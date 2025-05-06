@@ -1,7 +1,8 @@
 import { MarkdownRenderer } from '@/src/components/common/markdown'
 import { RoadmapActivityDetailsDto } from '@/src/services/moda-api'
-import { ColorPicker, Descriptions, Space } from 'antd'
+import { ColorPicker, Descriptions, Flex, Space } from 'antd'
 import dayjs from 'dayjs'
+import { FC } from 'react'
 
 const { Item: DescriptionsItem } = Descriptions
 
@@ -10,14 +11,14 @@ interface RoadmapActivityDrawerItemProps {
   openRoadmapItemDrawer: (itemId: string) => void
 }
 
-const RoadmapActivityDrawerItem: React.FC<RoadmapActivityDrawerItemProps> = (
+const RoadmapActivityDrawerItem: FC<RoadmapActivityDrawerItemProps> = (
   props: RoadmapActivityDrawerItemProps,
 ) => {
   const { activity } = props
 
   return (
-    <Space direction="vertical">
-      <Descriptions column={1}>
+    <Flex vertical gap="middle">
+      <Descriptions column={1} size="small">
         <DescriptionsItem label="Name">{activity.name}</DescriptionsItem>
         <DescriptionsItem label="Type">{activity.type.name}</DescriptionsItem>
         <DescriptionsItem label="Parent">
@@ -44,12 +45,12 @@ const RoadmapActivityDrawerItem: React.FC<RoadmapActivityDrawerItemProps> = (
           {dayjs(activity.end).format('MMM D, YYYY')}
         </DescriptionsItem>
       </Descriptions>
-      <Descriptions column={1} layout="vertical" style={{ paddingTop: 8 }}>
+      <Descriptions column={1} layout="vertical" size="small">
         <DescriptionsItem label="Description">
           <MarkdownRenderer markdown={activity?.description} />
         </DescriptionsItem>
       </Descriptions>
-    </Space>
+    </Flex>
   )
 }
 

@@ -7,7 +7,7 @@ import { useGetPortfoliosQuery } from '@/src/store/features/ppm/portfolios-api'
 import { AppstoreOutlined, MenuOutlined } from '@ant-design/icons'
 import { Button } from 'antd'
 import Segmented, { SegmentedLabeledOption } from 'antd/es/segmented'
-import { useEffect, useMemo, useState } from 'react'
+import { FC, useEffect, useMemo, useState } from 'react'
 import {
   CreatePortfolioForm,
   PortfoliosCardGrid,
@@ -32,7 +32,7 @@ const viewSelectorOptions: SegmentedLabeledOption[] = [
   },
 ]
 
-const PortfoliosPage: React.FC = () => {
+const PortfoliosPage: FC = () => {
   useDocumentTitle('Portfolios')
   const [currentView, setCurrentView] = useState<string | number>(Views.Cards)
   const [openCreatePortfolioForm, setOpenCreatePortfolioForm] =

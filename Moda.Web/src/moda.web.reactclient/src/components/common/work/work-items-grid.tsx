@@ -130,7 +130,7 @@ const WorkItemsGrid = (props: WorkItemsGridProps) => {
         cellRenderer: ProjectLinkCellRenderer,
       },
     ],
-    [],
+    [props.hideProjectColumn],
   )
 
   const refresh = useCallback(async () => {

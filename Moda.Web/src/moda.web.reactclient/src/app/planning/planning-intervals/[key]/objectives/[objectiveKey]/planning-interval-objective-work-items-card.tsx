@@ -12,8 +12,8 @@ import { useGetObjectiveWorkItemsQuery } from '@/src/store/features/planning/pla
 import { WorkProgress } from '@/src/components/common'
 
 export interface PlanningIntervalObjectiveWorkItemsCardProps {
-  planningIntervalId: string
-  objectiveId: string
+  planningIntervalKey: number
+  objectiveKey: number
   canLinkWorkItems: boolean
   width?: string | number
 }
@@ -31,8 +31,8 @@ const PlanningIntervalObjectiveWorkItemsCard = (
     isLoading,
     refetch,
   } = useGetObjectiveWorkItemsQuery({
-    planningIntervalId: props.planningIntervalId,
-    objectiveId: props.objectiveId,
+    planningIntervalKey: props.planningIntervalKey.toString(),
+    objectiveKey: props.objectiveKey.toString(),
   })
 
   const onWorkItemsDashboardClosed = () => {
@@ -90,15 +90,15 @@ const PlanningIntervalObjectiveWorkItemsCard = (
       {openWorkItemsDashboard && (
         <WorkItemsDashboardModal
           showDashboard={openWorkItemsDashboard}
-          planningIntervalId={props.planningIntervalId}
-          objectiveId={props.objectiveId}
+          planningIntervalKey={props.planningIntervalKey}
+          objectiveKey={props.objectiveKey}
           onModalClose={() => onWorkItemsDashboardClosed()}
         />
       )}
       {openManageWorkItemsForm && (
         <ManagePlanningIntervalObjectiveWorkItemsForm
-          planningIntervalId={props.planningIntervalId}
-          objectiveId={props.objectiveId}
+          planningIntervalKey={props.planningIntervalKey}
+          objectiveKey={props.objectiveKey}
           showForm={openManageWorkItemsForm}
           onFormComplete={() => onManageWorkItemsFormClosed(true)}
           onFormCancel={() => onManageWorkItemsFormClosed(false)}

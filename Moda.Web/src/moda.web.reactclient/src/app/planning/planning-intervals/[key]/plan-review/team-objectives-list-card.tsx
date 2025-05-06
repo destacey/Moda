@@ -31,10 +31,11 @@ export interface TeamObjectivesListCardProps {
   objectivesData: PlanningIntervalObjectiveListDto[]
   refreshObjectives: () => void
   planningIntervalId: string
+  planningIntervalKey: number
   teamId: string
   newObjectivesAllowed?: boolean
   refreshPlanningInterval: () => void
-  onObjectiveClick: (objectiveId: string) => void
+  onObjectiveClick: (objectiveKey: number) => void
   canManageObjectives: boolean
   canCreateHealthChecks: boolean
 }
@@ -56,6 +57,7 @@ const TeamObjectivesListCard = ({
   objectivesData,
   refreshObjectives,
   planningIntervalId,
+  planningIntervalKey,
   teamId,
   newObjectivesAllowed = false,
   refreshPlanningInterval,
@@ -69,7 +71,7 @@ const TeamObjectivesListCard = ({
     PlanningIntervalObjectiveListDto[]
   >([])
 
-  const messageApi = useMessage();
+  const messageApi = useMessage()
 
   const { badgeColor } = useTheme()
 
@@ -220,7 +222,7 @@ const TeamObjectivesListCard = ({
       </Card>
       {openCreateObjectiveForm && (
         <CreatePlanningIntervalObjectiveForm
-          planningIntervalId={planningIntervalId}
+          planningIntervalKey={planningIntervalKey}
           teamId={teamId}
           order={newObjectiveOrderValue()}
           showForm={openCreateObjectiveForm}

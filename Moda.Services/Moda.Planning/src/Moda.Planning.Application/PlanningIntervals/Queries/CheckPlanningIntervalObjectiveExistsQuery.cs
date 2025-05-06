@@ -1,13 +1,35 @@
-﻿namespace Moda.Planning.Application.PlanningIntervals.Queries;
-public sealed record CheckPlanningIntervalObjectiveExistsQuery(Guid PlanningIntervalId, Guid ObjectiveId) : IQuery<bool>;
+﻿using System.Linq;
+using System.Linq.Expressions;
+using Moda.Common.Application.Models;
 
-internal sealed class CheckPlanningIntervalObjectiveExistsQueryHandler(IPlanningDbContext planningDbContext) : IQueryHandler<CheckPlanningIntervalObjectiveExistsQuery, bool>
+namespace Moda.Planning.Application.PlanningIntervals.Queries;
+
+/// <summary>
+/// Query to check if a planning interval objective exists. If it exists, returns the ID of the objective.
+/// </summary>
+public sealed record CheckPlanningIntervalObjectiveExistsQuery : IQuery<Guid?>
+{
+    public CheckPlanningIntervalObjectiveExistsQuery(IdOrKey idOrKey, IdOrKey objectiveIdOrKey)
+    {
+        PlanningIntervalIdOrKeyFilter = idOrKey.CreateFilter<PlanningInterval>();
+        ObjectiveIdOrKeyFilter = objectiveIdOrKey.CreateFilter<PlanningIntervalObjective>();
+    }
+
+    public Expression<Func<PlanningInterval, bool>> PlanningIntervalIdOrKeyFilter { get; }
+    public Expression<Func<PlanningIntervalObjective, bool>> ObjectiveIdOrKeyFilter { get; }
+}
+
+internal sealed class CheckPlanningIntervalObjectiveExistsQueryHandler(IPlanningDbContext planningDbContext) : IQueryHandler<CheckPlanningIntervalObjectiveExistsQuery, Guid?>
 {
     private readonly IPlanningDbContext _planningDbContext = planningDbContext;
 
-    public async Task<bool> Handle(CheckPlanningIntervalObjectiveExistsQuery request, CancellationToken cancellationToken)
+    public async Task<Guid?> Handle(CheckPlanningIntervalObjectiveExistsQuery request, CancellationToken cancellationToken)
     {
         return await _planningDbContext.PlanningIntervals
-            .AnyAsync(p => p.Id == request.PlanningIntervalId && p.Objectives.Any(o => o.Id == request.ObjectiveId), cancellationToken);
+            .Where(request.PlanningIntervalIdOrKeyFilter)
+            .SelectMany(p => p.Objectives)
+            .Where(request.ObjectiveIdOrKeyFilter)
+            .Select(o => (Guid?)o.Id)
+            .FirstOrDefaultAsync(cancellationToken);
     }
 }

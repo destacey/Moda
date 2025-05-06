@@ -1,20 +1,26 @@
-﻿namespace Moda.Planning.Application.PlanningIntervals.Queries;
+﻿using Moda.Common.Application.Models;
+using System.Linq.Expressions;
 
-public sealed record GetPlanningIntervalTeamsQuery(Guid Id) : IQuery<IReadOnlyList<Guid>>;
+namespace Moda.Planning.Application.PlanningIntervals.Queries;
 
-internal sealed class GetPlanningIntervalTeamsQueryHandler : IQueryHandler<GetPlanningIntervalTeamsQuery, IReadOnlyList<Guid>>
+public sealed record GetPlanningIntervalTeamsQuery : IQuery<IReadOnlyList<Guid>>
 {
-    private readonly IPlanningDbContext _planningDbContext;
-
-    public GetPlanningIntervalTeamsQueryHandler(IPlanningDbContext planningDbContext)
+    public GetPlanningIntervalTeamsQuery(IdOrKey idOrKey)
     {
-        _planningDbContext = planningDbContext;
+        IdOrKeyFilter = idOrKey.CreateFilter<PlanningInterval>();
     }
+
+    public Expression<Func<PlanningInterval, bool>> IdOrKeyFilter { get; }
+}
+
+internal sealed class GetPlanningIntervalTeamsQueryHandler(IPlanningDbContext planningDbContext) : IQueryHandler<GetPlanningIntervalTeamsQuery, IReadOnlyList<Guid>>
+{
+    private readonly IPlanningDbContext _planningDbContext = planningDbContext;
 
     public async Task<IReadOnlyList<Guid>> Handle(GetPlanningIntervalTeamsQuery request, CancellationToken cancellationToken)
     {
         return await _planningDbContext.PlanningIntervals
-            .Where(p => p.Id == request.Id)
+            .Where(request.IdOrKeyFilter)
             .SelectMany(p => p.Teams.Select(t => t.TeamId))
             .ToListAsync(cancellationToken);
     }

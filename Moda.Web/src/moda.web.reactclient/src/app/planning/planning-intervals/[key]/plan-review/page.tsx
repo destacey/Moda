@@ -7,17 +7,17 @@ import { Alert, Card, Tag } from 'antd'
 import TeamPlanReview from './team-plan-review'
 import { notFound, useRouter } from 'next/navigation'
 import { ModaEmpty, PageTitle } from '@/src/components/common'
-import {
-  useGetPlanningInterval,
-  useGetPlanningIntervalTeams,
-} from '@/src/services/queries/planning-queries'
 import PlanningIntervalPlanReviewLoading from './loading'
 import { authorizePage } from '@/src/components/hoc'
+import {
+  useGetPlanningIntervalQuery,
+  useGetPlanningIntervalTeamsQuery,
+} from '@/src/store/features/planning/planning-interval-api'
 
 const PlanningIntervalPlanReviewPage = (props: {
   params: Promise<{ key: number }>
 }) => {
-  const { key } = use(props.params)
+  const { key: piKey } = use(props.params)
 
   useDocumentTitle('PI Plan Review')
   const [teams, setTeams] = useState<PlanningIntervalTeamResponse[]>([])
@@ -29,20 +29,20 @@ const PlanningIntervalPlanReviewPage = (props: {
   const {
     data: planningIntervalData,
     isLoading,
-    isFetching,
+    error,
     refetch: refetchPlanningInterval,
-  } = useGetPlanningInterval(key.toString())
+  } = useGetPlanningIntervalQuery(piKey)
 
   const { data: teamData, isLoading: teamsIsLoading } =
-    useGetPlanningIntervalTeams(planningIntervalData?.id, true)
+    useGetPlanningIntervalTeamsQuery(piKey)
 
   useEffect(() => {
-    if (planningIntervalData == null) return
+    if (!planningIntervalData || !teamData) return
     setPredictability(planningIntervalData?.predictability)
 
     const currentTeams = teamData
-      ?.sort((a, b) => a.code.localeCompare(b.code))
       .filter((t) => t.type === 'Team')
+      .sort((a, b) => a.code.localeCompare(b.code))
 
     setTeams(currentTeams)
 
@@ -95,7 +95,7 @@ const PlanningIntervalPlanReviewPage = (props: {
     return teams?.find((t) => t.code.toLowerCase() === activeTab)
   }, [teams, activeTab])
 
-  if (!isLoading && !isFetching && !planningIntervalData) {
+  if (!isLoading && !planningIntervalData) {
     notFound()
   }
   if (isLoading || teamsIsLoading) return <PlanningIntervalPlanReviewLoading />

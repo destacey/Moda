@@ -8,19 +8,19 @@ import {
   UpdatePlanningIntervalRequest,
 } from '@/src/services/moda-api'
 import { toFormErrors } from '@/src/utils'
-import {
-  useGetPlanningInterval,
-  useUpdatePlanningIntervalMutation,
-} from '@/src/services/queries/planning-queries'
 import { MarkdownEditor } from '@/src/components/common/markdown'
 import { useMessage } from '@/src/components/contexts/messaging'
+import {
+  useGetPlanningIntervalQuery,
+  useUpdatePlanningIntervalMutation,
+} from '@/src/store/features/planning/planning-interval-api'
 
 const { Item } = Form
 const { TextArea } = Input
 
 export interface EditPlanningIntervalFormProps {
   showForm: boolean
-  id: string
+  planningIntervalKey: number
   onFormUpdate: () => void
   onFormCancel: () => void
 }
@@ -43,7 +43,7 @@ const mapToRequestValues = (values: EditPlanningIntervalFormValues) => {
 
 const EditPlanningIntervalForm = ({
   showForm,
-  id,
+  planningIntervalKey,
   onFormUpdate,
   onFormCancel,
 }: EditPlanningIntervalFormProps) => {
@@ -54,14 +54,16 @@ const EditPlanningIntervalForm = ({
   const formValues = Form.useWatch([], form)
   const messageApi = useMessage()
 
-  const { data: planningIntervalData } = useGetPlanningInterval(id)
-  const updatePlanningInterval = useUpdatePlanningIntervalMutation()
+  const { data: planningIntervalData } =
+    useGetPlanningIntervalQuery(planningIntervalKey)
+  const [updatePlanningInterval, { error: mutationError }] =
+    useUpdatePlanningIntervalMutation()
 
-  const { hasClaim } = useAuth()
-  const canUpdatePlanningInterval = hasClaim(
-    'Permission',
+  const { hasPermissionClaim } = useAuth()
+  const canUpdatePlanningInterval = hasPermissionClaim(
     'Permissions.PlanningIntervals.Update',
   )
+
   const mapToFormValues = useCallback(
     (planningInterval: PlanningIntervalDetailsDto) => {
       form.setFieldsValue({
@@ -79,7 +81,15 @@ const EditPlanningIntervalForm = ({
   ): Promise<boolean> => {
     try {
       const request = mapToRequestValues(values)
-      await updatePlanningInterval.mutateAsync(request)
+      const response = await updatePlanningInterval({
+        request,
+        cacheKey: planningIntervalKey,
+      })
+      if (response.error) {
+        throw response.error
+      }
+      messageApi.success('Planning interval updated successfully.')
+
       return true
     } catch (error) {
       if (error.status === 422 && error.errors) {
@@ -104,7 +114,6 @@ const EditPlanningIntervalForm = ({
         setIsOpen(false)
         form.resetFields()
         onFormUpdate()
-        messageApi.success('Successfully updated planning interval.')
       }
     } catch (errorInfo) {
       console.error('handleOk error', errorInfo)

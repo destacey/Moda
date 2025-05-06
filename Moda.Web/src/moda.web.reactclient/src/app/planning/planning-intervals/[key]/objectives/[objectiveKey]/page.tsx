@@ -10,7 +10,6 @@ import EditPlanningIntervalObjectiveForm from '../../../_components/edit-plannin
 import { ItemType } from 'antd/es/menu/interface'
 import DeletePlanningIntervalObjectiveForm from './delete-planning-interval-objective-form'
 import { authorizePage } from '@/src/components/hoc'
-import { useGetPlanningIntervalObjectiveByKey } from '@/src/services/queries/planning-queries'
 import { notFound, useRouter } from 'next/navigation'
 import { useAppDispatch, useAppSelector } from '@/src/hooks'
 import PlanningIntervalObjectiveDetailsLoading from './loading'
@@ -20,11 +19,12 @@ import HealthCheckTag from '@/src/components/common/health-check/health-check-ta
 import { beginHealthCheckCreate } from '@/src/store/features/health-check-slice'
 import Link from 'next/link'
 import { PageActions } from '@/src/components/common'
+import { useGetPlanningIntervalObjectiveQuery } from '@/src/store/features/planning/planning-interval-api'
 
 const ObjectiveDetailsPage = (props: {
   params: Promise<{ key: number; objectiveKey: number }>
 }) => {
-  const { key, objectiveKey } = use(props.params)
+  const { key: planningIntervalKey, objectiveKey } = use(props.params)
 
   useDocumentTitle('PI Objective Details')
 
@@ -37,9 +37,11 @@ const ObjectiveDetailsPage = (props: {
   const {
     data: objectiveData,
     isLoading,
-    isFetching,
     refetch: refetchObjective,
-  } = useGetPlanningIntervalObjectiveByKey(key, objectiveKey)
+  } = useGetPlanningIntervalObjectiveQuery({
+    planningIntervalKey: planningIntervalKey.toString(),
+    objectiveKey: objectiveKey.toString(),
+  })
 
   const router = useRouter()
   const { hasClaim } = useAuth()
@@ -81,7 +83,7 @@ const ObjectiveDetailsPage = (props: {
     setOpenDeleteObjectiveForm(false)
     if (wasSaved) {
       // redirect to the PI details page
-      router.push(`/planning/planning-intervals/${key}`)
+      router.push(`/planning/planning-intervals/${planningIntervalKey}`)
     }
   }
 
@@ -127,7 +129,7 @@ const ObjectiveDetailsPage = (props: {
       key: 'healthReport',
       label: (
         <Link
-          href={`/planning/planning-intervals/${key}/objectives/${objectiveKey}/health-report`}
+          href={`/planning/planning-intervals/${planningIntervalKey}/objectives/${objectiveKey}/health-report`}
         >
           Health Report
         </Link>
@@ -140,15 +142,15 @@ const ObjectiveDetailsPage = (props: {
     canManageObjectives,
     dispatch,
     objectiveData?.id,
-    key,
     objectiveKey,
+    planningIntervalKey,
   ])
 
   if (isLoading) {
     return <PlanningIntervalObjectiveDetailsLoading />
   }
 
-  if (!isLoading && !isFetching && !objectiveData) {
+  if (!isLoading && !objectiveData) {
     notFound()
   }
 
@@ -171,8 +173,8 @@ const ObjectiveDetailsPage = (props: {
       {openUpdateObjectiveForm && (
         <EditPlanningIntervalObjectiveForm
           showForm={openUpdateObjectiveForm}
-          objectiveId={objectiveData?.id}
-          planningIntervalId={objectiveData?.planningInterval?.id}
+          objectiveKey={objectiveData?.key}
+          planningIntervalKey={objectiveData?.planningInterval?.key}
           onFormSave={() => onUpdateObjectiveFormClosed(true)}
           onFormCancel={() => onUpdateObjectiveFormClosed(false)}
         />

@@ -1,7 +1,8 @@
 import { MarkdownRenderer } from '@/src/components/common/markdown'
 import { RoadmapTimeboxDetailsDto } from '@/src/services/moda-api'
-import { Descriptions, Space } from 'antd'
+import { Descriptions, Flex } from 'antd'
 import dayjs from 'dayjs'
+import { FC } from 'react'
 
 const { Item: DescriptionsItem } = Descriptions
 
@@ -10,14 +11,14 @@ interface RoadmapTimeboxDrawerItemProps {
   openRoadmapItemDrawer: (itemId: string) => void
 }
 
-const RoadmapTimeboxDrawerItem: React.FC<RoadmapTimeboxDrawerItemProps> = (
+const RoadmapTimeboxDrawerItem: FC<RoadmapTimeboxDrawerItemProps> = (
   props: RoadmapTimeboxDrawerItemProps,
 ) => {
   const { timebox } = props
 
   return (
-    <Space direction="vertical">
-      <Descriptions column={1}>
+    <Flex vertical gap="middle">
+      <Descriptions column={1} size="small">
         <DescriptionsItem label="Name">{timebox.name}</DescriptionsItem>
         <DescriptionsItem label="Type">{timebox.type.name}</DescriptionsItem>
         <DescriptionsItem label="Parent">
@@ -34,12 +35,12 @@ const RoadmapTimeboxDrawerItem: React.FC<RoadmapTimeboxDrawerItemProps> = (
           {dayjs(timebox.end).format('MMM D, YYYY')}
         </DescriptionsItem>
       </Descriptions>
-      <Descriptions column={1} layout="vertical" style={{ paddingTop: 8 }}>
+      <Descriptions column={1} layout="vertical" size="small">
         <DescriptionsItem label="Description">
           <MarkdownRenderer markdown={timebox?.description} />
         </DescriptionsItem>
       </Descriptions>
-    </Space>
+    </Flex>
   )
 }
 

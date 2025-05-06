@@ -18,21 +18,22 @@ import {
   PlanningIntervalIterationListDto,
 } from '@/src/services/moda-api'
 import { toFormErrors } from '@/src/utils'
-import {
-  useGetPlanningInterval,
-  useGetPlanningIntervalIterationTypeOptions,
-  useGetPlanningIntervalIterations,
-  useManagePlanningIntervalDatesMutation,
-} from '@/src/services/queries/planning-queries'
 import dayjs from 'dayjs'
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons'
 import { useMessage } from '@/src/components/contexts/messaging'
+import {
+  useGetPlanningIntervalIterationsQuery,
+  useGetPlanningIntervalIterationTypeOptionsQuery,
+  useGetPlanningIntervalQuery,
+  useUpdatePlanningIntervalDatesMutation,
+} from '@/src/store/features/planning/planning-interval-api'
 
 const { Item, List } = Form
 
 export interface ManagePlanningIntervalDatesFormProps {
   showForm: boolean
   id: string
+  planningIntervalKey: number
   onFormSave: () => void
   onFormCancel: () => void
 }
@@ -72,6 +73,7 @@ const mapToRequestValues = (
 const ManagePlanningIntervalDatesForm = ({
   showForm,
   id,
+  planningIntervalKey,
   onFormSave,
   onFormCancel,
 }: ManagePlanningIntervalDatesFormProps) => {
@@ -83,17 +85,21 @@ const ManagePlanningIntervalDatesForm = ({
   const formValues = Form.useWatch([], form)
   const messageApi = useMessage()
 
-  const { data: planningIntervalData } = useGetPlanningInterval(id)
-  const { data: iterationsData } = useGetPlanningIntervalIterations(id)
+  const { data: planningIntervalData } =
+    useGetPlanningIntervalQuery(planningIntervalKey)
+  const { data: iterationsData } =
+    useGetPlanningIntervalIterationsQuery(planningIntervalKey)
   const { data: iterationTypesOptions } =
-    useGetPlanningIntervalIterationTypeOptions()
-  const managePlanningIntervalDates = useManagePlanningIntervalDatesMutation()
+    useGetPlanningIntervalIterationTypeOptionsQuery()
 
-  const { hasClaim } = useAuth()
-  const canUpdatePlanningInterval = hasClaim(
-    'Permission',
+  const [managePlanningIntervalDates, { error: mutationError }] =
+    useUpdatePlanningIntervalDatesMutation()
+
+  const { hasPermissionClaim } = useAuth()
+  const canUpdatePlanningInterval = hasPermissionClaim(
     'Permissions.PlanningIntervals.Update',
   )
+
   const mapToFormValues = useCallback(
     (
       planningInterval: PlanningIntervalDetailsDto,
@@ -120,7 +126,15 @@ const ManagePlanningIntervalDatesForm = ({
   ): Promise<boolean> => {
     try {
       const request = mapToRequestValues(values, id)
-      await managePlanningIntervalDates.mutateAsync(request)
+      const response = await managePlanningIntervalDates({
+        request,
+        cacheKey: planningIntervalKey,
+      })
+      if (response.error) {
+        throw response.error
+      }
+      messageApi.success('Planning interval dates updated successfully.')
+
       return true
     } catch (error) {
       if (error.status === 422 && error.errors) {
@@ -146,7 +160,6 @@ const ManagePlanningIntervalDatesForm = ({
         setIsOpen(false)
         form.resetFields()
         onFormSave()
-        messageApi.success('Successfully updated planning interval dates.')
       }
     } catch (errorInfo) {
       console.error('handleOk error', errorInfo)

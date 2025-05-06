@@ -4,25 +4,25 @@ import PageTitle from '@/src/components/common/page-title'
 import { use, useEffect } from 'react'
 import { useDocumentTitle } from '@/src/hooks/use-document-title'
 import { authorizePage } from '@/src/components/hoc'
-import { useGetPlanningIntervalObjectiveByKey } from '@/src/services/queries/planning-queries'
 import { notFound, usePathname } from 'next/navigation'
 import { useAppDispatch } from '@/src/hooks'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import HealthCheckTag from '@/src/components/common/health-check/health-check-tag'
 import HealthReportGrid from '@/src/components/common/health-check/health-report-grid'
+import { useGetPlanningIntervalObjectiveQuery } from '@/src/store/features/planning/planning-interval-api'
 
 const ObjectiveHealthReportPage = (props: {
   params: Promise<{ key: number; objectiveKey: number }>
 }) => {
-  const { key, objectiveKey } = use(props.params)
+  const { key: planningIntervalKey, objectiveKey } = use(props.params)
 
   useDocumentTitle('PI Objective Health Report')
 
-  const {
-    data: objectiveData,
-    isLoading,
-    isFetching,
-  } = useGetPlanningIntervalObjectiveByKey(key, objectiveKey)
+  const { data: objectiveData, isLoading } =
+    useGetPlanningIntervalObjectiveQuery({
+      planningIntervalKey: planningIntervalKey.toString(),
+      objectiveKey: objectiveKey.toString(),
+    })
 
   const pathname = usePathname()
   const dispatch = useAppDispatch()
@@ -62,7 +62,7 @@ const ObjectiveHealthReportPage = (props: {
     )
   }, [dispatch, objectiveData, pathname])
 
-  if (!isLoading && !isFetching && !objectiveData) {
+  if (!isLoading && !objectiveData) {
     notFound()
   }
 

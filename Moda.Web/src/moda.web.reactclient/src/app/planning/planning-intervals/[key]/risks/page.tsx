@@ -1,15 +1,13 @@
 'use client'
 
 import { useDocumentTitle } from '@/src/hooks'
-import {
-  useGetPlanningInterval,
-  useGetPlanningIntervalRisks,
-} from '@/src/services/queries/planning-queries'
+import { useGetPlanningIntervalRisks } from '@/src/services/queries/planning-queries'
 import { use, useCallback, useState } from 'react'
 import { PageTitle } from '@/src/components/common'
 import { notFound } from 'next/navigation'
 import RisksGrid from '@/src/components/common/planning/risks-grid'
 import { authorizePage } from '@/src/components/hoc'
+import { useGetPlanningIntervalQuery } from '@/src/store/features/planning/planning-interval-api'
 
 const PlanningIntervalRisksPage = (props: {
   params: Promise<{ key: number }>
@@ -19,18 +17,15 @@ const PlanningIntervalRisksPage = (props: {
   useDocumentTitle('PI Risks')
   const [includeClosedRisks, setIncludeClosedRisks] = useState<boolean>(false)
 
-  const {
-    data: planningIntervalData,
-    isLoading,
-    isFetching,
-  } = useGetPlanningInterval(key.toString())
+  const { data: planningIntervalData, isLoading } =
+    useGetPlanningIntervalQuery(key)
 
   const risksQuery = useGetPlanningIntervalRisks(
     planningIntervalData?.id,
     includeClosedRisks,
   )
 
-  if (!isLoading && !isFetching && !planningIntervalData) {
+  if (!isLoading && !planningIntervalData) {
     notFound()
   }
 

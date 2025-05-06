@@ -9,7 +9,7 @@ import { getSortedNames } from '@/src/utils'
 import { getDrawerWidthPercentage } from '@/src/utils/window-utils'
 import { Descriptions, Drawer, Flex, Spin } from 'antd'
 import Link from 'next/link'
-import { useCallback, useEffect, useMemo } from 'react'
+import { FC, useCallback, useEffect, useMemo } from 'react'
 
 const { Item } = Descriptions
 
@@ -19,7 +19,7 @@ export interface StrategicInitiativeDrawerProps {
   onDrawerClose: () => void
 }
 
-const StrategicInitiativeDrawer: React.FC<StrategicInitiativeDrawerProps> = (
+const StrategicInitiativeDrawer: FC<StrategicInitiativeDrawerProps> = (
   props: StrategicInitiativeDrawerProps,
 ) => {
   const messageApi = useMessage()
@@ -107,7 +107,7 @@ const StrategicInitiativeDrawer: React.FC<StrategicInitiativeDrawerProps> = (
             <Item label="Sponsors">{sponsorNames}</Item>
             <Item label="Owners">{ownerNames}</Item>
           </Descriptions>
-          <Descriptions layout="vertical" size="small">
+          <Descriptions column={1} layout="vertical" size="small">
             <Item label="Description">
               <MarkdownRenderer
                 markdown={strategicInitiativeData?.description}
