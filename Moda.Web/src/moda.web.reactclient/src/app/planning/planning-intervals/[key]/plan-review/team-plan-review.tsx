@@ -15,11 +15,11 @@ import {
   PlanningIntervalObjectiveDetailsDrawer,
   PlanningIntervalObjectivesTimeline,
 } from '../../_components'
-import { useGetPlanningIntervalRisksByTeamId } from '@/src/services/queries/planning-queries'
 import {
   useGetPlanningIntervalCalendarQuery,
   useGetPlanningIntervalObjectivesQuery,
   useGetPlanningIntervalTeamPredictabilityQuery,
+  useGetPlanningIntervalRisksQuery,
 } from '@/src/store/features/planning/planning-interval-api'
 import useAuth from '@/src/components/contexts/auth'
 
@@ -66,12 +66,20 @@ const TeamPlanReview = ({
         planningIntervalKey: planningInterval?.key,
         teamId: team?.id,
       },
-      { skip: !planningInterval?.id || !team?.id },
+      { skip: !planningInterval?.key || !team?.id },
     )
 
-  const risksQuery = useGetPlanningIntervalRisksByTeamId(
-    planningInterval?.id,
-    team?.id,
+  const {
+    data: risksData,
+    isLoading: risksIsLoading,
+    error: risksError,
+    refetch: refetchRisks,
+  } = useGetPlanningIntervalRisksQuery(
+    {
+      planningIntervalKey: planningInterval?.key,
+      teamId: team?.id,
+    },
+    { skip: !planningInterval?.key || !team?.id },
   )
 
   const { data: teamPredictabilityData } =
@@ -155,10 +163,11 @@ const TeamPlanReview = ({
           </Col>
           <Col xs={24} sm={24} md={24} lg={12}>
             <TeamRisksListCard
-              riskQuery={risksQuery}
+              risks={risksData}
               teamId={team?.id}
               canCreateRisks={canCreateRisks}
               canUpdateRisks={canUpdateRisks}
+              refreshRisks={refetchRisks}
             />
           </Col>
         </Row>

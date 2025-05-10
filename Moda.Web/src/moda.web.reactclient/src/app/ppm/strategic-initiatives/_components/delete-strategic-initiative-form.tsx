@@ -28,39 +28,28 @@ const DeleteStrategicInitiativeForm = (
   const formAction = async (
     strategicInitiative: StrategicInitiativeDetailsDto,
   ) => {
-    try {
-      const response = await deleteStrategicInitiativeMutation(
-        strategicInitiative.id,
-      )
+    const response = await deleteStrategicInitiativeMutation(
+      strategicInitiative.id,
+    )
 
-      if (response.error) {
-        throw response.error
-      }
-
-      return true
-    } catch (error) {
-      messageApi.error(
-        error.detail ??
-          'An unexpected error occurred while deleting the strategic initiative.',
-      )
-      console.log(error)
-      return false
+    if (response.error) {
+      throw response.error
     }
   }
 
   const handleOk = async () => {
     setIsSaving(true)
     try {
-      if (await formAction(props.strategicInitiative)) {
-        // TODO: not working because the parent page is gone
-        messageApi.success('Successfully deleted strategic initiative.')
-        props.onFormComplete()
-        setIsOpen(false)
-      }
-    } catch (errorInfo) {
-      console.log('handleOk error', errorInfo)
+      await formAction(props.strategicInitiative)
+
+      messageApi.success('Successfully deleted strategic initiative.')
+      setIsOpen(false)
+      props.onFormComplete()
+    } catch (error) {
+      console.log('handleOk error', error)
       messageApi.error(
-        'An unexpected error occurred while deleting the strategic initiative.',
+        error.detail ??
+          'An unexpected error occurred while deleting the strategic initiative.',
       )
     } finally {
       setIsSaving(false)

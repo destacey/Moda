@@ -1,63 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from 'react-query'
-import { getPlanningIntervalsClient, getRisksClient } from '../clients'
+import { getRisksClient } from '../clients'
 import { QK } from './query-keys'
 import { CreateRiskRequest, UpdateRiskRequest } from '../moda-api'
 import _ from 'lodash'
 import { OptionModel } from '@/src/components/types'
-
-// PLANNING INTERVAL - OBJECTIVES
-export const useGetPlanningIntervalObjectivesHealthReport = (
-  idOrKey: string,
-  teamId?: string,
-  enabled: boolean = true,
-) => {
-  return useQuery({
-    queryKey: [QK.PLANNING_INTERVAL_OBJECTIVES_HEALTH_REPORT, idOrKey, teamId],
-    queryFn: async () =>
-      getPlanningIntervalsClient().getObjectivesHealthReport(idOrKey, teamId),
-    // staleTime: 20000,
-    enabled: !!idOrKey && enabled,
-  })
-}
-
-// PLANNING INTERVAL - RISKS
-export const useGetPlanningIntervalRisks = (
-  id: string,
-  includeClosed: boolean = false,
-  enabled: boolean = true,
-) => {
-  return useQuery({
-    queryKey: [
-      QK.PLANNING_INTERVAL_RISKS,
-      id,
-      { includeClosed: includeClosed },
-    ],
-    queryFn: async () =>
-      getPlanningIntervalsClient().getRisks(id, null, includeClosed),
-    // staleTime: 10000,
-    enabled: !!id && enabled,
-  })
-}
-
-export const useGetPlanningIntervalRisksByTeamId = (
-  id: string,
-  teamId: string,
-  includeClosed: boolean = false,
-  enabled: boolean = true,
-) => {
-  return useQuery({
-    queryKey: [
-      QK.PLANNING_INTERVAL_RISKS,
-      id,
-      teamId,
-      { includeClosed: includeClosed },
-    ],
-    queryFn: async () =>
-      getPlanningIntervalsClient().getRisks(id, teamId, includeClosed),
-    // staleTime: 20000,
-    enabled: !!id && !!teamId && enabled,
-  })
-}
 
 // RISKS
 export const useGetRisk = (idOrKey: string) => {

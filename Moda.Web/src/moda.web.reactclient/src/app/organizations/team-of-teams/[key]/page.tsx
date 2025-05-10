@@ -129,8 +129,10 @@ const TeamOfTeamsDetailsPage = (props: {
       key: TeamOfTeamsTabs.RiskManagement,
       tab: 'Risk Management',
       content: createElement(RisksGrid, {
-        risksQuery: risksQuery,
+        risks: risksQuery.data,
         updateIncludeClosed: onIncludeClosedRisksChanged,
+        isLoadingRisks: risksQuery.isLoading,
+        refreshRisks: risksQuery.refetch,
         newRisksAllowed: true,
         teamId: team?.id,
         hideTeamColumn: true,

@@ -9,10 +9,12 @@ import {
   PlanningIntervalIterationListDto,
   PlanningIntervalListDto,
   PlanningIntervalObjectiveDetailsDto,
+  PlanningIntervalObjectiveHealthCheckDto,
   PlanningIntervalObjectiveListDto,
   PlanningIntervalObjectiveStatusDto,
   PlanningIntervalPredictabilityDto,
   PlanningIntervalTeamResponse,
+  RiskListDto,
   UpdatePlanningIntervalObjectiveRequest,
   UpdatePlanningIntervalObjectivesOrderRequest,
   UpdatePlanningIntervalRequest,
@@ -381,6 +383,43 @@ export const planningIntervalApi = apiSlice.injectEndpoints({
         return [{ type: QueryTags.PlanningIntervalObjective }]
       },
     }),
+    deletePlanningIntervalObjective: builder.mutation<
+      void,
+      {
+        planningIntervalId: string
+        planningIntervalKey: number
+        objectiveId: string
+        objectiveKey: number
+        teamId: string
+      }
+    >({
+      queryFn: async ({ planningIntervalId, objectiveId }) => {
+        try {
+          const data = await getPlanningIntervalsClient().deleteObjective(
+            planningIntervalId,
+            objectiveId,
+          )
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, arg) => {
+        return [
+          { type: QueryTags.PlanningIntervalObjective, id: 'LIST' },
+          { type: QueryTags.PlanningIntervalObjective, id: arg.objectiveKey },
+          {
+            type: QueryTags.PlanningIntervalPredictability,
+            id: arg.planningIntervalKey,
+          },
+          {
+            type: QueryTags.PlanningIntervalTeamPredictability,
+            id: `${arg.planningIntervalKey}:${arg.teamId}`,
+          },
+        ]
+      },
+    }),
     getObjectiveWorkItems: builder.query<
       WorkItemsSummaryDto,
       {
@@ -464,6 +503,24 @@ export const planningIntervalApi = apiSlice.injectEndpoints({
         ]
       },
     }),
+    getPlanningIntervalObjectivesHealthReport: builder.query<
+      PlanningIntervalObjectiveHealthCheckDto[],
+      { planningIntervalKey: number; teamId?: string }
+    >({
+      queryFn: async (request) => {
+        try {
+          const data =
+            await getPlanningIntervalsClient().getObjectivesHealthReport(
+              request.planningIntervalKey.toString(),
+              request.teamId,
+            )
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+    }),
     getPlanningIntervalObjectiveStatuses: builder.query<
       PlanningIntervalObjectiveStatusDto[],
       void
@@ -511,6 +568,36 @@ export const planningIntervalApi = apiSlice.injectEndpoints({
         { type: QueryTags.PlanningIntervalObjectiveStatusOptions, id: 'LIST' },
       ],
     }),
+    getPlanningIntervalRisks: builder.query<
+      RiskListDto[],
+      {
+        planningIntervalKey: number
+        includeClosed?: boolean
+        teamId?: string
+      }
+    >({
+      queryFn: async (request) => {
+        try {
+          const data = await getPlanningIntervalsClient().getRisks(
+            request.planningIntervalKey.toString(),
+            request.includeClosed,
+            request.teamId,
+          )
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: (result, error, arg) => [
+        {
+          type: QueryTags.PlanningIntervalRisk,
+          id: arg.teamId
+            ? `${arg.planningIntervalKey}:${arg.teamId}`
+            : arg.planningIntervalKey,
+        },
+      ],
+    }),
   }),
 })
 
@@ -530,10 +617,13 @@ export const {
   useGetPlanningIntervalObjectiveQuery,
   useCreatePlanningIntervalObjectiveMutation,
   useUpdatePlanningIntervalObjectiveMutation,
+  useUpdateObjectivesOrderMutation,
+  useDeletePlanningIntervalObjectiveMutation,
   useGetObjectiveWorkItemsQuery,
   useGetObjectiveWorkItemMetricsQuery,
-  useUpdateObjectivesOrderMutation,
   useManageObjectiveWorkItemsMutation,
+  useGetPlanningIntervalObjectivesHealthReportQuery,
   useGetPlanningIntervalObjectiveStatusesQuery,
   useGetPlanningIntervalObjectiveStatusOptionsQuery,
+  useGetPlanningIntervalRisksQuery,
 } = planningIntervalApi

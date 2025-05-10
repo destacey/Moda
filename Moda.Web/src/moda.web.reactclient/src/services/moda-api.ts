@@ -7283,21 +7283,19 @@ export class PlanningIntervalsClient {
     }
 
     /**
-     * Get planning interval risks.
-     * @param teamId (optional) 
+     * Get planning interval risks. The default value for includeClosed is false.
      * @param includeClosed (optional) 
+     * @param teamId (optional) 
      */
-    getRisks(id: string, teamId: string | null | undefined, includeClosed: boolean | undefined, cancelToken?: CancelToken): Promise<RiskListDto[]> {
-        let url_ = this.baseUrl + "/api/planning/planning-intervals/{id}/risks?";
-        if (id === undefined || id === null)
-            throw new Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+    getRisks(idOrKey: string, includeClosed: boolean | null | undefined, teamId: string | null | undefined, cancelToken?: CancelToken): Promise<RiskListDto[]> {
+        let url_ = this.baseUrl + "/api/planning/planning-intervals/{idOrKey}/risks?";
+        if (idOrKey === undefined || idOrKey === null)
+            throw new Error("The parameter 'idOrKey' must be defined.");
+        url_ = url_.replace("{idOrKey}", encodeURIComponent("" + idOrKey));
+        if (includeClosed !== undefined && includeClosed !== null)
+            url_ += "includeClosed=" + encodeURIComponent("" + includeClosed) + "&";
         if (teamId !== undefined && teamId !== null)
             url_ += "teamId=" + encodeURIComponent("" + teamId) + "&";
-        if (includeClosed === null)
-            throw new Error("The parameter 'includeClosed' cannot be null.");
-        else if (includeClosed !== undefined)
-            url_ += "includeClosed=" + encodeURIComponent("" + includeClosed) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {

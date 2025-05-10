@@ -5873,25 +5873,31 @@
         ]
       }
     },
-    "/api/planning/planning-intervals/{id}/risks": {
+    "/api/planning/planning-intervals/{idOrKey}/risks": {
       "get": {
         "tags": [
           "PlanningIntervals"
         ],
-        "summary": "Get planning interval risks.",
+        "summary": "Get planning interval risks. The default value for includeClosed is false.",
         "operationId": "PlanningIntervals_GetRisks",
         "parameters": [
           {
-            "name": "id",
+            "name": "idOrKey",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string",
-              "format": "guid",
-              "nullable": false,
-              "example": "00000000-0000-0000-0000-000000000000"
+              "type": "string"
             },
             "x-position": 1
+          },
+          {
+            "name": "includeClosed",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "nullable": true
+            },
+            "x-position": 2
           },
           {
             "name": "teamId",
@@ -5899,16 +5905,8 @@
             "schema": {
               "type": "string",
               "format": "guid",
-              "nullable": true
-            },
-            "x-position": 2
-          },
-          {
-            "name": "includeClosed",
-            "in": "query",
-            "schema": {
-              "type": "boolean",
-              "default": false
+              "nullable": true,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 3
           }

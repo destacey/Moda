@@ -1,29 +1,36 @@
 'use client'
 
 import { useDocumentTitle } from '@/src/hooks'
-import { useGetPlanningIntervalRisks } from '@/src/services/queries/planning-queries'
 import { use, useCallback, useState } from 'react'
 import { PageTitle } from '@/src/components/common'
 import { notFound } from 'next/navigation'
 import RisksGrid from '@/src/components/common/planning/risks-grid'
 import { authorizePage } from '@/src/components/hoc'
-import { useGetPlanningIntervalQuery } from '@/src/store/features/planning/planning-interval-api'
+import {
+  useGetPlanningIntervalQuery,
+  useGetPlanningIntervalRisksQuery,
+} from '@/src/store/features/planning/planning-interval-api'
 
 const PlanningIntervalRisksPage = (props: {
   params: Promise<{ key: number }>
 }) => {
-  const { key } = use(props.params)
+  const { key: piKey } = use(props.params)
 
   useDocumentTitle('PI Risks')
   const [includeClosedRisks, setIncludeClosedRisks] = useState<boolean>(false)
 
   const { data: planningIntervalData, isLoading } =
-    useGetPlanningIntervalQuery(key)
+    useGetPlanningIntervalQuery(piKey)
 
-  const risksQuery = useGetPlanningIntervalRisks(
-    planningIntervalData?.id,
-    includeClosedRisks,
-  )
+  const {
+    data: risksData,
+    isLoading: risksIsLoading,
+    error: risksError,
+    refetch: refetchRisks,
+  } = useGetPlanningIntervalRisksQuery({
+    planningIntervalKey: piKey,
+    includeClosed: includeClosedRisks,
+  })
 
   if (!isLoading && !planningIntervalData) {
     notFound()
@@ -37,8 +44,10 @@ const PlanningIntervalRisksPage = (props: {
     <>
       <PageTitle title="PI Risks" />
       <RisksGrid
-        risksQuery={risksQuery}
+        risks={risksData}
         updateIncludeClosed={onIncludeClosedRisksChanged}
+        isLoadingRisks={risksIsLoading}
+        refreshRisks={refetchRisks}
         newRisksAllowed={true}
         hideTeamColumn={false}
         gridHeight={650}
