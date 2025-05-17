@@ -48,7 +48,7 @@ const RisksGrid = ({
   const [hideTeam, setHideTeam] = useState<boolean>(hideTeamColumn)
   const [openCreateRiskForm, setOpenCreateRiskForm] = useState<boolean>(false)
   const [openUpdateRiskForm, setOpenUpdateRiskForm] = useState<boolean>(false)
-  const [editRiskId, setEditRiskId] = useState<string | null>(null)
+  const [editRiskKey, setEditRiskKey] = useState<number | null>(null)
 
   const { hasPermissionClaim } = useAuth()
   const canCreateRisks = hasPermissionClaim('Permissions.Risks.Create')
@@ -65,8 +65,8 @@ const RisksGrid = ({
   }
 
   const editRiskButtonClicked = useCallback(
-    (id: string) => {
-      setEditRiskId(id)
+    (key: number) => {
+      setEditRiskKey(key)
       setOpenUpdateRiskForm(true)
     },
     [setOpenUpdateRiskForm],
@@ -74,7 +74,7 @@ const RisksGrid = ({
 
   const onEditRiskFormClosed = (wasSaved: boolean) => {
     setOpenUpdateRiskForm(false)
-    setEditRiskId(null)
+    setEditRiskKey(null)
     if (wasSaved) {
       refreshRisks()
     }
@@ -140,7 +140,7 @@ const RisksGrid = ({
                 type="text"
                 size="small"
                 icon={<EditOutlined />}
-                onClick={() => editRiskButtonClicked(params.data.id)}
+                onClick={() => editRiskButtonClicked(params.data.key)}
               />
             )
           )
@@ -202,7 +202,7 @@ const RisksGrid = ({
       {openUpdateRiskForm && (
         <EditRiskForm
           showForm={openUpdateRiskForm}
-          riskId={editRiskId}
+          riskKey={editRiskKey}
           onFormSave={() => onEditRiskFormClosed(true)}
           onFormCancel={() => onEditRiskFormClosed(false)}
         />

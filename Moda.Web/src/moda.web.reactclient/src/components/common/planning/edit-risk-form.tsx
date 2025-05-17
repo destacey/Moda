@@ -3,6 +3,7 @@
 import {
   DatePicker,
   Descriptions,
+  Flex,
   Form,
   Input,
   Modal,
@@ -14,16 +15,16 @@ import useAuth from '../../contexts/auth'
 import { RiskDetailsDto, UpdateRiskRequest } from '@/src/services/moda-api'
 import { toFormErrors } from '@/src/utils'
 import dayjs from 'dayjs'
-import {
-  useGetRisk,
-  useGetRiskCategoryOptions,
-  useGetRiskGradeOptions,
-  useGetRiskStatusOptions,
-  useUpdateRiskMutation,
-} from '@/src/services/queries/planning-queries'
-import { useGetEmployeeOptions } from '@/src/services/queries/organization-queries'
 import { MarkdownEditor } from '../markdown'
 import { useMessage } from '../../contexts/messaging'
+import {
+  useGetRiskCategoryOptionsQuery,
+  useGetRiskGradeOptionsQuery,
+  useGetRiskQuery,
+  useGetRiskStatusOptionsQuery,
+  useUpdateRiskMutation,
+} from '@/src/store/features/planning/risks-api'
+import { useGetEmployeeOptionsQuery } from '@/src/store/features/organizations/employee-api'
 
 const { Item } = Descriptions
 const { Item: FormItem } = Form
@@ -32,7 +33,7 @@ const { Group: RadioGroup } = Radio
 
 export interface EditRiskFormProps {
   showForm: boolean
-  riskId: string
+  riskKey: number
   onFormSave: () => void
   onFormCancel: () => void
 }
@@ -69,7 +70,7 @@ const mapToRequestValues = (values: EditRiskFormValues) => {
 
 const EditRiskForm = ({
   showForm,
-  riskId,
+  riskKey,
   onFormSave,
   onFormCancel,
 }: EditRiskFormProps) => {
@@ -80,14 +81,16 @@ const EditRiskForm = ({
   const formValues = Form.useWatch([], form)
   const messageApi = useMessage()
 
-  const { data: riskData } = useGetRisk(riskId)
-  const [riskNumber, setRiskNumber] = useState<number>(undefined)
   const [teamName, setTeamName] = useState<string>('')
-  const updateRisk = useUpdateRiskMutation()
-  const { data: riskStatusOptions } = useGetRiskStatusOptions()
-  const { data: riskCategoryOptions } = useGetRiskCategoryOptions()
-  const { data: riskGradeOptions } = useGetRiskGradeOptions()
-  const { data: employeeOptions } = useGetEmployeeOptions()
+
+  const { data: riskData } = useGetRiskQuery(riskKey)
+
+  const [updateRisk, { error: mutationError }] = useUpdateRiskMutation()
+
+  const { data: riskStatusOptions } = useGetRiskStatusOptionsQuery()
+  const { data: riskCategoryOptions } = useGetRiskCategoryOptionsQuery()
+  const { data: riskGradeOptions } = useGetRiskGradeOptionsQuery()
+  const { data: employeeOptions } = useGetEmployeeOptionsQuery(true)
 
   const { hasPermissionClaim } = useAuth()
   const canUpdateRisks = hasPermissionClaim('Permissions.Risks.Update')
@@ -111,10 +114,16 @@ const EditRiskForm = ({
     [form],
   )
 
-  const update = async (values: EditRiskFormValues) => {
+  const formAction = async (values: EditRiskFormValues) => {
     try {
       const request = mapToRequestValues(values)
-      await updateRisk.mutateAsync(request)
+      const response = await updateRisk({ request, cacheKey: riskKey })
+
+      if (response.error) {
+        throw response.error
+      }
+
+      messageApi.success(`Risk updated successfully.`)
 
       return true
     } catch (error) {
@@ -124,9 +133,9 @@ const EditRiskForm = ({
         messageApi.error('Correct the validation error(s) to continue.')
       } else {
         messageApi.error(
-          'An unexpected error occurred while updating the Risk.',
+          error.detail ??
+            'An error occurred while updating the risk. Please try again.',
         )
-        console.error(error)
       }
       return false
     }
@@ -136,14 +145,16 @@ const EditRiskForm = ({
     setIsSaving(true)
     try {
       const values = await form.validateFields()
-      if (await update(values)) {
+      if (await formAction(values)) {
         setIsOpen(false)
         onFormSave()
         form.resetFields()
-        messageApi.success('Successfully updated risk.')
       }
-    } catch (errorInfo) {
-      console.log('handleOk error', errorInfo)
+    } catch (error) {
+      console.error('handleOk error', error)
+      messageApi.error(
+        'An error occurred while updating the risk. Please try again.',
+      )
     } finally {
       setIsSaving(false)
     }
@@ -159,29 +170,17 @@ const EditRiskForm = ({
     if (!riskData) return
     if (canUpdateRisks) {
       setIsOpen(showForm)
-      if (showForm === true) {
-        try {
-          const loadData = async () => {
-            setRiskNumber(riskData?.key)
-            setTeamName(riskData?.team.name)
-            mapToFormValues(riskData)
-          }
-          loadData()
-        } catch (error) {
-          handleCancel()
-          messageApi.error(
-            'An unexpected error occurred while loading form data.',
-          )
-          console.error(error)
-        }
+      if (showForm) {
+        setTeamName(riskData?.team.name)
+        mapToFormValues(riskData)
       }
     } else {
-      handleCancel()
+      onFormCancel()
       messageApi.error('You do not have permission to update Risks.')
     }
   }, [
     canUpdateRisks,
-    handleCancel,
+    onFormCancel,
     mapToFormValues,
     messageApi,
     riskData,
@@ -208,99 +207,110 @@ const EditRiskForm = ({
       keyboard={false} // disable esc key to close modal
       destroyOnClose={true}
     >
-      <Form form={form} size="small" layout="vertical" name="update-risk-form">
+      <Flex vertical gap="small">
         <Descriptions size="small" column={1}>
-          <Item label="Number">{riskNumber}</Item>
+          <Item label="Number">{riskKey}</Item>
           <Item label="Team">{teamName}</Item>
         </Descriptions>
-        <FormItem name="riskId" hidden={true}>
-          <Input />
-        </FormItem>
-        <FormItem name="teamId" hidden={true}>
-          <Input />
-        </FormItem>
-        <FormItem label="Summary" name="summary" rules={[{ required: true }]}>
-          <TextArea
-            autoSize={{ minRows: 2, maxRows: 4 }}
-            showCount
-            maxLength={256}
-          />
-        </FormItem>
-        <FormItem
-          name="description"
-          label="Description"
-          rules={[{ max: 1024 }]}
+        <Form
+          form={form}
+          size="small"
+          layout="vertical"
+          name="update-risk-form"
         >
-          <MarkdownEditor
-            value={form.getFieldValue('description')}
-            onChange={(value) => form.setFieldValue('description', value || '')}
-            maxLength={1024}
-          />
-        </FormItem>
-        <FormItem name="statusId" label="Status" rules={[{ required: true }]}>
-          <RadioGroup
-            options={riskStatusOptions}
-            optionType="button"
-            buttonStyle="solid"
-          />
-        </FormItem>
-        <FormItem
-          name="categoryId"
-          label="Category"
-          rules={[{ required: true }]}
-        >
-          <RadioGroup
-            options={riskCategoryOptions}
-            optionType="button"
-            buttonStyle="solid"
-          />
-        </FormItem>
-        <FormItem name="impactId" label="Impact" rules={[{ required: true }]}>
-          <RadioGroup
-            options={riskGradeOptions}
-            optionType="button"
-            buttonStyle="solid"
-          />
-        </FormItem>
-        <FormItem
-          name="likelihoodId"
-          label="Likelihood"
-          rules={[{ required: true }]}
-        >
-          <RadioGroup
-            options={riskGradeOptions}
-            optionType="button"
-            buttonStyle="solid"
-          />
-        </FormItem>
-        <FormItem name="assigneeId" label="Assignee">
-          <Select
-            allowClear
-            showSearch
-            placeholder="Select an assignee"
-            optionFilterProp="children"
-            filterOption={(input, option) =>
-              (option?.label.toLowerCase() ?? '').includes(input.toLowerCase())
-            }
-            filterSort={(optionA, optionB) =>
-              (optionA?.label ?? '')
-                .toLowerCase()
-                .localeCompare((optionB?.label ?? '').toLowerCase())
-            }
-            options={employeeOptions}
-          />
-        </FormItem>
-        <FormItem label="Follow Up" name="followUpDate">
-          <DatePicker />
-        </FormItem>
-        <FormItem name="response" label="Response" rules={[{ max: 1024 }]}>
-          <MarkdownEditor
-            value={form.getFieldValue('response')}
-            onChange={(value) => form.setFieldValue('response', value || '')}
-            maxLength={1024}
-          />
-        </FormItem>
-      </Form>
+          <FormItem name="riskId" hidden={true}>
+            <Input />
+          </FormItem>
+          <FormItem name="teamId" hidden={true}>
+            <Input />
+          </FormItem>
+          <FormItem label="Summary" name="summary" rules={[{ required: true }]}>
+            <TextArea
+              autoSize={{ minRows: 2, maxRows: 4 }}
+              showCount
+              maxLength={256}
+            />
+          </FormItem>
+          <FormItem
+            name="description"
+            label="Description"
+            rules={[{ max: 1024 }]}
+          >
+            <MarkdownEditor
+              value={form.getFieldValue('description')}
+              onChange={(value) =>
+                form.setFieldValue('description', value || '')
+              }
+              maxLength={1024}
+            />
+          </FormItem>
+          <FormItem name="statusId" label="Status" rules={[{ required: true }]}>
+            <RadioGroup
+              options={riskStatusOptions}
+              optionType="button"
+              buttonStyle="solid"
+            />
+          </FormItem>
+          <FormItem
+            name="categoryId"
+            label="Category"
+            rules={[{ required: true }]}
+          >
+            <RadioGroup
+              options={riskCategoryOptions}
+              optionType="button"
+              buttonStyle="solid"
+            />
+          </FormItem>
+          <FormItem name="impactId" label="Impact" rules={[{ required: true }]}>
+            <RadioGroup
+              options={riskGradeOptions}
+              optionType="button"
+              buttonStyle="solid"
+            />
+          </FormItem>
+          <FormItem
+            name="likelihoodId"
+            label="Likelihood"
+            rules={[{ required: true }]}
+          >
+            <RadioGroup
+              options={riskGradeOptions}
+              optionType="button"
+              buttonStyle="solid"
+            />
+          </FormItem>
+          <FormItem name="assigneeId" label="Assignee">
+            <Select
+              allowClear
+              showSearch
+              placeholder="Select an assignee"
+              optionFilterProp="children"
+              filterOption={(input, option) =>
+                (option?.label.toLowerCase() ?? '').includes(
+                  input.toLowerCase(),
+                )
+              }
+              filterSort={(optionA, optionB) =>
+                (optionA?.label ?? '')
+                  .toLowerCase()
+                  .localeCompare((optionB?.label ?? '').toLowerCase())
+              }
+              options={employeeOptions}
+            />
+          </FormItem>
+          <FormItem label="Follow Up" name="followUpDate">
+            <DatePicker />
+          </FormItem>
+          <FormItem name="response" label="Response" rules={[{ max: 1024 }]}>
+            <MarkdownEditor
+              value={form.getFieldValue('response')}
+              onChange={(value) => form.setFieldValue('response', value || '')}
+              maxLength={1024}
+            />
+          </FormItem>
+        </Form>
+      </Flex>
     </Modal>
   )
 }

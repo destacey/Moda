@@ -5997,7 +5997,7 @@
           "Risks"
         ],
         "summary": "Create a risk.",
-        "operationId": "Risks_CreateRisk",
+        "operationId": "Risks_Create",
         "requestBody": {
           "x-name": "request",
           "content": {
@@ -6016,8 +6016,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "integer",
-                  "format": "int32"
+                  "$ref": "#/components/schemas/ObjectIdAndKey"
                 }
               }
             }
