@@ -72,8 +72,4 @@
         <Message Text="$(NSwagOutput)" Condition="'$(NSwagExitCode)' == '0'" Importance="low" />
         <Error Text="$(NSwagOutput)" Condition="'$(NSwagExitCode)' != '0'" />
     </Target>
-
-    <PropertyGroup>
-        <CompressionEnabled>false</CompressionEnabled>
-    </PropertyGroup>
 </Project>
