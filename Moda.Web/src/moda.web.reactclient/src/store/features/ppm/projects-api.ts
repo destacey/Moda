@@ -60,7 +60,7 @@ export const projectsApi = apiSlice.injectEndpoints({
       void,
       { request: UpdateProjectRequest; cacheKey: number }
     >({
-      queryFn: async ({ request, cacheKey }) => {
+      queryFn: async ({ request }) => {
         try {
           const data = await getProjectsClient().update(request.id, request)
           return { data }

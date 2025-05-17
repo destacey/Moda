@@ -1,7 +1,8 @@
 import { Card, List } from 'antd'
 import { RiskListDto } from '@/src/services/moda-api'
 import Link from 'next/link'
-import { useGetMyRisks } from '@/src/services/queries/planning-queries'
+import { useGetMyRisksQuery } from '@/src/store/features/planning/risks-api'
+import useAuth from '../../contexts/auth'
 
 const { Item } = List
 
@@ -13,7 +14,10 @@ const riskMessage = (risk: RiskListDto) => {
 }
 
 const MyAssignedRisks = () => {
-  const { data: risks } = useGetMyRisks()
+  const { user } = useAuth()
+  const { data: risks } = useGetMyRisksQuery(user?.username, {
+    skip: !user?.username,
+  })
 
   const hasAssignedRisks = risks?.length > 0
 

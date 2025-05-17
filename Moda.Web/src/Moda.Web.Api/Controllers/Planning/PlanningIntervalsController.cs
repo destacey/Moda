@@ -314,21 +314,7 @@ public class PlanningIntervalsController : ControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IReadOnlyList<PlanningIntervalObjectiveHealthCheckDto>>> GetObjectivesHealthReport(string idOrKey, Guid? teamId, CancellationToken cancellationToken)
     {
-        GetPlanningIntervalObjectivesQuery objectivesQuery;
-        if (Guid.TryParse(idOrKey, out Guid guidId))
-        {
-            objectivesQuery = new GetPlanningIntervalObjectivesQuery(guidId, teamId);
-        }
-        else if (int.TryParse(idOrKey, out int intId))
-        {
-            objectivesQuery = new GetPlanningIntervalObjectivesQuery(intId, teamId);
-        }
-        else
-        {
-            return BadRequest(ProblemDetailsExtensions.ForUnknownIdOrKeyType(HttpContext));
-        }
-
-        var objectives = await _sender.Send(objectivesQuery, cancellationToken);
+        var objectives = await _sender.Send(new GetPlanningIntervalObjectivesQuery(idOrKey, teamId), cancellationToken);
         if (objectives == null)
             return Ok(new List<PlanningIntervalObjectiveHealthCheckDto>());
 
@@ -505,14 +491,15 @@ public class PlanningIntervalsController : ControllerBase
 
     #region Risks
 
-    [HttpGet("{id}/risks")]
+    [HttpGet("{idOrKey}/risks")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.PlanningIntervals)]
-    [OpenApiOperation("Get planning interval risks.", "")]
+    [OpenApiOperation("Get planning interval risks. The default value for includeClosed is false.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IReadOnlyList<RiskListDto>>> GetRisks(Guid id, CancellationToken cancellationToken, Guid? teamId = null, bool includeClosed = false)
+    public async Task<ActionResult<IReadOnlyList<RiskListDto>>> GetRisks(string idOrKey, bool? includeClosed, Guid? teamId, CancellationToken cancellationToken)
     {
-        var risks = await _sender.Send(new GetRisksByPlanningIntervalQuery(id, includeClosed, teamId), cancellationToken);
+        includeClosed ??= false;
+        var risks = await _sender.Send(new GetRisksByPlanningIntervalQuery(idOrKey, includeClosed.Value, teamId), cancellationToken);
 
         return Ok(risks);
     }

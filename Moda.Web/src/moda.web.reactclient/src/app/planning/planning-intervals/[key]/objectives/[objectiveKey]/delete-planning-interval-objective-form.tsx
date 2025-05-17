@@ -1,8 +1,9 @@
 import { useMessage } from '@/src/components/contexts/messaging'
-import { getPlanningIntervalsClient } from '@/src/services/clients'
+import { authorizeForm } from '@/src/components/hoc'
 import { PlanningIntervalObjectiveDetailsDto } from '@/src/services/moda-api'
+import { useDeletePlanningIntervalObjectiveMutation } from '@/src/store/features/planning/planning-interval-api'
 import { Modal } from 'antd'
-import { useEffect, useState } from 'react'
+import { FC, useEffect, useState } from 'react'
 
 interface DeletePlanningIntervalObjectiveFormProps {
   showForm: boolean
@@ -19,37 +20,39 @@ const DeletePlanningIntervalObjectiveForm = ({
 }: DeletePlanningIntervalObjectiveFormProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+
   const messageApi = useMessage()
 
-  const deleteObjective = async (
-    objective: PlanningIntervalObjectiveDetailsDto,
-  ) => {
-    try {
-      const planningIntervalsClient = await getPlanningIntervalsClient()
-      await planningIntervalsClient.deleteObjective(
-        objective.planningInterval.id,
-        objective.id,
-      )
-      return true
-    } catch (error) {
-      messageApi.error(
-        'An unexpected error occurred while deleting the PI objective.',
-      )
-      console.log(error)
-      return false
+  const [deleteObjective, { error: mutationError }] =
+    useDeletePlanningIntervalObjectiveMutation()
+
+  const formAction = async (objective: PlanningIntervalObjectiveDetailsDto) => {
+    const response = await deleteObjective({
+      planningIntervalId: objective.planningInterval.id,
+      planningIntervalKey: objective.planningInterval.key,
+      objectiveId: objective.id,
+      objectiveKey: objective.key,
+      teamId: objective.team.id,
+    })
+
+    if (response.error) {
+      throw response.error
     }
   }
 
   const handleOk = async () => {
     setIsSaving(true)
     try {
-      if (await deleteObjective(objective)) {
-        setIsOpen(false)
-        onFormSave()
-        messageApi.success('Successfully deleted PI objective.')
-      }
-    } catch (errorInfo) {
-      console.log('handleOk error', errorInfo)
+      await formAction(objective)
+      messageApi.success('Successfully deleted PI objective.')
+      setIsOpen(false)
+      onFormSave()
+    } catch (error) {
+      console.log('handleOk error', error)
+      messageApi.error(
+        error.detail ??
+          'An unexpected error occurred while deleting the objective.',
+      )
     } finally {
       setIsSaving(false)
     }
@@ -61,8 +64,10 @@ const DeletePlanningIntervalObjectiveForm = ({
   }
 
   useEffect(() => {
+    if (!objective) return
+
     setIsOpen(showForm)
-  }, [showForm])
+  }, [objective, showForm])
 
   return (
     <Modal
@@ -82,4 +87,17 @@ const DeletePlanningIntervalObjectiveForm = ({
   )
 }
 
-export default DeletePlanningIntervalObjectiveForm
+const AuthorizedDeletePlanningIntervalObjectiveForm: FC<
+  DeletePlanningIntervalObjectiveFormProps
+> = (props) => {
+  const AuthorizedForm = authorizeForm(
+    DeletePlanningIntervalObjectiveForm,
+    props.onFormCancel,
+    'Permission',
+    'Permissions.StrategicInitiatives.Delete',
+  )
+
+  return <AuthorizedForm {...props} />
+}
+
+export default AuthorizedDeletePlanningIntervalObjectiveForm

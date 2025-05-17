@@ -9,14 +9,14 @@ import { toFormErrors } from '@/src/utils'
 import { TeamListItem } from '@/src/app/organizations/types'
 import _ from 'lodash'
 import { OptionModel } from '../../types'
-import {
-  useCreateRiskMutation,
-  useGetRiskCategoryOptions,
-  useGetRiskGradeOptions,
-} from '@/src/services/queries/planning-queries'
-import { useGetEmployeeOptions } from '@/src/services/queries/organization-queries'
 import { MarkdownEditor } from '../markdown'
 import { useMessage } from '../../contexts/messaging'
+import {
+  useCreateRiskMutation,
+  useGetRiskCategoryOptionsQuery,
+  useGetRiskGradeOptionsQuery,
+} from '@/src/store/features/planning/risks-api'
+import { useGetEmployeeOptionsQuery } from '@/src/store/features/organizations/employee-api'
 
 const { Item } = Form
 const { TextArea } = Input
@@ -75,10 +75,10 @@ const CreateRiskForm = ({
   const { hasClaim } = useAuth()
   const canCreateRisks = hasClaim('Permission', 'Permissions.Risks.Create')
 
-  const createRisk = useCreateRiskMutation()
-  const { data: riskCategoryOptions } = useGetRiskCategoryOptions()
-  const { data: riskGradeOptions } = useGetRiskGradeOptions()
-  const { data: employeeOptions } = useGetEmployeeOptions()
+  const [createRisk, { error: mutationError }] = useCreateRiskMutation()
+  const { data: riskCategoryOptions } = useGetRiskCategoryOptionsQuery()
+  const { data: riskGradeOptions } = useGetRiskGradeOptionsQuery()
+  const { data: employeeOptions } = useGetEmployeeOptionsQuery(false)
 
   const mapToFormValues = useCallback(
     (teamId: string | undefined) => {
@@ -104,11 +104,18 @@ const CreateRiskForm = ({
     return _.sortBy(teams, ['label'])
   }, [])
 
-  const create = async (values: CreateRiskFormValues) => {
+  const formAction = async (values: CreateRiskFormValues) => {
     try {
       const request = mapToRequestValues(values)
-      const key = await createRisk.mutateAsync(request)
-      setNewRiskKey(key)
+      const response = await createRisk(request)
+      if (response.error) {
+        throw response.error
+      }
+
+      messageApi.success(
+        `Successfully created Risk. Risk key: ${response.data.key}`,
+      )
+
       return true
     } catch (error) {
       if (error.status === 422 && error.errors) {
@@ -117,9 +124,9 @@ const CreateRiskForm = ({
         messageApi.error('Correct the validation error(s) to continue.')
       } else {
         messageApi.error(
-          'An unexpected error occurred while creating the Risk.',
+          error.detail ??
+            'An error occurred while creating the strategic initiative. Please try again.',
         )
-        console.error(error)
       }
       return false
     }
@@ -129,9 +136,16 @@ const CreateRiskForm = ({
     setIsSaving(true)
     try {
       const values = await form.validateFields()
-      await create(values)
-    } catch (errorInfo) {
-      console.log('handleOk error', errorInfo)
+      if (await formAction(values)) {
+        setIsOpen(false)
+        form.resetFields()
+        onFormCreate()
+      }
+    } catch (error) {
+      console.error('handleOk error', error)
+      messageApi.error(
+        'An error occurred while creating the risk. Please try again.',
+      )
     } finally {
       setIsSaving(false)
     }
@@ -181,17 +195,6 @@ const CreateRiskForm = ({
       () => setIsValid(false),
     )
   }, [form, formValues])
-
-  useEffect(() => {
-    if (newRiskKey) {
-      setIsOpen(false)
-      form.resetFields()
-      onFormCreate()
-      messageApi.success('Successfully created Risk.')
-    }
-    // we don't want a trigger on the other dependencies
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [newRiskKey])
 
   return (
     <Modal

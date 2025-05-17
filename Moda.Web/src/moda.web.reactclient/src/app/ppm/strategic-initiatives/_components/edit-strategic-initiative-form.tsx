@@ -152,7 +152,7 @@ const EditStrategicInitiativeForm = (
     } catch (error) {
       console.error('handleOk error', error)
       messageApi.error(
-        'An error occurred while creating the strategic initiative. Please try again.',
+        'An error occurred while updating the strategic initiative. Please try again.',
       )
     } finally {
       setIsSaving(false)
@@ -172,10 +172,17 @@ const EditStrategicInitiativeForm = (
       if (showForm) {
         mapToFormValues(strategicInitiativeData)
       }
+    } else {
+      onFormCancel()
+      messageApi.error(
+        'You do not have permission to update strategic initiatives.',
+      )
     }
   }, [
     canUpdateStrategicInitiative,
     mapToFormValues,
+    messageApi,
+    onFormCancel,
     showForm,
     strategicInitiativeData,
   ])

@@ -7283,21 +7283,19 @@ export class PlanningIntervalsClient {
     }
 
     /**
-     * Get planning interval risks.
-     * @param teamId (optional) 
+     * Get planning interval risks. The default value for includeClosed is false.
      * @param includeClosed (optional) 
+     * @param teamId (optional) 
      */
-    getRisks(id: string, teamId: string | null | undefined, includeClosed: boolean | undefined, cancelToken?: CancelToken): Promise<RiskListDto[]> {
-        let url_ = this.baseUrl + "/api/planning/planning-intervals/{id}/risks?";
-        if (id === undefined || id === null)
-            throw new Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+    getRisks(idOrKey: string, includeClosed: boolean | null | undefined, teamId: string | null | undefined, cancelToken?: CancelToken): Promise<RiskListDto[]> {
+        let url_ = this.baseUrl + "/api/planning/planning-intervals/{idOrKey}/risks?";
+        if (idOrKey === undefined || idOrKey === null)
+            throw new Error("The parameter 'idOrKey' must be defined.");
+        url_ = url_.replace("{idOrKey}", encodeURIComponent("" + idOrKey));
+        if (includeClosed !== undefined && includeClosed !== null)
+            url_ += "includeClosed=" + encodeURIComponent("" + includeClosed) + "&";
         if (teamId !== undefined && teamId !== null)
             url_ += "teamId=" + encodeURIComponent("" + teamId) + "&";
-        if (includeClosed === null)
-            throw new Error("The parameter 'includeClosed' cannot be null.");
-        else if (includeClosed !== undefined)
-            url_ += "includeClosed=" + encodeURIComponent("" + includeClosed) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -7431,7 +7429,7 @@ export class RisksClient {
     /**
      * Create a risk.
      */
-    createRisk(request: CreateRiskRequest, cancelToken?: CancelToken): Promise<number> {
+    create(request: CreateRiskRequest, cancelToken?: CancelToken): Promise<ObjectIdAndKey> {
         let url_ = this.baseUrl + "/api/planning/risks";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -7455,11 +7453,11 @@ export class RisksClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processCreateRisk(_response);
+            return this.processCreate(_response);
         });
     }
 
-    protected processCreateRisk(response: AxiosResponse): Promise<number> {
+    protected processCreate(response: AxiosResponse): Promise<ObjectIdAndKey> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -7474,7 +7472,7 @@ export class RisksClient {
             let result201: any = null;
             let resultData201  = _responseText;
             result201 = JSON.parse(resultData201);
-            return Promise.resolve<number>(result201);
+            return Promise.resolve<ObjectIdAndKey>(result201);
 
         } else if (status === 400) {
             const _responseText = response.data;
@@ -7501,7 +7499,7 @@ export class RisksClient {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<number>(null as any);
+        return Promise.resolve<ObjectIdAndKey>(null as any);
     }
 
     /**

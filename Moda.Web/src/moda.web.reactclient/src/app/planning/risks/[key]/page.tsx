@@ -9,12 +9,12 @@ import useAuth from '@/src/components/contexts/auth'
 import EditRiskForm from '@/src/components/common/planning/edit-risk-form'
 import { authorizePage } from '@/src/components/hoc'
 import { notFound, usePathname } from 'next/navigation'
-import { useGetRisk } from '@/src/services/queries/planning-queries'
 import { useAppDispatch } from '@/src/hooks'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
+import { useGetRiskQuery } from '@/src/store/features/planning/risks-api'
 
 const RiskDetailsPage = (props: { params: Promise<{ key: number }> }) => {
-  const { key } = use(props.params)
+  const { key: riskKey } = use(props.params)
 
   useDocumentTitle('Risk Details')
 
@@ -23,12 +23,7 @@ const RiskDetailsPage = (props: { params: Promise<{ key: number }> }) => {
   const dispatch = useAppDispatch()
   const pathname = usePathname()
 
-  const {
-    data: riskData,
-    isLoading,
-    isFetching,
-    refetch,
-  } = useGetRisk(key.toString())
+  const { data: riskData, isLoading, error, refetch } = useGetRiskQuery(riskKey)
 
   const { hasClaim } = useAuth()
   const canUpdateRisks = hasClaim('Permission', 'Permissions.Risks.Update')
@@ -77,7 +72,7 @@ const RiskDetailsPage = (props: { params: Promise<{ key: number }> }) => {
     }
   }
 
-  if (!isLoading && !isFetching && !riskData) {
+  if (!isLoading && !riskData) {
     notFound()
   }
 
@@ -94,7 +89,7 @@ const RiskDetailsPage = (props: { params: Promise<{ key: number }> }) => {
   return (
     <>
       <PageTitle
-        title={`${riskData?.key} - ${riskData?.summary}`}
+        title={`${riskKey} - ${riskData?.summary}`}
         subtitle="Risk Details"
         actions={showActions && actions()}
       />
@@ -109,7 +104,7 @@ const RiskDetailsPage = (props: { params: Promise<{ key: number }> }) => {
       {openUpdateRiskForm && (
         <EditRiskForm
           showForm={openUpdateRiskForm}
-          riskId={riskData?.id}
+          riskKey={riskKey}
           onFormSave={() => onUpdateRiskFormClosed(true)}
           onFormCancel={() => onUpdateRiskFormClosed(false)}
         />

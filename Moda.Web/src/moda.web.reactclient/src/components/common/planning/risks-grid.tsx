@@ -9,18 +9,19 @@ import useAuth from '../../contexts/auth'
 import CreateRiskForm from './create-risk-form'
 import { EditOutlined } from '@ant-design/icons'
 import EditRiskForm from './edit-risk-form'
-import { UseQueryResult } from 'react-query'
 import { NestedTeamNameLinkCellRenderer } from '../moda-grid-cell-renderers'
 import { ColDef } from 'ag-grid-community'
 import { ControlItemSwitch } from '../control-items-menu'
 
 export interface RisksGridProps {
-  risksQuery: UseQueryResult<RiskListDto[], unknown>
+  risks: RiskListDto[]
   updateIncludeClosed: (includeClosed: boolean) => void
-  teamId?: string | null
+  teamId?: string
+  isLoadingRisks: boolean
+  refreshRisks: () => void
   newRisksAllowed?: boolean
   hideTeamColumn?: boolean
-  gridHeight?: number | null
+  gridHeight?: number
 }
 
 const RiskLinkCellRenderer = ({ value, data }) => {
@@ -34,9 +35,11 @@ const AssigneeLinkCellRenderer = ({ value, data }) => {
 }
 
 const RisksGrid = ({
-  risksQuery,
+  risks,
   updateIncludeClosed,
   teamId,
+  isLoadingRisks,
+  refreshRisks,
   newRisksAllowed = false,
   hideTeamColumn = false,
   gridHeight = 550,
@@ -45,11 +48,11 @@ const RisksGrid = ({
   const [hideTeam, setHideTeam] = useState<boolean>(hideTeamColumn)
   const [openCreateRiskForm, setOpenCreateRiskForm] = useState<boolean>(false)
   const [openUpdateRiskForm, setOpenUpdateRiskForm] = useState<boolean>(false)
-  const [editRiskId, setEditRiskId] = useState<string | null>(null)
+  const [editRiskKey, setEditRiskKey] = useState<number | null>(null)
 
-  const { hasClaim } = useAuth()
-  const canCreateRisks = hasClaim('Permission', 'Permissions.Risks.Create')
-  const canUpdateRisks = hasClaim('Permission', 'Permissions.Risks.Update')
+  const { hasPermissionClaim } = useAuth()
+  const canCreateRisks = hasPermissionClaim('Permissions.Risks.Create')
+  const canUpdateRisks = hasPermissionClaim('Permissions.Risks.Update')
   const showActions = newRisksAllowed && canCreateRisks
 
   const onIncludeClosedChange = (checked: boolean) => {
@@ -61,14 +64,9 @@ const RisksGrid = ({
     setHideTeam(checked)
   }
 
-  const refresh = useCallback(async () => {
-    risksQuery.refetch()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
   const editRiskButtonClicked = useCallback(
-    (id: string) => {
-      setEditRiskId(id)
+    (key: number) => {
+      setEditRiskKey(key)
       setOpenUpdateRiskForm(true)
     },
     [setOpenUpdateRiskForm],
@@ -76,16 +74,16 @@ const RisksGrid = ({
 
   const onEditRiskFormClosed = (wasSaved: boolean) => {
     setOpenUpdateRiskForm(false)
-    setEditRiskId(null)
+    setEditRiskKey(null)
     if (wasSaved) {
-      refresh()
+      refreshRisks()
     }
   }
 
   const onCreateRiskFormClosed = (wasCreated: boolean) => {
     setOpenCreateRiskForm(false)
     if (wasCreated) {
-      refresh()
+      refreshRisks()
     }
   }
 
@@ -142,7 +140,7 @@ const RisksGrid = ({
                 type="text"
                 size="small"
                 icon={<EditOutlined />}
-                onClick={() => editRiskButtonClicked(params.data.id)}
+                onClick={() => editRiskButtonClicked(params.data.key)}
               />
             )
           )
@@ -187,9 +185,9 @@ const RisksGrid = ({
       <ModaGrid
         height={gridHeight}
         columnDefs={columnDefs}
-        rowData={risksQuery.data}
-        loading={risksQuery.isLoading}
-        loadData={refresh}
+        rowData={risks}
+        loading={isLoadingRisks}
+        loadData={refreshRisks}
         actions={showActions && actions()}
         gridControlMenuItems={controlItems}
       />
@@ -204,7 +202,7 @@ const RisksGrid = ({
       {openUpdateRiskForm && (
         <EditRiskForm
           showForm={openUpdateRiskForm}
-          riskId={editRiskId}
+          riskKey={editRiskKey}
           onFormSave={() => onEditRiskFormClosed(true)}
           onFormCancel={() => onEditRiskFormClosed(false)}
         />
