@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:9.0.4 AS base
 WORKDIR /app
 EXPOSE 5150
 
@@ -9,7 +9,7 @@ ENV ASPNETCORE_URLS=http://+:5150
 # RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser /app
 # USER appuser
 
-FROM mcr.microsoft.com/dotnet/sdk:9.0.203 AS build
+FROM mcr.microsoft.com/dotnet/sdk:9.0.204 AS build
 WORKDIR /src
 COPY ["Moda.Web/src/Moda.Web.Api/Moda.Web.Api.csproj", "Moda.Web/src/Moda.Web.Api/"]
 RUN dotnet restore "Moda.Web/src/Moda.Web.Api/Moda.Web.Api.csproj"
