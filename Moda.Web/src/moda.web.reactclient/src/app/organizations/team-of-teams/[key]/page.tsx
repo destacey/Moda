@@ -44,7 +44,7 @@ enum TeamOfTeamsTabs {
 const TeamOfTeamsDetailsPage = (props: {
   params: Promise<{ key: number }>
 }) => {
-  const { key } = use(props.params)
+  const { key: teamKey } = use(props.params)
 
   useDocumentTitle('Team of Teams Details')
 
@@ -129,8 +129,10 @@ const TeamOfTeamsDetailsPage = (props: {
       key: TeamOfTeamsTabs.RiskManagement,
       tab: 'Risk Management',
       content: createElement(RisksGrid, {
-        risksQuery: risksQuery,
+        risks: risksQuery.data,
         updateIncludeClosed: onIncludeClosedRisksChanged,
+        isLoadingRisks: risksQuery.isLoading,
+        refreshRisks: risksQuery.refetch,
         newRisksAllowed: true,
         teamId: team?.id,
         hideTeamColumn: true,
@@ -148,8 +150,8 @@ const TeamOfTeamsDetailsPage = (props: {
   ]
 
   useEffect(() => {
-    dispatch(retrieveTeam({ key, type: 'Team of Teams' }))
-  }, [key, dispatch])
+    dispatch(retrieveTeam({ key: teamKey, type: 'Team of Teams' }))
+  }, [teamKey, dispatch])
 
   useEffect(() => {
     team && dispatch(setBreadcrumbTitle({ title: team.name, pathname }))
@@ -180,14 +182,14 @@ const TeamOfTeamsDetailsPage = (props: {
   const onCreateTeamMembershipFormClosed = (wasSaved: boolean) => {
     setOpenCreateTeamMembershipForm(false)
     if (wasSaved) {
-      dispatch(retrieveTeam({ key, type: 'Team of Teams' }))
+      dispatch(retrieveTeam({ key: teamKey, type: 'Team of Teams' }))
     }
   }
 
   const onDeactivateTeamFormClosed = (wasSaved: boolean) => {
     setOpenDeactivateTeamForm(false)
     if (wasSaved) {
-      dispatch(retrieveTeam({ key, type: 'Team of Teams' }))
+      dispatch(retrieveTeam({ key: teamKey, type: 'Team of Teams' }))
     }
   }
 

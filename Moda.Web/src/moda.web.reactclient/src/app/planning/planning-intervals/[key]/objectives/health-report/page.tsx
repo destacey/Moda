@@ -4,7 +4,6 @@ import PageTitle from '@/src/components/common/page-title'
 import { use, useCallback, useMemo } from 'react'
 import { useDocumentTitle } from '@/src/hooks/use-document-title'
 import { authorizePage } from '@/src/components/hoc'
-import { useGetPlanningIntervalObjectivesHealthReport } from '@/src/services/queries/planning-queries'
 import { notFound } from 'next/navigation'
 import {
   MarkdownCellRenderer,
@@ -16,6 +15,7 @@ import {
 import dayjs from 'dayjs'
 import { ModaGrid } from '@/src/components/common'
 import { Progress } from 'antd'
+import { useGetPlanningIntervalObjectivesHealthReportQuery } from '@/src/store/features/planning/planning-interval-api'
 
 const LocalHealthCheckCellRenderer = ({ data }) => {
   if (!data.healthCheckId) return null
@@ -37,16 +37,17 @@ const ProgressCellRenderer = ({ value, data }) => {
 const ObjectiveHealthReportPage = (props: {
   params: Promise<{ key: number }>
 }) => {
-  const { key } = use(props.params)
+  const { key: piKey } = use(props.params)
 
   useDocumentTitle('PI Objectives Health Report')
 
   const {
     data: healthReport,
     isLoading,
-    isFetching,
     refetch,
-  } = useGetPlanningIntervalObjectivesHealthReport(key.toString(), null, true)
+  } = useGetPlanningIntervalObjectivesHealthReportQuery({
+    planningIntervalKey: piKey,
+  })
 
   const columnDefs = useMemo(
     () => [
@@ -105,7 +106,7 @@ const ObjectiveHealthReportPage = (props: {
     refetch()
   }, [refetch])
 
-  if (!isLoading && !isFetching && !healthReport) {
+  if (!isLoading && !healthReport) {
     notFound()
   }
 

@@ -1,4 +1,6 @@
-﻿using MediatR;
+﻿using System.Linq.Expressions;
+using MediatR;
+using Moda.Common.Application.Models;
 using Moda.Common.Extensions;
 using Moda.Planning.Application.PlanningIntervals.Queries;
 using Moda.Planning.Application.Risks.Dtos;
@@ -6,30 +8,38 @@ using Moda.Planning.Domain.Enums;
 
 namespace Moda.Planning.Application.Risks.Queries;
 
-public sealed record GetRisksByPlanningIntervalQuery(Guid PlanningIntervalId, bool IncludeClosed, Guid? TeamId) : IQuery<IReadOnlyList<RiskListDto>>;
-
-internal sealed class GetRisksByPlanningIntervalQueryHandler : IQueryHandler<GetRisksByPlanningIntervalQuery, IReadOnlyList<RiskListDto>>
+public sealed record GetRisksByPlanningIntervalQuery : IQuery<IReadOnlyList<RiskListDto>>
 {
-    private readonly IPlanningDbContext _planningDbContext;
-    private readonly ISender _sender;
-
-    public GetRisksByPlanningIntervalQueryHandler(IPlanningDbContext planningDbContext, ISender sender)
+    public GetRisksByPlanningIntervalQuery(IdOrKey idOrKey, bool includeClosed, Guid? teamId)
     {
-        _planningDbContext = planningDbContext;
-        _sender = sender;
+        IdOrKeyFilter = idOrKey.CreateFilter<PlanningInterval>();
+        IdOrKey = idOrKey;
+        IncludeClosed = includeClosed;
+        TeamId = teamId;
     }
+
+    public Expression<Func<PlanningInterval, bool>> IdOrKeyFilter { get; }
+    public IdOrKey IdOrKey { get; }
+    public bool IncludeClosed { get; }
+    public Guid? TeamId { get; }
+}
+
+internal sealed class GetRisksByPlanningIntervalQueryHandler(IPlanningDbContext planningDbContext, ISender sender) : IQueryHandler<GetRisksByPlanningIntervalQuery, IReadOnlyList<RiskListDto>>
+{
+    private readonly IPlanningDbContext _planningDbContext = planningDbContext;
+    private readonly ISender _sender = sender;
 
     public async Task<IReadOnlyList<RiskListDto>> Handle(GetRisksByPlanningIntervalQuery request, CancellationToken cancellationToken)
     {
-        var teamIds = await _sender.Send(new GetPlanningIntervalTeamsQuery(request.PlanningIntervalId), cancellationToken);
+        var teamIds = await _sender.Send(new GetPlanningIntervalTeamsQuery(request.IdOrKey), cancellationToken);
         if (!teamIds.Any())
-            return new List<RiskListDto>();
+            return [];
 
         if (request.TeamId.HasValue && !teamIds.Contains(request.TeamId.Value))
-            return new List<RiskListDto>();
+            return [];
 
         var piDates = await _planningDbContext.PlanningIntervals
-            .Where(p => p.Id == request.PlanningIntervalId)
+            .Where(request.IdOrKeyFilter)
             .Select(p => new
             {
                 start = p.DateRange.Start.ToInstant(),
@@ -45,14 +55,9 @@ internal sealed class GetRisksByPlanningIntervalQueryHandler : IQueryHandler<Get
             .Where(r => r.ReportedOn <= piDates.end && (!r.ClosedDate.HasValue || piDates.start <= r.ClosedDate.Value))
             .AsQueryable();
 
-        if (request.TeamId.HasValue)
-        {
-            query = query.Where(r => r.TeamId == request.TeamId.Value);
-        }
-        else
-        {
-            query = query.Where(r => r.TeamId.HasValue && teamIds.ToList().Contains(r.TeamId.Value));
-        }
+        query = request.TeamId.HasValue
+            ? query.Where(r => r.TeamId == request.TeamId.Value)
+            : query.Where(r => r.TeamId.HasValue && teamIds.ToList().Contains(r.TeamId.Value));
 
         if (!request.IncludeClosed)
         {

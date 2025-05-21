@@ -80,7 +80,7 @@ const RiskListItem = ({
       {openUpdateRiskForm && (
         <EditRiskForm
           showForm={openUpdateRiskForm}
-          riskId={risk.id}
+          riskKey={risk.key}
           onFormSave={() => onEditRiskFormClosed(true)}
           onFormCancel={() => onEditRiskFormClosed(false)}
         />

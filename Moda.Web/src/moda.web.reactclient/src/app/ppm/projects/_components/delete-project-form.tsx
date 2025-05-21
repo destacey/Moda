@@ -26,7 +26,7 @@ const DeleteProjectForm = (props: DeleteProjectFormProps) => {
   const { hasPermissionClaim } = useAuth()
   const canDeleteProject = hasPermissionClaim('Permissions.Projects.Delete')
 
-  const deleteProject = async (project: ProjectDetailsDto) => {
+  const formAction = async (project: ProjectDetailsDto) => {
     try {
       const response = await deleteProjectMutation(project.id)
 
@@ -48,8 +48,7 @@ const DeleteProjectForm = (props: DeleteProjectFormProps) => {
   const handleOk = async () => {
     setIsSaving(true)
     try {
-      if (await deleteProject(props.project)) {
-        // TODO: not working because the parent page is gone
+      if (await formAction(props.project)) {
         messageApi.success('Successfully deleted Project.')
         props.onFormComplete()
         setIsOpen(false)
