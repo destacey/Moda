@@ -25,7 +25,7 @@ jobs:
             - name: Setup .NET
               uses: actions/setup-dotnet@v3
               with:
-                  dotnet-version: 9.0.204
+                  dotnet-version: 9.0.x
 
             - name: Restore dependencies
               run: dotnet restore
@@ -48,7 +48,7 @@ jobs:
 
             - uses: actions/setup-node@v4
               with:
-                  node-version: 20
+                  node-version: 22
 
             - name: npm ci
               run: npm ci
@@ -171,7 +171,7 @@ jobs:
             - name: Setup .NET
               uses: actions/setup-dotnet@v3
               with:
-                  dotnet-version: 9.0.204
+                  dotnet-version: 9.0.x
 
             - name: Restore dependencies
               run: dotnet restore
