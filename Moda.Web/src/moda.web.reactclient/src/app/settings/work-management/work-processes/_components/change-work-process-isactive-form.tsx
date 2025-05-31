@@ -97,7 +97,7 @@ const ChangeWorkProcessIsActiveForm = (
       onCancel={handleCancel}
       maskClosable={false}
       keyboard={false} // disable esc key to close modal
-      destroyOnClose={true}
+      destroyOnHidden={true}
     >
       <Text>
         {`Are you sure you want to ${actionLowerCase} the work process ${props.workProcessName}?`}

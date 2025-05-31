@@ -151,7 +151,7 @@ const ChangePortfolioStatusForm = (props: ChangePortfolioStatusFormProps) => {
         onCancel={handleCancel}
         maskClosable={false}
         keyboard={false} // disable esc key to close modal
-        destroyOnClose={true}
+        destroyOnHidden={true}
       >
         <Space direction="vertical">
           <div>

@@ -95,7 +95,7 @@ const DeletePortfolioForm = (props: DeletePortfolioFormProps) => {
         onCancel={handleCancel}
         maskClosable={false}
         keyboard={false} // disable esc key to close modal
-        destroyOnClose={true}
+        destroyOnHidden={true}
       >
         {props.portfolio?.key} - {props.portfolio?.name}
       </Modal>

@@ -9,9 +9,8 @@ import {
 import { DeleteOutlined } from '@ant-design/icons'
 import useTheme from '@/src/components/contexts/theme'
 import React, { ReactNode, useCallback, useRef } from 'react'
-import { AgGridReact } from 'ag-grid-react'
+import { AgGridReact, AgGridReactProps } from 'ag-grid-react'
 import { Flex } from 'antd'
-import { AgGridReactProps } from 'ag-grid-react/dist/types/src/shared/interfaces'
 
 export const asDraggableColDefs = <TData extends object>(
   colDefs: ColDef<TData>[],
@@ -60,8 +59,8 @@ interface GridTransferProps<TData extends object> {
   rightColumnDef: ColDef<TData>[]
   getRowId: (params: GetRowIdParams<TData>) => string
   onDragStop?: (items: TData[]) => void
-  leftGridRef?: React.MutableRefObject<AgGridReact<TData>>
-  rightGridRef?: React.MutableRefObject<AgGridReact<TData>>
+  leftGridRef?: React.RefObject<AgGridReact<TData>>
+  rightGridRef?: React.RefObject<AgGridReact<TData>>
   GridProps?: AgGridReactProps<TData>
   leftGridRowSelection?: RowSelectionOptions<TData> | 'single' | 'multiple'
   rightGridRowSelection?: RowSelectionOptions<TData> | 'single' | 'multiple'

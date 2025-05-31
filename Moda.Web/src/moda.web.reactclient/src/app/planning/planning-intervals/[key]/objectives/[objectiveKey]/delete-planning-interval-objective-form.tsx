@@ -80,7 +80,7 @@ const DeletePlanningIntervalObjectiveForm = ({
       onCancel={handleCancel}
       maskClosable={false}
       keyboard={false} // disable esc key to close modal
-      destroyOnClose={true}
+      destroyOnHidden={true}
     >
       {objective?.key} - {objective?.name}
     </Modal>

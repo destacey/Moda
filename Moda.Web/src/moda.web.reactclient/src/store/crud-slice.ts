@@ -11,17 +11,13 @@ import {
   createEntityAdapter,
   createSelector,
   createSlice,
+  AsyncThunk,
 } from '@reduxjs/toolkit'
 import { FieldData } from 'rc-field-form/lib/interface'
 import { toFormErrors } from '../utils'
-import { TypedActionCreator } from '@reduxjs/toolkit/src/mapBuilders'
 import { NoInfer } from 'react-redux'
 
-type CrudThunkAction = {
-  pending: TypedActionCreator<string>
-  fulfilled: TypedActionCreator<string>
-  rejected: TypedActionCreator<string>
-}
+type CrudThunkAction = AsyncThunk<any, any, any>
 
 /**
  * Options for creating a CRUD slice using `createSlice` from Redux Toolkit.

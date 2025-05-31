@@ -142,7 +142,7 @@ const CreateTeamMembershipForm = (props: CreateTeamMembershipFormProps) => {
       onCancel={handleCancel}
       maskClosable={false}
       keyboard={false} // disable esc key to close modal
-      destroyOnClose={true}
+      destroyOnHidden={true}
     >
       <Form
         form={form}

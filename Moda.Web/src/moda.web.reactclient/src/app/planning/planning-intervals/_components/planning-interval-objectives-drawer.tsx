@@ -48,7 +48,7 @@ const PlanningIntervalObjectiveDetailsDrawer: FC<
         placement="right"
         onClose={props.onDrawerClose}
         open={props.drawerOpen}
-        destroyOnClose={true}
+        destroyOnHidden={true}
         loading={objectiveDataIsLoading}
         width={getDrawerWidthPercentage()}
         extra={

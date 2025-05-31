@@ -97,7 +97,7 @@ const InitWorkProcessIntegrationForm = (
       onCancel={handleCancel}
       maskClosable={false}
       keyboard={false} // disable esc key to close modal
-      destroyOnClose={true}
+      destroyOnHidden={true}
     >
       <Text>
         Initializing the work process will create the necessary work item types,

@@ -21,7 +21,7 @@ const TeamOfTeamsDetails = ({ team }: TeamOfTeamsDetailsProps) => {
             <Descriptions>
               <Item label="Code">{team.code}</Item>
               <Item label="Type">{team.type}</Item>
-              <Item label="Parent Tam">
+              <Item label="Parent Team">
                 <Link
                   href={`/organizations/team-of-teams/${team.teamOfTeams?.key}`}
                 >

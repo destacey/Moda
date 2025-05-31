@@ -101,7 +101,7 @@ const DeleteAzdoBoardsConnectionForm = (
       onCancel={handleCancel}
       maskClosable={false}
       keyboard={false} // disable esc key to close modal
-      destroyOnClose={true}
+      destroyOnHidden={true}
     >
       <Descriptions size="small" column={1}>
         <Item label="Name">{props.connection?.name}</Item>
