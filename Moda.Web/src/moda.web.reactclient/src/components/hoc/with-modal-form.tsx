@@ -97,7 +97,7 @@ const withModalForm = <P extends FormProps<TFormValues>, TFormValues>(
         onCancel={handleCancel}
         maskClosable={false}
         keyboard={false} // disable esc key to close modal
-        destroyOnClose={true}
+        destroyOnHidden={true}
       >
         <WrappedForm form={form} {...(props as P)} />
       </Modal>

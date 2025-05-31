@@ -171,7 +171,7 @@ const ManageUserRolesForm: React.FC<ManageUserRolesFormProps> = (
       onCancel={handleCancel}
       maskClosable={false}
       keyboard={false} // disable esc key to close modal
-      destroyOnClose={true}
+      destroyOnHidden={true}
     >
       <Spin spinning={userRolesLoading} size="large">
         <Transfer

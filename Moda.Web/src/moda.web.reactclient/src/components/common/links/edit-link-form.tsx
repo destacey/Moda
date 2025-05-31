@@ -158,7 +158,7 @@ const EditLinkForm = ({
       onCancel={handleCancel}
       maskClosable={false}
       keyboard={false} // disable esc key to close modal
-      destroyOnClose={true}
+      destroyOnHidden={true}
     >
       <Form form={form} size="small" layout="vertical" name="edit-link-form">
         <Item label="Name" name="name" rules={[{ required: true }]}>

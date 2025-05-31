@@ -89,7 +89,7 @@ const DeleteProjectForm = (props: DeleteProjectFormProps) => {
         onCancel={handleCancel}
         maskClosable={false}
         keyboard={false} // disable esc key to close modal
-        destroyOnClose={true}
+        destroyOnHidden={true}
       >
         {props.project?.key} - {props.project?.name}
       </Modal>

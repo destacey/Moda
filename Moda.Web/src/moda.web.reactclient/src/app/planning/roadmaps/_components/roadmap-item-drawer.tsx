@@ -54,7 +54,7 @@ const RoadmapItemDrawer: FC<RoadmapItemDrawerProps> = (
         placement="right"
         onClose={props.onDrawerClose}
         open={props.drawerOpen}
-        destroyOnClose={true}
+        destroyOnHidden={true}
         width={getDrawerWidthPercentage()}
         extra={
           canUpdateRoadmap && (

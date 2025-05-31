@@ -94,7 +94,7 @@ const DeleteExpenditureCategoryForm = (
         onCancel={handleCancel}
         maskClosable={false}
         keyboard={false} // disable esc key to close modal
-        destroyOnClose={true}
+        destroyOnHidden={true}
       >
         {props.expenditureCategory?.id} - {props.expenditureCategory?.name}
       </Modal>

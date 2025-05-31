@@ -205,7 +205,7 @@ const EditRiskForm = ({
       onCancel={handleCancel}
       maskClosable={false}
       keyboard={false} // disable esc key to close modal
-      destroyOnClose={true}
+      destroyOnHidden={true}
     >
       <Flex vertical gap="small">
         <Descriptions size="small" column={1}>

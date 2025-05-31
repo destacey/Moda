@@ -207,7 +207,7 @@ const CreateRiskForm = ({
       onCancel={handleCancel}
       maskClosable={false}
       keyboard={false} // disable esc key to close modal
-      destroyOnClose={true}
+      destroyOnHidden={true}
     >
       <Form form={form} size="small" layout="vertical" name="create-risk-form">
         <Item name="teamId" label="Team" rules={[{ required: true }]}>

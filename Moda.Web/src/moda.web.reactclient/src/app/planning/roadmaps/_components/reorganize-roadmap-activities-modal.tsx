@@ -133,7 +133,7 @@ const ReorganizeRoadmapActivitiesModal: React.FC<
       width={'70vw'}
       maskClosable={false}
       keyboard={false} // disable esc key to close modal
-      destroyOnClose={true}
+      destroyOnHidden={true}
     >
       <DraggableTree
         data={activityTreeData}

@@ -93,7 +93,7 @@ const ProjectDrawer: FC<ProjectDrawerProps> = (props: ProjectDrawerProps) => {
       placement="right"
       onClose={handleDrawerClose}
       open={props.drawerOpen}
-      destroyOnClose={true}
+      destroyOnHidden={true}
       width={getDrawerWidthPercentage()}
     >
       <Spin spinning={isLoading}>
