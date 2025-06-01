@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Card } from 'antd'
 import { usePathname } from 'next/navigation'
 import PageTitle from '../../../components/common/page-title'
@@ -8,40 +8,53 @@ import ProfileForm from './profile-form'
 import ClaimsGrid from './claims-grid'
 import useAuth from '../../../components/contexts/auth'
 import { useDocumentTitle } from '../../../hooks/use-document-title'
-import { getProfileClient } from '@/src/services/clients'
-import { UserDetailsDto } from '@/src/services/moda-api'
 import { useAppDispatch } from '@/src/hooks'
 import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
+import { useGetProfileQuery } from '@/src/store/features/user-management/profile-api'
+import { useMessage } from '@/src/components/contexts/messaging'
+
+enum AccountTabs {
+  Profile = 'profile',
+  Claims = 'claims',
+}
+
+const tabs = [
+  {
+    key: AccountTabs.Profile,
+    tab: 'Profile',
+  },
+  { key: AccountTabs.Claims, tab: 'Claims' },
+]
 
 const AccountProfilePage = () => {
   useDocumentTitle('Account Profile')
+  const [activeTab, setActiveTab] = useState(AccountTabs.Profile)
+
+  const messageApi = useMessage()
   const { user, isLoading, refreshUser } = useAuth()
-  const [profile, setProfile] = useState<UserDetailsDto>()
-  const [activeTab, setActiveTab] = useState('profile')
+
   const dispatch = useAppDispatch()
   const pathname = usePathname()
 
-  const tabs = [
-    {
-      key: 'profile',
-      tab: 'Profile',
-      content: React.createElement(ProfileForm, profile),
-    },
-    { key: 'claims', tab: 'Claims', content: React.createElement(ClaimsGrid) },
-  ]
+  const {
+    data: profileData,
+    isLoading: profileLoading,
+    error: profileError,
+  } = useGetProfileQuery(null, { skip: !user })
 
-  useEffect(() => {
-    const loadProfile = async () => {
-      const profileClient = await getProfileClient()
-      setProfile(await profileClient.get())
+  const renderTabContent = useCallback(() => {
+    switch (activeTab) {
+      case AccountTabs.Profile:
+        return React.createElement(ProfileForm, profileData)
+      case AccountTabs.Claims:
+        return <ClaimsGrid />
+      default:
+        return null
     }
-    loadProfile()
+  }, [activeTab, profileData])
 
-    const reloadUserPermissions = async () => {
-      await refreshUser()
-    }
-    reloadUserPermissions()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  const onTabChange = useCallback((tabKey: string) => {
+    setActiveTab(tabKey as AccountTabs)
   }, [])
 
   useEffect(() => {
@@ -50,6 +63,13 @@ const AccountProfilePage = () => {
     }
   }, [user, isLoading, pathname, dispatch])
 
+  useEffect(() => {
+    if (profileError) {
+      console.error(profileError)
+      messageApi.error('Failed to load user profile.')
+    }
+  }, [profileError, messageApi])
+
   return (
     <>
       <PageTitle title="Account" subtitle="Manage your account" />
@@ -57,9 +77,9 @@ const AccountProfilePage = () => {
         style={{ width: '100%' }}
         tabList={tabs}
         activeTabKey={activeTab}
-        onTabChange={(key) => setActiveTab(key)}
+        onTabChange={onTabChange}
       >
-        {tabs.find((t) => t.key === activeTab)?.content}
+        {renderTabContent()}
       </Card>
     </>
   )

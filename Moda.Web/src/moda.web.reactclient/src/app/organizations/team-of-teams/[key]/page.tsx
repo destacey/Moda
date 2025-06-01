@@ -41,6 +41,21 @@ enum TeamOfTeamsTabs {
   TeamMemberships = 'team-memberships',
 }
 
+const tabs = [
+  {
+    key: TeamOfTeamsTabs.Details,
+    tab: 'Details',
+  },
+  {
+    key: TeamOfTeamsTabs.RiskManagement,
+    tab: 'Risk Management',
+  },
+  {
+    key: TeamOfTeamsTabs.TeamMemberships,
+    tab: 'Team Memberships',
+  },
+]
+
 const TeamOfTeamsDetailsPage = (props: {
   params: Promise<{ key: number }>
 }) => {
@@ -119,35 +134,36 @@ const TeamOfTeamsDetailsPage = (props: {
     return items
   }, [canManageTeamMemberships, canUpdateTeam, dispatch, team?.isActive])
 
-  const tabs = [
-    {
-      key: TeamOfTeamsTabs.Details,
-      tab: 'Details',
-      content: <TeamOfTeamsDetails team={team} />,
-    },
-    {
-      key: TeamOfTeamsTabs.RiskManagement,
-      tab: 'Risk Management',
-      content: createElement(RisksGrid, {
-        risks: risksQuery.data,
-        updateIncludeClosed: onIncludeClosedRisksChanged,
-        isLoadingRisks: risksQuery.isLoading,
-        refreshRisks: risksQuery.refetch,
-        newRisksAllowed: true,
-        teamId: team?.id,
-        hideTeamColumn: true,
-      } as RisksGridProps),
-    },
-    {
-      key: TeamOfTeamsTabs.TeamMemberships,
-      tab: 'Team Memberships',
-      content: createElement(TeamMembershipsGrid, {
-        teamId: team?.id,
-        teamMembershipsQuery: teamMembershipsQuery,
-        teamType: 'Team of Teams',
-      }),
-    },
-  ]
+  const renderTabContent = useCallback(() => {
+    switch (activeTab) {
+      case TeamOfTeamsTabs.Details:
+        return <TeamOfTeamsDetails team={team} />
+      case TeamOfTeamsTabs.RiskManagement:
+        return createElement(RisksGrid, {
+          risks: risksQuery.data,
+          updateIncludeClosed: onIncludeClosedRisksChanged,
+          isLoadingRisks: risksQuery.isLoading,
+          refreshRisks: risksQuery.refetch,
+          newRisksAllowed: true,
+          teamId: team?.id,
+          hideTeamColumn: true,
+        } as RisksGridProps)
+      case TeamOfTeamsTabs.TeamMemberships:
+        return createElement(TeamMembershipsGrid, {
+          teamId: team?.id,
+          teamMembershipsQuery: teamMembershipsQuery,
+          teamType: 'Team of Teams',
+        })
+      default:
+        return null
+    }
+  }, [
+    activeTab,
+    team,
+    risksQuery,
+    teamMembershipsQuery,
+    onIncludeClosedRisksChanged,
+  ])
 
   useEffect(() => {
     dispatch(retrieveTeam({ key: teamKey, type: 'Team of Teams' }))
@@ -163,8 +179,8 @@ const TeamOfTeamsDetailsPage = (props: {
 
   // doesn't trigger on first render
   const onTabChange = useCallback(
-    (tabKey) => {
-      setActiveTab(tabKey)
+    (tabKey: string) => {
+      setActiveTab(tabKey as TeamOfTeamsTabs)
 
       // enables the query for the tab on first render if it hasn't been enabled yet
       if (tabKey == TeamOfTeamsTabs.RiskManagement && !risksQueryEnabled) {
@@ -217,7 +233,7 @@ const TeamOfTeamsDetailsPage = (props: {
         activeTabKey={activeTab}
         onTabChange={onTabChange}
       >
-        {tabs.find((t) => t.key === activeTab)?.content}
+        {renderTabContent()}
       </Card>
       {isInEditMode && team && canUpdateTeam && <EditTeamForm team={team} />}
       {openCreateTeamMembershipForm && (

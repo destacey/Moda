@@ -18,6 +18,13 @@ enum EmployeeTabs {
   Details = 'details',
 }
 
+const tabs = [
+  {
+    key: EmployeeTabs.Details,
+    tab: 'Details',
+  },
+]
+
 const EmployeeDetailsPage = (props: { params: Promise<{ key: number }> }) => {
   const { key: employeeKey } = use(props.params)
 
@@ -38,13 +45,6 @@ const EmployeeDetailsPage = (props: { params: Promise<{ key: number }> }) => {
       ? `${employeeData.displayName} - Employee Details`
       : 'Employee Details',
   )
-
-  const tabs = [
-    {
-      key: EmployeeTabs.Details,
-      tab: 'Details',
-    },
-  ]
 
   const renderTabContent = useCallback(() => {
     switch (activeTab) {

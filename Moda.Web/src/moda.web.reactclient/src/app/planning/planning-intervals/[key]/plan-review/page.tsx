@@ -84,7 +84,6 @@ const PlanningIntervalPlanReviewPage = (props: {
         return {
           key: team.code.toLowerCase(),
           tab: team.code,
-          content: <div>{team.code}</div>,
         }
       }),
     [teams],

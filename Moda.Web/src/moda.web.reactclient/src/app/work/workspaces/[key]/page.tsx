@@ -22,6 +22,17 @@ enum WorkspaceTabs {
   WorkItems = 'workItems',
 }
 
+const tabs = [
+  {
+    key: WorkspaceTabs.Details,
+    tab: 'Details',
+  },
+  {
+    key: WorkspaceTabs.WorkItems,
+    tab: 'Work Items',
+  },
+]
+
 const WorkspaceDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const { key } = use(props.params)
 
@@ -50,6 +61,33 @@ const WorkspaceDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const dispatch = useAppDispatch()
   const pathname = usePathname()
 
+  const renderTabContent = useCallback(() => {
+    switch (activeTab) {
+      case WorkspaceTabs.Details:
+        return <WorkspaceDetails workspace={workspaceData} />
+      case WorkspaceTabs.WorkItems:
+        return (
+          <WorkItemsGrid
+            workItems={workItemsQuery.data}
+            isLoading={workItemsQuery.isLoading}
+            refetch={workItemsQuery.refetch}
+          />
+        )
+      default:
+        return null
+    }
+  }, [
+    activeTab,
+    workspaceData,
+    workItemsQuery.data,
+    workItemsQuery.isLoading,
+    workItemsQuery.refetch,
+  ])
+
+  const onTabChange = useCallback((tabKey: string) => {
+    setActiveTab(tabKey as WorkspaceTabs)
+  }, [])
+
   useEffect(() => {
     dispatch(setBreadcrumbTitle({ title: workspaceKey, pathname }))
   }, [dispatch, pathname, workspaceKey])
@@ -61,11 +99,6 @@ const WorkspaceDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   useEffect(() => {
     workItemsQuery.error && console.error(workItemsQuery.error)
   }, [workItemsQuery.error])
-
-  // doesn't trigger on first render
-  const onTabChange = useCallback((tabKey) => {
-    setActiveTab(tabKey)
-  }, [])
 
   if (isLoading) {
     return <WorkspaceDetailsLoading />
@@ -91,25 +124,6 @@ const WorkspaceDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     )
   }
 
-  const tabs = [
-    {
-      key: WorkspaceTabs.Details,
-      tab: 'Details',
-      content: <WorkspaceDetails workspace={workspaceData} />,
-    },
-    {
-      key: WorkspaceTabs.WorkItems,
-      tab: 'Work Items',
-      content: (
-        <WorkItemsGrid
-          workItems={workItemsQuery.data}
-          isLoading={workItemsQuery.isLoading}
-          refetch={workItemsQuery.refetch}
-        />
-      ),
-    },
-  ]
-
   const onSetWorkspaceExternalUrlTemplatesFormClosed = (wasSaved: boolean) => {
     setOpenSetWorkspaceExternalUrlTemplatesForm(false)
     if (wasSaved) {
@@ -130,7 +144,7 @@ const WorkspaceDetailsPage = (props: { params: Promise<{ key: string }> }) => {
         activeTabKey={activeTab}
         onTabChange={onTabChange}
       >
-        {tabs.find((t) => t.key === activeTab)?.content}
+        {renderTabContent()}
       </Card>
       {openSetWorkspaceExternalUrlTemplatesForm && (
         <SetWorkspaceExternalUrlTemplatesForm

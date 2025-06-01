@@ -20,6 +20,17 @@ import ChangeExpenditureCategoryStateForm, {
 } from '../_components/change-expenditure-category-state-form'
 import { useMessage } from '@/src/components/contexts/messaging'
 
+enum ExpenditureCategoryTabs {
+  Details = 'details',
+}
+
+const tabs = [
+  {
+    key: ExpenditureCategoryTabs.Details,
+    tab: 'Details',
+  },
+]
+
 enum MenuActions {
   Edit = 'Edit',
   Delete = 'Delete',
@@ -32,7 +43,7 @@ const ExpenditureCategoryDetailsPage = (props: {
 }) => {
   const { id } = use(props.params)
 
-  const [activeTab, setActiveTab] = useState('details')
+  const [activeTab, setActiveTab] = useState(ExpenditureCategoryTabs.Details)
   const [openEditExpenditureCategoryForm, setOpenEditExpenditureCategoryForm] =
     useState<boolean>(false)
   const [
@@ -66,6 +77,19 @@ const ExpenditureCategoryDetailsPage = (props: {
   const canDeleteExpenditureCategories = hasPermissionClaim(
     'Permissions.ExpenditureCategories.Delete',
   )
+
+  const renderTabContent = useCallback(() => {
+    switch (activeTab) {
+      case ExpenditureCategoryTabs.Details:
+        return <ExpenditureCategoryDetails expenditureCategory={categoryData} />
+      default:
+        return null
+    }
+  }, [activeTab, categoryData])
+
+  const onTabChange = useCallback((tabKey: string) => {
+    setActiveTab(tabKey as ExpenditureCategoryTabs)
+  }, [])
 
   const actionsMenuItems: MenuProps['items'] = useMemo(() => {
     const currentState = categoryData?.state.name
@@ -193,16 +217,6 @@ const ExpenditureCategoryDetailsPage = (props: {
     return notFound()
   }
 
-  const tabs = [
-    {
-      key: 'details',
-      tab: 'Details',
-      content: (
-        <ExpenditureCategoryDetails expenditureCategory={categoryData} />
-      ),
-    },
-  ]
-
   return (
     <>
       <BasicBreadcrumb
@@ -222,9 +236,9 @@ const ExpenditureCategoryDetailsPage = (props: {
         style={{ width: '100%' }}
         tabList={tabs}
         activeTabKey={activeTab}
-        onTabChange={(key) => setActiveTab(key)}
+        onTabChange={onTabChange}
       >
-        {tabs.find((t) => t.key === activeTab)?.content}
+        {renderTabContent()}
       </Card>
 
       {openEditExpenditureCategoryForm && (
