@@ -7474,20 +7474,6 @@ export class RisksClient {
             result201 = JSON.parse(resultData201);
             return Promise.resolve<ObjectIdAndKey>(result201);
 
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = JSON.parse(resultData400);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
-
-        } else if (status === 404) {
-            const _responseText = response.data;
-            let result404: any = null;
-            let resultData404  = _responseText;
-            result404 = JSON.parse(resultData404);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
-
         } else if (status === 422) {
             const _responseText = response.data;
             let result422: any = null;
@@ -7503,7 +7489,7 @@ export class RisksClient {
     }
 
     /**
-     * Get risk details by Id.
+     * Get risk details using the Id or key.
      */
     getRisk(idOrKey: string, cancelToken?: CancelToken): Promise<RiskDetailsDto> {
         let url_ = this.baseUrl + "/api/planning/risks/{idOrKey}";
@@ -11019,7 +11005,7 @@ export class EmployeesClient {
     /**
      * Create an employee.
      */
-    create(request: CreateEmployeeRequest, cancelToken?: CancelToken): Promise<number> {
+    create(request: CreateEmployeeRequest, cancelToken?: CancelToken): Promise<ObjectIdAndKey> {
         let url_ = this.baseUrl + "/api/organization/employees";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -11047,7 +11033,7 @@ export class EmployeesClient {
         });
     }
 
-    protected processCreate(response: AxiosResponse): Promise<number> {
+    protected processCreate(response: AxiosResponse): Promise<ObjectIdAndKey> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -11062,7 +11048,7 @@ export class EmployeesClient {
             let result201: any = null;
             let resultData201  = _responseText;
             result201 = JSON.parse(resultData201);
-            return Promise.resolve<number>(result201);
+            return Promise.resolve<ObjectIdAndKey>(result201);
 
         } else if (status === 422) {
             const _responseText = response.data;
@@ -11075,17 +11061,17 @@ export class EmployeesClient {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<number>(null as any);
+        return Promise.resolve<ObjectIdAndKey>(null as any);
     }
 
     /**
-     * Get employee details using the key.
+     * Get employee details using the Id or key.
      */
-    getById(id: number, cancelToken?: CancelToken): Promise<EmployeeDetailsDto> {
-        let url_ = this.baseUrl + "/api/organization/employees/{id}";
-        if (id === undefined || id === null)
-            throw new Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+    getEmployee(idOrKey: string, cancelToken?: CancelToken): Promise<EmployeeDetailsDto> {
+        let url_ = this.baseUrl + "/api/organization/employees/{idOrKey}";
+        if (idOrKey === undefined || idOrKey === null)
+            throw new Error("The parameter 'idOrKey' must be defined.");
+        url_ = url_.replace("{idOrKey}", encodeURIComponent("" + idOrKey));
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -11104,11 +11090,11 @@ export class EmployeesClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processGetById(_response);
+            return this.processGetEmployee(_response);
         });
     }
 
-    protected processGetById(response: AxiosResponse): Promise<EmployeeDetailsDto> {
+    protected processGetEmployee(response: AxiosResponse): Promise<EmployeeDetailsDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {

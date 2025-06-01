@@ -1,56 +1,31 @@
-﻿using Mapster;
+﻿using System.Linq.Expressions;
+using Mapster;
 using Moda.Common.Application.Employees.Dtos;
-using Moda.Common.Application.Exceptions;
 using Moda.Common.Application.Persistence;
+using Moda.Common.Domain.Employees;
 
 namespace Moda.Common.Application.Employees.Queries;
 public sealed record GetEmployeeQuery : IQuery<EmployeeDetailsDto?>
 {
-    public GetEmployeeQuery(Guid employeeId)
+    public GetEmployeeQuery(IdOrKey idOrKey)
     {
-        EmployeeId = employeeId;
-    }
-    public GetEmployeeQuery(int employeeKey)
-    {
-        EmployeeKey = employeeKey;
+        IdOrKeyFilter = idOrKey.CreateFilter<Employee>();
     }
 
-    public Guid? EmployeeId { get; }
-    public int? EmployeeKey { get; }
+    public Expression<Func<Employee, bool>> IdOrKeyFilter { get; }
 }
 
-internal sealed class GetEmployeeQueryHandler : IQueryHandler<GetEmployeeQuery, EmployeeDetailsDto?>
+internal sealed class GetEmployeeQueryHandler(
+    IModaDbContext modaDbContext) 
+    : IQueryHandler<GetEmployeeQuery, EmployeeDetailsDto?>
 {
-    private readonly IModaDbContext _modaDbContext;
-    private readonly ILogger<GetEmployeeQueryHandler> _logger;
-
-    public GetEmployeeQueryHandler(IModaDbContext modaDbContext, ILogger<GetEmployeeQueryHandler> logger)
-    {
-        _modaDbContext = modaDbContext;
-        _logger = logger;
-    }
+    private readonly IModaDbContext _modaDbContext = modaDbContext;
 
     public async Task<EmployeeDetailsDto?> Handle(GetEmployeeQuery request, CancellationToken cancellationToken)
     {
-        var query = _modaDbContext.Employees.AsQueryable();
-
-        if (request.EmployeeId.HasValue)
-        {
-            query = query.Where(e => e.Id == request.EmployeeId.Value);
-        }
-        else if (request.EmployeeKey.HasValue)
-        {
-            query = query.Where(e => e.Key == request.EmployeeKey.Value);
-        }
-        else
-        {
-            var requestName = request.GetType().Name;
-            var exception = new InternalServerException("No employee id or local id provided.");
-
-            _logger.LogError(exception, "Moda Request: Exception for Request {Name} {@Request}", requestName, request);
-            throw exception;
-        }
-
-        return await query.ProjectToType<EmployeeDetailsDto>().FirstOrDefaultAsync(cancellationToken);
+        return await _modaDbContext.Employees
+            .Where(request.IdOrKeyFilter)
+            .ProjectToType<EmployeeDetailsDto>()
+            .FirstOrDefaultAsync(cancellationToken);
     }
 }

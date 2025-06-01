@@ -4,7 +4,7 @@ using Moda.Common.Domain.Employees;
 using Moda.Common.Models;
 
 namespace Moda.Common.Application.Employees.Commands;
-public sealed record CreateEmployeeCommand : ICommand<int>
+public sealed record CreateEmployeeCommand : ICommand<ObjectIdAndKey>
 {
     public CreateEmployeeCommand(PersonName name, string employeeNumber, Instant? hireDate, EmailAddress email, string? jobTitle, string? department, string? officeLocation, Guid? managerId)
     {
@@ -90,7 +90,7 @@ public sealed class CreateEmployeeCommandValidator : CustomValidator<CreateEmplo
     }
 }
 
-internal sealed class CreateEmployeeCommandHandler : ICommandHandler<CreateEmployeeCommand, int>
+internal sealed class CreateEmployeeCommandHandler : ICommandHandler<CreateEmployeeCommand, ObjectIdAndKey>
 {
     private readonly IModaDbContext _modaDbContext;
     private readonly IDateTimeProvider _dateTimeProvider;
@@ -103,7 +103,7 @@ internal sealed class CreateEmployeeCommandHandler : ICommandHandler<CreateEmplo
         _logger = logger;
     }
 
-    public async Task<Result<int>> Handle(CreateEmployeeCommand request, CancellationToken cancellationToken)
+    public async Task<Result<ObjectIdAndKey>> Handle(CreateEmployeeCommand request, CancellationToken cancellationToken)
     {
         try
         {
@@ -131,7 +131,7 @@ internal sealed class CreateEmployeeCommandHandler : ICommandHandler<CreateEmplo
 
             await _modaDbContext.SaveChangesAsync(cancellationToken);
 
-            return Result.Success(employee.Key);
+            return new ObjectIdAndKey(employee.Id, employee.Key);
         }
         catch (Exception ex)
         {
@@ -139,7 +139,7 @@ internal sealed class CreateEmployeeCommandHandler : ICommandHandler<CreateEmplo
 
             _logger.LogError(ex, "Moda Request: Exception for Request {Name} {@Request}", requestName, request);
 
-            return Result.Failure<int>($"Moda Request: Exception for Request {requestName} {request}");
+            return Result.Failure<ObjectIdAndKey>($"Moda Request: Exception for Request {requestName} {request}");
         }
     }
 }
