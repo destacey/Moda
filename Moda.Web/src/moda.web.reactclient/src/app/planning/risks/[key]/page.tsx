@@ -73,7 +73,7 @@ const RiskDetailsPage = (props: { params: Promise<{ key: number }> }) => {
   }
 
   if (!isLoading && !riskData) {
-    notFound()
+    return notFound()
   }
 
   const actions = () => {

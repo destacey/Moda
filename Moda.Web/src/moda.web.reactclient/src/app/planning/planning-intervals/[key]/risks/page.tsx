@@ -32,13 +32,13 @@ const PlanningIntervalRisksPage = (props: {
     includeClosed: includeClosedRisks,
   })
 
-  if (!isLoading && !planningIntervalData) {
-    notFound()
-  }
-
   const onIncludeClosedRisksChanged = useCallback((includeClosed: boolean) => {
     setIncludeClosedRisks(includeClosed)
   }, [])
+
+  if (!isLoading && !planningIntervalData) {
+    return notFound()
+  }
 
   return (
     <>

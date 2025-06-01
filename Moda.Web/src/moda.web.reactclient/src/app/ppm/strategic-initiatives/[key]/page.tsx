@@ -419,7 +419,7 @@ const StrategicInitiativeDetailsPage = (props: {
   }
 
   if (!strategicInitiativeData) {
-    notFound()
+    return notFound()
   }
 
   return (

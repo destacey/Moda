@@ -96,7 +96,7 @@ const PlanningIntervalPlanReviewPage = (props: {
   }, [teams, activeTab])
 
   if (!isLoading && !planningIntervalData) {
-    notFound()
+    return notFound()
   }
   if (isLoading || teamsIsLoading) return <PlanningIntervalPlanReviewLoading />
   if (!planningIntervalData) return null

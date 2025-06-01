@@ -172,7 +172,7 @@ const PlanningIntervalDetailsPage = (props: {
   }
 
   if (!isLoading && !planningIntervalData) {
-    notFound()
+    return notFound()
   }
 
   return (

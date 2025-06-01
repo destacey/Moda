@@ -151,7 +151,7 @@ const ObjectiveDetailsPage = (props: {
   }
 
   if (!isLoading && !objectiveData) {
-    notFound()
+    return notFound()
   }
 
   return (

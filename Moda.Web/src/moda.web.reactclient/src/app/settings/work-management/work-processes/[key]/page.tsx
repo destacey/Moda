@@ -63,7 +63,7 @@ const WorkProcessDetailsPage = (props: {
   }
 
   if (!workProcessData) {
-    notFound()
+    return notFound()
   }
 
   const tabs = [

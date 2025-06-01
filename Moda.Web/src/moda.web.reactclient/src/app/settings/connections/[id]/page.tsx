@@ -221,7 +221,7 @@ const ConnectionDetailsPage = (props: { params: Promise<{ id: string }> }) => {
   ])
 
   if (!isLoading && !connectionData) {
-    notFound()
+    return notFound()
   }
 
   return (

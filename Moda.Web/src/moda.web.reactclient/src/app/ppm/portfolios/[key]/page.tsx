@@ -302,7 +302,7 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: number }> }) => {
   }
 
   if (!portfolioData) {
-    notFound()
+    return notFound()
   }
 
   return (

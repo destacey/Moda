@@ -72,7 +72,7 @@ const WorkspaceDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   }
 
   if (!isLoading && !workspaceData) {
-    notFound()
+    return notFound()
   }
 
   const actions = () => {

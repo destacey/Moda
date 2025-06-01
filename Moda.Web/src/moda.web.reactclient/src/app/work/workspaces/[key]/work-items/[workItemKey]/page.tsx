@@ -118,7 +118,7 @@ const WorkItemDetailsPage = (props: {
   }
 
   if (!isLoading && !workItemData) {
-    notFound()
+    return notFound()
   }
 
   const tabs = [

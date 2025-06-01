@@ -46,7 +46,7 @@ const RoleDetailsPage = (props: { params: Promise<{ id: string }> }) => {
   ]
 
   if (!isLoading && !roleData) {
-    notFound()
+    return notFound()
   }
 
   return (

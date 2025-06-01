@@ -80,10 +80,6 @@ const PlanningIntervalObjectivesPage = (props: {
     [currentView],
   )
 
-  if (!isLoading && !planningIntervalData) {
-    notFound()
-  }
-
   const createObjectiveButtonClicked = useCallback(() => {
     setOpenCreateObjectiveForm(true)
   }, [])
@@ -102,6 +98,10 @@ const PlanningIntervalObjectivesPage = (props: {
         )}
       </>
     )
+  }
+
+  if (!isLoading && !planningIntervalData) {
+    return notFound()
   }
 
   return (

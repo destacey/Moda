@@ -274,7 +274,7 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: number }> }) => {
   }
 
   if (!projectData) {
-    notFound()
+    return notFound()
   }
 
   return (

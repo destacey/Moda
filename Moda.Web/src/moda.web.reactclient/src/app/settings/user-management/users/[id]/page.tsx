@@ -26,7 +26,7 @@ const UserDetailsPage = (props: { params: Promise<{ id: string }> }) => {
   }
 
   if (!userData) {
-    notFound()
+    return notFound()
   }
 
   const tabs = [
