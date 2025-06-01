@@ -63,7 +63,7 @@ const ObjectiveHealthReportPage = (props: {
   }, [dispatch, objectiveData, pathname])
 
   if (!isLoading && !objectiveData) {
-    notFound()
+    return notFound()
   }
 
   return (

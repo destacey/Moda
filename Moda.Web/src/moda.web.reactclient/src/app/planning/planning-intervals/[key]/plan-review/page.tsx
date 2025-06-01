@@ -84,7 +84,6 @@ const PlanningIntervalPlanReviewPage = (props: {
         return {
           key: team.code.toLowerCase(),
           tab: team.code,
-          content: <div>{team.code}</div>,
         }
       }),
     [teams],
@@ -96,7 +95,7 @@ const PlanningIntervalPlanReviewPage = (props: {
   }, [teams, activeTab])
 
   if (!isLoading && !planningIntervalData) {
-    notFound()
+    return notFound()
   }
   if (isLoading || teamsIsLoading) return <PlanningIntervalPlanReviewLoading />
   if (!planningIntervalData) return null

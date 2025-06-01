@@ -3,7 +3,7 @@
 import PageTitle from '@/src/components/common/page-title'
 import { authorizePage } from '@/src/components/hoc'
 import { notFound } from 'next/navigation'
-import { use, useEffect, useMemo, useState } from 'react'
+import { use, useCallback, useEffect, useMemo, useState } from 'react'
 import { Card } from 'antd'
 import BasicBreadcrumb from '@/src/components/common/basic-breadcrumb'
 import WorkProcessDetailsLoading from './loading'
@@ -14,12 +14,23 @@ import { useGetWorkProcessQuery } from '@/src/store/features/work-management/wor
 import { ItemType } from 'antd/es/menu/interface'
 import { WorkProcessDetails } from '../_components'
 
+enum WorkProcessDetailsTabs {
+  Details = 'details',
+}
+
+const tabs = [
+  {
+    key: 'details',
+    tab: 'Details',
+  },
+]
+
 const WorkProcessDetailsPage = (props: {
   params: Promise<{ key: number }>
 }) => {
-  const { key } = use(props.params)
+  const { key: workProcessKey } = use(props.params)
 
-  const [activeTab, setActiveTab] = useState('details')
+  const [activeTab, setActiveTab] = useState(WorkProcessDetailsTabs.Details)
   const [
     openChangeWorkProcessIsActiveForm,
     setOpenChangeWorkProcessIsActiveForm,
@@ -35,7 +46,20 @@ const WorkProcessDetailsPage = (props: {
     isLoading,
     error,
     refetch,
-  } = useGetWorkProcessQuery(key.toString())
+  } = useGetWorkProcessQuery(workProcessKey.toString())
+
+  const renderTabContent = useCallback(() => {
+    switch (activeTab) {
+      case WorkProcessDetailsTabs.Details:
+        return <WorkProcessDetails workProcess={workProcessData} />
+      default:
+        return null
+    }
+  }, [activeTab, workProcessData])
+
+  const onTabChange = (tabKey: string) => {
+    setActiveTab(tabKey as WorkProcessDetailsTabs)
+  }
 
   useEffect(() => {
     error && console.error(error)
@@ -63,16 +87,8 @@ const WorkProcessDetailsPage = (props: {
   }
 
   if (!workProcessData) {
-    notFound()
+    return notFound()
   }
-
-  const tabs = [
-    {
-      key: 'details',
-      tab: 'Details',
-      content: <WorkProcessDetails workProcess={workProcessData} />,
-    },
-  ]
 
   const onChangeWorkProcessIsActiveFormClosed = (wasSaved: boolean) => {
     if (wasSaved) {
@@ -100,9 +116,9 @@ const WorkProcessDetailsPage = (props: {
         style={{ width: '100%' }}
         tabList={tabs}
         activeTabKey={activeTab}
-        onTabChange={(key) => setActiveTab(key)}
+        onTabChange={onTabChange}
       >
-        {tabs.find((t) => t.key === activeTab)?.content}
+        {renderTabContent()}
       </Card>
       {openChangeWorkProcessIsActiveForm && (
         <ChangeWorkProcessIsActiveForm

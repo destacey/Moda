@@ -38,6 +38,17 @@ enum PlanningIntervalTabs {
   Teams = 'teams',
 }
 
+const tabs = [
+  {
+    key: PlanningIntervalTabs.Details,
+    tab: 'Details',
+  },
+  {
+    key: PlanningIntervalTabs.Teams,
+    tab: 'Teams',
+  },
+]
+
 const PlanningIntervalDetailsPage = (props: {
   params: Promise<{ key: number }>
 }) => {
@@ -102,24 +113,22 @@ const PlanningIntervalDetailsPage = (props: {
     return items
   }, [canUpdatePlanningInterval])
 
-  const tabs = [
-    {
-      key: PlanningIntervalTabs.Details,
-      tab: 'Details',
-      content: (
-        <PlanningIntervalDetails planningInterval={planningIntervalData} />
-      ),
-    },
-    {
-      key: PlanningIntervalTabs.Teams,
-      tab: 'Teams',
-      content: createElement(TeamsGrid, {
-        teams: teamsData,
-        isLoading: teamsIsLoading,
-        refetch: refetchTeams,
-      } as TeamsGridProps),
-    },
-  ]
+  const renderTabContent = useCallback(() => {
+    switch (activeTab) {
+      case PlanningIntervalTabs.Details:
+        return (
+          <PlanningIntervalDetails planningInterval={planningIntervalData} />
+        )
+      case PlanningIntervalTabs.Teams:
+        return createElement(TeamsGrid, {
+          teams: teamsData,
+          isLoading: teamsIsLoading,
+          refetch: refetchTeams,
+        } as TeamsGridProps)
+      default:
+        return null
+    }
+  }, [activeTab, planningIntervalData, refetchTeams, teamsData, teamsIsLoading])
 
   useEffect(() => {
     planningIntervalData &&
@@ -156,8 +165,8 @@ const PlanningIntervalDetailsPage = (props: {
 
   // doesn't trigger on first render
   const onTabChange = useCallback(
-    (tabKey) => {
-      setActiveTab(tabKey)
+    (tabKey: string) => {
+      setActiveTab(tabKey as PlanningIntervalTabs)
 
       // enables the query for the tab on first render if it hasn't been enabled yet
       if (tabKey == PlanningIntervalTabs.Teams && !teamsQueryEnabled) {
@@ -172,7 +181,7 @@ const PlanningIntervalDetailsPage = (props: {
   }
 
   if (!isLoading && !planningIntervalData) {
-    notFound()
+    return notFound()
   }
 
   return (
@@ -187,7 +196,7 @@ const PlanningIntervalDetailsPage = (props: {
         activeTabKey={activeTab}
         onTabChange={onTabChange}
       >
-        {tabs.find((t) => t.key === activeTab)?.content}
+        {renderTabContent()}
       </Card>
       {openEditPlanningIntervalForm && (
         <EditPlanningIntervalForm

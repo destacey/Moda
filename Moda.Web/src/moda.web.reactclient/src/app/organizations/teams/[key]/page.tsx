@@ -50,6 +50,29 @@ enum TeamTabs {
   TeamMemberships = 'team-memberships',
 }
 
+const tabs = [
+  {
+    key: TeamTabs.Details,
+    tab: 'Details',
+  },
+  {
+    key: TeamTabs.Backlog,
+    tab: 'Backlog',
+  },
+  {
+    key: TeamTabs.DependencyManagement,
+    tab: 'Dependency Management',
+  },
+  {
+    key: TeamTabs.RiskManagement,
+    tab: 'Risk Management',
+  },
+  {
+    key: TeamTabs.TeamMemberships,
+    tab: 'Team Memberships',
+  },
+]
+
 const TeamDetailsPage = (props: { params: Promise<{ key: number }> }) => {
   const { key } = use(props.params)
 
@@ -127,50 +150,46 @@ const TeamDetailsPage = (props: { params: Promise<{ key: number }> }) => {
     return items
   }, [canManageTeamMemberships, canUpdateTeam, dispatch, team?.isActive])
 
-  const tabs = [
-    {
-      key: TeamTabs.Details,
-      tab: 'Details',
-      content: <TeamDetails team={team} />,
-    },
-    {
-      key: TeamTabs.Backlog,
-      tab: 'Backlog',
-      content: createElement(WorkItemsBacklogGrid, {
-        workItems: backlogQuery.data,
-        hideTeamColumn: true,
-        isLoading: backlogQuery.isLoading,
-        refetch: backlogQuery.refetch,
-      } as WorkItemsBacklogGridProps),
-    },
-    {
-      key: TeamTabs.DependencyManagement,
-      tab: 'Dependency Management',
-      content: <TeamDependencyManagement team={team} />,
-    },
-    {
-      key: TeamTabs.RiskManagement,
-      tab: 'Risk Management',
-      content: createElement(RisksGrid, {
-        risks: risksQuery.data,
-        updateIncludeClosed: onIncludeClosedRisksChanged,
-        isLoadingRisks: risksQuery.isLoading,
-        refreshRisks: risksQuery.refetch,
-        newRisksAllowed: true,
-        teamId: team?.id,
-        hideTeamColumn: true,
-      } as RisksGridProps),
-    },
-    {
-      key: TeamTabs.TeamMemberships,
-      tab: 'Team Memberships',
-      content: createElement(TeamMembershipsGrid, {
-        teamId: team?.id,
-        teamMembershipsQuery: teamMembershipsQuery,
-        teamType: 'Team',
-      }),
-    },
-  ]
+  const renderTabContent = useCallback(() => {
+    switch (activeTab) {
+      case TeamTabs.Details:
+        return <TeamDetails team={team} />
+      case TeamTabs.Backlog:
+        return createElement(WorkItemsBacklogGrid, {
+          workItems: backlogQuery.data,
+          hideTeamColumn: true,
+          isLoading: backlogQuery.isLoading,
+          refetch: backlogQuery.refetch,
+        } as WorkItemsBacklogGridProps)
+      case TeamTabs.DependencyManagement:
+        return <TeamDependencyManagement team={team} />
+      case TeamTabs.RiskManagement:
+        return createElement(RisksGrid, {
+          risks: risksQuery.data,
+          updateIncludeClosed: onIncludeClosedRisksChanged,
+          isLoadingRisks: risksQuery.isLoading,
+          refreshRisks: risksQuery.refetch,
+          newRisksAllowed: true,
+          teamId: team?.id,
+          hideTeamColumn: true,
+        } as RisksGridProps)
+      case TeamTabs.TeamMemberships:
+        return createElement(TeamMembershipsGrid, {
+          teamId: team?.id,
+          teamMembershipsQuery: teamMembershipsQuery,
+          teamType: 'Team',
+        })
+      default:
+        return null
+    }
+  }, [
+    activeTab,
+    team,
+    risksQuery,
+    teamMembershipsQuery,
+    backlogQuery,
+    onIncludeClosedRisksChanged,
+  ])
 
   useEffect(() => {
     dispatch(retrieveTeam({ key, type: 'Team' }))
@@ -186,8 +205,8 @@ const TeamDetailsPage = (props: { params: Promise<{ key: number }> }) => {
 
   // doesn't trigger on first render
   const onTabChange = useCallback(
-    (tabKey) => {
-      setActiveTab(tabKey)
+    (tabKey: string) => {
+      setActiveTab(tabKey as TeamTabs)
 
       // enables the query for the tab on first render if it hasn't been enabled yet
       if (tabKey == TeamTabs.RiskManagement && !risksQueryEnabled) {
@@ -234,7 +253,7 @@ const TeamDetailsPage = (props: { params: Promise<{ key: number }> }) => {
         activeTabKey={activeTab}
         onTabChange={onTabChange}
       >
-        {tabs.find((t) => t.key === activeTab)?.content}
+        {renderTabContent()}
       </Card>
       {isInEditMode && team && canUpdateTeam && <EditTeamForm team={team} />}
       {openCreateTeamMembershipForm && (

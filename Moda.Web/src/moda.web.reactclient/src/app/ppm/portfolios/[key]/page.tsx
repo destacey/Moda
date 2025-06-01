@@ -34,6 +34,21 @@ enum PortfolioTabs {
   StrategicInitiatives = 'strategicInitiatives',
 }
 
+const tabs = [
+  {
+    key: PortfolioTabs.Details,
+    label: 'Details',
+  },
+  {
+    key: PortfolioTabs.Projects,
+    label: 'Projects',
+  },
+  {
+    key: PortfolioTabs.StrategicInitiatives,
+    label: 'Strategic Initiatives',
+  },
+]
+
 enum MenuActions {
   Edit = 'Edit',
   Delete = 'Delete',
@@ -123,45 +138,38 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: number }> }) => {
     error && console.error(error)
   }, [error])
 
-  const tabs = useMemo(() => {
-    const pageTabs = [
-      {
-        key: PortfolioTabs.Details,
-        label: 'Details',
-        content: <PortfolioDetails portfolio={portfolioData} />,
-      },
-      {
-        key: PortfolioTabs.Projects,
-        label: 'Projects',
-        content: (
+  const renderTabContent = useCallback(() => {
+    switch (activeTab) {
+      case PortfolioTabs.Details:
+        return <PortfolioDetails portfolio={portfolioData} />
+      case PortfolioTabs.Projects:
+        return (
           <ProjectViewManager
             projects={projectData}
             isLoading={isLoadingProjects}
             refetch={refetchProjects}
           />
-        ),
-      },
-      {
-        key: PortfolioTabs.StrategicInitiatives,
-        label: 'Strategic Initiatives',
-        content: (
+        )
+      case PortfolioTabs.StrategicInitiatives:
+        return (
           <StrategicInitiativeViewManager
             strategicInitiatives={strategicInitiativeData}
             isLoading={isLoadingStrategicInitiatives}
             refetch={refetchStrategicInitiatives}
           />
-        ),
-      },
-    ]
-    return pageTabs
+        )
+      default:
+        return null
+    }
   }, [
-    isLoadingProjects,
-    isLoadingStrategicInitiatives,
+    activeTab,
     portfolioData,
     projectData,
+    strategicInitiativeData,
+    isLoadingProjects,
+    isLoadingStrategicInitiatives,
     refetchProjects,
     refetchStrategicInitiatives,
-    strategicInitiativeData,
   ])
 
   const actionsMenuItems: MenuProps['items'] = useMemo(() => {
@@ -233,16 +241,19 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: number }> }) => {
 
   // doesn't trigger on first render
   const onTabChange = useCallback(
-    (tabKey: PortfolioTabs) => {
-      if (tabKey === PortfolioTabs.Projects && !projectsQueried) {
+    (tabKey: string) => {
+      const tab = tabKey as PortfolioTabs
+
+      if (tab === PortfolioTabs.Projects && !projectsQueried) {
         setProjectsQueried(true)
       } else if (
-        tabKey === PortfolioTabs.StrategicInitiatives &&
+        tab === PortfolioTabs.StrategicInitiatives &&
         !strategicInitiativesQueried
       ) {
         setStrategicInitiativesQueried(true)
       }
-      setActiveTab(tabKey)
+
+      setActiveTab(tab)
     },
     [projectsQueried, strategicInitiativesQueried],
   )
@@ -302,7 +313,7 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: number }> }) => {
   }
 
   if (!portfolioData) {
-    notFound()
+    return notFound()
   }
 
   return (
@@ -318,7 +329,7 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: number }> }) => {
         activeTabKey={activeTab}
         onTabChange={onTabChange}
       >
-        {tabs.find((t) => t.key === activeTab)?.content}
+        {renderTabContent()}
       </Card>
 
       {openEditPortfolioForm && (

@@ -31,6 +31,17 @@ enum ConnectionTabs {
   OrganizationConfiguration = 'organization-configuration',
 }
 
+const tabs = [
+  {
+    key: ConnectionTabs.Details,
+    tab: 'Details',
+  },
+  {
+    key: ConnectionTabs.OrganizationConfiguration,
+    tab: 'Organization Configuration',
+  },
+]
+
 const ConnectionDetailsPage = (props: { params: Promise<{ id: string }> }) => {
   const { id } = use(props.params)
 
@@ -75,23 +86,25 @@ const ConnectionDetailsPage = (props: { params: Promise<{ id: string }> }) => {
     { error: syncAzdoConnectionOrganizationError },
   ] = useSyncAzdoConnectionOrganizationMutation()
 
-  const tabs = [
-    {
-      key: ConnectionTabs.Details,
-      tab: 'Details',
-      content: <AzdoBoardsConnectionDetails connection={connectionData} />,
-    },
-    {
-      key: ConnectionTabs.OrganizationConfiguration,
-      tab: 'Organization Configuration',
-      content: (
-        <AzdoBoardsOrganization
-          workProcesses={connectionData?.configuration?.workProcesses}
-          workspaces={connectionData?.configuration?.workspaces}
-        />
-      ),
-    },
-  ]
+  const renderTabContent = useCallback(() => {
+    switch (activeTab) {
+      case ConnectionTabs.Details:
+        return <AzdoBoardsConnectionDetails connection={connectionData} />
+      case ConnectionTabs.OrganizationConfiguration:
+        return (
+          <AzdoBoardsOrganization
+            workProcesses={connectionData?.configuration?.workProcesses}
+            workspaces={connectionData?.configuration?.workspaces}
+          />
+        )
+      default:
+        return null
+    }
+  }, [activeTab, connectionData])
+
+  const onTabChange = useCallback((tabKey: string) => {
+    setActiveTab(tabKey as ConnectionTabs)
+  }, [])
 
   useEffect(() => {
     if (!connectionData) return
@@ -221,7 +234,7 @@ const ConnectionDetailsPage = (props: { params: Promise<{ id: string }> }) => {
   ])
 
   if (!isLoading && !connectionData) {
-    notFound()
+    return notFound()
   }
 
   return (
@@ -258,12 +271,8 @@ const ConnectionDetailsPage = (props: { params: Promise<{ id: string }> }) => {
           reloadConnectionData: refetch,
         }}
       >
-        <Card
-          tabList={tabs}
-          activeTabKey={activeTab}
-          onTabChange={(key: ConnectionTabs) => setActiveTab(key)}
-        >
-          {tabs.find((t) => t.key === activeTab)?.content}
+        <Card tabList={tabs} activeTabKey={activeTab} onTabChange={onTabChange}>
+          {renderTabContent()}
         </Card>
       </AzdoBoardsConnectionContext.Provider>
       {openEditConnectionForm && (

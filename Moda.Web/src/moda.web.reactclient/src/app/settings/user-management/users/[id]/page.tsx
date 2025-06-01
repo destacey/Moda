@@ -4,18 +4,42 @@ import PageTitle from '@/src/components/common/page-title'
 import { authorizePage } from '@/src/components/hoc'
 import { notFound } from 'next/navigation'
 import UserDetailsLoading from './loading'
-import { use, useEffect, useState } from 'react'
+import { use, useCallback, useEffect, useState } from 'react'
 import { Card } from 'antd'
 import BasicBreadcrumb from '@/src/components/common/basic-breadcrumb'
 import { useGetUserQuery } from '@/src/store/features/user-management/users-api'
 import { UserDetails } from '../_components'
 
+enum UserDetailsTabs {
+  Details = 'details',
+}
+
+const tabs = [
+  {
+    key: UserDetailsTabs.Details,
+    tab: 'Details',
+  },
+]
+
 const UserDetailsPage = (props: { params: Promise<{ id: string }> }) => {
   const { id } = use(props.params)
 
-  const [activeTab, setActiveTab] = useState('details')
+  const [activeTab, setActiveTab] = useState(UserDetailsTabs.Details)
 
   const { data: userData, isLoading, error, refetch } = useGetUserQuery(id)
+
+  const renderTabContent = useCallback(() => {
+    switch (activeTab) {
+      case UserDetailsTabs.Details:
+        return <UserDetails user={userData} />
+      default:
+        return null
+    }
+  }, [activeTab, userData])
+
+  const onTabChange = useCallback((tabKey: string) => {
+    setActiveTab(tabKey as UserDetailsTabs)
+  }, [])
 
   useEffect(() => {
     error && console.error(error)
@@ -26,16 +50,8 @@ const UserDetailsPage = (props: { params: Promise<{ id: string }> }) => {
   }
 
   if (!userData) {
-    notFound()
+    return notFound()
   }
-
-  const tabs = [
-    {
-      key: 'details',
-      tab: 'Details',
-      content: <UserDetails user={userData} />,
-    },
-  ]
 
   const fullName = `${userData?.firstName} ${userData?.lastName}`
 
@@ -54,9 +70,9 @@ const UserDetailsPage = (props: { params: Promise<{ id: string }> }) => {
         style={{ width: '100%' }}
         tabList={tabs}
         activeTabKey={activeTab}
-        onTabChange={(key) => setActiveTab(key)}
+        onTabChange={onTabChange}
       >
-        {tabs.find((t) => t.key === activeTab)?.content}
+        {renderTabContent()}
       </Card>
     </>
   )

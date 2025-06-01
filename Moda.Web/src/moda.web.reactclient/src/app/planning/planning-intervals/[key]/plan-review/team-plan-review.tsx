@@ -137,7 +137,7 @@ const TeamPlanReview = ({
           <Title level={3} style={{ margin: '0' }}>
             <Link href={`/organizations/teams/${team?.key}`}>{team?.name}</Link>
           </Title>
-          {objectivesData?.length > 0 && teamPredictabilityData && (
+          {objectivesData?.length > 0 && teamPredictabilityData != null && (
             <Tag title="PI Predictability">{`${teamPredictabilityData}%`}</Tag>
           )}
         </Space>

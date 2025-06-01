@@ -20,6 +20,7 @@ import WorkItemDependencies from './work-item-dependencies'
 import useAuth from '@/src/components/contexts/auth'
 import { ItemType } from 'antd/es/menu/interface'
 import EditWorkItemProjectForm from '../../../_components/edit-workitem-project-form'
+import { WorkItemDetailsDto } from '@/src/services/moda-api'
 
 enum WorkItemTabs {
   Details = 'details',
@@ -27,6 +28,33 @@ enum WorkItemTabs {
   Dashboard = 'dashboard',
   Dependencies = 'dependencies',
 }
+
+const getWorkItemTabs = (workItemData: WorkItemDetailsDto) => [
+  {
+    key: WorkItemTabs.Details,
+    tab: 'Details',
+  },
+  ...(workItemData?.statusCategory.name !== 'Removed'
+    ? [
+        {
+          key: WorkItemTabs.Dashboard,
+          tab: 'Dashboard',
+        },
+      ]
+    : []),
+  ...(workItemData?.tier === 'Portfolio'
+    ? [
+        {
+          key: WorkItemTabs.WorkItems,
+          tab: 'Work Items',
+        },
+      ]
+    : []),
+  {
+    key: WorkItemTabs.Dependencies,
+    tab: 'Dependencies',
+  },
+]
 
 const WorkItemDetailsPage = (props: {
   params: Promise<{ key: string; workItemKey: string }>
@@ -66,6 +94,39 @@ const WorkItemDetailsPage = (props: {
 
   const dispatch = useAppDispatch()
   const pathname = usePathname()
+
+  const tabs = useMemo(() => getWorkItemTabs(workItemData), [workItemData])
+
+  const renderTabContent = useCallback(() => {
+    switch (activeTab) {
+      case WorkItemTabs.Details:
+        return <WorkItemDetails workItem={workItemData} />
+      case WorkItemTabs.WorkItems:
+        return (
+          <WorkItemsGrid
+            workItems={childWorkItemsQuery.data}
+            isLoading={childWorkItemsQuery.isLoading}
+            refetch={childWorkItemsQuery.refetch}
+          />
+        )
+      case WorkItemTabs.Dashboard:
+        return <WorkItemDashboard workItem={workItemData} />
+      case WorkItemTabs.Dependencies:
+        return <WorkItemDependencies workItem={workItemData} />
+      default:
+        return null
+    }
+  }, [
+    activeTab,
+    workItemData,
+    childWorkItemsQuery.data,
+    childWorkItemsQuery.isLoading,
+    childWorkItemsQuery.refetch,
+  ])
+
+  const onTabChange = useCallback((tabKey: string) => {
+    setActiveTab(tabKey as WorkItemTabs)
+  }, [])
 
   const actionsMenuItems: MenuProps['items'] = useMemo(() => {
     const items: ItemType[] = []
@@ -108,56 +169,13 @@ const WorkItemDetailsPage = (props: {
     error && console.error(error)
   }, [error])
 
-  // doesn't trigger on first render
-  const onTabChange = useCallback((tabKey) => {
-    setActiveTab(tabKey)
-  }, [])
-
   if (isLoading) {
     return <WorkItemDetailsLoading />
   }
 
   if (!isLoading && !workItemData) {
-    notFound()
+    return notFound()
   }
-
-  const tabs = [
-    {
-      key: WorkItemTabs.Details,
-      tab: 'Details',
-      content: <WorkItemDetails workItem={workItemData} />,
-    },
-    ...(workItemData?.statusCategory.name !== 'Removed'
-      ? [
-          {
-            key: WorkItemTabs.Dashboard,
-            tab: 'Dashboard',
-            content: <WorkItemDashboard workItem={workItemData} />,
-          },
-        ]
-      : []),
-    ...(workItemData?.tier === 'Portfolio'
-      ? [
-          {
-            key: WorkItemTabs.WorkItems,
-            tab: 'Work Items',
-            content: (
-              <WorkItemsGrid
-                workItems={childWorkItemsQuery.data}
-                isLoading={childWorkItemsQuery.isLoading}
-                refetch={childWorkItemsQuery.refetch}
-              />
-            ),
-          },
-        ]
-      : []),
-    {
-      key: WorkItemTabs.Dependencies,
-      tab: 'Dependencies',
-      content: <WorkItemDependencies workItem={workItemData} />,
-    },
-  ]
-
   return (
     <>
       <PageTitle
@@ -177,7 +195,7 @@ const WorkItemDetailsPage = (props: {
         activeTabKey={activeTab}
         onTabChange={onTabChange}
       >
-        {tabs.find((t) => t.key === activeTab)?.content}
+        {renderTabContent()}
       </Card>
       {openEditWorkItemProjectForm && (
         <EditWorkItemProjectForm

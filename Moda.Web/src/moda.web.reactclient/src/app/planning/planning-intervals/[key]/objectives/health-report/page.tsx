@@ -107,7 +107,7 @@ const ObjectiveHealthReportPage = (props: {
   }, [refetch])
 
   if (!isLoading && !healthReport) {
-    notFound()
+    return notFound()
   }
 
   return (

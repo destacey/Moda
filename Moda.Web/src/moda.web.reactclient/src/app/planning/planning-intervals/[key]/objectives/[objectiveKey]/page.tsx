@@ -2,7 +2,7 @@
 
 import PageTitle from '@/src/components/common/page-title'
 import { Card, MenuProps } from 'antd'
-import { use, useMemo, useState } from 'react'
+import { use, useCallback, useMemo, useState } from 'react'
 import PlanningIntervalObjectiveDetails from './planning-interval-objective-details'
 import { useDocumentTitle } from '@/src/hooks/use-document-title'
 import useAuth from '@/src/components/contexts/auth'
@@ -21,6 +21,17 @@ import Link from 'next/link'
 import { PageActions } from '@/src/components/common'
 import { useGetPlanningIntervalObjectiveQuery } from '@/src/store/features/planning/planning-interval-api'
 
+enum ObjectiveTabs {
+  Details = 'details',
+}
+
+const tabs = [
+  {
+    key: ObjectiveTabs.Details,
+    tab: 'Details',
+  },
+]
+
 const ObjectiveDetailsPage = (props: {
   params: Promise<{ key: number; objectiveKey: number }>
 }) => {
@@ -28,7 +39,7 @@ const ObjectiveDetailsPage = (props: {
 
   useDocumentTitle('PI Objective Details')
 
-  const [activeTab, setActiveTab] = useState('details')
+  const [activeTab, setActiveTab] = useState(ObjectiveTabs.Details)
   const [openUpdateObjectiveForm, setOpenUpdateObjectiveForm] =
     useState<boolean>(false)
   const [openDeleteObjectiveForm, setOpenDeleteObjectiveForm] =
@@ -59,18 +70,23 @@ const ObjectiveDetailsPage = (props: {
     (state) => state.healthCheck.createContext.objectId,
   )
 
-  const tabs = [
-    {
-      key: 'details',
-      tab: 'Details',
-      content: (
-        <PlanningIntervalObjectiveDetails
-          objective={objectiveData}
-          canManageObjectives={canManageObjectives}
-        />
-      ),
-    },
-  ]
+  const renderTabContent = useCallback(() => {
+    switch (activeTab) {
+      case ObjectiveTabs.Details:
+        return (
+          <PlanningIntervalObjectiveDetails
+            objective={objectiveData}
+            canManageObjectives={canManageObjectives}
+          />
+        )
+      default:
+        return null
+    }
+  }, [activeTab, objectiveData, canManageObjectives])
+
+  const onTabChange = (tabKey: string) => {
+    setActiveTab(tabKey as ObjectiveTabs)
+  }
 
   const onUpdateObjectiveFormClosed = (wasSaved: boolean) => {
     setOpenUpdateObjectiveForm(false)
@@ -151,7 +167,7 @@ const ObjectiveDetailsPage = (props: {
   }
 
   if (!isLoading && !objectiveData) {
-    notFound()
+    return notFound()
   }
 
   return (
@@ -166,9 +182,9 @@ const ObjectiveDetailsPage = (props: {
         style={{ width: '100%' }}
         tabList={tabs}
         activeTabKey={activeTab}
-        onTabChange={(key) => setActiveTab(key)}
+        onTabChange={onTabChange}
       >
-        {tabs.find((t) => t.key === activeTab)?.content}
+        {renderTabContent()}
       </Card>
       {openUpdateObjectiveForm && (
         <EditPlanningIntervalObjectiveForm

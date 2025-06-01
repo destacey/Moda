@@ -33,6 +33,21 @@ enum StrategicInitiativeTabs {
   Projects = 'projects',
 }
 
+const tabs = [
+  {
+    key: StrategicInitiativeTabs.Details,
+    label: 'Details',
+  },
+  {
+    key: StrategicInitiativeTabs.Kpis,
+    label: 'KPIs',
+  },
+  {
+    key: StrategicInitiativeTabs.Projects,
+    label: 'Projects',
+  },
+]
+
 enum StrategicInitiativeAction {
   Edit = 'Edit',
   Delete = 'Delete',
@@ -144,21 +159,16 @@ const StrategicInitiativeDetailsPage = (props: {
     error && console.error(error)
   }, [error])
 
-  const tabs = useMemo(() => {
-    const pageTabs = [
-      {
-        key: StrategicInitiativeTabs.Details,
-        label: 'Details',
-        content: (
+  const renderTabContent = useCallback(() => {
+    switch (activeTab) {
+      case StrategicInitiativeTabs.Details:
+        return (
           <StrategicInitiativeDetails
             strategicInitiative={strategicInitiativeData}
           />
-        ),
-      },
-      {
-        key: StrategicInitiativeTabs.Kpis,
-        label: 'KPIs',
-        content: (
+        )
+      case StrategicInitiativeTabs.Kpis:
+        return (
           <StrategicInitiativeKpisGrid
             strategicInitiativeId={strategicInitiativeData?.id}
             kpis={kpiData}
@@ -168,46 +178,43 @@ const StrategicInitiativeDetailsPage = (props: {
             gridHeight={550}
             isReadOnly={isReadOnly}
           />
-        ),
-      },
-      {
-        key: StrategicInitiativeTabs.Projects,
-        label: 'Projects',
-        content: (
+        )
+      case StrategicInitiativeTabs.Projects:
+        return (
           <ProjectViewManager
             projects={projectData}
             isLoading={isLoadingProjects}
             refetch={refetchProjects}
           />
-        ),
-      },
-    ]
-    return pageTabs
+        )
+      default:
+        return null
+    }
   }, [
+    activeTab,
     strategicInitiativeData,
     kpiData,
     canUpdateStrategicInitiative,
     isLoadingKpis,
     refetchKpis,
-    isReadOnly,
     projectData,
     isLoadingProjects,
     refetchProjects,
+    isReadOnly,
   ])
 
   // doesn't trigger on first render
   const onTabChange = useCallback(
-    (tabKey: StrategicInitiativeTabs) => {
-      if (tabKey === StrategicInitiativeTabs.Kpis && !kpisQueried) {
+    (tabKey: string) => {
+      const tab = tabKey as StrategicInitiativeTabs
+
+      if (tab === StrategicInitiativeTabs.Kpis && !kpisQueried) {
         setKpisQueried(true)
-      } else if (
-        tabKey === StrategicInitiativeTabs.Projects &&
-        !projectsQueried
-      ) {
+      } else if (tab === StrategicInitiativeTabs.Projects && !projectsQueried) {
         setProjectsQueried(true)
       }
 
-      setActiveTab(tabKey)
+      setActiveTab(tab)
     },
     [kpisQueried, projectsQueried],
   )
@@ -419,7 +426,7 @@ const StrategicInitiativeDetailsPage = (props: {
   }
 
   if (!strategicInitiativeData) {
-    notFound()
+    return notFound()
   }
 
   return (
@@ -435,7 +442,7 @@ const StrategicInitiativeDetailsPage = (props: {
         activeTabKey={activeTab}
         onTabChange={onTabChange}
       >
-        {tabs.find((t) => t.key === activeTab)?.content}
+        {renderTabContent()}
       </Card>
 
       {openEditStrategicInitiativeForm && (

@@ -28,6 +28,17 @@ enum ProjectTabs {
   WorkItems = 'workItems',
 }
 
+const tabs = [
+  {
+    key: ProjectTabs.Details,
+    label: 'Details',
+  },
+  {
+    key: ProjectTabs.WorkItems,
+    tab: 'Work Items',
+  },
+]
+
 enum ProjectAction {
   Edit = 'Edit',
   Delete = 'Delete',
@@ -98,17 +109,6 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: number }> }) => {
   useEffect(() => {
     error && console.error(error)
   }, [error])
-
-  const tabs = [
-    {
-      key: ProjectTabs.Details,
-      label: 'Details',
-    },
-    {
-      key: ProjectTabs.WorkItems,
-      tab: 'Work Items',
-    },
-  ]
 
   const renderTabContent = useCallback(() => {
     switch (activeTab) {
@@ -274,7 +274,7 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: number }> }) => {
   }
 
   if (!projectData) {
-    notFound()
+    return notFound()
   }
 
   return (

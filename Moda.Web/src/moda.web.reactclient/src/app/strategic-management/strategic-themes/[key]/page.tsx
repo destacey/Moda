@@ -201,7 +201,7 @@ const StrategicThemeDetailsPage = (props: {
   }
 
   if (!strategicThemeData) {
-    notFound()
+    return notFound()
   }
 
   return (

@@ -234,7 +234,7 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: number }> }) => {
   }
 
   if (!roadmapData) {
-    notFound()
+    return notFound()
   }
 
   return (

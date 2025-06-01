@@ -122,6 +122,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       setAuthStatus('Acquiring token...')
       const accessToken = await acquireToken()
+
       setAuthStatus('Fetching user permissions...')
       const profileClient = getProfileClient()
       const permissions = await profileClient.getPermissions()
@@ -136,6 +137,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           value: permission,
         })),
       ]
+
       setUser({
         name: activeAccount.name || '',
         username: activeAccount.username,

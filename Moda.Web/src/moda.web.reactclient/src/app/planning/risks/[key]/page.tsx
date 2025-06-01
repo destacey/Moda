@@ -1,7 +1,7 @@
 'use client'
 
 import PageTitle from '@/src/components/common/page-title'
-import { use, useEffect, useState } from 'react'
+import { use, useCallback, useEffect, useState } from 'react'
 import RiskDetails from './risk-details'
 import { Button, Card } from 'antd'
 import { useDocumentTitle } from '@/src/hooks/use-document-title'
@@ -13,29 +13,45 @@ import { useAppDispatch } from '@/src/hooks'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import { useGetRiskQuery } from '@/src/store/features/planning/risks-api'
 
+enum RiskTabs {
+  Details = 'details',
+}
+
+const tabs = [
+  {
+    key: RiskTabs.Details,
+    tab: 'Details',
+  },
+]
+
 const RiskDetailsPage = (props: { params: Promise<{ key: number }> }) => {
   const { key: riskKey } = use(props.params)
 
   useDocumentTitle('Risk Details')
 
-  const [activeTab, setActiveTab] = useState('details')
+  const [activeTab, setActiveTab] = useState(RiskTabs.Details)
   const [openUpdateRiskForm, setOpenUpdateRiskForm] = useState<boolean>(false)
   const dispatch = useAppDispatch()
   const pathname = usePathname()
 
   const { data: riskData, isLoading, error, refetch } = useGetRiskQuery(riskKey)
 
-  const { hasClaim } = useAuth()
-  const canUpdateRisks = hasClaim('Permission', 'Permissions.Risks.Update')
+  const { hasPermissionClaim } = useAuth()
+  const canUpdateRisks = hasPermissionClaim('Permissions.Risks.Update')
   const showActions = canUpdateRisks
 
-  const tabs = [
-    {
-      key: 'details',
-      tab: 'Details',
-      content: <RiskDetails risk={riskData} />,
-    },
-  ]
+  const renderTabContent = useCallback(() => {
+    switch (activeTab) {
+      case RiskTabs.Details:
+        return <RiskDetails risk={riskData} />
+      default:
+        return null
+    }
+  }, [activeTab, riskData])
+
+  const onTabChange = useCallback((tabKey: string) => {
+    setActiveTab(tabKey as RiskTabs)
+  }, [])
 
   useEffect(() => {
     if (!riskData) return
@@ -73,7 +89,7 @@ const RiskDetailsPage = (props: { params: Promise<{ key: number }> }) => {
   }
 
   if (!isLoading && !riskData) {
-    notFound()
+    return notFound()
   }
 
   const actions = () => {
@@ -97,9 +113,9 @@ const RiskDetailsPage = (props: { params: Promise<{ key: number }> }) => {
         style={{ width: '100%' }}
         tabList={tabs}
         activeTabKey={activeTab}
-        onTabChange={(key) => setActiveTab(key)}
+        onTabChange={onTabChange}
       >
-        {tabs.find((t) => t.key === activeTab)?.content}
+        {renderTabContent()}
       </Card>
       {openUpdateRiskForm && (
         <EditRiskForm
