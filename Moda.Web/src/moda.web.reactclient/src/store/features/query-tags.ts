@@ -17,6 +17,7 @@ export enum QueryTags {
   HealthChecksStatusOptions = 'Common.HealthChecks.StatusOptions',
 
   // ORGANIZATIONS
+  Employee = 'Organizations.Employee',
   EmployeeOption = 'Organizations.EmployeeOption',
   Team = 'Organizations.Team',
   TeamBacklog = 'Organizations.TeamBacklog',
