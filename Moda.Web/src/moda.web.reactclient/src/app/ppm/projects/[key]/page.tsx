@@ -37,7 +37,7 @@ enum ProjectAction {
 }
 
 const ProjectDetailsPage = (props: { params: Promise<{ key: number }> }) => {
-  const { key } = use(props.params)
+  const { key: projectKey } = use(props.params)
 
   useDocumentTitle('Project Details')
 
@@ -66,7 +66,7 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: number }> }) => {
     isLoading,
     error,
     refetch: refetchProject,
-  } = useGetProjectQuery(key)
+  } = useGetProjectQuery(projectKey)
 
   const {
     data: workItemsData,
@@ -99,32 +99,44 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: number }> }) => {
     error && console.error(error)
   }, [error])
 
-  const tabs = useMemo(() => {
-    const pageTabs = [
-      {
-        key: ProjectTabs.Details,
-        label: 'Details',
-        content: <ProjectDetails project={projectData} />,
-      },
-      {
-        key: ProjectTabs.WorkItems,
-        tab: 'Work Items',
-        content: (
+  const tabs = [
+    {
+      key: ProjectTabs.Details,
+      label: 'Details',
+    },
+    {
+      key: ProjectTabs.WorkItems,
+      tab: 'Work Items',
+    },
+  ]
+
+  const renderTabContent = useCallback(() => {
+    switch (activeTab) {
+      case ProjectTabs.Details:
+        return <ProjectDetails project={projectData} />
+      case ProjectTabs.WorkItems:
+        return (
           <WorkItemsGrid
             workItems={workItemsData}
             isLoading={workItemsDataIsLoading}
             refetch={refetchWorkItemsData}
             hideProjectColumn={true}
           />
-        ),
-      },
-    ]
-    return pageTabs
-  }, [projectData, refetchWorkItemsData, workItemsData, workItemsDataIsLoading])
+        )
+      default:
+        return null
+    }
+  }, [
+    activeTab,
+    projectData,
+    refetchWorkItemsData,
+    workItemsData,
+    workItemsDataIsLoading,
+  ])
 
   // doesn't trigger on first render
-  const onTabChange = useCallback((tabKey) => {
-    setActiveTab(tabKey)
+  const onTabChange = useCallback((tabKey: string) => {
+    setActiveTab(tabKey as ProjectTabs)
   }, [])
 
   const missingDates = projectData?.start === null || projectData?.end === null
@@ -289,7 +301,7 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: number }> }) => {
         activeTabKey={activeTab}
         onTabChange={onTabChange}
       >
-        {tabs.find((t) => t.key === activeTab)?.content}
+        {renderTabContent()}
       </Card>
 
       {openEditProjectForm && (

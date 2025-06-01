@@ -8,6 +8,7 @@ using Moda.Web.Api.Extensions;
 using Moda.Web.Api.Models.Planning.Risks;
 
 namespace Moda.Web.Api.Controllers.Planning;
+
 [Route("api/planning/risks")]
 [ApiVersionNeutral]
 [ApiController]
@@ -29,7 +30,7 @@ public class RisksController : ControllerBase
     [OpenApiOperation("Get a list of risks.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IReadOnlyList<RiskListDto>>> GetList(CancellationToken cancellationToken, bool includeClosed = false)
+    public async Task<ActionResult<IEnumerable<RiskListDto>>> GetList(CancellationToken cancellationToken, bool includeClosed = false)
     {
         var risks = await _sender.Send(new GetRisksQuery(includeClosed), cancellationToken);
         return Ok(risks);
@@ -37,7 +38,7 @@ public class RisksController : ControllerBase
 
     [HttpGet("{idOrKey}")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Risks)]
-    [OpenApiOperation("Get risk details by Id.", "")]
+    [OpenApiOperation("Get risk details using the Id or key.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<RiskDetailsDto>> GetRisk(string idOrKey, CancellationToken cancellationToken)
@@ -54,7 +55,7 @@ public class RisksController : ControllerBase
     [OpenApiOperation("Get a list of open risks assigned to me.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IReadOnlyList<RiskListDto>>> GetMyRisks(CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<RiskListDto>>> GetMyRisks(CancellationToken cancellationToken)
     {
         var risks = await _sender.Send(new GetMyRisksQuery(), cancellationToken);
         return Ok(risks);
@@ -63,11 +64,8 @@ public class RisksController : ControllerBase
     [HttpPost()]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.Risks)]
     [OpenApiOperation("Create a risk.", "")]
-    [ProducesResponseType(typeof(ObjectIdAndKey), StatusCodes.Status201Created)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
-    public async Task<ActionResult> Create([FromBody] CreateRiskRequest request, CancellationToken cancellationToken)
+    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201IdAndKey))]
+    public async Task<ActionResult<ObjectIdAndKey>> Create([FromBody] CreateRiskRequest request, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(request.ToCreateRiskCommand(), cancellationToken);
 
@@ -150,7 +148,7 @@ public class RisksController : ControllerBase
     [OpenApiOperation("Get a list of all risk statuses.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IReadOnlyList<RiskStatusDto>>> GetStatuses(CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<RiskStatusDto>>> GetStatuses(CancellationToken cancellationToken)
     {
         var items = await _sender.Send(new GetRiskStatusesQuery(), cancellationToken);
         return Ok(items.OrderBy(c => c.Order));
@@ -161,7 +159,7 @@ public class RisksController : ControllerBase
     [OpenApiOperation("Get a list of all risk categories.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IReadOnlyList<RiskCategoryDto>>> GetCategories(CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<RiskCategoryDto>>> GetCategories(CancellationToken cancellationToken)
     {
         var items = await _sender.Send(new GetRiskCategoriesQuery(), cancellationToken);
         return Ok(items.OrderBy(c => c.Order));
@@ -172,7 +170,7 @@ public class RisksController : ControllerBase
     [OpenApiOperation("Get a list of all risk grades.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IReadOnlyList<RiskGradeDto>>> GetGrades(CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<RiskGradeDto>>> GetGrades(CancellationToken cancellationToken)
     {
         var items = await _sender.Send(new GetRiskGradesQuery(), cancellationToken);
         return Ok(items.OrderBy(c => c.Order));

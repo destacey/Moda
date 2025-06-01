@@ -2,13 +2,14 @@
 
 import PageTitle from '@/src/components/common/page-title'
 import ModaGrid from '../../../components/common/moda-grid'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ItemType } from 'antd/es/menu/interface'
 import Link from 'next/link'
 import { useDocumentTitle } from '../../../hooks/use-document-title'
-import { useGetEmployees } from '@/src/services/queries/organization-queries'
 import { ControlItemSwitch } from '../../../components/common/control-items-menu'
 import { authorizePage } from '../../../components/hoc'
+import { useGetEmployeesQuery } from '@/src/store/features/organizations/employee-api'
+import { useMessage } from '@/src/components/contexts/messaging'
 
 const EmployeeLinkCellRenderer = ({ value, data }) => {
   return <Link href={`/organizations/employees/${data.key}`}>{value}</Link>
@@ -24,12 +25,21 @@ const EmployeeListPage = () => {
   useDocumentTitle('Employees')
   const [includeInactive, setIncludeInactive] = useState<boolean>(false)
 
+  const messageApi = useMessage()
+
   const {
     data: employeesData,
     isLoading,
-    isError,
+    error,
     refetch,
-  } = useGetEmployees(includeInactive)
+  } = useGetEmployeesQuery(includeInactive)
+
+  useEffect(() => {
+    if (error) {
+      console.error(error)
+      messageApi.error('Failed to load employees.')
+    }
+  }, [error, messageApi])
 
   const columnDefs = useMemo(
     () => [

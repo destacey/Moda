@@ -6021,26 +6021,6 @@
               }
             }
           },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
           "422": {
             "description": "",
             "content": {
@@ -6064,7 +6044,7 @@
         "tags": [
           "Risks"
         ],
-        "summary": "Get risk details by Id.",
+        "summary": "Get risk details using the Id or key.",
         "operationId": "Risks_GetRisk",
         "parameters": [
           {
@@ -8887,8 +8867,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "integer",
-                  "format": "int32"
+                  "$ref": "#/components/schemas/ObjectIdAndKey"
                 }
               }
             }
@@ -8911,21 +8890,20 @@
         ]
       }
     },
-    "/api/organization/employees/{id}": {
+    "/api/organization/employees/{idOrKey}": {
       "get": {
         "tags": [
           "Employees"
         ],
-        "summary": "Get employee details using the key.",
-        "operationId": "Employees_GetById",
+        "summary": "Get employee details using the Id or key.",
+        "operationId": "Employees_GetEmployee",
         "parameters": [
           {
-            "name": "id",
+            "name": "idOrKey",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string"
             },
             "x-position": 1
           }
@@ -8957,7 +8935,9 @@
             "Bearer": []
           }
         ]
-      },
+      }
+    },
+    "/api/organization/employees/{id}": {
       "put": {
         "tags": [
           "Employees"

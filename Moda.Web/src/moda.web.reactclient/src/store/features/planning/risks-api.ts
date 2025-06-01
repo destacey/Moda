@@ -8,7 +8,6 @@ import {
   UpdateRiskRequest,
 } from '@/src/services/moda-api'
 import { QueryTags } from '../query-tags'
-import { BaseOptionType } from 'antd/es/select'
 import _ from 'lodash'
 import { OptionModel } from '@/src/components/types'
 
@@ -27,7 +26,7 @@ export const risksApi = apiSlice.injectEndpoints({
       providesTags: (result, error, arg) => [{ type: QueryTags.Risk, id: arg }],
     }),
     getMyRisks: builder.query<RiskListDto[], string>({
-      queryFn: async (username) => {
+      queryFn: async () => {
         try {
           const data = await getRisksClient().getMyRisks()
           return { data }
