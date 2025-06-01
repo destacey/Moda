@@ -75,7 +75,7 @@ const EmployeeDetailsPage = (props: { params: Promise<{ key: number }> }) => {
   }
 
   if (!employeeData) {
-    notFound()
+    return notFound()
   }
 
   return (
