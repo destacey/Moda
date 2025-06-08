@@ -8,10 +8,7 @@ import {
   UpdateTeamMembershipRequest,
 } from '@/src/services/moda-api'
 import { toFormErrors } from '@/src/utils'
-import {
-  UpdateTeamMembershipMutationRequest,
-  useUpdateTeamMembershipMutation,
-} from '@/src/services/queries/organization-queries'
+import { useUpdateTeamMembershipMutation } from '@/src/store/features/organizations/team-api'
 import { TeamTypeName } from '../types'
 import dayjs from 'dayjs'
 import { useMessage } from '@/src/components/contexts/messaging'
@@ -47,7 +44,7 @@ const mapToRequestValues = (
     membership,
     parentTeamId: originalMembership.parent.id,
     teamType,
-  } as UpdateTeamMembershipMutationRequest
+  }
 }
 
 const EditTeamMembershipForm = (props: UpdateTeamMembershipFormProps) => {
@@ -58,7 +55,7 @@ const EditTeamMembershipForm = (props: UpdateTeamMembershipFormProps) => {
   const formValues = Form.useWatch([], form)
   const messageApi = useMessage()
 
-  const updateTeamMembership = useUpdateTeamMembershipMutation()
+  const [updateTeamMembership] = useUpdateTeamMembershipMutation()
 
   const { hasClaim } = useAuth()
   const canManageTeamMemberships = hasClaim(
@@ -88,7 +85,7 @@ const EditTeamMembershipForm = (props: UpdateTeamMembershipFormProps) => {
         props.membership,
         props.teamType,
       )
-      await updateTeamMembership.mutateAsync(request)
+      await updateTeamMembership(request).unwrap()
       return true
     } catch (error) {
       if (error.status === 422 && error.errors) {

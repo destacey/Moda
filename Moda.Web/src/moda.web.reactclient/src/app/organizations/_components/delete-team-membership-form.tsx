@@ -3,10 +3,7 @@ import { TeamTypeName } from '../types'
 import { useCallback, useEffect, useState } from 'react'
 import { Descriptions, Modal } from 'antd'
 import dayjs from 'dayjs'
-import {
-  DeleteTeamMembershipMutationRequest,
-  useDeleteTeamMembershipMutation,
-} from '@/src/services/queries/organization-queries'
+import { useDeleteTeamMembershipMutation } from '@/src/store/features/organizations/team-api'
 import useAuth from '../../../components/contexts/auth'
 import { useMessage } from '@/src/components/contexts/messaging'
 
@@ -29,7 +26,7 @@ const mapToRequestValues = (
     teamId: membership.child.id,
     parentTeamId: membership.parent.id,
     teamType,
-  } as DeleteTeamMembershipMutationRequest
+  }
 }
 
 const DeleteTeamMembershipForm = (props: DeleteTeamMembershipFormProps) => {
@@ -37,7 +34,7 @@ const DeleteTeamMembershipForm = (props: DeleteTeamMembershipFormProps) => {
   const [isSaving, setIsSaving] = useState(false)
   const messageApi = useMessage()
 
-  const deleteTeamMembershipMutation = useDeleteTeamMembershipMutation()
+  const [deleteTeamMembershipMutation] = useDeleteTeamMembershipMutation()
 
   const { hasClaim } = useAuth()
   const canManageTeamMemberships = hasClaim(
@@ -50,7 +47,7 @@ const DeleteTeamMembershipForm = (props: DeleteTeamMembershipFormProps) => {
   ): Promise<boolean> => {
     try {
       const request = mapToRequestValues(props.membership, props.teamType)
-      await deleteTeamMembershipMutation.mutateAsync(request)
+      await deleteTeamMembershipMutation(request).unwrap()
       return true
     } catch (error) {
       messageApi.error(

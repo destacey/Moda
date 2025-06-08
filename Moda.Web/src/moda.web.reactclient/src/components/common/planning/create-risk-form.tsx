@@ -3,12 +3,8 @@
 import { DatePicker, Form, Input, Modal, Radio, Select } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 import useAuth from '../../contexts/auth'
-import { getTeamsClient, getTeamsOfTeamsClient } from '@/src/services/clients'
 import { CreateRiskRequest } from '@/src/services/moda-api'
 import { toFormErrors } from '@/src/utils'
-import { TeamListItem } from '@/src/app/organizations/types'
-import _ from 'lodash'
-import { OptionModel } from '../../types'
 import { MarkdownEditor } from '../markdown'
 import { useMessage } from '../../contexts/messaging'
 import {
@@ -17,6 +13,7 @@ import {
   useGetRiskGradeOptionsQuery,
 } from '@/src/store/features/planning/risks-api'
 import { useGetEmployeeOptionsQuery } from '@/src/store/features/organizations/employee-api'
+import { useGetTeamOptionsQuery } from '@/src/store/features/organizations/team-api'
 
 const { Item } = Form
 const { TextArea } = Input
@@ -66,19 +63,19 @@ const CreateRiskForm = ({
   const [isValid, setIsValid] = useState(false)
   const [form] = Form.useForm<CreateRiskFormValues>()
   const formValues = Form.useWatch([], form)
+
   const messageApi = useMessage()
 
-  const [teamOptions, setTeamOptions] = useState<OptionModel[]>()
-
-  const [newRiskKey, setNewRiskKey] = useState<number>(null)
-
-  const { hasClaim } = useAuth()
-  const canCreateRisks = hasClaim('Permission', 'Permissions.Risks.Create')
+  const { hasPermissionClaim } = useAuth()
+  const canCreateRisks = hasPermissionClaim('Permissions.Risks.Create')
 
   const [createRisk, { error: mutationError }] = useCreateRiskMutation()
   const { data: riskCategoryOptions } = useGetRiskCategoryOptionsQuery()
   const { data: riskGradeOptions } = useGetRiskGradeOptionsQuery()
   const { data: employeeOptions } = useGetEmployeeOptionsQuery(false)
+
+  const { data: teamOptions, isLoading: isTeamsLoading } =
+    useGetTeamOptionsQuery(false)
 
   const mapToFormValues = useCallback(
     (teamId: string | undefined) => {
@@ -90,19 +87,6 @@ const CreateRiskForm = ({
     },
     [form],
   )
-
-  const getTeamOptions = useCallback(async () => {
-    const teamsClient = await getTeamsClient()
-    const teamsDtos = await teamsClient.getList(false)
-    const teamOfTeamsClient = await getTeamsOfTeamsClient()
-    const teamOfTeamsDtos = await teamOfTeamsClient.getList(false)
-    const teams: OptionModel[] = [
-      ...(teamsDtos as TeamListItem[]),
-      ...(teamOfTeamsDtos as TeamListItem[]),
-    ].map((t) => ({ value: t.id, label: t.name }))
-
-    return _.sortBy(teams, ['label'])
-  }, [])
 
   const formAction = async (values: CreateRiskFormValues) => {
     try {
@@ -150,7 +134,6 @@ const CreateRiskForm = ({
       setIsSaving(false)
     }
   }
-
   const handleCancel = useCallback(() => {
     setIsOpen(false)
     onFormCancel()
@@ -162,10 +145,6 @@ const CreateRiskForm = ({
       setIsOpen(showForm)
       if (showForm === true) {
         try {
-          const loadData = async () => {
-            setTeamOptions(await getTeamOptions())
-          }
-          loadData()
           mapToFormValues(createForTeamId)
         } catch (error) {
           handleCancel()
@@ -182,7 +161,6 @@ const CreateRiskForm = ({
   }, [
     canCreateRisks,
     createForTeamId,
-    getTeamOptions,
     handleCancel,
     mapToFormValues,
     messageApi,
@@ -201,7 +179,7 @@ const CreateRiskForm = ({
       title="Create Team Risk"
       open={isOpen}
       onOk={handleOk}
-      okButtonProps={{ disabled: !isValid }}
+      okButtonProps={{ disabled: !isValid || isTeamsLoading }}
       okText="Create"
       confirmLoading={isSaving}
       onCancel={handleCancel}
@@ -215,6 +193,7 @@ const CreateRiskForm = ({
             showSearch
             disabled={createForTeamId !== undefined}
             placeholder="Select a team"
+            loading={isTeamsLoading}
             optionFilterProp="children"
             filterOption={(input, option) =>
               (option?.label.toLowerCase() ?? '').includes(input.toLowerCase())

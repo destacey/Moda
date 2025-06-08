@@ -6,10 +6,9 @@ import useAuth from '../../../components/contexts/auth'
 import { AddTeamMembershipRequest } from '@/src/services/moda-api'
 import { toFormErrors } from '@/src/utils'
 import {
-  CreateTeamMembershipMutationRequest,
   useCreateTeamMembershipMutation,
-  useGetTeamOfTeamsOptions,
-} from '@/src/services/queries/organization-queries'
+  useGetTeamOfTeamsOptionsQuery,
+} from '@/src/store/features/organizations/team-api'
 import { TeamTypeName } from '../types'
 import { useMessage } from '@/src/components/contexts/messaging'
 
@@ -32,13 +31,15 @@ interface CreateTeamMembershipFormValues {
 const mapToRequestValues = (
   values: CreateTeamMembershipFormValues,
   teamType: TeamTypeName,
+  teamId: string,
 ) => {
   const membership = {
+    teamId: teamId,
     parentTeamId: values.parentTeamId,
     start: (values.start as any)?.format('YYYY-MM-DD'),
     end: (values.end as any)?.format('YYYY-MM-DD'),
   } as AddTeamMembershipRequest
-  return { membership, teamType } as CreateTeamMembershipMutationRequest
+  return { membership, teamType }
 }
 
 const CreateTeamMembershipForm = (props: CreateTeamMembershipFormProps) => {
@@ -48,11 +49,10 @@ const CreateTeamMembershipForm = (props: CreateTeamMembershipFormProps) => {
   const [form] = Form.useForm<CreateTeamMembershipFormValues>()
   const formValues = Form.useWatch([], form)
   const messageApi = useMessage()
-
   // TODO: only get teams that are not in the hierarchy
-  const { data: teamOptions } = useGetTeamOfTeamsOptions(false)
+  const { data: teamOptions } = useGetTeamOfTeamsOptionsQuery(false)
 
-  const createTeamMembership = useCreateTeamMembershipMutation()
+  const [createTeamMembership] = useCreateTeamMembershipMutation()
 
   const { hasClaim } = useAuth()
   const canManageTeamMemberships = hasClaim(
@@ -64,9 +64,8 @@ const CreateTeamMembershipForm = (props: CreateTeamMembershipFormProps) => {
     values: CreateTeamMembershipFormValues,
   ): Promise<boolean> => {
     try {
-      const request = mapToRequestValues(values, props.teamType)
-      request.membership.teamId = props.teamId
-      await createTeamMembership.mutateAsync(request)
+      const request = mapToRequestValues(values, props.teamType, props.teamId)
+      await createTeamMembership(request).unwrap()
       return true
     } catch (error) {
       if (error.status === 422 && error.errors) {

@@ -18,9 +18,9 @@ import { useDocumentTitle } from '@/src/hooks/use-document-title'
 import { EditTeamForm, TeamMembershipsGrid } from '../../_components'
 import useAuth from '@/src/components/contexts/auth'
 import {
-  useGetTeamOfTeamsMemberships,
-  useGetTeamOfTeamsRisks,
-} from '@/src/services/queries/organization-queries'
+  useGetTeamOfTeamsMembershipsQuery,
+  useGetTeamOfTeamsRisksQuery,
+} from '@/src/store/features/organizations/team-api'
 import { authorizePage } from '@/src/components/hoc'
 import { notFound, usePathname } from 'next/navigation'
 import {
@@ -88,16 +88,18 @@ const TeamOfTeamsDetailsPage = (props: {
   } = useAppSelector(selectTeamContext)
   const dispatch = useAppDispatch()
   const pathname = usePathname()
-
-  const teamMembershipsQuery = useGetTeamOfTeamsMemberships(
-    team?.id,
-    teamMembershipsQueryEnabled,
+  const teamMembershipsQuery = useGetTeamOfTeamsMembershipsQuery(
+    { teamId: team?.id, enabled: teamMembershipsQueryEnabled },
+    { skip: !team?.id || !teamMembershipsQueryEnabled },
   )
 
-  const risksQuery = useGetTeamOfTeamsRisks(
-    team?.id,
-    includeClosedRisks,
-    risksQueryEnabled,
+  const risksQuery = useGetTeamOfTeamsRisksQuery(
+    {
+      id: team?.id,
+      includeClosed: includeClosedRisks,
+      enabled: risksQueryEnabled,
+    },
+    { skip: !team?.id || !risksQueryEnabled },
   )
 
   const onIncludeClosedRisksChanged = useCallback((includeClosed: boolean) => {
@@ -133,7 +135,6 @@ const TeamOfTeamsDetailsPage = (props: {
 
     return items
   }, [canManageTeamMemberships, canUpdateTeam, dispatch, team?.isActive])
-
   const renderTabContent = useCallback(() => {
     switch (activeTab) {
       case TeamOfTeamsTabs.Details:
@@ -151,7 +152,9 @@ const TeamOfTeamsDetailsPage = (props: {
       case TeamOfTeamsTabs.TeamMemberships:
         return createElement(TeamMembershipsGrid, {
           teamId: team?.id,
-          teamMembershipsQuery: teamMembershipsQuery,
+          teamMemberships: teamMembershipsQuery.data,
+          isLoading: teamMembershipsQuery.isLoading,
+          refetch: teamMembershipsQuery.refetch,
           teamType: 'Team of Teams',
         })
       default:

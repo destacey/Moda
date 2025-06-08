@@ -4,7 +4,6 @@ import { useCallback, useMemo, useState } from 'react'
 import ModaGrid from '../../../components/common/moda-grid'
 import { TeamMembershipDto } from '@/src/services/moda-api'
 import dayjs from 'dayjs'
-import { UseQueryResult } from 'react-query'
 import {
   RowMenuCellRenderer,
   TeamNameLinkCellRenderer,
@@ -19,7 +18,9 @@ import { ColDef } from 'ag-grid-community'
 
 export interface TeamMembershipsGridProps {
   teamId: string
-  teamMembershipsQuery: UseQueryResult<TeamMembershipDto[], unknown>
+  teamMemberships: TeamMembershipDto[] | undefined
+  isLoading: boolean
+  refetch: () => void
   teamType: TeamTypeName
 }
 
@@ -59,7 +60,9 @@ const getRowMenuItems = (props: RowMenuProps) => {
 
 const TeamMembershipsGrid = ({
   teamId,
-  teamMembershipsQuery,
+  teamMemberships,
+  isLoading,
+  refetch,
   teamType,
 }: TeamMembershipsGridProps) => {
   const [openEditTeamMembershipForm, setOpenEditTeamMembershipForm] =
@@ -68,7 +71,6 @@ const TeamMembershipsGrid = ({
     useState<boolean>(false)
   const [selectedTeamMembership, setSelectedTeamMembership] =
     useState<TeamMembershipDto | null>(null)
-
   const { hasClaim } = useAuth()
   const canManageTeamMemberships = hasClaim(
     'Permission',
@@ -77,7 +79,7 @@ const TeamMembershipsGrid = ({
   const showRowActions = canManageTeamMemberships
 
   const refresh = useCallback(async () => {
-    teamMembershipsQuery.refetch()
+    refetch()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -165,14 +167,13 @@ const TeamMembershipsGrid = ({
       refresh()
     }
   }
-
   return (
     <>
       <ModaGrid
         height={550}
         columnDefs={columnDefs}
-        rowData={teamMembershipsQuery.data}
-        loading={teamMembershipsQuery.isLoading}
+        rowData={teamMemberships}
+        loading={isLoading}
         loadData={refresh}
       />
       {openEditTeamMembershipForm && (

@@ -20,8 +20,11 @@ export enum QueryTags {
   Employee = 'Organizations.Employee',
   EmployeeOption = 'Organizations.EmployeeOption',
   Team = 'Organizations.Team',
+  TeamOptions = 'Organizations.TeamOptions',
   TeamBacklog = 'Organizations.TeamBacklog',
   TeamDependency = 'Organizations.TeamDependency',
+  TeamMembership = 'Organizations.TeamMembership',
+  TeamRisk = 'Organizations.TeamRisk',
   FunctionalOrganizationChart = 'Organizations.FunctionalOrganizationChart',
 
   // PLANNING
