@@ -22,9 +22,9 @@ import {
 } from '../../_components'
 import useAuth from '@/src/components/contexts/auth'
 import {
-  useGetTeamMemberships,
-  useGetTeamRisks,
-} from '@/src/services/queries/organization-queries'
+  useGetTeamMembershipsQuery,
+  useGetTeamRisksQuery,
+} from '@/src/store/features/organizations/team-api'
 import { authorizePage } from '@/src/components/hoc'
 import { notFound, usePathname } from 'next/navigation'
 import {
@@ -102,18 +102,20 @@ const TeamDetailsPage = (props: { params: Promise<{ key: number }> }) => {
   } = useAppSelector(selectEditTeamContext)
   const dispatch = useAppDispatch()
   const pathname = usePathname()
-
-  const teamMembershipsQuery = useGetTeamMemberships(
-    team?.id,
-    teamMembershipsQueryEnabled,
+  const teamMembershipsQuery = useGetTeamMembershipsQuery(
+    { teamId: team?.id, enabled: teamMembershipsQueryEnabled },
+    { skip: !team?.id || !teamMembershipsQueryEnabled },
   )
 
   const backlogQuery = useGetTeamBacklogQuery(team?.id, { skip: !team?.id })
 
-  const risksQuery = useGetTeamRisks(
-    team?.id,
-    includeClosedRisks,
-    risksQueryEnabled,
+  const risksQuery = useGetTeamRisksQuery(
+    {
+      id: team?.id,
+      includeClosed: includeClosedRisks,
+      enabled: risksQueryEnabled,
+    },
+    { skip: !team?.id || !risksQueryEnabled },
   )
 
   const onIncludeClosedRisksChanged = useCallback((includeClosed: boolean) => {
@@ -149,7 +151,6 @@ const TeamDetailsPage = (props: { params: Promise<{ key: number }> }) => {
 
     return items
   }, [canManageTeamMemberships, canUpdateTeam, dispatch, team?.isActive])
-
   const renderTabContent = useCallback(() => {
     switch (activeTab) {
       case TeamTabs.Details:
@@ -176,7 +177,9 @@ const TeamDetailsPage = (props: { params: Promise<{ key: number }> }) => {
       case TeamTabs.TeamMemberships:
         return createElement(TeamMembershipsGrid, {
           teamId: team?.id,
-          teamMembershipsQuery: teamMembershipsQuery,
+          teamMemberships: teamMembershipsQuery.data,
+          isLoading: teamMembershipsQuery.isLoading,
+          refetch: teamMembershipsQuery.refetch,
           teamType: 'Team',
         })
       default:

@@ -9,12 +9,11 @@ import { useDocumentTitle } from '../../../hooks/use-document-title'
 import useAuth from '../../../components/contexts/auth'
 import { useAppSelector, useAppDispatch } from '../../../hooks'
 import {
-  retrieveTeams,
   setIncludeInactive,
   setEditMode,
-  selectTeamsContext,
   selectTeamIsInEditMode,
 } from '../../../store/features/organizations/team-slice'
+import { useGetTeamsQuery } from '../../../store/features/organizations/team-api'
 import { ModalCreateTeamForm } from '../_components/create-team-form'
 import {
   NestedTeamOfTeamsNameLinkCellRenderer,
@@ -27,9 +26,14 @@ import { authorizePage } from '../../../components/hoc'
 
 const TeamListPage = () => {
   useDocumentTitle('Teams')
-  const { data: teams, isLoading, error } = useAppSelector(selectTeamsContext)
+  const includeInactive = useAppSelector((state) => state.team.includeInactive)
+  const {
+    data: teams,
+    isLoading,
+    error,
+    refetch,
+  } = useGetTeamsQuery(includeInactive)
   const isInEditMode = useAppSelector(selectTeamIsInEditMode)
-  const includeDisabled = useAppSelector((state) => state.team.includeInactive)
 
   const columnDefs = useMemo<ColDef<TeamListItem>[]>(
     () => [
@@ -49,8 +53,8 @@ const TeamListPage = () => {
 
   const dispatch = useAppDispatch()
 
-  const { hasClaim } = useAuth()
-  const canCreateTeam = hasClaim('Permission', 'Permissions.Teams.Create')
+  const { hasPermissionClaim } = useAuth()
+  const canCreateTeam = hasPermissionClaim('Permissions.Teams.Create')
   const showActions = canCreateTeam
 
   const actions = () => {
@@ -65,27 +69,25 @@ const TeamListPage = () => {
       </>
     )
   }
-
   useEffect(() => {
     error && console.error(error)
   }, [error])
 
-  const onIncludeDisabledChange = (checked: boolean) => {
+  const onIncludeInactiveChange = (checked: boolean) => {
     dispatch(setIncludeInactive(checked))
-    dispatch(retrieveTeams())
   }
 
   const controlItems: ItemType[] = [
     {
       label: (
         <ControlItemSwitch
-          label="Include Disabled"
-          checked={includeDisabled}
-          onChange={onIncludeDisabledChange}
+          label="Include Inactive"
+          checked={includeInactive}
+          onChange={onIncludeInactiveChange}
         />
       ),
-      key: 'include-disabled',
-      onClick: () => onIncludeDisabledChange(!includeDisabled),
+      key: 'include-inactive',
+      onClick: () => onIncludeInactiveChange(!includeInactive),
     },
   ]
 
@@ -97,7 +99,7 @@ const TeamListPage = () => {
         gridControlMenuItems={controlItems}
         rowData={teams}
         loadData={() => {
-          dispatch(retrieveTeams())
+          refetch()
         }}
         loading={isLoading}
       />
