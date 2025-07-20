@@ -37,7 +37,7 @@ describe('MarkdownBlockquote', () => {
     render(<MarkdownBlockquote {...defaultProps} style={customStyle} />)
 
     const blockquote = screen.getByText('This is a blockquote')
-    expect(blockquote).toHaveStyle({ color: 'red' })
+    expect(blockquote).toHaveStyle({ color: 'rgb(255, 0, 0)' })
   })
 
   it('renders child elements inside the blockquote', () => {

@@ -96,11 +96,6 @@ const ReorganizeRoadmapActivitiesModal: React.FC<
     parentId,
     index,
   ) => {
-    // TODO: remove these after a release or two
-    console.log('changedKey', changedKey)
-    console.log('parentId', parentId)
-    console.log('position', index + 1)
-
     try {
       await reorganizeActivity({
         request: {

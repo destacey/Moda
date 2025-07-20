@@ -85,7 +85,7 @@ describe('MarkdownCodeBlock', () => {
     )
 
     const codeElement = screen.getByText('Custom styled code')
-    expect(codeElement).toHaveStyle('color: red')
+    expect(codeElement).toHaveStyle('color: rgb(255, 0, 0)')
   })
 
   it('does not render when children are absent', () => {
