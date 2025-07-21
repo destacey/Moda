@@ -13,6 +13,11 @@ import {
   MarkdownTable,
 } from '.'
 
+// Type for MDEditor's expected Components (compatible with older react-markdown)
+type MDEditorComponents = {
+  [key: string]: React.ComponentType<any>
+}
+
 const { Title, Paragraph, Text, Link: AntDLink } = Typography
 
 interface MarkdownLinkProps
@@ -69,4 +74,21 @@ export const useMarkdownComponents = (): Components => {
       table: (props) => <MarkdownTable {...props} />,
     }
   }, [token])
+}
+
+// Type-safe adapter for MDEditor compatibility
+export const useMarkdownComponentsForMDEditor = (): MDEditorComponents => {
+  const components = useMarkdownComponents()
+
+  // Convert to the format expected by MDEditor's older react-markdown version
+  return useMemo(() => {
+    const adapted: MDEditorComponents = {}
+
+    // Map each component with proper type compatibility
+    Object.entries(components).forEach(([key, Component]) => {
+      adapted[key] = Component as React.ComponentType<any>
+    })
+
+    return adapted
+  }, [components])
 }

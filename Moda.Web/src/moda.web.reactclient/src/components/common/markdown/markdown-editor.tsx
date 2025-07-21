@@ -3,7 +3,7 @@
 import dynamic from 'next/dynamic'
 import '@uiw/react-md-editor/markdown-editor.css'
 import '@uiw/react-markdown-preview/markdown.css'
-import { MarkdownEditorFooter, useMarkdownComponents } from '.'
+import { MarkdownEditorFooter, useMarkdownComponentsForMDEditor } from '.'
 import remarkGfm from 'remark-gfm'
 import useTheme from '../../contexts/theme'
 import { useEffect, useRef, useState } from 'react'
@@ -25,7 +25,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = React.memo(
 
     const editorRef = useRef<HTMLDivElement | null>(null)
 
-    const markdownComponents = useMarkdownComponents()
+    const markdownComponents = useMarkdownComponentsForMDEditor()
 
     const handleWrapperClick = () => {
       const textarea = editorRef.current?.querySelector('textarea')

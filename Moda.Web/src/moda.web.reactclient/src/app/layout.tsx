@@ -13,7 +13,6 @@ import AppSideNav from './_components/menu/app-side-nav'
 import AppBreadcrumb from './_components/app-breadcrumb'
 import { ThemeProvider } from '../components/contexts/theme'
 import { MenuToggleProvider } from '../components/contexts/menu-toggle'
-import { QueryClient, QueryClientProvider } from 'react-query'
 import { AntdRegistry } from '@ant-design/nextjs-registry'
 import { AuthProvider, msalInstance } from '../components/contexts/auth'
 import {
@@ -27,15 +26,6 @@ import { MessageProvider } from '../components/contexts/messaging'
 const { Content } = Layout
 
 const inter = Inter({ subsets: ['latin'] })
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: false,
-      refetchOnWindowFocus: false,
-    },
-  },
-})
 
 // Register all community features for ag-grid
 ModuleRegistry.registerModules([AllCommunityModule])
@@ -62,22 +52,20 @@ const RootLayout = ({ children }: React.PropsWithChildren) => {
               <AuthProvider>
                 <AuthenticatedTemplate>
                   <ThemeProvider>
-                    <QueryClientProvider client={queryClient}>
-                      <MenuToggleProvider>
-                        <MessageProvider>
-                          <Layout>
-                            <AppHeader />
-                            <Layout hasSider className="app-main-layout">
-                              <AppSideNav isMobile={isMobile} />
-                              <Content className="app-main-content">
-                                <AppBreadcrumb />
-                                {children}
-                              </Content>
-                            </Layout>
+                    <MenuToggleProvider>
+                      <MessageProvider>
+                        <Layout>
+                          <AppHeader />
+                          <Layout hasSider className="app-main-layout">
+                            <AppSideNav isMobile={isMobile} />
+                            <Content className="app-main-content">
+                              <AppBreadcrumb />
+                              {children}
+                            </Content>
                           </Layout>
-                        </MessageProvider>
-                      </MenuToggleProvider>
-                    </QueryClientProvider>
+                        </Layout>
+                      </MessageProvider>
+                    </MenuToggleProvider>
                   </ThemeProvider>
                 </AuthenticatedTemplate>
                 <UnauthenticatedTemplate>
