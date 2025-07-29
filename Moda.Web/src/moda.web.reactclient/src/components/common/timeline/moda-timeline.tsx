@@ -250,7 +250,9 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
         roots.forEach((root) => {
           try {
             root.unmount()
-          } catch {}
+          } catch (error) {
+            console.error("Error unmounting root:", error)
+          }
         })
       }, 0)
       elementMapRef.current = {}
