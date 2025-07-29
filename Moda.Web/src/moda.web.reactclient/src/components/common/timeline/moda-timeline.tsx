@@ -37,7 +37,13 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
   const [isFullScreen, setIsFullScreen] = useState(false)
   const [dynamicOptions, setDynamicOptions] = useState<TimelineOptions>({})
 
-  const elementMapRef = useRef<Record<string | number, HTMLElement>>({})
+  // Store both container and root for cleanup
+  const elementMapRef = useRef<
+    Record<
+      string | number,
+      { container: HTMLElement; root: ReturnType<typeof createRoot> }
+    >
+  >({})
   const timelineRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -58,13 +64,12 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
       if (!item) return ''
 
       const mapId = item.id ?? 0
-      if (elementMapRef.current?.[mapId]) return elementMapRef.current[mapId]
+      if (elementMapRef.current?.[mapId])
+        return elementMapRef.current[mapId].container
 
       // Create a container for the React element (prevents DOM node errors)
       const container = document.createElement('div')
-
       if (element) element.appendChild(container)
-
       const root = createRoot(container)
 
       // Unfortunately, typescript doesn't seem to handle nested constrained generics very well (see: https://github.com/microsoft/TypeScript/issues/23132)
@@ -83,8 +88,8 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
           />,
         )
 
-      // Store the rendered element container to reference later
-      elementMapRef.current[mapId] = container
+      // Store the rendered element container and root to reference later
+      elementMapRef.current[mapId] = { container, root }
 
       // Return the new container
       return container
@@ -99,12 +104,12 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
       if (!item) return ''
 
       const mapId = item.id ?? 0
-      if (elementMapRef.current?.[mapId]) return elementMapRef.current[mapId]
+      if (elementMapRef.current?.[mapId])
+        return elementMapRef.current[mapId].container
 
       // Create a container for the react element (prevents DOM node errors)
       const container = document.createElement('div')
       element?.appendChild(container)
-
       const root = createRoot(container)
 
       // Unfortunately, typescript doesn't seem to handle nested constrained generics very well (see: https://github.com/microsoft/TypeScript/issues/23132)
@@ -125,8 +130,8 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
         )
       }
 
-      // Store the rendered element container to reference later
-      elementMapRef.current[mapId] = container
+      // Store the rendered element container and root to reference later
+      elementMapRef.current[mapId] = { container, root }
 
       // Return the new container
       return container
@@ -239,6 +244,15 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
 
     // cleanup function to remove the timeline when the component is unmounted
     return () => {
+      // Defer unmounting roots to avoid React race condition
+      const roots = Object.values(elementMapRef.current).map(({ root }) => root)
+      setTimeout(() => {
+        roots.forEach((root) => {
+          try {
+            root.unmount()
+          } catch {}
+        })
+      }, 0)
       elementMapRef.current = {}
       if (timeline) {
         timeline.destroy()
