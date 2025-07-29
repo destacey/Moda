@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { Card, Flex, Typography } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
-import { DataGroup } from 'vis-timeline/standalone/esm/vis-timeline-graph2d'
+import { DataGroup } from 'vis-timeline/standalone'
 import {
   PlanningIntervalCalendarDto,
   PlanningIntervalObjectiveListDto,

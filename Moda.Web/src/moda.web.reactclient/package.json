@@ -65,7 +65,8 @@
     "rehype-raw": "^7.0.0",
     "rehype-sanitize": "^6.0.0",
     "remark-gfm": "^4.0.1",
-    "vis-timeline": "7.7.4"
+    "vis-data": "8.0.1",
+    "vis-timeline": "8.2.1"
   },
   "overrides": {
     "react": "$react",
