@@ -1,4 +1,4 @@
-import { DataItem } from 'vis-timeline/standalone'
+import { DataItem, TimelineOptionsTemplateFunction as OriginalTimelineOptionsTemplateFunction } from 'vis-timeline/standalone'
 import 'vis-timeline/standalone'
 
 declare module 'vis-timeline/standalone' {
@@ -6,10 +6,14 @@ declare module 'vis-timeline/standalone' {
     type: 'box' | 'point' | 'range' | 'background'
     group?: TGroup
   }
-
-  export type TimelineOptionsTemplateFunction<
-    TItem = DataItemEnhanced,
-    TEl = HTMLElement,
-    TData = unknown,
-  > = (item?: TItem, element?: TEl, data?: TData) => string | HTMLElement
 }
+
+// Create a generic version of the template function for backward compatibility
+export type TimelineOptionsTemplateFunction<
+  TItem = DataItemEnhanced,
+  TEl = HTMLElement,
+  TData = unknown,
+> = (item?: TItem, element?: TEl, data?: TData) => string | HTMLElement
+
+// Re-export the enhanced DataItem interface
+export type { DataItemEnhanced } from 'vis-timeline/standalone'

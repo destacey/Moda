@@ -2,12 +2,12 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
+import { DataSet } from 'vis-data'
 import {
-  DataSet,
   Timeline,
   TimelineOptions,
-  TimelineOptionsTemplateFunction,
 } from 'vis-timeline/standalone'
+import { TimelineOptionsTemplateFunction } from '@/src/lib/vis-timeline'
 import { Button, Spin } from 'antd'
 import useTheme from '../../contexts/theme'
 import { ModaEmpty } from '..'
