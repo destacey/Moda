@@ -55,14 +55,13 @@ const ObjectiveDetailsPage = (props: {
   })
 
   const router = useRouter()
-  const { hasClaim } = useAuth()
-  const canManageObjectives = hasClaim(
-    'Permission',
+  const { hasPermissionClaim } = useAuth()
+  const canManageObjectives = hasPermissionClaim(
     'Permissions.PlanningIntervalObjectives.Manage',
   )
   const canCreateHealthChecks =
     !!canManageObjectives &&
-    hasClaim('Permission', 'Permissions.HealthChecks.Create')
+    hasPermissionClaim('Permissions.HealthChecks.Create')
   const showActions = canManageObjectives
 
   const dispatch = useAppDispatch()

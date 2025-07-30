@@ -94,7 +94,7 @@ const AuthorizedDeletePlanningIntervalObjectiveForm: FC<
     DeletePlanningIntervalObjectiveForm,
     props.onFormCancel,
     'Permission',
-    'Permissions.StrategicInitiatives.Delete',
+    'Permissions.PlanningIntervalObjectives.Manage',
   )
 
   return <AuthorizedForm {...props} />
