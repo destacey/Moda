@@ -14,6 +14,7 @@ public class IterationNodeDtoExtensionsTests
             Id = 1,
             Identifier = Guid.NewGuid(),
             Name = "Root",
+            Path = "\\Root\\Iteration",
             Children = []
         };
         var teamId = Guid.NewGuid();
@@ -39,19 +40,22 @@ public class IterationNodeDtoExtensionsTests
             Id = 1,
             Identifier = Guid.NewGuid(),
             Name = "Root",
+            Path = "\\Root\\Iteration",
             Children =
                 [
                     new IterationNodeDto
                     {
                         Id = 2,
                         Identifier = Guid.NewGuid(),
-                        Name = "Child 1"
+                        Name = "Child 1",
+                        Path = "\\Root\\Iteration\\Child 1",
                     },
                     new IterationNodeDto
                     {
                         Id = 2,
                         Identifier = child2Id,
-                        Name = "Child 2"
+                        Name = "Child 2",
+                        Path = "\\Root\\Iteration\\Child 2",
                     }
                 ]
         };
@@ -82,13 +86,15 @@ public class IterationNodeDtoExtensionsTests
             Id = 1,
             Identifier = Guid.NewGuid(),
             Name = "Root",
+            Path = "\\Root\\Iteration",
             Children =
                 [
                     new IterationNodeDto
                     {
                         Id = 2,
                         Identifier = Guid.NewGuid(),
-                        Name = "Child"
+                        Name = "Child",
+                        Path = "\\Root\\Iteration\\Child",
                     }
                 ]
         };
@@ -116,6 +122,7 @@ public class IterationNodeDtoExtensionsTests
             Id = 1,
             Identifier = Guid.NewGuid(),
             Name = "Root",
+            Path = "\\Root\\Iteration",
             Children = []
         };
         var teamId = Guid.NewGuid();
@@ -141,6 +148,7 @@ public class IterationNodeDtoExtensionsTests
             Id = 1,
             Identifier = Guid.NewGuid(),
             Name = "Root",
+            Path = "\\Root\\Iteration",
             Children = null
         };
         var iterationTeamMappings = new Dictionary<Guid, Guid>();
@@ -160,7 +168,8 @@ public class IterationNodeDtoExtensionsTests
         {
             Id = 1,
             Identifier = Guid.NewGuid(),
-            Name = "Root"
+            Name = "Root",
+            Path = "\\Root\\Iteration",
         };
         var iterationTeamMappings = new Dictionary<Guid, Guid>();
 

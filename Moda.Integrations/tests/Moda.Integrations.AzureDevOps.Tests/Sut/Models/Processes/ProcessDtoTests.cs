@@ -21,7 +21,7 @@ public class ProcessDtoTests : CommonResponseOptions
         actualResponse.Description.Should().Be("Includes a fourth level initiative work item type");
         Assert.NotNull(actualResponse.Projects);
         actualResponse.Projects.Should().HaveCount(1);
-        actualResponse.Projects.First().Id.Should().Be(Guid.Parse("16301a76-6640-4efd-83cf-6e94474f2528"));
+        actualResponse.Projects.First().Id.Should().Be(Guid.Parse("3b15d01e-d259-48eb-a15c-dd29384fd598"));
         actualResponse.IsEnabled.Should().BeTrue();
     }
 
@@ -35,10 +35,10 @@ public class ProcessDtoTests : CommonResponseOptions
                 "description": "Includes a fourth level initiative work item type",
                 "projects": [
                     {
-                        "id": "16301a76-6640-4efd-83cf-6e94474f2528",
+                        "id": "3b15d01e-d259-48eb-a15c-dd29384fd598",
                         "name": "Moda",
                         "description": "test project for Moda",
-                        "url": "vstfs:///Classification/TeamProject/16301a76-6640-4efd-83cf-6e94474f2528"
+                        "url": "vstfs:///Classification/TeamProject/3b15d01e-d259-48eb-a15c-dd29384fd598"
                     }
                 ],
                 "parentProcessTypeId": "adcc42ab-9882-485e-a3ed-7678f01f66bc",
