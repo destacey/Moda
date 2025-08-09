@@ -199,6 +199,9 @@ const createCrudSlice = <
     reducers: {
       setEditMode(state, action: PayloadAction<boolean>) {
         state.detail.isInEditMode = action.payload
+        if (!action.payload) {
+          state.detail.validationErrors = []
+        }
       },
       ...options.reducers,
     },
