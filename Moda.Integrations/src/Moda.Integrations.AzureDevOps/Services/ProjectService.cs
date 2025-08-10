@@ -177,7 +177,7 @@ internal sealed class ProjectService(string organizationUrl, string token, strin
         catch (Exception ex)
         {
             _logger.LogError(ex, "Exception thrown getting areas for project {ProjectId} from Azure DevOps", projectName);
-            return Result.Failure<List<ClassificationNodeResponse>> (ex.ToString());
+            return Result.Failure<List<ClassificationNodeResponse>>(ex.ToString());
         }
     }
 
@@ -217,21 +217,21 @@ internal sealed class ProjectService(string organizationUrl, string token, strin
 
     private Dictionary<Guid, Guid> ConvertTeamSettingsToIterationTeamMapping(Dictionary<Guid, Guid?>? teamSettings)
     {
-        Dictionary<Guid, Guid> iterationTeamMapping = [];
-        if (teamSettings is not null)
+        if (teamSettings is null || teamSettings.Count == 0)
+            return [];
+
+        var iterationTeamMapping = new Dictionary<Guid, Guid>(teamSettings.Count);
+        foreach (var team in teamSettings)
         {
-            foreach (var team in teamSettings)
+            var teamId = team.Key;
+            var iterationId = team.Value;
+
+            if (iterationId is null)
+                continue;
+
+            if (!iterationTeamMapping.TryAdd(iterationId.Value, teamId))
             {
-                if (team.Value is null)
-                    continue;
-
-                if (iterationTeamMapping.ContainsKey(team.Value.Value))
-                {
-                    _logger.LogWarning("Iteration {IterationId} is already mapped to team {TeamId}.", team.Value.Value, team.Key);
-                    continue;
-                }
-
-                iterationTeamMapping.Add(team.Value.Value, team.Key);
+                _logger.LogWarning("Iteration {IterationId} is already mapped to team {TeamId}.", iterationId.Value, teamId);
             }
         }
 
