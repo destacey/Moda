@@ -23,7 +23,7 @@ public class AzureDevOpsService(ILogger<AzureDevOpsService> logger, IServiceProv
         try
         {
             // use the GetWorkProcesses method to test the connection
-            var result = await GetWorkProcesses(organizationUrl, token, CancellationToken.None);
+            var result = await GetWorkProcesses(organizationUrl, token, CancellationToken.None).ConfigureAwait(false);
 
             return result.IsSuccess
                 ? Result.Success()
@@ -40,7 +40,7 @@ public class AzureDevOpsService(ILogger<AzureDevOpsService> logger, IServiceProv
     {
         var processService = GetService<ProcessService>(organizationUrl, token);
 
-        var result = await processService.GetProcesses(cancellationToken);
+        var result = await processService.GetProcesses(cancellationToken).ConfigureAwait(false);
         return result.IsSuccess
             ? Result.Success(result.Value.ToList<IExternalWorkProcess>())
             : Result.Failure<List<IExternalWorkProcess>>(result.Error);
@@ -50,7 +50,7 @@ public class AzureDevOpsService(ILogger<AzureDevOpsService> logger, IServiceProv
     {
         var processService = GetService<ProcessService>(organizationUrl, token);
 
-        var result = await processService.GetProcess(processId, cancellationToken);
+        var result = await processService.GetProcess(processId, cancellationToken).ConfigureAwait(false);
         return result.IsSuccess
             ? result.Value
             : Result.Failure<IExternalWorkProcessConfiguration>(result.Error);
@@ -60,7 +60,7 @@ public class AzureDevOpsService(ILogger<AzureDevOpsService> logger, IServiceProv
     {
         var projectService = GetService<ProjectService>(organizationUrl, token);
 
-        var result = await projectService.GetProject(workspaceId, cancellationToken);
+        var result = await projectService.GetProject(workspaceId, cancellationToken).ConfigureAwait(false);
 
         if (result.IsFailure)
             return Result.Failure<IExternalWorkspaceConfiguration>(result.Error);
@@ -75,7 +75,7 @@ public class AzureDevOpsService(ILogger<AzureDevOpsService> logger, IServiceProv
     {
         var projectService = GetService<ProjectService>(organizationUrl, token);
 
-        var result = await projectService.GetProjects(cancellationToken);
+        var result = await projectService.GetProjects(cancellationToken).ConfigureAwait(false);
         if (result.IsFailure)
             return Result.Failure<List<IExternalWorkspace>>(result.Error);
 
@@ -86,7 +86,7 @@ public class AzureDevOpsService(ILogger<AzureDevOpsService> logger, IServiceProv
     {
         var projectService = GetService<ProjectService>(organizationUrl, token);
 
-        var result = await projectService.GetTeams(projectIds, cancellationToken);
+        var result = await projectService.GetTeams(projectIds, cancellationToken).ConfigureAwait(false);
         if (result.IsFailure)
             return Result.Failure<List<IExternalTeam>>(result.Error);
 
@@ -99,13 +99,13 @@ public class AzureDevOpsService(ILogger<AzureDevOpsService> logger, IServiceProv
     {
         var projectService = GetService<ProjectService>(organizationUrl, token);
 
-        var iterationsResult = await projectService.GetIterations(projectName, teamSettings, cancellationToken);
+        var iterationsResult = await projectService.GetIterations(projectName, teamSettings, cancellationToken).ConfigureAwait(false);
         if (iterationsResult.IsFailure)
             return Result.Failure<List<IExternalWorkItem>>(iterationsResult.Error);
 
         var workItemService = GetService<WorkItemService>(organizationUrl, token);
 
-        var result = await workItemService.GetWorkItems(projectName, lastChangedDate, workItemTypes, cancellationToken);
+        var result = await workItemService.GetWorkItems(projectName, lastChangedDate, workItemTypes, cancellationToken).ConfigureAwait(false);
 
         return result.IsSuccess
             ? Result.Success(result.Value.ToIExternalWorkItems(iterationsResult.Value))
@@ -116,7 +116,7 @@ public class AzureDevOpsService(ILogger<AzureDevOpsService> logger, IServiceProv
     {
         var workItemService = GetService<WorkItemService>(organizationUrl, token);
 
-        var result = await workItemService.GetParentLinkChanges(projectName, lastChangedDate, workItemTypes, cancellationToken);
+        var result = await workItemService.GetParentLinkChanges(projectName, lastChangedDate, workItemTypes, cancellationToken).ConfigureAwait(false);
 
         return result.IsSuccess
             ? Result.Success(result.Value.ToIExternalWorkItemLinks())
@@ -127,7 +127,7 @@ public class AzureDevOpsService(ILogger<AzureDevOpsService> logger, IServiceProv
     {
         var workItemService = GetService<WorkItemService>(organizationUrl, token);
 
-        var result = await workItemService.GetDependencyLinkChanges(projectName, lastChangedDate, workItemTypes, cancellationToken);
+        var result = await workItemService.GetDependencyLinkChanges(projectName, lastChangedDate, workItemTypes, cancellationToken).ConfigureAwait(false);
 
         return result.IsSuccess
             ? Result.Success(result.Value.ToIExternalWorkItemLinks())
@@ -138,7 +138,7 @@ public class AzureDevOpsService(ILogger<AzureDevOpsService> logger, IServiceProv
     {
         var workItemService = GetService<WorkItemService>(organizationUrl, token);
 
-        var result = await workItemService.GetDeletedWorkItemIds(projectName, lastChangedDate, cancellationToken);
+        var result = await workItemService.GetDeletedWorkItemIds(projectName, lastChangedDate, cancellationToken).ConfigureAwait(false);
 
         return result.IsSuccess
             ? Result.Success(result.Value)

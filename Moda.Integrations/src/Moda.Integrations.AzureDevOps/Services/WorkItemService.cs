@@ -13,7 +13,7 @@ internal sealed class WorkItemService(string organizationUrl, string token, stri
     {
         try
         {
-            var workItemIds = await _workItemClient.GetWorkItemIds(projectName, lastChangedDate, workItemTypes, cancellationToken);
+            var workItemIds = await _workItemClient.GetWorkItemIds(projectName, lastChangedDate, workItemTypes, cancellationToken).ConfigureAwait(false);
 
             _logger.LogDebug("{WorkItemIdCount} work item ids found for project {Project}", workItemIds.Length, projectName);
 
@@ -45,7 +45,7 @@ internal sealed class WorkItemService(string organizationUrl, string token, stri
                 "Microsoft.VSTS.Common.ClosedDate"
             ];
 
-            var workitems = await _workItemClient.GetWorkItems(projectName, workItemIds, fields, cancellationToken);
+            var workitems = await _workItemClient.GetWorkItems(projectName, workItemIds, fields, cancellationToken).ConfigureAwait(false);
 
             _logger.LogDebug("{WorkItemCount} work items found for project {Project}", workitems.Count, projectName);
 
@@ -64,7 +64,7 @@ internal sealed class WorkItemService(string organizationUrl, string token, stri
         {
             string[] linkTypes = ["System.LinkTypes.Hierarchy"];
 
-            var links = await _workItemClient.GetWorkItemLinkChanges(projectName, lastChangedDate, linkTypes, workItemTypes, cancellationToken);
+            var links = await _workItemClient.GetWorkItemLinkChanges(projectName, lastChangedDate, linkTypes, workItemTypes, cancellationToken).ConfigureAwait(false);
 
             _logger.LogDebug("{LinkCount} parent link changes found for project {Project}", links.Count, projectName);
 
@@ -83,7 +83,7 @@ internal sealed class WorkItemService(string organizationUrl, string token, stri
         {
             string[] linkTypes = ["System.LinkTypes.Dependency"];
 
-            var links = await _workItemClient.GetWorkItemLinkChanges(projectName, lastChangedDate, linkTypes, workItemTypes, cancellationToken);
+            var links = await _workItemClient.GetWorkItemLinkChanges(projectName, lastChangedDate, linkTypes, workItemTypes, cancellationToken).ConfigureAwait(false);
 
             _logger.LogDebug("{LinkCount} dependency link changes found for project {Project}", links.Count, projectName);
 
@@ -100,12 +100,12 @@ internal sealed class WorkItemService(string organizationUrl, string token, stri
     {
         try
         {
-            int[] workItemIds = await _workItemClient.GetDeletedWorkItemIds(projectName, cancellationToken);
+            int[] workItemIds = await _workItemClient.GetDeletedWorkItemIds(projectName, cancellationToken).ConfigureAwait(false);
 
             // TODO: make this configurable and better.
             // We are trying to solve for the scenario where a work item is synced, but then later
             // changes to a work item type that is not being synced.
-            int[] noneSyncedIds = await _workItemClient.GetWorkItemIds(projectName, lastChangedDate, ["Task", "Issue"], cancellationToken);
+            int[] noneSyncedIds = await _workItemClient.GetWorkItemIds(projectName, lastChangedDate, ["Task", "Issue"], cancellationToken).ConfigureAwait(false);
 
             int[] deletedWorkItemIds = new int[workItemIds.Length + noneSyncedIds.Length];
             Array.Copy(workItemIds, 0, deletedWorkItemIds, 0, workItemIds.Length);

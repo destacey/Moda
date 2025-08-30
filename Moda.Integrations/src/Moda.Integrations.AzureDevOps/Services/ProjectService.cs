@@ -23,7 +23,7 @@ internal sealed class ProjectService(string organizationUrl, string token, strin
 
             while (true)
             {
-                var batch = await _projectClient.GetProjects(top: _maxBatchSize, skip: projects.Count, cancellationToken);
+                var batch = await _projectClient.GetProjects(top: _maxBatchSize, skip: projects.Count, cancellationToken).ConfigureAwait(false);
                 if (!batch.IsSuccessful)
                 {
                     _logger.LogError("Error getting projects from Azure DevOps: {ErrorMessage}.", batch.ErrorMessage);
@@ -54,7 +54,7 @@ internal sealed class ProjectService(string organizationUrl, string token, strin
     {
         try
         {
-            var projectResponse = await _projectClient.GetProject(projectId, cancellationToken);
+            var projectResponse = await _projectClient.GetProject(projectId, cancellationToken).ConfigureAwait(false);
             if (!projectResponse.IsSuccessful && projectResponse.StatusCode != HttpStatusCode.NotFound)
             {
                 var statusDescription = projectResponse.StatusCode is 0 ? "Connection Error" : projectResponse.StatusDescription;
@@ -69,7 +69,7 @@ internal sealed class ProjectService(string organizationUrl, string token, strin
                 return Result.Failure<ProjectDetailsDto>(errorMesssage);
             }
 
-            var propertiesResponse = await _projectClient.GetProjectProperties(projectId, cancellationToken);
+            var propertiesResponse = await _projectClient.GetProjectProperties(projectId, cancellationToken).ConfigureAwait(false);
             if (!propertiesResponse.IsSuccessful && propertiesResponse.StatusCode != HttpStatusCode.NotFound)
             {
                 var statusDescription = propertiesResponse.StatusCode is 0 ? "Connection Error" : propertiesResponse.StatusDescription;
@@ -110,7 +110,7 @@ internal sealed class ProjectService(string organizationUrl, string token, strin
             foreach (var id in projectIds)
             {
                 currentProjectId = id;
-                var response = await _projectClient.GetProjectTeams(id, cancellationToken);
+                var response = await _projectClient.GetProjectTeams(id, cancellationToken).ConfigureAwait(false);
                 if (!response.IsSuccessful)
                 {
                     _logger.LogError("Error getting teams for project {ProjectId} from Azure DevOps: {ErrorMessage}.", id, response.ErrorMessage);
@@ -125,7 +125,7 @@ internal sealed class ProjectService(string organizationUrl, string token, strin
                 // set team settings: boardId
                 foreach (var team in response.Data.Value)
                 {
-                    var teamSettingsResponse = await _projectClient.GetProjectTeamsSettings(id, team.Id, cancellationToken);
+                    var teamSettingsResponse = await _projectClient.GetProjectTeamsSettings(id, team.Id, cancellationToken).ConfigureAwait(false);
                     if (!teamSettingsResponse.IsSuccessful)
                     {
                         _logger.LogError("Error getting team settings for team {TeamId} in project {ProjectId} from Azure DevOps: {ErrorMessage}.", team.Id, id, teamSettingsResponse.ErrorMessage);
@@ -156,7 +156,7 @@ internal sealed class ProjectService(string organizationUrl, string token, strin
     {
         try
         {
-            var response = await _projectClient.GetAreaPaths(projectName, cancellationToken);
+            var response = await _projectClient.GetAreaPaths(projectName, cancellationToken).ConfigureAwait(false);
             if (!response.IsSuccessful)
             {
                 _logger.LogError("Error getting areas for project {ProjectId} from Azure DevOps: {ErrorMessage}.", projectName, response.ErrorMessage);
@@ -185,7 +185,7 @@ internal sealed class ProjectService(string organizationUrl, string token, strin
     {
         try
         {
-            var response = await _projectClient.GetIterationPaths(projectName, cancellationToken);
+            var response = await _projectClient.GetIterationPaths(projectName, cancellationToken).ConfigureAwait(false);
             if (!response.IsSuccessful)
             {
                 _logger.LogError("Error getting iterations for project {ProjectId} from Azure DevOps: {ErrorMessage}.", projectName, response.ErrorMessage);
