@@ -80,10 +80,11 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
                     .ToArrayAsync(cancellationToken))
                 .ToHashSet();
 
-            int chunkSize = 1000;
-            var chunks = request.WorkItems.OrderBy(w => w.LastModified).Chunk(chunkSize);
+            int chunkSize = 2000;
+            var chunks = request.WorkItems.OrderBy(w => w.LastModified).Chunk(chunkSize).ToList();
 
             var missingParents = new Dictionary<int, int>();
+            int c = 1;
             foreach (var chunk in chunks)
             {
                 // TODO: this is not a performant way to do this.  Make it better.
@@ -131,7 +132,7 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
                         Guid? teamId = null;
                         if (externalWorkItem.TeamId.HasValue)
                         {
-                            request.teamMappings.TryGetValue(externalWorkItem.TeamId.Value, out teamId);
+                            request.TeamMappings.TryGetValue(externalWorkItem.TeamId.Value, out teamId);
                         }
 
                         if (workItem is null)
@@ -192,6 +193,7 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
                         }
 
                         _logger.LogError(ex, "Exception thrown while syncing external work item {ExternalId} in workspace {WorkspaceId} ({WorkspaceName}).", externalWorkItem.Id, workspace.Id, workspace.Name);
+                        _logger.LogDebug("LOCATION-196");
 
                         syncLog.ItemError();
                         continue;
@@ -204,10 +206,12 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
                 }
 
                 await _workDbContext.SaveChangesAsync(cancellationToken);
+
+                _logger.LogInformation("Synced {ChunkCount} of {TotalChuncks} for workspace {WorkspaceId} ({WorkspaceName}).", c++, chunks.Count, workspace.Id, workspace.Name);
             }
 
-            await MapMissingParents(workspace, missingParents, cancellationToken);
-            await SyncParentProjectIds(workspace, workTypes, cancellationToken);
+            //await MapMissingParents(workspace, missingParents, cancellationToken);
+            //await SyncParentProjectIds(workspace, workTypes, cancellationToken);
         }
         catch (Exception ex)
         {

@@ -13,11 +13,11 @@ public class PerformanceBehavior<TRequest, TResponse>(ILogger<PerformanceBehavio
     {
         var startTime = Stopwatch.GetTimestamp();
 
-        var response = await next();
+        var response = await next(cancellationToken);
 
         var elapsedMilliseconds = Stopwatch.GetElapsedTime(startTime).TotalMilliseconds;
 
-        if (elapsedMilliseconds > 700)
+        if (elapsedMilliseconds > 700 && request is not ILongRunningRequest)
         {
             var requestName = typeof(TRequest).Name;
 

@@ -1,5 +1,5 @@
 ﻿namespace Moda.Organization.Application.Teams.Commands;
-public sealed record SyncTeamMembershipEdgesCommand() : ICommand;
+public sealed record SyncTeamMembershipEdgesCommand() : ICommand, ILongRunningRequest;
 
 internal sealed class SyncTeamMembershipEdgesCommandHandler(IOrganizationDbContext organizationDbContext, ILogger<SyncTeamMembershipEdgesCommandHandler> logger) : ICommandHandler<SyncTeamMembershipEdgesCommand>
 {

@@ -17,7 +17,7 @@ public sealed class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRe
 
         _logger.LogInformation("Processing request: {AppRequestName}", requestName);
 
-        TResponse response = await next();
+        TResponse response = await next(cancellationToken);
 
         // THIS IS NOT CURRENTLY IN USE - only ICommand returns a Result in the reponse; IQuery does not
         // TODO: Update TResponse to "where TResponse : Result"

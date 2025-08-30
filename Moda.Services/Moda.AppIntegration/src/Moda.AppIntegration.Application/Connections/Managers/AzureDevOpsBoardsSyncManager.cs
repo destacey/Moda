@@ -48,8 +48,7 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
             {
                 if (cancellationToken.IsCancellationRequested)
                 {
-                    var message = "Cancellation requested. Stopping sync.";
-                    _logger.LogInformation(message);
+                    _logger.LogInformation("Cancellation requested. Stopping sync.");
                     return Result.Success();
                 }
 
@@ -83,8 +82,7 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
                 {
                     if (cancellationToken.IsCancellationRequested)
                     {
-                        var message = "Cancellation requested. Stopping sync.";
-                        _logger.LogInformation(message);
+                        _logger.LogInformation("Cancellation requested. Stopping sync.");
                         return Result.Success();
                     }
 
@@ -116,8 +114,7 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
                     {
                         if (cancellationToken.IsCancellationRequested)
                         {
-                            var message = "Cancellation requested. Stopping sync.";
-                            _logger.LogInformation(message);
+                            _logger.LogInformation("Cancellation requested. Stopping sync.");
                             return Result.Success();
                         }
 
@@ -205,8 +202,7 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
         }
         catch (Exception ex)
         {
-            string message = "An exception occurred while trying to sync Azure DevOps Boards.";
-            _logger.LogError(ex, message);
+            _logger.LogError(ex, "An exception occurred while trying to sync Azure DevOps Boards.");
             throw;
         }
     }

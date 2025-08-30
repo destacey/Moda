@@ -2,7 +2,7 @@
 using Moda.Common.Application.Validators;
 
 namespace Moda.Common.Application.Requests.WorkManagement;
-public sealed record SyncExternalWorkItemParentChangesCommand(Guid WorkspaceId, List<IExternalWorkItemLink> WorkItemLinks) : ICommand;
+public sealed record SyncExternalWorkItemParentChangesCommand(Guid WorkspaceId, List<IExternalWorkItemLink> WorkItemLinks) : ICommand, ILongRunningRequest;
 
 public sealed class SyncExternalWorkItemParentChangesCommandValidator : CustomValidator<SyncExternalWorkItemParentChangesCommand>
 {
