@@ -4,6 +4,7 @@ import {
   DataGroup,
 } from 'vis-timeline/standalone'
 import { TimelineOptionsTemplateFunction } from '@/src/lib/vis-timeline'
+import { TimelineItem } from 'vis-timeline/types'
 
 export type ModaDataItem<T = unknown, G = unknown> = DataItemEnhanced<G> & {
   itemColor?: string
@@ -40,6 +41,7 @@ export type ModaTimelineProps<
   emptyMessage?: string
   allowFullScreen?: boolean
   allowSaveAsImage?: boolean
+  onMove?: (item: TimelineItem) => void
 }
 
 export type GroupTemplateProps<T extends ModaDataGroup> = {

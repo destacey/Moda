@@ -3,10 +3,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { DataSet } from 'vis-data'
-import {
-  Timeline,
-  TimelineOptions,
-} from 'vis-timeline/standalone'
+import { Timeline, TimelineOptions } from 'vis-timeline/standalone'
 import { TimelineOptionsTemplateFunction } from '@/src/lib/vis-timeline'
 import { Button, Spin } from 'antd'
 import useTheme from '../../contexts/theme'
@@ -29,6 +26,8 @@ import {
 } from '@ant-design/icons'
 import { saveElementAsImage } from '@/src/utils'
 import { Options } from 'html2canvas'
+import { TimelineOptionsItemCallbackFunction } from 'vis-timeline'
+import dayjs from 'dayjs'
 
 const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
   props: ModaTimelineProps<TItem, TGroup>,
@@ -139,9 +138,38 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
     [colors.item.font, colors.item.foreground, props],
   )
 
+  const onMoveProp = props.onMove
+  const onMove = useCallback<TimelineOptionsItemCallbackFunction>(
+    (item, callback) => {
+      const original = props.data.find((x) => x.id === item.id)
+
+      if (!original) return
+
+      if (
+        dayjs(original.end).isSame(dayjs(item.end)) &&
+        dayjs(original.start).isSame(dayjs(item.start))
+      )
+        return
+
+      // TODO: Account for total days in a month when moving months
+
+      callback(item)
+
+      onMoveProp?.(item)
+    },
+    [onMoveProp, props.data],
+  )
+
   const baseOptions = useMemo((): TimelineOptions => {
     return {
-      editable: false,
+      editable: {
+        updateTime: true,
+        updateGroup: false,
+        remove: false,
+        add: false,
+        overrideItems: false,
+      },
+      onMove,
       selectable: true,
       orientation: 'top',
       maxHeight: props.options.maxHeight ?? 650,
@@ -171,6 +199,7 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
     props.options.showCurrentTime,
     props.options.start,
     props.options.template,
+    onMove,
   ])
 
   useEffect(() => {
@@ -251,7 +280,7 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
           try {
             root.unmount()
           } catch (error) {
-            console.error("Error unmounting root:", error)
+            console.error('Error unmounting root:', error)
           }
         })
       }, 0)

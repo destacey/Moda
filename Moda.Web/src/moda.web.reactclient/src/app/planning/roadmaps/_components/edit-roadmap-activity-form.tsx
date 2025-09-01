@@ -54,7 +54,7 @@ const mapToRequestValues = (
     start: (values.start as any)?.format('YYYY-MM-DD'),
     end: (values.end as any)?.format('YYYY-MM-DD'),
     color: values.color,
-  } as UpdateRoadmapActivityRequest
+  } satisfies UpdateRoadmapActivityRequest
 }
 
 const filterActivities = (activities: RoadmapActivityListDto[], activityId) => {
