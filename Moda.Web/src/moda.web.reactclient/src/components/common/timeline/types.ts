@@ -2,9 +2,9 @@ import { FC } from 'react'
 import {
   DataItemEnhanced,
   DataGroup,
+  TimelineItem,
 } from 'vis-timeline/standalone'
 import { TimelineOptionsTemplateFunction } from '@/src/lib/vis-timeline'
-import { TimelineItem } from 'vis-timeline/types'
 
 export type ModaDataItem<T = unknown, G = unknown> = DataItemEnhanced<G> & {
   itemColor?: string

@@ -1,12 +1,6 @@
 'use client'
 
-import {
-  ReactNode,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react'
+import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 import { Button, Card, Divider, Flex, Space, Switch, Typography } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import {
@@ -31,7 +25,7 @@ import dayjs from 'dayjs'
 import { MinusSquareOutlined, PlusSquareOutlined } from '@ant-design/icons'
 import { getLuminance } from '@/src/utils/color-helper'
 import { useUpdateRoadmapItemMutation } from '@/src/store/features/planning/roadmaps-api'
-import { TimelineItem } from 'vis-timeline/types'
+import { DateType, TimelineItem } from 'vis-timeline/standalone'
 
 const { Text } = Typography
 
@@ -66,8 +60,8 @@ interface ProcessedRoadmapData {
 
 const mapToRequestValues = (
   name: string,
-  start: Date,
-  end: Date,
+  start: DateType,
+  end: DateType,
   type: string,
   itemId: string,
   roadmapId: string,
