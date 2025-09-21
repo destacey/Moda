@@ -1,4 +1,4 @@
-﻿using Moda.Common.Application.Interfaces.Work;
+﻿using Moda.Common.Application.Interfaces.ExternalWork;
 using Moda.Common.Application.Validators;
 
 namespace Moda.Common.Application.Requests.WorkManagement;

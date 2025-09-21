@@ -6,6 +6,7 @@ using Moda.Common.Application.Enums;
 using Moda.Common.Application.Exceptions;
 using Moda.Common.Application.Interfaces.ExternalWork;
 using Moda.Common.Application.Requests.WorkManagement;
+using Moda.Common.Domain.Enums.AppIntegrations;
 using Moda.Work.Application.Workflows.Dtos;
 using Moda.Work.Application.WorkStatuses.Commands;
 using Moda.Work.Application.WorkTypes.Commands;
@@ -128,6 +129,12 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
                         _logger.LogInformation("Successfully synced Azure DevOps Boards workspace {WorkspaceId}.", workspace.IntegrationState!.InternalId);
                         activeWorkspacesSyncedCount++;
 
+                        var workspaceTeams = connectionDetails.TeamConfiguration.WorkspaceTeams
+                            .Where(t => t.WorkspaceId == workspace.ExternalId)
+                            .ToArray();
+
+                        //var syncSprintsResult = await SyncSprints(connectionDetails.Configuration.OrganizationUrl, connectionDetails.Configuration.PersonalAccessToken, workspace.Name, workspaceTeams, cancellationToken);
+
                         try
                         {
                             var lastChangedDate = syncType switch
@@ -136,10 +143,6 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
                                 SyncType.Differential => await GetWorkspaceMostRecentChangeDate(_sender, workspace.IntegrationState!.InternalId, cancellationToken),
                                 _ => new DateTime(1900, 01, 01)
                             };
-
-                            var workspaceTeams = connectionDetails.TeamConfiguration.WorkspaceTeams
-                                .Where(t => t.WorkspaceId == workspace.ExternalId)
-                                .ToArray();
 
                             var syncWorkItemsResult = await SyncWorkItems(connectionDetails.Configuration.OrganizationUrl, connectionDetails.Configuration.PersonalAccessToken, lastChangedDate, workspace.IntegrationState!.InternalId, workspace.Name, workspaceTeams, cancellationToken);
                             if (syncWorkItemsResult.IsFailure)
@@ -297,6 +300,45 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
             : updateResult;
     }
 
+    //private async Task<Result> SyncSprints(string organizationUrl, string personalAccessToken, string azdoWorkspaceName, AzureDevOpsBoardsWorkspaceTeamDto[] workspaceTeams, CancellationToken cancellationToken)
+    //{
+    //    Guard.Against.NullOrWhiteSpace(organizationUrl, nameof(organizationUrl));
+    //    Guard.Against.NullOrWhiteSpace(personalAccessToken, nameof(personalAccessToken));
+    //    Guard.Against.NullOrWhiteSpace(azdoWorkspaceName, nameof(azdoWorkspaceName));
+
+    //    // TODO: this is duplicate of SyncWorkspace - refactor
+    //    Dictionary<Guid, Guid?> teamSettings;
+    //    if (workspaceTeams.Length > 0)
+    //    {
+    //        teamSettings = new Dictionary<Guid, Guid?>(workspaceTeams.Length);
+
+    //        foreach (var team in workspaceTeams)
+    //        {
+    //            // Only add teams that have an internal team id.  This will allow mapped parent teams to be set for items that are assigned to teams that haven't been mapped.
+    //            if (team.InternalTeamId is null)
+    //                continue;
+
+    //            teamSettings[team.TeamId] = team.BoardId;
+    //        }
+    //    }
+    //    else
+    //    {
+    //        teamSettings = [];
+    //    }
+
+    //    var sprintsResult = await _azureDevOpsService.GetSprints(organizationUrl, personalAccessToken, azdoWorkspaceName, teamSettings, cancellationToken);
+    //    if (sprintsResult.IsFailure)
+    //        return sprintsResult.ConvertFailure();
+
+    //    return Result.Success();
+
+    //    //var updateResult = await _sender.Send(new UpdateExternalWorkspaceCommand(workspaceResult.Value), cancellationToken);
+
+    //    //return updateResult.IsSuccess
+    //    //    ? Result.Success()
+    //    //    : updateResult;
+    //}
+
     private async Task<Result> SyncWorkItems(string organizationUrl, string personalAccessToken, DateTime lastChangedDate, Guid workspaceId, string azdoWorkspaceName, AzureDevOpsBoardsWorkspaceTeamDto[] workspaceTeams, CancellationToken cancellationToken)
     {
         Guard.Against.NullOrWhiteSpace(organizationUrl, nameof(organizationUrl));
@@ -330,7 +372,7 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
             teamMappings = [];
         }
 
-        var workItemsResult = await _azureDevOpsService.GetWorkItems(organizationUrl, personalAccessToken, azdoWorkspaceName, lastChangedDate, workTypesResult.Value.Select(t => t.Name).ToArray(), teamSettings, cancellationToken);
+        var workItemsResult = await _azureDevOpsService.GetWorkItems(organizationUrl, personalAccessToken, azdoWorkspaceName, lastChangedDate, [.. workTypesResult.Value.Select(t => t.Name)], teamSettings, cancellationToken);
         if (workItemsResult.IsFailure)
             return workItemsResult.ConvertFailure();
 

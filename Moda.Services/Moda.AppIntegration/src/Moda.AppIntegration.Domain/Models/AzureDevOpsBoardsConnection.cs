@@ -1,4 +1,5 @@
 ﻿using Moda.Common.Application.Interfaces.ExternalWork;
+using Moda.Common.Domain.Enums.AppIntegrations;
 using Moda.Common.Domain.Models;
 
 namespace Moda.AppIntegration.Domain.Models;

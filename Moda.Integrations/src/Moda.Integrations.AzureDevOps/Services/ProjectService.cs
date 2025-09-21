@@ -39,7 +39,8 @@ internal sealed class ProjectService(string organizationUrl, string token, strin
                     break;
             }
 
-            _logger.LogDebug("{ProjectCount} projects found ", projects.Count);
+            if (_logger.IsEnabled(LogLevel.Debug))
+                _logger.LogDebug("{ProjectCount} projects found ", projects.Count);
 
             return projects;
         }
@@ -118,7 +119,8 @@ internal sealed class ProjectService(string organizationUrl, string token, strin
                 }
                 if (response.Data is null)
                 {
-                    _logger.LogDebug("No teams found for project {ProjectId}.", id);
+                    if (_logger.IsEnabled(LogLevel.Debug))
+                        _logger.LogDebug("No teams found for project {ProjectId}.", id);
                     continue;
                 }
 
@@ -140,7 +142,8 @@ internal sealed class ProjectService(string organizationUrl, string token, strin
                     teams.Add(team.ToAzdoTeam(id, teamSettingsResponse.Data.BacklogIteration?.Id));
                 }
 
-                _logger.LogDebug("{TeamCount} teams found for project {ProjectId}.", response.Data.Value.Count, id);
+                if (_logger.IsEnabled(LogLevel.Debug))
+                    _logger.LogDebug("{TeamCount} teams found for project {ProjectId}.", response.Data.Value.Count, id);
             }
 
             return teams;
@@ -170,7 +173,8 @@ internal sealed class ProjectService(string organizationUrl, string token, strin
 
             var areaPaths = response.Data.FlattenHierarchy(a => a.Children).ToList();
 
-            _logger.LogDebug("{AreaCount} areas found for project {ProjectId}.", areaPaths.Count, projectName);
+            if (_logger.IsEnabled(LogLevel.Debug))
+                _logger.LogDebug("{AreaCount} areas found for project {ProjectId}.", areaPaths.Count, projectName);
 
             return areaPaths;
         }
@@ -204,7 +208,8 @@ internal sealed class ProjectService(string organizationUrl, string token, strin
                 .FlattenHierarchy(a => a.Children, IterationDto.FromIterationNodeDto)
                 .ToList();
 
-            _logger.LogDebug("{IterationCount} iterations found for project {ProjectId}.", iterationPaths.Count, projectName);
+            if (_logger.IsEnabled(LogLevel.Debug))
+                _logger.LogDebug("{IterationCount} iterations found for project {ProjectId}.", iterationPaths.Count, projectName);
 
             return iterationPaths;
         }
@@ -221,20 +226,27 @@ internal sealed class ProjectService(string organizationUrl, string token, strin
             return [];
 
         var iterationTeamMapping = new Dictionary<Guid, Guid>(teamSettings.Count);
-        foreach (var team in teamSettings)
+
+        foreach (var kv in teamSettings)
         {
-            var teamId = team.Key;
-            var iterationId = team.Value;
+            var teamId = kv.Key;
+            var iterationId = kv.Value;
 
             if (iterationId is null)
                 continue;
 
             if (!iterationTeamMapping.TryAdd(iterationId.Value, teamId))
             {
-                _logger.LogWarning("Iteration {IterationId} is already mapped to team {TeamId}.", iterationId.Value, teamId);
+                _iterationAlreadyMapped(_logger, iterationId.Value, teamId, null);
             }
         }
 
         return iterationTeamMapping;
     }
+
+    // Cached logger delegate to avoid per-call allocations/boxing
+    // TODO: How do we manage EventId values?
+    private static readonly Action<ILogger, Guid, Guid, Exception?> _iterationAlreadyMapped =
+        LoggerMessage.Define<Guid, Guid>(LogLevel.Warning, new EventId(100001, "DuplicateIterationTeamMapping"),
+            "Iteration {IterationId} is already mapped to team {TeamId}.");
 }

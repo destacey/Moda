@@ -7,7 +7,6 @@ global using Moda.AppIntegration.Application.Connections.Dtos;
 global using Moda.AppIntegration.Application.Connections.Queries;
 global using Moda.AppIntegration.Application.Connectors.Dtos;
 global using Moda.AppIntegration.Application.Connectors.Queries;
-global using Moda.AppIntegration.Domain.Enums;
 global using Moda.Common.Application.Auditing;
 global using Moda.Common.Application.Identity.Roles;
 global using Moda.Common.Application.Identity.Users;

@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 using Moda.Common.Extensions;
-using Moda.Integrations.AzureDevOps.Models;
+using Moda.Integrations.AzureDevOps.Models.Projects;
 using Moda.Integrations.AzureDevOps.Tests.Models;
 
 namespace Moda.Integrations.AzureDevOps.Tests.Sut.Models;

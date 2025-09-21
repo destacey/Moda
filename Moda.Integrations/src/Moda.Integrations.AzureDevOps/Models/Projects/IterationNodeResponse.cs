@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Moda.Integrations.AzureDevOps.Models;
-internal record IterationNodeResponse
+namespace Moda.Integrations.AzureDevOps.Models.Projects;
+internal sealed record IterationNodeResponse
 {
     [JsonPropertyName("id")]
     public int Id { get; set; }
@@ -25,7 +25,7 @@ internal record IterationNodeResponse
     //public string WorkItemPath => Path[1..].Replace("\\Iteration", "");
 }
 
-internal record IterationAttributes
+internal sealed record IterationAttributes
 {
     [JsonPropertyName("startDate")]
     public DateTime? StartDate { get; set; }

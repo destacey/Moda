@@ -1,5 +1,6 @@
 ﻿using Mapster;
 using Microsoft.EntityFrameworkCore;
+using Moda.Common.Domain.Enums.AppIntegrations;
 
 namespace Moda.AppIntegration.Application.Connections.Queries;
 public sealed record GetConnectionsQuery : IQuery<IReadOnlyList<ConnectionListDto>>

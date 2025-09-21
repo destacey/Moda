@@ -1,4 +1,4 @@
-﻿using Moda.Common.Application.Interfaces.Work;
+﻿using Moda.Common.Application.Interfaces.ExternalWork;
 using NodaTime;
 
 namespace Moda.Integrations.AzureDevOps.Models.Contracts;

@@ -22,7 +22,7 @@ internal static class IterationNodeDtoExtensions
         return root;
     }
 
-    private record IterationNodeDtoStackItem
+    private sealed record IterationNodeDtoStackItem
     {
         public IterationNodeDto Iteration { get; set; } = null!;
         public Guid? ParentTeamId { get; set; }

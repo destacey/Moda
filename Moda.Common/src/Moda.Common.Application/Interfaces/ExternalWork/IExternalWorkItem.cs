@@ -1,4 +1,4 @@
-﻿namespace Moda.Common.Application.Interfaces.Work;
+﻿namespace Moda.Common.Application.Interfaces.ExternalWork;
 public interface IExternalWorkItem
 {
     int Id { get; }

@@ -1,5 +1,5 @@
 ﻿using System.Text.Json.Serialization;
-using Moda.Common.Application.Interfaces.Work;
+using Moda.Common.Application.Interfaces.ExternalWork;
 using Moda.Integrations.AzureDevOps.Models.Contracts;
 using Moda.Integrations.AzureDevOps.Models.Projects;
 using NodaTime;
@@ -35,7 +35,7 @@ internal static class WorkItemResponseExtensions
             WorkStatus = workItem.Fields.State,
             ParentId = workItem.Fields.Parent,
             AssignedTo = workItem.Fields.AssignedTo?.UniqueName,
-            Created = Instant.FromDateTimeOffset(workItem.Fields.CreatedDate),
+            Created = created,
             CreatedBy = workItem.Fields.CreatedBy?.UniqueName,
             LastModified = Instant.FromDateTimeOffset(workItem.Fields.ChangedDate),
             LastModifiedBy = workItem.Fields.ChangedBy?.UniqueName,
