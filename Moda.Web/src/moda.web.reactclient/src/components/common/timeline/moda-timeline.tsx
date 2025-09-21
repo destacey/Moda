@@ -163,7 +163,7 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
   const baseOptions = useMemo((): TimelineOptions => {
     return {
       editable: {
-        updateTime: true,
+        updateTime: onMoveProp ? true : false,
         updateGroup: false,
         remove: false,
         add: false,
@@ -200,6 +200,7 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
     props.options.start,
     props.options.template,
     onMove,
+    onMoveProp,
   ])
 
   useEffect(() => {

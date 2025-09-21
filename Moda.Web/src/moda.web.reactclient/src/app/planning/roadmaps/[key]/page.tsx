@@ -25,6 +25,7 @@ import { MarkdownRenderer } from '@/src/components/common/markdown'
 import ReorganizeRoadmapActivitiesModal from '../_components/reorganize-roadmap-activities-modal'
 import CreateRoadmapActivityForm from '../_components/create-roadmap-activity-form'
 import CreateRoadmapTimeboxForm from '../_components/create-roadmap-timebox-form'
+import { useGetInternalEmployeeIdQuery } from '@/src/store/features/user-management/profile-api'
 
 const { Item } = Descriptions
 
@@ -49,6 +50,7 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: number }> }) => {
     useState<boolean>(false)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
+  const [isRoadmapManager, setIsRoadmapManager] = useState(false)
 
   const pathname = usePathname()
   const dispatch = useAppDispatch()
@@ -65,6 +67,11 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: number }> }) => {
     error,
     refetch: refetchRoadmap,
   } = useGetRoadmapQuery(key.toString())
+
+  const {
+    data: currentUserInternalEmployeeId,
+    error: currentUserInternalEmployeeIdError,
+  } = useGetInternalEmployeeIdQuery()
 
   const {
     data: roadmapItems,
@@ -95,7 +102,7 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: number }> }) => {
   }, [dispatch, pathname, roadmapData])
 
   useEffect(() => {
-    if (!roadmapData) return
+    if (!roadmapData || !currentUserInternalEmployeeId) return
     const managers = roadmapData.roadmapManagers
       .slice()
       .sort((a, b) => a.name.localeCompare(b.name))
@@ -103,8 +110,13 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: number }> }) => {
       .join(', ')
     setManagersInfo(managers)
 
+    const isRoadmapManager = roadmapData.roadmapManagers.some(
+      (rm) => rm.id === currentUserInternalEmployeeId,
+    )
+    setIsRoadmapManager(isRoadmapManager)
+
     setChildren(roadmapItems)
-  }, [roadmapItems, roadmapData])
+  }, [roadmapItems, roadmapData, currentUserInternalEmployeeId])
 
   useEffect(() => {
     error && console.error(error)
@@ -112,6 +124,9 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: number }> }) => {
 
   const actionsMenuItems: MenuProps['items'] = useMemo(() => {
     const items: ItemType[] = []
+
+    if (!isRoadmapManager) return items
+
     if (canUpdateRoadmap) {
       items.push({
         key: 'edit',
@@ -155,7 +170,7 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: number }> }) => {
     }
 
     return items
-  }, [canDeleteRoadmap, canUpdateRoadmap])
+  }, [canDeleteRoadmap, canUpdateRoadmap, isRoadmapManager])
 
   const onEditRoadmapFormClosed = useCallback(
     (wasSaved: boolean) => {
@@ -267,7 +282,7 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: number }> }) => {
         roadmapItems={children}
         isRoadmapItemsLoading={isRoadmapItemsLoading}
         refreshRoadmapItems={refetchRoadmapItems}
-        canUpdateRoadmap={canUpdateRoadmap}
+        canUpdateRoadmap={canUpdateRoadmap && isRoadmapManager}
         openRoadmapItemDrawer={openRoadmapItemDrawer}
       />
       {openEditRoadmapForm && (
