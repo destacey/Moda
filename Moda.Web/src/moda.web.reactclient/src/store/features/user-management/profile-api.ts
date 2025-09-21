@@ -1,6 +1,7 @@
 import { getProfileClient } from '@/src/services/clients'
 import { apiSlice } from '../apiSlice'
 import { UserDetailsDto } from '@/src/services/moda-api'
+import { QueryTags } from '../query-tags'
 
 export const profileApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -36,6 +37,10 @@ export const profileApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
+      providesTags: (result) => [
+        { type: QueryTags.InternalEmployeeId, id: 'EMPLOYEEID' },
+      ],
+      keepUnusedDataFor: 300, // cache timeout in seconds (5 minutes)
     }),
   }),
 })
