@@ -57,6 +57,17 @@ public sealed class RoadmapTimebox : BaseRoadmapItem
     }
 
     /// <summary>
+    /// Updates the date range of the Roadmap Timebox.
+    /// </summary>
+    /// <param name="dateRange"></param>
+    /// <returns></returns>
+    internal Result UpdateDateRange(IUpsertRoadmapTimeboxDateRange dateRange)
+    {
+        DateRange = dateRange.DateRange;
+        return Result.Success();
+    }
+
+    /// <summary>
     /// Creates a new Roadmap Timebox.
     /// </summary>
     /// <param name="roadmapId"></param>

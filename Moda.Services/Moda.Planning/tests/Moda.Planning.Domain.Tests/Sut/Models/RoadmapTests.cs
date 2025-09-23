@@ -1,12 +1,14 @@
 ﻿using Moda.Common.Domain.Enums;
 using Moda.Common.Models;
 using Moda.Planning.Domain.Enums;
+using Moda.Planning.Domain.Interfaces.Roadmaps;
 using Moda.Planning.Domain.Models.Roadmaps;
 using Moda.Planning.Domain.Tests.Data;
 using Moda.Planning.Domain.Tests.Models;
 using Moda.Tests.Shared;
 using NodaTime.Extensions;
 using NodaTime.Testing;
+using OneOf;
 
 namespace Moda.Planning.Domain.Tests.Sut.Models;
 public class RoadmapTests
@@ -746,6 +748,160 @@ public class RoadmapTests
 
 
     #endregion Update Item Tests
+
+    #region Update Item Dates Tests
+
+    [Fact]
+    public void UpdateRoadmapItemDates_ActivityDateRange_ValidManager_ShouldReturnSuccess()
+    {
+        // Arrange
+        var fakeRoadmap = _faker.Generate();
+        var managerId = Guid.NewGuid();
+        var roadmap = Roadmap.Create(fakeRoadmap.Name, fakeRoadmap.Description, fakeRoadmap.DateRange, fakeRoadmap.Visibility, [managerId]).Value;
+        var activity = _activityFaker.Generate();
+        var upsertActivity = new TestUpsertRoadmapActivity(activity);
+        var createResult = roadmap.CreateActivity(upsertActivity, managerId);
+        createResult.IsSuccess.Should().BeTrue();
+
+        var newDateRange = new LocalDateRange(_dateTimeProvider.Today.PlusDays(2), _dateTimeProvider.Today.PlusDays(10));
+        var dateUpdate = OneOf<IUpsertRoadmapActivityDateRange, IUpsertRoadmapMilestoneDate, IUpsertRoadmapTimeboxDateRange>.FromT0(
+            new TestUpsertRoadmapActivityDateRange(newDateRange)
+        );
+
+        // Act
+        var result = roadmap.UpdateRoadmapItemDates(createResult.Value.Id, dateUpdate, managerId);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        var updatedActivity = roadmap.Items.OfType<RoadmapActivity>().First(x => x.Id == createResult.Value.Id);
+        updatedActivity.DateRange.Should().Be(newDateRange);
+    }
+
+    [Fact]
+    public void UpdateRoadmapItemDates_MilestoneDate_ValidManager_ShouldReturnSuccess()
+    {
+        // Arrange
+        var fakeRoadmap = _faker.Generate();
+        var managerId = Guid.NewGuid();
+        var roadmap = Roadmap.Create(fakeRoadmap.Name, fakeRoadmap.Description, fakeRoadmap.DateRange, fakeRoadmap.Visibility, [managerId]).Value;
+        var milestone = _milestoneFaker.Generate();
+        var upsertMilestone = new TestUpsertRoadmapMilestone(milestone);
+        var createResult = roadmap.CreateMilestone(upsertMilestone, managerId);
+        createResult.IsSuccess.Should().BeTrue();
+
+        var newDate = _dateTimeProvider.Today.PlusDays(5);
+        var dateUpdate = OneOf<IUpsertRoadmapActivityDateRange, IUpsertRoadmapMilestoneDate, IUpsertRoadmapTimeboxDateRange>.FromT1(
+            new TestUpsertRoadmapMilestoneDate(newDate)
+        );
+
+        // Act
+        var result = roadmap.UpdateRoadmapItemDates(createResult.Value.Id, dateUpdate, managerId);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        var updatedMilestone = roadmap.Items.OfType<RoadmapMilestone>().First(x => x.Id == createResult.Value.Id);
+        updatedMilestone.Date.Should().Be(newDate);
+    }
+
+    [Fact]
+    public void UpdateRoadmapItemDates_TimeboxDateRange_ValidManager_ShouldReturnSuccess()
+    {
+        // Arrange
+        var fakeRoadmap = _faker.Generate();
+        var managerId = Guid.NewGuid();
+        var roadmap = Roadmap.Create(fakeRoadmap.Name, fakeRoadmap.Description, fakeRoadmap.DateRange, fakeRoadmap.Visibility, [managerId]).Value;
+        var timebox = _timeboxFaker.Generate();
+        var upsertTimebox = new TestUpsertRoadmapTimebox(timebox);
+        var createResult = roadmap.CreateTimebox(upsertTimebox, managerId);
+        createResult.IsSuccess.Should().BeTrue();
+
+        var newDateRange = new LocalDateRange(_dateTimeProvider.Today.PlusDays(3), _dateTimeProvider.Today.PlusDays(8));
+        var dateUpdate = OneOf<IUpsertRoadmapActivityDateRange, IUpsertRoadmapMilestoneDate, IUpsertRoadmapTimeboxDateRange>.FromT2(
+            new TestUpsertRoadmapTimeboxDateRange(newDateRange)
+        );
+
+        // Act
+        var result = roadmap.UpdateRoadmapItemDates(createResult.Value.Id, dateUpdate, managerId);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        var updatedTimebox = roadmap.Items.OfType<RoadmapTimebox>().First(x => x.Id == createResult.Value.Id);
+        updatedTimebox.DateRange.Should().Be(newDateRange);
+    }
+
+    [Fact]
+    public void UpdateRoadmapItemDates_WhenUserIsNotManager_ShouldReturnFailure()
+    {
+        // Arrange
+        var fakeRoadmap = _faker.Generate();
+        var managerId = Guid.NewGuid();
+        var roadmap = Roadmap.Create(fakeRoadmap.Name, fakeRoadmap.Description, fakeRoadmap.DateRange, fakeRoadmap.Visibility, [managerId]).Value;
+        var activity = _activityFaker.Generate();
+        var upsertActivity = new TestUpsertRoadmapActivity(activity);
+        var createResult = roadmap.CreateActivity(upsertActivity, managerId);
+        createResult.IsSuccess.Should().BeTrue();
+
+        var newDateRange = new LocalDateRange(_dateTimeProvider.Today.PlusDays(2), _dateTimeProvider.Today.PlusDays(10));
+        var dateUpdate = OneOf<IUpsertRoadmapActivityDateRange, IUpsertRoadmapMilestoneDate, IUpsertRoadmapTimeboxDateRange>.FromT0(
+            new TestUpsertRoadmapActivityDateRange(newDateRange)
+        );
+        var nonManagerId = Guid.NewGuid();
+
+        // Act
+        var result = roadmap.UpdateRoadmapItemDates(createResult.Value.Id, dateUpdate, nonManagerId);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("User is not a roadmap manager of this roadmap.");
+    }
+
+    [Fact]
+    public void UpdateRoadmapItemDates_WhenItemDoesNotExist_ShouldReturnFailure()
+    {
+        // Arrange
+        var fakeRoadmap = _faker.Generate();
+        var managerId = Guid.NewGuid();
+        var roadmap = Roadmap.Create(fakeRoadmap.Name, fakeRoadmap.Description, fakeRoadmap.DateRange, fakeRoadmap.Visibility, [managerId]).Value;
+
+        var newDateRange = new LocalDateRange(_dateTimeProvider.Today.PlusDays(2), _dateTimeProvider.Today.PlusDays(10));
+        var dateUpdate = OneOf<IUpsertRoadmapActivityDateRange, IUpsertRoadmapMilestoneDate, IUpsertRoadmapTimeboxDateRange>.FromT0(
+            new TestUpsertRoadmapActivityDateRange(newDateRange)
+        );
+
+        // Act
+        var result = roadmap.UpdateRoadmapItemDates(Guid.NewGuid(), dateUpdate, managerId);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("Roadmap Item does not exist on this roadmap.");
+    }
+
+    [Fact]
+    public void UpdateRoadmapItemDates_TypeMismatch_ShouldReturnFailure()
+    {
+        // Arrange
+        var fakeRoadmap = _faker.Generate();
+        var managerId = Guid.NewGuid();
+        var roadmap = Roadmap.Create(fakeRoadmap.Name, fakeRoadmap.Description, fakeRoadmap.DateRange, fakeRoadmap.Visibility, [managerId]).Value;
+        var activity = _activityFaker.Generate();
+        var upsertActivity = new TestUpsertRoadmapActivity(activity);
+        var createResult = roadmap.CreateActivity(upsertActivity, managerId);
+        createResult.IsSuccess.Should().BeTrue();
+
+        var milestoneDate = _dateTimeProvider.Today.PlusDays(5);
+        var dateUpdate = OneOf<IUpsertRoadmapActivityDateRange, IUpsertRoadmapMilestoneDate, IUpsertRoadmapTimeboxDateRange>.FromT1(
+            new TestUpsertRoadmapMilestoneDate(milestoneDate)
+        );
+
+        // Act
+        var result = roadmap.UpdateRoadmapItemDates(createResult.Value.Id, dateUpdate, managerId);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("Item is not a Roadmap Milestone.");
+    }
+
+    #endregion Update Item Dates Tests
 
     //[Fact]
     //public void SetChildrenOrder_ForAll_WhenValidChildrenProvided_ShouldReturnSuccess()
