@@ -244,7 +244,12 @@ export const RoadmapRangeItemTemplate: TimelineTemplate<
   return (
     <Text style={{ padding: '5px', color: adjustedfontColor }}>
       <a
-        onClick={() => item.openRoadmapItemDrawer(item.id)}
+        onClick={(e) => {
+          e.stopPropagation()
+          item.openRoadmapItemDrawer(item.id)
+        }}
+        onMouseDown={(e) => e.stopPropagation()}
+        onPointerDown={(e) => e.stopPropagation()}
         style={{ color: adjustedfontColor, textDecoration: 'none' }}
         onMouseOver={(e) =>
           (e.currentTarget.style.textDecoration = 'underline')
