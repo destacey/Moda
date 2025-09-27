@@ -8635,6 +8635,77 @@ export class RoadmapsClient {
     }
 
     /**
+     * Update the date(s) on a roadmap item of type: Activity, Timebox, Milestone.
+     */
+    updateItemDates(roadmapId: string, itemId: string, request: UpdateRoadmapItemDatesRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/planning/roadmaps/{roadmapId}/items/{itemId}/dates";
+        if (roadmapId === undefined || roadmapId === null)
+            throw new globalThis.Error("The parameter 'roadmapId' must be defined.");
+        url_ = url_.replace("{roadmapId}", encodeURIComponent("" + roadmapId));
+        if (itemId === undefined || itemId === null)
+            throw new globalThis.Error("The parameter 'itemId' must be defined.");
+        url_ = url_.replace("{itemId}", encodeURIComponent("" + itemId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "PUT",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processUpdateItemDates(_response);
+        });
+    }
+
+    protected processUpdateItemDates(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 422) {
+            const _responseText = response.data;
+            let result422: any = null;
+            let resultData422  = _responseText;
+            result422 = JSON.parse(resultData422);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
      * Reorganize a roadmap activity.
      */
     reorganizeActivity(roadmapId: string, activityId: string, request: ReorganizeRoadmapActivityRequest, cancelToken?: CancelToken): Promise<void> {
@@ -16147,6 +16218,33 @@ export interface UpdateRoadmapMilestoneRequest extends UpdateRoadmapItemRequest 
 }
 
 export interface UpdateRoadmapTimeboxRequest extends UpdateRoadmapItemRequest {
+    /** The Roadmap Item start date. */
+    start?: Date;
+    /** The Roadmap Item end date. */
+    end?: Date;
+}
+
+export interface UpdateRoadmapItemDatesRequest {
+    /** The Roadmap Id the Roadmap Item belongs to. */
+    roadmapId: string;
+    /** The Roadmap Item Id. */
+    itemId: string;
+    $type: string;
+}
+
+export interface UpdateRoadmapActivityDatesRequest extends UpdateRoadmapItemDatesRequest {
+    /** The Roadmap Item start date. */
+    start?: Date;
+    /** The Roadmap Item end date. */
+    end?: Date;
+}
+
+export interface UpdateRoadmapMilestoneDatesRequest extends UpdateRoadmapItemDatesRequest {
+    /** The Milestone date. */
+    date?: Date;
+}
+
+export interface UpdateRoadmapTimeboxDatesRequest extends UpdateRoadmapItemDatesRequest {
     /** The Roadmap Item start date. */
     start?: Date;
     /** The Roadmap Item end date. */
