@@ -9,7 +9,7 @@ import {
   RoadmapItemListDto,
   RoadmapMilestoneListDto,
   RoadmapTimeboxListDto,
-  UpdateRoadmapActivityRequest,
+  UpdateRoadmapActivityDatesRequest,
 } from '@/src/services/moda-api'
 import { ControlItemsMenu } from '@/src/components/common/control-items-menu'
 import {
@@ -24,8 +24,9 @@ import {
 import dayjs from 'dayjs'
 import { MinusSquareOutlined, PlusSquareOutlined } from '@ant-design/icons'
 import { getLuminance } from '@/src/utils/color-helper'
-import { useUpdateRoadmapItemMutation } from '@/src/store/features/planning/roadmaps-api'
+import { useUpdateRoadmapItemDatesMutation } from '@/src/store/features/planning/roadmaps-api'
 import { DateType, TimelineItem } from 'vis-timeline/standalone'
+import { useMessage } from '@/src/components/contexts/messaging'
 
 const { Text } = Typography
 
@@ -60,27 +61,19 @@ interface ProcessedRoadmapData {
 }
 
 const mapToRequestValues = (
-  name: string,
   start: DateType,
   end: DateType,
   type: string,
   itemId: string,
   roadmapId: string,
-  description?: string,
-  parentActivityId?: string,
-  color?: string,
-): UpdateRoadmapActivityRequest => {
+): UpdateRoadmapActivityDatesRequest => {
   return {
     $type: type,
     roadmapId,
     itemId,
-    parentId: parentActivityId,
-    name: name,
-    description: description,
     start: dayjs(start)?.format('YYYY-MM-DD') as unknown as Date, // The type requires it to be a Date, but endpoint requires a string
     end: dayjs(end)?.format('YYYY-MM-DD') as unknown as Date, // The type requires it to be a Date, but endpoint requires a string
-    color: color,
-  } satisfies UpdateRoadmapActivityRequest
+  } satisfies UpdateRoadmapActivityDatesRequest
 }
 
 function flattenRoadmapItems(
@@ -272,7 +265,11 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
   const [hasUserChangedLevel, setHasUserChangedLevel] = useState(false)
 
   const [showCurrentTime, setShowCurrentTime] = useState<boolean>(true)
-  const [updateRoadmapItem] = useUpdateRoadmapItemMutation()
+
+  const messageApi = useMessage()
+
+  const [updateRoadmapItemDates, { error: updateDatesError }] =
+    useUpdateRoadmapItemDatesMutation()
 
   const processedData: ProcessedRoadmapData = useMemo(() => {
     if (!props.roadmap || props.isRoadmapItemsLoading || !props.roadmapItems) {
@@ -399,28 +396,34 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
   }
 
   const onMove = useCallback(
-    (item: TimelineItem) => {
+    async (item: TimelineItem) => {
       const originalItem = processedData?.items.find((i) => i.id === item.id)
 
       if (!originalItem) return
 
       const { objectData } = originalItem
 
-      const value = mapToRequestValues(
-        objectData.name,
-        item.start,
-        item.end,
-        objectData.$type,
-        originalItem.id,
-        objectData.roadmapId,
-        '', // TODO: add description
-        objectData?.parent?.id,
-        objectData.color,
-      )
+      try {
+        const value = mapToRequestValues(
+          item.start,
+          item.end,
+          objectData.$type,
+          originalItem.id,
+          objectData.roadmapId,
+        )
 
-      updateRoadmapItem(value)
+        const response = await updateRoadmapItemDates(value)
+        if (response.error) {
+          throw response.error
+        }
+      } catch (error) {
+        messageApi.error(
+          error.detail ??
+            'An error occurred while updating the roadmap activity. Please try again.',
+        )
+      }
     },
-    [processedData?.items, updateRoadmapItem],
+    [messageApi, processedData?.items, updateRoadmapItemDates],
   )
 
   return (

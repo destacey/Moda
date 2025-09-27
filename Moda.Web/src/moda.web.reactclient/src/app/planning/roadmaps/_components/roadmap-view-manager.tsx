@@ -73,6 +73,7 @@ const RoadmapViewManager = (props: RoadmapViewManagerProps) => {
           enableRowDrag={props.canUpdateRoadmap}
           roadmapId={props.roadmap.id}
           openRoadmapItemDrawer={props.openRoadmapItemDrawer}
+          isRoadmapManager={props.canUpdateRoadmap}
         />
       )}
     </>

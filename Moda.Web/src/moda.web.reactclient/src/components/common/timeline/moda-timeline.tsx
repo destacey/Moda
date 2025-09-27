@@ -152,6 +152,7 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
         return
 
       // TODO: Account for total days in a month when moving months
+      console.log(`Item ${item.id} moved to ${item.start} - ${item.end}`)
 
       callback(item)
 
