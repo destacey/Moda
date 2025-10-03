@@ -83,11 +83,11 @@ function flattenRoadmapItems(
 ): RoadmapTimelineItem[] {
   return items.reduce<RoadmapTimelineItem[]>((acc, item) => {
     const baseTimelineItem: Partial<RoadmapTimelineItem> = {
-      id: item.id,
+      id: String(item.id),
       title: item.name,
       content: item.name,
       itemColor: item.color,
-      group: item.parent?.id,
+      group: item.parent?.id ? String(item.parent?.id) : undefined,
       treeLevel: treeLevel,
       objectData: item,
       openRoadmapItemDrawer: openRoadmapItemDrawer,
@@ -264,8 +264,7 @@ export const RoadmapRangeItemTemplate: TimelineTemplate<
 
 const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
   const [isLoading, setIsLoading] = useState(true)
-  const [timelineStart, setTimelineStart] = useState<Date>(dayjs().toDate())
-  const [timelineEnd, setTimelineEnd] = useState<Date>(dayjs().toDate())
+  // timelineStart / timelineEnd are derived synchronously from props below
   const [currentLevel, setCurrentLevel] = useState<number | undefined>(1)
   const [hasUserChangedLevel, setHasUserChangedLevel] = useState(false)
 
@@ -284,7 +283,7 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
     // TODO: this is a hack to get the roadmap itself as an item
     const roadmapAsItem: RoadmapActivityListDto = {
       $type: RoadmapItemType.Roadmap,
-      id: props.roadmap.id,
+      id: String(props.roadmap.id),
       roadmapId: props.roadmap.id,
       name: props.roadmap.name,
       type: {
@@ -295,7 +294,7 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
       end: props.roadmap.end,
       children: props.roadmapItems.map((item) => ({
         ...item,
-        parent: props.roadmap,
+        parent: { ...props.roadmap, id: props.roadmap.id },
       })),
     }
 
@@ -347,14 +346,18 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
     }
   }, [processedData, hasUserChangedLevel])
 
-  useEffect(() => {
-    if (props.isRoadmapItemsLoading) return
+  // Compute timeline window synchronously from props so the timeline receives values on first render
+  const timelineWindow = useMemo(() => {
+    if (!props.roadmap) {
+      const now = dayjs()
+      return { start: now.toDate(), end: now.toDate() }
+    }
 
-    setTimelineStart(props.roadmap.start)
-    setTimelineEnd(props.roadmap.end)
+    return { start: props.roadmap.start, end: props.roadmap.end }
+  }, [props.roadmap])
 
-    setIsLoading(props.isRoadmapItemsLoading)
-  }, [props])
+  // Derive loading state directly from props so there's no post-mount setState
+  const derivedIsLoading = props.isRoadmapItemsLoading
 
   const timelineOptions = useMemo(
     (): ModaTimelineOptions<RoadmapTimelineItem> =>
@@ -362,12 +365,12 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
       ({
         showCurrentTime: showCurrentTime,
         maxHeight: 650,
-        start: timelineStart,
-        end: timelineEnd,
-        min: timelineStart,
-        max: timelineEnd,
+        start: timelineWindow.start,
+        end: timelineWindow.end,
+        min: timelineWindow.start,
+        max: timelineWindow.end,
       }),
-    [showCurrentTime, timelineEnd, timelineStart],
+    [showCurrentTime, timelineWindow.end, timelineWindow.start],
   )
 
   const onShowCurrentTimeChange = (checked: boolean) => {
@@ -453,7 +456,7 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
         <ModaTimeline
           data={filteredItems}
           groups={processedGroups}
-          isLoading={isLoading}
+          isLoading={derivedIsLoading}
           options={timelineOptions}
           rangeItemTemplate={RoadmapRangeItemTemplate}
           allowFullScreen={true}
