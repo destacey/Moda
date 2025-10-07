@@ -14,6 +14,7 @@ interface RoadmapViewManagerProps {
   refreshRoadmapItems: () => void
   canUpdateRoadmap: boolean
   openRoadmapItemDrawer: (itemId: string) => void
+  timelineEditMode?: boolean
 }
 
 const RoadmapViewManager = (props: RoadmapViewManagerProps) => {
@@ -61,6 +62,7 @@ const RoadmapViewManager = (props: RoadmapViewManagerProps) => {
           viewSelector={viewSelector}
           openRoadmapItemDrawer={props.openRoadmapItemDrawer}
           isRoadmapManager={props.canUpdateRoadmap}
+          editMode={props.timelineEditMode}
         />
       )}
       {currentView === 'List' && (

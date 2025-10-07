@@ -357,7 +357,10 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
     if (props.isLoading) return
 
     // Groups removed - need to reinitialize without groups
-    if ((!props.groups || props.groups.length === 0) && datasetGroupsRef.current) {
+    if (
+      (!props.groups || props.groups.length === 0) &&
+      datasetGroupsRef.current
+    ) {
       if (timelineInstanceRef.current) {
         timelineInstanceRef.current.destroy()
         timelineInstanceRef.current = null
