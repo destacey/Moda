@@ -378,7 +378,7 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
     setShowCurrentTime(checked)
   }
 
-  const controlItems = (): ItemType[] => {
+  const controlItems = useMemo((): ItemType[] => {
     const items: ItemType[] = []
 
     items.push({
@@ -397,7 +397,7 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
     })
 
     return items
-  }
+  }, [showCurrentTime])
 
   const onLevelChange = (treeLevel: number) => {
     setCurrentLevel(treeLevel)
@@ -448,7 +448,7 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
           onLevelChange={onLevelChange}
         />
         <Flex justify="end" align="center">
-          <ControlItemsMenu items={controlItems()} />
+          <ControlItemsMenu items={controlItems} />
           <Divider type="vertical" style={{ height: '30px' }} />
           {props.viewSelector}
         </Flex>

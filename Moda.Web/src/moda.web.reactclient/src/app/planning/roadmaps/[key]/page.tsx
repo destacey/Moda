@@ -43,7 +43,6 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: number }> }) => {
 
   useDocumentTitle('Roadmap Details')
   const [managersInfo, setManagersInfo] = useState('Unknown')
-  const [children, setChildren] = useState([])
   const [openCreateActivityForm, setOpenCreateActivityForm] =
     useState<boolean>(false)
   const [openCreateTimeboxForm, setOpenCreateTimeboxForm] =
@@ -122,9 +121,7 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: number }> }) => {
       (rm) => rm.id === currentUserInternalEmployeeId,
     )
     setIsRoadmapManager(isRoadmapManager)
-
-    setChildren(roadmapItems)
-  }, [roadmapItems, roadmapData, currentUserInternalEmployeeId])
+  }, [roadmapData, currentUserInternalEmployeeId])
 
   useEffect(() => {
     error && console.error(error)
@@ -287,7 +284,7 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: number }> }) => {
       <Divider />
       <RoadmapViewManager
         roadmap={roadmapData}
-        roadmapItems={children}
+        roadmapItems={roadmapItems}
         isRoadmapItemsLoading={isRoadmapItemsLoading}
         refreshRoadmapItems={refetchRoadmapItems}
         canUpdateRoadmap={canUpdateRoadmap && isRoadmapManager}

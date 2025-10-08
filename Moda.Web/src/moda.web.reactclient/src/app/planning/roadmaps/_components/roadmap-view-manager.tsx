@@ -19,11 +19,6 @@ interface RoadmapViewManagerProps {
 
 const RoadmapViewManager = (props: RoadmapViewManagerProps) => {
   const [currentView, setCurrentView] = useState<string | number>('Timeline')
-  const [roadmapItems, setRoadmapItems] = useState<RoadmapItemListDto[]>([])
-
-  useEffect(() => {
-    setRoadmapItems(props.roadmapItems)
-  }, [props.roadmapItems])
 
   const viewSelectorOptions: SegmentedLabeledOption[] = useMemo(() => {
     const options = [
@@ -56,7 +51,7 @@ const RoadmapViewManager = (props: RoadmapViewManagerProps) => {
       {currentView === 'Timeline' && (
         <RoadmapsTimeline
           roadmap={props.roadmap}
-          roadmapItems={roadmapItems}
+          roadmapItems={props.roadmapItems}
           isRoadmapItemsLoading={props.isRoadmapItemsLoading}
           refreshRoadmapItems={props.refreshRoadmapItems}
           viewSelector={viewSelector}
@@ -67,7 +62,7 @@ const RoadmapViewManager = (props: RoadmapViewManagerProps) => {
       )}
       {currentView === 'List' && (
         <RoadmapItemsGrid
-          roadmapItemsData={roadmapItems}
+          roadmapItemsData={props.roadmapItems}
           roadmapItemsIsLoading={props.isRoadmapItemsLoading}
           refreshRoadmapItems={props.refreshRoadmapItems}
           gridHeight={550}
