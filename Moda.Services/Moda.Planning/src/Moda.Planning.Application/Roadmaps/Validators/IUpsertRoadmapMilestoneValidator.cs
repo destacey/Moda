@@ -9,7 +9,6 @@ public sealed class IUpsertRoadmapMilestoneValidator : CustomValidator<IUpsertRo
 
         Include(new IUpsertRoadmapItemValidator());
 
-        RuleFor(x => x.Date)
-            .NotNull();
+        Include(new IUpsertRoadmapMilestoneDateValidator());
     }
 }

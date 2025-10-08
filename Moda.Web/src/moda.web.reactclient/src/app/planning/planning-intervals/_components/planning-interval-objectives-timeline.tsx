@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useMemo } from 'react'
 import { Card, Flex, Typography } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
@@ -94,68 +94,66 @@ const PlanningIntervalObjectivesTimeline = ({
   teamNames,
   viewSelector,
 }: PlanningIntervalObjectivesTimelineProps) => {
-  const [isLoading, setIsLoading] = useState(true)
-  const [piStart, setPiStart] = useState<Date>(dayjs().toDate())
-  const [piEnd, setPiEnd] = useState<Date>(dayjs().toDate())
-  const [iterations, setIterations] = useState<ObjectiveDataItem[]>([])
-  const [objectives, setObjectives] = useState<ObjectiveDataItem[]>([])
-
   const timelineOptions = useMemo(
-    (): ModaTimelineOptions<ObjectiveDataItem> =>
-      // TODO: start,end,min,max types don't allow undefined, but initial state is undefined
-      ({
-        maxHeight: 650,
-        start: piStart,
-        end: piEnd,
-        min: piStart,
-        max: piEnd,
-        groupOrder: 'content',
-      }),
-    [piEnd, piStart],
+    (): ModaTimelineOptions<ObjectiveDataItem> => ({
+      maxHeight: 650,
+      start: planningIntervalCalendar?.start ?? dayjs().toDate(),
+      end: planningIntervalCalendar?.end ?? dayjs().toDate(),
+      min: planningIntervalCalendar?.start ?? dayjs().toDate(),
+      max: planningIntervalCalendar?.end ?? dayjs().toDate(),
+      groupOrder: 'content',
+    }),
+    [planningIntervalCalendar],
   )
 
-  useEffect(() => {
-    if (!objectivesData || !planningIntervalCalendar) return
-
-    setPiStart(planningIntervalCalendar.start)
-    setPiEnd(planningIntervalCalendar.end)
-
-    setIterations(
-      planningIntervalCalendar.iterationSchedules?.map(
+  const iterations = useMemo((): ObjectiveDataItem[] => {
+    return (
+      planningIntervalCalendar?.iterationSchedules?.map(
         (i): ObjectiveDataItem => ({
-          id: i.key,
-          planningIntervalKey: planningIntervalCalendar.key,
+          id: String(i.key),
+          planningIntervalKey: planningIntervalCalendar?.key,
           title: i.name,
           content: i.name ?? '',
           start: dayjs(i.start).toDate(),
           end: dayjs(i.end).add(1, 'day').subtract(1, 'second').toDate(),
           type: 'background',
         }),
-      ) ?? [],
+      ) ?? []
     )
+  }, [planningIntervalCalendar])
 
-    setObjectives(
-      objectivesData
+  const objectives = useMemo((): ObjectiveDataItem[] => {
+    return (
+      (objectivesData ?? [])
         .filter((obj) => obj.status?.name !== 'Canceled')
         .map(
           (obj): ObjectiveDataItem => ({
-            id: obj.key,
+            id: String(obj.key),
             title: `${obj.name} (${obj.status?.name}) - ${obj.progress}%`,
             content: obj.name ?? '',
             start: dayjs(
-              obj.startDate ?? planningIntervalCalendar.start,
+              obj.startDate ?? planningIntervalCalendar?.start,
             ).toDate(),
-            end: dayjs(obj.targetDate ?? planningIntervalCalendar.end).toDate(),
+            end: dayjs(
+              obj.targetDate ?? planningIntervalCalendar?.end,
+            ).toDate(),
             group: obj.team?.name,
             type: 'range',
             zIndex: 1,
             objectData: obj,
           }),
-        ),
+        ) ?? []
     )
-
-    setIsLoading(false)
   }, [objectivesData, planningIntervalCalendar])
+
+  const combinedItems = useMemo(
+    () => [...iterations, ...objectives],
+    [iterations, objectives],
+  )
+  const derivedIsLoading = !(planningIntervalCalendar && objectivesData)
+
+  // Hooks must run unconditionally; perform an early return after hooks
+  if (!planningIntervalCalendar) return null
 
   return (
     <>
@@ -166,13 +164,13 @@ const PlanningIntervalObjectivesTimeline = ({
       )}
       <Card size="small" variant="borderless">
         <ModaTimeline
-          data={[...iterations, ...objectives]}
+          data={combinedItems}
           groups={
             enableGroups
               ? getDataGroups(teamNames ?? [], objectives)
               : undefined
           }
-          isLoading={isLoading}
+          isLoading={derivedIsLoading}
           options={timelineOptions}
           rangeItemTemplate={ObjectiveTimelineTemplate}
         />

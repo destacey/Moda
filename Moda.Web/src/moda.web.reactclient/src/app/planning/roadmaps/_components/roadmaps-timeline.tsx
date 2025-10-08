@@ -1,6 +1,6 @@
 'use client'
 
-import { ReactNode, useEffect, useMemo, useState } from 'react'
+import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 import { Button, Card, Divider, Flex, Space, Switch, Typography } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import {
@@ -9,6 +9,7 @@ import {
   RoadmapItemListDto,
   RoadmapMilestoneListDto,
   RoadmapTimeboxListDto,
+  UpdateRoadmapActivityDatesRequest,
 } from '@/src/services/moda-api'
 import { ControlItemsMenu } from '@/src/components/common/control-items-menu'
 import {
@@ -23,6 +24,9 @@ import {
 import dayjs from 'dayjs'
 import { MinusSquareOutlined, PlusSquareOutlined } from '@ant-design/icons'
 import { getLuminance } from '@/src/utils/color-helper'
+import { useUpdateRoadmapItemDatesMutation } from '@/src/store/features/planning/roadmaps-api'
+import { DateType, TimelineItem } from 'vis-timeline/standalone'
+import { useMessage } from '@/src/components/contexts/messaging'
 
 const { Text } = Typography
 
@@ -33,6 +37,8 @@ export interface RoadmapsTimelineProps {
   refreshRoadmapItems: () => void
   viewSelector?: ReactNode
   openRoadmapItemDrawer: (itemId: string) => void
+  isRoadmapManager: boolean
+  editMode?: boolean
 }
 
 interface RoadmapTimelineItem extends ModaDataItem<RoadmapItemListDto, string> {
@@ -55,6 +61,22 @@ interface ProcessedRoadmapData {
   maxLevel: number
 }
 
+const mapToRequestValues = (
+  start: DateType,
+  end: DateType,
+  type: string,
+  itemId: string,
+  roadmapId: string,
+): UpdateRoadmapActivityDatesRequest => {
+  return {
+    $type: type,
+    roadmapId,
+    itemId,
+    start: dayjs(start)?.format('YYYY-MM-DD') as unknown as Date, // The type requires it to be a Date, but endpoint requires a string
+    end: dayjs(end)?.format('YYYY-MM-DD') as unknown as Date, // The type requires it to be a Date, but endpoint requires a string
+  } satisfies UpdateRoadmapActivityDatesRequest
+}
+
 function flattenRoadmapItems(
   items: RoadmapItemListDto[],
   openRoadmapItemDrawer: (itemId: string) => void,
@@ -62,11 +84,11 @@ function flattenRoadmapItems(
 ): RoadmapTimelineItem[] {
   return items.reduce<RoadmapTimelineItem[]>((acc, item) => {
     const baseTimelineItem: Partial<RoadmapTimelineItem> = {
-      id: item.id,
+      id: String(item.id),
       title: item.name,
       content: item.name,
       itemColor: item.color,
-      group: item.parent?.id,
+      group: item.parent?.id ? String(item.parent?.id) : undefined,
       treeLevel: treeLevel,
       objectData: item,
       openRoadmapItemDrawer: openRoadmapItemDrawer,
@@ -223,7 +245,12 @@ export const RoadmapRangeItemTemplate: TimelineTemplate<
   return (
     <Text style={{ padding: '5px', color: adjustedfontColor }}>
       <a
-        onClick={() => item.openRoadmapItemDrawer(item.id)}
+        onClick={(e) => {
+          e.stopPropagation()
+          item.openRoadmapItemDrawer(item.id)
+        }}
+        onMouseDown={(e) => e.stopPropagation()}
+        onPointerDown={(e) => e.stopPropagation()}
         style={{ color: adjustedfontColor, textDecoration: 'none' }}
         onMouseOver={(e) =>
           (e.currentTarget.style.textDecoration = 'underline')
@@ -238,12 +265,16 @@ export const RoadmapRangeItemTemplate: TimelineTemplate<
 
 const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
   const [isLoading, setIsLoading] = useState(true)
-  const [timelineStart, setTimelineStart] = useState<Date>(dayjs().toDate())
-  const [timelineEnd, setTimelineEnd] = useState<Date>(dayjs().toDate())
+  // timelineStart / timelineEnd are derived synchronously from props below
   const [currentLevel, setCurrentLevel] = useState<number | undefined>(1)
   const [hasUserChangedLevel, setHasUserChangedLevel] = useState(false)
 
   const [showCurrentTime, setShowCurrentTime] = useState<boolean>(true)
+
+  const messageApi = useMessage()
+
+  const [updateRoadmapItemDates, { error: updateDatesError }] =
+    useUpdateRoadmapItemDatesMutation()
 
   const processedData: ProcessedRoadmapData = useMemo(() => {
     if (!props.roadmap || props.isRoadmapItemsLoading || !props.roadmapItems) {
@@ -253,7 +284,7 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
     // TODO: this is a hack to get the roadmap itself as an item
     const roadmapAsItem: RoadmapActivityListDto = {
       $type: RoadmapItemType.Roadmap,
-      id: props.roadmap.id,
+      id: String(props.roadmap.id),
       roadmapId: props.roadmap.id,
       name: props.roadmap.name,
       type: {
@@ -264,7 +295,7 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
       end: props.roadmap.end,
       children: props.roadmapItems.map((item) => ({
         ...item,
-        parent: props.roadmap,
+        parent: { ...props.roadmap, id: props.roadmap.id },
       })),
     }
 
@@ -316,14 +347,15 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
     }
   }, [processedData, hasUserChangedLevel])
 
-  useEffect(() => {
-    if (props.isRoadmapItemsLoading) return
+  // Compute timeline window synchronously from props so the timeline receives values on first render
+  const timelineWindow = useMemo(() => {
+    if (!props.roadmap) {
+      const now = dayjs()
+      return { start: now.toDate(), end: now.toDate() }
+    }
 
-    setTimelineStart(props.roadmap.start)
-    setTimelineEnd(props.roadmap.end)
-
-    setIsLoading(props.isRoadmapItemsLoading)
-  }, [props])
+    return { start: props.roadmap.start, end: props.roadmap.end }
+  }, [props.roadmap])
 
   const timelineOptions = useMemo(
     (): ModaTimelineOptions<RoadmapTimelineItem> =>
@@ -331,19 +363,19 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
       ({
         showCurrentTime: showCurrentTime,
         maxHeight: 650,
-        start: timelineStart,
-        end: timelineEnd,
-        min: timelineStart,
-        max: timelineEnd,
+        start: timelineWindow.start,
+        end: timelineWindow.end,
+        min: timelineWindow.start,
+        max: timelineWindow.end,
       }),
-    [showCurrentTime, timelineEnd, timelineStart],
+    [showCurrentTime, timelineWindow.end, timelineWindow.start],
   )
 
   const onShowCurrentTimeChange = (checked: boolean) => {
     setShowCurrentTime(checked)
   }
 
-  const controlItems = (): ItemType[] => {
+  const controlItems = useMemo((): ItemType[] => {
     const items: ItemType[] = []
 
     items.push({
@@ -362,12 +394,45 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
     })
 
     return items
-  }
+  }, [showCurrentTime])
 
   const onLevelChange = (treeLevel: number) => {
     setCurrentLevel(treeLevel)
     setHasUserChangedLevel(true)
   }
+
+  const onMove = useCallback(
+    async (item: TimelineItem) => {
+      const originalItem = processedData?.items.find((i) => i.id === item.id)
+
+      if (!originalItem) return
+
+      const { objectData } = originalItem
+
+      try {
+        const value = mapToRequestValues(
+          item.start,
+          item.end,
+          objectData.$type,
+          originalItem.id,
+          objectData.roadmapId,
+        )
+
+        const response = await updateRoadmapItemDates(value)
+        if (response.error) {
+          throw response.error
+        }
+        console.log('Update roadmap activity dates')
+      } catch (error) {
+        messageApi.error(
+          error.detail ??
+            'An error occurred while updating the roadmap activity. Please try again.',
+        )
+        console.error('Error updating roadmap activity dates', error)
+      }
+    },
+    [messageApi, processedData?.items, updateRoadmapItemDates],
+  )
 
   return (
     <>
@@ -382,7 +447,7 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
           onLevelChange={onLevelChange}
         />
         <Flex justify="end" align="center">
-          <ControlItemsMenu items={controlItems()} />
+          <ControlItemsMenu items={controlItems} />
           <Divider type="vertical" style={{ height: '30px' }} />
           {props.viewSelector}
         </Flex>
@@ -391,11 +456,12 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
         <ModaTimeline
           data={filteredItems}
           groups={processedGroups}
-          isLoading={isLoading}
+          isLoading={props.isRoadmapItemsLoading}
           options={timelineOptions}
           rangeItemTemplate={RoadmapRangeItemTemplate}
           allowFullScreen={true}
           allowSaveAsImage={true}
+          onMove={props.editMode && props.isRoadmapManager ? onMove : undefined}
         />
       </Card>
     </>

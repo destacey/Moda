@@ -1,12 +1,11 @@
 ﻿using Ardalis.GuardClauses;
 using Moda.Planning.Domain.Interfaces.Roadmaps;
-using Moda.Planning.Domain.Models.Roadmaps;
 using OneOf;
 
 namespace Moda.Planning.Application.Roadmaps.Commands;
 
 
-public sealed record UpdateRoadmapItemCommand(Guid RoadmapId, Guid ItemId, OneOf<IUpsertRoadmapActivity, IUpsertRoadmapMilestone, IUpsertRoadmapTimebox> item) : ICommand;
+public sealed record UpdateRoadmapItemCommand(Guid RoadmapId, Guid ItemId, OneOf<IUpsertRoadmapActivity, IUpsertRoadmapMilestone, IUpsertRoadmapTimebox> Item) : ICommand;
 
 public sealed class UpdateRoadmapItemCommandValidator : AbstractValidator<UpdateRoadmapItemCommand>
 {
@@ -29,7 +28,7 @@ public sealed class UpdateRoadmapItemCommandValidator : AbstractValidator<Update
         RuleFor(x => x.ItemId)
             .NotEmpty();
 
-        RuleFor(x => x.item)
+        RuleFor(x => x.Item)
             .NotNull()
             .Custom((item, context) =>
             {
@@ -72,7 +71,7 @@ internal sealed class UpdateRoadmapItemCommandHandler(IPlanningDbContext plannin
             if (roadmap is null)
                 return Result.Failure<Guid>($"Roadmap with id {request.RoadmapId} not found");
 
-            Result result = request.item.Match(
+            Result result = request.Item.Match(
                activity => roadmap.UpdateActivity(request.ItemId, activity, _currentUserEmployeeId),
                milestone => roadmap.UpdateMilestone(request.ItemId, milestone, _currentUserEmployeeId),
                timebox => roadmap.UpdateTimebox(request.ItemId, timebox, _currentUserEmployeeId)

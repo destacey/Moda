@@ -2,6 +2,7 @@ import { FC } from 'react'
 import {
   DataItemEnhanced,
   DataGroup,
+  TimelineItem,
 } from 'vis-timeline/standalone'
 import { TimelineOptionsTemplateFunction } from '@/src/lib/vis-timeline'
 
@@ -40,6 +41,7 @@ export type ModaTimelineProps<
   emptyMessage?: string
   allowFullScreen?: boolean
   allowSaveAsImage?: boolean
+  onMove?: (item: TimelineItem) => void
 }
 
 export type GroupTemplateProps<T extends ModaDataGroup> = {

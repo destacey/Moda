@@ -9,7 +9,6 @@ public sealed class IUpsertRoadmapActivityValidator : CustomValidator<IUpsertRoa
 
         Include(new IUpsertRoadmapItemValidator());
 
-        RuleFor(x => x.DateRange)
-            .NotNull();
+        Include(new IUpsertRoadmapActivityDateRangeValidator());
     }
 }

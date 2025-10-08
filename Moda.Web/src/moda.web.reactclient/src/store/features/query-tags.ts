@@ -77,6 +77,10 @@ export enum QueryTags {
   Role = 'UserManagement.Role',
   Permission = 'UserManagement.Permission',
 
+  // USER PROFILE
+  Profile = 'UserManagement.Profile',
+  InternalEmployeeId = 'UserManagement.InternalEmployeeId',
+
   // WORK MANAGEMENT
   WorkItem = 'Work.WorkItem',
   WorkItemChildren = 'Work.WorkItem.Children',

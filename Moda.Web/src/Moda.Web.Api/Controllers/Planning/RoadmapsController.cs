@@ -179,6 +179,34 @@ public class RoadmapsController : ControllerBase
             : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
+    [HttpPut("{roadmapId}/items/{itemId}/dates")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Roadmaps)]
+    [OpenApiOperation("Update the date(s) on a roadmap item of type: Activity, Timebox, Milestone.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> UpdateItemDates(Guid roadmapId, Guid itemId, [FromBody] UpdateRoadmapItemDatesRequest request, CancellationToken cancellationToken)
+    {
+        if (roadmapId != request.RoadmapId)
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(nameof(roadmapId), nameof(request.RoadmapId), HttpContext));
+        else if (itemId != request.ItemId)
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(nameof(itemId), nameof(request.ItemId), HttpContext));
+
+        var command = request switch
+        {
+            UpdateRoadmapActivityDatesRequest activity => activity.ToUpdateRoadmapItemDatesCommand(),
+            UpdateRoadmapTimeboxDatesRequest timebox => timebox.ToUpdateRoadmapItemDatesCommand(),
+            UpdateRoadmapMilestoneDatesRequest milestone => milestone.ToUpdateRoadmapItemDatesCommand(),
+            _ => throw new ArgumentException("Invalid roadmap item type", nameof(request))
+        };
+
+        var result = await _sender.Send(command, cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
     [HttpPost("{roadmapId}/items/{activityId}/reorganize")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Roadmaps)]
     [OpenApiOperation("Reorganize a roadmap activity.", "")]

@@ -11,7 +11,7 @@ import { StrategicInitiativeListDto } from '@/src/services/moda-api'
 import { Card, Divider, Flex, Space, Switch, Typography } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import dayjs from 'dayjs'
-import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
+import { ReactNode, useCallback, useMemo, useState } from 'react'
 import { StrategicInitiativeDrawer } from '.'
 
 const { Text } = Typography
@@ -51,15 +51,8 @@ export const StrategicInitiativeRangeItemTemplate: TimelineTemplate<
 const StrategicInitiativesTimeline: React.FC<
   StrategicInitiativesTimelineProps
 > = (props) => {
-  const [isLoading, setIsLoading] = useState(true)
-  const [strategicInitiatives, setStrategicInitiatives] = useState<
-    StrategicInitiativeTimelineItem[]
-  >([])
-  const [timelineStart, setTimelineStart] = useState<Date>(dayjs().toDate())
-  const [timelineEnd, setTimelineEnd] = useState<Date>(dayjs().toDate())
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [selectedItemKey, setSelectedItemKey] = useState<number | null>(null)
-
   const [showCurrentTime, setShowCurrentTime] = useState<boolean>(true)
 
   const showDrawer = useCallback(() => {
@@ -79,15 +72,14 @@ const StrategicInitiativesTimeline: React.FC<
     [showDrawer],
   )
 
-  useEffect(() => {
-    if (props.isLoading) return
+  const processedStrategicInitiatives =
+    useMemo((): StrategicInitiativeTimelineItem[] => {
+      if (props.isLoading || !props.strategicInitiatives) return []
 
-    // filter strategic initiatives to exclude those without start/end dates
-    const filteredStrategicInitiatives: StrategicInitiativeTimelineItem[] =
-      props.strategicInitiatives
+      return props.strategicInitiatives
         .filter((initiative) => initiative.start && initiative.end)
         .map((initiative) => ({
-          id: initiative.id,
+          id: String(initiative.id),
           title: initiative.name,
           content: initiative.name,
           objectData: initiative,
@@ -96,13 +88,17 @@ const StrategicInitiativesTimeline: React.FC<
           end: new Date(initiative.end),
           openStrategicInitiativeDrawer: openStrategicInitiativeDrawer,
         }))
+    }, [
+      openStrategicInitiativeDrawer,
+      props.isLoading,
+      props.strategicInitiatives,
+    ])
 
-    setStrategicInitiatives(filteredStrategicInitiatives)
-
+  const timelineWindow = useMemo(() => {
     let minDate = dayjs()
     let maxDate = dayjs()
 
-    filteredStrategicInitiatives.forEach((initiative) => {
+    processedStrategicInitiatives.forEach((initiative) => {
       if (initiative.start && dayjs(initiative.start).isBefore(minDate)) {
         minDate = dayjs(initiative.start)
       }
@@ -114,26 +110,19 @@ const StrategicInitiativesTimeline: React.FC<
     minDate = minDate.subtract(14, 'days')
     maxDate = maxDate.add(1, 'month')
 
-    setTimelineStart(minDate.toDate())
-    setTimelineEnd(maxDate.toDate())
-
-    setIsLoading(props.isLoading)
-  }, [
-    openStrategicInitiativeDrawer,
-    props.isLoading,
-    props.strategicInitiatives,
-  ])
+    return { start: minDate.toDate(), end: maxDate.toDate() }
+  }, [processedStrategicInitiatives])
 
   const timelineOptions = useMemo(
     (): ModaTimelineOptions<StrategicInitiativeTimelineItem> => ({
       showCurrentTime: showCurrentTime,
       maxHeight: 650,
-      start: timelineStart,
-      end: timelineEnd,
-      min: timelineStart,
-      max: timelineEnd,
+      start: timelineWindow.start,
+      end: timelineWindow.end,
+      min: timelineWindow.start,
+      max: timelineWindow.end,
     }),
-    [showCurrentTime, timelineEnd, timelineStart],
+    [showCurrentTime, timelineWindow.end, timelineWindow.start],
   )
 
   const onShowCurrentTimeChange = useCallback((checked: boolean) => {
@@ -170,8 +159,8 @@ const StrategicInitiativesTimeline: React.FC<
       </Flex>
       <Card size="small" variant="borderless">
         <ModaTimeline
-          data={strategicInitiatives}
-          isLoading={isLoading}
+          data={processedStrategicInitiatives}
+          isLoading={props.isLoading}
           options={timelineOptions}
           rangeItemTemplate={StrategicInitiativeRangeItemTemplate}
           allowFullScreen={true}

@@ -1,8 +1,5 @@
-﻿using NodaTime;
+﻿namespace Moda.Planning.Domain.Interfaces.Roadmaps;
 
-namespace Moda.Planning.Domain.Interfaces.Roadmaps;
-
-public interface IUpsertRoadmapMilestone : IUpsertRoadmapItem
+public interface IUpsertRoadmapMilestone : IUpsertRoadmapItem, IUpsertRoadmapMilestoneDate
 {
-    LocalDate Date { get; }
 }
