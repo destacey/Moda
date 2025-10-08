@@ -357,9 +357,6 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
     return { start: props.roadmap.start, end: props.roadmap.end }
   }, [props.roadmap])
 
-  // Derive loading state directly from props so there's no post-mount setState
-  const derivedIsLoading = props.isRoadmapItemsLoading
-
   const timelineOptions = useMemo(
     (): ModaTimelineOptions<RoadmapTimelineItem> =>
       // TODO: start,end,min,max types don't allow undefined, but initial state is undefined
@@ -425,11 +422,13 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
         if (response.error) {
           throw response.error
         }
+        console.log('Update roadmap activity dates')
       } catch (error) {
         messageApi.error(
           error.detail ??
             'An error occurred while updating the roadmap activity. Please try again.',
         )
+        console.error('Error updating roadmap activity dates', error)
       }
     },
     [messageApi, processedData?.items, updateRoadmapItemDates],
@@ -457,7 +456,7 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
         <ModaTimeline
           data={filteredItems}
           groups={processedGroups}
-          isLoading={derivedIsLoading}
+          isLoading={props.isRoadmapItemsLoading}
           options={timelineOptions}
           rangeItemTemplate={RoadmapRangeItemTemplate}
           allowFullScreen={true}

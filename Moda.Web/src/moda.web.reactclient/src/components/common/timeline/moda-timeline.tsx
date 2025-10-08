@@ -149,7 +149,7 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
   const onMoveProp = props.onMove
   const onMove = useCallback<TimelineOptionsItemCallbackFunction>(
     (item, callback) => {
-      const original = props.data.find((x) => x.id === item.id)
+      const original = datasetItemsRef.current?.get(item.id)
 
       if (!original) return
 
@@ -167,7 +167,7 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
       // Notify parent if they have a handler
       onMoveProp?.(item)
     },
-    [onMoveProp, props.data],
+    [onMoveProp],
   )
 
   const baseOptions = useMemo((): TimelineOptions => {
