@@ -29,9 +29,10 @@ enum MenuActions {
 }
 
 const StrategicThemeDetailsPage = (props: {
-  params: Promise<{ key: number }>
+  params: Promise<{ key: string }>
 }) => {
   const { key } = use(props.params)
+  const stKey = Number(key)
 
   useDocumentTitle('Strategic Theme Details')
 
@@ -62,7 +63,7 @@ const StrategicThemeDetailsPage = (props: {
     isLoading,
     error,
     refetch: refetchStrategicTheme,
-  } = useGetStrategicThemeQuery(key)
+  } = useGetStrategicThemeQuery(stKey)
 
   useEffect(() => {
     if (!strategicThemeData) return

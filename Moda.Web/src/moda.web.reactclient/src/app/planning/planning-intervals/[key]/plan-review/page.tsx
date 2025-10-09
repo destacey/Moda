@@ -15,9 +15,10 @@ import {
 } from '@/src/store/features/planning/planning-interval-api'
 
 const PlanningIntervalPlanReviewPage = (props: {
-  params: Promise<{ key: number }>
+  params: Promise<{ key: string }>
 }) => {
-  const { key: piKey } = use(props.params)
+  const { key } = use(props.params)
+  const piKey = Number(key)
 
   useDocumentTitle('PI Plan Review')
   const [teams, setTeams] = useState<PlanningIntervalTeamResponse[]>([])

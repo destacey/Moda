@@ -24,8 +24,9 @@ const tabs = [
   },
 ]
 
-const RiskDetailsPage = (props: { params: Promise<{ key: number }> }) => {
-  const { key: riskKey } = use(props.params)
+const RiskDetailsPage = (props: { params: Promise<{ key: string }> }) => {
+  const { key } = use(props.params)
+  const riskKey = Number(key)
 
   useDocumentTitle('Risk Details')
 

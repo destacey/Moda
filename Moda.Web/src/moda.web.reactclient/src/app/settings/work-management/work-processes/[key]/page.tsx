@@ -26,9 +26,10 @@ const tabs = [
 ]
 
 const WorkProcessDetailsPage = (props: {
-  params: Promise<{ key: number }>
+  params: Promise<{ key: string }>
 }) => {
-  const { key: workProcessKey } = use(props.params)
+  const { key } = use(props.params)
+  const workProcessKey = Number(key)
 
   const [activeTab, setActiveTab] = useState(WorkProcessDetailsTabs.Details)
   const [
