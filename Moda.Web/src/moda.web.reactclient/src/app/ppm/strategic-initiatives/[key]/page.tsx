@@ -58,9 +58,10 @@ enum StrategicInitiativeAction {
 }
 
 const StrategicInitiativeDetailsPage = (props: {
-  params: Promise<{ key: number }>
+  params: Promise<{ key: string }>
 }) => {
   const { key } = use(props.params)
+  const siKey = Number(key)
 
   useDocumentTitle('Strategic Initiative Details')
 
@@ -112,7 +113,7 @@ const StrategicInitiativeDetailsPage = (props: {
     isLoading,
     error,
     refetch: refetchStrategicInitiative,
-  } = useGetStrategicInitiativeQuery(key)
+  } = useGetStrategicInitiativeQuery(siKey)
 
   const {
     data: kpiData,

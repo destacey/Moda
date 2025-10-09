@@ -12,9 +12,10 @@ import {
 } from '@/src/store/features/planning/planning-interval-api'
 
 const PlanningIntervalRisksPage = (props: {
-  params: Promise<{ key: number }>
+  params: Promise<{ key: string }>
 }) => {
-  const { key: piKey } = use(props.params)
+  const { key } = use(props.params)
+  const piKey = Number(key)
 
   useDocumentTitle('PI Risks')
   const [includeClosedRisks, setIncludeClosedRisks] = useState<boolean>(false)

@@ -38,8 +38,8 @@ const visibilityTitle = (visibility: string, managersInfo: string) => {
   return `This roadmap is set to ${visibility}.\n\nThe roadmap managers are: ${managersInfo}`
 }
 
-const RoadmapDetailsPage = (props: { params: Promise<{ key: number }> }) => {
-  const { key } = use(props.params)
+const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
+  const { key: roadmapKey } = use(props.params)
 
   useDocumentTitle('Roadmap Details')
   const [managersInfo, setManagersInfo] = useState('Unknown')
@@ -70,7 +70,7 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: number }> }) => {
     isLoading,
     error,
     refetch: refetchRoadmap,
-  } = useGetRoadmapQuery(key.toString())
+  } = useGetRoadmapQuery(roadmapKey.toString())
 
   const {
     data: currentUserInternalEmployeeId,

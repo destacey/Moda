@@ -33,9 +33,10 @@ const viewSelectorOptions: SegmentedLabeledOption[] = [
 ]
 
 const PlanningIntervalObjectivesPage = (props: {
-  params: Promise<{ key: number }>
+  params: Promise<{ key: string }>
 }) => {
-  const { key: piKey } = use(props.params)
+  const { key } = use(props.params)
+  const piKey = Number(key)
 
   useDocumentTitle('PI Objectives')
   const [currentView, setCurrentView] = useState<string | number>('List')

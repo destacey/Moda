@@ -47,8 +47,9 @@ enum ProjectAction {
   Cancel = 'Cancel',
 }
 
-const ProjectDetailsPage = (props: { params: Promise<{ key: number }> }) => {
-  const { key: projectKey } = use(props.params)
+const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
+  const { key } = use(props.params)
+  const projectKey = Number(key)
 
   useDocumentTitle('Project Details')
 
