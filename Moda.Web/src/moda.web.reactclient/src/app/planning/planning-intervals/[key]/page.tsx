@@ -50,9 +50,10 @@ const tabs = [
 ]
 
 const PlanningIntervalDetailsPage = (props: {
-  params: Promise<{ key: number }>
+  params: Promise<{ key: string }>
 }) => {
-  const { key: piKey } = use(props.params)
+  const { key } = use(props.params)
+  const piKey = Number(key)
 
   useDocumentTitle('PI Details')
 

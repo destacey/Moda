@@ -1,6 +1,6 @@
 ﻿namespace Moda.Planning.Domain.Interfaces.Roadmaps;
 
-public interface IUpsertRoadmapTimebox : IUpsertRoadmapItem
+public interface IUpsertRoadmapTimebox : IUpsertRoadmapItem, IUpsertRoadmapTimeboxDateRange
 {
-    LocalDateRange DateRange { get; }
+
 }

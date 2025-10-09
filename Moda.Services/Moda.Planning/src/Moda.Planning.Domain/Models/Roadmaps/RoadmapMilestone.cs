@@ -48,6 +48,17 @@ public sealed class RoadmapMilestone : BaseRoadmapItem
     }
 
     /// <summary>
+    /// Updates the date of the Roadmap Milestone.
+    /// </summary>
+    /// <param name="date"></param>
+    /// <returns></returns>
+    internal Result UpdateDate(IUpsertRoadmapMilestoneDate date)
+    {
+        Date = date.Date;
+        return Result.Success();
+    }
+
+    /// <summary>
     /// Creates a new Roadmap RoadmapMilestone.
     /// </summary>
     /// <param name="roadmapId"></param>

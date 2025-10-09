@@ -2,7 +2,6 @@
 
 import { ModaEmpty } from '@/src/components/common'
 import { RowMenuCellRenderer } from '@/src/components/common/moda-grid-cell-renderers'
-import useAuth from '@/src/components/contexts/auth'
 import {
   RoadmapActivityListDto,
   RoadmapActivityNavigationDto,
@@ -27,6 +26,7 @@ export interface RoadmapItemsGridProps {
   viewSelector?: React.ReactNode | undefined
   enableRowDrag?: boolean | undefined
   openRoadmapItemDrawer: (itemId: string) => void
+  isRoadmapManager: boolean
 }
 
 type RoadmapItemUnion =
@@ -60,7 +60,7 @@ const getRowMenuItems = (props: RowMenuProps) => {
     !props.itemId ||
     !props.onEditItemMenuClicked
   ) {
-    return null
+    return []
   }
   return [
     {
@@ -107,11 +107,6 @@ const RoadmapItemsGrid: React.FC<RoadmapItemsGridProps> = (
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
   const tblRef: Parameters<typeof Table>[0]['ref'] = useRef(null)
 
-  const { hasPermissionClaim } = useAuth()
-  const canManageRoadmapItems = hasPermissionClaim(
-    'Permissions.Roadmaps.Update',
-  )
-
   const onEditItemMenuClicked = useCallback((record: RoadmapItemDataType) => {
     setSelectedItemId(record.id)
 
@@ -128,6 +123,21 @@ const RoadmapItemsGrid: React.FC<RoadmapItemsGridProps> = (
   }, [])
 
   const columnDefs = useMemo(() => {
+    const actionsColumn = {
+      dataIndex: '',
+      key: 'x',
+      width: 25,
+      render: (_: any, record: RoadmapItemDataType) => {
+        const menuItems = getRowMenuItems({
+          itemId: record.id,
+          canUpdateRoadmap: props.isRoadmapManager ?? false,
+          onEditItemMenuClicked: () => onEditItemMenuClicked(record),
+          onDeleteItemMenuClicked: () => onDeleteItemMenuClicked(record.id),
+        })
+        return RowMenuCellRenderer({ menuItems })
+      },
+    }
+
     return [
       {
         key: 'id',
@@ -145,21 +155,8 @@ const RoadmapItemsGrid: React.FC<RoadmapItemsGridProps> = (
           <a onClick={() => props.openRoadmapItemDrawer(record.id)}>{text}</a>
         ),
       },
-      {
-        dataIndex: '',
-        key: 'x',
-        width: 25,
-        render: (_: any, record: RoadmapItemDataType) => {
-          const menuItems = getRowMenuItems({
-            itemId: record.id,
-            canUpdateRoadmap: canManageRoadmapItems,
-            onEditItemMenuClicked: () => onEditItemMenuClicked(record),
-            onDeleteItemMenuClicked: () => onDeleteItemMenuClicked(record.id),
-          })
-
-          return RowMenuCellRenderer({ menuItems })
-        },
-      },
+      // Only include actions column if isRoadmapManager is true
+      ...(props.isRoadmapManager ? [actionsColumn] : []),
       {
         key: 'type',
         dataIndex: 'type',
@@ -191,12 +188,7 @@ const RoadmapItemsGrid: React.FC<RoadmapItemsGridProps> = (
         width: 100,
       },
     ] as TableColumnsType<RoadmapItemDataType>
-  }, [
-    canManageRoadmapItems,
-    onDeleteItemMenuClicked,
-    onEditItemMenuClicked,
-    props,
-  ])
+  }, [onDeleteItemMenuClicked, onEditItemMenuClicked, props])
 
   useEffect(() => {
     if (props.roadmapItemsIsLoading) return

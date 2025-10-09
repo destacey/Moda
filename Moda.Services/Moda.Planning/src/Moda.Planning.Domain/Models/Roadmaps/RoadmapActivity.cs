@@ -73,6 +73,17 @@ public sealed class RoadmapActivity : BaseRoadmapItem
     }
 
     /// <summary>
+    /// Updates the date range of the Roadmap Activity.
+    /// </summary>
+    /// <param name="dateRange"></param>
+    /// <returns></returns>
+    internal Result UpdateDateRange(IUpsertRoadmapActivityDateRange dateRange)
+    {
+        DateRange = dateRange.DateRange;
+        return Result.Success();
+    }
+
+    /// <summary>
     /// Sets the order of the Roadmap Activity.
     /// </summary>
     /// <param name="order"></param>

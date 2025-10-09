@@ -11,7 +11,7 @@ import { ProjectListDto } from '@/src/services/moda-api'
 import { Card, Divider, Flex, Space, Switch, Typography } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import dayjs from 'dayjs'
-import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
+import { ReactNode, useCallback, useMemo, useState } from 'react'
 import { ProjectDrawer } from '.'
 
 const { Text } = Typography
@@ -48,14 +48,10 @@ export const ProjectRangeItemTemplate: TimelineTemplate<
 }
 
 const ProjectsTimeline: React.FC<ProjectsTimelineProps> = (props) => {
-  const [isLoading, setIsLoading] = useState(true)
-  const [projects, setProjects] = useState<ProjectTimelineItem[]>([])
-  const [timelineStart, setTimelineStart] = useState<Date>(dayjs().toDate())
-  const [timelineEnd, setTimelineEnd] = useState<Date>(dayjs().toDate())
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [selectedItemKey, setSelectedItemKey] = useState<number | null>(null)
-
   const [showCurrentTime, setShowCurrentTime] = useState<boolean>(true)
+  // ...existing code...
 
   const showDrawer = useCallback(() => {
     setDrawerOpen(true)
@@ -74,14 +70,14 @@ const ProjectsTimeline: React.FC<ProjectsTimelineProps> = (props) => {
     [showDrawer],
   )
 
-  useEffect(() => {
-    if (props.isLoading) return
+  // Derive timeline items and window synchronously so the timeline receives data on first render
+  const processedProjects = useMemo((): ProjectTimelineItem[] => {
+    if (props.isLoading || !props.projects) return []
 
-    // filter projects to exclude those without start/end dates
-    const filteredProjects: ProjectTimelineItem[] = props.projects
+    return props.projects
       .filter((project) => project.start && project.end)
       .map((project) => ({
-        id: project.id,
+        id: String(project.id),
         title: project.name,
         content: project.name,
         objectData: project,
@@ -90,13 +86,13 @@ const ProjectsTimeline: React.FC<ProjectsTimelineProps> = (props) => {
         end: new Date(project.end),
         openProjectDrawer: openProjectDrawer,
       }))
+  }, [openProjectDrawer, props.isLoading, props.projects])
 
-    setProjects(filteredProjects)
-
+  const timelineWindow = useMemo(() => {
     let minDate = dayjs()
     let maxDate = dayjs()
 
-    filteredProjects.forEach((project) => {
+    processedProjects.forEach((project) => {
       if (project.start && dayjs(project.start).isBefore(minDate)) {
         minDate = dayjs(project.start)
       }
@@ -108,22 +104,19 @@ const ProjectsTimeline: React.FC<ProjectsTimelineProps> = (props) => {
     minDate = minDate.subtract(14, 'days')
     maxDate = maxDate.add(1, 'month')
 
-    setTimelineStart(minDate.toDate())
-    setTimelineEnd(maxDate.toDate())
-
-    setIsLoading(props.isLoading)
-  }, [openProjectDrawer, props.isLoading, props.projects])
+    return { start: minDate.toDate(), end: maxDate.toDate() }
+  }, [processedProjects])
 
   const timelineOptions = useMemo(
     (): ModaTimelineOptions<ProjectTimelineItem> => ({
       showCurrentTime: showCurrentTime,
       maxHeight: 650,
-      start: timelineStart,
-      end: timelineEnd,
-      min: timelineStart,
-      max: timelineEnd,
+      start: timelineWindow.start,
+      end: timelineWindow.end,
+      min: timelineWindow.start,
+      max: timelineWindow.end,
     }),
-    [showCurrentTime, timelineEnd, timelineStart],
+    [showCurrentTime, timelineWindow.end, timelineWindow.start],
   )
 
   const onShowCurrentTimeChange = useCallback((checked: boolean) => {
@@ -151,6 +144,8 @@ const ProjectsTimeline: React.FC<ProjectsTimelineProps> = (props) => {
     return items
   }, [showCurrentTime, onShowCurrentTimeChange])
 
+  const isLoading = props.isLoading
+
   return (
     <>
       <Flex justify="end" align="center">
@@ -160,7 +155,7 @@ const ProjectsTimeline: React.FC<ProjectsTimelineProps> = (props) => {
       </Flex>
       <Card size="small" variant="borderless">
         <ModaTimeline
-          data={projects}
+          data={processedProjects}
           isLoading={isLoading}
           options={timelineOptions}
           rangeItemTemplate={ProjectRangeItemTemplate}

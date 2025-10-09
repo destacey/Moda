@@ -7,8 +7,11 @@ import {
   RoadmapActivityListDto,
   RoadmapItemDetailsDto,
   RoadmapItemListDto,
+  UpdateRoadmapActivityDatesRequest,
   UpdateRoadmapActivityRequest,
+  UpdateRoadmapMilestoneDatesRequest,
   UpdateRoadmapMilestoneRequest,
+  UpdateRoadmapTimeboxDatesRequest,
   UpdateRoadmapTimeboxRequest,
 } from './../../../services/moda-api'
 import {
@@ -198,6 +201,32 @@ export const roadmapApi = apiSlice.injectEndpoints({
         ]
       },
     }),
+    updateRoadmapItemDates: builder.mutation<
+      void,
+      | UpdateRoadmapActivityDatesRequest
+      | UpdateRoadmapMilestoneDatesRequest
+      | UpdateRoadmapTimeboxDatesRequest
+    >({
+      queryFn: async (mutationRequest) => {
+        try {
+          const data = await getRoadmapsClient().updateItemDates(
+            mutationRequest.roadmapId,
+            mutationRequest.itemId,
+            mutationRequest,
+          )
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, arg) => {
+        return [
+          { type: QueryTags.RoadmapItem, id: arg.roadmapId },
+          { type: QueryTags.RoadmapItem, id: arg.itemId },
+        ]
+      },
+    }),
     reorganizeRoadmapActivity: builder.mutation<
       void,
       {
@@ -282,6 +311,7 @@ export const {
   useGetRoadmapActivitiesQuery,
   useCreateRoadmapItemMutation,
   useUpdateRoadmapItemMutation,
+  useUpdateRoadmapItemDatesMutation,
   useReorganizeRoadmapActivityMutation,
   useDeleteRoadmapItemMutation,
   useGetVisibilityOptionsQuery,

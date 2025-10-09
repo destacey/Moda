@@ -73,8 +73,9 @@ const tabs = [
   },
 ]
 
-const TeamDetailsPage = (props: { params: Promise<{ key: number }> }) => {
+const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const { key } = use(props.params)
+  const teamKey = Number(key)
 
   useDocumentTitle('Team Details')
 
@@ -195,8 +196,8 @@ const TeamDetailsPage = (props: { params: Promise<{ key: number }> }) => {
   ])
 
   useEffect(() => {
-    dispatch(retrieveTeam({ key, type: 'Team' }))
-  }, [key, dispatch])
+    dispatch(retrieveTeam({ key: teamKey, type: 'Team' }))
+  }, [teamKey, dispatch])
 
   useEffect(() => {
     team && dispatch(setBreadcrumbTitle({ title: team.name, pathname }))
@@ -227,14 +228,14 @@ const TeamDetailsPage = (props: { params: Promise<{ key: number }> }) => {
   const onCreateTeamMembershipFormClosed = (wasSaved: boolean) => {
     setOpenCreateTeamMembershipForm(false)
     if (wasSaved) {
-      dispatch(retrieveTeam({ key, type: 'Team' }))
+      dispatch(retrieveTeam({ key: teamKey, type: 'Team' }))
     }
   }
 
   const onDeactivateTeamFormClosed = (wasSaved: boolean) => {
     setOpenDeactivateTeamForm(false)
     if (wasSaved) {
-      dispatch(retrieveTeam({ key, type: 'Team' }))
+      dispatch(retrieveTeam({ key: teamKey, type: 'Team' }))
     }
   }
 

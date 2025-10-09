@@ -57,9 +57,10 @@ const tabs = [
 ]
 
 const TeamOfTeamsDetailsPage = (props: {
-  params: Promise<{ key: number }>
+  params: Promise<{ key: string }>
 }) => {
-  const { key: teamKey } = use(props.params)
+  const { key } = use(props.params)
+  const teamKey = Number(key)
 
   useDocumentTitle('Team of Teams Details')
 

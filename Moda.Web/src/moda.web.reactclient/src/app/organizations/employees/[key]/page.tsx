@@ -25,8 +25,9 @@ const tabs = [
   },
 ]
 
-const EmployeeDetailsPage = (props: { params: Promise<{ key: number }> }) => {
-  const { key: employeeKey } = use(props.params)
+const EmployeeDetailsPage = (props: { params: Promise<{ key: string }> }) => {
+  const { key } = use(props.params)
+  const employeeKey = Number(key)
 
   const [activeTab, setActiveTab] = useState(EmployeeTabs.Details)
 

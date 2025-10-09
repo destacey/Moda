@@ -5,6 +5,7 @@ using Moda.Common.Domain.Interfaces;
 using Moda.Planning.Domain.Enums;
 using Moda.Planning.Domain.Interfaces;
 using Moda.Planning.Domain.Interfaces.Roadmaps;
+using OneOf;
 
 namespace Moda.Planning.Domain.Models.Roadmaps;
 public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, IHasIdAndKey
@@ -368,7 +369,15 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, IHasIdAndKey
     }
 
 
-    #region Roadmap Items Create/Update/Delete
+    #region Roadmap Items Get/Create/Update/Delete
+
+    public Result<BaseRoadmapItem> GetItem(Guid itemId)
+    {
+        var item = _items.FirstOrDefault(x => x.Id == itemId);
+        return item is not null
+            ? item
+            : Result.Failure<BaseRoadmapItem>("Roadmap Item does not exist on this roadmap.");
+    }
 
     public Result<T> CreateRoadmapItem<T>(
         IUpsertRoadmapItem newItem,
@@ -531,6 +540,43 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, IHasIdAndKey
             (roadmapTimebox, item, parent) => roadmapTimebox.Update((IUpsertRoadmapTimebox)item, parent)
         );
     }
+
+    /// <summary>
+    /// Updates the date(s) of a Roadmap Item. The type of date update is determined by the OneOf parameter.
+    /// </summary>
+    /// <param name="itemId"></param>
+    /// <param name="dateUpdate"></param>
+    /// <param name="currentUserEmployeeId"></param>
+    /// <returns></returns>
+    public Result UpdateRoadmapItemDates(
+        Guid itemId,
+        OneOf<IUpsertRoadmapActivityDateRange, IUpsertRoadmapMilestoneDate, IUpsertRoadmapTimeboxDateRange> dateUpdate,
+        Guid currentUserEmployeeId)
+    {
+        var isManagerResult = CanEmployeeManage(currentUserEmployeeId);
+        if (isManagerResult.IsFailure)
+            return isManagerResult;
+
+        var item = _items.FirstOrDefault(x => x.Id == itemId);
+        if (item is null)
+            return Result.Failure("Roadmap Item does not exist on this roadmap.");
+
+        return dateUpdate.Match<Result>(
+            activityDateRange =>
+                item is RoadmapActivity activity
+                    ? activity.UpdateDateRange(activityDateRange)
+                    : Result.Failure("Item is not a Roadmap Activity."),
+            milestoneDate =>
+                item is RoadmapMilestone milestone
+                    ? milestone.UpdateDate(milestoneDate)
+                    : Result.Failure("Item is not a Roadmap Milestone."),
+            timeboxDateRange =>
+                item is RoadmapTimebox timebox
+                    ? timebox.UpdateDateRange(timeboxDateRange)
+                    : Result.Failure("Item is not a Roadmap Timebox.")
+        );
+    }
+
 
     /// <summary>
     /// Moves an Activity to a new parent Activity and sets the new order.

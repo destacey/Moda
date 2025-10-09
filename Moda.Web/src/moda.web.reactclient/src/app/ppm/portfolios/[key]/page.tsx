@@ -57,8 +57,9 @@ enum MenuActions {
   Archive = 'Archive',
 }
 
-const PortfolioDetailsPage = (props: { params: Promise<{ key: number }> }) => {
+const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const { key } = use(props.params)
+  const portfolioKey = Number(key)
 
   useDocumentTitle('Portfolio Details')
 
@@ -96,21 +97,23 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: number }> }) => {
     isLoading,
     error,
     refetch: refetchPortfolio,
-  } = useGetPortfolioQuery(key)
+  } = useGetPortfolioQuery(portfolioKey)
 
   const {
     data: projectData,
     isLoading: isLoadingProjects,
     error: errorProjects,
     refetch: refetchProjects,
-  } = useGetPortfolioProjectsQuery(key.toString(), { skip: !projectsQueried })
+  } = useGetPortfolioProjectsQuery(portfolioKey.toString(), {
+    skip: !projectsQueried,
+  })
 
   const {
     data: strategicInitiativeData,
     isLoading: isLoadingStrategicInitiatives,
     error: errorStrategicInitiatives,
     refetch: refetchStrategicInitiatives,
-  } = useGetPortfolioStrategicInitiativesQuery(key.toString(), {
+  } = useGetPortfolioStrategicInitiativesQuery(portfolioKey.toString(), {
     skip: !strategicInitiativesQueried,
   })
 

@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
+using OneOf.Serialization.SystemTextJson;
 
 namespace Moda.Infrastructure.Common.Services;
 public sealed class SystemTextJsonService : ISerializerService
@@ -23,7 +24,9 @@ public sealed class SystemTextJsonService : ISerializerService
             Converters =
             {
                 new JsonStringEnumConverter(JsonNamingPolicy.CamelCase),
-                new TypeConverter() // Add the custom TypeConverter
+                new TypeConverter(), // Add the custom TypeConverter
+                new OneOfJsonConverter(),
+                new OneOfBaseJsonConverter(),
             }
         };
         return JsonSerializer.Serialize(obj, options);

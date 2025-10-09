@@ -8,7 +8,12 @@ import {
   useGetRoadmapItemsQuery,
   useGetRoadmapQuery,
 } from '@/src/store/features/planning/roadmaps-api'
-import { notFound, usePathname, useRouter } from 'next/navigation'
+import {
+  notFound,
+  usePathname,
+  useRouter,
+  useSearchParams,
+} from 'next/navigation'
 import RoadmapDetailsLoading from './loading'
 import { use, useCallback, useEffect, useMemo, useState } from 'react'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
@@ -25,6 +30,7 @@ import { MarkdownRenderer } from '@/src/components/common/markdown'
 import ReorganizeRoadmapActivitiesModal from '../_components/reorganize-roadmap-activities-modal'
 import CreateRoadmapActivityForm from '../_components/create-roadmap-activity-form'
 import CreateRoadmapTimeboxForm from '../_components/create-roadmap-timebox-form'
+import { useGetInternalEmployeeIdQuery } from '@/src/store/features/user-management/profile-api'
 
 const { Item } = Descriptions
 
@@ -32,12 +38,11 @@ const visibilityTitle = (visibility: string, managersInfo: string) => {
   return `This roadmap is set to ${visibility}.\n\nThe roadmap managers are: ${managersInfo}`
 }
 
-const RoadmapDetailsPage = (props: { params: Promise<{ key: number }> }) => {
-  const { key } = use(props.params)
+const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
+  const { key: roadmapKey } = use(props.params)
 
   useDocumentTitle('Roadmap Details')
   const [managersInfo, setManagersInfo] = useState('Unknown')
-  const [children, setChildren] = useState([])
   const [openCreateActivityForm, setOpenCreateActivityForm] =
     useState<boolean>(false)
   const [openCreateTimeboxForm, setOpenCreateTimeboxForm] =
@@ -49,6 +54,7 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: number }> }) => {
     useState<boolean>(false)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
+  const [isRoadmapManager, setIsRoadmapManager] = useState(false)
 
   const pathname = usePathname()
   const dispatch = useAppDispatch()
@@ -64,7 +70,12 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: number }> }) => {
     isLoading,
     error,
     refetch: refetchRoadmap,
-  } = useGetRoadmapQuery(key.toString())
+  } = useGetRoadmapQuery(roadmapKey.toString())
+
+  const {
+    data: currentUserInternalEmployeeId,
+    error: currentUserInternalEmployeeIdError,
+  } = useGetInternalEmployeeIdQuery()
 
   const {
     data: roadmapItems,
@@ -73,6 +84,9 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: number }> }) => {
   } = useGetRoadmapItemsQuery(roadmapData?.id, {
     skip: !roadmapData,
   })
+
+  const searchParams = useSearchParams()
+  const timelineEditMode = searchParams.has('editMode')
 
   useEffect(() => {
     if (!roadmapData) return
@@ -95,7 +109,7 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: number }> }) => {
   }, [dispatch, pathname, roadmapData])
 
   useEffect(() => {
-    if (!roadmapData) return
+    if (!roadmapData || !currentUserInternalEmployeeId) return
     const managers = roadmapData.roadmapManagers
       .slice()
       .sort((a, b) => a.name.localeCompare(b.name))
@@ -103,8 +117,11 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: number }> }) => {
       .join(', ')
     setManagersInfo(managers)
 
-    setChildren(roadmapItems)
-  }, [roadmapItems, roadmapData])
+    const isRoadmapManager = roadmapData.roadmapManagers.some(
+      (rm) => rm.id === currentUserInternalEmployeeId,
+    )
+    setIsRoadmapManager(isRoadmapManager)
+  }, [roadmapData, currentUserInternalEmployeeId])
 
   useEffect(() => {
     error && console.error(error)
@@ -112,6 +129,9 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: number }> }) => {
 
   const actionsMenuItems: MenuProps['items'] = useMemo(() => {
     const items: ItemType[] = []
+
+    if (!isRoadmapManager) return items
+
     if (canUpdateRoadmap) {
       items.push({
         key: 'edit',
@@ -155,7 +175,7 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: number }> }) => {
     }
 
     return items
-  }, [canDeleteRoadmap, canUpdateRoadmap])
+  }, [canDeleteRoadmap, canUpdateRoadmap, isRoadmapManager])
 
   const onEditRoadmapFormClosed = useCallback(
     (wasSaved: boolean) => {
@@ -264,11 +284,12 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: number }> }) => {
       <Divider />
       <RoadmapViewManager
         roadmap={roadmapData}
-        roadmapItems={children}
+        roadmapItems={roadmapItems}
         isRoadmapItemsLoading={isRoadmapItemsLoading}
         refreshRoadmapItems={refetchRoadmapItems}
-        canUpdateRoadmap={canUpdateRoadmap}
+        canUpdateRoadmap={canUpdateRoadmap && isRoadmapManager}
         openRoadmapItemDrawer={openRoadmapItemDrawer}
+        timelineEditMode={timelineEditMode}
       />
       {openEditRoadmapForm && (
         <EditRoadmapForm

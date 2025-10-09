@@ -7,10 +7,11 @@ import Link from 'next/link'
 import { useMemo, use } from 'react'
 
 const PlanningIntervalLayout = (props: {
-  params: Promise<{ key: number }>
+  params: Promise<{ key: string }>
   children: React.ReactNode
 }) => {
-  const { key: piKey } = use(props.params)
+  const { key } = use(props.params)
+  const piKey = Number(key)
 
   const { children } = props
 
