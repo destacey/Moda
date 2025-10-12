@@ -1,6 +1,8 @@
 ﻿using Moda.Common.Application.Interfaces.ExternalWork;
 using Moda.Common.Application.Models;
+using Moda.Common.Domain.Enums.Planning;
 using Moda.Integrations.AzureDevOps.Models.Contracts;
+using NodaTime;
 
 namespace Moda.Integrations.AzureDevOps.Models.Projects;
 
@@ -38,31 +40,28 @@ internal sealed record IterationDto
 
 internal static class IterationDtoExtensions
 {
-    public static AzdoIteration ToAzdoSprint(this IterationDto iteration)
+    public static AzdoIteration ToAzdoIteration(this IterationDto iteration, Instant now)
     {
-        return new AzdoIteration
+        AzdoIterationMetadata metadata = new()
         {
-            Id = iteration.Id.ToString(),
-            Name = iteration.Name,
-            TeamId = iteration.TeamId,
-            StartDate = iteration.StartDate,
-            EndDate = iteration.EndDate,
-            Metadata = new AzdoIterationMetadata
-            {
-                Identifier = iteration.Identifier,
-                Path = iteration.Path,
-                HasChildren = iteration.HasChildren
-            }
+            Identifier = iteration.Identifier,
+            Path = iteration.Path,
         };
+
+        var type = iteration.HasChildren ? IterationType.Iteration : IterationType.Sprint;
+        Instant? start = iteration.StartDate.HasValue ? Instant.FromDateTimeUtc(iteration.StartDate.Value) : null;
+        Instant? end = iteration.EndDate.HasValue ? Instant.FromDateTimeUtc(iteration.EndDate.Value) : null;
+
+        return new AzdoIteration(iteration.Id.ToString(), iteration.Name, type, start, end, iteration.TeamId, metadata, now);
     }
 
-    public static List<IExternalSprint<AzdoIterationMetadata>> ToIExternalSprints(this List<IterationDto> iterations)
+    public static List<IExternalIteration<AzdoIterationMetadata>> ToIExternalIterations(this List<IterationDto> iterations, Instant now)
     {
-        List<IExternalSprint<AzdoIterationMetadata>> azdoSprints = new (iterations.Count);
+        List<IExternalIteration<AzdoIterationMetadata>> azdoIterations = new (iterations.Count);
         foreach (var iteration in iterations)
         {
-            azdoSprints.Add(iteration.ToAzdoSprint());
+            azdoIterations.Add(iteration.ToAzdoIteration(now));
         }
-        return azdoSprints;
+        return azdoIterations;
     }
 }

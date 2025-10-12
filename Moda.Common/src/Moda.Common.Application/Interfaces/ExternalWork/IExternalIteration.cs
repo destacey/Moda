@@ -1,13 +1,13 @@
 ﻿using Moda.Common.Domain.Enums.Planning;
 
 namespace Moda.Common.Application.Interfaces.ExternalWork;
-public interface IExternalSprint<TMetadata> where TMetadata : class
+public interface IExternalIteration<TMetadata> where TMetadata : class
 {
     string Id { get; }
     string Name { get; }
-    DateTime? StartDate { get; }
-    DateTime? EndDate { get; }
-    SprintState State { get; }
+    Instant? Start { get; }
+    Instant? End { get; }
+    IterationState State { get; }
     Guid? TeamId { get; }
     TMetadata Metadata { get; }
 }

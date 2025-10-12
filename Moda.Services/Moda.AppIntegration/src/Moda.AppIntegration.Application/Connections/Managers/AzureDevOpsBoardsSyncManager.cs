@@ -133,7 +133,7 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
                             .Where(t => t.WorkspaceId == workspace.ExternalId)
                             .ToArray();
 
-                        //var syncSprintsResult = await SyncSprints(connectionDetails.Configuration.OrganizationUrl, connectionDetails.Configuration.PersonalAccessToken, workspace.Name, workspaceTeams, cancellationToken);
+                        //var syncIterationsResult = await SyncIterations(connectionDetails.Configuration.OrganizationUrl, connectionDetails.Configuration.PersonalAccessToken, workspace.Name, workspaceTeams, cancellationToken);
 
                         try
                         {
@@ -300,7 +300,7 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
             : updateResult;
     }
 
-    //private async Task<Result> SyncSprints(string organizationUrl, string personalAccessToken, string azdoWorkspaceName, AzureDevOpsBoardsWorkspaceTeamDto[] workspaceTeams, CancellationToken cancellationToken)
+    //private async Task<Result> SyncIterations(string organizationUrl, string personalAccessToken, string azdoWorkspaceName, AzureDevOpsBoardsWorkspaceTeamDto[] workspaceTeams, CancellationToken cancellationToken)
     //{
     //    Guard.Against.NullOrWhiteSpace(organizationUrl, nameof(organizationUrl));
     //    Guard.Against.NullOrWhiteSpace(personalAccessToken, nameof(personalAccessToken));
@@ -326,9 +326,9 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
     //        teamSettings = [];
     //    }
 
-    //    var sprintsResult = await _azureDevOpsService.GetSprints(organizationUrl, personalAccessToken, azdoWorkspaceName, teamSettings, cancellationToken);
-    //    if (sprintsResult.IsFailure)
-    //        return sprintsResult.ConvertFailure();
+    //    var iterationsResult = await _azureDevOpsService.GetIterations(organizationUrl, personalAccessToken, azdoWorkspaceName, teamSettings, cancellationToken);
+    //    if (iterationsResult.IsFailure)
+    //        return iterationsResult.ConvertFailure();
 
     //    return Result.Success();
 

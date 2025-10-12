@@ -13,13 +13,14 @@ using Moda.Integrations.AzureDevOps.Services;
 
 namespace Moda.Integrations.AzureDevOps;
 
-public class AzureDevOpsService(ILogger<AzureDevOpsService> logger, IServiceProvider serviceProvider, IMemoryCache memoryCache) : IAzureDevOpsService
+public class AzureDevOpsService(ILogger<AzureDevOpsService> logger, IServiceProvider serviceProvider, IDateTimeProvider dateTimeProvider, IMemoryCache memoryCache) : IAzureDevOpsService
 {
     // https://learn.microsoft.com/en-us/azure/devops/integrate/concepts/rest-api-versioning?view=azure-devops#supported-versions
     private readonly string _apiVersion = "7.0";
 
     private readonly ILogger<AzureDevOpsService> _logger = logger;
     private readonly IServiceProvider _serviceProvider = serviceProvider;
+    private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
     private readonly IMemoryCache _memoryCache = memoryCache;
 
     public async Task<Result> TestConnection(string organizationUrl, string token)
@@ -102,13 +103,13 @@ public class AzureDevOpsService(ILogger<AzureDevOpsService> logger, IServiceProv
         return result.Value;
     }
 
-    public async Task<Result<List<IExternalSprint<AzdoIterationMetadata>>>> GetSprints(string organizationUrl, string token, string projectName, Dictionary<Guid, Guid?> teamSettings, CancellationToken cancellationToken)
+    public async Task<Result<List<IExternalIteration<AzdoIterationMetadata>>>> GetIterations(string organizationUrl, string token, string projectName, Dictionary<Guid, Guid?> teamSettings, CancellationToken cancellationToken)
     {
         var iterationsResult = await GetOrFetchIterationsAsync(organizationUrl, token, projectName, teamSettings, cancellationToken).ConfigureAwait(false);
 
         return iterationsResult.IsSuccess
-            ? iterationsResult.Value.ToIExternalSprints()
-            : Result.Failure<List<IExternalSprint<AzdoIterationMetadata>>>(iterationsResult.Error);
+            ? iterationsResult.Value.ToIExternalIterations(_dateTimeProvider.Now)
+            : Result.Failure<List<IExternalIteration<AzdoIterationMetadata>>>(iterationsResult.Error);
     }
 
     public async Task<Result<List<IExternalWorkItem>>> GetWorkItems(string organizationUrl, string token, string projectName, DateTime lastChangedDate, string[] workItemTypes, Dictionary<Guid, Guid?> teamSettings, CancellationToken cancellationToken)

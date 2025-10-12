@@ -1,6 +1,6 @@
 ﻿namespace Moda.Common.Domain.Enums.Planning;
 
-public enum SprintState
+public enum IterationState
 {
     Unknown = 0,
     Future = 1,
