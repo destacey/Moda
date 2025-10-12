@@ -13,9 +13,9 @@ public sealed record PlanningIntervalIterationUpsertRequest
     public string Name { get; set; } = default!;
 
     /// <summary>
-    /// The type of iteration.
+    /// The category of iteration.
     /// </summary>
-    public int TypeId { get; set; }
+    public int CategoryId { get; set; }
 
     /// <summary>Gets or sets the start.</summary>
     /// <value>The start.</value>
@@ -27,7 +27,7 @@ public sealed record PlanningIntervalIterationUpsertRequest
 
     public PlanningIntervalIterationUpsertDto ToPlanningIntervalIterationUpsertDto()
     {
-        return new PlanningIntervalIterationUpsertDto(IterationId, Name, (IterationType)TypeId, new LocalDateRange(Start, End));
+        return new PlanningIntervalIterationUpsertDto(IterationId, Name, (IterationCategory)CategoryId, new LocalDateRange(Start, End));
     }
 }
 
@@ -41,9 +41,9 @@ public sealed class PlanningIntervalIterationUpsertRequestValidator : CustomVali
             .NotEmpty()
             .MaximumLength(128);
 
-        RuleFor(c => (IterationType)c.TypeId)
+        RuleFor(c => (IterationCategory)c.CategoryId)
             .IsInEnum()
-            .WithMessage(errorMessage: "A valid iteration type must be selected."); ;
+            .WithMessage(errorMessage: "A valid iteration category must be selected."); ;
 
         RuleFor(i => i.Start)
             .NotNull();

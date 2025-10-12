@@ -100,20 +100,20 @@ public class PlanningIntervalIterationConfig : IEntityTypeConfiguration<Planning
         builder.HasAlternateKey(i => i.Key);
 
         builder.HasIndex(i => new { i.Id, i.IsDeleted })
-            .IncludeProperties(i => new { i.Key, i.PlanningIntervalId, i.Name, i.Type })
+            .IncludeProperties(i => new { i.Key, i.PlanningIntervalId, i.Name, i.Category })
             .HasFilter("[IsDeleted] = 0");
         builder.HasIndex(i => new { i.Key, i.IsDeleted })
-            .IncludeProperties(i => new { i.Id, i.PlanningIntervalId, i.Name, i.Type })
+            .IncludeProperties(i => new { i.Id, i.PlanningIntervalId, i.Name, i.Category })
             .HasFilter("[IsDeleted] = 0");
         builder.HasIndex(i => new { i.PlanningIntervalId, i.IsDeleted })
-            .IncludeProperties(i => new { i.Id, i.Key, i.Name, i.Type })
+            .IncludeProperties(i => new { i.Id, i.Key, i.Name, i.Category })
             .HasFilter("[IsDeleted] = 0");
 
         builder.Property(i => i.Key).ValueGeneratedOnAdd();
 
         builder.Property(i => i.Name).HasMaxLength(128).IsRequired();
-        builder.Property(i => i.Type).IsRequired()
-            .HasConversion<EnumConverter<IterationType>>()
+        builder.Property(i => i.Category).IsRequired()
+            .HasConversion<EnumConverter<IterationCategory>>()
             .HasColumnType("varchar")
             .HasMaxLength(32);
 

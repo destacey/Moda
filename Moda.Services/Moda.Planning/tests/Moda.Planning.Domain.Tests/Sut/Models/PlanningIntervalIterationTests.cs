@@ -26,13 +26,13 @@ public class PlanningIntervalIterationTests
         var faker = _faker.Generate();
 
         // Act
-        var result = new PlanningIntervalIteration(faker.PlanningIntervalId, faker.Name, faker.Type, faker.DateRange);
+        var result = new PlanningIntervalIteration(faker.PlanningIntervalId, faker.Name, faker.Category, faker.DateRange);
 
         // Assert
         result.Should().NotBeNull();
         result.PlanningIntervalId.Should().Be(faker.PlanningIntervalId);
         result.Name.Should().Be(faker.Name);
-        result.Type.Should().Be(faker.Type);
+        result.Category.Should().Be(faker.Category);
         result.DateRange.Should().Be(faker.DateRange);
     }
 
@@ -47,7 +47,7 @@ public class PlanningIntervalIterationTests
         var faker = _faker.Generate();
 
         // Act
-        var sut = new PlanningIntervalIteration(faker.PlanningIntervalId, $"  {faker.Name} ", faker.Type, faker.DateRange);
+        var sut = new PlanningIntervalIteration(faker.PlanningIntervalId, $"  {faker.Name} ", faker.Category, faker.DateRange);
 
         // Assert
         sut.Should().NotBeNull();
@@ -62,7 +62,7 @@ public class PlanningIntervalIterationTests
         var faker = _faker.Generate();
 
         // Act
-        Action act = () => new PlanningIntervalIteration(faker.PlanningIntervalId, name!, faker.Type, faker.DateRange);
+        Action act = () => new PlanningIntervalIteration(faker.PlanningIntervalId, name!, faker.Category, faker.DateRange);
 
         // Assert
         act.Should().Throw<ArgumentNullException>().WithMessage("Value cannot be null. (Parameter 'Name')");
@@ -76,7 +76,7 @@ public class PlanningIntervalIterationTests
         var faker = _faker.Generate();
 
         // Act
-        Action act = () => new PlanningIntervalIteration(faker.PlanningIntervalId, name!, faker.Type, faker.DateRange);
+        Action act = () => new PlanningIntervalIteration(faker.PlanningIntervalId, name!, faker.Category, faker.DateRange);
 
         // Assert
         act.Should().Throw<ArgumentNullException>().WithMessage("Value cannot be null. (Parameter 'Name')");
@@ -90,7 +90,7 @@ public class PlanningIntervalIterationTests
         var faker = _faker.Generate();
 
         // Act
-        Action act = () => new PlanningIntervalIteration(faker.PlanningIntervalId, name, faker.Type, faker.DateRange);
+        Action act = () => new PlanningIntervalIteration(faker.PlanningIntervalId, name, faker.Category, faker.DateRange);
 
         // Assert
         act.Should().Throw<ArgumentException>().WithMessage("Required input Name was empty. (Parameter 'Name')");
@@ -104,7 +104,7 @@ public class PlanningIntervalIterationTests
         var faker = _faker.Generate();
 
         // Act
-        Action act = () => new PlanningIntervalIteration(faker.PlanningIntervalId, name, faker.Type, faker.DateRange);
+        Action act = () => new PlanningIntervalIteration(faker.PlanningIntervalId, name, faker.Category, faker.DateRange);
 
         // Assert
         act.Should().Throw<ArgumentException>().WithMessage("Required input Name was empty. (Parameter 'Name')");
@@ -118,7 +118,7 @@ public class PlanningIntervalIterationTests
         var faker = _faker.Generate();
 
         // Act
-        Action act = () => new PlanningIntervalIteration(faker.PlanningIntervalId, faker.Name, faker.Type, dateRange!);
+        Action act = () => new PlanningIntervalIteration(faker.PlanningIntervalId, faker.Name, faker.Category, dateRange!);
 
         // Assert
         act.Should().Throw<ArgumentNullException>().WithMessage("Value cannot be null. (Parameter 'DateRange')");
@@ -135,13 +135,13 @@ public class PlanningIntervalIterationTests
         var faker = _faker.Generate();
 
         // Act
-        var result = PlanningIntervalIteration.Create(faker.PlanningIntervalId, faker.Name, faker.Type, faker.DateRange);
+        var result = PlanningIntervalIteration.Create(faker.PlanningIntervalId, faker.Name, faker.Category, faker.DateRange);
 
         // Assert
         result.Should().NotBeNull();
         result.PlanningIntervalId.Should().Be(faker.PlanningIntervalId);
         result.Name.Should().Be(faker.Name);
-        result.Type.Should().Be(faker.Type);
+        result.Category.Should().Be(faker.Category);
         result.DateRange.Should().Be(faker.DateRange);
     }
 
@@ -154,18 +154,18 @@ public class PlanningIntervalIterationTests
     {
         // Arrange
         var faker = _faker.Generate();
-        var sut = PlanningIntervalIteration.Create(faker.PlanningIntervalId, faker.Name, IterationType.Development, faker.DateRange);
+        var sut = PlanningIntervalIteration.Create(faker.PlanningIntervalId, faker.Name, IterationCategory.Development, faker.DateRange);
         var expectedName = faker.Name + "Updated";
-        var expectedType = IterationType.InnovationAndPlanning;
+        var expectedCategory = IterationCategory.InnovationAndPlanning;
         var expectedDateRange = new LocalDateRange(faker.DateRange.Start.Plus(Period.FromWeeks(1)), faker.DateRange.End.Plus(Period.FromWeeks(1)));
 
         // Act
-        var result = sut.Update(expectedName, expectedType, expectedDateRange);
+        var result = sut.Update(expectedName, expectedCategory, expectedDateRange);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
         sut.Name.Should().Be(expectedName);
-        sut.Type.Should().Be(expectedType);
+        sut.Category.Should().Be(expectedCategory);
         sut.DateRange.Should().Be(expectedDateRange);
     }
 

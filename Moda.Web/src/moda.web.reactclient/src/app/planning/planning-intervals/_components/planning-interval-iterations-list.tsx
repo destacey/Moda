@@ -31,7 +31,10 @@ const PlanningIntervalIterationsList: FC<
           dataSource={iterations}
           renderItem={(iteration) => (
             <Item>
-              <Meta title={iteration.name} description={iteration.type.name} />
+              <Meta
+                title={iteration.name}
+                description={iteration.category.name}
+              />
               <ModaDateRange dateRange={iteration} />
             </Item>
           )}

@@ -61,7 +61,7 @@ internal sealed class ManagePlanningIntervalDatesCommandHandler : ICommandHandle
             }
 
             var iterations = request.Iterations
-                .Select(i => UpsertPlanningIntervalIteration.Create(i.IterationId, i.Name, i.Type, i.DateRange)).ToList();
+                .Select(i => UpsertPlanningIntervalIteration.Create(i.IterationId, i.Name, i.Category, i.DateRange)).ToList();
 
             var result = planningInterval.ManageDates(request.DateRange, iterations);
             if (result.IsFailure)

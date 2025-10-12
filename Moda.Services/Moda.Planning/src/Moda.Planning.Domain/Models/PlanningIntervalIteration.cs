@@ -13,12 +13,12 @@ public sealed class PlanningIntervalIteration : BaseSoftDeletableEntity<Guid>, I
 
     private PlanningIntervalIteration() { }
 
-    internal PlanningIntervalIteration(Guid planningIntervalId, string name, IterationType type, LocalDateRange dateRange)
+    internal PlanningIntervalIteration(Guid planningIntervalId, string name, IterationCategory category, LocalDateRange dateRange)
     {
         // TODO guard against default planningIntervalId, but PI would need to generate a new Guid, rather than depend on the DB for this to work.
         PlanningIntervalId = planningIntervalId;
         Name = name;
-        Type = type;
+        Category = category;
         DateRange = dateRange;
     }
 
@@ -39,9 +39,9 @@ public sealed class PlanningIntervalIteration : BaseSoftDeletableEntity<Guid>, I
         private set => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
     }
 
-    /// <summary>Gets or sets the type.</summary>
-    /// <value>The iteration type.</value>
-    public IterationType Type { get; private set; }
+    /// <summary>Gets or sets the category.</summary>
+    /// <value>The iteration category.</value>
+    public IterationCategory Category { get; private set; }
 
     /// <summary>Gets or sets the date range.</summary>
     /// <value>The date range.</value>
@@ -61,17 +61,17 @@ public sealed class PlanningIntervalIteration : BaseSoftDeletableEntity<Guid>, I
         return IterationState.Future;
     }
 
-    internal Result Update(string name, IterationType type, LocalDateRange dateRange)
+    internal Result Update(string name, IterationCategory category, LocalDateRange dateRange)
     {
         Name = name;
-        Type = type;
+        Category = category;
         DateRange = dateRange;
 
         return Result.Success();
     }
 
-    internal static PlanningIntervalIteration Create(Guid planningIntervalId, string name, IterationType type, LocalDateRange dateRange)
+    internal static PlanningIntervalIteration Create(Guid planningIntervalId, string name, IterationCategory category, LocalDateRange dateRange)
     {
-        return new PlanningIntervalIteration(planningIntervalId, name, type, dateRange);
+        return new PlanningIntervalIteration(planningIntervalId, name, category, dateRange);
     }
 }

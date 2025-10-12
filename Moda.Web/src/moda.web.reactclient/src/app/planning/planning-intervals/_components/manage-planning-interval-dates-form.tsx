@@ -22,8 +22,8 @@ import dayjs from 'dayjs'
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons'
 import { useMessage } from '@/src/components/contexts/messaging'
 import {
+  useGetPlanningIntervalIterationCategoryOptionsQuery,
   useGetPlanningIntervalIterationsQuery,
-  useGetPlanningIntervalIterationTypeOptionsQuery,
   useGetPlanningIntervalQuery,
   useUpdatePlanningIntervalDatesMutation,
 } from '@/src/store/features/planning/planning-interval-api'
@@ -41,7 +41,7 @@ export interface ManagePlanningIntervalDatesFormProps {
 interface UpsertIterationFormValues {
   iterationId?: string
   name: string
-  typeId: number
+  categoryId: number
   start: Date
   end: Date
 }
@@ -63,7 +63,7 @@ const mapToRequestValues = (
     iterations: values.iterations.map((iteration) => ({
       iterationId: iteration.iterationId,
       name: iteration.name,
-      typeId: iteration.typeId,
+      categoryId: iteration.categoryId,
       start: (iteration.start as any)?.format('YYYY-MM-DD'),
       end: (iteration.end as any)?.format('YYYY-MM-DD'),
     })),
@@ -89,8 +89,8 @@ const ManagePlanningIntervalDatesForm = ({
     useGetPlanningIntervalQuery(planningIntervalKey)
   const { data: iterationsData } =
     useGetPlanningIntervalIterationsQuery(planningIntervalKey)
-  const { data: iterationTypesOptions } =
-    useGetPlanningIntervalIterationTypeOptionsQuery()
+  const { data: iterationCategoriesOptions } =
+    useGetPlanningIntervalIterationCategoryOptionsQuery()
 
   const [managePlanningIntervalDates, { error: mutationError }] =
     useUpdatePlanningIntervalDatesMutation()
@@ -111,7 +111,7 @@ const ManagePlanningIntervalDatesForm = ({
         iterations: iterationsData.map((iteration) => ({
           iterationId: iteration.id,
           name: iteration.name,
-          typeId: iteration.type.id,
+          categoryId: iteration.category.id,
           start: dayjs(iteration.start),
           end: dayjs(iteration.end),
         })),
@@ -192,7 +192,7 @@ const ManagePlanningIntervalDatesForm = ({
   ])
 
   useEffect(() => {
-    if (!planningIntervalData || !iterationsData || !iterationTypesOptions)
+    if (!planningIntervalData || !iterationsData || !iterationCategoriesOptions)
       return
     if (canUpdatePlanningInterval) {
       setIsOpen(showForm)
@@ -205,7 +205,7 @@ const ManagePlanningIntervalDatesForm = ({
     }
   }, [
     canUpdatePlanningInterval,
-    iterationTypesOptions,
+    iterationCategoriesOptions,
     iterationsData,
     loadData,
     messageApi,
@@ -298,12 +298,12 @@ const ManagePlanningIntervalDatesForm = ({
                         <Item
                           {...restField}
                           style={{ margin: '0', width: '35%' }}
-                          name={[name, 'typeId']}
+                          name={[name, 'categoryId']}
                           rules={[{ required: true }]}
                         >
                           <Select
-                            placeholder="Select Type"
-                            options={iterationTypesOptions}
+                            placeholder="Select Category"
+                            options={iterationCategoriesOptions}
                           />
                         </Item>
                         <Item

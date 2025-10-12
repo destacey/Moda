@@ -256,7 +256,7 @@ public class PlanningIntervalTests
     {
         // Arrange
         var sut = _planningIntervalFaker.Generate();
-        sut.ManageDates(new LocalDateRange(new LocalDate(2023, 10, 2), new LocalDate(2023, 11, 26)), new List<UpsertPlanningIntervalIteration>());
+        sut.ManageDates(new LocalDateRange(new LocalDate(2023, 10, 2), new LocalDate(2023, 11, 26)), []);
         var expectedIterations = 4;
 
         // Act
@@ -267,19 +267,19 @@ public class PlanningIntervalTests
         result.IsSuccess.Should().BeTrue();
         iterations.Count.Should().Be(expectedIterations);
         iterations[0].Name.Should().Be("Iteration 1");
-        iterations[0].Type.Should().Be(IterationType.Development);
+        iterations[0].Category.Should().Be(IterationCategory.Development);
         iterations[0].DateRange.Start.Should().Be(new LocalDate(2023, 10, 2));
         iterations[0].DateRange.End.Should().Be(new LocalDate(2023, 10, 15));
         iterations[1].Name.Should().Be("Iteration 2");
-        iterations[1].Type.Should().Be(IterationType.Development);
+        iterations[1].Category.Should().Be(IterationCategory.Development);
         iterations[1].DateRange.Start.Should().Be(new LocalDate(2023, 10, 16));
         iterations[1].DateRange.End.Should().Be(new LocalDate(2023, 10, 29));
         iterations[2].Name.Should().Be("Iteration 3");
-        iterations[2].Type.Should().Be(IterationType.Development);
+        iterations[2].Category.Should().Be(IterationCategory.Development);
         iterations[2].DateRange.Start.Should().Be(new LocalDate(2023, 10, 30));
         iterations[2].DateRange.End.Should().Be(new LocalDate(2023, 11, 12));
         iterations[3].Name.Should().Be("Iteration 4");
-        iterations[3].Type.Should().Be(IterationType.InnovationAndPlanning);
+        iterations[3].Category.Should().Be(IterationCategory.InnovationAndPlanning);
         iterations[3].DateRange.Start.Should().Be(new LocalDate(2023, 11, 13));
         iterations[3].DateRange.End.Should().Be(new LocalDate(2023, 11, 26));
     }
@@ -289,7 +289,7 @@ public class PlanningIntervalTests
     {
         // Arrange
         var sut = _planningIntervalFaker.Generate();
-        sut.ManageDates(new LocalDateRange(new LocalDate(2023, 10, 2), new LocalDate(2023, 11, 27)), new List<UpsertPlanningIntervalIteration>());
+        sut.ManageDates(new LocalDateRange(new LocalDate(2023, 10, 2), new LocalDate(2023, 11, 27)), []);
         var expectedIterations = 5;
 
         // Act
@@ -300,23 +300,23 @@ public class PlanningIntervalTests
         result.IsSuccess.Should().BeTrue();
         iterations.Count.Should().Be(expectedIterations);
         iterations[0].Name.Should().Be("Iteration 1");
-        iterations[0].Type.Should().Be(IterationType.Development);
+        iterations[0].Category.Should().Be(IterationCategory.Development);
         iterations[0].DateRange.Start.Should().Be(new LocalDate(2023, 10, 2));
         iterations[0].DateRange.End.Should().Be(new LocalDate(2023, 10, 15));
         iterations[1].Name.Should().Be("Iteration 2");
-        iterations[1].Type.Should().Be(IterationType.Development);
+        iterations[1].Category.Should().Be(IterationCategory.Development);
         iterations[1].DateRange.Start.Should().Be(new LocalDate(2023, 10, 16));
         iterations[1].DateRange.End.Should().Be(new LocalDate(2023, 10, 29));
         iterations[2].Name.Should().Be("Iteration 3");
-        iterations[2].Type.Should().Be(IterationType.Development);
+        iterations[2].Category.Should().Be(IterationCategory.Development);
         iterations[2].DateRange.Start.Should().Be(new LocalDate(2023, 10, 30));
         iterations[2].DateRange.End.Should().Be(new LocalDate(2023, 11, 12));
         iterations[3].Name.Should().Be("Iteration 4");
-        iterations[3].Type.Should().Be(IterationType.Development);
+        iterations[3].Category.Should().Be(IterationCategory.Development);
         iterations[3].DateRange.Start.Should().Be(new LocalDate(2023, 11, 13));
         iterations[3].DateRange.End.Should().Be(new LocalDate(2023, 11, 26));
         iterations[4].Name.Should().Be("Iteration 5");
-        iterations[4].Type.Should().Be(IterationType.InnovationAndPlanning);
+        iterations[4].Category.Should().Be(IterationCategory.InnovationAndPlanning);
         iterations[4].DateRange.Start.Should().Be(new LocalDate(2023, 11, 27));
         iterations[4].DateRange.End.Should().Be(new LocalDate(2023, 11, 27));
     }
@@ -328,9 +328,9 @@ public class PlanningIntervalTests
         var sut = _planningIntervalFaker.Generate();
 
         List<UpsertPlanningIntervalIteration> iterations = new();
-        iterations.Add(UpsertPlanningIntervalIteration.Create(null, "Iteration 1", IterationType.Development, new LocalDateRange(new LocalDate(2023, 1, 1), new LocalDate(2023, 1, 31))));
-        iterations.Add(UpsertPlanningIntervalIteration.Create(null, "Iteration 2", IterationType.Development, new LocalDateRange(new LocalDate(2023, 2, 1), new LocalDate(2023, 2, 28))));
-        iterations.Add(UpsertPlanningIntervalIteration.Create(null, "Iteration 3", IterationType.InnovationAndPlanning, new LocalDateRange(new LocalDate(2023, 3, 1), new LocalDate(2023, 3, 31))));
+        iterations.Add(UpsertPlanningIntervalIteration.Create(null, "Iteration 1", IterationCategory.Development, new LocalDateRange(new LocalDate(2023, 1, 1), new LocalDate(2023, 1, 31))));
+        iterations.Add(UpsertPlanningIntervalIteration.Create(null, "Iteration 2", IterationCategory.Development, new LocalDateRange(new LocalDate(2023, 2, 1), new LocalDate(2023, 2, 28))));
+        iterations.Add(UpsertPlanningIntervalIteration.Create(null, "Iteration 3", IterationCategory.InnovationAndPlanning, new LocalDateRange(new LocalDate(2023, 3, 1), new LocalDate(2023, 3, 31))));
 
         sut.ManageDates(new LocalDateRange(new LocalDate(2023, 1, 1), new LocalDate(2023, 3, 31)), iterations);
 
@@ -354,14 +354,14 @@ public class PlanningIntervalTests
         var sut = _planningIntervalFaker.WithData(dateRange: piDates).Generate();
 
         // Act
-        var result = sut.AddIteration("Iteration 1", IterationType.Development, new LocalDateRange(new LocalDate(2023, 1, 1), new LocalDate(2023, 1, 31)));
+        var result = sut.AddIteration("Iteration 1", IterationCategory.Development, new LocalDateRange(new LocalDate(2023, 1, 1), new LocalDate(2023, 1, 31)));
         var iterations = sut.Iterations.ToList();
 
         // Assert
         result.IsSuccess.Should().BeTrue();
         iterations.Count.Should().Be(1);
         iterations[0].Name.Should().Be("Iteration 1");
-        iterations[0].Type.Should().Be(IterationType.Development);
+        iterations[0].Category.Should().Be(IterationCategory.Development);
         iterations[0].DateRange.Start.Should().Be(new LocalDate(2023, 1, 1));
         iterations[0].DateRange.End.Should().Be(new LocalDate(2023, 1, 31));
     }
@@ -373,10 +373,10 @@ public class PlanningIntervalTests
         var piDates = new LocalDateRange(new LocalDate(2023, 1, 1), new LocalDate(2023, 3, 31));
         var sut = _planningIntervalFaker.WithData(dateRange: piDates).Generate();
 
-        sut.AddIteration("Iteration 1", IterationType.Development, new LocalDateRange(new LocalDate(2023, 1, 1), new LocalDate(2023, 1, 31)));
+        sut.AddIteration("Iteration 1", IterationCategory.Development, new LocalDateRange(new LocalDate(2023, 1, 1), new LocalDate(2023, 1, 31)));
 
         // Act
-        var result = sut.AddIteration("Iteration 1", IterationType.Development, new LocalDateRange(new LocalDate(2023, 1, 1), new LocalDate(2023, 1, 31)));
+        var result = sut.AddIteration("Iteration 1", IterationCategory.Development, new LocalDateRange(new LocalDate(2023, 1, 1), new LocalDate(2023, 1, 31)));
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -390,10 +390,10 @@ public class PlanningIntervalTests
         var piDates = new LocalDateRange(new LocalDate(2023, 1, 1), new LocalDate(2023, 3, 31));
         var sut = _planningIntervalFaker.WithData(dateRange: piDates).Generate();
 
-        sut.AddIteration("Iteration 1", IterationType.Development, new LocalDateRange(new LocalDate(2023, 1, 1), new LocalDate(2023, 1, 31)));
+        sut.AddIteration("Iteration 1", IterationCategory.Development, new LocalDateRange(new LocalDate(2023, 1, 1), new LocalDate(2023, 1, 31)));
 
         // Act
-        var result = sut.AddIteration("Iteration 2", IterationType.Development, new LocalDateRange(new LocalDate(2023, 1, 31), new LocalDate(2023, 2, 15)));
+        var result = sut.AddIteration("Iteration 2", IterationCategory.Development, new LocalDateRange(new LocalDate(2023, 1, 31), new LocalDate(2023, 2, 15)));
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -408,7 +408,7 @@ public class PlanningIntervalTests
         var sut = _planningIntervalFaker.WithData(dateRange: piDates).Generate();
 
         // Act
-        var result = sut.AddIteration("Iteration 1", IterationType.Development, new LocalDateRange(new LocalDate(2020, 12, 31), new LocalDate(2023, 1, 30)));
+        var result = sut.AddIteration("Iteration 1", IterationCategory.Development, new LocalDateRange(new LocalDate(2020, 12, 31), new LocalDate(2023, 1, 30)));
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -423,7 +423,7 @@ public class PlanningIntervalTests
         var sut = _planningIntervalFaker.WithData(dateRange: piDates).Generate();
 
         // Act
-        var result = sut.AddIteration("Iteration 1", IterationType.Development, new LocalDateRange(new LocalDate(2023, 3, 20), new LocalDate(2023, 4, 1)));
+        var result = sut.AddIteration("Iteration 1", IterationCategory.Development, new LocalDateRange(new LocalDate(2023, 3, 20), new LocalDate(2023, 4, 1)));
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -463,9 +463,9 @@ public class PlanningIntervalTests
 
         var iterations = new List<UpsertPlanningIntervalIteration>
         {
-            UpsertPlanningIntervalIteration.Create(null, "Iteration 1", IterationType.Development, new LocalDateRange(new LocalDate(2023, 1, 1), new LocalDate(2023, 1, 31))),
-            UpsertPlanningIntervalIteration.Create(null, "Iteration 2", IterationType.Development, new LocalDateRange(new LocalDate(2023, 2, 1), new LocalDate(2023, 2, 28))),
-            UpsertPlanningIntervalIteration.Create(null, "Iteration 3", IterationType.InnovationAndPlanning, new LocalDateRange(new LocalDate(2023, 3, 1), new LocalDate(2023, 3, 31)))
+            UpsertPlanningIntervalIteration.Create(null, "Iteration 1", IterationCategory.Development, new LocalDateRange(new LocalDate(2023, 1, 1), new LocalDate(2023, 1, 31))),
+            UpsertPlanningIntervalIteration.Create(null, "Iteration 2", IterationCategory.Development, new LocalDateRange(new LocalDate(2023, 2, 1), new LocalDate(2023, 2, 28))),
+            UpsertPlanningIntervalIteration.Create(null, "Iteration 3", IterationCategory.InnovationAndPlanning, new LocalDateRange(new LocalDate(2023, 3, 1), new LocalDate(2023, 3, 31)))
         };
 
         // Act
@@ -478,15 +478,15 @@ public class PlanningIntervalTests
         sut.DateRange.End.Should().Be(expectedEndDate);
         updatedIterations.Count.Should().Be(3);
         updatedIterations[0].Name.Should().Be("Iteration 1");
-        updatedIterations[0].Type.Should().Be(IterationType.Development);
+        updatedIterations[0].Category.Should().Be(IterationCategory.Development);
         updatedIterations[0].DateRange.Start.Should().Be(new LocalDate(2023, 1, 1));
         updatedIterations[0].DateRange.End.Should().Be(new LocalDate(2023, 1, 31));
         updatedIterations[1].Name.Should().Be("Iteration 2");
-        updatedIterations[1].Type.Should().Be(IterationType.Development);
+        updatedIterations[1].Category.Should().Be(IterationCategory.Development);
         updatedIterations[1].DateRange.Start.Should().Be(new LocalDate(2023, 2, 1));
         updatedIterations[1].DateRange.End.Should().Be(new LocalDate(2023, 2, 28));
         updatedIterations[2].Name.Should().Be("Iteration 3");
-        updatedIterations[2].Type.Should().Be(IterationType.InnovationAndPlanning);
+        updatedIterations[2].Category.Should().Be(IterationCategory.InnovationAndPlanning);
     }
 
     [Fact]
@@ -501,7 +501,7 @@ public class PlanningIntervalTests
             .Generate();
 
         var iterations = sut.Iterations
-            .Select(i => UpsertPlanningIntervalIteration.Create(i.Id, i.Name, i.Type, i.DateRange))
+            .Select(i => UpsertPlanningIntervalIteration.Create(i.Id, i.Name, i.Category, i.DateRange))
             .ToList();
 
         iterations.Last().Name = iterations.First().Name;
@@ -526,7 +526,7 @@ public class PlanningIntervalTests
             .Generate();
 
         var iterations = sut.Iterations
-            .Select(i => UpsertPlanningIntervalIteration.Create(i.Id, i.Name, i.Type, i.DateRange))
+            .Select(i => UpsertPlanningIntervalIteration.Create(i.Id, i.Name, i.Category, i.DateRange))
             .ToList();
 
         iterations.First().DateRange = new LocalDateRange(startDate.Plus(Period.FromDays(-1)), iterations.First().DateRange.End);
@@ -551,7 +551,7 @@ public class PlanningIntervalTests
             .Generate();
 
         var iterations = sut.Iterations
-            .Select(i => UpsertPlanningIntervalIteration.Create(i.Id, i.Name, i.Type, i.DateRange))
+            .Select(i => UpsertPlanningIntervalIteration.Create(i.Id, i.Name, i.Category, i.DateRange))
             .ToList();
 
         iterations.Last().DateRange = new LocalDateRange(iterations.Last().DateRange.Start, endDate.Plus(Period.FromDays(1)));
@@ -576,7 +576,7 @@ public class PlanningIntervalTests
             .Generate();
 
         var iterations = sut.Iterations
-            .Select(i => UpsertPlanningIntervalIteration.Create(i.Id, i.Name, i.Type, i.DateRange))
+            .Select(i => UpsertPlanningIntervalIteration.Create(i.Id, i.Name, i.Category, i.DateRange))
             .ToList();
 
         var secondIteration = iterations[1];
