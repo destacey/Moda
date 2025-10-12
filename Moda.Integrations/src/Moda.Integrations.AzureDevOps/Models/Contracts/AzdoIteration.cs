@@ -40,7 +40,7 @@ public sealed record AzdoIteration : IExternalIteration<AzdoIterationMetadata>
             }
             else if (End.Value < now)
             {
-                state = IterationState.Closed;
+                state = IterationState.Completed;
             }
             else
             {
@@ -56,7 +56,7 @@ public sealed record AzdoIteration : IExternalIteration<AzdoIterationMetadata>
         else if (!Start.HasValue && End.HasValue)
         {
             state = End.Value < now
-                ? IterationState.Closed 
+                ? IterationState.Completed 
                 : IterationState.Active;
         }
 

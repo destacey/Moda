@@ -1,4 +1,5 @@
 ﻿using Moda.Common.Domain.Enums.Organization;
+using Moda.Common.Domain.Enums.Planning;
 using Moda.Common.Models;
 using Moda.Planning.Domain.Enums;
 using Moda.Planning.Domain.Models;
