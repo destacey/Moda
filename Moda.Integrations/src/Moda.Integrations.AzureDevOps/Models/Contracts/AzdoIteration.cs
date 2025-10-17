@@ -7,7 +7,7 @@ namespace Moda.Integrations.AzureDevOps.Models.Contracts;
 
 public sealed record AzdoIteration : IExternalIteration<AzdoIterationMetadata>
 {
-    public AzdoIteration(string id, string name, IterationType type, Instant? startDate, Instant? endDate, Guid? teamId, AzdoIterationMetadata metadata, Instant timestamp)
+    public AzdoIteration(int id, string name, IterationType type, Instant? startDate, Instant? endDate, Guid? teamId, AzdoIterationMetadata metadata, Instant timestamp)
     {
         Id = id;
         Name = name;
@@ -20,7 +20,7 @@ public sealed record AzdoIteration : IExternalIteration<AzdoIterationMetadata>
         SetState(timestamp);
     }
 
-    public string Id { get; init; }
+    public int Id { get; init; }
     public string Name { get; init; }
     public IterationType Type { get; init; }
     public Instant? Start { get; init; }

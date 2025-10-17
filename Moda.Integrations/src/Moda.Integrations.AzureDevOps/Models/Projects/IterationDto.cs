@@ -52,7 +52,7 @@ internal static class IterationDtoExtensions
         Instant? start = iteration.StartDate.HasValue ? Instant.FromDateTimeUtc(iteration.StartDate.Value) : null;
         Instant? end = iteration.EndDate.HasValue ? Instant.FromDateTimeUtc(iteration.EndDate.Value) : null;
 
-        return new AzdoIteration(iteration.Id.ToString(), iteration.Name, type, start, end, iteration.TeamId, metadata, now);
+        return new AzdoIteration(iteration.Id, iteration.Name, type, start, end, iteration.TeamId, metadata, now);
     }
 
     public static List<IExternalIteration<AzdoIterationMetadata>> ToIExternalIterations(this List<IterationDto> iterations, Instant now)

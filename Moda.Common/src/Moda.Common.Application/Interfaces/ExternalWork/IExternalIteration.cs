@@ -3,8 +3,9 @@
 namespace Moda.Common.Application.Interfaces.ExternalWork;
 public interface IExternalIteration<TMetadata> where TMetadata : class
 {
-    string Id { get; }
+    int Id { get; }
     string Name { get; }
+    IterationType Type { get; }
     Instant? Start { get; }
     Instant? End { get; }
     IterationState State { get; }

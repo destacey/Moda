@@ -54,11 +54,11 @@ public class FlexibleInstantRange : ValueObject, IDateRange<Instant, Instant?>
     /// <summary>
     /// Determines whether the range includes the specified range.
     /// </summary>
-    /// <param name="otherRange"></param>
+    /// <param name="range"></param>
     /// <returns></returns>
-    public bool Includes(FlexibleInstantRange otherRange)
+    public bool Includes(FlexibleInstantRange range)
     {
-        return (Start <= otherRange.Start) && (otherRange.EffectiveEnd <= EffectiveEnd);
+        return (Start <= range.Start) && (range.EffectiveEnd <= EffectiveEnd);
     }
 
     /// <summary>
@@ -70,8 +70,8 @@ public class FlexibleInstantRange : ValueObject, IDateRange<Instant, Instant?>
     {
         return Includes(range)
             || range.Includes(this)
-            || (range.Start <= Start && Start <= range.End && range.End <= EffectiveEnd)
-            || (Start <= range.Start && range.Start <= EffectiveEnd && EffectiveEnd <= range.End);
+            || (range.Start <= Start && Start <= range.EffectiveEnd && range.EffectiveEnd <= EffectiveEnd)
+            || (Start <= range.Start && range.Start <= EffectiveEnd && EffectiveEnd <= range.EffectiveEnd);
     }
 
     /// <summary>
