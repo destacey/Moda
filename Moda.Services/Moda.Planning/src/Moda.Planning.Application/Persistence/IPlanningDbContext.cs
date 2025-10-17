@@ -1,8 +1,10 @@
-﻿using Moda.Planning.Domain.Models.Roadmaps;
+﻿using Moda.Planning.Domain.Models.Iterations;
+using Moda.Planning.Domain.Models.Roadmaps;
 
 namespace Moda.Planning.Application.Persistence;
 public interface IPlanningDbContext : IModaDbContext
 {
+    DbSet<Iteration> Iterations { get; }
     DbSet<PlanningInterval> PlanningIntervals { get; }
     DbSet<Risk> Risks { get; }
     DbSet<PlanningTeam> PlanningTeams { get; }

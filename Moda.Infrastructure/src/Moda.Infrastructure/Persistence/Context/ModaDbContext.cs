@@ -11,6 +11,7 @@ using Moda.Links.Models;
 using Moda.Organization.Application.Teams.Models;
 using Moda.Planning.Application.Persistence;
 using Moda.Planning.Domain.Models;
+using Moda.Planning.Domain.Models.Iterations;
 using Moda.Planning.Domain.Models.Roadmaps;
 using Moda.ProjectPortfolioManagement.Application;
 using Moda.ProjectPortfolioManagement.Domain.Models;
@@ -72,6 +73,7 @@ public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IGoalsDbCo
 
     #region IPlanning
 
+    public DbSet<Iteration> Iterations => Set<Iteration>();
     public DbSet<PlanningInterval> PlanningIntervals => Set<PlanningInterval>();
     public DbSet<Risk> Risks => Set<Risk>();
     public DbSet<PlanningTeam> PlanningTeams => Set<PlanningTeam>();
