@@ -40,6 +40,7 @@ const ConnectionsPage = () => {
       { field: 'id', hide: true },
       { field: 'name', cellRenderer: ConnectionLinkCellRenderer },
       { field: 'connector' },
+      { field: 'systemId', headerName: 'System Id' },
       { field: 'isActive' },
       { field: 'isValidConfiguration' },
       { field: 'isSyncEnabled' },

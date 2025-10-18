@@ -27,8 +27,8 @@ public class AzureDevOpsService(ILogger<AzureDevOpsService> logger, IServiceProv
     {
         try
         {
-            // use the GetWorkProcesses method to test the connection
-            var result = await GetWorkProcesses(organizationUrl, token, CancellationToken.None).ConfigureAwait(false);
+            // use the GetInstanceId method to test the connection
+            var result = await GetSystemId(organizationUrl, token, CancellationToken.None).ConfigureAwait(false);
 
             return result.IsSuccess
                 ? Result.Success()
@@ -39,6 +39,19 @@ public class AzureDevOpsService(ILogger<AzureDevOpsService> logger, IServiceProv
             _logger.LogError(ex, "Exception thrown testing Azure DevOps connection.");
             return Result.Failure(ex.InnerException?.Message ?? ex.Message);
         }
+    }
+
+    public async Task<Result<string>> GetSystemId(string organizationUrl, string token, CancellationToken cancellationToken)
+    {
+        var generalService = GetService<GeneralService>(organizationUrl, token);
+        
+        var result = await generalService.GetConnectionData(cancellationToken).ConfigureAwait(false);
+        if (result.IsFailure)
+            return Result.Failure<string>(result.Error);
+
+        return result.Value is not null
+            ? result.Value.InstanceId
+            : Result.Failure<string>("No systemId returned.");
     }
 
     public async Task<Result<List<IExternalWorkProcess>>> GetWorkProcesses(string organizationUrl, string token, CancellationToken cancellationToken)
@@ -201,9 +214,10 @@ public class AzureDevOpsService(ILogger<AzureDevOpsService> logger, IServiceProv
 
         return typeof(TService) switch
         {
-            Type type when type == typeof(ProcessService) => (TService)Activator.CreateInstance(typeof(ProcessService), organizationUrl, token, _apiVersion, logger!)!,
-            Type type when type == typeof(ProjectService) => (TService)Activator.CreateInstance(typeof(ProjectService), organizationUrl, token, _apiVersion, logger!)!,
-            Type type when type == typeof(WorkItemService) => (TService)Activator.CreateInstance(typeof(WorkItemService), organizationUrl, token, _apiVersion, logger!)!,
+            Type type when type == typeof(ProcessService) => (TService)Activator.CreateInstance(typeof(ProcessService), organizationUrl, token, _apiVersion, logger)!,
+            Type type when type == typeof(ProjectService) => (TService)Activator.CreateInstance(typeof(ProjectService), organizationUrl, token, _apiVersion, logger)!,
+            Type type when type == typeof(WorkItemService) => (TService)Activator.CreateInstance(typeof(WorkItemService), organizationUrl, token, _apiVersion, logger)!,
+            Type type when type == typeof(GeneralService) => (TService)Activator.CreateInstance(typeof(GeneralService), organizationUrl, token, _apiVersion, logger)!,
             _ => throw new NotImplementedException(),
         };
     }

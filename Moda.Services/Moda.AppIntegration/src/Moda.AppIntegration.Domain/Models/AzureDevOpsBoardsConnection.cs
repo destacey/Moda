@@ -9,10 +9,11 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
     private AzureDevOpsBoardsConnection() { }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
-    private AzureDevOpsBoardsConnection(string name, string? description, AzureDevOpsBoardsConnectionConfiguration configuration, bool configurationIsValid, AzureDevOpsBoardsTeamConfiguration? teamConfiguration)
+    private AzureDevOpsBoardsConnection(string name, string? description, string? systemId, AzureDevOpsBoardsConnectionConfiguration configuration, bool configurationIsValid, AzureDevOpsBoardsTeamConfiguration? teamConfiguration)
     {
         Name = name;
         Description = description;
+        SystemId = systemId;
         Connector = Connector.AzureDevOpsBoards;
         Configuration = Guard.Against.Null(configuration, nameof(Configuration));
         IsValidConfiguration = configurationIsValid;
@@ -50,6 +51,26 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
         {
             return Result.Failure(ex.ToString());
         }
+    }
+
+    /// <summary>
+    /// Temporary method to set the system id.  The system id should not change after creation. 
+    /// </summary>
+    /// <remarks>This property was not originally a part of the model which is why we need a way to update it.</remarks>
+    /// <param name="systemId"></param>
+    /// <returns></returns>
+    public Result SetSystemId(string systemId)
+    {
+        if (SystemId is not null)
+        {
+            return SystemId == systemId?.Trim()
+                ? Result.Success()
+                : Result.Failure("SystemId has already been set and cannot be changed to a different value.");
+        }
+
+        SystemId = systemId;
+
+        return Result.Success();
     }
 
     public Result SyncWorkspaces(IEnumerable<AzureDevOpsBoardsWorkspace> workspaces, Instant timestamp)
@@ -247,10 +268,12 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
         }
     }
 
-    public static AzureDevOpsBoardsConnection Create(string name, string? description, AzureDevOpsBoardsConnectionConfiguration configuration, bool configurationIsValid, AzureDevOpsBoardsTeamConfiguration? teamConfiguration, Instant timestamp)
+    public static AzureDevOpsBoardsConnection Create(string name, string? description, string? systemId, AzureDevOpsBoardsConnectionConfiguration configuration, bool configurationIsValid, AzureDevOpsBoardsTeamConfiguration? teamConfiguration, Instant timestamp)
     {
-        var connector = new AzureDevOpsBoardsConnection(name, description, configuration, configurationIsValid, teamConfiguration);
+        var connector = new AzureDevOpsBoardsConnection(name, description, systemId, configuration, configurationIsValid, teamConfiguration);
+
         connector.AddDomainEvent(EntityCreatedEvent.WithEntity(connector, timestamp));
+
         return connector;
     }
 }

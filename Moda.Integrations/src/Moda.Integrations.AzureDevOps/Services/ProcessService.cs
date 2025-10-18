@@ -23,12 +23,14 @@ internal sealed class ProcessService(string organizationUrl, string token, strin
             }
             else if (response.StatusCode == System.Net.HttpStatusCode.NonAuthoritativeInformation)
             {
+                _logger.LogError("The request was not authorized with Azure DevOps.");
                 return Result.Failure<List<AzdoWorkProcess>>("The request was not authorized with Azure DevOps.");
             }
 
             var processes = response.Data?.Items.ToAzdoWorkProcesses() ?? [];
-
-            _logger.LogDebug("{ProcessCount} processes found.", processes.Count);
+            
+            if (_logger.IsEnabled(LogLevel.Debug))
+                _logger.LogDebug("{ProcessCount} processes found.", processes.Count);
 
             return Result.Success(processes);
         }
@@ -81,7 +83,8 @@ internal sealed class ProcessService(string organizationUrl, string token, strin
             return Result.Failure<ProcessDto>(errorMesssage);
         }
 
-        _logger.LogDebug("Process {ProcessId} found.", processId);
+        if (_logger.IsEnabled(LogLevel.Debug))
+            _logger.LogDebug("Process {ProcessId} found.", processId);
 
         return Result.Success(response.Data);
     }
@@ -95,7 +98,8 @@ internal sealed class ProcessService(string organizationUrl, string token, strin
             return Result.Failure<List<BehaviorDto>>(response.ErrorMessage);
         }
 
-        _logger.LogDebug("{BehaviorCount} behaviors found for process {ProcessId}.", response.Data?.Count ?? 0, processId);
+        if (_logger.IsEnabled(LogLevel.Debug))
+            _logger.LogDebug("{BehaviorCount} behaviors found for process {ProcessId}.", response.Data?.Count ?? 0, processId);
 
         return Result.Success(response.Data?.Items ?? []);
     }
@@ -109,7 +113,8 @@ internal sealed class ProcessService(string organizationUrl, string token, strin
             return Result.Failure<List<ProcessWorkItemTypeDto>>(response.ErrorMessage);
         }
 
-        _logger.LogDebug("{WorkItemTypeCount} work item types found for process {ProcessId}.", response.Data?.Count ?? 0, processId);
+        if (_logger.IsEnabled(LogLevel.Debug))
+            _logger.LogDebug("{WorkItemTypeCount} work item types found for process {ProcessId}.", response.Data?.Count ?? 0, processId);
 
         return Result.Success(response.Data?.Items ?? []);
     }

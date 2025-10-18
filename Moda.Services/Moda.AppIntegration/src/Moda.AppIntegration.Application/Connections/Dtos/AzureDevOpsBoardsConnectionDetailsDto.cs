@@ -19,6 +19,11 @@ public sealed record AzureDevOpsBoardsConnectionDetailsDto : IMapFrom<AzureDevOp
     public string? Description { get; set; }
 
     /// <summary>
+    /// The unique identifier for the system that this connection connects to. 
+    /// </summary>
+    public string? SystemId { get; set; }
+
+    /// <summary>
     /// The type of connector for the connection.  This value cannot be changed once set.
     /// </summary>
     public required string Connector { get; set; }

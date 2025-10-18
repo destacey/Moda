@@ -2,37 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 
 namespace Moda.AppIntegration.Application.Connections.Commands;
-public sealed record UpdateAzureDevOpsBoardsConnectionCommand : ICommand<Guid>
-{
-    public UpdateAzureDevOpsBoardsConnectionCommand(Guid id, string name, string? description, string organization, string personalAccessToken)
-    {
-        Id = id;
-        Name = name;
-        Description = description;
-        Organization = organization;
-        PersonalAccessToken = personalAccessToken;
-    }
-
-    /// <summary>Gets or sets the identifier.</summary>
-    /// <value>The identifier.</value>
-    public Guid Id { get; }
-
-    /// <summary>Gets or sets the name of the connection.</summary>
-    /// <value>The name of the connection.</value>
-    public string Name { get; }
-
-    /// <summary>Gets or sets the description.</summary>
-    /// <value>The connection description.</value>
-    public string? Description { get; }
-
-    /// <summary>Gets the organization.</summary>
-    /// <value>The Azure DevOps Organization name.</value>
-    public string Organization { get; }
-
-    /// <summary>Gets the personal access token.</summary>
-    /// <value>The personal access token that enables access to Azure DevOps Boards data.</value>
-    public string PersonalAccessToken { get; }
-}
+public sealed record UpdateAzureDevOpsBoardsConnectionCommand(Guid Id, string Name, string? Description, string Organization, string PersonalAccessToken) : ICommand<Guid>;
 
 public sealed class UpdateAzureDevOpsBoardsConnectionCommandValidator : CustomValidator<UpdateAzureDevOpsBoardsConnectionCommand>
 {
@@ -69,20 +39,14 @@ public sealed class UpdateAzureDevOpsBoardsConnectionCommandValidator : CustomVa
     }
 }
 
-internal sealed class UpdateAzureDevOpsBoardsConnectionCommandHandler : ICommandHandler<UpdateAzureDevOpsBoardsConnectionCommand, Guid>
+internal sealed class UpdateAzureDevOpsBoardsConnectionCommandHandler(IAppIntegrationDbContext appIntegrationDbContext, IDateTimeProvider dateTimeProvider, ILogger<UpdateAzureDevOpsBoardsConnectionCommandHandler> logger, IAzureDevOpsService azureDevOpsService) : ICommandHandler<UpdateAzureDevOpsBoardsConnectionCommand, Guid>
 {
-    private readonly IAppIntegrationDbContext _appIntegrationDbContext;
-    private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly ILogger<UpdateAzureDevOpsBoardsConnectionCommandHandler> _logger;
-    private readonly IAzureDevOpsService _azureDevOpsService;
+    private const string AppRequestName = nameof(UpdateAzureDevOpsBoardsConnectionCommandHandler);
 
-    public UpdateAzureDevOpsBoardsConnectionCommandHandler(IAppIntegrationDbContext appIntegrationDbContext, IDateTimeProvider dateTimeProvider, ILogger<UpdateAzureDevOpsBoardsConnectionCommandHandler> logger, IAzureDevOpsService azureDevOpsService)
-    {
-        _appIntegrationDbContext = appIntegrationDbContext;
-        _dateTimeProvider = dateTimeProvider;
-        _logger = logger;
-        _azureDevOpsService = azureDevOpsService;
-    }
+    private readonly IAppIntegrationDbContext _appIntegrationDbContext = appIntegrationDbContext;
+    private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
+    private readonly ILogger<UpdateAzureDevOpsBoardsConnectionCommandHandler> _logger = logger;
+    private readonly IAzureDevOpsService _azureDevOpsService = azureDevOpsService;
 
     public async Task<Result<Guid>> Handle(UpdateAzureDevOpsBoardsConnectionCommand request, CancellationToken cancellationToken)
     {
@@ -99,18 +63,33 @@ internal sealed class UpdateAzureDevOpsBoardsConnectionCommandHandler : ICommand
                     ? connection.Configuration.PersonalAccessToken
                     : request.PersonalAccessToken;
 
-            var testConfig = new AzureDevOpsBoardsConnectionConfiguration(request.Organization, pat);
-            var testConnectionResult = await _azureDevOpsService.TestConnection(testConfig.OrganizationUrl, testConfig.PersonalAccessToken);
 
-            var updateResult = connection.Update(request.Name, request.Description, request.Organization, pat, testConnectionResult.IsSuccess, _dateTimeProvider.Now);
+            var config = new AzureDevOpsBoardsConnectionConfiguration(request.Organization, pat);
+
+            var systemIdAndTestResult = await _azureDevOpsService.GetSystemId(config.OrganizationUrl, config.PersonalAccessToken, cancellationToken);
+            if (systemIdAndTestResult.IsFailure)
+            {
+                _logger.LogWarning("Unable to get system id for Azure DevOps Boards connection for organization {Organization}. {Error}", request.Organization, systemIdAndTestResult.Error);
+            }
+            else if (string.IsNullOrWhiteSpace(connection.SystemId))
+            {
+                var setSystemIdResult = connection.SetSystemId(systemIdAndTestResult.Value);
+                if (setSystemIdResult.IsFailure)
+                {
+                    _logger.LogError("Error setting system id for connection {ConnectionId} to {SystemId}. {Error}", connection.Id, systemIdAndTestResult.Value, setSystemIdResult.Error);
+                }
+            }
+
+            var configurationIsValid = systemIdAndTestResult.IsSuccess && !string.IsNullOrWhiteSpace(connection.SystemId);
+
+            var updateResult = connection.Update(request.Name, request.Description, request.Organization, pat, configurationIsValid, _dateTimeProvider.Now);
             if (updateResult.IsFailure)
             {
                 // Reset the entity
                 await _appIntegrationDbContext.Entry(connection).ReloadAsync(cancellationToken);
                 connection.ClearDomainEvents();
 
-                var requestName = request.GetType().Name;
-                _logger.LogError("Moda Request: Failure for Request {Name} {@Request}.  Error message: {Error}", requestName, request, updateResult.Error);
+                _logger.LogError("Moda Request: Failure for Request {Name} {@Request}.  Error message: {Error}", AppRequestName, request, updateResult.Error);
                 return Result.Failure<Guid>(updateResult.Error);
             }
 
@@ -120,11 +99,9 @@ internal sealed class UpdateAzureDevOpsBoardsConnectionCommandHandler : ICommand
         }
         catch (Exception ex)
         {
-            var requestName = request.GetType().Name;
+            _logger.LogError(ex, "Moda Request: Exception for Request {Name} {@Request}", AppRequestName, request);
 
-            _logger.LogError(ex, "Moda Request: Exception for Request {Name} {@Request}", requestName, request);
-
-            return Result.Failure<Guid>($"Moda Request: Exception for Request {requestName} {request}");
+            return Result.Failure<Guid>($"Moda Request: Exception for Request {AppRequestName} {request}");
         }
     }
 }

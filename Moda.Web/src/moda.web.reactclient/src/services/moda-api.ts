@@ -16799,6 +16799,7 @@ export interface HealthStatusDto {
 export interface ConnectionListDto {
     id: string;
     name: string;
+    systemId?: string | undefined;
     connector: string;
     isActive: boolean;
     isValidConfiguration: boolean;
@@ -16809,6 +16810,7 @@ export interface AzureDevOpsBoardsConnectionDetailsDto {
     id: string;
     name: string;
     description?: string | undefined;
+    systemId?: string | undefined;
     connector: string;
     configuration: AzureDevOpsBoardsConnectionConfigurationDto;
     teamConfiguration: AzureDevOpsBoardsTeamConfigurationDto;
@@ -16860,13 +16862,13 @@ export interface AzureDevOpsBoardsWorkspaceTeamDto {
 }
 
 export interface CreateAzureDevOpsBoardConnectionRequest {
-    /** Gets or sets the name of the connection. */
+    /** The name of the connection. */
     name: string;
-    /** Gets or sets the description. */
+    /** The description of the connection. */
     description?: string | undefined;
-    /** Gets the organization. */
+    /** The Azure DevOps Organization name. */
     organization: string;
-    /** Gets the personal access token. */
+    /** The personal access token that enables access to Azure DevOps Boards data. */
     personalAccessToken: string;
 }
 

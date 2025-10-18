@@ -4,41 +4,50 @@ using Moda.Common.Extensions;
 namespace Moda.AppIntegration.Domain.Models;
 public abstract class Connection : BaseSoftDeletableEntity<Guid>, IActivatable
 {
-    private string _name = null!;
+    private string _name = default!;
     private string? _description;
+    private string? _systemId;
 
-    /// <summary>Gets or sets the name of the connection.</summary>
-    /// <value>The name of the connection.</value>
+    /// <summary>
+    /// The name of the connection.
+    /// </summary>
     public string Name
     {
         get => _name;
         protected set => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
     }
 
-    /// <summary>Gets or sets the description.</summary>
-    /// <value>The connection description.</value>
+    /// <summary>
+    /// The description of the connection.
+    /// </summary>
     public string? Description
     {
         get => _description;
         protected set => _description = value.NullIfWhiteSpacePlusTrim();
     }
 
-    /// <summary>Gets the type of connector.  This value cannot change.</summary>
-    /// <value>The type of connector.</value>
+    /// <summary>
+    /// The unique identifier for the system that this connection connects to.
+    /// </summary>
+    public string? SystemId 
+    { 
+        get => _systemId; 
+        protected set => _systemId = value.NullIfWhiteSpacePlusTrim(); 
+    }
+
+    /// <summary>
+    /// The connector type for the connection.
+    /// </summary>
     public Connector Connector { get; protected set; }
 
     /// <summary>
     /// Indicates whether the connection is active or not.  Inactive connection are not included in the synchronization process.
     /// </summary>
-    /// <value><c>true</c> if this instance is active; otherwise, <c>false</c>.</value>
     public bool IsActive { get; protected set; } = true;
 
     /// <summary>
-    /// Gets or sets a value indicating whether this instance has a valid configuration.
+    /// The value indicating whether this instance has a valid configuration.
     /// </summary>
-    /// <value>
-    ///   <c>true</c> if this instance is valid configuration; otherwise, <c>false</c>.
-    /// </value>
     public bool IsValidConfiguration { get; protected set; } = false;
 
     /// <summary>
@@ -46,6 +55,9 @@ public abstract class Connection : BaseSoftDeletableEntity<Guid>, IActivatable
     /// </summary>
     public bool IsSyncEnabled { get; private set; } = false;
 
+    /// <summary>
+    /// The indicator for whether the connection has any active integration objects.
+    /// </summary>
     public abstract bool HasActiveIntegrationObjects { get; }
 
     /// <summary>
@@ -111,14 +123,15 @@ public abstract class Connection : BaseSoftDeletableEntity<Guid>, IActivatable
     }
 }
 
-public abstract class Connection<TC,TT> : Connection
+public abstract class Connection<TC, TT> : Connection
 {
-    /// <summary>Gets the configuration.</summary>
-    /// <value>The configuration.</value>
-    public abstract TC Configuration { get; protected set; }
-    
     /// <summary>
-    /// Gets the team configuration.
+    /// The connection configuration.
+    /// </summary>
+    public abstract TC Configuration { get; protected set; }
+
+    /// <summary>
+    /// The team configuration.
     /// </summary>
     public abstract TT TeamConfiguration { get; protected set; }
 }

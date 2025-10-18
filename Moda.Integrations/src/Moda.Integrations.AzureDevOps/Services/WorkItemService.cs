@@ -15,7 +15,8 @@ internal sealed class WorkItemService(string organizationUrl, string token, stri
         {
             var workItemIds = await _workItemClient.GetWorkItemIds(projectName, lastChangedDate, workItemTypes, cancellationToken).ConfigureAwait(false);
 
-            _logger.LogDebug("{WorkItemIdCount} work item ids found for project {Project}", workItemIds.Length, projectName);
+            if (_logger.IsEnabled(LogLevel.Debug))
+                _logger.LogDebug("{WorkItemIdCount} work item ids found for project {Project}", workItemIds.Length, projectName);
 
             if (workItemIds.Length == 0)
             {
@@ -47,7 +48,8 @@ internal sealed class WorkItemService(string organizationUrl, string token, stri
 
             var workitems = await _workItemClient.GetWorkItems(projectName, workItemIds, fields, cancellationToken).ConfigureAwait(false);
 
-            _logger.LogDebug("{WorkItemCount} work items found for project {Project}", workitems.Count, projectName);
+            if (_logger.IsEnabled(LogLevel.Debug))
+                _logger.LogDebug("{WorkItemCount} work items found for project {Project}", workitems.Count, projectName);
 
             return Result.Success(workitems);
         }
@@ -66,7 +68,8 @@ internal sealed class WorkItemService(string organizationUrl, string token, stri
 
             var links = await _workItemClient.GetWorkItemLinkChanges(projectName, lastChangedDate, linkTypes, workItemTypes, cancellationToken).ConfigureAwait(false);
 
-            _logger.LogDebug("{LinkCount} parent link changes found for project {Project}", links.Count, projectName);
+            if (_logger.IsEnabled(LogLevel.Debug))
+                _logger.LogDebug("{LinkCount} parent link changes found for project {Project}", links.Count, projectName);
 
             return Result.Success(links);
         }
@@ -85,7 +88,8 @@ internal sealed class WorkItemService(string organizationUrl, string token, stri
 
             var links = await _workItemClient.GetWorkItemLinkChanges(projectName, lastChangedDate, linkTypes, workItemTypes, cancellationToken).ConfigureAwait(false);
 
-            _logger.LogDebug("{LinkCount} dependency link changes found for project {Project}", links.Count, projectName);
+            if (_logger.IsEnabled(LogLevel.Debug))
+                _logger.LogDebug("{LinkCount} dependency link changes found for project {Project}", links.Count, projectName);
 
             return Result.Success(links);
         }
@@ -111,7 +115,8 @@ internal sealed class WorkItemService(string organizationUrl, string token, stri
             Array.Copy(workItemIds, 0, deletedWorkItemIds, 0, workItemIds.Length);
             Array.Copy(noneSyncedIds, 0, deletedWorkItemIds, workItemIds.Length, noneSyncedIds.Length);
 
-            _logger.LogDebug("{WorkItemIdCount} deleted work item ids found for project {Project}", deletedWorkItemIds.Length, projectName);
+            if (_logger.IsEnabled(LogLevel.Debug))
+                _logger.LogDebug("{WorkItemIdCount} deleted work item ids found for project {Project}", deletedWorkItemIds.Length, projectName);
 
             return Result.Success(deletedWorkItemIds);
         }
