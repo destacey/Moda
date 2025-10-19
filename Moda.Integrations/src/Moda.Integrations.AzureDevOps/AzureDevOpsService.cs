@@ -77,9 +77,7 @@ public class AzureDevOpsService(ILogger<AzureDevOpsService> logger, IServiceProv
 
     public async Task<Result<IExternalWorkspaceConfiguration>> GetWorkspace(string organizationUrl, string token, Guid workspaceId, CancellationToken cancellationToken)
     {
-        var projectService = GetService<ProjectService>(organizationUrl, token);
-
-        var result = await projectService.GetProject(workspaceId, cancellationToken).ConfigureAwait(false);
+        var result = await GetProject(organizationUrl, token, workspaceId.ToString(), cancellationToken).ConfigureAwait(false);
 
         if (result.IsFailure)
             return Result.Failure<IExternalWorkspaceConfiguration>(result.Error);
@@ -117,10 +115,14 @@ public class AzureDevOpsService(ILogger<AzureDevOpsService> logger, IServiceProv
 
     public async Task<Result<List<IExternalIteration<AzdoIterationMetadata>>>> GetIterations(string organizationUrl, string token, string projectName, Dictionary<Guid, Guid?> teamSettings, CancellationToken cancellationToken)
     {
+        var projectResult = await GetProject(organizationUrl, token, projectName, cancellationToken).ConfigureAwait(false);
+        if (projectResult.IsFailure)
+            return Result.Failure<List<IExternalIteration<AzdoIterationMetadata>>>($"Unable to get details for project {projectName}");
+
         var iterationsResult = await GetOrFetchIterationsAsync(organizationUrl, token, projectName, teamSettings, cancellationToken).ConfigureAwait(false);
 
         return iterationsResult.IsSuccess
-            ? iterationsResult.Value.ToIExternalIterations(_dateTimeProvider.Now)
+            ? iterationsResult.Value.ToIExternalIterations(_dateTimeProvider.Now, projectResult.Value.Id)
             : Result.Failure<List<IExternalIteration<AzdoIterationMetadata>>>(iterationsResult.Error);
     }
 
@@ -172,6 +174,13 @@ public class AzureDevOpsService(ILogger<AzureDevOpsService> logger, IServiceProv
         return result.IsSuccess
             ? result.Value
             : Result.Failure<int[]>(result.Error);
+    }
+
+    private async Task<Result<ProjectDetailsDto>> GetProject(string organizationUrl, string token, string projectIdOrName, CancellationToken cancellationToken)
+    {
+        var projectService = GetService<ProjectService>(organizationUrl, token);
+
+        return await projectService.GetProject(projectIdOrName, cancellationToken).ConfigureAwait(false);
     }
 
     private async Task<Result<List<IterationDto>>> GetOrFetchIterationsAsync(string organizationUrl, string token, string projectName, Dictionary<Guid, Guid?>? teamSettings, CancellationToken cancellationToken, bool forceRefresh = false)

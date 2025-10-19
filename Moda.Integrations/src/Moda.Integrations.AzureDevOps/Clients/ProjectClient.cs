@@ -20,9 +20,9 @@ internal sealed class ProjectClient : BaseClient
         return await _client.ExecuteAsync<AzdoListResponse<ProjectDto>>(request, cancellationToken).ConfigureAwait(false);
     }
 
-    internal async Task<RestResponse<ProjectDto>> GetProject(Guid projectId, CancellationToken cancellationToken)
+    internal async Task<RestResponse<ProjectDto>> GetProject(string projectIdOrName, CancellationToken cancellationToken)
     {
-        var request = new RestRequest($"/_apis/projects/{projectId}", Method.Get);
+        var request = new RestRequest($"/_apis/projects/{projectIdOrName}", Method.Get);
         SetupRequest(request);
 
         return await _client.ExecuteAsync<ProjectDto>(request, cancellationToken);

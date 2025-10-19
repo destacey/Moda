@@ -6,7 +6,6 @@ using Moda.Common.Extensions;
 using Moda.Integrations.AzureDevOps.Clients;
 using Moda.Integrations.AzureDevOps.Models;
 using Moda.Integrations.AzureDevOps.Models.Projects;
-using Moda.Integrations.AzureDevOps.Utils;
 
 namespace Moda.Integrations.AzureDevOps.Services;
 internal sealed class ProjectService(string organizationUrl, string token, string apiVersion, ILogger<ProjectService> logger)
@@ -66,41 +65,41 @@ internal sealed class ProjectService(string organizationUrl, string token, strin
     /// <remarks>This method fetches the project details and its associated properties from Azure DevOps. If
     /// the project or its properties cannot be retrieved due to an error or if they do not exist, the method logs the
     /// error and returns a failure result.</remarks>
-    /// <param name="projectId">The unique identifier of the project to retrieve.</param>
+    /// <param name="projectIdOrName">The unique identifier or name of the project to retrieve.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A <see cref="Result{T}"/> containing the project details as a <see cref="ProjectDetailsDto"/> if successful;
     /// otherwise, a failure result with an error message.</returns>
-    public async Task<Result<ProjectDetailsDto>> GetProject(Guid projectId, CancellationToken cancellationToken)
+    public async Task<Result<ProjectDetailsDto>> GetProject(string projectIdOrName, CancellationToken cancellationToken)
     {
         try
         {
-            var projectResponse = await _projectClient.GetProject(projectId, cancellationToken).ConfigureAwait(false);
+            var projectResponse = await _projectClient.GetProject(projectIdOrName, cancellationToken).ConfigureAwait(false);
             if (!projectResponse.IsSuccessful && projectResponse.StatusCode != HttpStatusCode.NotFound)
             {
                 var statusDescription = projectResponse.StatusCode is 0 ? "Connection Error" : projectResponse.StatusDescription;
                 var errorMessage = projectResponse.ErrorMessage is null ? statusDescription : $"{statusDescription} - {projectResponse.ErrorMessage}";
-                _logger.LogError("Error getting project {ProjectId} from Azure DevOps: {ErrorMessage}.", projectId, errorMessage);
+                _logger.LogError("Error getting project {ProjectIdOrName} from Azure DevOps: {ErrorMessage}.", projectIdOrName, errorMessage);
                 return Result.Failure<ProjectDetailsDto>(errorMessage);
             }
             else if ((!projectResponse.IsSuccessful && projectResponse.StatusCode is HttpStatusCode.NotFound) || projectResponse.Data is null)
             {
                 var errorMesssage = projectResponse.IsSuccessful ? "No project data returned" : projectResponse.StatusDescription;
-                _logger.LogError("Error getting project {ProjectId} from Azure DevOps: {ErrorMessage}.", projectId, errorMesssage);
+                _logger.LogError("Error getting project {ProjectIdOrName} from Azure DevOps: {ErrorMessage}.", projectIdOrName, errorMesssage);
                 return Result.Failure<ProjectDetailsDto>(errorMesssage);
             }
 
-            var propertiesResponse = await _projectClient.GetProjectProperties(projectId, cancellationToken).ConfigureAwait(false);
+            var propertiesResponse = await _projectClient.GetProjectProperties(projectResponse.Data.Id, cancellationToken).ConfigureAwait(false);
             if (!propertiesResponse.IsSuccessful && propertiesResponse.StatusCode != HttpStatusCode.NotFound)
             {
                 var statusDescription = propertiesResponse.StatusCode is 0 ? "Connection Error" : propertiesResponse.StatusDescription;
                 var errorMessage = propertiesResponse.ErrorMessage is null ? statusDescription : $"{statusDescription} - {propertiesResponse.ErrorMessage}";
-                _logger.LogError("Error getting project properties {ProjectId} from Azure DevOps: {ErrorMessage}.", projectId, errorMessage);
+                _logger.LogError("Error getting project properties {ProjectId} from Azure DevOps: {ErrorMessage}.", projectIdOrName, errorMessage);
                 return Result.Failure<ProjectDetailsDto>(errorMessage);
             }
             else if ((!propertiesResponse.IsSuccessful && propertiesResponse.StatusCode is HttpStatusCode.NotFound) || propertiesResponse.Data is null)
             {
                 var errorMesssage = propertiesResponse.IsSuccessful ? "No project properties data returned" : propertiesResponse.StatusDescription;
-                _logger.LogError("Error getting project properties {ProjectId} from Azure DevOps: {ErrorMessage}.", projectId, errorMesssage);
+                _logger.LogError("Error getting project properties {ProjectId} from Azure DevOps: {ErrorMessage}.", projectIdOrName, errorMesssage);
                 return Result.Failure<ProjectDetailsDto>(errorMesssage);
             }
 
@@ -108,7 +107,7 @@ internal sealed class ProjectService(string organizationUrl, string token, strin
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Exception thrown getting project {ProjectId} from Azure DevOps", projectId);
+            _logger.LogError(ex, "Exception thrown getting project {ProjectId} from Azure DevOps", projectIdOrName);
             return Result.Failure<ProjectDetailsDto>(ex.ToString());
         }
     }
