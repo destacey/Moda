@@ -2,6 +2,7 @@
 using Moda.Common.Application.Models;
 using Moda.Common.Domain.Enums.Planning;
 using Moda.Integrations.AzureDevOps.Models.Contracts;
+using Moda.Integrations.AzureDevOps.Utils;
 using NodaTime;
 
 namespace Moda.Integrations.AzureDevOps.Models.Projects;
@@ -23,6 +24,21 @@ internal sealed record IterationDto
     public DateTime? EndDate { get; set; }
 
     public bool HasChildren { get; set; }
+
+    public static IterationDto FromIterationNodeResponse(IterationNodeResponse node, Guid? teamId = null)
+    {
+        return new IterationDto
+        {
+            Id = node.Id,
+            Identifier = node.Identifier,
+            Name = node.Name,
+            Path = ClassificationNodeUtils.RemoveClassificationTypeFromPath(node.Path),
+            TeamId = teamId,
+            StartDate = node.Attributes?.StartDate,
+            EndDate = node.Attributes?.EndDate,
+            HasChildren = node.Children is not null && node.Children.Count > 0
+        };
+    }
 }
 
 internal static class IterationDtoExtensions

@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Moda.Integrations.AzureDevOps.Models.Projects;
 using Moda.Integrations.AzureDevOps.Tests.Models;
+using Moda.Integrations.AzureDevOps.Utils;
 
 namespace Moda.Integrations.AzureDevOps.Tests.Sut.Services;
 
@@ -431,6 +432,48 @@ public class ProjectServiceTests : CommonResponseOptions
     }
 
     [Fact]
+    public void FlattenIterationNode_TransformsPathsByRemovingIterationNode()
+    {
+        // Arrange
+        var root = new IterationNodeResponse
+        {
+            Id = 1,
+            Identifier = Guid.NewGuid(),
+            Name = "Root",
+            Path = "\\Moda\\Iteration",
+            Children =
+            [
+                new IterationNodeResponse
+                {
+                    Id = 2,
+                    Identifier = Guid.NewGuid(),
+                    Name = "Team Moda",
+                    Path = "\\Moda\\Iteration\\Team Moda",
+                    Children =
+                    [
+                        new IterationNodeResponse
+                        {
+                            Id = 3,
+                            Identifier = Guid.NewGuid(),
+                            Name = "2024",
+                            Path = "\\Moda\\Iteration\\Team Moda\\2024"
+                        }
+                    ]
+                }
+            ]
+        };
+
+        // Act
+        var result = FlattenIterationNode(root, new Dictionary<Guid, Guid>());
+
+        // Assert
+        result.Should().HaveCount(3);
+        result.Single(i => i.Id == 1).Path.Should().Be("\\Moda");
+        result.Single(i => i.Id == 2).Path.Should().Be("\\Moda\\Team Moda");
+        result.Single(i => i.Id == 3).Path.Should().Be("\\Moda\\Team Moda\\2024");
+    }
+
+    [Fact]
     public void FlattenIterationNode_WithComplexRealWorldStructure_FlattensAndAssignsTeamIdsCorrectly()
     {
         // Arrange - Use the same JSON structure from IterationNodeResponseTests
@@ -494,7 +537,7 @@ public class ProjectServiceTests : CommonResponseOptions
                 Id = current.Id,
                 Identifier = current.Identifier,
                 Name = current.Name,
-                Path = current.Path,
+                Path = ClassificationNodeUtils.RemoveClassificationTypeFromPath(current.Path),
                 TeamId = teamId,
                 StartDate = current.Attributes?.StartDate,
                 EndDate = current.Attributes?.EndDate,

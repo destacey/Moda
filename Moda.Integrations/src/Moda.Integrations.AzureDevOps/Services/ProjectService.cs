@@ -6,6 +6,7 @@ using Moda.Common.Extensions;
 using Moda.Integrations.AzureDevOps.Clients;
 using Moda.Integrations.AzureDevOps.Models;
 using Moda.Integrations.AzureDevOps.Models.Projects;
+using Moda.Integrations.AzureDevOps.Utils;
 
 namespace Moda.Integrations.AzureDevOps.Services;
 internal sealed class ProjectService(string organizationUrl, string token, string apiVersion, ILogger<ProjectService> logger)
@@ -289,17 +290,7 @@ internal sealed class ProjectService(string organizationUrl, string token, strin
                 : parentTeamId;
 
             // Yield flattened result immediately - no intermediate allocations
-            yield return new IterationDto
-            {
-                Id = current.Id,
-                Identifier = current.Identifier,
-                Name = current.Name,
-                Path = current.Path,
-                TeamId = teamId,
-                StartDate = current.Attributes?.StartDate,
-                EndDate = current.Attributes?.EndDate,
-                HasChildren = current.Children is not null && current.Children.Count != 0
-            };
+            yield return IterationDto.FromIterationNodeResponse(current, teamId);
 
             // Push children onto stack with inherited team ID
             if (current.Children is not null)
