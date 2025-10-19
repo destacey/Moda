@@ -12,7 +12,7 @@ public class IterationDateRange : ValueObject, IDateRange<Instant?>
 
         if (Start.HasValue && End.HasValue && End < Start)
         {
-            throw new ArgumentException("The start date must be on or before the end date.", nameof(FlexibleInstantRange));
+            throw new ArgumentException("The start date must be on or before the end date.", nameof(IterationDateRange));
         }
     }
 
@@ -120,4 +120,13 @@ public class IterationDateRange : ValueObject, IDateRange<Instant?>
         yield return EffectiveStart;
         yield return EffectiveEnd;
     }
+
+    /// <summary>
+    /// Creates a new instance of the <see cref="IterationDateRange"/> class with the specified start and end dates.
+    /// </summary>
+    /// <param name="start">The optional start date of the iteration. Can be <see langword="null"/> to indicate no start date.</param>
+    /// <param name="end">The optional end date of the iteration. Can be <see langword="null"/> to indicate no end date.</param>
+    /// <returns>A new <see cref="IterationDateRange"/> instance initialized with the specified start and end dates.</returns>
+    public static IterationDateRange Create(Instant? start, Instant? end)
+        => new(start, end);
 }

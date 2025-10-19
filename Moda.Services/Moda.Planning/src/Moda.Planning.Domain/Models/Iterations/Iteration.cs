@@ -12,7 +12,7 @@ public class Iteration : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey
 
     private Iteration() { }
 
-    private Iteration(string name, IterationType type, IterationState state, IterationDateRange dateRange, Guid? teamId, OwnershipInfo ownershipInfo)
+    private Iteration(string name, IterationType type, IterationState state, IterationDateRange dateRange, Guid? teamId, OwnershipInfo ownershipInfo, List<KeyValueObjectMetadata> externalMetadata)
     {
         Name = name;
         Type = type;
@@ -20,6 +20,7 @@ public class Iteration : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey
         DateRange = dateRange;
         TeamId = teamId;
         OwnershipInfo = ownershipInfo ?? throw new ArgumentNullException(nameof(ownershipInfo));
+        _externalMetadata = externalMetadata ?? [];
     }
 
     /// <summary>
@@ -98,7 +99,8 @@ public class Iteration : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey
     /// <param name="dateRange"></param>
     /// <param name="teamId"></param>
     /// <param name="ownershipInfo"></param>
+    /// <param name="externalMetadata"></param>
     /// <returns></returns>
-    public static Iteration Create(string name, IterationType type, IterationState state, IterationDateRange dateRange, Guid? teamId, OwnershipInfo ownershipInfo)
-        => new(name, type, state, dateRange, teamId, ownershipInfo);
+    public static Iteration Create(string name, IterationType type, IterationState state, IterationDateRange dateRange, Guid? teamId, OwnershipInfo ownershipInfo, List<KeyValueObjectMetadata> externalMetadata)
+        => new(name, type, state, dateRange, teamId, ownershipInfo, externalMetadata);
 }

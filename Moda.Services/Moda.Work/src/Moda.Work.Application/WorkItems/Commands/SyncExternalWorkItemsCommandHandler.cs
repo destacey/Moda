@@ -116,12 +116,14 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
                         }
                         else if (parentWorkItemInfo.Tier != WorkTypeTier.Portfolio)
                         {
-                            _logger.LogDebug("Only portfolio tier work items can be parents. Unable to map parent for work item {ExternalId} in workspace {WorkspaceId}.", externalWorkItem.Id, workspace.Id);
+                            if (_logger.IsEnabled(LogLevel.Debug))
+                                _logger.LogDebug("Only portfolio tier work items can be parents. Unable to map parent for work item {ExternalId} in workspace {WorkspaceId}.", externalWorkItem.Id, workspace.Id);
                             parentWorkItemInfo = null;
                         }
                         else if (workType.Level!.Tier == WorkTypeTier.Portfolio && workType.Level.Order <= parentWorkItemInfo.LevelOrder)
                         {
-                            _logger.LogDebug("The parent must be a higher level than the work item {ExternalId} in workspace {WorkspaceId}.", externalWorkItem.Id, workspace.Id);
+                            if (_logger.IsEnabled(LogLevel.Debug))
+                                _logger.LogDebug("The parent must be a higher level than the work item {ExternalId} in workspace {WorkspaceId}.", externalWorkItem.Id, workspace.Id);
                             parentWorkItemInfo = null;
                         }
                     }
@@ -193,7 +195,6 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
                         }
 
                         _logger.LogError(ex, "Exception thrown while syncing external work item {ExternalId} in workspace {WorkspaceId} ({WorkspaceName}).", externalWorkItem.Id, workspace.Id, workspace.Name);
-                        _logger.LogDebug("LOCATION-196");
 
                         syncLog.ItemError();
                         continue;
@@ -207,11 +208,11 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
 
                 await _workDbContext.SaveChangesAsync(cancellationToken);
 
-                _logger.LogInformation("Synced {ChunkCount} of {TotalChuncks} for workspace {WorkspaceId} ({WorkspaceName}).", c++, chunks.Count, workspace.Id, workspace.Name);
+                _logger.LogInformation("Synced {ChunkCount} of {TotalChunks} for workspace {WorkspaceId} ({WorkspaceName}).", c++, chunks.Count, workspace.Id, workspace.Name);
             }
 
-            //await MapMissingParents(workspace, missingParents, cancellationToken);
-            //await SyncParentProjectIds(workspace, workTypes, cancellationToken);
+            await MapMissingParents(workspace, missingParents, cancellationToken);
+            await SyncParentProjectIds(workspace, workTypes, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -232,7 +233,9 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
 
     private async Task MapMissingParents(Workspace workspace, Dictionary<int, int> missingParents, CancellationToken cancellationToken)
     {
-        _logger.LogDebug("Mapping {WorkItemCount} missing parents for workspace {WorkspaceId}.", missingParents.Count, workspace.Id);
+        if (_logger.IsEnabled(LogLevel.Debug))
+            _logger.LogDebug("Mapping {WorkItemCount} missing parents for workspace {WorkspaceId}.", missingParents.Count, workspace.Id);
+
         if (missingParents.Count == 0)
         {
             return;
@@ -259,16 +262,22 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
 
             if (parentInfo is null)
             {
-                _logger.LogDebug("Unable to map missing parent for work item {ExternalId} in workspace {WorkspaceId}.", workItem.ExternalId, workspace.Id);
+                if (_logger.IsEnabled(LogLevel.Debug))
+                    _logger.LogDebug("Unable to map missing parent for work item {ExternalId} in workspace {WorkspaceId}.", workItem.ExternalId, workspace.Id);
             }
             else
             {
                 var result = workItem.UpdateParent(parentInfo, workItem.Type);
-                if (result.IsFailure)
+                if (result.IsFailure && _logger.IsEnabled(LogLevel.Debug))
                 {
                     if (workItem.ParentId.HasValue)
+                    {
                         _logger.LogDebug("Broken parent link for work item {ExternalId} in workspace {WorkspaceId}. {Error}", workItem.ExternalId, workspace.Id, result.Error);
-                    _logger.LogDebug("Unable to map parent for work item {ExternalId} in workspace {WorkspaceId}. {Error}", workItem.ExternalId, workspace.Id, result.Error);
+                    }
+                    else
+                    {
+                        _logger.LogDebug("Unable to map parent for work item {ExternalId} in workspace {WorkspaceId}. {Error}", workItem.ExternalId, workspace.Id, result.Error);
+                    }
                 }
             }
         }
@@ -278,7 +287,8 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
 
     private async Task SyncParentProjectIds(Workspace workspace, HashSet<WorkType> workTypes, CancellationToken cancellationToken)
     {
-        _logger.LogDebug("Syncing parent project ids for workspace {WorkspaceId}.", workspace.Id);
+        if (_logger.IsEnabled(LogLevel.Debug))
+            _logger.LogDebug("Syncing parent project ids for workspace {WorkspaceId}.", workspace.Id);
 
         if (workTypes.Any(t => t.Level is null))
         {
@@ -333,7 +343,8 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
             }
         }
 
-        _logger.LogDebug("Synced {UpdateCount} parent project ids for workspace {WorkspaceId}.", updateCount, workspace.Id);
+        if (_logger.IsEnabled(LogLevel.Debug))
+            _logger.LogDebug("Synced {UpdateCount} parent project ids for workspace {WorkspaceId}.", updateCount, workspace.Id);
     }
 
     private sealed record WorkStatusMapping(int WorkTypeId, WorkStatus WorkStatus, WorkStatusCategory WorkStatusCategory);
