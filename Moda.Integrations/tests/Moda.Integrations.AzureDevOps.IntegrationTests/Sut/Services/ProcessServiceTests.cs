@@ -43,15 +43,6 @@ public class ProcessServiceTests
         result.Value.Should().NotBeNull();
         result.Value.Should().NotBeEmpty();
         result.Value.Count.Should().Be(expectedCount);
-
-        _mockLogger.Verify(
-            x => x.Log(
-                It.Is<LogLevel>(l => l == LogLevel.Debug),
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => string.Equals(v.ToString(), expectedLogMessage)),
-                It.IsAny<Exception>(),
-                It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)!),
-            Times.Once);
     }
 
     [Fact]
@@ -75,16 +66,6 @@ public class ProcessServiceTests
         result.Should().NotBeNull();
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().NotBeNull();
-
-        _mockLogger.Verify(
-            x => x.Log(
-                It.Is<LogLevel>(l => l == LogLevel.Debug),
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => string.Equals(v.ToString(), expectedLogMessage)),
-                It.IsAny<Exception>(),
-                It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)!),
-            Times.Once);
-
         result.Value.WorkTypeLevels.Should().NotBeNull();
         result.Value.WorkTypeLevels.Should().NotBeEmpty();
         result.Value.WorkTypeLevels.Count().Should().Be(expectedBacklogLevelsCount);

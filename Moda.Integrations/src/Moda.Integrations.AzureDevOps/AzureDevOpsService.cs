@@ -1,6 +1,4 @@
-﻿using System.Security.Cryptography;
-using System.Text;
-using Ardalis.GuardClauses;
+﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
@@ -10,6 +8,7 @@ using Moda.Common.Application.Models;
 using Moda.Integrations.AzureDevOps.Models.Projects;
 using Moda.Integrations.AzureDevOps.Models.WorkItems;
 using Moda.Integrations.AzureDevOps.Services;
+using Moda.Integrations.AzureDevOps.Utils;
 
 namespace Moda.Integrations.AzureDevOps;
 
@@ -177,7 +176,7 @@ public class AzureDevOpsService(ILogger<AzureDevOpsService> logger, IServiceProv
 
     private async Task<Result<List<IterationDto>>> GetOrFetchIterationsAsync(string organizationUrl, string token, string projectName, Dictionary<Guid, Guid?>? teamSettings, CancellationToken cancellationToken, bool forceRefresh = false)
     {
-        var cacheKey = GetCacheKey("azdo-iterations", organizationUrl, projectName, teamSettings);
+        var cacheKey = CacheKeyGenerator.GetCacheKey("azdo-iterations", organizationUrl, projectName, teamSettings);
 
         if (!forceRefresh && _memoryCache.TryGetValue(cacheKey, out List<IterationDto>? cached) && cached is not null)
         {
@@ -220,34 +219,5 @@ public class AzureDevOpsService(ILogger<AzureDevOpsService> logger, IServiceProv
             Type type when type == typeof(GeneralService) => (TService)Activator.CreateInstance(typeof(GeneralService), organizationUrl, token, _apiVersion, logger)!,
             _ => throw new NotImplementedException(),
         };
-    }
-
-    private static string GetCacheKey(string resourceType, string organizationUrl, string projectIdOrName, Dictionary<Guid, Guid?>? teamSettings, string? extra = null)
-    {
-        // Normalize organization host (avoid duplicate keys for URL variants)
-        var orgHost = Uri.TryCreate(organizationUrl, UriKind.Absolute, out var uri)
-            ? uri.Host.ToLowerInvariant() 
-            : organizationUrl.ToLowerInvariant();
-
-        // Deterministic teamSettings representation
-        var teamPart = teamSettings is null || teamSettings.Count == 0
-            ? "no-teams"
-            : string.Join("|", teamSettings.OrderBy(kvp => kvp.Key)
-                                          .Select(kvp => $"{kvp.Key}:{(kvp.Value.HasValue ? kvp.Value.Value.ToString("D") : "null")}"));
-
-        // Build a compact fingerprint for teamSettings + extra params
-        var fingerprintSource = teamPart + (extra is null ? string.Empty : "|" + extra);
-        var fingerprint = ComputeSha256Hex(fingerprintSource);
-
-        return $"{resourceType}::{orgHost}::{projectIdOrName}::{fingerprint}";
-    }
-
-    private static string ComputeSha256Hex(string input)
-    {
-        // Encode once, compute hash via the static API
-        var bytes = Encoding.UTF8.GetBytes(input);
-        var hash = SHA256.HashData(bytes);
-
-        return Convert.ToHexString(hash).ToLowerInvariant();
     }
 }

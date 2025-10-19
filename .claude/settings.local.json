@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet test \"d:\\source\\repos\\Moda\\Moda.Integrations\\tests\\Moda.Integrations.AzureDevOps.Tests\\Moda.Integrations.AzureDevOps.Tests.csproj\" --filter \"FullyQualifiedName~ProjectServiceTests\" --verbosity minimal)",
+      "Bash(dotnet test \"d:\\source\\repos\\Moda\\Moda.Integrations\\tests\\Moda.Integrations.AzureDevOps.Tests\\Moda.Integrations.AzureDevOps.Tests.csproj\" --verbosity minimal)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

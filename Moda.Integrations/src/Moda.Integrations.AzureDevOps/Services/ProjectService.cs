@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using Moda.Common.Application.Interfaces.ExternalWork;
 using Moda.Common.Extensions;
 using Moda.Integrations.AzureDevOps.Clients;
-using Moda.Integrations.AzureDevOps.Extensions;
 using Moda.Integrations.AzureDevOps.Models;
 using Moda.Integrations.AzureDevOps.Models.Projects;
 
@@ -15,6 +14,15 @@ internal sealed class ProjectService(string organizationUrl, string token, strin
     private readonly ILogger<ProjectService> _logger = logger;
     private readonly int _maxBatchSize = 100;
 
+    /// <summary>
+    /// Retrieves a list of projects from Azure DevOps in batches.
+    /// </summary>
+    /// <remarks>This method fetches projects in batches to handle large datasets efficiently. It continues
+    /// retrieving batches until all projects are fetched or an error occurs. If an error occurs during the retrieval
+    /// process, the method logs the error and returns a failure result.</remarks>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests. The operation will terminate early if the token is canceled.</param>
+    /// <returns>A <see cref="Result{T}"/> containing a list of <see cref="ProjectDto"/> objects if the operation is successful;
+    /// otherwise, a failure result with an error message.</returns>
     public async Task<Result<List<ProjectDto>>> GetProjects(CancellationToken cancellationToken)
     {
         try
@@ -51,6 +59,16 @@ internal sealed class ProjectService(string organizationUrl, string token, strin
         }
     }
 
+    /// <summary>
+    /// Retrieves the details of a project, including its properties, from Azure DevOps.
+    /// </summary>
+    /// <remarks>This method fetches the project details and its associated properties from Azure DevOps. If
+    /// the project or its properties cannot be retrieved due to an error or if they do not exist, the method logs the
+    /// error and returns a failure result.</remarks>
+    /// <param name="projectId">The unique identifier of the project to retrieve.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>A <see cref="Result{T}"/> containing the project details as a <see cref="ProjectDetailsDto"/> if successful;
+    /// otherwise, a failure result with an error message.</returns>
     public async Task<Result<ProjectDetailsDto>> GetProject(Guid projectId, CancellationToken cancellationToken)
     {
         try
@@ -94,6 +112,12 @@ internal sealed class ProjectService(string organizationUrl, string token, strin
         }
     }
 
+    /// <summary>
+    /// Retrieves the teams for the specified project IDs from Azure DevOps.
+    /// </summary>
+    /// <param name="projectIds"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     public async Task<Result<List<IExternalTeam>>> GetTeams(Guid[] projectIds, CancellationToken cancellationToken)
     {
         List<IExternalTeam> teams = [];
@@ -155,6 +179,17 @@ internal sealed class ProjectService(string organizationUrl, string token, strin
         }
     }
 
+    /// <summary>
+    /// Retrieves the area paths for a specified project from Azure DevOps.
+    /// </summary>
+    /// <remarks>This method retrieves the hierarchical area paths for the specified project by querying Azure
+    /// DevOps. If the operation is unsuccessful, the result will contain an error message. If no area paths are found,
+    /// the result will indicate failure with an appropriate message.</remarks>
+    /// <param name="projectName">The name of the project for which to retrieve area paths. Cannot be null or empty.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>A <see cref="Task{TResult}"/> representing the asynchronous operation. The result contains a <see
+    /// cref="Result{T}"/> object that holds a list of <see cref="ClassificationNodeResponse"/> representing the area
+    /// paths if successful, or an error message if the operation fails.</returns>
     public async Task<Result<List<ClassificationNodeResponse>>> GetAreaPaths(string projectName, CancellationToken cancellationToken)
     {
         try
@@ -185,6 +220,19 @@ internal sealed class ProjectService(string organizationUrl, string token, strin
         }
     }
 
+    /// <summary>
+    /// Retrieves a list of iterations for the specified project, optionally mapping iterations to team settings.
+    /// </summary>
+    /// <remarks>This method retrieves iteration paths from Azure DevOps for the specified project. If team
+    /// settings are provided, the method maps iterations to the corresponding teams. The method logs errors and
+    /// warnings for unsuccessful operations or when no iterations are found.</remarks>
+    /// <param name="projectName">The name of the project for which to retrieve iterations. Cannot be null or empty.</param>
+    /// <param name="teamSettings">An optional dictionary mapping team IDs to their corresponding iteration IDs. If provided, the method will
+    /// associate iterations with the specified teams.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>A <see cref="Task{TResult}"/> representing the asynchronous operation. The result contains a <see
+    /// cref="Result{T}"/> object that holds a list of <see cref="IterationDto"/> instances if successful, or an error
+    /// message if the operation fails.</returns>
     public async Task<Result<List<IterationDto>>> GetIterations(string projectName, Dictionary<Guid, Guid?>? teamSettings, CancellationToken cancellationToken)
     {
         try
@@ -203,20 +251,64 @@ internal sealed class ProjectService(string organizationUrl, string token, strin
 
             Dictionary<Guid, Guid> iterationTeamMapping = ConvertTeamSettingsToIterationTeamMapping(teamSettings);
 
-            var iterationPaths = ((IterationNodeDto)response.Data)
-                .SetTeamIds(iterationTeamMapping)
-                .FlattenHierarchy(a => a.Children, IterationDto.FromIterationNodeDto)
-                .ToList();
+            var iterations = FlattenAndSetTeamIds(response.Data, iterationTeamMapping).ToList();
 
             if (_logger.IsEnabled(LogLevel.Debug))
-                _logger.LogDebug("{IterationCount} iterations found for project {ProjectId}.", iterationPaths.Count, projectName);
+                _logger.LogDebug("{IterationCount} iterations found for project {ProjectId}.", iterations.Count, projectName);
 
-            return iterationPaths;
+            return iterations;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Exception thrown getting iterations for project {ProjectId} from Azure DevOps", projectName);
             return Result.Failure<List<IterationDto>>(ex.ToString());
+        }
+    }
+
+    /// <summary>
+    /// Performs a single-pass traversal of the iteration hierarchy to flatten it and assign team IDs.
+    /// This optimized approach eliminates the need for intermediate DTO conversions and multiple tree traversals.
+    /// </summary>
+    /// <param name="root">The root iteration node from Azure DevOps</param>
+    /// <param name="iterationTeamMapping">Mapping of iteration IDs to team IDs</param>
+    /// <returns>Flattened list of iterations with team IDs assigned</returns>
+    private static IEnumerable<IterationDto> FlattenAndSetTeamIds(
+        IterationNodeResponse root,
+        Dictionary<Guid, Guid> iterationTeamMapping)
+    {
+        Stack<(IterationNodeResponse Node, Guid? ParentTeamId)> stack = new();
+        stack.Push((root, null));
+
+        while (stack.Count > 0)
+        {
+            var (current, parentTeamId) = stack.Pop();
+
+            // Determine team ID: use mapped value if exists, otherwise inherit from parent
+            var teamId = iterationTeamMapping.TryGetValue(current.Identifier, out var mappedTeamId)
+                ? mappedTeamId
+                : parentTeamId;
+
+            // Yield flattened result immediately - no intermediate allocations
+            yield return new IterationDto
+            {
+                Id = current.Id,
+                Identifier = current.Identifier,
+                Name = current.Name,
+                Path = current.Path,
+                TeamId = teamId,
+                StartDate = current.Attributes?.StartDate,
+                EndDate = current.Attributes?.EndDate,
+                HasChildren = current.Children is not null && current.Children.Count != 0
+            };
+
+            // Push children onto stack with inherited team ID
+            if (current.Children is not null)
+            {
+                foreach (var child in current.Children)
+                {
+                    stack.Push((child, teamId));
+                }
+            }
         }
     }
 

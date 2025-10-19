@@ -23,19 +23,6 @@ internal sealed record IterationDto
     public DateTime? EndDate { get; set; }
 
     public bool HasChildren { get; set; }
-
-    public static Func<IterationNodeDto, IterationDto> FromIterationNodeDto =>
-        iterationNodeDto => new IterationDto()
-        {
-            Id = iterationNodeDto.Id,
-            Identifier = iterationNodeDto.Identifier,
-            Name = iterationNodeDto.Name,
-            Path = iterationNodeDto.Path,
-            TeamId = iterationNodeDto.TeamId,
-            StartDate = iterationNodeDto.StartDate,
-            EndDate = iterationNodeDto.EndDate,
-            HasChildren = iterationNodeDto.Children is not null && iterationNodeDto.Children.Count != 0
-        };
 }
 
 internal static class IterationDtoExtensions
