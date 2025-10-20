@@ -36,6 +36,13 @@ public sealed class AzureDevOpsBoardsInitManager(ILogger<AzureDevOpsBoardsInitMa
                 return Result.Failure($"The configuration for connection {connectionId} is not valid.");
             }
 
+            var testConnectionResult = await _azureDevOpsService.TestConnection(connection.Configuration.OrganizationUrl, connection.Configuration.PersonalAccessToken);
+            if (testConnectionResult.IsFailure)
+            {
+                _logger.LogError("Unable to connect to Azure DevOps for connection {ConnectionId}. {Error}", connectionId, testConnectionResult.Error);
+                return Result.Failure($"Unable to connect to Azure DevOps for connection {connectionId}. {testConnectionResult.Error}");
+            }
+
             // Load Processes
             var workProcessesResult = await _azureDevOpsService.GetWorkProcesses(connection.Configuration.OrganizationUrl, connection.Configuration.PersonalAccessToken, cancellationToken);
             if (workProcessesResult.IsFailure)
@@ -67,16 +74,16 @@ public sealed class AzureDevOpsBoardsInitManager(ILogger<AzureDevOpsBoardsInitMa
             List<IExternalTeam> teams = [];
             if (workspaces.Count != 0)
             {
-                var teamsResult = await _azureDevOpsService.GetTeams(connection.Configuration.OrganizationUrl, connection.Configuration.PersonalAccessToken, workspaces.Select(w => w.ExternalId).ToArray(), cancellationToken);
+                var teamsResult = await _azureDevOpsService.GetTeams(connection.Configuration.OrganizationUrl, connection.Configuration.PersonalAccessToken, [.. workspaces.Select(w => w.ExternalId)], cancellationToken);
                 if (teamsResult.IsFailure)
                     return teamsResult;
 
                 teams = teamsResult.Value;
             }
 
-            var bulkUpsertResult = await _sender.Send(new SyncAzureDevOpsBoardsConnectionConfigurationCommand(connectionId, processes, workspaces, existingWorkProcessIntegrationStates, teams), cancellationToken);
+            var syncConfigurationResult = await _sender.Send(new SyncAzureDevOpsBoardsConnectionConfigurationCommand(connectionId, processes, workspaces, existingWorkProcessIntegrationStates, teams), cancellationToken);
 
-            return Result.Success();
+            return syncConfigurationResult;
         }
         catch (Exception ex)
         {

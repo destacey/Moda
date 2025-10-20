@@ -5000,13 +5000,13 @@
         ]
       }
     },
-    "/api/planning/planning-intervals/iteration-types": {
+    "/api/planning/planning-intervals/iteration-categories": {
       "get": {
         "tags": [
           "PlanningIntervals"
         ],
-        "summary": "Get a list of iteration types.",
-        "operationId": "PlanningIntervals_GetIterationTypes",
+        "summary": "Get a list of iteration categories.",
+        "operationId": "PlanningIntervals_GetIterationCategories",
         "responses": {
           "200": {
             "description": "",
@@ -5015,7 +5015,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/PlanningIntervalIterationTypeDto"
+                    "$ref": "#/components/schemas/PlanningIntervalIterationCategoryDto"
                   }
                 }
               }
@@ -15173,7 +15173,7 @@
         "additionalProperties": false,
         "required": [
           "name",
-          "typeId",
+          "categoryId",
           "start",
           "end"
         ],
@@ -15191,9 +15191,9 @@
             "minLength": 1,
             "nullable": false
           },
-          "typeId": {
+          "categoryId": {
             "type": "integer",
-            "description": "The type of iteration.",
+            "description": "The category of iteration.",
             "format": "int32"
           },
           "start": {
@@ -15246,7 +15246,7 @@
           "name",
           "start",
           "end",
-          "type"
+          "category"
         ],
         "properties": {
           "id": {
@@ -15270,12 +15270,12 @@
             "type": "string",
             "format": "date"
           },
-          "type": {
+          "category": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
           }
         }
       },
-      "PlanningIntervalIterationTypeDto": {
+      "PlanningIntervalIterationCategoryDto": {
         "type": "object",
         "additionalProperties": false,
         "required": [
@@ -19329,6 +19329,10 @@
           "name": {
             "type": "string"
           },
+          "systemId": {
+            "type": "string",
+            "nullable": true
+          },
           "connector": {
             "type": "string"
           },
@@ -19367,6 +19371,10 @@
             "type": "string"
           },
           "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "systemId": {
             "type": "string",
             "nullable": true
           },
@@ -19588,28 +19596,28 @@
         "properties": {
           "name": {
             "type": "string",
-            "description": "Gets or sets the name of the connection.",
+            "description": "The name of the connection.",
             "maxLength": 256,
             "minLength": 1,
             "nullable": false
           },
           "description": {
             "type": "string",
-            "description": "Gets or sets the description.",
+            "description": "The description of the connection.",
             "maxLength": 1024,
             "minLength": 0,
             "nullable": true
           },
           "organization": {
             "type": "string",
-            "description": "Gets the organization.",
+            "description": "The Azure DevOps Organization name.",
             "maxLength": 128,
             "minLength": 1,
             "nullable": false
           },
           "personalAccessToken": {
             "type": "string",
-            "description": "Gets the personal access token.",
+            "description": "The personal access token that enables access to Azure DevOps Boards data.",
             "maxLength": 128,
             "minLength": 1,
             "nullable": false

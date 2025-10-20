@@ -17,12 +17,12 @@ internal sealed class ProjectClient : BaseClient
         request.AddParameter("$top", top);
         request.AddParameter("$skip", skip);
 
-        return await _client.ExecuteAsync<AzdoListResponse<ProjectDto>>(request, cancellationToken);
+        return await _client.ExecuteAsync<AzdoListResponse<ProjectDto>>(request, cancellationToken).ConfigureAwait(false);
     }
 
-    internal async Task<RestResponse<ProjectDto>> GetProject(Guid projectId, CancellationToken cancellationToken)
+    internal async Task<RestResponse<ProjectDto>> GetProject(string projectIdOrName, CancellationToken cancellationToken)
     {
-        var request = new RestRequest($"/_apis/projects/{projectId}", Method.Get);
+        var request = new RestRequest($"/_apis/projects/{projectIdOrName}", Method.Get);
         SetupRequest(request);
 
         return await _client.ExecuteAsync<ProjectDto>(request, cancellationToken);
@@ -34,7 +34,7 @@ internal sealed class ProjectClient : BaseClient
         SetupRequest(request, true);
         request.AddParameter("keys", "System.ProcessTemplateType");
 
-        return await _client.ExecuteAsync<ListResponse<PropertyDto>>(request, cancellationToken);
+        return await _client.ExecuteAsync<ListResponse<PropertyDto>>(request, cancellationToken).ConfigureAwait(false);
     }
 
     internal async Task<RestResponse<ListResponse<TeamDto>>> GetProjectTeams(Guid projectId, CancellationToken cancellationToken)
@@ -42,7 +42,7 @@ internal sealed class ProjectClient : BaseClient
         var request = new RestRequest($"/_apis/projects/{projectId}/teams", Method.Get);
         SetupRequest(request);
 
-        return await _client.ExecuteAsync<ListResponse<TeamDto>>(request, cancellationToken);
+        return await _client.ExecuteAsync<ListResponse<TeamDto>>(request, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -57,7 +57,7 @@ internal sealed class ProjectClient : BaseClient
         var request = new RestRequest($"/{projectId}/{teamId}/_apis/work/teamsettings", Method.Get);
         SetupRequest(request);
 
-        return await _client.ExecuteAsync<TeamSettingsResponse>(request, cancellationToken);
+        return await _client.ExecuteAsync<TeamSettingsResponse>(request, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -72,7 +72,7 @@ internal sealed class ProjectClient : BaseClient
         SetupRequest(request);
         request.AddParameter("$depth", 100); // TODO: make this configurable
 
-        return await _client.ExecuteAsync<ClassificationNodeResponse>(request, cancellationToken);
+        return await _client.ExecuteAsync<ClassificationNodeResponse>(request, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -81,12 +81,12 @@ internal sealed class ProjectClient : BaseClient
     /// <param name="projectName"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    internal async Task<RestResponse<ClassificationNodeResponse>> GetIterationPaths(string projectName, CancellationToken cancellationToken)
+    internal async Task<RestResponse<IterationNodeResponse>> GetIterationPaths(string projectName, CancellationToken cancellationToken)
     {
         var request = new RestRequest($"/{projectName}/_apis/wit/classificationnodes/iterations", Method.Get);
         SetupRequest(request);
         request.AddParameter("$depth", 100); // TODO: make this configurable
 
-        return await _client.ExecuteAsync<ClassificationNodeResponse>(request, cancellationToken);
+        return await _client.ExecuteAsync<IterationNodeResponse>(request, cancellationToken).ConfigureAwait(false);
     }
 }

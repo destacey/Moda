@@ -1,6 +1,7 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
 using Moda.Common.Domain.Enums.Organization;
+using Moda.Common.Domain.Enums.Planning;
 using Moda.Common.Domain.Interfaces;
 using Moda.Planning.Domain.Enums;
 using Moda.Planning.Domain.Interfaces;
@@ -178,7 +179,7 @@ public class PlanningInterval : BaseSoftDeletableEntity<Guid>, ILocalSchedule, I
         // update existing iterations
         foreach (var iteration in iterations.Where(x => !x.IsNew))
         {
-            var updateResult = UpdateIteration(iteration.Id!.Value, iteration.Name, iteration.Type, iteration.DateRange);
+            var updateResult = UpdateIteration(iteration.Id!.Value, iteration.Name, iteration.Category, iteration.DateRange);
             if (updateResult.IsFailure)
                 return Result.Failure(updateResult.Error);
         }
@@ -186,7 +187,7 @@ public class PlanningInterval : BaseSoftDeletableEntity<Guid>, ILocalSchedule, I
         // add new iterations
         foreach (var iteration in iterations.Where(x => x.IsNew))
         {
-            var addResult = AddIteration(iteration.Name, iteration.Type, iteration.DateRange);
+            var addResult = AddIteration(iteration.Name, iteration.Category, iteration.DateRange);
             if (addResult.IsFailure)
                 return Result.Failure(addResult.Error);
         }
@@ -226,7 +227,7 @@ public class PlanningInterval : BaseSoftDeletableEntity<Guid>, ILocalSchedule, I
     /// <returns></returns>
     public Result InitializeIterations(int iterationWeeks, string? iterationPrefix)
     {
-        if (Iterations.Any())
+        if (Iterations.Count != 0)
             return Result.Failure("Unable to generate new iterations for a Planning Interval that has iterations.");
 
         var iterationStart = DateRange.Start;
@@ -236,15 +237,15 @@ public class PlanningInterval : BaseSoftDeletableEntity<Guid>, ILocalSchedule, I
         {
             var iterationName = $"{iterationPrefix}{iterationCount}";
             var iterationEnd = iterationStart.PlusDays(iterationWeeks * 7 - 1);
-            var iterationType = IterationType.Development;
+            var iterationCategory = IterationCategory.Development;
             if (iterationEnd >= DateRange.End)
             {
                 iterationEnd = DateRange.End;
-                iterationType = IterationType.InnovationAndPlanning;
+                iterationCategory = IterationCategory.InnovationAndPlanning;
                 isLastIteration = true;
             }
 
-            var addIterationResult = AddIteration(iterationName, iterationType, new LocalDateRange(iterationStart, iterationEnd));
+            var addIterationResult = AddIteration(iterationName, iterationCategory, new LocalDateRange(iterationStart, iterationEnd));
             if (addIterationResult.IsFailure)
                 return Result.Failure(addIterationResult.Error);
 
@@ -258,7 +259,7 @@ public class PlanningInterval : BaseSoftDeletableEntity<Guid>, ILocalSchedule, I
         return Result.Success();
     }
 
-    public Result AddIteration(string name, IterationType type, LocalDateRange dateRange)
+    public Result AddIteration(string name, IterationCategory category, LocalDateRange dateRange)
     {
         if (Iterations.Any(x => x.Name == name))
             return Result.Failure("Iteration name already exists.");
@@ -272,19 +273,19 @@ public class PlanningInterval : BaseSoftDeletableEntity<Guid>, ILocalSchedule, I
         if (dateRange.End > DateRange.End)
             return Result.Failure("Iteration date range cannot end after the Planning Interval date range.");
 
-        var iteration = new PlanningIntervalIteration(Id, name, type, dateRange);
+        var iteration = new PlanningIntervalIteration(Id, name, category, dateRange);
         _iterations.Add(iteration);
 
         return Result.Success();
     }
 
-    private Result UpdateIteration(Guid iterationId, string name, IterationType type, LocalDateRange dateRange)
+    private Result UpdateIteration(Guid iterationId, string name, IterationCategory category, LocalDateRange dateRange)
     {
         var existingIteration = _iterations.FirstOrDefault(x => x.Id == iterationId);
         if (existingIteration == null)
             return Result.Failure($"Iteration {iterationId} not found.");
 
-        var updateResult = existingIteration.Update(name, type, dateRange);
+        var updateResult = existingIteration.Update(name, category, dateRange);
         return updateResult.IsSuccess ? Result.Success() : Result.Failure(updateResult.Error);
     }
 

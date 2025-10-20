@@ -6368,10 +6368,10 @@ export class PlanningIntervalsClient {
     }
 
     /**
-     * Get a list of iteration types.
+     * Get a list of iteration categories.
      */
-    getIterationTypes( cancelToken?: CancelToken): Promise<PlanningIntervalIterationTypeDto[]> {
-        let url_ = this.baseUrl + "/api/planning/planning-intervals/iteration-types";
+    getIterationCategories( cancelToken?: CancelToken): Promise<PlanningIntervalIterationCategoryDto[]> {
+        let url_ = this.baseUrl + "/api/planning/planning-intervals/iteration-categories";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -6390,11 +6390,11 @@ export class PlanningIntervalsClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processGetIterationTypes(_response);
+            return this.processGetIterationCategories(_response);
         });
     }
 
-    protected processGetIterationTypes(response: AxiosResponse): Promise<PlanningIntervalIterationTypeDto[]> {
+    protected processGetIterationCategories(response: AxiosResponse): Promise<PlanningIntervalIterationCategoryDto[]> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -6409,7 +6409,7 @@ export class PlanningIntervalsClient {
             let result200: any = null;
             let resultData200  = _responseText;
             result200 = JSON.parse(resultData200);
-            return Promise.resolve<PlanningIntervalIterationTypeDto[]>(result200);
+            return Promise.resolve<PlanningIntervalIterationCategoryDto[]>(result200);
 
         } else if (status === 400) {
             const _responseText = response.data;
@@ -6422,7 +6422,7 @@ export class PlanningIntervalsClient {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<PlanningIntervalIterationTypeDto[]>(null as any);
+        return Promise.resolve<PlanningIntervalIterationCategoryDto[]>(null as any);
     }
 
     /**
@@ -15810,8 +15810,8 @@ export interface PlanningIntervalIterationUpsertRequest {
     iterationId?: string | undefined;
     /** The name of the iteration. */
     name: string;
-    /** The type of iteration. */
-    typeId: number;
+    /** The category of iteration. */
+    categoryId: number;
     /** Gets or sets the start. */
     start: Date;
     /** Gets or sets the end. */
@@ -15831,10 +15831,10 @@ export interface PlanningIntervalIterationListDto {
     name: string;
     start: Date;
     end: Date;
-    type: SimpleNavigationDto;
+    category: SimpleNavigationDto;
 }
 
-export interface PlanningIntervalIterationTypeDto {
+export interface PlanningIntervalIterationCategoryDto {
     id: number;
     name: string;
     description?: string | undefined;
@@ -16799,6 +16799,7 @@ export interface HealthStatusDto {
 export interface ConnectionListDto {
     id: string;
     name: string;
+    systemId?: string | undefined;
     connector: string;
     isActive: boolean;
     isValidConfiguration: boolean;
@@ -16809,6 +16810,7 @@ export interface AzureDevOpsBoardsConnectionDetailsDto {
     id: string;
     name: string;
     description?: string | undefined;
+    systemId?: string | undefined;
     connector: string;
     configuration: AzureDevOpsBoardsConnectionConfigurationDto;
     teamConfiguration: AzureDevOpsBoardsTeamConfigurationDto;
@@ -16860,13 +16862,13 @@ export interface AzureDevOpsBoardsWorkspaceTeamDto {
 }
 
 export interface CreateAzureDevOpsBoardConnectionRequest {
-    /** Gets or sets the name of the connection. */
+    /** The name of the connection. */
     name: string;
-    /** Gets or sets the description. */
+    /** The description of the connection. */
     description?: string | undefined;
-    /** Gets the organization. */
+    /** The Azure DevOps Organization name. */
     organization: string;
-    /** Gets the personal access token. */
+    /** The personal access token that enables access to Azure DevOps Boards data. */
     personalAccessToken: string;
 }
 

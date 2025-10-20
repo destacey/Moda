@@ -11,6 +11,11 @@ public sealed record ConnectionListDto : IMapFrom<Connection>
     /// <value>The name of the connection.</value>
     public required string Name { get; set; }
 
+    /// <summary>
+    /// The unique identifier for the system that this connection connects to. 
+    /// </summary>
+    public string? SystemId { get; set; }
+
     /// <summary>Gets the type of connector.  This value cannot change.</summary>
     /// <value>The type of connector.</value>
     public required string Connector { get; set; }

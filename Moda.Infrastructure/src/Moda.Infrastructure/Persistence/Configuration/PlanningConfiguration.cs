@@ -2,8 +2,11 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Moda.Common.Domain.Enums;
 using Moda.Common.Domain.Enums.Organization;
+using Moda.Common.Domain.Enums.Planning;
+using Moda.Common.Domain.Models;
 using Moda.Planning.Domain.Enums;
 using Moda.Planning.Domain.Models;
+using Moda.Planning.Domain.Models.Iterations;
 using Moda.Planning.Domain.Models.Roadmaps;
 
 namespace Moda.Infrastructure.Persistence.Configuration;
@@ -100,20 +103,20 @@ public class PlanningIntervalIterationConfig : IEntityTypeConfiguration<Planning
         builder.HasAlternateKey(i => i.Key);
 
         builder.HasIndex(i => new { i.Id, i.IsDeleted })
-            .IncludeProperties(i => new { i.Key, i.PlanningIntervalId, i.Name, i.Type })
+            .IncludeProperties(i => new { i.Key, i.PlanningIntervalId, i.Name, i.Category })
             .HasFilter("[IsDeleted] = 0");
         builder.HasIndex(i => new { i.Key, i.IsDeleted })
-            .IncludeProperties(i => new { i.Id, i.PlanningIntervalId, i.Name, i.Type })
+            .IncludeProperties(i => new { i.Id, i.PlanningIntervalId, i.Name, i.Category })
             .HasFilter("[IsDeleted] = 0");
         builder.HasIndex(i => new { i.PlanningIntervalId, i.IsDeleted })
-            .IncludeProperties(i => new { i.Id, i.Key, i.Name, i.Type })
+            .IncludeProperties(i => new { i.Id, i.Key, i.Name, i.Category })
             .HasFilter("[IsDeleted] = 0");
 
         builder.Property(i => i.Key).ValueGeneratedOnAdd();
 
         builder.Property(i => i.Name).HasMaxLength(128).IsRequired();
-        builder.Property(i => i.Type).IsRequired()
-            .HasConversion<EnumConverter<IterationType>>()
+        builder.Property(i => i.Category).IsRequired()
+            .HasConversion<EnumConverter<IterationCategory>>()
             .HasColumnType("varchar")
             .HasMaxLength(32);
 
@@ -467,6 +470,88 @@ public class RoadmapMilestoneConfiguration : IEntityTypeConfiguration<RoadmapMil
 }
 
 #endregion Roadmaps
+
+#region Iterations
+
+public class IterationConfig : IEntityTypeConfiguration<Iteration>
+{
+    public void Configure(EntityTypeBuilder<Iteration> builder)
+    {
+        builder.ToTable("Iterations", SchemaNames.Planning);
+
+        builder.HasKey(i => i.Id);
+        builder.HasAlternateKey(i => i.Key);
+
+        // Properties
+        builder.Property(i => i.Key).ValueGeneratedOnAdd();
+        builder.Property(i => i.Name).HasMaxLength(256).IsRequired();
+
+        builder.Property(i => i.Type).IsRequired()
+            .HasConversion<EnumConverter<IterationType>>()
+            .HasColumnType("varchar")
+            .HasMaxLength(32);
+
+        builder.Property(i => i.State).IsRequired()
+            .HasConversion<EnumConverter<IterationState>>()
+            .HasColumnType("varchar")
+            .HasMaxLength(32);
+
+        // Value Objects
+        builder.ComplexProperty(i => i.DateRange, options =>
+        {
+            options.Property(d => d.Start).HasColumnName("Start");
+            options.Property(d => d.End).HasColumnName("End");
+        });
+
+        builder.ComplexProperty(i => i.OwnershipInfo, options =>
+        {
+            options.Property(o => o.Ownership).HasColumnName("Ownership")
+                .HasConversion<EnumConverter<Ownership>>()
+                .HasColumnType("varchar")
+                .HasMaxLength(32)
+                .IsRequired();
+            options.Property(o => o.SystemId).HasColumnName("SystemId")
+                .HasMaxLength(128);
+            options.Property(o => o.ExternalId).HasColumnName("ExternalId")
+                .HasMaxLength(128);
+
+        });
+
+        // Ignore
+        builder.Ignore(i => i.ExternalMetadataManager);
+
+        // Relationships
+        builder.HasOne(o => o.Team)
+            .WithMany()
+            .HasForeignKey(p => p.TeamId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(i => i.ExternalMetadata)
+            .WithOne()
+            .HasForeignKey(m => m.ObjectId)
+            .OnDelete(DeleteBehavior.Cascade);
+    }
+}
+
+public class IterationExternalMetadata : IEntityTypeConfiguration<KeyValueObjectMetadata>
+{
+    public void Configure(EntityTypeBuilder<KeyValueObjectMetadata> builder)
+    {
+        builder.ToTable("IterationExternalMetadata", SchemaNames.Planning);
+
+        builder.HasKey(m => new { m.ObjectId, m.Name });
+
+        builder.HasIndex(m => m.ObjectId)
+            .IncludeProperties(m => new { m.Name, m.Value });
+
+        builder.Property(m => m.ObjectId).IsRequired();
+        builder.Property(m => m.Name).IsRequired().HasMaxLength(128);
+        builder.Property(m => m.Value).HasMaxLength(4000);
+    }
+}
+
+
+#endregion Iterations
 
 
 public class SimpleHealthCheckConfig : IEntityTypeConfiguration<SimpleHealthCheck>

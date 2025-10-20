@@ -178,15 +178,16 @@ export const planningIntervalApi = apiSlice.injectEndpoints({
         { type: QueryTags.PlanningIntervalIteration, id: arg }, // typically arg is the key
       ],
     }),
-    getPlanningIntervalIterationTypeOptions: builder.query<
+    getPlanningIntervalIterationCategoryOptions: builder.query<
       OptionModel<number>[],
       void
     >({
       queryFn: async () => {
         try {
-          const types = await getPlanningIntervalsClient().getIterationTypes()
+          const categories =
+            await getPlanningIntervalsClient().getIterationCategories()
 
-          const data: OptionModel<number>[] = types
+          const data: OptionModel<number>[] = categories
             .sort((a, b) => a.order - b.order)
             .map((t) => ({
               label: t.name,
@@ -610,7 +611,7 @@ export const {
   useGetPlanningIntervalCalendarQuery,
   useGetPlanningIntervalPredictabilityQuery,
   useGetPlanningIntervalIterationsQuery,
-  useGetPlanningIntervalIterationTypeOptionsQuery,
+  useGetPlanningIntervalIterationCategoryOptionsQuery,
   useGetPlanningIntervalTeamsQuery,
   useGetPlanningIntervalTeamPredictabilityQuery,
   useGetPlanningIntervalObjectivesQuery,

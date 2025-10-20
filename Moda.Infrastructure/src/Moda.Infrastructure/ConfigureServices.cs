@@ -25,6 +25,8 @@ public static class ConfigureServices
 
         services.AddSingleton<IClock>(SystemClock.Instance);
 
+        services.AddMemoryCache();
+
         // INTEGRATIONS
         services.AddTransient<IAzureDevOpsService, AzureDevOpsService>();
         services.AddScoped<IExternalEmployeeDirectoryService, MicrosoftGraphService>();

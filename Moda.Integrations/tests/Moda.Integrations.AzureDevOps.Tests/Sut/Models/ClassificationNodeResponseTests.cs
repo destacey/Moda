@@ -4,7 +4,7 @@ using Moda.Integrations.AzureDevOps.Models;
 using Moda.Integrations.AzureDevOps.Tests.Models;
 
 namespace Moda.Integrations.AzureDevOps.Tests.Sut.Models;
-public class ClassificationNodeDtoTests : CommonResponseOptions
+public class ClassificationNodeResponseTests : CommonResponseOptions
 {
     [Fact]
     public void JsonSerilizer_Deserialize_Succeeds()

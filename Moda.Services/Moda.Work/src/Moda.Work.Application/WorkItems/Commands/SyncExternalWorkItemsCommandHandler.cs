@@ -51,8 +51,8 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
                 return Result.Failure($"Unable to sync external work items for workspace {workspace.Id} because the workspace does not have a work process.");
             }
 
-            HashSet<WorkType> workTypes = [];
-            HashSet<WorkStatusMapping> workStatusMappings = [];
+            var workTypes = new HashSet<WorkType>();
+            var workStatusMappings = new HashSet<WorkStatusMapping>();
 
             foreach (var scheme in workProcess.Schemes)
             {
@@ -71,30 +71,65 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
                 }
             }
 
-            var employees = (await _workDbContext.Employees.Select(e => new { e.Id, e.Email }).ToListAsync(cancellationToken)).ToHashSet();
+            // Build dictionaries for fast lookups
+            var workTypeByName = workTypes.ToDictionary(t => t.Name, t => t);
+            var workStatusMap = workStatusMappings.ToDictionary(m => (m.WorkTypeId, m.WorkStatus.Name), m => m);
+
+            // Build dictionary for employees referenced by the incoming payload to avoid loading all employees
+            var referencedEmails = request.WorkItems
+                .SelectMany(w => new[] { w.CreatedBy, w.LastModifiedBy, w.AssignedTo })
+                .Where(e => !string.IsNullOrWhiteSpace(e))
+                .Select(e => e!.Trim())
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+
+            // Batch the employee queries to avoid very large IN lists (SQL parameter limits)
+            var employeesByEmail = new Dictionary<string, Guid>(StringComparer.OrdinalIgnoreCase);
+            if (referencedEmails.Length > 0)
+            {
+                const int batchSize = 1000; // safe batch size under SQL parameter limits
+                foreach (var batch in referencedEmails.Chunk(batchSize))
+                {
+                    var rows = await _workDbContext.Employees
+                        .Where(e => batch.Contains(e.Email))
+                        .Select(e => new { e.Id, e.Email })
+                        .ToListAsync(cancellationToken);
+
+                    foreach (var r in rows)
+                    {
+                        employeesByEmail[r.Email.Value] = r.Id;
+                    }
+                }
+            }
 
             // TODO: how do we handle parents in other workspaces, but in the same Azdo org?
-            var potentialParents = (await _workDbContext.WorkItems
+            var potentialParents = await _workDbContext.WorkItems
                     .Where(w => w.WorkspaceId == request.WorkspaceId)
                     .ProjectToType<WorkItemParentInfo>()
-                    .ToArrayAsync(cancellationToken))
-                .ToHashSet();
+                    .ToArrayAsync(cancellationToken);
 
-            int chunkSize = 1000;
-            var chunks = request.WorkItems.OrderBy(w => w.LastModified).Chunk(chunkSize);
+            // Create a dictionary keyed by ExternalId for O(1) parent lookups
+            var potentialParentsByExternalId = potentialParents
+                .Where(p => p.ExternalId.HasValue)
+                .ToDictionary(p => p.ExternalId!.Value, p => (IWorkItemParentInfo)p);
+
+            int chunkSize = 2000;
+            var chunks = request.WorkItems.OrderBy(w => w.LastModified).Chunk(chunkSize).ToList();
 
             var missingParents = new Dictionary<int, int>();
+            int c = 1;
             foreach (var chunk in chunks)
             {
-                // TODO: this is not a performant way to do this.  Make it better.
-                await _workDbContext.Entry(workspace)
-                    .Collection(w => w.WorkItems)
-                    .Query()
+                // Query existing work items for this chunk directly instead of loading the workspace navigation collection
+                var chunkExternalIds = chunk.Select(x => x.Id).ToArray();
+                var existingWorkItems = await _workDbContext.WorkItems
                     .Include(wi => wi.ExtendedProps)
                     .Include(wi => wi.Type)
                         .ThenInclude(t => t.Level)
-                    .Where(wi => chunk.Select(c => c.Id).Contains(wi.ExternalId!.Value))
-                    .LoadAsync(cancellationToken);
+                    .Where(wi => wi.WorkspaceId == workspace.Id && chunkExternalIds.Contains(wi.ExternalId!.Value))
+                    .ToListAsync(cancellationToken);
+
+                var existingByExternalId = existingWorkItems.ToDictionary(wi => wi.ExternalId!.Value, wi => wi);
 
                 List<WorkItem> newWorkItems = new(chunkSize);
 
@@ -102,40 +137,67 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
                 {
                     syncLog.ItemRequested(externalWorkItem.Id);
 
-                    var workType = workTypes.Single(t => t.Name == externalWorkItem.WorkType);
-                    var workFlowSchemeData = workStatusMappings.Single(m => m.WorkTypeId == workType.Id && m.WorkStatus.Name == externalWorkItem.WorkStatus);
+                    if (!workTypeByName.TryGetValue(externalWorkItem.WorkType, out var workType))
+                    {
+                        if (_logger.IsEnabled(LogLevel.Debug))
+                            _logger.LogDebug("Unknown work type {WorkType} for external work item {ExternalId} in workspace {WorkspaceId}.", externalWorkItem.WorkType, externalWorkItem.Id, workspace.Id);
+                        syncLog.ItemError();
+                        continue;
+                    }
+
+                    if (!workStatusMap.TryGetValue((workType.Id, externalWorkItem.WorkStatus), out var workFlowSchemeData))
+                    {
+                        if (_logger.IsEnabled(LogLevel.Debug))
+                            _logger.LogDebug("Unknown work status {WorkStatus} for external work item {ExternalId} in workspace {WorkspaceId}.", externalWorkItem.WorkStatus, externalWorkItem.Id, workspace.Id);
+                        syncLog.ItemError();
+                        continue;
+                    }
 
                     IWorkItemParentInfo? parentWorkItemInfo = null;
                     if (externalWorkItem.ParentId.HasValue)
                     {
-                        parentWorkItemInfo = potentialParents.FirstOrDefault(wi => wi.ExternalId == externalWorkItem.ParentId.Value);
-                        if (parentWorkItemInfo is null)
+                        // Use dictionary lookup instead of scanning the collection for each item
+                        if (!potentialParentsByExternalId.TryGetValue(externalWorkItem.ParentId.Value, out parentWorkItemInfo))
                         {
                             missingParents.Add(externalWorkItem.Id, externalWorkItem.ParentId.Value);
                         }
                         else if (parentWorkItemInfo.Tier != WorkTypeTier.Portfolio)
                         {
-                            _logger.LogDebug("Only portfolio tier work items can be parents. Unable to map parent for work item {ExternalId} in workspace {WorkspaceId}.", externalWorkItem.Id, workspace.Id);
+                            if (_logger.IsEnabled(LogLevel.Debug))
+                                _logger.LogDebug("Only portfolio tier work items can be parents. Unable to map parent for work item {ExternalId} in workspace {WorkspaceId}.", externalWorkItem.Id, workspace.Id);
                             parentWorkItemInfo = null;
                         }
                         else if (workType.Level!.Tier == WorkTypeTier.Portfolio && workType.Level.Order <= parentWorkItemInfo.LevelOrder)
                         {
-                            _logger.LogDebug("The parent must be a higher level than the work item {ExternalId} in workspace {WorkspaceId}.", externalWorkItem.Id, workspace.Id);
+                            if (_logger.IsEnabled(LogLevel.Debug))
+                                _logger.LogDebug("The parent must be a higher level than the work item {ExternalId} in workspace {WorkspaceId}.", externalWorkItem.Id, workspace.Id);
                             parentWorkItemInfo = null;
                         }
                     }
 
-                    var workItem = workspace.WorkItems.FirstOrDefault(wi => wi.ExternalId == externalWorkItem.Id);
+                    existingByExternalId.TryGetValue(externalWorkItem.Id, out var workItem);
                     try
                     {
                         Guid? teamId = null;
                         if (externalWorkItem.TeamId.HasValue)
                         {
-                            request.teamMappings.TryGetValue(externalWorkItem.TeamId.Value, out teamId);
+                            request.TeamMappings.TryGetValue(externalWorkItem.TeamId.Value, out teamId);
                         }
 
                         if (workItem is null)
                         {
+                            Guid? createdById = null;
+                            if (!string.IsNullOrWhiteSpace(externalWorkItem.CreatedBy) && employeesByEmail.TryGetValue(externalWorkItem.CreatedBy, out var tmpCreated))
+                                createdById = tmpCreated;
+
+                            Guid? lastModifiedById = null;
+                            if (!string.IsNullOrWhiteSpace(externalWorkItem.LastModifiedBy) && employeesByEmail.TryGetValue(externalWorkItem.LastModifiedBy, out var tmpLastModified))
+                                lastModifiedById = tmpLastModified;
+
+                            Guid? assignedToId = null;
+                            if (!string.IsNullOrWhiteSpace(externalWorkItem.AssignedTo) && employeesByEmail.TryGetValue(externalWorkItem.AssignedTo, out var tmpAssigned))
+                                assignedToId = tmpAssigned;
+
                             workItem = WorkItem.CreateExternal(
                                 workspace,
                                 externalWorkItem.Id,
@@ -146,10 +208,10 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
                                 parentWorkItemInfo,
                                 teamId,
                                 externalWorkItem.Created,
-                                employees.SingleOrDefault(e => e.Email == externalWorkItem.CreatedBy)?.Id,
+                                createdById,
                                 externalWorkItem.LastModified,
-                                employees.SingleOrDefault(e => e.Email == externalWorkItem.LastModifiedBy)?.Id,
-                                employees.SingleOrDefault(e => e.Email == externalWorkItem.AssignedTo)?.Id,
+                                lastModifiedById,
+                                assignedToId,
                                 externalWorkItem.Priority,
                                 externalWorkItem.StackRank,
                                 externalWorkItem.ActivatedTimestamp,
@@ -162,6 +224,14 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
                         }
                         else
                         {
+                            Guid? lastModifiedById = null;
+                            if (!string.IsNullOrWhiteSpace(externalWorkItem.LastModifiedBy) && employeesByEmail.TryGetValue(externalWorkItem.LastModifiedBy, out var tmpLastModified))
+                                lastModifiedById = tmpLastModified;
+
+                            Guid? assignedToId = null;
+                            if (!string.IsNullOrWhiteSpace(externalWorkItem.AssignedTo) && employeesByEmail.TryGetValue(externalWorkItem.AssignedTo, out var tmpAssigned))
+                                assignedToId = tmpAssigned;
+
                             workItem.Update(
                                 externalWorkItem.Title,
                                 workType,
@@ -170,8 +240,8 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
                                 parentWorkItemInfo,
                                 teamId,
                                 externalWorkItem.LastModified,
-                                employees.SingleOrDefault(e => e.Email == externalWorkItem.LastModifiedBy)?.Id,
-                                employees.SingleOrDefault(e => e.Email == externalWorkItem.AssignedTo)?.Id,
+                                lastModifiedById,
+                                assignedToId,
                                 externalWorkItem.Priority,
                                 externalWorkItem.StackRank,
                                 externalWorkItem.ActivatedTimestamp,
@@ -204,6 +274,8 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
                 }
 
                 await _workDbContext.SaveChangesAsync(cancellationToken);
+
+                _logger.LogInformation("Synced {ChunkCount} of {TotalChunks} for workspace {WorkspaceId} ({WorkspaceName}).", c++, chunks.Count, workspace.Id, workspace.Name);
             }
 
             await MapMissingParents(workspace, missingParents, cancellationToken);
@@ -228,7 +300,9 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
 
     private async Task MapMissingParents(Workspace workspace, Dictionary<int, int> missingParents, CancellationToken cancellationToken)
     {
-        _logger.LogDebug("Mapping {WorkItemCount} missing parents for workspace {WorkspaceId}.", missingParents.Count, workspace.Id);
+        if (_logger.IsEnabled(LogLevel.Debug))
+            _logger.LogDebug("Mapping {WorkItemCount} missing parents for workspace {WorkspaceId}.", missingParents.Count, workspace.Id);
+
         if (missingParents.Count == 0)
         {
             return;
@@ -255,16 +329,22 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
 
             if (parentInfo is null)
             {
-                _logger.LogDebug("Unable to map missing parent for work item {ExternalId} in workspace {WorkspaceId}.", workItem.ExternalId, workspace.Id);
+                if (_logger.IsEnabled(LogLevel.Debug))
+                    _logger.LogDebug("Unable to map missing parent for work item {ExternalId} in workspace {WorkspaceId}.", workItem.ExternalId, workspace.Id);
             }
             else
             {
                 var result = workItem.UpdateParent(parentInfo, workItem.Type);
-                if (result.IsFailure)
+                if (result.IsFailure && _logger.IsEnabled(LogLevel.Debug))
                 {
                     if (workItem.ParentId.HasValue)
+                    {
                         _logger.LogDebug("Broken parent link for work item {ExternalId} in workspace {WorkspaceId}. {Error}", workItem.ExternalId, workspace.Id, result.Error);
-                    _logger.LogDebug("Unable to map parent for work item {ExternalId} in workspace {WorkspaceId}. {Error}", workItem.ExternalId, workspace.Id, result.Error);
+                    }
+                    else
+                    {
+                        _logger.LogDebug("Unable to map parent for work item {ExternalId} in workspace {WorkspaceId}. {Error}", workItem.ExternalId, workspace.Id, result.Error);
+                    }
                 }
             }
         }
@@ -274,7 +354,8 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
 
     private async Task SyncParentProjectIds(Workspace workspace, HashSet<WorkType> workTypes, CancellationToken cancellationToken)
     {
-        _logger.LogDebug("Syncing parent project ids for workspace {WorkspaceId}.", workspace.Id);
+        if (_logger.IsEnabled(LogLevel.Debug))
+            _logger.LogDebug("Syncing parent project ids for workspace {WorkspaceId}.", workspace.Id);
 
         if (workTypes.Any(t => t.Level is null))
         {
@@ -285,7 +366,7 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
         int updateCount = 0;
 
         // WorkTypeTier.Other tier is not a valid target for project ids
-        WorkTypeTier[] tiers = [WorkTypeTier.Portfolio, WorkTypeTier.Requirement, WorkTypeTier.Task];
+        WorkTypeTier[] tiers = new[] { WorkTypeTier.Portfolio, WorkTypeTier.Requirement, WorkTypeTier.Task };
         var topTierLevelSkipped = false;
         foreach (var tier in tiers)
         {            
@@ -329,7 +410,8 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
             }
         }
 
-        _logger.LogDebug("Synced {UpdateCount} parent project ids for workspace {WorkspaceId}.", updateCount, workspace.Id);
+        if (_logger.IsEnabled(LogLevel.Debug))
+            _logger.LogDebug("Synced {UpdateCount} parent project ids for workspace {WorkspaceId}.", updateCount, workspace.Id);
     }
 
     private sealed record WorkStatusMapping(int WorkTypeId, WorkStatus WorkStatus, WorkStatusCategory WorkStatusCategory);

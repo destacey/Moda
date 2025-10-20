@@ -1,26 +1,28 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.IO;
+using System.Threading;
+using Microsoft.EntityFrameworkCore;
 using Moda.Common.Application.Interfaces.ExternalWork;
 using Moda.Common.Domain.Models;
 using NodaTime;
 
 namespace Moda.AppIntegration.Application.Connections.Commands;
 
-public sealed record SyncAzureDevOpsBoardsConnectionConfigurationCommand(Guid ConnectionId, IEnumerable<AzureDevOpsBoardsWorkProcess> WorkProcesses, IEnumerable<AzureDevOpsBoardsWorkspace> Workspaces, IEnumerable<IntegrationRegistration<Guid, Guid>> WorkProcessIntegrationRegistrations, List<IExternalTeam> Teams) : ICommand;
+public sealed record SyncAzureDevOpsBoardsConnectionConfigurationCommand(
+    Guid ConnectionId,
+    IEnumerable<AzureDevOpsBoardsWorkProcess> WorkProcesses,
+    IEnumerable<AzureDevOpsBoardsWorkspace> Workspaces,
+    IEnumerable<IntegrationRegistration<Guid, Guid>> WorkProcessIntegrationRegistrations,
+    List<IExternalTeam> Teams)
+    : ICommand;
 
-internal sealed class SyncAzureDevOpsBoardsConnectionConfigurationCommandHandler : ICommandHandler<SyncAzureDevOpsBoardsConnectionConfigurationCommand>
+internal sealed class SyncAzureDevOpsBoardsConnectionConfigurationCommandHandler(IAppIntegrationDbContext appIntegrationDbContext, IDateTimeProvider dateTimeProvider, ILogger<SyncAzureDevOpsBoardsConnectionConfigurationCommandHandler> logger, IAzureDevOpsService azureDevOpsService) : ICommandHandler<SyncAzureDevOpsBoardsConnectionConfigurationCommand>
 {
     private const string AppRequestName = nameof(SyncAzureDevOpsBoardsConnectionConfigurationCommand);
 
-    private readonly IAppIntegrationDbContext _appIntegrationDbContext;
-    private readonly Instant _timestamp;
-    private readonly ILogger<SyncAzureDevOpsBoardsConnectionConfigurationCommandHandler> _logger;
-
-    public SyncAzureDevOpsBoardsConnectionConfigurationCommandHandler(IAppIntegrationDbContext appIntegrationDbContext, IDateTimeProvider dateTimeProvider, ILogger<SyncAzureDevOpsBoardsConnectionConfigurationCommandHandler> logger)
-    {
-        _appIntegrationDbContext = appIntegrationDbContext;
-        _timestamp = dateTimeProvider.Now;
-        _logger = logger;
-    }
+    private readonly IAppIntegrationDbContext _appIntegrationDbContext = appIntegrationDbContext;
+    private readonly Instant _timestamp = dateTimeProvider.Now;
+    private readonly ILogger<SyncAzureDevOpsBoardsConnectionConfigurationCommandHandler> _logger = logger;
+    private readonly IAzureDevOpsService _azureDevOpsService = azureDevOpsService;
 
     public async Task<Result> Handle(SyncAzureDevOpsBoardsConnectionConfigurationCommand request, CancellationToken cancellationToken)
     {
@@ -29,6 +31,14 @@ internal sealed class SyncAzureDevOpsBoardsConnectionConfigurationCommandHandler
         {
             _logger.LogError("Unable to find Azure DevOps Boards connection with id {ConnectionId}.", request.ConnectionId);
             return Result.Failure($"Unable to find Azure DevOps Boards connection with id {request.ConnectionId}.");
+        }
+
+        // this is a temporary process to set the SystemId if it is missing
+        if (string.IsNullOrWhiteSpace(connection.SystemId))
+        {
+            var setSystemIdResult = await SetConnectionSystemId(connection, cancellationToken);
+            if (setSystemIdResult.IsFailure)
+                return setSystemIdResult;
         }
 
         var importWorkProcessesResult = connection.SyncProcesses(request.WorkProcesses, _timestamp);
@@ -71,5 +81,26 @@ internal sealed class SyncAzureDevOpsBoardsConnectionConfigurationCommandHandler
 
             return Result.Failure($"Errors occurred while processing {AppRequestName}.");
         }
+    }
+
+    private async Task<Result> SetConnectionSystemId(AzureDevOpsBoardsConnection connection, CancellationToken cancellationToken)
+    {
+        var config = new AzureDevOpsBoardsConnectionConfiguration(connection.Configuration.Organization, connection.Configuration.PersonalAccessToken);
+
+        var systemIdResult = await _azureDevOpsService.GetSystemId(config.OrganizationUrl, config.PersonalAccessToken, cancellationToken);
+        if (systemIdResult.IsFailure)
+        {
+            _logger.LogError("Unable to get system id for Azure DevOps Boards connection {ConnectionId}. {Error}", connection.Id, systemIdResult.Error);
+            return Result.Failure($"Unable to get system id for Azure DevOps Boards connection for organization {connection.Configuration.Organization}.");
+        }
+
+        var setSystemIdResult = connection.SetSystemId(systemIdResult.Value);
+        if (setSystemIdResult.IsFailure)
+        {
+            _logger.LogError("Error setting system id for connection {ConnectionId} to {SystemId}. {Error}", connection.Id, systemIdResult.Value, setSystemIdResult.Error);
+            return Result.Failure($"Error setting system id for connection {connection.Id} to {systemIdResult.Value}. {setSystemIdResult.Error}");
+        }
+
+        return Result.Success();
     }
 }

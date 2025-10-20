@@ -2,6 +2,7 @@
 using Moda.AppIntegration.Application.Interfaces;
 using Moda.AppIntegration.Domain.Models;
 using Moda.Common.Application.Interfaces;
+using Moda.Common.Domain.Enums.AppIntegrations;
 using Moda.Organization.Application.BaseTeams.Queries;
 using Moda.Web.Api.Extensions;
 using Moda.Web.Api.Models.AppIntegrations.Connections;

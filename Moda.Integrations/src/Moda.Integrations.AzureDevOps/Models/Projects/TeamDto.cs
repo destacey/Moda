@@ -1,5 +1,4 @@
-﻿using Moda.Common.Application.Interfaces.ExternalWork;
-using Moda.Integrations.AzureDevOps.Models.Contracts;
+﻿using Moda.Integrations.AzureDevOps.Models.Contracts;
 
 namespace Moda.Integrations.AzureDevOps.Models.Projects;
 internal record TeamDto

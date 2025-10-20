@@ -16,7 +16,7 @@ public class UnhandledExceptionBehavior<TRequest, TResponse> : IPipelineBehavior
     {
         try
         {
-            return await next();
+            return await next(cancellationToken);
         }
         catch (Exception ex)
         {

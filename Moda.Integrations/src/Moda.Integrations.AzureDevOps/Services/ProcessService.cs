@@ -15,7 +15,7 @@ internal sealed class ProcessService(string organizationUrl, string token, strin
     {
         try
         {
-            var response = await _processClient.GetProcesses(cancellationToken);
+            var response = await _processClient.GetProcesses(cancellationToken).ConfigureAwait(false);
             if (!response.IsSuccessful)
             {
                 _logger.LogError("Error getting processes from Azure DevOps: {ErrorMessage}.", response.ErrorMessage);
@@ -23,12 +23,14 @@ internal sealed class ProcessService(string organizationUrl, string token, strin
             }
             else if (response.StatusCode == System.Net.HttpStatusCode.NonAuthoritativeInformation)
             {
+                _logger.LogError("The request was not authorized with Azure DevOps.");
                 return Result.Failure<List<AzdoWorkProcess>>("The request was not authorized with Azure DevOps.");
             }
 
             var processes = response.Data?.Items.ToAzdoWorkProcesses() ?? [];
-
-            _logger.LogDebug("{ProcessCount} processes found.", processes.Count);
+            
+            if (_logger.IsEnabled(LogLevel.Debug))
+                _logger.LogDebug("{ProcessCount} processes found.", processes.Count);
 
             return Result.Success(processes);
         }
@@ -43,15 +45,15 @@ internal sealed class ProcessService(string organizationUrl, string token, strin
     {
         try
         {
-            var processResult = await GetProcessById(processId, cancellationToken);
+            var processResult = await GetProcessById(processId, cancellationToken).ConfigureAwait(false);
             if (processResult.IsFailure)
                 return Result.Failure<AzdoWorkProcessConfiguration>(processResult.Error);
 
-            var behaviorsResult = await GetProcessBehaviors(processId, cancellationToken);
+            var behaviorsResult = await GetProcessBehaviors(processId, cancellationToken).ConfigureAwait(false);
             if (behaviorsResult.IsFailure)
                 return Result.Failure<AzdoWorkProcessConfiguration>(behaviorsResult.Error);
 
-            var workTypesResult = await GetProcessWorkItemTypes(processId, cancellationToken);
+            var workTypesResult = await GetProcessWorkItemTypes(processId, cancellationToken).ConfigureAwait(false);
             if (workTypesResult.IsFailure)
                 return Result.Failure<AzdoWorkProcessConfiguration>(workTypesResult.Error);
 
@@ -66,7 +68,7 @@ internal sealed class ProcessService(string organizationUrl, string token, strin
 
     private async Task<Result<ProcessDto>> GetProcessById(Guid processId, CancellationToken cancellationToken)
     {
-        var response = await _processClient.GetProcess(processId, cancellationToken);
+        var response = await _processClient.GetProcess(processId, cancellationToken).ConfigureAwait(false);
         if (!response.IsSuccessful && response.StatusCode != HttpStatusCode.NotFound)
         {
             var statusDescription = response.StatusCode is 0 ? "Connection Error" : response.StatusDescription;
@@ -81,35 +83,38 @@ internal sealed class ProcessService(string organizationUrl, string token, strin
             return Result.Failure<ProcessDto>(errorMesssage);
         }
 
-        _logger.LogDebug("Process {ProcessId} found.", processId);
+        if (_logger.IsEnabled(LogLevel.Debug))
+            _logger.LogDebug("Process {ProcessId} found.", processId);
 
         return Result.Success(response.Data);
     }
 
     private async Task<Result<List<BehaviorDto>>> GetProcessBehaviors(Guid processId, CancellationToken cancellationToken)
     {
-        var response = await _processClient.GetBehaviors(processId, cancellationToken);
+        var response = await _processClient.GetBehaviors(processId, cancellationToken).ConfigureAwait(false);
         if (!response.IsSuccessful)
         {
             _logger.LogError("Error getting behaviors for process {ProcessId} from Azure DevOps: {ErrorMessage}.", processId, response.ErrorMessage);
             return Result.Failure<List<BehaviorDto>>(response.ErrorMessage);
         }
 
-        _logger.LogDebug("{BehaviorCount} behaviors found for process {ProcessId}.", response.Data?.Count ?? 0, processId);
+        if (_logger.IsEnabled(LogLevel.Debug))
+            _logger.LogDebug("{BehaviorCount} behaviors found for process {ProcessId}.", response.Data?.Count ?? 0, processId);
 
         return Result.Success(response.Data?.Items ?? []);
     }
 
     private async Task<Result<List<ProcessWorkItemTypeDto>>> GetProcessWorkItemTypes(Guid processId, CancellationToken cancellationToken)
     {
-        var response = await _processClient.GetWorkItemTypes(processId, cancellationToken);
+        var response = await _processClient.GetWorkItemTypes(processId, cancellationToken).ConfigureAwait(false);
         if (!response.IsSuccessful)
         {
             _logger.LogError("Error getting work item types for process {ProcessId} from Azure DevOps: {ErrorMessage}.", processId, response.ErrorMessage);
             return Result.Failure<List<ProcessWorkItemTypeDto>>(response.ErrorMessage);
         }
 
-        _logger.LogDebug("{WorkItemTypeCount} work item types found for process {ProcessId}.", response.Data?.Count ?? 0, processId);
+        if (_logger.IsEnabled(LogLevel.Debug))
+            _logger.LogDebug("{WorkItemTypeCount} work item types found for process {ProcessId}.", response.Data?.Count ?? 0, processId);
 
         return Result.Success(response.Data?.Items ?? []);
     }

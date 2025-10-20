@@ -10,7 +10,7 @@ namespace Moda.Common.Application.Requests.WorkManagement;
 /// <param name="ExternalWorkProcess"></param>
 /// <param name="ExternalWorkTypes">Includes data for work types associated to the work process.</param>
 /// <param name="WorkflowMappings">Includes data to map work types to their workflows.</param>
-public sealed record UpdateExternalWorkProcessCommand(IExternalWorkProcessConfiguration ExternalWorkProcess, IEnumerable<IExternalWorkType> ExternalWorkTypes, IEnumerable<ICreateWorkProcessScheme> WorkflowMappings) : ICommand;
+public sealed record UpdateExternalWorkProcessCommand(IExternalWorkProcessConfiguration ExternalWorkProcess, IEnumerable<IExternalWorkType> ExternalWorkTypes, IEnumerable<ICreateWorkProcessScheme> WorkflowMappings) : ICommand, ILongRunningRequest;
 
 public sealed class UpdateExternalWorkProcessCommandValidator : CustomValidator<UpdateExternalWorkProcessCommand>
 {

@@ -1,5 +1,5 @@
 ﻿namespace Moda.Organization.Application.Teams.Commands;
-public sealed record SyncTeamNodesCommand() : ICommand;
+public sealed record SyncTeamNodesCommand() : ICommand, ILongRunningRequest;
 
 internal sealed class SyncTeamNodesCommandHandler(IOrganizationDbContext organizationDbContext, ILogger<SyncTeamNodesCommandHandler> logger) : ICommandHandler<SyncTeamNodesCommand>
 {

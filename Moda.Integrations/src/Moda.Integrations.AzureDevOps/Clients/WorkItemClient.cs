@@ -30,7 +30,7 @@ internal sealed class WorkItemClient : BaseClient
 
             request.AddJsonBody(wiql);
 
-            var response = await _client.ExecuteAsync<WiqlResponse>(request, cancellationToken);
+            var response = await _client.ExecuteAsync<WiqlResponse>(request, cancellationToken).ConfigureAwait(false);
             if (!response.IsSuccessful)
             {
                 throw new Exception($"Error getting work item ids for project {projectName} from Azure DevOps: {response.ErrorMessage}");
@@ -73,7 +73,7 @@ internal sealed class WorkItemClient : BaseClient
         foreach (var batch in batches)
         {
             request.AddJsonBody(WorkItemsBatchRequest.Create(batch, fields));
-            var response = await _client.ExecuteAsync<ListResponse<WorkItemResponse>>(request, cancellationToken);
+            var response = await _client.ExecuteAsync<ListResponse<WorkItemResponse>>(request, cancellationToken).ConfigureAwait(false);
             if (!response.IsSuccessful)
             {
                 throw new Exception($"Error getting work items for project {projectName} from Azure DevOps: {response.ErrorMessage}");
@@ -127,7 +127,7 @@ internal sealed class WorkItemClient : BaseClient
                 request.AddQueryParameter("continuationToken", continuationToken);
             }
 
-            var response = await _client.ExecuteAsync<BatchResponse<ReportingWorkItemLinkResponse>>(request, cancellationToken);
+            var response = await _client.ExecuteAsync<BatchResponse<ReportingWorkItemLinkResponse>>(request, cancellationToken).ConfigureAwait(false);
 
             if (!response.IsSuccessful)
             {
@@ -159,7 +159,7 @@ internal sealed class WorkItemClient : BaseClient
         var request = new RestRequest($"/{projectName}/_apis/wit/recyclebin", Method.Get);
         SetupRequest(request);
 
-        var response = await _client.ExecuteAsync<ListResponse<WiqlWorkItemResponse>>(request, cancellationToken);
+        var response = await _client.ExecuteAsync<ListResponse<WiqlWorkItemResponse>>(request, cancellationToken).ConfigureAwait(false);
 
         return response.IsSuccessful
             ? response.Data?.Value.Select(w => w.Id).ToArray() ?? []

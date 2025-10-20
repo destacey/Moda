@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Moda.AppIntegration.Domain.Enums;
+using Moda.Common.Domain.Enums;
+using Moda.Common.Domain.Enums.AppIntegrations;
 
 namespace Moda.Infrastructure.Persistence.Configuration;
 
@@ -24,11 +25,11 @@ public class ConnectionConfig : IEntityTypeConfiguration<Connection>
 
         builder.Property(c => c.Name).IsRequired().HasMaxLength(128);
         builder.Property(c => c.Description).HasMaxLength(1024);
-        builder.Property(c => c.Connector)
-            .HasConversion(
-                c => c.ToString(),
-                c => (Connector)Enum.Parse(typeof(Connector), c))
-            .HasMaxLength(128);
+        builder.Property(c => c.SystemId).HasMaxLength(64);
+        builder.Property(w => w.Connector).IsRequired()
+            .HasConversion<EnumConverter<Connector>>()
+            .HasColumnType("varchar")
+            .HasMaxLength(32);
         builder.Property(c => c.IsActive);
         builder.Property(c => c.IsValidConfiguration);
         builder.Property(c => c.IsSyncEnabled);

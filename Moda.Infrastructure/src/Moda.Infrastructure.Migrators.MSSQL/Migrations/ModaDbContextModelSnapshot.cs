@@ -19,7 +19,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("Work")
-                .HasAnnotation("ProductVersion", "9.0.4")
+                .HasAnnotation("ProductVersion", "9.0.9")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -115,8 +115,8 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                     b.Property<string>("Connector")
                         .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar");
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
@@ -156,6 +156,10 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .IsRequired()
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("SystemId")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
 
                     b.HasKey("Id");
 
@@ -307,6 +311,40 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.HasIndex("ObjectId");
 
                     b.ToTable("ExternalEmployeeBlacklistItems", "Organization");
+                });
+
+            modelBuilder.Entity("Moda.Common.Domain.Models.KeyValueObjectMetadata", b =>
+                {
+                    b.Property<Guid>("ObjectId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<DateTime>("SystemCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("SystemCreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("SystemLastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("SystemLastModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Value")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
+
+                    b.HasKey("ObjectId", "Name");
+
+                    b.HasIndex("ObjectId");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("ObjectId"), new[] { "Name", "Value" });
+
+                    b.ToTable("IterationExternalMetadata", "Planning");
                 });
 
             modelBuilder.Entity("Moda.Goals.Domain.Models.Objective", b =>
@@ -964,6 +1002,91 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("TeamMemberships", "Organization");
                 });
 
+            modelBuilder.Entity("Moda.Planning.Domain.Models.Iterations.Iteration", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Key")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Key"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar");
+
+                    b.Property<DateTime>("SystemCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("SystemCreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("SystemLastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("SystemLastModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("TeamId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar");
+
+                    b.ComplexProperty<Dictionary<string, object>>("DateRange", "Moda.Planning.Domain.Models.Iterations.Iteration.DateRange#IterationDateRange", b1 =>
+                        {
+                            b1.IsRequired();
+
+                            b1.Property<DateTime?>("End")
+                                .HasColumnType("datetime2")
+                                .HasColumnName("End");
+
+                            b1.Property<DateTime?>("Start")
+                                .HasColumnType("datetime2")
+                                .HasColumnName("Start");
+                        });
+
+                    b.ComplexProperty<Dictionary<string, object>>("OwnershipInfo", "Moda.Planning.Domain.Models.Iterations.Iteration.OwnershipInfo#OwnershipInfo", b1 =>
+                        {
+                            b1.IsRequired();
+
+                            b1.Property<string>("ExternalId")
+                                .HasMaxLength(128)
+                                .HasColumnType("nvarchar(128)")
+                                .HasColumnName("ExternalId");
+
+                            b1.Property<string>("Ownership")
+                                .IsRequired()
+                                .HasMaxLength(32)
+                                .HasColumnType("varchar")
+                                .HasColumnName("Ownership");
+
+                            b1.Property<string>("SystemId")
+                                .HasMaxLength(128)
+                                .HasColumnType("nvarchar(128)")
+                                .HasColumnName("SystemId");
+                        });
+
+                    b.HasKey("Id");
+
+                    b.HasAlternateKey("Key");
+
+                    b.HasIndex("TeamId");
+
+                    b.ToTable("Iterations", "Planning");
+                });
+
             modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningInterval", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1043,6 +1166,11 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar");
+
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
@@ -1078,11 +1206,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<Guid>("PlanningIntervalId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("varchar");
-
                     b.ComplexProperty<Dictionary<string, object>>("DateRange", "Moda.Planning.Domain.Models.PlanningIntervalIteration.DateRange#LocalDateRange", b1 =>
                         {
                             b1.IsRequired();
@@ -1103,17 +1226,17 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.HasIndex("Id", "IsDeleted")
                         .HasFilter("[IsDeleted] = 0");
 
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Id", "IsDeleted"), new[] { "Key", "PlanningIntervalId", "Name", "Type" });
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Id", "IsDeleted"), new[] { "Key", "PlanningIntervalId", "Name", "Category" });
 
                     b.HasIndex("Key", "IsDeleted")
                         .HasFilter("[IsDeleted] = 0");
 
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Key", "IsDeleted"), new[] { "Id", "PlanningIntervalId", "Name", "Type" });
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Key", "IsDeleted"), new[] { "Id", "PlanningIntervalId", "Name", "Category" });
 
                     b.HasIndex("PlanningIntervalId", "IsDeleted")
                         .HasFilter("[IsDeleted] = 0");
 
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("PlanningIntervalId", "IsDeleted"), new[] { "Id", "Key", "Name", "Type" });
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("PlanningIntervalId", "IsDeleted"), new[] { "Id", "Key", "Name", "Category" });
 
                     b.ToTable("PlanningIntervalIterations", "Planning");
                 });
@@ -3365,6 +3488,15 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Manager");
                 });
 
+            modelBuilder.Entity("Moda.Common.Domain.Models.KeyValueObjectMetadata", b =>
+                {
+                    b.HasOne("Moda.Planning.Domain.Models.Iterations.Iteration", null)
+                        .WithMany("ExternalMetadata")
+                        .HasForeignKey("ObjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Moda.Health.Models.HealthCheck", b =>
                 {
                     b.HasOne("Moda.Common.Domain.Employees.Employee", "ReportedBy")
@@ -3431,6 +3563,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Source");
 
                     b.Navigation("Target");
+                });
+
+            modelBuilder.Entity("Moda.Planning.Domain.Models.Iterations.Iteration", b =>
+                {
+                    b.HasOne("Moda.Planning.Domain.Models.PlanningTeam", "Team")
+                        .WithMany()
+                        .HasForeignKey("TeamId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Team");
                 });
 
             modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningIntervalIteration", b =>
@@ -4302,6 +4444,11 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
             modelBuilder.Entity("Moda.Organization.Domain.Models.BaseTeam", b =>
                 {
                     b.Navigation("ParentMemberships");
+                });
+
+            modelBuilder.Entity("Moda.Planning.Domain.Models.Iterations.Iteration", b =>
+                {
+                    b.Navigation("ExternalMetadata");
                 });
 
             modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningInterval", b =>

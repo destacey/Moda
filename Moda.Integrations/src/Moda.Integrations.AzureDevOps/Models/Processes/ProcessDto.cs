@@ -42,6 +42,6 @@ internal static class ProcessDtoExtensions
 
     public static List<AzdoWorkProcess> ToAzdoWorkProcesses(this List<ProcessDto> processes)
     {
-        return processes.Select(p => p.ToAzdoWorkProcess()).ToList();
+        return [.. processes.Select(p => p.ToAzdoWorkProcess())];
     }
 }

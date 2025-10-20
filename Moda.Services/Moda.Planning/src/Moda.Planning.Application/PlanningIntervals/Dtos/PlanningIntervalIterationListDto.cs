@@ -25,15 +25,15 @@ public sealed record PlanningIntervalIterationListDto : IMapFrom<PlanningInterva
     public required LocalDate End { get; set; }
 
     /// <summary>
-    /// The iteration type.
+    /// The iteration category.
     /// </summary>
-    public required SimpleNavigationDto Type { get; set; }
+    public required SimpleNavigationDto Category { get; set; }
 
     public void ConfigureMapping(TypeAdapterConfig config)
     {
         config.NewConfig<PlanningIntervalIteration, PlanningIntervalIterationListDto>()
             .Map(dest => dest.Start, src => src.DateRange.Start)
             .Map(dest => dest.End, src => src.DateRange.End)
-            .Map(dest => dest.Type, src => SimpleNavigationDto.FromEnum(src.Type));
+            .Map(dest => dest.Category, src => SimpleNavigationDto.FromEnum(src.Category));
     }
 }

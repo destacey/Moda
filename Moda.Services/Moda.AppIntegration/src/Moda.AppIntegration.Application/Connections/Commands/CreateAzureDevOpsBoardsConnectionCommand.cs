@@ -3,32 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using NodaTime;
 
 namespace Moda.AppIntegration.Application.Connections.Commands;
-public sealed record CreateAzureDevOpsBoardsConnectionCommand : ICommand<Guid>
-{
-    public CreateAzureDevOpsBoardsConnectionCommand(string name, string? description, string organization, string personalAccessToken)
-    {
-        Name = name;
-        Description = description;
-        Organization = organization;
-        PersonalAccessToken = personalAccessToken;
-    }
-
-    /// <summary>Gets or sets the name of the connector.</summary>
-    /// <value>The name of the connector.</value>
-    public string Name { get; }
-
-    /// <summary>Gets or sets the description.</summary>
-    /// <value>The connector description.</value>
-    public string? Description { get; }
-
-    /// <summary>Gets the organization.</summary>
-    /// <value>The Azure DevOps Organization name.</value>
-    public string Organization { get; }
-
-    /// <summary>Gets the personal access token.</summary>
-    /// <value>The personal access token that enables access to Azure DevOps Boards data.</value>
-    public string PersonalAccessToken { get; }
-}
+public sealed record CreateAzureDevOpsBoardsConnectionCommand(string Name, string? Description, string Organization, string PersonalAccessToken) : ICommand<Guid>;
 
 public sealed class CreateAzureDevOpsBoardsConnectionCommandValidator : CustomValidator<CreateAzureDevOpsBoardsConnectionCommand>
 {
@@ -64,20 +39,14 @@ public sealed class CreateAzureDevOpsBoardsConnectionCommandValidator : CustomVa
     }
 }
 
-internal sealed class CreateAzureDevOpsBoardsConnectionCommandHandler : ICommandHandler<CreateAzureDevOpsBoardsConnectionCommand, Guid>
+internal sealed class CreateAzureDevOpsBoardsConnectionCommandHandler(IAppIntegrationDbContext appIntegrationDbContext, IDateTimeProvider dateTimeProvider, ILogger<CreateAzureDevOpsBoardsConnectionCommandHandler> logger, IAzureDevOpsService azureDevOpsService) : ICommandHandler<CreateAzureDevOpsBoardsConnectionCommand, Guid>
 {
-    private readonly IAppIntegrationDbContext _appIntegrationDbContext;
-    private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly ILogger<CreateAzureDevOpsBoardsConnectionCommandHandler> _logger;
-    private readonly IAzureDevOpsService _azureDevOpsService;
+    private const string AppRequestName = nameof(CreateAzureDevOpsBoardsConnectionCommandHandler);
 
-    public CreateAzureDevOpsBoardsConnectionCommandHandler(IAppIntegrationDbContext appIntegrationDbContext, IDateTimeProvider dateTimeProvider, ILogger<CreateAzureDevOpsBoardsConnectionCommandHandler> logger, IAzureDevOpsService azureDevOpsService)
-    {
-        _appIntegrationDbContext = appIntegrationDbContext;
-        _dateTimeProvider = dateTimeProvider;
-        _logger = logger;
-        _azureDevOpsService = azureDevOpsService;
-    }
+    private readonly IAppIntegrationDbContext _appIntegrationDbContext = appIntegrationDbContext;
+    private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
+    private readonly ILogger<CreateAzureDevOpsBoardsConnectionCommandHandler> _logger = logger;
+    private readonly IAzureDevOpsService _azureDevOpsService = azureDevOpsService;
 
     public async Task<Result<Guid>> Handle(CreateAzureDevOpsBoardsConnectionCommand request, CancellationToken cancellationToken)
     {
@@ -86,9 +55,14 @@ internal sealed class CreateAzureDevOpsBoardsConnectionCommandHandler : ICommand
             Instant timestamp = _dateTimeProvider.Now;
             var config = new AzureDevOpsBoardsConnectionConfiguration(request.Organization, request.PersonalAccessToken);
 
-            var testConnectionResult = await _azureDevOpsService.TestConnection(config.OrganizationUrl, config.PersonalAccessToken);
+            var systemIdResult = await _azureDevOpsService.GetSystemId(config.OrganizationUrl, config.PersonalAccessToken, cancellationToken);
+            if (systemIdResult.IsFailure)
+            {
+                _logger.LogWarning("Unable to get system id for Azure DevOps Boards connection for organization {Organization}. {Error}", request.Organization, systemIdResult.Error);
+            }
+            var systemId = systemIdResult.IsSuccess ? systemIdResult.Value : null;
 
-            var connection = AzureDevOpsBoardsConnection.Create(request.Name, request.Description, config, testConnectionResult.IsSuccess, null, timestamp);
+            var connection = AzureDevOpsBoardsConnection.Create(request.Name, request.Description, systemId, config, systemIdResult.IsSuccess, null, timestamp);
 
             await _appIntegrationDbContext.AzureDevOpsBoardsConnections.AddAsync(connection, cancellationToken);
 
@@ -98,11 +72,9 @@ internal sealed class CreateAzureDevOpsBoardsConnectionCommandHandler : ICommand
         }
         catch (Exception ex)
         {
-            var requestName = request.GetType().Name;
+            _logger.LogError(ex, "Moda Request: Exception for Request {Name} {@Request}", AppRequestName, request);
 
-            _logger.LogError(ex, "Moda Request: Exception for Request {Name} {@Request}", requestName, request);
-
-            return Result.Failure<Guid>($"Moda Request: Exception for Request {requestName} {request}");
+            return Result.Failure<Guid>($"Moda Request: Exception for Request {AppRequestName} {request}");
         }
     }
 }

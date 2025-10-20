@@ -206,14 +206,14 @@ public class PlanningIntervalsController : ControllerBase
         return Ok(iterations);
     }
 
-    [HttpGet("iteration-types")]
+    [HttpGet("iteration-categories")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.PlanningIntervals)]
-    [OpenApiOperation("Get a list of iteration types.", "")]
+    [OpenApiOperation("Get a list of iteration categories.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IReadOnlyList<PlanningIntervalIterationTypeDto>>> GetIterationTypes(CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<PlanningIntervalIterationCategoryDto>>> GetIterationCategories(CancellationToken cancellationToken)
     {
-        var items = await _sender.Send(new GetPlanningIntervalIterationTypesQuery(), cancellationToken);
+        var items = await _sender.Send(new GetPlanningIntervalIterationCategoriesQuery(), cancellationToken);
         return Ok(items.OrderBy(c => c.Order));
     }
 
