@@ -47,7 +47,7 @@ internal sealed class SyncAzureDevOpsIterationsCommandHandler(IPlanningDbContext
                 var externalIdsToKeep = group.Select(i => i.Id.ToString()).ToHashSet(StringComparer.Ordinal);
                 await DeleteMissingIterations(projectIterations, externalIdsToKeep, syncLog, cancellationToken);
 
-                var processResult = await ProcessIterations(request.SystemId, group, azdoProjectId, projectIterations, syncLog, cancellationToken);
+                var processResult = await ProcessIterations(request.SystemId, group, azdoProjectId, projectIterations, request.TeamMappings, syncLog, cancellationToken);
                 if (processResult.IsFailure)
                 {
                     return PublishSyncLog(processResult, request.SystemId, azdoProjectId, syncLog);
@@ -113,7 +113,7 @@ internal sealed class SyncAzureDevOpsIterationsCommandHandler(IPlanningDbContext
     /// <summary>
     /// Processes the iterations from the provided external iteration group, updating existing iterations or creating new ones as necessary.
     /// </summary>
-    private async Task<Result> ProcessIterations(string systemId, IEnumerable<IExternalIteration<AzdoIterationMetadata>> externalIterations, Guid azdoProjectId, List<Iteration> projectIterations, IterationSyncLog syncLog, CancellationToken cancellationToken)
+    private async Task<Result> ProcessIterations(string systemId, IEnumerable<IExternalIteration<AzdoIterationMetadata>> externalIterations, Guid azdoProjectId, List<Iteration> projectIterations, Dictionary<Guid, Guid?> teamMappings, IterationSyncLog syncLog, CancellationToken cancellationToken)
     {
         // Build lookup to avoid O(n^2) FirstOrDefault calls
         var existingByExternalId = projectIterations
@@ -124,6 +124,12 @@ internal sealed class SyncAzureDevOpsIterationsCommandHandler(IPlanningDbContext
         {
             syncLog.IterationRequested(externalIteration.Id);
 
+            Guid? teamId = null;
+            if (externalIteration.TeamId.HasValue)
+            {
+                teamMappings.TryGetValue(externalIteration.TeamId.Value, out teamId);
+            }
+
             var externalIdString = externalIteration.Id.ToString();
             if (existingByExternalId.TryGetValue(externalIdString, out var existingIteration))
             {
@@ -132,7 +138,7 @@ internal sealed class SyncAzureDevOpsIterationsCommandHandler(IPlanningDbContext
                     externalIteration.Type,
                     externalIteration.State,
                     IterationDateRange.Create(externalIteration.Start, externalIteration.End),
-                    externalIteration.TeamId
+                    teamId
                 );
                 if (updateResult.IsFailure)
                 {
@@ -161,7 +167,7 @@ internal sealed class SyncAzureDevOpsIterationsCommandHandler(IPlanningDbContext
                     externalIteration.Type,
                     externalIteration.State,
                     IterationDateRange.Create(externalIteration.Start, externalIteration.End),
-                    externalIteration.TeamId,
+                    teamId,
                     ownershipInfo,
                     externalMetadata
                 );

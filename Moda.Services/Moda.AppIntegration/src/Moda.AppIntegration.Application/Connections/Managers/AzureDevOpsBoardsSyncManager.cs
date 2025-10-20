@@ -5,6 +5,7 @@ using Moda.AppIntegration.Application.Interfaces;
 using Moda.Common.Application.Enums;
 using Moda.Common.Application.Exceptions;
 using Moda.Common.Application.Interfaces.ExternalWork;
+using Moda.Common.Application.Requests.Planning.Iterations;
 using Moda.Common.Application.Requests.WorkManagement;
 using Moda.Common.Domain.Enums.AppIntegrations;
 using Moda.Work.Application.Workflows.Dtos;
@@ -133,7 +134,12 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
                             .Where(t => t.WorkspaceId == workspace.ExternalId)
                             .ToArray();
 
-                        //var syncIterationsResult = await SyncIterations(connectionDetails.Configuration.OrganizationUrl, connectionDetails.Configuration.PersonalAccessToken, workspace.Name, workspaceTeams, cancellationToken);
+                        var syncIterationsResult = await SyncIterations(connectionDetails.Configuration.OrganizationUrl, connectionDetails.Configuration.PersonalAccessToken, workspace.Name, workspaceTeams, connection.SystemId!, cancellationToken);
+                        if (syncIterationsResult.IsFailure)
+                        {
+                            _logger.LogError("An error occurred while syncing Azure DevOps Boards workspace {WorkspaceId} iterations. Error: {Error}", workspace.IntegrationState!.InternalId, syncIterationsResult.Error);
+                            continue;
+                        }
 
                         try
                         {
@@ -300,44 +306,44 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
             : updateResult;
     }
 
-    //private async Task<Result> SyncIterations(string organizationUrl, string personalAccessToken, string azdoWorkspaceName, AzureDevOpsBoardsWorkspaceTeamDto[] workspaceTeams, CancellationToken cancellationToken)
-    //{
-    //    Guard.Against.NullOrWhiteSpace(organizationUrl, nameof(organizationUrl));
-    //    Guard.Against.NullOrWhiteSpace(personalAccessToken, nameof(personalAccessToken));
-    //    Guard.Against.NullOrWhiteSpace(azdoWorkspaceName, nameof(azdoWorkspaceName));
+    private async Task<Result> SyncIterations(string organizationUrl, string personalAccessToken, string azdoWorkspaceName, AzureDevOpsBoardsWorkspaceTeamDto[] workspaceTeams, string systemId, CancellationToken cancellationToken)
+    {
+        Guard.Against.NullOrWhiteSpace(organizationUrl, nameof(organizationUrl));
+        Guard.Against.NullOrWhiteSpace(personalAccessToken, nameof(personalAccessToken));
+        Guard.Against.NullOrWhiteSpace(azdoWorkspaceName, nameof(azdoWorkspaceName));
 
-    //    // TODO: this is duplicate of SyncWorkspace - refactor
-    //    Dictionary<Guid, Guid?> teamSettings;
-    //    if (workspaceTeams.Length > 0)
-    //    {
-    //        teamSettings = new Dictionary<Guid, Guid?>(workspaceTeams.Length);
+        // TODO: this is duplicate of SyncWorkspace - refactor
+        Dictionary<Guid, Guid?> teamSettings;
+        Dictionary<Guid, Guid?> teamMappings;
+        if (workspaceTeams.Length > 0)
+        {
+            teamSettings = new Dictionary<Guid, Guid?>(workspaceTeams.Length);
+            teamMappings = new Dictionary<Guid, Guid?>(workspaceTeams.Length);
 
-    //        foreach (var team in workspaceTeams)
-    //        {
-    //            // Only add teams that have an internal team id.  This will allow mapped parent teams to be set for items that are assigned to teams that haven't been mapped.
-    //            if (team.InternalTeamId is null)
-    //                continue;
+            foreach (var team in workspaceTeams)
+            {
+                // Only add teams that have an internal team id.  This will allow mapped parent teams to be set for items that are assigned to teams that haven't been mapped.
+                if (team.InternalTeamId is null)
+                    continue;
 
-    //            teamSettings[team.TeamId] = team.BoardId;
-    //        }
-    //    }
-    //    else
-    //    {
-    //        teamSettings = [];
-    //    }
+                teamSettings[team.TeamId] = team.BoardId;
+                teamMappings[team.TeamId] = team.InternalTeamId;
+            }
+        }
+        else
+        {
+            teamSettings = [];
+            teamMappings = [];
+        }
 
-    //    var iterationsResult = await _azureDevOpsService.GetIterations(organizationUrl, personalAccessToken, azdoWorkspaceName, teamSettings, cancellationToken);
-    //    if (iterationsResult.IsFailure)
-    //        return iterationsResult.ConvertFailure();
+        var iterationsResult = await _azureDevOpsService.GetIterations(organizationUrl, personalAccessToken, azdoWorkspaceName, teamSettings, cancellationToken);
+        if (iterationsResult.IsFailure)
+            return iterationsResult.ConvertFailure();
 
-    //    return Result.Success();
+        var syncResult = await _sender.Send(new SyncAzureDevOpsIterationsCommand(systemId, iterationsResult.Value, teamMappings), cancellationToken);
 
-    //    //var updateResult = await _sender.Send(new UpdateExternalWorkspaceCommand(workspaceResult.Value), cancellationToken);
-
-    //    //return updateResult.IsSuccess
-    //    //    ? Result.Success()
-    //    //    : updateResult;
-    //}
+        return syncResult;
+    }
 
     private async Task<Result> SyncWorkItems(string organizationUrl, string personalAccessToken, DateTime lastChangedDate, Guid workspaceId, string azdoWorkspaceName, AzureDevOpsBoardsWorkspaceTeamDto[] workspaceTeams, CancellationToken cancellationToken)
     {
