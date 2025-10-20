@@ -1,4 +1,8 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using NodaTime;
+using NodaTime.Serialization.SystemTextJson;
 
 namespace Moda.Infrastructure.Auditing;
 
@@ -35,10 +39,25 @@ public class AuditTrail
             SchemaName = SchemaName,
             TableName = TableName,
             DateTime = _dateTimeProvider.Now,
-            PrimaryKey = _serializer.Serialize(KeyValues),
-            OldValues = OldValues.Count == 0 ? null : _serializer.Serialize(OldValues),
-            NewValues = NewValues.Count == 0 ? null : _serializer.Serialize(NewValues),
-            AffectedColumns = ChangedColumns.Count == 0 ? null : _serializer.Serialize(ChangedColumns),
+            PrimaryKey = SerializeForAudit(KeyValues),
+            OldValues = OldValues.Count == 0 ? null : SerializeForAudit(OldValues),
+            NewValues = NewValues.Count == 0 ? null : SerializeForAudit(NewValues),
+            AffectedColumns = ChangedColumns.Count == 0 ? null : SerializeForAudit(ChangedColumns),
             CorrelationId = CorrelationId
         };
+
+    private static string SerializeForAudit(object obj)
+    {
+        var options = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            Converters =
+            {
+                new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)
+            }
+        };
+        options.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
+        return JsonSerializer.Serialize(obj, options);
+    }
 }
