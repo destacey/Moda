@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Options;
-using Moda.Common.Domain.Models.KeyPerformanceIndicators;
 using Moda.Infrastructure.Common.Services;
 using Moda.Infrastructure.Persistence.Extensions;
 using NodaTime;
@@ -15,17 +14,15 @@ public abstract class BaseDbContext : IdentityDbContext<ApplicationUser, Applica
 {
     protected readonly ICurrentUser _currentUser;
     protected readonly IDateTimeProvider _dateTimeProvider;
-    private readonly ISerializerService _serializer;
     private readonly DatabaseSettings _dbSettings;
     private readonly IEventPublisher _events;
     private readonly IRequestCorrelationIdProvider _requestCorrelationIdProvider;
 
-    protected BaseDbContext(DbContextOptions options, ICurrentUser currentUser, IDateTimeProvider dateTimeProvider, ISerializerService serializer, IOptions<DatabaseSettings> dbSettings, IEventPublisher events, IRequestCorrelationIdProvider requestCorrelationIdProvider)
+    protected BaseDbContext(DbContextOptions options, ICurrentUser currentUser, IDateTimeProvider dateTimeProvider, IOptions<DatabaseSettings> dbSettings, IEventPublisher events, IRequestCorrelationIdProvider requestCorrelationIdProvider)
         : base(options)
     {
         _currentUser = currentUser;
         _dateTimeProvider = dateTimeProvider;
-        _serializer = serializer;
         _dbSettings = dbSettings.Value;
         _events = events;
         _requestCorrelationIdProvider = requestCorrelationIdProvider;
@@ -101,7 +98,7 @@ public abstract class BaseDbContext : IdentityDbContext<ApplicationUser, Applica
     {
         var timestamp = _dateTimeProvider.Now;
         foreach (var entry in ChangeTracker.Entries()
-            .Where(e => e.Entity is IAuditable || e.Entity is ISystemAuditable || e.Entity is ISoftDelete)
+            .Where(e => e.Entity is IAuditable or ISystemAuditable or ISoftDelete)
             .ToList())
         {
 
@@ -114,8 +111,8 @@ public abstract class BaseDbContext : IdentityDbContext<ApplicationUser, Applica
                 }
                 if (entry.Entity is IAuditable auditable)
                 {
-                    auditable.CreatedBy = userId;
                     auditable.Created = timestamp;
+                    auditable.CreatedBy = userId;
                 }
             }
 
@@ -128,8 +125,8 @@ public abstract class BaseDbContext : IdentityDbContext<ApplicationUser, Applica
                 }
                 if (entry.Entity is IAuditable auditable)
                 {
-                    auditable.LastModifiedBy = userId;
                     auditable.LastModified = timestamp;
+                    auditable.LastModifiedBy = userId;
                 }
             }
 
@@ -145,11 +142,18 @@ public abstract class BaseDbContext : IdentityDbContext<ApplicationUser, Applica
         ChangeTracker.DetectChanges();
 
         var trailEntries = new List<AuditTrail>();
-        foreach (var entry in ChangeTracker.Entries<IAuditable>()
-            .Where(e => e.State is EntityState.Added or EntityState.Deleted or EntityState.Modified || e.HasChangedOwnedEntities())
-            .ToList())
+
+        var auditableEntries = ChangeTracker.Entries()
+            .Where(e =>
+                (e.Entity is IAuditable or ISystemAuditable)
+                && (e.State is EntityState.Added or EntityState.Deleted or EntityState.Modified
+                    || e.HasChangedOwnedEntities()))
+            .ToList();
+
+        foreach (var entry in auditableEntries)
         {
-            var trailEntry = new AuditTrail(entry, _serializer, _dateTimeProvider)
+            // TODO: Fix the table name.  Currently, it is returning the class name, not the table name which may be different due to mappings.
+            var trailEntry = new AuditTrail(entry, _dateTimeProvider)
             {
                 SchemaName = entry.Metadata.GetSchema(),
                 TableName = entry.Entity.GetType().Name,
@@ -157,6 +161,9 @@ public abstract class BaseDbContext : IdentityDbContext<ApplicationUser, Applica
                 CorrelationId = correlationId
             };
             trailEntries.Add(trailEntry);
+            // Track which complex properties we've already processed
+            var processedComplexProperties = new HashSet<string>();
+
             foreach (var property in entry.Properties)
             {
                 if (property.IsTemporary)
@@ -169,6 +176,12 @@ public abstract class BaseDbContext : IdentityDbContext<ApplicationUser, Applica
                 if (property.Metadata.IsPrimaryKey())
                 {
                     trailEntry.KeyValues[propertyName] = property.CurrentValue;
+                    continue;
+                }
+
+                // Skip properties that belong to complex types - we'll handle them separately
+                if (property.Metadata.DeclaringType is Microsoft.EntityFrameworkCore.Metadata.IComplexType)
+                {
                     continue;
                 }
 
@@ -195,7 +208,92 @@ public abstract class BaseDbContext : IdentityDbContext<ApplicationUser, Applica
                         }
                         break;
                 }
+            }
 
+            // Include complex properties in the audit trail
+            foreach (var complexProperty in entry.ComplexProperties)
+            {
+                string complexPropertyName = complexProperty.Metadata.Name;
+                if (processedComplexProperties.Contains(complexPropertyName))
+                    continue;
+
+                processedComplexProperties.Add(complexPropertyName);
+
+                switch (entry.State)
+                {
+                    case EntityState.Added:
+                        trailEntry.NewValues[complexPropertyName] = GetComplexPropertyValues(complexProperty, isCurrentValue: true);
+                        break;
+
+                    case EntityState.Deleted:
+                        trailEntry.OldValues[complexPropertyName] = GetComplexPropertyValues(complexProperty, isCurrentValue: false);
+                        break;
+
+                    case EntityState.Modified:
+                        var hasChanges = complexProperty.Properties.Any(p =>
+                            p.IsModified &&
+                            ((p.OriginalValue is null && p.CurrentValue is not null) ||
+                             p.OriginalValue?.Equals(p.CurrentValue) == false));
+
+                        if (hasChanges)
+                        {
+                            trailEntry.ChangedColumns.Add(complexPropertyName);
+                            trailEntry.OldValues[complexPropertyName] = GetComplexPropertyValues(complexProperty, isCurrentValue: false);
+                            trailEntry.NewValues[complexPropertyName] = GetComplexPropertyValues(complexProperty, isCurrentValue: true);
+                        }
+                        break;
+                }
+            }
+
+            // Include owned entities in the audit trail
+            foreach (var reference in entry.References.Where(r => r.TargetEntry != null && r.TargetEntry.Metadata.IsOwned()))
+            {
+                var ownedEntry = reference.TargetEntry!;
+                string navigationName = reference.Metadata.Name;
+
+                switch (entry.State)
+                {
+                    case EntityState.Added:
+                        if (ownedEntry.State == EntityState.Added)
+                        {
+                            trailEntry.NewValues[navigationName] = GetOwnedEntityValues(ownedEntry, isCurrentValue: true);
+                        }
+                        break;
+
+                    case EntityState.Deleted:
+                        if (ownedEntry.State == EntityState.Deleted)
+                        {
+                            trailEntry.OldValues[navigationName] = GetOwnedEntityValues(ownedEntry, isCurrentValue: false);
+                        }
+                        break;
+
+                    case EntityState.Modified:
+                        if (ownedEntry.State == EntityState.Added)
+                        {
+                            trailEntry.ChangedColumns.Add(navigationName);
+                            trailEntry.NewValues[navigationName] = GetOwnedEntityValues(ownedEntry, isCurrentValue: true);
+                        }
+                        else if (ownedEntry.State == EntityState.Modified)
+                        {
+                            var hasChanges = ownedEntry.Properties.Any(p =>
+                                p.IsModified &&
+                                ((p.OriginalValue is null && p.CurrentValue is not null) ||
+                                 p.OriginalValue?.Equals(p.CurrentValue) == false));
+
+                            if (hasChanges)
+                            {
+                                trailEntry.ChangedColumns.Add(navigationName);
+                                trailEntry.OldValues[navigationName] = GetOwnedEntityValues(ownedEntry, isCurrentValue: false);
+                                trailEntry.NewValues[navigationName] = GetOwnedEntityValues(ownedEntry, isCurrentValue: true);
+                            }
+                        }
+                        else if (ownedEntry.State == EntityState.Deleted)
+                        {
+                            trailEntry.ChangedColumns.Add(navigationName);
+                            trailEntry.OldValues[navigationName] = GetOwnedEntityValues(ownedEntry, isCurrentValue: false);
+                        }
+                        break;
+                }
             }
 
             // set trailtype to SoftDelete if the entity is soft deleted
@@ -212,6 +310,30 @@ public abstract class BaseDbContext : IdentityDbContext<ApplicationUser, Applica
         }
 
         return trailEntries.Where(e => e.HasTemporaryProperties).ToList();
+    }
+
+    private static Dictionary<string, object?> GetOwnedEntityValues(EntityEntry ownedEntry, bool isCurrentValue)
+    {
+        var values = new Dictionary<string, object?>();
+        foreach (var property in ownedEntry.Properties)
+        {
+            // Skip primary keys and foreign keys for owned entities
+            if (!property.Metadata.IsPrimaryKey() && !property.Metadata.IsForeignKey())
+            {
+                values[property.Metadata.Name] = isCurrentValue ? property.CurrentValue : property.OriginalValue;
+            }
+        }
+        return values;
+    }
+
+    private static Dictionary<string, object?> GetComplexPropertyValues(ComplexPropertyEntry complexProperty, bool isCurrentValue)
+    {
+        var values = new Dictionary<string, object?>();
+        foreach (var property in complexProperty.Properties)
+        {
+            values[property.Metadata.Name] = isCurrentValue ? property.CurrentValue : property.OriginalValue;
+        }
+        return values;
     }
 
     private Task HandleAuditingAfterSaveChangesAsync(List<AuditTrail> trailEntries, CancellationToken cancellationToken = new())
