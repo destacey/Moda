@@ -18,7 +18,7 @@ internal sealed class GeneralService(string organizationUrl, string token, strin
             if (!response.IsSuccessful)
             {
                 _logger.LogError("Error getting connection data from Azure DevOps: {ErrorMessage}.", response.ErrorMessage);
-                return null;
+                return Result.Failure<ConnectionDataResponse?>(response.ErrorMessage);
             }
             else if (response.StatusCode == System.Net.HttpStatusCode.NonAuthoritativeInformation)
             {
