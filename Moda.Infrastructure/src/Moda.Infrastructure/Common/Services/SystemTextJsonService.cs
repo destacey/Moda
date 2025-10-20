@@ -1,5 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
+using NodaTime;
+using NodaTime.Serialization.SystemTextJson;
 using OneOf.Serialization.SystemTextJson;
 
 namespace Moda.Infrastructure.Common.Services;
@@ -11,6 +13,7 @@ public sealed class SystemTextJsonService : ISerializerService
         {
             ReferenceHandler = ReferenceHandler.Preserve
         };
+        options.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
         return JsonSerializer.Deserialize<T>(text, options)!;
     }
 
@@ -29,6 +32,7 @@ public sealed class SystemTextJsonService : ISerializerService
                 new OneOfBaseJsonConverter(),
             }
         };
+        options.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
         return JsonSerializer.Serialize(obj, options);
     }
 
@@ -38,6 +42,7 @@ public sealed class SystemTextJsonService : ISerializerService
         {
             ReferenceHandler = ReferenceHandler.Preserve
         };
+        options.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
         return JsonSerializer.Serialize(obj, type, options);
     }
 }
