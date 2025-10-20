@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Options;
-using Moda.Common.Domain.Models.KeyPerformanceIndicators;
 using Moda.Infrastructure.Common.Services;
 using Moda.Infrastructure.Persistence.Extensions;
 using NodaTime;
@@ -101,7 +100,7 @@ public abstract class BaseDbContext : IdentityDbContext<ApplicationUser, Applica
     {
         var timestamp = _dateTimeProvider.Now;
         foreach (var entry in ChangeTracker.Entries()
-            .Where(e => e.Entity is IAuditable || e.Entity is ISystemAuditable || e.Entity is ISoftDelete)
+            .Where(e => e.Entity is IAuditable or ISystemAuditable or ISoftDelete)
             .ToList())
         {
 
@@ -114,8 +113,8 @@ public abstract class BaseDbContext : IdentityDbContext<ApplicationUser, Applica
                 }
                 if (entry.Entity is IAuditable auditable)
                 {
-                    auditable.CreatedBy = userId;
                     auditable.Created = timestamp;
+                    auditable.CreatedBy = userId;
                 }
             }
 
@@ -128,8 +127,8 @@ public abstract class BaseDbContext : IdentityDbContext<ApplicationUser, Applica
                 }
                 if (entry.Entity is IAuditable auditable)
                 {
-                    auditable.LastModifiedBy = userId;
                     auditable.LastModified = timestamp;
+                    auditable.LastModifiedBy = userId;
                 }
             }
 
@@ -145,9 +144,15 @@ public abstract class BaseDbContext : IdentityDbContext<ApplicationUser, Applica
         ChangeTracker.DetectChanges();
 
         var trailEntries = new List<AuditTrail>();
-        foreach (var entry in ChangeTracker.Entries<IAuditable>()
-            .Where(e => e.State is EntityState.Added or EntityState.Deleted or EntityState.Modified || e.HasChangedOwnedEntities())
-            .ToList())
+
+        var auditableEntries = ChangeTracker.Entries()
+            .Where(e =>
+                (e.Entity is IAuditable or ISystemAuditable)
+                && (e.State is EntityState.Added or EntityState.Deleted or EntityState.Modified
+                    || e.HasChangedOwnedEntities()))
+            .ToList();
+
+        foreach (var entry in auditableEntries)
         {
             var trailEntry = new AuditTrail(entry, _serializer, _dateTimeProvider)
             {
