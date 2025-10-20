@@ -8,13 +8,11 @@ namespace Moda.Infrastructure.Auditing;
 
 public class AuditTrail
 {
-    private readonly ISerializerService _serializer;
     private readonly IDateTimeProvider _dateTimeProvider;
 
-    public AuditTrail(EntityEntry entry, ISerializerService serializer, IDateTimeProvider dateTimeProvider)
+    public AuditTrail(EntityEntry entry, IDateTimeProvider dateTimeProvider)
     {
         Entry = entry;
-        _serializer = serializer;
         _dateTimeProvider = dateTimeProvider;
     }
 
