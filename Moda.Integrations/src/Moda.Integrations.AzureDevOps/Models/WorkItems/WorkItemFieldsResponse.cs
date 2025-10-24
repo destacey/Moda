@@ -39,6 +39,9 @@ internal class WorkItemFieldsResponse
     [JsonPropertyName("System.IterationId")]
     public int IterationId { get; set; }
 
+    [JsonPropertyName("Microsoft.VSTS.Scheduling.StoryPoints")]
+    public double? StoryPoints { get; set; }
+
     [JsonPropertyName("Microsoft.VSTS.Common.ActivatedDate")]
     public DateTime? ActivatedDate { get; set; }
 

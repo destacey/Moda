@@ -20,4 +20,6 @@ public sealed record AzdoWorkItem : IExternalWorkItem
     public Instant? DoneTimestamp { get; set; }
     public Guid? TeamId { get; set; }
     public string? ExternalTeamIdentifier { get; set; }
+    public int? IterationId { get; set; }
+    public double? StoryPoints { get; set; }
 }

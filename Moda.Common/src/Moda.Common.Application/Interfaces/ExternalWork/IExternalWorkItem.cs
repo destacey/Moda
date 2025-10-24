@@ -17,4 +17,6 @@ public interface IExternalWorkItem
     Instant? DoneTimestamp { get; }
     public Guid? TeamId { get; set; }
     string? ExternalTeamIdentifier { get; }
+    int? IterationId { get; }
+    double? StoryPoints { get; }
 }

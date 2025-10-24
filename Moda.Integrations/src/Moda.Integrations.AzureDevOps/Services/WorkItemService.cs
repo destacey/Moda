@@ -42,6 +42,7 @@ internal sealed class WorkItemService(string organizationUrl, string token, stri
                 "System.IterationId",
                 "Microsoft.VSTS.Common.Priority",
                 "Microsoft.VSTS.Common.StackRank",
+                "Microsoft.VSTS.Scheduling.StoryPoints",
                 "Microsoft.VSTS.Common.ActivatedDate",
                 "Microsoft.VSTS.Common.ClosedDate"
             ];
