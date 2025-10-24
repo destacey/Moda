@@ -27,6 +27,10 @@ internal static class WorkItemResponseExtensions
         Instant? activated = workItem.Fields.ActivatedDate.HasValue ? Instant.FromDateTimeUtc(workItem.Fields.ActivatedDate.Value) : null;
         Instant? closed = workItem.Fields.ClosedDate.HasValue ? Instant.FromDateTimeUtc(workItem.Fields.ClosedDate.Value) : null;
 
+        var storyPoints = workItem.Fields.StoryPoints;
+        if (storyPoints.HasValue && storyPoints < 0)
+            storyPoints = 0;
+
         return new AzdoWorkItem()
         {
             Id = workItem.Id,
@@ -48,7 +52,9 @@ internal static class WorkItemResponseExtensions
                 ? closed < created ? created : closed
                 : null,
             TeamId = iteration.TeamId,
-            ExternalTeamIdentifier = iteration.Identifier.ToString()
+            ExternalTeamIdentifier = iteration.Identifier.ToString(),
+            IterationId = workItem.Fields.IterationId,
+            StoryPoints = storyPoints,
         };
     }
 

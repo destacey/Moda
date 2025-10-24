@@ -129,6 +129,13 @@ const WorkItemsGrid = (props: WorkItemsGridProps) => {
         hide: props.hideProjectColumn,
         cellRenderer: ProjectLinkCellRenderer,
       },
+      {
+        field: 'storyPoints',
+        headerName: 'Story Points',
+        width: 100,
+        filter: 'agNumberColumnFilter',
+        type: 'numericColumn',
+      },
     ],
     [props.hideProjectColumn],
   )

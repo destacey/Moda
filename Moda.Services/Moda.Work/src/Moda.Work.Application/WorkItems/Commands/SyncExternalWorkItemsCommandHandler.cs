@@ -214,6 +214,7 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
                                 assignedToId,
                                 externalWorkItem.Priority,
                                 externalWorkItem.StackRank,
+                                externalWorkItem.StoryPoints,
                                 externalWorkItem.ActivatedTimestamp,
                                 externalWorkItem.DoneTimestamp,
                                 string.IsNullOrWhiteSpace(externalWorkItem.ExternalTeamIdentifier) ? null : WorkItemExtended.Create(externalWorkItem.ExternalTeamIdentifier)
@@ -244,6 +245,7 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
                                 assignedToId,
                                 externalWorkItem.Priority,
                                 externalWorkItem.StackRank,
+                                externalWorkItem.StoryPoints,
                                 externalWorkItem.ActivatedTimestamp,
                                 externalWorkItem.DoneTimestamp,
                                 string.IsNullOrWhiteSpace(externalWorkItem.ExternalTeamIdentifier) ? null : WorkItemExtended.Create(workItem.Id, externalWorkItem.ExternalTeamIdentifier)

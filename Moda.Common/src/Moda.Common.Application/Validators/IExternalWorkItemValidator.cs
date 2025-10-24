@@ -58,5 +58,11 @@ public sealed class IExternalWorkItemValidator : CustomValidator<IExternalWorkIt
 
         RuleFor(c => c.ExternalTeamIdentifier)
             .MaximumLength(128);
+
+        When(c => c.StoryPoints.HasValue, () =>
+        {
+            RuleFor(c => c.StoryPoints)
+                .GreaterThanOrEqualTo(0);
+        });
     }
 }

@@ -26,6 +26,7 @@ public sealed record WorkItemBacklogItemDto : IMapFrom<WorkItem>
 
     // This is used to set the rank of the work items in the backlog
     public double StackRank { get; set; }
+    public double? StoryPoints { get; set; }
 
     public void ConfigureMapping(TypeAdapterConfig config)
     {

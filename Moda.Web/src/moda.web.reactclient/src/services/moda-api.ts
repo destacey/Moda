@@ -15545,6 +15545,7 @@ export interface WorkItemListDto {
     team?: WorkTeamNavigationDto | undefined;
     assignedTo?: EmployeeNavigationDto | undefined;
     stackRank: number;
+    storyPoints?: number | undefined;
     project?: WorkProjectNavigationDto | undefined;
     externalViewWorkItemUrl?: string | undefined;
 }
@@ -16372,6 +16373,7 @@ export interface WorkItemDetailsDto {
     doneTimestamp?: Date | undefined;
     project?: WorkProjectNavigationDto | undefined;
     externalViewWorkItemUrl?: string | undefined;
+    storyPoints?: number | undefined;
 }
 
 export interface WorkItemProjectInfoDto {
@@ -16664,6 +16666,7 @@ export interface WorkItemBacklogItemDto {
     project?: WorkProjectNavigationDto | undefined;
     externalViewWorkItemUrl?: string | undefined;
     stackRank: number;
+    storyPoints?: number | undefined;
 }
 
 export interface DependencyDto {

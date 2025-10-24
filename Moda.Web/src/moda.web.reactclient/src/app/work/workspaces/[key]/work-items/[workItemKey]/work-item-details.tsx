@@ -28,6 +28,7 @@ const WorkItemDetails = ({ workItem }: WorkItemDetailsProps) => {
         <Item label="Status">{workItem.status}</Item>
         <Item label="Status Category">{workItem.statusCategory.name}</Item>
         <Item label="Priority">{workItem.priority}</Item>
+        <Item label="Story Points">{workItem.storyPoints}</Item>
         <Item label="Team">
           <Link href={teamLink}>{workItem.team?.name}</Link>
         </Item>
