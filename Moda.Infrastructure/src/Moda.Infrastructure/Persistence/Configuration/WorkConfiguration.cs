@@ -155,6 +155,7 @@ public class WorkItemConfig : IEntityTypeConfiguration<WorkItem>
         builder.Property(w => w.ExternalId);
         builder.Property(w => w.Priority);
         builder.Property(w => w.StackRank);
+        builder.Property(w => w.StoryPoints);
 
         builder.Property(w => w.Created);
         builder.Property(w => w.LastModified);

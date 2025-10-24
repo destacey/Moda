@@ -18,6 +18,7 @@ public sealed record WorkItemListDto : IMapFrom<WorkItem>
     public WorkTeamNavigationDto? Team { get; set; }
     public EmployeeNavigationDto? AssignedTo { get; set; }
     public double StackRank { get; set; }
+    public double? StoryPoints { get; set; }
     public WorkProjectNavigationDto? Project { get; set; }
     public string? ExternalViewWorkItemUrl { get; set; }
 

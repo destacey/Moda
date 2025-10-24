@@ -28,6 +28,7 @@ public sealed record WorkItemDetailsDto : IMapFrom<WorkItem>
     public Instant? DoneTimestamp { get; set; }
     public WorkProjectNavigationDto? Project { get; set; }
     public string? ExternalViewWorkItemUrl { get; set; }
+    public double? StoryPoints { get; set; }
 
     public void ConfigureMapping(TypeAdapterConfig config)
     {

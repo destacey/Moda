@@ -14152,6 +14152,11 @@
             "type": "number",
             "format": "double"
           },
+          "storyPoints": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
           "project": {
             "nullable": true,
             "oneOf": [
@@ -17550,6 +17555,11 @@
           "externalViewWorkItemUrl": {
             "type": "string",
             "nullable": true
+          },
+          "storyPoints": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
           }
         }
       },
@@ -18734,6 +18744,11 @@
           "stackRank": {
             "type": "number",
             "format": "double"
+          },
+          "storyPoints": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
           }
         }
       },
