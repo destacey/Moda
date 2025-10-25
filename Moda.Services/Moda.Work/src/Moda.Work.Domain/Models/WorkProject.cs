@@ -28,8 +28,11 @@ public class WorkProject : ISimpleProject, IHasIdAndKey
     /// <param name="project"></param>
     public void UpdateDetails(ISimpleProject project)
     {
-        Id = project.Id;
-        Key = project.Key;
+        if (project.Id != Id)
+        {
+            throw new ArgumentException("Project ID mismatch when updating WorkProject details.", nameof(project));
+        }
+
         Name = project.Name;
         Description = project.Description;
     }

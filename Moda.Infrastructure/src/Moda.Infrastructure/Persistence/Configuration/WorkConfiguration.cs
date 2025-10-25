@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Moda.Common.Domain.Enums;
 using Moda.Common.Domain.Enums.Organization;
+using Moda.Common.Domain.Enums.Planning;
 using Moda.Common.Domain.Enums.Work;
 using Moda.Common.Models;
 using Moda.Work.Domain.Models;
@@ -140,6 +141,9 @@ public class WorkItemConfig : IEntityTypeConfiguration<WorkItem>
         builder.HasIndex(w => w.ParentProjectId)
             .HasFilter("[ProjectId] IS NULL");
 
+        builder.HasIndex(w => w.IterationId)
+            .IncludeProperties(w => new { w.Id, w.Key, w.Title, w.WorkspaceId, w.AssignedToId, w.TypeId, w.StatusId, w.StatusCategory, w.ActivatedTimestamp, w.DoneTimestamp, w.ProjectId, w.ParentProjectId });
+
         // Properties
         builder.Property(w => w.Key).IsRequired()
             .HasConversion(
@@ -228,6 +232,11 @@ public class WorkItemConfig : IEntityTypeConfiguration<WorkItem>
             .WithMany()
             .HasForeignKey(w => w.ParentProjectId)
             .OnDelete(DeleteBehavior.ClientSetNull);
+
+        builder.HasOne(w => w.Iteration)
+            .WithMany()
+            .HasForeignKey(w => w.IterationId)
+            .OnDelete(DeleteBehavior.ClientSetNull);
     }
 }
 
@@ -292,6 +301,45 @@ public class WorkItemLinkConfig : IEntityTypeConfiguration<WorkItemLink>
     }
 }
 
+public class WorkIterationConfig : IEntityTypeConfiguration<WorkIteration>
+{
+    public void Configure(EntityTypeBuilder<WorkIteration> builder)
+    {
+        builder.ToTable("WorkIterations", SchemaNames.Work);
+
+        builder.HasKey(w => w.Id);
+        builder.HasAlternateKey(w => w.Key);
+
+        builder.Property(w => w.Id).ValueGeneratedNever();
+        builder.Property(w => w.Key).ValueGeneratedNever();
+
+        // Properties
+        builder.Property(i => i.Name).HasMaxLength(256).IsRequired();
+
+        builder.Property(i => i.Type).IsRequired()
+            .HasConversion<EnumConverter<IterationType>>()
+            .HasColumnType("varchar")
+            .HasMaxLength(32);
+
+        builder.Property(i => i.State).IsRequired()
+            .HasConversion<EnumConverter<IterationState>>()
+            .HasColumnType("varchar")
+            .HasMaxLength(32);
+
+        // Value Objects
+        builder.ComplexProperty(i => i.DateRange, options =>
+        {
+            options.Property(d => d.Start).HasColumnName("Start");
+            options.Property(d => d.End).HasColumnName("End");
+        });
+
+        // Relationships
+        builder.HasOne<WorkTeam>()
+            .WithMany()
+            .HasForeignKey(p => p.TeamId)
+            .OnDelete(DeleteBehavior.Cascade);
+    }
+}
 public class WorkProcessConfig : IEntityTypeConfiguration<WorkProcess>
 {
     public void Configure(EntityTypeBuilder<WorkProcess> builder)

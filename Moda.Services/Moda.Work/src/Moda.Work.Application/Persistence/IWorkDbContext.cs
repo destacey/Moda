@@ -6,6 +6,7 @@ public interface IWorkDbContext : IModaDbContext
     DbSet<WorkItemReference> WorkItemReferences { get; }
     DbSet<WorkItem> WorkItems { get; }
     DbSet<WorkItemLink> WorkItemLinks { get; }
+    DbSet<WorkIteration> WorkIterations { get; }
     DbSet<WorkProcess> WorkProcesses { get; }
     DbSet<WorkProject> WorkProjects { get; }
     DbSet<Workspace> Workspaces { get; }

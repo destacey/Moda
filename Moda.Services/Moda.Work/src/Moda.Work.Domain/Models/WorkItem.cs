@@ -130,6 +130,16 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable, HasWorkspace
     /// </summary>
     public Guid? CurrentProjectId => ProjectId ?? ParentProjectId;
 
+    /// <summary>
+    /// The current iteration id of the work item.
+    /// </summary>
+    public Guid? IterationId { get; set; }
+
+    /// <summary>
+    /// The current iteration of the work item.
+    /// </summary>
+    public WorkIteration? Iteration { get; set; }
+
     public Instant? ActivatedTimestamp { get; private set; }
 
     public Instant? DoneTimestamp { get; private set; }
