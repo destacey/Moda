@@ -25,4 +25,7 @@ public enum BackgroundJobType
 
     [Display(Name = "Projects Sync", Description = "Synchronize the latest projects data.", Order = 1002, GroupName = "Data Replication Jobs")]
     ProjectsSync = 1002,
+
+    [Display(Name = "Iterations Sync", Description = "Synchronize the latest iterations data.", Order = 1003, GroupName = "Data Replication Jobs")]
+    IterationsSync = 1003,
 }

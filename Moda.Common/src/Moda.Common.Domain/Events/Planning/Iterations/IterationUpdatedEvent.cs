@@ -4,11 +4,12 @@ using Moda.Common.Domain.Models.Planning.Iterations;
 using NodaTime;
 
 namespace Moda.Common.Domain.Events.Planning.Iterations;
-public sealed record IterationUpdatedEvent : DomainEvent
+public sealed record IterationUpdatedEvent : DomainEvent, ISimpleIteration
 {
     public IterationUpdatedEvent(ISimpleIteration iteration, Instant timestamp)
     {
         Id = iteration.Id;
+        Key = iteration.Key;
         Name = iteration.Name;
         Type = iteration.Type;
         State = iteration.State;
@@ -19,6 +20,7 @@ public sealed record IterationUpdatedEvent : DomainEvent
     }
 
     public Guid Id { get; }
+    public int Key { get; }
     public string Name { get; }
     public IterationType Type { get; }
     public IterationState State { get; }

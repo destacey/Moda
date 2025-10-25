@@ -4,9 +4,11 @@ using Moda.Common.Application.Enums;
 using Moda.Common.Application.Exceptions;
 using Moda.Common.Application.Interfaces;
 using Moda.Organization.Application.Teams.Commands;
+using Moda.Planning.Application.Iterations.Queries;
 using Moda.ProjectPortfolioManagement.Application.Projects.Queries;
 using Moda.StrategicManagement.Application.StrategicThemes.Queries;
 using Moda.Web.Api.Interfaces;
+using Moda.Work.Application.WorkIterations.Commands;
 using Moda.Work.Application.WorkProjects.Commands;
 using PpmSyncStrategicThemesCommand = Moda.ProjectPortfolioManagement.Application.StrategicThemes.Commands.SyncStrategicThemesCommand;
 
@@ -69,6 +71,23 @@ public class JobManager(ILogger<JobManager> logger, IEmployeeService employeeSer
         }
 
         _logger.LogInformation("Completed {BackgroundJob} job", nameof(RunSyncTeamsWithGraphTables));
+    }
+
+    [DisableConcurrentExecution(60 *3)]
+    public async Task RunSyncIterations(CancellationToken cancellationToken)
+    {
+        _logger.LogInformation("Running {BackgroundJob} job", nameof(RunSyncIterations));
+
+        var iterations = await _sender.Send(new GetSimpleIterationsQuery(), cancellationToken);
+
+        var result = await _sender.Send(new SyncWorkIterationsCommand(iterations), cancellationToken);
+        if (result.IsFailure)
+        {
+            _logger.LogError("Failed to sync iterations: {Error}", result.Error);
+            throw new InternalServerException($"Failed to sync iterations. Error: {result.Error}");
+        }
+
+        _logger.LogInformation("Completed {BackgroundJob} job", nameof(RunSyncIterations));
     }
 
 
