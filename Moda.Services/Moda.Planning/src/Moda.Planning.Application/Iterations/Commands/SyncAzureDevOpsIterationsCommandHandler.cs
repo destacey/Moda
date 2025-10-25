@@ -1,17 +1,22 @@
-﻿using Moda.Common.Application.Interfaces.ExternalWork;
+﻿using Moda.Common.Application.Events;
+using Moda.Common.Application.Interfaces.ExternalWork;
 using Moda.Common.Application.Models;
 using Moda.Common.Application.Requests.Planning.Iterations;
+using Moda.Common.Domain.Events.Planning.Iterations;
 using Moda.Common.Domain.Models;
+using Moda.Common.Domain.Models.Planning.Iterations;
 using Moda.Planning.Domain.Models.Iterations;
 
 namespace Moda.Planning.Application.Iterations.Commands;
-internal sealed class SyncAzureDevOpsIterationsCommandHandler(IPlanningDbContext planningDbContext, ILogger<SyncAzureDevOpsIterationsCommandHandler> logger)
+internal sealed class SyncAzureDevOpsIterationsCommandHandler(IPlanningDbContext planningDbContext, ILogger<SyncAzureDevOpsIterationsCommandHandler> logger, IDateTimeProvider dateTimeProvider, IEventPublisher eventPublisher)
     : ICommandHandler<SyncAzureDevOpsIterationsCommand>
 {
     private const string AppRequestName = nameof(SyncAzureDevOpsIterationsCommand);
 
     private readonly IPlanningDbContext _planningDbContext = planningDbContext;
     private readonly ILogger<SyncAzureDevOpsIterationsCommandHandler> _logger = logger;
+    private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
+    private readonly IEventPublisher _eventPublisher = eventPublisher;
 
     public async Task<Result> Handle(SyncAzureDevOpsIterationsCommand request, CancellationToken cancellationToken)
     {
@@ -108,6 +113,20 @@ internal sealed class SyncAzureDevOpsIterationsCommandHandler(IPlanningDbContext
             // Log and continue: delete failures should not stop processing of other project groups
             _logger.LogError(ex, "Failed to delete {Count} iterations during sync. Continuing processing.", iterationsToDelete.Count);
         }
+
+        try
+        {
+            foreach (var iteration in iterationsToDelete)
+            {
+                var deleteEvent = new IterationDeletedEvent(iteration.Id, _dateTimeProvider.Now);
+                await _eventPublisher.PublishAsync(deleteEvent);
+            }
+        }
+        catch (Exception ex)
+        {
+            // Log and continue: delete failures should not stop processing of other project groups
+            _logger.LogError(ex, "Exception while processing iteration delete events");
+        }
     }
 
     /// <summary>
@@ -138,7 +157,8 @@ internal sealed class SyncAzureDevOpsIterationsCommandHandler(IPlanningDbContext
                     externalIteration.Type,
                     externalIteration.State,
                     IterationDateRange.Create(externalIteration.Start, externalIteration.End),
-                    teamId
+                    teamId,
+                    _dateTimeProvider.Now
                 );
                 if (updateResult.IsFailure)
                 {
@@ -169,7 +189,8 @@ internal sealed class SyncAzureDevOpsIterationsCommandHandler(IPlanningDbContext
                     IterationDateRange.Create(externalIteration.Start, externalIteration.End),
                     teamId,
                     ownershipInfo,
-                    externalMetadata
+                    externalMetadata,
+                    _dateTimeProvider.Now
                 );
 
                 await _planningDbContext.Iterations.AddAsync(newIteration, cancellationToken);
