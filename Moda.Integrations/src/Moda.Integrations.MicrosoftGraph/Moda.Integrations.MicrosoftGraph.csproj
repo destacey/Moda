@@ -2,9 +2,9 @@
 
   <ItemGroup>
     <PackageReference Include="CSharpFunctionalExtensions" Version="3.6.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.9" />
-    <PackageReference Include="Microsoft.Graph" Version="5.94.0" />
-    <PackageReference Include="Microsoft.Identity.Web.MicrosoftGraph" Version="3.14.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.10" />
+    <PackageReference Include="Microsoft.Graph" Version="5.95.0" />
+    <PackageReference Include="Microsoft.Identity.Web.MicrosoftGraph" Version="4.0.1" />
     <PackageReference Include="NodaTime" Version="3.2.2" />
   </ItemGroup>
 
