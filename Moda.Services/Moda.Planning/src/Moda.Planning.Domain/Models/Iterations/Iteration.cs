@@ -1,5 +1,6 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
+using Moda.Common.Domain.Enums;
 using Moda.Common.Domain.Enums.Planning;
 using Moda.Common.Domain.Events.Planning.Iterations;
 using Moda.Common.Domain.Interfaces;
@@ -9,6 +10,12 @@ using Moda.Common.Domain.Models.Planning.Iterations;
 using NodaTime;
 
 namespace Moda.Planning.Domain.Models.Iterations;
+
+/// <summary>
+/// Represents an iteration, which is a time-boxed unit of work typically associated with a team.
+/// </summary>
+/// <remarks>An iteration is characterized by its name, type, state, date range, and ownership information.  This class
+/// provides methods for creating and updating iterations, as well as managing associated metadata.</remarks>
 public class Iteration : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey, ISimpleIteration
 {
     private string _name = default!;
@@ -23,8 +30,12 @@ public class Iteration : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey, ISimp
         State = state;
         DateRange = dateRange;
         TeamId = teamId;
-        OwnershipInfo = ownershipInfo ?? throw new ArgumentNullException(nameof(ownershipInfo));
-        _externalMetadata = externalMetadata ?? [];
+        OwnershipInfo = Guard.Against.Null(ownershipInfo);
+
+        if (OwnershipInfo.Ownership is Ownership.Managed)
+        {
+            _externalMetadata = externalMetadata ?? [];
+        }
     }
 
     /// <summary>

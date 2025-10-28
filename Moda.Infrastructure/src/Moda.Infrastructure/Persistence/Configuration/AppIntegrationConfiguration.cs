@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Moda.Common.Domain.Enums;
 using Moda.Common.Domain.Enums.AppIntegrations;
 
 namespace Moda.Infrastructure.Persistence.Configuration;
@@ -13,7 +12,7 @@ public class ConnectionConfig : IEntityTypeConfiguration<Connection>
 
         builder.HasKey(c => c.Id);
         builder.HasDiscriminator(c => c.Connector)
-            .HasValue<AzureDevOpsBoardsConnection>(Connector.AzureDevOpsBoards);
+            .HasValue<AzureDevOpsBoardsConnection>(Connector.AzureDevOps);
 
         builder.HasIndex(c => new { c.Id, c.IsDeleted })
             .HasFilter("[IsDeleted] = 0");
@@ -25,7 +24,9 @@ public class ConnectionConfig : IEntityTypeConfiguration<Connection>
 
         builder.Property(c => c.Name).IsRequired().HasMaxLength(128);
         builder.Property(c => c.Description).HasMaxLength(1024);
-        builder.Property(c => c.SystemId).HasMaxLength(64);
+        builder.Property(c => c.SystemId)
+            .HasColumnType("varchar")
+            .HasMaxLength(64);
         builder.Property(w => w.Connector).IsRequired()
             .HasConversion<EnumConverter<Connector>>()
             .HasColumnType("varchar")

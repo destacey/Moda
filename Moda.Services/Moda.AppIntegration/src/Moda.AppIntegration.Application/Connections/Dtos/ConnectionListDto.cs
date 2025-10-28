@@ -1,14 +1,17 @@
 ﻿using Mapster;
+using Moda.Common.Application.Dtos;
 
 namespace Moda.AppIntegration.Application.Connections.Dtos;
 public sealed record ConnectionListDto : IMapFrom<Connection>
 {
-    /// <summary>Gets the identifier.</summary>
-    /// <value>The identifier.</value>
+    /// <summary>
+    /// The unique identifier for the connection.
+    /// </summary>
     public Guid Id { get; set; }
 
-    /// <summary>Gets or sets the name of the connection.</summary>
-    /// <value>The name of the connection.</value>
+    /// <summary>
+    /// The name of the connection.
+    /// </summary>
     public required string Name { get; set; }
 
     /// <summary>
@@ -16,22 +19,19 @@ public sealed record ConnectionListDto : IMapFrom<Connection>
     /// </summary>
     public string? SystemId { get; set; }
 
-    /// <summary>Gets the type of connector.  This value cannot change.</summary>
-    /// <value>The type of connector.</value>
-    public required string Connector { get; set; }
+    /// <summary>
+    /// The type of connector for the connection.  This value cannot be changed once set.
+    /// </summary>
+    public required SimpleNavigationDto Connector { get; set; }
 
     /// <summary>
     /// Indicates whether the connection is active or not.  Inactive connections are not included in the synchronization process.
     /// </summary>
-    /// <value><c>true</c> if this instance is active; otherwise, <c>false</c>.</value>
     public bool IsActive { get; set; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether this instance has a valid configuration.
+    /// A flag indicating whether the connection configuration is valid.
     /// </summary>
-    /// <value>
-    ///   <c>true</c> if this instance is valid configuration; otherwise, <c>false</c>.
-    /// </value>
     public bool IsValidConfiguration { get; set; }
 
     /// <summary>
@@ -42,6 +42,6 @@ public sealed record ConnectionListDto : IMapFrom<Connection>
     public void ConfigureMapping(TypeAdapterConfig config)
     {
         config.NewConfig<Connection, ConnectionListDto>()
-            .Map(dest => dest.Connector, src => src.Connector.GetDisplayName());
+            .Map(dest => dest.Connector, src => SimpleNavigationDto.FromEnum(src.Connector));
     }
 }

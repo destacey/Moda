@@ -16,7 +16,7 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
 {
     private readonly ILogger<AzureDevOpsBoardsConnectionsController> _logger;
     private readonly ISender _sender;
-    private readonly Connector _connector = Connector.AzureDevOpsBoards;
+    private readonly Connector _connector = Connector.AzureDevOps;
 
     public AzureDevOpsBoardsConnectionsController(ILogger<AzureDevOpsBoardsConnectionsController> logger, ISender sender)
     {
