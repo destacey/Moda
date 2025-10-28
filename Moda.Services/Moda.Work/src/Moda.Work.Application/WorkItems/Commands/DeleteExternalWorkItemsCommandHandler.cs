@@ -20,7 +20,7 @@ internal sealed class DeleteExternalWorkItemsCommandHandler(IWorkDbContext workD
             }
 
             var workspace = await _workDbContext.Workspaces
-                .FirstOrDefaultAsync(w => w.Id == request.WorkspaceId && w.Ownership == Ownership.Managed, cancellationToken);
+                .FirstOrDefaultAsync(w => w.Id == request.WorkspaceId && w.OwnershipInfo.Ownership == Ownership.Managed, cancellationToken);
             if (workspace is null)
             {
                 _logger.LogWarning("Unable to delete external work items for workspace {WorkspaceId} because the workspace does not exist.", request.WorkspaceId);

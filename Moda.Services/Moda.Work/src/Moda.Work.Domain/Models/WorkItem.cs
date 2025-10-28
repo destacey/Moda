@@ -308,7 +308,7 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable, HasWorkspace
         Guard.Against.Null(workspace, nameof(workspace));
         Guard.Against.Null(workType, nameof(workType));
 
-        if (workspace.Ownership != Ownership.Managed)
+        if (workspace.OwnershipInfo.Ownership is not Ownership.Managed)
         {
             throw new InvalidOperationException("Only managed workspaces can have external work items.");
         }

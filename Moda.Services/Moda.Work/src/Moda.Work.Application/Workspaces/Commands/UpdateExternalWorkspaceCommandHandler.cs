@@ -1,17 +1,13 @@
 ﻿using Moda.Common.Application.Requests.WorkManagement;
+using Moda.Common.Application.Validators;
 using Moda.Work.Application.Persistence;
-using Moda.Work.Application.Workspaces.Validators;
 
 namespace Moda.Work.Application.Workspaces.Commands;
 
 public sealed class UpdateExternalWorkspaceCommandHandlerValidator : CustomValidator<UpdateExternalWorkspaceCommand>
 {
-    private readonly IWorkDbContext _workDbContext;
-
     public UpdateExternalWorkspaceCommandHandlerValidator(IWorkDbContext workDbContext)
     {
-        _workDbContext = workDbContext;
-
         RuleFor(c => c.ExternalWorkspace)
             .NotNull()
             .SetValidator(new IExternalWorkspaceConfigurationValidator());
@@ -20,7 +16,7 @@ public sealed class UpdateExternalWorkspaceCommandHandlerValidator : CustomValid
 
 internal sealed class UpdateExternalWorkspaceCommandHandler(IWorkDbContext workDbContext, IDateTimeProvider dateTimeProvider, ILogger<UpdateExternalWorkspaceCommandHandler> logger) : ICommandHandler<UpdateExternalWorkspaceCommand>
 {
-    private const string AppRequestName = nameof(UpdateExternalWorkProcessCommand);
+    private const string AppRequestName = nameof(UpdateExternalWorkspaceCommand);
 
     private readonly IWorkDbContext _workDbContext = workDbContext;
     private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
@@ -28,7 +24,7 @@ internal sealed class UpdateExternalWorkspaceCommandHandler(IWorkDbContext workD
 
     public async Task<Result> Handle(UpdateExternalWorkspaceCommand request, CancellationToken cancellationToken)
     {
-        var workspace = await _workDbContext.Workspaces.FirstOrDefaultAsync(wp => wp.ExternalId == request.ExternalWorkspace.Id, cancellationToken);
+        var workspace = await _workDbContext.Workspaces.FirstOrDefaultAsync(wp => wp.OwnershipInfo.ExternalId == request.ExternalWorkspace.Id.ToString(), cancellationToken);
         if (workspace is null)
         {
             _logger.LogWarning("{AppRequestName}: workspace {WorkspaceExternalId} not found.", AppRequestName, request.ExternalWorkspace.Id);

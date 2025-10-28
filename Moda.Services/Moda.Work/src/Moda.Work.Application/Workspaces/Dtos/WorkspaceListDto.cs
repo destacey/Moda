@@ -14,6 +14,6 @@ public sealed record WorkspaceListDto : IMapFrom<Workspace>
     {
         config.NewConfig<Workspace, WorkspaceListDto>()
             .Map(dest => dest.Key, src => src.Key.ToString())
-            .Map(dest => dest.Ownership, src => SimpleNavigationDto.FromEnum(src.Ownership));
+            .Map(dest => dest.Ownership, src => SimpleNavigationDto.FromEnum(src.OwnershipInfo.Ownership));
     }
 }

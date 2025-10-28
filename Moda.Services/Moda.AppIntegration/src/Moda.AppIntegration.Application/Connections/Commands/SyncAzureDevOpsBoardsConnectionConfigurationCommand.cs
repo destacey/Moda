@@ -1,6 +1,4 @@
-﻿using System.IO;
-using System.Threading;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Moda.Common.Application.Interfaces.ExternalWork;
 using Moda.Common.Domain.Models;
 using NodaTime;

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Moda.Common.Domain.Enums;
+using Moda.Common.Domain.Enums.AppIntegrations;
 using Moda.Common.Domain.Enums.Organization;
 using Moda.Common.Domain.Enums.Planning;
 using Moda.Common.Domain.Enums.Work;
@@ -458,20 +459,15 @@ public class WorkspaceConfig : IEntityTypeConfiguration<Workspace>
         builder.HasAlternateKey(w => w.Key);
 
         builder.HasIndex(w => new { w.Id, w.IsDeleted })
-            .IncludeProperties(w => new { w.Key, w.Name, w.Ownership, w.IsActive })
+            .IncludeProperties(w => new { w.Key, w.Name, w.IsActive })
             .HasFilter("[IsDeleted] = 0");
         builder.HasIndex(w => new { w.Key, w.IsDeleted })
-            .IncludeProperties(w => new { w.Id, w.Name, w.Ownership, w.IsActive })
+            .IncludeProperties(w => new { w.Id, w.Name, w.IsActive })
             .HasFilter("[IsDeleted] = 0");
         builder.HasIndex(w => w.Name).IsUnique();
         builder.HasIndex(w => new { w.IsActive, w.IsDeleted })
-            .IncludeProperties(w => new { w.Id, w.Key, w.Name, w.Ownership })
+            .IncludeProperties(w => new { w.Id, w.Key, w.Name })
             .HasFilter("[IsDeleted] = 0");
-
-        // Index for external workspace lookups
-        builder.HasIndex(w => w.ExternalId)
-            .IncludeProperties(w => new { w.Id })
-            .HasFilter("[ExternalId] IS NOT NULL");
 
         // Properties
         builder.Property(w => w.Key).IsRequired()
@@ -482,13 +478,29 @@ public class WorkspaceConfig : IEntityTypeConfiguration<Workspace>
             .HasMaxLength(20);
         builder.Property(w => w.Name).IsRequired().HasMaxLength(128);
         builder.Property(w => w.Description).HasMaxLength(1024);
-        builder.Property(w => w.Ownership).IsRequired()
-            .HasConversion<EnumConverter<Ownership>>()
-            .HasColumnType("varchar")
-            .HasMaxLength(32);
-        builder.Property(w => w.ExternalId);
         builder.Property(w => w.ExternalViewWorkItemUrlTemplate).HasMaxLength(256);
         builder.Property(w => w.IsActive);
+
+        // Value Objects
+        builder.ComplexProperty(w => w.OwnershipInfo, options =>
+        {
+            options.Property(o => o.Ownership).HasColumnName("Ownership")
+                .HasConversion<EnumConverter<Ownership>>()
+                .HasColumnType("varchar")
+                .HasMaxLength(32)
+                .IsRequired();
+            options.Property(o => o.Connector).HasColumnName("Connector")
+                .HasConversion<EnumConverter<Connector>>()
+                .HasColumnType("varchar")
+                .HasMaxLength(32);
+            options.Property(o => o.SystemId).HasColumnName("SystemId")
+                .HasColumnType("varchar")
+                .HasMaxLength(64);
+            options.Property(o => o.ExternalId).HasColumnName("ExternalId")
+                .HasColumnType("varchar")
+                .HasMaxLength(64);
+        });
+
 
         // Audit
         builder.Property(w => w.Created);

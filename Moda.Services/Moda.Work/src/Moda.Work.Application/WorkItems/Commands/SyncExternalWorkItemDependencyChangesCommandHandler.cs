@@ -63,26 +63,26 @@ internal sealed class SyncExternalWorkItemDependencyChangesCommandHandler(IWorkD
 
         // Split the uniqueIds into their components for the join
         var externalIds = uniqueIds.Select(id => id.ExternalId).ToHashSet();
-        var workspaceExternalIds = uniqueIds.Select(id => id.WorkspaceExternalId).ToHashSet();
+        var workspaceExternalIds = uniqueIds.Select(id => id.WorkspaceExternalId.ToString()).ToHashSet();
 
         var workItems = await _workDbContext.WorkItems
             .Where(wi => wi.ExternalId.HasValue &&
-                wi.Workspace.ExternalId.HasValue &&
                 externalIds.Contains(wi.ExternalId.Value) &&
-                workspaceExternalIds.Contains(wi.Workspace.ExternalId.Value))
+                wi.Workspace.OwnershipInfo.ExternalId != null &&
+                workspaceExternalIds.Contains(wi.Workspace.OwnershipInfo.ExternalId))
             .Select(wi => new
             {
                 wi.Id,
                 ExternalId = wi.ExternalId!.Value,
-                WorkspaceExternalId = wi.Workspace.ExternalId!.Value
+                WorkspaceExternalId = wi.Workspace.OwnershipInfo.ExternalId!
             })
             .ToListAsync(cancellationToken);
 
         // Post-process to ensure we only get exact matches
         return workItems
-            .Where(wi => uniqueIds.Contains(new WorkItemExternalId(wi.ExternalId, wi.WorkspaceExternalId)))
+            .Where(wi => uniqueIds.Contains(new WorkItemExternalId(wi.ExternalId, Guid.Parse(wi.WorkspaceExternalId))))
             .ToDictionary(
-                wi => new WorkItemExternalId(wi.ExternalId, wi.WorkspaceExternalId),
+                wi => new WorkItemExternalId(wi.ExternalId, Guid.Parse(wi.WorkspaceExternalId)),
                 wi => wi.Id);
     }
 

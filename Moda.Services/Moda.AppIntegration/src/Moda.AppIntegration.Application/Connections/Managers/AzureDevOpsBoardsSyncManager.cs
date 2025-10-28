@@ -29,7 +29,7 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
 
         try
         {
-            var connections = await _sender.Send(new GetConnectionsQuery(false, Connector.AzureDevOpsBoards), cancellationToken);
+            var connections = await _sender.Send(new GetConnectionsQuery(false, Connector.AzureDevOps), cancellationToken);
             if (!connections.Any(c => c.IsValidConfiguration && c.IsSyncEnabled))
             {
                 var message = "No active Azure DevOps Boards connections found.";

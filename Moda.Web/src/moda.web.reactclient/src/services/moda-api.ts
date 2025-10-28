@@ -16803,7 +16803,7 @@ export interface ConnectionListDto {
     id: string;
     name: string;
     systemId?: string | undefined;
-    connector: string;
+    connector: SimpleNavigationDto;
     isActive: boolean;
     isValidConfiguration: boolean;
     isSyncEnabled: boolean;
@@ -16814,7 +16814,7 @@ export interface AzureDevOpsBoardsConnectionDetailsDto {
     name: string;
     description?: string | undefined;
     systemId?: string | undefined;
-    connector: string;
+    connector: SimpleNavigationDto;
     configuration: AzureDevOpsBoardsConnectionConfigurationDto;
     teamConfiguration: AzureDevOpsBoardsTeamConfigurationDto;
     isActive: boolean;
