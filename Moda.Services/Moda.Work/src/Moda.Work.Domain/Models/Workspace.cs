@@ -1,5 +1,6 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
+using Moda.Common.Domain.Enums.AppIntegrations;
 using Moda.Common.Extensions;
 using Moda.Common.Models;
 using Moda.Work.Domain.Interfaces;
@@ -67,7 +68,7 @@ public sealed class Workspace : BaseSoftDeletableEntity<Guid>, IActivatable<Work
     /// <summary>
     /// The ownership information for this workspace.
     /// </summary>
-    public OwnershipInfo OwnershipInfo { get; private init; } = default!;
+    public OwnershipInfo OwnershipInfo { get; private set; } = default!;
 
     /// <summary>
     /// The foreign key for the work process.
@@ -156,6 +157,27 @@ public sealed class Workspace : BaseSoftDeletableEntity<Guid>, IActivatable<Work
         Description = newDescription;
 
         AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
+
+        return Result.Success();
+    }
+
+    public Result SetSystemId(string systemId)
+    {
+        // TODO: this method is temporary until all external workspaces have their system ids set
+
+        if (OwnershipInfo.Ownership is not Ownership.Managed)
+            return Result.Failure($"Unable to set the SystemId for an {OwnershipInfo.Ownership.GetDisplayName()} workspace.");
+
+        var systemIdTrimmed = systemId?.Trim();
+
+        if (OwnershipInfo.SystemId is not null)
+        {
+            return OwnershipInfo.SystemId == systemIdTrimmed
+                ? Result.Success()
+                : Result.Failure("SystemId has already been set and cannot be changed to a different value.");
+        }
+
+        OwnershipInfo = OwnershipInfo.CreateExternalOwned((Connector)OwnershipInfo.Connector!, systemIdTrimmed, OwnershipInfo.ExternalId!);
 
         return Result.Success();
     }
