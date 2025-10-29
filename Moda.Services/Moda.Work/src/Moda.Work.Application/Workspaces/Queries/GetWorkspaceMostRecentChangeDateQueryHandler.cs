@@ -28,8 +28,11 @@ internal sealed class GetWorkspaceMostRecentChangeDateQueryHandler(IWorkDbContex
             return Result.Failure<Instant?>("No valid workspace id or key provided.");
         }
 
-        return await query
+        var lastModified = await query
             .SelectMany(e => e.WorkItems)
-            .MaxAsync(w => w.LastModified, cancellationToken);
+            .Select(w => (Instant?)w.LastModified)
+            .MaxAsync(cancellationToken);
+
+        return lastModified;
     }
 }
