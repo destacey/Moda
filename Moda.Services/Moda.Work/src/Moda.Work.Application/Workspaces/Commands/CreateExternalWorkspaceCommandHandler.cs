@@ -1,9 +1,8 @@
 ﻿using Moda.Common.Application.Requests.WorkManagement;
+using Moda.Common.Application.Validators;
 using Moda.Common.Domain.Models;
 using Moda.Common.Models;
 using Moda.Work.Application.Persistence;
-using Moda.Work.Application.WorkProcesses.Commands;
-using Moda.Work.Application.Workspaces.Validators;
 
 namespace Moda.Work.Application.Workspaces.Commands;
 
@@ -15,6 +14,12 @@ public sealed class CreateExternalWorkspaceCommandHandlerValidator : CustomValid
     {
         _workDbContext = workDbContext;
 
+        RuleFor(c => c.Connector)
+            .IsInEnum();
+
+        RuleFor(c => c.SystemId)
+            .NotEmpty();
+
         RuleFor(c => c.ExternalWorkspace)
             .NotNull()
             .SetValidator(new IExternalWorkspaceConfigurationValidator());
@@ -23,9 +28,13 @@ public sealed class CreateExternalWorkspaceCommandHandlerValidator : CustomValid
             .NotNull()
             .MustAsync(BeUniqueWorkspaceKey).WithMessage("The workspace key already exists.");
 
+        RuleFor(c => c.WorkspaceKey.Value)
+            .NotNull()
+            .MaximumLength(20);
+
         RuleFor(c => c.WorkspaceName)
             .NotEmpty()
-            .MaximumLength(64)
+            .MaximumLength(128)
             .MustAsync(BeUniqueWorkspaceName).WithMessage("The workspace name already exists.");
 
         RuleFor(c => c.ExternalViewWorkItemUrlTemplate)
@@ -60,9 +69,11 @@ internal sealed class CreateExternalWorkspaceCommandHandler(IWorkDbContext workD
             return Result.Failure<IntegrationState<Guid>>($"Unable to create an external workspace {{request.ExternalWorkspace.Id}} without an active work process {{request.ExternalWorkspace.WorkProcessId}}.");
         }
 
+        var ownershipInfo = OwnershipInfo.CreateExternalOwned(request.Connector, request.SystemId, request.ExternalWorkspace.Id.ToString());
+
         var timestamp = _dateTimeProvider.Now;
 
-        var workspace = Workspace.CreateExternal(request.WorkspaceKey, request.WorkspaceName, request.ExternalWorkspace.Description, request.ExternalWorkspace.Id, workProcess.Id, request.ExternalViewWorkItemUrlTemplate, timestamp);
+        var workspace = Workspace.CreateExternal(request.WorkspaceKey, request.WorkspaceName, request.ExternalWorkspace.Description, ownershipInfo, workProcess.Id, request.ExternalViewWorkItemUrlTemplate, timestamp);
 
         _workDbContext.Workspaces.Add(workspace);
         await _workDbContext.SaveChangesAsync(cancellationToken);

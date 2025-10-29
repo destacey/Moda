@@ -1,17 +1,23 @@
-﻿using Moda.Common.Application.Interfaces.ExternalWork;
+﻿using Moda.Common.Application.Events;
+using Moda.Common.Application.Interfaces.ExternalWork;
 using Moda.Common.Application.Models;
 using Moda.Common.Application.Requests.Planning.Iterations;
+using Moda.Common.Domain.Events.Planning.Iterations;
 using Moda.Common.Domain.Models;
+using Moda.Common.Domain.Models.Planning.Iterations;
 using Moda.Planning.Domain.Models.Iterations;
+using Moda.Common.Domain.Enums.AppIntegrations;
 
 namespace Moda.Planning.Application.Iterations.Commands;
-internal sealed class SyncAzureDevOpsIterationsCommandHandler(IPlanningDbContext planningDbContext, ILogger<SyncAzureDevOpsIterationsCommandHandler> logger)
-    : ICommandHandler<SyncAzureDevOpsIterationsCommand>
+internal sealed class SyncAzureDevOpsIterationsCommandHandler(IPlanningDbContext planningDbContext, ILogger<SyncAzureDevOpsIterationsCommandHandler> logger, IDateTimeProvider dateTimeProvider, IEventPublisher eventPublisher)
+ : ICommandHandler<SyncAzureDevOpsIterationsCommand>
 {
     private const string AppRequestName = nameof(SyncAzureDevOpsIterationsCommand);
 
     private readonly IPlanningDbContext _planningDbContext = planningDbContext;
     private readonly ILogger<SyncAzureDevOpsIterationsCommandHandler> _logger = logger;
+    private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
+    private readonly IEventPublisher _eventPublisher = eventPublisher;
 
     public async Task<Result> Handle(SyncAzureDevOpsIterationsCommand request, CancellationToken cancellationToken)
     {
@@ -38,10 +44,10 @@ internal sealed class SyncAzureDevOpsIterationsCommandHandler(IPlanningDbContext
                 }
 
                 var projectIterations = await _planningDbContext.Iterations
-                    .Include(i => i.ExternalMetadata)
-                    .Where(i => i.OwnershipInfo.SystemId == request.SystemId
-                        && i.ExternalMetadata.Any(em => em.Name == "ProjectId" && em.Value == azdoProjectId.ToString()))
-                    .ToListAsync(cancellationToken);
+                .Include(i => i.ExternalMetadata)
+                .Where(i => i.OwnershipInfo.SystemId == request.SystemId
+                && i.ExternalMetadata.Any(em => em.Name == "ProjectId" && em.Value == azdoProjectId.ToString()))
+                .ToListAsync(cancellationToken);
 
                 // Delete iterations that are no longer present for this project. Don't stop processing if there is a delete error.
                 var externalIdsToKeep = group.Select(i => i.Id.ToString()).ToHashSet(StringComparer.Ordinal);
@@ -67,14 +73,14 @@ internal sealed class SyncAzureDevOpsIterationsCommandHandler(IPlanningDbContext
         Result PublishSyncLog(Result result, string systemId, Guid? azdoProjectId, IterationSyncLog log)
         {
             _logger.LogInformation("Synced {Processed} external iterations for system {SystemId}{AzdoProjectPart}. Requested: {Requested}, Created: {Created}, Updated: {Updated}, Deleted: {Deleted}, Last External Id: {LastExternalId}.",
-                log.Processed,
-                systemId,
-                azdoProjectId.HasValue ? $" and Azdo Project {azdoProjectId}" : string.Empty,
-                log.Requested,
-                log.Created,
-                log.Updated,
-                log.Deleted,
-                log.LastExternalId);
+            log.Processed,
+            systemId,
+            azdoProjectId.HasValue ? $" and Azdo Project {azdoProjectId}" : string.Empty,
+            log.Requested,
+            log.Created,
+            log.Updated,
+            log.Deleted,
+            log.LastExternalId);
 
             return result;
         }
@@ -90,8 +96,8 @@ internal sealed class SyncAzureDevOpsIterationsCommandHandler(IPlanningDbContext
             return;
 
         var iterationsToDelete = projectIterations
-            .Where(pi => pi.OwnershipInfo.ExternalId != null && !externalIdsToKeep.Contains(pi.OwnershipInfo.ExternalId))
-            .ToList();
+        .Where(pi => pi.OwnershipInfo.ExternalId != null && !externalIdsToKeep.Contains(pi.OwnershipInfo.ExternalId))
+        .ToList();
 
         if (iterationsToDelete.Count == 0)
             return;
@@ -108,6 +114,20 @@ internal sealed class SyncAzureDevOpsIterationsCommandHandler(IPlanningDbContext
             // Log and continue: delete failures should not stop processing of other project groups
             _logger.LogError(ex, "Failed to delete {Count} iterations during sync. Continuing processing.", iterationsToDelete.Count);
         }
+
+        try
+        {
+            foreach (var iteration in iterationsToDelete)
+            {
+                var deleteEvent = new IterationDeletedEvent(iteration.Id, _dateTimeProvider.Now);
+                await _eventPublisher.PublishAsync(deleteEvent);
+            }
+        }
+        catch (Exception ex)
+        {
+            // Log and continue: delete failures should not stop processing of other project groups
+            _logger.LogError(ex, "Exception while processing iteration delete events");
+        }
     }
 
     /// <summary>
@@ -117,8 +137,8 @@ internal sealed class SyncAzureDevOpsIterationsCommandHandler(IPlanningDbContext
     {
         // Build lookup to avoid O(n^2) FirstOrDefault calls
         var existingByExternalId = projectIterations
-            .Where(pi => !string.IsNullOrEmpty(pi.OwnershipInfo.ExternalId))
-            .ToDictionary(pi => pi.OwnershipInfo.ExternalId!, StringComparer.Ordinal);
+        .Where(pi => !string.IsNullOrEmpty(pi.OwnershipInfo.ExternalId))
+        .ToDictionary(pi => pi.OwnershipInfo.ExternalId!, StringComparer.Ordinal);
 
         foreach (var externalIteration in externalIterations)
         {
@@ -138,7 +158,8 @@ internal sealed class SyncAzureDevOpsIterationsCommandHandler(IPlanningDbContext
                     externalIteration.Type,
                     externalIteration.State,
                     IterationDateRange.Create(externalIteration.Start, externalIteration.End),
-                    teamId
+                    teamId,
+                    _dateTimeProvider.Now
                 );
                 if (updateResult.IsFailure)
                 {
@@ -153,7 +174,7 @@ internal sealed class SyncAzureDevOpsIterationsCommandHandler(IPlanningDbContext
             }
             else
             {
-                var ownershipInfo = OwnershipInfo.CreateExternalOwned(systemId, externalIdString);
+                var ownershipInfo = OwnershipInfo.CreateExternalOwned(Connector.AzureDevOps, systemId, externalIdString);
 
                 List<KeyValueObjectMetadata> externalMetadata =
                 [
@@ -169,7 +190,8 @@ internal sealed class SyncAzureDevOpsIterationsCommandHandler(IPlanningDbContext
                     IterationDateRange.Create(externalIteration.Start, externalIteration.End),
                     teamId,
                     ownershipInfo,
-                    externalMetadata
+                    externalMetadata,
+                    _dateTimeProvider.Now
                 );
 
                 await _planningDbContext.Iterations.AddAsync(newIteration, cancellationToken);

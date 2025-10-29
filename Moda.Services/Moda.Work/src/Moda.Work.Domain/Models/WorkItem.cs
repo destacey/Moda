@@ -20,7 +20,7 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable, HasWorkspace
 
     private WorkItem() { }
 
-    private WorkItem(WorkItemKey key, string title, Guid workspaceId, int? externalId, WorkType workType, int statusId, WorkStatusCategory statusCategory, IWorkItemParentInfo? parentInfo, Guid? teamId, Instant created, Guid? createdById, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int? priority, double stackRank, double? storyPoints, Instant? activatedTimestamp, Instant? doneTimestamp, WorkItemExtended? extendedProps)
+    private WorkItem(WorkItemKey key, string title, Guid workspaceId, int? externalId, WorkType workType, int statusId, WorkStatusCategory statusCategory, IWorkItemParentInfo? parentInfo, Guid? teamId, Instant created, Guid? createdById, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int? priority, double stackRank, double? storyPoints, Guid? iterationId, Instant? activatedTimestamp, Instant? doneTimestamp, WorkItemExtended? extendedProps)
     {
         Key = key;
         Title = title;
@@ -38,6 +38,8 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable, HasWorkspace
         Priority = priority;
         StackRank = stackRank;
         StoryPoints = storyPoints;
+        IterationId = iterationId;
+
         ActivatedTimestamp = activatedTimestamp;
         DoneTimestamp = doneTimestamp;
         ExtendedProps = extendedProps;
@@ -130,6 +132,16 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable, HasWorkspace
     /// </summary>
     public Guid? CurrentProjectId => ProjectId ?? ParentProjectId;
 
+    /// <summary>
+    /// The current iteration id of the work item.
+    /// </summary>
+    public Guid? IterationId { get; set; }
+
+    /// <summary>
+    /// The current iteration of the work item.
+    /// </summary>
+    public WorkIteration? Iteration { get; set; }
+
     public Instant? ActivatedTimestamp { get; private set; }
 
     public Instant? DoneTimestamp { get; private set; }
@@ -145,7 +157,7 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable, HasWorkspace
     /// </summary>
     //public IReadOnlyCollection<WorkItemRevision> History => _history.AsReadOnly();
 
-    public void Update(string title, WorkType workType, int statusId, WorkStatusCategory statusCategory, IWorkItemParentInfo? parentInfo, Guid? teamId, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int? priority, double stackRank, double? storyPoints, Instant? activatedTimestamp, Instant? doneTimestamp, WorkItemExtended? extendedProps)
+    public void Update(string title, WorkType workType, int statusId, WorkStatusCategory statusCategory, IWorkItemParentInfo? parentInfo, Guid? teamId, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int? priority, double stackRank, double? storyPoints, Guid? iterationId, Instant? activatedTimestamp, Instant? doneTimestamp, WorkItemExtended? extendedProps)
     {
         if (extendedProps != null && Id != extendedProps.Id)
         {
@@ -166,6 +178,7 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable, HasWorkspace
         Priority = priority;
         StackRank = stackRank;
         StoryPoints = storyPoints;
+        IterationId = iterationId;
 
         var result = UpdateParent(parentInfo, workType);
         if (result.IsFailure)
@@ -293,18 +306,18 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable, HasWorkspace
         return Result.Success();
     }
 
-    public static WorkItem CreateExternal(Workspace workspace, int externalId, string title, WorkType workType, int statusId, WorkStatusCategory statusCategory, IWorkItemParentInfo? parentInfo, Guid? teamId, Instant created, Guid? createdById, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int? priority, double stackRank, double? storyPoints, Instant? activatedTimestamp, Instant? doneTimestamp, WorkItemExtended? extendedProps)
+    public static WorkItem CreateExternal(Workspace workspace, int externalId, string title, WorkType workType, int statusId, WorkStatusCategory statusCategory, IWorkItemParentInfo? parentInfo, Guid? teamId, Instant created, Guid? createdById, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int? priority, double stackRank, double? storyPoints, Guid? iterationId, Instant? activatedTimestamp, Instant? doneTimestamp, WorkItemExtended? extendedProps)
     {
         Guard.Against.Null(workspace, nameof(workspace));
         Guard.Against.Null(workType, nameof(workType));
 
-        if (workspace.Ownership != Ownership.Managed)
+        if (workspace.OwnershipInfo.Ownership is not Ownership.Managed)
         {
             throw new InvalidOperationException("Only managed workspaces can have external work items.");
         }
 
         var key = new WorkItemKey(workspace.Key, externalId);
-        return new WorkItem(key, title, workspace.Id, externalId, workType, statusId, statusCategory, parentInfo, teamId, created, createdById, lastModified, lastModifiedById, assignedToId, priority, stackRank, storyPoints, activatedTimestamp, doneTimestamp, extendedProps);
+        return new WorkItem(key, title, workspace.Id, externalId, workType, statusId, statusCategory, parentInfo, teamId, created, createdById, lastModified, lastModifiedById, assignedToId, priority, stackRank, storyPoints, iterationId, activatedTimestamp, doneTimestamp, extendedProps);
 
         //var result = workspace.AddWorkItem(workItem);  // this is handled in the handler for performance reasons
     }

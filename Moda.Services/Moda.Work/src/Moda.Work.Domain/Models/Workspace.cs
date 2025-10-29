@@ -1,5 +1,6 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
+using Moda.Common.Domain.Enums.AppIntegrations;
 using Moda.Common.Extensions;
 using Moda.Common.Models;
 using Moda.Work.Domain.Interfaces;
@@ -7,9 +8,13 @@ using NodaTime;
 
 namespace Moda.Work.Domain.Models;
 
-/// <summary>A workspace is a container for work items.</summary>
-/// <seealso cref="Moda.Common.Domain.Data.BaseSoftDeletableEntity&lt;System.Guid&gt;" />
-/// <seealso cref="Moda.Common.Domain.Interfaces.IActivatable&lt;Moda.Work.Domain.Models.WorkspaceActivatableArgs, NodaTime.Instant&gt;" />
+/// <summary>
+/// Represents a workspace that organizes and manages work items, processes, and related metadata.
+/// </summary>
+/// <remarks>A workspace is a central entity that contains work items and is associated with a specific work
+/// process. It supports operations such as adding and removing work items, updating workspace properties, and managing
+/// activation and deactivation states. Workspaces can be either owned internally or managed externally, with optional
+/// support for external work item URL templates.</remarks>
 public sealed class Workspace : BaseSoftDeletableEntity<Guid>, IActivatable<WorkspaceActivatableArgs, Instant>, HasWorkspaceIdAndKey
 {
     private WorkspaceKey _key = null!;
@@ -20,21 +25,17 @@ public sealed class Workspace : BaseSoftDeletableEntity<Guid>, IActivatable<Work
 
     private Workspace() { }
 
-    private Workspace(WorkspaceKey key, string name, string? description, Ownership ownership, Guid? externalId, Guid workProcessId, string? externalViewWorkItemUrlTemplate)
+    private Workspace(WorkspaceKey key, string name, string? description, OwnershipInfo ownershipInfo, Guid workProcessId, string? externalViewWorkItemUrlTemplate)
     {
         Key = key;
         Name = name;
         Description = description;
-        Ownership = ownership;
+        OwnershipInfo = Guard.Against.Null(ownershipInfo);
         WorkProcessId = workProcessId;
 
-        if (ownership is Ownership.Managed)
+        if (OwnershipInfo.Ownership is Ownership.Managed)
         {
-            if (!externalId.HasValue)
-                throw new ArgumentException("The external identifier is required when the ownership is managed.", nameof(externalId));
-
-            ExternalId = externalId.Value;
-            ExternalViewWorkItemUrlTemplate = null;
+            ExternalViewWorkItemUrlTemplate = externalViewWorkItemUrlTemplate;
         }
     }
 
@@ -65,13 +66,9 @@ public sealed class Workspace : BaseSoftDeletableEntity<Guid>, IActivatable<Work
     }
 
     /// <summary>
-    /// Indicates whether the workspace is owned by Moda or a third party system.  This value should not change.
+    /// The ownership information for this workspace.
     /// </summary>
-    public Ownership Ownership { get; private init; }
-
-    /// <summary>Gets the external identifier. The value is required when Ownership is managed; otherwise it's null.</summary>
-    /// <value>The external identifier.</value>
-    public Guid? ExternalId { get; private init; }
+    public OwnershipInfo OwnershipInfo { get; private set; } = default!;
 
     /// <summary>
     /// The foreign key for the work process.
@@ -144,25 +141,67 @@ public sealed class Workspace : BaseSoftDeletableEntity<Guid>, IActivatable<Work
     /// </summary>
     /// <param name="name"></param>
     /// <param name="description"></param>
+    /// <param name="timestamp"></param>
     /// <returns></returns>
     public Result Update(string name, string? description, Instant timestamp)
     {
-        Name = name.Trim();
-        Description = description?.Trim();
+        var newName = name.Trim();
+        var newDescription = description?.Trim();
+
+        // return success if no changes
+        if (string.Equals(Name, newName, StringComparison.Ordinal)
+            && string.Equals(Description, newDescription, StringComparison.Ordinal)) 
+            return Result.Success();
+
+        Name = newName;
+        Description = newDescription;
 
         AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
 
         return Result.Success();
     }
 
+    public Result SetSystemId(string systemId)
+    {
+        // TODO: this method is temporary until all external workspaces have their system ids set
+
+        if (OwnershipInfo.Ownership is not Ownership.Managed)
+            return Result.Failure($"Unable to set the SystemId for an {OwnershipInfo.Ownership.GetDisplayName()} workspace.");
+
+        var systemIdTrimmed = systemId?.Trim();
+
+        if (OwnershipInfo.SystemId is not null)
+        {
+            return OwnershipInfo.SystemId == systemIdTrimmed
+                ? Result.Success()
+                : Result.Failure("SystemId has already been set and cannot be changed to a different value.");
+        }
+
+        OwnershipInfo = OwnershipInfo.CreateExternalOwned((Connector)OwnershipInfo.Connector!, systemIdTrimmed, OwnershipInfo.ExternalId!);
+
+        return Result.Success();
+    }
+
+    /// <summary>
+    /// Set's the work item's external URL template
+    /// </summary>
+    /// <param name="externalWorkItemUrlTemplate"></param>
+    /// <param name="timestamp"></param>
+    /// <returns></returns>
     public Result SetExternalViewWorkItemUrlTemplate(string? externalWorkItemUrlTemplate, Instant timestamp)
     {
-        if (Ownership is not Ownership.Managed)
-            return Result.Failure($"Unable to set the external view work item url template for an {Ownership.GetDisplayName()} workspace.");
+        if (OwnershipInfo.Ownership is not Ownership.Managed)
+            return Result.Failure($"Unable to set the external view work item url template for an {OwnershipInfo.Ownership.GetDisplayName()} workspace.");
+
+        var newExternalWorkItemUrlTemplate = externalWorkItemUrlTemplate?.Trim();
+
+        // return success if no changes
+        if (string.Equals(ExternalViewWorkItemUrlTemplate, newExternalWorkItemUrlTemplate, StringComparison.Ordinal))
+            return Result.Success();
 
         // TODO: validate the template
 
-        ExternalViewWorkItemUrlTemplate = externalWorkItemUrlTemplate;
+        ExternalViewWorkItemUrlTemplate = newExternalWorkItemUrlTemplate;
 
         AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
 
@@ -233,9 +272,10 @@ public sealed class Workspace : BaseSoftDeletableEntity<Guid>, IActivatable<Work
     /// <returns></returns>
     public static Workspace Create(WorkspaceKey key, string name, string? description, Guid workProcessId, Instant timestamp)
     {
-        var workspace = new Workspace(key, name, description, Ownership.Owned, null, workProcessId, null);
+        var workspace = new Workspace(key, name, description, OwnershipInfo.CreateModaOwned(), workProcessId, null);
 
         workspace.AddDomainEvent(EntityCreatedEvent.WithEntity(workspace, timestamp));
+
         return workspace;
     }
 
@@ -248,11 +288,12 @@ public sealed class Workspace : BaseSoftDeletableEntity<Guid>, IActivatable<Work
     /// <param name="externalViewWorkItemUrlTemplate">The external view work item URL template.</param>
     /// <param name="timestamp">The timestamp.</param>
     /// <returns></returns>
-    public static Workspace CreateExternal(WorkspaceKey key, string name, string? description, Guid externalId, Guid workProcessId, string? externalViewWorkItemUrlTemplate, Instant timestamp)
+    public static Workspace CreateExternal(WorkspaceKey key, string name, string? description, OwnershipInfo ownershipInfo, Guid workProcessId, string? externalViewWorkItemUrlTemplate, Instant timestamp)
     {
-        var workspace = new Workspace(key, name, description, Ownership.Managed, externalId, workProcessId, externalViewWorkItemUrlTemplate);
+        var workspace = new Workspace(key, name, description, ownershipInfo, workProcessId, externalViewWorkItemUrlTemplate);
 
         workspace.AddDomainEvent(EntityCreatedEvent.WithEntity(workspace, timestamp));
+
         return workspace;
     }
 }

@@ -1,6 +1,6 @@
 ﻿using Moda.Common.Application.Interfaces.ExternalWork;
 
-namespace Moda.Work.Application.Workspaces.Validators;
+namespace Moda.Common.Application.Validators;
 public sealed class IExternalWorkspaceConfigurationValidator : CustomValidator<IExternalWorkspaceConfiguration>
 {
     public IExternalWorkspaceConfigurationValidator()
@@ -10,7 +10,7 @@ public sealed class IExternalWorkspaceConfigurationValidator : CustomValidator<I
 
         RuleFor(c => c.Name)
             .NotEmpty()
-            .MaximumLength(64);
+            .MaximumLength(128);
 
         RuleFor(c => c.Description)
             .MaximumLength(1024);

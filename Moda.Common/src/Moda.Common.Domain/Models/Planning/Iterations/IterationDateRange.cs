@@ -2,7 +2,7 @@
 using Moda.Common.Interfaces;
 using NodaTime;
 
-namespace Moda.Planning.Domain.Models.Iterations;
+namespace Moda.Common.Domain.Models.Planning.Iterations;
 public class IterationDateRange : ValueObject, IDateRange<Instant?>
 {
     public IterationDateRange(Instant? start, Instant? end)
@@ -59,7 +59,7 @@ public class IterationDateRange : ValueObject, IDateRange<Instant?>
     /// <returns></returns>
     public bool Includes(IterationDateRange range)
     {
-        return (EffectiveStart <= range.EffectiveStart) && (range.EffectiveEnd <= EffectiveEnd);
+        return EffectiveStart <= range.EffectiveStart && range.EffectiveEnd <= EffectiveEnd;
     }
 
     /// <summary>
@@ -71,8 +71,8 @@ public class IterationDateRange : ValueObject, IDateRange<Instant?>
     {
         return Includes(range)
             || range.Includes(this)
-            || (range.EffectiveStart <= EffectiveStart && EffectiveStart <= range.EffectiveEnd && range.EffectiveEnd <= EffectiveEnd)
-            || (EffectiveStart <= range.EffectiveStart && range.EffectiveStart <= EffectiveEnd && EffectiveEnd <= range.EffectiveEnd);
+            || range.EffectiveStart <= EffectiveStart && EffectiveStart <= range.EffectiveEnd && range.EffectiveEnd <= EffectiveEnd
+            || EffectiveStart <= range.EffectiveStart && range.EffectiveStart <= EffectiveEnd && EffectiveEnd <= range.EffectiveEnd;
     }
 
     /// <summary>

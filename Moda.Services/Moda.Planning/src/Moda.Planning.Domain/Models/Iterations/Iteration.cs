@@ -1,11 +1,22 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
+using Moda.Common.Domain.Enums;
 using Moda.Common.Domain.Enums.Planning;
+using Moda.Common.Domain.Events.Planning.Iterations;
 using Moda.Common.Domain.Interfaces;
+using Moda.Common.Domain.Interfaces.Planning.Iterations;
 using Moda.Common.Domain.Models;
+using Moda.Common.Domain.Models.Planning.Iterations;
+using NodaTime;
 
 namespace Moda.Planning.Domain.Models.Iterations;
-public class Iteration : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey
+
+/// <summary>
+/// Represents an iteration, which is a time-boxed unit of work typically associated with a team.
+/// </summary>
+/// <remarks>An iteration is characterized by its name, type, state, date range, and ownership information.  This class
+/// provides methods for creating and updating iterations, as well as managing associated metadata.</remarks>
+public class Iteration : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey, ISimpleIteration
 {
     private string _name = default!;
     private readonly List<KeyValueObjectMetadata> _externalMetadata = [];
@@ -19,8 +30,12 @@ public class Iteration : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey
         State = state;
         DateRange = dateRange;
         TeamId = teamId;
-        OwnershipInfo = ownershipInfo ?? throw new ArgumentNullException(nameof(ownershipInfo));
-        _externalMetadata = externalMetadata ?? [];
+        OwnershipInfo = Guard.Against.Null(ownershipInfo);
+
+        if (OwnershipInfo.Ownership is Ownership.Managed)
+        {
+            _externalMetadata = externalMetadata ?? [];
+        }
     }
 
     /// <summary>
@@ -65,20 +80,29 @@ public class Iteration : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey
     /// <summary>
     /// The ownership information for this iteration.
     /// </summary>
-    public OwnershipInfo OwnershipInfo { get; set; } = default!;
-    
+    public OwnershipInfo OwnershipInfo { get; private init; } = default!;
+
     /// <summary>
     /// Gets a read-only collection of external metadata associated with the object.
     /// </summary>
     public IReadOnlyCollection<KeyValueObjectMetadata> ExternalMetadata => _externalMetadata.AsReadOnly();
 
-    public Result Update(string name, IterationType type, IterationState state, IterationDateRange dateRange, Guid? teamId)
+    public Result Update(string name, IterationType type, IterationState state, IterationDateRange dateRange, Guid? teamId, Instant timestamp)
     {
-        Name = name;
+        // Normalize and validate incoming values before comparing to current state
+        var newName = Guard.Against.NullOrWhiteSpace(name, nameof(name)).Trim();
+
+        if (!ValuesChanged(newName, type, state, dateRange, teamId))
+            return Result.Success();
+
+        // Apply changes
+        Name = newName;
         Type = type;
         State = state;
         DateRange = dateRange;
         TeamId = teamId;
+
+        AddDomainEvent(new IterationUpdatedEvent(this, timestamp));
 
         return Result.Success();
     }
@@ -100,7 +124,24 @@ public class Iteration : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey
     /// <param name="teamId"></param>
     /// <param name="ownershipInfo"></param>
     /// <param name="externalMetadata"></param>
+    /// <param name="timestamp"></param>
     /// <returns></returns>
-    public static Iteration Create(string name, IterationType type, IterationState state, IterationDateRange dateRange, Guid? teamId, OwnershipInfo ownershipInfo, List<KeyValueObjectMetadata> externalMetadata)
-        => new(name, type, state, dateRange, teamId, ownershipInfo, externalMetadata);
+    public static Iteration Create(string name, IterationType type, IterationState state, IterationDateRange dateRange, Guid? teamId, OwnershipInfo ownershipInfo, List<KeyValueObjectMetadata> externalMetadata, Instant timestamp)
+    {
+        var iteration = new Iteration (name, type, state, dateRange, teamId, ownershipInfo, externalMetadata);
+
+        iteration.AddPostPersistenceAction(() => iteration.AddDomainEvent(new IterationCreatedEvent(iteration, timestamp)));
+
+        return iteration;
+    }
+
+    private bool ValuesChanged(string newName, IterationType type, IterationState state, IterationDateRange dateRange, Guid? teamId)
+    {
+        if (!string.Equals(_name, newName, StringComparison.Ordinal)) return true;
+        if (Type != type) return true;
+        if (State != state) return true;
+        if (!EqualityComparer<IterationDateRange>.Default.Equals(DateRange, dateRange)) return true;
+        if (TeamId != teamId) return true;
+        return false;
+    }
 }

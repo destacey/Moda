@@ -70,6 +70,9 @@ public class BackgroundJobsController : ControllerBase
             case BackgroundJobType.TeamGraphSync:
                 _jobService.Enqueue(() => jobManager.RunSyncTeamsWithGraphTables(cancellationToken));
                 break;
+            case BackgroundJobType.IterationsSync:
+                _jobService.Enqueue(() => jobManager.RunSyncIterations(cancellationToken));
+                break;
             case BackgroundJobType.StrategicThemesSync:
                 _jobService.Enqueue(() => jobManager.RunSyncStrategicThemes(cancellationToken));
                 break;

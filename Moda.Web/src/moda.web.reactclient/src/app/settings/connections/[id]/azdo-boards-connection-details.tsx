@@ -20,7 +20,7 @@ const AzdoBoardsConnectionDetails = ({
         <Col xs={24} md={12}>
           <Descriptions column={1}>
             <Item label="System Id">{connection.systemId}</Item>
-            <Item label="Connector">{connection.connector}</Item>
+            <Item label="Connector">{connection.connector.name}</Item>
             <Item label="Is Active?">{connection.isActive ? 'Yes' : 'No'}</Item>
             <Item label="Is Valid Configuration?">
               {connection.isValidConfiguration ? 'Yes' : 'No'}

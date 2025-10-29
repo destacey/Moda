@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Moda.Common.Domain.Enums;
+using Moda.Common.Domain.Enums.AppIntegrations;
 using Moda.Common.Domain.Enums.Organization;
 using Moda.Common.Domain.Enums.Planning;
 using Moda.Common.Domain.Models;
@@ -510,11 +511,16 @@ public class IterationConfig : IEntityTypeConfiguration<Iteration>
                 .HasColumnType("varchar")
                 .HasMaxLength(32)
                 .IsRequired();
+            options.Property(o => o.Connector).HasColumnName("Connector")
+                .HasConversion<EnumConverter<Connector>>()
+                .HasColumnType("varchar")
+                .HasMaxLength(32);
             options.Property(o => o.SystemId).HasColumnName("SystemId")
-                .HasMaxLength(128);
+                .HasColumnType("varchar")
+                .HasMaxLength(64);
             options.Property(o => o.ExternalId).HasColumnName("ExternalId")
-                .HasMaxLength(128);
-
+                .HasColumnType("varchar")
+                .HasMaxLength(64);
         });
 
         // Ignore

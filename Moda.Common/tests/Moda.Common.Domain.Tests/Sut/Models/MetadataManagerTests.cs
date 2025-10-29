@@ -44,11 +44,11 @@ public class MetadataManagerTests
         // Arrange
         var collection = new List<KeyValueObjectMetadata>();
         var objectId = Guid.NewGuid();
-        var items = new[]
-        {
+        IEnumerable<(string Name, string? Value)> items =
+        [
             ("k1", "v1"),
             ("k2", "v2")
-        };
+        ];
 
         // Act
         var result = MetadataManager<KeyValueObjectMetadata>.UpsertMany(collection, objectId, items);

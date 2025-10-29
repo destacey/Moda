@@ -14,19 +14,22 @@ internal sealed class ProjectSyncHandler(IWorkDbContext workDbContext, ILogger<P
 
     public async Task Handle(EventNotification<ProjectCreatedEvent> notification, CancellationToken cancellationToken)
     {
-        _logger.LogDebug("Handling Work {SystemActionType} for a new Project {ProjectId}.", SystemActionType.ServiceDataReplication, notification.Event.Id);
+        if (_logger.IsEnabled(LogLevel.Debug))
+            _logger.LogDebug("Handling Work {SystemActionType} for a new Project {ProjectId}.", SystemActionType.ServiceDataReplication, notification.Event.Id);
         await CreateProject(notification.Event, cancellationToken);
     }
 
     public async Task Handle(EventNotification<ProjectDetailsUpdatedEvent> notification, CancellationToken cancellationToken)
     {
-        _logger.LogDebug("Handling Work {SystemActionType} for an updated Project {ProjectId}.", SystemActionType.ServiceDataReplication, notification.Event.Id);
+        if (_logger.IsEnabled(LogLevel.Debug))
+            _logger.LogDebug("Handling Work {SystemActionType} for an updated Project {ProjectId}.", SystemActionType.ServiceDataReplication, notification.Event.Id);
         await UpdateProject(notification.Event, cancellationToken);
     }
 
     public async Task Handle(EventNotification<ProjectDeletedEvent> notification, CancellationToken cancellationToken)
     {
-        _logger.LogDebug("Handling Work {SystemActionType} for a deleted Project {ProjectId}.", SystemActionType.ServiceDataReplication, notification.Event.Id);
+        if (_logger.IsEnabled(LogLevel.Debug))
+            _logger.LogDebug("Handling Work {SystemActionType} for a deleted Project {ProjectId}.", SystemActionType.ServiceDataReplication, notification.Event.Id);
         await DeleteProject(notification.Event, cancellationToken);
     }
 
@@ -40,8 +43,8 @@ internal sealed class ProjectSyncHandler(IWorkDbContext workDbContext, ILogger<P
                 return;
             }
             var project = new WorkProject(createdEvent);
-            await _workDbContext.WorkProjects.AddAsync(project, cancellationToken);
 
+            await _workDbContext.WorkProjects.AddAsync(project, cancellationToken);
             await _workDbContext.SaveChangesAsync(cancellationToken);
 
             _logger.LogInformation("Successful Work {SystemActionType} for the Project {ProjectId} created action.", SystemActionType.ServiceDataReplication, createdEvent.Id);

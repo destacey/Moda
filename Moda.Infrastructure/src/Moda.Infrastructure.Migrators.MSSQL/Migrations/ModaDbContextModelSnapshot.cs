@@ -19,7 +19,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("Work")
-                .HasAnnotation("ProductVersion", "9.0.9")
+                .HasAnnotation("ProductVersion", "9.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -159,7 +159,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                     b.Property<string>("SystemId")
                         .HasMaxLength(64)
-                        .HasColumnType("nvarchar(64)");
+                        .HasColumnType("varchar");
 
                     b.HasKey("Id");
 
@@ -1061,9 +1061,14 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         {
                             b1.IsRequired();
 
+                            b1.Property<string>("Connector")
+                                .HasMaxLength(32)
+                                .HasColumnType("varchar")
+                                .HasColumnName("Connector");
+
                             b1.Property<string>("ExternalId")
-                                .HasMaxLength(128)
-                                .HasColumnType("nvarchar(128)")
+                                .HasMaxLength(64)
+                                .HasColumnType("varchar")
                                 .HasColumnName("ExternalId");
 
                             b1.Property<string>("Ownership")
@@ -1073,8 +1078,8 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                                 .HasColumnName("Ownership");
 
                             b1.Property<string>("SystemId")
-                                .HasMaxLength(128)
-                                .HasColumnType("nvarchar(128)")
+                                .HasMaxLength(64)
+                                .HasColumnType("varchar")
                                 .HasColumnName("SystemId");
                         });
 
@@ -2488,6 +2493,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<int?>("ExternalId")
                         .HasColumnType("int");
 
+                    b.Property<Guid?>("IterationId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Key")
                         .IsRequired()
                         .HasMaxLength(64)
@@ -2566,6 +2574,10 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.HasIndex("Id");
 
                     SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Id"), new[] { "Key", "Title", "WorkspaceId", "ExternalId", "AssignedToId", "TypeId", "StatusId", "StatusCategory", "ActivatedTimestamp", "DoneTimestamp", "ProjectId", "ParentProjectId" });
+
+                    b.HasIndex("IterationId");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("IterationId"), new[] { "Id", "Key", "Title", "WorkspaceId", "AssignedToId", "TypeId", "StatusId", "StatusCategory", "ActivatedTimestamp", "DoneTimestamp", "ProjectId", "ParentProjectId" });
 
                     b.HasIndex("Key");
 
@@ -2725,6 +2737,54 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("ObjectId", "Context"), new[] { "WorkItemId" });
 
                     b.ToTable("WorkItemReferences", "Work");
+                });
+
+            modelBuilder.Entity("Moda.Work.Domain.Models.WorkIteration", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Key")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar");
+
+                    b.Property<Guid?>("TeamId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar");
+
+                    b.ComplexProperty<Dictionary<string, object>>("DateRange", "Moda.Work.Domain.Models.WorkIteration.DateRange#IterationDateRange", b1 =>
+                        {
+                            b1.IsRequired();
+
+                            b1.Property<DateTime?>("End")
+                                .HasColumnType("datetime2")
+                                .HasColumnName("End");
+
+                            b1.Property<DateTime?>("Start")
+                                .HasColumnType("datetime2")
+                                .HasColumnName("Start");
+                        });
+
+                    b.HasKey("Id");
+
+                    b.HasAlternateKey("Key");
+
+                    b.HasIndex("TeamId");
+
+                    b.ToTable("WorkIterations", "Work");
                 });
 
             modelBuilder.Entity("Moda.Work.Domain.Models.WorkProcess", b =>
@@ -3290,9 +3350,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasMaxLength(1024)
                         .HasColumnType("nvarchar(1024)");
 
-                    b.Property<Guid?>("ExternalId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("ExternalViewWorkItemUrlTemplate")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -3319,22 +3376,38 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)");
 
-                    b.Property<string>("Ownership")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("varchar");
-
                     b.Property<Guid>("WorkProcessId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.ComplexProperty<Dictionary<string, object>>("OwnershipInfo", "Moda.Work.Domain.Models.Workspace.OwnershipInfo#OwnershipInfo", b1 =>
+                        {
+                            b1.IsRequired();
+
+                            b1.Property<string>("Connector")
+                                .HasMaxLength(32)
+                                .HasColumnType("varchar")
+                                .HasColumnName("Connector");
+
+                            b1.Property<string>("ExternalId")
+                                .HasMaxLength(64)
+                                .HasColumnType("varchar")
+                                .HasColumnName("ExternalId");
+
+                            b1.Property<string>("Ownership")
+                                .IsRequired()
+                                .HasMaxLength(32)
+                                .HasColumnType("varchar")
+                                .HasColumnName("Ownership");
+
+                            b1.Property<string>("SystemId")
+                                .HasMaxLength(64)
+                                .HasColumnType("varchar")
+                                .HasColumnName("SystemId");
+                        });
 
                     b.HasKey("Id");
 
                     b.HasAlternateKey("Key");
-
-                    b.HasIndex("ExternalId")
-                        .HasFilter("[ExternalId] IS NOT NULL");
-
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("ExternalId"), new[] { "Id" });
 
                     b.HasIndex("Name")
                         .IsUnique();
@@ -3344,17 +3417,17 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.HasIndex("Id", "IsDeleted")
                         .HasFilter("[IsDeleted] = 0");
 
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Id", "IsDeleted"), new[] { "Key", "Name", "Ownership", "IsActive" });
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Id", "IsDeleted"), new[] { "Key", "Name", "IsActive" });
 
                     b.HasIndex("IsActive", "IsDeleted")
                         .HasFilter("[IsDeleted] = 0");
 
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("IsActive", "IsDeleted"), new[] { "Id", "Key", "Name", "Ownership" });
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("IsActive", "IsDeleted"), new[] { "Id", "Key", "Name" });
 
                     b.HasIndex("Key", "IsDeleted")
                         .HasFilter("[IsDeleted] = 0");
 
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Key", "IsDeleted"), new[] { "Id", "Name", "Ownership", "IsActive" });
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Key", "IsDeleted"), new[] { "Id", "Name", "IsActive" });
 
                     b.ToTable("Workspaces", "Work");
                 });
@@ -3363,7 +3436,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                 {
                     b.HasBaseType("Moda.AppIntegration.Domain.Models.Connection");
 
-                    b.HasDiscriminator().HasValue("AzureDevOpsBoards");
+                    b.HasDiscriminator().HasValue("AzureDevOps");
                 });
 
             modelBuilder.Entity("Moda.Organization.Domain.Models.Team", b =>
@@ -4055,6 +4128,10 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("Moda.Work.Domain.Models.WorkIteration", "Iteration")
+                        .WithMany()
+                        .HasForeignKey("IterationId");
+
                     b.HasOne("Moda.Common.Domain.Employees.Employee", "LastModifiedBy")
                         .WithMany()
                         .HasForeignKey("LastModifiedById")
@@ -4097,6 +4174,8 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("AssignedTo");
 
                     b.Navigation("CreatedBy");
+
+                    b.Navigation("Iteration");
 
                     b.Navigation("LastModifiedBy");
 
@@ -4164,6 +4243,14 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasForeignKey("WorkItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Moda.Work.Domain.Models.WorkIteration", b =>
+                {
+                    b.HasOne("Moda.Work.Domain.Models.WorkTeam", null)
+                        .WithMany()
+                        .HasForeignKey("TeamId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Moda.Work.Domain.Models.WorkProcessScheme", b =>

@@ -3,7 +3,7 @@ using Moda.Common.Domain.Interfaces.ProjectPortfolioManagement;
 using Moda.Work.Application.Persistence;
 
 namespace Moda.Work.Application.WorkProjects.Commands;
-public sealed record SyncWorkProjectsCommand(IEnumerable<ISimpleProject> Projects) : ICommand;
+public sealed record SyncWorkProjectsCommand(IEnumerable<ISimpleProject> Projects) : ICommand, ILongRunningRequest;
 
 internal sealed class SyncWorkProjectsCommandHandler(
     IWorkDbContext workDbContext,
@@ -11,6 +11,7 @@ internal sealed class SyncWorkProjectsCommandHandler(
     : ICommandHandler<SyncWorkProjectsCommand>
 {
     private const string AppRequestName = nameof(SyncWorkProjectsCommand);
+
     private readonly IWorkDbContext _workDbContext = workDbContext;
     private readonly ILogger<SyncWorkProjectsCommandHandler> _logger = logger;
 
@@ -48,7 +49,8 @@ internal sealed class SyncWorkProjectsCommandHandler(
                 var existingProject = existingProjects.FirstOrDefault(x => x.Id == project.Id);
                 if (existingProject == null)
                 {
-                    _logger.LogDebug("Creating new Work project {ProjectId}.", project.Id);
+                    if (_logger.IsEnabled(LogLevel.Debug))
+                        _logger.LogDebug("Creating new Work project {ProjectId}.", project.Id);
 
                     var newProject = new WorkProject(project);
 
@@ -57,7 +59,8 @@ internal sealed class SyncWorkProjectsCommandHandler(
                 }
                 else
                 {
-                    _logger.LogDebug("Updating existing Work project {ProjectId}.", project.Id);
+                    if (_logger.IsEnabled(LogLevel.Debug))
+                        _logger.LogDebug("Updating existing Work project {ProjectId}.", project.Id);
 
                     existingProject.UpdateDetails(project);
                     updateCount++;
@@ -73,7 +76,7 @@ internal sealed class SyncWorkProjectsCommandHandler(
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Exception handling {CommandName} command for request {@Request}.", AppRequestName, request);
+            _logger.LogError(ex, "Exception handling {CommandName} command.", AppRequestName);
             return Result.Failure($"Error handling {AppRequestName} command.");
         }
     }

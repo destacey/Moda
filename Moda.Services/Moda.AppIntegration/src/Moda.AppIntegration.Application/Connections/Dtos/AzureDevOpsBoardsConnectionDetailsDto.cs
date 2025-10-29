@@ -1,4 +1,5 @@
 ﻿using Mapster;
+using Moda.Common.Application.Dtos;
 
 namespace Moda.AppIntegration.Application.Connections.Dtos;
 public sealed record AzureDevOpsBoardsConnectionDetailsDto : IMapFrom<AzureDevOpsBoardsConnection>
@@ -26,7 +27,7 @@ public sealed record AzureDevOpsBoardsConnectionDetailsDto : IMapFrom<AzureDevOp
     /// <summary>
     /// The type of connector for the connection.  This value cannot be changed once set.
     /// </summary>
-    public required string Connector { get; set; }
+    public required SimpleNavigationDto Connector { get; set; }
 
     /// <summary>
     /// The configuration for the connection.
@@ -56,6 +57,6 @@ public sealed record AzureDevOpsBoardsConnectionDetailsDto : IMapFrom<AzureDevOp
     public void ConfigureMapping(TypeAdapterConfig config)
     {
         config.NewConfig<AzureDevOpsBoardsConnection, AzureDevOpsBoardsConnectionDetailsDto>()
-            .Map(dest => dest.Connector, src => src.Connector.GetDisplayName());
+            .Map(dest => dest.Connector, src => SimpleNavigationDto.FromEnum(src.Connector));
     }
 }

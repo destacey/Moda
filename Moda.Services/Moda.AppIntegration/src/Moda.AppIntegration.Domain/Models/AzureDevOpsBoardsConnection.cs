@@ -14,7 +14,7 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
         Name = name;
         Description = description;
         SystemId = systemId;
-        Connector = Connector.AzureDevOpsBoards;
+        Connector = Connector.AzureDevOps;
         Configuration = Guard.Against.Null(configuration, nameof(Configuration));
         IsValidConfiguration = configurationIsValid;
         TeamConfiguration = teamConfiguration ?? AzureDevOpsBoardsTeamConfiguration.CreateEmpty();

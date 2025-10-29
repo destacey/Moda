@@ -4,6 +4,7 @@ using Moda.AppIntegration.Application.Connections.Queries;
 using Moda.AppIntegration.Application.Interfaces;
 using Moda.Common.Application.Interfaces.ExternalWork;
 using Moda.Common.Application.Requests.WorkManagement;
+using Moda.Common.Domain.Enums.AppIntegrations;
 using Moda.Common.Domain.Models;
 using Moda.Common.Models;
 using Moda.Work.Application.Workflows.Dtos;
@@ -192,7 +193,7 @@ public sealed class AzureDevOpsBoardsInitManager(ILogger<AzureDevOpsBoardsInitMa
             // TODO: should the lookup be on the external id and connector? azdo|externalId
             // TODO: crossing service boundaries :(
             // verify the externalId isn't already integrated
-            var exists = await _sender.Send(new ExternalWorkspaceExistsQuery(workspaceExternalId), cancellationToken);
+            var exists = await _sender.Send(new ExternalWorkspaceExistsQuery(workspaceExternalId.ToString()), cancellationToken);
             if (exists)
             {
                 _logger.LogError("Unable to initialize a workspace {WorkspaceExternalId} from Azure DevOps for connection {ConnectionId} because it is already integrated.", workspaceExternalId, connectionId);
@@ -217,13 +218,20 @@ public sealed class AzureDevOpsBoardsInitManager(ILogger<AzureDevOpsBoardsInitMa
             if (connectionResult.IsFailure)
                 return connectionResult.ConvertFailure<Guid>();
 
+            var systemId = connectionResult.Value.SystemId;
+            if (string.IsNullOrWhiteSpace(systemId))
+            {
+                _logger.LogError("The connection {ConnectionId} is missing systemId.", connectionId);
+                return Result.Failure<Guid>("The connection is missing systemId.  Please re-sync your connection and try again.");
+            }
+
             // get the workspace
             var workspaceResult = await _azureDevOpsService.GetWorkspace(connectionResult.Value.Configuration.OrganizationUrl, connectionResult.Value.Configuration.PersonalAccessToken, workspaceExternalId, cancellationToken);
             if (workspaceResult.IsFailure)
                 return workspaceResult.ConvertFailure<Guid>();
 
             // create the workspace
-            var createWorkspaceResult = await _sender.Send(new CreateExternalWorkspaceCommand(workspaceResult.Value, new WorkspaceKey(workspaceKey), workspaceName, externalViewWorkItemUrlTemplate), cancellationToken);
+            var createWorkspaceResult = await _sender.Send(new CreateExternalWorkspaceCommand(Connector.AzureDevOps, systemId, workspaceResult.Value, new WorkspaceKey(workspaceKey), workspaceName, externalViewWorkItemUrlTemplate), cancellationToken);
             if (createWorkspaceResult.IsFailure)
                 return createWorkspaceResult.ConvertFailure<Guid>();
 

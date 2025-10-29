@@ -1,6 +1,6 @@
-﻿using Moda.Planning.Domain.Models.Iterations;
+﻿using Moda.Common.Domain.Models.Planning.Iterations;
 
-namespace Moda.Planning.Domain.Tests.Sut.Models.Iterations;
+namespace Moda.Common.Domain.Tests.Sut.Models.Planning.Iterations;
 
 public sealed class IterationDateRangeTests
 {

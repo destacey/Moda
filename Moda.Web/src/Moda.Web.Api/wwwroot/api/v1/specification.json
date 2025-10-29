@@ -19349,7 +19349,7 @@
             "nullable": true
           },
           "connector": {
-            "type": "string"
+            "$ref": "#/components/schemas/SimpleNavigationDto"
           },
           "isActive": {
             "type": "boolean"
@@ -19394,7 +19394,7 @@
             "nullable": true
           },
           "connector": {
-            "type": "string"
+            "$ref": "#/components/schemas/SimpleNavigationDto"
           },
           "configuration": {
             "$ref": "#/components/schemas/AzureDevOpsBoardsConnectionConfigurationDto"
