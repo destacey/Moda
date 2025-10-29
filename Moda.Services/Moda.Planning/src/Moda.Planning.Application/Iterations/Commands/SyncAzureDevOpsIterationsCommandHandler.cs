@@ -154,12 +154,12 @@ internal sealed class SyncAzureDevOpsIterationsCommandHandler(IPlanningDbContext
             if (existingByExternalId.TryGetValue(externalIdString, out var existingIteration))
             {
                 var updateResult = existingIteration.Update(
-                externalIteration.Name,
-                externalIteration.Type,
-                externalIteration.State,
-                IterationDateRange.Create(externalIteration.Start, externalIteration.End),
-                teamId,
-                _dateTimeProvider.Now
+                    externalIteration.Name,
+                    externalIteration.Type,
+                    externalIteration.State,
+                    IterationDateRange.Create(externalIteration.Start, externalIteration.End),
+                    teamId,
+                    _dateTimeProvider.Now
                 );
                 if (updateResult.IsFailure)
                 {

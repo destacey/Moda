@@ -190,7 +190,7 @@ public sealed class Workspace : BaseSoftDeletableEntity<Guid>, IActivatable<Work
     /// <returns></returns>
     public Result SetExternalViewWorkItemUrlTemplate(string? externalWorkItemUrlTemplate, Instant timestamp)
     {
-        if (OwnershipInfo.Ownership is Ownership.Managed)
+        if (OwnershipInfo.Ownership is not Ownership.Managed)
             return Result.Failure($"Unable to set the external view work item url template for an {OwnershipInfo.Ownership.GetDisplayName()} workspace.");
 
         var newExternalWorkItemUrlTemplate = externalWorkItemUrlTemplate?.Trim();

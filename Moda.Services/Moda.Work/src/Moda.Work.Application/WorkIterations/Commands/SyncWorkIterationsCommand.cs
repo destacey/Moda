@@ -76,7 +76,7 @@ internal sealed class SyncWorkIterationsCommandHandler(
         catch (Exception ex)
         {
             _logger.LogError(ex, "Exception handling {CommandName} command.", AppRequestName);
-            return Result.Failure<ObjectIdAndKey>($"Error handling {AppRequestName} command.");
+            return Result.Failure($"Error handling {AppRequestName} command.");
         }
     }
 }
