@@ -15,13 +15,12 @@ using NodaTime;
 
 namespace Moda.AppIntegration.Application.Connections.Managers;
 
-public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncManager> logger, IAzureDevOpsService azureDevOpsService, ISender sender, IAzureDevOpsBoardsInitManager initManager, ISerializerService jsonSerializer) : IAzureDevOpsBoardsSyncManager
+public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncManager> logger, IAzureDevOpsService azureDevOpsService, ISender sender, IAzureDevOpsBoardsInitManager initManager) : IAzureDevOpsBoardsSyncManager
 {
     private readonly ILogger<AzureDevOpsBoardsSyncManager> _logger = logger;
     private readonly IAzureDevOpsService _azureDevOpsService = azureDevOpsService;
     private readonly ISender _sender = sender;
     private readonly IAzureDevOpsBoardsInitManager _initManager = initManager;
-    private readonly ISerializerService _jsonSerializer = jsonSerializer;
 
     public async Task<Result> Sync(SyncType syncType, CancellationToken cancellationToken)
     {
@@ -150,7 +149,7 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
                                 _ => new DateTime(1900, 01, 01)
                             };
 
-                            var syncWorkItemsResult = await SyncWorkItems(connectionDetails.Configuration.OrganizationUrl, connectionDetails.Configuration.PersonalAccessToken, lastChangedDate, workspace.IntegrationState!.InternalId, workspace.Name, workspaceTeams, cancellationToken);
+                            var syncWorkItemsResult = await SyncWorkItems(connectionDetails.Configuration.OrganizationUrl, connectionDetails.Configuration.PersonalAccessToken, lastChangedDate, workspace.IntegrationState!.InternalId, workspace.Name, workspaceTeams, connectionDetails.SystemId!, cancellationToken);
                             if (syncWorkItemsResult.IsFailure)
                             {
                                 _logger.LogError("An error occurred while syncing Azure DevOps Boards workspace {WorkspaceId} work items. Error: {Error}", workspace.IntegrationState!.InternalId, syncWorkItemsResult.Error);
@@ -345,7 +344,7 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
         return syncResult;
     }
 
-    private async Task<Result> SyncWorkItems(string organizationUrl, string personalAccessToken, DateTime lastChangedDate, Guid workspaceId, string azdoWorkspaceName, AzureDevOpsBoardsWorkspaceTeamDto[] workspaceTeams, CancellationToken cancellationToken)
+    private async Task<Result> SyncWorkItems(string organizationUrl, string personalAccessToken, DateTime lastChangedDate, Guid workspaceId, string azdoWorkspaceName, AzureDevOpsBoardsWorkspaceTeamDto[] workspaceTeams, string systemId, CancellationToken cancellationToken)
     {
         Guard.Against.NullOrWhiteSpace(organizationUrl, nameof(organizationUrl));
         Guard.Against.NullOrWhiteSpace(personalAccessToken, nameof(personalAccessToken));
@@ -384,9 +383,11 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
 
         _logger.LogInformation("Retrieved {WorkItemCount} work items to sync for Azure DevOps project {Project}.", workItemsResult.Value.Count, azdoWorkspaceName);
 
+        var iterationMappings = await _sender.Send(new GetIterationMappingsQuery(Connector.AzureDevOps, systemId), cancellationToken);
+
         return workItemsResult.Value.Count == 0
             ? Result.Success()
-            : await _sender.Send(new SyncExternalWorkItemsCommand(workspaceId, workItemsResult.Value, teamMappings), cancellationToken);
+            : await _sender.Send(new SyncExternalWorkItemsCommand(workspaceId, workItemsResult.Value, teamMappings, iterationMappings), cancellationToken);
     }
 
     private async Task<Result> SyncWorkItemParentChanges(string organizationUrl, string personalAccessToken, DateTime lastChangedDate, Guid workspaceId, string azdoWorkspaceName, CancellationToken cancellationToken)

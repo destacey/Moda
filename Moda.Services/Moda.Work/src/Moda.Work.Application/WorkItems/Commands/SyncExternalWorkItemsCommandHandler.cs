@@ -113,6 +113,8 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
                 .Where(p => p.ExternalId.HasValue)
                 .ToDictionary(p => p.ExternalId!.Value, p => (IWorkItemParentInfo)p);
 
+            var hasIterationMappings = request.IterationMappings != null && request.IterationMappings.Count > 0;
+
             int chunkSize = 2000;
             var chunks = request.WorkItems.OrderBy(w => w.LastModified).Chunk(chunkSize).ToList();
 
@@ -184,6 +186,20 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
                             request.TeamMappings.TryGetValue(externalWorkItem.TeamId.Value, out teamId);
                         }
 
+                        Guid? iterationId = null;
+                        if (hasIterationMappings && externalWorkItem.IterationId.HasValue)
+                        {
+                            if (request.IterationMappings!.TryGetValue(externalWorkItem.IterationId.Value.ToString(), out var mappedIterationId))
+                            {
+                                iterationId = mappedIterationId;
+                            }
+                            else
+                            {
+                                if (_logger.IsEnabled(LogLevel.Debug))
+                                    _logger.LogDebug("Unknown iteration mapping for external iteration id {ExternalIterationId} for work item {ExternalId} in workspace {WorkspaceId}.", externalWorkItem.IterationId.Value, externalWorkItem.Id, workspace.Id);
+                            }
+                        }
+
                         if (workItem is null)
                         {
                             Guid? createdById = null;
@@ -215,6 +231,7 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
                                 externalWorkItem.Priority,
                                 externalWorkItem.StackRank,
                                 externalWorkItem.StoryPoints,
+                                iterationId,
                                 externalWorkItem.ActivatedTimestamp,
                                 externalWorkItem.DoneTimestamp,
                                 string.IsNullOrWhiteSpace(externalWorkItem.ExternalTeamIdentifier) ? null : WorkItemExtended.Create(externalWorkItem.ExternalTeamIdentifier)
@@ -246,6 +263,7 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
                                 externalWorkItem.Priority,
                                 externalWorkItem.StackRank,
                                 externalWorkItem.StoryPoints,
+                                iterationId,
                                 externalWorkItem.ActivatedTimestamp,
                                 externalWorkItem.DoneTimestamp,
                                 string.IsNullOrWhiteSpace(externalWorkItem.ExternalTeamIdentifier) ? null : WorkItemExtended.Create(workItem.Id, externalWorkItem.ExternalTeamIdentifier)

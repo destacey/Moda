@@ -9,7 +9,8 @@ namespace Moda.Common.Application.Requests.WorkManagement;
 /// <param name="WorkspaceId"></param>
 /// <param name="WorkItems"></param>
 /// <param name="TeamMappings">The key is set to the external team id and value is set to the internal (Moda) team id.</param>
-public sealed record SyncExternalWorkItemsCommand(Guid WorkspaceId, List<IExternalWorkItem> WorkItems, Dictionary<Guid, Guid?> TeamMappings) : ICommand, ILongRunningRequest;
+/// <param name="IterationMappings">The key is set to the external iteration id and value is set to the internal (Moda) iteration id.</param>
+public sealed record SyncExternalWorkItemsCommand(Guid WorkspaceId, List<IExternalWorkItem> WorkItems, Dictionary<Guid, Guid?> TeamMappings, Dictionary<string,Guid> IterationMappings) : ICommand, ILongRunningRequest;
 
 public sealed class SyncExternalWorkItemsCommandValidator : CustomValidator<SyncExternalWorkItemsCommand>
 {
@@ -38,6 +39,21 @@ public sealed class SyncExternalWorkItemsCommandValidator : CustomValidator<Sync
                         .NotEmpty()
                         .Must(v => v.HasValue && v.Value != Guid.Empty);
                 });
+            });
+        });
+
+        RuleFor(c => c.IterationMappings)
+            .NotNull();
+
+        When(c => c.IterationMappings.Count > 0, () =>
+        {
+            RuleForEach(c => c.IterationMappings).ChildRules(iterationMapping =>
+            {
+                iterationMapping.RuleFor(tm => tm.Key)
+                    .NotEmpty();
+
+                iterationMapping.RuleFor(tm => tm.Value)
+                    .NotEmpty();
             });
         });
     }
