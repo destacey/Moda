@@ -24,19 +24,19 @@ public sealed class IExternalWorkItemValidator : CustomValidator<IExternalWorkIt
             .GreaterThan(0).When(c => c.ParentId.HasValue);
 
         RuleFor(c => c.AssignedTo)
-            .MaximumLength(64);
+            .MaximumLength(256);
 
         RuleFor(c => c.Created)
             .NotEmpty();
 
         RuleFor(c => c.CreatedBy)
-            .MaximumLength(64);
+            .MaximumLength(256);
 
         RuleFor(c => c.LastModified)
             .NotEmpty();
 
         RuleFor(c => c.LastModifiedBy)
-            .MaximumLength(64);
+            .MaximumLength(256);
 
         RuleFor(c => c.Priority)
             .GreaterThanOrEqualTo(0).When(c => c.Priority.HasValue);
