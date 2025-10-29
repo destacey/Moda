@@ -21,6 +21,9 @@ internal sealed class SetSystemIdOnExternalWorkspacesCommandHandler(IWorkDbConte
                     && request.WorkspaceIds.Contains(w.Id))
                 .ToListAsync(cancellationToken);
 
+            if (workspaces.Count == 0)
+                return Result.Success();
+
             foreach (var workspace in workspaces)
             {
                 var result = workspace.SetSystemId(request.SystemId);
@@ -33,7 +36,8 @@ internal sealed class SetSystemIdOnExternalWorkspacesCommandHandler(IWorkDbConte
 
             await _workDbContext.SaveChangesAsync(cancellationToken);
 
-            _logger.LogDebug("Successfully set SystemId for {Count} workspaces.", workspaces.Count);
+            if (_logger.IsEnabled(LogLevel.Debug))
+                _logger.LogDebug("Successfully set SystemId for {Count} workspaces.", workspaces.Count);
 
             return Result.Success();
         }
