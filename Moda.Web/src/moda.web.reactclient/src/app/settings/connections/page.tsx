@@ -39,7 +39,7 @@ const ConnectionsPage = () => {
     () => [
       { field: 'id', hide: true },
       { field: 'name', cellRenderer: ConnectionLinkCellRenderer, width: 250 },
-      { field: 'connector', width: 150 },
+      { field: 'connector.name', width: 150 },
       { field: 'systemId', width: 250 },
       { field: 'isActive', width: 125 },
       { field: 'isValidConfiguration', width: 150 },
