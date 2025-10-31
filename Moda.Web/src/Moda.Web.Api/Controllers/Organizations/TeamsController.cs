@@ -5,6 +5,8 @@ using Moda.Organization.Application.Teams.Dtos;
 using Moda.Organization.Application.Teams.Queries;
 using Moda.Organization.Domain.Extensions;
 using Moda.Organization.Domain.Models;
+using Moda.Planning.Application.Iterations.Dtos;
+using Moda.Planning.Application.Iterations.Queries;
 using Moda.Planning.Application.Risks.Dtos;
 using Moda.Planning.Application.Risks.Queries;
 using Moda.Web.Api.Extensions;
@@ -308,6 +310,21 @@ public class TeamsController : ControllerBase
     }
 
     #endregion Risks
+
+    [HttpGet("{id}/sprints")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Iterations)]
+    [OpenApiOperation("Get the sprints for a team.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IEnumerable<SprintListDto>>> GetTeamSprints(Guid id, CancellationToken cancellationToken)
+    {
+        var sprints = await _sender.Send(new GetSprintForTeamQuery(id), cancellationToken);
+
+        return sprints is null
+            ? NotFound()
+            : Ok(sprints);
+    }
 
     [HttpGet("functional-organization-chart")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Teams)]

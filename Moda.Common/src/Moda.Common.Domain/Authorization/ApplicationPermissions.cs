@@ -43,6 +43,7 @@ public static class ApplicationResource
     public const string PlanningIntervalObjectives = nameof(PlanningIntervalObjectives);
     public const string Risks = nameof(Risks);
     public const string Roadmaps = nameof(Roadmaps);
+    public const string Iterations = nameof(Iterations);
 
     public const string ExpenditureCategories = nameof(ExpenditureCategories);
     public const string ProjectPortfolios = nameof(ProjectPortfolios);
@@ -164,6 +165,8 @@ public static class ApplicationPermissions
         new("Create Roadmaps", ApplicationAction.Create, ApplicationResource.Roadmaps, IsBasic: true),
         new("Update Roadmaps", ApplicationAction.Update, ApplicationResource.Roadmaps, IsBasic: true),
         new("Delete Roadmaps", ApplicationAction.Delete, ApplicationResource.Roadmaps, IsBasic: true),
+
+        new("View Iterations", ApplicationAction.View, ApplicationResource.Iterations, IsBasic: true),
     ];
 
     private static readonly ApplicationPermission[] _projectPortfolioManagement =
