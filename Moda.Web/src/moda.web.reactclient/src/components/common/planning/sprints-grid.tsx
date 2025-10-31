@@ -16,7 +16,7 @@ export interface SprintsGridProps {
 }
 
 const SprintsGrid: React.FC<SprintsGridProps> = (props: SprintsGridProps) => {
-  const { refetch } = props
+  const { refetch, sprints = [] } = props
 
   const columnDefs = useMemo<ColDef<SprintListDto>[]>(
     () => [
@@ -66,7 +66,7 @@ const SprintsGrid: React.FC<SprintsGridProps> = (props: SprintsGridProps) => {
     <>
       <ModaGrid
         columnDefs={columnDefs}
-        rowData={props.sprints}
+        rowData={sprints}
         loadData={refresh}
         loading={props.isLoading}
         height={props.gridHeight}
