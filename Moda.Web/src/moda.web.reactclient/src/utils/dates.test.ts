@@ -26,14 +26,13 @@ describe('dates', () => {
   })
 
   it('should handle end of month correctly', () => {
-    const endOfMonth = new Date()
-    endOfMonth.setMonth(endOfMonth.getMonth() + 1)
-    endOfMonth.setDate(0) // last day of the previous month
-    const today = new Date()
-    const daysDiff = Math.ceil(
-      (endOfMonth.getTime() - today.getTime()) / (1000 * 3600 * 24),
-    )
-    expect(daysRemaining(endOfMonth)).toEqual(daysDiff)
+    // Use fixed dates to avoid timing issues
+    const today = new Date('2024-01-15T10:30:00Z')
+    const endOfMonth = new Date('2024-01-31T15:45:00Z')
+
+    // Both dates should be normalized to midnight UTC by daysRemaining
+    // From Jan 15 to Jan 31 = 16 days
+    expect(daysRemaining(endOfMonth, today)).toEqual(16)
   })
 
   it('should handle leap years correctly', () => {
