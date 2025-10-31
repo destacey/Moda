@@ -52,9 +52,13 @@ internal static class IterationDtoExtensions
             Path = iteration.Path,
         };
 
-        var type = iteration.HasChildren ? IterationType.Iteration : IterationType.Sprint;
         Instant? start = iteration.StartDate.HasValue ? Instant.FromDateTimeUtc(iteration.StartDate.Value) : null;
         Instant? end = iteration.EndDate.HasValue ? Instant.FromDateTimeUtc(iteration.EndDate.Value) : null;
+
+        // Azure DevOps iterations are sprints only if they do not have child iterations and they have start and end dates
+        var type = !iteration.HasChildren && start.HasValue && end.HasValue
+            ? IterationType.Sprint
+            : IterationType.Iteration;                
 
         return new AzdoIteration(iteration.Id, iteration.Name, type, start, end, iteration.TeamId, metadata, now);
     }

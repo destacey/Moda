@@ -101,6 +101,51 @@ jest.mock('rehype-raw', () => ({
   default: jest.fn(),
 }))
 
+// Mock the useTheme hook globally
+jest.mock('./components/contexts/theme', () => ({
+  __esModule: true,
+  default: () => ({
+    agGridTheme: 'ag-theme-alpine',
+    token: {
+      colorPrimary: '#1890ff',
+      colorWarning: '#faad14',
+      colorSuccess: '#52c41a',
+      colorError: '#ff4d4f',
+      colorInfo: '#1890ff',
+    },
+  }),
+}))
+
+// Mock dayjs globally
+jest.mock('dayjs', () => {
+  const mockDayjs = (date?: any) => ({
+    format: (formatStr: string) => {
+      if (!date) return ''
+      const d = new Date(date)
+      if (isNaN(d.getTime())) return ''
+
+      // Simple format support for common patterns
+      if (formatStr === 'M/D/YYYY') {
+        return `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear()}`
+      }
+      if (formatStr === 'YYYY-MM-DD') {
+        return d.toISOString().split('T')[0]
+      }
+      return d.toISOString()
+    },
+    toISOString: () => {
+      if (!date) return ''
+      return new Date(date).toISOString()
+    },
+    valueOf: () => {
+      if (!date) return 0
+      return new Date(date).valueOf()
+    },
+  })
+  mockDayjs.extend = jest.fn()
+  return mockDayjs
+})
+
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: jest.fn().mockImplementation((query) => ({

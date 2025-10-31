@@ -45,18 +45,17 @@ internal sealed class SyncAzureDevOpsBoardsConnectionConfigurationCommandHandler
             await _appIntegrationDbContext.SaveChangesAsync(cancellationToken);
 
             _logger.LogInformation("Set SystemId for Azure DevOps Boards connection {ConnectionId} to {SystemId}.", connection.Id, connection.SystemId);
+
+            // get workspace internal ids after setting system id
+            var workspaceIds = connection.Configuration.Workspaces.Where(w => w.IntegrationState?.InternalId != null).Select(w => w.IntegrationState!.InternalId).ToList();
+
+            var setSystemIdOnWorkspacesResult = await _sender.Send(new SetSystemIdOnExternalWorkspacesCommand(workspaceIds, connection.Connector, connection.SystemId!), cancellationToken);
+            if (setSystemIdOnWorkspacesResult.IsFailure)
+            {
+                _logger.LogError("Failed to set SystemId on external workspaces for connection {ConnectionId}. {Error}", connection.Id, setSystemIdOnWorkspacesResult.Error);
+                return Result.Failure($"Failed to set SystemId on external workspaces for connection {connection.Id}. {setSystemIdOnWorkspacesResult.Error}");
+            }
         }
-
-        // get workspace internal ids after setting system id
-        var workspaceIds = connection.Configuration.Workspaces.Where(w => w.IntegrationState?.InternalId != null).Select(w => w.IntegrationState!.InternalId).ToList();
-
-        var setSystemIdOnWorkspacesResult = await _sender.Send(new SetSystemIdOnExternalWorkspacesCommand(workspaceIds, connection.Connector, connection.SystemId!), cancellationToken);
-        if (setSystemIdOnWorkspacesResult.IsFailure)
-        {
-            _logger.LogError("Failed to set SystemId on external workspaces for connection {ConnectionId}. {Error}", connection.Id, setSystemIdOnWorkspacesResult.Error);
-            return Result.Failure($"Failed to set SystemId on external workspaces for connection {connection.Id}. {setSystemIdOnWorkspacesResult.Error}");
-        }
-
 
         var importWorkProcessesResult = connection.SyncProcesses(request.WorkProcesses, _timestamp);
         if (importWorkProcessesResult.IsFailure)

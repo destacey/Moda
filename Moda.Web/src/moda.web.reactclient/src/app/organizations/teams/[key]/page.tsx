@@ -41,10 +41,12 @@ import TeamDependencyManagement from './team-dependency-management'
 import { ItemType } from 'antd/es/menu/interface'
 import { InactiveTag, PageActions } from '@/src/components/common'
 import DeactivateTeamForm from '../../_components/deactivate-team-form'
+import TeamSprints from './team-sprints'
 
 enum TeamTabs {
   Details = 'details',
   Backlog = 'backlog',
+  Sprints = 'sprints',
   DependencyManagement = 'dependency-management',
   RiskManagement = 'risk-management',
   TeamMemberships = 'team-memberships',
@@ -58,6 +60,10 @@ const tabs = [
   {
     key: TeamTabs.Backlog,
     tab: 'Backlog',
+  },
+  {
+    key: TeamTabs.Sprints,
+    tab: 'Sprints',
   },
   {
     key: TeamTabs.DependencyManagement,
@@ -163,6 +169,8 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
           isLoading: backlogQuery.isLoading,
           refetch: backlogQuery.refetch,
         } as WorkItemsBacklogGridProps)
+      case TeamTabs.Sprints:
+        return <TeamSprints teamId={team?.id} />
       case TeamTabs.DependencyManagement:
         return <TeamDependencyManagement team={team} />
       case TeamTabs.RiskManagement:
@@ -202,10 +210,6 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   useEffect(() => {
     team && dispatch(setBreadcrumbTitle({ title: team.name, pathname }))
   }, [team, dispatch, pathname])
-
-  useEffect(() => {
-    error && console.error(error)
-  }, [error])
 
   // doesn't trigger on first render
   const onTabChange = useCallback(
