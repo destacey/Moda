@@ -8962,6 +8962,67 @@ export class SprintsClient {
         }
         return Promise.resolve<SprintDetailsDto>(null as any);
     }
+
+    /**
+     * Get sprint backlog items.
+     */
+    getSprintBacklog(idOrKey: string, cancelToken?: CancelToken): Promise<SprintBacklogItemDto[]> {
+        let url_ = this.baseUrl + "/api/planning/sprints/{idOrKey}/backlog";
+        if (idOrKey === undefined || idOrKey === null)
+            throw new globalThis.Error("The parameter 'idOrKey' must be defined.");
+        url_ = url_.replace("{idOrKey}", encodeURIComponent("" + idOrKey));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetSprintBacklog(_response);
+        });
+    }
+
+    protected processGetSprintBacklog(response: AxiosResponse): Promise<SprintBacklogItemDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<SprintBacklogItemDto[]>(result200);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<SprintBacklogItemDto[]>(null as any);
+    }
 }
 
 export class TeamTypesClient {
@@ -16477,6 +16538,28 @@ export interface SprintDetailsDto {
     start: Date;
     end: Date;
     team: PlanningTeamNavigationDto;
+}
+
+export interface SprintBacklogItemDto {
+    id: string;
+    key: string;
+    title: string;
+    workspace: WorkspaceNavigationDto;
+    type: string;
+    status: string;
+    statusCategory: SimpleNavigationDto;
+    parent?: WorkItemNavigationDto | undefined;
+    team?: WorkTeamNavigationDto | undefined;
+    assignedTo?: EmployeeNavigationDto | undefined;
+    created: Date;
+    activated?: Date | undefined;
+    done?: Date | undefined;
+    rank: number;
+    parentRank?: number | undefined;
+    project?: WorkProjectNavigationDto | undefined;
+    externalViewWorkItemUrl?: string | undefined;
+    stackRank: number;
+    storyPoints?: number | undefined;
 }
 
 export interface TeamTypeDto {
