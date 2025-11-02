@@ -7,6 +7,8 @@ using Moda.Common.Domain.Models;
 using Moda.Common.Domain.Models.Planning.Iterations;
 using Moda.Planning.Domain.Models.Iterations;
 using Moda.Common.Domain.Enums.AppIntegrations;
+using Moda.Common.Domain.Enums.Planning;
+using Moda.Common.Domain.Enums.Organization;
 
 namespace Moda.Planning.Application.Iterations.Commands;
 internal sealed class SyncAzureDevOpsIterationsCommandHandler(IPlanningDbContext planningDbContext, ILogger<SyncAzureDevOpsIterationsCommandHandler> logger, IDateTimeProvider dateTimeProvider, IEventPublisher eventPublisher)
@@ -135,10 +137,14 @@ internal sealed class SyncAzureDevOpsIterationsCommandHandler(IPlanningDbContext
     /// </summary>
     private async Task<Result> ProcessIterations(string systemId, IEnumerable<IExternalIteration<AzdoIterationMetadata>> externalIterations, Guid azdoProjectId, List<Iteration> projectIterations, Dictionary<Guid, Guid?> teamMappings, IterationSyncLog syncLog, CancellationToken cancellationToken)
     {
-        // Build lookup to avoid O(n^2) FirstOrDefault calls
+        // Build lookups to avoid O(n^2) FirstOrDefault calls
         var existingByExternalId = projectIterations
         .Where(pi => !string.IsNullOrEmpty(pi.OwnershipInfo.ExternalId))
         .ToDictionary(pi => pi.OwnershipInfo.ExternalId!, StringComparer.Ordinal);
+
+        var teamTypes = await _planningDbContext.PlanningTeams
+            .Select(t => new { t.Id, t.Type })
+            .ToDictionaryAsync(t => t.Id, t => t.Type, cancellationToken);
 
         foreach (var externalIteration in externalIterations)
         {
@@ -150,12 +156,25 @@ internal sealed class SyncAzureDevOpsIterationsCommandHandler(IPlanningDbContext
                 teamMappings.TryGetValue(externalIteration.TeamId.Value, out teamId);
             }
 
+            var sprintType = externalIteration.Type;
+            if (sprintType == IterationType.Sprint)
+            {
+                // Validate that the mapped team (if any) supports sprints
+                if (teamId.HasValue && teamTypes.TryGetValue(teamId.Value, out var teamType))
+                {
+                    if (teamType != TeamType.Team)
+                    {
+                        sprintType = IterationType.Iteration;
+                    }
+                }
+            }
+
             var externalIdString = externalIteration.Id.ToString();
             if (existingByExternalId.TryGetValue(externalIdString, out var existingIteration))
             {
                 var updateResult = existingIteration.Update(
                     externalIteration.Name,
-                    externalIteration.Type,
+                    sprintType,
                     externalIteration.State,
                     IterationDateRange.Create(externalIteration.Start, externalIteration.End),
                     teamId,
@@ -185,7 +204,7 @@ internal sealed class SyncAzureDevOpsIterationsCommandHandler(IPlanningDbContext
 
                 var newIteration = Iteration.Create(
                     externalIteration.Name,
-                    externalIteration.Type,
+                    sprintType,
                     externalIteration.State,
                     IterationDateRange.Create(externalIteration.Start, externalIteration.End),
                     teamId,
