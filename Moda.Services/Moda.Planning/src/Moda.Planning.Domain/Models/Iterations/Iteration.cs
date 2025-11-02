@@ -135,12 +135,12 @@ public class Iteration : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey, ISimp
         return iteration;
     }
 
-    private bool ValuesChanged(string newName, IterationType type, IterationState state, IterationDateRange dateRange, Guid? teamId)
+    private bool ValuesChanged(string name, IterationType type, IterationState state, IterationDateRange dateRange, Guid? teamId)
     {
-        if (!string.Equals(_name, newName, StringComparison.Ordinal)) return true;
         if (Type != type) return true;
-        if (State != state) return true;
         if (!EqualityComparer<IterationDateRange>.Default.Equals(DateRange, dateRange)) return true;
+        if (!string.Equals(_name, name, StringComparison.Ordinal)) return true;
+        if (State != state) return true;
         if (TeamId != teamId) return true;
         return false;
     }
