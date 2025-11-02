@@ -21,6 +21,7 @@ const TeamSprints: FC<TeamSprintsProps> = (props) => {
       isLoading={isLoading}
       refetch={refetch}
       hideTeam={true}
+      gridHeight={550}
     />
   )
 }

@@ -3,9 +3,16 @@
 import { ModaGrid } from '@/src/components/common'
 import { TeamNameLinkCellRenderer } from '@/src/components/common/moda-grid-cell-renderers'
 import { SprintListDto } from '@/src/services/moda-api'
-import { ColDef } from 'ag-grid-community'
+import {
+  ColDef,
+  ICellRendererParams,
+  ValueFormatterParams,
+} from 'ag-grid-community'
 import dayjs from 'dayjs'
-import { useCallback, useMemo } from 'react'
+import utc from 'dayjs/plugin/utc'
+import { FC, useMemo } from 'react'
+
+dayjs.extend(utc)
 
 export interface SprintsGridProps {
   sprints: SprintListDto[]
@@ -15,20 +22,26 @@ export interface SprintsGridProps {
   gridHeight?: number | undefined
 }
 
-const SprintsGrid: React.FC<SprintsGridProps> = (props: SprintsGridProps) => {
+const teamCellRenderer = (params: ICellRendererParams<SprintListDto>) =>
+  TeamNameLinkCellRenderer({ data: params.data.team })
+
+const utcAsCalendarDateValueFormatter = (
+  params: ValueFormatterParams<SprintListDto>,
+) => params.value && dayjs.utc(params.value).format('M/D/YYYY')
+
+const SprintsGrid: FC<SprintsGridProps> = (props: SprintsGridProps) => {
   const { refetch, sprints = [] } = props
 
   const columnDefs = useMemo<ColDef<SprintListDto>[]>(
     () => [
       { field: 'key', width: 90 },
-      { field: 'name', width: 300 },
+      { field: 'name', width: 250 },
       {
         field: 'team.name',
         headerName: 'Team',
         width: 200,
         hide: props.hideTeam,
-        cellRenderer: (params) =>
-          TeamNameLinkCellRenderer({ data: params.data.team }),
+        cellRenderer: teamCellRenderer,
       },
       { field: 'state.name', headerName: 'State', width: 125 },
       {
@@ -40,8 +53,7 @@ const SprintsGrid: React.FC<SprintsGridProps> = (props: SprintsGridProps) => {
         filterParams: {
           includeTime: false,
         },
-        valueFormatter: (params) =>
-          params.value && dayjs(params.value).format('M/D/YYYY'),
+        valueFormatter: utcAsCalendarDateValueFormatter,
       },
       {
         field: 'end',
@@ -51,28 +63,21 @@ const SprintsGrid: React.FC<SprintsGridProps> = (props: SprintsGridProps) => {
         filterParams: {
           includeTime: false,
         },
-        valueFormatter: (params) =>
-          params.value && dayjs(params.value).format('M/D/YYYY'),
+        valueFormatter: utcAsCalendarDateValueFormatter,
       },
     ],
     [props.hideTeam],
   )
 
-  const refresh = useCallback(async () => {
-    refetch()
-  }, [refetch])
-
   return (
-    <>
-      <ModaGrid
-        columnDefs={columnDefs}
-        rowData={sprints}
-        loadData={refresh}
-        loading={props.isLoading}
-        height={props.gridHeight}
-        emptyMessage="No sprints found."
-      />
-    </>
+    <ModaGrid
+      columnDefs={columnDefs}
+      rowData={sprints}
+      loadData={refetch}
+      loading={props.isLoading}
+      height={props.gridHeight ?? 650}
+      emptyMessage="No sprints found."
+    />
   )
 }
 

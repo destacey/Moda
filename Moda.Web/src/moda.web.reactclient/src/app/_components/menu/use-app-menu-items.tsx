@@ -51,13 +51,18 @@ const menuItems: (Item | MenuItem)[] = [
       '/planning/planning-intervals',
     ),
     restrictedPermissionMenuItem(
+      'Permissions.Iterations.View',
+      'Sprints',
+      'plan.sprints',
+      '/planning/sprints',
+    ),
+    restrictedPermissionMenuItem(
       'Permissions.Roadmaps.View',
       'Roadmaps',
       'plan.roadmaps',
       '/planning/roadmaps',
     ),
     // menuItem('Increments', 'plan.increments'),
-    // menuItem('Sprints', 'plan.sprints'),
   ]),
   restrictedMenuSection('Work Management', 'work', null, menuIcons.work, [
     restrictedPermissionMenuItem(
