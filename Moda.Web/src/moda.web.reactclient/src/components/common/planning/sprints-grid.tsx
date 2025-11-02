@@ -10,7 +10,8 @@ import {
 } from 'ag-grid-community'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-import { FC, useMemo } from 'react'
+import Link from 'next/link'
+import { FC, useMemo, memo } from 'react'
 
 dayjs.extend(utc)
 
@@ -21,6 +22,10 @@ export interface SprintsGridProps {
   hideTeam?: boolean
   gridHeight?: number | undefined
 }
+
+const sprintLinkCellRenderer = (params: ICellRendererParams<SprintListDto>) => (
+  <Link href={`/planning/sprints/${params.data.key}`}>{params.value}</Link>
+)
 
 const teamCellRenderer = (params: ICellRendererParams<SprintListDto>) =>
   TeamNameLinkCellRenderer({ data: params.data.team })
@@ -35,7 +40,7 @@ const SprintsGrid: FC<SprintsGridProps> = (props: SprintsGridProps) => {
   const columnDefs = useMemo<ColDef<SprintListDto>[]>(
     () => [
       { field: 'key', width: 90 },
-      { field: 'name', width: 250 },
+      { field: 'name', width: 250, cellRenderer: sprintLinkCellRenderer },
       {
         field: 'team.name',
         headerName: 'Team',
