@@ -52,6 +52,7 @@ export enum QueryTags {
   RoadmapItem = 'Planning.RoadmapItem',
   RoadmapActivity = 'Planning.RoadmapActivity',
   RoadmapVisibility = 'Planning.RoadmapVisibility',
+  Sprint = 'Planning.Sprint',
 
   // PPM
   ExpenditureCategory = 'Ppm.ExpenditureCategory',

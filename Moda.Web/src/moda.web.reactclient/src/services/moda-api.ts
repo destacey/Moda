@@ -8828,6 +8828,142 @@ export class RoadmapsClient {
     }
 }
 
+export class SprintsClient {
+    protected instance: AxiosInstance;
+    protected baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, instance?: AxiosInstance) {
+
+        this.instance = instance || axios.create();
+
+        this.baseUrl = baseUrl ?? "";
+
+    }
+
+    /**
+     * Get a list of sprints.
+     * @param teamId (optional) 
+     */
+    getSprints(teamId: string | null | undefined, cancelToken?: CancelToken): Promise<SprintListDto[]> {
+        let url_ = this.baseUrl + "/api/planning/sprints?";
+        if (teamId !== undefined && teamId !== null)
+            url_ += "teamId=" + encodeURIComponent("" + teamId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetSprints(_response);
+        });
+    }
+
+    protected processGetSprints(response: AxiosResponse): Promise<SprintListDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<SprintListDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<SprintListDto[]>(null as any);
+    }
+
+    /**
+     * Get sprint details.
+     */
+    getSprint(idOrKey: string, cancelToken?: CancelToken): Promise<SprintDetailsDto> {
+        let url_ = this.baseUrl + "/api/planning/sprints/{idOrKey}";
+        if (idOrKey === undefined || idOrKey === null)
+            throw new globalThis.Error("The parameter 'idOrKey' must be defined.");
+        url_ = url_.replace("{idOrKey}", encodeURIComponent("" + idOrKey));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetSprint(_response);
+        });
+    }
+
+    protected processGetSprint(response: AxiosResponse): Promise<SprintDetailsDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<SprintDetailsDto>(result200);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<SprintDetailsDto>(null as any);
+    }
+}
+
 export class TeamTypesClient {
     protected instance: AxiosInstance;
     protected baseUrl: string;
@@ -12446,13 +12582,6 @@ export class TeamsClient {
             let resultData400  = _responseText;
             result400 = JSON.parse(resultData400);
             return throwException("A server side error occurred.", status, _responseText, _headers, result400);
-
-        } else if (status === 404) {
-            const _responseText = response.data;
-            let result404: any = null;
-            let resultData404  = _responseText;
-            result404 = JSON.parse(resultData404);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
@@ -16330,6 +16459,26 @@ export interface ReorganizeRoadmapActivityRequest {
 export interface VisibilityDto extends CommonEnumDto {
 }
 
+export interface SprintListDto {
+    id: string;
+    key: number;
+    name: string;
+    state: SimpleNavigationDto;
+    start: Date;
+    end: Date;
+    team: PlanningTeamNavigationDto;
+}
+
+export interface SprintDetailsDto {
+    id: string;
+    key: number;
+    name: string;
+    state: SimpleNavigationDto;
+    start: Date;
+    end: Date;
+    team: PlanningTeamNavigationDto;
+}
+
 export interface TeamTypeDto {
     id: number;
     name: string;
@@ -16746,16 +16895,6 @@ export interface DependencyDto {
     createdOn: Date;
     createdBy?: EmployeeNavigationDto | undefined;
     comment?: string | undefined;
-}
-
-export interface SprintListDto {
-    id: string;
-    key: number;
-    name: string;
-    state: SimpleNavigationDto;
-    start: Date;
-    end: Date;
-    team: PlanningTeamNavigationDto;
 }
 
 export interface FunctionalOrganizationChartDto {
