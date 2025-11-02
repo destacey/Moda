@@ -8,7 +8,7 @@ export const sprintsApi = apiSlice.injectEndpoints({
     getSprints: builder.query<SprintListDto[], void>({
       queryFn: async () => {
         try {
-          const data = await getSprintsClient().getSprints(undefined)
+          const data = await getSprintsClient().getSprints()
           return { data }
         } catch (error) {
           console.error('API Error:', error)
