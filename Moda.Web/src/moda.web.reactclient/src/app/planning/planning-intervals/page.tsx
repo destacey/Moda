@@ -12,10 +12,15 @@ import { Button } from 'antd'
 import { authorizePage } from '../../../components/hoc'
 import { useGetPlanningIntervalsQuery } from '@/src/store/features/planning/planning-interval-api'
 import { PlanningIntervalListDto } from '@/src/services/moda-api'
+import { ColDef, ValueFormatterParams } from 'ag-grid-community'
 
 const PlanningIntervalLinkCellRenderer = ({ value, data }) => {
   return <Link href={`/planning/planning-intervals/${data.key}`}>{value}</Link>
 }
+
+const dateOnlyValueFormatter = (
+  params: ValueFormatterParams<PlanningIntervalListDto>,
+) => params.value && dayjs(params.value).format('M/D/YYYY')
 
 const stateOrder = ['Active', 'Future', 'Completed']
 
@@ -26,12 +31,7 @@ const PlanningIntervalListPage = () => {
   const [openCreatePlanningIntervalForm, setOpenCreatePlanningIntervalForm] =
     useState<boolean>(false)
 
-  const {
-    data: piData,
-    isLoading,
-    error,
-    refetch,
-  } = useGetPlanningIntervalsQuery()
+  const { data: piData, isLoading, refetch } = useGetPlanningIntervalsQuery()
 
   const { hasPermissionClaim } = useAuth()
   const canCreatePlanningInterval = hasPermissionClaim(
@@ -39,8 +39,7 @@ const PlanningIntervalListPage = () => {
   )
   const showActions = canCreatePlanningInterval
 
-  // TODO: dates are formatted correctly and filter, but the filter is string based, not date based
-  const columnDefs = useMemo(
+  const columnDefs = useMemo<ColDef<PlanningIntervalListDto>[]>(
     () => [
       { field: 'key', width: 90 },
       { field: 'name', cellRenderer: PlanningIntervalLinkCellRenderer },
@@ -50,11 +49,11 @@ const PlanningIntervalListPage = () => {
       },
       {
         field: 'start',
-        valueGetter: (params) => dayjs(params.data.start).format('M/D/YYYY'),
+        valueFormatter: dateOnlyValueFormatter,
       },
       {
         field: 'end',
-        valueGetter: (params) => dayjs(params.data.end).format('M/D/YYYY'),
+        valueFormatter: dateOnlyValueFormatter,
       },
     ],
     [],

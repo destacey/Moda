@@ -1,7 +1,7 @@
 'use client'
 
 import PageTitle from '@/src/components/common/page-title'
-import { useCallback, useEffect, useState } from 'react'
+import { FC, useCallback, useEffect, useState } from 'react'
 import { useDocumentTitle } from '../../../hooks/use-document-title'
 import useAuth from '../../../components/contexts/auth'
 import { Button } from 'antd'
@@ -9,7 +9,7 @@ import { authorizePage } from '../../../components/hoc'
 import { useGetRoadmapsQuery } from '@/src/store/features/planning/roadmaps-api'
 import { CreateRoadmapForm, RoadmapsGrid } from './_components'
 
-const RoadmapsPage: React.FC = () => {
+const RoadmapsPage: FC = () => {
   useDocumentTitle('Roadmaps')
 
   const [openCreateRoadmapForm, setOpenCreateRoadmapForm] =
@@ -20,10 +20,6 @@ const RoadmapsPage: React.FC = () => {
   const { hasPermissionClaim } = useAuth()
   const canCreateRoadmap = hasPermissionClaim('Permissions.Roadmaps.Create')
   const showActions = canCreateRoadmap
-
-  useEffect(() => {
-    error && console.error(error)
-  }, [error])
 
   const refresh = useCallback(async () => {
     refetch()
