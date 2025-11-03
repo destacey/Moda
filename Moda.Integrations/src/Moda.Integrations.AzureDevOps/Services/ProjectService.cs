@@ -140,13 +140,13 @@ internal sealed class ProjectService(string organizationUrl, string token, strin
                 if (!response.IsSuccessful)
                 {
                     _logger.LogError("Error getting teams for project {ProjectId} from Azure DevOps: {ErrorMessage}.", id, response.ErrorMessage);
-                    return Result.Failure<List<IExternalTeam>>("Error getting teams for project {id} from Azure DevOps"); // each project should have at least one team
+                    return Result.Failure<List<IExternalTeam>>($"Error getting teams for project {id} from Azure DevOps"); // each project should have at least one team
                 }
                 if (response.Data is null)
                 {
                     if (_logger.IsEnabled(LogLevel.Debug))
                         _logger.LogDebug("No teams found for project {ProjectId}.", id);
-                    return Result.Failure<List<IExternalTeam>>("Error getting teams for project {id} from Azure DevOps"); // each project should have at least one team
+                    return Result.Failure<List<IExternalTeam>>($"Error getting teams for project {id} from Azure DevOps"); // each project should have at least one team
                 }
 
                 // set team settings: boardId
