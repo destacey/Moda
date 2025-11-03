@@ -124,8 +124,9 @@ internal sealed class ProjectService(string organizationUrl, string token, strin
 
         if (projectIds is null || projectIds.Length == 0)
         {
-            _logger.LogWarning("No project ids provided to get teams from Azure DevOps.");
-            return teams;
+            string message = "No project ids provided to get teams from Azure DevOps.";
+            _logger.LogWarning(message);
+            return Result.Failure<List<IExternalTeam>>(message);
         }
 
         Guid currentProjectId = Guid.Empty;
@@ -139,13 +140,13 @@ internal sealed class ProjectService(string organizationUrl, string token, strin
                 if (!response.IsSuccessful)
                 {
                     _logger.LogError("Error getting teams for project {ProjectId} from Azure DevOps: {ErrorMessage}.", id, response.ErrorMessage);
-                    continue;
+                    return Result.Failure<List<IExternalTeam>>("Error getting teams for project {id} from Azure DevOps"); // each project should have at least one team
                 }
                 if (response.Data is null)
                 {
                     if (_logger.IsEnabled(LogLevel.Debug))
                         _logger.LogDebug("No teams found for project {ProjectId}.", id);
-                    continue;
+                    return Result.Failure<List<IExternalTeam>>("Error getting teams for project {id} from Azure DevOps"); // each project should have at least one team
                 }
 
                 // set team settings: boardId
