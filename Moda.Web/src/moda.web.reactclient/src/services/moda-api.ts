@@ -989,7 +989,7 @@ export class UsersClient {
      * Get a user's roles.
      * @param includeUnassigned (optional) 
      */
-    getRoles(id: string, includeUnassigned: boolean | undefined, cancelToken?: CancelToken): Promise<UserRoleDto[]> {
+    getRoles(id: string, includeUnassigned?: boolean | undefined, cancelToken?: CancelToken): Promise<UserRoleDto[]> {
         let url_ = this.baseUrl + "/api/user-management/users/{id}/roles?";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
@@ -1205,7 +1205,7 @@ export class StrategicThemesClient {
      * Get a list of strategic themes.
      * @param state (optional) 
      */
-    getStrategicThemes(state: number | null | undefined, cancelToken?: CancelToken): Promise<StrategicThemeListDto[]> {
+    getStrategicThemes(state?: number | null | undefined, cancelToken?: CancelToken): Promise<StrategicThemeListDto[]> {
         let url_ = this.baseUrl + "/api/strategic-management/strategic-themes?";
         if (state !== undefined && state !== null)
             url_ += "state=" + encodeURIComponent("" + state) + "&";
@@ -1642,7 +1642,7 @@ export class StrategicThemesClient {
      * Get a list of strategic theme options.
      * @param includeArchived (optional) 
      */
-    getStrategicThemeOptions(includeArchived: boolean | null | undefined, cancelToken?: CancelToken): Promise<StrategicThemeOptionDto[]> {
+    getStrategicThemeOptions(includeArchived?: boolean | null | undefined, cancelToken?: CancelToken): Promise<StrategicThemeOptionDto[]> {
         let url_ = this.baseUrl + "/api/strategic-management/strategic-themes/options?";
         if (includeArchived !== undefined && includeArchived !== null)
             url_ += "includeArchived=" + encodeURIComponent("" + includeArchived) + "&";
@@ -1775,7 +1775,7 @@ export class StrategiesClient {
      * Get a list of strategies.
      * @param status (optional) 
      */
-    getStrategies(status: number | null | undefined, cancelToken?: CancelToken): Promise<StrategyListDto[]> {
+    getStrategies(status?: number | null | undefined, cancelToken?: CancelToken): Promise<StrategyListDto[]> {
         let url_ = this.baseUrl + "/api/strategic-management/strategies?";
         if (status !== undefined && status !== null)
             url_ += "status=" + encodeURIComponent("" + status) + "&";
@@ -2156,7 +2156,7 @@ export class VisionsClient {
      * Get a list of visions.
      * @param state (optional) 
      */
-    getVisions(state: number | null | undefined, cancelToken?: CancelToken): Promise<VisionDto[]> {
+    getVisions(state?: number | null | undefined, cancelToken?: CancelToken): Promise<VisionDto[]> {
         let url_ = this.baseUrl + "/api/strategic-management/visions?";
         if (state !== undefined && state !== null)
             url_ += "state=" + encodeURIComponent("" + state) + "&";
@@ -3099,7 +3099,7 @@ export class ExpenditureCategoriesClient {
      * Get a list of expenditure categories options.
      * @param includeArchived (optional) 
      */
-    getExpenditureCategoryOptions(includeArchived: boolean | null | undefined, cancelToken?: CancelToken): Promise<ExpenditureCategoryOptionDto[]> {
+    getExpenditureCategoryOptions(includeArchived?: boolean | null | undefined, cancelToken?: CancelToken): Promise<ExpenditureCategoryOptionDto[]> {
         let url_ = this.baseUrl + "/api/ppm/expenditure-categories/options?";
         if (includeArchived !== undefined && includeArchived !== null)
             url_ += "includeArchived=" + encodeURIComponent("" + includeArchived) + "&";
@@ -3174,7 +3174,7 @@ export class PortfoliosClient {
      * Get a list of project portfolios.
      * @param status (optional) 
      */
-    getPortfolios(status: number | null | undefined, cancelToken?: CancelToken): Promise<ProjectPortfolioListDto[]> {
+    getPortfolios(status?: number | null | undefined, cancelToken?: CancelToken): Promise<ProjectPortfolioListDto[]> {
         let url_ = this.baseUrl + "/api/ppm/portfolios?";
         if (status !== undefined && status !== null)
             url_ += "status=" + encodeURIComponent("" + status) + "&";
@@ -3736,7 +3736,7 @@ export class PortfoliosClient {
      * Get a list of strategic initiatives for the portfolio.
      * @param status (optional) 
      */
-    getStrategicInitiatives(idOrKey: string, status: number | null | undefined, cancelToken?: CancelToken): Promise<StrategicInitiativeListDto[]> {
+    getStrategicInitiatives(idOrKey: string, status?: number | null | undefined, cancelToken?: CancelToken): Promise<StrategicInitiativeListDto[]> {
         let url_ = this.baseUrl + "/api/ppm/portfolios/{idOrKey}/strategic-initiatives?";
         if (idOrKey === undefined || idOrKey === null)
             throw new globalThis.Error("The parameter 'idOrKey' must be defined.");
@@ -3872,7 +3872,7 @@ export class ProjectsClient {
      * Get a list of projects.
      * @param status (optional) 
      */
-    getProjects(status: number | null | undefined, cancelToken?: CancelToken): Promise<ProjectListDto[]> {
+    getProjects(status?: number | null | undefined, cancelToken?: CancelToken): Promise<ProjectListDto[]> {
         let url_ = this.baseUrl + "/api/ppm/projects?";
         if (status !== undefined && status !== null)
             url_ += "status=" + encodeURIComponent("" + status) + "&";
@@ -4455,7 +4455,7 @@ export class StrategicInitiativesClient {
      * Get a list of strategic initiatives.
      * @param status (optional) 
      */
-    getStrategicInitiatives(status: number | null | undefined, cancelToken?: CancelToken): Promise<StrategicInitiativeListDto[]> {
+    getStrategicInitiatives(status?: number | null | undefined, cancelToken?: CancelToken): Promise<StrategicInitiativeListDto[]> {
         let url_ = this.baseUrl + "/api/ppm/strategic-initiatives?";
         if (status !== undefined && status !== null)
             url_ += "status=" + encodeURIComponent("" + status) + "&";
@@ -6429,7 +6429,7 @@ export class PlanningIntervalsClient {
      * Get a list of planning interval teams.
      * @param teamId (optional) 
      */
-    getObjectives(idOrKey: string, teamId: string | null | undefined, cancelToken?: CancelToken): Promise<PlanningIntervalObjectiveListDto[]> {
+    getObjectives(idOrKey: string, teamId?: string | null | undefined, cancelToken?: CancelToken): Promise<PlanningIntervalObjectiveListDto[]> {
         let url_ = this.baseUrl + "/api/planning/planning-intervals/{idOrKey}/objectives?";
         if (idOrKey === undefined || idOrKey === null)
             throw new globalThis.Error("The parameter 'idOrKey' must be defined.");
@@ -6856,7 +6856,7 @@ export class PlanningIntervalsClient {
      * Get a health report for planning interval objectives.
      * @param teamId (optional) 
      */
-    getObjectivesHealthReport(idOrKey: string, teamId: string | null | undefined, cancelToken?: CancelToken): Promise<PlanningIntervalObjectiveHealthCheckDto[]> {
+    getObjectivesHealthReport(idOrKey: string, teamId?: string | null | undefined, cancelToken?: CancelToken): Promise<PlanningIntervalObjectiveHealthCheckDto[]> {
         let url_ = this.baseUrl + "/api/planning/planning-intervals/{idOrKey}/objectives/health-report?";
         if (idOrKey === undefined || idOrKey === null)
             throw new globalThis.Error("The parameter 'idOrKey' must be defined.");
@@ -7145,7 +7145,7 @@ export class PlanningIntervalsClient {
      * @param name (optional) 
      * @param fileName (optional) 
      */
-    importObjectives(id: string, contentType: string | null | undefined, contentDisposition: string | null | undefined, headers: any[] | null | undefined, length: number | undefined, name: string | null | undefined, fileName: string | null | undefined, cancelToken?: CancelToken): Promise<void> {
+    importObjectives(id: string, contentType?: string | null | undefined, contentDisposition?: string | null | undefined, headers?: any[] | null | undefined, length?: number | undefined, name?: string | null | undefined, fileName?: string | null | undefined, cancelToken?: CancelToken): Promise<void> {
         let url_ = this.baseUrl + "/api/planning/planning-intervals/{id}/objectives/import";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
@@ -7286,7 +7286,7 @@ export class PlanningIntervalsClient {
      * @param includeClosed (optional) 
      * @param teamId (optional) 
      */
-    getRisks(idOrKey: string, includeClosed: boolean | null | undefined, teamId: string | null | undefined, cancelToken?: CancelToken): Promise<RiskListDto[]> {
+    getRisks(idOrKey: string, includeClosed?: boolean | null | undefined, teamId?: string | null | undefined, cancelToken?: CancelToken): Promise<RiskListDto[]> {
         let url_ = this.baseUrl + "/api/planning/planning-intervals/{idOrKey}/risks?";
         if (idOrKey === undefined || idOrKey === null)
             throw new globalThis.Error("The parameter 'idOrKey' must be defined.");
@@ -7366,7 +7366,7 @@ export class RisksClient {
      * Get a list of risks.
      * @param includeClosed (optional) 
      */
-    getList(includeClosed: boolean | undefined, cancelToken?: CancelToken): Promise<RiskListDto[]> {
+    getList(includeClosed?: boolean | undefined, cancelToken?: CancelToken): Promise<RiskListDto[]> {
         let url_ = this.baseUrl + "/api/planning/risks?";
         if (includeClosed === null)
             throw new globalThis.Error("The parameter 'includeClosed' cannot be null.");
@@ -7683,7 +7683,7 @@ export class RisksClient {
      * @param name (optional) 
      * @param fileName (optional) 
      */
-    import(contentType: string | null | undefined, contentDisposition: string | null | undefined, headers: any[] | null | undefined, length: number | undefined, name: string | null | undefined, fileName: string | null | undefined, cancelToken?: CancelToken): Promise<void> {
+    import(contentType?: string | null | undefined, contentDisposition?: string | null | undefined, headers?: any[] | null | undefined, length?: number | undefined, name?: string | null | undefined, fileName?: string | null | undefined, cancelToken?: CancelToken): Promise<void> {
         let url_ = this.baseUrl + "/api/planning/risks/import";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -8828,6 +8828,203 @@ export class RoadmapsClient {
     }
 }
 
+export class SprintsClient {
+    protected instance: AxiosInstance;
+    protected baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, instance?: AxiosInstance) {
+
+        this.instance = instance || axios.create();
+
+        this.baseUrl = baseUrl ?? "";
+
+    }
+
+    /**
+     * Get a list of sprints.
+     * @param teamId (optional) 
+     */
+    getSprints(teamId?: string | null | undefined, cancelToken?: CancelToken): Promise<SprintListDto[]> {
+        let url_ = this.baseUrl + "/api/planning/sprints?";
+        if (teamId !== undefined && teamId !== null)
+            url_ += "teamId=" + encodeURIComponent("" + teamId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetSprints(_response);
+        });
+    }
+
+    protected processGetSprints(response: AxiosResponse): Promise<SprintListDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<SprintListDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<SprintListDto[]>(null as any);
+    }
+
+    /**
+     * Get sprint details.
+     */
+    getSprint(idOrKey: string, cancelToken?: CancelToken): Promise<SprintDetailsDto> {
+        let url_ = this.baseUrl + "/api/planning/sprints/{idOrKey}";
+        if (idOrKey === undefined || idOrKey === null)
+            throw new globalThis.Error("The parameter 'idOrKey' must be defined.");
+        url_ = url_.replace("{idOrKey}", encodeURIComponent("" + idOrKey));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetSprint(_response);
+        });
+    }
+
+    protected processGetSprint(response: AxiosResponse): Promise<SprintDetailsDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<SprintDetailsDto>(result200);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<SprintDetailsDto>(null as any);
+    }
+
+    /**
+     * Get sprint backlog items.
+     */
+    getSprintBacklog(idOrKey: string, cancelToken?: CancelToken): Promise<SprintBacklogItemDto[]> {
+        let url_ = this.baseUrl + "/api/planning/sprints/{idOrKey}/backlog";
+        if (idOrKey === undefined || idOrKey === null)
+            throw new globalThis.Error("The parameter 'idOrKey' must be defined.");
+        url_ = url_.replace("{idOrKey}", encodeURIComponent("" + idOrKey));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetSprintBacklog(_response);
+        });
+    }
+
+    protected processGetSprintBacklog(response: AxiosResponse): Promise<SprintBacklogItemDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<SprintBacklogItemDto[]>(result200);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<SprintBacklogItemDto[]>(null as any);
+    }
+}
+
 export class TeamTypesClient {
     protected instance: AxiosInstance;
     protected baseUrl: string;
@@ -8917,7 +9114,7 @@ export class WorkProcessesClient {
      * Get a list of work processes.
      * @param includeInactive (optional) 
      */
-    getList(includeInactive: boolean | undefined, cancelToken?: CancelToken): Promise<WorkProcessListDto[]> {
+    getList(includeInactive?: boolean | undefined, cancelToken?: CancelToken): Promise<WorkProcessListDto[]> {
         let url_ = this.baseUrl + "/api/work/work-processes?";
         if (includeInactive === null)
             throw new globalThis.Error("The parameter 'includeInactive' cannot be null.");
@@ -9244,7 +9441,7 @@ export class WorkspacesClient {
      * Get a list of workspaces.
      * @param includeInactive (optional) 
      */
-    getList(includeInactive: boolean | undefined, cancelToken?: CancelToken): Promise<WorkspaceListDto[]> {
+    getList(includeInactive?: boolean | undefined, cancelToken?: CancelToken): Promise<WorkspaceListDto[]> {
         let url_ = this.baseUrl + "/api/work/workspaces?";
         if (includeInactive === null)
             throw new globalThis.Error("The parameter 'includeInactive' cannot be null.");
@@ -9903,7 +10100,7 @@ export class WorkspacesClient {
      * @param query (optional) 
      * @param top (optional) 
      */
-    searchWorkItems(query: string | undefined, top: number | undefined, cancelToken?: CancelToken): Promise<WorkItemListDto[]> {
+    searchWorkItems(query?: string | undefined, top?: number | undefined, cancelToken?: CancelToken): Promise<WorkItemListDto[]> {
         let url_ = this.baseUrl + "/api/work/workspaces/work-items/search?";
         if (query === null)
             throw new globalThis.Error("The parameter 'query' cannot be null.");
@@ -10056,7 +10253,7 @@ export class WorkStatusesClient {
      * Get a list of all work statuss.
      * @param includeInactive (optional) 
      */
-    getList(includeInactive: boolean | undefined, cancelToken?: CancelToken): Promise<WorkStatusDto[]> {
+    getList(includeInactive?: boolean | undefined, cancelToken?: CancelToken): Promise<WorkStatusDto[]> {
         let url_ = this.baseUrl + "/api/work/work-statuses?";
         if (includeInactive === null)
             throw new globalThis.Error("The parameter 'includeInactive' cannot be null.");
@@ -10666,7 +10863,7 @@ export class WorkTypesClient {
      * Get a list of all work types.
      * @param includeInactive (optional) 
      */
-    getList(includeInactive: boolean | undefined, cancelToken?: CancelToken): Promise<WorkTypeDto[]> {
+    getList(includeInactive?: boolean | undefined, cancelToken?: CancelToken): Promise<WorkTypeDto[]> {
         let url_ = this.baseUrl + "/api/work/work-types?";
         if (includeInactive === null)
             throw new globalThis.Error("The parameter 'includeInactive' cannot be null.");
@@ -11013,7 +11210,7 @@ export class EmployeesClient {
      * Get a list of all employees.
      * @param includeInactive (optional) 
      */
-    getList(includeInactive: boolean | undefined, cancelToken?: CancelToken): Promise<EmployeeListDto[]> {
+    getList(includeInactive?: boolean | undefined, cancelToken?: CancelToken): Promise<EmployeeListDto[]> {
         let url_ = this.baseUrl + "/api/organization/employees?";
         if (includeInactive === null)
             throw new globalThis.Error("The parameter 'includeInactive' cannot be null.");
@@ -11392,7 +11589,7 @@ export class TeamsClient {
      * Get a list of teams.
      * @param includeInactive (optional) 
      */
-    getList(includeInactive: boolean | undefined, cancelToken?: CancelToken): Promise<TeamListDto[]> {
+    getList(includeInactive?: boolean | undefined, cancelToken?: CancelToken): Promise<TeamListDto[]> {
         let url_ = this.baseUrl + "/api/organization/teams?";
         if (includeInactive === null)
             throw new globalThis.Error("The parameter 'includeInactive' cannot be null.");
@@ -12103,7 +12300,7 @@ export class TeamsClient {
      * Get team risks.
      * @param includeClosed (optional) 
      */
-    getRisks(id: string, includeClosed: boolean | undefined, cancelToken?: CancelToken): Promise<RiskListDto[]> {
+    getRisks(id: string, includeClosed?: boolean | undefined, cancelToken?: CancelToken): Promise<RiskListDto[]> {
         let url_ = this.baseUrl + "/api/organization/teams/{id}/risks?";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
@@ -12447,13 +12644,6 @@ export class TeamsClient {
             result400 = JSON.parse(resultData400);
             return throwException("A server side error occurred.", status, _responseText, _headers, result400);
 
-        } else if (status === 404) {
-            const _responseText = response.data;
-            let result404: any = null;
-            let resultData404  = _responseText;
-            result404 = JSON.parse(resultData404);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
-
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
@@ -12465,7 +12655,7 @@ export class TeamsClient {
      * Get the functional organizaation chart for a given date.
      * @param asOfDate (optional) 
      */
-    getFunctionalOrganizationChart(asOfDate: Date | null | undefined, cancelToken?: CancelToken): Promise<FunctionalOrganizationChartDto> {
+    getFunctionalOrganizationChart(asOfDate?: Date | null | undefined, cancelToken?: CancelToken): Promise<FunctionalOrganizationChartDto> {
         let url_ = this.baseUrl + "/api/organization/teams/functional-organization-chart?";
         if (asOfDate !== undefined && asOfDate !== null)
             url_ += "asOfDate=" + encodeURIComponent(asOfDate ? "" + asOfDate.toISOString() : "") + "&";
@@ -12533,7 +12723,7 @@ export class TeamsOfTeamsClient {
      * Get a list of team of teams.
      * @param includeInactive (optional) 
      */
-    getList(includeInactive: boolean | undefined, cancelToken?: CancelToken): Promise<TeamOfTeamsListDto[]> {
+    getList(includeInactive?: boolean | undefined, cancelToken?: CancelToken): Promise<TeamOfTeamsListDto[]> {
         let url_ = this.baseUrl + "/api/organization/teams-of-teams?";
         if (includeInactive === null)
             throw new globalThis.Error("The parameter 'includeInactive' cannot be null.");
@@ -13115,7 +13305,7 @@ export class TeamsOfTeamsClient {
      * Get team risks.
      * @param includeClosed (optional) 
      */
-    getRisks(id: string, includeClosed: boolean | undefined, cancelToken?: CancelToken): Promise<RiskListDto[]> {
+    getRisks(id: string, includeClosed?: boolean | undefined, cancelToken?: CancelToken): Promise<RiskListDto[]> {
         let url_ = this.baseUrl + "/api/organization/teams-of-teams/{id}/risks?";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
@@ -14085,7 +14275,7 @@ export class AzureDevOpsBoardsConnectionsClient {
      * Get a list of all Azure DevOps Boards connections.
      * @param includeDisabled (optional) 
      */
-    getList(includeDisabled: boolean | undefined, cancelToken?: CancelToken): Promise<ConnectionListDto[]> {
+    getList(includeDisabled?: boolean | undefined, cancelToken?: CancelToken): Promise<ConnectionListDto[]> {
         let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections?";
         if (includeDisabled === null)
             throw new globalThis.Error("The parameter 'includeDisabled' cannot be null.");
@@ -14403,7 +14593,7 @@ export class AzureDevOpsBoardsConnectionsClient {
      * Update an Azure DevOps Boards connection sync state.
      * @param isSyncEnabled (optional) 
      */
-    updateSyncState(id: string, isSyncEnabled: boolean | undefined, cancelToken?: CancelToken): Promise<void> {
+    updateSyncState(id: string, isSyncEnabled?: boolean | undefined, cancelToken?: CancelToken): Promise<void> {
         let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections/{id}/sync-state?";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
@@ -14472,7 +14662,7 @@ export class AzureDevOpsBoardsConnectionsClient {
      * Get Azure DevOps connection teams based on id.
      * @param workspaceId (optional) 
      */
-    getConnectionTeams(id: string, workspaceId: string | null | undefined, cancelToken?: CancelToken): Promise<AzureDevOpsBoardsWorkspaceTeamDto[]> {
+    getConnectionTeams(id: string, workspaceId?: string | null | undefined, cancelToken?: CancelToken): Promise<AzureDevOpsBoardsWorkspaceTeamDto[]> {
         let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections/{id}/teams?";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
@@ -15050,7 +15240,7 @@ export class BackgroundJobsClient {
      * Run a background job.
      * @param jobTypeId (optional) 
      */
-    run(jobTypeId: number | undefined, cancelToken?: CancelToken): Promise<void> {
+    run(jobTypeId?: number | undefined, cancelToken?: CancelToken): Promise<void> {
         let url_ = this.baseUrl + "/api/admin/background-jobs/run?";
         if (jobTypeId === null)
             throw new globalThis.Error("The parameter 'jobTypeId' cannot be null.");
@@ -16330,6 +16520,48 @@ export interface ReorganizeRoadmapActivityRequest {
 export interface VisibilityDto extends CommonEnumDto {
 }
 
+export interface SprintListDto {
+    id: string;
+    key: number;
+    name: string;
+    state: SimpleNavigationDto;
+    start: Date;
+    end: Date;
+    team: PlanningTeamNavigationDto;
+}
+
+export interface SprintDetailsDto {
+    id: string;
+    key: number;
+    name: string;
+    state: SimpleNavigationDto;
+    start: Date;
+    end: Date;
+    team: PlanningTeamNavigationDto;
+}
+
+export interface SprintBacklogItemDto {
+    id: string;
+    key: string;
+    title: string;
+    workspace: WorkspaceNavigationDto;
+    type: string;
+    status: string;
+    statusCategory: SimpleNavigationDto;
+    parent?: WorkItemNavigationDto | undefined;
+    team?: WorkTeamNavigationDto | undefined;
+    assignedTo?: EmployeeNavigationDto | undefined;
+    created: Date;
+    activated?: Date | undefined;
+    done?: Date | undefined;
+    rank: number;
+    parentRank?: number | undefined;
+    project?: WorkProjectNavigationDto | undefined;
+    externalViewWorkItemUrl?: string | undefined;
+    stackRank: number;
+    storyPoints?: number | undefined;
+}
+
 export interface TeamTypeDto {
     id: number;
     name: string;
@@ -16746,16 +16978,6 @@ export interface DependencyDto {
     createdOn: Date;
     createdBy?: EmployeeNavigationDto | undefined;
     comment?: string | undefined;
-}
-
-export interface SprintListDto {
-    id: string;
-    key: number;
-    name: string;
-    state: SimpleNavigationDto;
-    start: Date;
-    end: Date;
-    team: PlanningTeamNavigationDto;
 }
 
 export interface FunctionalOrganizationChartDto {

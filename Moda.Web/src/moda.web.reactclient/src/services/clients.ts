@@ -25,6 +25,7 @@ import {
   ExpenditureCategoriesClient,
   ProjectsClient,
   StrategicInitiativesClient,
+  SprintsClient,
 } from './moda-api'
 import { tokenRequest } from '@/auth-config'
 import { InteractionRequiredAuthError } from '@azure/msal-browser'
@@ -89,6 +90,7 @@ export const getPlanningIntervalsClient = () =>
   new PlanningIntervalsClient('', axiosClient)
 export const getRisksClient = () => new RisksClient('', axiosClient)
 export const getRoadmapsClient = () => new RoadmapsClient('', axiosClient)
+export const getSprintsClient = () => new SprintsClient('', axiosClient)
 
 // PPM
 export const getExpenditureCategoriesClient = () =>

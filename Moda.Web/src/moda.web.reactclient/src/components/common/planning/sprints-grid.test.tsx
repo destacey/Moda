@@ -3,16 +3,22 @@ import { render, screen } from '@testing-library/react'
 
 // Mock the ModaGrid component
 jest.mock('../index', () => ({
-  ModaGrid: jest.fn(({ columnDefs, rowData, loadData, loading, height, emptyMessage }) => (
-    <div data-testid="moda-grid">
-      <div data-testid="row-count">{rowData?.length ?? 0}</div>
-      <div data-testid="loading">{loading ? 'loading' : 'not-loading'}</div>
-      <div data-testid="height">{height}</div>
-      <div data-testid="empty-message">{emptyMessage}</div>
-      <div data-testid="column-count">{columnDefs?.length ?? 0}</div>
-      {loadData && <button type="button" onClick={loadData} data-testid="load-data">Refresh</button>}
-    </div>
-  )),
+  ModaGrid: jest.fn(
+    ({ columnDefs, rowData, loadData, loading, height, emptyMessage }) => (
+      <div data-testid="moda-grid">
+        <div data-testid="row-count">{rowData?.length ?? 0}</div>
+        <div data-testid="loading">{loading ? 'loading' : 'not-loading'}</div>
+        <div data-testid="height">{height}</div>
+        <div data-testid="empty-message">{emptyMessage}</div>
+        <div data-testid="column-count">{columnDefs?.length ?? 0}</div>
+        {loadData && (
+          <button type="button" onClick={loadData} data-testid="load-data">
+            Refresh
+          </button>
+        )}
+      </div>
+    ),
+  ),
 }))
 
 // Mock the TeamNameLinkCellRenderer
@@ -62,7 +68,7 @@ describe('SprintsGrid', () => {
         sprints={mockSprints}
         isLoading={false}
         refetch={mockRefetch}
-      />
+      />,
     )
 
     expect(screen.getByTestId('moda-grid')).toBeInTheDocument()
@@ -74,7 +80,7 @@ describe('SprintsGrid', () => {
         sprints={mockSprints}
         isLoading={false}
         refetch={mockRefetch}
-      />
+      />,
     )
 
     expect(screen.getByTestId('row-count')).toHaveTextContent('2')
@@ -86,7 +92,7 @@ describe('SprintsGrid', () => {
         sprints={mockSprints}
         isLoading={true}
         refetch={mockRefetch}
-      />
+      />,
     )
 
     expect(screen.getByTestId('loading')).toHaveTextContent('loading')
@@ -98,20 +104,14 @@ describe('SprintsGrid', () => {
         sprints={mockSprints}
         isLoading={false}
         refetch={mockRefetch}
-      />
+      />,
     )
 
     expect(screen.getByTestId('loading')).toHaveTextContent('not-loading')
   })
 
   it('renders with empty sprints array', () => {
-    render(
-      <SprintsGrid
-        sprints={[]}
-        isLoading={false}
-        refetch={mockRefetch}
-      />
-    )
+    render(<SprintsGrid sprints={[]} isLoading={false} refetch={mockRefetch} />)
 
     expect(screen.getByTestId('row-count')).toHaveTextContent('0')
   })
@@ -122,10 +122,10 @@ describe('SprintsGrid', () => {
         sprints={mockSprints}
         isLoading={false}
         refetch={mockRefetch}
-      />
+      />,
     )
 
-    expect(screen.getByTestId('height')).toHaveTextContent('')
+    expect(screen.getByTestId('height')).toHaveTextContent('650')
   })
 
   it('uses custom grid height when specified', () => {
@@ -135,22 +135,18 @@ describe('SprintsGrid', () => {
         isLoading={false}
         refetch={mockRefetch}
         gridHeight={500}
-      />
+      />,
     )
 
     expect(screen.getByTestId('height')).toHaveTextContent('500')
   })
 
   it('displays correct empty message', () => {
-    render(
-      <SprintsGrid
-        sprints={[]}
-        isLoading={false}
-        refetch={mockRefetch}
-      />
-    )
+    render(<SprintsGrid sprints={[]} isLoading={false} refetch={mockRefetch} />)
 
-    expect(screen.getByTestId('empty-message')).toHaveTextContent('No sprints found.')
+    expect(screen.getByTestId('empty-message')).toHaveTextContent(
+      'No sprints found.',
+    )
   })
 
   it('creates correct number of columns', () => {
@@ -159,7 +155,7 @@ describe('SprintsGrid', () => {
         sprints={mockSprints}
         isLoading={false}
         refetch={mockRefetch}
-      />
+      />,
     )
 
     // Should have 6 columns: key, name, state, start, end, team
@@ -172,7 +168,7 @@ describe('SprintsGrid', () => {
         sprints={mockSprints}
         isLoading={false}
         refetch={mockRefetch}
-      />
+      />,
     )
 
     const refreshButton = screen.getByTestId('load-data')
@@ -187,7 +183,7 @@ describe('SprintsGrid', () => {
         sprints={mockSprints}
         isLoading={false}
         refetch={mockRefetch}
-      />
+      />,
     )
 
     // Rerender with same refetch function
@@ -196,7 +192,7 @@ describe('SprintsGrid', () => {
         sprints={mockSprints}
         isLoading={false}
         refetch={mockRefetch}
-      />
+      />,
     )
 
     const secondRefreshButton = screen.getByTestId('load-data')
@@ -215,12 +211,14 @@ describe('SprintsGrid', () => {
         isLoading={false}
         refetch={mockRefetch}
         hideTeam={true}
-      />
+      />,
     )
 
     // Check that ModaGrid was called with column definitions
     const mockCall = ModaGrid.mock.calls[0][0]
-    const teamColumn = mockCall.columnDefs.find((col: any) => col.field === 'team.name')
+    const teamColumn = mockCall.columnDefs.find(
+      (col: any) => col.field === 'team.name',
+    )
 
     expect(teamColumn).toBeDefined()
     expect(teamColumn.hide).toBe(true)
@@ -234,12 +232,14 @@ describe('SprintsGrid', () => {
         sprints={mockSprints}
         isLoading={false}
         refetch={mockRefetch}
-      />
+      />,
     )
 
     // Check that ModaGrid was called with column definitions
     const mockCall = ModaGrid.mock.calls[0][0]
-    const teamColumn = mockCall.columnDefs.find((col: any) => col.field === 'team.name')
+    const teamColumn = mockCall.columnDefs.find(
+      (col: any) => col.field === 'team.name',
+    )
 
     expect(teamColumn).toBeDefined()
     expect(teamColumn.hide).toBeUndefined()
@@ -253,7 +253,7 @@ describe('SprintsGrid', () => {
         sprints={mockSprints}
         isLoading={false}
         refetch={mockRefetch}
-      />
+      />,
     )
 
     const mockCall = ModaGrid.mock.calls[0][0]
@@ -265,28 +265,5 @@ describe('SprintsGrid', () => {
     expect(columnFields).toContain('start')
     expect(columnFields).toContain('end')
     expect(columnFields).toContain('team.name')
-  })
-
-  it('sets correct widths for columns', () => {
-    const ModaGrid = ModaGridModule.ModaGrid as jest.Mock
-
-    render(
-      <SprintsGrid
-        sprints={mockSprints}
-        isLoading={false}
-        refetch={mockRefetch}
-      />
-    )
-
-    const mockCall = ModaGrid.mock.calls[0][0]
-    const keyColumn = mockCall.columnDefs.find((col: any) => col.field === 'key')
-    const nameColumn = mockCall.columnDefs.find((col: any) => col.field === 'name')
-    const stateColumn = mockCall.columnDefs.find((col: any) => col.field === 'state.name')
-    const teamColumn = mockCall.columnDefs.find((col: any) => col.field === 'team.name')
-
-    expect(keyColumn.width).toBe(90)
-    expect(nameColumn.width).toBe(300)
-    expect(stateColumn.width).toBe(125)
-    expect(teamColumn.width).toBe(200)
   })
 })

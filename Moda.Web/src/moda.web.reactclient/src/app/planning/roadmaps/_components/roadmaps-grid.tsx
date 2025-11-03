@@ -2,10 +2,10 @@
 
 import { ModaGrid } from '@/src/components/common'
 import { RoadmapListDto } from '@/src/services/moda-api'
-import { ColDef } from 'ag-grid-community'
+import { ColDef, ValueFormatterParams } from 'ag-grid-community'
 import dayjs from 'dayjs'
 import Link from 'next/link'
-import { useMemo } from 'react'
+import { FC, useMemo } from 'react'
 
 export interface RoadmapsGridProps {
   roadmapsData: RoadmapListDto[]
@@ -20,24 +20,23 @@ const RoadmapCellRenderer = ({ value, data }) => {
   return <Link href={`/planning/roadmaps/${data.key}`}>{value}</Link>
 }
 
-// TODO: split this into two grids sharing one column definition
-const RoadmapsGrid: React.FC<RoadmapsGridProps> = (
-  props: RoadmapsGridProps,
-) => {
-  // TODO: dates are formatted correctly and filter, but the filter is string based, not date based
+const dateOnlyValueFormatter = (params: ValueFormatterParams<RoadmapListDto>) =>
+  params.value && dayjs(params.value).format('M/D/YYYY')
+
+const RoadmapsGrid: FC<RoadmapsGridProps> = (props: RoadmapsGridProps) => {
   const columnDefs = useMemo<ColDef<RoadmapListDto>[]>(
     () => [
       { field: 'key', width: 90 },
-      { field: 'name', width: 350, cellRenderer: RoadmapCellRenderer },
+      { field: 'name', width: 300, cellRenderer: RoadmapCellRenderer },
       {
         field: 'start',
-        width: 125,
-        valueGetter: (params) => dayjs(params.data.start).format('M/D/YYYY'),
+        width: 150,
+        valueFormatter: dateOnlyValueFormatter,
       },
       {
         field: 'end',
-        width: 125,
-        valueGetter: (params) => dayjs(params.data.end).format('M/D/YYYY'),
+        width: 150,
+        valueFormatter: dateOnlyValueFormatter,
       },
       {
         field: 'roadmapManagers',

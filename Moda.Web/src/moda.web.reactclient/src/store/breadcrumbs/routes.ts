@@ -33,6 +33,9 @@ const routes = {
   roadmaps: {
     title: 'Roadmaps',
   },
+  sprints: {
+    title: 'Sprints',
+  },
 
   ppm: {
     title: 'PPM',

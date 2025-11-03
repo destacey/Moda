@@ -14,6 +14,7 @@ import {
   Typography,
 } from 'antd'
 import {
+  ClearOutlined,
   DownloadOutlined,
   ReloadOutlined,
   SearchOutlined,
@@ -60,6 +61,7 @@ const ModaGrid = ({
 }: ModaGridProps) => {
   const { agGridTheme } = useTheme()
   const [displayedRowCount, setDisplayedRowCount] = useState(0)
+  const [searchValue, setSearchValue] = useState('')
   const showGlobalSearch = includeGlobalSearch ?? true
   const showExportButton = includeExportButton ?? true
   const showGridControls = gridControlMenuItems?.length > 0
@@ -79,11 +81,19 @@ const ModaGrid = ({
   }, [])
 
   const onGlobalSearchChange = useCallback((e) => {
-    gridRef.current?.api.setGridOption('quickFilterText', e.target.value)
+    const value = e.target.value
+    setSearchValue(value)
+    gridRef.current?.api.setGridOption('quickFilterText', value)
   }, [])
 
   const onBtnExport = useCallback(() => {
     gridRef.current?.api.exportDataAsCsv()
+  }, [])
+
+  const onClearFilters = useCallback(() => {
+    gridRef.current?.api.setFilterModel(null)
+    setSearchValue('')
+    gridRef.current?.api.setGridOption('quickFilterText', undefined)
   }, [])
 
   return (
@@ -105,6 +115,7 @@ const ModaGrid = ({
                   <Input
                     placeholder="Search"
                     allowClear={true}
+                    value={searchValue}
                     onChange={onGlobalSearchChange}
                     suffix={<SearchOutlined />}
                   />
@@ -124,6 +135,14 @@ const ModaGrid = ({
                     />
                   </Tooltip>
                 )}
+                <Tooltip title="Clear Filters">
+                  <Button
+                    type="text"
+                    shape="circle"
+                    icon={<ClearOutlined />}
+                    onClick={onClearFilters}
+                  />
+                </Tooltip>
                 {(showExportButton || toolbarActions) && (
                   <Divider type="vertical" style={{ height: '30px' }} />
                 )}

@@ -12,20 +12,23 @@ internal partial class UserService
 
         var userRoles = await _userManager.GetRolesAsync(user);
         var permissions = new List<string>();
-        foreach (var role in await _roleManager.Roles
+
+        var roles = await _roleManager.Roles
             .Where(r => userRoles.Contains(r.Name!))
-            .ToListAsync(cancellationToken))
+            .ToListAsync(cancellationToken);
+
+        foreach (var role in roles)
         {
             var claims = await _db.RoleClaims
                 .Where(rc => rc.RoleId == role.Id && rc.ClaimType == ApplicationClaims.Permission)
                 .Select(rc => rc.ClaimValue)
                 .ToListAsync(cancellationToken);
 
-            if (claims is not null && claims.Any())
+            if (claims is not null && claims.Count != 0)
                 permissions.AddRange(claims!);
         }
 
-        return permissions.Distinct().ToList();
+        return [.. permissions.Distinct()];
     }
 
     public async Task<bool> HasPermissionAsync(string userId, string permission, CancellationToken cancellationToken)

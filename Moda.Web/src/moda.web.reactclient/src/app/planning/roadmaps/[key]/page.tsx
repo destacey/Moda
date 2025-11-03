@@ -39,7 +39,8 @@ const visibilityTitle = (visibility: string, managersInfo: string) => {
 }
 
 const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
-  const { key: roadmapKey } = use(props.params)
+  const { key } = use(props.params)
+  const roadmapKey = Number(key)
 
   useDocumentTitle('Roadmap Details')
   const [managersInfo, setManagersInfo] = useState('Unknown')
@@ -293,7 +294,7 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       />
       {openEditRoadmapForm && (
         <EditRoadmapForm
-          roadmapKey={roadmapData?.key}
+          roadmapKey={roadmapKey}
           showForm={openEditRoadmapForm}
           onFormComplete={() => onEditRoadmapFormClosed(true)}
           onFormCancel={() => onEditRoadmapFormClosed(false)}

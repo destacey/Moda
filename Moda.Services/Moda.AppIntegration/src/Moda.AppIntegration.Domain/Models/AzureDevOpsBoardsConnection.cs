@@ -1,6 +1,7 @@
 ﻿using Moda.Common.Application.Interfaces.ExternalWork;
 using Moda.Common.Domain.Enums.AppIntegrations;
 using Moda.Common.Domain.Models;
+using Moda.Common.Extensions;
 
 namespace Moda.AppIntegration.Domain.Models;
 public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsConnectionConfiguration, AzureDevOpsBoardsTeamConfiguration>
@@ -33,15 +34,21 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
         try
         {
             Guard.Against.Null(Configuration, nameof(Configuration));
-            Guard.Against.NullOrWhiteSpace(organization, nameof(organization));
-            Guard.Against.NullOrWhiteSpace(personalAccessToken, nameof(personalAccessToken));
 
-            Name = name;
-            Description = description;
+            var newName = Guard.Against.NullOrWhiteSpace(name, nameof(name)).Trim();
+            var newDescription = description?.NullIfWhiteSpacePlusTrim();
+            var newOrganization = Guard.Against.NullOrWhiteSpace(organization, nameof(organization)).Trim();
+            var newPersonalAccessToken = Guard.Against.NullOrWhiteSpace(personalAccessToken, nameof(personalAccessToken)).Trim();
+
+            if (!UpdateValuesChanged(newName, newDescription, newOrganization, newPersonalAccessToken, configurationIsValid))
+                return Result.Success();
+
+            Name = newName;
+            Description = newDescription;
             IsValidConfiguration = configurationIsValid;
 
-            Configuration.Organization = organization;
-            Configuration.PersonalAccessToken = personalAccessToken;
+            Configuration.Organization = newOrganization;
+            Configuration.PersonalAccessToken = newPersonalAccessToken;
 
             AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
 
@@ -78,6 +85,7 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
         try
         {
             Guard.Against.Null(Configuration, nameof(Configuration));
+            bool hasChanges = false;
 
             // remove workspaces that are not in the new list
             var workspacesToRemove = Configuration.Workspaces.Where(w => !workspaces.Any(nw => nw.ExternalId == w.ExternalId)).ToList();
@@ -88,23 +96,34 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
                 if (result.IsFailure)
                     return result;
 
-                // remove any teams associated with the workspace
-                var removeTeamsResult = TeamConfiguration.RemoveTeamsForWorkspace(workspace.ExternalId);
+                // remove any teams associated with the workspace if any exist
+                if (TeamConfiguration?.WorkspaceTeams.Any(t => t.WorkspaceId == workspace.ExternalId) == true)
+                {
+                    var removeTeamsResult = TeamConfiguration.RemoveTeamsForWorkspace(workspace.ExternalId);
+                    if (removeTeamsResult.IsFailure) 
+                        return removeTeamsResult;
+                }
+
+                hasChanges = true;
             }
 
             // update existing or add new workspaces
             foreach (var workspace in workspaces)
             {
-                var existingWorkspace = Configuration.Workspaces.FirstOrDefault(w => w.ExternalId == workspace.ExternalId);
-                if (existingWorkspace is not null)
+                var existing = Configuration.Workspaces.FirstOrDefault(w => w.ExternalId == workspace.ExternalId);
+                if (existing is not null)
                 {
-                    var result = existingWorkspace.Update(
-                        workspace.Name,
-                        workspace.Description,
-                        workspace.WorkProcessId);
+                    // compare before calling Update
+                    if (!string.Equals(existing.Name, workspace.Name, StringComparison.Ordinal)
+                        || !string.Equals(existing.Description, workspace.Description, StringComparison.Ordinal)
+                        || existing.WorkProcessId != workspace.WorkProcessId)
+                    {
+                        var result = existing.Update(workspace.Name, workspace.Description, workspace.WorkProcessId);
+                        if (result.IsFailure) 
+                            return result;
 
-                    if (result.IsFailure)
-                        return result;
+                        hasChanges = true;
+                    }
                 }
                 else
                 {
@@ -116,11 +135,13 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
 
                     if (result.IsFailure)
                         return result;
+
+                    hasChanges = true;
                 }
             }
 
-            // TODO this will generate duplicate events in some cases
-            AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
+            if (hasChanges)
+                AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
 
             return Result.Success();
         }
@@ -135,6 +156,7 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
         try
         {
             Guard.Against.Null(Configuration, nameof(Configuration));
+            bool hasChanges = false;
 
             // remove processes that are not in the new list
             var processesToRemove = Configuration.WorkProcesses.Where(w => !processes.Any(nw => nw.ExternalId == w.ExternalId)).ToList();
@@ -144,6 +166,8 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
                 var result = Configuration.RemoveWorkProcess(process);
                 if (result.IsFailure)
                     return result;
+
+                hasChanges = true;
             }
 
             // update existing or add new processes
@@ -152,12 +176,19 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
                 var existingProcess = Configuration.WorkProcesses.FirstOrDefault(w => w.ExternalId == process.ExternalId);
                 if (existingProcess is not null)
                 {
-                    var result = existingProcess.Update(
-                        process.Name,
-                        process.Description);
+                    // compare before calling Update
+                    if (!string.Equals(existingProcess.Name, process.Name, StringComparison.Ordinal)
+                        || !string.Equals(existingProcess.Description, process.Description, StringComparison.Ordinal))
+                    {
+                        var result = existingProcess.Update(
+                            process.Name,
+                            process.Description);
 
-                    if (result.IsFailure)
-                        return result;
+                        if (result.IsFailure)
+                            return result;
+
+                        hasChanges = true;
+                    }
                 }
                 else
                 {
@@ -168,11 +199,14 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
 
                     if (result.IsFailure)
                         return result;
+
+                    hasChanges = true;
                 }
             }
 
-            // TODO this will generate duplicate events in some cases
-            AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
+            // only raise domain event if something actually changed
+            if (hasChanges)
+                AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
 
             return Result.Success();
         }
@@ -187,24 +221,51 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
         try
         {
             TeamConfiguration ??= AzureDevOpsBoardsTeamConfiguration.CreateEmpty();
+            bool hasChanges = false;
 
             var teamsToRemove = TeamConfiguration.WorkspaceTeams
                 .Where(t => !teams.Any(nw => nw.Id == t.TeamId))
                 .Select(t => t.TeamId)
                 .ToArray();
-            var removeResult = TeamConfiguration.RemoveTeams(teamsToRemove);
-            if (removeResult.IsFailure)
-                return removeResult;
+
+            if (teamsToRemove.Length >0)
+            {
+                var removeResult = TeamConfiguration.RemoveTeams(teamsToRemove);
+                if (removeResult.IsFailure)
+                    return removeResult;
+
+                hasChanges = true;
+            }
 
             foreach (var team in teams)
             {
-                var result = TeamConfiguration.UpsertWorkspaceTeam(team.WorkspaceId, team.Id, team.Name, team.BoardId);
-                if (result.IsFailure)
-                    return result;
+                var existing = TeamConfiguration.WorkspaceTeams.FirstOrDefault(t => t.TeamId == team.Id);
+                if (existing is not null)
+                {
+                    // compare before calling Upsert to avoid no-op
+                    if (existing.WorkspaceId != team.WorkspaceId
+                        || !string.Equals(existing.TeamName, team.Name, StringComparison.Ordinal)
+                        || existing.BoardId != team.BoardId)
+                    {
+                        var result = TeamConfiguration.UpsertWorkspaceTeam(team.WorkspaceId, team.Id, team.Name, team.BoardId);
+                        if (result.IsFailure)
+                            return result;
+
+                        hasChanges = true;
+                    }
+                }
+                else
+                {
+                    var result = TeamConfiguration.UpsertWorkspaceTeam(team.WorkspaceId, team.Id, team.Name, team.BoardId);
+                    if (result.IsFailure)
+                        return result;
+
+                    hasChanges = true;
+                }
             }
 
-            // TODO this will generate duplicate events in some cases
-            AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
+            if (hasChanges)
+                AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
 
             return Result.Success();
         }
@@ -224,13 +285,27 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
             if (workProcess is null)
                 return Result.Failure($"Unable to find work process with id {registration.ExternalId} in Azure DevOps Boards connection with id {Id}.");
 
-            Result setResult = workProcess.HasIntegration
-                ? workProcess.UpdateIntegrationState(registration.IntegrationState.IsActive)
-                : workProcess.AddIntegrationState(registration.IntegrationState);
-            if (setResult.IsFailure)
-                return setResult;
+            // if already has integration, only update if the active flag changed
+            if (workProcess.HasIntegration)
+            {
+                if (workProcess.IntegrationState is not null && workProcess.IntegrationState.IsActive == registration.IntegrationState.IsActive)
+                {
+                    // no change
+                    return Result.Success();
+                }
 
-            // TODO this will generate duplicate events in some cases
+                var setResult = workProcess.UpdateIntegrationState(registration.IntegrationState.IsActive);
+                if (setResult.IsFailure)
+                    return setResult;
+            }
+            else
+            {
+                var setResult = workProcess.AddIntegrationState(registration.IntegrationState);
+                if (setResult.IsFailure)
+                    return setResult;
+            }
+
+            // only raise domain event if something actually changed
             AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
 
             return Result.Success();
@@ -251,13 +326,27 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
             if (workspace is null)
                 return Result.Failure($"Unable to find workspace with id {registration.ExternalId} in Azure DevOps Boards connection with id {Id}.");
 
-            Result setResult = workspace.HasIntegration
-                ? workspace.UpdateIntegrationState(registration.IntegrationState.IsActive)
-                : workspace.AddIntegrationState(registration.IntegrationState);
-            if (setResult.IsFailure)
-                return setResult;
+            // if already has integration, only update if the active flag changed
+            if (workspace.HasIntegration)
+            {
+                if (workspace.IntegrationState is not null && workspace.IntegrationState.IsActive == registration.IntegrationState.IsActive)
+                {
+                    // no change
+                    return Result.Success();
+                }
 
-            // TODO this will generate duplicate events in some cases
+                var setResult = workspace.UpdateIntegrationState(registration.IntegrationState.IsActive);
+                if (setResult.IsFailure)
+                    return setResult;
+            }
+            else
+            {
+                var setResult = workspace.AddIntegrationState(registration.IntegrationState);
+                if (setResult.IsFailure)
+                    return setResult;
+            }
+
+            // only raise domain event if something actually changed
             AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
 
             return Result.Success();
@@ -275,5 +364,16 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
         connector.AddDomainEvent(EntityCreatedEvent.WithEntity(connector, timestamp));
 
         return connector;
+    }
+
+    private bool UpdateValuesChanged(string name, string? description, string organization, string personalAccessToken, bool configurationIsValid)
+    {
+        // ordered by most likely to change
+        if (!string.Equals(Name, name, StringComparison.Ordinal)) return true;
+        if (!string.Equals(Description, description, StringComparison.Ordinal)) return true;
+        if (!string.Equals(Configuration.PersonalAccessToken, personalAccessToken, StringComparison.Ordinal)) return true;
+        if (IsValidConfiguration != configurationIsValid) return true;
+        if (!string.Equals(Configuration.Organization, organization, StringComparison.Ordinal)) return true;
+        return false;
     }
 }

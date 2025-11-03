@@ -21,16 +21,10 @@ namespace Moda.Web.Api.Controllers.Organizations;
 [Route("api/organization/teams")]
 [ApiVersionNeutral]
 [ApiController]
-public class TeamsController : ControllerBase
+public class TeamsController(ILogger<TeamsController> logger, ISender sender) : ControllerBase
 {
-    private readonly ILogger<TeamsController> _logger;
-    private readonly ISender _sender;
-
-    public TeamsController(ILogger<TeamsController> logger, ISender sender)
-    {
-        _logger = logger;
-        _sender = sender;
-    }
+    private readonly ILogger<TeamsController> _logger = logger;
+    private readonly ISender _sender = sender;
 
     [HttpGet]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Teams)]
@@ -315,15 +309,12 @@ public class TeamsController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Iterations)]
     [OpenApiOperation("Get the sprints for a team.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IEnumerable<SprintListDto>>> GetTeamSprints(Guid id, CancellationToken cancellationToken)
     {
-        var sprints = await _sender.Send(new GetSprintForTeamQuery(id), cancellationToken);
+        var sprints = await _sender.Send(new GetSprintsQuery(id), cancellationToken);
 
-        return sprints is null
-            ? NotFound()
-            : Ok(sprints);
+        return Ok(sprints);
     }
 
     [HttpGet("functional-organization-chart")]
