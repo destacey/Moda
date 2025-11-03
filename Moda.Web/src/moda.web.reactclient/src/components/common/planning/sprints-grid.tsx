@@ -11,7 +11,7 @@ import {
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import Link from 'next/link'
-import { FC, useMemo, memo } from 'react'
+import { FC, useMemo } from 'react'
 
 dayjs.extend(utc)
 

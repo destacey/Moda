@@ -1,7 +1,7 @@
 'use client'
 
 import PageTitle from '@/src/components/common/page-title'
-import { FC, useCallback, useEffect, useState } from 'react'
+import { FC, useCallback, useState } from 'react'
 import { useDocumentTitle } from '../../../hooks/use-document-title'
 import useAuth from '../../../components/contexts/auth'
 import { Button } from 'antd'

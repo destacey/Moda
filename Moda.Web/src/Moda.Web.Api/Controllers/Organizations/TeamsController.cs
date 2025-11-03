@@ -1,5 +1,4 @@
-﻿using Microsoft.Graph.Models;
-using Moda.Common.Domain.Enums.Work;
+﻿using Moda.Common.Domain.Enums.Work;
 using Moda.Organization.Application.Models;
 using Moda.Organization.Application.Teams.Commands;
 using Moda.Organization.Application.Teams.Dtos;

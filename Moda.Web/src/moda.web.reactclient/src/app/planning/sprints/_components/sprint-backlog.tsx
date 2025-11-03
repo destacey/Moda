@@ -4,7 +4,7 @@ import { ModaGrid } from '@/src/components/common'
 import { SprintBacklogItemDto } from '@/src/services/moda-api'
 import { ColDef, ICellRendererParams } from 'ag-grid-community'
 import Link from 'next/link'
-import { useCallback, useMemo, memo } from 'react'
+import { useCallback, useMemo } from 'react'
 import { ExportOutlined } from '@ant-design/icons'
 import {
   workItemKeyComparator,
