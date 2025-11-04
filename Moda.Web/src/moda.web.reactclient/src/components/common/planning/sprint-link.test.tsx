@@ -5,9 +5,11 @@ import { WorkIterationNavigationDto } from '@/src/services/moda-api'
 
 // Mock Next.js Link component
 jest.mock('next/link', () => {
-  return ({ children, href }: { children: React.ReactNode; href: string }) => {
+  const MockedLink = ({ children, href }: { children: React.ReactNode; href: string }) => {
     return <a href={href}>{children}</a>
   }
+  MockedLink.displayName = 'Link'
+  return MockedLink
 })
 
 describe('SprintLink', () => {
