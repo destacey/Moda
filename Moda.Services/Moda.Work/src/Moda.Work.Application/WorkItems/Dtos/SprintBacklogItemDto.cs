@@ -1,5 +1,6 @@
 ﻿using Moda.Common.Application.Dtos;
 using Moda.Common.Application.Employees.Dtos;
+using Moda.Common.Domain.Enums.Planning;
 using Moda.Work.Application.WorkIterations.Dtos;
 using Moda.Work.Application.WorkProjects.Dtos;
 using Moda.Work.Application.Workspaces.Dtos;
@@ -38,7 +39,7 @@ public sealed record SprintBacklogItemDto : IMapFrom<WorkItem>
             .Map(dest => dest.Type, src => src.Type.Name)
             .Map(dest => dest.Status, src => src.Status.Name)
             .Map(dest => dest.StatusCategory, src => SimpleNavigationDto.FromEnum(src.StatusCategory))
-            .Map(dest => dest.Sprint, src => src.Iteration)
+            .Map(dest => dest.Sprint, src => src.Iteration != null && src.Iteration.Type == IterationType.Sprint ? src.Iteration : null)
             .Map(dest => dest.AssignedTo, src => src.AssignedTo == null ? null : EmployeeNavigationDto.From(src.AssignedTo))
             .Map(dest => dest.Activated, src => src.ActivatedTimestamp)
             .Map(dest => dest.Done, src => src.DoneTimestamp)
