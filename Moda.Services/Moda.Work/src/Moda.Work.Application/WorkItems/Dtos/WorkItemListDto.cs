@@ -5,6 +5,7 @@ using Moda.Work.Application.WorkProjects.Dtos;
 using Moda.Work.Application.Workspaces.Dtos;
 using Moda.Work.Application.WorkTeams.Dtos;
 using Moda.Work.Application.WorkTypes.Dtos;
+using Moda.Common.Domain.Enums.Planning;
 
 namespace Moda.Work.Application.WorkItems.Dtos;
 public sealed record WorkItemListDto : IMapFrom<WorkItem>
@@ -31,7 +32,7 @@ public sealed record WorkItemListDto : IMapFrom<WorkItem>
             .Map(dest => dest.Key, src => src.Key.ToString())
             .Map(dest => dest.Status, src => src.Status.Name)
             .Map(dest => dest.StatusCategory, src => SimpleNavigationDto.FromEnum(src.StatusCategory))
-            .Map(dest => dest.Sprint, src => src.Iteration)
+            .Map(dest => dest.Sprint, src => src.Iteration != null && src.Iteration.Type == IterationType.Sprint ? src.Iteration : null)
             .Map(dest => dest.AssignedTo, src => src.AssignedTo == null ? null : EmployeeNavigationDto.From(src.AssignedTo))
             .Map(dest => dest.Project, src => src.Project != null 
                 ? WorkProjectNavigationDto.From(src.Project) 

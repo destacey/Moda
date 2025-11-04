@@ -1,5 +1,6 @@
 ﻿using Moda.Common.Application.Dtos;
 using Moda.Common.Application.Employees.Dtos;
+using Moda.Common.Domain.Enums.Planning;
 using Moda.Work.Application.WorkIterations.Dtos;
 using Moda.Work.Application.WorkProjects.Dtos;
 using Moda.Work.Application.Workspaces.Dtos;
@@ -38,7 +39,8 @@ public sealed record WorkItemDetailsDto : IMapFrom<WorkItem>
             .Map(dest => dest.Key, src => src.Key.ToString())
             .Map(dest => dest.Status, src => src.Status.Name)
             .Map(dest => dest.StatusCategory, src => SimpleNavigationDto.FromEnum(src.StatusCategory))
-            .Map(dest => dest.Sprint, src => src.Iteration)
+            .Map(dest => dest.Team, src => src.Team)
+            .Map(dest => dest.Sprint, src => src.Iteration != null && src.Iteration.Type == IterationType.Sprint ? src.Iteration : null)
             .Map(dest => dest.AssignedTo, src => src.AssignedTo == null ? null : EmployeeNavigationDto.From(src.AssignedTo))
             .Map(dest => dest.CreatedBy, src => src.CreatedBy == null ? null : EmployeeNavigationDto.From(src.CreatedBy))
             .Map(dest => dest.LastModifiedBy, src => src.LastModifiedBy == null ? null : EmployeeNavigationDto.From(src.LastModifiedBy))
