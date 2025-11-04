@@ -1,8 +1,10 @@
 ﻿using Moda.Common.Application.Dtos;
 using Moda.Common.Application.Employees.Dtos;
+using Moda.Work.Application.WorkIterations.Dtos;
 using Moda.Work.Application.WorkProjects.Dtos;
 using Moda.Work.Application.Workspaces.Dtos;
 using Moda.Work.Application.WorkTeams.Dtos;
+using Moda.Work.Application.WorkTypes.Dtos;
 
 namespace Moda.Work.Application.WorkItems.Dtos;
 public sealed record WorkItemListDto : IMapFrom<WorkItem>
@@ -11,11 +13,12 @@ public sealed record WorkItemListDto : IMapFrom<WorkItem>
     public required string Key { get; set; }
     public required string Title { get; set; }
     public required WorkspaceNavigationDto Workspace { get; set; }
-    public required string Type { get; set; }
+    public required WorkTypeNavigationDto Type { get; set; }
     public required string Status { get; set; }
     public required SimpleNavigationDto StatusCategory { get; set; }
     public WorkItemNavigationDto? Parent { get; set; }
     public WorkTeamNavigationDto? Team { get; set; }
+    public WorkIterationNavigationDto? Sprint { get; set; }
     public EmployeeNavigationDto? AssignedTo { get; set; }
     public double StackRank { get; set; }
     public double? StoryPoints { get; set; }
@@ -26,9 +29,9 @@ public sealed record WorkItemListDto : IMapFrom<WorkItem>
     {
         config.NewConfig<WorkItem, WorkItemListDto>()
             .Map(dest => dest.Key, src => src.Key.ToString())
-            .Map(dest => dest.Type, src => src.Type.Name)
             .Map(dest => dest.Status, src => src.Status.Name)
             .Map(dest => dest.StatusCategory, src => SimpleNavigationDto.FromEnum(src.StatusCategory))
+            .Map(dest => dest.Sprint, src => src.Iteration)
             .Map(dest => dest.AssignedTo, src => src.AssignedTo == null ? null : EmployeeNavigationDto.From(src.AssignedTo))
             .Map(dest => dest.Project, src => src.Project != null 
                 ? WorkProjectNavigationDto.From(src.Project) 

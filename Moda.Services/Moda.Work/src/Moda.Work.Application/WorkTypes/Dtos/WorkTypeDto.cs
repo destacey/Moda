@@ -7,12 +7,14 @@ public sealed record WorkTypeDto : IMapFrom<WorkType>, IWorkTypeDto
 {
     public int Id { get; set; }
 
-    /// <summary>The name of the work type.  The name cannot be changed.</summary>
-    /// <value>The name.</value>
+    /// <summary>
+    /// The name of the work type.
+    /// </summary>
     public required string Name { get; set; }
 
-    /// <summary>The description of the work type.</summary>
-    /// <value>The description.</value>
+    /// <summary>
+    /// The description of the work type.
+    /// </summary>
     public string? Description { get; set; }
 
     /// <summary>
@@ -20,8 +22,9 @@ public sealed record WorkTypeDto : IMapFrom<WorkType>, IWorkTypeDto
     /// </summary>
     public required SimpleNavigationDto Level { get; set; }
 
-    /// <summary>Indicates whether the work type is active or not.</summary>
-    /// <value><c>true</c> if this instance is active; otherwise, <c>false</c>.</value>
+    /// <summary>
+    /// Indicates whether the work type is active.
+    /// </summary>
     public bool IsActive { get; set; }
 
     public void ConfigureMapping(TypeAdapterConfig config)

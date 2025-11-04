@@ -21,6 +21,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { useUpdateWorkTypeLevelsOrderMutation } from '@/src/store/features/work-management/work-type-level-api'
+import { WorkTypeTier } from '@/src/components/types'
 
 const { Text } = Typography
 
@@ -44,7 +45,7 @@ const WorkTypeTierCard = (props: WorkTypeTierCardProps) => {
   const [openCreateWorkTypeLevelForm, setOpenCreateWorkTypeLevelForm] =
     useState<boolean>(false)
 
-  const canOrder = props.tier.name === 'Portfolio'
+  const canOrder = props.tier.id === WorkTypeTier.Portfolio
 
   const canCreateNewLevel = canOrder && props.canCreateWorkTypeLevels
 

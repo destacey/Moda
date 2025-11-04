@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { useCallback, useMemo } from 'react'
 import { ExportOutlined } from '@ant-design/icons'
 import {
+  NestedWorkSprintLinkCellRenderer,
   NestedTeamNameLinkCellRenderer,
   ProjectLinkCellRenderer,
 } from '../moda-grid-cell-renderers'
@@ -19,6 +20,7 @@ export interface WorkItemsGridProps {
   workItems: WorkItemListDto[]
   isLoading: boolean
   refetch: () => void
+  hideParentColumn?: boolean
   hideProjectColumn?: boolean
 }
 
@@ -93,7 +95,7 @@ const WorkItemsGrid = (props: WorkItemsGridProps) => {
         cellRenderer: WorkItemLinkCellRenderer,
       },
       { field: 'title', width: 400 },
-      { field: 'type', width: 125 },
+      { field: 'type.name', headerName: 'Type', width: 125 },
       { field: 'status', width: 125 },
       {
         field: 'statusCategory.name',
@@ -107,8 +109,14 @@ const WorkItemsGrid = (props: WorkItemsGridProps) => {
         cellRenderer: NestedTeamNameLinkCellRenderer,
       },
       {
+        field: 'sprint.name',
+        headerName: 'Sprint',
+        cellRenderer: NestedWorkSprintLinkCellRenderer,
+      },
+      {
         field: 'parent.key',
         headerName: 'Parent Key',
+        hide: props.hideParentColumn,
         comparator: workItemKeyComparator,
         cellRenderer: ParentWorkItemLinkCellRenderer,
       },
@@ -116,6 +124,7 @@ const WorkItemsGrid = (props: WorkItemsGridProps) => {
         field: 'parent.title',
         headerName: 'Parent',
         width: 400,
+        hide: props.hideParentColumn,
       },
       {
         field: 'assignedTo.name',
@@ -137,7 +146,7 @@ const WorkItemsGrid = (props: WorkItemsGridProps) => {
         type: 'numericColumn',
       },
     ],
-    [props.hideProjectColumn],
+    [props.hideParentColumn, props.hideProjectColumn],
   )
 
   const refresh = useCallback(async () => {

@@ -1,10 +1,12 @@
 'use client'
 
 import { WorkItemDetailsDto } from '@/src/services/moda-api'
+import { SprintLink } from '@/src/components/common/planning'
 import { Descriptions } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import WorkItemSteps from './work-item-steps'
+import { WorkTypeTier } from '@/src/components/types'
 
 const { Item } = Descriptions
 
@@ -24,7 +26,7 @@ const WorkItemDetails = ({ workItem }: WorkItemDetailsProps) => {
     <>
       <Descriptions>
         <Item label="Key">{workItem.key}</Item>
-        <Item label="Type">{workItem.type}</Item>
+        <Item label="Type">{workItem.type.name}</Item>
         <Item label="Status">{workItem.status}</Item>
         <Item label="Status Category">{workItem.statusCategory.name}</Item>
         <Item label="Priority">{workItem.priority}</Item>
@@ -32,6 +34,15 @@ const WorkItemDetails = ({ workItem }: WorkItemDetailsProps) => {
         <Item label="Team">
           <Link href={teamLink}>{workItem.team?.name}</Link>
         </Item>
+        {workItem.type.tier.id === WorkTypeTier.Requirement && (
+          <Item label="Sprint">
+            {workItem.sprint ? (
+              <SprintLink sprint={workItem.sprint} />
+            ) : (
+              'Backlog'
+            )}
+          </Item>
+        )}
         <Item label="Parent">
           {workItem.parent ? (
             <Link
@@ -49,7 +60,7 @@ const WorkItemDetails = ({ workItem }: WorkItemDetailsProps) => {
               {workItem.project.name}
             </Link>
           ) : (
-            'No Parent'
+            'No Project'
           )}
         </Item>
         <Item label="Assigned To">

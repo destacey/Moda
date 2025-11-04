@@ -335,7 +335,7 @@ public class WorkIterationConfig : IEntityTypeConfiguration<WorkIteration>
         });
 
         // Relationships
-        builder.HasOne<WorkTeam>()
+        builder.HasOne(i => i.Team)
             .WithMany()
             .HasForeignKey(p => p.TeamId)
             .OnDelete(DeleteBehavior.Cascade);

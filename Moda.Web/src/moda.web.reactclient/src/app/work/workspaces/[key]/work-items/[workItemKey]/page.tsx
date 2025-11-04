@@ -21,6 +21,7 @@ import useAuth from '@/src/components/contexts/auth'
 import { ItemType } from 'antd/es/menu/interface'
 import EditWorkItemProjectForm from '../../../_components/edit-workitem-project-form'
 import { WorkItemDetailsDto } from '@/src/services/moda-api'
+import { WorkTypeTier } from '@/src/components/types'
 
 enum WorkItemTabs {
   Details = 'details',
@@ -42,7 +43,7 @@ const getWorkItemTabs = (workItemData: WorkItemDetailsDto) => [
         },
       ]
     : []),
-  ...(workItemData?.tier === 'Portfolio'
+  ...(workItemData?.type.tier.id === WorkTypeTier.Portfolio
     ? [
         {
           key: WorkItemTabs.WorkItems,
@@ -64,7 +65,7 @@ const WorkItemDetailsPage = (props: {
   const upperWorkspaceKey = key.toUpperCase()
   const upperWorkItemKey = workItemKey.toUpperCase()
 
-  useDocumentTitle('Work Item Details')
+  useDocumentTitle(`${upperWorkItemKey} - Work Item Details`)
 
   const [activeTab, setActiveTab] = useState(WorkItemTabs.Details)
   const [openEditWorkItemProjectForm, setOpenEditWorkItemProjectForm] =
@@ -107,6 +108,7 @@ const WorkItemDetailsPage = (props: {
             workItems={childWorkItemsQuery.data}
             isLoading={childWorkItemsQuery.isLoading}
             refetch={childWorkItemsQuery.refetch}
+            hideParentColumn={true}
           />
         )
       case WorkItemTabs.Dashboard:
@@ -131,7 +133,10 @@ const WorkItemDetailsPage = (props: {
   const actionsMenuItems: MenuProps['items'] = useMemo(() => {
     const items: ItemType[] = []
 
-    if (canManageProjectWorkItems && workItemData?.tier === 'Portfolio') {
+    if (
+      canManageProjectWorkItems &&
+      workItemData?.type.tier.id === WorkTypeTier.Portfolio
+    ) {
       items.push({
         key: 'edit-project',
         label: 'Edit Project',
@@ -140,7 +145,7 @@ const WorkItemDetailsPage = (props: {
     }
 
     return items
-  }, [canManageProjectWorkItems, workItemData?.tier])
+  }, [canManageProjectWorkItems, workItemData?.type.tier.id])
 
   useEffect(() => {
     const breadcrumbRoute: BreadcrumbItem[] = [
@@ -186,7 +191,7 @@ const WorkItemDetailsPage = (props: {
             tooltip="Open in external system"
           />
         }
-        subtitle={`${workItemData?.type ?? 'Work Item'} Details`}
+        subtitle={`${workItemData?.type.name ?? 'Work Item'} Details`}
         actions={<PageActions actionItems={actionsMenuItems} />}
       />
       <Card

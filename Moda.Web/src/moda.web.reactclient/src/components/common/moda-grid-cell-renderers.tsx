@@ -7,6 +7,7 @@ import {
   NavigationDto,
   PlanningIntervalObjectiveListDto,
   SimpleNavigationDto,
+  WorkIterationNavigationDto,
 } from '@/src/services/moda-api'
 import Link from 'next/link'
 import { MarkdownRenderer } from './markdown'
@@ -176,4 +177,35 @@ export const WorkspaceLinkCellRenderer = ({
 }: WorkspaceLinkCellRendererProps) => {
   if (!data) return null
   return <Link href={`/work/workspaces/${data.key}`}>{data.name}</Link>
+}
+
+export interface NestedWorkSprintLinkCellRendererProps {
+  data: {
+    sprint: WorkIterationNavigationDto | null
+  } | null
+  showTeamCode?: boolean
+}
+export const NestedWorkSprintLinkCellRenderer = ({
+  data,
+  showTeamCode = true,
+}: NestedWorkSprintLinkCellRendererProps) => {
+  return WorkSprintLinkCellRenderer({ data: data?.sprint, showTeamCode })
+}
+
+export interface WorkSprintLinkCellRendererProps {
+  data: WorkIterationNavigationDto | null
+  showTeamCode?: boolean
+}
+export const WorkSprintLinkCellRenderer = ({
+  data,
+  showTeamCode = true,
+}: WorkSprintLinkCellRendererProps) => {
+  if (!data) return null
+
+  const displayText =
+    showTeamCode && data.team?.code
+      ? `${data.name} (${data.team.code})`
+      : data.name
+
+  return <Link href={`/planning/sprints/${data.key}`}>{displayText}</Link>
 }

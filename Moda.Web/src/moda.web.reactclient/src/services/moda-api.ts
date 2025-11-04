@@ -15796,11 +15796,12 @@ export interface WorkItemListDto {
     key: string;
     title: string;
     workspace: WorkspaceNavigationDto;
-    type: string;
+    type: WorkTypeNavigationDto;
     status: string;
     statusCategory: SimpleNavigationDto;
     parent?: WorkItemNavigationDto | undefined;
     team?: WorkTeamNavigationDto | undefined;
+    sprint?: WorkIterationNavigationDto | undefined;
     assignedTo?: EmployeeNavigationDto | undefined;
     stackRank: number;
     storyPoints?: number | undefined;
@@ -15817,6 +15818,13 @@ export interface NavigationDtoOfGuidAndString {
 export interface WorkspaceNavigationDto extends NavigationDtoOfGuidAndString {
 }
 
+export interface WorkTypeNavigationDto {
+    id: number;
+    name: string;
+    level: SimpleNavigationDto;
+    tier: SimpleNavigationDto;
+}
+
 export interface WorkItemNavigationDto {
     id: string;
     key: string;
@@ -15826,7 +15834,12 @@ export interface WorkItemNavigationDto {
 }
 
 export interface WorkTeamNavigationDto extends NavigationDto {
+    code?: string;
     type?: string;
+}
+
+export interface WorkIterationNavigationDto extends NavigationDto {
+    team?: WorkTeamNavigationDto | undefined;
 }
 
 export interface WorkProjectNavigationDto extends NavigationDto {
@@ -16550,6 +16563,7 @@ export interface SprintBacklogItemDto {
     statusCategory: SimpleNavigationDto;
     parent?: WorkItemNavigationDto | undefined;
     team?: WorkTeamNavigationDto | undefined;
+    sprint: WorkIterationNavigationDto;
     assignedTo?: EmployeeNavigationDto | undefined;
     created: Date;
     activated?: Date | undefined;
@@ -16657,13 +16671,13 @@ export interface WorkItemDetailsDto {
     externalId?: number | undefined;
     title: string;
     workspace: WorkspaceNavigationDto;
-    type: string;
-    tier: string;
+    type: WorkTypeNavigationDto;
     status: string;
     statusCategory: SimpleNavigationDto;
     priority?: number | undefined;
     parent?: WorkItemNavigationDto | undefined;
     team?: WorkTeamNavigationDto | undefined;
+    sprint?: WorkIterationNavigationDto | undefined;
     assignedTo?: EmployeeNavigationDto | undefined;
     created: Date;
     createdBy?: EmployeeNavigationDto | undefined;
@@ -16959,6 +16973,7 @@ export interface WorkItemBacklogItemDto {
     statusCategory: SimpleNavigationDto;
     parent?: WorkItemNavigationDto | undefined;
     team?: WorkTeamNavigationDto | undefined;
+    sprint?: WorkIterationNavigationDto | undefined;
     assignedTo?: EmployeeNavigationDto | undefined;
     created: Date;
     rank: number;

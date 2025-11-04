@@ -1,5 +1,6 @@
 ﻿using Moda.Common.Application.Dtos;
 using Moda.Common.Application.Employees.Dtos;
+using Moda.Work.Application.WorkIterations.Dtos;
 using Moda.Work.Application.WorkProjects.Dtos;
 using Moda.Work.Application.Workspaces.Dtos;
 using Moda.Work.Application.WorkTeams.Dtos;
@@ -16,6 +17,7 @@ public sealed record SprintBacklogItemDto : IMapFrom<WorkItem>
     public required SimpleNavigationDto StatusCategory { get; set; }
     public WorkItemNavigationDto? Parent { get; set; }
     public WorkTeamNavigationDto? Team { get; set; }
+    public required WorkIterationNavigationDto Sprint { get; set; }
     public EmployeeNavigationDto? AssignedTo { get; set; }
     public Instant Created { get; set; }
     public Instant? Activated { get; set; }
@@ -36,6 +38,7 @@ public sealed record SprintBacklogItemDto : IMapFrom<WorkItem>
             .Map(dest => dest.Type, src => src.Type.Name)
             .Map(dest => dest.Status, src => src.Status.Name)
             .Map(dest => dest.StatusCategory, src => SimpleNavigationDto.FromEnum(src.StatusCategory))
+            .Map(dest => dest.Sprint, src => src.Iteration)
             .Map(dest => dest.AssignedTo, src => src.AssignedTo == null ? null : EmployeeNavigationDto.From(src.AssignedTo))
             .Map(dest => dest.Activated, src => src.ActivatedTimestamp)
             .Map(dest => dest.Done, src => src.DoneTimestamp)

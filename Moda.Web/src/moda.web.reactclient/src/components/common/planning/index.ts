@@ -5,5 +5,6 @@ export { default as MyAssignedRisks } from './my-assigned-risks'
 export { default as PlanningIntervalCard } from './planning-interval-card'
 export { default as PlanningIntervalObjectivesGrid } from './planning-interval-objectives-grid'
 export { default as RisksGrid } from './risks-grid'
+export { default as SprintLink } from './sprint-link'
 export { default as SprintsGrid } from './sprints-grid'
 
