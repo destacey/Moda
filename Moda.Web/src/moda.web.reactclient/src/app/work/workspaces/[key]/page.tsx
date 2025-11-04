@@ -93,10 +93,6 @@ const WorkspaceDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   }, [dispatch, pathname, workspaceKey])
 
   useEffect(() => {
-    error && console.error(error)
-  }, [error])
-
-  useEffect(() => {
     workItemsQuery.error && console.error(workItemsQuery.error)
   }, [workItemsQuery.error])
 

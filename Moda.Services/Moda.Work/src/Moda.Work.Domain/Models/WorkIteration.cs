@@ -29,6 +29,7 @@ public sealed class WorkIteration : ISimpleIteration, IHasIdAndKey
     public IterationState State { get; private set; }
     public IterationDateRange DateRange { get; private set; } = default!;
     public Guid? TeamId { get; private set; }
+    public WorkTeam? Team { get; private set; }
 
     /// <summary>
     /// Updates the current iteration with the values from the specified iteration.

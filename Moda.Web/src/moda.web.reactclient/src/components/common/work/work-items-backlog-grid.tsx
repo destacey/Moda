@@ -8,6 +8,7 @@ import { useCallback, useMemo } from 'react'
 import { ExportOutlined } from '@ant-design/icons'
 import {
   NestedTeamNameLinkCellRenderer,
+  NestedWorkSprintLinkCellRenderer,
   ProjectLinkCellRenderer,
 } from '../moda-grid-cell-renderers'
 import {
@@ -107,6 +108,11 @@ const WorkItemsBacklogGrid = (props: WorkItemsBacklogGridProps) => {
         headerName: 'Team',
         cellRenderer: NestedTeamNameLinkCellRenderer,
         hide: props.hideTeamColumn,
+      },
+      {
+        field: 'sprint.name',
+        headerName: 'Sprint',
+        cellRenderer: NestedWorkSprintLinkCellRenderer,
       },
       {
         field: 'parent.key',

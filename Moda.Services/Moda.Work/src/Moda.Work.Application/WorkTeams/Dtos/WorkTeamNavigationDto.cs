@@ -3,6 +3,7 @@
 namespace Moda.Work.Application.WorkTeams.Dtos;
 public record WorkTeamNavigationDto : NavigationDto, IMapFrom<WorkTeam>
 {
+    public required string Code { get; set; }
     public required string Type { get; set; }
 
     public void ConfigureMapping(TypeAdapterConfig config)
@@ -18,6 +19,7 @@ public record WorkTeamNavigationDto : NavigationDto, IMapFrom<WorkTeam>
             Id = team.Id,
             Key = team.Key,
             Name = team.Name,
+            Code = team.Code,
             Type = team.Type.GetDisplayName()
         };
     }

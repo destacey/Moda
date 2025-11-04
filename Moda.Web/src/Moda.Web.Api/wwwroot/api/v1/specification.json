@@ -14318,7 +14318,7 @@
             "$ref": "#/components/schemas/WorkspaceNavigationDto"
           },
           "type": {
-            "type": "string"
+            "$ref": "#/components/schemas/WorkTypeNavigationDto"
           },
           "status": {
             "type": "string"
@@ -14339,6 +14339,14 @@
             "oneOf": [
               {
                 "$ref": "#/components/schemas/WorkTeamNavigationDto"
+              }
+            ]
+          },
+          "sprint": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/WorkIterationNavigationDto"
               }
             ]
           },
@@ -14410,6 +14418,31 @@
           }
         }
       },
+      "WorkTypeNavigationDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "level",
+          "tier"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "level": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "tier": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          }
+        }
+      },
       "WorkItemNavigationDto": {
         "type": "object",
         "additionalProperties": false,
@@ -14450,8 +14483,32 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
+              "code": {
+                "type": "string"
+              },
               "type": {
                 "type": "string"
+              }
+            }
+          }
+        ]
+      },
+      "WorkIterationNavigationDto": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/NavigationDto"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "team": {
+                "nullable": true,
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/WorkTeamNavigationDto"
+                  }
+                ]
               }
             }
           }
@@ -17384,6 +17441,7 @@
           "type",
           "status",
           "statusCategory",
+          "sprint",
           "created",
           "rank",
           "stackRank"
@@ -17428,6 +17486,9 @@
                 "$ref": "#/components/schemas/WorkTeamNavigationDto"
               }
             ]
+          },
+          "sprint": {
+            "$ref": "#/components/schemas/WorkIterationNavigationDto"
           },
           "assignedTo": {
             "nullable": true,
@@ -17838,7 +17899,6 @@
           "title",
           "workspace",
           "type",
-          "tier",
           "status",
           "statusCategory",
           "created",
@@ -17866,10 +17926,7 @@
             "$ref": "#/components/schemas/WorkspaceNavigationDto"
           },
           "type": {
-            "type": "string"
-          },
-          "tier": {
-            "type": "string"
+            "$ref": "#/components/schemas/WorkTypeNavigationDto"
           },
           "status": {
             "type": "string"
@@ -17895,6 +17952,14 @@
             "oneOf": [
               {
                 "$ref": "#/components/schemas/WorkTeamNavigationDto"
+              }
+            ]
+          },
+          "sprint": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/WorkIterationNavigationDto"
               }
             ]
           },
@@ -19101,6 +19166,14 @@
             "oneOf": [
               {
                 "$ref": "#/components/schemas/WorkTeamNavigationDto"
+              }
+            ]
+          },
+          "sprint": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/WorkIterationNavigationDto"
               }
             ]
           },
