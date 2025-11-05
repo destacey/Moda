@@ -28,9 +28,9 @@
     <PackageReference Include="Microsoft.Identity.Web.MicrosoftGraph" Version="4.0.1" />
     <PackageReference Include="NodaTime" Version="3.2.2" />
     <PackageReference Include="NodaTime.Serialization.SystemTextJson" Version="1.3.0" />
-    <PackageReference Include="NSwag.AspNetCore" Version="14.6.1" />
-    <PackageReference Include="NSwag.CodeGeneration.CSharp" Version="14.6.1" />
-    <PackageReference Include="NSwag.CodeGeneration.TypeScript" Version="14.6.1" />
+    <PackageReference Include="NSwag.AspNetCore" Version="14.6.2" />
+    <PackageReference Include="NSwag.CodeGeneration.CSharp" Version="14.6.2" />
+    <PackageReference Include="NSwag.CodeGeneration.TypeScript" Version="14.6.2" />
     <PackageReference Include="OneOf.Serialization.SystemTextJson" Version="1.1.1" />
     <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
     <PackageReference Include="Serilog.Enrichers.AssemblyName" Version="2.0.0" />
@@ -45,10 +45,10 @@
     <PackageReference Include="Serilog.Settings.Configuration" Version="9.0.0" />
     <PackageReference Include="Serilog.Sinks.ApplicationInsights" Version="4.0.0" />
     <PackageReference Include="Serilog.Sinks.Async" Version="2.1.0" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
     <PackageReference Include="Serilog.Sinks.Datadog.Logs" Version="0.6.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
-    <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="9.0.1" />
+    <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="9.0.2" />
     <PackageReference Include="Serilog.Sinks.Seq" Version="9.0.0" />
     <PackageReference Include="SimplerSoftware.EntityFrameworkCore.SqlServer.NodaTime" Version="9.1.1" />
     <PackageReference Include="ZymLabs.NSwag.FluentValidation.AspNetCore" Version="0.7.1" />
