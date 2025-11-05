@@ -45,7 +45,7 @@ const workItemColDefs: ColDef<WorkItemListDto>[] = [
     width: 250,
   },
   {
-    field: 'type',
+    field: 'type.name',
     headerName: 'Type',
     width: 100,
   },
@@ -63,6 +63,11 @@ const workItemColDefs: ColDef<WorkItemListDto>[] = [
     field: 'parent.key',
     headerName: 'Parent Key',
     width: 125,
+  },
+  {
+    field: 'sprint.name',
+    headerName: 'Sprint',
+    width: 200,
   },
   {
     field: 'project.name',
