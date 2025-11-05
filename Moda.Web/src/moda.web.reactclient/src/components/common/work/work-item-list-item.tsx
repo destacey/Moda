@@ -1,5 +1,5 @@
 import { WorkItemListDto } from '@/src/services/moda-api'
-import { Flex, List, Space, Tag } from 'antd'
+import { Flex, List, Space, Tag, Typography } from 'antd'
 import Link from 'next/link'
 import ExternalIconLink from '../external-icon-link'
 import { getWorkStatusCategoryColor } from '@/src/utils'
@@ -8,6 +8,7 @@ import { WorkTypeTier } from '../../types'
 
 const { Item } = List
 const { Meta } = Item
+const { Text } = Typography
 
 export interface WorkItemListItemProps {
   workItem: WorkItemListDto
@@ -46,9 +47,9 @@ const WorkItemListItemDescription = ({ workItem }: WorkItemListItemProps) => {
   return (
     <Flex vertical gap="small">
       {showSprint && (
-        <span>
+        <Text type="secondary">
           Sprint: <SprintLink sprint={workItem.sprint} />
-        </span>
+        </Text>
       )}
       <Space wrap>
         <Tag title="Work Item Type">{workItem.type.name}</Tag>
