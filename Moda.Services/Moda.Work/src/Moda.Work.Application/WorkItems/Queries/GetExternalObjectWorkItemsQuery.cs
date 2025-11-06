@@ -2,6 +2,7 @@
 using Moda.Work.Application.WorkItems.Dtos;
 
 namespace Moda.Work.Application.WorkItems.Queries;
+
 public sealed record GetExternalObjectWorkItemsQuery(Guid ObjectId) : IQuery<WorkItemsSummaryDto>;
 
 internal sealed class GetExternalObjectWorkItemsQueryHandler(IWorkDbContext workDbContext) : IQueryHandler<GetExternalObjectWorkItemsQuery, WorkItemsSummaryDto>
@@ -24,5 +25,5 @@ internal sealed class GetExternalObjectWorkItemsQueryHandler(IWorkDbContext work
 
         var summary = WorkItemProgressSummary.Create(progress);
         return WorkItemsSummaryDto.Create(summary.RootRollup, workItems);
-    }    
+    }
 }

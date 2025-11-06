@@ -15,14 +15,4 @@ public record WorkTeamNavigationDto : NavigationDto, IMapFrom<WorkTeam>
             .Map(dest => dest.Code, src => src.Code)
             .Map(dest => dest.Type, src => src.Type.GetDisplayName());
     }
-
-    public static WorkTeamNavigationDto From(WorkTeam team)
-        => new()
-        {
-            Id = team.Id,
-            Key = team.Key,
-            Name = team.Name,
-            Code = team.Code,
-            Type = team.Type.GetDisplayName()
-        };
 }
