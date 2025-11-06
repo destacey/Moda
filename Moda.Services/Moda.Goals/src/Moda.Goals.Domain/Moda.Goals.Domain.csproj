@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <ItemGroup>
-        <PackageReference Include="CSharpFunctionalExtensions" Version="3.6.0" />
-        <PackageReference Include="NodaTime" Version="3.2.2" />
+        <PackageReference Include="CSharpFunctionalExtensions" />
+        <PackageReference Include="NodaTime" />
     </ItemGroup>
 
     <ItemGroup>
