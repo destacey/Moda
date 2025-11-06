@@ -338,7 +338,12 @@ public class WorkIterationConfig : IEntityTypeConfiguration<WorkIteration>
         builder.HasOne(i => i.Team)
             .WithMany()
             .HasForeignKey(p => p.TeamId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.ClientSetNull);
+
+        // TODO: this is needed for the nested mapping to work correctly. Not sure why Mapster doesn't pick it up automatically.
+        // WorkIterationNavigationDto with Team property
+        builder.Navigation(i => i.Team)
+            .AutoInclude();
     }
 }
 public class WorkProcessConfig : IEntityTypeConfiguration<WorkProcess>
