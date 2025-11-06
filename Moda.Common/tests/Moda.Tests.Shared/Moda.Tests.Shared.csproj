@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <PackageReference Include="Bogus" Version="35.6.5" />
-    <PackageReference Include="NodaTime.Testing" Version="3.2.2" />
+    <PackageReference Include="Bogus" />
+    <PackageReference Include="NodaTime.Testing" />
   </ItemGroup>
 
   <ItemGroup>
