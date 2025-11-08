@@ -44,7 +44,7 @@ const PlanningIntervalListPage = () => {
       { field: 'key', width: 90 },
       { field: 'name', cellRenderer: PlanningIntervalLinkCellRenderer },
       {
-        field: 'state',
+        field: 'state.name',
         width: 125,
       },
       {
@@ -67,8 +67,8 @@ const PlanningIntervalListPage = () => {
     if (!piData) return
 
     const sortedData = piData.slice().sort((a, b) => {
-      const aStateIndex = stateOrder.indexOf(a.state)
-      const bStateIndex = stateOrder.indexOf(b.state)
+      const aStateIndex = stateOrder.indexOf(a.state.name)
+      const bStateIndex = stateOrder.indexOf(b.state.name)
       if (aStateIndex !== bStateIndex) {
         return aStateIndex - bStateIndex
       } else {

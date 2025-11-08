@@ -138,13 +138,15 @@ const PlanningIntervalDetailsPage = (props: {
       )
   }, [dispatch, pathname, planningIntervalData])
 
-  const onEditFormClosed = useCallback((wasSaved: boolean) => {
-    setOpenEditPlanningIntervalForm(false)
-    if (wasSaved) {
-      refetchPlanningInterval()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  const onEditFormClosed = useCallback(
+    (wasSaved: boolean) => {
+      setOpenEditPlanningIntervalForm(false)
+      if (wasSaved) {
+        refetchPlanningInterval()
+      }
+    },
+    [refetchPlanningInterval],
+  )
 
   const onManagePlanningIntervalDatesFormClosed = useCallback(
     (wasSaved: boolean) => {
@@ -156,13 +158,15 @@ const PlanningIntervalDetailsPage = (props: {
     [refetchPlanningInterval],
   )
 
-  const onManageTeamsFormClosed = useCallback((wasSaved: boolean) => {
-    setOpenManageTeamsForm(false)
-    if (wasSaved) {
-      refetchPlanningInterval()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  const onManageTeamsFormClosed = useCallback(
+    (wasSaved: boolean) => {
+      setOpenManageTeamsForm(false)
+      if (wasSaved) {
+        refetchPlanningInterval()
+      }
+    },
+    [refetchPlanningInterval],
+  )
 
   // doesn't trigger on first render
   const onTabChange = useCallback(
