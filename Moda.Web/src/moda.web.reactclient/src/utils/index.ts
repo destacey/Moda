@@ -1,4 +1,4 @@
-export { daysRemaining } from './dates'
+export { daysRemaining, percentageElapsed } from './dates'
 export { getSortedNames } from './get-sorted-names'
 export {
   getWorkStatusCategoryColor,

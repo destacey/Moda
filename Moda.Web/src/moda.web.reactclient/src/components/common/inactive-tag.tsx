@@ -2,12 +2,13 @@
 
 import { Tag } from 'antd'
 import useTheme from '../contexts/theme'
+import { FC } from 'react'
 
 interface InactiveTagProps {
   isActive: boolean
 }
 
-const InactiveTag: React.FC<InactiveTagProps> = ({ isActive }) => {
+const InactiveTag: FC<InactiveTagProps> = ({ isActive }) => {
   const { token } = useTheme()
 
   if (isActive === undefined || isActive === null || isActive) {

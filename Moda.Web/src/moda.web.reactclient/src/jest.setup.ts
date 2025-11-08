@@ -124,12 +124,46 @@ jest.mock('dayjs', () => {
       const d = new Date(date)
       if (isNaN(d.getTime())) return ''
 
+      const monthNames = [
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec',
+      ]
+      const month = monthNames[d.getMonth()]
+      const day = d.getDate()
+      const year = d.getFullYear()
+      const hours = d.getHours()
+      const minutes = d.getMinutes()
+      const ampm = hours >= 12 ? 'PM' : 'AM'
+      const displayHours = hours % 12 || 12
+
       // Simple format support for common patterns
       if (formatStr === 'M/D/YYYY') {
         return `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear()}`
       }
       if (formatStr === 'YYYY-MM-DD') {
         return d.toISOString().split('T')[0]
+      }
+      if (formatStr === 'MMM D') {
+        return `${month} ${day}`
+      }
+      if (formatStr === 'MMM D, YYYY') {
+        return `${month} ${day}, ${year}`
+      }
+      if (formatStr === 'MMM D, h:mm A') {
+        return `${month} ${day}, ${displayHours}:${String(minutes).padStart(2, '0')} ${ampm}`
+      }
+      if (formatStr === 'MMM D, YYYY h:mm A') {
+        return `${month} ${day}, ${year} ${displayHours}:${String(minutes).padStart(2, '0')} ${ampm}`
       }
       return d.toISOString()
     },
@@ -140,6 +174,39 @@ jest.mock('dayjs', () => {
     valueOf: () => {
       if (!date) return 0
       return new Date(date).valueOf()
+    },
+    startOf: (unit: string) => {
+      if (!date) return mockDayjs(null)
+      const d = new Date(date)
+      if (isNaN(d.getTime())) return mockDayjs(null)
+
+      if (unit === 'day') {
+        d.setHours(0, 0, 0, 0)
+      }
+      return mockDayjs(d)
+    },
+    diff: (other: any, unit: string) => {
+      if (!date || !other) return 0
+      const d1 = new Date(date)
+      const d2 = new Date(other.valueOf ? other.valueOf() : other)
+      if (isNaN(d1.getTime()) || isNaN(d2.getTime())) return 0
+
+      const diffMs = d1.getTime() - d2.getTime()
+      if (unit === 'day') {
+        return Math.floor(diffMs / (1000 * 60 * 60 * 24))
+      }
+      return 0
+    },
+    isSame: (other: any, unit: string) => {
+      if (!date || !other) return false
+      const d1 = new Date(date)
+      const d2 = new Date(other.valueOf ? other.valueOf() : other)
+      if (isNaN(d1.getTime()) || isNaN(d2.getTime())) return false
+
+      if (unit === 'year') {
+        return d1.getFullYear() === d2.getFullYear()
+      }
+      return false
     },
   })
   mockDayjs.extend = jest.fn()
