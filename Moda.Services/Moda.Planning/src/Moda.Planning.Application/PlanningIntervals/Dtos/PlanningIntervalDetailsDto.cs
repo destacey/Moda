@@ -1,4 +1,4 @@
-﻿using Moda.Common.Extensions;
+﻿using Moda.Common.Application.Dtos;
 
 namespace Moda.Planning.Application.PlanningIntervals.Dtos;
 
@@ -29,9 +29,10 @@ public sealed record PlanningIntervalDetailsDto
     /// <value>The end.</value>
     public required LocalDate End { get; set; }
 
-    /// <summary>Gets or sets the state.</summary>
-    /// <value>The state.</value>
-    public required string State { get; set; }
+    /// <summary>
+    /// The current state of the Planning Interval.
+    /// </summary>
+    public required SimpleNavigationDto State { get; set; }
 
     /// <summary>Gets or sets a value indicating whether [objectives locked].</summary>
     /// <value><c>true</c> if [objectives locked]; otherwise, <c>false</c>.</value>
@@ -42,6 +43,7 @@ public sealed record PlanningIntervalDetailsDto
     // TODO: do this with Mapster
     public static PlanningIntervalDetailsDto Create(PlanningInterval planningInterval, IDateTimeProvider dateTimeProvider)
     {
+        var state = planningInterval.StateOn(dateTimeProvider.Now.InUtc().Date);
         return new PlanningIntervalDetailsDto()
         {
             Id = planningInterval.Id,
@@ -50,7 +52,7 @@ public sealed record PlanningIntervalDetailsDto
             Description = planningInterval.Description,
             Start = planningInterval.DateRange.Start,
             End = planningInterval.DateRange.End,
-            State = planningInterval.StateOn(dateTimeProvider.Now.InUtc().Date).GetDisplayName(),
+            State = SimpleNavigationDto.FromEnum(state),
             ObjectivesLocked = planningInterval.ObjectivesLocked,
             Predictability = planningInterval.CalculatePredictability(dateTimeProvider.Now.InUtc().Date)
         };
