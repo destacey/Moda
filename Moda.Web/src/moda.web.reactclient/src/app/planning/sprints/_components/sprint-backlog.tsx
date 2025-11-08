@@ -13,6 +13,7 @@ import {
 import {
   NestedTeamNameLinkCellRenderer,
   ProjectLinkCellRenderer,
+  WorkStatusTagCellRenderer,
 } from '@/src/components/common/moda-grid-cell-renderers'
 
 export interface SprintBacklogGridProps {
@@ -96,7 +97,7 @@ const SprintBacklogGrid = (props: SprintBacklogGridProps) => {
 
   const columnDefs = useMemo<ColDef<SprintBacklogItemDto>[]>(
     () => [
-      { field: 'rank', width: 80 },
+      { field: 'rank', width: 50, filter: false },
       {
         field: 'key',
         comparator: workItemKeyComparator,
@@ -104,11 +105,17 @@ const SprintBacklogGrid = (props: SprintBacklogGridProps) => {
       },
       { field: 'type', width: 125 },
       { field: 'title', width: 400 },
-      { field: 'status', width: 125 },
+      {
+        field: 'storyPoints',
+        headerName: 'SPs',
+        title: 'Story Points',
+        width: 80,
+      },
+      { field: 'status', width: 125, cellRenderer: WorkStatusTagCellRenderer },
       {
         field: 'statusCategory.name',
         headerName: 'Status Category',
-        width: 140,
+        width: 120,
         comparator: workStatusCategoryComparator,
       },
       {
@@ -150,11 +157,12 @@ const SprintBacklogGrid = (props: SprintBacklogGridProps) => {
   return (
     <>
       <ModaGrid
-        height={550}
+        height={-1}
         columnDefs={columnDefs}
         rowData={workItems}
         loadData={refresh}
         loading={props.isLoading}
+        emptyMessage="No planned work items"
       />
     </>
   )

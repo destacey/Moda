@@ -7,4 +7,4 @@ export { default as PlanningIntervalObjectivesGrid } from './planning-interval-o
 export { default as RisksGrid } from './risks-grid'
 export { default as SprintLink } from './sprint-link'
 export { default as SprintsGrid } from './sprints-grid'
-
+export { default as IterationStateTag } from './iteration-state-tag'
