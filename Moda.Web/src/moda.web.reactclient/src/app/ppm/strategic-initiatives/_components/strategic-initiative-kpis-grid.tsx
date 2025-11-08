@@ -1,7 +1,7 @@
 'use client'
 
 import { ModaGrid } from '@/src/components/common'
-import { ModaStatisticNumber } from '@/src/components/common/kpis'
+import { ModaStatisticNumber } from '@/src/components/common/metrics'
 import { RowMenuCellRenderer } from '@/src/components/common/moda-grid-cell-renderers'
 import { StrategicInitiativeKpiListDto } from '@/src/services/moda-api'
 import { ColDef, GetRowIdParams } from 'ag-grid-community'

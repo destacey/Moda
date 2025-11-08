@@ -3,6 +3,7 @@ import { Col, Row, Space, Typography } from 'antd'
 import PlanningIntervalCard from './planning-interval-card'
 import dayjs from 'dayjs'
 import { useGetPlanningIntervalsQuery } from '@/src/store/features/planning/planning-interval-api'
+import { IterationState } from '../../types'
 
 const { Title } = Typography
 
@@ -21,8 +22,9 @@ const ActivePlanningIntervals = () => {
       piData
         ?.filter(
           (pi) =>
-            pi.state === 'Active' ||
-            (pi.state === 'Future' && isWithinTwoWeeks(pi.start)),
+            (pi.state.id as IterationState) === IterationState.Active ||
+            ((pi.state.id as IterationState) === IterationState.Future &&
+              isWithinTwoWeeks(pi.start)),
         )
         ?.sort((a, b) => dayjs(a.start).unix() - dayjs(b.start).unix()) || []
     )

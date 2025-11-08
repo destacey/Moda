@@ -11,6 +11,9 @@ import {
 } from '@/src/services/moda-api'
 import Link from 'next/link'
 import { MarkdownRenderer } from './markdown'
+import { ICellRendererParams } from 'ag-grid-community'
+import WorkStatusTag from './work/work-status-tag'
+import { WorkStatusCategory } from '../types'
 
 export interface HealthCheckStatusColumn {
   id: string
@@ -37,6 +40,19 @@ export const HealthCheckStatusCellRenderer = ({
 }: HealthCheckStatusCellRendererProps) => {
   if (!data) return null
   return <HealthCheckTag healthCheck={data} />
+}
+
+export const WorkStatusTagCellRenderer = ({
+  value,
+  data,
+}: ICellRendererParams<any>) => {
+  if (!data || !data.status) return null
+  return (
+    <WorkStatusTag
+      status={value}
+      category={data.statusCategory.id as WorkStatusCategory}
+    />
+  )
 }
 
 export const MarkdownCellRenderer = ({ value }) => {

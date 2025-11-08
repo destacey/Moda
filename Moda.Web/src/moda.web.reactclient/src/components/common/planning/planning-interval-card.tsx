@@ -3,6 +3,7 @@ import { daysRemaining } from '@/src/utils'
 import { Card, Space, Typography } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
+import { IterationState } from '../../types'
 
 const { Text } = Typography
 
@@ -16,14 +17,14 @@ const PlanningIntervalCard = ({
   if (!planningInterval) return null
 
   const DaysCountdownLabel = () => {
-    switch (planningInterval.state) {
-      case 'Future':
+    switch (planningInterval.state.id as IterationState) {
+      case IterationState.Future:
         return (
           <Text>
             ({daysRemaining(planningInterval.start)} days until start)
           </Text>
         )
-      case 'Active':
+      case IterationState.Active:
         return (
           <Text>({daysRemaining(planningInterval.end)} days remaining)</Text>
         )

@@ -15059,7 +15059,7 @@
             "format": "date"
           },
           "state": {
-            "type": "string"
+            "$ref": "#/components/schemas/SimpleNavigationDto"
           }
         }
       },
@@ -15102,7 +15102,7 @@
             "format": "date"
           },
           "state": {
-            "type": "string"
+            "$ref": "#/components/schemas/SimpleNavigationDto"
           },
           "objectivesLocked": {
             "type": "boolean"
@@ -17538,6 +17538,11 @@
             "format": "double"
           },
           "storyPoints": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "cycleTime": {
             "type": "number",
             "format": "double",
             "nullable": true

@@ -15976,7 +15976,7 @@ export interface PlanningIntervalListDto {
     name: string;
     start: Date;
     end: Date;
-    state: string;
+    state: SimpleNavigationDto;
 }
 
 export interface PlanningIntervalDetailsDto {
@@ -15986,7 +15986,7 @@ export interface PlanningIntervalDetailsDto {
     description?: string | undefined;
     start: Date;
     end: Date;
-    state: string;
+    state: SimpleNavigationDto;
     objectivesLocked: boolean;
     predictability?: number | undefined;
 }
@@ -16574,6 +16574,7 @@ export interface SprintBacklogItemDto {
     externalViewWorkItemUrl?: string | undefined;
     stackRank: number;
     storyPoints?: number | undefined;
+    cycleTime?: number | undefined;
 }
 
 export interface TeamTypeDto {

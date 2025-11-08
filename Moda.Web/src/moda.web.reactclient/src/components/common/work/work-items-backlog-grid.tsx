@@ -10,6 +10,7 @@ import {
   NestedTeamNameLinkCellRenderer,
   NestedWorkSprintLinkCellRenderer,
   ProjectLinkCellRenderer,
+  WorkStatusTagCellRenderer,
 } from '../moda-grid-cell-renderers'
 import {
   workItemKeyComparator,
@@ -96,7 +97,13 @@ const WorkItemsBacklogGrid = (props: WorkItemsBacklogGridProps) => {
       },
       { field: 'title', width: 400 },
       { field: 'type', width: 125 },
-      { field: 'status', width: 125 },
+      {
+        field: 'storyPoints',
+        headerName: 'SPs',
+        title: 'Story Points',
+        width: 80,
+      },
+      { field: 'status', width: 125, cellRenderer: WorkStatusTagCellRenderer },
       {
         field: 'statusCategory.name',
         headerName: 'Status Category',

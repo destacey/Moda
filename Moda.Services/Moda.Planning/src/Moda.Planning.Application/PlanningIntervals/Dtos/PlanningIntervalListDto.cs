@@ -1,4 +1,4 @@
-﻿using Moda.Common.Extensions;
+﻿using Moda.Common.Application.Dtos;
 
 namespace Moda.Planning.Application.PlanningIntervals.Dtos;
 
@@ -25,13 +25,15 @@ public sealed record PlanningIntervalListDto
     /// <value>The end.</value>
     public LocalDate End { get; set; }
 
-    /// <summary>Gets or sets the state.</summary>
-    /// <value>The state.</value>
-    public required string State { get; set; }
+    /// <summary>
+    /// The current state of the Planning Interval.
+    /// </summary>
+    public required SimpleNavigationDto State { get; set; }
 
     // TODO: do this with Mapster
     public static PlanningIntervalListDto Create(PlanningInterval planningInterval, IDateTimeProvider dateTimeProvider)
     {
+        var state = planningInterval.StateOn(dateTimeProvider.Now.InUtc().Date);
         return new PlanningIntervalListDto()
         {
             Id = planningInterval.Id,
@@ -39,7 +41,7 @@ public sealed record PlanningIntervalListDto
             Name = planningInterval.Name,
             Start = planningInterval.DateRange.Start,
             End = planningInterval.DateRange.End,
-            State = planningInterval.StateOn(dateTimeProvider.Now.InUtc().Date).GetDisplayName()
+            State = SimpleNavigationDto.FromEnum(state)
         };
     }
 }

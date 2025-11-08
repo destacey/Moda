@@ -3,16 +3,25 @@
 import { PageTitle } from '@/src/components/common'
 import { authorizePage } from '@/src/components/hoc'
 import { useAppDispatch, useDocumentTitle } from '@/src/hooks'
-import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
+import {
+  BreadcrumbItem,
+  setBreadcrumbRoute,
+  setBreadcrumbTitle,
+} from '@/src/store/breadcrumbs'
 import {
   useGetSprintBacklogQuery,
   useGetSprintQuery,
 } from '@/src/store/features/planning/sprints-api'
-import { Card, Descriptions, Flex } from 'antd'
+import { Card, Descriptions, Divider, Flex, Typography } from 'antd'
 import { notFound, usePathname } from 'next/navigation'
 import { use, useCallback, useEffect, useState } from 'react'
 import SprintDetailsLoading from './loading'
 import { SprintBacklogGrid, SprintDetails } from '../_components'
+import { IterationStateTag } from '@/src/components/common/planning'
+import { IterationState } from '@/src/components/types'
+import LinksCard from '@/src/components/common/links/links-card'
+
+const { Title } = Typography
 
 enum SprintTabs {
   Details = 'details',
@@ -55,46 +64,32 @@ const SprintDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   useEffect(() => {
     if (!sprintData) return
 
-    const breadcrumbRoute: BreadcrumbItem[] = [
-      {
-        title: 'Planning',
-      },
-      {
-        href: `/planning/sprints`,
-        title: 'Sprints',
-      },
-    ]
+    dispatch(setBreadcrumbTitle({ title: sprintKey.toString(), pathname }))
+  }, [dispatch, pathname, sprintData, sprintKey])
 
-    breadcrumbRoute.push({
-      title: 'Details',
-    })
-
-    dispatch(setBreadcrumbRoute({ route: breadcrumbRoute, pathname }))
-  }, [dispatch, pathname, sprintData])
-
-  const renderTabContent = useCallback(() => {
-    switch (activeTab) {
-      case SprintTabs.Details:
-        return <SprintDetails sprint={sprintData} />
-      case SprintTabs.WorkItems:
-        return (
-          <SprintBacklogGrid
-            workItems={workItemsData}
-            isLoading={workItemsDataIsLoading}
-            refetch={refetchWorkItemsData}
-            hideTeamColumn={true}
-          />
-        )
-      default:
-        return null
-    }
-  }, [
-    activeTab,
-    refetchWorkItemsData,
-    sprintData,
-    workItemsData,
-    workItemsDataIsLoading,
-  ])
+  // const renderTabContent = useCallback(() => {
+  //   switch (activeTab) {
+  //     case SprintTabs.Details:
+  //       return <SprintDetails sprint={sprintData} backlog={workItemsData} />
+  //     case SprintTabs.WorkItems:
+  //       return (
+  //         <SprintBacklogGrid
+  //           workItems={workItemsData}
+  //           isLoading={workItemsDataIsLoading}
+  //           refetch={refetchWorkItemsData}
+  //           hideTeamColumn={true}
+  //         />
+  //       )
+  //     default:
+  //       return null
+  //   }
+  // }, [
+  //   activeTab,
+  //   refetchWorkItemsData,
+  //   sprintData,
+  //   workItemsData,
+  //   workItemsDataIsLoading,
+  // ])
 
   // doesn't trigger on first render
   const onTabChange = useCallback((tabKey: string) => {
@@ -114,15 +109,27 @@ const SprintDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       <PageTitle
         title={`${sprintKey} - ${sprintData.name}`}
         subtitle="Sprint Details"
+        tags={
+          <IterationStateTag state={sprintData.state.id as IterationState} />
+        }
       />
-      <Card
-        style={{ width: '100%' }}
-        tabList={tabs}
-        activeTabKey={activeTab}
-        onTabChange={onTabChange}
-      >
-        {renderTabContent()}
-      </Card>
+      <Flex vertical gap="middle">
+        <SprintDetails sprint={sprintData} backlog={workItemsData} />
+        <Divider size="small" />
+        <Flex vertical>
+          <Title level={4} style={{ marginBlockStart: '4px' }}>
+            Backlog
+          </Title>
+          <SprintBacklogGrid
+            workItems={workItemsData}
+            isLoading={workItemsDataIsLoading}
+            refetch={refetchWorkItemsData}
+            hideTeamColumn={true}
+          />
+        </Flex>
+        <Divider size="small" />
+        <LinksCard objectId={sprintData.id} />
+      </Flex>
     </>
   )
 }

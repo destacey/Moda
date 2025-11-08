@@ -1,6 +1,7 @@
 ﻿using Moda.Common.Application.Dtos;
 using Moda.Common.Application.Employees.Dtos;
 using Moda.Common.Domain.Enums.Planning;
+using Moda.Common.Domain.Enums.Work;
 using Moda.Work.Application.WorkIterations.Dtos;
 using Moda.Work.Application.WorkProjects.Dtos;
 using Moda.Work.Application.Workspaces.Dtos;
@@ -9,6 +10,9 @@ using Moda.Work.Application.WorkTeams.Dtos;
 namespace Moda.Work.Application.WorkItems.Dtos;
 public sealed record SprintBacklogItemDto : IMapFrom<WorkItem>
 {
+    // Named constant for the Done status category id to avoid repeated casts
+    private const int DoneStatusCategoryId = (int)WorkStatusCategory.Done;
+
     public Guid Id { get; set; }
     public required string Key { get; set; }
     public required string Title { get; set; }
@@ -23,6 +27,7 @@ public sealed record SprintBacklogItemDto : IMapFrom<WorkItem>
     public Instant Created { get; set; }
     public Instant? Activated { get; set; }
     public Instant? Done { get; set; }
+    
     public int Rank { get; set; }
     public int? ParentRank { get; set; }
     public WorkProjectNavigationDto? Project { get; set; }
@@ -31,6 +36,10 @@ public sealed record SprintBacklogItemDto : IMapFrom<WorkItem>
     // This is used to set the rank of the work items in the backlog
     public double StackRank { get; set; }
     public double? StoryPoints { get; set; }
+
+    public double? CycleTime => Activated.HasValue && Done.HasValue && !Activated.Value.Equals(Done.Value) && StatusCategory?.Id == DoneStatusCategoryId
+        ? (Done.Value - Activated.Value).ToTimeSpan().TotalDays
+        : null;
 
     public void ConfigureMapping(TypeAdapterConfig config)
     {

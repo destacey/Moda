@@ -13,8 +13,11 @@ import {
   Statistic,
 } from 'antd'
 import dayjs from 'dayjs'
-import { daysRemaining } from '@/src/utils'
 import { useMemo } from 'react'
+import {
+  DaysCountdownMetric,
+  MetricCard,
+} from '@/src/components/common/metrics'
 import {
   useGetPlanningIntervalObjectivesQuery,
   useGetPlanningIntervalPredictabilityQuery,
@@ -28,6 +31,7 @@ import {
   TeamPredictabilityRadarChart,
 } from '.'
 import { MarkdownRenderer } from '@/src/components/common/markdown'
+import { IterationState } from '@/src/components/types'
 
 const { Item } = Descriptions
 
@@ -53,7 +57,9 @@ const PlanningIntervalDetails = ({
       teamId: null,
     },
     {
-      skip: !planningInterval?.key || planningInterval?.state === 'Future',
+      skip:
+        !planningInterval?.key ||
+        planningInterval?.state.id === IterationState.Future,
     },
   )
 
@@ -69,9 +75,9 @@ const PlanningIntervalDetails = ({
       children: dayjs(planningInterval.end).format('MMM D, YYYY'),
     },
     {
-      key: 'state',
+      key: 'state.name',
       label: 'State',
-      children: planningInterval.state,
+      children: planningInterval.state.name,
     },
     {
       key: 'objectivesLocked',
@@ -79,35 +85,6 @@ const PlanningIntervalDetails = ({
       children: planningInterval.objectivesLocked ? 'Yes' : 'No',
     },
   ]
-
-  const daysCountdownMetric = useMemo(() => {
-    if (!planningInterval) return null
-
-    switch (planningInterval.state) {
-      case 'Future':
-        return (
-          <Card>
-            <Statistic
-              title="Days Until Start"
-              value={daysRemaining(planningInterval.start)}
-              suffix="days"
-            />
-          </Card>
-        )
-      case 'Active':
-        return (
-          <Card>
-            <Statistic
-              title="Days Remaining"
-              value={daysRemaining(planningInterval.end)}
-              suffix="days"
-            />
-          </Card>
-        )
-      default:
-        return null
-    }
-  }, [planningInterval])
 
   const { objectiveStatusData, objectiveHealthData } = useMemo(() => {
     if (!objectivesData)
@@ -178,16 +155,20 @@ const PlanningIntervalDetails = ({
       </Row>
       <Divider />
       <Space align="start" wrap>
-        {daysCountdownMetric}
+        <DaysCountdownMetric
+          state={planningInterval.state.id as IterationState}
+          startDate={new Date(planningInterval.start)}
+          endDate={new Date(planningInterval.end)}
+        />
         {objectivesData && objectivesData.length > 0 && (
           <>
-            <Card>
-              <Statistic
-                title="PI Predictability"
-                value={planningInterval.predictability ?? 0}
-                suffix="%"
-              />
-            </Card>
+            <MetricCard
+              title="PI Predictability"
+              value={planningInterval.predictability ?? 0}
+              precision={0}
+              suffix="%"
+              tooltip="The percentage of completed objectives compared to the number of non-stretched objectives in this planning interval."
+            />
             <TeamPredictabilityRadarChart
               teamPredictabilities={piPredictabilityData?.teamPredictabilities}
               isLoading={isLoadingPiPredictability}

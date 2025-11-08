@@ -162,7 +162,7 @@ const ModaGrid = ({
           </Col>
         </Row>
 
-        <div style={{ height: height ?? 700 }}>
+        <div {...(height !== -1 && { style: { height: height ?? 700 } })}>
           <AgGridReact
             ref={gridRef}
             theme={agGridTheme}
@@ -179,6 +179,7 @@ const ModaGrid = ({
             )}
             enableCellTextSelection={true}
             ensureDomOrder={true}
+            {...(height === -1 && { domLayout: 'autoHeight' })}
             {...props}
           ></AgGridReact>
         </div>
