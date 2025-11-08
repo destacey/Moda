@@ -28,7 +28,7 @@ const IterationDates: FC<IterationDatesProps> = ({
   return (
     <Card size="small" style={{ width: 'fit-content' }}>
       <Space size="middle">
-        <Flex vertical gap="{4}">
+        <Flex vertical>
           <Text
             type="secondary"
             style={{ fontSize: 12, textTransform: 'uppercase' }}
@@ -38,7 +38,7 @@ const IterationDates: FC<IterationDatesProps> = ({
           <Text>{startDate.format(DATE_TIME_FORMAT)}</Text>
         </Flex>
         <Text type="secondary">→</Text>
-        <Flex vertical gap={4}>
+        <Flex vertical>
           <Text
             type="secondary"
             style={{ fontSize: 12, textTransform: 'uppercase' }}
@@ -48,7 +48,7 @@ const IterationDates: FC<IterationDatesProps> = ({
           <Text>{endDate.format(DATE_TIME_FORMAT)}</Text>
         </Flex>
         <Divider type="vertical" />
-        <Flex vertical gap={4}>
+        <Flex vertical>
           <Text
             type="secondary"
             style={{ fontSize: 12, textTransform: 'uppercase' }}

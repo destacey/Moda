@@ -1,6 +1,9 @@
 'use client'
 
-import { DaysCountdownMetric, MetricCard } from '@/src/components/common/metrics'
+import {
+  DaysCountdownMetric,
+  MetricCard,
+} from '@/src/components/common/metrics'
 import useTheme from '@/src/components/contexts/theme'
 import { IterationState, WorkStatusCategory } from '@/src/components/types'
 import { SprintBacklogItemDto, SprintDetailsDto } from '@/src/services/moda-api'
@@ -233,7 +236,7 @@ export default SprintMetrics
 
 // missing
 // pie chart by type
-// burndown chart -- witing for work item history
+// burndown chart -- waiting for work item history
 // burnup chart -- waiting for work item history
 
 // removed
