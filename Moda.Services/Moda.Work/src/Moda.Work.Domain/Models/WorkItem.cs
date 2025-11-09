@@ -12,8 +12,10 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable, HasWorkspace
     private WorkItemKey _key = null!;
     private string _title = null!;
     private readonly List<WorkItem> _children = [];
-    private readonly List<WorkItemLink> _outboundLinksHistory = []; // source links
-    private readonly List<WorkItemLink> _inboundLinksHistory = []; // target links
+    private readonly List<WorkItemHierarchy> _outboundHierarchyHistory = []; // source links
+    private readonly List<WorkItemHierarchy> _inboundHierarchyHistory = []; // target links
+    private readonly List<WorkItemDependency> _outboundDependencyHistory = []; // source links
+    private readonly List<WorkItemDependency> _inboundDependencyHistory = []; // target links
     private readonly List<WorkItemReference> _referenceLinks = [];
 
     //private readonly List<WorkItemRevision> _history = [];
@@ -148,8 +150,11 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable, HasWorkspace
 
     public WorkItemExtended? ExtendedProps { get; private set; }
 
-    public IReadOnlyCollection<WorkItemLink> OutboundLinksHistory => _outboundLinksHistory.AsReadOnly();
-    public IReadOnlyCollection<WorkItemLink> InboundLinksHistory => _inboundLinksHistory.AsReadOnly();
+    public IReadOnlyCollection<WorkItemDependency> OutboundDependencies => _outboundDependencyHistory.AsReadOnly();
+    public IReadOnlyCollection<WorkItemDependency> InboundDependencies => _inboundDependencyHistory.AsReadOnly();
+    public IReadOnlyCollection<WorkItemHierarchy> OutboundHierarchies => _outboundHierarchyHistory.AsReadOnly();
+    public IReadOnlyCollection<WorkItemHierarchy> InboundHierarchies => _inboundHierarchyHistory.AsReadOnly();
+
     public IReadOnlyCollection<WorkItemReference> ReferenceLinks => _referenceLinks.AsReadOnly();
 
     /// <summary>
@@ -238,7 +243,7 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable, HasWorkspace
             return Result.Failure("A work item cannot be linked to itself.");
         }
 
-        var existingLink = _outboundLinksHistory.FirstOrDefault(x => x.TargetId == targetId 
+        var existingLink = _outboundDependencyHistory.FirstOrDefault(x => x.TargetId == targetId 
             && x.LinkType == WorkItemLinkType.Dependency 
             && x.CreatedOn == timestamp);
         if (existingLink is not null)
@@ -247,8 +252,8 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable, HasWorkspace
         }
         else
         {
-            var newLink = WorkItemLink.CreateDependency(Id, targetId, timestamp, createdById, null, null, comment);
-            _outboundLinksHistory.Add(newLink);
+            var newLink = WorkItemDependency.Create(Id, targetId, timestamp, createdById, null, null, comment);
+            _outboundDependencyHistory.Add(newLink);
         }
 
         return Result.Success();
@@ -261,7 +266,7 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable, HasWorkspace
             return Result.Failure("A work item cannot be linked to itself.");
         }
 
-        var existingLink = _outboundLinksHistory.FirstOrDefault(x => x.TargetId == targetId
+        var existingLink = _outboundDependencyHistory.FirstOrDefault(x => x.TargetId == targetId
             && x.LinkType == WorkItemLinkType.Dependency
             && x.RemovedOn == timestamp);
         if (existingLink is not null)
@@ -270,7 +275,7 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable, HasWorkspace
         }
         else
         {
-            var link = _outboundLinksHistory.OrderBy(l => l.CreatedOn).FirstOrDefault(x => x.TargetId == targetId
+            var link = _outboundDependencyHistory.OrderBy(l => l.CreatedOn).FirstOrDefault(x => x.TargetId == targetId
                 && x.LinkType == WorkItemLinkType.Dependency
                 && x.RemovedOn is null
                 && x.CreatedOn < timestamp);

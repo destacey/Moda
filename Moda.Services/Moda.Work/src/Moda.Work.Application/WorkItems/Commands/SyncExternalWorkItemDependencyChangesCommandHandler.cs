@@ -119,6 +119,9 @@ internal sealed class SyncExternalWorkItemDependencyChangesCommandHandler(IWorkD
 
     private void LogInvalidLink(IExternalWorkItemLink link, WorkItemExternalId sourceId, WorkItemExternalId targetId, Dictionary<WorkItemExternalId, Guid> workItemMap)
     {
+        if (!_logger.IsEnabled(LogLevel.Debug))
+            return;
+
         if (!workItemMap.ContainsKey(sourceId))
         {
             _logger.LogDebug(
@@ -174,7 +177,7 @@ internal sealed class SyncExternalWorkItemDependencyChangesCommandHandler(IWorkD
 
         // Load the source work items with their dependencies
         var sourceWorkItems = await _workDbContext.WorkItems
-            .Include(wi => wi.OutboundLinksHistory)
+            .Include(wi => wi.OutboundDependencies)
             .Where(wi => sourceWorkItemIds.Contains(wi.Id))
             .ToListAsync(cancellationToken);
 

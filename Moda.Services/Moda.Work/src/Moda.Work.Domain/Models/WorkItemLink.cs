@@ -4,13 +4,15 @@ using Moda.Common.Extensions;
 using NodaTime;
 
 namespace Moda.Work.Domain.Models;
-public sealed class WorkItemLink : BaseEntity<Guid>, ISystemAuditable
+
+public abstract class WorkItemLink : BaseEntity<Guid>, ISystemAuditable
 {
     private string? _comment;
 
-    private WorkItemLink() { }
+    // EF
+    protected WorkItemLink() { }
 
-    public WorkItemLink(Guid sourceId, Guid targetId, WorkItemLinkType linkType, Instant createdOn, Guid? createdById, Instant? removedOn, Guid? removedById, string? comment)
+    protected WorkItemLink(Guid sourceId, Guid targetId, WorkItemLinkType linkType, Instant createdOn, Guid? createdById, Instant? removedOn, Guid? removedById, string? comment)
     {
         if (sourceId == targetId)
             throw new ArgumentException("A work item cannot be linked to itself.", nameof(targetId));        
@@ -33,7 +35,7 @@ public sealed class WorkItemLink : BaseEntity<Guid>, ISystemAuditable
     
     public WorkItem? Target { get; private set; }
     
-    public WorkItemLinkType LinkType { get; private init; }
+    public WorkItemLinkType LinkType { get; private set; }
     
     public Instant CreatedOn { get; private init; }
 
@@ -65,19 +67,34 @@ public sealed class WorkItemLink : BaseEntity<Guid>, ISystemAuditable
         RemovedOn = removedOn;
         RemovedById = removedById;
     }
+}
 
-    public static WorkItemLink Create(Guid sourceId, Guid targetId, WorkItemLinkType linkType, Instant createdOn, Guid? createdById, Instant? removedOn, Guid? removedById, string? comment)
+public sealed class WorkItemHierarchy : WorkItemLink
+{
+    private WorkItemHierarchy() : base() { }
+
+    public WorkItemHierarchy(Guid sourceId, Guid targetId, Instant createdOn, Guid? createdById, Instant? removedOn, Guid? removedById, string? comment)
+    : base(sourceId, targetId, WorkItemLinkType.Hierarchy, createdOn, createdById, removedOn, removedById, comment)
     {
-        return new WorkItemLink(sourceId, targetId, linkType, createdOn, createdById, removedOn, removedById, comment);
     }
 
-    public static WorkItemLink CreateHierarchy(Guid sourceId, Guid targetId, Instant createdOn, Guid? createdById, Instant? removedOn, Guid? removedById, string? comment)
+    public static WorkItemHierarchy Create(Guid sourceId, Guid targetId, Instant createdOn, Guid? createdById, Instant? removedOn, Guid? removedById, string? comment)
     {
-        return Create(sourceId, targetId, WorkItemLinkType.Hierarchy, createdOn, createdById, removedOn, removedById, comment);
+        return new WorkItemHierarchy(sourceId, targetId, createdOn, createdById, removedOn, removedById, comment);
+    }
+}
+
+public sealed class WorkItemDependency : WorkItemLink
+{
+    private WorkItemDependency() : base() { }
+
+    public WorkItemDependency(Guid sourceId, Guid targetId, Instant createdOn, Guid? createdById, Instant? removedOn, Guid? removedById, string? comment)
+    : base(sourceId, targetId, WorkItemLinkType.Dependency, createdOn, createdById, removedOn, removedById, comment)
+    {
     }
 
-    public static WorkItemLink CreateDependency(Guid sourceId, Guid targetId, Instant createdOn, Guid? createdById, Instant? removedOn, Guid? removedById, string? comment)
+    public static WorkItemDependency Create(Guid sourceId, Guid targetId, Instant createdOn, Guid? createdById, Instant? removedOn, Guid? removedById, string? comment)
     {
-        return Create(sourceId, targetId, WorkItemLinkType.Dependency, createdOn, createdById, removedOn, removedById, comment);
+        return new WorkItemDependency(sourceId, targetId, createdOn, createdById, removedOn, removedById, comment);
     }
 }
