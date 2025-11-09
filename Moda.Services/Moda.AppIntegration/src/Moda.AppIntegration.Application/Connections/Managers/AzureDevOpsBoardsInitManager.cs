@@ -2,9 +2,11 @@
 using Moda.AppIntegration.Application.Connections.Commands;
 using Moda.AppIntegration.Application.Connections.Queries;
 using Moda.AppIntegration.Application.Interfaces;
+using Moda.AppIntegration.Application.Logging;
 using Moda.Common.Application.Interfaces.ExternalWork;
 using Moda.Common.Application.Requests.WorkManagement;
 using Moda.Common.Domain.Enums.AppIntegrations;
+using Moda.Common.Domain.Enums.Work;
 using Moda.Common.Domain.Models;
 using Moda.Common.Models;
 using Moda.Work.Application.Workflows.Dtos;
@@ -20,7 +22,7 @@ public sealed class AzureDevOpsBoardsInitManager(ILogger<AzureDevOpsBoardsInitMa
     private readonly IAzureDevOpsService _azureDevOpsService = azureDevOpsService;
     private readonly ISender _sender = sender;
 
-    public async Task<Result> SyncOrganizationConfiguration(Guid connectionId, CancellationToken cancellationToken)
+    public async Task<Result> SyncOrganizationConfiguration(Guid connectionId, CancellationToken cancellationToken, Guid? syncId = null)
     {
         try
         {
@@ -31,60 +33,64 @@ public sealed class AzureDevOpsBoardsInitManager(ILogger<AzureDevOpsBoardsInitMa
                 return Result.Failure($"Unable to find Azure DevOps connection with id {connectionId}.");
             }
 
-            if (connection.IsValidConfiguration is false)
+            using (_logger.BeginScope(new Dictionary<string, object> { ["ConnectionId"] = connectionId }))
             {
-                _logger.LogError("The configuration for Azure DevOps connection {ConnectionId} is not valid.", connectionId);
-                return Result.Failure($"The configuration for connection {connectionId} is not valid.");
+                if (connection.IsValidConfiguration is false)
+                {
+                    _logger.LogError("The configuration for Azure DevOps connection {ConnectionId} is not valid.", connectionId);
+                    return Result.Failure($"The configuration for connection {connectionId} is not valid.");
+                }
+
+                var testConnectionResult = await ExternalCallMeasure.MeasureAsync(_logger, "Azdo_SyncOrganizationConfiguration_TestConnection", () => _azureDevOpsService.TestConnection(connection.Configuration.OrganizationUrl, connection.Configuration.PersonalAccessToken), syncId);
+                if (testConnectionResult.IsFailure)
+                {
+                    _logger.LogError("Unable to connect to Azure DevOps for connection {ConnectionId}. {Error}", connectionId, testConnectionResult.Error);
+                    return Result.Failure($"Unable to connect to Azure DevOps for connection {connectionId}. {testConnectionResult.Error}");
+                }
+
+                // Load Processes
+                var workProcessesResult = await ExternalCallMeasure.MeasureAsync(_logger, "Azdo_SyncOrganizationConfiguration_GetWorkProcesses", () => _azureDevOpsService.GetWorkProcesses(connection.Configuration.OrganizationUrl, connection.Configuration.PersonalAccessToken, cancellationToken), syncId);
+                if (workProcessesResult.IsFailure)
+                    return workProcessesResult;
+
+                List<AzureDevOpsBoardsWorkProcess> processes = [];
+                foreach (var externalProcess in workProcessesResult.Value)
+                {
+                    var process = AzureDevOpsBoardsWorkProcess.Create(externalProcess.Id, externalProcess.Name, externalProcess.Description);
+                    processes.Add(process);
+                }
+
+                // Load Workspaces
+                var workspacesResult = await ExternalCallMeasure.MeasureAsync(_logger, "Azdo_SyncOrganizationConfiguration_GetWorkspaces", () => _azureDevOpsService.GetWorkspaces(connection.Configuration.OrganizationUrl, connection.Configuration.PersonalAccessToken, cancellationToken), syncId);
+                if (workspacesResult.IsFailure)
+                    return workspacesResult;
+
+                List<AzureDevOpsBoardsWorkspace> workspaces = [];
+                foreach (var externalWorkspace in workspacesResult.Value)
+                {
+                    var workProcessId = workProcessesResult.Value.FirstOrDefault(p => p.WorkspaceIds.Contains(externalWorkspace.Id))?.Id;
+                    var workspace = AzureDevOpsBoardsWorkspace.Create(externalWorkspace.Id, externalWorkspace.Name, externalWorkspace.Description, workProcessId);
+                    workspaces.Add(workspace);
+                }
+
+                var existingWorkProcessIntegrationStates = await _sender.Send(new GetIntegrationRegistrationsForWorkProcessesQuery(), cancellationToken);
+
+                // Load Teams
+                List<IExternalTeam> teams = [];
+                if (workspaces.Count !=0)
+                {
+                    var projectIds = workspaces.Select(w => w.ExternalId).ToArray();
+                    var teamsResult = await ExternalCallMeasure.MeasureAsync(_logger, "Azdo_SyncOrganizationConfiguration_GetTeams", () => _azureDevOpsService.GetTeams(connection.Configuration.OrganizationUrl, connection.Configuration.PersonalAccessToken, projectIds, cancellationToken), syncId);
+                    if (teamsResult.IsFailure)
+                        return teamsResult;
+
+                    teams = teamsResult.Value;
+                }
+
+                var syncConfigurationResult = await _sender.Send(new SyncAzureDevOpsBoardsConnectionConfigurationCommand(connectionId, processes, workspaces, existingWorkProcessIntegrationStates, teams), cancellationToken);
+
+                return syncConfigurationResult;
             }
-
-            var testConnectionResult = await _azureDevOpsService.TestConnection(connection.Configuration.OrganizationUrl, connection.Configuration.PersonalAccessToken);
-            if (testConnectionResult.IsFailure)
-            {
-                _logger.LogError("Unable to connect to Azure DevOps for connection {ConnectionId}. {Error}", connectionId, testConnectionResult.Error);
-                return Result.Failure($"Unable to connect to Azure DevOps for connection {connectionId}. {testConnectionResult.Error}");
-            }
-
-            // Load Processes
-            var workProcessesResult = await _azureDevOpsService.GetWorkProcesses(connection.Configuration.OrganizationUrl, connection.Configuration.PersonalAccessToken, cancellationToken);
-            if (workProcessesResult.IsFailure)
-                return workProcessesResult;
-
-            List<AzureDevOpsBoardsWorkProcess> processes = [];
-            foreach (var externalProcess in workProcessesResult.Value)
-            {
-                var process = AzureDevOpsBoardsWorkProcess.Create(externalProcess.Id, externalProcess.Name, externalProcess.Description);
-                processes.Add(process);
-            }
-
-            // Load Workspaces
-            var workspacesResult = await _azureDevOpsService.GetWorkspaces(connection.Configuration.OrganizationUrl, connection.Configuration.PersonalAccessToken, cancellationToken);
-            if (workspacesResult.IsFailure)
-                return workspacesResult;
-
-            List<AzureDevOpsBoardsWorkspace> workspaces = [];
-            foreach (var externalWorkspace in workspacesResult.Value)
-            {
-                var workProcessId = workProcessesResult.Value.FirstOrDefault(p => p.WorkspaceIds.Contains(externalWorkspace.Id))?.Id;
-                var workspace = AzureDevOpsBoardsWorkspace.Create(externalWorkspace.Id, externalWorkspace.Name, externalWorkspace.Description, workProcessId);
-                workspaces.Add(workspace);
-            }
-
-            var existingWorkProcessIntegrationStates = await _sender.Send(new GetIntegrationRegistrationsForWorkProcessesQuery(), cancellationToken);
-
-            // Load Teams
-            List<IExternalTeam> teams = [];
-            if (workspaces.Count != 0)
-            {
-                var teamsResult = await _azureDevOpsService.GetTeams(connection.Configuration.OrganizationUrl, connection.Configuration.PersonalAccessToken, [.. workspaces.Select(w => w.ExternalId)], cancellationToken);
-                if (teamsResult.IsFailure)
-                    return teamsResult;
-
-                teams = teamsResult.Value;
-            }
-
-            var syncConfigurationResult = await _sender.Send(new SyncAzureDevOpsBoardsConnectionConfigurationCommand(connectionId, processes, workspaces, existingWorkProcessIntegrationStates, teams), cancellationToken);
-
-            return syncConfigurationResult;
         }
         catch (Exception ex)
         {
@@ -93,87 +99,79 @@ public sealed class AzureDevOpsBoardsInitManager(ILogger<AzureDevOpsBoardsInitMa
         }
     }
 
-    public async Task<Result<Guid>> InitWorkProcessIntegration(Guid connectionId, Guid workProcessExternalId, CancellationToken cancellationToken)
+    public async Task<Result<Guid>> InitWorkProcessIntegration(Guid connectionId, Guid workProcessExternalId, CancellationToken cancellationToken, Guid? syncId = null)
     {
         try
         {
-            var connectionCheckResult = await GetValidConnectionDetailsForWorkProcess(connectionId, workProcessExternalId, cancellationToken);
-            if (connectionCheckResult.IsFailure)
-                return connectionCheckResult.ConvertFailure<Guid>();
-
-            // TODO: should the lookup be on the external id and connector? azdo|externalId
-            // TODO: crossing service boundaries :(
-            // verify the externalId isn't already integrated
-            var exists = await _sender.Send(new ExternalWorkProcessExistsQuery(workProcessExternalId), cancellationToken);
-            if (exists)
+            using (_logger.BeginScope(new Dictionary<string, object> { ["ConnectionId"] = connectionId, ["WorkProcessExternalId"] = workProcessExternalId }))
             {
-                _logger.LogError("Unable to initialize a work process {WorkProcessExternalId} from Azure DevOps for connection {ConnectionId} because it is already integrated.", workProcessExternalId, connectionId);
-                return Result.Failure<Guid>($"Unable to initialize a work process {workProcessExternalId} from Azure DevOps for connection {connectionId} because it is already integrated.");
+                var connectionCheckResult = await GetValidConnectionDetailsForWorkProcess(connectionId, workProcessExternalId, cancellationToken);
+                if (connectionCheckResult.IsFailure)
+                    return connectionCheckResult.ConvertFailure<Guid>();
+
+                var exists = await _sender.Send(new ExternalWorkProcessExistsQuery(workProcessExternalId), cancellationToken);
+                if (exists)
+                {
+                    _logger.LogError("Unable to initialize a work process {WorkProcessExternalId} from Azure DevOps for connection {ConnectionId} because it is already integrated.", workProcessExternalId, connectionId);
+                    return Result.Failure<Guid>($"Unable to initialize a work process {workProcessExternalId} from Azure DevOps for connection {connectionId} because it is already integrated.");
+                }
+
+                var importWorkspacesResult = await SyncOrganizationConfiguration(connectionId, cancellationToken, syncId);
+                if (importWorkspacesResult.IsFailure)
+                    return importWorkspacesResult.ConvertFailure<Guid>();
+
+                var connectionResult = await GetValidConnectionDetailsForWorkProcess(connectionId, workProcessExternalId, cancellationToken);
+                if (connectionResult.IsFailure)
+                    return connectionResult.ConvertFailure<Guid>();
+
+                var processResult = await ExternalCallMeasure.MeasureAsync(_logger, "InitWorkProcessIntegration_GetWorkProcess", () => _azureDevOpsService.GetWorkProcess(connectionResult.Value.Configuration.OrganizationUrl, connectionResult.Value.Configuration.PersonalAccessToken, workProcessExternalId, cancellationToken), syncId);
+                if (processResult.IsFailure)
+                    return processResult.ConvertFailure<Guid>();
+
+                var workTypes = processResult.Value.WorkTypes.OfType<IExternalWorkType>().ToList();
+                if (workTypes.Count !=0)
+                {
+                    var levels = await _sender.Send(new GetWorkTypeLevelsQuery(), cancellationToken);
+                    if (levels is null)
+                        return Result.Failure<Guid>("Unable to get work type levels.");
+
+                    int defaultLevelId = levels.Where(l => l.Tier.Id == (int)WorkTypeTier.Other).Select(l => l.Id).SingleOrDefault();
+
+                    var syncWorkTypesResult = await _sender.Send(new SyncExternalWorkTypesCommand(workTypes, defaultLevelId), cancellationToken);
+                    if (syncWorkTypesResult.IsFailure)
+                        return syncWorkTypesResult.ConvertFailure<Guid>();
+                }
+
+                if (processResult.Value.WorkStatuses.Count !=0)
+                {
+                    var syncWorkStatusesResult = await _sender.Send(new SyncExternalWorkStatusesCommand(processResult.Value.WorkStatuses), cancellationToken);
+                    if (syncWorkStatusesResult.IsFailure)
+                        return syncWorkStatusesResult.ConvertFailure<Guid>();
+                }
+
+                var workProcessSchemes = new List<CreateWorkProcessSchemeDto>(processResult.Value.WorkTypes.Count);
+                foreach (var workType in processResult.Value.WorkTypes)
+                {
+                    var createWorkflowResult = await _sender.Send(new CreateExternalWorkflowCommand(
+                        $"{processResult.Value.Name} - {workType.Name}",
+                        "Auto-generated workflow for Azure DevOps work process.",
+                        workType), cancellationToken);
+                    if (createWorkflowResult.IsFailure)
+                        return createWorkflowResult.ConvertFailure<Guid>();
+
+                    workProcessSchemes.Add(CreateWorkProcessSchemeDto.Create(workType.Name, workType.IsActive, createWorkflowResult.Value));
+                }
+
+                var createProcessResult = await _sender.Send(new CreateExternalWorkProcessCommand(processResult.Value, workProcessSchemes), cancellationToken);
+                if (createProcessResult.IsFailure)
+                    return createProcessResult.ConvertFailure<Guid>();
+
+                var updateIntegrationStateResult = await _sender.Send(new UpdateAzureDevOpsBoardsWorkProcessIntegrationStateCommand(connectionId, new IntegrationRegistration<Guid, Guid>(workProcessExternalId, createProcessResult.Value)), cancellationToken);
+
+                return updateIntegrationStateResult.IsSuccess
+                    ? Result.Success(createProcessResult.Value.InternalId)
+                    : updateIntegrationStateResult.ConvertFailure<Guid>();
             }
-
-            // re-import the connection to make sure everything is up-to-date
-            var importWorkspacesResult = await SyncOrganizationConfiguration(connectionId, cancellationToken);
-            if (importWorkspacesResult.IsFailure)
-                return importWorkspacesResult.ConvertFailure<Guid>();
-
-            // getting the connection again to make sure we have the latest data after the import
-            var connectionResult = await GetValidConnectionDetailsForWorkProcess(connectionId, workProcessExternalId, cancellationToken);
-            if (connectionResult.IsFailure)
-                return connectionResult.ConvertFailure<Guid>();
-
-            // get the process, types, states, and workflow
-            var processResult = await _azureDevOpsService.GetWorkProcess(connectionResult.Value.Configuration.OrganizationUrl, connectionResult.Value.Configuration.PersonalAccessToken, workProcessExternalId, cancellationToken);
-            if (processResult.IsFailure)
-                return processResult.ConvertFailure<Guid>();
-
-            // create new types
-            var workTypes = processResult.Value.WorkTypes.OfType<IExternalWorkType>().ToList();
-            if (workTypes.Count != 0)
-            {
-                var levels = await _sender.Send(new GetWorkTypeLevelsQuery(), cancellationToken);
-                if (levels is null)
-                    return Result.Failure<Guid>("Unable to get work type levels.");
-
-                int defaultLevelId = levels.Where(l => l.Tier.Id == (int)Common.Domain.Enums.Work.WorkTypeTier.Other).Select(l => l.Id).SingleOrDefault();
-
-                var syncWorkTypesResult = await _sender.Send(new SyncExternalWorkTypesCommand(workTypes, defaultLevelId), cancellationToken);
-                if (syncWorkTypesResult.IsFailure)
-                    return syncWorkTypesResult.ConvertFailure<Guid>();
-            }
-
-            // create new statuses
-            if (processResult.Value.WorkStatuses.Count != 0)
-            {
-                var syncWorkStatusesResult = await _sender.Send(new SyncExternalWorkStatusesCommand(processResult.Value.WorkStatuses), cancellationToken);
-                if (syncWorkStatusesResult.IsFailure)
-                    return syncWorkStatusesResult.ConvertFailure<Guid>();
-            }
-
-            // create workflow for each work type and map the workflow id to the type
-            var workProcessSchemes = new List<CreateWorkProcessSchemeDto>(processResult.Value.WorkTypes.Count);
-            foreach (var workType in processResult.Value.WorkTypes)
-            {
-                var createWorkflowResult = await _sender.Send(new CreateExternalWorkflowCommand(
-                    $"{processResult.Value.Name} - {workType.Name}",
-                    "Auto-generated workflow for Azure DevOps work process.",
-                    workType), cancellationToken);
-                if (createWorkflowResult.IsFailure)
-                    return createWorkflowResult.ConvertFailure<Guid>();
-
-                workProcessSchemes.Add(CreateWorkProcessSchemeDto.Create(workType.Name, workType.IsActive, createWorkflowResult.Value));
-            }
-
-            // create process
-            var createProcessResult = await _sender.Send(new CreateExternalWorkProcessCommand(processResult.Value, workProcessSchemes), cancellationToken);
-            if (createProcessResult.IsFailure)
-                return createProcessResult.ConvertFailure<Guid>();
-
-            // update the integration state
-            var updateIntegrationStateResult = await _sender.Send(new UpdateAzureDevOpsBoardsWorkProcessIntegrationStateCommand(connectionId, new IntegrationRegistration<Guid, Guid>(workProcessExternalId, createProcessResult.Value)), cancellationToken);
-
-            return updateIntegrationStateResult.IsSuccess
-                ? Result.Success(createProcessResult.Value.InternalId)
-                : updateIntegrationStateResult.ConvertFailure<Guid>();
         }
         catch (Exception ex)
         {
@@ -182,71 +180,81 @@ public sealed class AzureDevOpsBoardsInitManager(ILogger<AzureDevOpsBoardsInitMa
         }
     }
 
-    public async Task<Result<Guid>> InitWorkspaceIntegration(Guid connectionId, Guid workspaceExternalId, string workspaceKey, string workspaceName, string? externalViewWorkItemUrlTemplate, CancellationToken cancellationToken)
+    public async Task<Result<Guid>> InitWorkspaceIntegration(Guid connectionId, Guid workspaceExternalId, string workspaceKey, string workspaceName, string? externalViewWorkItemUrlTemplate, CancellationToken cancellationToken, Guid? syncId = null)
     {
         try
         {
-            var connectionCheckResult = await GetValidConnectionDetailsForWorkspace(connectionId, workspaceExternalId, cancellationToken);
-            if (connectionCheckResult.IsFailure)
-                return connectionCheckResult.ConvertFailure<Guid>();
-
-            // TODO: should the lookup be on the external id and connector? azdo|externalId
-            // TODO: crossing service boundaries :(
-            // verify the externalId isn't already integrated
-            var exists = await _sender.Send(new ExternalWorkspaceExistsQuery(workspaceExternalId.ToString()), cancellationToken);
-            if (exists)
+            using (_logger.BeginScope(new Dictionary<string, object> { ["ConnectionId"] = connectionId, ["WorkspaceExternalId"] = workspaceExternalId }))
             {
-                _logger.LogError("Unable to initialize a workspace {WorkspaceExternalId} from Azure DevOps for connection {ConnectionId} because it is already integrated.", workspaceExternalId, connectionId);
-                return Result.Failure<Guid>($"Unable to initialize a workspace {workspaceExternalId} from Azure DevOps for connection {connectionId} because it is already integrated.");
+                var connectionCheckResult = await GetValidConnectionDetailsForWorkspace(connectionId, workspaceExternalId, cancellationToken);
+                if (connectionCheckResult.IsFailure)
+                    return connectionCheckResult.ConvertFailure<Guid>();
+
+                var exists = await _sender.Send(new ExternalWorkspaceExistsQuery(workspaceExternalId.ToString()), cancellationToken);
+                if (exists)
+                {
+                    _logger.LogError("Unable to initialize a workspace {WorkspaceExternalId} from Azure DevOps for connection {ConnectionId} because it is already integrated.", workspaceExternalId, connectionId);
+                    return Result.Failure<Guid>($"Unable to initialize a workspace {workspaceExternalId} from Azure DevOps for connection {connectionId} because it is already integrated.");
+                }
+
+                var isDuplicateKey = await _sender.Send(new WorkspaceKeyExistsQuery(workspaceKey), cancellationToken);
+                if (isDuplicateKey)
+                {
+                    _logger.LogWarning("Unable to initialize a workspace {WorkspaceExternalId} from Azure DevOps for connection {ConnectionId} because the workspace key {WorkspaceKey} is already in use.", workspaceExternalId, connectionId, workspaceKey);
+                    return Result.Failure<Guid>($"Unable to initialize a workspace {workspaceExternalId} from Azure DevOps for connection {connectionId} because the workspace key {workspaceKey} is already in use.");
+                }
+
+                var importWorkspacesResult = await SyncOrganizationConfiguration(connectionId, cancellationToken, syncId);
+                if (importWorkspacesResult.IsFailure)
+                    return importWorkspacesResult.ConvertFailure<Guid>();
+
+                var connectionResult = await GetValidConnectionDetailsForWorkspace(connectionId, workspaceExternalId, cancellationToken);
+                if (connectionResult.IsFailure)
+                    return connectionResult.ConvertFailure<Guid>();
+
+                var systemId = connectionResult.Value.SystemId;
+                if (string.IsNullOrWhiteSpace(systemId))
+                {
+                    _logger.LogError("The connection {ConnectionId} is missing systemId.", connectionId);
+                    return Result.Failure<Guid>("The connection is missing systemId. Please re-sync your connection and try again.");
+                }
+
+                var workspaceResult = await ExternalCallMeasure.MeasureAsync(_logger, "InitWorkspaceIntegration_GetWorkspace", () => _azureDevOpsService.GetWorkspace(connectionResult.Value.Configuration.OrganizationUrl, connectionResult.Value.Configuration.PersonalAccessToken, workspaceExternalId, cancellationToken), syncId);
+                if (workspaceResult.IsFailure)
+                    return workspaceResult.ConvertFailure<Guid>();
+
+                var createWorkspaceResult = await _sender.Send(new CreateExternalWorkspaceCommand(Connector.AzureDevOps, systemId, workspaceResult.Value, new WorkspaceKey(workspaceKey), workspaceName, externalViewWorkItemUrlTemplate), cancellationToken);
+                if (createWorkspaceResult.IsFailure)
+                    return createWorkspaceResult.ConvertFailure<Guid>();
+
+                var updateIntegrationStateResult = await _sender.Send(new UpdateAzureDevOpsBoardsWorkspaceIntegrationStateCommand(connectionId, new IntegrationRegistration<Guid, Guid>(workspaceExternalId, createWorkspaceResult.Value)), cancellationToken);
+
+                return updateIntegrationStateResult.IsSuccess
+                    ? Result.Success(createWorkspaceResult.Value.InternalId)
+                    : updateIntegrationStateResult.ConvertFailure<Guid>();
             }
-
-            var isDuplicateKey = await _sender.Send(new WorkspaceKeyExistsQuery(workspaceKey), cancellationToken);
-            if (isDuplicateKey)
-            {
-                // TODO: should this be a validation exception
-                _logger.LogWarning("Unable to initialize a workspace {WorkspaceExternalId} from Azure DevOps for connection {ConnectionId} because the workspace key {WorkspaceKey} is already in use.", workspaceExternalId, connectionId, workspaceKey);
-                return Result.Failure<Guid>($"Unable to initialize a workspace {workspaceExternalId} from Azure DevOps for connection {connectionId} because the workspace key {workspaceKey} is already in use.");
-            }
-
-            // re-import the connection to make sure everything is up-to-date
-            var importWorkspacesResult = await SyncOrganizationConfiguration(connectionId, cancellationToken);
-            if (importWorkspacesResult.IsFailure)
-                return importWorkspacesResult.ConvertFailure<Guid>();
-
-            // getting the connection again to make sure we have the latest data after the import
-            var connectionResult = await GetValidConnectionDetailsForWorkspace(connectionId, workspaceExternalId, cancellationToken);
-            if (connectionResult.IsFailure)
-                return connectionResult.ConvertFailure<Guid>();
-
-            var systemId = connectionResult.Value.SystemId;
-            if (string.IsNullOrWhiteSpace(systemId))
-            {
-                _logger.LogError("The connection {ConnectionId} is missing systemId.", connectionId);
-                return Result.Failure<Guid>("The connection is missing systemId.  Please re-sync your connection and try again.");
-            }
-
-            // get the workspace
-            var workspaceResult = await _azureDevOpsService.GetWorkspace(connectionResult.Value.Configuration.OrganizationUrl, connectionResult.Value.Configuration.PersonalAccessToken, workspaceExternalId, cancellationToken);
-            if (workspaceResult.IsFailure)
-                return workspaceResult.ConvertFailure<Guid>();
-
-            // create the workspace
-            var createWorkspaceResult = await _sender.Send(new CreateExternalWorkspaceCommand(Connector.AzureDevOps, systemId, workspaceResult.Value, new WorkspaceKey(workspaceKey), workspaceName, externalViewWorkItemUrlTemplate), cancellationToken);
-            if (createWorkspaceResult.IsFailure)
-                return createWorkspaceResult.ConvertFailure<Guid>();
-
-            // update the integration state
-            var updateIntegrationStateResult = await _sender.Send(new UpdateAzureDevOpsBoardsWorkspaceIntegrationStateCommand(connectionId, new IntegrationRegistration<Guid, Guid>(workspaceExternalId, createWorkspaceResult.Value)), cancellationToken);
-
-            return updateIntegrationStateResult.IsSuccess
-                ? Result.Success(createWorkspaceResult.Value.InternalId)
-                : updateIntegrationStateResult.ConvertFailure<Guid>();
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "An error occurred while trying to initialize a workspace {WorkspaceExternalId} from Azure DevOps for connection {ConnectionId}.", workspaceExternalId, connectionId);
             return Result.Failure<Guid>($"An error occurred while trying to initialize a workspace {workspaceExternalId} from Azure DevOps for connection {connectionId}.");
         }
+    }
+
+    // Interface-compatible overloads that delegate to the syncId-aware implementations
+    public Task<Result> SyncOrganizationConfiguration(Guid connectionId, CancellationToken cancellationToken)
+    {
+        return SyncOrganizationConfiguration(connectionId, cancellationToken, null);
+    }
+
+    public Task<Result<Guid>> InitWorkProcessIntegration(Guid connectionId, Guid workProcessExternalId, CancellationToken cancellationToken)
+    {
+        return InitWorkProcessIntegration(connectionId, workProcessExternalId, cancellationToken, null);
+    }
+
+    public Task<Result<Guid>> InitWorkspaceIntegration(Guid connectionId, Guid workspaceExternalId, string workspaceKey, string workspaceName, string? externalViewWorkItemUrlTemplate, CancellationToken cancellationToken)
+    {
+        return InitWorkspaceIntegration(connectionId, workspaceExternalId, workspaceKey, workspaceName, externalViewWorkItemUrlTemplate, cancellationToken, null);
     }
 
     private async Task<Result<AzureDevOpsBoardsConnectionDetailsDto>> GetValidConnectionDetailsForWorkProcess(Guid connectionId, Guid workProcessExternalId, CancellationToken cancellationToken)

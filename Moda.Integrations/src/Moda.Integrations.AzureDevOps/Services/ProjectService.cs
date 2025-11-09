@@ -2,6 +2,7 @@
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Moda.Common.Application.Interfaces.ExternalWork;
+using Moda.Common.Application.Logging;
 using Moda.Common.Extensions;
 using Moda.Integrations.AzureDevOps.Clients;
 using Moda.Integrations.AzureDevOps.Models;
@@ -328,8 +329,7 @@ internal sealed class ProjectService(string organizationUrl, string token, strin
     }
 
     // Cached logger delegate to avoid per-call allocations/boxing
-    // TODO: How do we manage EventId values?
     private static readonly Action<ILogger, Guid, Guid, Exception?> _iterationAlreadyMapped =
-        LoggerMessage.Define<Guid, Guid>(LogLevel.Warning, new EventId(100001, "DuplicateIterationTeamMapping"),
+        LoggerMessage.Define<Guid, Guid>(LogLevel.Warning, AppEventId.Integrations_AzureDevOps_ProjectService_DuplicateIterationTeamMapping.ToEventId(),
             "Iteration {IterationId} is already mapped to team {TeamId}.");
 }
