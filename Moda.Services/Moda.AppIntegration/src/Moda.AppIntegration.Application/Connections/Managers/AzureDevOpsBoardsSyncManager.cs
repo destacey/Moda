@@ -78,7 +78,7 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
                         }
 
                         // Do we need to sync the organization configuration or do we just need to sync teams?
-                        var syncOrganizationResult = await _initManager.SyncOrganizationConfiguration(connection.Id, cancellationToken);
+                        var syncOrganizationResult = await _initManager.SyncOrganizationConfiguration(connection.Id, cancellationToken, syncId);
                         if (syncOrganizationResult.IsFailure)
                         {
                             _logger.LogError("An error occurred while syncing Azure DevOps Boards organization configuration for connection with ID {ConnectionId}. Error: {Error}", connection.Id, syncOrganizationResult.Error);

@@ -99,7 +99,7 @@ public sealed class AzureDevOpsBoardsInitManager(ILogger<AzureDevOpsBoardsInitMa
         }
     }
 
-    public async Task<Result<Guid>> InitWorkProcessIntegration(Guid connectionId, Guid workProcessExternalId, CancellationToken cancellationToken, Guid? syncId = null)
+    public async Task<Result<Guid>> InitWorkProcessIntegration(Guid connectionId, Guid workProcessExternalId, CancellationToken cancellationToken)
     {
         try
         {
@@ -116,7 +116,7 @@ public sealed class AzureDevOpsBoardsInitManager(ILogger<AzureDevOpsBoardsInitMa
                     return Result.Failure<Guid>($"Unable to initialize a work process {workProcessExternalId} from Azure DevOps for connection {connectionId} because it is already integrated.");
                 }
 
-                var importWorkspacesResult = await SyncOrganizationConfiguration(connectionId, cancellationToken, syncId);
+                var importWorkspacesResult = await SyncOrganizationConfiguration(connectionId, cancellationToken);
                 if (importWorkspacesResult.IsFailure)
                     return importWorkspacesResult.ConvertFailure<Guid>();
 
@@ -124,7 +124,7 @@ public sealed class AzureDevOpsBoardsInitManager(ILogger<AzureDevOpsBoardsInitMa
                 if (connectionResult.IsFailure)
                     return connectionResult.ConvertFailure<Guid>();
 
-                var processResult = await ExternalCallMeasure.MeasureAsync(_logger, "InitWorkProcessIntegration_GetWorkProcess", () => _azureDevOpsService.GetWorkProcess(connectionResult.Value.Configuration.OrganizationUrl, connectionResult.Value.Configuration.PersonalAccessToken, workProcessExternalId, cancellationToken), syncId);
+                var processResult = await ExternalCallMeasure.MeasureAsync(_logger, "InitWorkProcessIntegration_GetWorkProcess", () => _azureDevOpsService.GetWorkProcess(connectionResult.Value.Configuration.OrganizationUrl, connectionResult.Value.Configuration.PersonalAccessToken, workProcessExternalId, cancellationToken));
                 if (processResult.IsFailure)
                     return processResult.ConvertFailure<Guid>();
 
@@ -180,7 +180,7 @@ public sealed class AzureDevOpsBoardsInitManager(ILogger<AzureDevOpsBoardsInitMa
         }
     }
 
-    public async Task<Result<Guid>> InitWorkspaceIntegration(Guid connectionId, Guid workspaceExternalId, string workspaceKey, string workspaceName, string? externalViewWorkItemUrlTemplate, CancellationToken cancellationToken, Guid? syncId = null)
+    public async Task<Result<Guid>> InitWorkspaceIntegration(Guid connectionId, Guid workspaceExternalId, string workspaceKey, string workspaceName, string? externalViewWorkItemUrlTemplate, CancellationToken cancellationToken)
     {
         try
         {
@@ -204,7 +204,7 @@ public sealed class AzureDevOpsBoardsInitManager(ILogger<AzureDevOpsBoardsInitMa
                     return Result.Failure<Guid>($"Unable to initialize a workspace {workspaceExternalId} from Azure DevOps for connection {connectionId} because the workspace key {workspaceKey} is already in use.");
                 }
 
-                var importWorkspacesResult = await SyncOrganizationConfiguration(connectionId, cancellationToken, syncId);
+                var importWorkspacesResult = await SyncOrganizationConfiguration(connectionId, cancellationToken);
                 if (importWorkspacesResult.IsFailure)
                     return importWorkspacesResult.ConvertFailure<Guid>();
 
@@ -219,7 +219,7 @@ public sealed class AzureDevOpsBoardsInitManager(ILogger<AzureDevOpsBoardsInitMa
                     return Result.Failure<Guid>("The connection is missing systemId. Please re-sync your connection and try again.");
                 }
 
-                var workspaceResult = await ExternalCallMeasure.MeasureAsync(_logger, "InitWorkspaceIntegration_GetWorkspace", () => _azureDevOpsService.GetWorkspace(connectionResult.Value.Configuration.OrganizationUrl, connectionResult.Value.Configuration.PersonalAccessToken, workspaceExternalId, cancellationToken), syncId);
+                var workspaceResult = await ExternalCallMeasure.MeasureAsync(_logger, "InitWorkspaceIntegration_GetWorkspace", () => _azureDevOpsService.GetWorkspace(connectionResult.Value.Configuration.OrganizationUrl, connectionResult.Value.Configuration.PersonalAccessToken, workspaceExternalId, cancellationToken));
                 if (workspaceResult.IsFailure)
                     return workspaceResult.ConvertFailure<Guid>();
 
@@ -239,22 +239,6 @@ public sealed class AzureDevOpsBoardsInitManager(ILogger<AzureDevOpsBoardsInitMa
             _logger.LogError(ex, "An error occurred while trying to initialize a workspace {WorkspaceExternalId} from Azure DevOps for connection {ConnectionId}.", workspaceExternalId, connectionId);
             return Result.Failure<Guid>($"An error occurred while trying to initialize a workspace {workspaceExternalId} from Azure DevOps for connection {connectionId}.");
         }
-    }
-
-    // Interface-compatible overloads that delegate to the syncId-aware implementations
-    public Task<Result> SyncOrganizationConfiguration(Guid connectionId, CancellationToken cancellationToken)
-    {
-        return SyncOrganizationConfiguration(connectionId, cancellationToken, null);
-    }
-
-    public Task<Result<Guid>> InitWorkProcessIntegration(Guid connectionId, Guid workProcessExternalId, CancellationToken cancellationToken)
-    {
-        return InitWorkProcessIntegration(connectionId, workProcessExternalId, cancellationToken, null);
-    }
-
-    public Task<Result<Guid>> InitWorkspaceIntegration(Guid connectionId, Guid workspaceExternalId, string workspaceKey, string workspaceName, string? externalViewWorkItemUrlTemplate, CancellationToken cancellationToken)
-    {
-        return InitWorkspaceIntegration(connectionId, workspaceExternalId, workspaceKey, workspaceName, externalViewWorkItemUrlTemplate, cancellationToken, null);
     }
 
     private async Task<Result<AzureDevOpsBoardsConnectionDetailsDto>> GetValidConnectionDetailsForWorkProcess(Guid connectionId, Guid workProcessExternalId, CancellationToken cancellationToken)
