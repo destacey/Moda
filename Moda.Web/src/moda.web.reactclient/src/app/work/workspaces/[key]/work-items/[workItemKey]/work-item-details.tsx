@@ -46,7 +46,7 @@ const WorkItemDetails = ({ workItem }: WorkItemDetailsProps) => {
         <Item label="Parent">
           {workItem.parent ? (
             <Link
-              href={`/work/workspaces/${workItem.workspace.key}/work-items/${workItem.parent.key}`}
+              href={`/work/workspaces/${workItem.parent.workspaceKey}/work-items/${workItem.parent.key}`}
             >
               {workItem.parent.key} - {workItem.parent.title}
             </Link>

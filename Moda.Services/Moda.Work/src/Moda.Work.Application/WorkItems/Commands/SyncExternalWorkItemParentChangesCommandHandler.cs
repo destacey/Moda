@@ -57,7 +57,8 @@ internal sealed class SyncExternalWorkItemParentChangesCommandHandler(IWorkDbCon
                 {
                     _logger.LogWarning("Error updating parent for work item {WorkItemId} (ExternalId: {ExternalId}): {Error}", child.Id, child.ExternalId, updateParentResult.Error);
                 }
-                else {
+                else if (_logger.IsEnabled(LogLevel.Debug))
+                {
                     _logger.LogDebug("Updated parent for work item {WorkItemId} (ExternalId: {ExternalId})", child.Id, child.ExternalId);
                 }
             }
