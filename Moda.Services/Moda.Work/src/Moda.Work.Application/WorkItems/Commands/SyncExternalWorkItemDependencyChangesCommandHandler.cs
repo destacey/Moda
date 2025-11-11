@@ -78,17 +78,28 @@ internal sealed class SyncExternalWorkItemDependencyChangesCommandHandler(IWorkD
             })
             .ToListAsync(cancellationToken);
 
-        // Post-process to ensure we only get exact matches
-        return workItems
-            .Where(wi => uniqueIds.Contains(new WorkItemExternalId(wi.ExternalId, Guid.Parse(wi.WorkspaceExternalId))))
-            .ToDictionary(
-                wi => new WorkItemExternalId(wi.ExternalId, Guid.Parse(wi.WorkspaceExternalId)),
-                wi => wi.Id);
+        var map = new Dictionary<WorkItemExternalId, Guid>(workItems.Count);
+
+        foreach (var wi in workItems)
+        {
+            if (!Guid.TryParse(wi.WorkspaceExternalId, out var parsedWorkspaceId))
+                continue;
+
+            var key = new WorkItemExternalId(wi.ExternalId, parsedWorkspaceId);
+            if (uniqueIds.Contains(key))
+                map[key] = wi.Id;
+        }
+
+        return map;
     }
 
     private async Task<List<DependencyInfo>> MapValidLinks(IReadOnlyList<IExternalWorkItemLink> workItemLinks, Dictionary<WorkItemExternalId, Guid> workItemMap, CancellationToken cancellationToken)
     {
-        var employees = (await _workDbContext.Employees.Select(e => new { e.Id, e.Email }).ToListAsync(cancellationToken)).ToHashSet();
+        var employeeDict = await _workDbContext.Employees
+            .Select(e => new { Email = e.Email.ToString(), e.Id })
+            .ToDictionaryAsync(e => e.Email, e => e.Id, cancellationToken);
+
+        var employeeByEmail = new Dictionary<string, Guid>(employeeDict, StringComparer.OrdinalIgnoreCase);
 
         var validLinks = new List<DependencyInfo>();
 
@@ -100,10 +111,16 @@ internal sealed class SyncExternalWorkItemDependencyChangesCommandHandler(IWorkD
             if (workItemMap.TryGetValue(sourceId, out var sourceInternalId) &&
                 workItemMap.TryGetValue(targetId, out var targetInternalId))
             {
+                Guid? changedById = null;
+                if (link.ChangedBy != null && employeeByEmail.TryGetValue(link.ChangedBy!, out var empId))
+                {
+                    changedById = empId;
+                }
+
                 validLinks.Add(new DependencyInfo(
                     sourceInternalId,
                     targetInternalId,
-                    employees.SingleOrDefault(e => e.Email == link.ChangedBy)?.Id,
+                    changedById,
                     link.ChangedOperation,
                     link.ChangedDate,
                     link.Comment));
@@ -172,17 +189,14 @@ internal sealed class SyncExternalWorkItemDependencyChangesCommandHandler(IWorkD
 
     private async Task ProcessBatch(IReadOnlyList<DependencyInfo> batch, CancellationToken cancellationToken)
     {
-        // Get unique source work item IDs from the batch
-        var sourceWorkItemIds = batch.Select(x => x.SourceId).Distinct().ToList();
+        var sourceWorkItemIds = batch.Select(x => x.SourceId).ToHashSet();
+        var targetIds = batch.Select(x => x.TargetId).ToHashSet();
 
-        // Load the source work items with their dependencies
-        var sourceWorkItems = await _workDbContext.WorkItems
-            .Include(wi => wi.OutboundDependencies)
+        // Load the source work items with only the outbound dependencies that are relevant to this batch
+        var workItemLookup = await _workDbContext.WorkItems
             .Where(wi => sourceWorkItemIds.Contains(wi.Id))
-            .ToListAsync(cancellationToken);
-
-        // Create a lookup for faster access
-        var workItemLookup = sourceWorkItems.ToDictionary(wi => wi.Id);
+            .Include(wi => wi.OutboundDependencies.Where(d => targetIds.Contains(d.TargetId)))
+            .ToDictionaryAsync(wi => wi.Id, cancellationToken);
 
         foreach (var link in batch)
         {
