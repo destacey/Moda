@@ -5,7 +5,7 @@ using Moda.Work.Application.WorkItems.Dtos;
 
 namespace Moda.Work.Application.WorkItems.Queries;
 
-public sealed record GetTeamDependenciesQuery(Guid TeamId, List<DependencyStatus> DependencyStatuses) : IQuery<List<DependencyDto>?>;
+public sealed record GetTeamDependenciesQuery(Guid TeamId, List<DependencyState> DependencyStatuses) : IQuery<List<DependencyDto>?>;
 
 
 internal sealed class GetTeamDependenciesQueryHandler(IWorkDbContext workDbContext, ILogger<GetTeamDependenciesQueryHandler> logger) : IQueryHandler<GetTeamDependenciesQuery, List<DependencyDto>?>

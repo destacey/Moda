@@ -18093,7 +18093,7 @@
           "id",
           "dependency",
           "type",
-          "status",
+          "state",
           "createdOn"
         ],
         "properties": {
@@ -18109,7 +18109,7 @@
           "type": {
             "type": "string"
           },
-          "status": {
+          "state": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
           },
           "createdOn": {
@@ -19234,7 +19234,7 @@
           "source",
           "target",
           "linkType",
-          "status",
+          "state",
           "createdOn"
         ],
         "properties": {
@@ -19253,7 +19253,7 @@
           "linkType": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
           },
-          "status": {
+          "state": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
           },
           "createdOn": {

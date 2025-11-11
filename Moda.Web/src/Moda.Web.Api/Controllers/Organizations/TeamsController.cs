@@ -213,7 +213,7 @@ public class TeamsController(ILogger<TeamsController> logger, ISender sender) : 
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IEnumerable<DependencyDto>>> GetTeamDependencies(Guid id, CancellationToken cancellationToken)
     {
-        var dependencies = await _sender.Send(new GetTeamDependenciesQuery(id, [DependencyStatus.ToDo, DependencyStatus.InProgress]), cancellationToken);
+        var dependencies = await _sender.Send(new GetTeamDependenciesQuery(id, [DependencyState.ToDo, DependencyState.InProgress]), cancellationToken);
 
         return dependencies is null
             ? NotFound()

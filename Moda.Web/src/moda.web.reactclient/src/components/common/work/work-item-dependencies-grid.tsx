@@ -81,7 +81,7 @@ const WorkItemDependenciesGrid: React.FC<WorkItemDependenciesGridProps> = (
             sort: 'asc',
             sortIndex: 0,
           },
-          { field: 'status.name', headerName: 'Status', width: 100 },
+          { field: 'state.name', headerName: 'State', width: 100 },
           // {
           //   field: 'createdOn',
           //   width: 150,

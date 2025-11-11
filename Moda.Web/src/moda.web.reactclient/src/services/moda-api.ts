@@ -16707,7 +16707,7 @@ export interface ScopedDependencyDto {
     id: string;
     dependency: WorkItemDetailsNavigationDto;
     type: string;
-    status: SimpleNavigationDto;
+    state: SimpleNavigationDto;
     createdOn: Date;
     createdBy?: EmployeeNavigationDto | undefined;
     comment?: string | undefined;
@@ -16990,7 +16990,7 @@ export interface DependencyDto {
     source: WorkItemDetailsNavigationDto;
     target: WorkItemDetailsNavigationDto;
     linkType: SimpleNavigationDto;
-    status: SimpleNavigationDto;
+    state: SimpleNavigationDto;
     createdOn: Date;
     createdBy?: EmployeeNavigationDto | undefined;
     comment?: string | undefined;

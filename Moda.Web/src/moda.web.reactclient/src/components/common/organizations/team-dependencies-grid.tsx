@@ -55,7 +55,7 @@ const TeamDependenciesGrid: React.FC<TeamDependenciesGridProps> = (props) => {
     () => [
       {
         headerName: 'Dependency Info',
-        children: [{ field: 'status.name', headerName: 'Status', width: 125 }],
+        children: [{ field: 'state.name', headerName: 'State', width: 125 }],
       },
       {
         headerName: 'Predecessor Info',
