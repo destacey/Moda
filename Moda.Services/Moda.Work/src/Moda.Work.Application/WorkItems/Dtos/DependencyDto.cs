@@ -1,5 +1,6 @@
 ﻿using Moda.Common.Application.Dtos;
 using Moda.Common.Application.Employees.Dtos;
+using Moda.Common.Domain.Enums.Work;
 using Moda.Common.Domain.Extensions;
 
 namespace Moda.Work.Application.WorkItems.Dtos;

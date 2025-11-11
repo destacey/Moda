@@ -1,5 +1,4 @@
 ﻿using System.Linq.Expressions;
-using Moda.Common.Domain.Enums.Work;
 using Moda.Work.Application.Persistence;
 using Moda.Work.Application.WorkItems.Dtos;
 using Moda.Work.Application.Workspaces.Models;
@@ -39,13 +38,14 @@ internal sealed class GetWorkItemDependenciesQueryHandler(IWorkDbContext workDbC
             return null;
         }
 
-        var dependencyLinks = await _workDbContext.WorkItemLinks
-            .Where(l => l.LinkType == WorkItemLinkType.Dependency && l.RemovedOn == null)
+        var dependencyLinks = await _workDbContext.WorkItemDependencies
+            .Where(l => l.RemovedOn == null)
             .Where(l => l.SourceId == workItemId || l.TargetId == workItemId)
             .ProjectToType<DependencyDto>()
             .ToListAsync(cancellationToken);
 
-        _logger.LogDebug("{AppRequestName} - Found {DependencyLinksCount} dependency links for work item {WorkItemKey}", AppRequestName, dependencyLinks.Count, request.WorkItemKey);
+        if (_logger.IsEnabled(LogLevel.Debug))
+            _logger.LogDebug("{AppRequestName} - Found {DependencyLinksCount} dependency links for work item {WorkItemKey}", AppRequestName, dependencyLinks.Count, request.WorkItemKey);
 
         return dependencyLinks.Count == 0
             ? []

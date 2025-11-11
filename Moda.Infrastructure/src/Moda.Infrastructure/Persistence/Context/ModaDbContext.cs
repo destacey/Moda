@@ -107,7 +107,8 @@ public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IGoalsDbCo
     public DbSet<Workflow> Workflows => Set<Workflow>();
     public DbSet<WorkItemReference> WorkItemReferences => Set<WorkItemReference>();
     public DbSet<WorkItem> WorkItems => Set<WorkItem>();
-    public DbSet<WorkItemLink> WorkItemLinks => Set<WorkItemLink>();
+    public DbSet<WorkItemDependency> WorkItemDependencies => Set<WorkItemDependency>();
+    public DbSet<WorkItemHierarchy> WorkItemHierarchies => Set<WorkItemHierarchy>();
     public DbSet<WorkIteration> WorkIterations => Set<WorkIteration>();
     public DbSet<WorkProcess> WorkProcesses => Set<WorkProcess>();
     public DbSet<WorkProject> WorkProjects => Set<WorkProject>();
