@@ -31,3 +31,10 @@ export enum WorkStatusCategory {
   Done = 2,
   Removed = 3,
 }
+
+export enum DependencyHealth {
+  Healthy = 1,
+  AtRisk = 2,
+  Unhealthy = 3,
+  Unknown = 4,
+}

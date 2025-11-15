@@ -2,7 +2,7 @@
 
 import { Tag } from 'antd'
 import { WorkStatusCategory } from '../../types'
-import { FC } from 'react'
+import { FC, memo } from 'react'
 
 export interface WorkStatusTagProps {
   status: string
@@ -29,4 +29,4 @@ const WorkStatusTag: FC<WorkStatusTagProps> = ({ status, category }) => {
   return <Tag color={color}>{status}</Tag>
 }
 
-export default WorkStatusTag
+export default memo(WorkStatusTag)

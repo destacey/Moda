@@ -6,11 +6,15 @@ import {
   WorkItemDetailsNavigationDto,
 } from '@/src/services/moda-api'
 import { ColDef, GetRowIdParams } from 'ag-grid-community'
-import { useCallback, useMemo } from 'react'
+import { FC, useCallback, useMemo } from 'react'
 import ModaGrid from '../moda-grid'
 import Link from 'next/link'
 import { ExportOutlined } from '@ant-design/icons'
-import { TeamNameLinkCellRenderer } from '../moda-grid-cell-renderers'
+import {
+  DependencyHealthCellRenderer,
+  TeamNameLinkCellRenderer,
+  WorkSprintLinkCellRenderer,
+} from '../moda-grid-cell-renderers'
 import { workItemKeyComparator } from '../work'
 
 export interface TeamDependenciesGridProps {
@@ -44,7 +48,7 @@ const WorkItemLinkCellRenderer = (data: WorkItemDetailsNavigationDto) => {
   )
 }
 
-const TeamDependenciesGrid: React.FC<TeamDependenciesGridProps> = (props) => {
+const TeamDependenciesGrid: FC<TeamDependenciesGridProps> = (props) => {
   const { team, refetch } = props
 
   const getRowId = useCallback(({ data }: GetRowIdParams<DependencyDto>) => {
@@ -55,7 +59,15 @@ const TeamDependenciesGrid: React.FC<TeamDependenciesGridProps> = (props) => {
     () => [
       {
         headerName: 'Dependency Info',
-        children: [{ field: 'state.name', headerName: 'State', width: 125 }],
+        children: [
+          { field: 'state.name', headerName: 'State', width: 125 },
+          {
+            field: 'health.name',
+            headerName: 'Health',
+            width: 100,
+            cellRenderer: DependencyHealthCellRenderer,
+          },
+        ],
       },
       {
         headerName: 'Predecessor Info',
@@ -75,6 +87,14 @@ const TeamDependenciesGrid: React.FC<TeamDependenciesGridProps> = (props) => {
             headerName: 'Team',
             cellRenderer: (params) =>
               TeamNameLinkCellRenderer({ data: params.data?.source.team }),
+          },
+          {
+            field: 'source.sprint.name',
+            headerName: 'Sprint',
+            cellRenderer: (params) =>
+              WorkSprintLinkCellRenderer({
+                data: params.data?.source.sprint,
+              }),
           },
         ],
       },
@@ -96,6 +116,14 @@ const TeamDependenciesGrid: React.FC<TeamDependenciesGridProps> = (props) => {
             headerName: 'Team',
             cellRenderer: (params) =>
               TeamNameLinkCellRenderer({ data: params.data?.target.team }),
+          },
+          {
+            field: 'target.sprint.name',
+            headerName: 'Sprint',
+            cellRenderer: (params) =>
+              WorkSprintLinkCellRenderer({
+                data: params.data?.target.sprint,
+              }),
           },
         ],
       },

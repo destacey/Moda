@@ -13,7 +13,8 @@ import Link from 'next/link'
 import { MarkdownRenderer } from './markdown'
 import { ICellRendererParams } from 'ag-grid-community'
 import WorkStatusTag from './work/work-status-tag'
-import { WorkStatusCategory } from '../types'
+import { DependencyHealth, WorkStatusCategory } from '../types'
+import DependencyHealthTag from './work/dependency-health-tag'
 
 export interface HealthCheckStatusColumn {
   id: string
@@ -51,6 +52,19 @@ export const WorkStatusTagCellRenderer = ({
     <WorkStatusTag
       status={value}
       category={data.statusCategory.id as WorkStatusCategory}
+    />
+  )
+}
+
+export const DependencyHealthCellRenderer = ({
+  value,
+  data,
+}: ICellRendererParams<any>) => {
+  if (!data || !data.health) return null
+  return (
+    <DependencyHealthTag
+      name={value}
+      health={data.health.id as DependencyHealth}
     />
   )
 }

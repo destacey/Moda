@@ -5,12 +5,16 @@ import {
   WorkItemDetailsDto,
 } from '@/src/services/moda-api'
 import { ColDef, GetRowIdParams } from 'ag-grid-community'
-import { useCallback, useMemo, useRef } from 'react'
+import { FC, useCallback, useMemo } from 'react'
 import ModaGrid from '../moda-grid'
 import { workItemKeyComparator } from './work-item-utils'
 import Link from 'next/link'
 import { ExportOutlined } from '@ant-design/icons'
-import { TeamNameLinkCellRenderer } from '../moda-grid-cell-renderers'
+import {
+  DependencyHealthCellRenderer,
+  TeamNameLinkCellRenderer,
+  WorkSprintLinkCellRenderer,
+} from '../moda-grid-cell-renderers'
 
 export interface WorkItemDependenciesGridProps {
   workItem: WorkItemDetailsDto
@@ -56,9 +60,7 @@ const dependencyTypeTooltip = (
   return 'Unknown dependency type'
 }
 
-const WorkItemDependenciesGrid: React.FC<WorkItemDependenciesGridProps> = (
-  props,
-) => {
+const WorkItemDependenciesGrid: FC<WorkItemDependenciesGridProps> = (props) => {
   const { workItem, refetch } = props
 
   const getRowId = useCallback(
@@ -82,6 +84,12 @@ const WorkItemDependenciesGrid: React.FC<WorkItemDependenciesGridProps> = (
             sortIndex: 0,
           },
           { field: 'state.name', headerName: 'State', width: 100 },
+          {
+            field: 'health.name',
+            headerName: 'Health',
+            width: 100,
+            cellRenderer: DependencyHealthCellRenderer,
+          },
           // {
           //   field: 'createdOn',
           //   width: 150,
@@ -107,6 +115,14 @@ const WorkItemDependenciesGrid: React.FC<WorkItemDependenciesGridProps> = (
             headerName: 'Team',
             cellRenderer: (params) =>
               TeamNameLinkCellRenderer({ data: params.data?.dependency.team }),
+          },
+          {
+            field: 'dependency.sprint.name',
+            headerName: 'Sprint',
+            cellRenderer: (params) =>
+              WorkSprintLinkCellRenderer({
+                data: params.data?.dependency.sprint,
+              }),
           },
         ],
       },
