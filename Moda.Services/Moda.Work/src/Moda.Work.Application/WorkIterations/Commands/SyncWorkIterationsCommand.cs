@@ -1,5 +1,4 @@
-﻿using Moda.Common.Application.Models;
-using Moda.Common.Domain.Interfaces.Planning.Iterations;
+﻿using Moda.Common.Domain.Interfaces.Planning.Iterations;
 using Moda.Work.Application.Persistence;
 
 namespace Moda.Work.Application.WorkIterations.Commands;
@@ -61,7 +60,11 @@ internal sealed class SyncWorkIterationsCommandHandler(
                     if (_logger.IsEnabled(LogLevel.Debug))
                         _logger.LogDebug("Updating existing Work iteration {IterationId}.", iteration.Id);
 
-                    existingIteration.Update(iteration);
+                    var result = existingIteration.Update(iteration);
+                    if (result.IsFailure)
+                    {
+                        _logger.LogWarning("Failed to update Work iteration {IterationId}: {ErrorMessage}.", iteration.Id, result.Error);
+                    }
                     updateCount++;
                 }
             }

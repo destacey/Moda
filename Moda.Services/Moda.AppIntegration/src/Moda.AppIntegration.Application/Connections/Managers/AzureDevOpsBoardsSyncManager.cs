@@ -167,7 +167,7 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
 
                                     activeWorkspacesSyncedCount++;
 
-                                    var workspaceTeams = workspaceTeamsLookup.TryGetValue(workspace.ExternalId, out var wt) ? wt : Array.Empty<AzureDevOpsBoardsWorkspaceTeamDto>();
+                                    var workspaceTeams = workspaceTeamsLookup.TryGetValue(workspace.ExternalId, out var wt) ? wt : [];
 
                                     var syncIterationsResult = await SyncIterations(configuration.OrganizationUrl, configuration.PersonalAccessToken, workspace.Name, workspaceTeams, connection.SystemId!, syncId, cancellationToken);
                                     if (syncIterationsResult.IsFailure)

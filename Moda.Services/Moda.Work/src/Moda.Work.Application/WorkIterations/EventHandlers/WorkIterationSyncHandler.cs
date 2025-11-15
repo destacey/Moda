@@ -4,18 +4,20 @@ using Moda.Common.Domain.Events.Planning.Iterations;
 using Moda.Work.Application.Persistence;
 
 namespace Moda.Work.Application.WorkIterations.EventHandlers;
-internal sealed class WorkIterationSyncHandler(IWorkDbContext workDbContext, ILogger<WorkIterationSyncHandler> logger) :
+internal sealed class WorkIterationSyncHandler(IWorkDbContext workDbContext, ILogger<WorkIterationSyncHandler> logger, IDateTimeProvider dateTimeProvider) :
     IEventNotificationHandler<IterationCreatedEvent>,
     IEventNotificationHandler<IterationUpdatedEvent>,
     IEventNotificationHandler<IterationDeletedEvent>
 {
     private readonly IWorkDbContext _workDbContext = workDbContext;
     private readonly ILogger<WorkIterationSyncHandler> _logger = logger;
+    private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
 
     public async Task Handle(EventNotification<IterationCreatedEvent> notification, CancellationToken cancellationToken)
     {
         if (_logger.IsEnabled(LogLevel.Debug))
             _logger.LogDebug("Handling Work {SystemActionType} for a new Iteration {IterationId}.", SystemActionType.ServiceDataReplication, notification.Event.Id);
+
         await CreateIteration(notification.Event, cancellationToken);
     }
 
@@ -23,6 +25,7 @@ internal sealed class WorkIterationSyncHandler(IWorkDbContext workDbContext, ILo
     {
         if (_logger.IsEnabled(LogLevel.Debug))
             _logger.LogDebug("Handling Work {SystemActionType} for an updated Iteration {IterationId}.", SystemActionType.ServiceDataReplication, notification.Event.Id);
+
         await UpdateIteration(notification.Event, cancellationToken);
     }
 
@@ -30,6 +33,7 @@ internal sealed class WorkIterationSyncHandler(IWorkDbContext workDbContext, ILo
     {
         if (_logger.IsEnabled(LogLevel.Debug))
             _logger.LogDebug("Handling Work {SystemActionType} for a deleted Iteration {IterationId}.", SystemActionType.ServiceDataReplication, notification.Event.Id);
+
         await DeleteIteration(notification.Event, cancellationToken);
     }
 
@@ -67,7 +71,12 @@ internal sealed class WorkIterationSyncHandler(IWorkDbContext workDbContext, ILo
                 return;
             }
 
-            iteration.Update(updatedEvent);
+            var result = iteration.Update(updatedEvent, updatedEvent.Timestamp);
+            if (result.IsFailure)
+            {
+                _logger.LogCritical("Error processing Work {SystemActionType} for an updated Iteration. Iteration {IterationId} update failed with error: {Error}.", SystemActionType.ServiceDataReplication, updatedEvent.Id, result.Error);
+                return;
+            }
 
             await _workDbContext.SaveChangesAsync(cancellationToken);
 
@@ -81,6 +90,7 @@ internal sealed class WorkIterationSyncHandler(IWorkDbContext workDbContext, ILo
 
     private async Task DeleteIteration(IterationDeletedEvent deletedEvent, CancellationToken cancellationToken)
     {
+        // TODO: work items are being updated via cascade delete, which may be undesirable. Consider changing this behavior. And then send events from those work items to update their dependencies.
         try
         {
             var iteration = await _workDbContext.WorkIterations.FirstOrDefaultAsync(x => x.Id == deletedEvent.Id, cancellationToken);
@@ -101,5 +111,4 @@ internal sealed class WorkIterationSyncHandler(IWorkDbContext workDbContext, ILo
             _logger.LogCritical(ex, "Exception handling Work {SystemActionType} for the Iteration {IterationId} deleted action.", SystemActionType.ServiceDataReplication, deletedEvent.Id);
         }
     }
-
 }
