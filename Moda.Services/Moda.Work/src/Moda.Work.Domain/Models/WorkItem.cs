@@ -1,6 +1,7 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
 using Moda.Common.Domain.Employees;
+using Moda.Common.Domain.Enums.Planning;
 using Moda.Common.Domain.Enums.Work;
 using Moda.Work.Domain.Interfaces;
 using NodaTime;
@@ -236,7 +237,7 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable, HasWorkspace
         return Result.Success();
     }
 
-    public Result AddSuccessorLink(Guid targetId, Instant timestamp, Guid? createdById, string? comment)
+    public Result AddSuccessorLink(Guid targetId, Instant? targetPlannedDate, Instant createdOn, Guid? createdById, string? comment, Instant now)
     {
         if (Id == targetId)
         {
@@ -244,15 +245,21 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable, HasWorkspace
         }
 
         var existingLink = _outboundDependencyHistory.FirstOrDefault(x => x.TargetId == targetId 
-            && x.LinkType == WorkItemLinkType.Dependency 
-            && x.CreatedOn == timestamp);
+            && x.CreatedOn == createdOn);
         if (existingLink is not null)
         {
+            // TODO: move update successor link to it's own method
             existingLink.Update(createdById, existingLink.RemovedById, comment);
+            existingLink.UpdateSourceDetails(StatusCategory, null, now);
+            existingLink.UpdateTargetPlannedDate(targetPlannedDate, now);
         }
         else
         {
-            var newLink = WorkItemDependency.Create(Id, targetId, timestamp, createdById, null, null, comment);
+            var iterationEndDate = Iteration is not null && Iteration.Type is IterationType.Sprint
+                ? Iteration.DateRange.End
+                : null;
+
+            var newLink = WorkItemDependency.Create(Id, targetId, StatusCategory, iterationEndDate, targetPlannedDate, createdOn, createdById, null, null, comment, now);
             _outboundDependencyHistory.Add(newLink);
         }
 
@@ -267,7 +274,6 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable, HasWorkspace
         }
 
         var existingLink = _outboundDependencyHistory.FirstOrDefault(x => x.TargetId == targetId
-            && x.LinkType == WorkItemLinkType.Dependency
             && x.RemovedOn == timestamp);
         if (existingLink is not null)
         {
@@ -276,7 +282,6 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable, HasWorkspace
         else
         {
             var link = _outboundDependencyHistory.OrderBy(l => l.CreatedOn).FirstOrDefault(x => x.TargetId == targetId
-                && x.LinkType == WorkItemLinkType.Dependency
                 && x.RemovedOn is null
                 && x.CreatedOn < timestamp);
             if (link is null)

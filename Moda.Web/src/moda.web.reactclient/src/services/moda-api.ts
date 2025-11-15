@@ -16708,6 +16708,7 @@ export interface ScopedDependencyDto {
     dependency: WorkItemDetailsNavigationDto;
     type: string;
     state: SimpleNavigationDto;
+    health: SimpleNavigationDto;
     createdOn: Date;
     createdBy?: EmployeeNavigationDto | undefined;
     comment?: string | undefined;
@@ -16722,6 +16723,7 @@ export interface WorkItemDetailsNavigationDto {
     status: string;
     statusCategory: SimpleNavigationDto;
     team?: WorkTeamNavigationDto | undefined;
+    sprint?: WorkIterationNavigationDto | undefined;
     activatedTimestamp?: Date | undefined;
     doneTimestamp?: Date | undefined;
     externalViewWorkItemUrl?: string | undefined;
@@ -16991,6 +16993,7 @@ export interface DependencyDto {
     target: WorkItemDetailsNavigationDto;
     linkType: SimpleNavigationDto;
     state: SimpleNavigationDto;
+    health: SimpleNavigationDto;
     createdOn: Date;
     createdBy?: EmployeeNavigationDto | undefined;
     comment?: string | undefined;

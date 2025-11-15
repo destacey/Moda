@@ -18094,6 +18094,7 @@
           "dependency",
           "type",
           "state",
+          "health",
           "createdOn"
         ],
         "properties": {
@@ -18110,6 +18111,9 @@
             "type": "string"
           },
           "state": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "health": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
           },
           "createdOn": {
@@ -18172,6 +18176,14 @@
             "oneOf": [
               {
                 "$ref": "#/components/schemas/WorkTeamNavigationDto"
+              }
+            ]
+          },
+          "sprint": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/WorkIterationNavigationDto"
               }
             ]
           },
@@ -19235,6 +19247,7 @@
           "target",
           "linkType",
           "state",
+          "health",
           "createdOn"
         ],
         "properties": {
@@ -19254,6 +19267,9 @@
             "$ref": "#/components/schemas/SimpleNavigationDto"
           },
           "state": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "health": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
           },
           "createdOn": {

@@ -11,6 +11,8 @@ public sealed record ScopedDependencyDto
 
     public required SimpleNavigationDto State { get; set; }
 
+    public required SimpleNavigationDto Health { get; set; }
+
     public Instant CreatedOn { get; set; }
 
     public EmployeeNavigationDto? CreatedBy { get; set; }
@@ -38,6 +40,7 @@ public sealed record ScopedDependencyDto
             Dependency = isOutbound ? link.Target : link.Source,
             Type = isOutbound ? "Successor" : "Predecessor",
             State = link.State,
+            Health = link.Health,
             CreatedOn = link.CreatedOn,
             CreatedBy = link.CreatedBy,
             Comment = link.Comment

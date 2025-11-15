@@ -1,4 +1,5 @@
-﻿using Moda.Common.Domain.Employees;
+﻿using Ardalis.GuardClauses;
+using Moda.Common.Domain.Employees;
 using Moda.Common.Domain.Enums.Work;
 using Moda.Common.Extensions;
 using NodaTime;
@@ -14,6 +15,9 @@ public abstract class WorkItemLink : BaseEntity<Guid>, ISystemAuditable
 
     protected WorkItemLink(Guid sourceId, Guid targetId, WorkItemLinkType linkType, Instant createdOn, Guid? createdById, Instant? removedOn, Guid? removedById, string? comment)
     {
+        Guard.Against.NullOrEmpty(sourceId);
+        Guard.Against.NullOrEmpty(targetId);
+
         if (sourceId == targetId)
             throw new ArgumentException("A work item cannot be linked to itself.", nameof(targetId));        
 
@@ -39,13 +43,13 @@ public abstract class WorkItemLink : BaseEntity<Guid>, ISystemAuditable
     
     public Instant CreatedOn { get; private init; }
 
-    public Guid? CreatedById { get; set; }
+    public Guid? CreatedById { get; private set; }
 
     public Employee? CreatedBy { get; private set; }
 
     public Instant? RemovedOn { get; private set; }
 
-    public Guid? RemovedById { get; set; }
+    public Guid? RemovedById { get; private set; }
 
     public Employee? RemovedBy { get; private set; }
 
@@ -55,7 +59,7 @@ public abstract class WorkItemLink : BaseEntity<Guid>, ISystemAuditable
         private set => _comment = value.NullIfWhiteSpacePlusTrim(); 
     }
 
-    public void Update(Guid? createdById, Guid? removedById, string? comment)
+    public virtual void Update(Guid? createdById, Guid? removedById, string? comment)
     {
         CreatedById = createdById;
         RemovedById = removedById;
@@ -81,20 +85,5 @@ public sealed class WorkItemHierarchy : WorkItemLink
     public static WorkItemHierarchy Create(Guid sourceId, Guid targetId, Instant createdOn, Guid? createdById, Instant? removedOn, Guid? removedById, string? comment)
     {
         return new WorkItemHierarchy(sourceId, targetId, createdOn, createdById, removedOn, removedById, comment);
-    }
-}
-
-public sealed class WorkItemDependency : WorkItemLink
-{
-    private WorkItemDependency() : base() { }
-
-    public WorkItemDependency(Guid sourceId, Guid targetId, Instant createdOn, Guid? createdById, Instant? removedOn, Guid? removedById, string? comment)
-    : base(sourceId, targetId, WorkItemLinkType.Dependency, createdOn, createdById, removedOn, removedById, comment)
-    {
-    }
-
-    public static WorkItemDependency Create(Guid sourceId, Guid targetId, Instant createdOn, Guid? createdById, Instant? removedOn, Guid? removedById, string? comment)
-    {
-        return new WorkItemDependency(sourceId, targetId, createdOn, createdById, removedOn, removedById, comment);
     }
 }

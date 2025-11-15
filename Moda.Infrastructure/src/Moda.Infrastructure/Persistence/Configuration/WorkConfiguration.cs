@@ -342,6 +342,34 @@ public class WorkItemLinkConfig : IEntityTypeConfiguration<WorkItemLink>
     }
 }
 
+public class WorkItemDependencyConfig : IEntityTypeConfiguration<WorkItemDependency>
+{
+    public void Configure(EntityTypeBuilder<WorkItemDependency> builder)
+    {
+        // Base configuration is handled in WorkItemLinkConfig
+
+
+        // Properties
+        builder.Property(w => w.State).IsRequired()
+            .HasConversion<EnumConverter<DependencyState>>()
+            .HasColumnType("varchar")
+            .HasMaxLength(32);
+
+        builder.Property(w => w.Health).IsRequired()
+            .HasConversion<EnumConverter<DependencyPlanningHealth>>()
+            .HasColumnType("varchar")
+            .HasMaxLength(32);
+
+        builder.Property(w => w.SourceWorkStatusCategory).IsRequired()
+            .HasConversion<EnumConverter<WorkStatusCategory>>()
+            .HasColumnType("varchar")
+            .HasMaxLength(32);
+
+        builder.Property(w => w.SourcePlannedOn);
+        builder.Property(w => w.TargetPlannedOn);
+    }
+}
+
 public class WorkIterationConfig : IEntityTypeConfiguration<WorkIteration>
 {
     public void Configure(EntityTypeBuilder<WorkIteration> builder)

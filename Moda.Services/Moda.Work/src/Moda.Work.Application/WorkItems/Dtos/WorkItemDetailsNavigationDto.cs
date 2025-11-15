@@ -1,4 +1,6 @@
 ﻿using Moda.Common.Application.Dtos;
+using Moda.Common.Domain.Enums.Planning;
+using Moda.Work.Application.WorkIterations.Dtos;
 using Moda.Work.Application.WorkTeams.Dtos;
 
 namespace Moda.Work.Application.WorkItems.Dtos;
@@ -12,6 +14,7 @@ public sealed record WorkItemDetailsNavigationDto : IMapFrom<WorkItem>
     public required string Status { get; set; }
     public required SimpleNavigationDto StatusCategory { get; set; }
     public WorkTeamNavigationDto? Team { get; set; }
+    public WorkIterationNavigationDto? Sprint { get; set; }
     public Instant? ActivatedTimestamp { get; set; }
     public Instant? DoneTimestamp { get; set; }
     public string? ExternalViewWorkItemUrl { get; set; }
@@ -23,6 +26,7 @@ public sealed record WorkItemDetailsNavigationDto : IMapFrom<WorkItem>
             .Map(dest => dest.Type, src => src.Type.Name)
             .Map(dest => dest.Status, src => src.Status.Name)
             .Map(dest => dest.StatusCategory, src => SimpleNavigationDto.FromEnum(src.StatusCategory))
+            .Map(dest => dest.Sprint, src => src.Iteration != null && src.Iteration.Type == IterationType.Sprint ? src.Iteration : null)
             .Map(dest => dest.ExternalViewWorkItemUrl, src => src.Workspace.ExternalViewWorkItemUrlTemplate == null ? null : $"{src.Workspace.ExternalViewWorkItemUrlTemplate}{src.ExternalId}"); ;
     }
 }

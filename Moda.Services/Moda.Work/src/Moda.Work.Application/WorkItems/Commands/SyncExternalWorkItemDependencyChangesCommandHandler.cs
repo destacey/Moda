@@ -1,9 +1,11 @@
-﻿using Moda.Common.Application.Interfaces.ExternalWork;
+﻿using Moda.Common.Application.Interfaces;
+using Moda.Common.Application.Interfaces.ExternalWork;
 using Moda.Common.Application.Requests.WorkManagement;
+using Moda.Common.Domain.Enums.Planning;
 using Moda.Work.Application.Persistence;
 
 namespace Moda.Work.Application.WorkItems.Commands;
-internal sealed class SyncExternalWorkItemDependencyChangesCommandHandler(IWorkDbContext workDbContext, ILogger<SyncExternalWorkItemDependencyChangesCommandHandler> logger) : ICommandHandler<SyncExternalWorkItemDependencyChangesCommand>
+internal sealed class SyncExternalWorkItemDependencyChangesCommandHandler(IWorkDbContext workDbContext, ILogger<SyncExternalWorkItemDependencyChangesCommandHandler> logger, IDateTimeProvider dateTimeProvider) : ICommandHandler<SyncExternalWorkItemDependencyChangesCommand>
 {
     private const string AppRequestName = nameof(SyncExternalWorkItemDependencyChangesCommand);
     private const int DefaultBatchSize = 500;
@@ -16,11 +18,14 @@ internal sealed class SyncExternalWorkItemDependencyChangesCommandHandler(IWorkD
 
     private readonly IWorkDbContext _workDbContext = workDbContext;
     private readonly ILogger<SyncExternalWorkItemDependencyChangesCommandHandler> _logger = logger;
+    private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
 
     public async Task<Result> Handle(SyncExternalWorkItemDependencyChangesCommand request, CancellationToken cancellationToken)
     {
         try
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             var validLinks = await ValidateAndMapWorkItemLinks(request.WorkItemLinks, cancellationToken);
             if (!validLinks.Any())
             {
@@ -33,6 +38,11 @@ internal sealed class SyncExternalWorkItemDependencyChangesCommandHandler(IWorkD
             await ProcessLinksInBatches(validLinks, cancellationToken);
             return Result.Success();
         }
+        catch (OperationCanceledException)
+        {
+            _logger.LogInformation("{AppRequestName}: Operation cancelled.", AppRequestName);
+            throw;
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Exception thrown handling {AppRequestName}", AppRequestName);
@@ -42,12 +52,15 @@ internal sealed class SyncExternalWorkItemDependencyChangesCommandHandler(IWorkD
 
     private async Task<IReadOnlyList<DependencyInfo>> ValidateAndMapWorkItemLinks(IReadOnlyList<IExternalWorkItemLink> workItemLinks, CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         if (!workItemLinks.Any())
         {
             return [];
         }
 
         var workItemMap = await GetWorkItemMap(workItemLinks, cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         var validLinks = await MapValidLinks(workItemLinks, workItemMap, cancellationToken);
 
         return validLinks;
@@ -55,6 +68,8 @@ internal sealed class SyncExternalWorkItemDependencyChangesCommandHandler(IWorkD
 
     private async Task<Dictionary<WorkItemExternalId, Guid>> GetWorkItemMap(IReadOnlyList<IExternalWorkItemLink> workItemLinks, CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         var uniqueIds = workItemLinks.SelectMany(wil => new[]
         {
             new WorkItemExternalId(wil.SourceId, wil.SourceWorkspaceId),
@@ -78,6 +93,8 @@ internal sealed class SyncExternalWorkItemDependencyChangesCommandHandler(IWorkD
             })
             .ToListAsync(cancellationToken);
 
+        cancellationToken.ThrowIfCancellationRequested();
+
         var map = new Dictionary<WorkItemExternalId, Guid>(workItems.Count);
 
         foreach (var wi in workItems)
@@ -95,6 +112,8 @@ internal sealed class SyncExternalWorkItemDependencyChangesCommandHandler(IWorkD
 
     private async Task<List<DependencyInfo>> MapValidLinks(IReadOnlyList<IExternalWorkItemLink> workItemLinks, Dictionary<WorkItemExternalId, Guid> workItemMap, CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         var employeeDict = await _workDbContext.Employees
             .Select(e => new { Email = e.Email.ToString(), e.Id })
             .ToDictionaryAsync(e => e.Email, e => e.Id, cancellationToken);
@@ -105,6 +124,8 @@ internal sealed class SyncExternalWorkItemDependencyChangesCommandHandler(IWorkD
 
         foreach (var link in workItemLinks)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             var sourceId = new WorkItemExternalId(link.SourceId, link.SourceWorkspaceId);
             var targetId = new WorkItemExternalId(link.TargetId, link.TargetWorkspaceId);
 
@@ -158,6 +179,7 @@ internal sealed class SyncExternalWorkItemDependencyChangesCommandHandler(IWorkD
 
     private async Task ProcessLinksInBatches(IReadOnlyList<DependencyInfo> links, CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
 
         var orderedLinks = links
             .GroupBy(link => link.SourceId)
@@ -172,9 +194,16 @@ internal sealed class SyncExternalWorkItemDependencyChangesCommandHandler(IWorkD
 
         for (var i = 0; i < totalBatches; i++)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             try
             {
                 await ProcessBatch(batches[i], cancellationToken);
+            }
+            catch (OperationCanceledException)
+            {
+                _logger.LogInformation("{AppRequestName}: Batch processing cancelled at batch {BatchIndex}.", AppRequestName, i + 1);
+                throw;
             }
             catch (Exception ex)
             {
@@ -189,22 +218,52 @@ internal sealed class SyncExternalWorkItemDependencyChangesCommandHandler(IWorkD
 
     private async Task ProcessBatch(IReadOnlyList<DependencyInfo> batch, CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var now = _dateTimeProvider.Now;
         var sourceWorkItemIds = batch.Select(x => x.SourceId).ToHashSet();
         var targetIds = batch.Select(x => x.TargetId).ToHashSet();
 
         // Load the source work items with only the outbound dependencies that are relevant to this batch
-        var workItemLookup = await _workDbContext.WorkItems
+        var sourceWorkItemLookup = await _workDbContext.WorkItems
             .Where(wi => sourceWorkItemIds.Contains(wi.Id))
             .Include(wi => wi.OutboundDependencies.Where(d => targetIds.Contains(d.TargetId)))
+            .Include(wi => wi.Iteration)
             .ToDictionaryAsync(wi => wi.Id, cancellationToken);
+
+
+        var targetWorkItemLookup = await _workDbContext.WorkItems
+            .Where(wi => targetIds.Contains(wi.Id))
+            .Include(wi => wi.Iteration)
+            .Select(wi => new TargetWorkItemInfo(
+                wi.Id,
+                wi.Iteration != null && wi.Iteration.Type == IterationType.Sprint
+                    ? wi.Iteration.DateRange.End
+                    : (Instant?)null))
+            .ToDictionaryAsync(t => t.WorkItemId, t => t, cancellationToken);
 
         foreach (var link in batch)
         {
-            if (workItemLookup.TryGetValue(link.SourceId, out var sourceWorkItem))
+            cancellationToken.ThrowIfCancellationRequested();
+
+            if (sourceWorkItemLookup.TryGetValue(link.SourceId, out var sourceWorkItem))
             {
                 if (link.ChangedOperation.Equals("create", StringComparison.OrdinalIgnoreCase))
                 {
-                    sourceWorkItem.AddSuccessorLink(link.TargetId, link.ChangedDate, link.ChangedById, link.Comment);
+                    // lookup target work item to ensure it exists
+                    // and to obtain the iteration end date (null if iteration type is not Sprint)
+                    if (targetWorkItemLookup.TryGetValue(link.TargetId, out var targetInfo))
+                    {
+                        sourceWorkItem.AddSuccessorLink(targetInfo.WorkItemId, targetInfo.IterationEnd, link.ChangedDate, link.ChangedById, link.Comment, now);
+                    }
+                    else
+                    {
+                        _logger.LogWarning(
+                            "Target work item {TargetId} not found in database while processing dependency link from {SourceId}",
+                            link.TargetId,
+                            link.SourceId);
+                    }
+
                 }
                 else if (link.ChangedOperation.Equals("remove", StringComparison.OrdinalIgnoreCase))
                 {
@@ -224,6 +283,8 @@ internal sealed class SyncExternalWorkItemDependencyChangesCommandHandler(IWorkD
     }
 
     private record struct WorkItemExternalId(int ExternalId, Guid WorkspaceExternalId);
+
+    private record TargetWorkItemInfo(Guid WorkItemId, Instant? IterationEnd);
 
     private record DependencyInfo(
         Guid SourceId,
