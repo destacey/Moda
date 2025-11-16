@@ -62,9 +62,6 @@ public sealed record TeamListDto : IMapFrom<BaseTeam>
                             .Select(m => m.Target)
                             .FirstOrDefault());
 
-        // Ensure Mapster can map nested TeamNavigationDto using existing mapping configs
-        TypeAdapterConfig.GlobalSettings.Scan(typeof(TeamListDto).Assembly);
-
         return cfg;
     }
 }

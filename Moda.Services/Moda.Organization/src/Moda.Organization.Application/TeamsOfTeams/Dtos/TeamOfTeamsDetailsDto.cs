@@ -87,9 +87,6 @@ public class TeamOfTeamsDetailsDto : IMapFrom<BaseTeam>
                             .Select(m => m.Target)
                             .FirstOrDefault());
 
-        // Ensure Mapster can map nested TeamNavigationDto using existing mapping configs
-        TypeAdapterConfig.GlobalSettings.Scan(typeof(TeamOfTeamsDetailsDto).Assembly);
-
         return cfg;
     }
 }

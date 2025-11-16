@@ -2,6 +2,7 @@
 using Mapster;
 using Moda.Organization.Application.Models;
 using NodaTime;
+using System.Linq;
 
 namespace Moda.Organization.Application.Teams.Dtos;
 public sealed record TeamDetailsDto : IMapFrom<BaseTeam>
@@ -86,9 +87,6 @@ public sealed record TeamDetailsDto : IMapFrom<BaseTeam>
                             .Where(m => m.DateRange.Start <= asOf && (m.DateRange.End == null || m.DateRange.End >= asOf))
                             .Select(m => m.Target)
                             .FirstOrDefault());
-
-        // Ensure Mapster can map nested TeamNavigationDto using existing mapping configs
-        TypeAdapterConfig.GlobalSettings.Scan(typeof(TeamDetailsDto).Assembly);
 
         return cfg;
     }
