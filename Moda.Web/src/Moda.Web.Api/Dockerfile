@@ -11,6 +11,10 @@ ENV ASPNETCORE_URLS=http://+:5150
 
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
+# Copy central package management files
+COPY ["Directory.Build.props", "./"]
+COPY ["Directory.Packages.props", "./"]
+# Copy all .csproj files to preserve project structure for restore
 COPY ["Moda.Web/src/Moda.Web.Api/Moda.Web.Api.csproj", "Moda.Web/src/Moda.Web.Api/"]
 RUN dotnet restore "Moda.Web/src/Moda.Web.Api/Moda.Web.Api.csproj"
 COPY . .
