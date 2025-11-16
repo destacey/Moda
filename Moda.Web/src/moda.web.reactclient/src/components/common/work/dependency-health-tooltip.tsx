@@ -12,13 +12,13 @@ export interface DependencyHealthTooltipProps {
 const getHealthDescription = (health: DependencyHealth): string => {
   switch (health) {
     case DependencyHealth.Healthy:
-      return 'Either the predecessor is done, or is planned to complete on or before the successor.'
+      return 'The predecessor is done, planned with no successor plan, or is planned to complete on or before the successor.'
     case DependencyHealth.AtRisk:
-      return 'Neither the predecessor nor successor have future planned dates.'
+      return 'Neither the predecessor nor successor have future planned dates.  Sprints in the past are not considered for date comparisons.'
     case DependencyHealth.Unhealthy:
-      return 'Either the predecessor was removed, or is planned to complete after the successor needs it.'
+      return 'Either the predecessor was removed, is planned to complete after the successor needs it, or the successor is done or removed.'
     default:
-      return 'The health status of this dependency has not been determined or reported.'
+      return 'The dependency has been deleted or its health status cannot be determined.'
   }
 }
 

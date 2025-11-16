@@ -252,8 +252,7 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable, HasWorkspace
         {
             // TODO: move update successor link to it's own method
             existingLink.Update(createdById, existingLink.RemovedById, comment);
-            existingLink.UpdateSourceInfo(sourceInfo, now);
-            existingLink.UpdateTargetInfo(targetInfo, now);
+            existingLink.UpdateSourceAndTargetInfo(sourceInfo, targetInfo, now);
         }
         else
         {

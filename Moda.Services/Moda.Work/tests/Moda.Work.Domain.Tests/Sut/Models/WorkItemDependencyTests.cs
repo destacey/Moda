@@ -183,7 +183,7 @@ public class WorkItemDependencyTests
         Assert.Null(dep.SourcePlannedOn);
         Assert.Null(dep.TargetPlannedOn);
 
-        // Act: update both planned dates (source before target)
+        // Act: update both planned dates (source before target) using the combined method
         var sourcePlannedOn = now.Plus(Duration.FromDays(5));
         var targetPlannedOn = now.Plus(Duration.FromDays(10));
         var sourceInfo = new DependencyWorkItemInfo
@@ -198,8 +198,7 @@ public class WorkItemDependencyTests
             StatusCategory = WorkStatusCategory.Active,
             PlannedOn = targetPlannedOn
         };
-        dep.UpdateSourceInfo(sourceInfo, now);
-        dep.UpdateTargetInfo(targetInfo, now);
+        dep.UpdateSourceAndTargetInfo(sourceInfo, targetInfo, now);
 
         // Assert: both dates updated and health is Healthy
         Assert.Equal(DependencyPlanningHealth.Healthy, dep.Health);
@@ -221,7 +220,7 @@ public class WorkItemDependencyTests
 
         Assert.Equal(DependencyPlanningHealth.Healthy, dep.Health);
 
-        // Act: update to unhealthy configuration (source after target)
+        // Act: update to unhealthy configuration (source after target) using the combined method
         var newSourcePlannedOn = now.Plus(Duration.FromDays(15));
         var newTargetPlannedOn = now.Plus(Duration.FromDays(7));
         var sourceInfo = new DependencyWorkItemInfo
@@ -236,8 +235,7 @@ public class WorkItemDependencyTests
             StatusCategory = WorkStatusCategory.Active,
             PlannedOn = newTargetPlannedOn
         };
-        dep.UpdateSourceInfo(sourceInfo, now);
-        dep.UpdateTargetInfo(targetInfo, now);
+        dep.UpdateSourceAndTargetInfo(sourceInfo, targetInfo, now);
 
         // Assert: health is now Unhealthy
         Assert.Equal(DependencyPlanningHealth.Unhealthy, dep.Health);
@@ -259,7 +257,7 @@ public class WorkItemDependencyTests
 
         Assert.Equal(DependencyPlanningHealth.Healthy, dep.Health);
 
-        // Act: clear both planned dates
+        // Act: clear both planned dates using the combined method
         var sourceInfo = new DependencyWorkItemInfo
         {
             WorkItemId = source.Id,
@@ -272,8 +270,7 @@ public class WorkItemDependencyTests
             StatusCategory = WorkStatusCategory.Active,
             PlannedOn = null
         };
-        dep.UpdateSourceInfo(sourceInfo, now);
-        dep.UpdateTargetInfo(targetInfo, now);
+        dep.UpdateSourceAndTargetInfo(sourceInfo, targetInfo, now);
 
         // Assert: health is AtRisk when both are unplanned
         Assert.Equal(DependencyPlanningHealth.AtRisk, dep.Health);
@@ -307,6 +304,168 @@ public class WorkItemDependencyTests
         Assert.Equal(DependencyPlanningHealth.Healthy, dep.Health);
         Assert.Equal(sourcePlannedOn, dep.SourcePlannedOn);
         Assert.Null(dep.TargetPlannedOn);
+    }
+
+    [Fact]
+    public void UpdateSourceAndTargetInfo_WithInvalidSourceId_ReturnsFailure()
+    {
+        // Arrange
+        var now = _dateTimeProvider.Now;
+
+        var source = _workItemFaker.WithData(statusCategory: WorkStatusCategory.Active).Generate();
+        var target = _workItemFaker.WithData(statusCategory: WorkStatusCategory.Active).Generate();
+        var dep = _dependencyFaker.WithData(source: source, target: target, createdOn: now).Generate();
+
+        // Act: use wrong source ID
+        var sourceInfo = new DependencyWorkItemInfo
+        {
+            WorkItemId = Guid.NewGuid(), // Wrong ID
+            StatusCategory = WorkStatusCategory.Active,
+            PlannedOn = now.Plus(Duration.FromDays(5))
+        };
+        var targetInfo = new DependencyWorkItemInfo
+        {
+            WorkItemId = target.Id,
+            StatusCategory = WorkStatusCategory.Active,
+            PlannedOn = now.Plus(Duration.FromDays(10))
+        };
+        var result = dep.UpdateSourceAndTargetInfo(sourceInfo, targetInfo, now);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Contains("does not match existing SourceId", result.Error);
+    }
+
+    [Fact]
+    public void UpdateSourceAndTargetInfo_WithInvalidTargetId_ReturnsFailure()
+    {
+        // Arrange
+        var now = _dateTimeProvider.Now;
+
+        var source = _workItemFaker.WithData(statusCategory: WorkStatusCategory.Active).Generate();
+        var target = _workItemFaker.WithData(statusCategory: WorkStatusCategory.Active).Generate();
+        var dep = _dependencyFaker.WithData(source: source, target: target, createdOn: now).Generate();
+
+        // Act: use wrong target ID
+        var sourceInfo = new DependencyWorkItemInfo
+        {
+            WorkItemId = source.Id,
+            StatusCategory = WorkStatusCategory.Active,
+            PlannedOn = now.Plus(Duration.FromDays(5))
+        };
+        var targetInfo = new DependencyWorkItemInfo
+        {
+            WorkItemId = Guid.NewGuid(), // Wrong ID
+            StatusCategory = WorkStatusCategory.Active,
+            PlannedOn = now.Plus(Duration.FromDays(10))
+        };
+        var result = dep.UpdateSourceAndTargetInfo(sourceInfo, targetInfo, now);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Contains("does not match existing TargetId", result.Error);
+    }
+
+    [Fact]
+    public void UpdateSourceAndTargetInfo_ChangingStatusCategory_UpdatesStateAndHealth()
+    {
+        // Arrange: start with both active
+        var now = _dateTimeProvider.Now;
+
+        var source = _workItemFaker.WithData(statusCategory: WorkStatusCategory.Active).Generate();
+        var target = _workItemFaker.WithData(statusCategory: WorkStatusCategory.Active).Generate();
+        var dep = _dependencyFaker.WithData(source: source, target: target, createdOn: now).Generate();
+
+        Assert.Equal(DependencyState.InProgress, dep.State);
+
+        // Act: mark source as Done
+        var sourceInfo = new DependencyWorkItemInfo
+        {
+            WorkItemId = source.Id,
+            StatusCategory = WorkStatusCategory.Done,
+            PlannedOn = null
+        };
+        var targetInfo = new DependencyWorkItemInfo
+        {
+            WorkItemId = target.Id,
+            StatusCategory = WorkStatusCategory.Active,
+            PlannedOn = null
+        };
+        dep.UpdateSourceAndTargetInfo(sourceInfo, targetInfo, now);
+
+        // Assert: state should be Done and health should be Healthy
+        Assert.Equal(DependencyState.Done, dep.State);
+        Assert.Equal(DependencyPlanningHealth.Healthy, dep.Health);
+    }
+
+    [Fact]
+    public void UpdateSourceInfo_WithRecalculateFalse_DoesNotRecalculate()
+    {
+        // Arrange: start with unhealthy (predecessor after successor)
+        var now = _dateTimeProvider.Now;
+
+        var source = _workItemFaker.WithData(statusCategory: WorkStatusCategory.Active).Generate();
+        var target = _workItemFaker.WithData(statusCategory: WorkStatusCategory.Active).Generate();
+        var sourcePlannedOn = now.Plus(Duration.FromDays(10));
+        var targetPlannedOn = now.Plus(Duration.FromDays(5));
+        var dep = _dependencyFaker.WithData(source: source, target: target, sourcePlannedOn: sourcePlannedOn, targetPlannedOn: targetPlannedOn, createdOn: now).Generate();
+
+        Assert.Equal(DependencyPlanningHealth.Unhealthy, dep.Health);
+
+        // Act: update source to earlier date but skip recalculation
+        var newSourcePlannedOn = now.Plus(Duration.FromDays(1));
+        var sourceInfo = new DependencyWorkItemInfo
+        {
+            WorkItemId = source.Id,
+            StatusCategory = WorkStatusCategory.Active,
+            PlannedOn = newSourcePlannedOn
+        };
+        dep.UpdateSourceInfo(sourceInfo, now, recalculate: false);
+
+        // Assert: source is updated but health is NOT recalculated yet (still Unhealthy)
+        Assert.Equal(newSourcePlannedOn, dep.SourcePlannedOn);
+        Assert.Equal(DependencyPlanningHealth.Unhealthy, dep.Health);
+
+        // Act: now manually recalculate
+        dep.CalculateStateAndHealth(now);
+
+        // Assert: health is now Healthy
+        Assert.Equal(DependencyPlanningHealth.Healthy, dep.Health);
+    }
+
+    [Fact]
+    public void UpdateTargetInfo_WithRecalculateFalse_DoesNotRecalculate()
+    {
+        // Arrange: start with unhealthy (predecessor after successor)
+        var now = _dateTimeProvider.Now;
+
+        var source = _workItemFaker.WithData(statusCategory: WorkStatusCategory.Active).Generate();
+        var target = _workItemFaker.WithData(statusCategory: WorkStatusCategory.Active).Generate();
+        var sourcePlannedOn = now.Plus(Duration.FromDays(10));
+        var targetPlannedOn = now.Plus(Duration.FromDays(5));
+        var dep = _dependencyFaker.WithData(source: source, target: target, sourcePlannedOn: sourcePlannedOn, targetPlannedOn: targetPlannedOn, createdOn: now).Generate();
+
+        Assert.Equal(DependencyPlanningHealth.Unhealthy, dep.Health);
+
+        // Act: update target to later date but skip recalculation
+        var newTargetPlannedOn = now.Plus(Duration.FromDays(15));
+        var targetInfo = new DependencyWorkItemInfo
+        {
+            WorkItemId = target.Id,
+            StatusCategory = WorkStatusCategory.Active,
+            PlannedOn = newTargetPlannedOn
+        };
+        dep.UpdateTargetInfo(targetInfo, now, recalculate: false);
+
+        // Assert: target is updated but health is NOT recalculated yet (still Unhealthy)
+        Assert.Equal(newTargetPlannedOn, dep.TargetPlannedOn);
+        Assert.Equal(DependencyPlanningHealth.Unhealthy, dep.Health);
+
+        // Act: now manually recalculate
+        dep.CalculateStateAndHealth(now);
+
+        // Assert: health is now Healthy
+        Assert.Equal(DependencyPlanningHealth.Healthy, dep.Health);
     }
 
     [Fact]

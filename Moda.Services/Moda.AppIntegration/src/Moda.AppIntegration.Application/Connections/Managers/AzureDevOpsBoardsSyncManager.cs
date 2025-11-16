@@ -240,6 +240,13 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
                                 }
                             }
                         }
+
+                        var processDependenciesResult = await _sender.Send(new ProcessDependenciesCommand(connection.SystemId!), cancellationToken);
+                        if (processDependenciesResult.IsFailure)
+                        {
+                            _logger.LogError("An error occurred while processing dependencies for Azure DevOps connection {ConnectionId}. Error: {Error}", connection, processDependenciesResult.Error);
+                            continue;
+                        }
                     }
                 }
 

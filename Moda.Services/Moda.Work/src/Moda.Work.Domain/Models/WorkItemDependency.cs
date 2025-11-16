@@ -35,6 +35,21 @@ public sealed class WorkItemDependency : WorkItemLink
 
     public DependencyPlanningHealth Health { get; private set; }
 
+    public Result UpdateSourceAndTargetInfo(DependencyWorkItemInfo sourceInfo, DependencyWorkItemInfo targetInfo, Instant now)
+    {
+        var sourceResult = UpdateSourceInfo(sourceInfo, now, false);
+        if (sourceResult.IsFailure)
+            return sourceResult;
+
+        var targetResult = UpdateTargetInfo(targetInfo, now, false);
+        if (targetResult.IsFailure)
+            return targetResult;
+
+        CalculateStateAndHealth(now);
+
+        return Result.Success();
+    }
+
     /// <summary>
     /// Updates the source information for the current object based on the provided work item details.
     /// </summary>
@@ -43,9 +58,10 @@ public sealed class WorkItemDependency : WorkItemLink
     /// <paramref name="now"/> timestamp.</remarks>
     /// <param name="sourceInfo">The source work item information containing the updated details.</param>
     /// <param name="now">The current timestamp used to recalculate derived values.</param>
+    /// <param name="recalculate">Whether to recalculate state and health. Default is true.</param>
     /// <returns>A <see cref="Result"/> indicating the success or failure of the operation.  Returns a failure result if the
     /// <paramref name="sourceInfo"/> does not match the current source identifier.</returns>
-    public Result UpdateSourceInfo(DependencyWorkItemInfo sourceInfo, Instant now)
+    public Result UpdateSourceInfo(DependencyWorkItemInfo sourceInfo, Instant now, bool recalculate = true)
     {
         Guard.Against.Null(sourceInfo);
 
@@ -56,7 +72,10 @@ public sealed class WorkItemDependency : WorkItemLink
         SourcePlannedOn = sourceInfo.PlannedOn;
 
         // recompute derived values
-        CalculateStateAndHealth(now);
+        if (recalculate)
+        {
+            CalculateStateAndHealth(now);
+        }
 
         return Result.Success();
     }
@@ -67,9 +86,10 @@ public sealed class WorkItemDependency : WorkItemLink
     /// <param name="targetInfo">The updated information for the target, including its status category and planned date. Cannot be <see
     /// langword="null"/>.</param>
     /// <param name="now">The current timestamp used for recalculating derived values.</param>
+    /// <param name="recalculate">Whether to recalculate state and health. Default is true.</param>
     /// <returns>A <see cref="Result"/> indicating the outcome of the operation. Returns a failure result if the <paramref
     /// name="targetInfo"/> does not match the existing target identifier; otherwise, returns a success result.</returns>
-    public Result UpdateTargetInfo(DependencyWorkItemInfo targetInfo, Instant now)
+    public Result UpdateTargetInfo(DependencyWorkItemInfo targetInfo, Instant now, bool recalculate = true)
     {
         Guard.Against.Null(targetInfo);
 
@@ -80,7 +100,10 @@ public sealed class WorkItemDependency : WorkItemLink
         TargetPlannedOn = targetInfo.PlannedOn;
 
         // recompute derived values
-        CalculateStateAndHealth(now);
+        if (recalculate)
+        {
+            CalculateStateAndHealth(now);
+        }
 
         return Result.Success();
     }
