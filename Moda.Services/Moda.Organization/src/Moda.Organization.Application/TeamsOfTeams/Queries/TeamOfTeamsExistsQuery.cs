@@ -15,16 +15,13 @@ public sealed record TeamOfTeamsExistsQuery : IQuery<bool>
     public int? TeamKey { get; }
 }
 
-internal sealed class TeamOfTeamsExistsQueryHandler : IQueryHandler<TeamOfTeamsExistsQuery, bool>
+internal sealed class TeamOfTeamsExistsQueryHandler(
+    IOrganizationDbContext organizationDbContext, 
+    ILogger<TeamOfTeamsExistsQueryHandler> logger) 
+    : IQueryHandler<TeamOfTeamsExistsQuery, bool>
 {
-    private readonly IOrganizationDbContext _organizationDbContext;
-    private readonly ILogger<TeamOfTeamsExistsQueryHandler> _logger;
-
-    public TeamOfTeamsExistsQueryHandler(IOrganizationDbContext organizationDbContext, ILogger<TeamOfTeamsExistsQueryHandler> logger)
-    {
-        _organizationDbContext = organizationDbContext;
-        _logger = logger;
-    }
+    private readonly IOrganizationDbContext _organizationDbContext = organizationDbContext;
+    private readonly ILogger<TeamOfTeamsExistsQueryHandler> _logger = logger;
 
     public async Task<bool> Handle(TeamOfTeamsExistsQuery request, CancellationToken cancellationToken)
     {

@@ -2,6 +2,7 @@
 using Mapster;
 using Moda.Organization.Application.Models;
 using NodaTime;
+using System.Linq;
 
 namespace Moda.Organization.Application.Teams.Dtos;
 public sealed record TeamDetailsDto : IMapFrom<BaseTeam>
@@ -62,11 +63,31 @@ public sealed record TeamDetailsDto : IMapFrom<BaseTeam>
     /// </summary>
     public TeamNavigationDto? TeamOfTeams { get; set; }
 
-    public void ConfigureMapping(TypeAdapterConfig config)
+    /// <summary>
+    /// Create a TypeAdapterConfig configured to map BaseTeam -> TeamDetailsDto using the provided
+    /// asOf date to select the appropriate parent membership. Callers can pass this config to
+    /// ProjectToType to perform an EF-friendly projection that uses a captured constant date.
+    /// </summary>
+    public static TypeAdapterConfig CreateTypeAdapterConfig(LocalDate asOf)
     {
-        config.NewConfig<BaseTeam, TeamDetailsDto>()
+        var cfg = new TypeAdapterConfig();
+
+        cfg.NewConfig<BaseTeam, TeamDetailsDto>()
+            .Map(dest => dest.Id, src => src.Id)
+            .Map(dest => dest.Key, src => src.Key)
+            .Map(dest => dest.Name, src => src.Name)
             .Map(dest => dest.Code, src => src.Code.Value)
+            .Map(dest => dest.Description, src => src.Description)
             .Map(dest => dest.Type, src => src.Type.GetDisplayName())
-            .Map(dest => dest.TeamOfTeams, src => src.ParentMemberships == null ? null : src.ParentMemberships.FirstOrDefault()!.Target);
+            .Map(dest => dest.ActiveDate, src => src.ActiveDate)
+            .Map(dest => dest.InactiveDate, src => src.InactiveDate)
+            .Map(dest => dest.IsActive, src => src.IsActive)
+            .Map(dest => dest.TeamOfTeams,
+                 src => src.ParentMemberships
+                            .Where(m => m.DateRange.Start <= asOf && (m.DateRange.End == null || m.DateRange.End >= asOf))
+                            .Select(m => m.Target)
+                            .FirstOrDefault());
+
+        return cfg;
     }
 }

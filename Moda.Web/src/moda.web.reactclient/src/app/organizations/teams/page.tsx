@@ -38,13 +38,27 @@ const TeamListPage = () => {
   const columnDefs = useMemo<ColDef<TeamListItem>[]>(
     () => [
       { field: 'key', width: 90 },
-      { field: 'name', cellRenderer: TeamNameLinkCellRenderer },
+      {
+        field: 'name',
+        cellRenderer: TeamNameLinkCellRenderer,
+        width: 250,
+        comparator: (valueA, valueB) => {
+          return valueA.toLowerCase().localeCompare(valueB.toLowerCase())
+        },
+      },
       { field: 'code', width: 125 },
       { field: 'type' },
       {
         field: 'teamOfTeams.name',
         headerName: 'Team of Teams',
         cellRenderer: NestedTeamOfTeamsNameLinkCellRenderer,
+        width: 250,
+        comparator: (valueA, valueB) => {
+          if (!valueA && !valueB) return 0
+          if (!valueA) return 1
+          if (!valueB) return -1
+          return valueA.toLowerCase().localeCompare(valueB.toLowerCase())
+        },
       },
       { field: 'isActive' }, // TODO: convert to yes/no
     ],
@@ -102,6 +116,11 @@ const TeamListPage = () => {
           refetch()
         }}
         loading={isLoading}
+        initialState={{
+          sort: {
+            sortModel: [{ colId: 'name', sort: 'asc' }],
+          },
+        }}
       />
       {isInEditMode && <ModalCreateTeamForm />}
     </>
