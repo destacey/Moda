@@ -237,21 +237,23 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable, HasWorkspace
         return Result.Success();
     }
 
-    public Result AddSuccessorLink(Guid targetId, Instant? targetPlannedDate, Instant createdOn, Guid? createdById, string? comment, Instant now)
+    public Result AddSuccessorLink(DependencyWorkItemInfo targetInfo, Instant createdOn, Guid? createdById, string? comment, Instant now)
     {
-        if (Id == targetId)
+        if (Id == targetInfo.WorkItemId)
         {
             return Result.Failure("A work item cannot be linked to itself.");
         }
 
-        var existingLink = _outboundDependencyHistory.FirstOrDefault(x => x.TargetId == targetId 
+        var sourceInfo = DependencyWorkItemInfo.Create(this);
+
+        var existingLink = _outboundDependencyHistory.FirstOrDefault(x => x.TargetId == targetInfo.WorkItemId
             && x.CreatedOn == createdOn);
         if (existingLink is not null)
         {
             // TODO: move update successor link to it's own method
             existingLink.Update(createdById, existingLink.RemovedById, comment);
-            existingLink.UpdateSourceDetails(StatusCategory, null, now);
-            existingLink.UpdateTargetPlannedDate(targetPlannedDate, now);
+            existingLink.UpdateSourceInfo(sourceInfo, now);
+            existingLink.UpdateTargetInfo(targetInfo, now);
         }
         else
         {
@@ -259,7 +261,7 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable, HasWorkspace
                 ? Iteration.DateRange.End
                 : null;
 
-            var newLink = WorkItemDependency.Create(Id, targetId, StatusCategory, iterationEndDate, targetPlannedDate, createdOn, createdById, null, null, comment, now);
+            var newLink = WorkItemDependency.Create(sourceInfo, targetInfo, createdOn, createdById, null, null, comment, now);
             _outboundDependencyHistory.Add(newLink);
         }
 

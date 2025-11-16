@@ -15,5 +15,8 @@ public enum DependencyState
     Done = 3,
 
     [Display(Name = "Removed", Description = "The dependency has been removed from consideration.", Order = 4)]
-    Removed = 4
+    Removed = 4,
+
+    [Display(Name = "Deleted", Description = "The dependency has been deleted.", Order = 5)]
+    Deleted = 5
 }

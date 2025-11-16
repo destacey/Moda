@@ -33,11 +33,11 @@ public abstract class WorkItemLink : BaseEntity<Guid>, ISystemAuditable
 
     public Guid SourceId { get; private init; }
     
-    public WorkItem? Source { get; private set; }
+    public WorkItem? Source { get; protected set; }
     
     public Guid TargetId { get; private init; }
     
-    public WorkItem? Target { get; private set; }
+    public WorkItem? Target { get; protected set; }
     
     public WorkItemLinkType LinkType { get; private set; }
     

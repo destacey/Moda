@@ -100,4 +100,61 @@ public static class WorkItemFakerExtensions
 
         return faker;
     }
+
+    /// <summary>
+    /// Creates a work item that hasn't started yet (Proposed status category with no activated or done timestamps).
+    /// </summary>
+    public static WorkItemFaker WithProposedState(this WorkItemFaker faker)
+    {
+        var workStatus = new WorkStatusFaker().WithData(name: "To Do").Generate();
+
+        faker.RuleFor(x => x.StatusCategory, WorkStatusCategory.Proposed);
+        faker.RuleFor(x => x.StatusId, workStatus.Id);
+        faker.RuleFor(x => x.Status, workStatus);
+        faker.RuleFor(x => x.ActivatedTimestamp, (Instant?)null);
+        faker.RuleFor(x => x.DoneTimestamp, (Instant?)null);
+
+        return faker;
+    }
+
+    /// <summary>
+    /// Creates a work item that is currently in progress (Active status category with activated timestamp set and no done timestamp).
+    /// </summary>
+    /// <param name="faker"></param>
+    /// <returns></returns>
+    public static WorkItemFaker WithActiveState(this WorkItemFaker faker)
+    {
+        var workStatus = new WorkStatusFaker().WithData(name: "In Progress").Generate();
+        var created = faker.Generate().Created;
+        var activated = created.Plus(Duration.FromDays(1));
+
+        faker.RuleFor(x => x.StatusCategory, WorkStatusCategory.Active);
+        faker.RuleFor(x => x.StatusId, workStatus.Id);
+        faker.RuleFor(x => x.Status, workStatus);
+        faker.RuleFor(x => x.ActivatedTimestamp, activated);
+        faker.RuleFor(x => x.DoneTimestamp, (Instant?)null);
+
+        return faker;
+    }
+
+    /// <summary>
+    /// Creates a work item that has been completed (Done status category with both activated and done timestamps set).
+    /// </summary>
+    /// <param name="faker"></param>
+    /// <returns></returns>
+    public static WorkItemFaker WithDoneState(this WorkItemFaker faker)
+    {
+        var workStatus = new WorkStatusFaker().WithData(name: "Done").Generate();
+        var created = faker.Generate().Created;
+        var activated = created.Plus(Duration.FromDays(1));
+        var done = activated.Plus(Duration.FromDays(3));
+
+        faker.RuleFor(x => x.StatusCategory, WorkStatusCategory.Done);
+        faker.RuleFor(x => x.StatusId, workStatus.Id);
+        faker.RuleFor(x => x.Status, workStatus);
+        faker.RuleFor(x => x.ActivatedTimestamp, activated);
+        faker.RuleFor(x => x.DoneTimestamp, done);
+
+        return faker;
+    }
 }

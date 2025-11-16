@@ -6,13 +6,15 @@ public sealed record SyncWorkIterationsCommand(IEnumerable<ISimpleIteration> Ite
 
 internal sealed class SyncWorkIterationsCommandHandler(
     IWorkDbContext workDbContext,
-    ILogger<SyncWorkIterationsCommandHandler> logger)
+    ILogger<SyncWorkIterationsCommandHandler> logger,
+    IDateTimeProvider dateTimeProvider)
     : ICommandHandler<SyncWorkIterationsCommand>
 {
     private const string AppRequestName = nameof(SyncWorkIterationsCommand);
 
     private readonly IWorkDbContext _workDbContext = workDbContext;
     private readonly ILogger<SyncWorkIterationsCommandHandler> _logger = logger;
+    private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
 
     public async Task<Result> Handle(SyncWorkIterationsCommand request, CancellationToken cancellationToken)
     {
@@ -23,6 +25,8 @@ internal sealed class SyncWorkIterationsCommandHandler(
                 _logger.LogInformation("No iterations to sync.");
                 return Result.Success();
             }
+
+            var now = _dateTimeProvider.Now;
 
             int createCount = 0;
             int updateCount = 0;
@@ -60,7 +64,7 @@ internal sealed class SyncWorkIterationsCommandHandler(
                     if (_logger.IsEnabled(LogLevel.Debug))
                         _logger.LogDebug("Updating existing Work iteration {IterationId}.", iteration.Id);
 
-                    var result = existingIteration.Update(iteration);
+                    var result = existingIteration.Update(iteration, now);
                     if (result.IsFailure)
                     {
                         _logger.LogWarning("Failed to update Work iteration {IterationId}: {ErrorMessage}.", iteration.Id, result.Error);

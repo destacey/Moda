@@ -13,8 +13,8 @@ using Moda.Infrastructure.Persistence.Context;
 namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 {
     [DbContext(typeof(ModaDbContext))]
-    [Migration("20251115020136_Add-State-And-Health-To-Dependency")]
-    partial class AddStateAndHealthToDependency
+    [Migration("20251116164627_Add-Dependency-State-And-Health")]
+    partial class AddDependencyStateAndHealth
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -3523,26 +3523,23 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                 {
                     b.HasBaseType("Moda.Work.Domain.Models.WorkItemLink");
 
-                    b.Property<string>("Health")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("varchar");
+                    b.Property<int>("Health")
+                        .HasColumnType("int");
 
                     b.Property<DateTime?>("SourcePlannedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("SourceWorkStatusCategory")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("varchar");
+                    b.Property<int>("SourceStatusCategory")
+                        .HasColumnType("int");
 
-                    b.Property<string>("State")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("varchar");
+                    b.Property<int>("State")
+                        .HasColumnType("int");
 
                     b.Property<DateTime?>("TargetPlannedOn")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("TargetStatusCategory")
+                        .HasColumnType("int");
 
                     b.HasDiscriminator().HasValue("Dependency");
                 });
