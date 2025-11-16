@@ -202,7 +202,7 @@ const SprintMetrics: FC<SprintMetricsProps> = ({ sprint, backlog }) => {
             />
           </Col>
         )}
-        {averageCycleTime && (
+        {averageCycleTime !== null && (
           <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
             <MetricCard
               title="Avg Cycle Time"
