@@ -18,16 +18,13 @@ public sealed record GetTeamOfTeamsNavigationQuery : IQuery<TeamNavigationDto?>
     public int? TeamKey { get; }
 }
 
-internal sealed class GetTeamOfTeamsNavigationQueryHandler : IQueryHandler<GetTeamOfTeamsNavigationQuery, TeamNavigationDto?>
+internal sealed class GetTeamOfTeamsNavigationQueryHandler(
+    IOrganizationDbContext organizationDbContext, 
+    ILogger<GetTeamOfTeamsNavigationQueryHandler> logger) 
+    : IQueryHandler<GetTeamOfTeamsNavigationQuery, TeamNavigationDto?>
 {
-    private readonly IOrganizationDbContext _organizationDbContext;
-    private readonly ILogger<GetTeamOfTeamsNavigationQueryHandler> _logger;
-
-    public GetTeamOfTeamsNavigationQueryHandler(IOrganizationDbContext organizationDbContext, ILogger<GetTeamOfTeamsNavigationQueryHandler> logger)
-    {
-        _organizationDbContext = organizationDbContext;
-        _logger = logger;
-    }
+    private readonly IOrganizationDbContext _organizationDbContext = organizationDbContext;
+    private readonly ILogger<GetTeamOfTeamsNavigationQueryHandler> _logger = logger;
 
     public async Task<TeamNavigationDto?> Handle(GetTeamOfTeamsNavigationQuery request, CancellationToken cancellationToken)
     {

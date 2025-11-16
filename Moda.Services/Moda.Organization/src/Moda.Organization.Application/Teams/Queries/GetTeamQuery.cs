@@ -17,24 +17,19 @@ public sealed record GetTeamQuery : IQuery<TeamDetailsDto?>
     public int? TeamKey { get; }
 }
 
-internal sealed class GetTeamQueryHandler : IQueryHandler<GetTeamQuery, TeamDetailsDto?>
+internal sealed class GetTeamQueryHandler(
+    IOrganizationDbContext organizationDbContext, 
+    ILogger<GetTeamQueryHandler> logger, 
+    IDateTimeProvider dateTimeProvider) 
+    : IQueryHandler<GetTeamQuery, TeamDetailsDto?>
 {
-    private readonly IOrganizationDbContext _organizationDbContext;
-    private readonly ILogger<GetTeamQueryHandler> _logger;
-    private readonly IDateTimeProvider _dateTimeProvider;
-
-    public GetTeamQueryHandler(IOrganizationDbContext organizationDbContext, ILogger<GetTeamQueryHandler> logger, IDateTimeProvider dateTimeProvider)
-    {
-        _organizationDbContext = organizationDbContext;
-        _logger = logger;
-        _dateTimeProvider = dateTimeProvider;
-    }
+    private readonly IOrganizationDbContext _organizationDbContext = organizationDbContext;
+    private readonly ILogger<GetTeamQueryHandler> _logger = logger;
+    private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
 
     public async Task<TeamDetailsDto?> Handle(GetTeamQuery request, CancellationToken cancellationToken)
     {
-        var today = _dateTimeProvider.Now.InUtc().Date;
         var query = _organizationDbContext.Teams
-            .Include(t => t.ParentMemberships.Where(m => m.DateRange.Start <= today && (!m.DateRange.End.HasValue || today <= m.DateRange.End)))
             .AsQueryable();
 
         if (request.TeamId.HasValue)
@@ -54,9 +49,11 @@ internal sealed class GetTeamQueryHandler : IQueryHandler<GetTeamQuery, TeamDeta
             throw exception;
         }
 
+        var today = _dateTimeProvider.Now.InUtc().Date;
+        var cfg = TeamDetailsDto.CreateTypeAdapterConfig(today);
+
         return await query
-            .AsNoTrackingWithIdentityResolution()
-            .ProjectToType<TeamDetailsDto>()
+            .ProjectToType<TeamDetailsDto>(cfg)
             .FirstOrDefaultAsync(cancellationToken);
     }
 }

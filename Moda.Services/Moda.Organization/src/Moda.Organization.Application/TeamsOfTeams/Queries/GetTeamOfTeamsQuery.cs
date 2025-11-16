@@ -17,24 +17,19 @@ public sealed record GetTeamOfTeamsQuery : IQuery<TeamOfTeamsDetailsDto?>
     public int? TeamOfTeamsKey { get; }
 }
 
-internal sealed class GetTeamOfTeamsQueryHandler : IQueryHandler<GetTeamOfTeamsQuery, TeamOfTeamsDetailsDto?>
+internal sealed class GetTeamOfTeamsQueryHandler(
+    IOrganizationDbContext organizationDbContext, 
+    ILogger<GetTeamOfTeamsQueryHandler> logger, 
+    IDateTimeProvider dateTimeProvider) 
+    : IQueryHandler<GetTeamOfTeamsQuery, TeamOfTeamsDetailsDto?>
 {
-    private readonly IOrganizationDbContext _organizationDbContext;
-    private readonly ILogger<GetTeamOfTeamsQueryHandler> _logger;
-    private readonly IDateTimeProvider _dateTimeProvider;
-
-    public GetTeamOfTeamsQueryHandler(IOrganizationDbContext organizationDbContext, ILogger<GetTeamOfTeamsQueryHandler> logger, IDateTimeProvider dateTimeProvider)
-    {
-        _organizationDbContext = organizationDbContext;
-        _logger = logger;
-        _dateTimeProvider = dateTimeProvider;
-    }
+    private readonly IOrganizationDbContext _organizationDbContext = organizationDbContext;
+    private readonly ILogger<GetTeamOfTeamsQueryHandler> _logger = logger;
+    private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
 
     public async Task<TeamOfTeamsDetailsDto?> Handle(GetTeamOfTeamsQuery request, CancellationToken cancellationToken)
     {
-        var today = _dateTimeProvider.Now.InUtc().Date;
         var query = _organizationDbContext.TeamOfTeams
-            .Include(t => t.ParentMemberships.Where(m => m.DateRange.Start <= today && (!m.DateRange.End.HasValue || today <= m.DateRange.End)))
             .AsQueryable();
 
         if (request.TeamOfTeamsId.HasValue)
@@ -54,9 +49,12 @@ internal sealed class GetTeamOfTeamsQueryHandler : IQueryHandler<GetTeamOfTeamsQ
             throw exception;
         }
 
+        var today = _dateTimeProvider.Now.InUtc().Date;
+        var cfg = TeamOfTeamsDetailsDto.CreateTypeAdapterConfig(today);
+
         return await query
             .AsNoTrackingWithIdentityResolution()
-            .ProjectToType<TeamOfTeamsDetailsDto>()
+            .ProjectToType<TeamOfTeamsDetailsDto>(cfg)
             .FirstOrDefaultAsync(cancellationToken);
     }
 }
