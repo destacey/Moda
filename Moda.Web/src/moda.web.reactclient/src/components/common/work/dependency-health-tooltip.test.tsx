@@ -17,7 +17,7 @@ describe('DependencyHealthTooltip', () => {
       await user.hover(content)
 
       const tooltip = await screen.findByText(
-        'Either the predecessor is done, or is planned to complete on or before the successor.',
+        'The predecessor is done, planned with no successor plan, or is planned to complete on or before the successor.',
       )
       expect(tooltip).toBeInTheDocument()
     })
@@ -34,7 +34,7 @@ describe('DependencyHealthTooltip', () => {
       await user.hover(content)
 
       const tooltip = await screen.findByText(
-        'Neither the predecessor nor successor have future planned dates.',
+        'Neither the predecessor nor successor have future planned dates. Sprints in the past are not considered for date comparisons.',
       )
       expect(tooltip).toBeInTheDocument()
     })
@@ -51,7 +51,7 @@ describe('DependencyHealthTooltip', () => {
       await user.hover(content)
 
       const tooltip = await screen.findByText(
-        'Either the predecessor was removed, or is planned to complete after the successor needs it.',
+        'The predecessor was removed, is planned to complete after the successor needs it, or the successor is done or removed.',
       )
       expect(tooltip).toBeInTheDocument()
     })
