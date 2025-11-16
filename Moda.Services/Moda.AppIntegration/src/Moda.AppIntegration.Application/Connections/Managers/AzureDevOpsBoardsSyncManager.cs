@@ -232,6 +232,11 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
                                         _logger.LogError(ex, "A validation exception occurred while syncing Azure DevOps Boards workspace {WorkspaceId} work items.", workspaceId);
                                         continue;
                                     }
+                                    catch (OperationCanceledException)
+                                    {
+                                        _logger.LogInformation("Sync operation was canceled while syncing Azure DevOps Boards workspace {WorkspaceId} work items.", workspace.IntegrationState!.InternalId);
+                                        throw;
+                                    }
                                     catch (Exception ex)
                                     {
                                         _logger.LogError(ex, "An exception occurred while syncing Azure DevOps Boards workspace {WorkspaceId} work items.", workspace.IntegrationState!.InternalId);

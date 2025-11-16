@@ -256,10 +256,6 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable, HasWorkspace
         }
         else
         {
-            var iterationEndDate = Iteration is not null && Iteration.Type is IterationType.Sprint
-                ? Iteration.DateRange.End
-                : null;
-
             var newLink = WorkItemDependency.Create(sourceInfo, targetInfo, createdOn, createdById, null, null, comment, now);
             _outboundDependencyHistory.Add(newLink);
         }
