@@ -37,7 +37,7 @@ internal sealed class GetTeamOfTeamsListQueryHandler(
         var today = _dateTimeProvider.Now.InUtc().Date;
         var cfg = TeamOfTeamsListDto.CreateTypeAdapterConfig(today);
 
-        return await query.AsNoTrackingWithIdentityResolution()
+        return await query
             .ProjectToType<TeamOfTeamsListDto>(cfg)
             .ToListAsync(cancellationToken);
     }

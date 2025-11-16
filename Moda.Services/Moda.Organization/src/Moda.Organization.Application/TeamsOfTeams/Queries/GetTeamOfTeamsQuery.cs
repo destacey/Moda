@@ -53,7 +53,6 @@ internal sealed class GetTeamOfTeamsQueryHandler(
         var cfg = TeamOfTeamsDetailsDto.CreateTypeAdapterConfig(today);
 
         return await query
-            .AsNoTrackingWithIdentityResolution()
             .ProjectToType<TeamOfTeamsDetailsDto>(cfg)
             .FirstOrDefaultAsync(cancellationToken);
     }
