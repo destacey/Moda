@@ -1,7 +1,5 @@
-﻿using Moda.Common.Application.Interfaces;
-using Moda.Common.Application.Interfaces.ExternalWork;
+﻿using Moda.Common.Application.Interfaces.ExternalWork;
 using Moda.Common.Application.Requests.WorkManagement;
-using Moda.Common.Domain.Enums.Planning;
 using Moda.Work.Application.Persistence;
 
 namespace Moda.Work.Application.WorkItems.Commands;
@@ -231,16 +229,10 @@ internal sealed class SyncExternalWorkItemDependencyChangesCommandHandler(IWorkD
             .Include(wi => wi.Iteration)
             .ToDictionaryAsync(wi => wi.Id, cancellationToken);
 
-
         var targetWorkItemLookup = await _workDbContext.WorkItems
             .Where(wi => targetIds.Contains(wi.Id))
-            .Include(wi => wi.Iteration)
-            .Select(wi => new TargetWorkItemInfo(
-                wi.Id,
-                wi.Iteration != null && wi.Iteration.Type == IterationType.Sprint
-                    ? wi.Iteration.DateRange.End
-                    : (Instant?)null))
-            .ToDictionaryAsync(t => t.WorkItemId, t => t, cancellationToken);
+            .Select(DependencyWorkItemInfo.Projection)
+            .ToDictionaryAsync(t => t.WorkItemId, cancellationToken);
 
         foreach (var link in batch)
         {
@@ -251,10 +243,10 @@ internal sealed class SyncExternalWorkItemDependencyChangesCommandHandler(IWorkD
                 if (link.ChangedOperation.Equals("create", StringComparison.OrdinalIgnoreCase))
                 {
                     // lookup target work item to ensure it exists
-                    // and to obtain the iteration end date (null if iteration type is not Sprint)
-                    if (targetWorkItemLookup.TryGetValue(link.TargetId, out var targetInfo))
+                    // and to obtain the status category and planned date (PlannedOn is set to iteration end date if iteration type is Sprint)
+                    if (targetWorkItemLookup.TryGetValue(link.TargetId, out var target))
                     {
-                        sourceWorkItem.AddSuccessorLink(targetInfo.WorkItemId, targetInfo.IterationEnd, link.ChangedDate, link.ChangedById, link.Comment, now);
+                        sourceWorkItem.AddSuccessorLink(target, link.ChangedDate, link.ChangedById, link.Comment, now);
                     }
                     else
                     {
