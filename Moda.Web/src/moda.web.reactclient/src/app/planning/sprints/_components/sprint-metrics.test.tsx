@@ -238,7 +238,7 @@ describe('SprintMetrics', () => {
       )
     })
 
-    it('calculates average cycle time including removed items', () => {
+    it('calculates average cycle time for done items only, excluding removed items', () => {
       const backlog: SprintBacklogItemDto[] = [
         createBacklogItem({
           statusCategory: { id: WorkStatusCategory.Done, name: 'Done' },
@@ -252,9 +252,9 @@ describe('SprintMetrics', () => {
 
       render(<SprintMetrics sprint={mockSprint} backlog={backlog} />)
 
-      // Average: (6 + 4) / 2 = 5
+      // Average: 6 / 1 = 6 (only Done items, excludes Removed)
       expect(screen.getByTestId('value-Avg Cycle Time')).toHaveTextContent(
-        '5.00',
+        '6.00',
       )
     })
 
@@ -302,7 +302,7 @@ describe('SprintMetrics', () => {
       )
     })
 
-    it('displays N/A when no items have cycle time', () => {
+    it('does not display cycle time metric when no items have cycle time', () => {
       const backlog: SprintBacklogItemDto[] = [
         createBacklogItem({
           statusCategory: { id: WorkStatusCategory.Proposed, name: 'Proposed' },
@@ -316,17 +316,17 @@ describe('SprintMetrics', () => {
 
       render(<SprintMetrics sprint={mockSprint} backlog={backlog} />)
 
-      expect(screen.getByTestId('value-Avg Cycle Time')).toHaveTextContent(
-        'N/A',
-      )
+      expect(
+        screen.queryByTestId('metric-Avg Cycle Time'),
+      ).not.toBeInTheDocument()
     })
 
-    it('displays N/A when backlog is empty', () => {
+    it('does not display cycle time metric when backlog is empty', () => {
       render(<SprintMetrics sprint={mockSprint} backlog={[]} />)
 
-      expect(screen.getByTestId('value-Avg Cycle Time')).toHaveTextContent(
-        'N/A',
-      )
+      expect(
+        screen.queryByTestId('metric-Avg Cycle Time'),
+      ).not.toBeInTheDocument()
     })
 
     it('handles fractional cycle times correctly', () => {

@@ -113,8 +113,7 @@ const SprintMetrics: FC<SprintMetricsProps> = ({ sprint, backlog }) => {
       (item) =>
         item.cycleTime !== null &&
         item.cycleTime !== undefined &&
-        (item.statusCategory.id === WorkStatusCategory.Done ||
-          item.statusCategory.id === WorkStatusCategory.Removed),
+        item.statusCategory.id === WorkStatusCategory.Done,
     )
 
     if (itemsWithCycleTime.length === 0) return null
@@ -203,15 +202,17 @@ const SprintMetrics: FC<SprintMetricsProps> = ({ sprint, backlog }) => {
             />
           </Col>
         )}
-        <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
-          <MetricCard
-            title="Avg Cycle Time"
-            value={averageCycleTime}
-            precision={2}
-            suffix="days"
-            tooltip="The average cycle time of done work items in the sprint (in days). Cycle time measures the time from when work starts (Activated) to when it's completed (Done)."
-          />
-        </Col>
+        {averageCycleTime !== null && (
+          <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
+            <MetricCard
+              title="Avg Cycle Time"
+              value={averageCycleTime}
+              precision={2}
+              suffix="days"
+              tooltip="The average cycle time of done work items in the sprint (in days). Cycle time measures the time from when work starts (Activated) to when it's completed (Done)."
+            />
+          </Col>
+        )}
         {useStoryPoints && (
           <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
             <MetricCard
