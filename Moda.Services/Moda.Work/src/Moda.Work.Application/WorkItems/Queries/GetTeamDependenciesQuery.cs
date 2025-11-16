@@ -5,8 +5,7 @@ using Moda.Work.Application.WorkItems.Dtos;
 
 namespace Moda.Work.Application.WorkItems.Queries;
 
-// TODO: add TeamBoundary
-public sealed record GetTeamDependenciesQuery(Guid TeamId, List<DependencyStatus> DependencyStatuses) : IQuery<List<DependencyDto>?>;
+public sealed record GetTeamDependenciesQuery(Guid TeamId, List<DependencyState> DependencyStatuses) : IQuery<List<DependencyDto>?>;
 
 
 internal sealed class GetTeamDependenciesQueryHandler(IWorkDbContext workDbContext, ILogger<GetTeamDependenciesQueryHandler> logger) : IQueryHandler<GetTeamDependenciesQuery, List<DependencyDto>?>
@@ -30,14 +29,15 @@ internal sealed class GetTeamDependenciesQueryHandler(IWorkDbContext workDbConte
         // convert the dependency statuses to WorkStatusCategory
         var statusCategories = request.DependencyStatuses.Select(d => d.ToWorkStatusCategory()).ToArray();
 
-        var dependencies = await _workDbContext.WorkItemLinks
-            .Where(l => l.LinkType == WorkItemLinkType.Dependency && l.RemovedOn == null)
+        var dependencies = await _workDbContext.WorkItemDependencies
+            .Where(l => l.RemovedOn == null)
             .Where(l => l.Source!.TeamId == request.TeamId || l.Target!.TeamId == request.TeamId)
             .Where(l => statusCategories.Contains(l.Source!.StatusCategory))
             .ProjectToType<DependencyDto>()
             .ToListAsync(cancellationToken);
 
-        _logger.LogDebug("{AppRequestName}: Found {DependencyCount} dependencies for team {TeamId}.", AppRequestName, dependencies.Count, request.TeamId);
+        if (_logger.IsEnabled(LogLevel.Debug))
+            _logger.LogDebug("{AppRequestName}: Found {DependencyCount} dependencies for team {TeamId}.", AppRequestName, dependencies.Count, request.TeamId);
 
         return dependencies;
     }

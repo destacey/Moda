@@ -1,6 +1,7 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
 using Moda.Common.Domain.Employees;
+using Moda.Common.Domain.Enums.Planning;
 using Moda.Common.Domain.Enums.Work;
 using Moda.Work.Domain.Interfaces;
 using NodaTime;
@@ -12,8 +13,10 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable, HasWorkspace
     private WorkItemKey _key = null!;
     private string _title = null!;
     private readonly List<WorkItem> _children = [];
-    private readonly List<WorkItemLink> _outboundLinksHistory = []; // source links
-    private readonly List<WorkItemLink> _inboundLinksHistory = []; // target links
+    private readonly List<WorkItemHierarchy> _outboundHierarchyHistory = []; // source links
+    private readonly List<WorkItemHierarchy> _inboundHierarchyHistory = []; // target links
+    private readonly List<WorkItemDependency> _outboundDependencyHistory = []; // source links
+    private readonly List<WorkItemDependency> _inboundDependencyHistory = []; // target links
     private readonly List<WorkItemReference> _referenceLinks = [];
 
     //private readonly List<WorkItemRevision> _history = [];
@@ -148,8 +151,11 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable, HasWorkspace
 
     public WorkItemExtended? ExtendedProps { get; private set; }
 
-    public IReadOnlyCollection<WorkItemLink> OutboundLinksHistory => _outboundLinksHistory.AsReadOnly();
-    public IReadOnlyCollection<WorkItemLink> InboundLinksHistory => _inboundLinksHistory.AsReadOnly();
+    public IReadOnlyCollection<WorkItemDependency> OutboundDependencies => _outboundDependencyHistory.AsReadOnly();
+    public IReadOnlyCollection<WorkItemDependency> InboundDependencies => _inboundDependencyHistory.AsReadOnly();
+    public IReadOnlyCollection<WorkItemHierarchy> OutboundHierarchies => _outboundHierarchyHistory.AsReadOnly();
+    public IReadOnlyCollection<WorkItemHierarchy> InboundHierarchies => _inboundHierarchyHistory.AsReadOnly();
+
     public IReadOnlyCollection<WorkItemReference> ReferenceLinks => _referenceLinks.AsReadOnly();
 
     /// <summary>
@@ -231,24 +237,27 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable, HasWorkspace
         return Result.Success();
     }
 
-    public Result AddSuccessorLink(Guid targetId, Instant timestamp, Guid? createdById, string? comment)
+    public Result AddSuccessorLink(DependencyWorkItemInfo targetInfo, Instant createdOn, Guid? createdById, string? comment, Instant now)
     {
-        if (Id == targetId)
+        if (Id == targetInfo.WorkItemId)
         {
             return Result.Failure("A work item cannot be linked to itself.");
         }
 
-        var existingLink = _outboundLinksHistory.FirstOrDefault(x => x.TargetId == targetId 
-            && x.LinkType == WorkItemLinkType.Dependency 
-            && x.CreatedOn == timestamp);
+        var sourceInfo = DependencyWorkItemInfo.Create(this);
+
+        var existingLink = _outboundDependencyHistory.FirstOrDefault(x => x.TargetId == targetInfo.WorkItemId
+            && x.CreatedOn == createdOn);
         if (existingLink is not null)
         {
+            // TODO: move update successor link to it's own method
             existingLink.Update(createdById, existingLink.RemovedById, comment);
+            existingLink.UpdateSourceAndTargetInfo(sourceInfo, targetInfo, now);
         }
         else
         {
-            var newLink = WorkItemLink.CreateDependency(Id, targetId, timestamp, createdById, null, null, comment);
-            _outboundLinksHistory.Add(newLink);
+            var newLink = WorkItemDependency.Create(sourceInfo, targetInfo, createdOn, createdById, null, null, comment, now);
+            _outboundDependencyHistory.Add(newLink);
         }
 
         return Result.Success();
@@ -261,8 +270,7 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable, HasWorkspace
             return Result.Failure("A work item cannot be linked to itself.");
         }
 
-        var existingLink = _outboundLinksHistory.FirstOrDefault(x => x.TargetId == targetId
-            && x.LinkType == WorkItemLinkType.Dependency
+        var existingLink = _outboundDependencyHistory.FirstOrDefault(x => x.TargetId == targetId
             && x.RemovedOn == timestamp);
         if (existingLink is not null)
         {
@@ -270,8 +278,7 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable, HasWorkspace
         }
         else
         {
-            var link = _outboundLinksHistory.OrderBy(l => l.CreatedOn).FirstOrDefault(x => x.TargetId == targetId
-                && x.LinkType == WorkItemLinkType.Dependency
+            var link = _outboundDependencyHistory.OrderBy(l => l.CreatedOn).FirstOrDefault(x => x.TargetId == targetId
                 && x.RemovedOn is null
                 && x.CreatedOn < timestamp);
             if (link is null)

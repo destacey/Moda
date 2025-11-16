@@ -89,14 +89,11 @@ public class Iteration : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey, ISimp
 
     public Result Update(string name, IterationType type, IterationState state, IterationDateRange dateRange, Guid? teamId, Instant timestamp)
     {
-        // Normalize and validate incoming values before comparing to current state
-        var newName = Guard.Against.NullOrWhiteSpace(name, nameof(name)).Trim();
-
-        if (!ValuesChanged(newName, type, state, dateRange, teamId))
+        if (!ValuesChanged(name, type, state, dateRange, teamId))
             return Result.Success();
 
         // Apply changes
-        Name = newName;
+        Name = name;
         Type = type;
         State = state;
         DateRange = dateRange;
@@ -137,9 +134,12 @@ public class Iteration : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey, ISimp
 
     private bool ValuesChanged(string name, IterationType type, IterationState state, IterationDateRange dateRange, Guid? teamId)
     {
+        // Normalize and validate incoming values before comparing to current state
+        var newName = Guard.Against.NullOrWhiteSpace(name, nameof(name)).Trim();
+
         if (Type != type) return true;
         if (!EqualityComparer<IterationDateRange>.Default.Equals(DateRange, dateRange)) return true;
-        if (!string.Equals(_name, name, StringComparison.Ordinal)) return true;
+        if (!string.Equals(_name, newName, StringComparison.Ordinal)) return true;
         if (State != state) return true;
         if (TeamId != teamId) return true;
         return false;

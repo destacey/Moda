@@ -1,4 +1,5 @@
-﻿using Moda.Common.Application.Requests.WorkManagement;
+﻿using System.Linq;
+using Moda.Common.Application.Requests.WorkManagement;
 using Moda.Common.Domain.Enums;
 using Moda.Work.Application.Persistence;
 
@@ -29,8 +30,10 @@ internal sealed class DeleteExternalWorkItemsCommandHandler(IWorkDbContext workD
 
             var workItems = await _workDbContext.WorkItems
                 .Include(w => w.Children)
-                .Include(w => w.OutboundLinksHistory)
-                .Include(w => w.InboundLinksHistory)
+                .Include(w => w.OutboundDependencies)
+                .Include(w => w.InboundDependencies)
+                .Include(w => w.OutboundHierarchies)
+                .Include(w => w.InboundHierarchies)
                 .Include(w => w.ReferenceLinks)
                 .Where(w => w.WorkspaceId == workspace.Id && request.WorkItemIds.Contains(w.ExternalId!.Value))
                 .ToListAsync(cancellationToken);
@@ -42,7 +45,8 @@ internal sealed class DeleteExternalWorkItemsCommandHandler(IWorkDbContext workD
                 return Result.Success();
             }
 
-            _workDbContext.WorkItemLinks.RemoveRange(workItems.SelectMany(w => w.OutboundLinksHistory.Concat(w.InboundLinksHistory)));
+            _workDbContext.WorkItemDependencies.RemoveRange(workItems.SelectMany(w => w.OutboundDependencies.Concat(w.InboundDependencies)));
+            _workDbContext.WorkItemHierarchies.RemoveRange(workItems.SelectMany(w => w.OutboundHierarchies.Concat(w.InboundHierarchies)));
             _workDbContext.WorkItems.RemoveRange(workItems);
 
             await _workDbContext.SaveChangesAsync(cancellationToken);

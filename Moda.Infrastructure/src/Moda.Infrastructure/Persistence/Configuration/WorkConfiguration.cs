@@ -204,15 +204,45 @@ public class WorkItemConfig : IEntityTypeConfiguration<WorkItem>
             .HasForeignKey(w => w.LastModifiedById)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasMany(w => w.OutboundLinksHistory)
-            .WithOne(ol => ol.Source)
-            .HasForeignKey(ol => ol.SourceId)
+        // Map the concrete, typed collections on WorkItem to the corresponding derived
+        // WorkItemLink types. These collections are backed by private fields; instruct
+        // EF to use field access so it attaches to the backing lists.
+        builder.HasMany(w => w.OutboundHierarchies)
+            .WithOne(h => h.Source)
+            .HasForeignKey(h => h.SourceId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasMany(w => w.InboundLinksHistory)
-            .WithOne(ol => ol.Target)
-            .HasForeignKey(ol => ol.TargetId)
+        builder.Navigation(w => w.OutboundHierarchies)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
+        // Explicitly set backing field so EF can discover the private list
+        builder.Navigation(w => w.OutboundHierarchies).Metadata.SetField("_outboundHierarchyHistory");
+
+        builder.HasMany(w => w.InboundHierarchies)
+            .WithOne(h => h.Target)
+            .HasForeignKey(h => h.TargetId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Navigation(w => w.InboundHierarchies)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
+        builder.Navigation(w => w.InboundHierarchies).Metadata.SetField("_inboundHierarchyHistory");
+
+        builder.HasMany(w => w.OutboundDependencies)
+            .WithOne(d => d.Source)
+            .HasForeignKey(d => d.SourceId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Navigation(w => w.OutboundDependencies)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
+        builder.Navigation(w => w.OutboundDependencies).Metadata.SetField("_outboundDependencyHistory");
+
+        builder.HasMany(w => w.InboundDependencies)
+            .WithOne(d => d.Target)
+            .HasForeignKey(d => d.TargetId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Navigation(w => w.InboundDependencies)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
+        builder.Navigation(w => w.InboundDependencies).Metadata.SetField("_inboundDependencyHistory");
 
         builder.HasMany(w => w.ReferenceLinks)
             .WithOne()
@@ -262,6 +292,11 @@ public class WorkItemLinkConfig : IEntityTypeConfiguration<WorkItemLink>
 
         builder.HasKey(w => w.Id);
 
+        // Configure TPH discriminator using the LinkType property
+        builder.HasDiscriminator(w => w.LinkType)
+            .HasValue<WorkItemHierarchy>(WorkItemLinkType.Hierarchy)
+            .HasValue<WorkItemDependency>(WorkItemLinkType.Dependency);
+
         builder.HasIndex(w => new { w.SourceId, w.LinkType })
             .IncludeProperties(w => new { w.Id, w.TargetId });
 
@@ -299,6 +334,33 @@ public class WorkItemLinkConfig : IEntityTypeConfiguration<WorkItemLink>
             .WithMany()
             .HasForeignKey(w => w.RemovedById)
             .OnDelete(DeleteBehavior.Restrict);
+
+        // Configure Source/Target relationships here on the dependent (WorkItemLink)
+        // by mapping to the WorkItem inverse collection names. This avoids ambiguity
+        // between multiple relationships connecting WorkItem and WorkItemLink.
+        // (Placed below in the WorkItemLinkConfig section.)
+    }
+}
+
+public class WorkItemDependencyConfig : IEntityTypeConfiguration<WorkItemDependency>
+{
+    public void Configure(EntityTypeBuilder<WorkItemDependency> builder)
+    {
+        // Base configuration is handled in WorkItemLinkConfig
+
+
+        // Properties
+        builder.Property(w => w.State).IsRequired();
+
+        builder.Property(w => w.Health).IsRequired();
+
+        builder.Property(w => w.SourceStatusCategory).IsRequired();
+
+        builder.Property(w => w.TargetStatusCategory).IsRequired();
+
+        builder.Property(w => w.SourcePlannedOn);
+
+        builder.Property(w => w.TargetPlannedOn);
     }
 }
 

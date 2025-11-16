@@ -18093,7 +18093,8 @@
           "id",
           "dependency",
           "type",
-          "status",
+          "state",
+          "health",
           "createdOn"
         ],
         "properties": {
@@ -18109,7 +18110,10 @@
           "type": {
             "type": "string"
           },
-          "status": {
+          "state": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "health": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
           },
           "createdOn": {
@@ -18172,6 +18176,14 @@
             "oneOf": [
               {
                 "$ref": "#/components/schemas/WorkTeamNavigationDto"
+              }
+            ]
+          },
+          "sprint": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/WorkIterationNavigationDto"
               }
             ]
           },
@@ -19234,7 +19246,8 @@
           "source",
           "target",
           "linkType",
-          "status",
+          "state",
+          "health",
           "createdOn"
         ],
         "properties": {
@@ -19253,7 +19266,10 @@
           "linkType": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
           },
-          "status": {
+          "state": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "health": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
           },
           "createdOn": {

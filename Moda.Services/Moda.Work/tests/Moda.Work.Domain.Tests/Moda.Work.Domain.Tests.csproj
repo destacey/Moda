@@ -25,4 +25,8 @@
       <ProjectReference Include="..\..\src\Moda.Work.Domain\Moda.Work.Domain.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Models\" />
+    </ItemGroup>
+
 </Project>

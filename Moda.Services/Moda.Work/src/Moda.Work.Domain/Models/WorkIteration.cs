@@ -1,13 +1,17 @@
-﻿using Moda.Common.Domain.Enums.Planning;
+﻿using Ardalis.GuardClauses;
+using CSharpFunctionalExtensions;
+using Moda.Common.Domain.Enums.Planning;
+using Moda.Common.Domain.Events.WorkManagement.WorkIterations;
 using Moda.Common.Domain.Interfaces.Planning.Iterations;
 using Moda.Common.Domain.Models.Planning.Iterations;
+using NodaTime;
 
 namespace Moda.Work.Domain.Models;
 
 /// <summary>
 /// A copy of the Moda.Common.Domain.Interfaces.Planning.Iterations.ISimpleIteration interface.  Used to hold basic iteration information for the work service and db context.
 /// </summary>
-public sealed class WorkIteration : ISimpleIteration, IHasIdAndKey
+public sealed class WorkIteration : BaseEntity<Guid>, ISimpleIteration, IHasIdAndKey
 {
     private WorkIteration() { }
 
@@ -22,7 +26,6 @@ public sealed class WorkIteration : ISimpleIteration, IHasIdAndKey
         TeamId = iteration.TeamId;
     }
 
-    public Guid Id { get; private init; }
     public int Key { get; private init; }
     public string Name { get; private set; } = default!;
     public IterationType Type { get; private set; }
@@ -37,11 +40,16 @@ public sealed class WorkIteration : ISimpleIteration, IHasIdAndKey
     /// <param name="iteration">The iteration containing the updated values. The <see cref="ISimpleIteration.Id"/> must match the current
     /// iteration's ID.</param>
     /// <exception cref="ArgumentException">Thrown if the <paramref name="iteration"/> ID does not match the current iteration's ID.</exception>
-    public void Update(ISimpleIteration iteration)
+    public Result Update(ISimpleIteration iteration, Instant timestamp)
     {
         if (iteration.Id != Id)
         {
-            throw new ArgumentException("Iteration ID does not match.", nameof(iteration));
+            return Result.Failure("Iteration ID does not match.");
+        }
+
+        if (!ValuesChanged(iteration.Name, iteration.Type, iteration.State, iteration.DateRange, iteration.TeamId))
+        {
+            return Result.Success();
         }
 
         Name = iteration.Name;
@@ -49,5 +57,22 @@ public sealed class WorkIteration : ISimpleIteration, IHasIdAndKey
         State = iteration.State;
         DateRange = iteration.DateRange;
         TeamId = iteration.TeamId;
+
+        AddDomainEvent(new WorkIterationUpdatedEvent(this, timestamp));
+
+        return Result.Success();
+    }
+
+    private bool ValuesChanged(string name, IterationType type, IterationState state, IterationDateRange dateRange, Guid? teamId)
+    {
+        // Normalize and validate incoming values before comparing to current state
+        var newName = Guard.Against.NullOrWhiteSpace(name, nameof(name)).Trim();
+
+        if (Type != type) return true;
+        if (!EqualityComparer<IterationDateRange>.Default.Equals(DateRange, dateRange)) return true;
+        if (!string.Equals(Name, newName, StringComparison.Ordinal)) return true;
+        if (State != state) return true;
+        if (TeamId != teamId) return true;
+        return false;
     }
 }

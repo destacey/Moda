@@ -9,7 +9,9 @@ public sealed record ScopedDependencyDto
 
     public required string Type { get; set; }
 
-    public required SimpleNavigationDto Status { get; set; }
+    public required SimpleNavigationDto State { get; set; }
+
+    public required SimpleNavigationDto Health { get; set; }
 
     public Instant CreatedOn { get; set; }
 
@@ -18,7 +20,7 @@ public sealed record ScopedDependencyDto
     public string? Comment { get; set; }
 
     /// <summary>
-    /// Converts a work item link to a scoped dependency.
+    /// Converts a work item dependency to a scoped dependency.
     /// </summary>
     /// <param name="link"></param>
     /// <param name="workItemKey">The work item key in which the dependencies are scoped to.</param>
@@ -37,7 +39,8 @@ public sealed record ScopedDependencyDto
             Id = link.Id,
             Dependency = isOutbound ? link.Target : link.Source,
             Type = isOutbound ? "Successor" : "Predecessor",
-            Status = link.Status,
+            State = link.State,
+            Health = link.Health,
             CreatedOn = link.CreatedOn,
             CreatedBy = link.CreatedBy,
             Comment = link.Comment
