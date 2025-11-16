@@ -1,6 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
+        <!--Target framework is required here for the Docker build to work correctly-->
+        <TargetFramework>net10.0</TargetFramework>
         <UserSecretsId>ccaebfb8-fc4c-4b73-9da4-9bab70a12a1c</UserSecretsId>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <NoWarn>$(NoWarn);1591</NoWarn>
