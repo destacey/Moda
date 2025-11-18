@@ -1,7 +1,7 @@
 'use client'
 
 import PageTitle from '@/src/components/common/page-title'
-import { Card } from 'antd'
+import { Card, Space } from 'antd'
 import {
   createElement,
   use,
@@ -16,11 +16,11 @@ import TeamsGrid, {
 import { useDocumentTitle } from '@/src/hooks/use-document-title'
 import useAuth from '@/src/components/contexts/auth'
 import { authorizePage } from '@/src/components/hoc'
-import { notFound, usePathname } from 'next/navigation'
+import { notFound, usePathname, useRouter } from 'next/navigation'
 import { useAppDispatch } from '@/src/hooks'
 import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
 import PlanningIntervalDetailsLoading from './loading'
-import { PageActions } from '@/src/components/common'
+import { IconMenu, PageActions } from '@/src/components/common'
 import { ItemType } from 'antd/es/menu/interface'
 import {
   EditPlanningIntervalForm,
@@ -30,8 +30,12 @@ import {
 } from '../_components'
 import {
   useGetPlanningIntervalQuery,
+  useGetPlanningIntervalsQuery,
   useGetPlanningIntervalTeamsQuery,
 } from '@/src/store/features/planning/planning-interval-api'
+import { IterationState } from '@/src/components/types'
+import { IterationStateTag } from '@/src/components/common/planning'
+import { SwapOutlined } from '@ant-design/icons'
 
 enum PlanningIntervalTabs {
   Details = 'details',
@@ -55,8 +59,6 @@ const PlanningIntervalDetailsPage = (props: {
   const { key } = use(props.params)
   const piKey = Number(key)
 
-  useDocumentTitle('PI Details')
-
   const [activeTab, setActiveTab] = useState(PlanningIntervalTabs.Details)
   const [openEditPlanningIntervalForm, setOpenEditPlanningIntervalForm] =
     useState<boolean>(false)
@@ -68,6 +70,7 @@ const PlanningIntervalDetailsPage = (props: {
   const [openManageTeamsForm, setOpenManageTeamsForm] = useState<boolean>(false)
 
   const pathname = usePathname()
+  const router = useRouter()
   const dispatch = useAppDispatch()
 
   const { hasPermissionClaim } = useAuth()
@@ -82,6 +85,8 @@ const PlanningIntervalDetailsPage = (props: {
     refetch: refetchPlanningInterval,
   } = useGetPlanningIntervalQuery(+piKey)
 
+  useDocumentTitle(`${planningIntervalData?.name ?? piKey} - PI Details`)
+
   const {
     data: teamsData,
     isLoading: teamsIsLoading,
@@ -89,6 +94,8 @@ const PlanningIntervalDetailsPage = (props: {
   } = useGetPlanningIntervalTeamsQuery(+piKey, {
     skip: !teamsQueryEnabled,
   })
+
+  const { data: piListData } = useGetPlanningIntervalsQuery()
 
   const actionsMenuItems = useMemo(() => {
     const items = [] as ItemType[]
@@ -181,6 +188,39 @@ const PlanningIntervalDetailsPage = (props: {
     [teamsQueryEnabled],
   )
 
+  const handlePIChange = useCallback(
+    (value: string | number) => {
+      router.push(`/planning/planning-intervals/${value}`)
+    },
+    [router],
+  )
+
+  const piItems = useMemo(() => {
+    if (!piListData) return []
+
+    return [...piListData]
+      .sort((a, b) => new Date(b.start).getTime() - new Date(a.start).getTime())
+      .map((option) => ({
+        label: option.name,
+        extra: option.state.name,
+        value: option.key,
+      }))
+  }, [piListData])
+
+  const switchSprints = useMemo(() => {
+    if (!piItems.length) return null
+
+    return (
+      <IconMenu
+        icon={<SwapOutlined />}
+        tooltip="Switch to another PI"
+        items={piItems}
+        selectedKeys={[piKey.toString()]}
+        onChange={handlePIChange}
+      />
+    )
+  }, [piItems, piKey, handlePIChange])
+
   if (isLoading) {
     return <PlanningIntervalDetailsLoading />
   }
@@ -193,6 +233,14 @@ const PlanningIntervalDetailsPage = (props: {
     <>
       <PageTitle
         title="PI Details"
+        tags={
+          <Space>
+            {switchSprints}
+            <IterationStateTag
+              state={planningIntervalData.state.id as IterationState}
+            />
+          </Space>
+        }
         actions={<PageActions actionItems={actionsMenuItems} />}
       />
       <Card

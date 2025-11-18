@@ -2,16 +2,7 @@
 
 import LinksCard from '@/src/components/common/links/links-card'
 import { PlanningIntervalDetailsDto } from '@/src/services/moda-api'
-import {
-  Card,
-  Col,
-  Descriptions,
-  DescriptionsProps,
-  Divider,
-  Row,
-  Space,
-  Statistic,
-} from 'antd'
+import { Col, Descriptions, DescriptionsProps, Divider, Row, Space } from 'antd'
 import dayjs from 'dayjs'
 import { useMemo } from 'react'
 import {
@@ -73,11 +64,6 @@ const PlanningIntervalDetails = ({
       key: 'end',
       label: 'End',
       children: dayjs(planningInterval.end).format('MMM D, YYYY'),
-    },
-    {
-      key: 'state.name',
-      label: 'State',
-      children: planningInterval.state.name,
     },
     {
       key: 'objectivesLocked',
