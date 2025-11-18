@@ -1,7 +1,7 @@
 'use client'
 
 import PageTitle from '@/src/components/common/page-title'
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import ModaGrid from '../../../components/common/moda-grid'
 import { ItemType } from 'antd/es/menu/interface'
 import { Button } from 'antd'
@@ -83,9 +83,6 @@ const TeamListPage = () => {
       </>
     )
   }
-  useEffect(() => {
-    error && console.error(error)
-  }, [error])
 
   const onIncludeInactiveChange = (checked: boolean) => {
     dispatch(setIncludeInactive(checked))

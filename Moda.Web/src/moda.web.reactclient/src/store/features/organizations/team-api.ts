@@ -48,6 +48,7 @@ export const teamApi = apiSlice.injectEndpoints({
         return tags
       },
     }),
+
     deactivateTeam: builder.mutation<void, DeactivateTeamRequest>({
       queryFn: async (request) => {
         try {
@@ -70,6 +71,7 @@ export const teamApi = apiSlice.injectEndpoints({
         { type: QueryTags.TeamOptions, id: 'TEAM_OF_TEAMS-false' },
       ],
     }),
+
     deactivateTeamOfTeams: builder.mutation<void, DeactivateTeamOfTeamsRequest>(
       {
         queryFn: async (request) => {
@@ -97,6 +99,7 @@ export const teamApi = apiSlice.injectEndpoints({
         ],
       },
     ),
+
     getTeamOptions: builder.query<BaseOptionType[], boolean>({
       queryFn: async (includeInactive) => {
         try {
@@ -126,12 +129,16 @@ export const teamApi = apiSlice.injectEndpoints({
         ]
         if (result) {
           result.forEach((option) => {
-            tags.push({ type: QueryTags.TeamOptions, id: option.value as string })
+            tags.push({
+              type: QueryTags.TeamOptions,
+              id: option.value as string,
+            })
           })
         }
         return tags
       },
     }),
+
     getTeamBacklog: builder.query<WorkItemBacklogItemDto[], string>({
       queryFn: async (idOrCode: string) => {
         try {
@@ -147,6 +154,7 @@ export const teamApi = apiSlice.injectEndpoints({
         { type: QueryTags.TeamBacklog, id: arg },
       ],
     }),
+
     getTeamDependencies: builder.query<DependencyDto[], string>({
       queryFn: async (id: string) => {
         try {
@@ -162,6 +170,7 @@ export const teamApi = apiSlice.injectEndpoints({
         { type: QueryTags.TeamDependency, id: arg },
       ],
     }),
+
     getTeamSprints: builder.query<SprintListDto[], string>({
       queryFn: async (teamId: string) => {
         try {
@@ -177,6 +186,31 @@ export const teamApi = apiSlice.injectEndpoints({
         { type: QueryTags.TeamSprint, id: arg },
       ],
     }),
+
+    getTeamSprintOptions: builder.query<BaseOptionType[], string>({
+      queryFn: async (teamId: string) => {
+        try {
+          const sprints = await getTeamsClient().getTeamSprints(teamId)
+
+          const data: BaseOptionType[] = sprints
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .map((team) => ({
+              label: team.name,
+              value: team.id,
+            }))
+
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: (result, error, arg) => [
+        QueryTags.TeamSprint,
+        { type: QueryTags.TeamSprint, id: arg },
+      ],
+    }),
+
     getFunctionalOrganizationChart: builder.query<
       FunctionalOrganizationChartDto,
       string | null | undefined
@@ -198,7 +232,9 @@ export const teamApi = apiSlice.injectEndpoints({
           id: arg,
         },
       ],
-    }), // TEAM OF TEAMS OPTIONS
+    }),
+
+    // TEAM OF TEAMS OPTIONS
     getTeamOfTeamsOptions: builder.query<OptionModel[], boolean>({
       queryFn: async (includeInactive = false) => {
         try {
@@ -217,7 +253,10 @@ export const teamApi = apiSlice.injectEndpoints({
       },
       providesTags: (result, error, includeInactive) => {
         const tags = [
-          { type: QueryTags.TeamOptions, id: `TEAM_OF_TEAMS-${includeInactive}` },
+          {
+            type: QueryTags.TeamOptions,
+            id: `TEAM_OF_TEAMS-${includeInactive}`,
+          },
           QueryTags.TeamOptions, // Keep general tag for invalidation
         ]
         if (result) {
@@ -428,6 +467,7 @@ export const {
   useGetTeamBacklogQuery,
   useGetTeamDependenciesQuery,
   useGetTeamSprintsQuery,
+  useGetTeamSprintOptionsQuery,
   useGetFunctionalOrganizationChartQuery,
   useGetTeamOfTeamsOptionsQuery,
   useGetTeamMembershipsQuery,

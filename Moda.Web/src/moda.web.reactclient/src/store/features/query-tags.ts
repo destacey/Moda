@@ -24,6 +24,7 @@ export enum QueryTags {
   TeamBacklog = 'Organizations.TeamBacklog',
   TeamDependency = 'Organizations.TeamDependency',
   TeamSprint = 'Organizations.TeamSprint',
+  TeamSprintOption = 'Organizations.TeamSprintOption',
   TeamMembership = 'Organizations.TeamMembership',
   TeamRisk = 'Organizations.TeamRisk',
   FunctionalOrganizationChart = 'Organizations.FunctionalOrganizationChart',
