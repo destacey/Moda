@@ -22,7 +22,7 @@ internal sealed class GetTeamActiveSprintQueryHandler(IPlanningDbContext plannin
     public async Task<SprintDetailsDto?> Handle(GetTeamActiveSprintQuery request, CancellationToken cancellationToken)
     {
         var sprint = await _planningDbContext.Iterations
-            .Where(i => i.TeamId == request.TeamId && i.Type == IterationType.Sprint)
+            .Where(i => i.TeamId == request.TeamId && i.Type == IterationType.Sprint && i.State == IterationState.Active)
             .ProjectToType<SprintDetailsDto>()
             .FirstOrDefaultAsync(cancellationToken);
 

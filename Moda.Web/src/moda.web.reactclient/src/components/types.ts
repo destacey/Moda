@@ -38,3 +38,13 @@ export enum DependencyHealth {
   Unhealthy = 3,
   Unknown = 4,
 }
+
+export interface SprintMetricsData {
+  completed: number
+  inProgress: number
+  notStarted: number
+  completedStoryPoints: number
+  inProgressStoryPoints: number
+  notStartedStoryPoints: number
+  missingStoryPoints: number
+}
