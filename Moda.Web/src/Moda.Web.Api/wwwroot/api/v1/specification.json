@@ -10253,7 +10253,7 @@
           "Teams"
         ],
         "summary": "Get the sprints for a team.",
-        "operationId": "Teams_GetTeamSprints",
+        "operationId": "Teams_GetSprints",
         "parameters": [
           {
             "name": "id",
@@ -10278,6 +10278,56 @@
                   "items": {
                     "$ref": "#/components/schemas/SprintListDto"
                   }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/organization/teams/{id}/sprints/active": {
+      "get": {
+        "tags": [
+          "Teams"
+        ],
+        "summary": "Get the team's active sprint",
+        "operationId": "Teams_GetActiveSprint",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SprintDetailsDto"
                 }
               }
             }
