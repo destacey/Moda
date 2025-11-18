@@ -206,8 +206,8 @@ export const teamApi = apiSlice.injectEndpoints({
         }
       },
       providesTags: (result, error, arg) => [
-        QueryTags.TeamSprint,
-        { type: QueryTags.TeamSprint, id: arg },
+        QueryTags.TeamSprintOption,
+        { type: QueryTags.TeamSprintOption, id: arg },
       ],
     }),
 
