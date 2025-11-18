@@ -5,7 +5,11 @@ import {
   MetricCard,
 } from '@/src/components/common/metrics'
 import useTheme from '@/src/components/contexts/theme'
-import { IterationState, WorkStatusCategory } from '@/src/components/types'
+import {
+  IterationState,
+  SprintMetricsData,
+  WorkStatusCategory,
+} from '@/src/components/types'
 import { SprintBacklogItemDto, SprintDetailsDto } from '@/src/services/moda-api'
 import { Col, Flex, Row, Segmented, Tooltip } from 'antd'
 import { FC, useMemo, useState } from 'react'
@@ -20,7 +24,7 @@ const SprintMetrics: FC<SprintMetricsProps> = ({ sprint, backlog }) => {
 
   const { token } = useTheme()
 
-  const metrics = useMemo(() => {
+  const metrics = useMemo((): SprintMetricsData => {
     return backlog.reduce(
       (acc, item) => {
         const points = item.storyPoints ?? 0

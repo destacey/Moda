@@ -101,4 +101,62 @@ describe('IterationDates', () => {
     expect(screen.getByText('Oct 26, 2025 12:00 PM')).toBeInTheDocument()
     expect(screen.getByText('Nov 8, 2025 12:00 PM')).toBeInTheDocument()
   })
+
+  it('hides duration when showDurationDays is false', () => {
+    render(
+      <IterationDates
+        start={startDate}
+        end={endDate}
+        showDurationDays={false}
+      />,
+    )
+
+    expect(screen.getByText('Start Date')).toBeInTheDocument()
+    expect(screen.getByText('End Date')).toBeInTheDocument()
+    expect(screen.queryByText('Duration')).not.toBeInTheDocument()
+    expect(screen.queryByText('14 Days')).not.toBeInTheDocument()
+  })
+
+  it('shows duration by default', () => {
+    render(<IterationDates start={startDate} end={endDate} />)
+
+    expect(screen.getByText('Duration')).toBeInTheDocument()
+    expect(screen.getByText('14 Days')).toBeInTheDocument()
+  })
+
+  it('applies default width fit-content style', () => {
+    const { container } = render(
+      <IterationDates start={startDate} end={endDate} />,
+    )
+
+    const card = container.querySelector('.ant-card')
+    expect(card).toHaveStyle({ width: 'fit-content' })
+  })
+
+  it('applies custom styles', () => {
+    const { container } = render(
+      <IterationDates
+        start={startDate}
+        end={endDate}
+        style={{ width: '100%', padding: '10px' }}
+      />,
+    )
+
+    const card = container.querySelector('.ant-card')
+    expect(card).toHaveStyle({ width: '100%' })
+    expect(card).toHaveStyle({ padding: '10px' })
+  })
+
+  it('custom styles override default styles', () => {
+    const { container } = render(
+      <IterationDates
+        start={startDate}
+        end={endDate}
+        style={{ width: '500px' }}
+      />,
+    )
+
+    const card = container.querySelector('.ant-card')
+    expect(card).toHaveStyle({ width: '500px' })
+  })
 })

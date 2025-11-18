@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { FC } from 'react'
+import { CSSProperties, FC } from 'react'
 import { Card, Divider, Flex, Space, Typography } from 'antd'
 
 const { Text } = Typography
@@ -9,11 +9,15 @@ const DATE_TIME_FORMAT = 'MMM D, YYYY h:mm A'
 export interface IterationDatesProps {
   start: Date | null
   end: Date | null
+  showDurationDays?: boolean
+  style?: CSSProperties
 }
 
 const IterationDates: FC<IterationDatesProps> = ({
   start,
   end,
+  showDurationDays = true,
+  style,
 }: IterationDatesProps) => {
   if (!start || !end) return null
 
@@ -26,7 +30,7 @@ const IterationDates: FC<IterationDatesProps> = ({
   const durationDays = endDay.diff(startDay, 'day') + 1
 
   return (
-    <Card size="small" style={{ width: 'fit-content' }}>
+    <Card size="small" style={{ width: 'fit-content', ...style }}>
       <Space size="middle">
         <Flex vertical>
           <Text
@@ -47,16 +51,17 @@ const IterationDates: FC<IterationDatesProps> = ({
           </Text>
           <Text>{endDate.format(DATE_TIME_FORMAT)}</Text>
         </Flex>
-        <Divider type="vertical" />
-        <Flex vertical>
-          <Text
-            type="secondary"
-            style={{ fontSize: 12, textTransform: 'uppercase' }}
-          >
-            Duration
-          </Text>
-          <Text>{durationDays} Days</Text>
-        </Flex>
+        {showDurationDays && (
+          <Flex vertical>
+            <Text
+              type="secondary"
+              style={{ fontSize: 12, textTransform: 'uppercase' }}
+            >
+              Duration
+            </Text>
+            <Text>{durationDays} Days</Text>
+          </Flex>
+        )}
       </Space>
     </Card>
   )

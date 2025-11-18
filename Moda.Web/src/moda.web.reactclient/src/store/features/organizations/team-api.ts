@@ -8,6 +8,7 @@ import {
   TeamMembershipDto,
   RiskListDto,
   SprintListDto,
+  SprintDetailsDto,
 } from './../../../services/moda-api'
 import { TeamListItem, TeamTypeName } from '@/src/app/organizations/types'
 import { apiSlice } from '../apiSlice'
@@ -174,7 +175,7 @@ export const teamApi = apiSlice.injectEndpoints({
     getTeamSprints: builder.query<SprintListDto[], string>({
       queryFn: async (teamId: string) => {
         try {
-          const data = await getTeamsClient().getTeamSprints(teamId)
+          const data = await getTeamsClient().getSprints(teamId)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -187,10 +188,25 @@ export const teamApi = apiSlice.injectEndpoints({
       ],
     }),
 
+    getActiveSprint: builder.query<SprintDetailsDto, string>({
+      queryFn: async (id: string) => {
+        try {
+          const data = await getTeamsClient().getActiveSprint(id)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: (result, error, arg) => [
+        { type: QueryTags.ActiveSprint, id: arg },
+      ],
+    }),
+
     getTeamSprintOptions: builder.query<BaseOptionType[], string>({
       queryFn: async (teamId: string) => {
         try {
-          const sprints = await getTeamsClient().getTeamSprints(teamId)
+          const sprints = await getTeamsClient().getSprints(teamId)
 
           const data: BaseOptionType[] = sprints
             .sort((a, b) => a.name.localeCompare(b.name))
@@ -467,6 +483,7 @@ export const {
   useGetTeamBacklogQuery,
   useGetTeamDependenciesQuery,
   useGetTeamSprintsQuery,
+  useGetActiveSprintQuery,
   useGetTeamSprintOptionsQuery,
   useGetFunctionalOrganizationChartQuery,
   useGetTeamOfTeamsOptionsQuery,

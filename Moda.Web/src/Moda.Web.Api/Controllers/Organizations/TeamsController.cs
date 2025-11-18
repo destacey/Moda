@@ -310,11 +310,23 @@ public class TeamsController(ILogger<TeamsController> logger, ISender sender) : 
     [OpenApiOperation("Get the sprints for a team.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IEnumerable<SprintListDto>>> GetTeamSprints(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<SprintListDto>>> GetSprints(Guid id, CancellationToken cancellationToken)
     {
         var sprints = await _sender.Send(new GetSprintsQuery(id), cancellationToken);
 
         return Ok(sprints);
+    }
+
+    [HttpGet("{id}/sprints/active")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Iterations)]
+    [OpenApiOperation("Get the team's active sprint", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<SprintDetailsDto>> GetActiveSprint(Guid id, CancellationToken cancellationToken)
+    {
+        var sprint = await _sender.Send(new GetTeamActiveSprintQuery(id), cancellationToken);
+
+        return Ok(sprint);
     }
 
     [HttpGet("functional-organization-chart")]
