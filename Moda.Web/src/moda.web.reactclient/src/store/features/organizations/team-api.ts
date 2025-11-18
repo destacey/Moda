@@ -188,10 +188,10 @@ export const teamApi = apiSlice.injectEndpoints({
       ],
     }),
 
-    getActiveSprint: builder.query<SprintDetailsDto, number>({
-      queryFn: async (key: number) => {
+    getActiveSprint: builder.query<SprintDetailsDto, string>({
+      queryFn: async (id: string) => {
         try {
-          const data = await getTeamsClient().getActiveSprint(key.toString())
+          const data = await getTeamsClient().getActiveSprint(id)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
