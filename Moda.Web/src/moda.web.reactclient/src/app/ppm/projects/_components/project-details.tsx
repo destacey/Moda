@@ -45,6 +45,13 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({
             {project.portfolio.name}
           </Link>
         </Item>
+        <Item label="Program">
+          {project.program && (
+            <Link href={`/ppm/programs/${project.program.key}`}>
+              {project.program.name}
+            </Link>
+          )}
+        </Item>
         <Item label="Dates">
           <ModaDateRange
             dateRange={{ start: project.start, end: project.end }}

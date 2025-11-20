@@ -16,6 +16,7 @@ import {
   PortfolioDetails,
 } from '../_components'
 import {
+  useGetPortfolioProgramsQuery,
   useGetPortfolioProjectsQuery,
   useGetPortfolioQuery,
   useGetPortfolioStrategicInitiativesQuery,
@@ -24,12 +25,14 @@ import ChangePortfolioStatusForm, {
   PortfolioStatusAction,
 } from '../_components/change-portfolio-status-form'
 import {
+  ProgramViewManager,
   ProjectViewManager,
   StrategicInitiativeViewManager,
 } from '../../_components'
 
 enum PortfolioTabs {
   Details = 'details',
+  Programs = 'programs',
   Projects = 'projects',
   StrategicInitiatives = 'strategicInitiatives',
 }
@@ -38,6 +41,10 @@ const tabs = [
   {
     key: PortfolioTabs.Details,
     label: 'Details',
+  },
+  {
+    key: PortfolioTabs.Programs,
+    label: 'Programs',
   },
   {
     key: PortfolioTabs.Projects,
@@ -64,6 +71,7 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   useDocumentTitle('Portfolio Details')
 
   const [activeTab, setActiveTab] = useState(PortfolioTabs.Details)
+  const [programsQueried, setProgramsQueried] = useState(false)
   const [projectsQueried, setProjectsQueried] = useState(false)
   const [strategicInitiativesQueried, setStrategicInitiativesQueried] =
     useState(false)
@@ -100,6 +108,15 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   } = useGetPortfolioQuery(portfolioKey)
 
   const {
+    data: programData,
+    isLoading: isLoadingPrograms,
+    error: errorPrograms,
+    refetch: refetchPrograms,
+  } = useGetPortfolioProgramsQuery(portfolioKey.toString(), {
+    skip: !programsQueried,
+  })
+
+  const {
     data: projectData,
     isLoading: isLoadingProjects,
     error: errorProjects,
@@ -116,6 +133,8 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   } = useGetPortfolioStrategicInitiativesQuery(portfolioKey.toString(), {
     skip: !strategicInitiativesQueried,
   })
+
+  useDocumentTitle(`${portfolioData?.name ?? portfolioKey} - Portfolio Details`)
 
   useEffect(() => {
     if (!portfolioData) return
@@ -137,14 +156,18 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     dispatch(setBreadcrumbRoute({ route: breadcrumbRoute, pathname }))
   }, [dispatch, pathname, portfolioData])
 
-  useEffect(() => {
-    error && console.error(error)
-  }, [error])
-
   const renderTabContent = useCallback(() => {
     switch (activeTab) {
       case PortfolioTabs.Details:
         return <PortfolioDetails portfolio={portfolioData} />
+      case PortfolioTabs.Programs:
+        return (
+          <ProgramViewManager
+            programs={programData}
+            isLoading={isLoadingPrograms}
+            refetch={refetchPrograms}
+          />
+        )
       case PortfolioTabs.Projects:
         return (
           <ProjectViewManager
@@ -167,10 +190,13 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   }, [
     activeTab,
     portfolioData,
+    programData,
     projectData,
     strategicInitiativeData,
+    isLoadingPrograms,
     isLoadingProjects,
     isLoadingStrategicInitiatives,
+    refetchPrograms,
     refetchProjects,
     refetchStrategicInitiatives,
   ])
@@ -247,7 +273,9 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     (tabKey: string) => {
       const tab = tabKey as PortfolioTabs
 
-      if (tab === PortfolioTabs.Projects && !projectsQueried) {
+      if (tab === PortfolioTabs.Programs && !programsQueried) {
+        setProgramsQueried(true)
+      } else if (tab === PortfolioTabs.Projects && !projectsQueried) {
         setProjectsQueried(true)
       } else if (
         tab === PortfolioTabs.StrategicInitiatives &&
@@ -258,7 +286,7 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
 
       setActiveTab(tab)
     },
-    [projectsQueried, strategicInitiativesQueried],
+    [programsQueried, projectsQueried, strategicInitiativesQueried],
   )
 
   const onEditPortfolioFormClosed = useCallback(

@@ -3,6 +3,7 @@
 import { ModaGrid } from '@/src/components/common'
 import {
   PortfolioLinkCellRenderer,
+  ProgramLinkCellRenderer,
   ProjectLinkCellRenderer,
 } from '@/src/components/common/moda-grid-cell-renderers'
 import { ProjectListDto } from '@/src/services/moda-api'
@@ -16,6 +17,7 @@ export interface ProjectsGridProps {
   isLoading: boolean
   refetch: () => void
   hidePortfolio?: boolean
+  hideProgram?: boolean
   gridHeight?: number | undefined
   viewSelector?: React.ReactNode | undefined
 }
@@ -37,6 +39,15 @@ const ProjectsGrid: React.FC<ProjectsGridProps> = (
         hide: props.hidePortfolio,
         cellRenderer: (params) =>
           PortfolioLinkCellRenderer({ data: params.data.portfolio }),
+      },
+      {
+        field: 'program.name',
+        headerName: 'Program',
+        width: 200,
+        hide: props.hideProgram,
+        cellRenderer: (params) =>
+          params.data.program &&
+          ProgramLinkCellRenderer({ data: params.data.program }),
       },
       {
         field: 'start',
@@ -71,7 +82,7 @@ const ProjectsGrid: React.FC<ProjectsGridProps> = (
         valueGetter: (params) => getSortedNames(params.data.strategicThemes),
       },
     ],
-    [props.hidePortfolio],
+    [props.hidePortfolio, props.hideProgram],
   )
 
   const refresh = useCallback(async () => {
@@ -88,6 +99,11 @@ const ProjectsGrid: React.FC<ProjectsGridProps> = (
         toolbarActions={props.viewSelector}
         height={props.gridHeight}
         emptyMessage="No projects found."
+        initialState={{
+          sort: {
+            sortModel: [{ colId: 'name', sort: 'asc' }],
+          },
+        }}
       />
     </>
   )

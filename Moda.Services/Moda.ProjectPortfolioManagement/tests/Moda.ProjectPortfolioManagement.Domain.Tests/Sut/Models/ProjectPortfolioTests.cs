@@ -7,6 +7,7 @@ using Moda.ProjectPortfolioManagement.Domain.Tests.Data.Extensions;
 using Moda.Tests.Shared;
 using NodaTime.Extensions;
 using NodaTime.Testing;
+using Moda.Common.Domain.Events.ProjectPortfolioManagement;
 
 namespace Moda.ProjectPortfolioManagement.Domain.Tests.Sut.Models;
 
@@ -414,7 +415,7 @@ public class ProjectPortfolioTests
         var portfolio = _portfolioFaker.Generate();
 
         // Act
-        var result = portfolio.CreateProgram("Test Program", "Test Description", null);
+        var result = portfolio.CreateProgram("Test Program", "Test Description", null, null, null, _dateTimeProvider.Now);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -428,7 +429,7 @@ public class ProjectPortfolioTests
         var portfolio = _portfolioFaker.AsActive(_dateTimeProvider);
 
         // Act
-        var result = portfolio.CreateProgram("Test Program", "Test Description", null);
+        var result = portfolio.CreateProgram("Test Program", "Test Description", null, null, null, _dateTimeProvider.Now);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -441,7 +442,7 @@ public class ProjectPortfolioTests
     {
         // Arrange
         var portfolio = _portfolioFaker.AsActive(_dateTimeProvider);
-        var program = portfolio.CreateProgram("Test Program", "Description", null).Value;
+        var program = portfolio.CreateProgram("Test Program", "Description", null, null, null, _dateTimeProvider.Now).Value;
         var project = _projectFaker.AsActive(_dateTimeProvider, portfolio.Id);
 
         program.AddProject(project);
@@ -456,6 +457,86 @@ public class ProjectPortfolioTests
         result.Error.Should().Be("All programs must be completed or canceled before the portfolio can be closed.");
     }
 
+    [Fact]
+    public void DeleteProgram_ShouldRemoveProgramFromPortfolioAndRaiseEvent()
+    {
+        // Arrange
+        var portfolio = _portfolioFaker.AsActive(_dateTimeProvider);
+
+        var createProgramResult = portfolio.CreateProgram("Test Program", "Description", null, null, null, _dateTimeProvider.Now);
+        createProgramResult.IsSuccess.Should().BeTrue();
+        var program = createProgramResult.Value;
+
+        // Act
+        var result = portfolio.DeleteProgram(program.Id, _dateTimeProvider.Now);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        portfolio.Programs.Should().NotContain(p => p.Id == program.Id);
+        portfolio.DomainEvents.Should().Contain(e => e is ProgramDeletedEvent && ((ProgramDeletedEvent)e).Id == program.Id);
+    }
+
+    [Fact]
+    public void DeleteProgram_ShouldFail_WhenProgramIsNotInPortfolio()
+    {
+        // Arrange
+        var portfolio = _portfolioFaker.Generate();
+
+        // Act
+        var result = portfolio.DeleteProgram(Guid.NewGuid(), _dateTimeProvider.Now);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("The specified program does not belong to this portfolio.");
+    }
+
+    [Fact]
+    public void DeleteProgram_ShouldFail_WhenPortfolioIsReadonly()
+    {
+        // Arrange
+        var portfolio = _portfolioFaker.AsArchived(_dateTimeProvider).AddPrograms(1, _dateTimeProvider);
+        var program = portfolio.Programs.First();
+
+        // Act
+        var result = portfolio.DeleteProgram(program.Id, _dateTimeProvider.Now);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("Project Portfolio is readonly and cannot be updated.");
+    }
+
+    [Fact]
+    public void DeleteProgram_ShouldFail_WhenProgramHasProjects()
+    {
+        // Arrange
+        var portfolio = _portfolioFaker.AsActive(_dateTimeProvider).AddPrograms(1, _dateTimeProvider);
+        var program = portfolio.Programs.First();
+
+        var projectCreate = portfolio.CreateProject("Test Project", "Description", 1, null, program.Id, null, null, _dateTimeProvider.Now);
+        projectCreate.IsSuccess.Should().BeTrue();
+
+        // Act
+        var result = portfolio.DeleteProgram(program.Id, _dateTimeProvider.Now);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("The program cannot be deleted while it has associated projects.");
+    }
+
+    [Fact]
+    public void DeleteProgram_ShouldFail_WhenProgramCannotBeDeleted()
+    {
+        // Arrange
+        var portfolio = _portfolioFaker.AsActive(_dateTimeProvider).AddPrograms(1, _dateTimeProvider);
+        var program = portfolio.Programs.First();
+
+        // Act
+        var result = portfolio.DeleteProgram(program.Id, _dateTimeProvider.Now);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("The program cannot be deleted.");
+    }
 
     #endregion Program Management
 
@@ -498,7 +579,7 @@ public class ProjectPortfolioTests
         var portfolio = _portfolioFaker.AsActive(_dateTimeProvider);
         var fakeProgram = _programFaker.Generate();
 
-        var createProgramResult = portfolio.CreateProgram(fakeProgram.Name, fakeProgram.Description, null);
+        var createProgramResult = portfolio.CreateProgram(fakeProgram.Name, fakeProgram.Description, null, null, null, _dateTimeProvider.Now);
         createProgramResult.IsSuccess.Should().BeTrue();
         var program = createProgramResult.Value;
 

@@ -1,5 +1,4 @@
-﻿using Moda.Common.Application.Models;
-using Moda.ProjectPortfolioManagement.Domain.Enums;
+﻿using Moda.ProjectPortfolioManagement.Domain.Enums;
 using Moda.ProjectPortfolioManagement.Domain.Models;
 
 namespace Moda.ProjectPortfolioManagement.Application.Portfolios.Command;

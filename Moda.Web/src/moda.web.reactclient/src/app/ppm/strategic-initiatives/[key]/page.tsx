@@ -156,10 +156,6 @@ const StrategicInitiativeDetailsPage = (props: {
     dispatch(setBreadcrumbRoute({ route: breadcrumbRoute, pathname }))
   }, [dispatch, pathname, strategicInitiativeData])
 
-  useEffect(() => {
-    error && console.error(error)
-  }, [error])
-
   const renderTabContent = useCallback(() => {
     switch (activeTab) {
       case StrategicInitiativeTabs.Details:
@@ -186,6 +182,7 @@ const StrategicInitiativeDetailsPage = (props: {
             projects={projectData}
             isLoading={isLoadingProjects}
             refetch={refetchProjects}
+            hidePortfolio={true}
           />
         )
       default:

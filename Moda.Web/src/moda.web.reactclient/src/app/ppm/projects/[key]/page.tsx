@@ -14,6 +14,7 @@ import { use, useCallback, useEffect, useMemo, useState } from 'react'
 import ProjectDetailsLoading from './loading'
 import {
   ChangeProjectStatusForm,
+  ChangeProjectProgramForm,
   DeleteProjectForm,
   EditProjectForm,
   ProjectDetails,
@@ -41,6 +42,7 @@ const tabs = [
 
 enum ProjectAction {
   Edit = 'Edit',
+  ChangeProgram = 'Change Program',
   Delete = 'Delete',
   Activate = 'Activate',
   Complete = 'Complete',
@@ -55,6 +57,8 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
 
   const [activeTab, setActiveTab] = useState(ProjectTabs.Details)
   const [openEditProjectForm, setOpenEditProjectForm] = useState<boolean>(false)
+  const [openChangeProgramForm, setOpenChangeProgramForm] =
+    useState<boolean>(false)
   const [openActivateProjectForm, setOpenActivateProjectForm] =
     useState<boolean>(false)
   const [openCompleteProjectForm, setOpenCompleteProjectForm] =
@@ -168,6 +172,13 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
         onClick: () => setOpenEditProjectForm(true),
       })
     }
+    if (canUpdateProject) {
+      items.push({
+        key: 'change-program',
+        label: ProjectAction.ChangeProgram,
+        onClick: () => setOpenChangeProgramForm(true),
+      })
+    }
     if (canDeleteProject && availableActions.includes(ProjectAction.Delete)) {
       items.push({
         key: 'delete',
@@ -223,6 +234,16 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const onEditProjectFormClosed = useCallback(
     (wasSaved: boolean) => {
       setOpenEditProjectForm(false)
+      if (wasSaved) {
+        refetchProject()
+      }
+    },
+    [refetchProject],
+  )
+
+  const onChangeProgramFormClosed = useCallback(
+    (wasSaved: boolean) => {
+      setOpenChangeProgramForm(false)
       if (wasSaved) {
         refetchProject()
       }
@@ -311,6 +332,14 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
           showForm={openEditProjectForm}
           onFormComplete={() => onEditProjectFormClosed(true)}
           onFormCancel={() => onEditProjectFormClosed(false)}
+        />
+      )}
+      {openChangeProgramForm && (
+        <ChangeProjectProgramForm
+          project={projectData}
+          showForm={openChangeProgramForm}
+          onFormComplete={() => onChangeProgramFormClosed(true)}
+          onFormCancel={() => onChangeProgramFormClosed(false)}
         />
       )}
       {openActivateProjectForm && (

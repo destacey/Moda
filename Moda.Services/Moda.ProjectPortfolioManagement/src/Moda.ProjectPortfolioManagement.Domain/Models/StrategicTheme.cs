@@ -14,8 +14,6 @@ public class StrategicTheme : IStrategicThemeData, IHasIdAndKey
     public StrategicTheme(IStrategicThemeData strategicTheme)
     {
         Guard.Against.Null(strategicTheme, nameof(strategicTheme));
-        Guard.Against.NullOrWhiteSpace(strategicTheme.Name, nameof(strategicTheme.Name));
-        Guard.Against.NullOrWhiteSpace(strategicTheme.Description, nameof(strategicTheme.Description));
 
         Id = strategicTheme.Id;
         Key = strategicTheme.Key;
@@ -28,9 +26,17 @@ public class StrategicTheme : IStrategicThemeData, IHasIdAndKey
 
     public int Key { get; private init; }
 
-    public string Name { get; private set; } = default!;
+    public string Name
+    {
+        get;
+        private set => field = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
+    } = default!;
 
-    public string Description { get; private set; } = default!;
+    public string Description
+    {
+        get;
+        private set => field = Guard.Against.NullOrWhiteSpace(value, nameof(Description)).Trim();
+    } = default!;
 
     public StrategicThemeState State { get; private set; }
 
@@ -42,9 +48,6 @@ public class StrategicTheme : IStrategicThemeData, IHasIdAndKey
     /// <param name="state"></param>
     public void Update(string name, string description, StrategicThemeState state)
     {
-        Guard.Against.NullOrWhiteSpace(name, nameof(name));
-        Guard.Against.NullOrWhiteSpace(description, nameof(description));
-
         Name = name;
         Description = description;
         State = state;

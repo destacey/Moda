@@ -33,7 +33,7 @@ internal sealed class ChangeProjectProgramCommandHandler(IProjectPortfolioManage
         {
             var project = await _projectPortfolioManagementDbContext.Projects
                 .Include(p => p.Portfolio)
-                .Include(p => p.Program)
+                    .ThenInclude(p => p.Programs)
                 .FirstOrDefaultAsync(s => s.Id == request.Id, cancellationToken);
             if (project is null)
             {
@@ -56,7 +56,7 @@ internal sealed class ChangeProjectProgramCommandHandler(IProjectPortfolioManage
 
             await _projectPortfolioManagementDbContext.SaveChangesAsync(cancellationToken);
 
-            _logger.LogInformation("Project {ProjectId} activated.", request.Id);
+            _logger.LogInformation("Project {ProjectId} changed from program {OldProgramId} to {NewProgramId}.", request.Id, project.ProgramId, request.ProgramId);
 
             return Result.Success();
         }

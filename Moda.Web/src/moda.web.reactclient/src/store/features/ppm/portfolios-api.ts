@@ -3,6 +3,7 @@ import { apiSlice } from '../apiSlice'
 import {
   CreatePortfolioRequest,
   ObjectIdAndKey,
+  ProgramListDto,
   ProjectListDto,
   ProjectPortfolioDetailsDto,
   ProjectPortfolioListDto,
@@ -147,6 +148,21 @@ export const portfoliosApi = apiSlice.injectEndpoints({
         return [{ type: QueryTags.Portfolio, id: 'LIST' }]
       },
     }),
+    getPortfolioPrograms: builder.query<ProgramListDto[], string>({
+      queryFn: async (portfolioIdOrKey) => {
+        try {
+          const data = await getPortfoliosClient().getPrograms(portfolioIdOrKey)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: (result, error, arg) => [
+        { type: QueryTags.PortfolioPrograms, id: 'LIST' },
+        { type: QueryTags.PortfolioPrograms, id: arg },
+      ],
+    }),
     getPortfolioProjects: builder.query<ProjectListDto[], string>({
       queryFn: async (portfolioIdOrKey) => {
         try {
@@ -202,6 +218,33 @@ export const portfoliosApi = apiSlice.injectEndpoints({
         }
       },
     }),
+    getPortfolioProgramOptions: builder.query<BaseOptionType[], string>({
+      queryFn: async (portfolioIdOrKey) => {
+        try {
+          // TODO: hard coding status for now.  Need status values from the client.
+          const programs = await getPortfoliosClient().getPrograms(
+            portfolioIdOrKey,
+            2,
+          )
+
+          const data: BaseOptionType[] = programs
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .map((category) => ({
+              label: category.name,
+              value: category.id,
+            }))
+
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: (result, error, arg) => [
+        { type: QueryTags.PortfolioPrograms, id: 'LIST' },
+        { type: QueryTags.PortfolioPrograms, id: arg },
+      ],
+    }),
   }),
 })
 
@@ -214,7 +257,9 @@ export const {
   useClosePortfolioMutation,
   useArchivePortfolioMutation,
   useDeletePortfolioMutation,
+  useGetPortfolioProgramsQuery,
   useGetPortfolioProjectsQuery,
   useGetPortfolioStrategicInitiativesQuery,
   useGetPortfolioOptionsQuery,
+  useGetPortfolioProgramOptionsQuery,
 } = portfoliosApi

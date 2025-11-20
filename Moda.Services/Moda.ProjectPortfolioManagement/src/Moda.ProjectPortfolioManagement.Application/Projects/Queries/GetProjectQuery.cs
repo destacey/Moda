@@ -14,14 +14,14 @@ public sealed record GetProjectQuery : IQuery<ProjectDetailsDto?>
     public Expression<Func<Project, bool>> IdOrKeyFilter { get; }
 }
 
-internal sealed class GetProjectQueryHandler(IProjectPortfolioManagementDbContext projectPortfolioManagementDbContext) 
+internal sealed class GetProjectQueryHandler(IProjectPortfolioManagementDbContext ppmDbContext) 
     : IQueryHandler<GetProjectQuery, ProjectDetailsDto?>
 {
-    private readonly IProjectPortfolioManagementDbContext _projectPortfolioManagementDbContext = projectPortfolioManagementDbContext;
+    private readonly IProjectPortfolioManagementDbContext _ppmDbContext = ppmDbContext;
 
     public async Task<ProjectDetailsDto?> Handle(GetProjectQuery request, CancellationToken cancellationToken)
     {
-        return await _projectPortfolioManagementDbContext.Projects
+        return await _ppmDbContext.Projects
             .Where(request.IdOrKeyFilter)
             .ProjectToType<ProjectDetailsDto>()
             .FirstOrDefaultAsync(cancellationToken);

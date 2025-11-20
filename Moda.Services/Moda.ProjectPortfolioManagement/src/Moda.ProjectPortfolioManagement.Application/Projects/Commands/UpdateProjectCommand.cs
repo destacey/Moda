@@ -92,7 +92,7 @@ internal sealed class UpdateProjectCommandHandler(
                 return await HandleDomainFailure(project, updateRolesResult, cancellationToken);
             }
 
-            var strategicThemes = request.StrategicThemeIds?.Distinct().ToHashSet() ?? [];
+            var strategicThemes = request.StrategicThemeIds?.ToHashSet() ?? [];
             var updateStrategicThemesResult = project.UpdateStrategicThemes(strategicThemes);
             if (updateStrategicThemesResult.IsFailure)
             {

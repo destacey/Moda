@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { FC } from 'react'
 import { Flex, Grid } from 'antd'
 
 const { useBreakpoint } = Grid
@@ -11,7 +11,7 @@ interface ResponsiveFlexProps {
   align?: string
 }
 
-const ResponsiveFlex: React.FC<ResponsiveFlexProps> = ({
+const ResponsiveFlex: FC<ResponsiveFlexProps> = ({
   children,
   gap = 'middle',
   align = 'start',

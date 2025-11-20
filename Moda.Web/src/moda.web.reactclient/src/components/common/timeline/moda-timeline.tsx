@@ -1,6 +1,13 @@
 'use client'
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, {
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import { createRoot } from 'react-dom/client'
 import { DataSet } from 'vis-data'
 import { Timeline, TimelineOptions } from 'vis-timeline/standalone'
@@ -456,6 +463,8 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
   }
 
   const isLoading = props.isLoading || isTimelineLoading
+  const hasData = props.data && props.data.length > 0
+  const showControls = !isLoading && hasData
 
   return (
     <Spin spinning={isLoading} tip="Loading timeline..." size="large">
@@ -474,7 +483,7 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
           overflow: isFullScreen ? 'auto' : 'unset',
         }}
       >
-        {enableFullScreenToggle && !isLoading && (
+        {enableFullScreenToggle && showControls && (
           <Button
             type="text"
             shape="circle"
@@ -495,7 +504,7 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
             }}
           />
         )}
-        {enableSaveAsImage && !isLoading && (
+        {enableSaveAsImage && showControls && (
           <Button
             type="text"
             shape="circle"
@@ -512,7 +521,7 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
             }}
           />
         )}
-        {!isLoading && (
+        {showControls && (
           <Button
             type="text"
             shape="circle"
@@ -548,4 +557,4 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
   )
 }
 
-export default React.memo(ModaTimeline)
+export default memo(ModaTimeline)

@@ -11,6 +11,8 @@ interface ProjectViewManagerProps {
   projects: ProjectListDto[]
   isLoading: boolean
   refetch: () => void
+  hidePortfolio?: boolean
+  hideProgram?: boolean
 }
 
 const viewSelectorOptions: SegmentedLabeledOption[] = [
@@ -45,7 +47,8 @@ const ProjectViewManager = (props: ProjectViewManagerProps) => {
           projects={props.projects}
           isLoading={props.isLoading}
           refetch={props.refetch}
-          hidePortfolio={true}
+          hidePortfolio={props.hidePortfolio}
+          hideProgram={props.hideProgram}
           gridHeight={550}
           viewSelector={viewSelector}
         />

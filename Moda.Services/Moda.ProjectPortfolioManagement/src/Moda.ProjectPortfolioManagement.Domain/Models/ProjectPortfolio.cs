@@ -290,15 +290,16 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, IHasI
     /// <param name="dateRange">The date range of the program (optional).</param>
     /// <param name="roles">The roles associated with the program (optional).</param>
     /// <param name="strategicThemes">The strategic themes associated with the program (optional).</param>
+    /// <param name="timestamp"></param>
     /// <returns>A result containing the created program or an error.</returns>
-    public Result<Program> CreateProgram(string name, string description, LocalDateRange? dateRange, Dictionary<ProgramRole, HashSet<Guid>>? roles = null, HashSet<Guid>? strategicThemes = null)
+    public Result<Program> CreateProgram(string name, string description, LocalDateRange? dateRange, Dictionary<ProgramRole, HashSet<Guid>>? roles, HashSet<Guid>? strategicThemes, Instant timestamp)
     {
         if (!IsActive)
         {
             return Result.Failure<Program>("Programs can only be created in active or on-hold portfolios.");
         }
 
-        var program = Program.Create(name, description, dateRange, Id, roles, strategicThemes);
+        var program = Program.Create(name, description, dateRange, Id, roles, strategicThemes, timestamp);
         _programs.Add(program);
 
         return Result.Success(program);
@@ -410,6 +411,43 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, IHasI
                 return Result.Failure(removeFromProgramResult.Error);
             }
         }
+
+        return Result.Success();
+    }
+
+    /// <summary>
+    /// Deletes the specified program from the portfolio.
+    /// </summary>
+    /// <param name="programId"></param>
+    /// 
+    /// <param name="timestamp"></param>
+    /// <returns></returns>
+    public Result DeleteProgram(Guid programId, Instant timestamp)
+    {
+        var program = _programs.SingleOrDefault(p => p.Id == programId);
+        if (program is null)
+        {
+            return Result.Failure("The specified program does not belong to this portfolio.");
+        }
+
+        if (IsReadOnly)
+        {
+            return Result.Failure(ReadOnlyErrorMessage);
+        }
+
+        if (program.Projects.Count != 0)
+        {
+            return Result.Failure("The program cannot be deleted while it has associated projects.");
+        }
+
+        if (!program.CanBeDeleted())
+        {
+            return Result.Failure("The program cannot be deleted.");
+        }
+
+        _programs.Remove(program);
+
+        AddDomainEvent(new ProgramDeletedEvent(programId, timestamp));
 
         return Result.Success();
     }

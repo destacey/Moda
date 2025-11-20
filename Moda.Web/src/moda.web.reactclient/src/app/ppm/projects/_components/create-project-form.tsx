@@ -7,7 +7,10 @@ import { useMessage } from '@/src/components/contexts/messaging'
 import { CreateProjectRequest } from '@/src/services/moda-api'
 import { useGetEmployeeOptionsQuery } from '@/src/store/features/organizations/employee-api'
 import { useGetExpenditureCategoryOptionsQuery } from '@/src/store/features/ppm/expenditure-categories-api'
-import { useGetPortfolioOptionsQuery } from '@/src/store/features/ppm/portfolios-api'
+import {
+  useGetPortfolioOptionsQuery,
+  useGetPortfolioProgramOptionsQuery,
+} from '@/src/store/features/ppm/portfolios-api'
 import { useCreateProjectMutation } from '@/src/store/features/ppm/projects-api'
 import { useGetStrategicThemeOptionsQuery } from '@/src/store/features/strategic-management/strategic-themes-api'
 import { toFormErrors } from '@/src/utils'
@@ -25,6 +28,7 @@ export interface CreateProjectFormProps {
 
 interface CreateProjectFormValues {
   portfolioId: string
+  programId?: string
   name: string
   description: string
   expenditureCategoryId: number
@@ -46,6 +50,7 @@ const mapToRequestValues = (
     start: (values.start as any)?.format('YYYY-MM-DD'),
     end: (values.end as any)?.format('YYYY-MM-DD'),
     portfolioId: values.portfolioId,
+    programId: values.programId,
     sponsorIds: values.sponsorIds,
     ownerIds: values.ownerIds,
     managerIds: values.managerIds,
@@ -77,6 +82,14 @@ const CreateProjectForm = (props: CreateProjectFormProps) => {
   } = useGetPortfolioOptionsQuery()
 
   const {
+    data: programData,
+    isLoading: programOptionsIsLoading,
+    error: programOptionsError,
+  } = useGetPortfolioProgramOptionsQuery(form.getFieldValue('portfolioId'), {
+    skip: !form.getFieldValue('portfolioId'),
+  })
+
+  const {
     data: employeeData,
     isLoading: employeeOptionsIsLoading,
     error: employeeOptionsError,
@@ -95,18 +108,21 @@ const CreateProjectForm = (props: CreateProjectFormProps) => {
     if (
       expenditureOptionsError ||
       portfolioOptionsError ||
+      programOptionsError ||
       employeeOptionsError ||
       strategicThemeOptionsError
     ) {
       console.error(
         expenditureOptionsError ??
           portfolioOptionsError ??
+          programOptionsError ??
           employeeOptionsError ??
           strategicThemeOptionsError,
       )
       messageApi.error(
         expenditureOptionsError.detail ??
           portfolioOptionsError.detail ??
+          programOptionsError.detail ??
           employeeOptionsError.detail ??
           strategicThemeOptionsError.detail ??
           'An error occurred while loading form data. Please try again.',
@@ -116,6 +132,7 @@ const CreateProjectForm = (props: CreateProjectFormProps) => {
     employeeOptionsError,
     expenditureOptionsError,
     portfolioOptionsError,
+    programOptionsError,
     messageApi,
     strategicThemeOptionsError,
   ])
@@ -218,6 +235,14 @@ const CreateProjectForm = (props: CreateProjectFormProps) => {
               allowClear
               options={portfolioData ?? []}
               placeholder="Select Portfolio"
+            />
+          </Item>
+          <Item name="programId" label="Program">
+            <Select
+              allowClear
+              options={programData ?? []}
+              placeholder="Select Program"
+              disabled={!form.getFieldValue('portfolioId')}
             />
           </Item>
           <Item

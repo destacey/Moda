@@ -45,6 +45,10 @@ const routes = {
     title: 'Portfolios',
     href: '/ppm/portfolios',
   },
+  programs: {
+    title: 'Programs',
+    href: '/ppm/programs',
+  },
   projects: {
     title: 'Projects',
     href: '/ppm/projects',

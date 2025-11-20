@@ -35,7 +35,7 @@ public class ProgramTests
         var portfolioId = Guid.NewGuid();
 
         // Act
-        var program = Program.Create(name, description, null, portfolioId);
+        var program = Program.Create(name, description, null, portfolioId, null, null, _dateTimeProvider.Now);
 
         // Assert
         program.Should().NotBeNull();
@@ -54,7 +54,7 @@ public class ProgramTests
         var program = _programFaker.Generate();
 
         // Act
-        Action action = () => program.UpdateDetails("", "Valid Description");
+        Action action = () => program.UpdateDetails("", "Valid Description", _dateTimeProvider.Now);
 
         // Assert
         action.Should().Throw<ArgumentException>().WithMessage("Required input Name was empty. (Parameter 'Name')");
@@ -67,7 +67,7 @@ public class ProgramTests
         var program = _programFaker.Generate();
 
         // Act
-        Action action = () => program.UpdateDetails("Valid Name", "");
+        Action action = () => program.UpdateDetails("Valid Name", "", _dateTimeProvider.Now);
 
         // Assert
         action.Should().Throw<ArgumentException>().WithMessage("Required input Description was empty. (Parameter 'Description')");
