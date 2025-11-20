@@ -3,35 +3,35 @@
 import { MarkdownEditor } from '@/src/components/common/markdown'
 import { EmployeeSelect } from '@/src/components/common/organizations'
 import useAuth from '@/src/components/contexts/auth'
-import { useMessage } from '@/src/components/contexts/messaging'
-import { CreateProjectRequest } from '@/src/services/moda-api'
-import { useGetEmployeeOptionsQuery } from '@/src/store/features/organizations/employee-api'
-import { useGetExpenditureCategoryOptionsQuery } from '@/src/store/features/ppm/expenditure-categories-api'
 import {
-  useGetPortfolioOptionsQuery,
-  useGetPortfolioProgramOptionsQuery,
-} from '@/src/store/features/ppm/portfolios-api'
-import { useCreateProjectMutation } from '@/src/store/features/ppm/projects-api'
+  ProgramDetailsDto,
+  UpdateProgramRequest,
+} from '@/src/services/moda-api'
+import { useGetEmployeeOptionsQuery } from '@/src/store/features/organizations/employee-api'
+import {
+  useGetProgramQuery,
+  useUpdateProgramMutation,
+} from '@/src/store/features/ppm/programs-api'
 import { useGetStrategicThemeOptionsQuery } from '@/src/store/features/strategic-management/strategic-themes-api'
-import { toFormErrors } from '@/src/utils'
 import { DatePicker, Form, Modal, Select } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
 import { useCallback, useEffect, useState } from 'react'
+import dayjs from 'dayjs'
+import { toFormErrors } from '@/src/utils'
+import { useMessage } from '@/src/components/contexts/messaging'
 
 const { Item } = Form
 
-export interface CreateProjectFormProps {
+export interface EditProgramFormProps {
+  programKey: number
   showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
 }
 
-interface CreateProjectFormValues {
-  portfolioId: string
-  programId?: string
+interface EditProgramFormValues {
   name: string
   description: string
-  expenditureCategoryId: number
   start?: Date
   end?: Date
   sponsorIds: string[]
@@ -41,59 +41,44 @@ interface CreateProjectFormValues {
 }
 
 const mapToRequestValues = (
-  values: CreateProjectFormValues,
-): CreateProjectRequest => {
+  values: EditProgramFormValues,
+  programId: string,
+): UpdateProgramRequest => {
   return {
+    id: programId,
     name: values.name,
     description: values.description,
-    expenditureCategoryId: values.expenditureCategoryId,
     start: (values.start as any)?.format('YYYY-MM-DD'),
     end: (values.end as any)?.format('YYYY-MM-DD'),
-    portfolioId: values.portfolioId,
-    programId: values.programId,
     sponsorIds: values.sponsorIds,
     ownerIds: values.ownerIds,
     managerIds: values.managerIds,
     strategicThemeIds: values.strategicThemeIds,
-  } as CreateProjectRequest
+  } as UpdateProgramRequest
 }
 
-const CreateProjectForm = (props: CreateProjectFormProps) => {
+const EditProgramForm = (props: EditProgramFormProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [isValid, setIsValid] = useState(false)
-  const [form] = Form.useForm<CreateProjectFormValues>()
+  const [form] = Form.useForm<EditProgramFormValues>()
   const formValues = Form.useWatch([], form)
 
   const messageApi = useMessage()
 
-  const [createProject, { error: mutationError }] = useCreateProjectMutation()
-
-  const {
-    data: expenditureData,
-    isLoading: expenditureOptionsIsLoading,
-    error: expenditureOptionsError,
-  } = useGetExpenditureCategoryOptionsQuery(false)
-
-  const {
-    data: portfolioData,
-    isLoading: portfolioOptionsIsLoading,
-    error: portfolioOptionsError,
-  } = useGetPortfolioOptionsQuery()
+  const [updateProgram, { error: mutationError }] = useUpdateProgramMutation()
 
   const {
     data: programData,
-    isLoading: programOptionsIsLoading,
-    error: programOptionsError,
-  } = useGetPortfolioProgramOptionsQuery(form.getFieldValue('portfolioId'), {
-    skip: !form.getFieldValue('portfolioId'),
-  })
+    isLoading,
+    error,
+  } = useGetProgramQuery(props.programKey)
 
   const {
     data: employeeData,
     isLoading: employeeOptionsIsLoading,
     error: employeeOptionsError,
-  } = useGetEmployeeOptionsQuery(false)
+  } = useGetEmployeeOptionsQuery(true)
 
   const {
     data: strategicThemeData,
@@ -102,54 +87,44 @@ const CreateProjectForm = (props: CreateProjectFormProps) => {
   } = useGetStrategicThemeOptionsQuery(false)
 
   const { hasPermissionClaim } = useAuth()
-  const canCreateProject = hasPermissionClaim('Permissions.Projects.Create')
+  const canUpdateProgram = hasPermissionClaim('Permissions.Programs.Update')
 
-  useEffect(() => {
-    if (
-      expenditureOptionsError ||
-      portfolioOptionsError ||
-      programOptionsError ||
-      employeeOptionsError ||
-      strategicThemeOptionsError
-    ) {
-      console.error(
-        expenditureOptionsError ??
-          portfolioOptionsError ??
-          programOptionsError ??
-          employeeOptionsError ??
-          strategicThemeOptionsError,
-      )
-      messageApi.error(
-        expenditureOptionsError.detail ??
-          portfolioOptionsError.detail ??
-          programOptionsError.detail ??
-          employeeOptionsError.detail ??
-          strategicThemeOptionsError.detail ??
-          'An error occurred while loading form data. Please try again.',
-      )
-    }
-  }, [
-    employeeOptionsError,
-    expenditureOptionsError,
-    portfolioOptionsError,
-    programOptionsError,
-    messageApi,
-    strategicThemeOptionsError,
-  ])
+  const mapToFormValues = useCallback(
+    (program: ProgramDetailsDto) => {
+      if (!program) {
+        throw new Error('Program not found')
+      }
+      form.setFieldsValue({
+        name: program.name,
+        description: program.description,
+        start: program.start ? dayjs(program.start) : undefined,
+        end: program.end ? dayjs(program.end) : undefined,
+        sponsorIds: program.programSponsors.map((s) => s.id),
+        ownerIds: program.programOwners.map((o) => o.id),
+        managerIds: program.programManagers.map((m) => m.id),
+        strategicThemeIds: program.strategicThemes.map((t) => t.id),
+      })
+    },
+    [form],
+  )
 
-  const create = async (values: CreateProjectFormValues) => {
+  const update = async (
+    values: EditProgramFormValues,
+    program: ProgramDetailsDto,
+  ) => {
     try {
-      const request = mapToRequestValues(values)
-      const response = await createProject(request)
+      const request = mapToRequestValues(values, program.id)
+      const response = await updateProgram({
+        request,
+        cacheKey: program.key,
+      })
       if (response.error) {
         throw response.error
       }
-      messageApi.success(
-        'Project created successfully. Project key: ' + response.data.key,
-      )
-
+      messageApi.success(`Program updated successfully.`)
       return true
     } catch (error) {
+      console.error('update error', error)
       if (error.status === 422 && error.errors) {
         const formErrors = toFormErrors(error.errors)
         form.setFields(formErrors)
@@ -157,7 +132,7 @@ const CreateProjectForm = (props: CreateProjectFormProps) => {
       } else {
         messageApi.error(
           error.detail ??
-            'An error occurred while creating the project. Please try again.',
+            'An error occurred while updating the program. Please try again.',
         )
       }
       return false
@@ -168,15 +143,14 @@ const CreateProjectForm = (props: CreateProjectFormProps) => {
     setIsSaving(true)
     try {
       const values = await form.validateFields()
-      if (await create(values)) {
+      if (await update(values, programData)) {
         setIsOpen(false)
-        form.resetFields()
         props.onFormComplete()
       }
-    } catch (error) {
-      console.error('handleOk error', error)
+    } catch (errorInfo) {
+      console.log('handleOk error', errorInfo)
       messageApi.error(
-        'An error occurred while creating the project. Please try again.',
+        'An error occurred while updating the program. Please try again.',
       )
     } finally {
       setIsSaving(false)
@@ -190,17 +164,17 @@ const CreateProjectForm = (props: CreateProjectFormProps) => {
   }, [form, props])
 
   useEffect(() => {
-    if (canCreateProject) {
+    if (canUpdateProgram && programData) {
       setIsOpen(props.showForm)
-    } else {
+      mapToFormValues(programData)
+    } else if (!canUpdateProgram) {
       props.onFormCancel()
-      messageApi.error('You do not have permission to create projects.')
     }
-  }, [canCreateProject, messageApi, props])
+  }, [canUpdateProgram, mapToFormValues, programData, props])
 
   useEffect(() => {
     form.validateFields({ validateOnly: true }).then(
-      () => setIsValid(true && form.isFieldsTouched()),
+      () => setIsValid(true),
       () => setIsValid(false),
     )
   }, [form, formValues])
@@ -208,12 +182,12 @@ const CreateProjectForm = (props: CreateProjectFormProps) => {
   return (
     <>
       <Modal
-        title="Create Project"
+        title="Edit Program"
         open={isOpen}
         width={'60vw'}
         onOk={handleOk}
         okButtonProps={{ disabled: !isValid }}
-        okText="Create"
+        okText="Save"
         confirmLoading={isSaving}
         onCancel={handleCancel}
         maskClosable={false}
@@ -224,27 +198,8 @@ const CreateProjectForm = (props: CreateProjectFormProps) => {
           form={form}
           size="small"
           layout="vertical"
-          name="create-project-form"
+          name="edit-program-form"
         >
-          <Item
-            name="portfolioId"
-            label="Portfolio"
-            rules={[{ required: true, message: 'Portfolio is required' }]}
-          >
-            <Select
-              allowClear
-              options={portfolioData ?? []}
-              placeholder="Select Portfolio"
-            />
-          </Item>
-          <Item name="programId" label="Program">
-            <Select
-              allowClear
-              options={programData ?? []}
-              placeholder="Select Program"
-              disabled={!form.getFieldValue('portfolioId')}
-            />
-          </Item>
           <Item
             label="Name"
             name="name"
@@ -268,25 +223,6 @@ const CreateProjectForm = (props: CreateProjectFormProps) => {
             ]}
           >
             <MarkdownEditor maxLength={2048} />
-          </Item>
-          <Item
-            name="expenditureCategoryId"
-            label="Expenditure Category"
-            rules={[
-              { required: true, message: 'Expenditure Category is required' },
-            ]}
-          >
-            <Select
-              allowClear
-              options={expenditureData ?? []}
-              placeholder="Select Expenditure Category"
-              optionFilterProp="children"
-              filterOption={(input, option) =>
-                (option?.label?.toLowerCase() ?? '').includes(
-                  input.toLowerCase(),
-                )
-              }
-            />
           </Item>
           <Item name="start" label="Start">
             <DatePicker />
@@ -358,4 +294,4 @@ const CreateProjectForm = (props: CreateProjectFormProps) => {
   )
 }
 
-export default CreateProjectForm
+export default EditProgramForm

@@ -3,16 +3,14 @@
 import { BuildOutlined, MenuOutlined } from '@ant-design/icons'
 import Segmented, { SegmentedLabeledOption } from 'antd/es/segmented'
 import { memo, useMemo, useState } from 'react'
-import { ProjectListDto } from '@/src/services/moda-api'
-import ProjectsGrid from './projects-grid'
-import { ProjectsTimeline } from '.'
+import { ProgramListDto } from '@/src/services/moda-api'
+import ProgramsGrid from './programs-grid'
+import { ProgramsTimeline } from '.'
 
-interface ProjectViewManagerProps {
-  projects: ProjectListDto[]
+interface ProgramViewManagerProps {
+  programs: ProgramListDto[]
   isLoading: boolean
   refetch: () => void
-  hidePortfolio?: boolean
-  hideProgram?: boolean
 }
 
 const viewSelectorOptions: SegmentedLabeledOption[] = [
@@ -26,7 +24,7 @@ const viewSelectorOptions: SegmentedLabeledOption[] = [
   },
 ]
 
-const ProjectViewManager = (props: ProjectViewManagerProps) => {
+const ProgramViewManager = (props: ProgramViewManagerProps) => {
   const [currentView, setCurrentView] = useState<string | number>('List')
 
   const viewSelector = useMemo(
@@ -43,19 +41,18 @@ const ProjectViewManager = (props: ProjectViewManagerProps) => {
   return (
     <>
       {currentView === 'List' && (
-        <ProjectsGrid
-          projects={props.projects}
+        <ProgramsGrid
+          programs={props.programs}
           isLoading={props.isLoading}
           refetch={props.refetch}
-          hidePortfolio={props.hidePortfolio}
-          hideProgram={props.hideProgram}
+          hidePortfolio={true}
           gridHeight={550}
           viewSelector={viewSelector}
         />
       )}
       {currentView === 'Timeline' && (
-        <ProjectsTimeline
-          projects={props.projects}
+        <ProgramsTimeline
+          programs={props.programs}
           isLoading={props.isLoading}
           refetch={props.refetch}
           viewSelector={viewSelector}
@@ -65,4 +62,4 @@ const ProjectViewManager = (props: ProjectViewManagerProps) => {
   )
 }
 
-export default memo(ProjectViewManager)
+export default memo(ProgramViewManager)

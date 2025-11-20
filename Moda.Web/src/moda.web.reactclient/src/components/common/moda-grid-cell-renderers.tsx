@@ -168,6 +168,24 @@ export const PortfolioLinkCellRenderer = ({
   return <Link href={`/ppm/portfolios/${data.key}`}>{data.name}</Link>
 }
 
+export interface ProgramLinkCellRendererProps {
+  data: NavigationDto | { program: NavigationDto | null } | null
+}
+
+export const ProgramLinkCellRenderer = ({
+  data,
+}: ProgramLinkCellRendererProps) => {
+  if (!data) return null
+
+  // Handle both direct NavigationDto and nested program cases
+  const programData = 'program' in data ? data.program : data
+  if (!programData) return null
+
+  return (
+    <Link href={`/ppm/programs/${programData.key}`}>{programData.name}</Link>
+  )
+}
+
 export interface ProjectLinkCellRendererProps {
   data: NavigationDto | { project: NavigationDto | null } | null
 }

@@ -4,33 +4,29 @@ import { ModaGrid } from '@/src/components/common'
 import {
   PortfolioLinkCellRenderer,
   ProgramLinkCellRenderer,
-  ProjectLinkCellRenderer,
 } from '@/src/components/common/moda-grid-cell-renderers'
-import { ProjectListDto } from '@/src/services/moda-api'
+import { ProgramListDto } from '@/src/services/moda-api'
 import { getSortedNames } from '@/src/utils'
 import { ColDef } from 'ag-grid-community'
 import dayjs from 'dayjs'
-import { useCallback, useMemo } from 'react'
+import { FC, useCallback, useMemo } from 'react'
 
-export interface ProjectsGridProps {
-  projects: ProjectListDto[]
+export interface ProgramsGridProps {
+  programs: ProgramListDto[]
   isLoading: boolean
   refetch: () => void
   hidePortfolio?: boolean
-  hideProgram?: boolean
   gridHeight?: number | undefined
   viewSelector?: React.ReactNode | undefined
 }
 
-const ProjectsGrid: React.FC<ProjectsGridProps> = (
-  props: ProjectsGridProps,
-) => {
+const ProgramsGrid: FC<ProgramsGridProps> = (props: ProgramsGridProps) => {
   const { refetch } = props
 
-  const columnDefs = useMemo<ColDef<ProjectListDto>[]>(
+  const columnDefs = useMemo<ColDef<ProgramListDto>[]>(
     () => [
       { field: 'key', width: 90 },
-      { field: 'name', cellRenderer: ProjectLinkCellRenderer, width: 300 },
+      { field: 'name', cellRenderer: ProgramLinkCellRenderer, width: 300 },
       { field: 'status.name', headerName: 'Status', width: 125 },
       {
         field: 'portfolio.name',
@@ -39,15 +35,6 @@ const ProjectsGrid: React.FC<ProjectsGridProps> = (
         hide: props.hidePortfolio,
         cellRenderer: (params) =>
           PortfolioLinkCellRenderer({ data: params.data.portfolio }),
-      },
-      {
-        field: 'program.name',
-        headerName: 'Program',
-        width: 200,
-        hide: props.hideProgram,
-        cellRenderer: (params) =>
-          params.data.program &&
-          ProgramLinkCellRenderer({ data: params.data.program }),
       },
       {
         field: 'start',
@@ -62,19 +49,19 @@ const ProjectsGrid: React.FC<ProjectsGridProps> = (
           params.data.end && dayjs(params.data.end).format('M/D/YYYY'),
       },
       {
-        field: 'projectSponsors',
+        field: 'programSponsors',
         headerName: 'Sponsors',
-        valueGetter: (params) => getSortedNames(params.data.projectSponsors),
+        valueGetter: (params) => getSortedNames(params.data.programSponsors),
       },
       {
-        field: 'projectOwners',
+        field: 'programOwners',
         headerName: 'Owners',
-        valueGetter: (params) => getSortedNames(params.data.projectOwners),
+        valueGetter: (params) => getSortedNames(params.data.programOwners),
       },
       {
-        field: 'projectManagers',
+        field: 'programManagers',
         headerName: 'Managers',
-        valueGetter: (params) => getSortedNames(params.data.projectManagers),
+        valueGetter: (params) => getSortedNames(params.data.programManagers),
       },
       {
         field: 'strategicThemes',
@@ -82,7 +69,7 @@ const ProjectsGrid: React.FC<ProjectsGridProps> = (
         valueGetter: (params) => getSortedNames(params.data.strategicThemes),
       },
     ],
-    [props.hidePortfolio, props.hideProgram],
+    [props.hidePortfolio],
   )
 
   const refresh = useCallback(async () => {
@@ -93,12 +80,12 @@ const ProjectsGrid: React.FC<ProjectsGridProps> = (
     <>
       <ModaGrid
         columnDefs={columnDefs}
-        rowData={props.projects}
+        rowData={props.programs}
         loadData={refresh}
         loading={props.isLoading}
         toolbarActions={props.viewSelector}
         height={props.gridHeight}
-        emptyMessage="No projects found."
+        emptyMessage="No programs found."
         initialState={{
           sort: {
             sortModel: [{ colId: 'name', sort: 'asc' }],
@@ -109,4 +96,4 @@ const ProjectsGrid: React.FC<ProjectsGridProps> = (
   )
 }
 
-export default ProjectsGrid
+export default ProgramsGrid

@@ -7,6 +7,7 @@ import {
   ProjectDetailsDto,
   UpdateProjectRequest,
   WorkItemListDto,
+  ChangeProjectProgramRequest,
 } from '@/src/services/moda-api'
 import { QueryTags } from '../query-tags'
 import { BaseOptionType } from 'antd/es/select'
@@ -74,6 +75,28 @@ export const projectsApi = apiSlice.injectEndpoints({
           { type: QueryTags.Project, id: 'LIST' },
           { type: QueryTags.Project, id: cacheKey },
           { type: QueryTags.PortfolioProjects, id: 'LIST' },
+        ]
+      },
+    }),
+    changeProjectProgram: builder.mutation<
+      void,
+      { id: string; request: ChangeProjectProgramRequest; cacheKey: number }
+    >({
+      queryFn: async ({ id, request }) => {
+        try {
+          const data = await getProjectsClient().changeProgram(id, request)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, { cacheKey }) => {
+        return [
+          { type: QueryTags.Project, id: 'LIST' },
+          { type: QueryTags.Project, id: cacheKey },
+          { type: QueryTags.PortfolioProjects, id: 'LIST' },
+          { type: QueryTags.ProgramProjects, id: 'LIST' },
         ]
       },
     }),
@@ -190,6 +213,7 @@ export const {
   useGetProjectQuery,
   useCreateProjectMutation,
   useUpdateProjectMutation,
+  useChangeProjectProgramMutation,
   useActivateProjectMutation,
   useCompleteProjectMutation,
   useCancelProjectMutation,

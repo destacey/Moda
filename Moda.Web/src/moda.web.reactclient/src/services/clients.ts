@@ -22,6 +22,7 @@ import {
   RoadmapsClient,
   StrategicThemesClient,
   PortfoliosClient,
+  ProgramsClient,
   ExpenditureCategoriesClient,
   ProjectsClient,
   StrategicInitiativesClient,
@@ -96,6 +97,7 @@ export const getSprintsClient = () => new SprintsClient('', axiosClient)
 export const getExpenditureCategoriesClient = () =>
   new ExpenditureCategoriesClient('', axiosClient)
 export const getPortfoliosClient = () => new PortfoliosClient('', axiosClient)
+export const getProgramsClient = () => new ProgramsClient('', axiosClient)
 export const getProjectsClient = () => new ProjectsClient('', axiosClient)
 export const getStrategicInitiativesClient = () =>
   new StrategicInitiativesClient('', axiosClient)

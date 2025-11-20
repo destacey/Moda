@@ -4,14 +4,10 @@ import { MarkdownEditor } from '@/src/components/common/markdown'
 import { EmployeeSelect } from '@/src/components/common/organizations'
 import useAuth from '@/src/components/contexts/auth'
 import { useMessage } from '@/src/components/contexts/messaging'
-import { CreateProjectRequest } from '@/src/services/moda-api'
+import { CreateProgramRequest } from '@/src/services/moda-api'
 import { useGetEmployeeOptionsQuery } from '@/src/store/features/organizations/employee-api'
-import { useGetExpenditureCategoryOptionsQuery } from '@/src/store/features/ppm/expenditure-categories-api'
-import {
-  useGetPortfolioOptionsQuery,
-  useGetPortfolioProgramOptionsQuery,
-} from '@/src/store/features/ppm/portfolios-api'
-import { useCreateProjectMutation } from '@/src/store/features/ppm/projects-api'
+import { useGetPortfolioOptionsQuery } from '@/src/store/features/ppm/portfolios-api'
+import { useCreateProgramMutation } from '@/src/store/features/ppm/programs-api'
 import { useGetStrategicThemeOptionsQuery } from '@/src/store/features/strategic-management/strategic-themes-api'
 import { toFormErrors } from '@/src/utils'
 import { DatePicker, Form, Modal, Select } from 'antd'
@@ -20,18 +16,16 @@ import { useCallback, useEffect, useState } from 'react'
 
 const { Item } = Form
 
-export interface CreateProjectFormProps {
+export interface CreateProgramFormProps {
   showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
 }
 
-interface CreateProjectFormValues {
+interface CreateProgramFormValues {
   portfolioId: string
-  programId?: string
   name: string
   description: string
-  expenditureCategoryId: number
   start?: Date
   end?: Date
   sponsorIds: string[]
@@ -41,53 +35,37 @@ interface CreateProjectFormValues {
 }
 
 const mapToRequestValues = (
-  values: CreateProjectFormValues,
-): CreateProjectRequest => {
+  values: CreateProgramFormValues,
+): CreateProgramRequest => {
   return {
     name: values.name,
     description: values.description,
-    expenditureCategoryId: values.expenditureCategoryId,
     start: (values.start as any)?.format('YYYY-MM-DD'),
     end: (values.end as any)?.format('YYYY-MM-DD'),
     portfolioId: values.portfolioId,
-    programId: values.programId,
     sponsorIds: values.sponsorIds,
     ownerIds: values.ownerIds,
     managerIds: values.managerIds,
     strategicThemeIds: values.strategicThemeIds,
-  } as CreateProjectRequest
+  } as CreateProgramRequest
 }
 
-const CreateProjectForm = (props: CreateProjectFormProps) => {
+const CreateProgramForm = (props: CreateProgramFormProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [isValid, setIsValid] = useState(false)
-  const [form] = Form.useForm<CreateProjectFormValues>()
+  const [form] = Form.useForm<CreateProgramFormValues>()
   const formValues = Form.useWatch([], form)
 
   const messageApi = useMessage()
 
-  const [createProject, { error: mutationError }] = useCreateProjectMutation()
-
-  const {
-    data: expenditureData,
-    isLoading: expenditureOptionsIsLoading,
-    error: expenditureOptionsError,
-  } = useGetExpenditureCategoryOptionsQuery(false)
+  const [createProgram, { error: mutationError }] = useCreateProgramMutation()
 
   const {
     data: portfolioData,
     isLoading: portfolioOptionsIsLoading,
     error: portfolioOptionsError,
   } = useGetPortfolioOptionsQuery()
-
-  const {
-    data: programData,
-    isLoading: programOptionsIsLoading,
-    error: programOptionsError,
-  } = useGetPortfolioProgramOptionsQuery(form.getFieldValue('portfolioId'), {
-    skip: !form.getFieldValue('portfolioId'),
-  })
 
   const {
     data: employeeData,
@@ -102,27 +80,21 @@ const CreateProjectForm = (props: CreateProjectFormProps) => {
   } = useGetStrategicThemeOptionsQuery(false)
 
   const { hasPermissionClaim } = useAuth()
-  const canCreateProject = hasPermissionClaim('Permissions.Projects.Create')
+  const canCreateProgram = hasPermissionClaim('Permissions.Programs.Create')
 
   useEffect(() => {
     if (
-      expenditureOptionsError ||
       portfolioOptionsError ||
-      programOptionsError ||
       employeeOptionsError ||
       strategicThemeOptionsError
     ) {
       console.error(
-        expenditureOptionsError ??
-          portfolioOptionsError ??
-          programOptionsError ??
+        portfolioOptionsError ??
           employeeOptionsError ??
           strategicThemeOptionsError,
       )
       messageApi.error(
-        expenditureOptionsError.detail ??
-          portfolioOptionsError.detail ??
-          programOptionsError.detail ??
+        portfolioOptionsError.detail ??
           employeeOptionsError.detail ??
           strategicThemeOptionsError.detail ??
           'An error occurred while loading form data. Please try again.',
@@ -130,22 +102,20 @@ const CreateProjectForm = (props: CreateProjectFormProps) => {
     }
   }, [
     employeeOptionsError,
-    expenditureOptionsError,
     portfolioOptionsError,
-    programOptionsError,
     messageApi,
     strategicThemeOptionsError,
   ])
 
-  const create = async (values: CreateProjectFormValues) => {
+  const create = async (values: CreateProgramFormValues) => {
     try {
       const request = mapToRequestValues(values)
-      const response = await createProject(request)
+      const response = await createProgram(request)
       if (response.error) {
         throw response.error
       }
       messageApi.success(
-        'Project created successfully. Project key: ' + response.data.key,
+        'Program created successfully. Program key: ' + response.data.key,
       )
 
       return true
@@ -157,7 +127,7 @@ const CreateProjectForm = (props: CreateProjectFormProps) => {
       } else {
         messageApi.error(
           error.detail ??
-            'An error occurred while creating the project. Please try again.',
+            'An error occurred while creating the program. Please try again.',
         )
       }
       return false
@@ -176,7 +146,7 @@ const CreateProjectForm = (props: CreateProjectFormProps) => {
     } catch (error) {
       console.error('handleOk error', error)
       messageApi.error(
-        'An error occurred while creating the project. Please try again.',
+        'An error occurred while creating the program. Please try again.',
       )
     } finally {
       setIsSaving(false)
@@ -190,13 +160,13 @@ const CreateProjectForm = (props: CreateProjectFormProps) => {
   }, [form, props])
 
   useEffect(() => {
-    if (canCreateProject) {
+    if (canCreateProgram) {
       setIsOpen(props.showForm)
     } else {
       props.onFormCancel()
-      messageApi.error('You do not have permission to create projects.')
+      messageApi.error('You do not have permission to create programs.')
     }
-  }, [canCreateProject, messageApi, props])
+  }, [canCreateProgram, messageApi, props])
 
   useEffect(() => {
     form.validateFields({ validateOnly: true }).then(
@@ -208,7 +178,7 @@ const CreateProjectForm = (props: CreateProjectFormProps) => {
   return (
     <>
       <Modal
-        title="Create Project"
+        title="Create Program"
         open={isOpen}
         width={'60vw'}
         onOk={handleOk}
@@ -224,7 +194,7 @@ const CreateProjectForm = (props: CreateProjectFormProps) => {
           form={form}
           size="small"
           layout="vertical"
-          name="create-project-form"
+          name="create-program-form"
         >
           <Item
             name="portfolioId"
@@ -235,14 +205,6 @@ const CreateProjectForm = (props: CreateProjectFormProps) => {
               allowClear
               options={portfolioData ?? []}
               placeholder="Select Portfolio"
-            />
-          </Item>
-          <Item name="programId" label="Program">
-            <Select
-              allowClear
-              options={programData ?? []}
-              placeholder="Select Program"
-              disabled={!form.getFieldValue('portfolioId')}
             />
           </Item>
           <Item
@@ -268,25 +230,6 @@ const CreateProjectForm = (props: CreateProjectFormProps) => {
             ]}
           >
             <MarkdownEditor maxLength={2048} />
-          </Item>
-          <Item
-            name="expenditureCategoryId"
-            label="Expenditure Category"
-            rules={[
-              { required: true, message: 'Expenditure Category is required' },
-            ]}
-          >
-            <Select
-              allowClear
-              options={expenditureData ?? []}
-              placeholder="Select Expenditure Category"
-              optionFilterProp="children"
-              filterOption={(input, option) =>
-                (option?.label?.toLowerCase() ?? '').includes(
-                  input.toLowerCase(),
-                )
-              }
-            />
           </Item>
           <Item name="start" label="Start">
             <DatePicker />
@@ -358,4 +301,4 @@ const CreateProjectForm = (props: CreateProjectFormProps) => {
   )
 }
 
-export default CreateProjectForm
+export default CreateProgramForm

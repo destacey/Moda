@@ -89,7 +89,12 @@ const menuItems: (Item | MenuItem)[] = [
       'ppm.portfolios',
       '/ppm/portfolios',
     ),
-    // restrictedPermissionMenuItem('Permissions.Programs.View', 'Programs', 'ppm.programs', '/ppm/programs'),
+    restrictedPermissionMenuItem(
+      'Permissions.Programs.View',
+      'Programs',
+      'ppm.programs',
+      '/ppm/programs',
+    ),
     restrictedPermissionMenuItem(
       'Permissions.Projects.View',
       'Projects',
@@ -102,21 +107,28 @@ const menuItems: (Item | MenuItem)[] = [
       'ppm.strategic-initiatives',
       '/ppm/strategic-initiatives',
     ),
+    { key: 'settings-ppm-divider', type: 'divider' },
+    restrictedPermissionMenuItem(
+      'Permissions.StrategicThemes.View',
+      'Strategic Themes',
+      'strategy.strategic-themes',
+      '/strategic-management/strategic-themes',
+    ),
   ]),
-  restrictedMenuSection(
-    'Strategic Management',
-    'strategy',
-    null,
-    menuIcons.strategy,
-    [
-      restrictedPermissionMenuItem(
-        'Permissions.StrategicThemes.View',
-        'Strategic Themes',
-        'strategy.strategic-themes',
-        '/strategic-management/strategic-themes',
-      ),
-    ],
-  ),
+  // restrictedMenuSection(
+  //   'Strategic Management',
+  //   'strategy',
+  //   null,
+  //   menuIcons.strategy,
+  //   [
+  //     restrictedPermissionMenuItem(
+  //       'Permissions.StrategicThemes.View',
+  //       'Strategic Themes',
+  //       'strategy.strategic-themes',
+  //       '/strategic-management/strategic-themes',
+  //     ),
+  //   ],
+  // ),
   { key: 'settings-divider', type: 'divider' },
   menuItem('Settings', 'settings', '/settings', menuIcons.settings),
 ]
