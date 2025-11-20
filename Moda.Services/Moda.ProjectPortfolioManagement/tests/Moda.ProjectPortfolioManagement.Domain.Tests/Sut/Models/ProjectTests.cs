@@ -427,7 +427,7 @@ public class ProjectTests
     {
         // Arrange
         var project = _projectFaker.Generate();
-        var program = Program.Create("Test Program", "Description", null, project.PortfolioId);
+        var program = Program.Create("Test Program", "Description", null, project.PortfolioId, null, null, _dateTimeProvider.Now);
 
         // Act
         var result = project.UpdateProgram(program);
@@ -443,7 +443,7 @@ public class ProjectTests
         // Arrange
         var project = _projectFaker.Generate();
         var portfolioId = Guid.NewGuid();
-        var program = Program.Create("Test Program", "Description", null, portfolioId);
+        var program = Program.Create("Test Program", "Description", null, portfolioId, null, null, _dateTimeProvider.Now);
 
         // Act
         var result = project.UpdateProgram(program);

@@ -7,10 +7,6 @@ namespace Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 
 public sealed class StrategicInitiative : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey
 {
-    private string _name = default!;
-    private string _description = default!;
-    private LocalDateRange _dateRange = default!;
-
     private readonly HashSet<RoleAssignment<StrategicInitiativeRole>> _roles = [];
     private readonly HashSet<StrategicInitiativeKpi> _kpis = [];
     private readonly HashSet<StrategicInitiativeProject> _strategicInitiativeProjects = [];
@@ -42,18 +38,18 @@ public sealed class StrategicInitiative : BaseEntity<Guid>, ISystemAuditable, IH
     /// </summary>
     public string Name
     {
-        get => _name;
-        private set => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
-    }
+        get;
+        private set => field = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
+    } = default!;
 
     /// <summary>
     /// A detailed explanation of what the strategic initiative aims to achieve.
     /// </summary>
     public string Description
     {
-        get => _description;
-        private set => _description = Guard.Against.NullOrWhiteSpace(value, nameof(Description)).Trim();
-    }
+        get;
+        private set => field = Guard.Against.NullOrWhiteSpace(value, nameof(Description)).Trim();
+    } = default!;
 
     /// <summary>
     /// The status of the strategic initiative.
@@ -65,9 +61,9 @@ public sealed class StrategicInitiative : BaseEntity<Guid>, ISystemAuditable, IH
     /// </summary>
     public LocalDateRange DateRange
     {
-        get => _dateRange;
-        private set => _dateRange = Guard.Against.Null(value, nameof(DateRange));
-    }
+        get;
+        private set => field = Guard.Against.Null(value, nameof(DateRange));
+    } = default!;
 
     /// <summary>
     /// The Id of the portfolio to which this strategic initiative belongs.

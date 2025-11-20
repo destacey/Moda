@@ -6,9 +6,6 @@ namespace Moda.ProjectPortfolioManagement.Domain.Models;
 
 public sealed class ExpenditureCategory : BaseEntity<int>, ISystemAuditable
 {
-    private string _name = default!;
-    private string _description = default!;
-
     private ExpenditureCategory() { }
 
     private ExpenditureCategory(string name, string description, ExpenditureCategoryState state, bool isCapitalizable, bool requiresDepreciation, string? accountingCode)
@@ -26,18 +23,18 @@ public sealed class ExpenditureCategory : BaseEntity<int>, ISystemAuditable
     /// </summary>
     public string Name
     {
-        get => _name;
-        private set => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
-    }
+        get;
+        private set => field = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
+    } = default!;
 
     /// <summary>
     /// Detailed description of what qualifies under this expenditure category.
     /// </summary>
     public string Description
     {
-        get => _description;
-        private set => _description = Guard.Against.NullOrWhiteSpace(value, nameof(Description)).Trim();
-    }
+        get;
+        private set => field = Guard.Against.NullOrWhiteSpace(value, nameof(Description)).Trim();
+    } = default!;
 
     /// <summary>
     /// Tracks the lifecycle of the category (e.g., Proposed, Active, Archived).

@@ -1,5 +1,7 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
+using Moda.Common.Domain.Events.ProjectPortfolioManagement;
+using Moda.Common.Domain.Interfaces.ProjectPortfolioManagement;
 using Moda.ProjectPortfolioManagement.Domain.Enums;
 using NodaTime;
 
@@ -8,11 +10,8 @@ namespace Moda.ProjectPortfolioManagement.Domain.Models;
 /// <summary>
 /// Represents a program consisting of related projects within a portfolio, designed to achieve strategic objectives.
 /// </summary>
-public sealed class Program : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey
+public sealed class Program : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey, ISimpleProgram
 {
-    private string _name = default!;
-    private string _description = default!;
-
     private readonly HashSet<RoleAssignment<ProgramRole>> _roles = [];
     private readonly HashSet<Project> _projects = [];
     private readonly HashSet<StrategicThemeTag<Program>> _strategicThemeTags = [];
@@ -52,18 +51,18 @@ public sealed class Program : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey
     /// </summary>
     public string Name
     {
-        get => _name;
-        private set => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
-    }
+        get;
+        private set => field = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
+    } = default!;
 
     /// <summary>
     /// A detailed description of the program's purpose and scope.
     /// </summary>
     public string Description
     {
-        get => _description;
-        private set => _description = Guard.Against.NullOrWhiteSpace(value, nameof(Description)).Trim();
-    }
+        get;
+        private set => field = Guard.Against.NullOrWhiteSpace(value, nameof(Description)).Trim();
+    } = default!;
 
     /// <summary>
     /// The current status of the program.
@@ -117,16 +116,29 @@ public sealed class Program : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey
     public bool CanBeDeleted() => Status is ProgramStatus.Proposed;
 
     /// <summary>
-    /// Updates the program details.
+    /// Updates the program's name and description with the specified values and records the update event.
     /// </summary>
-    public Result UpdateDetails(string name, string description)
+    /// <remarks>This method raises a domain event to signal that the program details have been updated. The
+    /// event includes the provided timestamp.</remarks>
+    /// <param name="name">The new name to assign to the program. Cannot be null.</param>
+    /// <param name="description">The new description to assign to the program. Cannot be null.</param>
+    /// <param name="timestamp">The timestamp indicating when the update occurred.</param>
+    /// <returns>A result indicating whether the update operation was successful.</returns>
+    public Result UpdateDetails(string name, string description, Instant timestamp)
     {
         Name = name;
         Description = description;
 
+        AddDomainEvent(new ProgramDetailsUpdatedEvent(this, timestamp));
+
         return Result.Success();
     }
 
+    /// <summary>
+    /// Updates the program's timeline with the specified date range.
+    /// </summary>
+    /// <param name="dateRange">The new date range to assign to the program.</param>
+    /// <returns>A result indicating whether the update operation was successful.</returns>
     public Result UpdateTimeline(LocalDateRange? dateRange)
     {
         if (Status is ProgramStatus.Active or ProgramStatus.Completed && dateRange is null)
@@ -351,9 +363,24 @@ public sealed class Program : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey
     /// <param name="portfolioId"></param>
     /// <param name="roles"></param>
     /// <param name="strategicThemes"></param>
+    /// <param name="timestamp"></param>
     /// <returns></returns>
-    internal static Program Create(string name, string description, LocalDateRange? dateRange, Guid portfolioId, Dictionary<ProgramRole, HashSet<Guid>>? roles = null, HashSet<Guid>? strategicThemes = null)
+    internal static Program Create(string name, string description, LocalDateRange? dateRange, Guid portfolioId, Dictionary<ProgramRole, HashSet<Guid>>? roles, HashSet<Guid>? strategicThemes, Instant timestamp)
     {
-        return new Program(name, description, ProgramStatus.Proposed, dateRange, portfolioId, roles, strategicThemes);
+        var program = new Program(name, description, ProgramStatus.Proposed, dateRange, portfolioId, roles, strategicThemes);
+
+        program.AddPostPersistenceAction(() => program.AddDomainEvent(new ProgramCreatedEvent(
+                program,
+                (int)program.Status,
+                program.DateRange,
+                program.PortfolioId,
+                program.Roles
+                    .GroupBy(x => (int)x.Role)
+                    .ToDictionary(x => x.Key, x => x.Select(y => y.EmployeeId).ToArray()),
+                [.. program.StrategicThemeTags.Select(x => x.StrategicThemeId)],
+                timestamp
+            )));
+
+        return program;
     }
 }

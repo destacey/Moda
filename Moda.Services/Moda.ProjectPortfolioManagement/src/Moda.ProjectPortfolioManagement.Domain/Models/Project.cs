@@ -13,9 +13,6 @@ namespace Moda.ProjectPortfolioManagement.Domain.Models;
 /// </summary>
 public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey, ISimpleProject
 {
-    private string _name = default!;
-    private string _description = default!;
-    
     private readonly HashSet<RoleAssignment<ProjectRole>> _roles = [];
     private readonly HashSet<StrategicThemeTag<Project>> _strategicThemeTags = [];
     private readonly HashSet<StrategicInitiativeProject> _strategicInitiativeProjects = [];
@@ -58,18 +55,18 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey, 
     /// </summary>
     public string Name
     {
-        get => _name;
-        private set => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
-    }
+        get;
+        private set => field = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
+    } = default!;
 
     /// <summary>
     /// A detailed description of the project's purpose and scope.
     /// </summary>
     public string Description
     {
-        get => _description;
-        private set => _description = Guard.Against.NullOrWhiteSpace(value, nameof(Description)).Trim();
-    }
+        get;
+        private set => field = Guard.Against.NullOrWhiteSpace(value, nameof(Description)).Trim();
+    } = default!;
 
     /// <summary>
     /// The current status of the project.
@@ -138,12 +135,12 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey, 
     public bool CanBeDeleted() => Status is ProjectStatus.Proposed;
 
     /// <summary>
-    /// Updates the project's basic details.
+    /// Updates the core details of the project.
     /// </summary>
-    /// <param name="name"></param>
-    /// <param name="description"></param>
-    /// <param name="expenditureCategoryId"></param>
-    /// <param name="timestamp"></param>
+    /// <param name="name">The new name to assign to the project. Cannot be null.</param>
+    /// <param name="description">The new description to assign to the project. Cannot be null.</param>
+    /// <param name="expenditureCategoryId">The new expenditure category ID to assign to the project.</param>
+    /// <param name="timestamp">The timestamp indicating when the update occurred.</param>
     /// <returns></returns>
     public Result UpdateDetails(string name, string description, int expenditureCategoryId, Instant timestamp)
     {
