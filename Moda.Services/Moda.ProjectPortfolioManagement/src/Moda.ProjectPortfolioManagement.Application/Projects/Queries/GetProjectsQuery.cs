@@ -6,14 +6,14 @@ namespace Moda.ProjectPortfolioManagement.Application.Projects.Queries;
 
 public sealed record GetProjectsQuery(ProjectStatus? StatusFilter = null, IdOrKey? PortfolioIdOrKey = null, IdOrKey? ProgramIdOrKey = null) : IQuery<List<ProjectListDto>>;
 
-internal sealed class GetProjectsQueryHandler(IProjectPortfolioManagementDbContext projectPortfolioManagementDbContext) 
+internal sealed class GetProjectsQueryHandler(IProjectPortfolioManagementDbContext ppmDbContext) 
     : IQueryHandler<GetProjectsQuery, List<ProjectListDto>>
 {
-    private readonly IProjectPortfolioManagementDbContext _projectPortfolioManagementDbContext = projectPortfolioManagementDbContext;
+    private readonly IProjectPortfolioManagementDbContext _ppmDbContext = ppmDbContext;
 
     public async Task<List<ProjectListDto>> Handle(GetProjectsQuery request, CancellationToken cancellationToken)
     {
-        var query = _projectPortfolioManagementDbContext.Projects.AsQueryable();
+        var query = _ppmDbContext.Projects.AsQueryable();
 
         if (request.StatusFilter.HasValue)
         {
@@ -25,7 +25,7 @@ internal sealed class GetProjectsQueryHandler(IProjectPortfolioManagementDbConte
             // TODO: make this reusable
             Guid? portfolioId = request.PortfolioIdOrKey.IsId 
                 ? request.PortfolioIdOrKey.AsId 
-                : await _projectPortfolioManagementDbContext.Portfolios
+                : await _ppmDbContext.Portfolios
                     .Where(p => p.Key == request.PortfolioIdOrKey.AsKey)
                     .Select(p => (Guid?)p.Id)
                     .FirstOrDefaultAsync(cancellationToken);
@@ -42,7 +42,7 @@ internal sealed class GetProjectsQueryHandler(IProjectPortfolioManagementDbConte
         {
             Guid? programId = request.ProgramIdOrKey.IsId
                 ? request.ProgramIdOrKey.AsId
-                : await _projectPortfolioManagementDbContext.Programs
+                : await _ppmDbContext.Programs
                     .Where(p => p.Key == request.ProgramIdOrKey.AsKey)
                     .Select(p => (Guid?)p.Id)
                     .FirstOrDefaultAsync(cancellationToken);

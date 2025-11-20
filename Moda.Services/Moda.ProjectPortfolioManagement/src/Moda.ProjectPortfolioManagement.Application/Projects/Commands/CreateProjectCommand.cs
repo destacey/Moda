@@ -76,7 +76,7 @@ internal sealed class CreateProjectCommandHandler(
                 return Result.Failure<ObjectIdAndKey>("Expenditure Category is not active.");
             }
 
-            var strategicThemeIds = request.StrategicThemeIds?.Distinct().ToHashSet() ?? [];
+            var strategicThemeIds = request.StrategicThemeIds?.ToHashSet() ?? [];
             var strategicThemes = request.StrategicThemeIds is not null && request.StrategicThemeIds.Count != 0
                 ? await _projectPortfolioManagementDbContext.PpmStrategicThemes
                     .Where(st => strategicThemeIds.Contains(st.Id))
