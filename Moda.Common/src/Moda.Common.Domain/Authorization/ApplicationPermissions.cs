@@ -183,6 +183,11 @@ public static class ApplicationPermissions
         new ("Update Portfolios", ApplicationAction.Update, ApplicationResource.ProjectPortfolios),
         new ("Delete Portfolios", ApplicationAction.Delete, ApplicationResource.ProjectPortfolios),
 
+        new ("View Programs", ApplicationAction.View, ApplicationResource.Programs),
+        new ("Create Programs", ApplicationAction.Create, ApplicationResource.Programs),
+        new ("Update Programs", ApplicationAction.Update, ApplicationResource.Programs),
+        new ("Delete Programs", ApplicationAction.Delete, ApplicationResource.Programs),
+
         new ("View Projects", ApplicationAction.View, ApplicationResource.Projects),
         new ("Create Projects", ApplicationAction.Create, ApplicationResource.Projects),
         new ("Update Projects", ApplicationAction.Update, ApplicationResource.Projects),

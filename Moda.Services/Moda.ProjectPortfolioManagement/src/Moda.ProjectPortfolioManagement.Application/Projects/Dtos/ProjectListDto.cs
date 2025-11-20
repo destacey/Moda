@@ -40,6 +40,11 @@ public sealed record ProjectListDto : IMapFrom<Project>
     public required NavigationDto Portfolio { get; set; }
 
     /// <summary>
+    /// Gets or sets the navigation information for the program section.
+    /// </summary>
+    public NavigationDto? Program { get; set; }
+
+    /// <summary>
     /// The sponsors of the project.
     /// </summary>
     public required List<EmployeeNavigationDto> ProjectSponsors { get; set; } = [];
@@ -66,6 +71,7 @@ public sealed record ProjectListDto : IMapFrom<Project>
             .Map(dest => dest.Start, src => src.DateRange != null ? src.DateRange.Start : (LocalDate?)null)
             .Map(dest => dest.End, src => src.DateRange != null ? src.DateRange.End : (LocalDate?)null)
             .Map(dest => dest.Portfolio, src => NavigationDto.Create(src.Portfolio!.Id, src.Portfolio.Key, src.Portfolio.Name))
+            .Map(dest => dest.Program, src => src.Program != null ? NavigationDto.Create(src.Program.Id, src.Program.Key, src.Program.Name) : null)
             .Map(dest => dest.ProjectSponsors, src => src.Roles.Where(r => r.Role == ProjectRole.Sponsor).Select(x => EmployeeNavigationDto.From(x.Employee!)).ToList())
             .Map(dest => dest.ProjectOwners, src => src.Roles.Where(r => r.Role == ProjectRole.Owner).Select(x => EmployeeNavigationDto.From(x.Employee!)).ToList())
             .Map(dest => dest.ProjectManagers, src => src.Roles.Where(r => r.Role == ProjectRole.Manager).Select(x => EmployeeNavigationDto.From(x.Employee!)).ToList())
