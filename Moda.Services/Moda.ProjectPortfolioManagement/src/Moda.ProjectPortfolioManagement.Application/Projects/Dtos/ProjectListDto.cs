@@ -40,7 +40,7 @@ public sealed record ProjectListDto : IMapFrom<Project>
     public required NavigationDto Portfolio { get; set; }
 
     /// <summary>
-    /// Gets or sets the navigation information for the program section.
+    /// The program associated with this project.
     /// </summary>
     public NavigationDto? Program { get; set; }
 

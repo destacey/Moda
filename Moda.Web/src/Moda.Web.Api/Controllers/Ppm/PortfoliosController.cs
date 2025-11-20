@@ -4,6 +4,8 @@ using Moda.ProjectPortfolioManagement.Application.ExpenditureCategories.Queries;
 using Moda.ProjectPortfolioManagement.Application.Portfolios.Command;
 using Moda.ProjectPortfolioManagement.Application.Portfolios.Dtos;
 using Moda.ProjectPortfolioManagement.Application.Portfolios.Queries;
+using Moda.ProjectPortfolioManagement.Application.Programs.Dtos;
+using Moda.ProjectPortfolioManagement.Application.Programs.Queries;
 using Moda.ProjectPortfolioManagement.Application.Projects.Dtos;
 using Moda.ProjectPortfolioManagement.Application.Projects.Queries;
 using Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Dtos;
@@ -139,6 +141,20 @@ public class PortfoliosController(ILogger<PortfoliosController> logger, ISender 
         return result.IsSuccess
             ? NoContent()
             : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpGet("{idOrKey}/programs")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Programs)]
+    [OpenApiOperation("Get a list of programs for the portfolio.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IEnumerable<ProgramListDto>>> GetPrograms(string idOrKey, [FromQuery] int? status, CancellationToken cancellationToken)
+    {
+        ProgramStatus? filter = status.HasValue ? (ProgramStatus)status.Value : null;
+
+        var programs = await _sender.Send(new GetProgramsQuery(PortfolioIdOrKey: idOrKey, StatusFilter: filter), cancellationToken);
+
+        return Ok(programs);
     }
 
     [HttpGet("{idOrKey}/projects")]

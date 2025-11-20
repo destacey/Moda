@@ -77,6 +77,24 @@ public class ProjectsController(ILogger<ProjectsController> logger, ISender send
             : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
+    // change project program
+
+
+    [HttpPut("{id}/program")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Projects)]
+    [OpenApiOperation("Change a project's program.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> ChangeProgram(Guid id, [FromBody] ChangeProjectProgramRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(request.ToChangeProjectProgramCommand(id), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
     [HttpPost("{id}/activate")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Projects)]
     [OpenApiOperation("Activate a project.", "")]

@@ -3672,6 +3672,70 @@ export class PortfoliosClient {
     }
 
     /**
+     * Get a list of programs for the portfolio.
+     * @param status (optional) 
+     */
+    getPrograms(idOrKey: string, status?: number | null | undefined, cancelToken?: CancelToken): Promise<ProgramListDto[]> {
+        let url_ = this.baseUrl + "/api/ppm/portfolios/{idOrKey}/programs?";
+        if (idOrKey === undefined || idOrKey === null)
+            throw new globalThis.Error("The parameter 'idOrKey' must be defined.");
+        url_ = url_.replace("{idOrKey}", encodeURIComponent("" + idOrKey));
+        if (status !== undefined && status !== null)
+            url_ += "status=" + encodeURIComponent("" + status) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetPrograms(_response);
+        });
+    }
+
+    protected processGetPrograms(response: AxiosResponse): Promise<ProgramListDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<ProgramListDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ProgramListDto[]>(null as any);
+    }
+
+    /**
      * Get a list of projects for the portfolio.
      */
     getProjects(idOrKey: string, cancelToken?: CancelToken): Promise<ProjectListDto[]> {
@@ -4748,6 +4812,74 @@ export class ProjectsClient {
             let resultData400  = _responseText;
             result400 = JSON.parse(resultData400);
             return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Change a project's program.
+     */
+    changeProgram(id: string, request: ChangeProjectProgramRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/ppm/projects/{id}/program";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "PUT",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processChangeProgram(_response);
+        });
+    }
+
+    protected processChangeProgram(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 422) {
+            const _responseText = response.data;
+            let result422: any = null;
+            let resultData422  = _responseText;
+            result422 = JSON.parse(resultData422);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
@@ -16336,6 +16468,20 @@ export interface UpdatePortfolioRequest {
     managerIds?: string[] | undefined;
 }
 
+export interface ProgramListDto {
+    id: string;
+    key: number;
+    name: string;
+    status: SimpleNavigationDto;
+    start?: Date | undefined;
+    end?: Date | undefined;
+    portfolio: NavigationDto;
+    programSponsors: EmployeeNavigationDto[];
+    programOwners: EmployeeNavigationDto[];
+    programManagers: EmployeeNavigationDto[];
+    strategicThemes: NavigationDto[];
+}
+
 export interface ProjectListDto {
     id: string;
     key: number;
@@ -16366,20 +16512,6 @@ export interface StrategicInitiativeListDto {
 export interface ProjectPortfolioOptionDto {
     id: string;
     name: string;
-}
-
-export interface ProgramListDto {
-    id: string;
-    key: number;
-    name: string;
-    status: SimpleNavigationDto;
-    start?: Date | undefined;
-    end?: Date | undefined;
-    portfolio: NavigationDto;
-    programSponsors: EmployeeNavigationDto[];
-    programOwners: EmployeeNavigationDto[];
-    programManagers: EmployeeNavigationDto[];
-    strategicThemes: NavigationDto[];
 }
 
 export interface ProgramDetailsDto {
@@ -16449,6 +16581,7 @@ export interface ProjectDetailsDto {
     start?: Date | undefined;
     end?: Date | undefined;
     portfolio: NavigationDto;
+    program?: NavigationDto | undefined;
     projectSponsors: EmployeeNavigationDto[];
     projectOwners: EmployeeNavigationDto[];
     projectManagers: EmployeeNavigationDto[];
@@ -16501,6 +16634,11 @@ export interface UpdateProjectRequest {
     managerIds?: string[] | undefined;
     /** The strategic themes associated with this project. */
     strategicThemeIds?: string[] | undefined;
+}
+
+export interface ChangeProjectProgramRequest {
+    /** The new ProgramId to assign to the Project. If null the Program will be removed. */
+    programId?: string | undefined;
 }
 
 export interface WorkItemListDto {
