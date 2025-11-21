@@ -1,4 +1,5 @@
-﻿using Moda.Organization.Application.Teams.Models;
+﻿using Moda.Common.Domain.Models.Organizations;
+using Moda.Organization.Application.Teams.Models;
 using NodaTime;
 
 namespace Moda.Organization.Application.Teams.Commands;

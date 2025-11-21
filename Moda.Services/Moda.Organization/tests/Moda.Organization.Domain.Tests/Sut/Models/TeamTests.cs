@@ -1,5 +1,6 @@
 ﻿using Moda.Common.Domain.Enums.Organization;
 using Moda.Common.Domain.Events;
+using Moda.Common.Domain.Models.Organizations;
 using Moda.Organization.Domain.Models;
 using Moda.Organization.Domain.Tests.Data;
 using Moda.Tests.Shared;

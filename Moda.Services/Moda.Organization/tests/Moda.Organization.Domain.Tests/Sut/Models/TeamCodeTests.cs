@@ -1,4 +1,4 @@
-﻿using Moda.Organization.Domain.Models;
+﻿using Moda.Common.Domain.Models.Organizations;
 
 namespace Moda.Common.Tests.Sut.Models;
 

@@ -1,5 +1,5 @@
 ﻿using Moda.Common.Domain.Enums.Work;
-using Moda.Organization.Domain.Models;
+using Moda.Common.Domain.Models.Organizations;
 using Moda.Work.Application.Persistence;
 using Moda.Work.Application.WorkItems.Dtos;
 

@@ -2,6 +2,7 @@
 using CSharpFunctionalExtensions;
 using Moda.Common.Domain.Enums.Organization;
 using Moda.Common.Domain.Interfaces.Organization;
+using Moda.Common.Domain.Models.Organizations;
 using Moda.Common.Extensions;
 using NodaTime;
 

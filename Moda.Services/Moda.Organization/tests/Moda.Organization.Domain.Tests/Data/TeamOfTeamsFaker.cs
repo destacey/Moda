@@ -1,4 +1,5 @@
 ﻿using Moda.Common.Domain.Enums.Organization;
+using Moda.Common.Domain.Models.Organizations;
 using Moda.Organization.Domain.Models;
 using Moda.Tests.Shared.Data;
 using NodaTime;

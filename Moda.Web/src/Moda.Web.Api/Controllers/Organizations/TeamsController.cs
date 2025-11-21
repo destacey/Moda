@@ -1,9 +1,10 @@
 ﻿using Moda.Common.Domain.Enums.Work;
+using Moda.Common.Domain.Extensions.Organizations;
+using Moda.Common.Domain.Models.Organizations;
 using Moda.Organization.Application.Models;
 using Moda.Organization.Application.Teams.Commands;
 using Moda.Organization.Application.Teams.Dtos;
 using Moda.Organization.Application.Teams.Queries;
-using Moda.Organization.Domain.Extensions;
 using Moda.Organization.Domain.Models;
 using Moda.Planning.Application.Iterations.Dtos;
 using Moda.Planning.Application.Iterations.Queries;

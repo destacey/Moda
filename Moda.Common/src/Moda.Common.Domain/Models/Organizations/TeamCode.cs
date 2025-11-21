@@ -1,13 +1,13 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
-using Moda.Organization.Domain.Extensions;
+using Moda.Common.Domain.Extensions.Organizations;
 
-namespace Moda.Organization.Domain.Models;
+namespace Moda.Common.Domain.Models.Organizations;
 
 // TODO: move to Moda.Common.Domain
 public class TeamCode : ValueObject
 {
-    public static string Regex = "^([A-Z0-9]){2,10}$";
+    public const string Regex = "^([A-Z0-9]){2,10}$";
 
     public TeamCode(string value)
     {

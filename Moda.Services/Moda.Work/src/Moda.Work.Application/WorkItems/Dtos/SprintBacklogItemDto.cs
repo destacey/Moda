@@ -26,8 +26,7 @@ public sealed record SprintBacklogItemDto : IMapFrom<WorkItem>
     public EmployeeNavigationDto? AssignedTo { get; set; }
     public Instant Created { get; set; }
     public Instant? Activated { get; set; }
-    public Instant? Done { get; set; }
-    
+    public Instant? Done { get; set; }    
     public int Rank { get; set; }
     public int? ParentRank { get; set; }
     public WorkProjectNavigationDto? Project { get; set; }

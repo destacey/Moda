@@ -1,4 +1,6 @@
-﻿namespace Moda.Organization.Application.Validators;
+﻿using Moda.Common.Domain.Models.Organizations;
+
+namespace Moda.Organization.Application.Validators;
 public sealed class TeamCodeValidator : CustomValidator<TeamCode>
 {
     private readonly IOrganizationDbContext _organizationDbContext;
