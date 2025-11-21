@@ -36,8 +36,6 @@ public abstract class BaseTeam : BaseSoftDeletableEntity<Guid>, ISimpleTeam, IHa
         protected set => _code = Guard.Against.Null(value, nameof(Code));
     }
 
-    string ISimpleTeam.Code => Code.Value;
-
     /// <summary>
     /// The description of the team.
     /// </summary>

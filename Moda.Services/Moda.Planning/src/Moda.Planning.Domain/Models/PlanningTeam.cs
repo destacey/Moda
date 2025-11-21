@@ -1,6 +1,7 @@
 ﻿using Moda.Common.Domain.Enums.Organization;
 using Moda.Common.Domain.Interfaces;
 using Moda.Common.Domain.Interfaces.Organization;
+using Moda.Common.Domain.Models.Organizations;
 
 namespace Moda.Planning.Domain.Models;
 
@@ -26,7 +27,7 @@ public class PlanningTeam : ISimpleTeam, IHasIdAndKey
     public Guid Id { get; private set; }
     public int Key { get; private set; }
     public string Name { get; private set; } = default!;
-    public string Code { get; private set; } = default!;
+    public TeamCode Code { get; private set; } = default!;
     public TeamType Type { get; private set; } = default!;
     public bool IsActive { get; private set; }
     public IReadOnlyCollection<PlanningIntervalTeam> PlanningIntervalTeams => _planningIntervalTeams.AsReadOnly();

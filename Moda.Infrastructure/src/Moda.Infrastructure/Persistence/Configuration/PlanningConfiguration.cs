@@ -5,6 +5,7 @@ using Moda.Common.Domain.Enums.AppIntegrations;
 using Moda.Common.Domain.Enums.Organization;
 using Moda.Common.Domain.Enums.Planning;
 using Moda.Common.Domain.Models;
+using Moda.Common.Domain.Models.Organizations;
 using Moda.Planning.Domain.Enums;
 using Moda.Planning.Domain.Models;
 using Moda.Planning.Domain.Models.Iterations;
@@ -35,7 +36,10 @@ public class PlanningTeamConfig : IEntityTypeConfiguration<PlanningTeam>
         builder.Property(t => t.Key).ValueGeneratedNever();
 
         builder.Property(t => t.Name).IsRequired().HasMaxLength(128);
-        builder.Property(t => t.Code).IsRequired()
+        builder.Property(o => o.Code).IsRequired()
+            .HasConversion(
+                o => o.Value,
+                o => new TeamCode(o))
             .HasColumnType("varchar")
             .HasMaxLength(10);
         builder.Property(t => t.Type).IsRequired()

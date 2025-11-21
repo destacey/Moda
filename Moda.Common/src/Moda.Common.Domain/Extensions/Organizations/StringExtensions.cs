@@ -13,8 +13,6 @@ public static partial class StringExtensions
     /// </returns>
     public static bool IsValidTeamCodeFormat(this string? value)
     {
-        // TODO: move to Moda.Common.Domain
-
         return !string.IsNullOrWhiteSpace(value)
             && TeamCodeRegex().IsMatch(value);
     }
