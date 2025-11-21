@@ -15294,7 +15294,8 @@
           "type",
           "status",
           "statusCategory",
-          "stackRank"
+          "stackRank",
+          "created"
         ],
         "properties": {
           "id": {
@@ -15372,6 +15373,25 @@
           },
           "externalViewWorkItemUrl": {
             "type": "string",
+            "nullable": true
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "activated": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "done": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "cycleTime": {
+            "type": "number",
+            "format": "double",
             "nullable": true
           }
         }

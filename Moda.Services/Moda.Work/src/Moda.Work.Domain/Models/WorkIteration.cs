@@ -4,6 +4,7 @@ using Moda.Common.Domain.Enums.Planning;
 using Moda.Common.Domain.Events.WorkManagement.WorkIterations;
 using Moda.Common.Domain.Interfaces.Planning.Iterations;
 using Moda.Common.Domain.Models.Planning.Iterations;
+using Moda.Work.Domain.Interfaces;
 using NodaTime;
 
 namespace Moda.Work.Domain.Models;
@@ -11,7 +12,7 @@ namespace Moda.Work.Domain.Models;
 /// <summary>
 /// A copy of the Moda.Common.Domain.Interfaces.Planning.Iterations.ISimpleIteration interface.  Used to hold basic iteration information for the work service and db context.
 /// </summary>
-public sealed class WorkIteration : BaseEntity<Guid>, ISimpleIteration, IHasIdAndKey
+public sealed class WorkIteration : BaseEntity<Guid>, ISimpleIteration, IHasIdAndKey, IHasOptionalWorkTeam
 {
     private WorkIteration() { }
 

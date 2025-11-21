@@ -8,7 +8,7 @@ namespace Moda.Planning.Domain.Models;
 /// <summary>
 /// A copy of the Moda.Common.Domain.Interfaces.Organization.ISimpleTeam interface.  Used to hold basic team information for the planning service and db context.
 /// </summary>
-public class PlanningTeam : ISimpleTeam, IHasIdAndKey
+public class PlanningTeam : ISimpleTeam, IHasIdAndKey, IHasTeamIdAndCode
 {
     protected readonly List<PlanningIntervalTeam> _planningIntervalTeams = [];
 

@@ -4,7 +4,7 @@ using Moda.Work.Domain.Interfaces;
 using OneOf;
 
 namespace Moda.Work.Application.Workspaces.Models;
-public class WorkspaceIdOrKey : OneOfBase<Guid, WorkspaceKey>
+public sealed class WorkspaceIdOrKey : OneOfBase<Guid, WorkspaceKey>
 {
     public WorkspaceIdOrKey(OneOf<Guid, WorkspaceKey> value) : base(value) { }
     public WorkspaceIdOrKey(string value) : base(Guid.TryParse(value, out var guid) ? guid : new WorkspaceKey(value)) { }
@@ -23,7 +23,7 @@ public static class WorkspaceIdOrKeyExtensions
     /// <param name="idOrKey"></param>
     /// <returns></returns>
     public static Expression<Func<T, bool>> CreateFilter<T>(this WorkspaceIdOrKey idOrKey)
-        where T : HasWorkspaceIdAndKey
+        where T : IHasWorkspaceIdAndKey
     {
         return idOrKey.Match<Expression<Func<T, bool>>>(
             id => x => x.Id == id,
@@ -38,7 +38,7 @@ public static class WorkspaceIdOrKeyExtensions
     /// <param name="idOrKey"></param>
     /// <returns></returns>
     public static Expression<Func<T, bool>> CreateWorkspaceFilter<T>(this WorkspaceIdOrKey idOrKey)
-        where T : HasWorkspace
+        where T : IHasWorkspace
     {
         // Match returns the predicate directly - no additional expression building needed
         return idOrKey.Match<Expression<Func<T, bool>>>(

@@ -15,7 +15,7 @@ namespace Moda.Work.Domain.Models;
 /// process. It supports operations such as adding and removing work items, updating workspace properties, and managing
 /// activation and deactivation states. Workspaces can be either owned internally or managed externally, with optional
 /// support for external work item URL templates.</remarks>
-public sealed class Workspace : BaseSoftDeletableEntity<Guid>, IActivatable<WorkspaceActivatableArgs, Instant>, HasWorkspaceIdAndKey
+public sealed class Workspace : BaseSoftDeletableEntity<Guid>, IActivatable<WorkspaceActivatableArgs, Instant>, IHasWorkspaceIdAndKey
 {
     private WorkspaceKey _key = null!;
     private string _name = null!;
