@@ -368,3 +368,15 @@ export const renderSprintLinkHelper = (sprint: { key: number | string; name: str
   if (!sprint) return null
   return <Link href={`/planning/sprints/${sprint.key}`}>{sprint.name}</Link>
 }
+
+export const DateTimeCellRenderer = (props: CustomCellRendererProps) => {
+  const { value } = props
+  if (!value) return ''
+  return new Date(value).toLocaleString(undefined, {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}

@@ -2,10 +2,12 @@
 
 import { ModaGrid } from '@/src/components/common'
 import { WorkItemListDto } from '@/src/services/moda-api'
-import { ColDef } from 'ag-grid-community'
-import { useCallback, useMemo } from 'react'
+import { ColDef, ICellRendererParams } from 'ag-grid-community'
+import { forwardRef, useCallback, useMemo } from 'react'
+import { AgGridReact } from 'ag-grid-react'
 import {
   AssignedToLinkCellRenderer,
+  DateTimeCellRenderer,
   NestedTeamNameLinkCellRenderer,
   NestedWorkSprintLinkCellRenderer,
   ParentWorkItemLinkCellRenderer,
@@ -25,9 +27,11 @@ export interface WorkItemsGridProps {
   gridHeight?: number
   hideParentColumn?: boolean
   hideProjectColumn?: boolean
+  showStats?: boolean
+  onFilterChanged?: () => void
 }
 
-const WorkItemsGrid = (props: WorkItemsGridProps) => {
+const WorkItemsGrid = forwardRef<AgGridReact<WorkItemListDto>, WorkItemsGridProps>((props, ref) => {
   const { refetch } = props
 
   const columnDefs = useMemo<ColDef<WorkItemListDto>[]>(
@@ -39,18 +43,19 @@ const WorkItemsGrid = (props: WorkItemsGridProps) => {
       },
       { field: 'title', width: 400 },
       { field: 'type.name', headerName: 'Type', width: 125 },
-      {
-        field: 'storyPoints',
-        headerName: 'SPs',
-        title: 'Story Points',
-        width: 80,
-      },
       { field: 'status', width: 125, cellRenderer: WorkStatusTagCellRenderer },
       {
         field: 'statusCategory.name',
         headerName: 'Status Category',
         width: 140,
         comparator: workStatusCategoryComparator,
+      },
+      {
+        field: 'storyPoints',
+        headerName: 'Story Points',
+        width: 100,
+        filter: 'agNumberColumnFilter',
+        type: 'numericColumn',
       },
       {
         field: 'team.name',
@@ -88,14 +93,38 @@ const WorkItemsGrid = (props: WorkItemsGridProps) => {
         cellRenderer: ProjectLinkCellRenderer,
       },
       {
-        field: 'storyPoints',
-        headerName: 'Story Points',
-        width: 100,
-        filter: 'agNumberColumnFilter',
+        field: 'activated',
+        hide: !props.showStats,
+        filter: 'agDateColumnFilter',
+        filterParams: {
+          includeBlanksInEquals: false,
+          includeBlanksInLessThan: false,
+          includeBlanksInGreaterThan: false,
+        },
+        cellRenderer: DateTimeCellRenderer,
+      },
+      {
+        field: 'done',
+        hide: !props.showStats,
+        sort: 'desc',
+        filter: 'agDateColumnFilter',
+        filterParams: {
+          includeBlanksInEquals: false,
+          includeBlanksInLessThan: false,
+          includeBlanksInGreaterThan: false,
+        },
+        cellRenderer: DateTimeCellRenderer,
+      },
+      {
+        field: 'cycleTime',
+        headerName: 'Cycle Time (Days)',
+        hide: !props.showStats,
         type: 'numericColumn',
+        cellRenderer: (params: ICellRendererParams<WorkItemListDto>) =>
+          params.value?.toFixed(2) ?? '',
       },
     ],
-    [props.hideParentColumn, props.hideProjectColumn],
+    [props.hideParentColumn, props.hideProjectColumn, props.showStats],
   )
 
   const refresh = useCallback(async () => {
@@ -104,13 +133,17 @@ const WorkItemsGrid = (props: WorkItemsGridProps) => {
 
   return (
     <ModaGrid
+      ref={ref}
       height={props.gridHeight ?? 550}
       columnDefs={columnDefs}
       rowData={props.workItems}
       loadData={refresh}
       loading={props.isLoading}
+      onFilterChanged={props.onFilterChanged}
     />
   )
-}
+})
+
+WorkItemsGrid.displayName = 'WorkItemsGrid'
 
 export default WorkItemsGrid

@@ -1,7 +1,7 @@
 'use client'
 
 import { AgGridReact, AgGridReactProps } from 'ag-grid-react'
-import { useCallback, useRef, useState } from 'react'
+import { forwardRef, useCallback, useImperativeHandle, useRef, useState } from 'react'
 import {
   Button,
   Col,
@@ -45,7 +45,7 @@ const modaDefaultColDef = {
   floatingFilter: true,
 }
 
-const ModaGrid = ({
+const ModaGrid = forwardRef<AgGridReact, ModaGridProps>(({
   height,
   width,
   includeGlobalSearch,
@@ -58,7 +58,7 @@ const ModaGrid = ({
   loadData,
   emptyMessage,
   ...props
-}: ModaGridProps) => {
+}, ref) => {
   const { agGridTheme } = useTheme()
   const [displayedRowCount, setDisplayedRowCount] = useState(0)
   const [searchValue, setSearchValue] = useState('')
@@ -67,6 +67,9 @@ const ModaGrid = ({
   const showGridControls = gridControlMenuItems?.length > 0
 
   const gridRef = useRef<AgGridReact>(null)
+
+  // Forward the ref to parent components
+  useImperativeHandle(ref, () => gridRef.current as AgGridReact, [])
 
   const rowCount = rowData?.length ?? 0
 
@@ -186,6 +189,8 @@ const ModaGrid = ({
       </Space>
     </div>
   )
-}
+})
+
+ModaGrid.displayName = 'ModaGrid'
 
 export default ModaGrid

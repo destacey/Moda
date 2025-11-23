@@ -1,7 +1,7 @@
 'use client'
 
 import '@/styles/globals.css'
-import React, { useMemo } from 'react'
+import React, { memo, PropsWithChildren, useMemo } from 'react'
 import '@ant-design/v5-patch-for-react-19'
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community'
 import { Provider } from 'react-redux'
@@ -30,7 +30,7 @@ const inter = Inter({ subsets: ['latin'] })
 // Register all community features for ag-grid
 ModuleRegistry.registerModules([AllCommunityModule])
 
-const AppContent = React.memo(({ children }: React.PropsWithChildren) => {
+const AppContent = memo(({ children }: PropsWithChildren) => {
   const screens = Grid.useBreakpoint()
   const isMobile = useMemo(() => !screens.md, [screens.md]) // md breakpoint is 768px in Ant Design
 

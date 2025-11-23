@@ -3,6 +3,7 @@ import '@testing-library/jest-dom'
 import { CustomCellRendererProps } from 'ag-grid-react'
 import {
   AssignedToLinkCellRenderer,
+  DateTimeCellRenderer,
   DependencyHealthCellRenderer,
   MarkdownCellRenderer,
   NestedTeamNameLinkCellRenderer,
@@ -521,6 +522,62 @@ describe('Helper Functions', () => {
     it('should return null when sprint is null', () => {
       const result = renderSprintLinkHelper(null)
       expect(result).toBeNull()
+    })
+  })
+})
+
+describe('DateTime Cell Renderer', () => {
+  describe('DateTimeCellRenderer', () => {
+    it('should format date with time', () => {
+      const dateValue = '2025-11-23T14:30:00.000Z'
+      const props = createMockProps(null, dateValue)
+
+      const result = DateTimeCellRenderer(props)
+
+      // The result should be a formatted string
+      expect(typeof result).toBe('string')
+      expect(result).toBeTruthy()
+      // Should contain year
+      expect(result).toContain('2025')
+      // Should contain month (11)
+      expect(result).toContain('11')
+      // Should contain day (23)
+      expect(result).toContain('23')
+    })
+
+    it('should return empty string when value is null', () => {
+      const props = createMockProps(null, null)
+      const result = DateTimeCellRenderer(props)
+      expect(result).toBe('')
+    })
+
+    it('should return empty string when value is undefined', () => {
+      const props = createMockProps(null, undefined)
+      const result = DateTimeCellRenderer(props)
+      expect(result).toBe('')
+    })
+
+    it('should handle Date objects', () => {
+      const dateValue = new Date('2025-11-23T14:30:00.000Z')
+      const props = createMockProps(null, dateValue)
+
+      const result = DateTimeCellRenderer(props)
+
+      expect(typeof result).toBe('string')
+      expect(result).toBeTruthy()
+      expect(result).toContain('2025')
+    })
+
+    it('should format date with two-digit month and day', () => {
+      // Create a date with single digit month and day to test formatting
+      const dateValue = '2025-01-05T09:05:00.000Z'
+      const props = createMockProps(null, dateValue)
+
+      const result = DateTimeCellRenderer(props)
+
+      // Should contain two-digit month and day
+      expect(result).toContain('01')
+      expect(result).toContain('05')
     })
   })
 })

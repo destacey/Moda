@@ -2,6 +2,7 @@
 
 import PageTitle from '@/src/components/common/page-title'
 import { Card, MenuProps } from 'antd'
+import { CloseOutlined } from '@ant-design/icons'
 import {
   createElement,
   use,
@@ -10,7 +11,7 @@ import {
   useMemo,
   useState,
 } from 'react'
-import TeamDetails from './team-details'
+import TeamDetails from '../_components/team-details'
 import RisksGrid, {
   RisksGridProps,
 } from '@/src/components/common/planning/risks-grid'
@@ -34,14 +35,13 @@ import {
 } from '../../../../store/features/organizations/team-slice'
 import { useAppDispatch, useAppSelector } from '@/src/hooks'
 import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
-import { WorkItemsBacklogGrid } from '@/src/components/common/work'
-import { useGetTeamBacklogQuery } from '@/src/store/features/organizations/team-api'
-import { WorkItemsBacklogGridProps } from '@/src/components/common/work/work-items-backlog-grid'
-import TeamDependencyManagement from './team-dependency-management'
+import TeamDependencyManagement from '../_components/team-dependency-management'
 import { ItemType } from 'antd/es/menu/interface'
 import { InactiveTag, PageActions } from '@/src/components/common'
 import DeactivateTeamForm from '../../_components/deactivate-team-form'
-import TeamSprints from './team-sprints'
+import TeamSprints from '../_components/team-sprints'
+import { CycleTimeReport } from '@/src/components/common/work/cycle-time-report'
+import TeamBacklog from '../_components/team-backlog'
 
 enum TeamTabs {
   Details = 'details',
@@ -50,6 +50,7 @@ enum TeamTabs {
   DependencyManagement = 'dependency-management',
   RiskManagement = 'risk-management',
   TeamMemberships = 'team-memberships',
+  CycleTimeReport = 'cycle-time-report',
 }
 
 const tabs = [
@@ -83,9 +84,7 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const { key } = use(props.params)
   const teamKey = Number(key)
 
-  useDocumentTitle('Team Details')
-
-  const [activeTab, setActiveTab] = useState(TeamTabs.Details)
+  const [activeTab, setActiveTab] = useState<TeamTabs>(TeamTabs.Details)
   const [openCreateTeamMembershipForm, setOpenCreateTeamMembershipForm] =
     useState<boolean>(false)
   const [openDeactivateTeamForm, setOpenDeactivateTeamForm] =
@@ -94,6 +93,9 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     useState<boolean>(false)
   const [risksQueryEnabled, setRisksQueryEnabled] = useState<boolean>(false)
   const [includeClosedRisks, setIncludeClosedRisks] = useState<boolean>(false)
+  const [dynamicTabs, setDynamicTabs] = useState<
+    Array<{ key: string; tab: string; closable: boolean }>
+  >([])
 
   const { hasPermissionClaim } = useAuth()
   const canUpdateTeam = hasPermissionClaim('Permissions.Teams.Update')
@@ -114,7 +116,7 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     { skip: !team?.id || !teamMembershipsQueryEnabled },
   )
 
-  const backlogQuery = useGetTeamBacklogQuery(team?.id, { skip: !team?.id })
+  useDocumentTitle(`${team?.code ?? teamKey} - Team Details`)
 
   const risksQuery = useGetTeamRisksQuery(
     {
@@ -128,6 +130,28 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const onIncludeClosedRisksChanged = useCallback((includeClosed: boolean) => {
     setIncludeClosedRisks(includeClosed)
   }, [])
+
+  const openCycleTimeReport = useCallback(() => {
+    // Check if the cycle time report tab is already open
+    const cycleTimeTabExists = dynamicTabs.some(
+      (tab) => tab.key === TeamTabs.CycleTimeReport,
+    )
+
+    if (!cycleTimeTabExists) {
+      // Add the tab to the end
+      setDynamicTabs((prevTabs) => [
+        ...prevTabs,
+        {
+          key: TeamTabs.CycleTimeReport,
+          tab: 'Cycle Time Report',
+          closable: true,
+        },
+      ])
+    }
+
+    // Switch to the cycle time report tab
+    setActiveTab(TeamTabs.CycleTimeReport)
+  }, [dynamicTabs])
 
   const actionsMenuItems: MenuProps['items'] = useMemo(() => {
     const items: ItemType[] = []
@@ -156,19 +180,38 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       })
     }
 
+    if (items.length > 0) {
+      items.push({
+        type: 'divider',
+      })
+    }
+
+    items.push({
+      type: 'group',
+      label: 'Reports',
+      children: [
+        {
+          key: 'cycle-time-report',
+          label: 'Cycle Time Report',
+          onClick: openCycleTimeReport,
+        },
+      ],
+    })
+
     return items
-  }, [canManageTeamMemberships, canUpdateTeam, dispatch, team?.isActive])
+  }, [
+    canManageTeamMemberships,
+    canUpdateTeam,
+    dispatch,
+    team?.isActive,
+    openCycleTimeReport,
+  ])
   const renderTabContent = useCallback(() => {
     switch (activeTab) {
       case TeamTabs.Details:
         return <TeamDetails team={team} />
       case TeamTabs.Backlog:
-        return createElement(WorkItemsBacklogGrid, {
-          workItems: backlogQuery.data,
-          hideTeamColumn: true,
-          isLoading: backlogQuery.isLoading,
-          refetch: backlogQuery.refetch,
-        } as WorkItemsBacklogGridProps)
+        return <TeamBacklog teamId={team?.id} />
       case TeamTabs.Sprints:
         return <TeamSprints teamId={team?.id} />
       case TeamTabs.DependencyManagement:
@@ -191,6 +234,8 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
           refetch: teamMembershipsQuery.refetch,
           teamType: 'Team',
         })
+      case TeamTabs.CycleTimeReport:
+        return <CycleTimeReport teamCode={team?.code} />
       default:
         return null
     }
@@ -199,7 +244,6 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     team,
     risksQuery,
     teamMembershipsQuery,
-    backlogQuery,
     onIncludeClosedRisksChanged,
   ])
 
@@ -229,6 +273,42 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     [risksQueryEnabled, teamMembershipsQueryEnabled],
   )
 
+  const closeTab = useCallback(
+    (tabKey: string, e: React.MouseEvent) => {
+      e.stopPropagation()
+      // Remove the tab from dynamicTabs
+      setDynamicTabs((prevTabs) => prevTabs.filter((tab) => tab.key !== tabKey))
+
+      // If the active tab is being closed, switch to Details tab
+      if (activeTab === tabKey) {
+        setActiveTab(TeamTabs.Details)
+      }
+    },
+    [activeTab],
+  )
+
+  const allTabs = useMemo(() => {
+    const staticTabs = tabs.map((tab) => ({
+      key: tab.key,
+      tab: tab.tab,
+    }))
+
+    const closableTabs = dynamicTabs.map((tab) => ({
+      key: tab.key,
+      tab: (
+        <span>
+          {tab.tab}
+          <CloseOutlined
+            style={{ marginLeft: 8 }}
+            onClick={(e) => closeTab(tab.key, e)}
+          />
+        </span>
+      ),
+    }))
+
+    return [...staticTabs, ...closableTabs]
+  }, [dynamicTabs, closeTab])
+
   const onCreateTeamMembershipFormClosed = (wasSaved: boolean) => {
     setOpenCreateTeamMembershipForm(false)
     if (wasSaved) {
@@ -257,7 +337,7 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       />
       <Card
         style={{ width: '100%' }}
-        tabList={tabs}
+        tabList={allTabs}
         activeTabKey={activeTab}
         onTabChange={onTabChange}
       >
