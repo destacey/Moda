@@ -12,7 +12,7 @@ public record WorkTeamNavigationDto : NavigationDto, IMapFrom<WorkTeam>
             .Map(dest => dest.Id, src => src.Id)
             .Map(dest => dest.Key, src => src.Key)
             .Map(dest => dest.Name, src => src.Name)
-            .Map(dest => dest.Code, src => src.Code)
+            .Map(dest => dest.Code, src => src.Code.Value)
             .Map(dest => dest.Type, src => src.Type.GetDisplayName());
     }
 }

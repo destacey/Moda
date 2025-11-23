@@ -1,19 +1,15 @@
 'use client'
 
-import {
-  DependencyDto,
-  TeamDetailsDto,
-  WorkItemDetailsNavigationDto,
-} from '@/src/services/moda-api'
+import { DependencyDto, TeamDetailsDto } from '@/src/services/moda-api'
 import { ColDef, GetRowIdParams } from 'ag-grid-community'
+import { CustomCellRendererProps } from 'ag-grid-react'
 import { FC, useCallback, useMemo } from 'react'
 import ModaGrid from '../moda-grid'
-import Link from 'next/link'
-import { ExportOutlined } from '@ant-design/icons'
 import {
   DependencyHealthCellRenderer,
-  TeamNameLinkCellRenderer,
-  WorkSprintLinkCellRenderer,
+  renderSprintLinkHelper,
+  renderTeamLinkHelper,
+  renderWorkItemLinkHelper,
 } from '../moda-grid-cell-renderers'
 import { workItemKeyComparator } from '../work'
 
@@ -22,30 +18,6 @@ export interface TeamDependenciesGridProps {
   dependencies: DependencyDto[]
   isLoading: boolean
   refetch: () => void
-}
-
-const WorkItemLinkCellRenderer = (data: WorkItemDetailsNavigationDto) => {
-  return (
-    <>
-      <Link
-        href={`/work/workspaces/${data.workspaceKey}/work-items/${data.key}`}
-        prefetch={false}
-      >
-        {data.key}
-      </Link>
-
-      {data.externalViewWorkItemUrl && (
-        <Link
-          href={data.externalViewWorkItemUrl}
-          target="_blank"
-          title="Open in external system"
-          style={{ marginLeft: '5px' }}
-        >
-          <ExportOutlined style={{ width: '10px' }} />
-        </Link>
-      )}
-    </>
-  )
 }
 
 const TeamDependenciesGrid: FC<TeamDependenciesGridProps> = (props) => {
@@ -76,8 +48,8 @@ const TeamDependenciesGrid: FC<TeamDependenciesGridProps> = (props) => {
             field: 'source.key',
             headerName: 'Key',
             comparator: workItemKeyComparator,
-            cellRenderer: (params) =>
-              WorkItemLinkCellRenderer(params.data?.source),
+            cellRenderer: (params: CustomCellRendererProps<DependencyDto>) =>
+              renderWorkItemLinkHelper(params.data?.source),
           },
           { field: 'source.title', headerName: 'Title', width: 400 },
           { field: 'source.type', headerName: 'Type', width: 150 },
@@ -85,16 +57,14 @@ const TeamDependenciesGrid: FC<TeamDependenciesGridProps> = (props) => {
           {
             field: 'source.team.name',
             headerName: 'Team',
-            cellRenderer: (params) =>
-              TeamNameLinkCellRenderer({ data: params.data?.source.team }),
+            cellRenderer: (params: CustomCellRendererProps<DependencyDto>) =>
+              renderTeamLinkHelper(params.data?.source.team),
           },
           {
             field: 'source.sprint.name',
             headerName: 'Sprint',
-            cellRenderer: (params) =>
-              WorkSprintLinkCellRenderer({
-                data: params.data?.source.sprint,
-              }),
+            cellRenderer: (params: CustomCellRendererProps<DependencyDto>) =>
+              renderSprintLinkHelper(params.data?.source.sprint),
           },
         ],
       },
@@ -105,8 +75,8 @@ const TeamDependenciesGrid: FC<TeamDependenciesGridProps> = (props) => {
             field: 'target.key',
             headerName: 'Key',
             comparator: workItemKeyComparator,
-            cellRenderer: (params) =>
-              WorkItemLinkCellRenderer(params.data?.target),
+            cellRenderer: (params: CustomCellRendererProps<DependencyDto>) =>
+              renderWorkItemLinkHelper(params.data?.target),
           },
           { field: 'target.title', headerName: 'Title', width: 400 },
           { field: 'target.type', headerName: 'Type', width: 150 },
@@ -114,16 +84,14 @@ const TeamDependenciesGrid: FC<TeamDependenciesGridProps> = (props) => {
           {
             field: 'target.team.name',
             headerName: 'Team',
-            cellRenderer: (params) =>
-              TeamNameLinkCellRenderer({ data: params.data?.target.team }),
+            cellRenderer: (params: CustomCellRendererProps<DependencyDto>) =>
+              renderTeamLinkHelper(params.data?.target.team),
           },
           {
             field: 'target.sprint.name',
             headerName: 'Sprint',
-            cellRenderer: (params) =>
-              WorkSprintLinkCellRenderer({
-                data: params.data?.target.sprint,
-              }),
+            cellRenderer: (params: CustomCellRendererProps<DependencyDto>) =>
+              renderSprintLinkHelper(params.data?.target.sprint),
           },
         ],
       },

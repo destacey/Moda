@@ -17,14 +17,14 @@ import { ModaGrid } from '@/src/components/common'
 import { Progress } from 'antd'
 import { useGetPlanningIntervalObjectivesHealthReportQuery } from '@/src/store/features/planning/planning-interval-api'
 
-const LocalHealthCheckCellRenderer = ({ data }) => {
-  if (!data.healthCheckId) return null
+const LocalHealthCheckCellRenderer = (params) => {
+  if (!params.data?.healthCheckId) return null
   const healthCheck: HealthCheckStatusColumn = {
-    id: data.healthCheckId,
-    status: data.healthStatus,
-    expiration: data.expiration,
+    id: params.data.healthCheckId,
+    status: params.data.healthStatus,
+    expiration: params.data.expiration,
   }
-  return HealthCheckStatusCellRenderer({ data: healthCheck })
+  return HealthCheckStatusCellRenderer({ ...params, data: healthCheck })
 }
 
 const ProgressCellRenderer = ({ value, data }) => {

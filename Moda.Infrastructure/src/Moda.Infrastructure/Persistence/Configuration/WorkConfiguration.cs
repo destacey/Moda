@@ -5,6 +5,7 @@ using Moda.Common.Domain.Enums.AppIntegrations;
 using Moda.Common.Domain.Enums.Organization;
 using Moda.Common.Domain.Enums.Planning;
 using Moda.Common.Domain.Enums.Work;
+using Moda.Common.Domain.Models.Organizations;
 using Moda.Common.Models;
 using Moda.Work.Domain.Models;
 
@@ -644,7 +645,10 @@ public class WorkTeamConfig : IEntityTypeConfiguration<WorkTeam>
         builder.Property(t => t.Key).ValueGeneratedNever();
 
         builder.Property(t => t.Name).IsRequired().HasMaxLength(128);
-        builder.Property(t => t.Code).IsRequired()
+        builder.Property(o => o.Code).IsRequired()
+            .HasConversion(
+                o => o.Value,
+                o => new TeamCode(o))
             .HasColumnType("varchar")
             .HasMaxLength(10);
         builder.Property(t => t.Type).IsRequired()

@@ -1,15 +1,19 @@
 ﻿using Moda.Common.Application.Dtos;
 using Moda.Common.Application.Employees.Dtos;
+using Moda.Common.Domain.Enums.Planning;
+using Moda.Common.Domain.Enums.Work;
 using Moda.Work.Application.WorkIterations.Dtos;
 using Moda.Work.Application.WorkProjects.Dtos;
 using Moda.Work.Application.Workspaces.Dtos;
 using Moda.Work.Application.WorkTeams.Dtos;
 using Moda.Work.Application.WorkTypes.Dtos;
-using Moda.Common.Domain.Enums.Planning;
 
 namespace Moda.Work.Application.WorkItems.Dtos;
 public sealed record WorkItemListDto : IMapFrom<WorkItem>
 {
+    // Named constant for the Done status category id to avoid repeated casts
+    private const int DoneStatusCategoryId = (int)WorkStatusCategory.Done;
+
     public Guid Id { get; set; }
     public required string Key { get; set; }
     public required string Title { get; set; }
@@ -25,6 +29,13 @@ public sealed record WorkItemListDto : IMapFrom<WorkItem>
     public double? StoryPoints { get; set; }
     public WorkProjectNavigationDto? Project { get; set; }
     public string? ExternalViewWorkItemUrl { get; set; }
+    public Instant Created { get; set; }
+    public Instant? Activated { get; set; }
+    public Instant? Done { get; set; }
+
+    public double? CycleTime => Activated.HasValue && Done.HasValue && !Activated.Value.Equals(Done.Value) && StatusCategory?.Id == DoneStatusCategoryId
+        ? (Done.Value - Activated.Value).ToTimeSpan().TotalDays
+        : null;
 
     public void ConfigureMapping(TypeAdapterConfig config)
     {
@@ -34,12 +45,14 @@ public sealed record WorkItemListDto : IMapFrom<WorkItem>
             .Map(dest => dest.StatusCategory, src => SimpleNavigationDto.FromEnum(src.StatusCategory))
             .Map(dest => dest.Sprint, src => src.Iteration != null && src.Iteration.Type == IterationType.Sprint ? src.Iteration : null)
             .Map(dest => dest.AssignedTo, src => src.AssignedTo == null ? null : EmployeeNavigationDto.From(src.AssignedTo))
-            .Map(dest => dest.Project, src => src.Project != null 
-                ? WorkProjectNavigationDto.From(src.Project) 
-                : src.ParentProject != null 
-                    ? WorkProjectNavigationDto.From(src.ParentProject) 
+            .Map(dest => dest.Project, src => src.Project != null
+                ? WorkProjectNavigationDto.From(src.Project)
+                : src.ParentProject != null
+                    ? WorkProjectNavigationDto.From(src.ParentProject)
                     : null)
-            .Map(dest => dest.ExternalViewWorkItemUrl, src => src.Workspace.ExternalViewWorkItemUrlTemplate == null ? null : $"{src.Workspace.ExternalViewWorkItemUrlTemplate}{src.ExternalId}");
+            .Map(dest => dest.ExternalViewWorkItemUrl, src => src.Workspace.ExternalViewWorkItemUrlTemplate == null ? null : $"{src.Workspace.ExternalViewWorkItemUrlTemplate}{src.ExternalId}")
+            .Map(dest => dest.Activated, src => src.ActivatedTimestamp)
+            .Map(dest => dest.Done, src => src.DoneTimestamp);
     }
 }
 

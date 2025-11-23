@@ -1,9 +1,10 @@
 ﻿using Moda.Common.Domain.Enums.Work;
+using Moda.Common.Domain.Extensions.Organizations;
+using Moda.Common.Domain.Models.Organizations;
 using Moda.Organization.Application.Models;
 using Moda.Organization.Application.Teams.Commands;
 using Moda.Organization.Application.Teams.Dtos;
 using Moda.Organization.Application.Teams.Queries;
-using Moda.Organization.Domain.Extensions;
 using Moda.Organization.Domain.Models;
 using Moda.Planning.Application.Iterations.Dtos;
 using Moda.Planning.Application.Iterations.Queries;
@@ -15,6 +16,7 @@ using Moda.Web.Api.Models.Organizations.Teams;
 using Moda.Web.Api.Models.Planning.Risks;
 using Moda.Work.Application.WorkItems.Dtos;
 using Moda.Work.Application.WorkItems.Queries;
+using NodaTime;
 
 namespace Moda.Web.Api.Controllers.Organizations;
 
@@ -174,7 +176,7 @@ public class TeamsController(ILogger<TeamsController> logger, ISender sender) : 
 
     #endregion Team Memberships
 
-    #region Backlog
+    #region Work Items
 
     // TODO: update the claims check for viewing teams and work items
     [HttpGet("{idOrCode}/backlog")]
@@ -184,25 +186,47 @@ public class TeamsController(ILogger<TeamsController> logger, ISender sender) : 
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IEnumerable<WorkItemBacklogItemDto>>> GetTeamBacklog(string idOrCode, CancellationToken cancellationToken)
     {
-        GetTeamBacklogQuery query;
-        if (Guid.TryParse(idOrCode, out Guid guidId))
-        {
-            query = new GetTeamBacklogQuery(guidId);
-        }
-        else if (idOrCode.IsValidTeamCodeFormat())
-        {
-            query = new GetTeamBacklogQuery(new TeamCode(idOrCode));
-        }
-        else
-        {
-            return BadRequest(ProblemDetailsExtensions.ForUnknownIdOrKeyType(HttpContext));
-        }
-
-        var result = await _sender.Send(query, cancellationToken);
+        var result = await _sender.Send(new GetTeamBacklogQuery(idOrCode), cancellationToken);
 
         return result.IsSuccess
             ? Ok(result.Value)
             : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpGet("{idOrCode}/work-items")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkItems)]
+    [OpenApiOperation("Get the work items for a team.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IEnumerable<WorkItemListDto>>> GetTeamWorkItems(
+        string idOrCode,
+        [FromQuery] WorkStatusCategory[]? statusCategories,
+        [FromQuery] DateTime? doneFrom,
+        [FromQuery] DateTime? doneTo,
+        CancellationToken cancellationToken)
+    {
+        Instant? doneFromInstant = null;
+        Instant? doneToInstant = null;
+
+        if (doneFrom.HasValue)
+        {
+            var df = doneFrom.Value;
+            df = df.Kind == DateTimeKind.Unspecified ? DateTime.SpecifyKind(df, DateTimeKind.Utc) : df.ToUniversalTime();
+            doneFromInstant = Instant.FromDateTimeUtc(df);
+        }
+
+        if (doneTo.HasValue)
+        {
+            var dt = doneTo.Value;
+            dt = dt.Kind == DateTimeKind.Unspecified ? DateTime.SpecifyKind(dt, DateTimeKind.Utc) : dt.ToUniversalTime();
+            doneToInstant = Instant.FromDateTimeUtc(dt);
+        }
+
+        var workItems = await _sender.Send(new GetTeamWorkItemsQuery(idOrCode, statusCategories, doneFromInstant, doneToInstant), cancellationToken);
+
+        return workItems is null
+            ? NotFound()
+            : Ok(workItems);
     }
 
     [HttpGet("{id}/dependencies")]
@@ -220,7 +244,7 @@ public class TeamsController(ILogger<TeamsController> logger, ISender sender) : 
             : Ok(dependencies);
     }
 
-    #endregion Backlog
+    #endregion Work Items
 
     #region Risks
 

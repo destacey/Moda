@@ -1,7 +1,6 @@
 'use client'
 
 import { ModaEmpty } from '@/src/components/common'
-import { RowMenuCellRenderer } from '@/src/components/common/moda-grid-cell-renderers'
 import {
   RoadmapActivityListDto,
   RoadmapActivityNavigationDto,
@@ -9,7 +8,8 @@ import {
   RoadmapMilestoneListDto,
   RoadmapTimeboxListDto,
 } from '@/src/services/moda-api'
-import { ColorPicker, Flex, MenuProps, Table, TableColumnsType } from 'antd'
+import { Button, ColorPicker, Dropdown, Flex, MenuProps, Table, TableColumnsType } from 'antd'
+import { MoreOutlined } from '@ant-design/icons'
 import { ItemType } from 'antd/es/menu/interface'
 import dayjs from 'dayjs'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -134,7 +134,12 @@ const RoadmapItemsGrid: React.FC<RoadmapItemsGridProps> = (
           onEditItemMenuClicked: () => onEditItemMenuClicked(record),
           onDeleteItemMenuClicked: () => onDeleteItemMenuClicked(record.id),
         })
-        return RowMenuCellRenderer({ menuItems })
+        if (menuItems.length === 0) return null
+        return (
+          <Dropdown menu={{ items: menuItems }} trigger={['click']}>
+            <Button type="text" size="small" icon={<MoreOutlined />} />
+          </Dropdown>
+        )
       },
     }
 

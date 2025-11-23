@@ -1,4 +1,4 @@
-import { MoreOutlined } from '@ant-design/icons'
+import { ExportOutlined, MoreOutlined } from '@ant-design/icons'
 import { Button, Dropdown } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import './moda-grid-cell-renderers.css'
@@ -11,7 +11,7 @@ import {
 } from '@/src/services/moda-api'
 import Link from 'next/link'
 import { MarkdownRenderer } from './markdown'
-import { ICellRendererParams } from 'ag-grid-community'
+import { CustomCellRendererProps } from 'ag-grid-react'
 import WorkStatusTag from './work/work-status-tag'
 import { DependencyHealth, WorkStatusCategory } from '../types'
 import DependencyHealthTag from './work/dependency-health-tag'
@@ -22,54 +22,50 @@ export interface HealthCheckStatusColumn {
   expiration: Date
 }
 
-export interface NestedHealthCheckStatusCellRendererProps {
-  data: {
-    healthCheck: HealthCheckStatusColumn | null
-  } | null
-}
-export const NestedHealthCheckStatusCellRenderer = ({
-  data,
-}: NestedHealthCheckStatusCellRendererProps) => {
-  return HealthCheckStatusCellRenderer({ data: data?.healthCheck })
+export const NestedHealthCheckStatusCellRenderer = <T extends { healthCheck: HealthCheckStatusColumn | null }>(
+  props: CustomCellRendererProps<T>,
+) => {
+  const { data } = props
+  if (!data?.healthCheck) return null
+  return <HealthCheckTag healthCheck={data.healthCheck} />
 }
 
-export interface HealthCheckStatusCellRendererProps {
-  data: HealthCheckStatusColumn | null
-}
-export const HealthCheckStatusCellRenderer = ({
-  data,
-}: HealthCheckStatusCellRendererProps) => {
+export const HealthCheckStatusCellRenderer = (
+  props: CustomCellRendererProps<HealthCheckStatusColumn>,
+) => {
+  const { data } = props
   if (!data) return null
   return <HealthCheckTag healthCheck={data} />
 }
 
-export const WorkStatusTagCellRenderer = ({
-  value,
-  data,
-}: ICellRendererParams<any>) => {
-  if (!data || !data.status) return null
+export const WorkStatusTagCellRenderer = <T extends { status: string; statusCategory: { id: WorkStatusCategory } }>(
+  props: CustomCellRendererProps<T>,
+) => {
+  const { value, data } = props
+  if (!data?.status) return null
   return (
     <WorkStatusTag
       status={value}
-      category={data.statusCategory.id as WorkStatusCategory}
+      category={data.statusCategory.id}
     />
   )
 }
 
-export const DependencyHealthCellRenderer = ({
-  value,
-  data,
-}: ICellRendererParams<any>) => {
-  if (!data || !data.health) return null
+export const DependencyHealthCellRenderer = <T extends { health: { id: DependencyHealth; name: string } }>(
+  props: CustomCellRendererProps<T>,
+) => {
+  const { value, data } = props
+  if (!data?.health) return null
   return (
     <DependencyHealthTag
       name={value}
-      health={data.health.id as DependencyHealth}
+      health={data.health.id}
     />
   )
 }
 
-export const MarkdownCellRenderer = ({ value }) => {
+export const MarkdownCellRenderer = (props: CustomCellRendererProps) => {
+  const { value } = props
   if (!value) return null
   return (
     <div className="grid-react-markdown">
@@ -82,35 +78,34 @@ export interface TeamNameLinkColumn extends NavigationDto {
   type?: string
 }
 
-export interface NestedTeamNameLinkCellRendererProps {
-  data: {
-    team: TeamNameLinkColumn | null
-  } | null
-}
-export const NestedTeamNameLinkCellRenderer = ({
-  data,
-}: NestedTeamNameLinkCellRendererProps) => {
-  return TeamNameLinkCellRenderer({ data: data?.team })
-}
-
-// TODO: how can we merge these two nested renderers?
-export interface NestedTeamOfTeamsNameLinkCellRendererProps {
-  data: {
-    teamOfTeams: TeamNameLinkColumn | null
-  } | null
-}
-export const NestedTeamOfTeamsNameLinkCellRenderer = ({
-  data,
-}: NestedTeamOfTeamsNameLinkCellRendererProps) => {
-  return TeamNameLinkCellRenderer({ data: data?.teamOfTeams })
+export const NestedTeamNameLinkCellRenderer = <T extends { team: TeamNameLinkColumn | null }>(
+  props: CustomCellRendererProps<T>,
+) => {
+  const { data } = props
+  if (!data?.team) return null
+  const teamLink =
+    data.team.type === 'Team'
+      ? `/organizations/teams/${data.team.key}`
+      : `/organizations/team-of-teams/${data.team.key}`
+  return <Link href={teamLink}>{data.team.name}</Link>
 }
 
-export interface TeamNameLinkCellRendererProps {
-  data: TeamNameLinkColumn
+export const NestedTeamOfTeamsNameLinkCellRenderer = <T extends { teamOfTeams: TeamNameLinkColumn | null }>(
+  props: CustomCellRendererProps<T>,
+) => {
+  const { data } = props
+  if (!data?.teamOfTeams) return null
+  const teamLink =
+    data.teamOfTeams.type === 'Team'
+      ? `/organizations/teams/${data.teamOfTeams.key}`
+      : `/organizations/team-of-teams/${data.teamOfTeams.key}`
+  return <Link href={teamLink}>{data.teamOfTeams.name}</Link>
 }
-export const TeamNameLinkCellRenderer = ({
-  data,
-}: TeamNameLinkCellRendererProps) => {
+
+export const TeamNameLinkCellRenderer = (
+  props: CustomCellRendererProps<TeamNameLinkColumn>,
+) => {
+  const { data } = props
   if (!data) return null
   const teamLink =
     data.type === 'Team'
@@ -119,12 +114,10 @@ export const TeamNameLinkCellRenderer = ({
   return <Link href={teamLink}>{data.name}</Link>
 }
 
-export interface PlanningIntervalObjectiveLinkCellRendererProps {
-  data: PlanningIntervalObjectiveListDto
-}
-export const PlanningIntervalObjectiveLinkCellRenderer = ({
-  data,
-}: PlanningIntervalObjectiveLinkCellRendererProps) => {
+export const PlanningIntervalObjectiveLinkCellRenderer = (
+  props: CustomCellRendererProps<PlanningIntervalObjectiveListDto>,
+) => {
+  const { data } = props
   if (!data) return null
   return (
     <Link
@@ -135,50 +128,44 @@ export const PlanningIntervalObjectiveLinkCellRenderer = ({
   )
 }
 
-export interface NestedPlanningIntervalLinkCellRendererProps {
-  data: {
-    planningInterval: NavigationDto | null
-  } | null
-}
-export const NestedPlanningIntervalLinkCellRenderer = ({
-  data,
-}: NestedPlanningIntervalLinkCellRendererProps) => {
-  return PlanningIntervalLinkCellRenderer({ data: data?.planningInterval })
+export const NestedPlanningIntervalLinkCellRenderer = <T extends { planningInterval: NavigationDto | null }>(
+  props: CustomCellRendererProps<T>,
+) => {
+  const { data } = props
+  if (!data?.planningInterval) return null
+  return (
+    <Link href={`/planning/planning-intervals/${data.planningInterval.key}`}>
+      {data.planningInterval.name}
+    </Link>
+  )
 }
 
-export interface PlanningIntervalLinkCellRendererProps {
-  data: NavigationDto
-}
-export const PlanningIntervalLinkCellRenderer = ({
-  data,
-}: PlanningIntervalLinkCellRendererProps) => {
+export const PlanningIntervalLinkCellRenderer = (
+  props: CustomCellRendererProps<NavigationDto>,
+) => {
+  const { data } = props
   if (!data) return null
   return (
     <Link href={`/planning/planning-intervals/${data.key}`}>{data.name}</Link>
   )
 }
 
-export interface PortfolioLinkCellRendererProps {
-  data: NavigationDto
-}
-export const PortfolioLinkCellRenderer = ({
-  data,
-}: PortfolioLinkCellRendererProps) => {
+export const PortfolioLinkCellRenderer = (
+  props: CustomCellRendererProps<NavigationDto>,
+) => {
+  const { data } = props
   if (!data) return null
   return <Link href={`/ppm/portfolios/${data.key}`}>{data.name}</Link>
 }
 
-export interface ProgramLinkCellRendererProps {
-  data: NavigationDto | { program: NavigationDto | null } | null
-}
-
-export const ProgramLinkCellRenderer = ({
-  data,
-}: ProgramLinkCellRendererProps) => {
+export const ProgramLinkCellRenderer = <T extends NavigationDto | { program: NavigationDto | null }>(
+  props: CustomCellRendererProps<T>,
+) => {
+  const { data } = props
   if (!data) return null
 
   // Handle both direct NavigationDto and nested program cases
-  const programData = 'program' in data ? data.program : data
+  const programData: NavigationDto | null = 'program' in data ? data.program : data
   if (!programData) return null
 
   return (
@@ -186,17 +173,14 @@ export const ProgramLinkCellRenderer = ({
   )
 }
 
-export interface ProjectLinkCellRendererProps {
-  data: NavigationDto | { project: NavigationDto | null } | null
-}
-
-export const ProjectLinkCellRenderer = ({
-  data,
-}: ProjectLinkCellRendererProps) => {
+export const ProjectLinkCellRenderer = <T extends NavigationDto | { project: NavigationDto | null }>(
+  props: CustomCellRendererProps<T>,
+) => {
+  const { data } = props
   if (!data) return null
 
   // Handle both direct NavigationDto and nested project cases
-  const projectData = 'project' in data ? data.project : data
+  const projectData: NavigationDto | null = 'project' in data ? data.project : data
   if (!projectData) return null
 
   return (
@@ -204,7 +188,7 @@ export const ProjectLinkCellRenderer = ({
   )
 }
 
-export interface RowMenuCellRendererProps {
+export interface RowMenuCellRendererProps extends CustomCellRendererProps {
   menuItems: ItemType[]
 }
 export const RowMenuCellRenderer = (props: RowMenuCellRendererProps) => {
@@ -217,37 +201,32 @@ export const RowMenuCellRenderer = (props: RowMenuCellRendererProps) => {
   )
 }
 
-export interface WorkspaceLinkCellRendererProps {
-  data: NavigationDto
-}
-export const WorkspaceLinkCellRenderer = ({
-  data,
-}: WorkspaceLinkCellRendererProps) => {
+export const WorkspaceLinkCellRenderer = (
+  props: CustomCellRendererProps<NavigationDto>,
+) => {
+  const { data } = props
   if (!data) return null
   return <Link href={`/work/workspaces/${data.key}`}>{data.name}</Link>
 }
 
-export interface NestedWorkSprintLinkCellRendererProps {
-  data: {
-    sprint: WorkIterationNavigationDto | null
-  } | null
-  showTeamCode?: boolean
-}
-export const NestedWorkSprintLinkCellRenderer = ({
-  data,
-  showTeamCode = true,
-}: NestedWorkSprintLinkCellRendererProps) => {
-  return WorkSprintLinkCellRenderer({ data: data?.sprint, showTeamCode })
+export const NestedWorkSprintLinkCellRenderer = <T extends { sprint: WorkIterationNavigationDto | null }>(
+  props: CustomCellRendererProps<T> & { showTeamCode?: boolean },
+) => {
+  const { data, showTeamCode = true } = props
+  if (!data?.sprint) return null
+
+  const displayText =
+    showTeamCode && data.sprint.team?.code
+      ? `${data.sprint.name} (${data.sprint.team.code})`
+      : data.sprint.name
+
+  return <Link href={`/planning/sprints/${data.sprint.key}`}>{displayText}</Link>
 }
 
-export interface WorkSprintLinkCellRendererProps {
-  data: WorkIterationNavigationDto | null
-  showTeamCode?: boolean
-}
-export const WorkSprintLinkCellRenderer = ({
-  data,
-  showTeamCode = true,
-}: WorkSprintLinkCellRendererProps) => {
+export const WorkSprintLinkCellRenderer = (
+  props: CustomCellRendererProps<WorkIterationNavigationDto> & { showTeamCode?: boolean },
+) => {
+  const { data, showTeamCode = true } = props
   if (!data) return null
 
   const displayText =
@@ -256,4 +235,148 @@ export const WorkSprintLinkCellRenderer = ({
       : data.name
 
   return <Link href={`/planning/sprints/${data.key}`}>{displayText}</Link>
+}
+
+// Work Item Cell Renderers
+export interface WorkItemLinkColumn {
+  key: string
+  workspace: { key: string }
+  externalViewWorkItemUrl?: string | null
+}
+
+export const WorkItemLinkCellRenderer = <T extends WorkItemLinkColumn>(
+  props: CustomCellRendererProps<T>,
+) => {
+  const { value, data } = props
+  if (!data) return null
+
+  return (
+    <>
+      <Link
+        href={`/work/workspaces/${data.workspace.key}/work-items/${data.key}`}
+        prefetch={false}
+      >
+        {value}
+      </Link>
+
+      {data.externalViewWorkItemUrl && (
+        <Link
+          href={data.externalViewWorkItemUrl}
+          target="_blank"
+          title="Open in external system"
+          style={{ marginLeft: '5px' }}
+        >
+          <ExportOutlined style={{ width: '10px' }} />
+        </Link>
+      )}
+    </>
+  )
+}
+
+export const ParentWorkItemLinkCellRenderer = <
+  T extends {
+    parent: {
+      key: string
+      workspaceKey: string
+      externalViewWorkItemUrl?: string | null
+    } | null
+  },
+>(
+  props: CustomCellRendererProps<T>,
+) => {
+  const { value, data } = props
+  if (!data?.parent) return null
+
+  return (
+    <>
+      <Link
+        href={`/work/workspaces/${data.parent.workspaceKey}/work-items/${data.parent.key}`}
+        prefetch={false}
+      >
+        {value}
+      </Link>
+      {data.parent.externalViewWorkItemUrl && (
+        <Link
+          href={data.parent.externalViewWorkItemUrl}
+          target="_blank"
+          title="Open in external system"
+          style={{ marginLeft: '5px' }}
+        >
+          <ExportOutlined style={{ width: '10px' }} />
+        </Link>
+      )}
+    </>
+  )
+}
+
+export const AssignedToLinkCellRenderer = <
+  T extends { assignedTo: { key: string; name?: string } | null },
+>(
+  props: CustomCellRendererProps<T>,
+) => {
+  const { value, data } = props
+  if (!data?.assignedTo) return null
+
+  return (
+    <Link
+      href={`/organizations/employees/${data.assignedTo.key}`}
+      prefetch={false}
+    >
+      {value}
+    </Link>
+  )
+}
+
+// Helper utility functions for rendering links (can be used outside of cell renderers)
+export const renderWorkItemLinkHelper = (workItem: {
+  key: string
+  workspaceKey: string
+  externalViewWorkItemUrl?: string | null
+} | null | undefined) => {
+  if (!workItem) return null
+  return (
+    <>
+      <Link
+        href={`/work/workspaces/${workItem.workspaceKey}/work-items/${workItem.key}`}
+        prefetch={false}
+      >
+        {workItem.key}
+      </Link>
+      {workItem.externalViewWorkItemUrl && (
+        <Link
+          href={workItem.externalViewWorkItemUrl}
+          target="_blank"
+          title="Open in external system"
+          style={{ marginLeft: '5px' }}
+        >
+          <ExportOutlined style={{ width: '10px' }} />
+        </Link>
+      )}
+    </>
+  )
+}
+
+export const renderTeamLinkHelper = (team: { key: number | string; name: string; type?: string } | null | undefined) => {
+  if (!team) return null
+  const teamLink = team.type === 'Team'
+    ? `/organizations/teams/${team.key}`
+    : `/organizations/team-of-teams/${team.key}`
+  return <Link href={teamLink}>{team.name}</Link>
+}
+
+export const renderSprintLinkHelper = (sprint: { key: number | string; name: string } | null | undefined) => {
+  if (!sprint) return null
+  return <Link href={`/planning/sprints/${sprint.key}`}>{sprint.name}</Link>
+}
+
+export const DateTimeCellRenderer = (props: CustomCellRendererProps) => {
+  const { value } = props
+  if (!value) return ''
+  return new Date(value).toLocaleString(undefined, {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
 }

@@ -3,13 +3,14 @@
 import { ModaGrid } from '@/src/components/common'
 import { WorkItemBacklogItemDto } from '@/src/services/moda-api'
 import { ColDef } from 'ag-grid-community'
-import Link from 'next/link'
 import { useCallback, useMemo } from 'react'
-import { ExportOutlined } from '@ant-design/icons'
 import {
+  AssignedToLinkCellRenderer,
   NestedTeamNameLinkCellRenderer,
   NestedWorkSprintLinkCellRenderer,
+  ParentWorkItemLinkCellRenderer,
   ProjectLinkCellRenderer,
+  WorkItemLinkCellRenderer,
   WorkStatusTagCellRenderer,
 } from '../moda-grid-cell-renderers'
 import {
@@ -22,66 +23,6 @@ export interface WorkItemsBacklogGridProps {
   hideTeamColumn: boolean
   isLoading: boolean
   refetch: () => void
-}
-
-const WorkItemLinkCellRenderer = ({ value, data }) => {
-  return (
-    <>
-      <Link
-        href={`/work/workspaces/${data.workspace.key}/work-items/${data.key}`}
-        prefetch={false}
-      >
-        {value}
-      </Link>
-
-      {data.externalViewWorkItemUrl && (
-        <Link
-          href={data.externalViewWorkItemUrl}
-          target="_blank"
-          title="Open in external system"
-          style={{ marginLeft: '5px' }}
-        >
-          <ExportOutlined style={{ width: '10px' }} />
-        </Link>
-      )}
-    </>
-  )
-}
-
-const ParentWorkItemLinkCellRenderer = ({ value, data }) => {
-  if (!data.parent) return null
-  return (
-    <>
-      <Link
-        href={`/work/workspaces/${data.parent.workspaceKey}/work-items/${data.parent.key}`}
-        prefetch={false}
-      >
-        {value}
-      </Link>
-      {data.parent.externalViewWorkItemUrl && (
-        <Link
-          href={data.parent.externalViewWorkItemUrl}
-          target="_blank"
-          title="Open in external system"
-          style={{ marginLeft: '5px' }}
-        >
-          <ExportOutlined style={{ width: '10px' }} />
-        </Link>
-      )}
-    </>
-  )
-}
-
-const AssignedToLinkCellRenderer = ({ value, data }) => {
-  if (!data.assignedTo) return null
-  return (
-    <Link
-      href={`/organizations/employees/${data.assignedTo.key}`}
-      prefetch={false}
-    >
-      {value}
-    </Link>
-  )
 }
 
 const WorkItemsBacklogGrid = (props: WorkItemsBacklogGridProps) => {

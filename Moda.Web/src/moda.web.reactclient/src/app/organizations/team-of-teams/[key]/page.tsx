@@ -10,7 +10,7 @@ import {
   useMemo,
   useState,
 } from 'react'
-import TeamOfTeamsDetails from './team-of-teams-details'
+import TeamOfTeamsDetails from '../_components/team-of-teams-details'
 import RisksGrid, {
   RisksGridProps,
 } from '@/src/components/common/planning/risks-grid'

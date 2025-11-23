@@ -42,7 +42,6 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const { key } = use(props.params)
   const roadmapKey = Number(key)
 
-  useDocumentTitle('Roadmap Details')
   const [managersInfo, setManagersInfo] = useState('Unknown')
   const [openCreateActivityForm, setOpenCreateActivityForm] =
     useState<boolean>(false)
@@ -72,6 +71,8 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     error,
     refetch: refetchRoadmap,
   } = useGetRoadmapQuery(roadmapKey.toString())
+
+  useDocumentTitle(`${roadmapData?.name ?? roadmapKey} - Roadmap Details`)
 
   const {
     data: currentUserInternalEmployeeId,

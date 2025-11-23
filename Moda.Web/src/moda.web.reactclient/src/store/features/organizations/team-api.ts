@@ -9,6 +9,8 @@ import {
   RiskListDto,
   SprintListDto,
   SprintDetailsDto,
+  WorkStatusCategory,
+  WorkItemListDto,
 } from './../../../services/moda-api'
 import { TeamListItem, TeamTypeName } from '@/src/app/organizations/types'
 import { apiSlice } from '../apiSlice'
@@ -153,6 +155,40 @@ export const teamApi = apiSlice.injectEndpoints({
       providesTags: (result, error, arg) => [
         QueryTags.TeamBacklog,
         { type: QueryTags.TeamBacklog, id: arg },
+      ],
+    }),
+
+    getTeamWorkItems: builder.query<
+      WorkItemListDto[],
+      {
+        idOrCode: string
+        statusCategories?: WorkStatusCategory[] | null
+        /** ISO 8601 date string (e.g., "2025-08-25T00:00:00.000Z") */
+        doneFrom?: string | null
+        /** ISO 8601 date string (e.g., "2025-08-25T00:00:00.000Z") */
+        doneTo?: string | null
+      }
+    >({
+      queryFn: async ({ idOrCode, statusCategories, doneFrom, doneTo }) => {
+        try {
+          const data = await getTeamsClient().getTeamWorkItems(
+            idOrCode,
+            statusCategories,
+            doneFrom ? new Date(doneFrom) : null,
+            doneTo ? new Date(doneTo) : null,
+          )
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: (result, error, arg) => [
+        QueryTags.TeamWorkItems,
+        {
+          type: QueryTags.TeamWorkItems,
+          id: `${arg.idOrCode}-${arg.statusCategories?.join(',') ?? ''}-${arg.doneFrom ?? ''}-${arg.doneTo ?? ''}`,
+        },
       ],
     }),
 
@@ -481,6 +517,7 @@ export const {
   useDeactivateTeamOfTeamsMutation,
   useGetTeamOptionsQuery,
   useGetTeamBacklogQuery,
+  useGetTeamWorkItemsQuery,
   useGetTeamDependenciesQuery,
   useGetTeamSprintsQuery,
   useGetActiveSprintQuery,

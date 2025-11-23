@@ -1,7 +1,7 @@
 'use client'
 
 import { ModaGrid } from '@/src/components/common'
-import { TeamNameLinkCellRenderer } from '@/src/components/common/moda-grid-cell-renderers'
+import { renderTeamLinkHelper } from '@/src/components/common/moda-grid-cell-renderers'
 import { SprintListDto } from '@/src/services/moda-api'
 import {
   ColDef,
@@ -28,7 +28,7 @@ const sprintLinkCellRenderer = (params: ICellRendererParams<SprintListDto>) => (
 )
 
 const teamCellRenderer = (params: ICellRendererParams<SprintListDto>) =>
-  TeamNameLinkCellRenderer({ data: params.data.team })
+  renderTeamLinkHelper(params.data?.team)
 
 const utcAsCalendarDateValueFormatter = (
   params: ValueFormatterParams<SprintListDto>,
@@ -54,7 +54,7 @@ const SprintsGrid: FC<SprintsGridProps> = (props: SprintsGridProps) => {
         headerName: 'Start',
         width: 150,
         sort: 'desc',
-        filter: 'agDateColumnFilter',
+        type: 'dateColumn',
         filterParams: {
           includeTime: false,
         },
@@ -64,7 +64,7 @@ const SprintsGrid: FC<SprintsGridProps> = (props: SprintsGridProps) => {
         field: 'end',
         headerName: 'End',
         width: 150,
-        filter: 'agDateColumnFilter',
+        type: 'dateColumn',
         filterParams: {
           includeTime: false,
         },

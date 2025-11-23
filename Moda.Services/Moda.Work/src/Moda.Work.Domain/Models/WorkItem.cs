@@ -1,14 +1,13 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
 using Moda.Common.Domain.Employees;
-using Moda.Common.Domain.Enums.Planning;
 using Moda.Common.Domain.Enums.Work;
 using Moda.Work.Domain.Interfaces;
 using NodaTime;
 
 namespace Moda.Work.Domain.Models;
 
-public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable, HasWorkspace
+public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable, IHasWorkspace, IHasOptionalWorkTeam
 {
     private WorkItemKey _key = null!;
     private string _title = null!;

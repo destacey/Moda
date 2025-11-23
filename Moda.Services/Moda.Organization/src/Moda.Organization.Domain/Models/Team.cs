@@ -1,5 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
 using Moda.Common.Domain.Enums.Organization;
+using Moda.Common.Domain.Models.Organizations;
+using Moda.Common.Domain.Interfaces.Organization;
 using NodaTime;
 
 namespace Moda.Organization.Domain.Models;
@@ -9,7 +11,7 @@ namespace Moda.Organization.Domain.Models;
 /// </summary>
 /// <seealso cref="Moda.Organization.Domain.Models.BaseTeam" />
 /// <seealso cref="Moda.Common.Domain.Interfaces.Organization.IActivatable{NodaTime.Instant, Moda.Organization.Domain.Models.TeamDeactivatableArgs}" />"/>
-public sealed class Team : BaseTeam, IActivatable<Instant, TeamDeactivatableArgs>
+public sealed class Team : BaseTeam, IActivatable<Instant, TeamDeactivatableArgs>, IHasTeamIdAndCode
 {
     private Team() { }
 

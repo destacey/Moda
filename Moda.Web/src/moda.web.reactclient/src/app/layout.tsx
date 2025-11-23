@@ -1,12 +1,12 @@
 'use client'
 
 import '@/styles/globals.css'
-import React, { useEffect, useState } from 'react'
+import React, { memo, PropsWithChildren, useMemo } from 'react'
 import '@ant-design/v5-patch-for-react-19'
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community'
 import { Provider } from 'react-redux'
 import { Inter } from 'next/font/google'
-import { Layout } from 'antd'
+import { Grid, Layout } from 'antd'
 import { store } from '../store'
 import AppHeader from './_components/app-header'
 import AppSideNav from './_components/menu/app-side-nav'
@@ -30,19 +30,27 @@ const inter = Inter({ subsets: ['latin'] })
 // Register all community features for ag-grid
 ModuleRegistry.registerModules([AllCommunityModule])
 
+const AppContent = memo(({ children }: PropsWithChildren) => {
+  const screens = Grid.useBreakpoint()
+  const isMobile = useMemo(() => !screens.md, [screens.md]) // md breakpoint is 768px in Ant Design
+
+  return (
+    <Layout>
+      <AppHeader />
+      <Layout hasSider className="app-main-layout">
+        <AppSideNav isMobile={isMobile} />
+        <Content className="app-main-content">
+          <AppBreadcrumb />
+          {children}
+        </Content>
+      </Layout>
+    </Layout>
+  )
+})
+
+AppContent.displayName = 'AppContent'
+
 const RootLayout = ({ children }: React.PropsWithChildren) => {
-  const [isMobile, setIsMobile] = useState(false)
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-
-    const handleResize = () => setIsMobile(window.innerWidth < 768)
-    handleResize()
-
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
-
   return (
     <html lang="en">
       <body className={inter.className}>
@@ -54,16 +62,7 @@ const RootLayout = ({ children }: React.PropsWithChildren) => {
                   <ThemeProvider>
                     <MenuToggleProvider>
                       <MessageProvider>
-                        <Layout>
-                          <AppHeader />
-                          <Layout hasSider className="app-main-layout">
-                            <AppSideNav isMobile={isMobile} />
-                            <Content className="app-main-content">
-                              <AppBreadcrumb />
-                              {children}
-                            </Content>
-                          </Layout>
-                        </Layout>
+                        <AppContent>{children}</AppContent>
                       </MessageProvider>
                     </MenuToggleProvider>
                   </ThemeProvider>

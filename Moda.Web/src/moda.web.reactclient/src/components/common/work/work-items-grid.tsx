@@ -2,14 +2,17 @@
 
 import { ModaGrid } from '@/src/components/common'
 import { WorkItemListDto } from '@/src/services/moda-api'
-import { ColDef } from 'ag-grid-community'
-import Link from 'next/link'
-import { useCallback, useMemo } from 'react'
-import { ExportOutlined } from '@ant-design/icons'
+import { ColDef, ICellRendererParams } from 'ag-grid-community'
+import { forwardRef, useCallback, useMemo } from 'react'
+import { AgGridReact } from 'ag-grid-react'
 import {
-  NestedWorkSprintLinkCellRenderer,
+  AssignedToLinkCellRenderer,
+  DateTimeCellRenderer,
   NestedTeamNameLinkCellRenderer,
+  NestedWorkSprintLinkCellRenderer,
+  ParentWorkItemLinkCellRenderer,
   ProjectLinkCellRenderer,
+  WorkItemLinkCellRenderer,
   WorkStatusTagCellRenderer,
 } from '../moda-grid-cell-renderers'
 import {
@@ -21,71 +24,14 @@ export interface WorkItemsGridProps {
   workItems: WorkItemListDto[]
   isLoading: boolean
   refetch: () => void
+  gridHeight?: number
   hideParentColumn?: boolean
   hideProjectColumn?: boolean
+  showStats?: boolean
+  onFilterChanged?: () => void
 }
 
-const WorkItemLinkCellRenderer = ({ value, data }) => {
-  return (
-    <>
-      <Link
-        href={`/work/workspaces/${data.workspace.key}/work-items/${data.key}`}
-        prefetch={false}
-      >
-        {value}
-      </Link>
-
-      {data.externalViewWorkItemUrl && (
-        <Link
-          href={data.externalViewWorkItemUrl}
-          target="_blank"
-          title="Open in external system"
-          style={{ marginLeft: '5px' }}
-        >
-          <ExportOutlined style={{ width: '10px' }} />
-        </Link>
-      )}
-    </>
-  )
-}
-
-const ParentWorkItemLinkCellRenderer = ({ value, data }) => {
-  if (!data.parent) return null
-  return (
-    <>
-      <Link
-        href={`/work/workspaces/${data.parent.workspaceKey}/work-items/${data.parent.key}`}
-        prefetch={false}
-      >
-        {value}
-      </Link>
-      {data.parent.externalViewWorkItemUrl && (
-        <Link
-          href={data.parent.externalViewWorkItemUrl}
-          target="_blank"
-          title="Open in external system"
-          style={{ marginLeft: '5px' }}
-        >
-          <ExportOutlined style={{ width: '10px' }} />
-        </Link>
-      )}
-    </>
-  )
-}
-
-const AssignedToLinkCellRenderer = ({ value, data }) => {
-  if (!data.assignedTo) return null
-  return (
-    <Link
-      href={`/organizations/employees/${data.assignedTo.key}`}
-      prefetch={false}
-    >
-      {value}
-    </Link>
-  )
-}
-
-const WorkItemsGrid = (props: WorkItemsGridProps) => {
+const WorkItemsGrid = forwardRef<AgGridReact<WorkItemListDto>, WorkItemsGridProps>((props, ref) => {
   const { refetch } = props
 
   const columnDefs = useMemo<ColDef<WorkItemListDto>[]>(
@@ -97,18 +43,19 @@ const WorkItemsGrid = (props: WorkItemsGridProps) => {
       },
       { field: 'title', width: 400 },
       { field: 'type.name', headerName: 'Type', width: 125 },
-      {
-        field: 'storyPoints',
-        headerName: 'SPs',
-        title: 'Story Points',
-        width: 80,
-      },
       { field: 'status', width: 125, cellRenderer: WorkStatusTagCellRenderer },
       {
         field: 'statusCategory.name',
         headerName: 'Status Category',
         width: 140,
         comparator: workStatusCategoryComparator,
+      },
+      {
+        field: 'storyPoints',
+        headerName: 'Story Points',
+        width: 100,
+        filter: 'agNumberColumnFilter',
+        type: 'numericColumn',
       },
       {
         field: 'team.name',
@@ -146,14 +93,38 @@ const WorkItemsGrid = (props: WorkItemsGridProps) => {
         cellRenderer: ProjectLinkCellRenderer,
       },
       {
-        field: 'storyPoints',
-        headerName: 'Story Points',
-        width: 100,
-        filter: 'agNumberColumnFilter',
+        field: 'activated',
+        hide: !props.showStats,
+        filter: 'agDateColumnFilter',
+        filterParams: {
+          includeBlanksInEquals: false,
+          includeBlanksInLessThan: false,
+          includeBlanksInGreaterThan: false,
+        },
+        cellRenderer: DateTimeCellRenderer,
+      },
+      {
+        field: 'done',
+        hide: !props.showStats,
+        sort: 'desc',
+        filter: 'agDateColumnFilter',
+        filterParams: {
+          includeBlanksInEquals: false,
+          includeBlanksInLessThan: false,
+          includeBlanksInGreaterThan: false,
+        },
+        cellRenderer: DateTimeCellRenderer,
+      },
+      {
+        field: 'cycleTime',
+        headerName: 'Cycle Time (Days)',
+        hide: !props.showStats,
         type: 'numericColumn',
+        cellRenderer: (params: ICellRendererParams<WorkItemListDto>) =>
+          params.value?.toFixed(2) ?? '',
       },
     ],
-    [props.hideParentColumn, props.hideProjectColumn],
+    [props.hideParentColumn, props.hideProjectColumn, props.showStats],
   )
 
   const refresh = useCallback(async () => {
@@ -161,16 +132,18 @@ const WorkItemsGrid = (props: WorkItemsGridProps) => {
   }, [refetch])
 
   return (
-    <>
-      <ModaGrid
-        height={550}
-        columnDefs={columnDefs}
-        rowData={props.workItems}
-        loadData={refresh}
-        loading={props.isLoading}
-      />
-    </>
+    <ModaGrid
+      ref={ref}
+      height={props.gridHeight ?? 550}
+      columnDefs={columnDefs}
+      rowData={props.workItems}
+      loadData={refresh}
+      loading={props.isLoading}
+      onFilterChanged={props.onFilterChanged}
+    />
   )
-}
+})
+
+WorkItemsGrid.displayName = 'WorkItemsGrid'
 
 export default WorkItemsGrid

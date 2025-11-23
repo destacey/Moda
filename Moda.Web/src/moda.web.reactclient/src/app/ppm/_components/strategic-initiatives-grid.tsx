@@ -57,7 +57,7 @@ const StrategicInitiativesGrid: React.FC<StrategicInitiativesGridProps> = (
         width: 200,
         hide: props.hidePortfolio,
         cellRenderer: (params) =>
-          PortfolioLinkCellRenderer({ data: params.data.portfolio }),
+          PortfolioLinkCellRenderer({ ...params, data: params.data.portfolio }),
       },
       {
         field: 'start',

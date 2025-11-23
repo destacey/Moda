@@ -1,8 +1,8 @@
 ﻿using System.Text.RegularExpressions;
-using Moda.Organization.Domain.Models;
+using Moda.Common.Domain.Models.Organizations;
 
-namespace Moda.Organization.Domain.Extensions;
-public static class StringExtensions
+namespace Moda.Common.Domain.Extensions.Organizations;
+public static partial class StringExtensions
 {
     /// <summary>
     /// Determines whether the value is valid team code format.  Team codes are uppercase letters and numbers only, 2-10 characters.
@@ -13,9 +13,10 @@ public static class StringExtensions
     /// </returns>
     public static bool IsValidTeamCodeFormat(this string? value)
     {
-        // TODO: move to Moda.Common.Domain
-
         return !string.IsNullOrWhiteSpace(value)
-            && Regex.IsMatch(value, TeamCode.Regex);
+            && TeamCodeRegex().IsMatch(value);
     }
+
+    [GeneratedRegex(TeamCode.Regex)]
+    private static partial Regex TeamCodeRegex();
 }

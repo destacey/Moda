@@ -1,6 +1,6 @@
-﻿using Moda.Organization.Application.Teams.Commands;
-using Moda.Organization.Domain.Extensions;
-using Moda.Organization.Domain.Models;
+﻿using Moda.Common.Domain.Extensions.Organizations;
+using Moda.Common.Domain.Models.Organizations;
+using Moda.Organization.Application.Teams.Commands;
 
 namespace Moda.Web.Api.Models.Organizations.Teams;
 
