@@ -6,5 +6,7 @@ namespace Moda.Common.Domain.Enums.AppIntegrations;
 public enum Connector
 {
     [Display(Name = "Azure DevOps", Description = "The Azure DevOps connector enables Moda to connect and retrieve data for the following areas and sychronize the it:  Projects, Areas, Iterations, Work Items, Work Item Types.  This sychronization is one-way.")]
-    AzureDevOps = 0
+    AzureDevOps = 0,
+    [Display(Name = "OpenAI", Description = "The OpenAI connector enables Moda to connect and retrieve data from OpenAI services.")]
+    OpenAI = 1
 }
