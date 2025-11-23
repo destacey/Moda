@@ -147,7 +147,7 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
             onAddMeasurementMenuClicked,
           })
 
-          return RowMenuCellRenderer({ menuItems })
+          return RowMenuCellRenderer({ ...params, menuItems })
         },
       },
       { field: 'key', width: 90 },

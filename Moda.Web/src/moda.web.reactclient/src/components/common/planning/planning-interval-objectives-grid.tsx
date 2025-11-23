@@ -168,7 +168,7 @@ const PlanningIntervalObjectivesGrid = ({
             onCreateHealthCheckMenuClicked,
           })
 
-          return RowMenuCellRenderer({ menuItems })
+          return RowMenuCellRenderer({ ...params, menuItems })
         },
       },
       { field: 'id', hide: true },

@@ -26,9 +26,11 @@ import { DependencyHealth, WorkStatusCategory } from '../types'
 
 // Mock Next.js Link component
 jest.mock('next/link', () => {
-  return ({ children, href, target, ...props }: any) => {
+  const MockLink = ({ children, href, target, ...props }: any) => {
     return <a href={href} target={target} {...props}>{children}</a>
   }
+  MockLink.displayName = 'MockLink'
+  return MockLink
 })
 
 // Helper to create mock cell renderer props

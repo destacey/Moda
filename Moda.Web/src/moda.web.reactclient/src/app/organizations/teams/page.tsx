@@ -45,6 +45,7 @@ const TeamListPage = () => {
         comparator: (valueA, valueB) => {
           return valueA.toLowerCase().localeCompare(valueB.toLowerCase())
         },
+        initialSort: 'asc',
       },
       { field: 'code', width: 125 },
       { field: 'type' },
@@ -113,11 +114,6 @@ const TeamListPage = () => {
           refetch()
         }}
         loading={isLoading}
-        initialState={{
-          sort: {
-            sortModel: [{ colId: 'name', sort: 'asc' }],
-          },
-        }}
       />
       {isInEditMode && <ModalCreateTeamForm />}
     </>

@@ -30,7 +30,12 @@ const ProjectsGrid: React.FC<ProjectsGridProps> = (
   const columnDefs = useMemo<ColDef<ProjectListDto>[]>(
     () => [
       { field: 'key', width: 90 },
-      { field: 'name', cellRenderer: ProjectLinkCellRenderer, width: 300 },
+      {
+        field: 'name',
+        cellRenderer: ProjectLinkCellRenderer,
+        width: 300,
+        initialSort: 'asc',
+      },
       { field: 'status.name', headerName: 'Status', width: 125 },
       {
         field: 'portfolio.name',
@@ -38,7 +43,7 @@ const ProjectsGrid: React.FC<ProjectsGridProps> = (
         width: 200,
         hide: props.hidePortfolio,
         cellRenderer: (params) =>
-          PortfolioLinkCellRenderer({ data: params.data.portfolio }),
+          PortfolioLinkCellRenderer({ ...params, data: params.data.portfolio }),
       },
       {
         field: 'program.name',
@@ -47,7 +52,7 @@ const ProjectsGrid: React.FC<ProjectsGridProps> = (
         hide: props.hideProgram,
         cellRenderer: (params) =>
           params.data.program &&
-          ProgramLinkCellRenderer({ data: params.data.program }),
+          ProgramLinkCellRenderer({ ...params, data: params.data.program }),
       },
       {
         field: 'start',
@@ -99,11 +104,6 @@ const ProjectsGrid: React.FC<ProjectsGridProps> = (
         toolbarActions={props.viewSelector}
         height={props.gridHeight}
         emptyMessage="No projects found."
-        initialState={{
-          sort: {
-            sortModel: [{ colId: 'name', sort: 'asc' }],
-          },
-        }}
       />
     </>
   )

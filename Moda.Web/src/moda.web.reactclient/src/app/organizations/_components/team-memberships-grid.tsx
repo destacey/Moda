@@ -6,7 +6,7 @@ import { TeamMembershipDto } from '@/src/services/moda-api'
 import dayjs from 'dayjs'
 import {
   RowMenuCellRenderer,
-  TeamNameLinkCellRenderer,
+  renderTeamLinkHelper,
 } from '../../../components/common/moda-grid-cell-renderers'
 import useAuth from '../../../components/contexts/auth'
 import { MenuProps } from 'antd'
@@ -25,11 +25,11 @@ export interface TeamMembershipsGridProps {
 }
 
 const LocalChildTeamNameLinkCellRenderer = ({ data }) => {
-  return TeamNameLinkCellRenderer({ data: data.child })
+  return renderTeamLinkHelper(data?.child)
 }
 
 const LocalParentTeamNameLinkCellRenderer = ({ data }) => {
-  return TeamNameLinkCellRenderer({ data: data.parent })
+  return renderTeamLinkHelper(data?.parent)
 }
 
 interface RowMenuProps extends MenuProps {
@@ -119,7 +119,7 @@ const TeamMembershipsGrid = ({
             onDeleteTeamMembershipMenuClicked,
           })
 
-          return RowMenuCellRenderer({ menuItems })
+          return RowMenuCellRenderer({ ...params, menuItems })
         },
       },
       {

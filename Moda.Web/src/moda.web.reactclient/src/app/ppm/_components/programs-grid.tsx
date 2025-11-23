@@ -26,7 +26,12 @@ const ProgramsGrid: FC<ProgramsGridProps> = (props: ProgramsGridProps) => {
   const columnDefs = useMemo<ColDef<ProgramListDto>[]>(
     () => [
       { field: 'key', width: 90 },
-      { field: 'name', cellRenderer: ProgramLinkCellRenderer, width: 300 },
+      {
+        field: 'name',
+        cellRenderer: ProgramLinkCellRenderer,
+        width: 300,
+        initialSort: 'asc',
+      },
       { field: 'status.name', headerName: 'Status', width: 125 },
       {
         field: 'portfolio.name',
@@ -34,7 +39,7 @@ const ProgramsGrid: FC<ProgramsGridProps> = (props: ProgramsGridProps) => {
         width: 200,
         hide: props.hidePortfolio,
         cellRenderer: (params) =>
-          PortfolioLinkCellRenderer({ data: params.data.portfolio }),
+          PortfolioLinkCellRenderer({ ...params, data: params.data.portfolio }),
       },
       {
         field: 'start',
@@ -86,11 +91,6 @@ const ProgramsGrid: FC<ProgramsGridProps> = (props: ProgramsGridProps) => {
         toolbarActions={props.viewSelector}
         height={props.gridHeight}
         emptyMessage="No programs found."
-        initialState={{
-          sort: {
-            sortModel: [{ colId: 'name', sort: 'asc' }],
-          },
-        }}
       />
     </>
   )
