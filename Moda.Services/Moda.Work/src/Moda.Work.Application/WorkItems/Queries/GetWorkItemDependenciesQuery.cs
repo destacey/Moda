@@ -9,7 +9,6 @@ public sealed record GetWorkItemDependenciesQuery : IQuery<Result<List<ScopedDep
     public GetWorkItemDependenciesQuery(WorkspaceIdOrKey workspaceIdOrKey, WorkItemKey workItemKey)
     {
         WorkspaceIdOrKeyFilter = workspaceIdOrKey.CreateWorkspaceFilter<WorkItem>();
-        //WorkspaceIdOrKeyFilter = workspaceIdOrKey.CreateFilter<WorkItem>(wi => wi.WorkspaceId, wi => wi.Workspace.Key);
         WorkItemKey = workItemKey;
     }
 

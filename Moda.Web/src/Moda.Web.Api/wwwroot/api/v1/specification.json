@@ -10477,6 +10477,90 @@
         ]
       }
     },
+    "/api/organization/teams/{idOrCode}/work-items": {
+      "get": {
+        "tags": [
+          "Teams"
+        ],
+        "summary": "Get the work items for a team.",
+        "operationId": "Teams_GetTeamWorkItems",
+        "parameters": [
+          {
+            "name": "idOrCode",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "statusCategories",
+            "in": "query",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "$ref": "#/components/schemas/WorkStatusCategory"
+              }
+            },
+            "x-position": 2
+          },
+          {
+            "name": "doneFrom",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "nullable": true
+            },
+            "x-position": 3
+          },
+          {
+            "name": "doneTo",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "nullable": true
+            },
+            "x-position": 4
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WorkItemListDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/organization/teams/{id}/dependencies": {
       "get": {
         "tags": [
@@ -20252,6 +20336,22 @@
             "nullable": true
           }
         }
+      },
+      "WorkStatusCategory": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "Proposed",
+          "Active",
+          "Done",
+          "Removed"
+        ],
+        "enum": [
+          "Proposed",
+          "Active",
+          "Done",
+          "Removed"
+        ]
       },
       "DependencyDto": {
         "type": "object",

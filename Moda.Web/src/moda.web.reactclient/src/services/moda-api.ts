@@ -12940,6 +12940,76 @@ export class TeamsClient {
     }
 
     /**
+     * Get the work items for a team.
+     * @param statusCategories (optional) 
+     * @param doneFrom (optional) 
+     * @param doneTo (optional) 
+     */
+    getTeamWorkItems(idOrCode: string, statusCategories?: WorkStatusCategory[] | null | undefined, doneFrom?: Date | null | undefined, doneTo?: Date | null | undefined, cancelToken?: CancelToken): Promise<WorkItemListDto[]> {
+        let url_ = this.baseUrl + "/api/organization/teams/{idOrCode}/work-items?";
+        if (idOrCode === undefined || idOrCode === null)
+            throw new globalThis.Error("The parameter 'idOrCode' must be defined.");
+        url_ = url_.replace("{idOrCode}", encodeURIComponent("" + idOrCode));
+        if (statusCategories !== undefined && statusCategories !== null)
+            statusCategories && statusCategories.forEach(item => { url_ += "statusCategories=" + encodeURIComponent("" + item) + "&"; });
+        if (doneFrom !== undefined && doneFrom !== null)
+            url_ += "doneFrom=" + encodeURIComponent(doneFrom ? "" + doneFrom.toISOString() : "") + "&";
+        if (doneTo !== undefined && doneTo !== null)
+            url_ += "doneTo=" + encodeURIComponent(doneTo ? "" + doneTo.toISOString() : "") + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetTeamWorkItems(_response);
+        });
+    }
+
+    protected processGetTeamWorkItems(response: AxiosResponse): Promise<WorkItemListDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<WorkItemListDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<WorkItemListDto[]>(null as any);
+    }
+
+    /**
      * Get the active dependencies for a team.
      */
     getTeamDependencies(id: string, cancelToken?: CancelToken): Promise<DependencyDto[]> {
@@ -16657,6 +16727,10 @@ export interface WorkItemListDto {
     storyPoints?: number | undefined;
     project?: WorkProjectNavigationDto | undefined;
     externalViewWorkItemUrl?: string | undefined;
+    created: Date;
+    activated?: Date | undefined;
+    done?: Date | undefined;
+    cycleTime?: number | undefined;
 }
 
 export interface NavigationDtoOfGuidAndString {
@@ -17835,6 +17909,13 @@ export interface WorkItemBacklogItemDto {
     externalViewWorkItemUrl?: string | undefined;
     stackRank: number;
     storyPoints?: number | undefined;
+}
+
+export enum WorkStatusCategory {
+    Proposed = "Proposed",
+    Active = "Active",
+    Done = "Done",
+    Removed = "Removed",
 }
 
 export interface DependencyDto {
