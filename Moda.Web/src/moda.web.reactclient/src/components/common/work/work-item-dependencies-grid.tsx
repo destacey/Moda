@@ -5,6 +5,7 @@ import {
   WorkItemDetailsDto,
 } from '@/src/services/moda-api'
 import { ColDef, GetRowIdParams } from 'ag-grid-community'
+import { CustomCellRendererProps } from 'ag-grid-react'
 import { FC, useCallback, useMemo } from 'react'
 import ModaGrid from '../moda-grid'
 import { workItemKeyComparator } from './work-item-utils'
@@ -12,8 +13,8 @@ import Link from 'next/link'
 import { ExportOutlined } from '@ant-design/icons'
 import {
   DependencyHealthCellRenderer,
-  TeamNameLinkCellRenderer,
-  WorkSprintLinkCellRenderer,
+  renderSprintLinkHelper,
+  renderTeamLinkHelper,
 } from '../moda-grid-cell-renderers'
 
 export interface WorkItemDependenciesGridProps {
@@ -23,7 +24,12 @@ export interface WorkItemDependenciesGridProps {
   refetch: () => void
 }
 
-const WorkItemLinkCellRenderer = ({ value, data }) => {
+const WorkItemLinkCellRenderer = (
+  props: CustomCellRendererProps<ScopedDependencyDto>,
+) => {
+  const { value, data } = props
+  if (!data?.dependency) return null
+
   return (
     <>
       <Link
@@ -113,16 +119,14 @@ const WorkItemDependenciesGrid: FC<WorkItemDependenciesGridProps> = (props) => {
           {
             field: 'dependency.team.name',
             headerName: 'Team',
-            cellRenderer: (params) =>
-              TeamNameLinkCellRenderer({ data: params.data?.dependency.team }),
+            cellRenderer: (params: CustomCellRendererProps<ScopedDependencyDto>) =>
+              renderTeamLinkHelper(params.data?.dependency.team),
           },
           {
             field: 'dependency.sprint.name',
             headerName: 'Sprint',
-            cellRenderer: (params) =>
-              WorkSprintLinkCellRenderer({
-                data: params.data?.dependency.sprint,
-              }),
+            cellRenderer: (params: CustomCellRendererProps<ScopedDependencyDto>) =>
+              renderSprintLinkHelper(params.data?.dependency.sprint),
           },
         ],
       },
