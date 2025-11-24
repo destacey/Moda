@@ -42,21 +42,17 @@ const PlanningIntervalPlanReviewPage = (props: {
       .sort((a, b) => a.code.localeCompare(b.code))
   }, [teamData])
 
-  // Initialize active tab from URL hash or first team
-  const [activeTab, setActiveTab] = useState<string>(() => {
-    if (typeof window === 'undefined') return null
-    const hash = window.location.hash.slice(1)
-    return hash && hash !== '' ? hash : null
-  })
+  // Track user interactions separately from derived state
+  const [userSelectedTab, setUserSelectedTab] = useState<string | null>(null)
 
-  // Initialize activeTab when teams load if not already set
-  if (teams.length > 0 && activeTab === null) {
-    const hash = window.location.hash.slice(1)
-    const initialTeamCode = hash && hash !== '' ? hash : teams[0]?.code.toLowerCase()
-    if (initialTeamCode) {
-      setActiveTab(initialTeamCode)
-    }
-  }
+  // Derive activeTab: use user selection, or fall back to hash/first team
+  const activeTab = useMemo(() => {
+    if (userSelectedTab) return userSelectedTab
+    if (teams.length === 0) return ''
+
+    const hash = typeof window !== 'undefined' ? window.location.hash.slice(1) : ''
+    return hash && hash !== '' ? hash : teams[0]?.code.toLowerCase()
+  }, [userSelectedTab, teams])
 
   // Update URL hash if it doesn't match activeTab - side effect only
   useEffect(() => {
@@ -72,7 +68,7 @@ const PlanningIntervalPlanReviewPage = (props: {
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.slice(1)
-      setActiveTab(hash)
+      setUserSelectedTab(hash || null)
     }
     window.addEventListener('hashchange', handleHashChange)
 
@@ -128,7 +124,7 @@ const PlanningIntervalPlanReviewPage = (props: {
         style={{ width: '100%' }}
         tabList={tabs}
         activeTabKey={activeTab}
-        onTabChange={(key) => setActiveTab(key)}
+        onTabChange={(key) => setUserSelectedTab(key)}
       >
         {!tabExists ? (
           <Alert message="Please select a valid team." type="error" />

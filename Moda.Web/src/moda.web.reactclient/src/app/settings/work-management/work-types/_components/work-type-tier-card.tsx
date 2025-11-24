@@ -1,7 +1,7 @@
 import { ModaEmpty } from '@/src/components/common'
 import { WorkTypeLevelDto, WorkTypeTierDto } from '@/src/services/moda-api'
 import { Button, Card, List, Typography } from 'antd'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { CreateWorkTypeLevelForm, WorkTypeLevelCard } from '.'
 import { PlusOutlined } from '@ant-design/icons'
 import {
@@ -34,7 +34,6 @@ interface WorkTypeTierCardProps {
 }
 
 const sortOrderedLevels = (levels: WorkTypeLevelDto[]) => {
-  // .slice() is used to prevent: TypeError: Cannot assign to read only property '0' of object '[object Array]'
   return levels.slice().sort((a, b) => {
     return a.order - b.order
   })
@@ -67,13 +66,9 @@ const WorkTypeTierCard = (props: WorkTypeTierCardProps) => {
   const [updateLevelsOrder] = useUpdateWorkTypeLevelsOrderMutation()
 
   // Sync orderedLevels when sortedLevels changes from external updates (e.g., after create/delete)
-  // Use a key-based approach: compare the IDs to detect if levels changed
-  const currentLevelIds = sortedLevels.map((l) => l.id).join(',')
-  const orderedLevelIds = orderedLevels.map((l) => l.id).join(',')
-
-  if (currentLevelIds !== orderedLevelIds) {
+  useEffect(() => {
     setOrderedLevels(sortedLevels)
-  }
+  }, [sortedLevels])
 
   const onCreateObjectiveFormClosed = (wasSaved: boolean) => {
     setOpenCreateWorkTypeLevelForm(false)
@@ -103,8 +98,7 @@ const WorkTypeTierCard = (props: WorkTypeTierCardProps) => {
     setOrderedLevels(updatedLevels)
 
     // after optimistic update
-    // eslint-disable-next-line prefer-const
-    let changedLevelsDictionary: { [key: string]: number } = {}
+    const changedLevelsDictionary: { [key: string]: number } = {}
     updatedLevels.forEach((o, i) => {
       const position = i + 1
       if (o.order !== position) {
