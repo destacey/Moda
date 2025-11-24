@@ -1,9 +1,9 @@
 import { useMessage } from '@/src/components/contexts/messaging'
-import { authorizeForm } from '@/src/components/hoc'
+import { authorizeFormWithPropCallback } from '@/src/components/hoc'
 import { PlanningIntervalObjectiveDetailsDto } from '@/src/services/moda-api'
 import { useDeletePlanningIntervalObjectiveMutation } from '@/src/store/features/planning/planning-interval-api'
 import { Modal } from 'antd'
-import { FC, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 interface DeletePlanningIntervalObjectiveFormProps {
   showForm: boolean
@@ -87,17 +87,11 @@ const DeletePlanningIntervalObjectiveForm = ({
   )
 }
 
-const AuthorizedDeletePlanningIntervalObjectiveForm: FC<
-  DeletePlanningIntervalObjectiveFormProps
-> = (props) => {
-  const AuthorizedForm = authorizeForm(
-    DeletePlanningIntervalObjectiveForm,
-    props.onFormCancel,
-    'Permission',
-    'Permissions.PlanningIntervalObjectives.Manage',
-  )
-
-  return <AuthorizedForm {...props} />
-}
+// Wrap with authorization HOC - this is created outside render and reused
+const AuthorizedDeletePlanningIntervalObjectiveForm = authorizeFormWithPropCallback(
+  DeletePlanningIntervalObjectiveForm,
+  'Permission',
+  'Permissions.PlanningIntervalObjectives.Manage',
+)
 
 export default AuthorizedDeletePlanningIntervalObjectiveForm

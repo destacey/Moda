@@ -41,7 +41,6 @@ const statusMap = {
 const HealthReportChart: React.FC<HealthReportChartProps> = (
   props: HealthReportChartProps,
 ) => {
-  const [seriesData, setSeriesData] = useState([])
   const { currentThemeName, antDesignChartsTheme } = useTheme()
 
   const {
@@ -52,10 +51,11 @@ const HealthReportChart: React.FC<HealthReportChartProps> = (
     refetch,
   } = useGetHealthReportQuery(props.objectId, { skip: !props.objectId })
 
-  useEffect(() => {
-    if (!healthReportData) return
+  // Derive series data from health report data
+  const seriesData = useMemo(() => {
+    if (!healthReportData) return []
 
-    const chartData = healthReportData
+    return healthReportData
       .slice()
       .sort((a, b) =>
         dayjs(a.reportedOn).isAfter(dayjs(b.reportedOn)) ? 1 : -1,
@@ -64,8 +64,6 @@ const HealthReportChart: React.FC<HealthReportChartProps> = (
         date: dayjs(report.reportedOn).toDate(),
         status: convertStatusToNumber(report.status?.name),
       }))
-
-    setSeriesData(chartData)
   }, [healthReportData])
 
   // https://ant-design-charts.antgroup.com/en/options/plots/component/axis

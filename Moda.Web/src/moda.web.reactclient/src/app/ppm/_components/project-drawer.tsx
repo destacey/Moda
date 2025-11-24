@@ -56,7 +56,7 @@ const ProjectDrawer: FC<ProjectDrawerProps> = (props: ProjectDrawerProps) => {
       projectData?.projectSponsors.length > 0
         ? getSortedNames(projectData.projectSponsors)
         : 'No sponsors assigned',
-    [projectData?.projectSponsors],
+    [projectData],
   )
 
   const ownerNames = useMemo(
@@ -64,7 +64,7 @@ const ProjectDrawer: FC<ProjectDrawerProps> = (props: ProjectDrawerProps) => {
       projectData?.projectOwners.length > 0
         ? getSortedNames(projectData.projectOwners)
         : 'No owners assigned',
-    [projectData?.projectOwners],
+    [projectData],
   )
 
   const managerNames = useMemo(
@@ -72,7 +72,7 @@ const ProjectDrawer: FC<ProjectDrawerProps> = (props: ProjectDrawerProps) => {
       projectData?.projectManagers.length > 0
         ? getSortedNames(projectData.projectManagers)
         : 'No managers assigned',
-    [projectData?.projectManagers],
+    [projectData],
   )
 
   const strategicThemes = useMemo(
@@ -80,7 +80,7 @@ const ProjectDrawer: FC<ProjectDrawerProps> = (props: ProjectDrawerProps) => {
       projectData?.strategicThemes.length > 0
         ? getSortedNames(projectData.strategicThemes)
         : null,
-    [projectData?.strategicThemes],
+    [projectData],
   )
 
   const handleDrawerClose = useCallback(() => {

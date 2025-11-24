@@ -23,33 +23,33 @@ export interface WorkItemsCumulativeFlowChartProps {
 const WorkItemsCumulativeFlowChart = (
   props: WorkItemsCumulativeFlowChartProps,
 ) => {
-  const [data, setData] = useState<any[]>([])
   const { antDesignChartsTheme } = useTheme()
 
-  useMemo(() => {
-    if (props.workItems) {
-      const workItems = props.workItems
+  // Derive chart data from work items
+  const data = useMemo(() => {
+    if (!props.workItems) return []
 
-      const proposedData = workItems.map((item) => ({
-        date: dayjs(item.date).toDate(),
-        category: 'Proposed',
-        value: item.proposed,
-      }))
+    const workItems = props.workItems
 
-      const activeData = workItems.map((item) => ({
-        date: dayjs(item.date).toDate(),
-        category: 'Active',
-        value: item.active,
-      }))
+    const proposedData = workItems.map((item) => ({
+      date: dayjs(item.date).toDate(),
+      category: 'Proposed',
+      value: item.proposed,
+    }))
 
-      const doneData = workItems.map((item) => ({
-        date: dayjs(item.date).toDate(),
-        category: 'Done',
-        value: item.done,
-      }))
+    const activeData = workItems.map((item) => ({
+      date: dayjs(item.date).toDate(),
+      category: 'Active',
+      value: item.active,
+    }))
 
-      setData([...doneData, ...activeData, ...proposedData])
-    }
+    const doneData = workItems.map((item) => ({
+      date: dayjs(item.date).toDate(),
+      category: 'Done',
+      value: item.done,
+    }))
+
+    return [...doneData, ...activeData, ...proposedData]
   }, [props.workItems])
 
   const config = useMemo(() => {

@@ -68,7 +68,6 @@ const StrategicInitiativeDetailsPage = (props: {
   const [activeTab, setActiveTab] = useState(StrategicInitiativeTabs.Details)
   const [kpisQueried, setKpisQueried] = useState(false)
   const [projectsQueried, setProjectsQueried] = useState(false)
-  const [isReadOnly, setIsReadOnly] = useState(false)
 
   const [openEditStrategicInitiativeForm, setOpenEditStrategicInitiativeForm] =
     useState<boolean>(false)
@@ -133,11 +132,16 @@ const StrategicInitiativeDetailsPage = (props: {
     skip: !projectsQueried,
   })
 
+  // Derive isReadOnly from strategic initiative status
+  const isReadOnly = useMemo(() => {
+    if (!strategicInitiativeData) return false
+    const status = strategicInitiativeData.status.name
+    return status === 'Completed' || status === 'Cancelled'
+  }, [strategicInitiativeData])
+
+  // Update breadcrumb route - side effect only
   useEffect(() => {
     if (!strategicInitiativeData) return
-
-    const status = strategicInitiativeData.status.name
-    setIsReadOnly(status === 'Completed' || status === 'Cancelled')
 
     const breadcrumbRoute: BreadcrumbItem[] = [
       {

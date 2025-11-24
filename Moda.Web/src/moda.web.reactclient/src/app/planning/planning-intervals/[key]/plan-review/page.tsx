@@ -21,10 +21,6 @@ const PlanningIntervalPlanReviewPage = (props: {
   const piKey = Number(key)
 
   useDocumentTitle('PI Plan Review')
-  const [teams, setTeams] = useState<PlanningIntervalTeamResponse[]>([])
-  const [activeTab, setActiveTab] = useState<string>(null)
-  const [predictability, setPredictability] = useState<number>()
-
   const router = useRouter()
 
   const {
@@ -37,30 +33,43 @@ const PlanningIntervalPlanReviewPage = (props: {
   const { data: teamData, isLoading: teamsIsLoading } =
     useGetPlanningIntervalTeamsQuery(piKey)
 
-  useEffect(() => {
-    if (!planningIntervalData || !teamData) return
-    setPredictability(planningIntervalData?.predictability)
+  const predictability = planningIntervalData?.predictability
 
-    const currentTeams = teamData
+  const teams = useMemo(() => {
+    if (!teamData) return []
+    return teamData
       .filter((t) => t.type === 'Team')
       .sort((a, b) => a.code.localeCompare(b.code))
+  }, [teamData])
 
-    setTeams(currentTeams)
+  // Initialize active tab from URL hash or first team
+  const [activeTab, setActiveTab] = useState<string>(() => {
+    if (typeof window === 'undefined') return null
+    const hash = window.location.hash.slice(1)
+    return hash && hash !== '' ? hash : null
+  })
 
-    if (currentTeams?.length > 0) {
-      const hash = window.location.hash.slice(1)
-      const initialTeamCode =
-        hash && hash !== '' ? hash : currentTeams[0].code.toLowerCase()
-
-      if (!hash || hash === '') {
-        router.replace(`#${initialTeamCode}`, { scroll: false })
-      }
-
-      if (currentTeams.some((t) => t.code.toLowerCase() === initialTeamCode)) {
-        setActiveTab(initialTeamCode)
-      }
+  // Initialize activeTab when teams load if not already set
+  if (teams.length > 0 && activeTab === null) {
+    const hash = window.location.hash.slice(1)
+    const initialTeamCode = hash && hash !== '' ? hash : teams[0]?.code.toLowerCase()
+    if (initialTeamCode) {
+      setActiveTab(initialTeamCode)
     }
+  }
 
+  // Update URL hash if it doesn't match activeTab - side effect only
+  useEffect(() => {
+    if (!activeTab || teams.length === 0) return
+
+    const hash = window.location.hash.slice(1)
+    if (!hash || hash === '') {
+      router.replace(`#${activeTab}`, { scroll: false })
+    }
+  }, [activeTab, teams, router])
+
+  // Handle hash change events
+  useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.slice(1)
       setActiveTab(hash)
@@ -70,7 +79,7 @@ const PlanningIntervalPlanReviewPage = (props: {
     return () => {
       window.removeEventListener('hashchange', handleHashChange)
     }
-  }, [planningIntervalData, router, teamData])
+  }, [])
 
   useEffect(() => {
     const hash = window.location.hash.slice(1)

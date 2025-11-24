@@ -1,11 +1,11 @@
 'use client'
 
 import { useMessage } from '@/src/components/contexts/messaging'
-import { authorizeForm } from '@/src/components/hoc'
+import { authorizeFormWithPropCallback } from '@/src/components/hoc'
 import { StrategicInitiativeKpiListDto } from '@/src/services/moda-api'
 import { useDeleteStrategicInitiativeKpiMutation } from '@/src/store/features/ppm/strategic-initiatives-api'
 import { Modal } from 'antd'
-import { FC, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export interface DeleteStrategicInitiativeKpiFormProps {
   strategicInitiativeId: string
@@ -95,17 +95,11 @@ const DeleteStrategicInitiativeKpiForm = (
   )
 }
 
-const AuthorizedDeleteStrategicInitiativeKpiForm: FC<
-  DeleteStrategicInitiativeKpiFormProps
-> = (props) => {
-  const AuthorizedForm = authorizeForm(
-    DeleteStrategicInitiativeKpiForm,
-    props.onFormCancel,
-    'Permission',
-    'Permissions.StrategicInitiatives.Update',
-  )
-
-  return <AuthorizedForm {...props} />
-}
+// Wrap with authorization HOC - this is created outside render and reused
+const AuthorizedDeleteStrategicInitiativeKpiForm = authorizeFormWithPropCallback(
+  DeleteStrategicInitiativeKpiForm,
+  'Permission',
+  'Permissions.StrategicInitiatives.Update',
+)
 
 export default AuthorizedDeleteStrategicInitiativeKpiForm

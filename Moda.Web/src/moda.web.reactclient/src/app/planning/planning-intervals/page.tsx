@@ -27,7 +27,6 @@ const stateOrder = ['Active', 'Future', 'Completed']
 const PlanningIntervalListPage = () => {
   useDocumentTitle('Planning Intervals')
 
-  const [data, setData] = useState<PlanningIntervalListDto[]>([])
   const [openCreatePlanningIntervalForm, setOpenCreatePlanningIntervalForm] =
     useState<boolean>(false)
 
@@ -38,6 +37,20 @@ const PlanningIntervalListPage = () => {
     'Permissions.PlanningIntervals.Create',
   )
   const showActions = canCreatePlanningInterval
+
+  const data = useMemo(() => {
+    if (!piData) return []
+
+    return piData.slice().sort((a, b) => {
+      const aStateIndex = stateOrder.indexOf(a.state.name)
+      const bStateIndex = stateOrder.indexOf(b.state.name)
+      if (aStateIndex !== bStateIndex) {
+        return aStateIndex - bStateIndex
+      } else {
+        return dayjs(b.start).unix() - dayjs(a.start).unix()
+      }
+    })
+  }, [piData])
 
   const columnDefs = useMemo<ColDef<PlanningIntervalListDto>[]>(
     () => [
@@ -62,22 +75,6 @@ const PlanningIntervalListPage = () => {
   const refresh = useCallback(async () => {
     refetch()
   }, [refetch])
-
-  useEffect(() => {
-    if (!piData) return
-
-    const sortedData = piData.slice().sort((a, b) => {
-      const aStateIndex = stateOrder.indexOf(a.state.name)
-      const bStateIndex = stateOrder.indexOf(b.state.name)
-      if (aStateIndex !== bStateIndex) {
-        return aStateIndex - bStateIndex
-      } else {
-        return dayjs(b.start).unix() - dayjs(a.start).unix()
-      }
-    })
-
-    setData(sortedData)
-  }, [piData])
 
   const onCreatePlanningIntervalFormClosed = (wasCreated: boolean) => {
     setOpenCreatePlanningIntervalForm(false)

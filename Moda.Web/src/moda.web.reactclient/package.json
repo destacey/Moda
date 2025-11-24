@@ -6,7 +6,7 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "test": "jest"
   },
   "devDependencies": {
@@ -74,3 +74,4 @@
     "@types/react-dom": "19.2.3"
   }
 }
+

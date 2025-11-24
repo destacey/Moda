@@ -8,7 +8,6 @@ import {
 import { toFormErrors } from '@/src/utils'
 import { Button, Form, Input, Popconfirm, Space } from 'antd'
 import { useRouter } from 'next/navigation'
-import React, { useEffect, useState } from 'react'
 
 const { Item } = Form
 const { TextArea } = Input
@@ -18,10 +17,9 @@ interface RolesDetailProps {
 }
 
 const RoleDetails = (props: RolesDetailProps) => {
-  const [role, setRole] = useState<RoleDto>(props.role)
   const [form] = Form.useForm<CreateOrUpdateRoleRequest>()
   const router = useRouter()
-  const messageApi = useMessage();
+  const messageApi = useMessage()
 
   const { hasClaim } = useAuth()
   const canDelete = hasClaim('Permission', 'Permissions.Roles.Delete')
@@ -29,11 +27,9 @@ const RoleDetails = (props: RolesDetailProps) => {
   const [upsertRole, { error: upsertRoleError }] = useUpsertRoleMutation()
   const [deleteRole, { error: deleteRoleError }] = useDeleteRoleMutation()
 
-  useEffect(() => setRole(props.role), [props.role])
-
   const confirmDelete = async () => {
     try {
-      await deleteRole(role.id)
+      await deleteRole(props.role.id)
       messageApi.success('Role deleted successfully')
 
       // Allow delay for message to show
@@ -52,7 +48,7 @@ const RoleDetails = (props: RolesDetailProps) => {
   const onFinish = async (values: any) => {
     try {
       await upsertRole({
-        id: role?.id,
+        id: props.role?.id,
         name: values.name,
         description: values.description,
       })
@@ -79,7 +75,7 @@ const RoleDetails = (props: RolesDetailProps) => {
 
   return (
     <div>
-      {role && (
+      {props.role && (
         <Form
           form={form}
           labelCol={{ span: 8 }}
@@ -92,7 +88,7 @@ const RoleDetails = (props: RolesDetailProps) => {
           <Item
             label="Name"
             name="name"
-            initialValue={role?.name}
+            initialValue={props.role.name}
             rules={[{ required: true }]}
           >
             <TextArea
@@ -105,7 +101,7 @@ const RoleDetails = (props: RolesDetailProps) => {
           <Item
             label="Description"
             name="description"
-            initialValue={role?.description}
+            initialValue={props.role.description}
           >
             <TextArea
               autoSize={{ minRows: 6, maxRows: 10 }}

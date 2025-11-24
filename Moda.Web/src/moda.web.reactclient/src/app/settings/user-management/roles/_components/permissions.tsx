@@ -13,7 +13,7 @@ import {
   Space,
   Spin,
 } from 'antd'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 
 const { Title } = Typography
 const { Item } = List
@@ -38,9 +38,6 @@ const Permissions = (props: PermissionsProps) => {
   const theme = useTheme()
 
   const [permissions, setPermissions] = useState<string[]>(props.permissions)
-  const [permissionGroups, setPermissionGroups] = useState<PermissionGroup[]>(
-    [],
-  )
   const [activePermissionGroup, setActivePermissionGroup] =
     useState<PermissionGroup | null>(null)
 
@@ -54,8 +51,8 @@ const Permissions = (props: PermissionsProps) => {
   const [updatePermissions, { error: updatePermissionsError }] =
     useUpdatePermissionsMutation()
 
-  useEffect(() => {
-    if (!permissionsData) return
+  const permissionGroups = useMemo(() => {
+    if (!permissionsData) return []
     const groups = permissionsData.reduce(
       (acc: PermissionGroup[], permission) => {
         const item: PermissionItem = {
@@ -76,11 +73,11 @@ const Permissions = (props: PermissionsProps) => {
       [],
     )
 
-    setPermissionGroups(
-      groups?.sort((a, b) => a.name.localeCompare(b.name)) ?? groups,
-    )
-    setActivePermissionGroup(groups?.[0])
+    return groups?.sort((a, b) => a.name.localeCompare(b.name)) ?? groups
   }, [permissionsData])
+
+  // Derive active permission group: use the selected one or default to first group
+  const effectiveActiveGroup = activePermissionGroup ?? (permissionGroups.length > 0 ? permissionGroups[0] : null)
 
   const handlePermissionChange = (item: PermissionItem) => {
     let updatedPermissions: string[] = [...permissions]
@@ -122,10 +119,10 @@ const Permissions = (props: PermissionsProps) => {
   if (isLoading) return <Spin size="small" />
 
   function handleSelectAll(select: boolean): void {
-    if (activePermissionGroup) {
+    if (effectiveActiveGroup) {
       const updatedPermissions: string[] = [...permissions]
 
-      activePermissionGroup.permissions.forEach((p) => {
+      effectiveActiveGroup.permissions.forEach((p) => {
         if (select) {
           if (!hasPermission(p.name)) {
             updatedPermissions.push(p.name)
@@ -160,7 +157,7 @@ const Permissions = (props: PermissionsProps) => {
                   cursor: 'pointer',
                   display: 'flex',
                   borderLeft: `${
-                    activePermissionGroup.name == item.name
+                    effectiveActiveGroup?.name == item.name
                       ? '2px solid' + theme.token.colorPrimary
                       : ''
                   }`,
@@ -186,9 +183,9 @@ const Permissions = (props: PermissionsProps) => {
         >
           <Space direction="vertical" style={{ height: '100%' }}>
             <Title level={5}>
-              {activePermissionGroup?.name} Available Permissions
+              {effectiveActiveGroup?.name} Available Permissions
             </Title>
-            {activePermissionGroup?.permissions?.map((permission, i) => (
+            {effectiveActiveGroup?.permissions?.map((permission, i) => (
               <Space key={i} style={{ paddingBottom: '15px' }}>
                 <Switch
                   checked={hasPermission(permission.name)}

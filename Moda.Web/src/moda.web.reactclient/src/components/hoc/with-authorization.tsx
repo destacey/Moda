@@ -26,6 +26,9 @@ const withAuthorization = <P extends object>(
   defaultClaimType?: string,
   defaultClaimValue?: string,
 ): FC<P & WithAuthorizationProps> => {
+  const wrappedComponentName =
+    WrappedComponent.displayName || WrappedComponent.name || 'Component'
+
   const WithAuthorization: ComponentType<P & WithAuthorizationProps> = ({
     claimType,
     claimValue,
@@ -33,10 +36,6 @@ const withAuthorization = <P extends object>(
     ...props
   }) => {
     const { hasClaim } = useAuth()
-    const wrappedComponentName =
-      WrappedComponent.displayName || WrappedComponent.name || 'Component'
-
-    WithAuthorization.displayName = `withAuthorization(${wrappedComponentName})`
 
     return hasClaim(
       claimType ?? defaultClaimType ?? 'Permission',
@@ -49,6 +48,9 @@ const withAuthorization = <P extends object>(
       <NotAuthorized />
     )
   }
+
+  WithAuthorization.displayName = `withAuthorization(${wrappedComponentName})`
+
   return WithAuthorization
 }
 

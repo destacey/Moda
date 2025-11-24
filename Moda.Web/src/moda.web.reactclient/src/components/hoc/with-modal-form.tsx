@@ -33,12 +33,10 @@ const withModalForm = <P extends FormProps<TFormValues>, TFormValues>(
   WrappedForm: ComponentType<P>,
   modalFormProps: ModalFormProps<TFormValues>,
 ): FC<Omit<P, 'form'>> => {
+  const wrappedComponentName =
+    WrappedForm.displayName || WrappedForm.name || 'Component'
+
   const WithModalForm: ComponentType<Omit<P, 'form'>> = ({ ...props }) => {
-    const wrappedComponentName =
-      WrappedForm.displayName || WrappedForm.name || 'Component'
-
-    WithModalForm.displayName = `withModalForm(${wrappedComponentName})`
-
     const [isValid, setIsValid] = useState(false)
     const [form] = Form.useForm<TFormValues>()
     const formValues = Form.useWatch([], form)
@@ -103,6 +101,9 @@ const withModalForm = <P extends FormProps<TFormValues>, TFormValues>(
       </Modal>
     )
   }
+
+  WithModalForm.displayName = `withModalForm(${wrappedComponentName})`
+
   return WithModalForm
 }
 

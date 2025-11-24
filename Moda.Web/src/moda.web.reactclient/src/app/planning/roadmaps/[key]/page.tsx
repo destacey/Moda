@@ -42,7 +42,6 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const { key } = use(props.params)
   const roadmapKey = Number(key)
 
-  const [managersInfo, setManagersInfo] = useState('Unknown')
   const [openCreateActivityForm, setOpenCreateActivityForm] =
     useState<boolean>(false)
   const [openCreateTimeboxForm, setOpenCreateTimeboxForm] =
@@ -54,7 +53,6 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     useState<boolean>(false)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
-  const [isRoadmapManager, setIsRoadmapManager] = useState(false)
 
   const pathname = usePathname()
   const dispatch = useAppDispatch()
@@ -90,6 +88,22 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const searchParams = useSearchParams()
   const timelineEditMode = searchParams.has('editMode')
 
+  const managersInfo = useMemo(() => {
+    if (!roadmapData) return 'Unknown'
+    return roadmapData.roadmapManagers
+      .slice()
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map((m) => m.name)
+      .join(', ')
+  }, [roadmapData])
+
+  const isRoadmapManager = useMemo(() => {
+    if (!roadmapData || !currentUserInternalEmployeeId) return false
+    return roadmapData.roadmapManagers.some(
+      (rm) => rm.id === currentUserInternalEmployeeId,
+    )
+  }, [roadmapData, currentUserInternalEmployeeId])
+
   useEffect(() => {
     if (!roadmapData) return
 
@@ -109,21 +123,6 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
 
     dispatch(setBreadcrumbRoute({ route: breadcrumbRoute, pathname }))
   }, [dispatch, pathname, roadmapData])
-
-  useEffect(() => {
-    if (!roadmapData || !currentUserInternalEmployeeId) return
-    const managers = roadmapData.roadmapManagers
-      .slice()
-      .sort((a, b) => a.name.localeCompare(b.name))
-      .map((m) => m.name)
-      .join(', ')
-    setManagersInfo(managers)
-
-    const isRoadmapManager = roadmapData.roadmapManagers.some(
-      (rm) => rm.id === currentUserInternalEmployeeId,
-    )
-    setIsRoadmapManager(isRoadmapManager)
-  }, [roadmapData, currentUserInternalEmployeeId])
 
   useEffect(() => {
     error && console.error(error)
