@@ -97,7 +97,6 @@ const MapRoadmapItem = (item: RoadmapItemUnion): RoadmapItemDataType => {
 const RoadmapItemsGrid: React.FC<RoadmapItemsGridProps> = (
   props: RoadmapItemsGridProps,
 ) => {
-  const [data, setData] = useState<RoadmapItemDataType[]>([])
   const [openUpdateRoadmapActivityForm, setOpenUpdateRoadmapActivityForm] =
     useState<boolean>(false)
   const [openUpdateRoadmapTimeboxForm, setOpenUpdateRoadmapTimeboxForm] =
@@ -195,28 +194,24 @@ const RoadmapItemsGrid: React.FC<RoadmapItemsGridProps> = (
     ] as TableColumnsType<RoadmapItemDataType>
   }, [onDeleteItemMenuClicked, onEditItemMenuClicked, props])
 
-  useEffect(() => {
-    if (props.roadmapItemsIsLoading) return
+  const data = useMemo(() => {
+    if (props.roadmapItemsIsLoading) return []
 
-    const roadmapItemsData: RoadmapItemDataType[] = props.roadmapItemsData.map(
-      (item: RoadmapItemUnion) => {
-        const mapItemWithChildren = (
-          item: RoadmapItemUnion,
-        ): RoadmapItemDataType => {
-          const roadmapItem = MapRoadmapItem(item)
-          if ('children' in item && item.children.length > 0) {
-            roadmapItem.children = item.children.map((child) =>
-              mapItemWithChildren(child),
-            )
-          }
-          return roadmapItem
+    return props.roadmapItemsData.map((item: RoadmapItemUnion) => {
+      const mapItemWithChildren = (
+        item: RoadmapItemUnion,
+      ): RoadmapItemDataType => {
+        const roadmapItem = MapRoadmapItem(item)
+        if ('children' in item && item.children.length > 0) {
+          roadmapItem.children = item.children.map((child) =>
+            mapItemWithChildren(child),
+          )
         }
+        return roadmapItem
+      }
 
-        return mapItemWithChildren(item)
-      },
-    )
-
-    setData(roadmapItemsData)
+      return mapItemWithChildren(item)
+    })
   }, [props.roadmapItemsData, props.roadmapItemsIsLoading])
 
   const onUpdateRoadmapActivityFormClosed = (wasSaved: boolean) => {

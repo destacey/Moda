@@ -16,7 +16,7 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve", // nextjs needs this to be "preserve"
+    "jsx": "react-jsx",
     "incremental": true,
     "allowSyntheticDefaultImports": true,
     "baseUrl": "./",
@@ -36,7 +36,8 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "__mocks__/matchMedia.js"
+    "__mocks__/matchMedia.js",
+    ".next/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

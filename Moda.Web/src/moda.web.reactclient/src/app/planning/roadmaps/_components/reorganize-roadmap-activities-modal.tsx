@@ -10,7 +10,7 @@ import {
 } from '@/src/services/moda-api'
 import { useReorganizeRoadmapActivityMutation } from '@/src/store/features/planning/roadmaps-api'
 import { Button, Modal, TreeDataNode } from 'antd'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 
 interface RoadmapActivityReorganizeModalProps {
   showModal: boolean
@@ -47,9 +47,6 @@ const MapRoadmapActivity = (
 const ReorganizeRoadmapActivitiesModal: React.FC<
   RoadmapActivityReorganizeModalProps
 > = (props) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [activityTreeData, setActivityTreeData] = useState<TreeDataNode[]>([])
-
   const messageApi = useMessage()
 
   const { hasPermissionClaim } = useAuth()
@@ -60,27 +57,29 @@ const ReorganizeRoadmapActivitiesModal: React.FC<
   const [reorganizeActivity, { error: reorganizeError }] =
     useReorganizeRoadmapActivityMutation()
 
-  useEffect(() => {
-    if (!props.showModal) return
+  // Derive tree data from props
+  const activityTreeData = useMemo(() => {
+    if (!props.roadmapItems) return []
 
-    if (!canManageRoadmapItems) {
-      setIsOpen(false)
-      props.onClose()
-      messageApi.error('You do not have permission to update roadmap items.')
-    }
-
-    const activities: RoadmapActivityListDto[] = props.roadmapItems?.filter(
+    const activities: RoadmapActivityListDto[] = props.roadmapItems.filter(
       (child) => child.$type === 'activity',
     )
 
-    const treeData = activities
+    return activities
       .sort((a, b) => a.order - b.order)
       .map((item: RoadmapItemListDto) => MapRoadmapActivity(item))
+  }, [props.roadmapItems])
 
-    setActivityTreeData(treeData)
+  // Derive modal open state from props and authorization
+  const isOpen = props.showModal && canManageRoadmapItems
 
-    setIsOpen(true)
-  }, [canManageRoadmapItems, messageApi, props])
+  // Handle authorization failure - side effect only
+  useEffect(() => {
+    if (props.showModal && !canManageRoadmapItems) {
+      props.onClose()
+      messageApi.error('You do not have permission to update roadmap items.')
+    }
+  }, [props.showModal, canManageRoadmapItems, props, messageApi])
 
   useEffect(() => {
     if (reorganizeError) {

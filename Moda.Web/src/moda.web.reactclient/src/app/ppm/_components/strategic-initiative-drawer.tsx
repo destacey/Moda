@@ -60,7 +60,7 @@ const StrategicInitiativeDrawer: FC<StrategicInitiativeDrawerProps> = (
       strategicInitiativeData?.strategicInitiativeSponsors.length > 0
         ? getSortedNames(strategicInitiativeData.strategicInitiativeSponsors)
         : 'No sponsors assigned',
-    [strategicInitiativeData?.strategicInitiativeSponsors],
+    [strategicInitiativeData],
   )
 
   const ownerNames = useMemo(
@@ -68,7 +68,7 @@ const StrategicInitiativeDrawer: FC<StrategicInitiativeDrawerProps> = (
       strategicInitiativeData?.strategicInitiativeOwners.length > 0
         ? getSortedNames(strategicInitiativeData.strategicInitiativeOwners)
         : 'No owners assigned',
-    [strategicInitiativeData?.strategicInitiativeOwners],
+    [strategicInitiativeData],
   )
 
   const handleDrawerClose = useCallback(() => {

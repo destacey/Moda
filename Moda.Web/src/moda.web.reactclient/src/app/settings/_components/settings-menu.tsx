@@ -7,7 +7,7 @@ import {
   SubMenuType,
 } from 'antd/es/menu/interface'
 import useAuth from '../../../components/contexts/auth'
-import { useEffect, useState } from 'react'
+import { useMemo } from 'react'
 import { Menu } from 'antd'
 import Link from 'next/link'
 
@@ -172,20 +172,16 @@ const settingsMenuItems: ItemType[] = [
 
 // TODO: improve style and layout for smaller screens
 export default function SettingsMenu() {
-  const [menuItems, setMenuItems] = useState<ItemType<MenuItemType>[]>([])
   const { hasPermissionClaim } = useAuth()
 
-  useEffect(() => {
+  // Derive menu items based on user's permissions
+  const menuItems = useMemo(() => {
     // Reduce the menu items based on the user's claims and transformed into antd menu items using the getItem function
-    const filteredMenu = settingsMenuItems.reduce(
+    return settingsMenuItems.reduce(
       (acc: ItemType<MenuItemType>[], item: SectionMenuItem) =>
         authorizeMenuItems(acc, item, hasPermissionClaim),
       [],
     )
-
-    if (filteredMenu.length === 0) return
-
-    setMenuItems(filteredMenu)
   }, [hasPermissionClaim])
 
   return (

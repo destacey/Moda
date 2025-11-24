@@ -104,7 +104,9 @@ export const AgGridTransfer = <TData extends object>(
           newValue: false,
         })
     },
-    [leftGridRef, onDragStop],
+    // Refs are intentionally excluded - they don't trigger re-renders
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [onDragStop],
   )
 
   const onGridReady = useCallback(
@@ -118,7 +120,9 @@ export const AgGridTransfer = <TData extends object>(
       leftGridRef.current.api.removeRowDropZone(dropZoneParams)
       leftGridRef.current.api.addRowDropZone(dropZoneParams)
     },
-    [leftGridRef, onDragStopInternal, rightGridRef],
+    // Refs are intentionally excluded - they don't trigger re-renders
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [onDragStopInternal],
   )
 
   const getGrid = useCallback(

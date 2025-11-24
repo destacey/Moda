@@ -56,7 +56,7 @@ const ProgramDrawer: FC<ProgramDrawerProps> = (props: ProgramDrawerProps) => {
       programData?.programSponsors.length > 0
         ? getSortedNames(programData.programSponsors)
         : 'No sponsors assigned',
-    [programData?.programSponsors],
+    [programData],
   )
 
   const ownerNames = useMemo(
@@ -64,7 +64,7 @@ const ProgramDrawer: FC<ProgramDrawerProps> = (props: ProgramDrawerProps) => {
       programData?.programOwners.length > 0
         ? getSortedNames(programData.programOwners)
         : 'No owners assigned',
-    [programData?.programOwners],
+    [programData],
   )
 
   const managerNames = useMemo(
@@ -72,7 +72,7 @@ const ProgramDrawer: FC<ProgramDrawerProps> = (props: ProgramDrawerProps) => {
       programData?.programManagers.length > 0
         ? getSortedNames(programData.programManagers)
         : 'No managers assigned',
-    [programData?.programManagers],
+    [programData],
   )
 
   const strategicThemes = useMemo(
@@ -80,7 +80,7 @@ const ProgramDrawer: FC<ProgramDrawerProps> = (props: ProgramDrawerProps) => {
       programData?.strategicThemes.length > 0
         ? getSortedNames(programData.strategicThemes)
         : null,
-    [programData?.strategicThemes],
+    [programData],
   )
 
   const handleDrawerClose = useCallback(() => {

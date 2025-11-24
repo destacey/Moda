@@ -21,10 +21,6 @@ const PlanningIntervalPlanReviewPage = (props: {
   const piKey = Number(key)
 
   useDocumentTitle('PI Plan Review')
-  const [teams, setTeams] = useState<PlanningIntervalTeamResponse[]>([])
-  const [activeTab, setActiveTab] = useState<string>(null)
-  const [predictability, setPredictability] = useState<number>()
-
   const router = useRouter()
 
   const {
@@ -37,40 +33,49 @@ const PlanningIntervalPlanReviewPage = (props: {
   const { data: teamData, isLoading: teamsIsLoading } =
     useGetPlanningIntervalTeamsQuery(piKey)
 
-  useEffect(() => {
-    if (!planningIntervalData || !teamData) return
-    setPredictability(planningIntervalData?.predictability)
+  const predictability = planningIntervalData?.predictability
 
-    const currentTeams = teamData
+  const teams = useMemo(() => {
+    if (!teamData) return []
+    return teamData
       .filter((t) => t.type === 'Team')
       .sort((a, b) => a.code.localeCompare(b.code))
+  }, [teamData])
 
-    setTeams(currentTeams)
+  // Track user interactions separately from derived state
+  const [userSelectedTab, setUserSelectedTab] = useState<string | null>(null)
 
-    if (currentTeams?.length > 0) {
-      const hash = window.location.hash.slice(1)
-      const initialTeamCode =
-        hash && hash !== '' ? hash : currentTeams[0].code.toLowerCase()
+  // Derive activeTab: use user selection, or fall back to hash/first team
+  const activeTab = useMemo(() => {
+    if (userSelectedTab) return userSelectedTab
+    if (teams.length === 0) return ''
 
-      if (!hash || hash === '') {
-        router.replace(`#${initialTeamCode}`, { scroll: false })
-      }
+    const hash = typeof window !== 'undefined' ? window.location.hash.slice(1) : ''
+    return hash && hash !== '' ? hash : teams[0]?.code.toLowerCase()
+  }, [userSelectedTab, teams])
 
-      if (currentTeams.some((t) => t.code.toLowerCase() === initialTeamCode)) {
-        setActiveTab(initialTeamCode)
-      }
+  // Update URL hash if it doesn't match activeTab - side effect only
+  useEffect(() => {
+    if (!activeTab || teams.length === 0) return
+
+    const hash = window.location.hash.slice(1)
+    if (!hash || hash === '') {
+      router.replace(`#${activeTab}`, { scroll: false })
     }
+  }, [activeTab, teams, router])
 
+  // Handle hash change events
+  useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.slice(1)
-      setActiveTab(hash)
+      setUserSelectedTab(hash || null)
     }
     window.addEventListener('hashchange', handleHashChange)
 
     return () => {
       window.removeEventListener('hashchange', handleHashChange)
     }
-  }, [planningIntervalData, router, teamData])
+  }, [])
 
   useEffect(() => {
     const hash = window.location.hash.slice(1)
@@ -119,7 +124,7 @@ const PlanningIntervalPlanReviewPage = (props: {
         style={{ width: '100%' }}
         tabList={tabs}
         activeTabKey={activeTab}
-        onTabChange={(key) => setActiveTab(key)}
+        onTabChange={(key) => setUserSelectedTab(key)}
       >
         {!tabExists ? (
           <Alert message="Please select a valid team." type="error" />

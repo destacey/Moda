@@ -2,7 +2,6 @@
 
 import { Breadcrumb, Typography } from 'antd'
 import { ItemType } from 'antd/es/breadcrumb/Breadcrumb'
-import { useEffect, useState } from 'react'
 import { useAppSelector } from '../../hooks'
 import { selectBreadcrumb, BreadcrumbItem } from '@/src/store/breadcrumbs'
 import { usePathname } from 'next/navigation'
@@ -26,19 +25,15 @@ const BreadcrumbSegment = ({ route, last }: BreadcrumbSegmentProps) => {
 }
 
 const AppBreadcrumb = () => {
-  const [pathItems, setPathItems] = useState<ItemType[]>([])
-  const [isVisible, setIsVisible] = useState<boolean>(true)
   const pathname = usePathname()
   const breadcrumbRoute = useAppSelector(selectBreadcrumb)
 
-  useEffect(() => {
-    if (pathname === breadcrumbRoute.forPath) {
-      setPathItems(breadcrumbRoute.items)
-      setIsVisible(breadcrumbRoute.isVisible)
-    } else {
-      setPathItems(generateRoute(pathname))
-    }
-  }, [pathname, breadcrumbRoute])
+  const pathItems =
+    pathname === breadcrumbRoute.forPath
+      ? breadcrumbRoute.items
+      : generateRoute(pathname)
+  const isVisible =
+    pathname === breadcrumbRoute.forPath ? breadcrumbRoute.isVisible : true
 
   const itemRender = (
     route: BreadcrumbItem,

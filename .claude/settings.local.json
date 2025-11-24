@@ -4,7 +4,8 @@
       "Bash(dotnet test \"d:\\source\\repos\\Moda\\Moda.Integrations\\tests\\Moda.Integrations.AzureDevOps.Tests\\Moda.Integrations.AzureDevOps.Tests.csproj\" --filter \"FullyQualifiedName~ProjectServiceTests\" --verbosity minimal)",
       "Bash(dotnet test \"d:\\source\\repos\\Moda\\Moda.Integrations\\tests\\Moda.Integrations.AzureDevOps.Tests\\Moda.Integrations.AzureDevOps.Tests.csproj\" --verbosity minimal)",
       "Bash(npm test:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(npm run lint:*)"
     ],
     "deny": [],
     "ask": []

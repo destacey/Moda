@@ -11,6 +11,78 @@ export interface LinksCardProps {
   objectId: string
 }
 
+const EditModeButton = ({
+  editModeEnabled,
+  setEditModeEnabled,
+}: {
+  editModeEnabled: boolean
+  setEditModeEnabled: (enabled: boolean) => void
+}) => {
+  if (editModeEnabled) {
+    return (
+      <Button
+        type="text"
+        title="Click to turn off Edit mode"
+        icon={<EditTwoTone />}
+        onClick={() => setEditModeEnabled(false)}
+      />
+    )
+  } else {
+    return (
+      <Button
+        type="text"
+        title="Click to turn on Edit mode"
+        icon={<EditOutlined />}
+        onClick={() => setEditModeEnabled(true)}
+      />
+    )
+  }
+}
+
+const LinksContent = ({
+  isLoading,
+  hasLinks,
+  linksData,
+  editModeEnabled,
+  canUpdateLinks,
+  canDeleteLinks,
+}: {
+  isLoading: boolean
+  hasLinks: boolean
+  linksData: any[]
+  editModeEnabled: boolean
+  canUpdateLinks: boolean
+  canDeleteLinks: boolean
+}) => {
+  if (isLoading) {
+    return <Spin size="small" />
+  } else if (!hasLinks) {
+    return <ModaEmpty message="No links found" />
+  } else {
+    return (
+      <Space
+        direction="vertical"
+        style={{
+          width: '100%',
+        }}
+      >
+        {linksData
+          .slice()
+          .sort((a, b) => a.name.localeCompare(b.name))
+          .map((item) => (
+            <LinkItem
+              key={item.id}
+              link={item}
+              editModeEnabled={editModeEnabled}
+              canUpdateLinks={canUpdateLinks}
+              canDeleteLinks={canDeleteLinks}
+            />
+          ))}
+      </Space>
+    )
+  }
+}
+
 const LinksCard = ({ objectId }: LinksCardProps) => {
   const [openCreateLinkForm, setOpenCreateLinkForm] = useState<boolean>(false)
   const [editModeEnabled, setEditModeEnabled] = useState<boolean>(false)
@@ -29,58 +101,6 @@ const LinksCard = ({ objectId }: LinksCardProps) => {
   const canUpdateLinks = hasPermissionClaim('Permissions.Links.Update')
   const canDeleteLinks = hasPermissionClaim('Permissions.Links.Delete')
 
-  const EditModeButton = () => {
-    if (editModeEnabled) {
-      return (
-        <Button
-          type="text"
-          title="Click to turn off Edit mode"
-          icon={<EditTwoTone />}
-          onClick={() => setEditModeEnabled(false)}
-        />
-      )
-    } else {
-      return (
-        <Button
-          type="text"
-          title="Click to turn on Edit mode"
-          icon={<EditOutlined />}
-          onClick={() => setEditModeEnabled(true)}
-        />
-      )
-    }
-  }
-
-  const LinksContent = () => {
-    if (isLoading) {
-      return <Spin size="small" />
-    } else if (!hasLinks) {
-      return <ModaEmpty message="No links found" />
-    } else {
-      return (
-        <Space
-          direction="vertical"
-          style={{
-            width: '100%',
-          }}
-        >
-          {linksData
-            .slice()
-            .sort((a, b) => a.name.localeCompare(b.name))
-            .map((item) => (
-              <LinkItem
-                key={item.id}
-                link={item}
-                editModeEnabled={editModeEnabled}
-                canUpdateLinks={canUpdateLinks}
-                canDeleteLinks={canDeleteLinks}
-              />
-            ))}
-        </Space>
-      )
-    }
-  }
-
   return (
     <>
       <Card
@@ -97,12 +117,22 @@ const LinksCard = ({ objectId }: LinksCardProps) => {
               />
             )}
             {hasLinks && (canUpdateLinks || canDeleteLinks) && (
-              <EditModeButton />
+              <EditModeButton
+                editModeEnabled={editModeEnabled}
+                setEditModeEnabled={setEditModeEnabled}
+              />
             )}
           </>
         }
       >
-        <LinksContent />
+        <LinksContent
+          isLoading={isLoading}
+          hasLinks={hasLinks}
+          linksData={linksData || []}
+          editModeEnabled={editModeEnabled}
+          canUpdateLinks={canUpdateLinks}
+          canDeleteLinks={canDeleteLinks}
+        />
       </Card>
       {openCreateLinkForm && (
         <CreateLinkForm
