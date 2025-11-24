@@ -1,7 +1,7 @@
 import { ModaEmpty } from '@/src/components/common'
 import { WorkTypeLevelDto, WorkTypeTierDto } from '@/src/services/moda-api'
 import { Button, Card, List, Typography } from 'antd'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { CreateWorkTypeLevelForm, WorkTypeLevelCard } from '.'
 import { PlusOutlined } from '@ant-design/icons'
 import {
@@ -47,7 +47,8 @@ const WorkTypeTierCard = (props: WorkTypeTierCardProps) => {
   )
 
   // Initialize with sorted levels and update when levels change from external source
-  const [orderedLevels, setOrderedLevels] = useState<WorkTypeLevelDto[]>(sortedLevels)
+  const [orderedLevels, setOrderedLevels] =
+    useState<WorkTypeLevelDto[]>(sortedLevels)
   const [openCreateWorkTypeLevelForm, setOpenCreateWorkTypeLevelForm] =
     useState<boolean>(false)
 
@@ -67,8 +68,8 @@ const WorkTypeTierCard = (props: WorkTypeTierCardProps) => {
 
   // Sync orderedLevels when sortedLevels changes from external updates (e.g., after create/delete)
   // Use a key-based approach: compare the IDs to detect if levels changed
-  const currentLevelIds = sortedLevels.map(l => l.id).join(',')
-  const orderedLevelIds = orderedLevels.map(l => l.id).join(',')
+  const currentLevelIds = sortedLevels.map((l) => l.id).join(',')
+  const orderedLevelIds = orderedLevels.map((l) => l.id).join(',')
 
   if (currentLevelIds !== orderedLevelIds) {
     setOrderedLevels(sortedLevels)

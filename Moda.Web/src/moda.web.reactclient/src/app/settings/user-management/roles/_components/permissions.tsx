@@ -13,7 +13,7 @@ import {
   Space,
   Spin,
 } from 'antd'
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
 
 const { Title } = Typography
 const { Item } = List
@@ -34,7 +34,7 @@ interface PermissionItem {
 }
 
 const Permissions = (props: PermissionsProps) => {
-  const messageApi = useMessage();
+  const messageApi = useMessage()
   const theme = useTheme()
 
   const [permissions, setPermissions] = useState<string[]>(props.permissions)
@@ -77,7 +77,9 @@ const Permissions = (props: PermissionsProps) => {
   }, [permissionsData])
 
   // Derive active permission group: use the selected one or default to first group
-  const effectiveActiveGroup = activePermissionGroup ?? (permissionGroups.length > 0 ? permissionGroups[0] : null)
+  const effectiveActiveGroup =
+    activePermissionGroup ??
+    (permissionGroups.length > 0 ? permissionGroups[0] : null)
 
   const handlePermissionChange = (item: PermissionItem) => {
     let updatedPermissions: string[] = [...permissions]

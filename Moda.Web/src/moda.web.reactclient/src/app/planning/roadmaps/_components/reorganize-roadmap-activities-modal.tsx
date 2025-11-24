@@ -10,7 +10,7 @@ import {
 } from '@/src/services/moda-api'
 import { useReorganizeRoadmapActivityMutation } from '@/src/store/features/planning/roadmaps-api'
 import { Button, Modal, TreeDataNode } from 'antd'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 
 interface RoadmapActivityReorganizeModalProps {
   showModal: boolean
