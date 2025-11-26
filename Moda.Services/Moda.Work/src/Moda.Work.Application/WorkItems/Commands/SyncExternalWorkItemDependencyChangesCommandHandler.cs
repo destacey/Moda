@@ -1,9 +1,9 @@
-﻿using System.Diagnostics;
-using Moda.Common.Application.Interfaces.ExternalWork;
+﻿using Moda.Common.Application.Interfaces.ExternalWork;
 using Moda.Common.Application.Requests.WorkManagement;
 using Moda.Work.Application.Persistence;
 
 namespace Moda.Work.Application.WorkItems.Commands;
+
 internal sealed class SyncExternalWorkItemDependencyChangesCommandHandler(IWorkDbContext workDbContext, ILogger<SyncExternalWorkItemDependencyChangesCommandHandler> logger, IDateTimeProvider dateTimeProvider) : ICommandHandler<SyncExternalWorkItemDependencyChangesCommand>
 {
     private const string AppRequestName = nameof(SyncExternalWorkItemDependencyChangesCommand);
@@ -24,8 +24,6 @@ internal sealed class SyncExternalWorkItemDependencyChangesCommandHandler(IWorkD
         try
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var now = _dateTimeProvider.Now;
-            var startTime = Stopwatch.GetTimestamp();
 
             var validLinks = await ValidateAndMapWorkItemLinks(request.WorkItemLinks, cancellationToken);
             if (!validLinks.Any())
@@ -37,10 +35,6 @@ internal sealed class SyncExternalWorkItemDependencyChangesCommandHandler(IWorkD
             _logger.LogInformation("{AppRequestName}: Found {ValidLinksCount} valid work item dependency links out of {WorkItemLinksCount}.", AppRequestName, validLinks.Count, request.WorkItemLinks.Count);
 
             await ProcessLinksInBatches(validLinks, cancellationToken);
-
-            var elapsedMilliseconds = Stopwatch.GetElapsedTime(startTime).TotalMilliseconds;
-            _logger.LogInformation("{AppRequestName}: Processed {ValidLinksCount} work item dependency links for workspace {WorkspaceId} in {ElapsedMilliseconds} ms.", AppRequestName, validLinks.Count, request.WorkspaceId, elapsedMilliseconds);
-
             return Result.Success();
         }
         catch (OperationCanceledException)
@@ -244,68 +238,51 @@ internal sealed class SyncExternalWorkItemDependencyChangesCommandHandler(IWorkD
         var sourceWorkItemIds = batch.Select(x => x.SourceId).Distinct().ToArray();
         var targetIds = batch.Select(x => x.TargetId).Distinct().ToArray();
 
-        // Load source work items without the OutboundDependencies navigation to avoid loading thousands of dependencies
-        // We'll query the specific dependencies we need separately
+        // Load the source work items with only the outbound dependencies that are relevant to this batch
         var sourceWorkItemLookup = await _workDbContext.WorkItems
             .Where(wi => sourceWorkItemIds.Contains(wi.Id))
+            .Include(wi => wi.OutboundDependencies.Where(d => targetIds.Contains(d.TargetId)))
             .Include(wi => wi.Iteration)
             .ToDictionaryAsync(wi => wi.Id, cancellationToken);
 
-        // Get target work item info for creating new dependencies
         var targetWorkItemLookup = await _workDbContext.WorkItems
             .Where(wi => targetIds.Contains(wi.Id))
             .Select(DependencyWorkItemInfo.Projection)
             .ToDictionaryAsync(t => t.WorkItemId, cancellationToken);
 
-        // Load ONLY the specific dependencies we're going to modify
-        var dependencyPairs = batch
-            .Select(link => new { link.SourceId, link.TargetId })
-            .Distinct()
-            .ToList();
-
-        // Query existing dependencies for these specific pairs
-        var existingDependencies = await _workDbContext.WorkItemDependencies
-            .Where(d => sourceWorkItemIds.Contains(d.SourceId) && targetIds.Contains(d.TargetId))
-            .ToListAsync(cancellationToken);
-
-        // Group by source for faster lookup
-        var dependenciesBySource = existingDependencies
-            .GroupBy(d => d.SourceId)
-            .ToDictionary(
-                g => g.Key,
-                g => g.ToList()
-            );
-
         foreach (var link in batch)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            if (!sourceWorkItemLookup.TryGetValue(link.SourceId, out var sourceWorkItem))
+            if (sourceWorkItemLookup.TryGetValue(link.SourceId, out var sourceWorkItem))
+            {
+                if (link.ChangedOperation.Equals("create", StringComparison.OrdinalIgnoreCase))
+                {
+                    // lookup target work item to ensure it exists
+                    // and to obtain the status category and planned date (PlannedOn is set to iteration end date if iteration type is Sprint)
+                    if (targetWorkItemLookup.TryGetValue(link.TargetId, out var target))
+                    {
+                        sourceWorkItem.AddSuccessorLink(target, link.ChangedDate, link.ChangedById, link.Comment, now);
+                    }
+                    else
+                    {
+                        _logger.LogWarning(
+                            "Target work item {TargetId} not found in database while processing dependency link from {SourceId}",
+                            link.TargetId,
+                            link.SourceId);
+                    }
+                }
+                else if (link.ChangedOperation.Equals("remove", StringComparison.OrdinalIgnoreCase))
+                {
+                    sourceWorkItem.RemoveSuccessorLink(link.TargetId, link.ChangedDate, link.ChangedById);
+                }
+            }
+            else
             {
                 _logger.LogWarning(
                     "Source work item {SourceId} not found in database while processing dependency link to {TargetId}",
                     link.SourceId,
                     link.TargetId);
-                continue;
-            }
-
-            if (link.ChangedOperation.Equals("create", StringComparison.OrdinalIgnoreCase))
-            {
-                if (targetWorkItemLookup.TryGetValue(link.TargetId, out var target))
-                {
-                    sourceWorkItem.AddSuccessorLink(target, link.ChangedDate, link.ChangedById, link.Comment, now);
-                }
-                else
-                {
-                    _logger.LogWarning(
-                        "Target work item {TargetId} not found in database while processing dependency link from {SourceId}",
-                        link.TargetId,
-                        link.SourceId);
-                }
-            }
-            else if (link.ChangedOperation.Equals("remove", StringComparison.OrdinalIgnoreCase))
-            {
-                sourceWorkItem.RemoveSuccessorLink(link.TargetId, link.ChangedDate, link.ChangedById);
             }
         }
 
