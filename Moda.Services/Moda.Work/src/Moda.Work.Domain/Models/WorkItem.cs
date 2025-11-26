@@ -9,8 +9,6 @@ namespace Moda.Work.Domain.Models;
 
 public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable, IHasWorkspace, IHasOptionalWorkTeam
 {
-    private WorkItemKey _key = null!;
-    private string _title = null!;
     private readonly List<WorkItem> _children = [];
     private readonly List<WorkItemHierarchy> _outboundHierarchyHistory = []; // source links
     private readonly List<WorkItemHierarchy> _inboundHierarchyHistory = []; // target links
@@ -57,18 +55,18 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable, IHasWorkspace
     /// <value>The key.</value>
     public WorkItemKey Key
     {
-        get => _key;
-        private set => _key = Guard.Against.Null(value, nameof(Key));
-    }
+        get;
+        private set => field = Guard.Against.Null(value, nameof(Key));
+    } = null!;
 
     public string Title 
     { 
-        get => _title; 
-        private set => _title = Guard.Against.NullOrWhiteSpace(value, nameof(Title)).Trim();
+        get; 
+        private set => field = Guard.Against.NullOrWhiteSpace(value, nameof(Title)).Trim();
 
-    }
+    } = null!;
 
-    public Guid WorkspaceId { get; private init; }
+    public Guid WorkspaceId { get; private set; }
 
     public Workspace Workspace { get; private set; } = null!;
 
@@ -162,6 +160,26 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable, IHasWorkspace
     /// </summary>
     //public IReadOnlyCollection<WorkItemRevision> History => _history.AsReadOnly();
 
+    /// <summary>
+    /// Updates the work item properties.
+    /// </summary>
+    /// <param name="title"></param>
+    /// <param name="workType"></param>
+    /// <param name="statusId"></param>
+    /// <param name="statusCategory"></param>
+    /// <param name="parentInfo"></param>
+    /// <param name="teamId"></param>
+    /// <param name="lastModified"></param>
+    /// <param name="lastModifiedById"></param>
+    /// <param name="assignedToId"></param>
+    /// <param name="priority"></param>
+    /// <param name="stackRank"></param>
+    /// <param name="storyPoints"></param>
+    /// <param name="iterationId"></param>
+    /// <param name="activatedTimestamp"></param>
+    /// <param name="doneTimestamp"></param>
+    /// <param name="extendedProps"></param>
+    /// <exception cref="InvalidOperationException"></exception>
     public void Update(string title, WorkType workType, int statusId, WorkStatusCategory statusCategory, IWorkItemParentInfo? parentInfo, Guid? teamId, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int? priority, double stackRank, double? storyPoints, Guid? iterationId, Instant? activatedTimestamp, Instant? doneTimestamp, WorkItemExtended? extendedProps)
     {
         if (extendedProps != null && Id != extendedProps.Id)
@@ -308,6 +326,39 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable, IHasWorkspace
         ProjectId = projectId;
 
         TryResetProjectId();
+
+        return Result.Success();
+    }
+
+    /// <summary>
+    /// Changes the workspace of the work item.
+    /// </summary>
+    /// <param name="workspaceId"></param>
+    /// <param name="workType"></param>
+    /// <param name="statusId"></param>
+    /// <param name="statusCategory"></param>
+    public Result ChangeExternalWorkspace(Workspace workspace, WorkType workType, int statusId, WorkStatusCategory statusCategory)
+    {
+        Guard.Against.Null(workspace, nameof(workspace));
+        Guard.Against.Null(workType, nameof(workType));
+
+        if (workspace.OwnershipInfo.Ownership is not Ownership.Managed)
+        {
+            return Result.Failure("Only managed workspaces can have external work items.");
+        }
+
+        if (ExternalId is null)
+        {
+            return Result.Failure("Only external work items can change workspaces.");
+        }
+
+        var key = new WorkItemKey(workspace.Key, ExternalId.Value);
+
+        Key = key;
+        WorkspaceId = workspace.Id;
+        TypeId = workType.Id;
+        StatusId = statusId;
+        StatusCategory = statusCategory;
 
         return Result.Success();
     }

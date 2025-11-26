@@ -86,7 +86,10 @@ public class WorkItemConfig : IEntityTypeConfiguration<WorkItem>
         builder.ToTable("WorkItems", SchemaNames.Work);
 
         builder.HasKey(w => w.Id);
-        builder.HasAlternateKey(w => w.Key);
+
+        // Use a unique index instead of alternate key so we can change the Key value when the item changes workspaces
+        builder.HasIndex(w => w.Key)
+            .IsUnique();
 
         builder.HasIndex(w => w.Id)
             .IncludeProperties(w => new { w.Key, w.Title, w.WorkspaceId, w.ExternalId, w.AssignedToId, w.TypeId, w.StatusId, w.StatusCategory, w.ActivatedTimestamp, w.DoneTimestamp, w.ProjectId, w.ParentProjectId });
@@ -101,7 +104,7 @@ public class WorkItemConfig : IEntityTypeConfiguration<WorkItem>
             .IncludeProperties(w => new { w.Id, w.WorkspaceId, w.ExternalId, w.AssignedToId, w.TypeId, w.StatusId, w.StatusCategory, w.ActivatedTimestamp, w.DoneTimestamp });
 
         builder.HasIndex(w => w.ExternalId)
-            .IncludeProperties(w => new { w.Id, w.Key , w.Title, w.WorkspaceId, w.AssignedToId, w.TypeId, w.StatusId, w.StatusCategory, w.ActivatedTimestamp, w.DoneTimestamp, w.ProjectId, w.ParentProjectId });
+            .IncludeProperties(w => new { w.Id, w.Key, w.Title, w.WorkspaceId, w.AssignedToId, w.TypeId, w.StatusId, w.StatusCategory, w.ActivatedTimestamp, w.DoneTimestamp, w.ProjectId, w.ParentProjectId });
 
         builder.HasIndex(w => w.StatusCategory)
             .IncludeProperties(w => new { w.Id, w.Key, w.Title, w.WorkspaceId, w.AssignedToId, w.TypeId, w.StatusId, w.ActivatedTimestamp, w.DoneTimestamp, w.ProjectId, w.ParentProjectId });
@@ -153,6 +156,7 @@ public class WorkItemConfig : IEntityTypeConfiguration<WorkItem>
                 w => new WorkItemKey(w))
             .HasColumnType("varchar")
             .HasMaxLength(64);
+
         builder.Property(w => w.Title).IsRequired().HasMaxLength(256);
         builder.Property(w => w.StatusCategory).IsRequired()
             .HasConversion<EnumConverter<WorkStatusCategory>>()
