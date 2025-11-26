@@ -103,7 +103,10 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
                 }
             }
 
-            // Only load parents for work items that actually reference them
+            // Handle workspace changes separately before main batch processing
+            await ProcessWorkspaceChanges(workspace, request.WorkItems, workTypeByName, workStatusMap, cancellationToken);
+
+            // Load parents after workspace changes to ensure we have the current state
             var referencedParentIds = request.WorkItems
                 .Where(w => w.ParentId.HasValue)
                 .Select(w => w.ParentId!.Value)
@@ -116,9 +119,6 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
                 cancellationToken);
 
             var hasIterationMappings = request.IterationMappings != null && request.IterationMappings.Count > 0;
-
-            // Handle workspace changes separately before main batch processing
-            await ProcessWorkspaceChanges(workspace, request.WorkItems, workTypeByName, workStatusMap, cancellationToken);
 
             int chunkSize = 2000;
             var chunks = request.WorkItems.OrderBy(w => w.LastModified).Chunk(chunkSize).ToList();
@@ -170,7 +170,7 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
                         {
                             missingParents.TryAdd(externalWorkItem.Id, externalWorkItem.ParentId.Value);
                         }
-                        else if (workType.Level is null || workType.Level.Order <= parentWorkItemInfo.LevelOrder)
+                        else if (workType.Level is null || workType.Level.Order >= parentWorkItemInfo.LevelOrder)
                         {
                             if (_logger.IsEnabled(LogLevel.Debug))
                                 _logger.LogDebug("The parent must be a higher level than the work item {ExternalId} in workspace {WorkspaceId}.", externalWorkItem.Id, workspace.Id);
