@@ -280,6 +280,9 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
 
                 await _workDbContext.SaveChangesAsync(cancellationToken);
 
+                // Clear the change tracker to release tracked entities and prevent memory bloat
+                _workDbContext.ChangeTracker.Clear();
+
                 _logger.LogInformation("Synced {ChunkCount} of {TotalChunks} for workspace {WorkspaceId} ({WorkspaceName}).", c++, chunks.Count, workspace.Id, workspace.Name);
             }
 
@@ -459,6 +462,13 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
             missingParentIds,
             cancellationToken);
 
+        if (potentialParents.Count == 0)
+        {
+            if (_logger.IsEnabled(LogLevel.Debug))
+                _logger.LogDebug("No potential parents found for missing parent external IDs.");
+            return;
+        }
+
         var workItemIdsMissingParents = missingParents.Keys.ToArray();
 
         if (workItemIdsMissingParents.Length == 0)
@@ -466,12 +476,21 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
 
         foreach (var batch in workItemIdsMissingParents.Chunk(batchSize))
         {
+            // Load only the work items that have valid parents available
+            // This reduces the number of entities loaded when many parents are missing
+            var validExternalIds = batch
+                .Where(extId => missingParents.TryGetValue(extId, out var parentExtId) && potentialParents.ContainsKey(parentExtId))
+                .ToArray();
+
+            if (validExternalIds.Length == 0)
+                continue;
+
             var missingParentWorkItems = await _workDbContext.WorkItems
                 .Include(w => w.Type)
                     .ThenInclude(t => t.Level)
                 .Where(w => w.WorkspaceId == workspace.Id
                     && w.ExternalId != null
-                    && batch.Contains(w.ExternalId.Value))
+                    && validExternalIds.Contains(w.ExternalId.Value))
                 .ToListAsync(cancellationToken);
 
             foreach (var workItem in missingParentWorkItems)
@@ -496,14 +515,12 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
                         }
                     }
                 }
-                else
-                {
-                    if (_logger.IsEnabled(LogLevel.Debug))
-                        _logger.LogDebug("Unable to map missing parent for work item {ExternalId} in workspace {WorkspaceId}.", workItem.ExternalId, workspace.Id);
-                }
             }
 
-            await _workDbContext.SaveChangesAsync(cancellationToken);
+            if (missingParentWorkItems.Count > 0)
+            {
+                await _workDbContext.SaveChangesAsync(cancellationToken);
+            }
         }
     }
 
@@ -536,34 +553,70 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
                     topTierLevelSkipped = true;
                     continue;
                 }
-                int typeUpdateCount = 0;
 
-                // get workitems for the work type that have a parent and the workitem.parentprojectid doesn't match the parent workitem projectId ?? parentProjectId
-                var workItems = await _workDbContext.WorkItems
-                    .Include(i => i.Type)
-                        .ThenInclude(t => t.Level)
-                    .Include(i => i.Status)
-                    .Include(i => i.Parent)
-                        .ThenInclude(p => p!.Type)
-                            .ThenInclude(t => t.Level)
+                // First, get only the IDs and parent info we need with a lightweight projection query
+                // This avoids loading full entities with navigation properties
+                var workItemsNeedingUpdate = await _workDbContext.WorkItems
                     .Where(wi => wi.WorkspaceId == workspace.Id
                         && wi.TypeId == workType.Id
                         && wi.Parent != null
                         && wi.ParentProjectId != (wi.Parent.ProjectId ?? wi.Parent.ParentProjectId))
+                    .Select(wi => new
+                    {
+                        wi.Id,
+                        wi.ExternalId,
+                        ParentInfo = new WorkItemParentInfo
+                        {
+                            Id = wi.Parent!.Id,
+                            ExternalId = wi.Parent.ExternalId,
+                            Tier = wi.Parent.Type.Level!.Tier,
+                            LevelOrder = wi.Parent.Type.Level.Order,
+                            ProjectId = wi.Parent.ProjectId ?? wi.Parent.ParentProjectId
+                        }
+                    })
+                    .AsNoTracking()
                     .ToListAsync(cancellationToken);
 
-                foreach (var workItem in workItems)
-                {
-                    var parentInfo = workItem.Parent.Adapt<WorkItemParentInfo>();
-                    workItem.UpdateParent(parentInfo, workType);
+                if (workItemsNeedingUpdate.Count == 0)
+                    continue;
 
-                    typeUpdateCount++;
+                // Now load only the entities that need updating (without Parent navigation to avoid circular reference)
+                var workItemIds = workItemsNeedingUpdate.Select(x => x.Id).ToArray();
+                var workItems = await _workDbContext.WorkItems
+                    .Include(wi => wi.Type)
+                        .ThenInclude(t => t.Level)
+                    .Where(wi => workItemIds.Contains(wi.Id))
+                    .ToListAsync(cancellationToken);
+
+                var workItemDict = workItems.ToDictionary(wi => wi.Id);
+
+                int typeUpdateCount = 0;
+                foreach (var item in workItemsNeedingUpdate)
+                {
+                    if (workItemDict.TryGetValue(item.Id, out var workItem))
+                    {
+                        // Use domain method to update parent which respects business rules
+                        var result = workItem.UpdateParent(item.ParentInfo, workType);
+                        if (result.IsSuccess)
+                        {
+                            typeUpdateCount++;
+                        }
+                        else if (_logger.IsEnabled(LogLevel.Debug))
+                        {
+                            _logger.LogDebug("Unable to update parent project id for work item {ExternalId} in workspace {WorkspaceId}. {Error}",
+                                item.ExternalId, workspace.Id, result.Error);
+                        }
+                    }
                 }
 
                 if (typeUpdateCount > 0)
                 {
                     await _workDbContext.SaveChangesAsync(cancellationToken);
                     updateCount += typeUpdateCount;
+
+                    if (_logger.IsEnabled(LogLevel.Debug))
+                        _logger.LogDebug("Updated {Count} parent project ids for work type {WorkTypeId} in workspace {WorkspaceId}.",
+                            typeUpdateCount, workType.Id, workspace.Id);
                 }
             }
         }

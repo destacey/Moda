@@ -1,4 +1,5 @@
-﻿using Moda.Common.Application.Interfaces.ExternalWork;
+﻿using System.Diagnostics;
+using Moda.Common.Application.Interfaces.ExternalWork;
 using Moda.Common.Application.Requests.WorkManagement;
 using Moda.Work.Application.Persistence;
 
@@ -23,6 +24,8 @@ internal sealed class SyncExternalWorkItemDependencyChangesCommandHandler(IWorkD
         try
         {
             cancellationToken.ThrowIfCancellationRequested();
+            var now = _dateTimeProvider.Now;
+            var startTime = Stopwatch.GetTimestamp();
 
             var validLinks = await ValidateAndMapWorkItemLinks(request.WorkItemLinks, cancellationToken);
             if (!validLinks.Any())
@@ -34,6 +37,10 @@ internal sealed class SyncExternalWorkItemDependencyChangesCommandHandler(IWorkD
             _logger.LogInformation("{AppRequestName}: Found {ValidLinksCount} valid work item dependency links out of {WorkItemLinksCount}.", AppRequestName, validLinks.Count, request.WorkItemLinks.Count);
 
             await ProcessLinksInBatches(validLinks, cancellationToken);
+
+            var elapsedMilliseconds = Stopwatch.GetElapsedTime(startTime).TotalMilliseconds;
+            _logger.LogInformation("{AppRequestName}: Processed {ValidLinksCount} work item dependency links for workspace {WorkspaceId} in {ElapsedMilliseconds} ms.", AppRequestName, validLinks.Count, request.WorkspaceId, elapsedMilliseconds);
+
             return Result.Success();
         }
         catch (OperationCanceledException)
@@ -112,11 +119,26 @@ internal sealed class SyncExternalWorkItemDependencyChangesCommandHandler(IWorkD
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var employeeDict = await _workDbContext.Employees
-            .Select(e => new { Email = e.Email.ToString(), e.Id })
-            .ToDictionaryAsync(e => e.Email, e => e.Id, cancellationToken);
+        // Only load employees that are actually referenced in the links
+        var referencedEmails = workItemLinks
+            .Where(l => !string.IsNullOrWhiteSpace(l.ChangedBy))
+            .Select(l => l.ChangedBy!)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
 
-        var employeeByEmail = new Dictionary<string, Guid>(employeeDict, StringComparer.OrdinalIgnoreCase);
+        var employeeByEmail = new Dictionary<string, Guid>(StringComparer.OrdinalIgnoreCase);
+        if (referencedEmails.Length > 0)
+        {
+            var employees = await _workDbContext.Employees
+                .Where(e => referencedEmails.Contains(e.Email))
+                .Select(e => new { Email = e.Email.ToString(), e.Id })
+                .ToListAsync(cancellationToken);
+
+            foreach (var emp in employees)
+            {
+                employeeByEmail[emp.Email] = emp.Id;
+            }
+        }
 
         var validLinks = new List<DependencyInfo>();
 
@@ -219,59 +241,78 @@ internal sealed class SyncExternalWorkItemDependencyChangesCommandHandler(IWorkD
         cancellationToken.ThrowIfCancellationRequested();
 
         var now = _dateTimeProvider.Now;
-        var sourceWorkItemIds = batch.Select(x => x.SourceId).ToHashSet();
-        var targetIds = batch.Select(x => x.TargetId).ToHashSet();
+        var sourceWorkItemIds = batch.Select(x => x.SourceId).Distinct().ToArray();
+        var targetIds = batch.Select(x => x.TargetId).Distinct().ToArray();
 
-        // Load the source work items with only the outbound dependencies that are relevant to this batch
+        // Load source work items without the OutboundDependencies navigation to avoid loading thousands of dependencies
+        // We'll query the specific dependencies we need separately
         var sourceWorkItemLookup = await _workDbContext.WorkItems
             .Where(wi => sourceWorkItemIds.Contains(wi.Id))
-            .Include(wi => wi.OutboundDependencies.Where(d => targetIds.Contains(d.TargetId)))
             .Include(wi => wi.Iteration)
             .ToDictionaryAsync(wi => wi.Id, cancellationToken);
 
+        // Get target work item info for creating new dependencies
         var targetWorkItemLookup = await _workDbContext.WorkItems
             .Where(wi => targetIds.Contains(wi.Id))
             .Select(DependencyWorkItemInfo.Projection)
             .ToDictionaryAsync(t => t.WorkItemId, cancellationToken);
 
+        // Load ONLY the specific dependencies we're going to modify
+        var dependencyPairs = batch
+            .Select(link => new { link.SourceId, link.TargetId })
+            .Distinct()
+            .ToList();
+
+        // Query existing dependencies for these specific pairs
+        var existingDependencies = await _workDbContext.WorkItemDependencies
+            .Where(d => sourceWorkItemIds.Contains(d.SourceId) && targetIds.Contains(d.TargetId))
+            .ToListAsync(cancellationToken);
+
+        // Group by source for faster lookup
+        var dependenciesBySource = existingDependencies
+            .GroupBy(d => d.SourceId)
+            .ToDictionary(
+                g => g.Key,
+                g => g.ToList()
+            );
+
         foreach (var link in batch)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            if (sourceWorkItemLookup.TryGetValue(link.SourceId, out var sourceWorkItem))
-            {
-                if (link.ChangedOperation.Equals("create", StringComparison.OrdinalIgnoreCase))
-                {
-                    // lookup target work item to ensure it exists
-                    // and to obtain the status category and planned date (PlannedOn is set to iteration end date if iteration type is Sprint)
-                    if (targetWorkItemLookup.TryGetValue(link.TargetId, out var target))
-                    {
-                        sourceWorkItem.AddSuccessorLink(target, link.ChangedDate, link.ChangedById, link.Comment, now);
-                    }
-                    else
-                    {
-                        _logger.LogWarning(
-                            "Target work item {TargetId} not found in database while processing dependency link from {SourceId}",
-                            link.TargetId,
-                            link.SourceId);
-                    }
-
-                }
-                else if (link.ChangedOperation.Equals("remove", StringComparison.OrdinalIgnoreCase))
-                {
-                    sourceWorkItem.RemoveSuccessorLink(link.TargetId, link.ChangedDate, link.ChangedById);
-                }
-            }
-            else
+            if (!sourceWorkItemLookup.TryGetValue(link.SourceId, out var sourceWorkItem))
             {
                 _logger.LogWarning(
                     "Source work item {SourceId} not found in database while processing dependency link to {TargetId}",
                     link.SourceId,
                     link.TargetId);
+                continue;
+            }
+
+            if (link.ChangedOperation.Equals("create", StringComparison.OrdinalIgnoreCase))
+            {
+                if (targetWorkItemLookup.TryGetValue(link.TargetId, out var target))
+                {
+                    sourceWorkItem.AddSuccessorLink(target, link.ChangedDate, link.ChangedById, link.Comment, now);
+                }
+                else
+                {
+                    _logger.LogWarning(
+                        "Target work item {TargetId} not found in database while processing dependency link from {SourceId}",
+                        link.TargetId,
+                        link.SourceId);
+                }
+            }
+            else if (link.ChangedOperation.Equals("remove", StringComparison.OrdinalIgnoreCase))
+            {
+                sourceWorkItem.RemoveSuccessorLink(link.TargetId, link.ChangedDate, link.ChangedById);
             }
         }
 
         await _workDbContext.SaveChangesAsync(cancellationToken);
+
+        // Clear the change tracker to release tracked entities between batches
+        _workDbContext.ChangeTracker.Clear();
     }
 
     private record struct WorkItemExternalId(int ExternalId, Guid WorkspaceExternalId);
