@@ -31,9 +31,15 @@ internal sealed class ProcessDependenciesCommandHandler(
             return Result.Success();
         }
 
-        // Get all unique work items (both sources and targets) and project to DependencyWorkItemInfo
+        // Collect all unique work item IDs (both sources and targets) from dependencies
+        var workItemIds = dependencies
+            .SelectMany(d => new[] { d.SourceId, d.TargetId })
+            .Distinct()
+            .ToArray();
+
+        // Get all unique work items and project to DependencyWorkItemInfo using Contains for better performance
         var workItemInfoDictionary = await _workDbContext.WorkItems
-            .Where(wi => dependenciesQuery.Any(d => d.SourceId == wi.Id || d.TargetId == wi.Id))
+            .Where(wi => workItemIds.Contains(wi.Id))
             .Select(DependencyWorkItemInfo.Projection)
             .ToDictionaryAsync(x => x.WorkItemId, cancellationToken);
 
@@ -56,7 +62,7 @@ internal sealed class ProcessDependenciesCommandHandler(
                 workItemInfoDictionary.TryGetValue(dependency.TargetId, out var targetInfo))
             {
                 dependency.UpdateSourceAndTargetInfo(sourceInfo, targetInfo, now);
-                
+
                 // Check if EF detected any changes
                 var entry = _workDbContext.Entry(dependency);
                 if (entry.State == EntityState.Modified)

@@ -3,6 +3,7 @@ using Moda.Common.Application.Requests.WorkManagement;
 using Moda.Work.Application.Persistence;
 
 namespace Moda.Work.Application.WorkItems.Commands;
+
 internal sealed class SyncExternalWorkItemDependencyChangesCommandHandler(IWorkDbContext workDbContext, ILogger<SyncExternalWorkItemDependencyChangesCommandHandler> logger, IDateTimeProvider dateTimeProvider) : ICommandHandler<SyncExternalWorkItemDependencyChangesCommand>
 {
     private const string AppRequestName = nameof(SyncExternalWorkItemDependencyChangesCommand);
@@ -112,11 +113,26 @@ internal sealed class SyncExternalWorkItemDependencyChangesCommandHandler(IWorkD
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var employeeDict = await _workDbContext.Employees
-            .Select(e => new { Email = e.Email.ToString(), e.Id })
-            .ToDictionaryAsync(e => e.Email, e => e.Id, cancellationToken);
+        // Only load employees that are actually referenced in the links
+        var referencedEmails = workItemLinks
+            .Where(l => !string.IsNullOrWhiteSpace(l.ChangedBy))
+            .Select(l => l.ChangedBy!)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
 
-        var employeeByEmail = new Dictionary<string, Guid>(employeeDict, StringComparer.OrdinalIgnoreCase);
+        var employeeByEmail = new Dictionary<string, Guid>(StringComparer.OrdinalIgnoreCase);
+        if (referencedEmails.Length > 0)
+        {
+            var employees = await _workDbContext.Employees
+                .Where(e => referencedEmails.Contains(e.Email))
+                .Select(e => new { Email = e.Email.ToString(), e.Id })
+                .ToListAsync(cancellationToken);
+
+            foreach (var emp in employees)
+            {
+                employeeByEmail[emp.Email] = emp.Id;
+            }
+        }
 
         var validLinks = new List<DependencyInfo>();
 
@@ -219,8 +235,8 @@ internal sealed class SyncExternalWorkItemDependencyChangesCommandHandler(IWorkD
         cancellationToken.ThrowIfCancellationRequested();
 
         var now = _dateTimeProvider.Now;
-        var sourceWorkItemIds = batch.Select(x => x.SourceId).ToHashSet();
-        var targetIds = batch.Select(x => x.TargetId).ToHashSet();
+        var sourceWorkItemIds = batch.Select(x => x.SourceId).Distinct().ToArray();
+        var targetIds = batch.Select(x => x.TargetId).Distinct().ToArray();
 
         // Load the source work items with only the outbound dependencies that are relevant to this batch
         var sourceWorkItemLookup = await _workDbContext.WorkItems
@@ -255,7 +271,6 @@ internal sealed class SyncExternalWorkItemDependencyChangesCommandHandler(IWorkD
                             link.TargetId,
                             link.SourceId);
                     }
-
                 }
                 else if (link.ChangedOperation.Equals("remove", StringComparison.OrdinalIgnoreCase))
                 {
@@ -272,6 +287,9 @@ internal sealed class SyncExternalWorkItemDependencyChangesCommandHandler(IWorkD
         }
 
         await _workDbContext.SaveChangesAsync(cancellationToken);
+
+        // Clear the change tracker to release tracked entities between batches
+        _workDbContext.ChangeTracker.Clear();
     }
 
     private record struct WorkItemExternalId(int ExternalId, Guid WorkspaceExternalId);
