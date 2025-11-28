@@ -5,6 +5,7 @@ using Moda.Tests.Shared.Data;
 using NodaTime;
 
 namespace Moda.Organization.Domain.Tests.Data;
+
 public class TeamFaker : PrivateConstructorFaker<Team>
 {
     public TeamFaker(LocalDate? activeDate = null)
@@ -24,17 +25,66 @@ public class TeamFaker : PrivateConstructorFaker<Team>
 
 public static class TeamFakerExtensions
 {
-    public static TeamFaker WithData(this TeamFaker faker, Guid? id = null, int? key = null, string? name = null, TeamCode? code = null, string? description = null, LocalDate? activeDate = null, LocalDate? inactiveDate = null, bool? isActive = null)
+    public static TeamFaker WithId(this TeamFaker faker, Guid id)
     {
-        if (id.HasValue) { faker.RuleFor(x => x.Id, id.Value); }
-        if (key.HasValue) { faker.RuleFor(x => x.Key, key.Value); }
-        if (!string.IsNullOrWhiteSpace(name)) { faker.RuleFor(x => x.Name, name); }
-        if (code is not null) { faker.RuleFor(x => x.Code, code); }
-        if (!string.IsNullOrWhiteSpace(description)) { faker.RuleFor(x => x.Description, description); }
-        if (activeDate.HasValue) { faker.RuleFor(x => x.ActiveDate, activeDate.Value); }
-        if (inactiveDate.HasValue) { faker.RuleFor(x => x.InactiveDate, inactiveDate.Value); }
-        if (isActive.HasValue) { faker.RuleFor(x => x.IsActive, isActive.Value); }
+        faker.RuleFor(x => x.Id, id);
+        return faker;
+    }
 
+    public static TeamFaker WithKey(this TeamFaker faker, int key)
+    {
+        faker.RuleFor(x => x.Key, key);
+        return faker;
+    }
+
+    public static TeamFaker WithName(this TeamFaker faker, string name)
+    {
+        faker.RuleFor(x => x.Name, name);
+        return faker;
+    }
+
+    public static TeamFaker WithCode(this TeamFaker faker, TeamCode code)
+    {
+        faker.RuleFor(x => x.Code, code);
+        return faker;
+    }
+
+    public static TeamFaker WithDescription(this TeamFaker faker, string? description)
+    {
+        faker.RuleFor(x => x.Description, description);
+        return faker;
+    }
+
+    public static TeamFaker WithActiveDate(this TeamFaker faker, LocalDate activeDate)
+    {
+        faker.RuleFor(x => x.ActiveDate, activeDate);
+        return faker;
+    }
+
+    public static TeamFaker WithInactiveDate(this TeamFaker faker, LocalDate? inactiveDate)
+    {
+        faker.RuleFor(x => x.InactiveDate, inactiveDate);
+        return faker;
+    }
+
+    public static TeamFaker WithIsActive(this TeamFaker faker, bool isActive)
+    {
+        faker.RuleFor(x => x.IsActive, isActive);
+        return faker;
+    }
+
+    public static TeamFaker AsActive(this TeamFaker faker)
+    {
+        faker.RuleFor(x => x.IsActive, true);
+        faker.RuleFor(x => x.InactiveDate, (LocalDate?)null);
+        return faker;
+    }
+
+    public static TeamFaker AsInactive(this TeamFaker faker, LocalDate? inactiveDate = null)
+    {
+        var actualInactiveDate = inactiveDate ?? LocalDate.FromDateTime(DateTime.UtcNow);
+        faker.RuleFor(x => x.IsActive, false);
+        faker.RuleFor(x => x.InactiveDate, actualInactiveDate);
         return faker;
     }
 }

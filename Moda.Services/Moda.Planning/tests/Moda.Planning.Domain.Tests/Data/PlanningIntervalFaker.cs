@@ -1,9 +1,11 @@
 ﻿using Moda.Common.Models;
 using Moda.Planning.Domain.Models;
 using Moda.Tests.Shared.Data;
+using Moda.Tests.Shared.Extensions;
 using NodaTime.Extensions;
 
 namespace Moda.Planning.Domain.Tests.Data;
+
 public class PlanningIntervalFaker : PrivateConstructorFaker<PlanningInterval>
 {
     public PlanningIntervalFaker()
@@ -22,14 +24,39 @@ public class PlanningIntervalFaker : PrivateConstructorFaker<PlanningInterval>
 
 public static class PlanningIntervalFakerExtensions
 {
-    public static PlanningIntervalFaker WithData(this PlanningIntervalFaker faker, Guid? planningIntervalId = null, string? name = null, string? description = null, LocalDateRange? dateRange = null, bool? objectivesLocked = null)
+    public static PlanningIntervalFaker WithId(this PlanningIntervalFaker faker, Guid planningIntervalId)
     {
-        if (planningIntervalId.HasValue) { faker.RuleFor(x => x.Id, planningIntervalId.Value); }
-        if (!string.IsNullOrWhiteSpace(name)) { faker.RuleFor(x => x.Name, name); }
-        if (!string.IsNullOrWhiteSpace(description)) { faker.RuleFor(x => x.Description, description); }
-        if (dateRange is not null) { faker.RuleFor(x => x.DateRange, dateRange); }
-        if (objectivesLocked.HasValue) { faker.RuleFor(x => x.ObjectivesLocked, objectivesLocked); }
+        faker.RuleFor(x => x.Id, planningIntervalId);
+        return faker;
+    }
 
+    public static PlanningIntervalFaker WithKey(this PlanningIntervalFaker faker, int key)
+    {
+        faker.RuleFor(x => x.Key, key);
+        return faker;
+    }
+
+    public static PlanningIntervalFaker WithName(this PlanningIntervalFaker faker, string name)
+    {
+        faker.RuleFor(x => x.Name, name);
+        return faker;
+    }
+
+    public static PlanningIntervalFaker WithDescription(this PlanningIntervalFaker faker, string? description)
+    {
+        faker.RuleFor(x => x.Description, description);
+        return faker;
+    }
+
+    public static PlanningIntervalFaker WithDateRange(this PlanningIntervalFaker faker, LocalDateRange dateRange)
+    {
+        faker.RuleFor(x => x.DateRange, dateRange);
+        return faker;
+    }
+
+    public static PlanningIntervalFaker WithObjectivesLocked(this PlanningIntervalFaker faker, bool objectivesLocked)
+    {
+        faker.RuleFor(x => x.ObjectivesLocked, objectivesLocked);
         return faker;
     }
 

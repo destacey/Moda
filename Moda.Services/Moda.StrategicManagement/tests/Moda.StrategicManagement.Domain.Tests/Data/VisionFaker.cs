@@ -7,6 +7,7 @@ using NodaTime;
 using NodaTime.Extensions;
 
 namespace Moda.StrategicManagement.Domain.Tests.Data;
+
 public sealed class VisionFaker : PrivateConstructorFaker<Vision>
 {
     public VisionFaker()
@@ -21,14 +22,33 @@ public sealed class VisionFaker : PrivateConstructorFaker<Vision>
 
 public static class VisionFakerExtensions
 {
-    public static VisionFaker WithData(this VisionFaker faker, Guid? id = null, int? key = null, string? description = null, VisionState? state = null, FlexibleInstantRange? dates = null)
+    public static VisionFaker WithId(this VisionFaker faker, Guid id)
     {
-        if (id.HasValue) { faker.RuleFor(x => x.Id, id.Value); }
-        if (key.HasValue) { faker.RuleFor(x => x.Key, key.Value); }
-        if (!string.IsNullOrWhiteSpace(description)) { faker.RuleFor(x => x.Description, description); }
-        if (state.HasValue) { faker.RuleFor(x => x.State, state); }
-        if (dates is not null) { faker.RuleFor(x => x.Dates, dates); }
+        faker.RuleFor(x => x.Id, id);
+        return faker;
+    }
 
+    public static VisionFaker WithKey(this VisionFaker faker, int key)
+    {
+        faker.RuleFor(x => x.Key, key);
+        return faker;
+    }
+
+    public static VisionFaker WithDescription(this VisionFaker faker, string description)
+    {
+        faker.RuleFor(x => x.Description, description);
+        return faker;
+    }
+
+    public static VisionFaker WithState(this VisionFaker faker, VisionState state)
+    {
+        faker.RuleFor(x => x.State, state);
+        return faker;
+    }
+
+    public static VisionFaker WithDates(this VisionFaker faker, FlexibleInstantRange? dates)
+    {
+        faker.RuleFor(x => x.Dates, dates);
         return faker;
     }
 
@@ -43,10 +63,10 @@ public static class VisionFakerExtensions
         var now = dateTimeProvider?.Now ?? DateTime.UtcNow.ToInstant();
         var defaultActiveInstant = now.Plus(Duration.FromDays(-10));
 
-        return faker.WithData(
-            state: VisionState.Active, 
-            dates: new FlexibleInstantRange(defaultActiveInstant)
-            ).Generate();
+        return faker
+            .WithState(VisionState.Active)
+            .WithDates(new FlexibleInstantRange(defaultActiveInstant))
+            .Generate();
     }
 
     /// <summary>
@@ -61,9 +81,28 @@ public static class VisionFakerExtensions
         var defaultActiveInstant = now.Plus(Duration.FromDays(-20));
         var defaultArchivedInstant = defaultActiveInstant.Plus(Duration.FromDays(10));
 
-        return faker.WithData(
-            state: VisionState.Archived,
-            dates: new FlexibleInstantRange(defaultActiveInstant, defaultArchivedInstant)
-            ).Generate();
+        return faker
+            .WithState(VisionState.Archived)
+            .WithDates(new FlexibleInstantRange(defaultActiveInstant, defaultArchivedInstant))
+            .Generate();
+    }
+
+    public static VisionFaker AsProposed(this VisionFaker faker)
+    {
+        faker.RuleFor(x => x.State, VisionState.Proposed);
+        faker.RuleFor(x => x.Dates, f => null);
+        return faker;
+    }
+
+    public static VisionFaker AsActive(this VisionFaker faker)
+    {
+        faker.RuleFor(x => x.State, VisionState.Active);
+        return faker;
+    }
+
+    public static VisionFaker AsArchived(this VisionFaker faker)
+    {
+        faker.RuleFor(x => x.State, VisionState.Archived);
+        return faker;
     }
 }

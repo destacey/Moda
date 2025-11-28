@@ -146,10 +146,10 @@ public sealed class VisionAggregateTests
     public void Archive_ShouldArchiveSuccessfully_WhenEarlierThanExistingArchived()
     {
         // Arrange
-        var activeVision = _faker.WithData(
-            state: VisionState.Active,
-            dates: new FlexibleInstantRange(_dateTimeProvider.Now.Plus(Duration.FromDays(-50)))
-            ).Generate();
+        var activeVision = _faker
+            .WithState(VisionState.Active)
+            .WithDates(new FlexibleInstantRange(_dateTimeProvider.Now.Plus(Duration.FromDays(-50))))
+            .Generate();
         var expectedActiveDate = activeVision.Dates!.Start;
 
         var archivedVision = _faker.ArchivedVision(_dateTimeProvider);
@@ -208,10 +208,10 @@ public sealed class VisionAggregateTests
         // Arrange
         var archivedVision = _faker.ArchivedVision(_dateTimeProvider);
 
-        var activeVision = _faker.WithData(
-            state: VisionState.Active,
-            dates: new FlexibleInstantRange(_dateTimeProvider.Now.Plus(Duration.FromDays(-15)))
-        ).Generate();
+        var activeVision = _faker
+            .WithState(VisionState.Active)
+            .WithDates(new FlexibleInstantRange(_dateTimeProvider.Now.Plus(Duration.FromDays(-15))))
+            .Generate();
 
         var visionAggregate = new VisionAggregate([archivedVision, activeVision]);
 

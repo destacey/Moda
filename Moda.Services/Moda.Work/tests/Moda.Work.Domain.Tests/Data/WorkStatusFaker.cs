@@ -15,12 +15,27 @@ public class WorkStatusFaker : PrivateConstructorFaker<WorkStatus>
 
 public static class WorkStatusFakerExtensions
 {
-    public static WorkStatusFaker WithData(this WorkStatusFaker faker, string? name = null, string? description = null, bool? isActive = null)
+    public static WorkStatusFaker WithId(this WorkStatusFaker faker, int id)
     {
-        if (!string.IsNullOrWhiteSpace(name)) { faker.RuleFor(x => x.Name, name); }
-        if (!string.IsNullOrWhiteSpace(description)) { faker.RuleFor(x => x.Description, description); }
-        if (isActive.HasValue) { faker.RuleFor(x => x.IsActive, isActive.Value); }
+        faker.RuleFor(x => x.Id, id);
+        return faker;
+    }
 
+    public static WorkStatusFaker WithName(this WorkStatusFaker faker, string name)
+    {
+        faker.RuleFor(x => x.Name, name);
+        return faker;
+    }
+
+    public static WorkStatusFaker WithDescription(this WorkStatusFaker faker, string description)
+    {
+        faker.RuleFor(x => x.Description, description);
+        return faker;
+    }
+
+    public static WorkStatusFaker WithIsActive(this WorkStatusFaker faker, bool isActive)
+    {
+        faker.RuleFor(x => x.IsActive, isActive);
         return faker;
     }
 }

@@ -62,10 +62,10 @@ public class VisionTests
     public void Update_ShouldUpdateVisionSuccessfully_WhenStateIsActive()
     {
         // Arrange
-        var vision = _faker.WithData(
-            state: VisionState.Active, 
-            dates: new FlexibleInstantRange(_dateTimeProvider.Now)
-            ).Generate();
+        var vision = _faker
+            .WithState(VisionState.Active)
+            .WithDates(new FlexibleInstantRange(_dateTimeProvider.Now))
+            .Generate();
         var expectedState = vision.State;
         var expectedDates = vision.Dates;
 
@@ -85,10 +85,10 @@ public class VisionTests
     public void Update_ShouldFail_WhenStateIsArchived()
     {
         // Arrange
-        var vision = _faker.WithData(
-            state: VisionState.Archived, 
-            dates: new FlexibleInstantRange(_dateTimeProvider.Now.Plus(Duration.FromDays(-10)), _dateTimeProvider.Now)
-            ).Generate();
+        var vision = _faker
+            .WithState(VisionState.Archived)
+            .WithDates(new FlexibleInstantRange(_dateTimeProvider.Now.Plus(Duration.FromDays(-10)), _dateTimeProvider.Now))
+            .Generate();
 
         string updatedDescription = "Do amazing things.";
 
@@ -177,10 +177,10 @@ public class VisionTests
     public void Archive_ShouldFail_WhenStateIsArchived()
     {
         // Arrange
-        var vision = _faker.WithData(
-            state: VisionState.Archived,
-            dates: new FlexibleInstantRange(_dateTimeProvider.Now.Plus(Duration.FromDays(-10)), _dateTimeProvider.Now)
-            ).Generate();
+        var vision = _faker
+            .WithState(VisionState.Archived)
+            .WithDates(new FlexibleInstantRange(_dateTimeProvider.Now.Plus(Duration.FromDays(-10)), _dateTimeProvider.Now))
+            .Generate();
         var archiveDate = _dateTimeProvider.Now;
 
         // Act
@@ -195,10 +195,10 @@ public class VisionTests
     public void Archive_ShouldFail_WhenEndIsEarlierThanStart()
     {
         // Arrange
-        var vision = _faker.WithData(
-            state: VisionState.Active,
-            dates: new FlexibleInstantRange(_dateTimeProvider.Now)
-            ).Generate();
+        var vision = _faker
+            .WithState(VisionState.Active)
+            .WithDates(new FlexibleInstantRange(_dateTimeProvider.Now))
+            .Generate();
         var archiveDate = _dateTimeProvider.Now.Plus(Duration.FromDays(-5));
 
         // Act
