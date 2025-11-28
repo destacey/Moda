@@ -19,27 +19,44 @@ public class WorkTypeFaker : PrivateConstructorFaker<WorkType>
 
 public static class WorkTypeFakerExtensions
 {
-    public static WorkTypeFaker WithData(this WorkTypeFaker faker, string? name = null, string? description = null, WorkTypeLevel? level = null, bool? isActive = null)
+    public static WorkTypeFaker WithId(this WorkTypeFaker faker, int id)
     {
-        if (!string.IsNullOrWhiteSpace(name)) { faker.RuleFor(x => x.Name, name); }
-        if (!string.IsNullOrWhiteSpace(description)) { faker.RuleFor(x => x.Description, description); }
-        if (level != null) 
-        { 
-            faker.RuleFor(x => x.LevelId, level.Id);
-            faker.RuleFor(x => x.Level, level); 
-        }
-        if (isActive.HasValue) { faker.RuleFor(x => x.IsActive, isActive.Value); }
+        faker.RuleFor(x => x.Id, id);
+        return faker;
+    }
 
+    public static WorkTypeFaker WithName(this WorkTypeFaker faker, string name)
+    {
+        faker.RuleFor(x => x.Name, name);
+        return faker;
+    }
+
+    public static WorkTypeFaker WithDescription(this WorkTypeFaker faker, string description)
+    {
+        faker.RuleFor(x => x.Description, description);
+        return faker;
+    }
+
+    public static WorkTypeFaker WithLevel(this WorkTypeFaker faker, WorkTypeLevel level)
+    {
+        faker.RuleFor(x => x.LevelId, level.Id);
+        faker.RuleFor(x => x.Level, level);
+        return faker;
+    }
+
+    public static WorkTypeFaker WithIsActive(this WorkTypeFaker faker, bool isActive)
+    {
+        faker.RuleFor(x => x.IsActive, isActive);
         return faker;
     }
 
     public static WorkTypeFaker AsEpic(this WorkTypeFaker faker)
     {
         var level = new WorkTypeLevelFaker().AsEpics().Generate();
-        faker.RuleFor(x => x.Name, "Epic");
-        faker.RuleFor(x => x.Description, "The Epic type");
-        faker.RuleFor(x => x.LevelId, level.Id);
-        faker.RuleFor(x => x.Level, level);
+
+        faker.WithName("Epic");
+        faker.WithDescription("The Epic type");
+        faker.WithLevel(level);
 
         return faker;
     }
@@ -47,10 +64,10 @@ public static class WorkTypeFakerExtensions
     public static WorkTypeFaker AsFeature(this WorkTypeFaker faker)
     {
         var level = new WorkTypeLevelFaker().AsFeatures().Generate();
-        faker.RuleFor(x => x.Name, "Feature");
-        faker.RuleFor(x => x.Description, "The Feature type");
-        faker.RuleFor(x => x.LevelId, level.Id);
-        faker.RuleFor(x => x.Level, level);
+
+        faker.WithName("Feature");
+        faker.WithDescription("The Feature type");
+        faker.WithLevel(level);
 
         return faker;
     }
@@ -58,10 +75,10 @@ public static class WorkTypeFakerExtensions
     public static WorkTypeFaker AsStory(this WorkTypeFaker faker)
     {
         var level = new WorkTypeLevelFaker().AsStories().Generate();
-        faker.RuleFor(x => x.Name, "Story");
-        faker.RuleFor(x => x.Description, "The Story type");
-        faker.RuleFor(x => x.LevelId, level.Id);
-        faker.RuleFor(x => x.Level, level);
+
+        faker.WithName("Story");
+        faker.WithDescription("The Story type");
+        faker.WithLevel(level);
 
         return faker;
     }
@@ -69,10 +86,10 @@ public static class WorkTypeFakerExtensions
     public static WorkTypeFaker AsBug(this WorkTypeFaker faker)
     {
         var level = new WorkTypeLevelFaker().AsStories().Generate();
-        faker.RuleFor(x => x.Name, "Bug");
-        faker.RuleFor(x => x.Description, "The Bug type");
-        faker.RuleFor(x => x.LevelId, level.Id);
-        faker.RuleFor(x => x.Level, level);
+
+        faker.WithName("Bug");
+        faker.WithDescription("The Bug type");
+        faker.WithLevel(level);
 
         return faker;
     }
@@ -80,10 +97,10 @@ public static class WorkTypeFakerExtensions
     public static WorkTypeFaker AsOther(this WorkTypeFaker faker)
     {
         var level = new WorkTypeLevelFaker().AsOther().Generate();
-        faker.RuleFor(x => x.Name, "Other");
-        faker.RuleFor(x => x.Description, "The other type");
-        faker.RuleFor(x => x.LevelId, level.Id);
-        faker.RuleFor(x => x.Level, level);
+
+        faker.WithName("Other");
+        faker.WithDescription("The Other type");
+        faker.WithLevel(level);
 
         return faker;
     }

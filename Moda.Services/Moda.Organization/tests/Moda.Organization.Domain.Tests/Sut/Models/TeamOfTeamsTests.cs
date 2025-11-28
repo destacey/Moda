@@ -215,7 +215,7 @@ public class TeamOfTeamsTests
     {
         // Arrange
         var inactiveDate = _dateTimeProvider.Now.Minus(Duration.FromDays(10)).InUtc().LocalDateTime.Date;
-        var team = _teamOfTeamsFaker.WithData(isActive: false, inactiveDate: inactiveDate).Generate();
+        var team = _teamOfTeamsFaker.AsInactive(inactiveDate).Generate();
 
         // Act
         team.Activate(_dateTimeProvider.Now);
@@ -250,7 +250,7 @@ public class TeamOfTeamsTests
     {
         // Arrange
         var inactiveDate = _dateTimeProvider.Now.Minus(Duration.FromDays(10)).InUtc().LocalDateTime.Date;
-        var team = _teamOfTeamsFaker.WithData(isActive: false, inactiveDate: inactiveDate).Generate();
+        var team = _teamOfTeamsFaker.AsInactive(inactiveDate).Generate();
         var args = TeamDeactivatableArgs.Create(inactiveDate, _dateTimeProvider.Now);
 
         // Act
@@ -534,7 +534,7 @@ public class TeamOfTeamsTests
     {
         // Arrange
         var inactiveDate = _dateTimeProvider.Now.Minus(Duration.FromDays(10)).InUtc().LocalDateTime.Date;
-        var team = _teamOfTeamsFaker.WithData(isActive: false, inactiveDate: inactiveDate).Generate();
+        var team = _teamOfTeamsFaker.AsInactive(inactiveDate).Generate();
         var parentTeam = _teamOfTeamsFaker.Generate();
         LocalDate start = new(2023, 1, 1);
         LocalDate? end = null;
@@ -557,7 +557,7 @@ public class TeamOfTeamsTests
         // Arrange
         var team = _teamOfTeamsFaker.Generate();
         var inactiveDate = _dateTimeProvider.Now.Minus(Duration.FromDays(10)).InUtc().LocalDateTime.Date;
-        var parentTeam = _teamOfTeamsFaker.WithData(isActive: false, inactiveDate: inactiveDate).Generate();
+        var parentTeam = _teamOfTeamsFaker.AsInactive(inactiveDate).Generate();
         LocalDate start = new(2023, 1, 1);
         LocalDate? end = null;
         MembershipDateRange dateRange = new(start, end);

@@ -58,6 +58,7 @@ public class WorkItemFaker : PrivateConstructorFaker<WorkItem>
         RuleFor(x => x.Parent, f => null);
         RuleFor(x => x.Priority, f => f.Random.Int(1, 4));
         RuleFor(x => x.StackRank, f => f.Random.Double(1000, 100000));
+        RuleFor(x => x.StoryPoints, f => f.Random.Double(0, 20));
 
         RuleFor(x => x.ProjectId, f => null);
         RuleFor(x => x.ParentProjectId, f => null);
@@ -106,7 +107,7 @@ public static class WorkItemFakerExtensions
     /// </summary>
     public static WorkItemFaker WithProposedState(this WorkItemFaker faker)
     {
-        var workStatus = new WorkStatusFaker().WithData(name: "To Do").Generate();
+        var workStatus = new WorkStatusFaker().WithName("To Do").Generate();
 
         faker.RuleFor(x => x.StatusCategory, WorkStatusCategory.Proposed);
         faker.RuleFor(x => x.StatusId, workStatus.Id);
@@ -124,7 +125,7 @@ public static class WorkItemFakerExtensions
     /// <returns></returns>
     public static WorkItemFaker WithActiveState(this WorkItemFaker faker)
     {
-        var workStatus = new WorkStatusFaker().WithData(name: "In Progress").Generate();
+        var workStatus = new WorkStatusFaker().WithName("In Progress").Generate();
         var created = faker.Generate().Created;
         var activated = created.Plus(Duration.FromDays(1));
 
@@ -144,7 +145,7 @@ public static class WorkItemFakerExtensions
     /// <returns></returns>
     public static WorkItemFaker WithDoneState(this WorkItemFaker faker)
     {
-        var workStatus = new WorkStatusFaker().WithData(name: "Done").Generate();
+        var workStatus = new WorkStatusFaker().WithName("Done").Generate();
         var created = faker.Generate().Created;
         var activated = created.Plus(Duration.FromDays(1));
         var done = activated.Plus(Duration.FromDays(3));

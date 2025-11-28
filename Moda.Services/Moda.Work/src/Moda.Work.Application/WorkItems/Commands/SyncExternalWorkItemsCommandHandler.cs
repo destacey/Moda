@@ -281,7 +281,8 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
                 await _workDbContext.SaveChangesAsync(cancellationToken);
 
                 // Clear the change tracker to release tracked entities and prevent memory bloat
-                _workDbContext.ChangeTracker.Clear();
+                // needs a null check for tests
+                _workDbContext.ChangeTracker?.Clear();
 
                 _logger.LogInformation("Synced {ChunkCount} of {TotalChunks} for workspace {WorkspaceId} ({WorkspaceName}).", c++, chunks.Count, workspace.Id, workspace.Name);
             }

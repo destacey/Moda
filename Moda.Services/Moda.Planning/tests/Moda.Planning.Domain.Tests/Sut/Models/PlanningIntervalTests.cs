@@ -27,7 +27,7 @@ public class PlanningIntervalTests
         // Arrange
         var today = _dateTimeProvider.Today;
         var planningIntervalDateRange = new LocalDateRange(today.Plus(Period.FromWeeks(-14)), today.Plus(Period.FromWeeks(-2)));
-        var sut = _planningIntervalFaker.WithData(dateRange: planningIntervalDateRange).Generate();
+        var sut = _planningIntervalFaker.WithDateRange(planningIntervalDateRange).Generate();
 
         // Act
         var result = sut.StateOn(today);
@@ -42,7 +42,7 @@ public class PlanningIntervalTests
         // Arrange
         var today = _dateTimeProvider.Today;
         var planningIntervalDateRange = new LocalDateRange(today.Plus(Period.FromWeeks(-1)), today.Plus(Period.FromWeeks(11)));
-        var sut = _planningIntervalFaker.WithData(dateRange: planningIntervalDateRange).Generate();
+        var sut = _planningIntervalFaker.WithDateRange(planningIntervalDateRange).Generate();
 
         // Act
         var result = sut.StateOn(today);
@@ -57,7 +57,7 @@ public class PlanningIntervalTests
         // Arrange
         var today = _dateTimeProvider.Today;
         var planningIntervalDateRange = new LocalDateRange(today.Plus(Period.FromWeeks(1)), today.Plus(Period.FromWeeks(13)));
-        var sut = _planningIntervalFaker.WithData(dateRange: planningIntervalDateRange).Generate();
+        var sut = _planningIntervalFaker.WithDateRange(planningIntervalDateRange).Generate();
 
         // Act
         var result = sut.StateOn(today);
@@ -352,7 +352,7 @@ public class PlanningIntervalTests
     {
         // Arrange
         var piDates = new LocalDateRange(new LocalDate(2023, 1, 1), new LocalDate(2023, 3, 31));
-        var sut = _planningIntervalFaker.WithData(dateRange: piDates).Generate();
+        var sut = _planningIntervalFaker.WithDateRange(piDates).Generate();
 
         // Act
         var result = sut.AddIteration("Iteration 1", IterationCategory.Development, new LocalDateRange(new LocalDate(2023, 1, 1), new LocalDate(2023, 1, 31)));
@@ -372,7 +372,7 @@ public class PlanningIntervalTests
     {
         // Arrange
         var piDates = new LocalDateRange(new LocalDate(2023, 1, 1), new LocalDate(2023, 3, 31));
-        var sut = _planningIntervalFaker.WithData(dateRange: piDates).Generate();
+        var sut = _planningIntervalFaker.WithDateRange(piDates).Generate();
 
         sut.AddIteration("Iteration 1", IterationCategory.Development, new LocalDateRange(new LocalDate(2023, 1, 1), new LocalDate(2023, 1, 31)));
 
@@ -389,7 +389,7 @@ public class PlanningIntervalTests
     {
         // Arrange
         var piDates = new LocalDateRange(new LocalDate(2023, 1, 1), new LocalDate(2023, 3, 31));
-        var sut = _planningIntervalFaker.WithData(dateRange: piDates).Generate();
+        var sut = _planningIntervalFaker.WithDateRange(piDates).Generate();
 
         sut.AddIteration("Iteration 1", IterationCategory.Development, new LocalDateRange(new LocalDate(2023, 1, 1), new LocalDate(2023, 1, 31)));
 
@@ -406,7 +406,7 @@ public class PlanningIntervalTests
     {
         // Arrange
         var piDates = new LocalDateRange(new LocalDate(2023, 1, 1), new LocalDate(2023, 3, 31));
-        var sut = _planningIntervalFaker.WithData(dateRange: piDates).Generate();
+        var sut = _planningIntervalFaker.WithDateRange(piDates).Generate();
 
         // Act
         var result = sut.AddIteration("Iteration 1", IterationCategory.Development, new LocalDateRange(new LocalDate(2020, 12, 31), new LocalDate(2023, 1, 30)));
@@ -421,7 +421,7 @@ public class PlanningIntervalTests
     {
         // Arrange
         var piDates = new LocalDateRange(new LocalDate(2023, 1, 1), new LocalDate(2023, 3, 31));
-        var sut = _planningIntervalFaker.WithData(dateRange: piDates).Generate();
+        var sut = _planningIntervalFaker.WithDateRange(piDates).Generate();
 
         // Act
         var result = sut.AddIteration("Iteration 1", IterationCategory.Development, new LocalDateRange(new LocalDate(2023, 3, 20), new LocalDate(2023, 4, 1)));

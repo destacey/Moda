@@ -18,6 +18,21 @@ public static class GenericExtensions
     }
 
     /// <summary>
+    /// Sets the value of a private or protected field on an instance.
+    /// Useful for configuring Bogus fakers that need to set private fields.
+    /// </summary>
+    /// <typeparam name="T">The type of the instance</typeparam>
+    /// <typeparam name="TValue">The type of the field value</typeparam>
+    /// <param name="instance">The instance to modify</param>
+    /// <param name="fieldName">The name of the private field (e.g., "_workStatus")</param>
+    /// <param name="value">The value to set</param>
+    public static void SetPrivateField<T, TValue>(this T instance, string fieldName, TValue value)
+    {
+        var field = typeof(T).GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance);
+        field?.SetValue(instance, value);
+    }
+
+    /// <summary>
     /// A generic method to get the value of a private or protected list field and add an item to it.
     /// </summary>
     /// <typeparam name="T"></typeparam>
