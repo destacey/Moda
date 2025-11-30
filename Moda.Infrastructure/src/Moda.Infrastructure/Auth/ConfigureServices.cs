@@ -19,7 +19,22 @@ internal static class ConfigureServices
             // Must add identity before adding auth!
             .AddIdentity()
             .AddAzureAdAuth(config)
-            .AddPersonalAccessTokenAuth();
+            .AddPersonalAccessTokenAuth()
+            .AddAuthorizationPolicies();
+    }
+
+    private static IServiceCollection AddAuthorizationPolicies(this IServiceCollection services)
+    {
+        services.AddAuthorization(options =>
+        {
+            // Default policy that accepts both JWT and PAT authentication
+            options.DefaultPolicy = new AuthorizationPolicyBuilder()
+                .AddAuthenticationSchemes(Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme, "PersonalAccessToken")
+                .RequireAuthenticatedUser()
+                .Build();
+        });
+
+        return services;
     }
 
     internal static IApplicationBuilder UseCurrentUser(this IApplicationBuilder app) =>
