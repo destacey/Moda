@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Moda.Common.Domain.Employees;
+using Moda.Common.Domain.Identity;
 
 namespace Moda.Infrastructure.Persistence.Configuration;
 
@@ -64,4 +66,66 @@ public class IdentityUserTokenConfig : IEntityTypeConfiguration<IdentityUserToke
     public void Configure(EntityTypeBuilder<IdentityUserToken<string>> builder) =>
         builder
             .ToTable("UserTokens", SchemaNames.Identity);
+}
+
+public class PersonalAccessTokenConfig : IEntityTypeConfiguration<PersonalAccessToken>
+{
+    public void Configure(EntityTypeBuilder<PersonalAccessToken> builder)
+    {
+        builder.ToTable("PersonalAccessTokens", SchemaNames.Identity);
+
+        builder.HasKey(p => p.Id);
+
+        // Indexes
+        builder.HasIndex(p => p.TokenHash)
+            .IsUnique()
+            .HasDatabaseName("IX_PersonalAccessTokens_TokenHash");
+
+        builder.HasIndex(p => p.UserId)
+            .HasDatabaseName("IX_PersonalAccessTokens_UserId");
+
+        builder.HasIndex(p => p.ExpiresAt)
+            .HasDatabaseName("IX_PersonalAccessTokens_ExpiresAt");
+
+        builder.HasIndex(p => new { p.UserId, p.RevokedAt })
+            .HasDatabaseName("IX_PersonalAccessTokens_UserId_RevokedAt");
+
+        // Properties
+        builder.Property(p => p.Name)
+            .HasMaxLength(100)
+            .IsRequired();
+
+        builder.Property(p => p.TokenHash)
+            .HasMaxLength(255)
+            .IsRequired();
+
+        builder.Property(p => p.UserId)
+            .HasMaxLength(450)
+            .IsRequired();
+
+        builder.Property(p => p.EmployeeId);
+
+        builder.Property(p => p.Scopes)
+            .HasMaxLength(4000); // Allows for JSON array of permission names
+
+        builder.Property(p => p.ExpiresAt)
+            .IsRequired();
+
+        builder.Property(p => p.LastUsedAt);
+
+        builder.Property(p => p.RevokedAt);
+
+        builder.Property(p => p.RevokedBy);
+
+        // Relationships
+        builder.HasOne<ApplicationUser>()
+            .WithMany()
+            .HasForeignKey(p => p.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne<Employee>()
+            .WithMany()
+            .HasForeignKey(p => p.EmployeeId)
+            .OnDelete(DeleteBehavior.NoAction);
+    }
 }

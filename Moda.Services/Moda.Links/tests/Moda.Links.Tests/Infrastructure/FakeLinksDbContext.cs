@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Moda.Common.Domain.Employees;
+using Moda.Common.Domain.Identity;
 using Moda.Links;
 using Moda.Links.Models;
 using Moda.Tests.Shared.Infrastructure;
@@ -20,11 +21,13 @@ public class FakeLinksDbContext : ILinksDbContext, IDisposable
     // Common domain entities
     private readonly List<Employee> _employees = [];
     private readonly List<ExternalEmployeeBlacklistItem> _externalEmployeeBlacklistItems = [];
+    private readonly List<PersonalAccessToken> _personalAccessTokens = [];
 
     // DbSet properties
     public DbSet<Link> Links => _links.AsDbSet();
     public DbSet<Employee> Employees => _employees.AsDbSet();
     public DbSet<ExternalEmployeeBlacklistItem> ExternalEmployeeBlacklistItems => _externalEmployeeBlacklistItems.AsDbSet();
+    public DbSet<PersonalAccessToken> PersonalAccessTokens => _personalAccessTokens.AsDbSet();
 
     // ChangeTracker - we can't create a real one, so we return null and the handler uses defensive coding
     public ChangeTracker ChangeTracker => null!;
@@ -40,9 +43,9 @@ public class FakeLinksDbContext : ILinksDbContext, IDisposable
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         SaveChangesCallCount++;
-        
+
         // Return the total number of entities as a simple success indicator
-        var count = _links.Count + _employees.Count + _externalEmployeeBlacklistItems.Count;
+        var count = _links.Count + _employees.Count + _externalEmployeeBlacklistItems.Count + _personalAccessTokens.Count;
         return Task.FromResult(count);
     }
 
@@ -75,6 +78,7 @@ public class FakeLinksDbContext : ILinksDbContext, IDisposable
         _links.Clear();
         _employees.Clear();
         _externalEmployeeBlacklistItems.Clear();
+        _personalAccessTokens.Clear();
         SaveChangesCallCount = 0;
     }
 

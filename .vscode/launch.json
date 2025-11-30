@@ -23,22 +23,31 @@
             }
         },
         {
+            "name": "Next.js: debug server-side",
+            "type": "node-terminal",
+            "request": "launch",
+            "command": "npm run dev -- --inspect"
+        },
+        {
             "name": "Next.js: debug client-side",
-            "type": "edge",
+            "type": "msedge",
             "request": "launch",
             "url": "http://localhost:3000",
             "cwd": "${workspaceFolder}/Moda.Web/src/moda.web.reactclient",
-          },
+        },
         {
             "name": "Next.js: debug full stack",
-            "type": "node-terminal",
+            "type": "node",
             "request": "launch",
-            "command": "npm run dev",
-            "cwd": "${workspaceFolder}/Moda.Web/src/moda.web.reactclient",
+            "program": "${workspaceFolder}/Moda.Web/src/moda.web.reactclient/node_modules/next/dist/bin/next",
+            "runtimeArgs": ["--inspect"],
+            "skipFiles": ["<node_internals>/**"],
             "serverReadyAction": {
-                "pattern": "started server on .+, url: (http://.+)",
+                "action": "debugWithEdge",
+                "killOnServerStop": true,
+                "pattern": "- Local:.+(https?://.+)",
                 "uriFormat": "%s",
-                "action": "debugWithEdge"
+                "webRoot": "${workspaceFolder}/Moda.Web/src/moda.web.reactclient/"
             }
         },
         {

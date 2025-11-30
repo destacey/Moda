@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moda.Infrastructure.Auth.AzureAd;
 using Moda.Infrastructure.Auth.Permissions;
+using Moda.Infrastructure.Auth.PersonalAccessToken;
 
 namespace Moda.Infrastructure.Auth;
 
@@ -17,7 +18,8 @@ internal static class ConfigureServices
 
             // Must add identity before adding auth!
             .AddIdentity()
-            .AddAzureAdAuth(config);
+            .AddAzureAdAuth(config)
+            .AddPersonalAccessTokenAuth();
     }
 
     internal static IApplicationBuilder UseCurrentUser(this IApplicationBuilder app) =>

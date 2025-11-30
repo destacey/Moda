@@ -5,7 +5,9 @@
       "Bash(dotnet test \"d:\\source\\repos\\Moda\\Moda.Integrations\\tests\\Moda.Integrations.AzureDevOps.Tests\\Moda.Integrations.AzureDevOps.Tests.csproj\" --verbosity minimal)",
       "Bash(npm test:*)",
       "Bash(npm run build:*)",
-      "Bash(npm run lint:*)"
+      "Bash(npm run lint:*)",
+      "Bash(rm:*)",
+      "Bash(dotnet build:*)"
     ],
     "deny": [],
     "ask": []

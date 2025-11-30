@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Moda.Common.Domain.Employees;
+using Moda.Common.Domain.Identity;
 using Moda.Goals.Application.Persistence;
 using Moda.Goals.Domain.Models;
 using Moda.Health;
@@ -35,6 +36,7 @@ public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IGoalsDbCo
     #region Common
     public DbSet<Employee> Employees => Set<Employee>();
     public DbSet<ExternalEmployeeBlacklistItem> ExternalEmployeeBlacklistItems => Set<ExternalEmployeeBlacklistItem>();
+    public DbSet<PersonalAccessToken> PersonalAccessTokens => Set<PersonalAccessToken>();
 
     #endregion Common
 

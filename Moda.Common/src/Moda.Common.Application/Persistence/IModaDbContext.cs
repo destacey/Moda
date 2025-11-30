@@ -1,11 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Moda.Common.Domain.Employees;
+using Moda.Common.Domain.Identity;
 
 namespace Moda.Common.Application.Persistence;
 public interface IModaDbContext
 {
-    // this dependency is bigger than needed, but most of the extensions methods are leveraging it. 
+    // this dependency is bigger than needed, but most of the extensions methods are leveraging it.
     DatabaseFacade Database { get; }
     ChangeTracker ChangeTracker { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
@@ -15,4 +16,5 @@ public interface IModaDbContext
     // Common DbSets
     DbSet<Employee> Employees { get; }
     DbSet<ExternalEmployeeBlacklistItem> ExternalEmployeeBlacklistItems { get; }
+    DbSet<PersonalAccessToken> PersonalAccessTokens { get; }
 }
