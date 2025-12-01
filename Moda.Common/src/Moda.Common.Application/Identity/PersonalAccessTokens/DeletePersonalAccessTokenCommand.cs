@@ -6,10 +6,7 @@ namespace Moda.Common.Application.Identity.PersonalAccessTokens;
 /// Command to permanently delete a personal access token.
 /// Unlike revoke, this removes the token from the database entirely.
 /// </summary>
-public sealed record DeletePersonalAccessTokenCommand : ICommand
-{
-    public Guid TokenId { get; init; }
-}
+public sealed record DeletePersonalAccessTokenCommand(Guid TokenId) : ICommand;
 
 public sealed class DeletePersonalAccessTokenCommandValidator : CustomValidator<DeletePersonalAccessTokenCommand>
 {
@@ -37,21 +34,14 @@ public sealed class DeletePersonalAccessTokenCommandValidator : CustomValidator<
     }
 }
 
-internal sealed class DeletePersonalAccessTokenCommandHandler : ICommandHandler<DeletePersonalAccessTokenCommand>
+internal sealed class DeletePersonalAccessTokenCommandHandler(
+    IModaDbContext dbContext,
+    ICurrentUser currentUser,
+    ILogger<DeletePersonalAccessTokenCommandHandler> logger) : ICommandHandler<DeletePersonalAccessTokenCommand>
 {
-    private readonly IModaDbContext _dbContext;
-    private readonly ICurrentUser _currentUser;
-    private readonly ILogger<DeletePersonalAccessTokenCommandHandler> _logger;
-
-    public DeletePersonalAccessTokenCommandHandler(
-        IModaDbContext dbContext,
-        ICurrentUser currentUser,
-        ILogger<DeletePersonalAccessTokenCommandHandler> logger)
-    {
-        _dbContext = dbContext;
-        _currentUser = currentUser;
-        _logger = logger;
-    }
+    private readonly IModaDbContext _dbContext = dbContext;
+    private readonly ICurrentUser _currentUser = currentUser;
+    private readonly ILogger<DeletePersonalAccessTokenCommandHandler> _logger = logger;
 
     public async Task<Result> Handle(DeletePersonalAccessTokenCommand request, CancellationToken cancellationToken)
     {

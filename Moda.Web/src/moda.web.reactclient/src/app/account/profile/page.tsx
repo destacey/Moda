@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation'
 import PageTitle from '../../../components/common/page-title'
 import ProfileForm from './profile-form'
 import ClaimsGrid from './claims-grid'
+import PersonalAccessTokens from './personal-access-tokens'
 import useAuth from '../../../components/contexts/auth'
 import { useDocumentTitle } from '../../../hooks/use-document-title'
 import { useAppDispatch } from '@/src/hooks'
@@ -16,6 +17,7 @@ import { useMessage } from '@/src/components/contexts/messaging'
 enum AccountTabs {
   Profile = 'profile',
   Claims = 'claims',
+  PersonalAccessTokens = 'personalAccessTokens',
 }
 
 const tabs = [
@@ -24,6 +26,7 @@ const tabs = [
     tab: 'Profile',
   },
   { key: AccountTabs.Claims, tab: 'Claims' },
+  { key: AccountTabs.PersonalAccessTokens, tab: 'Personal Access Tokens' },
 ]
 
 const AccountProfilePage = () => {
@@ -48,6 +51,8 @@ const AccountProfilePage = () => {
         return React.createElement(ProfileForm, profileData)
       case AccountTabs.Claims:
         return <ClaimsGrid />
+      case AccountTabs.PersonalAccessTokens:
+        return <PersonalAccessTokens />
       default:
         return null
     }

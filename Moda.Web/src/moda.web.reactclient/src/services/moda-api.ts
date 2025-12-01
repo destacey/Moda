@@ -16578,15 +16578,10 @@ export interface HttpValidationProblemDetails extends ProblemDetails {
 }
 
 export interface CreatePersonalAccessTokenRequest {
-    /** Gets or sets the user-friendly name for this token. */
+    /** The user-friendly name for this token. */
     name: string;
-    /** Gets or sets the optional expiration date for the token.
-If not provided, defaults to 1 year from creation.
-Maximum allowed is 2 years from creation. */
-    expiresAt?: Date | undefined;
-    /** Gets or sets the optional scopes/permissions to limit this token to.
-If null or empty, token has full access (all user permissions). */
-    scopes?: string | undefined;
+    /** The expiration date for the token. Must be in the future and within 2 years from now. */
+    expiresAt: Date;
 }
 
 export interface UserDetailsDto {

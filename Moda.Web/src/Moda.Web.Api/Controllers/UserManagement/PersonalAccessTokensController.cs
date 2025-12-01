@@ -50,7 +50,7 @@ public class PersonalAccessTokensController : ControllerBase
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult<CreatePersonalAccessTokenResult>> Create(CreatePersonalAccessTokenRequest request, CancellationToken cancellationToken)
     {
-        var command = request.ToCommand();
+        var command = request.ToCreatePersonalAccessTokenCommand();
         var result = await _sender.Send(command, cancellationToken);
 
         return result.IsSuccess
@@ -79,7 +79,7 @@ public class PersonalAccessTokensController : ControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
-        var result = await _sender.Send(new DeletePersonalAccessTokenCommand { TokenId = id }, cancellationToken);
+        var result = await _sender.Send(new DeletePersonalAccessTokenCommand(id), cancellationToken);
 
         return result.IsSuccess
             ? NoContent()

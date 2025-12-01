@@ -1,49 +1,55 @@
 using Moda.Common.Application.Identity.PersonalAccessTokens;
-using NodaTime;
+using Moda.Common.Application.Interfaces;
 
 namespace Moda.Web.Api.Models.UserManagement.PersonalAccessTokens;
 
 public sealed record CreatePersonalAccessTokenRequest
 {
     /// <summary>
-    /// Gets or sets the user-friendly name for this token.
+    /// The user-friendly name for this token.
     /// </summary>
     public string Name { get; set; } = default!;
 
     /// <summary>
-    /// Gets or sets the optional expiration date for the token.
-    /// If not provided, defaults to 1 year from creation.
-    /// Maximum allowed is 2 years from creation.
+    /// The expiration date for the token. Must be in the future and within 2 years from now.
     /// </summary>
-    public Instant? ExpiresAt { get; set; }
+    public Instant ExpiresAt { get; set; }
 
-    /// <summary>
-    /// Gets or sets the optional scopes/permissions to limit this token to.
-    /// If null or empty, token has full access (all user permissions).
-    /// </summary>
-    public string? Scopes { get; set; }
-
-    public CreatePersonalAccessTokenCommand ToCommand()
+    public CreatePersonalAccessTokenCommand ToCreatePersonalAccessTokenCommand()
         => new()
         {
             Name = Name,
-            ExpiresAt = ExpiresAt,
-            Scopes = Scopes
+            ExpiresAt = ExpiresAt
         };
 }
 
 public sealed class CreatePersonalAccessTokenRequestValidator : CustomValidator<CreatePersonalAccessTokenRequest>
 {
-    public CreatePersonalAccessTokenRequestValidator()
+    private const int MaxExpirationDays = 730; // 2 years
+
+    private readonly IDateTimeProvider _dateTimeProvider;
+
+    public CreatePersonalAccessTokenRequestValidator(IDateTimeProvider dateTimeProvider)
     {
+        _dateTimeProvider = dateTimeProvider;
+
         RuleLevelCascadeMode = CascadeMode.Stop;
 
         RuleFor(p => p.Name)
             .NotEmpty()
             .MaximumLength(100);
 
-        RuleFor(p => p.Scopes)
-            .MaximumLength(4000)
-            .When(p => !string.IsNullOrWhiteSpace(p.Scopes));
+        RuleFor(x => x.ExpiresAt)
+            .Must(BeValidExpirationDate)
+                .WithMessage($"Expiration date must be between 1 day and {MaxExpirationDays} days ({MaxExpirationDays / 365} years) from now.");
+    }
+
+    private bool BeValidExpirationDate(Instant expiresAt)
+    {
+        var now = _dateTimeProvider.Now;
+        var minExpiration = now.Plus(Duration.FromDays(1));
+        var maxExpiration = now.Plus(Duration.FromDays(MaxExpirationDays));
+
+        return expiresAt >= minExpiration && expiresAt <= maxExpiration;
     }
 }

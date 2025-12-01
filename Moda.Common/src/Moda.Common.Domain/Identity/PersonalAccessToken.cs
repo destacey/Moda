@@ -109,48 +109,6 @@ public sealed class PersonalAccessToken : BaseEntity<Guid>, ISystemAuditable
     public bool IsRevoked => RevokedAt.HasValue;
 
     /// <summary>
-    /// Creates a new personal access token.
-    /// </summary>
-    /// <param name="name">User-friendly name for the token.</param>
-    /// <param name="tokenHash">The hashed token value.</param>
-    /// <param name="userId">The ID of the user who owns this token.</param>
-    /// <param name="employeeId">Optional employee ID.</param>
-    /// <param name="expiresAt">When the token expires.</param>
-    /// <param name="scopes">Optional scopes to limit token permissions.</param>
-    /// <param name="timestamp">The timestamp for the creation event.</param>
-    /// <returns>A Result containing the new PersonalAccessToken or an error.</returns>
-    public static Result<PersonalAccessToken> Create(
-        string name,
-        string tokenHash,
-        string userId,
-        Guid? employeeId,
-        Instant expiresAt,
-        string? scopes,
-        Instant timestamp)
-    {
-        try
-        {
-            if (expiresAt <= timestamp)
-            {
-                return Result.Failure<PersonalAccessToken>("Expiration date must be in the future.");
-            }
-
-            var token = new PersonalAccessToken(name, tokenHash, userId, employeeId, expiresAt, timestamp)
-            {
-                Scopes = scopes
-            };
-
-            token.AddDomainEvent(EntityCreatedEvent.WithEntity(token, timestamp));
-
-            return Result.Success(token);
-        }
-        catch (Exception ex)
-        {
-            return Result.Failure<PersonalAccessToken>(ex.Message);
-        }
-    }
-
-    /// <summary>
     /// Validates that this token is usable for authentication.
     /// </summary>
     /// <param name="timestamp">The current timestamp.</param>
@@ -223,6 +181,48 @@ public sealed class PersonalAccessToken : BaseEntity<Guid>, ISystemAuditable
         catch (Exception ex)
         {
             return Result.Failure(ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// Creates a new personal access token.
+    /// </summary>
+    /// <param name="name">User-friendly name for the token.</param>
+    /// <param name="tokenHash">The hashed token value.</param>
+    /// <param name="userId">The ID of the user who owns this token.</param>
+    /// <param name="employeeId">Optional employee ID.</param>
+    /// <param name="expiresAt">When the token expires.</param>
+    /// <param name="scopes">Optional scopes to limit token permissions.</param>
+    /// <param name="timestamp">The timestamp for the creation event.</param>
+    /// <returns>A Result containing the new PersonalAccessToken or an error.</returns>
+    public static Result<PersonalAccessToken> Create(
+        string name,
+        string tokenHash,
+        string userId,
+        Guid? employeeId,
+        Instant expiresAt,
+        string? scopes,
+        Instant timestamp)
+    {
+        try
+        {
+            if (expiresAt <= timestamp)
+            {
+                return Result.Failure<PersonalAccessToken>("Expiration date must be in the future.");
+            }
+
+            var token = new PersonalAccessToken(name, tokenHash, userId, employeeId, expiresAt, timestamp)
+            {
+                Scopes = scopes
+            };
+
+            token.AddDomainEvent(EntityCreatedEvent.WithEntity(token, timestamp));
+
+            return Result.Success(token);
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure<PersonalAccessToken>(ex.Message);
         }
     }
 }
