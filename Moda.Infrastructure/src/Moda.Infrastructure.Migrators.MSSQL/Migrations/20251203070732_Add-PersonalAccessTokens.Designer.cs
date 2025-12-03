@@ -13,8 +13,8 @@ using Moda.Infrastructure.Persistence.Context;
 namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 {
     [DbContext(typeof(ModaDbContext))]
-    [Migration("20251203050500_AddTokenIdentifierToPersonalAccessTokens")]
-    partial class AddTokenIdentifierToPersonalAccessTokens
+    [Migration("20251203070732_Add-PersonalAccessTokens")]
+    partial class AddPersonalAccessTokens
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
