@@ -8,8 +8,8 @@ namespace Moda.Work.Domain.Tests.Data;
 
 public class WorkflowFaker : PrivateConstructorFaker<Workflow>
 {
-    private readonly WorkStatus? _workStatus;
-    private readonly WorkStatusCategory? _workStatusCategory;
+    private readonly WorkStatus? _workStatus = null;
+    private readonly WorkStatusCategory? _workStatusCategory = null;
 
     public WorkflowFaker()
     {

@@ -26,7 +26,7 @@ const tabs = [
     tab: 'Profile',
   },
   { key: AccountTabs.Claims, tab: 'Claims' },
-  { key: AccountTabs.PersonalAccessTokens, tab: 'Personal Access Tokens' },
+  { key: AccountTabs.PersonalAccessTokens, tab: 'PATs' },
 ]
 
 const AccountProfilePage = () => {

@@ -90,9 +90,17 @@ public class PersonalAccessTokenConfig : IEntityTypeConfiguration<PersonalAccess
         builder.HasIndex(p => new { p.UserId, p.RevokedAt })
             .HasDatabaseName("IX_PersonalAccessTokens_UserId_RevokedAt");
 
+        // Composite index for efficient token lookup
+        builder.HasIndex(p => new { p.TokenIdentifier, p.RevokedAt, p.ExpiresAt })
+            .HasDatabaseName("IX_PersonalAccessTokens_TokenIdentifier_RevokedAt_ExpiresAt");
+
         // Properties
         builder.Property(p => p.Name)
             .HasMaxLength(100)
+            .IsRequired();
+
+        builder.Property(p => p.TokenIdentifier)
+            .HasMaxLength(8)
             .IsRequired();
 
         builder.Property(p => p.TokenHash)

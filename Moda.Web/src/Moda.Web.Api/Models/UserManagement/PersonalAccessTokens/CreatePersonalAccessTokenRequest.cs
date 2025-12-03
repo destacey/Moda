@@ -1,4 +1,4 @@
-using Moda.Common.Application.Identity.PersonalAccessTokens;
+using Moda.Common.Application.Identity.PersonalAccessTokens.Commands;
 using Moda.Common.Application.Interfaces;
 
 namespace Moda.Web.Api.Models.UserManagement.PersonalAccessTokens;

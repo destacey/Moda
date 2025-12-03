@@ -10,12 +10,11 @@ namespace Moda.Infrastructure.Auth.PersonalAccessToken;
 
 /// <summary>
 /// Authentication handler for Personal Access Tokens (PATs).
-/// Checks the x-api-key header for tokens in the format: moda_pat_*
+/// Checks the x-api-key header for valid tokens.
 /// </summary>
 public class PersonalAccessTokenAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {
     private const string ApiKeyHeaderName = "x-api-key";
-    private const string TokenPrefix = "moda_pat_";
 
     private readonly ModaDbContext _dbContext;
     private readonly ITokenHashingService _tokenHashingService;
@@ -51,25 +50,26 @@ public class PersonalAccessTokenAuthenticationHandler : AuthenticationHandler<Au
             return AuthenticateResult.NoResult();
         }
 
-        // Verify it's a PAT token (starts with our prefix)
-        if (!providedToken.StartsWith(TokenPrefix, StringComparison.Ordinal))
-        {
-            _logger.Warning("Invalid token format in x-api-key header");
-            return AuthenticateResult.Fail("Invalid token format.");
-        }
-
         try
         {
-            // Look up all active tokens (we need to check the hash against all of them)
-            // This is necessary because we can't reverse the hash
+            // Extract the token identifier (first 8 characters) for efficient lookup
+            string tokenIdentifier = providedToken.Length >= 8
+                ? providedToken.Substring(0, 8)
+                : providedToken;
+
             var now = _dateTimeProvider.Now;
+
+            // Efficient lookup: only get tokens with matching identifier
             var potentialTokens = await _dbContext.PersonalAccessTokens
-                .Where(t => t.RevokedAt == null && t.ExpiresAt > now)
+                .Where(t => t.TokenIdentifier == tokenIdentifier
+                         && t.RevokedAt == null
+                         && t.ExpiresAt > now)
+                .AsNoTracking()
                 .ToListAsync();
 
-            // Find the matching token by verifying the hash
+            // Find the matching token by verifying the full hash
             var matchingToken = potentialTokens
-                .FirstOrDefault(t => _tokenHashingService.VerifyToken(providedToken, t.TokenHash));
+                .FirstOrDefault(t => _tokenHashingService.VerifyToken(providedToken, t.TokenIdentifier, t.TokenHash));
 
             if (matchingToken == null)
             {
@@ -115,10 +115,15 @@ public class PersonalAccessTokenAuthenticationHandler : AuthenticationHandler<Au
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
                 new Claim(ClaimTypes.Name, user.UserName ?? user.Email ?? "Unknown"),
-                new Claim(ClaimTypes.Email, user.Email ?? string.Empty),
                 new Claim("AuthenticationType", "PersonalAccessToken"),
                 new Claim("TokenId", matchingToken.Id.ToString())
             };
+
+            // Only add email claim if email exists
+            if (!string.IsNullOrWhiteSpace(user.Email))
+            {
+                claims.Add(new Claim(ClaimTypes.Email, user.Email));
+            }
 
             if (matchingToken.EmployeeId.HasValue)
             {
@@ -133,8 +138,8 @@ public class PersonalAccessTokenAuthenticationHandler : AuthenticationHandler<Au
             var ticket = new AuthenticationTicket(principal, Scheme.Name);
 
             _logger.Information(
-                "Personal access token authentication succeeded. UserId: {UserId}, TokenId: {TokenId}, TokenName: {TokenName}",
-                user.Id, matchingToken.Id, matchingToken.Name);
+                "Personal access token authentication succeeded. UserId: {UserId}, UserEmail: {UserEmail}, TokenId: {TokenId}, TokenName: {TokenName}",
+                user.Id, user.Email, matchingToken.Id, matchingToken.Name);
 
             return AuthenticateResult.Success(ticket);
         }

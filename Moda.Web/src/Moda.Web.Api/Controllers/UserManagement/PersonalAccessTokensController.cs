@@ -1,4 +1,6 @@
-using Moda.Common.Application.Identity.PersonalAccessTokens;
+using Moda.Common.Application.Identity.PersonalAccessTokens.Commands;
+using Moda.Common.Application.Identity.PersonalAccessTokens.Dtos;
+using Moda.Common.Application.Identity.PersonalAccessTokens.Queries;
 using Moda.Web.Api.Extensions;
 using Moda.Web.Api.Models.UserManagement.PersonalAccessTokens;
 
@@ -36,7 +38,7 @@ public class PersonalAccessTokensController : ControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<PersonalAccessTokenDto>> GetById(Guid id, CancellationToken cancellationToken)
     {
-        var result = await _sender.Send(new GetPersonalAccessTokenQuery { TokenId = id }, cancellationToken);
+        var result = await _sender.Send(new GetPersonalAccessTokenQuery(id), cancellationToken);
 
         return result.IsSuccess
             ? Ok(result.Value)
@@ -65,7 +67,7 @@ public class PersonalAccessTokensController : ControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult> Revoke(Guid id, CancellationToken cancellationToken)
     {
-        var result = await _sender.Send(new RevokePersonalAccessTokenCommand { TokenId = id }, cancellationToken);
+        var result = await _sender.Send(new RevokePersonalAccessTokenCommand(id), cancellationToken);
 
         return result.IsSuccess
             ? NoContent()

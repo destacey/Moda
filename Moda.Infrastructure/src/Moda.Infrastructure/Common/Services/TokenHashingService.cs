@@ -8,14 +8,14 @@ namespace Moda.Infrastructure.Common.Services;
 /// </summary>
 public class TokenHashingService : ITokenHashingService
 {
-    private const string TokenPrefix = "moda_pat_";
     private const int TokenBytesLength = 32; // 32 bytes = 256 bits of randomness
     private const int SaltBytesLength = 16; // 16 bytes = 128 bits salt
+    private const int TokenIdentifierLength = 8; // First 8 characters used as identifier
 
     /// <summary>
     /// Generates a cryptographically secure random token.
     /// </summary>
-    /// <returns>A token string in the format: moda_pat_{base64-encoded-random-bytes}</returns>
+    /// <returns>A URL-safe base64-encoded random token.</returns>
     public string GenerateToken()
     {
         byte[] tokenBytes = RandomNumberGenerator.GetBytes(TokenBytesLength);
@@ -24,21 +24,25 @@ public class TokenHashingService : ITokenHashingService
             .Replace("/", "_")
             .TrimEnd('='); // URL-safe base64
 
-        return $"{TokenPrefix}{tokenValue}";
+        return tokenValue;
     }
 
     /// <summary>
     /// Hashes a token for secure storage using SHA256 with a random salt.
-    /// Format: {salt}:{hash}
     /// </summary>
     /// <param name="token">The plain text token to hash.</param>
-    /// <returns>The hashed token with salt.</returns>
-    public string HashToken(string token)
+    /// <returns>A tuple containing the token identifier (first 8 chars) and the hash with salt (format: {salt}:{hash}).</returns>
+    public (string TokenIdentifier, string TokenHash) HashToken(string token)
     {
         if (string.IsNullOrWhiteSpace(token))
         {
             throw new ArgumentException("Token cannot be null or empty.", nameof(token));
         }
+
+        // Extract identifier (first 8 characters)
+        string tokenIdentifier = token.Length >= TokenIdentifierLength
+            ? token.Substring(0, TokenIdentifierLength)
+            : token;
 
         // Generate random salt
         byte[] salt = RandomNumberGenerator.GetBytes(SaltBytesLength);
@@ -46,19 +50,27 @@ public class TokenHashingService : ITokenHashingService
         // Hash the token with the salt
         byte[] hash = HashWithSalt(token, salt);
 
-        // Return salt and hash as base64 strings separated by ':'
-        return $"{Convert.ToBase64String(salt)}:{Convert.ToBase64String(hash)}";
+        // Return tuple with identifier and hash
+        string tokenHash = $"{Convert.ToBase64String(salt)}:{Convert.ToBase64String(hash)}";
+        return (tokenIdentifier, tokenHash);
     }
 
     /// <summary>
     /// Verifies that a plain text token matches a stored hash.
     /// </summary>
     /// <param name="token">The plain text token to verify.</param>
+    /// <param name="tokenIdentifier">The stored token identifier for quick validation.</param>
     /// <param name="hash">The stored hash to verify against (format: {salt}:{hash}).</param>
     /// <returns>True if the token matches the hash, false otherwise.</returns>
-    public bool VerifyToken(string token, string hash)
+    public bool VerifyToken(string token, string tokenIdentifier, string hash)
     {
         if (string.IsNullOrWhiteSpace(token) || string.IsNullOrWhiteSpace(hash))
+        {
+            return false;
+        }
+
+        // Quick check: does the token start with the expected identifier?
+        if (!token.StartsWith(tokenIdentifier, StringComparison.Ordinal))
         {
             return false;
         }

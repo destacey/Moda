@@ -1,7 +1,7 @@
 using Moda.Common.Application.Persistence;
 using Moda.Common.Domain.Identity;
 
-namespace Moda.Common.Application.Identity.PersonalAccessTokens;
+namespace Moda.Common.Application.Identity.PersonalAccessTokens.Commands;
 
 /// <summary>
 /// Command to create a new personal access token.
@@ -92,29 +92,20 @@ public sealed class CreatePersonalAccessTokenCommandValidator : CustomValidator<
     }
 }
 
-internal sealed class CreatePersonalAccessTokenCommandHandler : ICommandHandler<CreatePersonalAccessTokenCommand, CreatePersonalAccessTokenResult>
+internal sealed class CreatePersonalAccessTokenCommandHandler(
+    IModaDbContext dbContext,
+    ICurrentUser currentUser,
+    IDateTimeProvider dateTimeProvider,
+    ITokenHashingService tokenHashingService,
+    ILogger<CreatePersonalAccessTokenCommandHandler> logger) : ICommandHandler<CreatePersonalAccessTokenCommand, CreatePersonalAccessTokenResult>
 {
-    private const int DefaultExpirationDays = 365; // 1 year
+    private const string AppRequestName = nameof(CreatePersonalAccessTokenCommand);
 
-    private readonly IModaDbContext _dbContext;
-    private readonly ICurrentUser _currentUser;
-    private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly ITokenHashingService _tokenHashingService;
-    private readonly ILogger<CreatePersonalAccessTokenCommandHandler> _logger;
-
-    public CreatePersonalAccessTokenCommandHandler(
-        IModaDbContext dbContext,
-        ICurrentUser currentUser,
-        IDateTimeProvider dateTimeProvider,
-        ITokenHashingService tokenHashingService,
-        ILogger<CreatePersonalAccessTokenCommandHandler> logger)
-    {
-        _dbContext = dbContext;
-        _currentUser = currentUser;
-        _dateTimeProvider = dateTimeProvider;
-        _tokenHashingService = tokenHashingService;
-        _logger = logger;
-    }
+    private readonly IModaDbContext _dbContext = dbContext;
+    private readonly ICurrentUser _currentUser = currentUser;
+    private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
+    private readonly ITokenHashingService _tokenHashingService = tokenHashingService;
+    private readonly ILogger<CreatePersonalAccessTokenCommandHandler> _logger = logger;
 
     public async Task<Result<CreatePersonalAccessTokenResult>> Handle(CreatePersonalAccessTokenCommand request, CancellationToken cancellationToken)
     {
@@ -126,11 +117,11 @@ internal sealed class CreatePersonalAccessTokenCommandHandler : ICommandHandler<
 
             // Generate the token
             var plaintextToken = _tokenHashingService.GenerateToken();
-            var tokenHash = _tokenHashingService.HashToken(plaintextToken);
+            var (tokenIdentifier, tokenHash) = _tokenHashingService.HashToken(plaintextToken);
 
-            // Create the domain entity
             var tokenResult = PersonalAccessToken.Create(
                 name: request.Name,
+                tokenIdentifier: tokenIdentifier,
                 tokenHash: tokenHash,
                 userId: userId,
                 employeeId: employeeId,
@@ -146,7 +137,6 @@ internal sealed class CreatePersonalAccessTokenCommandHandler : ICommandHandler<
 
             var token = tokenResult.Value;
 
-            // Save to database
             await _dbContext.PersonalAccessTokens.AddAsync(token, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
 
@@ -165,9 +155,8 @@ internal sealed class CreatePersonalAccessTokenCommandHandler : ICommandHandler<
         }
         catch (Exception ex)
         {
-            var requestName = request.GetType().Name;
-            _logger.LogError(ex, "Moda Request: Exception for Request {Name} {@Request}", requestName, request);
-            return Result.Failure<CreatePersonalAccessTokenResult>($"Failed to create personal access token: {ex.Message}");
+            _logger.LogError(ex, "Exception handling {CommandName} command for request {@Request}.", AppRequestName, request);
+            return Result.Failure<CreatePersonalAccessTokenResult>($"Error handling {AppRequestName} command.");
         }
     }
 }

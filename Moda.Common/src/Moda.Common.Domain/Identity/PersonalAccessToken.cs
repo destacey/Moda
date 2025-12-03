@@ -11,6 +11,7 @@ namespace Moda.Common.Domain.Identity;
 public sealed class PersonalAccessToken : BaseEntity<Guid>, ISystemAuditable
 {
     private string _name = null!;
+    private string _tokenIdentifier = null!;
     private string _tokenHash = null!;
     private string _userId = null!;
 
@@ -18,6 +19,7 @@ public sealed class PersonalAccessToken : BaseEntity<Guid>, ISystemAuditable
 
     private PersonalAccessToken(
         string name,
+        string tokenIdentifier,
         string tokenHash,
         string userId,
         Guid? employeeId,
@@ -25,6 +27,7 @@ public sealed class PersonalAccessToken : BaseEntity<Guid>, ISystemAuditable
         Instant timestamp)
     {
         Name = name;
+        TokenIdentifier = tokenIdentifier;
         TokenHash = tokenHash;
         UserId = userId;
         EmployeeId = employeeId;
@@ -41,6 +44,15 @@ public sealed class PersonalAccessToken : BaseEntity<Guid>, ISystemAuditable
     {
         get => _name;
         private set => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
+    }
+
+    /// <summary>
+    /// Gets the token identifier (first 8 characters). Used for efficient database lookups.
+    /// </summary>
+    public string TokenIdentifier
+    {
+        get => _tokenIdentifier;
+        private set => _tokenIdentifier = Guard.Against.NullOrWhiteSpace(value, nameof(TokenIdentifier));
     }
 
     /// <summary>
@@ -188,6 +200,7 @@ public sealed class PersonalAccessToken : BaseEntity<Guid>, ISystemAuditable
     /// Creates a new personal access token.
     /// </summary>
     /// <param name="name">User-friendly name for the token.</param>
+    /// <param name="tokenIdentifier">The token identifier (first 8 characters).</param>
     /// <param name="tokenHash">The hashed token value.</param>
     /// <param name="userId">The ID of the user who owns this token.</param>
     /// <param name="employeeId">Optional employee ID.</param>
@@ -197,6 +210,7 @@ public sealed class PersonalAccessToken : BaseEntity<Guid>, ISystemAuditable
     /// <returns>A Result containing the new PersonalAccessToken or an error.</returns>
     public static Result<PersonalAccessToken> Create(
         string name,
+        string tokenIdentifier,
         string tokenHash,
         string userId,
         Guid? employeeId,
@@ -211,7 +225,7 @@ public sealed class PersonalAccessToken : BaseEntity<Guid>, ISystemAuditable
                 return Result.Failure<PersonalAccessToken>("Expiration date must be in the future.");
             }
 
-            var token = new PersonalAccessToken(name, tokenHash, userId, employeeId, expiresAt, timestamp)
+            var token = new PersonalAccessToken(name, tokenIdentifier, tokenHash, userId, employeeId, expiresAt, timestamp)
             {
                 Scopes = scopes
             };

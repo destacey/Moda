@@ -1,6 +1,6 @@
 using Moda.Common.Application.Persistence;
 
-namespace Moda.Common.Application.Identity.PersonalAccessTokens;
+namespace Moda.Common.Application.Identity.PersonalAccessTokens.Commands;
 
 /// <summary>
 /// Command to permanently delete a personal access token.
@@ -10,27 +10,12 @@ public sealed record DeletePersonalAccessTokenCommand(Guid TokenId) : ICommand;
 
 public sealed class DeletePersonalAccessTokenCommandValidator : CustomValidator<DeletePersonalAccessTokenCommand>
 {
-    private readonly IModaDbContext _dbContext;
-    private readonly ICurrentUser _currentUser;
-
-    public DeletePersonalAccessTokenCommandValidator(IModaDbContext dbContext, ICurrentUser currentUser)
+    public DeletePersonalAccessTokenCommandValidator()
     {
-        _dbContext = dbContext;
-        _currentUser = currentUser;
-
         RuleLevelCascadeMode = CascadeMode.Stop;
 
         RuleFor(x => x.TokenId)
-            .NotEmpty()
-            .MustAsync(TokenExistsAndBelongsToUser)
-                .WithMessage("Token not found or you do not have permission to delete it.");
-    }
-
-    private async Task<bool> TokenExistsAndBelongsToUser(Guid tokenId, CancellationToken cancellationToken)
-    {
-        var userId = _currentUser.GetUserId().ToString();
-        return await _dbContext.PersonalAccessTokens
-            .AnyAsync(t => t.Id == tokenId && t.UserId == userId, cancellationToken);
+            .NotEmpty();
     }
 }
 
@@ -39,6 +24,8 @@ internal sealed class DeletePersonalAccessTokenCommandHandler(
     ICurrentUser currentUser,
     ILogger<DeletePersonalAccessTokenCommandHandler> logger) : ICommandHandler<DeletePersonalAccessTokenCommand>
 {
+    private const string AppRequestName = nameof(DeletePersonalAccessTokenCommand);
+
     private readonly IModaDbContext _dbContext = dbContext;
     private readonly ICurrentUser _currentUser = currentUser;
     private readonly ILogger<DeletePersonalAccessTokenCommandHandler> _logger = logger;
@@ -54,6 +41,9 @@ internal sealed class DeletePersonalAccessTokenCommandHandler(
 
             if (token == null)
             {
+                _logger.LogWarning(
+                    "Attempt to delete personal access token failed. Token not found or no permission. UserId: {UserId}, TokenId: {TokenId}",
+                    userIdString, request.TokenId);
                 return Result.Failure("Token not found or you do not have permission to delete it.");
             }
 
@@ -68,9 +58,8 @@ internal sealed class DeletePersonalAccessTokenCommandHandler(
         }
         catch (Exception ex)
         {
-            var requestName = request.GetType().Name;
-            _logger.LogError(ex, "Moda Request: Exception for Request {Name} {@Request}", requestName, request);
-            return Result.Failure($"Failed to delete personal access token: {ex.Message}");
+            _logger.LogError(ex, "Exception handling {CommandName} command for request {@Request}.", AppRequestName, request);
+            return Result.Failure<CreatePersonalAccessTokenResult>($"Error handling {AppRequestName} command.");
         }
     }
 }

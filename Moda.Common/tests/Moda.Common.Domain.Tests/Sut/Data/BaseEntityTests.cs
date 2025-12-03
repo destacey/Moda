@@ -98,6 +98,7 @@ public sealed class BaseEntityTests
 
         // Assert
         entity.PostPersistenceActions.Should().BeEmpty();
+        executed.Should().BeFalse();
     }
 
     [Fact]

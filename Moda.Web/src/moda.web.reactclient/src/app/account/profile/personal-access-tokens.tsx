@@ -1,15 +1,7 @@
 'use client'
 
-import React, { useState, useMemo, useCallback, FC } from 'react'
-import {
-  Button,
-  Space,
-  Tag,
-  Popconfirm,
-  Alert,
-  message as antdMessage,
-  Flex,
-} from 'antd'
+import { useState, useMemo, useCallback, FC } from 'react'
+import { Button, Space, Tag, Popconfirm, Alert, Flex, Typography } from 'antd'
 import { PlusOutlined, DeleteOutlined, StopOutlined } from '@ant-design/icons'
 import {
   useGetMyPersonalAccessTokensQuery,
@@ -26,6 +18,8 @@ import {
   PersonalAccessTokenCreatedModal,
 } from './_components'
 import { useMessage } from '@/src/components/contexts/messaging'
+
+const { Text } = Typography
 
 // Custom cell renderers
 const StatusCellRenderer = (
@@ -202,13 +196,18 @@ const PersonalAccessTokens: FC = () => {
 
   return (
     <Flex vertical gap={16}>
-      <Space direction="vertical">
+      <Space direction="vertical" size={16}>
         <Alert
           message="Personal Access Tokens (PATs)"
           description="Personal access tokens function like passwords for API authentication. Keep them secure and never share them."
           type="info"
           showIcon
         />
+
+        <Text type="secondary">
+          Use this token in the <code>x-api-key</code> header when making API
+          requests.
+        </Text>
         <Button
           type="primary"
           icon={<PlusOutlined />}

@@ -1,15 +1,13 @@
 using Mapster;
+using Moda.Common.Application.Identity.PersonalAccessTokens.Dtos;
 using Moda.Common.Application.Persistence;
 
-namespace Moda.Common.Application.Identity.PersonalAccessTokens;
+namespace Moda.Common.Application.Identity.PersonalAccessTokens.Queries;
 
 /// <summary>
 /// Query to get a single personal access token by ID.
 /// </summary>
-public sealed record GetPersonalAccessTokenQuery : IQuery<Result<PersonalAccessTokenDto>>
-{
-    public Guid TokenId { get; init; }
-}
+public sealed record GetPersonalAccessTokenQuery(Guid TokenId) : IQuery<Result<PersonalAccessTokenDto>>;
 
 public sealed class GetPersonalAccessTokenQueryValidator : CustomValidator<GetPersonalAccessTokenQuery>
 {
@@ -20,16 +18,10 @@ public sealed class GetPersonalAccessTokenQueryValidator : CustomValidator<GetPe
     }
 }
 
-internal sealed class GetPersonalAccessTokenQueryHandler : IQueryHandler<GetPersonalAccessTokenQuery, Result<PersonalAccessTokenDto>>
+internal sealed class GetPersonalAccessTokenQueryHandler(IModaDbContext dbContext, ICurrentUser currentUser) : IQueryHandler<GetPersonalAccessTokenQuery, Result<PersonalAccessTokenDto>>
 {
-    private readonly IModaDbContext _dbContext;
-    private readonly ICurrentUser _currentUser;
-
-    public GetPersonalAccessTokenQueryHandler(IModaDbContext dbContext, ICurrentUser currentUser)
-    {
-        _dbContext = dbContext;
-        _currentUser = currentUser;
-    }
+    private readonly IModaDbContext _dbContext = dbContext;
+    private readonly ICurrentUser _currentUser = currentUser;
 
     public async Task<Result<PersonalAccessTokenDto>> Handle(GetPersonalAccessTokenQuery request, CancellationToken cancellationToken)
     {

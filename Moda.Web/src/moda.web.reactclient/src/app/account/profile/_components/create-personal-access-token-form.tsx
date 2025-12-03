@@ -135,7 +135,7 @@ const CreatePersonalAccessTokenForm = ({
         <Item
           name="expiresAt"
           label="Expiration Date"
-          help="Default: 1 year from now. Maximum: 2 years from now."
+          help="Maximum: 2 years from now."
           rules={[
             {
               required: true,
