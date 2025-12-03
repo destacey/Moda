@@ -1,25 +1,34 @@
 using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
 
 namespace Moda.Infrastructure.Auth;
 
 public class CurrentUser : ICurrentUser, ICurrentUserInitializer
 {
+    private readonly IHttpContextAccessor _httpContextAccessor;
     private ClaimsPrincipal? _user;
-
-    public string? Name => _user?.Identity?.Name;
-
     private Guid _userId = Guid.Empty;
+
+    public CurrentUser(IHttpContextAccessor httpContextAccessor)
+    {
+        _httpContextAccessor = httpContextAccessor;
+    }
+
+    // Lazily access user from HttpContext when available, otherwise use _user set via SetCurrentUser
+    private ClaimsPrincipal? User => _user ?? _httpContextAccessor.HttpContext?.User;
+
+    public string? Name => User?.Identity?.Name;
 
     public Guid GetUserId() =>
         IsAuthenticated()
-            ? Guid.Parse(_user?.GetUserId() ?? Guid.Empty.ToString())
+            ? Guid.Parse(User?.GetUserId() ?? Guid.Empty.ToString())
             : _userId;
 
     public Guid? GetEmployeeId()
     {
         if (IsAuthenticated())
         {
-            var employeeId = _user?.GetEmployeeId();
+            var employeeId = User?.GetEmployeeId();
             if (Guid.TryParse(employeeId, out var employeeGuid))
                 return employeeGuid;
         }
@@ -29,20 +38,20 @@ public class CurrentUser : ICurrentUser, ICurrentUserInitializer
 
     public string? GetUserEmail() =>
         IsAuthenticated()
-            ? _user!.GetEmail()
+            ? User!.GetEmail()
             : string.Empty;
 
     public bool IsAuthenticated() =>
-        _user?.Identity?.IsAuthenticated is true;
+        User?.Identity?.IsAuthenticated is true;
 
     public bool IsInRole(string role) =>
-        _user?.IsInRole(role) is true;
+        User?.IsInRole(role) is true;
 
     public bool HasClaim(string type, string value) =>
-        _user?.HasClaim(type, value) is true;
+        User?.HasClaim(type, value) is true;
 
     public IEnumerable<Claim>? GetUserClaims() =>
-        _user?.Claims;
+        User?.Claims;
 
     public void SetCurrentUser(ClaimsPrincipal user)
     {

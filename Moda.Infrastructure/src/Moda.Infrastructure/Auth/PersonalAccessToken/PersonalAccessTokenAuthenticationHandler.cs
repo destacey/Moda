@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Serilog;
 
 namespace Moda.Infrastructure.Auth.PersonalAccessToken;
 
@@ -19,7 +18,7 @@ public class PersonalAccessTokenAuthenticationHandler : AuthenticationHandler<Au
     private readonly ModaDbContext _dbContext;
     private readonly ITokenHashingService _tokenHashingService;
     private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly Serilog.ILogger _logger;
+    private readonly ILogger<PersonalAccessTokenAuthenticationHandler> _logger;
 
     public PersonalAccessTokenAuthenticationHandler(
         IOptionsMonitor<AuthenticationSchemeOptions> options,
@@ -33,7 +32,8 @@ public class PersonalAccessTokenAuthenticationHandler : AuthenticationHandler<Au
         _dbContext = dbContext;
         _tokenHashingService = tokenHashingService;
         _dateTimeProvider = dateTimeProvider;
-        _logger = Log.ForContext<PersonalAccessTokenAuthenticationHandler>();
+        _logger = loggerFactory.CreateLogger<PersonalAccessTokenAuthenticationHandler>();
+
     }
 
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
@@ -73,7 +73,7 @@ public class PersonalAccessTokenAuthenticationHandler : AuthenticationHandler<Au
 
             if (matchingToken == null)
             {
-                _logger.Warning("Personal access token not found or invalid");
+                _logger.LogWarning("Personal access token not found or invalid");
                 return AuthenticateResult.Fail("Invalid or expired token.");
             }
 
@@ -81,7 +81,7 @@ public class PersonalAccessTokenAuthenticationHandler : AuthenticationHandler<Au
             var validationResult = matchingToken.ValidateForUse(now);
             if (validationResult.IsFailure)
             {
-                _logger.Warning("Personal access token validation failed: {Error}", validationResult.Error);
+                _logger.LogWarning("Personal access token validation failed: {Error}", validationResult.Error);
                 return AuthenticateResult.Fail(validationResult.Error);
             }
 
@@ -92,7 +92,7 @@ public class PersonalAccessTokenAuthenticationHandler : AuthenticationHandler<Au
 
             if (user == null || !user.IsActive)
             {
-                _logger.Warning("User not found or inactive for token. UserId: {UserId}", matchingToken.UserId);
+                _logger.LogWarning("User not found or inactive for token. UserId: {UserId}", matchingToken.UserId);
                 return AuthenticateResult.Fail("User not found or inactive.");
             }
 
@@ -106,7 +106,7 @@ public class PersonalAccessTokenAuthenticationHandler : AuthenticationHandler<Au
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error(ex, "Failed to update last used timestamp for token {TokenId}", matchingToken.Id);
+                    _logger.LogError(ex, "Failed to update last used timestamp for token {TokenId}", matchingToken.Id);
                 }
             });
 
@@ -137,15 +137,18 @@ public class PersonalAccessTokenAuthenticationHandler : AuthenticationHandler<Au
             var principal = new ClaimsPrincipal(identity);
             var ticket = new AuthenticationTicket(principal, Scheme.Name);
 
-            _logger.Information(
-                "Personal access token authentication succeeded. UserId: {UserId}, UserEmail: {UserEmail}, TokenId: {TokenId}, TokenName: {TokenName}",
-                user.Id, user.Email, matchingToken.Id, matchingToken.Name);
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _logger.LogDebug(
+                    "Personal access token authentication succeeded. UserId: {UserId}, UserEmail: {UserEmail}, TokenId: {TokenId}, TokenName: {TokenName}",
+                    user.Id, user.Email, matchingToken.Id, matchingToken.Name);
+            }
 
             return AuthenticateResult.Success(ticket);
         }
         catch (Exception ex)
         {
-            _logger.Error(ex, "Exception during personal access token authentication");
+            _logger.LogError(ex, "Exception during personal access token authentication");
             return AuthenticateResult.Fail($"Authentication failed: {ex.Message}");
         }
     }

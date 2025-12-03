@@ -89,7 +89,6 @@ public static class ConfigureServices
             .UseRouting()
             .UseCorsPolicy()
             .UseAuthentication()
-            .UseCurrentUser()
             .UseAuthorization()
             .UseRequestLogging(config) // TODO: we currently don't log 403 logs because it is lower in the middleware pipeline. It should be above UseRouting, but then we don't get user information.
             .UseHangfireDashboard(config)

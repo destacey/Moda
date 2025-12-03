@@ -37,12 +37,9 @@ internal static class ConfigureServices
         return services;
     }
 
-    internal static IApplicationBuilder UseCurrentUser(this IApplicationBuilder app) =>
-        app.UseMiddleware<CurrentUserMiddleware>();
-
     private static IServiceCollection AddCurrentUser(this IServiceCollection services) =>
         services
-            .AddScoped<CurrentUserMiddleware>()
+            .AddHttpContextAccessor()
             .AddScoped<ICurrentUser, CurrentUser>()
             .AddScoped(sp => (ICurrentUserInitializer)sp.GetRequiredService<ICurrentUser>());
 
