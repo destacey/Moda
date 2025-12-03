@@ -2,6 +2,7 @@ using System.Security.Claims;
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -18,6 +19,7 @@ public class PersonalAccessTokenAuthenticationHandler : AuthenticationHandler<Au
     private readonly ModaDbContext _dbContext;
     private readonly ITokenHashingService _tokenHashingService;
     private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly IServiceProvider _serviceProvider;
     private readonly ILogger<PersonalAccessTokenAuthenticationHandler> _logger;
 
     public PersonalAccessTokenAuthenticationHandler(
@@ -26,12 +28,14 @@ public class PersonalAccessTokenAuthenticationHandler : AuthenticationHandler<Au
         UrlEncoder encoder,
         ModaDbContext dbContext,
         ITokenHashingService tokenHashingService,
-        IDateTimeProvider dateTimeProvider)
+        IDateTimeProvider dateTimeProvider,
+        IServiceProvider serviceProvider)
         : base(options, loggerFactory, encoder)
     {
         _dbContext = dbContext;
         _tokenHashingService = tokenHashingService;
         _dateTimeProvider = dateTimeProvider;
+        _serviceProvider = serviceProvider;
         _logger = loggerFactory.CreateLogger<PersonalAccessTokenAuthenticationHandler>();
 
     }
@@ -96,19 +100,38 @@ public class PersonalAccessTokenAuthenticationHandler : AuthenticationHandler<Au
                 return AuthenticateResult.Fail("User not found or inactive.");
             }
 
-            // Update last used timestamp (async, don't wait)
-            _ = Task.Run(async () =>
+            // Update last used timestamp only if it's been more than 1 hour since last use
+            // This reduces database writes by ~99% while still providing useful tracking
+            var hoursSinceLastUse = matchingToken.LastUsedAt.HasValue
+                ? (now - matchingToken.LastUsedAt.Value).TotalHours
+                : double.MaxValue;
+
+            if (hoursSinceLastUse >= 1.0)
             {
-                try
+                // Use a separate scoped DbContext for the background update to avoid tracking conflicts
+                _ = Task.Run(async () =>
                 {
-                    matchingToken.UpdateLastUsed(_dateTimeProvider.Now);
-                    await _dbContext.SaveChangesAsync();
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Failed to update last used timestamp for token {TokenId}", matchingToken.Id);
-                }
-            });
+                    try
+                    {
+                        using var scope = _serviceProvider.CreateScope();
+                        var dbContext = scope.ServiceProvider.GetRequiredService<ModaDbContext>();
+                        var dateTimeProvider = scope.ServiceProvider.GetRequiredService<IDateTimeProvider>();
+
+                        var token = await dbContext.PersonalAccessTokens
+                            .FirstOrDefaultAsync(t => t.Id == matchingToken.Id);
+
+                        if (token != null)
+                        {
+                            token.UpdateLastUsed(dateTimeProvider.Now);
+                            await dbContext.SaveChangesAsync();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Failed to update last used timestamp for token {TokenId}", matchingToken.Id);
+                    }
+                });
+            }
 
             // Build claims principal
             var claims = new List<Claim>
