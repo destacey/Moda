@@ -167,6 +167,8 @@ const PersonalAccessTokens: FC = () => {
         headerName: 'Last Used',
         cellRenderer: DateTimeCellRenderer,
         width: 180,
+        headerTooltip:
+          'The last time this token was used for authentication. Updates at most once per hour.',
       },
       {
         headerName: 'Actions',
