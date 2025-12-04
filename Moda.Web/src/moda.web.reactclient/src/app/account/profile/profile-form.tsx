@@ -5,13 +5,11 @@ const { Item } = Descriptions
 
 const ProfileForm = (profile: UserDetailsDto) => {
   return (
-    <>
-      <Descriptions>
-        <Item label="First Name">{profile?.firstName}</Item>
-        <Item label="Last Name">{profile?.lastName}</Item>
-        <Item label="Email">{profile?.email}</Item>
-      </Descriptions>
-    </>
+    <Descriptions column={1} size="small">
+      <Item label="First Name">{profile?.firstName}</Item>
+      <Item label="Last Name">{profile?.lastName}</Item>
+      <Item label="Email">{profile?.email}</Item>
+    </Descriptions>
   )
 }
 

@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moda.Infrastructure.Auth.AzureAd;
 using Moda.Infrastructure.Auth.Permissions;
+using Moda.Infrastructure.Auth.PersonalAccessToken;
 
 namespace Moda.Infrastructure.Auth;
 
@@ -17,15 +18,28 @@ internal static class ConfigureServices
 
             // Must add identity before adding auth!
             .AddIdentity()
-            .AddAzureAdAuth(config);
+            .AddAzureAdAuth(config)
+            .AddPersonalAccessTokenAuth()
+            .AddAuthorizationPolicies();
     }
 
-    internal static IApplicationBuilder UseCurrentUser(this IApplicationBuilder app) =>
-        app.UseMiddleware<CurrentUserMiddleware>();
+    private static IServiceCollection AddAuthorizationPolicies(this IServiceCollection services)
+    {
+        services.AddAuthorization(options =>
+        {
+            // Default policy that accepts both JWT and PAT authentication
+            options.DefaultPolicy = new AuthorizationPolicyBuilder()
+                .AddAuthenticationSchemes(Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme, "PersonalAccessToken")
+                .RequireAuthenticatedUser()
+                .Build();
+        });
+
+        return services;
+    }
 
     private static IServiceCollection AddCurrentUser(this IServiceCollection services) =>
         services
-            .AddScoped<CurrentUserMiddleware>()
+            .AddHttpContextAccessor()
             .AddScoped<ICurrentUser, CurrentUser>()
             .AddScoped(sp => (ICurrentUserInitializer)sp.GetRequiredService<ICurrentUser>());
 

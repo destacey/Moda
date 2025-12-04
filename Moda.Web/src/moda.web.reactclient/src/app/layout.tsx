@@ -6,7 +6,7 @@ import '@ant-design/v5-patch-for-react-19'
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community'
 import { Provider } from 'react-redux'
 import { Inter } from 'next/font/google'
-import { Grid, Layout } from 'antd'
+import { App, Grid, Layout } from 'antd'
 import { store } from '../store'
 import AppHeader from './_components/app-header'
 import AppSideNav from './_components/menu/app-side-nav'
@@ -61,9 +61,11 @@ const RootLayout = ({ children }: React.PropsWithChildren) => {
                 <AuthenticatedTemplate>
                   <ThemeProvider>
                     <MenuToggleProvider>
-                      <MessageProvider>
-                        <AppContent>{children}</AppContent>
-                      </MessageProvider>
+                      <App>
+                        <MessageProvider>
+                          <AppContent>{children}</AppContent>
+                        </MessageProvider>
+                      </App>
                     </MenuToggleProvider>
                   </ThemeProvider>
                 </AuthenticatedTemplate>

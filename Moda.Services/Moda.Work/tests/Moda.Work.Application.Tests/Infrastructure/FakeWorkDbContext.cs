@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Moda.Common.Domain.Employees;
+using Moda.Common.Domain.Identity;
 using Moda.Tests.Shared.Infrastructure;
 using Moda.Work.Application.Persistence;
 using Moda.Work.Domain.Models;
@@ -32,6 +33,7 @@ public class FakeWorkDbContext : IWorkDbContext, IDisposable
     // Common domain entities
     private readonly List<Employee> _employees = [];
     private readonly List<ExternalEmployeeBlacklistItem> _externalEmployeeBlacklistItems = [];
+    private readonly List<PersonalAccessToken> _personalAccessTokens = [];
 
     // DbSet properties
     public DbSet<Workspace> Workspaces => _workspaces.AsDbSet();
@@ -49,6 +51,7 @@ public class FakeWorkDbContext : IWorkDbContext, IDisposable
     public DbSet<WorkItemDependency> WorkItemDependencies => _workItemDependencies.AsDbSet();
     public DbSet<Employee> Employees => _employees.AsDbSet();
     public DbSet<ExternalEmployeeBlacklistItem> ExternalEmployeeBlacklistItems => _externalEmployeeBlacklistItems.AsDbSet();
+    public DbSet<PersonalAccessToken> PersonalAccessTokens => _personalAccessTokens.AsDbSet();
 
     // ChangeTracker - we can't create a real one, so we return null and the handler uses defensive coding (_workDbContext.ChangeTracker?.Clear())
     public ChangeTracker ChangeTracker => null!;
@@ -66,10 +69,11 @@ public class FakeWorkDbContext : IWorkDbContext, IDisposable
         SaveChangesCallCount++;
         
         // Return the total number of entities as a simple success indicator
-        var count = _workspaces.Count + _workProcesses.Count + _workItems.Count + 
+        var count = _workspaces.Count + _workProcesses.Count + _workItems.Count +
                     _workTypes.Count + _workStatuses.Count + _workflows.Count +
                     _workTypeHierarchies.Count + _workTeams.Count + _workProjects.Count +
-                    _workIterations.Count + _employees.Count;
+                    _workIterations.Count + _employees.Count + _externalEmployeeBlacklistItems.Count +
+                    _personalAccessTokens.Count;
         return Task.FromResult(count);
     }
 
@@ -153,6 +157,7 @@ public class FakeWorkDbContext : IWorkDbContext, IDisposable
         _workItemDependencies.Clear();
         _employees.Clear();
         _externalEmployeeBlacklistItems.Clear();
+        _personalAccessTokens.Clear();
         SaveChangesCallCount = 0;
     }
 

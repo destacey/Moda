@@ -15,7 +15,6 @@ internal static class ConfigureServices
         var logger = Log.ForContext(typeof(AzureAdJwtBearerEvents));
 
         services
-            .AddAuthorization()
             .AddAuthentication(authentication =>
             {
                 authentication.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

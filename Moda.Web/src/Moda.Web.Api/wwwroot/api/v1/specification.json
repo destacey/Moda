@@ -21,6 +21,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -60,6 +63,362 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/user-management/personal-access-tokens": {
+      "get": {
+        "tags": [
+          "PersonalAccessTokens"
+        ],
+        "summary": "Get all personal access tokens for the current user.",
+        "operationId": "PersonalAccessTokens_GetMyTokens",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PersonalAccessTokenDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "PersonalAccessTokens"
+        ],
+        "summary": "Create a new personal access token.",
+        "description": "Returns the plaintext token - this is the ONLY time it will be visible!",
+        "operationId": "PersonalAccessTokens_Create",
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePersonalAccessTokenRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreatePersonalAccessTokenResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/user-management/personal-access-tokens/{id}": {
+      "get": {
+        "tags": [
+          "PersonalAccessTokens"
+        ],
+        "summary": "Get a personal access token by ID.",
+        "operationId": "PersonalAccessTokens_GetById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonalAccessTokenDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "PersonalAccessTokens"
+        ],
+        "summary": "Update a personal access token's name and/or expiration date.",
+        "operationId": "PersonalAccessTokens_Update",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePersonalAccessTokenRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "PersonalAccessTokens"
+        ],
+        "summary": "Permanently delete a personal access token.",
+        "description": "This removes the token from the database entirely.",
+        "operationId": "PersonalAccessTokens_Delete",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/user-management/personal-access-tokens/{id}/revoke": {
+      "put": {
+        "tags": [
+          "PersonalAccessTokens"
+        ],
+        "summary": "Revoke a personal access token.",
+        "description": "Revoked tokens are kept for audit purposes.",
+        "operationId": "PersonalAccessTokens_Revoke",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -96,6 +455,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -145,6 +507,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -184,6 +549,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -220,6 +588,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -259,6 +630,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -298,6 +672,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -344,6 +721,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -401,6 +781,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -449,6 +832,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -506,6 +892,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -556,6 +945,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -595,6 +987,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -652,6 +1047,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -721,6 +1119,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -781,6 +1182,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -833,6 +1237,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -884,6 +1291,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -930,6 +1340,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -977,6 +1390,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -1042,6 +1458,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -1083,6 +1502,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -1136,6 +1558,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -1189,6 +1614,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -1239,6 +1667,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -1278,6 +1709,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -1329,6 +1763,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -1375,6 +1812,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -1422,6 +1862,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -1487,6 +1930,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -1528,6 +1974,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -1567,6 +2016,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -1618,6 +2070,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -1664,6 +2119,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -1711,6 +2169,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -1776,6 +2237,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -1817,6 +2281,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -1870,6 +2337,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -1923,6 +2393,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -1962,6 +2435,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -2001,6 +2477,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -2048,6 +2527,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -2096,6 +2578,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -2157,6 +2642,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -2196,6 +2684,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -2247,6 +2738,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -2298,6 +2792,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -2348,6 +2845,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -2399,6 +2899,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -2445,6 +2948,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -2492,6 +2998,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -2557,6 +3066,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -2598,6 +3110,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -2651,6 +3166,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -2704,6 +3222,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -2757,6 +3278,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -2817,6 +3341,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -2867,6 +3394,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -2927,6 +3457,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -2966,6 +3499,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -3017,6 +3553,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -3063,6 +3602,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -3110,6 +3652,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -3175,6 +3720,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -3216,6 +3764,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -3269,6 +3820,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -3322,6 +3876,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -3375,6 +3932,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -3435,6 +3995,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -3486,6 +4049,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -3532,6 +4098,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -3579,6 +4148,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -3644,6 +4216,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -3685,6 +4260,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -3750,6 +4328,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -3803,6 +4384,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -3856,6 +4440,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -3909,6 +4496,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -3972,6 +4562,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -4023,6 +4616,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -4069,6 +4665,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -4116,6 +4715,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -4181,6 +4783,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -4222,6 +4827,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -4275,6 +4883,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -4328,6 +4939,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -4381,6 +4995,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -4434,6 +5051,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -4484,6 +5104,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -4544,6 +5167,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -4600,6 +5226,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -4675,6 +5304,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -4738,6 +5370,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -4815,6 +5450,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -4854,6 +5492,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -4893,6 +5534,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -4943,6 +5587,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -5008,6 +5655,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -5047,6 +5697,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -5093,6 +5746,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -5140,6 +5796,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -5197,6 +5856,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -5254,6 +5916,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -5319,6 +5984,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -5369,6 +6037,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -5430,6 +6101,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -5485,6 +6159,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -5540,6 +6217,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -5590,6 +6270,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -5629,6 +6312,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -5690,6 +6376,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -5756,6 +6445,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -5838,6 +6530,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -5925,6 +6620,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -5978,6 +6676,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -6053,6 +6754,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -6114,6 +6818,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -6180,6 +6887,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -6249,6 +6959,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -6336,6 +7049,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -6424,6 +7140,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -6463,6 +7182,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -6533,6 +7255,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -6583,6 +7308,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -6629,6 +7357,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -6676,6 +7407,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -6715,6 +7449,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -6780,6 +7517,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -6854,6 +7594,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -6893,6 +7636,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -6932,6 +7678,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -6971,6 +7720,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -7010,6 +7762,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -7056,6 +7811,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -7103,6 +7861,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -7168,6 +7929,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -7209,6 +7973,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -7259,6 +8026,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -7309,6 +8079,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -7368,6 +8141,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -7430,6 +8206,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -7507,6 +8286,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -7560,6 +8342,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -7637,6 +8422,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -7704,6 +8492,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -7743,6 +8534,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -7795,6 +8589,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -7842,6 +8639,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -7892,6 +8692,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -7931,6 +8734,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -7981,6 +8787,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -8038,6 +8847,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -8081,6 +8893,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -8124,6 +8939,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -8187,6 +9005,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -8237,6 +9058,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -8294,6 +9118,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -8349,6 +9176,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -8399,6 +9229,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -8465,6 +9298,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -8531,6 +9367,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -8598,6 +9437,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -8657,6 +9499,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -8726,6 +9571,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -8785,6 +9633,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -8844,6 +9695,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -8883,6 +9737,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -8933,6 +9790,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -8980,6 +9840,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -9038,6 +9901,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -9099,6 +9965,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -9138,6 +10007,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -9185,6 +10057,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -9243,6 +10118,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -9304,6 +10182,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -9355,6 +10236,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -9405,6 +10289,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -9452,6 +10339,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -9510,6 +10400,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -9571,6 +10464,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -9610,6 +10506,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -9660,6 +10559,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -9706,6 +10608,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -9753,6 +10658,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -9808,6 +10716,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -9861,6 +10772,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -9904,6 +10818,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -9954,6 +10871,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -10001,6 +10921,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -10049,6 +10972,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -10112,6 +11038,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -10177,6 +11106,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -10230,6 +11162,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -10293,6 +11228,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -10370,6 +11308,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -10423,6 +11364,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -10473,6 +11417,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -10557,6 +11504,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -10620,6 +11570,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -10692,6 +11645,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -10775,6 +11731,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -10844,6 +11803,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -10921,6 +11883,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -10974,6 +11939,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -11024,6 +11992,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -11062,6 +12033,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -11112,6 +12086,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -11159,6 +12136,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -11207,6 +12187,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -11270,6 +12253,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -11335,6 +12321,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -11388,6 +12377,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -11451,6 +12443,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -11528,6 +12523,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -11581,6 +12579,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -11653,6 +12654,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -11736,6 +12740,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -11805,6 +12812,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -11882,6 +12892,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -11935,6 +12948,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -11985,6 +13001,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -12055,6 +13074,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -12096,6 +13118,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -12147,6 +13172,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -12197,6 +13225,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -12267,6 +13298,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -12330,6 +13364,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -12381,6 +13418,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -12420,6 +13460,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -12470,6 +13513,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -12519,6 +13565,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -12579,6 +13628,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -12642,6 +13694,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -12683,6 +13738,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -12744,6 +13802,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -12808,6 +13869,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       },
@@ -12861,6 +13925,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -12902,6 +13969,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -12945,6 +14015,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -13010,6 +14083,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -13075,6 +14151,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -13114,6 +14193,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -13153,6 +14235,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -13192,6 +14277,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -13232,6 +14320,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -13273,6 +14364,9 @@
         "security": [
           {
             "Bearer": []
+          },
+          {
+            "ApiKey": []
           }
         ]
       }
@@ -13338,6 +14432,152 @@
           "instance": {
             "type": "string",
             "nullable": true
+          }
+        }
+      },
+      "PersonalAccessTokenDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "expiresAt",
+          "isActive",
+          "isExpired",
+          "isRevoked"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "name": {
+            "type": "string"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "lastUsedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "revokedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "isExpired": {
+            "type": "boolean"
+          },
+          "isRevoked": {
+            "type": "boolean"
+          },
+          "scopes": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "CreatePersonalAccessTokenResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "token",
+          "expiresAt"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "name": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "HttpValidationProblemDetails": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ProblemDetails"
+          },
+          {
+            "type": "object",
+            "additionalProperties": {
+              "nullable": true
+            },
+            "properties": {
+              "errors": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "CreatePersonalAccessTokenRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "expiresAt"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The user-friendly name for this token.",
+            "maxLength": 100,
+            "minLength": 1,
+            "nullable": false
+          },
+          "expiresAt": {
+            "type": "string",
+            "description": "The expiration date for the token. Must be in the future and within 2 years from now.",
+            "format": "date-time"
+          }
+        }
+      },
+      "UpdatePersonalAccessTokenRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "expiresAt"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The user-friendly name for this token.",
+            "maxLength": 100,
+            "minLength": 1,
+            "nullable": false
+          },
+          "expiresAt": {
+            "type": "string",
+            "description": "The expiration date for the token. Must be in the future and within 2 years from now.",
+            "format": "date-time"
           }
         }
       },
@@ -13421,30 +14661,6 @@
             "minLength": 1
           }
         }
-      },
-      "HttpValidationProblemDetails": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/ProblemDetails"
-          },
-          {
-            "type": "object",
-            "additionalProperties": {
-              "nullable": true
-            },
-            "properties": {
-              "errors": {
-                "type": "object",
-                "additionalProperties": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          }
-        ]
       },
       "UpdateProfileRequest": {
         "type": "object",
@@ -21565,6 +22781,12 @@
             }
           }
         }
+      },
+      "ApiKey": {
+        "type": "apiKey",
+        "description": "Personal Access Token - Enter your PAT directly without any prefix",
+        "name": "x-api-key",
+        "in": "header"
       }
     }
   }

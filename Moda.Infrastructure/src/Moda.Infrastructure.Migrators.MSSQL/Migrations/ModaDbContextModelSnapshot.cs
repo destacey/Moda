@@ -313,6 +313,86 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("ExternalEmployeeBlacklistItems", "Organization");
                 });
 
+            modelBuilder.Entity("Moda.Common.Domain.Identity.PersonalAccessToken", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("EmployeeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("LastUsedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("RevokedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("RevokedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Scopes")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
+
+                    b.Property<DateTime>("SystemCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("SystemCreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("SystemLastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("SystemLastModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("TokenHash")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("TokenIdentifier")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .HasColumnType("nvarchar(8)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.HasIndex("ExpiresAt")
+                        .HasDatabaseName("IX_PersonalAccessTokens_ExpiresAt");
+
+                    b.HasIndex("TokenHash")
+                        .IsUnique()
+                        .HasDatabaseName("IX_PersonalAccessTokens_TokenHash");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("IX_PersonalAccessTokens_UserId");
+
+                    b.HasIndex("UserId", "RevokedAt")
+                        .HasDatabaseName("IX_PersonalAccessTokens_UserId_RevokedAt");
+
+                    b.HasIndex("TokenIdentifier", "RevokedAt", "ExpiresAt")
+                        .HasDatabaseName("IX_PersonalAccessTokens_TokenIdentifier_RevokedAt_ExpiresAt");
+
+                    b.ToTable("PersonalAccessTokens", "Identity");
+                });
+
             modelBuilder.Entity("Moda.Common.Domain.Models.KeyValueObjectMetadata", b =>
                 {
                     b.Property<Guid>("ObjectId")
@@ -3597,6 +3677,20 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("Manager");
+                });
+
+            modelBuilder.Entity("Moda.Common.Domain.Identity.PersonalAccessToken", b =>
+                {
+                    b.HasOne("Moda.Common.Domain.Employees.Employee", null)
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Moda.Infrastructure.Identity.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Moda.Common.Domain.Models.KeyValueObjectMetadata", b =>

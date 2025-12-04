@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Moda.Common.Domain.Employees;
+using Moda.Common.Domain.Identity;
 using Moda.ProjectPortfolioManagement.Application;
 using Moda.ProjectPortfolioManagement.Domain.Models;
 using Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
@@ -26,6 +27,7 @@ public class FakeProjectPortfolioManagementDbContext : IProjectPortfolioManageme
     // Common domain entities
     private readonly List<Employee> _employees = [];
     private readonly List<ExternalEmployeeBlacklistItem> _externalEmployeeBlacklistItems = [];
+    private readonly List<PersonalAccessToken> _personalAccessTokens = [];
 
     // DbSet properties
     public DbSet<ExpenditureCategory> ExpenditureCategories => _expenditureCategories.AsDbSet();
@@ -36,6 +38,7 @@ public class FakeProjectPortfolioManagementDbContext : IProjectPortfolioManageme
     public DbSet<StrategicInitiative> StrategicInitiatives => _strategicInitiatives.AsDbSet();
     public DbSet<Employee> Employees => _employees.AsDbSet();
     public DbSet<ExternalEmployeeBlacklistItem> ExternalEmployeeBlacklistItems => _externalEmployeeBlacklistItems.AsDbSet();
+    public DbSet<PersonalAccessToken> PersonalAccessTokens => _personalAccessTokens.AsDbSet();
 
     // ChangeTracker - we can't create a real one, so we return null and the handler uses defensive coding
     public ChangeTracker ChangeTracker => null!;
@@ -51,11 +54,11 @@ public class FakeProjectPortfolioManagementDbContext : IProjectPortfolioManageme
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         SaveChangesCallCount++;
-        
+
         // Return the total number of entities as a simple success indicator
-        var count = _expenditureCategories.Count + _portfolios.Count + _programs.Count + 
+        var count = _expenditureCategories.Count + _portfolios.Count + _programs.Count +
                     _projects.Count + _ppmStrategicThemes.Count + _strategicInitiatives.Count +
-                    _employees.Count + _externalEmployeeBlacklistItems.Count;
+                    _employees.Count + _externalEmployeeBlacklistItems.Count + _personalAccessTokens.Count;
         return Task.FromResult(count);
     }
 
@@ -113,6 +116,7 @@ public class FakeProjectPortfolioManagementDbContext : IProjectPortfolioManageme
         _strategicInitiatives.Clear();
         _employees.Clear();
         _externalEmployeeBlacklistItems.Clear();
+        _personalAccessTokens.Clear();
         SaveChangesCallCount = 0;
     }
 

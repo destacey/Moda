@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Moda.Common.Domain.Employees;
+using Moda.Common.Domain.Identity;
 using Moda.Goals.Application.Persistence;
 using Moda.Goals.Domain.Models;
 using Moda.Tests.Shared.Infrastructure;
@@ -20,11 +21,13 @@ public class FakeGoalsDbContext : IGoalsDbContext, IDisposable
     // Common domain entities
     private readonly List<Employee> _employees = [];
     private readonly List<ExternalEmployeeBlacklistItem> _externalEmployeeBlacklistItems = [];
+    private readonly List<PersonalAccessToken> _personalAccessTokens = [];
 
     // DbSet properties
     public DbSet<Objective> Objectives => _objectives.AsDbSet();
     public DbSet<Employee> Employees => _employees.AsDbSet();
     public DbSet<ExternalEmployeeBlacklistItem> ExternalEmployeeBlacklistItems => _externalEmployeeBlacklistItems.AsDbSet();
+    public DbSet<PersonalAccessToken> PersonalAccessTokens => _personalAccessTokens.AsDbSet();
 
     // ChangeTracker - we can't create a real one, so we return null and the handler uses defensive coding
     public ChangeTracker ChangeTracker => null!;
@@ -40,9 +43,9 @@ public class FakeGoalsDbContext : IGoalsDbContext, IDisposable
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         SaveChangesCallCount++;
-        
+
         // Return the total number of entities as a simple success indicator
-        var count = _objectives.Count + _employees.Count + _externalEmployeeBlacklistItems.Count;
+        var count = _objectives.Count + _employees.Count + _externalEmployeeBlacklistItems.Count + _personalAccessTokens.Count;
         return Task.FromResult(count);
     }
 
@@ -75,6 +78,7 @@ public class FakeGoalsDbContext : IGoalsDbContext, IDisposable
         _objectives.Clear();
         _employees.Clear();
         _externalEmployeeBlacklistItems.Clear();
+        _personalAccessTokens.Clear();
         SaveChangesCallCount = 0;
     }
 

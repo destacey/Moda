@@ -18,23 +18,12 @@ internal static class ObjectExtensions
 
 /// <summary>
 /// The default NSwag AspNetCoreOperationProcessor doesn't take .RequireAuthorization() calls into account
-/// Unless the AllowAnonymous attribute is defined, this processor will always add the security scheme
-/// when it's not already there, so effectively adding "Global Auth".
+/// Unless the AllowAnonymous attribute is defined, this processor will always add the security schemes
+/// when they're not already there, so effectively adding "Global Auth".
+/// Supports multiple authentication schemes (JWT Bearer and API Key).
 /// </summary>
 public class SwaggerGlobalAuthProcessor : IOperationProcessor
 {
-    private readonly string _name;
-
-    public SwaggerGlobalAuthProcessor()
-        : this(JwtBearerDefaults.AuthenticationScheme)
-    {
-    }
-
-    public SwaggerGlobalAuthProcessor(string name)
-    {
-        _name = name;
-    }
-
     public bool Process(OperationProcessorContext context)
     {
         IList<object>? list = ((AspNetCoreOperationProcessorContext)context).ApiDescription?.ActionDescriptor?.TryGetPropertyValue<IList<object>>("EndpointMetadata");
@@ -47,13 +36,22 @@ public class SwaggerGlobalAuthProcessor : IOperationProcessor
 
             if (context.OperationDescription.Operation.Security?.Any() != true)
             {
-                (context.OperationDescription.Operation.Security ??= new List<OpenApiSecurityRequirement>()).Add(new OpenApiSecurityRequirement
+                // Add both authentication schemes as alternatives
+                // Each security requirement in the array represents an OR relationship
+                // Users can authenticate with either JWT Bearer OR API Key
+                context.OperationDescription.Operation.Security = new List<OpenApiSecurityRequirement>
                 {
+                    // Option 1: JWT Bearer (OAuth2)
+                    new OpenApiSecurityRequirement
                     {
-                        _name,
-                        Array.Empty<string>()
+                        { JwtBearerDefaults.AuthenticationScheme, Array.Empty<string>() }
+                    },
+                    // Option 2: API Key (Personal Access Token)
+                    new OpenApiSecurityRequirement
+                    {
+                        { "ApiKey", Array.Empty<string>() }
                     }
-                });
+                };
             }
         }
 

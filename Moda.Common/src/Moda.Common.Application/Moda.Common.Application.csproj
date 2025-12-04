@@ -19,4 +19,10 @@
       <ProjectReference Include="..\Moda.Common\Moda.Common.csproj" />
     </ItemGroup>
 
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="Moda.Common.Application.Tests" />
+        <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+    </ItemGroup>
+
 </Project>

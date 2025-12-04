@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Moda.Infrastructure.Common.Services;
 
 namespace Moda.Infrastructure.Common;
 
@@ -6,6 +7,7 @@ internal static class ConfigureServices
 {
     internal static IServiceCollection AddServices(this IServiceCollection services) =>
         services
+            .AddScoped<ITokenHashingService, TokenHashingService>()
             .AddServices(typeof(ITransientService), ServiceLifetime.Transient)
             .AddServices(typeof(IScopedService), ServiceLifetime.Scoped);
 

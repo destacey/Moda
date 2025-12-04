@@ -41,6 +41,7 @@ internal static class ConfigureServices
                     };
                 };
 
+                // OAuth2 (Azure AD) Authentication
                 document.AddSecurity(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
                 {
                     Type = OpenApiSecuritySchemeType.OAuth2,
@@ -60,7 +61,15 @@ internal static class ConfigureServices
                     }
                 });
 
-                document.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor());
+                // Personal Access Token (API Key) Authentication
+                document.AddSecurity("ApiKey", new OpenApiSecurityScheme
+                {
+                    Type = OpenApiSecuritySchemeType.ApiKey,
+                    Name = "x-api-key",
+                    In = OpenApiSecurityApiKeyLocation.Header,
+                    Description = "Personal Access Token - Enter your PAT directly without any prefix"
+                });
+
                 document.OperationProcessors.Add(new SwaggerGlobalAuthProcessor());
 
                 document.SchemaSettings.TypeMappers.Add(new PrimitiveTypeMapper(typeof(Guid), schema =>
