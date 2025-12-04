@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
-    "start": "cross-env HOSTNAME=localhost node .next/standalone/server.js",
+    "start": "next start",
     "lint": "eslint .",
     "test": "jest"
   },
