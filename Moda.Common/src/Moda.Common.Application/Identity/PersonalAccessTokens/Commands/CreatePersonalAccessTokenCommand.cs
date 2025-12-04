@@ -43,10 +43,6 @@ public sealed class CreatePersonalAccessTokenCommandValidator : CustomValidator<
         RuleFor(x => x.ExpiresAt)
             .Must(BeValidExpirationDate)
                 .WithMessage($"Expiration date must be between 1 day and {MaxExpirationDays} days ({MaxExpirationDays / 365} years) from now.");
-
-        RuleFor(x => x)
-            .MustAsync(NotExceedTokenLimit)
-                .WithMessage($"You have reached the maximum of {MaxTokensPerUser} active tokens. Please revoke an existing token before creating a new one.");
     }
 
     private async Task<bool> BeUniqueTokenName(string name, CancellationToken cancellationToken)
@@ -63,15 +59,6 @@ public sealed class CreatePersonalAccessTokenCommandValidator : CustomValidator<
         var maxExpiration = now.Plus(Duration.FromDays(MaxExpirationDays));
 
         return expiresAt >= minExpiration && expiresAt <= maxExpiration;
-    }
-
-    private async Task<bool> NotExceedTokenLimit(CreatePersonalAccessTokenCommand command, CancellationToken cancellationToken)
-    {
-        var userId = _currentUser.GetUserId().ToString();
-        var activeTokenCount = await _dbContext.PersonalAccessTokens
-            .CountAsync(t => t.UserId == userId && t.RevokedAt == null && t.ExpiresAt > _dateTimeProvider.Now, cancellationToken);
-
-        return activeTokenCount < MaxTokensPerUser;
     }
 }
 
@@ -97,6 +84,14 @@ internal sealed class CreatePersonalAccessTokenCommandHandler(
             var userId = _currentUser.GetUserId().ToString();
             var employeeId = _currentUser.GetEmployeeId();
             var now = _dateTimeProvider.Now;
+
+            // verify user hasn't exceeded token limit
+            var activeTokenCount = await _dbContext.PersonalAccessTokens
+                .CountAsync(t => t.UserId == userId && t.RevokedAt == null && t.ExpiresAt > now, cancellationToken);
+            if (activeTokenCount >= 10)
+            {
+                return Result.Failure<CreatePersonalAccessTokenResult>($"You have reached the maximum of 10 active tokens. Please revoke an existing token before creating a new one.");
+            }
 
             // Generate the token
             var plaintextToken = _tokenHashingService.GenerateToken();

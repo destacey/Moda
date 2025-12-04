@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useMemo, useCallback, FC } from 'react'
-import { Button, Space, Tag, Popconfirm, Alert, Flex, Typography } from 'antd'
-import { PlusOutlined, DeleteOutlined, StopOutlined, EditOutlined } from '@ant-design/icons'
+import { Button, Tag, Alert, Flex, Typography, App, Space } from 'antd'
+import { PlusOutlined } from '@ant-design/icons'
 import {
   useGetMyPersonalAccessTokensQuery,
   useRevokePersonalAccessTokenMutation,
@@ -19,6 +19,9 @@ import {
   PersonalAccessTokenCreatedModal,
 } from './_components'
 import { useMessage } from '@/src/components/contexts/messaging'
+import { RowMenuCellRenderer } from '@/src/components/common/moda-grid-cell-renderers'
+import { ItemType } from 'antd/es/menu/interface'
+import { MenuProps } from 'antd'
 
 const { Text } = Typography
 
@@ -47,63 +50,72 @@ const DateTimeCellRenderer = (props: CustomCellRendererProps) => {
   return dayjs(value).format('YYYY-MM-DD h:mm A')
 }
 
-interface ActionsCellRendererProps
-  extends CustomCellRendererProps<PersonalAccessTokenDto> {
-  onEdit: (token: PersonalAccessTokenDto) => void
-  onRevoke: (id: string, name: string) => void
-  onDelete: (id: string, name: string) => void
+interface RowMenuProps extends MenuProps {
+  tokenId: string
+  tokenName: string
+  isActive: boolean
+  token: PersonalAccessTokenDto
+  modal: ReturnType<typeof App.useApp>['modal']
+  onEditTokenMenuClicked: (token: PersonalAccessTokenDto) => void
+  onRevokeTokenMenuClicked: (id: string, name: string) => void
+  onDeleteTokenMenuClicked: (id: string, name: string) => void
 }
 
-const ActionsCellRenderer = (props: ActionsCellRendererProps) => {
-  const { data, onEdit, onRevoke, onDelete } = props
-  if (!data) return null
+const getRowMenuItems = (props: RowMenuProps) => {
+  if (!props.tokenId) return null
 
-  return (
-    <Space size="small">
-      {data.isActive && (
-        <>
-          <Button
-            type="link"
-            icon={<EditOutlined />}
-            size="small"
-            onClick={() => onEdit(data)}
-          >
-            Edit
-          </Button>
-          <Popconfirm
-            title="Revoke Token"
-            description="Are you sure you want to revoke this token? It will no longer work."
-            onConfirm={() => onRevoke(data.id!, data.name!)}
-            okText="Revoke"
-            cancelText="Cancel"
-          >
-            <Button type="link" icon={<StopOutlined />} size="small" danger>
-              Revoke
-            </Button>
-          </Popconfirm>
-        </>
-      )}
-      <Popconfirm
-        title="Delete Token"
-        description="Are you sure you want to permanently delete this token? This cannot be undone."
-        onConfirm={() => onDelete(data.id!, data.name!)}
-        okText="Delete"
-        cancelText="Cancel"
-      >
-        <Button type="link" icon={<DeleteOutlined />} size="small" danger>
-          Delete
-        </Button>
-      </Popconfirm>
-    </Space>
-  )
+  const items: ItemType[] = []
+
+  if (props.isActive) {
+    items.push({
+      key: 'editToken',
+      label: 'Edit',
+      onClick: () => props.onEditTokenMenuClicked(props.token),
+    })
+    items.push({
+      key: 'revokeToken',
+      label: 'Revoke',
+      onClick: () => {
+        props.modal.confirm({
+          title: `Revoke Token - ${props.tokenName}`,
+          content:
+            'Are you sure you want to revoke this token? It will no longer work.',
+          okText: 'Revoke',
+          okType: 'danger',
+          onOk: () =>
+            props.onRevokeTokenMenuClicked(props.tokenId, props.tokenName),
+        })
+      },
+    })
+  }
+
+  items.push({
+    key: 'deleteToken',
+    label: 'Delete',
+    onClick: () => {
+      props.modal.confirm({
+        title: `Delete Token - ${props.tokenName}`,
+        content:
+          'Are you sure you want to permanently delete this token? This cannot be undone.',
+        okText: 'Delete',
+        okType: 'danger',
+        onOk: () =>
+          props.onDeleteTokenMenuClicked(props.tokenId, props.tokenName),
+      })
+    },
+  })
+
+  return items
 }
 
 const PersonalAccessTokens: FC = () => {
   const [isCreateFormVisible, setIsCreateFormVisible] = useState(false)
   const [isEditFormVisible, setIsEditFormVisible] = useState(false)
-  const [editingToken, setEditingToken] = useState<PersonalAccessTokenDto | null>(null)
+  const [editingToken, setEditingToken] =
+    useState<PersonalAccessTokenDto | null>(null)
   const [newToken, setNewToken] = useState<string | null>(null)
   const messageApi = useMessage()
+  const { modal } = App.useApp()
 
   const {
     data: tokens,
@@ -175,6 +187,25 @@ const PersonalAccessTokens: FC = () => {
   const columnDefs = useMemo<ColDef<PersonalAccessTokenDto>[]>(
     () => [
       {
+        width: 50,
+        filter: false,
+        sortable: false,
+        resizable: false,
+        cellRenderer: (params) => {
+          const menuItems = getRowMenuItems({
+            tokenId: params.data?.id ?? '',
+            tokenName: params.data?.name ?? '',
+            isActive: params.data?.isActive ?? false,
+            token: params.data!,
+            modal,
+            onEditTokenMenuClicked: handleEdit,
+            onRevokeTokenMenuClicked: handleRevoke,
+            onDeleteTokenMenuClicked: handleDelete,
+          })
+          return RowMenuCellRenderer({ ...params, menuItems })
+        },
+      },
+      {
         field: 'name',
         headerName: 'Name',
         flex: 1,
@@ -199,20 +230,8 @@ const PersonalAccessTokens: FC = () => {
         headerTooltip:
           'The last time this token was used for authentication. Updates at most once per hour.',
       },
-      {
-        headerName: 'Actions',
-        cellRenderer: ActionsCellRenderer,
-        cellRendererParams: {
-          onEdit: handleEdit,
-          onRevoke: handleRevoke,
-          onDelete: handleDelete,
-        },
-        width: 250,
-        sortable: false,
-        filter: false,
-      },
     ],
-    [handleEdit, handleRevoke, handleDelete],
+    [handleEdit, handleRevoke, handleDelete, modal],
   )
 
   if (error) {
