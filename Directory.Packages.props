@@ -7,9 +7,9 @@
     <PackageVersion Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0" />
     <PackageVersion Include="CSharpFunctionalExtensions" Version="3.6.0" />
     <PackageVersion Include="CsvHelper" Version="33.1.0" />
-    <PackageVersion Include="FluentValidation" Version="12.1.0" />
+    <PackageVersion Include="FluentValidation" Version="12.1.1" />
     <PackageVersion Include="FluentValidation.AspNetCore" Version="11.3.1" />
-    <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.0" />
+    <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
     <PackageVersion Include="Hangfire" Version="1.8.22" />
     <PackageVersion Include="Hangfire.Console.Extensions" Version="2.1.0" />
     <PackageVersion Include="Hangfire.Console.Extensions.Serilog" Version="2.1.0" />
@@ -39,21 +39,21 @@
     <PackageVersion Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="10.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="10.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0" />
-    <PackageVersion Include="Microsoft.Graph" Version="5.96.0" />
-    <PackageVersion Include="Microsoft.Identity.Web" Version="4.0.1" />
-    <PackageVersion Include="Microsoft.Identity.Web.MicrosoftGraph" Version="4.0.1" />
+    <PackageVersion Include="Microsoft.Graph" Version="5.97.0" />
+    <PackageVersion Include="Microsoft.Identity.Web" Version="4.1.1" />
+    <PackageVersion Include="Microsoft.Identity.Web.MicrosoftGraph" Version="4.1.1" />
     <PackageVersion Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1" />
     <PackageVersion Include="NodaTime" Version="3.2.2" />
     <PackageVersion Include="NodaTime.Serialization.SystemTextJson" Version="1.3.0" />
-    <PackageVersion Include="NSwag.AspNetCore" Version="14.6.2" />
-    <PackageVersion Include="NSwag.CodeGeneration.CSharp" Version="14.6.2" />
-    <PackageVersion Include="NSwag.CodeGeneration.TypeScript" Version="14.6.2" />
-    <PackageVersion Include="NSwag.MSBuild" Version="14.6.2" />
+    <PackageVersion Include="NSwag.AspNetCore" Version="14.6.3" />
+    <PackageVersion Include="NSwag.CodeGeneration.CSharp" Version="14.6.3" />
+    <PackageVersion Include="NSwag.CodeGeneration.TypeScript" Version="14.6.3" />
+    <PackageVersion Include="NSwag.MSBuild" Version="14.6.3" />
     <PackageVersion Include="OneOf" Version="3.0.271" />
     <PackageVersion Include="OneOf.Serialization.SystemTextJson" Version="1.1.1" />
-    <PackageVersion Include="RestSharp" Version="112.1.0" />
+    <PackageVersion Include="RestSharp" Version="113.0.0" />
     <PackageVersion Include="Serilog" Version="4.3.0" />
-    <PackageVersion Include="Serilog.AspNetCore" Version="9.0.0" />
+    <PackageVersion Include="Serilog.AspNetCore" Version="10.0.0" />
     <PackageVersion Include="Serilog.Enrichers.AssemblyName" Version="2.0.0" />
     <PackageVersion Include="Serilog.Enrichers.Process" Version="3.0.0" />
     <PackageVersion Include="Serilog.Enrichers.Span" Version="3.1.0" />
@@ -61,9 +61,9 @@
     <PackageVersion Include="Serilog.Exceptions" Version="8.4.0" />
     <PackageVersion Include="Serilog.Expressions" Version="5.0.0" />
     <PackageVersion Include="Serilog.Enrichers.Environment" Version="3.0.1" />
-    <PackageVersion Include="Serilog.Extensions.Hosting" Version="9.0.0" />
+    <PackageVersion Include="Serilog.Extensions.Hosting" Version="10.0.0" />
     <PackageVersion Include="Serilog.Formatting.Compact" Version="3.0.0" />
-    <PackageVersion Include="Serilog.Settings.Configuration" Version="9.0.0" />
+    <PackageVersion Include="Serilog.Settings.Configuration" Version="10.0.0" />
     <PackageVersion Include="Serilog.Sinks.ApplicationInsights" Version="4.1.0" />
     <PackageVersion Include="Serilog.Sinks.Async" Version="2.1.0" />
     <PackageVersion Include="Serilog.Sinks.Console" Version="6.1.1" />
@@ -79,7 +79,7 @@
     <PackageVersion Include="FluentAssertions" Version="[7.1.0]" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
     <PackageVersion Include="Moq" Version="4.20.72" />
-    <PackageVersion Include="Moq.AutoMock" Version="3.5.0" />
+    <PackageVersion Include="Moq.AutoMock" Version="3.6.0" />
     <PackageVersion Include="NodaTime.Testing" Version="3.2.2" />
     <PackageVersion Include="xunit" Version="2.9.3" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
