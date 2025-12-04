@@ -221,6 +221,66 @@ public sealed class PersonalAccessTokenTests
     }
 
     [Fact]
+    public void UpdateExpiresAt_ShouldUpdateExpirationSuccessfully()
+    {
+        // Arrange
+        var token = _tokenFaker.Generate();
+        var newExpiresAt = _now.Plus(Duration.FromDays(180));
+
+        // Act
+        var result = token.UpdateExpiresAt(newExpiresAt, _now);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        token.ExpiresAt.Should().Be(newExpiresAt);
+    }
+
+    [Fact]
+    public void UpdateExpiresAt_ShouldReturnFailure_WhenTokenIsRevoked()
+    {
+        // Arrange
+        var revokedBy = Guid.NewGuid();
+        var token = _tokenFaker.WithRevokedToken(revokedBy, _now).Generate();
+        var newExpiresAt = _now.Plus(Duration.FromDays(180));
+
+        // Act
+        var result = token.UpdateExpiresAt(newExpiresAt, _now);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Contain("revoked");
+    }
+
+    [Fact]
+    public void UpdateExpiresAt_ShouldReturnFailure_WhenNewExpirationIsInPast()
+    {
+        // Arrange
+        var token = _tokenFaker.Generate();
+        var pastExpiresAt = _now.Minus(Duration.FromDays(1));
+
+        // Act
+        var result = token.UpdateExpiresAt(pastExpiresAt, _now);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Contain("future");
+    }
+
+    [Fact]
+    public void UpdateExpiresAt_ShouldReturnFailure_WhenNewExpirationIsNow()
+    {
+        // Arrange
+        var token = _tokenFaker.Generate();
+
+        // Act
+        var result = token.UpdateExpiresAt(_now, _now);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Contain("future");
+    }
+
+    [Fact]
     public void IsExpired_ShouldReturnTrue_WhenCurrentTimeIsAfterExpiration()
     {
         // Arrange

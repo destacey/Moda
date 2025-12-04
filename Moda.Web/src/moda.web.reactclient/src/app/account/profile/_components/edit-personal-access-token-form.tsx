@@ -1,43 +1,51 @@
 'use client'
 
-import { Form, Input, Modal, DatePicker, Alert } from 'antd'
+import { Form, Input, Modal, DatePicker } from 'antd'
 import { useEffect, useState } from 'react'
 import { useMessage } from '@/src/components/contexts/messaging'
 import dayjs, { Dayjs } from 'dayjs'
-import { ExclamationCircleOutlined } from '@ant-design/icons'
-import { useCreatePersonalAccessTokenMutation } from '@/src/store/features/user-management/personal-access-tokens-api'
+import { useUpdatePersonalAccessTokenMutation } from '@/src/store/features/user-management/personal-access-tokens-api'
+import { PersonalAccessTokenDto } from '@/src/services/moda-api'
 import { toFormErrors } from '@/src/utils'
 
 const { Item } = Form
 
-export interface CreatePersonalAccessTokenFormProps {
+export interface EditPersonalAccessTokenFormProps {
+  token: PersonalAccessTokenDto
   showForm: boolean
-  onFormCreate: (token: string) => void
+  onFormUpdate: () => void
   onFormCancel: () => void
 }
 
-interface CreateTokenFormValues {
+interface EditTokenFormValues {
   name: string
   expiresAt: Dayjs
 }
 
-const CreatePersonalAccessTokenForm = ({
+const EditPersonalAccessTokenForm = ({
+  token,
   showForm,
-  onFormCreate,
+  onFormUpdate,
   onFormCancel,
-}: CreatePersonalAccessTokenFormProps) => {
+}: EditPersonalAccessTokenFormProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [isValid, setIsValid] = useState(false)
-  const [form] = Form.useForm<CreateTokenFormValues>()
+  const [form] = Form.useForm<EditTokenFormValues>()
   const formValues = Form.useWatch([], form)
   const messageApi = useMessage()
 
-  const [createToken] = useCreatePersonalAccessTokenMutation()
+  const [updateToken] = useUpdatePersonalAccessTokenMutation()
 
   useEffect(() => {
     setIsOpen(showForm)
-  }, [showForm])
+    if (showForm && token) {
+      form.setFieldsValue({
+        name: token.name!,
+        expiresAt: dayjs(token.expiresAt),
+      })
+    }
+  }, [showForm, token, form])
 
   useEffect(() => {
     form.validateFields({ validateOnly: true }).then(
@@ -46,20 +54,21 @@ const CreatePersonalAccessTokenForm = ({
     )
   }, [form, formValues])
 
-  const create = async (
-    values: CreateTokenFormValues,
-  ): Promise<string | null> => {
+  const update = async (values: EditTokenFormValues): Promise<boolean> => {
     try {
-      const response = await createToken({
-        name: values.name,
-        expiresAt: values.expiresAt.toDate(),
+      const response = await updateToken({
+        id: token.id!,
+        request: {
+          name: values.name,
+          expiresAt: values.expiresAt.toDate(),
+        },
       })
 
       if (response.error) {
         throw response.error
       }
 
-      return response.data.token!
+      return true
     } catch (error) {
       if (error.status === 422 && error.errors) {
         const formErrors = toFormErrors(error.errors)
@@ -68,10 +77,10 @@ const CreatePersonalAccessTokenForm = ({
       } else {
         messageApi.error(
           error.detail ??
-            'An error occurred while creating the PAT. Please try again.',
+            'An error occurred while updating the PAT. Please try again.',
         )
       }
-      return null
+      return false
     }
   }
 
@@ -79,14 +88,14 @@ const CreatePersonalAccessTokenForm = ({
     setIsSaving(true)
     try {
       const values = await form.validateFields()
-      const token = await create(values)
+      const success = await update(values)
 
-      if (token) {
+      if (success) {
         setIsOpen(false)
         setIsSaving(false)
         form.resetFields()
-        onFormCreate(token)
-        messageApi.success('Personal access token created successfully')
+        onFormUpdate()
+        messageApi.success('Personal access token updated successfully')
       } else {
         setIsSaving(false)
       }
@@ -103,11 +112,11 @@ const CreatePersonalAccessTokenForm = ({
 
   return (
     <Modal
-      title="Create Personal Access Token"
+      title="Edit Personal Access Token"
       open={isOpen}
       onOk={handleOk}
       okButtonProps={{ disabled: !isValid }}
-      okText="Create"
+      okText="Save"
       confirmLoading={isSaving}
       onCancel={handleCancel}
       maskClosable={false}
@@ -115,20 +124,11 @@ const CreatePersonalAccessTokenForm = ({
       destroyOnHidden={true}
       width={600}
     >
-      <Alert
-        message="Important"
-        description="After creation, the token will only be shown once. Make sure to copy it to a secure location."
-        type="warning"
-        showIcon
-        icon={<ExclamationCircleOutlined />}
-        style={{ marginBottom: 16 }}
-      />
       <Form
         form={form}
         size="small"
         layout="vertical"
-        name="create-personal-access-token-form"
-        initialValues={{ expiresAt: dayjs().add(1, 'year') }}
+        name="edit-personal-access-token-form"
       >
         <Item
           label="Token Name"
@@ -166,4 +166,4 @@ const CreatePersonalAccessTokenForm = ({
   )
 }
 
-export default CreatePersonalAccessTokenForm
+export default EditPersonalAccessTokenForm

@@ -25,8 +25,8 @@ const tabs = [
     key: AccountTabs.Profile,
     tab: 'Profile',
   },
-  { key: AccountTabs.Claims, tab: 'Claims' },
   { key: AccountTabs.PersonalAccessTokens, tab: 'PATs' },
+  { key: AccountTabs.Claims, tab: 'Claims' },
 ]
 
 const AccountProfilePage = () => {
@@ -49,10 +49,10 @@ const AccountProfilePage = () => {
     switch (activeTab) {
       case AccountTabs.Profile:
         return React.createElement(ProfileForm, profileData)
-      case AccountTabs.Claims:
-        return <ClaimsGrid />
       case AccountTabs.PersonalAccessTokens:
         return <PersonalAccessTokens />
+      case AccountTabs.Claims:
+        return <ClaimsGrid />
       default:
         return null
     }

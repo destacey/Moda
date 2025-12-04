@@ -234,6 +234,82 @@
           }
         ]
       },
+      "put": {
+        "tags": [
+          "PersonalAccessTokens"
+        ],
+        "summary": "Update a personal access token's name and/or expiration date.",
+        "operationId": "PersonalAccessTokens_Update",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePersonalAccessTokenRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      },
       "delete": {
         "tags": [
           "PersonalAccessTokens"
@@ -14462,6 +14538,28 @@
         ]
       },
       "CreatePersonalAccessTokenRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "expiresAt"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The user-friendly name for this token.",
+            "maxLength": 100,
+            "minLength": 1,
+            "nullable": false
+          },
+          "expiresAt": {
+            "type": "string",
+            "description": "The expiration date for the token. Must be in the future and within 2 years from now.",
+            "format": "date-time"
+          }
+        }
+      },
+      "UpdatePersonalAccessTokenRequest": {
         "type": "object",
         "additionalProperties": false,
         "required": [

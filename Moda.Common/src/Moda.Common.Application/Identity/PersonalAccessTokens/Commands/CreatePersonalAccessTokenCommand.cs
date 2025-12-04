@@ -6,30 +6,13 @@ namespace Moda.Common.Application.Identity.PersonalAccessTokens.Commands;
 /// <summary>
 /// Command to create a new personal access token.
 /// </summary>
-public sealed record CreatePersonalAccessTokenCommand : ICommand<CreatePersonalAccessTokenResult>
-{
-    /// <summary>
-    /// The user-friendly name for this token.
-    /// </summary>
-    public string Name { get; init; } = null!;
-
-    /// <summary>
-    /// The expiration date for the token. Must be in the future and within 2 years from now.
-    /// </summary>
-    public Instant ExpiresAt { get; init; }
-}
+public sealed record CreatePersonalAccessTokenCommand(string Name, Instant ExpiresAt) : ICommand<CreatePersonalAccessTokenResult>;
 
 /// <summary>
 /// Response DTO containing the created token details including the plaintext token.
 /// This is the ONLY time the plaintext token is returned.
 /// </summary>
-public sealed record CreatePersonalAccessTokenResult
-{
-    public Guid Id { get; init; }
-    public string Name { get; init; } = null!;
-    public string Token { get; init; } = null!; // Plaintext token - only shown once!
-    public Instant ExpiresAt { get; init; }
-}
+public sealed record CreatePersonalAccessTokenResult(Guid Id, string Name, string Token, Instant ExpiresAt);
 
 public sealed class CreatePersonalAccessTokenCommandValidator : CustomValidator<CreatePersonalAccessTokenCommand>
 {
@@ -145,13 +128,7 @@ internal sealed class CreatePersonalAccessTokenCommandHandler(
                 userId, token.Id, token.Name, token.ExpiresAt);
 
             // Return the result with the plaintext token (ONLY time it's visible!)
-            return Result.Success(new CreatePersonalAccessTokenResult
-            {
-                Id = token.Id,
-                Name = token.Name,
-                Token = plaintextToken,
-                ExpiresAt = token.ExpiresAt
-            });
+            return Result.Success(new CreatePersonalAccessTokenResult(token.Id, token.Name, plaintextToken, token.ExpiresAt));
         }
         catch (Exception ex)
         {

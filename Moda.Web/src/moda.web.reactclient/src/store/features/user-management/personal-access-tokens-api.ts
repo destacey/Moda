@@ -5,6 +5,7 @@ import {
   PersonalAccessTokenDto,
   CreatePersonalAccessTokenResult,
   CreatePersonalAccessTokenRequest,
+  UpdatePersonalAccessTokenRequest,
 } from '@/src/services/moda-api'
 import axios from 'axios'
 import { tokenRequest } from '@/auth-config'
@@ -87,11 +88,29 @@ export const personalAccessTokensApi = apiSlice.injectEndpoints({
       },
       invalidatesTags: [{ type: QueryTags.PersonalAccessTokens, id: 'LIST' }],
     }),
+    updatePersonalAccessToken: builder.mutation<
+      void,
+      { id: string; request: UpdatePersonalAccessTokenRequest }
+    >({
+      queryFn: async ({ id, request }) => {
+        try {
+          const data = await getPersonalAccessTokensClient().update(id, request)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, { id }) => [
+        { type: QueryTags.PersonalAccessTokens, id },
+        { type: QueryTags.PersonalAccessTokens, id: 'LIST' },
+      ],
+    }),
     revokePersonalAccessToken: builder.mutation<void, string>({
       queryFn: async (id) => {
         try {
-          await getPersonalAccessTokensClient().revoke(id)
-          return { data: undefined }
+          const data = await getPersonalAccessTokensClient().revoke(id)
+          return { data }
         } catch (error) {
           console.error('API Error:', error)
           return { error }
@@ -112,7 +131,7 @@ export const personalAccessTokensApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
-      invalidatesTags: (result, error, id) => [
+      invalidatesTags: () => [
         { type: QueryTags.PersonalAccessTokens, id: 'LIST' },
       ],
     }),
@@ -122,6 +141,7 @@ export const personalAccessTokensApi = apiSlice.injectEndpoints({
 export const {
   useGetMyPersonalAccessTokensQuery,
   useCreatePersonalAccessTokenMutation,
+  useUpdatePersonalAccessTokenMutation,
   useRevokePersonalAccessTokenMutation,
   useDeletePersonalAccessTokenMutation,
 } = personalAccessTokensApi

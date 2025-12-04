@@ -60,6 +60,22 @@ public class PersonalAccessTokensController : ControllerBase
             : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
+    [HttpPut("{id}")]
+    [OpenApiOperation("Update a personal access token's name and/or expiration date.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> Update(Guid id, UpdatePersonalAccessTokenRequest request, CancellationToken cancellationToken)
+    {
+        var command = request.ToUpdatePersonalAccessTokenCommand(id);
+        var result = await _sender.Send(command, cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
     [HttpPut("{id}/revoke")]
     [OpenApiOperation("Revoke a personal access token.", "Revoked tokens are kept for audit purposes.")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]

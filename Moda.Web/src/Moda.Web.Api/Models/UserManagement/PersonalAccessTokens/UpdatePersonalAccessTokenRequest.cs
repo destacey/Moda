@@ -3,7 +3,7 @@ using Moda.Common.Application.Interfaces;
 
 namespace Moda.Web.Api.Models.UserManagement.PersonalAccessTokens;
 
-public sealed record CreatePersonalAccessTokenRequest
+public sealed record UpdatePersonalAccessTokenRequest
 {
     /// <summary>
     /// The user-friendly name for this token.
@@ -15,17 +15,17 @@ public sealed record CreatePersonalAccessTokenRequest
     /// </summary>
     public Instant ExpiresAt { get; set; }
 
-    public CreatePersonalAccessTokenCommand ToCreatePersonalAccessTokenCommand()
-        => new(Name, ExpiresAt);
+    public UpdatePersonalAccessTokenCommand ToUpdatePersonalAccessTokenCommand(Guid tokenId)
+        => new(tokenId, Name, ExpiresAt);
 }
 
-public sealed class CreatePersonalAccessTokenRequestValidator : CustomValidator<CreatePersonalAccessTokenRequest>
+public sealed class UpdatePersonalAccessTokenRequestValidator : CustomValidator<UpdatePersonalAccessTokenRequest>
 {
     private const int MaxExpirationDays = 730; // 2 years
 
     private readonly IDateTimeProvider _dateTimeProvider;
 
-    public CreatePersonalAccessTokenRequestValidator(IDateTimeProvider dateTimeProvider)
+    public UpdatePersonalAccessTokenRequestValidator(IDateTimeProvider dateTimeProvider)
     {
         _dateTimeProvider = dateTimeProvider;
 

@@ -10,11 +10,6 @@ namespace Moda.Common.Domain.Identity;
 /// </summary>
 public sealed class PersonalAccessToken : BaseEntity<Guid>, ISystemAuditable
 {
-    private string _name = null!;
-    private string _tokenIdentifier = null!;
-    private string _tokenHash = null!;
-    private string _userId = null!;
-
     private PersonalAccessToken() { }
 
     private PersonalAccessToken(
@@ -42,36 +37,36 @@ public sealed class PersonalAccessToken : BaseEntity<Guid>, ISystemAuditable
     /// </summary>
     public string Name
     {
-        get => _name;
-        private set => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
-    }
+        get;
+        private set => field = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
+    } = null!;
 
     /// <summary>
     /// Gets the token identifier (first 8 characters). Used for efficient database lookups.
     /// </summary>
     public string TokenIdentifier
     {
-        get => _tokenIdentifier;
-        private set => _tokenIdentifier = Guard.Against.NullOrWhiteSpace(value, nameof(TokenIdentifier));
-    }
+        get;
+        private set => field = Guard.Against.NullOrWhiteSpace(value, nameof(TokenIdentifier));
+    } = null!;
 
     /// <summary>
     /// Gets the hashed token value. The plain text token is never stored.
     /// </summary>
     public string TokenHash
     {
-        get => _tokenHash;
-        private set => _tokenHash = Guard.Against.NullOrWhiteSpace(value, nameof(TokenHash));
-    }
+        get;
+        private set => field = Guard.Against.NullOrWhiteSpace(value, nameof(TokenHash));
+    } = null!;
 
     /// <summary>
     /// Gets the ID of the user who owns this token.
     /// </summary>
     public string UserId
     {
-        get => _userId;
-        private set => _userId = Guard.Against.NullOrWhiteSpace(value, nameof(UserId));
-    }
+        get;
+        private set => field = Guard.Against.NullOrWhiteSpace(value, nameof(UserId));
+    } = null!;
 
     /// <summary>
     /// Gets the optional employee ID associated with this token's user.
@@ -194,6 +189,30 @@ public sealed class PersonalAccessToken : BaseEntity<Guid>, ISystemAuditable
         {
             return Result.Failure(ex.Message);
         }
+    }
+
+    /// <summary>
+    /// Updates the token expiration date.
+    /// </summary>
+    /// <param name="expiresAt">The new expiration date.</param>
+    /// <param name="timestamp">The timestamp for the update.</param>
+    /// <returns>A Result indicating success or failure.</returns>
+    public Result UpdateExpiresAt(Instant expiresAt, Instant timestamp)
+    {
+        if (IsRevoked)
+        {
+            return Result.Failure("Cannot update a revoked token.");
+        }
+
+        if (expiresAt <= timestamp)
+        {
+            return Result.Failure("Expiration date must be in the future.");
+        }
+
+        ExpiresAt = expiresAt;
+        AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
+
+        return Result.Success();
     }
 
     /// <summary>

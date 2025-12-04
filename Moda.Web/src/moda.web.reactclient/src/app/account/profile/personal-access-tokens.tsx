@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useCallback, FC } from 'react'
 import { Button, Space, Tag, Popconfirm, Alert, Flex, Typography } from 'antd'
-import { PlusOutlined, DeleteOutlined, StopOutlined } from '@ant-design/icons'
+import { PlusOutlined, DeleteOutlined, StopOutlined, EditOutlined } from '@ant-design/icons'
 import {
   useGetMyPersonalAccessTokensQuery,
   useRevokePersonalAccessTokenMutation,
@@ -15,6 +15,7 @@ import { CustomCellRendererProps } from 'ag-grid-react'
 import { ColDef } from 'ag-grid-community'
 import {
   CreatePersonalAccessTokenForm,
+  EditPersonalAccessTokenForm,
   PersonalAccessTokenCreatedModal,
 } from './_components'
 import { useMessage } from '@/src/components/contexts/messaging'
@@ -48,28 +49,39 @@ const DateTimeCellRenderer = (props: CustomCellRendererProps) => {
 
 interface ActionsCellRendererProps
   extends CustomCellRendererProps<PersonalAccessTokenDto> {
+  onEdit: (token: PersonalAccessTokenDto) => void
   onRevoke: (id: string, name: string) => void
   onDelete: (id: string, name: string) => void
 }
 
 const ActionsCellRenderer = (props: ActionsCellRendererProps) => {
-  const { data, onRevoke, onDelete } = props
+  const { data, onEdit, onRevoke, onDelete } = props
   if (!data) return null
 
   return (
     <Space size="small">
       {data.isActive && (
-        <Popconfirm
-          title="Revoke Token"
-          description="Are you sure you want to revoke this token? It will no longer work."
-          onConfirm={() => onRevoke(data.id!, data.name!)}
-          okText="Revoke"
-          cancelText="Cancel"
-        >
-          <Button type="link" icon={<StopOutlined />} size="small" danger>
-            Revoke
+        <>
+          <Button
+            type="link"
+            icon={<EditOutlined />}
+            size="small"
+            onClick={() => onEdit(data)}
+          >
+            Edit
           </Button>
-        </Popconfirm>
+          <Popconfirm
+            title="Revoke Token"
+            description="Are you sure you want to revoke this token? It will no longer work."
+            onConfirm={() => onRevoke(data.id!, data.name!)}
+            okText="Revoke"
+            cancelText="Cancel"
+          >
+            <Button type="link" icon={<StopOutlined />} size="small" danger>
+              Revoke
+            </Button>
+          </Popconfirm>
+        </>
       )}
       <Popconfirm
         title="Delete Token"
@@ -88,6 +100,8 @@ const ActionsCellRenderer = (props: ActionsCellRendererProps) => {
 
 const PersonalAccessTokens: FC = () => {
   const [isCreateFormVisible, setIsCreateFormVisible] = useState(false)
+  const [isEditFormVisible, setIsEditFormVisible] = useState(false)
+  const [editingToken, setEditingToken] = useState<PersonalAccessTokenDto | null>(null)
   const [newToken, setNewToken] = useState<string | null>(null)
   const messageApi = useMessage()
 
@@ -99,6 +113,11 @@ const PersonalAccessTokens: FC = () => {
   } = useGetMyPersonalAccessTokensQuery()
   const [revokeToken] = useRevokePersonalAccessTokenMutation()
   const [deleteToken] = useDeletePersonalAccessTokenMutation()
+
+  const handleEdit = useCallback((token: PersonalAccessTokenDto) => {
+    setEditingToken(token)
+    setIsEditFormVisible(true)
+  }, [])
 
   const handleRevoke = useCallback(
     async (id: string, name: string) => {
@@ -132,6 +151,16 @@ const PersonalAccessTokens: FC = () => {
 
   const handleFormCancel = () => {
     setIsCreateFormVisible(false)
+  }
+
+  const handleEditFormUpdate = () => {
+    setIsEditFormVisible(false)
+    setEditingToken(null)
+  }
+
+  const handleEditFormCancel = () => {
+    setIsEditFormVisible(false)
+    setEditingToken(null)
   }
 
   const handleTokenModalClose = () => {
@@ -174,15 +203,16 @@ const PersonalAccessTokens: FC = () => {
         headerName: 'Actions',
         cellRenderer: ActionsCellRenderer,
         cellRendererParams: {
+          onEdit: handleEdit,
           onRevoke: handleRevoke,
           onDelete: handleDelete,
         },
-        width: 200,
+        width: 250,
         sortable: false,
         filter: false,
       },
     ],
-    [handleRevoke, handleDelete],
+    [handleEdit, handleRevoke, handleDelete],
   )
 
   if (error) {
@@ -233,6 +263,15 @@ const PersonalAccessTokens: FC = () => {
           showForm={isCreateFormVisible}
           onFormCreate={handleFormCreate}
           onFormCancel={handleFormCancel}
+        />
+      )}
+
+      {isEditFormVisible && editingToken && (
+        <EditPersonalAccessTokenForm
+          token={editingToken}
+          showForm={isEditFormVisible}
+          onFormUpdate={handleEditFormUpdate}
+          onFormCancel={handleEditFormCancel}
         />
       )}
 
