@@ -292,7 +292,6 @@ public sealed class PersonalAccessTokenTests
 
         // Fast forward time
         var futureTime = expiresAt.Plus(Duration.FromMinutes(1));
-        var futureProvider = new TestingDateTimeProvider(new FakeClock(futureTime));
 
         // The IsExpired property uses SystemClock.Instance.GetCurrentInstant()
         // In a real scenario, we'd need to mock SystemClock or test at the right time
