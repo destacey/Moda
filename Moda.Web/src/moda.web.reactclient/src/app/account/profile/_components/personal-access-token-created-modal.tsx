@@ -1,13 +1,6 @@
 'use client'
 
-import {
-  Modal,
-  Alert,
-  Typography,
-  Button,
-  message as antdMessage,
-  Flex,
-} from 'antd'
+import { Modal, Alert, Typography, Button, Flex } from 'antd'
 import { CopyOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
 import { useMessage } from '@/src/components/contexts/messaging'
 
