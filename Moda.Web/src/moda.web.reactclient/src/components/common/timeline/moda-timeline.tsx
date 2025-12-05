@@ -1,13 +1,6 @@
 'use client'
 
-import React, {
-  memo,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react'
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { DataSet } from 'vis-data'
 import { Timeline, TimelineOptions } from 'vis-timeline/standalone'
@@ -222,7 +215,10 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
 
   useEffect(() => {
     // Always update dynamicOptionsRef based on fullscreen state
-    const maxHeight = isFullScreen ? window.innerHeight - 100 : baseOptions.maxHeight
+    const FULLSCREEN_VERTICAL_OFFSET = 40 // Space for header and padding
+    const maxHeight = isFullScreen
+      ? window.innerHeight - FULLSCREEN_VERTICAL_OFFSET
+      : baseOptions.maxHeight
     const updatedOptions = {
       ...baseOptions,
       maxHeight,
@@ -461,12 +457,12 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
     }
   }, [])
 
-  const toggleFullScreen = () => {
+  const toggleFullScreen = useCallback(() => {
     if (!enableFullScreenToggle) return
     setIsFullScreen(!isFullScreen)
-  }
+  }, [enableFullScreenToggle, isFullScreen])
 
-  const saveTimelineAsImage = async () => {
+  const saveTimelineAsImage = useCallback(async () => {
     if (!timelineRef.current || !timelineInstanceRef.current) return
 
     // Store current options
@@ -488,14 +484,20 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
         backgroundColor: token.colorBgContainer,
       }
 
-      await saveElementAsImage(timelineRef.current, 'timeline.png', canvasOptions)
+      await saveElementAsImage(
+        timelineRef.current,
+        'timeline.png',
+        canvasOptions,
+      )
+    } catch (error) {
+      console.error('Failed to save timeline as image:', error)
     } finally {
       // Restore original options
       timelineInstanceRef.current.setOptions(currentOptions)
     }
-  }
+  }, [token.colorBgContainer])
 
-  const resetWindow = () => {
+  const resetWindow = useCallback(() => {
     if (timelineInstanceRef.current && initialWindowRef.current) {
       timelineInstanceRef.current.setWindow(
         initialWindowRef.current.start,
@@ -503,7 +505,7 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
         { animation: true },
       )
     }
-  }
+  }, [])
 
   const isLoading = props.isLoading || isTimelineLoading
   const hasData = props.data && props.data.length > 0
@@ -516,7 +518,11 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
       items.push({
         key: 'fullscreen',
         label: isFullScreen ? 'Exit Fullscreen' : 'Enter Fullscreen',
-        icon: isFullScreen ? <FullscreenExitOutlined /> : <FullscreenOutlined />,
+        icon: isFullScreen ? (
+          <FullscreenExitOutlined />
+        ) : (
+          <FullscreenOutlined />
+        ),
         onClick: toggleFullScreen,
       })
     }
@@ -538,7 +544,14 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
     })
 
     return items
-  }, [enableFullScreenToggle, enableSaveAsImage, isFullScreen])
+  }, [
+    enableFullScreenToggle,
+    enableSaveAsImage,
+    isFullScreen,
+    toggleFullScreen,
+    saveTimelineAsImage,
+    resetWindow,
+  ])
 
   return (
     <Spin spinning={isLoading} tip="Loading timeline..." size="large">
