@@ -18151,6 +18151,7 @@ export interface ScopedDependencyDto {
     type: string;
     state: SimpleNavigationDto;
     health: SimpleNavigationDto;
+    scope: SimpleNavigationDto;
     createdOn: Date;
     createdBy?: EmployeeNavigationDto | undefined;
     comment?: string | undefined;
@@ -18443,6 +18444,7 @@ export interface DependencyDto {
     linkType: SimpleNavigationDto;
     state: SimpleNavigationDto;
     health: SimpleNavigationDto;
+    scope: SimpleNavigationDto;
     createdOn: Date;
     createdBy?: EmployeeNavigationDto | undefined;
     comment?: string | undefined;

@@ -96,6 +96,13 @@ const WorkItemDependenciesGrid: FC<WorkItemDependenciesGridProps> = (props) => {
             width: 100,
             cellRenderer: DependencyHealthCellRenderer,
           },
+          {
+            field: 'scope.name',
+            headerName: 'Scope',
+            width: 100,
+            headerTooltip:
+              'Defines whether this dependency is managed inside a single team (intra-team) or requires coordination between multiple teams (cross-team).',
+          },
           // {
           //   field: 'createdOn',
           //   width: 150,
@@ -119,14 +126,16 @@ const WorkItemDependenciesGrid: FC<WorkItemDependenciesGridProps> = (props) => {
           {
             field: 'dependency.team.name',
             headerName: 'Team',
-            cellRenderer: (params: CustomCellRendererProps<ScopedDependencyDto>) =>
-              renderTeamLinkHelper(params.data?.dependency.team),
+            cellRenderer: (
+              params: CustomCellRendererProps<ScopedDependencyDto>,
+            ) => renderTeamLinkHelper(params.data?.dependency.team),
           },
           {
             field: 'dependency.sprint.name',
             headerName: 'Sprint',
-            cellRenderer: (params: CustomCellRendererProps<ScopedDependencyDto>) =>
-              renderSprintLinkHelper(params.data?.dependency.sprint),
+            cellRenderer: (
+              params: CustomCellRendererProps<ScopedDependencyDto>,
+            ) => renderSprintLinkHelper(params.data?.dependency.sprint),
           },
         ],
       },

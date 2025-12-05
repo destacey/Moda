@@ -1,7 +1,7 @@
 ﻿using Moda.Common.Domain.Enums.Work;
 using Moda.Common.Domain.Extensions;
 using Moda.Work.Application.Persistence;
-using Moda.Work.Application.WorkItems.Dtos;
+using Moda.Work.Application.WorkItemDependencies.Dtos;
 
 namespace Moda.Work.Application.WorkItems.Queries;
 

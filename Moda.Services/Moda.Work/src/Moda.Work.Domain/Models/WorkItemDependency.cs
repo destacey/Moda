@@ -172,9 +172,10 @@ public sealed class WorkItemDependency : WorkItemLink
             return;
         }
 
-        if (TargetStatusCategory is WorkStatusCategory.Done or WorkStatusCategory.Removed)
+        // if the source is not done but the target is active/done/removed -> unhealthy
+        if (TargetStatusCategory is WorkStatusCategory.Active or WorkStatusCategory.Done or WorkStatusCategory.Removed)
         {
-            Health = DependencyPlanningHealth.Healthy;
+            Health = DependencyPlanningHealth.Unhealthy;
             return;
         }
 

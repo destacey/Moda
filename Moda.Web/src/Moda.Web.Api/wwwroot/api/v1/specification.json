@@ -20505,6 +20505,7 @@
           "type",
           "state",
           "health",
+          "scope",
           "createdOn"
         ],
         "properties": {
@@ -20524,6 +20525,9 @@
             "$ref": "#/components/schemas/SimpleNavigationDto"
           },
           "health": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "scope": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
           },
           "createdOn": {
@@ -21674,6 +21678,7 @@
           "linkType",
           "state",
           "health",
+          "scope",
           "createdOn"
         ],
         "properties": {
@@ -21696,6 +21701,9 @@
             "$ref": "#/components/schemas/SimpleNavigationDto"
           },
           "health": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "scope": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
           },
           "createdOn": {

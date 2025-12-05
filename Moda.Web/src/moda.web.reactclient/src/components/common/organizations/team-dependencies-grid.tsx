@@ -39,6 +39,13 @@ const TeamDependenciesGrid: FC<TeamDependenciesGridProps> = (props) => {
             width: 100,
             cellRenderer: DependencyHealthCellRenderer,
           },
+          {
+            field: 'scope.name',
+            headerName: 'Scope',
+            width: 100,
+            headerTooltip:
+              'Defines whether this dependency is managed inside a single team (intra-team) or requires coordination between multiple teams (cross-team).',
+          },
         ],
       },
       {
