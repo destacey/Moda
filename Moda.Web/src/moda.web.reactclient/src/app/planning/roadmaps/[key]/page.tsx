@@ -21,6 +21,7 @@ import { LockOutlined, UnlockOutlined } from '@ant-design/icons'
 import { Descriptions, Divider, MenuProps } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import {
+  CopyRoadmapForm,
   DeleteRoadmapForm,
   EditRoadmapForm,
   RoadmapItemDrawer,
@@ -47,6 +48,7 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const [openCreateTimeboxForm, setOpenCreateTimeboxForm] =
     useState<boolean>(false)
   const [openEditRoadmapForm, setOpenEditRoadmapForm] = useState<boolean>(false)
+  const [openCopyRoadmapForm, setOpenCopyRoadmapForm] = useState<boolean>(false)
   const [openDeleteRoadmapForm, setOpenDeleteRoadmapForm] =
     useState<boolean>(false)
   const [openReorganizeActivitiesModal, setOpenReorganizeActivitiesModal] =
@@ -62,6 +64,7 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const { hasPermissionClaim } = useAuth()
   const canUpdateRoadmap = hasPermissionClaim('Permissions.Roadmaps.Update')
   const canDeleteRoadmap = hasPermissionClaim('Permissions.Roadmaps.Delete')
+  const canCreateRoadmap = hasPermissionClaim('Permissions.Roadmaps.Create')
 
   const {
     data: roadmapData,
@@ -131,6 +134,15 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const actionsMenuItems: MenuProps['items'] = useMemo(() => {
     const items: ItemType[] = []
 
+    // Copy is available to anyone who can view the roadmap and create roadmaps
+    if (canCreateRoadmap) {
+      items.push({
+        key: 'copy',
+        label: 'Copy',
+        onClick: () => setOpenCopyRoadmapForm(true),
+      })
+    }
+
     if (!isRoadmapManager) return items
 
     if (canUpdateRoadmap) {
@@ -176,7 +188,7 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     }
 
     return items
-  }, [canDeleteRoadmap, canUpdateRoadmap, isRoadmapManager])
+  }, [canCreateRoadmap, canDeleteRoadmap, canUpdateRoadmap, isRoadmapManager])
 
   const onEditRoadmapFormClosed = useCallback(
     (wasSaved: boolean) => {
@@ -187,6 +199,10 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     },
     [refetchRoadmap],
   )
+
+  const onCopyRoadmapFormClosed = useCallback(() => {
+    setOpenCopyRoadmapForm(false)
+  }, [])
 
   const onDeleteFormClosed = useCallback(
     (wasDeleted: boolean) => {
@@ -298,6 +314,15 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
           showForm={openEditRoadmapForm}
           onFormComplete={() => onEditRoadmapFormClosed(true)}
           onFormCancel={() => onEditRoadmapFormClosed(false)}
+        />
+      )}
+      {openCopyRoadmapForm && (
+        <CopyRoadmapForm
+          sourceRoadmapId={roadmapData?.id}
+          sourceRoadmapName={roadmapData?.name}
+          showForm={openCopyRoadmapForm}
+          onFormComplete={onCopyRoadmapFormClosed}
+          onFormCancel={onCopyRoadmapFormClosed}
         />
       )}
       {openDeleteRoadmapForm && (

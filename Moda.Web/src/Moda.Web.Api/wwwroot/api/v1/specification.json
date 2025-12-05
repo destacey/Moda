@@ -7868,6 +7868,57 @@
         ]
       }
     },
+    "/api/planning/roadmaps/copy": {
+      "post": {
+        "tags": [
+          "Roadmaps"
+        ],
+        "summary": "Copy an existing roadmap.",
+        "operationId": "Roadmaps_Copy",
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CopyRoadmapRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectIdAndKey"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
     "/api/planning/roadmaps/{id}": {
       "put": {
         "tags": [
@@ -18921,6 +18972,50 @@
           "visibilityId": {
             "type": "integer",
             "description": "The visibility id for the Roadmap. If the Roadmap is public, all users can see the Roadmap. Otherwise, only the Roadmap Managers can see the Roadmap.",
+            "format": "int32"
+          }
+        }
+      },
+      "CopyRoadmapRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "sourceRoadmapId",
+          "name",
+          "roadmapManagerIds",
+          "visibilityId"
+        ],
+        "properties": {
+          "sourceRoadmapId": {
+            "type": "string",
+            "description": "The Id of the source Roadmap to copy.",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the new Roadmap.",
+            "maxLength": 128,
+            "minLength": 1,
+            "nullable": false
+          },
+          "roadmapManagerIds": {
+            "type": "array",
+            "description": "The managers of the new Roadmap.",
+            "minLength": 1,
+            "nullable": false,
+            "items": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            }
+          },
+          "visibilityId": {
+            "type": "integer",
+            "description": "The visibility id for the new Roadmap. If the Roadmap is public, all users can see the Roadmap. Otherwise, only the Roadmap Managers can see the Roadmap.",
             "format": "int32"
           }
         }

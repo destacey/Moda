@@ -15,6 +15,7 @@ import {
   UpdateRoadmapTimeboxRequest,
 } from './../../../services/moda-api'
 import {
+  CopyRoadmapRequest,
   CreateRoadmapRequest,
   RoadmapDetailsDto,
   RoadmapListDto,
@@ -55,6 +56,20 @@ export const roadmapApi = apiSlice.injectEndpoints({
       queryFn: async (request) => {
         try {
           const data = await getRoadmapsClient().create(request)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, arg) => {
+        return [{ type: QueryTags.Roadmap, id: 'LIST' }]
+      },
+    }),
+    copyRoadmap: builder.mutation<ObjectIdAndKey, CopyRoadmapRequest>({
+      queryFn: async (request) => {
+        try {
+          const data = await getRoadmapsClient().copy(request)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -304,6 +319,7 @@ export const {
   useGetRoadmapsQuery,
   useGetRoadmapQuery,
   useCreateRoadmapMutation,
+  useCopyRoadmapMutation,
   useUpdateRoadmapMutation,
   useDeleteRoadmapMutation,
   useGetRoadmapItemsQuery,
