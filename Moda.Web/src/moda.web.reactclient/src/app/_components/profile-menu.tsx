@@ -1,7 +1,11 @@
 'use client'
 
-import { Avatar, Dropdown, Space, Typography } from 'antd'
-import { LogoutOutlined, UserOutlined } from '@ant-design/icons'
+import { Avatar, Dropdown, MenuProps, Space, Typography } from 'antd'
+import {
+  FileTextOutlined,
+  LogoutOutlined,
+  UserOutlined,
+} from '@ant-design/icons'
 import { useRouter } from 'next/navigation'
 import useAuth from '../../components/contexts/auth'
 import { useCallback, useMemo } from 'react'
@@ -22,42 +26,49 @@ const ProfileMenu = () => {
     }
   }, [logout])
 
-  const menuItems = useMemo(
+  const menuItems: MenuProps['items'] = useMemo(
     () => [
-      { key: 'profile', label: 'Account', icon: <UserOutlined /> },
+      {
+        key: 'profile',
+        label: 'Account',
+        icon: <UserOutlined />,
+        onClick: () => router.push('/account/profile'),
+      },
       themeToggleMenuItem,
-      { key: 'logout', label: 'Logout', icon: <LogoutOutlined /> },
+      {
+        key: 'divider',
+        type: 'divider',
+      },
+      ...(process.env.NEXT_PUBLIC_API_BASE_URL
+        ? [
+            {
+              key: 'api-spec',
+              label: 'API Specification',
+              icon: <FileTextOutlined />,
+              onClick: () =>
+                window.open(
+                  `${process.env.NEXT_PUBLIC_API_BASE_URL}/swagger`,
+                  '_blank',
+                  'noopener,noreferrer',
+                ),
+            },
+          ]
+        : []),
+      {
+        key: 'logout',
+        label: 'Logout',
+        icon: <LogoutOutlined />,
+        onClick: handleLogout,
+      },
     ],
-    [themeToggleMenuItem],
-  )
-
-  const menuActions: Record<string, () => void> = useMemo(() => {
-    return {
-      profile: () => router.push('/account/profile'),
-      logout: handleLogout,
-    }
-  }, [router, handleLogout])
-
-  const handleMenuItemClicked = useCallback(
-    (info: { key: string }) => {
-      const action = menuActions[info.key]
-      if (action) {
-        action()
-      } else {
-        console.warn(`No action found for menu key: ${info.key}`)
-      }
-    },
-    [menuActions],
+    [themeToggleMenuItem, router, handleLogout],
   )
 
   return (
     <>
       <Space>
         {user?.name && <Text>Welcome, {user.name}</Text>}
-        <Dropdown
-          menu={{ items: menuItems, onClick: handleMenuItemClicked }}
-          trigger={['click']}
-        >
+        <Dropdown menu={{ items: menuItems }} trigger={['click']}>
           <Avatar icon={<UserOutlined />} />
         </Dropdown>
       </Space>
