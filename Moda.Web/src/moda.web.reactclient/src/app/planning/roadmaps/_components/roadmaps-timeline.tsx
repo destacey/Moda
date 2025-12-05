@@ -264,7 +264,6 @@ export const RoadmapRangeItemTemplate: TimelineTemplate<
 }
 
 const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
-  const [isLoading, setIsLoading] = useState(true)
   // timelineStart / timelineEnd are derived synchronously from props below
   const [currentLevel, setCurrentLevel] = useState<number | undefined>(1)
   const [hasUserChangedLevel, setHasUserChangedLevel] = useState(false)

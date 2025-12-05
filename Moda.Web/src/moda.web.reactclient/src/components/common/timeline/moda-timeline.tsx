@@ -42,7 +42,6 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
 ) => {
   const [isTimelineLoading, setIsTimelineLoading] = useState(false)
   const [isFullScreen, setIsFullScreen] = useState(false)
-  const [dynamicOptions, setDynamicOptions] = useState<TimelineOptions>({})
   const [reinitTrigger, setReinitTrigger] = useState(0)
 
   // Store both container and root for cleanup
@@ -221,13 +220,37 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
   ])
 
   useEffect(() => {
-    // Update options when fullscreen changes
+    // Always update dynamicOptionsRef based on fullscreen state
+    const maxHeight = isFullScreen ? window.innerHeight - 100 : baseOptions.maxHeight
     const updatedOptions = {
       ...baseOptions,
-      maxHeight: isFullScreen ? undefined : baseOptions.maxHeight,
+      maxHeight,
     }
-    setDynamicOptions(updatedOptions)
     dynamicOptionsRef.current = updatedOptions
+
+    // Update existing timeline instance if already initialized
+    if (timelineInstanceRef.current && isInitializedRef.current) {
+      timelineInstanceRef.current.setOptions(updatedOptions)
+    }
+
+    // Add resize listener when in fullscreen
+    if (isFullScreen) {
+      const handleResize = () => {
+        if (!timelineInstanceRef.current || !isInitializedRef.current) return
+        const newMaxHeight = window.innerHeight - 100
+        const resizedOptions = {
+          ...baseOptions,
+          maxHeight: newMaxHeight,
+        }
+        dynamicOptionsRef.current = resizedOptions
+        timelineInstanceRef.current.setOptions(resizedOptions)
+      }
+
+      window.addEventListener('resize', handleResize)
+      return () => {
+        window.removeEventListener('resize', handleResize)
+      }
+    }
   }, [isFullScreen, baseOptions])
 
   // Initialize or reinitialize timeline when structure changes (item count or group count)
