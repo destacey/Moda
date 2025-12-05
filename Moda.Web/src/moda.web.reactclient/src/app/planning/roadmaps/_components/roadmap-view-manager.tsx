@@ -3,7 +3,7 @@
 import { RoadmapDetailsDto, RoadmapItemListDto } from '@/src/services/moda-api'
 import { BuildOutlined, MenuOutlined } from '@ant-design/icons'
 import Segmented, { SegmentedLabeledOption } from 'antd/es/segmented'
-import { memo, useEffect, useMemo, useState } from 'react'
+import { memo, useMemo, useState } from 'react'
 import { RoadmapsTimeline } from '.'
 import RoadmapItemsGrid from './roadmap-items-grid'
 
