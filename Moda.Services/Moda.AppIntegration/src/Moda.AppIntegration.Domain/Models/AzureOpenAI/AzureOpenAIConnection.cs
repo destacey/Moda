@@ -2,7 +2,7 @@ using Moda.AppIntegration.Domain.Models;
 using Moda.AppIntegration.Domain.Models.OpenAI;
 using Moda.Common.Extensions;
 
-public class AzureOpenAIConnection : Connection<AzureOpenAIConnectionConfiguration>
+public class AzureOpenAIConnection : AIConnection<AzureOpenAIConnectionConfiguration>
 {
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
     private AzureOpenAIConnection() { }
@@ -11,15 +11,13 @@ public class AzureOpenAIConnection : Connection<AzureOpenAIConnectionConfigurati
     private AzureOpenAIConnection(
         string name,
         string? description,
-        string? systemId,
         bool configurationIsValid,
         AzureOpenAIConnectionConfiguration configuration)
     {
         Name = name;
         Description = description;
-        SystemId = systemId;
         IsValidConfiguration = configurationIsValid;
-        Connector = Moda.Common.Domain.Enums.AppIntegrations.Connector.OpenAI;
+        Connector = Moda.Common.Domain.Enums.AppIntegrations.Connector.AzureOpenAI;
         Configuration = Guard.Against.Null(configuration, nameof(Configuration));
     }
 
@@ -30,7 +28,6 @@ public class AzureOpenAIConnection : Connection<AzureOpenAIConnectionConfigurati
     public static AzureOpenAIConnection Create(
         string name,
         string? description,
-        string? systemId,
         AzureOpenAIConnectionConfiguration configuration,
         bool configurationIsValid,
         Instant timestamp)
@@ -38,7 +35,6 @@ public class AzureOpenAIConnection : Connection<AzureOpenAIConnectionConfigurati
         var connection = new AzureOpenAIConnection(
             name,
             description,
-            systemId,
             configurationIsValid,
             configuration);
 

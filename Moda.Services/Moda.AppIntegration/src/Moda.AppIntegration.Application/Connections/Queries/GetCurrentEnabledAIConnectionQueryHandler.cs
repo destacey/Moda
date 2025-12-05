@@ -1,0 +1,22 @@
+using Moda.Common.Application.Dtos;
+using Moda.Common.Application.Requests.AppIntegration;
+
+namespace Moda.AppIntegration.Application.Connections.Queries;
+
+internal sealed class GetAIConnectionQueryHandler : IQueryHandler<GetAIConnectionQuery, EnabledAIConnectionDto>
+{
+    private readonly IAppIntegrationDbContext _appIntegrationDbContext;
+
+    public GetAIConnectionQueryHandler(IAppIntegrationDbContext appIntegrationDbContext)
+    {
+        _appIntegrationDbContext = appIntegrationDbContext;
+    }
+
+    public async Task<EnabledAIConnectionDto> Handle(GetAIConnectionQuery request, CancellationToken cancellationToken)
+    {
+        // var query = _appIntegrationDbContext.Connections.AsQueryable();
+
+        // return await query.ProjectToType<EnabledAIConnectionDto>().FirstOrDefaultAsync(cancellationToken);
+        throw new NotImplementedException();
+    }
+}

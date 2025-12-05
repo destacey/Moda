@@ -44,6 +44,7 @@ public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IGoalsDbCo
 
     public DbSet<Connection> Connections => Set<Connection>();
     public DbSet<AzureDevOpsBoardsConnection> AzureDevOpsBoardsConnections => Set<AzureDevOpsBoardsConnection>();
+    public DbSet<AzureOpenAIConnection> AzureOpenAIConnections => Set<AzureOpenAIConnection>();
 
     #endregion IAppIntegration
 
