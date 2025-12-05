@@ -465,13 +465,32 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
     setIsFullScreen(!isFullScreen)
   }
 
-  const saveTimelineAsImage = () => {
-    if (timelineRef.current) {
+  const saveTimelineAsImage = async () => {
+    if (!timelineRef.current || !timelineInstanceRef.current) return
+
+    // Store current options
+    const currentOptions = dynamicOptionsRef.current
+
+    try {
+      // Temporarily remove height constraints to capture full timeline
+      const captureOptions = {
+        ...currentOptions,
+        maxHeight: undefined,
+        height: undefined,
+      }
+      timelineInstanceRef.current.setOptions(captureOptions)
+
+      // Wait for the timeline to re-render with full height
+      await new Promise((resolve) => setTimeout(resolve, 300))
+
       const canvasOptions: Partial<Options> = {
         backgroundColor: token.colorBgContainer,
       }
 
-      saveElementAsImage(timelineRef.current, 'timeline.png', canvasOptions)
+      await saveElementAsImage(timelineRef.current, 'timeline.png', canvasOptions)
+    } finally {
+      // Restore original options
+      timelineInstanceRef.current.setOptions(currentOptions)
     }
   }
 
