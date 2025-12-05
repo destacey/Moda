@@ -1,7 +1,6 @@
 ﻿using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Moda.AppIntegration.Domain.Models.OpenAI;
-using Moda.Common.Application.Interfaces.AzureOpenAI;
 
 namespace Moda.AppIntegration.Application.Connections.Commands;
 
@@ -48,14 +47,13 @@ public sealed class UpdateAzureOpenAIConnectionCommandValidator : CustomValidato
     }
 }
 
-internal sealed class UpdateAzureOpenAIConnectionCommandHandler(IAppIntegrationDbContext appIntegrationDbContext, IDateTimeProvider dateTimeProvider, ILogger<UpdateAzureOpenAIConnectionCommandHandler> logger, IModaAIService azureOpenAIService) : ICommandHandler<UpdateAzureOpenAIConnectionCommand, Guid>
+internal sealed class UpdateAzureOpenAIConnectionCommandHandler(IAppIntegrationDbContext appIntegrationDbContext, IDateTimeProvider dateTimeProvider, ILogger<UpdateAzureOpenAIConnectionCommandHandler> logger) : ICommandHandler<UpdateAzureOpenAIConnectionCommand, Guid>
 {
     private const string AppRequestName = nameof(UpdateAzureOpenAIConnectionCommandHandler);
 
     private readonly IAppIntegrationDbContext _appIntegrationDbContext = appIntegrationDbContext;
     private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
     private readonly ILogger<UpdateAzureOpenAIConnectionCommandHandler> _logger = logger;
-    private readonly IModaAIService _azureOpenAIService = azureOpenAIService;
 
     public async Task<Result<Guid>> Handle(UpdateAzureOpenAIConnectionCommand request, CancellationToken cancellationToken)
     {
@@ -74,21 +72,8 @@ internal sealed class UpdateAzureOpenAIConnectionCommandHandler(IAppIntegrationD
 
             var config = new AzureOpenAIConnectionConfiguration(request.BaseUrl, request.DeploymentName, apiKey);
 
-            var systemIdAndTestResult = await _azureOpenAIService.GetSystemId(config.BaseUrl, config.ApiKey, config.DeploymentName, cancellationToken);
-            if (systemIdAndTestResult.IsFailure)
-            {
-                _logger.LogWarning("Unable to get system id for Azure OpenAI connection with name {Name}. {Error}", request.Name, systemIdAndTestResult.Error);
-            }
-            else if (string.IsNullOrWhiteSpace(connection.SystemId))
-            {
-                var setSystemIdResult = connection.SetSystemId(systemIdAndTestResult.Value);
-                if (setSystemIdResult.IsFailure)
-                {
-                    _logger.LogError("Error setting system id for connection {ConnectionId} to {SystemId}. {Error}", connection.Id, systemIdAndTestResult.Value, setSystemIdResult.Error);
-                }
-            }
-
-            var configurationIsValid = systemIdAndTestResult.IsSuccess && !string.IsNullOrWhiteSpace(connection.SystemId);
+            // TODO: Check the connection validity via some service making a "Test message" chat call using the connection creds
+            var configurationIsValid = true;
 
             var updateResult = connection.Update(request.Name, request.Description, apiKey, request.DeploymentName, configurationIsValid, _dateTimeProvider.Now);
             if (updateResult.IsFailure)

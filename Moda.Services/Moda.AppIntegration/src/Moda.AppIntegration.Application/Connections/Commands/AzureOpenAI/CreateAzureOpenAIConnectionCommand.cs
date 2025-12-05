@@ -1,7 +1,6 @@
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Moda.AppIntegration.Domain.Models.OpenAI;
-using Moda.Common.Application.Interfaces.AzureOpenAI;
 using NodaTime;
 
 namespace Moda.AppIntegration.Application.Connections.Commands;
@@ -52,14 +51,13 @@ public sealed class CreateAzureOpenAIConnectionCommandValidator : CustomValidato
     }
 }
 
-internal sealed class CreateAzureOpenAIConnectionCommandHandler(IAppIntegrationDbContext appIntegrationDbContext, IDateTimeProvider dateTimeProvider, ILogger<CreateAzureOpenAIConnectionCommandHandler> logger, IModaAIService azureOpenAIService) : ICommandHandler<CreateAzureOpenAIConnectionCommand, Guid>
+internal sealed class CreateAzureOpenAIConnectionCommandHandler(IAppIntegrationDbContext appIntegrationDbContext, IDateTimeProvider dateTimeProvider, ILogger<CreateAzureOpenAIConnectionCommandHandler> logger) : ICommandHandler<CreateAzureOpenAIConnectionCommand, Guid>
 {
     private const string AppRequestName = nameof(CreateAzureOpenAIConnectionCommandHandler);
 
     private readonly IAppIntegrationDbContext _appIntegrationDbContext = appIntegrationDbContext;
     private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
     private readonly ILogger<CreateAzureOpenAIConnectionCommandHandler> _logger = logger;
-    private readonly IModaAIService _azureOpenAIService = azureOpenAIService;
 
     public async Task<Result<Guid>> Handle(CreateAzureOpenAIConnectionCommand request, CancellationToken cancellationToken)
     {
@@ -68,14 +66,10 @@ internal sealed class CreateAzureOpenAIConnectionCommandHandler(IAppIntegrationD
             Instant timestamp = _dateTimeProvider.Now;
             var config = new AzureOpenAIConnectionConfiguration(request.ApiKey, request.DeploymentName, request.BaseUrl);
 
-            var systemIdResult = await _azureOpenAIService.GetSystemId(config.BaseUrl, config.ApiKey, config.DeploymentName, cancellationToken);
-            if (systemIdResult.IsFailure)
-            {
-                _logger.LogWarning("Unable to get System ID for Azure OpenAI connection with name {Name}. {Error}", request.Name, systemIdResult.Error);
-            }
-            var systemId = systemIdResult.IsSuccess ? systemIdResult.Value : null;
+            // TODO: call some thing to Test the connection to then pass in the isValidConfiguration flag
+            var isConfigurationValid = true;
 
-            var connection = AzureOpenAIConnection.Create(request.Name, request.Description, systemId, config, systemIdResult.IsSuccess, timestamp);
+            var connection = AzureOpenAIConnection.Create(request.Name, request.Description, config, isConfigurationValid, timestamp);
 
             await _appIntegrationDbContext.AzureOpenAIConnections.AddAsync(connection, cancellationToken);
 
