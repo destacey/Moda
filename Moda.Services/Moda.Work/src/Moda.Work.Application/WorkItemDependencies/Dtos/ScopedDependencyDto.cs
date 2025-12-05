@@ -1,7 +1,8 @@
 ﻿using Moda.Common.Application.Dtos;
 using Moda.Common.Application.Employees.Dtos;
+using Moda.Work.Application.WorkItems.Dtos;
 
-namespace Moda.Work.Application.WorkItems.Dtos;
+namespace Moda.Work.Application.WorkItemDependencies.Dtos;
 public sealed record ScopedDependencyDto
 {
     public Guid Id { get; set; }
@@ -12,6 +13,8 @@ public sealed record ScopedDependencyDto
     public required SimpleNavigationDto State { get; set; }
 
     public required SimpleNavigationDto Health { get; set; }
+
+    public required SimpleNavigationDto Scope { get; set; }
 
     public Instant CreatedOn { get; set; }
 
@@ -41,6 +44,7 @@ public sealed record ScopedDependencyDto
             Type = isOutbound ? "Successor" : "Predecessor",
             State = link.State,
             Health = link.Health,
+            Scope = link.Scope,
             CreatedOn = link.CreatedOn,
             CreatedBy = link.CreatedBy,
             Comment = link.Comment

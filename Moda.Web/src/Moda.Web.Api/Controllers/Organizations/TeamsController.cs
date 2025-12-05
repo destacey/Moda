@@ -14,6 +14,7 @@ using Moda.Web.Api.Extensions;
 using Moda.Web.Api.Models.Organizations;
 using Moda.Web.Api.Models.Organizations.Teams;
 using Moda.Web.Api.Models.Planning.Risks;
+using Moda.Work.Application.WorkItemDependencies.Dtos;
 using Moda.Work.Application.WorkItems.Dtos;
 using Moda.Work.Application.WorkItems.Queries;
 using NodaTime;
