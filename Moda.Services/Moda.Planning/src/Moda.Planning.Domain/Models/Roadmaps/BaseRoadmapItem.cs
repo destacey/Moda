@@ -78,4 +78,15 @@ public abstract class BaseRoadmapItem : BaseEntity<Guid>, ISystemAuditable
 
         return Result.Success();
     }
+
+    /// <summary>
+    /// Sets the parent Roadmap Activity directly. Used for copying items where IDs are not yet assigned.
+    /// </summary>
+    /// <param name="newParentActivity">The new parent activity to assign.</param>
+    internal void SetParentDirect(RoadmapActivity? newParentActivity)
+    {
+        ParentId = newParentActivity?.Id;
+        Parent = newParentActivity;
+        newParentActivity?.AddChild(this);
+    }
 }

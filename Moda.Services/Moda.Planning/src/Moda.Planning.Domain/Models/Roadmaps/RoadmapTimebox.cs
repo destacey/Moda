@@ -10,7 +10,7 @@ public sealed class RoadmapTimebox : BaseRoadmapItem
 
     private RoadmapTimebox() { }
 
-    private RoadmapTimebox(Guid roadmapId, string name, string? description, LocalDateRange dateRange, Guid? parentId, string? color)
+    internal RoadmapTimebox(Guid roadmapId, string name, string? description, LocalDateRange dateRange, Guid? parentId, string? color)
     {
         RoadmapId = roadmapId;
         Name = name;

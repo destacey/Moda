@@ -8,7 +8,7 @@ public sealed class RoadmapMilestone : BaseRoadmapItem
 {
     private RoadmapMilestone() { }
 
-    private RoadmapMilestone(Guid roadmapId, string name, string? description, LocalDate date, Guid? parentId, string? color)
+    internal RoadmapMilestone(Guid roadmapId, string name, string? description, LocalDate date, Guid? parentId, string? color)
     {
         RoadmapId = roadmapId;
         Name = name;

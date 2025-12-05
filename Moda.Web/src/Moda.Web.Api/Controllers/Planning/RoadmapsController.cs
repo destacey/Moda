@@ -54,7 +54,20 @@ public class RoadmapsController : ControllerBase
     public async Task<ActionResult<ObjectIdAndKey>> Create([FromBody] CreateRoadmapRequest request, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(request.ToCreateRoadmapCommand(), cancellationToken);
-        
+
+        return result.IsSuccess
+            ? CreatedAtAction(nameof(GetRoadmap), new { idOrKey = result.Value.Id.ToString() }, result.Value)
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpPost("copy")]
+    [MustHavePermission(ApplicationAction.Create, ApplicationResource.Roadmaps)]
+    [OpenApiOperation("Copy an existing roadmap.", "")]
+    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201IdAndKey))]
+    public async Task<ActionResult<ObjectIdAndKey>> Copy([FromBody] CopyRoadmapRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(request.ToCopyRoadmapCommand(), cancellationToken);
+
         return result.IsSuccess
             ? CreatedAtAction(nameof(GetRoadmap), new { idOrKey = result.Value.Id.ToString() }, result.Value)
             : BadRequest(result.ToBadRequestObject(HttpContext));

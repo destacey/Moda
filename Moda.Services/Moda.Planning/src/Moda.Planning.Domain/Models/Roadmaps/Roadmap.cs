@@ -745,4 +745,90 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, IHasIdAndKey
             return Result.Failure<Roadmap>(ex.Message);
         }
     }
+
+    /// <summary>
+    /// Creates a copy of an existing Roadmap with a new name, managers, and visibility.
+    /// </summary>
+    /// <param name="name">The name for the new roadmap.</param>
+    /// <param name="roadmapManagerIds">The managers for the new roadmap.</param>
+    /// <param name="visibility">The visibility for the new roadmap.</param>
+    /// <returns>A new Roadmap that is a copy of the current one.</returns>
+    public Result<Roadmap> Copy(string name, IEnumerable<Guid> roadmapManagerIds, Visibility visibility)
+    {
+        try
+        {
+            var newRoadmap = new Roadmap(name, Description, DateRange, visibility, roadmapManagerIds);
+
+            // Copy all items - we need to maintain a mapping of old items to new items for parent references
+            var itemMapping = new Dictionary<Guid, BaseRoadmapItem>();
+
+            // First pass: copy all items without parent relationships
+            foreach (var item in _items)
+            {
+                BaseRoadmapItem newItem;
+
+                switch (item)
+                {
+                    case RoadmapActivity activity:
+                        newItem = new RoadmapActivity(
+                            newRoadmap.Id,
+                            activity.Name,
+                            activity.Description,
+                            activity.DateRange,
+                            null, // Will set parent in second pass
+                            activity.Color,
+                            activity.Order);
+                        break;
+                    case RoadmapMilestone milestone:
+                        newItem = new RoadmapMilestone(
+                            newRoadmap.Id,
+                            milestone.Name,
+                            milestone.Description,
+                            milestone.Date,
+                            null, // Will set parent in second pass
+                            milestone.Color);
+                        break;
+                    case RoadmapTimebox timebox:
+                        newItem = new RoadmapTimebox(
+                            newRoadmap.Id,
+                            timebox.Name,
+                            timebox.Description,
+                            timebox.DateRange,
+                            null, // Will set parent in second pass
+                            timebox.Color);
+                        break;
+                    default:
+                        continue;
+                }
+
+                // Map old item ID to new item instance (not ID, since new IDs aren't generated yet)
+                itemMapping[item.Id] = newItem;
+                newRoadmap._items.Add(newItem);
+            }
+
+            // Second pass: update parent references using the item mapping
+            foreach (var oldItem in _items)
+            {
+                if (!oldItem.ParentId.HasValue) continue;
+
+                // Find the corresponding new item
+                if (!itemMapping.TryGetValue(oldItem.Id, out var newItem)) continue;
+
+                // Find the new parent item
+                if (!itemMapping.TryGetValue(oldItem.ParentId.Value, out var newParent)) continue;
+
+                // Only activities can be parents
+                if (newParent is RoadmapActivity newParentActivity)
+                {
+                    newItem.SetParentDirect(newParentActivity);
+                }
+            }
+
+            return newRoadmap;
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure<Roadmap>(ex.Message);
+        }
+    }
 }

@@ -195,6 +195,148 @@ public class RoadmapTests
 
     #endregion Add/Remove Manager Tests
 
+    #region Copy Tests
+
+    [Fact]
+    public void Copy_ValidParameters_ShouldReturnSuccess()
+    {
+        // Arrange
+        var fakeRoadmap = _faker.Generate();
+        var managerId = Guid.NewGuid();
+        var roadmap = Roadmap.Create(fakeRoadmap.Name, fakeRoadmap.Description, fakeRoadmap.DateRange, fakeRoadmap.Visibility, [managerId]).Value;
+
+        var newName = "Copied Roadmap";
+        var newManagerId = Guid.NewGuid();
+        var newVisibility = Visibility.Private;
+
+        // Act
+        var result = roadmap.Copy(newName, [newManagerId], newVisibility);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Name.Should().Be(newName);
+        result.Value.Description.Should().Be(fakeRoadmap.Description);
+        result.Value.DateRange.Should().Be(fakeRoadmap.DateRange);
+        result.Value.Visibility.Should().Be(newVisibility);
+        result.Value.RoadmapManagers.Should().HaveCount(1);
+        result.Value.RoadmapManagers.First().ManagerId.Should().Be(newManagerId);
+        result.Value.Items.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void Copy_NoManagers_ShouldReturnFailure()
+    {
+        // Arrange
+        var fakeRoadmap = _faker.Generate();
+        var managerId = Guid.NewGuid();
+        var roadmap = Roadmap.Create(fakeRoadmap.Name, fakeRoadmap.Description, fakeRoadmap.DateRange, fakeRoadmap.Visibility, [managerId]).Value;
+
+        var newName = "Copied Roadmap";
+        var managers = Array.Empty<Guid>();
+
+        // Act
+        var result = roadmap.Copy(newName, managers, Visibility.Public);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("Required input roadmapManagerIds was empty. (Parameter 'roadmapManagerIds')");
+    }
+
+    [Fact]
+    public void Copy_WithItems_ShouldCopyAllItems()
+    {
+        // Arrange
+        var fakeRoadmap = _faker.Generate();
+        var managerId = Guid.NewGuid();
+        var roadmap = Roadmap.Create(fakeRoadmap.Name, fakeRoadmap.Description, fakeRoadmap.DateRange, fakeRoadmap.Visibility, [managerId]).Value;
+
+        // Create some items
+        var activityResult = roadmap.CreateActivity(new TestUpsertRoadmapActivity(_activityFaker.Generate()), managerId);
+        activityResult.IsSuccess.Should().BeTrue();
+
+        var milestoneResult = roadmap.CreateMilestone(new TestUpsertRoadmapMilestone(_milestoneFaker.Generate()), managerId);
+        milestoneResult.IsSuccess.Should().BeTrue();
+
+        var timeboxResult = roadmap.CreateTimebox(new TestUpsertRoadmapTimebox(_timeboxFaker.Generate()), managerId);
+        timeboxResult.IsSuccess.Should().BeTrue();
+
+        var newName = "Copied Roadmap";
+        var newManagerId = Guid.NewGuid();
+
+        // Act
+        var result = roadmap.Copy(newName, [newManagerId], Visibility.Public);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Items.Should().HaveCount(3);
+
+        var copiedActivity = result.Value.Items.OfType<RoadmapActivity>().FirstOrDefault();
+        copiedActivity.Should().NotBeNull();
+        copiedActivity!.Name.Should().Be(activityResult.Value.Name);
+        copiedActivity.Description.Should().Be(activityResult.Value.Description);
+        copiedActivity.DateRange.Should().Be(activityResult.Value.DateRange);
+
+        var copiedMilestone = result.Value.Items.OfType<RoadmapMilestone>().FirstOrDefault();
+        copiedMilestone.Should().NotBeNull();
+        copiedMilestone!.Name.Should().Be(milestoneResult.Value.Name);
+        copiedMilestone.Description.Should().Be(milestoneResult.Value.Description);
+        copiedMilestone.Date.Should().Be(milestoneResult.Value.Date);
+
+        var copiedTimebox = result.Value.Items.OfType<RoadmapTimebox>().FirstOrDefault();
+        copiedTimebox.Should().NotBeNull();
+        copiedTimebox!.Name.Should().Be(timeboxResult.Value.Name);
+        copiedTimebox.Description.Should().Be(timeboxResult.Value.Description);
+        copiedTimebox.DateRange.Should().Be(timeboxResult.Value.DateRange);
+    }
+
+    [Fact]
+    public void Copy_WithNestedActivities_ShouldPreserveHierarchy()
+    {
+        // Arrange
+        var fakeRoadmap = _faker.Generate();
+        var managerId = Guid.NewGuid();
+        var roadmap = Roadmap.Create(fakeRoadmap.Name, fakeRoadmap.Description, fakeRoadmap.DateRange, fakeRoadmap.Visibility, [managerId]).Value;
+        roadmap.SetPrivate(x => x.Id, Guid.NewGuid());
+
+        // Create parent activity
+        var parentActivityResult = roadmap.CreateActivity(new TestUpsertRoadmapActivity(_activityFaker.Generate()), managerId);
+        parentActivityResult.IsSuccess.Should().BeTrue();
+        parentActivityResult.Value.SetPrivate(x => x.Id, Guid.NewGuid());
+
+        // Create child activity
+        var childActivity = _activityFaker.WithData(parentId: parentActivityResult.Value.Id).Generate();
+        var childActivityResult = roadmap.CreateActivity(new TestUpsertRoadmapActivity(childActivity), managerId);
+        childActivityResult.IsSuccess.Should().BeTrue();
+        childActivityResult.Value.SetPrivate(x => x.Id, Guid.NewGuid());
+
+        var newName = "Copied Roadmap";
+        var newManagerId = Guid.NewGuid();
+
+        // Act
+        var result = roadmap.Copy(newName, [newManagerId], Visibility.Public);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Items.Should().HaveCount(2);
+
+        var copiedActivities = result.Value.Items.OfType<RoadmapActivity>().ToList();
+        copiedActivities.Should().HaveCount(2);
+
+        // Verify parent activity was copied
+        var copiedParent = copiedActivities.FirstOrDefault(a => a.ParentId == null);
+        copiedParent.Should().NotBeNull();
+        copiedParent!.Name.Should().Be(parentActivityResult.Value.Name);
+
+        // Verify child activity was copied and has correct parent reference
+        var copiedChild = copiedActivities.FirstOrDefault(a => a.Name == childActivityResult.Value.Name && a != copiedParent);
+        copiedChild.Should().NotBeNull();
+        copiedChild!.Name.Should().Be(childActivityResult.Value.Name);
+        copiedChild.Parent.Should().Be(copiedParent);
+        copiedParent.Children.Should().Contain(copiedChild);
+    }
+
+    #endregion Copy Tests
+
     #region Create Item Tests
 
     [Fact]
