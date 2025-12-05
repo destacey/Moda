@@ -63,13 +63,13 @@ public class WorkItemDependencyTests
 
     [Theory]
     [MemberData(nameof(HealthTestCases))]
-    public void Create_Health_VariousCases(WorkStatusCategory sourceStatus, int? sourceOffsetDays, int? targetOffsetDays, DependencyPlanningHealth expected)
+    public void Create_Health_VariousCases(WorkStatusCategory sourceStatusCategory, WorkStatusCategory targetStatusCategory, int? sourceOffsetDays, int? targetOffsetDays, DependencyPlanningHealth expected)
     {
         // Arrange
         var now = _dateTimeProvider.Now;
 
-        var source = _workItemFaker.WithData(statusCategory: sourceStatus).Generate();
-        var target = _workItemFaker.WithData(statusCategory: WorkStatusCategory.Active).Generate();
+        var source = _workItemFaker.WithData(statusCategory: sourceStatusCategory).Generate();
+        var target = _workItemFaker.WithData(statusCategory: targetStatusCategory).Generate();
 
         var sourcePlannedOn = sourceOffsetDays.HasValue 
             ? now.Plus(Duration.FromDays(sourceOffsetDays.Value))
@@ -88,29 +88,43 @@ public class WorkItemDependencyTests
     public static IEnumerable<object[]> HealthTestCases()
     {
         // state Done should always be Healthy (ignores planned dates)
-        yield return new object[] { WorkStatusCategory.Done, -10, -5, DependencyPlanningHealth.Healthy };
+        yield return new object[] { WorkStatusCategory.Done, WorkStatusCategory.Proposed, -10, -5, DependencyPlanningHealth.Healthy };
+        yield return new object[] { WorkStatusCategory.Done, WorkStatusCategory.Active, -10, -5, DependencyPlanningHealth.Healthy };
+        yield return new object[] { WorkStatusCategory.Done, WorkStatusCategory.Done, -10, -5, DependencyPlanningHealth.Healthy };
+        yield return new object[] { WorkStatusCategory.Done, WorkStatusCategory.Removed, -10, -5, DependencyPlanningHealth.Healthy };
 
         // state Removed should always be Unhealthy (ignores planned dates)
-        yield return new object[] { WorkStatusCategory.Removed, -10, -5, DependencyPlanningHealth.Unhealthy };
+        yield return new object[] { WorkStatusCategory.Removed, WorkStatusCategory.Proposed, -10, -5, DependencyPlanningHealth.Unhealthy };
+        yield return new object[] { WorkStatusCategory.Removed, WorkStatusCategory.Active, -10, -5, DependencyPlanningHealth.Unhealthy };
+        yield return new object[] { WorkStatusCategory.Removed, WorkStatusCategory.Done, -10, -5, DependencyPlanningHealth.Unhealthy };
+        yield return new object[] { WorkStatusCategory.Removed, WorkStatusCategory.Removed, -10, -5, DependencyPlanningHealth.Unhealthy };
 
-        // both unplanned -> AtRisk
-        yield return new object[] { WorkStatusCategory.Active, null!, null!, DependencyPlanningHealth.AtRisk };
-        
+        // both proposed and unplanned, -> AtRisk
+        yield return new object[] { WorkStatusCategory.Proposed, WorkStatusCategory.Proposed, null!, null!, DependencyPlanningHealth.AtRisk };
+
+        // if the source is not done but the target is active/done/removed, -> Unhealthy
+        yield return new object[] { WorkStatusCategory.Proposed, WorkStatusCategory.Active, null!, null!, DependencyPlanningHealth.Unhealthy };
+        yield return new object[] { WorkStatusCategory.Proposed, WorkStatusCategory.Done, null!, null!, DependencyPlanningHealth.Unhealthy };
+        yield return new object[] { WorkStatusCategory.Proposed, WorkStatusCategory.Removed, null!, null!, DependencyPlanningHealth.Unhealthy };
+        yield return new object[] { WorkStatusCategory.Active, WorkStatusCategory.Active, null!, null!, DependencyPlanningHealth.Unhealthy };
+        yield return new object[] { WorkStatusCategory.Active, WorkStatusCategory.Done, null!, null!, DependencyPlanningHealth.Unhealthy };
+        yield return new object[] { WorkStatusCategory.Active, WorkStatusCategory.Removed, null!, null!, DependencyPlanningHealth.Unhealthy };
+
         // both planned in the past (or at now) -> treated as unplanned -> AtRisk
-        yield return new object[] { WorkStatusCategory.Active, -2, -1, DependencyPlanningHealth.AtRisk };
-        yield return new object[] { WorkStatusCategory.Active, 0, 0, DependencyPlanningHealth.AtRisk };
+        yield return new object[] { WorkStatusCategory.Proposed, WorkStatusCategory.Proposed, -2, -1, DependencyPlanningHealth.AtRisk };
+        yield return new object[] { WorkStatusCategory.Proposed, WorkStatusCategory.Proposed, 0, 0, DependencyPlanningHealth.AtRisk };
 
         // predecessor before successor -> Healthy
-        yield return new object[] { WorkStatusCategory.Active, 1, 2, DependencyPlanningHealth.Healthy };
-        
+        yield return new object[] { WorkStatusCategory.Proposed, WorkStatusCategory.Proposed, 1, 2, DependencyPlanningHealth.Healthy };
+
         // predecessor equal successor -> Healthy
-        yield return new object[] { WorkStatusCategory.Active, 5, 5, DependencyPlanningHealth.Healthy };
+        yield return new object[] { WorkStatusCategory.Proposed, WorkStatusCategory.Proposed, 5, 5, DependencyPlanningHealth.Healthy };
         
         // predecessor after successor -> Unhealthy
-        yield return new object[] { WorkStatusCategory.Active, 5, 2, DependencyPlanningHealth.Unhealthy };
-        
+        yield return new object[] { WorkStatusCategory.Proposed, WorkStatusCategory.Proposed, 5, 2, DependencyPlanningHealth.Unhealthy };
+
         // predecessor planned and successor unplanned -> Healthy
-        yield return new object[] { WorkStatusCategory.Active, 3, null!, DependencyPlanningHealth.Healthy };
+        yield return new object[] { WorkStatusCategory.Proposed, WorkStatusCategory.Proposed, 3, null!, DependencyPlanningHealth.Healthy };
     }
 
     [Fact]
