@@ -49,6 +49,7 @@ const ProfileMenu = () => {
                 window.open(
                   `${process.env.NEXT_PUBLIC_API_BASE_URL}/swagger`,
                   '_blank',
+                  'noopener,noreferrer',
                 ),
             },
           ]
