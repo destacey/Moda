@@ -250,7 +250,7 @@ const PersonalAccessTokens: FC = () => {
       <Space direction="vertical" size={16}>
         <Alert
           message="Personal Access Tokens (PATs)"
-          description="Personal access tokens function like passwords for API authentication. Keep them secure and never share them."
+          description="Personal access tokens function like passwords for API authentication. Keep them secure and never share them. Each user can have up to 10 active tokens."
           type="info"
           showIcon
         />
