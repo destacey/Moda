@@ -1,4 +1,5 @@
 export { default as CreateRoadmapForm } from './create-roadmap-form'
+export { default as CopyRoadmapForm } from './copy-roadmap-form'
 export { default as DeleteRoadmapForm } from './delete-roadmap-form'
 export { default as DeleteRoadmapItemForm } from './delete-roadmap-item-form'
 export { default as EditRoadmapForm } from './edit-roadmap-form'
