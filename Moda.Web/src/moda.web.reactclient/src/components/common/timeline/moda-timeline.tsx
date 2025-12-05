@@ -12,7 +12,7 @@ import { createRoot } from 'react-dom/client'
 import { DataSet } from 'vis-data'
 import { Timeline, TimelineOptions } from 'vis-timeline/standalone'
 import { TimelineOptionsTemplateFunction } from '@/src/lib/vis-timeline'
-import { Button, Spin } from 'antd'
+import { Button, Dropdown, MenuProps, Spin } from 'antd'
 import useTheme from '../../contexts/theme'
 import { ModaEmpty } from '..'
 import './moda-timeline.css'
@@ -30,6 +30,7 @@ import {
   FileImageOutlined,
   FullscreenExitOutlined,
   FullscreenOutlined,
+  MoreOutlined,
   UndoOutlined,
 } from '@ant-design/icons'
 import { saveElementAsImage } from '@/src/utils'
@@ -508,6 +509,37 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
   const hasData = props.data && props.data.length > 0
   const showControls = !isLoading && hasData
 
+  const menuItems: MenuProps['items'] = useMemo(() => {
+    const items: MenuProps['items'] = []
+
+    if (enableFullScreenToggle) {
+      items.push({
+        key: 'fullscreen',
+        label: isFullScreen ? 'Exit Fullscreen' : 'Enter Fullscreen',
+        icon: isFullScreen ? <FullscreenExitOutlined /> : <FullscreenOutlined />,
+        onClick: toggleFullScreen,
+      })
+    }
+
+    if (enableSaveAsImage) {
+      items.push({
+        key: 'save-image',
+        label: 'Save as Image',
+        icon: <FileImageOutlined />,
+        onClick: saveTimelineAsImage,
+      })
+    }
+
+    items.push({
+      key: 'reset',
+      label: 'Reset View',
+      icon: <UndoOutlined />,
+      onClick: resetWindow,
+    })
+
+    return items
+  }, [enableFullScreenToggle, enableSaveAsImage, isFullScreen])
+
   return (
     <Spin spinning={isLoading} tip="Loading timeline..." size="large">
       <div
@@ -525,68 +557,23 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
           overflow: isFullScreen ? 'auto' : 'unset',
         }}
       >
-        {enableFullScreenToggle && showControls && (
-          <Button
-            type="text"
-            shape="circle"
-            title={isFullScreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
-            aria-label={
-              isFullScreen ? 'Exit Fullscreen Mode' : 'Enter Fullscreen Mode'
-            }
-            icon={
-              isFullScreen ? <FullscreenExitOutlined /> : <FullscreenOutlined />
-            }
-            onClick={toggleFullScreen}
-            size="small"
-            style={{
-              position: 'absolute',
-              top: isFullScreen ? 25 : 5,
-              right: isFullScreen ? 25 : 5,
-              zIndex: 1000,
-            }}
-          />
-        )}
-        {enableSaveAsImage && showControls && (
-          <Button
-            type="text"
-            shape="circle"
-            title="Save Timeline as Image"
-            aria-label="Save Timeline as Image"
-            icon={<FileImageOutlined />}
-            onClick={saveTimelineAsImage}
-            size="small"
-            style={{
-              position: 'absolute',
-              top: isFullScreen ? 25 : 5,
-              right: isFullScreen ? 65 : 45,
-              zIndex: 1000,
-            }}
-          />
-        )}
         {showControls && (
-          <Button
-            type="text"
-            shape="circle"
-            title="Reset Timeline View"
-            aria-label="Reset Timeline View"
-            icon={<UndoOutlined />}
-            onClick={resetWindow}
-            size="small"
-            style={{
-              position: 'absolute',
-              top: isFullScreen ? 25 : 5,
-              right: enableSaveAsImage
-                ? isFullScreen
-                  ? 105
-                  : 85
-                : enableFullScreenToggle
-                  ? isFullScreen
-                    ? 65
-                    : 45
-                  : 5,
-              zIndex: 1000,
-            }}
-          />
+          <Dropdown menu={{ items: menuItems }} trigger={['click']}>
+            <Button
+              type="text"
+              shape="circle"
+              title="Timeline Actions"
+              aria-label="Timeline Actions"
+              icon={<MoreOutlined />}
+              size="small"
+              style={{
+                position: 'absolute',
+                top: isFullScreen ? 25 : 5,
+                right: isFullScreen ? 25 : 5,
+                zIndex: 1000,
+              }}
+            />
+          </Dropdown>
         )}
         <div ref={timelineRef} />
         {!isLoading &&
