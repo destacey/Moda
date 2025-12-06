@@ -194,7 +194,7 @@ export const projectsApi = apiSlice.injectEndpoints({
           const data: BaseOptionType[] = portfolios
             .sort((a, b) => a.name.localeCompare(b.name))
             .map((category) => ({
-              label: category.name,
+              label: `${category.name} (${category.key})`,
               value: category.id,
             }))
 

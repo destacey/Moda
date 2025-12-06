@@ -199,7 +199,6 @@ const EditWorkItemProjectForm = (props: EditWorkItemProjectFormProps) => {
       <Modal
         title="Edit Project"
         open={isOpen}
-        width={'60vw'}
         onOk={handleOk}
         okButtonProps={{ disabled: !isValid }}
         okText="Save"
@@ -231,6 +230,13 @@ const EditWorkItemProjectForm = (props: EditWorkItemProjectFormProps) => {
                 allowClear
                 options={projectOptions ?? []}
                 placeholder="Select Project"
+                showSearch
+                optionFilterProp="label"
+                filterOption={(input, option) =>
+                  (option?.label?.toLowerCase() ?? '').includes(
+                    input.toLowerCase(),
+                  )
+                }
               />
             </Item>
           </Form>
