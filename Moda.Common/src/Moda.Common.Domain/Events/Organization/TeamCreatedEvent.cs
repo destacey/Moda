@@ -1,10 +1,11 @@
 using Moda.Common.Domain.Enums.Organization;
+using Moda.Common.Domain.Interfaces.Organization;
 using Moda.Common.Domain.Models.Organizations;
 using NodaTime;
 
 namespace Moda.Common.Domain.Events.Organization;
 
-public record TeamCreatedEvent : DomainEvent
+public sealed record TeamCreatedEvent : DomainEvent, ISimpleTeam
 {
     public TeamCreatedEvent(Guid id, int key, TeamCode code, string name, string? description, TeamType type, LocalDate activeDate, LocalDate? inactiveDate, bool isActive, Instant timestamp)
     {

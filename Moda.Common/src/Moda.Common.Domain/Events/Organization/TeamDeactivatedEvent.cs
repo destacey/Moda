@@ -2,7 +2,7 @@ using NodaTime;
 
 namespace Moda.Common.Domain.Events.Organization;
 
-public record TeamDeactivatedEvent : DomainEvent
+public sealed record TeamDeactivatedEvent : DomainEvent
 {
     public TeamDeactivatedEvent(Guid id, LocalDate inactiveDate, Instant timestamp)
     {

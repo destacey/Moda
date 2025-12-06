@@ -1,10 +1,10 @@
-using NodaTime;
+﻿using NodaTime;
 
 namespace Moda.Common.Domain.Events.Organization;
 
-public sealed record TeamActivatedEvent : DomainEvent
+public sealed record TeamDeletedEvent : DomainEvent
 {
-    public TeamActivatedEvent(Guid id, Instant timestamp)
+    public TeamDeletedEvent(Guid id, Instant timestamp)
     {
         Id = id;
         Timestamp = timestamp;

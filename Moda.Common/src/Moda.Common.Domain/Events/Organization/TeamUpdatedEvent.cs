@@ -3,7 +3,7 @@ using NodaTime;
 
 namespace Moda.Common.Domain.Events.Organization;
 
-public record TeamUpdatedEvent : DomainEvent
+public sealed record TeamUpdatedEvent : DomainEvent
 {
     public TeamUpdatedEvent(Guid id, TeamCode code, string name, string? description, Instant timestamp)
     {
