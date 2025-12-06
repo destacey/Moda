@@ -42,6 +42,9 @@ dotnet test --filter "FullyQualifiedName~ProjectServiceTests.ShouldReturnValidRe
 
 # Run tests with verbosity
 dotnet test --verbosity minimal
+
+# Run architecture tests (enforce Clean Architecture rules)
+dotnet test Moda.ArchitectureTests/Moda.ArchitectureTests.csproj
 ```
 
 **Run the API locally:**
@@ -121,6 +124,27 @@ Infrastructure (depends on Application & Domain)
   ↑
 Web API (depends on all layers)
 ```
+
+**Architecture Tests**: The solution includes automated architecture tests in `Moda.ArchitectureTests` that enforce these dependency rules using NetArchTest.Rules. These tests ensure:
+
+- **Domain Layer** (`Moda.*.Domain`):
+  - Cannot depend on Application, Infrastructure, Web, or Integrations
+  - Can only depend on `Moda.Common` and `Moda.Common.Domain`
+
+- **Application Layer** (`Moda.*.Application`):
+  - Cannot depend on Infrastructure, Web, or Integrations
+  - Can depend on its own Domain and cross-cutting domains (e.g., `Organization.Domain`)
+  - Can depend on `Moda.Common`, `Moda.Common.Domain`, and `Moda.Common.Application`
+
+- **Common Layers**:
+  - `Moda.Common.Domain` cannot depend on `Moda.Common.Application`
+  - Common projects cannot depend on Infrastructure
+
+- **Service Isolation**:
+  - Application projects should primarily reference their own domain
+  - Cross-service domain references must be intentional (e.g., `Organization.Domain` is a known cross-cutting concern)
+
+Run architecture tests: `dotnet test Moda.ArchitectureTests/Moda.ArchitectureTests.csproj`
 
 ### Solution Structure
 
@@ -232,6 +256,7 @@ Moda.Work.Application/
 - FluentAssertions
 - Moq + Moq.AutoMock
 - Bogus (fake data generation)
+- NetArchTest.Rules (architecture tests)
 - Jest (frontend)
 
 ### Database
