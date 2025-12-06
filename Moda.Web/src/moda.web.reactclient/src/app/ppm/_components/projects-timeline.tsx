@@ -8,14 +8,17 @@ import {
   TimelineTemplate,
 } from '@/src/components/common/timeline'
 import { ProjectListDto } from '@/src/services/moda-api'
-import { Card, Divider, Flex, Space, Switch, Typography } from 'antd'
+import { Card, Divider, Flex, Space, Switch, theme, Typography } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import dayjs from 'dayjs'
 import { ReactNode, useCallback, useMemo, useState } from 'react'
 import { ProjectDrawer } from '.'
 import { DataGroup } from 'vis-timeline/standalone'
+import { ProjectStatus } from '@/src/components/types'
+import { getLuminance } from '@/src/utils/color-helper'
 
 const { Text } = Typography
+const { useToken } = theme
 
 export interface ProjectsTimelineProps {
   projects: ProjectListDto[]
@@ -33,11 +36,14 @@ interface ProjectTimelineItem extends ModaDataItem<ProjectListDto, string> {
 export const ProjectRangeItemTemplate: TimelineTemplate<
   ProjectTimelineItem
 > = ({ item, fontColor, foregroundColor }) => {
+  const adjustedfontColor =
+    getLuminance(item.itemColor ?? '') > 0.6 ? '#4d4d4d' : '#FFFFFF'
+
   return (
     <Text style={{ padding: '5px' }}>
       <a
         onClick={() => item.openProjectDrawer(item.objectData.key)}
-        style={{ textDecoration: 'none' }}
+        style={{ color: adjustedfontColor, textDecoration: 'none' }}
         onMouseOver={(e) =>
           (e.currentTarget.style.textDecoration = 'underline')
         }
@@ -50,10 +56,26 @@ export const ProjectRangeItemTemplate: TimelineTemplate<
 }
 
 const ProjectsTimeline: React.FC<ProjectsTimelineProps> = (props) => {
+  const { token } = useToken()
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [selectedItemKey, setSelectedItemKey] = useState<number | null>(null)
   const [showCurrentTime, setShowCurrentTime] = useState<boolean>(true)
-  // ...existing code...
+
+  const getProjectStatusColor = useCallback(
+    (status: ProjectStatus): string => {
+      switch (status) {
+        case ProjectStatus.Active:
+          return token.colorInfo
+        case ProjectStatus.Completed:
+          return token.colorSuccess
+        case ProjectStatus.Cancelled:
+          return token.colorError
+        default:
+          return token.colorTextBase
+      }
+    },
+    [token],
+  )
 
   const showDrawer = useCallback(() => {
     setDrawerOpen(true)
@@ -114,6 +136,7 @@ const ProjectsTimeline: React.FC<ProjectsTimelineProps> = (props) => {
         id: String(project.id),
         title: project.name,
         content: project.name,
+        itemColor: getProjectStatusColor(project.status.id as ProjectStatus),
         objectData: project,
         group: project.program?.name ?? 'No Program',
         type: 'range',
@@ -121,7 +144,12 @@ const ProjectsTimeline: React.FC<ProjectsTimelineProps> = (props) => {
         end: new Date(project.end),
         openProjectDrawer: openProjectDrawer,
       }))
-  }, [openProjectDrawer, props.isLoading, props.projects])
+  }, [
+    getProjectStatusColor,
+    openProjectDrawer,
+    props.isLoading,
+    props.projects,
+  ])
 
   const timelineWindow = useMemo(() => {
     let minDate = dayjs()

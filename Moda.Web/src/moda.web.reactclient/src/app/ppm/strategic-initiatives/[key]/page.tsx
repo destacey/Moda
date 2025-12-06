@@ -187,6 +187,7 @@ const StrategicInitiativeDetailsPage = (props: {
             isLoading={isLoadingProjects}
             refetch={refetchProjects}
             hidePortfolio={true}
+            groupByProgram={true}
           />
         )
       default:
