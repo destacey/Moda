@@ -1,5 +1,6 @@
 ﻿using Moda.Common.Domain.Enums.Organization;
 using Moda.Common.Domain.Events;
+using Moda.Common.Domain.Events.Organization;
 using Moda.Common.Domain.Models.Organizations;
 using Moda.Organization.Domain.Models;
 using Moda.Organization.Domain.Tests.Data;
@@ -41,8 +42,26 @@ public class TeamOfTeamsTests
         sut.ParentMemberships.Should().BeEmpty();
         sut.ChildMemberships.Should().BeEmpty();
 
+        sut.PostPersistenceActions.Should().NotBeEmpty();
+
+        // get the first action and execute it to ensure it's a valid TeamCreatedEvent
+        var action = sut.PostPersistenceActions.First();
+        action.Should().NotBeNull();
+        action();
         sut.DomainEvents.Should().NotBeEmpty();
-        sut.DomainEvents.Should().ContainSingle(e => e is EntityCreatedEvent<TeamOfTeams>);
+        sut.DomainEvents.Should().ContainSingle(e => e is TeamCreatedEvent);
+
+        // get the event and verify its properties
+        var createdEvent = sut.DomainEvents.OfType<TeamCreatedEvent>().First();
+        createdEvent.Id.Should().Be(sut.Id);
+        createdEvent.Key.Should().Be(sut.Key);
+        createdEvent.Code.Should().Be(sut.Code);
+        createdEvent.Name.Should().Be(sut.Name);
+        createdEvent.Description.Should().Be(sut.Description);
+        createdEvent.Type.Should().Be(TeamType.TeamOfTeams);
+        createdEvent.ActiveDate.Should().Be(sut.ActiveDate);
+        createdEvent.InactiveDate.Should().BeNull();
+        createdEvent.IsActive.Should().BeTrue();
     }
 
     [Fact]
@@ -130,7 +149,7 @@ public class TeamOfTeamsTests
         team.IsActive.Should().BeTrue();
 
         team.DomainEvents.Should().NotBeEmpty();
-        team.DomainEvents.Should().ContainSingle(e => e is EntityUpdatedEvent<TeamOfTeams>);
+        team.DomainEvents.Should().ContainSingle(e => e is TeamUpdatedEvent);
     }
 
     [Fact]
@@ -202,7 +221,7 @@ public class TeamOfTeamsTests
         team.Description.Should().BeNull();
 
         team.DomainEvents.Should().NotBeEmpty();
-        team.DomainEvents.Should().ContainSingle(e => e is EntityUpdatedEvent<TeamOfTeams>);
+        team.DomainEvents.Should().ContainSingle(e => e is TeamUpdatedEvent);
     }
 
     #endregion Update
@@ -224,7 +243,7 @@ public class TeamOfTeamsTests
         team.IsActive.Should().BeTrue();
 
         team.DomainEvents.Should().NotBeEmpty();
-        team.DomainEvents.Should().ContainSingle(e => e is EntityActivatedEvent<TeamOfTeams>);
+        team.DomainEvents.Should().ContainSingle(e => e is TeamActivatedEvent);
     }
 
     [Fact]
@@ -242,7 +261,7 @@ public class TeamOfTeamsTests
         result.IsSuccess.Should().BeTrue();
         team.IsActive.Should().BeFalse();
         team.InactiveDate.Should().Be(inactiveDate);
-        team.DomainEvents.Should().ContainSingle(e => e is EntityDeactivatedEvent<TeamOfTeams>);
+        team.DomainEvents.Should().ContainSingle(e => e is TeamDeactivatedEvent);
     }
 
     [Fact]

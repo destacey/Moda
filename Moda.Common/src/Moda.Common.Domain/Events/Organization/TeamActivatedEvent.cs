@@ -1,0 +1,14 @@
+using NodaTime;
+
+namespace Moda.Common.Domain.Events.Organization;
+
+public record TeamActivatedEvent : DomainEvent
+{
+    public TeamActivatedEvent(Guid id, Instant timestamp)
+    {
+        Id = id;
+        Timestamp = timestamp;
+    }
+
+    public Guid Id { get; }
+}
