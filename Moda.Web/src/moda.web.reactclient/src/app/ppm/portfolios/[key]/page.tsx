@@ -174,6 +174,7 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
             projects={projectData}
             isLoading={isLoadingProjects}
             refetch={refetchProjects}
+            groupByProgram={true}
           />
         )
       case PortfolioTabs.StrategicInitiatives:

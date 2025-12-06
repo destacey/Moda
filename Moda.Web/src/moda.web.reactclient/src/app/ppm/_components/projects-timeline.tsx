@@ -13,6 +13,7 @@ import { ItemType } from 'antd/es/menu/interface'
 import dayjs from 'dayjs'
 import { ReactNode, useCallback, useMemo, useState } from 'react'
 import { ProjectDrawer } from '.'
+import { DataGroup } from 'vis-timeline/standalone'
 
 const { Text } = Typography
 
@@ -21,6 +22,7 @@ export interface ProjectsTimelineProps {
   isLoading: boolean
   refetch: () => void
   viewSelector?: ReactNode
+  groupByProgram?: boolean
 }
 
 interface ProjectTimelineItem extends ModaDataItem<ProjectListDto, string> {
@@ -70,6 +72,38 @@ const ProjectsTimeline: React.FC<ProjectsTimelineProps> = (props) => {
     [showDrawer],
   )
 
+  const groups: DataGroup[] = useMemo((): DataGroup[] => {
+    if (!props.groupByProgram) {
+      return []
+    }
+
+    const programGroups: { [key: string]: DataGroup } = {}
+
+    props.projects.forEach((project) => {
+      const programName = project.program?.name || 'No Program'
+      if (!programGroups[programName]) {
+        programGroups[programName] = {
+          id: programName,
+          content: programName,
+        }
+      }
+    })
+
+    const groups = Object.values(programGroups)
+
+    // if the only group is "No Program", return an empty list
+    if (groups.length === 1 && groups[0].id === 'No Program') {
+      return []
+    }
+
+    // return alphabetically sorted groups with 'No Program' last
+    return groups.sort((a, b) => {
+      if (a.id === 'No Program') return 1
+      if (b.id === 'No Program') return -1
+      return String(a.id).localeCompare(String(b.id))
+    })
+  }, [props.groupByProgram, props.projects])
+
   // Derive timeline items and window synchronously so the timeline receives data on first render
   const processedProjects = useMemo((): ProjectTimelineItem[] => {
     if (props.isLoading || !props.projects) return []
@@ -81,6 +115,7 @@ const ProjectsTimeline: React.FC<ProjectsTimelineProps> = (props) => {
         title: project.name,
         content: project.name,
         objectData: project,
+        group: project.program?.name ?? 'No Program',
         type: 'range',
         start: new Date(project.start),
         end: new Date(project.end),
@@ -106,6 +141,10 @@ const ProjectsTimeline: React.FC<ProjectsTimelineProps> = (props) => {
 
     return { start: minDate.toDate(), end: maxDate.toDate() }
   }, [processedProjects])
+
+  const projectsNoDatesCount = useMemo(() => {
+    return props.projects.filter((project) => !project.start).length
+  }, [props.projects])
 
   const timelineOptions = useMemo(
     (): ModaTimelineOptions<ProjectTimelineItem> => ({
@@ -144,8 +183,6 @@ const ProjectsTimeline: React.FC<ProjectsTimelineProps> = (props) => {
     return items
   }, [showCurrentTime, onShowCurrentTimeChange])
 
-  const isLoading = props.isLoading
-
   return (
     <>
       <Flex justify="end" align="center">
@@ -156,13 +193,21 @@ const ProjectsTimeline: React.FC<ProjectsTimelineProps> = (props) => {
       <Card size="small" variant="borderless">
         <ModaTimeline
           data={processedProjects}
-          isLoading={isLoading}
+          groups={groups.length > 0 ? groups : undefined}
+          isLoading={props.isLoading}
           options={timelineOptions}
           rangeItemTemplate={ProjectRangeItemTemplate}
           allowFullScreen={true}
           allowSaveAsImage={true}
         />
       </Card>
+      {projectsNoDatesCount > 0 && (
+        <Text type="warning">
+          Note: {projectsNoDatesCount}{' '}
+          {projectsNoDatesCount === 1 ? 'project is' : 'projects are'} not shown
+          on the timeline due to missing dates.
+        </Text>
+      )}
       {selectedItemKey && (
         <ProjectDrawer
           projectKey={selectedItemKey}
