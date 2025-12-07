@@ -1,9 +1,13 @@
-﻿using CSharpFunctionalExtensions;
+﻿using Ardalis.GuardClauses;
+using CSharpFunctionalExtensions;
+using Moda.Common.Domain.Data;
 using Moda.Common.Domain.Enums.Goals;
-using Moda.Common.Domain.Interfaces;
-using Moda.Goals.Domain.Enums;
+using Moda.Common.Extensions;
+using NodaTime;
 
 namespace Moda.Goals.Domain.Models;
+
+// TODO make a BaseObjective to inherit Objective and KeyResult from
 public class Objective : BaseSoftDeletableEntity<Guid>, IHasIdAndKey
 {
     private string _name = default!;
@@ -61,6 +65,7 @@ public class Objective : BaseSoftDeletableEntity<Guid>, IHasIdAndKey
     /// <value>The progress percentage.</value>
     public double Progress
     {
+        // TODO: switch to decimal
         get => _progress;
         private set => _progress = value < 0
             ? 0.0d

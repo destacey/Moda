@@ -13,7 +13,6 @@
     <ItemGroup>
         <ProjectReference Include="..\..\..\..\Moda.Common\src\Moda.Common.Application\Moda.Common.Application.csproj" />
         <ProjectReference Include="..\..\..\..\Moda.Common\src\Moda.Common\Moda.Common.csproj" />
-        <ProjectReference Include="..\..\..\Moda.Goals\src\Moda.Goals.Application\Moda.Goals.Application.csproj" />
         <ProjectReference Include="..\Moda.Planning.Domain\Moda.Planning.Domain.csproj" />
     </ItemGroup>
 

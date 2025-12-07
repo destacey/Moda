@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using Moda.Common.Application.Requests.Goals;
+using Moda.Common.Application.Requests.Goals.Commands;
 
 namespace Moda.Planning.Application.PlanningIntervals.Commands;
 public sealed record UpdatePlanningIntervalObjectivesOrderCommand(Guid PlanningIntervalId, Dictionary<Guid,int?> Objectives) : ICommand;
@@ -20,20 +20,13 @@ public sealed class UpdatePlanningIntervalObjectivesOrderCommandValidator : Cust
     }
 }
 
-internal sealed class UpdatePlanningIntervalObjectivesOrderCommandHandler : ICommandHandler<UpdatePlanningIntervalObjectivesOrderCommand>
+internal sealed class UpdatePlanningIntervalObjectivesOrderCommandHandler(IPlanningDbContext planningDbContext, ISender sender, ILogger<UpdatePlanningIntervalObjectivesOrderCommandHandler> logger) : ICommandHandler<UpdatePlanningIntervalObjectivesOrderCommand>
 {
     private const string AppRequestName = nameof(UpdatePlanningIntervalObjectivesOrderCommand);
 
-    private readonly IPlanningDbContext _planningDbContext;
-    private readonly ISender _sender;
-    private readonly ILogger<UpdatePlanningIntervalObjectivesOrderCommandHandler> _logger;
-
-    public UpdatePlanningIntervalObjectivesOrderCommandHandler(IPlanningDbContext planningDbContext, ISender sender, ILogger<UpdatePlanningIntervalObjectivesOrderCommandHandler> logger)
-    {
-        _planningDbContext = planningDbContext;
-        _sender = sender;
-        _logger = logger;
-    }
+    private readonly IPlanningDbContext _planningDbContext = planningDbContext;
+    private readonly ISender _sender = sender;
+    private readonly ILogger<UpdatePlanningIntervalObjectivesOrderCommandHandler> _logger = logger;
 
     public async Task<Result> Handle(UpdatePlanningIntervalObjectivesOrderCommand request, CancellationToken cancellationToken)
     {

@@ -1,5 +1,4 @@
 ﻿using Moda.Common.Domain.Enums.Goals;
-using Moda.Goals.Domain.Enums;
 
 namespace Moda.Goals.Domain.Tests.Data;
 public class ObjectiveFaker : Faker<Objective>

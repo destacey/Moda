@@ -1,5 +1,5 @@
 ﻿using Moda.Common.Application.Dtos;
-using Moda.Goals.Application.Objectives.Dtos;
+using Moda.Common.Application.Requests.Goals.Dtos;
 using Moda.Planning.Application.Models;
 
 namespace Moda.Planning.Application.PlanningIntervals.Dtos;

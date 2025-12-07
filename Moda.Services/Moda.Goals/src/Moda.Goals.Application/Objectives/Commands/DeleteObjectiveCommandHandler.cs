@@ -1,18 +1,12 @@
-﻿using Moda.Goals.Application.Persistence;
+﻿using Moda.Common.Application.Requests.Goals.Commands;
+using Moda.Goals.Application.Persistence;
 
 namespace Moda.Goals.Application.Objectives.Commands;
-public sealed record DeleteObjectiveCommand(Guid Id) : ICommand;
 
-internal sealed class DeleteObjectiveCommandHandler : ICommandHandler<DeleteObjectiveCommand>
+internal sealed class DeleteObjectiveCommandHandler(IGoalsDbContext goalsDbContext, ILogger<DeleteObjectiveCommandHandler> logger) : ICommandHandler<DeleteObjectiveCommand>
 {
-    private readonly IGoalsDbContext _goalsDbContext;
-    private readonly ILogger<DeleteObjectiveCommandHandler> _logger;
-
-    public DeleteObjectiveCommandHandler(IGoalsDbContext goalsDbContext, ILogger<DeleteObjectiveCommandHandler> logger)
-    {
-        _goalsDbContext = goalsDbContext;
-        _logger = logger;
-    }
+    private readonly IGoalsDbContext _goalsDbContext = goalsDbContext;
+    private readonly ILogger<DeleteObjectiveCommandHandler> _logger = logger;
 
     public async Task<Result> Handle(DeleteObjectiveCommand request, CancellationToken cancellationToken)
     {

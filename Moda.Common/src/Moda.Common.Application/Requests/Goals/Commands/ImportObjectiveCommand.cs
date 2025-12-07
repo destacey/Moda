@@ -1,9 +1,7 @@
 ﻿using Moda.Common.Domain.Enums.Goals;
-using Moda.Goals.Application.Persistence;
-using Moda.Goals.Domain.Enums;
-using Moda.Goals.Domain.Models;
 
-namespace Moda.Goals.Application.Objectives.Commands;
+namespace Moda.Common.Application.Requests.Goals.Commands;
+
 public sealed record ImportObjectiveCommand(string Name, string? Description, ObjectiveType Type, ObjectiveStatus Status, double Progress, Guid? OwnerId, Guid? PlanId, LocalDate? StartDate, LocalDate? TargetDate, Instant? ClosedDate, int? Order) : ICommand<Guid>;
 
 public sealed class ImportObjectiveCommandValidator : CustomValidator<ImportObjectiveCommand>
@@ -59,53 +57,5 @@ public sealed class ImportObjectiveCommandValidator : CustomValidator<ImportObje
             .Otherwise(() => RuleFor(o => o.ClosedDate)
                 .Empty()
                     .WithMessage("The ClosedDateUtc must be empty if the status is not Completed or Canceled"));
-    }
-}
-
-internal sealed class ImportObjectiveCommandHandler : ICommandHandler<ImportObjectiveCommand, Guid>
-{
-    private readonly IGoalsDbContext _goalsDbContext;
-    private readonly ILogger<ImportObjectiveCommandHandler> _logger;
-
-    public ImportObjectiveCommandHandler(IGoalsDbContext goalsDbContext, ILogger<ImportObjectiveCommandHandler> logger)
-    {
-        _goalsDbContext = goalsDbContext;
-        _logger = logger;
-    }
-
-    public async Task<Result<Guid>> Handle(ImportObjectiveCommand request, CancellationToken cancellationToken)
-    {
-        try
-        {
-            var objective = Objective.
-
-                Import(
-                request.Name,
-                request.Description,
-                request.Type,
-                request.Status,
-                request.Progress,
-                request.OwnerId,
-                request.PlanId,
-                request.StartDate,
-                request.TargetDate,
-                request.ClosedDate,
-                request.Order
-                );
-
-            await _goalsDbContext.Objectives.AddAsync(objective, cancellationToken);
-
-            await _goalsDbContext.SaveChangesAsync(cancellationToken);
-
-            return Result.Success(objective.Id);
-        }
-        catch (Exception ex)
-        {
-            var requestName = request.GetType().Name;
-
-            _logger.LogError(ex, "Moda Request: Exception for Request {Name} {@Request}", requestName, request);
-
-            return Result.Failure<Guid>($"Moda Request: Exception for Request {requestName} {request}");
-        }
     }
 }

@@ -1,23 +1,16 @@
 using MediatR;
-using Moda.Goals.Application.Objectives.Commands;
-using Moda.Goals.Application.Objectives.Queries;
+using Moda.Common.Application.Requests.Goals.Commands;
+using Moda.Common.Application.Requests.Goals.Queries;
 
 namespace Moda.Planning.Application.PlanningIntervals.Commands;
 
 public sealed record DeletePlanningIntervalObjectiveCommand(Guid PlanningIntervalId, Guid PlanningIntervalObjectiveId) : ICommand;
 
-internal sealed class DeletePlanningIntervalObjectiveCommandHandler : ICommandHandler<DeletePlanningIntervalObjectiveCommand>
+internal sealed class DeletePlanningIntervalObjectiveCommandHandler(IPlanningDbContext planningDbContext, ISender sender, ILogger<DeletePlanningIntervalObjectiveCommandHandler> logger) : ICommandHandler<DeletePlanningIntervalObjectiveCommand>
 {
-    private readonly IPlanningDbContext _planningDbContext;
-    private readonly ISender _sender;
-    private readonly ILogger<DeletePlanningIntervalObjectiveCommandHandler> _logger;
-
-    public DeletePlanningIntervalObjectiveCommandHandler(IPlanningDbContext planningDbContext, ISender sender, ILogger<DeletePlanningIntervalObjectiveCommandHandler> logger)
-    {
-        _planningDbContext = planningDbContext;
-        _sender = sender;
-        _logger = logger;
-    }
+    private readonly IPlanningDbContext _planningDbContext = planningDbContext;
+    private readonly ISender _sender = sender;
+    private readonly ILogger<DeletePlanningIntervalObjectiveCommandHandler> _logger = logger;
 
     public async Task<Result> Handle(DeletePlanningIntervalObjectiveCommand request, CancellationToken cancellationToken)
     {

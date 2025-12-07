@@ -1,22 +1,14 @@
-﻿using Moda.Common.Application.Requests.Goals;
+﻿using Moda.Common.Application.Requests.Goals.Commands;
 using Moda.Goals.Application.Persistence;
 
 namespace Moda.Goals.Application.Objectives.Commands;
 
-internal sealed class  UpdateObjectivesOrderCommandHandler : ICommandHandler<UpdateObjectivesOrderCommand>
+internal sealed class UpdateObjectivesOrderCommandHandler(IGoalsDbContext goalsDbContext, ILogger<UpdateObjectivesOrderCommandHandler> logger) : ICommandHandler<UpdateObjectivesOrderCommand>
 {
     private const string AppRequestName = nameof(UpdateObjectivesOrderCommand);
 
-    private readonly IGoalsDbContext _goalsDbContext;
-    private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly ILogger<UpdateObjectivesOrderCommandHandler> _logger;
-
-    public UpdateObjectivesOrderCommandHandler(IGoalsDbContext goalsDbContext, IDateTimeProvider dateTimeProvider, ILogger<UpdateObjectivesOrderCommandHandler> logger)
-    {
-        _goalsDbContext = goalsDbContext;
-        _dateTimeProvider = dateTimeProvider;
-        _logger = logger;
-    }
+    private readonly IGoalsDbContext _goalsDbContext = goalsDbContext;
+    private readonly ILogger<UpdateObjectivesOrderCommandHandler> _logger = logger;
 
     public async Task<Result> Handle(UpdateObjectivesOrderCommand request, CancellationToken cancellationToken)
     {

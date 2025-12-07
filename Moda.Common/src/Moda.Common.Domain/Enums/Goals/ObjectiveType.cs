@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Moda.Goals.Domain.Enums;
+namespace Moda.Common.Domain.Enums.Goals;
 public enum ObjectiveType
 {
     [Display(Name = "Personal", Order = 1)]

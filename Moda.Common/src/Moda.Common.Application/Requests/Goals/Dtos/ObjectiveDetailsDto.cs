@@ -1,8 +1,9 @@
-﻿using Moda.Common.Application.Dtos;
+﻿using Mapster;
+using Moda.Common.Application.Dtos;
 using Moda.Goals.Domain.Models;
 
-namespace Moda.Goals.Application.Objectives.Dtos;
-public sealed record ObjectiveListDto : IMapFrom<Objective>
+namespace Moda.Common.Application.Requests.Goals.Dtos;
+public sealed record ObjectiveDetailsDto : IMapFrom<Objective>
 {
     /// <summary>Gets or sets the identifier.</summary>
     /// <value>The identifier.</value>
@@ -16,6 +17,11 @@ public sealed record ObjectiveListDto : IMapFrom<Objective>
     /// The name of the objective.
     /// </summary>
     public required string Name { get; set; }
+
+    /// <summary>
+    /// The description of the objective.
+    /// </summary>
+    public string? Description { get; set; }
 
     /// <summary>Gets or sets the type.</summary>
     /// <value>The PI objective type.</value>
@@ -39,20 +45,19 @@ public sealed record ObjectiveListDto : IMapFrom<Objective>
 
     /// <summary>Gets or sets the start date.</summary>
     /// <value>The start date.</value>
-    public LocalDate? StartDate { get; set; }
+    public LocalDate? StartDate { get; private set; }
 
     /// <summary>Gets or sets the target date.</summary>
     /// <value>The target date.</value>
     public LocalDate? TargetDate { get; set; }
 
-    /// <summary>
-    /// The order of the Objective compared to other Objectives in the same context.
-    /// </summary>
-    public int? Order { get; set; }
+    /// <summary>Gets the closed date.</summary>
+    /// <value>The closed date.</value>
+    public Instant? ClosedDate { get; private set; }
 
     public void ConfigureMapping(TypeAdapterConfig config)
     {
-        config.NewConfig<Objective, ObjectiveListDto>()
+        config.NewConfig<Objective, ObjectiveDetailsDto>()
             .Map(dest => dest.Status, src => SimpleNavigationDto.FromEnum(src.Status))
             .Map(dest => dest.Type, src => SimpleNavigationDto.FromEnum(src.Type));
     }
