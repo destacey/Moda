@@ -133,8 +133,8 @@ public class WorkItemDependencyTests
         // Arrange: start with no planned dates -> AtRisk
         var now = _dateTimeProvider.Now;
 
-        var source = _workItemFaker.WithData(statusCategory: WorkStatusCategory.Active).Generate();
-        var target = _workItemFaker.WithData(statusCategory: WorkStatusCategory.Active).Generate();
+        var source = _workItemFaker.WithProposedState().Generate();
+        var target = _workItemFaker.WithData(statusCategory: WorkStatusCategory.Proposed).Generate();
         var dep = _dependencyFaker.WithData(source: source, target: target, createdOn: now).Generate();
 
         Assert.Equal(DependencyPlanningHealth.AtRisk, dep.Health);
@@ -144,7 +144,7 @@ public class WorkItemDependencyTests
         var sourceInfo = new DependencyWorkItemInfo
         {
             WorkItemId = source.Id,
-            StatusCategory = WorkStatusCategory.Active,
+            StatusCategory = WorkStatusCategory.Proposed,
             PlannedOn = sourcePlannedOn
         };
         dep.UpdateSourceInfo(sourceInfo, now);
@@ -160,8 +160,8 @@ public class WorkItemDependencyTests
         // Arrange: predecessor after successor -> Unhealthy
         var now = _dateTimeProvider.Now;
 
-        var source = _workItemFaker.WithData(statusCategory: WorkStatusCategory.Active).Generate();
-        var target = _workItemFaker.WithData(statusCategory: WorkStatusCategory.Active).Generate();
+        var source = _workItemFaker.WithProposedState().Generate();
+        var target = _workItemFaker.WithProposedState().Generate();
         var sourcePlannedOn = now.Plus(Duration.FromDays(5));
         var targetPlannedOn = now.Plus(Duration.FromDays(2));
         var dep = _dependencyFaker.WithData(source: source, target: target, sourcePlannedOn: sourcePlannedOn, targetPlannedOn: targetPlannedOn, createdOn: now).Generate();
@@ -173,7 +173,7 @@ public class WorkItemDependencyTests
         var targetInfo = new DependencyWorkItemInfo
         {
             WorkItemId = target.Id,
-            StatusCategory = WorkStatusCategory.Active,
+            StatusCategory = WorkStatusCategory.Proposed,
             PlannedOn = newTargetPlannedOn
         };
         dep.UpdateTargetInfo(targetInfo, now);
@@ -189,8 +189,8 @@ public class WorkItemDependencyTests
         // Arrange: start with no planned dates -> AtRisk
         var now = _dateTimeProvider.Now;
 
-        var source = _workItemFaker.WithData(statusCategory: WorkStatusCategory.Active).Generate();
-        var target = _workItemFaker.WithData(statusCategory: WorkStatusCategory.Active).Generate();
+        var source = _workItemFaker.WithProposedState().Generate();
+        var target = _workItemFaker.WithData(statusCategory: WorkStatusCategory.Proposed).Generate();
         var dep = _dependencyFaker.WithData(source: source, target: target, createdOn: now).Generate();
 
         Assert.Equal(DependencyPlanningHealth.AtRisk, dep.Health);
@@ -203,13 +203,13 @@ public class WorkItemDependencyTests
         var sourceInfo = new DependencyWorkItemInfo
         {
             WorkItemId = source.Id,
-            StatusCategory = WorkStatusCategory.Active,
+            StatusCategory = WorkStatusCategory.Proposed,
             PlannedOn = sourcePlannedOn
         };
         var targetInfo = new DependencyWorkItemInfo
         {
             WorkItemId = target.Id,
-            StatusCategory = WorkStatusCategory.Active,
+            StatusCategory = WorkStatusCategory.Proposed,
             PlannedOn = targetPlannedOn
         };
         dep.UpdateSourceAndTargetInfo(sourceInfo, targetInfo, now);
@@ -226,8 +226,8 @@ public class WorkItemDependencyTests
         // Arrange: start with healthy planned dates
         var now = _dateTimeProvider.Now;
 
-        var source = _workItemFaker.WithData(statusCategory: WorkStatusCategory.Active).Generate();
-        var target = _workItemFaker.WithData(statusCategory: WorkStatusCategory.Active).Generate();
+        var source = _workItemFaker.WithProposedState().Generate();
+        var target = _workItemFaker.WithData(statusCategory: WorkStatusCategory.Proposed).Generate();
         var sourcePlannedOn = now.Plus(Duration.FromDays(5));
         var targetPlannedOn = now.Plus(Duration.FromDays(10));
         var dep = _dependencyFaker.WithData(source: source, target: target, sourcePlannedOn: sourcePlannedOn, targetPlannedOn: targetPlannedOn, createdOn: now).Generate();
@@ -240,13 +240,13 @@ public class WorkItemDependencyTests
         var sourceInfo = new DependencyWorkItemInfo
         {
             WorkItemId = source.Id,
-            StatusCategory = WorkStatusCategory.Active,
+            StatusCategory = WorkStatusCategory.Proposed,
             PlannedOn = newSourcePlannedOn
         };
         var targetInfo = new DependencyWorkItemInfo
         {
             WorkItemId = target.Id,
-            StatusCategory = WorkStatusCategory.Active,
+            StatusCategory = WorkStatusCategory.Proposed,
             PlannedOn = newTargetPlannedOn
         };
         dep.UpdateSourceAndTargetInfo(sourceInfo, targetInfo, now);
@@ -263,8 +263,8 @@ public class WorkItemDependencyTests
         // Arrange: start with healthy planned dates
         var now = _dateTimeProvider.Now;
 
-        var source = _workItemFaker.WithData(statusCategory: WorkStatusCategory.Active).Generate();
-        var target = _workItemFaker.WithData(statusCategory: WorkStatusCategory.Active).Generate();
+        var source = _workItemFaker.WithProposedState().Generate();
+        var target = _workItemFaker.WithData(statusCategory: WorkStatusCategory.Proposed).Generate();
         var sourcePlannedOn = now.Plus(Duration.FromDays(5));
         var targetPlannedOn = now.Plus(Duration.FromDays(10));
         var dep = _dependencyFaker.WithData(source: source, target: target, sourcePlannedOn: sourcePlannedOn, targetPlannedOn: targetPlannedOn, createdOn: now).Generate();
@@ -275,13 +275,13 @@ public class WorkItemDependencyTests
         var sourceInfo = new DependencyWorkItemInfo
         {
             WorkItemId = source.Id,
-            StatusCategory = WorkStatusCategory.Active,
+            StatusCategory = WorkStatusCategory.Proposed,
             PlannedOn = null
         };
         var targetInfo = new DependencyWorkItemInfo
         {
             WorkItemId = target.Id,
-            StatusCategory = WorkStatusCategory.Active,
+            StatusCategory = WorkStatusCategory.Proposed,
             PlannedOn = null
         };
         dep.UpdateSourceAndTargetInfo(sourceInfo, targetInfo, now);
@@ -298,8 +298,8 @@ public class WorkItemDependencyTests
         // Arrange: start with both unplanned -> AtRisk
         var now = _dateTimeProvider.Now;
 
-        var source = _workItemFaker.WithData(statusCategory: WorkStatusCategory.Active).Generate();
-        var target = _workItemFaker.WithData(statusCategory: WorkStatusCategory.Active).Generate();
+        var source = _workItemFaker.WithProposedState().Generate();
+        var target = _workItemFaker.WithData(statusCategory: WorkStatusCategory.Proposed).Generate();
         var dep = _dependencyFaker.WithData(source: source, target: target, createdOn: now).Generate();
 
         Assert.Equal(DependencyPlanningHealth.AtRisk, dep.Health);
@@ -309,7 +309,7 @@ public class WorkItemDependencyTests
         var sourceInfo = new DependencyWorkItemInfo
         {
             WorkItemId = source.Id,
-            StatusCategory = WorkStatusCategory.Active,
+            StatusCategory = WorkStatusCategory.Proposed,
             PlannedOn = sourcePlannedOn
         };
         dep.UpdateSourceInfo(sourceInfo, now);
@@ -418,8 +418,8 @@ public class WorkItemDependencyTests
         // Arrange: start with unhealthy (predecessor after successor)
         var now = _dateTimeProvider.Now;
 
-        var source = _workItemFaker.WithData(statusCategory: WorkStatusCategory.Active).Generate();
-        var target = _workItemFaker.WithData(statusCategory: WorkStatusCategory.Active).Generate();
+        var source = _workItemFaker.WithProposedState().Generate();
+        var target = _workItemFaker.WithData(statusCategory: WorkStatusCategory.Proposed).Generate();
         var sourcePlannedOn = now.Plus(Duration.FromDays(10));
         var targetPlannedOn = now.Plus(Duration.FromDays(5));
         var dep = _dependencyFaker.WithData(source: source, target: target, sourcePlannedOn: sourcePlannedOn, targetPlannedOn: targetPlannedOn, createdOn: now).Generate();
@@ -431,7 +431,7 @@ public class WorkItemDependencyTests
         var sourceInfo = new DependencyWorkItemInfo
         {
             WorkItemId = source.Id,
-            StatusCategory = WorkStatusCategory.Active,
+            StatusCategory = WorkStatusCategory.Proposed,
             PlannedOn = newSourcePlannedOn
         };
         dep.UpdateSourceInfo(sourceInfo, now, recalculate: false);
@@ -453,8 +453,8 @@ public class WorkItemDependencyTests
         // Arrange: start with unhealthy (predecessor after successor)
         var now = _dateTimeProvider.Now;
 
-        var source = _workItemFaker.WithData(statusCategory: WorkStatusCategory.Active).Generate();
-        var target = _workItemFaker.WithData(statusCategory: WorkStatusCategory.Active).Generate();
+        var source = _workItemFaker.WithProposedState().Generate();
+        var target = _workItemFaker.WithData(statusCategory: WorkStatusCategory.Proposed).Generate();
         var sourcePlannedOn = now.Plus(Duration.FromDays(10));
         var targetPlannedOn = now.Plus(Duration.FromDays(5));
         var dep = _dependencyFaker.WithData(source: source, target: target, sourcePlannedOn: sourcePlannedOn, targetPlannedOn: targetPlannedOn, createdOn: now).Generate();
@@ -466,7 +466,7 @@ public class WorkItemDependencyTests
         var targetInfo = new DependencyWorkItemInfo
         {
             WorkItemId = target.Id,
-            StatusCategory = WorkStatusCategory.Active,
+            StatusCategory = WorkStatusCategory.Proposed,
             PlannedOn = newTargetPlannedOn
         };
         dep.UpdateTargetInfo(targetInfo, now, recalculate: false);
