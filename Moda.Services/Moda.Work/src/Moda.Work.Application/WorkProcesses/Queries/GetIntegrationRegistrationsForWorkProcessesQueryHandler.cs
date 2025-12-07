@@ -1,8 +1,8 @@
-﻿using Moda.Common.Domain.Models;
+﻿using Moda.Common.Application.Requests.WorkManagement.Queries;
+using Moda.Common.Domain.Models;
 using Moda.Work.Application.Persistence;
 
 namespace Moda.Work.Application.WorkProcesses.Queries;
-public sealed record GetIntegrationRegistrationsForWorkProcessesQuery(Guid? ExternalId = null) : IQuery<List<IntegrationRegistration<Guid, Guid>>>;
 
 internal sealed class GetIntegrationRegistrationsForWorkProcessesQueryHandler(IWorkDbContext workDbContext) : IQueryHandler<GetIntegrationRegistrationsForWorkProcessesQuery, List<IntegrationRegistration<Guid, Guid>>>
 {

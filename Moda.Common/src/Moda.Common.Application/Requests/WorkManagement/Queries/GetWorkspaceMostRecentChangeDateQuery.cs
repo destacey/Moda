@@ -1,7 +1,7 @@
 ﻿using Ardalis.GuardClauses;
 using Moda.Common.Models;
 
-namespace Moda.Common.Application.Requests.WorkManagement;
+namespace Moda.Common.Application.Requests.WorkManagement.Queries;
 public sealed record GetWorkspaceMostRecentChangeDateQuery : IQuery<Result<Instant?>>
 {
     public GetWorkspaceMostRecentChangeDateQuery(Guid workspaceId)

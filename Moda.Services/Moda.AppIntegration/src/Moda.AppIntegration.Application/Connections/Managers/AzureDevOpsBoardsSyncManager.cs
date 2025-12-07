@@ -8,12 +8,11 @@ using Moda.Common.Application.Exceptions;
 using Moda.Common.Application.Interfaces.ExternalWork;
 using Moda.Common.Application.Logging;
 using Moda.Common.Application.Requests.Planning.Iterations;
-using Moda.Common.Application.Requests.WorkManagement;
+using Moda.Common.Application.Requests.WorkManagement.Commands;
+using Moda.Common.Application.Requests.WorkManagement.Dtos;
+using Moda.Common.Application.Requests.WorkManagement.Queries;
 using Moda.Common.Domain.Enums.AppIntegrations;
 using Moda.Common.Domain.Enums.Work;
-using Moda.Work.Application.Workflows.Dtos;
-using Moda.Work.Application.WorkStatuses.Commands;
-using Moda.Work.Application.WorkTypes.Commands;
 using NodaTime;
 
 namespace Moda.AppIntegration.Application.Connections.Managers;

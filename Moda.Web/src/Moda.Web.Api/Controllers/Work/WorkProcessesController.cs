@@ -1,4 +1,4 @@
-﻿using Moda.Common.Application.Requests.WorkManagement;
+﻿using Moda.Common.Application.Requests.WorkManagement.Queries;
 using Moda.Web.Api.Extensions;
 using Moda.Work.Application.WorkProcesses.Commands;
 using Moda.Work.Application.WorkProcesses.Dtos;

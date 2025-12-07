@@ -1,22 +1,7 @@
-﻿using Moda.Common.Application.Interfaces.ExternalWork;
+﻿using Moda.Common.Application.Requests.WorkManagement.Commands;
 using Moda.Work.Application.Persistence;
-using Moda.Work.Application.WorkStatuses.Validators;
 
 namespace Moda.Work.Application.WorkStatuses.Commands;
-public sealed record SyncExternalWorkStatusesCommand(IList<IExternalWorkStatus> WorkStatuses) : ICommand;
-
-public sealed class SyncExternalWorkStatusesCommandValidator : CustomValidator<SyncExternalWorkStatusesCommand>
-{
-    public SyncExternalWorkStatusesCommandValidator()
-    {
-        RuleFor(c => c.WorkStatuses)
-            .NotEmpty();
-
-        RuleForEach(c => c.WorkStatuses)
-            .NotNull()
-            .SetValidator(new IExternalWorkStatusValidator());
-    }
-}
 
 
 public sealed class SyncExternalWorkStatusesCommandHandler(IWorkDbContext workDbContext, IDateTimeProvider dateTimeProvider, ILogger<SyncExternalWorkStatusesCommandHandler> logger) : ICommandHandler<SyncExternalWorkStatusesCommand>

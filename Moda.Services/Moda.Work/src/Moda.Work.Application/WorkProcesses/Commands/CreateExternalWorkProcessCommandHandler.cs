@@ -1,4 +1,4 @@
-﻿using Moda.Common.Application.Requests.WorkManagement;
+﻿using Moda.Common.Application.Requests.WorkManagement.Commands;
 using Moda.Common.Domain.Models;
 using Moda.Work.Application.Persistence;
 

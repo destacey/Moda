@@ -4,16 +4,13 @@ using Moda.AppIntegration.Application.Connections.Queries;
 using Moda.AppIntegration.Application.Interfaces;
 using Moda.AppIntegration.Application.Logging;
 using Moda.Common.Application.Interfaces.ExternalWork;
-using Moda.Common.Application.Requests.WorkManagement;
+using Moda.Common.Application.Requests.WorkManagement.Commands;
+using Moda.Common.Application.Requests.WorkManagement.Dtos;
+using Moda.Common.Application.Requests.WorkManagement.Queries;
 using Moda.Common.Domain.Enums.AppIntegrations;
 using Moda.Common.Domain.Enums.Work;
 using Moda.Common.Domain.Models;
 using Moda.Common.Models;
-using Moda.Work.Application.Workflows.Dtos;
-using Moda.Work.Application.WorkProcesses.Queries;
-using Moda.Work.Application.Workspaces.Queries;
-using Moda.Work.Application.WorkStatuses.Commands;
-using Moda.Work.Application.WorkTypes.Commands;
 
 namespace Moda.AppIntegration.Application.Connections.Managers;
 public sealed class AzureDevOpsBoardsInitManager(ILogger<AzureDevOpsBoardsInitManager> logger, IAzureDevOpsService azureDevOpsService, ISender sender) : IAzureDevOpsBoardsInitManager

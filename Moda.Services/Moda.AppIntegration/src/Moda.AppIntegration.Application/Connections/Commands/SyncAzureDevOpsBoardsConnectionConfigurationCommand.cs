@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Moda.Common.Application.Interfaces.ExternalWork;
-using Moda.Common.Application.Requests.WorkManagement;
+using Moda.Common.Application.Requests.WorkManagement.Commands;
 using Moda.Common.Domain.Models;
 using NodaTime;
 

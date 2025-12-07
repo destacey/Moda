@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using Moda.Common.Application.Requests.WorkManagement;
+using Moda.Common.Application.Requests.WorkManagement.Commands;
 using Moda.Common.Domain.Enums;
 using Moda.Work.Application.Persistence;
 

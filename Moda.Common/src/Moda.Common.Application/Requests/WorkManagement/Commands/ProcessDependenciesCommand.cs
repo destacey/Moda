@@ -1,4 +1,4 @@
-﻿namespace Moda.Common.Application.Requests.WorkManagement;
+﻿namespace Moda.Common.Application.Requests.WorkManagement.Commands;
 public sealed record ProcessDependenciesCommand(string SystemId) : ICommand, ILongRunningRequest;
 
 public sealed class ProcessDependenciesCommandValidator : CustomValidator<ProcessDependenciesCommand>

@@ -2,7 +2,7 @@
 using Moda.Common.Application.Requests.WorkManagement.Interfaces;
 using Moda.Common.Application.Validators;
 
-namespace Moda.Common.Application.Requests.WorkManagement;
+namespace Moda.Common.Application.Requests.WorkManagement.Commands;
 
 /// <summary>
 /// Updates an external work process configuration.

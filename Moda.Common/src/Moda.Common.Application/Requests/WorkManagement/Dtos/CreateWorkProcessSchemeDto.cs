@@ -1,6 +1,7 @@
 ﻿using Moda.Common.Application.Requests.WorkManagement.Interfaces;
 
-namespace Moda.Work.Application.Workflows.Dtos;
+namespace Moda.Common.Application.Requests.WorkManagement.Dtos;
+
 public sealed record CreateWorkProcessSchemeDto : ICreateWorkProcessScheme
 {
     public required string WorkTypeName { get; set; }

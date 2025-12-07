@@ -1,7 +1,7 @@
-﻿using Moda.Work.Application.Persistence;
+﻿using Moda.Common.Application.Requests.WorkManagement.Queries;
+using Moda.Work.Application.Persistence;
 
 namespace Moda.Work.Application.Workspaces.Queries;
-public sealed record ExternalWorkspaceExistsQuery(string ExternalId) : IQuery<bool>;
 
 internal sealed class ExternalWorkspaceExistsQueryHandler(IWorkDbContext workDbContext) : IQueryHandler<ExternalWorkspaceExistsQuery, bool>
 {

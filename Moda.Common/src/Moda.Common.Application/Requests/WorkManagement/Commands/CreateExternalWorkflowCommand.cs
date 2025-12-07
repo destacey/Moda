@@ -1,7 +1,7 @@
 ﻿using Moda.Common.Application.Interfaces.ExternalWork;
 using Moda.Common.Application.Validators;
 
-namespace Moda.Common.Application.Requests.WorkManagement;
+namespace Moda.Common.Application.Requests.WorkManagement.Commands;
 public sealed record CreateExternalWorkflowCommand(string Name, string? Description, IExternalWorkTypeWorkflow ExternalWorkTypeWorkflow) : ICommand<Guid>;
 
 public sealed class CreateExternalWorkflowCommandValidator : CustomValidator<CreateExternalWorkflowCommand>
