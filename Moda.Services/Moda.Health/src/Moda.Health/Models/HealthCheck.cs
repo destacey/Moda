@@ -3,7 +3,7 @@ using CSharpFunctionalExtensions;
 using Moda.Common.Domain.Data;
 using Moda.Common.Domain.Employees;
 using Moda.Common.Domain.Enums;
-using Moda.Common.Domain.Events;
+using Moda.Common.Domain.Events.Health;
 using Moda.Common.Domain.Interfaces;
 using Moda.Common.Extensions;
 using NodaTime;
@@ -12,12 +12,9 @@ namespace Moda.Health.Models;
 
 public sealed class HealthCheck : BaseSoftDeletableEntity<Guid>, IHealthCheck
 {
-    private string? _note;
-    private Instant _expiration;
-
     private HealthCheck() { }
 
-    internal HealthCheck(Guid objectId, SystemContext context, HealthStatus status, Guid reportedById, Instant reportedOn, Instant expiration, string? note)
+    private HealthCheck(Guid objectId, SystemContext context, HealthStatus status, Guid reportedById, Instant reportedOn, Instant expiration, string? note)
     {
         Guard.Against.Default(objectId, nameof(objectId));
 
@@ -65,7 +62,7 @@ public sealed class HealthCheck : BaseSoftDeletableEntity<Guid>, IHealthCheck
     /// </summary>
     public Instant Expiration
     {
-        get => _expiration;
+        get;
         private set
         {
             if (value <= ReportedOn)
@@ -73,7 +70,7 @@ public sealed class HealthCheck : BaseSoftDeletableEntity<Guid>, IHealthCheck
                 throw new ArgumentException("Expiration must be greater than timestamp.", nameof(Expiration));
             }
 
-            _expiration = value;
+            field = value;
         }
     }
 
@@ -82,8 +79,8 @@ public sealed class HealthCheck : BaseSoftDeletableEntity<Guid>, IHealthCheck
     /// </summary>
     public string? Note
     {
-        get => _note;
-        private set => _note = value.NullIfWhiteSpacePlusTrim();
+        get;
+        private set => field = value.NullIfWhiteSpacePlusTrim();
     }
 
     /// <summary>
@@ -118,7 +115,7 @@ public sealed class HealthCheck : BaseSoftDeletableEntity<Guid>, IHealthCheck
             Expiration = expiration;
             Note = note;
 
-            AddDomainEvent(EntityUpdatedEvent.WithEntity(this, now));
+            AddDomainEvent(new HealthCheckUpdatedEvent(Id, ObjectId, Context, Status, Expiration, Note, now));
 
             return Result.Success();
         }
@@ -126,5 +123,16 @@ public sealed class HealthCheck : BaseSoftDeletableEntity<Guid>, IHealthCheck
         {
             return Result.Failure(ex.Message.ToString());
         }
+    }
+
+    public static HealthCheck Create(Guid objectId, SystemContext context, HealthStatus status, Guid reportedById, Instant reportedOn, Instant expiration, string? note, Instant now)
+    {
+        var healthCheck = new HealthCheck(objectId, context, status, reportedById, reportedOn, expiration, note);
+
+        healthCheck.AddPostPersistenceAction(() =>
+            healthCheck.AddDomainEvent(new HealthCheckCreatedEvent(healthCheck.Id, healthCheck.ObjectId, healthCheck.Context, healthCheck.Status, healthCheck.ReportedById, healthCheck.ReportedOn, healthCheck.Expiration, healthCheck.Note, now))
+        );
+
+        return healthCheck;
     }
 }
