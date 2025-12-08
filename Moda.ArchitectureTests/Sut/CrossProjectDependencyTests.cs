@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using NetArchTest.Rules;
+using Moda.ArchitectureTests.Helpers;
 
 namespace Moda.ArchitectureTests.Sut;
 
@@ -55,7 +56,7 @@ public class CrossProjectDependencyTests
     public void DomainLayer_ShouldNotDependOnApplication()
     {
         // Arrange
-        var domainAssemblies = Types.InAssemblies(GetDomainAssemblies());
+        var domainAssemblies = Types.InAssemblies(AssemblyHelper.GetDomainAssemblies());
 
         // Act
         var result = domainAssemblies
@@ -73,7 +74,7 @@ public class CrossProjectDependencyTests
     public void DomainLayer_ShouldNotDependOnInfrastructure()
     {
         // Arrange
-        var domainAssemblies = Types.InAssemblies(GetDomainAssemblies());
+        var domainAssemblies = Types.InAssemblies(AssemblyHelper.GetDomainAssemblies());
 
         // Act
         var result = domainAssemblies
@@ -91,7 +92,7 @@ public class CrossProjectDependencyTests
     public void DomainLayer_ShouldNotDependOnWeb()
     {
         // Arrange
-        var domainAssemblies = Types.InAssemblies(GetDomainAssemblies());
+        var domainAssemblies = Types.InAssemblies(AssemblyHelper.GetDomainAssemblies());
 
         // Act
         var result = domainAssemblies
@@ -109,7 +110,7 @@ public class CrossProjectDependencyTests
     public void DomainLayer_ShouldOnlyDependOnCommonLayers()
     {
         // Arrange
-        var domainAssemblies = Types.InAssemblies(GetDomainAssemblies());
+        var domainAssemblies = Types.InAssemblies(AssemblyHelper.GetDomainAssemblies());
 
         // Act
         var result = domainAssemblies
@@ -139,7 +140,7 @@ public class CrossProjectDependencyTests
     public void ApplicationLayer_ShouldNotDependOnInfrastructure()
     {
         // Arrange
-        var applicationAssemblies = Types.InAssemblies(GetApplicationAssemblies());
+        var applicationAssemblies = Types.InAssemblies(AssemblyHelper.GetApplicationAssemblies());
 
         // Act
         var result = applicationAssemblies
@@ -157,7 +158,7 @@ public class CrossProjectDependencyTests
     public void ApplicationLayer_ShouldNotDependOnWeb()
     {
         // Arrange
-        var applicationAssemblies = Types.InAssemblies(GetApplicationAssemblies());
+        var applicationAssemblies = Types.InAssemblies(AssemblyHelper.GetApplicationAssemblies());
 
         // Act
         var result = applicationAssemblies
@@ -175,7 +176,7 @@ public class CrossProjectDependencyTests
     public void ApplicationLayer_ShouldNotDependOnIntegrations()
     {
         // Arrange
-        var applicationAssemblies = Types.InAssemblies(GetApplicationAssemblies());
+        var applicationAssemblies = Types.InAssemblies(AssemblyHelper.GetApplicationAssemblies());
 
         // Act
         var result = applicationAssemblies
@@ -198,7 +199,7 @@ public class CrossProjectDependencyTests
     public void InfrastructureLayer_ShouldNotDependOnWeb()
     {
         // Arrange
-        var infrastructureAssemblies = GetInfrastructureAssemblies();
+        var infrastructureAssemblies = AssemblyHelper.GetInfrastructureAssemblies();
 
         // Act
         var result = Types.InAssemblies(infrastructureAssemblies)
@@ -220,7 +221,7 @@ public class CrossProjectDependencyTests
     public void IntegrationLayer_ShouldOnlyDependOnCommonLayers()
     {
         // Arrange
-        var integrationAssemblies = GetIntegrationAssemblies();
+        var integrationAssemblies = AssemblyHelper.GetIntegrationAssemblies();
 
         // Act
         var result = Types.InAssemblies(integrationAssemblies)
@@ -240,8 +241,8 @@ public class CrossProjectDependencyTests
     public void IntegrationLayer_ShouldNotDependOnServiceDomains()
     {
         // Integration projects should not depend on any service Domain projects
-        var integrationAssemblies = GetIntegrationAssemblies();
-        var serviceDomains = GetAllServiceDomainAssemblies();
+        var integrationAssemblies = AssemblyHelper.GetIntegrationAssemblies();
+        var serviceDomains = AssemblyHelper.GetServiceDomainAssemblies();
         var failures = new List<string>();
 
         foreach (var integrationAssembly in integrationAssemblies)
@@ -274,8 +275,8 @@ public class CrossProjectDependencyTests
     public void IntegrationLayer_ShouldNotDependOnServiceApplications()
     {
         // Integration projects should not depend on any service Application projects
-        var integrationAssemblies = GetIntegrationAssemblies();
-        var serviceApplications = GetAllServiceApplicationAssemblies();
+        var integrationAssemblies = AssemblyHelper.GetIntegrationAssemblies();
+        var serviceApplications = AssemblyHelper.GetServiceApplicationAssemblies();
         var failures = new List<string>();
 
         foreach (var integrationAssembly in integrationAssemblies)
@@ -375,7 +376,7 @@ public class CrossProjectDependencyTests
         // Each service's Domain project should be isolated and not depend on other service Domains
         // This test dynamically discovers all service Domain assemblies
 
-        var allServiceDomains = GetAllServiceDomainAssemblies();
+        var allServiceDomains = AssemblyHelper.GetServiceDomainAssemblies();
         var failures = new List<string>();
 
         foreach (var serviceDomain in allServiceDomains)
@@ -412,29 +413,42 @@ public class CrossProjectDependencyTests
         // Each service's Application project should not depend on other service Application projects
         // This test dynamically discovers all service Application assemblies
 
-        var allServiceApplications = GetAllServiceApplicationAssemblies();
+        // Known exceptions that require refactoring to resolve:
+        var ignoredDependencies = new Dictionary<string, string[]>();
+
+        var allServiceApplications = AssemblyHelper.GetServiceApplicationAssemblies();
         var failures = new List<string>();
 
         foreach (var serviceApplication in allServiceApplications)
         {
+            var serviceApplicationName = serviceApplication.GetName().Name!;
+
             // Get all OTHER service application names (exclude this one)
             var otherServiceApplicationNames = allServiceApplications
                 .Where(s => s != serviceApplication)
                 .Select(a => a.GetName().Name!)
-                .ToArray();
+                .ToList();
 
-            if (otherServiceApplicationNames.Length == 0) continue;
+            // Remove ignored dependencies for this service from the check
+            if (ignoredDependencies.TryGetValue(serviceApplicationName, out var ignoredApps))
+            {
+                otherServiceApplicationNames = otherServiceApplicationNames
+                    .Where(name => !ignoredApps.Contains(name))
+                    .ToList();
+            }
+
+            if (otherServiceApplicationNames.Count == 0) continue;
 
             var types = Types.InAssembly(serviceApplication);
             var result = types
                 .ShouldNot()
-                .HaveDependencyOnAny(otherServiceApplicationNames)
+                .HaveDependencyOnAny(otherServiceApplicationNames.ToArray())
                 .GetResult();
 
             if (!result.IsSuccessful)
             {
                 var violatingTypes = string.Join(", ", result.FailingTypes ?? []);
-                failures.Add($"{serviceApplication.GetName().Name} -> {violatingTypes}");
+                failures.Add($"{serviceApplicationName} -> {violatingTypes}");
             }
         }
 
@@ -449,8 +463,8 @@ public class CrossProjectDependencyTests
         // Each service's Application project should only depend on its own Domain project
         // This test identifies cross-service Domain dependencies (like the Organization.Domain issue)
 
-        var allServiceApplications = GetAllServiceApplicationAssemblies();
-        var allServiceDomains = GetAllServiceDomainAssemblies();
+        var allServiceApplications = AssemblyHelper.GetServiceApplicationAssemblies();
+        var allServiceDomains = AssemblyHelper.GetServiceDomainAssemblies();
         var failures = new List<string>();
 
         foreach (var serviceApplication in allServiceApplications)
@@ -484,104 +498,6 @@ public class CrossProjectDependencyTests
         failures.Should().BeEmpty(
             "Service Application projects should only depend on their own Domain project, not other service Domain projects. This test identifies the Organization.Domain cross-cutting dependency issue that needs to be resolved. Violations: {0}",
             string.Join("; ", failures));
-    }
-
-    #endregion
-
-    #region Helper Methods
-
-    private static System.Reflection.Assembly[] GetDomainAssemblies()
-    {
-        var assemblies = AppDomain.CurrentDomain.GetAssemblies()
-            .Where(a => a.FullName != null &&
-                        a.FullName.StartsWith("Moda.") &&
-                        a.FullName.Contains(".Domain") &&
-                        !a.FullName.Contains(".Application") &&
-                        !a.FullName.Contains("Test"))
-            .ToArray();
-
-        return assemblies;
-    }
-
-    private static System.Reflection.Assembly[] GetApplicationAssemblies()
-    {
-        var assemblies = AppDomain.CurrentDomain.GetAssemblies()
-            .Where(a => a.FullName != null &&
-                        a.FullName.StartsWith("Moda.") &&
-                        a.FullName.Contains(".Application") &&
-                        !a.FullName.Contains("Test"))
-            .ToArray();
-
-        return assemblies;
-    }
-
-    private static System.Reflection.Assembly[] GetInfrastructureAssemblies()
-    {
-        var assemblies = AppDomain.CurrentDomain.GetAssemblies()
-            .Where(a => a.FullName != null &&
-                        a.FullName.StartsWith("Moda.") &&
-                        a.FullName.Contains(".Infrastructure") &&
-                        !a.FullName.Contains("Test"))
-            .ToArray();
-
-        return assemblies;
-    }
-
-    /// <summary>
-    /// Dynamically discovers all service Domain assemblies by searching the file system.
-    /// Excludes Common.Domain and test assemblies.
-    /// Pattern: Moda.{ServiceName}.Domain
-    /// </summary>
-    private static System.Reflection.Assembly[] GetAllServiceDomainAssemblies()
-    {
-        var assemblyDir = Path.GetDirectoryName(typeof(CrossProjectDependencyTests).Assembly.Location)!;
-        var domainDlls = Directory.GetFiles(assemblyDir, "Moda.*.Domain.dll")
-            .Where(f =>
-            {
-                var fileName = Path.GetFileName(f);
-                return !fileName.Contains("Common.Domain") && !fileName.Contains("Test");
-            })
-            .ToArray();
-
-        return domainDlls.Select(System.Reflection.Assembly.LoadFrom).ToArray();
-    }
-
-    /// <summary>
-    /// Dynamically discovers all service Application assemblies by searching the file system.
-    /// Excludes Common.Application and test assemblies.
-    /// Pattern: Moda.{ServiceName}.Application
-    /// </summary>
-    private static System.Reflection.Assembly[] GetAllServiceApplicationAssemblies()
-    {
-        var assemblyDir = Path.GetDirectoryName(typeof(CrossProjectDependencyTests).Assembly.Location)!;
-        var applicationDlls = Directory.GetFiles(assemblyDir, "Moda.*.Application.dll")
-            .Where(f =>
-            {
-                var fileName = Path.GetFileName(f);
-                return !fileName.Contains("Common.Application") && !fileName.Contains("Test");
-            })
-            .ToArray();
-
-        return applicationDlls.Select(System.Reflection.Assembly.LoadFrom).ToArray();
-    }
-
-    /// <summary>
-    /// Dynamically discovers all Integration assemblies by searching the file system.
-    /// Excludes test assemblies.
-    /// Pattern: Moda.Integrations.{IntegrationName}
-    /// </summary>
-    private static System.Reflection.Assembly[] GetIntegrationAssemblies()
-    {
-        var assemblyDir = Path.GetDirectoryName(typeof(CrossProjectDependencyTests).Assembly.Location)!;
-        var integrationDlls = Directory.GetFiles(assemblyDir, "Moda.Integrations.*.dll")
-            .Where(f =>
-            {
-                var fileName = Path.GetFileName(f);
-                return !fileName.Contains("Test");
-            })
-            .ToArray();
-
-        return integrationDlls.Select(System.Reflection.Assembly.LoadFrom).ToArray();
     }
 
     #endregion

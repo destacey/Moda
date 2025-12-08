@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Moda.ArchitectureTests.Helpers;
 
 namespace Moda.ArchitectureTests.Sut;
 
@@ -57,7 +58,7 @@ namespace Moda.ArchitectureTests.Sut;
 /// </summary>
 public class FileStructureTests
 {
-    private static readonly string SolutionRoot = GetSolutionRoot();
+    private static readonly string SolutionRoot = AssemblyHelper.GetSolutionRoot();
 
     #region Common Layer Structure Tests
 
@@ -404,6 +405,8 @@ public class FileStructureTests
                     return !name.EndsWith(".Tests") && !name.EndsWith(".IntegrationTests");
                 })
                 .Select(Path.GetFileName)
+                .Where(name => name != null)
+                .Cast<string>()
                 .ToList();
 
             invalidTestProjects.AddRange(invalid);
@@ -484,30 +487,6 @@ public class FileStructureTests
 
         Directory.Exists(testsFolder).Should().BeFalse(
             "Moda.ArchitectureTests should not have a 'tests' folder - it's the only exception to the src/tests rule");
-    }
-
-    #endregion
-
-    #region Helper Methods
-
-    private static string GetSolutionRoot()
-    {
-        // Start from the test assembly location and walk up to find the solution root
-        var assemblyLocation = Path.GetDirectoryName(typeof(FileStructureTests).Assembly.Location)!;
-        var currentDir = assemblyLocation;
-
-        while (currentDir != null)
-        {
-            // Look for Moda.sln file
-            if (File.Exists(Path.Combine(currentDir, "Moda.sln")))
-            {
-                return currentDir;
-            }
-
-            currentDir = Directory.GetParent(currentDir)?.FullName;
-        }
-
-        throw new InvalidOperationException("Could not find solution root. Expected to find Moda.sln file.");
     }
 
     #endregion
