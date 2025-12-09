@@ -3,7 +3,7 @@ using Moda.Work.Application.Persistence;
 
 namespace Moda.Work.Application.WorkTypes.Commands;
 
-public sealed class SyncExternalWorkTypesCommandHandler(IWorkDbContext workDbContext, IDateTimeProvider dateTimeProvider, ILogger<SyncExternalWorkTypesCommandHandler> logger) : ICommandHandler<SyncExternalWorkTypesCommand>
+internal sealed class SyncExternalWorkTypesCommandHandler(IWorkDbContext workDbContext, IDateTimeProvider dateTimeProvider, ILogger<SyncExternalWorkTypesCommandHandler> logger) : ICommandHandler<SyncExternalWorkTypesCommand>
 {
     private const string AppRequestName = nameof(SyncExternalWorkTypesCommand);
 

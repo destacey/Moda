@@ -48,22 +48,22 @@ public class CqrsPatternTests
         // Arrange
         var applicationAssemblies = AssemblyHelper.GetApplicationAssemblies();
 
-        // Act
-        var result = Types.InAssemblies(applicationAssemblies)
+        // Act - Find commands that don't end with Command
+        var allTypes = Types.InAssemblies(applicationAssemblies)
             .That()
-            .ResideInNamespace("Commands")
-            .And()
             .AreClasses()
-            .And()
-            .DoNotHaveNameMatching(".*Handler$")
-            .Should()
-            .HaveNameEndingWith("Command")
-            .GetResult();
+            .GetTypes()
+            .ToList();
+
+        var commandsWithoutCommandSuffix = allTypes
+            .Where(IsCommand)
+            .Where(t => !t.Name.EndsWith("Command"))
+            .ToList();
 
         // Assert
-        result.IsSuccessful.Should().BeTrue(
-            "All command classes in Commands folders should end with 'Command'. Violating types: {0}",
-            string.Join(", ", result.FailingTypes ?? []));
+        commandsWithoutCommandSuffix.Should().BeEmpty(
+            "All command classes should end with 'Command'. Violating types: {0}",
+            string.Join(", ", commandsWithoutCommandSuffix.Select(t => t.FullName)));
     }
 
     [Fact]
@@ -148,22 +148,22 @@ public class CqrsPatternTests
         // Arrange
         var applicationAssemblies = AssemblyHelper.GetApplicationAssemblies();
 
-        // Act
-        var result = Types.InAssemblies(applicationAssemblies)
+        // Act - Find queries that don't end with Query
+        var allTypes = Types.InAssemblies(applicationAssemblies)
             .That()
-            .ResideInNamespace("Queries")
-            .And()
             .AreClasses()
-            .And()
-            .DoNotHaveNameMatching(".*Handler$")
-            .Should()
-            .HaveNameEndingWith("Query")
-            .GetResult();
+            .GetTypes()
+            .ToList();
+
+        var queriesWithoutQuerySuffix = allTypes
+            .Where(IsQuery)
+            .Where(t => !t.Name.EndsWith("Query"))
+            .ToList();
 
         // Assert
-        result.IsSuccessful.Should().BeTrue(
-            "All query classes in Queries folders should end with 'Query'. Violating types: {0}",
-            string.Join(", ", result.FailingTypes ?? []));
+        queriesWithoutQuerySuffix.Should().BeEmpty(
+            "All query classes should end with 'Query'. Violating types: {0}",
+            string.Join(", ", queriesWithoutQuerySuffix.Select(t => t.FullName)));
     }
 
     [Fact]
@@ -291,28 +291,30 @@ public class CqrsPatternTests
     }
 
     [Fact]
-    public void Handlers_ShouldBePublicOrInternal()
+    public void Handlers_ShouldBeInternal()
     {
         // Arrange
         var applicationAssemblies = AssemblyHelper.GetApplicationAssemblies();
 
-        // Act - Handlers should not be private or protected
-        var allHandlers = Types.InAssemblies(applicationAssemblies)
+        // Act - Find all command and query handlers that are NOT internal
+        var allTypes = Types.InAssemblies(applicationAssemblies)
             .That()
-            .HaveNameEndingWith("Handler")
-            .And()
             .AreClasses()
-            .GetTypes();
+            .GetTypes()
+            .ToList();
 
-        var privateOrProtectedHandlers = allHandlers
-            .Where(t => !t.IsPublic && !t.IsNotPublic) // IsNotPublic means internal in this context
-            .Where(t => t.IsNestedPrivate || t.IsNestedFamily || t.IsNestedFamORAssem)
+        var allHandlers = allTypes
+            .Where(t => IsCommandHandler(t) || IsQueryHandler(t))
+            .ToList();
+
+        var nonInternalHandlers = allHandlers
+            .Where(t => t.IsPublic || t.IsNestedPublic || t.IsNestedPrivate || t.IsNestedFamily || t.IsNestedFamORAssem)
             .ToList();
 
         // Assert
-        privateOrProtectedHandlers.Should().BeEmpty(
-            "All handler classes should be public or internal, not private or protected. Violating types: {0}",
-            string.Join(", ", privateOrProtectedHandlers.Select(t => t.FullName)));
+        nonInternalHandlers.Should().BeEmpty(
+            "All handler classes should be internal (sealed). Handlers should not be public, private, or protected. Violating types: {0}",
+            string.Join(", ", nonInternalHandlers.Select(t => t.FullName)));
     }
 
     #endregion
@@ -324,12 +326,14 @@ public class CqrsPatternTests
     {
         // Arrange
         var applicationAssemblies = AssemblyHelper.GetApplicationAssemblies();
-        var allHandlers = Types.InAssemblies(applicationAssemblies)
+        var allTypes = Types.InAssemblies(applicationAssemblies)
             .That()
-            .HaveNameEndingWith("Handler")
-            .And()
             .AreClasses()
             .GetTypes()
+            .ToList();
+
+        var allHandlers = allTypes
+            .Where(t => IsCommandHandler(t) || IsQueryHandler(t))
             .ToList();
 
         var violations = new List<string>();

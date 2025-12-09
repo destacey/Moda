@@ -10,12 +10,12 @@ internal sealed class GetConnectorsQueryHandler : IQueryHandler<GetConnectorsQue
 {
     public Task<IReadOnlyList<ConnectorListDto>> Handle(GetConnectorsQuery request, CancellationToken cancellationToken)
     {
-        IReadOnlyList<ConnectorListDto> values = Enum.GetValues<Connector>().Select(c => new ConnectorListDto
+        IReadOnlyList<ConnectorListDto> values = [.. Enum.GetValues<Connector>().Select(c => new ConnectorListDto
         {
             Id = (int)c,
             Name = c.GetDisplayName(),
             Description = c.GetDisplayDescription()
-        }).ToList();
+        })];
 
         return Task.FromResult(values);
     }

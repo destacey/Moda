@@ -3,8 +3,7 @@ using Moda.Work.Application.Persistence;
 
 namespace Moda.Work.Application.WorkStatuses.Commands;
 
-
-public sealed class SyncExternalWorkStatusesCommandHandler(IWorkDbContext workDbContext, IDateTimeProvider dateTimeProvider, ILogger<SyncExternalWorkStatusesCommandHandler> logger) : ICommandHandler<SyncExternalWorkStatusesCommand>
+internal sealed class SyncExternalWorkStatusesCommandHandler(IWorkDbContext workDbContext, IDateTimeProvider dateTimeProvider, ILogger<SyncExternalWorkStatusesCommandHandler> logger) : ICommandHandler<SyncExternalWorkStatusesCommand>
 {
     private readonly IWorkDbContext _workDbContext = workDbContext;
     private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
