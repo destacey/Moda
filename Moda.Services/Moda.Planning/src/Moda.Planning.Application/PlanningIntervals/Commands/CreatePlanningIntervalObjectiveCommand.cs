@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Moda.Common.Application.Models;
-using Moda.Goals.Application.Objectives.Commands;
+using Moda.Common.Application.Requests.Goals.Commands;
+using Moda.Common.Domain.Enums.Goals;
 
 namespace Moda.Planning.Application.PlanningIntervals.Commands;
 public sealed record CreatePlanningIntervalObjectiveCommand(Guid PlanningIntervalId, Guid TeamId, string Name, string? Description, LocalDate? StartDate, LocalDate? TargetDate, bool IsStretch, int? Order) : ICommand<ObjectIdAndKey>;
@@ -91,7 +92,7 @@ internal sealed class CreatePlanningIntervalObjectiveCommandHandler(IPlanningDbC
             var objectiveResult = await _sender.Send(new CreateObjectiveCommand(
                 request.Name,
                 request.Description,
-                Goals.Domain.Enums.ObjectiveType.PlanningInterval,
+                ObjectiveType.PlanningInterval,
                 request.TeamId,
                 request.PlanningIntervalId,
                 request.StartDate,

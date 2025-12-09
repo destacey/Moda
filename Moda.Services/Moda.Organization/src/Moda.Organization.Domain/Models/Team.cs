@@ -2,6 +2,7 @@
 using Moda.Common.Domain.Enums.Organization;
 using Moda.Common.Domain.Models.Organizations;
 using Moda.Common.Domain.Interfaces.Organization;
+using Moda.Common.Domain.Events.Organization;
 using NodaTime;
 
 namespace Moda.Organization.Domain.Models;
@@ -36,7 +37,8 @@ public sealed class Team : BaseTeam, IActivatable<Instant, TeamDeactivatableArgs
             // TODO is there logic that would prevent activation?
             IsActive = true;
             InactiveDate = null;
-            AddDomainEvent(EntityActivatedEvent.WithEntity(this, timestamp));
+            AddDomainEvent(new TeamActivatedEvent(Id, timestamp));
+
         }
 
         return Result.Success();
@@ -70,7 +72,8 @@ public sealed class Team : BaseTeam, IActivatable<Instant, TeamDeactivatableArgs
 
         InactiveDate = args.AsOfDate;
         IsActive = false;  // TODO: this will be invalid if the InactiveDate is in the future
-        AddDomainEvent(EntityDeactivatedEvent.WithEntity(this, args.Timestamp)); // TODO: this doesn't include the asOfTimestamp
+
+        AddDomainEvent(new TeamDeactivatedEvent(Id, InactiveDate!.Value, args.Timestamp));
 
         return Result.Success();
     }
@@ -91,7 +94,8 @@ public sealed class Team : BaseTeam, IActivatable<Instant, TeamDeactivatableArgs
             Code = code;
             Description = description;
 
-            AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
+            // Publish specific TeamUpdatedEvent immediately; Id is already set prior to updates
+            AddDomainEvent(new TeamUpdatedEvent(Id, Code, Name, Description, timestamp));
 
             return Result.Success();
         }
@@ -112,7 +116,10 @@ public sealed class Team : BaseTeam, IActivatable<Instant, TeamDeactivatableArgs
     {
         var team = new Team(name, code, description, activeDate);
 
-        team.AddDomainEvent(EntityCreatedEvent.WithEntity(team, timestamp));
+        team.AddPostPersistenceAction(() =>
+            team.AddDomainEvent(new TeamCreatedEvent(team.Id, team.Key, team.Code, team.Name, team.Description, team.Type, team.ActiveDate, team.InactiveDate, team.IsActive, timestamp))
+        );
+
         return team;
     }
 }

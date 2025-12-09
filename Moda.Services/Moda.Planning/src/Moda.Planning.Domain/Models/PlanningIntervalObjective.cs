@@ -56,11 +56,31 @@ public class PlanningIntervalObjective : BaseSoftDeletableEntity<Guid>, IHasIdAn
     /// <param name="status">The status.</param>
     /// <param name="isStretch">if set to <c>true</c> [is stretch].</param>
     /// <returns></returns>
-    public Result Update(ObjectiveStatus status, bool isStretch)
+    internal Result Update(ObjectiveStatus status, bool isStretch)
     {
         Status = status;
         IsStretch = isStretch;
 
         return Result.Success();
     }
+
+    public Result AddHealthCheck(SimpleHealthCheck healthCheck)
+    {
+        if (HealthCheck is not null)
+            return Result.Failure("Health check already exists.");
+
+        HealthCheck = healthCheck;
+
+        return Result.Success();
+    }
+
+    public Result RemoveHealthCheck()
+    {
+        if (HealthCheck is null)
+            return Result.Failure("No health check to remove.");
+
+        HealthCheck = null;
+
+        return Result.Success();
+    }   
 }

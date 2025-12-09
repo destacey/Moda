@@ -33,7 +33,7 @@ public sealed class SimpleHealthCheck : BaseEntity<Guid>
     /// <summary>
     /// The timestamp of when the health check was initially created.
     /// </summary>
-    public Instant ReportedOn { get; private set; }
+    public Instant ReportedOn { get; private init; }
 
     /// <summary>
     /// The expiration of the health check.
@@ -50,16 +50,13 @@ public sealed class SimpleHealthCheck : BaseEntity<Guid>
     /// </summary>
     /// <param name="id"></param>
     /// <param name="status"></param>
-    /// <param name="reportedOn"></param>
     /// <param name="expiration"></param>
     /// <returns>Result</returns>
-    public Result Update(Guid id, HealthStatus status, Instant reportedOn, Instant expiration)
+    public Result Update(HealthStatus status, Instant expiration)
     {
         try
         {
-            Id = id;
             Status = status;
-            ReportedOn = reportedOn;
             Expiration = expiration;
 
             return Result.Success();

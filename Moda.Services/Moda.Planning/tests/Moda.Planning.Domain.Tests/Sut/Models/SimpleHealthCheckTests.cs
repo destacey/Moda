@@ -95,19 +95,17 @@ public class SimpleSimpleHealthCheckTests
     {
         // Arrange
         var sut = _healthCheckFaker.Generate();
-        var id = sut.Id;
         var status = sut.Status;
-        var reportedOn = sut.ReportedOn;
         var expiration = sut.Expiration.Plus(Duration.FromDays(2));
 
         // Act
-        var result = sut.Update(id, status, reportedOn, expiration);
+        var result = sut.Update(status, expiration);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        sut.Id.Should().Be(id);
+        sut.Id.Should().Be(sut.Id);
+        sut.ReportedOn.Should().Be(sut.ReportedOn);
         sut.Status.Should().Be(status);
-        sut.ReportedOn.Should().Be(reportedOn);
         sut.Expiration.Should().Be(expiration);
 
         sut.DomainEvents.Should().BeEmpty();
@@ -118,19 +116,15 @@ public class SimpleSimpleHealthCheckTests
     {
         // Arrange
         var sut = _healthCheckFaker.Generate();
-        var id = Guid.NewGuid();
         var status = HealthStatus.AtRisk;
-        var reportedOn = sut.ReportedOn.Plus(Duration.FromDays(2));
-        var expiration = reportedOn.Plus(Duration.FromDays(8));
+        var expiration = sut.ReportedOn.Plus(Duration.FromDays(8));
 
         // Act
-        var result = sut.Update(id, status, reportedOn, expiration);
+        var result = sut.Update(status, expiration);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        sut.Id.Should().Be(id);
         sut.Status.Should().Be(status);
-        sut.ReportedOn.Should().Be(reportedOn);
         sut.Expiration.Should().Be(expiration);
 
         sut.DomainEvents.Should().BeEmpty();

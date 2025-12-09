@@ -1,4 +1,4 @@
-﻿using Moda.Common.Domain.Events;
+﻿using Moda.Common.Domain.Events.Health;
 using Moda.Health.Tests.Data;
 using Moda.Tests.Shared;
 using NodaTime.Extensions;
@@ -18,16 +18,16 @@ public class HealthCheckTests
         _healthCheckFaker = new(_dateTimeProvider.Now);
     }
 
-    #region Constructor
+    #region Create
 
     [Fact]
-    public void Constructor_WhenValid_ReturnsHealthCheck()
+    public void Create_WhenValid_ReturnsHealthCheck()
     {
         // Arrange
         var faker = _healthCheckFaker.Generate();
 
         // Act
-        var result = new HealthCheck(faker.ObjectId, faker.Context, faker.Status, faker.ReportedById, faker.ReportedOn, faker.Expiration, faker.Note);
+        var result = HealthCheck.Create(faker.ObjectId, faker.Context, faker.Status, faker.ReportedById, faker.ReportedOn, faker.Expiration, faker.Note, _dateTimeProvider.Now);
 
         // Assert
         result.Should().NotBeNull();
@@ -43,21 +43,21 @@ public class HealthCheckTests
     }
 
     [Fact]
-    public void Constructor_ObjectIdIsEmpty_ThrowsArgumentException()
+    public void Create_ObjectIdIsEmpty_ThrowsArgumentException()
     {
         // Arrange
         var objectId = Guid.Empty;
         var faker = _healthCheckFaker.Generate();
 
         // Act
-        Action act = () => new HealthCheck(objectId, faker.Context, faker.Status, faker.ReportedById, faker.ReportedOn, faker.Expiration, faker.Note);
+        Action act = () => HealthCheck.Create(objectId, faker.Context, faker.Status, faker.ReportedById, faker.ReportedOn, faker.Expiration, faker.Note, _dateTimeProvider.Now);
 
         // Assert
         act.Should().Throw<ArgumentException>().WithMessage("Parameter [objectId] is default value for type Guid (Parameter 'objectId')");
     }
 
     [Fact]
-    public void Constructor_WhenExpirationLessThanTimestamp_ThrowsArgumentException()
+    public void Create_WhenExpirationLessThanTimestamp_ThrowsArgumentException()
     {
         // Arrange
         var timestamp = Instant.FromDateTimeUtc(DateTime.UtcNow);
@@ -65,7 +65,7 @@ public class HealthCheckTests
         var faker = _healthCheckFaker.Generate();
 
         // Act
-        Action act = () => new HealthCheck(faker.ObjectId, faker.Context, faker.Status, faker.ReportedById, timestamp, expiration, faker.Note);
+        Action act = () => HealthCheck.Create(faker.ObjectId, faker.Context, faker.Status, faker.ReportedById, timestamp, expiration, faker.Note, _dateTimeProvider.Now);
 
         // Assert
         act.Should().Throw<ArgumentException>().WithMessage("Expiration must be greater than timestamp. (Parameter 'expiration')");
@@ -159,7 +159,7 @@ public class HealthCheckTests
         sut.Note.Should().Be(note);
 
         sut.DomainEvents.Should().NotBeEmpty();
-        sut.DomainEvents.Should().ContainSingle(e => e is EntityUpdatedEvent<HealthCheck>);
+        sut.DomainEvents.Should().ContainSingle(e => e is HealthCheckUpdatedEvent);
     }
 
     [Fact]
@@ -181,7 +181,7 @@ public class HealthCheckTests
         sut.Note.Should().BeNull();
 
         sut.DomainEvents.Should().NotBeEmpty();
-        sut.DomainEvents.Should().ContainSingle(e => e is EntityUpdatedEvent<HealthCheck>);
+        sut.DomainEvents.Should().ContainSingle(e => e is HealthCheckUpdatedEvent);
     }
 
     [Fact]
@@ -206,7 +206,7 @@ public class HealthCheckTests
     {
         // Arrange
         var faker = _healthCheckFaker.Generate();
-        var sut = new HealthCheck(faker.ObjectId, faker.Context, faker.Status, faker.ReportedById, faker.ReportedOn.Minus(Duration.FromDays(15)), faker.ReportedOn.Minus(Duration.FromDays(10)), faker.Note);
+        var sut = HealthCheck.Create(faker.ObjectId, faker.Context, faker.Status, faker.ReportedById, faker.ReportedOn.Minus(Duration.FromDays(15)), faker.ReportedOn.Minus(Duration.FromDays(10)), faker.Note, _dateTimeProvider.Now);
         var status = HealthStatus.Healthy;
         var expiration = _dateTimeProvider.Now.Plus(Duration.FromDays(1));
         var note = "Updated Note";

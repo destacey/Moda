@@ -1,7 +1,5 @@
-﻿using Moda.Common.Application.Requests.WorkManagement;
-using Moda.Planning.Application.PlanningIntervals.Commands;
+﻿using Moda.Common.Application.Requests.WorkManagement.Queries;
 using Moda.Web.Api.Extensions;
-using Moda.Web.Api.Models.Planning.PlanningIntervals;
 using Moda.Web.Api.Models.Work.WorkTypeLevels;
 using Moda.Work.Application.WorkTypeLevels.Commands;
 using Moda.Work.Application.WorkTypeLevels.Dtos;

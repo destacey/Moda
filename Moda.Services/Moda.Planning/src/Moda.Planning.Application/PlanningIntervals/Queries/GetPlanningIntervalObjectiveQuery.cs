@@ -1,9 +1,8 @@
-﻿using System.Linq;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using MediatR;
 using Moda.Common.Application.Dtos;
 using Moda.Common.Application.Models;
-using Moda.Goals.Application.Objectives.Queries;
+using Moda.Common.Application.Requests.Goals.Queries;
 using Moda.Planning.Application.PlanningIntervals.Dtos;
 
 namespace Moda.Planning.Application.PlanningIntervals.Queries;

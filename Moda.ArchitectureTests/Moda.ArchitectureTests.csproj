@@ -1,0 +1,59 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <IsPackable>false</IsPackable>
+        <IsTestProject>true</IsTestProject>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="FluentAssertions" />
+        <PackageReference Include="NetArchTest.Rules" />
+        <PackageReference Include="NodaTime.Testing" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" />
+        <PackageReference Include="xunit" />
+        <PackageReference Include="xunit.runner.visualstudio">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="coverlet.collector">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Using Include="Xunit" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <!-- Reference all domain and application projects to load assemblies for testing -->
+        <ProjectReference Include="..\Moda.Common\src\Moda.Common\Moda.Common.csproj" />
+        <ProjectReference Include="..\Moda.Common\src\Moda.Common.Domain\Moda.Common.Domain.csproj" />
+        <ProjectReference Include="..\Moda.Common\src\Moda.Common.Application\Moda.Common.Application.csproj" />
+
+        <!-- Infrastructure Projects -->
+        <ProjectReference Include="..\Moda.Infrastructure\src\Moda.Infrastructure\Moda.Infrastructure.csproj" />
+        <ProjectReference Include="..\Moda.Infrastructure\src\Moda.Infrastructure.Migrators.MSSQL\Moda.Infrastructure.Migrators.MSSQL.csproj" />
+
+        <!-- Integration Projects -->
+        <ProjectReference Include="..\Moda.Integrations\src\Moda.Integrations.AzureDevOps\Moda.Integrations.AzureDevOps.csproj" />
+        <ProjectReference Include="..\Moda.Integrations\src\Moda.Integrations.MicrosoftGraph\Moda.Integrations.MicrosoftGraph.csproj" />
+
+        <!-- Service Domain Projects -->
+        <ProjectReference Include="..\Moda.Services\Moda.Work\src\Moda.Work.Domain\Moda.Work.Domain.csproj" />
+        <ProjectReference Include="..\Moda.Services\Moda.Work\src\Moda.Work.Application\Moda.Work.Application.csproj" />
+        <ProjectReference Include="..\Moda.Services\Moda.Organization\src\Moda.Organization.Domain\Moda.Organization.Domain.csproj" />
+        <ProjectReference Include="..\Moda.Services\Moda.Organization\src\Moda.Organization.Application\Moda.Organization.Application.csproj" />
+        <ProjectReference Include="..\Moda.Services\Moda.Planning\src\Moda.Planning.Domain\Moda.Planning.Domain.csproj" />
+        <ProjectReference Include="..\Moda.Services\Moda.Planning\src\Moda.Planning.Application\Moda.Planning.Application.csproj" />
+        <ProjectReference Include="..\Moda.Services\Moda.Goals\src\Moda.Goals.Domain\Moda.Goals.Domain.csproj" />
+        <ProjectReference Include="..\Moda.Services\Moda.Goals\src\Moda.Goals.Application\Moda.Goals.Application.csproj" />
+        <ProjectReference Include="..\Moda.Services\Moda.AppIntegration\src\Moda.AppIntegration.Domain\Moda.AppIntegration.Domain.csproj" />
+        <ProjectReference Include="..\Moda.Services\Moda.AppIntegration\src\Moda.AppIntegration.Application\Moda.AppIntegration.Application.csproj" />
+        <ProjectReference Include="..\Moda.Services\Moda.StrategicManagement\src\Moda.StrategicManagement.Domain\Moda.StrategicManagement.Domain.csproj" />
+        <ProjectReference Include="..\Moda.Services\Moda.StrategicManagement\src\Moda.StrategicManagement.Application\Moda.StrategicManagement.Application.csproj" />
+        <ProjectReference Include="..\Moda.Services\Moda.ProjectPortfolioManagement\src\Moda.ProjectPortfolioManagement.Domain\Moda.ProjectPortfolioManagement.Domain.csproj" />
+        <ProjectReference Include="..\Moda.Services\Moda.ProjectPortfolioManagement\src\Moda.ProjectPortfolioManagement.Application\Moda.ProjectPortfolioManagement.Application.csproj" />
+    </ItemGroup>
+
+</Project>

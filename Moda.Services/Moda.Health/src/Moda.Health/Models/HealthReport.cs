@@ -1,16 +1,15 @@
 ﻿using Moda.Common.Domain.Enums;
-using Moda.Common.Domain.Events;
 using NodaTime;
 
 namespace Moda.Health.Models;
 public sealed class HealthReport
 {
-    private readonly List<HealthCheck> _healthChecks = new();
+    private readonly List<HealthCheck> _healthChecks = [];
 
     private HealthReport() { }
     public HealthReport(List<HealthCheck> healthChecks)
     {
-        _healthChecks = healthChecks.OrderByDescending(h => h.ReportedOn).ToList();
+        _healthChecks = [.. healthChecks.OrderByDescending(h => h.ReportedOn)];
     }
 
     public IReadOnlyCollection<HealthCheck> HealthChecks => _healthChecks.AsReadOnly();
@@ -28,7 +27,7 @@ public sealed class HealthReport
     /// <returns></returns>
     internal HealthCheck AddHealthCheck(Guid objectId, SystemContext context, HealthStatus status, Guid reportedById, Instant reportedOn, Instant expiration, string? note)
     {
-        var healthCheck = new HealthCheck(objectId, context, status, reportedById, reportedOn, expiration, note);
+        var healthCheck = HealthCheck.Create(objectId, context, status, reportedById, reportedOn, expiration, note, reportedOn);
 
         // health checks should not overlap
         // expire latest health check if not expired
@@ -39,8 +38,6 @@ public sealed class HealthReport
         }
 
         _healthChecks.Add(healthCheck);
-
-        healthCheck.AddDomainEvent(EntityCreatedEvent.WithEntity(healthCheck, reportedOn));
 
         return healthCheck;
     }

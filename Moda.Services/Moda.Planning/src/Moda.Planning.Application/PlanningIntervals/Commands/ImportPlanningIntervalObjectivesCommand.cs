@@ -1,5 +1,6 @@
 ﻿using MediatR;
-using Moda.Goals.Application.Objectives.Commands;
+using Moda.Common.Application.Requests.Goals.Commands;
+using Moda.Common.Domain.Enums.Goals;
 using Moda.Planning.Application.PlanningIntervals.Dtos;
 using Moda.Planning.Application.PlanningIntervals.Extensions;
 
@@ -30,18 +31,11 @@ public sealed class ImportPlanningIntervalObjectivesCommandValidator : CustomVal
     }
 }
 
-internal sealed class ImportPlanningIntervalObjectivesCommandHandler : ICommandHandler<ImportPlanningIntervalObjectivesCommand>
+internal sealed class ImportPlanningIntervalObjectivesCommandHandler(IPlanningDbContext planningDbContext, ISender sender, ILogger<ImportPlanningIntervalObjectivesCommandHandler> logger) : ICommandHandler<ImportPlanningIntervalObjectivesCommand>
 {
-    private readonly IPlanningDbContext _planningDbContext;
-    private readonly ISender _sender;
-    private readonly ILogger<ImportPlanningIntervalObjectivesCommandHandler> _logger;
-
-    public ImportPlanningIntervalObjectivesCommandHandler(IPlanningDbContext planningDbContext, ISender sender, ILogger<ImportPlanningIntervalObjectivesCommandHandler> logger)
-    {
-        _planningDbContext = planningDbContext;
-        _sender = sender;
-        _logger = logger;
-    }
+    private readonly IPlanningDbContext _planningDbContext = planningDbContext;
+    private readonly ISender _sender = sender;
+    private readonly ILogger<ImportPlanningIntervalObjectivesCommandHandler> _logger = logger;
 
     public async Task<Result> Handle(ImportPlanningIntervalObjectivesCommand request, CancellationToken cancellationToken)
     {
@@ -74,7 +68,7 @@ internal sealed class ImportPlanningIntervalObjectivesCommandHandler : ICommandH
                 var objectiveResult = await _sender.Send(new ImportObjectiveCommand(
                     importedObjective.Name,
                     importedObjective.Description,
-                    Goals.Domain.Enums.ObjectiveType.PlanningInterval,
+                    ObjectiveType.PlanningInterval,
                     mappedStatus,
                     importedObjective.Progress,
                     importedObjective.TeamId,

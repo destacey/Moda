@@ -13,4 +13,8 @@
         <InternalsVisibleTo Include="Moda.Organization.Domain.Tests" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Events\" />
+    </ItemGroup>
+
 </Project>

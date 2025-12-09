@@ -1,6 +1,6 @@
 ﻿using MediatR;
-using Moda.Goals.Application.Objectives.Commands;
-using Moda.Goals.Application.Objectives.Queries;
+using Moda.Common.Application.Requests.Goals.Commands;
+using Moda.Common.Application.Requests.Goals.Queries;
 using Moda.Planning.Application.PlanningIntervals.Extensions;
 using Moda.Planning.Domain.Enums;
 
