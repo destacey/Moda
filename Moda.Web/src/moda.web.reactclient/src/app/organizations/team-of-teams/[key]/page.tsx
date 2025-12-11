@@ -226,7 +226,7 @@ const TeamOfTeamsDetailsPage = (props: {
   return (
     <>
       <PageTitle
-        title={team?.name}
+        title={teamName}
         subtitle="Team of Teams Details"
         tags={<InactiveTag isActive={team?.isActive} />}
         actions={<PageActions actionItems={actionsMenuItems} />}
