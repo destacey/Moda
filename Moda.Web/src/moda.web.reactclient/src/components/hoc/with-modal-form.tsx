@@ -1,6 +1,6 @@
 import { Form, FormInstance, Modal } from 'antd'
 import { ComponentType, FC, useEffect, useState } from 'react'
-import { FieldData } from 'rc-field-form/lib/interface'
+import { FieldData } from '@rc-component/form/lib/interface'
 import { useAppDispatch } from '../../hooks'
 import { Action, ThunkAction } from '@reduxjs/toolkit'
 import { RootState } from '@/src/store'

@@ -13,7 +13,7 @@ import {
   createSlice,
   AsyncThunk,
 } from '@reduxjs/toolkit'
-import { FieldData } from 'rc-field-form/lib/interface'
+import { FieldData } from '@rc-component/form/lib/interface'
 import { toFormErrors } from '../utils'
 import { NoInfer } from 'react-redux'
 

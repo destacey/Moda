@@ -1,4 +1,4 @@
-import { FieldData } from 'rc-field-form/lib/interface'
+import { FieldData } from '@rc-component/form/lib/interface'
 
 const toFormErrors = (problemDetails: {
   [property: string]: string[]
