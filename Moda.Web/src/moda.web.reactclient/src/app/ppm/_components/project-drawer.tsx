@@ -104,6 +104,14 @@ const ProjectDrawer: FC<ProjectDrawerProps> = (props: ProjectDrawerProps) => {
             </Item>
             <Item label="Key">{projectData?.key}</Item>
             <Item label="Status">{projectData?.status.name}</Item>
+
+            {projectData?.program && (
+              <Item label="Program">
+                <Link href={`/ppm/programs/${projectData.program.key}`}>
+                  {projectData.program.name}
+                </Link>
+              </Item>
+            )}
             <Item label="Dates">
               <ModaDateRange
                 dateRange={{ start: projectData?.start, end: projectData?.end }}
