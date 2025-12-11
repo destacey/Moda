@@ -210,7 +210,7 @@ const EditConnectionForm = ({
 
         {/* TODO: make the configuration section dynamic based on the connector  */}
 
-        <Divider orientation="left" style={{ marginTop: '50px' }}>
+        <Divider titlePlacement="left" style={{ marginTop: '50px' }}>
           Azure DevOps Configuration
         </Divider>
         <Item

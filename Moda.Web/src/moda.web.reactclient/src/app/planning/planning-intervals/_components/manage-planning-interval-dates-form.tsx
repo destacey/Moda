@@ -265,7 +265,7 @@ const ManagePlanningIntervalDatesForm = ({
           <DatePicker />
         </Item>
 
-        <Divider orientation="left">Iterations</Divider>
+        <Divider titlePlacement="start">Iterations</Divider>
         <List name="iterations">
           {(fields, { add, remove }) => (
             <>
