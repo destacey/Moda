@@ -4,7 +4,6 @@ import {
   RoadmapTimeboxDetailsDto,
 } from '@/src/services/moda-api'
 import { useGetRoadmapItemQuery } from '@/src/store/features/planning/roadmaps-api'
-import { getDrawerWidthPercentage } from '@/src/utils/window-utils'
 import { Button, Drawer, Spin } from 'antd'
 import {
   EditRoadmapActivityForm,
@@ -55,7 +54,6 @@ const RoadmapItemDrawer: FC<RoadmapItemDrawerProps> = (
         onClose={props.onDrawerClose}
         open={props.drawerOpen}
         destroyOnHidden={true}
-        width={getDrawerWidthPercentage()}
         extra={
           canUpdateRoadmap && (
             <Button onClick={() => setOpenEditRoadmapItemForm(true)}>

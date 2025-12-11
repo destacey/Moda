@@ -71,7 +71,7 @@ const ProjectsTimeline: React.FC<ProjectsTimelineProps> = (props) => {
         case ProjectStatus.Cancelled:
           return token.colorError
         default:
-          return token.colorTextBase
+          return
       }
     },
     [token],
@@ -215,7 +215,7 @@ const ProjectsTimeline: React.FC<ProjectsTimelineProps> = (props) => {
     <>
       <Flex justify="end" align="center">
         <ControlItemsMenu items={controlItems()} />
-        <Divider type="vertical" style={{ height: '30px' }} />
+        <Divider vertical style={{ height: '30px' }} />
         {props.viewSelector}
       </Flex>
       <Card size="small" variant="borderless">

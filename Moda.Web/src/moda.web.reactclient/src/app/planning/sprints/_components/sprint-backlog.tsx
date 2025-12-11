@@ -108,7 +108,7 @@ const SprintBacklogGrid = (props: SprintBacklogGridProps) => {
       {
         field: 'storyPoints',
         headerName: 'SPs',
-        title: 'Story Points',
+        headerTooltip: 'Story Points',
         width: 80,
       },
       { field: 'status', width: 125, cellRenderer: WorkStatusTagCellRenderer },

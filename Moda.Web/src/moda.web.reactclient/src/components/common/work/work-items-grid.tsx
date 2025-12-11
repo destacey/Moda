@@ -31,7 +31,10 @@ export interface WorkItemsGridProps {
   onFilterChanged?: () => void
 }
 
-const WorkItemsGrid = forwardRef<AgGridReact<WorkItemListDto>, WorkItemsGridProps>((props, ref) => {
+const WorkItemsGrid = forwardRef<
+  AgGridReact<WorkItemListDto>,
+  WorkItemsGridProps
+>((props, ref) => {
   const { refetch } = props
 
   const columnDefs = useMemo<ColDef<WorkItemListDto>[]>(
@@ -52,7 +55,8 @@ const WorkItemsGrid = forwardRef<AgGridReact<WorkItemListDto>, WorkItemsGridProp
       },
       {
         field: 'storyPoints',
-        headerName: 'Story Points',
+        headerName: 'SPs',
+        headerTooltip: 'Story Points',
         width: 100,
         filter: 'agNumberColumnFilter',
         type: 'numericColumn',

@@ -6,7 +6,7 @@ const ThemeTest = () => {
 
   return (
     <Card title="Theme Test">
-      <Space direction="vertical">
+      <Space vertical>
         <p>Current Theme: {currentThemeName}</p>
         <p>Primary Color: {token.colorPrimary}</p>
         <p>Border Radius: {token.borderRadius}px</p>

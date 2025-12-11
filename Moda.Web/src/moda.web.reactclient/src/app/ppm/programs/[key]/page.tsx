@@ -290,7 +290,7 @@ const ProgramDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       {missingDates === true && (
         <>
           <Alert
-            message="Program Dates are required before activating."
+            title="Program Dates are required before activating."
             type="warning"
             showIcon
           />

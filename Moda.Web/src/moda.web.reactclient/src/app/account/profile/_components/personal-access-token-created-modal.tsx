@@ -44,7 +44,7 @@ const PersonalAccessTokenCreatedModal = ({
       maskClosable={false}
     >
       <Alert
-        message="Save This Token Now!"
+        title="Save This Token Now!"
         description="This is the only time you will see this token. Copy it and store it securely."
         type="error"
         showIcon

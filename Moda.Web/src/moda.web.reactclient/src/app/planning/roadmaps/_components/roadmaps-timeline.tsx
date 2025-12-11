@@ -447,7 +447,7 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
         />
         <Flex justify="end" align="center">
           <ControlItemsMenu items={controlItems} />
-          <Divider type="vertical" style={{ height: '30px' }} />
+          <Divider vertical style={{ height: '30px' }} />
           {props.viewSelector}
         </Flex>
       </Flex>

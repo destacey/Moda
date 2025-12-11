@@ -208,7 +208,7 @@ const EditWorkItemProjectForm = (props: EditWorkItemProjectFormProps) => {
         keyboard={false} // disable esc key to close modal
         destroyOnHidden={true}
       >
-        <Space direction="vertical">
+        <Space vertical>
           {projectSourceText && <Text italic>{projectSourceText}</Text>}
           <Form
             form={form}

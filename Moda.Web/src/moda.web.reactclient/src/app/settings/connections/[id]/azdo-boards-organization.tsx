@@ -25,21 +25,21 @@ const AzdoBoardsOrganization = (props: AzdoBoardsOrganizationProps) => {
 
   return (
     <>
-      <Space direction="vertical" size="large" style={{ display: 'flex' }}>
+      <Space vertical size="large" style={{ display: 'flex' }}>
         <Text>
           The work processes and workspaces below represent processes and
           projects pulled from Azure DevOps.
         </Text>
         {props.workProcesses.length === 0 ? (
           <Alert
-            message="No work processes were found for this connection."
+            title="No work processes were found for this connection."
             type="error"
           />
         ) : (
           <>
             <Title level={5}>Work Processes</Title>
             <Tabs
-              tabPosition="left"
+              tabPlacement="start"
               items={props.workProcesses
                 .slice() // array is likely in strict mode. clone the array to avoid sorting the original
                 .sort((a, b) => a.name.localeCompare(b.name))

@@ -23,8 +23,10 @@ export interface StrategicInitiativesTimelineProps {
   viewSelector?: ReactNode
 }
 
-interface StrategicInitiativeTimelineItem
-  extends ModaDataItem<StrategicInitiativeListDto, string> {
+interface StrategicInitiativeTimelineItem extends ModaDataItem<
+  StrategicInitiativeListDto,
+  string
+> {
   id: string
   openStrategicInitiativeDrawer: (strategicInitiativeKey: number) => void
 }
@@ -154,7 +156,7 @@ const StrategicInitiativesTimeline: React.FC<
     <>
       <Flex justify="end" align="center">
         <ControlItemsMenu items={controlItems()} />
-        <Divider type="vertical" style={{ height: '30px' }} />
+        <Divider vertical style={{ height: '30px' }} />
         {props.viewSelector}
       </Flex>
       <Card size="small" variant="borderless">

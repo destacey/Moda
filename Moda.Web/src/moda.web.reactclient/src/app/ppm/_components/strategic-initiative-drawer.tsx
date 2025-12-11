@@ -6,7 +6,6 @@ import useAuth from '@/src/components/contexts/auth'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { useGetStrategicInitiativeQuery } from '@/src/store/features/ppm/strategic-initiatives-api'
 import { getSortedNames } from '@/src/utils'
-import { getDrawerWidthPercentage } from '@/src/utils/window-utils'
 import { Descriptions, Drawer, Flex, Spin } from 'antd'
 import Link from 'next/link'
 import { FC, useCallback, useEffect, useMemo } from 'react'
@@ -82,7 +81,6 @@ const StrategicInitiativeDrawer: FC<StrategicInitiativeDrawerProps> = (
       onClose={handleDrawerClose}
       open={props.drawerOpen}
       destroyOnHidden={true}
-      width={getDrawerWidthPercentage()}
     >
       <Spin spinning={isLoading}>
         <Flex vertical gap="middle">
