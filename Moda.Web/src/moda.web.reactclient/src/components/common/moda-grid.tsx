@@ -101,7 +101,7 @@ const ModaGrid = forwardRef<AgGridReact, ModaGridProps>(({
 
   return (
     <div style={{ width: width }}>
-      <Space direction="vertical" style={{ width: '100%' }}>
+      <Space vertical style={{ width: '100%' }}>
         <Row>
           {actions && (
             <Col xs={24} sm={24} md={10}>
@@ -147,7 +147,7 @@ const ModaGrid = forwardRef<AgGridReact, ModaGridProps>(({
                   />
                 </Tooltip>
                 {(showExportButton || toolbarActions) && (
-                  <Divider type="vertical" style={{ height: '30px' }} />
+                  <Divider orientation="vertical" style={{ height: '30px' }} />
                 )}
                 {showExportButton && (
                   <Tooltip title="Export to CSV">

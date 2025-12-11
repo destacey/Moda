@@ -2,7 +2,6 @@
 
 import '@/styles/globals.css'
 import React, { memo, PropsWithChildren, useMemo } from 'react'
-import '@ant-design/v5-patch-for-react-19'
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community'
 import { Provider } from 'react-redux'
 import { Inter } from 'next/font/google'
