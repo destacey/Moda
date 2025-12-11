@@ -158,7 +158,7 @@ const ChangeProjectStatusForm = (props: ChangeProjectStatusFormProps) => {
         keyboard={false} // disable esc key to close modal
         destroyOnHidden={true}
       >
-        <Space direction="vertical">
+        <Space vertical>
           <div>
             {props.project?.key} - {props.project?.name}
           </div>

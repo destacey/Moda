@@ -5,7 +5,6 @@ import { Button, Descriptions, Drawer, Flex } from 'antd'
 import Link from 'next/link'
 import dayjs from 'dayjs'
 import PlanningIntervalObjectiveWorkItemsCard from '../[key]/objectives/[objectiveKey]/planning-interval-objective-work-items-card'
-import { getDrawerWidthPercentage } from '@/src/utils/window-utils'
 import { MarkdownRenderer } from '@/src/components/common/markdown'
 import { FC, useState } from 'react'
 import { EditPlanningIntervalObjectiveForm } from '.'
@@ -50,7 +49,6 @@ const PlanningIntervalObjectiveDetailsDrawer: FC<
         open={props.drawerOpen}
         destroyOnHidden={true}
         loading={objectiveDataIsLoading}
-        width={getDrawerWidthPercentage()}
         extra={
           props.canManageObjectives && (
             <Button onClick={() => setOpenEditObjectiveForm(true)}>Edit</Button>

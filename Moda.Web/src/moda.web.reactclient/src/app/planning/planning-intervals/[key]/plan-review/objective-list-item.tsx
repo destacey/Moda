@@ -210,7 +210,7 @@ const ObjectiveListItem = ({
           )}
           <Meta title={title()} description={description()} />
           {canUpdateObjectives && (
-            <Dropdown menu={{ items: menuItems }}>
+            <Dropdown menu={{ items: menuItems }} trigger={['click']}>
               <Button
                 type="text"
                 size="small"

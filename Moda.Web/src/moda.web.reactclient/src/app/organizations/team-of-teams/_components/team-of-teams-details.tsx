@@ -15,7 +15,7 @@ const TeamOfTeamsDetails = ({ team }: TeamOfTeamsDetailsProps) => {
   if (!team) return null
   return (
     <>
-      <Space direction="vertical">
+      <Space vertical>
         <Row>
           <Col xs={24} md={12}>
             <Descriptions>

@@ -15,7 +15,7 @@ const ExpenditureCategoryDetails: React.FC<ExpenditureCategoryDetailsProps> = ({
   if (!expenditureCategory) return null
 
   return (
-    <Space direction="vertical">
+    <Space vertical>
       <Descriptions size="small">
         <Item label="State">{expenditureCategory.state.name}</Item>
         <Item label="Capitalizable">

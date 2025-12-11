@@ -50,7 +50,8 @@ const PlanningIntervalPlanReviewPage = (props: {
     if (userSelectedTab) return userSelectedTab
     if (teams.length === 0) return ''
 
-    const hash = typeof window !== 'undefined' ? window.location.hash.slice(1) : ''
+    const hash =
+      typeof window !== 'undefined' ? window.location.hash.slice(1) : ''
     return hash && hash !== '' ? hash : teams[0]?.code.toLowerCase()
   }, [userSelectedTab, teams])
 
@@ -127,7 +128,7 @@ const PlanningIntervalPlanReviewPage = (props: {
         onTabChange={(key) => setUserSelectedTab(key)}
       >
         {!tabExists ? (
-          <Alert message="Please select a valid team." type="error" />
+          <Alert title="Please select a valid team." type="error" />
         ) : (
           <TeamPlanReview
             planningInterval={planningIntervalData}

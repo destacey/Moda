@@ -269,7 +269,7 @@ const EditPlanningIntervalObjectiveForm = ({
           name="update-objective-form"
         >
           {planningIntervalData?.objectivesLocked && (
-            <Alert message="PI Objectives are locked." type="info" showIcon />
+            <Alert title="PI Objectives are locked." type="info" showIcon />
           )}
           <Descriptions size="small" column={1}>
             <Item label="Key">{objectiveData?.key}</Item>

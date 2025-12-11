@@ -11,7 +11,7 @@ import { ProjectListDto } from '@/src/services/moda-api'
 import { Card, Divider, Flex, Space, Switch, theme, Typography } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import dayjs from 'dayjs'
-import { ReactNode, useCallback, useMemo, useState } from 'react'
+import { FC, ReactNode, useCallback, useMemo, useState } from 'react'
 import { ProjectDrawer } from '.'
 import { DataGroup } from 'vis-timeline/standalone'
 import { ProjectStatus } from '@/src/components/types'
@@ -55,14 +55,14 @@ export const ProjectRangeItemTemplate: TimelineTemplate<
   )
 }
 
-const ProjectsTimeline: React.FC<ProjectsTimelineProps> = (props) => {
+const ProjectsTimeline: FC<ProjectsTimelineProps> = (props) => {
   const { token } = useToken()
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [selectedItemKey, setSelectedItemKey] = useState<number | null>(null)
   const [showCurrentTime, setShowCurrentTime] = useState<boolean>(true)
 
   const getProjectStatusColor = useCallback(
-    (status: ProjectStatus): string => {
+    (status: ProjectStatus): string | undefined => {
       switch (status) {
         case ProjectStatus.Active:
           return token.colorInfo
@@ -71,7 +71,7 @@ const ProjectsTimeline: React.FC<ProjectsTimelineProps> = (props) => {
         case ProjectStatus.Cancelled:
           return token.colorError
         default:
-          return token.colorTextBase
+          return undefined
       }
     },
     [token],
@@ -215,7 +215,7 @@ const ProjectsTimeline: React.FC<ProjectsTimelineProps> = (props) => {
     <>
       <Flex justify="end" align="center">
         <ControlItemsMenu items={controlItems()} />
-        <Divider type="vertical" style={{ height: '30px' }} />
+        <Divider vertical style={{ height: '30px' }} />
         {props.viewSelector}
       </Flex>
       <Card size="small" variant="borderless">

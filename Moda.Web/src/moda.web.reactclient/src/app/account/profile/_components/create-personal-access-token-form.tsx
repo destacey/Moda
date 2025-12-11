@@ -116,7 +116,7 @@ const CreatePersonalAccessTokenForm = ({
       width={600}
     >
       <Alert
-        message="Important"
+        title="Important"
         description="After creation, the token will only be shown once. Make sure to copy it to a secure location."
         type="warning"
         showIcon

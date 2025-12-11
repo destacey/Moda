@@ -21,7 +21,11 @@ const PageActions = ({
 }: PageActionsProps) => {
   if (!actionItems || actionItems.length === 0) return null
   return (
-    <Dropdown placement={placement} menu={{ items: actionItems }}>
+    <Dropdown
+      placement={placement}
+      menu={{ items: actionItems }}
+      trigger={['click']}
+    >
       <Button>
         <Space>
           {menuTitle}

@@ -21,7 +21,7 @@ const WorkspaceCard: React.FC<WorkspaceCardProps> = (
       hoverable
       onClick={() => router.push(`/work/workspaces/${props.workspace.key}`)}
     >
-      <Space direction="vertical">
+      <Space vertical>
         <Descriptions column={1} size="small">
           <DiscriptionItem label="Key">{props.workspace.key}</DiscriptionItem>
           <DiscriptionItem>

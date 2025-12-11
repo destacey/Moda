@@ -22,9 +22,7 @@ const DaysCountdownLabel = ({
         <Text>({daysRemaining(planningInterval.start)} days until start)</Text>
       )
     case IterationState.Active:
-      return (
-        <Text>({daysRemaining(planningInterval.end)} days remaining)</Text>
-      )
+      return <Text>({daysRemaining(planningInterval.end)} days remaining)</Text>
     default:
       return null
   }
@@ -37,7 +35,7 @@ const PlanningIntervalCard = ({
 
   return (
     <Card size="small" title={planningInterval.name}>
-      <Space direction="vertical">
+      <Space vertical>
         <Space wrap>
           {dayjs(planningInterval.start).format('M/D/YYYY')}
           <Text type="secondary"> - </Text>

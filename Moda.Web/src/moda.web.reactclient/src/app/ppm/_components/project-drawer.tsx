@@ -6,7 +6,6 @@ import useAuth from '@/src/components/contexts/auth'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { useGetProjectQuery } from '@/src/store/features/ppm/projects-api'
 import { getSortedNames } from '@/src/utils'
-import { getDrawerWidthPercentage } from '@/src/utils/window-utils'
 import { Descriptions, Drawer, Flex, Spin } from 'antd'
 import Link from 'next/link'
 import { FC, useCallback, useEffect, useMemo } from 'react'
@@ -94,7 +93,6 @@ const ProjectDrawer: FC<ProjectDrawerProps> = (props: ProjectDrawerProps) => {
       onClose={handleDrawerClose}
       open={props.drawerOpen}
       destroyOnHidden={true}
-      width={getDrawerWidthPercentage()}
     >
       <Spin spinning={isLoading}>
         <Flex vertical gap="middle">
@@ -106,6 +104,14 @@ const ProjectDrawer: FC<ProjectDrawerProps> = (props: ProjectDrawerProps) => {
             </Item>
             <Item label="Key">{projectData?.key}</Item>
             <Item label="Status">{projectData?.status.name}</Item>
+
+            {projectData?.program && (
+              <Item label="Program">
+                <Link href={`/ppm/programs/${projectData.program.key}`}>
+                  {projectData.program.name}
+                </Link>
+              </Item>
+            )}
             <Item label="Dates">
               <ModaDateRange
                 dateRange={{ start: projectData?.start, end: projectData?.end }}

@@ -36,7 +36,7 @@ const ActivePlanningIntervals = () => {
 
   return (
     <>
-      <Space direction="vertical">
+      <Space vertical>
         <Title level={2} style={{ margin: '0px', fontWeight: '400' }}>
           Planning Intervals
         </Title>

@@ -3,6 +3,36 @@ import '@testing-library/jest-dom'
 
 import crypto from 'crypto'
 
+// Mock MessageChannel for Ant Design v6 components
+global.MessageChannel = class MessageChannel {
+  port1: MessagePort
+  port2: MessagePort
+
+  constructor() {
+    this.port1 = {
+      postMessage: jest.fn(),
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+      start: jest.fn(),
+      close: jest.fn(),
+      onmessage: null,
+      onmessageerror: null,
+      dispatchEvent: jest.fn(() => false),
+    } as unknown as MessagePort
+
+    this.port2 = {
+      postMessage: jest.fn(),
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+      start: jest.fn(),
+      close: jest.fn(),
+      onmessage: null,
+      onmessageerror: null,
+      dispatchEvent: jest.fn(() => false),
+    } as unknown as MessagePort
+  }
+}
+
 // Mock BroadcastChannel to prevent ReferenceError in Jest (Node.js environment)
 global.BroadcastChannel = class BroadcastChannel {
   name: string

@@ -183,7 +183,7 @@ const Permissions = (props: PermissionsProps) => {
           push={1}
           style={{ display: 'flex', flexDirection: 'column' }}
         >
-          <Space direction="vertical" style={{ height: '100%' }}>
+          <Space vertical style={{ height: '100%' }}>
             <Title level={5}>
               {effectiveActiveGroup?.name} Available Permissions
             </Title>
