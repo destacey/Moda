@@ -64,7 +64,7 @@ const EmployeeListPage = () => {
   )
 
   const refresh = useCallback(async () => {
-    refetch
+    refetch()
   }, [refetch])
 
   const onIncludeInactiveChange = (checked: boolean) => {

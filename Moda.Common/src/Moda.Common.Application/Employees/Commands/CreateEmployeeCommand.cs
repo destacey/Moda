@@ -124,6 +124,7 @@ internal sealed class CreateEmployeeCommandHandler : ICommandHandler<CreateEmplo
                 request.Department,
                 request.OfficeLocation,
                 managerId,
+                true,
                 _dateTimeProvider.Now
                 );
 
