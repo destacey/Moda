@@ -5,10 +5,10 @@ import { MarkdownRenderer } from '@/src/components/common/markdown'
 import useAuth from '@/src/components/contexts/auth'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { useGetProgramQuery } from '@/src/store/features/ppm/programs-api'
-import { getSortedNames } from '@/src/utils'
-import { Descriptions, Drawer, Flex, Spin } from 'antd'
+import { getDrawerWidthPixels, getSortedNames } from '@/src/utils'
+import { Descriptions, Drawer, Flex } from 'antd'
 import Link from 'next/link'
-import { FC, useCallback, useEffect, useMemo } from 'react'
+import { FC, useCallback, useEffect, useMemo, useState } from 'react'
 
 const { Item } = Descriptions
 
@@ -19,6 +19,7 @@ export interface ProgramDrawerProps {
 }
 
 const ProgramDrawer: FC<ProgramDrawerProps> = (props: ProgramDrawerProps) => {
+  const [size, setSize] = useState(getDrawerWidthPixels())
   const messageApi = useMessage()
 
   const {
@@ -42,7 +43,6 @@ const ProgramDrawer: FC<ProgramDrawerProps> = (props: ProgramDrawerProps) => {
 
   useEffect(() => {
     if (error) {
-      console.error(error)
       messageApi.error(
         error.detail ??
           'An error occurred while loading program data. Please try again.',
@@ -82,45 +82,45 @@ const ProgramDrawer: FC<ProgramDrawerProps> = (props: ProgramDrawerProps) => {
     [programData],
   )
 
-  const handleDrawerClose = useCallback(() => {
-    props.onDrawerClose()
-  }, [props])
-
   return (
     <Drawer
       title="Program Details"
       placement="right"
-      onClose={handleDrawerClose}
+      onClose={props.onDrawerClose}
       open={props.drawerOpen}
+      loading={isLoading}
+      mask={{ blur: false }}
+      size={size}
+      resizable={{
+        onResize: (newSize) => setSize(newSize),
+      }}
       destroyOnHidden={true}
     >
-      <Spin spinning={isLoading}>
-        <Flex vertical gap="middle">
-          <Descriptions column={1} size="small">
-            <Item label="Name">
-              <Link href={`/ppm/programs/${programData?.key}`}>
-                {programData?.name}
-              </Link>
-            </Item>
-            <Item label="Key">{programData?.key}</Item>
-            <Item label="Status">{programData?.status.name}</Item>
-            <Item label="Dates">
-              <ModaDateRange
-                dateRange={{ start: programData?.start, end: programData?.end }}
-              />
-            </Item>
-            <Item label="Sponsors">{sponsorNames}</Item>
-            <Item label="Owners">{ownerNames}</Item>
-            <Item label="Managers">{managerNames}</Item>
-            <Item label="Strategic Themes">{strategicThemes}</Item>
-          </Descriptions>
-          <Descriptions layout="vertical" size="small">
-            <Item label="Description">
-              <MarkdownRenderer markdown={programData?.description} />
-            </Item>
-          </Descriptions>
-        </Flex>
-      </Spin>
+      <Flex vertical gap="middle">
+        <Descriptions column={1} size="small">
+          <Item label="Name">
+            <Link href={`/ppm/programs/${programData?.key}`}>
+              {programData?.name}
+            </Link>
+          </Item>
+          <Item label="Key">{programData?.key}</Item>
+          <Item label="Status">{programData?.status.name}</Item>
+          <Item label="Dates">
+            <ModaDateRange
+              dateRange={{ start: programData?.start, end: programData?.end }}
+            />
+          </Item>
+          <Item label="Sponsors">{sponsorNames}</Item>
+          <Item label="Owners">{ownerNames}</Item>
+          <Item label="Managers">{managerNames}</Item>
+          <Item label="Strategic Themes">{strategicThemes}</Item>
+        </Descriptions>
+        <Descriptions layout="vertical" size="small">
+          <Item label="Description">
+            <MarkdownRenderer markdown={programData?.description} />
+          </Item>
+        </Descriptions>
+      </Flex>
     </Drawer>
   )
 }

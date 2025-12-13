@@ -22,7 +22,7 @@ public sealed record ProjectListDto : IMapFrom<Project>
     /// <summary>
     /// The current status of the project.
     /// </summary>
-    public required SimpleNavigationDto Status { get; set; }
+    public required LifecycleNavigationDto Status { get; set; }
 
     /// <summary>
     /// The project start date.
@@ -67,7 +67,7 @@ public sealed record ProjectListDto : IMapFrom<Project>
     public void ConfigureMapping(TypeAdapterConfig config)
     {
         config.NewConfig<Project, ProjectListDto>()
-            .Map(dest => dest.Status, src => SimpleNavigationDto.FromEnum(src.Status))
+            .Map(dest => dest.Status, src => LifecycleNavigationDto.FromEnum(src.Status))
             .Map(dest => dest.Start, src => src.DateRange != null ? src.DateRange.Start : (LocalDate?)null)
             .Map(dest => dest.End, src => src.DateRange != null ? src.DateRange.End : (LocalDate?)null)
             .Map(dest => dest.Portfolio, src => NavigationDto.Create(src.Portfolio!.Id, src.Portfolio.Key, src.Portfolio.Name))

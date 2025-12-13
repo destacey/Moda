@@ -14,8 +14,7 @@ import dayjs from 'dayjs'
 import { FC, ReactNode, useCallback, useMemo, useState } from 'react'
 import { ProjectDrawer } from '.'
 import { DataGroup } from 'vis-timeline/standalone'
-import { ProjectStatus } from '@/src/components/types'
-import { getLuminance } from '@/src/utils/color-helper'
+import { getLifecyclePhaseColorFromStatus, getLuminance } from '@/src/utils'
 
 const { Text } = Typography
 const { useToken } = theme
@@ -56,26 +55,10 @@ export const ProjectRangeItemTemplate: TimelineTemplate<
 }
 
 const ProjectsTimeline: FC<ProjectsTimelineProps> = (props) => {
-  const { token } = useToken()
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [selectedItemKey, setSelectedItemKey] = useState<number | null>(null)
   const [showCurrentTime, setShowCurrentTime] = useState<boolean>(true)
-
-  const getProjectStatusColor = useCallback(
-    (status: ProjectStatus): string | undefined => {
-      switch (status) {
-        case ProjectStatus.Active:
-          return token.colorInfo
-        case ProjectStatus.Completed:
-          return token.colorSuccess
-        case ProjectStatus.Cancelled:
-          return token.colorError
-        default:
-          return undefined
-      }
-    },
-    [token],
-  )
+  const { token } = useToken()
 
   const showDrawer = useCallback(() => {
     setDrawerOpen(true)
@@ -136,7 +119,7 @@ const ProjectsTimeline: FC<ProjectsTimelineProps> = (props) => {
         id: String(project.id),
         title: project.name,
         content: project.name,
-        itemColor: getProjectStatusColor(project.status.id as ProjectStatus),
+        itemColor: getLifecyclePhaseColorFromStatus(project.status, token),
         objectData: project,
         group: project.program?.name ?? 'No Program',
         type: 'range',
@@ -144,12 +127,7 @@ const ProjectsTimeline: FC<ProjectsTimelineProps> = (props) => {
         end: new Date(project.end),
         openProjectDrawer: openProjectDrawer,
       }))
-  }, [
-    getProjectStatusColor,
-    openProjectDrawer,
-    props.isLoading,
-    props.projects,
-  ])
+  }, [openProjectDrawer, props.isLoading, props.projects, token])
 
   const timelineWindow = useMemo(() => {
     let minDate = dayjs()

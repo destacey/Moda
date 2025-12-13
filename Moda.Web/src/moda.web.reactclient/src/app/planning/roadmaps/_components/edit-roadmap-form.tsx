@@ -23,6 +23,7 @@ import { useMessage } from '@/src/components/contexts/messaging'
 const { Item } = Form
 const { TextArea } = Input
 const { Group: RadioGroup } = Radio
+const { RangePicker } = DatePicker
 
 export interface EditRoadmapFormProps {
   roadmapKey: number
@@ -34,8 +35,7 @@ export interface EditRoadmapFormProps {
 interface EditRoadmapFormValues {
   name: string
   description?: string
-  start: Date
-  end: Date
+  range: any[]
   roadmapManagerIds: string[]
   visibilityId: number
 }
@@ -48,8 +48,8 @@ const mapToRequestValues = (
     id: objectiveId,
     name: values.name,
     description: values.description,
-    start: (values.start as any)?.format('YYYY-MM-DD'),
-    end: (values.end as any)?.format('YYYY-MM-DD'),
+    start: (values.range?.[0] as any)?.format('YYYY-MM-DD'),
+    end: (values.range?.[1] as any)?.format('YYYY-MM-DD'),
     roadmapManagerIds: values.roadmapManagerIds,
     visibilityId: values.visibilityId,
   } as UpdateRoadmapRequest
@@ -99,8 +99,7 @@ const EditRoadmapForm = (props: EditRoadmapFormProps) => {
       form.setFieldsValue({
         name: roadmap.name,
         description: roadmap.description || '', // Ensure an empty string if description is undefined
-        start: dayjs(roadmap.start),
-        end: dayjs(roadmap.end),
+        range: [dayjs(roadmap.start), dayjs(roadmap.end)],
         visibilityId: roadmap.visibility.id,
         roadmapManagerIds: roadmap.roadmapManagers.map((rm) => rm.id),
       })
@@ -262,29 +261,30 @@ const EditRoadmapForm = (props: EditRoadmapFormProps) => {
               maxLength={2048}
             />
           </Item>
-          <Item name="start" label="Start" rules={[{ required: true }]}>
-            <DatePicker />
-          </Item>
           <Item
-            name="end"
-            label="End"
-            dependencies={['start']}
+            name="range"
+            label="Dates"
             rules={[
-              { required: true },
-              ({ getFieldValue }) => ({
-                validator(_, value) {
-                  const start = getFieldValue('start')
-                  if (!value || !start || start < value) {
-                    return Promise.resolve()
+              { required: true, message: 'Select start and end dates' },
+              {
+                validator: (_, value) => {
+                  if (!value || !value[0] || !value[1]) {
+                    return Promise.reject(
+                      new Error('Start and end dates are required'),
+                    )
                   }
-                  return Promise.reject(
-                    new Error('End date must be after start date'),
-                  )
+                  const [start, end] = value
+                  if (!start || !end || !start.isBefore(end)) {
+                    return Promise.reject(
+                      new Error('End date must be after start date'),
+                    )
+                  }
+                  return Promise.resolve()
                 },
-              }),
+              },
             ]}
           >
-            <DatePicker />
+            <RangePicker />
           </Item>
           <Item
             name="roadmapManagerIds"

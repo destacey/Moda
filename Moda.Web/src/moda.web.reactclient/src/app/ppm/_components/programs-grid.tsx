@@ -2,6 +2,7 @@
 
 import { ModaGrid } from '@/src/components/common'
 import {
+  LifecycleStatusTagCellRenderer,
   PortfolioLinkCellRenderer,
   ProgramLinkCellRenderer,
 } from '@/src/components/common/moda-grid-cell-renderers'
@@ -32,7 +33,12 @@ const ProgramsGrid: FC<ProgramsGridProps> = (props: ProgramsGridProps) => {
         width: 300,
         initialSort: 'asc',
       },
-      { field: 'status.name', headerName: 'Status', width: 125 },
+      {
+        field: 'status.name',
+        headerName: 'Status',
+        width: 125,
+        cellRenderer: LifecycleStatusTagCellRenderer,
+      },
       {
         field: 'portfolio.name',
         headerName: 'Portfolio',
