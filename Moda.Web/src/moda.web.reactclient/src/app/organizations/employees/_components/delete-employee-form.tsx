@@ -6,7 +6,6 @@ import {
 } from '@/src/store/features/organizations/employee-api'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { useEffect, useState } from 'react'
-import { skip } from 'node:test'
 import useAuth from '@/src/components/contexts/auth'
 import { Modal } from 'antd'
 
@@ -25,11 +24,7 @@ const DeleteEmployeeForm = (props: DeleteEmployeeFormProps) => {
   const { hasPermissionClaim } = useAuth()
   const canDeleteEmployee = hasPermissionClaim('Permissions.Employees.Delete')
 
-  const {
-    data: employeeData,
-    isLoading,
-    error,
-  } = useGetEmployeeQuery(props.employeeKey)
+  const { data: employeeData } = useGetEmployeeQuery(props.employeeKey)
 
   const [deleteEmployeeMutation, { error: mutationError }] =
     useDeleteEmployeeMutation()
