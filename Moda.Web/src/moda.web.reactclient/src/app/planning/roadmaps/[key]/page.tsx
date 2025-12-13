@@ -127,10 +127,6 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     dispatch(setBreadcrumbRoute({ route: breadcrumbRoute, pathname }))
   }, [dispatch, pathname, roadmapData])
 
-  useEffect(() => {
-    error && console.error(error)
-  }, [error])
-
   const actionsMenuItems: MenuProps['items'] = useMemo(() => {
     const items: ItemType[] = []
 

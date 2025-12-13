@@ -3,16 +3,19 @@
 import PageTitle from '@/src/components/common/page-title'
 import { use, useCallback, useEffect, useMemo, useState } from 'react'
 import EmployeeDetails from './employee-details'
-import { Card } from 'antd'
+import { Card, MenuProps } from 'antd'
 import { useDocumentTitle } from '@/src/hooks/use-document-title'
 import { authorizePage } from '@/src/components/hoc'
-import { notFound, usePathname } from 'next/navigation'
+import { notFound, usePathname, useRouter } from 'next/navigation'
 import { useAppDispatch } from '@/src/hooks'
 import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
-import { InactiveTag } from '@/src/components/common'
+import { InactiveTag, PageActions } from '@/src/components/common'
 import { useGetEmployeeQuery } from '@/src/store/features/organizations/employee-api'
 import EmployeeDetailsLoading from './loading'
 import { useMessage } from '@/src/components/contexts/messaging'
+import useAuth from '@/src/components/contexts/auth'
+import { ItemType } from 'antd/es/menu/interface'
+import DeleteEmployeeForm from '../_components/delete-employee-form'
 
 enum EmployeeTabs {
   Details = 'details',
@@ -30,10 +33,17 @@ const EmployeeDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const employeeKey = Number(key)
 
   const [activeTab, setActiveTab] = useState(EmployeeTabs.Details)
+  const [openDeleteEmployeeForm, setOpenDeleteEmployeeForm] =
+    useState<boolean>(false)
 
   const messageApi = useMessage()
   const pathname = usePathname()
   const dispatch = useAppDispatch()
+
+  const router = useRouter()
+
+  const { hasPermissionClaim } = useAuth()
+  const canDeleteEmployee = hasPermissionClaim('Permissions.Employees.Delete')
 
   const {
     data: employeeData,
@@ -66,10 +76,32 @@ const EmployeeDetailsPage = (props: { params: Promise<{ key: string }> }) => {
 
   useEffect(() => {
     if (error) {
-      console.error(error)
       messageApi.error('Failed to load employee details.')
     }
   }, [error, messageApi])
+
+  const actionsMenuItems: MenuProps['items'] = useMemo(() => {
+    const items: ItemType[] = []
+    if (canDeleteEmployee) {
+      items.push({
+        key: 'delete',
+        label: 'Delete',
+        onClick: () => setOpenDeleteEmployeeForm(true),
+      })
+    }
+
+    return items
+  }, [canDeleteEmployee])
+
+  const onDeleteFormClosed = useCallback(
+    (wasDeleted: boolean) => {
+      setOpenDeleteEmployeeForm(false)
+      if (wasDeleted) {
+        router.push('/organizations/employees/')
+      }
+    },
+    [router],
+  )
 
   if (isLoading) {
     return <EmployeeDetailsLoading />
@@ -82,9 +114,10 @@ const EmployeeDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   return (
     <>
       <PageTitle
-        title={employeeData?.displayName}
+        title={`${employeeData?.key} - ${employeeData?.displayName}`}
         subtitle="Employee Details"
         tags={<InactiveTag isActive={employeeData?.isActive} />}
+        actions={<PageActions actionItems={actionsMenuItems} />}
       />
       <Card
         style={{ width: '100%' }}
@@ -94,6 +127,19 @@ const EmployeeDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       >
         {renderTabContent()}
       </Card>
+
+      {/* Delete Employee Form */}
+      {openDeleteEmployeeForm && (
+        <DeleteEmployeeForm
+          employeeKey={employeeData.key}
+          onFormComplete={() => {
+            onDeleteFormClosed(true)
+          }}
+          onFormCancel={() => {
+            onDeleteFormClosed(false)
+          }}
+        />
+      )}
     </>
   )
 }
