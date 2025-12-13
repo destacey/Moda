@@ -22,7 +22,7 @@ public sealed record ProgramListDto : IMapFrom<Program>
     /// <summary>
     /// The current status of the program.
     /// </summary>
-    public required SimpleNavigationDto Status { get; set; }
+    public required LifecycleNavigationDto Status { get; set; }
 
     /// <summary>
     /// The program start date.
@@ -62,7 +62,7 @@ public sealed record ProgramListDto : IMapFrom<Program>
     public void ConfigureMapping(TypeAdapterConfig config)
     {
         config.NewConfig<Program, ProgramListDto>()
-            .Map(dest => dest.Status, src => SimpleNavigationDto.FromEnum(src.Status))
+            .Map(dest => dest.Status, src => LifecycleNavigationDto.FromEnum(src.Status))
             .Map(dest => dest.Start, src => src.DateRange != null ? src.DateRange.Start : (LocalDate?)null)
             .Map(dest => dest.End, src => src.DateRange != null ? src.DateRange.End : (LocalDate?)null)
             .Map(dest => dest.Portfolio, src => NavigationDto.Create(src.Portfolio!.Id, src.Portfolio.Key, src.Portfolio.Name))

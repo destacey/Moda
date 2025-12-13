@@ -16997,10 +16997,16 @@ export interface ProjectPortfolioListDto {
     key: number;
     name: string;
     description: string;
-    status: SimpleNavigationDto;
+    status: LifecycleNavigationDto;
     portfolioSponsors: EmployeeNavigationDto[];
     portfolioOwners: EmployeeNavigationDto[];
     portfolioManagers: EmployeeNavigationDto[];
+}
+
+export interface LifecycleNavigationDto {
+    id: number;
+    name: string;
+    lifecyclePhase: string;
 }
 
 export interface EmployeeNavigationDto extends NavigationDto {
@@ -17011,7 +17017,7 @@ export interface ProjectPortfolioDetailsDto {
     key: number;
     name: string;
     description: string;
-    status: SimpleNavigationDto;
+    status: LifecycleNavigationDto;
     portfolioSponsors: EmployeeNavigationDto[];
     portfolioOwners: EmployeeNavigationDto[];
     portfolioManagers: EmployeeNavigationDto[];
@@ -17049,7 +17055,7 @@ export interface ProgramListDto {
     id: string;
     key: number;
     name: string;
-    status: SimpleNavigationDto;
+    status: LifecycleNavigationDto;
     start?: Date | undefined;
     end?: Date | undefined;
     portfolio: NavigationDto;
@@ -17063,7 +17069,7 @@ export interface ProjectListDto {
     id: string;
     key: number;
     name: string;
-    status: SimpleNavigationDto;
+    status: LifecycleNavigationDto;
     start?: Date | undefined;
     end?: Date | undefined;
     portfolio: NavigationDto;
@@ -17078,7 +17084,7 @@ export interface StrategicInitiativeListDto {
     id: string;
     key: number;
     name: string;
-    status: SimpleNavigationDto;
+    status: LifecycleNavigationDto;
     start?: Date | undefined;
     end?: Date | undefined;
     portfolio: NavigationDto;
@@ -17096,7 +17102,7 @@ export interface ProgramDetailsDto {
     key: number;
     name: string;
     description: string;
-    status: SimpleNavigationDto;
+    status: LifecycleNavigationDto;
     start?: Date | undefined;
     end?: Date | undefined;
     portfolio: NavigationDto;
@@ -17153,7 +17159,7 @@ export interface ProjectDetailsDto {
     key: number;
     name: string;
     description: string;
-    status: SimpleNavigationDto;
+    status: LifecycleNavigationDto;
     expenditureCategory: SimpleNavigationDto;
     start?: Date | undefined;
     end?: Date | undefined;
@@ -17281,7 +17287,7 @@ export interface StrategicInitiativeDetailsDto {
     key: number;
     name: string;
     description: string;
-    status: SimpleNavigationDto;
+    status: LifecycleNavigationDto;
     start?: Date | undefined;
     end?: Date | undefined;
     portfolio: NavigationDto;

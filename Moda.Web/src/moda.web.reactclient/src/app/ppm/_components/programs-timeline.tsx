@@ -8,13 +8,15 @@ import {
   TimelineTemplate,
 } from '@/src/components/common/timeline'
 import { ProgramListDto } from '@/src/services/moda-api'
-import { Card, Divider, Flex, Space, Switch, Typography } from 'antd'
+import { Card, Divider, Flex, Space, Switch, theme, Typography } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import dayjs from 'dayjs'
 import { ReactNode, useCallback, useMemo, useState } from 'react'
 import { ProgramDrawer } from '.'
+import { getLifecyclePhaseColorFromStatus, getLuminance } from '@/src/utils'
 
 const { Text } = Typography
+const { useToken } = theme
 
 export interface ProgramsTimelineProps {
   programs: ProgramListDto[]
@@ -31,11 +33,14 @@ interface ProgramTimelineItem extends ModaDataItem<ProgramListDto, string> {
 export const ProgramRangeItemTemplate: TimelineTemplate<
   ProgramTimelineItem
 > = ({ item, fontColor, foregroundColor }) => {
+  const adjustedfontColor =
+    getLuminance(item.itemColor ?? '') > 0.6 ? '#4d4d4d' : '#FFFFFF'
+
   return (
     <Text style={{ padding: '5px' }}>
       <a
         onClick={() => item.openProgramDrawer(item.objectData.key)}
-        style={{ textDecoration: 'none' }}
+        style={{ color: adjustedfontColor, textDecoration: 'none' }}
         onMouseOver={(e) =>
           (e.currentTarget.style.textDecoration = 'underline')
         }
@@ -51,7 +56,7 @@ const ProgramsTimeline: React.FC<ProgramsTimelineProps> = (props) => {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [selectedItemKey, setSelectedItemKey] = useState<number | null>(null)
   const [showCurrentTime, setShowCurrentTime] = useState<boolean>(true)
-  // ...existing code...
+  const { token } = useToken()
 
   const showDrawer = useCallback(() => {
     setDrawerOpen(true)
@@ -80,13 +85,14 @@ const ProgramsTimeline: React.FC<ProgramsTimelineProps> = (props) => {
         id: String(program.id),
         title: program.name,
         content: program.name,
+        itemColor: getLifecyclePhaseColorFromStatus(program.status, token),
         objectData: program,
         type: 'range',
         start: new Date(program.start),
         end: new Date(program.end),
         openProgramDrawer: openProgramDrawer,
       }))
-  }, [openProgramDrawer, props.isLoading, props.programs])
+  }, [openProgramDrawer, props.isLoading, props.programs, token])
 
   const timelineWindow = useMemo(() => {
     let minDate = dayjs()

@@ -8,13 +8,15 @@ import {
   TimelineTemplate,
 } from '@/src/components/common/timeline'
 import { StrategicInitiativeListDto } from '@/src/services/moda-api'
-import { Card, Divider, Flex, Space, Switch, Typography } from 'antd'
+import { Card, Divider, Flex, Space, Switch, theme, Typography } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import dayjs from 'dayjs'
-import { ReactNode, useCallback, useMemo, useState } from 'react'
+import { FC, ReactNode, useCallback, useMemo, useState } from 'react'
 import { StrategicInitiativeDrawer } from '.'
+import { getLifecyclePhaseColorFromStatus, getLuminance } from '@/src/utils'
 
 const { Text } = Typography
+const { useToken } = theme
 
 export interface StrategicInitiativesTimelineProps {
   strategicInitiatives: StrategicInitiativeListDto[]
@@ -34,11 +36,14 @@ interface StrategicInitiativeTimelineItem extends ModaDataItem<
 export const StrategicInitiativeRangeItemTemplate: TimelineTemplate<
   StrategicInitiativeTimelineItem
 > = ({ item, fontColor, foregroundColor }) => {
+  const adjustedfontColor =
+    getLuminance(item.itemColor ?? '') > 0.6 ? '#4d4d4d' : '#FFFFFF'
+
   return (
     <Text style={{ padding: '5px' }}>
       <a
         onClick={() => item.openStrategicInitiativeDrawer(item.objectData.key)}
-        style={{ textDecoration: 'none' }}
+        style={{ color: adjustedfontColor, textDecoration: 'none' }}
         onMouseOver={(e) =>
           (e.currentTarget.style.textDecoration = 'underline')
         }
@@ -50,12 +55,13 @@ export const StrategicInitiativeRangeItemTemplate: TimelineTemplate<
   )
 }
 
-const StrategicInitiativesTimeline: React.FC<
-  StrategicInitiativesTimelineProps
-> = (props) => {
+const StrategicInitiativesTimeline: FC<StrategicInitiativesTimelineProps> = (
+  props,
+) => {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [selectedItemKey, setSelectedItemKey] = useState<number | null>(null)
   const [showCurrentTime, setShowCurrentTime] = useState<boolean>(true)
+  const { token } = useToken()
 
   const showDrawer = useCallback(() => {
     setDrawerOpen(true)
@@ -84,6 +90,7 @@ const StrategicInitiativesTimeline: React.FC<
           id: String(initiative.id),
           title: initiative.name,
           content: initiative.name,
+          itemColor: getLifecyclePhaseColorFromStatus(initiative.status, token),
           objectData: initiative,
           type: 'range',
           start: new Date(initiative.start),
@@ -94,6 +101,7 @@ const StrategicInitiativesTimeline: React.FC<
       openStrategicInitiativeDrawer,
       props.isLoading,
       props.strategicInitiatives,
+      token,
     ])
 
   const timelineWindow = useMemo(() => {

@@ -1,6 +1,7 @@
 export { default as ContainerCard } from './container-card'
 export { default as IconMenu } from './icon-menu'
 export { default as InactiveTag } from './inactive-tag'
+export { default as LifecycleStatusTag } from './lifecycle-status-tag'
 export { default as LoadingAccount } from './loading-account'
 export { default as ModaColorPicker } from './moda-color-picker'
 export { default as ModaDateRange } from './moda-date-range'

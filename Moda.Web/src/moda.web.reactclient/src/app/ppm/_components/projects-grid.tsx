@@ -2,6 +2,7 @@
 
 import { ModaGrid } from '@/src/components/common'
 import {
+  LifecycleStatusTagCellRenderer,
   PortfolioLinkCellRenderer,
   ProgramLinkCellRenderer,
   ProjectLinkCellRenderer,
@@ -36,7 +37,12 @@ const ProjectsGrid: React.FC<ProjectsGridProps> = (
         width: 300,
         initialSort: 'asc',
       },
-      { field: 'status.name', headerName: 'Status', width: 125 },
+      {
+        field: 'status.name',
+        headerName: 'Status',
+        width: 125,
+        cellRenderer: LifecycleStatusTagCellRenderer,
+      },
       {
         field: 'portfolio.name',
         headerName: 'Portfolio',

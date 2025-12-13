@@ -1,6 +1,10 @@
 'use client'
 
-import { PageActions, PageTitle } from '@/src/components/common'
+import {
+  LifecycleStatusTag,
+  PageActions,
+  PageTitle,
+} from '@/src/components/common'
 import useAuth from '@/src/components/contexts/auth'
 import { authorizePage } from '@/src/components/hoc'
 import { useAppDispatch, useDocumentTitle } from '@/src/hooks'
@@ -108,10 +112,6 @@ const ProgramDetailsPage = (props: { params: Promise<{ key: string }> }) => {
 
     dispatch(setBreadcrumbRoute({ route: breadcrumbRoute, pathname }))
   }, [dispatch, pathname, programData])
-
-  useEffect(() => {
-    error && console.error(error)
-  }, [error])
 
   const renderTabContent = useCallback(() => {
     switch (activeTab) {
@@ -284,6 +284,7 @@ const ProgramDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       <PageTitle
         title={`${programData?.key} - ${programData?.name}`}
         subtitle="Program Details"
+        tags={<LifecycleStatusTag status={programData?.status} />}
         actions={<PageActions actionItems={actionsMenuItems} />}
       />
 

@@ -33,7 +33,6 @@ const PortfolioDetails: React.FC<PortfolioDetailsProps> = ({
   return (
     <ResponsiveFlex gap="middle" align="start">
       <Descriptions column={1} size="small">
-        <Item label="Status">{portfolio.status.name}</Item>
         <Item label="Sponsors">{sponsorNames}</Item>
         <Item label="Owners">{ownerNames}</Item>
         <Item label="Managers">{managerNames}</Item>

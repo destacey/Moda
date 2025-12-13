@@ -1,6 +1,10 @@
 'use client'
 
-import { PageActions, PageTitle } from '@/src/components/common'
+import {
+  LifecycleStatusTag,
+  PageActions,
+  PageTitle,
+} from '@/src/components/common'
 import useAuth from '@/src/components/contexts/auth'
 import { authorizePage } from '@/src/components/hoc'
 import { useAppDispatch, useDocumentTitle } from '@/src/hooks'
@@ -437,6 +441,7 @@ const StrategicInitiativeDetailsPage = (props: {
       <PageTitle
         title={`${strategicInitiativeData?.key} - ${strategicInitiativeData?.name}`}
         subtitle="Strategic Initiative Details"
+        tags={<LifecycleStatusTag status={strategicInitiativeData?.status} />}
         actions={<PageActions actionItems={actionsMenuItems} />}
       />
       <Card

@@ -22,7 +22,7 @@ public sealed record StrategicInitiativeListDto : IMapFrom<StrategicInitiative>
     /// <summary>
     /// The status of the strategic initiative.
     /// </summary>
-    public required SimpleNavigationDto Status { get; set; }
+    public required LifecycleNavigationDto Status { get; set; }
 
     /// <summary>
     /// The strategic initiative start date.
@@ -52,7 +52,7 @@ public sealed record StrategicInitiativeListDto : IMapFrom<StrategicInitiative>
     public void ConfigureMapping(TypeAdapterConfig config)
     {
         config.NewConfig<StrategicInitiative, StrategicInitiativeListDto>()
-            .Map(dest => dest.Status, src => SimpleNavigationDto.FromEnum(src.Status))
+            .Map(dest => dest.Status, src => LifecycleNavigationDto.FromEnum(src.Status))
             .Map(dest => dest.Start, src => src.DateRange != null ? src.DateRange.Start : (LocalDate?)null)
             .Map(dest => dest.End, src => src.DateRange != null ? src.DateRange.End : (LocalDate?)null)
             .Map(dest => dest.Portfolio, src => NavigationDto.Create(src.Portfolio!.Id, src.Portfolio.Key, src.Portfolio.Name))

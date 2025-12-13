@@ -39,7 +39,6 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({
   return (
     <ResponsiveFlex gap="middle" align="start">
       <Descriptions column={1} size="small">
-        <Item label="Status">{project.status.name}</Item>
         <Item label="Portfolio">
           <Link href={`/ppm/portfolios/${project.portfolio.key}`}>
             {project.portfolio.name}

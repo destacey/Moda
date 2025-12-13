@@ -1,6 +1,10 @@
 'use client'
 
-import { PageActions, PageTitle } from '@/src/components/common'
+import {
+  LifecycleStatusTag,
+  PageActions,
+  PageTitle,
+} from '@/src/components/common'
 import useAuth from '@/src/components/contexts/auth'
 import { authorizePage } from '@/src/components/hoc'
 import { useAppDispatch, useDocumentTitle } from '@/src/hooks'
@@ -353,6 +357,7 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       <PageTitle
         title={`${portfolioData?.key} - ${portfolioData?.name}`}
         subtitle="Portfolio Details"
+        tags={<LifecycleStatusTag status={portfolioData?.status} />}
         actions={<PageActions actionItems={actionsMenuItems} />}
       />
       <Card
