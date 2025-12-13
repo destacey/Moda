@@ -12,7 +12,7 @@ public sealed class Employee : BaseSoftDeletableEntity<Guid>, IActivatable, IHas
 
     private Employee() { }
 
-    private Employee(PersonName personName, string employeeNumber, Instant? hireDate, EmailAddress email, string? jobTitle, string? department, string? officeLocation, Guid? managerId)
+    private Employee(PersonName personName, string employeeNumber, Instant? hireDate, EmailAddress email, string? jobTitle, string? department, string? officeLocation, Guid? managerId, bool isActive)
     {
         Name = personName;
         EmployeeNumber = employeeNumber;
@@ -22,6 +22,7 @@ public sealed class Employee : BaseSoftDeletableEntity<Guid>, IActivatable, IHas
         Department = department;
         OfficeLocation = officeLocation;
         ManagerId = managerId;
+        IsActive = isActive;
     }
 
     /// <summary>Gets the key.</summary>
@@ -214,9 +215,10 @@ public sealed class Employee : BaseSoftDeletableEntity<Guid>, IActivatable, IHas
         string? department,
         string? officeLocation,
         Guid? managerId,
+        bool isActive,
         Instant timestamp)
     {
-        Employee employee = new(personName, employeeNumber, hireDate, email, jobTitle, department, officeLocation, managerId);
+        Employee employee = new(personName, employeeNumber, hireDate, email, jobTitle, department, officeLocation, managerId, isActive);
         employee.AddDomainEvent(EntityCreatedEvent.WithEntity(employee, timestamp));
         return employee;
     }
