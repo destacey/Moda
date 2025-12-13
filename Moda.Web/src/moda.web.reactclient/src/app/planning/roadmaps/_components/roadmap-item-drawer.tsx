@@ -4,7 +4,7 @@ import {
   RoadmapTimeboxDetailsDto,
 } from '@/src/services/moda-api'
 import { useGetRoadmapItemQuery } from '@/src/store/features/planning/roadmaps-api'
-import { Button, Drawer, Spin } from 'antd'
+import { Button, Drawer } from 'antd'
 import {
   EditRoadmapActivityForm,
   EditRoadmapTimeboxForm,
@@ -14,6 +14,8 @@ import {
 } from '.'
 import { FC, useEffect, useState } from 'react'
 import useAuth from '@/src/components/contexts/auth'
+import { getDrawerWidthPixels } from '@/src/utils/window-utils'
+import { useMessage } from '@/src/components/contexts/messaging'
 
 interface RoadmapItemDrawerProps {
   roadmapId: string
@@ -28,12 +30,13 @@ const RoadmapItemDrawer: FC<RoadmapItemDrawerProps> = (
 ) => {
   const [openEditRoadmapItemForm, setOpenEditRoadmapItemForm] =
     useState<boolean>(false)
+  const [size, setSize] = useState(getDrawerWidthPixels())
+  const messageApi = useMessage()
 
   const {
     data: itemData,
     isLoading,
     error,
-    refetch: refetchItem,
   } = useGetRoadmapItemQuery({
     roadmapId: props.roadmapId,
     itemId: props.roadmapItemId,
@@ -43,8 +46,13 @@ const RoadmapItemDrawer: FC<RoadmapItemDrawerProps> = (
   const canUpdateRoadmap = hasPermissionClaim('Permissions.Roadmaps.Update')
 
   useEffect(() => {
-    error && console.error(error)
-  }, [error])
+    if (error) {
+      messageApi.error(
+        error.detail ??
+          'An error occurred while loading roadmap item data. Please try again.',
+      )
+    }
+  }, [error, messageApi])
 
   return (
     <>
@@ -53,6 +61,12 @@ const RoadmapItemDrawer: FC<RoadmapItemDrawerProps> = (
         placement="right"
         onClose={props.onDrawerClose}
         open={props.drawerOpen}
+        loading={isLoading}
+        mask={{ blur: false }}
+        size={size}
+        resizable={{
+          onResize: (newSize) => setSize(newSize),
+        }}
         destroyOnHidden={true}
         extra={
           canUpdateRoadmap && (
@@ -62,26 +76,24 @@ const RoadmapItemDrawer: FC<RoadmapItemDrawerProps> = (
           )
         }
       >
-        <Spin spinning={isLoading}>
-          {itemData?.type.name === 'Activity' && (
-            <RoadmapActivityDrawerItem
-              activity={itemData as RoadmapActivityDetailsDto}
-              openRoadmapItemDrawer={props.openRoadmapItemDrawer}
-            />
-          )}
-          {itemData?.type.name === 'Timebox' && (
-            <RoadmapTimeboxDrawerItem
-              timebox={itemData as RoadmapTimeboxDetailsDto}
-              openRoadmapItemDrawer={props.openRoadmapItemDrawer}
-            />
-          )}
-          {itemData?.type.name === 'Milestone' && (
-            <RoadmapMilestoneDrawerItem
-              milestone={itemData as RoadmapMilestoneDetailsDto}
-              openRoadmapItemDrawer={props.openRoadmapItemDrawer}
-            />
-          )}
-        </Spin>
+        {itemData?.type.name === 'Activity' && (
+          <RoadmapActivityDrawerItem
+            activity={itemData as RoadmapActivityDetailsDto}
+            openRoadmapItemDrawer={props.openRoadmapItemDrawer}
+          />
+        )}
+        {itemData?.type.name === 'Timebox' && (
+          <RoadmapTimeboxDrawerItem
+            timebox={itemData as RoadmapTimeboxDetailsDto}
+            openRoadmapItemDrawer={props.openRoadmapItemDrawer}
+          />
+        )}
+        {itemData?.type.name === 'Milestone' && (
+          <RoadmapMilestoneDrawerItem
+            milestone={itemData as RoadmapMilestoneDetailsDto}
+            openRoadmapItemDrawer={props.openRoadmapItemDrawer}
+          />
+        )}
       </Drawer>
       {itemData?.type.name === 'Activity' && openEditRoadmapItemForm && (
         <EditRoadmapActivityForm

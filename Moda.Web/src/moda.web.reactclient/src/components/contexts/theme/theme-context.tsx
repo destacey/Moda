@@ -1,5 +1,9 @@
 import { createContext, useEffect, useMemo, useState } from 'react'
-import { themeBalham, colorSchemeDark, type Theme as AgGridTheme } from 'ag-grid-community'
+import {
+  themeBalham,
+  colorSchemeDark,
+  type Theme as AgGridTheme,
+} from 'ag-grid-community'
 import { useLocalStorageState } from '@/src/hooks'
 import { ConfigProvider, theme } from 'antd'
 import lightTheme from '@/src/config/theme/light-theme'
@@ -8,8 +12,8 @@ import { ThemeContextType, ThemeName } from './types'
 
 export const ThemeContext = createContext<ThemeContextType | null>(null)
 
-const agGridLightTheme = themeBalham;
-const agGridDarkTheme = themeBalham.withPart(colorSchemeDark);
+const agGridLightTheme = themeBalham
+const agGridDarkTheme = themeBalham.withPart(colorSchemeDark)
 
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const [currentThemeName, setCurrentThemeName] =
@@ -50,6 +54,15 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
       setBadgeColor(token.colorPrimary)
     }, [token.colorPrimary])
 
+    useEffect(() => {
+      // Set data-theme on document.documentElement (html element) for global theme access
+      // This includes portaled elements like drawers that render outside the theme context
+      document.documentElement.setAttribute('data-theme', currentThemeName)
+      // currentThemeName is needed as dependency - when it changes in parent state,
+      // this component re-renders and we need to update the DOM attribute
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentThemeName])
+
     const themeContextValue = useMemo(
       () => ({
         currentThemeName,
@@ -65,7 +78,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
 
     return (
       <ThemeContext.Provider value={themeContextValue}>
-        <div data-theme={currentThemeName}>{children}</div>
+        {children}
       </ThemeContext.Provider>
     )
   }

@@ -7,3 +7,4 @@ export {
 export { saveElementAsImage } from './save-element-as-image'
 
 export { default as toFormErrors } from './problem-details'
+export { getDrawerWidthPixels } from './window-utils'

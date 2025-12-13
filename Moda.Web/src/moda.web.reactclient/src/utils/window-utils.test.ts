@@ -1,6 +1,6 @@
-import { getDrawerWidthPercentage } from './window-utils'
+import { getDrawerWidthPixels } from './window-utils'
 
-describe('getDrawerWidthPercentage', () => {
+describe('getDrawerWidthPixels', () => {
   beforeEach(() => {
     // Reset the window.innerWidth before each test
     Object.defineProperty(window, 'innerWidth', {
@@ -10,28 +10,28 @@ describe('getDrawerWidthPercentage', () => {
     })
   })
 
-  it('should return 30% for window width >= 1500', () => {
+  it('should return 30% in pixels for window width >= 1500', () => {
     window.innerWidth = 1500
-    expect(getDrawerWidthPercentage()).toBe('30%')
+    expect(getDrawerWidthPixels()).toBe(450) // 1500 * 0.3
   })
 
-  it('should return 35% for window width >= 1300 and < 1500', () => {
+  it('should return 35% in pixels for window width >= 1300 and < 1500', () => {
     window.innerWidth = 1300
-    expect(getDrawerWidthPercentage()).toBe('35%')
+    expect(getDrawerWidthPixels()).toBe(454) // Math.floor(1300 * 0.35) = 454 (due to floating-point precision)
   })
 
-  it('should return 40% for window width >= 1100 and < 1300', () => {
+  it('should return 40% in pixels for window width >= 1100 and < 1300', () => {
     window.innerWidth = 1100
-    expect(getDrawerWidthPercentage()).toBe('40%')
+    expect(getDrawerWidthPixels()).toBe(440) // 1100 * 0.4
   })
 
-  it('should return 50% for window width >= 900 and < 1100', () => {
+  it('should return 50% in pixels for window width >= 900 and < 1100', () => {
     window.innerWidth = 900
-    expect(getDrawerWidthPercentage()).toBe('50%')
+    expect(getDrawerWidthPixels()).toBe(450) // 900 * 0.5
   })
 
-  it('should return 80% for window width < 900', () => {
+  it('should return 80% in pixels for window width < 900', () => {
     window.innerWidth = 800
-    expect(getDrawerWidthPercentage()).toBe('80%')
+    expect(getDrawerWidthPixels()).toBe(640) // 800 * 0.8
   })
 })
