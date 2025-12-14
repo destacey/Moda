@@ -16,6 +16,7 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey, 
     private readonly HashSet<RoleAssignment<ProjectRole>> _roles = [];
     private readonly HashSet<StrategicThemeTag<Project>> _strategicThemeTags = [];
     private readonly HashSet<StrategicInitiativeProject> _strategicInitiativeProjects = [];
+    private readonly List<ProjectTask> _tasks = [];
 
     private Project() { }
 
@@ -49,6 +50,12 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey, 
     /// The unique key of the project. This is an alternate key to the Id.
     /// </summary>
     public int Key { get; private init; }
+
+    /// <summary>
+    /// The unique code of the project used for task key generation (e.g., "APOLLO", "MARS").
+    /// Must be 2-20 uppercase alphanumeric characters or hyphens.
+    /// </summary>
+    public ProjectCode Code { get; private set; } = default!;
 
     /// <summary>
     /// The name of the project.
@@ -127,6 +134,11 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey, 
     /// The strategic initiatives associated with this project.
     /// </summary>
     public IReadOnlyCollection<StrategicInitiativeProject> StrategicInitiativeProjects => _strategicInitiativeProjects;
+
+    /// <summary>
+    /// The tasks associated with this project.
+    /// </summary>
+    public IReadOnlyCollection<ProjectTask> Tasks => _tasks.AsReadOnly();
 
     /// <summary>
     /// Indicates whether the project can be deleted.
@@ -313,6 +325,127 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey, 
         Guard.Against.Null(date, nameof(date));
 
         return DateRange is not null && DateRange.IsActiveOn(date);
+    }
+
+    /// <summary>
+    /// Updates the project code used for task key generation.
+    /// </summary>
+    /// <param name="code">The new project code (2-20 uppercase alphanumeric characters or hyphens).</param>
+    /// <returns></returns>
+    public Result UpdateCode(string code)
+    {
+        if (_tasks.Any())
+        {
+            return Result.Failure("Cannot change project code after tasks have been created.");
+        }
+
+        try
+        {
+            Code = new ProjectCode(code);
+            return Result.Success();
+        }
+        catch (ArgumentException ex)
+        {
+            return Result.Failure(ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// Creates a new task within this project.
+    /// </summary>
+    public Result<ProjectTask> CreateTask(
+        string name,
+        string? description,
+        ProjectTaskType type,
+        TaskPriority? priority,
+        Guid? parentId,
+        Guid? teamId,
+        FlexibleDateRange? plannedDateRange,
+        LocalDate? plannedDate,
+        decimal? estimatedEffortHours,
+        Dictionary<TaskAssignmentRole, HashSet<Guid>>? assignments)
+    {
+        if (Code is null)
+        {
+            return Result.Failure<ProjectTask>("Project must have a code before tasks can be created.");
+        }
+
+        ProjectTask? parent = null;
+        if (parentId.HasValue)
+        {
+            parent = _tasks.FirstOrDefault(t => t.Id == parentId);
+            if (parent is null)
+            {
+                return Result.Failure<ProjectTask>("Parent task not found.");
+            }
+
+            if (parent.Type == ProjectTaskType.Milestone)
+            {
+                return Result.Failure<ProjectTask>("Milestones cannot have child tasks.");
+            }
+        }
+
+        // Calculate order
+        var siblings = parentId.HasValue
+            ? _tasks.Where(t => t.ParentId == parentId)
+            : _tasks.Where(t => t.ParentId is null);
+        var order = siblings.Any() ? siblings.Max(t => t.Order) + 1 : 1;
+
+        // Get next task number (will be handled by DB sequence in practice, but for domain logic we calculate it)
+        var nextNumber = _tasks.Count > 0 ? _tasks.Max(t => t.Key) + 1 : 1;
+
+        var task = ProjectTask.Create(
+            Id,
+            Code,
+            nextNumber,
+            name,
+            description,
+            type,
+            priority,
+            order,
+            parentId,
+            teamId,
+            plannedDateRange,
+            plannedDate,
+            estimatedEffortHours,
+            assignments);
+
+        _tasks.Add(task);
+
+        if (parent is not null)
+        {
+            parent.AddChild(task);
+        }
+
+        return Result.Success(task);
+    }
+
+    /// <summary>
+    /// Deletes a task from this project.
+    /// </summary>
+    public Result DeleteTask(Guid taskId)
+    {
+        var task = _tasks.FirstOrDefault(t => t.Id == taskId);
+        if (task is null)
+        {
+            return Result.Failure("Task not found.");
+        }
+
+        // Check if task has children
+        if (task.Children.Count > 0)
+        {
+            return Result.Failure("Cannot delete a task with children. Delete child tasks first.");
+        }
+
+        // Check if task has active dependencies
+        if (task.Successors.Any(d => d.IsActive) || task.Predecessors.Any(d => d.IsActive))
+        {
+            return Result.Failure("Cannot delete a task with active dependencies. Remove dependencies first.");
+        }
+
+        _tasks.Remove(task);
+
+        return Result.Success();
     }
 
     /// <summary>

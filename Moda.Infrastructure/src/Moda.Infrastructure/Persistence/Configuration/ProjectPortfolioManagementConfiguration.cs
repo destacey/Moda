@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Moda.Common.Domain.Enums.Organization;
 using Moda.Common.Domain.Enums.StrategicManagement;
 using Moda.Common.Domain.Models.KeyPerformanceIndicators;
+using Moda.Common.Domain.Models.Organizations;
 using Moda.ProjectPortfolioManagement.Domain.Enums;
 using Moda.ProjectPortfolioManagement.Domain.Models;
 using Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
@@ -161,10 +163,24 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
         builder.Property(p => p.Key).ValueGeneratedOnAdd();
         builder.Property(p => p.Name).HasMaxLength(128).IsRequired();
         builder.Property(p => p.Description).HasMaxLength(2048).IsRequired();
+
+        // Value Object for Code
+        builder.Property(p => p.Code).IsRequired()
+            .HasConversion(
+                c => c.Value,
+                c => new ProjectCode(c))
+            .HasColumnType("varchar")
+            .HasMaxLength(20);
+
         builder.Property(p => p.Status).IsRequired()
             .HasConversion<EnumConverter<ProjectStatus>>()
             .HasMaxLength(32)
             .HasColumnType("varchar");
+
+        // Unique index on Code (with filter for non-null and non-cancelled projects)
+        builder.HasIndex(p => p.Code)
+            .IsUnique()
+            .HasFilter("[Code] IS NOT NULL AND [Status] <> 'Cancelled'");
 
         // Value Objects
         builder.OwnsOne(r => r.DateRange, options =>
@@ -192,6 +208,11 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
         builder.HasMany(p => p.StrategicInitiativeProjects)
             .WithOne(i => i.Project)
             .HasForeignKey(i => i.ProjectId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(p => p.Tasks)
+            .WithOne(t => t.Project)
+            .HasForeignKey(t => t.ProjectId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }
@@ -482,3 +503,177 @@ public class ProgramStrategicThemesConfiguration : IEntityTypeConfiguration<Stra
 }
 
 #endregion Strategic Theme Tags
+
+#region PpmTeam
+
+public class PpmTeamConfig : IEntityTypeConfiguration<PpmTeam>
+{
+    public void Configure(EntityTypeBuilder<PpmTeam> builder)
+    {
+        builder.ToTable("PpmTeams", SchemaNames.ProjectPortfolioManagement);
+
+        builder.HasKey(t => t.Id);
+        builder.HasAlternateKey(t => t.Key);
+
+        builder.HasIndex(t => t.Id)
+            .IncludeProperties(t => new { t.Key, t.Name, t.Code, t.Type, t.IsActive });
+        builder.HasIndex(t => t.Key)
+            .IncludeProperties(t => new { t.Id, t.Name, t.Code, t.Type, t.IsActive });
+        builder.HasIndex(t => t.Code)
+            .IsUnique()
+            .IncludeProperties(t => new { t.Id, t.Key, t.Name, t.Type, t.IsActive });
+        builder.HasIndex(t => t.IsActive)
+            .IncludeProperties(t => new { t.Id, t.Key, t.Name, t.Code, t.Type });
+
+        builder.Property(t => t.Id).ValueGeneratedNever();
+        builder.Property(t => t.Key).ValueGeneratedNever();
+
+        builder.Property(t => t.Name).IsRequired().HasMaxLength(128);
+        builder.Property(o => o.Code).IsRequired()
+            .HasConversion(
+                o => o.Value,
+                o => new TeamCode(o))
+            .HasColumnType("varchar")
+            .HasMaxLength(10);
+        builder.Property(t => t.Type).IsRequired()
+            .HasConversion<EnumConverter<TeamType>>()
+            .HasColumnType("varchar")
+            .HasMaxLength(32);
+        builder.Property(t => t.IsActive);
+    }
+}
+
+#endregion PpmTeam
+
+#region Project Tasks
+
+public class ProjectTaskConfiguration : IEntityTypeConfiguration<ProjectTask>
+{
+    public void Configure(EntityTypeBuilder<ProjectTask> builder)
+    {
+        builder.ToTable("ProjectTasks", SchemaNames.ProjectPortfolioManagement);
+
+        builder.HasKey(t => t.Id);
+        builder.HasAlternateKey(t => t.Key);
+
+        builder.HasIndex(t => t.ProjectId);
+        builder.HasIndex(t => t.ParentId);
+        builder.HasIndex(t => t.Status);
+
+        builder.Property(t => t.Key).ValueGeneratedOnAdd();
+        builder.Property(t => t.Name).HasMaxLength(256).IsRequired();
+        builder.Property(t => t.Description).HasMaxLength(2048);
+
+        // Value Object for TaskKey
+        builder.OwnsOne(t => t.TaskKey, options =>
+        {
+            options.Property(k => k.Value)
+                .HasColumnName("TaskKey")
+                .HasMaxLength(30)
+                .IsRequired();
+        });
+
+        builder.Property(t => t.Type).IsRequired()
+            .HasConversion<EnumConverter<ProjectTaskType>>()
+            .HasMaxLength(32)
+            .HasColumnType("varchar");
+
+        builder.Property(t => t.Status).IsRequired()
+            .HasConversion<EnumConverter<Moda.ProjectPortfolioManagement.Domain.Enums.TaskStatus>>()
+            .HasMaxLength(32)
+            .HasColumnType("varchar");
+
+        builder.Property(t => t.Priority)
+            .HasConversion<EnumConverter<TaskPriority>>()
+            .HasMaxLength(32)
+            .HasColumnType("varchar");
+
+        builder.Property(t => t.Order).IsRequired();
+        builder.Property(t => t.EstimatedEffortHours).HasColumnType("decimal(18,2)");
+        builder.Property(t => t.ActualEffortHours).HasColumnType("decimal(18,2)");
+
+        // Value Objects for Date Ranges
+        builder.OwnsOne(t => t.PlannedDateRange, options =>
+        {
+            options.Property(d => d.Start).HasColumnName("PlannedStart");
+            options.Property(d => d.End).HasColumnName("PlannedEnd");
+        });
+
+        builder.OwnsOne(t => t.ActualDateRange, options =>
+        {
+            options.Property(d => d.Start).HasColumnName("ActualStart");
+            options.Property(d => d.End).HasColumnName("ActualEnd");
+        });
+
+        builder.Property(t => t.PlannedDate).HasColumnName("PlannedDate");
+        builder.Property(t => t.ActualDate).HasColumnName("ActualDate");
+
+        // Self-referencing relationship for hierarchy
+        builder.HasOne(t => t.Parent)
+            .WithMany(t => t.Children)
+            .HasForeignKey(t => t.ParentId)
+            .OnDelete(DeleteBehavior.ClientSetNull);
+
+        // Relationship to Assignments
+        builder.HasMany(t => t.Assignments)
+            .WithOne()
+            .HasForeignKey(a => a.ObjectId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Relationship to Dependencies (successors)
+        builder.HasMany(t => t.Successors)
+            .WithOne(d => d.Predecessor)
+            .HasForeignKey(d => d.PredecessorId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        // Relationship to Dependencies (predecessors)
+        builder.HasMany(t => t.Predecessors)
+            .WithOne(d => d.Successor)
+            .HasForeignKey(d => d.SuccessorId)
+            .OnDelete(DeleteBehavior.NoAction);
+    }
+}
+
+public class ProjectTaskDependencyConfiguration : IEntityTypeConfiguration<ProjectTaskDependency>
+{
+    public void Configure(EntityTypeBuilder<ProjectTaskDependency> builder)
+    {
+        builder.ToTable("ProjectTaskDependencies", SchemaNames.ProjectPortfolioManagement);
+
+        builder.HasKey(d => d.Id);
+
+        builder.HasIndex(d => d.PredecessorId);
+        builder.HasIndex(d => d.SuccessorId);
+        builder.HasIndex(d => d.RemovedOn);
+
+        builder.Property(d => d.Type).IsRequired()
+            .HasConversion<EnumConverter<DependencyType>>()
+            .HasMaxLength(32)
+            .HasColumnType("varchar");
+    }
+}
+
+public class TaskAssignmentRoleConfiguration : IEntityTypeConfiguration<RoleAssignment<TaskAssignmentRole>>
+{
+    public void Configure(EntityTypeBuilder<RoleAssignment<TaskAssignmentRole>> builder)
+    {
+        builder.ToTable("ProjectTaskAssignments", SchemaNames.ProjectPortfolioManagement);
+
+        builder.HasKey(a => new { a.ObjectId, a.EmployeeId, a.Role });
+
+        builder.HasIndex(a => a.ObjectId);
+        builder.HasIndex(a => a.EmployeeId);
+
+        builder.Property(a => a.Role).IsRequired()
+            .HasConversion<EnumConverter<TaskAssignmentRole>>()
+            .HasMaxLength(32)
+            .HasColumnType("varchar");
+
+        builder.HasOne(a => a.Employee)
+            .WithMany()
+            .HasForeignKey(a => a.EmployeeId)
+            .OnDelete(DeleteBehavior.NoAction);
+    }
+}
+
+#endregion Project Tasks
