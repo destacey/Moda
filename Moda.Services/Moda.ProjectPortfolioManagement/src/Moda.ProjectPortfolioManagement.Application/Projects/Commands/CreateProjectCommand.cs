@@ -1,10 +1,11 @@
-﻿using Moda.Common.Application.Models;
-using Moda.Common.Domain.Enums.StrategicManagement;
+﻿using Moda.Common.Domain.Enums.StrategicManagement;
+using Moda.Common.Domain.Models.ProjectPortfolioManagement;
+using Moda.ProjectPortfolioManagement.Application.Projects.Models;
 using Moda.ProjectPortfolioManagement.Domain.Enums;
 
 namespace Moda.ProjectPortfolioManagement.Application.Projects.Commands;
 
-public sealed record CreateProjectCommand(string Name, string Description, int ExpenditureCategoryId, LocalDateRange? DateRange, Guid PortfolioId, Guid? ProgramId, List<Guid>? SponsorIds, List<Guid>? OwnerIds, List<Guid>? ManagerIds, List<Guid>? StrategicThemeIds) : ICommand<ObjectIdAndKey>;
+public sealed record CreateProjectCommand(string Name, string Description, string Key, int ExpenditureCategoryId, LocalDateRange? DateRange, Guid PortfolioId, Guid? ProgramId, List<Guid>? SponsorIds, List<Guid>? OwnerIds, List<Guid>? ManagerIds, List<Guid>? StrategicThemeIds) : ICommand<ProjectIdAndKey>;
 
 public sealed class CreateProjectCommandValidator : AbstractValidator<CreateProjectCommand>
 {
@@ -17,6 +18,12 @@ public sealed class CreateProjectCommandValidator : AbstractValidator<CreateProj
         RuleFor(x => x.Description)
             .NotEmpty()
             .MaximumLength(2048);
+
+        RuleFor(x => x.Key)
+            .NotEmpty()
+            .MaximumLength(20)
+            .Matches("^[A-Z0-9]+$")
+            .WithMessage("Key must contain only uppercase letters and numbers.");
 
         RuleFor(x => x.ExpenditureCategoryId)
             .GreaterThan(0);
@@ -50,7 +57,7 @@ internal sealed class CreateProjectCommandHandler(
     IProjectPortfolioManagementDbContext projectPortfolioManagementDbContext,
     ILogger<CreateProjectCommandHandler> logger,
     IDateTimeProvider dateTimeProvider)
-    : ICommandHandler<CreateProjectCommand, ObjectIdAndKey>
+    : ICommandHandler<CreateProjectCommand, ProjectIdAndKey>
 {
     private const string AppRequestName = nameof(CreateProjectCommand);
 
@@ -58,7 +65,7 @@ internal sealed class CreateProjectCommandHandler(
     private readonly ILogger<CreateProjectCommandHandler> _logger = logger;
     private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
 
-    public async Task<Result<ObjectIdAndKey>> Handle(CreateProjectCommand request, CancellationToken cancellationToken)
+    public async Task<Result<ProjectIdAndKey>> Handle(CreateProjectCommand request, CancellationToken cancellationToken)
     {
         try
         {
@@ -68,12 +75,12 @@ internal sealed class CreateProjectCommandHandler(
             if (expenditureCategory == null)
             {
                 _logger.LogInformation("Expenditure Category with Id {ExpenditureCategoryId} not found.", request.ExpenditureCategoryId);
-                return Result.Failure<ObjectIdAndKey>("Expenditure Category not found.");
+                return Result.Failure<ProjectIdAndKey>("Expenditure Category not found.");
             }
             else if (expenditureCategory.State != ExpenditureCategoryState.Active)
             {
                 _logger.LogInformation("Expenditure Category with Id {ExpenditureCategoryId} is not active.", request.ExpenditureCategoryId);
-                return Result.Failure<ObjectIdAndKey>("Expenditure Category is not active.");
+                return Result.Failure<ProjectIdAndKey>("Expenditure Category is not active.");
             }
 
             var strategicThemeIds = request.StrategicThemeIds?.ToHashSet() ?? [];
@@ -85,12 +92,12 @@ internal sealed class CreateProjectCommandHandler(
             if (request.StrategicThemeIds is not null && strategicThemes.Count != strategicThemeIds.Count)
             {
                 _logger.LogInformation("One or more Strategic Themes not found.");
-                return Result.Failure<ObjectIdAndKey>("One or more Strategic Themes not found.");
+                return Result.Failure<ProjectIdAndKey>("One or more Strategic Themes not found.");
             }
             else if (request.StrategicThemeIds is not null && strategicThemes.Any(st => st.State != StrategicThemeState.Active))
             {
                 _logger.LogInformation("One or more Strategic Themes are not active.");
-                return Result.Failure<ObjectIdAndKey>("One or more Strategic Themes are not active.");
+                return Result.Failure<ProjectIdAndKey>("One or more Strategic Themes are not active.");
             }
 
             var portfolio = await _projectPortfolioManagementDbContext.Portfolios
@@ -98,14 +105,17 @@ internal sealed class CreateProjectCommandHandler(
                     .FirstOrDefaultAsync(p => p.Id == request.PortfolioId, cancellationToken);
             if (portfolio == null) {
                 _logger.LogInformation("Portfolio with Id {PortfolioId} not found.", request.PortfolioId);
-                return Result.Failure<ObjectIdAndKey>("Portfolio not found.");
+                return Result.Failure<ProjectIdAndKey>("Portfolio not found.");
             }
 
             var roles = GetRoles(request);
 
+            var projectKey = new ProjectKey(request.Key);
+
             var createResult = portfolio.CreateProject(
                 request.Name,
                 request.Description,
+                projectKey,
                 request.ExpenditureCategoryId,
                 request.DateRange,
                 request.ProgramId,
@@ -116,7 +126,7 @@ internal sealed class CreateProjectCommandHandler(
             if (createResult.IsFailure)
             {
                 _logger.LogError("Error creating project {ProjectName} for Portfolio {PortfolioId}. Error message: {Error}", request.Name, request.PortfolioId, createResult.Error);
-                return Result.Failure<ObjectIdAndKey>(createResult.Error);
+                return Result.Failure<ProjectIdAndKey>(createResult.Error);
             }
 
             await _projectPortfolioManagementDbContext.SaveChangesAsync(cancellationToken);
@@ -125,12 +135,12 @@ internal sealed class CreateProjectCommandHandler(
 
             _logger.LogInformation("Project {ProjectId} created with Key {ProjectKey}.", project.Id, project.Key);
 
-            return Result.Success(new ObjectIdAndKey(project.Id, project.Key));
+            return Result.Success(new ProjectIdAndKey(project.Id, project.Key));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Exception handling {CommandName} command for request {@Request}.", AppRequestName, request);
-            return Result.Failure<ObjectIdAndKey>($"Error handling {AppRequestName} command.");
+            return Result.Failure<ProjectIdAndKey>($"Error handling {AppRequestName} command.");
         }
     }
 

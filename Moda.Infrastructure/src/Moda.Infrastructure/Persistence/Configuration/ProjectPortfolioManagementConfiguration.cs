@@ -4,6 +4,7 @@ using Moda.Common.Domain.Enums.Organization;
 using Moda.Common.Domain.Enums.StrategicManagement;
 using Moda.Common.Domain.Models.KeyPerformanceIndicators;
 using Moda.Common.Domain.Models.Organizations;
+using Moda.Common.Domain.Models.ProjectPortfolioManagement;
 using Moda.ProjectPortfolioManagement.Domain.Enums;
 using Moda.ProjectPortfolioManagement.Domain.Models;
 using Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
@@ -156,19 +157,21 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
         builder.ToTable("Projects", SchemaNames.ProjectPortfolioManagement);
 
         builder.HasKey(p => p.Id);
-        builder.HasAlternateKey(p => p.Key);
+
+        // Unique index on Key
+        builder.HasIndex(p => p.Key)
+            .IsUnique();
 
         builder.HasIndex(p => p.Status);
 
-        builder.Property(p => p.Key).ValueGeneratedOnAdd();
         builder.Property(p => p.Name).HasMaxLength(128).IsRequired();
         builder.Property(p => p.Description).HasMaxLength(2048).IsRequired();
 
-        // Value Object for Code
-        builder.Property(p => p.Code).IsRequired()
+        // Value Object for Key
+        builder.Property(p => p.Key).IsRequired()
             .HasConversion(
                 c => c.Value,
-                c => new ProjectCode(c))
+                c => new ProjectKey(c))
             .HasColumnType("varchar")
             .HasMaxLength(20);
 
@@ -176,11 +179,6 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
             .HasConversion<EnumConverter<ProjectStatus>>()
             .HasMaxLength(32)
             .HasColumnType("varchar");
-
-        // Unique index on Code (with filter for non-null and non-cancelled projects)
-        builder.HasIndex(p => p.Code)
-            .IsUnique()
-            .HasFilter("[Code] IS NOT NULL AND [Status] <> 'Cancelled'");
 
         // Value Objects
         builder.OwnsOne(r => r.DateRange, options =>

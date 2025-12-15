@@ -13,10 +13,10 @@ public class WorkItemProjectInfoDto : IMapFrom<WorkItem>
         config.NewConfig<WorkItem, WorkItemProjectInfoDto>()
             .Map(dest => dest.Key, src => src.Key.ToString())
             .Map(dest => dest.Project, src => src.Project != null
-                ? WorkProjectNavigationDto.From(src.Project)
+                ? src.Project
                 : null)
             .Map(dest => dest.ParentProject, src => src.ParentProject != null
-                ? WorkProjectNavigationDto.From(src.ParentProject)
+                ? src.ParentProject
                 : null);
     }
 }

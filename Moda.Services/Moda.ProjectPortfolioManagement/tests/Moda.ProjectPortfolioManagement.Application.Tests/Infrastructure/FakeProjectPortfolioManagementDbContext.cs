@@ -96,6 +96,14 @@ public class FakeProjectPortfolioManagementDbContext : IProjectPortfolioManageme
     public void AddProject(Project project) => _projects.Add(project);
     public void AddProjects(IEnumerable<Project> projects) => _projects.AddRange(projects);
 
+    // ProjectTask
+    public void AddProjectTask(ProjectTask task) => _projectTasks.Add(task);
+    public void AddProjectTasks(IEnumerable<ProjectTask> tasks) => _projectTasks.AddRange(tasks);
+
+    // ProjectTaskDependency
+    public void AddProjectTaskDependency(ProjectTaskDependency dependency) => _projectTaskDependencies.Add(dependency);
+    public void AddProjectTaskDependencies(IEnumerable<ProjectTaskDependency> dependencies) => _projectTaskDependencies.AddRange(dependencies);
+
     // PpmTeam
     public void AddPpmTeam(PpmTeam team) => _ppmTeams.Add(team);
     public void AddPpmTeams(IEnumerable<PpmTeam> teams) => _ppmTeams.AddRange(teams);

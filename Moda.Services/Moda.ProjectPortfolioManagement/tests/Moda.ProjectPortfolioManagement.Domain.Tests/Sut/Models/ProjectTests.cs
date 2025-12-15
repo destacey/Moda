@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using Moda.Common.Domain.Models.ProjectPortfolioManagement;
 using Moda.Common.Models;
 using Moda.ProjectPortfolioManagement.Domain.Enums;
 using Moda.ProjectPortfolioManagement.Domain.Models;
@@ -30,16 +31,18 @@ public class ProjectTests
         // Arrange
         var name = "Test Project";
         var description = "Test Description";
+        var key = new ProjectKey("TEST");
         var portfolioId = Guid.NewGuid();
         var expenditureCategoryId = 1;
 
         // Act
-        var project = Project.Create(name, description, expenditureCategoryId, null, portfolioId, null, null, null, _dateTimeProvider.Now);
+        var project = Project.Create(name, description, key, expenditureCategoryId, null, portfolioId, null, null, null, _dateTimeProvider.Now);
 
         // Assert
         project.Should().NotBeNull();
         project.Name.Should().Be(name);
         project.Description.Should().Be(description);
+        project.Key.Value.Should().Be(key);
         project.Status.Should().Be(ProjectStatus.Proposed);
         project.ExpenditureCategoryId.Should().Be(expenditureCategoryId);
         project.PortfolioId.Should().Be(portfolioId);

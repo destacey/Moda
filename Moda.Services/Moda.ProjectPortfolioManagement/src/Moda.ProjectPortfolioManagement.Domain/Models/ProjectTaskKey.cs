@@ -1,15 +1,16 @@
 using System.Text.RegularExpressions;
 using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
+using Moda.Common.Domain.Models.ProjectPortfolioManagement;
 
 namespace Moda.ProjectPortfolioManagement.Domain.Models;
 
 /// <summary>
-/// Represents a unique identifier for a project task in the format {ProjectCode}-T{Number}.
+/// Represents a unique identifier for a project task in the format {ProjectKey}-T{Number}.
 /// </summary>
 public sealed class ProjectTaskKey : ValueObject
 {
-    internal const string ValidationRegex = "^([A-Z0-9-]{2,20})-T(\\d+)$";
+    internal const string ValidationRegex = "^([A-Z0-9]{2,20})-T(\\d+)$";
 
     private ProjectTaskKey() { }
 
@@ -30,20 +31,20 @@ public sealed class ProjectTaskKey : ValueObject
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ProjectTaskKey"/> class from a project code and task number.
+    /// Initializes a new instance of the <see cref="ProjectTaskKey"/> class from a project key and task number.
     /// </summary>
-    /// <param name="projectCode">The project code.</param>
+    /// <param name="projectKey">The project key.</param>
     /// <param name="taskNumber">The task number.</param>
-    public ProjectTaskKey(ProjectCode projectCode, int taskNumber)
+    public ProjectTaskKey(ProjectKey projectKey, int taskNumber)
     {
-        Guard.Against.Null(projectCode, nameof(projectCode));
+        Guard.Against.Null(projectKey, nameof(projectKey));
         Guard.Against.NegativeOrZero(taskNumber, nameof(taskNumber));
 
-        string value = $"{projectCode.Value}-T{taskNumber}";
+        string value = $"{projectKey.Value}-T{taskNumber}";
 
         if (!ValidateFormat(value))
         {
-            throw new ArgumentException($"The project code '{projectCode.Value}' does not meet the required format. Must be 2-20 uppercase alphanumeric characters or hyphens.", nameof(projectCode));
+            throw new ArgumentException($"The project key '{projectKey.Value}' does not meet the required format. Must be 2-20 uppercase alphanumeric characters or hyphens.", nameof(projectKey));
         }
 
         Value = value;
@@ -55,9 +56,9 @@ public sealed class ProjectTaskKey : ValueObject
     public string Value { get; init; } = default!;
 
     /// <summary>
-    /// Gets the project code portion of the task key (e.g., "APOLLO").
+    /// Gets the project key portion of the task key (e.g., "APOLLO").
     /// </summary>
-    public string ProjectCode => Value.Split("-T")[0];
+    public string ProjectKey => Value.Split("-T")[0];
 
     /// <summary>
     /// Gets the task number portion of the task key (e.g., 1 from "APOLLO-T001").

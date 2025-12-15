@@ -6,6 +6,7 @@ using Moda.Common.Domain.Enums.Organization;
 using Moda.Common.Domain.Enums.Planning;
 using Moda.Common.Domain.Enums.Work;
 using Moda.Common.Domain.Models.Organizations;
+using Moda.Common.Domain.Models.ProjectPortfolioManagement;
 using Moda.Common.Models;
 using Moda.Work.Domain.Models;
 
@@ -510,12 +511,16 @@ public class WorkProjectConfig : IEntityTypeConfiguration<WorkProject>
         builder.ToTable("WorkProjects", SchemaNames.Work);
 
         builder.HasKey(w => w.Id);
-        builder.HasAlternateKey(w => w.Key);
 
         builder.Property(w => w.Id).ValueGeneratedNever();
-        builder.Property(w => w.Key).ValueGeneratedNever();
 
         // Properties
+        builder.Property(p => p.Key).IsRequired()
+            .HasConversion(
+                c => c.Value,
+                c => new ProjectKey(c))
+            .HasColumnType("varchar")
+            .HasMaxLength(20);
         builder.Property(w => w.Name).IsRequired().HasMaxLength(128);
         builder.Property(p => p.Description).HasMaxLength(2048).IsRequired();
     }

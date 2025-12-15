@@ -4569,6 +4569,787 @@
         ]
       }
     },
+    "/api/ppm/projects/{projectIdOrKey}/tasks": {
+      "get": {
+        "tags": [
+          "ProjectTasks"
+        ],
+        "summary": "Get a list of project tasks.",
+        "operationId": "ProjectTasks_GetProjectTasks",
+        "parameters": [
+          {
+            "name": "projectIdOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            },
+            "x-position": 2
+          },
+          {
+            "name": "parentId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": true
+            },
+            "x-position": 3
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProjectTaskListDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "ProjectTasks"
+        ],
+        "summary": "Create a project task.",
+        "operationId": "ProjectTasks_CreateProjectTask",
+        "parameters": [
+          {
+            "name": "projectIdOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateProjectTaskRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectIdAndTaskKey"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/ppm/projects/{projectIdOrKey}/tasks/tree": {
+      "get": {
+        "tags": [
+          "ProjectTasks"
+        ],
+        "summary": "Get a hierarchical tree of project tasks with WBS codes.",
+        "operationId": "ProjectTasks_GetProjectTaskTree",
+        "parameters": [
+          {
+            "name": "projectIdOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProjectTaskTreeDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/ppm/projects/{projectIdOrKey}/tasks/{idOrTaskKey}": {
+      "get": {
+        "tags": [
+          "ProjectTasks"
+        ],
+        "summary": "Get project task details.",
+        "operationId": "ProjectTasks_GetProjectTask",
+        "parameters": [
+          {
+            "name": "projectIdOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "idOrTaskKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectTaskDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/ppm/projects/{projectIdOrKey}/tasks/{id}": {
+      "put": {
+        "tags": [
+          "ProjectTasks"
+        ],
+        "summary": "Update a project task.",
+        "operationId": "ProjectTasks_UpdateProjectTask",
+        "parameters": [
+          {
+            "name": "projectIdOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 2
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProjectTaskRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 3
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "ProjectTasks"
+        ],
+        "summary": "Delete a project task.",
+        "operationId": "ProjectTasks_DeleteProjectTask",
+        "parameters": [
+          {
+            "name": "projectIdOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/ppm/projects/{projectIdOrKey}/tasks/{id}/order": {
+      "put": {
+        "tags": [
+          "ProjectTasks"
+        ],
+        "summary": "Update a project task's order within its parent.",
+        "operationId": "ProjectTasks_UpdateProjectTaskOrder",
+        "parameters": [
+          {
+            "name": "projectIdOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 2
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProjectTaskOrderRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 3
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/ppm/projects/{projectIdOrKey}/tasks/critical-path": {
+      "get": {
+        "tags": [
+          "ProjectTasks"
+        ],
+        "summary": "Get the critical path for the project.",
+        "description": "Returns an ordered list of task IDs on the critical path.",
+        "operationId": "ProjectTasks_GetCriticalPath",
+        "parameters": [
+          {
+            "name": "projectIdOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "guid",
+                    "nullable": false,
+                    "example": "00000000-0000-0000-0000-000000000000"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/ppm/projects/{projectIdOrKey}/tasks/{id}/dependencies": {
+      "post": {
+        "tags": [
+          "ProjectTasks"
+        ],
+        "summary": "Add a dependency to a task.",
+        "description": "Creates a finish-to-start dependency where the specified task is the predecessor.",
+        "operationId": "ProjectTasks_AddTaskDependency",
+        "parameters": [
+          {
+            "name": "projectIdOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 2
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddTaskDependencyRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 3
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/ppm/projects/{projectIdOrKey}/tasks/{id}/dependencies/{successorId}": {
+      "delete": {
+        "tags": [
+          "ProjectTasks"
+        ],
+        "summary": "Remove a dependency from a task.",
+        "description": "Removes the finish-to-start dependency between the predecessor and successor tasks.",
+        "operationId": "ProjectTasks_RemoveTaskDependency",
+        "parameters": [
+          {
+            "name": "projectIdOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 2
+          },
+          {
+            "name": "successorId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 3
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/ppm/projects/{projectIdOrKey}/tasks/statuses": {
+      "get": {
+        "tags": [
+          "ProjectTasks"
+        ],
+        "summary": "Get a list of all task statuses.",
+        "operationId": "ProjectTasks_GetTaskStatuses",
+        "parameters": [
+          {
+            "name": "projectIdOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TaskStatusDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/ppm/projects/{projectIdOrKey}/tasks/priorities": {
+      "get": {
+        "tags": [
+          "ProjectTasks"
+        ],
+        "summary": "Get a list of all task priorities.",
+        "operationId": "ProjectTasks_GetTaskPriorities",
+        "parameters": [
+          {
+            "name": "projectIdOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TaskPriorityDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
     "/api/ppm/strategic-initiatives": {
       "get": {
         "tags": [
@@ -16015,8 +16796,7 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
-            "type": "integer",
-            "format": "int32"
+            "type": "string"
           },
           "name": {
             "type": "string"
@@ -16422,8 +17202,7 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
-            "type": "integer",
-            "format": "int32"
+            "type": "string"
           },
           "name": {
             "type": "string"
@@ -16490,6 +17269,7 @@
         "required": [
           "name",
           "description",
+          "key",
           "expenditureCategoryId",
           "portfolioId"
         ],
@@ -16503,9 +17283,17 @@
           },
           "description": {
             "type": "string",
-            "description": "A detailed description of the project’s purpose.",
+            "description": "A detailed description of the project's purpose.",
             "maxLength": 2048,
             "minLength": 1,
+            "nullable": false
+          },
+          "key": {
+            "type": "string",
+            "description": "The unique key for the project (2-20 uppercase alphanumeric characters).",
+            "maxLength": 20,
+            "minLength": 1,
+            "pattern": "^[A-Z0-9]+$",
             "nullable": false
           },
           "expenditureCategoryId": {
@@ -16945,15 +17733,835 @@
         ]
       },
       "WorkProjectNavigationDto": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/NavigationDto"
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
-          {
-            "type": "object",
-            "additionalProperties": false
+          "key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
           }
+        }
+      },
+      "ProjectTaskListDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "taskKey",
+          "projectId",
+          "name",
+          "type",
+          "status",
+          "order"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "key": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "taskKey": {
+            "type": "string"
+          },
+          "projectId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "priority": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/SimpleNavigationDto"
+              }
+            ]
+          },
+          "order": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "parentId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "parent": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ProjectTaskNavigationDto"
+              }
+            ]
+          },
+          "team": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PpmTeamNavigationDto"
+              }
+            ]
+          },
+          "plannedStart": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "plannedEnd": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "plannedDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "actualStart": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "actualEnd": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "actualDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "estimatedEffortHours": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
+          "actualEffortHours": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          }
+        }
+      },
+      "ProjectTaskNavigationDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "taskKey",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "key": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "taskKey": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "PpmTeamNavigationDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "code",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "key": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "ProjectTaskTreeDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "taskKey",
+          "projectId",
+          "name",
+          "type",
+          "status",
+          "order",
+          "wbs",
+          "children"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "key": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "taskKey": {
+            "type": "string"
+          },
+          "projectId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "priority": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/SimpleNavigationDto"
+              }
+            ]
+          },
+          "order": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "parentId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "wbs": {
+            "type": "string"
+          },
+          "team": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PpmTeamNavigationDto"
+              }
+            ]
+          },
+          "plannedStart": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "plannedEnd": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "plannedDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "actualStart": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "actualEnd": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "actualDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "estimatedEffortHours": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
+          "actualEffortHours": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
+          "children": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProjectTaskTreeDto"
+            }
+          }
+        }
+      },
+      "ProjectTaskDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "taskKey",
+          "projectId",
+          "name",
+          "type",
+          "status",
+          "order",
+          "assignments"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "key": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "taskKey": {
+            "type": "string"
+          },
+          "projectId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "priority": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/SimpleNavigationDto"
+              }
+            ]
+          },
+          "order": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "parentId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "parent": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ProjectTaskNavigationDto"
+              }
+            ]
+          },
+          "team": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PpmTeamNavigationDto"
+              }
+            ]
+          },
+          "assignments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProjectTaskAssignmentDto"
+            }
+          },
+          "plannedStart": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "plannedEnd": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "plannedDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "actualStart": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "actualEnd": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "actualDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "estimatedEffortHours": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
+          "actualEffortHours": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          }
+        }
+      },
+      "ProjectTaskAssignmentDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "employeeId",
+          "employee",
+          "role"
+        ],
+        "properties": {
+          "employeeId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "employee": {
+            "$ref": "#/components/schemas/EmployeeNavigationDto"
+          },
+          "role": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          }
+        }
+      },
+      "ObjectIdAndTaskKey": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "taskKey"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "taskKey": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateProjectTaskRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "typeId",
+          "plannedDate"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the task.",
+            "maxLength": 256,
+            "minLength": 1,
+            "nullable": false
+          },
+          "description": {
+            "type": "string",
+            "description": "A detailed description of the task (optional).",
+            "maxLength": 2048,
+            "minLength": 0,
+            "nullable": true
+          },
+          "typeId": {
+            "type": "integer",
+            "description": "The type of task (Task or Milestone).",
+            "format": "int32"
+          },
+          "priorityId": {
+            "type": "integer",
+            "description": "The priority level of the task (optional).",
+            "format": "int32",
+            "nullable": true
+          },
+          "parentId": {
+            "type": "string",
+            "description": "The ID of the parent task (optional).",
+            "format": "guid",
+            "nullable": true,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "teamId": {
+            "type": "string",
+            "description": "The ID of the team assigned to this task (optional).",
+            "format": "guid",
+            "nullable": true,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "plannedStart": {
+            "type": "string",
+            "description": "The planned start date for the task (for tasks, not milestones).",
+            "format": "date",
+            "nullable": true
+          },
+          "plannedEnd": {
+            "type": "string",
+            "description": "The planned end date for the task (for tasks, not milestones).",
+            "format": "date",
+            "nullable": true
+          },
+          "plannedDate": {
+            "type": "string",
+            "description": "The planned date for a milestone (for milestones only).",
+            "format": "date",
+            "nullable": false
+          },
+          "estimatedEffortHours": {
+            "type": "number",
+            "description": "The estimated effort in hours (optional).",
+            "format": "decimal",
+            "minimum": 0.0,
+            "nullable": true,
+            "exclusiveMinimum": true
+          },
+          "assignments": {
+            "type": "array",
+            "description": "The role-based assignments for this task (optional).",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/TaskRoleAssignmentRequest"
+            }
+          }
+        }
+      },
+      "TaskRoleAssignmentRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "employeeId",
+          "role"
+        ],
+        "properties": {
+          "employeeId": {
+            "type": "string",
+            "description": "The ID of the employee.",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "role": {
+            "description": "The role of the assignment (Assignee or Reviewer).",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/TaskAssignmentRole"
+              }
+            ]
+          }
+        }
+      },
+      "TaskAssignmentRole": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "Assignee",
+          "Reviewer"
+        ],
+        "enum": [
+          "Assignee",
+          "Reviewer"
         ]
+      },
+      "UpdateProjectTaskRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "statusId"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The ID of the task.",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the task.",
+            "maxLength": 256,
+            "minLength": 1,
+            "nullable": false
+          },
+          "description": {
+            "type": "string",
+            "description": "A detailed description of the task (optional).",
+            "maxLength": 2048,
+            "minLength": 0,
+            "nullable": true
+          },
+          "statusId": {
+            "type": "integer",
+            "description": "The current status of the task.",
+            "format": "int32"
+          },
+          "priorityId": {
+            "type": "integer",
+            "description": "The priority level of the task (optional).",
+            "format": "int32",
+            "nullable": true
+          },
+          "teamId": {
+            "type": "string",
+            "description": "The ID of the team assigned to this task (optional).",
+            "format": "guid",
+            "nullable": true,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "plannedStart": {
+            "type": "string",
+            "description": "The planned start date for the task.",
+            "format": "date",
+            "nullable": true
+          },
+          "plannedEnd": {
+            "type": "string",
+            "description": "The planned end date for the task.",
+            "format": "date",
+            "nullable": true
+          },
+          "plannedDate": {
+            "type": "string",
+            "description": "The planned date for a milestone.",
+            "format": "date",
+            "nullable": true
+          },
+          "actualStart": {
+            "type": "string",
+            "description": "The actual start date when work began.",
+            "format": "date",
+            "nullable": true
+          },
+          "actualEnd": {
+            "type": "string",
+            "description": "The actual end date when work completed.",
+            "format": "date",
+            "nullable": true
+          },
+          "actualDate": {
+            "type": "string",
+            "description": "The actual date a milestone was achieved.",
+            "format": "date",
+            "nullable": true
+          },
+          "estimatedEffortHours": {
+            "type": "number",
+            "description": "The estimated effort in hours (optional).",
+            "format": "decimal",
+            "minimum": 0.0,
+            "nullable": true,
+            "exclusiveMinimum": true
+          },
+          "actualEffortHours": {
+            "type": "number",
+            "description": "The actual effort spent in hours (optional).",
+            "format": "decimal",
+            "minimum": 0.0,
+            "nullable": true,
+            "exclusiveMinimum": true
+          },
+          "assignments": {
+            "type": "array",
+            "description": "The role-based assignments for this task (optional).",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/TaskRoleAssignmentRequest"
+            }
+          }
+        }
+      },
+      "UpdateProjectTaskOrderRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "taskId",
+          "order"
+        ],
+        "properties": {
+          "taskId": {
+            "type": "string",
+            "description": "The ID of the task.",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "order": {
+            "type": "integer",
+            "description": "The new order/position of the task within its parent.",
+            "format": "int32",
+            "minimum": 0.0,
+            "exclusiveMinimum": true
+          }
+        }
+      },
+      "AddTaskDependencyRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "predecessorId",
+          "successorId"
+        ],
+        "properties": {
+          "predecessorId": {
+            "type": "string",
+            "description": "The ID of the predecessor task (the task that must complete first).",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "successorId": {
+            "type": "string",
+            "description": "The ID of the successor task (the task that depends on the predecessor).",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          }
+        }
+      },
+      "TaskStatusDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "order"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "order": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "TaskPriorityDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "order"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "order": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
       },
       "StrategicInitiativeDetailsDto": {
         "type": "object",

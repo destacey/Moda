@@ -1,4 +1,5 @@
-﻿using Moda.Common.Models;
+﻿using Moda.Common.Domain.Models.ProjectPortfolioManagement;
+using Moda.Common.Models;
 using Moda.ProjectPortfolioManagement.Domain.Enums;
 using Moda.ProjectPortfolioManagement.Domain.Models;
 using Moda.Tests.Shared;
@@ -11,7 +12,7 @@ public sealed class ProjectFaker : PrivateConstructorFaker<Project>
     public ProjectFaker()
     {
         RuleFor(x => x.Id, f => f.Random.Guid());
-        RuleFor(x => x.Key, f => f.Random.Int(1000, 10000));
+        RuleFor(x => x.Key, f => new ProjectKey(f.Random.AlphaNumeric(5)));
         RuleFor(x => x.Name, f => f.Commerce.ProductName());
         RuleFor(x => x.Description, f => f.Lorem.Paragraph());
         RuleFor(x => x.Status, f => ProjectStatus.Proposed);
@@ -27,7 +28,7 @@ public static class ProjectFakerExtensions
     public static ProjectFaker WithData(
         this ProjectFaker faker,
         Guid? id = null,
-        int? key = null,
+        ProjectKey? key = null,
         string? name = null,
         string? description = null,
         ProjectStatus? status = null,
@@ -38,7 +39,7 @@ public static class ProjectFakerExtensions
         Dictionary<ProjectRole, HashSet<Guid>>? roles = null)
     {
         if (id.HasValue) { faker.RuleFor(x => x.Id, id.Value); }
-        if (key.HasValue) { faker.RuleFor(x => x.Key, key.Value); }
+        if (key is not null) { faker.RuleFor(x => x.Key, key); }
         if (!string.IsNullOrWhiteSpace(name)) { faker.RuleFor(x => x.Name, name); }
         if (!string.IsNullOrWhiteSpace(description)) { faker.RuleFor(x => x.Description, description); }
         if (status.HasValue) { faker.RuleFor(x => x.Status, status); }

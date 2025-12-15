@@ -1,0 +1,9 @@
+namespace Moda.ProjectPortfolioManagement.Application.ProjectTasks.Dtos;
+
+public sealed record TaskStatusDto
+{
+    public int Id { get; set; }
+    public required string Name { get; set; }
+    public string? Description { get; set; }
+    public int Order { get; set; }
+}

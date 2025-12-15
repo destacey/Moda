@@ -1,0 +1,254 @@
+using Moda.Common.Application.Models;
+using Moda.Common.Domain.Models.ProjectPortfolioManagement;
+using Moda.ProjectPortfolioManagement.Application.Projects.Queries;
+using Moda.ProjectPortfolioManagement.Application.ProjectTasks.Commands;
+using Moda.ProjectPortfolioManagement.Application.ProjectTasks.Dtos;
+using Moda.ProjectPortfolioManagement.Application.ProjectTasks.Queries;
+using Moda.ProjectPortfolioManagement.Domain.Models;
+using Moda.Web.Api.Extensions;
+using Moda.Web.Api.Models.Ppm.ProjectTasks;
+using TaskStatus = Moda.ProjectPortfolioManagement.Domain.Enums.TaskStatus;
+
+namespace Moda.Web.Api.Controllers.Ppm;
+
+[Route("api/ppm/projects/{projectIdOrKey}/tasks")]
+[ApiVersionNeutral]
+[ApiController]
+public class ProjectTasksController(ILogger<ProjectTasksController> logger, ISender sender) : ControllerBase
+{
+    private readonly ILogger<ProjectTasksController> _logger = logger;
+    private readonly ISender _sender = sender;
+
+    [HttpGet]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Projects)]
+    [OpenApiOperation("Get a list of project tasks.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IReadOnlyList<ProjectTaskListDto>>> GetProjectTasks(
+        string projectIdOrKey,
+        CancellationToken cancellationToken,
+        [FromQuery] int? status = null,
+        [FromQuery] Guid? parentId = null)
+    {
+        TaskStatus? statusFilter = status.HasValue ? (TaskStatus)status.Value : null;
+
+        var tasks = await _sender.Send(
+            new GetProjectTasksQuery(projectIdOrKey, statusFilter, parentId),
+            cancellationToken);
+
+        return Ok(tasks);
+    }
+
+    [HttpGet("tree")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Projects)]
+    [OpenApiOperation("Get a hierarchical tree of project tasks with WBS codes.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IReadOnlyList<ProjectTaskTreeDto>>> GetProjectTaskTree(
+        string projectIdOrKey,
+        CancellationToken cancellationToken)
+    {
+        var tasks = await _sender.Send(new GetProjectTaskTreeQuery(projectIdOrKey), cancellationToken);
+
+        return Ok(tasks);
+    }
+
+    [HttpGet("{idOrTaskKey}")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Projects)]
+    [OpenApiOperation("Get project task details.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<ProjectTaskDto>> GetProjectTask(
+        string projectIdOrKey,
+        string idOrTaskKey,
+        CancellationToken cancellationToken)
+    {
+        var task = await _sender.Send(new GetProjectTaskQuery(idOrTaskKey), cancellationToken);
+
+        return task is not null
+            ? Ok(task)
+            : NotFound();
+    }
+
+    [HttpPost]
+    [MustHavePermission(ApplicationAction.Create, ApplicationResource.Projects)]
+    [OpenApiOperation("Create a project task.", "")]
+    [ProducesResponseType(typeof(ObjectIdAndTaskKey), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult<ObjectIdAndTaskKey>> CreateProjectTask(
+        string projectIdOrKey,
+        [FromBody] CreateProjectTaskRequest request,
+        CancellationToken cancellationToken)
+    {
+        // Resolve project ID from IdOrKey
+        var projectId = await ResolveProjectId(projectIdOrKey, cancellationToken);
+        if (projectId is null)
+            return NotFound($"Project with identifier '{projectIdOrKey}' not found.");
+
+        var result = await _sender.Send(request.ToCreateProjectTaskCommand(projectId.Value), cancellationToken);
+
+        return result.IsSuccess
+            ? CreatedAtAction(
+                nameof(GetProjectTask),
+                new { projectIdOrKey, idOrTaskKey = result.Value.TaskKey },
+                result.Value)
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpPut("{id}")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Projects)]
+    [OpenApiOperation("Update a project task.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> UpdateProjectTask(
+        string projectIdOrKey,
+        Guid id,
+        [FromBody] UpdateProjectTaskRequest request,
+        CancellationToken cancellationToken)
+    {
+        if (id != request.Id)
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(HttpContext));
+
+        var result = await _sender.Send(request.ToUpdateProjectTaskCommand(), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpDelete("{id}")]
+    [MustHavePermission(ApplicationAction.Delete, ApplicationResource.Projects)]
+    [OpenApiOperation("Delete a project task.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> DeleteProjectTask(
+        string projectIdOrKey,
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(new DeleteProjectTaskCommand(id), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpPut("{id}/order")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Projects)]
+    [OpenApiOperation("Update a project task's order within its parent.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> UpdateProjectTaskOrder(
+        string projectIdOrKey,
+        Guid id,
+        [FromBody] UpdateProjectTaskOrderRequest request,
+        CancellationToken cancellationToken)
+    {
+        if (id != request.TaskId)
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(HttpContext));
+
+        var result = await _sender.Send(new UpdateProjectTaskOrderCommand(request.TaskId, request.Order), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpGet("critical-path")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Projects)]
+    [OpenApiOperation("Get the critical path for the project.", "Returns an ordered list of task IDs on the critical path.")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IReadOnlyList<Guid>>> GetCriticalPath(
+        string projectIdOrKey,
+        CancellationToken cancellationToken)
+    {
+        var criticalPath = await _sender.Send(new GetCriticalPathQuery(projectIdOrKey), cancellationToken);
+
+        return Ok(criticalPath);
+    }
+
+    [HttpPost("{id}/dependencies")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Projects)]
+    [OpenApiOperation("Add a dependency to a task.", "Creates a finish-to-start dependency where the specified task is the predecessor.")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> AddTaskDependency(
+        string projectIdOrKey,
+        Guid id,
+        [FromBody] AddTaskDependencyRequest request,
+        CancellationToken cancellationToken)
+    {
+        if (id != request.PredecessorId)
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(HttpContext));
+
+        var result = await _sender.Send(new AddProjectTaskDependencyCommand(request.PredecessorId, request.SuccessorId), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpDelete("{id}/dependencies/{successorId}")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Projects)]
+    [OpenApiOperation("Remove a dependency from a task.", "Removes the finish-to-start dependency between the predecessor and successor tasks.")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> RemoveTaskDependency(
+        string projectIdOrKey,
+        Guid id,
+        Guid successorId,
+        CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(new RemoveProjectTaskDependencyCommand(id, successorId), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpGet("statuses")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Projects)]
+    [OpenApiOperation("Get a list of all task statuses.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IEnumerable<TaskStatusDto>>> GetTaskStatuses(string projectIdOrKey, CancellationToken cancellationToken)
+    {
+        var items = await _sender.Send(new GetTaskStatusesQuery(), cancellationToken);
+        return Ok(items.OrderBy(c => c.Order));
+    }
+
+    [HttpGet("priorities")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Projects)]
+    [OpenApiOperation("Get a list of all task priorities.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IEnumerable<TaskPriorityDto>>> GetTaskPriorities(string projectIdOrKey, CancellationToken cancellationToken)
+    {
+        var items = await _sender.Send(new GetTaskPrioritiesQuery(), cancellationToken);
+        return Ok(items.OrderBy(c => c.Order));
+    }
+
+    private async Task<Guid?> ResolveProjectId(string projectIdOrKey, CancellationToken cancellationToken)
+    {
+        if (Guid.TryParse(projectIdOrKey, out var id))
+        {
+            return id;
+        }
+
+        try
+        {
+            var key = new ProjectKey(projectIdOrKey);
+            return await _sender.Send(new GetProjectIdQuery(key), cancellationToken);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+}

@@ -1,8 +1,8 @@
 using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
-using Moda.Common.Domain.Employees;
-using Moda.Common.Models;
+using Moda.Common.Domain.Models.ProjectPortfolioManagement;
 using Moda.ProjectPortfolioManagement.Domain.Enums;
+using Moda.ProjectPortfolioManagement.Domain.Interfaces;
 using NodaTime;
 using TaskStatus = Moda.ProjectPortfolioManagement.Domain.Enums.TaskStatus;
 
@@ -11,7 +11,7 @@ namespace Moda.ProjectPortfolioManagement.Domain.Models;
 /// <summary>
 /// Represents a task within a project with hierarchical structure and dependency management.
 /// </summary>
-public sealed class ProjectTask : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey
+public sealed class ProjectTask : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey, IHasProject
 {
     private readonly List<ProjectTask> _children = [];
     private readonly HashSet<RoleAssignment<TaskAssignmentRole>> _assignments = [];
@@ -22,7 +22,7 @@ public sealed class ProjectTask : BaseEntity<Guid>, ISystemAuditable, IHasIdAndK
 
     private ProjectTask(
         Guid projectId,
-        ProjectCode projectCode,
+        ProjectKey projectKey,
         int taskNumber,
         string name,
         string? description,
@@ -46,7 +46,7 @@ public sealed class ProjectTask : BaseEntity<Guid>, ISystemAuditable, IHasIdAndK
         // No need to validate date range - FlexibleDateRange constructor handles it
 
         ProjectId = projectId;
-        TaskKey = new ProjectTaskKey(projectCode, taskNumber);
+        TaskKey = new ProjectTaskKey(projectKey, taskNumber);
         Name = name;
         Description = description;
         Type = type;
@@ -84,7 +84,7 @@ public sealed class ProjectTask : BaseEntity<Guid>, ISystemAuditable, IHasIdAndK
     /// <summary>
     /// The project this task belongs to.
     /// </summary>
-    public Project? Project { get; private set; }
+    public Project Project { get; private set; }
 
     /// <summary>
     /// The name of the task.
@@ -349,7 +349,7 @@ public sealed class ProjectTask : BaseEntity<Guid>, ISystemAuditable, IHasIdAndK
     /// <summary>
     /// Sets the order of this task within its parent.
     /// </summary>
-    internal Result SetOrder(int order)
+    public Result SetOrder(int order)
     {
         if (order < 1)
         {
@@ -500,7 +500,7 @@ public sealed class ProjectTask : BaseEntity<Guid>, ISystemAuditable, IHasIdAndK
     /// </summary>
     internal static ProjectTask Create(
         Guid projectId,
-        ProjectCode projectCode,
+        ProjectKey projectKey,
         int taskNumber,
         string name,
         string? description,
@@ -516,7 +516,7 @@ public sealed class ProjectTask : BaseEntity<Guid>, ISystemAuditable, IHasIdAndK
     {
         return new ProjectTask(
             projectId,
-            projectCode,
+            projectKey,
             taskNumber,
             name,
             description,

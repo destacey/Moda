@@ -13,7 +13,7 @@ using Moda.Infrastructure.Persistence.Context;
 namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 {
     [DbContext(typeof(ModaDbContext))]
-    [Migration("20251214171135_Add-ProjectTasks")]
+    [Migration("20251214205828_Add-ProjectTasks")]
     partial class AddProjectTasks
     {
         /// <inheritdoc />
@@ -1917,11 +1917,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("varchar");
-
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(2048)
@@ -1930,11 +1925,10 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<int>("ExpenditureCategoryId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Key")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Key"));
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -1966,13 +1960,10 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasAlternateKey("Key");
-
-                    b.HasIndex("Code")
-                        .IsUnique()
-                        .HasFilter("[Code] IS NOT NULL AND [Status] <> 'Cancelled'");
-
                     b.HasIndex("ExpenditureCategoryId");
+
+                    b.HasIndex("Key")
+                        .IsUnique();
 
                     b.HasIndex("PortfolioId");
 
@@ -3234,8 +3225,10 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasMaxLength(2048)
                         .HasColumnType("nvarchar(2048)");
 
-                    b.Property<int>("Key")
-                        .HasColumnType("int");
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -3243,8 +3236,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasColumnType("nvarchar(128)");
 
                     b.HasKey("Id");
-
-                    b.HasAlternateKey("Key");
 
                     b.ToTable("WorkProjects", "Work");
                 });

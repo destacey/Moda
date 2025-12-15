@@ -2,6 +2,7 @@
 using CSharpFunctionalExtensions;
 using Moda.Common.Domain.Events.ProjectPortfolioManagement;
 using Moda.Common.Domain.Interfaces.ProjectPortfolioManagement;
+using Moda.Common.Domain.Models.ProjectPortfolioManagement;
 using Moda.ProjectPortfolioManagement.Domain.Enums;
 using Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 using NodaTime;
@@ -11,7 +12,7 @@ namespace Moda.ProjectPortfolioManagement.Domain.Models;
 /// <summary>
 /// Represents an individual project within a portfolio or program.
 /// </summary>
-public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey, ISimpleProject
+public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasProjectIdAndKey, ISimpleProject
 {
     private readonly HashSet<RoleAssignment<ProjectRole>> _roles = [];
     private readonly HashSet<StrategicThemeTag<Project>> _strategicThemeTags = [];
@@ -20,7 +21,7 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey, 
 
     private Project() { }
 
-    private Project(string name, string description, ProjectStatus status, int expenditureCategoryId, LocalDateRange? dateRange, Guid portfolioId, Guid? programId = null, Dictionary<ProjectRole, HashSet<Guid>>? roles = null, HashSet<Guid>? strategicThemes = null)
+    private Project(string name, string description, ProjectKey key, ProjectStatus status, int expenditureCategoryId, LocalDateRange? dateRange, Guid portfolioId, Guid? programId = null, Dictionary<ProjectRole, HashSet<Guid>>? roles = null, HashSet<Guid>? strategicThemes = null)
     {
         if (Status is ProjectStatus.Active or ProjectStatus.Completed && dateRange is null)
         {
@@ -29,6 +30,7 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey, 
 
         Name = name;
         Description = description;
+        Key = key;
         Status = status;
         ExpenditureCategoryId = expenditureCategoryId;
         DateRange = dateRange;
@@ -47,15 +49,11 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey, 
     }
 
     /// <summary>
-    /// The unique key of the project. This is an alternate key to the Id.
-    /// </summary>
-    public int Key { get; private init; }
-
-    /// <summary>
-    /// The unique code of the project used for task key generation (e.g., "APOLLO", "MARS").
+    /// The unique key of the project used for task key generation (e.g., "APOLLO", "MARS").
+    /// This is an alternate key to the Id.
     /// Must be 2-20 uppercase alphanumeric characters or hyphens.
     /// </summary>
-    public ProjectCode Code { get; private set; } = default!;
+    public ProjectKey Key { get; private set; } = default!;
 
     /// <summary>
     /// The name of the project.
@@ -328,29 +326,6 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey, 
     }
 
     /// <summary>
-    /// Updates the project code used for task key generation.
-    /// </summary>
-    /// <param name="code">The new project code (2-20 uppercase alphanumeric characters or hyphens).</param>
-    /// <returns></returns>
-    public Result UpdateCode(string code)
-    {
-        if (_tasks.Any())
-        {
-            return Result.Failure("Cannot change project code after tasks have been created.");
-        }
-
-        try
-        {
-            Code = new ProjectCode(code);
-            return Result.Success();
-        }
-        catch (ArgumentException ex)
-        {
-            return Result.Failure(ex.Message);
-        }
-    }
-
-    /// <summary>
     /// Creates a new task within this project.
     /// </summary>
     public Result<ProjectTask> CreateTask(
@@ -365,7 +340,7 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey, 
         decimal? estimatedEffortHours,
         Dictionary<TaskAssignmentRole, HashSet<Guid>>? assignments)
     {
-        if (Code is null)
+        if (Key is null)
         {
             return Result.Failure<ProjectTask>("Project must have a code before tasks can be created.");
         }
@@ -396,7 +371,7 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey, 
 
         var task = ProjectTask.Create(
             Id,
-            Code,
+            Key,
             nextNumber,
             name,
             description,
@@ -453,6 +428,7 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey, 
     /// </summary>
     /// <param name="name"></param>
     /// <param name="description"></param>
+    /// <param name="key"></param>
     /// <param name="expenditureCategoryId"></param>
     /// <param name="dateRange"></param>
     /// <param name="portfolioId"></param>
@@ -461,9 +437,9 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey, 
     /// <param name="strategicThemes"></param>
     /// <param name="timestamp"></param>
     /// <returns></returns>
-    internal static Project Create(string name, string description, int expenditureCategoryId, LocalDateRange? dateRange, Guid portfolioId, Guid? programId, Dictionary<ProjectRole, HashSet<Guid>>? roles, HashSet<Guid>? strategicThemes, Instant timestamp)
+    internal static Project Create(string name, string description, ProjectKey key, int expenditureCategoryId, LocalDateRange? dateRange, Guid portfolioId, Guid? programId, Dictionary<ProjectRole, HashSet<Guid>>? roles, HashSet<Guid>? strategicThemes, Instant timestamp)
     {
-        var project = new Project(name, description, ProjectStatus.Proposed, expenditureCategoryId, dateRange, portfolioId, programId, roles, strategicThemes);
+        var project = new Project(name, description, key, ProjectStatus.Proposed, expenditureCategoryId, dateRange, portfolioId, programId, roles, strategicThemes);
 
         project.AddPostPersistenceAction(() => project.AddDomainEvent(
             new ProjectCreatedEvent

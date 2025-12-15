@@ -10,8 +10,29 @@ public partial class AddProjectTasks : Migration
     /// <inheritdoc />
     protected override void Up(MigrationBuilder migrationBuilder)
     {
+        migrationBuilder.DropUniqueConstraint(
+            name: "AK_WorkProjects_Key",
+            schema: "Work",
+            table: "WorkProjects");
+
+        migrationBuilder.DropUniqueConstraint(
+            name: "AK_Projects_Key",
+            schema: "Ppm",
+            table: "Projects");
+
+        migrationBuilder.AlterColumn<string>(
+            name: "Key",
+            schema: "Work",
+            table: "WorkProjects",
+            type: "varchar(20)",
+            maxLength: 20,
+            nullable: false,
+            oldClrType: typeof(int),
+            oldType: "int");
+
+        // Convert Ppm.Projects.Key from int IDENTITY to varchar(20) by creating a new column, copying data, dropping old, and renaming
         migrationBuilder.AddColumn<string>(
-            name: "Code",
+            name: "Key_tmp",
             schema: "Ppm",
             table: "Projects",
             type: "varchar(20)",
@@ -19,11 +40,19 @@ public partial class AddProjectTasks : Migration
             nullable: false,
             defaultValue: "");
 
-        migrationBuilder.Sql(@"
-            UPDATE Ppm.Projects
-            SET Code = CAST([Key] AS VARCHAR(20))
-            WHERE Code = '';
-        ");
+        migrationBuilder.Sql(
+            "UPDATE [Ppm].[Projects] SET [Key_tmp] = CASE WHEN LEN(CAST([Key] AS varchar(20))) > 1 THEN CAST([Key] AS varchar(20)) ELSE '0' + CAST([Key] AS varchar(20)) END;");
+
+        migrationBuilder.DropColumn(
+            name: "Key",
+            schema: "Ppm",
+            table: "Projects");
+
+        migrationBuilder.RenameColumn(
+            name: "Key_tmp",
+            schema: "Ppm",
+            table: "Projects",
+            newName: "Key");
 
         migrationBuilder.CreateTable(
             name: "PpmTeams",
@@ -158,12 +187,11 @@ public partial class AddProjectTasks : Migration
             });
 
         migrationBuilder.CreateIndex(
-            name: "IX_Projects_Code",
+            name: "IX_Projects_Key",
             schema: "Ppm",
             table: "Projects",
-            column: "Code",
-            unique: true,
-            filter: "[Code] IS NOT NULL AND [Status] <> 'Cancelled'");
+            column: "Key",
+            unique: true);
 
         migrationBuilder.CreateIndex(
             name: "IX_PpmTeams_Code",
@@ -263,13 +291,45 @@ public partial class AddProjectTasks : Migration
             schema: "Ppm");
 
         migrationBuilder.DropIndex(
-            name: "IX_Projects_Code",
+            name: "IX_Projects_Key",
             schema: "Ppm",
             table: "Projects");
 
+        migrationBuilder.AlterColumn<int>(
+            name: "Key",
+            schema: "Work",
+            table: "WorkProjects",
+            type: "int",
+            nullable: false,
+            oldClrType: typeof(string),
+            oldType: "varchar(20)",
+            oldMaxLength: 20);
+
+        // Drop the varchar Key column
         migrationBuilder.DropColumn(
-            name: "Code",
+            name: "Key",
             schema: "Ppm",
             table: "Projects");
+
+        // Add back the Key column as int IDENTITY
+        migrationBuilder.AddColumn<int>(
+            name: "Key",
+            schema: "Ppm",
+            table: "Projects",
+            type: "int",
+            nullable: false)
+            .Annotation("SqlServer:Identity", "1, 1");
+
+        migrationBuilder.AddUniqueConstraint(
+            name: "AK_WorkProjects_Key",
+            schema: "Work",
+            table: "WorkProjects",
+            column: "Key");
+
+        migrationBuilder.AddUniqueConstraint(
+            name: "AK_Projects_Key",
+            schema: "Ppm",
+            table: "Projects",
+            column: "Key");
     }
 }
