@@ -4,7 +4,7 @@ using Moda.Common.Domain.Models;
 using Moda.Common.Extensions;
 
 namespace Moda.AppIntegration.Domain.Models;
-public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsConnectionConfiguration, AzureDevOpsBoardsTeamConfiguration>
+public sealed class AzureDevOpsBoardsConnection : WorkManagementConnection<AzureDevOpsBoardsConnectionConfiguration, AzureDevOpsBoardsTeamConfiguration>
 {
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     private AzureDevOpsBoardsConnection() { }
