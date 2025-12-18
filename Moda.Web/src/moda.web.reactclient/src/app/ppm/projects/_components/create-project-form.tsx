@@ -14,7 +14,7 @@ import {
 import { useCreateProjectMutation } from '@/src/store/features/ppm/projects-api'
 import { useGetStrategicThemeOptionsQuery } from '@/src/store/features/strategic-management/strategic-themes-api'
 import { toFormErrors } from '@/src/utils'
-import { DatePicker, Form, Modal, Select } from 'antd'
+import { DatePicker, Form, Input, Modal, Select } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
 import { useCallback, useEffect, useState } from 'react'
 
@@ -29,6 +29,7 @@ export interface CreateProjectFormProps {
 interface CreateProjectFormValues {
   portfolioId: string
   programId?: string
+  key: string
   name: string
   description: string
   expenditureCategoryId: number
@@ -46,6 +47,7 @@ const mapToRequestValues = (
   return {
     name: values.name,
     description: values.description,
+    key: values.key,
     expenditureCategoryId: values.expenditureCategoryId,
     start: (values.start as any)?.format('YYYY-MM-DD'),
     end: (values.end as any)?.format('YYYY-MM-DD'),
@@ -243,6 +245,31 @@ const CreateProjectForm = (props: CreateProjectFormProps) => {
               options={programData ?? []}
               placeholder="Select Program"
               disabled={!form.getFieldValue('portfolioId')}
+            />
+          </Item>
+          <Item
+            label="Key"
+            name="key"
+            rules={[
+              { required: true, message: 'Key is required' },
+              { min: 2, message: 'Key must be at least 2 characters' },
+              { max: 20, message: 'Key must be at most 20 characters' },
+              {
+                pattern: /^[A-Z0-9]+$/,
+                message:
+                  'Key must contain only uppercase letters and numbers',
+              },
+            ]}
+            tooltip="A unique identifier for the project (e.g., APOLLO, MARS1). Must be 2-20 uppercase alphanumeric characters."
+          >
+            <Input
+              placeholder="Enter project key (e.g., APOLLO)"
+              maxLength={20}
+              showCount
+              style={{ textTransform: 'uppercase' }}
+              onChange={(e) => {
+                form.setFieldValue('key', e.target.value.toUpperCase())
+              }}
             />
           </Item>
           <Item

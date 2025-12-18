@@ -26,10 +26,10 @@ export const projectsApi = apiSlice.injectEndpoints({
       },
       providesTags: () => [{ type: QueryTags.Project, id: 'LIST' }],
     }),
-    getProject: builder.query<ProjectDetailsDto, number>({
-      queryFn: async (key) => {
+    getProject: builder.query<ProjectDetailsDto, string>({
+      queryFn: async (idOrKey) => {
         try {
-          const data = await getProjectsClient().getProject(key.toString())
+          const data = await getProjectsClient().getProject(idOrKey)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -59,7 +59,7 @@ export const projectsApi = apiSlice.injectEndpoints({
     }),
     updateProject: builder.mutation<
       void,
-      { request: UpdateProjectRequest; cacheKey: number }
+      { request: UpdateProjectRequest; cacheKey: string }
     >({
       queryFn: async ({ request }) => {
         try {
@@ -80,7 +80,7 @@ export const projectsApi = apiSlice.injectEndpoints({
     }),
     changeProjectProgram: builder.mutation<
       void,
-      { id: string; request: ChangeProjectProgramRequest; cacheKey: number }
+      { id: string; request: ChangeProjectProgramRequest; cacheKey: string }
     >({
       queryFn: async ({ id, request }) => {
         try {
@@ -100,7 +100,7 @@ export const projectsApi = apiSlice.injectEndpoints({
         ]
       },
     }),
-    activateProject: builder.mutation<void, { id: string; cacheKey: number }>({
+    activateProject: builder.mutation<void, { id: string; cacheKey: string }>({
       queryFn: async ({ id }) => {
         try {
           const data = await getProjectsClient().activate(id)
@@ -118,7 +118,7 @@ export const projectsApi = apiSlice.injectEndpoints({
         ]
       },
     }),
-    completeProject: builder.mutation<void, { id: string; cacheKey: number }>({
+    completeProject: builder.mutation<void, { id: string; cacheKey: string }>({
       queryFn: async ({ id }) => {
         try {
           const data = await getProjectsClient().complete(id)
@@ -136,7 +136,7 @@ export const projectsApi = apiSlice.injectEndpoints({
         ]
       },
     }),
-    cancelProject: builder.mutation<void, { id: string; cacheKey: number }>({
+    cancelProject: builder.mutation<void, { id: string; cacheKey: string }>({
       queryFn: async ({ id }) => {
         try {
           const data = await getProjectsClient().cancel(id)

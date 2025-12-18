@@ -24,7 +24,7 @@ import { useMessage } from '@/src/components/contexts/messaging'
 const { Item } = Form
 
 export interface EditProjectFormProps {
-  projectKey: number
+  projectKey: string
   showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void

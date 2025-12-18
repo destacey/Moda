@@ -123,20 +123,18 @@ const ModaGrid = forwardRef<AgGridReact, ModaGridProps>(
                 style={{ display: 'flex', justifyContent: 'flex-end' }}
                 wrap
               >
-                <Space style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                  <Text>
-                    {displayedRowCount} of {rowCount}
-                  </Text>
-                  {showGlobalSearch && (
-                    <Input
-                      placeholder="Search"
-                      allowClear={true}
-                      value={searchValue}
-                      onChange={onGlobalSearchChange}
-                      suffix={<SearchOutlined />}
-                    />
-                  )}
-                </Space>
+                <Text>
+                  {displayedRowCount} of {rowCount}
+                </Text>
+                {showGlobalSearch && (
+                  <Input
+                    placeholder="Search"
+                    allowClear={true}
+                    value={searchValue}
+                    onChange={onGlobalSearchChange}
+                    suffix={<SearchOutlined />}
+                  />
+                )}
                 <Space style={{ display: 'flex', justifyContent: 'flex-end' }}>
                   {showGridControls && (
                     <ControlItemsMenu items={gridControlMenuItems} />
