@@ -4,7 +4,6 @@ using Moda.ProjectPortfolioManagement.Application.Projects.Queries;
 using Moda.ProjectPortfolioManagement.Application.ProjectTasks.Commands;
 using Moda.ProjectPortfolioManagement.Application.ProjectTasks.Dtos;
 using Moda.ProjectPortfolioManagement.Application.ProjectTasks.Queries;
-using Moda.ProjectPortfolioManagement.Domain.Models;
 using Moda.Web.Api.Extensions;
 using Moda.Web.Api.Models.Ppm.ProjectTasks;
 using TaskStatus = Moda.ProjectPortfolioManagement.Domain.Enums.TaskStatus;

@@ -9,7 +9,7 @@ public sealed record CreateProjectTaskCommand(
     string Name,
     string? Description,
     ProjectTaskType Type,
-    TaskPriority? Priority,
+    TaskPriority Priority,
     Guid? ParentId,
     Guid? TeamId,
     FlexibleDateRange? PlannedDateRange,
@@ -38,8 +38,7 @@ public sealed class CreateProjectTaskCommandValidator : AbstractValidator<Create
             .IsInEnum();
 
         RuleFor(x => x.Priority)
-            .IsInEnum()
-            .When(x => x.Priority.HasValue);
+            .IsInEnum();
 
         RuleFor(x => x.ParentId)
             .Must(id => id == null || id != Guid.Empty)
@@ -159,8 +158,18 @@ internal sealed class CreateProjectTaskCommandHandler(
                     );
             }
 
+            // Get the next task key number atomically using a database query with row locking
+            // This uses UPDLOCK and ROWLOCK to prevent race conditions when multiple tasks are created concurrently
+            var nextKey = await _ppmDbContext.Database
+                .SqlQuery<int>($@"
+                    SELECT ISNULL(MAX([Key]), 0) + 1 AS [Value]
+                    FROM [Ppm].[ProjectTasks] WITH (UPDLOCK, ROWLOCK)
+                    WHERE [ProjectId] = {request.ProjectId}")
+                .FirstOrDefaultAsync(cancellationToken);
+
             // Create the task through the project
             var createResult = project.CreateTask(
+                nextKey,
                 request.Name,
                 request.Description,
                 request.Type,
@@ -180,9 +189,9 @@ internal sealed class CreateProjectTaskCommandHandler(
                 return Result.Failure<ObjectIdAndTaskKey>(createResult.Error);
             }
 
-            var task = createResult.Value;
-
             await _ppmDbContext.SaveChangesAsync(cancellationToken);
+
+            var task = createResult.Value;
 
             _logger.LogInformation("Project task {TaskId} created with Key {TaskKey} for project {ProjectId}.",
                 task.Id, task.TaskKey.Value, request.ProjectId);

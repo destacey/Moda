@@ -13,7 +13,7 @@ using Moda.Infrastructure.Persistence.Context;
 namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 {
     [DbContext(typeof(ModaDbContext))]
-    [Migration("20251214205828_Add-ProjectTasks")]
+    [Migration("20251218050600_Add-ProjectTasks")]
     partial class AddProjectTasks
     {
         /// <inheritdoc />
@@ -2064,6 +2064,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasColumnName("PlannedDate");
 
                     b.Property<string>("Priority")
+                        .IsRequired()
                         .HasMaxLength(32)
                         .HasColumnType("varchar");
 

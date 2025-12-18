@@ -28,7 +28,7 @@ public sealed class ProjectTask : BaseEntity<Guid>, ISystemAuditable, IHasIdAndK
         string? description,
         ProjectTaskType type,
         TaskStatus status,
-        TaskPriority? priority,
+        TaskPriority priority,
         int order,
         Guid? parentId,
         Guid? teamId,
@@ -84,7 +84,7 @@ public sealed class ProjectTask : BaseEntity<Guid>, ISystemAuditable, IHasIdAndK
     /// <summary>
     /// The project this task belongs to.
     /// </summary>
-    public Project Project { get; private set; }
+    public Project Project { get; private set; } = null!;
 
     /// <summary>
     /// The name of the task.
@@ -113,7 +113,7 @@ public sealed class ProjectTask : BaseEntity<Guid>, ISystemAuditable, IHasIdAndK
     /// <summary>
     /// The priority level of the task.
     /// </summary>
-    public TaskPriority? Priority { get; private set; }
+    public TaskPriority Priority { get; private set; }
 
     /// <summary>
     /// The order of the task within its parent (used for WBS calculation).
@@ -194,7 +194,7 @@ public sealed class ProjectTask : BaseEntity<Guid>, ISystemAuditable, IHasIdAndK
     /// <summary>
     /// Updates the basic details of the task.
     /// </summary>
-    public Result UpdateDetails(string name, string? description, TaskPriority? priority)
+    public Result UpdateDetails(string name, string? description, TaskPriority priority)
     {
         Name = name;
         Description = description;
@@ -505,7 +505,7 @@ public sealed class ProjectTask : BaseEntity<Guid>, ISystemAuditable, IHasIdAndK
         string name,
         string? description,
         ProjectTaskType type,
-        TaskPriority? priority,
+        TaskPriority priority,
         int order,
         Guid? parentId,
         Guid? teamId,

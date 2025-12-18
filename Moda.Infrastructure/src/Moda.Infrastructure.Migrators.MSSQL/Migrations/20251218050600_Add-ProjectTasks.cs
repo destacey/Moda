@@ -86,7 +86,7 @@ public partial class AddProjectTasks : Migration
                 Description = table.Column<string>(type: "nvarchar(2048)", maxLength: 2048, nullable: true),
                 Type = table.Column<string>(type: "varchar(32)", maxLength: 32, nullable: false),
                 Status = table.Column<string>(type: "varchar(32)", maxLength: 32, nullable: false),
-                Priority = table.Column<string>(type: "varchar(32)", maxLength: 32, nullable: true),
+                Priority = table.Column<string>(type: "varchar(32)", maxLength: 32, nullable: false),
                 Order = table.Column<int>(type: "int", nullable: false),
                 ParentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                 TeamId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
@@ -295,15 +295,19 @@ public partial class AddProjectTasks : Migration
             schema: "Ppm",
             table: "Projects");
 
-        migrationBuilder.AlterColumn<int>(
+        // Drop the varchar Key column
+        migrationBuilder.DropColumn(
             name: "Key",
-            schema: "Work",
+            schema: "Ppm",
+            table: "WorkProjects");
+
+        // Add back the Key column as int IDENTITY
+        migrationBuilder.AddColumn<int>(
+            name: "Key",
+            schema: "Ppm",
             table: "WorkProjects",
             type: "int",
-            nullable: false,
-            oldClrType: typeof(string),
-            oldType: "varchar(20)",
-            oldMaxLength: 20);
+            nullable: false);
 
         // Drop the varchar Key column
         migrationBuilder.DropColumn(

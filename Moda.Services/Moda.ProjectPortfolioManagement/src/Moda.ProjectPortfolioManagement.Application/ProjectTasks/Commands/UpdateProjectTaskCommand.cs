@@ -7,7 +7,8 @@ public sealed record UpdateProjectTaskCommand(
     string Name,
     string? Description,
     Domain.Enums.TaskStatus Status,
-    TaskPriority? Priority,
+    TaskPriority Priority,
+    Guid? ParentId,
     Guid? TeamId,
     FlexibleDateRange? PlannedDateRange,
     LocalDate? PlannedDate,
@@ -36,8 +37,11 @@ public sealed class UpdateProjectTaskCommandValidator : AbstractValidator<Update
             .IsInEnum();
 
         RuleFor(x => x.Priority)
-            .IsInEnum()
-            .When(x => x.Priority.HasValue);
+            .IsInEnum();
+
+        RuleFor(x => x.ParentId)
+            .Must(id => id == null || id != Guid.Empty)
+            .WithMessage("ParentId cannot be an empty GUID.");
 
         RuleFor(x => x.TeamId)
             .Must(id => id == null || id != Guid.Empty)
@@ -81,6 +85,35 @@ internal sealed class UpdateProjectTaskCommandHandler(
             {
                 _logger.LogInformation("Project task with Id {TaskId} not found.", request.Id);
                 return Result.Failure("Project task not found.");
+            }
+
+            // Validate parent if specified
+            if (request.ParentId.HasValue)
+            {
+                // Cannot set self as parent
+                if (request.ParentId.Value == request.Id)
+                {
+                    _logger.LogInformation("Cannot set task {TaskId} as its own parent.", request.Id);
+                    return Result.Failure("A task cannot be its own parent.");
+                }
+
+                var parentExists = await _ppmDbContext.ProjectTasks
+                    .AnyAsync(t => t.Id == request.ParentId.Value, cancellationToken);
+
+                if (!parentExists)
+                {
+                    _logger.LogInformation("Parent task {ParentId} not found.", request.ParentId);
+                    return Result.Failure("Parent task not found.");
+                }
+
+                // Check for circular reference (would create a cycle in the hierarchy)
+                // Need to check if the new parent is a descendant of the current task
+                var descendants = await GetDescendantIds(request.Id, cancellationToken);
+                if (descendants.Contains(request.ParentId.Value))
+                {
+                    _logger.LogInformation("Cannot set task {ParentId} as parent of {TaskId} - would create circular reference.", request.ParentId, request.Id);
+                    return Result.Failure("Cannot set a descendant task as parent - this would create a circular reference.");
+                }
             }
 
             // Validate team if specified
@@ -152,6 +185,21 @@ internal sealed class UpdateProjectTaskCommandHandler(
                 return effortResult;
             }
 
+            // Update parent if changed
+            if (request.ParentId != task.ParentId)
+            {
+                var newParent = request.ParentId.HasValue
+                    ? await _ppmDbContext.ProjectTasks.FindAsync([request.ParentId.Value], cancellationToken)
+                    : null;
+
+                var parentResult = task.ChangeParent(request.ParentId, newParent);
+                if (parentResult.IsFailure)
+                {
+                    _logger.LogError("Error changing parent for task {TaskId}. Error: {Error}", task.Id, parentResult.Error);
+                    return parentResult;
+                }
+            }
+
             // Update team assignment
             var teamResult = task.AssignTeam(request.TeamId);
             if (teamResult.IsFailure)
@@ -189,5 +237,23 @@ internal sealed class UpdateProjectTaskCommandHandler(
             _logger.LogError(ex, "Exception handling {CommandName} command for request {@Request}.", AppRequestName, request);
             return Result.Failure($"Error handling {AppRequestName} command.");
         }
+    }
+
+    private async Task<HashSet<Guid>> GetDescendantIds(Guid taskId, CancellationToken cancellationToken)
+    {
+        var descendants = new HashSet<Guid>();
+        var children = await _ppmDbContext.ProjectTasks
+            .Where(t => t.ParentId == taskId)
+            .Select(t => t.Id)
+            .ToListAsync(cancellationToken);
+
+        foreach (var childId in children)
+        {
+            descendants.Add(childId);
+            var childDescendants = await GetDescendantIds(childId, cancellationToken);
+            descendants.UnionWith(childDescendants);
+        }
+
+        return descendants;
     }
 }

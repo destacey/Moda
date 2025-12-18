@@ -18156,7 +18156,7 @@ export interface ProjectTaskListDto {
     name: string;
     type: SimpleNavigationDto;
     status: SimpleNavigationDto;
-    priority?: SimpleNavigationDto | undefined;
+    priority: SimpleNavigationDto;
     order: number;
     parentId?: string | undefined;
     parent?: ProjectTaskNavigationDto | undefined;
@@ -18253,8 +18253,8 @@ export interface CreateProjectTaskRequest {
     description?: string | undefined;
     /** The type of task (Task or Milestone). */
     typeId: number;
-    /** The priority level of the task (optional). */
-    priorityId?: number | undefined;
+    /** The priority level of the task. */
+    priorityId: number;
     /** The ID of the parent task (optional). */
     parentId?: string | undefined;
     /** The ID of the team assigned to this task (optional). */
@@ -18292,8 +18292,10 @@ export interface UpdateProjectTaskRequest {
     description?: string | undefined;
     /** The current status of the task. */
     statusId: number;
-    /** The priority level of the task (optional). */
-    priorityId?: number | undefined;
+    /** The priority level of the task. */
+    priorityId: number;
+    /** The ID of the parent task (optional). */
+    parentId?: string | undefined;
     /** The ID of the team assigned to this task (optional). */
     teamId?: string | undefined;
     /** The planned start date for the task. */

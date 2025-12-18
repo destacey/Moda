@@ -17769,6 +17769,7 @@
           "name",
           "type",
           "status",
+          "priority",
           "order"
         ],
         "properties": {
@@ -17801,12 +17802,7 @@
             "$ref": "#/components/schemas/SimpleNavigationDto"
           },
           "priority": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/SimpleNavigationDto"
-              }
-            ]
+            "$ref": "#/components/schemas/SimpleNavigationDto"
           },
           "order": {
             "type": "integer",
@@ -18234,6 +18230,7 @@
         "required": [
           "name",
           "typeId",
+          "priorityId",
           "plannedDate"
         ],
         "properties": {
@@ -18258,9 +18255,8 @@
           },
           "priorityId": {
             "type": "integer",
-            "description": "The priority level of the task (optional).",
-            "format": "int32",
-            "nullable": true
+            "description": "The priority level of the task.",
+            "format": "int32"
           },
           "parentId": {
             "type": "string",
@@ -18355,7 +18351,8 @@
         "required": [
           "id",
           "name",
-          "statusId"
+          "statusId",
+          "priorityId"
         ],
         "properties": {
           "id": {
@@ -18387,9 +18384,15 @@
           },
           "priorityId": {
             "type": "integer",
-            "description": "The priority level of the task (optional).",
-            "format": "int32",
-            "nullable": true
+            "description": "The priority level of the task.",
+            "format": "int32"
+          },
+          "parentId": {
+            "type": "string",
+            "description": "The ID of the parent task (optional).",
+            "format": "guid",
+            "nullable": true,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "teamId": {
             "type": "string",

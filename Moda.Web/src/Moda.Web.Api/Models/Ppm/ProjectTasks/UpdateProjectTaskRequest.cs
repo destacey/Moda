@@ -27,9 +27,14 @@ public sealed record UpdateProjectTaskRequest
     public int StatusId { get; set; }
 
     /// <summary>
-    /// The priority level of the task (optional).
+    /// The priority level of the task.
     /// </summary>
-    public int? PriorityId { get; set; }
+    public int PriorityId { get; set; }
+
+    /// <summary>
+    /// The ID of the parent task (optional).
+    /// </summary>
+    public Guid? ParentId { get; set; }
 
     /// <summary>
     /// The ID of the team assigned to this task (optional).
@@ -100,7 +105,8 @@ public sealed record UpdateProjectTaskRequest
             Name,
             Description,
             (TaskStatus)StatusId,
-            PriorityId.HasValue ? (TaskPriority)PriorityId.Value : null,
+            (TaskPriority)PriorityId,
+            ParentId,
             TeamId,
             plannedDateRange,
             PlannedDate,
@@ -132,28 +138,27 @@ public sealed class UpdateProjectTaskRequestValidator : CustomValidator<UpdatePr
             .WithMessage("Invalid task status.");
 
         RuleFor(x => x.PriorityId)
-            .Must(priority => Enum.IsDefined(typeof(TaskPriority), priority!.Value))
-            .When(x => x.PriorityId.HasValue)
+            .Must(priority => Enum.IsDefined(typeof(TaskPriority), priority))
             .WithMessage("Invalid task priority.");
 
         RuleFor(x => x.TeamId)
             .Must(id => id == null || id != Guid.Empty)
             .WithMessage("TeamId cannot be an empty GUID.");
 
-        RuleFor(x => x)
-            .Must(x => (x.PlannedStart == null && x.PlannedEnd == null) || (x.PlannedStart != null && x.PlannedEnd != null))
+        RuleFor(x => x.PlannedStart)
+            .Must((request, plannedStart) => (request.PlannedStart == null && request.PlannedEnd == null) || (request.PlannedStart != null && request.PlannedEnd != null))
             .WithMessage("PlannedStart and PlannedEnd must either both be null or both have a value.");
 
-        RuleFor(x => x)
-            .Must(x => x.PlannedStart == null || x.PlannedEnd == null || x.PlannedStart <= x.PlannedEnd)
+        RuleFor(x => x.PlannedEnd)
+            .Must((request, plannedEnd) => request.PlannedStart == null || request.PlannedEnd == null || request.PlannedStart <= request.PlannedEnd)
             .WithMessage("PlannedEnd must be greater than or equal to PlannedStart.");
 
-        RuleFor(x => x)
-            .Must(x => (x.ActualStart == null && x.ActualEnd == null) || (x.ActualStart != null && x.ActualEnd != null))
+        RuleFor(x => x.ActualStart)
+            .Must((request, actualStart) => (request.ActualStart == null && request.ActualEnd == null) || (request.ActualStart != null && request.ActualEnd != null))
             .WithMessage("ActualStart and ActualEnd must either both be null or both have a value.");
 
-        RuleFor(x => x)
-            .Must(x => x.ActualStart == null || x.ActualEnd == null || x.ActualStart <= x.ActualEnd)
+        RuleFor(x => x.ActualEnd)
+            .Must((request, actualEnd) => request.ActualStart == null || request.ActualEnd == null || request.ActualStart <= request.ActualEnd)
             .WithMessage("ActualEnd must be greater than or equal to ActualStart.");
 
         RuleFor(x => x.EstimatedEffortHours)

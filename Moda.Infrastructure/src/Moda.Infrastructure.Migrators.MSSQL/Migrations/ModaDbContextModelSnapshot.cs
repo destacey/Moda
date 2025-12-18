@@ -2061,6 +2061,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasColumnName("PlannedDate");
 
                     b.Property<string>("Priority")
+                        .IsRequired()
                         .HasMaxLength(32)
                         .HasColumnType("varchar");
 

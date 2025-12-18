@@ -10,7 +10,7 @@ namespace Moda.ProjectPortfolioManagement.Domain.Models;
 /// </summary>
 public sealed class ProjectTaskKey : ValueObject
 {
-    internal const string ValidationRegex = "^([A-Z0-9]{2,20})-T(\\d+)$";
+    internal const string ValidationRegex = "^([A-Z0-9]{2,20})-(\\d+)$";
 
     private ProjectTaskKey() { }
 
@@ -40,7 +40,7 @@ public sealed class ProjectTaskKey : ValueObject
         Guard.Against.Null(projectKey, nameof(projectKey));
         Guard.Against.NegativeOrZero(taskNumber, nameof(taskNumber));
 
-        string value = $"{projectKey.Value}-T{taskNumber}";
+        string value = $"{projectKey.Value}-{taskNumber}";
 
         if (!ValidateFormat(value))
         {

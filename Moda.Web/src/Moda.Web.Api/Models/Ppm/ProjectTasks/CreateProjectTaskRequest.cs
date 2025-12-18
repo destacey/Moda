@@ -21,9 +21,9 @@ public sealed record CreateProjectTaskRequest
     public int TypeId { get; set; }
 
     /// <summary>
-    /// The priority level of the task (optional).
+    /// The priority level of the task.
     /// </summary>
-    public int? PriorityId { get; set; }
+    public int PriorityId { get; set; }
 
     /// <summary>
     /// The ID of the parent task (optional).
@@ -75,7 +75,7 @@ public sealed record CreateProjectTaskRequest
             Name,
             Description,
             (ProjectTaskType)TypeId,
-            PriorityId.HasValue ? (TaskPriority)PriorityId.Value : null,
+            (TaskPriority)PriorityId,
             ParentId,
             TeamId,
             plannedDateRange,
@@ -115,8 +115,7 @@ public sealed class CreateProjectTaskRequestValidator : CustomValidator<CreatePr
             .WithMessage("Invalid task type.");
 
         RuleFor(x => x.PriorityId)
-            .Must(priority => Enum.IsDefined(typeof(TaskPriority), priority!.Value))
-            .When(x => x.PriorityId.HasValue)
+            .Must(priority => Enum.IsDefined(typeof(TaskPriority), priority))
             .WithMessage("Invalid task priority.");
 
         RuleFor(x => x.ParentId)
@@ -133,8 +132,8 @@ public sealed class CreateProjectTaskRequestValidator : CustomValidator<CreatePr
             .When(x => x.TypeId == (int)ProjectTaskType.Milestone)
             .WithMessage("PlannedDate is required for milestones.");
 
-        RuleFor(x => x)
-            .Must(x => x.TypeId != (int)ProjectTaskType.Milestone || (x.PlannedStart == null && x.PlannedEnd == null))
+        RuleFor(x => x.PlannedStart)
+            .Must((request, plannedStart) => request.TypeId != (int)ProjectTaskType.Milestone || (request.PlannedStart == null && request.PlannedEnd == null))
             .WithMessage("Milestones cannot have a planned date range.");
 
         // Task-specific validations
@@ -143,13 +142,13 @@ public sealed class CreateProjectTaskRequestValidator : CustomValidator<CreatePr
             .When(x => x.TypeId == (int)ProjectTaskType.Task)
             .WithMessage("Tasks cannot have a single planned date. Use PlannedStart and PlannedEnd instead.");
 
-        RuleFor(x => x)
-            .Must(x => (x.PlannedStart == null && x.PlannedEnd == null) || (x.PlannedStart != null && x.PlannedEnd != null))
+        RuleFor(x => x.PlannedStart)
+            .Must((request, plannedStart) => (request.PlannedStart == null && request.PlannedEnd == null) || (request.PlannedStart != null && request.PlannedEnd != null))
             .When(x => x.TypeId == (int)ProjectTaskType.Task)
             .WithMessage("PlannedStart and PlannedEnd must either both be null or both have a value.");
 
-        RuleFor(x => x)
-            .Must(x => x.PlannedStart == null || x.PlannedEnd == null || x.PlannedStart <= x.PlannedEnd)
+        RuleFor(x => x.PlannedEnd)
+            .Must((request, plannedEnd) => request.PlannedStart == null || request.PlannedEnd == null || request.PlannedStart <= request.PlannedEnd)
             .When(x => x.TypeId == (int)ProjectTaskType.Task)
             .WithMessage("PlannedEnd must be greater than or equal to PlannedStart.");
 

@@ -577,11 +577,11 @@ public class ProjectTaskConfiguration : IEntityTypeConfiguration<ProjectTask>
             .HasColumnType("varchar");
 
         builder.Property(t => t.Status).IsRequired()
-            .HasConversion<EnumConverter<Moda.ProjectPortfolioManagement.Domain.Enums.TaskStatus>>()
+            .HasConversion<EnumConverter<ProjectPortfolioManagement.Domain.Enums.TaskStatus>>()
             .HasMaxLength(32)
             .HasColumnType("varchar");
 
-        builder.Property(t => t.Priority)
+        builder.Property(t => t.Priority).IsRequired()
             .HasConversion<EnumConverter<TaskPriority>>()
             .HasMaxLength(32)
             .HasColumnType("varchar");

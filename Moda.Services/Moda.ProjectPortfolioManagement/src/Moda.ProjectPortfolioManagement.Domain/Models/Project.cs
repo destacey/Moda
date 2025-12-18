@@ -329,10 +329,11 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasProjectIdA
     /// Creates a new task within this project.
     /// </summary>
     public Result<ProjectTask> CreateTask(
+        int key,
         string name,
         string? description,
         ProjectTaskType type,
-        TaskPriority? priority,
+        TaskPriority priority,
         Guid? parentId,
         Guid? teamId,
         FlexibleDateRange? plannedDateRange,
@@ -366,13 +367,10 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasProjectIdA
             : _tasks.Where(t => t.ParentId is null);
         var order = siblings.Any() ? siblings.Max(t => t.Order) + 1 : 1;
 
-        // Get next task number (will be handled by DB sequence in practice, but for domain logic we calculate it)
-        var nextNumber = _tasks.Count > 0 ? _tasks.Max(t => t.Key) + 1 : 1;
-
         var task = ProjectTask.Create(
             Id,
             Key,
-            nextNumber,
+            key,
             name,
             description,
             type,

@@ -47,7 +47,7 @@ public sealed record ProjectTaskTreeDto : IMapFrom<ProjectTask>
             .Map(dest => dest.TaskKey, src => src.TaskKey.Value)
             .Map(dest => dest.Type, src => SimpleNavigationDto.FromEnum(src.Type))
             .Map(dest => dest.Status, src => SimpleNavigationDto.FromEnum(src.Status))
-            .Map(dest => dest.Priority, src => src.Priority.HasValue ? SimpleNavigationDto.FromEnum(src.Priority.Value) : null)
+            .Map(dest => dest.Priority, src => SimpleNavigationDto.FromEnum(src.Priority))
             .Map(dest => dest.PlannedStart, src => src.PlannedDateRange != null ? src.PlannedDateRange.Start : (LocalDate?)null)
             .Map(dest => dest.PlannedEnd, src => src.PlannedDateRange != null ? src.PlannedDateRange.End : null)
             .Map(dest => dest.ActualStart, src => src.ActualDateRange != null ? src.ActualDateRange.Start : (LocalDate?)null)
