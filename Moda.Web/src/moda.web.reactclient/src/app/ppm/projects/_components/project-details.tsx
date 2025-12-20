@@ -6,6 +6,7 @@ import { ProjectDetailsDto } from '@/src/services/moda-api'
 import { getSortedNames } from '@/src/utils'
 import { Descriptions } from 'antd'
 import Link from 'next/link'
+import { FC } from 'react'
 
 const { Item } = Descriptions
 
@@ -13,7 +14,7 @@ export interface ProjectDetailsProps {
   project: ProjectDetailsDto
 }
 
-const ProjectDetails: React.FC<ProjectDetailsProps> = ({
+const ProjectDetails: FC<ProjectDetailsProps> = ({
   project,
 }: ProjectDetailsProps) => {
   if (!project) return null

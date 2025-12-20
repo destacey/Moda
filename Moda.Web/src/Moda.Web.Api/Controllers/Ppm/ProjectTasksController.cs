@@ -233,6 +233,17 @@ public class ProjectTasksController(ILogger<ProjectTasksController> logger, ISen
         return Ok(items.OrderBy(c => c.Order));
     }
 
+    [HttpGet("types")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Projects)]
+    [OpenApiOperation("Get a list of all task types.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IEnumerable<ProjectTaskTypeDto>>> GetProjectTaskTypes(string projectIdOrKey, CancellationToken cancellationToken)
+    {
+        var items = await _sender.Send(new GetProjectTaskTypesQuery(), cancellationToken);
+        return Ok(items.OrderBy(c => c.Order));
+    }
+
     private async Task<Guid?> ResolveProjectId(string projectIdOrKey, CancellationToken cancellationToken)
     {
         if (Guid.TryParse(projectIdOrKey, out var id))

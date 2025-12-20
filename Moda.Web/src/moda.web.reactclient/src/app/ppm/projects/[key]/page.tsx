@@ -12,11 +12,7 @@ import {
   useGetProjectQuery,
   useGetProjectWorkItemsQuery,
 } from '@/src/store/features/ppm/projects-api'
-import {
-  useGetProjectTaskTreeQuery,
-  useUpdateProjectTaskMutation,
-} from '@/src/store/features/ppm/project-tasks-api'
-import { Alert, Card, MenuProps, theme } from 'antd'
+import { Alert, Card, MenuProps } from 'antd'
 import { notFound, usePathname, useRouter } from 'next/navigation'
 import { use, useCallback, useEffect, useMemo, useState } from 'react'
 import ProjectDetailsLoading from './loading'
@@ -26,15 +22,12 @@ import {
   DeleteProjectForm,
   EditProjectForm,
   ProjectDetails,
-  ProjectTasksTable,
-  CreateProjectTaskForm,
-  EditProjectTaskForm,
-  DeleteProjectTaskForm,
 } from '../_components'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import { ItemType } from 'antd/es/menu/interface'
 import { ProjectStatusAction } from '../_components/change-project-status-form'
 import { WorkItemsGrid } from '@/src/components/common/work'
+import ProjectTasks from '../_components/project-tasks'
 
 enum ProjectTabs {
   Details = 'details',
@@ -69,8 +62,6 @@ enum ProjectAction {
 const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const { key: projectKey } = use(props.params)
 
-  useDocumentTitle('Project Details')
-
   const [activeTab, setActiveTab] = useState(ProjectTabs.Details)
   const [openEditProjectForm, setOpenEditProjectForm] = useState<boolean>(false)
   const [openChangeProgramForm, setOpenChangeProgramForm] =
@@ -84,14 +75,6 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const [openDeleteProjectForm, setOpenDeleteProjectForm] =
     useState<boolean>(false)
 
-  // Task form state
-  const [openCreateTaskForm, setOpenCreateTaskForm] = useState<boolean>(false)
-  const [openEditTaskForm, setOpenEditTaskForm] = useState<boolean>(false)
-  const [openDeleteTaskForm, setOpenDeleteTaskForm] = useState<boolean>(false)
-  const [selectedTaskId, setSelectedTaskId] = useState<string | undefined>(
-    undefined,
-  )
-
   const pathname = usePathname()
   const dispatch = useAppDispatch()
 
@@ -104,27 +87,16 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const {
     data: projectData,
     isLoading,
-    error,
     refetch: refetchProject,
   } = useGetProjectQuery(projectKey)
+
+  useDocumentTitle(`${projectKey} - Project Details`)
 
   const {
     data: workItemsData,
     isLoading: workItemsDataIsLoading,
-    error: workItemsDataError,
     refetch: refetchWorkItemsData,
   } = useGetProjectWorkItemsQuery(projectData?.id, { skip: !projectData?.id })
-
-  const {
-    data: tasksData,
-    isLoading: tasksDataIsLoading,
-    refetch: refetchTasksData,
-  } = useGetProjectTaskTreeQuery(
-    { projectIdOrKey: projectData?.key || '' },
-    { skip: !projectData?.key },
-  )
-
-  const [updateProjectTask] = useUpdateProjectTaskMutation()
 
   useEffect(() => {
     if (!projectData) return
@@ -146,173 +118,15 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     dispatch(setBreadcrumbRoute({ route: breadcrumbRoute, pathname }))
   }, [dispatch, pathname, projectData])
 
-  useEffect(() => {
-    error && console.error(error)
-  }, [error])
-
-  // Task form handlers
-  const handleCreateTask = useCallback(() => {
-    setOpenCreateTaskForm(true)
-  }, [])
-
-  const handleEditTask = useCallback((task: any) => {
-    setSelectedTaskId(task.id)
-    setOpenEditTaskForm(true)
-  }, [])
-
-  const handleDeleteTask = useCallback((task: any) => {
-    setSelectedTaskId(task.id)
-    setOpenDeleteTaskForm(true)
-  }, [])
-
-  const handleUpdateTaskField = useCallback(
-    async (taskId: string, updates: Partial<any>) => {
-      if (!projectData?.key) return
-
-      // Find the task in the tree
-      const findTask = (tasks: any[], id: string): any => {
-        for (const task of tasks) {
-          if (task.id === id) return task
-          if (task.children?.length) {
-            const found = findTask(task.children, id)
-            if (found) return found
-          }
-        }
-        return null
-      }
-
-      const task = findTask(tasksData || [], taskId)
-      if (!task) return
-
-      try {
-        await updateProjectTask({
-          projectIdOrKey: projectData.key,
-          cacheKey: taskId,
-          request: {
-            id: task.id,
-            name: updates.name ?? task.name,
-            description: updates.description ?? task.description,
-            statusId: updates.statusId ?? task.status?.id,
-            priorityId: updates.priorityId ?? task.priority?.id,
-            parentId: task.parentId,
-            teamId: task.team?.id,
-            plannedStart:
-              updates.plannedStart !== undefined
-                ? updates.plannedStart
-                : task.plannedStart,
-            plannedEnd:
-              updates.plannedEnd !== undefined
-                ? updates.plannedEnd
-                : task.plannedEnd,
-            plannedDate: updates.plannedDate ?? task.plannedDate,
-            actualStart: task.actualStart,
-            actualEnd: task.actualEnd,
-            actualDate: task.actualDate,
-            estimatedEffortHours: task.estimatedEffortHours,
-            actualEffortHours: task.actualEffortHours,
-            assignments: [],
-          },
-        }).unwrap()
-      } catch (error) {
-        console.error('Failed to update task:', error)
-      }
-    },
-    [projectData?.key, tasksData, updateProjectTask],
-  )
-
-  const handleUpdateStatus = useCallback(
-    async (taskId: string, statusId: number) => {
-      await handleUpdateTaskField(taskId, { statusId })
-    },
-    [handleUpdateTaskField],
-  )
-
-  const handleUpdatePriority = useCallback(
-    async (taskId: string, priorityId: number) => {
-      await handleUpdateTaskField(taskId, { priorityId })
-    },
-    [handleUpdateTaskField],
-  )
-
-  const handleUpdateName = useCallback(
-    async (taskId: string, name: string) => {
-      await handleUpdateTaskField(taskId, { name })
-    },
-    [handleUpdateTaskField],
-  )
-
-  const handleUpdateType = useCallback(
-    async (taskId: string, typeId: number) => {
-      await handleUpdateTaskField(taskId, { typeId })
-    },
-    [handleUpdateTaskField],
-  )
-
-  const handleUpdatePlannedStart = useCallback(
-    async (taskId: string, date: string | null) => {
-      await handleUpdateTaskField(taskId, { plannedStart: date })
-    },
-    [handleUpdateTaskField],
-  )
-
-  const handleUpdatePlannedEnd = useCallback(
-    async (taskId: string, date: string | null) => {
-      await handleUpdateTaskField(taskId, { plannedEnd: date })
-    },
-    [handleUpdateTaskField],
-  )
-
-  const onCreateTaskFormClosed = useCallback(
-    (wasSaved: boolean) => {
-      setOpenCreateTaskForm(false)
-      if (wasSaved) {
-        refetchTasksData()
-      }
-    },
-    [refetchTasksData],
-  )
-
-  const onEditTaskFormClosed = useCallback(
-    (wasSaved: boolean) => {
-      setOpenEditTaskForm(false)
-      setSelectedTaskId(undefined)
-      if (wasSaved) {
-        refetchTasksData()
-      }
-    },
-    [refetchTasksData],
-  )
-
-  const onDeleteTaskFormClosed = useCallback(
-    (wasDeleted: boolean) => {
-      setOpenDeleteTaskForm(false)
-      setSelectedTaskId(undefined)
-      if (wasDeleted) {
-        refetchTasksData()
-      }
-    },
-    [refetchTasksData],
-  )
-
   const renderTabContent = useCallback(() => {
     switch (activeTab) {
       case ProjectTabs.Details:
         return <ProjectDetails project={projectData} />
       case ProjectTabs.Tasks:
         return (
-          <ProjectTasksTable
-            tasks={tasksData || []}
-            isLoading={tasksDataIsLoading}
-            onCreateTask={handleCreateTask}
-            onEditTask={handleEditTask}
-            onDeleteTask={handleDeleteTask}
-            onRefresh={refetchTasksData}
-            onUpdateStatus={handleUpdateStatus}
-            onUpdatePriority={handleUpdatePriority}
-            onUpdateName={handleUpdateName}
-            onUpdateType={handleUpdateType}
-            onUpdatePlannedStart={handleUpdatePlannedStart}
-            onUpdatePlannedEnd={handleUpdatePlannedEnd}
+          <ProjectTasks
+            project={projectData}
+            canManageTasks={canUpdateProject}
           />
         )
       case ProjectTabs.WorkItems:
@@ -329,12 +143,8 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     }
   }, [
     activeTab,
+    canUpdateProject,
     projectData,
-    tasksData,
-    tasksDataIsLoading,
-    handleCreateTask,
-    handleEditTask,
-    handleDeleteTask,
     refetchWorkItemsData,
     workItemsData,
     workItemsDataIsLoading,
@@ -577,33 +387,6 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
           showForm={openDeleteProjectForm}
           onFormComplete={() => onDeleteProjectFormClosed(true)}
           onFormCancel={() => onDeleteProjectFormClosed(false)}
-        />
-      )}
-
-      {openCreateTaskForm && (
-        <CreateProjectTaskForm
-          projectIdOrKey={projectData?.key || ''}
-          showForm={openCreateTaskForm}
-          onFormComplete={() => onCreateTaskFormClosed(true)}
-          onFormCancel={() => onCreateTaskFormClosed(false)}
-        />
-      )}
-      {openEditTaskForm && selectedTaskId && (
-        <EditProjectTaskForm
-          projectIdOrKey={projectData?.key || ''}
-          taskIdOrKey={selectedTaskId}
-          showForm={openEditTaskForm}
-          onFormComplete={() => onEditTaskFormClosed(true)}
-          onFormCancel={() => onEditTaskFormClosed(false)}
-        />
-      )}
-      {openDeleteTaskForm && selectedTaskId && (
-        <DeleteProjectTaskForm
-          projectIdOrKey={projectData?.key || ''}
-          taskIdOrKey={selectedTaskId}
-          showForm={openDeleteTaskForm}
-          onFormComplete={() => onDeleteTaskFormClosed(true)}
-          onFormCancel={() => onDeleteTaskFormClosed(false)}
         />
       )}
     </>

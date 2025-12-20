@@ -5350,6 +5350,59 @@
         ]
       }
     },
+    "/api/ppm/projects/{projectIdOrKey}/tasks/types": {
+      "get": {
+        "tags": [
+          "ProjectTasks"
+        ],
+        "summary": "Get a list of all task types.",
+        "operationId": "ProjectTasks_GetProjectTaskTypes",
+        "parameters": [
+          {
+            "name": "projectIdOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProjectTaskTypeDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
     "/api/ppm/strategic-initiatives": {
       "get": {
         "tags": [
@@ -17941,6 +17994,7 @@
           "status",
           "order",
           "wbs",
+          "assignments",
           "children"
         ],
         "properties": {
@@ -18005,6 +18059,12 @@
               }
             ]
           },
+          "assignments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProjectTaskAssignmentDto"
+            }
+          },
           "plannedStart": {
             "type": "string",
             "format": "date",
@@ -18050,6 +18110,29 @@
             "items": {
               "$ref": "#/components/schemas/ProjectTaskTreeDto"
             }
+          }
+        }
+      },
+      "ProjectTaskAssignmentDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "employeeId",
+          "employee",
+          "role"
+        ],
+        "properties": {
+          "employeeId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "employee": {
+            "$ref": "#/components/schemas/EmployeeNavigationDto"
+          },
+          "role": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
           }
         }
       },
@@ -18179,29 +18262,6 @@
             "type": "number",
             "format": "decimal",
             "nullable": true
-          }
-        }
-      },
-      "ProjectTaskAssignmentDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "employeeId",
-          "employee",
-          "role"
-        ],
-        "properties": {
-          "employeeId": {
-            "type": "string",
-            "format": "guid",
-            "nullable": false,
-            "example": "00000000-0000-0000-0000-000000000000"
-          },
-          "employee": {
-            "$ref": "#/components/schemas/EmployeeNavigationDto"
-          },
-          "role": {
-            "$ref": "#/components/schemas/SimpleNavigationDto"
           }
         }
       },
@@ -18541,6 +18601,32 @@
         }
       },
       "TaskPriorityDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "order"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "order": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "ProjectTaskTypeDto": {
         "type": "object",
         "additionalProperties": false,
         "required": [

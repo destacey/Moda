@@ -74,6 +74,7 @@ export enum QueryTags {
   ProjectWorkItems = 'Ppm.Project.WorkItems',
   TaskStatusOptions = 'Ppm.Project.Task.StatusOptions',
   TaskPriorityOptions = 'Ppm.Project.Task.PriorityOptions',
+  TaskTypeOptions = 'Ppm.Project.Task.TypeOptions',
   StrategicInitiative = 'Ppm.StrategicInitiative',
   StrategicInitiativeKpi = 'Ppm.StrategicInitiativeKpi',
   StrategicInitiativeKpiCheckpoint = 'Ppm.StrategicInitiativeKpiCheckpoint',

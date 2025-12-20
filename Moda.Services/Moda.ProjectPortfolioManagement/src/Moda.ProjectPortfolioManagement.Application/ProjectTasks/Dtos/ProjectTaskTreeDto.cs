@@ -1,4 +1,5 @@
 using Moda.Common.Application.Dtos;
+using Moda.Common.Application.Employees.Dtos;
 using Moda.ProjectPortfolioManagement.Application.PpmTeams.Dtos;
 using Moda.ProjectPortfolioManagement.Domain.Models;
 
@@ -27,6 +28,7 @@ public sealed record ProjectTaskTreeDto : IMapFrom<ProjectTask>
     public required string Wbs { get; set; }
 
     public PpmTeamNavigationDto? Team { get; set; }
+    public List<ProjectTaskAssignmentDto> Assignments { get; set; } = [];
     public LocalDate? PlannedStart { get; set; }
     public LocalDate? PlannedEnd { get; set; }
     public LocalDate? PlannedDate { get; set; }
@@ -52,6 +54,12 @@ public sealed record ProjectTaskTreeDto : IMapFrom<ProjectTask>
             .Map(dest => dest.PlannedEnd, src => src.PlannedDateRange != null ? src.PlannedDateRange.End : null)
             .Map(dest => dest.ActualStart, src => src.ActualDateRange != null ? src.ActualDateRange.Start : (LocalDate?)null)
             .Map(dest => dest.ActualEnd, src => src.ActualDateRange != null ? src.ActualDateRange.End : null)
+            .Map(dest => dest.Assignments, src => src.Assignments.Select(a => new ProjectTaskAssignmentDto
+            {
+                EmployeeId = a.EmployeeId,
+                Employee = EmployeeNavigationDto.From(a.Employee!),
+                Role = SimpleNavigationDto.FromEnum(a.Role)
+            }).ToList())
             .Map(dest => dest.Wbs, src => string.Empty) // WBS will be calculated by WbsCalculator in the query handler
             .Map(dest => dest.Children, src => new List<ProjectTaskTreeDto>()); // Children will be populated in the query handler
     }

@@ -6363,6 +6363,67 @@ export class ProjectTasksClient {
         }
         return Promise.resolve<TaskPriorityDto[]>(null as any);
     }
+
+    /**
+     * Get a list of all task types.
+     */
+    getProjectTaskTypes(projectIdOrKey: string, cancelToken?: CancelToken): Promise<ProjectTaskTypeDto[]> {
+        let url_ = this.baseUrl + "/api/ppm/projects/{projectIdOrKey}/tasks/types";
+        if (projectIdOrKey === undefined || projectIdOrKey === null)
+            throw new globalThis.Error("The parameter 'projectIdOrKey' must be defined.");
+        url_ = url_.replace("{projectIdOrKey}", encodeURIComponent("" + projectIdOrKey));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetProjectTaskTypes(_response);
+        });
+    }
+
+    protected processGetProjectTaskTypes(response: AxiosResponse): Promise<ProjectTaskTypeDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<ProjectTaskTypeDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ProjectTaskTypeDto[]>(null as any);
+    }
 }
 
 export class StrategicInitiativesClient {
@@ -18199,6 +18260,7 @@ export interface ProjectTaskTreeDto {
     parentId?: string | undefined;
     wbs: string;
     team?: PpmTeamNavigationDto | undefined;
+    assignments: ProjectTaskAssignmentDto[];
     plannedStart?: Date | undefined;
     plannedEnd?: Date | undefined;
     plannedDate?: Date | undefined;
@@ -18208,6 +18270,12 @@ export interface ProjectTaskTreeDto {
     estimatedEffortHours?: number | undefined;
     actualEffortHours?: number | undefined;
     children: ProjectTaskTreeDto[];
+}
+
+export interface ProjectTaskAssignmentDto {
+    employeeId: string;
+    employee: EmployeeNavigationDto;
+    role: SimpleNavigationDto;
 }
 
 export interface ProjectTaskDto {
@@ -18233,12 +18301,6 @@ export interface ProjectTaskDto {
     actualDate?: Date | undefined;
     estimatedEffortHours?: number | undefined;
     actualEffortHours?: number | undefined;
-}
-
-export interface ProjectTaskAssignmentDto {
-    employeeId: string;
-    employee: EmployeeNavigationDto;
-    role: SimpleNavigationDto;
 }
 
 export interface ObjectIdAndTaskKey {
@@ -18340,6 +18402,13 @@ export interface TaskStatusDto {
 }
 
 export interface TaskPriorityDto {
+    id: number;
+    name: string;
+    description?: string | undefined;
+    order: number;
+}
+
+export interface ProjectTaskTypeDto {
     id: number;
     name: string;
     description?: string | undefined;

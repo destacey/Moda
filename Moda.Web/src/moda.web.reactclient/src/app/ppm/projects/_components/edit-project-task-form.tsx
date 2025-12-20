@@ -25,6 +25,8 @@ import dayjs from 'dayjs'
 import { useCallback, useEffect, useState } from 'react'
 
 const { Item } = Form
+const { TextArea } = Input
+const { Group: RadioGroup } = Radio
 const { RangePicker } = DatePicker
 
 export interface EditProjectTaskFormProps {
@@ -80,31 +82,23 @@ const EditProjectTaskForm = (props: EditProjectTaskFormProps) => {
     data: taskData,
     isLoading,
     error,
-  } = useGetProjectTaskQuery(
-    {
-      projectIdOrKey: props.projectIdOrKey,
-      idOrTaskKey: props.taskIdOrKey,
-    },
-    { skip: !props.showForm },
-  )
+  } = useGetProjectTaskQuery({
+    projectIdOrKey: props.projectIdOrKey,
+    idOrTaskKey: props.taskIdOrKey,
+  })
 
-  const { data: statusOptions = [] } = useGetTaskStatusOptionsQuery(
-    { projectIdOrKey: props.projectIdOrKey },
-    { skip: !props.showForm },
-  )
+  const { data: statusOptions = [] } = useGetTaskStatusOptionsQuery({
+    projectIdOrKey: props.projectIdOrKey,
+  })
 
-  const { data: priorityOptions = [] } = useGetTaskPriorityOptionsQuery(
-    { projectIdOrKey: props.projectIdOrKey },
-    { skip: !props.showForm },
-  )
+  const { data: priorityOptions = [] } = useGetTaskPriorityOptionsQuery({
+    projectIdOrKey: props.projectIdOrKey,
+  })
 
-  const { data: parentTaskOptions = [] } = useGetParentTaskOptionsQuery(
-    {
-      projectIdOrKey: props.projectIdOrKey,
-      excludeTaskId: taskData?.id,
-    },
-    { skip: !props.showForm || !taskData?.id },
-  )
+  const { data: parentTaskOptions = [] } = useGetParentTaskOptionsQuery({
+    projectIdOrKey: props.projectIdOrKey,
+    excludeTaskId: taskData?.id,
+  })
 
   const { hasPermissionClaim } = useAuth()
   const canUpdateTask = hasPermissionClaim('Permissions.Projects.Update')
@@ -229,10 +223,11 @@ const EditProjectTaskForm = (props: EditProjectTaskFormProps) => {
       okText="Save"
       confirmLoading={isSaving}
       onCancel={handleCancel}
+      mask={{ blur: false }}
       maskClosable={false}
       keyboard={false}
       destroyOnHidden={true}
-      width={600}
+      width={500}
     >
       <Form
         form={form}
@@ -245,31 +240,31 @@ const EditProjectTaskForm = (props: EditProjectTaskFormProps) => {
             allowClear
             placeholder="Select parent task (optional)"
             treeData={parentTaskOptions}
-            showSearch
             treeDefaultExpandAll
-            filterTreeNode={(input, node) =>
-              (node?.title ?? '')
-                .toString()
-                .toLowerCase()
-                .includes(input.toLowerCase())
-            }
+            showSearch={{
+              filterTreeNode: (input, node) =>
+                node.title
+                  ?.toString()
+                  .toLowerCase()
+                  .includes(input.toLowerCase()),
+            }}
           />
         </Item>
-
         <Item
-          name="name"
           label="Name"
+          name="name"
           rules={[
-            {
-              required: true,
-              message: 'Please enter a task name',
-            },
+            { required: true, message: 'Name is required' },
+            { max: 256 },
           ]}
         >
-          <Input placeholder="Enter task name" />
+          <TextArea
+            autoSize={{ minRows: 1, maxRows: 2 }}
+            showCount
+            maxLength={256}
+          />
         </Item>
-
-        <Item name="description" label="Description">
+        <Item name="description" label="Description" rules={[{ max: 2048 }]}>
           <MarkdownEditor maxLength={2048} />
         </Item>
 
@@ -278,13 +273,11 @@ const EditProjectTaskForm = (props: EditProjectTaskFormProps) => {
           label="Status"
           rules={[{ required: true, message: 'Please select a status' }]}
         >
-          <Radio.Group optionType="button" buttonStyle="solid">
-            {statusOptions.map((option) => (
-              <Radio.Button key={option.value} value={option.value}>
-                {option.label}
-              </Radio.Button>
-            ))}
-          </Radio.Group>
+          <RadioGroup
+            options={statusOptions}
+            optionType="button"
+            buttonStyle="solid"
+          />
         </Item>
 
         <Item
@@ -292,33 +285,31 @@ const EditProjectTaskForm = (props: EditProjectTaskFormProps) => {
           label="Priority"
           rules={[{ required: true, message: 'Please select a priority' }]}
         >
-          <Radio.Group optionType="button" buttonStyle="solid">
-            {priorityOptions.map((option) => (
-              <Radio.Button key={option.value} value={option.value}>
-                {option.label}
-              </Radio.Button>
-            ))}
-          </Radio.Group>
+          <RadioGroup
+            options={priorityOptions}
+            optionType="button"
+            buttonStyle="solid"
+          />
         </Item>
 
         {!isMilestone ? (
           <>
             <Item name="plannedRange" label="Planned Date Range">
-              <RangePicker style={{ width: '100%' }} format="MMM D, YYYY" />
+              <RangePicker style={{ width: '60%' }} format="MMM D, YYYY" />
             </Item>
 
             <Item name="estimatedEffortHours" label="Estimated Effort (hours)">
               <InputNumber
                 min={0}
-                step={0.5}
-                style={{ width: '100%' }}
+                step={0.25}
+                style={{ width: '33%' }}
                 placeholder="Enter estimated hours"
               />
             </Item>
           </>
         ) : (
           <Item name="plannedDate" label="Planned Date">
-            <DatePicker style={{ width: '100%' }} format="MMM D, YYYY" />
+            <DatePicker style={{ width: '60%' }} format="MMM D, YYYY" />
           </Item>
         )}
       </Form>

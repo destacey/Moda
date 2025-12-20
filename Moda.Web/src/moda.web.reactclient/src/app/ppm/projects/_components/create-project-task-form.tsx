@@ -7,6 +7,7 @@ import { CreateProjectTaskRequest } from '@/src/services/moda-api'
 import {
   useCreateProjectTaskMutation,
   useGetTaskPriorityOptionsQuery,
+  useGetTaskTypeOptionsQuery,
   useGetParentTaskOptionsQuery,
 } from '@/src/store/features/ppm/project-tasks-api'
 import { toFormErrors } from '@/src/utils'
@@ -22,6 +23,8 @@ import {
 import { useCallback, useEffect, useState } from 'react'
 
 const { Item } = Form
+const { TextArea } = Input
+const { Group: RadioGroup } = Radio
 const { RangePicker } = DatePicker
 
 export interface CreateProjectTaskFormProps {
@@ -71,21 +74,27 @@ const CreateProjectTaskForm = (props: CreateProjectTaskFormProps) => {
   const [createProjectTask, { error: mutationError }] =
     useCreateProjectTaskMutation()
 
-  const { data: priorityOptions = [] } = useGetTaskPriorityOptionsQuery(
-    { projectIdOrKey: props.projectIdOrKey },
-    { skip: !props.showForm },
-  )
+  const { data: priorityOptions = [] } = useGetTaskPriorityOptionsQuery({
+    projectIdOrKey: props.projectIdOrKey,
+  })
 
-  const { data: parentTaskOptions = [] } = useGetParentTaskOptionsQuery(
-    { projectIdOrKey: props.projectIdOrKey },
-    { skip: !props.showForm },
-  )
+  const { data: typeOptions = [] } = useGetTaskTypeOptionsQuery({
+    projectIdOrKey: props.projectIdOrKey,
+  })
+
+  const { data: parentTaskOptions = [] } = useGetParentTaskOptionsQuery({
+    projectIdOrKey: props.projectIdOrKey,
+  })
 
   const { hasPermissionClaim } = useAuth()
   const canCreateTask = hasPermissionClaim('Permissions.Projects.Create')
 
   const selectedType = Form.useWatch('type', form)
-  const isMilestone = selectedType === 2 // Milestone
+  // Find the Milestone value dynamically from options
+  const milestoneValue = typeOptions.find(
+    (opt) => opt.label === 'Milestone',
+  )?.value
+  const isMilestone = selectedType === milestoneValue
 
   useEffect(() => {
     form.validateFields({ validateOnly: true }).then(
@@ -170,6 +179,7 @@ const CreateProjectTaskForm = (props: CreateProjectTaskFormProps) => {
       okText="Create"
       confirmLoading={isSaving}
       onCancel={handleCancel}
+      mask={{ blur: false }}
       maskClosable={false}
       keyboard={false}
       destroyOnHidden={true}
@@ -181,8 +191,9 @@ const CreateProjectTaskForm = (props: CreateProjectTaskFormProps) => {
         layout="vertical"
         name="create-project-task-form"
         initialValues={{
-          type: 1, // Task
-          priority: 2, // Medium
+          type: typeOptions.find((opt) => opt.label === 'Task')?.value ?? 1,
+          priority:
+            priorityOptions.find((opt) => opt.label === 'Medium')?.value ?? 2,
           parentId: props.parentTaskId,
         }}
       >
@@ -191,31 +202,31 @@ const CreateProjectTaskForm = (props: CreateProjectTaskFormProps) => {
             allowClear
             placeholder="Select parent task (optional)"
             treeData={parentTaskOptions}
-            showSearch
             treeDefaultExpandAll
-            filterTreeNode={(input, node) =>
-              (node?.title ?? '')
-                .toString()
-                .toLowerCase()
-                .includes(input.toLowerCase())
-            }
+            showSearch={{
+              filterTreeNode: (input, node) =>
+                node.title
+                  ?.toString()
+                  .toLowerCase()
+                  .includes(input.toLowerCase()),
+            }}
           />
         </Item>
-
         <Item
-          name="name"
           label="Name"
+          name="name"
           rules={[
-            {
-              required: true,
-              message: 'Please enter a task name',
-            },
+            { required: true, message: 'Name is required' },
+            { max: 256 },
           ]}
         >
-          <Input placeholder="Enter task name" />
+          <TextArea
+            autoSize={{ minRows: 1, maxRows: 2 }}
+            showCount
+            maxLength={256}
+          />
         </Item>
-
-        <Item name="description" label="Description">
+        <Item name="description" label="Description" rules={[{ max: 2048 }]}>
           <MarkdownEditor maxLength={2048} />
         </Item>
 
@@ -224,10 +235,11 @@ const CreateProjectTaskForm = (props: CreateProjectTaskFormProps) => {
           label="Type"
           rules={[{ required: true, message: 'Please select a type' }]}
         >
-          <Radio.Group optionType="button" buttonStyle="solid">
-            <Radio.Button value={1}>Task</Radio.Button>
-            <Radio.Button value={2}>Milestone</Radio.Button>
-          </Radio.Group>
+          <RadioGroup
+            options={typeOptions}
+            optionType="button"
+            buttonStyle="solid"
+          />
         </Item>
 
         <Item
@@ -235,13 +247,11 @@ const CreateProjectTaskForm = (props: CreateProjectTaskFormProps) => {
           label="Priority"
           rules={[{ required: true, message: 'Please select a priority' }]}
         >
-          <Radio.Group optionType="button" buttonStyle="solid">
-            {priorityOptions.map((option) => (
-              <Radio.Button key={option.value} value={option.value}>
-                {option.label}
-              </Radio.Button>
-            ))}
-          </Radio.Group>
+          <RadioGroup
+            options={priorityOptions}
+            optionType="button"
+            buttonStyle="solid"
+          />
         </Item>
 
         {!isMilestone ? (
@@ -261,7 +271,7 @@ const CreateProjectTaskForm = (props: CreateProjectTaskFormProps) => {
           </>
         ) : (
           <Item name="plannedDate" label="Planned Date">
-            <DatePicker style={{ width: '100%' }} format="MMM D, YYYY" />
+            <DatePicker style={{ width: '60%' }} format="MMM D, YYYY" />
           </Item>
         )}
       </Form>

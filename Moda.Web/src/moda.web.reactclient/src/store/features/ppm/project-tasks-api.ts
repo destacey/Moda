@@ -253,15 +253,15 @@ export const projectTasksApi = apiSlice.injectEndpoints({
     >({
       queryFn: async ({ projectIdOrKey }) => {
         try {
-          const data = await getProjectTasksClient().getTaskStatuses(
-            projectIdOrKey,
-          )
+          const data =
+            await getProjectTasksClient().getTaskStatuses(projectIdOrKey)
           return {
-            data: data.map((s) => ({
-              value: s.id,
-              label: s.name,
-              order: s.order,
-            })),
+            data: data
+              .sort((a, b) => a.order - b.order)
+              .map((s) => ({
+                value: s.id,
+                label: s.name,
+              })),
           }
         } catch (error) {
           console.error('API Error:', error)
@@ -276,24 +276,45 @@ export const projectTasksApi = apiSlice.injectEndpoints({
     >({
       queryFn: async ({ projectIdOrKey }) => {
         try {
-          const data = await getProjectTasksClient().getTaskPriorities(
-            projectIdOrKey,
-          )
+          const data =
+            await getProjectTasksClient().getTaskPriorities(projectIdOrKey)
           return {
-            data: data.map((p) => ({
-              value: p.id,
-              label: p.name,
-              order: p.order,
-            })),
+            data: data
+              .sort((a, b) => a.order - b.order)
+              .map((p) => ({
+                value: p.id,
+                label: p.name,
+              })),
           }
         } catch (error) {
           console.error('API Error:', error)
           return { error }
         }
       },
-      providesTags: () => [
-        { type: QueryTags.TaskPriorityOptions, id: 'LIST' },
-      ],
+      providesTags: () => [{ type: QueryTags.TaskPriorityOptions, id: 'LIST' }],
+    }),
+    getTaskTypeOptions: builder.query<
+      OptionModel<number>[],
+      { projectIdOrKey: string }
+    >({
+      queryFn: async ({ projectIdOrKey }) => {
+        try {
+          const data =
+            await getProjectTasksClient().getProjectTaskTypes(projectIdOrKey)
+          return {
+            data: data
+              .sort((a, b) => a.order - b.order)
+              .map((t) => ({
+                value: t.id,
+                label: t.name,
+              })),
+          }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: () => [{ type: QueryTags.TaskTypeOptions, id: 'LIST' }],
     }),
     getParentTaskOptions: builder.query<
       Array<{
@@ -309,9 +330,8 @@ export const projectTasksApi = apiSlice.injectEndpoints({
     >({
       queryFn: async ({ projectIdOrKey, excludeTaskId }) => {
         try {
-          const treeData = await getProjectTasksClient().getProjectTaskTree(
-            projectIdOrKey,
-          )
+          const treeData =
+            await getProjectTasksClient().getProjectTaskTree(projectIdOrKey)
 
           // Recursively convert tree to TreeSelect format, excluding a specific task
           const convertToTreeSelect = (
@@ -322,7 +342,9 @@ export const projectTasksApi = apiSlice.injectEndpoints({
             children?: any[]
           }> => {
             return tasks
-              .filter((t) => t.id !== excludeTaskId)
+              .filter(
+                (t) => t.id !== excludeTaskId && t.type.name !== 'Milestone',
+              )
               .map((t) => ({
                 value: t.id,
                 title: `${t.taskKey} - ${t.name}`,
@@ -361,5 +383,6 @@ export const {
   useRemoveTaskDependencyMutation,
   useGetTaskStatusOptionsQuery,
   useGetTaskPriorityOptionsQuery,
+  useGetTaskTypeOptionsQuery,
   useGetParentTaskOptionsQuery,
 } = projectTasksApi

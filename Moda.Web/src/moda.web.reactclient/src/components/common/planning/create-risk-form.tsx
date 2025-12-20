@@ -109,7 +109,7 @@ const CreateRiskForm = ({
       } else {
         messageApi.error(
           error.detail ??
-            'An error occurred while creating the strategic initiative. Please try again.',
+            'An error occurred while creating the risk. Please try again.',
         )
       }
       return false
