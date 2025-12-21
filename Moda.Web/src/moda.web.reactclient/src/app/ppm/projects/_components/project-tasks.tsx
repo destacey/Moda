@@ -114,7 +114,10 @@ const ProjectTasks: FC<ProjectTasksProps> = ({
                 : task.plannedEnd,
             plannedDate: updates.plannedDate ?? task.plannedDate,
             actualDate: task.actualDate,
-            estimatedEffortHours: task.estimatedEffortHours,
+            estimatedEffortHours:
+              updates.estimatedEffortHours !== undefined
+                ? updates.estimatedEffortHours
+                : task.estimatedEffortHours,
             assignments: [],
           },
         }).unwrap()

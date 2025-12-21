@@ -140,6 +140,7 @@ interface ProjectTasksTableProps {
       plannedStart: string | null
       plannedEnd: string | null
       plannedDate: string | null
+      estimatedEffortHours: number | null
     }>,
   ) => Promise<void>
   taskStatusOptions?: OptionModel<number>[]
@@ -374,23 +375,21 @@ const ProjectTasksTable = ({
     .moda-project-tasks-table__editable-cell .ant-input,
     .moda-project-tasks-table__editable-cell .ant-select,
     .moda-project-tasks-table__editable-cell .ant-picker {
-      border: 1px solid var(--ant-color-border);
-      background-color: var(--ant-color-bg-container);
-      border-radius: var(--ant-border-radius);
+      width: 100%;
     }
-    .moda-project-tasks-table__editable-cell .ant-input:hover,
-    .moda-project-tasks-table__editable-cell .ant-select:hover .ant-select-selector,
-    .moda-project-tasks-table__editable-cell .ant-picker:hover {
-      border-color: var(--ant-color-primary-hover);
-    }
-    .moda-project-tasks-table__editable-cell .ant-input:focus,
-    .moda-project-tasks-table__editable-cell .ant-select-focused,
-    .moda-project-tasks-table__editable-cell .ant-select-open,
-    .moda-project-tasks-table__editable-cell .ant-picker-focused {
-      border-color: var(--ant-color-primary) !important;
-      border-width: 2px !important;
-      box-shadow: 0 0 0 3px var(--ant-color-primary-bg) !important;
-    }
+    // .moda-project-tasks-table__editable-cell .ant-input:hover,
+    // .moda-project-tasks-table__editable-cell .ant-select:hover .ant-select-selector,
+    // .moda-project-tasks-table__editable-cell .ant-picker:hover {
+    //   border-color: var(--ant-color-primary-hover);
+    // }
+    // .moda-project-tasks-table__editable-cell .ant-input:focus,
+    // .moda-project-tasks-table__editable-cell .ant-select-focused,
+    // .moda-project-tasks-table__editable-cell .ant-select-open,
+    // .moda-project-tasks-table__editable-cell .ant-picker-focused {
+    //   border-color: var(--ant-color-primary) !important;
+    //   border-width: 2px !important;
+    //   box-shadow: 0 0 0 3px var(--ant-color-primary-bg) !important;
+    // }
     .moda-project-tasks-table__expander-btn {
       padding: 0 4px;
     }
@@ -453,6 +452,7 @@ const ProjectTasksTable = ({
             plannedStart: task.plannedStart ? dayjs(task.plannedStart) : null,
             plannedEnd: task.plannedEnd ? dayjs(task.plannedEnd) : null,
             plannedDate: task.plannedDate ? dayjs(task.plannedDate) : null,
+            estimatedEffortHours: task.estimatedEffortHours,
           }
           form.setFieldsValue(initialValues)
           // Store initial values to compare later
@@ -598,6 +598,7 @@ const ProjectTasksTable = ({
           plannedStart: dayjs.Dayjs | null
           plannedEnd: dayjs.Dayjs | null
           plannedDate: dayjs.Dayjs | null
+          estimatedEffortHours: number | null
         }
 
         const task = getCurrentTask(taskId)
@@ -677,6 +678,12 @@ const ProjectTasksTable = ({
             : null
           hasAnyChanges = true
         }
+        if (hasChanged('estimatedEffortHours')) {
+          updates.estimatedEffortHours = values.estimatedEffortHours
+            ? Number(values.estimatedEffortHours)
+            : null
+          hasAnyChanges = true
+        }
 
         if (!hasAnyChanges) {
           // No changes to save, execute pending navigation if any
@@ -705,7 +712,15 @@ const ProjectTasksTable = ({
 
   // Editable columns in order
   const editableColumns = useMemo(
-    () => ['name', 'type', 'status', 'priority', 'plannedStart', 'plannedEnd'],
+    () => [
+      'name',
+      'type',
+      'status',
+      'priority',
+      'plannedStart',
+      'plannedEnd',
+      'estimatedEffortHours',
+    ],
     [],
   )
 
@@ -1136,7 +1151,6 @@ const ProjectTasksTable = ({
                   <Input
                     ref={nameInputRef}
                     size="small"
-                    variant="borderless"
                     onPressEnter={(e) => {
                       e.currentTarget.blur()
                     }}
@@ -1188,8 +1202,6 @@ const ProjectTasksTable = ({
                 <Select
                   size="small"
                   options={taskTypeOptions}
-                  style={{ width: '100%' }}
-                  variant="borderless"
                   onClick={(e) => e.stopPropagation()}
                   onKeyDown={(e) => handleKeyDown(e, task.id, 'type')}
                 />
@@ -1247,8 +1259,6 @@ const ProjectTasksTable = ({
                 <Select
                   size="small"
                   options={availableStatusOptions}
-                  style={{ width: '100%' }}
-                  variant="borderless"
                   onClick={(e) => e.stopPropagation()}
                   onKeyDown={(e) => handleKeyDown(e, task.id, 'status')}
                 />
@@ -1299,8 +1309,6 @@ const ProjectTasksTable = ({
                 <Select
                   size="small"
                   options={taskPriorityOptions}
-                  style={{ width: '100%' }}
-                  variant="borderless"
                   onClick={(e) => e.stopPropagation()}
                   onKeyDown={(e) => handleKeyDown(e, task.id, 'priority')}
                 />
@@ -1329,7 +1337,7 @@ const ProjectTasksTable = ({
           const isMilestone = task.type?.name === 'Milestone'
 
           if (!isSelected || !onUpdateTask) {
-            return value || '-'
+            return value
           }
 
           const fieldName = isMilestone ? 'plannedDate' : 'plannedStart'
@@ -1339,12 +1347,9 @@ const ProjectTasksTable = ({
               <Form.Item name={fieldName} style={{ margin: 0 }}>
                 <DatePicker
                   size="small"
-                  variant="borderless"
                   format="MMM D, YYYY"
                   onClick={(e) => e.stopPropagation()}
                   onKeyDown={(e) => handleKeyDown(e, task.id, 'plannedStart')}
-                  style={{ width: '100%' }}
-                  placeholder="-"
                 />
               </Form.Item>
             </div>
@@ -1387,7 +1392,7 @@ const ProjectTasksTable = ({
           const isMilestone = task.type?.name === 'Milestone'
 
           if (!isSelected || !onUpdateTask || isMilestone) {
-            return value || '-'
+            return value
           }
 
           return (
@@ -1395,12 +1400,9 @@ const ProjectTasksTable = ({
               <Form.Item name="plannedEnd" style={{ margin: 0 }}>
                 <DatePicker
                   size="small"
-                  variant="borderless"
                   format="MMM D, YYYY"
                   onClick={(e) => e.stopPropagation()}
                   onKeyDown={(e) => handleKeyDown(e, task.id, 'plannedEnd')}
-                  style={{ width: '100%' }}
-                  placeholder="-"
                 />
               </Form.Item>
             </div>
@@ -1413,6 +1415,48 @@ const ProjectTasksTable = ({
           const bv = b.original.plannedEnd
             ? dayjs(b.original.plannedEnd).valueOf()
             : -Infinity
+          return av === bv ? 0 : av > bv ? 1 : -1
+        },
+      },
+      {
+        id: 'estimatedEffortHours',
+        accessorFn: (row) => row.estimatedEffortHours ?? '',
+        header: 'Est Effort',
+        size: 140,
+        enableGlobalFilter: false,
+        enableColumnFilter: false,
+        cell: (info) => {
+          const task = info.row.original
+          const value = task.estimatedEffortHours
+          const isSelected = selectedRowId === task.id
+          const cellId = `${task.id}-estimatedEffortHours`
+          const isMilestone = task.type?.name === 'Milestone'
+
+          if (!isSelected || !onUpdateTask || isMilestone) {
+            return value ? `${value}h` : null
+          }
+
+          return (
+            <div data-cell-id={cellId}>
+              <Form.Item name="estimatedEffortHours" style={{ margin: 0 }}>
+                <Input
+                  size="small"
+                  type="number"
+                  min={0}
+                  step={0.25}
+                  suffix="h"
+                  onClick={(e) => e.stopPropagation()}
+                  onKeyDown={(e) =>
+                    handleKeyDown(e, task.id, 'estimatedEffortHours')
+                  }
+                />
+              </Form.Item>
+            </div>
+          )
+        },
+        sortingFn: (a, b) => {
+          const av = a.original.estimatedEffortHours ?? -Infinity
+          const bv = b.original.estimatedEffortHours ?? -Infinity
           return av === bv ? 0 : av > bv ? 1 : -1
         },
       },
@@ -1522,6 +1566,7 @@ const ProjectTasksTable = ({
       'Priority',
       'Planned Start',
       'Planned End',
+      'Estimated Effort (hours)',
     ]
 
     const escapeCsv = (value: unknown) => {
@@ -1546,6 +1591,7 @@ const ProjectTasksTable = ({
         task.priority?.name ?? '',
         plannedStartDate ? dayjs(plannedStartDate).format('MMM D, YYYY') : '',
         task.plannedEnd ? dayjs(task.plannedEnd).format('MMM D, YYYY') : '',
+        task.estimatedEffortHours ?? '',
       ]
     })
 
@@ -1863,14 +1909,6 @@ const ProjectTasksTable = ({
                             cellElement?.getAttribute('data-column-id')
 
                           // Check if clicked column is editable
-                          const editableColumns = [
-                            'name',
-                            'type',
-                            'status',
-                            'priority',
-                            'plannedStart',
-                            'plannedEnd',
-                          ]
                           const isEditableColumn =
                             clickedColumnId &&
                             editableColumns.includes(clickedColumnId)
