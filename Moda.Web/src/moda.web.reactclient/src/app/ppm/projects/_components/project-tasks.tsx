@@ -125,68 +125,6 @@ const ProjectTasks: FC<ProjectTasksProps> = ({
     [project?.key, tasksData, updateProjectTask],
   )
 
-  const handleUpdateStatus = useCallback(
-    async (taskId: string, statusId: number) => {
-      await handleUpdateTaskField(taskId, { statusId })
-    },
-    [handleUpdateTaskField],
-  )
-
-  const handleUpdatePriority = useCallback(
-    async (taskId: string, priorityId: number) => {
-      await handleUpdateTaskField(taskId, { priorityId })
-    },
-    [handleUpdateTaskField],
-  )
-
-  const handleUpdateName = useCallback(
-    async (taskId: string, name: string) => {
-      await handleUpdateTaskField(taskId, { name })
-    },
-    [handleUpdateTaskField],
-  )
-
-  const handleUpdateType = useCallback(
-    async (taskId: string, typeId: number) => {
-      await handleUpdateTaskField(taskId, { typeId })
-    },
-    [handleUpdateTaskField],
-  )
-
-  const handleUpdatePlannedStart = useCallback(
-    async (taskId: string, date: string | null) => {
-      // Find the task to determine if it's a milestone
-      const findTask = (tasks: any[], id: string): any => {
-        for (const task of tasks) {
-          if (task.id === id) return task
-          if (task.children?.length) {
-            const found = findTask(task.children, id)
-            if (found) return found
-          }
-        }
-        return null
-      }
-
-      const task = findTask(tasksData || [], taskId)
-      const isMilestone = task?.type?.name === 'Milestone'
-
-      // For milestones, update plannedDate; for tasks, update plannedStart
-      if (isMilestone) {
-        await handleUpdateTaskField(taskId, { plannedDate: date })
-      } else {
-        await handleUpdateTaskField(taskId, { plannedStart: date })
-      }
-    },
-    [handleUpdateTaskField, tasksData],
-  )
-
-  const handleUpdatePlannedEnd = useCallback(
-    async (taskId: string, date: string | null) => {
-      await handleUpdateTaskField(taskId, { plannedEnd: date })
-    },
-    [handleUpdateTaskField],
-  )
-
   const onCreateTaskFormClosed = useCallback(
     (wasSaved: boolean) => {
       setOpenCreateTaskForm(false)
@@ -224,19 +162,13 @@ const ProjectTasks: FC<ProjectTasksProps> = ({
   return (
     <>
       <ProjectTasksTable
-        tasks={tasksData || []}
+        tasks={tasksData}
         isLoading={tasksDataIsLoading}
         onCreateTask={handleCreateTask}
         onEditTask={handleEditTask}
         onDeleteTask={handleDeleteTask}
         onRefresh={refetchTasksData}
         onUpdateTask={handleUpdateTaskField}
-        onUpdateStatus={handleUpdateStatus}
-        onUpdatePriority={handleUpdatePriority}
-        onUpdateName={handleUpdateName}
-        onUpdateType={handleUpdateType}
-        onUpdatePlannedStart={handleUpdatePlannedStart}
-        onUpdatePlannedEnd={handleUpdatePlannedEnd}
         taskStatusOptions={taskStatusOptions}
         taskPriorityOptions={taskPriorityOptions}
         taskTypeOptions={taskTypeOptions}
@@ -244,7 +176,7 @@ const ProjectTasks: FC<ProjectTasksProps> = ({
 
       {openCreateTaskForm && (
         <CreateProjectTaskForm
-          projectIdOrKey={project?.key || ''}
+          projectIdOrKey={project?.key}
           showForm={openCreateTaskForm}
           onFormComplete={() => onCreateTaskFormClosed(true)}
           onFormCancel={() => onCreateTaskFormClosed(false)}
@@ -252,7 +184,7 @@ const ProjectTasks: FC<ProjectTasksProps> = ({
       )}
       {openEditTaskForm && selectedTaskId && (
         <EditProjectTaskForm
-          projectIdOrKey={project?.key || ''}
+          projectIdOrKey={project?.key}
           taskIdOrKey={selectedTaskId}
           showForm={openEditTaskForm}
           onFormComplete={() => onEditTaskFormClosed(true)}
@@ -261,7 +193,7 @@ const ProjectTasks: FC<ProjectTasksProps> = ({
       )}
       {openDeleteTaskForm && selectedTaskId && (
         <DeleteProjectTaskForm
-          projectIdOrKey={project?.key || ''}
+          projectIdOrKey={project?.key}
           taskIdOrKey={selectedTaskId}
           showForm={openDeleteTaskForm}
           onFormComplete={() => onDeleteTaskFormClosed(true)}
