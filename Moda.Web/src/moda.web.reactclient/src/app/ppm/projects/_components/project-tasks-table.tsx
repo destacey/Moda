@@ -3,10 +3,11 @@
 import styles from './project-tasks-table.module.css'
 import { ProjectTaskTreeDto } from '@/src/services/moda-api'
 import { ModaEmpty } from '@/src/components/common'
-import { OptionModel } from '@/src/components/types'
 import {
   Button,
   DatePicker,
+  Descriptions,
+  Flex,
   Form,
   Input,
   Popover,
@@ -53,113 +54,87 @@ import {
   type SortingState,
   useReactTable,
 } from '@tanstack/react-table'
+import { generateCsv, downloadCsvWithTimestamp } from '@/src/utils/csv-utils'
+import {
+  useGetTaskPriorityOptionsQuery,
+  useGetTaskStatusOptionsQuery,
+  useGetTaskTypeOptionsQuery,
+  useUpdateProjectTaskMutation,
+} from '@/src/store/features/ppm/project-tasks-api'
+import {
+  CreateProjectTaskForm,
+  DeleteProjectTaskForm,
+  EditProjectTaskForm,
+} from '.'
 
 const { Text } = Typography
+const { Item: DescriptionItem } = Descriptions
+const { Item: FormItem } = Form
 
 // Keyboard shortcuts help content
 const KeyboardShortcutsContent = () => (
-  <div style={{ maxWidth: 400 }}>
-    <Typography.Title level={5} style={{ marginTop: 0 }}>
-      Inline Editing
-    </Typography.Title>
-    <Space direction="vertical" size="small" style={{ width: '100%' }}>
-      <div>
-        <Text strong>Click row or cell</Text>
-        <br />
-        <Text type="secondary">Enter edit mode</Text>
-      </div>
-      <div>
-        <Text strong>Enter / ↓</Text>
-        <br />
-        <Text type="secondary">Save and move to next row</Text>
-      </div>
-      <div>
-        <Text strong>↑</Text>
-        <br />
-        <Text type="secondary">Save and move to previous row</Text>
-      </div>
-      <div>
-        <Text strong>Tab</Text>
-        <br />
-        <Text type="secondary">Move to next field (wraps to next row)</Text>
-      </div>
-      <div>
-        <Text strong>Shift + Tab</Text>
-        <br />
-        <Text type="secondary">
-          Move to previous field (wraps to previous row)
-        </Text>
-      </div>
-      <div>
-        <Text strong>Esc</Text>
-        <br />
-        <Text type="secondary">Cancel changes and exit edit mode</Text>
-      </div>
-      <div>
-        <Text strong>Click outside table</Text>
-        <br />
-        <Text type="secondary">Save changes and exit edit mode</Text>
-      </div>
-    </Space>
-    <Typography.Title level={5} style={{ marginTop: 16 }}>
-      Dropdown Navigation
-    </Typography.Title>
-    <Space direction="vertical" size="small" style={{ width: '100%' }}>
-      <div>
-        <Text strong>Space</Text>
-        <br />
-        <Text type="secondary">Open dropdown</Text>
-      </div>
-      <div>
-        <Text strong>↑ / ↓</Text>
-        <br />
-        <Text type="secondary">Navigate options in open dropdown</Text>
-      </div>
-      <div>
-        <Text strong>Enter</Text>
-        <br />
-        <Text type="secondary">Select highlighted option</Text>
-      </div>
-    </Space>
-  </div>
+  <Flex vertical gap="large" style={{ width: 400 }}>
+    <Descriptions
+      size="small"
+      column={1}
+      styles={{ header: { marginBottom: 4 } }}
+      title="Inline Editing"
+    >
+      <DescriptionItem label="Click row or cell">
+        <Text>Enter edit mode</Text>
+      </DescriptionItem>
+      <DescriptionItem label="Enter / ↓">
+        <Text>Save and move to next row</Text>
+      </DescriptionItem>
+      <DescriptionItem label="↑">
+        <Text>Save and move to previous row</Text>
+      </DescriptionItem>
+      <DescriptionItem label="Tab">
+        <Text>Move to next field (wraps to next row)</Text>
+      </DescriptionItem>
+      <DescriptionItem label="Shift + Tab">
+        <Text>Move to previous field (wraps to previous row)</Text>
+      </DescriptionItem>
+      <DescriptionItem label="Esc">
+        <Text>Cancel changes and exit edit mode</Text>
+      </DescriptionItem>
+      <DescriptionItem label="Click outside table">
+        <Text>Save changes and exit edit mode</Text>
+      </DescriptionItem>
+    </Descriptions>
+    <Descriptions
+      size="small"
+      column={1}
+      title="Dropdown Navigation"
+      styles={{ header: { marginBottom: 4 } }}
+    >
+      <DescriptionItem label="Space">
+        <Text>Open dropdown</Text>
+      </DescriptionItem>
+      <DescriptionItem label="↑ / ↓">
+        <Text>Navigate options in open dropdown</Text>
+      </DescriptionItem>
+      <DescriptionItem label="Enter">
+        <Text>Select highlighted option</Text>
+      </DescriptionItem>
+    </Descriptions>
+  </Flex>
 )
 
 interface ProjectTasksTableProps {
+  projectKey: string
   tasks: ProjectTaskTreeDto[]
   isLoading: boolean
-  onCreateTask?: () => void
-  onEditTask?: (task: ProjectTaskTreeDto) => void
-  onDeleteTask?: (task: ProjectTaskTreeDto) => void
-  onRefresh?: () => void
-  onUpdateTask?: (
-    taskId: string,
-    updates: Partial<{
-      name: string
-      statusId: number
-      priorityId: number
-      typeId: number
-      plannedStart: string | null
-      plannedEnd: string | null
-      plannedDate: string | null
-      estimatedEffortHours: number | null
-    }>,
-  ) => Promise<void>
-  taskStatusOptions?: OptionModel<number>[]
-  taskPriorityOptions?: OptionModel<number>[]
-  taskTypeOptions?: OptionModel<number>[]
+  canManageTasks: boolean
+  refetch: () => void
 }
 
 const ProjectTasksTable = ({
+  projectKey,
   tasks = [],
   isLoading,
-  onCreateTask,
-  onEditTask,
-  onDeleteTask,
-  onRefresh,
-  onUpdateTask,
-  taskStatusOptions = [],
-  taskPriorityOptions = [],
-  taskTypeOptions = [],
+  canManageTasks,
+  refetch,
 }: ProjectTasksTableProps) => {
   const [searchValue, setSearchValue] = useState('')
   const [sorting, setSorting] = useState<SortingState>([])
@@ -174,6 +149,125 @@ const ProjectTasksTable = ({
   const lastFocusedCellRef = useRef<string | null>(null)
   const clickedInTableRef = useRef(false)
 
+  const [openCreateTaskForm, setOpenCreateTaskForm] = useState<boolean>(false)
+  const [openEditTaskForm, setOpenEditTaskForm] = useState<boolean>(false)
+  const [openDeleteTaskForm, setOpenDeleteTaskForm] = useState<boolean>(false)
+  const [selectedTaskId, setSelectedTaskId] = useState<string | undefined>(
+    undefined,
+  )
+
+  const { data: taskStatusOptions = [] } = useGetTaskStatusOptionsQuery()
+
+  const { data: taskPriorityOptions = [] } = useGetTaskPriorityOptionsQuery()
+
+  const { data: taskTypeOptions = [] } = useGetTaskTypeOptionsQuery()
+
+  const [updateProjectTask] = useUpdateProjectTaskMutation()
+
+  // Task form handlers
+  const handleCreateTask = useCallback(() => {
+    setOpenCreateTaskForm(true)
+  }, [])
+
+  const handleEditTask = useCallback((task: any) => {
+    setSelectedTaskId(task.id)
+    setOpenEditTaskForm(true)
+  }, [])
+
+  const handleDeleteTask = useCallback((task: any) => {
+    setSelectedTaskId(task.id)
+    setOpenDeleteTaskForm(true)
+  }, [])
+
+  const handleUpdateTask = useCallback(
+    async (taskId: string, updates: Partial<any>) => {
+      if (!projectKey) return
+
+      // Find the task in the tree
+      const findTask = (tasks: any[], id: string): any => {
+        for (const task of tasks) {
+          if (task.id === id) return task
+          if (task.children?.length) {
+            const found = findTask(task.children, id)
+            if (found) return found
+          }
+        }
+        return null
+      }
+
+      const task = findTask(tasks || [], taskId)
+      if (!task) return
+
+      try {
+        await updateProjectTask({
+          projectIdOrKey: projectKey,
+          cacheKey: taskId,
+          request: {
+            id: task.id,
+            name: updates.name ?? task.name,
+            description: updates.description ?? task.description,
+            statusId: updates.statusId ?? task.status?.id,
+            priorityId: updates.priorityId ?? task.priority?.id,
+            parentId: task.parentId,
+            teamId: task.team?.id,
+            plannedStart:
+              updates.plannedStart !== undefined
+                ? updates.plannedStart
+                : task.plannedStart,
+            plannedEnd:
+              updates.plannedEnd !== undefined
+                ? updates.plannedEnd
+                : task.plannedEnd,
+            plannedDate: updates.plannedDate ?? task.plannedDate,
+            actualDate: task.actualDate,
+            estimatedEffortHours:
+              updates.estimatedEffortHours !== undefined
+                ? updates.estimatedEffortHours
+                : task.estimatedEffortHours,
+            assignments: [],
+          },
+        }).unwrap()
+        // Refetch to ensure UI has latest data before navigation
+        refetch()
+      } catch (error) {
+        console.error('Failed to update task:', error)
+      }
+    },
+    [projectKey, refetch, tasks, updateProjectTask],
+  )
+
+  const onCreateTaskFormClosed = useCallback(
+    (wasSaved: boolean) => {
+      setOpenCreateTaskForm(false)
+      if (wasSaved) {
+        refetch()
+      }
+    },
+    [refetch],
+  )
+
+  const onEditTaskFormClosed = useCallback(
+    (wasSaved: boolean) => {
+      setOpenEditTaskForm(false)
+      setSelectedTaskId(undefined)
+      if (wasSaved) {
+        refetch()
+      }
+    },
+    [refetch],
+  )
+
+  const onDeleteTaskFormClosed = useCallback(
+    (wasDeleted: boolean) => {
+      setOpenDeleteTaskForm(false)
+      setSelectedTaskId(undefined)
+      if (wasDeleted) {
+        refetch()
+      }
+    },
+    [refetch],
+  )
+
   // API options are already in the correct format - use them directly
   // Stable empty array reference to avoid re-renders
   const emptyFilterArray = useMemo(() => [] as number[], [])
@@ -187,8 +281,6 @@ const ProjectTasksTable = ({
       )
     return count(tasks)
   }, [tasks])
-
-
 
   // Helper to get the current task
   const getCurrentTask = useCallback(
@@ -225,7 +317,7 @@ const ProjectTasksTable = ({
           return false
         }
 
-        if (!onUpdateTask) {
+        if (!handleUpdateTask) {
           return true
         }
 
@@ -297,7 +389,7 @@ const ProjectTasksTable = ({
 
         // Send update
         setIsSaving(true)
-        await onUpdateTask(taskId, updates)
+        await handleUpdateTask(taskId, updates)
         setIsSaving(false)
         return true
       } catch (error) {
@@ -306,7 +398,7 @@ const ProjectTasksTable = ({
         return false
       }
     },
-    [getCurrentTask, onUpdateTask],
+    [getCurrentTask, handleUpdateTask],
   )
 
   // Initialize form when row selection changes
@@ -383,7 +475,9 @@ const ProjectTasksTable = ({
       }
 
       // Check if click was in table via ref flag or if focused element is in table
-      const focusedInTable = document.activeElement?.closest(`.${styles.tableWrapper}`)
+      const focusedInTable = document.activeElement?.closest(
+        `.${styles.tableWrapper}`,
+      )
       if (!clickedInTableRef.current && !focusedInTable) {
         await saveFormChanges(selectedRowId, form)
         setSelectedRowId(null)
@@ -785,35 +879,29 @@ const ProjectTasksTable = ({
           const cellId = `${task.id}-name`
 
           const nameContent = (
-             <span
-               className={styles.nameCell}
-               data-cell-id={cellId}
-             >
-               {Array.from({ length: depth }).map((_, index) => (
-                 <span
-                   key={index}
-                   className={styles.indentSpacer}
-                 />
-               ))}
-               {row.getCanExpand() ? (
-                 <Button
-                   type="text"
-                   size="small"
-                   icon={
-                     row.getIsExpanded() ? (
-                       <CaretDownOutlined />
-                     ) : (
-                       <CaretRightOutlined />
-                     )
-                   }
-                   onClick={row.getToggleExpandedHandler()}
-                   className={styles.expanderBtn}
-                 />
+            <span className={styles.nameCell} data-cell-id={cellId}>
+              {Array.from({ length: depth }).map((_, index) => (
+                <span key={index} className={styles.indentSpacer} />
+              ))}
+              {row.getCanExpand() ? (
+                <Button
+                  type="text"
+                  size="small"
+                  icon={
+                    row.getIsExpanded() ? (
+                      <CaretDownOutlined />
+                    ) : (
+                      <CaretRightOutlined />
+                    )
+                  }
+                  onClick={row.getToggleExpandedHandler()}
+                  className={styles.expanderBtn}
+                />
               ) : (
                 <span style={{ width: 24, display: 'inline-block' }} />
               )}
-              {isSelected && onUpdateTask ? (
-                <Form.Item
+              {isSelected && handleUpdateTask ? (
+                <FormItem
                   name="name"
                   style={{ margin: 0, flex: 1, minWidth: 0 }}
                   rules={[
@@ -829,7 +917,7 @@ const ProjectTasksTable = ({
                     onKeyDown={(e) => handleKeyDown(e, task.id, 'name')}
                     style={{ flex: 1, minWidth: 0 }}
                   />
-                </Form.Item>
+                </FormItem>
               ) : (
                 <span>{task.name}</span>
               )}
@@ -885,7 +973,7 @@ const ProjectTasksTable = ({
             Cancelled: 'error',
           }
 
-          if (!isSelected || !onUpdateTask) {
+          if (!isSelected || !handleUpdateTask) {
             return (
               <Tag color={colorMap[status] || 'default'}>{status || '-'}</Tag>
             )
@@ -899,7 +987,7 @@ const ProjectTasksTable = ({
 
           return (
             <div data-cell-id={cellId}>
-              <Form.Item
+              <FormItem
                 name="statusId"
                 style={{ margin: 0 }}
                 rules={[{ required: true, message: 'Status is required' }]}
@@ -909,7 +997,7 @@ const ProjectTasksTable = ({
                   options={availableStatusOptions}
                   onKeyDown={(e) => handleKeyDown(e, task.id, 'status')}
                 />
-              </Form.Item>
+              </FormItem>
             </div>
           )
         },
@@ -935,7 +1023,7 @@ const ProjectTasksTable = ({
           const isSelected = selectedRowId === task.id
           const cellId = `${task.id}-priority`
 
-          if (!isSelected || !onUpdateTask) {
+          if (!isSelected || !handleUpdateTask) {
             if (!priority) return '-'
             const colorMap: Record<string, string> = {
               Low: 'green',
@@ -948,7 +1036,7 @@ const ProjectTasksTable = ({
 
           return (
             <div data-cell-id={cellId}>
-              <Form.Item
+              <FormItem
                 name="priorityId"
                 style={{ margin: 0 }}
                 rules={[{ required: true, message: 'Priority is required' }]}
@@ -957,8 +1045,8 @@ const ProjectTasksTable = ({
                   size="small"
                   options={taskPriorityOptions}
                   onKeyDown={(e) => handleKeyDown(e, task.id, 'priority')}
-                  />
-              </Form.Item>
+                />
+              </FormItem>
             </div>
           )
         },
@@ -982,7 +1070,7 @@ const ProjectTasksTable = ({
           const cellId = `${task.id}-plannedStart`
           const isMilestone = task.type?.name === 'Milestone'
 
-          if (!isSelected || !onUpdateTask) {
+          if (!isSelected || !handleUpdateTask) {
             return value
           }
 
@@ -990,13 +1078,25 @@ const ProjectTasksTable = ({
 
           return (
             <div data-cell-id={cellId}>
-              <Form.Item name={fieldName} style={{ margin: 0 }}>
+              <FormItem name={fieldName} style={{ margin: 0 }}>
                 <DatePicker
                   size="small"
                   format="MMM D, YYYY"
                   onKeyDown={(e) => handleKeyDown(e, task.id, 'plannedStart')}
-                  />
-              </Form.Item>
+                  onOpenChange={(open) => {
+                    if (!open) {
+                      setTimeout(() => {
+                        const input = document.querySelector(
+                          `[data-cell-id="${cellId}"] input`,
+                        ) as HTMLInputElement
+                        if (input) {
+                          input.focus()
+                        }
+                      }, 0)
+                    }
+                  }}
+                />
+              </FormItem>
             </div>
           )
         },
@@ -1036,19 +1136,31 @@ const ProjectTasksTable = ({
           const cellId = `${task.id}-plannedEnd`
           const isMilestone = task.type?.name === 'Milestone'
 
-          if (!isSelected || !onUpdateTask || isMilestone) {
+          if (!isSelected || !handleUpdateTask || isMilestone) {
             return value
           }
 
           return (
             <div data-cell-id={cellId}>
-              <Form.Item name="plannedEnd" style={{ margin: 0 }}>
+              <FormItem name="plannedEnd" style={{ margin: 0 }}>
                 <DatePicker
                   size="small"
                   format="MMM D, YYYY"
                   onKeyDown={(e) => handleKeyDown(e, task.id, 'plannedEnd')}
-                  />
-              </Form.Item>
+                  onOpenChange={(open) => {
+                    if (!open) {
+                      setTimeout(() => {
+                        const input = document.querySelector(
+                          `[data-cell-id="${cellId}"] input`,
+                        ) as HTMLInputElement
+                        if (input) {
+                          input.focus()
+                        }
+                      }, 0)
+                    }
+                  }}
+                />
+              </FormItem>
             </div>
           )
         },
@@ -1076,13 +1188,13 @@ const ProjectTasksTable = ({
           const cellId = `${task.id}-estimatedEffortHours`
           const isMilestone = task.type?.name === 'Milestone'
 
-          if (!isSelected || !onUpdateTask || isMilestone) {
+          if (!isSelected || !handleUpdateTask || isMilestone) {
             return value
           }
 
           return (
             <div data-cell-id={cellId}>
-              <Form.Item name="estimatedEffortHours" style={{ margin: 0 }}>
+              <FormItem name="estimatedEffortHours" style={{ margin: 0 }}>
                 <Input
                   size="small"
                   type="number"
@@ -1092,8 +1204,8 @@ const ProjectTasksTable = ({
                   onKeyDown={(e) =>
                     handleKeyDown(e, task.id, 'estimatedEffortHours')
                   }
-                  />
-              </Form.Item>
+                />
+              </FormItem>
             </div>
           )
         },
@@ -1103,51 +1215,52 @@ const ProjectTasksTable = ({
           return av === bv ? 0 : av > bv ? 1 : -1
         },
       },
-      {
-        id: 'actions',
-        header: 'Actions',
-        size: 110,
-        enableSorting: false,
-        enableGlobalFilter: false,
-        enableColumnFilter: false,
-        cell: ({ row }) => (
-          <Space size="small">
-            {onEditTask && (
-              <Tooltip title="Edit">
-                <Button
-                  type="text"
-                  size="small"
-                  icon={<EditOutlined />}
-                  onClick={() => onEditTask(row.original)}
-                  tabIndex={-1}
-                />
-              </Tooltip>
-            )}
-            {onDeleteTask && (
-              <Tooltip title="Delete">
-                <Button
-                  type="text"
-                  size="small"
-                  danger
-                  icon={<DeleteOutlined />}
-                  onClick={() => onDeleteTask(row.original)}
-                  tabIndex={-1}
-                />
-              </Tooltip>
-            )}
-          </Space>
-        ),
-      },
+      ...(canManageTasks
+        ? [
+            {
+              id: 'actions',
+              header: 'Actions',
+              size: 110,
+              enableSorting: false,
+              enableGlobalFilter: false,
+              enableColumnFilter: false,
+              enableExport: false,
+              cell: ({ row }) => (
+                <Space size="small">
+                  <Tooltip title="Edit">
+                    <Button
+                      type="text"
+                      size="small"
+                      icon={<EditOutlined />}
+                      onClick={() => handleEditTask(row.original)}
+                      tabIndex={-1}
+                    />
+                  </Tooltip>
+                  <Tooltip title="Delete">
+                    <Button
+                      type="text"
+                      size="small"
+                      danger
+                      icon={<DeleteOutlined />}
+                      onClick={() => handleDeleteTask(row.original)}
+                      tabIndex={-1}
+                    />
+                  </Tooltip>
+                </Space>
+              ),
+            },
+          ]
+        : []),
     ],
     [
-      onEditTask,
-      onDeleteTask,
-      onUpdateTask,
+      canManageTasks,
+      handleEditTask,
+      handleDeleteTask,
+      handleUpdateTask,
       selectedRowId,
       handleKeyDown,
       taskStatusOptions,
       taskPriorityOptions,
-      taskTypeOptions,
     ],
   )
 
@@ -1200,59 +1313,55 @@ const ProjectTasksTable = ({
     !!searchValue || columnFilters.length > 0 || sorting.length > 0
 
   const onExportCsv = useCallback(() => {
-    const headers = [
-      'WBS',
-      'Key',
-      'Name',
-      'Type',
-      'Status',
-      'Priority',
-      'Planned Start',
-      'Planned End',
-      'Estimated Effort (hours)',
-    ]
+    const exportableColumns = columns.filter(
+      (col: any) => col.enableExport !== false,
+    )
 
-    const escapeCsv = (value: unknown) => {
-      const str = value == null ? '' : String(value)
-      const escaped = str.replace(/\"/g, '""')
-      return /[\",\n\r]/.test(escaped) ? `"${escaped}"` : escaped
-    }
-
-    const rows = table.getRowModel().rows.map((row) => {
-      const task = row.original
-      const isMilestone = task.type?.name === 'Milestone'
-      const plannedStartDate = isMilestone
-        ? task.plannedDate
-        : task.plannedStart
-
-      return [
-        task.wbs ?? '',
-        task.taskKey ?? '',
-        task.name ?? '',
-        task.type?.name ?? '',
-        task.status?.name ?? '',
-        task.priority?.name ?? '',
-        plannedStartDate ? dayjs(plannedStartDate).format('MMM D, YYYY') : '',
-        task.plannedEnd ? dayjs(task.plannedEnd).format('MMM D, YYYY') : '',
-        task.estimatedEffortHours ?? '',
-      ]
+    const headers = exportableColumns.map((col: any) => {
+      if (typeof col.header === 'string') {
+        return col.header
+      }
+      return col.id || ''
     })
 
-    const csv = [
-      headers.map(escapeCsv).join(','),
-      ...rows.map((r) => r.map(escapeCsv).join(',')),
-    ].join('\n')
+    const rows = table.getRowModel().rows.map((row) => {
+      return exportableColumns.map((col: any) => {
+        let value: unknown = ''
 
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-    const url = URL.createObjectURL(blob)
+        // Use accessor function if available, otherwise use accessorKey
+        if (col.accessorFn) {
+          value = col.accessorFn(row.original, row.index)
+        } else if (col.accessorKey) {
+          const key = col.accessorKey as string
+          value = (row.original as any)[key]
+        }
 
-    const link = document.createElement('a')
-    link.href = url
-    link.download = `project-tasks-${dayjs().format('YYYY-MM-DD')}.csv`
-    link.click()
+        // Format dates for plannedStart
+        if (col.id === 'plannedStart' && value) {
+          const isMilestone = row.original.type?.name === 'Milestone'
+          const plannedStartDate = isMilestone
+            ? row.original.plannedDate
+            : row.original.plannedStart
+          return plannedStartDate
+            ? dayjs(plannedStartDate).format('MMM D, YYYY')
+            : ''
+        }
 
-    URL.revokeObjectURL(url)
-  }, [table])
+        // Format dates for plannedEnd
+        if (
+          (col.id === 'plannedEnd' || col.accessorKey === 'plannedEnd') &&
+          value
+        ) {
+          return dayjs(value as string).format('MMM D, YYYY')
+        }
+
+        return value ?? ''
+      })
+    })
+
+    const csv = generateCsv(headers, rows)
+    downloadCsvWithTimestamp(csv, 'project-tasks')
+  }, [table, columns])
 
   return (
     <>
@@ -1260,11 +1369,11 @@ const ProjectTasksTable = ({
         <div className={styles.table}>
           <div className={styles.toolbar}>
             <div>
-              {onCreateTask && (
+              {canManageTasks && (
                 <Button
                   type="primary"
                   icon={<PlusOutlined />}
-                  onClick={onCreateTask}
+                  onClick={handleCreateTask}
                 >
                   Create Task
                 </Button>
@@ -1273,23 +1382,23 @@ const ProjectTasksTable = ({
 
             <div className={styles.toolbarRight}>
               <Text>
-                 {displayedRowCount} of {totalRowCount}
-               </Text>
-               <Input
-                 placeholder="Search"
-                 allowClear={true}
-                 value={searchValue}
-                 onChange={onSearchChange}
-                 suffix={<SearchOutlined />}
-                 className={styles.toolbarSearch}
-               />
-              {onRefresh && (
+                {displayedRowCount} of {totalRowCount}
+              </Text>
+              <Input
+                placeholder="Search"
+                allowClear={true}
+                value={searchValue}
+                onChange={onSearchChange}
+                suffix={<SearchOutlined />}
+                className={styles.toolbarSearch}
+              />
+              {refetch && (
                 <Tooltip title="Refresh">
                   <Button
                     type="text"
                     shape="circle"
                     icon={<ReloadOutlined />}
-                    onClick={onRefresh}
+                    onClick={refetch}
                   />
                 </Tooltip>
               )}
@@ -1354,17 +1463,17 @@ const ProjectTasksTable = ({
 
                         return (
                           <th
-                             key={header.id}
-                             className={`${styles.th}${
-                               canSort ? ` ${styles.thSortable}` : ''
-                             }${canResize ? ` ${styles.thResizable}` : ''}`}
-                             onClick={
-                               canSort
-                                 ? header.column.getToggleSortingHandler()
-                                 : undefined
-                             }
-                           >
-                             <span className={styles.thContent}>
+                            key={header.id}
+                            className={`${styles.th}${
+                              canSort ? ` ${styles.thSortable}` : ''
+                            }${canResize ? ` ${styles.thResizable}` : ''}`}
+                            onClick={
+                              canSort
+                                ? header.column.getToggleSortingHandler()
+                                : undefined
+                            }
+                          >
+                            <span className={styles.thContent}>
                               {header.isPlaceholder
                                 ? null
                                 : flexRender(
@@ -1399,13 +1508,13 @@ const ProjectTasksTable = ({
                         const column = header.column
 
                         if (!column.getCanFilter() || header.isPlaceholder) {
-                           return (
-                             <th
-                               key={`${header.id}-filter`}
-                               className={styles.filterTh}
-                             />
-                           )
-                         }
+                          return (
+                            <th
+                              key={`${header.id}-filter`}
+                              className={styles.filterTh}
+                            />
+                          )
+                        }
 
                         const colId = column.id
                         const rawFilterValue = column.getFilterValue()
@@ -1429,11 +1538,11 @@ const ProjectTasksTable = ({
                                 : []
 
                         return (
-                           <th
-                             key={`${header.id}-filter`}
-                             className={styles.filterTh}
-                             onClick={(e) => e.stopPropagation()}
-                           >
+                          <th
+                            key={`${header.id}-filter`}
+                            className={styles.filterTh}
+                            onClick={(e) => e.stopPropagation()}
+                          >
                             {isSelect ? (
                               <Select
                                 size="small"
@@ -1459,17 +1568,17 @@ const ProjectTasksTable = ({
                                 suffixIcon={<FilterOutlined />}
                                 popupMatchSelectWidth={false}
                                 classNames={{
-                                   popup: {
-                                     root: styles.filterPopup,
-                                   },
-                                 }}
+                                  popup: {
+                                    root: styles.filterPopup,
+                                  },
+                                }}
                                 onChange={(v) =>
                                   column.setFilterValue(
                                     v && v.length ? v : undefined,
                                   )
                                 }
                                 className={styles.filterControl}
-                                />
+                              />
                             ) : (
                               <Input
                                 size="small"
@@ -1491,104 +1600,104 @@ const ProjectTasksTable = ({
               </thead>
               <tbody>
                 {isLoading ? (
-                   <tr>
-                     <td
-                       colSpan={columns.length}
-                       className={`${styles.td} ${styles.loading}`}
-                     >
-                       <Spin />
-                     </td>
-                   </tr>
-                 ) : table.getRowModel().rows.length === 0 ? (
-                   <tr>
-                     <td
-                       colSpan={columns.length}
-                       className={`${styles.td} ${styles.empty}`}
-                     >
-                       <ModaEmpty message="No tasks found" />
-                     </td>
-                   </tr>
-                 ) : (
+                  <tr>
+                    <td
+                      colSpan={columns.length}
+                      className={`${styles.td} ${styles.loading}`}
+                    >
+                      <Spin />
+                    </td>
+                  </tr>
+                ) : table.getRowModel().rows.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={columns.length}
+                      className={`${styles.td} ${styles.empty}`}
+                    >
+                      <ModaEmpty message="No tasks found" />
+                    </td>
+                  </tr>
+                ) : (
                   table.getRowModel().rows.map((row, index) => {
                     const isSelected = selectedRowId === row.original.id
                     return (
                       <tr
-                         key={row.id}
-                         className={`${styles.tr}${index % 2 === 1 ? ` ${styles.trAlt}` : ''}${isSelected ? ` ${styles.trSelected}` : ''}`}
+                        key={row.id}
+                        className={`${styles.tr}${index % 2 === 1 ? ` ${styles.trAlt}` : ''}${isSelected ? ` ${styles.trSelected}` : ''}`}
                         onClick={async (e) => {
-                             clickedInTableRef.current = true
+                          clickedInTableRef.current = true
 
-                             // Block row selection while saving
-                             if (isSaving) {
-                               return
-                             }
+                          // Block row selection while saving or if cannot manage tasks
+                          if (isSaving || !canManageTasks) {
+                            return
+                          }
 
-                             // Ignore clicks from form inputs/controls (they handle their own interactions)
-                             const target = e.target as HTMLElement
-                             if (
-                               target.closest('.ant-select-dropdown') ||
-                               target.closest('.ant-picker-dropdown') ||
-                               target.closest('input') ||
-                               target.closest('.ant-select-selector') ||
-                               target.classList.contains(
-                                 'ant-select-item-option-content',
-                               )
-                             ) {
-                               return
-                             }
+                          // Ignore clicks from form inputs/controls (they handle their own interactions)
+                          const target = e.target as HTMLElement
+                          if (
+                            target.closest('.ant-select-dropdown') ||
+                            target.closest('.ant-picker-dropdown') ||
+                            target.closest('input') ||
+                            target.closest('.ant-select-selector') ||
+                            target.classList.contains(
+                              'ant-select-item-option-content',
+                            )
+                          ) {
+                            return
+                          }
 
-                             // Ignore clicks on buttons (expander, edit, delete) - they handle their own actions
-                             if (
-                               target.closest('button') ||
-                               target.closest('.ant-btn')
-                             ) {
-                               return
-                             }
+                          // Ignore clicks on buttons (expander, edit, delete) - they handle their own actions
+                          if (
+                            target.closest('button') ||
+                            target.closest('.ant-btn')
+                          ) {
+                            return
+                          }
 
-                             // Find which cell was clicked
-                             const cellElement = target.closest('td')
-                             const clickedColumnId =
-                               cellElement?.getAttribute('data-column-id')
+                          // Find which cell was clicked
+                          const cellElement = target.closest('td')
+                          const clickedColumnId =
+                            cellElement?.getAttribute('data-column-id')
 
-                            // If no cell found, ignore the click
-                            if (!cellElement || !clickedColumnId) {
-                              return
-                            }
+                          // If no cell found, ignore the click
+                          if (!cellElement || !clickedColumnId) {
+                            return
+                          }
 
-                             // Check if clicked column is editable
-                              const isEditableColumn =
-                                editableColumns.includes(clickedColumnId)
+                          // Check if clicked column is editable
+                          const isEditableColumn =
+                            editableColumns.includes(clickedColumnId)
 
-                              if (selectedRowId === row.original.id) {
-                               // Clicking same row
-                               if (isEditableColumn) {
-                                 // Clicked an editable cell - switch to it only if different cell
-                                 const targetCellId = `${row.original.id}-${clickedColumnId}`
-                                 if (selectedCellId !== targetCellId) {
-                                   setSelectedCellId(targetCellId)
-                                 }
-                               } else {
-                                 // Clicked a non-editable cell - exit edit mode
-                                 setSelectedRowId(null)
-                                 setSelectedCellId(null)
-                               }
-                              } else if (selectedRowId) {
-                               // Clicking different row - save current row first, then navigate
-                               await saveFormChanges(selectedRowId, form)
-                               setSelectedRowId(row.original.id)
-                               const targetCellId = isEditableColumn
-                                 ? `${row.original.id}-${clickedColumnId}`
-                                 : `${row.original.id}-name`
-                               setSelectedCellId(targetCellId)
-                              } else {
-                               // No previous selection - just select the row
-                               setSelectedRowId(row.original.id)
-                               const targetCellId = isEditableColumn
-                                 ? `${row.original.id}-${clickedColumnId}`
-                                 : `${row.original.id}-name`
-                               setSelectedCellId(targetCellId)
+                          if (selectedRowId === row.original.id) {
+                            // Clicking same row
+                            if (isEditableColumn) {
+                              // Clicked an editable cell - switch to it only if different cell
+                              const targetCellId = `${row.original.id}-${clickedColumnId}`
+                              if (selectedCellId !== targetCellId) {
+                                setSelectedCellId(targetCellId)
                               }
-                           }}
+                            } else {
+                              // Clicked a non-editable cell - exit edit mode
+                              setSelectedRowId(null)
+                              setSelectedCellId(null)
+                            }
+                          } else if (selectedRowId) {
+                            // Clicking different row - save current row first, then navigate
+                            await saveFormChanges(selectedRowId, form)
+                            setSelectedRowId(row.original.id)
+                            const targetCellId = isEditableColumn
+                              ? `${row.original.id}-${clickedColumnId}`
+                              : `${row.original.id}-name`
+                            setSelectedCellId(targetCellId)
+                          } else {
+                            // No previous selection - just select the row
+                            setSelectedRowId(row.original.id)
+                            const targetCellId = isEditableColumn
+                              ? `${row.original.id}-${clickedColumnId}`
+                              : `${row.original.id}-name`
+                            setSelectedCellId(targetCellId)
+                          }
+                        }}
                       >
                         {row.getVisibleCells().map((cell) => {
                           // Determine if this cell is editable when row is selected
@@ -1604,22 +1713,22 @@ const ProjectTasksTable = ({
 
                           return (
                             <td
-                               key={cell.id}
-                               data-cell-id={cell.id}
-                               data-column-id={cell.column.id}
-                               className={`${styles.td}${isEditableCell ? ` ${styles.editableCell}` : ''}`}
-                               onClick={(e) => {
-                                 // If clicking inside a form input/select, let it handle the click
-                                 const target = e.target as HTMLElement
-                                 if (
-                                   target.closest('input') ||
-                                   target.closest('.ant-select') ||
-                                   target.closest('.ant-picker')
-                                 ) {
-                                   e.stopPropagation()
-                                 }
-                               }}
-                             >
+                              key={cell.id}
+                              data-cell-id={cell.id}
+                              data-column-id={cell.column.id}
+                              className={`${styles.td}${isEditableCell ? ` ${styles.editableCell}` : ''}`}
+                              onClick={(e) => {
+                                // If clicking inside a form input/select, let it handle the click
+                                const target = e.target as HTMLElement
+                                if (
+                                  target.closest('input') ||
+                                  target.closest('.ant-select') ||
+                                  target.closest('.ant-picker')
+                                ) {
+                                  e.stopPropagation()
+                                }
+                              }}
+                            >
                               {flexRender(
                                 cell.column.columnDef.cell,
                                 cell.getContext(),
@@ -1636,6 +1745,33 @@ const ProjectTasksTable = ({
           </div>
         </div>
       </Form>
+
+      {openCreateTaskForm && (
+        <CreateProjectTaskForm
+          projectIdOrKey={projectKey}
+          showForm={openCreateTaskForm}
+          onFormComplete={() => onCreateTaskFormClosed(true)}
+          onFormCancel={() => onCreateTaskFormClosed(false)}
+        />
+      )}
+      {openEditTaskForm && selectedTaskId && (
+        <EditProjectTaskForm
+          projectIdOrKey={projectKey}
+          taskIdOrKey={selectedTaskId}
+          showForm={openEditTaskForm}
+          onFormComplete={() => onEditTaskFormClosed(true)}
+          onFormCancel={() => onEditTaskFormClosed(false)}
+        />
+      )}
+      {openDeleteTaskForm && selectedTaskId && (
+        <DeleteProjectTaskForm
+          projectIdOrKey={projectKey}
+          taskIdOrKey={selectedTaskId}
+          showForm={openDeleteTaskForm}
+          onFormComplete={() => onDeleteTaskFormClosed(true)}
+          onFormCancel={() => onDeleteTaskFormClosed(false)}
+        />
+      )}
     </>
   )
 }

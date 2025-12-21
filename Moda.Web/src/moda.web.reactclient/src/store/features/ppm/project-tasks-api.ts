@@ -247,14 +247,10 @@ export const projectTasksApi = apiSlice.injectEndpoints({
         { type: QueryTags.ProjectCriticalPath, id: projectIdOrKey },
       ],
     }),
-    getTaskStatusOptions: builder.query<
-      OptionModel<number>[],
-      { projectIdOrKey: string }
-    >({
-      queryFn: async ({ projectIdOrKey }) => {
+    getTaskStatusOptions: builder.query<OptionModel<number>[], void>({
+      queryFn: async () => {
         try {
-          const data =
-            await getProjectTasksClient().getTaskStatuses(projectIdOrKey)
+          const data = await getProjectTasksClient().getTaskStatuses()
           return {
             data: data
               .sort((a, b) => a.order - b.order)
@@ -270,14 +266,10 @@ export const projectTasksApi = apiSlice.injectEndpoints({
       },
       providesTags: () => [{ type: QueryTags.TaskStatusOptions, id: 'LIST' }],
     }),
-    getTaskPriorityOptions: builder.query<
-      OptionModel<number>[],
-      { projectIdOrKey: string }
-    >({
-      queryFn: async ({ projectIdOrKey }) => {
+    getTaskPriorityOptions: builder.query<OptionModel<number>[], void>({
+      queryFn: async () => {
         try {
-          const data =
-            await getProjectTasksClient().getTaskPriorities(projectIdOrKey)
+          const data = await getProjectTasksClient().getTaskPriorities()
           return {
             data: data
               .sort((a, b) => a.order - b.order)
@@ -293,14 +285,10 @@ export const projectTasksApi = apiSlice.injectEndpoints({
       },
       providesTags: () => [{ type: QueryTags.TaskPriorityOptions, id: 'LIST' }],
     }),
-    getTaskTypeOptions: builder.query<
-      OptionModel<number>[],
-      { projectIdOrKey: string }
-    >({
-      queryFn: async ({ projectIdOrKey }) => {
+    getTaskTypeOptions: builder.query<OptionModel<number>[], void>({
+      queryFn: async () => {
         try {
-          const data =
-            await getProjectTasksClient().getProjectTaskTypes(projectIdOrKey)
+          const data = await getProjectTasksClient().getTaskTypes()
           return {
             data: data
               .sort((a, b) => a.order - b.order)

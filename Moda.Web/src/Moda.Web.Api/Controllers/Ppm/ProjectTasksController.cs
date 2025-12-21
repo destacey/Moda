@@ -211,36 +211,36 @@ public class ProjectTasksController(ILogger<ProjectTasksController> logger, ISen
             : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
-    [HttpGet("statuses")]
-    [MustHavePermission(ApplicationAction.View, ApplicationResource.Projects)]
-    [OpenApiOperation("Get a list of all task statuses.", "")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IEnumerable<TaskStatusDto>>> GetTaskStatuses(string projectIdOrKey, CancellationToken cancellationToken)
-    {
-        var items = await _sender.Send(new GetTaskStatusesQuery(), cancellationToken);
-        return Ok(items.OrderBy(c => c.Order));
-    }
-
-    [HttpGet("priorities")]
-    [MustHavePermission(ApplicationAction.View, ApplicationResource.Projects)]
-    [OpenApiOperation("Get a list of all task priorities.", "")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IEnumerable<TaskPriorityDto>>> GetTaskPriorities(string projectIdOrKey, CancellationToken cancellationToken)
-    {
-        var items = await _sender.Send(new GetTaskPrioritiesQuery(), cancellationToken);
-        return Ok(items.OrderBy(c => c.Order));
-    }
-
-    [HttpGet("types")]
+    [HttpGet("/api/ppm/projects/tasks/types")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Projects)]
     [OpenApiOperation("Get a list of all task types.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IEnumerable<ProjectTaskTypeDto>>> GetProjectTaskTypes(string projectIdOrKey, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<ProjectTaskTypeDto>>> GetTaskTypes(CancellationToken cancellationToken)
     {
         var items = await _sender.Send(new GetProjectTaskTypesQuery(), cancellationToken);
+        return Ok(items.OrderBy(c => c.Order));
+    }
+
+    [HttpGet("/api/ppm/projects/tasks/statuses")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Projects)]
+    [OpenApiOperation("Get a list of all task statuses.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IEnumerable<TaskStatusDto>>> GetTaskStatuses(CancellationToken cancellationToken)
+    {
+        var items = await _sender.Send(new GetProjectTaskStatusesQuery(), cancellationToken);
+        return Ok(items.OrderBy(c => c.Order));
+    }
+
+    [HttpGet("/api/ppm/projects/tasks/priorities")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Projects)]
+    [OpenApiOperation("Get a list of all task priorities.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IEnumerable<TaskPriorityDto>>> GetTaskPriorities(CancellationToken cancellationToken)
+    {
+        var items = await _sender.Send(new GetProjectTaskPrioritiesQuery(), cancellationToken);
         return Ok(items.OrderBy(c => c.Order));
     }
 

@@ -65,7 +65,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = React.memo(
           }}
         >
           <MDEditor
-            value={value}
+            value={value ?? ''}
             onChange={onChange}
             height={300}
             preview="edit" // Options: 'live', 'edit', 'preview'

@@ -6243,13 +6243,68 @@ export class ProjectTasksClient {
     }
 
     /**
+     * Get a list of all task types.
+     */
+    getTaskTypes( cancelToken?: CancelToken): Promise<ProjectTaskTypeDto[]> {
+        let url_ = this.baseUrl + "/api/ppm/projects/tasks/types";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetTaskTypes(_response);
+        });
+    }
+
+    protected processGetTaskTypes(response: AxiosResponse): Promise<ProjectTaskTypeDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<ProjectTaskTypeDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ProjectTaskTypeDto[]>(null as any);
+    }
+
+    /**
      * Get a list of all task statuses.
      */
-    getTaskStatuses(projectIdOrKey: string, cancelToken?: CancelToken): Promise<TaskStatusDto[]> {
-        let url_ = this.baseUrl + "/api/ppm/projects/{projectIdOrKey}/tasks/statuses";
-        if (projectIdOrKey === undefined || projectIdOrKey === null)
-            throw new globalThis.Error("The parameter 'projectIdOrKey' must be defined.");
-        url_ = url_.replace("{projectIdOrKey}", encodeURIComponent("" + projectIdOrKey));
+    getTaskStatuses( cancelToken?: CancelToken): Promise<TaskStatusDto[]> {
+        let url_ = this.baseUrl + "/api/ppm/projects/tasks/statuses";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -6306,11 +6361,8 @@ export class ProjectTasksClient {
     /**
      * Get a list of all task priorities.
      */
-    getTaskPriorities(projectIdOrKey: string, cancelToken?: CancelToken): Promise<TaskPriorityDto[]> {
-        let url_ = this.baseUrl + "/api/ppm/projects/{projectIdOrKey}/tasks/priorities";
-        if (projectIdOrKey === undefined || projectIdOrKey === null)
-            throw new globalThis.Error("The parameter 'projectIdOrKey' must be defined.");
-        url_ = url_.replace("{projectIdOrKey}", encodeURIComponent("" + projectIdOrKey));
+    getTaskPriorities( cancelToken?: CancelToken): Promise<TaskPriorityDto[]> {
+        let url_ = this.baseUrl + "/api/ppm/projects/tasks/priorities";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -6362,67 +6414,6 @@ export class ProjectTasksClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
         return Promise.resolve<TaskPriorityDto[]>(null as any);
-    }
-
-    /**
-     * Get a list of all task types.
-     */
-    getProjectTaskTypes(projectIdOrKey: string, cancelToken?: CancelToken): Promise<ProjectTaskTypeDto[]> {
-        let url_ = this.baseUrl + "/api/ppm/projects/{projectIdOrKey}/tasks/types";
-        if (projectIdOrKey === undefined || projectIdOrKey === null)
-            throw new globalThis.Error("The parameter 'projectIdOrKey' must be defined.");
-        url_ = url_.replace("{projectIdOrKey}", encodeURIComponent("" + projectIdOrKey));
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "GET",
-            url: url_,
-            headers: {
-                "Accept": "application/json"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processGetProjectTaskTypes(_response);
-        });
-    }
-
-    protected processGetProjectTaskTypes(response: AxiosResponse): Promise<ProjectTaskTypeDto[]> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = JSON.parse(resultData200);
-            return Promise.resolve<ProjectTaskTypeDto[]>(result200);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = JSON.parse(resultData400);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<ProjectTaskTypeDto[]>(null as any);
     }
 }
 
@@ -18394,6 +18385,13 @@ export interface AddTaskDependencyRequest {
     successorId: string;
 }
 
+export interface ProjectTaskTypeDto {
+    id: number;
+    name: string;
+    description?: string | undefined;
+    order: number;
+}
+
 export interface TaskStatusDto {
     id: number;
     name: string;
@@ -18402,13 +18400,6 @@ export interface TaskStatusDto {
 }
 
 export interface TaskPriorityDto {
-    id: number;
-    name: string;
-    description?: string | undefined;
-    order: number;
-}
-
-export interface ProjectTaskTypeDto {
     id: number;
     name: string;
     description?: string | undefined;

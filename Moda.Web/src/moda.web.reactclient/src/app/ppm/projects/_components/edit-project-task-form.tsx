@@ -87,13 +87,9 @@ const EditProjectTaskForm = (props: EditProjectTaskFormProps) => {
     idOrTaskKey: props.taskIdOrKey,
   })
 
-  const { data: statusOptions = [] } = useGetTaskStatusOptionsQuery({
-    projectIdOrKey: props.projectIdOrKey,
-  })
+  const { data: statusOptions = [] } = useGetTaskStatusOptionsQuery()
 
-  const { data: priorityOptions = [] } = useGetTaskPriorityOptionsQuery({
-    projectIdOrKey: props.projectIdOrKey,
-  })
+  const { data: priorityOptions = [] } = useGetTaskPriorityOptionsQuery()
 
   const { data: parentTaskOptions = [] } = useGetParentTaskOptionsQuery({
     projectIdOrKey: props.projectIdOrKey,
