@@ -121,6 +121,8 @@ const ProjectTasks: FC<ProjectTasksProps> = ({
             assignments: [],
           },
         }).unwrap()
+        // Refetch to ensure UI has latest data before navigation
+        await refetchTasksData()
       } catch (error) {
         console.error('Failed to update task:', error)
       }

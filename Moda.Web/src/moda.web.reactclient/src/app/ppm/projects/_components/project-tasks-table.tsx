@@ -168,15 +168,9 @@ const ProjectTasksTable = ({
   const [selectedCellId, setSelectedCellId] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [form] = Form.useForm()
-  const previousSelectedRowIdRef = useRef<string | null>(null)
-  const formInitialValuesRef = useRef<Record<string, any> | null>(null)
-  const nameInputRef = useRef<any>(null)
-  const pendingNavigationRef = useRef<{
-    type: 'row' | 'direction' | 'exit'
-    targetRowId?: string
-    direction?: 'up' | 'down'
-    callback?: () => void
-  } | null>(null)
+  const tableRef = useRef<any>(null)
+  const isInitializingRef = useRef(false)
+  const lastFocusedCellRef = useRef<string | null>(null)
 
   // API options are already in the correct format - use them directly
   // Stable empty array reference to avoid re-renders
@@ -435,59 +429,158 @@ const ProjectTasksTable = ({
     [tasks],
   )
 
+  // Save form changes - defined early so it can be used in effects
+  const saveFormChanges = useCallback(
+    async (
+      taskId: string,
+      formInstance: ReturnType<typeof Form.useForm>[0],
+    ) => {
+      try {
+        // Validate form
+        await formInstance.validateFields()
+
+        const task = getCurrentTask(taskId)
+        if (!task) {
+          return false
+        }
+
+        if (!onUpdateTask) {
+          return true
+        }
+
+        // Get current form values
+        const values = formInstance.getFieldsValue() as any
+
+        // Detect changes by comparing to current task
+        const updates: Record<string, any> = {}
+        let hasChanges = false
+
+        // Check simple fields
+        if (values.name !== task.name) {
+          updates.name = values.name
+          hasChanges = true
+        }
+        if (values.statusId !== task.status?.id) {
+          updates.statusId = values.statusId
+          hasChanges = true
+        }
+        if (values.priorityId !== task.priority?.id) {
+          updates.priorityId = values.priorityId
+          hasChanges = true
+        }
+
+        // Check date fields
+        const taskPlannedStart = task.plannedStart
+          ? String(task.plannedStart).split('T')[0]
+          : null
+        const plannedStartFormatted = values.plannedStart
+          ? values.plannedStart.format('YYYY-MM-DD')
+          : null
+        if (plannedStartFormatted !== taskPlannedStart) {
+          updates.plannedStart = plannedStartFormatted
+          hasChanges = true
+        }
+
+        const taskPlannedEnd = task.plannedEnd
+          ? String(task.plannedEnd).split('T')[0]
+          : null
+        const plannedEndFormatted = values.plannedEnd
+          ? values.plannedEnd.format('YYYY-MM-DD')
+          : null
+        if (plannedEndFormatted !== taskPlannedEnd) {
+          updates.plannedEnd = plannedEndFormatted
+          hasChanges = true
+        }
+
+        const taskPlannedDate = task.plannedDate
+          ? String(task.plannedDate).split('T')[0]
+          : null
+        const plannedDateFormatted = values.plannedDate
+          ? values.plannedDate.format('YYYY-MM-DD')
+          : null
+        if (plannedDateFormatted !== taskPlannedDate) {
+          updates.plannedDate = plannedDateFormatted
+          hasChanges = true
+        }
+
+        if (values.estimatedEffortHours !== task.estimatedEffortHours) {
+          updates.estimatedEffortHours = values.estimatedEffortHours
+            ? Number(values.estimatedEffortHours)
+            : null
+          hasChanges = true
+        }
+
+        if (!hasChanges) {
+          return true
+        }
+
+        // Send update
+        setIsSaving(true)
+        await onUpdateTask(taskId, updates)
+        setIsSaving(false)
+        return true
+      } catch (error) {
+        console.error('Validation or save failed:', error)
+        setIsSaving(false)
+        return false
+      }
+    },
+    [getCurrentTask, onUpdateTask],
+  )
+
   // Initialize form when row selection changes
   useEffect(() => {
-    const initializeForm = () => {
-      // Initialize form for newly selected row
-      if (selectedRowId) {
-        const task = getCurrentTask(selectedRowId)
-        if (task) {
-          // Reset form first to prevent visual artifacts
-          form.resetFields()
-          const initialValues = {
-            name: task.name,
-            typeId: task.type?.id,
-            statusId: task.status?.id,
-            priorityId: task.priority?.id,
-            plannedStart: task.plannedStart ? dayjs(task.plannedStart) : null,
-            plannedEnd: task.plannedEnd ? dayjs(task.plannedEnd) : null,
-            plannedDate: task.plannedDate ? dayjs(task.plannedDate) : null,
-            estimatedEffortHours: task.estimatedEffortHours,
-          }
-          form.setFieldsValue(initialValues)
-          // Store initial values to compare later
-          formInitialValuesRef.current = initialValues
-          // Focus the selected cell (or name field if no specific cell selected)
-          setTimeout(() => {
-            if (selectedCellId) {
-              const cellElement = document.querySelector(
-                `[data-cell-id="${selectedCellId}"]`,
-              )
-              if (cellElement) {
-                const input = cellElement.querySelector('input') as HTMLElement
-                if (input) {
-                  input.focus()
-                  if (input instanceof HTMLInputElement) {
-                    input.select()
-                  }
-                }
-              }
-            } else {
-              nameInputRef.current?.focus()
-            }
-          }, 0)
-        }
-      } else {
+    isInitializingRef.current = true
+
+    if (selectedRowId) {
+      const task = getCurrentTask(selectedRowId)
+      if (task) {
         form.resetFields()
-        formInitialValuesRef.current = null
+        const initialValues = {
+          name: task.name,
+          typeId: task.type?.id,
+          statusId: task.status?.id,
+          priorityId: task.priority?.id,
+          plannedStart: task.plannedStart ? dayjs(task.plannedStart) : null,
+          plannedEnd: task.plannedEnd ? dayjs(task.plannedEnd) : null,
+          plannedDate: task.plannedDate ? dayjs(task.plannedDate) : null,
+          estimatedEffortHours: task.estimatedEffortHours,
+        }
+        form.setFieldsValue(initialValues)
+
+        // Allow change tracking after form is set
+        isInitializingRef.current = false
       }
-
-      previousSelectedRowIdRef.current = selectedRowId
+    } else {
+      form.resetFields()
+      isInitializingRef.current = false
     }
-
-    initializeForm()
+    // Only re-run when selectedRowId changes (cell focus is separate)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedRowId])
+
+  // Handle cell focusing separately - only focus when cell ID changes
+  useEffect(() => {
+    if (!selectedRowId || !selectedCellId) return
+
+    // Only focus if we've moved to a different cell
+    if (lastFocusedCellRef.current === selectedCellId) return
+
+    lastFocusedCellRef.current = selectedCellId
+
+    const cellElement = document.querySelector(
+      `[data-cell-id="${selectedCellId}"]`,
+    )
+    if (cellElement) {
+      const input = cellElement.querySelector('input') as HTMLElement
+      if (input) {
+        input.focus()
+        if (input instanceof HTMLInputElement) {
+          input.select()
+        }
+      }
+    }
+  }, [selectedRowId, selectedCellId])
 
   // Handle click outside table to save changes and exit edit mode
   useEffect(() => {
@@ -504,12 +597,11 @@ const ProjectTasksTable = ({
         return
       }
 
-      // Check if click is on the actual table rows - if not, queue exit and save
+      // Check if click is on the actual table rows - if not, save and exit
       if (!target.closest('.moda-project-tasks-table__table-wrapper')) {
-        pendingNavigationRef.current = {
-          type: 'exit',
-        }
         await saveFormChanges(selectedRowId, form)
+        setSelectedRowId(null)
+        setSelectedCellId(null)
       }
     }
 
@@ -517,204 +609,12 @@ const ProjectTasksTable = ({
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedRowId])
-
-  // Navigate to adjacent row (up or down)
-  const navigateToAdjacentRow = useCallback(
-    (direction: 'up' | 'down') => {
-      if (!selectedRowId || !tableRef.current) return
-
-      const allRows = tableRef.current.getRowModel().rows
-      const currentIndex = allRows.findIndex((r) => r.id === selectedRowId)
-
-      if (currentIndex === -1) return
-
-      const nextIndex =
-        direction === 'down' ? currentIndex + 1 : currentIndex - 1
-
-      if (nextIndex >= 0 && nextIndex < allRows.length) {
-        const nextRow = allRows[nextIndex]
-        setSelectedRowId(nextRow.id)
-        setSelectedCellId(`${nextRow.id}-name`)
-
-        // Focus the name input in the next row
-        setTimeout(() => {
-          nameInputRef.current?.focus()
-        }, 0)
-      }
-    },
-    [selectedRowId],
-  )
-
-  // Execute pending navigation action
-  const executePendingNavigation = useCallback(() => {
-    const pending = pendingNavigationRef.current
-    if (!pending) return
-
-    // Clear pending navigation
-    pendingNavigationRef.current = null
-
-    switch (pending.type) {
-      case 'row':
-        if (pending.targetRowId) {
-          setSelectedRowId(pending.targetRowId)
-          setSelectedCellId(`${pending.targetRowId}-name`)
-          setTimeout(() => {
-            nameInputRef.current?.focus()
-          }, 0)
-        }
-        break
-      case 'direction':
-        if (pending.direction) {
-          navigateToAdjacentRow(pending.direction)
-        }
-        break
-      case 'exit':
-        setSelectedRowId(null)
-        setSelectedCellId(null)
-        if (pending.callback) {
-          pending.callback()
-        }
-        break
-    }
-  }, [navigateToAdjacentRow])
-
-  // Save form changes - now works with EditableRow's form via ref passed from keyboard handlers
-  const saveFormChanges = useCallback(
-    async (
-      taskId: string,
-      formInstance: ReturnType<typeof Form.useForm>[0],
-    ) => {
-      try {
-        // Validate form
-        await formInstance.validateFields()
-
-        const values = formInstance.getFieldsValue() as {
-          name: string
-          typeId: number
-          statusId: number
-          priorityId: number
-          plannedStart: dayjs.Dayjs | null
-          plannedEnd: dayjs.Dayjs | null
-          plannedDate: dayjs.Dayjs | null
-          estimatedEffortHours: number | null
-        }
-
-        const task = getCurrentTask(taskId)
-        if (!task) {
-          return false
-        }
-
-        // Check if form has changes by comparing with initial values
-        const initialValues = formInitialValuesRef.current
-        if (!initialValues) {
-          return true
-        }
-
-        // Helper to check if a field has changed
-        const hasChanged = (fieldName: keyof typeof initialValues) => {
-          const initial = initialValues[fieldName]
-          const current = values[fieldName]
-
-          // Handle dayjs comparison
-          if (
-            initial &&
-            current &&
-            typeof initial === 'object' &&
-            'isSame' in initial
-          ) {
-            return !initial.isSame(current as any)
-          }
-
-          // Handle null/undefined
-          if (initial === null && current === null) return false
-          if (initial === undefined && current === undefined) return false
-          if (initial === null && current === undefined) return false
-          if (initial === undefined && current === null) return false
-
-          return initial !== current
-        }
-
-        if (!onUpdateTask) {
-          return true
-        }
-
-        // Collect all changes into a single update object
-        const updates: Record<string, any> = {}
-        let hasAnyChanges = false
-
-        if (hasChanged('name')) {
-          updates.name = values.name
-          hasAnyChanges = true
-        }
-        if (hasChanged('statusId')) {
-          updates.statusId = values.statusId
-          hasAnyChanges = true
-        }
-        if (hasChanged('priorityId')) {
-          updates.priorityId = values.priorityId
-          hasAnyChanges = true
-        }
-        if (hasChanged('typeId')) {
-          updates.typeId = values.typeId
-          hasAnyChanges = true
-        }
-        if (hasChanged('plannedStart')) {
-          updates.plannedStart = values.plannedStart
-            ? values.plannedStart.format('YYYY-MM-DD')
-            : null
-          hasAnyChanges = true
-        }
-        if (hasChanged('plannedEnd')) {
-          updates.plannedEnd = values.plannedEnd
-            ? values.plannedEnd.format('YYYY-MM-DD')
-            : null
-          hasAnyChanges = true
-        }
-        if (hasChanged('plannedDate')) {
-          updates.plannedDate = values.plannedDate
-            ? values.plannedDate.format('YYYY-MM-DD')
-            : null
-          hasAnyChanges = true
-        }
-        if (hasChanged('estimatedEffortHours')) {
-          updates.estimatedEffortHours = values.estimatedEffortHours
-            ? Number(values.estimatedEffortHours)
-            : null
-          hasAnyChanges = true
-        }
-
-        if (!hasAnyChanges) {
-          // No changes to save, execute pending navigation if any
-          executePendingNavigation()
-          return true
-        }
-
-        // Single batch update with all changes
-        setIsSaving(true)
-        await onUpdateTask(taskId, updates)
-        setIsSaving(false)
-
-        // Execute pending navigation after successful save
-        executePendingNavigation()
-        return true
-      } catch (error) {
-        console.error('Validation or save failed:', error)
-        setIsSaving(false)
-        // Clear pending navigation on save failure
-        pendingNavigationRef.current = null
-        return false
-      }
-    },
-    [getCurrentTask, onUpdateTask, executePendingNavigation],
-  )
+  }, [selectedRowId, form, saveFormChanges])
 
   // Editable columns in order
   const editableColumns = useMemo(
     () => [
       'name',
-      'type',
       'status',
       'priority',
       'plannedStart',
@@ -723,9 +623,6 @@ const ProjectTasksTable = ({
     ],
     [],
   )
-
-  // Use a ref to store the table instance to avoid circular dependency
-  const tableRef = useRef<any>(null)
 
   // Global keyboard handler for navigation when row is selected
   useEffect(() => {
@@ -842,12 +739,10 @@ const ProjectTasksTable = ({
         }
 
         if (targetRowId) {
-          // Queue navigation and save
-          pendingNavigationRef.current = {
-            type: 'row',
-            targetRowId: targetRowId,
-          }
+          // Save current row before navigating
           await saveFormChanges(selectedRowId, form)
+          setSelectedRowId(targetRowId)
+          setSelectedCellId(`${targetRowId}-name`)
         }
       }
     }
@@ -892,15 +787,13 @@ const ProjectTasksTable = ({
             return
           }
           e.preventDefault()
-          // Queue navigation down to same column, then save
+          // Save and navigate down to same column
           if (currentRowIndex < rows.length - 1) {
             nextRowId = rows[currentRowIndex + 1].original.id
             nextColId = columnId
-            pendingNavigationRef.current = {
-              type: 'row',
-              targetRowId: nextRowId,
-            }
             await saveFormChanges(selectedRowId, form)
+            setSelectedRowId(nextRowId)
+            setSelectedCellId(`${nextRowId}-${nextColId}`)
             return
           }
           break
@@ -915,15 +808,13 @@ const ProjectTasksTable = ({
             return
           }
           e.preventDefault()
-          // Queue navigation up to same column, then save
+          // Save and navigate up to same column
           if (currentRowIndex > 0) {
             nextRowId = rows[currentRowIndex - 1].original.id
             nextColId = columnId
-            pendingNavigationRef.current = {
-              type: 'row',
-              targetRowId: nextRowId,
-            }
             await saveFormChanges(selectedRowId, form)
+            setSelectedRowId(nextRowId)
+            setSelectedCellId(`${nextRowId}-${nextColId}`)
             return
           }
           break
@@ -938,25 +829,20 @@ const ProjectTasksTable = ({
             return
           }
           e.preventDefault()
-          // Queue navigation down to same column, then save
+          // Save and navigate down to same column
           if (currentRowIndex < rows.length - 1) {
             nextRowId = rows[currentRowIndex + 1].original.id
             nextColId = columnId
-            pendingNavigationRef.current = {
-              type: 'row',
-              targetRowId: nextRowId,
-            }
             await saveFormChanges(selectedRowId, form)
+            setSelectedRowId(nextRowId)
+            setSelectedCellId(`${nextRowId}-${nextColId}`)
             return
           }
           break
 
         case 'Escape':
           e.preventDefault()
-          // Reset form to original values and exit edit mode (no save)
-          if (formInitialValuesRef.current) {
-            form.setFieldsValue(formInitialValuesRef.current)
-          }
+          // Exit edit mode without saving
           setSelectedRowId(null)
           setSelectedCellId(null)
           return
@@ -1017,7 +903,8 @@ const ProjectTasksTable = ({
               nextRowId = result.rowId
               nextColId = result.colId
             } else {
-              // No previous field found - exit edit mode
+              // No previous field found - save and exit edit mode
+              await saveFormChanges(rowId, form)
               setSelectedRowId(null)
               setSelectedCellId(null)
               return
@@ -1033,11 +920,10 @@ const ProjectTasksTable = ({
               nextRowId = result.rowId
               nextColId = result.colId
             } else {
-              // No next field found - queue exit and save current row
-              pendingNavigationRef.current = {
-                type: 'exit',
-              }
+              // No next field found - save and exit edit mode
               await saveFormChanges(rowId, form)
+              setSelectedRowId(null)
+              setSelectedCellId(null)
               return
             }
           }
@@ -1149,7 +1035,6 @@ const ProjectTasksTable = ({
                   ]}
                 >
                   <Input
-                    ref={nameInputRef}
                     size="small"
                     onPressEnter={(e) => {
                       e.currentTarget.blur()
@@ -1184,30 +1069,7 @@ const ProjectTasksTable = ({
           return filterValue === typeId
         },
         cell: (info) => {
-          const task = info.row.original
-          const isSelected = selectedRowId === task.id
-          const cellId = `${task.id}-type`
-
-          if (!isSelected || !onUpdateTask) {
-            return info.getValue()
-          }
-
-          return (
-            <div data-cell-id={cellId}>
-              <Form.Item
-                name="typeId"
-                style={{ margin: 0 }}
-                rules={[{ required: true, message: 'Type is required' }]}
-              >
-                <Select
-                  size="small"
-                  options={taskTypeOptions}
-                  onClick={(e) => e.stopPropagation()}
-                  onKeyDown={(e) => handleKeyDown(e, task.id, 'type')}
-                />
-              </Form.Item>
-            </div>
-          )
+          return info.getValue()
         },
       },
       {
@@ -1422,7 +1284,7 @@ const ProjectTasksTable = ({
         id: 'estimatedEffortHours',
         accessorFn: (row) => row.estimatedEffortHours ?? '',
         header: 'Est Effort',
-        size: 140,
+        size: 90,
         enableGlobalFilter: false,
         enableColumnFilter: false,
         cell: (info) => {
@@ -1433,7 +1295,7 @@ const ProjectTasksTable = ({
           const isMilestone = task.type?.name === 'Milestone'
 
           if (!isSelected || !onUpdateTask || isMilestone) {
-            return value ? `${value}h` : null
+            return value
           }
 
           return (
@@ -1918,20 +1780,17 @@ const ProjectTasksTable = ({
                             setSelectedRowId(null)
                             setSelectedCellId(null)
                           } else if (selectedRowId) {
-                            // Clicking different row - queue navigation and save current row first
-                            pendingNavigationRef.current = {
-                              type: 'row',
-                              targetRowId: row.original.id,
-                            }
-                            // Store the cell to select after navigation
-                            if (isEditableColumn) {
-                              const targetCellId = `${row.original.id}-${clickedColumnId}`
-                              const originalExecute = executePendingNavigation
-                              pendingNavigationRef.current.callback = () => {
-                                setSelectedCellId(targetCellId)
-                              }
-                            }
+                            // Clicking different row - save current row first, then navigate
                             await saveFormChanges(selectedRowId, form)
+                            setSelectedRowId(row.original.id)
+                            // Set cell ID if an editable column was clicked, otherwise default to name
+                            if (isEditableColumn) {
+                              setSelectedCellId(
+                                `${row.original.id}-${clickedColumnId}`,
+                              )
+                            } else {
+                              setSelectedCellId(`${row.original.id}-name`)
+                            }
                           } else {
                             // No previous selection - just select the row
                             setSelectedRowId(row.original.id)
@@ -1950,7 +1809,6 @@ const ProjectTasksTable = ({
                           // Determine if this cell is editable when row is selected
                           const editableCells = [
                             'name',
-                            'type',
                             'status',
                             'priority',
                             'plannedStart',
@@ -1962,6 +1820,7 @@ const ProjectTasksTable = ({
                           return (
                             <td
                               key={cell.id}
+                              data-cell-id={cell.id}
                               data-column-id={cell.column.id}
                               className={`moda-project-tasks-table__td${isEditableCell ? ' moda-project-tasks-table__editable-cell' : ''}`}
                             >
@@ -1986,3 +1845,4 @@ const ProjectTasksTable = ({
 }
 
 export default ProjectTasksTable
+
