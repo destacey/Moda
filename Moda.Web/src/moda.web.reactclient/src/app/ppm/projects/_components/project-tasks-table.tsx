@@ -1,5 +1,6 @@
 'use client'
 
+import styles from './project-tasks-table.module.css'
 import { ProjectTaskTreeDto } from '@/src/services/moda-api'
 import { ModaEmpty } from '@/src/components/common'
 import { OptionModel } from '@/src/components/types'
@@ -171,6 +172,7 @@ const ProjectTasksTable = ({
   const tableRef = useRef<any>(null)
   const isInitializingRef = useRef(false)
   const lastFocusedCellRef = useRef<string | null>(null)
+  const clickedInTableRef = useRef(false)
 
   // API options are already in the correct format - use them directly
   // Stable empty array reference to avoid re-renders
@@ -186,228 +188,7 @@ const ProjectTasksTable = ({
     return count(tasks)
   }, [tasks])
 
-  // Static CSS using Ant Design CSS variables - automatically updates with theme
-  const cssString = `
-    .moda-project-tasks-table {
-      width: 100%;
-    }
-    .moda-project-tasks-table__toolbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: var(--ant-margin);
-      margin-bottom: var(--ant-margin);
-      flex-wrap: nowrap;
-      overflow: hidden;
-    }
-    .moda-project-tasks-table__toolbar-right {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: var(--ant-margin-sm);
-      flex-wrap: nowrap;
-      white-space: nowrap;
-    }
-    .moda-project-tasks-table__toolbar-search {
-      width: 225;
-    }
-    .moda-project-tasks-table__toolbar-divider {
-      width: 1px;
-      height: 30px;
-      background-color: var(--ant-color-split);
-    }
-    .moda-project-tasks-table__table-wrapper {
-      overflow-x: auto;
-      overflow-y: hidden;
-      border-radius: var(--ant-border-radius-lg);
-      border: 1px solid var(--ant-color-border);
-      background-color: var(--ant-color-bg-container);
-    }
-    .moda-project-tasks-table__table {
-      width: max-content;
-      min-width: 100%;
-      border-collapse: separate;
-      border-spacing: 0;
-      background-color: transparent;
-      font-size: var(--ant-font-size);
-      table-layout: fixed;
-    }
-    .moda-project-tasks-table__th {
-      padding: var(--ant-padding-sm) var(--ant-padding-sm);
-      background-color: var(--ant-color-fill-alter);
-      border-bottom: 1px solid var(--ant-color-border);
-      color: var(--ant-color-text);
-      text-align: left;
-      font-weight: var(--ant-font-weight-strong);
-      white-space: nowrap;
-      position: relative;
-      overflow: hidden;
-    }
-    .moda-project-tasks-table__th--sortable {
-      cursor: pointer;
-      user-select: none;
-    }
-    .moda-project-tasks-table__th--resizable {
-      padding-right: var(--ant-padding-lg);
-    }
-    .moda-project-tasks-table__th-content {
-      display: inline-flex;
-      align-items: center;
-      gap: var(--ant-margin-xs);
-    }
-    .moda-project-tasks-table__resizer {
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 10px;
-      height: 100%;
-      cursor: col-resize;
-      user-select: none;
-      touch-action: none;
-      z-index: 1;
-    }
-    .moda-project-tasks-table__resizer::after {
-      content: "";
-      position: absolute;
-      top: var(--ant-padding-xs);
-      bottom: var(--ant-padding-xs);
-      right: 4px;
-      width: 1px;
-      background-color: var(--ant-color-border);
-      opacity: 0.7;
-    }
-    .moda-project-tasks-table__resizer--active::after {
-      background-color: var(--ant-color-primary);
-      opacity: 1;
-    }
-    .moda-project-tasks-table__filter-th {
-      padding: 4px 4px;
-      background-color: var(--ant-color-fill-alter);
-      border-bottom: 1px solid var(--ant-color-border);
-      color: var(--ant-color-text);
-      font-weight: normal;
-      overflow: hidden;
-      text-align: left;
-    }
-    .moda-project-tasks-table__filter-control {
-      width: 100%;
-      max-width: 100%;
-      box-sizing: border-box;
-    }
-    .moda-project-tasks-table__filter-control.ant-input-affix-wrapper {
-      min-width: 0;
-      max-width: 100%;
-    }
-    .moda-project-tasks-table__filter-control.ant-input-affix-wrapper .ant-input {
-      min-width: 0;
-      font-weight: normal;
-    }
-    .moda-project-tasks-table__filter-control.ant-select {
-      width: 100%;
-      min-width: 0;
-      max-width: 100%;
-      position: relative;
-    }
-    .moda-project-tasks-table__filter-control.ant-select .ant-select-selector {
-      min-width: 0;
-      max-width: 100%;
-      align-items: center;
-      flex-wrap: nowrap !important;
-      overflow: hidden;
-    }
-    .moda-project-tasks-table__filter-control.ant-select .ant-select-selection-item {
-      font-weight: normal;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      flex-shrink: 1;
-    }
-    .moda-project-tasks-table__filter-control.ant-select .ant-select-selection-overflow {
-      flex-wrap: nowrap !important;
-      overflow: hidden;
-    }
-    .moda-project-tasks-table__filter-control.ant-select .ant-select-selection-overflow-item {
-      flex-shrink: 1;
-      max-width: 100%;
-    }
-    .moda-project-tasks-table__filter-control.ant-select .ant-select-selection-search {
-      min-width: 0;
-    }
-    .moda-project-tasks-table__filter-control.ant-select .ant-select-selection-search-input {
-      font-weight: normal;
-    }
-    .moda-project-tasks-table__filter-control.ant-select .ant-select-clear {
-      margin-right: 10px;
-    }
-    .moda-project-tasks-table__filter-popup {
-      min-width: 220px;
-    }
-    .moda-project-tasks-table__td {
-      padding: 2px 7px;
-      border-bottom: 1px solid var(--ant-color-border-secondary);
-      color: var(--ant-color-text);
-      vertical-align: middle;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    .moda-project-tasks-table__tr--alt .moda-project-tasks-table__td {
-      background-color: var(--ant-color-fill-quaternary);
-    }
-    .moda-project-tasks-table__tr:hover .moda-project-tasks-table__td {
-      background-color: var(--ant-color-fill-secondary);
-    }
-    .moda-project-tasks-table__tr--selected .moda-project-tasks-table__td {
-      background-color: var(--ant-color-bg-container);
-    }
-    .moda-project-tasks-table__tr {
-      cursor: pointer;
-    }
-    .moda-project-tasks-table__editable-cell {
-      padding: 1px 4px !important;
-    }
-    .moda-project-tasks-table__editable-cell .ant-input,
-    .moda-project-tasks-table__editable-cell .ant-select,
-    .moda-project-tasks-table__editable-cell .ant-picker {
-      width: 100%;
-    }
-    // .moda-project-tasks-table__editable-cell .ant-input:hover,
-    // .moda-project-tasks-table__editable-cell .ant-select:hover .ant-select-selector,
-    // .moda-project-tasks-table__editable-cell .ant-picker:hover {
-    //   border-color: var(--ant-color-primary-hover);
-    // }
-    // .moda-project-tasks-table__editable-cell .ant-input:focus,
-    // .moda-project-tasks-table__editable-cell .ant-select-focused,
-    // .moda-project-tasks-table__editable-cell .ant-select-open,
-    // .moda-project-tasks-table__editable-cell .ant-picker-focused {
-    //   border-color: var(--ant-color-primary) !important;
-    //   border-width: 2px !important;
-    //   box-shadow: 0 0 0 3px var(--ant-color-primary-bg) !important;
-    // }
-    .moda-project-tasks-table__expander-btn {
-      padding: 0 4px;
-    }
-    .moda-project-tasks-table__name-cell {
-      display: flex;
-      align-items: center;
-      gap: var(--ant-margin-xxs);
-      min-width: 0;
-      width: 100%;
-    }
-    .moda-project-tasks-table__indent-spacer {
-      display: inline-block;
-      width: 24px;
-      flex: 0 0 24px;
-    }
-    .moda-project-tasks-table__empty {
-      padding: var(--ant-padding-lg);
-    }
-    .moda-project-tasks-table__loading {
-      padding: var(--ant-padding-lg);
-      display: flex;
-      justify-content: center;
-    }
-  `
+
 
   // Helper to get the current task
   const getCurrentTask = useCallback(
@@ -568,18 +349,22 @@ const ProjectTasksTable = ({
 
     lastFocusedCellRef.current = selectedCellId
 
-    const cellElement = document.querySelector(
-      `[data-cell-id="${selectedCellId}"]`,
-    )
-    if (cellElement) {
-      const input = cellElement.querySelector('input') as HTMLElement
-      if (input) {
-        input.focus()
-        if (input instanceof HTMLInputElement) {
-          input.select()
+    const timeout = setTimeout(() => {
+      const cellElement = document.querySelector(
+        `[data-cell-id="${selectedCellId}"]`,
+      )
+      if (cellElement) {
+        const input = cellElement.querySelector('input') as HTMLElement
+        if (input) {
+          input.focus()
+          if (input instanceof HTMLInputElement) {
+            input.select()
+          }
         }
       }
-    }
+    }, 0)
+
+    return () => clearTimeout(timeout)
   }, [selectedRowId, selectedCellId])
 
   // Handle click outside table to save changes and exit edit mode
@@ -597,12 +382,14 @@ const ProjectTasksTable = ({
         return
       }
 
-      // Check if click is on the actual table rows - if not, save and exit
-      if (!target.closest('.moda-project-tasks-table__table-wrapper')) {
+      // Check if click was in table via ref flag or if focused element is in table
+      const focusedInTable = document.activeElement?.closest(`.${styles.tableWrapper}`)
+      if (!clickedInTableRef.current && !focusedInTable) {
         await saveFormChanges(selectedRowId, form)
         setSelectedRowId(null)
         setSelectedCellId(null)
       }
+      clickedInTableRef.current = false
     }
 
     document.addEventListener('mousedown', handleClickOutside)
@@ -998,30 +785,30 @@ const ProjectTasksTable = ({
           const cellId = `${task.id}-name`
 
           const nameContent = (
-            <span
-              className="moda-project-tasks-table__name-cell"
-              data-cell-id={cellId}
-            >
-              {Array.from({ length: depth }).map((_, index) => (
-                <span
-                  key={index}
-                  className="moda-project-tasks-table__indent-spacer"
-                />
-              ))}
-              {row.getCanExpand() ? (
-                <Button
-                  type="text"
-                  size="small"
-                  icon={
-                    row.getIsExpanded() ? (
-                      <CaretDownOutlined />
-                    ) : (
-                      <CaretRightOutlined />
-                    )
-                  }
-                  onClick={row.getToggleExpandedHandler()}
-                  className="moda-project-tasks-table__expander-btn"
-                />
+             <span
+               className={styles.nameCell}
+               data-cell-id={cellId}
+             >
+               {Array.from({ length: depth }).map((_, index) => (
+                 <span
+                   key={index}
+                   className={styles.indentSpacer}
+                 />
+               ))}
+               {row.getCanExpand() ? (
+                 <Button
+                   type="text"
+                   size="small"
+                   icon={
+                     row.getIsExpanded() ? (
+                       <CaretDownOutlined />
+                     ) : (
+                       <CaretRightOutlined />
+                     )
+                   }
+                   onClick={row.getToggleExpandedHandler()}
+                   className={styles.expanderBtn}
+                 />
               ) : (
                 <span style={{ width: 24, display: 'inline-block' }} />
               )}
@@ -1040,7 +827,6 @@ const ProjectTasksTable = ({
                       e.currentTarget.blur()
                     }}
                     onKeyDown={(e) => handleKeyDown(e, task.id, 'name')}
-                    onClick={(e) => e.stopPropagation()}
                     style={{ flex: 1, minWidth: 0 }}
                   />
                 </Form.Item>
@@ -1121,7 +907,6 @@ const ProjectTasksTable = ({
                 <Select
                   size="small"
                   options={availableStatusOptions}
-                  onClick={(e) => e.stopPropagation()}
                   onKeyDown={(e) => handleKeyDown(e, task.id, 'status')}
                 />
               </Form.Item>
@@ -1171,9 +956,8 @@ const ProjectTasksTable = ({
                 <Select
                   size="small"
                   options={taskPriorityOptions}
-                  onClick={(e) => e.stopPropagation()}
                   onKeyDown={(e) => handleKeyDown(e, task.id, 'priority')}
-                />
+                  />
               </Form.Item>
             </div>
           )
@@ -1210,9 +994,8 @@ const ProjectTasksTable = ({
                 <DatePicker
                   size="small"
                   format="MMM D, YYYY"
-                  onClick={(e) => e.stopPropagation()}
                   onKeyDown={(e) => handleKeyDown(e, task.id, 'plannedStart')}
-                />
+                  />
               </Form.Item>
             </div>
           )
@@ -1263,9 +1046,8 @@ const ProjectTasksTable = ({
                 <DatePicker
                   size="small"
                   format="MMM D, YYYY"
-                  onClick={(e) => e.stopPropagation()}
                   onKeyDown={(e) => handleKeyDown(e, task.id, 'plannedEnd')}
-                />
+                  />
               </Form.Item>
             </div>
           )
@@ -1307,11 +1089,10 @@ const ProjectTasksTable = ({
                   min={0}
                   step={0.25}
                   suffix="h"
-                  onClick={(e) => e.stopPropagation()}
                   onKeyDown={(e) =>
                     handleKeyDown(e, task.id, 'estimatedEffortHours')
                   }
-                />
+                  />
               </Form.Item>
             </div>
           )
@@ -1475,10 +1256,9 @@ const ProjectTasksTable = ({
 
   return (
     <>
-      <style>{cssString}</style>
       <Form form={form} component={false}>
-        <div className="moda-project-tasks-table">
-          <div className="moda-project-tasks-table__toolbar">
+        <div className={styles.table}>
+          <div className={styles.toolbar}>
             <div>
               {onCreateTask && (
                 <Button
@@ -1491,18 +1271,18 @@ const ProjectTasksTable = ({
               )}
             </div>
 
-            <div className="moda-project-tasks-table__toolbar-right">
+            <div className={styles.toolbarRight}>
               <Text>
-                {displayedRowCount} of {totalRowCount}
-              </Text>
-              <Input
-                placeholder="Search"
-                allowClear={true}
-                value={searchValue}
-                onChange={onSearchChange}
-                suffix={<SearchOutlined />}
-                className="moda-project-tasks-table__toolbar-search"
-              />
+                 {displayedRowCount} of {totalRowCount}
+               </Text>
+               <Input
+                 placeholder="Search"
+                 allowClear={true}
+                 value={searchValue}
+                 onChange={onSearchChange}
+                 suffix={<SearchOutlined />}
+                 className={styles.toolbarSearch}
+               />
               {onRefresh && (
                 <Tooltip title="Refresh">
                   <Button
@@ -1522,7 +1302,7 @@ const ProjectTasksTable = ({
                   disabled={!hasActiveFilters}
                 />
               </Tooltip>
-              <span className="moda-project-tasks-table__toolbar-divider" />
+              <span className={styles.toolbarDivider} />
               <Tooltip title="Export to CSV">
                 <Button
                   type="text"
@@ -1549,8 +1329,8 @@ const ProjectTasksTable = ({
             </div>
           </div>
 
-          <div className="moda-project-tasks-table__table-wrapper">
-            <table className="moda-project-tasks-table__table">
+          <div className={styles.tableWrapper}>
+            <table className={styles.tableElement}>
               <colgroup>
                 {table.getVisibleLeafColumns().map((column) => (
                   <col key={column.id} width={column.getSize()} />
@@ -1574,19 +1354,17 @@ const ProjectTasksTable = ({
 
                         return (
                           <th
-                            key={header.id}
-                            className={`moda-project-tasks-table__th${
-                              canSort
-                                ? ' moda-project-tasks-table__th--sortable'
-                                : ''
-                            }${canResize ? ' moda-project-tasks-table__th--resizable' : ''}`}
-                            onClick={
-                              canSort
-                                ? header.column.getToggleSortingHandler()
-                                : undefined
-                            }
-                          >
-                            <span className="moda-project-tasks-table__th-content">
+                             key={header.id}
+                             className={`${styles.th}${
+                               canSort ? ` ${styles.thSortable}` : ''
+                             }${canResize ? ` ${styles.thResizable}` : ''}`}
+                             onClick={
+                               canSort
+                                 ? header.column.getToggleSortingHandler()
+                                 : undefined
+                             }
+                           >
+                             <span className={styles.thContent}>
                               {header.isPlaceholder
                                 ? null
                                 : flexRender(
@@ -1604,9 +1382,9 @@ const ProjectTasksTable = ({
                                 onTouchStart={header.getResizeHandler()}
                                 onDoubleClick={() => header.column.resetSize()}
                                 onClick={(e) => e.stopPropagation()}
-                                className={`moda-project-tasks-table__resizer${
+                                className={`${styles.resizer}${
                                   header.column.getIsResizing()
-                                    ? ' moda-project-tasks-table__resizer--active'
+                                    ? ` ${styles.resizerActive}`
                                     : ''
                                 }`}
                               />
@@ -1621,13 +1399,13 @@ const ProjectTasksTable = ({
                         const column = header.column
 
                         if (!column.getCanFilter() || header.isPlaceholder) {
-                          return (
-                            <th
-                              key={`${header.id}-filter`}
-                              className="moda-project-tasks-table__filter-th"
-                            />
-                          )
-                        }
+                           return (
+                             <th
+                               key={`${header.id}-filter`}
+                               className={styles.filterTh}
+                             />
+                           )
+                         }
 
                         const colId = column.id
                         const rawFilterValue = column.getFilterValue()
@@ -1651,11 +1429,11 @@ const ProjectTasksTable = ({
                                 : []
 
                         return (
-                          <th
-                            key={`${header.id}-filter`}
-                            className="moda-project-tasks-table__filter-th"
-                            onClick={(e) => e.stopPropagation()}
-                          >
+                           <th
+                             key={`${header.id}-filter`}
+                             className={styles.filterTh}
+                             onClick={(e) => e.stopPropagation()}
+                           >
                             {isSelect ? (
                               <Select
                                 size="small"
@@ -1681,17 +1459,17 @@ const ProjectTasksTable = ({
                                 suffixIcon={<FilterOutlined />}
                                 popupMatchSelectWidth={false}
                                 classNames={{
-                                  popup: {
-                                    root: 'moda-project-tasks-table__filter-popup',
-                                  },
-                                }}
+                                   popup: {
+                                     root: styles.filterPopup,
+                                   },
+                                 }}
                                 onChange={(v) =>
                                   column.setFilterValue(
                                     v && v.length ? v : undefined,
                                   )
                                 }
-                                className="moda-project-tasks-table__filter-control"
-                              />
+                                className={styles.filterControl}
+                                />
                             ) : (
                               <Input
                                 size="small"
@@ -1701,7 +1479,7 @@ const ProjectTasksTable = ({
                                   const next = e.target.value
                                   column.setFilterValue(next ? next : undefined)
                                 }}
-                                className="moda-project-tasks-table__filter-control"
+                                className={styles.filterControl}
                               />
                             )}
                           </th>
@@ -1713,97 +1491,104 @@ const ProjectTasksTable = ({
               </thead>
               <tbody>
                 {isLoading ? (
-                  <tr>
-                    <td
-                      colSpan={columns.length}
-                      className="moda-project-tasks-table__td moda-project-tasks-table__loading"
-                    >
-                      <Spin />
-                    </td>
-                  </tr>
-                ) : table.getRowModel().rows.length === 0 ? (
-                  <tr>
-                    <td
-                      colSpan={columns.length}
-                      className="moda-project-tasks-table__td moda-project-tasks-table__empty"
-                    >
-                      <ModaEmpty message="No tasks found" />
-                    </td>
-                  </tr>
-                ) : (
+                   <tr>
+                     <td
+                       colSpan={columns.length}
+                       className={`${styles.td} ${styles.loading}`}
+                     >
+                       <Spin />
+                     </td>
+                   </tr>
+                 ) : table.getRowModel().rows.length === 0 ? (
+                   <tr>
+                     <td
+                       colSpan={columns.length}
+                       className={`${styles.td} ${styles.empty}`}
+                     >
+                       <ModaEmpty message="No tasks found" />
+                     </td>
+                   </tr>
+                 ) : (
                   table.getRowModel().rows.map((row, index) => {
                     const isSelected = selectedRowId === row.original.id
                     return (
                       <tr
-                        key={row.id}
-                        className={`moda-project-tasks-table__tr${index % 2 === 1 ? ' moda-project-tasks-table__tr--alt' : ''}${isSelected ? ' moda-project-tasks-table__tr--selected' : ''}`}
+                         key={row.id}
+                         className={`${styles.tr}${index % 2 === 1 ? ` ${styles.trAlt}` : ''}${isSelected ? ` ${styles.trSelected}` : ''}`}
                         onClick={async (e) => {
-                          // Block row selection while saving
-                          if (isSaving) {
-                            return
-                          }
+                             clickedInTableRef.current = true
 
-                          // Ignore clicks from form inputs/controls (they handle their own interactions)
-                          const target = e.target as HTMLElement
-                          if (
-                            target.closest('.ant-select-dropdown') ||
-                            target.closest('.ant-picker-dropdown') ||
-                            target.closest('input') ||
-                            target.closest('.ant-select-selector') ||
-                            target.classList.contains(
-                              'ant-select-item-option-content',
-                            )
-                          ) {
-                            return
-                          }
+                             // Block row selection while saving
+                             if (isSaving) {
+                               return
+                             }
 
-                          // Ignore clicks on buttons (expander, edit, delete) - they handle their own actions
-                          if (
-                            target.closest('button') ||
-                            target.closest('.ant-btn')
-                          ) {
-                            return
-                          }
+                             // Ignore clicks from form inputs/controls (they handle their own interactions)
+                             const target = e.target as HTMLElement
+                             if (
+                               target.closest('.ant-select-dropdown') ||
+                               target.closest('.ant-picker-dropdown') ||
+                               target.closest('input') ||
+                               target.closest('.ant-select-selector') ||
+                               target.classList.contains(
+                                 'ant-select-item-option-content',
+                               )
+                             ) {
+                               return
+                             }
 
-                          // Find which cell was clicked
-                          const cellElement = target.closest('td')
-                          const clickedColumnId =
-                            cellElement?.getAttribute('data-column-id')
+                             // Ignore clicks on buttons (expander, edit, delete) - they handle their own actions
+                             if (
+                               target.closest('button') ||
+                               target.closest('.ant-btn')
+                             ) {
+                               return
+                             }
 
-                          // Check if clicked column is editable
-                          const isEditableColumn =
-                            clickedColumnId &&
-                            editableColumns.includes(clickedColumnId)
+                             // Find which cell was clicked
+                             const cellElement = target.closest('td')
+                             const clickedColumnId =
+                               cellElement?.getAttribute('data-column-id')
 
-                          if (selectedRowId === row.original.id) {
-                            // Clicking same row - toggle selection (no save needed)
-                            setSelectedRowId(null)
-                            setSelectedCellId(null)
-                          } else if (selectedRowId) {
-                            // Clicking different row - save current row first, then navigate
-                            await saveFormChanges(selectedRowId, form)
-                            setSelectedRowId(row.original.id)
-                            // Set cell ID if an editable column was clicked, otherwise default to name
-                            if (isEditableColumn) {
-                              setSelectedCellId(
-                                `${row.original.id}-${clickedColumnId}`,
-                              )
-                            } else {
-                              setSelectedCellId(`${row.original.id}-name`)
+                            // If no cell found, ignore the click
+                            if (!cellElement || !clickedColumnId) {
+                              return
                             }
-                          } else {
-                            // No previous selection - just select the row
-                            setSelectedRowId(row.original.id)
-                            // Set cell ID if an editable column was clicked, otherwise default to name
-                            if (isEditableColumn) {
-                              setSelectedCellId(
-                                `${row.original.id}-${clickedColumnId}`,
-                              )
-                            } else {
-                              setSelectedCellId(`${row.original.id}-name`)
-                            }
-                          }
-                        }}
+
+                             // Check if clicked column is editable
+                              const isEditableColumn =
+                                editableColumns.includes(clickedColumnId)
+
+                              if (selectedRowId === row.original.id) {
+                               // Clicking same row
+                               if (isEditableColumn) {
+                                 // Clicked an editable cell - switch to it only if different cell
+                                 const targetCellId = `${row.original.id}-${clickedColumnId}`
+                                 if (selectedCellId !== targetCellId) {
+                                   setSelectedCellId(targetCellId)
+                                 }
+                               } else {
+                                 // Clicked a non-editable cell - exit edit mode
+                                 setSelectedRowId(null)
+                                 setSelectedCellId(null)
+                               }
+                              } else if (selectedRowId) {
+                               // Clicking different row - save current row first, then navigate
+                               await saveFormChanges(selectedRowId, form)
+                               setSelectedRowId(row.original.id)
+                               const targetCellId = isEditableColumn
+                                 ? `${row.original.id}-${clickedColumnId}`
+                                 : `${row.original.id}-name`
+                               setSelectedCellId(targetCellId)
+                              } else {
+                               // No previous selection - just select the row
+                               setSelectedRowId(row.original.id)
+                               const targetCellId = isEditableColumn
+                                 ? `${row.original.id}-${clickedColumnId}`
+                                 : `${row.original.id}-name`
+                               setSelectedCellId(targetCellId)
+                              }
+                           }}
                       >
                         {row.getVisibleCells().map((cell) => {
                           // Determine if this cell is editable when row is selected
@@ -1819,11 +1604,22 @@ const ProjectTasksTable = ({
 
                           return (
                             <td
-                              key={cell.id}
-                              data-cell-id={cell.id}
-                              data-column-id={cell.column.id}
-                              className={`moda-project-tasks-table__td${isEditableCell ? ' moda-project-tasks-table__editable-cell' : ''}`}
-                            >
+                               key={cell.id}
+                               data-cell-id={cell.id}
+                               data-column-id={cell.column.id}
+                               className={`${styles.td}${isEditableCell ? ` ${styles.editableCell}` : ''}`}
+                               onClick={(e) => {
+                                 // If clicking inside a form input/select, let it handle the click
+                                 const target = e.target as HTMLElement
+                                 if (
+                                   target.closest('input') ||
+                                   target.closest('.ant-select') ||
+                                   target.closest('.ant-picker')
+                                 ) {
+                                   e.stopPropagation()
+                                 }
+                               }}
+                             >
                               {flexRender(
                                 cell.column.columnDef.cell,
                                 cell.getContext(),
