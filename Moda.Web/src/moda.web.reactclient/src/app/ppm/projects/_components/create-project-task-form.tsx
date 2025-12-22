@@ -74,13 +74,9 @@ const CreateProjectTaskForm = (props: CreateProjectTaskFormProps) => {
   const [createProjectTask, { error: mutationError }] =
     useCreateProjectTaskMutation()
 
-  const { data: priorityOptions = [] } = useGetTaskPriorityOptionsQuery({
-    projectIdOrKey: props.projectIdOrKey,
-  })
+  const { data: priorityOptions = [] } = useGetTaskPriorityOptionsQuery()
 
-  const { data: typeOptions = [] } = useGetTaskTypeOptionsQuery({
-    projectIdOrKey: props.projectIdOrKey,
-  })
+  const { data: typeOptions = [] } = useGetTaskTypeOptionsQuery()
 
   const { data: parentTaskOptions = [] } = useGetParentTaskOptionsQuery({
     projectIdOrKey: props.projectIdOrKey,
@@ -126,7 +122,7 @@ const CreateProjectTaskForm = (props: CreateProjectTaskFormProps) => {
       } else {
         messageApi.error(
           error.detail ??
-            'An error occurred while creating the project. Please try again.',
+            'An error occurred while creating the project task. Please try again.',
         )
       }
       return false
@@ -261,12 +257,7 @@ const CreateProjectTaskForm = (props: CreateProjectTaskFormProps) => {
             </Item>
 
             <Item name="estimatedEffortHours" label="Estimated Effort (hours)">
-              <InputNumber
-                min={0}
-                step={0.25}
-                style={{ width: '33%' }}
-                placeholder="Estimated hours"
-              />
+              <InputNumber min={0} step={0.25} style={{ width: '33%' }} />
             </Item>
           </>
         ) : (

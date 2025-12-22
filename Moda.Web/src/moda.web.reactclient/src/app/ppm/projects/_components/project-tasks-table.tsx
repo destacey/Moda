@@ -17,6 +17,7 @@ import {
   Tag,
   Tooltip,
   Typography,
+  theme,
 } from 'antd'
 import {
   CaretRightOutlined,
@@ -55,6 +56,8 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 import { generateCsv, downloadCsvWithTimestamp } from '@/src/utils/csv-utils'
+
+import { useMessage } from '@/src/components/contexts/messaging'
 import {
   useGetTaskPriorityOptionsQuery,
   useGetTaskStatusOptionsQuery,
@@ -126,7 +129,7 @@ interface ProjectTasksTableProps {
   tasks: ProjectTaskTreeDto[]
   isLoading: boolean
   canManageTasks: boolean
-  refetch: () => void
+  refetch: () => Promise<any>
 }
 
 const ProjectTasksTable = ({
@@ -155,6 +158,10 @@ const ProjectTasksTable = ({
   const [selectedTaskId, setSelectedTaskId] = useState<string | undefined>(
     undefined,
   )
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
+
+  const { token } = theme.useToken()
+  const messageApi = useMessage()
 
   const { data: taskStatusOptions = [] } = useGetTaskStatusOptionsQuery()
 
@@ -199,7 +206,7 @@ const ProjectTasksTable = ({
       if (!task) return
 
       try {
-        await updateProjectTask({
+        const response = await updateProjectTask({
           projectIdOrKey: projectKey,
           cacheKey: taskId,
           request: {
@@ -219,21 +226,85 @@ const ProjectTasksTable = ({
                 ? updates.plannedEnd
                 : task.plannedEnd,
             plannedDate: updates.plannedDate ?? task.plannedDate,
-            actualDate: task.actualDate,
             estimatedEffortHours:
               updates.estimatedEffortHours !== undefined
                 ? updates.estimatedEffortHours
                 : task.estimatedEffortHours,
             assignments: [],
           },
-        }).unwrap()
+        })
+        if (response.error) {
+          throw response.error
+        }
         // Refetch to ensure UI has latest data before navigation
-        refetch()
-      } catch (error) {
-        console.error('Failed to update task:', error)
+        // DO NOT REMOVE THE AWAIT - the UI will show stale data in between api calls
+        await refetch()
+        return true
+      } catch (error: any) {
+        if (error?.status === 422 && error?.errors) {
+          const errorMap: Record<string, string> = {}
+          const errorFields: string[] = []
+          Object.entries(error.errors).forEach(([key, messages]) => {
+            const fieldName = key.charAt(0).toLowerCase() + key.slice(1)
+            errorMap[fieldName] = Array.isArray(messages)
+              ? messages[0]
+              : messages
+            errorFields.push(fieldName)
+          })
+          setFieldErrors(errorMap)
+
+          // Focus on the first mappable error field, or first editable column if none map
+          setTimeout(() => {
+            let focused = false
+
+            // Try each error field in order
+            for (const errorField of errorFields) {
+              const columnId =
+                errorField === 'plannedDate'
+                  ? 'plannedStart'
+                  : errorField.replace(/Id$/, '')
+
+              const cellElement = document.querySelector(
+                `[data-cell-id="${taskId}-${columnId}"]`,
+              )
+              if (cellElement) {
+                const input = cellElement.querySelector(
+                  'input, .ant-select',
+                ) as HTMLElement
+                if (input) {
+                  input.focus()
+                  focused = true
+                  break
+                }
+              }
+            }
+
+            // If no error field could be mapped, focus first editable column
+            if (!focused) {
+              const cellElement = document.querySelector(
+                `[data-cell-id="${taskId}-name"]`,
+              )
+              if (cellElement) {
+                const input = cellElement.querySelector('input') as HTMLElement
+                if (input) {
+                  input.focus()
+                }
+              }
+            }
+          }, 0)
+
+          messageApi.error('Correct the validation error(s) to continue.')
+          return false
+        } else {
+          messageApi.error(
+            error?.detail ??
+              'An error occurred while updating the project task. Please try again.',
+          )
+        }
+        return false
       }
     },
-    [projectKey, refetch, tasks, updateProjectTask],
+    [messageApi, projectKey, refetch, tasks, updateProjectTask],
   )
 
   const onCreateTaskFormClosed = useCallback(
@@ -281,6 +352,14 @@ const ProjectTasksTable = ({
       )
     return count(tasks)
   }, [tasks])
+
+  // Helper to get field errors
+  const getFieldError = useCallback(
+    (fieldName: string): string | undefined => {
+      return fieldErrors[fieldName]
+    },
+    [fieldErrors],
+  )
 
   // Helper to get the current task
   const getCurrentTask = useCallback(
@@ -389,15 +468,15 @@ const ProjectTasksTable = ({
 
         // Send update
         setIsSaving(true)
-        await handleUpdateTask(taskId, updates)
+        const success = await handleUpdateTask(taskId, updates)
         setIsSaving(false)
-        return true
+        return success
       } catch (error) {
-        console.error('Validation or save failed:', error)
         setIsSaving(false)
         return false
       }
     },
+
     [getCurrentTask, handleUpdateTask],
   )
 
@@ -409,6 +488,7 @@ const ProjectTasksTable = ({
       const task = getCurrentTask(selectedRowId)
       if (task) {
         form.resetFields()
+        setFieldErrors({})
         const initialValues = {
           name: task.name,
           typeId: task.type?.id,
@@ -428,9 +508,10 @@ const ProjectTasksTable = ({
       form.resetFields()
       isInitializingRef.current = false
     }
+    // Clear cell focus tracking when row changes
+    lastFocusedCellRef.current = null
     // Only re-run when selectedRowId changes (cell focus is separate)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedRowId])
+  }, [form, getCurrentTask, selectedRowId])
 
   // Handle cell focusing separately - only focus when cell ID changes
   useEffect(() => {
@@ -442,11 +523,33 @@ const ProjectTasksTable = ({
     lastFocusedCellRef.current = selectedCellId
 
     const timeout = setTimeout(() => {
-      const cellElement = document.querySelector(
-        `[data-cell-id="${selectedCellId}"]`,
+      // First try finding by data-cell-id on td
+      let cellElement = document.querySelector(
+        `td[data-cell-id="${selectedCellId}"]`,
       )
+
+      // If not found, search within the row
+      if (!cellElement) {
+        const rows = document.querySelectorAll('tr')
+        for (const row of rows) {
+          const cell = row.querySelector(`[data-cell-id="${selectedCellId}"]`)
+          if (cell) {
+            cellElement = cell
+            break
+          }
+        }
+      }
+
       if (cellElement) {
-        const input = cellElement.querySelector('input') as HTMLElement
+        // Try to find input, select, or date picker
+        let input = cellElement.querySelector('input') as HTMLElement
+
+        if (!input) {
+          input = cellElement.querySelector(
+            '.ant-select, .ant-picker',
+          ) as HTMLElement
+        }
+
         if (input) {
           input.focus()
           if (input instanceof HTMLInputElement) {
@@ -454,7 +557,7 @@ const ProjectTasksTable = ({
           }
         }
       }
-    }, 0)
+    }, 10)
 
     return () => clearTimeout(timeout)
   }, [selectedRowId, selectedCellId])
@@ -668,13 +771,15 @@ const ProjectTasksTable = ({
             return
           }
           e.preventDefault()
-          // Save and navigate down to same column
+          // Save and navigate down to first editable column
           if (currentRowIndex < rows.length - 1) {
-            nextRowId = rows[currentRowIndex + 1].original.id
-            nextColId = columnId
-            await saveFormChanges(selectedRowId, form)
-            setSelectedRowId(nextRowId)
-            setSelectedCellId(`${nextRowId}-${nextColId}`)
+            const saved = await saveFormChanges(selectedRowId, form)
+            if (saved) {
+              nextRowId = rows[currentRowIndex + 1].original.id
+              nextColId = editableColumns[0]
+              setSelectedRowId(nextRowId)
+              setSelectedCellId(`${nextRowId}-${nextColId}`)
+            }
             return
           }
           break
@@ -689,10 +794,10 @@ const ProjectTasksTable = ({
             return
           }
           e.preventDefault()
-          // Save and navigate up to same column
+          // Save and navigate up to first editable column
           if (currentRowIndex > 0) {
             nextRowId = rows[currentRowIndex - 1].original.id
-            nextColId = columnId
+            nextColId = editableColumns[0]
             await saveFormChanges(selectedRowId, form)
             setSelectedRowId(nextRowId)
             setSelectedCellId(`${nextRowId}-${nextColId}`)
@@ -752,11 +857,13 @@ const ProjectTasksTable = ({
               ) {
                 const testRowId = rows[currentRowIdx].original.id
                 const testColId = editableColumns[currentColIdx]
-                const cellExists = document.querySelector(
-                  `[data-cell-id="${testRowId}-${testColId}"]`,
+                // Check if a cell with this column ID exists in the DOM
+                // (TanStack cell.id uses row index, so just check if column exists)
+                const cellElement = document.querySelector(
+                  `[data-cell-id*="-${testColId}"]`,
                 )
 
-                if (cellExists) {
+                if (cellElement) {
                   return { rowId: testRowId, colId: testColId }
                 }
 
@@ -908,6 +1015,7 @@ const ProjectTasksTable = ({
                     { required: true, message: 'Name is required' },
                     { max: 256, message: 'Name cannot exceed 256 characters' },
                   ]}
+                  validateStatus={getFieldError('name') ? 'error' : ''}
                 >
                   <Input
                     size="small"
@@ -916,6 +1024,7 @@ const ProjectTasksTable = ({
                     }}
                     onKeyDown={(e) => handleKeyDown(e, task.id, 'name')}
                     style={{ flex: 1, minWidth: 0 }}
+                    status={getFieldError('name') ? 'error' : ''}
                   />
                 </FormItem>
               ) : (
@@ -985,17 +1094,20 @@ const ProjectTasksTable = ({
             ? taskStatusOptions.filter((opt) => opt.label !== 'In Progress')
             : taskStatusOptions
 
+          const error = getFieldError('statusId')
           return (
             <div data-cell-id={cellId}>
               <FormItem
                 name="statusId"
                 style={{ margin: 0 }}
                 rules={[{ required: true, message: 'Status is required' }]}
+                validateStatus={error ? 'error' : ''}
               >
                 <Select
                   size="small"
                   options={availableStatusOptions}
                   onKeyDown={(e) => handleKeyDown(e, task.id, 'status')}
+                  status={error ? 'error' : ''}
                 />
               </FormItem>
             </div>
@@ -1034,17 +1146,20 @@ const ProjectTasksTable = ({
             return <Tag color={colorMap[priority]}>{priority}</Tag>
           }
 
+          const error = getFieldError('priorityId')
           return (
             <div data-cell-id={cellId}>
               <FormItem
                 name="priorityId"
                 style={{ margin: 0 }}
                 rules={[{ required: true, message: 'Priority is required' }]}
+                validateStatus={error ? 'error' : ''}
               >
                 <Select
                   size="small"
                   options={taskPriorityOptions}
                   onKeyDown={(e) => handleKeyDown(e, task.id, 'priority')}
+                  status={error ? 'error' : ''}
                 />
               </FormItem>
             </div>
@@ -1075,10 +1190,15 @@ const ProjectTasksTable = ({
           }
 
           const fieldName = isMilestone ? 'plannedDate' : 'plannedStart'
+          const error = getFieldError(fieldName)
 
           return (
             <div data-cell-id={cellId}>
-              <FormItem name={fieldName} style={{ margin: 0 }}>
+              <FormItem
+                name={fieldName}
+                style={{ margin: 0 }}
+                validateStatus={error ? 'error' : ''}
+              >
                 <DatePicker
                   size="small"
                   format="MMM D, YYYY"
@@ -1087,7 +1207,7 @@ const ProjectTasksTable = ({
                     if (!open) {
                       setTimeout(() => {
                         const input = document.querySelector(
-                          `[data-cell-id="${cellId}"] input`,
+                          `[data-cell-id="${info.cell.id}"] input`,
                         ) as HTMLInputElement
                         if (input) {
                           input.focus()
@@ -1095,6 +1215,7 @@ const ProjectTasksTable = ({
                       }, 0)
                     }
                   }}
+                  status={error ? 'error' : ''}
                 />
               </FormItem>
             </div>
@@ -1140,9 +1261,15 @@ const ProjectTasksTable = ({
             return value
           }
 
+          const error = getFieldError('plannedEnd')
+
           return (
             <div data-cell-id={cellId}>
-              <FormItem name="plannedEnd" style={{ margin: 0 }}>
+              <FormItem
+                name="plannedEnd"
+                style={{ margin: 0 }}
+                validateStatus={error ? 'error' : ''}
+              >
                 <DatePicker
                   size="small"
                   format="MMM D, YYYY"
@@ -1151,7 +1278,7 @@ const ProjectTasksTable = ({
                     if (!open) {
                       setTimeout(() => {
                         const input = document.querySelector(
-                          `[data-cell-id="${cellId}"] input`,
+                          `[data-cell-id="${info.cell.id}"] input`,
                         ) as HTMLInputElement
                         if (input) {
                           input.focus()
@@ -1159,6 +1286,7 @@ const ProjectTasksTable = ({
                       }, 0)
                     }
                   }}
+                  status={error ? 'error' : ''}
                 />
               </FormItem>
             </div>
@@ -1192,9 +1320,14 @@ const ProjectTasksTable = ({
             return value
           }
 
+          const error = getFieldError('estimatedEffortHours')
           return (
             <div data-cell-id={cellId}>
-              <FormItem name="estimatedEffortHours" style={{ margin: 0 }}>
+              <FormItem
+                name="estimatedEffortHours"
+                style={{ margin: 0 }}
+                validateStatus={error ? 'error' : ''}
+              >
                 <Input
                   size="small"
                   type="number"
@@ -1204,6 +1337,7 @@ const ProjectTasksTable = ({
                   onKeyDown={(e) =>
                     handleKeyDown(e, task.id, 'estimatedEffortHours')
                   }
+                  status={error ? 'error' : ''}
                 />
               </FormItem>
             </div>
@@ -1254,13 +1388,14 @@ const ProjectTasksTable = ({
     ],
     [
       canManageTasks,
-      handleEditTask,
+      getFieldError,
       handleDeleteTask,
+      handleEditTask,
+      handleKeyDown,
       handleUpdateTask,
       selectedRowId,
-      handleKeyDown,
-      taskStatusOptions,
       taskPriorityOptions,
+      taskStatusOptions,
     ],
   )
 
@@ -1618,9 +1753,9 @@ const ProjectTasksTable = ({
                     </td>
                   </tr>
                 ) : (
-                  table.getRowModel().rows.map((row, index) => {
+                  table.getRowModel().rows.flatMap((row, index) => {
                     const isSelected = selectedRowId === row.original.id
-                    return (
+                    const rowElements = [
                       <tr
                         key={row.id}
                         className={`${styles.tr}${index % 2 === 1 ? ` ${styles.trAlt}` : ''}${isSelected ? ` ${styles.trSelected}` : ''}`}
@@ -1683,12 +1818,17 @@ const ProjectTasksTable = ({
                             }
                           } else if (selectedRowId) {
                             // Clicking different row - save current row first, then navigate
-                            await saveFormChanges(selectedRowId, form)
-                            setSelectedRowId(row.original.id)
-                            const targetCellId = isEditableColumn
-                              ? `${row.original.id}-${clickedColumnId}`
-                              : `${row.original.id}-name`
-                            setSelectedCellId(targetCellId)
+                            const saved = await saveFormChanges(
+                              selectedRowId,
+                              form,
+                            )
+                            if (saved) {
+                              setSelectedRowId(row.original.id)
+                              const targetCellId = isEditableColumn
+                                ? `${row.original.id}-${clickedColumnId}`
+                                : `${row.original.id}-name`
+                              setSelectedCellId(targetCellId)
+                            }
                           } else {
                             // No previous selection - just select the row
                             setSelectedRowId(row.original.id)
@@ -1714,7 +1854,7 @@ const ProjectTasksTable = ({
                           return (
                             <td
                               key={cell.id}
-                              data-cell-id={cell.id}
+                              data-cell-id={`${row.original.id}-${cell.column.id}`}
                               data-column-id={cell.column.id}
                               className={`${styles.td}${isEditableCell ? ` ${styles.editableCell}` : ''}`}
                               onClick={(e) => {
@@ -1736,8 +1876,45 @@ const ProjectTasksTable = ({
                             </td>
                           )
                         })}
-                      </tr>
-                    )
+                      </tr>,
+                    ]
+
+                    // Add error row if row is selected and has field errors
+                    if (isSelected && Object.keys(fieldErrors).length > 0) {
+                      const errorItems = Object.entries(fieldErrors).map(
+                        ([field, error]) => (
+                          <div key={field} style={{ marginBottom: '4px' }}>
+                            <span style={{ fontWeight: 500 }}>{field}:</span>{' '}
+                            {error}
+                          </div>
+                        ),
+                      )
+
+                      rowElements.push(
+                        <tr
+                          key={`${row.id}-errors`}
+                          className={styles.tr}
+                          style={{
+                            backgroundColor: token.colorErrorBg,
+                          }}
+                        >
+                          <td
+                            colSpan={columns.length}
+                            className={styles.td}
+                            style={{
+                              color: token.colorError,
+                              fontSize: '12px',
+                              padding: '12px',
+                              borderTop: `1px solid ${token.colorErrorBorder}`,
+                            }}
+                          >
+                            {errorItems}
+                          </td>
+                        </tr>,
+                      )
+                    }
+
+                    return rowElements
                   })
                 )}
               </tbody>

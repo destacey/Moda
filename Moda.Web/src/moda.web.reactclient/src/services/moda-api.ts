@@ -18357,16 +18357,8 @@ export interface UpdateProjectTaskRequest {
     plannedEnd?: Date | undefined;
     /** The planned date for a milestone. */
     plannedDate?: Date | undefined;
-    /** The actual start date when work began. */
-    actualStart?: Date | undefined;
-    /** The actual end date when work completed. */
-    actualEnd?: Date | undefined;
-    /** The actual date a milestone was achieved. */
-    actualDate?: Date | undefined;
     /** The estimated effort in hours (optional). */
     estimatedEffortHours?: number | undefined;
-    /** The actual effort spent in hours (optional). */
-    actualEffortHours?: number | undefined;
     /** The role-based assignments for this task (optional). */
     assignments?: TaskRoleAssignmentRequest[] | undefined;
 }

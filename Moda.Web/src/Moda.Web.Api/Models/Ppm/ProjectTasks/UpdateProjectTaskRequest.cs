@@ -57,29 +57,9 @@ public sealed record UpdateProjectTaskRequest
     public LocalDate? PlannedDate { get; set; }
 
     /// <summary>
-    /// The actual start date when work began.
-    /// </summary>
-    public LocalDate? ActualStart { get; set; }
-
-    /// <summary>
-    /// The actual end date when work completed.
-    /// </summary>
-    public LocalDate? ActualEnd { get; set; }
-
-    /// <summary>
-    /// The actual date a milestone was achieved.
-    /// </summary>
-    public LocalDate? ActualDate { get; set; }
-
-    /// <summary>
     /// The estimated effort in hours (optional).
     /// </summary>
     public decimal? EstimatedEffortHours { get; set; }
-
-    /// <summary>
-    /// The actual effort spent in hours (optional).
-    /// </summary>
-    public decimal? ActualEffortHours { get; set; }
 
     /// <summary>
     /// The role-based assignments for this task (optional).
@@ -91,10 +71,6 @@ public sealed record UpdateProjectTaskRequest
         var plannedDateRange = PlannedStart is null || PlannedEnd is null
             ? null
             : new FlexibleDateRange((LocalDate)PlannedStart, (LocalDate)PlannedEnd);
-
-        var actualDateRange = ActualStart is null || ActualEnd is null
-            ? null
-            : new FlexibleDateRange((LocalDate)ActualStart, (LocalDate)ActualEnd);
 
         var assignments = Assignments?
             .Select(a => new TaskRoleAssignment(a.EmployeeId, a.Role))
@@ -110,10 +86,7 @@ public sealed record UpdateProjectTaskRequest
             TeamId,
             plannedDateRange,
             PlannedDate,
-            actualDateRange,
-            ActualDate,
             EstimatedEffortHours,
-            ActualEffortHours,
             assignments
         );
     }
@@ -153,21 +126,9 @@ public sealed class UpdateProjectTaskRequestValidator : CustomValidator<UpdatePr
             .Must((request, plannedEnd) => request.PlannedStart == null || request.PlannedEnd == null || request.PlannedStart <= request.PlannedEnd)
             .WithMessage("PlannedEnd must be greater than or equal to PlannedStart.");
 
-        RuleFor(x => x.ActualStart)
-            .Must((request, actualStart) => (request.ActualStart == null && request.ActualEnd == null) || (request.ActualStart != null && request.ActualEnd != null))
-            .WithMessage("ActualStart and ActualEnd must either both be null or both have a value.");
-
-        RuleFor(x => x.ActualEnd)
-            .Must((request, actualEnd) => request.ActualStart == null || request.ActualEnd == null || request.ActualStart <= request.ActualEnd)
-            .WithMessage("ActualEnd must be greater than or equal to ActualStart.");
-
         RuleFor(x => x.EstimatedEffortHours)
             .GreaterThan(0)
             .When(x => x.EstimatedEffortHours.HasValue);
-
-        RuleFor(x => x.ActualEffortHours)
-            .GreaterThan(0)
-            .When(x => x.ActualEffortHours.HasValue);
 
         RuleFor(x => x.Assignments)
             .Must(assignments => assignments == null || assignments.All(a => a.EmployeeId != Guid.Empty))

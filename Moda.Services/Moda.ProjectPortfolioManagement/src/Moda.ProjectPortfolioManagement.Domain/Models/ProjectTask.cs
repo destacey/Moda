@@ -296,20 +296,15 @@ public sealed class ProjectTask : BaseEntity<Guid>, ISystemAuditable, IHasIdAndK
     /// <summary>
     /// Updates the effort estimates and actuals.
     /// </summary>
-    public Result UpdateEffort(decimal? estimatedEffortHours, decimal? actualEffortHours)
+    public Result UpdateEffort(decimal? estimatedEffortHours)
     {
         if (estimatedEffortHours.HasValue && estimatedEffortHours < 0)
         {
             return Result.Failure("Estimated effort cannot be negative.");
         }
 
-        if (actualEffortHours.HasValue && actualEffortHours < 0)
-        {
-            return Result.Failure("Actual effort cannot be negative.");
-        }
-
         EstimatedEffortHours = estimatedEffortHours;
-        ActualEffortHours = actualEffortHours;
+
         return Result.Success();
     }
 

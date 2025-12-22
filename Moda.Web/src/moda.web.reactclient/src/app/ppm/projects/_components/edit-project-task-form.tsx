@@ -153,7 +153,6 @@ const EditProjectTaskForm = (props: EditProjectTaskFormProps) => {
 
       return true
     } catch (error) {
-      console.error('update error', error)
       if (error.status === 422 && error.errors) {
         const formErrors = toFormErrors(error.errors)
         form.setFields(formErrors)
@@ -161,7 +160,7 @@ const EditProjectTaskForm = (props: EditProjectTaskFormProps) => {
       } else {
         messageApi.error(
           error.detail ??
-            'An error occurred while updating the project. Please try again.',
+            'An error occurred while update the project task. Please try again.',
         )
       }
       return false
@@ -251,7 +250,7 @@ const EditProjectTaskForm = (props: EditProjectTaskFormProps) => {
           name="name"
           rules={[
             { required: true, message: 'Name is required' },
-            { max: 256 },
+            { max: 256, message: 'Name cannot exceed 256 characters' },
           ]}
         >
           <TextArea
@@ -260,7 +259,13 @@ const EditProjectTaskForm = (props: EditProjectTaskFormProps) => {
             maxLength={256}
           />
         </Item>
-        <Item name="description" label="Description" rules={[{ max: 2048 }]}>
+        <Item
+          name="description"
+          label="Description"
+          rules={[
+            { max: 2048, message: 'Description cannot exceed 2048 characters' },
+          ]}
+        >
           <MarkdownEditor maxLength={2048} />
         </Item>
 
@@ -294,13 +299,10 @@ const EditProjectTaskForm = (props: EditProjectTaskFormProps) => {
               <RangePicker style={{ width: '60%' }} format="MMM D, YYYY" />
             </Item>
 
+            {/* TODO: the validation error is not displaying for this field
+              even though it's being set in the form correctly (same as create form) */}
             <Item name="estimatedEffortHours" label="Estimated Effort (hours)">
-              <InputNumber
-                min={0}
-                step={0.25}
-                style={{ width: '33%' }}
-                placeholder="Enter estimated hours"
-              />
+              <InputNumber min={0} step={0.25} style={{ width: '33%' }} />
             </Item>
           </>
         ) : (
@@ -314,3 +316,4 @@ const EditProjectTaskForm = (props: EditProjectTaskFormProps) => {
 }
 
 export default EditProjectTaskForm
+

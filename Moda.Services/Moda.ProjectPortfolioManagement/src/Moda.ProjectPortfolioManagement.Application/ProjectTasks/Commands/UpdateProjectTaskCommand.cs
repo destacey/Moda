@@ -12,10 +12,7 @@ public sealed record UpdateProjectTaskCommand(
     Guid? TeamId,
     FlexibleDateRange? PlannedDateRange,
     LocalDate? PlannedDate,
-    FlexibleDateRange? ActualDateRange,
-    LocalDate? ActualDate,
     decimal? EstimatedEffortHours,
-    decimal? ActualEffortHours,
     List<TaskRoleAssignment>? Assignments
 ) : ICommand;
 
@@ -50,10 +47,6 @@ public sealed class UpdateProjectTaskCommandValidator : AbstractValidator<Update
         RuleFor(x => x.EstimatedEffortHours)
             .GreaterThan(0)
             .When(x => x.EstimatedEffortHours.HasValue);
-
-        RuleFor(x => x.ActualEffortHours)
-            .GreaterThan(0)
-            .When(x => x.ActualEffortHours.HasValue);
 
         RuleFor(x => x.Assignments)
             .Must(assignments => assignments == null || assignments.All(a => a.EmployeeId != Guid.Empty))
@@ -169,16 +162,8 @@ internal sealed class UpdateProjectTaskCommandHandler(
                 return plannedDatesResult;
             }
 
-            // Update actual dates
-            var actualDatesResult = task.UpdateActualDates(request.ActualDateRange, request.ActualDate);
-            if (actualDatesResult.IsFailure)
-            {
-                _logger.LogError("Error updating task {TaskId} actual dates. Error: {Error}", task.Id, actualDatesResult.Error);
-                return actualDatesResult;
-            }
-
             // Update effort
-            var effortResult = task.UpdateEffort(request.EstimatedEffortHours, request.ActualEffortHours);
+            var effortResult = task.UpdateEffort(request.EstimatedEffortHours);
             if (effortResult.IsFailure)
             {
                 _logger.LogError("Error updating task {TaskId} effort. Error: {Error}", task.Id, effortResult.Error);

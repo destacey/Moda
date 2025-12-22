@@ -18446,35 +18446,9 @@
             "format": "date",
             "nullable": true
           },
-          "actualStart": {
-            "type": "string",
-            "description": "The actual start date when work began.",
-            "format": "date",
-            "nullable": true
-          },
-          "actualEnd": {
-            "type": "string",
-            "description": "The actual end date when work completed.",
-            "format": "date",
-            "nullable": true
-          },
-          "actualDate": {
-            "type": "string",
-            "description": "The actual date a milestone was achieved.",
-            "format": "date",
-            "nullable": true
-          },
           "estimatedEffortHours": {
             "type": "number",
             "description": "The estimated effort in hours (optional).",
-            "format": "decimal",
-            "minimum": 0.0,
-            "nullable": true,
-            "exclusiveMinimum": true
-          },
-          "actualEffortHours": {
-            "type": "number",
-            "description": "The actual effort spent in hours (optional).",
             "format": "decimal",
             "minimum": 0.0,
             "nullable": true,
