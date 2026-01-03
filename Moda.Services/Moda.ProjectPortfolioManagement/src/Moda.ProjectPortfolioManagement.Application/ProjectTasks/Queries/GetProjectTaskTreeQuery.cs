@@ -50,7 +50,7 @@ internal sealed class GetProjectTaskTreeQueryHandler(IProjectPortfolioManagement
         }
 
         // Build hierarchy - filter to only root tasks
-        var rootTasks = dtos.Where(t => t.ParentId is null).ToList();
+        var rootTasks = dtos.Where(t => t.ParentId is null).OrderBy(t => t.Order).ToList();
 
         // Build children for each task
         BuildTaskHierarchy(rootTasks, dtos);
@@ -62,7 +62,7 @@ internal sealed class GetProjectTaskTreeQueryHandler(IProjectPortfolioManagement
     {
         foreach (var parent in parentTasks)
         {
-            parent.Children = [.. allTasks.Where(t => t.ParentId == parent.Id)];
+            parent.Children = [.. allTasks.Where(t => t.ParentId == parent.Id).OrderBy(t => t.Order)];
             if (parent.Children.Count != 0)
             {
                 BuildTaskHierarchy(parent.Children, allTasks);

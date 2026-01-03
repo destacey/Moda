@@ -306,27 +306,21 @@ public sealed class ProjectTask : BaseEntity<Guid>, ISystemAuditable, IHasIdAndK
     /// <summary>
     /// Changes the parent of this task.
     /// </summary>
-    public Result ChangeParent(Guid? newParentId, ProjectTask? newParent)
+    public Result ChangeParent(Guid? newParentId, int order)
     {
         // Validation: prevent circular references
         if (newParentId.HasValue && newParentId == Id)
         {
             return Result.Failure("A task cannot be its own parent.");
         }
-
-        if (newParent is not null && newParent.Type == ProjectTaskType.Milestone)
+        else if (newParentId.HasValue && IsDescendant(newParentId.Value))
         {
-            return Result.Failure("Milestones cannot have child tasks.");
-        }
-
-        // Check for circular reference by checking if newParent is a descendant of this task
-        if (newParent is not null && IsDescendant(newParent.Id))
-        {
-            return Result.Failure("Cannot create a circular reference. The new parent is a descendant of this task.");
+            return Result.Failure("A task cannot be moved under one of its descendants.");
         }
 
         ParentId = newParentId;
-        return Result.Success();
+
+        return SetOrder(order);
     }
 
     /// <summary>

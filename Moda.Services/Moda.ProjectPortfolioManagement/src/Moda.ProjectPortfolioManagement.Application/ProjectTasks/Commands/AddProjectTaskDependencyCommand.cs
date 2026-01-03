@@ -1,11 +1,28 @@
-using Moda.ProjectPortfolioManagement.Domain.Models;
-
 namespace Moda.ProjectPortfolioManagement.Application.ProjectTasks.Commands;
 
 /// <summary>
 /// Adds a dependency between two tasks (Finish-to-Start).
 /// </summary>
-public sealed record AddProjectTaskDependencyCommand(Guid PredecessorId, Guid SuccessorId) : ICommand;
+public sealed record AddProjectTaskDependencyCommand(Guid ProjectId, Guid PredecessorId, Guid SuccessorId) : ICommand;
+
+public sealed class AddProjectTaskDependencyCommandValidator : CustomValidator<AddProjectTaskDependencyCommand>
+{
+    public AddProjectTaskDependencyCommandValidator()
+    {
+        RuleFor(x => x.ProjectId)
+            .NotEmpty();
+
+        RuleFor(x => x.PredecessorId)
+            .NotEmpty();
+
+        RuleFor(x => x.SuccessorId)
+            .NotEmpty();
+
+        RuleFor(x => x)
+            .Must(x => x.PredecessorId != x.SuccessorId)
+            .WithMessage("A task cannot depend on itself.");
+    }
+}
 
 internal sealed class AddProjectTaskDependencyCommandHandler(
     IProjectPortfolioManagementDbContext ppmDbContext,
@@ -20,54 +37,34 @@ internal sealed class AddProjectTaskDependencyCommandHandler(
         // Load both tasks
         var predecessor = await _ppmDbContext.ProjectTasks
             .Include(t => t.Successors)
-            .FirstOrDefaultAsync(t => t.Id == request.PredecessorId, cancellationToken);
-
+            .FirstOrDefaultAsync(t => t.Id == request.PredecessorId && t.ProjectId == request.ProjectId, cancellationToken);
         if (predecessor is null)
         {
-            var message = $"Predecessor task with ID {request.PredecessorId} not found.";
-            _logger.LogWarning("AddProjectTaskDependency: {Message}", message);
-            return Result.Failure(message);
+            _logger.LogError("Predecessor task {TaskId} not found", request.PredecessorId);
+            return Result.Failure("Predecessor task not found");
         }
 
         var successor = await _ppmDbContext.ProjectTasks
-            .FirstOrDefaultAsync(t => t.Id == request.SuccessorId, cancellationToken);
-
+            .FirstOrDefaultAsync(t => t.Id == request.SuccessorId && t.ProjectId == request.ProjectId, cancellationToken);
         if (successor is null)
         {
-            var message = $"Successor task with ID {request.SuccessorId} not found.";
-            _logger.LogWarning("AddProjectTaskDependency: {Message}", message);
-            return Result.Failure(message);
+            _logger.LogError("Successor task {TaskId} not found", request.SuccessorId);
+            return Result.Failure("Successor task not found");
         }
 
         var result = predecessor.AddDependency(successor);
         if (result.IsFailure)
         {
-            _logger.LogWarning("AddProjectTaskDependency: Failed to add dependency from {PredecessorKey} to {SuccessorKey}. Error: {Error}",
+            _logger.LogError("Failed to add dependency from {PredecessorKey} to {SuccessorKey}. Error: {Error}",
                 predecessor.Key.Value, successor.Key.Value, result.Error);
             return result;
         }
 
         await _ppmDbContext.SaveChangesAsync(cancellationToken);
 
-        _logger.LogInformation("AddProjectTaskDependency: Successfully added dependency from {PredecessorKey} to {SuccessorKey}.",
+        _logger.LogInformation("Successfully added dependency from {PredecessorKey} to {SuccessorKey}.",
             predecessor.Key.Value, successor.Key.Value);
 
         return Result.Success();
-    }
-}
-
-public sealed class AddProjectTaskDependencyCommandValidator : CustomValidator<AddProjectTaskDependencyCommand>
-{
-    public AddProjectTaskDependencyCommandValidator()
-    {
-        RuleFor(x => x.PredecessorId)
-            .NotEmpty();
-
-        RuleFor(x => x.SuccessorId)
-            .NotEmpty();
-
-        RuleFor(x => x)
-            .Must(x => x.PredecessorId != x.SuccessorId)
-            .WithMessage("A task cannot depend on itself.");
     }
 }

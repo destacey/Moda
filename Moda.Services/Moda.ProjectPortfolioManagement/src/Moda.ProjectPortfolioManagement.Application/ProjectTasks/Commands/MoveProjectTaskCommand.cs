@@ -1,73 +1,9 @@
-using Moda.ProjectPortfolioManagement.Domain.Models;
-
 namespace Moda.ProjectPortfolioManagement.Application.ProjectTasks.Commands;
 
 /// <summary>
 /// Moves a task to a new parent in the hierarchy.
 /// </summary>
-public sealed record MoveProjectTaskCommand(Guid TaskId, Guid? NewParentId) : ICommand;
-
-internal sealed class MoveProjectTaskCommandHandler(
-    IProjectPortfolioManagementDbContext ppmDbContext,
-    ILogger<MoveProjectTaskCommandHandler> logger)
-    : ICommandHandler<MoveProjectTaskCommand>
-{
-    private readonly IProjectPortfolioManagementDbContext _ppmDbContext = ppmDbContext;
-    private readonly ILogger<MoveProjectTaskCommandHandler> _logger = logger;
-
-    public async Task<Result> Handle(MoveProjectTaskCommand request, CancellationToken cancellationToken)
-    {
-        var task = await _ppmDbContext.ProjectTasks
-            .Include(t => t.Parent)
-            .FirstOrDefaultAsync(t => t.Id == request.TaskId, cancellationToken);
-
-        if (task is null)
-        {
-            var message = $"ProjectTask with ID {request.TaskId} not found.";
-            _logger.LogWarning("MoveProjectTask: {Message}", message);
-            return Result.Failure(message);
-        }
-
-        // Validate new parent exists if specified
-        ProjectTask? newParent = null;
-        if (request.NewParentId.HasValue)
-        {
-            newParent = await _ppmDbContext.ProjectTasks
-                .FirstOrDefaultAsync(t => t.Id == request.NewParentId.Value, cancellationToken);
-
-            if (newParent is null)
-            {
-                var message = $"Parent task with ID {request.NewParentId.Value} not found.";
-                _logger.LogWarning("MoveProjectTask: {Message}", message);
-                return Result.Failure(message);
-            }
-
-            // Verify tasks are in the same project
-            if (task.ProjectId != newParent.ProjectId)
-            {
-                var message = "Cannot move task to a parent in a different project.";
-                _logger.LogWarning("MoveProjectTask: {Message} TaskProject={TaskProject}, ParentProject={ParentProject}",
-                    message, task.ProjectId, newParent.ProjectId);
-                return Result.Failure(message);
-            }
-        }
-
-        var result = task.ChangeParent(request.NewParentId, newParent);
-        if (result.IsFailure)
-        {
-            _logger.LogWarning("MoveProjectTask: Failed to move task {TaskId} to parent {NewParentId}. Error: {Error}",
-                task.Id, request.NewParentId, result.Error);
-            return result;
-        }
-
-        await _ppmDbContext.SaveChangesAsync(cancellationToken);
-
-        _logger.LogInformation("MoveProjectTask: Successfully moved task {TaskKey} to parent {NewParentKey}.",
-            task.Key.Value, newParent?.Key.Value ?? "root");
-
-        return Result.Success();
-    }
-}
+public sealed record MoveProjectTaskCommand(Guid TaskId, Guid ProjectId, Guid? NewParentId) : ICommand;
 
 public sealed class MoveProjectTaskCommandValidator : CustomValidator<MoveProjectTaskCommand>
 {
@@ -75,9 +11,62 @@ public sealed class MoveProjectTaskCommandValidator : CustomValidator<MoveProjec
     {
         RuleFor(x => x.TaskId)
             .NotEmpty();
-
+        RuleFor(x => x.ProjectId)
+            .NotEmpty();
         RuleFor(x => x.NewParentId)
             .Must(id => id == null || id != Guid.Empty)
             .WithMessage("NewParentId cannot be an empty GUID.");
+    }
+}
+
+internal sealed class MoveProjectTaskCommandHandler(
+    IProjectPortfolioManagementDbContext ppmDbContext,
+    ILogger<MoveProjectTaskCommandHandler> logger)
+    : ICommandHandler<MoveProjectTaskCommand>
+{
+    private const string AppRequestName = nameof(MoveProjectTaskCommand);
+
+    private readonly IProjectPortfolioManagementDbContext _ppmDbContext = ppmDbContext;
+    private readonly ILogger<MoveProjectTaskCommandHandler> _logger = logger;
+
+    public async Task<Result> Handle(MoveProjectTaskCommand request, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var taskExists = await _ppmDbContext.ProjectTasks
+            .AnyAsync(t => t.Id == request.TaskId, cancellationToken);
+            if (!taskExists)
+            {
+                _logger.LogInformation("Project Task {TaskId} not found.", request.TaskId);
+                return Result.Failure($"Project Task not found.");
+            }
+
+            var project = await _ppmDbContext.Projects
+                .Include(p => p.Tasks)
+                .FirstOrDefaultAsync(p => p.Id == request.ProjectId, cancellationToken);
+            if (project is null)
+            {
+                _logger.LogInformation("Project {ProjectId} not found.", request.ProjectId);
+                return Result.Failure($"Project {request.ProjectId} not found.");
+            }
+
+            var parentResult = project.ChangeTaskParent(request.TaskId, request.NewParentId);
+            if (parentResult.IsFailure)
+            {
+                _logger.LogError("Error changing parent for task {TaskId}. Error: {Error}", request.TaskId, parentResult.Error);
+                return parentResult;
+            }
+
+            await _ppmDbContext.SaveChangesAsync(cancellationToken);
+
+            _logger.LogInformation("Successfully changed parent for task {TaskId} to {NewParentId}.", request.TaskId, request.NewParentId);
+
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Exception handling {CommandName} command for request {@Request}.", AppRequestName, request);
+            return Result.Failure($"Error handling {AppRequestName} command.");
+        }
     }
 }

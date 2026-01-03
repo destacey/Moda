@@ -69,10 +69,9 @@ internal sealed class UpdateProjectTaskCommandHandler(
             var task = await _ppmDbContext.ProjectTasks
                 .Include(t => t.Roles)
                 .FirstOrDefaultAsync(t => t.Id == request.Id, cancellationToken);
-
             if (task is null)
             {
-                _logger.LogInformation("Project task with Id {TaskId} not found.", request.Id);
+                _logger.LogInformation("Project task {TaskId} not found.", request.Id);
                 return Result.Failure("Project task not found.");
             }
 
@@ -88,7 +87,6 @@ internal sealed class UpdateProjectTaskCommandHandler(
 
                 var parentExists = await _ppmDbContext.ProjectTasks
                     .AnyAsync(t => t.Id == request.ParentId.Value, cancellationToken);
-
                 if (!parentExists)
                 {
                     _logger.LogInformation("Parent task {ParentId} not found.", request.ParentId);
@@ -173,11 +171,17 @@ internal sealed class UpdateProjectTaskCommandHandler(
             // Update parent if changed
             if (request.ParentId != task.ParentId)
             {
-                var newParent = request.ParentId.HasValue
-                    ? await _ppmDbContext.ProjectTasks.FindAsync([request.ParentId.Value], cancellationToken)
-                    : null;
+                // get the project with all tasks to perform the parent change
+                var project = await _ppmDbContext.Projects
+                    .Include(p => p.Tasks)
+                    .FirstOrDefaultAsync(p => p.Id == task.ProjectId, cancellationToken);
+                if (project is null)
+                {
+                    _logger.LogError("Project with Id {ProjectId} not found for task {TaskId}.", task.ProjectId, task.Id);
+                    return Result.Failure("Project not found for the task.");
+                }
 
-                var parentResult = task.ChangeParent(request.ParentId, newParent);
+                var parentResult = project.ChangeTaskParent(task.Id, request.ParentId);
                 if (parentResult.IsFailure)
                 {
                     _logger.LogError("Error changing parent for task {TaskId}. Error: {Error}", task.Id, parentResult.Error);

@@ -140,7 +140,9 @@ const ProjectTasksTable = ({
   refetch,
 }: ProjectTasksTableProps) => {
   const [searchValue, setSearchValue] = useState('')
-  const [sorting, setSorting] = useState<SortingState>([])
+  const [sorting, setSorting] = useState<SortingState>([
+    { id: 'wbs', desc: false },
+  ])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnSizing, setColumnSizing] = useState<ColumnSizingState>({})
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null)
@@ -179,11 +181,13 @@ const ProjectTasksTable = ({
   }, [])
 
   const handleEditTask = useCallback((task: any) => {
+    setSelectedRowId(null) // Exit inline edit mode
     setSelectedTaskId(task.id)
     setOpenEditTaskForm(true)
   }, [])
 
   const handleDeleteTask = useCallback((task: any) => {
+    setSelectedRowId(null) // Exit inline edit mode
     setSelectedTaskId(task.id)
     setOpenDeleteTaskForm(true)
   }, [])

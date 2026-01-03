@@ -186,7 +186,11 @@ public class ProjectTasksController(ILogger<ProjectTasksController> logger, ISen
         if (id != request.PredecessorId)
             return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(HttpContext));
 
-        var result = await _sender.Send(new AddProjectTaskDependencyCommand(request.PredecessorId, request.SuccessorId), cancellationToken);
+        var projectId = await ResolveProjectId(projectIdOrKey, cancellationToken);
+        if (projectId is null)
+            return NotFound($"Project with identifier '{projectIdOrKey}' not found.");
+
+        var result = await _sender.Send(new AddProjectTaskDependencyCommand(projectId.Value, request.PredecessorId, request.SuccessorId), cancellationToken);
 
         return result.IsSuccess
             ? NoContent()
@@ -204,7 +208,12 @@ public class ProjectTasksController(ILogger<ProjectTasksController> logger, ISen
         Guid successorId,
         CancellationToken cancellationToken)
     {
-        var result = await _sender.Send(new RemoveProjectTaskDependencyCommand(id, successorId), cancellationToken);
+
+        var projectId = await ResolveProjectId(projectIdOrKey, cancellationToken);
+        if (projectId is null)
+            return NotFound($"Project with identifier '{projectIdOrKey}' not found.");
+
+        var result = await _sender.Send(new RemoveProjectTaskDependencyCommand(projectId.Value, id, successorId), cancellationToken);
 
         return result.IsSuccess
             ? NoContent()

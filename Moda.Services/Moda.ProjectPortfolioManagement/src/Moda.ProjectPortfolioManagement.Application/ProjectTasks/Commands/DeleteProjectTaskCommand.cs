@@ -30,18 +30,16 @@ internal sealed class DeleteProjectTaskCommandHandler(
                 .Include(t => t.Predecessors)
                 .Include(t => t.Successors)
                 .FirstOrDefaultAsync(t => t.Id == request.Id, cancellationToken);
-
             if (task is null)
             {
-                _logger.LogInformation("Project task with Id {TaskId} not found.", request.Id);
+                _logger.LogInformation("Project task {TaskId} not found.", request.Id);
                 return Result.Failure("Project task not found.");
             }
 
             // Load the project to call DeleteTask
             var project = await _ppmDbContext.Projects
-                .Include(p => p.Tasks.Where(t => t.Id == request.Id))
+                .Include(p => p.Tasks.Where(t => t.ParentId == task.ParentId))
                 .FirstOrDefaultAsync(p => p.Id == task.ProjectId, cancellationToken);
-
             if (project is null)
             {
                 _logger.LogInformation("Project {ProjectId} not found for task {TaskId}.", task.ProjectId, request.Id);

@@ -43,7 +43,7 @@ public class RemoveProjectTaskDependencyCommandHandlerTests : IDisposable
         // Add dependency first
         predecessor.AddDependency(successor);
 
-        var command = new RemoveProjectTaskDependencyCommand(predecessor.Id, successor.Id);
+        var command = new RemoveProjectTaskDependencyCommand(projectId, predecessor.Id, successor.Id);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -62,7 +62,7 @@ public class RemoveProjectTaskDependencyCommandHandlerTests : IDisposable
         _dbContext.AddProjectTask(successor);
 
         var nonExistentPredecessorId = Guid.NewGuid();
-        var command = new RemoveProjectTaskDependencyCommand(nonExistentPredecessorId, successor.Id);
+        var command = new RemoveProjectTaskDependencyCommand(successor.ProjectId, nonExistentPredecessorId, successor.Id);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -82,7 +82,7 @@ public class RemoveProjectTaskDependencyCommandHandlerTests : IDisposable
         _dbContext.AddProjectTask(predecessor);
 
         var nonExistentSuccessorId = Guid.NewGuid();
-        var command = new RemoveProjectTaskDependencyCommand(predecessor.Id, nonExistentSuccessorId);
+        var command = new RemoveProjectTaskDependencyCommand(predecessor.ProjectId, predecessor.Id, nonExistentSuccessorId);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -104,7 +104,7 @@ public class RemoveProjectTaskDependencyCommandHandlerTests : IDisposable
         _dbContext.AddProjectTasks([predecessor, successor]);
 
         // No dependency added
-        var command = new RemoveProjectTaskDependencyCommand(predecessor.Id, successor.Id);
+        var command = new RemoveProjectTaskDependencyCommand(projectId, predecessor.Id, successor.Id);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -131,9 +131,9 @@ public class RemoveProjectTaskDependencyCommandHandlerTests : IDisposable
         predecessor.AddDependency(successor2);
 
         // Act - Remove first dependency
-        var result1 = await _handler.Handle(new RemoveProjectTaskDependencyCommand(predecessor.Id, successor1.Id), CancellationToken.None);
+        var result1 = await _handler.Handle(new RemoveProjectTaskDependencyCommand(projectId, predecessor.Id, successor1.Id), CancellationToken.None);
         // Remove second dependency
-        var result2 = await _handler.Handle(new RemoveProjectTaskDependencyCommand(predecessor.Id, successor2.Id), CancellationToken.None);
+        var result2 = await _handler.Handle(new RemoveProjectTaskDependencyCommand(projectId, predecessor.Id, successor2.Id), CancellationToken.None);
 
         // Assert
         result1.IsSuccess.Should().BeTrue();

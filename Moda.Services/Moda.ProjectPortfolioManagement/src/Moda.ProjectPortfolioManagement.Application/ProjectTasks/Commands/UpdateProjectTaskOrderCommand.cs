@@ -5,43 +5,6 @@ namespace Moda.ProjectPortfolioManagement.Application.ProjectTasks.Commands;
 /// </summary>
 public sealed record UpdateProjectTaskOrderCommand(Guid TaskId, int Order) : ICommand;
 
-internal sealed class UpdateProjectTaskOrderCommandHandler(
-    IProjectPortfolioManagementDbContext ppmDbContext,
-    ILogger<UpdateProjectTaskOrderCommandHandler> logger)
-    : ICommandHandler<UpdateProjectTaskOrderCommand>
-{
-    private readonly IProjectPortfolioManagementDbContext _ppmDbContext = ppmDbContext;
-    private readonly ILogger<UpdateProjectTaskOrderCommandHandler> _logger = logger;
-
-    public async Task<Result> Handle(UpdateProjectTaskOrderCommand request, CancellationToken cancellationToken)
-    {
-        var task = await _ppmDbContext.ProjectTasks
-            .FirstOrDefaultAsync(t => t.Id == request.TaskId, cancellationToken);
-
-        if (task is null)
-        {
-            var message = $"ProjectTask with ID {request.TaskId} not found.";
-            _logger.LogWarning("UpdateProjectTaskOrder: {Message}", message);
-            return Result.Failure(message);
-        }
-
-        var result = task.SetOrder(request.Order);
-        if (result.IsFailure)
-        {
-            _logger.LogWarning("UpdateProjectTaskOrder: Failed to update order for task {TaskId}. Error: {Error}",
-                task.Id, result.Error);
-            return result;
-        }
-
-        await _ppmDbContext.SaveChangesAsync(cancellationToken);
-
-        _logger.LogInformation("UpdateProjectTaskOrder: Successfully updated order for task {TaskKey} to {Order}.",
-            task.Key.Value, request.Order);
-
-        return Result.Success();
-    }
-}
-
 public sealed class UpdateProjectTaskOrderCommandValidator : CustomValidator<UpdateProjectTaskOrderCommand>
 {
     public UpdateProjectTaskOrderCommandValidator()
@@ -52,5 +15,51 @@ public sealed class UpdateProjectTaskOrderCommandValidator : CustomValidator<Upd
         RuleFor(x => x.Order)
             .GreaterThan(0)
             .WithMessage("Order must be greater than 0.");
+    }
+}
+
+internal sealed class UpdateProjectTaskOrderCommandHandler(
+    IProjectPortfolioManagementDbContext ppmDbContext,
+    ILogger<UpdateProjectTaskOrderCommandHandler> logger)
+    : ICommandHandler<UpdateProjectTaskOrderCommand>
+{
+    private const string AppRequestName = nameof(UpdateProjectTaskOrderCommand);
+
+    private readonly IProjectPortfolioManagementDbContext _ppmDbContext = ppmDbContext;
+    private readonly ILogger<UpdateProjectTaskOrderCommandHandler> _logger = logger;
+
+    public async Task<Result> Handle(UpdateProjectTaskOrderCommand request, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var task = await _ppmDbContext.ProjectTasks
+            .FirstOrDefaultAsync(t => t.Id == request.TaskId, cancellationToken);
+
+        if (task is null)
+        {
+            _logger.LogWarning("Project task {TaskId} not found.", request.TaskId);
+            return Result.Failure("Project task not found.");
+        }
+
+        var result = task.SetOrder(request.Order);
+        if (result.IsFailure)
+        {
+            _logger.LogError("Failed to update order for task {TaskId}. Error: {Error}",
+                task.Id, result.Error);
+            return result;
+        }
+
+        await _ppmDbContext.SaveChangesAsync(cancellationToken);
+
+        _logger.LogInformation("Successfully updated order for task {TaskId} to {Order}.",
+            task.Id, request.Order);
+
+        return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Exception handling {CommandName} command for request {@Request}.", AppRequestName, request);
+            return Result.Failure($"Error handling {AppRequestName} command.");
+        }
     }
 }

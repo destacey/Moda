@@ -37,7 +37,7 @@ public class AddProjectTaskDependencyCommandHandlerTests : IDisposable
 
         _dbContext.AddProjectTasks([predecessor, successor]);
 
-        var command = new AddProjectTaskDependencyCommand(predecessor.Id, successor.Id);
+        var command = new AddProjectTaskDependencyCommand(projectId, predecessor.Id, successor.Id);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -57,7 +57,7 @@ public class AddProjectTaskDependencyCommandHandlerTests : IDisposable
         _dbContext.AddProjectTask(successor);
 
         var nonExistentPredecessorId = Guid.NewGuid();
-        var command = new AddProjectTaskDependencyCommand(nonExistentPredecessorId, successor.Id);
+        var command = new AddProjectTaskDependencyCommand(successor.ProjectId, nonExistentPredecessorId, successor.Id);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -77,7 +77,7 @@ public class AddProjectTaskDependencyCommandHandlerTests : IDisposable
         _dbContext.AddProjectTask(predecessor);
 
         var nonExistentSuccessorId = Guid.NewGuid();
-        var command = new AddProjectTaskDependencyCommand(predecessor.Id, nonExistentSuccessorId);
+        var command = new AddProjectTaskDependencyCommand(predecessor.ProjectId, predecessor.Id, nonExistentSuccessorId);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -101,14 +101,14 @@ public class AddProjectTaskDependencyCommandHandlerTests : IDisposable
 
         _dbContext.AddProjectTasks([predecessor, successor]);
 
-        var command = new AddProjectTaskDependencyCommand(predecessor.Id, successor.Id);
+        var command = new AddProjectTaskDependencyCommand(project1Id, predecessor.Id, successor.Id);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Should().Contain("same project");
+        result.Error.Should().Contain("Successor task not found");
         _dbContext.SaveChangesCallCount.Should().Be(0);
     }
 
@@ -125,7 +125,7 @@ public class AddProjectTaskDependencyCommandHandlerTests : IDisposable
         // First, create dependency: task1 -> task2
         task1.AddDependency(task2);
 
-        var command = new AddProjectTaskDependencyCommand(task2.Id, task1.Id);
+        var command = new AddProjectTaskDependencyCommand(projectId, task2.Id, task1.Id);
 
         // Act - Try to create reverse dependency: task2 -> task1 (creates circular reference)
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -143,7 +143,7 @@ public class AddProjectTaskDependencyCommandHandlerTests : IDisposable
         var task = _taskFaker.Generate();
         _dbContext.AddProjectTask(task);
 
-        var command = new AddProjectTaskDependencyCommand(task.Id, task.Id);
+        var command = new AddProjectTaskDependencyCommand(task.ProjectId, task.Id, task.Id);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -167,7 +167,7 @@ public class AddProjectTaskDependencyCommandHandlerTests : IDisposable
         // Add dependency first time
         predecessor.AddDependency(successor);
 
-        var command = new AddProjectTaskDependencyCommand(predecessor.Id, successor.Id);
+        var command = new AddProjectTaskDependencyCommand(projectId, predecessor.Id, successor.Id);
 
         // Act - Try to add same dependency again
         var result = await _handler.Handle(command, CancellationToken.None);

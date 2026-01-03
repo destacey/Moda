@@ -325,9 +325,30 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey<P
         return DateRange is not null && DateRange.IsActiveOn(date);
     }
 
+    #region Tasks
+
     /// <summary>
-    /// Creates a new task within this project.
+    /// Creates a new project task with the specified details and adds it to the project.
     /// </summary>
+    /// <remarks>The project must have a key assigned before tasks can be created. If a parent task is
+    /// specified, it must exist and cannot be a milestone, as milestones cannot have child tasks. The new task is
+    /// assigned an order value based on its siblings under the same parent.</remarks>
+    /// <param name="nextNumber">The next available task number to assign to the new task. Must be unique within the project.</param>
+    /// <param name="name">The name of the task. Cannot be null or empty.</param>
+    /// <param name="description">An optional description providing additional details about the task.</param>
+    /// <param name="type">The type of the task to create. Determines the task's category, such as standard task or milestone.</param>
+    /// <param name="status">The initial status to assign to the new task.</param>
+    /// <param name="priority">The priority level of the task, indicating its relative importance.</param>
+    /// <param name="progress">The current progress of the task, or null if not specified.</param>
+    /// <param name="parentId">The unique identifier of the parent task, or null if the new task is a top-level task. If specified, the parent
+    /// task must exist and cannot be a milestone.</param>
+    /// <param name="plannedDateRange">The planned date range for the task, or null if not specified.</param>
+    /// <param name="plannedDate">The planned date for the task, or null if not specified.</param>
+    /// <param name="estimatedEffortHours">The estimated effort required to complete the task, in hours. Can be null if not specified.</param>
+    /// <param name="assignments">A mapping of task roles to sets of user identifiers assigned to each role, or null if no assignments are
+    /// specified.</param>
+    /// <returns>A result containing the newly created project task if successful; otherwise, a failure result with an error
+    /// message.</returns>
     public Result<ProjectTask> CreateTask(
         int nextNumber,
         string name,
@@ -392,8 +413,67 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey<P
     }
 
     /// <summary>
-    /// Deletes a task from this project.
+    /// Changes the parent of the specified task to a new parent task or to the root level.
     /// </summary>
+    /// <remarks>If the new parent is a milestone, the operation fails because milestones cannot have child
+    /// tasks. The order of the task within its new parent is set to follow existing children, and the order of siblings
+    /// in the original parent is updated to maintain sequence.</remarks>
+    /// <param name="taskId">The unique identifier of the task to update.</param>
+    /// <param name="newParentId">The unique identifier of the new parent task. If null, the task is moved to the root level.</param>
+    /// <returns>A Result indicating whether the operation succeeded. Returns a failure result if the task or new parent is not
+    /// found, or if the new parent is a milestone.</returns>
+    public Result ChangeTaskParent(Guid taskId, Guid? newParentId)
+    {
+        // get the current task
+        var task = _tasks.FirstOrDefault(t => t.Id == taskId);
+        if (task is null)
+        {
+            return Result.Failure("Task not found.");
+        }
+
+        var origParentId = task.ParentId;
+
+        // get the new parent task if specified
+        ProjectTask? newParent = null;
+        if (newParentId.HasValue)
+        {
+            newParent = _tasks.FirstOrDefault(t => t.Id == newParentId);
+            if (newParent is null)
+            {
+                return Result.Failure("New parent task not found.");
+            }
+
+            if (newParent.Type == ProjectTaskType.Milestone)
+            {
+                return Result.Failure("Milestones cannot have child tasks.");
+            }
+        }
+
+        // set order in new parent
+        var parentChildren = newParentId.HasValue
+            ? _tasks.Count(t => t.ParentId == newParentId)
+            : _tasks.Count(t => t.ParentId is null);
+
+        var changeResult = task.ChangeParent(newParentId, parentChildren + 1);
+        if (changeResult.IsFailure)
+        {
+            return changeResult;
+        }
+
+        BalanceOrderForChildTasks(origParentId);
+
+        return Result.Success();
+    }
+
+
+    /// <summary>
+    /// Deletes the task with the specified identifier if it has no child tasks or active dependencies.
+    /// </summary>
+    /// <remarks>A task cannot be deleted if it has child tasks or if it has active dependencies. Remove all
+    /// child tasks and dependencies before attempting to delete the task.</remarks>
+    /// <param name="taskId">The unique identifier of the task to delete.</param>
+    /// <returns>A Result indicating whether the deletion was successful. Returns a failure result if the task does not exist,
+    /// has child tasks, or has active dependencies.</returns>
     public Result DeleteTask(Guid taskId)
     {
         var task = _tasks.FirstOrDefault(t => t.Id == taskId);
@@ -414,10 +494,32 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey<P
             return Result.Failure("Cannot delete a task with active dependencies. Remove dependencies first.");
         }
 
+        var parentId = task.ParentId;
+
         _tasks.Remove(task);
+
+        BalanceOrderForChildTasks(parentId);
 
         return Result.Success();
     }
+
+    private void BalanceOrderForChildTasks(Guid? parentId)
+    {
+        var siblings = parentId.HasValue
+            ? _tasks.Where(t => t.ParentId == parentId.Value)
+            : _tasks.Where(t => t.ParentId is null);
+        if (siblings.Any())
+        {
+            int order = 1;
+            foreach (var sibling in siblings.OrderBy(t => t.Order))
+            {
+                sibling.SetOrder(order);
+                order++;
+            }
+        }
+    }
+
+    #endregion Tasks
 
     /// <summary>
     /// Creates a new project.
