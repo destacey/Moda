@@ -1,8 +1,8 @@
-using Moda.Common.Application.Models;
 using Moda.Common.Domain.Models.ProjectPortfolioManagement;
 using Moda.ProjectPortfolioManagement.Application.Projects.Queries;
 using Moda.ProjectPortfolioManagement.Application.ProjectTasks.Commands;
 using Moda.ProjectPortfolioManagement.Application.ProjectTasks.Dtos;
+using Moda.ProjectPortfolioManagement.Application.ProjectTasks.Models;
 using Moda.ProjectPortfolioManagement.Application.ProjectTasks.Queries;
 using Moda.Web.Api.Extensions;
 using Moda.Web.Api.Models.Ppm.ProjectTasks;
@@ -52,17 +52,17 @@ public class ProjectTasksController(ILogger<ProjectTasksController> logger, ISen
         return Ok(tasks);
     }
 
-    [HttpGet("{idOrTaskKey}")]
+    [HttpGet("{taskIdOrKey}")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Projects)]
     [OpenApiOperation("Get project task details.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ProjectTaskDto>> GetProjectTask(
         string projectIdOrKey,
-        string idOrTaskKey,
+        string taskIdOrKey,
         CancellationToken cancellationToken)
     {
-        var task = await _sender.Send(new GetProjectTaskQuery(idOrTaskKey), cancellationToken);
+        var task = await _sender.Send(new GetProjectTaskQuery(taskIdOrKey), cancellationToken);
 
         return task is not null
             ? Ok(task)
@@ -72,10 +72,10 @@ public class ProjectTasksController(ILogger<ProjectTasksController> logger, ISen
     [HttpPost]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.Projects)]
     [OpenApiOperation("Create a project task.", "")]
-    [ProducesResponseType(typeof(ObjectIdAndTaskKey), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ProjectTaskIdAndKey), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
-    public async Task<ActionResult<ObjectIdAndTaskKey>> CreateProjectTask(
+    public async Task<ActionResult<ProjectTaskIdAndKey>> CreateProjectTask(
         string projectIdOrKey,
         [FromBody] CreateProjectTaskRequest request,
         CancellationToken cancellationToken)
@@ -90,7 +90,7 @@ public class ProjectTasksController(ILogger<ProjectTasksController> logger, ISen
         return result.IsSuccess
             ? CreatedAtAction(
                 nameof(GetProjectTask),
-                new { projectIdOrKey, idOrTaskKey = result.Value.TaskKey },
+                new { projectIdOrKey, taskIdOrKey = result.Value.Key },
                 result.Value)
             : BadRequest(result.ToBadRequestObject(HttpContext));
     }

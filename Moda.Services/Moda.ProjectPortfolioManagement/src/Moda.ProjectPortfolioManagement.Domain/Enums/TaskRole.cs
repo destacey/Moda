@@ -5,7 +5,7 @@ namespace Moda.ProjectPortfolioManagement.Domain.Enums;
 /// <summary>
 /// Represents the role an employee can have for a project task.
 /// </summary>
-public enum TaskAssignmentRole
+public enum TaskRole
 {
     /// <summary>
     /// Responsible for completing the task.

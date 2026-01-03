@@ -32,14 +32,14 @@ public sealed record UpdateProjectTaskRequest
     public int PriorityId { get; set; }
 
     /// <summary>
+    /// The progress of the task (optional). Ranges from 0.0 to 100.0. Milestones can not update progress directly.
+    /// </summary>
+    public decimal? Progress { get; set; }
+
+    /// <summary>
     /// The ID of the parent task (optional).
     /// </summary>
     public Guid? ParentId { get; set; }
-
-    /// <summary>
-    /// The ID of the team assigned to this task (optional).
-    /// </summary>
-    public Guid? TeamId { get; set; }
 
     /// <summary>
     /// The planned start date for the task.
@@ -82,8 +82,8 @@ public sealed record UpdateProjectTaskRequest
             Description,
             (TaskStatus)StatusId,
             (TaskPriority)PriorityId,
+            Progress.HasValue ? new Progress(Progress.Value) : null,
             ParentId,
-            TeamId,
             plannedDateRange,
             PlannedDate,
             EstimatedEffortHours,
@@ -113,10 +113,6 @@ public sealed class UpdateProjectTaskRequestValidator : CustomValidator<UpdatePr
         RuleFor(x => x.PriorityId)
             .Must(priority => Enum.IsDefined(typeof(TaskPriority), priority))
             .WithMessage("Invalid task priority.");
-
-        RuleFor(x => x.TeamId)
-            .Must(id => id == null || id != Guid.Empty)
-            .WithMessage("TeamId cannot be an empty GUID.");
 
         RuleFor(x => x.PlannedStart)
             .Must((request, plannedStart) => (request.PlannedStart == null && request.PlannedEnd == null) || (request.PlannedStart != null && request.PlannedEnd != null))

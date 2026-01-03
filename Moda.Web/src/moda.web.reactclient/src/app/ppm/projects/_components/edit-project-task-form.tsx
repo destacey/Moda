@@ -42,6 +42,7 @@ interface EditProjectTaskFormValues {
   description?: string
   status: number
   priority?: number
+  progress?: number
   parentId?: string
   plannedRange?: any[]
   plannedDate?: Date
@@ -58,6 +59,7 @@ const mapToRequestValues = (
     description: values.description,
     statusId: values.status,
     priorityId: values.priority,
+    progress: values.progress,
     parentId: values.parentId,
     plannedStart: (values.plannedRange?.[0] as any)?.format('YYYY-MM-DD'),
     plannedEnd: (values.plannedRange?.[1] as any)?.format('YYYY-MM-DD'),
@@ -84,10 +86,15 @@ const EditProjectTaskForm = (props: EditProjectTaskFormProps) => {
     error,
   } = useGetProjectTaskQuery({
     projectIdOrKey: props.projectIdOrKey,
-    idOrTaskKey: props.taskIdOrKey,
+    taskIdOrKey: props.taskIdOrKey,
   })
 
-  const { data: statusOptions = [] } = useGetTaskStatusOptionsQuery()
+  const taskType = taskData?.type?.name
+  const isMilestone = taskType === 'Milestone'
+
+  const { data: statusOptions = [] } = useGetTaskStatusOptionsQuery({
+    forMilestone: isMilestone,
+  })
 
   const { data: priorityOptions = [] } = useGetTaskPriorityOptionsQuery()
 
@@ -98,9 +105,6 @@ const EditProjectTaskForm = (props: EditProjectTaskFormProps) => {
 
   const { hasPermissionClaim } = useAuth()
   const canUpdateTask = hasPermissionClaim('Permissions.Projects.Update')
-
-  const taskType = taskData?.type?.name
-  const isMilestone = taskType === 'Milestone'
 
   const mapToFormValues = useCallback(
     (task: any) => {
@@ -117,6 +121,7 @@ const EditProjectTaskForm = (props: EditProjectTaskFormProps) => {
         description: task.description,
         status: task.status.id,
         priority: task.priority?.id,
+        progress: task.progress,
         parentId: task.parent?.id,
         plannedRange,
         plannedDate: task.plannedDate ? dayjs(task.plannedDate) : undefined,
@@ -234,6 +239,7 @@ const EditProjectTaskForm = (props: EditProjectTaskFormProps) => {
           <TreeSelect
             allowClear
             placeholder="Select parent task (optional)"
+            notFoundContent="No tasks found"
             treeData={parentTaskOptions}
             treeDefaultExpandAll
             showSearch={{
@@ -297,6 +303,10 @@ const EditProjectTaskForm = (props: EditProjectTaskFormProps) => {
           <>
             <Item name="plannedRange" label="Planned Date Range">
               <RangePicker style={{ width: '60%' }} format="MMM D, YYYY" />
+            </Item>
+
+            <Item name="progress" label="Progress %">
+              <InputNumber min={0} max={100} style={{ width: '33%' }} />
             </Item>
 
             {/* TODO: the validation error is not displaying for this field

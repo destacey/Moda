@@ -27,7 +27,7 @@ internal sealed class GetProjectTaskTreeQueryHandler(IProjectPortfolioManagement
         var tasks = await _ppmDbContext.ProjectTasks
             .Where(request.ProjectIdOrKeyFilter)
             .Include(t => t.Parent)
-            .Include(t => t.Assignments)
+            .Include(t => t.Roles)
                 .ThenInclude(a => a.Employee)
             .ToListAsync(cancellationToken);
 

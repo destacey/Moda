@@ -11,10 +11,10 @@ namespace Moda.ProjectPortfolioManagement.Domain.Models;
 /// <summary>
 /// Represents a task within a project with hierarchical structure and dependency management.
 /// </summary>
-public sealed class ProjectTask : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey, IHasProject
+public sealed class ProjectTask : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey<ProjectTaskKey>, IHasProject
 {
     private readonly List<ProjectTask> _children = [];
-    private readonly HashSet<RoleAssignment<TaskAssignmentRole>> _assignments = [];
+    private readonly HashSet<RoleAssignment<TaskRole>> _roles = [];
     private readonly List<ProjectTaskDependency> _predecessors = [];
     private readonly List<ProjectTaskDependency> _successors = [];
 
@@ -22,20 +22,19 @@ public sealed class ProjectTask : BaseEntity<Guid>, ISystemAuditable, IHasIdAndK
 
     private ProjectTask(
         Guid projectId,
-        ProjectKey projectKey,
-        int taskNumber,
+        ProjectTaskKey key,
         string name,
         string? description,
         ProjectTaskType type,
         TaskStatus status,
         TaskPriority priority,
+        Progress progress,
         int order,
         Guid? parentId,
-        Guid? teamId,
         FlexibleDateRange? plannedDateRange,
         LocalDate? plannedDate,
         decimal? estimatedEffortHours,
-        Dictionary<TaskAssignmentRole, HashSet<Guid>>? assignments)
+        Dictionary<TaskRole, HashSet<Guid>>? roles)
     {
         // Validation
         if (type == ProjectTaskType.Milestone && plannedDate is null)
@@ -46,35 +45,36 @@ public sealed class ProjectTask : BaseEntity<Guid>, ISystemAuditable, IHasIdAndK
         // No need to validate date range - FlexibleDateRange constructor handles it
 
         ProjectId = projectId;
-        TaskKey = new ProjectTaskKey(projectKey, taskNumber);
+        Key = key;
+        Number = key.TaskNumber;
         Name = name;
         Description = description;
         Type = type;
         Status = status;
         Priority = priority;
+        Progress = progress;
         Order = order;
         ParentId = parentId;
-        TeamId = teamId;
         PlannedDateRange = plannedDateRange;
         PlannedDate = plannedDate;
         EstimatedEffortHours = estimatedEffortHours;
 
-        _assignments = assignments?
+        _roles = roles?
             .SelectMany(r => r.Value
-                .Select(e => new RoleAssignment<TaskAssignmentRole>(Id, r.Key, e)))
+                .Select(e => new RoleAssignment<TaskRole>(Id, r.Key, e)))
             .ToHashSet()
             ?? [];
     }
 
     /// <summary>
-    /// The unique integer key of the task. This is an alternate key to the Id.
+    /// The unique task key in the format {ProjectCode}-{Number} (e.g., "APOLLO-1").
     /// </summary>
-    public int Key { get; private init; }
+    public ProjectTaskKey Key { get; private set; } = null!;
 
     /// <summary>
-    /// The unique task key in the format {ProjectCode}-T{Number} (e.g., "APOLLO-T001").
+    /// The numeric part of the task key.
     /// </summary>
-    public ProjectTaskKey TaskKey { get; private init; } = null!;
+    public int Number { get; private init; }
 
     /// <summary>
     /// The ID of the project this task belongs to.
@@ -116,6 +116,13 @@ public sealed class ProjectTask : BaseEntity<Guid>, ISystemAuditable, IHasIdAndK
     public TaskPriority Priority { get; private set; }
 
     /// <summary>
+    /// The current progress as a decimal value between 0 and 100.
+    /// </summary>
+    /// <remarks>A value of 0 indicates no progress, while a value of 100 indicates completion. Intermediate
+    /// values represent partial progress. Milestones have a progress of 0 or 100 based on their completion status.</remarks>
+    public Progress Progress { get; private set; } = null!;
+
+    /// <summary>
     /// The order of the task within its parent (used for WBS calculation).
     /// </summary>
     public int Order { get; private set; }
@@ -136,14 +143,9 @@ public sealed class ProjectTask : BaseEntity<Guid>, ISystemAuditable, IHasIdAndK
     public IReadOnlyList<ProjectTask> Children => _children.AsReadOnly();
 
     /// <summary>
-    /// The ID of the team assigned to this task.
-    /// </summary>
-    public Guid? TeamId { get; private set; }
-
-    /// <summary>
     /// The role-based assignments for this task.
     /// </summary>
-    public IReadOnlyCollection<RoleAssignment<TaskAssignmentRole>> Assignments => _assignments;
+    public IReadOnlyCollection<RoleAssignment<TaskRole>> Roles => _roles;
 
     // Date properties for regular tasks
     /// <summary>
@@ -151,33 +153,17 @@ public sealed class ProjectTask : BaseEntity<Guid>, ISystemAuditable, IHasIdAndK
     /// </summary>
     public FlexibleDateRange? PlannedDateRange { get; private set; }
 
-    /// <summary>
-    /// The actual date range when the task was worked on. Only applicable for tasks (not milestones).
-    /// End date is null until the task is completed.
-    /// </summary>
-    public FlexibleDateRange? ActualDateRange { get; private set; }
-
     // Date properties for milestones
     /// <summary>
     /// The planned date for a milestone. Only applicable for milestones (not tasks).
     /// </summary>
     public LocalDate? PlannedDate { get; private set; }
 
-    /// <summary>
-    /// The actual date a milestone was achieved. Only applicable for milestones (not tasks).
-    /// </summary>
-    public LocalDate? ActualDate { get; private set; }
-
     // Effort tracking
     /// <summary>
     /// The estimated effort in hours.
     /// </summary>
     public decimal? EstimatedEffortHours { get; private set; }
-
-    /// <summary>
-    /// The actual effort spent in hours.
-    /// </summary>
-    public decimal? ActualEffortHours { get; private set; }
 
     /// <summary>
     /// The dependencies where this task is the predecessor.
@@ -203,7 +189,7 @@ public sealed class ProjectTask : BaseEntity<Guid>, ISystemAuditable, IHasIdAndK
     }
 
     /// <summary>
-    /// Updates the status of the task and auto-sets actual dates based on status transitions.
+    /// Updates the status of the task.
     /// </summary>
     public Result UpdateStatus(TaskStatus status, Instant timestamp)
     {
@@ -212,41 +198,31 @@ public sealed class ProjectTask : BaseEntity<Guid>, ISystemAuditable, IHasIdAndK
             return Result.Failure("Milestones cannot be in progress. Use NotStarted or Completed.");
         }
 
-        var previousStatus = Status;
         Status = status;
 
-        // Auto-set actual dates based on status
-        var currentDate = timestamp.InUtc().Date;
-
-        if (status == TaskStatus.InProgress && previousStatus == TaskStatus.NotStarted && ActualDateRange is null)
+        if (Type == ProjectTaskType.Milestone)
         {
-            if (Type == ProjectTaskType.Task)
+            if (Status == TaskStatus.Completed)
             {
-                // Start the task with open-ended range (no end date yet)
-                ActualDateRange = new FlexibleDateRange(currentDate, null);
-            }
-        }
-
-        if (status == TaskStatus.Completed)
-        {
-            if (Type == ProjectTaskType.Milestone)
-            {
-                ActualDate = currentDate;
+                Progress = Progress.Completed();
             }
             else
             {
-                if (ActualDateRange is not null)
-                {
-                    // Task was in progress, now complete it
-                    ActualDateRange = new FlexibleDateRange(ActualDateRange.Start, currentDate);
-                }
-                else
-                {
-                    // Task completed without being marked in progress
-                    ActualDateRange = new FlexibleDateRange(currentDate, currentDate);
-                }
+                Progress = Progress.NotStarted();
             }
         }
+
+        return Result.Success();
+    }
+
+    public Result UpdateProgress(Progress progress)
+    {
+        if (Type == ProjectTaskType.Milestone)
+        {
+            return Result.Failure("Milestones do not support progress updates. Use status to mark completion.");
+        }
+
+        Progress = progress;
 
         return Result.Success();
     }
@@ -275,25 +251,6 @@ public sealed class ProjectTask : BaseEntity<Guid>, ISystemAuditable, IHasIdAndK
     }
 
     /// <summary>
-    /// Updates the actual dates for the task.
-    /// </summary>
-    public Result UpdateActualDates(FlexibleDateRange? actualDateRange, LocalDate? actualDate)
-    {
-        if (Type == ProjectTaskType.Milestone)
-        {
-            ActualDate = actualDate;
-            ActualDateRange = null;
-        }
-        else
-        {
-            ActualDateRange = actualDateRange;
-            ActualDate = null;
-        }
-
-        return Result.Success();
-    }
-
-    /// <summary>
     /// Updates the effort estimates and actuals.
     /// </summary>
     public Result UpdateEffort(decimal? estimatedEffortHours)
@@ -311,34 +268,25 @@ public sealed class ProjectTask : BaseEntity<Guid>, ISystemAuditable, IHasIdAndK
     /// <summary>
     /// Assigns an employee to a specific role for this task.
     /// </summary>
-    public Result AssignRole(TaskAssignmentRole role, Guid employeeId)
+    public Result AssignRole(TaskRole role, Guid employeeId)
     {
-        return RoleManager.AssignRole(_assignments, Id, role, employeeId);
+        return RoleManager.AssignRole(_roles, Id, role, employeeId);
     }
 
     /// <summary>
     /// Removes an employee from a specific role for this task.
     /// </summary>
-    public Result RemoveRole(TaskAssignmentRole role, Guid employeeId)
+    public Result RemoveRole(TaskRole role, Guid employeeId)
     {
-        return RoleManager.RemoveAssignment(_assignments, role, employeeId);
+        return RoleManager.RemoveAssignment(_roles, role, employeeId);
     }
 
     /// <summary>
     /// Updates all role assignments for this task.
     /// </summary>
-    public Result UpdateRoles(Dictionary<TaskAssignmentRole, HashSet<Guid>> updatedRoles)
+    public Result UpdateRoles(Dictionary<TaskRole, HashSet<Guid>> updatedRoles)
     {
-        return RoleManager.UpdateRoles(_assignments, Id, updatedRoles);
-    }
-
-    /// <summary>
-    /// Assigns a team to this task.
-    /// </summary>
-    public Result AssignTeam(Guid? teamId)
-    {
-        TeamId = teamId;
-        return Result.Success();
+        return RoleManager.UpdateRoles(_roles, Id, updatedRoles);
     }
 
     /// <summary>
@@ -364,11 +312,6 @@ public sealed class ProjectTask : BaseEntity<Guid>, ISystemAuditable, IHasIdAndK
         if (newParentId.HasValue && newParentId == Id)
         {
             return Result.Failure("A task cannot be its own parent.");
-        }
-
-        if (newParent is not null && Type == ProjectTaskType.Milestone)
-        {
-            return Result.Failure("Milestones cannot be moved under other tasks.");
         }
 
         if (newParent is not null && newParent.Type == ProjectTaskType.Milestone)
@@ -491,39 +434,55 @@ public sealed class ProjectTask : BaseEntity<Guid>, ISystemAuditable, IHasIdAndK
     #endregion
 
     /// <summary>
-    /// Creates a new project task (called from Project entity).
+    /// Creates a new instance of a project task with the specified properties.
     /// </summary>
+    /// <remarks>If progress is null, the task is initialized as not started. The method does not validate the
+    /// existence of referenced project or parent task identifiers.</remarks>
+    /// <param name="projectId">The unique identifier of the project to which the task belongs.</param>
+    /// <param name="key">The key that uniquely identifies the task within the project.</param>
+    /// <param name="name">The name of the task. Cannot be null or empty.</param>
+    /// <param name="description">An optional description providing additional details about the task, or null if not specified.</param>
+    /// <param name="type">The type of the task, indicating its category or purpose.</param>
+    /// <param name="status">The current status of the task.</param>
+    /// <param name="priority">The priority level assigned to the task.</param>
+    /// <param name="progress">The progress of the task, or null to indicate not started.</param>
+    /// <param name="order">The order or position of the task within its parent or list. Must be zero or greater.</param>
+    /// <param name="parentId">The unique identifier of the parent task if this is a subtask; otherwise, null.</param>
+    /// <param name="plannedDateRange">The planned date range for the task, or null if not specified.</param>
+    /// <param name="plannedDate">The planned date for the task, or null if not specified.</param>
+    /// <param name="estimatedEffortHours">The estimated effort required to complete the task, in hours, or null if not specified.</param>
+    /// <param name="roles">A mapping of task roles to sets of user identifiers assigned to each role, or null if no roles are assigned.</param>
+    /// <returns>A new ProjectTask instance initialized with the specified values.</returns>
     internal static ProjectTask Create(
         Guid projectId,
-        ProjectKey projectKey,
-        int taskNumber,
+        ProjectTaskKey key,
         string name,
         string? description,
         ProjectTaskType type,
+        TaskStatus status,
         TaskPriority priority,
+        Progress? progress,
         int order,
         Guid? parentId,
-        Guid? teamId,
         FlexibleDateRange? plannedDateRange,
         LocalDate? plannedDate,
         decimal? estimatedEffortHours,
-        Dictionary<TaskAssignmentRole, HashSet<Guid>>? assignments)
+        Dictionary<TaskRole, HashSet<Guid>>? roles)
     {
         return new ProjectTask(
             projectId,
-            projectKey,
-            taskNumber,
+            key,
             name,
             description,
             type,
-            TaskStatus.NotStarted,
+            status,
             priority,
+            progress ?? Progress.NotStarted(),
             order,
             parentId,
-            teamId,
             plannedDateRange,
             plannedDate,
             estimatedEffortHours,
-            assignments);
+            roles);
     }
 }

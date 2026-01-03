@@ -8,7 +8,7 @@ using Moda.ProjectPortfolioManagement.Domain.Models;
 using Moda.ProjectPortfolioManagement.Domain.Tests.Data;
 using Moq;
 
-namespace Moda.ProjectPortfolioManagement.Application.Tests.ProjectTasks.Queries;
+namespace Moda.ProjectPortfolioManagement.Application.Tests.Sut.ProjectTasks.Queries;
 
 public class GetCriticalPathQueryHandlerTests : IDisposable
 {

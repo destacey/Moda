@@ -164,6 +164,8 @@ const ProjectTasksTable = ({
   const messageApi = useMessage()
 
   const { data: taskStatusOptions = [] } = useGetTaskStatusOptionsQuery()
+  const { data: taskStatusOptionsForMilestone = [] } =
+    useGetTaskStatusOptionsQuery({ forMilestone: true })
 
   const { data: taskPriorityOptions = [] } = useGetTaskPriorityOptionsQuery()
 
@@ -215,8 +217,8 @@ const ProjectTasksTable = ({
             description: updates.description ?? task.description,
             statusId: updates.statusId ?? task.status?.id,
             priorityId: updates.priorityId ?? task.priority?.id,
+            progress: updates.progress ?? task.progress,
             parentId: task.parentId,
-            teamId: task.team?.id,
             plannedStart:
               updates.plannedStart !== undefined
                 ? updates.plannedStart
@@ -455,6 +457,11 @@ const ProjectTasksTable = ({
           hasChanges = true
         }
 
+        if (values.progress !== task.progress) {
+          updates.progress = values.progress
+          hasChanges = true
+        }
+
         if (values.estimatedEffortHours !== task.estimatedEffortHours) {
           updates.estimatedEffortHours = values.estimatedEffortHours
             ? Number(values.estimatedEffortHours)
@@ -494,6 +501,7 @@ const ProjectTasksTable = ({
           typeId: task.type?.id,
           statusId: task.status?.id,
           priorityId: task.priority?.id,
+          progress: task.progress,
           plannedStart: task.plannedStart ? dayjs(task.plannedStart) : null,
           plannedEnd: task.plannedEnd ? dayjs(task.plannedEnd) : null,
           plannedDate: task.plannedDate ? dayjs(task.plannedDate) : null,
@@ -603,6 +611,7 @@ const ProjectTasksTable = ({
       'priority',
       'plannedStart',
       'plannedEnd',
+      'progress',
       'estimatedEffortHours',
     ],
     [],
@@ -964,7 +973,7 @@ const ProjectTasksTable = ({
         filterFn: 'includesString',
       },
       {
-        accessorKey: 'taskKey',
+        accessorKey: 'key',
         header: 'Key',
         size: 120,
         enableGlobalFilter: true,
@@ -1088,10 +1097,10 @@ const ProjectTasksTable = ({
             )
           }
 
-          // Filter out "In Progress" for milestones
+          // Use pre-filtered status options based on task type
           const isMilestone = task.type?.name === 'Milestone'
           const availableStatusOptions = isMilestone
-            ? taskStatusOptions.filter((opt) => opt.label !== 'In Progress')
+            ? taskStatusOptionsForMilestone
             : taskStatusOptions
 
           const error = getFieldError('statusId')
@@ -1302,6 +1311,52 @@ const ProjectTasksTable = ({
           return av === bv ? 0 : av > bv ? 1 : -1
         },
       },
+      ,
+      {
+        id: 'progress',
+        accessorFn: (row) => row.progress ?? '',
+        header: 'Progress',
+        size: 90,
+        enableGlobalFilter: false,
+        enableColumnFilter: true,
+        cell: (info) => {
+          const task = info.row.original
+          const value = task.progress
+          const isSelected = selectedRowId === task.id
+          const cellId = `${task.id}-progress`
+          const isMilestone = task.type?.name === 'Milestone'
+
+          if (!isSelected || !handleUpdateTask || isMilestone) {
+            return value !== undefined ? `${value} %` : ''
+          }
+
+          const error = getFieldError('progress')
+          return (
+            <div data-cell-id={cellId}>
+              <FormItem
+                name="progress"
+                style={{ margin: 0 }}
+                validateStatus={error ? 'error' : ''}
+              >
+                <Input
+                  size="small"
+                  type="number"
+                  min={0}
+                  max={100}
+                  suffix="%"
+                  onKeyDown={(e) => handleKeyDown(e, task.id, 'progress')}
+                  status={error ? 'error' : ''}
+                />
+              </FormItem>
+            </div>
+          )
+        },
+        sortingFn: (a, b) => {
+          const av = a.original.progress ?? -Infinity
+          const bv = b.original.progress ?? -Infinity
+          return av === bv ? 0 : av > bv ? 1 : -1
+        },
+      },
       {
         id: 'estimatedEffortHours',
         accessorFn: (row) => row.estimatedEffortHours ?? '',
@@ -1396,6 +1451,7 @@ const ProjectTasksTable = ({
       selectedRowId,
       taskPriorityOptions,
       taskStatusOptions,
+      taskStatusOptionsForMilestone,
     ],
   )
 

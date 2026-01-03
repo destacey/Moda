@@ -9,6 +9,7 @@ import {
   useGetTaskPriorityOptionsQuery,
   useGetTaskTypeOptionsQuery,
   useGetParentTaskOptionsQuery,
+  useGetTaskStatusOptionsQuery,
 } from '@/src/store/features/ppm/project-tasks-api'
 import { toFormErrors } from '@/src/utils'
 import {
@@ -39,7 +40,9 @@ interface CreateProjectTaskFormValues {
   name: string
   description?: string
   type: number
+  status: number
   priority?: number
+  progress?: number
   parentId?: string
   plannedRange?: any[]
   plannedDate?: Date
@@ -53,7 +56,9 @@ const mapToRequestValues = (
     name: values.name,
     description: values.description,
     typeId: values.type,
+    statusId: values.status,
     priorityId: values.priority,
+    progress: values.progress,
     parentId: values.parentId,
     plannedStart: (values.plannedRange?.[0] as any)?.format('YYYY-MM-DD'),
     plannedEnd: (values.plannedRange?.[1] as any)?.format('YYYY-MM-DD'),
@@ -74,9 +79,20 @@ const CreateProjectTaskForm = (props: CreateProjectTaskFormProps) => {
   const [createProjectTask, { error: mutationError }] =
     useCreateProjectTaskMutation()
 
-  const { data: priorityOptions = [] } = useGetTaskPriorityOptionsQuery()
-
   const { data: typeOptions = [] } = useGetTaskTypeOptionsQuery()
+
+  const selectedType = Form.useWatch('type', form)
+  // Find the Milestone value dynamically from options
+  const milestoneValue = typeOptions.find(
+    (opt) => opt.label === 'Milestone',
+  )?.value
+  const isMilestone = selectedType === milestoneValue
+
+  const { data: statusOptions = [] } = useGetTaskStatusOptionsQuery({
+    forMilestone: isMilestone,
+  })
+
+  const { data: priorityOptions = [] } = useGetTaskPriorityOptionsQuery()
 
   const { data: parentTaskOptions = [] } = useGetParentTaskOptionsQuery({
     projectIdOrKey: props.projectIdOrKey,
@@ -85,12 +101,13 @@ const CreateProjectTaskForm = (props: CreateProjectTaskFormProps) => {
   const { hasPermissionClaim } = useAuth()
   const canCreateTask = hasPermissionClaim('Permissions.Projects.Create')
 
-  const selectedType = Form.useWatch('type', form)
-  // Find the Milestone value dynamically from options
-  const milestoneValue = typeOptions.find(
-    (opt) => opt.label === 'Milestone',
-  )?.value
-  const isMilestone = selectedType === milestoneValue
+  // Reset status to "Not Started" (1) if user changes type to Milestone while status is "In Progress" (2)
+  useEffect(() => {
+    const currentStatus = form.getFieldValue('status')
+    if (isMilestone && currentStatus === 2) {
+      form.setFieldValue('status', 1)
+    }
+  }, [isMilestone, form])
 
   useEffect(() => {
     form.validateFields({ validateOnly: true }).then(
@@ -110,7 +127,7 @@ const CreateProjectTaskForm = (props: CreateProjectTaskFormProps) => {
         throw response.error
       }
       messageApi.success(
-        'Task created successfully. Task key: ' + response.data.taskKey,
+        'Task created successfully. Task key: ' + response.data.key,
       )
 
       return true
@@ -187,16 +204,18 @@ const CreateProjectTaskForm = (props: CreateProjectTaskFormProps) => {
         layout="vertical"
         name="create-project-task-form"
         initialValues={{
-          type: typeOptions.find((opt) => opt.label === 'Task')?.value ?? 1,
-          priority:
-            priorityOptions.find((opt) => opt.label === 'Medium')?.value ?? 2,
+          type: 1, // Default to 'Task' type
+          status: 1, // Default to 'Not Started' status
+          priority: 2, // Default to 'Medium' priority
           parentId: props.parentTaskId,
+          progress: 0,
         }}
       >
         <Item name="parentId" label="Parent Task">
           <TreeSelect
             allowClear
             placeholder="Select parent task (optional)"
+            notFoundContent="No tasks found"
             treeData={parentTaskOptions}
             treeDefaultExpandAll
             showSearch={{
@@ -239,6 +258,18 @@ const CreateProjectTaskForm = (props: CreateProjectTaskFormProps) => {
         </Item>
 
         <Item
+          name="status"
+          label="Status"
+          rules={[{ required: true, message: 'Please select a status' }]}
+        >
+          <RadioGroup
+            options={statusOptions}
+            optionType="button"
+            buttonStyle="solid"
+          />
+        </Item>
+
+        <Item
           name="priority"
           label="Priority"
           rules={[{ required: true, message: 'Please select a priority' }]}
@@ -256,12 +287,20 @@ const CreateProjectTaskForm = (props: CreateProjectTaskFormProps) => {
               <RangePicker style={{ width: '60%' }} format="MMM D, YYYY" />
             </Item>
 
+            <Item name="progress" label="Progress %">
+              <InputNumber min={0} max={100} style={{ width: '33%' }} />
+            </Item>
+
             <Item name="estimatedEffortHours" label="Estimated Effort (hours)">
               <InputNumber min={0} step={0.25} style={{ width: '33%' }} />
             </Item>
           </>
         ) : (
-          <Item name="plannedDate" label="Planned Date">
+          <Item
+            name="plannedDate"
+            label="Planned Date"
+            rules={[{ required: true }]}
+          >
             <DatePicker style={{ width: '60%' }} format="MMM D, YYYY" />
           </Item>
         )}

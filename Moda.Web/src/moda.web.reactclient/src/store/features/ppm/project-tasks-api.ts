@@ -6,9 +6,9 @@ import {
   ProjectTaskTreeDto,
   CreateProjectTaskRequest,
   UpdateProjectTaskRequest,
-  ObjectIdAndTaskKey,
   UpdateProjectTaskOrderRequest,
   AddTaskDependencyRequest,
+  ProjectTaskIdAndKey,
 } from '@/src/services/moda-api'
 import { QueryTags } from '../query-tags'
 import { OptionModel } from '@/src/components/types'
@@ -61,13 +61,13 @@ export const projectTasksApi = apiSlice.injectEndpoints({
     }),
     getProjectTask: builder.query<
       ProjectTaskDto,
-      { projectIdOrKey: string; idOrTaskKey: string }
+      { projectIdOrKey: string; taskIdOrKey: string }
     >({
-      queryFn: async ({ projectIdOrKey, idOrTaskKey }) => {
+      queryFn: async ({ projectIdOrKey, taskIdOrKey }) => {
         try {
           const data = await getProjectTasksClient().getProjectTask(
             projectIdOrKey,
-            idOrTaskKey,
+            taskIdOrKey,
           )
           return { data }
         } catch (error) {
@@ -75,12 +75,12 @@ export const projectTasksApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
-      providesTags: (result, error, { idOrTaskKey }) => [
-        { type: QueryTags.ProjectTask, id: idOrTaskKey },
+      providesTags: (result, error, { taskIdOrKey }) => [
+        { type: QueryTags.ProjectTask, id: taskIdOrKey },
       ],
     }),
     createProjectTask: builder.mutation<
-      ObjectIdAndTaskKey,
+      ProjectTaskIdAndKey,
       { projectIdOrKey: string; request: CreateProjectTaskRequest }
     >({
       queryFn: async ({ projectIdOrKey, request }) => {
@@ -247,24 +247,41 @@ export const projectTasksApi = apiSlice.injectEndpoints({
         { type: QueryTags.ProjectCriticalPath, id: projectIdOrKey },
       ],
     }),
-    getTaskStatusOptions: builder.query<OptionModel<number>[], void>({
-      queryFn: async () => {
+    getTaskStatusOptions: builder.query<
+      OptionModel<number>[],
+      { forMilestone?: boolean } | void
+    >({
+      queryFn: async (arg) => {
         try {
+          const forMilestone = arg && typeof arg === 'object' ? arg.forMilestone : false
           const data = await getProjectTasksClient().getTaskStatuses()
-          return {
-            data: data
-              .sort((a, b) => a.order - b.order)
-              .map((s) => ({
-                value: s.id,
-                label: s.name,
-              })),
+          let options = data
+            .sort((a, b) => a.order - b.order)
+            .map((s) => ({
+              value: s.id,
+              label: s.name,
+            }))
+
+          // Filter out "In Progress" for milestones
+          if (forMilestone) {
+            options = options.filter((opt) => opt.label !== 'In Progress')
           }
+
+          return { data: options }
         } catch (error) {
           console.error('API Error:', error)
           return { error }
         }
       },
-      providesTags: () => [{ type: QueryTags.TaskStatusOptions, id: 'LIST' }],
+      providesTags: (_result, _error, arg) => {
+        const forMilestone = arg && typeof arg === 'object' ? arg.forMilestone : false
+        return [
+          {
+            type: QueryTags.TaskStatusOptions,
+            id: forMilestone ? 'MILESTONE' : 'LIST',
+          },
+        ]
+      },
     }),
     getTaskPriorityOptions: builder.query<OptionModel<number>[], void>({
       queryFn: async () => {
@@ -335,7 +352,7 @@ export const projectTasksApi = apiSlice.injectEndpoints({
               )
               .map((t) => ({
                 value: t.id,
-                title: `${t.taskKey} - ${t.name}`,
+                title: `${t.key} - ${t.name}`,
                 children:
                   t.children && t.children.length > 0
                     ? convertToTreeSelect(t.children)

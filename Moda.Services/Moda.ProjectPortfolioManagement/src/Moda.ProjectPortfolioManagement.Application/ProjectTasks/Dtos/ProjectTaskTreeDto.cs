@@ -1,6 +1,5 @@
 using Moda.Common.Application.Dtos;
 using Moda.Common.Application.Employees.Dtos;
-using Moda.ProjectPortfolioManagement.Application.PpmTeams.Dtos;
 using Moda.ProjectPortfolioManagement.Domain.Models;
 
 namespace Moda.ProjectPortfolioManagement.Application.ProjectTasks.Dtos;
@@ -11,14 +10,17 @@ namespace Moda.ProjectPortfolioManagement.Application.ProjectTasks.Dtos;
 public sealed record ProjectTaskTreeDto : IMapFrom<ProjectTask>
 {
     public Guid Id { get; set; }
-    public int Key { get; set; }
-    public required string TaskKey { get; set; }
+    public required string Key { get; set; }
     public Guid ProjectId { get; set; }
     public required string Name { get; set; }
-    public string? Description { get; set; }
     public required SimpleNavigationDto Type { get; set; }
     public required SimpleNavigationDto Status { get; set; }
     public SimpleNavigationDto? Priority { get; set; }
+
+    /// <summary>
+    /// The progress of the task as a percentage (0 to 100).
+    /// </summary>
+    public decimal Progress { get; set; }
     public int Order { get; set; }
     public Guid? ParentId { get; set; }
 
@@ -26,17 +28,11 @@ public sealed record ProjectTaskTreeDto : IMapFrom<ProjectTask>
     /// The Work Breakdown Structure (WBS) number (e.g., "1.2.3").
     /// </summary>
     public required string Wbs { get; set; }
-
-    public PpmTeamNavigationDto? Team { get; set; }
     public List<ProjectTaskAssignmentDto> Assignments { get; set; } = [];
     public LocalDate? PlannedStart { get; set; }
     public LocalDate? PlannedEnd { get; set; }
     public LocalDate? PlannedDate { get; set; }
-    public LocalDate? ActualStart { get; set; }
-    public LocalDate? ActualEnd { get; set; }
-    public LocalDate? ActualDate { get; set; }
     public decimal? EstimatedEffortHours { get; set; }
-    public decimal? ActualEffortHours { get; set; }
 
     /// <summary>
     /// The child tasks.
@@ -46,17 +42,15 @@ public sealed record ProjectTaskTreeDto : IMapFrom<ProjectTask>
     public void ConfigureMapping(TypeAdapterConfig config)
     {
         config.NewConfig<ProjectTask, ProjectTaskTreeDto>()
-            .Map(dest => dest.TaskKey, src => src.TaskKey.Value)
+            .Map(dest => dest.Key, src => src.Key.Value)
             .Map(dest => dest.Type, src => SimpleNavigationDto.FromEnum(src.Type))
             .Map(dest => dest.Status, src => SimpleNavigationDto.FromEnum(src.Status))
             .Map(dest => dest.Priority, src => SimpleNavigationDto.FromEnum(src.Priority))
+            .Map(dest => dest.Progress, src => src.Progress.Value)
             .Map(dest => dest.PlannedStart, src => src.PlannedDateRange != null ? src.PlannedDateRange.Start : (LocalDate?)null)
             .Map(dest => dest.PlannedEnd, src => src.PlannedDateRange != null ? src.PlannedDateRange.End : null)
-            .Map(dest => dest.ActualStart, src => src.ActualDateRange != null ? src.ActualDateRange.Start : (LocalDate?)null)
-            .Map(dest => dest.ActualEnd, src => src.ActualDateRange != null ? src.ActualDateRange.End : null)
-            .Map(dest => dest.Assignments, src => src.Assignments.Select(a => new ProjectTaskAssignmentDto
+            .Map(dest => dest.Assignments, src => src.Roles.Select(a => new ProjectTaskAssignmentDto
             {
-                EmployeeId = a.EmployeeId,
                 Employee = EmployeeNavigationDto.From(a.Employee!),
                 Role = SimpleNavigationDto.FromEnum(a.Role)
             }).ToList())

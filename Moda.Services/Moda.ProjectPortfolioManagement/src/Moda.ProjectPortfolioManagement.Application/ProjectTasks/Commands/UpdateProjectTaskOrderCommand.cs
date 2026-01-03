@@ -36,7 +36,7 @@ internal sealed class UpdateProjectTaskOrderCommandHandler(
         await _ppmDbContext.SaveChangesAsync(cancellationToken);
 
         _logger.LogInformation("UpdateProjectTaskOrder: Successfully updated order for task {TaskKey} to {Order}.",
-            task.TaskKey.Value, request.Order);
+            task.Key.Value, request.Order);
 
         return Result.Success();
     }

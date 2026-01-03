@@ -8,8 +8,8 @@ public sealed record UpdateProjectTaskCommand(
     string? Description,
     Domain.Enums.TaskStatus Status,
     TaskPriority Priority,
+    Progress? Progress,
     Guid? ParentId,
-    Guid? TeamId,
     FlexibleDateRange? PlannedDateRange,
     LocalDate? PlannedDate,
     decimal? EstimatedEffortHours,
@@ -40,10 +40,6 @@ public sealed class UpdateProjectTaskCommandValidator : AbstractValidator<Update
             .Must(id => id == null || id != Guid.Empty)
             .WithMessage("ParentId cannot be an empty GUID.");
 
-        RuleFor(x => x.TeamId)
-            .Must(id => id == null || id != Guid.Empty)
-            .WithMessage("TeamId cannot be an empty GUID.");
-
         RuleFor(x => x.EstimatedEffortHours)
             .GreaterThan(0)
             .When(x => x.EstimatedEffortHours.HasValue);
@@ -71,7 +67,7 @@ internal sealed class UpdateProjectTaskCommandHandler(
         try
         {
             var task = await _ppmDbContext.ProjectTasks
-                .Include(t => t.Assignments)
+                .Include(t => t.Roles)
                 .FirstOrDefaultAsync(t => t.Id == request.Id, cancellationToken);
 
             if (task is null)
@@ -109,19 +105,6 @@ internal sealed class UpdateProjectTaskCommandHandler(
                 }
             }
 
-            // Validate team if specified
-            if (request.TeamId.HasValue)
-            {
-                var teamExists = await _ppmDbContext.PpmTeams
-                    .AnyAsync(t => t.Id == request.TeamId.Value && t.IsActive, cancellationToken);
-
-                if (!teamExists)
-                {
-                    _logger.LogInformation("Team {TeamId} not found or inactive.", request.TeamId);
-                    return Result.Failure("Team not found or inactive.");
-                }
-            }
-
             // Validate employees if assignments specified
             if (request.Assignments is not null && request.Assignments.Count > 0)
             {
@@ -154,6 +137,23 @@ internal sealed class UpdateProjectTaskCommandHandler(
                 return statusResult;
             }
 
+            // Update progress
+            if (task.Type is ProjectTaskType.Task)
+            {
+                if(request.Progress is null)
+                {
+                    _logger.LogInformation("Progress must be provided for task type 'Task'.");
+                    return Result.Failure("Progress must be provided for task type 'Task'.");
+                }
+
+                var progressResult = task.UpdateProgress(request.Progress);
+                if (progressResult.IsFailure)
+                {
+                    _logger.LogError("Error updating task {TaskId} progress. Error: {Error}", task.Id, progressResult.Error);
+                    return progressResult;
+                }
+            }
+
             // Update planned dates
             var plannedDatesResult = task.UpdatePlannedDates(request.PlannedDateRange, request.PlannedDate);
             if (plannedDatesResult.IsFailure)
@@ -183,14 +183,6 @@ internal sealed class UpdateProjectTaskCommandHandler(
                     _logger.LogError("Error changing parent for task {TaskId}. Error: {Error}", task.Id, parentResult.Error);
                     return parentResult;
                 }
-            }
-
-            // Update team assignment
-            var teamResult = task.AssignTeam(request.TeamId);
-            if (teamResult.IsFailure)
-            {
-                _logger.LogError("Error assigning team to task {TaskId}. Error: {Error}", task.Id, teamResult.Error);
-                return teamResult;
             }
 
             // Update role assignments if specified

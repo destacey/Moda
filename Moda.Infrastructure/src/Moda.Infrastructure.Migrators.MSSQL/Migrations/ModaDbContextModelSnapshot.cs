@@ -2025,13 +2025,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime?>("ActualDate")
-                        .HasColumnType("date")
-                        .HasColumnName("ActualDate");
-
-                    b.Property<decimal?>("ActualEffortHours")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<string>("Description")
                         .HasMaxLength(2048)
                         .HasColumnType("nvarchar(2048)");
@@ -2039,16 +2032,18 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<decimal?>("EstimatedEffortHours")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("Key")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Key"));
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<int>("Number")
+                        .HasColumnType("int");
 
                     b.Property<int>("Order")
                         .HasColumnType("int");
@@ -2064,6 +2059,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .IsRequired()
                         .HasMaxLength(32)
                         .HasColumnType("varchar");
+
+                    b.Property<decimal>("Progress")
+                        .HasColumnType("decimal(5,2)");
 
                     b.Property<Guid>("ProjectId")
                         .HasColumnType("uniqueidentifier");
@@ -2085,9 +2083,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<Guid?>("SystemLastModifiedBy")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("TeamId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasMaxLength(32)
@@ -2095,7 +2090,10 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasAlternateKey("Key");
+                    b.HasIndex("Key")
+                        .IsUnique();
+
+                    b.HasIndex("Number");
 
                     b.HasIndex("ParentId");
 
@@ -2284,7 +2282,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("StrategicInitiativeRoleAssignments", "Ppm");
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.RoleAssignment<Moda.ProjectPortfolioManagement.Domain.Enums.TaskAssignmentRole>", b =>
+            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.RoleAssignment<Moda.ProjectPortfolioManagement.Domain.Enums.TaskRole>", b =>
                 {
                     b.Property<Guid>("ObjectId")
                         .HasColumnType("uniqueidentifier");
@@ -4228,27 +4226,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsOne("Moda.Common.Models.FlexibleDateRange", "ActualDateRange", b1 =>
-                        {
-                            b1.Property<Guid>("ProjectTaskId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<DateTime?>("End")
-                                .HasColumnType("date")
-                                .HasColumnName("ActualEnd");
-
-                            b1.Property<DateTime>("Start")
-                                .HasColumnType("date")
-                                .HasColumnName("ActualStart");
-
-                            b1.HasKey("ProjectTaskId");
-
-                            b1.ToTable("ProjectTasks", "Ppm");
-
-                            b1.WithOwner()
-                                .HasForeignKey("ProjectTaskId");
-                        });
-
                     b.OwnsOne("Moda.Common.Models.FlexibleDateRange", "PlannedDateRange", b1 =>
                         {
                             b1.Property<Guid>("ProjectTaskId")
@@ -4270,35 +4247,11 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                                 .HasForeignKey("ProjectTaskId");
                         });
 
-                    b.OwnsOne("Moda.ProjectPortfolioManagement.Domain.Models.ProjectTaskKey", "TaskKey", b1 =>
-                        {
-                            b1.Property<Guid>("ProjectTaskId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<string>("Value")
-                                .IsRequired()
-                                .HasMaxLength(30)
-                                .HasColumnType("nvarchar(30)")
-                                .HasColumnName("TaskKey");
-
-                            b1.HasKey("ProjectTaskId");
-
-                            b1.ToTable("ProjectTasks", "Ppm");
-
-                            b1.WithOwner()
-                                .HasForeignKey("ProjectTaskId");
-                        });
-
-                    b.Navigation("ActualDateRange");
-
                     b.Navigation("Parent");
 
                     b.Navigation("PlannedDateRange");
 
                     b.Navigation("Project");
-
-                    b.Navigation("TaskKey")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.ProjectTaskDependency", b =>
@@ -4388,7 +4341,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Employee");
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.RoleAssignment<Moda.ProjectPortfolioManagement.Domain.Enums.TaskAssignmentRole>", b =>
+            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.RoleAssignment<Moda.ProjectPortfolioManagement.Domain.Enums.TaskRole>", b =>
                 {
                     b.HasOne("Moda.Common.Domain.Employees.Employee", "Employee")
                         .WithMany()
@@ -4397,7 +4350,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .IsRequired();
 
                     b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.ProjectTask", null)
-                        .WithMany("Assignments")
+                        .WithMany("Roles")
                         .HasForeignKey("ObjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -5060,11 +5013,11 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
             modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.ProjectTask", b =>
                 {
-                    b.Navigation("Assignments");
-
                     b.Navigation("Children");
 
                     b.Navigation("Predecessors");
+
+                    b.Navigation("Roles");
 
                     b.Navigation("Successors");
                 });

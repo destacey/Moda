@@ -4676,7 +4676,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ObjectIdAndTaskKey"
+                  "$ref": "#/components/schemas/ProjectTaskIdAndKey"
                 }
               }
             }
@@ -4765,7 +4765,7 @@
         ]
       }
     },
-    "/api/ppm/projects/{projectIdOrKey}/tasks/{idOrTaskKey}": {
+    "/api/ppm/projects/{projectIdOrKey}/tasks/{taskIdOrKey}": {
       "get": {
         "tags": [
           "ProjectTasks"
@@ -4783,7 +4783,7 @@
             "x-position": 1
           },
           {
-            "name": "idOrTaskKey",
+            "name": "taskIdOrKey",
             "in": "path",
             "required": true,
             "schema": {
@@ -17784,12 +17784,12 @@
         "required": [
           "id",
           "key",
-          "taskKey",
           "projectId",
           "name",
           "type",
           "status",
           "priority",
+          "progress",
           "order"
         ],
         "properties": {
@@ -17800,10 +17800,6 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "taskKey": {
             "type": "string"
           },
           "projectId": {
@@ -17823,6 +17819,10 @@
           },
           "priority": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "progress": {
+            "type": "number",
+            "format": "decimal"
           },
           "order": {
             "type": "integer",
@@ -17842,14 +17842,6 @@
               }
             ]
           },
-          "team": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/PpmTeamNavigationDto"
-              }
-            ]
-          },
           "plannedStart": {
             "type": "string",
             "format": "date",
@@ -17865,27 +17857,7 @@
             "format": "date",
             "nullable": true
           },
-          "actualStart": {
-            "type": "string",
-            "format": "date",
-            "nullable": true
-          },
-          "actualEnd": {
-            "type": "string",
-            "format": "date",
-            "nullable": true
-          },
-          "actualDate": {
-            "type": "string",
-            "format": "date",
-            "nullable": true
-          },
           "estimatedEffortHours": {
-            "type": "number",
-            "format": "decimal",
-            "nullable": true
-          },
-          "actualEffortHours": {
             "type": "number",
             "format": "decimal",
             "nullable": true
@@ -17898,7 +17870,6 @@
         "required": [
           "id",
           "key",
-          "taskKey",
           "name"
         ],
         "properties": {
@@ -17909,38 +17880,6 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "taskKey": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          }
-        }
-      },
-      "PpmTeamNavigationDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "key",
-          "code",
-          "name"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "guid",
-            "nullable": false,
-            "example": "00000000-0000-0000-0000-000000000000"
-          },
-          "key": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "code": {
             "type": "string"
           },
           "name": {
@@ -17954,11 +17893,11 @@
         "required": [
           "id",
           "key",
-          "taskKey",
           "projectId",
           "name",
           "type",
           "status",
+          "progress",
           "order",
           "wbs",
           "assignments",
@@ -17972,10 +17911,6 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "taskKey": {
             "type": "string"
           },
           "projectId": {
@@ -17986,10 +17921,6 @@
           },
           "name": {
             "type": "string"
-          },
-          "description": {
-            "type": "string",
-            "nullable": true
           },
           "type": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -18005,6 +17936,10 @@
               }
             ]
           },
+          "progress": {
+            "type": "number",
+            "format": "decimal"
+          },
           "order": {
             "type": "integer",
             "format": "int32"
@@ -18017,14 +17952,6 @@
           },
           "wbs": {
             "type": "string"
-          },
-          "team": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/PpmTeamNavigationDto"
-              }
-            ]
           },
           "assignments": {
             "type": "array",
@@ -18047,27 +17974,7 @@
             "format": "date",
             "nullable": true
           },
-          "actualStart": {
-            "type": "string",
-            "format": "date",
-            "nullable": true
-          },
-          "actualEnd": {
-            "type": "string",
-            "format": "date",
-            "nullable": true
-          },
-          "actualDate": {
-            "type": "string",
-            "format": "date",
-            "nullable": true
-          },
           "estimatedEffortHours": {
-            "type": "number",
-            "format": "decimal",
-            "nullable": true
-          },
-          "actualEffortHours": {
             "type": "number",
             "format": "decimal",
             "nullable": true
@@ -18084,17 +17991,10 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "employeeId",
           "employee",
           "role"
         ],
         "properties": {
-          "employeeId": {
-            "type": "string",
-            "format": "guid",
-            "nullable": false,
-            "example": "00000000-0000-0000-0000-000000000000"
-          },
           "employee": {
             "$ref": "#/components/schemas/EmployeeNavigationDto"
           },
@@ -18109,11 +18009,12 @@
         "required": [
           "id",
           "key",
-          "taskKey",
           "projectId",
           "name",
           "type",
           "status",
+          "priority",
+          "progress",
           "order",
           "assignments"
         ],
@@ -18125,10 +18026,6 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "taskKey": {
             "type": "string"
           },
           "projectId": {
@@ -18151,12 +18048,11 @@
             "$ref": "#/components/schemas/SimpleNavigationDto"
           },
           "priority": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/SimpleNavigationDto"
-              }
-            ]
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "progress": {
+            "type": "number",
+            "format": "decimal"
           },
           "order": {
             "type": "integer",
@@ -18173,14 +18069,6 @@
             "oneOf": [
               {
                 "$ref": "#/components/schemas/ProjectTaskNavigationDto"
-              }
-            ]
-          },
-          "team": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/PpmTeamNavigationDto"
               }
             ]
           },
@@ -18205,39 +18093,19 @@
             "format": "date",
             "nullable": true
           },
-          "actualStart": {
-            "type": "string",
-            "format": "date",
-            "nullable": true
-          },
-          "actualEnd": {
-            "type": "string",
-            "format": "date",
-            "nullable": true
-          },
-          "actualDate": {
-            "type": "string",
-            "format": "date",
-            "nullable": true
-          },
           "estimatedEffortHours": {
-            "type": "number",
-            "format": "decimal",
-            "nullable": true
-          },
-          "actualEffortHours": {
             "type": "number",
             "format": "decimal",
             "nullable": true
           }
         }
       },
-      "ObjectIdAndTaskKey": {
+      "ProjectTaskIdAndKey": {
         "type": "object",
         "additionalProperties": false,
         "required": [
           "id",
-          "taskKey"
+          "key"
         ],
         "properties": {
           "id": {
@@ -18246,7 +18114,7 @@
             "nullable": false,
             "example": "00000000-0000-0000-0000-000000000000"
           },
-          "taskKey": {
+          "key": {
             "type": "string"
           }
         }
@@ -18257,7 +18125,9 @@
         "required": [
           "name",
           "typeId",
+          "statusId",
           "priorityId",
+          "progress",
           "plannedDate"
         ],
         "properties": {
@@ -18280,21 +18150,25 @@
             "description": "The type of task (Task or Milestone).",
             "format": "int32"
           },
+          "statusId": {
+            "type": "integer",
+            "description": "The current status of the task.",
+            "format": "int32"
+          },
           "priorityId": {
             "type": "integer",
             "description": "The priority level of the task.",
             "format": "int32"
           },
+          "progress": {
+            "type": "number",
+            "description": "The progress of the task (optional). Ranges from 0.0 to 100.0. Milestones can not update progress directly.",
+            "format": "decimal",
+            "nullable": false
+          },
           "parentId": {
             "type": "string",
             "description": "The ID of the parent task (optional).",
-            "format": "guid",
-            "nullable": true,
-            "example": "00000000-0000-0000-0000-000000000000"
-          },
-          "teamId": {
-            "type": "string",
-            "description": "The ID of the team assigned to this task (optional).",
             "format": "guid",
             "nullable": true,
             "example": "00000000-0000-0000-0000-000000000000"
@@ -18354,13 +18228,13 @@
             "description": "The role of the assignment (Assignee or Reviewer).",
             "oneOf": [
               {
-                "$ref": "#/components/schemas/TaskAssignmentRole"
+                "$ref": "#/components/schemas/TaskRole"
               }
             ]
           }
         }
       },
-      "TaskAssignmentRole": {
+      "TaskRole": {
         "type": "string",
         "description": "",
         "x-enumNames": [
@@ -18414,16 +18288,15 @@
             "description": "The priority level of the task.",
             "format": "int32"
           },
+          "progress": {
+            "type": "number",
+            "description": "The progress of the task (optional). Ranges from 0.0 to 100.0. Milestones can not update progress directly.",
+            "format": "decimal",
+            "nullable": true
+          },
           "parentId": {
             "type": "string",
             "description": "The ID of the parent task (optional).",
-            "format": "guid",
-            "nullable": true,
-            "example": "00000000-0000-0000-0000-000000000000"
-          },
-          "teamId": {
-            "type": "string",
-            "description": "The ID of the team assigned to this task (optional).",
             "format": "guid",
             "nullable": true,
             "example": "00000000-0000-0000-0000-000000000000"

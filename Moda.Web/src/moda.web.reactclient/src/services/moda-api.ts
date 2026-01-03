@@ -5644,7 +5644,7 @@ export class ProjectTasksClient {
     /**
      * Create a project task.
      */
-    createProjectTask(projectIdOrKey: string, request: CreateProjectTaskRequest, cancelToken?: CancelToken): Promise<ObjectIdAndTaskKey> {
+    createProjectTask(projectIdOrKey: string, request: CreateProjectTaskRequest, cancelToken?: CancelToken): Promise<ProjectTaskIdAndKey> {
         let url_ = this.baseUrl + "/api/ppm/projects/{projectIdOrKey}/tasks";
         if (projectIdOrKey === undefined || projectIdOrKey === null)
             throw new globalThis.Error("The parameter 'projectIdOrKey' must be defined.");
@@ -5675,7 +5675,7 @@ export class ProjectTasksClient {
         });
     }
 
-    protected processCreateProjectTask(response: AxiosResponse): Promise<ObjectIdAndTaskKey> {
+    protected processCreateProjectTask(response: AxiosResponse): Promise<ProjectTaskIdAndKey> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -5690,7 +5690,7 @@ export class ProjectTasksClient {
             let result201: any = null;
             let resultData201  = _responseText;
             result201 = JSON.parse(resultData201);
-            return Promise.resolve<ObjectIdAndTaskKey>(result201);
+            return Promise.resolve<ProjectTaskIdAndKey>(result201);
 
         } else if (status === 400) {
             const _responseText = response.data;
@@ -5710,7 +5710,7 @@ export class ProjectTasksClient {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<ObjectIdAndTaskKey>(null as any);
+        return Promise.resolve<ProjectTaskIdAndKey>(null as any);
     }
 
     /**
@@ -5777,14 +5777,14 @@ export class ProjectTasksClient {
     /**
      * Get project task details.
      */
-    getProjectTask(projectIdOrKey: string, idOrTaskKey: string, cancelToken?: CancelToken): Promise<ProjectTaskDto> {
-        let url_ = this.baseUrl + "/api/ppm/projects/{projectIdOrKey}/tasks/{idOrTaskKey}";
+    getProjectTask(projectIdOrKey: string, taskIdOrKey: string, cancelToken?: CancelToken): Promise<ProjectTaskDto> {
+        let url_ = this.baseUrl + "/api/ppm/projects/{projectIdOrKey}/tasks/{taskIdOrKey}";
         if (projectIdOrKey === undefined || projectIdOrKey === null)
             throw new globalThis.Error("The parameter 'projectIdOrKey' must be defined.");
         url_ = url_.replace("{projectIdOrKey}", encodeURIComponent("" + projectIdOrKey));
-        if (idOrTaskKey === undefined || idOrTaskKey === null)
-            throw new globalThis.Error("The parameter 'idOrTaskKey' must be defined.");
-        url_ = url_.replace("{idOrTaskKey}", encodeURIComponent("" + idOrTaskKey));
+        if (taskIdOrKey === undefined || taskIdOrKey === null)
+            throw new globalThis.Error("The parameter 'taskIdOrKey' must be defined.");
+        url_ = url_.replace("{taskIdOrKey}", encodeURIComponent("" + taskIdOrKey));
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -18202,101 +18202,76 @@ export interface WorkProjectNavigationDto {
 
 export interface ProjectTaskListDto {
     id: string;
-    key: number;
-    taskKey: string;
+    key: string;
     projectId: string;
     name: string;
     type: SimpleNavigationDto;
     status: SimpleNavigationDto;
     priority: SimpleNavigationDto;
+    progress: number;
     order: number;
     parentId?: string | undefined;
     parent?: ProjectTaskNavigationDto | undefined;
-    team?: PpmTeamNavigationDto | undefined;
     plannedStart?: Date | undefined;
     plannedEnd?: Date | undefined;
     plannedDate?: Date | undefined;
-    actualStart?: Date | undefined;
-    actualEnd?: Date | undefined;
-    actualDate?: Date | undefined;
     estimatedEffortHours?: number | undefined;
-    actualEffortHours?: number | undefined;
 }
 
 export interface ProjectTaskNavigationDto {
     id: string;
-    key: number;
-    taskKey: string;
-    name: string;
-}
-
-export interface PpmTeamNavigationDto {
-    id: string;
-    key: number;
-    code: string;
+    key: string;
     name: string;
 }
 
 export interface ProjectTaskTreeDto {
     id: string;
-    key: number;
-    taskKey: string;
+    key: string;
     projectId: string;
     name: string;
-    description?: string | undefined;
     type: SimpleNavigationDto;
     status: SimpleNavigationDto;
     priority?: SimpleNavigationDto | undefined;
+    progress: number;
     order: number;
     parentId?: string | undefined;
     wbs: string;
-    team?: PpmTeamNavigationDto | undefined;
     assignments: ProjectTaskAssignmentDto[];
     plannedStart?: Date | undefined;
     plannedEnd?: Date | undefined;
     plannedDate?: Date | undefined;
-    actualStart?: Date | undefined;
-    actualEnd?: Date | undefined;
-    actualDate?: Date | undefined;
     estimatedEffortHours?: number | undefined;
-    actualEffortHours?: number | undefined;
     children: ProjectTaskTreeDto[];
 }
 
 export interface ProjectTaskAssignmentDto {
-    employeeId: string;
     employee: EmployeeNavigationDto;
     role: SimpleNavigationDto;
 }
 
 export interface ProjectTaskDto {
     id: string;
-    key: number;
-    taskKey: string;
+    key: string;
     projectId: string;
     name: string;
     description?: string | undefined;
     type: SimpleNavigationDto;
     status: SimpleNavigationDto;
-    priority?: SimpleNavigationDto | undefined;
+    priority: SimpleNavigationDto;
+    progress: number;
     order: number;
     parentId?: string | undefined;
     parent?: ProjectTaskNavigationDto | undefined;
-    team?: PpmTeamNavigationDto | undefined;
     assignments: ProjectTaskAssignmentDto[];
     plannedStart?: Date | undefined;
     plannedEnd?: Date | undefined;
     plannedDate?: Date | undefined;
-    actualStart?: Date | undefined;
-    actualEnd?: Date | undefined;
-    actualDate?: Date | undefined;
     estimatedEffortHours?: number | undefined;
-    actualEffortHours?: number | undefined;
 }
 
-export interface ObjectIdAndTaskKey {
+export interface ProjectTaskIdAndKey {
     id: string;
-    taskKey: string;
+    key: string;
 }
 
 export interface CreateProjectTaskRequest {
@@ -18306,12 +18281,14 @@ export interface CreateProjectTaskRequest {
     description?: string | undefined;
     /** The type of task (Task or Milestone). */
     typeId: number;
+    /** The current status of the task. */
+    statusId: number;
     /** The priority level of the task. */
     priorityId: number;
+    /** The progress of the task (optional). Ranges from 0.0 to 100.0. Milestones can not update progress directly. */
+    progress: number;
     /** The ID of the parent task (optional). */
     parentId?: string | undefined;
-    /** The ID of the team assigned to this task (optional). */
-    teamId?: string | undefined;
     /** The planned start date for the task (for tasks, not milestones). */
     plannedStart?: Date | undefined;
     /** The planned end date for the task (for tasks, not milestones). */
@@ -18328,10 +18305,10 @@ export interface TaskRoleAssignmentRequest {
     /** The ID of the employee. */
     employeeId: string;
     /** The role of the assignment (Assignee or Reviewer). */
-    role: TaskAssignmentRole;
+    role: TaskRole;
 }
 
-export enum TaskAssignmentRole {
+export enum TaskRole {
     Assignee = "Assignee",
     Reviewer = "Reviewer",
 }
@@ -18347,10 +18324,10 @@ export interface UpdateProjectTaskRequest {
     statusId: number;
     /** The priority level of the task. */
     priorityId: number;
+    /** The progress of the task (optional). Ranges from 0.0 to 100.0. Milestones can not update progress directly. */
+    progress?: number | undefined;
     /** The ID of the parent task (optional). */
     parentId?: string | undefined;
-    /** The ID of the team assigned to this task (optional). */
-    teamId?: string | undefined;
     /** The planned start date for the task. */
     plannedStart?: Date | undefined;
     /** The planned end date for the task. */

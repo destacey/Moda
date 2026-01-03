@@ -21,4 +21,10 @@
         <ProjectReference Include="..\Moda.ProjectPortfolioManagement.Domain\Moda.ProjectPortfolioManagement.Domain.csproj" />
     </ItemGroup>
 
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="Moda.ProjectPortfolioManagement.Application.Tests" />
+        <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+    </ItemGroup>
+
 </Project>

@@ -1,7 +1,5 @@
 using FluentAssertions;
-using Moda.Common.Domain.Models.ProjectPortfolioManagement;
-using Moda.ProjectPortfolioManagement.Domain.Enums;
-using Moda.ProjectPortfolioManagement.Domain.Models;
+using Moda.ProjectPortfolioManagement.Domain.Tests.Data;
 using Moda.Tests.Shared;
 using NodaTime.Extensions;
 using NodaTime.Testing;
@@ -12,9 +10,13 @@ public class ProjectTaskTests
 {
     private readonly TestingDateTimeProvider _dateTimeProvider;
 
+    private readonly ProjectTaskFaker _projectTaskFaker;
+
     public ProjectTaskTests()
     {
         _dateTimeProvider = new TestingDateTimeProvider(new FakeClock(DateTime.UtcNow.ToInstant()));
+
+        _projectTaskFaker = new ProjectTaskFaker();
     }
 
     #region SetOrder Tests
@@ -23,23 +25,7 @@ public class ProjectTaskTests
     public void SetOrder_ShouldSucceed_WhenOrderIsValid()
     {
         // Arrange
-        var projectId = Guid.NewGuid();
-        var projectKey = new ProjectKey("TEST");
-        var task = ProjectTask.Create(
-            projectId: projectId,
-            projectKey: projectKey,
-            taskNumber: 1,
-            name: "Test Task",
-            description: "Description",
-            type: ProjectTaskType.Task,
-            priority: TaskPriority.Medium,
-            order: 1,
-            parentId: null,
-            teamId: null,
-            plannedDateRange: null,
-            plannedDate: null,
-            estimatedEffortHours: null,
-            assignments: null);
+        var task = _projectTaskFaker.Generate();
 
         // Act
         var result = task.SetOrder(5);
@@ -53,23 +39,7 @@ public class ProjectTaskTests
     public void SetOrder_ShouldFail_WhenOrderIsZero()
     {
         // Arrange
-        var projectId = Guid.NewGuid();
-        var projectKey = new ProjectKey("TEST");
-        var task = ProjectTask.Create(
-            projectId: projectId,
-            projectKey: projectKey,
-            taskNumber: 1,
-            name: "Test Task",
-            description: "Description",
-            type: ProjectTaskType.Task,
-            priority: TaskPriority.Medium,
-            order: 1,
-            parentId: null,
-            teamId: null,
-            plannedDateRange: null,
-            plannedDate: null,
-            estimatedEffortHours: null,
-            assignments: null);
+        var task = _projectTaskFaker.Generate();
 
         // Act
         var result = task.SetOrder(0);
@@ -77,30 +47,14 @@ public class ProjectTaskTests
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Error.Should().Be("Order must be greater than 0.");
-        task.Order.Should().Be(1); // Should remain unchanged
+        task.Order.Should().Be(task.Order); // Should remain unchanged
     }
 
     [Fact]
     public void SetOrder_ShouldFail_WhenOrderIsNegative()
     {
         // Arrange
-        var projectId = Guid.NewGuid();
-        var projectKey = new ProjectKey("TEST");
-        var task = ProjectTask.Create(
-            projectId: projectId,
-            projectKey: projectKey,
-            taskNumber: 1,
-            name: "Test Task",
-            description: "Description",
-            type: ProjectTaskType.Task,
-            priority: TaskPriority.Medium,
-            order: 1,
-            parentId: null,
-            teamId: null,
-            plannedDateRange: null,
-            plannedDate: null,
-            estimatedEffortHours: null,
-            assignments: null);
+        var task = _projectTaskFaker.Generate();
 
         // Act
         var result = task.SetOrder(-5);
@@ -108,30 +62,14 @@ public class ProjectTaskTests
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Error.Should().Be("Order must be greater than 0.");
-        task.Order.Should().Be(1); // Should remain unchanged
+        task.Order.Should().Be(task.Order); // Should remain unchanged
     }
 
     [Fact]
     public void SetOrder_ShouldAllowUpdatingMultipleTimes()
     {
         // Arrange
-        var projectId = Guid.NewGuid();
-        var projectKey = new ProjectKey("TEST");
-        var task = ProjectTask.Create(
-            projectId: projectId,
-            projectKey: projectKey,
-            taskNumber: 1,
-            name: "Test Task",
-            description: "Description",
-            type: ProjectTaskType.Task,
-            priority: TaskPriority.Medium,
-            order: 1,
-            parentId: null,
-            teamId: null,
-            plannedDateRange: null,
-            plannedDate: null,
-            estimatedEffortHours: null,
-            assignments: null);
+        var task = _projectTaskFaker.Generate();
 
         // Act
         var result1 = task.SetOrder(5);

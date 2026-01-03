@@ -41,7 +41,7 @@ internal sealed class RemoveProjectTaskDependencyCommandHandler(
         await _ppmDbContext.SaveChangesAsync(cancellationToken);
 
         _logger.LogInformation("RemoveProjectTaskDependency: Successfully removed dependency from {PredecessorKey} to successor {SuccessorId}.",
-            predecessor.TaskKey.Value, request.SuccessorId);
+            predecessor.Key.Value, request.SuccessorId);
 
         return Result.Success();
     }

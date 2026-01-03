@@ -5,23 +5,26 @@ using Moda.ProjectPortfolioManagement.Application.Tests.Infrastructure;
 using Moda.ProjectPortfolioManagement.Domain.Tests.Data;
 using Moq;
 
-namespace Moda.ProjectPortfolioManagement.Application.Tests.ProjectTasks.Commands;
+namespace Moda.ProjectPortfolioManagement.Application.Tests.Sut.ProjectTasks.Commands;
 
 public class AddProjectTaskDependencyCommandHandlerTests : IDisposable
 {
+    private readonly ProjectTaskFaker _taskFaker;
     private readonly FakeProjectPortfolioManagementDbContext _dbContext;
     private readonly AddProjectTaskDependencyCommandHandler _handler;
     private readonly Mock<ILogger<AddProjectTaskDependencyCommandHandler>> _mockLogger;
-    private readonly ProjectTaskFaker _taskFaker;
 
     public AddProjectTaskDependencyCommandHandlerTests()
     {
+        _taskFaker = new ProjectTaskFaker();
+
         _dbContext = new FakeProjectPortfolioManagementDbContext();
         _mockLogger = new Mock<ILogger<AddProjectTaskDependencyCommandHandler>>();
+
         _handler = new AddProjectTaskDependencyCommandHandler(
             _dbContext,
             _mockLogger.Object);
-        _taskFaker = new ProjectTaskFaker();
+
     }
 
     [Fact]

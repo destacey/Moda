@@ -32,7 +32,7 @@ const DeleteProjectTaskForm = (props: DeleteProjectTaskFormProps) => {
   } = useGetProjectTaskQuery(
     {
       projectIdOrKey: props.projectIdOrKey,
-      idOrTaskKey: props.taskIdOrKey,
+      taskIdOrKey: props.taskIdOrKey,
     },
     { skip: !props.showForm },
   )
@@ -100,7 +100,7 @@ const DeleteProjectTaskForm = (props: DeleteProjectTaskFormProps) => {
         keyboard={false}
         destroyOnHidden={true}
       >
-        {taskData?.taskKey} - {taskData?.name}
+        {taskData?.key} - {taskData?.name}
       </Modal>
     </>
   )

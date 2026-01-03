@@ -63,7 +63,7 @@ internal sealed class MoveProjectTaskCommandHandler(
         await _ppmDbContext.SaveChangesAsync(cancellationToken);
 
         _logger.LogInformation("MoveProjectTask: Successfully moved task {TaskKey} to parent {NewParentKey}.",
-            task.TaskKey.Value, newParent?.TaskKey.Value ?? "root");
+            task.Key.Value, newParent?.Key.Value ?? "root");
 
         return Result.Success();
     }

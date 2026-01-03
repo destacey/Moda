@@ -43,14 +43,14 @@ internal sealed class AddProjectTaskDependencyCommandHandler(
         if (result.IsFailure)
         {
             _logger.LogWarning("AddProjectTaskDependency: Failed to add dependency from {PredecessorKey} to {SuccessorKey}. Error: {Error}",
-                predecessor.TaskKey.Value, successor.TaskKey.Value, result.Error);
+                predecessor.Key.Value, successor.Key.Value, result.Error);
             return result;
         }
 
         await _ppmDbContext.SaveChangesAsync(cancellationToken);
 
         _logger.LogInformation("AddProjectTaskDependency: Successfully added dependency from {PredecessorKey} to {SuccessorKey}.",
-            predecessor.TaskKey.Value, successor.TaskKey.Value);
+            predecessor.Key.Value, successor.Key.Value);
 
         return Result.Success();
     }

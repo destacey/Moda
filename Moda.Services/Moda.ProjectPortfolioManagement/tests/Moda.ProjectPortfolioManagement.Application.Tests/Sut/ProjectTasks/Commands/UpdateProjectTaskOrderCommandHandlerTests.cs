@@ -1,17 +1,14 @@
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
-using Moda.Common.Domain.Models.ProjectPortfolioManagement;
 using Moda.ProjectPortfolioManagement.Application.ProjectTasks.Commands;
 using Moda.ProjectPortfolioManagement.Application.Tests.Infrastructure;
-using Moda.ProjectPortfolioManagement.Domain.Enums;
-using Moda.ProjectPortfolioManagement.Domain.Models;
 using Moda.ProjectPortfolioManagement.Domain.Tests.Data;
 using Moda.Tests.Shared;
 using Moq;
 using NodaTime.Extensions;
 using NodaTime.Testing;
 
-namespace Moda.ProjectPortfolioManagement.Application.Tests.ProjectTasks.Commands;
+namespace Moda.ProjectPortfolioManagement.Application.Tests.Sut.ProjectTasks.Commands;
 
 public class UpdateProjectTaskOrderCommandHandlerTests : IDisposable
 {
@@ -26,9 +23,11 @@ public class UpdateProjectTaskOrderCommandHandlerTests : IDisposable
         _dbContext = new FakeProjectPortfolioManagementDbContext();
         _dateTimeProvider = new TestingDateTimeProvider(new FakeClock(DateTime.UtcNow.ToInstant()));
         _mockLogger = new Mock<ILogger<UpdateProjectTaskOrderCommandHandler>>();
+
         _handler = new UpdateProjectTaskOrderCommandHandler(
             _dbContext,
             _mockLogger.Object);
+
         _taskFaker = new ProjectTaskFaker();
     }
 

@@ -6,7 +6,7 @@ namespace Moda.Work.Domain.Models;
 /// <summary>
 /// A copy of the Moda.Common.Domain.Interfaces.Ppm.ISimpleProject interface.  Used to hold basic project information for the work service and db context.
 /// </summary>
-public class WorkProject : ISimpleProject, IHasProjectIdAndKey
+public class WorkProject : ISimpleProject, IHasIdAndKey<ProjectKey>
 {
     private WorkProject() { }
 

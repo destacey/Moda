@@ -21,19 +21,24 @@ public sealed record CreateProjectTaskRequest
     public int TypeId { get; set; }
 
     /// <summary>
+    /// The current status of the task.
+    /// </summary>
+    public int StatusId { get; set; }
+
+    /// <summary>
     /// The priority level of the task.
     /// </summary>
     public int PriorityId { get; set; }
 
     /// <summary>
+    /// The progress of the task (optional). Ranges from 0.0 to 100.0. Milestones can not update progress directly.
+    /// </summary>
+    public decimal? Progress { get; set; }
+
+    /// <summary>
     /// The ID of the parent task (optional).
     /// </summary>
     public Guid? ParentId { get; set; }
-
-    /// <summary>
-    /// The ID of the team assigned to this task (optional).
-    /// </summary>
-    public Guid? TeamId { get; set; }
 
     /// <summary>
     /// The planned start date for the task (for tasks, not milestones).
@@ -75,9 +80,10 @@ public sealed record CreateProjectTaskRequest
             Name,
             Description,
             (ProjectTaskType)TypeId,
+            (ProjectPortfolioManagement.Domain.Enums.TaskStatus)StatusId,
             (TaskPriority)PriorityId,
+            Progress.HasValue ? new Progress(Progress.Value) : null,
             ParentId,
-            TeamId,
             plannedDateRange,
             PlannedDate,
             EstimatedEffortHours,
@@ -96,7 +102,7 @@ public sealed record TaskRoleAssignmentRequest
     /// <summary>
     /// The role of the assignment (Assignee or Reviewer).
     /// </summary>
-    public TaskAssignmentRole Role { get; set; }
+    public TaskRole Role { get; set; }
 }
 
 public sealed class CreateProjectTaskRequestValidator : CustomValidator<CreateProjectTaskRequest>
@@ -114,17 +120,27 @@ public sealed class CreateProjectTaskRequestValidator : CustomValidator<CreatePr
             .Must(type => Enum.IsDefined(typeof(ProjectTaskType), type))
             .WithMessage("Invalid task type.");
 
+        RuleFor(x => x.StatusId)
+            .Must(status => Enum.IsDefined(typeof(ProjectPortfolioManagement.Domain.Enums.TaskStatus), status))
+            .WithMessage("Invalid task status.");
+
         RuleFor(x => x.PriorityId)
             .Must(priority => Enum.IsDefined(typeof(TaskPriority), priority))
             .WithMessage("Invalid task priority.");
 
+        RuleFor(x => x.Progress)
+            .NotNull()
+            .When(x => x.TypeId == (int)ProjectTaskType.Task)
+            .WithMessage("Progress is required for tasks.");
+
+        RuleFor(x => x.Progress)
+            .Null()
+            .When(x => x.TypeId == (int)ProjectTaskType.Milestone)
+            .WithMessage("Progress is not applicable for milestones.");
+
         RuleFor(x => x.ParentId)
             .Must(id => id == null || id != Guid.Empty)
             .WithMessage("ParentId cannot be an empty GUID.");
-
-        RuleFor(x => x.TeamId)
-            .Must(id => id == null || id != Guid.Empty)
-            .WithMessage("TeamId cannot be an empty GUID.");
 
         // Milestone-specific validations
         RuleFor(x => x.PlannedDate)

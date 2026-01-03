@@ -12,7 +12,7 @@ namespace Moda.ProjectPortfolioManagement.Domain.Models;
 /// <summary>
 /// Represents an individual project within a portfolio or program.
 /// </summary>
-public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasProjectIdAndKey, ISimpleProject
+public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey<ProjectKey>, ISimpleProject
 {
     private readonly HashSet<RoleAssignment<ProjectRole>> _roles = [];
     private readonly HashSet<StrategicThemeTag<Project>> _strategicThemeTags = [];
@@ -329,21 +329,22 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasProjectIdA
     /// Creates a new task within this project.
     /// </summary>
     public Result<ProjectTask> CreateTask(
-        int key,
+        int nextNumber,
         string name,
         string? description,
         ProjectTaskType type,
+        Enums.TaskStatus status,
         TaskPriority priority,
+        Progress? progress,
         Guid? parentId,
-        Guid? teamId,
         FlexibleDateRange? plannedDateRange,
         LocalDate? plannedDate,
         decimal? estimatedEffortHours,
-        Dictionary<TaskAssignmentRole, HashSet<Guid>>? assignments)
+        Dictionary<TaskRole, HashSet<Guid>>? assignments)
     {
         if (Key is null)
         {
-            return Result.Failure<ProjectTask>("Project must have a code before tasks can be created.");
+            return Result.Failure<ProjectTask>("Project must have a key before tasks can be created.");
         }
 
         ProjectTask? parent = null;
@@ -369,15 +370,15 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasProjectIdA
 
         var task = ProjectTask.Create(
             Id,
-            Key,
-            key,
+            new ProjectTaskKey(Key, nextNumber),
             name,
             description,
             type,
+            status,
             priority,
+            progress,
             order,
             parentId,
-            teamId,
             plannedDateRange,
             plannedDate,
             estimatedEffortHours,
@@ -385,10 +386,7 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasProjectIdA
 
         _tasks.Add(task);
 
-        if (parent is not null)
-        {
-            parent.AddChild(task);
-        }
+        parent?.AddChild(task);
 
         return Result.Success(task);
     }

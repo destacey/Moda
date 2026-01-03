@@ -30,6 +30,8 @@ public partial class AddProjectTasks : Migration
             oldClrType: typeof(int),
             oldType: "int");
 
+        // CUSTOM CODE START - Convert Work.WorkProjects.Key from int to varchar(20)
+
         // Convert Ppm.Projects.Key from int IDENTITY to varchar(20) by creating a new column, copying data, dropping old, and renaming
         migrationBuilder.AddColumn<string>(
             name: "Key_tmp",
@@ -53,6 +55,11 @@ public partial class AddProjectTasks : Migration
             schema: "Ppm",
             table: "Projects",
             newName: "Key");
+
+        migrationBuilder.Sql(
+            "UPDATE [Work].[WorkProjects] SET [Key] = (SELECT [Key] FROM [Ppm].[Projects] WHERE [Ppm].[Projects].Id = [Work].[WorkProjects].Id)");
+
+        // CUSTOM CODE END - Convert Work.WorkProjects.Key from int to varchar(20)
 
         migrationBuilder.CreateTable(
             name: "PpmTeams",
@@ -78,26 +85,21 @@ public partial class AddProjectTasks : Migration
             columns: table => new
             {
                 Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                Key = table.Column<int>(type: "int", nullable: false)
-                    .Annotation("SqlServer:Identity", "1, 1"),
-                TaskKey = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
+                Key = table.Column<string>(type: "varchar(30)", maxLength: 30, nullable: false),
+                Number = table.Column<int>(type: "int", nullable: false),
                 ProjectId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                Name = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
                 Description = table.Column<string>(type: "nvarchar(2048)", maxLength: 2048, nullable: true),
                 Type = table.Column<string>(type: "varchar(32)", maxLength: 32, nullable: false),
                 Status = table.Column<string>(type: "varchar(32)", maxLength: 32, nullable: false),
                 Priority = table.Column<string>(type: "varchar(32)", maxLength: 32, nullable: false),
+                Progress = table.Column<decimal>(type: "decimal(5,2)", nullable: false),
                 Order = table.Column<int>(type: "int", nullable: false),
                 ParentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                TeamId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                 PlannedStart = table.Column<DateTime>(type: "date", nullable: true),
                 PlannedEnd = table.Column<DateTime>(type: "date", nullable: true),
-                ActualStart = table.Column<DateTime>(type: "date", nullable: true),
-                ActualEnd = table.Column<DateTime>(type: "date", nullable: true),
                 PlannedDate = table.Column<DateTime>(type: "date", nullable: true),
-                ActualDate = table.Column<DateTime>(type: "date", nullable: true),
                 EstimatedEffortHours = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                ActualEffortHours = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                 SystemCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
                 SystemCreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                 SystemLastModified = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -106,7 +108,6 @@ public partial class AddProjectTasks : Migration
             constraints: table =>
             {
                 table.PrimaryKey("PK_ProjectTasks", x => x.Id);
-                table.UniqueConstraint("AK_ProjectTasks_Key", x => x.Key);
                 table.ForeignKey(
                     name: "FK_ProjectTasks_ProjectTasks_ParentId",
                     column: x => x.ParentId,
@@ -253,6 +254,19 @@ public partial class AddProjectTasks : Migration
             column: "SuccessorId");
 
         migrationBuilder.CreateIndex(
+            name: "IX_ProjectTasks_Key",
+            schema: "Ppm",
+            table: "ProjectTasks",
+            column: "Key",
+            unique: true);
+
+        migrationBuilder.CreateIndex(
+            name: "IX_ProjectTasks_Number",
+            schema: "Ppm",
+            table: "ProjectTasks",
+            column: "Number");
+
+        migrationBuilder.CreateIndex(
             name: "IX_ProjectTasks_ParentId",
             schema: "Ppm",
             table: "ProjectTasks",
@@ -299,20 +313,6 @@ public partial class AddProjectTasks : Migration
         migrationBuilder.DropColumn(
             name: "Key",
             schema: "Ppm",
-            table: "WorkProjects");
-
-        // Add back the Key column as int IDENTITY
-        migrationBuilder.AddColumn<int>(
-            name: "Key",
-            schema: "Ppm",
-            table: "WorkProjects",
-            type: "int",
-            nullable: false);
-
-        // Drop the varchar Key column
-        migrationBuilder.DropColumn(
-            name: "Key",
-            schema: "Ppm",
             table: "Projects");
 
         // Add back the Key column as int IDENTITY
@@ -323,6 +323,24 @@ public partial class AddProjectTasks : Migration
             type: "int",
             nullable: false)
             .Annotation("SqlServer:Identity", "1, 1");
+
+        // Drop the varchar Key column
+        migrationBuilder.DropColumn(
+            name: "Key",
+            schema: "Work",
+            table: "WorkProjects");
+
+        // Add back the Key column as int IDENTITY
+        migrationBuilder.AddColumn<int>(
+            name: "Key",
+            schema: "Work",
+            table: "WorkProjects",
+            type: "int",
+            nullable: false,
+            defaultValue: 0);
+
+        migrationBuilder.Sql(
+            "UPDATE [Work].[WorkProjects] SET [Key] = (SELECT [Key] FROM [Ppm].[Projects] WHERE [Ppm].[Projects].Id = [Work].[WorkProjects].Id)");
 
         migrationBuilder.AddUniqueConstraint(
             name: "AK_WorkProjects_Key",

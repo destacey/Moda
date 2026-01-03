@@ -8,7 +8,7 @@ using Moq;
 using NodaTime.Extensions;
 using NodaTime.Testing;
 
-namespace Moda.ProjectPortfolioManagement.Application.Tests.ProjectTasks.Commands;
+namespace Moda.ProjectPortfolioManagement.Application.Tests.Sut.ProjectTasks.Commands;
 
 public class RemoveProjectTaskDependencyCommandHandlerTests : IDisposable
 {

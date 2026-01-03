@@ -1,12 +1,12 @@
 ﻿using System.Linq.Expressions;
-using Moda.Common.Domain.Interfaces.ProjectPortfolioManagement;
+using Moda.Common.Domain.Interfaces;
 using Moda.Common.Domain.Models.ProjectPortfolioManagement;
 using Moda.ProjectPortfolioManagement.Domain.Interfaces;
 using OneOf;
 
 namespace Moda.ProjectPortfolioManagement.Application.Projects.Models;
 
-/// <summary>
+/// <summary>r
 /// Represents either a Guid ID or a string project key.
 /// </summary>
 public sealed class ProjectIdOrKey : OneOfBase<Guid, ProjectKey>
@@ -26,7 +26,7 @@ public static class ProjectIdOrKeyExtensions
     /// Creates a filter expression that matches entities by project ID or key.
     /// </summary>
     public static Expression<Func<T, bool>> CreateFilter<T>(this ProjectIdOrKey idOrKey)
-        where T : IHasProjectIdAndKey
+        where T : IHasIdAndKey<ProjectKey>
     {
         return idOrKey.Match<Expression<Func<T, bool>>>(
             id => x => x.Id == id,

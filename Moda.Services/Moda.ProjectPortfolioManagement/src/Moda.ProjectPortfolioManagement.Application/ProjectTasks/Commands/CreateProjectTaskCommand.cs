@@ -1,4 +1,4 @@
-using Moda.Common.Application.Models;
+using Moda.ProjectPortfolioManagement.Application.ProjectTasks.Models;
 using Moda.ProjectPortfolioManagement.Domain.Enums;
 using Moda.ProjectPortfolioManagement.Domain.Models;
 
@@ -8,17 +8,18 @@ public sealed record CreateProjectTaskCommand(
     Guid ProjectId,
     string Name,
     string? Description,
-    ProjectTaskType Type,
+    ProjectTaskType Type, 
+    Domain.Enums.TaskStatus Status,
     TaskPriority Priority,
+    Progress? Progress,
     Guid? ParentId,
-    Guid? TeamId,
     FlexibleDateRange? PlannedDateRange,
     LocalDate? PlannedDate,
     decimal? EstimatedEffortHours,
     List<TaskRoleAssignment>? Assignments
-) : ICommand<ObjectIdAndTaskKey>;
+) : ICommand<ProjectTaskIdAndKey>;
 
-public sealed record TaskRoleAssignment(Guid EmployeeId, TaskAssignmentRole Role);
+public sealed record TaskRoleAssignment(Guid EmployeeId, TaskRole Role);
 
 public sealed class CreateProjectTaskCommandValidator : AbstractValidator<CreateProjectTaskCommand>
 {
@@ -37,16 +38,25 @@ public sealed class CreateProjectTaskCommandValidator : AbstractValidator<Create
         RuleFor(x => x.Type)
             .IsInEnum();
 
+        RuleFor(x => x.Status)
+            .IsInEnum();
+
         RuleFor(x => x.Priority)
             .IsInEnum();
+
+        RuleFor(x => x.Progress)
+            .NotNull()
+            .When(x => x.Type == ProjectTaskType.Task)
+            .WithMessage("Progress is required for tasks.");
+
+        RuleFor(x => x.Progress)
+            .Null()
+            .When(x => x.Type == ProjectTaskType.Milestone)
+            .WithMessage("Progress is not applicable for milestones.");
 
         RuleFor(x => x.ParentId)
             .Must(id => id == null || id != Guid.Empty)
             .WithMessage("ParentId cannot be an empty GUID.");
-
-        RuleFor(x => x.TeamId)
-            .Must(id => id == null || id != Guid.Empty)
-            .WithMessage("TeamId cannot be an empty GUID.");
 
         // Milestone-specific validations
         RuleFor(x => x.PlannedDate)
@@ -78,14 +88,14 @@ public sealed class CreateProjectTaskCommandValidator : AbstractValidator<Create
 internal sealed class CreateProjectTaskCommandHandler(
     IProjectPortfolioManagementDbContext ppmDbContext,
     ILogger<CreateProjectTaskCommandHandler> logger)
-    : ICommandHandler<CreateProjectTaskCommand, ObjectIdAndTaskKey>
+    : ICommandHandler<CreateProjectTaskCommand, ProjectTaskIdAndKey>
 {
     private const string AppRequestName = nameof(CreateProjectTaskCommand);
 
     private readonly IProjectPortfolioManagementDbContext _ppmDbContext = ppmDbContext;
     private readonly ILogger<CreateProjectTaskCommandHandler> _logger = logger;
 
-    public async Task<Result<ObjectIdAndTaskKey>> Handle(CreateProjectTaskCommand request, CancellationToken cancellationToken)
+    public async Task<Result<ProjectTaskIdAndKey>> Handle(CreateProjectTaskCommand request, CancellationToken cancellationToken)
     {
         try
         {
@@ -95,7 +105,7 @@ internal sealed class CreateProjectTaskCommandHandler(
             if (project is null)
             {
                 _logger.LogInformation("Project with Id {ProjectId} not found.", request.ProjectId);
-                return Result.Failure<ObjectIdAndTaskKey>("Project not found.");
+                return Result.Failure<ProjectTaskIdAndKey>("Project not found.");
             }
 
             // Validate parent task if specified
@@ -103,36 +113,35 @@ internal sealed class CreateProjectTaskCommandHandler(
             if (request.ParentId.HasValue)
             {
                 parentTask = await _ppmDbContext.ProjectTasks
+                    .Include(p => p.Children)
                     .FirstOrDefaultAsync(t => t.Id == request.ParentId.Value && t.ProjectId == request.ProjectId, cancellationToken);
                 if (parentTask is null)
                 {
                     _logger.LogInformation("Parent task {ParentId} not found in project {ProjectId}.", request.ParentId, request.ProjectId);
-                    return Result.Failure<ObjectIdAndTaskKey>("Parent task not found in this project.");
+                    return Result.Failure<ProjectTaskIdAndKey>("Parent task not found in this project.");
                 }
 
                 // Milestones cannot have children
                 if (parentTask.Type == ProjectTaskType.Milestone)
                 {
                     _logger.LogInformation("Cannot create child task under milestone {ParentId}.", request.ParentId);
-                    return Result.Failure<ObjectIdAndTaskKey>("Milestones cannot have child tasks.");
+                    return Result.Failure<ProjectTaskIdAndKey>("Milestones cannot have child tasks.");
                 }
             }
-
-            // Validate team if specified
-            if (request.TeamId.HasValue)
+            else
             {
-                var teamExists = await _ppmDbContext.PpmTeams
-                    .AnyAsync(t => t.Id == request.TeamId.Value && t.IsActive, cancellationToken);
-                if (!teamExists)
-                {
-                    _logger.LogInformation("Team {TeamId} not found or inactive.", request.TeamId);
-                    return Result.Failure<ObjectIdAndTaskKey>("Team not found or inactive.");
-                }
+                // load root tasks to the project to validate order later
+                _ = await _ppmDbContext.ProjectTasks
+                    .Where(t => t.ProjectId == request.ProjectId && t.ParentId == null)
+                    .ToListAsync(cancellationToken);
             }
 
-            // Validate employees if assignments specified
+            Dictionary<TaskRole, HashSet<Guid>>? assignments = null;
+
+            // Prepare role assignments if specified
             if (request.Assignments is not null && request.Assignments.Count > 0)
             {
+                // Validate employees if assignments specified
                 var employeeIds = request.Assignments.Select(a => a.EmployeeId).ToHashSet();
                 var employees = await _ppmDbContext.Employees
                     .Where(e => employeeIds.Contains(e.Id))
@@ -142,14 +151,9 @@ internal sealed class CreateProjectTaskCommandHandler(
                 if (employees.Count != employeeIds.Count)
                 {
                     _logger.LogInformation("One or more employees not found.");
-                    return Result.Failure<ObjectIdAndTaskKey>("One or more employees not found.");
+                    return Result.Failure<ProjectTaskIdAndKey>("One or more employees not found.");
                 }
-            }
 
-            // Prepare role assignments if specified
-            Dictionary<TaskAssignmentRole, HashSet<Guid>>? assignments = null;
-            if (request.Assignments is not null && request.Assignments.Count > 0)
-            {
                 assignments = request.Assignments
                     .GroupBy(a => a.Role)
                     .ToDictionary(
@@ -158,24 +162,27 @@ internal sealed class CreateProjectTaskCommandHandler(
                     );
             }
 
+
             // Get the next task key number atomically using a database query with row locking
             // This uses UPDLOCK and ROWLOCK to prevent race conditions when multiple tasks are created concurrently
-            var nextKey = await _ppmDbContext.Database
+            // Alternatively, we would need to include existing tasks in the project aggregate and get the number there
+            var nextNumber = await _ppmDbContext.Database
                 .SqlQuery<int>($@"
-                    SELECT ISNULL(MAX([Key]), 0) + 1 AS [Value]
+                    SELECT ISNULL(MAX([Number]), 0) + 1 AS [Value]
                     FROM [Ppm].[ProjectTasks] WITH (UPDLOCK, ROWLOCK)
                     WHERE [ProjectId] = {request.ProjectId}")
                 .FirstOrDefaultAsync(cancellationToken);
 
             // Create the task through the project
             var createResult = project.CreateTask(
-                nextKey,
+                nextNumber,
                 request.Name,
                 request.Description,
                 request.Type,
+                request.Status,
                 request.Priority,
+                request.Progress,
                 request.ParentId,
-                request.TeamId,
                 request.PlannedDateRange,
                 request.PlannedDate,
                 request.EstimatedEffortHours,
@@ -186,7 +193,7 @@ internal sealed class CreateProjectTaskCommandHandler(
             {
                 _logger.LogError("Error creating task {TaskName} for project {ProjectId}. Error: {Error}",
                     request.Name, request.ProjectId, createResult.Error);
-                return Result.Failure<ObjectIdAndTaskKey>(createResult.Error);
+                return Result.Failure<ProjectTaskIdAndKey>(createResult.Error);
             }
 
             await _ppmDbContext.SaveChangesAsync(cancellationToken);
@@ -194,14 +201,14 @@ internal sealed class CreateProjectTaskCommandHandler(
             var task = createResult.Value;
 
             _logger.LogInformation("Project task {TaskId} created with Key {TaskKey} for project {ProjectId}.",
-                task.Id, task.TaskKey.Value, request.ProjectId);
+                task.Id, task.Key.Value, request.ProjectId);
 
-            return Result.Success(new ObjectIdAndTaskKey(task.Id, task.TaskKey.Value));
+            return Result.Success(new ProjectTaskIdAndKey(task.Id, task.Key.Value));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Exception handling {CommandName} command for request {@Request}.", AppRequestName, request);
-            return Result.Failure<ObjectIdAndTaskKey>($"Error handling {AppRequestName} command.");
+            return Result.Failure<ProjectTaskIdAndKey>($"Error handling {AppRequestName} command.");
         }
     }
 }
