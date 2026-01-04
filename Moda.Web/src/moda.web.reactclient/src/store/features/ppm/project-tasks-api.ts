@@ -1,4 +1,7 @@
-import { getProjectTasksClient } from '@/src/services/clients'
+import {
+  getProjectTasksClient,
+  authenticatedFetch,
+} from '@/src/services/clients'
 import { apiSlice } from '../apiSlice'
 import {
   ProjectTaskListDto,
@@ -122,6 +125,49 @@ export const projectTasksApi = apiSlice.injectEndpoints({
         }
       },
       invalidatesTags: (result, error, { projectIdOrKey, cacheKey }) => [
+        { type: QueryTags.ProjectTask, id: `LIST-${projectIdOrKey}` },
+        { type: QueryTags.ProjectTask, id: cacheKey },
+        { type: QueryTags.ProjectTaskTree, id: `TREE-${projectIdOrKey}` },
+      ],
+    }),
+    patchProjectTask: builder.mutation<
+      void,
+      {
+        projectIdOrKey: string
+        taskId: string
+        patchOperations: Array<{
+          op: 'replace' | 'add' | 'remove'
+          path: string
+          value?: any
+        }>
+        cacheKey: string
+      }
+    >({
+      queryFn: async ({ projectIdOrKey, taskId, patchOperations }) => {
+        try {
+          const response = await authenticatedFetch(
+            `/api/ppm/projects/${projectIdOrKey}/tasks/${taskId}`,
+            {
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/json-patch+json',
+              },
+              body: JSON.stringify(patchOperations),
+            },
+          )
+
+          if (!response.ok) {
+            const errorText = await response.text()
+            throw new Error(`HTTP ${response.status}: ${errorText}`)
+          }
+
+          return { data: null as any }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (_result, _error, { projectIdOrKey, cacheKey }) => [
         { type: QueryTags.ProjectTask, id: `LIST-${projectIdOrKey}` },
         { type: QueryTags.ProjectTask, id: cacheKey },
         { type: QueryTags.ProjectTaskTree, id: `TREE-${projectIdOrKey}` },
@@ -253,7 +299,8 @@ export const projectTasksApi = apiSlice.injectEndpoints({
     >({
       queryFn: async (arg) => {
         try {
-          const forMilestone = arg && typeof arg === 'object' ? arg.forMilestone : false
+          const forMilestone =
+            arg && typeof arg === 'object' ? arg.forMilestone : false
           const data = await getProjectTasksClient().getTaskStatuses()
           let options = data
             .sort((a, b) => a.order - b.order)
@@ -274,7 +321,8 @@ export const projectTasksApi = apiSlice.injectEndpoints({
         }
       },
       providesTags: (_result, _error, arg) => {
-        const forMilestone = arg && typeof arg === 'object' ? arg.forMilestone : false
+        const forMilestone =
+          arg && typeof arg === 'object' ? arg.forMilestone : false
         return [
           {
             type: QueryTags.TaskStatusOptions,
@@ -381,6 +429,7 @@ export const {
   useGetProjectTaskQuery,
   useCreateProjectTaskMutation,
   useUpdateProjectTaskMutation,
+  usePatchProjectTaskMutation,
   useDeleteProjectTaskMutation,
   useUpdateProjectTaskOrderMutation,
   useGetCriticalPathQuery,

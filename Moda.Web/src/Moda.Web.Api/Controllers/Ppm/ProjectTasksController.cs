@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.JsonPatch.SystemTextJson;
 using Moda.Common.Domain.Models.ProjectPortfolioManagement;
 using Moda.ProjectPortfolioManagement.Application.Projects.Queries;
 using Moda.ProjectPortfolioManagement.Application.ProjectTasks.Commands;
@@ -111,6 +112,46 @@ public class ProjectTasksController(ILogger<ProjectTasksController> logger, ISen
             return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(HttpContext));
 
         var result = await _sender.Send(request.ToUpdateProjectTaskCommand(), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpPatch("{id}")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Projects)]
+    [OpenApiOperation("Partially update a project task using JSON Patch (RFC 6902).", "Applies a JSON Patch document to update specific fields.")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> PatchProjectTask(
+        string projectIdOrKey,
+        Guid id,
+        [FromBody] JsonPatchDocument<UpdateProjectTaskRequest> patchDocument,
+        CancellationToken cancellationToken)
+    {
+        if (patchDocument == null)
+            return BadRequest("Patch document cannot be null.");
+
+        // Get the current task state
+        var taskDto = await _sender.Send(new GetProjectTaskQuery(id.ToString()), cancellationToken);
+        if (taskDto is null)
+            return NotFound($"Project task with ID '{id}' not found.");
+
+        // Convert DTO to UpdateProjectTaskRequest
+        var updateRequest = UpdateProjectTaskRequest.FromDto(taskDto);
+
+        // Apply the patch document to the update request
+        patchDocument.ApplyTo(updateRequest, error =>
+        {
+            ModelState.AddModelError(error.AffectedObject.GetType().Name, error.ErrorMessage);
+        });
+
+        if (!ModelState.IsValid)
+            return ValidationProblem(ModelState);
+
+        var result = await _sender.Send(updateRequest.ToUpdateProjectTaskCommand(), cancellationToken);
 
         return result.IsSuccess
             ? NoContent()

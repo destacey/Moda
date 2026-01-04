@@ -1,4 +1,5 @@
 using Moda.ProjectPortfolioManagement.Application.ProjectTasks.Commands;
+using Moda.ProjectPortfolioManagement.Application.ProjectTasks.Dtos;
 using Moda.ProjectPortfolioManagement.Domain.Enums;
 using TaskStatus = Moda.ProjectPortfolioManagement.Domain.Enums.TaskStatus;
 
@@ -65,6 +66,34 @@ public sealed record UpdateProjectTaskRequest
     /// The role-based assignments for this task (optional).
     /// </summary>
     public List<TaskRoleAssignmentRequest>? Assignments { get; set; }
+
+    /// <summary>
+    /// Creates an UpdateProjectTaskRequest from a ProjectTaskDto.
+    /// </summary>
+    public static UpdateProjectTaskRequest FromDto(ProjectTaskDto dto)
+    {
+        return new UpdateProjectTaskRequest
+        {
+            Id = dto.Id,
+            Name = dto.Name,
+            Description = dto.Description,
+            StatusId = dto.Status.Id,
+            PriorityId = dto.Priority.Id,
+            Progress = dto.Progress,
+            ParentId = dto.ParentId,
+            PlannedStart = dto.PlannedStart,
+            PlannedEnd = dto.PlannedEnd,
+            PlannedDate = dto.PlannedDate,
+            EstimatedEffortHours = dto.EstimatedEffortHours,
+            Assignments = dto.Assignments?
+                .Select(a => new TaskRoleAssignmentRequest
+                {
+                    EmployeeId = a.Employee.Id,
+                    Role = (TaskRole)a.Role.Id
+                })
+                .ToList()
+        };
+    }
 
     public UpdateProjectTaskCommand ToUpdateProjectTaskCommand()
     {

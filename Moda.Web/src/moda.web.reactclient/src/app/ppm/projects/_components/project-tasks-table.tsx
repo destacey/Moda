@@ -62,7 +62,7 @@ import {
   useGetTaskPriorityOptionsQuery,
   useGetTaskStatusOptionsQuery,
   useGetTaskTypeOptionsQuery,
-  useUpdateProjectTaskMutation,
+  usePatchProjectTaskMutation,
 } from '@/src/store/features/ppm/project-tasks-api'
 import {
   CreateProjectTaskForm,
@@ -173,7 +173,7 @@ const ProjectTasksTable = ({
 
   const { data: taskTypeOptions = [] } = useGetTaskTypeOptionsQuery()
 
-  const [updateProjectTask] = useUpdateProjectTaskMutation()
+  const [patchProjectTask] = usePatchProjectTaskMutation()
 
   // Task form handlers
   const handleCreateTask = useCallback(() => {
@@ -212,32 +212,47 @@ const ProjectTasksTable = ({
       if (!task) return
 
       try {
-        const response = await updateProjectTask({
+        // Build RFC 6902 JSON Patch operations for only changed fields
+        // Note: ASP.NET Core JsonPatch expects PascalCase paths matching the C# property names
+        const patchOperations: Array<{
+          op: 'replace'
+          path: string
+          value: any
+        }> = []
+
+        if (updates.name !== undefined) {
+          patchOperations.push({ op: 'replace', path: '/Name', value: updates.name })
+        }
+        if (updates.description !== undefined) {
+          patchOperations.push({ op: 'replace', path: '/Description', value: updates.description })
+        }
+        if (updates.statusId !== undefined) {
+          patchOperations.push({ op: 'replace', path: '/StatusId', value: updates.statusId })
+        }
+        if (updates.priorityId !== undefined) {
+          patchOperations.push({ op: 'replace', path: '/PriorityId', value: updates.priorityId })
+        }
+        if (updates.progress !== undefined) {
+          patchOperations.push({ op: 'replace', path: '/Progress', value: updates.progress })
+        }
+        if (updates.plannedStart !== undefined) {
+          patchOperations.push({ op: 'replace', path: '/PlannedStart', value: updates.plannedStart })
+        }
+        if (updates.plannedEnd !== undefined) {
+          patchOperations.push({ op: 'replace', path: '/PlannedEnd', value: updates.plannedEnd })
+        }
+        if (updates.plannedDate !== undefined) {
+          patchOperations.push({ op: 'replace', path: '/PlannedDate', value: updates.plannedDate })
+        }
+        if (updates.estimatedEffortHours !== undefined) {
+          patchOperations.push({ op: 'replace', path: '/EstimatedEffortHours', value: updates.estimatedEffortHours })
+        }
+
+        const response = await patchProjectTask({
           projectIdOrKey: projectKey,
+          taskId: taskId,
+          patchOperations,
           cacheKey: taskId,
-          request: {
-            id: task.id,
-            name: updates.name ?? task.name,
-            description: updates.description ?? task.description,
-            statusId: updates.statusId ?? task.status?.id,
-            priorityId: updates.priorityId ?? task.priority?.id,
-            progress: updates.progress ?? task.progress,
-            parentId: task.parentId,
-            plannedStart:
-              updates.plannedStart !== undefined
-                ? updates.plannedStart
-                : task.plannedStart,
-            plannedEnd:
-              updates.plannedEnd !== undefined
-                ? updates.plannedEnd
-                : task.plannedEnd,
-            plannedDate: updates.plannedDate ?? task.plannedDate,
-            estimatedEffortHours:
-              updates.estimatedEffortHours !== undefined
-                ? updates.estimatedEffortHours
-                : task.estimatedEffortHours,
-            assignments: [],
-          },
         })
         if (response.error) {
           throw response.error
@@ -310,7 +325,7 @@ const ProjectTasksTable = ({
         return false
       }
     },
-    [messageApi, projectKey, refetch, tasks, updateProjectTask],
+    [messageApi, projectKey, refetch, tasks, patchProjectTask],
   )
 
   const onCreateTaskFormClosed = useCallback(
@@ -1218,12 +1233,16 @@ const ProjectTasksTable = ({
                   onKeyDown={(e) => handleKeyDown(e, task.id, 'plannedStart')}
                   onOpenChange={(open) => {
                     if (!open) {
+                      // Restore focus to the input after picker closes
                       setTimeout(() => {
-                        const input = document.querySelector(
-                          `[data-cell-id="${info.cell.id}"] input`,
-                        ) as HTMLInputElement
-                        if (input) {
-                          input.focus()
+                        const cell = document.querySelector(
+                          `[data-cell-id="${cellId}"]`,
+                        )
+                        if (cell) {
+                          const input = cell.querySelector('input') as HTMLInputElement
+                          if (input) {
+                            input.focus()
+                          }
                         }
                       }, 0)
                     }
@@ -1289,12 +1308,16 @@ const ProjectTasksTable = ({
                   onKeyDown={(e) => handleKeyDown(e, task.id, 'plannedEnd')}
                   onOpenChange={(open) => {
                     if (!open) {
+                      // Restore focus to the input after picker closes
                       setTimeout(() => {
-                        const input = document.querySelector(
-                          `[data-cell-id="${info.cell.id}"] input`,
-                        ) as HTMLInputElement
-                        if (input) {
-                          input.focus()
+                        const cell = document.querySelector(
+                          `[data-cell-id="${cellId}"]`,
+                        )
+                        if (cell) {
+                          const input = cell.querySelector('input') as HTMLInputElement
+                          if (input) {
+                            input.focus()
+                          }
                         }
                       }, 0)
                     }
