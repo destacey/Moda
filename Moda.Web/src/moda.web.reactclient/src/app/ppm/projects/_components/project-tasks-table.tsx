@@ -7,6 +7,7 @@ import {
   Button,
   DatePicker,
   Descriptions,
+  Dropdown,
   Flex,
   Form,
   Input,
@@ -32,6 +33,7 @@ import {
   DownloadOutlined,
   FilterOutlined,
   QuestionCircleOutlined,
+  MoreOutlined,
 } from '@ant-design/icons'
 import {
   Fragment,
@@ -221,31 +223,67 @@ const ProjectTasksTable = ({
         }> = []
 
         if (updates.name !== undefined) {
-          patchOperations.push({ op: 'replace', path: '/Name', value: updates.name })
+          patchOperations.push({
+            op: 'replace',
+            path: '/Name',
+            value: updates.name,
+          })
         }
         if (updates.description !== undefined) {
-          patchOperations.push({ op: 'replace', path: '/Description', value: updates.description })
+          patchOperations.push({
+            op: 'replace',
+            path: '/Description',
+            value: updates.description,
+          })
         }
         if (updates.statusId !== undefined) {
-          patchOperations.push({ op: 'replace', path: '/StatusId', value: updates.statusId })
+          patchOperations.push({
+            op: 'replace',
+            path: '/StatusId',
+            value: updates.statusId,
+          })
         }
         if (updates.priorityId !== undefined) {
-          patchOperations.push({ op: 'replace', path: '/PriorityId', value: updates.priorityId })
+          patchOperations.push({
+            op: 'replace',
+            path: '/PriorityId',
+            value: updates.priorityId,
+          })
         }
         if (updates.progress !== undefined) {
-          patchOperations.push({ op: 'replace', path: '/Progress', value: updates.progress })
+          patchOperations.push({
+            op: 'replace',
+            path: '/Progress',
+            value: updates.progress,
+          })
         }
         if (updates.plannedStart !== undefined) {
-          patchOperations.push({ op: 'replace', path: '/PlannedStart', value: updates.plannedStart })
+          patchOperations.push({
+            op: 'replace',
+            path: '/PlannedStart',
+            value: updates.plannedStart,
+          })
         }
         if (updates.plannedEnd !== undefined) {
-          patchOperations.push({ op: 'replace', path: '/PlannedEnd', value: updates.plannedEnd })
+          patchOperations.push({
+            op: 'replace',
+            path: '/PlannedEnd',
+            value: updates.plannedEnd,
+          })
         }
         if (updates.plannedDate !== undefined) {
-          patchOperations.push({ op: 'replace', path: '/PlannedDate', value: updates.plannedDate })
+          patchOperations.push({
+            op: 'replace',
+            path: '/PlannedDate',
+            value: updates.plannedDate,
+          })
         }
         if (updates.estimatedEffortHours !== undefined) {
-          patchOperations.push({ op: 'replace', path: '/EstimatedEffortHours', value: updates.estimatedEffortHours })
+          patchOperations.push({
+            op: 'replace',
+            path: '/EstimatedEffortHours',
+            value: updates.estimatedEffortHours,
+          })
         }
 
         const response = await patchProjectTask({
@@ -1000,6 +1038,48 @@ const ProjectTasksTable = ({
         filterFn: 'includesString',
         cell: (info) => info.getValue(),
       },
+      ...(canManageTasks
+        ? [
+            {
+              id: 'actions',
+              header: '',
+              size: 40,
+              enableSorting: false,
+              enableGlobalFilter: false,
+              enableColumnFilter: false,
+              enableExport: false,
+              cell: ({ row }) => (
+                <Dropdown
+                  menu={{
+                    items: [
+                      {
+                        key: 'edit',
+                        label: 'Edit',
+                        icon: <EditOutlined />,
+                        onClick: () => handleEditTask(row.original),
+                      },
+                      {
+                        key: 'delete',
+                        label: 'Delete',
+                        icon: <DeleteOutlined />,
+                        danger: true,
+                        onClick: () => handleDeleteTask(row.original),
+                      },
+                    ],
+                  }}
+                  trigger={['click']}
+                >
+                  <Button
+                    type="text"
+                    size="small"
+                    icon={<MoreOutlined />}
+                    tabIndex={-1}
+                  />
+                </Dropdown>
+              ),
+            },
+          ]
+        : []),
       {
         accessorKey: 'name',
         header: 'Name',
@@ -1239,7 +1319,9 @@ const ProjectTasksTable = ({
                           `[data-cell-id="${cellId}"]`,
                         )
                         if (cell) {
-                          const input = cell.querySelector('input') as HTMLInputElement
+                          const input = cell.querySelector(
+                            'input',
+                          ) as HTMLInputElement
                           if (input) {
                             input.focus()
                           }
@@ -1314,7 +1396,9 @@ const ProjectTasksTable = ({
                           `[data-cell-id="${cellId}"]`,
                         )
                         if (cell) {
-                          const input = cell.querySelector('input') as HTMLInputElement
+                          const input = cell.querySelector(
+                            'input',
+                          ) as HTMLInputElement
                           if (input) {
                             input.focus()
                           }
@@ -1431,42 +1515,6 @@ const ProjectTasksTable = ({
           return av === bv ? 0 : av > bv ? 1 : -1
         },
       },
-      ...(canManageTasks
-        ? [
-            {
-              id: 'actions',
-              header: 'Actions',
-              size: 110,
-              enableSorting: false,
-              enableGlobalFilter: false,
-              enableColumnFilter: false,
-              enableExport: false,
-              cell: ({ row }) => (
-                <Space size="small">
-                  <Tooltip title="Edit">
-                    <Button
-                      type="text"
-                      size="small"
-                      icon={<EditOutlined />}
-                      onClick={() => handleEditTask(row.original)}
-                      tabIndex={-1}
-                    />
-                  </Tooltip>
-                  <Tooltip title="Delete">
-                    <Button
-                      type="text"
-                      size="small"
-                      danger
-                      icon={<DeleteOutlined />}
-                      onClick={() => handleDeleteTask(row.original)}
-                      tabIndex={-1}
-                    />
-                  </Tooltip>
-                </Space>
-              ),
-            },
-          ]
-        : []),
     ],
     [
       canManageTasks,
