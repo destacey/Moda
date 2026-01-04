@@ -1,12 +1,10 @@
 import { dateSortBy } from './project-tasks-table.sorting'
+import type { Row } from '@tanstack/react-table'
 
 describe('project-tasks-table.sorting', () => {
   describe('dateSortBy', () => {
-    type TestRow = { original: { value?: string | number | Date | null } }
-
-    const row = (value?: string | number | Date | null): TestRow => ({
-      original: { value },
-    })
+    const row = (value?: string | number | Date | null): Row<any> =>
+      ({ original: { value } }) as unknown as Row<any>
 
     it('returns 0 for equal dates', () => {
       const sort = dateSortBy((r: any) => r.original.value)

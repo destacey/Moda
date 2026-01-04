@@ -1,6 +1,5 @@
 using Moda.Common.Domain.Enums.Organization;
 using Moda.Common.Domain.Events.Organization;
-using Moda.Common.Domain.Interfaces;
 using Moda.Common.Domain.Interfaces.Organization;
 using Moda.Common.Domain.Models.Organizations;
 
@@ -14,6 +13,16 @@ public class PpmTeam : ISimpleTeam, IHasIdAndKey, IHasTeamIdAndCode
     private PpmTeam() { }
 
     public PpmTeam(TeamCreatedEvent team)
+    {
+        Id = team.Id;
+        Key = team.Key;
+        Name = team.Name;
+        Code = team.Code;
+        Type = team.Type;
+        IsActive = team.IsActive;
+    }
+
+    public PpmTeam(ISimpleTeam team)
     {
         Id = team.Id;
         Key = team.Key;
@@ -43,5 +52,37 @@ public class PpmTeam : ISimpleTeam, IHasIdAndKey, IHasTeamIdAndCode
     public void UpdateIsActive(bool isActive)
     {
         IsActive = isActive;
+    }
+
+
+    /// <summary>
+    /// Used to resynchronize the PpmTeam with an ISimpleTeam instance.
+    /// </summary>
+    /// <param name="team"></param>
+    /// <exception cref="InvalidOperationException"></exception>
+    public void UpdateSimpleTeam(ISimpleTeam team)
+    {
+        if (Id != team.Id)
+        {
+            throw new InvalidOperationException("Cannot update PpmTeam with a different Id.");
+        }
+
+        Key = team.Key;
+        Name = team.Name;
+        Code = team.Code;
+        Type = team.Type;
+        IsActive = team.IsActive;
+    }
+
+    public bool EqualsSimpleTeam(ISimpleTeam? other)
+    {
+        if (other is null) return false;
+
+        return Id == other.Id
+            && Key == other.Key
+            && string.Equals(Name, other.Name, StringComparison.Ordinal)
+            && Equals(Code, other.Code)
+            && Equals(Type, other.Type)
+            && IsActive == other.IsActive;
     }
 }

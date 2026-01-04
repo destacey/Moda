@@ -22,6 +22,16 @@ public class WorkTeam : ISimpleTeam, IHasIdAndKey, IHasTeamIdAndCode
         IsActive = team.IsActive;
     }
 
+    public WorkTeam(ISimpleTeam team)
+    {
+        Id = team.Id;
+        Key = team.Key;
+        Name = team.Name;
+        Code = team.Code;
+        Type = team.Type;
+        IsActive = team.IsActive;
+    }
+
     public Guid Id { get; private set; }
     public int Key { get; private set; }
     public string Name { get; private set; } = default!;
@@ -42,5 +52,36 @@ public class WorkTeam : ISimpleTeam, IHasIdAndKey, IHasTeamIdAndCode
     public void UpdateIsActive(bool isActive)
     {
         IsActive = isActive;
+    }
+
+    /// <summary>
+    /// Used to resynchronize the WorkTeam with an ISimpleTeam instance.
+    /// </summary>
+    /// <param name="team"></param>
+    /// <exception cref="InvalidOperationException"></exception>
+    public void UpdateSimpleTeam(ISimpleTeam team)
+    {
+        if (Id != team.Id)
+        {
+            throw new InvalidOperationException("Cannot update WorkTeam with a different Id.");
+        }
+
+        Key = team.Key;
+        Name = team.Name;
+        Code = team.Code;
+        Type = team.Type;
+        IsActive = team.IsActive;
+    }
+
+    public bool EqualsSimpleTeam(ISimpleTeam? other)
+    {
+        if (other is null) return false;
+
+        return Id == other.Id
+            && Key == other.Key
+            && string.Equals(Name, other.Name, StringComparison.Ordinal)
+            && Equals(Code, other.Code)
+            && Equals(Type, other.Type)
+            && IsActive == other.IsActive;
     }
 }
