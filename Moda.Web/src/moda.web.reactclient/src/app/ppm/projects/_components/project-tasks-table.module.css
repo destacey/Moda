@@ -244,3 +244,26 @@
   display: flex;
   justify-content: center;
 }
+
+.validationErrorRow {
+  background-color: var(--ant-color-error-bg);
+}
+
+.validationErrorCell {
+  color: var(--ant-color-error);
+  font-size: 12px;
+  padding: 12px;
+  border-top: 1px solid var(--ant-color-error-border);
+}
+
+.validationErrorItem {
+  margin-bottom: 4px;
+}
+
+.validationErrorItem:last-child {
+  margin-bottom: 0;
+}
+
+.validationErrorField {
+  font-weight: 500;
+}

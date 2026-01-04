@@ -13,7 +13,7 @@ import { FC, useEffect, useMemo, useState } from 'react'
 const { Item } = Descriptions
 
 export interface ProjectDrawerProps {
-  projectKey: number
+  projectKey: string
   drawerOpen: boolean
   onDrawerClose: () => void
 }
