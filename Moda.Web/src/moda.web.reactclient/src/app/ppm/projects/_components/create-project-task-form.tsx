@@ -232,13 +232,13 @@ const CreateProjectTaskForm = (props: CreateProjectTaskFormProps) => {
           name="name"
           rules={[
             { required: true, message: 'Name is required' },
-            { max: 256 },
+            { max: 128 },
           ]}
         >
           <TextArea
             autoSize={{ minRows: 1, maxRows: 2 }}
             showCount
-            maxLength={256}
+            maxLength={128}
           />
         </Item>
         <Item name="description" label="Description" rules={[{ max: 2048 }]}>

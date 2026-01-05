@@ -13,7 +13,6 @@ public sealed class ProjectKeyValidator : CustomValidator<ProjectKey>
         _id = id;
 
         RuleFor(x => x.Value)
-            .NotEqual("TTT").WithMessage("The project key 'TTT' is reserved and cannot be used.")
             .MustAsync(BeUniqueProjectKey).OverridePropertyName(string.Empty).WithMessage("The project key already exists.");
     }
 

@@ -60,6 +60,8 @@ const mapToRequestValues = (
   } as CreateProjectRequest
 }
 
+const keyPattern = /^[A-Z0-9]{2,20}$/
+
 const CreateProjectForm = (props: CreateProjectFormProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
@@ -249,27 +251,24 @@ const CreateProjectForm = (props: CreateProjectFormProps) => {
             />
           </Item>
           <Item
-            label="Key"
             name="key"
+            label="Key"
+            extra="2-20 uppercase alphanumeric characters (A-Z, 0-9)"
             rules={[
-              { required: true, message: 'Key is required' },
-              { min: 2, message: 'Key must be at least 2 characters' },
-              { max: 20, message: 'Key must be at most 20 characters' },
+              { required: true, message: 'Key is required.' },
               {
-                pattern: /^[A-Z0-9]+$/,
-                message: 'Key must contain only uppercase letters and numbers',
+                pattern: keyPattern,
+                message:
+                  'Key must be 2-20 uppercase alphanumeric characters (A-Z, 0-9).',
               },
             ]}
-            tooltip="A unique identifier for the project (e.g., APOLLO, MARS1). Must be 2-20 uppercase alphanumeric characters."
+            normalize={(value) => (value ?? '').toUpperCase()}
           >
             <Input
-              placeholder="Enter project key (e.g., APOLLO)"
-              maxLength={20}
+              placeholder="Enter new key"
+              autoComplete="off"
               showCount
-              style={{ textTransform: 'uppercase' }}
-              onChange={(e) => {
-                form.setFieldValue('key', e.target.value.toUpperCase())
-              }}
+              maxLength={20}
             />
           </Item>
           <Item

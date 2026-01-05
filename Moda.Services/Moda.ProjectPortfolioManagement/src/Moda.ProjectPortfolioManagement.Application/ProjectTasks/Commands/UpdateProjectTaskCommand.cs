@@ -25,7 +25,7 @@ public sealed class UpdateProjectTaskCommandValidator : AbstractValidator<Update
 
         RuleFor(x => x.Name)
             .NotEmpty()
-            .MaximumLength(256);
+            .MaximumLength(128);
 
         RuleFor(x => x.Description)
             .MaximumLength(2048);

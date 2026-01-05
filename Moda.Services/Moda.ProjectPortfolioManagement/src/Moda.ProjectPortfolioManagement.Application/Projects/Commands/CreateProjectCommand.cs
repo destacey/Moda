@@ -1,15 +1,16 @@
 ﻿using Moda.Common.Domain.Enums.StrategicManagement;
 using Moda.Common.Domain.Models.ProjectPortfolioManagement;
 using Moda.ProjectPortfolioManagement.Application.Projects.Models;
+using Moda.ProjectPortfolioManagement.Application.Projects.Validators;
 using Moda.ProjectPortfolioManagement.Domain.Enums;
 
 namespace Moda.ProjectPortfolioManagement.Application.Projects.Commands;
 
-public sealed record CreateProjectCommand(string Name, string Description, string Key, int ExpenditureCategoryId, LocalDateRange? DateRange, Guid PortfolioId, Guid? ProgramId, List<Guid>? SponsorIds, List<Guid>? OwnerIds, List<Guid>? ManagerIds, List<Guid>? StrategicThemeIds) : ICommand<ProjectIdAndKey>;
+public sealed record CreateProjectCommand(string Name, string Description, ProjectKey Key, int ExpenditureCategoryId, LocalDateRange? DateRange, Guid PortfolioId, Guid? ProgramId, List<Guid>? SponsorIds, List<Guid>? OwnerIds, List<Guid>? ManagerIds, List<Guid>? StrategicThemeIds) : ICommand<ProjectIdAndKey>;
 
 public sealed class CreateProjectCommandValidator : AbstractValidator<CreateProjectCommand>
 {
-    public CreateProjectCommandValidator()
+    public CreateProjectCommandValidator(IProjectPortfolioManagementDbContext ppmDbContext)
     {
         RuleFor(x => x.Name)
             .NotEmpty()
@@ -21,9 +22,7 @@ public sealed class CreateProjectCommandValidator : AbstractValidator<CreateProj
 
         RuleFor(x => x.Key)
             .NotEmpty()
-            .MaximumLength(20)
-            .Matches("^[A-Z0-9]+$")
-            .WithMessage("Key must contain only uppercase letters and numbers.");
+            .SetValidator(x => new ProjectKeyValidator(ppmDbContext, null));
 
         RuleFor(x => x.ExpenditureCategoryId)
             .GreaterThan(0);

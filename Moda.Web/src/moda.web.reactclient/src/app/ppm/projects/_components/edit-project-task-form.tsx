@@ -256,13 +256,13 @@ const EditProjectTaskForm = (props: EditProjectTaskFormProps) => {
           name="name"
           rules={[
             { required: true, message: 'Name is required' },
-            { max: 256, message: 'Name cannot exceed 256 characters' },
+            { max: 128, message: 'Name cannot exceed 256 characters' },
           ]}
         >
           <TextArea
             autoSize={{ minRows: 1, maxRows: 2 }}
             showCount
-            maxLength={256}
+            maxLength={128}
           />
         </Item>
         <Item
