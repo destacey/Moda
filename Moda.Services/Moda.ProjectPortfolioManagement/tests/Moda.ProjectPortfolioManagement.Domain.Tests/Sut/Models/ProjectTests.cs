@@ -542,4 +542,86 @@ public class ProjectTests
     }
 
     #endregion Strategic Theme Management
+
+    #region Key Management
+
+    [Fact]
+    public void ChangeKey_ShouldUpdateProjectKeySuccessfully()
+    {
+        // Arrange
+        var project = _projectFaker.Generate();
+        var originalKey = project.Key;
+        var newKey = new ProjectKey("NEWPROJ");
+
+        // Act
+        var result = project.ChangeKey(newKey);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        project.Key.Should().Be(newKey);
+        project.Key.Should().NotBe(originalKey);
+    }
+
+    [Fact]
+    public void ChangeKey_ShouldBeNoOp_WhenKeyIsUnchanged()
+    {
+        // Arrange
+        var project = _projectFaker.Generate();
+        var originalKey = project.Key;
+
+        // Act
+        var result = project.ChangeKey(originalKey);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        project.Key.Should().Be(originalKey);
+    }
+
+    [Fact]
+    public void ChangeKey_ShouldUpdateAllTaskKeys_WhenProjectHasTasks()
+    {
+        // Arrange
+        var project = _projectFaker.Generate();
+        var task1 = project.CreateTask(
+            nextNumber: 1,
+            name: "Task 1",
+            description: null,
+            type: ProjectTaskType.Task,
+            status: Enums.TaskStatus.NotStarted,
+            priority: TaskPriority.Medium,
+            progress: null,
+            parentId: null,
+            plannedDateRange: null,
+            plannedDate: null,
+            estimatedEffortHours: null,
+            assignments: null).Value;
+
+        var task2 = project.CreateTask(
+            nextNumber: 2,
+            name: "Task 2",
+            description: null,
+            type: ProjectTaskType.Task,
+            status: Enums.TaskStatus.NotStarted,
+            priority: TaskPriority.Medium,
+            progress: null,
+            parentId: null,
+            plannedDateRange: null,
+            plannedDate: null,
+            estimatedEffortHours: null,
+            assignments: null).Value;
+
+        var newKey = new ProjectKey("NEWTASKS");
+
+        // Act
+        var result = project.ChangeKey(newKey);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        project.Key.Should().Be(newKey);
+
+        task1.Key.Value.Should().Be($"{newKey.Value}-1");
+        task2.Key.Value.Should().Be($"{newKey.Value}-2");
+    }
+
+    #endregion Key Management
 }

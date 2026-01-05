@@ -19,6 +19,7 @@ import ProjectDetailsLoading from './loading'
 import {
   ChangeProjectStatusForm,
   ChangeProjectProgramForm,
+  ChangeProjectKeyForm,
   DeleteProjectForm,
   EditProjectForm,
   ProjectDetails,
@@ -53,6 +54,7 @@ const tabs = [
 enum ProjectAction {
   Edit = 'Edit',
   ChangeProgram = 'Change Program',
+  ChangeKey = 'Change Key',
   Delete = 'Delete',
   Activate = 'Activate',
   Complete = 'Complete',
@@ -66,6 +68,7 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const [openEditProjectForm, setOpenEditProjectForm] = useState<boolean>(false)
   const [openChangeProgramForm, setOpenChangeProgramForm] =
     useState<boolean>(false)
+  const [openChangeKeyForm, setOpenChangeKeyForm] = useState<boolean>(false)
   const [openActivateProjectForm, setOpenActivateProjectForm] =
     useState<boolean>(false)
   const [openCompleteProjectForm, setOpenCompleteProjectForm] =
@@ -189,6 +192,11 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
         label: ProjectAction.ChangeProgram,
         onClick: () => setOpenChangeProgramForm(true),
       })
+      items.push({
+        key: 'change-key',
+        label: ProjectAction.ChangeKey,
+        onClick: () => setOpenChangeKeyForm(true),
+      })
     }
     if (canDeleteProject && availableActions.includes(ProjectAction.Delete)) {
       items.push({
@@ -260,6 +268,20 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       }
     },
     [refetchProject],
+  )
+
+  const onChangeKeyFormClosed = useCallback(
+    (wasSaved: boolean, newKey?: string) => {
+      setOpenChangeKeyForm(false)
+      if (wasSaved) {
+        if (newKey && newKey !== projectData?.key) {
+          router.push(`/ppm/projects/${newKey}`)
+          return
+        }
+        refetchProject()
+      }
+    },
+    [projectData?.key, refetchProject, router],
   )
 
   const onActivateProjectFormClosed = useCallback(
@@ -352,6 +374,13 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
           showForm={openChangeProgramForm}
           onFormComplete={() => onChangeProgramFormClosed(true)}
           onFormCancel={() => onChangeProgramFormClosed(false)}
+        />
+      )}
+      {openChangeKeyForm && (
+        <ChangeProjectKeyForm
+          projectKey={projectData.key}
+          onFormComplete={(newKey) => onChangeKeyFormClosed(true, newKey)}
+          onFormCancel={() => onChangeKeyFormClosed(false)}
         />
       )}
       {openActivateProjectForm && (

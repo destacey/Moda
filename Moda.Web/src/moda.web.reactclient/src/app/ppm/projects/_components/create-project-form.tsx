@@ -218,6 +218,7 @@ const CreateProjectForm = (props: CreateProjectFormProps) => {
         okText="Create"
         confirmLoading={isSaving}
         onCancel={handleCancel}
+        mask={{ blur: false }}
         maskClosable={false}
         keyboard={false} // disable esc key to close modal
         destroyOnHidden={true}
@@ -256,8 +257,7 @@ const CreateProjectForm = (props: CreateProjectFormProps) => {
               { max: 20, message: 'Key must be at most 20 characters' },
               {
                 pattern: /^[A-Z0-9]+$/,
-                message:
-                  'Key must contain only uppercase letters and numbers',
+                message: 'Key must contain only uppercase letters and numbers',
               },
             ]}
             tooltip="A unique identifier for the project (e.g., APOLLO, MARS1). Must be 2-20 uppercase alphanumeric characters."

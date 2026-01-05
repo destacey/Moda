@@ -154,6 +154,7 @@ const ChangeProjectStatusForm = (props: ChangeProjectStatusFormProps) => {
         okText={props.statusAction}
         confirmLoading={isSaving}
         onCancel={handleCancel}
+        mask={{ blur: false }}
         maskClosable={false}
         keyboard={false} // disable esc key to close modal
         destroyOnHidden={true}

@@ -4335,6 +4335,74 @@
         ]
       }
     },
+    "/api/ppm/projects/{id}/key": {
+      "put": {
+        "tags": [
+          "Projects"
+        ],
+        "summary": "Change a project's key.",
+        "operationId": "Projects_ChangeKey",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeProjectKeyRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
     "/api/ppm/projects/{id}/activate": {
       "post": {
         "tags": [
@@ -17589,6 +17657,21 @@
             "format": "guid",
             "nullable": true,
             "example": "00000000-0000-0000-0000-000000000000"
+          }
+        }
+      },
+      "ChangeProjectKeyRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "key"
+        ],
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "The new key to assign to the Project (2-20 uppercase alphanumeric characters).",
+            "pattern": "^([A-Z0-9]){2,20}$",
+            "nullable": false
           }
         }
       },

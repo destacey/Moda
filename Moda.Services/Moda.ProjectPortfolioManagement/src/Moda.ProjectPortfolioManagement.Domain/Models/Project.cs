@@ -557,4 +557,30 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey<P
 
         return project;
     }
+
+    /// <summary>
+    /// Updates the project's key and cascades the change to all linked tasks by updating their task keys.
+    /// </summary>
+    public Result ChangeKey(ProjectKey key)
+    {
+        Guard.Against.Null(key, nameof(key));
+
+        if (Key.Value == key.Value)
+        {
+            return Result.Success();
+        }
+
+        Key = key;
+
+        foreach (var task in _tasks)
+        {
+            var updateResult = task.UpdateProjectKey(Key);
+            if (updateResult.IsFailure)
+            {
+                return updateResult;
+            }
+        }
+
+        return Result.Success();
+    }
 }

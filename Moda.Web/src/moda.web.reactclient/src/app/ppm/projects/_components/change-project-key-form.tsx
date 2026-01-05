@@ -3,46 +3,45 @@
 import useAuth from '@/src/components/contexts/auth'
 import { useMessage } from '@/src/components/contexts/messaging'
 import {
-  ChangeProjectProgramRequest,
   ProjectDetailsDto,
+  ChangeProjectKeyRequest,
 } from '@/src/services/moda-api'
-import { useGetPortfolioProgramOptionsQuery } from '@/src/store/features/ppm/portfolios-api'
-import { useChangeProjectProgramMutation } from '@/src/store/features/ppm/projects-api'
+import {
+  useChangeProjectKeyMutation,
+  useGetProjectQuery,
+} from '@/src/store/features/ppm/projects-api'
 import { toFormErrors } from '@/src/utils'
-import { Flex, Form, Modal, Select, Typography } from 'antd'
+import { Flex, Form, Input, Modal, Typography } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 
 const { Item } = Form
 const { Text } = Typography
 
-export interface ChangeProjectProgramFormProps {
-  project: ProjectDetailsDto
-  showForm: boolean
-  onFormComplete: () => void
+export interface ChangeProjectKeyFormProps {
+  projectKey: string
+  onFormComplete: (newKey: string) => void
   onFormCancel: () => void
 }
 
-interface ChangeProjectProgramFormValues {
-  programId?: string
+interface ChangeProjectKeyFormValues {
+  key: string
 }
 
-const ChangeProjectProgramForm = (props: ChangeProjectProgramFormProps) => {
+const keyPattern = /^[A-Z0-9]{2,20}$/
+
+const ChangeProjectKeyForm = (props: ChangeProjectKeyFormProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [isValid, setIsValid] = useState(false)
-  const [form] = Form.useForm<ChangeProjectProgramFormValues>()
+  const [isInitialized, setIsInitialized] = useState(false)
+  const [form] = Form.useForm<ChangeProjectKeyFormValues>()
   const formValues = Form.useWatch([], form)
 
   const messageApi = useMessage()
 
-  const [changeProjectProgram, { error: mutationError }] =
-    useChangeProjectProgramMutation()
+  const { data: projectData } = useGetProjectQuery(props.projectKey)
 
-  const {
-    data: programData,
-    isLoading: programOptionsIsLoading,
-    error: programOptionsError,
-  } = useGetPortfolioProgramOptionsQuery(props.project.portfolio.id)
+  const [changeProjectKey] = useChangeProjectKeyMutation()
 
   const { hasPermissionClaim } = useAuth()
   const canUpdateProject = hasPermissionClaim('Permissions.Projects.Update')
@@ -53,32 +52,35 @@ const ChangeProjectProgramForm = (props: ChangeProjectProgramFormProps) => {
         throw new Error('Project not found')
       }
       form.setFieldsValue({
-        programId: project.program?.id ?? undefined,
+        key: project.key,
       })
+      setIsInitialized(true)
     },
     [form],
   )
 
-  const changeProgram = async (
-    values: ChangeProjectProgramFormValues,
+  const changeKey = async (
+    values: ChangeProjectKeyFormValues,
     project: ProjectDetailsDto,
   ) => {
     try {
-      const request: ChangeProjectProgramRequest = {
-        programId: values.programId ?? null,
+      const newKey = values.key.trim().toUpperCase()
+      const request: ChangeProjectKeyRequest = {
+        key: newKey,
       }
-      const response = await changeProjectProgram({
+
+      const response = await changeProjectKey({
         id: project.id,
         request,
-        cacheKey: project.key,
       })
+
       if (response.error) {
         throw response.error
       }
-      messageApi.success(`Project program changed successfully.`)
-      return true
+
+      messageApi.success(`Project key changed successfully.`)
+      return newKey
     } catch (error) {
-      console.error('change program error', error)
       if (error.status === 422 && error.errors) {
         const formErrors = toFormErrors(error.errors)
         form.setFields(formErrors)
@@ -86,10 +88,10 @@ const ChangeProjectProgramForm = (props: ChangeProjectProgramFormProps) => {
       } else {
         messageApi.error(
           error.detail ??
-            'An error occurred while changing the project program. Please try again.',
+            'An error occurred while updating the project key. Please try again.',
         )
       }
-      return false
+      return null
     }
   }
 
@@ -97,15 +99,16 @@ const ChangeProjectProgramForm = (props: ChangeProjectProgramFormProps) => {
     setIsSaving(true)
     try {
       const values = await form.validateFields()
-      if (await changeProgram(values, props.project)) {
+      const newKey = await changeKey(values, projectData)
+      if (newKey) {
         setIsOpen(false)
         form.resetFields()
-        props.onFormComplete()
+        props.onFormComplete(newKey)
       }
     } catch (error) {
       console.error('handleOk error', error)
       messageApi.error(
-        'An error occurred while changing the project program. Please try again.',
+        'An error occurred while changing the project key. Please try again.',
       )
     } finally {
       setIsSaving(false)
@@ -119,17 +122,23 @@ const ChangeProjectProgramForm = (props: ChangeProjectProgramFormProps) => {
   }, [form, props])
 
   useEffect(() => {
-    if (!props.project) return
+    if (!projectData || isInitialized) return
+
     if (canUpdateProject) {
-      setIsOpen(props.showForm)
-      if (props.showForm) {
-        mapToFormValues(props.project)
-      }
+      mapToFormValues(projectData)
+      setIsOpen(true)
     } else {
       props.onFormCancel()
       messageApi.error('You do not have permission to update projects.')
     }
-  }, [canUpdateProject, mapToFormValues, messageApi, props])
+  }, [
+    canUpdateProject,
+    isInitialized,
+    mapToFormValues,
+    messageApi,
+    projectData,
+    props,
+  ])
 
   useEffect(() => {
     form.validateFields({ validateOnly: true }).then(
@@ -138,20 +147,10 @@ const ChangeProjectProgramForm = (props: ChangeProjectProgramFormProps) => {
     )
   }, [form, formValues])
 
-  useEffect(() => {
-    if (programOptionsError) {
-      console.error(programOptionsError)
-      messageApi.error(
-        programOptionsError.detail ??
-          'An error occurred while loading program options. Please try again.',
-      )
-    }
-  }, [programOptionsError, messageApi])
-
   return (
     <>
       <Modal
-        title="Change Project Program"
+        title="Change Project Key"
         open={isOpen}
         width={'40vw'}
         onOk={handleOk}
@@ -165,28 +164,32 @@ const ChangeProjectProgramForm = (props: ChangeProjectProgramFormProps) => {
         destroyOnHidden={true}
       >
         <Flex vertical gap="small">
-          <Text type="secondary">
-            Select a new program to assign this project to, or clear to remove
-            the program assignment.
-          </Text>
+          <Text type="secondary">Enter a new key for this project.</Text>
           <Form
             form={form}
             size="small"
             layout="vertical"
-            name="change-project-program-form"
+            name="change-project-key-form"
           >
-            <Item name="programId" label="Program">
-              <Select
-                allowClear
-                options={programData ?? []}
-                placeholder="Select Program"
-                loading={programOptionsIsLoading}
-                optionFilterProp="label"
-                filterOption={(input, option) =>
-                  (option?.label?.toLowerCase() ?? '').includes(
-                    input.toLowerCase(),
-                  )
-                }
+            <Item
+              name="key"
+              label="Key"
+              extra="2-20 uppercase alphanumeric characters (A-Z, 0-9)"
+              rules={[
+                { required: true, message: 'Key is required.' },
+                {
+                  pattern: keyPattern,
+                  message:
+                    'Key must be 2-20 uppercase alphanumeric characters (A-Z, 0-9).',
+                },
+              ]}
+              normalize={(value) => (value ?? '').toUpperCase()}
+            >
+              <Input
+                placeholder="Enter new key"
+                autoComplete="off"
+                showCount
+                maxLength={20}
               />
             </Item>
           </Form>
@@ -196,4 +199,4 @@ const ChangeProjectProgramForm = (props: ChangeProjectProgramFormProps) => {
   )
 }
 
-export default ChangeProjectProgramForm
+export default ChangeProjectKeyForm

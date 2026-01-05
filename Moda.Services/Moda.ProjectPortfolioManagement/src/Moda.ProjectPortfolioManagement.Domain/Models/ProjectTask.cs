@@ -369,6 +369,26 @@ public sealed class ProjectTask : BaseEntity<Guid>, ISystemAuditable, IHasIdAndK
         return Result.Success();
     }
 
+    /// <summary>
+    /// Updates the task key when the owning project's key changes.
+    /// Preserves the task number.
+    /// </summary>
+    internal Result UpdateProjectKey(ProjectKey projectKey)
+    {
+        Guard.Against.Null(projectKey, nameof(projectKey));
+
+        var newKey = new ProjectTaskKey(projectKey, Number);
+
+        if (newKey.Value == Key.Value)
+        {
+            return Result.Success();
+        }
+
+        Key = newKey;
+
+        return Result.Success();
+    }
+
     #endregion
 
     #region Helper Methods

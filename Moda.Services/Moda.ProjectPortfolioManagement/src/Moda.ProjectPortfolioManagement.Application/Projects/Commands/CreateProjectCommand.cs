@@ -133,7 +133,7 @@ internal sealed class CreateProjectCommandHandler(
 
             var project = createResult.Value;
 
-            _logger.LogInformation("Project {ProjectId} created with Key {ProjectKey}.", project.Id, project.Key);
+            _logger.LogInformation("Project {ProjectId} created with Key {ProjectKey}.", project.Id, project.Key.Value);
 
             return Result.Success(new ProjectIdAndKey(project.Id, project.Key));
         }

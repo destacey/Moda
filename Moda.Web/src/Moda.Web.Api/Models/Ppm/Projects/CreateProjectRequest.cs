@@ -1,5 +1,4 @@
-﻿using Moda.ProjectPortfolioManagement.Application.Portfolios.Command;
-using Moda.ProjectPortfolioManagement.Application.Projects.Commands;
+﻿using Moda.ProjectPortfolioManagement.Application.Projects.Commands;
 
 namespace Moda.Web.Api.Models.Ppm.Projects;
 

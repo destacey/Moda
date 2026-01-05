@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Moda.Common.Domain.Models.ProjectPortfolioManagement;
 using Moda.ProjectPortfolioManagement.Domain.Tests.Data;
 using Moda.Tests.Shared;
 using NodaTime.Extensions;
@@ -18,6 +19,46 @@ public class ProjectTaskTests
 
         _projectTaskFaker = new ProjectTaskFaker();
     }
+
+    #region UpdateProjectKey Tests
+
+    [Fact]
+    public void UpdateProjectKey_ShouldUpdateTaskKeyAndPreserveNumber()
+    {
+        // Arrange
+        var originalProjectKey = new ProjectKey("ORIG");
+        var taskNumber = 123;
+        var task = _projectTaskFaker.WithData(key: new ProjectTaskKey(originalProjectKey, taskNumber)).Generate();
+
+        var newProjectKey = new ProjectKey("NEWKEY");
+
+        // Act
+        var result = task.UpdateProjectKey(newProjectKey);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        task.Number.Should().Be(taskNumber);
+        task.Key.Value.Should().Be($"{newProjectKey.Value}-{taskNumber}");
+    }
+
+    [Fact]
+    public void UpdateProjectKey_ShouldBeNoOp_WhenProjectKeyIsUnchanged()
+    {
+        // Arrange
+        var projectKey = new ProjectKey("SAME");
+        var taskNumber = 7;
+        var task = _projectTaskFaker.WithData(key: new ProjectTaskKey(projectKey, taskNumber)).Generate();
+        var originalTaskKeyValue = task.Key.Value;
+
+        // Act
+        var result = task.UpdateProjectKey(projectKey);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        task.Key.Value.Should().Be(originalTaskKeyValue);
+    }
+
+    #endregion UpdateProjectKey Tests
 
     #region SetOrder Tests
 

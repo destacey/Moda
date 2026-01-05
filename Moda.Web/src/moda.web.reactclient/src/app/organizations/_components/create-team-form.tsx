@@ -44,16 +44,9 @@ const CreateTeamForm = ({ form }: FormProps<CreateTeamFormValues>) => {
               'The Code field is invalid. Uppercase letters and numbers only.',
           },
         ]}
+        normalize={(value) => (value ?? '').toUpperCase()}
       >
-        <Input
-          showCount
-          maxLength={10}
-          onInput={(e) =>
-            ((e.target as HTMLInputElement).value = (
-              e.target as HTMLInputElement
-            ).value.toUpperCase())
-          }
-        />
+        <Input showCount maxLength={10} />
       </Item>
       <Item
         name="description"
