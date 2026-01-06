@@ -6123,10 +6123,10 @@ export class ProjectTasksClient {
     }
 
     /**
-     * Update a project task's order within its parent.
+     * Update a project task's placement within a parent.
      */
-    updateProjectTaskOrder(projectIdOrKey: string, id: string, request: UpdateProjectTaskOrderRequest, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/ppm/projects/{projectIdOrKey}/tasks/{id}/order";
+    updateProjectTaskPlacement(projectIdOrKey: string, id: string, request: UpdateProjectTaskPlacementRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/ppm/projects/{projectIdOrKey}/tasks/{id}/placement";
         if (projectIdOrKey === undefined || projectIdOrKey === null)
             throw new globalThis.Error("The parameter 'projectIdOrKey' must be defined.");
         url_ = url_.replace("{projectIdOrKey}", encodeURIComponent("" + projectIdOrKey));
@@ -6154,11 +6154,11 @@ export class ProjectTasksClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processUpdateProjectTaskOrder(_response);
+            return this.processUpdateProjectTaskPlacement(_response);
         });
     }
 
-    protected processUpdateProjectTaskOrder(response: AxiosResponse): Promise<void> {
+    protected processUpdateProjectTaskPlacement(response: AxiosResponse): Promise<void> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -18508,11 +18508,13 @@ export interface Operation extends OperationBase {
 export interface OperationOfUpdateProjectTaskRequest extends Operation {
 }
 
-export interface UpdateProjectTaskOrderRequest {
+export interface UpdateProjectTaskPlacementRequest {
     /** The ID of the task. */
     taskId: string;
+    /** The ID of the new parent task. If null, the task will be moved to the root level. */
+    parentId?: string | undefined;
     /** The new order/position of the task within its parent. */
-    order: number;
+    order?: number | undefined;
 }
 
 export interface AddTaskDependencyRequest {

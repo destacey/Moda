@@ -181,7 +181,7 @@ internal sealed class UpdateProjectTaskCommandHandler(
                     return Result.Failure("Project not found for the task.");
                 }
 
-                var parentResult = project.ChangeTaskParent(task.Id, request.ParentId);
+                var parentResult = project.ChangeTaskPlacement(task.Id, request.ParentId, null);
                 if (parentResult.IsFailure)
                 {
                     _logger.LogError("Error changing parent for task {TaskId}. Error: {Error}", task.Id, parentResult.Error);

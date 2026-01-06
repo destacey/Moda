@@ -4,6 +4,7 @@ using Moda.ProjectPortfolioManagement.Domain.Enums;
 using Moda.ProjectPortfolioManagement.Domain.Models;
 using Moda.Tests.Shared;
 using Moda.Tests.Shared.Data;
+using Moda.Tests.Shared.Extensions;
 
 namespace Moda.ProjectPortfolioManagement.Domain.Tests.Data;
 
@@ -142,5 +143,64 @@ public static class ProjectFakerExtensions
             portfolioId: portfolioId,
             programId: programId
         ).Generate();
+    }
+
+    /// <summary>
+    /// Creates the specified number of tasks and adds them to the project's internal _tasks collection.
+    /// This properly simulates EF Core's Include behavior for unit tests.
+    /// </summary>
+    /// <param name="project">The project to add tasks to.</param>
+    /// <param name="taskCount">The number of tasks to create.</param>
+    /// <returns>The list of created tasks, also accessible via project.Tasks.</returns>
+    public static List<ProjectTask> WithTasks(this Project project, int taskCount)
+    {
+        var tasks = new List<ProjectTask>();
+        var taskFaker = new ProjectTaskFaker();
+
+        for (int i = 1; i <= taskCount; i++)
+        {
+            var task = taskFaker.WithData(
+                id: Guid.NewGuid(),
+                projectId: project.Id,
+                key: new ProjectTaskKey(project.Key, i),
+                order: i
+            ).Generate();
+
+            tasks.Add(task);
+            project.AddToPrivateList("_tasks", task);
+        }
+
+        return tasks;
+    }
+
+    /// <summary>
+    /// Creates the specified number of tasks with custom configuration and adds them to the project's internal _tasks collection.
+    /// This properly simulates EF Core's Include behavior for unit tests.
+    /// </summary>
+    /// <param name="project">The project to add tasks to.</param>
+    /// <param name="taskCount">The number of tasks to create.</param>
+    /// <param name="configureTask">An action to configure each task faker before generation. The int parameter is the task number (1-based).</param>
+    /// <returns>The list of created tasks, also accessible via project.Tasks.</returns>
+    public static List<ProjectTask> WithTasks(this Project project, int taskCount, Action<ProjectTaskFaker, int> configureTask)
+    {
+        var tasks = new List<ProjectTask>();
+
+        for (int i = 1; i <= taskCount; i++)
+        {
+            var taskFaker = new ProjectTaskFaker()
+                .WithData(
+                    id: Guid.NewGuid(),
+                    projectId: project.Id,
+                    key: new ProjectTaskKey(project.Key, i),
+                    order: i);
+
+            configureTask(taskFaker, i);
+
+            var task = taskFaker.Generate();
+            tasks.Add(task);
+            project.AddToPrivateList("_tasks", task);
+        }
+
+        return tasks;
     }
 }

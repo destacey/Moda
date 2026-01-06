@@ -176,22 +176,26 @@ public class ProjectTasksController(ILogger<ProjectTasksController> logger, ISen
             : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
-    [HttpPut("{id}/order")]
+    [HttpPut("{id}/placement")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Projects)]
-    [OpenApiOperation("Update a project task's order within its parent.", "")]
+    [OpenApiOperation("Update a project task's placement within a parent.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
-    public async Task<ActionResult> UpdateProjectTaskOrder(
+    public async Task<ActionResult> UpdateProjectTaskPlacement(
         string projectIdOrKey,
         Guid id,
-        [FromBody] UpdateProjectTaskOrderRequest request,
+        [FromBody] UpdateProjectTaskPlacementRequest request,
         CancellationToken cancellationToken)
     {
         if (id != request.TaskId)
             return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(HttpContext));
 
-        var result = await _sender.Send(new UpdateProjectTaskOrderCommand(request.TaskId, request.Order), cancellationToken);
+        var projectId = await ResolveProjectId(projectIdOrKey, cancellationToken);
+        if (projectId is null)
+            return NotFound($"Project with identifier '{projectIdOrKey}' not found.");
+
+        var result = await _sender.Send(request.ToUpdateProjectTaskPlacementCommand(projectId.Value), cancellationToken);
 
         return result.IsSuccess
             ? NoContent()

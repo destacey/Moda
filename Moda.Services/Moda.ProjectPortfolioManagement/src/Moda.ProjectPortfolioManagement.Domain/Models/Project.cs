@@ -412,17 +412,7 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey<P
         return Result.Success(task);
     }
 
-    /// <summary>
-    /// Changes the parent of the specified task to a new parent task or to the root level.
-    /// </summary>
-    /// <remarks>If the new parent is a milestone, the operation fails because milestones cannot have child
-    /// tasks. The order of the task within its new parent is set to follow existing children, and the order of siblings
-    /// in the original parent is updated to maintain sequence.</remarks>
-    /// <param name="taskId">The unique identifier of the task to update.</param>
-    /// <param name="newParentId">The unique identifier of the new parent task. If null, the task is moved to the root level.</param>
-    /// <returns>A Result indicating whether the operation succeeded. Returns a failure result if the task or new parent is not
-    /// found, or if the new parent is a milestone.</returns>
-    public Result ChangeTaskParent(Guid taskId, Guid? newParentId)
+    public Result ChangeTaskPlacement(Guid taskId, Guid? parentId, int? order)
     {
         // get the current task
         var task = _tasks.FirstOrDefault(t => t.Id == taskId);
@@ -431,40 +421,97 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey<P
             return Result.Failure("Task not found.");
         }
 
-        var origParentId = task.ParentId;
-
-        // get the new parent task if specified
-        ProjectTask? newParent = null;
-        if (newParentId.HasValue)
+        if (order.HasValue && order.Value < 1)
         {
-            newParent = _tasks.FirstOrDefault(t => t.Id == newParentId);
-            if (newParent is null)
+            return Result.Failure("Order must be greater than zero.");
+        }
+
+        // get the parent task
+        ProjectTask? parentTask = null;
+        if (parentId.HasValue)
+        {
+            parentTask = _tasks.FirstOrDefault(t => t.Id == parentId);
+            if (parentTask is null)
             {
                 return Result.Failure("New parent task not found.");
             }
 
-            if (newParent.Type == ProjectTaskType.Milestone)
+            if (parentTask.Type == ProjectTaskType.Milestone)
             {
                 return Result.Failure("Milestones cannot have child tasks.");
             }
         }
 
-        // set order in new parent
-        var parentChildren = newParentId.HasValue
-            ? _tasks.Count(t => t.ParentId == newParentId)
-            : _tasks.Count(t => t.ParentId is null);
+        var origParentId = task.ParentId;
+        var isChangingParent = origParentId != parentId;
 
-        var changeResult = task.ChangeParent(newParentId, parentChildren + 1);
-        if (changeResult.IsFailure)
+        // set order in new parent
+        var parentChildrenQuery = parentId.HasValue
+                ? _tasks.Where(t => t.ParentId == parentId)
+                : _tasks.Where(t => t.ParentId is null);
+
+        if (!isChangingParent)
         {
-            return changeResult;
+            // Exclude the task being moved from the siblings list
+            parentChildrenQuery = parentChildrenQuery.Where(t => t.Id != taskId);
         }
 
-        BalanceOrderForChildTasks(origParentId);
+        // Calculate new order
+        var childrenCount = parentChildrenQuery.Count() + 1;
+        var newOrder = Math.Min(order ?? childrenCount, childrenCount);
 
-        return Result.Success();
+        Result changeResult;
+        if (isChangingParent)
+        {
+            // Update Old Parent and Children
+            if (origParentId.HasValue)
+            {
+                var oldParent = _tasks.FirstOrDefault(t => t.Id == origParentId);
+                oldParent?.RemoveChild(task);
+            }
+
+            ResetOrderForChildTasks(origParentId);
+
+            // Update New Parent and Children
+            foreach (var sibling in parentChildrenQuery.Where(t => t.Order >= newOrder))
+            {
+                sibling.ChangeOrder(sibling.Order + 1);
+            }
+
+            changeResult = task.ChangeParent(parentId, newOrder);
+
+            parentTask?.AddChild(task);
+        }
+        else
+        {
+            var previousOrder = task.Order;
+
+            if (newOrder == previousOrder)
+                return Result.Success();
+
+            if (newOrder < previousOrder)
+            {
+                // Moving up: Increment orders of siblings between new and old order
+                foreach (var sibling in parentChildrenQuery.Where(t => t.Order >= newOrder && t.Order < previousOrder))
+                {
+                    sibling.ChangeOrder(sibling.Order + 1);
+                }
+            }
+            else
+            {
+                // Moving down: Decrement orders of siblings between old and new order
+                foreach (var sibling in parentChildrenQuery.Where(t => t.Order > previousOrder && t.Order <= newOrder))
+                {
+                    sibling.ChangeOrder(sibling.Order - 1);
+                }
+            }
+
+            changeResult = task.ChangeOrder(newOrder);
+
+        }
+
+        return changeResult;
     }
-
 
     /// <summary>
     /// Deletes the task with the specified identifier if it has no child tasks or active dependencies.
@@ -498,12 +545,15 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey<P
 
         _tasks.Remove(task);
 
-        BalanceOrderForChildTasks(parentId);
+        ResetOrderForChildTasks(parentId);
 
         return Result.Success();
     }
 
-    private void BalanceOrderForChildTasks(Guid? parentId)
+
+
+    // TODO: this really belongs on the ProjectTask so a parent can reset its own children, but root tasks have no parent
+    private void ResetOrderForChildTasks(Guid? parentId)
     {
         var siblings = parentId.HasValue
             ? _tasks.Where(t => t.ParentId == parentId.Value)
@@ -513,7 +563,7 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey<P
             int order = 1;
             foreach (var sibling in siblings.OrderBy(t => t.Order))
             {
-                sibling.SetOrder(order);
+                sibling.ChangeOrder(order);
                 order++;
             }
         }
@@ -542,11 +592,11 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey<P
         project.AddPostPersistenceAction(() => project.AddDomainEvent(
             new ProjectCreatedEvent
             (
-                project, 
-                project.ExpenditureCategoryId, 
-                (int)project.Status, 
-                project.DateRange, 
-                project.PortfolioId, 
+                project,
+                project.ExpenditureCategoryId,
+                (int)project.Status,
+                project.DateRange,
+                project.PortfolioId,
                 project.ProgramId,
                 project.Roles
                     .GroupBy(x => (int)x.Role)

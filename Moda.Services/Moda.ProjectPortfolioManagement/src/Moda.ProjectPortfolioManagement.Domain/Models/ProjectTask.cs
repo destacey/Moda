@@ -290,9 +290,9 @@ public sealed class ProjectTask : BaseEntity<Guid>, ISystemAuditable, IHasIdAndK
     }
 
     /// <summary>
-    /// Sets the order of this task within its parent.
+    /// Changes the order of this task within its parent.
     /// </summary>
-    public Result SetOrder(int order)
+    internal Result ChangeOrder(int order)
     {
         if (order < 1)
         {
@@ -306,7 +306,7 @@ public sealed class ProjectTask : BaseEntity<Guid>, ISystemAuditable, IHasIdAndK
     /// <summary>
     /// Changes the parent of this task.
     /// </summary>
-    public Result ChangeParent(Guid? newParentId, int order)
+    internal Result ChangeParent(Guid? newParentId, int order)
     {
         // Validation: prevent circular references
         if (newParentId.HasValue && newParentId == Id)
@@ -320,7 +320,7 @@ public sealed class ProjectTask : BaseEntity<Guid>, ISystemAuditable, IHasIdAndK
 
         ParentId = newParentId;
 
-        return SetOrder(order);
+        return ChangeOrder(order);
     }
 
     /// <summary>

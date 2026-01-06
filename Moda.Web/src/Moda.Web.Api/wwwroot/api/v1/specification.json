@@ -5118,13 +5118,13 @@
         ]
       }
     },
-    "/api/ppm/projects/{projectIdOrKey}/tasks/{id}/order": {
+    "/api/ppm/projects/{projectIdOrKey}/tasks/{id}/placement": {
       "put": {
         "tags": [
           "ProjectTasks"
         ],
-        "summary": "Update a project task's order within its parent.",
-        "operationId": "ProjectTasks_UpdateProjectTaskOrder",
+        "summary": "Update a project task's placement within a parent.",
+        "operationId": "ProjectTasks_UpdateProjectTaskPlacement",
         "parameters": [
           {
             "name": "projectIdOrKey",
@@ -5153,7 +5153,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateProjectTaskOrderRequest"
+                "$ref": "#/components/schemas/UpdateProjectTaskPlacementRequest"
               }
             }
           },
@@ -18301,7 +18301,7 @@
           "name": {
             "type": "string",
             "description": "The name of the task.",
-            "maxLength": 256,
+            "maxLength": 128,
             "minLength": 1,
             "nullable": false
           },
@@ -18434,7 +18434,7 @@
           "name": {
             "type": "string",
             "description": "The name of the task.",
-            "maxLength": 256,
+            "maxLength": 128,
             "minLength": 1,
             "nullable": false
           },
@@ -18570,12 +18570,11 @@
           }
         }
       },
-      "UpdateProjectTaskOrderRequest": {
+      "UpdateProjectTaskPlacementRequest": {
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "taskId",
-          "order"
+          "taskId"
         ],
         "properties": {
           "taskId": {
@@ -18586,11 +18585,19 @@
             "nullable": false,
             "example": "00000000-0000-0000-0000-000000000000"
           },
+          "parentId": {
+            "type": "string",
+            "description": "The ID of the new parent task. If null, the task will be moved to the root level.",
+            "format": "guid",
+            "nullable": true,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
           "order": {
             "type": "integer",
             "description": "The new order/position of the task within its parent.",
             "format": "int32",
             "minimum": 0.0,
+            "nullable": true,
             "exclusiveMinimum": true
           }
         }

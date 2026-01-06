@@ -9,9 +9,9 @@ import {
   ProjectTaskTreeDto,
   CreateProjectTaskRequest,
   UpdateProjectTaskRequest,
-  UpdateProjectTaskOrderRequest,
   AddTaskDependencyRequest,
   ProjectTaskIdAndKey,
+  UpdateProjectTaskPlacementRequest,
 } from '@/src/services/moda-api'
 import { QueryTags } from '../query-tags'
 import { OptionModel } from '@/src/components/types'
@@ -44,6 +44,7 @@ export const projectTasksApi = apiSlice.injectEndpoints({
         ],
       },
     ),
+
     getProjectTaskTree: builder.query<
       ProjectTaskTreeDto[],
       { projectIdOrKey: string }
@@ -62,6 +63,7 @@ export const projectTasksApi = apiSlice.injectEndpoints({
         { type: QueryTags.ProjectTaskTree, id: `TREE-${projectIdOrKey}` },
       ],
     }),
+
     getProjectTask: builder.query<
       ProjectTaskDto,
       { projectIdOrKey: string; taskIdOrKey: string }
@@ -82,6 +84,7 @@ export const projectTasksApi = apiSlice.injectEndpoints({
         { type: QueryTags.ProjectTask, id: taskIdOrKey },
       ],
     }),
+
     createProjectTask: builder.mutation<
       ProjectTaskIdAndKey,
       { projectIdOrKey: string; request: CreateProjectTaskRequest }
@@ -103,6 +106,7 @@ export const projectTasksApi = apiSlice.injectEndpoints({
         { type: QueryTags.ProjectTaskTree, id: `TREE-${projectIdOrKey}` },
       ],
     }),
+
     updateProjectTask: builder.mutation<
       void,
       {
@@ -130,6 +134,7 @@ export const projectTasksApi = apiSlice.injectEndpoints({
         { type: QueryTags.ProjectTaskTree, id: `TREE-${projectIdOrKey}` },
       ],
     }),
+
     patchProjectTask: builder.mutation<
       void,
       {
@@ -173,6 +178,7 @@ export const projectTasksApi = apiSlice.injectEndpoints({
         { type: QueryTags.ProjectTaskTree, id: `TREE-${projectIdOrKey}` },
       ],
     }),
+
     deleteProjectTask: builder.mutation<
       void,
       { projectIdOrKey: string; id: string }
@@ -194,17 +200,18 @@ export const projectTasksApi = apiSlice.injectEndpoints({
         { type: QueryTags.ProjectTaskTree, id: `TREE-${projectIdOrKey}` },
       ],
     }),
-    updateProjectTaskOrder: builder.mutation<
+
+    updateProjectTaskPlacement: builder.mutation<
       void,
       {
         projectIdOrKey: string
         id: string
-        request: UpdateProjectTaskOrderRequest
+        request: UpdateProjectTaskPlacementRequest
       }
     >({
       queryFn: async ({ projectIdOrKey, id, request }) => {
         try {
-          const data = await getProjectTasksClient().updateProjectTaskOrder(
+          const data = await getProjectTasksClient().updateProjectTaskPlacement(
             projectIdOrKey,
             id,
             request,
@@ -220,6 +227,7 @@ export const projectTasksApi = apiSlice.injectEndpoints({
         { type: QueryTags.ProjectTaskTree, id: `TREE-${projectIdOrKey}` },
       ],
     }),
+
     getCriticalPath: builder.query<string[], { projectIdOrKey: string }>({
       queryFn: async ({ projectIdOrKey }) => {
         try {
@@ -235,6 +243,7 @@ export const projectTasksApi = apiSlice.injectEndpoints({
         { type: QueryTags.ProjectCriticalPath, id: projectIdOrKey },
       ],
     }),
+
     addTaskDependency: builder.mutation<
       void,
       {
@@ -264,6 +273,7 @@ export const projectTasksApi = apiSlice.injectEndpoints({
         { type: QueryTags.ProjectCriticalPath, id: projectIdOrKey },
       ],
     }),
+
     removeTaskDependency: builder.mutation<
       void,
       {
@@ -293,6 +303,7 @@ export const projectTasksApi = apiSlice.injectEndpoints({
         { type: QueryTags.ProjectCriticalPath, id: projectIdOrKey },
       ],
     }),
+
     getTaskStatusOptions: builder.query<
       OptionModel<number>[],
       { forMilestone?: boolean } | void
@@ -331,6 +342,7 @@ export const projectTasksApi = apiSlice.injectEndpoints({
         ]
       },
     }),
+
     getTaskPriorityOptions: builder.query<OptionModel<number>[], void>({
       queryFn: async () => {
         try {
@@ -350,6 +362,7 @@ export const projectTasksApi = apiSlice.injectEndpoints({
       },
       providesTags: () => [{ type: QueryTags.TaskPriorityOptions, id: 'LIST' }],
     }),
+
     getTaskTypeOptions: builder.query<OptionModel<number>[], void>({
       queryFn: async () => {
         try {
@@ -369,6 +382,7 @@ export const projectTasksApi = apiSlice.injectEndpoints({
       },
       providesTags: () => [{ type: QueryTags.TaskTypeOptions, id: 'LIST' }],
     }),
+
     getParentTaskOptions: builder.query<
       Array<{
         value: string
@@ -431,7 +445,7 @@ export const {
   useUpdateProjectTaskMutation,
   usePatchProjectTaskMutation,
   useDeleteProjectTaskMutation,
-  useUpdateProjectTaskOrderMutation,
+  useUpdateProjectTaskPlacementMutation,
   useGetCriticalPathQuery,
   useAddTaskDependencyMutation,
   useRemoveTaskDependencyMutation,
