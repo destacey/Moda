@@ -45,9 +45,9 @@ public sealed record WorkItemDetailsDto : IMapFrom<WorkItem>
             .Map(dest => dest.CreatedBy, src => src.CreatedBy == null ? null : EmployeeNavigationDto.From(src.CreatedBy))
             .Map(dest => dest.LastModifiedBy, src => src.LastModifiedBy == null ? null : EmployeeNavigationDto.From(src.LastModifiedBy))
             .Map(dest => dest.Project, src => src.Project != null
-                ? WorkProjectNavigationDto.From(src.Project)
+                ? src.Project
                 : src.ParentProject != null
-                    ? WorkProjectNavigationDto.From(src.ParentProject)
+                    ? src.ParentProject
                     : null)
             .Map(dest => dest.ExternalViewWorkItemUrl, src => src.Workspace.ExternalViewWorkItemUrlTemplate == null ? null : $"{src.Workspace.ExternalViewWorkItemUrlTemplate}{src.ExternalId}");
     }

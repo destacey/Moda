@@ -5301,6 +5301,74 @@ export class ProjectsClient {
     }
 
     /**
+     * Change a project's key.
+     */
+    changeKey(id: string, request: ChangeProjectKeyRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/ppm/projects/{id}/key";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "PUT",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processChangeKey(_response);
+        });
+    }
+
+    protected processChangeKey(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 422) {
+            const _responseText = response.data;
+            let result422: any = null;
+            let resultData422  = _responseText;
+            result422 = JSON.parse(resultData422);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
      * Activate a project.
      */
     activate(id: string, cancelToken?: CancelToken): Promise<void> {
@@ -5558,6 +5626,940 @@ export class ProjectsClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
         return Promise.resolve<WorkItemListDto[]>(null as any);
+    }
+}
+
+export class ProjectTasksClient {
+    protected instance: AxiosInstance;
+    protected baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, instance?: AxiosInstance) {
+
+        this.instance = instance || axios.create();
+
+        this.baseUrl = baseUrl ?? "";
+
+    }
+
+    /**
+     * Get a list of project tasks.
+     * @param status (optional) 
+     * @param parentId (optional) 
+     */
+    getProjectTasks(projectIdOrKey: string, status?: number | null | undefined, parentId?: string | null | undefined, cancelToken?: CancelToken): Promise<ProjectTaskListDto[]> {
+        let url_ = this.baseUrl + "/api/ppm/projects/{projectIdOrKey}/tasks?";
+        if (projectIdOrKey === undefined || projectIdOrKey === null)
+            throw new globalThis.Error("The parameter 'projectIdOrKey' must be defined.");
+        url_ = url_.replace("{projectIdOrKey}", encodeURIComponent("" + projectIdOrKey));
+        if (status !== undefined && status !== null)
+            url_ += "status=" + encodeURIComponent("" + status) + "&";
+        if (parentId !== undefined && parentId !== null)
+            url_ += "parentId=" + encodeURIComponent("" + parentId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetProjectTasks(_response);
+        });
+    }
+
+    protected processGetProjectTasks(response: AxiosResponse): Promise<ProjectTaskListDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<ProjectTaskListDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ProjectTaskListDto[]>(null as any);
+    }
+
+    /**
+     * Create a project task.
+     */
+    createProjectTask(projectIdOrKey: string, request: CreateProjectTaskRequest, cancelToken?: CancelToken): Promise<ProjectTaskIdAndKey> {
+        let url_ = this.baseUrl + "/api/ppm/projects/{projectIdOrKey}/tasks";
+        if (projectIdOrKey === undefined || projectIdOrKey === null)
+            throw new globalThis.Error("The parameter 'projectIdOrKey' must be defined.");
+        url_ = url_.replace("{projectIdOrKey}", encodeURIComponent("" + projectIdOrKey));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processCreateProjectTask(_response);
+        });
+    }
+
+    protected processCreateProjectTask(response: AxiosResponse): Promise<ProjectTaskIdAndKey> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 201) {
+            const _responseText = response.data;
+            let result201: any = null;
+            let resultData201  = _responseText;
+            result201 = JSON.parse(resultData201);
+            return Promise.resolve<ProjectTaskIdAndKey>(result201);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 422) {
+            const _responseText = response.data;
+            let result422: any = null;
+            let resultData422  = _responseText;
+            result422 = JSON.parse(resultData422);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ProjectTaskIdAndKey>(null as any);
+    }
+
+    /**
+     * Get a hierarchical tree of project tasks with WBS codes.
+     */
+    getProjectTaskTree(projectIdOrKey: string, cancelToken?: CancelToken): Promise<ProjectTaskTreeDto[]> {
+        let url_ = this.baseUrl + "/api/ppm/projects/{projectIdOrKey}/tasks/tree";
+        if (projectIdOrKey === undefined || projectIdOrKey === null)
+            throw new globalThis.Error("The parameter 'projectIdOrKey' must be defined.");
+        url_ = url_.replace("{projectIdOrKey}", encodeURIComponent("" + projectIdOrKey));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetProjectTaskTree(_response);
+        });
+    }
+
+    protected processGetProjectTaskTree(response: AxiosResponse): Promise<ProjectTaskTreeDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<ProjectTaskTreeDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ProjectTaskTreeDto[]>(null as any);
+    }
+
+    /**
+     * Get project task details.
+     */
+    getProjectTask(projectIdOrKey: string, taskIdOrKey: string, cancelToken?: CancelToken): Promise<ProjectTaskDto> {
+        let url_ = this.baseUrl + "/api/ppm/projects/{projectIdOrKey}/tasks/{taskIdOrKey}";
+        if (projectIdOrKey === undefined || projectIdOrKey === null)
+            throw new globalThis.Error("The parameter 'projectIdOrKey' must be defined.");
+        url_ = url_.replace("{projectIdOrKey}", encodeURIComponent("" + projectIdOrKey));
+        if (taskIdOrKey === undefined || taskIdOrKey === null)
+            throw new globalThis.Error("The parameter 'taskIdOrKey' must be defined.");
+        url_ = url_.replace("{taskIdOrKey}", encodeURIComponent("" + taskIdOrKey));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetProjectTask(_response);
+        });
+    }
+
+    protected processGetProjectTask(response: AxiosResponse): Promise<ProjectTaskDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<ProjectTaskDto>(result200);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ProjectTaskDto>(null as any);
+    }
+
+    /**
+     * Update a project task.
+     */
+    updateProjectTask(projectIdOrKey: string, id: string, request: UpdateProjectTaskRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/ppm/projects/{projectIdOrKey}/tasks/{id}";
+        if (projectIdOrKey === undefined || projectIdOrKey === null)
+            throw new globalThis.Error("The parameter 'projectIdOrKey' must be defined.");
+        url_ = url_.replace("{projectIdOrKey}", encodeURIComponent("" + projectIdOrKey));
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "PUT",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processUpdateProjectTask(_response);
+        });
+    }
+
+    protected processUpdateProjectTask(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 422) {
+            const _responseText = response.data;
+            let result422: any = null;
+            let resultData422  = _responseText;
+            result422 = JSON.parse(resultData422);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Partially update a project task using JSON Patch (RFC 6902).
+     */
+    patchProjectTask(projectIdOrKey: string, id: string, patchDocument: JsonPatchDocumentOfUpdateProjectTaskRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/ppm/projects/{projectIdOrKey}/tasks/{id}";
+        if (projectIdOrKey === undefined || projectIdOrKey === null)
+            throw new globalThis.Error("The parameter 'projectIdOrKey' must be defined.");
+        url_ = url_.replace("{projectIdOrKey}", encodeURIComponent("" + projectIdOrKey));
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(patchDocument);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "PATCH",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processPatchProjectTask(_response);
+        });
+    }
+
+    protected processPatchProjectTask(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status === 422) {
+            const _responseText = response.data;
+            let result422: any = null;
+            let resultData422  = _responseText;
+            result422 = JSON.parse(resultData422);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Delete a project task.
+     */
+    deleteProjectTask(projectIdOrKey: string, id: string, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/ppm/projects/{projectIdOrKey}/tasks/{id}";
+        if (projectIdOrKey === undefined || projectIdOrKey === null)
+            throw new globalThis.Error("The parameter 'projectIdOrKey' must be defined.");
+        url_ = url_.replace("{projectIdOrKey}", encodeURIComponent("" + projectIdOrKey));
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "DELETE",
+            url: url_,
+            headers: {
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processDeleteProjectTask(_response);
+        });
+    }
+
+    protected processDeleteProjectTask(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Update a project task's placement within a parent.
+     */
+    updateProjectTaskPlacement(projectIdOrKey: string, id: string, request: UpdateProjectTaskPlacementRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/ppm/projects/{projectIdOrKey}/tasks/{id}/placement";
+        if (projectIdOrKey === undefined || projectIdOrKey === null)
+            throw new globalThis.Error("The parameter 'projectIdOrKey' must be defined.");
+        url_ = url_.replace("{projectIdOrKey}", encodeURIComponent("" + projectIdOrKey));
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "PUT",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processUpdateProjectTaskPlacement(_response);
+        });
+    }
+
+    protected processUpdateProjectTaskPlacement(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 422) {
+            const _responseText = response.data;
+            let result422: any = null;
+            let resultData422  = _responseText;
+            result422 = JSON.parse(resultData422);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Get the critical path for the project.
+     */
+    getCriticalPath(projectIdOrKey: string, cancelToken?: CancelToken): Promise<string[]> {
+        let url_ = this.baseUrl + "/api/ppm/projects/{projectIdOrKey}/tasks/critical-path";
+        if (projectIdOrKey === undefined || projectIdOrKey === null)
+            throw new globalThis.Error("The parameter 'projectIdOrKey' must be defined.");
+        url_ = url_.replace("{projectIdOrKey}", encodeURIComponent("" + projectIdOrKey));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetCriticalPath(_response);
+        });
+    }
+
+    protected processGetCriticalPath(response: AxiosResponse): Promise<string[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<string[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<string[]>(null as any);
+    }
+
+    /**
+     * Add a dependency to a task.
+     */
+    addTaskDependency(projectIdOrKey: string, id: string, request: AddTaskDependencyRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/ppm/projects/{projectIdOrKey}/tasks/{id}/dependencies";
+        if (projectIdOrKey === undefined || projectIdOrKey === null)
+            throw new globalThis.Error("The parameter 'projectIdOrKey' must be defined.");
+        url_ = url_.replace("{projectIdOrKey}", encodeURIComponent("" + projectIdOrKey));
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processAddTaskDependency(_response);
+        });
+    }
+
+    protected processAddTaskDependency(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 422) {
+            const _responseText = response.data;
+            let result422: any = null;
+            let resultData422  = _responseText;
+            result422 = JSON.parse(resultData422);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Remove a dependency from a task.
+     */
+    removeTaskDependency(projectIdOrKey: string, id: string, successorId: string, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/ppm/projects/{projectIdOrKey}/tasks/{id}/dependencies/{successorId}";
+        if (projectIdOrKey === undefined || projectIdOrKey === null)
+            throw new globalThis.Error("The parameter 'projectIdOrKey' must be defined.");
+        url_ = url_.replace("{projectIdOrKey}", encodeURIComponent("" + projectIdOrKey));
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        if (successorId === undefined || successorId === null)
+            throw new globalThis.Error("The parameter 'successorId' must be defined.");
+        url_ = url_.replace("{successorId}", encodeURIComponent("" + successorId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "DELETE",
+            url: url_,
+            headers: {
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processRemoveTaskDependency(_response);
+        });
+    }
+
+    protected processRemoveTaskDependency(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Get a list of all task types.
+     */
+    getTaskTypes( cancelToken?: CancelToken): Promise<ProjectTaskTypeDto[]> {
+        let url_ = this.baseUrl + "/api/ppm/projects/tasks/types";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetTaskTypes(_response);
+        });
+    }
+
+    protected processGetTaskTypes(response: AxiosResponse): Promise<ProjectTaskTypeDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<ProjectTaskTypeDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ProjectTaskTypeDto[]>(null as any);
+    }
+
+    /**
+     * Get a list of all task statuses.
+     */
+    getTaskStatuses( cancelToken?: CancelToken): Promise<TaskStatusDto[]> {
+        let url_ = this.baseUrl + "/api/ppm/projects/tasks/statuses";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetTaskStatuses(_response);
+        });
+    }
+
+    protected processGetTaskStatuses(response: AxiosResponse): Promise<TaskStatusDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<TaskStatusDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<TaskStatusDto[]>(null as any);
+    }
+
+    /**
+     * Get a list of all task priorities.
+     */
+    getTaskPriorities( cancelToken?: CancelToken): Promise<TaskPriorityDto[]> {
+        let url_ = this.baseUrl + "/api/ppm/projects/tasks/priorities";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetTaskPriorities(_response);
+        });
+    }
+
+    protected processGetTaskPriorities(response: AxiosResponse): Promise<TaskPriorityDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<TaskPriorityDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<TaskPriorityDto[]>(null as any);
     }
 }
 
@@ -17124,7 +18126,7 @@ export interface ProgramListDto {
 
 export interface ProjectListDto {
     id: string;
-    key: number;
+    key: string;
     name: string;
     status: LifecycleNavigationDto;
     start?: Date | undefined;
@@ -17213,7 +18215,7 @@ export interface UpdateProgramRequest {
 
 export interface ProjectDetailsDto {
     id: string;
-    key: number;
+    key: string;
     name: string;
     description: string;
     status: LifecycleNavigationDto;
@@ -17231,8 +18233,10 @@ export interface ProjectDetailsDto {
 export interface CreateProjectRequest {
     /** The name of the project. */
     name: string;
-    /** A detailed description of the project’s purpose. */
+    /** A detailed description of the project's purpose. */
     description: string;
+    /** The unique key for the project (2-20 uppercase alphanumeric characters). */
+    key: string;
     /** The ID of the expenditure category associated with the project. */
     expenditureCategoryId: number;
     /** The Project start date. */
@@ -17279,6 +18283,11 @@ export interface UpdateProjectRequest {
 export interface ChangeProjectProgramRequest {
     /** The new ProgramId to assign to the Project. If null the Program will be removed. */
     programId?: string | undefined;
+}
+
+export interface ChangeProjectKeyRequest {
+    /** The new key to assign to the Project (2-20 uppercase alphanumeric characters). */
+    key: string;
 }
 
 export interface WorkItemListDto {
@@ -17336,7 +18345,204 @@ export interface WorkIterationNavigationDto extends NavigationDto {
     team?: WorkTeamNavigationDto | undefined;
 }
 
-export interface WorkProjectNavigationDto extends NavigationDto {
+export interface WorkProjectNavigationDto {
+    id: string;
+    key: string;
+    name: string;
+}
+
+export interface ProjectTaskListDto {
+    id: string;
+    key: string;
+    projectId: string;
+    name: string;
+    type: SimpleNavigationDto;
+    status: SimpleNavigationDto;
+    priority: SimpleNavigationDto;
+    progress: number;
+    order: number;
+    parentId?: string | undefined;
+    parent?: ProjectTaskNavigationDto | undefined;
+    plannedStart?: Date | undefined;
+    plannedEnd?: Date | undefined;
+    plannedDate?: Date | undefined;
+    estimatedEffortHours?: number | undefined;
+}
+
+export interface ProjectTaskNavigationDto {
+    id: string;
+    key: string;
+    name: string;
+}
+
+export interface ProjectTaskTreeDto {
+    id: string;
+    key: string;
+    projectId: string;
+    name: string;
+    type: SimpleNavigationDto;
+    status: SimpleNavigationDto;
+    priority?: SimpleNavigationDto | undefined;
+    progress: number;
+    order: number;
+    parentId?: string | undefined;
+    wbs: string;
+    assignments: ProjectTaskAssignmentDto[];
+    plannedStart?: Date | undefined;
+    plannedEnd?: Date | undefined;
+    plannedDate?: Date | undefined;
+    estimatedEffortHours?: number | undefined;
+    children: ProjectTaskTreeDto[];
+}
+
+export interface ProjectTaskAssignmentDto {
+    employee: EmployeeNavigationDto;
+    role: SimpleNavigationDto;
+}
+
+export interface ProjectTaskDto {
+    id: string;
+    key: string;
+    projectId: string;
+    name: string;
+    description?: string | undefined;
+    type: SimpleNavigationDto;
+    status: SimpleNavigationDto;
+    priority: SimpleNavigationDto;
+    progress: number;
+    order: number;
+    parentId?: string | undefined;
+    parent?: ProjectTaskNavigationDto | undefined;
+    assignments: ProjectTaskAssignmentDto[];
+    plannedStart?: Date | undefined;
+    plannedEnd?: Date | undefined;
+    plannedDate?: Date | undefined;
+    estimatedEffortHours?: number | undefined;
+}
+
+export interface ProjectTaskIdAndKey {
+    id: string;
+    key: string;
+}
+
+export interface CreateProjectTaskRequest {
+    /** The name of the task. */
+    name: string;
+    /** A detailed description of the task (optional). */
+    description?: string | undefined;
+    /** The type of task (Task or Milestone). */
+    typeId: number;
+    /** The current status of the task. */
+    statusId: number;
+    /** The priority level of the task. */
+    priorityId: number;
+    /** The progress of the task (optional). Ranges from 0.0 to 100.0. Milestones can not update progress directly. */
+    progress: number;
+    /** The ID of the parent task (optional). */
+    parentId?: string | undefined;
+    /** The planned start date for the task (for tasks, not milestones). */
+    plannedStart?: Date | undefined;
+    /** The planned end date for the task (for tasks, not milestones). */
+    plannedEnd?: Date | undefined;
+    /** The planned date for a milestone (for milestones only). */
+    plannedDate: Date;
+    /** The estimated effort in hours (optional). */
+    estimatedEffortHours?: number | undefined;
+    /** The role-based assignments for this task (optional). */
+    assignments?: TaskRoleAssignmentRequest[] | undefined;
+}
+
+export interface TaskRoleAssignmentRequest {
+    /** The ID of the employee. */
+    employeeId: string;
+    /** The role of the assignment (Assignee or Reviewer). */
+    role: TaskRole;
+}
+
+export enum TaskRole {
+    Assignee = "Assignee",
+    Reviewer = "Reviewer",
+}
+
+export interface UpdateProjectTaskRequest {
+    /** The ID of the task. */
+    id: string;
+    /** The name of the task. */
+    name: string;
+    /** A detailed description of the task (optional). */
+    description?: string | undefined;
+    /** The current status of the task. */
+    statusId: number;
+    /** The priority level of the task. */
+    priorityId: number;
+    /** The progress of the task (optional). Ranges from 0.0 to 100.0. Milestones can not update progress directly. */
+    progress?: number | undefined;
+    /** The ID of the parent task (optional). */
+    parentId?: string | undefined;
+    /** The planned start date for the task. */
+    plannedStart?: Date | undefined;
+    /** The planned end date for the task. */
+    plannedEnd?: Date | undefined;
+    /** The planned date for a milestone. */
+    plannedDate?: Date | undefined;
+    /** The estimated effort in hours (optional). */
+    estimatedEffortHours?: number | undefined;
+    /** The role-based assignments for this task (optional). */
+    assignments?: TaskRoleAssignmentRequest[] | undefined;
+}
+
+export interface JsonPatchDocumentOfUpdateProjectTaskRequest {
+    operations: OperationOfUpdateProjectTaskRequest[] | undefined;
+}
+
+export interface OperationBase {
+    path: string | undefined;
+    op: string | undefined;
+    from: string | undefined;
+}
+
+export interface Operation extends OperationBase {
+    value?: any | undefined;
+}
+
+export interface OperationOfUpdateProjectTaskRequest extends Operation {
+}
+
+export interface UpdateProjectTaskPlacementRequest {
+    /** The ID of the task. */
+    taskId: string;
+    /** The ID of the new parent task. If null, the task will be moved to the root level. */
+    parentId?: string | undefined;
+    /** The new order/position of the task within its parent. */
+    order?: number | undefined;
+}
+
+export interface AddTaskDependencyRequest {
+    /** The ID of the predecessor task (the task that must complete first). */
+    predecessorId: string;
+    /** The ID of the successor task (the task that depends on the predecessor). */
+    successorId: string;
+}
+
+export interface ProjectTaskTypeDto {
+    id: number;
+    name: string;
+    description?: string | undefined;
+    order: number;
+}
+
+export interface TaskStatusDto {
+    id: number;
+    name: string;
+    description?: string | undefined;
+    order: number;
+}
+
+export interface TaskPriorityDto {
+    id: number;
+    name: string;
+    description?: string | undefined;
+    order: number;
 }
 
 export interface StrategicInitiativeDetailsDto {

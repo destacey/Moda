@@ -1,3 +1,4 @@
+using Moda.Common.Domain.Models.ProjectPortfolioManagement;
 using Moda.Tests.Shared.Data;
 using Moda.Work.Domain.Models;
 
@@ -8,7 +9,7 @@ public class WorkProjectFaker : PrivateConstructorFaker<WorkProject>
     public WorkProjectFaker()
     {
         RuleFor(x => x.Id, f => f.Random.Guid());
-        RuleFor(x => x.Key, f => f.Random.Int(1, 10000));
+        RuleFor(x => x.Key, f => new ProjectKey(f.Random.AlphaNumeric(5)));
         RuleFor(x => x.Name, f => f.Company.CompanyName());
         RuleFor(x => x.Description, f => f.Lorem.Sentence());
     }
@@ -22,7 +23,7 @@ public static class WorkProjectFakerExtensions
         return faker;
     }
 
-    public static WorkProjectFaker WithKey(this WorkProjectFaker faker, int key)
+    public static WorkProjectFaker WithKey(this WorkProjectFaker faker, ProjectKey key)
     {
         faker.RuleFor(x => x.Key, key);
         return faker;

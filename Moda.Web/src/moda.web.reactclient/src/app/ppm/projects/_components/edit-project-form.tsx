@@ -24,7 +24,7 @@ import { useMessage } from '@/src/components/contexts/messaging'
 const { Item } = Form
 
 export interface EditProjectFormProps {
-  projectKey: number
+  projectKey: string
   showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
@@ -134,7 +134,6 @@ const EditProjectForm = (props: EditProjectFormProps) => {
       messageApi.success(`Project updated successfully.`)
       return true
     } catch (error) {
-      console.error('update error', error)
       if (error.status === 422 && error.errors) {
         const formErrors = toFormErrors(error.errors)
         form.setFields(formErrors)
@@ -176,6 +175,7 @@ const EditProjectForm = (props: EditProjectFormProps) => {
 
   useEffect(() => {
     if (!projectData) return
+
     if (canUpdateProject) {
       setIsOpen(props.showForm)
       if (props.showForm) {
@@ -234,6 +234,7 @@ const EditProjectForm = (props: EditProjectFormProps) => {
         okText="Save"
         confirmLoading={isSaving}
         onCancel={handleCancel}
+        mask={{ blur: false }}
         maskClosable={false}
         keyboard={false} // disable esc key to close modal
         destroyOnHidden={true}

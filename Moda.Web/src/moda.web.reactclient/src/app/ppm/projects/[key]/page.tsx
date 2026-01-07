@@ -19,9 +19,11 @@ import ProjectDetailsLoading from './loading'
 import {
   ChangeProjectStatusForm,
   ChangeProjectProgramForm,
+  ChangeProjectKeyForm,
   DeleteProjectForm,
   EditProjectForm,
   ProjectDetails,
+  ProjectPlan,
 } from '../_components'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import { ItemType } from 'antd/es/menu/interface'
@@ -30,6 +32,7 @@ import { WorkItemsGrid } from '@/src/components/common/work'
 
 enum ProjectTabs {
   Details = 'details',
+  Plan = 'tasks',
   WorkItems = 'workItems',
 }
 
@@ -39,14 +42,19 @@ const tabs = [
     label: 'Details',
   },
   {
+    key: ProjectTabs.Plan,
+    label: 'Plan',
+  },
+  {
     key: ProjectTabs.WorkItems,
-    tab: 'Work Items',
+    label: 'Work Items',
   },
 ]
 
 enum ProjectAction {
   Edit = 'Edit',
   ChangeProgram = 'Change Program',
+  ChangeKey = 'Change Key',
   Delete = 'Delete',
   Activate = 'Activate',
   Complete = 'Complete',
@@ -54,15 +62,13 @@ enum ProjectAction {
 }
 
 const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
-  const { key } = use(props.params)
-  const projectKey = Number(key)
-
-  useDocumentTitle('Project Details')
+  const { key: projectKey } = use(props.params)
 
   const [activeTab, setActiveTab] = useState(ProjectTabs.Details)
   const [openEditProjectForm, setOpenEditProjectForm] = useState<boolean>(false)
   const [openChangeProgramForm, setOpenChangeProgramForm] =
     useState<boolean>(false)
+  const [openChangeKeyForm, setOpenChangeKeyForm] = useState<boolean>(false)
   const [openActivateProjectForm, setOpenActivateProjectForm] =
     useState<boolean>(false)
   const [openCompleteProjectForm, setOpenCompleteProjectForm] =
@@ -84,14 +90,14 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const {
     data: projectData,
     isLoading,
-    error,
     refetch: refetchProject,
   } = useGetProjectQuery(projectKey)
+
+  useDocumentTitle(`${projectKey} - Project Details`)
 
   const {
     data: workItemsData,
     isLoading: workItemsDataIsLoading,
-    error: workItemsDataError,
     refetch: refetchWorkItemsData,
   } = useGetProjectWorkItemsQuery(projectData?.id, { skip: !projectData?.id })
 
@@ -115,14 +121,17 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     dispatch(setBreadcrumbRoute({ route: breadcrumbRoute, pathname }))
   }, [dispatch, pathname, projectData])
 
-  useEffect(() => {
-    error && console.error(error)
-  }, [error])
-
   const renderTabContent = useCallback(() => {
     switch (activeTab) {
       case ProjectTabs.Details:
         return <ProjectDetails project={projectData} />
+      case ProjectTabs.Plan:
+        return (
+          <ProjectPlan
+            project={projectData}
+            canManageTasks={canUpdateProject}
+          />
+        )
       case ProjectTabs.WorkItems:
         return (
           <WorkItemsGrid
@@ -137,6 +146,7 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     }
   }, [
     activeTab,
+    canUpdateProject,
     projectData,
     refetchWorkItemsData,
     workItemsData,
@@ -181,6 +191,11 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
         key: 'change-program',
         label: ProjectAction.ChangeProgram,
         onClick: () => setOpenChangeProgramForm(true),
+      })
+      items.push({
+        key: 'change-key',
+        label: ProjectAction.ChangeKey,
+        onClick: () => setOpenChangeKeyForm(true),
       })
     }
     if (canDeleteProject && availableActions.includes(ProjectAction.Delete)) {
@@ -253,6 +268,20 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       }
     },
     [refetchProject],
+  )
+
+  const onChangeKeyFormClosed = useCallback(
+    (wasSaved: boolean, newKey?: string) => {
+      setOpenChangeKeyForm(false)
+      if (wasSaved) {
+        if (newKey && newKey !== projectData?.key) {
+          router.push(`/ppm/projects/${newKey}`)
+          return
+        }
+        refetchProject()
+      }
+    },
+    [projectData?.key, refetchProject, router],
   )
 
   const onActivateProjectFormClosed = useCallback(
@@ -345,6 +374,13 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
           showForm={openChangeProgramForm}
           onFormComplete={() => onChangeProgramFormClosed(true)}
           onFormCancel={() => onChangeProgramFormClosed(false)}
+        />
+      )}
+      {openChangeKeyForm && (
+        <ChangeProjectKeyForm
+          projectKey={projectData.key}
+          onFormComplete={(newKey) => onChangeKeyFormClosed(true, newKey)}
+          onFormCancel={() => onChangeKeyFormClosed(false)}
         />
       )}
       {openActivateProjectForm && (

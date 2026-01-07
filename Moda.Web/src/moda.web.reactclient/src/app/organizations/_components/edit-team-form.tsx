@@ -67,16 +67,9 @@ const EditTeamForm = ({ form, team }: EditTeamFormProps) => {
                 'The Code field is invalid. Uppercase letters and numbers only.',
             },
           ]}
+          normalize={(value) => (value ?? '').toUpperCase()}
         >
-          <Input
-            showCount
-            maxLength={10}
-            onInput={(e) =>
-              ((e.target as HTMLInputElement).value = (
-                e.target as HTMLInputElement
-              ).value.toUpperCase())
-            }
-          />
+          <Input showCount maxLength={10} />
         </Item>
         <Item name="description" label="Description" rules={[{ max: 1024 }]}>
           <MarkdownEditor

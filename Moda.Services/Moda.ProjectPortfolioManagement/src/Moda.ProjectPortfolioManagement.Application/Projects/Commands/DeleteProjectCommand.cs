@@ -59,7 +59,7 @@ internal sealed class DeleteProjectCommandHandler(IProjectPortfolioManagementDbC
 
             await _projectPortfolioManagementDbContext.SaveChangesAsync(cancellationToken);
 
-            _logger.LogInformation("Project {ProjectId} deleted. Key: {ProjectKey}, Name: {ProjectName}", project.Id, project.Key, project.Name);
+            _logger.LogInformation("Project {ProjectId} deleted. Key: {ProjectKey}, Name: {ProjectName}", project.Id, project.Key.Value, project.Name);
 
             return Result.Success();
         }

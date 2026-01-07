@@ -30,7 +30,7 @@ const ProjectsGrid: React.FC<ProjectsGridProps> = (
 
   const columnDefs = useMemo<ColDef<ProjectListDto>[]>(
     () => [
-      { field: 'key', width: 90 },
+      { field: 'key', width: 125 },
       {
         field: 'name',
         cellRenderer: ProjectLinkCellRenderer,

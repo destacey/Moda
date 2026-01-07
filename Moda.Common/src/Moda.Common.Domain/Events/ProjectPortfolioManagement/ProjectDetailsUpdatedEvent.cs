@@ -1,4 +1,5 @@
 ﻿using Moda.Common.Domain.Interfaces.ProjectPortfolioManagement;
+using Moda.Common.Domain.Models.ProjectPortfolioManagement;
 using NodaTime;
 
 namespace Moda.Common.Domain.Events.ProjectPortfolioManagement;
@@ -16,7 +17,7 @@ public sealed record ProjectDetailsUpdatedEvent : DomainEvent, ISimpleProject
     }
 
     public Guid Id { get; init; }
-    public int Key { get; init; }
+    public ProjectKey Key { get; init; }
     public string Name { get; init; }
     public string Description { get; init; }
     public int ExpenditureCategoryId { get; init; }

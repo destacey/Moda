@@ -52,9 +52,9 @@ public sealed record SprintBacklogItemDto : IMapFrom<WorkItem>
             .Map(dest => dest.Activated, src => src.ActivatedTimestamp)
             .Map(dest => dest.Done, src => src.DoneTimestamp)
             .Map(dest => dest.Project, src => src.Project != null
-                ? WorkProjectNavigationDto.From(src.Project)
+                ? src.Project
                 : src.ParentProject != null
-                    ? WorkProjectNavigationDto.From(src.ParentProject)
+                    ? src.ParentProject
                     : null)
             .Map(dest => dest.ExternalViewWorkItemUrl, src => src.Workspace.ExternalViewWorkItemUrlTemplate == null ? null : $"{src.Workspace.ExternalViewWorkItemUrlTemplate}{src.ExternalId}");
     }

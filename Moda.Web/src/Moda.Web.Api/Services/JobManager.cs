@@ -4,17 +4,26 @@ using Moda.Common.Application.Enums;
 using Moda.Common.Application.Exceptions;
 using Moda.Common.Application.Interfaces;
 using Moda.Organization.Application.Teams.Commands;
+using Moda.Organization.Application.Teams.Queries;
 using Moda.Planning.Application.Iterations.Queries;
+using Moda.Planning.Application.PlanningTeams.Commands;
+using Moda.ProjectPortfolioManagement.Application.PpmTeams.Commands;
 using Moda.ProjectPortfolioManagement.Application.Projects.Queries;
 using Moda.StrategicManagement.Application.StrategicThemes.Queries;
 using Moda.Web.Api.Interfaces;
 using Moda.Work.Application.WorkIterations.Commands;
 using Moda.Work.Application.WorkProjects.Commands;
+using Moda.Work.Application.WorkTeams.Commands;
 using PpmSyncStrategicThemesCommand = Moda.ProjectPortfolioManagement.Application.StrategicThemes.Commands.SyncStrategicThemesCommand;
 
 namespace Moda.Web.Api.Services;
 
-public class JobManager(ILogger<JobManager> logger, IEmployeeService employeeService, IAzureDevOpsBoardsSyncManager azdoBoardsSyncManager, ISender sender) : IJobManager
+public class JobManager(
+    ILogger<JobManager> logger, 
+    IEmployeeService employeeService, 
+    IAzureDevOpsBoardsSyncManager azdoBoardsSyncManager, 
+    ISender sender) 
+    : IJobManager
 {
     // TODO: does this belong in JobService/HangfireService?
 
@@ -60,14 +69,12 @@ public class JobManager(ILogger<JobManager> logger, IEmployeeService employeeSer
         if (teamNodesresult.IsFailure)
         {
             _logger.LogError("Failed to sync teams with graph tables: {Error}", teamNodesresult.Error);
-            throw new InternalServerException($"Failed to sync teams with graph tables. Error: {teamNodesresult.Error}");
         }
 
         var teamMembershipEdgesResult = await _sender.Send(new SyncTeamMembershipEdgesCommand(), cancellationToken);
         if (teamMembershipEdgesResult.IsFailure)
         {
             _logger.LogError("Failed to sync team memberships with graph tables: {Error}", teamMembershipEdgesResult.Error);
-            throw new InternalServerException($"Failed to sync team memberships with graph tables. Error: {teamMembershipEdgesResult.Error}");
         }
 
         _logger.LogInformation("Completed {BackgroundJob} job", nameof(RunSyncTeamsWithGraphTables));
@@ -84,7 +91,6 @@ public class JobManager(ILogger<JobManager> logger, IEmployeeService employeeSer
         if (result.IsFailure)
         {
             _logger.LogError("Failed to sync iterations: {Error}", result.Error);
-            throw new InternalServerException($"Failed to sync iterations. Error: {result.Error}");
         }
 
         _logger.LogInformation("Completed {BackgroundJob} job", nameof(RunSyncIterations));
@@ -102,7 +108,6 @@ public class JobManager(ILogger<JobManager> logger, IEmployeeService employeeSer
         if (result.IsFailure)
         {
             _logger.LogError("Failed to sync strategic themes: {Error}", result.Error);
-            throw new InternalServerException($"Failed to sync strategic themes. Error: {result.Error}");
         }
 
         _logger.LogInformation("Completed {BackgroundJob} job", nameof(RunSyncStrategicThemes));
@@ -119,8 +124,37 @@ public class JobManager(ILogger<JobManager> logger, IEmployeeService employeeSer
         if (result.IsFailure)
         {
             _logger.LogError("Failed to sync projects: {Error}", result.Error);
-            throw new InternalServerException($"Failed to sync projects. Error: {result.Error}");
         }
         _logger.LogInformation("Completed {BackgroundJob} job", nameof(RunSyncProjects));
+    }
+
+
+
+    [DisableConcurrentExecution(60 * 3)]
+    public async Task RunSyncTeams(CancellationToken cancellationToken)
+    {
+        _logger.LogInformation("Running {BackgroundJob} job", nameof(RunSyncTeams));
+
+        var teams = await _sender.Send(new GetSimpleTeamsQuery(), cancellationToken);
+
+        var planningSyncResult = await _sender.Send(new SyncPlanningTeamsCommand(teams), cancellationToken);
+        if (planningSyncResult.IsFailure)
+        {
+            _logger.LogError("Failed to sync planning teams: {Error}", planningSyncResult.Error);
+        }
+
+        var ppmSyncResult = await _sender.Send(new SyncPpmTeamsCommand(teams), cancellationToken);
+        if (ppmSyncResult.IsFailure)
+        {
+            _logger.LogError("Failed to sync PPM teams: {Error}", ppmSyncResult.Error);
+        }
+
+        var workSyncResult = await _sender.Send(new SyncWorkTeamsCommand(teams), cancellationToken);
+        if (workSyncResult.IsFailure)
+        {
+            _logger.LogError("Failed to sync work teams: {Error}", workSyncResult.Error);
+        }
+
+        _logger.LogInformation("Completed {BackgroundJob} job", nameof(RunSyncTeams));
     }
 }

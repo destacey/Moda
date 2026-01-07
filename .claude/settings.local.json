@@ -8,7 +8,9 @@
       "Bash(npm run lint:*)",
       "Bash(rm:*)",
       "Bash(dotnet build:*)",
-      "Bash(dotnet test:*)"
+      "Bash(dotnet test:*)",
+      "Bash(cat:*)",
+      "Bash(dotnet ef migrations add:*)"
     ],
     "deny": [],
     "ask": []

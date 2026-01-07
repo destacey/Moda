@@ -12,7 +12,7 @@ public sealed record ProjectDetailsDto : IMapFrom<Project>
     /// <summary>
     /// The unique key of the project.  This is an alternate key to the Id.
     /// </summary>
-    public int Key { get; set; }
+    public required string Key { get; set; }
 
     /// <summary>
     /// The name of the project.
@@ -77,6 +77,7 @@ public sealed record ProjectDetailsDto : IMapFrom<Project>
     public void ConfigureMapping(TypeAdapterConfig config)
     {
         config.NewConfig<Project, ProjectDetailsDto>()
+            .Map(dest => dest.Key, src => src.Key.Value)
             .Map(dest => dest.Status, src => LifecycleNavigationDto.FromEnum(src.Status))
             .Map(dest => dest.ExpenditureCategory, src => SimpleNavigationDto.Create(src.ExpenditureCategory!.Id, src.ExpenditureCategory.Name))
             .Map(dest => dest.Start, src => src.DateRange != null ? src.DateRange.Start : (LocalDate?)null)

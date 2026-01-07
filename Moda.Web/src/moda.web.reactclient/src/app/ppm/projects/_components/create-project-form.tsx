@@ -14,7 +14,7 @@ import {
 import { useCreateProjectMutation } from '@/src/store/features/ppm/projects-api'
 import { useGetStrategicThemeOptionsQuery } from '@/src/store/features/strategic-management/strategic-themes-api'
 import { toFormErrors } from '@/src/utils'
-import { DatePicker, Form, Modal, Select } from 'antd'
+import { DatePicker, Form, Input, Modal, Select } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
 import { useCallback, useEffect, useState } from 'react'
 
@@ -29,6 +29,7 @@ export interface CreateProjectFormProps {
 interface CreateProjectFormValues {
   portfolioId: string
   programId?: string
+  key: string
   name: string
   description: string
   expenditureCategoryId: number
@@ -46,6 +47,7 @@ const mapToRequestValues = (
   return {
     name: values.name,
     description: values.description,
+    key: values.key,
     expenditureCategoryId: values.expenditureCategoryId,
     start: (values.start as any)?.format('YYYY-MM-DD'),
     end: (values.end as any)?.format('YYYY-MM-DD'),
@@ -57,6 +59,8 @@ const mapToRequestValues = (
     strategicThemeIds: values.strategicThemeIds,
   } as CreateProjectRequest
 }
+
+const keyPattern = /^[A-Z0-9]{2,20}$/
 
 const CreateProjectForm = (props: CreateProjectFormProps) => {
   const [isOpen, setIsOpen] = useState(false)
@@ -216,6 +220,7 @@ const CreateProjectForm = (props: CreateProjectFormProps) => {
         okText="Create"
         confirmLoading={isSaving}
         onCancel={handleCancel}
+        mask={{ blur: false }}
         maskClosable={false}
         keyboard={false} // disable esc key to close modal
         destroyOnHidden={true}
@@ -243,6 +248,27 @@ const CreateProjectForm = (props: CreateProjectFormProps) => {
               options={programData ?? []}
               placeholder="Select Program"
               disabled={!form.getFieldValue('portfolioId')}
+            />
+          </Item>
+          <Item
+            name="key"
+            label="Key"
+            extra="2-20 uppercase alphanumeric characters (A-Z, 0-9)"
+            rules={[
+              { required: true, message: 'Key is required.' },
+              {
+                pattern: keyPattern,
+                message:
+                  'Key must be 2-20 uppercase alphanumeric characters (A-Z, 0-9).',
+              },
+            ]}
+            normalize={(value) => (value ?? '').toUpperCase()}
+          >
+            <Input
+              placeholder="Enter new key"
+              autoComplete="off"
+              showCount
+              maxLength={20}
             />
           </Item>
           <Item

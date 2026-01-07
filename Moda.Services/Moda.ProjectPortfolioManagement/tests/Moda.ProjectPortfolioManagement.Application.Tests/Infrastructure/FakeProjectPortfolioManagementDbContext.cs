@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Moda.Common.Domain.Employees;
 using Moda.Common.Domain.Identity;
-using Moda.ProjectPortfolioManagement.Application;
 using Moda.ProjectPortfolioManagement.Domain.Models;
 using Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 using Moda.Tests.Shared.Infrastructure;
@@ -21,6 +20,9 @@ public class FakeProjectPortfolioManagementDbContext : IProjectPortfolioManageme
     private readonly List<ProjectPortfolio> _portfolios = [];
     private readonly List<Program> _programs = [];
     private readonly List<Project> _projects = [];
+    private readonly List<ProjectTask> _projectTasks = [];
+    private readonly List<ProjectTaskDependency> _projectTaskDependencies = [];
+    private readonly List<PpmTeam> _ppmTeams = [];
     private readonly List<StrategicTheme> _ppmStrategicThemes = [];
     private readonly List<StrategicInitiative> _strategicInitiatives = [];
     
@@ -34,6 +36,9 @@ public class FakeProjectPortfolioManagementDbContext : IProjectPortfolioManageme
     public DbSet<ProjectPortfolio> Portfolios => _portfolios.AsDbSet();
     public DbSet<Program> Programs => _programs.AsDbSet();
     public DbSet<Project> Projects => _projects.AsDbSet();
+    public DbSet<ProjectTask> ProjectTasks => _projectTasks.AsDbSet();
+    public DbSet<ProjectTaskDependency> ProjectTaskDependencies => _projectTaskDependencies.AsDbSet();
+    public DbSet<PpmTeam> PpmTeams => _ppmTeams.AsDbSet();
     public DbSet<StrategicTheme> PpmStrategicThemes => _ppmStrategicThemes.AsDbSet();
     public DbSet<StrategicInitiative> StrategicInitiatives => _strategicInitiatives.AsDbSet();
     public DbSet<Employee> Employees => _employees.AsDbSet();
@@ -57,7 +62,8 @@ public class FakeProjectPortfolioManagementDbContext : IProjectPortfolioManageme
 
         // Return the total number of entities as a simple success indicator
         var count = _expenditureCategories.Count + _portfolios.Count + _programs.Count +
-                    _projects.Count + _ppmStrategicThemes.Count + _strategicInitiatives.Count +
+                    _projects.Count + _projectTasks.Count + _projectTaskDependencies.Count +
+                    _ppmTeams.Count + _ppmStrategicThemes.Count + _strategicInitiatives.Count +
                     _employees.Count + _externalEmployeeBlacklistItems.Count + _personalAccessTokens.Count;
         return Task.FromResult(count);
     }
@@ -89,7 +95,19 @@ public class FakeProjectPortfolioManagementDbContext : IProjectPortfolioManageme
     // Project
     public void AddProject(Project project) => _projects.Add(project);
     public void AddProjects(IEnumerable<Project> projects) => _projects.AddRange(projects);
-    
+
+    // ProjectTask
+    public void AddProjectTask(ProjectTask task) => _projectTasks.Add(task);
+    public void AddProjectTasks(IEnumerable<ProjectTask> tasks) => _projectTasks.AddRange(tasks);
+
+    // ProjectTaskDependency
+    public void AddProjectTaskDependency(ProjectTaskDependency dependency) => _projectTaskDependencies.Add(dependency);
+    public void AddProjectTaskDependencies(IEnumerable<ProjectTaskDependency> dependencies) => _projectTaskDependencies.AddRange(dependencies);
+
+    // PpmTeam
+    public void AddPpmTeam(PpmTeam team) => _ppmTeams.Add(team);
+    public void AddPpmTeams(IEnumerable<PpmTeam> teams) => _ppmTeams.AddRange(teams);
+
     // StrategicTheme (PPM)
     public void AddPpmStrategicTheme(StrategicTheme theme) => _ppmStrategicThemes.Add(theme);
     public void AddPpmStrategicThemes(IEnumerable<StrategicTheme> themes) => _ppmStrategicThemes.AddRange(themes);
@@ -112,6 +130,9 @@ public class FakeProjectPortfolioManagementDbContext : IProjectPortfolioManageme
         _portfolios.Clear();
         _programs.Clear();
         _projects.Clear();
+        _projectTasks.Clear();
+        _projectTaskDependencies.Clear();
+        _ppmTeams.Clear();
         _ppmStrategicThemes.Clear();
         _strategicInitiatives.Clear();
         _employees.Clear();

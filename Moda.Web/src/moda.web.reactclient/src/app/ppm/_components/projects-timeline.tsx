@@ -29,7 +29,7 @@ export interface ProjectsTimelineProps {
 
 interface ProjectTimelineItem extends ModaDataItem<ProjectListDto, string> {
   id: string
-  openProjectDrawer: (projectKey: number) => void
+  openProjectDrawer: (projectKey: string) => void
 }
 
 export const ProjectRangeItemTemplate: TimelineTemplate<
@@ -56,7 +56,7 @@ export const ProjectRangeItemTemplate: TimelineTemplate<
 
 const ProjectsTimeline: FC<ProjectsTimelineProps> = (props) => {
   const [drawerOpen, setDrawerOpen] = useState(false)
-  const [selectedItemKey, setSelectedItemKey] = useState<number | null>(null)
+  const [selectedItemKey, setSelectedItemKey] = useState<string | null>(null)
   const [showCurrentTime, setShowCurrentTime] = useState<boolean>(true)
   const { token } = useToken()
 
@@ -70,7 +70,7 @@ const ProjectsTimeline: FC<ProjectsTimelineProps> = (props) => {
   }, [])
 
   const openProjectDrawer = useCallback(
-    (projectKey: number) => {
+    (projectKey: string) => {
       setSelectedItemKey(projectKey)
       showDrawer()
     },
