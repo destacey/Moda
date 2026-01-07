@@ -4,6 +4,8 @@ import {
   CaretRightOutlined,
   DeleteOutlined,
   EditOutlined,
+  HolderOutlined,
+  LockOutlined,
   MoreOutlined,
 } from '@ant-design/icons'
 import { Button, DatePicker, Dropdown, Form, Input, Select, Tag } from 'antd'
@@ -15,8 +17,38 @@ import {
   setContainsFilter,
 } from './project-tasks-table.filters'
 import { dateSortBy } from './project-tasks-table.sorting'
+import { useDragHandle } from './project-task-sortable-row'
 
 const { Item: FormItem } = Form
+
+// Drag handle component that uses the context from the sortable row
+function DragHandleCell({ isDragEnabled }: { isDragEnabled: boolean }) {
+  const { listeners, attributes } = useDragHandle()
+
+  return (
+    <div
+      {...listeners}
+      {...attributes}
+      className={styles.dragHandle}
+      onClick={(e) => e.stopPropagation()}
+      title={
+        isDragEnabled
+          ? 'Drag to reorder or change parent'
+          : 'Drag and drop is disabled'
+      }
+      style={{
+        cursor: isDragEnabled ? 'grab' : 'not-allowed',
+        touchAction: 'none',
+      }}
+    >
+      {isDragEnabled ? (
+        <HolderOutlined style={{ fontSize: 14, color: '#8c8c8c' }} />
+      ) : (
+        <LockOutlined style={{ fontSize: 12, color: '#d9d9d9' }} />
+      )}
+    </div>
+  )
+}
 
 interface ProjectTasksTableColumnsParams {
   canManageTasks: boolean
@@ -33,6 +65,8 @@ interface ProjectTasksTableColumnsParams {
   taskStatusOptions: any[]
   taskStatusOptionsForMilestone: any[]
   taskPriorityOptions: any[]
+  isDragEnabled?: boolean
+  enableDragAndDrop?: boolean
 }
 
 export const getProjectTasksTableColumns = ({
@@ -46,8 +80,24 @@ export const getProjectTasksTableColumns = ({
   taskStatusOptions,
   taskStatusOptionsForMilestone,
   taskPriorityOptions,
+  isDragEnabled = false,
+  enableDragAndDrop = false,
 }: ProjectTasksTableColumnsParams): ColumnDef<ProjectTaskTreeDto>[] => {
   return [
+    ...(canManageTasks && enableDragAndDrop
+      ? [
+          {
+            id: 'dragHandle',
+            header: '',
+            size: 32,
+            enableSorting: false,
+            enableGlobalFilter: false,
+            enableColumnFilter: false,
+            enableExport: false,
+            cell: () => <DragHandleCell isDragEnabled={isDragEnabled} />,
+          } as ColumnDef<ProjectTaskTreeDto>,
+        ]
+      : []),
     ...(canManageTasks
       ? [
           {

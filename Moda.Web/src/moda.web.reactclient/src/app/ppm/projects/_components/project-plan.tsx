@@ -5,15 +5,15 @@ import { FC } from 'react'
 import { ProjectTasksTable } from '.'
 import { useGetProjectTaskTreeQuery } from '@/src/store/features/ppm/project-tasks-api'
 
-export interface ProjectTasksProps {
+export interface ProjectPlanProps {
   project: ProjectDetailsDto
   canManageTasks: boolean
 }
 
-const ProjectTasks: FC<ProjectTasksProps> = ({
+const ProjectPlan: FC<ProjectPlanProps> = ({
   project,
   canManageTasks,
-}: ProjectTasksProps) => {
+}: ProjectPlanProps) => {
   const {
     data: tasksData,
     isLoading: tasksDataIsLoading,
@@ -36,5 +36,5 @@ const ProjectTasks: FC<ProjectTasksProps> = ({
   )
 }
 
-export default ProjectTasks
+export default ProjectPlan
 

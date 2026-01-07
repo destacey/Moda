@@ -267,3 +267,26 @@
 .validationErrorField {
   font-weight: 500;
 }
+
+/* Drag and Drop Styles */
+.dragHandle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  transition: opacity 0.2s;
+}
+
+.dragHandle:hover {
+  opacity: 0.8;
+}
+
+.tr[data-dragging='true'] {
+  opacity: 0.4;
+  position: relative;
+  z-index: 999;
+}
+
+.tr[data-dragging='true'] .td {
+  background-color: var(--ant-color-fill-tertiary);
+}

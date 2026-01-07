@@ -30,6 +30,18 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 import { generateCsv, downloadCsvWithTimestamp } from '@/src/utils/csv-utils'
+import {
+  DndContext,
+  DragEndEvent,
+  DragStartEvent,
+  DragOverEvent,
+  useSensor,
+  useSensors,
+  PointerSensor,
+  KeyboardSensor,
+  closestCenter,
+} from '@dnd-kit/core'
+import { SortableContext } from '@dnd-kit/sortable'
 
 import { useMessage } from '@/src/components/contexts/messaging'
 import {
@@ -37,6 +49,7 @@ import {
   useGetTaskStatusOptionsQuery,
   useGetTaskTypeOptionsQuery,
   usePatchProjectTaskMutation,
+  useUpdateProjectTaskPlacementMutation,
 } from '@/src/store/features/ppm/project-tasks-api'
 
 import CreateProjectTaskForm from './create-project-task-form'
@@ -48,6 +61,16 @@ import ProjectTasksTableToolbar from './project-tasks-table-toolbar'
 import { getProjectTasksTableColumns } from './project-tasks-table.columns'
 import { useProjectTasksInlineEditing } from './project-tasks-table.inline-editing'
 import { stringContainsFilter } from './project-tasks-table.filters'
+import { ProjectTaskSortableRow } from './project-task-sortable-row'
+import {
+  flattenTree,
+  buildTree,
+  getProjection,
+  calculateOrderInParent,
+  updateTaskPlacement,
+  INDENTATION_WIDTH,
+  DRAG_ACTIVATION_DISTANCE,
+} from './project-task-tree-dnd-utils'
 
 const EMPTY_STRING_ARRAY: string[] = []
 
@@ -57,6 +80,7 @@ interface ProjectTasksTableProps {
   isLoading: boolean
   canManageTasks: boolean
   refetch: () => Promise<any>
+  enableDragAndDrop?: boolean
 }
 
 const ProjectTasksTable = ({
@@ -65,11 +89,10 @@ const ProjectTasksTable = ({
   isLoading,
   canManageTasks,
   refetch,
+  enableDragAndDrop = true,
 }: ProjectTasksTableProps) => {
   const [searchValue, setSearchValue] = useState('')
-  const [sorting, setSorting] = useState<SortingState>([
-    { id: 'wbs', desc: false },
-  ])
+  const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnSizing, setColumnSizing] = useState<ColumnSizingState>({})
   const [form] = Form.useForm()
@@ -81,6 +104,7 @@ const ProjectTasksTable = ({
     undefined,
   )
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
+  const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null)
   const messageApi = useMessage()
 
   const { data: taskStatusOptions = [] } = useGetTaskStatusOptionsQuery()
@@ -92,6 +116,22 @@ const ProjectTasksTable = ({
   const { data: taskTypeOptions = [] } = useGetTaskTypeOptionsQuery()
 
   const [patchProjectTask] = usePatchProjectTaskMutation()
+  const [updateProjectTaskPlacement] = useUpdateProjectTaskPlacementMutation()
+
+  // Flatten tree for drag-and-drop
+  const flattenedTasks = useMemo(() => {
+    return flattenTree(tasks)
+  }, [tasks])
+
+  // DnD sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: DRAG_ACTIVATION_DISTANCE,
+      },
+    }),
+    useSensor(KeyboardSensor),
+  )
 
   const handleUpdateTask = useCallback(
     async (taskId: string, updates: Partial<any>) => {
@@ -299,6 +339,15 @@ const ProjectTasksTable = ({
     return countProjectTasks(tasks)
   }, [tasks])
 
+  // Early calculation for isDragEnabled (before columns definition)
+  const hasFilters =
+    !!searchValue || columnFilters.length > 0 || sorting.length > 0
+  const isDragEnabled = useMemo(() => {
+    return (
+      enableDragAndDrop !== false && canManageTasks && !hasFilters && !isLoading
+    )
+  }, [enableDragAndDrop, canManageTasks, hasFilters, isLoading])
+
   const columns = useMemo<ColumnDef<ProjectTaskTreeDto>[]>(
     () =>
       getProjectTasksTableColumns({
@@ -312,6 +361,8 @@ const ProjectTasksTable = ({
         taskStatusOptions,
         taskStatusOptionsForMilestone,
         taskPriorityOptions,
+        isDragEnabled,
+        enableDragAndDrop,
       }),
     [
       canManageTasks,
@@ -324,6 +375,8 @@ const ProjectTasksTable = ({
       taskPriorityOptions,
       taskStatusOptions,
       taskStatusOptionsForMilestone,
+      isDragEnabled,
+      enableDragAndDrop,
     ],
   )
 
@@ -390,6 +443,134 @@ const ProjectTasksTable = ({
 
   const hasActiveFilters =
     !!searchValue || columnFilters.length > 0 || sorting.length > 0
+
+  // Drag handlers
+  const handleDragStart = useCallback(
+    (event: DragStartEvent) => {
+      console.log('DragStart:', {
+        activeId: event.active.id,
+        activeRect: event.active.rect,
+      })
+      setDraggedTaskId(event.active.id as string)
+      setSelectedRowId(null) // Cancel inline editing
+    },
+    [setSelectedRowId],
+  )
+
+  const handleDragOver = useCallback((event: DragOverEvent) => {
+    console.log('DragOver:', {
+      activeId: event.active.id,
+      overId: event.over?.id,
+      delta: event.delta,
+    })
+  }, [])
+
+  const handleDragEnd = useCallback(
+    async (event: DragEndEvent) => {
+      const { active, over, delta } = event
+
+      // Debug logging - log even if no valid drop
+      console.log('DragEnd:', {
+        activeId: active.id,
+        overId: over?.id,
+        hasOver: !!over,
+        deltaX: delta.x,
+        deltaY: delta.y,
+        indentationWidth: INDENTATION_WIDTH,
+      })
+
+      setDraggedTaskId(null)
+
+      if (!over) {
+        console.log('DragEnd: No valid drop target')
+        return
+      }
+
+      // Now that we've removed verticalListSortingStrategy, delta.x should work
+      const horizontalOffset = delta.x
+
+      // Allow dragging over self if there's horizontal movement (depth change)
+      const hasHorizontalMovement =
+        Math.abs(horizontalOffset) >= INDENTATION_WIDTH / 2
+
+      if (active.id === over.id && !hasHorizontalMovement) {
+        console.log('DragEnd: Same position, no depth change')
+        return
+      }
+
+      // Debug logging
+      console.log('DragEnd Processing:', {
+        activeId: active.id,
+        overId: over.id,
+        deltaX: delta.x,
+        deltaY: delta.y,
+        horizontalOffset,
+        hasHorizontalMovement,
+        indentationWidth: INDENTATION_WIDTH,
+      })
+
+      // Calculate projection using the tracked horizontal offset
+      const projection = getProjection(
+        flattenedTasks,
+        active.id as string,
+        over.id as string,
+        horizontalOffset,
+        INDENTATION_WIDTH,
+      )
+
+      console.log('Projection:', projection)
+
+      if (!projection.canDrop) {
+        messageApi.warning(
+          projection.reason || 'Cannot move task to this location',
+        )
+        return
+      }
+
+      // Calculate new order
+      const overIndex = flattenedTasks.findIndex((t) => t.id === over.id)
+      const newOrder = calculateOrderInParent(
+        flattenedTasks,
+        active.id as string,
+        overIndex,
+        projection.parentId,
+      )
+
+      console.log('API Call:', {
+        taskId: active.id,
+        parentId: projection.parentId ?? undefined,
+        order: newOrder,
+        depth: projection.depth,
+      })
+
+      // Call API with optimistic update approach
+      try {
+        await updateProjectTaskPlacement({
+          projectIdOrKey: projectKey,
+          id: active.id as string,
+          request: {
+            taskId: active.id as string,
+            parentId: projection.parentId ?? undefined,
+            order: newOrder,
+          },
+        }).unwrap()
+
+        // Refetch to ensure consistency
+        await refetch()
+      } catch (error: any) {
+        messageApi.error(
+          error?.data?.detail || 'Failed to move task. Please try again.',
+        )
+      }
+    },
+    [
+      flattenedTasks,
+      projectKey,
+      updateProjectTaskPlacement,
+      refetch,
+      messageApi,
+    ],
+  )
 
   const onExportCsv = useCallback(() => {
     const exportableColumns = columns.filter(
@@ -460,289 +641,313 @@ const ProjectTasksTable = ({
             onCreateTask={handleCreateTask}
           />
 
-          <div className={styles.tableWrapper}>
-            <table className={styles.tableElement}>
-              <colgroup>
-                {table.getVisibleLeafColumns().map((column) => (
-                  <col key={column.id} width={column.getSize()} />
-                ))}
-              </colgroup>
-              <thead>
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <Fragment key={headerGroup.id}>
-                    <tr key={headerGroup.id}>
-                      {headerGroup.headers.map((header) => {
-                        const canSort = header.column.getCanSort()
-                        const sortState = header.column.getIsSorted()
-                        const canResize = header.column.getCanResize()
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragStart={handleDragStart}
+            onDragOver={handleDragOver}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext items={flattenedTasks.map((t) => t.id)}>
+              <div className={styles.tableWrapper}>
+                <table className={styles.tableElement}>
+                  <colgroup>
+                    {table.getVisibleLeafColumns().map((column) => (
+                      <col key={column.id} width={column.getSize()} />
+                    ))}
+                  </colgroup>
+                  <thead>
+                    {table.getHeaderGroups().map((headerGroup) => (
+                      <Fragment key={headerGroup.id}>
+                        <tr key={headerGroup.id}>
+                          {headerGroup.headers.map((header) => {
+                            const canSort = header.column.getCanSort()
+                            const sortState = header.column.getIsSorted()
+                            const canResize = header.column.getCanResize()
 
-                        const sortIcon =
-                          sortState === 'asc' ? (
-                            <CaretUpOutlined />
-                          ) : sortState === 'desc' ? (
-                            <CaretDownOutlined />
-                          ) : null
+                            const sortIcon =
+                              sortState === 'asc' ? (
+                                <CaretUpOutlined />
+                              ) : sortState === 'desc' ? (
+                                <CaretDownOutlined />
+                              ) : null
 
-                        return (
-                          <th
-                            key={header.id}
-                            className={`${styles.th}${
-                              canSort ? ` ${styles.thSortable}` : ''
-                            }${canResize ? ` ${styles.thResizable}` : ''}`}
-                            onClick={
-                              canSort
-                                ? header.column.getToggleSortingHandler()
-                                : undefined
+                            return (
+                              <th
+                                key={header.id}
+                                className={`${styles.th}${
+                                  canSort ? ` ${styles.thSortable}` : ''
+                                }${canResize ? ` ${styles.thResizable}` : ''}`}
+                                onClick={
+                                  canSort
+                                    ? header.column.getToggleSortingHandler()
+                                    : undefined
+                                }
+                              >
+                                <span className={styles.thContent}>
+                                  {header.isPlaceholder
+                                    ? null
+                                    : flexRender(
+                                        header.column.columnDef.header,
+                                        header.getContext(),
+                                      )}
+                                  {sortIcon}
+                                </span>
+
+                                {canResize && (
+                                  <span
+                                    role="separator"
+                                    aria-orientation="vertical"
+                                    onMouseDown={header.getResizeHandler()}
+                                    onTouchStart={header.getResizeHandler()}
+                                    onDoubleClick={() =>
+                                      header.column.resetSize()
+                                    }
+                                    onClick={(e) => e.stopPropagation()}
+                                    className={`${styles.resizer}${
+                                      header.column.getIsResizing()
+                                        ? ` ${styles.resizerActive}`
+                                        : ''
+                                    }`}
+                                  />
+                                )}
+                              </th>
+                            )
+                          })}
+                        </tr>
+
+                        <tr
+                          key={`${headerGroup.id}-filters`}
+                          data-role="column-filters"
+                        >
+                          {headerGroup.headers.map((header) => {
+                            const column = header.column
+
+                            if (
+                              !column.getCanFilter() ||
+                              header.isPlaceholder
+                            ) {
+                              return (
+                                <th
+                                  key={`${header.id}-filter`}
+                                  className={styles.filterTh}
+                                />
+                              )
                             }
-                          >
-                            <span className={styles.thContent}>
-                              {header.isPlaceholder
-                                ? null
-                                : flexRender(
-                                    header.column.columnDef.header,
-                                    header.getContext(),
-                                  )}
-                              {sortIcon}
-                            </span>
 
-                            {canResize && (
-                              <span
-                                role="separator"
-                                aria-orientation="vertical"
-                                onMouseDown={header.getResizeHandler()}
-                                onTouchStart={header.getResizeHandler()}
-                                onDoubleClick={() => header.column.resetSize()}
+                            const colId = column.id
+                            const rawFilterValue = column.getFilterValue()
+                            const textValue = (rawFilterValue ?? '') as string
+                            const isSelect =
+                              colId === 'type' ||
+                              colId === 'status' ||
+                              colId === 'priority'
+                            const selectValue = (
+                              Array.isArray(rawFilterValue)
+                                ? rawFilterValue
+                                : emptyFilterArray
+                            ) as string[]
+                            const options =
+                              colId === 'type'
+                                ? taskTypeFilterOptions
+                                : colId === 'status'
+                                  ? taskStatusFilterOptions
+                                  : colId === 'priority'
+                                    ? taskPriorityFilterOptions
+                                    : []
+
+                            const numericRangePlaceholder =
+                              colId === 'progress' ||
+                              colId === 'estimatedEffortHours'
+                                ? 'e.g. >=10 or 2-6'
+                                : undefined
+
+                            return (
+                              <th
+                                key={`${header.id}-filter`}
+                                className={styles.filterTh}
                                 onClick={(e) => e.stopPropagation()}
-                                className={`${styles.resizer}${
-                                  header.column.getIsResizing()
-                                    ? ` ${styles.resizerActive}`
-                                    : ''
-                                }`}
-                              />
-                            )}
-                          </th>
-                        )
-                      })}
-                    </tr>
+                              >
+                                {isSelect ? (
+                                  <Select
+                                    size="small"
+                                    mode="multiple"
+                                    allowClear
+                                    maxTagCount={0}
+                                    maxTagPlaceholder={(values) => {
+                                      const labels = values
+                                        .map((v) =>
+                                          String(v.label ?? v.value ?? ''),
+                                        )
+                                        .filter(Boolean)
+                                      return labels.length === 1
+                                        ? labels[0]
+                                        : `${labels.length} selected`
+                                    }}
+                                    value={
+                                      selectValue.length
+                                        ? selectValue
+                                        : undefined
+                                    }
+                                    options={options}
+                                    suffixIcon={<FilterOutlined />}
+                                    popupMatchSelectWidth={false}
+                                    classNames={{
+                                      popup: {
+                                        root: styles.filterPopup,
+                                      },
+                                    }}
+                                    onChange={(v) =>
+                                      column.setFilterValue(
+                                        v && v.length ? v : undefined,
+                                      )
+                                    }
+                                    className={styles.filterControl}
+                                  />
+                                ) : (
+                                  <Input
+                                    size="small"
+                                    allowClear
+                                    placeholder={numericRangePlaceholder}
+                                    value={textValue}
+                                    onChange={(e) => {
+                                      const next = e.target.value
+                                      column.setFilterValue(
+                                        next ? next : undefined,
+                                      )
+                                    }}
+                                    className={styles.filterControl}
+                                  />
+                                )}
+                              </th>
+                            )
+                          })}
+                        </tr>
+                      </Fragment>
+                    ))}
+                  </thead>
+                  <tbody>
+                    {isLoading ? (
+                      <tr>
+                        <td
+                          colSpan={columns.length}
+                          className={`${styles.td} ${styles.loading}`}
+                        >
+                          <Spin />
+                        </td>
+                      </tr>
+                    ) : table.getRowModel().rows.length === 0 ? (
+                      <tr>
+                        <td
+                          colSpan={columns.length}
+                          className={`${styles.td} ${styles.empty}`}
+                        >
+                          <ModaEmpty message="No tasks found" />
+                        </td>
+                      </tr>
+                    ) : (
+                      table.getRowModel().rows.flatMap((row, index) => {
+                        const isSelected = selectedRowId === row.original.id
+                        const isDragging = draggedTaskId === row.original.id
+                        const rowElements = [
+                          <ProjectTaskSortableRow
+                            key={row.id}
+                            taskId={row.original.id}
+                            isDragEnabled={isDragEnabled}
+                            isDragging={isDragging}
+                            className={`${styles.tr}${index % 2 === 1 ? ` ${styles.trAlt}` : ''}${isSelected ? ` ${styles.trSelected}` : ''}`}
+                            onClick={(e) => {
+                              void handleRowClick(e, {
+                                rowId: row.original.id,
+                                isEditableColumn: (columnId) =>
+                                  editableColumns.includes(columnId),
+                                getClickedColumnId: (target) =>
+                                  target
+                                    .closest('td')
+                                    ?.getAttribute('data-column-id') ?? null,
+                              })
+                            }}
+                          >
+                            {row.getVisibleCells().map((cell) => {
+                              // Determine if this cell is editable when row is selected
+                              const editableCells = [
+                                'name',
+                                'status',
+                                'priority',
+                                'plannedStart',
+                                'plannedEnd',
+                              ]
+                              const isEditableCell =
+                                isSelected &&
+                                editableCells.includes(cell.column.id)
 
-                    <tr
-                      key={`${headerGroup.id}-filters`}
-                      data-role="column-filters"
-                    >
-                      {headerGroup.headers.map((header) => {
-                        const column = header.column
+                              return (
+                                <td
+                                  key={cell.id}
+                                  data-cell-id={`${row.original.id}-${cell.column.id}`}
+                                  data-column-id={cell.column.id}
+                                  className={`${styles.td}${isEditableCell ? ` ${styles.editableCell}` : ''}`}
+                                  onClick={(e) => {
+                                    // If clicking inside a form input/select, let it handle the click
+                                    const target = e.target as HTMLElement
+                                    if (
+                                      target.closest('input') ||
+                                      target.closest('.ant-select') ||
+                                      target.closest('.ant-picker')
+                                    ) {
+                                      e.stopPropagation()
+                                    }
+                                  }}
+                                >
+                                  {flexRender(
+                                    cell.column.columnDef.cell,
+                                    cell.getContext(),
+                                  )}
+                                </td>
+                              )
+                            })}
+                          </ProjectTaskSortableRow>,
+                        ]
 
-                        if (!column.getCanFilter() || header.isPlaceholder) {
-                          return (
-                            <th
-                              key={`${header.id}-filter`}
-                              className={styles.filterTh}
-                            />
+                        // Add error row if row is selected and has field errors
+                        if (isSelected && Object.keys(fieldErrors).length > 0) {
+                          const errorItems = Object.entries(fieldErrors).map(
+                            ([field, error]) => (
+                              <div
+                                key={field}
+                                className={styles.validationErrorItem}
+                              >
+                                <span className={styles.validationErrorField}>
+                                  {field}:
+                                </span>{' '}
+                                {error}
+                              </div>
+                            ),
+                          )
+
+                          rowElements.push(
+                            <tr
+                              key={`${row.id}-errors`}
+                              className={`${styles.tr} ${styles.validationErrorRow}`}
+                            >
+                              <td
+                                colSpan={columns.length}
+                                className={`${styles.td} ${styles.validationErrorCell}`}
+                              >
+                                {errorItems}
+                              </td>
+                            </tr>,
                           )
                         }
 
-                        const colId = column.id
-                        const rawFilterValue = column.getFilterValue()
-                        const textValue = (rawFilterValue ?? '') as string
-                        const isSelect =
-                          colId === 'type' ||
-                          colId === 'status' ||
-                          colId === 'priority'
-                        const selectValue = (
-                          Array.isArray(rawFilterValue)
-                            ? rawFilterValue
-                            : emptyFilterArray
-                        ) as string[]
-                        const options =
-                          colId === 'type'
-                            ? taskTypeFilterOptions
-                            : colId === 'status'
-                              ? taskStatusFilterOptions
-                              : colId === 'priority'
-                                ? taskPriorityFilterOptions
-                                : []
-
-                        const numericRangePlaceholder =
-                          colId === 'progress' ||
-                          colId === 'estimatedEffortHours'
-                            ? 'e.g. >=10 or 2-6'
-                            : undefined
-
-                        return (
-                          <th
-                            key={`${header.id}-filter`}
-                            className={styles.filterTh}
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            {isSelect ? (
-                              <Select
-                                size="small"
-                                mode="multiple"
-                                allowClear
-                                maxTagCount={0}
-                                maxTagPlaceholder={(values) => {
-                                  const labels = values
-                                    .map((v) =>
-                                      String(v.label ?? v.value ?? ''),
-                                    )
-                                    .filter(Boolean)
-                                  return labels.length === 1
-                                    ? labels[0]
-                                    : `${labels.length} selected`
-                                }}
-                                value={
-                                  selectValue.length ? selectValue : undefined
-                                }
-                                options={options}
-                                suffixIcon={<FilterOutlined />}
-                                popupMatchSelectWidth={false}
-                                classNames={{
-                                  popup: {
-                                    root: styles.filterPopup,
-                                  },
-                                }}
-                                onChange={(v) =>
-                                  column.setFilterValue(
-                                    v && v.length ? v : undefined,
-                                  )
-                                }
-                                className={styles.filterControl}
-                              />
-                            ) : (
-                              <Input
-                                size="small"
-                                allowClear
-                                placeholder={numericRangePlaceholder}
-                                value={textValue}
-                                onChange={(e) => {
-                                  const next = e.target.value
-                                  column.setFilterValue(next ? next : undefined)
-                                }}
-                                className={styles.filterControl}
-                              />
-                            )}
-                          </th>
-                        )
-                      })}
-                    </tr>
-                  </Fragment>
-                ))}
-              </thead>
-              <tbody>
-                {isLoading ? (
-                  <tr>
-                    <td
-                      colSpan={columns.length}
-                      className={`${styles.td} ${styles.loading}`}
-                    >
-                      <Spin />
-                    </td>
-                  </tr>
-                ) : table.getRowModel().rows.length === 0 ? (
-                  <tr>
-                    <td
-                      colSpan={columns.length}
-                      className={`${styles.td} ${styles.empty}`}
-                    >
-                      <ModaEmpty message="No tasks found" />
-                    </td>
-                  </tr>
-                ) : (
-                  table.getRowModel().rows.flatMap((row, index) => {
-                    const isSelected = selectedRowId === row.original.id
-                    const rowElements = [
-                      <tr
-                        key={row.id}
-                        className={`${styles.tr}${index % 2 === 1 ? ` ${styles.trAlt}` : ''}${isSelected ? ` ${styles.trSelected}` : ''}`}
-                        onClick={(e) => {
-                          void handleRowClick(e, {
-                            rowId: row.original.id,
-                            isEditableColumn: (columnId) =>
-                              editableColumns.includes(columnId),
-                            getClickedColumnId: (target) =>
-                              target
-                                .closest('td')
-                                ?.getAttribute('data-column-id') ?? null,
-                          })
-                        }}
-                      >
-                        {row.getVisibleCells().map((cell) => {
-                          // Determine if this cell is editable when row is selected
-                          const editableCells = [
-                            'name',
-                            'status',
-                            'priority',
-                            'plannedStart',
-                            'plannedEnd',
-                          ]
-                          const isEditableCell =
-                            isSelected && editableCells.includes(cell.column.id)
-
-                          return (
-                            <td
-                              key={cell.id}
-                              data-cell-id={`${row.original.id}-${cell.column.id}`}
-                              data-column-id={cell.column.id}
-                              className={`${styles.td}${isEditableCell ? ` ${styles.editableCell}` : ''}`}
-                              onClick={(e) => {
-                                // If clicking inside a form input/select, let it handle the click
-                                const target = e.target as HTMLElement
-                                if (
-                                  target.closest('input') ||
-                                  target.closest('.ant-select') ||
-                                  target.closest('.ant-picker')
-                                ) {
-                                  e.stopPropagation()
-                                }
-                              }}
-                            >
-                              {flexRender(
-                                cell.column.columnDef.cell,
-                                cell.getContext(),
-                              )}
-                            </td>
-                          )
-                        })}
-                      </tr>,
-                    ]
-
-                    // Add error row if row is selected and has field errors
-                    if (isSelected && Object.keys(fieldErrors).length > 0) {
-                      const errorItems = Object.entries(fieldErrors).map(
-                        ([field, error]) => (
-                          <div
-                            key={field}
-                            className={styles.validationErrorItem}
-                          >
-                            <span className={styles.validationErrorField}>
-                              {field}:
-                            </span>{' '}
-                            {error}
-                          </div>
-                        ),
-                      )
-
-                      rowElements.push(
-                        <tr
-                          key={`${row.id}-errors`}
-                          className={`${styles.tr} ${styles.validationErrorRow}`}
-                        >
-                          <td
-                            colSpan={columns.length}
-                            className={`${styles.td} ${styles.validationErrorCell}`}
-                          >
-                            {errorItems}
-                          </td>
-                        </tr>,
-                      )
-                    }
-
-                    return rowElements
-                  })
-                )}
-              </tbody>
-            </table>
-          </div>
+                        return rowElements
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </SortableContext>
+          </DndContext>
         </div>
       </Form>
 

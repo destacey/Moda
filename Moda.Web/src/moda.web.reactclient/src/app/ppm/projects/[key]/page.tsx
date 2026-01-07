@@ -23,16 +23,16 @@ import {
   DeleteProjectForm,
   EditProjectForm,
   ProjectDetails,
+  ProjectPlan,
 } from '../_components'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import { ItemType } from 'antd/es/menu/interface'
 import { ProjectStatusAction } from '../_components/change-project-status-form'
 import { WorkItemsGrid } from '@/src/components/common/work'
-import ProjectTasks from '../_components/project-tasks'
 
 enum ProjectTabs {
   Details = 'details',
-  Tasks = 'tasks',
+  Plan = 'tasks',
   WorkItems = 'workItems',
 }
 
@@ -42,8 +42,8 @@ const tabs = [
     label: 'Details',
   },
   {
-    key: ProjectTabs.Tasks,
-    label: 'Tasks',
+    key: ProjectTabs.Plan,
+    label: 'Plan',
   },
   {
     key: ProjectTabs.WorkItems,
@@ -125,9 +125,9 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     switch (activeTab) {
       case ProjectTabs.Details:
         return <ProjectDetails project={projectData} />
-      case ProjectTabs.Tasks:
+      case ProjectTabs.Plan:
         return (
-          <ProjectTasks
+          <ProjectPlan
             project={projectData}
             canManageTasks={canUpdateProject}
           />
