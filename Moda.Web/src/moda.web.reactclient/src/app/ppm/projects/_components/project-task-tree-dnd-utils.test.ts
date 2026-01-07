@@ -368,7 +368,13 @@ describe('project-task-tree-dnd-utils', () => {
       ]
 
       // Move task 1 over task 3 with no horizontal offset (same depth)
-      const projection = getProjection(flatItems, '1', '3', 0, INDENTATION_WIDTH)
+      const projection = getProjection(
+        flatItems,
+        '1',
+        '3',
+        0,
+        INDENTATION_WIDTH,
+      )
 
       expect(projection.depth).toBe(0)
       expect(projection.parentId).toBeNull()
@@ -393,17 +399,102 @@ describe('project-task-tree-dnd-utils', () => {
         },
       ]
 
-      // Move task 2 over task 1 with positive horizontal offset (make child of 1)
+      // Move task 2 over task 2 with positive horizontal offset
+      // (simulates dragging down after repositioning, looks backwards to find task 1)
       const projection = getProjection(
         flatItems,
         '2',
-        '1',
+        '2',
         INDENTATION_WIDTH,
         INDENTATION_WIDTH,
       )
 
       expect(projection.depth).toBe(1)
       expect(projection.parentId).toBe('1')
+      expect(projection.canDrop).toBe(true)
+    })
+
+    it('should make task 3 child of task 1 when hovering over task 1 and dragging right', () => {
+      // Scenario: 3 root-level tasks, drag task 3 upward toward task 1, indent right
+      // Due to dynamic row repositioning, collision reports task 2 (which shifted into position)
+      // Expected: Task 3 becomes child of Task 1 (found by looking backwards from task 2)
+      const flatItems: FlattenedProjectTask[] = [
+        {
+          ...createMockTask('1', 'Task 1'),
+          depth: 0,
+          parentId: null,
+          ancestorIds: [],
+          flatIndex: 0,
+        },
+        {
+          ...createMockTask('2', 'Task 2'),
+          depth: 0,
+          parentId: null,
+          ancestorIds: [],
+          flatIndex: 1,
+        },
+        {
+          ...createMockTask('3', 'Task 3'),
+          depth: 0,
+          parentId: null,
+          ancestorIds: [],
+          flatIndex: 2,
+        },
+      ]
+
+      // Drag task 3 toward task 1, but collision reports task 2 due to row shifting
+      const projection = getProjection(
+        flatItems,
+        '3', // activeId
+        '2', // overId - collision detects task 2 due to dynamic repositioning
+        INDENTATION_WIDTH, // drag right
+        INDENTATION_WIDTH,
+      )
+
+      expect(projection.depth).toBe(1)
+      expect(projection.parentId).toBe('1') // Looks backwards from task 2, finds task 1
+      expect(projection.canDrop).toBe(true)
+    })
+
+    it('should make task 3 child of task 2 when hovering over task 2 and dragging right', () => {
+      // Scenario: 3 root-level tasks, drag task 3 downward toward task 2, indent right
+      // Due to dynamic repositioning, collision reports task 3's new position
+      // Expected: Task 3 becomes child of Task 2 (found by looking backwards from task 3)
+      const flatItems: FlattenedProjectTask[] = [
+        {
+          ...createMockTask('1', 'Task 1'),
+          depth: 0,
+          parentId: null,
+          ancestorIds: [],
+          flatIndex: 0,
+        },
+        {
+          ...createMockTask('2', 'Task 2'),
+          depth: 0,
+          parentId: null,
+          ancestorIds: [],
+          flatIndex: 1,
+        },
+        {
+          ...createMockTask('3', 'Task 3'),
+          depth: 0,
+          parentId: null,
+          ancestorIds: [],
+          flatIndex: 2,
+        },
+      ]
+
+      // Drag task 3 toward task 2, collision reports task 3 after row shifting
+      const projection = getProjection(
+        flatItems,
+        '3', // activeId
+        '3', // overId - collision detects task 3's new position after repositioning
+        INDENTATION_WIDTH, // drag right
+        INDENTATION_WIDTH,
+      )
+
+      expect(projection.depth).toBe(1)
+      expect(projection.parentId).toBe('2') // Looks backwards from task 3, finds task 2
       expect(projection.canDrop).toBe(true)
     })
 
@@ -432,13 +523,14 @@ describe('project-task-tree-dnd-utils', () => {
         },
       ]
 
-      // Try to move parent (1) over its grandchild (1-1-1) with horizontal offset to become its child
-      // This would make 1 a child of 1-1-1, which is a descendant of 1 - circular reference
+      // Try to move parent (1) over its grandchild (1-1-1) with horizontal offset
+      // Looking backwards from 1-1-1 finds 1-1 at depth 1, which has 1 in its ancestors
+      // Validation should catch this circular reference
       const projection = getProjection(
         flatItems,
         '1',
         '1-1-1',
-        INDENTATION_WIDTH * 3, // Drag far right to attempt deep nesting
+        INDENTATION_WIDTH * 2, // Drag right to attempt nesting under 1-1
         INDENTATION_WIDTH,
       )
 
@@ -462,13 +554,21 @@ describe('project-task-tree-dnd-utils', () => {
           ancestorIds: [],
           flatIndex: 1,
         },
+        {
+          ...createMockTask('3', 'Task 3'),
+          depth: 0,
+          parentId: null,
+          ancestorIds: [],
+          flatIndex: 2,
+        },
       ]
 
-      // Try to make task 2 a child of milestone 1
+      // Try to make task 3 a child of milestone 1 by dragging over task 2 with right offset
+      // Looking backwards from task 2 finds milestone 1, validation should reject
       const projection = getProjection(
         flatItems,
+        '3',
         '2',
-        '1',
         INDENTATION_WIDTH,
         INDENTATION_WIDTH,
       )
@@ -830,3 +930,4 @@ describe('project-task-tree-dnd-utils', () => {
     })
   })
 })
+
