@@ -34,7 +34,7 @@ import {
   DndContext,
   DragEndEvent,
   DragStartEvent,
-  DragOverEvent,
+  DragCancelEvent,
   useSensor,
   useSensors,
   PointerSensor,
@@ -342,11 +342,16 @@ const ProjectTasksTable = ({
   // Early calculation for isDragEnabled (before columns definition)
   const hasFilters =
     !!searchValue || columnFilters.length > 0 || sorting.length > 0
+  const isEditing = selectedRowId !== null
   const isDragEnabled = useMemo(() => {
     return (
-      enableDragAndDrop !== false && canManageTasks && !hasFilters && !isLoading
+      enableDragAndDrop !== false &&
+      canManageTasks &&
+      !hasFilters &&
+      !isLoading &&
+      !isEditing
     )
-  }, [enableDragAndDrop, canManageTasks, hasFilters, isLoading])
+  }, [enableDragAndDrop, canManageTasks, hasFilters, isLoading, isEditing])
 
   const columns = useMemo<ColumnDef<ProjectTaskTreeDto>[]>(
     () =>
@@ -447,42 +452,19 @@ const ProjectTasksTable = ({
   // Drag handlers
   const handleDragStart = useCallback(
     (event: DragStartEvent) => {
-      console.log('DragStart:', {
-        activeId: event.active.id,
-        activeRect: event.active.rect,
-      })
       setDraggedTaskId(event.active.id as string)
       setSelectedRowId(null) // Cancel inline editing
     },
     [setSelectedRowId],
   )
 
-  const handleDragOver = useCallback((event: DragOverEvent) => {
-    console.log('DragOver:', {
-      activeId: event.active.id,
-      overId: event.over?.id,
-      delta: event.delta,
-    })
-  }, [])
-
   const handleDragEnd = useCallback(
     async (event: DragEndEvent) => {
       const { active, over, delta } = event
 
-      // Debug logging - log even if no valid drop
-      console.log('DragEnd:', {
-        activeId: active.id,
-        overId: over?.id,
-        hasOver: !!over,
-        deltaX: delta.x,
-        deltaY: delta.y,
-        indentationWidth: INDENTATION_WIDTH,
-      })
-
       setDraggedTaskId(null)
 
       if (!over) {
-        console.log('DragEnd: No valid drop target')
         return
       }
 
@@ -494,20 +476,8 @@ const ProjectTasksTable = ({
         Math.abs(horizontalOffset) >= INDENTATION_WIDTH / 2
 
       if (active.id === over.id && !hasHorizontalMovement) {
-        console.log('DragEnd: Same position, no depth change')
         return
       }
-
-      // Debug logging
-      console.log('DragEnd Processing:', {
-        activeId: active.id,
-        overId: over.id,
-        deltaX: delta.x,
-        deltaY: delta.y,
-        horizontalOffset,
-        hasHorizontalMovement,
-        indentationWidth: INDENTATION_WIDTH,
-      })
 
       // Calculate projection using the tracked horizontal offset
       const projection = getProjection(
@@ -517,8 +487,6 @@ const ProjectTasksTable = ({
         horizontalOffset,
         INDENTATION_WIDTH,
       )
-
-      console.log('Projection:', projection)
 
       if (!projection.canDrop) {
         messageApi.warning(
@@ -535,13 +503,6 @@ const ProjectTasksTable = ({
         overIndex,
         projection.parentId,
       )
-
-      console.log('API Call:', {
-        taskId: active.id,
-        parentId: projection.parentId ?? undefined,
-        order: newOrder,
-        depth: projection.depth,
-      })
 
       // Call API with optimistic update approach
       try {
@@ -571,6 +532,14 @@ const ProjectTasksTable = ({
       messageApi,
     ],
   )
+
+  const handleDragCancel = useCallback((event: DragCancelEvent) => {
+    setDraggedTaskId(null)
+    // Remove focus from the drag handle after cancel
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur()
+    }
+  }, [])
 
   const onExportCsv = useCallback(() => {
     const exportableColumns = columns.filter(
@@ -645,8 +614,8 @@ const ProjectTasksTable = ({
             sensors={sensors}
             collisionDetection={closestCenter}
             onDragStart={handleDragStart}
-            onDragOver={handleDragOver}
             onDragEnd={handleDragEnd}
+            onDragCancel={handleDragCancel}
           >
             <SortableContext items={flattenedTasks.map((t) => t.id)}>
               <div className={styles.tableWrapper}>

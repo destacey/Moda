@@ -945,9 +945,7 @@ public class ProjectTests
         result.IsSuccess.Should().BeTrue();
         child2.ParentId.Should().Be(newParent.Id);
         child1.Order.Should().Be(1); // Unchanged
-        // Note: ResetOrderForChildTasks is called before ChangeParent, so child3 keeps its relative order
-        // The remaining siblings (child1 and child3) maintain consecutive ordering
-        child3.Order.Should().Be(3); // Order maintained (reset happens before parent change)
+        child3.Order.Should().Be(2); // Order reset to be consecutive after child2 was moved
     }
 
     [Fact]

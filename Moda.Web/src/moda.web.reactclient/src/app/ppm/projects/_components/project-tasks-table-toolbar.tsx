@@ -9,7 +9,7 @@ import {
   ReloadOutlined,
   SearchOutlined,
 } from '@ant-design/icons'
-import { ProjectTasksKeyboardShortcutsContent } from './project-tasks-table.keyboard-shortcuts'
+import { ProjectTasksHelp } from './project-tasks-table.keyboard-shortcuts'
 
 const { Text } = Typography
 
@@ -92,12 +92,11 @@ const ProjectTasksTableToolbar = ({
           />
         </Tooltip>
         <Popover
-          content={<ProjectTasksKeyboardShortcutsContent />}
-          title="Keyboard Shortcuts"
+          content={<ProjectTasksHelp />}
           trigger="click"
           placement="bottomRight"
         >
-          <Tooltip title="Keyboard Shortcuts">
+          <Tooltip title="Grid Actions Help">
             <Button
               type="text"
               shape="circle"

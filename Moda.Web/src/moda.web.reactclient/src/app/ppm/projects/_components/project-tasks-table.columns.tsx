@@ -5,7 +5,6 @@ import {
   DeleteOutlined,
   EditOutlined,
   HolderOutlined,
-  LockOutlined,
   MoreOutlined,
 } from '@ant-design/icons'
 import { Button, DatePicker, Dropdown, Form, Input, Select, Tag } from 'antd'
@@ -25,27 +24,23 @@ const { Item: FormItem } = Form
 function DragHandleCell({ isDragEnabled }: { isDragEnabled: boolean }) {
   const { listeners, attributes } = useDragHandle()
 
+  if (!isDragEnabled) {
+    return null
+  }
+
   return (
     <div
       {...listeners}
       {...attributes}
       className={styles.dragHandle}
       onClick={(e) => e.stopPropagation()}
-      title={
-        isDragEnabled
-          ? 'Drag to reorder or change parent'
-          : 'Drag and drop is disabled'
-      }
+      title="Drag to reorder or change parent"
       style={{
-        cursor: isDragEnabled ? 'grab' : 'not-allowed',
+        cursor: 'grab',
         touchAction: 'none',
       }}
     >
-      {isDragEnabled ? (
-        <HolderOutlined style={{ fontSize: 14, color: '#8c8c8c' }} />
-      ) : (
-        <LockOutlined style={{ fontSize: 12, color: '#d9d9d9' }} />
-      )}
+      <HolderOutlined style={{ fontSize: 14, color: '#8c8c8c' }} />
     </div>
   )
 }

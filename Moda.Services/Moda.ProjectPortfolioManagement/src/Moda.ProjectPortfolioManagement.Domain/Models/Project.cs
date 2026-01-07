@@ -470,8 +470,6 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey<P
                 oldParent?.RemoveChild(task);
             }
 
-            ResetOrderForChildTasks(origParentId);
-
             // Update New Parent and Children
             foreach (var sibling in parentChildrenQuery.Where(t => t.Order >= newOrder))
             {
@@ -481,6 +479,9 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey<P
             changeResult = task.ChangeParent(parentId, newOrder);
 
             parentTask?.AddChild(task);
+
+            // Reset order for old parent's remaining children after the task has been moved
+            ResetOrderForChildTasks(origParentId);
         }
         else
         {

@@ -65,12 +65,10 @@ export function flattenTree(
       })
 
       if (task.children && task.children.length > 0) {
-        flatten(
-          task.children,
+        flatten(task.children, task.id, currentDepth + 1, [
+          ...currentAncestors,
           task.id,
-          currentDepth + 1,
-          [...currentAncestors, task.id],
-        )
+        ])
       }
     })
   }
@@ -90,13 +88,19 @@ export function buildTree(
   flatItems: FlattenedProjectTask[],
 ): ProjectTaskTreeDto[] {
   // Create a root pseudo-node to simplify logic
-  const root: ProjectTaskTreeDto & { id: string; children: ProjectTaskTreeDto[] } = {
+  const root: ProjectTaskTreeDto & {
+    id: string
+    children: ProjectTaskTreeDto[]
+  } = {
     id: '__root__',
     children: [],
   } as any
 
   // Create lookup map for all nodes
-  const nodes: Record<string, ProjectTaskTreeDto & { children: ProjectTaskTreeDto[] }> = {
+  const nodes: Record<
+    string,
+    ProjectTaskTreeDto & { children: ProjectTaskTreeDto[] }
+  > = {
     [root.id]: root,
   }
 
@@ -111,7 +115,8 @@ export function buildTree(
 
   // Build the node lookup and attach children to parents
   for (const item of items) {
-    const parentId = flatItems.find((f) => f.id === item.id)?.parentId ?? root.id
+    const parentId =
+      flatItems.find((f) => f.id === item.id)?.parentId ?? root.id
     const parent = nodes[parentId] ?? root
 
     nodes[item.id] = item
@@ -189,10 +194,17 @@ export function getProjection(
   // Calculate depth change from horizontal drag offset
   const dragDepth = Math.round(dragOffset / indentationWidth)
 
-  // Default behavior: if no horizontal drag, match the depth of the task being hovered over
-  // This makes the task a sibling at the same level
-  const defaultDepth = overTask.depth
-  const projectedDepth = dragDepth === 0 ? defaultDepth : activeTask.depth + dragDepth
+  // When no horizontal drag (dragDepth === 0):
+  // - Default to matching the overTask's depth (standard "insert as sibling" behavior)
+  // - BUT cap it to not exceed the activeTask's current depth unless user explicitly drags right
+  // This prevents accidentally nesting deeper when dropping on a nested child
+  let defaultDepth = overTask.depth
+  if (dragDepth === 0 && overTask.depth > activeTask.depth) {
+    // Don't auto-nest deeper than current level without explicit horizontal drag
+    defaultDepth = activeTask.depth
+  }
+  const projectedDepth =
+    dragDepth === 0 ? defaultDepth : activeTask.depth + dragDepth
 
   // Use the "over" item's context to determine depth constraints
   // The active item is being placed after/near the over item
@@ -204,9 +216,10 @@ export function getProjection(
   // - If dragged right (positive offset): A could become child of B (or previous sibling if B is self)
   // - If dragged left (negative offset): A moves to shallower depth
   // Special case: when dragging over self with positive offset, use previous item's depth
-  const referenceTask = activeId === overId && dragDepth > 0 && previousItem
-    ? previousItem
-    : overTask
+  const referenceTask =
+    activeId === overId && dragDepth > 0 && previousItem
+      ? previousItem
+      : overTask
   const maxDepth = referenceTask.depth + 1
   const minDepth = 0
 
@@ -229,17 +242,44 @@ export function getProjection(
       return overTask.parentId
     }
 
-    // If deeper than over task (depth = overTask.depth + 1), over task becomes parent
-    if (depth === overTask.depth + 1) {
-      return overTask.id
+    // If deeper than over task, we need to find a parent by looking backwards
+    // The parent should be the nearest task at (depth - 1) ABOVE the drop position
+    // This handles the case: drag Task 3 between Task 1 and Task 2, drag right
+    // → Task 1 should be the parent, not Task 2 (which we're hovering over)
+    if (depth > overTask.depth) {
+      // Look backwards to find the nearest task at the target parent depth
+      for (let i = overIndex - 1; i >= 0; i--) {
+        const item = items[i]
+        // Skip the active task itself
+        if (item.id === activeId) continue
+
+        // Found a task at the target parent depth
+        if (item.depth === depth - 1) {
+          return item.id
+        }
+        // If we've gone past the target depth without finding a match, stop
+        if (item.depth < depth - 1) {
+          break
+        }
+      }
+      return null
     }
 
-    // If shallower, find the nearest ancestor at target depth by going backwards
-    for (let i = overIndex - 1; i >= 0; i--) {
-      if (items[i].depth === depth - 1) {
-        return items[i].id
+    // If shallower than over task, we need to find the appropriate parent
+    // by looking backwards from the over position to find a task at (depth - 1)
+    // This handles the case where we're hovering over a deeply nested task
+    // but want to stay at a shallower level
+    for (let i = overIndex; i >= 0; i--) {
+      const item = items[i]
+      // Skip the active task itself
+      if (item.id === activeId) continue
+
+      // Found a task at the target parent depth
+      if (item.depth === depth - 1) {
+        return item.id
       }
-      if (items[i].depth < depth - 1) {
+      // If we've gone past the target depth without finding a match, stop
+      if (item.depth < depth - 1) {
         break
       }
     }
@@ -305,11 +345,13 @@ export function validateMove(
   // Check if target parent is a descendant of the active task
   // This prevents circular references (moving a parent into its own child)
   if (targetParent && 'ancestorIds' in targetParent) {
-    const targetAncestors = (targetParent as FlattenedProjectTask).ancestorIds || []
+    const targetAncestors =
+      (targetParent as FlattenedProjectTask).ancestorIds || []
     if (targetAncestors.includes(activeTask.id)) {
       return {
         canMove: false,
-        reason: 'Cannot move a parent task into its own children or descendants',
+        reason:
+          'Cannot move a parent task into its own children or descendants',
       }
     }
   }
@@ -351,15 +393,20 @@ export function calculateOrderInParent(
     return 1 // First (and only) item in parent
   }
 
+  // Find the active task's original position to determine drag direction
+  const activeIndex = flatItems.findIndex((item) => item.id === activeId)
+  const isDraggingDown = activeIndex < overIndex
+
   // Find the task we're hovering over
   const overTask = flatItems[overIndex]
 
-  // If we're hovering over a task with the same parent, insert before/after it
+  // If we're hovering over a task with the same parent
   if (overTask.parentId === parentId) {
     const overSiblingIndex = siblings.findIndex((s) => s.id === overTask.id)
     if (overSiblingIndex >= 0) {
-      // Insert right after the task we're hovering over
-      return overSiblingIndex + 2 // +1 for 1-based, +1 to insert after
+      // When dragging down, insert AFTER the hovered item
+      // When dragging up, insert BEFORE (at) the hovered item's position
+      return isDraggingDown ? overSiblingIndex + 2 : overSiblingIndex + 1
     }
   }
 
@@ -399,7 +446,9 @@ export function updateTaskPlacement(
       let newAncestorIds: string[] = []
       if (newParentId) {
         const parent = flatItems.find((f) => f.id === newParentId)
-        newAncestorIds = parent ? [...parent.ancestorIds, newParentId] : [newParentId]
+        newAncestorIds = parent
+          ? [...parent.ancestorIds, newParentId]
+          : [newParentId]
       }
 
       return {
@@ -412,3 +461,4 @@ export function updateTaskPlacement(
     return item
   })
 }
+

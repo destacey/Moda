@@ -62,7 +62,7 @@ internal sealed class UpdateProjectTaskPlacementCommandHandler(
                 return Result.Failure($"Project {request.ProjectId} not found.");
             }
 
-            var changeResult = project.ChangeTaskPlacement(request.TaskId, request.ParentId, null);
+            var changeResult = project.ChangeTaskPlacement(request.TaskId, request.ParentId, request.Order);
             if (changeResult.IsFailure)
             {
                 _logger.LogError("Error changing placement for task {TaskId}. Error: {Error}", request.TaskId, changeResult.Error);
