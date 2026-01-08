@@ -13,6 +13,8 @@ const config: Config = {
   collectCoverage: true,
   // Add more setup options before each test is run
   setupFilesAfterEnv: ['./src/jest.setup.ts'],
+  // Run tests serially to avoid race conditions in React 19
+  maxWorkers: 1,
   transform: {
     '^.+\\.(ts|tsx|js|jsx)$': [
       'ts-jest',

@@ -10,7 +10,11 @@
       "Bash(dotnet build:*)",
       "Bash(dotnet test:*)",
       "Bash(cat:*)",
-      "Bash(dotnet ef migrations add:*)"
+      "Bash(dotnet ef migrations add:*)",
+      "Bash(for:*)",
+      "Bash(do echo \"=== Run $i ===\")",
+      "Bash(done)",
+      "Bash(do npm test -- --silent)"
     ],
     "deny": [],
     "ask": []

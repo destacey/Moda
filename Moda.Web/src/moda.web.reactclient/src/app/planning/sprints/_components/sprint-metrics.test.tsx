@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import SprintMetrics from './sprint-metrics'
 import { IterationState, WorkStatusCategory } from '@/src/components/types'
@@ -180,10 +180,19 @@ describe('SprintMetrics', () => {
 
       render(<SprintMetrics sprint={mockSprint} backlog={backlog} />)
 
+      // Ensure component is fully rendered before interaction
+      await waitFor(() => {
+        expect(screen.getByTestId('value-Total')).toBeInTheDocument()
+      })
+
       const countOption = screen.getByText('Count')
       await user.click(countOption)
 
-      expect(screen.getByTestId('value-Total')).toHaveTextContent('3') // 3 items
+      // Wait for state updates to propagate in React 19
+      await waitFor(() => {
+        expect(screen.getByTestId('value-Total')).toHaveTextContent('3') // 3 items
+      })
+
       expect(screen.getByTestId('value-Velocity')).toHaveTextContent('1')
       expect(screen.getByTestId('value-In Progress')).toHaveTextContent('1')
       expect(screen.getByTestId('value-Not Started')).toHaveTextContent('1')
