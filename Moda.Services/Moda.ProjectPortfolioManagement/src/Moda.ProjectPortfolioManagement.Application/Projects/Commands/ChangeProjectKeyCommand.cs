@@ -25,13 +25,15 @@ public sealed class ChangeProjectKeyCommandValidator : AbstractValidator<ChangeP
 
 internal sealed class ChangeProjectKeyCommandHandler(
     IProjectPortfolioManagementDbContext projectPortfolioManagementDbContext,
-    ILogger<ChangeProjectKeyCommandHandler> logger)
+    ILogger<ChangeProjectKeyCommandHandler> logger,
+    IDateTimeProvider dateTimeProvider)
     : ICommandHandler<ChangeProjectKeyCommand>
 {
     private const string AppRequestName = nameof(ChangeProjectKeyCommand);
 
     private readonly IProjectPortfolioManagementDbContext _projectPortfolioManagementDbContext = projectPortfolioManagementDbContext;
     private readonly ILogger<ChangeProjectKeyCommandHandler> _logger = logger;
+    private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
 
     public async Task<Result> Handle(ChangeProjectKeyCommand request, CancellationToken cancellationToken)
     {
@@ -49,7 +51,7 @@ internal sealed class ChangeProjectKeyCommandHandler(
             var originalKey = project.Key;
             var newKey = request.Key;
 
-            var changeResult = project.ChangeKey(newKey);
+            var changeResult = project.ChangeKey(newKey, _dateTimeProvider.Now);
             if (changeResult.IsFailure)
             {
                 // Reset the entity
