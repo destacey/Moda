@@ -202,6 +202,34 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey<P
     }
 
     /// <summary>
+    /// Updates the project's key and cascades the change to all linked tasks by updating their task keys.
+    /// </summary>
+    public Result ChangeKey(ProjectKey key, Instant timestamp)
+    {
+        Guard.Against.Null(key, nameof(key));
+
+        if (Key.Value == key.Value)
+        {
+            return Result.Success();
+        }
+
+        Key = key;
+
+        AddDomainEvent(new ProjectDetailsUpdatedEvent(this, ExpenditureCategoryId, timestamp));
+
+        foreach (var task in _tasks)
+        {
+            var updateResult = task.UpdateProjectKey(Key);
+            if (updateResult.IsFailure)
+            {
+                return updateResult;
+            }
+        }
+
+        return Result.Success();
+    }
+
+    /// <summary>
     /// Updates the project's program association.
     /// </summary>
     /// <param name="program"></param>
@@ -551,8 +579,6 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey<P
         return Result.Success();
     }
 
-
-
     // TODO: this really belongs on the ProjectTask so a parent can reset its own children, but root tasks have no parent
     private void ResetOrderForChildTasks(Guid? parentId)
     {
@@ -607,31 +633,5 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey<P
             )));
 
         return project;
-    }
-
-    /// <summary>
-    /// Updates the project's key and cascades the change to all linked tasks by updating their task keys.
-    /// </summary>
-    public Result ChangeKey(ProjectKey key)
-    {
-        Guard.Against.Null(key, nameof(key));
-
-        if (Key.Value == key.Value)
-        {
-            return Result.Success();
-        }
-
-        Key = key;
-
-        foreach (var task in _tasks)
-        {
-            var updateResult = task.UpdateProjectKey(Key);
-            if (updateResult.IsFailure)
-            {
-                return updateResult;
-            }
-        }
-
-        return Result.Success();
     }
 }

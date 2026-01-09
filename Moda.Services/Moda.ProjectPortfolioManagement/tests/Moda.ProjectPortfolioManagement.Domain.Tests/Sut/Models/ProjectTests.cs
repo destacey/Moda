@@ -555,7 +555,7 @@ public class ProjectTests
         var newKey = new ProjectKey("NEWPROJ");
 
         // Act
-        var result = project.ChangeKey(newKey);
+        var result = project.ChangeKey(newKey, _dateTimeProvider.Now);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -571,7 +571,7 @@ public class ProjectTests
         var originalKey = project.Key;
 
         // Act
-        var result = project.ChangeKey(originalKey);
+        var result = project.ChangeKey(originalKey, _dateTimeProvider.Now);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -614,7 +614,7 @@ public class ProjectTests
         var newKey = new ProjectKey("NEWTASKS");
 
         // Act
-        var result = project.ChangeKey(newKey);
+        var result = project.ChangeKey(newKey, _dateTimeProvider.Now);
 
         // Assert
         result.IsSuccess.Should().BeTrue();

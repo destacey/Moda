@@ -1,10 +1,12 @@
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
+using Moda.Common.Application.Interfaces;
 using Moda.Common.Domain.Models.ProjectPortfolioManagement;
 using Moda.ProjectPortfolioManagement.Application.Projects.Commands;
 using Moda.ProjectPortfolioManagement.Application.Tests.Infrastructure;
 using Moda.ProjectPortfolioManagement.Domain.Enums;
 using Moda.ProjectPortfolioManagement.Domain.Tests.Data;
+using Moda.Tests.Shared;
 using Moq;
 
 namespace Moda.ProjectPortfolioManagement.Application.Tests.Sut.Projects.Commands;
@@ -14,6 +16,7 @@ public class ChangeProjectKeyCommandHandlerTests : IDisposable
     private readonly FakeProjectPortfolioManagementDbContext _dbContext;
     private readonly ChangeProjectKeyCommandHandler _handler;
     private readonly Mock<ILogger<ChangeProjectKeyCommandHandler>> _mockLogger;
+    private readonly IDateTimeProvider _dateTimeProvider;
 
     private readonly ProjectFaker _projectFaker;
 
@@ -21,8 +24,9 @@ public class ChangeProjectKeyCommandHandlerTests : IDisposable
     {
         _dbContext = new FakeProjectPortfolioManagementDbContext();
         _mockLogger = new Mock<ILogger<ChangeProjectKeyCommandHandler>>();
+        _dateTimeProvider = new TestingDateTimeProvider(new DateTime(2025, 3, 3));
 
-        _handler = new ChangeProjectKeyCommandHandler(_dbContext, _mockLogger.Object);
+        _handler = new ChangeProjectKeyCommandHandler(_dbContext, _mockLogger.Object, _dateTimeProvider);
 
         _projectFaker = new ProjectFaker();
     }

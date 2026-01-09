@@ -34,6 +34,7 @@ public class WorkProject : ISimpleProject, IHasIdAndKey<ProjectKey>
             throw new ArgumentException("Project ID mismatch when updating WorkProject details.", nameof(project));
         }
 
+        Key = project.Key;
         Name = project.Name;
         Description = project.Description;
     }
