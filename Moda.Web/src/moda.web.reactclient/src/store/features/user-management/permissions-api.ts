@@ -16,6 +16,8 @@ export const permissionsApi = apiSlice.injectEndpoints({
         }
       },
       providesTags: () => [{ type: QueryTags.Permission, id: 'LIST' }],
+      // Cache permissions for 5 minutes since they don't change except on new deployments
+      keepUnusedDataFor: 300,
     }),
   }),
 })
