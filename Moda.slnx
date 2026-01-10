@@ -121,5 +121,6 @@
     <File Path="Directory.Packages.props" />
     <File Path="README.md" />
   </Folder>
+  <Project Path="Moda.AppHost/Moda.AppHost.csproj" />
   <Project Path="Moda.ArchitectureTests/Moda.ArchitectureTests.csproj" />
 </Solution>
