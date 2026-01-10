@@ -6,33 +6,38 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Moda is a work management system used to plan, manage, and create associations across work items, projects, teams, planning and products. It uses Clean Architecture with Domain-Driven Design principles and a modular monolith approach with a shared database.
 
-Documentation: https://destacey.github.io/Moda
+Documentation: <https://destacey.github.io/Moda>
 
 ## Build and Test Commands
 
 ### .NET Backend
 
 **Build the entire solution:**
+
 ```bash
-dotnet build Moda.sln
+dotnet build Moda.slnx
 ```
 
 **Build a specific project:**
+
 ```bash
 dotnet build "Moda.Web/src/Moda.Web.Api/Moda.Web.Api.csproj"
 ```
 
 **Run all tests:**
+
 ```bash
-dotnet test Moda.sln
+dotnet test Moda.slnx
 ```
 
 **Run tests for a specific project:**
+
 ```bash
 dotnet test "Moda.Services/Moda.Work/tests/Moda.Work.Application.Tests/Moda.Work.Application.Tests.csproj"
 ```
 
 **Run tests with filters:**
+
 ```bash
 # Run specific test class
 dotnet test --filter "FullyQualifiedName~ProjectServiceTests"
@@ -48,12 +53,14 @@ dotnet test Moda.ArchitectureTests/Moda.ArchitectureTests.csproj
 ```
 
 **Run the API locally:**
+
 ```bash
 cd Moda.Web/src/Moda.Web.Api
 dotnet run
 ```
 
 **Database migrations (from repository root):**
+
 ```bash
 # Add new migration
 dotnet ef migrations add <MigrationName> --project "Moda.Infrastructure/src/Moda.Infrastructure.Migrators.MSSQL" --startup-project "Moda.Web/src/Moda.Web.Api"
@@ -89,20 +96,22 @@ npm test
 ### Docker
 
 **Run entire stack with Docker Compose:**
+
 ```bash
 docker compose up
 ```
 
 **Tear down containers:**
+
 ```bash
 docker compose down
 ```
 
 **Access points when running via Docker:**
 
-- API: https://localhost:5001 (Swagger: https://localhost:5001/swagger)
-- Client: http://localhost:5002
-- Seq (logs): http://localhost:8081
+- API: <https://localhost:5001> (Swagger: <https://localhost:5001/swagger>)
+- Client: <http://localhost:5002>
+- Seq (logs): <http://localhost:8081>
 
 ### VSCode Launch Configurations
 
@@ -312,7 +321,7 @@ API_SCOPE='{scope to attach to API requests; for AAD this is usually api://{clie
 API_BASE_URL='https://localhost:5001'
 ```
 
-2. Use User Secrets for API configuration (right-click `Moda.Web.Api` project → Manage User Secrets)
+1. Use User Secrets for API configuration (right-click `Moda.Web.Api` project → Manage User Secrets)
 
 ### Background Jobs
 
