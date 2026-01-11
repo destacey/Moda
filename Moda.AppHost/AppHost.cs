@@ -31,11 +31,8 @@ var modaClient = builder.AddJavaScriptApp("moda-client", "../Moda.Web/src/moda.w
     .WaitFor(modaApi)
     .WithHttpEndpoint(env: "PORT", port: 3000)
     .WithExternalHttpEndpoints()
-    .WithEnvironment("NEXT_PUBLIC_API_BASE_URL", modaApi.GetEndpoint("https"))
-    .WithEnvironment("OTEL_EXPORTER_OTLP_ENDPOINT", builder.Configuration["ASPIRE_DASHBOARD_OTLP_ENDPOINT_URL"] ?? "http://localhost:4317")
-    .WithEnvironment("OTEL_EXPORTER_OTLP_PROTOCOL", "grpc")
-    .WithEnvironment("OTEL_SERVICE_NAME", "moda-client")
-    .WithEnvironment("NEXT_OTEL_VERBOSE", "1")
-    .WithEnvironment("NODE_TLS_REJECT_UNAUTHORIZED", "0"); // Allow self-signed certs
+    .WithEnvironment("NEXT_PUBLIC_API_BASE_URL", modaApi.GetEndpoint("http"))
+    .WithEnvironment("NEXT_OTEL_VERBOSE", "1");
+    //.WithEnvironment("NODE_TLS_REJECT_UNAUTHORIZED", "0"); // Allow self-signed certs for local development.  not needed for http.
 
 builder.Build().Run();
