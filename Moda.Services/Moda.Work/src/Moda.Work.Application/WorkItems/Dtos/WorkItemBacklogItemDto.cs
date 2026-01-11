@@ -41,9 +41,9 @@ public sealed record WorkItemBacklogItemDto : IMapFrom<WorkItem>
             .Map(dest => dest.Sprint, src => src.Iteration != null && src.Iteration.Type == IterationType.Sprint ? src.Iteration : null)
             .Map(dest => dest.AssignedTo, src => src.AssignedTo == null ? null : EmployeeNavigationDto.From(src.AssignedTo))
             .Map(dest => dest.Project, src => src.Project != null
-                ? WorkProjectNavigationDto.From(src.Project)
+                ? src.Project
                 : src.ParentProject != null
-                    ? WorkProjectNavigationDto.From(src.ParentProject)
+                    ? src.ParentProject
                     : null)
             .Map(dest => dest.ExternalViewWorkItemUrl, src => src.Workspace.ExternalViewWorkItemUrlTemplate == null ? null : $"{src.Workspace.ExternalViewWorkItemUrlTemplate}{src.ExternalId}");
     }

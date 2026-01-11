@@ -114,7 +114,7 @@ const ChangeExpenditureCategoryStateForm = (
         keyboard={false} // disable esc key to close modal
         destroyOnHidden={true}
       >
-        <Space direction="vertical">
+        <Space vertical>
           <div>
             {props.expenditureCategory?.id} - {props.expenditureCategory?.name}
           </div>

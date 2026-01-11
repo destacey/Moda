@@ -11,11 +11,11 @@ namespace Moda.Infrastructure.Auth.PersonalAccessToken;
 /// <summary>
 /// Authentication handler for Personal Access Tokens (PATs).
 /// Checks the x-api-key header for valid tokens.
+/// Only attempts authentication when the x-api-key header is present to avoid
+/// unnecessary logging when users authenticate via other schemes (e.g., JWT/AzureAD).
 /// </summary>
 public class PersonalAccessTokenAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {
-    private const string ApiKeyHeaderName = "x-api-key";
-
     private readonly ModaDbContext _dbContext;
     private readonly ITokenHashingService _tokenHashingService;
     private readonly IDateTimeProvider _dateTimeProvider;
@@ -43,7 +43,9 @@ public class PersonalAccessTokenAuthenticationHandler : AuthenticationHandler<Au
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
     {
         // Check if the x-api-key header is present
-        if (!Request.Headers.TryGetValue(ApiKeyHeaderName, out var apiKeyHeaderValues))
+        // Return NoResult immediately if not - this prevents unnecessary logging
+        // about the scheme not being authenticated when users are using JWT/AzureAD
+        if (!Request.Headers.TryGetValue(AuthConstants.ApiKeyHeaderName, out var apiKeyHeaderValues))
         {
             return AuthenticateResult.NoResult();
         }
@@ -51,7 +53,8 @@ public class PersonalAccessTokenAuthenticationHandler : AuthenticationHandler<Au
         var providedToken = apiKeyHeaderValues.FirstOrDefault();
         if (string.IsNullOrWhiteSpace(providedToken))
         {
-            return AuthenticateResult.NoResult();
+            _logger.LogWarning("Personal access token header present but empty");
+            return AuthenticateResult.Fail("API key header present but empty.");
         }
 
         try

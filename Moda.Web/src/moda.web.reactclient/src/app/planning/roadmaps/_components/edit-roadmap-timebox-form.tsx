@@ -18,6 +18,7 @@ import { useMessage } from '@/src/components/contexts/messaging'
 
 const { Item } = Form
 const { TextArea } = Input
+const { RangePicker } = DatePicker
 
 export interface EditRoadmapTimeboxFormProps {
   showForm: boolean
@@ -31,8 +32,7 @@ interface EditRoadmapTimeboxFormValues {
   parentActivityId?: string
   name: string
   description?: string
-  start: Date
-  end: Date
+  range: any[]
   color?: string
 }
 
@@ -48,8 +48,8 @@ const mapToRequestValues = (
     parentId: values.parentActivityId,
     name: values.name,
     description: values.description,
-    start: (values.start as any)?.format('YYYY-MM-DD'),
-    end: (values.end as any)?.format('YYYY-MM-DD'),
+    start: (values.range?.[0] as any)?.format('YYYY-MM-DD'),
+    end: (values.range?.[1] as any)?.format('YYYY-MM-DD'),
     color: values.color,
   } as UpdateRoadmapTimeboxRequest
 }
@@ -97,8 +97,7 @@ const EditRoadmapTimeboxForm = (props: EditRoadmapTimeboxFormProps) => {
         parentActivityId: activity.parent?.id,
         name: activity.name,
         description: activity.description || '',
-        start: dayjs(activity.start),
-        end: dayjs(activity.end),
+        range: [dayjs(activity.start), dayjs(activity.end)],
         color: activity.color,
       })
     },
@@ -255,29 +254,30 @@ const EditRoadmapTimeboxForm = (props: EditRoadmapTimeboxFormProps) => {
               maxLength={2048}
             />
           </Item>
-          <Item name="start" label="Start" rules={[{ required: true }]}>
-            <DatePicker />
-          </Item>
           <Item
-            name="end"
-            label="End"
-            dependencies={['start']}
+            name="range"
+            label="Dates"
             rules={[
-              { required: true },
-              ({ getFieldValue }) => ({
-                validator(_, value) {
-                  const start = getFieldValue('start')
-                  if (!value || !start || start < value) {
-                    return Promise.resolve()
+              { required: true, message: 'Select start and end dates' },
+              {
+                validator: (_, value) => {
+                  if (!value || !value[0] || !value[1]) {
+                    return Promise.reject(
+                      new Error('Start and end dates are required'),
+                    )
                   }
-                  return Promise.reject(
-                    new Error('End date must be after start date'),
-                  )
+                  const [start, end] = value
+                  if (!start || !end || !start.isBefore(end)) {
+                    return Promise.reject(
+                      new Error('End date must be after start date'),
+                    )
+                  }
+                  return Promise.resolve()
                 },
-              }),
+              },
             ]}
           >
-            <DatePicker />
+            <RangePicker />
           </Item>
         </Form>
       </Modal>

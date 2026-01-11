@@ -1,9 +1,11 @@
 ﻿using FluentAssertions;
+using Moda.Common.Domain.Models.ProjectPortfolioManagement;
 using Moda.Common.Models;
 using Moda.ProjectPortfolioManagement.Domain.Enums;
 using Moda.ProjectPortfolioManagement.Domain.Models;
 using Moda.ProjectPortfolioManagement.Domain.Tests.Data;
 using Moda.Tests.Shared;
+using Moda.Tests.Shared.Extensions;
 using NodaTime.Extensions;
 using NodaTime.Testing;
 
@@ -30,16 +32,18 @@ public class ProjectTests
         // Arrange
         var name = "Test Project";
         var description = "Test Description";
+        var key = new ProjectKey("TEST");
         var portfolioId = Guid.NewGuid();
         var expenditureCategoryId = 1;
 
         // Act
-        var project = Project.Create(name, description, expenditureCategoryId, null, portfolioId, null, null, null, _dateTimeProvider.Now);
+        var project = Project.Create(name, description, key, expenditureCategoryId, null, portfolioId, null, null, null, _dateTimeProvider.Now);
 
         // Assert
         project.Should().NotBeNull();
         project.Name.Should().Be(name);
         project.Description.Should().Be(description);
+        project.Key.Value.Should().Be(key);
         project.Status.Should().Be(ProjectStatus.Proposed);
         project.ExpenditureCategoryId.Should().Be(expenditureCategoryId);
         project.PortfolioId.Should().Be(portfolioId);
@@ -539,4 +543,589 @@ public class ProjectTests
     }
 
     #endregion Strategic Theme Management
+
+    #region Key Management
+
+    [Fact]
+    public void ChangeKey_ShouldUpdateProjectKeySuccessfully()
+    {
+        // Arrange
+        var project = _projectFaker.Generate();
+        var originalKey = project.Key;
+        var newKey = new ProjectKey("NEWPROJ");
+
+        // Act
+        var result = project.ChangeKey(newKey, _dateTimeProvider.Now);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        project.Key.Should().Be(newKey);
+        project.Key.Should().NotBe(originalKey);
+    }
+
+    [Fact]
+    public void ChangeKey_ShouldBeNoOp_WhenKeyIsUnchanged()
+    {
+        // Arrange
+        var project = _projectFaker.Generate();
+        var originalKey = project.Key;
+
+        // Act
+        var result = project.ChangeKey(originalKey, _dateTimeProvider.Now);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        project.Key.Should().Be(originalKey);
+    }
+
+    [Fact]
+    public void ChangeKey_ShouldUpdateAllTaskKeys_WhenProjectHasTasks()
+    {
+        // Arrange
+        var project = _projectFaker.Generate();
+        var task1 = project.CreateTask(
+            nextNumber: 1,
+            name: "Task 1",
+            description: null,
+            type: ProjectTaskType.Task,
+            status: Enums.TaskStatus.NotStarted,
+            priority: TaskPriority.Medium,
+            progress: null,
+            parentId: null,
+            plannedDateRange: null,
+            plannedDate: null,
+            estimatedEffortHours: null,
+            assignments: null).Value;
+
+        var task2 = project.CreateTask(
+            nextNumber: 2,
+            name: "Task 2",
+            description: null,
+            type: ProjectTaskType.Task,
+            status: Enums.TaskStatus.NotStarted,
+            priority: TaskPriority.Medium,
+            progress: null,
+            parentId: null,
+            plannedDateRange: null,
+            plannedDate: null,
+            estimatedEffortHours: null,
+            assignments: null).Value;
+
+        var newKey = new ProjectKey("NEWTASKS");
+
+        // Act
+        var result = project.ChangeKey(newKey, _dateTimeProvider.Now);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        project.Key.Should().Be(newKey);
+
+        task1.Key.Value.Should().Be($"{newKey.Value}-1");
+        task2.Key.Value.Should().Be($"{newKey.Value}-2");
+    }
+
+    #endregion Key Management
+
+    #region ChangeTaskPlacement Tests
+
+    [Fact]
+    public void ChangeTaskPlacement_ShouldFail_WhenTaskNotFound()
+    {
+        // Arrange
+        var project = _projectFaker.Generate();
+        var nonExistentTaskId = Guid.NewGuid();
+
+        // Act
+        var result = project.ChangeTaskPlacement(nonExistentTaskId, null, null);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("Task not found.");
+    }
+
+    [Fact]
+    public void ChangeTaskPlacement_ShouldFail_WhenOrderIsZero()
+    {
+        // Arrange
+        var project = _projectFaker.Generate();
+        var tasks = project.WithTasks(1);
+        var task = tasks[0];
+
+        // Act
+        var result = project.ChangeTaskPlacement(task.Id, null, 0);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("Order must be greater than zero.");
+    }
+
+    [Fact]
+    public void ChangeTaskPlacement_ShouldFail_WhenOrderIsNegative()
+    {
+        // Arrange
+        var project = _projectFaker.Generate();
+        var tasks = project.WithTasks(1);
+        var task = tasks[0];
+
+        // Act
+        var result = project.ChangeTaskPlacement(task.Id, null, -1);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("Order must be greater than zero.");
+    }
+
+    [Fact]
+    public void ChangeTaskPlacement_ShouldFail_WhenNewParentNotFound()
+    {
+        // Arrange
+        var project = _projectFaker.Generate();
+        var tasks = project.WithTasks(1);
+        var task = tasks[0];
+        var nonExistentParentId = Guid.NewGuid();
+
+        // Act
+        var result = project.ChangeTaskPlacement(task.Id, nonExistentParentId, null);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("New parent task not found.");
+    }
+
+    [Fact]
+    public void ChangeTaskPlacement_ShouldFail_WhenNewParentIsMilestone()
+    {
+        // Arrange
+        var project = _projectFaker.Generate();
+        var tasks = project.WithTasks(2, (faker, i) =>
+        {
+            if (i == 1)
+            {
+                faker.WithData(type: ProjectTaskType.Milestone, plannedDate: _dateTimeProvider.Today.PlusDays(30));
+            }
+        });
+        var milestoneTask = tasks[0];
+        var regularTask = tasks[1];
+
+        // Act
+        var result = project.ChangeTaskPlacement(regularTask.Id, milestoneTask.Id, null);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("Milestones cannot have child tasks.");
+    }
+
+    [Fact]
+    public void ChangeTaskPlacement_ShouldSucceed_WhenMovingTaskToNewParent()
+    {
+        // Arrange
+        var project = _projectFaker.Generate();
+        var tasks = project.WithTasks(3);
+        var parentTask = tasks[0];
+        var taskToMove = tasks[1];
+
+        // Act
+        var result = project.ChangeTaskPlacement(taskToMove.Id, parentTask.Id, null);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        taskToMove.ParentId.Should().Be(parentTask.Id);
+        taskToMove.Order.Should().Be(1); // First child of new parent
+    }
+
+    [Fact]
+    public void ChangeTaskPlacement_ShouldSucceed_WhenMovingTaskToRoot()
+    {
+        // Arrange
+        var project = _projectFaker.Generate();
+        var parentTask = new ProjectTaskFaker()
+            .WithData(
+                id: Guid.NewGuid(),
+                projectId: project.Id,
+                key: new ProjectTaskKey(project.Key, 1),
+                order: 1)
+            .Generate();
+        project.AddToPrivateList("_tasks", parentTask);
+
+        var childTask = new ProjectTaskFaker()
+            .WithData(
+                id: Guid.NewGuid(),
+                projectId: project.Id,
+                key: new ProjectTaskKey(project.Key, 2),
+                order: 1,
+                parentId: parentTask.Id)
+            .Generate();
+        project.AddToPrivateList("_tasks", childTask);
+        parentTask.AddChild(childTask);
+
+        // Act
+        var result = project.ChangeTaskPlacement(childTask.Id, null, null);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        childTask.ParentId.Should().BeNull();
+    }
+
+    [Fact]
+    public void ChangeTaskPlacement_ShouldSucceed_WhenChangingOrderWithinSameParent_MovingUp()
+    {
+        // Arrange
+        var project = _projectFaker.Generate();
+        var tasks = project.WithTasks(3);
+        var task1 = tasks[0]; // Order 1
+        var task2 = tasks[1]; // Order 2
+        var task3 = tasks[2]; // Order 3
+
+        // Act - Move task3 to position 1
+        var result = project.ChangeTaskPlacement(task3.Id, null, 1);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        task3.Order.Should().Be(1);
+        task1.Order.Should().Be(2); // Shifted down
+        task2.Order.Should().Be(3); // Shifted down
+    }
+
+    [Fact]
+    public void ChangeTaskPlacement_ShouldSucceed_WhenChangingOrderWithinSameParent_MovingDown()
+    {
+        // Arrange
+        var project = _projectFaker.Generate();
+        var tasks = project.WithTasks(3);
+        var task1 = tasks[0]; // Order 1
+        var task2 = tasks[1]; // Order 2
+        var task3 = tasks[2]; // Order 3
+
+        // Act - Move task1 to position 3
+        var result = project.ChangeTaskPlacement(task1.Id, null, 3);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        task1.Order.Should().Be(3);
+        task2.Order.Should().Be(1); // Shifted up
+        task3.Order.Should().Be(2); // Shifted up
+    }
+
+    [Fact]
+    public void ChangeTaskPlacement_ShouldSucceed_WhenOrderIsNull_DefaultsToEnd()
+    {
+        // Arrange
+        var project = _projectFaker.Generate();
+        var parentTask = new ProjectTaskFaker()
+            .WithData(
+                id: Guid.NewGuid(),
+                projectId: project.Id,
+                key: new ProjectTaskKey(project.Key, 1),
+                order: 1)
+            .Generate();
+        project.AddToPrivateList("_tasks", parentTask);
+
+        var existingChild = new ProjectTaskFaker()
+            .WithData(
+                id: Guid.NewGuid(),
+                projectId: project.Id,
+                key: new ProjectTaskKey(project.Key, 2),
+                order: 1,
+                parentId: parentTask.Id)
+            .Generate();
+        project.AddToPrivateList("_tasks", existingChild);
+        parentTask.AddChild(existingChild);
+
+        var taskToMove = new ProjectTaskFaker()
+            .WithData(
+                id: Guid.NewGuid(),
+                projectId: project.Id,
+                key: new ProjectTaskKey(project.Key, 3),
+                order: 2)
+            .Generate();
+        project.AddToPrivateList("_tasks", taskToMove);
+
+        // Act - Move task to parent without specifying order
+        var result = project.ChangeTaskPlacement(taskToMove.Id, parentTask.Id, null);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        taskToMove.ParentId.Should().Be(parentTask.Id);
+        taskToMove.Order.Should().Be(2); // Added at the end
+    }
+
+    [Fact]
+    public void ChangeTaskPlacement_ShouldClampOrder_WhenOrderExceedsChildrenCount()
+    {
+        // Arrange
+        var project = _projectFaker.Generate();
+        var tasks = project.WithTasks(2);
+        var task1 = tasks[0];
+        var task2 = tasks[1];
+
+        // Act - Try to move task1 to position 10 (only 2 tasks exist)
+        var result = project.ChangeTaskPlacement(task1.Id, null, 10);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        task1.Order.Should().Be(2); // Clamped to max valid position
+    }
+
+    [Fact]
+    public void ChangeTaskPlacement_ShouldReturnSuccess_WhenNoChangeNeeded()
+    {
+        // Arrange
+        var project = _projectFaker.Generate();
+        var tasks = project.WithTasks(3);
+        var task2 = tasks[1]; // Order 2
+
+        // Act - Request same order
+        var result = project.ChangeTaskPlacement(task2.Id, null, 2);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        task2.Order.Should().Be(2);
+    }
+
+    [Fact]
+    public void ChangeTaskPlacement_ShouldUpdateOldParentChildren_WhenMovingToNewParent()
+    {
+        // Arrange
+        var project = _projectFaker.Generate();
+        var oldParent = new ProjectTaskFaker()
+            .WithData(
+                id: Guid.NewGuid(),
+                projectId: project.Id,
+                key: new ProjectTaskKey(project.Key, 1),
+                order: 1)
+            .Generate();
+        project.AddToPrivateList("_tasks", oldParent);
+
+        var child1 = new ProjectTaskFaker()
+            .WithData(
+                id: Guid.NewGuid(),
+                projectId: project.Id,
+                key: new ProjectTaskKey(project.Key, 2),
+                order: 1,
+                parentId: oldParent.Id)
+            .Generate();
+        project.AddToPrivateList("_tasks", child1);
+        oldParent.AddChild(child1);
+
+        var child2 = new ProjectTaskFaker()
+            .WithData(
+                id: Guid.NewGuid(),
+                projectId: project.Id,
+                key: new ProjectTaskKey(project.Key, 3),
+                order: 2,
+                parentId: oldParent.Id)
+            .Generate();
+        project.AddToPrivateList("_tasks", child2);
+        oldParent.AddChild(child2);
+
+        var child3 = new ProjectTaskFaker()
+            .WithData(
+                id: Guid.NewGuid(),
+                projectId: project.Id,
+                key: new ProjectTaskKey(project.Key, 4),
+                order: 3,
+                parentId: oldParent.Id)
+            .Generate();
+        project.AddToPrivateList("_tasks", child3);
+        oldParent.AddChild(child3);
+
+        var newParent = new ProjectTaskFaker()
+            .WithData(
+                id: Guid.NewGuid(),
+                projectId: project.Id,
+                key: new ProjectTaskKey(project.Key, 5),
+                order: 2)
+            .Generate();
+        project.AddToPrivateList("_tasks", newParent);
+
+        // Act - Move child2 from oldParent to newParent
+        var result = project.ChangeTaskPlacement(child2.Id, newParent.Id, null);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        child2.ParentId.Should().Be(newParent.Id);
+        child1.Order.Should().Be(1); // Unchanged
+        child3.Order.Should().Be(2); // Order reset to be consecutive after child2 was moved
+    }
+
+    [Fact]
+    public void ChangeTaskPlacement_ShouldMoveTaskToSpecificPosition_WhenMovingToNewParent()
+    {
+        // Arrange
+        var project = _projectFaker.Generate();
+        var newParent = new ProjectTaskFaker()
+            .WithData(
+                id: Guid.NewGuid(),
+                projectId: project.Id,
+                key: new ProjectTaskKey(project.Key, 1),
+                order: 1)
+            .Generate();
+        project.AddToPrivateList("_tasks", newParent);
+
+        var existingChild1 = new ProjectTaskFaker()
+            .WithData(
+                id: Guid.NewGuid(),
+                projectId: project.Id,
+                key: new ProjectTaskKey(project.Key, 2),
+                order: 1,
+                parentId: newParent.Id)
+            .Generate();
+        project.AddToPrivateList("_tasks", existingChild1);
+        newParent.AddChild(existingChild1);
+
+        var existingChild2 = new ProjectTaskFaker()
+            .WithData(
+                id: Guid.NewGuid(),
+                projectId: project.Id,
+                key: new ProjectTaskKey(project.Key, 3),
+                order: 2,
+                parentId: newParent.Id)
+            .Generate();
+        project.AddToPrivateList("_tasks", existingChild2);
+        newParent.AddChild(existingChild2);
+
+        var taskToMove = new ProjectTaskFaker()
+            .WithData(
+                id: Guid.NewGuid(),
+                projectId: project.Id,
+                key: new ProjectTaskKey(project.Key, 4),
+                order: 2)
+            .Generate();
+        project.AddToPrivateList("_tasks", taskToMove);
+
+        // Act - Move task to position 1 under newParent
+        var result = project.ChangeTaskPlacement(taskToMove.Id, newParent.Id, 1);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        taskToMove.ParentId.Should().Be(newParent.Id);
+        taskToMove.Order.Should().Be(1);
+        existingChild1.Order.Should().Be(2); // Shifted
+        existingChild2.Order.Should().Be(3); // Shifted
+    }
+
+    [Fact]
+    public void ChangeTaskPlacement_ShouldFail_WhenTaskIsItsOwnParent()
+    {
+        // Arrange
+        var project = _projectFaker.Generate();
+        var tasks = project.WithTasks(1);
+        var task = tasks[0];
+
+        // Act
+        var result = project.ChangeTaskPlacement(task.Id, task.Id, null);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("A task cannot be its own parent.");
+    }
+
+    [Fact]
+    public void ChangeTaskPlacement_ShouldFail_WhenMovingToDescendant()
+    {
+        // Arrange
+        var project = _projectFaker.Generate();
+        var parentTask = new ProjectTaskFaker()
+            .WithData(
+                id: Guid.NewGuid(),
+                projectId: project.Id,
+                key: new ProjectTaskKey(project.Key, 1),
+                order: 1)
+            .Generate();
+        project.AddToPrivateList("_tasks", parentTask);
+
+        var childTask = new ProjectTaskFaker()
+            .WithData(
+                id: Guid.NewGuid(),
+                projectId: project.Id,
+                key: new ProjectTaskKey(project.Key, 2),
+                order: 1,
+                parentId: parentTask.Id)
+            .Generate();
+        project.AddToPrivateList("_tasks", childTask);
+        parentTask.AddChild(childTask);
+
+        var grandchildTask = new ProjectTaskFaker()
+            .WithData(
+                id: Guid.NewGuid(),
+                projectId: project.Id,
+                key: new ProjectTaskKey(project.Key, 3),
+                order: 1,
+                parentId: childTask.Id)
+            .Generate();
+        project.AddToPrivateList("_tasks", grandchildTask);
+        childTask.AddChild(grandchildTask);
+
+        // Act - Try to move parent under its grandchild (circular reference)
+        var result = project.ChangeTaskPlacement(parentTask.Id, grandchildTask.Id, null);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("A task cannot be moved under one of its descendants.");
+    }
+
+    [Fact]
+    public void ChangeTaskPlacement_ShouldHandleSingleTask_WhenChangingOrder()
+    {
+        // Arrange
+        var project = _projectFaker.Generate();
+        var tasks = project.WithTasks(1);
+        var task = tasks[0];
+
+        // Act - Try to change order of only task
+        var result = project.ChangeTaskPlacement(task.Id, null, 1);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        task.Order.Should().Be(1);
+    }
+
+    [Fact]
+    public void ChangeTaskPlacement_ShouldMoveToMiddlePosition_WhenMovingUp()
+    {
+        // Arrange
+        var project = _projectFaker.Generate();
+        var tasks = project.WithTasks(5);
+        var task1 = tasks[0]; // Order 1
+        var task2 = tasks[1]; // Order 2
+        var task3 = tasks[2]; // Order 3
+        var task4 = tasks[3]; // Order 4
+        var task5 = tasks[4]; // Order 5
+
+        // Act - Move task5 to position 2
+        var result = project.ChangeTaskPlacement(task5.Id, null, 2);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        task1.Order.Should().Be(1); // Unchanged
+        task5.Order.Should().Be(2); // Moved here
+        task2.Order.Should().Be(3); // Shifted down
+        task3.Order.Should().Be(4); // Shifted down
+        task4.Order.Should().Be(5); // Shifted down
+    }
+
+    [Fact]
+    public void ChangeTaskPlacement_ShouldMoveToMiddlePosition_WhenMovingDown()
+    {
+        // Arrange
+        var project = _projectFaker.Generate();
+        var tasks = project.WithTasks(5);
+        var task1 = tasks[0]; // Order 1
+        var task2 = tasks[1]; // Order 2
+        var task3 = tasks[2]; // Order 3
+        var task4 = tasks[3]; // Order 4
+        var task5 = tasks[4]; // Order 5
+
+        // Act - Move task1 to position 4
+        var result = project.ChangeTaskPlacement(task1.Id, null, 4);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        task2.Order.Should().Be(1); // Shifted up
+        task3.Order.Should().Be(2); // Shifted up
+        task4.Order.Should().Be(3); // Shifted up
+        task1.Order.Should().Be(4); // Moved here
+        task5.Order.Should().Be(5); // Unchanged
+    }
+    #endregion ChangeTaskPlacement Tests
 }

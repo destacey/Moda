@@ -237,7 +237,7 @@ const PersonalAccessTokens: FC = () => {
   if (error) {
     return (
       <Alert
-        message="Error"
+        title="Error"
         description="Failed to load personal access tokens"
         type="error"
         showIcon
@@ -247,9 +247,9 @@ const PersonalAccessTokens: FC = () => {
 
   return (
     <Flex vertical gap={16}>
-      <Space direction="vertical" size={16}>
+      <Space vertical size={16}>
         <Alert
-          message="Personal Access Tokens (PATs)"
+          title="Personal Access Tokens (PATs)"
           description="Personal access tokens function like passwords for API authentication. Keep them secure and never share them. Each user can have up to 10 active tokens."
           type="info"
           showIcon

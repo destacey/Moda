@@ -171,7 +171,7 @@ const ChangeStrategicInitiativeStatusForm = (
         keyboard={false} // disable esc key to close modal
         destroyOnHidden={true}
       >
-        <Space direction="vertical">
+        <Space vertical>
           <div>
             {props.strategicInitiative?.key} - {props.strategicInitiative?.name}
           </div>

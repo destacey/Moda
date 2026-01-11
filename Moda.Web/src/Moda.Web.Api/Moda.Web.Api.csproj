@@ -14,6 +14,7 @@
         <PackageReference Include="CsvHelper" />
         <PackageReference Include="FluentValidation.AspNetCore" />
         <PackageReference Include="Hangfire.Console.Extensions.Serilog" />
+        <PackageReference Include="Microsoft.AspNetCore.JsonPatch.SystemTextJson" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

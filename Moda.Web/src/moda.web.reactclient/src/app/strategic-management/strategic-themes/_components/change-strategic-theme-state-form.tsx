@@ -127,7 +127,7 @@ const ChangeStrategicThemeStateForm = (
         keyboard={false} // disable esc key to close modal
         destroyOnHidden={true}
       >
-        <Space direction="vertical">
+        <Space vertical>
           <div>
             {props.strategicTheme?.key} - {props.strategicTheme?.name}
           </div>

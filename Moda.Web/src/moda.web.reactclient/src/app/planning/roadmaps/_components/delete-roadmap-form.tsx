@@ -26,6 +26,16 @@ const DeleteRoadmapForm = (props: DeleteRoadmapFormProps) => {
   const { hasPermissionClaim } = useAuth()
   const canDeleteRoadmap = hasPermissionClaim('Permissions.Roadmaps.Delete')
 
+  useEffect(() => {
+    if (!props.roadmap) return
+    if (canDeleteRoadmap) {
+      setIsOpen(props.showForm)
+    } else {
+      props.onFormCancel()
+      messageApi.error('You do not have permission to delete roadmaps.')
+    }
+  }, [canDeleteRoadmap, messageApi, props])
+
   const deleteRoadmap = async (roadmap: RoadmapDetailsDto) => {
     try {
       await deleteRoadmapMutation(roadmap.id)
@@ -62,16 +72,6 @@ const DeleteRoadmapForm = (props: DeleteRoadmapFormProps) => {
     setIsOpen(false)
     props.onFormCancel()
   }
-
-  useEffect(() => {
-    if (!props.roadmap) return
-    if (canDeleteRoadmap) {
-      setIsOpen(props.showForm)
-    } else {
-      props.onFormCancel()
-      messageApi.error('You do not have permission to delete roadmaps.')
-    }
-  }, [canDeleteRoadmap, messageApi, props])
 
   return (
     <>

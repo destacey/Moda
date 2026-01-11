@@ -1,3 +1,4 @@
+import { User } from './../../components/contexts/auth/types.d'
 export enum QueryTags {
   // ADMIN
   BackgroundJob = 'Admin.BackgroundJob',
@@ -67,7 +68,14 @@ export enum QueryTags {
   Program = 'Ppm.Program',
   ProgramProjects = 'Ppm.Program.Projects',
   Project = 'Ppm.Project',
+  ProjectTask = 'Ppm.Project.Task',
+  ProjectTaskTree = 'Ppm.Project.TaskTree',
+  ProjectTaskDependency = 'Ppm.Project.TaskDependency',
+  ProjectCriticalPath = 'Ppm.Project.CriticalPath',
   ProjectWorkItems = 'Ppm.Project.WorkItems',
+  TaskStatusOptions = 'Ppm.Project.Task.StatusOptions',
+  TaskPriorityOptions = 'Ppm.Project.Task.PriorityOptions',
+  TaskTypeOptions = 'Ppm.Project.Task.TypeOptions',
   StrategicInitiative = 'Ppm.StrategicInitiative',
   StrategicInitiativeKpi = 'Ppm.StrategicInitiativeKpi',
   StrategicInitiativeKpiCheckpoint = 'Ppm.StrategicInitiativeKpiCheckpoint',
@@ -82,6 +90,7 @@ export enum QueryTags {
 
   // USER MANAGEMENT
   User = 'UserManagement.User',
+  UserPermission = 'UserManagement.UserPermission',
   UserRole = 'UserManagement.UserRole',
   Role = 'UserManagement.Role',
   Permission = 'UserManagement.Permission',

@@ -1,4 +1,4 @@
-﻿using Moda.ProjectPortfolioManagement.Application.Portfolios.Command;
+﻿using Moda.Common.Domain.Models.ProjectPortfolioManagement;
 using Moda.ProjectPortfolioManagement.Application.Projects.Commands;
 
 namespace Moda.Web.Api.Models.Ppm.Projects;
@@ -11,9 +11,14 @@ public sealed record CreateProjectRequest
     public string Name { get; set; } = default!;
 
     /// <summary>
-    /// A detailed description of the project’s purpose.
+    /// A detailed description of the project's purpose.
     /// </summary>
     public string Description { get; set; } = default!;
+
+    /// <summary>
+    /// The unique key for the project (2-20 uppercase alphanumeric characters).
+    /// </summary>
+    public string Key { get; set; } = default!;
 
     /// <summary>
     /// The ID of the expenditure category associated with the project.
@@ -64,7 +69,7 @@ public sealed record CreateProjectRequest
     {
         var dateRange = Start is null || End is null ? null : new LocalDateRange((LocalDate)Start, (LocalDate)End);
 
-        return new CreateProjectCommand(Name, Description, ExpenditureCategoryId, dateRange, PortfolioId, ProgramId, SponsorIds, OwnerIds, ManagerIds, StrategicThemeIds);
+        return new CreateProjectCommand(Name, Description, new ProjectKey(Key), ExpenditureCategoryId, dateRange, PortfolioId, ProgramId, SponsorIds, OwnerIds, ManagerIds, StrategicThemeIds);
     }
 }
 
@@ -79,6 +84,11 @@ public sealed class CreateProjectRequestValidator : CustomValidator<CreateProjec
         RuleFor(p => p.Description)
             .NotEmpty()
             .MaximumLength(2048);
+
+        RuleFor(p => p.Key)
+            .NotNull()
+            .Matches(ProjectKey.Regex)
+                .WithMessage("Invalid code format. Project keys are uppercase letters and numbers only, 2-20 characters.");
 
         RuleFor(p => p.ExpenditureCategoryId)
             .GreaterThan(0);

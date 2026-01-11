@@ -1,6 +1,7 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
 using Moda.Common.Domain.Events.ProjectPortfolioManagement;
+using Moda.Common.Domain.Models.ProjectPortfolioManagement;
 using Moda.ProjectPortfolioManagement.Domain.Enums;
 using Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 using NodaTime;
@@ -310,6 +311,7 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, IHasI
     /// </summary>
     /// <param name="name">The name of the project.</param>
     /// <param name="description">The description of the project.</param>
+    /// <param name="key">The unique code for the project (2-20 uppercase alphanumeric characters or hyphens).</param>
     /// <param name="expenditureCategory">The Id of the expenditure category associated with the project.</param>
     /// <param name="dateRange">The date range of the project.</param>
     /// <param name="programId">The Id of the program the project should be associated with (optional).</param>
@@ -317,7 +319,7 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, IHasI
     /// <param name="strategicThemes">The strategic themes associated with the project (optional).</param>
     /// <param name="timestamp"></param>
     /// <returns>A result containing the created project or an error.</returns>
-    public Result<Project> CreateProject(string name, string description, int expenditureCategory, LocalDateRange? dateRange, Guid? programId, Dictionary<ProjectRole, HashSet<Guid>>? roles, HashSet<Guid>? strategicThemes, Instant timestamp)
+    public Result<Project> CreateProject(string name, string description, ProjectKey key, int expenditureCategory, LocalDateRange? dateRange, Guid? programId, Dictionary<ProjectRole, HashSet<Guid>>? roles, HashSet<Guid>? strategicThemes, Instant timestamp)
     {
         if (!IsActive)
         {
@@ -341,7 +343,7 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, IHasI
         }
 
         // Create the project
-        var project = Project.Create(name, description, expenditureCategory, dateRange, Id, programId, roles, strategicThemes, timestamp);
+        var project = Project.Create(name, description, key, expenditureCategory, dateRange, Id, programId, roles, strategicThemes, timestamp);
 
         // Add the project to the portfolio's project list
         _projects.Add(project);

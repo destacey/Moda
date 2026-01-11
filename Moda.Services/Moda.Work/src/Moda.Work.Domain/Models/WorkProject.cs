@@ -1,11 +1,12 @@
 ﻿using Moda.Common.Domain.Interfaces.ProjectPortfolioManagement;
+using Moda.Common.Domain.Models.ProjectPortfolioManagement;
 
 namespace Moda.Work.Domain.Models;
 
 /// <summary>
 /// A copy of the Moda.Common.Domain.Interfaces.Ppm.ISimpleProject interface.  Used to hold basic project information for the work service and db context.
 /// </summary>
-public class WorkProject : ISimpleProject, IHasIdAndKey
+public class WorkProject : ISimpleProject, IHasIdAndKey<ProjectKey>
 {
     private WorkProject() { }
 
@@ -18,7 +19,7 @@ public class WorkProject : ISimpleProject, IHasIdAndKey
     }
 
     public Guid Id { get; private set; }
-    public int Key { get; private set; }
+    public ProjectKey Key { get; private set; } = default!;
     public string Name { get; private set; } = default!;
     public string Description { get; private set; } = default!;
 
@@ -33,6 +34,7 @@ public class WorkProject : ISimpleProject, IHasIdAndKey
             throw new ArgumentException("Project ID mismatch when updating WorkProject details.", nameof(project));
         }
 
+        Key = project.Key;
         Name = project.Name;
         Description = project.Description;
     }

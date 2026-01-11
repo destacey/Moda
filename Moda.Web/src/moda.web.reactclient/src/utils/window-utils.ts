@@ -1,14 +1,14 @@
 // a method to determine the drawer width based on the window size
 // the drawer width is calculated based on the window size
-export const getDrawerWidthPercentage = (): string => {
+export const getDrawerWidthPixels = (): number => {
   const width = window.innerWidth
   return width >= 1500
-    ? '30%'
+    ? Math.floor(width * 0.3)
     : width >= 1300
-      ? '35%'
+      ? Math.floor(width * 0.35)
       : width >= 1100
-        ? '40%'
+        ? Math.floor(width * 0.4)
         : width >= 900
-          ? '50%'
-          : '80%'
+          ? Math.floor(width * 0.5)
+          : Math.floor(width * 0.8)
 }

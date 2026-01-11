@@ -10,4 +10,5 @@ public interface IJobManager
     Task RunSyncIterations(CancellationToken cancellationToken);
     Task RunSyncStrategicThemes(CancellationToken cancellationToken);
     Task RunSyncProjects(CancellationToken cancellationToken);
+    Task RunSyncTeams(CancellationToken cancellationToken);
 }

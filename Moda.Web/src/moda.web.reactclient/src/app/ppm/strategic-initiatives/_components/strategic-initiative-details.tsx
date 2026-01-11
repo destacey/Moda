@@ -31,7 +31,6 @@ const StrategicInitiativeDetails: React.FC<StrategicInitiativeDetailsProps> = ({
     <>
       <ResponsiveFlex gap="middle" align="start">
         <Descriptions column={1} size="small">
-          <Item label="Status">{strategicInitiative.status.name}</Item>
           <Item label="Portfolio">
             <Link href={`/ppm/portfolios/${strategicInitiative.portfolio.key}`}>
               {strategicInitiative.portfolio.name}

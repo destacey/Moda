@@ -30,11 +30,11 @@ const WorkItemSteps = ({ workItem }: WorkItemStepsProps) => {
   const stepItems = [
     {
       title: 'Proposed',
-      description: `Created on ${dayjs(workItem.created).format('MMM D, YYYY @ h:mm A')}`,
+      content: `Created on ${dayjs(workItem.created).format('MMM D, YYYY @ h:mm A')}`,
     },
     {
       title: 'Active',
-      description:
+      content:
         currentStep === 0
           ? 'Work has not started'
           : workItem.activatedTimestamp
@@ -43,7 +43,7 @@ const WorkItemSteps = ({ workItem }: WorkItemStepsProps) => {
     },
     {
       title: currentStep < 3 ? 'Done' : 'Removed',
-      description:
+      content:
         currentStep < 2
           ? 'Work has not completed'
           : currentStep === 2
@@ -53,7 +53,7 @@ const WorkItemSteps = ({ workItem }: WorkItemStepsProps) => {
   ]
 
   return (
-    <Steps progressDot current={currentStep} items={stepItems} size="small" />
+    <Steps type="dot" current={currentStep} items={stepItems} size="small" />
   )
 }
 

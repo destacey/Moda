@@ -11,11 +11,10 @@ import { ProjectListDto } from '@/src/services/moda-api'
 import { Card, Divider, Flex, Space, Switch, theme, Typography } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import dayjs from 'dayjs'
-import { ReactNode, useCallback, useMemo, useState } from 'react'
+import { FC, ReactNode, useCallback, useMemo, useState } from 'react'
 import { ProjectDrawer } from '.'
 import { DataGroup } from 'vis-timeline/standalone'
-import { ProjectStatus } from '@/src/components/types'
-import { getLuminance } from '@/src/utils/color-helper'
+import { getLifecyclePhaseColorFromStatus, getLuminance } from '@/src/utils'
 
 const { Text } = Typography
 const { useToken } = theme
@@ -30,7 +29,7 @@ export interface ProjectsTimelineProps {
 
 interface ProjectTimelineItem extends ModaDataItem<ProjectListDto, string> {
   id: string
-  openProjectDrawer: (projectKey: number) => void
+  openProjectDrawer: (projectKey: string) => void
 }
 
 export const ProjectRangeItemTemplate: TimelineTemplate<
@@ -55,27 +54,11 @@ export const ProjectRangeItemTemplate: TimelineTemplate<
   )
 }
 
-const ProjectsTimeline: React.FC<ProjectsTimelineProps> = (props) => {
-  const { token } = useToken()
+const ProjectsTimeline: FC<ProjectsTimelineProps> = (props) => {
   const [drawerOpen, setDrawerOpen] = useState(false)
-  const [selectedItemKey, setSelectedItemKey] = useState<number | null>(null)
+  const [selectedItemKey, setSelectedItemKey] = useState<string | null>(null)
   const [showCurrentTime, setShowCurrentTime] = useState<boolean>(true)
-
-  const getProjectStatusColor = useCallback(
-    (status: ProjectStatus): string => {
-      switch (status) {
-        case ProjectStatus.Active:
-          return token.colorInfo
-        case ProjectStatus.Completed:
-          return token.colorSuccess
-        case ProjectStatus.Cancelled:
-          return token.colorError
-        default:
-          return token.colorTextBase
-      }
-    },
-    [token],
-  )
+  const { token } = useToken()
 
   const showDrawer = useCallback(() => {
     setDrawerOpen(true)
@@ -87,7 +70,7 @@ const ProjectsTimeline: React.FC<ProjectsTimelineProps> = (props) => {
   }, [])
 
   const openProjectDrawer = useCallback(
-    (projectKey: number) => {
+    (projectKey: string) => {
       setSelectedItemKey(projectKey)
       showDrawer()
     },
@@ -136,7 +119,7 @@ const ProjectsTimeline: React.FC<ProjectsTimelineProps> = (props) => {
         id: String(project.id),
         title: project.name,
         content: project.name,
-        itemColor: getProjectStatusColor(project.status.id as ProjectStatus),
+        itemColor: getLifecyclePhaseColorFromStatus(project.status, token),
         objectData: project,
         group: project.program?.name ?? 'No Program',
         type: 'range',
@@ -144,12 +127,7 @@ const ProjectsTimeline: React.FC<ProjectsTimelineProps> = (props) => {
         end: new Date(project.end),
         openProjectDrawer: openProjectDrawer,
       }))
-  }, [
-    getProjectStatusColor,
-    openProjectDrawer,
-    props.isLoading,
-    props.projects,
-  ])
+  }, [openProjectDrawer, props.isLoading, props.projects, token])
 
   const timelineWindow = useMemo(() => {
     let minDate = dayjs()
@@ -215,7 +193,7 @@ const ProjectsTimeline: React.FC<ProjectsTimelineProps> = (props) => {
     <>
       <Flex justify="end" align="center">
         <ControlItemsMenu items={controlItems()} />
-        <Divider type="vertical" style={{ height: '30px' }} />
+        <Divider vertical style={{ height: '30px' }} />
         {props.viewSelector}
       </Flex>
       <Card size="small" variant="borderless">

@@ -8,6 +8,7 @@ import {
   UpdateProjectRequest,
   WorkItemListDto,
   ChangeProjectProgramRequest,
+  ChangeProjectKeyRequest,
 } from '@/src/services/moda-api'
 import { QueryTags } from '../query-tags'
 import { BaseOptionType } from 'antd/es/select'
@@ -26,10 +27,11 @@ export const projectsApi = apiSlice.injectEndpoints({
       },
       providesTags: () => [{ type: QueryTags.Project, id: 'LIST' }],
     }),
-    getProject: builder.query<ProjectDetailsDto, number>({
-      queryFn: async (key) => {
+
+    getProject: builder.query<ProjectDetailsDto, string>({
+      queryFn: async (idOrKey) => {
         try {
-          const data = await getProjectsClient().getProject(key.toString())
+          const data = await getProjectsClient().getProject(idOrKey)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -40,6 +42,7 @@ export const projectsApi = apiSlice.injectEndpoints({
         { type: QueryTags.Project, id: arg },
       ],
     }),
+
     createProject: builder.mutation<ObjectIdAndKey, CreateProjectRequest>({
       queryFn: async (request) => {
         try {
@@ -57,9 +60,10 @@ export const projectsApi = apiSlice.injectEndpoints({
         ]
       },
     }),
+
     updateProject: builder.mutation<
       void,
-      { request: UpdateProjectRequest; cacheKey: number }
+      { request: UpdateProjectRequest; cacheKey: string }
     >({
       queryFn: async ({ request }) => {
         try {
@@ -78,9 +82,10 @@ export const projectsApi = apiSlice.injectEndpoints({
         ]
       },
     }),
+
     changeProjectProgram: builder.mutation<
       void,
-      { id: string; request: ChangeProjectProgramRequest; cacheKey: number }
+      { id: string; request: ChangeProjectProgramRequest; cacheKey: string }
     >({
       queryFn: async ({ id, request }) => {
         try {
@@ -100,7 +105,33 @@ export const projectsApi = apiSlice.injectEndpoints({
         ]
       },
     }),
-    activateProject: builder.mutation<void, { id: string; cacheKey: number }>({
+
+    changeProjectKey: builder.mutation<
+      void,
+      { id: string; request: ChangeProjectKeyRequest }
+    >({
+      queryFn: async ({ id, request }) => {
+        try {
+          const data = await getProjectsClient().changeKey(id, request)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, { request }) => {
+        if (error) return []
+        return [
+          { type: QueryTags.Project, id: 'LIST' },
+          // If any screens already cached the *new* key, ensure it's refreshed.
+          { type: QueryTags.Project, id: request.key },
+          { type: QueryTags.PortfolioProjects, id: 'LIST' },
+          { type: QueryTags.ProgramProjects, id: 'LIST' },
+        ]
+      },
+    }),
+
+    activateProject: builder.mutation<void, { id: string; cacheKey: string }>({
       queryFn: async ({ id }) => {
         try {
           const data = await getProjectsClient().activate(id)
@@ -118,7 +149,8 @@ export const projectsApi = apiSlice.injectEndpoints({
         ]
       },
     }),
-    completeProject: builder.mutation<void, { id: string; cacheKey: number }>({
+
+    completeProject: builder.mutation<void, { id: string; cacheKey: string }>({
       queryFn: async ({ id }) => {
         try {
           const data = await getProjectsClient().complete(id)
@@ -136,7 +168,8 @@ export const projectsApi = apiSlice.injectEndpoints({
         ]
       },
     }),
-    cancelProject: builder.mutation<void, { id: string; cacheKey: number }>({
+
+    cancelProject: builder.mutation<void, { id: string; cacheKey: string }>({
       queryFn: async ({ id }) => {
         try {
           const data = await getProjectsClient().cancel(id)
@@ -154,6 +187,7 @@ export const projectsApi = apiSlice.injectEndpoints({
         ]
       },
     }),
+
     deleteProject: builder.mutation<void, string>({
       queryFn: async (id) => {
         try {
@@ -171,6 +205,7 @@ export const projectsApi = apiSlice.injectEndpoints({
         ]
       },
     }),
+
     getProjectWorkItems: builder.query<WorkItemListDto[], string>({
       queryFn: async (id) => {
         try {
@@ -186,6 +221,7 @@ export const projectsApi = apiSlice.injectEndpoints({
         ...result.map(({ key }) => ({ type: QueryTags.ProjectWorkItems, key })),
       ],
     }),
+
     getProjectOptions: builder.query<BaseOptionType[], void>({
       queryFn: async () => {
         try {
@@ -214,6 +250,7 @@ export const {
   useCreateProjectMutation,
   useUpdateProjectMutation,
   useChangeProjectProgramMutation,
+  useChangeProjectKeyMutation,
   useActivateProjectMutation,
   useCompleteProjectMutation,
   useCancelProjectMutation,

@@ -4,7 +4,7 @@ using Moda.Common.Domain.Employees;
 
 namespace Moda.Common.Application.Employees.Commands;
 
-public sealed record BulkUpsertEmployeesCommand : ICommand
+public sealed record BulkUpsertEmployeesCommand : ICommand, ILongRunningRequest
 {
     public BulkUpsertEmployeesCommand(IEnumerable<IExternalEmployee> employees)
     {
@@ -33,18 +33,11 @@ public sealed class BulkUpsertEmployeesCommandValidator : CustomValidator<BulkUp
     }
 }
 
-internal sealed class BulkUpsertEmployeesCommandHandler : ICommandHandler<BulkUpsertEmployeesCommand>
+internal sealed class BulkUpsertEmployeesCommandHandler(IModaDbContext modaDbContext, IDateTimeProvider dateTimeProvider, ILogger<BulkUpsertEmployeesCommandHandler> logger) : ICommandHandler<BulkUpsertEmployeesCommand>
 {
-    private readonly IModaDbContext _modaDbContext;
-    private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly ILogger<BulkUpsertEmployeesCommandHandler> _logger;
-
-    public BulkUpsertEmployeesCommandHandler(IModaDbContext modaDbContext, IDateTimeProvider dateTimeProvider, ILogger<BulkUpsertEmployeesCommandHandler> logger)
-    {
-        _modaDbContext = modaDbContext;
-        _dateTimeProvider = dateTimeProvider;
-        _logger = logger;
-    }
+    private readonly IModaDbContext _modaDbContext = modaDbContext;
+    private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
+    private readonly ILogger<BulkUpsertEmployeesCommandHandler> _logger = logger;
 
     public async Task<Result> Handle(BulkUpsertEmployeesCommand request, CancellationToken cancellationToken)
     {
@@ -54,11 +47,18 @@ internal sealed class BulkUpsertEmployeesCommandHandler : ICommandHandler<BulkUp
         List<Employee> employees = await _modaDbContext.Employees.ToListAsync(cancellationToken) ?? [];
         var blacklist = await _modaDbContext.ExternalEmployeeBlacklistItems.Select(b => b.ObjectId).ToListAsync(cancellationToken);
 
+        // Build a case-insensitive lookup for manager ids from the initially loaded employees
+        var employeeNumberToId = employees.ToDictionary(e => e.EmployeeNumber, e => e.Id, StringComparer.OrdinalIgnoreCase);
+        var requestedEmployeeNumbers = request.Employees
+            .Where(e => !blacklist.Contains(e.EmployeeNumber))
+            .Select(e => e.EmployeeNumber)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
         foreach (var externalEmployee in request.Employees.Where(e => !blacklist.Contains(e.EmployeeNumber)))
         {
             try
             {
-                var managerId = GetManagerId(externalEmployee.ManagerEmployeeNumber);
+                var managerId = GetManagerId(externalEmployee.ManagerEmployeeNumber, employeeNumberToId);
 
                 if (employees.FirstOrDefault(e => e.EmployeeNumber == externalEmployee.EmployeeNumber) is Employee employee)
                 { // update
@@ -81,7 +81,7 @@ internal sealed class BulkUpsertEmployeesCommandHandler : ICommandHandler<BulkUp
                         await _modaDbContext.Entry(employee).ReloadAsync(cancellationToken);
                         employee.ClearDomainEvents();
 
-                        _logger.LogError("Moda Request: Failure for Request {Name} {@Request}.  Error message: {Error}", requestName, request, updateResult.Error);
+                        _logger.LogError("Moda Request: Failure for Request {Name}.  Error message: {Error}", requestName, updateResult.Error);
                         errors.Add(externalEmployee.EmployeeNumber, updateResult.Error);
 
                         continue;
@@ -98,6 +98,7 @@ internal sealed class BulkUpsertEmployeesCommandHandler : ICommandHandler<BulkUp
                         externalEmployee.Department,
                         externalEmployee.OfficeLocation,
                         managerId,
+                        externalEmployee.IsActive,
                         _dateTimeProvider.Now
                         );
 
@@ -112,7 +113,7 @@ internal sealed class BulkUpsertEmployeesCommandHandler : ICommandHandler<BulkUp
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Moda Request: Exception for Request {Name} {@Request}", requestName, request);
+                _logger.LogError(ex, "Moda Request: Exception for Request {Name}", requestName);
             }
         }
 
@@ -120,41 +121,88 @@ internal sealed class BulkUpsertEmployeesCommandHandler : ICommandHandler<BulkUp
         {
             await _modaDbContext.SaveChangesAsync(cancellationToken);
 
-            await SetMissingManagers();
+            await ProcessMissingManagers(missingManagers, cancellationToken);
+
+            await DeactivateEmployeesNotInPayload(requestedEmployeeNumbers, cancellationToken);
 
             return Result.Success();
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Moda Request: Exception for Request {Name} {@Request} while updating the database.", requestName, request);
+            _logger.LogError(ex, "Moda Request: Exception for Request {Name} while updating the database.", requestName);
 
             return Result.Failure<int>($"Moda Request: Exception for Request {requestName} {request}");
         }
+    }
 
-        //// LOCAL FUNCTIONS
-        Guid? GetManagerId(string? managerEmployeeNumber)
+    private async Task ProcessMissingManagers(Dictionary<string, string> missingManagers, CancellationToken cancellationToken)
+    {
+        if (missingManagers.Count == 0)
+            return;
+
+        // Build sets to limit queries to only affected employees and managers
+        var employeeNumbersNeedingManagers = missingManagers.Keys.ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var managerNumbersNeeded = missingManagers.Values.Where(v => !string.IsNullOrWhiteSpace(v)).ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        // Load employees that need manager updates into a dictionary for O(1) lookups
+        var employeesNeedingUpdate = await _modaDbContext.Employees
+            .Where(e => employeeNumbersNeedingManagers.Contains(e.EmployeeNumber))
+            .ToDictionaryAsync(e => e.EmployeeNumber, e => e, StringComparer.OrdinalIgnoreCase, cancellationToken);
+
+        if (employeesNeedingUpdate.Count == 0)
+            return;
+
+        // Load managers referenced directly into a dictionary
+        var managerLookup = await _modaDbContext.Employees
+            .Where(e => managerNumbersNeeded.Contains(e.EmployeeNumber))
+            .ToDictionaryAsync(e => e.EmployeeNumber, e => e.Id, StringComparer.OrdinalIgnoreCase, cancellationToken);
+
+        // Update tracked employee entities with resolved manager ids
+        foreach (var kvp in missingManagers)
         {
-            if (string.IsNullOrWhiteSpace(managerEmployeeNumber))
-                return null;
+            if (!employeesNeedingUpdate.TryGetValue(kvp.Key, out var employee))
+                continue;
 
-            var managerId = employees?.FirstOrDefault(e => e.EmployeeNumber == managerEmployeeNumber)?.Id;
-            return managerId.IsNullEmptyOrDefault() ? null : managerId;
+            if (!managerLookup.TryGetValue(kvp.Value, out var managerId))
+                continue;
+
+            employee.UpdateManagerId(managerId, _dateTimeProvider.Now);
         }
 
-        async Task SetMissingManagers()
-        {
-            if (missingManagers.Count != 0)
-            {
-                List<Employee> updatedEmployees = await _modaDbContext.Employees.ToListAsync(cancellationToken);
-                foreach (var item in missingManagers)
-                {
-                    var managerId = GetManagerId(item.Value);
-                    var employee = updatedEmployees.First(e => e.EmployeeNumber == item.Key);
-                    employee.UpdateManagerId(managerId, _dateTimeProvider.Now);
-                }
+        await _modaDbContext.SaveChangesAsync(cancellationToken);
+    }
 
-                await _modaDbContext.SaveChangesAsync(cancellationToken);
+    private async Task DeactivateEmployeesNotInPayload(HashSet<string> requestedEmployeeNumbers, CancellationToken cancellationToken)
+    {
+        // Find active employees not included in the request payload and deactivate them
+        var toDeactivate = await _modaDbContext.Employees
+            .Where(e => e.IsActive && !requestedEmployeeNumbers.Contains(e.EmployeeNumber))
+            .ToListAsync(cancellationToken);
+
+        if (toDeactivate.Count == 0)
+            return;
+
+        foreach (var employee in toDeactivate)
+        {
+            var result = employee.Deactivate(_dateTimeProvider.Now);
+            if (result.IsFailure)
+            {
+                _logger.LogError("Failed to deactivate employee {EmployeeNumber}. Error: {Error}", employee.EmployeeNumber, result.Error);
             }
         }
+
+        await _modaDbContext.SaveChangesAsync(cancellationToken);
+
+        _logger.LogInformation("Deactivated {Count} employees not present in the payload.", toDeactivate.Count);
+    }
+
+    private static Guid? GetManagerId(string? managerEmployeeNumber, IDictionary<string, Guid> employeeNumberToId)
+    {
+        if (string.IsNullOrWhiteSpace(managerEmployeeNumber) || employeeNumberToId.Count == 0)
+            return null;
+
+        return employeeNumberToId.TryGetValue(managerEmployeeNumber, out var id) && id != Guid.Empty
+            ? id
+            : null;
     }
 }

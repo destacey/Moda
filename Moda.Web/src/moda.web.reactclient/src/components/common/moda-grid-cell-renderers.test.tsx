@@ -26,15 +26,22 @@ import { DependencyHealth, WorkStatusCategory } from '../types'
 
 // Mock Next.js Link component
 jest.mock('next/link', () => {
-  const MockLink = ({ children, href, target, ...props }: any) => {
-    return <a href={href} target={target} {...props}>{children}</a>
+  const MockLink = ({ children, href, target, prefetch, ...props }: any) => {
+    return (
+      <a href={href} target={target} {...props}>
+        {children}
+      </a>
+    )
   }
   MockLink.displayName = 'MockLink'
   return MockLink
 })
 
 // Helper to create mock cell renderer props
-const createMockProps = <T,>(data: T | null, value?: any): CustomCellRendererProps<T> => {
+const createMockProps = <T,>(
+  data: T | null,
+  value?: any,
+): CustomCellRendererProps<T> => {
   return {
     data,
     value: value ?? null,
@@ -46,12 +53,12 @@ const createMockProps = <T,>(data: T | null, value?: any): CustomCellRendererPro
     colDef: {},
     column: {} as any,
     api: {} as any,
-    columnApi: {} as any,
     context: {},
     refreshCell: () => {},
     eGridCell: {} as any,
     eParentOfValue: {} as any,
     registerRowDragger: () => {},
+    setTooltip: () => {},
   }
 }
 
@@ -68,7 +75,10 @@ describe('Work Item Cell Renderers', () => {
 
       const link = screen.getByRole('link', { name: 'WI-123' })
       expect(link).toBeInTheDocument()
-      expect(link).toHaveAttribute('href', '/work/workspaces/workspace-1/work-items/WI-123')
+      expect(link).toHaveAttribute(
+        'href',
+        '/work/workspaces/workspace-1/work-items/WI-123',
+      )
     })
 
     it('should render external link icon when externalViewWorkItemUrl is present', () => {
@@ -108,7 +118,10 @@ describe('Work Item Cell Renderers', () => {
 
       const link = screen.getByRole('link', { name: 'WI-100' })
       expect(link).toBeInTheDocument()
-      expect(link).toHaveAttribute('href', '/work/workspaces/workspace-1/work-items/WI-100')
+      expect(link).toHaveAttribute(
+        'href',
+        '/work/workspaces/workspace-1/work-items/WI-100',
+      )
     })
 
     it('should return null when parent is null', () => {
@@ -149,13 +162,14 @@ describe('Team Cell Renderers', () => {
   describe('TeamNameLinkCellRenderer', () => {
     it('should render team link for Team type', () => {
       const data = {
+        id: '1',
         key: 1,
         name: 'Engineering Team',
-        type: 'Team',
+        type: 'Team' as const,
       }
       const props = createMockProps(data)
 
-      render(<>{TeamNameLinkCellRenderer(props)}</>)
+      render(<>{TeamNameLinkCellRenderer(props as any)}</>)
 
       const link = screen.getByRole('link', { name: 'Engineering Team' })
       expect(link).toBeInTheDocument()
@@ -164,13 +178,14 @@ describe('Team Cell Renderers', () => {
 
     it('should render team-of-teams link for non-Team type', () => {
       const data = {
+        id: '2',
         key: 2,
         name: 'Product Division',
-        type: 'TeamOfTeams',
+        type: 'TeamOfTeams' as const,
       }
       const props = createMockProps(data)
 
-      render(<>{TeamNameLinkCellRenderer(props)}</>)
+      render(<>{TeamNameLinkCellRenderer(props as any)}</>)
 
       const link = screen.getByRole('link', { name: 'Product Division' })
       expect(link).toHaveAttribute('href', '/organizations/team-of-teams/2')
@@ -181,9 +196,10 @@ describe('Team Cell Renderers', () => {
     it('should render nested team link', () => {
       const data = {
         team: {
+          id: '1',
           key: 1,
           name: 'Dev Team',
-          type: 'Team',
+          type: 'Team' as const,
         },
       }
       const props = createMockProps(data)
@@ -207,6 +223,7 @@ describe('Sprint Cell Renderers', () => {
   describe('WorkSprintLinkCellRenderer', () => {
     it('should render sprint link', () => {
       const data = {
+        id: 'sprint-10',
         key: 10,
         name: 'Sprint 23',
       }
@@ -221,13 +238,19 @@ describe('Sprint Cell Renderers', () => {
 
     it('should render sprint with team code when showTeamCode is true', () => {
       const data = {
+        id: 'sprint-10',
         key: 10,
         name: 'Sprint 23',
-        team: { code: 'ENG' },
+        team: {
+          id: 'team-1',
+          key: 1,
+          code: 'ENG' as const,
+          name: 'Engineering',
+        },
       }
       const props = { ...createMockProps(data), showTeamCode: true }
 
-      render(<>{WorkSprintLinkCellRenderer(props)}</>)
+      render(<>{WorkSprintLinkCellRenderer(props as any)}</>)
 
       const link = screen.getByRole('link', { name: 'Sprint 23 (ENG)' })
       expect(link).toBeInTheDocument()
@@ -235,13 +258,19 @@ describe('Sprint Cell Renderers', () => {
 
     it('should not render team code when showTeamCode is false', () => {
       const data = {
+        id: 'sprint-10',
         key: 10,
         name: 'Sprint 23',
-        team: { code: 'ENG' },
+        team: {
+          id: 'team-1',
+          key: 1,
+          code: 'ENG' as const,
+          name: 'Engineering',
+        },
       }
       const props = { ...createMockProps(data), showTeamCode: false }
 
-      render(<>{WorkSprintLinkCellRenderer(props)}</>)
+      render(<>{WorkSprintLinkCellRenderer(props as any)}</>)
 
       const link = screen.getByRole('link', { name: 'Sprint 23' })
       expect(link).toBeInTheDocument()
@@ -252,6 +281,7 @@ describe('Sprint Cell Renderers', () => {
     it('should render nested sprint link', () => {
       const data = {
         sprint: {
+          id: 'sprint-10',
           key: 10,
           name: 'Sprint 23',
         },
@@ -270,7 +300,8 @@ describe('Project/Program/Portfolio Cell Renderers', () => {
   describe('PortfolioLinkCellRenderer', () => {
     it('should render portfolio link', () => {
       const data = {
-        key: 'portfolio-1',
+        id: 'portfolio-1',
+        key: 'portfolio-1' as any,
         name: 'Enterprise Portfolio',
       }
       const props = createMockProps(data)
@@ -285,7 +316,8 @@ describe('Project/Program/Portfolio Cell Renderers', () => {
   describe('ProgramLinkCellRenderer', () => {
     it('should render program link from direct data', () => {
       const data = {
-        key: 'program-1',
+        id: 'program-1',
+        key: 'program-1' as any,
         name: 'Digital Transformation',
       }
       const props = createMockProps(data)
@@ -299,7 +331,8 @@ describe('Project/Program/Portfolio Cell Renderers', () => {
     it('should render program link from nested data', () => {
       const data = {
         program: {
-          key: 'program-1',
+          id: 'program-1',
+          key: 'program-1' as any,
           name: 'Digital Transformation',
         },
       }
@@ -316,7 +349,8 @@ describe('Project/Program/Portfolio Cell Renderers', () => {
     it('should render project link from nested data', () => {
       const data = {
         project: {
-          key: 'project-1',
+          id: 'project-1',
+          key: 'project-1' as any,
           name: 'Customer Portal',
         },
       }
@@ -334,7 +368,8 @@ describe('Planning Interval Cell Renderers', () => {
   describe('PlanningIntervalLinkCellRenderer', () => {
     it('should render planning interval link', () => {
       const data = {
-        key: 'pi-2024-q1',
+        id: 'pi-2024-q1',
+        key: 'pi-2024-q1' as any,
         name: '2024 Q1',
       }
       const props = createMockProps(data)
@@ -342,7 +377,10 @@ describe('Planning Interval Cell Renderers', () => {
       render(<>{PlanningIntervalLinkCellRenderer(props)}</>)
 
       const link = screen.getByRole('link', { name: '2024 Q1' })
-      expect(link).toHaveAttribute('href', '/planning/planning-intervals/pi-2024-q1')
+      expect(link).toHaveAttribute(
+        'href',
+        '/planning/planning-intervals/pi-2024-q1',
+      )
     })
   })
 })
@@ -351,7 +389,8 @@ describe('Workspace Cell Renderer', () => {
   describe('WorkspaceLinkCellRenderer', () => {
     it('should render workspace link', () => {
       const data = {
-        key: 'workspace-1',
+        id: 'workspace-1',
+        key: 'workspace-1' as any,
         name: 'Main Workspace',
       }
       const props = createMockProps(data)
@@ -437,7 +476,10 @@ describe('Helper Functions', () => {
       render(<>{renderWorkItemLinkHelper(workItem)}</>)
 
       const link = screen.getByRole('link', { name: 'WI-456' })
-      expect(link).toHaveAttribute('href', '/work/workspaces/ws-1/work-items/WI-456')
+      expect(link).toHaveAttribute(
+        'href',
+        '/work/workspaces/ws-1/work-items/WI-456',
+      )
     })
 
     it('should return null when workItem is null', () => {
@@ -583,3 +625,4 @@ describe('DateTime Cell Renderer', () => {
     })
   })
 })
+

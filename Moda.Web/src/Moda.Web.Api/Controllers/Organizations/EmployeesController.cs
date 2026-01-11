@@ -70,13 +70,19 @@ public class EmployeesController(ILogger<EmployeesController> logger, ISender se
             : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
-    //[HttpDelete("{id}")]
-    //[MustHavePermission(ApplicationAction.Delete, ApplicationResource.Employees)]
-    //[OpenApiOperation("Delete an employee.", "")]
-    //public async Task<string> Delete(string id)
-    //{
-    //    throw new NotImplementedException();
-    //}
+    [HttpDelete("{id}")]
+    [MustHavePermission(ApplicationAction.Delete, ApplicationResource.Employees)]
+    [OpenApiOperation("Delete an employee.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> Delete(string id)
+    {
+        var result = await _sender.Send(new DeleteEmployeeCommand(Guid.Parse(id)));
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
 
     [HttpGet("{id}/direct-reports")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Employees)]

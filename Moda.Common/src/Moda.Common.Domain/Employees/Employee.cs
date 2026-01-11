@@ -8,18 +8,11 @@ using NodaTime;
 namespace Moda.Common.Domain.Employees;
 public sealed class Employee : BaseSoftDeletableEntity<Guid>, IActivatable, IHasIdAndKey
 {
-    private readonly List<Employee> _directReports = new();
-    private PersonName _name = null!;
-    private string _employeeNumber = null!;
-    private EmailAddress _email = null!;
-    private string? _jobTitle;
-    private string? _department;
-    private string? _officeLocation;
-    private Guid? _managerId;
+    private readonly List<Employee> _directReports = [];
 
     private Employee() { }
 
-    private Employee(PersonName personName, string employeeNumber, Instant? hireDate, EmailAddress email, string? jobTitle, string? department, string? officeLocation, Guid? managerId)
+    private Employee(PersonName personName, string employeeNumber, Instant? hireDate, EmailAddress email, string? jobTitle, string? department, string? officeLocation, Guid? managerId, bool isActive)
     {
         Name = personName;
         EmployeeNumber = employeeNumber;
@@ -29,6 +22,7 @@ public sealed class Employee : BaseSoftDeletableEntity<Guid>, IActivatable, IHas
         Department = department;
         OfficeLocation = officeLocation;
         ManagerId = managerId;
+        IsActive = isActive;
     }
 
     /// <summary>Gets the key.</summary>
@@ -39,17 +33,17 @@ public sealed class Employee : BaseSoftDeletableEntity<Guid>, IActivatable, IHas
     /// <value>The employee name.</value>
     public PersonName Name
     {
-        get => _name;
-        private set => _name = Guard.Against.Null(value, nameof(EmployeeNumber));
-    }
+        get;
+        private set => field = Guard.Against.Null(value, nameof(EmployeeNumber));
+    } = null!;
 
     /// <summary>Gets the employee number.</summary>
     /// <value>The employee number.</value>
     public string EmployeeNumber
     {
-        get => _employeeNumber;
-        private set => _employeeNumber = Guard.Against.NullOrWhiteSpace(value, nameof(EmployeeNumber)).Trim();
-    }
+        get;
+        private set => field = Guard.Against.NullOrWhiteSpace(value, nameof(EmployeeNumber)).Trim();
+    } = null!;
 
     /// <summary>Gets the hire date.</summary>
     /// <value>The hire date.</value>
@@ -59,28 +53,28 @@ public sealed class Employee : BaseSoftDeletableEntity<Guid>, IActivatable, IHas
     /// <value>The email.</value>
     public EmailAddress Email
     {
-        get => _email;
-        private set => _email = Guard.Against.Null(value, nameof(Email));
-    }
+        get;
+        private set => field = Guard.Against.Null(value, nameof(Email));
+    } = null!;
 
     /// <summary>Gets the job title.</summary>
     /// <value>The job title.</value>
-    public string? JobTitle { get => _jobTitle; private set => _jobTitle = value.NullIfWhiteSpacePlusTrim(); }
+    public string? JobTitle { get; private set => field = value.NullIfWhiteSpacePlusTrim(); }
 
     /// <summary>Gets the department.</summary>
     /// <value>The department.</value>
-    public string? Department { get => _department; private set => _department = value.NullIfWhiteSpacePlusTrim(); }
+    public string? Department { get; private set => field = value.NullIfWhiteSpacePlusTrim(); }
 
     /// <summary>Gets the office location.</summary>
     /// <value>The office location.</value>
-    public string? OfficeLocation { get => _officeLocation; private set => _officeLocation = value.NullIfWhiteSpacePlusTrim(); }
+    public string? OfficeLocation { get; private set => field = value.NullIfWhiteSpacePlusTrim(); }
 
     /// <summary>Gets the manager identifier.</summary>
     /// <value>The manager identifier.</value>
     public Guid? ManagerId
     {
-        get => _managerId;
-        private set => _managerId = value.HasValue ? Guard.Against.Default(value) : null;
+        get;
+        private set => field = value.HasValue ? Guard.Against.Default(value) : null;
     }
 
     /// <summary>Gets the manager.</summary>
@@ -221,9 +215,10 @@ public sealed class Employee : BaseSoftDeletableEntity<Guid>, IActivatable, IHas
         string? department,
         string? officeLocation,
         Guid? managerId,
+        bool isActive,
         Instant timestamp)
     {
-        Employee employee = new(personName, employeeNumber, hireDate, email, jobTitle, department, officeLocation, managerId);
+        Employee employee = new(personName, employeeNumber, hireDate, email, jobTitle, department, officeLocation, managerId, isActive);
         employee.AddDomainEvent(EntityCreatedEvent.WithEntity(employee, timestamp));
         return employee;
     }

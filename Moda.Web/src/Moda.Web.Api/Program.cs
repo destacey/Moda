@@ -1,7 +1,6 @@
 using System.Reflection;
 using System.Text.Json.Serialization;
 using FluentValidation.AspNetCore;
-using Microsoft.ApplicationInsights.Extensibility.Implementation;
 using Moda.AppIntegration.Application;
 using Moda.Common.Application;
 using Moda.Common.Application.Interfaces;
@@ -21,8 +20,6 @@ using Moda.Work.Application;
 using NodaTime.Serialization.SystemTextJson;
 using Serilog;
 
-TelemetryDebugWriter.IsTracingDisabled = true;
-
 StaticLogger.EnsureInitialized();
 Log.Information("Server Booting Up...");
 try
@@ -30,16 +27,8 @@ try
     var builder = WebApplication.CreateBuilder(args);
 
     builder.Host.AddConfigurations();
-    builder.Host.UseSerilog((context, config) =>
-    {
-        config.ReadFrom.Configuration(context.Configuration);
-        config.Enrich.WithProperty("version", Environment.GetEnvironmentVariable("version") ?? Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "none-supplied");
-    });
 
-    if (builder.Environment.IsDevelopment())
-    {
-        Serilog.Debugging.SelfLog.Enable(Console.Error);
-    }
+    builder.AddServiceDefaults();
 
     builder.Services.AddControllers()
         .AddJsonOptions(options =>
@@ -82,13 +71,13 @@ try
     builder.Services.AddScoped<ICsvService, CsvService>();
     builder.Services.AddScoped<IJobManager, JobManager>();
 
+
     var app = builder.Build();
 
     await app.Services.InitializeDatabases();
 
     app.UseInfrastructure(builder.Configuration);
-    app.MapEndpoints();
-    app.MapGet("/startup", () => Results.Ok());
+    app.MapDefaultEndpoints();
     app.Run();
 }
 catch (Exception ex) when (!ex.GetType().Name.Equals("HostAbortedException", StringComparison.Ordinal))

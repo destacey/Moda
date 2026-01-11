@@ -6,6 +6,7 @@ import { ProjectDetailsDto } from '@/src/services/moda-api'
 import { getSortedNames } from '@/src/utils'
 import { Descriptions } from 'antd'
 import Link from 'next/link'
+import { FC } from 'react'
 
 const { Item } = Descriptions
 
@@ -13,7 +14,7 @@ export interface ProjectDetailsProps {
   project: ProjectDetailsDto
 }
 
-const ProjectDetails: React.FC<ProjectDetailsProps> = ({
+const ProjectDetails: FC<ProjectDetailsProps> = ({
   project,
 }: ProjectDetailsProps) => {
   if (!project) return null
@@ -39,7 +40,6 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({
   return (
     <ResponsiveFlex gap="middle" align="start">
       <Descriptions column={1} size="small">
-        <Item label="Status">{project.status.name}</Item>
         <Item label="Portfolio">
           <Link href={`/ppm/portfolios/${project.portfolio.key}`}>
             {project.portfolio.name}

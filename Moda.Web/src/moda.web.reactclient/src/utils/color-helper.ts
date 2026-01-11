@@ -1,3 +1,7 @@
+import { GlobalToken } from 'antd'
+import { LifecyclePhase } from '../components/types'
+import { LifecycleNavigationDto } from '../services/moda-api'
+
 /**
  * Determines the ant design status color string based on the status of a work status category.
  *
@@ -70,4 +74,41 @@ export const getLuminance = (hexColor: string): number => {
 export const getLuminanceTheme = (hexColor: string): string => {
   // returns 'dark' or 'light' based on the luminance of the color
   return getLuminance(hexColor) >= 0.5 ? 'light' : 'dark'
+}
+
+export const getLifecyclePhaseColor = (
+  phase: LifecyclePhase,
+  token: GlobalToken, // GlobalToken from antd theme
+): string | undefined => {
+  switch (phase) {
+    case LifecyclePhase.Active:
+      return token.colorPrimary // or token.colorPrimary
+    case LifecyclePhase.Done:
+      return token.colorSuccess
+    default:
+      return undefined
+  }
+}
+
+export const getLifecyclePhaseColorFromStatus = (
+  status: LifecycleNavigationDto,
+  token: any,
+): string | undefined => {
+  // Map string to enum
+  const phase =
+    LifecyclePhase[status.lifecyclePhase as keyof typeof LifecyclePhase]
+  return getLifecyclePhaseColor(phase, token)
+}
+
+export const getLifecyclePhaseTagColor = (
+  phase: LifecyclePhase,
+): string | undefined => {
+  switch (phase) {
+    case LifecyclePhase.Active:
+      return 'processing'
+    case LifecyclePhase.Done:
+      return 'success'
+    default:
+      return 'default'
+  }
 }

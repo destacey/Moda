@@ -49,7 +49,7 @@ const HierarchyPage = () => {
         size="large"
         style={{ paddingTop: 50 }}
       >
-        <Space direction="vertical">
+        <Space vertical>
           {workTiers?.map((tier) => (
             <WorkTypeTierCard
               key={tier.id}

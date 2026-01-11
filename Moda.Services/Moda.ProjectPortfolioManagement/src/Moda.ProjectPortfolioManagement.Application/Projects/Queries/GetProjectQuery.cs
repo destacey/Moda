@@ -1,12 +1,13 @@
 ﻿using System.Linq.Expressions;
 using Moda.Common.Application.Models;
 using Moda.ProjectPortfolioManagement.Application.Projects.Dtos;
+using Moda.ProjectPortfolioManagement.Application.Projects.Models;
 using Moda.ProjectPortfolioManagement.Domain.Models;
 
 namespace Moda.ProjectPortfolioManagement.Application.Projects.Queries;
 public sealed record GetProjectQuery : IQuery<ProjectDetailsDto?>
 {
-    public GetProjectQuery(IdOrKey idOrKey)
+    public GetProjectQuery(ProjectIdOrKey idOrKey)
     {
         IdOrKeyFilter = idOrKey.CreateFilter<Project>();
     }
@@ -21,9 +22,11 @@ internal sealed class GetProjectQueryHandler(IProjectPortfolioManagementDbContex
 
     public async Task<ProjectDetailsDto?> Handle(GetProjectQuery request, CancellationToken cancellationToken)
     {
-        return await _ppmDbContext.Projects
+        var project = await _ppmDbContext.Projects
             .Where(request.IdOrKeyFilter)
             .ProjectToType<ProjectDetailsDto>()
             .FirstOrDefaultAsync(cancellationToken);
+
+        return project;
     }
 }

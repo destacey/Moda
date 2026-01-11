@@ -2,6 +2,7 @@
 using CSharpFunctionalExtensions;
 using Moda.Common.Domain.Events.ProjectPortfolioManagement;
 using Moda.Common.Domain.Interfaces.ProjectPortfolioManagement;
+using Moda.Common.Domain.Models.ProjectPortfolioManagement;
 using Moda.ProjectPortfolioManagement.Domain.Enums;
 using Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 using NodaTime;
@@ -11,15 +12,16 @@ namespace Moda.ProjectPortfolioManagement.Domain.Models;
 /// <summary>
 /// Represents an individual project within a portfolio or program.
 /// </summary>
-public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey, ISimpleProject
+public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey<ProjectKey>, ISimpleProject
 {
     private readonly HashSet<RoleAssignment<ProjectRole>> _roles = [];
     private readonly HashSet<StrategicThemeTag<Project>> _strategicThemeTags = [];
     private readonly HashSet<StrategicInitiativeProject> _strategicInitiativeProjects = [];
+    private readonly List<ProjectTask> _tasks = [];
 
     private Project() { }
 
-    private Project(string name, string description, ProjectStatus status, int expenditureCategoryId, LocalDateRange? dateRange, Guid portfolioId, Guid? programId = null, Dictionary<ProjectRole, HashSet<Guid>>? roles = null, HashSet<Guid>? strategicThemes = null)
+    private Project(string name, string description, ProjectKey key, ProjectStatus status, int expenditureCategoryId, LocalDateRange? dateRange, Guid portfolioId, Guid? programId = null, Dictionary<ProjectRole, HashSet<Guid>>? roles = null, HashSet<Guid>? strategicThemes = null)
     {
         if (Status is ProjectStatus.Active or ProjectStatus.Completed && dateRange is null)
         {
@@ -28,6 +30,7 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey, 
 
         Name = name;
         Description = description;
+        Key = key;
         Status = status;
         ExpenditureCategoryId = expenditureCategoryId;
         DateRange = dateRange;
@@ -46,9 +49,11 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey, 
     }
 
     /// <summary>
-    /// The unique key of the project. This is an alternate key to the Id.
+    /// The unique key of the project used for task key generation (e.g., "APOLLO", "MARS").
+    /// This is an alternate key to the Id.
+    /// Must be 2-20 uppercase alphanumeric characters or hyphens.
     /// </summary>
-    public int Key { get; private init; }
+    public ProjectKey Key { get; private set; } = default!;
 
     /// <summary>
     /// The name of the project.
@@ -129,6 +134,11 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey, 
     public IReadOnlyCollection<StrategicInitiativeProject> StrategicInitiativeProjects => _strategicInitiativeProjects;
 
     /// <summary>
+    /// The tasks associated with this project.
+    /// </summary>
+    public IReadOnlyCollection<ProjectTask> Tasks => _tasks.AsReadOnly();
+
+    /// <summary>
     /// Indicates whether the project can be deleted.
     /// </summary>
     /// <returns></returns>
@@ -187,6 +197,34 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey, 
         }
 
         DateRange = dateRange;
+
+        return Result.Success();
+    }
+
+    /// <summary>
+    /// Updates the project's key and cascades the change to all linked tasks by updating their task keys.
+    /// </summary>
+    public Result ChangeKey(ProjectKey key, Instant timestamp)
+    {
+        Guard.Against.Null(key, nameof(key));
+
+        if (Key.Value == key.Value)
+        {
+            return Result.Success();
+        }
+
+        Key = key;
+
+        AddDomainEvent(new ProjectDetailsUpdatedEvent(this, ExpenditureCategoryId, timestamp));
+
+        foreach (var task in _tasks)
+        {
+            var updateResult = task.UpdateProjectKey(Key);
+            if (updateResult.IsFailure)
+            {
+                return updateResult;
+            }
+        }
 
         return Result.Success();
     }
@@ -315,11 +353,257 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey, 
         return DateRange is not null && DateRange.IsActiveOn(date);
     }
 
+    #region Tasks
+
+    /// <summary>
+    /// Creates a new project task with the specified details and adds it to the project.
+    /// </summary>
+    /// <remarks>The project must have a key assigned before tasks can be created. If a parent task is
+    /// specified, it must exist and cannot be a milestone, as milestones cannot have child tasks. The new task is
+    /// assigned an order value based on its siblings under the same parent.</remarks>
+    /// <param name="nextNumber">The next available task number to assign to the new task. Must be unique within the project.</param>
+    /// <param name="name">The name of the task. Cannot be null or empty.</param>
+    /// <param name="description">An optional description providing additional details about the task.</param>
+    /// <param name="type">The type of the task to create. Determines the task's category, such as standard task or milestone.</param>
+    /// <param name="status">The initial status to assign to the new task.</param>
+    /// <param name="priority">The priority level of the task, indicating its relative importance.</param>
+    /// <param name="progress">The current progress of the task, or null if not specified.</param>
+    /// <param name="parentId">The unique identifier of the parent task, or null if the new task is a top-level task. If specified, the parent
+    /// task must exist and cannot be a milestone.</param>
+    /// <param name="plannedDateRange">The planned date range for the task, or null if not specified.</param>
+    /// <param name="plannedDate">The planned date for the task, or null if not specified.</param>
+    /// <param name="estimatedEffortHours">The estimated effort required to complete the task, in hours. Can be null if not specified.</param>
+    /// <param name="assignments">A mapping of task roles to sets of user identifiers assigned to each role, or null if no assignments are
+    /// specified.</param>
+    /// <returns>A result containing the newly created project task if successful; otherwise, a failure result with an error
+    /// message.</returns>
+    public Result<ProjectTask> CreateTask(
+        int nextNumber,
+        string name,
+        string? description,
+        ProjectTaskType type,
+        Enums.TaskStatus status,
+        TaskPriority priority,
+        Progress? progress,
+        Guid? parentId,
+        FlexibleDateRange? plannedDateRange,
+        LocalDate? plannedDate,
+        decimal? estimatedEffortHours,
+        Dictionary<TaskRole, HashSet<Guid>>? assignments)
+    {
+        if (Key is null)
+        {
+            return Result.Failure<ProjectTask>("Project must have a key before tasks can be created.");
+        }
+
+        ProjectTask? parent = null;
+        if (parentId.HasValue)
+        {
+            parent = _tasks.FirstOrDefault(t => t.Id == parentId);
+            if (parent is null)
+            {
+                return Result.Failure<ProjectTask>("Parent task not found.");
+            }
+
+            if (parent.Type == ProjectTaskType.Milestone)
+            {
+                return Result.Failure<ProjectTask>("Milestones cannot have child tasks.");
+            }
+        }
+
+        // Calculate order
+        var siblings = parentId.HasValue
+            ? _tasks.Where(t => t.ParentId == parentId)
+            : _tasks.Where(t => t.ParentId is null);
+        var order = siblings.Any() ? siblings.Max(t => t.Order) + 1 : 1;
+
+        var task = ProjectTask.Create(
+            Id,
+            new ProjectTaskKey(Key, nextNumber),
+            name,
+            description,
+            type,
+            status,
+            priority,
+            progress,
+            order,
+            parentId,
+            plannedDateRange,
+            plannedDate,
+            estimatedEffortHours,
+            assignments);
+
+        _tasks.Add(task);
+
+        parent?.AddChild(task);
+
+        return Result.Success(task);
+    }
+
+    public Result ChangeTaskPlacement(Guid taskId, Guid? parentId, int? order)
+    {
+        // get the current task
+        var task = _tasks.FirstOrDefault(t => t.Id == taskId);
+        if (task is null)
+        {
+            return Result.Failure("Task not found.");
+        }
+
+        if (order.HasValue && order.Value < 1)
+        {
+            return Result.Failure("Order must be greater than zero.");
+        }
+
+        // get the parent task
+        ProjectTask? parentTask = null;
+        if (parentId.HasValue)
+        {
+            parentTask = _tasks.FirstOrDefault(t => t.Id == parentId);
+            if (parentTask is null)
+            {
+                return Result.Failure("New parent task not found.");
+            }
+
+            if (parentTask.Type == ProjectTaskType.Milestone)
+            {
+                return Result.Failure("Milestones cannot have child tasks.");
+            }
+        }
+
+        var origParentId = task.ParentId;
+        var isChangingParent = origParentId != parentId;
+
+        // set order in new parent
+        var parentChildrenQuery = parentId.HasValue
+                ? _tasks.Where(t => t.ParentId == parentId)
+                : _tasks.Where(t => t.ParentId is null);
+
+        if (!isChangingParent)
+        {
+            // Exclude the task being moved from the siblings list
+            parentChildrenQuery = parentChildrenQuery.Where(t => t.Id != taskId);
+        }
+
+        // Calculate new order
+        var childrenCount = parentChildrenQuery.Count() + 1;
+        var newOrder = Math.Min(order ?? childrenCount, childrenCount);
+
+        Result changeResult;
+        if (isChangingParent)
+        {
+            // Update Old Parent and Children
+            if (origParentId.HasValue)
+            {
+                var oldParent = _tasks.FirstOrDefault(t => t.Id == origParentId);
+                oldParent?.RemoveChild(task);
+            }
+
+            // Update New Parent and Children
+            foreach (var sibling in parentChildrenQuery.Where(t => t.Order >= newOrder))
+            {
+                sibling.ChangeOrder(sibling.Order + 1);
+            }
+
+            changeResult = task.ChangeParent(parentId, newOrder);
+
+            parentTask?.AddChild(task);
+
+            // Reset order for old parent's remaining children after the task has been moved
+            ResetOrderForChildTasks(origParentId);
+        }
+        else
+        {
+            var previousOrder = task.Order;
+
+            if (newOrder == previousOrder)
+                return Result.Success();
+
+            if (newOrder < previousOrder)
+            {
+                // Moving up: Increment orders of siblings between new and old order
+                foreach (var sibling in parentChildrenQuery.Where(t => t.Order >= newOrder && t.Order < previousOrder))
+                {
+                    sibling.ChangeOrder(sibling.Order + 1);
+                }
+            }
+            else
+            {
+                // Moving down: Decrement orders of siblings between old and new order
+                foreach (var sibling in parentChildrenQuery.Where(t => t.Order > previousOrder && t.Order <= newOrder))
+                {
+                    sibling.ChangeOrder(sibling.Order - 1);
+                }
+            }
+
+            changeResult = task.ChangeOrder(newOrder);
+
+        }
+
+        return changeResult;
+    }
+
+    /// <summary>
+    /// Deletes the task with the specified identifier if it has no child tasks or active dependencies.
+    /// </summary>
+    /// <remarks>A task cannot be deleted if it has child tasks or if it has active dependencies. Remove all
+    /// child tasks and dependencies before attempting to delete the task.</remarks>
+    /// <param name="taskId">The unique identifier of the task to delete.</param>
+    /// <returns>A Result indicating whether the deletion was successful. Returns a failure result if the task does not exist,
+    /// has child tasks, or has active dependencies.</returns>
+    public Result DeleteTask(Guid taskId)
+    {
+        var task = _tasks.FirstOrDefault(t => t.Id == taskId);
+        if (task is null)
+        {
+            return Result.Failure("Task not found.");
+        }
+
+        // Check if task has children
+        if (task.Children.Count > 0)
+        {
+            return Result.Failure("Cannot delete a task with children. Delete child tasks first.");
+        }
+
+        // Check if task has active dependencies
+        if (task.Successors.Any(d => d.IsActive) || task.Predecessors.Any(d => d.IsActive))
+        {
+            return Result.Failure("Cannot delete a task with active dependencies. Remove dependencies first.");
+        }
+
+        var parentId = task.ParentId;
+
+        _tasks.Remove(task);
+
+        ResetOrderForChildTasks(parentId);
+
+        return Result.Success();
+    }
+
+    // TODO: this really belongs on the ProjectTask so a parent can reset its own children, but root tasks have no parent
+    private void ResetOrderForChildTasks(Guid? parentId)
+    {
+        var siblings = parentId.HasValue
+            ? _tasks.Where(t => t.ParentId == parentId.Value)
+            : _tasks.Where(t => t.ParentId is null);
+        if (siblings.Any())
+        {
+            int order = 1;
+            foreach (var sibling in siblings.OrderBy(t => t.Order))
+            {
+                sibling.ChangeOrder(order);
+                order++;
+            }
+        }
+    }
+
+    #endregion Tasks
+
     /// <summary>
     /// Creates a new project.
     /// </summary>
     /// <param name="name"></param>
     /// <param name="description"></param>
+    /// <param name="key"></param>
     /// <param name="expenditureCategoryId"></param>
     /// <param name="dateRange"></param>
     /// <param name="portfolioId"></param>
@@ -328,18 +612,18 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey, 
     /// <param name="strategicThemes"></param>
     /// <param name="timestamp"></param>
     /// <returns></returns>
-    internal static Project Create(string name, string description, int expenditureCategoryId, LocalDateRange? dateRange, Guid portfolioId, Guid? programId, Dictionary<ProjectRole, HashSet<Guid>>? roles, HashSet<Guid>? strategicThemes, Instant timestamp)
+    internal static Project Create(string name, string description, ProjectKey key, int expenditureCategoryId, LocalDateRange? dateRange, Guid portfolioId, Guid? programId, Dictionary<ProjectRole, HashSet<Guid>>? roles, HashSet<Guid>? strategicThemes, Instant timestamp)
     {
-        var project = new Project(name, description, ProjectStatus.Proposed, expenditureCategoryId, dateRange, portfolioId, programId, roles, strategicThemes);
+        var project = new Project(name, description, key, ProjectStatus.Proposed, expenditureCategoryId, dateRange, portfolioId, programId, roles, strategicThemes);
 
         project.AddPostPersistenceAction(() => project.AddDomainEvent(
             new ProjectCreatedEvent
             (
-                project, 
-                project.ExpenditureCategoryId, 
-                (int)project.Status, 
-                project.DateRange, 
-                project.PortfolioId, 
+                project,
+                project.ExpenditureCategoryId,
+                (int)project.Status,
+                project.DateRange,
+                project.PortfolioId,
                 project.ProgramId,
                 project.Roles
                     .GroupBy(x => (int)x.Role)

@@ -92,6 +92,9 @@ public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IGoalsDbCo
     public DbSet<ProjectPortfolio> Portfolios => Set<ProjectPortfolio>();
     public DbSet<Program> Programs => Set<Program>();
     public DbSet<Project> Projects => Set<Project>();
+    public DbSet<ProjectTask> ProjectTasks => Set<ProjectTask>();
+    public DbSet<ProjectTaskDependency> ProjectTaskDependencies => Set<ProjectTaskDependency>();
+    public DbSet<PpmTeam> PpmTeams => Set<PpmTeam>();
     public DbSet<PpmStrategicTheme> PpmStrategicThemes => Set<PpmStrategicTheme>();
     public DbSet<StrategicInitiative> StrategicInitiatives => Set<StrategicInitiative>();
 

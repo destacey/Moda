@@ -3,7 +3,12 @@ export { getSortedNames } from './get-sorted-names'
 export {
   getWorkStatusCategoryColor,
   getObjectiveStatusColor,
+  getLuminance,
+  getLifecyclePhaseColor,
+  getLifecyclePhaseTagColor,
+  getLifecyclePhaseColorFromStatus,
 } from './color-helper'
 export { saveElementAsImage } from './save-element-as-image'
 
 export { default as toFormErrors } from './problem-details'
+export { getDrawerWidthPixels } from './window-utils'

@@ -40,7 +40,6 @@ const ProgramDetails: FC<ProgramDetailsProps> = ({
   return (
     <ResponsiveFlex gap="middle" align="start">
       <Descriptions column={1} size="small">
-        <Item label="Status">{program.status.name}</Item>
         <Item label="Portfolio">
           <Link href={`/ppm/portfolios/${program.portfolio.key}`}>
             {program.portfolio.name}

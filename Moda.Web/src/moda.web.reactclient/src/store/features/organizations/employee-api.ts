@@ -58,6 +58,18 @@ export const employeeApi = apiSlice.injectEndpoints({
       },
       providesTags: () => [QueryTags.EmployeeOption],
     }),
+    deleteEmployee: builder.mutation<void, string>({
+      queryFn: async (employeeId) => {
+        try {
+          const data = await getEmployeesClient().delete(employeeId)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: [{ type: QueryTags.Employee, id: 'LIST' }],
+    }),
   }),
 })
 
@@ -65,4 +77,5 @@ export const {
   useGetEmployeesQuery,
   useGetEmployeeQuery,
   useGetEmployeeOptionsQuery,
+  useDeleteEmployeeMutation,
 } = employeeApi

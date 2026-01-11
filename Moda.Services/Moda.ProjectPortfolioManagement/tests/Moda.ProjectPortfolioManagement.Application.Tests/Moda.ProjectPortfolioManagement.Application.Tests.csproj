@@ -27,6 +27,7 @@
         <ProjectReference Include="..\..\..\..\Moda.Common\tests\Moda.Tests.Shared\Moda.Tests.Shared.csproj" />
         <ProjectReference Include="..\Moda.ProjectPortfolioManagement.Domain.Tests\Moda.ProjectPortfolioManagement.Domain.Tests.csproj" />
         <ProjectReference Include="..\..\src\Moda.ProjectPortfolioManagement.Application\Moda.ProjectPortfolioManagement.Application.csproj" />
+        <ProjectReference Include="..\..\..\..\Moda.Common\tests\Moda.Common.Domain.Tests\Moda.Common.Domain.Tests.csproj" />
     </ItemGroup>
 
     <ItemGroup>

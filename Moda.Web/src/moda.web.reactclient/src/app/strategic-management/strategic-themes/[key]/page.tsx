@@ -212,7 +212,7 @@ const StrategicThemeDetailsPage = (props: {
         subtitle="Strategic Theme Details"
         actions={<PageActions actionItems={actionsMenuItems} />}
       />
-      <Space direction="vertical" size="small">
+      <Space vertical size="small">
         <Descriptions>
           <Item label="State">{strategicThemeData.state.name}</Item>
         </Descriptions>

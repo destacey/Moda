@@ -7,7 +7,6 @@ import {
   ProjectDetailsDto,
 } from '@/src/services/moda-api'
 import { useGetPortfolioProgramOptionsQuery } from '@/src/store/features/ppm/portfolios-api'
-import { useGetProgramOptionsQuery } from '@/src/store/features/ppm/programs-api'
 import { useChangeProjectProgramMutation } from '@/src/store/features/ppm/projects-api'
 import { toFormErrors } from '@/src/utils'
 import { Flex, Form, Modal, Select, Typography } from 'antd'
@@ -160,6 +159,7 @@ const ChangeProjectProgramForm = (props: ChangeProjectProgramFormProps) => {
         okText="Save"
         confirmLoading={isSaving}
         onCancel={handleCancel}
+        mask={{ blur: false }}
         maskClosable={false}
         keyboard={false}
         destroyOnHidden={true}

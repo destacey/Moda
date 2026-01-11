@@ -1,6 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <ItemGroup>
+        <InternalsVisibleTo Include="Moda.ProjectPortfolioManagement.Application.Tests" />
+        <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="CSharpFunctionalExtensions" />
         <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
         <PackageReference Include="Mapster" />
@@ -14,6 +19,12 @@
         <ProjectReference Include="..\..\..\..\Moda.Common\src\Moda.Common.Application\Moda.Common.Application.csproj" />
         <ProjectReference Include="..\..\..\..\Moda.Common\src\Moda.Common\Moda.Common.csproj" />
         <ProjectReference Include="..\Moda.ProjectPortfolioManagement.Domain\Moda.ProjectPortfolioManagement.Domain.csproj" />
+    </ItemGroup>
+
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="Moda.ProjectPortfolioManagement.Application.Tests" />
+        <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
     </ItemGroup>
 
 </Project>

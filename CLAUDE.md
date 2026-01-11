@@ -6,33 +6,38 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Moda is a work management system used to plan, manage, and create associations across work items, projects, teams, planning and products. It uses Clean Architecture with Domain-Driven Design principles and a modular monolith approach with a shared database.
 
-Documentation: https://destacey.github.io/Moda
+Documentation: <https://destacey.github.io/Moda>
 
 ## Build and Test Commands
 
 ### .NET Backend
 
 **Build the entire solution:**
+
 ```bash
-dotnet build Moda.sln
+dotnet build Moda.slnx
 ```
 
 **Build a specific project:**
+
 ```bash
 dotnet build "Moda.Web/src/Moda.Web.Api/Moda.Web.Api.csproj"
 ```
 
 **Run all tests:**
+
 ```bash
-dotnet test Moda.sln
+dotnet test Moda.slnx
 ```
 
 **Run tests for a specific project:**
+
 ```bash
 dotnet test "Moda.Services/Moda.Work/tests/Moda.Work.Application.Tests/Moda.Work.Application.Tests.csproj"
 ```
 
 **Run tests with filters:**
+
 ```bash
 # Run specific test class
 dotnet test --filter "FullyQualifiedName~ProjectServiceTests"
@@ -48,12 +53,14 @@ dotnet test Moda.ArchitectureTests/Moda.ArchitectureTests.csproj
 ```
 
 **Run the API locally:**
+
 ```bash
 cd Moda.Web/src/Moda.Web.Api
 dotnet run
 ```
 
 **Database migrations (from repository root):**
+
 ```bash
 # Add new migration
 dotnet ef migrations add <MigrationName> --project "Moda.Infrastructure/src/Moda.Infrastructure.Migrators.MSSQL" --startup-project "Moda.Web/src/Moda.Web.Api"
@@ -86,23 +93,54 @@ npm run lint
 npm test
 ```
 
+### .NET Aspire (Recommended for Local Development)
+
+**Run the entire stack with Aspire:**
+
+```bash
+cd Moda.AppHost
+dotnet run
+```
+
+**Access points when running via Aspire:**
+
+- Aspire Dashboard: <http://localhost:15888> (telemetry, logs, metrics, traces)
+- API: Dynamic HTTPS port (shown in Aspire dashboard)
+- Client: <http://localhost:3000>
+
+**Aspire Configuration:**
+
+- Located in `Moda.AppHost/AppHost.cs`
+- Automatically configures OpenTelemetry for all resources
+- Database connection string loaded from `Moda.Web.Api/Configurations/database.json`
+- Environment variables auto-injected (OTLP endpoint, service names, etc.)
+
+**Aspire Benefits:**
+
+- Unified dashboard for monitoring all services
+- Automatic OpenTelemetry instrumentation
+- Simplified local development orchestration
+- Real-time telemetry (traces, metrics, logs)
+
 ### Docker
 
 **Run entire stack with Docker Compose:**
+
 ```bash
 docker compose up
 ```
 
 **Tear down containers:**
+
 ```bash
 docker compose down
 ```
 
 **Access points when running via Docker:**
 
-- API: https://localhost:5001 (Swagger: https://localhost:5001/swagger)
-- Client: http://localhost:5002
-- Seq (logs): http://localhost:8081
+- API: <https://localhost:5001> (Swagger: <https://localhost:5001/swagger>)
+- Client: <http://localhost:5002>
+- Seq (logs): <http://localhost:8081>
 
 ### VSCode Launch Configurations
 
@@ -312,7 +350,7 @@ API_SCOPE='{scope to attach to API requests; for AAD this is usually api://{clie
 API_BASE_URL='https://localhost:5001'
 ```
 
-2. Use User Secrets for API configuration (right-click `Moda.Web.Api` project → Manage User Secrets)
+1. Use User Secrets for API configuration (right-click `Moda.Web.Api` project → Manage User Secrets)
 
 ### Background Jobs
 
@@ -377,3 +415,36 @@ When using Docker Compose for local development:
 ### OpenAPI Client Generation
 
 The TypeScript client for the frontend is auto-generated from the API's OpenAPI spec. Configuration in `nswag.json`.
+
+### OpenTelemetry and Observability
+
+**Backend (.NET API):**
+
+- Configured in `Moda.Infrastructure/src/Moda.Infrastructure/OpenTelemetry/ConfigureServices.cs`
+- Automatic instrumentation: ASP.NET Core, HttpClient, SQL Client
+- Exports to OTLP endpoint (Aspire dashboard) when `OTEL_EXPORTER_OTLP_ENDPOINT` is set
+- Optional Application Insights export via `APPLICATIONINSIGHTS_CONNECTION_STRING`
+- Excludes health check endpoints from traces
+- Captures SQL statements and parameters in traces
+
+**Frontend (Next.js):**
+
+- Server-side instrumentation only (Node.js runtime)
+- Configured in `instrumentation.ts` and `instrumentation.node.ts`
+- Uses OpenTelemetry NodeSDK with auto-instrumentations
+- Only initializes when `OTEL_EXPORTER_OTLP_ENDPOINT` is present (i.e., when running with Aspire)
+- Automatically disabled in production unless explicitly configured
+- Client-side browser requests are NOT instrumented (limitation of browser-based telemetry with gRPC)
+
+**Key OpenTelemetry Packages (Next.js):**
+
+- `@opentelemetry/sdk-node` - Core Node.js SDK
+- `@opentelemetry/exporter-trace-otlp-grpc` - gRPC exporter for Aspire
+- `@opentelemetry/auto-instrumentations-node` - Auto-instrumentation for HTTP, etc.
+
+**Telemetry in Aspire:**
+
+- Traces, metrics, and logs visible in Aspire dashboard
+- API traces include SQL queries with full details
+- Next.js server-side operations are traced (SSR, API routes, middleware)
+- Browser-to-API calls appear as separate traces (not connected due to browser limitations)

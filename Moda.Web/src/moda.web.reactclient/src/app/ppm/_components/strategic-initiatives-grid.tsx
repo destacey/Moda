@@ -1,7 +1,10 @@
 'use client'
 
 import { ModaGrid } from '@/src/components/common'
-import { PortfolioLinkCellRenderer } from '@/src/components/common/moda-grid-cell-renderers'
+import {
+  LifecycleStatusTagCellRenderer,
+  PortfolioLinkCellRenderer,
+} from '@/src/components/common/moda-grid-cell-renderers'
 import {
   NavigationDto,
   StrategicInitiativeListDto,
@@ -10,7 +13,7 @@ import { getSortedNames } from '@/src/utils'
 import { ColDef } from 'ag-grid-community'
 import dayjs from 'dayjs'
 import Link from 'next/link'
-import { useCallback, useMemo } from 'react'
+import { FC, useCallback, useMemo } from 'react'
 
 export interface StrategicInitiativesGridProps {
   strategicInitiatives: StrategicInitiativeListDto[]
@@ -33,7 +36,7 @@ export const StrategicInitiativeLinkCellRenderer = ({
   )
 }
 
-const StrategicInitiativesGrid: React.FC<StrategicInitiativesGridProps> = (
+const StrategicInitiativesGrid: FC<StrategicInitiativesGridProps> = (
   props: StrategicInitiativesGridProps,
 ) => {
   const { refetch } = props
@@ -50,6 +53,7 @@ const StrategicInitiativesGrid: React.FC<StrategicInitiativesGridProps> = (
         field: 'status.name',
         headerName: 'Status',
         width: 125,
+        cellRenderer: LifecycleStatusTagCellRenderer,
       },
       {
         field: 'portfolio.name',

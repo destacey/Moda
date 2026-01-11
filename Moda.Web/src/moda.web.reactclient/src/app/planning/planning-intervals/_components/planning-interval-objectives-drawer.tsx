@@ -5,10 +5,11 @@ import { Button, Descriptions, Drawer, Flex } from 'antd'
 import Link from 'next/link'
 import dayjs from 'dayjs'
 import PlanningIntervalObjectiveWorkItemsCard from '../[key]/objectives/[objectiveKey]/planning-interval-objective-work-items-card'
-import { getDrawerWidthPercentage } from '@/src/utils/window-utils'
 import { MarkdownRenderer } from '@/src/components/common/markdown'
-import { FC, useState } from 'react'
+import { FC, useEffect, useState } from 'react'
 import { EditPlanningIntervalObjectiveForm } from '.'
+import { getDrawerWidthPixels } from '@/src/utils'
+import { useMessage } from '@/src/components/contexts/messaging'
 
 const { Item: DescriptionsItem } = Descriptions
 
@@ -25,15 +26,29 @@ const PlanningIntervalObjectiveDetailsDrawer: FC<
 > = (props: PlanningIntervalObjectiveDetailsDrawerProps) => {
   const [openEditObjectiveForm, setOpenEditObjectiveForm] =
     useState<boolean>(false)
+  const [size, setSize] = useState(getDrawerWidthPixels())
+  const messageApi = useMessage()
 
-  const { data: objectiveData, isLoading: objectiveDataIsLoading } =
-    useGetPlanningIntervalObjectiveQuery(
-      {
-        planningIntervalKey: props.planningIntervalKey.toString(),
-        objectiveKey: props.objectiveKey.toString(),
-      },
-      { skip: !props.planningIntervalKey || !props.objectiveKey },
-    )
+  const {
+    data: objectiveData,
+    isLoading: objectiveDataIsLoading,
+    error,
+  } = useGetPlanningIntervalObjectiveQuery(
+    {
+      planningIntervalKey: props.planningIntervalKey.toString(),
+      objectiveKey: props.objectiveKey.toString(),
+    },
+    { skip: !props.planningIntervalKey || !props.objectiveKey },
+  )
+
+  useEffect(() => {
+    if (error) {
+      messageApi.error(
+        error.detail ??
+          'An error occurred while loading objective data. Please try again.',
+      )
+    }
+  }, [error, messageApi])
 
   if (!props.planningIntervalKey || !props.objectiveKey) {
     return null
@@ -48,9 +63,19 @@ const PlanningIntervalObjectiveDetailsDrawer: FC<
         placement="right"
         onClose={props.onDrawerClose}
         open={props.drawerOpen}
-        destroyOnHidden={true}
         loading={objectiveDataIsLoading}
-        width={getDrawerWidthPercentage()}
+        mask={{ blur: false }}
+        size={size}
+        resizable={{
+          onResize: (newSize) => setSize(newSize),
+        }}
+        destroyOnHidden={true}
+        styles={{
+          body: {
+            scrollbarWidth: 'auto',
+          } as React.CSSProperties,
+        }}
+        className="custom-drawer"
         extra={
           props.canManageObjectives && (
             <Button onClick={() => setOpenEditObjectiveForm(true)}>Edit</Button>

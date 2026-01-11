@@ -188,8 +188,8 @@ public static class AssemblyHelper
 
         while (currentDir != null)
         {
-            // Look for Moda.sln file
-            if (File.Exists(Path.Combine(currentDir, "Moda.sln")))
+            // Look for Moda.slnx file
+            if (File.Exists(Path.Combine(currentDir, "Moda.slnx")))
             {
                 return currentDir;
             }
@@ -197,7 +197,7 @@ public static class AssemblyHelper
             currentDir = Directory.GetParent(currentDir)?.FullName;
         }
 
-        throw new InvalidOperationException("Could not find solution root. Expected to find Moda.sln file.");
+        throw new InvalidOperationException("Could not find solution root. Expected to find Moda.slnx file.");
     }
 
     /// <summary>

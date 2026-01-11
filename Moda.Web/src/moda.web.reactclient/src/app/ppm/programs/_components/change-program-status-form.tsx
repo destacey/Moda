@@ -158,7 +158,7 @@ const ChangeProgramStatusForm = (props: ChangeProgramStatusFormProps) => {
         keyboard={false} // disable esc key to close modal
         destroyOnHidden={true}
       >
-        <Space direction="vertical">
+        <Space vertical>
           <div>
             {props.program?.key} - {props.program?.name}
           </div>

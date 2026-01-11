@@ -153,7 +153,7 @@ const ChangePortfolioStatusForm = (props: ChangePortfolioStatusFormProps) => {
         keyboard={false} // disable esc key to close modal
         destroyOnHidden={true}
       >
-        <Space direction="vertical">
+        <Space vertical>
           <div>
             {props.portfolio?.key} - {props.portfolio?.name}
           </div>

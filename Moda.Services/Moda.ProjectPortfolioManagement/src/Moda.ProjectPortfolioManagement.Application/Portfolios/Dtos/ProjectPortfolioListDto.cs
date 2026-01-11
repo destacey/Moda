@@ -26,7 +26,7 @@ public sealed record ProjectPortfolioListDto : IMapFrom<ProjectPortfolio>
     /// <summary>
     /// The status of the portfolio.
     /// </summary>
-    public required SimpleNavigationDto Status { get; set; }
+    public required LifecycleNavigationDto Status { get; set; }
 
     /// <summary>
     /// The sponsors of the portfolio.
@@ -46,7 +46,7 @@ public sealed record ProjectPortfolioListDto : IMapFrom<ProjectPortfolio>
     public void ConfigureMapping(TypeAdapterConfig config)
     {
         config.NewConfig<ProjectPortfolio, ProjectPortfolioListDto>()
-            .Map(dest => dest.Status, src => SimpleNavigationDto.FromEnum(src.Status))
+            .Map(dest => dest.Status, src => LifecycleNavigationDto.FromEnum(src.Status))
             .Map(dest => dest.PortfolioSponsors, src => src.Roles.Where(r => r.Role == ProjectPortfolioRole.Sponsor).Select(x => EmployeeNavigationDto.From(x.Employee!)).ToList())
             .Map(dest => dest.PortfolioOwners, src => src.Roles.Where(r => r.Role == ProjectPortfolioRole.Owner).Select(x => EmployeeNavigationDto.From(x.Employee!)).ToList())
             .Map(dest => dest.PortfolioManagers, src => src.Roles.Where(r => r.Role == ProjectPortfolioRole.Manager).Select(x => EmployeeNavigationDto.From(x.Employee!)).ToList());

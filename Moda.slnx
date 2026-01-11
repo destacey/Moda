@@ -1,0 +1,126 @@
+<Solution>
+  <Folder Name="/Moda.Common/" />
+  <Folder Name="/Moda.Common/src/">
+    <Project Path="Moda.Common/src/Moda.Common.Application/Moda.Common.Application.csproj" />
+    <Project Path="Moda.Common/src/Moda.Common.Domain/Moda.Common.Domain.csproj" />
+    <Project Path="Moda.Common/src/Moda.Common/Moda.Common.csproj" />
+  </Folder>
+  <Folder Name="/Moda.Common/tests/">
+    <Project Path="Moda.Common/tests/Moda.Common.Application.Tests/Moda.Common.Application.Tests.csproj" />
+    <Project Path="Moda.Common/tests/Moda.Common.Domain.Tests/Moda.Common.Domain.Tests.csproj" />
+    <Project Path="Moda.Common/tests/Moda.Common.Tests/Moda.Common.Tests.csproj" />
+    <Project Path="Moda.Common/tests/Moda.Tests.Shared/Moda.Tests.Shared.csproj" />
+  </Folder>
+  <Folder Name="/Moda.Infrastructure/" />
+  <Folder Name="/Moda.Infrastructure/src/">
+    <Project Path="Moda.Infrastructure/src/Moda.Infrastructure.Migrators.MSSQL/Moda.Infrastructure.Migrators.MSSQL.csproj" />
+    <Project Path="Moda.Infrastructure/src/Moda.Infrastructure/Moda.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/Moda.Infrastructure/tests/" />
+  <Folder Name="/Moda.Integrations/" />
+  <Folder Name="/Moda.Integrations/src/">
+    <Project Path="Moda.Integrations/src/Moda.Integrations.AzureDevOps/Moda.Integrations.AzureDevOps.csproj" />
+    <Project Path="Moda.Integrations/src/Moda.Integrations.MicrosoftGraph/Moda.Integrations.MicrosoftGraph.csproj" />
+  </Folder>
+  <Folder Name="/Moda.Integrations/tests/">
+    <Project Path="Moda.Integrations/tests/Moda.Integrations.AzureDevOps.IntegrationTests/Moda.Integrations.AzureDevOps.IntegrationTests.csproj" />
+    <Project Path="Moda.Integrations/tests/Moda.Integrations.AzureDevOps.Tests/Moda.Integrations.AzureDevOps.Tests.csproj" />
+  </Folder>
+  <Folder Name="/Moda.Services/" />
+  <Folder Name="/Moda.Services/Moda.AppIntegration/" />
+  <Folder Name="/Moda.Services/Moda.AppIntegration/src/">
+    <Project Path="Moda.Services/Moda.AppIntegration/src/Moda.AppIntegration.Application/Moda.AppIntegration.Application.csproj" />
+    <Project Path="Moda.Services/Moda.AppIntegration/src/Moda.AppIntegration.Domain/Moda.AppIntegration.Domain.csproj" />
+  </Folder>
+  <Folder Name="/Moda.Services/Moda.AppIntegration/tests/">
+    <Project Path="Moda.Services/Moda.AppIntegration/tests/Moda.AppIntegration.Application.Tests/Moda.AppIntegration.Application.Tests.csproj" />
+    <Project Path="Moda.Services/Moda.AppIntegration/tests/Moda.AppIntegration.Domain.Tests/Moda.AppIntegration.Domain.Tests.csproj" />
+  </Folder>
+  <Folder Name="/Moda.Services/Moda.Goals/" />
+  <Folder Name="/Moda.Services/Moda.Goals/src/">
+    <Project Path="Moda.Services/Moda.Goals/src/Moda.Goals.Application/Moda.Goals.Application.csproj" />
+    <Project Path="Moda.Services/Moda.Goals/src/Moda.Goals.Domain/Moda.Goals.Domain.csproj" />
+  </Folder>
+  <Folder Name="/Moda.Services/Moda.Goals/tests/">
+    <Project Path="Moda.Services/Moda.Goals/tests/Moda.Goals.Application.Tests/Moda.Goals.Application.Tests.csproj" />
+    <Project Path="Moda.Services/Moda.Goals/tests/Moda.Goals.Domain.Tests/Moda.Goals.Domain.Tests.csproj" />
+  </Folder>
+  <Folder Name="/Moda.Services/Moda.Health/" />
+  <Folder Name="/Moda.Services/Moda.Health/src/">
+    <Project Path="Moda.Services/Moda.Health/src/Moda.Health/Moda.Health.csproj" />
+  </Folder>
+  <Folder Name="/Moda.Services/Moda.Health/tests/">
+    <Project Path="Moda.Services/Moda.Health/tests/Moda.Health.Tests/Moda.Health.Tests.csproj" />
+  </Folder>
+  <Folder Name="/Moda.Services/Moda.Links/" />
+  <Folder Name="/Moda.Services/Moda.Links/src/">
+    <Project Path="Moda.Services/Moda.Links/src/Moda.Links/Moda.Links.csproj" />
+  </Folder>
+  <Folder Name="/Moda.Services/Moda.Links/tests/">
+    <Project Path="Moda.Services/Moda.Links/tests/Moda.Links.Tests/Moda.Links.Tests.csproj" />
+  </Folder>
+  <Folder Name="/Moda.Services/Moda.Organization/" />
+  <Folder Name="/Moda.Services/Moda.Organization/src/">
+    <Project Path="Moda.Services/Moda.Organization/src/Moda.Organization.Application/Moda.Organization.Application.csproj" />
+    <Project Path="Moda.Services/Moda.Organization/src/Moda.Organization.Domain/Moda.Organization.Domain.csproj" />
+  </Folder>
+  <Folder Name="/Moda.Services/Moda.Organization/tests/">
+    <Project Path="Moda.Services/Moda.Organization/tests/Moda.Organization.Application.Tests/Moda.Organization.Application.Tests.csproj" />
+    <Project Path="Moda.Services/Moda.Organization/tests/Moda.Organization.Domain.Tests/Moda.Organization.Domain.Tests.csproj" />
+  </Folder>
+  <Folder Name="/Moda.Services/Moda.Planning/" />
+  <Folder Name="/Moda.Services/Moda.Planning/src/">
+    <Project Path="Moda.Services/Moda.Planning/src/Moda.Planning.Application/Moda.Planning.Application.csproj" />
+    <Project Path="Moda.Services/Moda.Planning/src/Moda.Planning.Domain/Moda.Planning.Domain.csproj" />
+  </Folder>
+  <Folder Name="/Moda.Services/Moda.Planning/tests/">
+    <Project Path="Moda.Services/Moda.Planning/tests/Moda.Planning.Application.Tests/Moda.Planning.Application.Tests.csproj" />
+    <Project Path="Moda.Services/Moda.Planning/tests/Moda.Planning.Domain.Tests/Moda.Planning.Domain.Tests.csproj" />
+  </Folder>
+  <Folder Name="/Moda.Services/Moda.ProjectPortfolioManagement/" />
+  <Folder Name="/Moda.Services/Moda.ProjectPortfolioManagement/src/">
+    <Project Path="Moda.Services/Moda.ProjectPortfolioManagement/src/Moda.ProjectPortfolioManagement.Application/Moda.ProjectPortfolioManagement.Application.csproj" />
+    <Project Path="Moda.Services/Moda.ProjectPortfolioManagement/src/Moda.ProjectPortfolioManagement.Domain/Moda.ProjectPortfolioManagement.Domain.csproj" />
+  </Folder>
+  <Folder Name="/Moda.Services/Moda.ProjectPortfolioManagement/tests/">
+    <Project Path="Moda.Services/Moda.ProjectPortfolioManagement/tests/Moda.ProjectPortfolioManagement.Application.Tests/Moda.ProjectPortfolioManagement.Application.Tests.csproj" />
+    <Project Path="Moda.Services/Moda.ProjectPortfolioManagement/tests/Moda.ProjectPortfolioManagement.Domain.Tests/Moda.ProjectPortfolioManagement.Domain.Tests.csproj" />
+  </Folder>
+  <Folder Name="/Moda.Services/Moda.StrategicManagement/" />
+  <Folder Name="/Moda.Services/Moda.StrategicManagement/src/">
+    <Project Path="Moda.Services/Moda.StrategicManagement/src/Moda.StrategicManagement.Application/Moda.StrategicManagement.Application.csproj" />
+    <Project Path="Moda.Services/Moda.StrategicManagement/src/Moda.StrategicManagement.Domain/Moda.StrategicManagement.Domain.csproj" />
+  </Folder>
+  <Folder Name="/Moda.Services/Moda.StrategicManagement/tests/">
+    <Project Path="Moda.Services/Moda.StrategicManagement/tests/Moda.StrategicManagement.Application.Tests/Moda.StrategicManagement.Application.Tests.csproj" />
+    <Project Path="Moda.Services/Moda.StrategicManagement/tests/Moda.StrategicManagement.Domain.Tests/Moda.StrategicManagement.Domain.Tests.csproj" />
+  </Folder>
+  <Folder Name="/Moda.Services/Moda.Work/" />
+  <Folder Name="/Moda.Services/Moda.Work/src/">
+    <Project Path="Moda.Services/Moda.Work/src/Moda.Work.Application/Moda.Work.Application.csproj" />
+    <Project Path="Moda.Services/Moda.Work/src/Moda.Work.Domain/Moda.Work.Domain.csproj" />
+  </Folder>
+  <Folder Name="/Moda.Services/Moda.Work/tests/">
+    <Project Path="Moda.Services/Moda.Work/tests/Moda.Work.Application.Tests/Moda.Work.Application.Tests.csproj" />
+    <Project Path="Moda.Services/Moda.Work/tests/Moda.Work.Domain.Tests/Moda.Work.Domain.Tests.csproj" />
+  </Folder>
+  <Folder Name="/Moda.Web/" />
+  <Folder Name="/Moda.Web/src/">
+    <Project Path="Moda.Web/src/Moda.Web.Api/Moda.Web.Api.csproj" />
+    <Project Path="Moda.Web/src/moda.web.reactclient/moda.web.reactclient.esproj">
+      <Build />
+      <Deploy />
+    </Project>
+  </Folder>
+  <Folder Name="/Moda.Web/tests/">
+    <Project Path="Moda.Web/tests/Moda.Web.Api.Tests/Moda.Web.Api.Tests.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="README.md" />
+  </Folder>
+  <Project Path="Moda.AppHost/Moda.AppHost.csproj" />
+  <Project Path="Moda.ArchitectureTests/Moda.ArchitectureTests.csproj" />
+</Solution>
