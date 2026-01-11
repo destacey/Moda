@@ -29,12 +29,15 @@ internal static class ConfigureServices
             .WithTracing(tracing =>
             {
                 tracing.AddSource(builder.Environment.ApplicationName)
-                    .AddAspNetCoreInstrumentation(tracing =>
+                    .AddAspNetCoreInstrumentation(options =>
+                    {
                         // Exclude health check requests from tracing
-                        tracing.Filter = context =>
+                        options.Filter = context =>
                             !context.Request.Path.StartsWithSegments(ServiceEndpoints.HealthEndpointPath)
-                            && !context.Request.Path.StartsWithSegments(ServiceEndpoints.AlivenessEndpointPath)
-                    )
+                            && !context.Request.Path.StartsWithSegments(ServiceEndpoints.AlivenessEndpointPath);
+                        // Enable recording exception details
+                        options.RecordException = true;
+                    })
                     // Uncomment the following line to enable gRPC instrumentation (requires the OpenTelemetry.Instrumentation.GrpcNetClient package)
                     //.AddGrpcClientInstrumentation()
                     .AddHttpClientInstrumentation()
