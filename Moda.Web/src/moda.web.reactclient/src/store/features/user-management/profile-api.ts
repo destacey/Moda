@@ -26,6 +26,9 @@ export const profileApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
+      providesTags: () => [{ type: QueryTags.UserPermission, id: 'USER' }],
+      // Cache current user permissions for 1 minute since they don't change often
+      keepUnusedDataFor: 60,
     }),
     getInternalEmployeeId: builder.query<string, void>({
       queryFn: async () => {
@@ -40,7 +43,7 @@ export const profileApi = apiSlice.injectEndpoints({
       providesTags: (result) => [
         { type: QueryTags.InternalEmployeeId, id: 'EMPLOYEEID' },
       ],
-      keepUnusedDataFor: 300, // cache timeout in seconds (5 minutes)
+      keepUnusedDataFor: 300, // Cache internal employee ID for 5 minutes since it doesn't change often
     }),
   }),
 })

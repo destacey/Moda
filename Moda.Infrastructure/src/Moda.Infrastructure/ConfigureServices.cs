@@ -3,12 +3,16 @@ using System.Reflection;
 using Asp.Versioning;
 using Mapster;
 using Mapster.Utils;
-using Microsoft.ApplicationInsights.DependencyCollector;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Hosting;
+using Moda.Infrastructure.Logging;
+using Moda.Infrastructure.OpenTelemetry;
 using Moda.Integrations.AzureDevOps;
 using Moda.Integrations.MicrosoftGraph;
 using NodaTime;
@@ -17,6 +21,34 @@ namespace Moda.Infrastructure;
 
 public static class ConfigureServices
 {
+    public static TBuilder AddServiceDefaults<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
+    {
+        builder.AddLoggingDefaults();
+
+        builder.ConfigureOpenTelemetry();
+
+        builder.AddDefaultHealthChecks();
+
+        builder.Services.AddServiceDiscovery();
+
+        builder.Services.ConfigureHttpClientDefaults(http =>
+        {
+            // Turn on resilience by default
+            http.AddStandardResilienceHandler();
+
+            // Turn on service discovery by default
+            http.AddServiceDiscovery();
+        });
+
+        // Uncomment the following to restrict the allowed schemes for service discovery.
+        // builder.Services.Configure<ServiceDiscoveryOptions>(options =>
+        // {
+        //     options.AllowedSchemes = ["https"];
+        // });
+
+        return builder;
+    }
+
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration config)
     {
         var assembly = Assembly.GetExecutingAssembly();
@@ -30,7 +62,6 @@ public static class ConfigureServices
         // INTEGRATIONS
         services.AddTransient<IAzureDevOpsService, AzureDevOpsService>();
         services.AddScoped<IExternalEmployeeDirectoryService, MicrosoftGraphService>();
-        services.ConfigureTelemetryModule<DependencyTrackingTelemetryModule>((module, o) => { module.EnableSqlCommandTextInstrumentation = true; });
 
         return services
             .AddApiVersioning()
@@ -49,12 +80,10 @@ public static class ConfigureServices
                 };
             })
             .AddExceptionMiddleware()
-            .AddHealthCheck()
             .AddMediatR(options => options.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
             .AddOpenApiDocumentation(config)
             .AddPersistence(config)
             .AddRequestLogging(config)
-            .AddApplicationInsightsTelemetry()
             .AddRouting(options => options.LowercaseUrls = true)
             .AddServices();
     }
@@ -67,8 +96,14 @@ public static class ConfigureServices
             config.ReportApiVersions = true;
         }).Services;
 
-    private static IServiceCollection AddHealthCheck(this IServiceCollection services) =>
-        services.AddHealthChecks().Services;
+    private static TBuilder AddDefaultHealthChecks<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
+    {
+        builder.Services.AddHealthChecks()
+            // Add a default liveness check to ensure app is responsive
+            .AddCheck("self", () => HealthCheckResult.Healthy(), ["live"]);
+
+        return builder;
+    }
 
     public static async Task InitializeDatabases(this IServiceProvider services, CancellationToken cancellationToken = default)
     {
@@ -94,13 +129,30 @@ public static class ConfigureServices
             .UseHangfireDashboard(config)
             .UseOpenApiDocumentation(config);
 
-    public static IEndpointRouteBuilder MapEndpoints(this IEndpointRouteBuilder builder)
-    {
-        builder.MapControllers().RequireAuthorization();
-        builder.MapHealthCheck();
-        return builder;
-    }
 
-    private static IEndpointConventionBuilder MapHealthCheck(this IEndpointRouteBuilder endpoints) =>
-        endpoints.MapHealthChecks("/api/health").RequireAuthorization();
+
+    public static WebApplication MapDefaultEndpoints(this WebApplication app)
+    {
+        app.MapControllers().RequireAuthorization();
+
+        if (app.Environment.IsDevelopment())
+        {
+            // All health checks must pass for app to be considered ready to accept traffic after starting
+            app.MapHealthChecks(ServiceEndpoints.HealthEndpointPath);
+
+            // Only health checks tagged with the "live" tag must pass for app to be considered alive
+            app.MapHealthChecks(ServiceEndpoints.AlivenessEndpointPath, new HealthCheckOptions
+            {
+                Predicate = r => r.Tags.Contains("live")
+            });
+        }
+        else
+        {
+            app.MapHealthChecks(ServiceEndpoints.HealthEndpointPath).RequireAuthorization();
+        }
+
+        app.MapGet(ServiceEndpoints.StartupEndpointPath, () => Results.Ok());
+
+        return app;
+    }
 }

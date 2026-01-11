@@ -2,85 +2,33 @@
 
 import React, {
   createContext,
-  useState,
-  useEffect,
   useCallback,
+  useEffect,
   useMemo,
+  useRef,
+  useState,
 } from 'react'
 import { useMsal, useIsAuthenticated } from '@azure/msal-react'
-import { InteractionRequiredAuthError } from '@azure/msal-browser'
-import { jwtDecode } from 'jwt-decode'
-import { getProfileClient } from '@/src/services/clients'
+import {
+  InteractionRequiredAuthError,
+  SilentRequest,
+} from '@azure/msal-browser'
 import { LoadingAccount } from '@/src/components/common'
 import { AuthContextType, Claim, User } from './types'
 import { tokenRequest } from '@/auth-config'
+import { useGetUserPermissionsQuery } from '@/src/store/features/user-management/profile-api'
 
 export const AuthContext = createContext<AuthContextType | null>(null)
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { instance, accounts } = useMsal()
   const isAuthenticated = useIsAuthenticated()
+
+  const initializeOnce = useRef(false)
+
   const [redirectHandled, setRedirectHandled] = useState(false)
-  const [hasRefreshedUser, setHasRefreshedUser] = useState(false)
-
-  // New state for tracking the current step/message.
+  const [isLoading, setIsLoading] = useState(true)
   const [authStatus, setAuthStatus] = useState('Initializing authentication...')
-
-  // Handle redirect promise and initialize MSAL.
-  useEffect(() => {
-    const initializeMsal = async () => {
-      try {
-        setAuthStatus('Initializing Moda authentication...')
-        await instance.initialize()
-      } catch (initError) {
-        console.error('Error during MSAL initialization:', initError)
-        setAuthStatus('Moda authentication initialization error.')
-      }
-      try {
-        setAuthStatus('Handling redirect response...')
-        const response = await instance.handleRedirectPromise()
-        if (response && response.account) {
-          instance.setActiveAccount(response.account)
-        }
-      } catch (error) {
-        console.error('handleRedirectPromise error:', error)
-        setAuthStatus('Error processing redirect.')
-      }
-      // If no accounts are available, attempt a silent SSO before falling back to interactive login.
-      if (!instance.getAllAccounts().length) {
-        try {
-          setAuthStatus('Attempting silent SSO...')
-          // ssoSilent will try to obtain an account using an iframe.
-          const ssoResponse = await instance.ssoSilent(tokenRequest)
-          if (ssoResponse && ssoResponse.account) {
-            instance.setActiveAccount(ssoResponse.account)
-          }
-          setAuthStatus('Silent SSO successful. Setting up account...')
-          setRedirectHandled(true)
-        } catch (ssoError) {
-          console.warn(
-            'ssoSilent failed, falling back to interactive login:',
-            ssoError,
-          )
-          setAuthStatus('Silent SSO failed. Redirecting to login...')
-          await instance.loginRedirect()
-        }
-      } else {
-        setAuthStatus('Redirect handled. Setting up account...')
-        setRedirectHandled(true)
-      }
-    }
-    initializeMsal()
-  }, [instance])
-
-  // Ensure an active account is set from available accounts.
-  useEffect(() => {
-    if (accounts.length > 0 && !instance.getActiveAccount()) {
-      instance.setActiveAccount(accounts[0])
-    }
-  }, [accounts, instance])
-
-  const activeAccount = instance.getActiveAccount()
 
   const [user, setUser] = useState<User>({
     name: '',
@@ -88,15 +36,102 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     isAuthenticated: false,
     claims: [],
   })
-  const [isLoading, setIsLoading] = useState(true)
 
+  /**
+   * -------------------------------------------------------------
+   * MSAL initialize + redirect + silent SSO
+   * -------------------------------------------------------------
+   */
+  useEffect(() => {
+    const handleAuth = async () => {
+      if (initializeOnce.current) return
+      initializeOnce.current = true
+
+      try {
+        setAuthStatus('Initializing authentication...')
+        await instance.initialize()
+
+        setAuthStatus('Processing authentication redirect...')
+        const response = await instance.handleRedirectPromise()
+
+        if (response?.account) {
+          instance.setActiveAccount(response.account)
+          setRedirectHandled(true)
+          return
+        }
+
+        if (instance.getAllAccounts().length === 0) {
+          try {
+            setAuthStatus('Attempting silent sign-in...')
+            const ssoResponse = await instance.ssoSilent(tokenRequest)
+
+            if (ssoResponse?.account) {
+              instance.setActiveAccount(ssoResponse.account)
+            }
+          } catch (error) {
+            console.warn('Silent SSO failed, redirecting to login', error)
+            setAuthStatus('Redirecting to sign-in...')
+            await instance.loginRedirect()
+            return
+          }
+        }
+
+        setRedirectHandled(true)
+      } catch (error) {
+        console.error('Authentication initialization failed', error)
+        setAuthStatus('Authentication error')
+        setRedirectHandled(true)
+      }
+    }
+
+    handleAuth()
+  }, [instance])
+
+  /**
+   * -------------------------------------------------------------
+   * Ensure active account is set
+   * -------------------------------------------------------------
+   */
+  useEffect(() => {
+    if (!instance.getActiveAccount() && accounts.length > 0) {
+      instance.setActiveAccount(accounts[0])
+    }
+  }, [accounts, instance])
+
+  const activeAccount = useMemo(
+    () => instance.getActiveAccount(),
+
+    // accounts is needed to auth correctly when changing tabs
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [instance, accounts],
+  )
+
+  /**
+   * -------------------------------------------------------------
+   * Permissions (RTK Query)
+   * -------------------------------------------------------------
+   */
+  const {
+    data: permissions,
+    isLoading: permissionsLoading,
+    error: permissionsError,
+  } = useGetUserPermissionsQuery(undefined, {
+    skip: !redirectHandled || !isAuthenticated || !activeAccount,
+  })
+
+  /**
+   * -------------------------------------------------------------
+   * Token helper
+   * -------------------------------------------------------------
+   */
   const acquireToken = useCallback(
-    async (requestOverrides?: object): Promise<string> => {
+    async (requestOverrides?: Partial<SilentRequest>): Promise<string> => {
       const request = { ...tokenRequest, ...requestOverrides }
+
       try {
         const response = await instance.acquireTokenSilent(request)
         return response.accessToken
-      } catch (error: any) {
+      } catch (error) {
         if (error instanceof InteractionRequiredAuthError) {
           const response = await instance.acquireTokenPopup(request)
           return response.accessToken
@@ -107,8 +142,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     [instance],
   )
 
-  const refreshUser = useCallback(async (): Promise<void> => {
-    if (!activeAccount || !activeAccount.homeAccountId) {
+  /**
+   * -------------------------------------------------------------
+   * Build user
+   * -------------------------------------------------------------
+   */
+  const refreshUser = useCallback(async () => {
+    if (!activeAccount) {
       setUser({
         name: '',
         username: '',
@@ -119,33 +159,39 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       return
     }
 
-    try {
-      setAuthStatus('Acquiring token...')
-      const accessToken = await acquireToken()
+    if (permissionsLoading) return
 
-      setAuthStatus('Fetching user permissions...')
-      const profileClient = getProfileClient()
-      const permissions = await profileClient.getPermissions()
-      const decodedClaims = jwtDecode<any>(accessToken)
-      const claims: Claim[] = [
-        ...Object.keys(decodedClaims).map((key) => ({
-          type: key,
-          value: decodedClaims[key],
-        })),
-        ...permissions.map((permission: string) => ({
-          type: 'Permission',
-          value: permission,
-        })),
-      ]
+    try {
+      setAuthStatus('Loading user profile...')
+
+      const idTokenClaims = activeAccount.idTokenClaims ?? {}
+      const claims: Claim[] = []
+
+      for (const [key, value] of Object.entries(idTokenClaims)) {
+        if (typeof value === 'string') {
+          claims.push({ type: key, value })
+        }
+      }
+
+      if (permissions) {
+        claims.push(
+          ...permissions.map((p) => ({
+            type: 'Permission',
+            value: p,
+          })),
+        )
+      } else if (permissionsError) {
+        console.error('Failed to load permissions', permissionsError)
+      }
 
       setUser({
-        name: activeAccount.name || '',
+        name: activeAccount.name ?? '',
         username: activeAccount.username,
         isAuthenticated: true,
         claims,
       })
     } catch (error) {
-      console.error('Error refreshing user info:', error)
+      console.error('Error refreshing user', error)
       setUser({
         name: '',
         username: '',
@@ -155,32 +201,43 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } finally {
       setIsLoading(false)
     }
-  }, [activeAccount, acquireToken])
+  }, [activeAccount, permissions, permissionsLoading, permissionsError])
 
-  // Call refreshUser only once after redirect handling is complete.
+  /**
+   * -------------------------------------------------------------
+   * React to auth readiness
+   * -------------------------------------------------------------
+   */
   useEffect(() => {
     if (!redirectHandled) return
-    if (isAuthenticated && activeAccount && !hasRefreshedUser) {
-      refreshUser().then(() => {
-        setHasRefreshedUser(true)
-        setAuthStatus('User data loaded.')
-      })
-    } else {
+
+    if (!isAuthenticated || !activeAccount) {
       setIsLoading(false)
+      return
+    }
+
+    if (!permissionsLoading) {
+      refreshUser()
     }
   }, [
+    redirectHandled,
     isAuthenticated,
     activeAccount,
+    permissionsLoading,
     refreshUser,
-    redirectHandled,
-    hasRefreshedUser,
   ])
 
-  const login = useCallback(async (): Promise<void> => {
+  /**
+   * -------------------------------------------------------------
+   * Auth actions
+   * -------------------------------------------------------------
+   */
+  const login = useCallback(async () => {
     await instance.loginRedirect()
   }, [instance])
 
-  const logout = useCallback(async (): Promise<void> => {
+  const logout = useCallback(async () => {
+    instance.setActiveAccount(null)
     setUser({
       name: '',
       username: '',
@@ -190,20 +247,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     await instance.logoutRedirect()
   }, [instance])
 
-  const authContext: AuthContextType = useMemo(
+  /**
+   * -------------------------------------------------------------
+   * Context value
+   * -------------------------------------------------------------
+   */
+  const authContext = useMemo<AuthContextType>(
     () => ({
       user,
       isLoading,
       acquireToken,
       refreshUser,
       hasClaim: (type: string, value: string) =>
-        user.claims.some(
-          (claim) => claim.type === type && claim.value === value,
-        ),
+        user.claims.some((c) => c.type === type && c.value === value),
       hasPermissionClaim: (value: string) =>
-        user.claims.some(
-          (claim) => claim.type === 'Permission' && claim.value === value,
-        ),
+        user.claims.some((c) => c.type === 'Permission' && c.value === value),
       login,
       logout,
     }),
@@ -211,7 +269,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   )
 
   if (isLoading) {
-    // Pass the current authStatus to LoadingAccount
     return <LoadingAccount message={authStatus} />
   }
 

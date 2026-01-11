@@ -1,3 +1,4 @@
+import { User } from './../../components/contexts/auth/types.d'
 export enum QueryTags {
   // ADMIN
   BackgroundJob = 'Admin.BackgroundJob',
@@ -89,6 +90,7 @@ export enum QueryTags {
 
   // USER MANAGEMENT
   User = 'UserManagement.User',
+  UserPermission = 'UserManagement.UserPermission',
   UserRole = 'UserManagement.UserRole',
   Role = 'UserManagement.Role',
   Permission = 'UserManagement.Permission',

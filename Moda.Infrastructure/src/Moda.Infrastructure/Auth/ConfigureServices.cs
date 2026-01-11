@@ -27,11 +27,8 @@ internal static class ConfigureServices
     {
         services.AddAuthorization(options =>
         {
-            // Default policy that accepts both JWT and PAT authentication
-            options.DefaultPolicy = new AuthorizationPolicyBuilder()
-                .AddAuthenticationSchemes(Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme, "PersonalAccessToken")
-                .RequireAuthenticatedUser()
-                .Build();
+            // Default policy is dynamically determined by PermissionPolicyProvider
+            // based on the presence of the x-api-key header to avoid unnecessary PAT authentication attempts
         });
 
         return services;
