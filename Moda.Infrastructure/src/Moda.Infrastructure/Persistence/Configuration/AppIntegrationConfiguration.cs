@@ -12,7 +12,8 @@ public class ConnectionConfig : IEntityTypeConfiguration<Connection>
 
         builder.HasKey(c => c.Id);
         builder.HasDiscriminator(c => c.Connector)
-            .HasValue<AzureDevOpsBoardsConnection>(Connector.AzureDevOps);
+            .HasValue<AzureDevOpsBoardsConnection>(Connector.AzureDevOps)
+            .HasValue<AzureOpenAIConnection>(Connector.AzureOpenAI);
 
         builder.HasIndex(c => new { c.Id, c.IsDeleted })
             .HasFilter("[IsDeleted] = 0");
@@ -69,6 +70,17 @@ public class AzureDevOpsBoardsConnectionConfig : IEntityTypeConfiguration<AzureD
         {
             ownedBuilder.ToJson();
             ownedBuilder.OwnsMany(conf => conf.WorkspaceTeams);
+        });
+    }
+}
+
+public class AzureOpenAIConnectionConfig : IEntityTypeConfiguration<AzureOpenAIConnection>
+{
+    public void Configure(EntityTypeBuilder<AzureOpenAIConnection> builder)
+    {
+        builder.OwnsOne(c => c.Configuration, ownedBuilder =>
+        {
+            ownedBuilder.ToJson();
         });
     }
 }
