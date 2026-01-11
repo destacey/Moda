@@ -93,6 +93,35 @@ npm run lint
 npm test
 ```
 
+### .NET Aspire (Recommended for Local Development)
+
+**Run the entire stack with Aspire:**
+
+```bash
+cd Moda.AppHost
+dotnet run
+```
+
+**Access points when running via Aspire:**
+
+- Aspire Dashboard: <http://localhost:15888> (telemetry, logs, metrics, traces)
+- API: Dynamic HTTPS port (shown in Aspire dashboard)
+- Client: <http://localhost:3000>
+
+**Aspire Configuration:**
+
+- Located in `Moda.AppHost/AppHost.cs`
+- Automatically configures OpenTelemetry for all resources
+- Database connection string loaded from `Moda.Web.Api/Configurations/database.json`
+- Environment variables auto-injected (OTLP endpoint, service names, etc.)
+
+**Aspire Benefits:**
+
+- Unified dashboard for monitoring all services
+- Automatic OpenTelemetry instrumentation
+- Simplified local development orchestration
+- Real-time telemetry (traces, metrics, logs)
+
 ### Docker
 
 **Run entire stack with Docker Compose:**
@@ -386,3 +415,36 @@ When using Docker Compose for local development:
 ### OpenAPI Client Generation
 
 The TypeScript client for the frontend is auto-generated from the API's OpenAPI spec. Configuration in `nswag.json`.
+
+### OpenTelemetry and Observability
+
+**Backend (.NET API):**
+
+- Configured in `Moda.Infrastructure/src/Moda.Infrastructure/OpenTelemetry/ConfigureServices.cs`
+- Automatic instrumentation: ASP.NET Core, HttpClient, SQL Client
+- Exports to OTLP endpoint (Aspire dashboard) when `OTEL_EXPORTER_OTLP_ENDPOINT` is set
+- Optional Application Insights export via `APPLICATIONINSIGHTS_CONNECTION_STRING`
+- Excludes health check endpoints from traces
+- Captures SQL statements and parameters in traces
+
+**Frontend (Next.js):**
+
+- Server-side instrumentation only (Node.js runtime)
+- Configured in `instrumentation.ts` and `instrumentation.node.ts`
+- Uses OpenTelemetry NodeSDK with auto-instrumentations
+- Only initializes when `OTEL_EXPORTER_OTLP_ENDPOINT` is present (i.e., when running with Aspire)
+- Automatically disabled in production unless explicitly configured
+- Client-side browser requests are NOT instrumented (limitation of browser-based telemetry with gRPC)
+
+**Key OpenTelemetry Packages (Next.js):**
+
+- `@opentelemetry/sdk-node` - Core Node.js SDK
+- `@opentelemetry/exporter-trace-otlp-grpc` - gRPC exporter for Aspire
+- `@opentelemetry/auto-instrumentations-node` - Auto-instrumentation for HTTP, etc.
+
+**Telemetry in Aspire:**
+
+- Traces, metrics, and logs visible in Aspire dashboard
+- API traces include SQL queries with full details
+- Next.js server-side operations are traced (SSR, API routes, middleware)
+- Browser-to-API calls appear as separate traces (not connected due to browser limitations)
