@@ -1,8 +1,8 @@
-using Moda.AppIntegration.Domain.Models;
-using Moda.AppIntegration.Domain.Models.OpenAI;
 using Moda.Common.Extensions;
 
-public class AzureOpenAIConnection : AIConnection<AzureOpenAIConnectionConfiguration>
+namespace Moda.AppIntegration.Domain.Models.AzureOpenAI;
+
+public class AzureOpenAIConnection : Connection<AzureOpenAIConnectionConfiguration>
 {
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
     private AzureOpenAIConnection() { }
@@ -24,24 +24,6 @@ public class AzureOpenAIConnection : AIConnection<AzureOpenAIConnectionConfigura
     public override AzureOpenAIConnectionConfiguration Configuration { get; protected set; }
 
     public override bool HasActiveIntegrationObjects => IsValidConfiguration;
-
-    public static AzureOpenAIConnection Create(
-        string name,
-        string? description,
-        AzureOpenAIConnectionConfiguration configuration,
-        bool configurationIsValid,
-        Instant timestamp)
-    {
-        var connection = new AzureOpenAIConnection(
-            name,
-            description,
-            configurationIsValid,
-            configuration);
-
-        connection.AddDomainEvent(EntityCreatedEvent.WithEntity(connection, timestamp));
-
-        return connection;
-    }
 
     public Result Update(string name, string? description, string apiKey, string deploymentName, bool configurationIsValid, Instant timestamp)
     {
@@ -86,5 +68,23 @@ public class AzureOpenAIConnection : AIConnection<AzureOpenAIConnectionConfigura
             || Configuration.ApiKey != apiKey.Trim()
             || Configuration.DeploymentName != deploymentName.Trim()
             || IsValidConfiguration != configurationIsValid; // Assuming OpenAIConnectionConfiguration has an appropriate Equals method
+    }
+
+    public static AzureOpenAIConnection Create(
+        string name,
+        string? description,
+        AzureOpenAIConnectionConfiguration configuration,
+        bool configurationIsValid,
+        Instant timestamp)
+    {
+        var connection = new AzureOpenAIConnection(
+            name,
+            description,
+            configurationIsValid,
+            configuration);
+
+        connection.AddDomainEvent(EntityCreatedEvent.WithEntity(connection, timestamp));
+
+        return connection;
     }
 }

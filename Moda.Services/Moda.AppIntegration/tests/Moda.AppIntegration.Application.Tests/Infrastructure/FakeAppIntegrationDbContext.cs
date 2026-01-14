@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Moda.AppIntegration.Application.Persistence;
 using Moda.AppIntegration.Domain.Models;
+using Moda.AppIntegration.Domain.Models.AzureOpenAI;
 using Moda.Common.Domain.Employees;
 using Moda.Common.Domain.Identity;
 using Moda.Tests.Shared.Infrastructure;
@@ -18,7 +19,8 @@ public class FakeAppIntegrationDbContext : IAppIntegrationDbContext, IDisposable
     // AppIntegration domain entities
     private readonly List<Connection> _connections = [];
     private readonly List<AzureDevOpsBoardsConnection> _azureDevOpsBoardsConnections = [];
-    
+    private readonly List<AzureOpenAIConnection> _azureOpenAIConnections = [];
+
     // Common domain entities
     private readonly List<Employee> _employees = [];
     private readonly List<ExternalEmployeeBlacklistItem> _externalEmployeeBlacklistItems = [];
@@ -27,6 +29,7 @@ public class FakeAppIntegrationDbContext : IAppIntegrationDbContext, IDisposable
     // DbSet properties
     public DbSet<Connection> Connections => _connections.AsDbSet();
     public DbSet<AzureDevOpsBoardsConnection> AzureDevOpsBoardsConnections => _azureDevOpsBoardsConnections.AsDbSet();
+    public DbSet<AzureOpenAIConnection> AzureOpenAIConnections => _azureOpenAIConnections.AsDbSet();
     public DbSet<Employee> Employees => _employees.AsDbSet();
     public DbSet<ExternalEmployeeBlacklistItem> ExternalEmployeeBlacklistItems => _externalEmployeeBlacklistItems.AsDbSet();
     public DbSet<PersonalAccessToken> PersonalAccessTokens => _personalAccessTokens.AsDbSet();

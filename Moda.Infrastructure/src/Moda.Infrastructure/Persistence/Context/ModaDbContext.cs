@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Moda.AppIntegration.Domain.Models.AzureOpenAI;
 using Moda.Common.Domain.Employees;
-using Moda.Common.Domain.Identity;
 using Moda.Goals.Application.Persistence;
 using Moda.Goals.Domain.Models;
 using Moda.Health;

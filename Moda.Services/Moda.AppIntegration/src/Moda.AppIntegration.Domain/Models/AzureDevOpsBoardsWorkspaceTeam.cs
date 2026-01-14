@@ -1,10 +1,13 @@
-﻿namespace Moda.AppIntegration.Domain.Models;
+﻿using System.Text.Json.Serialization;
+
+namespace Moda.AppIntegration.Domain.Models;
 public sealed class AzureDevOpsBoardsWorkspaceTeam
 {
     private string _teamName = default!;
 
     private AzureDevOpsBoardsWorkspaceTeam() { }
 
+    [JsonConstructor]
     public AzureDevOpsBoardsWorkspaceTeam(Guid workspaceId, Guid teamId, string teamName, Guid? boardId)
     {
         WorkspaceId = workspaceId;

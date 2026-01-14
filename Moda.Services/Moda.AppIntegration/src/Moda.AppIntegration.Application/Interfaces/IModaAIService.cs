@@ -1,6 +1,6 @@
 using Moda.AppIntegration.Domain.Models.AICapabilities.ObjectiveHealthCheckSummary;
 
-namespace Moda.AppIntegration.Application.Interfaces.AzureOpenAI;
+namespace Moda.AppIntegration.Application.Interfaces;
 
 public interface IModaAIService
 {

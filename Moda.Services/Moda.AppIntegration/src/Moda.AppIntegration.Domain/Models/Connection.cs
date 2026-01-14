@@ -123,18 +123,6 @@ public abstract class Connection : BaseSoftDeletableEntity<Guid>, IActivatable
     }
 }
 
-public abstract class WorkManagementConnection<TC, TT> : Connection<TC>
-{
-    /// <summary>
-    /// The team configuration.
-    /// </summary>
-    public abstract TT TeamConfiguration { get; protected set; }
-}
-
-public abstract class AIConnection<TC> : Connection<TC>
-{
-}
-
 public abstract class Connection<TC> : Connection
 {
     /// <summary>

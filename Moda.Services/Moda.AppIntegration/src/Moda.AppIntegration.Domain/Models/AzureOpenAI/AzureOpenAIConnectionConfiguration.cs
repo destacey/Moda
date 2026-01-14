@@ -1,49 +1,46 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 
-namespace Moda.AppIntegration.Domain.Models.OpenAI;
+namespace Moda.AppIntegration.Domain.Models.AzureOpenAI;
 
-/// <summary>
-/// 
-/// </summary>
-/// <param name="apiKey"></param>
-/// <param name="deploymentName"></param>
-/// <param name="baseUrl"></param>
-/// <param name="defaultTemperature"></param>
-/// <param name="defaultMaxOutputTokens"></param>
-/// <param name="jsonModePreferred"></param>
-[method: SetsRequiredMembers]
-public sealed class AzureOpenAIConnectionConfiguration(string apiKey, string deploymentName, string baseUrl, double defaultTemperature = 0.1, int defaultMaxOutputTokens = 400, bool jsonModePreferred = true)
+public sealed class AzureOpenAIConnectionConfiguration
 {
+    [JsonConstructor]
+    private AzureOpenAIConnectionConfiguration() { }
+
+    [SetsRequiredMembers]
+    public AzureOpenAIConnectionConfiguration(string apiKey, string deploymentName, string baseUrl, double defaultTemperature = 0.1, int defaultMaxOutputTokens = 400, bool jsonModePreferred = true)
+    {
+        ApiKey = apiKey.Trim();
+        DeploymentName = deploymentName.Trim();
+        BaseUrl = baseUrl.Trim();
+        DefaultTemperature = defaultTemperature;
+        DefaultMaxOutputTokens = defaultMaxOutputTokens;
+        JsonModePreferred = jsonModePreferred;
+    }
+
     /// <summary>
     /// Gets or sets the API key for Azure OpenAI resource via ApiKeyCredential().
     /// </summary>
-    public required string ApiKey { get; set; } = apiKey.Trim();
+    public required string ApiKey { get; set; }
 
     /// <summary>
     /// Azure OpenAI resource URL.
     /// </summary>
-    public required string BaseUrl { get; set; } = baseUrl.Trim();
+    public required string BaseUrl { get; set; }
 
     /// <summary>
     /// The OpenAI model name to use for this connection (e.g. "gpt-4o")
     /// </summary>
-    public required string DeploymentName { get; set; } = deploymentName.Trim();
+    public required string DeploymentName { get; set; }
 
     #region Common AI Settings
 
-    /// <summary>
-    /// 
-    /// </summary>
-    public double DefaultTemperature { get; } = defaultTemperature;
+    public double DefaultTemperature { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    public int DefaultMaxOutputTokens { get; } = defaultMaxOutputTokens;
+    public int DefaultMaxOutputTokens { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    public bool JsonModePreferred { get; } = jsonModePreferred;
+    public bool JsonModePreferred { get; set; }
+
     #endregion
 }

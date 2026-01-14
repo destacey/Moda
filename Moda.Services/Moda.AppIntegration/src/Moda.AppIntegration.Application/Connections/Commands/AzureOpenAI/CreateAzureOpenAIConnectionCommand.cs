@@ -1,9 +1,9 @@
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using Moda.AppIntegration.Domain.Models.OpenAI;
+using Moda.AppIntegration.Domain.Models.AzureOpenAI;
 using NodaTime;
 
-namespace Moda.AppIntegration.Application.Connections.Commands;
+namespace Moda.AppIntegration.Application.Connections.Commands.AzureOpenAI;
 public sealed record CreateAzureOpenAIConnectionCommand(string Name, string? Description, string ApiKey, string DeploymentName, string BaseUrl) : ICommand<Guid>;
 
 public sealed class CreateAzureOpenAIConnectionCommandValidator : CustomValidator<CreateAzureOpenAIConnectionCommand>

@@ -3,14 +3,9 @@ using Moda.Common.Application.Requests.AppIntegration;
 
 namespace Moda.AppIntegration.Application.Connections.Queries;
 
-internal sealed class GetAIConnectionQueryHandler : IQueryHandler<GetAIConnectionQuery, EnabledAIConnectionDto>
+internal sealed class GetAIConnectionQueryHandler(IAppIntegrationDbContext appIntegrationDbContext) : IQueryHandler<GetAIConnectionQuery, EnabledAIConnectionDto>
 {
-    private readonly IAppIntegrationDbContext _appIntegrationDbContext;
-
-    public GetAIConnectionQueryHandler(IAppIntegrationDbContext appIntegrationDbContext)
-    {
-        _appIntegrationDbContext = appIntegrationDbContext;
-    }
+    private readonly IAppIntegrationDbContext _appIntegrationDbContext = appIntegrationDbContext;
 
     public async Task<EnabledAIConnectionDto> Handle(GetAIConnectionQuery request, CancellationToken cancellationToken)
     {
