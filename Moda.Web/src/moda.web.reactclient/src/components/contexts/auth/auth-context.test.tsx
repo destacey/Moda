@@ -1,6 +1,6 @@
 import { render, screen, waitFor, act } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import { useContext } from 'react'
+import React, { useImperativeHandle, forwardRef } from 'react'
 
 // Mock LoadingAccount component - must be before imports that use it
 jest.mock('../../common', () => ({
@@ -50,7 +50,7 @@ jest.mock('@azure/msal-browser', () => ({
 }))
 
 // Import after mocks
-import { AuthProvider, AuthContext } from './auth-context'
+import { AuthProvider } from './auth-context'
 import useAuth from './use-auth'
 import type { AuthContextType } from './types'
 
@@ -73,6 +73,31 @@ const TestConsumer = () => {
     </div>
   )
 }
+
+// Test component that exposes auth context via ref for testing
+interface AuthContextHandle {
+  getContext: () => AuthContextType
+}
+
+const TestConsumerWithRef = forwardRef<AuthContextHandle>(
+  function TestConsumerWithRef(_props, ref) {
+    const auth = useAuth()
+
+    useImperativeHandle(ref, () => ({
+      getContext: () => auth,
+    }))
+
+    return (
+      <div>
+        <span data-testid="user-name">{auth.user?.name || 'No user'}</span>
+        <span data-testid="user-authenticated">
+          {auth.user?.isAuthenticated ? 'true' : 'false'}
+        </span>
+        <span data-testid="is-loading">{auth.isLoading ? 'true' : 'false'}</span>
+      </div>
+    )
+  },
+)
 
 describe('AuthContext', () => {
   const mockAccount = {
@@ -305,24 +330,21 @@ describe('AuthContext', () => {
         error: undefined,
       })
 
-      let authContext: AuthContextType | null = null
-      const ContextCapture = () => {
-        authContext = useContext(AuthContext)
-        return null
-      }
+      const ref = React.createRef<AuthContextHandle>()
 
       render(
         <AuthProvider>
-          <ContextCapture />
+          <TestConsumerWithRef ref={ref} />
         </AuthProvider>,
       )
 
       await waitFor(() => {
-        expect(authContext?.user?.isAuthenticated).toBe(true)
+        expect(ref.current?.getContext().user?.isAuthenticated).toBe(true)
       })
 
-      expect(authContext?.hasClaim('email', 'test@example.com')).toBe(true)
-      expect(authContext?.hasClaim('email', 'other@example.com')).toBe(false)
+      const authContext = ref.current!.getContext()
+      expect(authContext.hasClaim('email', 'test@example.com')).toBe(true)
+      expect(authContext.hasClaim('email', 'other@example.com')).toBe(false)
     })
 
     it('hasPermissionClaim returns true when permission exists', async () => {
@@ -339,24 +361,21 @@ describe('AuthContext', () => {
         error: undefined,
       })
 
-      let authContext: AuthContextType | null = null
-      const ContextCapture = () => {
-        authContext = useContext(AuthContext)
-        return null
-      }
+      const ref = React.createRef<AuthContextHandle>()
 
       render(
         <AuthProvider>
-          <ContextCapture />
+          <TestConsumerWithRef ref={ref} />
         </AuthProvider>,
       )
 
       await waitFor(() => {
-        expect(authContext?.user?.isAuthenticated).toBe(true)
+        expect(ref.current?.getContext().user?.isAuthenticated).toBe(true)
       })
 
-      expect(authContext?.hasPermissionClaim('Permission.Read')).toBe(true)
-      expect(authContext?.hasPermissionClaim('Permission.Delete')).toBe(false)
+      const authContext = ref.current!.getContext()
+      expect(authContext.hasPermissionClaim('Permission.Read')).toBe(true)
+      expect(authContext.hasPermissionClaim('Permission.Delete')).toBe(false)
     })
   })
 
@@ -438,23 +457,19 @@ describe('AuthContext', () => {
         error: undefined,
       })
 
-      let authContext: AuthContextType | null = null
-      const ContextCapture = () => {
-        authContext = useContext(AuthContext)
-        return null
-      }
+      const ref = React.createRef<AuthContextHandle>()
 
       render(
         <AuthProvider>
-          <ContextCapture />
+          <TestConsumerWithRef ref={ref} />
         </AuthProvider>,
       )
 
       await waitFor(() => {
-        expect(authContext?.user?.isAuthenticated).toBe(true)
+        expect(ref.current?.getContext().user?.isAuthenticated).toBe(true)
       })
 
-      const token = await authContext?.acquireToken()
+      const token = await ref.current!.getContext().acquireToken()
       expect(token).toBe('test-token')
       expect(mockInstance.acquireTokenSilent).toHaveBeenCalled()
     })
@@ -486,23 +501,19 @@ describe('AuthContext', () => {
         error: undefined,
       })
 
-      let authContext: AuthContextType | null = null
-      const ContextCapture = () => {
-        authContext = useContext(AuthContext)
-        return null
-      }
+      const ref = React.createRef<AuthContextHandle>()
 
       render(
         <AuthProvider>
-          <ContextCapture />
+          <TestConsumerWithRef ref={ref} />
         </AuthProvider>,
       )
 
       await waitFor(() => {
-        expect(authContext?.user?.isAuthenticated).toBe(true)
+        expect(ref.current?.getContext().user?.isAuthenticated).toBe(true)
       })
 
-      const token = await authContext?.acquireToken()
+      const token = await ref.current!.getContext().acquireToken()
       expect(token).toBe('popup-token')
       expect(mockInstance.acquireTokenPopup).toHaveBeenCalled()
     })
