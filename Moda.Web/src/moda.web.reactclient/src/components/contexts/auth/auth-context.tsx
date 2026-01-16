@@ -5,12 +5,12 @@ import React, {
   useCallback,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from 'react'
-import { useMsal, useIsAuthenticated } from '@azure/msal-react'
+import { useMsal, useIsAuthenticated, useMsalAuthentication } from '@azure/msal-react'
 import {
   InteractionRequiredAuthError,
+  InteractionType,
   SilentRequest,
 } from '@azure/msal-browser'
 import { LoadingAccount } from '@/src/components/common'
@@ -21,12 +21,13 @@ import { useGetUserPermissionsQuery } from '@/src/store/features/user-management
 export const AuthContext = createContext<AuthContextType | null>(null)
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const { instance, accounts } = useMsal()
+  const { instance, accounts, inProgress } = useMsal()
   const isAuthenticated = useIsAuthenticated()
 
-  const initializeOnce = useRef(false)
+  // useMsalAuthentication handles the login flow automatically
+  // It will use silent auth if possible, otherwise redirect to login
+  const { error: authError } = useMsalAuthentication(InteractionType.Redirect, tokenRequest)
 
-  const [redirectHandled, setRedirectHandled] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [authStatus, setAuthStatus] = useState('Initializing authentication...')
 
@@ -37,74 +38,34 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     claims: [],
   })
 
-  /**
-   * -------------------------------------------------------------
-   * MSAL initialize + redirect + silent SSO
-   * -------------------------------------------------------------
-   */
-  useEffect(() => {
-    const handleAuth = async () => {
-      if (initializeOnce.current) return
-      initializeOnce.current = true
-
-      try {
-        setAuthStatus('Initializing authentication...')
-        await instance.initialize()
-
-        setAuthStatus('Processing authentication redirect...')
-        const response = await instance.handleRedirectPromise()
-
-        if (response?.account) {
-          instance.setActiveAccount(response.account)
-          setRedirectHandled(true)
-          return
-        }
-
-        if (instance.getAllAccounts().length === 0) {
-          try {
-            setAuthStatus('Attempting silent sign-in...')
-            const ssoResponse = await instance.ssoSilent(tokenRequest)
-
-            if (ssoResponse?.account) {
-              instance.setActiveAccount(ssoResponse.account)
-            }
-          } catch (error) {
-            console.warn('Silent SSO failed, redirecting to login', error)
-            setAuthStatus('Redirecting to sign-in...')
-            await instance.loginRedirect()
-            return
-          }
-        }
-
-        setRedirectHandled(true)
-      } catch (error) {
-        console.error('Authentication initialization failed', error)
-        setAuthStatus('Authentication error')
-        setRedirectHandled(true)
-      }
-    }
-
-    handleAuth()
-  }, [instance])
+  // Track when MSAL has finished any in-progress operations
+  const isReady = inProgress === 'none'
 
   /**
    * -------------------------------------------------------------
-   * Ensure active account is set
+   * Ensure active account is set when we have accounts
    * -------------------------------------------------------------
    */
   useEffect(() => {
-    if (!instance.getActiveAccount() && accounts.length > 0) {
+    if (!isReady) return
+
+    const activeAccount = instance.getActiveAccount()
+    if (!activeAccount && accounts.length > 0) {
       instance.setActiveAccount(accounts[0])
     }
-  }, [accounts, instance])
+  }, [accounts, instance, isReady])
 
-  const activeAccount = useMemo(
-    () => instance.getActiveAccount(),
+  const activeAccount = useMemo(() => {
+    if (!isReady) return null
+    return instance.getActiveAccount()
+  }, [instance, accounts, isReady]) // eslint-disable-line react-hooks/exhaustive-deps
 
-    // accounts is needed to auth correctly when changing tabs
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [instance, accounts],
-  )
+  // Log auth errors
+  useEffect(() => {
+    if (authError) {
+      console.error('[Auth] Authentication error:', authError)
+    }
+  }, [authError])
 
   /**
    * -------------------------------------------------------------
@@ -116,7 +77,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     isLoading: permissionsLoading,
     error: permissionsError,
   } = useGetUserPermissionsQuery(undefined, {
-    skip: !redirectHandled || !isAuthenticated || !activeAccount,
+    skip: !isReady || !isAuthenticated || !activeAccount,
   })
 
   /**
@@ -191,7 +152,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         claims,
       })
     } catch (error) {
-      console.error('Error refreshing user', error)
+      console.error('[Auth] Error building user profile', error)
       setUser({
         name: '',
         username: '',
@@ -209,7 +170,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
    * -------------------------------------------------------------
    */
   useEffect(() => {
-    if (!redirectHandled) return
+    if (!isReady) {
+      setAuthStatus('Authenticating...')
+      return
+    }
 
     if (!isAuthenticated || !activeAccount) {
       setIsLoading(false)
@@ -220,7 +184,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       refreshUser()
     }
   }, [
-    redirectHandled,
+    isReady,
     isAuthenticated,
     activeAccount,
     permissionsLoading,
