@@ -179,6 +179,9 @@ jobs:
             - name: Install dotnet ef
               run: dotnet tool install --global dotnet-ef
 
+            - name: Build for migrations
+              run: dotnet build Moda.Web/src/Moda.Web.Api/Moda.Web.Api.csproj
+
             - name: Run migrations
               run: |
                   dotnet ef database update --connection "${{ steps.tfoutputs.outputs.sql_server_connection_string }}" --startup-project Moda.Web/src/Moda.Web.Api/Moda.Web.Api.csproj --project Moda.Infrastructure/src/Moda.Infrastructure.Migrators.MSSQL/Moda.Infrastructure.Migrators.MSSQL.csproj
