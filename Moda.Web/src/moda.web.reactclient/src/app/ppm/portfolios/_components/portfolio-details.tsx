@@ -1,10 +1,11 @@
 'use client'
 
 import { ResponsiveFlex } from '@/src/components/common'
+import LinksCard from '@/src/components/common/links/links-card'
 import { MarkdownRenderer } from '@/src/components/common/markdown'
 import { ProjectPortfolioDetailsDto } from '@/src/services/moda-api'
 import { getSortedNames } from '@/src/utils'
-import { Descriptions } from 'antd'
+import { Descriptions, Flex } from 'antd'
 
 const { Item } = Descriptions
 
@@ -31,18 +32,21 @@ const PortfolioDetails: React.FC<PortfolioDetailsProps> = ({
       : 'No managers assigned'
 
   return (
-    <ResponsiveFlex gap="middle" align="start">
-      <Descriptions column={1} size="small">
-        <Item label="Sponsors">{sponsorNames}</Item>
-        <Item label="Owners">{ownerNames}</Item>
-        <Item label="Managers">{managerNames}</Item>
-      </Descriptions>
-      <Descriptions layout="vertical" size="small">
-        <Item label="Description">
-          <MarkdownRenderer markdown={portfolio.description} />
-        </Item>
-      </Descriptions>
-    </ResponsiveFlex>
+    <Flex vertical gap="middle">
+      <ResponsiveFlex gap="middle" align="start">
+        <Descriptions column={1} size="small">
+          <Item label="Sponsors">{sponsorNames}</Item>
+          <Item label="Owners">{ownerNames}</Item>
+          <Item label="Managers">{managerNames}</Item>
+        </Descriptions>
+        <Descriptions layout="vertical" size="small">
+          <Item label="Description">
+            <MarkdownRenderer markdown={portfolio.description} />
+          </Item>
+        </Descriptions>
+      </ResponsiveFlex>
+      <LinksCard objectId={portfolio.id} />
+    </Flex>
   )
 }
 

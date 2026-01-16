@@ -1,10 +1,11 @@
 'use client'
 
 import { ModaDateRange, ResponsiveFlex } from '@/src/components/common'
+import LinksCard from '@/src/components/common/links/links-card'
 import { MarkdownRenderer } from '@/src/components/common/markdown'
 import { StrategicInitiativeDetailsDto } from '@/src/services/moda-api'
 import { getSortedNames } from '@/src/utils'
-import { Descriptions, List } from 'antd'
+import { Descriptions, Flex, List } from 'antd'
 import Link from 'next/link'
 
 const { Item } = Descriptions
@@ -28,7 +29,7 @@ const StrategicInitiativeDetails: React.FC<StrategicInitiativeDetailsProps> = ({
       : 'No owners assigned'
 
   return (
-    <>
+    <Flex vertical gap="middle">
       <ResponsiveFlex gap="middle" align="start">
         <Descriptions column={1} size="small">
           <Item label="Portfolio">
@@ -53,7 +54,8 @@ const StrategicInitiativeDetails: React.FC<StrategicInitiativeDetailsProps> = ({
           </Item>
         </Descriptions>
       </ResponsiveFlex>
-    </>
+      <LinksCard objectId={strategicInitiative.id} />
+    </Flex>
   )
 }
 

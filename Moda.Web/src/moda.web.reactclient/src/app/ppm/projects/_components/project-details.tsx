@@ -1,10 +1,11 @@
 'use client'
 
 import { ModaDateRange, ResponsiveFlex } from '@/src/components/common'
+import LinksCard from '@/src/components/common/links/links-card'
 import { MarkdownRenderer } from '@/src/components/common/markdown'
 import { ProjectDetailsDto } from '@/src/services/moda-api'
 import { getSortedNames } from '@/src/utils'
-import { Descriptions } from 'antd'
+import { Descriptions, Flex } from 'antd'
 import Link from 'next/link'
 import { FC } from 'react'
 
@@ -38,39 +39,42 @@ const ProjectDetails: FC<ProjectDetailsProps> = ({
       : null
 
   return (
-    <ResponsiveFlex gap="middle" align="start">
-      <Descriptions column={1} size="small">
-        <Item label="Portfolio">
-          <Link href={`/ppm/portfolios/${project.portfolio.key}`}>
-            {project.portfolio.name}
-          </Link>
-        </Item>
-        <Item label="Program">
-          {project.program && (
-            <Link href={`/ppm/programs/${project.program.key}`}>
-              {project.program.name}
+    <Flex vertical gap="middle">
+      <ResponsiveFlex gap="middle" align="start">
+        <Descriptions column={1} size="small">
+          <Item label="Portfolio">
+            <Link href={`/ppm/portfolios/${project.portfolio.key}`}>
+              {project.portfolio.name}
             </Link>
-          )}
-        </Item>
-        <Item label="Dates">
-          <ModaDateRange
-            dateRange={{ start: project.start, end: project.end }}
-          />
-        </Item>
-        <Item label="Expenditure Category">
-          {project.expenditureCategory.name}
-        </Item>
-        <Item label="Sponsors">{sponsorNames}</Item>
-        <Item label="Owners">{ownerNames}</Item>
-        <Item label="Managers">{managerNames}</Item>
-        <Item label="Strategic Themes">{strategicThemes}</Item>
-      </Descriptions>
-      <Descriptions layout="vertical" size="small">
-        <Item label="Description">
-          <MarkdownRenderer markdown={project.description} />
-        </Item>
-      </Descriptions>
-    </ResponsiveFlex>
+          </Item>
+          <Item label="Program">
+            {project.program && (
+              <Link href={`/ppm/programs/${project.program.key}`}>
+                {project.program.name}
+              </Link>
+            )}
+          </Item>
+          <Item label="Dates">
+            <ModaDateRange
+              dateRange={{ start: project.start, end: project.end }}
+            />
+          </Item>
+          <Item label="Expenditure Category">
+            {project.expenditureCategory.name}
+          </Item>
+          <Item label="Sponsors">{sponsorNames}</Item>
+          <Item label="Owners">{ownerNames}</Item>
+          <Item label="Managers">{managerNames}</Item>
+          <Item label="Strategic Themes">{strategicThemes}</Item>
+        </Descriptions>
+        <Descriptions layout="vertical" size="small">
+          <Item label="Description">
+            <MarkdownRenderer markdown={project.description} />
+          </Item>
+        </Descriptions>
+      </ResponsiveFlex>
+      <LinksCard objectId={project.id} />
+    </Flex>
   )
 }
 
