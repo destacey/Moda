@@ -51,6 +51,7 @@ import {
   usePatchProjectTaskMutation,
   useUpdateProjectTaskPlacementMutation,
 } from '@/src/store/features/ppm/project-tasks-api'
+import { useGetEmployeeOptionsQuery } from '@/src/store/features/organizations/employee-api'
 
 import CreateProjectTaskForm from './create-project-task-form'
 import DeleteProjectTaskForm from './delete-project-task-form'
@@ -114,6 +115,8 @@ const ProjectTasksTable = ({
   const { data: taskPriorityOptions = [] } = useGetTaskPriorityOptionsQuery()
 
   const { data: taskTypeOptions = [] } = useGetTaskTypeOptionsQuery()
+
+  const { data: employeeOptions = [] } = useGetEmployeeOptionsQuery(false)
 
   const [patchProjectTask] = usePatchProjectTaskMutation()
   const [updateProjectTaskPlacement] = useUpdateProjectTaskPlacementMutation()
@@ -366,6 +369,7 @@ const ProjectTasksTable = ({
         taskStatusOptions,
         taskStatusOptionsForMilestone,
         taskPriorityOptions,
+        employeeOptions,
         isDragEnabled,
         enableDragAndDrop,
       }),
@@ -380,6 +384,7 @@ const ProjectTasksTable = ({
       taskPriorityOptions,
       taskStatusOptions,
       taskStatusOptionsForMilestone,
+      employeeOptions,
       isDragEnabled,
       enableDragAndDrop,
     ],
@@ -845,6 +850,7 @@ const ProjectTasksTable = ({
                                 'priority',
                                 'plannedStart',
                                 'plannedEnd',
+                                'assignees',
                               ]
                               const isEditableCell =
                                 isSelected &&

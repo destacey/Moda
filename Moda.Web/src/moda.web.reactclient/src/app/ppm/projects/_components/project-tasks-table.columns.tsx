@@ -8,6 +8,7 @@ import {
   MoreOutlined,
 } from '@ant-design/icons'
 import { Button, DatePicker, Dropdown, Form, Input, Select, Tag } from 'antd'
+import { BaseOptionType } from 'antd/es/select'
 import dayjs from 'dayjs'
 import { ColumnDef } from '@tanstack/react-table'
 import styles from './project-tasks-table.module.css'
@@ -60,6 +61,7 @@ interface ProjectTasksTableColumnsParams {
   taskStatusOptions: any[]
   taskStatusOptionsForMilestone: any[]
   taskPriorityOptions: any[]
+  employeeOptions: BaseOptionType[]
   isDragEnabled?: boolean
   enableDragAndDrop?: boolean
 }
@@ -75,6 +77,7 @@ export const getProjectTasksTableColumns = ({
   taskStatusOptions,
   taskStatusOptionsForMilestone,
   taskPriorityOptions,
+  employeeOptions,
   isDragEnabled = false,
   enableDragAndDrop = false,
 }: ProjectTasksTableColumnsParams): ColumnDef<ProjectTaskTreeDto>[] => {
@@ -438,6 +441,56 @@ export const getProjectTasksTableColumns = ({
                   }
                 }}
                 status={error ? 'error' : ''}
+              />
+            </FormItem>
+          </div>
+        )
+      },
+    },
+    {
+      id: 'assignees',
+      accessorFn: (row) => row.assignees?.map((a) => a.name).join(', ') ?? '',
+      header: 'Assignees',
+      size: 250,
+      enableGlobalFilter: true,
+      enableColumnFilter: true,
+      filterFn: 'includesString',
+      sortingFn: 'text',
+      cell: (info) => {
+        const task = info.row.original as ProjectTaskTreeDto
+        const assignees = task.assignees ?? []
+        const isSelected = selectedRowId === task.id
+        const cellId = `${task.id}-assignees`
+
+        if (!isSelected || !handleUpdateTask) {
+          if (assignees.length === 0) return ''
+          return assignees.map((a) => a.name).join(', ')
+        }
+
+        const error = getFieldError('assigneeIds')
+        return (
+          <div data-cell-id={cellId}>
+            <FormItem
+              name="assigneeIds"
+              style={{ margin: 0 }}
+              validateStatus={error ? 'error' : ''}
+            >
+              <Select
+                size="small"
+                mode="multiple"
+                allowClear
+                placeholder="Select assignees"
+                optionFilterProp="label"
+                filterOption={(input, option) =>
+                  (option?.label?.toString().toLowerCase() ?? '').includes(
+                    input.toLowerCase(),
+                  )
+                }
+                options={employeeOptions}
+                onKeyDown={(e) => handleKeyDown(e, task.id, 'assignees')}
+                status={error ? 'error' : ''}
+                maxTagCount={1}
+                maxTagPlaceholder={(omitted) => `+${omitted.length}`}
               />
             </FormItem>
           </div>
