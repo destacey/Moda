@@ -1,4 +1,5 @@
 using Moda.ProjectPortfolioManagement.Domain.Enums;
+using Moda.ProjectPortfolioManagement.Domain.Models;
 
 namespace Moda.ProjectPortfolioManagement.Application.ProjectTasks.Commands;
 
@@ -13,7 +14,7 @@ public sealed record UpdateProjectTaskCommand(
     FlexibleDateRange? PlannedDateRange,
     LocalDate? PlannedDate,
     decimal? EstimatedEffortHours,
-    List<TaskRoleAssignment>? Assignments
+    List<Guid>? AssigneeIds
 ) : ICommand;
 
 public sealed class UpdateProjectTaskCommandValidator : AbstractValidator<UpdateProjectTaskCommand>
@@ -44,9 +45,9 @@ public sealed class UpdateProjectTaskCommandValidator : AbstractValidator<Update
             .GreaterThan(0)
             .When(x => x.EstimatedEffortHours.HasValue);
 
-        RuleFor(x => x.Assignments)
-            .Must(assignments => assignments == null || assignments.All(a => a.EmployeeId != Guid.Empty))
-            .WithMessage("Assignment employee IDs cannot be empty GUIDs.");
+        RuleFor(x => x.AssigneeIds)
+            .Must(ids => ids == null || ids.All(id => id != Guid.Empty))
+            .WithMessage("AssigneeIds cannot contain empty GUIDs.");
     }
 }
 
@@ -103,36 +104,18 @@ internal sealed class UpdateProjectTaskCommandHandler(
                 }
             }
 
-            // Validate employees if assignments specified
-            if (request.Assignments is not null && request.Assignments.Count > 0)
-            {
-                var employeeIds = request.Assignments.Select(a => a.EmployeeId).ToHashSet();
-                var employees = await _ppmDbContext.Employees
-                    .Where(e => employeeIds.Contains(e.Id))
-                    .Select(e => e.Id)
-                    .ToListAsync(cancellationToken);
-
-                if (employees.Count != employeeIds.Count)
-                {
-                    _logger.LogInformation("One or more employees not found.");
-                    return Result.Failure("One or more employees not found.");
-                }
-            }
-
             // Update basic details
             var detailsResult = task.UpdateDetails(request.Name, request.Description, request.Priority);
             if (detailsResult.IsFailure)
             {
-                _logger.LogError("Error updating task {TaskId} details. Error: {Error}", task.Id, detailsResult.Error);
-                return detailsResult;
+                return await HandleDomainFailure(task, detailsResult, cancellationToken);
             }
 
             // Update status
             var statusResult = task.UpdateStatus(request.Status, _dateTimeProvider.Now);
             if (statusResult.IsFailure)
             {
-                _logger.LogError("Error updating task {TaskId} status. Error: {Error}", task.Id, statusResult.Error);
-                return statusResult;
+                return await HandleDomainFailure(task, statusResult, cancellationToken);
             }
 
             // Update progress
@@ -147,8 +130,7 @@ internal sealed class UpdateProjectTaskCommandHandler(
                 var progressResult = task.UpdateProgress(request.Progress);
                 if (progressResult.IsFailure)
                 {
-                    _logger.LogError("Error updating task {TaskId} progress. Error: {Error}", task.Id, progressResult.Error);
-                    return progressResult;
+                    return await HandleDomainFailure(task, progressResult, cancellationToken);
                 }
             }
 
@@ -156,16 +138,14 @@ internal sealed class UpdateProjectTaskCommandHandler(
             var plannedDatesResult = task.UpdatePlannedDates(request.PlannedDateRange, request.PlannedDate);
             if (plannedDatesResult.IsFailure)
             {
-                _logger.LogError("Error updating task {TaskId} planned dates. Error: {Error}", task.Id, plannedDatesResult.Error);
-                return plannedDatesResult;
+                return await HandleDomainFailure(task, plannedDatesResult, cancellationToken);
             }
 
             // Update effort
             var effortResult = task.UpdateEffort(request.EstimatedEffortHours);
             if (effortResult.IsFailure)
             {
-                _logger.LogError("Error updating task {TaskId} effort. Error: {Error}", task.Id, effortResult.Error);
-                return effortResult;
+                return await HandleDomainFailure(task, effortResult, cancellationToken);
             }
 
             // Update parent if changed
@@ -184,27 +164,15 @@ internal sealed class UpdateProjectTaskCommandHandler(
                 var parentResult = project.ChangeTaskPlacement(task.Id, request.ParentId, null);
                 if (parentResult.IsFailure)
                 {
-                    _logger.LogError("Error changing parent for task {TaskId}. Error: {Error}", task.Id, parentResult.Error);
-                    return parentResult;
+                    return await HandleDomainFailure(task, parentResult, cancellationToken);
                 }
             }
 
-            // Update role assignments if specified
-            if (request.Assignments is not null)
+            var roles = GetRoles(request);
+            var updateRolesResult = task.UpdateRoles(roles);
+            if (updateRolesResult.IsFailure)
             {
-                var assignments = request.Assignments
-                    .GroupBy(a => a.Role)
-                    .ToDictionary(
-                        g => g.Key,
-                        g => g.Select(a => a.EmployeeId).ToHashSet()
-                    );
-
-                var assignResult = task.UpdateRoles(assignments);
-                if (assignResult.IsFailure)
-                {
-                    _logger.LogError("Error updating task {TaskId} role assignments. Error: {Error}", task.Id, assignResult.Error);
-                    return assignResult;
-                }
+                return await HandleDomainFailure(task, updateRolesResult, cancellationToken);
             }
 
             await _ppmDbContext.SaveChangesAsync(cancellationToken);
@@ -236,5 +204,27 @@ internal sealed class UpdateProjectTaskCommandHandler(
         }
 
         return descendants;
+    }
+
+    private static Dictionary<TaskRole, HashSet<Guid>> GetRoles(UpdateProjectTaskCommand request)
+    {
+        Dictionary<TaskRole, HashSet<Guid>> roles = [];
+
+        if (request.AssigneeIds != null && request.AssigneeIds.Count != 0)
+        {
+            roles.Add(TaskRole.Assignee, [.. request.AssigneeIds]);
+        }
+
+        return roles;
+    }
+
+    private async Task<Result> HandleDomainFailure(ProjectTask task, Result errorResult, CancellationToken cancellationToken)
+    {
+        // Reset the entity
+        await _ppmDbContext.Entry(task).ReloadAsync(cancellationToken);
+        task.ClearDomainEvents();
+
+        _logger.LogError("Unable to update project task {ProjectTaskId}.  Error message: {Error}", task.Id, errorResult.Error);
+        return Result.Failure(errorResult.Error);
     }
 }

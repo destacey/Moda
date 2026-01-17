@@ -17956,6 +17956,7 @@
           "type",
           "status",
           "priority",
+          "assignees",
           "progress",
           "order"
         ],
@@ -17986,6 +17987,12 @@
           },
           "priority": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "assignees": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmployeeNavigationDto"
+            }
           },
           "progress": {
             "type": "number",
@@ -18064,10 +18071,10 @@
           "name",
           "type",
           "status",
+          "assignees",
           "progress",
           "order",
           "wbs",
-          "assignments",
           "children"
         ],
         "properties": {
@@ -18103,6 +18110,12 @@
               }
             ]
           },
+          "assignees": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmployeeNavigationDto"
+            }
+          },
           "progress": {
             "type": "number",
             "format": "decimal"
@@ -18119,12 +18132,6 @@
           },
           "wbs": {
             "type": "string"
-          },
-          "assignments": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ProjectTaskAssignmentDto"
-            }
           },
           "plannedStart": {
             "type": "string",
@@ -18154,22 +18161,6 @@
           }
         }
       },
-      "ProjectTaskAssignmentDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "employee",
-          "role"
-        ],
-        "properties": {
-          "employee": {
-            "$ref": "#/components/schemas/EmployeeNavigationDto"
-          },
-          "role": {
-            "$ref": "#/components/schemas/SimpleNavigationDto"
-          }
-        }
-      },
       "ProjectTaskDto": {
         "type": "object",
         "additionalProperties": false,
@@ -18181,9 +18172,9 @@
           "type",
           "status",
           "priority",
+          "assignees",
           "progress",
-          "order",
-          "assignments"
+          "order"
         ],
         "properties": {
           "id": {
@@ -18217,6 +18208,12 @@
           "priority": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
           },
+          "assignees": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmployeeNavigationDto"
+            }
+          },
           "progress": {
             "type": "number",
             "format": "decimal"
@@ -18238,12 +18235,6 @@
                 "$ref": "#/components/schemas/ProjectTaskNavigationDto"
               }
             ]
-          },
-          "assignments": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ProjectTaskAssignmentDto"
-            }
           },
           "plannedStart": {
             "type": "string",
@@ -18327,6 +18318,17 @@
             "description": "The priority level of the task.",
             "format": "int32"
           },
+          "assigneeIds": {
+            "type": "array",
+            "description": "The assignees of the project task.",
+            "nullable": true,
+            "items": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            }
+          },
           "progress": {
             "type": "number",
             "description": "The progress of the task (optional). Ranges from 0.0 to 100.0. Milestones can not update progress directly.",
@@ -18365,53 +18367,8 @@
             "minimum": 0.0,
             "nullable": true,
             "exclusiveMinimum": true
-          },
-          "assignments": {
-            "type": "array",
-            "description": "The role-based assignments for this task (optional).",
-            "nullable": true,
-            "items": {
-              "$ref": "#/components/schemas/TaskRoleAssignmentRequest"
-            }
           }
         }
-      },
-      "TaskRoleAssignmentRequest": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "employeeId",
-          "role"
-        ],
-        "properties": {
-          "employeeId": {
-            "type": "string",
-            "description": "The ID of the employee.",
-            "format": "guid",
-            "nullable": false,
-            "example": "00000000-0000-0000-0000-000000000000"
-          },
-          "role": {
-            "description": "The role of the assignment (Assignee or Reviewer).",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/TaskRole"
-              }
-            ]
-          }
-        }
-      },
-      "TaskRole": {
-        "type": "string",
-        "description": "",
-        "x-enumNames": [
-          "Assignee",
-          "Reviewer"
-        ],
-        "enum": [
-          "Assignee",
-          "Reviewer"
-        ]
       },
       "UpdateProjectTaskRequest": {
         "type": "object",
@@ -18455,6 +18412,17 @@
             "description": "The priority level of the task.",
             "format": "int32"
           },
+          "assigneeIds": {
+            "type": "array",
+            "description": "The assignees of the project task.",
+            "nullable": true,
+            "items": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            }
+          },
           "progress": {
             "type": "number",
             "description": "The progress of the task (optional). Ranges from 0.0 to 100.0. Milestones can not update progress directly.",
@@ -18493,14 +18461,6 @@
             "minimum": 0.0,
             "nullable": true,
             "exclusiveMinimum": true
-          },
-          "assignments": {
-            "type": "array",
-            "description": "The role-based assignments for this task (optional).",
-            "nullable": true,
-            "items": {
-              "$ref": "#/components/schemas/TaskRoleAssignmentRequest"
-            }
           }
         }
       },

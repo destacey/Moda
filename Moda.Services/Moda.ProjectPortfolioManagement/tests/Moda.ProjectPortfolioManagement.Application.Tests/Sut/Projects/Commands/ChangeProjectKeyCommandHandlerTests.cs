@@ -65,7 +65,7 @@ public class ChangeProjectKeyCommandHandlerTests : IDisposable
             plannedDateRange: null,
             plannedDate: null,
             estimatedEffortHours: null,
-            assignments: null);
+            roles: null);
         createTask1Result.IsSuccess.Should().BeTrue();
 
         var createTask2Result = project.CreateTask(
@@ -80,7 +80,7 @@ public class ChangeProjectKeyCommandHandlerTests : IDisposable
             plannedDateRange: null,
             plannedDate: null,
             estimatedEffortHours: null,
-            assignments: null);
+            roles: null);
         createTask2Result.IsSuccess.Should().BeTrue();
 
         _dbContext.AddProject(project);
