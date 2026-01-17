@@ -43,7 +43,7 @@ public abstract class Connection : BaseSoftDeletableEntity<Guid>, IActivatable
     /// <summary>
     /// Indicates whether the connection is active or not.  Inactive connection are not included in the synchronization process.
     /// </summary>
-    public bool IsActive { get; protected set; } = true;
+    public bool IsActive { get; protected set; } = false;
 
     /// <summary>
     /// The value indicating whether this instance has a valid configuration.
@@ -123,15 +123,10 @@ public abstract class Connection : BaseSoftDeletableEntity<Guid>, IActivatable
     }
 }
 
-public abstract class Connection<TC, TT> : Connection
+public abstract class Connection<TC> : Connection
 {
     /// <summary>
     /// The connection configuration.
     /// </summary>
     public abstract TC Configuration { get; protected set; }
-
-    /// <summary>
-    /// The team configuration.
-    /// </summary>
-    public abstract TT TeamConfiguration { get; protected set; }
 }

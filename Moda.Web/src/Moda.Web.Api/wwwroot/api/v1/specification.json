@@ -24194,12 +24194,6 @@
           "name"
         ],
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "guid",
-            "nullable": true,
-            "example": "00000000-0000-0000-0000-000000000000"
-          },
           "externalId": {
             "type": "string",
             "format": "guid",
@@ -24251,12 +24245,6 @@
           "workProcessId"
         ],
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "guid",
-            "nullable": true,
-            "example": "00000000-0000-0000-0000-000000000000"
-          },
           "externalId": {
             "type": "string",
             "format": "guid",

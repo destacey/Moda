@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using Moda.Common.Domain.Enums.AppIntegrations;
 
 namespace Moda.AppIntegration.Application.Connections.Commands;
 public sealed record UpdateAzureDevOpsBoardsConnectionCommand(Guid Id, string Name, string? Description, string Organization, string PersonalAccessToken) : ICommand<Guid>;
@@ -33,9 +34,12 @@ public sealed class UpdateAzureDevOpsBoardsConnectionCommandValidator : CustomVa
 
     public async Task<bool> BeUniqueOrganization(Guid id, string organization, CancellationToken cancellationToken)
     {
-        return await _appIntegrationDbContext.AzureDevOpsBoardsConnections
-            .Where(c => c.Id != id)
-            .AllAsync(c => c.Configuration!.Organization != organization, cancellationToken);
+        var configurations = await _appIntegrationDbContext.AzureDevOpsBoardsConnections
+            .Where(c => c.Connector == Connector.AzureDevOps && c.Id != id)
+            .Select(c => c.Configuration)
+            .ToListAsync(cancellationToken);
+
+        return configurations.All(c => c.Organization != organization);
     }
 }
 

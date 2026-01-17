@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Moda.Common.Domain.Enums.Organization;
 using Moda.Common.Domain.Models.Organizations;
+using Moda.Infrastructure.Persistence.Converters;
 
 namespace Moda.Infrastructure.Persistence.Configuration;
 

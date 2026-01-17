@@ -19870,7 +19870,6 @@ export interface AzureDevOpsBoardsConnectionConfigurationDto {
 }
 
 export interface AzureDevOpsBoardsWorkProcessDto {
-    id?: string | undefined;
     externalId: string;
     name: string;
     description?: string | undefined;
@@ -19883,7 +19882,6 @@ export interface IntegrationStateDto {
 }
 
 export interface AzureDevOpsBoardsWorkspaceDto {
-    id?: string | undefined;
     externalId: string;
     name: string;
     description?: string | undefined;

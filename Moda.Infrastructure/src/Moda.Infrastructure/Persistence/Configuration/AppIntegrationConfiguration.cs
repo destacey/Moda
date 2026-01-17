@@ -1,6 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Moda.AppIntegration.Domain.Models.AzureOpenAI;
 using Moda.Common.Domain.Enums.AppIntegrations;
+using Moda.Infrastructure.Persistence.Converters;
+using Moda.Infrastructure.Persistence.Extensions;
 
 namespace Moda.Infrastructure.Persistence.Configuration;
 
@@ -12,7 +15,8 @@ public class ConnectionConfig : IEntityTypeConfiguration<Connection>
 
         builder.HasKey(c => c.Id);
         builder.HasDiscriminator(c => c.Connector)
-            .HasValue<AzureDevOpsBoardsConnection>(Connector.AzureDevOps);
+            .HasValue<AzureDevOpsBoardsConnection>(Connector.AzureDevOps)
+            .HasValue<AzureOpenAIConnection>(Connector.AzureOpenAI);
 
         builder.HasIndex(c => new { c.Id, c.IsDeleted })
             .HasFilter("[IsDeleted] = 0");
@@ -52,23 +56,24 @@ public class AzureDevOpsBoardsConnectionConfig : IEntityTypeConfiguration<AzureD
 {
     public void Configure(EntityTypeBuilder<AzureDevOpsBoardsConnection> builder)
     {
-        builder.OwnsOne(c => c.Configuration, ownedBuilder =>
-        {
-            ownedBuilder.ToJson();
-            ownedBuilder.OwnsMany(conf => conf.Workspaces, wb =>
-            {
-                wb.OwnsOne(w => w.IntegrationState);
-            });
-            ownedBuilder.OwnsMany(conf => conf.WorkProcesses, wb =>
-            {
-                wb.OwnsOne(w => w.IntegrationState);
-            });
-        });
+        builder.Property(c => c.Configuration)
+            .HasJsonConversion()
+            .HasColumnName("Configuration");
 
         builder.OwnsOne(c => c.TeamConfiguration, ownedBuilder =>
         {
             ownedBuilder.ToJson();
             ownedBuilder.OwnsMany(conf => conf.WorkspaceTeams);
         });
+    }
+}
+
+public class AzureOpenAIConnectionConfig : IEntityTypeConfiguration<AzureOpenAIConnection>
+{
+    public void Configure(EntityTypeBuilder<AzureOpenAIConnection> builder)
+    {
+        builder.Property(c => c.Configuration)
+            .HasJsonConversion()
+            .HasColumnName("Configuration");
     }
 }

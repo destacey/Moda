@@ -8,6 +8,7 @@ using Moda.Common.Domain.Enums.Work;
 using Moda.Common.Domain.Models.Organizations;
 using Moda.Common.Domain.Models.ProjectPortfolioManagement;
 using Moda.Common.Models;
+using Moda.Infrastructure.Persistence.Converters;
 using Moda.Work.Domain.Models;
 
 namespace Moda.Infrastructure.Persistence.Configuration;
