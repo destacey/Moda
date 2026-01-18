@@ -50,15 +50,18 @@
 }
 
 .th {
-  padding: var(--ant-padding-sm) var(--ant-padding-sm);
+  padding: 5px var(--ant-padding-sm);
   background-color: var(--ant-color-fill-alter);
   border-bottom: 1px solid var(--ant-color-border);
   color: var(--ant-color-text);
   text-align: left;
+  font-size: 12px;
   font-weight: var(--ant-font-weight-strong);
   white-space: nowrap;
   position: relative;
   overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 0;
 }
 
 .thSortable {
@@ -68,13 +71,28 @@
 }
 
 .thResizable {
-  padding-right: var(--ant-padding-lg);
+  padding-left: 0;
+}
+
+.thResizable .thContent {
+  padding-right: 12px;
 }
 
 .thContent {
   display: inline-flex;
   align-items: center;
   gap: var(--ant-margin-xs);
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.thText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  flex: 1;
 }
 
 .resizer {
@@ -185,10 +203,12 @@
   padding: 2px 7px;
   border-bottom: 1px solid var(--ant-color-border-secondary);
   color: var(--ant-color-text);
+  font-size: 12px;
   vertical-align: middle;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  max-width: 0;
 }
 
 .tr {
@@ -215,6 +235,7 @@
 .editableCell :global(.ant-select),
 .editableCell :global(.ant-picker) {
   width: 100%;
+  font-size: 12px;
 }
 
 .expanderBtn {
