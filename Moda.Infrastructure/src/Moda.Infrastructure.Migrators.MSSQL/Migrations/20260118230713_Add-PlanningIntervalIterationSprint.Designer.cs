@@ -13,7 +13,7 @@ using Moda.Infrastructure.Persistence.Context;
 namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 {
     [DbContext(typeof(ModaDbContext))]
-    [Migration("20260118163729_Add-PlanningIntervalIterationSprint")]
+    [Migration("20260118230713_Add-PlanningIntervalIterationSprint")]
     partial class AddPlanningIntervalIterationSprint
     {
         /// <inheritdoc />
@@ -1333,6 +1333,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
             modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningIntervalIterationSprint", b =>
                 {
                     b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("PlanningIntervalId")
@@ -4056,13 +4057,13 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.HasOne("Moda.Planning.Domain.Models.PlanningInterval", null)
                         .WithMany("IterationSprints")
                         .HasForeignKey("PlanningIntervalId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Moda.Planning.Domain.Models.PlanningIntervalIteration", "PlanningIntervalIteration")
                         .WithMany("IterationSprints")
                         .HasForeignKey("PlanningIntervalIterationId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Moda.Planning.Domain.Models.Iterations.Iteration", "Sprint")

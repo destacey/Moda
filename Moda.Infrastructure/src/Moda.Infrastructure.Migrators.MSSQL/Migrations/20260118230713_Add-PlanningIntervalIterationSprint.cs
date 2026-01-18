@@ -39,14 +39,14 @@ public partial class AddPlanningIntervalIterationSprint : Migration
                     column: x => x.PlanningIntervalIterationId,
                     principalSchema: "Planning",
                     principalTable: "PlanningIntervalIterations",
-                    principalColumn: "Id",
-                    onDelete: ReferentialAction.Cascade);
+                    principalColumn: "Id");
                 table.ForeignKey(
                     name: "FK_PlanningIntervalIterationSprints_PlanningIntervals_PlanningIntervalId",
                     column: x => x.PlanningIntervalId,
                     principalSchema: "Planning",
                     principalTable: "PlanningIntervals",
-                    principalColumn: "Id");
+                    principalColumn: "Id",
+                    onDelete: ReferentialAction.Cascade);
             });
 
         migrationBuilder.CreateIndex(

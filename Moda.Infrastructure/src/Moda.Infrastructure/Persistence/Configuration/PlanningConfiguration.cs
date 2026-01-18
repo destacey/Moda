@@ -578,7 +578,6 @@ public class PlanningIntervalIterationSprintConfig : IEntityTypeConfiguration<Pl
             .IsUnique()
             .IncludeProperties(s => new { s.PlanningIntervalId, s.PlanningIntervalIterationId });
 
-        builder.Property(s => s.Id).ValueGeneratedNever();
         builder.Property(s => s.PlanningIntervalId).IsRequired();
         builder.Property(s => s.PlanningIntervalIterationId).IsRequired();
         builder.Property(s => s.SprintId).IsRequired();
@@ -587,12 +586,12 @@ public class PlanningIntervalIterationSprintConfig : IEntityTypeConfiguration<Pl
         builder.HasOne<PlanningInterval>()
             .WithMany(p => p.IterationSprints)
             .HasForeignKey(s => s.PlanningIntervalId)
-            .OnDelete(DeleteBehavior.NoAction); // NoAction to avoid multiple cascade paths
+            .OnDelete(DeleteBehavior.Cascade); // Cascade to enable deletion when removed from collection
 
         builder.HasOne(s => s.PlanningIntervalIteration)
             .WithMany(i => i.IterationSprints)
             .HasForeignKey(s => s.PlanningIntervalIterationId)
-            .OnDelete(DeleteBehavior.Cascade); // Cascade through iteration is the primary path
+            .OnDelete(DeleteBehavior.NoAction); // NoAction to avoid multiple cascade paths
 
         builder.HasOne(s => s.Sprint)
             .WithMany()
