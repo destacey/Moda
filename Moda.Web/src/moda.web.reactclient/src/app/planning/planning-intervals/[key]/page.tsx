@@ -27,6 +27,7 @@ import {
   ManagePlanningIntervalDatesForm,
   ManagePlanningIntervalTeamsForm,
   PlanningIntervalDetails,
+  PlanningIntervalTeamSprintMappings,
 } from '../_components'
 import {
   useGetPlanningIntervalQuery,
@@ -40,6 +41,7 @@ import { SwapOutlined } from '@ant-design/icons'
 enum PlanningIntervalTabs {
   Details = 'details',
   Teams = 'teams',
+  SprintMappings = 'sprint-mappings',
 }
 
 const tabs = [
@@ -50,6 +52,10 @@ const tabs = [
   {
     key: PlanningIntervalTabs.Teams,
     tab: 'Teams',
+  },
+  {
+    key: PlanningIntervalTabs.SprintMappings,
+    tab: 'Sprint Mappings',
   },
 ]
 
@@ -133,6 +139,12 @@ const PlanningIntervalDetailsPage = (props: {
           isLoading: teamsIsLoading,
           refetch: refetchTeams,
         } as TeamsGridProps)
+      case PlanningIntervalTabs.SprintMappings:
+        return (
+          <PlanningIntervalTeamSprintMappings
+            planningInterval={planningIntervalData}
+          />
+        )
       default:
         return null
     }

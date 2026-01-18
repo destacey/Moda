@@ -11,6 +11,7 @@ export { default as ManagePlanningIntervalTeamsForm } from './manage-planning-in
 export { default as ManagePlanningIntervalDatesForm } from './manage-planning-interval-dates-form'
 export { default as PlanningIntervalIterationsList } from './planning-interval-iterations-list'
 export { default as PlanningIntervalDetails } from './planning-interval-details'
+export { default as PlanningIntervalTeamSprintMappings } from './planning-interval-team-sprint-mappings'
 
 export type { ObjectiveHealthChartDataItem } from './objective-health-chart'
 export type { ObjectiveStatusChartDataItem } from './objective-status-chart'
