@@ -77,10 +77,12 @@ const ConfigureTeamSprintMappingsForm = ({
   const sprintOptions = useMemo(() => {
     if (!teamSprintsData) return []
 
-    return teamSprintsData.map((sprint) => ({
-      value: sprint.id,
-      label: formatSprintOption(sprint),
-    }))
+    return [...teamSprintsData]
+      .sort((a, b) => new Date(b.start).getTime() - new Date(a.start).getTime())
+      .map((sprint) => ({
+        value: sprint.id,
+        label: formatSprintOption(sprint),
+      }))
   }, [teamSprintsData])
 
   // Initialize mappings from iteration sprints data
@@ -153,7 +155,9 @@ const ConfigureTeamSprintMappingsForm = ({
 
       setIsOpen(false)
       onFormSave()
-      messageApi.success(`Successfully updated sprint mappings for ${teamName}.`)
+      messageApi.success(
+        `Successfully updated sprint mappings for ${teamName}.`,
+      )
     } catch (error) {
       console.error('Error saving sprint mappings:', error)
       messageApi.error(
@@ -211,7 +215,10 @@ const ConfigureTeamSprintMappingsForm = ({
                   </Text>
                 </div>
                 <Text type="secondary" style={{ fontSize: '12px' }}>
-                  {formatDateRange(mapping.iterationStart, mapping.iterationEnd)}
+                  {formatDateRange(
+                    mapping.iterationStart,
+                    mapping.iterationEnd,
+                  )}
                 </Text>
               </div>
               <Select
