@@ -5,8 +5,8 @@ import { ProjectTaskTreeDto } from '@/src/services/moda-api'
 import { ModaEmpty } from '@/src/components/common'
 import { Form, Input, Select, Spin } from 'antd'
 import {
-  CaretUpOutlined,
-  CaretDownOutlined,
+  ArrowUpOutlined,
+  ArrowDownOutlined,
   FilterOutlined,
 } from '@ant-design/icons'
 import {
@@ -14,6 +14,7 @@ import {
   type ChangeEvent,
   useCallback,
   useMemo,
+  useRef,
   useState,
 } from 'react'
 import dayjs from 'dayjs'
@@ -51,6 +52,7 @@ import {
   usePatchProjectTaskMutation,
   useUpdateProjectTaskPlacementMutation,
 } from '@/src/store/features/ppm/project-tasks-api'
+import { useGetEmployeeOptionsQuery } from '@/src/store/features/organizations/employee-api'
 
 import CreateProjectTaskForm from './create-project-task-form'
 import DeleteProjectTaskForm from './delete-project-task-form'
@@ -105,6 +107,7 @@ const ProjectTasksTable = ({
   )
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null)
+  const isResizingRef = useRef(false)
   const messageApi = useMessage()
 
   const { data: taskStatusOptions = [] } = useGetTaskStatusOptionsQuery()
@@ -114,6 +117,8 @@ const ProjectTasksTable = ({
   const { data: taskPriorityOptions = [] } = useGetTaskPriorityOptionsQuery()
 
   const { data: taskTypeOptions = [] } = useGetTaskTypeOptionsQuery()
+
+  const { data: employeeOptions = [] } = useGetEmployeeOptionsQuery(false)
 
   const [patchProjectTask] = usePatchProjectTaskMutation()
   const [updateProjectTaskPlacement] = useUpdateProjectTaskPlacementMutation()
@@ -366,6 +371,7 @@ const ProjectTasksTable = ({
         taskStatusOptions,
         taskStatusOptionsForMilestone,
         taskPriorityOptions,
+        employeeOptions,
         isDragEnabled,
         enableDragAndDrop,
       }),
@@ -380,6 +386,7 @@ const ProjectTasksTable = ({
       taskPriorityOptions,
       taskStatusOptions,
       taskStatusOptionsForMilestone,
+      employeeOptions,
       isDragEnabled,
       enableDragAndDrop,
     ],
@@ -636,10 +643,28 @@ const ProjectTasksTable = ({
 
                             const sortIcon =
                               sortState === 'asc' ? (
-                                <CaretUpOutlined />
+                                <ArrowUpOutlined />
                               ) : sortState === 'desc' ? (
-                                <CaretDownOutlined />
+                                <ArrowDownOutlined />
                               ) : null
+
+                            const handleSortClick = canSort
+                              ? (e: React.MouseEvent) => {
+                                  // Skip sorting if we just finished resizing
+                                  if (isResizingRef.current) {
+                                    isResizingRef.current = false
+                                    return
+                                  }
+                                  header.column.getToggleSortingHandler()?.(e)
+                                }
+                              : undefined
+
+                            const handleResizeStart = (
+                              e: React.MouseEvent | React.TouchEvent,
+                            ) => {
+                              isResizingRef.current = true
+                              header.getResizeHandler()(e)
+                            }
 
                             return (
                               <th
@@ -647,19 +672,17 @@ const ProjectTasksTable = ({
                                 className={`${styles.th}${
                                   canSort ? ` ${styles.thSortable}` : ''
                                 }${canResize ? ` ${styles.thResizable}` : ''}`}
-                                onClick={
-                                  canSort
-                                    ? header.column.getToggleSortingHandler()
-                                    : undefined
-                                }
+                                onClick={handleSortClick}
                               >
                                 <span className={styles.thContent}>
-                                  {header.isPlaceholder
-                                    ? null
-                                    : flexRender(
-                                        header.column.columnDef.header,
-                                        header.getContext(),
-                                      )}
+                                  <span className={styles.thText}>
+                                    {header.isPlaceholder
+                                      ? null
+                                      : flexRender(
+                                          header.column.columnDef.header,
+                                          header.getContext(),
+                                        )}
+                                  </span>
                                   {sortIcon}
                                 </span>
 
@@ -667,8 +690,8 @@ const ProjectTasksTable = ({
                                   <span
                                     role="separator"
                                     aria-orientation="vertical"
-                                    onMouseDown={header.getResizeHandler()}
-                                    onTouchStart={header.getResizeHandler()}
+                                    onMouseDown={handleResizeStart}
+                                    onTouchStart={handleResizeStart}
                                     onDoubleClick={() =>
                                       header.column.resetSize()
                                     }
@@ -845,6 +868,7 @@ const ProjectTasksTable = ({
                                 'priority',
                                 'plannedStart',
                                 'plannedEnd',
+                                'assignees',
                               ]
                               const isEditableCell =
                                 isSelected &&

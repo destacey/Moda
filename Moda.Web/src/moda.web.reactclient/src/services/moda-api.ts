@@ -18359,6 +18359,7 @@ export interface ProjectTaskListDto {
     type: SimpleNavigationDto;
     status: SimpleNavigationDto;
     priority: SimpleNavigationDto;
+    assignees: EmployeeNavigationDto[];
     progress: number;
     order: number;
     parentId?: string | undefined;
@@ -18383,21 +18384,16 @@ export interface ProjectTaskTreeDto {
     type: SimpleNavigationDto;
     status: SimpleNavigationDto;
     priority?: SimpleNavigationDto | undefined;
+    assignees: EmployeeNavigationDto[];
     progress: number;
     order: number;
     parentId?: string | undefined;
     wbs: string;
-    assignments: ProjectTaskAssignmentDto[];
     plannedStart?: Date | undefined;
     plannedEnd?: Date | undefined;
     plannedDate?: Date | undefined;
     estimatedEffortHours?: number | undefined;
     children: ProjectTaskTreeDto[];
-}
-
-export interface ProjectTaskAssignmentDto {
-    employee: EmployeeNavigationDto;
-    role: SimpleNavigationDto;
 }
 
 export interface ProjectTaskDto {
@@ -18409,11 +18405,11 @@ export interface ProjectTaskDto {
     type: SimpleNavigationDto;
     status: SimpleNavigationDto;
     priority: SimpleNavigationDto;
+    assignees: EmployeeNavigationDto[];
     progress: number;
     order: number;
     parentId?: string | undefined;
     parent?: ProjectTaskNavigationDto | undefined;
-    assignments: ProjectTaskAssignmentDto[];
     plannedStart?: Date | undefined;
     plannedEnd?: Date | undefined;
     plannedDate?: Date | undefined;
@@ -18436,6 +18432,8 @@ export interface CreateProjectTaskRequest {
     statusId: number;
     /** The priority level of the task. */
     priorityId: number;
+    /** The assignees of the project task. */
+    assigneeIds?: string[] | undefined;
     /** The progress of the task (optional). Ranges from 0.0 to 100.0. Milestones can not update progress directly. */
     progress: number;
     /** The ID of the parent task (optional). */
@@ -18448,20 +18446,6 @@ export interface CreateProjectTaskRequest {
     plannedDate: Date;
     /** The estimated effort in hours (optional). */
     estimatedEffortHours?: number | undefined;
-    /** The role-based assignments for this task (optional). */
-    assignments?: TaskRoleAssignmentRequest[] | undefined;
-}
-
-export interface TaskRoleAssignmentRequest {
-    /** The ID of the employee. */
-    employeeId: string;
-    /** The role of the assignment (Assignee or Reviewer). */
-    role: TaskRole;
-}
-
-export enum TaskRole {
-    Assignee = "Assignee",
-    Reviewer = "Reviewer",
 }
 
 export interface UpdateProjectTaskRequest {
@@ -18475,6 +18459,8 @@ export interface UpdateProjectTaskRequest {
     statusId: number;
     /** The priority level of the task. */
     priorityId: number;
+    /** The assignees of the project task. */
+    assigneeIds?: string[] | undefined;
     /** The progress of the task (optional). Ranges from 0.0 to 100.0. Milestones can not update progress directly. */
     progress?: number | undefined;
     /** The ID of the parent task (optional). */
@@ -18487,8 +18473,6 @@ export interface UpdateProjectTaskRequest {
     plannedDate?: Date | undefined;
     /** The estimated effort in hours (optional). */
     estimatedEffortHours?: number | undefined;
-    /** The role-based assignments for this task (optional). */
-    assignments?: TaskRoleAssignmentRequest[] | undefined;
 }
 
 export interface JsonPatchDocumentOfUpdateProjectTaskRequest {

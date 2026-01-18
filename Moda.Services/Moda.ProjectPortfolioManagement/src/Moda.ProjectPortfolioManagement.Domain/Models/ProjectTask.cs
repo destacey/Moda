@@ -143,7 +143,7 @@ public sealed class ProjectTask : BaseEntity<Guid>, ISystemAuditable, IHasIdAndK
     public IReadOnlyList<ProjectTask> Children => _children.AsReadOnly();
 
     /// <summary>
-    /// The role-based assignments for this task.
+    /// The roles associated with the project task.
     /// </summary>
     public IReadOnlyCollection<RoleAssignment<TaskRole>> Roles => _roles;
 

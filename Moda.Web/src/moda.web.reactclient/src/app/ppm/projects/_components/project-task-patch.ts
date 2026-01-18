@@ -3,6 +3,7 @@ export type ProjectTaskUpdate = {
   description?: string
   statusId?: number
   priorityId?: number
+  assigneeIds?: string[]
   progress?: number
   plannedStart?: string | null
   plannedEnd?: string | null
@@ -44,6 +45,13 @@ export const buildProjectTaskPatchOperations = (
       op: 'replace',
       path: '/PriorityId',
       value: updates.priorityId,
+    })
+  }
+  if (updates.assigneeIds !== undefined) {
+    patchOperations.push({
+      op: 'replace',
+      path: '/AssigneeIds',
+      value: updates.assigneeIds,
     })
   }
   if (updates.progress !== undefined) {

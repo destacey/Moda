@@ -373,7 +373,7 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey<P
     /// <param name="plannedDateRange">The planned date range for the task, or null if not specified.</param>
     /// <param name="plannedDate">The planned date for the task, or null if not specified.</param>
     /// <param name="estimatedEffortHours">The estimated effort required to complete the task, in hours. Can be null if not specified.</param>
-    /// <param name="assignments">A mapping of task roles to sets of user identifiers assigned to each role, or null if no assignments are
+    /// <param name="roles">A mapping of task roles to sets of user identifiers assigned to each role, or null if no assignments are
     /// specified.</param>
     /// <returns>A result containing the newly created project task if successful; otherwise, a failure result with an error
     /// message.</returns>
@@ -389,7 +389,7 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey<P
         FlexibleDateRange? plannedDateRange,
         LocalDate? plannedDate,
         decimal? estimatedEffortHours,
-        Dictionary<TaskRole, HashSet<Guid>>? assignments)
+        Dictionary<TaskRole, HashSet<Guid>>? roles)
     {
         if (Key is null)
         {
@@ -431,7 +431,7 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey<P
             plannedDateRange,
             plannedDate,
             estimatedEffortHours,
-            assignments);
+            roles);
 
         _tasks.Add(task);
 

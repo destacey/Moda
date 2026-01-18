@@ -1,4 +1,6 @@
 using Moda.Common.Application.Dtos;
+using Moda.Common.Application.Employees.Dtos;
+using Moda.ProjectPortfolioManagement.Domain.Enums;
 using Moda.ProjectPortfolioManagement.Domain.Models;
 
 namespace Moda.ProjectPortfolioManagement.Application.ProjectTasks.Dtos;
@@ -15,6 +17,11 @@ public sealed record ProjectTaskListDto : IMapFrom<ProjectTask>
     public required SimpleNavigationDto Type { get; set; }
     public required SimpleNavigationDto Status { get; set; }
     public required SimpleNavigationDto Priority { get; set; }
+
+    /// <summary>
+    /// The assignees of the project task.
+    /// </summary>
+    public required List<EmployeeNavigationDto> Assignees { get; set; } = [];
 
     /// <summary>
     /// The progress of the task as a percentage (0 to 100).
@@ -34,8 +41,9 @@ public sealed record ProjectTaskListDto : IMapFrom<ProjectTask>
             .Map(dest => dest.Key, src => src.Key.Value)
             .Map(dest => dest.Type, src => SimpleNavigationDto.FromEnum(src.Type))
             .Map(dest => dest.Status, src => SimpleNavigationDto.FromEnum(src.Status))
-            .Map(dest => dest.Priority, src => SimpleNavigationDto.FromEnum(src.Priority))
             .Map(dest => dest.Progress, src => src.Progress.Value)
+            .Map(dest => dest.Assignees, src => src.Roles.Where(r => r.Role == TaskRole.Assignee).Select(r => EmployeeNavigationDto.From(r.Employee!)).ToList())
+            .Map(dest => dest.Priority, src => SimpleNavigationDto.FromEnum(src.Priority))
             .Map(dest => dest.PlannedStart, src => src.PlannedDateRange != null ? src.PlannedDateRange.Start : (LocalDate?)null)
             .Map(dest => dest.PlannedEnd, src => src.PlannedDateRange != null ? src.PlannedDateRange.End : null);
     }
