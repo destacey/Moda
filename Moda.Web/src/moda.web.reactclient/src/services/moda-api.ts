@@ -8551,6 +8551,77 @@ export class PlanningIntervalsClient {
     }
 
     /**
+     * Map team sprints to Planning Interval iterations.
+     */
+    mapSprints(id: string, teamId: string, request: MapPlanningIntervalSprintsRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/planning/planning-intervals/{id}/teams/{teamId}/sprints";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        if (teamId === undefined || teamId === null)
+            throw new globalThis.Error("The parameter 'teamId' must be defined.");
+        url_ = url_.replace("{teamId}", encodeURIComponent("" + teamId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processMapSprints(_response);
+        });
+    }
+
+    protected processMapSprints(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 422) {
+            const _responseText = response.data;
+            let result422: any = null;
+            let resultData422  = _responseText;
+            result422 = JSON.parse(resultData422);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
      * Get a list of planning interval teams.
      * @param teamId (optional) 
      */
@@ -18795,6 +18866,20 @@ export interface PlanningIntervalIterationCategoryDto {
     name: string;
     description?: string | undefined;
     order: number;
+}
+
+/** Request model for mapping team sprints to Planning Interval iterations. */
+export interface MapPlanningIntervalSprintsRequest {
+    /** The ID of the planning interval. */
+    id: string;
+    /** The ID of the team whose sprints are being synchronized. */
+    teamId: string;
+    /** Dictionary representing the complete desired state where key is iteration ID and value is sprint ID.
+This is a sync/replace operation - any team sprints currently mapped but not included will be unmapped.
+- Non-null value: Maps the sprint to the iteration.
+- Null value: Explicitly unmaps any sprint from that iteration for this team.
+- Omitted iteration: No change to that iteration's mappings. */
+    iterationSprintMappings: { [key: string]: string; };
 }
 
 export interface PlanningIntervalObjectiveListDto {

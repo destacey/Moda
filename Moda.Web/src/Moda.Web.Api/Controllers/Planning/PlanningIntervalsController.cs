@@ -3,7 +3,6 @@ using CsvHelper;
 using Mapster;
 using Moda.Common.Application.Interfaces;
 using Moda.Common.Application.Models;
-using Moda.Common.Application.Requests.Planning;
 using Moda.Common.Extensions;
 using Moda.Health.Queries;
 using Moda.Organization.Application.Teams.Queries;
@@ -216,6 +215,27 @@ public class PlanningIntervalsController : ControllerBase
     {
         var items = await _sender.Send(new GetPlanningIntervalIterationCategoriesQuery(), cancellationToken);
         return Ok(items.OrderBy(c => c.Order));
+    }
+
+    [HttpPost("{id}/teams/{teamId}/sprints")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.PlanningIntervals)]
+    [OpenApiOperation("Map team sprints to Planning Interval iterations.", "This is a sync/replace operation that sets the complete desired state for the team's sprint mappings.")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> MapTeamSprints(Guid id, Guid teamId, [FromBody] MapPlanningIntervalSprintsRequest request, CancellationToken cancellationToken)
+    {
+        if (id != request.Id)
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(nameof(id), nameof(request.Id), HttpContext));
+        
+        if (teamId != request.TeamId)
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(nameof(teamId), nameof(request.TeamId), HttpContext));
+
+        var result = await _sender.Send(request.ToMapPlanningIntervalSprintsCommand(), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     #endregion Iterations
