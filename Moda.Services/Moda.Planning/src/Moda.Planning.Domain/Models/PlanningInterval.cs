@@ -319,7 +319,6 @@ public class PlanningInterval : BaseSoftDeletableEntity<Guid>, ILocalSchedule, I
         return Result.Success();
     }
 
-
     #endregion Iterations
 
     #region Sprint Mappings
@@ -334,6 +333,11 @@ public class PlanningInterval : BaseSoftDeletableEntity<Guid>, ILocalSchedule, I
     {
         Guard.Against.Null(sprint, nameof(sprint));
 
+        // Validate iteration exists
+        var iteration = _iterations.FirstOrDefault(i => i.Id == iterationId);
+        if (iteration is null)
+            return Result.Failure($"Iteration {iterationId} not found in this Planning Interval.");
+
         // Validate sprint type
         if (sprint.Type != IterationType.Sprint)
             return Result.Failure("Only sprints of type Sprint can be mapped to iterations.");
@@ -342,19 +346,26 @@ public class PlanningInterval : BaseSoftDeletableEntity<Guid>, ILocalSchedule, I
         if (!sprint.TeamId.HasValue || !_teams.Any(t => t.TeamId == sprint.TeamId.Value))
             return Result.Failure("The sprint must belong to a team that is part of this Planning Interval.");
 
-        // Validate iteration exists
-        var iteration = _iterations.FirstOrDefault(i => i.Id == iterationId);
-        if (iteration is null)
-            return Result.Failure($"Iteration {iterationId} not found in this Planning Interval.");
-
-        // Validate sprint is not already mapped to another iteration in this PI
+        // Check if sprint is already mapped
         var existingMapping = _iterationSprints.FirstOrDefault(s => s.SprintId == sprint.Id);
         if (existingMapping is not null)
         {
+            // If already mapped to this iteration, operation is idempotent - return success
             if (existingMapping.PlanningIntervalIterationId == iterationId)
-                return Result.Failure("This sprint is already mapped to the specified iteration.");
+                return Result.Success();
             
-            return Result.Failure("This sprint is already mapped to another iteration in this Planning Interval.");
+            // Sprint is mapped to a different iteration - unmap it and continue to map to new iteration
+            _iterationSprints.Remove(existingMapping);
+        }
+
+        // If the team already has a different sprint mapped to this iteration, unmap it first
+        // This ensures a team can only have one sprint per iteration (replace behavior)
+        var teamSprintInIteration = _iterationSprints
+            .Where(s => s.PlanningIntervalIterationId == iterationId && s.SprintId != sprint.Id)
+            .FirstOrDefault(s => s.Sprint?.TeamId == sprint.TeamId);        
+        if (teamSprintInIteration is not null)
+        {
+            _iterationSprints.Remove(teamSprintInIteration);
         }
 
         // Add the mapping
@@ -387,6 +398,75 @@ public class PlanningInterval : BaseSoftDeletableEntity<Guid>, ILocalSchedule, I
     public IReadOnlyCollection<PlanningIntervalIterationSprint> GetSprintsForIteration(Guid iterationId)
     {
         return _iterationSprints.Where(s => s.PlanningIntervalIterationId == iterationId).ToList().AsReadOnly();
+    }
+
+    /// <summary>
+    /// Synchronizes team sprint mappings to the desired state.
+    /// This is a sync/replace operation that:
+    /// - Maps sprints as specified in the dictionary
+    /// - Unmaps sprints not included in the desired state
+    /// - Ensures idempotency and proper validation
+    /// </summary>
+    /// <param name="teamId">The team whose sprints are being synchronized.</param>
+    /// <param name="iterationSprintMappings">Dictionary where key is iteration ID and value is sprint ID (null to unmap).</param>
+    /// <param name="sprints">Dictionary of available sprints keyed by ID.</param>
+    /// <returns>A result indicating success or failure with an error message.</returns>
+    public Result SyncTeamSprintMappings(Guid teamId, Dictionary<Guid, Guid?> iterationSprintMappings, Dictionary<Guid, Iteration> sprints)
+    {
+        Guard.Against.Null(iterationSprintMappings, nameof(iterationSprintMappings));
+        Guard.Against.Null(sprints, nameof(sprints));
+
+        // Process each mapping in the dictionary
+        foreach (var (iterationId, sprintId) in iterationSprintMappings)
+        {
+            if (!sprintId.HasValue)
+            {
+                // Null value means unmap any existing team sprint from this iteration
+                var teamSprintsInIteration = _iterationSprints
+                    .Where(s => s.PlanningIntervalIterationId == iterationId && 
+                               s.Sprint?.TeamId == teamId)
+                    .ToList();
+
+                foreach (var sprintMapping in teamSprintsInIteration)
+                {
+                    var unmapResult = UnmapSprint(sprintMapping.SprintId);
+                    if (unmapResult.IsFailure)
+                        return unmapResult;
+                }
+            }
+            else
+            {
+                // Map the sprint to the iteration (domain handles all validation)
+                if (!sprints.TryGetValue(sprintId.Value, out var sprint))
+                    return Result.Failure($"Sprint {sprintId.Value} not found.");
+
+                var mapResult = MapSprintToIteration(iterationId, sprint);
+                if (mapResult.IsFailure)
+                    return mapResult;
+            }
+        }
+
+        // Unmap any team sprints that are currently mapped but not in the desired state
+        var desiredSprintIds = iterationSprintMappings.Values
+            .Where(id => id.HasValue)
+            .Select(id => id!.Value)
+            .ToHashSet();
+
+        var currentTeamSprints = _iterationSprints
+            .Where(s => s.Sprint?.TeamId == teamId)
+            .ToList();
+
+        foreach (var currentSprint in currentTeamSprints)
+        {
+            if (!desiredSprintIds.Contains(currentSprint.SprintId))
+            {
+                var unmapResult = UnmapSprint(currentSprint.SprintId);
+                if (unmapResult.IsFailure)
+                    return unmapResult;
+            }
+        }
+
+        return Result.Success();
     }
 
     #endregion Sprint Mappings

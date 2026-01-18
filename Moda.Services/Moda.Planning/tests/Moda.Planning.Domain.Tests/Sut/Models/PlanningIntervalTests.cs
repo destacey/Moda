@@ -736,7 +736,7 @@ public class PlanningIntervalTests
     }
 
     [Fact]
-    public void MapSprintToIteration_WithSprintAlreadyMappedToSameIteration_ReturnsFailure()
+    public void MapSprintToIteration_WhenSprintAlreadyMappedToSameIteration_IsIdempotent()
     {
         // Arrange
         var piDates = new LocalDateRange(new LocalDate(2023, 1, 1), new LocalDate(2023, 3, 31));
@@ -748,24 +748,23 @@ public class PlanningIntervalTests
             .Generate();
 
         var iterationId = sut.Iterations.First().Id;
-        var sprint = new IterationFaker()
-            .AsSprint()
-            .WithTeamId(teamId)
-            .Generate();
+        var sprint = new IterationFaker().AsSprint().WithTeamId(teamId).Generate();
 
-        sut.MapSprintToIteration(iterationId, sprint);
+        // Map sprint first time
+        var firstResult = sut.MapSprintToIteration(iterationId, sprint);
+        firstResult.IsSuccess.Should().BeTrue();
 
-        // Act
-        var result = sut.MapSprintToIteration(iterationId, sprint);
+        // Act - Map same sprint to same iteration again
+        var secondResult = sut.MapSprintToIteration(iterationId, sprint);
 
-        // Assert
-        result.IsFailure.Should().BeTrue();
-        result.Error.Should().Be("This sprint is already mapped to the specified iteration.");
-        sut.IterationSprints.Should().HaveCount(1);
+        // Assert - Operation is idempotent, should succeed
+        secondResult.IsSuccess.Should().BeTrue();
+        sut.IterationSprints.Should().HaveCount(1, "mapping same sprint twice should not create duplicate");
+        sut.IterationSprints.First().SprintId.Should().Be(sprint.Id);
     }
 
     [Fact]
-    public void MapSprintToIteration_WithSprintAlreadyMappedToDifferentIteration_ReturnsFailure()
+    public void MapSprintToIteration_WithSprintAlreadyMappedToDifferentIteration_MovesSprintToNewIteration()
     {
         // Arrange
         var piDates = new LocalDateRange(new LocalDate(2023, 1, 1), new LocalDate(2023, 3, 31));
@@ -784,15 +783,55 @@ public class PlanningIntervalTests
             .Generate();
 
         sut.MapSprintToIteration(firstIterationId, sprint);
+        sut.IterationSprints.Should().HaveCount(1);
+        sut.IterationSprints.First().PlanningIntervalIterationId.Should().Be(firstIterationId);
 
-        // Act
+        // Act - Map same sprint to second iteration (should move it)
         var result = sut.MapSprintToIteration(secondIterationId, sprint);
 
         // Assert
-        result.IsFailure.Should().BeTrue();
-        result.Error.Should().Be("This sprint is already mapped to another iteration in this Planning Interval.");
+        result.IsSuccess.Should().BeTrue();
+        sut.IterationSprints.Should().HaveCount(1, "sprint should be moved, not duplicated");
+        sut.IterationSprints.First().SprintId.Should().Be(sprint.Id);
+        sut.IterationSprints.First().PlanningIntervalIterationId.Should().Be(secondIterationId, "sprint should now be mapped to the second iteration");
+    }
+
+    [Fact]
+    public void MapSprintToIteration_WithTeamAlreadyHavingSprintInIteration_ReplacesExistingSprint()
+    {
+        // Arrange
+        var piDates = new LocalDateRange(new LocalDate(2023, 1, 1), new LocalDate(2023, 3, 31));
+        var teamId = Guid.NewGuid();
+        var sut = _planningIntervalFaker
+            .WithDateRange(piDates)
+            .WithTeams(teamId)
+            .WithIterations(piDates, 2, "Iteration ")
+            .Generate();
+
+        var iterationId = sut.Iterations.First().Id;
+        var sprint1 = new IterationFaker().AsSprint().WithTeamId(teamId).Generate();
+        var sprint2 = new IterationFaker().AsSprint().WithTeamId(teamId).Generate();
+
+        // Map first sprint successfully
+        sut.MapSprintToIteration(iterationId, sprint1);
+        
+        // Set up Sprint navigation property (simulates EF Core loading)
+        foreach (var mapping in sut.IterationSprints)
+        {
+            if (mapping.SprintId == sprint1.Id)
+                mapping.SetPrivate(m => m.Sprint, sprint1);
+        }
+        
         sut.IterationSprints.Should().HaveCount(1);
-        sut.IterationSprints.First().PlanningIntervalIterationId.Should().Be(firstIterationId);
+        sut.IterationSprints.First().SprintId.Should().Be(sprint1.Id);
+
+        // Act - Map second sprint from same team to same iteration (should replace)
+        var result = sut.MapSprintToIteration(iterationId, sprint2);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        sut.IterationSprints.Should().HaveCount(1, "team can only have one sprint per iteration");
+        sut.IterationSprints.First().SprintId.Should().Be(sprint2.Id, "new sprint should replace the old one");
     }
 
     [Fact]
