@@ -5,18 +5,16 @@ using Moda.Common.Domain.Enums.Planning;
 using Moda.Common.Domain.Interfaces;
 using Moda.Planning.Domain.Enums;
 using Moda.Planning.Domain.Interfaces;
+using Moda.Planning.Domain.Models.Iterations;
 using NodaTime;
 
 namespace Moda.Planning.Domain.Models;
 public class PlanningInterval : BaseSoftDeletableEntity<Guid>, ILocalSchedule, IHasIdAndKey
 {
-    private string _name = default!;
-    private string? _description;
-    private LocalDateRange _dateRange = default!;
-
     private readonly List<PlanningIntervalTeam> _teams = [];
     private readonly List<PlanningIntervalIteration> _iterations = [];
     private readonly List<PlanningIntervalObjective> _objectives = [];
+    private readonly List<PlanningIntervalIterationSprint> _iterationSprints = [];
 
     private PlanningInterval() { }
 
@@ -40,26 +38,26 @@ public class PlanningInterval : BaseSoftDeletableEntity<Guid>, ILocalSchedule, I
     /// </summary>
     public string Name
     {
-        get => _name;
-        private set => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
-    }
+        get;
+        private set => field = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
+    } = default!;
 
     /// <summary>
     /// The description of the Planning Interval.
     /// </summary>
     public string? Description
     {
-        get => _description;
-        private set => _description = value.NullIfWhiteSpacePlusTrim();
+        get;
+        private set => field = value.NullIfWhiteSpacePlusTrim();
     }
 
     /// <summary>Gets or sets the date range.</summary>
     /// <value>The date range.</value>
     public LocalDateRange DateRange
     {
-        get => _dateRange;
-        private set => _dateRange = Guard.Against.Null(value, nameof(DateRange));
-    }
+        get;
+        private set => field = Guard.Against.Null(value, nameof(DateRange));
+    } = default!;
 
     public bool ObjectivesLocked { get; private set; } = false;
 
@@ -74,6 +72,10 @@ public class PlanningInterval : BaseSoftDeletableEntity<Guid>, ILocalSchedule, I
     /// <summary>Gets the objectives.</summary>
     /// <value>The PI objectives.</value>
     public IReadOnlyCollection<PlanningIntervalObjective> Objectives => _objectives.AsReadOnly();
+
+    /// <summary>Gets the iteration sprint mappings.</summary>
+    /// <value>The PI iteration sprint mappings.</value>
+    public IReadOnlyCollection<PlanningIntervalIterationSprint> IterationSprints => _iterationSprints.AsReadOnly();
 
     public double? CalculatePredictability(LocalDate date, Guid? teamId = null)
     {
@@ -206,6 +208,15 @@ public class PlanningInterval : BaseSoftDeletableEntity<Guid>, ILocalSchedule, I
         foreach (var removedTeam in removedTeams)
         {
             _teams.Remove(removedTeam);
+
+            // Remove sprint mappings for the removed team
+            var removedTeamSprints = _iterationSprints
+                .Where(s => s.Sprint?.TeamId == removedTeam.TeamId)
+                .ToList();
+            foreach (var sprint in removedTeamSprints)
+            {
+                _iterationSprints.Remove(sprint);
+            }
         }
 
         var addedTeams = teamIds.Where(x => !_teams.Any(y => y.TeamId == x)).ToList();
@@ -302,6 +313,75 @@ public class PlanningInterval : BaseSoftDeletableEntity<Guid>, ILocalSchedule, I
 
 
     #endregion Iterations
+
+    #region Sprint Mappings
+
+    /// <summary>
+    /// Maps a sprint to an iteration within this Planning Interval.
+    /// </summary>
+    /// <param name="iterationId">The iteration ID within this PI.</param>
+    /// <param name="sprint">The sprint entity to map.</param>
+    /// <returns>A result indicating success or failure with an error message.</returns>
+    public Result MapSprintToIteration(Guid iterationId, Iteration sprint)
+    {
+        Guard.Against.Null(sprint, nameof(sprint));
+
+        // Validate sprint type
+        if (sprint.Type != IterationType.Sprint)
+            return Result.Failure("Only sprints of type Sprint can be mapped to iterations.");
+
+        // Validate sprint belongs to a team in the PI
+        if (!sprint.TeamId.HasValue || !_teams.Any(t => t.TeamId == sprint.TeamId.Value))
+            return Result.Failure("The sprint must belong to a team that is part of this Planning Interval.");
+
+        // Validate iteration exists
+        var iteration = _iterations.FirstOrDefault(i => i.Id == iterationId);
+        if (iteration is null)
+            return Result.Failure($"Iteration {iterationId} not found in this Planning Interval.");
+
+        // Validate sprint is not already mapped to another iteration in this PI
+        var existingMapping = _iterationSprints.FirstOrDefault(s => s.SprintId == sprint.Id);
+        if (existingMapping is not null)
+        {
+            if (existingMapping.PlanningIntervalIterationId == iterationId)
+                return Result.Failure("This sprint is already mapped to the specified iteration.");
+            
+            return Result.Failure("This sprint is already mapped to another iteration in this Planning Interval.");
+        }
+
+        // Add the mapping
+        var mapping = new PlanningIntervalIterationSprint(Id, iterationId, sprint.Id);
+        _iterationSprints.Add(mapping);
+
+        return Result.Success();
+    }
+
+    /// <summary>
+    /// Removes a sprint mapping from an iteration within this Planning Interval.
+    /// </summary>
+    /// <param name="sprintId">The sprint ID to unmap.</param>
+    /// <returns>A result indicating success or failure with an error message.</returns>
+    public Result UnmapSprint(Guid sprintId)
+    {
+        var mapping = _iterationSprints.FirstOrDefault(s => s.SprintId == sprintId);
+        if (mapping is null)
+            return Result.Failure("Sprint mapping not found in this Planning Interval.");
+
+        _iterationSprints.Remove(mapping);
+        return Result.Success();
+    }
+
+    /// <summary>
+    /// Gets all sprints mapped to a specific iteration.
+    /// </summary>
+    /// <param name="iterationId">The iteration ID.</param>
+    /// <returns>A collection of sprint mappings for the specified iteration.</returns>
+    public IReadOnlyCollection<PlanningIntervalIterationSprint> GetSprintsForIteration(Guid iterationId)
+    {
+        return _iterationSprints.Where(s => s.PlanningIntervalIterationId == iterationId).ToList().AsReadOnly();
+    }
+
+    #endregion Sprint Mappings
 
     #region Objectives
 

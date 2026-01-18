@@ -30,4 +30,10 @@ public static class PlanningIntervalIterationFakerExtensions
 
         return faker;
     }
+
+    public static PlanningIntervalIterationFaker WithSprints(this PlanningIntervalIterationFaker faker, params PlanningIntervalIterationSprint[] sprints)
+    {
+        faker.RuleFor("_sprints", f => sprints.ToList());
+        return faker;
+    }
 }
