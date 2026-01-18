@@ -7220,6 +7220,16 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -7274,6 +7284,81 @@
         ]
       }
     },
+    "/api/planning/planning-intervals/{idOrKey}/iterations/sprints": {
+      "get": {
+        "tags": [
+          "PlanningIntervals"
+        ],
+        "summary": "Get iteration sprint mappings for a Planning Interval.",
+        "description": "Retrieves all sprint-to-iteration mappings, with optional filtering by iteration.",
+        "operationId": "PlanningIntervals_GetIterationSprints",
+        "parameters": [
+          {
+            "name": "idOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "iterationId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": true,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PlanningIntervalIterationSprintsDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
     "/api/planning/planning-intervals/{id}/teams/{teamId}/sprints": {
       "post": {
         "tags": [
@@ -7281,7 +7366,7 @@
         ],
         "summary": "Map team sprints to Planning Interval iterations.",
         "description": "This is a sync/replace operation that sets the complete desired state for the team's sprint mappings.",
-        "operationId": "PlanningIntervals_MapSprints",
+        "operationId": "PlanningIntervals_MapTeamSprints",
         "parameters": [
           {
             "name": "id",
@@ -19787,6 +19872,93 @@
           }
         }
       },
+      "PlanningIntervalIterationSprintsDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "name",
+          "start",
+          "end",
+          "category",
+          "sprints"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "key": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "start": {
+            "type": "string",
+            "format": "date"
+          },
+          "end": {
+            "type": "string",
+            "format": "date"
+          },
+          "category": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "sprints": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SprintListDto"
+            }
+          }
+        }
+      },
+      "SprintListDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "name",
+          "state",
+          "start",
+          "end",
+          "team"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "key": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "state": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "start": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "end": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "team": {
+            "$ref": "#/components/schemas/PlanningTeamNavigationDto"
+          }
+        }
+      },
       "MapPlanningIntervalSprintsRequest": {
         "type": "object",
         "description": "Request model for mapping team sprints to Planning Interval iterations.",
@@ -21650,48 +21822,6 @@
             "additionalProperties": false
           }
         ]
-      },
-      "SprintListDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "key",
-          "name",
-          "state",
-          "start",
-          "end",
-          "team"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "guid",
-            "nullable": false,
-            "example": "00000000-0000-0000-0000-000000000000"
-          },
-          "key": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "name": {
-            "type": "string"
-          },
-          "state": {
-            "$ref": "#/components/schemas/SimpleNavigationDto"
-          },
-          "start": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "end": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "team": {
-            "$ref": "#/components/schemas/PlanningTeamNavigationDto"
-          }
-        }
       },
       "SprintDetailsDto": {
         "type": "object",

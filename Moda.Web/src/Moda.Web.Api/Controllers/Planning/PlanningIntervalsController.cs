@@ -199,11 +199,14 @@ public class PlanningIntervalsController : ControllerBase
     [OpenApiOperation("Get a list of planning interval iterations.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<IReadOnlyList<PlanningIntervalIterationListDto>>> GetIterations(string idOrKey, CancellationToken cancellationToken)
     {
         var iterations = await _sender.Send(new GetPlanningIntervalIterationsQuery(idOrKey), cancellationToken);
 
-        return Ok(iterations);
+        return iterations is not null 
+            ? Ok(iterations) 
+            : NotFound();
     }
 
     [HttpGet("iteration-categories")]
@@ -215,6 +218,21 @@ public class PlanningIntervalsController : ControllerBase
     {
         var items = await _sender.Send(new GetPlanningIntervalIterationCategoriesQuery(), cancellationToken);
         return Ok(items.OrderBy(c => c.Order));
+    }
+
+    [HttpGet("{idOrKey}/iterations/sprints")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.PlanningIntervals)]
+    [OpenApiOperation("Get iteration sprint mappings for a Planning Interval.", "Retrieves all sprint-to-iteration mappings, with optional filtering by iteration.")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<IReadOnlyList<PlanningIntervalIterationSprintsDto>>> GetIterationSprints(string idOrKey, [FromQuery] Guid? iterationId, CancellationToken cancellationToken)
+    {
+        var iterations = await _sender.Send(new GetPlanningIntervalIterationSprintsQuery(idOrKey, iterationId), cancellationToken);
+
+        return iterations is not null 
+            ? Ok(iterations) 
+            : NotFound();
     }
 
     [HttpPost("{id}/teams/{teamId}/sprints")]
