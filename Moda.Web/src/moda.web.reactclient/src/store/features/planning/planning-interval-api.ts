@@ -300,6 +300,7 @@ export const planningIntervalApi = apiSlice.injectEndpoints({
         { type: QueryTags.PlanningInterval, id: arg.cacheKey },
         { type: QueryTags.PlanningIntervalIteration, id: arg.cacheKey },
         { type: QueryTags.PlanningIntervalTeam, id: arg.cacheKey },
+        { type: QueryTags.PlanningIntervalIterationSprints, id: arg.cacheKey },
       ],
     }),
     getPlanningIntervalObjectives: builder.query<

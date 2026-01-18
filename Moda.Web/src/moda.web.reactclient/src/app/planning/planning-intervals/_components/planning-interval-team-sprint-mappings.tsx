@@ -1,9 +1,10 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import Link from 'next/link'
 import dayjs from 'dayjs'
-import { Flex, Spin, Table, Tag, Tooltip, Typography } from 'antd'
+import { Button, Flex, Spin, Table, Tag, Tooltip, Typography } from 'antd'
+import { EditOutlined } from '@ant-design/icons'
 import type { ColumnsType } from 'antd/es/table'
 import {
   PlanningIntervalDetailsDto,
@@ -15,6 +16,8 @@ import {
 } from '@/src/store/features/planning/planning-interval-api'
 import ModaEmpty from '@/src/components/common/moda-empty'
 import useTheme from '@/src/components/contexts/theme'
+import useAuth from '@/src/components/contexts/auth'
+import ConfigureTeamSprintMappingsForm from './configure-team-sprint-mappings-form'
 
 const { Text } = Typography
 
@@ -75,6 +78,26 @@ export const PlanningIntervalTeamSprintMappings = ({
   planningInterval,
 }: PlanningIntervalTeamSprintMappingsProps) => {
   const { token } = useTheme()
+
+  const { hasPermissionClaim } = useAuth()
+  const canUpdatePlanningInterval = hasPermissionClaim(
+    'Permissions.PlanningIntervals.Update',
+  )
+
+  const [editingTeam, setEditingTeam] = useState<TeamRowData | null>(null)
+
+  const onEditTeamSprints = useCallback((team: TeamRowData) => {
+    setEditingTeam(team)
+  }, [])
+
+  const onFormSave = useCallback(() => {
+    setEditingTeam(null)
+  }, [])
+
+  const onFormCancel = useCallback(() => {
+    setEditingTeam(null)
+  }, [])
+
   const { data: teamsData, isLoading: teamsLoading } =
     useGetPlanningIntervalTeamsQuery(planningInterval.key)
 
@@ -101,11 +124,12 @@ export const PlanningIntervalTeamSprintMappings = ({
     return lookup
   }, [iterationSprintsData])
 
-  // Build table data with team rows, sorted alphabetically by team name
+  // Build table data with team rows, filtered to only Teams (not Team of Teams), sorted alphabetically
   const tableData = useMemo((): TeamRowData[] => {
     if (!teamsData || !iterationSprintsData) return []
 
     return [...teamsData]
+      .filter((team) => team.type === 'Team')
       .sort((a, b) => a.name.localeCompare(b.name))
       .map((team) => {
         const sprintsByIteration: Record<string, SprintListDto | null> = {}
@@ -136,20 +160,30 @@ export const PlanningIntervalTeamSprintMappings = ({
         dataIndex: 'teamName',
         key: 'team',
         fixed: 'left',
-        width: 180,
+        width: 200,
         render: (_, record) => (
-          <div>
-            <Link href={`/organizations/teams/${record.teamKey}`}>
-              {record.teamName}
-            </Link>
-            {record.teamOfTeamsName && (
-              <div>
-                <Text type="secondary" style={{ fontSize: '12px' }}>
-                  {record.teamOfTeamsName}
-                </Text>
-              </div>
+          <Flex justify="space-between" align="center">
+            <div>
+              <Link href={`/organizations/teams/${record.teamKey}`}>
+                {record.teamName}
+              </Link>
+              {record.teamOfTeamsName && (
+                <div>
+                  <Text type="secondary" style={{ fontSize: '12px' }}>
+                    {record.teamOfTeamsName}
+                  </Text>
+                </div>
+              )}
+            </div>
+            {canUpdatePlanningInterval && (
+              <Button
+                type="text"
+                size="small"
+                icon={<EditOutlined />}
+                onClick={() => onEditTeamSprints(record)}
+              />
             )}
-          </div>
+          </Flex>
         ),
       },
     ]
@@ -209,7 +243,7 @@ export const PlanningIntervalTeamSprintMappings = ({
     }
 
     return cols
-  }, [iterationSprintsData, token.colorPrimary, teamsData?.length])
+  }, [iterationSprintsData, token.colorPrimary, teamsData?.length, canUpdatePlanningInterval, onEditTeamSprints])
 
   if (isLoading) {
     return (
@@ -226,14 +260,28 @@ export const PlanningIntervalTeamSprintMappings = ({
   }
 
   return (
-    <Table
-      dataSource={tableData}
-      columns={columns}
-      pagination={false}
-      scroll={{ x: 'max-content' }}
-      size="small"
-      bordered
-    />
+    <>
+      <Table
+        dataSource={tableData}
+        columns={columns}
+        pagination={false}
+        scroll={{ x: 'max-content' }}
+        size="small"
+        bordered
+      />
+      {editingTeam && (
+        <ConfigureTeamSprintMappingsForm
+          showForm={!!editingTeam}
+          planningIntervalId={planningInterval.id}
+          planningIntervalKey={planningInterval.key}
+          teamId={editingTeam.teamId}
+          teamName={editingTeam.teamName}
+          teamOfTeamsName={editingTeam.teamOfTeamsName}
+          onFormSave={onFormSave}
+          onFormCancel={onFormCancel}
+        />
+      )}
+    </>
   )
 }
 
