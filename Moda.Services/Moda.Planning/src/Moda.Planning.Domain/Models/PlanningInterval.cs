@@ -51,30 +51,38 @@ public class PlanningInterval : BaseSoftDeletableEntity<Guid>, ILocalSchedule, I
         private set => field = value.NullIfWhiteSpacePlusTrim();
     }
 
-    /// <summary>Gets or sets the date range.</summary>
-    /// <value>The date range.</value>
+    /// <summary>
+    /// The date range of the Planning Interval.
+    /// </summary>
     public LocalDateRange DateRange
     {
         get;
         private set => field = Guard.Against.Null(value, nameof(DateRange));
     } = default!;
 
+    /// <summary>
+    /// A value indicating whether objectives are locked for this Planning Interval.
+    /// </summary>
     public bool ObjectivesLocked { get; private set; } = false;
 
-    /// <summary>Gets the teams.</summary>
-    /// <value>The PI teams.</value>
+    /// <summary>
+    /// The teams associated with this Planning Interval.
+    /// </summary>
     public IReadOnlyCollection<PlanningIntervalTeam> Teams => _teams.AsReadOnly();
 
-    /// <summary>Gets the iterations.</summary>
-    /// <value>The PI iterations.</value>
+    /// <summary>
+    /// The iterations within this Planning Interval.
+    /// </summary>
     public IReadOnlyCollection<PlanningIntervalIteration> Iterations => _iterations.OrderBy(i => i.DateRange.Start).ToList().AsReadOnly();
 
-    /// <summary>Gets the objectives.</summary>
-    /// <value>The PI objectives.</value>
+    /// <summary>
+    /// The objectives associated with this Planning Interval.
+    /// </summary>
     public IReadOnlyCollection<PlanningIntervalObjective> Objectives => _objectives.AsReadOnly();
 
-    /// <summary>Gets the iteration sprint mappings.</summary>
-    /// <value>The PI iteration sprint mappings.</value>
+    /// <summary>
+    /// The sprints mapped to iterations within this Planning Interval.
+    /// </summary>
     public IReadOnlyCollection<PlanningIntervalIterationSprint> IterationSprints => _iterationSprints.AsReadOnly();
 
     public double? CalculatePredictability(LocalDate date, Guid? teamId = null)

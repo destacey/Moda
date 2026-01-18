@@ -18,7 +18,6 @@ namespace Moda.Planning.Domain.Models.Iterations;
 /// provides methods for creating and updating iterations, as well as managing associated metadata.</remarks>
 public class Iteration : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey, ISimpleIteration
 {
-    private string _name = default!;
     private readonly List<KeyValueObjectMetadata> _externalMetadata = [];
 
     private Iteration() { }
@@ -48,9 +47,9 @@ public class Iteration : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey, ISimp
     /// </summary>
     public string Name
     {
-        get => _name;
-        private set => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
-    }
+        get;
+        private set => field = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
+    } = default!;
 
     /// <summary>
     /// The type of iteration being performed.
@@ -139,7 +138,7 @@ public class Iteration : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey, ISimp
 
         if (Type != type) return true;
         if (!EqualityComparer<IterationDateRange>.Default.Equals(DateRange, dateRange)) return true;
-        if (!string.Equals(_name, newName, StringComparison.Ordinal)) return true;
+        if (!string.Equals(Name, newName, StringComparison.Ordinal)) return true;
         if (State != state) return true;
         if (TeamId != teamId) return true;
         return false;

@@ -3,14 +3,16 @@ using Moda.Common.Domain.Events.Organization;
 using Moda.Common.Domain.Interfaces;
 using Moda.Common.Domain.Interfaces.Organization;
 using Moda.Common.Domain.Models.Organizations;
+using Moda.Planning.Domain.Models.Iterations;
 
 namespace Moda.Planning.Domain.Models;
 
 /// <summary>
-/// A copy of the Moda.Common.Domain.Interfaces.Organization.ISimpleTeam interface.  Used to hold basic team information for the planning service and db context.
+/// A copy of the Moda.Common.Domain.Interfaces.Organization.ISimpleTeam interface.  Used to hold team information for the planning service and db context.
 /// </summary>
 public class PlanningTeam : ISimpleTeam, IHasIdAndKey, IHasTeamIdAndCode
 {
+    protected readonly List<Iteration> _iterations = [];
     protected readonly List<PlanningIntervalTeam> _planningIntervalTeams = [];
 
     private PlanningTeam() { }
@@ -41,6 +43,7 @@ public class PlanningTeam : ISimpleTeam, IHasIdAndKey, IHasTeamIdAndCode
     public TeamCode Code { get; private set; } = default!;
     public TeamType Type { get; private set; } = default!;
     public bool IsActive { get; private set; }
+    public IReadOnlyCollection<Iteration> Iterations => _iterations.AsReadOnly();
     public IReadOnlyCollection<PlanningIntervalTeam> PlanningIntervalTeams => _planningIntervalTeams.AsReadOnly();
 
     /// <summary>

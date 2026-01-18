@@ -5,7 +5,6 @@ using Moda.Planning.Domain.Enums;
 using Moda.Planning.Domain.Models;
 using Moda.Planning.Domain.Tests.Data;
 using Moda.Tests.Shared;
-using Moda.Tests.Shared.Extensions;
 using NodaTime.Extensions;
 using NodaTime.Testing;
 

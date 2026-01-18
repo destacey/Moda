@@ -21,6 +21,8 @@ internal sealed class ManagePlanningIntervalTeamsCommandHandler : ICommandHandle
         {
             var planningInterval = await _planningDbContext.PlanningIntervals
                 .Include(x => x.Teams)
+                .Include(x => x.IterationSprints)
+                    .ThenInclude(itsp => itsp.Sprint)
                 .SingleOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
 
             if (planningInterval == null)
