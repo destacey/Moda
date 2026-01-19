@@ -1,12 +1,20 @@
-import { NodeSDK } from '@opentelemetry/sdk-node'
-import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc'
-import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node'
+// Empty export to make this a module (enables top-level await)
+export {}
 
 // Only initialize OpenTelemetry if OTLP endpoint is configured (e.g., when running with Aspire)
 const otlpEndpoint = process.env.OTEL_EXPORTER_OTLP_ENDPOINT
 
 if (otlpEndpoint) {
   console.log(`Initializing OpenTelemetry with endpoint: ${otlpEndpoint}`)
+
+  // Dynamic imports to avoid loading heavy packages when OTel is disabled
+  const { NodeSDK } = await import('@opentelemetry/sdk-node')
+  const { OTLPTraceExporter } = await import(
+    '@opentelemetry/exporter-trace-otlp-grpc'
+  )
+  const { getNodeAutoInstrumentations } = await import(
+    '@opentelemetry/auto-instrumentations-node'
+  )
 
   // Configure metric export intervals via environment variables
   // This prevents timing validation errors in the SDK
