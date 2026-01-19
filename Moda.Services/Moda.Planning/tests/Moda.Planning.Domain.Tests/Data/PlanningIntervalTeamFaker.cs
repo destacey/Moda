@@ -10,6 +10,12 @@ public sealed class PlanningIntervalTeamFaker : PrivateConstructorFaker<Planning
         RuleFor(x => x.PlanningIntervalId, f => f.Random.Guid());
         RuleFor(x => x.TeamId, f => f.Random.Guid());
     }
+
+    public PlanningIntervalTeamFaker(Guid planningIntervalId, Guid teamId)
+    {
+        RuleFor(x => x.PlanningIntervalId, planningIntervalId);
+        RuleFor(x => x.TeamId, teamId);
+    }
 }
 
 public static class PlanningIntervalTeamFakerExtensions

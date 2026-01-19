@@ -9,8 +9,7 @@ using NodaTime;
 namespace Moda.Planning.Domain.Models;
 public sealed class PlanningIntervalIteration : BaseSoftDeletableEntity<Guid>, ILocalSchedule, IHasIdAndKey
 {
-    private string _name = default!;
-    private LocalDateRange _dateRange = default!;
+    private readonly List<PlanningIntervalIterationSprint> _iterationSprints = [];
 
     private PlanningIntervalIteration() { }
 
@@ -23,12 +22,14 @@ public sealed class PlanningIntervalIteration : BaseSoftDeletableEntity<Guid>, I
         DateRange = dateRange;
     }
 
-    /// <summary>Gets the key.</summary>
-    /// <value>The key.</value>
+    /// <summary>
+    /// The alternate key of the Planning Interval Iteration.
+    /// </summary>
     public int Key { get; private init; }
 
-    /// <summary>Gets the planning interval identifier.</summary>
-    /// <value>The planning interval identifier.</value>
+    /// <summary>
+    /// The ID of the Planning Interval this iteration belongs to.
+    /// </summary>
     public Guid PlanningIntervalId { get; private init; }
 
     /// <summary>
@@ -36,21 +37,28 @@ public sealed class PlanningIntervalIteration : BaseSoftDeletableEntity<Guid>, I
     /// </summary>
     public string Name
     {
-        get => _name;
-        private set => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
-    }
+        get;
+        private set => field = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
+    } = default!;
 
-    /// <summary>Gets or sets the category.</summary>
-    /// <value>The iteration category.</value>
+    /// <summary>
+    /// The category of the Planning Interval Iteration.
+    /// </summary>
     public IterationCategory Category { get; private set; }
 
-    /// <summary>Gets or sets the date range.</summary>
-    /// <value>The date range.</value>
+    /// <summary>
+    /// The date range of the Planning Interval Iteration.
+    /// </summary>
     public LocalDateRange DateRange
     {
-        get => _dateRange;
-        private set => _dateRange = Guard.Against.Null(value, nameof(DateRange));
-    }
+        get;
+        private set => field = Guard.Against.Null(value, nameof(DateRange));
+    } = default!;
+
+    /// <summary>
+    /// Gets the sprints mapped to this iteration.
+    /// </summary>
+    public IReadOnlyCollection<PlanningIntervalIterationSprint> IterationSprints => _iterationSprints.AsReadOnly();
 
     /// <summary>Iteration state on given date.</summary>
     /// <param name="date">The date.</param>
@@ -62,6 +70,13 @@ public sealed class PlanningIntervalIteration : BaseSoftDeletableEntity<Guid>, I
         return IterationState.Future;
     }
 
+    /// <summary>
+    /// Updates the Planning Interval Iteration.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="category"></param>
+    /// <param name="dateRange"></param>
+    /// <returns></returns>
     internal Result Update(string name, IterationCategory category, LocalDateRange dateRange)
     {
         Name = name;
@@ -71,6 +86,14 @@ public sealed class PlanningIntervalIteration : BaseSoftDeletableEntity<Guid>, I
         return Result.Success();
     }
 
+    /// <summary>
+    /// Factory method to create a Planning Interval Iteration.
+    /// </summary>
+    /// <param name="planningIntervalId"></param>
+    /// <param name="name"></param>
+    /// <param name="category"></param>
+    /// <param name="dateRange"></param>
+    /// <returns></returns>
     internal static PlanningIntervalIteration Create(Guid planningIntervalId, string name, IterationCategory category, LocalDateRange dateRange)
     {
         return new PlanningIntervalIteration(planningIntervalId, name, category, dateRange);

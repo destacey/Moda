@@ -24,6 +24,7 @@
         <ProjectReference Include="..\..\..\..\Moda.Common\tests\Moda.Tests.Shared\Moda.Tests.Shared.csproj" />
         <ProjectReference Include="..\..\src\Moda.Planning.Application\Moda.Planning.Application.csproj" />
         <ProjectReference Include="..\..\src\Moda.Planning.Domain\Moda.Planning.Domain.csproj" />
+        <ProjectReference Include="..\Moda.Planning.Domain.Tests\Moda.Planning.Domain.Tests.csproj" />
     </ItemGroup>
 
 </Project>
