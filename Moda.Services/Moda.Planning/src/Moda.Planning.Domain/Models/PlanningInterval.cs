@@ -454,16 +454,14 @@ public class PlanningInterval : BaseSoftDeletableEntity<Guid>, ILocalSchedule, I
 
         var currentTeamSprints = _iterationSprints
             .Where(s => s.Sprint?.TeamId == teamId)
+            .Where(s => !desiredSprintIds.Contains(s.SprintId))
             .ToList();
 
         foreach (var currentSprint in currentTeamSprints)
         {
-            if (!desiredSprintIds.Contains(currentSprint.SprintId))
-            {
-                var unmapResult = UnmapSprint(currentSprint.SprintId);
-                if (unmapResult.IsFailure)
-                    return unmapResult;
-            }
+            var unmapResult = UnmapSprint(currentSprint.SprintId);
+            if (unmapResult.IsFailure)
+                return unmapResult;
         }
 
         return Result.Success();
