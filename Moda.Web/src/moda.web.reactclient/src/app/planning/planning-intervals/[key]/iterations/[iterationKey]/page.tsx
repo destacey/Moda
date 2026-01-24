@@ -15,10 +15,7 @@ import PlanningIntervalIterationDetailsLoading from './loading'
 import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
 import { SwapOutlined } from '@ant-design/icons'
 import { Card, Flex, Space } from 'antd'
-import {
-  IterationDates,
-  SprintBacklogGrid,
-} from '@/src/components/common/planning'
+import { SprintBacklogGrid } from '@/src/components/common/planning'
 import { PlanningIntervalIterationSummary } from './_components'
 
 enum IterationTabs {
@@ -139,7 +136,12 @@ const PlanningIntervalIterationDetailsPage = (props: {
         if (metricsIsLoading || !metricsData) {
           return <div>Loading metrics...</div>
         }
-        return <PlanningIntervalIterationSummary metrics={metricsData} />
+        return (
+          <PlanningIntervalIterationSummary
+            iteration={iterationData}
+            metrics={metricsData}
+          />
+        )
       case IterationTabs.Backlog:
         return (
           <SprintBacklogGrid
@@ -155,6 +157,7 @@ const PlanningIntervalIterationDetailsPage = (props: {
     }
   }, [
     activeTab,
+    iterationData,
     metricsData,
     metricsIsLoading,
     backlogData,
@@ -182,11 +185,6 @@ const PlanningIntervalIterationDetailsPage = (props: {
         tags={<Space>{switchIterations}</Space>}
       />
       <Flex vertical gap="middle">
-        <IterationDates
-          start={iterationData.start}
-          end={iterationData.end}
-          dateTimeFormat="MMM D, YYYY"
-        />
         <Card
           style={{ width: '100%' }}
           tabList={tabs}

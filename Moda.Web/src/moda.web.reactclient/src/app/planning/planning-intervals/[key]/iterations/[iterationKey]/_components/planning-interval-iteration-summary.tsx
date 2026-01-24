@@ -1,8 +1,17 @@
 'use client'
 
-import { MetricCard } from '@/src/components/common/metrics'
+import {
+  CompletionRateMetric,
+  CycleTimeMetric,
+  HealthMetric,
+  MetricCard,
+  StatusMetric,
+  VelocityMetric,
+} from '@/src/components/common/metrics'
+import { IterationDates } from '@/src/components/common/planning'
 import useTheme from '@/src/components/contexts/theme'
 import {
+  PlanningIntervalIterationDetailsDto,
   PlanningIntervalIterationMetricsResponse,
   SprintMetricsSummary,
 } from '@/src/services/moda-api'
@@ -12,6 +21,7 @@ import { FC, useMemo, useState } from 'react'
 const { Text, Title } = Typography
 
 export interface PlanningIntervalIterationSummaryProps {
+  iteration: PlanningIntervalIterationDetailsDto
   metrics: PlanningIntervalIterationMetricsResponse
 }
 
@@ -30,7 +40,9 @@ const SprintCard: FC<SprintCardProps> = ({ sprint, useStoryPoints }) => {
     ? sprint.completedStoryPoints
     : sprint.completedWorkItems
   const completionRate =
-    displayTotal > 0 ? (displayCompleted / displayTotal) * 100 : 0
+    displayTotal > 0
+      ? Number(((displayCompleted / displayTotal) * 100).toFixed(1))
+      : 0
 
   return (
     <Card size="small" hoverable>
@@ -79,7 +91,7 @@ const SprintCard: FC<SprintCardProps> = ({ sprint, useStoryPoints }) => {
 
 const PlanningIntervalIterationSummary: FC<
   PlanningIntervalIterationSummaryProps
-> = ({ metrics }) => {
+> = ({ iteration, metrics }) => {
   const [useStoryPoints, setUseStoryPoints] = useState(true)
   const { token } = useTheme()
 
@@ -95,21 +107,6 @@ const PlanningIntervalIterationSummary: FC<
   const displayNotStarted = useStoryPoints
     ? metrics.notStartedStoryPoints
     : metrics.notStartedWorkItems
-  const completionRate =
-    displayTotal > 0 ? (displayCompleted / displayTotal) * 100 : 0
-
-  const velocityPercentage =
-    displayTotal > 0
-      ? `${((displayCompleted / displayTotal) * 100).toFixed(1)}%`
-      : '0%'
-  const inProgressPercentage =
-    displayTotal > 0
-      ? `${((displayInProgress / displayTotal) * 100).toFixed(1)}%`
-      : '0%'
-  const notStartedPercentage =
-    displayTotal > 0
-      ? `${((displayNotStarted / displayTotal) * 100).toFixed(1)}%`
-      : '0%'
 
   const sortedSprints = useMemo(() => {
     return [...metrics.sprintMetrics].sort((a, b) =>
@@ -119,6 +116,11 @@ const PlanningIntervalIterationSummary: FC<
 
   return (
     <Flex vertical gap="middle">
+      <IterationDates
+        start={iteration.start}
+        end={iteration.end}
+        dateTimeFormat="MMM D, YYYY"
+      />
       <Flex gap="small" justify="flex-end">
         <Tooltip title="Switch between summing story points and counting work items for metrics">
           <Segmented<string>
@@ -134,10 +136,15 @@ const PlanningIntervalIterationSummary: FC<
       <Row gutter={[8, 8]}>
         <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
           <MetricCard
-            title="Completion Rate"
-            value={completionRate}
-            precision={1}
-            suffix="%"
+            title="Team Sprints"
+            value={metrics.teamCount}
+            tooltip="Number of teams with sprints mapped to this iteration."
+          />
+        </Col>
+        <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
+          <CompletionRateMetric
+            completed={displayCompleted}
+            total={displayTotal}
             tooltip="Percentage of story points or items across all team sprints that are completed (Done or Removed)."
           />
         </Col>
@@ -149,68 +156,43 @@ const PlanningIntervalIterationSummary: FC<
           />
         </Col>
         <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
-          <MetricCard
-            title="Velocity"
-            value={displayCompleted}
-            valueStyle={{ color: token.colorSuccess }}
-            secondaryValue={velocityPercentage}
-            tooltip="Total completed story points or items across all team sprints."
+          <VelocityMetric
+            completed={displayCompleted}
+            total={displayTotal}
+            tooltip="Total completed story points or items across all team sprints (Done or Removed)."
           />
         </Col>
         <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
-          <MetricCard
+          <StatusMetric
             title="In Progress"
             value={displayInProgress}
-            valueStyle={{ color: token.colorInfo }}
-            secondaryValue={inProgressPercentage}
+            total={displayTotal}
+            color={token.colorInfo}
             tooltip="Total in-progress story points or items across all team sprints."
           />
         </Col>
         <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
-          <MetricCard
+          <StatusMetric
             title="Not Started"
             value={displayNotStarted}
-            secondaryValue={notStartedPercentage}
+            total={displayTotal}
             tooltip="Total not-started story points or items across all team sprints."
-          />
-        </Col>
-        <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
-          <MetricCard
-            title="Teams"
-            value={metrics.teamCount}
-            tooltip="Number of teams with sprints mapped to this iteration."
-          />
-        </Col>
-        <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
-          <MetricCard
-            title="Sprints"
-            value={metrics.sprintCount}
-            tooltip="Number of team sprints mapped to this iteration."
           />
         </Col>
         {metrics.averageCycleTimeDays !== undefined &&
           metrics.averageCycleTimeDays !== null && (
             <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
-              <MetricCard
-                title="Avg Cycle Time"
+              <CycleTimeMetric
                 value={metrics.averageCycleTimeDays}
-                precision={2}
-                suffix="days"
-                tooltip="Average cycle time of completed work items across all team sprints."
+                tooltip="Average cycle time of completed (Done) work items across all team sprints."
               />
             </Col>
           )}
         {useStoryPoints && (
           <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
-            <MetricCard
+            <HealthMetric
               title="Missing SPs"
               value={metrics.missingStoryPointsCount}
-              valueStyle={{
-                color:
-                  metrics.missingStoryPointsCount === 0
-                    ? token.colorSuccess
-                    : token.colorError,
-              }}
               tooltip="Number of work items across all team sprints that don't have story points assigned."
             />
           </Col>

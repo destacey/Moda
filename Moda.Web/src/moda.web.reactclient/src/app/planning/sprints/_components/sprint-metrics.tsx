@@ -1,8 +1,13 @@
 'use client'
 
 import {
+  CompletionRateMetric,
+  CycleTimeMetric,
   DaysCountdownMetric,
+  HealthMetric,
   MetricCard,
+  StatusMetric,
+  VelocityMetric,
 } from '@/src/components/common/metrics'
 import useTheme from '@/src/components/contexts/theme'
 import { IterationState } from '@/src/components/types'
@@ -29,10 +34,6 @@ const SprintMetrics: FC<SprintMetricsProps> = ({ sprint }) => {
         inProgress: 0,
         notStarted: 0,
         completionRate: 0,
-        velocityPercentage: '0%',
-        inProgressPercentage: '0%',
-        notStartedPercentage: '0%',
-        wipPercentage: '0%',
       }
     }
 
@@ -48,7 +49,8 @@ const SprintMetrics: FC<SprintMetricsProps> = ({ sprint }) => {
     const notStarted = useStoryPoints
       ? metrics.notStartedStoryPoints
       : metrics.notStartedWorkItems
-    const completionRate = total > 0 ? (completed / total) * 100 : 0
+    const completionRate =
+      total > 0 ? Number(((completed / total) * 100).toFixed(1)) : 0
 
     return {
       total,
@@ -56,16 +58,6 @@ const SprintMetrics: FC<SprintMetricsProps> = ({ sprint }) => {
       inProgress,
       notStarted,
       completionRate,
-      velocityPercentage:
-        total > 0 ? `${((completed / total) * 100).toFixed(1)}%` : '0%',
-      inProgressPercentage:
-        total > 0 ? `${((inProgress / total) * 100).toFixed(1)}%` : '0%',
-      notStartedPercentage:
-        total > 0 ? `${((notStarted / total) * 100).toFixed(1)}%` : '0%',
-      wipPercentage:
-        total > 0
-          ? `${((metrics.inProgressWorkItems / total) * 100).toFixed(1)}%`
-          : '0%',
     }
   }, [metrics, useStoryPoints])
 
@@ -98,11 +90,9 @@ const SprintMetrics: FC<SprintMetricsProps> = ({ sprint }) => {
           </Col>
         )}
         <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
-          <MetricCard
-            title="Completion Rate"
-            value={displayValues.completionRate}
-            precision={1}
-            suffix="%"
+          <CompletionRateMetric
+            completed={displayValues.completed}
+            total={displayValues.total}
             tooltip="Percentage of story points or items currently in the sprint that are completed (Done or Removed)."
           />
         </Col>
@@ -114,37 +104,34 @@ const SprintMetrics: FC<SprintMetricsProps> = ({ sprint }) => {
           />
         </Col>
         <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
-          <MetricCard
-            title="Velocity"
-            value={displayValues.completed}
-            valueStyle={{ color: token.colorSuccess }}
-            secondaryValue={displayValues.velocityPercentage}
-            tooltip="Total number of story points or items currently in the sprint that are completed (Status Category: Done or Removed). Percentage shown represents the portion of total sprint work that is complete."
+          <VelocityMetric
+            completed={displayValues.completed}
+            total={displayValues.total}
           />
         </Col>
         <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
-          <MetricCard
+          <StatusMetric
             title="In Progress"
             value={displayValues.inProgress}
-            valueStyle={{ color: token.colorInfo }}
-            secondaryValue={displayValues.inProgressPercentage}
+            total={displayValues.total}
+            color={token.colorInfo}
             tooltip="Total number of story points or items currently in the sprint that are in progress (Status Category: Active). Percentage shown represents the portion of total sprint work that is in progress."
           />
         </Col>
         <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
-          <MetricCard
+          <StatusMetric
             title="Not Started"
             value={displayValues.notStarted}
-            secondaryValue={displayValues.notStartedPercentage}
+            total={displayValues.total}
             tooltip="Total number of story points or items currently in the sprint that are not started (Status Category: Proposed). Percentage shown represents the portion of total sprint work that has not been started."
           />
         </Col>
         {sprint.state.id === IterationState.Active && metrics && (
           <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
-            <MetricCard
+            <StatusMetric
               title="WIP"
               value={metrics.inProgressWorkItems}
-              secondaryValue={displayValues.wipPercentage}
+              total={displayValues.total}
               tooltip="Work In Progress - Count of active work items (Status Category: Active). Percentage shown represents the portion of total sprint work that is currently in progress."
             />
           </Col>
@@ -152,26 +139,17 @@ const SprintMetrics: FC<SprintMetricsProps> = ({ sprint }) => {
         {metrics?.averageCycleTimeDays !== undefined &&
           metrics.averageCycleTimeDays !== null && (
             <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
-              <MetricCard
-                title="Avg Cycle Time"
+              <CycleTimeMetric
                 value={metrics.averageCycleTimeDays}
-                precision={2}
-                suffix="days"
                 tooltip="The average cycle time of done work items in the sprint (in days). Cycle time measures the time from when work starts (Activated) to when it's completed (Done)."
               />
             </Col>
           )}
         {useStoryPoints && metrics && (
           <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
-            <MetricCard
+            <HealthMetric
               title="Missing SPs"
               value={metrics.missingStoryPointsCount}
-              valueStyle={{
-                color:
-                  metrics.missingStoryPointsCount === 0
-                    ? token.colorSuccess
-                    : token.colorError,
-              }}
               tooltip="Number of work items in the sprint that don't have story points assigned."
             />
           </Col>
