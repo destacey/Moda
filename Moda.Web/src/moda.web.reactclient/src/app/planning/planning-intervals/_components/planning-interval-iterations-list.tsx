@@ -5,6 +5,7 @@ import { useGetPlanningIntervalIterationsQuery } from '@/src/store/features/plan
 import { Card, List } from 'antd'
 import { FC } from 'react'
 import useTheme from '@/src/components/contexts/theme'
+import Link from 'next/link'
 
 const { Item } = List
 const { Meta } = Item
@@ -47,7 +48,13 @@ const PlanningIntervalIterationsList: FC<
                 }}
               >
                 <Meta
-                  title={iteration.name}
+                  title={
+                    <Link
+                      href={`/planning/planning-intervals/${planningIntervalKey}/iterations/${iteration.key}`}
+                    >
+                      {iteration.name}
+                    </Link>
+                  }
                   description={iteration.category.name}
                   style={{
                     color: isActive ? token.colorPrimaryText : undefined,

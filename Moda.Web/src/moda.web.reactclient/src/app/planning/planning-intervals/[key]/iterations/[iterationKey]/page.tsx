@@ -1,0 +1,209 @@
+'use client'
+
+import { IconMenu, PageTitle } from '@/src/components/common'
+import { authorizePage } from '@/src/components/hoc'
+import { useAppDispatch, useDocumentTitle } from '@/src/hooks'
+import {
+  useGetPlanningIntervalIterationBacklogQuery,
+  useGetPlanningIntervalIterationMetricsQuery,
+  useGetPlanningIntervalIterationQuery,
+  useGetPlanningIntervalIterationsQuery,
+} from '@/src/store/features/planning/planning-interval-api'
+import { notFound, usePathname, useRouter } from 'next/navigation'
+import { use, useCallback, useEffect, useMemo, useState } from 'react'
+import PlanningIntervalIterationDetailsLoading from './loading'
+import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
+import { SwapOutlined } from '@ant-design/icons'
+import { Card, Flex, Space } from 'antd'
+import {
+  IterationDates,
+  SprintBacklogGrid,
+} from '@/src/components/common/planning'
+import { PlanningIntervalIterationSummary } from './_components'
+
+enum IterationTabs {
+  Summary = 'summary',
+  Backlog = 'backlog',
+}
+
+const tabs = [
+  {
+    key: IterationTabs.Summary,
+    tab: 'Summary',
+  },
+  {
+    key: IterationTabs.Backlog,
+    tab: 'Backlog',
+  },
+]
+
+const PlanningIntervalIterationDetailsPage = (props: {
+  params: Promise<{ key: string; iterationKey: string }>
+}) => {
+  const { key, iterationKey } = use(props.params)
+  const piKey = Number(key)
+  const piIterationKey = Number(iterationKey)
+
+  const [activeTab, setActiveTab] = useState(IterationTabs.Summary)
+  const [backlogQueryEnabled, setBacklogQueryEnabled] = useState(false)
+
+  const pathname = usePathname()
+  const router = useRouter()
+  const dispatch = useAppDispatch()
+
+  const {
+    data: iterationData,
+    isLoading,
+    error,
+  } = useGetPlanningIntervalIterationQuery({
+    planningIntervalKey: piKey,
+    iterationKey: piIterationKey,
+  })
+
+  useDocumentTitle(
+    `${iterationData?.name ?? piIterationKey} - PI Iteration Details`,
+  )
+
+  const { data: piIterationsData } =
+    useGetPlanningIntervalIterationsQuery(piKey)
+
+  const {
+    data: metricsData,
+    isLoading: metricsIsLoading,
+    refetch: refetchMetrics,
+  } = useGetPlanningIntervalIterationMetricsQuery({
+    planningIntervalKey: piKey,
+    iterationKey: piIterationKey,
+  })
+
+  const {
+    data: backlogData,
+    isLoading: backlogIsLoading,
+    refetch: refetchBacklog,
+  } = useGetPlanningIntervalIterationBacklogQuery(
+    {
+      planningIntervalKey: piKey,
+      iterationKey: piIterationKey,
+    },
+    {
+      skip: !backlogQueryEnabled,
+    },
+  )
+
+  const handleIterationChange = useCallback(
+    (value: string | number) => {
+      router.push(`/planning/planning-intervals/${piKey}/iterations/${value}`)
+    },
+    [router, piKey],
+  )
+
+  const iterationItems = useMemo(() => {
+    if (!piIterationsData) return []
+
+    return [...piIterationsData]
+      .sort((a, b) => new Date(b.start).getTime() - new Date(a.start).getTime())
+      .map((option) => ({
+        label: option.name,
+        value: option.key,
+      }))
+  }, [piIterationsData])
+
+  const switchIterations = useMemo(() => {
+    if (!iterationItems.length) return null
+
+    return (
+      <IconMenu
+        icon={<SwapOutlined />}
+        tooltip="Switch to another PI iteration"
+        items={iterationItems}
+        selectedKeys={[piIterationKey.toString()]}
+        onChange={handleIterationChange}
+      />
+    )
+  }, [iterationItems, piIterationKey, handleIterationChange])
+
+  const onTabChange = useCallback(
+    (tabKey: string) => {
+      setActiveTab(tabKey as IterationTabs)
+
+      if (tabKey === IterationTabs.Backlog && !backlogQueryEnabled) {
+        setBacklogQueryEnabled(true)
+      }
+    },
+    [backlogQueryEnabled],
+  )
+
+  const renderTabContent = useCallback(() => {
+    switch (activeTab) {
+      case IterationTabs.Summary:
+        if (metricsIsLoading || !metricsData) {
+          return <div>Loading metrics...</div>
+        }
+        return <PlanningIntervalIterationSummary metrics={metricsData} />
+      case IterationTabs.Backlog:
+        return (
+          <SprintBacklogGrid
+            workItems={backlogData ?? []}
+            isLoading={backlogIsLoading}
+            refetch={refetchBacklog}
+            hideSprintColumn={false}
+            gridHeight={550}
+          />
+        )
+      default:
+        return null
+    }
+  }, [
+    activeTab,
+    metricsData,
+    metricsIsLoading,
+    backlogData,
+    backlogIsLoading,
+    refetchBacklog,
+  ])
+
+  useEffect(() => {
+    if (!iterationData) return
+
+    dispatch(setBreadcrumbTitle({ title: piIterationKey.toString(), pathname }))
+  }, [dispatch, iterationData, pathname, piIterationKey])
+
+  if (isLoading) {
+    return <PlanningIntervalIterationDetailsLoading />
+  }
+
+  if (!iterationData) return notFound()
+
+  return (
+    <>
+      <PageTitle
+        title={`${iterationKey} - ${iterationData.name}`}
+        subtitle="PI Iteration Details"
+        tags={<Space>{switchIterations}</Space>}
+      />
+      <Flex vertical gap="middle">
+        <IterationDates
+          start={iterationData.start}
+          end={iterationData.end}
+          dateTimeFormat="MMM D, YYYY"
+        />
+        <Card
+          style={{ width: '100%' }}
+          tabList={tabs}
+          activeTabKey={activeTab}
+          onTabChange={onTabChange}
+        >
+          {renderTabContent()}
+        </Card>
+      </Flex>
+    </>
+  )
+}
+
+const PlanningIntervalIterationDetailsPageWithAuthorization = authorizePage(
+  PlanningIntervalIterationDetailsPage,
+  'Permission',
+  'Permissions.PlanningIntervals.View',
+)
+
+export default PlanningIntervalIterationDetailsPageWithAuthorization

@@ -5,130 +5,73 @@ import {
   MetricCard,
 } from '@/src/components/common/metrics'
 import useTheme from '@/src/components/contexts/theme'
-import {
-  IterationState,
-  SprintMetricsData,
-  WorkStatusCategory,
-} from '@/src/components/types'
-import { SprintBacklogItemDto, SprintDetailsDto } from '@/src/services/moda-api'
-import { Col, Flex, Row, Segmented, Tooltip } from 'antd'
+import { IterationState } from '@/src/components/types'
+import { SprintDetailsDto } from '@/src/services/moda-api'
+import { useGetSprintMetricsQuery } from '@/src/store/features/planning/sprints-api'
+import { Col, Flex, Row, Segmented, Skeleton, Tooltip } from 'antd'
 import { FC, useMemo, useState } from 'react'
 
 export interface SprintMetricsProps {
   sprint: SprintDetailsDto
-  backlog: SprintBacklogItemDto[]
 }
 
-const SprintMetrics: FC<SprintMetricsProps> = ({ sprint, backlog }) => {
+const SprintMetrics: FC<SprintMetricsProps> = ({ sprint }) => {
   const [useStoryPoints, setUseStoryPoints] = useState(true)
-
   const { token } = useTheme()
 
-  const metrics = useMemo((): SprintMetricsData => {
-    return backlog.reduce(
-      (acc, item) => {
-        const points = item.storyPoints ?? 0
+  const { data: metrics, isLoading } = useGetSprintMetricsQuery(sprint.key)
 
-        // Track items without story points
-        if (
-          item.storyPoints === null ||
-          item.storyPoints === undefined ||
-          item.storyPoints === 0
-        ) {
-          acc.missingStoryPoints += 1
-        }
-
-        switch (item.statusCategory.id) {
-          case WorkStatusCategory.Done:
-          case WorkStatusCategory.Removed:
-            acc.completed += 1
-            acc.completedStoryPoints += points
-            break
-          case WorkStatusCategory.Active:
-            acc.inProgress += 1
-            acc.inProgressStoryPoints += points
-            break
-          case WorkStatusCategory.Proposed:
-            acc.notStarted += 1
-            acc.notStartedStoryPoints += points
-            break
-        }
-
-        return acc
-      },
-      {
+  const displayValues = useMemo(() => {
+    if (!metrics) {
+      return {
+        total: 0,
         completed: 0,
         inProgress: 0,
         notStarted: 0,
-        completedStoryPoints: 0,
-        inProgressStoryPoints: 0,
-        notStartedStoryPoints: 0,
-        missingStoryPoints: 0,
-      },
-    )
-  }, [backlog])
+        completionRate: 0,
+        velocityPercentage: '0%',
+        inProgressPercentage: '0%',
+        notStartedPercentage: '0%',
+        wipPercentage: '0%',
+      }
+    }
 
-  const totalItems = backlog.length
-  const totalStoryPoints =
-    metrics.completedStoryPoints +
-    metrics.inProgressStoryPoints +
-    metrics.notStartedStoryPoints
-  const completionRate =
-    totalItems > 0 ? (metrics.completed / totalItems) * 100 : 0
-  const storyPointsCompletionRate =
-    totalStoryPoints > 0
-      ? (metrics.completedStoryPoints / totalStoryPoints) * 100
-      : 0
+    const total = useStoryPoints
+      ? metrics.totalStoryPoints
+      : metrics.totalWorkItems
+    const completed = useStoryPoints
+      ? metrics.completedStoryPoints
+      : metrics.completedWorkItems
+    const inProgress = useStoryPoints
+      ? metrics.inProgressStoryPoints
+      : metrics.inProgressWorkItems
+    const notStarted = useStoryPoints
+      ? metrics.notStartedStoryPoints
+      : metrics.notStartedWorkItems
+    const completionRate = total > 0 ? (completed / total) * 100 : 0
 
-  const displayVelocity = useStoryPoints
-    ? metrics.completedStoryPoints
-    : metrics.completed
-  const displayInProgress = useStoryPoints
-    ? metrics.inProgressStoryPoints
-    : metrics.inProgress
-  const displayNotStarted = useStoryPoints
-    ? metrics.notStartedStoryPoints
-    : metrics.notStarted
-  const displayTotal = useStoryPoints ? totalStoryPoints : totalItems
-  const displayCompletionRate = useStoryPoints
-    ? storyPointsCompletionRate
-    : completionRate
+    return {
+      total,
+      completed,
+      inProgress,
+      notStarted,
+      completionRate,
+      velocityPercentage:
+        total > 0 ? `${((completed / total) * 100).toFixed(1)}%` : '0%',
+      inProgressPercentage:
+        total > 0 ? `${((inProgress / total) * 100).toFixed(1)}%` : '0%',
+      notStartedPercentage:
+        total > 0 ? `${((notStarted / total) * 100).toFixed(1)}%` : '0%',
+      wipPercentage:
+        total > 0
+          ? `${((metrics.inProgressWorkItems / total) * 100).toFixed(1)}%`
+          : '0%',
+    }
+  }, [metrics, useStoryPoints])
 
-  const velocityPercentage =
-    displayTotal > 0
-      ? `${((displayVelocity / displayTotal) * 100).toFixed(1)}%`
-      : '0%'
-  const inProgressPercentage =
-    displayTotal > 0
-      ? `${((displayInProgress / displayTotal) * 100).toFixed(1)}%`
-      : '0%'
-  const notStartedPercentage =
-    displayTotal > 0
-      ? `${((displayNotStarted / displayTotal) * 100).toFixed(1)}%`
-      : '0%'
-  const wipPercentage =
-    displayTotal > 0
-      ? `${((metrics.inProgress / displayTotal) * 100).toFixed(1)}%`
-      : '0%'
-
-  // Calculate average cycle time for completed items
-  const averageCycleTime = useMemo(() => {
-    const itemsWithCycleTime = backlog.filter(
-      (item) =>
-        item.cycleTime !== null &&
-        item.cycleTime !== undefined &&
-        item.statusCategory.id === WorkStatusCategory.Done,
-    )
-
-    if (itemsWithCycleTime.length === 0) return null
-
-    const totalCycleTime = itemsWithCycleTime.reduce(
-      (sum, item) => sum + (item.cycleTime ?? 0),
-      0,
-    )
-
-    return totalCycleTime / itemsWithCycleTime.length
-  }, [backlog])
+  if (isLoading) {
+    return <Skeleton active paragraph={{ rows: 2 }} />
+  }
 
   return (
     <Flex vertical gap="small">
@@ -157,7 +100,7 @@ const SprintMetrics: FC<SprintMetricsProps> = ({ sprint, backlog }) => {
         <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
           <MetricCard
             title="Completion Rate"
-            value={displayCompletionRate}
+            value={displayValues.completionRate}
             precision={1}
             suffix="%"
             tooltip="Percentage of story points or items currently in the sprint that are completed (Done or Removed)."
@@ -166,65 +109,66 @@ const SprintMetrics: FC<SprintMetricsProps> = ({ sprint, backlog }) => {
         <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
           <MetricCard
             title="Total"
-            value={displayTotal}
+            value={displayValues.total}
             tooltip="Total number of story points or items currently in the sprint."
           />
         </Col>
         <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
           <MetricCard
             title="Velocity"
-            value={displayVelocity}
+            value={displayValues.completed}
             valueStyle={{ color: token.colorSuccess }}
-            secondaryValue={velocityPercentage}
+            secondaryValue={displayValues.velocityPercentage}
             tooltip="Total number of story points or items currently in the sprint that are completed (Status Category: Done or Removed). Percentage shown represents the portion of total sprint work that is complete."
           />
         </Col>
         <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
           <MetricCard
             title="In Progress"
-            value={displayInProgress}
+            value={displayValues.inProgress}
             valueStyle={{ color: token.colorInfo }}
-            secondaryValue={inProgressPercentage}
+            secondaryValue={displayValues.inProgressPercentage}
             tooltip="Total number of story points or items currently in the sprint that are in progress (Status Category: Active). Percentage shown represents the portion of total sprint work that is in progress."
           />
         </Col>
         <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
           <MetricCard
             title="Not Started"
-            value={displayNotStarted}
-            secondaryValue={notStartedPercentage}
+            value={displayValues.notStarted}
+            secondaryValue={displayValues.notStartedPercentage}
             tooltip="Total number of story points or items currently in the sprint that are not started (Status Category: Proposed). Percentage shown represents the portion of total sprint work that has not been started."
           />
         </Col>
-        {sprint.state.id === IterationState.Active && (
+        {sprint.state.id === IterationState.Active && metrics && (
           <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
             <MetricCard
               title="WIP"
-              value={metrics.inProgress}
-              secondaryValue={wipPercentage}
+              value={metrics.inProgressWorkItems}
+              secondaryValue={displayValues.wipPercentage}
               tooltip="Work In Progress - Count of active work items (Status Category: Active). Percentage shown represents the portion of total sprint work that is currently in progress."
             />
           </Col>
         )}
-        {averageCycleTime !== null && (
-          <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
-            <MetricCard
-              title="Avg Cycle Time"
-              value={averageCycleTime}
-              precision={2}
-              suffix="days"
-              tooltip="The average cycle time of done work items in the sprint (in days). Cycle time measures the time from when work starts (Activated) to when it's completed (Done)."
-            />
-          </Col>
-        )}
-        {useStoryPoints && (
+        {metrics?.averageCycleTimeDays !== undefined &&
+          metrics.averageCycleTimeDays !== null && (
+            <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
+              <MetricCard
+                title="Avg Cycle Time"
+                value={metrics.averageCycleTimeDays}
+                precision={2}
+                suffix="days"
+                tooltip="The average cycle time of done work items in the sprint (in days). Cycle time measures the time from when work starts (Activated) to when it's completed (Done)."
+              />
+            </Col>
+          )}
+        {useStoryPoints && metrics && (
           <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
             <MetricCard
               title="Missing SPs"
-              value={metrics.missingStoryPoints}
+              value={metrics.missingStoryPointsCount}
               valueStyle={{
                 color:
-                  metrics.missingStoryPoints === 0
+                  metrics.missingStoryPointsCount === 0
                     ? token.colorSuccess
                     : token.colorError,
               }}
@@ -238,15 +182,3 @@ const SprintMetrics: FC<SprintMetricsProps> = ({ sprint, backlog }) => {
 }
 
 export default SprintMetrics
-
-// missing
-// pie chart by type
-// burndown chart -- waiting for work item history
-// burnup chart -- waiting for work item history
-
-// removed
-// scope creep
-
-// dependencies
-
-// sprint health based on planned vs time remaining

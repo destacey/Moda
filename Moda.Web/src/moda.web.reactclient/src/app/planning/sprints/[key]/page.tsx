@@ -107,7 +107,7 @@ const SprintDetailsPage = (props: { params: Promise<{ key: string }> }) => {
         }
       />
       <Flex vertical gap="middle">
-        <SprintDetails sprint={sprintData} backlog={workItemsData} />
+        <SprintDetails sprint={sprintData} />
         <Divider size="small" />
         <Flex vertical>
           <Title level={4} style={{ marginBlockStart: '4px' }}>

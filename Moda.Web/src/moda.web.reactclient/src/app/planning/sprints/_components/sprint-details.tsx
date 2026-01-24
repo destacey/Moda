@@ -1,8 +1,7 @@
 'use client'
 
-import LinksCard from '@/src/components/common/links/links-card'
 import { IterationState } from '@/src/components/types'
-import { SprintBacklogItemDto, SprintDetailsDto } from '@/src/services/moda-api'
+import { SprintDetailsDto } from '@/src/services/moda-api'
 import { Descriptions, Flex } from 'antd'
 import Link from 'next/link'
 import SprintMetrics from './sprint-metrics'
@@ -12,14 +11,12 @@ const { Item: DescriptionItem } = Descriptions
 
 export interface SprintDetailsProps {
   sprint: SprintDetailsDto
-  backlog: SprintBacklogItemDto[]
 }
 
 const SprintDetails: React.FC<SprintDetailsProps> = ({
   sprint,
-  backlog,
 }: SprintDetailsProps) => {
-  if (!sprint || !backlog) return null
+  if (!sprint) return null
 
   const sprintState = sprint.state.id as IterationState
   const showMetrics =
@@ -36,7 +33,7 @@ const SprintDetails: React.FC<SprintDetailsProps> = ({
         </DescriptionItem>
       </Descriptions>
       <IterationDates start={sprint.start} end={sprint.end} />
-      {showMetrics && <SprintMetrics sprint={sprint} backlog={backlog} />}
+      {showMetrics && <SprintMetrics sprint={sprint} />}
     </Flex>
   )
 }

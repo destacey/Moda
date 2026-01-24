@@ -2,98 +2,40 @@
 
 import { ModaGrid } from '@/src/components/common'
 import { SprintBacklogItemDto } from '@/src/services/moda-api'
-import { ColDef, ICellRendererParams } from 'ag-grid-community'
-import Link from 'next/link'
+import { ColDef } from 'ag-grid-community'
 import { useCallback, useMemo } from 'react'
-import { ExportOutlined } from '@ant-design/icons'
 import {
   workItemKeyComparator,
   workStatusCategoryComparator,
 } from '@/src/components/common/work'
 import {
+  AssignedToLinkCellRenderer,
   NestedTeamNameLinkCellRenderer,
+  NestedWorkSprintLinkCellRenderer,
+  ParentWorkItemLinkCellRenderer,
   ProjectLinkCellRenderer,
+  WorkItemLinkCellRenderer,
   WorkStatusTagCellRenderer,
 } from '@/src/components/common/moda-grid-cell-renderers'
 
 export interface SprintBacklogGridProps {
   workItems: SprintBacklogItemDto[]
-  hideTeamColumn: boolean
   isLoading: boolean
   refetch: () => void
-}
-
-const WorkItemLinkCellRenderer = ({
-  value,
-  data,
-}: ICellRendererParams<SprintBacklogItemDto>) => {
-  return (
-    <>
-      <Link
-        href={`/work/workspaces/${data.workspace.key}/work-items/${data.key}`}
-        prefetch={false}
-      >
-        {value}
-      </Link>
-
-      {data.externalViewWorkItemUrl && (
-        <Link
-          href={data.externalViewWorkItemUrl}
-          target="_blank"
-          title="Open in external system"
-          style={{ marginLeft: '5px' }}
-        >
-          <ExportOutlined style={{ width: '10px' }} />
-        </Link>
-      )}
-    </>
-  )
-}
-
-const ParentWorkItemLinkCellRenderer = ({
-  value,
-  data,
-}: ICellRendererParams<SprintBacklogItemDto>) => {
-  if (!data.parent) return null
-  return (
-    <>
-      <Link
-        href={`/work/workspaces/${data.parent.workspaceKey}/work-items/${data.parent.key}`}
-        prefetch={false}
-      >
-        {value}
-      </Link>
-      {data.parent.externalViewWorkItemUrl && (
-        <Link
-          href={data.parent.externalViewWorkItemUrl}
-          target="_blank"
-          title="Open in external system"
-          style={{ marginLeft: '5px' }}
-        >
-          <ExportOutlined style={{ width: '10px' }} />
-        </Link>
-      )}
-    </>
-  )
-}
-
-const AssignedToLinkCellRenderer = ({
-  value,
-  data,
-}: ICellRendererParams<SprintBacklogItemDto>) => {
-  if (!data.assignedTo) return null
-  return (
-    <Link
-      href={`/organizations/employees/${data.assignedTo.key}`}
-      prefetch={false}
-    >
-      {value}
-    </Link>
-  )
+  hideTeamColumn?: boolean
+  hideSprintColumn?: boolean
+  /** Grid height in pixels. Use -1 for auto-height (expands to fit all rows). Default: -1 */
+  gridHeight?: number
 }
 
 const SprintBacklogGrid = (props: SprintBacklogGridProps) => {
-  const { workItems = [], refetch } = props
+  const {
+    workItems = [],
+    refetch,
+    hideTeamColumn = false,
+    hideSprintColumn = true,
+    gridHeight = -1,
+  } = props
 
   const columnDefs = useMemo<ColDef<SprintBacklogItemDto>[]>(
     () => [
@@ -122,7 +64,14 @@ const SprintBacklogGrid = (props: SprintBacklogGridProps) => {
         field: 'team.name',
         headerName: 'Team',
         cellRenderer: NestedTeamNameLinkCellRenderer,
-        hide: props.hideTeamColumn,
+        hide: hideTeamColumn,
+      },
+      {
+        field: 'sprint.name',
+        headerName: 'Sprint',
+        cellRenderer: NestedWorkSprintLinkCellRenderer,
+        cellRendererParams: { showTeamCode: false },
+        hide: hideSprintColumn,
       },
       {
         field: 'parent.key',
@@ -147,7 +96,7 @@ const SprintBacklogGrid = (props: SprintBacklogGridProps) => {
         cellRenderer: ProjectLinkCellRenderer,
       },
     ],
-    [props.hideTeamColumn],
+    [hideTeamColumn, hideSprintColumn],
   )
 
   const refresh = useCallback(async () => {
@@ -155,16 +104,14 @@ const SprintBacklogGrid = (props: SprintBacklogGridProps) => {
   }, [refetch])
 
   return (
-    <>
-      <ModaGrid
-        height={-1}
-        columnDefs={columnDefs}
-        rowData={workItems}
-        loadData={refresh}
-        loading={props.isLoading}
-        emptyMessage="No planned work items"
-      />
-    </>
+    <ModaGrid
+      height={gridHeight}
+      columnDefs={columnDefs}
+      rowData={workItems}
+      loadData={refresh}
+      loading={props.isLoading}
+      emptyMessage="No planned work items"
+    />
   )
 }
 
