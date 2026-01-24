@@ -142,7 +142,7 @@ public class PlanningIntervalIterationConfig : IEntityTypeConfiguration<Planning
         builder.Property(i => i.IsDeleted);
 
         // Relationships
-        builder.HasOne<PlanningInterval>()
+        builder.HasOne(i => i.PlanningInterval)
             .WithMany(p => p.Iterations)
             .HasForeignKey(i => i.PlanningIntervalId)
             .OnDelete(DeleteBehavior.Cascade);

@@ -7,7 +7,7 @@ using Moda.Planning.Domain.Interfaces;
 using NodaTime;
 
 namespace Moda.Planning.Domain.Models;
-public sealed class PlanningIntervalIteration : BaseSoftDeletableEntity<Guid>, ILocalSchedule, IHasIdAndKey
+public sealed class PlanningIntervalIteration : BaseSoftDeletableEntity<Guid>, ILocalSchedule, INavigable
 {
     private readonly List<PlanningIntervalIterationSprint> _iterationSprints = [];
 
@@ -31,6 +31,11 @@ public sealed class PlanningIntervalIteration : BaseSoftDeletableEntity<Guid>, I
     /// The ID of the Planning Interval this iteration belongs to.
     /// </summary>
     public Guid PlanningIntervalId { get; private init; }
+
+    /// <summary>
+    /// The Planning Interval this iteration belongs to.
+    /// </summary>
+    public PlanningInterval? PlanningInterval { get; private set; }
 
     /// <summary>
     /// The name of the Planning Interval.

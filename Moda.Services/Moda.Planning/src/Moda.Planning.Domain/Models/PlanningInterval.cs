@@ -9,7 +9,7 @@ using Moda.Planning.Domain.Models.Iterations;
 using NodaTime;
 
 namespace Moda.Planning.Domain.Models;
-public class PlanningInterval : BaseSoftDeletableEntity<Guid>, ILocalSchedule, IHasIdAndKey
+public class PlanningInterval : BaseSoftDeletableEntity<Guid>, ILocalSchedule, INavigable
 {
     private readonly List<PlanningIntervalTeam> _teams = [];
     private readonly List<PlanningIntervalIteration> _iterations = [];

@@ -7242,6 +7242,75 @@
         ]
       }
     },
+    "/api/planning/planning-intervals/{idOrKey}/iterations/{iterationIdOrKey}": {
+      "get": {
+        "tags": [
+          "PlanningIntervals"
+        ],
+        "summary": "Get a specific planning interval iteration.",
+        "operationId": "PlanningIntervals_GetIteration",
+        "parameters": [
+          {
+            "name": "idOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "iterationIdOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanningIntervalIterationDetailsDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
     "/api/planning/planning-intervals/iteration-categories": {
       "get": {
         "tags": [
@@ -7425,6 +7494,147 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/planning/planning-intervals/{idOrKey}/iterations/{iterationIdOrKey}/metrics": {
+      "get": {
+        "tags": [
+          "PlanningIntervals"
+        ],
+        "summary": "Get metrics for a PI iteration aggregated across all mapped sprints.",
+        "operationId": "PlanningIntervals_GetIterationMetrics",
+        "parameters": [
+          {
+            "name": "idOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "iterationIdOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanningIntervalIterationMetricsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/planning/planning-intervals/{idOrKey}/iterations/{iterationIdOrKey}/backlog": {
+      "get": {
+        "tags": [
+          "PlanningIntervals"
+        ],
+        "summary": "Get combined backlog for a PI iteration from all mapped sprints.",
+        "operationId": "PlanningIntervals_GetIterationBacklog",
+        "parameters": [
+          {
+            "name": "idOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "iterationIdOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SprintBacklogItemDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -9846,6 +10056,56 @@
                   "items": {
                     "$ref": "#/components/schemas/SprintBacklogItemDto"
                   }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/planning/sprints/{idOrKey}/metrics": {
+      "get": {
+        "tags": [
+          "Sprints"
+        ],
+        "summary": "Get sprint work item metrics.",
+        "operationId": "Sprints_GetSprintMetrics",
+        "parameters": [
+          {
+            "name": "idOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SprintWorkItemMetricsDto"
                 }
               }
             }
@@ -19846,6 +20106,48 @@
           }
         }
       },
+      "PlanningIntervalIterationDetailsDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "name",
+          "start",
+          "end",
+          "category",
+          "planningInterval"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "key": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "start": {
+            "type": "string",
+            "format": "date"
+          },
+          "end": {
+            "type": "string",
+            "format": "date"
+          },
+          "category": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "planningInterval": {
+            "$ref": "#/components/schemas/NavigationDto"
+          }
+        }
+      },
       "PlanningIntervalIterationCategoryDto": {
         "type": "object",
         "additionalProperties": false,
@@ -19995,6 +20297,324 @@
               "nullable": true,
               "example": "00000000-0000-0000-0000-000000000000"
             }
+          }
+        }
+      },
+      "PlanningIntervalIterationMetricsResponse": {
+        "type": "object",
+        "description": "Response containing PI Iteration metrics aggregated across all mapped sprints.",
+        "additionalProperties": false,
+        "required": [
+          "iterationId",
+          "iterationKey",
+          "iterationName",
+          "start",
+          "end",
+          "category",
+          "teamCount",
+          "sprintCount",
+          "totalWorkItems",
+          "totalStoryPoints",
+          "completedWorkItems",
+          "completedStoryPoints",
+          "inProgressWorkItems",
+          "inProgressStoryPoints",
+          "notStartedWorkItems",
+          "notStartedStoryPoints",
+          "missingStoryPointsCount",
+          "sprintMetrics"
+        ],
+        "properties": {
+          "iterationId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "iterationKey": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "iterationName": {
+            "type": "string"
+          },
+          "start": {
+            "type": "string",
+            "format": "date"
+          },
+          "end": {
+            "type": "string",
+            "format": "date"
+          },
+          "category": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "teamCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sprintCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalWorkItems": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalStoryPoints": {
+            "type": "number",
+            "format": "double"
+          },
+          "completedWorkItems": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "completedStoryPoints": {
+            "type": "number",
+            "format": "double"
+          },
+          "inProgressWorkItems": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "inProgressStoryPoints": {
+            "type": "number",
+            "format": "double"
+          },
+          "notStartedWorkItems": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "notStartedStoryPoints": {
+            "type": "number",
+            "format": "double"
+          },
+          "missingStoryPointsCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "averageCycleTimeDays": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "sprintMetrics": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SprintMetricsSummary"
+            }
+          }
+        }
+      },
+      "SprintMetricsSummary": {
+        "type": "object",
+        "description": "Metrics summary for an individual sprint within the PI Iteration.",
+        "additionalProperties": false,
+        "required": [
+          "sprintId",
+          "sprintKey",
+          "sprintName",
+          "state",
+          "start",
+          "end",
+          "team",
+          "totalWorkItems",
+          "totalStoryPoints",
+          "completedWorkItems",
+          "completedStoryPoints",
+          "inProgressWorkItems",
+          "inProgressStoryPoints",
+          "notStartedWorkItems",
+          "notStartedStoryPoints",
+          "missingStoryPointsCount"
+        ],
+        "properties": {
+          "sprintId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "sprintKey": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sprintName": {
+            "type": "string"
+          },
+          "state": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "start": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "end": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "team": {
+            "$ref": "#/components/schemas/NavigationDto"
+          },
+          "totalWorkItems": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalStoryPoints": {
+            "type": "number",
+            "format": "double"
+          },
+          "completedWorkItems": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "completedStoryPoints": {
+            "type": "number",
+            "format": "double"
+          },
+          "inProgressWorkItems": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "inProgressStoryPoints": {
+            "type": "number",
+            "format": "double"
+          },
+          "notStartedWorkItems": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "notStartedStoryPoints": {
+            "type": "number",
+            "format": "double"
+          },
+          "missingStoryPointsCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "averageCycleTimeDays": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          }
+        }
+      },
+      "SprintBacklogItemDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "title",
+          "workspace",
+          "type",
+          "status",
+          "statusCategory",
+          "sprint",
+          "created",
+          "rank",
+          "stackRank"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "key": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "workspace": {
+            "$ref": "#/components/schemas/WorkspaceNavigationDto"
+          },
+          "type": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "statusCategory": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "parent": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/WorkItemNavigationDto"
+              }
+            ]
+          },
+          "team": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/WorkTeamNavigationDto"
+              }
+            ]
+          },
+          "sprint": {
+            "$ref": "#/components/schemas/WorkIterationNavigationDto"
+          },
+          "assignedTo": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/EmployeeNavigationDto"
+              }
+            ]
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "activated": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "done": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "rank": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "parentRank": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "project": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/WorkProjectNavigationDto"
+              }
+            ]
+          },
+          "externalViewWorkItemUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "stackRank": {
+            "type": "number",
+            "format": "double"
+          },
+          "storyPoints": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "cycleTime": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
           }
         }
       },
@@ -21865,119 +22485,65 @@
           }
         }
       },
-      "SprintBacklogItemDto": {
+      "SprintWorkItemMetricsDto": {
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
-          "key",
-          "title",
-          "workspace",
-          "type",
-          "status",
-          "statusCategory",
-          "sprint",
-          "created",
-          "rank",
-          "stackRank"
+          "sprintId",
+          "totalWorkItems",
+          "totalStoryPoints",
+          "completedWorkItems",
+          "completedStoryPoints",
+          "inProgressWorkItems",
+          "inProgressStoryPoints",
+          "notStartedWorkItems",
+          "notStartedStoryPoints",
+          "missingStoryPointsCount"
         ],
         "properties": {
-          "id": {
+          "sprintId": {
             "type": "string",
             "format": "guid",
             "nullable": false,
             "example": "00000000-0000-0000-0000-000000000000"
           },
-          "key": {
-            "type": "string"
-          },
-          "title": {
-            "type": "string"
-          },
-          "workspace": {
-            "$ref": "#/components/schemas/WorkspaceNavigationDto"
-          },
-          "type": {
-            "type": "string"
-          },
-          "status": {
-            "type": "string"
-          },
-          "statusCategory": {
-            "$ref": "#/components/schemas/SimpleNavigationDto"
-          },
-          "parent": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/WorkItemNavigationDto"
-              }
-            ]
-          },
-          "team": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/WorkTeamNavigationDto"
-              }
-            ]
-          },
-          "sprint": {
-            "$ref": "#/components/schemas/WorkIterationNavigationDto"
-          },
-          "assignedTo": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/EmployeeNavigationDto"
-              }
-            ]
-          },
-          "created": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "activated": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "done": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "rank": {
+          "totalWorkItems": {
             "type": "integer",
             "format": "int32"
           },
-          "parentRank": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "project": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/WorkProjectNavigationDto"
-              }
-            ]
-          },
-          "externalViewWorkItemUrl": {
-            "type": "string",
-            "nullable": true
-          },
-          "stackRank": {
+          "totalStoryPoints": {
             "type": "number",
             "format": "double"
           },
-          "storyPoints": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
+          "completedWorkItems": {
+            "type": "integer",
+            "format": "int32"
           },
-          "cycleTime": {
+          "completedStoryPoints": {
+            "type": "number",
+            "format": "double"
+          },
+          "inProgressWorkItems": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "inProgressStoryPoints": {
+            "type": "number",
+            "format": "double"
+          },
+          "notStartedWorkItems": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "notStartedStoryPoints": {
+            "type": "number",
+            "format": "double"
+          },
+          "missingStoryPointsCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "averageCycleTimeDays": {
             "type": "number",
             "format": "double",
             "nullable": true
