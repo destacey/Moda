@@ -1,6 +1,6 @@
 import { Button, Dropdown, Tooltip } from 'antd'
 import type { MenuProps } from 'antd'
-import { FC, ReactNode, useMemo } from 'react'
+import { FC, ReactNode, useCallback, useMemo } from 'react'
 import useTheme from '../contexts/theme'
 
 export interface IconMenuOption {
@@ -47,6 +47,21 @@ const IconMenu: FC<IconMenuProps> = ({
     }
   }
 
+  const handleOpenChange = useCallback(
+    (open: boolean) => {
+      if (open && selectedKeys?.length) {
+        // Use setTimeout to wait for the dropdown to render
+        setTimeout(() => {
+          const selectedElement = document.querySelector(
+            `.ant-dropdown-menu-item-selected`,
+          )
+          selectedElement?.scrollIntoView({ block: 'center' })
+        }, 0)
+      }
+    },
+    [selectedKeys],
+  )
+
   if (!icon || !items || items.length === 0) return null
 
   return (
@@ -64,6 +79,7 @@ const IconMenu: FC<IconMenuProps> = ({
           },
         }}
         trigger={['click']}
+        onOpenChange={handleOpenChange}
       >
         <Button type="text" shape="circle" icon={icon} />
       </Dropdown>

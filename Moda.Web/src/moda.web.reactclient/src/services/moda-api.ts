@@ -19219,6 +19219,7 @@ export interface PlanningIntervalIterationDetailsDto {
     name: string;
     start: Date;
     end: Date;
+    state: string;
     category: SimpleNavigationDto;
     planningInterval: NavigationDto;
 }

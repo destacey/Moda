@@ -11,7 +11,7 @@ export interface IterationDatesProps {
   end: Date | null
   showDurationDays?: boolean
   style?: CSSProperties
-  dateTimeFormat?: string
+  dateFormat?: string
 }
 
 const IterationDates: FC<IterationDatesProps> = ({
@@ -19,7 +19,7 @@ const IterationDates: FC<IterationDatesProps> = ({
   end,
   showDurationDays = true,
   style,
-  dateTimeFormat = DATE_TIME_FORMAT,
+  dateFormat = DATE_TIME_FORMAT,
 }: IterationDatesProps) => {
   if (!start || !end) return null
 
@@ -41,7 +41,7 @@ const IterationDates: FC<IterationDatesProps> = ({
           >
             Start Date
           </Text>
-          <Text>{startDate.format(dateTimeFormat)}</Text>
+          <Text>{startDate.format(dateFormat)}</Text>
         </Flex>
         <Text type="secondary">→</Text>
         <Flex vertical>
@@ -51,7 +51,7 @@ const IterationDates: FC<IterationDatesProps> = ({
           >
             End Date
           </Text>
-          <Text>{endDate.format(dateTimeFormat)}</Text>
+          <Text>{endDate.format(dateFormat)}</Text>
         </Flex>
         {showDurationDays && (
           <Flex vertical>

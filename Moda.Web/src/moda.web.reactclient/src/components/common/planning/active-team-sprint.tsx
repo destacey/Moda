@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { FC, useMemo, useState } from 'react'
 import { CompletionRateMetric, VelocityMetric } from '../metrics'
 import IterationDates from './iteration-dates'
+import TimelineProgress from './timeline-progress'
 
 const { Text } = Typography
 
@@ -72,10 +73,10 @@ const ActiveTeamSprint: FC<ActiveTeamSprintProps> = ({ teamId }) => {
       style={{ maxWidth: '450px' }}
     >
       <Flex vertical gap="small">
-        <IterationDates
+        <TimelineProgress
           start={sprintData.start}
           end={sprintData.end}
-          showDurationDays={false}
+          dateFormat="MMM D - h:mm A"
           style={{ width: '100%' }}
         />
         <Row gutter={[8, 8]}>

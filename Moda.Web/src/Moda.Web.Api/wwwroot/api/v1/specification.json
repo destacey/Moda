@@ -20115,6 +20115,7 @@
           "name",
           "start",
           "end",
+          "state",
           "category",
           "planningInterval"
         ],
@@ -20139,6 +20140,9 @@
           "end": {
             "type": "string",
             "format": "date"
+          },
+          "state": {
+            "type": "string"
           },
           "category": {
             "$ref": "#/components/schemas/SimpleNavigationDto"

@@ -33,7 +33,7 @@ const SprintBacklogGrid = (props: SprintBacklogGridProps) => {
     workItems = [],
     refetch,
     hideTeamColumn = false,
-    hideSprintColumn = true,
+    hideSprintColumn = false,
     gridHeight = -1,
   } = props
 

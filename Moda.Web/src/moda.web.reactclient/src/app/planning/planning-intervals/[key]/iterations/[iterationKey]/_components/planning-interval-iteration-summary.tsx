@@ -8,21 +8,29 @@ import {
   StatusMetric,
   VelocityMetric,
 } from '@/src/components/common/metrics'
-import { IterationDates } from '@/src/components/common/planning'
+import TimelineProgress from '@/src/components/common/planning/timeline-progress'
 import useTheme from '@/src/components/contexts/theme'
 import {
   PlanningIntervalIterationDetailsDto,
-  PlanningIntervalIterationMetricsResponse,
   SprintMetricsSummary,
 } from '@/src/services/moda-api'
-import { Card, Col, Flex, Row, Segmented, Tooltip, Typography } from 'antd'
+import { useGetPlanningIntervalIterationMetricsQuery } from '@/src/store/features/planning/planning-interval-api'
+import {
+  Card,
+  Col,
+  Flex,
+  Row,
+  Segmented,
+  Skeleton,
+  Tooltip,
+  Typography,
+} from 'antd'
 import { FC, useMemo, useState } from 'react'
 
 const { Text, Title } = Typography
 
 export interface PlanningIntervalIterationSummaryProps {
   iteration: PlanningIntervalIterationDetailsDto
-  metrics: PlanningIntervalIterationMetricsResponse
 }
 
 interface SprintCardProps {
@@ -91,9 +99,26 @@ const SprintCard: FC<SprintCardProps> = ({ sprint, useStoryPoints }) => {
 
 const PlanningIntervalIterationSummary: FC<
   PlanningIntervalIterationSummaryProps
-> = ({ iteration, metrics }) => {
+> = ({ iteration }) => {
   const [useStoryPoints, setUseStoryPoints] = useState(true)
   const { token } = useTheme()
+
+  const { data: metrics, isLoading } =
+    useGetPlanningIntervalIterationMetricsQuery({
+      planningIntervalKey: iteration.planningInterval.key,
+      iterationKey: iteration.key,
+    })
+
+  const sortedSprints = useMemo(() => {
+    if (!metrics) return []
+    return [...metrics.sprintMetrics].sort((a, b) =>
+      a.team.name.localeCompare(b.team.name),
+    )
+  }, [metrics])
+
+  if (isLoading || !metrics) {
+    return <Skeleton active />
+  }
 
   const displayTotal = useStoryPoints
     ? metrics.totalStoryPoints
@@ -108,18 +133,14 @@ const PlanningIntervalIterationSummary: FC<
     ? metrics.notStartedStoryPoints
     : metrics.notStartedWorkItems
 
-  const sortedSprints = useMemo(() => {
-    return [...metrics.sprintMetrics].sort((a, b) =>
-      a.team.name.localeCompare(b.team.name),
-    )
-  }, [metrics.sprintMetrics])
+  const isFuture = iteration.state === 'Future'
 
   return (
     <Flex vertical gap="middle">
-      <IterationDates
+      <TimelineProgress
         start={iteration.start}
         end={iteration.end}
-        dateTimeFormat="MMM D, YYYY"
+        dateFormat="MMM D"
       />
       <Flex gap="small" justify="flex-end">
         <Tooltip title="Switch between summing story points and counting work items for metrics">
@@ -141,13 +162,15 @@ const PlanningIntervalIterationSummary: FC<
             tooltip="Number of teams with sprints mapped to this iteration."
           />
         </Col>
-        <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
-          <CompletionRateMetric
-            completed={displayCompleted}
-            total={displayTotal}
-            tooltip="Percentage of story points or items across all team sprints that are completed (Done or Removed)."
-          />
-        </Col>
+        {!isFuture && (
+          <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
+            <CompletionRateMetric
+              completed={displayCompleted}
+              total={displayTotal}
+              tooltip="Percentage of story points or items across all team sprints that are completed (Done or Removed)."
+            />
+          </Col>
+        )}
         <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
           <MetricCard
             title="Total"
@@ -155,47 +178,51 @@ const PlanningIntervalIterationSummary: FC<
             tooltip="Total number of story points or items across all team sprints in this iteration."
           />
         </Col>
-        <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
-          <VelocityMetric
-            completed={displayCompleted}
-            total={displayTotal}
-            tooltip="Total completed story points or items across all team sprints (Done or Removed)."
-          />
-        </Col>
-        <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
-          <StatusMetric
-            title="In Progress"
-            value={displayInProgress}
-            total={displayTotal}
-            color={token.colorInfo}
-            tooltip="Total in-progress story points or items across all team sprints."
-          />
-        </Col>
-        <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
-          <StatusMetric
-            title="Not Started"
-            value={displayNotStarted}
-            total={displayTotal}
-            tooltip="Total not-started story points or items across all team sprints."
-          />
-        </Col>
-        {metrics.averageCycleTimeDays !== undefined &&
-          metrics.averageCycleTimeDays !== null && (
+        {!isFuture && (
+          <>
             <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
-              <CycleTimeMetric
-                value={metrics.averageCycleTimeDays}
-                tooltip="Average cycle time of completed (Done) work items across all team sprints."
+              <VelocityMetric
+                completed={displayCompleted}
+                total={displayTotal}
+                tooltip="Total completed story points or items across all team sprints (Done or Removed)."
               />
             </Col>
-          )}
-        {useStoryPoints && (
-          <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
-            <HealthMetric
-              title="Missing SPs"
-              value={metrics.missingStoryPointsCount}
-              tooltip="Number of work items across all team sprints that don't have story points assigned."
-            />
-          </Col>
+            <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
+              <StatusMetric
+                title="In Progress"
+                value={displayInProgress}
+                total={displayTotal}
+                color={token.colorInfo}
+                tooltip="Total in-progress story points or items across all team sprints."
+              />
+            </Col>
+            <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
+              <StatusMetric
+                title="Not Started"
+                value={displayNotStarted}
+                total={displayTotal}
+                tooltip="Total not-started story points or items across all team sprints."
+              />
+            </Col>
+            {metrics.averageCycleTimeDays !== undefined &&
+              metrics.averageCycleTimeDays !== null && (
+                <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
+                  <CycleTimeMetric
+                    value={metrics.averageCycleTimeDays}
+                    tooltip="Average cycle time of completed (Done) work items across all team sprints."
+                  />
+                </Col>
+              )}
+            {useStoryPoints && (
+              <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
+                <HealthMetric
+                  title="Missing SPs"
+                  value={metrics.missingStoryPointsCount}
+                  tooltip="Number of work items across all team sprints that don't have story points assigned."
+                />
+              </Col>
+            )}
+          </>
         )}
       </Row>
 

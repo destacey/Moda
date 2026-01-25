@@ -20,10 +20,10 @@ jest.mock('../../contexts/theme', () => ({
   }),
 }))
 
-// Mock IterationDates
-jest.mock('./iteration-dates', () => ({
+// Mock TimelineProgress
+jest.mock('./timeline-progress', () => ({
   __esModule: true,
-  default: () => <div data-testid="iteration-dates">Iteration Dates</div>,
+  default: () => <div data-testid="timeline-progress">Timeline Progress</div>,
 }))
 
 // Mock Metrics
@@ -66,7 +66,7 @@ describe('ActiveTeamSprint', () => {
 
     expect(screen.getByText('Active Sprint')).toBeInTheDocument()
     expect(screen.getByText('Sprint 1')).toBeInTheDocument()
-    expect(screen.getByTestId('iteration-dates')).toBeInTheDocument()
+    expect(screen.getByTestId('timeline-progress')).toBeInTheDocument()
     expect(screen.getByTestId('completion-rate-metric')).toBeInTheDocument()
     expect(screen.getByTestId('velocity-metric')).toBeInTheDocument()
   })

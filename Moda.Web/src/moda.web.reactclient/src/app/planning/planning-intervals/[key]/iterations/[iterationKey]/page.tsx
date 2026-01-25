@@ -5,7 +5,6 @@ import { authorizePage } from '@/src/components/hoc'
 import { useAppDispatch, useDocumentTitle } from '@/src/hooks'
 import {
   useGetPlanningIntervalIterationBacklogQuery,
-  useGetPlanningIntervalIterationMetricsQuery,
   useGetPlanningIntervalIterationQuery,
   useGetPlanningIntervalIterationsQuery,
 } from '@/src/store/features/planning/planning-interval-api'
@@ -14,9 +13,13 @@ import { use, useCallback, useEffect, useMemo, useState } from 'react'
 import PlanningIntervalIterationDetailsLoading from './loading'
 import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
 import { SwapOutlined } from '@ant-design/icons'
-import { Card, Flex, Space } from 'antd'
-import { SprintBacklogGrid } from '@/src/components/common/planning'
+import { Card, Flex, Space, Tag } from 'antd'
+import {
+  IterationStateTag,
+  SprintBacklogGrid,
+} from '@/src/components/common/planning'
 import { PlanningIntervalIterationSummary } from './_components'
+import { IterationState } from '@/src/components/types'
 
 enum IterationTabs {
   Summary = 'summary',
@@ -63,15 +66,6 @@ const PlanningIntervalIterationDetailsPage = (props: {
 
   const { data: piIterationsData } =
     useGetPlanningIntervalIterationsQuery(piKey)
-
-  const {
-    data: metricsData,
-    isLoading: metricsIsLoading,
-    refetch: refetchMetrics,
-  } = useGetPlanningIntervalIterationMetricsQuery({
-    planningIntervalKey: piKey,
-    iterationKey: piIterationKey,
-  })
 
   const {
     data: backlogData,
@@ -133,37 +127,20 @@ const PlanningIntervalIterationDetailsPage = (props: {
   const renderTabContent = useCallback(() => {
     switch (activeTab) {
       case IterationTabs.Summary:
-        if (metricsIsLoading || !metricsData) {
-          return <div>Loading metrics...</div>
-        }
-        return (
-          <PlanningIntervalIterationSummary
-            iteration={iterationData}
-            metrics={metricsData}
-          />
-        )
+        return <PlanningIntervalIterationSummary iteration={iterationData} />
       case IterationTabs.Backlog:
         return (
           <SprintBacklogGrid
             workItems={backlogData ?? []}
             isLoading={backlogIsLoading}
             refetch={refetchBacklog}
-            hideSprintColumn={false}
             gridHeight={550}
           />
         )
       default:
         return null
     }
-  }, [
-    activeTab,
-    iterationData,
-    metricsData,
-    metricsIsLoading,
-    backlogData,
-    backlogIsLoading,
-    refetchBacklog,
-  ])
+  }, [activeTab, iterationData, backlogData, backlogIsLoading, refetchBacklog])
 
   useEffect(() => {
     if (!iterationData) return
@@ -177,12 +154,22 @@ const PlanningIntervalIterationDetailsPage = (props: {
 
   if (!iterationData) return notFound()
 
+  const state =
+    IterationState[iterationData.state as keyof typeof IterationState] ??
+    IterationState.Future
+
   return (
     <>
       <PageTitle
         title={`${iterationKey} - ${iterationData.name}`}
         subtitle="PI Iteration Details"
-        tags={<Space>{switchIterations}</Space>}
+        tags={
+          <Space>
+            {switchIterations}
+            <IterationStateTag state={state} />
+            <Tag>{iterationData.category.name}</Tag>
+          </Space>
+        }
       />
       <Flex vertical gap="middle">
         <Card

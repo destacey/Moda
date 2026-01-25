@@ -159,4 +159,25 @@ describe('IterationDates', () => {
     const card = container.querySelector('.ant-card')
     expect(card).toHaveStyle({ width: '500px' })
   })
+
+  it('uses custom dateFormat when provided', () => {
+    render(
+      <IterationDates
+        start={startDate}
+        end={endDate}
+        dateFormat="MMM D"
+      />,
+    )
+
+    expect(screen.getByText('Oct 26')).toBeInTheDocument()
+    expect(screen.getByText('Nov 8')).toBeInTheDocument()
+  })
+
+  it('uses default date format with full datetime', () => {
+    render(<IterationDates start={startDate} end={endDate} />)
+
+    // Default format is 'MMM D, YYYY h:mm A'
+    expect(screen.getByText('Oct 26, 2025 5:00 PM')).toBeInTheDocument()
+    expect(screen.getByText('Nov 8, 2025 4:00 PM')).toBeInTheDocument()
+  })
 })

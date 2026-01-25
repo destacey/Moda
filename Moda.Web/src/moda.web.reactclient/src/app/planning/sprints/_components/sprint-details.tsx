@@ -5,7 +5,7 @@ import { SprintDetailsDto } from '@/src/services/moda-api'
 import { Descriptions, Flex } from 'antd'
 import Link from 'next/link'
 import SprintMetrics from './sprint-metrics'
-import IterationDates from '@/src/components/common/planning/iteration-dates'
+import TimelineProgress from '@/src/components/common/planning/timeline-progress'
 
 const { Item: DescriptionItem } = Descriptions
 
@@ -32,7 +32,11 @@ const SprintDetails: React.FC<SprintDetailsProps> = ({
           </Link>
         </DescriptionItem>
       </Descriptions>
-      <IterationDates start={sprint.start} end={sprint.end} />
+      <TimelineProgress
+        start={sprint.start}
+        end={sprint.end}
+        dateFormat="MMM D, YYYY h:mm A"
+      />
       {showMetrics && <SprintMetrics sprint={sprint} />}
     </Flex>
   )
