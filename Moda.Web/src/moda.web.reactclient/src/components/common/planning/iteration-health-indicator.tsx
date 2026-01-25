@@ -60,7 +60,7 @@ const IterationHealthIndicator: FC<IterationHealthIndicatorProps> = ({
     })
   }, [startDate, endDate, total, completed])
 
-  const getHealthColor2 = (
+  const getHealthColor = (
     status: IterationHealthStatus,
   ): PresetStatusColorType => {
     switch (status) {
@@ -77,7 +77,7 @@ const IterationHealthIndicator: FC<IterationHealthIndicatorProps> = ({
     }
   }
 
-  const color = getHealthColor2(healthResult.status)
+  const color = getHealthColor(healthResult.status)
 
   // span is needed for Tooltip to work with Badge
   return (

@@ -28,15 +28,13 @@ const SprintDetails: FC<SprintDetailsProps> = ({
 
   return (
     <Flex vertical gap={16}>
-      <Flex justify="space-betwee">
-        <Descriptions column={4}>
-          <DescriptionItem label="Team">
-            <Link href={`/organizations/teams/${sprint.team?.key}`}>
-              {sprint.team?.name}
-            </Link>
-          </DescriptionItem>
-        </Descriptions>
-      </Flex>
+      <Descriptions column={4}>
+        <DescriptionItem label="Team">
+          <Link href={`/organizations/teams/${sprint.team?.key}`}>
+            {sprint.team?.name}
+          </Link>
+        </DescriptionItem>
+      </Descriptions>
       <TimelineProgress
         start={sprint.start}
         end={sprint.end}
