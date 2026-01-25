@@ -5,7 +5,7 @@ import LinksCard from '@/src/components/common/links/links-card'
 import { MarkdownRenderer } from '@/src/components/common/markdown'
 import { StrategicInitiativeDetailsDto } from '@/src/services/moda-api'
 import { getSortedNames } from '@/src/utils'
-import { Descriptions, Flex, List } from 'antd'
+import { Descriptions, Flex } from 'antd'
 import Link from 'next/link'
 
 const { Item } = Descriptions

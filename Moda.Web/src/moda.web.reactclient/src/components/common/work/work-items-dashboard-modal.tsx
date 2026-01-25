@@ -1,7 +1,7 @@
 'use client'
 
 import { Modal } from 'antd'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import WorkItemsCumulativeFlowChart from './work-items-cumulative-flow-chart'
 import { useGetObjectiveWorkItemMetricsQuery } from '@/src/store/features/planning/planning-interval-api'
 

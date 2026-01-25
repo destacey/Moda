@@ -1,4 +1,3 @@
-import { User } from './../../components/contexts/auth/types.d'
 export enum QueryTags {
   // ADMIN
   BackgroundJob = 'Admin.BackgroundJob',

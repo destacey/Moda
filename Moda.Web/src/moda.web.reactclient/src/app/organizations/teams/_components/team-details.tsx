@@ -2,7 +2,7 @@ import LinksCard from '@/src/components/common/links/links-card'
 import { MarkdownRenderer } from '@/src/components/common/markdown'
 import ActiveTeamSprint from '@/src/components/common/planning/active-team-sprint'
 import { TeamDetailsDto } from '@/src/services/moda-api'
-import { Col, Descriptions, Divider, Flex, Row, Space } from 'antd'
+import { Col, Descriptions, Divider, Flex, Row } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 

@@ -66,10 +66,8 @@ import { stringContainsFilter } from './project-tasks-table.filters'
 import { ProjectTaskSortableRow } from './project-task-sortable-row'
 import {
   flattenTree,
-  buildTree,
   getProjection,
   calculateOrderInParent,
-  updateTaskPlacement,
   INDENTATION_WIDTH,
   DRAG_ACTIVATION_DISTANCE,
 } from './project-task-tree-dnd-utils'
@@ -975,4 +973,3 @@ const ProjectTasksTable = ({
 }
 
 export default ProjectTasksTable
-

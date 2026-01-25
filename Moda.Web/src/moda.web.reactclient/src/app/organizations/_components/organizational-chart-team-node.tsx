@@ -1,4 +1,4 @@
-import { Card, GlobalToken, Typography } from 'antd'
+import { Card, Typography } from 'antd'
 import Link from 'next/link'
 import { useMemo } from 'react'
 import { ModaOrganizationChartNodeProps } from '../../../components/common/organization-chart'
