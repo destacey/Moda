@@ -9,18 +9,23 @@ import {
   StatusMetric,
   VelocityMetric,
 } from '@/src/components/common/metrics'
+import { IterationHealthIndicator } from '@/src/components/common/planning'
 import useTheme from '@/src/components/contexts/theme'
 import { IterationState } from '@/src/components/types'
 import { SprintDetailsDto } from '@/src/services/moda-api'
 import { useGetSprintMetricsQuery } from '@/src/store/features/planning/sprints-api'
 import { Col, Flex, Row, Segmented, Skeleton, Tooltip } from 'antd'
-import { FC, useMemo, useState } from 'react'
+import { FC, ReactNode, useEffect, useMemo, useState } from 'react'
 
 export interface SprintMetricsProps {
   sprint: SprintDetailsDto
+  onHealthIndicatorReady?: (indicator: ReactNode) => void
 }
 
-const SprintMetrics: FC<SprintMetricsProps> = ({ sprint }) => {
+const SprintMetrics: FC<SprintMetricsProps> = ({
+  sprint,
+  onHealthIndicatorReady,
+}) => {
   const [useStoryPoints, setUseStoryPoints] = useState(true)
   const { token } = useTheme()
 
@@ -33,7 +38,6 @@ const SprintMetrics: FC<SprintMetricsProps> = ({ sprint }) => {
         completed: 0,
         inProgress: 0,
         notStarted: 0,
-        completionRate: 0,
       }
     }
 
@@ -49,20 +53,39 @@ const SprintMetrics: FC<SprintMetricsProps> = ({ sprint }) => {
     const notStarted = useStoryPoints
       ? metrics.notStartedStoryPoints
       : metrics.notStartedWorkItems
-    const completionRate =
-      total > 0 ? Number(((completed / total) * 100).toFixed(1)) : 0
 
     return {
       total,
       completed,
       inProgress,
       notStarted,
-      completionRate,
     }
   }, [metrics, useStoryPoints])
 
+  // Notify parent when health indicator is ready
+  useEffect(() => {
+    if (!isLoading && metrics && onHealthIndicatorReady) {
+      onHealthIndicatorReady(
+        <IterationHealthIndicator
+          startDate={new Date(sprint.start)}
+          endDate={new Date(sprint.end)}
+          total={displayValues.total}
+          completed={displayValues.completed}
+        />,
+      )
+    }
+  }, [
+    displayValues.completed,
+    displayValues.total,
+    isLoading,
+    metrics,
+    onHealthIndicatorReady,
+    sprint.end,
+    sprint.start,
+  ])
+
   if (isLoading) {
-    return <Skeleton active paragraph={{ rows: 2 }} />
+    return <Skeleton active />
   }
 
   return (
@@ -160,3 +183,4 @@ const SprintMetrics: FC<SprintMetricsProps> = ({ sprint }) => {
 }
 
 export default SprintMetrics
+

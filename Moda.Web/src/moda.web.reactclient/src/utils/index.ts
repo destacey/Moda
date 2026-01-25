@@ -8,6 +8,12 @@ export {
   getLifecyclePhaseTagColor,
   getLifecyclePhaseColorFromStatus,
 } from './color-helper'
+export {
+  calculateIterationHealth,
+  IterationHealthStatus,
+  type IterationHealthParams,
+  type IterationHealthResult,
+} from './iteration-health'
 export { saveElementAsImage } from './save-element-as-image'
 
 export { default as toFormErrors } from './problem-details'

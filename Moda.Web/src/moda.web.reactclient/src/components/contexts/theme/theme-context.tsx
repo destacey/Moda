@@ -73,15 +73,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
         antDesignChartsTheme,
         antvisG6ChartsTheme,
       }),
-      [
-        currentThemeName,
-        setCurrentThemeName,
-        agGridTheme,
-        token,
-        badgeColor,
-        antDesignChartsTheme,
-        antvisG6ChartsTheme,
-      ],
+      [token],
     )
 
     return (

@@ -6,15 +6,18 @@ import { Descriptions, Flex } from 'antd'
 import Link from 'next/link'
 import SprintMetrics from './sprint-metrics'
 import TimelineProgress from '@/src/components/common/planning/timeline-progress'
+import { FC, ReactNode } from 'react'
 
 const { Item: DescriptionItem } = Descriptions
 
 export interface SprintDetailsProps {
   sprint: SprintDetailsDto
+  onHealthIndicatorReady?: (indicator: ReactNode) => void
 }
 
-const SprintDetails: React.FC<SprintDetailsProps> = ({
+const SprintDetails: FC<SprintDetailsProps> = ({
   sprint,
+  onHealthIndicatorReady,
 }: SprintDetailsProps) => {
   if (!sprint) return null
 
@@ -25,19 +28,26 @@ const SprintDetails: React.FC<SprintDetailsProps> = ({
 
   return (
     <Flex vertical gap={16}>
-      <Descriptions column={4}>
-        <DescriptionItem label="Team">
-          <Link href={`/organizations/teams/${sprint.team?.key}`}>
-            {sprint.team?.name}
-          </Link>
-        </DescriptionItem>
-      </Descriptions>
+      <Flex justify="space-betwee">
+        <Descriptions column={4}>
+          <DescriptionItem label="Team">
+            <Link href={`/organizations/teams/${sprint.team?.key}`}>
+              {sprint.team?.name}
+            </Link>
+          </DescriptionItem>
+        </Descriptions>
+      </Flex>
       <TimelineProgress
         start={sprint.start}
         end={sprint.end}
         dateFormat="MMM D, YYYY h:mm A"
       />
-      {showMetrics && <SprintMetrics sprint={sprint} />}
+      {showMetrics && (
+        <SprintMetrics
+          sprint={sprint}
+          onHealthIndicatorReady={onHealthIndicatorReady}
+        />
+      )}
     </Flex>
   )
 }

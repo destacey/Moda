@@ -32,6 +32,14 @@ jest.mock('../metrics', () => ({
   VelocityMetric: () => <div data-testid="velocity-metric" />,
 }))
 
+// Mock IterationHealthIndicator
+jest.mock('./iteration-health-indicator', () => ({
+  __esModule: true,
+  default: () => (
+    <div data-testid="iteration-health-indicator">Health Indicator</div>
+  ),
+}))
+
 import { useGetActiveSprintQuery } from '../../../store/features/organizations/team-api'
 import { useGetSprintMetricsQuery } from '../../../store/features/planning/sprints-api'
 
@@ -64,11 +72,12 @@ describe('ActiveTeamSprint', () => {
   it('renders active sprint details', () => {
     render(<ActiveTeamSprint teamId="team-1" />)
 
-    expect(screen.getByText('Active Sprint')).toBeInTheDocument()
+    expect(screen.getByText('Active Sprint:')).toBeInTheDocument()
     expect(screen.getByText('Sprint 1')).toBeInTheDocument()
     expect(screen.getByTestId('timeline-progress')).toBeInTheDocument()
     expect(screen.getByTestId('completion-rate-metric')).toBeInTheDocument()
     expect(screen.getByTestId('velocity-metric')).toBeInTheDocument()
+    expect(screen.getByTestId('iteration-health-indicator')).toBeInTheDocument()
   })
 
   it('renders skeleton when loading sprint', () => {
@@ -82,10 +91,10 @@ describe('ActiveTeamSprint', () => {
   })
 
   it('renders loading state when loading metrics', () => {
-     // When metrics are loading, the card should show loading state
-     // but the content might still try to render or be hidden?
-     // In the component: <Card loading={metricsIsLoading} ...>
-     ;(useGetSprintMetricsQuery as jest.Mock).mockReturnValue({
+    // When metrics are loading, the card should show loading state
+    // but the content might still try to render or be hidden?
+    // In the component: <Card loading={metricsIsLoading} ...>
+    ;(useGetSprintMetricsQuery as jest.Mock).mockReturnValue({
       data: undefined,
       isLoading: true,
     })
@@ -93,7 +102,9 @@ describe('ActiveTeamSprint', () => {
     render(<ActiveTeamSprint teamId="team-1" />)
     // Ant Design Card loading state replaces content with skeleton-like structure
     // We can check if the metrics are NOT present
-    expect(screen.queryByTestId('completion-rate-metric')).not.toBeInTheDocument()
+    expect(
+      screen.queryByTestId('completion-rate-metric'),
+    ).not.toBeInTheDocument()
   })
 
   it('renders nothing if no active sprint', () => {
@@ -105,4 +116,20 @@ describe('ActiveTeamSprint', () => {
     const { container } = render(<ActiveTeamSprint teamId="team-1" />)
     expect(container).toBeEmptyDOMElement()
   })
+
+  it('renders health indicator with correct data', () => {
+    render(<ActiveTeamSprint teamId="team-1" />)
+
+    // Verify health indicator is rendered
+    expect(screen.getByTestId('iteration-health-indicator')).toBeInTheDocument()
+  })
+
+  it('displays link to sprint details page', () => {
+    render(<ActiveTeamSprint teamId="team-1" />)
+
+    const link = screen.getByRole('link', { name: 'Sprint 1' })
+    expect(link).toBeInTheDocument()
+    expect(link).toHaveAttribute('href', '/planning/sprints/S1')
+  })
 })
+

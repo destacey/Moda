@@ -6,8 +6,8 @@ import { Card, Col, Flex, Row, Skeleton, Typography } from 'antd'
 import Link from 'next/link'
 import { FC, useMemo, useState } from 'react'
 import { CompletionRateMetric, VelocityMetric } from '../metrics'
-import IterationDates from './iteration-dates'
 import TimelineProgress from './timeline-progress'
+import IterationHealthIndicator from './iteration-health-indicator'
 
 const { Text } = Typography
 
@@ -58,10 +58,18 @@ const ActiveTeamSprint: FC<ActiveTeamSprintProps> = ({ teamId }) => {
 
   const title = (
     <Flex justify="space-between">
-      <Text>Active Sprint</Text>
-      <Link href={`/planning/sprints/${sprintData.key}`}>
-        {sprintData.name}
-      </Link>
+      <div>
+        <Text>Active Sprint: </Text>
+        <Link href={`/planning/sprints/${sprintData.key}`}>
+          {sprintData.name}
+        </Link>
+      </div>
+      <IterationHealthIndicator
+        startDate={new Date(sprintData.start)}
+        endDate={new Date(sprintData.end)}
+        total={displayValues.total}
+        completed={displayValues.completed}
+      />
     </Flex>
   )
 

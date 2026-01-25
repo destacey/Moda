@@ -9,7 +9,14 @@ import {
   useGetPlanningIntervalIterationsQuery,
 } from '@/src/store/features/planning/planning-interval-api'
 import { notFound, usePathname, useRouter } from 'next/navigation'
-import { use, useCallback, useEffect, useMemo, useState } from 'react'
+import {
+  ReactNode,
+  use,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 import PlanningIntervalIterationDetailsLoading from './loading'
 import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
 import { SwapOutlined } from '@ant-design/icons'
@@ -46,6 +53,7 @@ const PlanningIntervalIterationDetailsPage = (props: {
 
   const [activeTab, setActiveTab] = useState(IterationTabs.Summary)
   const [backlogQueryEnabled, setBacklogQueryEnabled] = useState(false)
+  const [healthIndicator, setHealthIndicator] = useState<ReactNode>(null)
 
   const pathname = usePathname()
   const router = useRouter()
@@ -127,7 +135,12 @@ const PlanningIntervalIterationDetailsPage = (props: {
   const renderTabContent = useCallback(() => {
     switch (activeTab) {
       case IterationTabs.Summary:
-        return <PlanningIntervalIterationSummary iteration={iterationData} />
+        return (
+          <PlanningIntervalIterationSummary
+            iteration={iterationData}
+            onHealthIndicatorReady={setHealthIndicator}
+          />
+        )
       case IterationTabs.Backlog:
         return (
           <SprintBacklogGrid
@@ -170,6 +183,7 @@ const PlanningIntervalIterationDetailsPage = (props: {
             <Tag>{iterationData.category.name}</Tag>
           </Space>
         }
+        actions={healthIndicator}
       />
       <Flex vertical gap="middle">
         <Card

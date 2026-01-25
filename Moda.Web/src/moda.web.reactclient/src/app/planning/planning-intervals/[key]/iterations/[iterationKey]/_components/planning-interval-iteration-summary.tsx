@@ -10,14 +10,11 @@ import {
 } from '@/src/components/common/metrics'
 import TimelineProgress from '@/src/components/common/planning/timeline-progress'
 import useTheme from '@/src/components/contexts/theme'
-import {
-  PlanningIntervalIterationDetailsDto,
-  SprintMetricsSummary,
-} from '@/src/services/moda-api'
+import { PlanningIntervalIterationDetailsDto } from '@/src/services/moda-api'
 import { useGetPlanningIntervalIterationMetricsQuery } from '@/src/store/features/planning/planning-interval-api'
 import {
-  Card,
   Col,
+  Divider,
   Flex,
   Row,
   Segmented,
@@ -25,81 +22,20 @@ import {
   Tooltip,
   Typography,
 } from 'antd'
-import { FC, useMemo, useState } from 'react'
+import { FC, ReactNode, useEffect, useMemo, useState } from 'react'
+import { SprintCard } from '.'
+import { IterationHealthIndicator } from '@/src/components/common/planning'
 
-const { Text, Title } = Typography
+const { Title } = Typography
 
 export interface PlanningIntervalIterationSummaryProps {
   iteration: PlanningIntervalIterationDetailsDto
-}
-
-interface SprintCardProps {
-  sprint: SprintMetricsSummary
-  useStoryPoints: boolean
-}
-
-const SprintCard: FC<SprintCardProps> = ({ sprint, useStoryPoints }) => {
-  const { token } = useTheme()
-
-  const displayTotal = useStoryPoints
-    ? sprint.totalStoryPoints
-    : sprint.totalWorkItems
-  const displayCompleted = useStoryPoints
-    ? sprint.completedStoryPoints
-    : sprint.completedWorkItems
-  const completionRate =
-    displayTotal > 0
-      ? Number(((displayCompleted / displayTotal) * 100).toFixed(1))
-      : 0
-
-  return (
-    <Card size="small" hoverable>
-      <Flex vertical gap="small">
-        <Flex justify="space-between" align="center">
-          <Text strong>{sprint.team.name}</Text>
-          <Text type="secondary">{sprint.sprintName}</Text>
-        </Flex>
-        <Flex justify="space-between" wrap="wrap" gap="small">
-          <Tooltip title="Completion Rate">
-            <Text>
-              Completion:{' '}
-              <Text
-                strong
-                style={{
-                  color: completionRate >= 80 ? token.colorSuccess : undefined,
-                }}
-              >
-                {completionRate.toFixed(1)}%
-              </Text>
-            </Text>
-          </Tooltip>
-          <Tooltip title="Velocity (completed)">
-            <Text>
-              Velocity:{' '}
-              <Text strong style={{ color: token.colorSuccess }}>
-                {displayCompleted}
-              </Text>
-              <Text type="secondary"> / {displayTotal}</Text>
-            </Text>
-          </Tooltip>
-          {sprint.averageCycleTimeDays !== undefined &&
-            sprint.averageCycleTimeDays !== null && (
-              <Tooltip title="Average Cycle Time">
-                <Text>
-                  Cycle Time:{' '}
-                  <Text strong>{sprint.averageCycleTimeDays.toFixed(1)}d</Text>
-                </Text>
-              </Tooltip>
-            )}
-        </Flex>
-      </Flex>
-    </Card>
-  )
+  onHealthIndicatorReady?: (indicator: ReactNode) => void
 }
 
 const PlanningIntervalIterationSummary: FC<
   PlanningIntervalIterationSummaryProps
-> = ({ iteration }) => {
+> = ({ iteration, onHealthIndicatorReady }) => {
   const [useStoryPoints, setUseStoryPoints] = useState(true)
   const { token } = useTheme()
 
@@ -116,22 +52,62 @@ const PlanningIntervalIterationSummary: FC<
     )
   }, [metrics])
 
+  const displayValues = useMemo(() => {
+    if (!metrics) {
+      return {
+        total: 0,
+        completed: 0,
+        inProgress: 0,
+        notStarted: 0,
+      }
+    }
+
+    const total = useStoryPoints
+      ? metrics.totalStoryPoints
+      : metrics.totalWorkItems
+    const completed = useStoryPoints
+      ? metrics.completedStoryPoints
+      : metrics.completedWorkItems
+    const inProgress = useStoryPoints
+      ? metrics.inProgressStoryPoints
+      : metrics.inProgressWorkItems
+    const notStarted = useStoryPoints
+      ? metrics.notStartedStoryPoints
+      : metrics.notStartedWorkItems
+
+    return {
+      total,
+      completed,
+      inProgress,
+      notStarted,
+    }
+  }, [metrics, useStoryPoints])
+
+  // Notify parent when health indicator is ready
+  useEffect(() => {
+    if (!isLoading && metrics && onHealthIndicatorReady) {
+      onHealthIndicatorReady(
+        <IterationHealthIndicator
+          startDate={new Date(iteration.start)}
+          endDate={new Date(iteration.end)}
+          total={displayValues.total}
+          completed={displayValues.completed}
+        />,
+      )
+    }
+  }, [
+    displayValues.completed,
+    displayValues.total,
+    isLoading,
+    metrics,
+    onHealthIndicatorReady,
+    iteration.end,
+    iteration.start,
+  ])
+
   if (isLoading || !metrics) {
     return <Skeleton active />
   }
-
-  const displayTotal = useStoryPoints
-    ? metrics.totalStoryPoints
-    : metrics.totalWorkItems
-  const displayCompleted = useStoryPoints
-    ? metrics.completedStoryPoints
-    : metrics.completedWorkItems
-  const displayInProgress = useStoryPoints
-    ? metrics.inProgressStoryPoints
-    : metrics.inProgressWorkItems
-  const displayNotStarted = useStoryPoints
-    ? metrics.notStartedStoryPoints
-    : metrics.notStartedWorkItems
 
   const isFuture = iteration.state === 'Future'
 
@@ -165,8 +141,8 @@ const PlanningIntervalIterationSummary: FC<
         {!isFuture && (
           <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
             <CompletionRateMetric
-              completed={displayCompleted}
-              total={displayTotal}
+              completed={displayValues.completed}
+              total={displayValues.total}
               tooltip="Percentage of story points or items across all team sprints that are completed (Done or Removed)."
             />
           </Col>
@@ -174,7 +150,7 @@ const PlanningIntervalIterationSummary: FC<
         <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
           <MetricCard
             title="Total"
-            value={displayTotal}
+            value={displayValues.total}
             tooltip="Total number of story points or items across all team sprints in this iteration."
           />
         </Col>
@@ -182,16 +158,16 @@ const PlanningIntervalIterationSummary: FC<
           <>
             <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
               <VelocityMetric
-                completed={displayCompleted}
-                total={displayTotal}
+                completed={displayValues.completed}
+                total={displayValues.total}
                 tooltip="Total completed story points or items across all team sprints (Done or Removed)."
               />
             </Col>
             <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
               <StatusMetric
                 title="In Progress"
-                value={displayInProgress}
-                total={displayTotal}
+                value={displayValues.inProgress}
+                total={displayValues.total}
                 color={token.colorInfo}
                 tooltip="Total in-progress story points or items across all team sprints."
               />
@@ -199,8 +175,8 @@ const PlanningIntervalIterationSummary: FC<
             <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
               <StatusMetric
                 title="Not Started"
-                value={displayNotStarted}
-                total={displayTotal}
+                value={displayValues.notStarted}
+                total={displayValues.total}
                 tooltip="Total not-started story points or items across all team sprints."
               />
             </Col>
@@ -226,18 +202,22 @@ const PlanningIntervalIterationSummary: FC<
         )}
       </Row>
 
+      <Divider />
+
       {sortedSprints.length > 0 && (
         <Flex vertical gap="small">
           <Title level={5} style={{ margin: 0 }}>
             Team Sprints
           </Title>
-          <Row gutter={[8, 8]}>
+          <Flex vertical gap={8}>
             {sortedSprints.map((sprint) => (
-              <Col key={sprint.sprintId} xs={24} sm={12} md={8} lg={6} xxl={4}>
-                <SprintCard sprint={sprint} useStoryPoints={useStoryPoints} />
-              </Col>
+              <SprintCard
+                key={sprint.sprintId}
+                sprint={sprint}
+                useStoryPoints={useStoryPoints}
+              />
             ))}
-          </Row>
+          </Flex>
         </Flex>
       )}
     </Flex>

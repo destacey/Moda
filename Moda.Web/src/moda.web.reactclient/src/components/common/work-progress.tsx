@@ -3,7 +3,7 @@
 import { WorkItemProgressRollupDto } from '@/src/services/moda-api'
 import { Progress, Tooltip } from 'antd'
 import { round } from 'lodash'
-import React, { useMemo } from 'react'
+import { memo, useMemo } from 'react'
 
 export interface WorkProgressProps {
   progress: WorkItemProgressRollupDto
@@ -44,7 +44,7 @@ const calculateProgressPercentages = (
   }
 }
 
-const WorkProgress = React.memo(({ progress }: WorkProgressProps) => {
+const WorkProgress = memo(({ progress }: WorkProgressProps) => {
   const progressSummary = useMemo(
     () => (progress ? calculateProgressPercentages(progress) : null),
     [progress],

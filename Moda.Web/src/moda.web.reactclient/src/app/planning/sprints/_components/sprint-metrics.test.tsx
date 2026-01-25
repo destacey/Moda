@@ -5,6 +5,19 @@ import { IterationState } from '@/src/components/types'
 import { SprintDetailsDto, SprintMetricsDto } from '@/src/services/moda-api'
 import { useGetSprintMetricsQuery } from '../../../../store/features/planning/sprints-api'
 
+// Mock dayjs
+jest.mock('dayjs', () => {
+  const mockDayjs = jest.fn(() => ({
+    add: jest.fn().mockReturnThis(),
+    endOf: jest.fn().mockReturnThis(),
+    startOf: jest.fn().mockReturnThis(),
+    format: jest.fn(() => '2025-01-01'),
+    toDate: jest.fn(() => new Date()),
+  }))
+  mockDayjs.extend = jest.fn()
+  return mockDayjs
+})
+
 // Mock the API hooks
 jest.mock('../../../../store/features/planning/sprints-api', () => ({
   useGetSprintMetricsQuery: jest.fn(),
@@ -67,6 +80,13 @@ jest.mock('../../../../components/common/metrics', () => ({
   ),
 }))
 
+// Mock IterationHealthIndicator
+jest.mock('../../../../components/common/planning', () => ({
+  IterationHealthIndicator: () => (
+    <div data-testid="iteration-health-indicator">Health Indicator</div>
+  ),
+}))
+
 describe('SprintMetrics', () => {
   const mockSprint: SprintDetailsDto = {
     id: 'sprint-1',
@@ -109,17 +129,19 @@ describe('SprintMetrics', () => {
       expect(screen.getByTestId('metric-Completion Rate')).toBeInTheDocument()
       // Note: Our mock for CompletionRateMetric just renders 'completed', which matches the prop we pass.
       // The real component calculates percentage. Here we verify the prop passed is correct (50).
-      expect(screen.getByTestId('value-Completion Rate')).toHaveTextContent('50') 
-      
+      expect(screen.getByTestId('value-Completion Rate')).toHaveTextContent(
+        '50',
+      )
+
       expect(screen.getByTestId('metric-Total')).toBeInTheDocument()
       expect(screen.getByTestId('value-Total')).toHaveTextContent('100')
-      
+
       expect(screen.getByTestId('metric-Velocity')).toBeInTheDocument()
       expect(screen.getByTestId('value-Velocity')).toHaveTextContent('50')
-      
+
       expect(screen.getByTestId('metric-In Progress')).toBeInTheDocument()
       expect(screen.getByTestId('value-In Progress')).toHaveTextContent('30')
-      
+
       expect(screen.getByTestId('metric-Not Started')).toBeInTheDocument()
       expect(screen.getByTestId('value-Not Started')).toHaveTextContent('20')
     })
@@ -146,7 +168,9 @@ describe('SprintMetrics', () => {
   describe('Average Cycle Time', () => {
     it('renders average cycle time when available', () => {
       render(<SprintMetrics sprint={mockSprint} />)
-      expect(screen.getByTestId('value-Avg Cycle Time')).toHaveTextContent('4.5')
+      expect(screen.getByTestId('value-Avg Cycle Time')).toHaveTextContent(
+        '4.5',
+      )
     })
 
     it('does not render cycle time when null', () => {
@@ -155,7 +179,9 @@ describe('SprintMetrics', () => {
         isLoading: false,
       })
       render(<SprintMetrics sprint={mockSprint} />)
-      expect(screen.queryByTestId('metric-Avg Cycle Time')).not.toBeInTheDocument()
+      expect(
+        screen.queryByTestId('metric-Avg Cycle Time'),
+      ).not.toBeInTheDocument()
     })
   })
 
@@ -169,30 +195,88 @@ describe('SprintMetrics', () => {
       expect(container.querySelector('.ant-skeleton')).toBeInTheDocument()
     })
   })
-  
+
   describe('WIP', () => {
-      it('renders WIP when active', () => {
-          render(<SprintMetrics sprint={mockSprint} />)
-          expect(screen.getByTestId('metric-WIP')).toBeInTheDocument()
-          // WIP is always count of items (3)
-          expect(screen.getByTestId('value-WIP')).toHaveTextContent('3')
-      })
+    it('renders WIP when active', () => {
+      render(<SprintMetrics sprint={mockSprint} />)
+      expect(screen.getByTestId('metric-WIP')).toBeInTheDocument()
+      // WIP is always count of items (3)
+      expect(screen.getByTestId('value-WIP')).toHaveTextContent('3')
+    })
   })
-  
+
   describe('Missing SPs', () => {
-      it('renders missing SPs in story points mode', () => {
-          render(<SprintMetrics sprint={mockSprint} />)
-          expect(screen.getByTestId('metric-Missing SPs')).toBeInTheDocument()
-          expect(screen.getByTestId('value-Missing SPs')).toHaveTextContent('1')
+    it('renders missing SPs in story points mode', () => {
+      render(<SprintMetrics sprint={mockSprint} />)
+      expect(screen.getByTestId('metric-Missing SPs')).toBeInTheDocument()
+      expect(screen.getByTestId('value-Missing SPs')).toHaveTextContent('1')
+    })
+
+    it('does not render missing SPs in count mode', async () => {
+      const user = userEvent.setup()
+      render(<SprintMetrics sprint={mockSprint} />)
+
+      await user.click(screen.getByText('Count'))
+
+      expect(screen.queryByTestId('metric-Missing SPs')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('Health Indicator Callback', () => {
+    it('calls onHealthIndicatorReady when metrics are loaded', async () => {
+      const onHealthIndicatorReady = jest.fn()
+      render(
+        <SprintMetrics
+          sprint={mockSprint}
+          onHealthIndicatorReady={onHealthIndicatorReady}
+        />,
+      )
+
+      await waitFor(() => {
+        expect(onHealthIndicatorReady).toHaveBeenCalled()
       })
-      
-      it('does not render missing SPs in count mode', async () => {
-          const user = userEvent.setup()
-          render(<SprintMetrics sprint={mockSprint} />)
-          
-          await user.click(screen.getByText('Count'))
-          
-          expect(screen.queryByTestId('metric-Missing SPs')).not.toBeInTheDocument()
+    })
+
+    it('does not call onHealthIndicatorReady when loading', () => {
+      ;(useGetSprintMetricsQuery as jest.Mock).mockReturnValue({
+        data: undefined,
+        isLoading: true,
       })
+
+      const onHealthIndicatorReady = jest.fn()
+      render(
+        <SprintMetrics
+          sprint={mockSprint}
+          onHealthIndicatorReady={onHealthIndicatorReady}
+        />,
+      )
+
+      expect(onHealthIndicatorReady).not.toHaveBeenCalled()
+    })
+
+    it('updates health indicator when switching modes', async () => {
+      const onHealthIndicatorReady = jest.fn()
+      const user = userEvent.setup()
+      render(
+        <SprintMetrics
+          sprint={mockSprint}
+          onHealthIndicatorReady={onHealthIndicatorReady}
+        />,
+      )
+
+      // Should be called initially
+      await waitFor(() => {
+        expect(onHealthIndicatorReady).toHaveBeenCalledTimes(1)
+      })
+
+      // Switch to Count mode
+      await user.click(screen.getByText('Count'))
+
+      // Should be called again with updated values
+      await waitFor(() => {
+        expect(onHealthIndicatorReady).toHaveBeenCalledTimes(2)
+      })
+    })
   })
 })
+

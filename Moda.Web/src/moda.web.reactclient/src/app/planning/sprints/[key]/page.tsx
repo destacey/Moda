@@ -10,7 +10,14 @@ import {
 } from '@/src/store/features/planning/sprints-api'
 import { Divider, Flex, Space, Typography } from 'antd'
 import { notFound, usePathname, useRouter } from 'next/navigation'
-import { use, useCallback, useEffect, useMemo } from 'react'
+import {
+  ReactNode,
+  use,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 import SprintDetailsLoading from './loading'
 import { SprintBacklogGrid, SprintDetails } from '../_components'
 import { IterationStateTag } from '@/src/components/common/planning'
@@ -24,6 +31,8 @@ const { Title } = Typography
 const SprintDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const { key } = use(props.params)
   const sprintKey = Number(key)
+
+  const [healthIndicator, setHealthIndicator] = useState<ReactNode>(null)
 
   const pathname = usePathname()
   const router = useRouter()
@@ -105,9 +114,13 @@ const SprintDetailsPage = (props: { params: Promise<{ key: string }> }) => {
             <IterationStateTag state={sprintData.state.id as IterationState} />
           </Space>
         }
+        actions={healthIndicator}
       />
       <Flex vertical gap="middle">
-        <SprintDetails sprint={sprintData} />
+        <SprintDetails
+          sprint={sprintData}
+          onHealthIndicatorReady={setHealthIndicator}
+        />
         <Divider size="small" />
         <Flex vertical>
           <Title level={4} style={{ marginBlockStart: '4px' }}>

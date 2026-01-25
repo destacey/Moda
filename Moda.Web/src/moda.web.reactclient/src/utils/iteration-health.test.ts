@@ -1,0 +1,154 @@
+import {
+  calculateIterationHealth,
+  IterationHealthStatus,
+} from './iteration-health'
+
+describe('calculateIterationHealth', () => {
+  // Base sprint: 40 SP, 14 days (Jan 1-14)
+  const baseParams = {
+    startDate: new Date('2024-01-01'),
+    endDate: new Date('2024-01-15'), // 14 days total
+    total: 40,
+  }
+
+  describe('On Track scenarios', () => {
+    it('should return On Track when ahead of schedule', () => {
+      // Day 10: Should have ~71% done (28.6 SP), actually have 30 SP done
+      const result = calculateIterationHealth({
+        ...baseParams,
+        completed: 30,
+        referenceDate: new Date('2024-01-11'), // Day 10
+      })
+
+      expect(result.status).toBe(IterationHealthStatus.OnTrack)
+      expect(result.variancePercent).toBeLessThan(0) // Ahead
+    })
+
+    it('should return On Track when exactly on ideal burndown', () => {
+      // Day 7 (halfway): Should have 50% done (20 SP)
+      const result = calculateIterationHealth({
+        ...baseParams,
+        completed: 20,
+        referenceDate: new Date('2024-01-08'), // Day 7
+      })
+
+      expect(result.status).toBe(IterationHealthStatus.OnTrack)
+      expect(Math.abs(result.variancePercent)).toBeLessThan(1) // Near zero
+    })
+
+    it('should return On Track when within 10% threshold', () => {
+      // Day 10: ideal remaining = 40 * (4/14) = 11.4 SP
+      // Actual: 26 SP done, 14 SP remaining
+      // Variance: 14 - 11.4 = 2.6 SP = 6.5%
+      const result = calculateIterationHealth({
+        ...baseParams,
+        completed: 26,
+        referenceDate: new Date('2024-01-11'),
+      })
+
+      expect(result.status).toBe(IterationHealthStatus.OnTrack)
+      expect(result.variancePercent).toBeLessThanOrEqual(10)
+    })
+  })
+
+  describe('At Risk scenarios', () => {
+    it('should return At Risk when 10-25% behind', () => {
+      // Day 10: ideal remaining = 11.4 SP
+      // Actual: 24 SP done, 16 SP remaining
+      // Variance: 16 - 11.4 = 4.6 SP = 11.5%
+      const result = calculateIterationHealth({
+        ...baseParams,
+        completed: 24,
+        referenceDate: new Date('2024-01-11'),
+      })
+
+      expect(result.status).toBe(IterationHealthStatus.AtRisk)
+      expect(result.variancePercent).toBeGreaterThan(10)
+      expect(result.variancePercent).toBeLessThanOrEqual(25)
+    })
+  })
+
+  describe('Off Track scenarios', () => {
+    it('should return Off Track when more than 25% behind', () => {
+      // Day 10: ideal remaining = 11.4 SP
+      // Actual: 18 SP done, 22 SP remaining
+      // Variance: 22 - 11.4 = 10.6 SP = 26.5%
+      const result = calculateIterationHealth({
+        ...baseParams,
+        completed: 18,
+        referenceDate: new Date('2024-01-11'),
+      })
+
+      expect(result.status).toBe(IterationHealthStatus.OffTrack)
+      expect(result.variancePercent).toBeGreaterThan(25)
+    })
+
+    it('should return Off Track when nothing completed near end', () => {
+      // Day 12: almost done, nothing completed
+      const result = calculateIterationHealth({
+        ...baseParams,
+        completed: 0,
+        referenceDate: new Date('2024-01-13'),
+      })
+
+      expect(result.status).toBe(IterationHealthStatus.OffTrack)
+    })
+  })
+
+  describe('Edge cases', () => {
+    it('should return Unknown when total is zero', () => {
+      const result = calculateIterationHealth({
+        ...baseParams,
+        total: 0,
+        completed: 0,
+        referenceDate: new Date('2024-01-08'),
+      })
+
+      expect(result.status).toBe(IterationHealthStatus.Unknown)
+      expect(result.variancePercent).toBe(0)
+    })
+
+    it('should return NotStarted when iteration has not started', () => {
+      const result = calculateIterationHealth({
+        ...baseParams,
+        completed: 0,
+        referenceDate: new Date('2023-12-31'), // Before start
+      })
+
+      expect(result.status).toBe(IterationHealthStatus.NotStarted)
+    })
+
+    it('should return Completed when iteration is past end date', () => {
+      const result = calculateIterationHealth({
+        ...baseParams,
+        completed: 32,
+        referenceDate: new Date('2024-01-20'), // After end
+      })
+
+      expect(result.status).toBe(IterationHealthStatus.Completed)
+    })
+
+    it('should return On Track when fully completed', () => {
+      const result = calculateIterationHealth({
+        ...baseParams,
+        completed: 40,
+        referenceDate: new Date('2024-01-11'),
+      })
+
+      expect(result.status).toBe(IterationHealthStatus.OnTrack)
+      expect(result.variancePercent).toBeLessThan(0) // Ahead
+    })
+
+    it('should use current date when referenceDate not provided', () => {
+      // This test just ensures no error is thrown
+      const result = calculateIterationHealth({
+        startDate: new Date(Date.now() - 7 * 24 * 3600 * 1000), // 7 days ago
+        endDate: new Date(Date.now() + 7 * 24 * 3600 * 1000), // 7 days from now
+        total: 40,
+        completed: 20,
+      })
+
+      expect(result.status).toBeDefined()
+    })
+  })
+})
