@@ -8500,6 +8500,77 @@ export class PlanningIntervalsClient {
     }
 
     /**
+     * Get a specific planning interval iteration.
+     */
+    getIteration(idOrKey: string, iterationIdOrKey: string, cancelToken?: CancelToken): Promise<PlanningIntervalIterationDetailsDto> {
+        let url_ = this.baseUrl + "/api/planning/planning-intervals/{idOrKey}/iterations/{iterationIdOrKey}";
+        if (idOrKey === undefined || idOrKey === null)
+            throw new globalThis.Error("The parameter 'idOrKey' must be defined.");
+        url_ = url_.replace("{idOrKey}", encodeURIComponent("" + idOrKey));
+        if (iterationIdOrKey === undefined || iterationIdOrKey === null)
+            throw new globalThis.Error("The parameter 'iterationIdOrKey' must be defined.");
+        url_ = url_.replace("{iterationIdOrKey}", encodeURIComponent("" + iterationIdOrKey));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetIteration(_response);
+        });
+    }
+
+    protected processGetIteration(response: AxiosResponse): Promise<PlanningIntervalIterationDetailsDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<PlanningIntervalIterationDetailsDto>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<PlanningIntervalIterationDetailsDto>(null as any);
+    }
+
+    /**
      * Get a list of iteration categories.
      */
     getIterationCategories( cancelToken?: CancelToken): Promise<PlanningIntervalIterationCategoryDto[]> {
@@ -8697,6 +8768,148 @@ export class PlanningIntervalsClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
         return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Get metrics for a PI iteration aggregated across all mapped sprints.
+     */
+    getIterationMetrics(idOrKey: string, iterationIdOrKey: string, cancelToken?: CancelToken): Promise<PlanningIntervalIterationMetricsResponse> {
+        let url_ = this.baseUrl + "/api/planning/planning-intervals/{idOrKey}/iterations/{iterationIdOrKey}/metrics";
+        if (idOrKey === undefined || idOrKey === null)
+            throw new globalThis.Error("The parameter 'idOrKey' must be defined.");
+        url_ = url_.replace("{idOrKey}", encodeURIComponent("" + idOrKey));
+        if (iterationIdOrKey === undefined || iterationIdOrKey === null)
+            throw new globalThis.Error("The parameter 'iterationIdOrKey' must be defined.");
+        url_ = url_.replace("{iterationIdOrKey}", encodeURIComponent("" + iterationIdOrKey));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetIterationMetrics(_response);
+        });
+    }
+
+    protected processGetIterationMetrics(response: AxiosResponse): Promise<PlanningIntervalIterationMetricsResponse> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<PlanningIntervalIterationMetricsResponse>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<PlanningIntervalIterationMetricsResponse>(null as any);
+    }
+
+    /**
+     * Get combined backlog for a PI iteration from all mapped sprints.
+     */
+    getIterationBacklog(idOrKey: string, iterationIdOrKey: string, cancelToken?: CancelToken): Promise<SprintBacklogItemDto[]> {
+        let url_ = this.baseUrl + "/api/planning/planning-intervals/{idOrKey}/iterations/{iterationIdOrKey}/backlog";
+        if (idOrKey === undefined || idOrKey === null)
+            throw new globalThis.Error("The parameter 'idOrKey' must be defined.");
+        url_ = url_.replace("{idOrKey}", encodeURIComponent("" + idOrKey));
+        if (iterationIdOrKey === undefined || iterationIdOrKey === null)
+            throw new globalThis.Error("The parameter 'iterationIdOrKey' must be defined.");
+        url_ = url_.replace("{iterationIdOrKey}", encodeURIComponent("" + iterationIdOrKey));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetIterationBacklog(_response);
+        });
+    }
+
+    protected processGetIterationBacklog(response: AxiosResponse): Promise<SprintBacklogItemDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<SprintBacklogItemDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<SprintBacklogItemDto[]>(null as any);
     }
 
     /**
@@ -11358,6 +11571,67 @@ export class SprintsClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
         return Promise.resolve<SprintBacklogItemDto[]>(null as any);
+    }
+
+    /**
+     * Get sprint work item metrics.
+     */
+    getSprintMetrics(idOrKey: string, cancelToken?: CancelToken): Promise<SprintWorkItemMetricsDto> {
+        let url_ = this.baseUrl + "/api/planning/sprints/{idOrKey}/metrics";
+        if (idOrKey === undefined || idOrKey === null)
+            throw new globalThis.Error("The parameter 'idOrKey' must be defined.");
+        url_ = url_.replace("{idOrKey}", encodeURIComponent("" + idOrKey));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetSprintMetrics(_response);
+        });
+    }
+
+    protected processGetSprintMetrics(response: AxiosResponse): Promise<SprintWorkItemMetricsDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<SprintWorkItemMetricsDto>(result200);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<SprintWorkItemMetricsDto>(null as any);
     }
 }
 
@@ -18939,6 +19213,17 @@ export interface PlanningIntervalIterationListDto {
     category: SimpleNavigationDto;
 }
 
+export interface PlanningIntervalIterationDetailsDto {
+    id: string;
+    key: number;
+    name: string;
+    start: Date;
+    end: Date;
+    state: string;
+    category: SimpleNavigationDto;
+    planningInterval: NavigationDto;
+}
+
 export interface PlanningIntervalIterationCategoryDto {
     id: number;
     name: string;
@@ -18978,6 +19263,74 @@ This is a sync/replace operation - any team sprints currently mapped but not inc
 - Null value: Explicitly unmaps any sprint from that iteration for this team.
 - Omitted iteration: No change to that iteration's mappings. */
     iterationSprintMappings: { [key: string]: string; };
+}
+
+/** Response containing PI Iteration metrics aggregated across all mapped sprints. */
+export interface PlanningIntervalIterationMetricsResponse {
+    iterationId: string;
+    iterationKey: number;
+    iterationName: string;
+    start: Date;
+    end: Date;
+    category: SimpleNavigationDto;
+    teamCount: number;
+    sprintCount: number;
+    totalWorkItems: number;
+    totalStoryPoints: number;
+    completedWorkItems: number;
+    completedStoryPoints: number;
+    inProgressWorkItems: number;
+    inProgressStoryPoints: number;
+    notStartedWorkItems: number;
+    notStartedStoryPoints: number;
+    missingStoryPointsCount: number;
+    averageCycleTimeDays?: number | undefined;
+    sprintMetrics: SprintMetricsSummary[];
+}
+
+/** Metrics summary for an individual sprint within the PI Iteration. */
+export interface SprintMetricsSummary {
+    sprintId: string;
+    sprintKey: number;
+    sprintName: string;
+    state: SimpleNavigationDto;
+    start: Date;
+    end: Date;
+    team: NavigationDto;
+    totalWorkItems: number;
+    totalStoryPoints: number;
+    completedWorkItems: number;
+    completedStoryPoints: number;
+    inProgressWorkItems: number;
+    inProgressStoryPoints: number;
+    notStartedWorkItems: number;
+    notStartedStoryPoints: number;
+    missingStoryPointsCount: number;
+    averageCycleTimeDays?: number | undefined;
+}
+
+export interface SprintBacklogItemDto {
+    id: string;
+    key: string;
+    title: string;
+    workspace: WorkspaceNavigationDto;
+    type: string;
+    status: string;
+    statusCategory: SimpleNavigationDto;
+    parent?: WorkItemNavigationDto | undefined;
+    team?: WorkTeamNavigationDto | undefined;
+    sprint: WorkIterationNavigationDto;
+    assignedTo?: EmployeeNavigationDto | undefined;
+    created: Date;
+    activated?: Date | undefined;
+    done?: Date | undefined;
+    rank: number;
+    parentRank?: number | undefined;
+    project?: WorkProjectNavigationDto | undefined;
+    externalViewWorkItemUrl?: string | undefined;
+    stackRank: number;
+    storyPoints?: number | undefined;
+    cycleTime?: number | undefined;
 }
 
 export interface PlanningIntervalObjectiveListDto {
@@ -19421,28 +19774,18 @@ export interface SprintDetailsDto {
     team: PlanningTeamNavigationDto;
 }
 
-export interface SprintBacklogItemDto {
-    id: string;
-    key: string;
-    title: string;
-    workspace: WorkspaceNavigationDto;
-    type: string;
-    status: string;
-    statusCategory: SimpleNavigationDto;
-    parent?: WorkItemNavigationDto | undefined;
-    team?: WorkTeamNavigationDto | undefined;
-    sprint: WorkIterationNavigationDto;
-    assignedTo?: EmployeeNavigationDto | undefined;
-    created: Date;
-    activated?: Date | undefined;
-    done?: Date | undefined;
-    rank: number;
-    parentRank?: number | undefined;
-    project?: WorkProjectNavigationDto | undefined;
-    externalViewWorkItemUrl?: string | undefined;
-    stackRank: number;
-    storyPoints?: number | undefined;
-    cycleTime?: number | undefined;
+export interface SprintWorkItemMetricsDto {
+    sprintId: string;
+    totalWorkItems: number;
+    totalStoryPoints: number;
+    completedWorkItems: number;
+    completedStoryPoints: number;
+    inProgressWorkItems: number;
+    inProgressStoryPoints: number;
+    notStartedWorkItems: number;
+    notStartedStoryPoints: number;
+    missingStoryPointsCount: number;
+    averageCycleTimeDays?: number | undefined;
 }
 
 export interface TeamTypeDto {

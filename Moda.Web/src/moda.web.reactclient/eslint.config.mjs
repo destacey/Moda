@@ -1,5 +1,5 @@
-import nextCoreWebVitals from "eslint-config-next/core-web-vitals";
-import nextTypescript from "eslint-config-next/typescript";
+import nextCoreWebVitals from 'eslint-config-next/core-web-vitals'
+import nextTypescript from 'eslint-config-next/typescript'
 import { FlatCompat } from '@eslint/eslintrc'
 
 const compat = new FlatCompat({
@@ -7,17 +7,24 @@ const compat = new FlatCompat({
   baseDirectory: import.meta.dirname,
 })
 
-const eslintConfig = [...nextCoreWebVitals, ...nextTypescript, ...compat.config({
-  extends: ['prettier'],
+const eslintConfig = [
+  ...nextCoreWebVitals,
+  ...nextTypescript,
+  ...compat.config({
+    extends: ['prettier'],
+    plugins: ['unused-imports'],
 
-  rules: {
-    '@typescript-eslint/no-explicit-any': 'off',
-    '@typescript-eslint/no-unused-vars': 'off',
-    '@typescript-eslint/no-unused-expressions': 'off',
-    '@typescript-eslint/no-empty-object-type': 'off',
-  }
-}), {
-  ignores: ["coverage/**"]
-}]
+    rules: {
+      'unused-imports/no-unused-imports': 'warn',
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-expressions': 'off',
+      '@typescript-eslint/no-empty-object-type': 'off',
+    },
+  }),
+  {
+    ignores: ['coverage/**'],
+  },
+]
 
 export default eslintConfig

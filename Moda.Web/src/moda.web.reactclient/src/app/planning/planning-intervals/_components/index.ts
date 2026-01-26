@@ -13,6 +13,7 @@ export { default as PlanningIntervalIterationsList } from './planning-interval-i
 export { default as PlanningIntervalDetails } from './planning-interval-details'
 export { default as PlanningIntervalTeamSprintMappings } from './planning-interval-team-sprint-mappings'
 export { default as ConfigureTeamSprintMappingsForm } from './configure-team-sprint-mappings-form'
+export { default as PlanningIntervalIterationsListItem } from './planning-interval-iterations-list-item'
 
 export type { ObjectiveHealthChartDataItem } from './objective-health-chart'
 export type { ObjectiveStatusChartDataItem } from './objective-status-chart'

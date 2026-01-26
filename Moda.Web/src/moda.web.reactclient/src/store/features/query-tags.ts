@@ -1,4 +1,3 @@
-import { User } from './../../components/contexts/auth/types.d'
 export enum QueryTags {
   // ADMIN
   BackgroundJob = 'Admin.BackgroundJob',
@@ -37,6 +36,8 @@ export enum QueryTags {
   PlanningIntervalCalendar = 'Planning.PlanningInterval.Calendar',
   PlanningIntervalIteration = 'Planning.PlanningInterval.Iteration',
   PlanningIntervalIterationSprints = 'Planning.PlanningInterval.Iteration.Sprints',
+  PlanningIntervalIterationMetrics = 'Planning.PlanningInterval.Iteration.Metrics',
+  PlanningIntervalIterationBacklog = 'Planning.PlanningInterval.Iteration.Backlog',
   PlanningIntervalIterationTypeOptions = 'Planning.PlanningInterval.IterationTypeOptions',
   PlanningIntervalTeam = 'Planning.PlanningInterval.Team',
   PlanningIntervalPredictability = 'Planning.PlanningInterval.Predictability',
@@ -59,6 +60,7 @@ export enum QueryTags {
   RoadmapVisibility = 'Planning.RoadmapVisibility',
   Sprint = 'Planning.Sprint',
   SprintBacklog = 'Planning.Sprint.Backlog',
+  SprintMetrics = 'Planning.Sprint.Metrics',
 
   // PPM
   ExpenditureCategory = 'Ppm.ExpenditureCategory',

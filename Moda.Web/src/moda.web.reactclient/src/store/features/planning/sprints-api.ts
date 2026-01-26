@@ -5,6 +5,7 @@ import {
   SprintBacklogItemDto,
   SprintDetailsDto,
   SprintListDto,
+  SprintWorkItemMetricsDto,
 } from '@/src/services/moda-api'
 
 export const sprintsApi = apiSlice.injectEndpoints({
@@ -51,6 +52,23 @@ export const sprintsApi = apiSlice.injectEndpoints({
         { type: QueryTags.SprintBacklog, id: sprintKey },
       ],
     }),
+
+    getSprintMetrics: builder.query<SprintWorkItemMetricsDto, number>({
+      queryFn: async (sprintKey: number) => {
+        try {
+          const data = await getSprintsClient().getSprintMetrics(
+            sprintKey.toString(),
+          )
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: (result, error, sprintKey) => [
+        { type: QueryTags.SprintMetrics, id: sprintKey },
+      ],
+    }),
   }),
 })
 
@@ -58,4 +76,5 @@ export const {
   useGetSprintsQuery,
   useGetSprintQuery,
   useGetSprintBacklogQuery,
+  useGetSprintMetricsQuery,
 } = sprintsApi

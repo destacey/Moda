@@ -6,7 +6,7 @@ import {
   MenuOutlined,
 } from '@ant-design/icons'
 import React, { FC, useMemo, useState } from 'react'
-import { Layout, Button, Typography, Dropdown, Menu, Flex } from 'antd'
+import { Layout, Button, Typography, Dropdown, Flex } from 'antd'
 import useMenuToggle from '../../components/contexts/menu-toggle'
 import { useMediaQuery } from 'react-responsive'
 import { useAppMenuItems } from './menu'

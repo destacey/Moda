@@ -209,6 +209,21 @@ public class PlanningIntervalsController : ControllerBase
             : NotFound();
     }
 
+    [HttpGet("{idOrKey}/iterations/{iterationIdOrKey}")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.PlanningIntervals)]
+    [OpenApiOperation("Get a specific planning interval iteration.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<PlanningIntervalIterationDetailsDto?>> GetIteration(string idOrKey, string iterationIdOrKey, CancellationToken cancellationToken)
+    {
+        var iteration = await _sender.Send(new GetPlanningIntervalIterationQuery(idOrKey, iterationIdOrKey), cancellationToken);
+
+        return iteration is not null
+            ? Ok(iteration)
+            : NotFound();
+    }
+
     [HttpGet("iteration-categories")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.PlanningIntervals)]
     [OpenApiOperation("Get a list of iteration categories.", "")]
@@ -245,7 +260,7 @@ public class PlanningIntervalsController : ControllerBase
     {
         if (id != request.Id)
             return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(nameof(id), nameof(request.Id), HttpContext));
-        
+
         if (teamId != request.TeamId)
             return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(nameof(teamId), nameof(request.TeamId), HttpContext));
 
@@ -254,6 +269,126 @@ public class PlanningIntervalsController : ControllerBase
         return result.IsSuccess
             ? NoContent()
             : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpGet("{idOrKey}/iterations/{iterationIdOrKey}/metrics")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.PlanningIntervals)]
+    [OpenApiOperation("Get metrics for a PI iteration aggregated across all mapped sprints.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<PlanningIntervalIterationMetricsResponse>> GetIterationMetrics(string idOrKey, string iterationIdOrKey, CancellationToken cancellationToken)
+    {
+        // Get the iteration with its mapped sprints from Planning context
+        var iterationSprints = await _sender.Send(
+            new GetPlanningIntervalIterationSprintsQuery(idOrKey, null),
+            cancellationToken);
+
+        if (iterationSprints is null)
+            return NotFound();
+
+        // Find the specific iteration
+        var iterationKey = new IdOrKey(iterationIdOrKey);
+        var iteration = iterationSprints.FirstOrDefault(i =>
+            iterationKey.IsId ? i.Id == iterationKey.AsId : i.Key == iterationKey.AsKey);
+
+        if (iteration is null)
+            return NotFound();
+
+        // Get work item metrics from Work context
+        var sprintIds = iteration.Sprints.Select(s => s.Id).ToList();
+        var sprintMetrics = await _sender.Send(
+            new GetSprintsWorkItemMetricsQuery(sprintIds),
+            cancellationToken);
+
+        // Build per-sprint metrics summaries
+        var sprintMetricsSummaries = iteration.Sprints.Select(sprint =>
+        {
+            var metrics = sprintMetrics.FirstOrDefault(m => m.SprintId == sprint.Id);
+            return new SprintMetricsSummary
+            {
+                SprintId = sprint.Id,
+                SprintKey = sprint.Key,
+                SprintName = sprint.Name,
+                State = sprint.State,
+                Start = sprint.Start,
+                End = sprint.End,
+                Team = new Common.Application.Dtos.NavigationDto { Id = sprint.Team.Id, Key = sprint.Team.Key, Name = sprint.Team.Name },
+                TotalWorkItems = metrics?.TotalWorkItems ?? 0,
+                TotalStoryPoints = metrics?.TotalStoryPoints ?? 0,
+                CompletedWorkItems = metrics?.CompletedWorkItems ?? 0,
+                CompletedStoryPoints = metrics?.CompletedStoryPoints ?? 0,
+                InProgressWorkItems = metrics?.InProgressWorkItems ?? 0,
+                InProgressStoryPoints = metrics?.InProgressStoryPoints ?? 0,
+                NotStartedWorkItems = metrics?.NotStartedWorkItems ?? 0,
+                NotStartedStoryPoints = metrics?.NotStartedStoryPoints ?? 0,
+                MissingStoryPointsCount = metrics?.MissingStoryPointsCount ?? 0,
+                AverageCycleTimeDays = metrics?.AverageCycleTimeDays
+            };
+        }).ToList();
+
+        // Calculate aggregate cycle time
+        var allCycleTimes = sprintMetricsSummaries
+            .Where(s => s.AverageCycleTimeDays.HasValue)
+            .Select(s => s.AverageCycleTimeDays!.Value)
+            .ToList();
+        var avgCycleTime = allCycleTimes.Count > 0 ? allCycleTimes.Average() : (double?)null;
+
+        return Ok(new PlanningIntervalIterationMetricsResponse
+        {
+            IterationId = iteration.Id,
+            IterationKey = iteration.Key,
+            IterationName = iteration.Name,
+            Start = iteration.Start,
+            End = iteration.End,
+            Category = iteration.Category,
+            TeamCount = iteration.Sprints.Select(s => s.Team.Id).Distinct().Count(),
+            SprintCount = iteration.Sprints.Count,
+            TotalWorkItems = sprintMetricsSummaries.Sum(s => s.TotalWorkItems),
+            TotalStoryPoints = sprintMetricsSummaries.Sum(s => s.TotalStoryPoints),
+            CompletedWorkItems = sprintMetricsSummaries.Sum(s => s.CompletedWorkItems),
+            CompletedStoryPoints = sprintMetricsSummaries.Sum(s => s.CompletedStoryPoints),
+            InProgressWorkItems = sprintMetricsSummaries.Sum(s => s.InProgressWorkItems),
+            InProgressStoryPoints = sprintMetricsSummaries.Sum(s => s.InProgressStoryPoints),
+            NotStartedWorkItems = sprintMetricsSummaries.Sum(s => s.NotStartedWorkItems),
+            NotStartedStoryPoints = sprintMetricsSummaries.Sum(s => s.NotStartedStoryPoints),
+            MissingStoryPointsCount = sprintMetricsSummaries.Sum(s => s.MissingStoryPointsCount),
+            AverageCycleTimeDays = avgCycleTime,
+            SprintMetrics = sprintMetricsSummaries
+        });
+    }
+
+    [HttpGet("{idOrKey}/iterations/{iterationIdOrKey}/backlog")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.PlanningIntervals)]
+    [OpenApiOperation("Get combined backlog for a PI iteration from all mapped sprints.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<List<SprintBacklogItemDto>>> GetIterationBacklog(string idOrKey, string iterationIdOrKey, CancellationToken cancellationToken)
+    {
+        // Get the iteration with its mapped sprints from Planning context
+        var iterationSprints = await _sender.Send(
+            new GetPlanningIntervalIterationSprintsQuery(idOrKey, null),
+            cancellationToken);
+
+        if (iterationSprints is null)
+            return NotFound();
+
+        // Find the specific iteration
+        var iterationKey = new IdOrKey(iterationIdOrKey);
+        var iteration = iterationSprints.FirstOrDefault(i =>
+            iterationKey.IsId ? i.Id == iterationKey.AsId : i.Key == iterationKey.AsKey);
+
+        if (iteration is null)
+            return NotFound();
+
+        // Get combined backlog from Work context
+        var sprintIds = iteration.Sprints.Select(s => s.Id).ToList();
+        var backlog = await _sender.Send(
+            new GetSprintsBacklogQuery(sprintIds),
+            cancellationToken);
+
+        return Ok(backlog);
     }
 
     #endregion Iterations

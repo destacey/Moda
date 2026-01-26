@@ -3,7 +3,7 @@
 import { useCallback, useMemo, useState } from 'react'
 import Link from 'next/link'
 import dayjs from 'dayjs'
-import { Button, Flex, Spin, Table, Tag, Tooltip, Typography } from 'antd'
+import { Button, Flex, Spin, Table, Tag, Typography } from 'antd'
 import { EditOutlined } from '@ant-design/icons'
 import type { ColumnsType } from 'antd/es/table'
 import {
@@ -243,7 +243,13 @@ export const PlanningIntervalTeamSprintMappings = ({
     }
 
     return cols
-  }, [iterationSprintsData, token.colorPrimary, teamsData?.length, canUpdatePlanningInterval, onEditTeamSprints])
+  }, [
+    iterationSprintsData,
+    token.colorPrimary,
+    teamsData?.length,
+    canUpdatePlanningInterval,
+    onEditTeamSprints,
+  ])
 
   if (isLoading) {
     return (

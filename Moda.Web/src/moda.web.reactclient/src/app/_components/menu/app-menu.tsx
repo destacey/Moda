@@ -1,7 +1,7 @@
 'use client'
 
 import { Menu } from 'antd'
-import { CSSProperties, FC, useMemo } from 'react'
+import { CSSProperties, FC } from 'react'
 import React from 'react'
 import { useAppMenuItems } from '.'
 

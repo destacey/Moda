@@ -2,7 +2,6 @@
 
 import useTheme from '@/src/components/contexts/theme'
 import { PlanningIntervalTeamPredictabilityDto } from '@/src/services/moda-api'
-import { RadarConfig } from '@ant-design/charts'
 import { Card } from 'antd'
 import dynamic from 'next/dynamic'
 import { useMemo } from 'react'

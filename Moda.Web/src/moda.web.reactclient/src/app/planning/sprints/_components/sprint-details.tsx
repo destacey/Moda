@@ -1,25 +1,25 @@
 'use client'
 
-import LinksCard from '@/src/components/common/links/links-card'
 import { IterationState } from '@/src/components/types'
-import { SprintBacklogItemDto, SprintDetailsDto } from '@/src/services/moda-api'
+import { SprintDetailsDto } from '@/src/services/moda-api'
 import { Descriptions, Flex } from 'antd'
 import Link from 'next/link'
 import SprintMetrics from './sprint-metrics'
-import IterationDates from '@/src/components/common/planning/iteration-dates'
+import TimelineProgress from '@/src/components/common/planning/timeline-progress'
+import { FC, ReactNode } from 'react'
 
 const { Item: DescriptionItem } = Descriptions
 
 export interface SprintDetailsProps {
   sprint: SprintDetailsDto
-  backlog: SprintBacklogItemDto[]
+  onHealthIndicatorReady?: (indicator: ReactNode) => void
 }
 
-const SprintDetails: React.FC<SprintDetailsProps> = ({
+const SprintDetails: FC<SprintDetailsProps> = ({
   sprint,
-  backlog,
+  onHealthIndicatorReady,
 }: SprintDetailsProps) => {
-  if (!sprint || !backlog) return null
+  if (!sprint) return null
 
   const sprintState = sprint.state.id as IterationState
   const showMetrics =
@@ -35,8 +35,17 @@ const SprintDetails: React.FC<SprintDetailsProps> = ({
           </Link>
         </DescriptionItem>
       </Descriptions>
-      <IterationDates start={sprint.start} end={sprint.end} />
-      {showMetrics && <SprintMetrics sprint={sprint} backlog={backlog} />}
+      <TimelineProgress
+        start={sprint.start}
+        end={sprint.end}
+        dateFormat="MMM D, YYYY h:mm A"
+      />
+      {showMetrics && (
+        <SprintMetrics
+          sprint={sprint}
+          onHealthIndicatorReady={onHealthIndicatorReady}
+        />
+      )}
     </Flex>
   )
 }
