@@ -4,6 +4,8 @@ import { Card, Space, Typography } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { IterationState } from '../../types'
+import { useGetPlanningIntervalIterationsQuery } from '@/src/store/features/planning/planning-interval-api'
+import { useMemo } from 'react'
 
 const { Text } = Typography
 
@@ -31,15 +33,27 @@ const DaysCountdownLabel = ({
 const PlanningIntervalCard = ({
   planningInterval,
 }: PlanningIntervalCardProps) => {
+  const { data: iterationsData } = useGetPlanningIntervalIterationsQuery(
+    planningInterval.key,
+    {
+      skip: planningInterval?.state.name !== 'Active',
+    },
+  )
+
+  const activeIteration = useMemo(
+    () => iterationsData?.find((iteration) => iteration.state === 'Active'),
+    [iterationsData],
+  )
+
   if (!planningInterval) return null
 
   return (
     <Card size="small" title={planningInterval.name}>
       <Space vertical>
         <Space wrap>
-          {dayjs(planningInterval.start).format('M/D/YYYY')}
+          {dayjs(planningInterval.start).format('MMM D, YYYY')}
           <Text type="secondary"> - </Text>
-          {dayjs(planningInterval.end).format('M/D/YYYY')}
+          {dayjs(planningInterval.end).format('MMM D, YYYY')}
           <DaysCountdownLabel planningInterval={planningInterval} />
         </Space>
         <Space>
@@ -52,6 +66,16 @@ const PlanningIntervalCard = ({
           >
             Plan Review
           </Link>
+          {activeIteration && (
+            <>
+              <Text type="secondary"> | </Text>
+              <Link
+                href={`/planning/planning-intervals/${planningInterval.key}/iterations/${activeIteration.key}`}
+              >
+                {activeIteration.name}
+              </Link>
+            </>
+          )}
         </Space>
       </Space>
     </Card>

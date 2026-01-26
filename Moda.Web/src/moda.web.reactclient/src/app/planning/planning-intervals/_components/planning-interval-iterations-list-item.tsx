@@ -6,19 +6,21 @@ import { Card, Flex, Typography } from 'antd'
 import ModaDateRange from '@/src/components/common/moda-date-range'
 import useTheme from '@/src/components/contexts/theme'
 import './planning-interval-iterations-list-item.css'
+import { PlanningIntervalIterationListDto } from '@/src/services/moda-api'
 
 const { Title, Text } = Typography
 
 interface PlanningIntervalIterationsListItemProps {
-  iteration: any
+  iteration: PlanningIntervalIterationListDto
   planningIntervalKey: number
-  isActive: boolean
 }
 
 const PlanningIntervalIterationsListItem: FC<
   PlanningIntervalIterationsListItemProps
-> = ({ iteration, planningIntervalKey, isActive }) => {
+> = ({ iteration, planningIntervalKey }) => {
   const { token } = useTheme()
+
+  const isActive = iteration.state === 'Active'
 
   return (
     <Link
