@@ -19,13 +19,6 @@ const PlanningIntervalIterationsList: FC<
     { skip: !planningIntervalKey },
   )
 
-  const isActiveIteration = (iteration: any) => {
-    const today = new Date()
-    return (
-      today >= new Date(iteration.start) && today <= new Date(iteration.end)
-    )
-  }
-
   if (isLoading) return <Skeleton active />
 
   if (!iterations?.length) return null
@@ -41,7 +34,6 @@ const PlanningIntervalIterationsList: FC<
             key={iteration.key}
             iteration={iteration}
             planningIntervalKey={planningIntervalKey}
-            isActive={isActiveIteration(iteration)}
           />
         ))}
       </Flex>
