@@ -29,15 +29,31 @@ public sealed record PlanningIntervalIterationListDto : IMapFrom<PlanningInterva
     public required LocalDate End { get; set; }
 
     /// <summary>
+    /// The PI iteration state.
+    /// </summary>
+    public required string State { get; set; }
+
+    /// <summary>
     /// The PI iteration category.
     /// </summary>
     public required SimpleNavigationDto Category { get; set; }
 
-    public void ConfigureMapping(TypeAdapterConfig config)
+    public static TypeAdapterConfig CreateTypeAdapterConfig(LocalDate asOf)
     {
+        var config = new TypeAdapterConfig();
+
         config.NewConfig<PlanningIntervalIteration, PlanningIntervalIterationListDto>()
             .Map(dest => dest.Start, src => src.DateRange.Start)
             .Map(dest => dest.End, src => src.DateRange.End)
-            .Map(dest => dest.Category, src => SimpleNavigationDto.FromEnum(src.Category));
+            .Map(dest => dest.Category, src => SimpleNavigationDto.FromEnum(src.Category))
+            .Map(dest => dest.State, src =>
+                asOf < src.DateRange.Start
+                    ? "Future"
+                    : asOf > src.DateRange.End
+                        ? "Completed"
+                        : "Active"
+            );
+
+        return config;
     }
 }
