@@ -50,6 +50,17 @@ const AppContent = memo(({ children }: PropsWithChildren) => {
 AppContent.displayName = 'AppContent'
 
 const RootLayout = ({ children }: React.PropsWithChildren) => {
+  // Guard against SSR where msalInstance is null
+  if (!msalInstance) {
+    return (
+      <html lang="en">
+        <body className={inter.className}>
+          <LoadingAccount message="Initializing authentication..." />
+        </body>
+      </html>
+    )
+  }
+
   return (
     <html lang="en">
       <body className={inter.className}>
