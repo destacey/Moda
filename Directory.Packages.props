@@ -8,7 +8,7 @@
     <PackageVersion Include="Aspire.Hosting.AppHost" Version="13.1.0" />
     <PackageVersion Include="Aspire.Hosting.JavaScript" Version="13.1.0" />
     <PackageVersion Include="Aspire.Hosting.SqlServer" Version="13.1.0" />
-    <PackageVersion Include="Azure.Monitor.OpenTelemetry.AspNetCore" Version="1.3.0" />
+    <PackageVersion Include="Azure.Monitor.OpenTelemetry.AspNetCore" Version="1.4.0" />
     <PackageVersion Include="CSharpFunctionalExtensions" Version="3.6.0" />
     <PackageVersion Include="CsvHelper" Version="33.1.0" />
     <PackageVersion Include="FluentValidation" Version="12.1.1" />
@@ -23,29 +23,29 @@
     <PackageVersion Include="MediatR" Version="[12.5.0]" />
     <PackageVersion Include="MediatR.Contracts" Version="2.0.1" />
     <PackageVersion Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.9" />
-    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.1" />
-    <PackageVersion Include="Microsoft.AspNetCore.Components.Authorization" Version="10.0.1" />
-    <PackageVersion Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.1" />
-    <PackageVersion Include="Microsoft.AspNetCore.JsonPatch.SystemTextJson" Version="10.0.1" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.1" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.1" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.1" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.1" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer.NetTopologySuite" Version="10.0.1" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.1" />
-    <PackageVersion Include="Microsoft.Extensions.Caching.Abstractions" Version="10.0.1" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration" Version="10.0.1" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.1" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.1" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.1" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="10.0.1" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.UserSecrets" Version="10.0.1" />
-    <PackageVersion Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="10.0.1" />
-    <PackageVersion Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="10.0.1" />
-    <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="10.1.0" />
-    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.1" />
-    <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="10.1.0" />
-    <PackageVersion Include="Microsoft.Graph" Version="5.100.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.2" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.Authorization" Version="10.0.2" />
+    <PackageVersion Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.2" />
+    <PackageVersion Include="Microsoft.AspNetCore.JsonPatch.SystemTextJson" Version="10.0.2" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.2" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.2" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.2" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.2" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer.NetTopologySuite" Version="10.0.2" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.Caching.Abstractions" Version="10.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration" Version="10.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="10.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.UserSecrets" Version="10.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="10.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="10.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="10.2.0" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="10.2.0" />
+    <PackageVersion Include="Microsoft.Graph" Version="5.101.0" />
     <PackageVersion Include="Microsoft.Identity.Web" Version="4.3.0" />
     <PackageVersion Include="Microsoft.Identity.Web.MicrosoftGraph" Version="4.3.0" />
     <PackageVersion Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1" />
@@ -57,13 +57,13 @@
     <PackageVersion Include="NSwag.MSBuild" Version="14.6.3" />
     <PackageVersion Include="OneOf" Version="3.0.271" />
     <PackageVersion Include="OneOf.Serialization.SystemTextJson" Version="1.1.1" />
-    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.14.0" />
-    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.14.0" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.14.0" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.14.0" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.14.0" />
+    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.15.0" />
+    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.15.0" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.15.0" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.15.0" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.15.0" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.SqlClient" Version="1.14.0-beta.1" />
-    <PackageVersion Include="RestSharp" Version="113.0.0" />
+    <PackageVersion Include="RestSharp" Version="113.1.0" />
     <PackageVersion Include="Serilog" Version="4.3.0" />
     <PackageVersion Include="Serilog.AspNetCore" Version="10.0.0" />
     <PackageVersion Include="Serilog.Enrichers.AssemblyName" Version="2.0.0" />
