@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Moda.Common.Domain.Enums.Organization;
 using Moda.Common.Domain.Models.Organizations;
+using Moda.Organization.Domain.Enums;
+using Moda.Organization.Domain.Models;
 
 namespace Moda.Infrastructure.Persistence.Configuration;
 
@@ -106,5 +108,49 @@ public class TeamMembershipConfig : IEntityTypeConfiguration<TeamMembership>
         builder.Property(o => o.Deleted);
         builder.Property(o => o.DeletedBy);
         builder.Property(o => o.IsDeleted);
+    }
+}
+
+public class TeamOperatingModelConfig : IEntityTypeConfiguration<TeamOperatingModel>
+{
+    public void Configure(EntityTypeBuilder<TeamOperatingModel> builder)
+    {
+        builder.ToTable("TeamOperatingModels", SchemaNames.Organization);
+
+        builder.HasKey(m => m.Id);
+
+        // Indexes
+        builder.HasIndex(m => m.TeamId);
+
+        builder.HasIndex(m => m.TeamId)
+            .IncludeProperties(m => new { m.Id, m.Methodology, m.SizingMethod })
+            .HasFilter("[End] IS NULL")
+            .HasDatabaseName("IX_TeamOperatingModels_TeamId_Current");
+
+        // Enums
+        builder.Property(m => m.Methodology)
+            .IsRequired()
+            .HasConversion<EnumConverter<Methodology>>()
+            .HasColumnType("varchar")
+            .HasMaxLength(32);
+
+        builder.Property(m => m.SizingMethod)
+            .IsRequired()
+            .HasConversion<EnumConverter<SizingMethod>>()
+            .HasColumnType("varchar")
+            .HasMaxLength(32);
+
+        // Value Object
+        builder.ComplexProperty(m => m.DateRange, options =>
+        {
+            options.Property(d => d.Start).HasColumnName("Start").IsRequired();
+            options.Property(d => d.End).HasColumnName("End");
+        });
+
+        // Relationships
+        builder.HasOne(m => m.Team)
+            .WithMany(t => t.OperatingModels)
+            .HasForeignKey(m => m.TeamId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
