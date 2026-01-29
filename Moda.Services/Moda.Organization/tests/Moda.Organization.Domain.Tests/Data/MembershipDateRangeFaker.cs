@@ -1,4 +1,4 @@
-using Bogus;
+﻿using Bogus;
 using Moda.Organization.Domain.Models;
 using NodaTime;
 
@@ -8,9 +8,11 @@ public sealed class MembershipDateRangeFaker : Faker<MembershipDateRange>
 {
     public MembershipDateRangeFaker()
     {
-        var start = LocalDate.FromDateTime(DateTime.UtcNow.AddMonths(-3));
-        
-        CustomInstantiator(f => new MembershipDateRange(start, null));
+        CustomInstantiator(f =>
+        {
+            var startDateTime = f.Date.Recent(days: 180); // Within last 180 days
+            return new MembershipDateRange(LocalDate.FromDateTime(startDateTime), null);
+        });
     }
 }
 

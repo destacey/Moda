@@ -3,6 +3,7 @@ using Moda.Common.Domain.Enums.Organization;
 using Moda.Common.Domain.Models.Organizations;
 using Moda.Common.Domain.Interfaces.Organization;
 using Moda.Common.Domain.Events.Organization;
+using Moda.Organization.Domain.Enums;
 using NodaTime;
 
 namespace Moda.Organization.Domain.Models;
@@ -14,6 +15,8 @@ namespace Moda.Organization.Domain.Models;
 /// <seealso cref="Moda.Common.Domain.Interfaces.Organization.IActivatable{NodaTime.Instant, Moda.Organization.Domain.Models.TeamDeactivatableArgs}" />"/>
 public sealed class Team : BaseTeam, IActivatable<Instant, TeamDeactivatableArgs>, IHasTeamIdAndCode
 {
+    private readonly List<TeamOperatingModel> _operatingModels = [];
+
     private Team() { }
 
     private Team(string name, TeamCode code, string? description, LocalDate activeDate)
@@ -24,6 +27,9 @@ public sealed class Team : BaseTeam, IActivatable<Instant, TeamDeactivatableArgs
         Type = TeamType.Team;
         ActiveDate = activeDate;
     }
+
+    /// <summary>Gets the operating models for this team.</summary>
+    public IReadOnlyCollection<TeamOperatingModel> OperatingModels => _operatingModels.AsReadOnly();
 
     /// <summary>
     /// The process for activating an organization.
@@ -103,6 +109,47 @@ public sealed class Team : BaseTeam, IActivatable<Instant, TeamDeactivatableArgs
         {
             return Result.Failure(ex.ToString());
         }
+    }
+
+    /// <summary>
+    /// Sets a new operating model for the team. If a current model exists, it will be closed
+    /// with an end date of one day before the new model's start date.
+    /// </summary>
+    /// <param name="startDate">The start date for the new operating model.</param>
+    /// <param name="methodology">The methodology the team uses.</param>
+    /// <param name="sizingMethod">The sizing method the team uses.</param>
+    /// <returns>A result containing the new operating model or an error.</returns>
+    public Result<TeamOperatingModel> SetOperatingModel(LocalDate startDate, Methodology methodology, SizingMethod sizingMethod)
+    {
+        var currentModel = _operatingModels.SingleOrDefault(m => m.IsCurrent);
+
+        var result = TeamOperatingModel.Create(Id, startDate, methodology, sizingMethod, currentModel);
+
+        if (result.IsSuccess)
+        {
+            _operatingModels.Add(result.Value);
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Removes an operating model from the team.
+    /// </summary>
+    /// <param name="operatingModelId">The operating model identifier to remove.</param>
+    /// <returns>A result indicating success or failure.</returns>
+    public Result RemoveOperatingModel(Guid operatingModelId)
+    {
+        var operatingModel = _operatingModels.SingleOrDefault(m => m.Id == operatingModelId);
+
+        if (operatingModel is null)
+        {
+            return Result.Failure($"Operating model with Id {operatingModelId} not found for this team.");
+        }
+
+        _operatingModels.Remove(operatingModel);
+
+        return Result.Success();
     }
 
     /// <summary>Creates the specified team.</summary>

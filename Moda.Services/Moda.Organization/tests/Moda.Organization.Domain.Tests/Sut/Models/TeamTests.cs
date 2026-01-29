@@ -665,4 +665,217 @@ public class TeamTests
 
 
     #endregion Memberships
+
+
+    #region OperatingModels
+
+    [Fact]
+    public void SetOperatingModel_WhenNoExistingModels_Success()
+    {
+        // Arrange
+        var team = _teamFaker.Generate();
+        var startDate = new LocalDate(2024, 1, 1);
+        var methodology = Moda.Organization.Domain.Enums.Methodology.Scrum;
+        var sizingMethod = Moda.Organization.Domain.Enums.SizingMethod.StoryPoints;
+
+        // Act
+        var result = team.SetOperatingModel(startDate, methodology, sizingMethod);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        team.OperatingModels.Should().HaveCount(1);
+        
+        var model = team.OperatingModels.First();
+        model.TeamId.Should().Be(team.Id);
+        model.DateRange.Start.Should().Be(startDate);
+        model.DateRange.End.Should().BeNull();
+        model.Methodology.Should().Be(methodology);
+        model.SizingMethod.Should().Be(sizingMethod);
+        model.IsCurrent.Should().BeTrue();
+    }
+
+    [Fact]
+    public void SetOperatingModel_WhenCurrentModelExists_ClosesCurrentAndCreatesNew()
+    {
+        // Arrange
+        var team = _teamFaker.Generate();
+        var firstStartDate = new LocalDate(2023, 1, 1);
+        var secondStartDate = new LocalDate(2024, 1, 1);
+        var methodology1 = Moda.Organization.Domain.Enums.Methodology.Scrum;
+        var methodology2 = Moda.Organization.Domain.Enums.Methodology.Kanban;
+        var sizingMethod1 = Moda.Organization.Domain.Enums.SizingMethod.StoryPoints;
+        var sizingMethod2 = Moda.Organization.Domain.Enums.SizingMethod.Count;
+
+        // Create first operating model
+        var result1 = team.SetOperatingModel(firstStartDate, methodology1, sizingMethod1);
+
+        // Act - Create second operating model
+        var result2 = team.SetOperatingModel(secondStartDate, methodology2, sizingMethod2);
+
+        // Assert
+        result1.IsSuccess.Should().BeTrue();
+        result2.IsSuccess.Should().BeTrue();
+        team.OperatingModels.Should().HaveCount(2);
+
+        // First model should be closed
+        var firstModel = team.OperatingModels.First();
+        firstModel.IsCurrent.Should().BeFalse();
+        firstModel.DateRange.Start.Should().Be(firstStartDate);
+        firstModel.DateRange.End.Should().Be(new LocalDate(2023, 12, 31));
+        firstModel.Methodology.Should().Be(methodology1);
+        firstModel.SizingMethod.Should().Be(sizingMethod1);
+
+        // Second model should be current
+        var secondModel = team.OperatingModels.Last();
+        secondModel.IsCurrent.Should().BeTrue();
+        secondModel.DateRange.Start.Should().Be(secondStartDate);
+        secondModel.DateRange.End.Should().BeNull();
+        secondModel.Methodology.Should().Be(methodology2);
+        secondModel.SizingMethod.Should().Be(sizingMethod2);
+    }
+
+    [Fact]
+    public void SetOperatingModel_WithStartDateBeforeCurrentStart_ReturnsFailure()
+    {
+        // Arrange
+        var team = _teamFaker.Generate();
+        var firstStartDate = new LocalDate(2024, 1, 1);
+        var secondStartDate = new LocalDate(2023, 12, 31); // Before first
+        var methodology = Moda.Organization.Domain.Enums.Methodology.Scrum;
+        var sizingMethod = Moda.Organization.Domain.Enums.SizingMethod.StoryPoints;
+
+        // Create first operating model
+        team.SetOperatingModel(firstStartDate, methodology, sizingMethod);
+
+        // Act - Try to create second operating model with earlier start date
+        var result = team.SetOperatingModel(secondStartDate, methodology, sizingMethod);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("New operating model start date must be after the current model's start date.");
+        team.OperatingModels.Should().HaveCount(1); // Only the first model should exist
+    }
+
+    [Fact]
+    public void SetOperatingModel_WithMultipleModelsOverTime_Success()
+    {
+        // Arrange
+        var team = _teamFaker.Generate();
+        var date1 = new LocalDate(2022, 1, 1);
+        var date2 = new LocalDate(2023, 1, 1);
+        var date3 = new LocalDate(2024, 1, 1);
+
+        // Act - Create three operating models over time
+        var result1 = team.SetOperatingModel(date1, Moda.Organization.Domain.Enums.Methodology.Scrum, Moda.Organization.Domain.Enums.SizingMethod.StoryPoints);
+        var result2 = team.SetOperatingModel(date2, Moda.Organization.Domain.Enums.Methodology.Kanban, Moda.Organization.Domain.Enums.SizingMethod.Count);
+        var result3 = team.SetOperatingModel(date3, Moda.Organization.Domain.Enums.Methodology.Scrum, Moda.Organization.Domain.Enums.SizingMethod.StoryPoints);
+
+        // Assert
+        result1.IsSuccess.Should().BeTrue();
+        result2.IsSuccess.Should().BeTrue();
+        result3.IsSuccess.Should().BeTrue();
+        team.OperatingModels.Should().HaveCount(3);
+
+        // All but the last should be closed
+        var models = team.OperatingModels.OrderBy(m => m.DateRange.Start).ToList();
+        
+        models[0].IsCurrent.Should().BeFalse();
+        models[0].DateRange.Start.Should().Be(date1);
+        models[0].DateRange.End.Should().Be(new LocalDate(2022, 12, 31));
+
+        models[1].IsCurrent.Should().BeFalse();
+        models[1].DateRange.Start.Should().Be(date2);
+        models[1].DateRange.End.Should().Be(new LocalDate(2023, 12, 31));
+
+        models[2].IsCurrent.Should().BeTrue();
+        models[2].DateRange.Start.Should().Be(date3);
+        models[2].DateRange.End.Should().BeNull();
+    }
+
+    [Fact]
+    public void RemoveOperatingModel_WhenModelExists_Success()
+    {
+        // Arrange
+        var team = _teamFaker.Generate();
+        var startDate = new LocalDate(2024, 1, 1);
+        var methodology = Moda.Organization.Domain.Enums.Methodology.Scrum;
+        var sizingMethod = Moda.Organization.Domain.Enums.SizingMethod.StoryPoints;
+
+        var createResult = team.SetOperatingModel(startDate, methodology, sizingMethod);
+        
+        // Set a unique ID for the model (simulating what EF Core would do)
+        var modelId = Guid.NewGuid();
+        createResult.Value.SetPrivate(m => m.Id, modelId);
+
+        // Act
+        var result = team.RemoveOperatingModel(modelId);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        team.OperatingModels.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void RemoveOperatingModel_WhenModelDoesNotExist_ReturnsFailure()
+    {
+        // Arrange
+        var team = _teamFaker.Generate();
+        var nonExistentId = Guid.NewGuid();
+
+        // Act
+        var result = team.RemoveOperatingModel(nonExistentId);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be($"Operating model with Id {nonExistentId} not found for this team.");
+    }
+
+    [Fact]
+    public void RemoveOperatingModel_WhenMultipleModelsExist_RemovesOnlySpecified()
+    {
+        // Arrange
+        var team = _teamFaker.Generate();
+        var date1 = new LocalDate(2023, 1, 1);
+        var date2 = new LocalDate(2024, 1, 1);
+
+        var result1 = team.SetOperatingModel(date1, Moda.Organization.Domain.Enums.Methodology.Scrum, Moda.Organization.Domain.Enums.SizingMethod.StoryPoints);
+        var result2 = team.SetOperatingModel(date2, Moda.Organization.Domain.Enums.Methodology.Kanban, Moda.Organization.Domain.Enums.SizingMethod.Count);
+
+        // Set unique IDs for the models (simulating what EF Core would do)
+        var model1Id = Guid.NewGuid();
+        var model2Id = Guid.NewGuid();
+        result1.Value.SetPrivate(m => m.Id, model1Id);
+        result2.Value.SetPrivate(m => m.Id, model2Id);
+
+        // Act - Remove the first model
+        var removeResult = team.RemoveOperatingModel(model1Id);
+
+        // Assert
+        removeResult.IsSuccess.Should().BeTrue();
+        team.OperatingModels.Should().HaveCount(1);
+        team.OperatingModels.First().Id.Should().Be(model2Id);
+    }
+
+    [Fact]
+    public void OperatingModels_InitiallyEmpty()
+    {
+        // Arrange & Act
+        var team = _teamFaker.Generate();
+
+        // Assert
+        team.OperatingModels.Should().NotBeNull();
+        team.OperatingModels.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void OperatingModels_IsReadOnly()
+    {
+        // Arrange
+        var team = _teamFaker.Generate();
+
+        // Act & Assert
+        team.OperatingModels.Should().BeAssignableTo<IReadOnlyCollection<TeamOperatingModel>>();
+    }
+
+    #endregion OperatingModels
 }
