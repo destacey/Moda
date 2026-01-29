@@ -1,11 +1,8 @@
 ﻿using Moda.Common.Domain.Enums.Work;
-using Moda.Common.Domain.Extensions.Organizations;
-using Moda.Common.Domain.Models.Organizations;
 using Moda.Organization.Application.Models;
 using Moda.Organization.Application.Teams.Commands;
 using Moda.Organization.Application.Teams.Dtos;
 using Moda.Organization.Application.Teams.Queries;
-using Moda.Organization.Domain.Models;
 using Moda.Planning.Application.Iterations.Dtos;
 using Moda.Planning.Application.Iterations.Queries;
 using Moda.Planning.Application.Risks.Dtos;
@@ -17,7 +14,6 @@ using Moda.Web.Api.Models.Planning.Risks;
 using Moda.Work.Application.WorkItemDependencies.Dtos;
 using Moda.Work.Application.WorkItems.Dtos;
 using Moda.Work.Application.WorkItems.Queries;
-using NodaTime;
 
 namespace Moda.Web.Api.Controllers.Organizations;
 
@@ -329,6 +325,111 @@ public class TeamsController(ILogger<TeamsController> logger, ISender sender) : 
     }
 
     #endregion Risks
+
+    #region Operating Models
+
+    [HttpGet("{id}/operating-models")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Teams)]
+    [OpenApiOperation("Get the current operating model for a team, or the model effective on a specific date.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<TeamOperatingModelDto>> GetOperatingModel(Guid id, [FromQuery] LocalDate? asOfDate, CancellationToken cancellationToken)
+    {
+        var teamExists = await _sender.Send(new TeamExistsQuery(id), cancellationToken);
+        if (!teamExists)
+            return NotFound();
+
+        var operatingModel = await _sender.Send(new GetTeamOperatingModelQuery(id, asOfDate), cancellationToken);
+
+        return operatingModel is not null
+            ? Ok(operatingModel)
+            : NotFound();
+    }
+
+    [HttpGet("{id}/operating-models/history")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Teams)]
+    [OpenApiOperation("Get the operating model history for a team.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<IReadOnlyList<TeamOperatingModelDto>>> GetOperatingModelHistory(Guid id, CancellationToken cancellationToken)
+    {
+        var teamExists = await _sender.Send(new TeamExistsQuery(id), cancellationToken);
+        if (!teamExists)
+            return NotFound();
+
+        var history = await _sender.Send(new GetTeamOperatingModelHistoryQuery(id), cancellationToken);
+
+        return Ok(history);
+    }
+
+    [HttpGet("{id}/has-ever-been-scrum")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Teams)]
+    [OpenApiOperation("Check if a team has ever used the Scrum methodology.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<bool>> HasEverBeenScrum(Guid id, CancellationToken cancellationToken)
+    {
+        var teamExists = await _sender.Send(new TeamExistsQuery(id), cancellationToken);
+        if (!teamExists)
+            return NotFound();
+
+        var hasBeenScrum = await _sender.Send(new TeamHasEverBeenScrumQuery(id), cancellationToken);
+
+        return Ok(hasBeenScrum);
+    }
+
+    [HttpPost("{id}/operating-models")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Teams)]
+    [OpenApiOperation("Set a new operating model for a team.", "")]
+    [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> SetOperatingModel(Guid id, [FromBody] SetTeamOperatingModelRequest request, CancellationToken cancellationToken)
+    {
+        var teamExists = await _sender.Send(new TeamExistsQuery(id), cancellationToken);
+        if (!teamExists)
+            return NotFound();
+
+        var result = await _sender.Send(request.ToSetTeamOperatingModelCommand(id), cancellationToken);
+
+        return result.IsSuccess
+            ? CreatedAtAction(nameof(GetOperatingModel), new { id }, result.Value)
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpPut("{id}/operating-models/{operatingModelId}")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Teams)]
+    [OpenApiOperation("Update an existing operating model for a team.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> UpdateOperatingModel(Guid id, Guid operatingModelId, [FromBody] UpdateTeamOperatingModelRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(request.ToUpdateTeamOperatingModelCommand(id, operatingModelId), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpDelete("{id}/operating-models/{operatingModelId}")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Teams)]
+    [OpenApiOperation("Delete an operating model from a team.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> DeleteOperatingModel(Guid id, Guid operatingModelId, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(new DeleteTeamOperatingModelCommand(id, operatingModelId), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    #endregion Operating Models
 
     [HttpGet("{id}/sprints")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Iterations)]
