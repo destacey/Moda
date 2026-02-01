@@ -16,11 +16,6 @@ import RisksGrid, {
   RisksGridProps,
 } from '@/src/components/common/planning/risks-grid'
 import { useDocumentTitle } from '@/src/hooks/use-document-title'
-import {
-  CreateTeamMembershipForm,
-  EditTeamForm,
-  TeamMembershipsGrid,
-} from '../../_components'
 import useAuth from '@/src/components/contexts/auth'
 import {
   useGetTeamMembershipsQuery,
@@ -42,6 +37,16 @@ import DeactivateTeamForm from '../../_components/deactivate-team-form'
 import TeamSprints from '../_components/team-sprints'
 import { CycleTimeReport } from '@/src/components/common/work/cycle-time-report'
 import TeamBacklog from '../_components/team-backlog'
+import {
+  SetTeamOperatingModelForm,
+  TeamOperatingModelsGrid,
+  EditTeamOperatingModelForm,
+} from '../_components'
+import {
+  CreateTeamMembershipForm,
+  EditTeamForm,
+  TeamMembershipsGrid,
+} from '../../_components'
 
 enum TeamTabs {
   Details = 'details',
@@ -50,6 +55,7 @@ enum TeamTabs {
   DependencyManagement = 'dependency-management',
   RiskManagement = 'risk-management',
   TeamMemberships = 'team-memberships',
+  OperatingModelHistory = 'operating-model-history',
   CycleTimeReport = 'cycle-time-report',
 }
 
@@ -88,6 +94,10 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const [openCreateTeamMembershipForm, setOpenCreateTeamMembershipForm] =
     useState<boolean>(false)
   const [openDeactivateTeamForm, setOpenDeactivateTeamForm] =
+    useState<boolean>(false)
+  const [openSetOperatingModelForm, setOpenSetOperatingModelForm] =
+    useState<boolean>(false)
+  const [openUpdateOperatingModelForm, setOpenUpdateOperatingModelForm] =
     useState<boolean>(false)
   const [teamMembershipsQueryEnabled, setTeamMembershipsQueryEnabled] =
     useState<boolean>(false)
@@ -153,6 +163,25 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     setActiveTab(TeamTabs.CycleTimeReport)
   }, [dynamicTabs])
 
+  const openOperatingModelHistory = useCallback(() => {
+    const tabExists = dynamicTabs.some(
+      (tab) => tab.key === TeamTabs.OperatingModelHistory,
+    )
+
+    if (!tabExists) {
+      setDynamicTabs((prevTabs) => [
+        ...prevTabs,
+        {
+          key: TeamTabs.OperatingModelHistory,
+          tab: 'Operating Model History',
+          closable: true,
+        },
+      ])
+    }
+
+    setActiveTab(TeamTabs.OperatingModelHistory)
+  }, [dynamicTabs])
+
   const actionsMenuItems: MenuProps['items'] = useMemo(() => {
     const items: ItemType[] = []
 
@@ -180,6 +209,37 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       })
     }
 
+    if (canUpdateTeam && team?.isActive === true) {
+      items.push({
+        type: 'divider',
+        key: 'divider-operating-model',
+      })
+
+      const operatingModelChildren: ItemType[] = []
+
+      if (team?.operatingModel) {
+        operatingModelChildren.push({
+          key: 'update-operating-model',
+          label: 'Update Operating Model',
+          title: 'Updates the current operating model for the team',
+          onClick: () => setOpenUpdateOperatingModelForm(true),
+        })
+      }
+
+      operatingModelChildren.push({
+        key: 'set-operating-model',
+        label: 'Set Operating Model',
+        title: 'Sets a new operating model for the team',
+        onClick: () => setOpenSetOperatingModelForm(true),
+      })
+
+      items.push({
+        type: 'group',
+        label: 'Operating Model',
+        children: operatingModelChildren,
+      })
+    }
+
     if (items.length > 0) {
       items.push({
         type: 'divider',
@@ -195,6 +255,11 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
           label: 'Cycle Time Report',
           onClick: openCycleTimeReport,
         },
+        {
+          key: 'operating-model-history',
+          label: 'Operating Model History',
+          onClick: openOperatingModelHistory,
+        },
       ],
     })
 
@@ -204,7 +269,9 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     canUpdateTeam,
     dispatch,
     team?.isActive,
+    team?.operatingModel,
     openCycleTimeReport,
+    openOperatingModelHistory,
   ])
   const renderTabContent = useCallback(() => {
     switch (activeTab) {
@@ -234,6 +301,13 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
           refetch: teamMembershipsQuery.refetch,
           teamType: 'Team',
         })
+      case TeamTabs.OperatingModelHistory:
+        return (
+          <TeamOperatingModelsGrid
+            teamId={team?.id}
+            canUpdate={canUpdateTeam}
+          />
+        )
       case TeamTabs.CycleTimeReport:
         return <CycleTimeReport teamCode={team?.code} />
       default:
@@ -245,6 +319,7 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     risksQuery,
     teamMembershipsQuery,
     onIncludeClosedRisksChanged,
+    canUpdateTeam,
   ])
 
   useEffect(() => {
@@ -323,6 +398,20 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     }
   }
 
+  const onSetOperatingModelFormClosed = (wasSaved: boolean) => {
+    setOpenSetOperatingModelForm(false)
+    if (wasSaved) {
+      dispatch(retrieveTeam({ key: teamKey, type: 'Team' }))
+    }
+  }
+
+  const onUpdateOperatingModelFormClosed = (wasSaved: boolean) => {
+    setOpenUpdateOperatingModelForm(false)
+    if (wasSaved) {
+      dispatch(retrieveTeam({ key: teamKey, type: 'Team' }))
+    }
+  }
+
   if (teamNotFound) {
     return notFound()
   }
@@ -359,6 +448,23 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
           showForm={openDeactivateTeamForm}
           onFormComplete={() => onDeactivateTeamFormClosed(true)}
           onFormCancel={() => onDeactivateTeamFormClosed(false)}
+        />
+      )}
+      {openSetOperatingModelForm && team && (
+        <SetTeamOperatingModelForm
+          showForm={openSetOperatingModelForm}
+          teamId={team.id}
+          onFormComplete={() => onSetOperatingModelFormClosed(true)}
+          onFormCancel={() => onSetOperatingModelFormClosed(false)}
+        />
+      )}
+      {openUpdateOperatingModelForm && team?.operatingModel && (
+        <EditTeamOperatingModelForm
+          showForm={openUpdateOperatingModelForm}
+          teamId={team.id}
+          operatingModelId={team.operatingModel.id}
+          onFormComplete={() => onUpdateOperatingModelFormClosed(true)}
+          onFormCancel={() => onUpdateOperatingModelFormClosed(false)}
         />
       )}
     </>
