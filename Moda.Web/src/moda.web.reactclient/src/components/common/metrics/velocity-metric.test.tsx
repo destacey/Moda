@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import VelocityMetric from './velocity-metric'
+import { SizingMethod } from '../../../services/moda-api'
 
 // Mock useTheme
 jest.mock('../../contexts/theme', () => ({
@@ -37,6 +38,36 @@ describe('VelocityMetric', () => {
     // Here we trust MetricCard handles it, so we just check if it renders.
     render(<VelocityMetric completed={5} total={10} tooltip={customTooltip} />)
     expect(screen.getByText('Velocity')).toBeInTheDocument()
+  })
+
+  it('renders with SizingMethod.StoryPoints tooltip', () => {
+    render(
+      <VelocityMetric
+        completed={5}
+        total={10}
+        tooltip={SizingMethod.StoryPoints}
+      />,
+    )
+    expect(screen.getByText('Velocity')).toBeInTheDocument()
+    expect(screen.getByText('5')).toBeInTheDocument()
+    expect(screen.getByText('50.0%')).toBeInTheDocument()
+  })
+
+  it('renders with SizingMethod.Count tooltip', () => {
+    render(
+      <VelocityMetric completed={3} total={6} tooltip={SizingMethod.Count} />,
+    )
+    expect(screen.getByText('Velocity')).toBeInTheDocument()
+    expect(screen.getByText('3')).toBeInTheDocument()
+    expect(screen.getByText('50.0%')).toBeInTheDocument()
+  })
+
+  it('defaults to StoryPoints tooltip when not provided', () => {
+    // Default tooltip is SizingMethod.StoryPoints
+    render(<VelocityMetric completed={8} total={16} />)
+    expect(screen.getByText('Velocity')).toBeInTheDocument()
+    expect(screen.getByText('8')).toBeInTheDocument()
+    expect(screen.getByText('50.0%')).toBeInTheDocument()
   })
 })
 
