@@ -13,17 +13,15 @@ public class TeamOperatingModelTests
     public void Create_WithValidData_Success()
     {
         // ARRANGE
-        var teamId = Guid.NewGuid();
         var startDate = new LocalDate(2024, 1, 1);
         var methodology = Methodology.Scrum;
         var sizingMethod = SizingMethod.StoryPoints;
 
         // ACT
-        var result = TeamOperatingModel.Create(teamId, startDate, methodology, sizingMethod);
+        var result = TeamOperatingModel.Create(startDate, methodology, sizingMethod);
 
         // ASSERT
         result.IsSuccess.Should().BeTrue();
-        result.Value.TeamId.Should().Be(teamId);
         result.Value.DateRange.Start.Should().Be(startDate);
         result.Value.DateRange.End.Should().BeNull();
         result.Value.Methodology.Should().Be(methodology);
@@ -32,37 +30,19 @@ public class TeamOperatingModelTests
     }
 
     [Fact]
-    public void Create_WithDefaultTeamId_ThrowsException()
-    {
-        // ARRANGE
-        var teamId = Guid.Empty;
-        var startDate = new LocalDate(2024, 1, 1);
-        var methodology = Methodology.Scrum;
-        var sizingMethod = SizingMethod.StoryPoints;
-
-        // ACT & ASSERT
-        var exception = Assert.Throws<ArgumentException>(() =>
-            TeamOperatingModel.Create(teamId, startDate, methodology, sizingMethod));
-
-        exception.Message.Should().Contain("teamId");
-    }
-
-    [Fact]
     public void Create_WithCurrentModel_ClosesCurrentModelAndCreatesNew()
     {
         // ARRANGE
-        var teamId = Guid.NewGuid();
         var currentStartDate = new LocalDate(2023, 1, 1);
         var newStartDate = new LocalDate(2024, 1, 1);
         var methodology = Methodology.Kanban;
         var sizingMethod = SizingMethod.Count;
 
         var currentModel = new TeamOperatingModelFaker(currentStartDate)
-            .WithTeamId(teamId)
             .Generate();
 
         // ACT
-        var result = TeamOperatingModel.Create(teamId, newStartDate, methodology, sizingMethod, currentModel);
+        var result = TeamOperatingModel.Create(newStartDate, methodology, sizingMethod, currentModel);
 
         // ASSERT
         result.IsSuccess.Should().BeTrue();
@@ -79,18 +59,16 @@ public class TeamOperatingModelTests
     public void Create_WithNewStartDateBeforeCurrentStart_ReturnsFailure()
     {
         // ARRANGE
-        var teamId = Guid.NewGuid();
         var currentStartDate = new LocalDate(2024, 1, 1);
         var newStartDate = new LocalDate(2023, 12, 31);
         var methodology = Methodology.Scrum;
         var sizingMethod = SizingMethod.StoryPoints;
 
         var currentModel = new TeamOperatingModelFaker(currentStartDate)
-            .WithTeamId(teamId)
             .Generate();
 
         // ACT
-        var result = TeamOperatingModel.Create(teamId, newStartDate, methodology, sizingMethod, currentModel);
+        var result = TeamOperatingModel.Create(newStartDate, methodology, sizingMethod, currentModel);
 
         // ASSERT
         result.IsFailure.Should().BeTrue();
@@ -101,18 +79,16 @@ public class TeamOperatingModelTests
     public void Create_WithNewStartDateEqualToCurrentStart_ReturnsFailure()
     {
         // ARRANGE
-        var teamId = Guid.NewGuid();
         var currentStartDate = new LocalDate(2024, 1, 1);
         var newStartDate = new LocalDate(2024, 1, 1);
         var methodology = Methodology.Scrum;
         var sizingMethod = SizingMethod.StoryPoints;
 
         var currentModel = new TeamOperatingModelFaker(currentStartDate)
-            .WithTeamId(teamId)
             .Generate();
 
         // ACT
-        var result = TeamOperatingModel.Create(teamId, newStartDate, methodology, sizingMethod, currentModel);
+        var result = TeamOperatingModel.Create(newStartDate, methodology, sizingMethod, currentModel);
 
         // ASSERT
         result.IsFailure.Should().BeTrue();
@@ -123,7 +99,6 @@ public class TeamOperatingModelTests
     public void Create_WithClosedCurrentModel_DoesNotCloseCurrent()
     {
         // ARRANGE
-        var teamId = Guid.NewGuid();
         var currentStartDate = new LocalDate(2023, 1, 1);
         var currentEndDate = new LocalDate(2023, 12, 31);
         var newStartDate = new LocalDate(2024, 1, 1);
@@ -131,16 +106,15 @@ public class TeamOperatingModelTests
         var sizingMethod = SizingMethod.StoryPoints;
 
         var currentModel = new TeamOperatingModelFaker()
-            .WithTeamId(teamId)
             .WithDateRange(currentStartDate, currentEndDate)
             .Generate();
 
         // ACT
-        var result = TeamOperatingModel.Create(teamId, newStartDate, methodology, sizingMethod, currentModel);
+        var result = TeamOperatingModel.Create(newStartDate, methodology, sizingMethod, currentModel);
 
         // ASSERT
         result.IsSuccess.Should().BeTrue();
-        
+
         // Closed model should remain unchanged
         currentModel.DateRange.End.Should().Be(currentEndDate);
     }
@@ -176,7 +150,7 @@ public class TeamOperatingModelTests
         // ARRANGE
         var methodology = Methodology.Scrum;
         var sizingMethod = SizingMethod.StoryPoints;
-        
+
         var model = new TeamOperatingModelFaker()
             .WithMethodology(methodology)
             .WithSizingMethod(sizingMethod)
@@ -201,7 +175,7 @@ public class TeamOperatingModelTests
         // ARRANGE
         var startDate = new LocalDate(2024, 1, 1);
         var endDate = new LocalDate(2024, 12, 31);
-        
+
         var model = new TeamOperatingModelFaker(startDate)
             .Generate();
 
@@ -219,7 +193,7 @@ public class TeamOperatingModelTests
         // ARRANGE
         var startDate = new LocalDate(2024, 1, 1);
         var endDate = new LocalDate(2024, 1, 1);
-        
+
         var model = new TeamOperatingModelFaker(startDate)
             .Generate();
 
@@ -267,40 +241,34 @@ public class TeamOperatingModelTests
     public void Scenario_CreateMultipleOperatingModelsOverTime_Success()
     {
         // ARRANGE
-        var teamId = Guid.NewGuid();
-        
-        // Create initial operating model
         var model1StartDate = new LocalDate(2022, 1, 1);
         var result1 = TeamOperatingModel.Create(
-            teamId, 
-            model1StartDate, 
-            Methodology.Scrum, 
+            model1StartDate,
+            Methodology.Scrum,
             SizingMethod.StoryPoints);
-        
+
         result1.IsSuccess.Should().BeTrue();
         var model1 = result1.Value;
 
         // Create second operating model (should close first)
         var model2StartDate = new LocalDate(2023, 1, 1);
         var result2 = TeamOperatingModel.Create(
-            teamId, 
-            model2StartDate, 
-            Methodology.Kanban, 
-            SizingMethod.Count, 
+            model2StartDate,
+            Methodology.Kanban,
+            SizingMethod.Count,
             model1);
-        
+
         result2.IsSuccess.Should().BeTrue();
         var model2 = result2.Value;
 
         // Create third operating model (should close second)
         var model3StartDate = new LocalDate(2024, 1, 1);
         var result3 = TeamOperatingModel.Create(
-            teamId, 
-            model3StartDate, 
-            Methodology.Scrum, 
-            SizingMethod.StoryPoints, 
+            model3StartDate,
+            Methodology.Scrum,
+            SizingMethod.StoryPoints,
             model2);
-        
+
         result3.IsSuccess.Should().BeTrue();
         var model3 = result3.Value;
 
@@ -325,15 +293,13 @@ public class TeamOperatingModelTests
     public void Scenario_UpdateCurrentOperatingModel_Success()
     {
         // ARRANGE
-        var teamId = Guid.NewGuid();
         var startDate = new LocalDate(2024, 1, 1);
-        
+
         var result = TeamOperatingModel.Create(
-            teamId, 
-            startDate, 
-            Methodology.Scrum, 
+            startDate,
+            Methodology.Scrum,
             SizingMethod.StoryPoints);
-        
+
         result.IsSuccess.Should().BeTrue();
         var model = result.Value;
 

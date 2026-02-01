@@ -12,7 +12,6 @@ public class TeamOperatingModelFaker : PrivateConstructorFaker<TeamOperatingMode
         startDate ??= LocalDate.FromDateTime(FakerHub.Date.Past(1));
 
         RuleFor(x => x.Id, f => f.Random.Guid());
-        RuleFor(x => x.TeamId, f => f.Random.Guid());
         RuleFor(x => x.DateRange, f => new OperatingModelDateRange(startDate.Value, null));
         RuleFor(x => x.Methodology, f => f.PickRandom<Methodology>());
         RuleFor(x => x.SizingMethod, f => f.PickRandom<SizingMethod>());
@@ -24,12 +23,6 @@ public static class TeamOperatingModelFakerExtensions
     public static TeamOperatingModelFaker WithId(this TeamOperatingModelFaker faker, Guid id)
     {
         faker.RuleFor(x => x.Id, id);
-        return faker;
-    }
-
-    public static TeamOperatingModelFaker WithTeamId(this TeamOperatingModelFaker faker, Guid teamId)
-    {
-        faker.RuleFor(x => x.TeamId, teamId);
         return faker;
     }
 
@@ -60,17 +53,17 @@ public static class TeamOperatingModelFakerExtensions
     public static TeamOperatingModelFaker AsCurrent(this TeamOperatingModelFaker faker)
     {
         faker.RuleFor(x => x.DateRange, f => new OperatingModelDateRange(
-            LocalDate.FromDateTime(f.Date.Recent()).PlusMonths(-3), 
+            LocalDate.FromDateTime(f.Date.Recent()).PlusMonths(-3),
             null));
         return faker;
     }
 
     public static TeamOperatingModelFaker AsClosed(this TeamOperatingModelFaker faker, LocalDate? endDate = null)
-    { 
+    {
         var actualEndDate = endDate ?? new LocalDate(2025,5,20);
 
         faker.RuleFor(x => x.DateRange, f => new OperatingModelDateRange(
-            actualEndDate.PlusDays(-90), 
+            actualEndDate.PlusDays(-90),
             actualEndDate));
         return faker;
     }

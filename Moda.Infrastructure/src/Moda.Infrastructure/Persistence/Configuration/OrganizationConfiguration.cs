@@ -119,10 +119,13 @@ public class TeamOperatingModelConfig : IEntityTypeConfiguration<TeamOperatingMo
 
         builder.HasKey(m => m.Id);
 
-        // Indexes
-        builder.HasIndex(m => m.TeamId);
+        // Shadow property for the FK (not exposed on the domain entity)
+        builder.Property<Guid>("TeamId");
 
-        builder.HasIndex(m => m.TeamId)
+        // Indexes using shadow property
+        builder.HasIndex("TeamId");
+
+        builder.HasIndex("TeamId")
             .IncludeProperties(m => new { m.Id, m.Methodology, m.SizingMethod })
             .HasFilter("[End] IS NULL")
             .HasDatabaseName("IX_TeamOperatingModels_TeamId_Current");
@@ -147,10 +150,10 @@ public class TeamOperatingModelConfig : IEntityTypeConfiguration<TeamOperatingMo
             options.Property(d => d.End).HasColumnName("End");
         });
 
-        // Relationships
-        builder.HasOne(m => m.Team)
+        // Relationships using shadow property FK (no navigation property on TeamOperatingModel)
+        builder.HasOne<Team>()
             .WithMany(t => t.OperatingModels)
-            .HasForeignKey(m => m.TeamId)
+            .HasForeignKey("TeamId")
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

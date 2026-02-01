@@ -30,7 +30,7 @@ internal sealed class DeleteTeamOperatingModelCommandHandler(
         try
         {
             var team = await _organizationDbContext.Teams
-                .Include(t => t.OperatingModels.Where(m => m.Id == request.OperatingModelId))
+                .Include(t => t.OperatingModels)
                 .FirstOrDefaultAsync(t => t.Id == request.TeamId, cancellationToken);
             if (team is null)
             {

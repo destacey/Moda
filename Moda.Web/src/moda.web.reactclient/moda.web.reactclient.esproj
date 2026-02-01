@@ -12,4 +12,10 @@
   <ItemGroup>
     <None Include=".docker\Dockerfile" />
   </ItemGroup>
+  <ItemGroup>
+    <TypeScriptConfiguration Remove=".docker\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove=".docker\**" />
+  </ItemGroup>
 </Project>

@@ -41,8 +41,18 @@ internal sealed class UpdateTeamOperatingModelCommandHandler(
     {
         try
         {
-            var operatingModel = await _organizationDbContext.TeamOperatingModels
-                .FirstOrDefaultAsync(m => m.Id == request.OperatingModelId && m.TeamId == request.TeamId, cancellationToken);
+            // Load through Team aggregate
+            var team = await _organizationDbContext.Teams
+                .Include(t => t.OperatingModels)
+                .FirstOrDefaultAsync(t => t.Id == request.TeamId, cancellationToken);
+
+            if (team is null)
+            {
+                _logger.LogInformation("Team {TeamId} not found", request.TeamId);
+                return Result.Failure($"Team with Id {request.TeamId} not found.");
+            }
+
+            var operatingModel = team.OperatingModels.SingleOrDefault(m => m.Id == request.OperatingModelId);
             if (operatingModel is null)
             {
                 _logger.LogInformation("Operating model {OperatingModelId} for Team {TeamId} not found",

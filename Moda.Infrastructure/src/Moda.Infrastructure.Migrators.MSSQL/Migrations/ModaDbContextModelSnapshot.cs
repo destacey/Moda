@@ -4087,13 +4087,11 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
             modelBuilder.Entity("Moda.Organization.Domain.Models.TeamOperatingModel", b =>
                 {
-                    b.HasOne("Moda.Organization.Domain.Models.Team", "Team")
+                    b.HasOne("Moda.Organization.Domain.Models.Team", null)
                         .WithMany("OperatingModels")
                         .HasForeignKey("TeamId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Team");
                 });
 
             modelBuilder.Entity("Moda.Planning.Domain.Models.Iterations.Iteration", b =>

@@ -1,42 +1,37 @@
-using Mapster;
+﻿using Mapster;
 using NodaTime;
 
 namespace Moda.Organization.Application.Teams.Queries;
 
 /// <summary>
-/// Gets the operating model for a team. When AsOfDate is null, returns the current model.
-/// When AsOfDate is specified, returns the model that was effective on that date.
+/// Gets a specific operating model for a team. 
 /// Returns null if no operating model is defined for the team.
 /// </summary>
-public sealed record GetTeamOperatingModelQuery(Guid TeamId, LocalDate? AsOfDate = null)
-    : IQuery<TeamOperatingModelDto?>;
+public sealed record GetTeamOperatingModelQuery(Guid TeamId, Guid TeamOperatingModelId)
+    : IQuery<TeamOperatingModelDetailsDto?>;
 
-internal sealed class GetTeamOperatingModelQueryHandler(IOrganizationDbContext organizationDbContext)
-    : IQueryHandler<GetTeamOperatingModelQuery, TeamOperatingModelDto?>
+internal sealed class GetTeamOperatingModelQueryHandler(IOrganizationDbContext organizationDbContext, IDateTimeProvider dateTimeProvider)
+    : IQueryHandler<GetTeamOperatingModelQuery, TeamOperatingModelDetailsDto?>
 {
     private readonly IOrganizationDbContext _organizationDbContext = organizationDbContext;
+    private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
 
-    public async Task<TeamOperatingModelDto?> Handle(GetTeamOperatingModelQuery request, CancellationToken cancellationToken)
+    public async Task<TeamOperatingModelDetailsDto?> Handle(GetTeamOperatingModelQuery request, CancellationToken cancellationToken)
     {
-        var query = _organizationDbContext.TeamOperatingModels
-            .Where(m => m.TeamId == request.TeamId);
-
-        if (request.AsOfDate is null)
-        {
-            // Return current model (End is null)
-            query = query.Where(m => m.DateRange.End == null);
-        }
-        else
-        {
-            // Return model effective on the specified date
-            var asOfDate = request.AsOfDate.Value;
-            query = query.Where(m =>
-                m.DateRange.Start <= asOfDate &&
-                (m.DateRange.End == null || m.DateRange.End >= asOfDate));
-        }
-
-        return await query
-            .ProjectToType<TeamOperatingModelDto>()
+        var model = await _organizationDbContext.Teams
+            .AsNoTracking()
+            .Where(t => t.Id == request.TeamId)
+            .SelectMany(t => t.OperatingModels)
+            .Where(m => m.Id == request.TeamOperatingModelId)
             .FirstOrDefaultAsync(cancellationToken);
+
+        if (model is null)
+        {
+            return null;
+        }
+
+        var dto = model.Adapt<TeamOperatingModelDetailsDto>();
+        dto.TeamId = request.TeamId;
+        return dto;
     }
 }

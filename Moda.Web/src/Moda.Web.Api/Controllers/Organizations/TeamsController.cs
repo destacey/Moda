@@ -328,38 +328,56 @@ public class TeamsController(ILogger<TeamsController> logger, ISender sender) : 
 
     #region Operating Models
 
-    [HttpGet("{id}/operating-models")]
+    [HttpGet("{id}/operating-models/{operatingModelId}")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Teams)]
-    [OpenApiOperation("Get the current operating model for a team, or the model effective on a specific date.", "")]
+    [OpenApiOperation("Get a specific operating model for a team.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<TeamOperatingModelDto>> GetOperatingModel(Guid id, [FromQuery] LocalDate? asOfDate, CancellationToken cancellationToken)
+    public async Task<ActionResult<TeamOperatingModelDetailsDto>> GetOperatingModel(Guid id, Guid operatingModelId, CancellationToken cancellationToken)
     {
         var teamExists = await _sender.Send(new TeamExistsQuery(id), cancellationToken);
         if (!teamExists)
             return NotFound();
 
-        var operatingModel = await _sender.Send(new GetTeamOperatingModelQuery(id, asOfDate), cancellationToken);
+        var operatingModel = await _sender.Send(new GetTeamOperatingModelQuery(id, operatingModelId), cancellationToken);
 
         return operatingModel is not null
             ? Ok(operatingModel)
             : NotFound();
     }
 
-    [HttpGet("{id}/operating-models/history")]
+    [HttpGet("{id}/operating-models")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Teams)]
     [OpenApiOperation("Get the operating model history for a team.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<IReadOnlyList<TeamOperatingModelDto>>> GetOperatingModelHistory(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult<IReadOnlyList<TeamOperatingModelDetailsDto>>> GetOperatingModels(Guid id, CancellationToken cancellationToken)
     {
         var teamExists = await _sender.Send(new TeamExistsQuery(id), cancellationToken);
         if (!teamExists)
             return NotFound();
 
-        var history = await _sender.Send(new GetTeamOperatingModelHistoryQuery(id), cancellationToken);
+        var history = await _sender.Send(new GetTeamOperatingModelsQuery(id), cancellationToken);
 
         return Ok(history);
+    }
+
+    [HttpGet("{id}/operating-models/as-of")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Teams)]
+    [OpenApiOperation("Get the current operating model for a team, or the model effective on a specific date.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<TeamOperatingModelDetailsDto>> GetOperatingModelAsOf(Guid id, [FromQuery] LocalDate? asOfDate, CancellationToken cancellationToken)
+    {
+        var teamExists = await _sender.Send(new TeamExistsQuery(id), cancellationToken);
+        if (!teamExists)
+            return NotFound();
+
+        var operatingModel = await _sender.Send(new GetTeamOperatingModelAsOfQuery(id, asOfDate), cancellationToken);
+
+        return operatingModel is not null
+            ? Ok(operatingModel)
+            : NotFound();
     }
 
     [HttpGet("{id}/has-ever-been-scrum")]
@@ -394,7 +412,7 @@ public class TeamsController(ILogger<TeamsController> logger, ISender sender) : 
         var result = await _sender.Send(request.ToSetTeamOperatingModelCommand(id), cancellationToken);
 
         return result.IsSuccess
-            ? CreatedAtAction(nameof(GetOperatingModel), new { id }, result.Value)
+            ? CreatedAtAction(nameof(GetOperatingModel), new { id, operatingModelId = result.Value }, result.Value)
             : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 

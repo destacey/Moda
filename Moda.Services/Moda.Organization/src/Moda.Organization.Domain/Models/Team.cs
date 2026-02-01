@@ -123,7 +123,7 @@ public sealed class Team : BaseTeam, IActivatable<Instant, TeamDeactivatableArgs
     {
         var currentModel = _operatingModels.SingleOrDefault(m => m.IsCurrent);
 
-        var result = TeamOperatingModel.Create(Id, startDate, methodology, sizingMethod, currentModel);
+        var result = TeamOperatingModel.Create(startDate, methodology, sizingMethod, currentModel);
 
         if (result.IsSuccess)
         {
@@ -134,7 +134,9 @@ public sealed class Team : BaseTeam, IActivatable<Instant, TeamDeactivatableArgs
     }
 
     /// <summary>
-    /// Removes an operating model from the team.
+    /// Removes the current operating model from the team.
+    /// A team must always have at least one operating model, so the current model
+    /// can only be removed if there is at least one historical model to fall back to.
     /// </summary>
     /// <param name="operatingModelId">The operating model identifier to remove.</param>
     /// <returns>A result indicating success or failure.</returns>
@@ -147,25 +149,48 @@ public sealed class Team : BaseTeam, IActivatable<Instant, TeamDeactivatableArgs
             return Result.Failure($"Operating model with Id {operatingModelId} not found for this team.");
         }
 
+        if (!operatingModel.IsCurrent)
+        {
+            return Result.Failure("Only the current operating model can be removed. Historical operating models must be preserved to maintain data integrity.");
+        }
+
+        if (_operatingModels.Count == 1)
+        {
+            return Result.Failure("Cannot remove the last operating model. A team must always have at least one operating model.");
+        }
+
+        // Find the previous operating model (the one with the latest start date before the current one)
+        var previousModel = _operatingModels
+            .Where(m => m.Id != operatingModelId)
+            .OrderByDescending(m => m.DateRange.Start)
+            .First();
+
+        // Clear the end date to make it current again
+        previousModel.ClearEndDate();
+
         _operatingModels.Remove(operatingModel);
 
         return Result.Success();
     }
 
-    /// <summary>Creates the specified team.</summary>
+    /// <summary>Creates the specified team with an initial operating model.</summary>
     /// <param name="name">The name.</param>
     /// <param name="code">The code.</param>
     /// <param name="description">The description.</param>
-    /// <param name="activeDate">The active timestamp.</param>
+    /// <param name="activeDate">The active date.</param>
+    /// <param name="methodology">The initial methodology for the team's operating model.</param>
+    /// <param name="sizingMethod">The initial sizing method for the team's operating model.</param>
     /// <param name="timestamp">The timestamp.</param>
-    /// <returns></returns>
-    public static Team Create(string name, TeamCode code, string? description, LocalDate activeDate, Instant timestamp)
+    /// <returns>The new team.</returns>
+    public static Team Create(string name, TeamCode code, string? description, LocalDate activeDate, Methodology methodology, SizingMethod sizingMethod, Instant timestamp)
     {
         var team = new Team(name, code, description, activeDate);
 
         team.AddPostPersistenceAction(() =>
             team.AddDomainEvent(new TeamCreatedEvent(team.Id, team.Key, team.Code, team.Name, team.Description, team.Type, team.ActiveDate, team.InactiveDate, team.IsActive, timestamp))
         );
+
+        team.SetOperatingModel(activeDate, methodology, sizingMethod);
 
         return team;
     }

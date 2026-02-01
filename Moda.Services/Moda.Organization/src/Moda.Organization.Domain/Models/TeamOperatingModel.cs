@@ -13,19 +13,12 @@ public sealed class TeamOperatingModel : BaseEntity<Guid>, ISystemAuditable
 {
     private TeamOperatingModel() { }
 
-    private TeamOperatingModel(Guid teamId, OperatingModelDateRange dateRange, Methodology methodology, SizingMethod sizingMethod)
+    private TeamOperatingModel(OperatingModelDateRange dateRange, Methodology methodology, SizingMethod sizingMethod)
     {
-        TeamId = teamId;
         DateRange = dateRange;
         Methodology = methodology;
         SizingMethod = sizingMethod;
     }
-
-    /// <summary>Gets the team identifier.</summary>
-    public Guid TeamId { get; private set; }
-
-    /// <summary>Gets the team navigation property.</summary>
-    public Team? Team { get; private set; }
 
     /// <summary>Gets the effective date range for this operating model.</summary>
     public OperatingModelDateRange DateRange { get; private set; } = null!;
@@ -62,24 +55,28 @@ public sealed class TeamOperatingModel : BaseEntity<Guid>, ISystemAuditable
     }
 
     /// <summary>
+    /// Clears the end date from the current date range, leaving only the start date set.
+    /// </summary>
+    internal void ClearEndDate()
+    {
+        DateRange.ClearEnd();
+    }
+
+    /// <summary>
     /// Creates a new team operating model.
     /// If a current model exists, it will be closed with an end date of one day before the new model's start date.
     /// </summary>
-    /// <param name="teamId">The team identifier.</param>
     /// <param name="startDate">The start date for this operating model.</param>
     /// <param name="methodology">The methodology the team uses.</param>
     /// <param name="sizingMethod">The sizing method the team uses.</param>
     /// <param name="currentModel">The current operating model, if one exists.</param>
     /// <returns>A result containing the new operating model or an error.</returns>
-    public static Result<TeamOperatingModel> Create(
-        Guid teamId,
+    internal static Result<TeamOperatingModel> Create(
         LocalDate startDate,
         Methodology methodology,
         SizingMethod sizingMethod,
         TeamOperatingModel? currentModel = null)
     {
-        Guard.Against.Default(teamId);
-
         // If there's a current model, validate and close it
         if (currentModel is not null && currentModel.IsCurrent)
         {
@@ -96,7 +93,7 @@ public sealed class TeamOperatingModel : BaseEntity<Guid>, ISystemAuditable
         }
 
         var dateRange = new OperatingModelDateRange(startDate, null);
-        var model = new TeamOperatingModel(teamId, dateRange, methodology, sizingMethod);
+        var model = new TeamOperatingModel(dateRange, methodology, sizingMethod);
 
         return Result.Success(model);
     }

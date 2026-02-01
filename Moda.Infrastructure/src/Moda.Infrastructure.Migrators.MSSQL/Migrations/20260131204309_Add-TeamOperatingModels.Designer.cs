@@ -13,7 +13,7 @@ using Moda.Infrastructure.Persistence.Context;
 namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 {
     [DbContext(typeof(ModaDbContext))]
-    [Migration("20260129121149_Add-TeamOperatingModels")]
+    [Migration("20260131204309_Add-TeamOperatingModels")]
     partial class AddTeamOperatingModels
     {
         /// <inheritdoc />
@@ -4090,13 +4090,11 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
             modelBuilder.Entity("Moda.Organization.Domain.Models.TeamOperatingModel", b =>
                 {
-                    b.HasOne("Moda.Organization.Domain.Models.Team", "Team")
+                    b.HasOne("Moda.Organization.Domain.Models.Team", null)
                         .WithMany("OperatingModels")
                         .HasForeignKey("TeamId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Team");
                 });
 
             modelBuilder.Entity("Moda.Planning.Domain.Models.Iterations.Iteration", b =>

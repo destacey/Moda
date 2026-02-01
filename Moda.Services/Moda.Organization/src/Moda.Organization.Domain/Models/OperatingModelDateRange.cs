@@ -1,4 +1,4 @@
-using Ardalis.GuardClauses;
+﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
 using Moda.Common.Interfaces;
 using NodaTime;
@@ -65,6 +65,11 @@ public class OperatingModelDateRange : ValueObject, IDateRange<LocalDate, LocalD
             throw new ArgumentException("The end date cannot be before the start date.", nameof(endDate));
 
         End = endDate;
+    }
+
+    internal void ClearEnd()
+    {
+        End = null;
     }
 
     protected override IEnumerable<IComparable?> GetEqualityComponents()

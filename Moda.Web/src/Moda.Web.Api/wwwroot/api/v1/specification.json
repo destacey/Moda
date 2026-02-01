@@ -13363,12 +13363,12 @@
         ]
       }
     },
-    "/api/organization/teams/{id}/operating-models": {
+    "/api/organization/teams/{id}/operating-models/{operatingModelId}": {
       "get": {
         "tags": [
           "Teams"
         ],
-        "summary": "Get the current operating model for a team, or the model effective on a specific date.",
+        "summary": "Get a specific operating model for a team.",
         "operationId": "Teams_GetOperatingModel",
         "parameters": [
           {
@@ -13384,12 +13384,14 @@
             "x-position": 1
           },
           {
-            "name": "asOfDate",
-            "in": "query",
+            "name": "operatingModelId",
+            "in": "path",
+            "required": true,
             "schema": {
               "type": "string",
-              "format": "date",
-              "nullable": true
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 2
           }
@@ -13400,7 +13402,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TeamOperatingModelDto"
+                  "$ref": "#/components/schemas/TeamOperatingModelDetailsDto"
                 }
               }
             }
@@ -13425,203 +13427,6 @@
           }
         ]
       },
-      "post": {
-        "tags": [
-          "Teams"
-        ],
-        "summary": "Set a new operating model for a team.",
-        "operationId": "Teams_SetOperatingModel",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "guid",
-              "nullable": false,
-              "example": "00000000-0000-0000-0000-000000000000"
-            },
-            "x-position": 1
-          }
-        ],
-        "requestBody": {
-          "x-name": "request",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SetTeamOperatingModelRequest"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 2
-        },
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "string",
-                  "format": "guid",
-                  "nullable": false,
-                  "example": "00000000-0000-0000-0000-000000000000"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": []
-          },
-          {
-            "ApiKey": []
-          }
-        ]
-      }
-    },
-    "/api/organization/teams/{id}/operating-models/history": {
-      "get": {
-        "tags": [
-          "Teams"
-        ],
-        "summary": "Get the operating model history for a team.",
-        "operationId": "Teams_GetOperatingModelHistory",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "guid",
-              "nullable": false,
-              "example": "00000000-0000-0000-0000-000000000000"
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/TeamOperatingModelDto"
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": []
-          },
-          {
-            "ApiKey": []
-          }
-        ]
-      }
-    },
-    "/api/organization/teams/{id}/has-ever-been-scrum": {
-      "get": {
-        "tags": [
-          "Teams"
-        ],
-        "summary": "Check if a team has ever used the Scrum methodology.",
-        "operationId": "Teams_HasEverBeenScrum",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "guid",
-              "nullable": false,
-              "example": "00000000-0000-0000-0000-000000000000"
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "boolean"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": []
-          },
-          {
-            "ApiKey": []
-          }
-        ]
-      }
-    },
-    "/api/organization/teams/{id}/operating-models/{operatingModelId}": {
       "put": {
         "tags": [
           "Teams"
@@ -13752,6 +13557,264 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/organization/teams/{id}/operating-models": {
+      "get": {
+        "tags": [
+          "Teams"
+        ],
+        "summary": "Get the operating model history for a team.",
+        "operationId": "Teams_GetOperatingModels",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TeamOperatingModelDetailsDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Teams"
+        ],
+        "summary": "Set a new operating model for a team.",
+        "operationId": "Teams_SetOperatingModel",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetTeamOperatingModelRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "guid",
+                  "nullable": false,
+                  "example": "00000000-0000-0000-0000-000000000000"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/organization/teams/{id}/operating-models/as-of": {
+      "get": {
+        "tags": [
+          "Teams"
+        ],
+        "summary": "Get the current operating model for a team, or the model effective on a specific date.",
+        "operationId": "Teams_GetOperatingModelAsOf",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "asOfDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "nullable": true
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TeamOperatingModelDetailsDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/organization/teams/{id}/has-ever-been-scrum": {
+      "get": {
+        "tags": [
+          "Teams"
+        ],
+        "summary": "Check if a team has ever used the Scrum methodology.",
+        "operationId": "Teams_HasEverBeenScrum",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "boolean"
                 }
               }
             }
@@ -24298,6 +24361,7 @@
           "code",
           "type",
           "isActive",
+          "operatingModel",
           "activeDate"
         ],
         "properties": {
@@ -24347,8 +24411,59 @@
                 "$ref": "#/components/schemas/TeamNavigationDto"
               }
             ]
+          },
+          "operatingModel": {
+            "$ref": "#/components/schemas/TeamOperatingModelListDto"
           }
         }
+      },
+      "TeamOperatingModelListDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "methodology",
+          "sizingMethod"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "methodology": {
+            "$ref": "#/components/schemas/Methodology"
+          },
+          "sizingMethod": {
+            "$ref": "#/components/schemas/SizingMethod"
+          }
+        }
+      },
+      "Methodology": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "Scrum",
+          "Kanban"
+        ],
+        "enum": [
+          "Scrum",
+          "Kanban"
+        ]
+      },
+      "SizingMethod": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "StoryPoints",
+          "Count"
+        ],
+        "enum": [
+          "StoryPoints",
+          "Count"
+        ]
       },
       "CreateTeamRequest": {
         "type": "object",
@@ -24737,7 +24852,7 @@
           }
         }
       },
-      "TeamOperatingModelDto": {
+      "TeamOperatingModelDetailsDto": {
         "type": "object",
         "additionalProperties": false,
         "required": [
@@ -24774,12 +24889,10 @@
             "nullable": true
           },
           "methodology": {
-            "type": "string",
-            "minLength": 1
+            "$ref": "#/components/schemas/Methodology"
           },
           "sizingMethod": {
-            "type": "string",
-            "minLength": 1
+            "$ref": "#/components/schemas/SizingMethod"
           },
           "isCurrent": {
             "type": "boolean"
@@ -24819,30 +24932,6 @@
             ]
           }
         }
-      },
-      "Methodology": {
-        "type": "string",
-        "description": "",
-        "x-enumNames": [
-          "Scrum",
-          "Kanban"
-        ],
-        "enum": [
-          "Scrum",
-          "Kanban"
-        ]
-      },
-      "SizingMethod": {
-        "type": "string",
-        "description": "",
-        "x-enumNames": [
-          "StoryPoints",
-          "Count"
-        ],
-        "enum": [
-          "StoryPoints",
-          "Count"
-        ]
       },
       "UpdateTeamOperatingModelRequest": {
         "type": "object",

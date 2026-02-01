@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Mapster;
+using Moda.Organization.Domain.Enums;
 using NodaTime;
 
 namespace Moda.Organization.Application.Teams.Dtos;
@@ -7,7 +8,7 @@ namespace Moda.Organization.Application.Teams.Dtos;
 /// <summary>
 /// Represents the operating model for a team.
 /// </summary>
-public sealed record TeamOperatingModelDto : IMapFrom<TeamOperatingModel>
+public sealed record TeamOperatingModelDetailsDto : IMapFrom<TeamOperatingModel>
 {
     /// <summary>
     /// The identifier of the operating model.
@@ -36,13 +37,13 @@ public sealed record TeamOperatingModelDto : IMapFrom<TeamOperatingModel>
     /// The methodology the team uses (e.g., Scrum, Kanban).
     /// </summary>
     [Required]
-    public required string Methodology { get; set; }
+    public Methodology Methodology { get; set; }
 
     /// <summary>
-    /// The sizing method the team uses (e.g., Story Points, Count).
+    /// The sizing method the team uses (e.g., StoryPoints, Count).
     /// </summary>
     [Required]
-    public required string SizingMethod { get; set; }
+    public SizingMethod SizingMethod { get; set; }
 
     /// <summary>
     /// Indicates whether this operating model is current (has no end date).
@@ -52,11 +53,10 @@ public sealed record TeamOperatingModelDto : IMapFrom<TeamOperatingModel>
 
     public void ConfigureMapping(TypeAdapterConfig config)
     {
-        config.NewConfig<TeamOperatingModel, TeamOperatingModelDto>()
+        // Note: TeamId is set manually in query handlers after loading through Team aggregate
+        config.NewConfig<TeamOperatingModel, TeamOperatingModelDetailsDto>()
             .Map(dest => dest.Start, src => src.DateRange.Start)
             .Map(dest => dest.End, src => src.DateRange.End)
-            .Map(dest => dest.Methodology, src => src.Methodology.GetDisplayName())
-            .Map(dest => dest.SizingMethod, src => src.SizingMethod.GetDisplayName())
             .Map(dest => dest.IsCurrent, src => src.IsCurrent);
     }
 }

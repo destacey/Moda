@@ -19,7 +19,7 @@ public class TeamFaker : PrivateConstructorFaker<Team>
         RuleFor(x => x.Description, f => f.Random.Words(5));
         RuleFor(x => x.Type, f => TeamType.Team);
         RuleFor(x => x.ActiveDate, f => activeDate);
-        RuleFor(x => x.IsActive, f => true);
+        RuleFor(x => x.IsActive, f => true);        
     }
 }
 
@@ -86,6 +86,18 @@ public static class TeamFakerExtensions
 
         faker.RuleFor(x => x.IsActive, false);
         faker.RuleFor(x => x.InactiveDate, actualInactiveDate);
+        return faker;
+    }
+
+    public static TeamFaker WithOperatingModel(this TeamFaker faker, TeamOperatingModelFaker operatingModelFaker, LocalDate? activeDate = null)
+    {
+        var actualActiveDate = activeDate ?? new LocalDate(2025, 5, 20);
+
+        var operatingModel = operatingModelFaker.WithDateRange(actualActiveDate, null).Generate();
+
+        faker.RuleFor(x => x.ActiveDate, actualActiveDate);
+        faker.RuleFor("_operatingModels", f => new List<TeamOperatingModel> { operatingModel });
+
         return faker;
     }
 }

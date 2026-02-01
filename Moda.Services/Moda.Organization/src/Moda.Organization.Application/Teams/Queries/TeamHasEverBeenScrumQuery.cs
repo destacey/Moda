@@ -15,7 +15,10 @@ internal sealed class TeamHasEverBeenScrumQueryHandler(IOrganizationDbContext or
 
     public async Task<bool> Handle(TeamHasEverBeenScrumQuery request, CancellationToken cancellationToken)
     {
-        return await _organizationDbContext.TeamOperatingModels
-            .AnyAsync(m => m.TeamId == request.TeamId && m.Methodology == Methodology.Scrum, cancellationToken);
+        // Query through Team aggregate
+        return await _organizationDbContext.Teams
+            .Where(t => t.Id == request.TeamId)
+            .SelectMany(t => t.OperatingModels)
+            .AnyAsync(m => m.Methodology == Methodology.Scrum, cancellationToken);
     }
 }
