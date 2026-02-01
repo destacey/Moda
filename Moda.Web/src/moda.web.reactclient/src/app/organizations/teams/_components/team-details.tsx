@@ -66,7 +66,10 @@ const TeamDetails = ({ team }: TeamDetailsProps) => {
 
         {team.operatingModel?.methodology === Methodology.Scrum && (
           <Col sm={24} md={12} lg={12}>
-            <ActiveTeamSprint teamId={team.id} />
+            <ActiveTeamSprint
+              teamId={team.id}
+              sizingMethod={team.operatingModel.sizingMethod}
+            />
           </Col>
         )}
       </Row>
