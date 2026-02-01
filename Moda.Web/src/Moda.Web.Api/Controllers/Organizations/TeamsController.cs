@@ -30,7 +30,7 @@ public class TeamsController(ILogger<TeamsController> logger, ISender sender) : 
     [OpenApiOperation("Get a list of teams.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IReadOnlyList<TeamListDto>>> GetList(CancellationToken cancellationToken, bool includeInactive = false)
+    public async Task<ActionResult<IEnumerable<TeamListDto>>> GetList(CancellationToken cancellationToken, bool includeInactive = false)
     {
         var teams = await _sender.Send(new GetTeamsQuery(includeInactive), cancellationToken);
         return Ok(teams.OrderBy(e => e.Name));
@@ -114,7 +114,7 @@ public class TeamsController(ILogger<TeamsController> logger, ISender sender) : 
     [OpenApiOperation("Get parent team memberships.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IReadOnlyList<TeamMembershipDto>>> GetTeamMemberships(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<TeamMembershipDto>>> GetTeamMemberships(Guid id, CancellationToken cancellationToken)
     {
         return Ok(await _sender.Send(new GetTeamMembershipsQuery(id), cancellationToken));
     }
@@ -251,7 +251,7 @@ public class TeamsController(ILogger<TeamsController> logger, ISender sender) : 
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<IReadOnlyList<RiskListDto>>> GetRisks(Guid id, CancellationToken cancellationToken, bool includeClosed = false)
+    public async Task<ActionResult<IEnumerable<RiskListDto>>> GetRisks(Guid id, CancellationToken cancellationToken, bool includeClosed = false)
     {
         var teamExists = await _sender.Send(new TeamExistsQuery(id), cancellationToken);
         if (!teamExists)
@@ -351,15 +351,13 @@ public class TeamsController(ILogger<TeamsController> logger, ISender sender) : 
     [OpenApiOperation("Get the operating model history for a team.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<IReadOnlyList<TeamOperatingModelDetailsDto>>> GetOperatingModels(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<TeamOperatingModelDetailsDto>>> GetOperatingModels(Guid id, CancellationToken cancellationToken)
     {
-        var teamExists = await _sender.Send(new TeamExistsQuery(id), cancellationToken);
-        if (!teamExists)
-            return NotFound();
-
         var history = await _sender.Send(new GetTeamOperatingModelsQuery(id), cancellationToken);
 
-        return Ok(history);
+        return history is not null
+            ? Ok(history)
+            : NotFound();
     }
 
     [HttpGet("{id}/operating-models/as-of")]
@@ -367,13 +365,15 @@ public class TeamsController(ILogger<TeamsController> logger, ISender sender) : 
     [OpenApiOperation("Get the current operating model for a team, or the model effective on a specific date.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<TeamOperatingModelDetailsDto>> GetOperatingModelAsOf(Guid id, [FromQuery] LocalDate? asOfDate, CancellationToken cancellationToken)
+    public async Task<ActionResult<TeamOperatingModelDetailsDto>> GetOperatingModelAsOf(Guid id, [FromQuery] DateTime? asOfDate, CancellationToken cancellationToken)
     {
-        var teamExists = await _sender.Send(new TeamExistsQuery(id), cancellationToken);
-        if (!teamExists)
-            return NotFound();
+        // TODO: using LocalDate or DateOnly from NSWAG and axios doesn't working correctly.
+        // NSwag's TypeScript generator uses toISOString() for all Date types, regardless of whether the OpenAPI spec specifies format: date or format: date-time. This is a known NSwag limitation (Issue #2339).
+        LocalDate? localDate = asOfDate.HasValue
+            ? LocalDate.FromDateTime(asOfDate.Value)
+            : null;
 
-        var operatingModel = await _sender.Send(new GetTeamOperatingModelAsOfQuery(id, asOfDate), cancellationToken);
+        var operatingModel = await _sender.Send(new GetTeamOperatingModelAsOfQuery(id, localDate), cancellationToken);
 
         return operatingModel is not null
             ? Ok(operatingModel)
@@ -479,8 +479,8 @@ public class TeamsController(ILogger<TeamsController> logger, ISender sender) : 
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<FunctionalOrganizationChartDto>> GetFunctionalOrganizationChart([FromQuery] DateTime? asOfDate, CancellationToken cancellationToken)
     {
-        // TODO: using LocalDate or DateOnly from axios wasn't working correctly
-
+        // TODO: using LocalDate or DateOnly from NSWAG and axios doesn't working correctly.
+        // NSwag's TypeScript generator uses toISOString() for all Date types, regardless of whether the OpenAPI spec specifies format: date or format: date-time. This is a known NSwag limitation (Issue #2339).
         LocalDate? dateOnlyAsOfDate = asOfDate.HasValue
             ? LocalDate.FromDateTime(asOfDate.Value)
             : null;

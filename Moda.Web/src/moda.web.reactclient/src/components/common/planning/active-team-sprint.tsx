@@ -96,12 +96,14 @@ const ActiveTeamSprint: FC<ActiveTeamSprintProps> = ({
             <CompletionRateMetric
               completed={displayValues.completed}
               total={displayValues.total}
+              tooltip={sizingMethod}
             />
           </Col>
           <Col xs={24} sm={24} md={12} lg={12} xxl={12}>
             <VelocityMetric
               completed={displayValues.completed}
               total={displayValues.total}
+              tooltip={sizingMethod}
             />
           </Col>
         </Row>

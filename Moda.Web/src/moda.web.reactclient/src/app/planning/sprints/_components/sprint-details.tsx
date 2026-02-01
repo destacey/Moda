@@ -1,7 +1,7 @@
 'use client'
 
 import { IterationState } from '@/src/components/types'
-import { SprintDetailsDto } from '@/src/services/moda-api'
+import { SizingMethod, SprintDetailsDto } from '@/src/services/moda-api'
 import { Descriptions, Flex } from 'antd'
 import Link from 'next/link'
 import SprintMetrics from './sprint-metrics'
@@ -12,11 +12,13 @@ const { Item: DescriptionItem } = Descriptions
 
 export interface SprintDetailsProps {
   sprint: SprintDetailsDto
+  sizingMethod?: SizingMethod
   onHealthIndicatorReady?: (indicator: ReactNode) => void
 }
 
 const SprintDetails: FC<SprintDetailsProps> = ({
   sprint,
+  sizingMethod,
   onHealthIndicatorReady,
 }: SprintDetailsProps) => {
   if (!sprint) return null
@@ -43,6 +45,7 @@ const SprintDetails: FC<SprintDetailsProps> = ({
       {showMetrics && (
         <SprintMetrics
           sprint={sprint}
+          sizingMethod={sizingMethod}
           onHealthIndicatorReady={onHealthIndicatorReady}
         />
       )}

@@ -13749,7 +13749,7 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "format": "date",
+              "format": "date-time",
               "nullable": true
             },
             "x-position": 2

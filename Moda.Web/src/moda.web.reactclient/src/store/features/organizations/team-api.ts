@@ -540,11 +540,17 @@ export const teamApi = apiSlice.injectEndpoints({
 
     getTeamOperatingModelAsOf: builder.query<
       TeamOperatingModelDetailsDto | null,
-      { teamId: string; asOfDate?: string }
+      { teamId: string; asOfDate?: Date | string }
     >({
       queryFn: async ({ teamId, asOfDate }) => {
         try {
-          const date = asOfDate ? new Date(asOfDate) : undefined
+          // Convert string to Date if needed
+          const date = asOfDate
+            ? asOfDate instanceof Date
+              ? asOfDate
+              : new Date(asOfDate)
+            : undefined
+
           const data = await getTeamsClient().getOperatingModelAsOf(
             teamId,
             date,
