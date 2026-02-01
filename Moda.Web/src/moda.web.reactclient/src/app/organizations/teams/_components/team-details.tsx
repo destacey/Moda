@@ -3,7 +3,11 @@
 import LinksCard from '@/src/components/common/links/links-card'
 import { MarkdownRenderer } from '@/src/components/common/markdown'
 import ActiveTeamSprint from '@/src/components/common/planning/active-team-sprint'
-import { SizingMethod, TeamDetailsDto } from '@/src/services/moda-api'
+import {
+  Methodology,
+  SizingMethod,
+  TeamDetailsDto,
+} from '@/src/services/moda-api'
 import { Col, Descriptions, Divider, Flex, Row } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
@@ -60,9 +64,11 @@ const TeamDetails = ({ team }: TeamDetailsProps) => {
           </Descriptions>
         </Col>
 
-        <Col sm={24} md={12} lg={12}>
-          <ActiveTeamSprint teamId={team.id} />
-        </Col>
+        {team.operatingModel?.methodology === Methodology.Scrum && (
+          <Col sm={24} md={12} lg={12}>
+            <ActiveTeamSprint teamId={team.id} />
+          </Col>
+        )}
       </Row>
       <Divider />
       <LinksCard objectId={team.id} />

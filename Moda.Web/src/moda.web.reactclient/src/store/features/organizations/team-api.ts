@@ -641,6 +641,7 @@ export const teamApi = apiSlice.injectEndpoints({
       invalidatesTags: (result, error, { teamId }) => [
         { type: QueryTags.TeamOperatingModel, id: teamId },
         { type: QueryTags.TeamOperatingModel, id: `${teamId}-history` },
+        { type: QueryTags.TeamOperatingModel, id: `${teamId}-scrum` },
       ],
     }),
 

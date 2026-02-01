@@ -18,6 +18,7 @@ import RisksGrid, {
 import { useDocumentTitle } from '@/src/hooks/use-document-title'
 import useAuth from '@/src/components/contexts/auth'
 import {
+  useGetTeamHasEverBeenScrumQuery,
   useGetTeamMembershipsQuery,
   useGetTeamRisksQuery,
 } from '@/src/store/features/organizations/team-api'
@@ -42,6 +43,7 @@ import {
   TeamOperatingModelsGrid,
   EditTeamOperatingModelForm,
 } from '../_components'
+import { Methodology } from '@/src/services/moda-api'
 import {
   CreateTeamMembershipForm,
   EditTeamForm,
@@ -59,32 +61,42 @@ enum TeamTabs {
   CycleTimeReport = 'cycle-time-report',
 }
 
-const tabs = [
-  {
-    key: TeamTabs.Details,
-    tab: 'Details',
-  },
-  {
-    key: TeamTabs.Backlog,
-    tab: 'Backlog',
-  },
-  {
-    key: TeamTabs.Sprints,
-    tab: 'Sprints',
-  },
-  {
-    key: TeamTabs.DependencyManagement,
-    tab: 'Dependency Management',
-  },
-  {
-    key: TeamTabs.RiskManagement,
-    tab: 'Risk Management',
-  },
-  {
-    key: TeamTabs.TeamMemberships,
-    tab: 'Team Memberships',
-  },
-]
+const getStaticTabs = (isScrumTeam: boolean) => {
+  const baseTabs = [
+    {
+      key: TeamTabs.Details,
+      tab: 'Details',
+    },
+    {
+      key: TeamTabs.Backlog,
+      tab: 'Backlog',
+    },
+  ]
+
+  if (isScrumTeam) {
+    baseTabs.push({
+      key: TeamTabs.Sprints,
+      tab: 'Sprints',
+    })
+  }
+
+  baseTabs.push(
+    {
+      key: TeamTabs.DependencyManagement,
+      tab: 'Dependency Management',
+    },
+    {
+      key: TeamTabs.RiskManagement,
+      tab: 'Risk Management',
+    },
+    {
+      key: TeamTabs.TeamMemberships,
+      tab: 'Team Memberships',
+    },
+  )
+
+  return baseTabs
+}
 
 const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const { key } = use(props.params)
@@ -121,6 +133,12 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   } = useAppSelector(selectEditTeamContext)
   const dispatch = useAppDispatch()
   const pathname = usePathname()
+  const isScrumTeam = team?.operatingModel?.methodology === Methodology.Scrum
+
+  const { data: hasEverBeenScrum } = useGetTeamHasEverBeenScrumQuery(team?.id, {
+    skip: !team?.id,
+  })
+
   const teamMembershipsQuery = useGetTeamMembershipsQuery(
     { teamId: team?.id, enabled: teamMembershipsQueryEnabled },
     { skip: !team?.id || !teamMembershipsQueryEnabled },
@@ -330,6 +348,13 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     team && dispatch(setBreadcrumbTitle({ title: team.name, pathname }))
   }, [team, dispatch, pathname])
 
+  // Redirect from Sprints tab if team has never been a Scrum team
+  useEffect(() => {
+    if (activeTab === TeamTabs.Sprints && hasEverBeenScrum === false) {
+      setActiveTab(TeamTabs.Details)
+    }
+  }, [activeTab, hasEverBeenScrum])
+
   // doesn't trigger on first render
   const onTabChange = useCallback(
     (tabKey: string) => {
@@ -363,7 +388,7 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   )
 
   const allTabs = useMemo(() => {
-    const staticTabs = tabs.map((tab) => ({
+    const staticTabs = getStaticTabs(hasEverBeenScrum === true).map((tab) => ({
       key: tab.key,
       tab: tab.tab,
     }))
@@ -382,7 +407,7 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     }))
 
     return [...staticTabs, ...closableTabs]
-  }, [dynamicTabs, closeTab])
+  }, [dynamicTabs, closeTab, hasEverBeenScrum])
 
   const onCreateTeamMembershipFormClosed = (wasSaved: boolean) => {
     setOpenCreateTeamMembershipForm(false)
