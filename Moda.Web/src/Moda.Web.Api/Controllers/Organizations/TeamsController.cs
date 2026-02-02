@@ -387,13 +387,11 @@ public class TeamsController(ILogger<TeamsController> logger, ISender sender) : 
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<bool>> HasEverBeenScrum(Guid id, CancellationToken cancellationToken)
     {
-        var teamExists = await _sender.Send(new TeamExistsQuery(id), cancellationToken);
-        if (!teamExists)
-            return NotFound();
-
         var hasBeenScrum = await _sender.Send(new TeamHasEverBeenScrumQuery(id), cancellationToken);
 
-        return Ok(hasBeenScrum);
+        return hasBeenScrum is not null
+            ? Ok(hasBeenScrum)
+            : NotFound();
     }
 
     [HttpPost("{id}/operating-models")]

@@ -351,6 +351,7 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   // Redirect from Sprints tab if team has never been a Scrum team
   useEffect(() => {
     if (activeTab === TeamTabs.Sprints && hasEverBeenScrum === false) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setActiveTab(TeamTabs.Details)
     }
   }, [activeTab, hasEverBeenScrum])

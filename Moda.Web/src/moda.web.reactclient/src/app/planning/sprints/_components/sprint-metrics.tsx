@@ -37,8 +37,11 @@ const SprintMetrics: FC<SprintMetricsProps> = ({
   const { data: metrics, isLoading } = useGetSprintMetricsQuery(sprint.key)
 
   // Update local state when sizingMethod prop changes
+  // This allows the component to be both controlled (responds to prop changes)
+  // and uncontrolled (maintains local state for user interactions)
   useEffect(() => {
     if (sizingMethod) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSizingMethodState(sizingMethod)
     }
   }, [sizingMethod])
