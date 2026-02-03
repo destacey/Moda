@@ -21,9 +21,19 @@ export const profileApi = apiSlice.injectEndpoints({
         try {
           const data = await getProfileClient().getPermissions()
           return { data }
-        } catch (error) {
-          console.error('API Error:', error)
-          return { error }
+        } catch (error: any) {
+          console.error('Error fetching permissions:', error)
+          // Extract status code from axios error or API exception
+          const status = error?.status || error?.response?.status || 500
+          return {
+            error: {
+              status,
+              error:
+                error instanceof Error
+                  ? error.message
+                  : 'Failed to load permissions',
+            },
+          }
         }
       },
       providesTags: () => [{ type: QueryTags.UserPermission, id: 'USER' }],

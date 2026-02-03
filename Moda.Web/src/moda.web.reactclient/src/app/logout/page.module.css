@@ -1,0 +1,136 @@
+/* Page Background */
+.pageBackground {
+  min-height: 100vh;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: linear-gradient(135deg, #42a5f5 0%, #2196f3 40%, #1976d2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Background decoration circles */
+.bgCircle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.bgCircle1 {
+  top: -120px;
+  left: -100px;
+  width: 340px;
+  height: 340px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.bgCircle2 {
+  bottom: -80px;
+  right: -60px;
+  width: 260px;
+  height: 260px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.bgCircle3 {
+  top: 50%;
+  left: 15%;
+  width: 180px;
+  height: 180px;
+  background: rgba(255, 255, 255, 0.04);
+  transform: translateY(-50%);
+}
+
+/* Main Card */
+.card {
+  width: 100%;
+  max-width: 420px;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 25px 60px rgba(13, 71, 161, 0.35);
+  background: #fff;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 40px;
+}
+
+/* Logo */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 40px;
+}
+
+.logoIcon {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+.logoDivider {
+  width: 1px;
+  height: 40px;
+  background: #90caf9;
+}
+
+.logoText {
+  font-size: 32px;
+  font-weight: 600;
+  color: #1976d2;
+  letter-spacing: -0.5px;
+}
+
+/* Spinner */
+.spinnerWrapper {
+  margin-bottom: 24px;
+  color: #2196f3;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Header */
+.title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #0d47a1;
+  letter-spacing: -0.5px;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #6b7280;
+  text-align: center;
+  line-height: 1.5;
+  max-width: 280px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .card {
+    margin: 0 16px;
+  }
+
+  .content {
+    padding: 40px 24px;
+  }
+}

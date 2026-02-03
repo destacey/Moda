@@ -7,29 +7,40 @@ import React, {
   useMemo,
   useState,
 } from 'react'
-import { useMsal, useIsAuthenticated, useMsalAuthentication } from '@azure/msal-react'
+import { usePathname } from 'next/navigation'
+import { useMsal, useIsAuthenticated } from '@azure/msal-react'
 import {
+  AccountInfo,
   InteractionRequiredAuthError,
-  InteractionType,
   SilentRequest,
 } from '@azure/msal-browser'
 import { LoadingAccount } from '@/src/components/common'
 import { AuthContextType, Claim, User } from './types'
 import { tokenRequest } from '@/auth-config'
 import { useGetUserPermissionsQuery } from '@/src/store/features/user-management/profile-api'
+import UnauthorizedPage from '@/src/app/unauthorized/page'
+import ServiceUnavailablePage from '@/src/app/service-unavailable/page'
 
 export const AuthContext = createContext<AuthContextType | null>(null)
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { instance, accounts, inProgress } = useMsal()
   const isAuthenticated = useIsAuthenticated()
+  const pathname = usePathname()
 
-  // useMsalAuthentication handles the login flow automatically
-  // It will use silent auth if possible, otherwise redirect to login
-  const { error: authError } = useMsalAuthentication(InteractionType.Redirect, tokenRequest)
+  // Bypass loading/error gates on logout route so logout always executes promptly
+  const isLogoutRoute = pathname === '/logout'
+
+  // Note: We no longer use useMsalAuthentication for auto-login
+  // Users will see the LoginPage and click "Sign in with Microsoft" manually
 
   const [isLoading, setIsLoading] = useState(true)
+  const [isUnauthorized, setIsUnauthorized] = useState(false)
+  const [isServiceUnavailable, setIsServiceUnavailable] = useState(false)
   const [authStatus, setAuthStatus] = useState('Initializing authentication...')
+  const [activeAccount, setActiveAccountState] = useState<AccountInfo | null>(
+    null,
+  )
 
   const [user, setUser] = useState<User>({
     name: '',
@@ -44,28 +55,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   /**
    * -------------------------------------------------------------
    * Ensure active account is set when we have accounts
+   * Uses useState to ensure React properly tracks the active account
    * -------------------------------------------------------------
    */
   useEffect(() => {
-    if (!isReady) return
+    if (!isReady) {
+      setActiveAccountState(null)
+      return
+    }
 
-    const activeAccount = instance.getActiveAccount()
-    if (!activeAccount && accounts.length > 0) {
+    let account = instance.getActiveAccount()
+    if (!account && accounts.length > 0) {
       instance.setActiveAccount(accounts[0])
+      account = accounts[0]
     }
+    setActiveAccountState(account)
   }, [accounts, instance, isReady])
-
-  const activeAccount = useMemo(() => {
-    if (!isReady) return null
-    return instance.getActiveAccount()
-  }, [instance, accounts, isReady]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Log auth errors
-  useEffect(() => {
-    if (authError) {
-      console.error('[Auth] Authentication error:', authError)
-    }
-  }, [authError])
 
   /**
    * -------------------------------------------------------------
@@ -76,9 +81,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     data: permissions,
     isLoading: permissionsLoading,
     error: permissionsError,
+    refetch: refetchPermissions,
   } = useGetUserPermissionsQuery(undefined, {
     skip: !isReady || !isAuthenticated || !activeAccount,
   })
+
+  /**
+   * -------------------------------------------------------------
+   * Retry handler for service unavailable
+   * -------------------------------------------------------------
+   */
+  const handleRetry = useCallback(() => {
+    setIsServiceUnavailable(false)
+    setIsLoading(true)
+    refetchPermissions()
+  }, [refetchPermissions])
 
   /**
    * -------------------------------------------------------------
@@ -90,7 +107,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const request = { ...tokenRequest, ...requestOverrides }
 
       try {
-        const response = await instance.acquireTokenSilent(request)
+        // MSAL v5 requires account parameter for silent token acquisition
+        const accounts = instance.getAllAccounts()
+        if (accounts.length === 0) {
+          throw new Error('No authenticated accounts found')
+        }
+
+        const response = await instance.acquireTokenSilent({
+          ...request,
+          account: request.account || accounts[0], // Use provided account or first available
+        })
         return response.accessToken
       } catch (error) {
         if (error instanceof InteractionRequiredAuthError) {
@@ -142,7 +168,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           })),
         )
       } else if (permissionsError) {
-        console.error('Failed to load permissions', permissionsError)
+        // Check if it's a 403 Forbidden error - user is authenticated but not authorized
+        const errorStatus = (permissionsError as any)?.status
+        if (errorStatus === 403) {
+          setIsUnauthorized(true)
+          setIsLoading(false)
+          return
+        }
+        // For other errors (timeout, network issues, 5xx), show service unavailable
+        setIsServiceUnavailable(true)
+        setIsLoading(false)
+        return
       }
 
       setUser({
@@ -171,25 +207,33 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
    */
   useEffect(() => {
     if (!isReady) {
+      // Show loading state during MSAL operations (redirect handling, etc.)
+      setIsLoading(true)
       setAuthStatus('Authenticating...')
       return
     }
 
-    if (!isAuthenticated || !activeAccount) {
+    // For unauthenticated users, don't show loading - they'll see login page
+    if (!isAuthenticated) {
       setIsLoading(false)
       return
     }
 
-    if (!permissionsLoading) {
-      refreshUser()
+    // Wait for activeAccount to be set (happens in separate useEffect)
+    // Don't set isLoading to false here - keep showing loading state
+    if (!activeAccount) {
+      setAuthStatus('Loading account...')
+      return
     }
-  }, [
-    isReady,
-    isAuthenticated,
-    activeAccount,
-    permissionsLoading,
-    refreshUser,
-  ])
+
+    if (permissionsLoading) {
+      setAuthStatus('Loading user permissions...')
+      return
+    }
+
+    // Only proceed when permissions have loaded or errored
+    refreshUser()
+  }, [isReady, isAuthenticated, activeAccount, permissionsLoading, refreshUser])
 
   /**
    * -------------------------------------------------------------
@@ -201,15 +245,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, [instance])
 
   const logout = useCallback(async () => {
-    instance.setActiveAccount(null)
-    setUser({
-      name: '',
-      username: '',
-      isAuthenticated: false,
-      claims: [],
-    })
-    await instance.logoutRedirect()
-  }, [instance])
+    // Navigate to logout page which handles the Microsoft logout redirect
+    window.location.href = '/logout'
+  }, [])
 
   /**
    * -------------------------------------------------------------
@@ -232,8 +270,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     [user, isLoading, acquireToken, refreshUser, login, logout],
   )
 
-  if (isLoading) {
-    return <LoadingAccount message={authStatus} />
+  // Bypass all loading/error gates on logout route so logout executes promptly
+  // This ensures users can always sign out, even if permissions call is slow/failed
+  if (!isLogoutRoute) {
+    // Only show loading state for authenticated users loading permissions
+    // Unauthenticated users should see the login page immediately via UnauthenticatedTemplate
+    if (isLoading && isAuthenticated) {
+      return <LoadingAccount message={authStatus} />
+    }
+
+    if (isUnauthorized) {
+      return <UnauthorizedPage />
+    }
+
+    if (isServiceUnavailable) {
+      return <ServiceUnavailablePage onRetry={handleRetry} />
+    }
   }
 
   return (

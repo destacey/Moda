@@ -1,0 +1,282 @@
+/* Page Background */
+.pageBackground {
+  min-height: 100vh;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: linear-gradient(135deg, #42a5f5 0%, #2196f3 40%, #1976d2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Background decoration circles */
+.bgCircle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.bgCircle1 {
+  top: -120px;
+  left: -100px;
+  width: 340px;
+  height: 340px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.bgCircle2 {
+  bottom: -80px;
+  right: -60px;
+  width: 260px;
+  height: 260px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.bgCircle3 {
+  top: 50%;
+  left: 15%;
+  width: 180px;
+  height: 180px;
+  background: rgba(255, 255, 255, 0.04);
+  transform: translateY(-50%);
+}
+
+/* Main Card */
+.card {
+  display: flex;
+  width: min(66vw, 1100px);
+  min-width: 680px;
+  min-height: min(82vh, 600px);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 25px 60px rgba(13, 71, 161, 0.35);
+}
+
+/* Left Panel */
+.leftPanel {
+  flex: 1 1 45%;
+  min-width: 0;
+  background: linear-gradient(160deg, #0d47a1 0%, #1565c0 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 36px 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.illustrationWrapper {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 320px;
+}
+
+.leftPanelText {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.leftPanelTitle {
+  color: #fff;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  margin-bottom: 6px;
+}
+
+.leftPanelDescription {
+  color: rgba(187, 222, 251, 0.75);
+  font-size: 13px;
+  max-width: 260px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+/* Decorative dots */
+.decorativeDots {
+  position: absolute;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  z-index: 1;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(100, 181, 246, 0.35);
+}
+
+.dotActive {
+  background: #2196f3;
+}
+
+/* Right Panel */
+.rightPanel {
+  flex: 1 1 55%;
+  min-width: 0;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 48px;
+}
+
+.rightPanelContent {
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Logo */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.logoIcon {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+.logoDivider {
+  width: 1px;
+  height: 40px;
+  background: #90caf9;
+}
+
+.logoText {
+  font-size: 32px;
+  font-weight: 600;
+  color: #1976d2;
+  letter-spacing: -0.5px;
+}
+
+/* Header */
+.title {
+  font-size: 26px;
+  font-weight: 700;
+  color: #0d47a1;
+  letter-spacing: -0.5px;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.subtitle {
+  font-size: 13.5px;
+  color: #6b7280;
+  text-align: center;
+  line-height: 1.5;
+  max-width: 280px;
+  margin-bottom: 40px;
+}
+
+/* Login Button */
+.loginButton {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 14px 24px;
+  border: 1.5px solid #bbdefb;
+  border-radius: 10px;
+  background: #fff;
+  cursor: pointer;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s,
+    transform 0.15s;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: #0d47a1;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.loginButton:hover:not(:disabled) {
+  border-color: #0078d4;
+  box-shadow: 0 4px 16px rgba(0, 120, 212, 0.2);
+  transform: translateY(-1px);
+}
+
+.loginButton:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.loginButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Spinner */
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Divider */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin: 32px 0 0;
+}
+
+.dividerLine {
+  flex: 1;
+  height: 1px;
+  background: #e3f2fd;
+}
+
+.dividerText {
+  font-size: 12px;
+  color: #b0b8c8;
+  font-weight: 500;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .card {
+    flex-direction: column;
+    min-width: auto;
+    width: 100%;
+    max-width: 500px;
+  }
+
+  .leftPanel {
+    padding: 24px 16px;
+  }
+
+  .illustrationWrapper {
+    max-width: 280px;
+  }
+
+  .rightPanel {
+    padding: 32px 24px;
+  }
+}
