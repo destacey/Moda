@@ -94,7 +94,7 @@ public sealed record TeamDetailsDto : IMapFrom<Team>
                             .FirstOrDefault())
             .Map(dest => dest.OperatingModel, src => src.OperatingModels
                 .Where(om => om.DateRange.Start <= asOf && (om.DateRange.End == null || om.DateRange.End >= asOf))
-                .FirstOrDefault());
+                .First());
 
         return cfg;
     }
