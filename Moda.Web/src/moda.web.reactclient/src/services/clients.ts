@@ -79,9 +79,16 @@ axiosClient.interceptors.request.use(
       }
     }
 
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
+    // Require token for all API requests
+    if (!token) {
+      return Promise.reject(
+        new Error(
+          'Failed to acquire authentication token. User may not be authenticated.',
+        ),
+      )
     }
+
+    config.headers.Authorization = `Bearer ${token}`
     return config
   },
   (error) => Promise.reject(error),
@@ -189,11 +196,16 @@ export async function authenticatedFetch(
     }
   }
 
+  // Require token for authenticated requests
+  if (!token) {
+    throw new Error(
+      'Failed to acquire authentication token. User may not be authenticated.',
+    )
+  }
+
   // Merge headers
   const headers = new Headers(options.headers)
-  if (token) {
-    headers.set('Authorization', `Bearer ${token}`)
-  }
+  headers.set('Authorization', `Bearer ${token}`)
 
   // Add Accept header if not present
   if (!headers.has('Accept')) {

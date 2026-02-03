@@ -2,7 +2,7 @@
 
 import { useMsal, useIsAuthenticated } from '@azure/msal-react'
 import { InteractionStatus } from '@azure/msal-browser'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import styles from './page.module.css'
 
@@ -26,12 +26,7 @@ const pulseAnimation = `
 `
 
 function AnalyticsIllustration() {
-  const [, setTick] = useState(0)
-  useEffect(() => {
-    const interval = setInterval(() => setTick((t) => t + 1), 2000)
-    return () => clearInterval(interval)
-  }, [])
-
+  // Animations are CSS-based (keyframes), no React state needed
   const nodes = [
     { x: 140, y: 80, r: 10, color: '#fff', label: 'Teams' },
     { x: 60, y: 160, r: 7, color: '#90caf9', label: 'Sprints' },

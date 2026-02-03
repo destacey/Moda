@@ -46,9 +46,16 @@ axiosClient.interceptors.request.use(
       }
     }
 
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
+    // Require token for all API requests - these endpoints are per-user
+    if (!token) {
+      return Promise.reject(
+        new Error(
+          'Failed to acquire authentication token. User may not be authenticated.',
+        ),
+      )
     }
+
+    config.headers.Authorization = `Bearer ${token}`
     return config
   },
   (error) => Promise.reject(error),

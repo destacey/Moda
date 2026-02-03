@@ -23,7 +23,7 @@ export default function ServiceUnavailablePage({
 
   return (
     <Result
-      status="500"
+      status="error"
       title="Service Unavailable"
       subTitle="Moda is unable to connect to the server. Please try again later."
       extra={[

@@ -7,6 +7,7 @@ import React, {
   useMemo,
   useState,
 } from 'react'
+import { usePathname } from 'next/navigation'
 import { useMsal, useIsAuthenticated } from '@azure/msal-react'
 import {
   AccountInfo,
@@ -25,6 +26,10 @@ export const AuthContext = createContext<AuthContextType | null>(null)
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { instance, accounts, inProgress } = useMsal()
   const isAuthenticated = useIsAuthenticated()
+  const pathname = usePathname()
+
+  // Bypass loading/error gates on logout route so logout always executes promptly
+  const isLogoutRoute = pathname === '/logout'
 
   // Note: We no longer use useMsalAuthentication for auto-login
   // Users will see the LoginPage and click "Sign in with Microsoft" manually
@@ -265,18 +270,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     [user, isLoading, acquireToken, refreshUser, login, logout],
   )
 
-  // Only show loading state for authenticated users loading permissions
-  // Unauthenticated users should see the login page immediately via UnauthenticatedTemplate
-  if (isLoading && isAuthenticated) {
-    return <LoadingAccount message={authStatus} />
-  }
+  // Bypass all loading/error gates on logout route so logout executes promptly
+  // This ensures users can always sign out, even if permissions call is slow/failed
+  if (!isLogoutRoute) {
+    // Only show loading state for authenticated users loading permissions
+    // Unauthenticated users should see the login page immediately via UnauthenticatedTemplate
+    if (isLoading && isAuthenticated) {
+      return <LoadingAccount message={authStatus} />
+    }
 
-  if (isUnauthorized) {
-    return <UnauthorizedPage />
-  }
+    if (isUnauthorized) {
+      return <UnauthorizedPage />
+    }
 
-  if (isServiceUnavailable) {
-    return <ServiceUnavailablePage onRetry={handleRetry} />
+    if (isServiceUnavailable) {
+      return <ServiceUnavailablePage onRetry={handleRetry} />
+    }
   }
 
   return (

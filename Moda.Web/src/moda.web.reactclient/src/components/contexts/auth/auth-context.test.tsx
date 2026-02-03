@@ -29,6 +29,12 @@ jest.mock('../../../app/service-unavailable/page', () => ({
   ),
 }))
 
+// Mock next/navigation
+const mockUsePathname = jest.fn()
+jest.mock('next/navigation', () => ({
+  usePathname: () => mockUsePathname(),
+}))
+
 // Mock the permissions API
 const mockUseGetUserPermissionsQuery = jest.fn()
 jest.mock('../../../store/features/user-management/profile-api', () => ({
@@ -130,6 +136,7 @@ describe('AuthContext', () => {
     jest.clearAllMocks()
 
     // Default mock implementations
+    mockUsePathname.mockReturnValue('/') // Default to home route
     mockUseMsal.mockReturnValue({
       instance: mockInstance,
       accounts: [],

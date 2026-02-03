@@ -25,6 +25,8 @@ import { MessageProvider } from '../components/contexts/messaging'
 import LoginPage from './login/page'
 import LogoutPage from './logout/page'
 import logoutStyles from './logout/page.module.css'
+// Note: LogoutPage is only used in UnauthenticatedView (after MSAL determines auth state)
+// SsrFallback and MsalInitializingView use inline markup to avoid hydration mismatch
 import { usePathname } from 'next/navigation'
 
 const { Content } = Layout
@@ -49,20 +51,49 @@ const UnauthenticatedView = () => {
 }
 
 /**
- * Shows login page during MSAL initialization (before auth state is determined)
- * This prevents showing a blank page or loading screen before the login page
+ * Shows loading state during MSAL initialization (before auth state is determined)
+ * Must render the same markup as SsrFallback to avoid hydration mismatch
  */
 const MsalInitializingView = () => {
   const { inProgress } = useMsal()
   const pathname = usePathname()
+  const isLogoutRoute = pathname === '/logout'
 
   // Only show during MSAL startup - once ready, Auth/Unauth templates take over
   if (inProgress === InteractionStatus.Startup) {
-    // Show logout page if on logout route during initialization
-    if (pathname === '/logout') {
-      return <LogoutPage />
-    }
-    return <LoginPage />
+    // Render same markup as SsrFallback to avoid hydration mismatch
+    return (
+      <div className={logoutStyles.pageBackground}>
+        <div className={`${logoutStyles.bgCircle} ${logoutStyles.bgCircle1}`} />
+        <div className={`${logoutStyles.bgCircle} ${logoutStyles.bgCircle2}`} />
+        <div className={`${logoutStyles.bgCircle} ${logoutStyles.bgCircle3}`} />
+        <div className={logoutStyles.card}>
+          <div className={logoutStyles.content}>
+            <div className={logoutStyles.logo}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/moda-icon.png"
+                alt="Moda"
+                className={logoutStyles.logoIcon}
+              />
+              <div className={logoutStyles.logoDivider} />
+              <span className={logoutStyles.logoText}>moda</span>
+            </div>
+            <div className={logoutStyles.spinnerWrapper}>
+              <LoadingSpinner />
+            </div>
+            <h1 className={logoutStyles.title}>
+              {isLogoutRoute ? 'Signing out...' : 'Loading...'}
+            </h1>
+            <p className={logoutStyles.subtitle}>
+              {isLogoutRoute
+                ? 'Please wait while we sign you out of your account.'
+                : 'Please wait while we initialize the application.'}
+            </p>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return null
@@ -114,18 +145,14 @@ const LoadingSpinner = () => (
 /**
  * Component to handle SSR fallback when msalInstance is null
  * Shows loading state during initial hydration to avoid login page flash
- * Reuses logout page styles for consistent appearance
+ * IMPORTANT: This must render identical markup to MsalInitializingView to avoid hydration mismatch
  */
 const SsrFallback = () => {
   const pathname = usePathname()
+  const isLogoutRoute = pathname === '/logout'
 
-  // Show logout page if on logout route
-  if (pathname === '/logout') {
-    return <LogoutPage />
-  }
-
-  // Show a loading state that matches the login/logout page styling
-  // This prevents the login form from flashing when user is actually authenticated
+  // Render identical markup to MsalInitializingView to avoid hydration mismatch
+  // Both components show the same loading state during SSR and client initialization
   return (
     <div className={logoutStyles.pageBackground}>
       {/* Background decoration circles */}
@@ -153,9 +180,13 @@ const SsrFallback = () => {
             <LoadingSpinner />
           </div>
 
-          <h1 className={logoutStyles.title}>Loading...</h1>
+          <h1 className={logoutStyles.title}>
+            {isLogoutRoute ? 'Signing out...' : 'Loading...'}
+          </h1>
           <p className={logoutStyles.subtitle}>
-            Please wait while we initialize the application.
+            {isLogoutRoute
+              ? 'Please wait while we sign you out of your account.'
+              : 'Please wait while we initialize the application.'}
           </p>
         </div>
       </div>
