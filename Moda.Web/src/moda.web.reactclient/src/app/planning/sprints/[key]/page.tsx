@@ -23,7 +23,10 @@ import { SprintBacklogGrid, SprintDetails } from '../_components'
 import { IterationStateTag } from '@/src/components/common/planning'
 import { IterationState } from '@/src/components/types'
 import LinksCard from '@/src/components/common/links/links-card'
-import { useGetTeamSprintsQuery } from '@/src/store/features/organizations/team-api'
+import {
+  useGetTeamOperatingModelAsOfQuery,
+  useGetTeamSprintsQuery,
+} from '@/src/store/features/organizations/team-api'
 import { SwapOutlined } from '@ant-design/icons'
 
 const { Title } = Typography
@@ -49,6 +52,14 @@ const SprintDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   } = useGetSprintBacklogQuery(sprintKey, {
     skip: !sprintKey,
   })
+
+  const { data: teamOperatingModel } = useGetTeamOperatingModelAsOfQuery(
+    {
+      teamId: sprintData?.team.id,
+      asOfDate: sprintData?.start,
+    },
+    { skip: !sprintData || !sprintData?.team.id },
+  )
 
   useDocumentTitle(`${sprintData?.name ?? sprintKey} - Sprint Details`)
 
@@ -119,6 +130,7 @@ const SprintDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       <Flex vertical gap="middle">
         <SprintDetails
           sprint={sprintData}
+          sizingMethod={teamOperatingModel?.sizingMethod}
           onHealthIndicatorReady={setHealthIndicator}
         />
         <Divider size="small" />

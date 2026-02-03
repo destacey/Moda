@@ -2,7 +2,11 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import SprintMetrics from './sprint-metrics'
 import { IterationState } from '@/src/components/types'
-import { SprintDetailsDto, SprintMetricsDto } from '@/src/services/moda-api'
+import {
+  SprintDetailsDto,
+  SprintMetricsDto,
+  SizingMethod,
+} from '@/src/services/moda-api'
 import { useGetSprintMetricsQuery } from '../../../../store/features/planning/sprints-api'
 
 // Mock dayjs
@@ -122,13 +126,39 @@ describe('SprintMetrics', () => {
     })
   })
 
-  describe('Story Points mode', () => {
-    it('renders all metrics with story points by default', () => {
+  describe('Default (Count) mode', () => {
+    it('renders all metrics with count by default', () => {
       render(<SprintMetrics sprint={mockSprint} />)
 
       expect(screen.getByTestId('metric-Completion Rate')).toBeInTheDocument()
       // Note: Our mock for CompletionRateMetric just renders 'completed', which matches the prop we pass.
-      // The real component calculates percentage. Here we verify the prop passed is correct (50).
+      // The real component calculates percentage. Here we verify the prop passed is correct (5).
+      expect(screen.getByTestId('value-Completion Rate')).toHaveTextContent('5')
+
+      expect(screen.getByTestId('metric-Total')).toBeInTheDocument()
+      expect(screen.getByTestId('value-Total')).toHaveTextContent('10')
+
+      expect(screen.getByTestId('metric-Velocity')).toBeInTheDocument()
+      expect(screen.getByTestId('value-Velocity')).toHaveTextContent('5')
+
+      expect(screen.getByTestId('metric-In Progress')).toBeInTheDocument()
+      expect(screen.getByTestId('value-In Progress')).toHaveTextContent('3')
+
+      expect(screen.getByTestId('metric-Not Started')).toBeInTheDocument()
+      expect(screen.getByTestId('value-Not Started')).toHaveTextContent('2')
+    })
+  })
+
+  describe('Story Points mode', () => {
+    it('renders all metrics with story points when sizingMethod prop is StoryPoints', () => {
+      render(
+        <SprintMetrics
+          sprint={mockSprint}
+          sizingMethod={SizingMethod.StoryPoints}
+        />,
+      )
+
+      expect(screen.getByTestId('metric-Completion Rate')).toBeInTheDocument()
       expect(screen.getByTestId('value-Completion Rate')).toHaveTextContent(
         '50',
       )
@@ -147,11 +177,40 @@ describe('SprintMetrics', () => {
     })
   })
 
-  describe('Count mode', () => {
-    it('switches to count mode when segmented control is clicked', async () => {
+  describe('Switching between modes', () => {
+    it('switches to story points mode when segmented control is clicked', async () => {
       const user = userEvent.setup()
       render(<SprintMetrics sprint={mockSprint} />)
 
+      // Initially in Count mode, verify count values
+      expect(screen.getByTestId('value-Total')).toHaveTextContent('10')
+
+      // Switch to Story Points
+      const storyPointsOption = screen.getByText('Story Points')
+      await user.click(storyPointsOption)
+
+      await waitFor(() => {
+        expect(screen.getByTestId('value-Total')).toHaveTextContent('100')
+      })
+
+      expect(screen.getByTestId('value-Velocity')).toHaveTextContent('50')
+      expect(screen.getByTestId('value-In Progress')).toHaveTextContent('30')
+      expect(screen.getByTestId('value-Not Started')).toHaveTextContent('20')
+    })
+
+    it('switches back to count mode from story points', async () => {
+      const user = userEvent.setup()
+      render(
+        <SprintMetrics
+          sprint={mockSprint}
+          sizingMethod={SizingMethod.StoryPoints}
+        />,
+      )
+
+      // Initially in Story Points mode
+      expect(screen.getByTestId('value-Total')).toHaveTextContent('100')
+
+      // Switch to Count
       const countOption = screen.getByText('Count')
       await user.click(countOption)
 
@@ -162,6 +221,29 @@ describe('SprintMetrics', () => {
       expect(screen.getByTestId('value-Velocity')).toHaveTextContent('5')
       expect(screen.getByTestId('value-In Progress')).toHaveTextContent('3')
       expect(screen.getByTestId('value-Not Started')).toHaveTextContent('2')
+    })
+
+    it('updates when sizingMethod prop changes', async () => {
+      const { rerender } = render(<SprintMetrics sprint={mockSprint} />)
+
+      // Initially in Count mode
+      expect(screen.getByTestId('value-Total')).toHaveTextContent('10')
+
+      // Change prop to Story Points
+      rerender(
+        <SprintMetrics
+          sprint={mockSprint}
+          sizingMethod={SizingMethod.StoryPoints}
+        />,
+      )
+
+      await waitFor(() => {
+        expect(screen.getByTestId('value-Total')).toHaveTextContent('100')
+      })
+
+      expect(screen.getByTestId('value-Velocity')).toHaveTextContent('50')
+      expect(screen.getByTestId('value-In Progress')).toHaveTextContent('30')
+      expect(screen.getByTestId('value-Not Started')).toHaveTextContent('20')
     })
   })
 
@@ -207,17 +289,18 @@ describe('SprintMetrics', () => {
 
   describe('Missing SPs', () => {
     it('renders missing SPs in story points mode', () => {
-      render(<SprintMetrics sprint={mockSprint} />)
+      render(
+        <SprintMetrics
+          sprint={mockSprint}
+          sizingMethod={SizingMethod.StoryPoints}
+        />,
+      )
       expect(screen.getByTestId('metric-Missing SPs')).toBeInTheDocument()
       expect(screen.getByTestId('value-Missing SPs')).toHaveTextContent('1')
     })
 
-    it('does not render missing SPs in count mode', async () => {
-      const user = userEvent.setup()
+    it('does not render missing SPs in count mode', () => {
       render(<SprintMetrics sprint={mockSprint} />)
-
-      await user.click(screen.getByText('Count'))
-
       expect(screen.queryByTestId('metric-Missing SPs')).not.toBeInTheDocument()
     })
   })
@@ -264,13 +347,13 @@ describe('SprintMetrics', () => {
         />,
       )
 
-      // Should be called initially
+      // Should be called initially (in Count mode)
       await waitFor(() => {
         expect(onHealthIndicatorReady).toHaveBeenCalledTimes(1)
       })
 
-      // Switch to Count mode
-      await user.click(screen.getByText('Count'))
+      // Switch to Story Points mode
+      await user.click(screen.getByText('Story Points'))
 
       // Should be called again with updated values
       await waitFor(() => {

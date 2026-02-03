@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Moda.Common.Domain.Enums.Organization;
 using Moda.Common.Domain.Models.Organizations;
+using Moda.Organization.Domain.Enums;
+using Moda.Organization.Domain.Models;
 
 namespace Moda.Infrastructure.Persistence.Configuration;
 
@@ -106,5 +108,52 @@ public class TeamMembershipConfig : IEntityTypeConfiguration<TeamMembership>
         builder.Property(o => o.Deleted);
         builder.Property(o => o.DeletedBy);
         builder.Property(o => o.IsDeleted);
+    }
+}
+
+public class TeamOperatingModelConfig : IEntityTypeConfiguration<TeamOperatingModel>
+{
+    public void Configure(EntityTypeBuilder<TeamOperatingModel> builder)
+    {
+        builder.ToTable("TeamOperatingModels", SchemaNames.Organization);
+
+        builder.HasKey(m => m.Id);
+
+        // Shadow property for the FK (not exposed on the domain entity)
+        builder.Property<Guid>("TeamId");
+
+        // Indexes using shadow property
+        builder.HasIndex("TeamId");
+
+        builder.HasIndex("TeamId")
+            .IncludeProperties(m => new { m.Id, m.Methodology, m.SizingMethod })
+            .HasFilter("[End] IS NULL")
+            .HasDatabaseName("IX_TeamOperatingModels_TeamId_Current");
+
+        // Enums
+        builder.Property(m => m.Methodology)
+            .IsRequired()
+            .HasConversion<EnumConverter<Methodology>>()
+            .HasColumnType("varchar")
+            .HasMaxLength(32);
+
+        builder.Property(m => m.SizingMethod)
+            .IsRequired()
+            .HasConversion<EnumConverter<SizingMethod>>()
+            .HasColumnType("varchar")
+            .HasMaxLength(32);
+
+        // Value Object
+        builder.ComplexProperty(m => m.DateRange, options =>
+        {
+            options.Property(d => d.Start).HasColumnName("Start").IsRequired();
+            options.Property(d => d.End).HasColumnName("End");
+        });
+
+        // Relationships using shadow property FK (no navigation property on TeamOperatingModel)
+        builder.HasOne<Team>()
+            .WithMany(t => t.OperatingModels)
+            .HasForeignKey("TeamId")
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

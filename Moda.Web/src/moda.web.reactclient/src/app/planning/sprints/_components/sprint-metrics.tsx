@@ -12,24 +12,39 @@ import {
 import { IterationHealthIndicator } from '@/src/components/common/planning'
 import useTheme from '@/src/components/contexts/theme'
 import { IterationState } from '@/src/components/types'
-import { SprintDetailsDto } from '@/src/services/moda-api'
+import { SizingMethod, SprintDetailsDto } from '@/src/services/moda-api'
 import { useGetSprintMetricsQuery } from '@/src/store/features/planning/sprints-api'
 import { Col, Flex, Row, Segmented, Skeleton, Tooltip } from 'antd'
 import { FC, ReactNode, useEffect, useMemo, useState } from 'react'
 
 export interface SprintMetricsProps {
   sprint: SprintDetailsDto
+  sizingMethod?: SizingMethod
   onHealthIndicatorReady?: (indicator: ReactNode) => void
 }
 
 const SprintMetrics: FC<SprintMetricsProps> = ({
   sprint,
+  sizingMethod = SizingMethod.Count,
   onHealthIndicatorReady,
 }) => {
-  const [useStoryPoints, setUseStoryPoints] = useState(true)
+  const [sizingMethodState, setSizingMethodState] =
+    useState<SizingMethod>(sizingMethod)
   const { token } = useTheme()
 
+  const useStoryPoints = sizingMethodState === SizingMethod.StoryPoints
+
   const { data: metrics, isLoading } = useGetSprintMetricsQuery(sprint.key)
+
+  // Update local state when sizingMethod prop changes
+  // This allows the component to be both controlled (responds to prop changes)
+  // and uncontrolled (maintains local state for user interactions)
+  useEffect(() => {
+    if (sizingMethod) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSizingMethodState(sizingMethod)
+    }
+  }, [sizingMethod])
 
   const displayValues = useMemo(() => {
     if (!metrics) {
@@ -91,12 +106,16 @@ const SprintMetrics: FC<SprintMetricsProps> = ({
   return (
     <Flex vertical gap="small">
       <Flex gap="small" justify="flex-end">
-        <Tooltip title="Switch between summing story points and counting work items for metrics">
+        <Tooltip title="Switch between counting work items and summing story points for metrics">
           <Segmented<string>
-            options={['Story Points', 'Count']}
+            options={['Count', 'Story Points']}
             value={useStoryPoints ? 'Story Points' : 'Count'}
             onChange={(value) =>
-              setUseStoryPoints(value === 'Story Points' ? true : false)
+              setSizingMethodState(
+                value === 'Story Points'
+                  ? SizingMethod.StoryPoints
+                  : SizingMethod.Count,
+              )
             }
           />
         </Tooltip>
@@ -116,7 +135,7 @@ const SprintMetrics: FC<SprintMetricsProps> = ({
           <CompletionRateMetric
             completed={displayValues.completed}
             total={displayValues.total}
-            tooltip="Percentage of story points or items currently in the sprint that are completed (Done or Removed)."
+            tooltip={sizingMethodState}
           />
         </Col>
         <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
@@ -130,6 +149,7 @@ const SprintMetrics: FC<SprintMetricsProps> = ({
           <VelocityMetric
             completed={displayValues.completed}
             total={displayValues.total}
+            tooltip={sizingMethodState}
           />
         </Col>
         <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
@@ -183,4 +203,3 @@ const SprintMetrics: FC<SprintMetricsProps> = ({
 }
 
 export default SprintMetrics
-

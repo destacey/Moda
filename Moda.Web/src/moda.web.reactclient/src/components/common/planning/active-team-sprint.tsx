@@ -2,9 +2,10 @@
 
 import { useGetActiveSprintQuery } from '@/src/store/features/organizations/team-api'
 import { useGetSprintMetricsQuery } from '@/src/store/features/planning/sprints-api'
+import { SizingMethod } from '@/src/services/moda-api'
 import { Card, Col, Flex, Row, Skeleton, Typography } from 'antd'
 import Link from 'next/link'
-import { FC, useMemo, useState } from 'react'
+import { FC, useMemo } from 'react'
 import { CompletionRateMetric, VelocityMetric } from '../metrics'
 import TimelineProgress from './timeline-progress'
 import IterationHealthIndicator from './iteration-health-indicator'
@@ -13,11 +14,14 @@ const { Text } = Typography
 
 export interface ActiveTeamSprintProps {
   teamId: string
+  sizingMethod: SizingMethod
 }
 
-const ActiveTeamSprint: FC<ActiveTeamSprintProps> = ({ teamId }) => {
-  // TODO: update this based on team preferences (story points vs. count)
-  const [useStoryPoints] = useState(true)
+const ActiveTeamSprint: FC<ActiveTeamSprintProps> = ({
+  teamId,
+  sizingMethod,
+}) => {
+  const useStoryPoints = sizingMethod === SizingMethod.StoryPoints
 
   const { data: sprintData, isLoading: sprintIsLoading } =
     useGetActiveSprintQuery(teamId)
@@ -92,12 +96,14 @@ const ActiveTeamSprint: FC<ActiveTeamSprintProps> = ({ teamId }) => {
             <CompletionRateMetric
               completed={displayValues.completed}
               total={displayValues.total}
+              tooltip={sizingMethod}
             />
           </Col>
           <Col xs={24} sm={24} md={12} lg={12} xxl={12}>
             <VelocityMetric
               completed={displayValues.completed}
               total={displayValues.total}
+              tooltip={sizingMethod}
             />
           </Col>
         </Row>

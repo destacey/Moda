@@ -1,5 +1,6 @@
 ﻿using Moda.Common.Domain.Models.Organizations;
 using Moda.Organization.Application.Teams.Models;
+using Moda.Organization.Domain.Enums;
 using NodaTime;
 
 namespace Moda.Organization.Application.Teams.Commands;
@@ -56,9 +57,17 @@ internal sealed class CreateTeamCommandHandler : ICommandHandler<CreateTeamComma
     {
         try
         {
-            var team = Team.Create(request.Name, request.Code, request.Description, request.ActiveDate, _dateTimeProvider.Now);
-            await _organizationDbContext.Teams.AddAsync(team, cancellationToken);
+            // Create team with default operating model (Kanban + Count)
+            var team = Team.Create(
+                request.Name,
+                request.Code,
+                request.Description,
+                request.ActiveDate,
+                Methodology.Kanban,
+                SizingMethod.Count,
+                _dateTimeProvider.Now);
 
+            await _organizationDbContext.Teams.AddAsync(team, cancellationToken);
             await _organizationDbContext.SaveChangesAsync(cancellationToken);
 
             _logger.LogDebug("{RequestName}: created Team with Id {TeamId}, Key {TeamKey}, and Code {TeamCode}", RequestName, team.Id, team.Key, team.Code);

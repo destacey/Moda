@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import ActiveTeamSprint from './active-team-sprint'
+import { SizingMethod } from '../../../services/moda-api'
 
 // Mock the API hooks
 jest.mock('../../../store/features/organizations/team-api', () => ({
@@ -69,8 +70,26 @@ describe('ActiveTeamSprint', () => {
     })
   })
 
-  it('renders active sprint details', () => {
-    render(<ActiveTeamSprint teamId="team-1" />)
+  it('renders active sprint details with story points sizing', () => {
+    render(
+      <ActiveTeamSprint
+        teamId="team-1"
+        sizingMethod={SizingMethod.StoryPoints}
+      />,
+    )
+
+    expect(screen.getByText('Active Sprint:')).toBeInTheDocument()
+    expect(screen.getByText('Sprint 1')).toBeInTheDocument()
+    expect(screen.getByTestId('timeline-progress')).toBeInTheDocument()
+    expect(screen.getByTestId('completion-rate-metric')).toBeInTheDocument()
+    expect(screen.getByTestId('velocity-metric')).toBeInTheDocument()
+    expect(screen.getByTestId('iteration-health-indicator')).toBeInTheDocument()
+  })
+
+  it('renders active sprint details with count sizing', () => {
+    render(
+      <ActiveTeamSprint teamId="team-1" sizingMethod={SizingMethod.Count} />,
+    )
 
     expect(screen.getByText('Active Sprint:')).toBeInTheDocument()
     expect(screen.getByText('Sprint 1')).toBeInTheDocument()
@@ -86,7 +105,12 @@ describe('ActiveTeamSprint', () => {
       isLoading: true,
     })
 
-    const { container } = render(<ActiveTeamSprint teamId="team-1" />)
+    const { container } = render(
+      <ActiveTeamSprint
+        teamId="team-1"
+        sizingMethod={SizingMethod.StoryPoints}
+      />,
+    )
     expect(container.querySelector('.ant-skeleton')).toBeInTheDocument()
   })
 
@@ -99,7 +123,12 @@ describe('ActiveTeamSprint', () => {
       isLoading: true,
     })
 
-    render(<ActiveTeamSprint teamId="team-1" />)
+    render(
+      <ActiveTeamSprint
+        teamId="team-1"
+        sizingMethod={SizingMethod.StoryPoints}
+      />,
+    )
     // Ant Design Card loading state replaces content with skeleton-like structure
     // We can check if the metrics are NOT present
     expect(
@@ -113,19 +142,34 @@ describe('ActiveTeamSprint', () => {
       isLoading: false,
     })
 
-    const { container } = render(<ActiveTeamSprint teamId="team-1" />)
+    const { container } = render(
+      <ActiveTeamSprint
+        teamId="team-1"
+        sizingMethod={SizingMethod.StoryPoints}
+      />,
+    )
     expect(container).toBeEmptyDOMElement()
   })
 
   it('renders health indicator with correct data', () => {
-    render(<ActiveTeamSprint teamId="team-1" />)
+    render(
+      <ActiveTeamSprint
+        teamId="team-1"
+        sizingMethod={SizingMethod.StoryPoints}
+      />,
+    )
 
     // Verify health indicator is rendered
     expect(screen.getByTestId('iteration-health-indicator')).toBeInTheDocument()
   })
 
   it('displays link to sprint details page', () => {
-    render(<ActiveTeamSprint teamId="team-1" />)
+    render(
+      <ActiveTeamSprint
+        teamId="team-1"
+        sizingMethod={SizingMethod.StoryPoints}
+      />,
+    )
 
     const link = screen.getByRole('link', { name: 'Sprint 1' })
     expect(link).toBeInTheDocument()

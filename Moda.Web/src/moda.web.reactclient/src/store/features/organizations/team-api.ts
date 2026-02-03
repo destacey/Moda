@@ -2,7 +2,6 @@ import {
   DeactivateTeamOfTeamsRequest,
   DeactivateTeamRequest,
   FunctionalOrganizationChartDto,
-  // Add missing imports for memberships and risks
   AddTeamMembershipRequest,
   UpdateTeamMembershipRequest,
   TeamMembershipDto,
@@ -11,6 +10,9 @@ import {
   SprintDetailsDto,
   WorkStatusCategory,
   WorkItemListDto,
+  SetTeamOperatingModelRequest,
+  UpdateTeamOperatingModelRequest,
+  TeamOperatingModelDetailsDto,
 } from './../../../services/moda-api'
 import { TeamListItem, TeamTypeName } from '@/src/app/organizations/types'
 import { apiSlice } from '../apiSlice'
@@ -508,6 +510,169 @@ export const teamApi = apiSlice.injectEndpoints({
         { type: QueryTags.TeamRisk, id: 'LIST' },
       ],
     }),
+
+    // TEAM OPERATING MODELS
+    getTeamOperatingModel: builder.query<
+      TeamOperatingModelDetailsDto | null,
+      { teamId: string; operatingModelId: string }
+    >({
+      queryFn: async ({ teamId, operatingModelId }) => {
+        try {
+          const data = await getTeamsClient().getOperatingModel(
+            teamId,
+            operatingModelId,
+          )
+          return { data }
+        } catch (error: any) {
+          // Return null for 404 (no operating model defined)
+          if (error?.status === 404) {
+            return { data: null }
+          }
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: (result, error, { teamId, operatingModelId }) => [
+        { type: QueryTags.TeamOperatingModel, id: teamId },
+        { type: QueryTags.TeamOperatingModel, id: operatingModelId },
+      ],
+    }),
+
+    getTeamOperatingModelAsOf: builder.query<
+      TeamOperatingModelDetailsDto | null,
+      { teamId: string; asOfDate?: Date | string }
+    >({
+      queryFn: async ({ teamId, asOfDate }) => {
+        try {
+          // Convert string to Date if needed
+          const date = asOfDate
+            ? asOfDate instanceof Date
+              ? asOfDate
+              : new Date(asOfDate)
+            : undefined
+
+          const data = await getTeamsClient().getOperatingModelAsOf(
+            teamId,
+            date,
+          )
+          return { data }
+        } catch (error: any) {
+          // Return null for 404 (no operating model defined)
+          if (error?.status === 404) {
+            return { data: null }
+          }
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: (result, error, { teamId }) => [
+        { type: QueryTags.TeamOperatingModel, id: teamId },
+      ],
+    }),
+
+    getTeamOperatingModels: builder.query<
+      TeamOperatingModelDetailsDto[],
+      string
+    >({
+      queryFn: async (teamId) => {
+        try {
+          const data = await getTeamsClient().getOperatingModels(teamId)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: (result, error, teamId) => [
+        { type: QueryTags.TeamOperatingModel, id: `${teamId}-history` },
+      ],
+    }),
+
+    getTeamHasEverBeenScrum: builder.query<boolean, string>({
+      queryFn: async (teamId) => {
+        try {
+          const data = await getTeamsClient().hasEverBeenScrum(teamId)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: (result, error, teamId) => [
+        { type: QueryTags.TeamOperatingModel, id: `${teamId}-scrum` },
+      ],
+    }),
+
+    setTeamOperatingModel: builder.mutation<
+      string,
+      { teamId: string; request: SetTeamOperatingModelRequest }
+    >({
+      queryFn: async ({ teamId, request }) => {
+        try {
+          const data = await getTeamsClient().setOperatingModel(teamId, request)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, { teamId }) => [
+        { type: QueryTags.TeamOperatingModel, id: teamId },
+        { type: QueryTags.TeamOperatingModel, id: `${teamId}-history` },
+        { type: QueryTags.TeamOperatingModel, id: `${teamId}-scrum` },
+      ],
+    }),
+
+    updateTeamOperatingModel: builder.mutation<
+      void,
+      {
+        teamId: string
+        operatingModelId: string
+        request: UpdateTeamOperatingModelRequest
+      }
+    >({
+      queryFn: async ({ teamId, operatingModelId, request }) => {
+        try {
+          const data = await getTeamsClient().updateOperatingModel(
+            teamId,
+            operatingModelId,
+            request,
+          )
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, { teamId }) => [
+        { type: QueryTags.TeamOperatingModel, id: teamId },
+        { type: QueryTags.TeamOperatingModel, id: `${teamId}-history` },
+        { type: QueryTags.TeamOperatingModel, id: `${teamId}-scrum` },
+      ],
+    }),
+
+    deleteTeamOperatingModel: builder.mutation<
+      void,
+      { teamId: string; operatingModelId: string }
+    >({
+      queryFn: async ({ teamId, operatingModelId }) => {
+        try {
+          const data = await getTeamsClient().deleteOperatingModel(
+            teamId,
+            operatingModelId,
+          )
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, { teamId }) => [
+        { type: QueryTags.TeamOperatingModel, id: teamId },
+        { type: QueryTags.TeamOperatingModel, id: `${teamId}-history` },
+        { type: QueryTags.TeamOperatingModel, id: `${teamId}-scrum` },
+      ],
+    }),
   }),
 })
 
@@ -531,4 +696,12 @@ export const {
   useDeleteTeamMembershipMutation,
   useGetTeamRisksQuery,
   useGetTeamOfTeamsRisksQuery,
+  // Operating Models
+  useGetTeamOperatingModelQuery,
+  useGetTeamOperatingModelAsOfQuery,
+  useGetTeamOperatingModelsQuery,
+  useGetTeamHasEverBeenScrumQuery,
+  useSetTeamOperatingModelMutation,
+  useUpdateTeamOperatingModelMutation,
+  useDeleteTeamOperatingModelMutation,
 } = teamApi

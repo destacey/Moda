@@ -1,16 +1,23 @@
 'use client'
 
-import { FC } from 'react'
+import { CSSProperties, FC } from 'react'
 import { MetricCard } from '.'
 import useTheme from '@/src/components/contexts/theme'
+import { SizingMethod } from '@/src/services/moda-api'
+
+const getTooltipText = (sizingMethod: SizingMethod): string => {
+  const unit =
+    sizingMethod === SizingMethod.StoryPoints ? 'story points' : 'work items'
+  return `Percentage of ${unit} that are completed (Done or Removed).`
+}
 
 export interface CompletionRateMetricProps {
   completed: number
   total: number
   target?: number
   title?: string
-  tooltip?: string
-  cardStyle?: React.CSSProperties
+  tooltip?: string | SizingMethod
+  cardStyle?: CSSProperties
 }
 
 const CompletionRateMetric: FC<CompletionRateMetricProps> = ({
@@ -18,13 +25,18 @@ const CompletionRateMetric: FC<CompletionRateMetricProps> = ({
   total,
   target = 80,
   title = 'Completion Rate',
-  tooltip = 'Percentage of story points or items that are completed (Done or Removed).',
+  tooltip = SizingMethod.StoryPoints,
   cardStyle,
 }) => {
   const { token } = useTheme()
 
   const completionRate =
     total > 0 ? Number(((completed / total) * 100).toFixed(1)) : 0
+
+  const resolvedTooltip =
+    tooltip === SizingMethod.StoryPoints || tooltip === SizingMethod.Count
+      ? getTooltipText(tooltip)
+      : tooltip
 
   return (
     <MetricCard
@@ -35,11 +47,10 @@ const CompletionRateMetric: FC<CompletionRateMetricProps> = ({
       valueStyle={{
         color: completionRate >= target ? token.colorSuccess : undefined,
       }}
-      tooltip={tooltip}
+      tooltip={resolvedTooltip}
       cardStyle={cardStyle}
     />
   )
 }
 
 export default CompletionRateMetric
-
