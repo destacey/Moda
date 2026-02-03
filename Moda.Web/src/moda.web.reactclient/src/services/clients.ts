@@ -79,16 +79,11 @@ axiosClient.interceptors.request.use(
       }
     }
 
-    // Require token for all API requests
-    if (!token) {
-      return Promise.reject(
-        new Error(
-          'Failed to acquire authentication token. User may not be authenticated.',
-        ),
-      )
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
     }
-
-    config.headers.Authorization = `Bearer ${token}`
+    // If no token, let request proceed - API will return 401 which is handled gracefully
+    // This handles edge cases like MSAL transitional states (block_iframe_reload, timed_out)
     return config
   },
   (error) => Promise.reject(error),
@@ -196,16 +191,13 @@ export async function authenticatedFetch(
     }
   }
 
-  // Require token for authenticated requests
-  if (!token) {
-    throw new Error(
-      'Failed to acquire authentication token. User may not be authenticated.',
-    )
-  }
-
   // Merge headers
   const headers = new Headers(options.headers)
-  headers.set('Authorization', `Bearer ${token}`)
+  if (token) {
+    headers.set('Authorization', `Bearer ${token}`)
+  }
+  // If no token, let request proceed - API will return 401 which caller should handle
+  // This handles edge cases like MSAL transitional states (block_iframe_reload, timed_out)
 
   // Add Accept header if not present
   if (!headers.has('Accept')) {

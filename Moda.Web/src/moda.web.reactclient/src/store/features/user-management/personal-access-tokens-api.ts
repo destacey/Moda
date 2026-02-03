@@ -46,16 +46,11 @@ axiosClient.interceptors.request.use(
       }
     }
 
-    // Require token for all API requests - these endpoints are per-user
-    if (!token) {
-      return Promise.reject(
-        new Error(
-          'Failed to acquire authentication token. User may not be authenticated.',
-        ),
-      )
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
     }
-
-    config.headers.Authorization = `Bearer ${token}`
+    // If no token, let request proceed - API will return 401 which is handled gracefully
+    // This handles edge cases like MSAL transitional states (block_iframe_reload, timed_out)
     return config
   },
   (error) => Promise.reject(error),
