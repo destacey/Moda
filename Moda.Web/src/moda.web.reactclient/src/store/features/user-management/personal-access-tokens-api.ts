@@ -24,23 +24,30 @@ axiosClient.interceptors.request.use(
   async (config) => {
     let token: string | null = null
     try {
-      const response = await msalInstance.acquireTokenSilent(tokenRequest)
-      token = response.accessToken
+      // MSAL v5 requires account parameter for silent token acquisition
+      const accounts = msalInstance.getAllAccounts()
+      if (accounts.length > 0) {
+        const response = await msalInstance.acquireTokenSilent({
+          ...tokenRequest,
+          account: accounts[0],
+        })
+        token = response.accessToken
+      }
     } catch (error: any) {
       if (error instanceof InteractionRequiredAuthError) {
-        const response = await msalInstance.acquireTokenPopup(tokenRequest)
-        token = response.accessToken
+        try {
+          const response = await msalInstance.acquireTokenPopup(tokenRequest)
+          token = response.accessToken
+        } catch (popupError) {
+          console.error('Token popup failed:', popupError)
+        }
       } else {
-        throw error
+        console.error('Token acquisition error:', error)
       }
     }
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
-    } else {
-      throw new Error(
-        'Unable to acquire token. User might not be authenticated.',
-      )
     }
     return config
   },

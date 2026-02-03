@@ -37,32 +37,50 @@ const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL
 
 const axiosClient = axios.create({
   baseURL: apiUrl,
+  timeout: 30000, // 30 second timeout
   // Ensuring that responses are processed correctly.
   transformResponse: (data) => data,
 })
+
+// Response interceptor for error handling
+axiosClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    console.error('API Error:', error.message, error.config?.url)
+    return Promise.reject(error)
+  },
+)
 
 // Use the shared MSAL instance to acquire tokens for outgoing requests.
 axiosClient.interceptors.request.use(
   async (config) => {
     let token: string | null = null
     try {
-      const response = await msalInstance.acquireTokenSilent(tokenRequest)
-      token = response.accessToken
+      // MSAL v5 requires account parameter for silent token acquisition
+      const accounts = msalInstance.getAllAccounts()
+
+      if (accounts.length > 0) {
+        const response = await msalInstance.acquireTokenSilent({
+          ...tokenRequest,
+          account: accounts[0],
+        })
+        token = response.accessToken
+      }
     } catch (error: any) {
       if (error instanceof InteractionRequiredAuthError) {
-        const response = await msalInstance.acquireTokenPopup(tokenRequest)
-        token = response.accessToken
+        try {
+          const response = await msalInstance.acquireTokenPopup(tokenRequest)
+          token = response.accessToken
+        } catch (popupError) {
+          console.error('Token popup failed:', popupError)
+        }
       } else {
-        throw error
+        console.error('Token acquisition error:', error)
       }
     }
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
-    } else {
-      throw new Error(
-        'Unable to acquire token. User might not be authenticated.',
-      )
     }
     return config
   },
@@ -149,26 +167,33 @@ export async function authenticatedFetch(
   // Acquire auth token
   let token: string | null = null
   try {
-    const response = await msalInstance.acquireTokenSilent(tokenRequest)
-    token = response.accessToken
+    // MSAL v5 requires account parameter for silent token acquisition
+    const accounts = msalInstance.getAllAccounts()
+    if (accounts.length > 0) {
+      const response = await msalInstance.acquireTokenSilent({
+        ...tokenRequest,
+        account: accounts[0],
+      })
+      token = response.accessToken
+    }
   } catch (error: any) {
     if (error instanceof InteractionRequiredAuthError) {
-      const response = await msalInstance.acquireTokenPopup(tokenRequest)
-      token = response.accessToken
+      try {
+        const response = await msalInstance.acquireTokenPopup(tokenRequest)
+        token = response.accessToken
+      } catch (popupError) {
+        console.error('Token popup failed:', popupError)
+      }
     } else {
-      throw error
+      console.error('Token acquisition error:', error)
     }
   }
 
-  if (!token) {
-    throw new Error(
-      'Unable to acquire token. User might not be authenticated.',
-    )
-  }
-
-  // Merge headers with Authorization
+  // Merge headers
   const headers = new Headers(options.headers)
-  headers.set('Authorization', `Bearer ${token}`)
+  if (token) {
+    headers.set('Authorization', `Bearer ${token}`)
+  }
 
   // Add Accept header if not present
   if (!headers.has('Accept')) {
