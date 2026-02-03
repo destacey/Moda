@@ -1,8 +1,8 @@
-import styles from '@/src/app/logout/page.module.css'
+'use client'
 
-interface LoadingAccountProps {
-  message?: string
-}
+import { useMsal } from '@azure/msal-react'
+import { useEffect, useRef } from 'react'
+import styles from './page.module.css'
 
 function LoadingSpinner() {
   return (
@@ -26,8 +26,24 @@ function LoadingSpinner() {
   )
 }
 
-const LoadingAccount: React.FC<LoadingAccountProps> = (props) => {
-  const message = props.message || 'Loading...'
+export default function LogoutPage() {
+  const { instance } = useMsal()
+  const hasInitiatedLogout = useRef(false)
+
+  useEffect(() => {
+    // Prevent double-execution in React strict mode
+    if (hasInitiatedLogout.current) return
+    hasInitiatedLogout.current = true
+
+    const performLogout = async () => {
+      instance.setActiveAccount(null)
+      await instance.logoutRedirect({
+        postLogoutRedirectUri: `${window.location.origin}/login`,
+      })
+    }
+
+    performLogout()
+  }, [instance])
 
   return (
     <div className={styles.pageBackground}>
@@ -56,14 +72,12 @@ const LoadingAccount: React.FC<LoadingAccountProps> = (props) => {
             <LoadingSpinner />
           </div>
 
-          <h1 className={styles.title}>{message}</h1>
+          <h1 className={styles.title}>Signing out...</h1>
           <p className={styles.subtitle}>
-            Please wait while we prepare your account.
+            Please wait while we sign you out of your account.
           </p>
         </div>
       </div>
     </div>
   )
 }
-
-export default LoadingAccount

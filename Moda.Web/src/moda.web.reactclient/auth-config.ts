@@ -9,7 +9,7 @@ export const msalConfig: Configuration = {
     authority: microsoftLogonAuthority,
     clientId: azureAdClientId,
     redirectUri: '/',
-    postLogoutRedirectUri: '/',
+    postLogoutRedirectUri: '/login',
   },
   cache: {
     cacheLocation: 'localStorage',

@@ -18,9 +18,14 @@ import {
   AuthenticatedTemplate,
   MsalProvider,
   UnauthenticatedTemplate,
+  useMsal,
 } from '@azure/msal-react'
-import { LoadingAccount } from '../components/common'
+import { InteractionStatus } from '@azure/msal-browser'
 import { MessageProvider } from '../components/contexts/messaging'
+import LoginPage from './login/page'
+import LogoutPage from './logout/page'
+import logoutStyles from './logout/page.module.css'
+import { usePathname } from 'next/navigation'
 
 const { Content } = Layout
 
@@ -28,6 +33,40 @@ const inter = Inter({ subsets: ['latin'] })
 
 // Register all community features for ag-grid
 ModuleRegistry.registerModules([AllCommunityModule])
+
+/**
+ * Shows the appropriate page for unauthenticated users based on route
+ */
+const UnauthenticatedView = () => {
+  const pathname = usePathname()
+
+  // Show logout page if on logout route
+  if (pathname === '/logout') {
+    return <LogoutPage />
+  }
+
+  return <LoginPage />
+}
+
+/**
+ * Shows login page during MSAL initialization (before auth state is determined)
+ * This prevents showing a blank page or loading screen before the login page
+ */
+const MsalInitializingView = () => {
+  const { inProgress } = useMsal()
+  const pathname = usePathname()
+
+  // Only show during MSAL startup - once ready, Auth/Unauth templates take over
+  if (inProgress === InteractionStatus.Startup) {
+    // Show logout page if on logout route during initialization
+    if (pathname === '/logout') {
+      return <LogoutPage />
+    }
+    return <LoginPage />
+  }
+
+  return null
+}
 
 const AppContent = memo(({ children }: PropsWithChildren) => {
   const screens = Grid.useBreakpoint()
@@ -49,13 +88,88 @@ const AppContent = memo(({ children }: PropsWithChildren) => {
 
 AppContent.displayName = 'AppContent'
 
+/**
+ * Loading spinner component for SSR fallback
+ */
+const LoadingSpinner = () => (
+  <svg
+    className={logoutStyles.spinner}
+    width="48"
+    height="48"
+    viewBox="0 0 24 24"
+    fill="none"
+  >
+    <circle
+      cx="12"
+      cy="12"
+      r="10"
+      stroke="currentColor"
+      strokeWidth="3"
+      strokeLinecap="round"
+      strokeDasharray="31.4 31.4"
+    />
+  </svg>
+)
+
+/**
+ * Component to handle SSR fallback when msalInstance is null
+ * Shows loading state during initial hydration to avoid login page flash
+ * Reuses logout page styles for consistent appearance
+ */
+const SsrFallback = () => {
+  const pathname = usePathname()
+
+  // Show logout page if on logout route
+  if (pathname === '/logout') {
+    return <LogoutPage />
+  }
+
+  // Show a loading state that matches the login/logout page styling
+  // This prevents the login form from flashing when user is actually authenticated
+  return (
+    <div className={logoutStyles.pageBackground}>
+      {/* Background decoration circles */}
+      <div className={`${logoutStyles.bgCircle} ${logoutStyles.bgCircle1}`} />
+      <div className={`${logoutStyles.bgCircle} ${logoutStyles.bgCircle2}`} />
+      <div className={`${logoutStyles.bgCircle} ${logoutStyles.bgCircle3}`} />
+
+      {/* Main card */}
+      <div className={logoutStyles.card}>
+        <div className={logoutStyles.content}>
+          {/* Logo */}
+          <div className={logoutStyles.logo}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/moda-icon.png"
+              alt="Moda"
+              className={logoutStyles.logoIcon}
+            />
+            <div className={logoutStyles.logoDivider} />
+            <span className={logoutStyles.logoText}>moda</span>
+          </div>
+
+          {/* Loading state */}
+          <div className={logoutStyles.spinnerWrapper}>
+            <LoadingSpinner />
+          </div>
+
+          <h1 className={logoutStyles.title}>Loading...</h1>
+          <p className={logoutStyles.subtitle}>
+            Please wait while we initialize the application.
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 const RootLayout = ({ children }: React.PropsWithChildren) => {
-  // Guard against SSR where msalInstance is null
+  // Guard against SSR where msalInstance is null - show appropriate page based on route
   if (!msalInstance) {
     return (
       <html lang="en">
         <body className={inter.className}>
-          <LoadingAccount message="Initializing authentication..." />
+          <SsrFallback />
         </body>
       </html>
     )
@@ -67,8 +181,8 @@ const RootLayout = ({ children }: React.PropsWithChildren) => {
         <AntdRegistry>
           <Provider store={store}>
             <MsalProvider instance={msalInstance}>
-              <AuthProvider>
-                <AuthenticatedTemplate>
+              <AuthenticatedTemplate>
+                <AuthProvider>
                   <ThemeProvider>
                     <MenuToggleProvider>
                       <App>
@@ -78,12 +192,12 @@ const RootLayout = ({ children }: React.PropsWithChildren) => {
                       </App>
                     </MenuToggleProvider>
                   </ThemeProvider>
-                </AuthenticatedTemplate>
-                <UnauthenticatedTemplate>
-                  {/* TODO: change this to a login form after the login flow is manual rather than automatic */}
-                  <LoadingAccount message="Unauthenticated Moda user.  Redirecting to login..." />
-                </UnauthenticatedTemplate>
-              </AuthProvider>
+                </AuthProvider>
+              </AuthenticatedTemplate>
+              <UnauthenticatedTemplate>
+                <UnauthenticatedView />
+              </UnauthenticatedTemplate>
+              <MsalInitializingView />
             </MsalProvider>
           </Provider>
         </AntdRegistry>
