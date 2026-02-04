@@ -380,6 +380,27 @@ public class TeamsController(ILogger<TeamsController> logger, ISender sender) : 
             : NotFound();
     }
 
+    [HttpGet("operating-models")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Teams)]
+    [OpenApiOperation("Get operating models for multiple teams.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IEnumerable<TeamOperatingModelDetailsDto>>> GetOperatingModelsForTeams(
+        [FromQuery] Guid[] teamIds,
+        [FromQuery] DateTime? asOfDate,
+        CancellationToken cancellationToken)
+    {
+        // TODO: using LocalDate or DateOnly from NSWAG and axios doesn't working correctly.
+        // NSwag's TypeScript generator uses toISOString() for all Date types, regardless of whether the OpenAPI spec specifies format: date or format: date-time. This is a known NSwag limitation (Issue #2339).
+        LocalDate? localDate = asOfDate.HasValue
+            ? LocalDate.FromDateTime(asOfDate.Value)
+            : null;
+
+        var operatingModels = await _sender.Send(new GetTeamOperatingModelsForTeamsQuery(teamIds, localDate), cancellationToken);
+
+        return Ok(operatingModels);
+    }
+
     [HttpGet("{id}/has-ever-been-scrum")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Teams)]
     [OpenApiOperation("Check if a team has ever used the Scrum methodology.", "")]

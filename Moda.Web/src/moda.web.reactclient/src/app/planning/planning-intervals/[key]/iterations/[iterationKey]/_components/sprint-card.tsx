@@ -11,8 +11,12 @@ import {
   IterationProgressBar,
 } from '@/src/components/common/planning'
 import { IterationState } from '@/src/components/types'
-import { SprintMetricsSummary } from '@/src/services/moda-api'
-import { Card, Col, Flex, Row, Typography } from 'antd'
+import {
+  SizingMethod,
+  SprintMetricsSummary,
+  TeamOperatingModelDetailsDto,
+} from '@/src/services/moda-api'
+import { Card, Col, Flex, Row, Tag, Tooltip, Typography } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { FC } from 'react'
@@ -21,10 +25,23 @@ const { Text } = Typography
 
 interface SprintCardProps {
   sprint: SprintMetricsSummary
-  useStoryPoints: boolean
+  operatingModel?: TeamOperatingModelDetailsDto
+  sizingMethod: SizingMethod
 }
 
-const SprintCard: FC<SprintCardProps> = ({ sprint, useStoryPoints }) => {
+const SprintCard: FC<SprintCardProps> = ({
+  sprint,
+  operatingModel,
+  sizingMethod,
+}) => {
+  const teamSupportsSP =
+    operatingModel?.sizingMethod === SizingMethod.StoryPoints
+  const useStoryPoints =
+    sizingMethod === SizingMethod.StoryPoints && teamSupportsSP
+  const effectiveSizingMethod = useStoryPoints
+    ? SizingMethod.StoryPoints
+    : SizingMethod.Count
+
   const displayTotal = useStoryPoints
     ? sprint.totalStoryPoints
     : sprint.totalWorkItems
@@ -78,12 +95,20 @@ const SprintCard: FC<SprintCardProps> = ({ sprint, useStoryPoints }) => {
               {formatDateRange()}
             </Text>
           </Flex>
-          <IterationHealthIndicator
-            startDate={new Date(sprint.start)}
-            endDate={new Date(sprint.end)}
-            total={displayTotal}
-            completed={displayCompleted}
-          />
+
+          <Flex vertical gap={8} align="end">
+            <IterationHealthIndicator
+              startDate={new Date(sprint.start)}
+              endDate={new Date(sprint.end)}
+              total={displayTotal}
+              completed={displayCompleted}
+            />
+            {sizingMethod === SizingMethod.StoryPoints && !teamSupportsSP && (
+              <Tooltip title="This team does not support story point sizing. Values are based on work item counts.">
+                <Tag>Count-based Metrics</Tag>
+              </Tooltip>
+            )}
+          </Flex>
         </Flex>
 
         {/* Progress Bar - only show for active/completed sprints */}
@@ -103,7 +128,7 @@ const SprintCard: FC<SprintCardProps> = ({ sprint, useStoryPoints }) => {
               <MetricCard
                 title="Total"
                 value={displayTotal}
-                tooltip="Total story points or items planned for this sprint"
+                tooltip="Total story points or work items planned for this sprint"
                 cardStyle={metricCardStyle}
               />
             </Col>
@@ -114,6 +139,7 @@ const SprintCard: FC<SprintCardProps> = ({ sprint, useStoryPoints }) => {
                   completed={displayCompleted}
                   total={displayTotal}
                   cardStyle={metricCardStyle}
+                  tooltip={effectiveSizingMethod}
                 />
               </Col>
               <Col xs={12} sm={8} md={6}>
@@ -121,6 +147,7 @@ const SprintCard: FC<SprintCardProps> = ({ sprint, useStoryPoints }) => {
                   completed={displayCompleted}
                   total={displayTotal}
                   cardStyle={metricCardStyle}
+                  tooltip={effectiveSizingMethod}
                 />
               </Col>
               <Col xs={12} sm={8} md={6}>
@@ -128,7 +155,7 @@ const SprintCard: FC<SprintCardProps> = ({ sprint, useStoryPoints }) => {
                   title="In Progress"
                   value={displayInProgress}
                   secondaryValue={`${displayNotStarted} not started`}
-                  tooltip="Work items currently in progress"
+                  tooltip="Total story points or work items currently in progress"
                   cardStyle={metricCardStyle}
                 />
               </Col>
