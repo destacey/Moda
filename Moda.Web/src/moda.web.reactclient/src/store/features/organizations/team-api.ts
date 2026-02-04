@@ -673,6 +673,44 @@ export const teamApi = apiSlice.injectEndpoints({
         { type: QueryTags.TeamOperatingModel, id: `${teamId}-scrum` },
       ],
     }),
+
+    getTeamOperatingModelsForTeams: builder.query<
+      TeamOperatingModelDetailsDto[],
+      { teamIds: string[]; asOfDate?: Date | string }
+    >({
+      queryFn: async ({ teamIds, asOfDate }) => {
+        try {
+          // Convert string to Date if needed
+          const date = asOfDate
+            ? asOfDate instanceof Date
+              ? asOfDate
+              : new Date(asOfDate)
+            : undefined
+
+          const data = await getTeamsClient().getOperatingModelsForTeams(
+            teamIds,
+            date,
+          )
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: (result, error, { teamIds }) => {
+        const tags = [
+          {
+            type: QueryTags.TeamOperatingModel,
+            id: `BULK-${teamIds.join(',')}`,
+          },
+        ]
+        // Add individual team tags for cache invalidation
+        teamIds.forEach((id) => {
+          tags.push({ type: QueryTags.TeamOperatingModel, id })
+        })
+        return tags
+      },
+    }),
   }),
 })
 
@@ -704,4 +742,5 @@ export const {
   useSetTeamOperatingModelMutation,
   useUpdateTeamOperatingModelMutation,
   useDeleteTeamOperatingModelMutation,
+  useGetTeamOperatingModelsForTeamsQuery,
 } = teamApi

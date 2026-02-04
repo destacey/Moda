@@ -27,6 +27,7 @@ import {
 import { FC, ReactNode, useEffect, useMemo, useState } from 'react'
 import { SprintCard } from '.'
 import { IterationHealthIndicator } from '@/src/components/common/planning'
+import { useGetTeamOperatingModelsForTeamsQuery } from '@/src/store/features/organizations/team-api'
 
 const { Title } = Typography
 
@@ -49,12 +50,26 @@ const PlanningIntervalIterationSummary: FC<
       iterationKey: iteration.key,
     })
 
+  const { data: operatingModels, isLoading: isOperatingModelsLoading } =
+    useGetTeamOperatingModelsForTeamsQuery(
+      {
+        teamIds: metrics?.sprintMetrics.map((s) => s.team.id),
+        asOfDate: iteration.start,
+      },
+      { skip: !metrics || metrics.sprintMetrics.length === 0 },
+    )
+
   const sortedSprints = useMemo(() => {
     if (!metrics) return []
     return [...metrics.sprintMetrics].sort((a, b) =>
       a.team.name.localeCompare(b.team.name),
     )
   }, [metrics])
+
+  const operatingModelMap = useMemo(() => {
+    if (!operatingModels) return new Map()
+    return new Map(operatingModels.map((m) => [m.teamId, m]))
+  }, [operatingModels])
 
   const displayValues = useMemo(() => {
     if (!metrics) {
@@ -101,7 +116,7 @@ const PlanningIntervalIterationSummary: FC<
     iteration.start,
   ])
 
-  if (isLoading || !metrics) {
+  if (isLoading || !metrics || isOperatingModelsLoading) {
     return <Skeleton active />
   }
 
@@ -209,6 +224,7 @@ const PlanningIntervalIterationSummary: FC<
               <SprintCard
                 key={sprint.sprintId}
                 sprint={sprint}
+                operatingModel={operatingModelMap.get(sprint.team.id)}
                 sizingMethod={sizingMethod}
               />
             ))}
