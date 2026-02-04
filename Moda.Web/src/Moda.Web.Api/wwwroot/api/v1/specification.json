@@ -13787,6 +13787,76 @@
         ]
       }
     },
+    "/api/organization/teams/operating-models": {
+      "get": {
+        "tags": [
+          "Teams"
+        ],
+        "summary": "Get operating models for multiple teams.",
+        "operationId": "Teams_GetOperatingModelsForTeams",
+        "parameters": [
+          {
+            "name": "teamIds",
+            "in": "query",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "guid",
+                "nullable": false,
+                "example": "00000000-0000-0000-0000-000000000000"
+              }
+            },
+            "x-position": 1
+          },
+          {
+            "name": "asOfDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "nullable": true
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TeamOperatingModelDetailsDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
     "/api/organization/teams/{id}/has-ever-been-scrum": {
       "get": {
         "tags": [

@@ -20,30 +20,20 @@ internal sealed class GetTeamOperatingModelsForTeamsQueryHandler(IOrganizationDb
     public async Task<List<TeamOperatingModelDetailsDto>> Handle(GetTeamOperatingModelsForTeamsQuery request, CancellationToken cancellationToken)
     {
         var teamIdList = request.TeamIds.ToList();
-
         if (teamIdList.Count == 0)
         {
             return [];
         }
 
+        var asOfDate = request.AsOfDate ?? LocalDate.FromDateTime(_dateTimeProvider.Now.ToDateTimeUtc());
+
         var query = _organizationDbContext.Teams
             .Where(t => teamIdList.Contains(t.Id))
             .SelectMany(t => t.OperatingModels, (team, model) => new { team.Id, Model = model });
 
-        if (request.AsOfDate is null)
-        {
-            var today = LocalDate.FromDateTime(_dateTimeProvider.Now.ToDateTimeUtc());
-            query = query.Where(x =>
-                x.Model.DateRange.Start <= today &&
-                (x.Model.DateRange.End == null || x.Model.DateRange.End >= today));
-        }
-        else
-        {
-            var asOfDate = request.AsOfDate.Value;
-            query = query.Where(x =>
-                x.Model.DateRange.Start <= asOfDate &&
-                (x.Model.DateRange.End == null || x.Model.DateRange.End >= asOfDate));
-        }
+        query = query.Where(x =>
+            x.Model.DateRange.Start <= asOfDate &&
+            (x.Model.DateRange.End == null || x.Model.DateRange.End >= asOfDate));        
 
         var results = await query
             .Select(x => new { x.Id, x.Model })
