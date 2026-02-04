@@ -3,14 +3,16 @@
 import {
   CompletionRateMetric,
   CycleTimeMetric,
-  HealthMetric,
   MetricCard,
   StatusMetric,
   VelocityMetric,
 } from '@/src/components/common/metrics'
 import TimelineProgress from '@/src/components/common/planning/timeline-progress'
 import useTheme from '@/src/components/contexts/theme'
-import { PlanningIntervalIterationDetailsDto } from '@/src/services/moda-api'
+import {
+  PlanningIntervalIterationDetailsDto,
+  SizingMethod,
+} from '@/src/services/moda-api'
 import { useGetPlanningIntervalIterationMetricsQuery } from '@/src/store/features/planning/planning-interval-api'
 import {
   Col,
@@ -36,7 +38,9 @@ export interface PlanningIntervalIterationSummaryProps {
 const PlanningIntervalIterationSummary: FC<
   PlanningIntervalIterationSummaryProps
 > = ({ iteration, onHealthIndicatorReady }) => {
-  const [useStoryPoints, setUseStoryPoints] = useState(true)
+  const [sizingMethod, setSizingMethod] = useState<SizingMethod>(
+    SizingMethod.StoryPoints,
+  )
   const { token } = useTheme()
 
   const { data: metrics, isLoading } =
@@ -62,18 +66,10 @@ const PlanningIntervalIterationSummary: FC<
       }
     }
 
-    const total = useStoryPoints
-      ? metrics.totalStoryPoints
-      : metrics.totalWorkItems
-    const completed = useStoryPoints
-      ? metrics.completedStoryPoints
-      : metrics.completedWorkItems
-    const inProgress = useStoryPoints
-      ? metrics.inProgressStoryPoints
-      : metrics.inProgressWorkItems
-    const notStarted = useStoryPoints
-      ? metrics.notStartedStoryPoints
-      : metrics.notStartedWorkItems
+    const total = metrics.totalWorkItems
+    const completed = metrics.completedWorkItems
+    const inProgress = metrics.inProgressWorkItems
+    const notStarted = metrics.notStartedWorkItems
 
     return {
       total,
@@ -81,7 +77,7 @@ const PlanningIntervalIterationSummary: FC<
       inProgress,
       notStarted,
     }
-  }, [metrics, useStoryPoints])
+  }, [metrics])
 
   // Notify parent when health indicator is ready
   useEffect(() => {
@@ -118,17 +114,6 @@ const PlanningIntervalIterationSummary: FC<
         end={iteration.end}
         dateFormat="MMM D"
       />
-      <Flex gap="small" justify="flex-end">
-        <Tooltip title="Switch between summing story points and counting work items for metrics">
-          <Segmented<string>
-            options={['Story Points', 'Count']}
-            value={useStoryPoints ? 'Story Points' : 'Count'}
-            onChange={(value) =>
-              setUseStoryPoints(value === 'Story Points' ? true : false)
-            }
-          />
-        </Tooltip>
-      </Flex>
 
       <Row gutter={[8, 8]}>
         <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
@@ -143,7 +128,7 @@ const PlanningIntervalIterationSummary: FC<
             <CompletionRateMetric
               completed={displayValues.completed}
               total={displayValues.total}
-              tooltip="Percentage of story points or items across all team sprints that are completed (Done or Removed)."
+              tooltip="Percentage of work items across all team sprints that are completed (Done or Removed)."
             />
           </Col>
         )}
@@ -151,7 +136,7 @@ const PlanningIntervalIterationSummary: FC<
           <MetricCard
             title="Total"
             value={displayValues.total}
-            tooltip="Total number of story points or items across all team sprints in this iteration."
+            tooltip="Total number of work items across all team sprints in this iteration."
           />
         </Col>
         {!isFuture && (
@@ -160,7 +145,7 @@ const PlanningIntervalIterationSummary: FC<
               <VelocityMetric
                 completed={displayValues.completed}
                 total={displayValues.total}
-                tooltip="Total completed story points or items across all team sprints (Done or Removed)."
+                tooltip="Total completed work items across all team sprints (Done or Removed)."
               />
             </Col>
             <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
@@ -169,7 +154,7 @@ const PlanningIntervalIterationSummary: FC<
                 value={displayValues.inProgress}
                 total={displayValues.total}
                 color={token.colorInfo}
-                tooltip="Total in-progress story points or items across all team sprints."
+                tooltip="Total in-progress work items across all team sprints."
               />
             </Col>
             <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
@@ -177,7 +162,7 @@ const PlanningIntervalIterationSummary: FC<
                 title="Not Started"
                 value={displayValues.notStarted}
                 total={displayValues.total}
-                tooltip="Total not-started story points or items across all team sprints."
+                tooltip="Total not-started work items across all team sprints."
               />
             </Col>
             {metrics.averageCycleTimeDays !== undefined &&
@@ -189,15 +174,6 @@ const PlanningIntervalIterationSummary: FC<
                   />
                 </Col>
               )}
-            {useStoryPoints && (
-              <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
-                <HealthMetric
-                  title="Missing SPs"
-                  value={metrics.missingStoryPointsCount}
-                  tooltip="Number of work items across all team sprints that don't have story points assigned."
-                />
-              </Col>
-            )}
           </>
         )}
       </Row>
@@ -206,15 +182,34 @@ const PlanningIntervalIterationSummary: FC<
 
       {sortedSprints.length > 0 && (
         <Flex vertical gap="small">
-          <Title level={5} style={{ margin: 0 }}>
-            Team Sprints
-          </Title>
+          <Flex gap="small" justify="space-between">
+            <Title level={5} style={{ margin: 0 }}>
+              Team Sprints
+            </Title>
+            <Tooltip title="Switch between summing story points and counting work items for metrics">
+              <Segmented<string>
+                options={['Count', 'Story Points']}
+                value={
+                  sizingMethod === SizingMethod.StoryPoints
+                    ? 'Story Points'
+                    : 'Count'
+                }
+                onChange={(value) =>
+                  setSizingMethod(
+                    value === 'Story Points'
+                      ? SizingMethod.StoryPoints
+                      : SizingMethod.Count,
+                  )
+                }
+              />
+            </Tooltip>
+          </Flex>
           <Flex vertical gap={8}>
             {sortedSprints.map((sprint) => (
               <SprintCard
                 key={sprint.sprintId}
                 sprint={sprint}
-                useStoryPoints={useStoryPoints}
+                sizingMethod={sizingMethod}
               />
             ))}
           </Flex>

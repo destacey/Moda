@@ -11,7 +11,7 @@ import {
   IterationProgressBar,
 } from '@/src/components/common/planning'
 import { IterationState } from '@/src/components/types'
-import { SprintMetricsSummary } from '@/src/services/moda-api'
+import { SizingMethod, SprintMetricsSummary } from '@/src/services/moda-api'
 import { Card, Col, Flex, Row, Typography } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
@@ -21,10 +21,12 @@ const { Text } = Typography
 
 interface SprintCardProps {
   sprint: SprintMetricsSummary
-  useStoryPoints: boolean
+  sizingMethod: SizingMethod
 }
 
-const SprintCard: FC<SprintCardProps> = ({ sprint, useStoryPoints }) => {
+const SprintCard: FC<SprintCardProps> = ({ sprint, sizingMethod }) => {
+  const useStoryPoints = sizingMethod === SizingMethod.StoryPoints
+
   const displayTotal = useStoryPoints
     ? sprint.totalStoryPoints
     : sprint.totalWorkItems
