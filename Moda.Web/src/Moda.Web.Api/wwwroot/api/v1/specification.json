@@ -958,7 +958,7 @@
           "Users"
         ],
         "summary": "Get list of all users.",
-        "operationId": "Users_GetList",
+        "operationId": "Users_GetUsers",
         "responses": {
           "200": {
             "description": "",
@@ -1000,7 +1000,7 @@
           "Users"
         ],
         "summary": "Get a user's details.",
-        "operationId": "Users_GetById",
+        "operationId": "Users_GetUser",
         "parameters": [
           {
             "name": "id",
@@ -16633,6 +16633,11 @@
           },
           "phoneNumber": {
             "type": "string",
+            "nullable": true
+          },
+          "lastActivityAt": {
+            "type": "string",
+            "format": "date-time",
             "nullable": true
           },
           "employee": {

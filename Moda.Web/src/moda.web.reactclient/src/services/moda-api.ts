@@ -1274,7 +1274,7 @@ export class UsersClient {
     /**
      * Get list of all users.
      */
-    getList( cancelToken?: CancelToken): Promise<UserDetailsDto[]> {
+    getUsers( cancelToken?: CancelToken): Promise<UserDetailsDto[]> {
         let url_ = this.baseUrl + "/api/user-management/users";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -1294,11 +1294,11 @@ export class UsersClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processGetList(_response);
+            return this.processGetUsers(_response);
         });
     }
 
-    protected processGetList(response: AxiosResponse): Promise<UserDetailsDto[]> {
+    protected processGetUsers(response: AxiosResponse): Promise<UserDetailsDto[]> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -1332,7 +1332,7 @@ export class UsersClient {
     /**
      * Get a user's details.
      */
-    getById(id: string, cancelToken?: CancelToken): Promise<UserDetailsDto> {
+    getUser(id: string, cancelToken?: CancelToken): Promise<UserDetailsDto> {
         let url_ = this.baseUrl + "/api/user-management/users/{id}";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
@@ -1355,11 +1355,11 @@ export class UsersClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processGetById(_response);
+            return this.processGetUser(_response);
         });
     }
 
-    protected processGetById(response: AxiosResponse): Promise<UserDetailsDto> {
+    protected processGetUser(response: AxiosResponse): Promise<UserDetailsDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -18758,6 +18758,7 @@ export interface UserDetailsDto {
     email?: string | undefined;
     isActive: boolean;
     phoneNumber?: string | undefined;
+    lastActivityAt?: Date | undefined;
     employee?: NavigationDto | undefined;
 }
 

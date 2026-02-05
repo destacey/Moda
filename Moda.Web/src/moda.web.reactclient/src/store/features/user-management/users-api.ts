@@ -12,7 +12,7 @@ export const usersApi = apiSlice.injectEndpoints({
     getUsers: builder.query<UserDetailsDto[], void>({
       queryFn: async () => {
         try {
-          const data = await getUsersClient().getList()
+          const data = await getUsersClient().getUsers()
           data.sort((a, b) => a.userName.localeCompare(b.userName))
           return { data }
         } catch (error) {
@@ -25,7 +25,7 @@ export const usersApi = apiSlice.injectEndpoints({
     getUser: builder.query<UserDetailsDto, string>({
       queryFn: async (id: string) => {
         try {
-          const data = await getUsersClient().getById(id)
+          const data = await getUsersClient().getUser(id)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
