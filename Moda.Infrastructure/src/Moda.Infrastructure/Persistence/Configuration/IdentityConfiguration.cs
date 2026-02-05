@@ -21,6 +21,8 @@ public class ApplicationUserConfig : IEntityTypeConfiguration<ApplicationUser>
         builder.Property(u => u.LastName).HasMaxLength(100);
         builder.Property(u => u.PhoneNumber).HasMaxLength(20);
 
+        builder.Property(u => u.LastActivityAt);
+
         // Relationships
         builder.HasOne(e => e.Employee).WithMany().HasForeignKey(e => e.EmployeeId).OnDelete(DeleteBehavior.NoAction);
     }

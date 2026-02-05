@@ -7,6 +7,9 @@ import { authorizePage } from '@/src/components/hoc'
 import Link from 'next/link'
 import { useDocumentTitle } from '@/src/hooks'
 import { useGetUsersQuery } from '@/src/store/features/user-management/users-api'
+import { UserDetailsDto } from '@/src/services/moda-api'
+import { ValueFormatterParams } from 'ag-grid-community'
+import dayjs from 'dayjs'
 
 const UserLinkCellRenderer = ({ value, data }) => {
   return <Link href={`users/${data.id}`}>{value}</Link>
@@ -17,6 +20,10 @@ const EmployeeLinkCellRenderer = ({ value, data }) => {
     <Link href={`/organizations/employees/${data.employee?.key}`}>{value}</Link>
   )
 }
+
+const dateTimeValueFormatter = (
+  params: ValueFormatterParams<UserDetailsDto>,
+) => (params.value ? dayjs(params.value).format('YYYY-MM-DD h:mm A') : '')
 
 const UsersListPage = () => {
   useDocumentTitle('Users')
@@ -34,6 +41,11 @@ const UsersListPage = () => {
         field: 'employee.name',
         headerName: 'Employee',
         cellRenderer: EmployeeLinkCellRenderer,
+      },
+      {
+        field: 'lastActivityAt',
+        headerName: 'Last Activity',
+        valueFormatter: dateTimeValueFormatter,
       },
       { field: 'isActive' }, // TODO: convert to yes/no
     ],

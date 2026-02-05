@@ -5,6 +5,7 @@ import { UserDetailsDto } from '@/src/services/moda-api'
 import { useGetUserRolesQuery } from '@/src/store/features/user-management/users-api'
 import { EditOutlined, InfoCircleOutlined } from '@ant-design/icons'
 import { Button, Card, Descriptions, Flex, List } from 'antd'
+import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 import { ManageUserRolesForm } from '.'
@@ -60,6 +61,11 @@ const UserDetails = (props: UserDetailsProps) => {
             <Link href={`/organizations/employees/${user.employee?.key}`}>
               {user.employee?.name}
             </Link>
+          </Item>
+          <Item label="Last Activity">
+            {user.lastActivityAt
+              ? dayjs(user.lastActivityAt).format('MMM D, YYYY h:mm A')
+              : null}
           </Item>
           <Item label="Is Active?">{user.isActive?.toString()}</Item>
         </Descriptions>
