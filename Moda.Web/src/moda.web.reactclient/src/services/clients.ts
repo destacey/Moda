@@ -42,10 +42,41 @@ const axiosClient = axios.create({
   transformResponse: (data) => data,
 })
 
-// Response interceptor for error handling
+// Response interceptor with automatic 401 token refresh and retry.
+// When a request returns 401, we attempt one silent token refresh with
+// forceRefresh and retry the request. This handles the common multi-tab
+// scenario where the cached token expired between the request interceptor's
+// acquireTokenSilent call and the server validating the token.
 axiosClient.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
+    const originalRequest = error.config
+
+    if (
+      error.response?.status === 401 &&
+      originalRequest &&
+      !(originalRequest as any)._retry &&
+      msalInstance
+    ) {
+      ;(originalRequest as any)._retry = true
+
+      try {
+        const accounts = msalInstance.getAllAccounts()
+        if (accounts.length > 0) {
+          const response = await msalInstance.acquireTokenSilent({
+            ...tokenRequest,
+            account: accounts[0],
+            forceRefresh: true,
+          })
+          originalRequest.headers = originalRequest.headers || {}
+          originalRequest.headers.Authorization = `Bearer ${response.accessToken}`
+          return axiosClient(originalRequest)
+        }
+      } catch (refreshError) {
+        console.error('Token refresh on 401 failed:', refreshError)
+      }
+    }
+
     console.error('API Error:', error.message, error.config?.url)
     return Promise.reject(error)
   },
