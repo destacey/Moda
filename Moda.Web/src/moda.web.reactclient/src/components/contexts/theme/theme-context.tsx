@@ -73,6 +73,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
         antDesignChartsTheme,
         antvisG6ChartsTheme,
       }),
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       [
         currentThemeName,
         setCurrentThemeName,

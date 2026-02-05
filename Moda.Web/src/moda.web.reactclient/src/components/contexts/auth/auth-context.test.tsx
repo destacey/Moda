@@ -51,6 +51,8 @@ const mockInstance = {
   acquireTokenPopup: jest.fn(),
   loginRedirect: jest.fn(),
   logoutRedirect: jest.fn(),
+  addEventCallback: jest.fn().mockReturnValue('callback-id'),
+  removeEventCallback: jest.fn(),
 }
 
 const mockUseMsal = jest.fn()
@@ -67,6 +69,12 @@ jest.mock('@azure/msal-browser', () => ({
       super(message)
       this.name = 'InteractionRequiredAuthError'
     }
+  },
+  EventType: {
+    LOGIN_SUCCESS: 'msal:loginSuccess',
+    ACQUIRE_TOKEN_SUCCESS: 'msal:acquireTokenSuccess',
+    LOGOUT_SUCCESS: 'msal:logoutSuccess',
+    ACTIVE_ACCOUNT_CHANGED: 'msal:activeAccountChanged',
   },
 }))
 
