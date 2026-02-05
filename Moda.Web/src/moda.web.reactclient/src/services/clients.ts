@@ -68,6 +68,7 @@ axiosClient.interceptors.response.use(
             account: accounts[0],
             forceRefresh: true,
           })
+          originalRequest.headers = originalRequest.headers || {}
           originalRequest.headers.Authorization = `Bearer ${response.accessToken}`
           return axiosClient(originalRequest)
         }
