@@ -68,6 +68,7 @@ public static class ConfigureServices
             .AddAuth(config)
             .AddBackgroundJobs(config)
             .AddCorsPolicy(config)
+            .AddUserActivityTracking()
             .AddProblemDetails(options =>
             {
                 options.CustomizeProblemDetails = (context) =>
@@ -125,6 +126,7 @@ public static class ConfigureServices
             .UseCorsPolicy()
             .UseAuthentication()
             .UseAuthorization()
+            .UseUserActivityTracking()
             .UseRequestLogging(config) // TODO: we currently don't log 403 logs because it is lower in the middleware pipeline. It should be above UseRouting, but then we don't get user information.
             .UseHangfireDashboard(config)
             .UseOpenApiDocumentation(config);

@@ -15,6 +15,12 @@ internal static class ConfigureServices
     internal static IApplicationBuilder UseExceptionMiddleware(this IApplicationBuilder app) =>
         app.UseMiddleware<ExceptionMiddleware>();
 
+    internal static IServiceCollection AddUserActivityTracking(this IServiceCollection services) =>
+        services.AddScoped<UserActivityTrackingMiddleware>();
+
+    internal static IApplicationBuilder UseUserActivityTracking(this IApplicationBuilder app) =>
+        app.UseMiddleware<UserActivityTrackingMiddleware>();
+
     internal static IServiceCollection AddRequestLogging(this IServiceCollection services, IConfiguration config)
     {
         if (GetMiddlewareSettings(config).EnableHttpsLogging)
