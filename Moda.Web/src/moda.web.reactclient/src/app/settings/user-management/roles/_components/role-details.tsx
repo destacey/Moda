@@ -21,9 +21,15 @@ const RoleDetails = (props: RolesDetailProps) => {
   const router = useRouter()
   const messageApi = useMessage()
 
+  // TODO: build this into the model or permissions system so we don't have to hardcode role names here
+  const editableRole =
+    props.role && props.role.name !== 'Admin' && props.role.name !== 'Basic'
+
   const { hasClaim } = useAuth()
-  const canUpdate = hasClaim('Permission', 'Permissions.Roles.Update')
-  const canDelete = hasClaim('Permission', 'Permissions.Roles.Delete')
+  const canUpdate =
+    hasClaim('Permission', 'Permissions.Roles.Update') && editableRole
+  const canDelete =
+    hasClaim('Permission', 'Permissions.Roles.Delete') && editableRole
 
   const [upsertRole, { error: upsertRoleError }] = useUpsertRoleMutation()
   const [deleteRole, { error: deleteRoleError }] = useDeleteRoleMutation()
@@ -114,7 +120,9 @@ const RoleDetails = (props: RolesDetailProps) => {
           </Item>
           {(canUpdate || canDelete) && (
             <Item wrapperCol={{ offset: 8, span: 16 }}>
-              <Space style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <Space
+                style={{ display: 'flex', justifyContent: 'space-between' }}
+              >
                 {canUpdate && (
                   <Button type="primary" htmlType="submit">
                     Save

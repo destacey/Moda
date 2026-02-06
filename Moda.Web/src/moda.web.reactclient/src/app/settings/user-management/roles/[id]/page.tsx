@@ -56,7 +56,7 @@ const RoleDetailsPage = (props: { params: Promise<{ id: string }> }) => {
       case RoleDetailsTabs.Permissions:
         return (
           <Permissions
-            roleId={roleData?.id}
+            role={roleData}
             permissions={roleData?.permissions}
             onDirtyChange={setPermissionsDirty}
           />

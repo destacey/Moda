@@ -17,11 +17,12 @@ import {
 } from 'antd'
 import { SearchOutlined } from '@ant-design/icons'
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { RoleDto } from '@/src/services/moda-api'
 
 const { Title } = Typography
 
 interface PermissionsProps {
-  roleId: string
+  role: RoleDto
   permissions: string[]
   onDirtyChange?: (isDirty: boolean) => void
 }
@@ -46,7 +47,11 @@ const Permissions = (props: PermissionsProps) => {
   const messageApi = useMessage()
   const theme = useTheme()
 
-  const canUpdate = hasPermissionClaim('Permissions.Roles.Update')
+  const editableRole =
+    props.role && props.role.name !== 'Admin' && props.role.name !== 'Basic'
+
+  const canUpdate =
+    hasPermissionClaim('Permissions.Roles.Update') && editableRole
 
   const [permissions, setPermissions] = useState<string[]>(props.permissions)
   const [searchText, setSearchText] = useState('')
@@ -238,7 +243,7 @@ const Permissions = (props: PermissionsProps) => {
   const handleSave = async () => {
     try {
       await updatePermissions({
-        roleId: props.roleId,
+        roleId: props.role.id,
         permissions: permissions,
       })
 
