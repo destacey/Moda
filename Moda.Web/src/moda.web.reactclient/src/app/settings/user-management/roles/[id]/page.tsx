@@ -30,6 +30,7 @@ const RoleDetailsPage = (props: { params: Promise<{ id: string }> }) => {
   const { id } = use(props.params)
 
   const [activeTab, setActiveTab] = useState(RoleDetailsTabs.Details)
+  const [permissionsDirty, setPermissionsDirty] = useState(false)
 
   const { hasPermissionClaim } = useAuth()
 
@@ -57,6 +58,7 @@ const RoleDetailsPage = (props: { params: Promise<{ id: string }> }) => {
           <Permissions
             roleId={roleData?.id}
             permissions={roleData?.permissions}
+            onDirtyChange={setPermissionsDirty}
           />
         )
       default:
@@ -64,9 +66,20 @@ const RoleDetailsPage = (props: { params: Promise<{ id: string }> }) => {
     }
   }, [activeTab, roleData])
 
-  const onTabChange = useCallback((tabKey: string) => {
-    setActiveTab(tabKey as RoleDetailsTabs)
-  }, [])
+  const onTabChange = useCallback(
+    (tabKey: string) => {
+      if (
+        permissionsDirty &&
+        !window.confirm(
+          'You have unsaved permission changes. Are you sure you want to leave?',
+        )
+      )
+        return
+      setPermissionsDirty(false)
+      setActiveTab(tabKey as RoleDetailsTabs)
+    },
+    [permissionsDirty],
+  )
 
   if (!isLoading && !roleData) {
     return notFound()
