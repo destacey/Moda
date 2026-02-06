@@ -18696,6 +18696,7 @@ export interface ApplicationPermission {
     description: string;
     action: string;
     resource: string;
+    category: string;
     isBasic: boolean;
     isRoot: boolean;
     name: string;

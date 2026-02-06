@@ -21,8 +21,15 @@ const RoleDetails = (props: RolesDetailProps) => {
   const router = useRouter()
   const messageApi = useMessage()
 
+  // TODO: build this into the model or permissions system so we don't have to hardcode role names here
+  const editableRole =
+    props.role && props.role.name !== 'Admin' && props.role.name !== 'Basic'
+
   const { hasClaim } = useAuth()
-  const canDelete = hasClaim('Permission', 'Permissions.Roles.Delete')
+  const canUpdate =
+    hasClaim('Permission', 'Permissions.Roles.Update') && editableRole
+  const canDelete =
+    hasClaim('Permission', 'Permissions.Roles.Delete') && editableRole
 
   const [upsertRole, { error: upsertRoleError }] = useUpsertRoleMutation()
   const [deleteRole, { error: deleteRoleError }] = useDeleteRoleMutation()
@@ -95,6 +102,7 @@ const RoleDetails = (props: RolesDetailProps) => {
               autoSize={{ minRows: 1, maxRows: 4 }}
               showCount
               maxLength={256}
+              disabled={!canUpdate}
             />
           </Item>
 
@@ -107,29 +115,36 @@ const RoleDetails = (props: RolesDetailProps) => {
               autoSize={{ minRows: 6, maxRows: 10 }}
               showCount
               maxLength={1024}
+              disabled={!canUpdate}
             />
           </Item>
-          <Item wrapperCol={{ offset: 8, span: 16 }}>
-            <Space style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <Button type="primary" htmlType="submit">
-                Save
-              </Button>
-
-              {canDelete && (
-                <Popconfirm
-                  title="Delete Role"
-                  description="Are you sure to delete this role?"
-                  onConfirm={confirmDelete}
-                  okText="Yes"
-                  cancelText="No"
-                >
-                  <Button type="text" danger>
-                    Delete
+          {(canUpdate || canDelete) && (
+            <Item wrapperCol={{ offset: 8, span: 16 }}>
+              <Space
+                style={{ display: 'flex', justifyContent: 'space-between' }}
+              >
+                {canUpdate && (
+                  <Button type="primary" htmlType="submit">
+                    Save
                   </Button>
-                </Popconfirm>
-              )}
-            </Space>
-          </Item>
+                )}
+
+                {canDelete && (
+                  <Popconfirm
+                    title="Delete Role"
+                    description="Are you sure to delete this role?"
+                    onConfirm={confirmDelete}
+                    okText="Yes"
+                    cancelText="No"
+                  >
+                    <Button type="text" danger>
+                      Delete
+                    </Button>
+                  </Popconfirm>
+                )}
+              </Space>
+            </Item>
+          )}
         </Form>
       )}
     </div>
