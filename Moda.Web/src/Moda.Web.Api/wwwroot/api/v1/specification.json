@@ -16401,6 +16401,7 @@
           "description",
           "action",
           "resource",
+          "category",
           "isBasic",
           "isRoot",
           "name"
@@ -16413,6 +16414,9 @@
             "type": "string"
           },
           "resource": {
+            "type": "string"
+          },
+          "category": {
             "type": "string"
           },
           "isBasic": {

@@ -3,9 +3,22 @@ import { useMessage } from '@/src/components/contexts/messaging'
 import useTheme from '@/src/components/contexts/theme'
 import { useGetPermissionsQuery } from '@/src/store/features/user-management/permissions-api'
 import { useUpdatePermissionsMutation } from '@/src/store/features/user-management/roles-api'
-import { Button, Collapse, Divider, Flex, Input, Space, Spin, Switch, Tag } from 'antd'
+import {
+  Button,
+  Collapse,
+  Divider,
+  Flex,
+  Input,
+  Space,
+  Spin,
+  Switch,
+  Tag,
+  Typography,
+} from 'antd'
 import { SearchOutlined } from '@ant-design/icons'
 import { useCallback, useEffect, useMemo, useState } from 'react'
+
+const { Title } = Typography
 
 interface PermissionsProps {
   roleId: string
@@ -13,14 +26,19 @@ interface PermissionsProps {
   onDirtyChange?: (isDirty: boolean) => void
 }
 
+interface PermissionItem {
+  name: string
+  description: string
+}
+
 interface PermissionGroup {
   name: string
   permissions: PermissionItem[]
 }
 
-interface PermissionItem {
+interface PermissionCategory {
   name: string
-  description: string
+  groups: PermissionGroup[]
 }
 
 const Permissions = (props: PermissionsProps) => {
@@ -94,48 +112,73 @@ const Permissions = (props: PermissionsProps) => {
   const [updatePermissions, { error: updatePermissionsError }] =
     useUpdatePermissionsMutation()
 
-  const permissionGroups = useMemo(() => {
+  const categories = useMemo(() => {
     if (!permissionsData) return []
-    const groups = permissionsData.reduce(
-      (acc: PermissionGroup[], permission) => {
-        const item: PermissionItem = {
-          name: permission.name,
-          description: permission.description,
-        }
-        const group = acc.find((g) => g.name === permission.resource)
-        if (group) {
-          group.permissions.push(item)
-        } else {
-          acc.push({
-            name: permission.resource,
-            permissions: [item],
-          })
-        }
-        return acc
-      },
-      [],
-    )
+    const categoryMap = new Map<string, Map<string, PermissionItem[]>>()
 
-    return groups?.sort((a, b) => a.name.localeCompare(b.name)) ?? groups
+    permissionsData.forEach((permission) => {
+      const categoryName = permission.category || 'Other'
+      if (!categoryMap.has(categoryName)) {
+        categoryMap.set(categoryName, new Map())
+      }
+      const groupMap = categoryMap.get(categoryName)!
+      if (!groupMap.has(permission.resource)) {
+        groupMap.set(permission.resource, [])
+      }
+      groupMap.get(permission.resource)!.push({
+        name: permission.name,
+        description: permission.description,
+      })
+    })
+
+    const result: PermissionCategory[] = []
+    categoryMap.forEach((groupMap, categoryName) => {
+      const groups: PermissionGroup[] = []
+      groupMap.forEach((perms, resourceName) => {
+        groups.push({ name: resourceName, permissions: perms })
+      })
+      groups.sort((a, b) => a.name.localeCompare(b.name))
+      result.push({ name: categoryName, groups })
+    })
+
+    return result.sort((a, b) => a.name.localeCompare(b.name))
   }, [permissionsData])
 
-  const filteredGroups = useMemo(() => {
-    if (!searchText) return permissionGroups
+  const allGroups = useMemo(
+    () => categories.flatMap((c) => c.groups),
+    [categories],
+  )
+
+  const filteredCategories = useMemo(() => {
+    if (!searchText) return categories
     const lower = searchText.toLowerCase()
-    return permissionGroups
-      .map((group) => {
-        const groupNameMatch = group.name.toLowerCase().includes(lower)
-        if (groupNameMatch) return group
-        const filteredPermissions = group.permissions.filter(
-          (p) =>
-            p.name.toLowerCase().includes(lower) ||
-            p.description.toLowerCase().includes(lower),
-        )
-        if (filteredPermissions.length === 0) return null
-        return { ...group, permissions: filteredPermissions }
+    return categories
+      .map((category) => {
+        const categoryMatch = category.name.toLowerCase().includes(lower)
+        if (categoryMatch) return category
+        const filteredGroups = category.groups
+          .map((group) => {
+            const groupMatch = group.name.toLowerCase().includes(lower)
+            if (groupMatch) return group
+            const filteredPerms = group.permissions.filter(
+              (p) =>
+                p.name.toLowerCase().includes(lower) ||
+                p.description.toLowerCase().includes(lower),
+            )
+            if (filteredPerms.length === 0) return null
+            return { ...group, permissions: filteredPerms }
+          })
+          .filter(Boolean) as PermissionGroup[]
+        if (filteredGroups.length === 0) return null
+        return { ...category, groups: filteredGroups }
       })
-      .filter(Boolean) as PermissionGroup[]
-  }, [permissionGroups, searchText])
+      .filter(Boolean) as PermissionCategory[]
+  }, [categories, searchText])
+
+  const allFilteredGroups = useMemo(
+    () => filteredCategories.flatMap((c) => c.groups),
+    [filteredCategories],
+  )
 
   const hasPermission = useCallback(
     (permission: string) => permissions.includes(permission),
@@ -165,20 +208,20 @@ const Permissions = (props: PermissionsProps) => {
 
   const handleSelectAll = (select: boolean) => {
     if (select) {
-      const allNames = permissionGroups.flatMap((g) =>
+      const allNames = allGroups.flatMap((g) =>
         g.permissions.map((p) => p.name),
       )
       setPermissions([...new Set([...permissions, ...allNames])])
     } else {
       const allNames = new Set(
-        permissionGroups.flatMap((g) => g.permissions.map((p) => p.name)),
+        allGroups.flatMap((g) => g.permissions.map((p) => p.name)),
       )
       setPermissions(permissions.filter((p) => !allNames.has(p)))
     }
   }
 
   const handleExpandAll = () => {
-    setExpandedKeys(filteredGroups.map((g) => g.name))
+    setExpandedKeys(allFilteredGroups.map((g) => g.name))
   }
 
   const handleCollapseAll = () => {
@@ -186,14 +229,11 @@ const Permissions = (props: PermissionsProps) => {
   }
 
   const isAllExpanded =
-    filteredGroups.length > 0 &&
-    expandedKeys.length === filteredGroups.length
+    allFilteredGroups.length > 0 &&
+    expandedKeys.length === allFilteredGroups.length
 
   const getGroupSelectedCount = (group: PermissionGroup) =>
     group.permissions.filter((p) => hasPermission(p.name)).length
-
-  const isGroupAllSelected = (group: PermissionGroup) =>
-    group.permissions.every((p) => hasPermission(p.name))
 
   const handleSave = async () => {
     try {
@@ -210,72 +250,75 @@ const Permissions = (props: PermissionsProps) => {
 
   if (isLoading) return <Spin size="small" />
 
-  const collapseItems = filteredGroups.map((group) => {
-    const selectedCount = getGroupSelectedCount(group)
-    const totalCount = group.permissions.length
-    const allSelected = selectedCount === totalCount
+  const buildCollapseItems = (groups: PermissionGroup[]) =>
+    groups.map((group) => {
+      const selectedCount = getGroupSelectedCount(group)
+      const totalCount = group.permissions.length
+      const allSelected = selectedCount === totalCount
 
-    return {
-      key: group.name,
-      label: (
-        <Flex align="center">
-          <span style={{ fontWeight: 600 }}>{group.name}</span>
-          <Tag
-            color={selectedCount > 0 ? 'blue' : undefined}
-            style={{ marginLeft: 8 }}
-          >
-            {selectedCount} of {totalCount}
-          </Tag>
-        </Flex>
-      ),
-      extra: (
-        <Flex align="center" gap={8} onClick={(e) => e.stopPropagation()}>
-          <span style={{ fontSize: 13, color: theme.token.colorTextSecondary }}>
-            Toggle All
-          </span>
-          <Switch
-            size="small"
-            checked={allSelected}
-            disabled={!canUpdate}
-            onChange={(checked) => handleToggleGroup(group, checked)}
-          />
-        </Flex>
-      ),
-      children: (
-        <div>
-          {group.permissions.map((permission, idx) => (
-            <div key={permission.name}>
-              {idx > 0 && <Divider style={{ margin: '8px 0' }} />}
-              <Flex
-                justify="space-between"
-                align="center"
-                style={{ padding: '4px 0' }}
-              >
-                <div>
-                  <div style={{ fontWeight: 600 }}>
-                    {permission.description}
+      return {
+        key: group.name,
+        label: (
+          <Flex align="center">
+            <span style={{ fontWeight: 600 }}>{group.name}</span>
+            <Tag
+              color={selectedCount > 0 ? 'blue' : undefined}
+              style={{ marginLeft: 8 }}
+            >
+              {selectedCount} of {totalCount}
+            </Tag>
+          </Flex>
+        ),
+        extra: (
+          <Flex align="center" gap={8} onClick={(e) => e.stopPropagation()}>
+            <span
+              style={{ fontSize: 13, color: theme.token.colorTextSecondary }}
+            >
+              Toggle All
+            </span>
+            <Switch
+              size="small"
+              checked={allSelected}
+              disabled={!canUpdate}
+              onChange={(checked) => handleToggleGroup(group, checked)}
+            />
+          </Flex>
+        ),
+        children: (
+          <div>
+            {group.permissions.map((permission, idx) => (
+              <div key={permission.name}>
+                {idx > 0 && <Divider style={{ margin: '8px 0' }} />}
+                <Flex
+                  justify="space-between"
+                  align="center"
+                  style={{ padding: '4px 0' }}
+                >
+                  <div>
+                    <div style={{ fontWeight: 600 }}>
+                      {permission.description}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 13,
+                        color: theme.token.colorTextSecondary,
+                      }}
+                    >
+                      {permission.name}
+                    </div>
                   </div>
-                  <div
-                    style={{
-                      fontSize: 13,
-                      color: theme.token.colorTextSecondary,
-                    }}
-                  >
-                    {permission.name}
-                  </div>
-                </div>
-                <Switch
-                  checked={hasPermission(permission.name)}
-                  disabled={!canUpdate}
-                  onChange={() => handlePermissionChange(permission)}
-                />
-              </Flex>
-            </div>
-          ))}
-        </div>
-      ),
-    }
-  })
+                  <Switch
+                    checked={hasPermission(permission.name)}
+                    disabled={!canUpdate}
+                    onChange={() => handlePermissionChange(permission)}
+                  />
+                </Flex>
+              </div>
+            ))}
+          </div>
+        ),
+      }
+    })
 
   return (
     <div>
@@ -306,11 +349,18 @@ const Permissions = (props: PermissionsProps) => {
         </Space>
       </Flex>
 
-      <Collapse
-        activeKey={expandedKeys}
-        onChange={(keys) => setExpandedKeys(keys as string[])}
-        items={collapseItems}
-      />
+      {filteredCategories.map((category) => (
+        <div key={category.name} style={{ marginBottom: 16 }}>
+          <Title level={5} style={{ marginBottom: 8 }}>
+            {category.name}
+          </Title>
+          <Collapse
+            activeKey={expandedKeys}
+            onChange={(keys) => setExpandedKeys(keys as string[])}
+            items={buildCollapseItems(category.groups)}
+          />
+        </div>
+      ))}
     </div>
   )
 }
