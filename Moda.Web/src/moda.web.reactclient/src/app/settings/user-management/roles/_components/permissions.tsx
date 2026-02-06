@@ -199,16 +199,15 @@ const Permissions = (props: PermissionsProps) => {
   }
 
   const handleToggleGroup = (group: PermissionGroup, checked: boolean) => {
-    const updated = [...permissions]
+    const permSet = new Set(permissions)
     group.permissions.forEach((p) => {
-      const idx = updated.indexOf(p.name)
-      if (checked && idx === -1) {
-        updated.push(p.name)
-      } else if (!checked && idx !== -1) {
-        updated.splice(idx, 1)
+      if (checked) {
+        permSet.add(p.name)
+      } else {
+        permSet.delete(p.name)
       }
     })
-    setPermissions(updated)
+    setPermissions(Array.from(permSet))
   }
 
   const handleSelectAll = (select: boolean) => {
