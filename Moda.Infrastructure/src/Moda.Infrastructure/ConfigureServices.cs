@@ -141,17 +141,17 @@ public static class ConfigureServices
         {
             // All health checks must pass for app to be considered ready to accept traffic after starting
             app.MapHealthChecks(ServiceEndpoints.HealthEndpointPath);
-
-            // Only health checks tagged with the "live" tag must pass for app to be considered alive
-            app.MapHealthChecks(ServiceEndpoints.AlivenessEndpointPath, new HealthCheckOptions
-            {
-                Predicate = r => r.Tags.Contains("live")
-            });
         }
         else
         {
             app.MapHealthChecks(ServiceEndpoints.HealthEndpointPath).RequireAuthorization();
         }
+
+        // Only health checks tagged with the "live" tag must pass for app to be considered alive
+        app.MapHealthChecks(ServiceEndpoints.AlivenessEndpointPath, new HealthCheckOptions
+        {
+            Predicate = r => r.Tags.Contains("live")
+        });
 
         app.MapGet(ServiceEndpoints.StartupEndpointPath, () => Results.Ok());
 
