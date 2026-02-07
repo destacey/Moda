@@ -43,6 +43,12 @@ interface PermissionCategory {
 }
 
 const Permissions = (props: PermissionsProps) => {
+  const [permissions, setPermissions] = useState<string[]>(props.permissions)
+  const [searchText, setSearchText] = useState('')
+  const [expandedKeys, setExpandedKeys] = useState<string[]>([])
+
+  const { onDirtyChange } = props
+
   const { hasPermissionClaim } = useAuth()
   const messageApi = useMessage()
   const theme = useTheme()
@@ -53,9 +59,15 @@ const Permissions = (props: PermissionsProps) => {
   const canUpdate =
     hasPermissionClaim('Permissions.Roles.Update') && editableRole
 
-  const [permissions, setPermissions] = useState<string[]>(props.permissions)
-  const [searchText, setSearchText] = useState('')
-  const [expandedKeys, setExpandedKeys] = useState<string[]>([])
+  const {
+    data: permissionsData,
+    isLoading,
+    error,
+    refetch,
+  } = useGetPermissionsQuery()
+
+  const [updatePermissions, { error: updatePermissionsError }] =
+    useUpdatePermissionsMutation()
 
   const isDirty = useMemo(() => {
     if (permissions.length !== props.permissions.length) return true
@@ -64,7 +76,6 @@ const Permissions = (props: PermissionsProps) => {
     return sorted.some((p, i) => p !== sortedProps[i])
   }, [permissions, props.permissions])
 
-  const { onDirtyChange } = props
   useEffect(() => {
     onDirtyChange?.(isDirty)
   }, [isDirty, onDirtyChange])
@@ -106,16 +117,6 @@ const Permissions = (props: PermissionsProps) => {
       document.removeEventListener('click', handleClick, true)
     }
   }, [isDirty])
-
-  const {
-    data: permissionsData,
-    isLoading,
-    error,
-    refetch,
-  } = useGetPermissionsQuery()
-
-  const [updatePermissions, { error: updatePermissionsError }] =
-    useUpdatePermissionsMutation()
 
   const categories = useMemo(() => {
     if (!permissionsData) return []
