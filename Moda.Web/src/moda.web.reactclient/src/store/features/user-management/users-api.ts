@@ -69,7 +69,11 @@ export const usersApi = apiSlice.injectEndpoints({
         }
       },
       invalidatesTags: (result, error, arg) => {
-        return [{ type: QueryTags.UserRole, id: arg.userId }]
+        return [
+          { type: QueryTags.UserRole, id: arg.userId },
+          { type: QueryTags.User, id: arg.userId },
+          { type: QueryTags.User, id: 'LIST' },
+        ]
       },
     }),
   }),

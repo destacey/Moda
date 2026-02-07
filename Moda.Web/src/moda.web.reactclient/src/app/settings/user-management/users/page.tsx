@@ -43,6 +43,11 @@ const UsersListPage = () => {
         cellRenderer: EmployeeLinkCellRenderer,
       },
       {
+        field: 'roles',
+        valueFormatter: (params) =>
+          params.value?.map((r) => r.name).sort().join(', ') ?? '',
+      },
+      {
         field: 'lastActivityAt',
         headerName: 'Last Activity',
         valueFormatter: dateTimeValueFormatter,
