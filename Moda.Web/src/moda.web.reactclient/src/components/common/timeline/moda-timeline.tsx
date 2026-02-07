@@ -53,6 +53,7 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
   const initialWindowRef = useRef<{ start: Date; end: Date } | null>(null)
   const isInitializedRef = useRef(false)
   const dynamicOptionsRef = useRef<TimelineOptions>({})
+  const prevWindowBoundsRef = useRef<{ start: Date; end: Date } | null>(null)
 
   const { currentThemeName, token } = useTheme()
 
@@ -250,8 +251,35 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
 
     // Update existing timeline instance if already initialized
     if (timelineInstanceRef.current && isInitializedRef.current) {
-      // Exclude start/end from options to prevent window reset
-      // These define the initial window range, not the current view
+      // Check if window bounds (start/end) have changed
+      const currentStart = updatedOptions.start
+        ? new Date(updatedOptions.start)
+        : null
+      const currentEnd = updatedOptions.end ? new Date(updatedOptions.end) : null
+
+      const startChanged =
+        !prevWindowBoundsRef.current ||
+        !currentStart ||
+        prevWindowBoundsRef.current.start.getTime() !== currentStart.getTime()
+      const endChanged =
+        !prevWindowBoundsRef.current ||
+        !currentEnd ||
+        prevWindowBoundsRef.current.end.getTime() !== currentEnd.getTime()
+
+      if (startChanged || endChanged) {
+        // Window bounds changed - update the visible window
+        if (currentStart && currentEnd) {
+          timelineInstanceRef.current.setWindow(currentStart, currentEnd, {
+            animation: true,
+          })
+          prevWindowBoundsRef.current = {
+            start: currentStart,
+            end: currentEnd,
+          }
+        }
+      }
+
+      // Always update other options, excluding start/end to avoid implicit resets
       const { start, end, ...optionsWithoutWindow } = updatedOptions
       timelineInstanceRef.current.setOptions(optionsWithoutWindow)
     }
@@ -332,9 +360,17 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
     // Store initial window for reset functionality
     const opts = dynamicOptionsRef.current
     if (opts.start && opts.end) {
+      const startDate = new Date(opts.start)
+      const endDate = new Date(opts.end)
+
       initialWindowRef.current = {
-        start: opts.start as Date,
-        end: opts.end as Date,
+        start: startDate,
+        end: endDate,
+      }
+      // Also track as previous bounds for conditional updates
+      prevWindowBoundsRef.current = {
+        start: startDate,
+        end: endDate,
       }
     }
 
@@ -484,6 +520,7 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
       datasetItemsRef.current = null
       datasetGroupsRef.current = null
       isInitializedRef.current = false
+      prevWindowBoundsRef.current = null
     }
   }, [])
 

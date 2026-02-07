@@ -8,12 +8,7 @@ import {
   useGetRoadmapItemsQuery,
   useGetRoadmapQuery,
 } from '@/src/store/features/planning/roadmaps-api'
-import {
-  notFound,
-  usePathname,
-  useRouter,
-  useSearchParams,
-} from 'next/navigation'
+import { notFound, usePathname, useRouter } from 'next/navigation'
 import RoadmapDetailsLoading from './loading'
 import { use, useCallback, useEffect, useMemo, useState } from 'react'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
@@ -87,8 +82,6 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   } = useGetRoadmapItemsQuery(roadmapData?.id, {
     skip: !roadmapData,
   })
-
-  const searchParams = useSearchParams()
 
   const managersInfo = useMemo(() => {
     if (!roadmapData) return 'Unknown'
