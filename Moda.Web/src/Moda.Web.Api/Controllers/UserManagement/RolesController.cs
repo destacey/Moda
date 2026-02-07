@@ -1,4 +1,4 @@
-using Moda.Common.Application.Exceptions;
+﻿using Moda.Common.Application.Exceptions;
 using Moda.Web.Api.Extensions;
 using Moda.Web.Api.Models.UserManagement.Roles;
 
@@ -7,16 +7,10 @@ namespace Moda.Web.Api.Controllers.UserManagement;
 [Route("api/user-management/roles")]
 [ApiVersionNeutral]
 [ApiController]
-public class RolesController : ControllerBase
+public class RolesController(IRoleService roleService, ILogger<RolesController> logger) : ControllerBase
 {
-    private readonly IRoleService _roleService;
-    private readonly ILogger<RolesController> _logger;
-
-    public RolesController(IRoleService roleService, ILogger<RolesController> logger)
-    {
-        _roleService = roleService;
-        _logger = logger;
-    }
+    private readonly IRoleService _roleService = roleService;
+    private readonly ILogger<RolesController> _logger = logger;
 
     [HttpGet]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Roles)]

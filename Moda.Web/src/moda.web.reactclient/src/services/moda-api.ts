@@ -18761,6 +18761,7 @@ export interface UserDetailsDto {
     phoneNumber?: string | undefined;
     lastActivityAt?: Date | undefined;
     employee?: NavigationDto | undefined;
+    roles: RoleListDto[];
 }
 
 export interface NavigationDtoOfGuidAndInteger {
@@ -18770,6 +18771,12 @@ export interface NavigationDtoOfGuidAndInteger {
 }
 
 export interface NavigationDto extends NavigationDtoOfGuidAndInteger {
+}
+
+export interface RoleListDto {
+    id: string;
+    name: string;
+    description?: string | undefined;
 }
 
 export interface UpdateProfileRequest {
@@ -18790,12 +18797,6 @@ export interface AuditDto {
     newValues?: string | undefined;
     affectedColumns?: string | undefined;
     primaryKey?: string | undefined;
-}
-
-export interface RoleListDto {
-    id: string;
-    name: string;
-    description?: string | undefined;
 }
 
 export interface RoleDto {

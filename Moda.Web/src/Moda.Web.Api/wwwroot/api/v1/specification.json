@@ -16610,7 +16610,8 @@
         "additionalProperties": false,
         "required": [
           "id",
-          "isActive"
+          "isActive",
+          "roles"
         ],
         "properties": {
           "id": {
@@ -16651,6 +16652,12 @@
                 "$ref": "#/components/schemas/NavigationDto"
               }
             ]
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RoleListDto"
+            }
           }
         }
       },
@@ -16688,6 +16695,26 @@
           "name": {
             "type": "string",
             "minLength": 1
+          }
+        }
+      },
+      "RoleListDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
           }
         }
       },
@@ -16776,26 +16803,6 @@
             "nullable": true
           },
           "primaryKey": {
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
-      "RoleListDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "name"
-        ],
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "description": {
             "type": "string",
             "nullable": true
           }
