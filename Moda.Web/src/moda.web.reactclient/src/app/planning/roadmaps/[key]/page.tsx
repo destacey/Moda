@@ -89,7 +89,6 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   })
 
   const searchParams = useSearchParams()
-  const timelineEditMode = searchParams.has('editMode')
 
   const managersInfo = useMemo(() => {
     if (!roadmapData) return 'Unknown'
@@ -302,7 +301,6 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
         refreshRoadmapItems={refetchRoadmapItems}
         canUpdateRoadmap={canUpdateRoadmap && isRoadmapManager}
         openRoadmapItemDrawer={openRoadmapItemDrawer}
-        timelineEditMode={timelineEditMode}
       />
       {openEditRoadmapForm && (
         <EditRoadmapForm

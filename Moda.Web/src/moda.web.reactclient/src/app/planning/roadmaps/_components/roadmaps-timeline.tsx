@@ -38,7 +38,6 @@ export interface RoadmapsTimelineProps {
   viewSelector?: ReactNode
   openRoadmapItemDrawer: (itemId: string) => void
   isRoadmapManager: boolean
-  editMode?: boolean
 }
 
 interface RoadmapTimelineItem extends ModaDataItem<RoadmapItemListDto, string> {
@@ -460,7 +459,7 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
           rangeItemTemplate={RoadmapRangeItemTemplate}
           allowFullScreen={true}
           allowSaveAsImage={true}
-          onMove={props.editMode && props.isRoadmapManager ? onMove : undefined}
+          onMove={props.isRoadmapManager ? onMove : undefined}
         />
       </Card>
     </>
