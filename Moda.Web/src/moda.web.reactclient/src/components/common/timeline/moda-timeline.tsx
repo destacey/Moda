@@ -188,6 +188,29 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
       showCurrentTime: props.options.showCurrentTime ?? true,
       verticalScroll: true,
       zoomKey: 'ctrlKey',
+      // Day-level precision: snap items to day boundaries when dragging
+      snap: (date) => {
+        const d = new Date(date)
+        d.setHours(0, 0, 0, 0)
+        return d
+      },
+      // Prevent zooming to time level (minimum 1 day)
+      zoomMin: 86400000,
+      // Format axis to show only dates, not times
+      format: {
+        minorLabels: {
+          day: 'D',
+          weekday: 'ddd D',
+          month: 'MMM',
+          year: 'YYYY',
+        },
+        majorLabels: {
+          day: 'MMMM YYYY',
+          weekday: 'MMMM YYYY',
+          month: 'YYYY',
+          year: '',
+        },
+      },
       start: props.options.start,
       end: props.options.end,
       min: props.options.min,
@@ -227,7 +250,10 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
 
     // Update existing timeline instance if already initialized
     if (timelineInstanceRef.current && isInitializedRef.current) {
-      timelineInstanceRef.current.setOptions(updatedOptions)
+      // Exclude start/end from options to prevent window reset
+      // These define the initial window range, not the current view
+      const { start, end, ...optionsWithoutWindow } = updatedOptions
+      timelineInstanceRef.current.setOptions(optionsWithoutWindow)
     }
 
     // Add resize listener when in fullscreen
@@ -240,7 +266,9 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
           maxHeight: newMaxHeight,
         }
         dynamicOptionsRef.current = resizedOptions
-        timelineInstanceRef.current.setOptions(resizedOptions)
+        // Exclude start/end to prevent window reset during resize
+        const { start, end, ...optionsWithoutWindow } = resizedOptions
+        timelineInstanceRef.current.setOptions(optionsWithoutWindow)
       }
 
       window.addEventListener('resize', handleResize)
@@ -409,7 +437,9 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
       timelineInstanceRef.current.setGroups(datasetGroups)
 
       // Re-apply options to ensure they're still set correctly after adding groups
-      timelineInstanceRef.current.setOptions(dynamicOptionsRef.current)
+      // Exclude start/end to prevent window reset
+      const { start, end, ...optionsWithoutWindow } = dynamicOptionsRef.current
+      timelineInstanceRef.current.setOptions(optionsWithoutWindow)
       return
     }
 
