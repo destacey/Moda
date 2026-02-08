@@ -1256,6 +1256,128 @@ export class RolesClient {
         }
         return Promise.resolve<void>(null as any);
     }
+
+    /**
+     * Get list of all users with this role.
+     */
+    getUsers(id: string, cancelToken?: CancelToken): Promise<UserDetailsDto[]> {
+        let url_ = this.baseUrl + "/api/user-management/roles/{id}/users";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetUsers(_response);
+        });
+    }
+
+    protected processGetUsers(response: AxiosResponse): Promise<UserDetailsDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<UserDetailsDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<UserDetailsDto[]>(null as any);
+    }
+
+    /**
+     * Get a count of all users with this role.
+     */
+    getUsersCount(id: string, cancelToken?: CancelToken): Promise<number> {
+        let url_ = this.baseUrl + "/api/user-management/roles/{id}/users-count";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetUsersCount(_response);
+        });
+    }
+
+    protected processGetUsersCount(response: AxiosResponse): Promise<number> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<number>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<number>(null as any);
+    }
 }
 
 export class UsersClient {
@@ -1274,7 +1396,7 @@ export class UsersClient {
     /**
      * Get list of all users.
      */
-    getList( cancelToken?: CancelToken): Promise<UserDetailsDto[]> {
+    getUsers( cancelToken?: CancelToken): Promise<UserDetailsDto[]> {
         let url_ = this.baseUrl + "/api/user-management/users";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -1294,11 +1416,11 @@ export class UsersClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processGetList(_response);
+            return this.processGetUsers(_response);
         });
     }
 
-    protected processGetList(response: AxiosResponse): Promise<UserDetailsDto[]> {
+    protected processGetUsers(response: AxiosResponse): Promise<UserDetailsDto[]> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -1332,7 +1454,7 @@ export class UsersClient {
     /**
      * Get a user's details.
      */
-    getById(id: string, cancelToken?: CancelToken): Promise<UserDetailsDto> {
+    getUser(id: string, cancelToken?: CancelToken): Promise<UserDetailsDto> {
         let url_ = this.baseUrl + "/api/user-management/users/{id}";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
@@ -1355,11 +1477,11 @@ export class UsersClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processGetById(_response);
+            return this.processGetUser(_response);
         });
     }
 
-    protected processGetById(response: AxiosResponse): Promise<UserDetailsDto> {
+    protected processGetUser(response: AxiosResponse): Promise<UserDetailsDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -1473,7 +1595,7 @@ export class UsersClient {
     /**
      * Update a user's assigned roles.
      */
-    manageRoles(id: string, request: AssignUserRolesRequest, cancelToken?: CancelToken): Promise<void> {
+    manageUserRoles(id: string, request: AssignUserRolesRequest, cancelToken?: CancelToken): Promise<void> {
         let url_ = this.baseUrl + "/api/user-management/users/{id}/roles";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
@@ -1499,11 +1621,76 @@ export class UsersClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processManageRoles(_response);
+            return this.processManageUserRoles(_response);
         });
     }
 
-    protected processManageRoles(response: AxiosResponse): Promise<void> {
+    protected processManageUserRoles(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 422) {
+            const _responseText = response.data;
+            let result422: any = null;
+            let resultData422  = _responseText;
+            result422 = JSON.parse(resultData422);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Add or remove users from a role.
+     */
+    manageRoleUsers(request: ManageRoleUsersRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/user-management/users/manage-role";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processManageRoleUsers(_response);
+        });
+    }
+
+    protected processManageRoleUsers(response: AxiosResponse): Promise<void> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -8485,11 +8672,89 @@ export class PlanningIntervalsClient {
             result400 = JSON.parse(resultData400);
             return throwException("A server side error occurred.", status, _responseText, _headers, result400);
 
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
         return Promise.resolve<PlanningIntervalIterationListDto[]>(null as any);
+    }
+
+    /**
+     * Get a specific planning interval iteration.
+     */
+    getIteration(idOrKey: string, iterationIdOrKey: string, cancelToken?: CancelToken): Promise<PlanningIntervalIterationDetailsDto> {
+        let url_ = this.baseUrl + "/api/planning/planning-intervals/{idOrKey}/iterations/{iterationIdOrKey}";
+        if (idOrKey === undefined || idOrKey === null)
+            throw new globalThis.Error("The parameter 'idOrKey' must be defined.");
+        url_ = url_.replace("{idOrKey}", encodeURIComponent("" + idOrKey));
+        if (iterationIdOrKey === undefined || iterationIdOrKey === null)
+            throw new globalThis.Error("The parameter 'iterationIdOrKey' must be defined.");
+        url_ = url_.replace("{iterationIdOrKey}", encodeURIComponent("" + iterationIdOrKey));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetIteration(_response);
+        });
+    }
+
+    protected processGetIteration(response: AxiosResponse): Promise<PlanningIntervalIterationDetailsDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<PlanningIntervalIterationDetailsDto>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<PlanningIntervalIterationDetailsDto>(null as any);
     }
 
     /**
@@ -8548,6 +8813,290 @@ export class PlanningIntervalsClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
         return Promise.resolve<PlanningIntervalIterationCategoryDto[]>(null as any);
+    }
+
+    /**
+     * Get iteration sprint mappings for a Planning Interval.
+     * @param iterationId (optional) 
+     */
+    getIterationSprints(idOrKey: string, iterationId?: string | null | undefined, cancelToken?: CancelToken): Promise<PlanningIntervalIterationSprintsDto[]> {
+        let url_ = this.baseUrl + "/api/planning/planning-intervals/{idOrKey}/iterations/sprints?";
+        if (idOrKey === undefined || idOrKey === null)
+            throw new globalThis.Error("The parameter 'idOrKey' must be defined.");
+        url_ = url_.replace("{idOrKey}", encodeURIComponent("" + idOrKey));
+        if (iterationId !== undefined && iterationId !== null)
+            url_ += "iterationId=" + encodeURIComponent("" + iterationId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetIterationSprints(_response);
+        });
+    }
+
+    protected processGetIterationSprints(response: AxiosResponse): Promise<PlanningIntervalIterationSprintsDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<PlanningIntervalIterationSprintsDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<PlanningIntervalIterationSprintsDto[]>(null as any);
+    }
+
+    /**
+     * Map team sprints to Planning Interval iterations.
+     */
+    mapTeamSprints(id: string, teamId: string, request: MapPlanningIntervalSprintsRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/planning/planning-intervals/{id}/teams/{teamId}/sprints";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        if (teamId === undefined || teamId === null)
+            throw new globalThis.Error("The parameter 'teamId' must be defined.");
+        url_ = url_.replace("{teamId}", encodeURIComponent("" + teamId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processMapTeamSprints(_response);
+        });
+    }
+
+    protected processMapTeamSprints(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 422) {
+            const _responseText = response.data;
+            let result422: any = null;
+            let resultData422  = _responseText;
+            result422 = JSON.parse(resultData422);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Get metrics for a PI iteration aggregated across all mapped sprints.
+     */
+    getIterationMetrics(idOrKey: string, iterationIdOrKey: string, cancelToken?: CancelToken): Promise<PlanningIntervalIterationMetricsResponse> {
+        let url_ = this.baseUrl + "/api/planning/planning-intervals/{idOrKey}/iterations/{iterationIdOrKey}/metrics";
+        if (idOrKey === undefined || idOrKey === null)
+            throw new globalThis.Error("The parameter 'idOrKey' must be defined.");
+        url_ = url_.replace("{idOrKey}", encodeURIComponent("" + idOrKey));
+        if (iterationIdOrKey === undefined || iterationIdOrKey === null)
+            throw new globalThis.Error("The parameter 'iterationIdOrKey' must be defined.");
+        url_ = url_.replace("{iterationIdOrKey}", encodeURIComponent("" + iterationIdOrKey));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetIterationMetrics(_response);
+        });
+    }
+
+    protected processGetIterationMetrics(response: AxiosResponse): Promise<PlanningIntervalIterationMetricsResponse> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<PlanningIntervalIterationMetricsResponse>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<PlanningIntervalIterationMetricsResponse>(null as any);
+    }
+
+    /**
+     * Get combined backlog for a PI iteration from all mapped sprints.
+     */
+    getIterationBacklog(idOrKey: string, iterationIdOrKey: string, cancelToken?: CancelToken): Promise<SprintBacklogItemDto[]> {
+        let url_ = this.baseUrl + "/api/planning/planning-intervals/{idOrKey}/iterations/{iterationIdOrKey}/backlog";
+        if (idOrKey === undefined || idOrKey === null)
+            throw new globalThis.Error("The parameter 'idOrKey' must be defined.");
+        url_ = url_.replace("{idOrKey}", encodeURIComponent("" + idOrKey));
+        if (iterationIdOrKey === undefined || iterationIdOrKey === null)
+            throw new globalThis.Error("The parameter 'iterationIdOrKey' must be defined.");
+        url_ = url_.replace("{iterationIdOrKey}", encodeURIComponent("" + iterationIdOrKey));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetIterationBacklog(_response);
+        });
+    }
+
+    protected processGetIterationBacklog(response: AxiosResponse): Promise<SprintBacklogItemDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<SprintBacklogItemDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<SprintBacklogItemDto[]>(null as any);
     }
 
     /**
@@ -11209,6 +11758,67 @@ export class SprintsClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
         return Promise.resolve<SprintBacklogItemDto[]>(null as any);
+    }
+
+    /**
+     * Get sprint work item metrics.
+     */
+    getSprintMetrics(idOrKey: string, cancelToken?: CancelToken): Promise<SprintWorkItemMetricsDto> {
+        let url_ = this.baseUrl + "/api/planning/sprints/{idOrKey}/metrics";
+        if (idOrKey === undefined || idOrKey === null)
+            throw new globalThis.Error("The parameter 'idOrKey' must be defined.");
+        url_ = url_.replace("{idOrKey}", encodeURIComponent("" + idOrKey));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetSprintMetrics(_response);
+        });
+    }
+
+    protected processGetSprintMetrics(response: AxiosResponse): Promise<SprintWorkItemMetricsDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<SprintWorkItemMetricsDto>(result200);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<SprintWorkItemMetricsDto>(null as any);
     }
 }
 
@@ -14905,6 +15515,546 @@ export class TeamsClient {
     }
 
     /**
+     * Get a specific operating model for a team.
+     */
+    getOperatingModel(id: string, operatingModelId: string, cancelToken?: CancelToken): Promise<TeamOperatingModelDetailsDto> {
+        let url_ = this.baseUrl + "/api/organization/teams/{id}/operating-models/{operatingModelId}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        if (operatingModelId === undefined || operatingModelId === null)
+            throw new globalThis.Error("The parameter 'operatingModelId' must be defined.");
+        url_ = url_.replace("{operatingModelId}", encodeURIComponent("" + operatingModelId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetOperatingModel(_response);
+        });
+    }
+
+    protected processGetOperatingModel(response: AxiosResponse): Promise<TeamOperatingModelDetailsDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<TeamOperatingModelDetailsDto>(result200);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<TeamOperatingModelDetailsDto>(null as any);
+    }
+
+    /**
+     * Update an existing operating model for a team.
+     */
+    updateOperatingModel(id: string, operatingModelId: string, request: UpdateTeamOperatingModelRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/organization/teams/{id}/operating-models/{operatingModelId}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        if (operatingModelId === undefined || operatingModelId === null)
+            throw new globalThis.Error("The parameter 'operatingModelId' must be defined.");
+        url_ = url_.replace("{operatingModelId}", encodeURIComponent("" + operatingModelId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "PUT",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processUpdateOperatingModel(_response);
+        });
+    }
+
+    protected processUpdateOperatingModel(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status === 422) {
+            const _responseText = response.data;
+            let result422: any = null;
+            let resultData422  = _responseText;
+            result422 = JSON.parse(resultData422);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Delete an operating model from a team.
+     */
+    deleteOperatingModel(id: string, operatingModelId: string, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/organization/teams/{id}/operating-models/{operatingModelId}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        if (operatingModelId === undefined || operatingModelId === null)
+            throw new globalThis.Error("The parameter 'operatingModelId' must be defined.");
+        url_ = url_.replace("{operatingModelId}", encodeURIComponent("" + operatingModelId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "DELETE",
+            url: url_,
+            headers: {
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processDeleteOperatingModel(_response);
+        });
+    }
+
+    protected processDeleteOperatingModel(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Get the operating model history for a team.
+     */
+    getOperatingModels(id: string, cancelToken?: CancelToken): Promise<TeamOperatingModelDetailsDto[]> {
+        let url_ = this.baseUrl + "/api/organization/teams/{id}/operating-models";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetOperatingModels(_response);
+        });
+    }
+
+    protected processGetOperatingModels(response: AxiosResponse): Promise<TeamOperatingModelDetailsDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<TeamOperatingModelDetailsDto[]>(result200);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<TeamOperatingModelDetailsDto[]>(null as any);
+    }
+
+    /**
+     * Set a new operating model for a team.
+     */
+    setOperatingModel(id: string, request: SetTeamOperatingModelRequest, cancelToken?: CancelToken): Promise<string> {
+        let url_ = this.baseUrl + "/api/organization/teams/{id}/operating-models";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processSetOperatingModel(_response);
+        });
+    }
+
+    protected processSetOperatingModel(response: AxiosResponse): Promise<string> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 201) {
+            const _responseText = response.data;
+            let result201: any = null;
+            let resultData201  = _responseText;
+            result201 = JSON.parse(resultData201);
+            return Promise.resolve<string>(result201);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status === 422) {
+            const _responseText = response.data;
+            let result422: any = null;
+            let resultData422  = _responseText;
+            result422 = JSON.parse(resultData422);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<string>(null as any);
+    }
+
+    /**
+     * Get the current operating model for a team, or the model effective on a specific date.
+     * @param asOfDate (optional) 
+     */
+    getOperatingModelAsOf(id: string, asOfDate?: Date | null | undefined, cancelToken?: CancelToken): Promise<TeamOperatingModelDetailsDto> {
+        let url_ = this.baseUrl + "/api/organization/teams/{id}/operating-models/as-of?";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        if (asOfDate !== undefined && asOfDate !== null)
+            url_ += "asOfDate=" + encodeURIComponent(asOfDate ? "" + asOfDate.toISOString() : "") + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetOperatingModelAsOf(_response);
+        });
+    }
+
+    protected processGetOperatingModelAsOf(response: AxiosResponse): Promise<TeamOperatingModelDetailsDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<TeamOperatingModelDetailsDto>(result200);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<TeamOperatingModelDetailsDto>(null as any);
+    }
+
+    /**
+     * Get operating models for multiple teams.
+     * @param teamIds (optional) 
+     * @param asOfDate (optional) 
+     */
+    getOperatingModelsForTeams(teamIds?: string[] | undefined, asOfDate?: Date | null | undefined, cancelToken?: CancelToken): Promise<TeamOperatingModelDetailsDto[]> {
+        let url_ = this.baseUrl + "/api/organization/teams/operating-models?";
+        if (teamIds === null)
+            throw new globalThis.Error("The parameter 'teamIds' cannot be null.");
+        else if (teamIds !== undefined)
+            teamIds && teamIds.forEach(item => { url_ += "teamIds=" + encodeURIComponent("" + item) + "&"; });
+        if (asOfDate !== undefined && asOfDate !== null)
+            url_ += "asOfDate=" + encodeURIComponent(asOfDate ? "" + asOfDate.toISOString() : "") + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetOperatingModelsForTeams(_response);
+        });
+    }
+
+    protected processGetOperatingModelsForTeams(response: AxiosResponse): Promise<TeamOperatingModelDetailsDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<TeamOperatingModelDetailsDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<TeamOperatingModelDetailsDto[]>(null as any);
+    }
+
+    /**
+     * Check if a team has ever used the Scrum methodology.
+     */
+    hasEverBeenScrum(id: string, cancelToken?: CancelToken): Promise<boolean> {
+        let url_ = this.baseUrl + "/api/organization/teams/{id}/has-ever-been-scrum";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processHasEverBeenScrum(_response);
+        });
+    }
+
+    protected processHasEverBeenScrum(response: AxiosResponse): Promise<boolean> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<boolean>(result200);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<boolean>(null as any);
+    }
+
+    /**
      * Get the sprints for a team.
      */
     getSprints(id: string, cancelToken?: CancelToken): Promise<SprintListDto[]> {
@@ -17733,6 +18883,7 @@ export interface ApplicationPermission {
     description: string;
     action: string;
     resource: string;
+    category: string;
     isBasic: boolean;
     isRoot: boolean;
     name: string;
@@ -17795,7 +18946,9 @@ export interface UserDetailsDto {
     email?: string | undefined;
     isActive: boolean;
     phoneNumber?: string | undefined;
+    lastActivityAt?: Date | undefined;
     employee?: NavigationDto | undefined;
+    roles: RoleListDto[];
 }
 
 export interface NavigationDtoOfGuidAndInteger {
@@ -17805,6 +18958,12 @@ export interface NavigationDtoOfGuidAndInteger {
 }
 
 export interface NavigationDto extends NavigationDtoOfGuidAndInteger {
+}
+
+export interface RoleListDto {
+    id: string;
+    name: string;
+    description?: string | undefined;
 }
 
 export interface UpdateProfileRequest {
@@ -17825,12 +18984,6 @@ export interface AuditDto {
     newValues?: string | undefined;
     affectedColumns?: string | undefined;
     primaryKey?: string | undefined;
-}
-
-export interface RoleListDto {
-    id: string;
-    name: string;
-    description?: string | undefined;
 }
 
 export interface RoleDto {
@@ -17861,6 +19014,12 @@ export interface UserRoleDto {
 export interface AssignUserRolesRequest {
     userId: string;
     roleNames: string[];
+}
+
+export interface ManageRoleUsersRequest {
+    roleId: string;
+    userIdsToAdd: string[];
+    userIdsToRemove: string[];
 }
 
 export interface ToggleUserStatusRequest {
@@ -18359,6 +19518,7 @@ export interface ProjectTaskListDto {
     type: SimpleNavigationDto;
     status: SimpleNavigationDto;
     priority: SimpleNavigationDto;
+    assignees: EmployeeNavigationDto[];
     progress: number;
     order: number;
     parentId?: string | undefined;
@@ -18383,21 +19543,16 @@ export interface ProjectTaskTreeDto {
     type: SimpleNavigationDto;
     status: SimpleNavigationDto;
     priority?: SimpleNavigationDto | undefined;
+    assignees: EmployeeNavigationDto[];
     progress: number;
     order: number;
     parentId?: string | undefined;
     wbs: string;
-    assignments: ProjectTaskAssignmentDto[];
     plannedStart?: Date | undefined;
     plannedEnd?: Date | undefined;
     plannedDate?: Date | undefined;
     estimatedEffortHours?: number | undefined;
     children: ProjectTaskTreeDto[];
-}
-
-export interface ProjectTaskAssignmentDto {
-    employee: EmployeeNavigationDto;
-    role: SimpleNavigationDto;
 }
 
 export interface ProjectTaskDto {
@@ -18409,11 +19564,11 @@ export interface ProjectTaskDto {
     type: SimpleNavigationDto;
     status: SimpleNavigationDto;
     priority: SimpleNavigationDto;
+    assignees: EmployeeNavigationDto[];
     progress: number;
     order: number;
     parentId?: string | undefined;
     parent?: ProjectTaskNavigationDto | undefined;
-    assignments: ProjectTaskAssignmentDto[];
     plannedStart?: Date | undefined;
     plannedEnd?: Date | undefined;
     plannedDate?: Date | undefined;
@@ -18436,6 +19591,8 @@ export interface CreateProjectTaskRequest {
     statusId: number;
     /** The priority level of the task. */
     priorityId: number;
+    /** The assignees of the project task. */
+    assigneeIds?: string[] | undefined;
     /** The progress of the task (optional). Ranges from 0.0 to 100.0. Milestones can not update progress directly. */
     progress: number;
     /** The ID of the parent task (optional). */
@@ -18448,20 +19605,6 @@ export interface CreateProjectTaskRequest {
     plannedDate: Date;
     /** The estimated effort in hours (optional). */
     estimatedEffortHours?: number | undefined;
-    /** The role-based assignments for this task (optional). */
-    assignments?: TaskRoleAssignmentRequest[] | undefined;
-}
-
-export interface TaskRoleAssignmentRequest {
-    /** The ID of the employee. */
-    employeeId: string;
-    /** The role of the assignment (Assignee or Reviewer). */
-    role: TaskRole;
-}
-
-export enum TaskRole {
-    Assignee = "Assignee",
-    Reviewer = "Reviewer",
 }
 
 export interface UpdateProjectTaskRequest {
@@ -18475,6 +19618,8 @@ export interface UpdateProjectTaskRequest {
     statusId: number;
     /** The priority level of the task. */
     priorityId: number;
+    /** The assignees of the project task. */
+    assigneeIds?: string[] | undefined;
     /** The progress of the task (optional). Ranges from 0.0 to 100.0. Milestones can not update progress directly. */
     progress?: number | undefined;
     /** The ID of the parent task (optional). */
@@ -18487,8 +19632,6 @@ export interface UpdateProjectTaskRequest {
     plannedDate?: Date | undefined;
     /** The estimated effort in hours (optional). */
     estimatedEffortHours?: number | undefined;
-    /** The role-based assignments for this task (optional). */
-    assignments?: TaskRoleAssignmentRequest[] | undefined;
 }
 
 export interface JsonPatchDocumentOfUpdateProjectTaskRequest {
@@ -18803,7 +19946,19 @@ export interface PlanningIntervalIterationListDto {
     name: string;
     start: Date;
     end: Date;
+    state: string;
     category: SimpleNavigationDto;
+}
+
+export interface PlanningIntervalIterationDetailsDto {
+    id: string;
+    key: number;
+    name: string;
+    start: Date;
+    end: Date;
+    state: string;
+    category: SimpleNavigationDto;
+    planningInterval: NavigationDto;
 }
 
 export interface PlanningIntervalIterationCategoryDto {
@@ -18811,6 +19966,108 @@ export interface PlanningIntervalIterationCategoryDto {
     name: string;
     description?: string | undefined;
     order: number;
+}
+
+export interface PlanningIntervalIterationSprintsDto {
+    id: string;
+    key: number;
+    name: string;
+    start: Date;
+    end: Date;
+    category: SimpleNavigationDto;
+    sprints: SprintListDto[];
+}
+
+export interface SprintListDto {
+    id: string;
+    key: number;
+    name: string;
+    state: SimpleNavigationDto;
+    start: Date;
+    end: Date;
+    team: PlanningTeamNavigationDto;
+}
+
+/** Request model for mapping team sprints to Planning Interval iterations. */
+export interface MapPlanningIntervalSprintsRequest {
+    /** The ID of the planning interval. */
+    id: string;
+    /** The ID of the team whose sprints are being synchronized. */
+    teamId: string;
+    /** Dictionary representing the complete desired state where key is iteration ID and value is sprint ID.
+This is a sync/replace operation - any team sprints currently mapped but not included will be unmapped.
+- Non-null value: Maps the sprint to the iteration.
+- Null value: Explicitly unmaps any sprint from that iteration for this team.
+- Omitted iteration: No change to that iteration's mappings. */
+    iterationSprintMappings: { [key: string]: string; };
+}
+
+/** Response containing PI Iteration metrics aggregated across all mapped sprints. */
+export interface PlanningIntervalIterationMetricsResponse {
+    iterationId: string;
+    iterationKey: number;
+    iterationName: string;
+    start: Date;
+    end: Date;
+    category: SimpleNavigationDto;
+    teamCount: number;
+    sprintCount: number;
+    totalWorkItems: number;
+    totalStoryPoints: number;
+    completedWorkItems: number;
+    completedStoryPoints: number;
+    inProgressWorkItems: number;
+    inProgressStoryPoints: number;
+    notStartedWorkItems: number;
+    notStartedStoryPoints: number;
+    missingStoryPointsCount: number;
+    averageCycleTimeDays?: number | undefined;
+    sprintMetrics: SprintMetricsSummary[];
+}
+
+/** Metrics summary for an individual sprint within the PI Iteration. */
+export interface SprintMetricsSummary {
+    sprintId: string;
+    sprintKey: number;
+    sprintName: string;
+    state: SimpleNavigationDto;
+    start: Date;
+    end: Date;
+    team: NavigationDto;
+    totalWorkItems: number;
+    totalStoryPoints: number;
+    completedWorkItems: number;
+    completedStoryPoints: number;
+    inProgressWorkItems: number;
+    inProgressStoryPoints: number;
+    notStartedWorkItems: number;
+    notStartedStoryPoints: number;
+    missingStoryPointsCount: number;
+    averageCycleTimeDays?: number | undefined;
+}
+
+export interface SprintBacklogItemDto {
+    id: string;
+    key: string;
+    title: string;
+    workspace: WorkspaceNavigationDto;
+    type: string;
+    status: string;
+    statusCategory: SimpleNavigationDto;
+    parent?: WorkItemNavigationDto | undefined;
+    team?: WorkTeamNavigationDto | undefined;
+    sprint: WorkIterationNavigationDto;
+    assignedTo?: EmployeeNavigationDto | undefined;
+    created: Date;
+    activated?: Date | undefined;
+    done?: Date | undefined;
+    rank: number;
+    parentRank?: number | undefined;
+    project?: WorkProjectNavigationDto | undefined;
+    externalViewWorkItemUrl?: string | undefined;
+    stackRank: number;
+    storyPoints?: number | undefined;
+    cycleTime?: number | undefined;
 }
 
 export interface PlanningIntervalObjectiveListDto {
@@ -19244,16 +20501,6 @@ export interface ReorganizeRoadmapActivityRequest {
 export interface VisibilityDto extends CommonEnumDto {
 }
 
-export interface SprintListDto {
-    id: string;
-    key: number;
-    name: string;
-    state: SimpleNavigationDto;
-    start: Date;
-    end: Date;
-    team: PlanningTeamNavigationDto;
-}
-
 export interface SprintDetailsDto {
     id: string;
     key: number;
@@ -19264,28 +20511,18 @@ export interface SprintDetailsDto {
     team: PlanningTeamNavigationDto;
 }
 
-export interface SprintBacklogItemDto {
-    id: string;
-    key: string;
-    title: string;
-    workspace: WorkspaceNavigationDto;
-    type: string;
-    status: string;
-    statusCategory: SimpleNavigationDto;
-    parent?: WorkItemNavigationDto | undefined;
-    team?: WorkTeamNavigationDto | undefined;
-    sprint: WorkIterationNavigationDto;
-    assignedTo?: EmployeeNavigationDto | undefined;
-    created: Date;
-    activated?: Date | undefined;
-    done?: Date | undefined;
-    rank: number;
-    parentRank?: number | undefined;
-    project?: WorkProjectNavigationDto | undefined;
-    externalViewWorkItemUrl?: string | undefined;
-    stackRank: number;
-    storyPoints?: number | undefined;
-    cycleTime?: number | undefined;
+export interface SprintWorkItemMetricsDto {
+    sprintId: string;
+    totalWorkItems: number;
+    totalStoryPoints: number;
+    completedWorkItems: number;
+    completedStoryPoints: number;
+    inProgressWorkItems: number;
+    inProgressStoryPoints: number;
+    notStartedWorkItems: number;
+    notStartedStoryPoints: number;
+    missingStoryPointsCount: number;
+    averageCycleTimeDays?: number | undefined;
 }
 
 export interface TeamTypeDto {
@@ -19627,6 +20864,23 @@ export interface TeamDetailsDto {
     inactiveDate?: Date | undefined;
     isActive: boolean;
     teamOfTeams?: TeamNavigationDto | undefined;
+    operatingModel: TeamOperatingModelListDto;
+}
+
+export interface TeamOperatingModelListDto {
+    id: string;
+    methodology: Methodology;
+    sizingMethod: SizingMethod;
+}
+
+export enum Methodology {
+    Scrum = "Scrum",
+    Kanban = "Kanban",
+}
+
+export enum SizingMethod {
+    StoryPoints = "StoryPoints",
+    Count = "Count",
 }
 
 export interface CreateTeamRequest {
@@ -19717,6 +20971,32 @@ export interface DependencyDto {
     createdOn: Date;
     createdBy?: EmployeeNavigationDto | undefined;
     comment?: string | undefined;
+}
+
+export interface TeamOperatingModelDetailsDto {
+    id: string;
+    teamId: string;
+    start: Date;
+    end?: Date | undefined;
+    methodology: Methodology;
+    sizingMethod: SizingMethod;
+    isCurrent: boolean;
+}
+
+export interface SetTeamOperatingModelRequest {
+    /** The start date for this operating model. */
+    startDate: Date;
+    /** The methodology the team uses (e.g., Scrum, Kanban). */
+    methodology: Methodology;
+    /** The sizing method the team uses (e.g., StoryPoints, Count). */
+    sizingMethod: SizingMethod;
+}
+
+export interface UpdateTeamOperatingModelRequest {
+    /** The methodology the team uses (e.g., Scrum, Kanban). */
+    methodology: Methodology;
+    /** The sizing method the team uses (e.g., StoryPoints, Count). */
+    sizingMethod: SizingMethod;
 }
 
 export interface FunctionalOrganizationChartDto {

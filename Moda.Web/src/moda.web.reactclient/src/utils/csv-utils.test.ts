@@ -1,5 +1,9 @@
-import { escapeCsv, generateCsv, downloadCsv, downloadCsvWithTimestamp } from './csv-utils'
-import dayjs from 'dayjs'
+import {
+  escapeCsv,
+  generateCsv,
+  downloadCsv,
+  downloadCsvWithTimestamp,
+} from './csv-utils'
 
 jest.mock('dayjs', () => {
   const originalDayjs = jest.requireActual('dayjs')
@@ -94,7 +98,9 @@ describe('csv-utils', () => {
       const rows = [['John Doe', 'Works in "Tech" division']]
       const csv = generateCsv(headers, rows)
 
-      expect(csv).toBe('Name,Description\nJohn Doe,"Works in ""Tech"" division"')
+      expect(csv).toBe(
+        'Name,Description\nJohn Doe,"Works in ""Tech"" division"',
+      )
     })
 
     it('should handle values with commas', () => {

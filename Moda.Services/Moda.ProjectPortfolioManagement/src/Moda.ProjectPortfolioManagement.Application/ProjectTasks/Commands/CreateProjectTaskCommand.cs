@@ -16,10 +16,8 @@ public sealed record CreateProjectTaskCommand(
     FlexibleDateRange? PlannedDateRange,
     LocalDate? PlannedDate,
     decimal? EstimatedEffortHours,
-    List<TaskRoleAssignment>? Assignments
+    List<Guid>? AssigneeIds
 ) : ICommand<ProjectTaskIdAndKey>;
-
-public sealed record TaskRoleAssignment(Guid EmployeeId, TaskRole Role);
 
 public sealed class CreateProjectTaskCommandValidator : AbstractValidator<CreateProjectTaskCommand>
 {
@@ -79,9 +77,9 @@ public sealed class CreateProjectTaskCommandValidator : AbstractValidator<Create
             .GreaterThan(0)
             .When(x => x.EstimatedEffortHours.HasValue);
 
-        RuleFor(x => x.Assignments)
-            .Must(assignments => assignments == null || assignments.All(a => a.EmployeeId != Guid.Empty))
-            .WithMessage("Assignment employee IDs cannot be empty GUIDs.");
+        RuleFor(x => x.AssigneeIds)
+            .Must(ids => ids == null || ids.All(id => id != Guid.Empty))
+            .WithMessage("AssigneeIds cannot contain empty GUIDs.");
     }
 }
 
@@ -136,32 +134,7 @@ internal sealed class CreateProjectTaskCommandHandler(
                     .ToListAsync(cancellationToken);
             }
 
-            Dictionary<TaskRole, HashSet<Guid>>? assignments = null;
-
-            // Prepare role assignments if specified
-            if (request.Assignments is not null && request.Assignments.Count > 0)
-            {
-                // Validate employees if assignments specified
-                var employeeIds = request.Assignments.Select(a => a.EmployeeId).ToHashSet();
-                var employees = await _ppmDbContext.Employees
-                    .Where(e => employeeIds.Contains(e.Id))
-                    .Select(e => e.Id)
-                    .ToListAsync(cancellationToken);
-
-                if (employees.Count != employeeIds.Count)
-                {
-                    _logger.LogInformation("One or more employees not found.");
-                    return Result.Failure<ProjectTaskIdAndKey>("One or more employees not found.");
-                }
-
-                assignments = request.Assignments
-                    .GroupBy(a => a.Role)
-                    .ToDictionary(
-                        g => g.Key,
-                        g => g.Select(a => a.EmployeeId).ToHashSet()
-                    );
-            }
-
+            var roles = GetRoles(request);
 
             // Get the next task key number atomically using a database query with row locking
             // This uses UPDLOCK and ROWLOCK to prevent race conditions when multiple tasks are created concurrently
@@ -186,7 +159,7 @@ internal sealed class CreateProjectTaskCommandHandler(
                 request.PlannedDateRange,
                 request.PlannedDate,
                 request.EstimatedEffortHours,
-                assignments
+                roles
             );
 
             if (createResult.IsFailure)
@@ -210,5 +183,17 @@ internal sealed class CreateProjectTaskCommandHandler(
             _logger.LogError(ex, "Exception handling {CommandName} command for request {@Request}.", AppRequestName, request);
             return Result.Failure<ProjectTaskIdAndKey>($"Error handling {AppRequestName} command.");
         }
+    }
+
+    private static Dictionary<TaskRole, HashSet<Guid>> GetRoles(CreateProjectTaskCommand request)
+    {
+        Dictionary<TaskRole, HashSet<Guid>> roles = [];
+
+        if (request.AssigneeIds != null && request.AssigneeIds.Count != 0)
+        {
+            roles.Add(TaskRole.Assignee, [.. request.AssigneeIds]);
+        }
+
+        return roles;
     }
 }

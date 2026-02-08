@@ -1,9 +1,11 @@
 'use client'
 
 import { MarkdownEditor } from '@/src/components/common/markdown'
+import { EmployeeSelect } from '@/src/components/common/organizations'
 import useAuth from '@/src/components/contexts/auth'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { UpdateProjectTaskRequest } from '@/src/services/moda-api'
+import { useGetEmployeeOptionsQuery } from '@/src/store/features/organizations/employee-api'
 import {
   useGetProjectTaskQuery,
   useGetTaskStatusOptionsQuery,
@@ -42,6 +44,7 @@ interface EditProjectTaskFormValues {
   description?: string
   status: number
   priority?: number
+  assigneeIds: string[]
   progress?: number
   parentId?: string
   plannedRange?: any[]
@@ -59,6 +62,7 @@ const mapToRequestValues = (
     description: values.description,
     statusId: values.status,
     priorityId: values.priority,
+    assigneeIds: values.assigneeIds,
     progress: values.progress,
     parentId: values.parentId,
     plannedStart: (values.plannedRange?.[0] as any)?.format('YYYY-MM-DD'),
@@ -92,6 +96,12 @@ const EditProjectTaskForm = (props: EditProjectTaskFormProps) => {
   const taskType = taskData?.type?.name
   const isMilestone = taskType === 'Milestone'
 
+  const {
+    data: employeeData,
+    isLoading: employeeOptionsIsLoading,
+    error: employeeOptionsError,
+  } = useGetEmployeeOptionsQuery(true)
+
   const { data: statusOptions = [] } = useGetTaskStatusOptionsQuery({
     forMilestone: isMilestone,
   })
@@ -121,6 +131,7 @@ const EditProjectTaskForm = (props: EditProjectTaskFormProps) => {
         description: task.description,
         status: task.status.id,
         priority: task.priority?.id,
+        assigneeIds: task.assignees.map((a: any) => a.id),
         progress: task.progress,
         parentId: task.parent?.id,
         plannedRange,
@@ -299,6 +310,14 @@ const EditProjectTaskForm = (props: EditProjectTaskFormProps) => {
           />
         </Item>
 
+        <Item name="assigneeIds" label="Assignees">
+          <EmployeeSelect
+            employees={employeeData ?? []}
+            allowMultiple={true}
+            placeholder="Select Assignees"
+          />
+        </Item>
+
         {!isMilestone ? (
           <>
             <Item name="plannedRange" label="Planned Date Range">
@@ -326,4 +345,3 @@ const EditProjectTaskForm = (props: EditProjectTaskFormProps) => {
 }
 
 export default EditProjectTaskForm
-

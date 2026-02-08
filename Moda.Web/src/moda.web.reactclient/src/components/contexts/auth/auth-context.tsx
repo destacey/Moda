@@ -5,11 +5,13 @@ import React, {
   useCallback,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from 'react'
+import { usePathname } from 'next/navigation'
 import { useMsal, useIsAuthenticated } from '@azure/msal-react'
 import {
+  AccountInfo,
+  EventType,
   InteractionRequiredAuthError,
   SilentRequest,
 } from '@azure/msal-browser'
@@ -17,18 +19,39 @@ import { LoadingAccount } from '@/src/components/common'
 import { AuthContextType, Claim, User } from './types'
 import { tokenRequest } from '@/auth-config'
 import { useGetUserPermissionsQuery } from '@/src/store/features/user-management/profile-api'
+import UnauthorizedPage from '@/src/app/unauthorized/page'
+import ServiceUnavailablePage from '@/src/app/service-unavailable/page'
 
 export const AuthContext = createContext<AuthContextType | null>(null)
 
+// Global flag to prevent concurrent redirect attempts across multiple 401 errors.
+// This prevents MSAL interaction_in_progress errors when multiple API calls
+// fail simultaneously (e.g., when a token expires).
+let isRedirectInProgress = false
+
+/** @internal Reset redirect flag between tests */
+export const _resetRedirectFlag = () => {
+  isRedirectInProgress = false
+}
+
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const { instance, accounts } = useMsal()
+  const { instance, accounts, inProgress } = useMsal()
   const isAuthenticated = useIsAuthenticated()
+  const pathname = usePathname()
 
-  const initializeOnce = useRef(false)
+  // Bypass loading/error gates on logout route so logout always executes promptly
+  const isLogoutRoute = pathname === '/logout'
 
-  const [redirectHandled, setRedirectHandled] = useState(false)
+  // Note: We no longer use useMsalAuthentication for auto-login
+  // Users will see the LoginPage and click "Sign in with Microsoft" manually
+
   const [isLoading, setIsLoading] = useState(true)
+  const [isUnauthorized, setIsUnauthorized] = useState(false)
+  const [isServiceUnavailable, setIsServiceUnavailable] = useState(false)
   const [authStatus, setAuthStatus] = useState('Initializing authentication...')
+  const [activeAccount, setActiveAccountState] = useState<AccountInfo | null>(
+    null,
+  )
 
   const [user, setUser] = useState<User>({
     name: '',
@@ -37,74 +60,101 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     claims: [],
   })
 
+  // Track when MSAL has finished any in-progress operations
+  const isReady = inProgress === 'none'
+
   /**
    * -------------------------------------------------------------
-   * MSAL initialize + redirect + silent SSO
+   * Ensure active account is set when we have accounts
+   * Uses useState to ensure React properly tracks the active account
    * -------------------------------------------------------------
    */
   useEffect(() => {
-    const handleAuth = async () => {
-      if (initializeOnce.current) return
-      initializeOnce.current = true
+    if (!isReady) {
+      setActiveAccountState(null)
+      return
+    }
 
-      try {
-        setAuthStatus('Initializing authentication...')
-        await instance.initialize()
+    let account = instance.getActiveAccount()
+    if (!account && accounts.length > 0) {
+      instance.setActiveAccount(accounts[0])
+      account = accounts[0]
+    }
+    setActiveAccountState(account)
+  }, [accounts, instance, isReady])
 
-        setAuthStatus('Processing authentication redirect...')
-        const response = await instance.handleRedirectPromise()
+  /**
+   * -------------------------------------------------------------
+   * Cross-tab account synchronization.
+   * MSAL event callbacks handle same-tab events (login, logout,
+   * token refresh). The storage event listener detects changes
+   * from other tabs via localStorage.
+   * -------------------------------------------------------------
+   */
+  useEffect(() => {
+    // Same-tab: react to MSAL lifecycle events
+    const callbackId = instance.addEventCallback((event) => {
+      switch (event.eventType) {
+        case EventType.LOGIN_SUCCESS:
+        case EventType.ACQUIRE_TOKEN_SUCCESS: {
+          const payload = event.payload as { account?: AccountInfo } | null
+          if (payload?.account) {
+            // ACQUIRE_TOKEN_SUCCESS fires on every silent token acquisition,
+            // so only update if the account has actually changed to avoid
+            // unnecessary re-renders.
+            const currentActiveAccount = instance.getActiveAccount()
+            const isDifferentAccount =
+              !currentActiveAccount ||
+              currentActiveAccount.homeAccountId !==
+                payload.account.homeAccountId
 
-        if (response?.account) {
-          instance.setActiveAccount(response.account)
-          setRedirectHandled(true)
-          return
-        }
-
-        if (instance.getAllAccounts().length === 0) {
-          try {
-            setAuthStatus('Attempting silent sign-in...')
-            const ssoResponse = await instance.ssoSilent(tokenRequest)
-
-            if (ssoResponse?.account) {
-              instance.setActiveAccount(ssoResponse.account)
+            if (isDifferentAccount) {
+              instance.setActiveAccount(payload.account)
+              setActiveAccountState(payload.account)
             }
-          } catch (error) {
-            console.warn('Silent SSO failed, redirecting to login', error)
-            setAuthStatus('Redirecting to sign-in...')
-            await instance.loginRedirect()
-            return
           }
+          break
         }
+        case EventType.LOGOUT_SUCCESS: {
+          setActiveAccountState(null)
+          break
+        }
+        case EventType.ACTIVE_ACCOUNT_CHANGED: {
+          setActiveAccountState(instance.getActiveAccount())
+          break
+        }
+      }
+    })
 
-        setRedirectHandled(true)
-      } catch (error) {
-        console.error('Authentication initialization failed', error)
-        setAuthStatus('Authentication error')
-        setRedirectHandled(true)
+    // Cross-tab: detect account changes via localStorage storage events.
+    // MSAL stores auth state in localStorage with keys prefixed by 'msal.'.
+    // A null key means localStorage.clear() was called.
+    const handleStorageChange = (event: StorageEvent) => {
+      if (!event.key?.startsWith('msal.') && event.key !== null) return
+
+      const currentAccounts = instance.getAllAccounts()
+      if (currentAccounts.length === 0) {
+        // Accounts were cleared (e.g., logout in another tab).
+        // Clear active account so React naturally transitions to the
+        // unauthenticated view without a disruptive full-page reload.
+        instance.setActiveAccount(null)
+        setActiveAccountState(null)
+      } else if (!instance.getActiveAccount()) {
+        // Accounts exist but no active account (e.g., login in another tab)
+        instance.setActiveAccount(currentAccounts[0])
+        setActiveAccountState(currentAccounts[0])
       }
     }
 
-    handleAuth()
-  }, [instance])
+    window.addEventListener('storage', handleStorageChange)
 
-  /**
-   * -------------------------------------------------------------
-   * Ensure active account is set
-   * -------------------------------------------------------------
-   */
-  useEffect(() => {
-    if (!instance.getActiveAccount() && accounts.length > 0) {
-      instance.setActiveAccount(accounts[0])
+    return () => {
+      if (callbackId) {
+        instance.removeEventCallback(callbackId)
+      }
+      window.removeEventListener('storage', handleStorageChange)
     }
-  }, [accounts, instance])
-
-  const activeAccount = useMemo(
-    () => instance.getActiveAccount(),
-
-    // accounts is needed to auth correctly when changing tabs
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [instance, accounts],
-  )
+  }, [instance])
 
   /**
    * -------------------------------------------------------------
@@ -115,9 +165,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     data: permissions,
     isLoading: permissionsLoading,
     error: permissionsError,
+    refetch: refetchPermissions,
   } = useGetUserPermissionsQuery(undefined, {
-    skip: !redirectHandled || !isAuthenticated || !activeAccount,
+    skip: !isReady || !isAuthenticated || !activeAccount,
   })
+
+  /**
+   * -------------------------------------------------------------
+   * Retry handler for service unavailable
+   * -------------------------------------------------------------
+   */
+  const handleRetry = useCallback(() => {
+    setIsServiceUnavailable(false)
+    setIsLoading(true)
+    refetchPermissions()
+  }, [refetchPermissions])
 
   /**
    * -------------------------------------------------------------
@@ -129,7 +191,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const request = { ...tokenRequest, ...requestOverrides }
 
       try {
-        const response = await instance.acquireTokenSilent(request)
+        // MSAL v5 requires account parameter for silent token acquisition
+        const accounts = instance.getAllAccounts()
+        if (accounts.length === 0) {
+          throw new Error('No authenticated accounts found')
+        }
+
+        const response = await instance.acquireTokenSilent({
+          ...request,
+          account: request.account || accounts[0], // Use provided account or first available
+        })
         return response.accessToken
       } catch (error) {
         if (error instanceof InteractionRequiredAuthError) {
@@ -181,7 +252,48 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           })),
         )
       } else if (permissionsError) {
-        console.error('Failed to load permissions', permissionsError)
+        const errorStatus = (permissionsError as any)?.status
+        if (errorStatus === 403) {
+          // User is authenticated but not authorized in Moda
+          setIsUnauthorized(true)
+          setIsLoading(false)
+          return
+        }
+        if (errorStatus === 401) {
+          // Token is invalid or expired - redirect to re-authenticate.
+          // This typically happens in multi-tab scenarios where the token
+          // was revoked or expired and silent refresh failed.
+
+          // Check if redirect is already in progress (either from us or MSAL)
+          if (isRedirectInProgress || inProgress !== 'none') {
+            console.log(
+              '[Auth] Redirect already in progress, skipping duplicate redirect',
+            )
+            setIsLoading(false)
+            return
+          }
+
+          setAuthStatus('Session expired, redirecting to login...')
+          isRedirectInProgress = true
+
+          try {
+            await instance.loginRedirect()
+          } catch (loginError) {
+            console.error(
+              '[Auth] Re-authentication redirect failed',
+              loginError,
+            )
+            isRedirectInProgress = false
+            // If redirect fails (e.g., interaction already in progress),
+            // stop loading so the user isn't stuck on a spinner
+            setIsLoading(false)
+          }
+          return
+        }
+        // For other errors (timeout, network issues, 5xx), show service unavailable
+        setIsServiceUnavailable(true)
+        setIsLoading(false)
+        return
       }
 
       setUser({
@@ -191,7 +303,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         claims,
       })
     } catch (error) {
-      console.error('Error refreshing user', error)
+      console.error('[Auth] Error building user profile', error)
       setUser({
         name: '',
         username: '',
@@ -201,7 +313,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } finally {
       setIsLoading(false)
     }
-  }, [activeAccount, permissions, permissionsLoading, permissionsError])
+  }, [
+    activeAccount,
+    permissionsLoading,
+    permissions,
+    permissionsError,
+    inProgress,
+    instance,
+  ])
 
   /**
    * -------------------------------------------------------------
@@ -209,23 +328,34 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
    * -------------------------------------------------------------
    */
   useEffect(() => {
-    if (!redirectHandled) return
+    if (!isReady) {
+      // Show loading state during MSAL operations (redirect handling, etc.)
+      setIsLoading(true)
+      setAuthStatus('Authenticating...')
+      return
+    }
 
-    if (!isAuthenticated || !activeAccount) {
+    // For unauthenticated users, don't show loading - they'll see login page
+    if (!isAuthenticated) {
       setIsLoading(false)
       return
     }
 
-    if (!permissionsLoading) {
-      refreshUser()
+    // Wait for activeAccount to be set (happens in separate useEffect)
+    // Don't set isLoading to false here - keep showing loading state
+    if (!activeAccount) {
+      setAuthStatus('Loading account...')
+      return
     }
-  }, [
-    redirectHandled,
-    isAuthenticated,
-    activeAccount,
-    permissionsLoading,
-    refreshUser,
-  ])
+
+    if (permissionsLoading) {
+      setAuthStatus('Loading user permissions...')
+      return
+    }
+
+    // Only proceed when permissions have loaded or errored
+    refreshUser()
+  }, [isReady, isAuthenticated, activeAccount, permissionsLoading, refreshUser])
 
   /**
    * -------------------------------------------------------------
@@ -237,15 +367,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, [instance])
 
   const logout = useCallback(async () => {
-    instance.setActiveAccount(null)
-    setUser({
-      name: '',
-      username: '',
-      isAuthenticated: false,
-      claims: [],
-    })
-    await instance.logoutRedirect()
-  }, [instance])
+    // Navigate to logout page which handles the Microsoft logout redirect
+    window.location.href = '/logout'
+  }, [])
 
   /**
    * -------------------------------------------------------------
@@ -268,8 +392,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     [user, isLoading, acquireToken, refreshUser, login, logout],
   )
 
-  if (isLoading) {
-    return <LoadingAccount message={authStatus} />
+  // Bypass all loading/error gates on logout route so logout executes promptly
+  // This ensures users can always sign out, even if permissions call is slow/failed
+  if (!isLogoutRoute) {
+    // Only show loading state for authenticated users loading permissions
+    // Unauthenticated users should see the login page immediately via UnauthenticatedTemplate
+    if (isLoading && isAuthenticated) {
+      return <LoadingAccount message={authStatus} />
+    }
+
+    if (isUnauthorized) {
+      return <UnauthorizedPage />
+    }
+
+    if (isServiceUnavailable) {
+      return <ServiceUnavailablePage onRetry={handleRetry} onLogout={logout} />
+    }
   }
 
   return (

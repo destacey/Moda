@@ -10,6 +10,7 @@ using Moda.Infrastructure.Common.Services;
 using Moda.Links;
 using Moda.Links.Models;
 using Moda.Organization.Application.Teams.Models;
+using Moda.Organization.Domain.Models;
 using Moda.Planning.Application.Persistence;
 using Moda.Planning.Domain.Models;
 using Moda.Planning.Domain.Models.Iterations;
@@ -71,6 +72,7 @@ public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IGoalsDbCo
     public DbSet<BaseTeam> BaseTeams => Set<BaseTeam>();
     public DbSet<Team> Teams => Set<Team>();
     public DbSet<TeamOfTeams> TeamOfTeams => Set<TeamOfTeams>();
+    public DbSet<TeamOperatingModel> TeamOperatingModels => Set<TeamOperatingModel>();
 
     #endregion IOrganization
 

@@ -1,4 +1,3 @@
-import { User } from './../../components/contexts/auth/types.d'
 export enum QueryTags {
   // ADMIN
   BackgroundJob = 'Admin.BackgroundJob',
@@ -30,12 +29,16 @@ export enum QueryTags {
   TeamSprintOption = 'Organizations.TeamSprintOption',
   TeamMembership = 'Organizations.TeamMembership',
   TeamRisk = 'Organizations.TeamRisk',
+  TeamOperatingModel = 'Organizations.TeamOperatingModel',
   FunctionalOrganizationChart = 'Organizations.FunctionalOrganizationChart',
 
   // PLANNING
   PlanningInterval = 'Planning.PlanningInterval',
   PlanningIntervalCalendar = 'Planning.PlanningInterval.Calendar',
   PlanningIntervalIteration = 'Planning.PlanningInterval.Iteration',
+  PlanningIntervalIterationSprints = 'Planning.PlanningInterval.Iteration.Sprints',
+  PlanningIntervalIterationMetrics = 'Planning.PlanningInterval.Iteration.Metrics',
+  PlanningIntervalIterationBacklog = 'Planning.PlanningInterval.Iteration.Backlog',
   PlanningIntervalIterationTypeOptions = 'Planning.PlanningInterval.IterationTypeOptions',
   PlanningIntervalTeam = 'Planning.PlanningInterval.Team',
   PlanningIntervalPredictability = 'Planning.PlanningInterval.Predictability',
@@ -58,6 +61,7 @@ export enum QueryTags {
   RoadmapVisibility = 'Planning.RoadmapVisibility',
   Sprint = 'Planning.Sprint',
   SprintBacklog = 'Planning.Sprint.Backlog',
+  SprintMetrics = 'Planning.Sprint.Metrics',
 
   // PPM
   ExpenditureCategory = 'Ppm.ExpenditureCategory',
@@ -92,7 +96,10 @@ export enum QueryTags {
   User = 'UserManagement.User',
   UserPermission = 'UserManagement.UserPermission',
   UserRole = 'UserManagement.UserRole',
+  UserOption = 'UserManagement.UserOption',
   Role = 'UserManagement.Role',
+  RoleUsers = 'UserManagement.RoleUsers',
+  RoleUsersCount = 'UserManagement.RoleUsersCount',
   Permission = 'UserManagement.Permission',
 
   // USER PROFILE

@@ -53,4 +53,18 @@ public class SprintsController(ILogger<SprintsController> logger, ISender sender
             ? Ok(backlogItems)
             : NotFound();
     }
+
+    [HttpGet("{idOrKey}/metrics")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Iterations)]
+    [OpenApiOperation("Get sprint work item metrics.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<SprintWorkItemMetricsDto>> GetSprintMetrics(string idOrKey, CancellationToken cancellationToken)
+    {
+        var metrics = await _sender.Send(new GetSprintWorkItemMetricsQuery(idOrKey), cancellationToken);
+
+        return metrics is not null
+            ? Ok(metrics)
+            : NotFound();
+    }
 }

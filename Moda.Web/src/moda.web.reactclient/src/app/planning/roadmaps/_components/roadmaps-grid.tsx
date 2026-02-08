@@ -5,14 +5,14 @@ import { RoadmapListDto } from '@/src/services/moda-api'
 import { ColDef, ValueFormatterParams } from 'ag-grid-community'
 import dayjs from 'dayjs'
 import Link from 'next/link'
-import { FC, useMemo } from 'react'
+import { FC, ReactNode, useMemo } from 'react'
 
 export interface RoadmapsGridProps {
   roadmapsData: RoadmapListDto[]
   roadmapsLoading: boolean
   refreshRoadmaps: () => void
   gridHeight?: number | undefined
-  viewSelector?: React.ReactNode | undefined
+  viewSelector?: ReactNode | undefined
   parentRoadmapId?: string | undefined
 }
 

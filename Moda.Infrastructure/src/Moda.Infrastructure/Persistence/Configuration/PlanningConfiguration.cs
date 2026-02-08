@@ -143,7 +143,7 @@ public class PlanningIntervalIterationConfig : IEntityTypeConfiguration<Planning
         builder.Property(i => i.IsDeleted);
 
         // Relationships
-        builder.HasOne<PlanningInterval>()
+        builder.HasOne(i => i.PlanningInterval)
             .WithMany(p => p.Iterations)
             .HasForeignKey(i => i.PlanningIntervalId)
             .OnDelete(DeleteBehavior.Cascade);
@@ -533,7 +533,7 @@ public class IterationConfig : IEntityTypeConfiguration<Iteration>
 
         // Relationships
         builder.HasOne(o => o.Team)
-            .WithMany()
+            .WithMany(t => t.Iterations)
             .HasForeignKey(p => p.TeamId)
             .OnDelete(DeleteBehavior.Cascade);
 
@@ -558,6 +558,46 @@ public class IterationExternalMetadata : IEntityTypeConfiguration<KeyValueObject
         builder.Property(m => m.ObjectId).IsRequired();
         builder.Property(m => m.Name).IsRequired().HasMaxLength(128);
         builder.Property(m => m.Value).HasMaxLength(4000);
+    }
+}
+
+public class PlanningIntervalIterationSprintConfig : IEntityTypeConfiguration<PlanningIntervalIterationSprint>
+{
+    public void Configure(EntityTypeBuilder<PlanningIntervalIterationSprint> builder)
+    {
+        builder.ToTable("PlanningIntervalIterationSprints", SchemaNames.Planning);
+
+        builder.HasKey(s => s.Id);
+
+        builder.HasIndex(s => s.PlanningIntervalId)
+            .IncludeProperties(s => new { s.PlanningIntervalIterationId, s.SprintId });
+
+        builder.HasIndex(s => s.PlanningIntervalIterationId)
+            .IncludeProperties(s => new { s.PlanningIntervalId, s.SprintId });
+
+        builder.HasIndex(s => s.SprintId)
+            .IsUnique()
+            .IncludeProperties(s => new { s.PlanningIntervalId, s.PlanningIntervalIterationId });
+
+        builder.Property(s => s.PlanningIntervalId).IsRequired();
+        builder.Property(s => s.PlanningIntervalIterationId).IsRequired();
+        builder.Property(s => s.SprintId).IsRequired();
+
+        // Relationships
+        builder.HasOne<PlanningInterval>()
+            .WithMany(p => p.IterationSprints)
+            .HasForeignKey(s => s.PlanningIntervalId)
+            .OnDelete(DeleteBehavior.Cascade); // Cascade to enable deletion when removed from collection
+
+        builder.HasOne(s => s.PlanningIntervalIteration)
+            .WithMany(i => i.IterationSprints)
+            .HasForeignKey(s => s.PlanningIntervalIterationId)
+            .OnDelete(DeleteBehavior.NoAction); // NoAction to avoid multiple cascade paths
+
+        builder.HasOne(s => s.Sprint)
+            .WithMany()
+            .HasForeignKey(s => s.SprintId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }
 

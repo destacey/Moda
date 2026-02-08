@@ -1,5 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moda.Infrastructure.Auth.AzureAd;
@@ -43,5 +42,6 @@ internal static class ConfigureServices
     private static IServiceCollection AddPermissions(this IServiceCollection services) =>
         services
             .AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>()
-            .AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
+            .AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>()
+            .AddScoped<IAuthorizationHandler, AnyPermissionAuthorizationHandler>();
 }

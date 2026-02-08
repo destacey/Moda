@@ -1,5 +1,4 @@
 import { render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import DependencyHealthTooltip from './dependency-health-tooltip'
 import { DependencyHealth } from '../../types'
 

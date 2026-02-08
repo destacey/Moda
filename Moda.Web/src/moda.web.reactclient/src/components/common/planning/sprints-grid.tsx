@@ -54,7 +54,7 @@ const SprintsGrid: FC<SprintsGridProps> = (props: SprintsGridProps) => {
         headerName: 'Start',
         width: 150,
         sort: 'desc',
-        type: 'dateColumn',
+        cellDataType: 'date',
         filterParams: {
           includeTime: false,
         },
@@ -64,7 +64,7 @@ const SprintsGrid: FC<SprintsGridProps> = (props: SprintsGridProps) => {
         field: 'end',
         headerName: 'End',
         width: 150,
-        type: 'dateColumn',
+        cellDataType: 'date',
         filterParams: {
           includeTime: false,
         },

@@ -952,13 +952,117 @@
         ]
       }
     },
+    "/api/user-management/roles/{id}/users": {
+      "get": {
+        "tags": [
+          "Roles"
+        ],
+        "summary": "Get list of all users with this role.",
+        "operationId": "Roles_GetUsers",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserDetailsDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/user-management/roles/{id}/users-count": {
+      "get": {
+        "tags": [
+          "Roles"
+        ],
+        "summary": "Get a count of all users with this role.",
+        "operationId": "Roles_GetUsersCount",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
     "/api/user-management/users": {
       "get": {
         "tags": [
           "Users"
         ],
         "summary": "Get list of all users.",
-        "operationId": "Users_GetList",
+        "operationId": "Users_GetUsers",
         "responses": {
           "200": {
             "description": "",
@@ -1000,7 +1104,7 @@
           "Users"
         ],
         "summary": "Get a user's details.",
-        "operationId": "Users_GetById",
+        "operationId": "Users_GetUser",
         "parameters": [
           {
             "name": "id",
@@ -1130,7 +1234,7 @@
           "Users"
         ],
         "summary": "Update a user's assigned roles.",
-        "operationId": "Users_ManageRoles",
+        "operationId": "Users_ManageUserRoles",
         "parameters": [
           {
             "name": "id",
@@ -1153,6 +1257,60 @@
           },
           "required": true,
           "x-position": 2
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/user-management/users/manage-role": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Add or remove users from a role.",
+        "operationId": "Users_ManageRoleUsers",
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManageRoleUsersRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
         },
         "responses": {
           "204": {
@@ -7220,6 +7378,85 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/planning/planning-intervals/{idOrKey}/iterations/{iterationIdOrKey}": {
+      "get": {
+        "tags": [
+          "PlanningIntervals"
+        ],
+        "summary": "Get a specific planning interval iteration.",
+        "operationId": "PlanningIntervals_GetIteration",
+        "parameters": [
+          {
+            "name": "idOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "iterationIdOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanningIntervalIterationDetailsDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -7254,6 +7491,303 @@
             }
           },
           "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/planning/planning-intervals/{idOrKey}/iterations/sprints": {
+      "get": {
+        "tags": [
+          "PlanningIntervals"
+        ],
+        "summary": "Get iteration sprint mappings for a Planning Interval.",
+        "description": "Retrieves all sprint-to-iteration mappings, with optional filtering by iteration.",
+        "operationId": "PlanningIntervals_GetIterationSprints",
+        "parameters": [
+          {
+            "name": "idOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "iterationId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": true,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PlanningIntervalIterationSprintsDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/planning/planning-intervals/{id}/teams/{teamId}/sprints": {
+      "post": {
+        "tags": [
+          "PlanningIntervals"
+        ],
+        "summary": "Map team sprints to Planning Interval iterations.",
+        "description": "This is a sync/replace operation that sets the complete desired state for the team's sprint mappings.",
+        "operationId": "PlanningIntervals_MapTeamSprints",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "teamId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 2
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MapPlanningIntervalSprintsRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 3
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/planning/planning-intervals/{idOrKey}/iterations/{iterationIdOrKey}/metrics": {
+      "get": {
+        "tags": [
+          "PlanningIntervals"
+        ],
+        "summary": "Get metrics for a PI iteration aggregated across all mapped sprints.",
+        "operationId": "PlanningIntervals_GetIterationMetrics",
+        "parameters": [
+          {
+            "name": "idOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "iterationIdOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanningIntervalIterationMetricsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/planning/planning-intervals/{idOrKey}/iterations/{iterationIdOrKey}/backlog": {
+      "get": {
+        "tags": [
+          "PlanningIntervals"
+        ],
+        "summary": "Get combined backlog for a PI iteration from all mapped sprints.",
+        "operationId": "PlanningIntervals_GetIterationBacklog",
+        "parameters": [
+          {
+            "name": "idOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "iterationIdOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SprintBacklogItemDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
             "description": "",
             "content": {
               "application/json": {
@@ -9680,6 +10214,56 @@
                   "items": {
                     "$ref": "#/components/schemas/SprintBacklogItemDto"
                   }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/planning/sprints/{idOrKey}/metrics": {
+      "get": {
+        "tags": [
+          "Sprints"
+        ],
+        "summary": "Get sprint work item metrics.",
+        "operationId": "Sprints_GetSprintMetrics",
+        "parameters": [
+          {
+            "name": "idOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SprintWorkItemMetricsDto"
                 }
               }
             }
@@ -12937,6 +13521,553 @@
         ]
       }
     },
+    "/api/organization/teams/{id}/operating-models/{operatingModelId}": {
+      "get": {
+        "tags": [
+          "Teams"
+        ],
+        "summary": "Get a specific operating model for a team.",
+        "operationId": "Teams_GetOperatingModel",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "operatingModelId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TeamOperatingModelDetailsDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Teams"
+        ],
+        "summary": "Update an existing operating model for a team.",
+        "operationId": "Teams_UpdateOperatingModel",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "operatingModelId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 2
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTeamOperatingModelRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 3
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Teams"
+        ],
+        "summary": "Delete an operating model from a team.",
+        "operationId": "Teams_DeleteOperatingModel",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "operatingModelId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/organization/teams/{id}/operating-models": {
+      "get": {
+        "tags": [
+          "Teams"
+        ],
+        "summary": "Get the operating model history for a team.",
+        "operationId": "Teams_GetOperatingModels",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TeamOperatingModelDetailsDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Teams"
+        ],
+        "summary": "Set a new operating model for a team.",
+        "operationId": "Teams_SetOperatingModel",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetTeamOperatingModelRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "guid",
+                  "nullable": false,
+                  "example": "00000000-0000-0000-0000-000000000000"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/organization/teams/{id}/operating-models/as-of": {
+      "get": {
+        "tags": [
+          "Teams"
+        ],
+        "summary": "Get the current operating model for a team, or the model effective on a specific date.",
+        "operationId": "Teams_GetOperatingModelAsOf",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "asOfDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "nullable": true
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TeamOperatingModelDetailsDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/organization/teams/operating-models": {
+      "get": {
+        "tags": [
+          "Teams"
+        ],
+        "summary": "Get operating models for multiple teams.",
+        "operationId": "Teams_GetOperatingModelsForTeams",
+        "parameters": [
+          {
+            "name": "teamIds",
+            "in": "query",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "guid",
+                "nullable": false,
+                "example": "00000000-0000-0000-0000-000000000000"
+              }
+            },
+            "x-position": 1
+          },
+          {
+            "name": "asOfDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "nullable": true
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TeamOperatingModelDetailsDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/organization/teams/{id}/has-ever-been-scrum": {
+      "get": {
+        "tags": [
+          "Teams"
+        ],
+        "summary": "Check if a team has ever used the Scrum methodology.",
+        "operationId": "Teams_HasEverBeenScrum",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
     "/api/organization/teams/{id}/sprints": {
       "get": {
         "tags": [
@@ -15428,6 +16559,7 @@
           "description",
           "action",
           "resource",
+          "category",
           "isBasic",
           "isRoot",
           "name"
@@ -15440,6 +16572,9 @@
             "type": "string"
           },
           "resource": {
+            "type": "string"
+          },
+          "category": {
             "type": "string"
           },
           "isBasic": {
@@ -15633,7 +16768,8 @@
         "additionalProperties": false,
         "required": [
           "id",
-          "isActive"
+          "isActive",
+          "roles"
         ],
         "properties": {
           "id": {
@@ -15662,6 +16798,11 @@
             "type": "string",
             "nullable": true
           },
+          "lastActivityAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
           "employee": {
             "nullable": true,
             "oneOf": [
@@ -15669,6 +16810,12 @@
                 "$ref": "#/components/schemas/NavigationDto"
               }
             ]
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RoleListDto"
+            }
           }
         }
       },
@@ -15706,6 +16853,26 @@
           "name": {
             "type": "string",
             "minLength": 1
+          }
+        }
+      },
+      "RoleListDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
           }
         }
       },
@@ -15794,26 +16961,6 @@
             "nullable": true
           },
           "primaryKey": {
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
-      "RoleListDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "name"
-        ],
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "description": {
             "type": "string",
             "nullable": true
           }
@@ -15927,6 +17074,34 @@
             "type": "string"
           },
           "roleNames": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ManageRoleUsersRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "roleId",
+          "userIdsToAdd",
+          "userIdsToRemove"
+        ],
+        "properties": {
+          "roleId": {
+            "type": "string",
+            "minLength": 1,
+            "nullable": false
+          },
+          "userIdsToAdd": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "userIdsToRemove": {
             "type": "array",
             "items": {
               "type": "string"
@@ -17956,6 +19131,7 @@
           "type",
           "status",
           "priority",
+          "assignees",
           "progress",
           "order"
         ],
@@ -17986,6 +19162,12 @@
           },
           "priority": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "assignees": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmployeeNavigationDto"
+            }
           },
           "progress": {
             "type": "number",
@@ -18064,10 +19246,10 @@
           "name",
           "type",
           "status",
+          "assignees",
           "progress",
           "order",
           "wbs",
-          "assignments",
           "children"
         ],
         "properties": {
@@ -18103,6 +19285,12 @@
               }
             ]
           },
+          "assignees": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmployeeNavigationDto"
+            }
+          },
           "progress": {
             "type": "number",
             "format": "decimal"
@@ -18119,12 +19307,6 @@
           },
           "wbs": {
             "type": "string"
-          },
-          "assignments": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ProjectTaskAssignmentDto"
-            }
           },
           "plannedStart": {
             "type": "string",
@@ -18154,22 +19336,6 @@
           }
         }
       },
-      "ProjectTaskAssignmentDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "employee",
-          "role"
-        ],
-        "properties": {
-          "employee": {
-            "$ref": "#/components/schemas/EmployeeNavigationDto"
-          },
-          "role": {
-            "$ref": "#/components/schemas/SimpleNavigationDto"
-          }
-        }
-      },
       "ProjectTaskDto": {
         "type": "object",
         "additionalProperties": false,
@@ -18181,9 +19347,9 @@
           "type",
           "status",
           "priority",
+          "assignees",
           "progress",
-          "order",
-          "assignments"
+          "order"
         ],
         "properties": {
           "id": {
@@ -18217,6 +19383,12 @@
           "priority": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
           },
+          "assignees": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmployeeNavigationDto"
+            }
+          },
           "progress": {
             "type": "number",
             "format": "decimal"
@@ -18238,12 +19410,6 @@
                 "$ref": "#/components/schemas/ProjectTaskNavigationDto"
               }
             ]
-          },
-          "assignments": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ProjectTaskAssignmentDto"
-            }
           },
           "plannedStart": {
             "type": "string",
@@ -18327,6 +19493,17 @@
             "description": "The priority level of the task.",
             "format": "int32"
           },
+          "assigneeIds": {
+            "type": "array",
+            "description": "The assignees of the project task.",
+            "nullable": true,
+            "items": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            }
+          },
           "progress": {
             "type": "number",
             "description": "The progress of the task (optional). Ranges from 0.0 to 100.0. Milestones can not update progress directly.",
@@ -18365,53 +19542,8 @@
             "minimum": 0.0,
             "nullable": true,
             "exclusiveMinimum": true
-          },
-          "assignments": {
-            "type": "array",
-            "description": "The role-based assignments for this task (optional).",
-            "nullable": true,
-            "items": {
-              "$ref": "#/components/schemas/TaskRoleAssignmentRequest"
-            }
           }
         }
-      },
-      "TaskRoleAssignmentRequest": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "employeeId",
-          "role"
-        ],
-        "properties": {
-          "employeeId": {
-            "type": "string",
-            "description": "The ID of the employee.",
-            "format": "guid",
-            "nullable": false,
-            "example": "00000000-0000-0000-0000-000000000000"
-          },
-          "role": {
-            "description": "The role of the assignment (Assignee or Reviewer).",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/TaskRole"
-              }
-            ]
-          }
-        }
-      },
-      "TaskRole": {
-        "type": "string",
-        "description": "",
-        "x-enumNames": [
-          "Assignee",
-          "Reviewer"
-        ],
-        "enum": [
-          "Assignee",
-          "Reviewer"
-        ]
       },
       "UpdateProjectTaskRequest": {
         "type": "object",
@@ -18455,6 +19587,17 @@
             "description": "The priority level of the task.",
             "format": "int32"
           },
+          "assigneeIds": {
+            "type": "array",
+            "description": "The assignees of the project task.",
+            "nullable": true,
+            "items": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            }
+          },
           "progress": {
             "type": "number",
             "description": "The progress of the task (optional). Ranges from 0.0 to 100.0. Milestones can not update progress directly.",
@@ -18493,14 +19636,6 @@
             "minimum": 0.0,
             "nullable": true,
             "exclusiveMinimum": true
-          },
-          "assignments": {
-            "type": "array",
-            "description": "The role-based assignments for this task (optional).",
-            "nullable": true,
-            "items": {
-              "$ref": "#/components/schemas/TaskRoleAssignmentRequest"
-            }
           }
         }
       },
@@ -19691,6 +20826,7 @@
           "name",
           "start",
           "end",
+          "state",
           "category"
         ],
         "properties": {
@@ -19715,8 +20851,57 @@
             "type": "string",
             "format": "date"
           },
+          "state": {
+            "type": "string"
+          },
           "category": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
+          }
+        }
+      },
+      "PlanningIntervalIterationDetailsDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "name",
+          "start",
+          "end",
+          "state",
+          "category",
+          "planningInterval"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "key": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "start": {
+            "type": "string",
+            "format": "date"
+          },
+          "end": {
+            "type": "string",
+            "format": "date"
+          },
+          "state": {
+            "type": "string"
+          },
+          "category": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "planningInterval": {
+            "$ref": "#/components/schemas/NavigationDto"
           }
         }
       },
@@ -19743,6 +20928,450 @@
           "order": {
             "type": "integer",
             "format": "int32"
+          }
+        }
+      },
+      "PlanningIntervalIterationSprintsDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "name",
+          "start",
+          "end",
+          "category",
+          "sprints"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "key": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "start": {
+            "type": "string",
+            "format": "date"
+          },
+          "end": {
+            "type": "string",
+            "format": "date"
+          },
+          "category": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "sprints": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SprintListDto"
+            }
+          }
+        }
+      },
+      "SprintListDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "name",
+          "state",
+          "start",
+          "end",
+          "team"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "key": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "state": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "start": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "end": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "team": {
+            "$ref": "#/components/schemas/PlanningTeamNavigationDto"
+          }
+        }
+      },
+      "MapPlanningIntervalSprintsRequest": {
+        "type": "object",
+        "description": "Request model for mapping team sprints to Planning Interval iterations.",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "teamId",
+          "iterationSprintMappings"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The ID of the planning interval.",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "teamId": {
+            "type": "string",
+            "description": "The ID of the team whose sprints are being synchronized.",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "iterationSprintMappings": {
+            "type": "object",
+            "description": "Dictionary representing the complete desired state where key is iteration ID and value is sprint ID.\nThis is a sync/replace operation - any team sprints currently mapped but not included will be unmapped.\n- Non-null value: Maps the sprint to the iteration.\n- Null value: Explicitly unmaps any sprint from that iteration for this team.\n- Omitted iteration: No change to that iteration's mappings.",
+            "nullable": false,
+            "additionalProperties": {
+              "type": "string",
+              "format": "guid",
+              "nullable": true,
+              "example": "00000000-0000-0000-0000-000000000000"
+            }
+          }
+        }
+      },
+      "PlanningIntervalIterationMetricsResponse": {
+        "type": "object",
+        "description": "Response containing PI Iteration metrics aggregated across all mapped sprints.",
+        "additionalProperties": false,
+        "required": [
+          "iterationId",
+          "iterationKey",
+          "iterationName",
+          "start",
+          "end",
+          "category",
+          "teamCount",
+          "sprintCount",
+          "totalWorkItems",
+          "totalStoryPoints",
+          "completedWorkItems",
+          "completedStoryPoints",
+          "inProgressWorkItems",
+          "inProgressStoryPoints",
+          "notStartedWorkItems",
+          "notStartedStoryPoints",
+          "missingStoryPointsCount",
+          "sprintMetrics"
+        ],
+        "properties": {
+          "iterationId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "iterationKey": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "iterationName": {
+            "type": "string"
+          },
+          "start": {
+            "type": "string",
+            "format": "date"
+          },
+          "end": {
+            "type": "string",
+            "format": "date"
+          },
+          "category": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "teamCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sprintCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalWorkItems": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalStoryPoints": {
+            "type": "number",
+            "format": "double"
+          },
+          "completedWorkItems": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "completedStoryPoints": {
+            "type": "number",
+            "format": "double"
+          },
+          "inProgressWorkItems": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "inProgressStoryPoints": {
+            "type": "number",
+            "format": "double"
+          },
+          "notStartedWorkItems": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "notStartedStoryPoints": {
+            "type": "number",
+            "format": "double"
+          },
+          "missingStoryPointsCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "averageCycleTimeDays": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "sprintMetrics": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SprintMetricsSummary"
+            }
+          }
+        }
+      },
+      "SprintMetricsSummary": {
+        "type": "object",
+        "description": "Metrics summary for an individual sprint within the PI Iteration.",
+        "additionalProperties": false,
+        "required": [
+          "sprintId",
+          "sprintKey",
+          "sprintName",
+          "state",
+          "start",
+          "end",
+          "team",
+          "totalWorkItems",
+          "totalStoryPoints",
+          "completedWorkItems",
+          "completedStoryPoints",
+          "inProgressWorkItems",
+          "inProgressStoryPoints",
+          "notStartedWorkItems",
+          "notStartedStoryPoints",
+          "missingStoryPointsCount"
+        ],
+        "properties": {
+          "sprintId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "sprintKey": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sprintName": {
+            "type": "string"
+          },
+          "state": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "start": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "end": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "team": {
+            "$ref": "#/components/schemas/NavigationDto"
+          },
+          "totalWorkItems": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalStoryPoints": {
+            "type": "number",
+            "format": "double"
+          },
+          "completedWorkItems": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "completedStoryPoints": {
+            "type": "number",
+            "format": "double"
+          },
+          "inProgressWorkItems": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "inProgressStoryPoints": {
+            "type": "number",
+            "format": "double"
+          },
+          "notStartedWorkItems": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "notStartedStoryPoints": {
+            "type": "number",
+            "format": "double"
+          },
+          "missingStoryPointsCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "averageCycleTimeDays": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          }
+        }
+      },
+      "SprintBacklogItemDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "title",
+          "workspace",
+          "type",
+          "status",
+          "statusCategory",
+          "sprint",
+          "created",
+          "rank",
+          "stackRank"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "key": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "workspace": {
+            "$ref": "#/components/schemas/WorkspaceNavigationDto"
+          },
+          "type": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "statusCategory": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "parent": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/WorkItemNavigationDto"
+              }
+            ]
+          },
+          "team": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/WorkTeamNavigationDto"
+              }
+            ]
+          },
+          "sprint": {
+            "$ref": "#/components/schemas/WorkIterationNavigationDto"
+          },
+          "assignedTo": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/EmployeeNavigationDto"
+              }
+            ]
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "activated": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "done": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "rank": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "parentRank": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "project": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/WorkProjectNavigationDto"
+              }
+            ]
+          },
+          "externalViewWorkItemUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "stackRank": {
+            "type": "number",
+            "format": "double"
+          },
+          "storyPoints": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "cycleTime": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
           }
         }
       },
@@ -21571,48 +23200,6 @@
           }
         ]
       },
-      "SprintListDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "key",
-          "name",
-          "state",
-          "start",
-          "end",
-          "team"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "guid",
-            "nullable": false,
-            "example": "00000000-0000-0000-0000-000000000000"
-          },
-          "key": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "name": {
-            "type": "string"
-          },
-          "state": {
-            "$ref": "#/components/schemas/SimpleNavigationDto"
-          },
-          "start": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "end": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "team": {
-            "$ref": "#/components/schemas/PlanningTeamNavigationDto"
-          }
-        }
-      },
       "SprintDetailsDto": {
         "type": "object",
         "additionalProperties": false,
@@ -21655,119 +23242,65 @@
           }
         }
       },
-      "SprintBacklogItemDto": {
+      "SprintWorkItemMetricsDto": {
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
-          "key",
-          "title",
-          "workspace",
-          "type",
-          "status",
-          "statusCategory",
-          "sprint",
-          "created",
-          "rank",
-          "stackRank"
+          "sprintId",
+          "totalWorkItems",
+          "totalStoryPoints",
+          "completedWorkItems",
+          "completedStoryPoints",
+          "inProgressWorkItems",
+          "inProgressStoryPoints",
+          "notStartedWorkItems",
+          "notStartedStoryPoints",
+          "missingStoryPointsCount"
         ],
         "properties": {
-          "id": {
+          "sprintId": {
             "type": "string",
             "format": "guid",
             "nullable": false,
             "example": "00000000-0000-0000-0000-000000000000"
           },
-          "key": {
-            "type": "string"
-          },
-          "title": {
-            "type": "string"
-          },
-          "workspace": {
-            "$ref": "#/components/schemas/WorkspaceNavigationDto"
-          },
-          "type": {
-            "type": "string"
-          },
-          "status": {
-            "type": "string"
-          },
-          "statusCategory": {
-            "$ref": "#/components/schemas/SimpleNavigationDto"
-          },
-          "parent": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/WorkItemNavigationDto"
-              }
-            ]
-          },
-          "team": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/WorkTeamNavigationDto"
-              }
-            ]
-          },
-          "sprint": {
-            "$ref": "#/components/schemas/WorkIterationNavigationDto"
-          },
-          "assignedTo": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/EmployeeNavigationDto"
-              }
-            ]
-          },
-          "created": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "activated": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "done": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "rank": {
+          "totalWorkItems": {
             "type": "integer",
             "format": "int32"
           },
-          "parentRank": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "project": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/WorkProjectNavigationDto"
-              }
-            ]
-          },
-          "externalViewWorkItemUrl": {
-            "type": "string",
-            "nullable": true
-          },
-          "stackRank": {
+          "totalStoryPoints": {
             "type": "number",
             "format": "double"
           },
-          "storyPoints": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
+          "completedWorkItems": {
+            "type": "integer",
+            "format": "int32"
           },
-          "cycleTime": {
+          "completedStoryPoints": {
+            "type": "number",
+            "format": "double"
+          },
+          "inProgressWorkItems": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "inProgressStoryPoints": {
+            "type": "number",
+            "format": "double"
+          },
+          "notStartedWorkItems": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "notStartedStoryPoints": {
+            "type": "number",
+            "format": "double"
+          },
+          "missingStoryPointsCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "averageCycleTimeDays": {
             "type": "number",
             "format": "double",
             "nullable": true
@@ -23100,6 +24633,7 @@
           "code",
           "type",
           "isActive",
+          "operatingModel",
           "activeDate"
         ],
         "properties": {
@@ -23149,8 +24683,59 @@
                 "$ref": "#/components/schemas/TeamNavigationDto"
               }
             ]
+          },
+          "operatingModel": {
+            "$ref": "#/components/schemas/TeamOperatingModelListDto"
           }
         }
+      },
+      "TeamOperatingModelListDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "methodology",
+          "sizingMethod"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "methodology": {
+            "$ref": "#/components/schemas/Methodology"
+          },
+          "sizingMethod": {
+            "$ref": "#/components/schemas/SizingMethod"
+          }
+        }
+      },
+      "Methodology": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "Scrum",
+          "Kanban"
+        ],
+        "enum": [
+          "Scrum",
+          "Kanban"
+        ]
+      },
+      "SizingMethod": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "StoryPoints",
+          "Count"
+        ],
+        "enum": [
+          "StoryPoints",
+          "Count"
+        ]
       },
       "CreateTeamRequest": {
         "type": "object",
@@ -23536,6 +25121,113 @@
           "comment": {
             "type": "string",
             "nullable": true
+          }
+        }
+      },
+      "TeamOperatingModelDetailsDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "teamId",
+          "start",
+          "methodology",
+          "sizingMethod",
+          "isCurrent"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "teamId": {
+            "type": "string",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "start": {
+            "type": "string",
+            "format": "date",
+            "minLength": 1
+          },
+          "end": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "methodology": {
+            "$ref": "#/components/schemas/Methodology"
+          },
+          "sizingMethod": {
+            "$ref": "#/components/schemas/SizingMethod"
+          },
+          "isCurrent": {
+            "type": "boolean"
+          }
+        }
+      },
+      "SetTeamOperatingModelRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "startDate",
+          "methodology",
+          "sizingMethod"
+        ],
+        "properties": {
+          "startDate": {
+            "type": "string",
+            "description": "The start date for this operating model.",
+            "format": "date",
+            "minLength": 1,
+            "nullable": false
+          },
+          "methodology": {
+            "description": "The methodology the team uses (e.g., Scrum, Kanban).",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Methodology"
+              }
+            ]
+          },
+          "sizingMethod": {
+            "description": "The sizing method the team uses (e.g., StoryPoints, Count).",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/SizingMethod"
+              }
+            ]
+          }
+        }
+      },
+      "UpdateTeamOperatingModelRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "methodology",
+          "sizingMethod"
+        ],
+        "properties": {
+          "methodology": {
+            "description": "The methodology the team uses (e.g., Scrum, Kanban).",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Methodology"
+              }
+            ]
+          },
+          "sizingMethod": {
+            "description": "The sizing method the team uses (e.g., StoryPoints, Count).",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/SizingMethod"
+              }
+            ]
           }
         }
       },

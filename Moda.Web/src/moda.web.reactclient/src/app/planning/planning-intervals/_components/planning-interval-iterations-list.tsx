@@ -1,13 +1,11 @@
 'use client'
 
-import ModaDateRange from '@/src/components/common/moda-date-range'
-import { useGetPlanningIntervalIterationsQuery } from '@/src/store/features/planning/planning-interval-api'
-import { Card, List } from 'antd'
 import { FC } from 'react'
-import useTheme from '@/src/components/contexts/theme'
+import { Card, Flex, Skeleton, Typography } from 'antd'
+import { useGetPlanningIntervalIterationsQuery } from '@/src/store/features/planning/planning-interval-api'
+import { PlanningIntervalIterationsListItem } from '.'
 
-const { Item } = List
-const { Meta } = Item
+const { Title } = Typography
 
 interface PlanningIntervalIterationsListProps {
   planningIntervalKey: number
@@ -15,51 +13,31 @@ interface PlanningIntervalIterationsListProps {
 
 const PlanningIntervalIterationsList: FC<
   PlanningIntervalIterationsListProps
-> = (props) => {
-  const { planningIntervalKey } = props
-  const { token } = useTheme()
-  const { data: iterations } = useGetPlanningIntervalIterationsQuery(
+> = ({ planningIntervalKey }) => {
+  const { data: iterations, isLoading } = useGetPlanningIntervalIterationsQuery(
     planningIntervalKey,
     { skip: !planningIntervalKey },
   )
 
-  const isActiveIteration = (iteration: any) => {
-    const today = new Date()
-    const start = new Date(iteration.start)
-    const end = new Date(iteration.end)
-    return today >= start && today <= end
-  }
+  if (isLoading) return <Skeleton active />
 
-  if (!iterations || iterations.length === 0) return null
+  if (!iterations?.length) return null
+
   return (
-    <>
-      <Card size="small" title="Iterations">
-        <List
-          size="small"
-          itemLayout="horizontal"
-          dataSource={iterations}
-          renderItem={(iteration) => {
-            const isActive = isActiveIteration(iteration)
-            return (
-              <Item
-                style={{
-                  backgroundColor: isActive ? token.colorPrimaryBg : undefined,
-                }}
-              >
-                <Meta
-                  title={iteration.name}
-                  description={iteration.category.name}
-                  style={{
-                    color: isActive ? token.colorPrimaryText : undefined,
-                  }}
-                />
-                <ModaDateRange dateRange={iteration} />
-              </Item>
-            )
-          }}
-        />
-      </Card>
-    </>
+    <Card size="small" variant="borderless">
+      <Title level={5} style={{ marginTop: 0 }}>
+        Iterations
+      </Title>
+      <Flex vertical gap={4}>
+        {iterations.map((iteration) => (
+          <PlanningIntervalIterationsListItem
+            key={iteration.key}
+            iteration={iteration}
+            planningIntervalKey={planningIntervalKey}
+          />
+        ))}
+      </Flex>
+    </Card>
   )
 }
 

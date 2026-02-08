@@ -595,4 +595,389 @@ public class PlanningIntervalTests
     // TODO: Add tests updating and removing iterations
 
     #endregion ManageDates
+
+    #region Sprint Mappings
+
+    [Fact]
+    public void MapSprintToIteration_WithValidSprint_ReturnsSuccess()
+    {
+        // Arrange
+        var piDates = new LocalDateRange(new LocalDate(2023, 1, 1), new LocalDate(2023, 3, 31));
+        var teamId = Guid.NewGuid();
+        var sut = _planningIntervalFaker
+            .WithDateRange(piDates)
+            .WithTeams(teamId)
+            .WithIterations(piDates, 2, "Iteration ")
+            .Generate();
+
+        var iterationId = sut.Iterations.First().Id;
+        var sprint = new IterationFaker()
+            .AsSprint()
+            .WithTeamId(teamId)
+            .Generate();
+
+        // Act
+        var result = sut.MapSprintToIteration(iterationId, sprint);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        sut.IterationSprints.Should().HaveCount(1);
+        sut.IterationSprints.First().SprintId.Should().Be(sprint.Id);
+        sut.IterationSprints.First().PlanningIntervalIterationId.Should().Be(iterationId);
+    }
+
+    [Fact]
+    public void MapSprintToIteration_WithNonSprintType_ReturnsFailure()
+    {
+        // Arrange
+        var piDates = new LocalDateRange(new LocalDate(2023, 1, 1), new LocalDate(2023, 3, 31));
+        var teamId = Guid.NewGuid();
+        var sut = _planningIntervalFaker
+            .WithDateRange(piDates)
+            .WithTeams(teamId)
+            .WithIterations(piDates, 2, "Iteration ")
+            .Generate();
+
+        var iterationId = sut.Iterations.First().Id;
+        var iteration = new IterationFaker()
+            .AsIteration() // Not a sprint
+            .WithTeamId(teamId)
+            .Generate();
+
+        // Act
+        var result = sut.MapSprintToIteration(iterationId, iteration);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("Only sprints of type Sprint can be mapped to iterations.");
+        sut.IterationSprints.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void MapSprintToIteration_WithSprintNotBelongingToTeamInPI_ReturnsFailure()
+    {
+        // Arrange
+        var piDates = new LocalDateRange(new LocalDate(2023, 1, 1), new LocalDate(2023, 3, 31));
+        var teamId = Guid.NewGuid();
+        var otherTeamId = Guid.NewGuid();
+        var sut = _planningIntervalFaker
+            .WithDateRange(piDates)
+            .WithTeams(teamId) // Only teamId is in the PI
+            .WithIterations(piDates, 2, "Iteration ")
+            .Generate();
+
+        var iterationId = sut.Iterations.First().Id;
+        var sprint = new IterationFaker()
+            .AsSprint()
+            .WithTeamId(otherTeamId) // Sprint belongs to different team
+            .Generate();
+
+        // Act
+        var result = sut.MapSprintToIteration(iterationId, sprint);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("The sprint must belong to a team that is part of this Planning Interval.");
+        sut.IterationSprints.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void MapSprintToIteration_WithSprintWithoutTeam_ReturnsFailure()
+    {
+        // Arrange
+        var piDates = new LocalDateRange(new LocalDate(2023, 1, 1), new LocalDate(2023, 3, 31));
+        var teamId = Guid.NewGuid();
+        var sut = _planningIntervalFaker
+            .WithDateRange(piDates)
+            .WithTeams(teamId)
+            .WithIterations(piDates, 2, "Iteration ")
+            .Generate();
+
+        var iterationId = sut.Iterations.First().Id;
+        var sprint = new IterationFaker()
+            .AsSprint()
+            .WithTeamId(null) // No team assigned
+            .Generate();
+
+        // Act
+        var result = sut.MapSprintToIteration(iterationId, sprint);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("The sprint must belong to a team that is part of this Planning Interval.");
+        sut.IterationSprints.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void MapSprintToIteration_WithNonExistentIteration_ReturnsFailure()
+    {
+        // Arrange
+        var piDates = new LocalDateRange(new LocalDate(2023, 1, 1), new LocalDate(2023, 3, 31));
+        var teamId = Guid.NewGuid();
+        var sut = _planningIntervalFaker
+            .WithDateRange(piDates)
+            .WithTeams(teamId)
+            .WithIterations(piDates, 2, "Iteration ")
+            .Generate();
+
+        var nonExistentIterationId = Guid.NewGuid();
+        var sprint = new IterationFaker()
+            .AsSprint()
+            .WithTeamId(teamId)
+            .Generate();
+
+        // Act
+        var result = sut.MapSprintToIteration(nonExistentIterationId, sprint);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be($"Iteration {nonExistentIterationId} not found in this Planning Interval.");
+        sut.IterationSprints.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void MapSprintToIteration_WhenSprintAlreadyMappedToSameIteration_IsIdempotent()
+    {
+        // Arrange
+        var piDates = new LocalDateRange(new LocalDate(2023, 1, 1), new LocalDate(2023, 3, 31));
+        var teamId = Guid.NewGuid();
+        var sut = _planningIntervalFaker
+            .WithDateRange(piDates)
+            .WithTeams(teamId)
+            .WithIterations(piDates, 2, "Iteration ")
+            .Generate();
+
+        var iterationId = sut.Iterations.First().Id;
+        var sprint = new IterationFaker().AsSprint().WithTeamId(teamId).Generate();
+
+        // Map sprint first time
+        var firstResult = sut.MapSprintToIteration(iterationId, sprint);
+        firstResult.IsSuccess.Should().BeTrue();
+
+        // Act - Map same sprint to same iteration again
+        var secondResult = sut.MapSprintToIteration(iterationId, sprint);
+
+        // Assert - Operation is idempotent, should succeed
+        secondResult.IsSuccess.Should().BeTrue();
+        sut.IterationSprints.Should().HaveCount(1, "mapping same sprint twice should not create duplicate");
+        sut.IterationSprints.First().SprintId.Should().Be(sprint.Id);
+    }
+
+    [Fact]
+    public void MapSprintToIteration_WithSprintAlreadyMappedToDifferentIteration_MovesSprintToNewIteration()
+    {
+        // Arrange
+        var piDates = new LocalDateRange(new LocalDate(2023, 1, 1), new LocalDate(2023, 3, 31));
+        var teamId = Guid.NewGuid();
+        var sut = _planningIntervalFaker
+            .WithDateRange(piDates)
+            .WithTeams(teamId)
+            .WithIterations(piDates, 2, "Iteration ")
+            .Generate();
+
+        var firstIterationId = sut.Iterations.First().Id;
+        var secondIterationId = sut.Iterations.Last().Id;
+        var sprint = new IterationFaker()
+            .AsSprint()
+            .WithTeamId(teamId)
+            .Generate();
+
+        sut.MapSprintToIteration(firstIterationId, sprint);
+        sut.IterationSprints.Should().HaveCount(1);
+        sut.IterationSprints.First().PlanningIntervalIterationId.Should().Be(firstIterationId);
+
+        // Act - Map same sprint to second iteration (should move it)
+        var result = sut.MapSprintToIteration(secondIterationId, sprint);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        sut.IterationSprints.Should().HaveCount(1, "sprint should be moved, not duplicated");
+        sut.IterationSprints.First().SprintId.Should().Be(sprint.Id);
+        sut.IterationSprints.First().PlanningIntervalIterationId.Should().Be(secondIterationId, "sprint should now be mapped to the second iteration");
+    }
+
+    [Fact]
+    public void MapSprintToIteration_WithTeamAlreadyHavingSprintInIteration_ReplacesExistingSprint()
+    {
+        // Arrange
+        var piDates = new LocalDateRange(new LocalDate(2023, 1, 1), new LocalDate(2023, 3, 31));
+        var teamId = Guid.NewGuid();
+        var sut = _planningIntervalFaker
+            .WithDateRange(piDates)
+            .WithTeams(teamId)
+            .WithIterations(piDates, 2, "Iteration ")
+            .Generate();
+
+        var iterationId = sut.Iterations.First().Id;
+        var sprint1 = new IterationFaker().AsSprint().WithTeamId(teamId).Generate();
+        var sprint2 = new IterationFaker().AsSprint().WithTeamId(teamId).Generate();
+
+        // Map first sprint successfully
+        sut.MapSprintToIteration(iterationId, sprint1);
+        
+        // Set up Sprint navigation property (simulates EF Core loading)
+        foreach (var mapping in sut.IterationSprints)
+        {
+            if (mapping.SprintId == sprint1.Id)
+                mapping.SetPrivate(m => m.Sprint, sprint1);
+        }
+        
+        sut.IterationSprints.Should().HaveCount(1);
+        sut.IterationSprints.First().SprintId.Should().Be(sprint1.Id);
+
+        // Act - Map second sprint from same team to same iteration (should replace)
+        var result = sut.MapSprintToIteration(iterationId, sprint2);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        sut.IterationSprints.Should().HaveCount(1, "team can only have one sprint per iteration");
+        sut.IterationSprints.First().SprintId.Should().Be(sprint2.Id, "new sprint should replace the old one");
+    }
+
+    [Fact]
+    public void UnmapSprint_WithExistingSprint_ReturnsSuccess()
+    {
+        // Arrange
+        var piDates = new LocalDateRange(new LocalDate(2023, 1, 1), new LocalDate(2023, 3, 31));
+        var teamId = Guid.NewGuid();
+        var sut = _planningIntervalFaker
+            .WithDateRange(piDates)
+            .WithTeams(teamId)
+            .WithIterations(piDates, 2, "Iteration ")
+            .Generate();
+
+        var iterationId = sut.Iterations.First().Id;
+        var sprint = new IterationFaker()
+            .AsSprint()
+            .WithTeamId(teamId)
+            .Generate();
+
+        sut.MapSprintToIteration(iterationId, sprint);
+
+        // Act
+        var result = sut.UnmapSprint(sprint.Id);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        sut.IterationSprints.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void UnmapSprint_WithNonExistentSprint_ReturnsFailure()
+    {
+        // Arrange
+        var piDates = new LocalDateRange(new LocalDate(2023, 1, 1), new LocalDate(2023, 3, 31));
+        var sut = _planningIntervalFaker
+            .WithDateRange(piDates)
+            .WithIterations(piDates, 2, "Iteration ")
+            .Generate();
+
+        var nonExistentSprintId = Guid.NewGuid();
+
+        // Act
+        var result = sut.UnmapSprint(nonExistentSprintId);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("Sprint mapping not found in this Planning Interval.");
+    }
+
+    [Fact]
+    public void GetSprintsForIteration_WithMultipleSprints_ReturnsCorrectSprints()
+    {
+        // Arrange
+        var piDates = new LocalDateRange(new LocalDate(2023, 1, 1), new LocalDate(2023, 3, 31));
+        var teamId = Guid.NewGuid();
+        var sut = _planningIntervalFaker
+            .WithDateRange(piDates)
+            .WithTeams(teamId)
+            .WithIterations(piDates, 2, "Iteration ")
+            .Generate();
+
+        var firstIterationId = sut.Iterations.First().Id;
+        var secondIterationId = sut.Iterations.Last().Id;
+
+        var sprint1 = new IterationFaker().AsSprint().WithTeamId(teamId).Generate();
+        var sprint2 = new IterationFaker().AsSprint().WithTeamId(teamId).Generate();
+        var sprint3 = new IterationFaker().AsSprint().WithTeamId(teamId).Generate();
+
+        sut.MapSprintToIteration(firstIterationId, sprint1);
+        sut.MapSprintToIteration(firstIterationId, sprint2);
+        sut.MapSprintToIteration(secondIterationId, sprint3);
+
+        // Act
+        var firstIterationSprints = sut.GetSprintsForIteration(firstIterationId);
+        var secondIterationSprints = sut.GetSprintsForIteration(secondIterationId);
+
+        // Assert
+        firstIterationSprints.Should().HaveCount(2);
+        firstIterationSprints.Should().Contain(s => s.SprintId == sprint1.Id);
+        firstIterationSprints.Should().Contain(s => s.SprintId == sprint2.Id);
+
+        secondIterationSprints.Should().HaveCount(1);
+        secondIterationSprints.First().SprintId.Should().Be(sprint3.Id);
+    }
+
+    [Fact]
+    public void GetSprintsForIteration_WithNoSprints_ReturnsEmptyCollection()
+    {
+        // Arrange
+        var piDates = new LocalDateRange(new LocalDate(2023, 1, 1), new LocalDate(2023, 3, 31));
+        var sut = _planningIntervalFaker
+            .WithDateRange(piDates)
+            .WithIterations(piDates, 2, "Iteration ")
+            .Generate();
+
+        var iterationId = sut.Iterations.First().Id;
+
+        // Act
+        var sprints = sut.GetSprintsForIteration(iterationId);
+
+        // Assert
+        sprints.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void ManageTeams_WhenRemovingTeam_RemovesAssociatedSprintMappings()
+    {
+        // Arrange
+        var piDates = new LocalDateRange(new LocalDate(2023, 1, 1), new LocalDate(2023, 3, 31));
+        var team1Id = Guid.NewGuid();
+        var team2Id = Guid.NewGuid();
+        var sut = _planningIntervalFaker
+            .WithDateRange(piDates)
+            .WithTeams(team1Id, team2Id)
+            .WithIterations(piDates, 2, "Iteration ")
+            .Generate();
+
+        var iterationId = sut.Iterations.First().Id;
+        var team1Sprint = new IterationFaker().AsSprint().WithTeamId(team1Id).Generate();
+        var team2Sprint = new IterationFaker().AsSprint().WithTeamId(team2Id).Generate();
+
+        sut.MapSprintToIteration(iterationId, team1Sprint);
+        sut.MapSprintToIteration(iterationId, team2Sprint);
+
+        // Set up the Sprint navigation properties (simulates EF Core loading)
+        foreach (var mapping in sut.IterationSprints)
+        {
+            if (mapping.SprintId == team1Sprint.Id)
+                mapping.SetPrivate(m => m.Sprint, team1Sprint);
+            if (mapping.SprintId == team2Sprint.Id)
+                mapping.SetPrivate(m => m.Sprint, team2Sprint);
+        }
+
+        // Act - Remove team1, keep team2
+        var result = sut.ManageTeams(new[] { team2Id });
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        sut.Teams.Should().HaveCount(1);
+        sut.Teams.First().TeamId.Should().Be(team2Id);
+        sut.IterationSprints.Should().HaveCount(1);
+        sut.IterationSprints.First().SprintId.Should().Be(team2Sprint.Id);
+    }
+
+    #endregion Sprint Mappings
 }
+
+

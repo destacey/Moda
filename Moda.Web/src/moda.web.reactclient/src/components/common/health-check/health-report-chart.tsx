@@ -1,7 +1,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import React, { useEffect, useMemo, useState } from 'react'
+import { FC, useMemo } from 'react'
 import useTheme from '../../contexts/theme'
 import { useGetHealthReportQuery } from '@/src/store/features/common/health-checks-api'
 import { Card } from 'antd'
@@ -38,7 +38,7 @@ const statusMap = {
 // TODO: copying the image in light mode works, but in dark mode it doesn't
 // TODO: add empty state
 
-const HealthReportChart: React.FC<HealthReportChartProps> = (
+const HealthReportChart: FC<HealthReportChartProps> = (
   props: HealthReportChartProps,
 ) => {
   const { currentThemeName, antDesignChartsTheme } = useTheme()

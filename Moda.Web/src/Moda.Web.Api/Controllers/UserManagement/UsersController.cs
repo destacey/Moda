@@ -1,4 +1,4 @@
-using Moda.Web.Api.Extensions;
+﻿using Moda.Web.Api.Extensions;
 using Moda.Web.Api.Models.UserManagement.Users;
 
 namespace Moda.Web.Api.Controllers.UserManagement;
@@ -6,21 +6,16 @@ namespace Moda.Web.Api.Controllers.UserManagement;
 [Route("api/user-management/users")]
 [ApiVersionNeutral]
 [ApiController]
-public class UsersController : ControllerBase
+public class UsersController(IUserService userService) : ControllerBase
 {
-    private readonly IUserService _userService;
-
-    public UsersController(IUserService userService)
-    {
-        _userService = userService;
-    }
+    private readonly IUserService _userService = userService;
 
     [HttpGet]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Users)]
     [OpenApiOperation("Get list of all users.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<List<UserDetailsDto>> GetList(CancellationToken cancellationToken)
+    public async Task<List<UserDetailsDto>> GetUsers(CancellationToken cancellationToken)
     {
         return await _userService.GetListAsync(cancellationToken);
     }
@@ -31,7 +26,7 @@ public class UsersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<UserDetailsDto>> GetById(string id, CancellationToken cancellationToken)
+    public async Task<ActionResult<UserDetailsDto>> GetUser(string id, CancellationToken cancellationToken)
     {
         var user = await _userService.GetAsync(id, cancellationToken);
 
@@ -57,7 +52,7 @@ public class UsersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
-    public async Task<ActionResult> ManageRoles(string id, AssignUserRolesRequest request, CancellationToken cancellationToken)
+    public async Task<ActionResult> ManageUserRoles(string id, AssignUserRolesRequest request, CancellationToken cancellationToken)
     {
         if (id != request.UserId)
             return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(nameof(id), nameof(request.UserId), HttpContext));
@@ -66,6 +61,21 @@ public class UsersController : ControllerBase
 
         return result.IsSuccess
             ? Ok()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpPost("manage-role")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.UserRoles)]
+    [OpenApiOperation("Add or remove users from a role.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> ManageRoleUsers(ManageRoleUsersRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _userService.ManageRoleUsersAsync(request.ToManageRoleUsersCommand(), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
             : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 

@@ -1,40 +1,58 @@
 'use client'
 
-import PageTitle from '@/src/components/common/page-title'
-import { Card } from 'antd'
+import { PageActions, PageTitle } from '@/src/components/common'
+import { Card, Flex, MenuProps, Spin, Tag, Typography } from 'antd'
 import { use, useCallback, useMemo, useState } from 'react'
 import useAuth from '@/src/components/contexts/auth'
 import { authorizePage } from '@/src/components/hoc'
-import { notFound } from 'next/navigation'
+import { notFound, useRouter } from 'next/navigation'
 import BasicBreadcrumb from '@/src/components/common/basic-breadcrumb'
-import { useGetRoleQuery } from '@/src/store/features/user-management/roles-api'
-import { Permissions, RoleDetails } from '../_components'
+import {
+  useGetRoleQuery,
+  useGetRoleUsersCountQuery,
+} from '@/src/store/features/user-management/roles-api'
+import {
+  DeleteRoleForm,
+  EditRoleForm,
+  ManageRoleUsersForm,
+  Permissions,
+  RoleUsersGrid,
+} from '../_components'
+import { ItemType } from 'antd/es/menu/interface'
+import { useDocumentTitle } from '@/src/hooks'
+import { TeamOutlined } from '@ant-design/icons'
+
+const { Text } = Typography
 
 enum RoleDetailsTabs {
-  Details = 'details',
   Permissions = 'permissions',
+  Users = 'users',
 }
 
-const getRoleTabs = (canViewPermissions: boolean) => [
+const getRoleTabs = () => [
   {
-    key: RoleDetailsTabs.Details,
-    tab: 'Details',
-  },
-  canViewPermissions && {
     key: RoleDetailsTabs.Permissions,
     tab: 'Permissions',
+  },
+  {
+    key: RoleDetailsTabs.Users,
+    tab: 'Users',
   },
 ]
 
 const RoleDetailsPage = (props: { params: Promise<{ id: string }> }) => {
   const { id } = use(props.params)
 
-  const [activeTab, setActiveTab] = useState(RoleDetailsTabs.Details)
+  const [activeTab, setActiveTab] = useState(RoleDetailsTabs.Permissions)
+  const [permissionsDirty, setPermissionsDirty] = useState(false)
+  const [openEditRoleForm, setOpenEditRoleForm] = useState<boolean>(false)
+  const [openDeleteRoleForm, setOpenDeleteRoleForm] = useState<boolean>(false)
+  const [openManageRoleUsersForm, setOpenManageRoleUsersForm] =
+    useState<boolean>(false)
+
+  const router = useRouter()
 
   const { hasPermissionClaim } = useAuth()
-
-  //const canUpdateRole = hasPermissionClaim('Permissions.Roles.Update')
-  const canViewPermissions = hasPermissionClaim('Permissions.Permissions.View')
 
   const {
     data: roleData,
@@ -43,30 +61,105 @@ const RoleDetailsPage = (props: { params: Promise<{ id: string }> }) => {
     refetch: refetch,
   } = useGetRoleQuery(id)
 
-  const tabs = useMemo(
-    () => getRoleTabs(canViewPermissions),
-    [canViewPermissions],
-  )
+  const { data: countData } = useGetRoleUsersCountQuery(id)
+
+  const title = roleData ? `${roleData.name} - Role Details` : 'Role Details'
+  useDocumentTitle(title)
+
+  const isSystemRole =
+    !!roleData && (roleData.name === 'Admin' || roleData.name === 'Basic')
+  const editableRole = !!roleData && !isSystemRole
+
+  const canUpdateRole =
+    hasPermissionClaim('Permissions.Roles.Update') && editableRole
+  const canDeleteRole =
+    hasPermissionClaim('Permissions.Roles.Delete') && editableRole
+  const canUpdateUserRoles = hasPermissionClaim('Permissions.UserRoles.Update')
+
+  const tabs = useMemo(() => getRoleTabs(), [])
+
+  const actionsMenuItems: MenuProps['items'] = useMemo(() => {
+    let includesDetailsSection = false
+    const items: ItemType[] = []
+    if (canUpdateRole) {
+      items.push({
+        key: 'edit',
+        label: 'Edit',
+        onClick: () => setOpenEditRoleForm(true),
+      })
+      includesDetailsSection = true
+    }
+    if (canDeleteRole) {
+      items.push({
+        key: 'delete',
+        label: 'Delete',
+        onClick: () => setOpenDeleteRoleForm(true),
+        disabled: countData !== undefined && countData > 0,
+        title:
+          countData !== undefined && countData > 0
+            ? 'This role is assigned to users and cannot be deleted.'
+            : undefined,
+      })
+      includesDetailsSection = true
+    }
+    if (canUpdateUserRoles) {
+      if (includesDetailsSection) {
+        items.push({
+          key: 'manage-divider',
+          type: 'divider',
+        })
+      }
+      items.push({
+        key: 'manage-users',
+        label: 'Manage Users',
+        onClick: () => setOpenManageRoleUsersForm(true),
+      })
+    }
+    return items
+  }, [canDeleteRole, canUpdateRole, canUpdateUserRoles, countData])
 
   const renderTabContent = useCallback(() => {
     switch (activeTab) {
-      case RoleDetailsTabs.Details:
-        return <RoleDetails role={roleData} />
       case RoleDetailsTabs.Permissions:
         return (
           <Permissions
-            roleId={roleData?.id}
+            role={roleData}
             permissions={roleData?.permissions}
+            isSystemRole={isSystemRole}
+            onDirtyChange={setPermissionsDirty}
           />
         )
+      case RoleDetailsTabs.Users:
+        return <RoleUsersGrid roleId={id} />
       default:
         return null
     }
-  }, [activeTab, roleData])
+  }, [activeTab, id, isSystemRole, roleData])
 
-  const onTabChange = useCallback((tabKey: string) => {
-    setActiveTab(tabKey as RoleDetailsTabs)
-  }, [])
+  const onTabChange = useCallback(
+    (tabKey: string) => {
+      if (
+        permissionsDirty &&
+        !window.confirm(
+          'You have unsaved permission changes. Are you sure you want to leave?',
+        )
+      )
+        return
+      setPermissionsDirty(false)
+      setActiveTab(tabKey as RoleDetailsTabs)
+    },
+    [permissionsDirty],
+  )
+
+  const onDeleteRoleFormClosed = useCallback(
+    (wasDeleted: boolean) => {
+      setOpenDeleteRoleForm(false)
+      if (wasDeleted) {
+        router.push('/settings/user-management/roles')
+      }
+    },
+    [router],
+  )
 
   if (!isLoading && !roleData) {
     return notFound()
@@ -82,10 +175,56 @@ const RoleDetailsPage = (props: { params: Promise<{ id: string }> }) => {
           { title: 'Details' },
         ]}
       />
-      <PageTitle title={roleData?.name} subtitle="Role Details" />
+      <PageTitle
+        title={roleData?.name}
+        subtitle="Role Details"
+        tags={isSystemRole ? <Tag color="warning">System Role</Tag> : undefined}
+        actions={<PageActions actionItems={actionsMenuItems} />}
+        extra={
+          <Flex vertical gap="small">
+            {roleData?.description && (
+              <Text type="secondary">{roleData?.description}</Text>
+            )}
+            {countData !== undefined && (
+              <Text type="secondary">
+                <TeamOutlined style={{ marginRight: 4 }} />
+                {countData} user{countData !== 1 ? 's' : ''} assigned
+              </Text>
+            )}
+          </Flex>
+        }
+      />
       <Card tabList={tabs} activeTabKey={activeTab} onTabChange={onTabChange}>
-        {renderTabContent()}
+        <Spin spinning={isLoading}>{!isLoading && renderTabContent()}</Spin>
       </Card>
+      {openEditRoleForm && (
+        <EditRoleForm
+          role={roleData}
+          showForm={openEditRoleForm}
+          onFormComplete={() => {
+            setOpenEditRoleForm(false)
+            refetch()
+          }}
+          onFormCancel={() => setOpenEditRoleForm(false)}
+        />
+      )}
+      {openManageRoleUsersForm && roleData && (
+        <ManageRoleUsersForm
+          roleId={id}
+          roleName={roleData.name}
+          showForm={openManageRoleUsersForm}
+          onFormComplete={() => setOpenManageRoleUsersForm(false)}
+          onFormCancel={() => setOpenManageRoleUsersForm(false)}
+        />
+      )}
+      {openDeleteRoleForm && (
+        <DeleteRoleForm
+          role={roleData}
+          showForm={openDeleteRoleForm}
+          onFormComplete={() => onDeleteRoleFormClosed(true)}
+          onFormCancel={() => onDeleteRoleFormClosed(false)}
+        />
+      )}
     </>
   )
 }
@@ -97,3 +236,4 @@ const RoleDetailsPageWithAuthorization = authorizePage(
 )
 
 export default RoleDetailsPageWithAuthorization
+

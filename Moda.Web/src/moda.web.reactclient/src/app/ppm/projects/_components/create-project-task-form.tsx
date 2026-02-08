@@ -1,9 +1,11 @@
 'use client'
 
 import { MarkdownEditor } from '@/src/components/common/markdown'
+import { EmployeeSelect } from '@/src/components/common/organizations'
 import useAuth from '@/src/components/contexts/auth'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { CreateProjectTaskRequest } from '@/src/services/moda-api'
+import { useGetEmployeeOptionsQuery } from '@/src/store/features/organizations/employee-api'
 import {
   useCreateProjectTaskMutation,
   useGetTaskPriorityOptionsQuery,
@@ -42,6 +44,7 @@ interface CreateProjectTaskFormValues {
   type: number
   status: number
   priority?: number
+  assigneeIds: string[]
   progress?: number
   parentId?: string
   plannedRange?: any[]
@@ -58,6 +61,7 @@ const mapToRequestValues = (
     typeId: values.type,
     statusId: values.status,
     priorityId: values.priority,
+    assigneeIds: values.assigneeIds,
     progress: values.progress,
     parentId: values.parentId,
     plannedStart: (values.plannedRange?.[0] as any)?.format('YYYY-MM-DD'),
@@ -87,6 +91,12 @@ const CreateProjectTaskForm = (props: CreateProjectTaskFormProps) => {
     (opt) => opt.label === 'Milestone',
   )?.value
   const isMilestone = selectedType === milestoneValue
+
+  const {
+    data: employeeData,
+    isLoading: employeeOptionsIsLoading,
+    error: employeeOptionsError,
+  } = useGetEmployeeOptionsQuery(false)
 
   const { data: statusOptions = [] } = useGetTaskStatusOptionsQuery({
     forMilestone: isMilestone,
@@ -278,6 +288,14 @@ const CreateProjectTaskForm = (props: CreateProjectTaskFormProps) => {
             options={priorityOptions}
             optionType="button"
             buttonStyle="solid"
+          />
+        </Item>
+
+        <Item name="assigneeIds" label="Assignees">
+          <EmployeeSelect
+            employees={employeeData ?? []}
+            allowMultiple={true}
+            placeholder="Select Assignees"
           />
         </Item>
 

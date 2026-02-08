@@ -20,6 +20,7 @@ public class FakeOrganizationDbContext : IOrganizationDbContext, IDisposable
     private readonly List<BaseTeam> _baseTeams = [];
     private readonly List<Team> _teams = [];
     private readonly List<TeamOfTeams> _teamOfTeams = [];
+    private readonly List<TeamOperatingModel> _teamOperatingModels = [];
     
     // Common domain entities
     private readonly List<Employee> _employees = [];
@@ -30,6 +31,7 @@ public class FakeOrganizationDbContext : IOrganizationDbContext, IDisposable
     public DbSet<BaseTeam> BaseTeams => _baseTeams.AsDbSet();
     public DbSet<Team> Teams => _teams.AsDbSet();
     public DbSet<TeamOfTeams> TeamOfTeams => _teamOfTeams.AsDbSet();
+    public DbSet<TeamOperatingModel> TeamOperatingModels => _teamOperatingModels.AsDbSet();
     public DbSet<Employee> Employees => _employees.AsDbSet();
     public DbSet<ExternalEmployeeBlacklistItem> ExternalEmployeeBlacklistItems => _externalEmployeeBlacklistItems.AsDbSet();
     public DbSet<PersonalAccessToken> PersonalAccessTokens => _personalAccessTokens.AsDbSet();
@@ -50,8 +52,8 @@ public class FakeOrganizationDbContext : IOrganizationDbContext, IDisposable
         SaveChangesCallCount++;
 
         // Return the total number of entities as a simple success indicator
-        var count = _baseTeams.Count + _teams.Count + _teamOfTeams.Count + _employees.Count +
-                    _externalEmployeeBlacklistItems.Count + _personalAccessTokens.Count;
+        var count = _baseTeams.Count + _teams.Count + _teamOfTeams.Count + _teamOperatingModels.Count +
+                    _employees.Count + _externalEmployeeBlacklistItems.Count + _personalAccessTokens.Count;
         return Task.FromResult(count);
     }
 
@@ -124,13 +126,17 @@ public class FakeOrganizationDbContext : IOrganizationDbContext, IDisposable
         _teamOfTeams.Add(teamOfTeams);
         _baseTeams.Add(teamOfTeams);
     }
-    
+
     public void AddTeamOfTeams(IEnumerable<TeamOfTeams> teamOfTeams)
     {
         _teamOfTeams.AddRange(teamOfTeams);
         _baseTeams.AddRange(teamOfTeams);
     }
-    
+
+    // TeamOperatingModel
+    public void AddTeamOperatingModel(TeamOperatingModel operatingModel) => _teamOperatingModels.Add(operatingModel);
+    public void AddTeamOperatingModels(IEnumerable<TeamOperatingModel> operatingModels) => _teamOperatingModels.AddRange(operatingModels);
+
     // Employee
     public void AddEmployee(Employee employee) => _employees.Add(employee);
     public void AddEmployees(IEnumerable<Employee> employees) => _employees.AddRange(employees);
@@ -144,6 +150,7 @@ public class FakeOrganizationDbContext : IOrganizationDbContext, IDisposable
         _baseTeams.Clear();
         _teams.Clear();
         _teamOfTeams.Clear();
+        _teamOperatingModels.Clear();
         _employees.Clear();
         _externalEmployeeBlacklistItems.Clear();
         _personalAccessTokens.Clear();

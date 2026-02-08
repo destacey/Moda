@@ -1,6 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <ItemGroup>
+      <Compile Remove="Events\**" />
+      <EmbeddedResource Remove="Events\**" />
+      <None Remove="Events\**" />
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="Ardalis.GuardClauses" />
     </ItemGroup>
 
@@ -11,10 +17,6 @@
 
     <ItemGroup>
         <InternalsVisibleTo Include="Moda.Organization.Domain.Tests" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Events\" />
     </ItemGroup>
 
 </Project>

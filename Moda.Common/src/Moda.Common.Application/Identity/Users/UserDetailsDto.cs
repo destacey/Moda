@@ -1,4 +1,5 @@
-using Moda.Common.Application.Dtos;
+﻿using Moda.Common.Application.Dtos;
+using Moda.Common.Application.Identity.Roles;
 
 namespace Moda.Common.Application.Identity.Users;
 
@@ -18,5 +19,10 @@ public sealed record UserDetailsDto
 
     public string? PhoneNumber { get; set; }
 
+    public Instant? LastActivityAt { get; set; }
+
     public NavigationDto? Employee { get; set; }
+
+    public List<RoleListDto> Roles { get; set; } = [];
 }
+

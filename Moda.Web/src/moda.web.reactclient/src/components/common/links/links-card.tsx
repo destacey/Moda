@@ -1,14 +1,16 @@
-import { Button, Card, Space, Spin } from 'antd'
+import { Alert, Button, Card, Flex, Spin } from 'antd'
 import useAuth from '../../contexts/auth'
 import { EditOutlined, EditTwoTone, PlusOutlined } from '@ant-design/icons'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import CreateLinkForm from './create-link-form'
 import LinkItem from './link-item'
 import ModaEmpty from '../moda-empty'
 import { useGetLinksQuery } from '@/src/store/features/common/links-api'
+import { LinkDto } from '@/src/services/moda-api'
 
 export interface LinksCardProps {
   objectId: string
+  width?: number | string
 }
 
 const EditModeButton = ({
@@ -17,26 +19,24 @@ const EditModeButton = ({
 }: {
   editModeEnabled: boolean
   setEditModeEnabled: (enabled: boolean) => void
-}) => {
-  if (editModeEnabled) {
-    return (
-      <Button
-        type="text"
-        title="Click to turn off Edit mode"
-        icon={<EditTwoTone />}
-        onClick={() => setEditModeEnabled(false)}
-      />
-    )
-  } else {
-    return (
-      <Button
-        type="text"
-        title="Click to turn on Edit mode"
-        icon={<EditOutlined />}
-        onClick={() => setEditModeEnabled(true)}
-      />
-    )
-  }
+}) => (
+  <Button
+    type="text"
+    title={`Click to turn ${editModeEnabled ? 'off' : 'on'} Edit mode`}
+    aria-label={`Turn ${editModeEnabled ? 'off' : 'on'} edit mode`}
+    icon={editModeEnabled ? <EditTwoTone /> : <EditOutlined />}
+    onClick={() => setEditModeEnabled(!editModeEnabled)}
+  />
+)
+
+interface LinksContentProps {
+  isLoading: boolean
+  hasLinks: boolean
+  linksData: LinkDto[]
+  editModeEnabled: boolean
+  canUpdateLinks: boolean
+  canDeleteLinks: boolean
+  error?: unknown
 }
 
 const LinksContent = ({
@@ -46,44 +46,41 @@ const LinksContent = ({
   editModeEnabled,
   canUpdateLinks,
   canDeleteLinks,
-}: {
-  isLoading: boolean
-  hasLinks: boolean
-  linksData: any[]
-  editModeEnabled: boolean
-  canUpdateLinks: boolean
-  canDeleteLinks: boolean
-}) => {
+  error,
+}: LinksContentProps) => {
+  const sortedLinks = useMemo(
+    () => [...linksData].sort((a, b) => a.name.localeCompare(b.name)),
+    [linksData],
+  )
+
   if (isLoading) {
     return <Spin size="small" />
-  } else if (!hasLinks) {
-    return <ModaEmpty message="No links found" />
-  } else {
-    return (
-      <Space
-        direction="vertical"
-        style={{
-          width: '100%',
-        }}
-      >
-        {linksData
-          .slice()
-          .sort((a, b) => a.name.localeCompare(b.name))
-          .map((item) => (
-            <LinkItem
-              key={item.id}
-              link={item}
-              editModeEnabled={editModeEnabled}
-              canUpdateLinks={canUpdateLinks}
-              canDeleteLinks={canDeleteLinks}
-            />
-          ))}
-      </Space>
-    )
   }
+
+  if (error) {
+    return <Alert type="error" title="Failed to load links" showIcon />
+  }
+
+  if (!hasLinks) {
+    return <ModaEmpty message="No links found" />
+  }
+
+  return (
+    <Flex vertical gap="small" style={{ width: '100%' }} role="list">
+      {sortedLinks.map((item) => (
+        <LinkItem
+          key={item.id}
+          link={item}
+          editModeEnabled={editModeEnabled}
+          canUpdateLinks={canUpdateLinks}
+          canDeleteLinks={canDeleteLinks}
+        />
+      ))}
+    </Flex>
+  )
 }
 
-const LinksCard = ({ objectId }: LinksCardProps) => {
+const LinksCard = ({ objectId, width = 300 }: LinksCardProps) => {
   const [openCreateLinkForm, setOpenCreateLinkForm] = useState<boolean>(false)
   const [editModeEnabled, setEditModeEnabled] = useState<boolean>(false)
 
@@ -91,7 +88,6 @@ const LinksCard = ({ objectId }: LinksCardProps) => {
     data: linksData,
     isLoading,
     error,
-    refetch,
   } = useGetLinksQuery(objectId, { skip: !objectId })
 
   const hasLinks = linksData && linksData.length > 0
@@ -106,12 +102,13 @@ const LinksCard = ({ objectId }: LinksCardProps) => {
       <Card
         size="small"
         title="Links"
-        style={{ width: 300 }}
+        style={{ width }}
         extra={
           <>
             {canCreateLinks && (
               <Button
                 type="text"
+                aria-label="Add new link"
                 icon={<PlusOutlined />}
                 onClick={() => setOpenCreateLinkForm(true)}
               />
@@ -132,6 +129,7 @@ const LinksCard = ({ objectId }: LinksCardProps) => {
           editModeEnabled={editModeEnabled}
           canUpdateLinks={canUpdateLinks}
           canDeleteLinks={canDeleteLinks}
+          error={error}
         />
       </Card>
       {openCreateLinkForm && (

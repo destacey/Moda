@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import { CSSProperties, FC } from 'react'
-import { Card, Divider, Flex, Space, Typography } from 'antd'
+import { Card, Flex, Space, Typography } from 'antd'
 
 const { Text } = Typography
 
@@ -11,6 +11,7 @@ export interface IterationDatesProps {
   end: Date | null
   showDurationDays?: boolean
   style?: CSSProperties
+  dateFormat?: string
 }
 
 const IterationDates: FC<IterationDatesProps> = ({
@@ -18,6 +19,7 @@ const IterationDates: FC<IterationDatesProps> = ({
   end,
   showDurationDays = true,
   style,
+  dateFormat = DATE_TIME_FORMAT,
 }: IterationDatesProps) => {
   if (!start || !end) return null
 
@@ -39,7 +41,7 @@ const IterationDates: FC<IterationDatesProps> = ({
           >
             Start Date
           </Text>
-          <Text>{startDate.format(DATE_TIME_FORMAT)}</Text>
+          <Text>{startDate.format(dateFormat)}</Text>
         </Flex>
         <Text type="secondary">→</Text>
         <Flex vertical>
@@ -49,7 +51,7 @@ const IterationDates: FC<IterationDatesProps> = ({
           >
             End Date
           </Text>
-          <Text>{endDate.format(DATE_TIME_FORMAT)}</Text>
+          <Text>{endDate.format(dateFormat)}</Text>
         </Flex>
         {showDurationDays && (
           <Flex vertical>

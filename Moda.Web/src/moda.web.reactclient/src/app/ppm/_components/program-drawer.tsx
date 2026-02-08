@@ -8,7 +8,7 @@ import { useGetProgramQuery } from '@/src/store/features/ppm/programs-api'
 import { getDrawerWidthPixels, getSortedNames } from '@/src/utils'
 import { Descriptions, Drawer, Flex } from 'antd'
 import Link from 'next/link'
-import { FC, useCallback, useEffect, useMemo, useState } from 'react'
+import { FC, useEffect, useMemo, useState } from 'react'
 
 const { Item } = Descriptions
 

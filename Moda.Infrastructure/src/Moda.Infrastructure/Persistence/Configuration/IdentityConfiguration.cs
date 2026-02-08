@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Moda.Common.Domain.Employees;
-using Moda.Common.Domain.Identity;
 
 namespace Moda.Infrastructure.Persistence.Configuration;
 
@@ -21,16 +20,25 @@ public class ApplicationUserConfig : IEntityTypeConfiguration<ApplicationUser>
         builder.Property(u => u.LastName).HasMaxLength(100);
         builder.Property(u => u.PhoneNumber).HasMaxLength(20);
 
+        builder.Property(u => u.LastActivityAt);
+
         // Relationships
         builder.HasOne(e => e.Employee).WithMany().HasForeignKey(e => e.EmployeeId).OnDelete(DeleteBehavior.NoAction);
+
+        // Configure many-to-many relationship with roles
+        builder.HasMany(u => u.UserRoles)
+            .WithOne()
+            .HasForeignKey(ur => ur.UserId)
+            .IsRequired();
     }
 }
 
 public class ApplicationRoleConfig : IEntityTypeConfiguration<ApplicationRole>
 {
-    public void Configure(EntityTypeBuilder<ApplicationRole> builder) =>
-        builder
-            .ToTable("Roles", SchemaNames.Identity);
+    public void Configure(EntityTypeBuilder<ApplicationRole> builder)
+    {
+        builder.ToTable("Roles", SchemaNames.Identity);
+    }
 }
 
 public class ApplicationRoleClaimConfig : IEntityTypeConfiguration<ApplicationRoleClaim>
@@ -42,9 +50,21 @@ public class ApplicationRoleClaimConfig : IEntityTypeConfiguration<ApplicationRo
 
 public class IdentityUserRoleConfig : IEntityTypeConfiguration<IdentityUserRole<string>>
 {
-    public void Configure(EntityTypeBuilder<IdentityUserRole<string>> builder) =>
-        builder
-            .ToTable("UserRoles", SchemaNames.Identity);
+    public void Configure(EntityTypeBuilder<IdentityUserRole<string>> builder)
+    {
+        builder.ToTable("UserRoles", SchemaNames.Identity);
+
+        // Configure navigation properties
+        builder.HasOne<ApplicationUser>()
+            .WithMany(u => u.UserRoles)
+            .HasForeignKey(ur => ur.UserId)
+            .IsRequired();
+
+        builder.HasOne<ApplicationRole>()
+            .WithMany(r => r.UserRoles)
+            .HasForeignKey(ur => ur.RoleId)
+            .IsRequired();
+    }
 }
 
 public class IdentityUserClaimConfig : IEntityTypeConfiguration<IdentityUserClaim<string>>

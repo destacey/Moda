@@ -595,7 +595,7 @@ public class ProjectTests
             plannedDateRange: null,
             plannedDate: null,
             estimatedEffortHours: null,
-            assignments: null).Value;
+            roles: null).Value;
 
         var task2 = project.CreateTask(
             nextNumber: 2,
@@ -609,7 +609,7 @@ public class ProjectTests
             plannedDateRange: null,
             plannedDate: null,
             estimatedEffortHours: null,
-            assignments: null).Value;
+            roles: null).Value;
 
         var newKey = new ProjectKey("NEWTASKS");
 

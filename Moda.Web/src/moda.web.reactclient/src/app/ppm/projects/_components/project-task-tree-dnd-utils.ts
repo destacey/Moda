@@ -1,5 +1,4 @@
 import { ProjectTaskTreeDto } from '@/src/services/moda-api'
-import { arrayMove } from '@dnd-kit/sortable'
 
 /**
  * Flattened project task with metadata for drag-and-drop operations
@@ -461,4 +460,3 @@ export function updateTaskPlacement(
     return item
   })
 }
-

@@ -4,6 +4,7 @@ import {
   RoleDto,
   RoleListDto,
   UpdateRolePermissionsRequest,
+  UserDetailsDto,
 } from '@/src/services/moda-api'
 import { getRolesClient } from '@/src/services/clients'
 import { QueryTags } from '../query-tags'
@@ -78,6 +79,37 @@ export const rolesApi = apiSlice.injectEndpoints({
       ],
     }),
 
+    getRoleUsers: builder.query<UserDetailsDto[], string>({
+      queryFn: async (id: string) => {
+        try {
+          const data = await getRolesClient().getUsers(id)
+          data.sort((a, b) => a.userName.localeCompare(b.userName))
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: (result, error, arg) => [
+        { type: QueryTags.RoleUsers, id: arg },
+      ],
+    }),
+
+    getRoleUsersCount: builder.query<number, string>({
+      queryFn: async (id: string) => {
+        try {
+          const data = await getRolesClient().getUsersCount(id)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: (result, error, arg) => [
+        { type: QueryTags.RoleUsersCount, id: arg },
+      ],
+    }),
+
     deleteRole: builder.mutation<void, string>({
       queryFn: async (id: string) => {
         try {
@@ -101,5 +133,7 @@ export const {
   useGetRoleQuery,
   useUpsertRoleMutation,
   useUpdatePermissionsMutation,
+  useGetRoleUsersQuery,
+  useGetRoleUsersCountQuery,
   useDeleteRoleMutation,
 } = rolesApi

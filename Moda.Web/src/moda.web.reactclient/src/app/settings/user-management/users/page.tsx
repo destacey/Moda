@@ -7,10 +7,10 @@ import { authorizePage } from '@/src/components/hoc'
 import Link from 'next/link'
 import { useDocumentTitle } from '@/src/hooks'
 import { useGetUsersQuery } from '@/src/store/features/user-management/users-api'
-
-const UserLinkCellRenderer = ({ value, data }) => {
-  return <Link href={`users/${data.id}`}>{value}</Link>
-}
+import { RoleListDto, UserDetailsDto } from '@/src/services/moda-api'
+import { ColDef, ValueFormatterParams } from 'ag-grid-community'
+import dayjs from 'dayjs'
+import { UserLinkCellRenderer } from '@/src/components/common/moda-grid-cell-renderers'
 
 const EmployeeLinkCellRenderer = ({ value, data }) => {
   return (
@@ -18,12 +18,16 @@ const EmployeeLinkCellRenderer = ({ value, data }) => {
   )
 }
 
+const dateTimeValueFormatter = (
+  params: ValueFormatterParams<UserDetailsDto>,
+) => (params.value ? dayjs(params.value).format('YYYY-MM-DD h:mm A') : '')
+
 const UsersListPage = () => {
   useDocumentTitle('Users')
 
   const { data: usersData, isLoading, error, refetch } = useGetUsersQuery()
 
-  const columnDefs = useMemo(
+  const columnDefs = useMemo<ColDef<UserDetailsDto>[]>(
     () => [
       { field: 'id', hide: true },
       { field: 'userName', cellRenderer: UserLinkCellRenderer },
@@ -34,6 +38,19 @@ const UsersListPage = () => {
         field: 'employee.name',
         headerName: 'Employee',
         cellRenderer: EmployeeLinkCellRenderer,
+      },
+      {
+        field: 'roles',
+        valueFormatter: (params) =>
+          params.value
+            ?.map((r: RoleListDto) => r.name)
+            .sort()
+            .join(', ') ?? '',
+      },
+      {
+        field: 'lastActivityAt',
+        headerName: 'Last Activity',
+        valueFormatter: dateTimeValueFormatter,
       },
       { field: 'isActive' }, // TODO: convert to yes/no
     ],
@@ -70,3 +87,4 @@ const PageWithAuthorization = authorizePage(
 )
 
 export default PageWithAuthorization
+

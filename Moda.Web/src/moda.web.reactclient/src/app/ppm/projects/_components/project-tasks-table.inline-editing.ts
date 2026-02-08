@@ -39,6 +39,7 @@ export const useProjectTasksInlineEditing = ({
       'priority',
       'plannedStart',
       'plannedEnd',
+      'assignees',
       'progress',
       'estimatedEffortHours',
     ],
@@ -77,6 +78,17 @@ export const useProjectTasksInlineEditing = ({
         }
         if (values.priorityId !== task.priority?.id) {
           updates.priorityId = values.priorityId
+          hasChanges = true
+        }
+
+        // Compare assignee IDs arrays
+        const taskAssigneeIds = task.assignees?.map((a) => a.id) ?? []
+        const formAssigneeIds = values.assigneeIds ?? []
+        const assigneesChanged =
+          taskAssigneeIds.length !== formAssigneeIds.length ||
+          !taskAssigneeIds.every((id: string) => formAssigneeIds.includes(id))
+        if (assigneesChanged) {
+          updates.assigneeIds = formAssigneeIds
           hasChanges = true
         }
 
@@ -155,6 +167,7 @@ export const useProjectTasksInlineEditing = ({
           typeId: task.type?.id,
           statusId: task.status?.id,
           priorityId: task.priority?.id,
+          assigneeIds: task.assignees?.map((a) => a.id) ?? [],
           progress: task.progress,
           plannedStart: task.plannedStart ? dayjs(task.plannedStart) : null,
           plannedEnd: task.plannedEnd ? dayjs(task.plannedEnd) : null,

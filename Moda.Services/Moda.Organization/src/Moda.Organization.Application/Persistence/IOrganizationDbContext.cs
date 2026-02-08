@@ -6,6 +6,7 @@ public interface IOrganizationDbContext : IModaDbContext
     DbSet<BaseTeam> BaseTeams { get; }
     DbSet<Team> Teams { get; }
     DbSet<TeamOfTeams> TeamOfTeams { get; }
+    DbSet<TeamOperatingModel> TeamOperatingModels { get; }
 
     // Graph Table Syncs
     Task<int> UpsertTeamNode(TeamNode teamNode, CancellationToken cancellationToken);

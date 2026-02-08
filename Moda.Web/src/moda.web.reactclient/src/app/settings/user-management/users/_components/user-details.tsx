@@ -2,11 +2,11 @@
 
 import useAuth from '@/src/components/contexts/auth'
 import { UserDetailsDto } from '@/src/services/moda-api'
-import { useGetUserRolesQuery } from '@/src/store/features/user-management/users-api'
 import { EditOutlined, InfoCircleOutlined } from '@ant-design/icons'
-import { Button, Card, Descriptions, Flex, List, Space } from 'antd'
+import { Button, Card, Descriptions, Flex, List } from 'antd'
+import dayjs from 'dayjs'
 import Link from 'next/link'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { ManageUserRolesForm } from '.'
 
 const { Item } = Descriptions
@@ -21,29 +21,12 @@ const UserDetails = (props: UserDetailsProps) => {
   const [openManageUserRolesForm, setOpenManageUserRolesForm] =
     useState<boolean>(false)
 
-  const {
-    data: userRoleData,
-    isLoading,
-    error,
-    refetch,
-  } = useGetUserRolesQuery({ id: user?.id })
-
   const { hasPermissionClaim } = useAuth()
   const canUpdateUserRoles = hasPermissionClaim('Permissions.UserRoles.Update')
 
-  useEffect(() => {
-    error && console.error(error)
-  }, [error])
-
-  const onOpenManageUserRolesFormClosed = useCallback(
-    (wasSaved: boolean) => {
-      setOpenManageUserRolesForm(false)
-      if (wasSaved) {
-        refetch()
-      }
-    },
-    [refetch],
-  )
+  const onOpenManageUserRolesFormClosed = useCallback((wasSaved: boolean) => {
+    setOpenManageUserRolesForm(false)
+  }, [])
 
   if (!user) return null
 
@@ -60,6 +43,11 @@ const UserDetails = (props: UserDetailsProps) => {
             <Link href={`/organizations/employees/${user.employee?.key}`}>
               {user.employee?.name}
             </Link>
+          </Item>
+          <Item label="Last Activity">
+            {user.lastActivityAt
+              ? dayjs(user.lastActivityAt).format('MMM D, YYYY h:mm A')
+              : null}
           </Item>
           <Item label="Is Active?">{user.isActive?.toString()}</Item>
         </Descriptions>
@@ -81,12 +69,11 @@ const UserDetails = (props: UserDetailsProps) => {
         >
           <List
             size="small"
-            dataSource={userRoleData}
-            loading={isLoading}
+            dataSource={user.roles}
             renderItem={(item) => (
               <ListItem>
-                <Link href={`/settings/user-management/roles/${item.roleId}`}>
-                  {item.roleName}
+                <Link href={`/settings/user-management/roles/${item.id}`}>
+                  {item.name}
                 </Link>
                 {item.description && (
                   <InfoCircleOutlined title={item.description} />
@@ -109,3 +96,4 @@ const UserDetails = (props: UserDetailsProps) => {
 }
 
 export default UserDetails
+

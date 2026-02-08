@@ -5,18 +5,16 @@ using Moda.Common.Domain.Enums.Planning;
 using Moda.Common.Domain.Interfaces;
 using Moda.Planning.Domain.Enums;
 using Moda.Planning.Domain.Interfaces;
+using Moda.Planning.Domain.Models.Iterations;
 using NodaTime;
 
 namespace Moda.Planning.Domain.Models;
-public class PlanningInterval : BaseSoftDeletableEntity<Guid>, ILocalSchedule, IHasIdAndKey
+public class PlanningInterval : BaseSoftDeletableEntity<Guid>, ILocalSchedule, INavigable
 {
-    private string _name = default!;
-    private string? _description;
-    private LocalDateRange _dateRange = default!;
-
     private readonly List<PlanningIntervalTeam> _teams = [];
     private readonly List<PlanningIntervalIteration> _iterations = [];
     private readonly List<PlanningIntervalObjective> _objectives = [];
+    private readonly List<PlanningIntervalIterationSprint> _iterationSprints = [];
 
     private PlanningInterval() { }
 
@@ -40,40 +38,52 @@ public class PlanningInterval : BaseSoftDeletableEntity<Guid>, ILocalSchedule, I
     /// </summary>
     public string Name
     {
-        get => _name;
-        private set => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
-    }
+        get;
+        private set => field = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
+    } = default!;
 
     /// <summary>
     /// The description of the Planning Interval.
     /// </summary>
     public string? Description
     {
-        get => _description;
-        private set => _description = value.NullIfWhiteSpacePlusTrim();
+        get;
+        private set => field = value.NullIfWhiteSpacePlusTrim();
     }
 
-    /// <summary>Gets or sets the date range.</summary>
-    /// <value>The date range.</value>
+    /// <summary>
+    /// The date range of the Planning Interval.
+    /// </summary>
     public LocalDateRange DateRange
     {
-        get => _dateRange;
-        private set => _dateRange = Guard.Against.Null(value, nameof(DateRange));
-    }
+        get;
+        private set => field = Guard.Against.Null(value, nameof(DateRange));
+    } = default!;
 
+    /// <summary>
+    /// A value indicating whether objectives are locked for this Planning Interval.
+    /// </summary>
     public bool ObjectivesLocked { get; private set; } = false;
 
-    /// <summary>Gets the teams.</summary>
-    /// <value>The PI teams.</value>
+    /// <summary>
+    /// The teams associated with this Planning Interval.
+    /// </summary>
     public IReadOnlyCollection<PlanningIntervalTeam> Teams => _teams.AsReadOnly();
 
-    /// <summary>Gets the iterations.</summary>
-    /// <value>The PI iterations.</value>
+    /// <summary>
+    /// The iterations within this Planning Interval.
+    /// </summary>
     public IReadOnlyCollection<PlanningIntervalIteration> Iterations => _iterations.OrderBy(i => i.DateRange.Start).ToList().AsReadOnly();
 
-    /// <summary>Gets the objectives.</summary>
-    /// <value>The PI objectives.</value>
+    /// <summary>
+    /// The objectives associated with this Planning Interval.
+    /// </summary>
     public IReadOnlyCollection<PlanningIntervalObjective> Objectives => _objectives.AsReadOnly();
+
+    /// <summary>
+    /// The sprints mapped to iterations within this Planning Interval.
+    /// </summary>
+    public IReadOnlyCollection<PlanningIntervalIterationSprint> IterationSprints => _iterationSprints.AsReadOnly();
 
     public double? CalculatePredictability(LocalDate date, Guid? teamId = null)
     {
@@ -206,6 +216,15 @@ public class PlanningInterval : BaseSoftDeletableEntity<Guid>, ILocalSchedule, I
         foreach (var removedTeam in removedTeams)
         {
             _teams.Remove(removedTeam);
+
+            // Remove sprint mappings for the removed team
+            var removedTeamSprints = _iterationSprints
+                .Where(s => s.Sprint?.TeamId == removedTeam.TeamId)
+                .ToList();
+            foreach (var sprint in removedTeamSprints)
+            {
+                _iterationSprints.Remove(sprint);
+            }
         }
 
         var addedTeams = teamIds.Where(x => !_teams.Any(y => y.TeamId == x)).ToList();
@@ -300,8 +319,155 @@ public class PlanningInterval : BaseSoftDeletableEntity<Guid>, ILocalSchedule, I
         return Result.Success();
     }
 
-
     #endregion Iterations
+
+    #region Sprint Mappings
+
+    /// <summary>
+    /// Maps a sprint to an iteration within this Planning Interval.
+    /// </summary>
+    /// <param name="iterationId">The iteration ID within this PI.</param>
+    /// <param name="sprint">The sprint entity to map.</param>
+    /// <returns>A result indicating success or failure with an error message.</returns>
+    public Result MapSprintToIteration(Guid iterationId, Iteration sprint)
+    {
+        Guard.Against.Null(sprint, nameof(sprint));
+
+        // Validate iteration exists
+        var iteration = _iterations.FirstOrDefault(i => i.Id == iterationId);
+        if (iteration is null)
+            return Result.Failure($"Iteration {iterationId} not found in this Planning Interval.");
+
+        // Validate sprint type
+        if (sprint.Type != IterationType.Sprint)
+            return Result.Failure("Only sprints of type Sprint can be mapped to iterations.");
+
+        // Validate sprint belongs to a team in the PI
+        if (!sprint.TeamId.HasValue || !_teams.Any(t => t.TeamId == sprint.TeamId.Value))
+            return Result.Failure("The sprint must belong to a team that is part of this Planning Interval.");
+
+        // Check if sprint is already mapped
+        var existingMapping = _iterationSprints.FirstOrDefault(s => s.SprintId == sprint.Id);
+        if (existingMapping is not null)
+        {
+            // If already mapped to this iteration, operation is idempotent - return success
+            if (existingMapping.PlanningIntervalIterationId == iterationId)
+                return Result.Success();
+            
+            // Sprint is mapped to a different iteration - unmap it and continue to map to new iteration
+            _iterationSprints.Remove(existingMapping);
+        }
+
+        // If the team already has a different sprint mapped to this iteration, unmap it first
+        // This ensures a team can only have one sprint per iteration (replace behavior)
+        var teamSprintInIteration = _iterationSprints
+            .Where(s => s.PlanningIntervalIterationId == iterationId && s.SprintId != sprint.Id)
+            .FirstOrDefault(s => s.Sprint?.TeamId == sprint.TeamId);        
+        if (teamSprintInIteration is not null)
+        {
+            _iterationSprints.Remove(teamSprintInIteration);
+        }
+
+        // Add the mapping
+        var mapping = new PlanningIntervalIterationSprint(Id, iterationId, sprint.Id);
+        _iterationSprints.Add(mapping);
+
+        return Result.Success();
+    }
+
+    /// <summary>
+    /// Removes a sprint mapping from an iteration within this Planning Interval.
+    /// </summary>
+    /// <param name="sprintId">The sprint ID to unmap.</param>
+    /// <returns>A result indicating success or failure with an error message.</returns>
+    public Result UnmapSprint(Guid sprintId)
+    {
+        var mapping = _iterationSprints.FirstOrDefault(s => s.SprintId == sprintId);
+        if (mapping is null)
+            return Result.Failure("Sprint mapping not found in this Planning Interval.");
+
+        _iterationSprints.Remove(mapping);
+        return Result.Success();
+    }
+
+    /// <summary>
+    /// Gets all sprints mapped to a specific iteration.
+    /// </summary>
+    /// <param name="iterationId">The iteration ID.</param>
+    /// <returns>A collection of sprint mappings for the specified iteration.</returns>
+    public IReadOnlyCollection<PlanningIntervalIterationSprint> GetSprintsForIteration(Guid iterationId)
+    {
+        return _iterationSprints.Where(s => s.PlanningIntervalIterationId == iterationId).ToList().AsReadOnly();
+    }
+
+    /// <summary>
+    /// Synchronizes team sprint mappings to the desired state.
+    /// This is a sync/replace operation that:
+    /// - Maps sprints as specified in the dictionary
+    /// - Unmaps sprints not included in the desired state
+    /// - Ensures idempotency and proper validation
+    /// </summary>
+    /// <param name="teamId">The team whose sprints are being synchronized.</param>
+    /// <param name="iterationSprintMappings">Dictionary where key is iteration ID and value is sprint ID (null to unmap).</param>
+    /// <param name="sprints">Dictionary of available sprints keyed by ID.</param>
+    /// <returns>A result indicating success or failure with an error message.</returns>
+    public Result SyncTeamSprintMappings(Guid teamId, Dictionary<Guid, Guid?> iterationSprintMappings, Dictionary<Guid, Iteration> sprints)
+    {
+        Guard.Against.Null(iterationSprintMappings, nameof(iterationSprintMappings));
+        Guard.Against.Null(sprints, nameof(sprints));
+
+        // Process each mapping in the dictionary
+        foreach (var (iterationId, sprintId) in iterationSprintMappings)
+        {
+            if (!sprintId.HasValue)
+            {
+                // Null value means unmap any existing team sprint from this iteration
+                var teamSprintsInIteration = _iterationSprints
+                    .Where(s => s.PlanningIntervalIterationId == iterationId && 
+                               s.Sprint?.TeamId == teamId)
+                    .ToList();
+
+                foreach (var sprintMapping in teamSprintsInIteration)
+                {
+                    var unmapResult = UnmapSprint(sprintMapping.SprintId);
+                    if (unmapResult.IsFailure)
+                        return unmapResult;
+                }
+            }
+            else
+            {
+                // Map the sprint to the iteration (domain handles all validation)
+                if (!sprints.TryGetValue(sprintId.Value, out var sprint))
+                    return Result.Failure($"Sprint {sprintId.Value} not found.");
+
+                var mapResult = MapSprintToIteration(iterationId, sprint);
+                if (mapResult.IsFailure)
+                    return mapResult;
+            }
+        }
+
+        // Unmap any team sprints that are currently mapped but not in the desired state
+        var desiredSprintIds = iterationSprintMappings.Values
+            .Where(id => id.HasValue)
+            .Select(id => id!.Value)
+            .ToHashSet();
+
+        var currentTeamSprints = _iterationSprints
+            .Where(s => s.Sprint?.TeamId == teamId)
+            .Where(s => !desiredSprintIds.Contains(s.SprintId))
+            .ToList();
+
+        foreach (var currentSprint in currentTeamSprints)
+        {
+            var unmapResult = UnmapSprint(currentSprint.SprintId);
+            if (unmapResult.IsFailure)
+                return unmapResult;
+        }
+
+        return Result.Success();
+    }
+
+    #endregion Sprint Mappings
 
     #region Objectives
 

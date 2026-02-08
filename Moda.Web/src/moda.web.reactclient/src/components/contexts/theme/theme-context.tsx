@@ -20,7 +20,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
     useLocalStorageState<ThemeName>('modaTheme', 'light')
 
   const [agGridTheme, setAgGridTheme] = useState<AgGridTheme>(agGridLightTheme)
-  const [badgeColor, setBadgeColor] = useState<string>(null)
+  const [badgeColor, setBadgeColor] = useState<string | null>(null)
   const [antDesignChartsTheme, setAntDesignChartsTheme] = useState('classic')
   const [antvisG6ChartsTheme, setAntvisG6ChartsTheme] = useState('light')
 
@@ -73,6 +73,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
         antDesignChartsTheme,
         antvisG6ChartsTheme,
       }),
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       [
         currentThemeName,
         setCurrentThemeName,

@@ -80,4 +80,17 @@ public static class PlanningIntervalFakerExtensions
         faker.RuleFor("_objectives", f => new PlanningIntervalObjectiveFaker(faker.PlanningIntervalId, team, Enums.ObjectiveStatus.NotStarted, false).Generate(objectivesCount));
         return faker;
     }
+
+    public static PlanningIntervalFaker WithTeams(this PlanningIntervalFaker faker, params Guid[] teamIds)
+    {
+        var teams = teamIds.Select(teamId => new PlanningIntervalTeamFaker(faker.PlanningIntervalId, teamId).Generate()).ToList();
+        faker.RuleFor("_teams", f => teams);
+        return faker;
+    }
+
+    public static PlanningIntervalFaker WithIterationSprints(this PlanningIntervalFaker faker, params PlanningIntervalIterationSprint[] sprints)
+    {
+        faker.RuleFor("_iterationSprints", f => sprints.ToList());
+        return faker;
+    }
 }

@@ -1,6 +1,6 @@
 import { MarkdownRenderer } from '@/src/components/common/markdown'
 import { RoadmapMilestoneDetailsDto } from '@/src/services/moda-api'
-import { Descriptions, Flex, Space } from 'antd'
+import { Descriptions, Flex } from 'antd'
 import dayjs from 'dayjs'
 import { FC } from 'react'
 

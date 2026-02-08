@@ -2,10 +2,9 @@
 using Mapster;
 using Moda.Organization.Application.Models;
 using NodaTime;
-using System.Linq;
 
 namespace Moda.Organization.Application.Teams.Dtos;
-public sealed record TeamDetailsDto : IMapFrom<BaseTeam>
+public sealed record TeamDetailsDto : IMapFrom<Team>
 {
     /// <summary>
     /// The identifier of the team.
@@ -64,6 +63,12 @@ public sealed record TeamDetailsDto : IMapFrom<BaseTeam>
     public TeamNavigationDto? TeamOfTeams { get; set; }
 
     /// <summary>
+    /// The current operating model of the team.
+    /// </summary>
+    [Required]
+    public required TeamOperatingModelListDto OperatingModel { get; set; }
+
+    /// <summary>
     /// Create a TypeAdapterConfig configured to map BaseTeam -> TeamDetailsDto using the provided
     /// asOf date to select the appropriate parent membership. Callers can pass this config to
     /// ProjectToType to perform an EF-friendly projection that uses a captured constant date.
@@ -72,7 +77,7 @@ public sealed record TeamDetailsDto : IMapFrom<BaseTeam>
     {
         var cfg = new TypeAdapterConfig();
 
-        cfg.NewConfig<BaseTeam, TeamDetailsDto>()
+        cfg.NewConfig<Team, TeamDetailsDto>()
             .Map(dest => dest.Id, src => src.Id)
             .Map(dest => dest.Key, src => src.Key)
             .Map(dest => dest.Name, src => src.Name)
@@ -86,7 +91,10 @@ public sealed record TeamDetailsDto : IMapFrom<BaseTeam>
                  src => src.ParentMemberships
                             .Where(m => m.DateRange.Start <= asOf && (m.DateRange.End == null || m.DateRange.End >= asOf))
                             .Select(m => m.Target)
-                            .FirstOrDefault());
+                            .FirstOrDefault())
+            .Map(dest => dest.OperatingModel, src => src.OperatingModels
+                .Where(om => om.DateRange.Start <= asOf && (om.DateRange.End == null || om.DateRange.End >= asOf))
+                .First());
 
         return cfg;
     }

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Moda.Common.Domain.Interfaces;
 
 namespace Moda.Common.Application.Dtos;
 
@@ -32,4 +33,17 @@ public record NavigationDto : NavigationDto<Guid, int>
             Key = key,
             Name = name
         };
+
+    /// <summary>
+    /// Creates a NavigationDto from any entity implementing INavigable.
+    /// </summary>
+    public static NavigationDto FromNavigable<T>(T entity) where T : INavigable
+    {
+        return new NavigationDto
+        {
+            Id = entity.Id,
+            Key = entity.Key,
+            Name = entity.Name
+        };
+    }
 }

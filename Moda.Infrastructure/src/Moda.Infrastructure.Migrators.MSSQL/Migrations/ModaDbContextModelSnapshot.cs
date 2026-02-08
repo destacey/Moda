@@ -19,7 +19,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("Work")
-                .HasAnnotation("ProductVersion", "10.0.1")
+                .HasAnnotation("ProductVersion", "10.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -736,6 +736,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+                    b.Property<DateTime?>("LastActivityAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("LastName")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -1083,6 +1086,61 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("TeamMemberships", "Organization");
                 });
 
+            modelBuilder.Entity("Moda.Organization.Domain.Models.TeamOperatingModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Methodology")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar");
+
+                    b.Property<string>("SizingMethod")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar");
+
+                    b.Property<DateTime>("SystemCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("SystemCreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("SystemLastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("SystemLastModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("TeamId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.ComplexProperty(typeof(Dictionary<string, object>), "DateRange", "Moda.Organization.Domain.Models.TeamOperatingModel.DateRange#OperatingModelDateRange", b1 =>
+                        {
+                            b1.IsRequired();
+
+                            b1.Property<DateTime?>("End")
+                                .HasColumnType("date")
+                                .HasColumnName("End");
+
+                            b1.Property<DateTime>("Start")
+                                .HasColumnType("date")
+                                .HasColumnName("Start");
+                        });
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TeamId")
+                        .HasDatabaseName("IX_TeamOperatingModels_TeamId_Current")
+                        .HasFilter("[End] IS NULL");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("TeamId"), new[] { "Id", "Methodology", "SizingMethod" });
+
+                    b.ToTable("TeamOperatingModels", "Organization");
+                });
+
             modelBuilder.Entity("Moda.Planning.Domain.Models.Iterations.Iteration", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1325,6 +1383,51 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("PlanningIntervalId", "IsDeleted"), new[] { "Id", "Key", "Name", "Category" });
 
                     b.ToTable("PlanningIntervalIterations", "Planning");
+                });
+
+            modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningIntervalIterationSprint", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("PlanningIntervalId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("PlanningIntervalIterationId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("SprintId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("SystemCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("SystemCreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("SystemLastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("SystemLastModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PlanningIntervalId");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("PlanningIntervalId"), new[] { "PlanningIntervalIterationId", "SprintId" });
+
+                    b.HasIndex("PlanningIntervalIterationId");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("PlanningIntervalIterationId"), new[] { "PlanningIntervalId", "SprintId" });
+
+                    b.HasIndex("SprintId")
+                        .IsUnique();
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("SprintId"), new[] { "PlanningIntervalId", "PlanningIntervalIterationId" });
+
+                    b.ToTable("PlanningIntervalIterationSprints", "Planning");
                 });
 
             modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningIntervalObjective", b =>
@@ -3985,10 +4088,19 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Target");
                 });
 
+            modelBuilder.Entity("Moda.Organization.Domain.Models.TeamOperatingModel", b =>
+                {
+                    b.HasOne("Moda.Organization.Domain.Models.Team", null)
+                        .WithMany("OperatingModels")
+                        .HasForeignKey("TeamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Moda.Planning.Domain.Models.Iterations.Iteration", b =>
                 {
                     b.HasOne("Moda.Planning.Domain.Models.PlanningTeam", "Team")
-                        .WithMany()
+                        .WithMany("Iterations")
                         .HasForeignKey("TeamId")
                         .OnDelete(DeleteBehavior.Cascade);
 
@@ -3997,11 +4109,38 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
             modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningIntervalIteration", b =>
                 {
-                    b.HasOne("Moda.Planning.Domain.Models.PlanningInterval", null)
+                    b.HasOne("Moda.Planning.Domain.Models.PlanningInterval", "PlanningInterval")
                         .WithMany("Iterations")
                         .HasForeignKey("PlanningIntervalId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("PlanningInterval");
+                });
+
+            modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningIntervalIterationSprint", b =>
+                {
+                    b.HasOne("Moda.Planning.Domain.Models.PlanningInterval", null)
+                        .WithMany("IterationSprints")
+                        .HasForeignKey("PlanningIntervalId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Moda.Planning.Domain.Models.PlanningIntervalIteration", "PlanningIntervalIteration")
+                        .WithMany("IterationSprints")
+                        .HasForeignKey("PlanningIntervalIterationId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Moda.Planning.Domain.Models.Iterations.Iteration", "Sprint")
+                        .WithMany()
+                        .HasForeignKey("SprintId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("PlanningIntervalIteration");
+
+                    b.Navigation("Sprint");
                 });
 
             modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningIntervalObjective", b =>
@@ -4749,7 +4888,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                             b1.ToTable("Connections", "AppIntegrations");
 
-                            b1.ToJson("Configuration");
+                            b1
+                                .ToJson("Configuration")
+                                .HasColumnType("nvarchar(max)");
 
                             b1.WithOwner()
                                 .HasForeignKey("AzureDevOpsBoardsConnectionId");
@@ -4853,7 +4994,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                             b1.ToTable("Connections", "AppIntegrations");
 
-                            b1.ToJson("TeamConfiguration");
+                            b1
+                                .ToJson("TeamConfiguration")
+                                .HasColumnType("nvarchar(max)");
 
                             b1.WithOwner()
                                 .HasForeignKey("AzureDevOpsBoardsConnectionId");
@@ -4956,11 +5099,18 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
             modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningInterval", b =>
                 {
+                    b.Navigation("IterationSprints");
+
                     b.Navigation("Iterations");
 
                     b.Navigation("Objectives");
 
                     b.Navigation("Teams");
+                });
+
+            modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningIntervalIteration", b =>
+                {
+                    b.Navigation("IterationSprints");
                 });
 
             modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningIntervalObjective", b =>
@@ -4970,6 +5120,8 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
             modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningTeam", b =>
                 {
+                    b.Navigation("Iterations");
+
                     b.Navigation("PlanningIntervalTeams");
                 });
 
@@ -5075,6 +5227,11 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
             modelBuilder.Entity("Moda.Work.Domain.Models.Workspace", b =>
                 {
                     b.Navigation("WorkItems");
+                });
+
+            modelBuilder.Entity("Moda.Organization.Domain.Models.Team", b =>
+                {
+                    b.Navigation("OperatingModels");
                 });
 
             modelBuilder.Entity("Moda.Organization.Domain.Models.TeamOfTeams", b =>

@@ -1,11 +1,8 @@
 ﻿using Moda.Common.Domain.Enums.Work;
-using Moda.Common.Domain.Extensions.Organizations;
-using Moda.Common.Domain.Models.Organizations;
 using Moda.Organization.Application.Models;
 using Moda.Organization.Application.Teams.Commands;
 using Moda.Organization.Application.Teams.Dtos;
 using Moda.Organization.Application.Teams.Queries;
-using Moda.Organization.Domain.Models;
 using Moda.Planning.Application.Iterations.Dtos;
 using Moda.Planning.Application.Iterations.Queries;
 using Moda.Planning.Application.Risks.Dtos;
@@ -17,7 +14,6 @@ using Moda.Web.Api.Models.Planning.Risks;
 using Moda.Work.Application.WorkItemDependencies.Dtos;
 using Moda.Work.Application.WorkItems.Dtos;
 using Moda.Work.Application.WorkItems.Queries;
-using NodaTime;
 
 namespace Moda.Web.Api.Controllers.Organizations;
 
@@ -34,7 +30,7 @@ public class TeamsController(ILogger<TeamsController> logger, ISender sender) : 
     [OpenApiOperation("Get a list of teams.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IReadOnlyList<TeamListDto>>> GetList(CancellationToken cancellationToken, bool includeInactive = false)
+    public async Task<ActionResult<IEnumerable<TeamListDto>>> GetList(CancellationToken cancellationToken, bool includeInactive = false)
     {
         var teams = await _sender.Send(new GetTeamsQuery(includeInactive), cancellationToken);
         return Ok(teams.OrderBy(e => e.Name));
@@ -118,7 +114,7 @@ public class TeamsController(ILogger<TeamsController> logger, ISender sender) : 
     [OpenApiOperation("Get parent team memberships.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IReadOnlyList<TeamMembershipDto>>> GetTeamMemberships(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<TeamMembershipDto>>> GetTeamMemberships(Guid id, CancellationToken cancellationToken)
     {
         return Ok(await _sender.Send(new GetTeamMembershipsQuery(id), cancellationToken));
     }
@@ -255,7 +251,7 @@ public class TeamsController(ILogger<TeamsController> logger, ISender sender) : 
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<IReadOnlyList<RiskListDto>>> GetRisks(Guid id, CancellationToken cancellationToken, bool includeClosed = false)
+    public async Task<ActionResult<IEnumerable<RiskListDto>>> GetRisks(Guid id, CancellationToken cancellationToken, bool includeClosed = false)
     {
         var teamExists = await _sender.Send(new TeamExistsQuery(id), cancellationToken);
         if (!teamExists)
@@ -330,6 +326,148 @@ public class TeamsController(ILogger<TeamsController> logger, ISender sender) : 
 
     #endregion Risks
 
+    #region Operating Models
+
+    [HttpGet("{id}/operating-models/{operatingModelId}")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Teams)]
+    [OpenApiOperation("Get a specific operating model for a team.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<TeamOperatingModelDetailsDto>> GetOperatingModel(Guid id, Guid operatingModelId, CancellationToken cancellationToken)
+    {
+        var teamExists = await _sender.Send(new TeamExistsQuery(id), cancellationToken);
+        if (!teamExists)
+            return NotFound();
+
+        var operatingModel = await _sender.Send(new GetTeamOperatingModelQuery(id, operatingModelId), cancellationToken);
+
+        return operatingModel is not null
+            ? Ok(operatingModel)
+            : NotFound();
+    }
+
+    [HttpGet("{id}/operating-models")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Teams)]
+    [OpenApiOperation("Get the operating model history for a team.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<IEnumerable<TeamOperatingModelDetailsDto>>> GetOperatingModels(Guid id, CancellationToken cancellationToken)
+    {
+        var history = await _sender.Send(new GetTeamOperatingModelsQuery(id), cancellationToken);
+
+        return history is not null
+            ? Ok(history)
+            : NotFound();
+    }
+
+    [HttpGet("{id}/operating-models/as-of")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Teams)]
+    [OpenApiOperation("Get the current operating model for a team, or the model effective on a specific date.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<TeamOperatingModelDetailsDto>> GetOperatingModelAsOf(Guid id, [FromQuery] DateTime? asOfDate, CancellationToken cancellationToken)
+    {
+        // TODO: using LocalDate or DateOnly from NSWAG and axios doesn't working correctly.
+        // NSwag's TypeScript generator uses toISOString() for all Date types, regardless of whether the OpenAPI spec specifies format: date or format: date-time. This is a known NSwag limitation (Issue #2339).
+        LocalDate? localDate = asOfDate.HasValue
+            ? LocalDate.FromDateTime(asOfDate.Value)
+            : null;
+
+        var operatingModel = await _sender.Send(new GetTeamOperatingModelAsOfQuery(id, localDate), cancellationToken);
+
+        return operatingModel is not null
+            ? Ok(operatingModel)
+            : NotFound();
+    }
+
+    [HttpGet("operating-models")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Teams)]
+    [OpenApiOperation("Get operating models for multiple teams.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IEnumerable<TeamOperatingModelDetailsDto>>> GetOperatingModelsForTeams(
+        [FromQuery] Guid[] teamIds,
+        [FromQuery] DateTime? asOfDate,
+        CancellationToken cancellationToken)
+    {
+        // TODO: using LocalDate or DateOnly from NSWAG and axios doesn't working correctly.
+        // NSwag's TypeScript generator uses toISOString() for all Date types, regardless of whether the OpenAPI spec specifies format: date or format: date-time. This is a known NSwag limitation (Issue #2339).
+        LocalDate? localDate = asOfDate.HasValue
+            ? LocalDate.FromDateTime(asOfDate.Value)
+            : null;
+
+        var operatingModels = await _sender.Send(new GetTeamOperatingModelsForTeamsQuery(teamIds, localDate), cancellationToken);
+
+        return Ok(operatingModels);
+    }
+
+    [HttpGet("{id}/has-ever-been-scrum")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Teams)]
+    [OpenApiOperation("Check if a team has ever used the Scrum methodology.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<bool>> HasEverBeenScrum(Guid id, CancellationToken cancellationToken)
+    {
+        var hasBeenScrum = await _sender.Send(new TeamHasEverBeenScrumQuery(id), cancellationToken);
+
+        return hasBeenScrum is not null
+            ? Ok(hasBeenScrum)
+            : NotFound();
+    }
+
+    [HttpPost("{id}/operating-models")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Teams)]
+    [OpenApiOperation("Set a new operating model for a team.", "")]
+    [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> SetOperatingModel(Guid id, [FromBody] SetTeamOperatingModelRequest request, CancellationToken cancellationToken)
+    {
+        var teamExists = await _sender.Send(new TeamExistsQuery(id), cancellationToken);
+        if (!teamExists)
+            return NotFound();
+
+        var result = await _sender.Send(request.ToSetTeamOperatingModelCommand(id), cancellationToken);
+
+        return result.IsSuccess
+            ? CreatedAtAction(nameof(GetOperatingModel), new { id, operatingModelId = result.Value }, result.Value)
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpPut("{id}/operating-models/{operatingModelId}")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Teams)]
+    [OpenApiOperation("Update an existing operating model for a team.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> UpdateOperatingModel(Guid id, Guid operatingModelId, [FromBody] UpdateTeamOperatingModelRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(request.ToUpdateTeamOperatingModelCommand(id, operatingModelId), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpDelete("{id}/operating-models/{operatingModelId}")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Teams)]
+    [OpenApiOperation("Delete an operating model from a team.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> DeleteOperatingModel(Guid id, Guid operatingModelId, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(new DeleteTeamOperatingModelCommand(id, operatingModelId), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    #endregion Operating Models
+
     [HttpGet("{id}/sprints")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Iterations)]
     [OpenApiOperation("Get the sprints for a team.", "")]
@@ -360,8 +498,8 @@ public class TeamsController(ILogger<TeamsController> logger, ISender sender) : 
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<FunctionalOrganizationChartDto>> GetFunctionalOrganizationChart([FromQuery] DateTime? asOfDate, CancellationToken cancellationToken)
     {
-        // TODO: using LocalDate or DateOnly from axios wasn't working correctly
-
+        // TODO: using LocalDate or DateOnly from NSWAG and axios doesn't working correctly.
+        // NSwag's TypeScript generator uses toISOString() for all Date types, regardless of whether the OpenAPI spec specifies format: date or format: date-time. This is a known NSwag limitation (Issue #2339).
         LocalDate? dateOnlyAsOfDate = asOfDate.HasValue
             ? LocalDate.FromDateTime(asOfDate.Value)
             : null;

@@ -68,6 +68,7 @@ public static class ConfigureServices
             .AddAuth(config)
             .AddBackgroundJobs(config)
             .AddCorsPolicy(config)
+            .AddUserActivityTracking()
             .AddProblemDetails(options =>
             {
                 options.CustomizeProblemDetails = (context) =>
@@ -125,6 +126,7 @@ public static class ConfigureServices
             .UseCorsPolicy()
             .UseAuthentication()
             .UseAuthorization()
+            .UseUserActivityTracking()
             .UseRequestLogging(config) // TODO: we currently don't log 403 logs because it is lower in the middleware pipeline. It should be above UseRouting, but then we don't get user information.
             .UseHangfireDashboard(config)
             .UseOpenApiDocumentation(config);
@@ -139,17 +141,17 @@ public static class ConfigureServices
         {
             // All health checks must pass for app to be considered ready to accept traffic after starting
             app.MapHealthChecks(ServiceEndpoints.HealthEndpointPath);
-
-            // Only health checks tagged with the "live" tag must pass for app to be considered alive
-            app.MapHealthChecks(ServiceEndpoints.AlivenessEndpointPath, new HealthCheckOptions
-            {
-                Predicate = r => r.Tags.Contains("live")
-            });
         }
         else
         {
             app.MapHealthChecks(ServiceEndpoints.HealthEndpointPath).RequireAuthorization();
         }
+
+        // Only health checks tagged with the "live" tag must pass for app to be considered alive
+        app.MapHealthChecks(ServiceEndpoints.AlivenessEndpointPath, new HealthCheckOptions
+        {
+            Predicate = r => r.Tags.Contains("live")
+        });
 
         app.MapGet(ServiceEndpoints.StartupEndpointPath, () => Results.Ok());
 

@@ -82,7 +82,7 @@ public static class TeamOfTeamsFakerExtensions
 
     public static TeamOfTeamsFaker AsInactive(this TeamOfTeamsFaker faker, LocalDate? inactiveDate = null)
     {
-        var actualInactiveDate = inactiveDate ?? LocalDate.FromDateTime(DateTime.UtcNow);
+        var actualInactiveDate = inactiveDate ?? new LocalDate(2025, 5, 20);
         faker.RuleFor(x => x.IsActive, false);
         faker.RuleFor(x => x.InactiveDate, actualInactiveDate);
         return faker;

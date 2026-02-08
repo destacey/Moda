@@ -3,10 +3,14 @@ import {
   CreatePlanningIntervalRequest,
   ManagePlanningIntervalDatesRequest,
   ManagePlanningIntervalObjectiveWorkItemsRequest,
+  MapPlanningIntervalSprintsRequest,
   ObjectIdAndKey,
   PlanningIntervalCalendarDto,
   PlanningIntervalDetailsDto,
+  PlanningIntervalIterationDetailsDto,
   PlanningIntervalIterationListDto,
+  PlanningIntervalIterationMetricsResponse,
+  PlanningIntervalIterationSprintsDto,
   PlanningIntervalListDto,
   PlanningIntervalObjectiveDetailsDto,
   PlanningIntervalObjectiveHealthCheckDto,
@@ -15,6 +19,7 @@ import {
   PlanningIntervalPredictabilityDto,
   PlanningIntervalTeamResponse,
   RiskListDto,
+  SprintBacklogItemDto,
   UpdatePlanningIntervalObjectiveRequest,
   UpdatePlanningIntervalObjectivesOrderRequest,
   UpdatePlanningIntervalRequest,
@@ -178,6 +183,100 @@ export const planningIntervalApi = apiSlice.injectEndpoints({
         { type: QueryTags.PlanningIntervalIteration, id: arg }, // typically arg is the key
       ],
     }),
+    getPlanningIntervalIteration: builder.query<
+      PlanningIntervalIterationDetailsDto,
+      { planningIntervalKey: number; iterationKey: number }
+    >({
+      queryFn: async ({ planningIntervalKey, iterationKey }) => {
+        try {
+          const data = await getPlanningIntervalsClient().getIteration(
+            planningIntervalKey.toString(),
+            iterationKey.toString(),
+          )
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: (result, error, arg) => [
+        {
+          type: QueryTags.PlanningIntervalIteration,
+          id: `${arg.planningIntervalKey}:${arg.iterationKey}`,
+        },
+      ],
+    }),
+    getIterationSprints: builder.query<
+      PlanningIntervalIterationSprintsDto[],
+      { idOrKey: string; iterationId?: string }
+    >({
+      queryFn: async ({ idOrKey, iterationId }) => {
+        try {
+          const data = await getPlanningIntervalsClient().getIterationSprints(
+            idOrKey,
+            iterationId,
+          )
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: (result, error, arg) => [
+        {
+          type: QueryTags.PlanningIntervalIterationSprints,
+          id: arg.iterationId
+            ? `${arg.idOrKey}:${arg.iterationId}`
+            : arg.idOrKey,
+        },
+      ],
+    }),
+    getPlanningIntervalIterationMetrics: builder.query<
+      PlanningIntervalIterationMetricsResponse,
+      { planningIntervalKey: number; iterationKey: number }
+    >({
+      queryFn: async ({ planningIntervalKey, iterationKey }) => {
+        try {
+          const data = await getPlanningIntervalsClient().getIterationMetrics(
+            planningIntervalKey.toString(),
+            iterationKey.toString(),
+          )
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: (result, error, arg) => [
+        {
+          type: QueryTags.PlanningIntervalIterationMetrics,
+          id: `${arg.planningIntervalKey}:${arg.iterationKey}`,
+        },
+      ],
+    }),
+    getPlanningIntervalIterationBacklog: builder.query<
+      SprintBacklogItemDto[],
+      { planningIntervalKey: number; iterationKey: number }
+    >({
+      queryFn: async ({ planningIntervalKey, iterationKey }) => {
+        try {
+          const data = await getPlanningIntervalsClient().getIterationBacklog(
+            planningIntervalKey.toString(),
+            iterationKey.toString(),
+          )
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: (result, error, arg) => [
+        {
+          type: QueryTags.PlanningIntervalIterationBacklog,
+          id: `${arg.planningIntervalKey}:${arg.iterationKey}`,
+        },
+      ],
+    }),
     getPlanningIntervalIterationCategoryOptions: builder.query<
       OptionModel<number>[],
       void
@@ -245,6 +344,35 @@ export const planningIntervalApi = apiSlice.injectEndpoints({
           type: QueryTags.PlanningIntervalTeamPredictability,
           id: `${arg.planningIntervalKey}:${arg.teamId}`,
         },
+      ],
+    }),
+    mapTeamSprints: builder.mutation<
+      void,
+      {
+        planningIntervalId: string
+        teamId: string
+        request: MapPlanningIntervalSprintsRequest
+        cacheKey: number
+      }
+    >({
+      queryFn: async ({ planningIntervalId, teamId, request }) => {
+        try {
+          const data = await getPlanningIntervalsClient().mapTeamSprints(
+            planningIntervalId,
+            teamId,
+            request,
+          )
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, arg) => [
+        { type: QueryTags.PlanningInterval, id: arg.cacheKey },
+        { type: QueryTags.PlanningIntervalIteration, id: arg.cacheKey },
+        { type: QueryTags.PlanningIntervalTeam, id: arg.cacheKey },
+        { type: QueryTags.PlanningIntervalIterationSprints, id: arg.cacheKey },
       ],
     }),
     getPlanningIntervalObjectives: builder.query<
@@ -611,9 +739,14 @@ export const {
   useGetPlanningIntervalCalendarQuery,
   useGetPlanningIntervalPredictabilityQuery,
   useGetPlanningIntervalIterationsQuery,
+  useGetPlanningIntervalIterationQuery,
+  useGetPlanningIntervalIterationMetricsQuery,
+  useGetPlanningIntervalIterationBacklogQuery,
+  useGetIterationSprintsQuery,
   useGetPlanningIntervalIterationCategoryOptionsQuery,
   useGetPlanningIntervalTeamsQuery,
   useGetPlanningIntervalTeamPredictabilityQuery,
+  useMapTeamSprintsMutation,
   useGetPlanningIntervalObjectivesQuery,
   useGetPlanningIntervalObjectiveQuery,
   useCreatePlanningIntervalObjectiveMutation,

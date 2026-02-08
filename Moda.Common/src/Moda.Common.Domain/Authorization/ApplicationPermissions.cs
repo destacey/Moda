@@ -74,185 +74,195 @@ public static class ApplicationPermissions
 {
     private static readonly ApplicationPermission[] _common = [];
 
+    private const string BackgroundJobsCategory = "Background Jobs";
     private static readonly ApplicationPermission[] _backgroundJobs =
     [
-        new("View Hangfire", ApplicationAction.View, ApplicationResource.Hangfire),
-        new("View Background Jobs", ApplicationAction.View, ApplicationResource.BackgroundJobs),
-        new("Create Background Jobs", ApplicationAction.Create, ApplicationResource.BackgroundJobs),
-        new("Run Background Jobs", ApplicationAction.Run, ApplicationResource.BackgroundJobs)
+        new("View Hangfire", ApplicationAction.View, ApplicationResource.Hangfire, BackgroundJobsCategory),
+        new("View Background Jobs", ApplicationAction.View, ApplicationResource.BackgroundJobs, BackgroundJobsCategory),
+        new("Create Background Jobs", ApplicationAction.Create, ApplicationResource.BackgroundJobs, BackgroundJobsCategory),
+        new("Run Background Jobs", ApplicationAction.Run, ApplicationResource.BackgroundJobs, BackgroundJobsCategory)
     ];
 
+    private const string IdentityCategory = "Identity";
     private static readonly ApplicationPermission[] _identity =
     [
-        new("View Users", ApplicationAction.View, ApplicationResource.Users),
-        new("Search Users", ApplicationAction.Search, ApplicationResource.Users),
-        new("Create Users", ApplicationAction.Create, ApplicationResource.Users),
-        new("Update Users", ApplicationAction.Update, ApplicationResource.Users),
-        new("Delete Users", ApplicationAction.Delete, ApplicationResource.Users),
-        new("Export Users", ApplicationAction.Export, ApplicationResource.Users),
+        new("View Users", ApplicationAction.View, ApplicationResource.Users, IdentityCategory),
+        new("Search Users", ApplicationAction.Search, ApplicationResource.Users, IdentityCategory),
+        new("Create Users", ApplicationAction.Create, ApplicationResource.Users, IdentityCategory),
+        new("Update Users", ApplicationAction.Update, ApplicationResource.Users, IdentityCategory),
+        new("Delete Users", ApplicationAction.Delete, ApplicationResource.Users, IdentityCategory),
+        new("Export Users", ApplicationAction.Export, ApplicationResource.Users, IdentityCategory),
 
-        new("View UserRoles", ApplicationAction.View, ApplicationResource.UserRoles),
-        new("Update UserRoles", ApplicationAction.Update, ApplicationResource.UserRoles),
+        new("View UserRoles", ApplicationAction.View, ApplicationResource.UserRoles, IdentityCategory),
+        new("Update UserRoles", ApplicationAction.Update, ApplicationResource.UserRoles, IdentityCategory),
 
-        new("View Roles", ApplicationAction.View, ApplicationResource.Roles),
-        new("Create Roles", ApplicationAction.Create, ApplicationResource.Roles),
-        new("Update Roles", ApplicationAction.Update, ApplicationResource.Roles),
-        new("Delete Roles", ApplicationAction.Delete, ApplicationResource.Roles),
+        new("View Roles", ApplicationAction.View, ApplicationResource.Roles, IdentityCategory),
+        new("Create Roles", ApplicationAction.Create, ApplicationResource.Roles, IdentityCategory),
+        new("Update Roles", ApplicationAction.Update, ApplicationResource.Roles, IdentityCategory),
+        new("Delete Roles", ApplicationAction.Delete, ApplicationResource.Roles, IdentityCategory),
 
-        new("View RoleClaims", ApplicationAction.View, ApplicationResource.RoleClaims),
-        new("Update RoleClaims", ApplicationAction.Update, ApplicationResource.RoleClaims),
+        new("View RoleClaims", ApplicationAction.View, ApplicationResource.RoleClaims, IdentityCategory),
+        new("Update RoleClaims", ApplicationAction.Update, ApplicationResource.RoleClaims, IdentityCategory),
 
-        new("View Permissions", ApplicationAction.View, ApplicationResource.Permissions)
+        new("View Permissions", ApplicationAction.View, ApplicationResource.Permissions, IdentityCategory)
     ];
 
+    private const string IntegrationsCategory = "Integrations";
     private static readonly ApplicationPermission[] _appIntegration =
     [
-        new("View Connections", ApplicationAction.View, ApplicationResource.Connections),
-        new("Create Connections", ApplicationAction.Create, ApplicationResource.Connections),
-        new("Update Connections", ApplicationAction.Update, ApplicationResource.Connections),
-        new("Delete Connections", ApplicationAction.Delete, ApplicationResource.Connections),
+        new("View Connections", ApplicationAction.View, ApplicationResource.Connections, IntegrationsCategory),
+        new("Create Connections", ApplicationAction.Create, ApplicationResource.Connections, IntegrationsCategory),
+        new("Update Connections", ApplicationAction.Update, ApplicationResource.Connections, IntegrationsCategory),
+        new("Delete Connections", ApplicationAction.Delete, ApplicationResource.Connections, IntegrationsCategory),
 
-        new("View Connectors", ApplicationAction.View, ApplicationResource.Connectors),
+        new("View Connectors", ApplicationAction.View, ApplicationResource.Connectors, IntegrationsCategory),
     ];
 
+    private const string HealthCategory = "Health";
     private static readonly ApplicationPermission[] _healthChecks =
     [
-        new("View Health Checks", ApplicationAction.View, ApplicationResource.HealthChecks, IsBasic: true),
-        new("Create Health Checks", ApplicationAction.Create, ApplicationResource.HealthChecks, IsBasic: true),
-        new("Update Health Checks", ApplicationAction.Update, ApplicationResource.HealthChecks, IsBasic: true),
+        new("View Health Checks", ApplicationAction.View, ApplicationResource.HealthChecks, HealthCategory, IsBasic: true),
+        new("Create Health Checks", ApplicationAction.Create, ApplicationResource.HealthChecks, HealthCategory, IsBasic: true),
+        new("Update Health Checks", ApplicationAction.Update, ApplicationResource.HealthChecks, HealthCategory, IsBasic: true),
     ];
 
+    private const string LinksCategory = "Links";
     private static readonly ApplicationPermission[] _links =
     [
-        new("View Links", ApplicationAction.View, ApplicationResource.Links, IsBasic: true),
-        new("Create Links", ApplicationAction.Create, ApplicationResource.Links, IsBasic: true),
-        new("Update Links", ApplicationAction.Update, ApplicationResource.Links, IsBasic: true),
-        new("Delete Links", ApplicationAction.Delete, ApplicationResource.Links, IsBasic: true),
+        new("View Links", ApplicationAction.View, ApplicationResource.Links, LinksCategory, IsBasic: true),
+        new("Create Links", ApplicationAction.Create, ApplicationResource.Links, LinksCategory, IsBasic: true),
+        new("Update Links", ApplicationAction.Update, ApplicationResource.Links, LinksCategory, IsBasic: true),
+        new("Delete Links", ApplicationAction.Delete, ApplicationResource.Links, LinksCategory, IsBasic: true),
     ];
 
+    private const string OrganizationCategory = "Organization";
     private static readonly ApplicationPermission[] _organization =
     [
-        new("View Employees", ApplicationAction.View, ApplicationResource.Employees, IsBasic: true),
-        new("Create Employees", ApplicationAction.Create, ApplicationResource.Employees),
-        new("Update Employees", ApplicationAction.Update, ApplicationResource.Employees),
-        new("Delete Employees", ApplicationAction.Delete, ApplicationResource.Employees),
+        new("View Employees", ApplicationAction.View, ApplicationResource.Employees, OrganizationCategory, IsBasic: true),
+        new("Create Employees", ApplicationAction.Create, ApplicationResource.Employees, OrganizationCategory),
+        new("Update Employees", ApplicationAction.Update, ApplicationResource.Employees, OrganizationCategory),
+        new("Delete Employees", ApplicationAction.Delete, ApplicationResource.Employees, OrganizationCategory),
 
-        new("View Teams and Teams of Teams", ApplicationAction.View, ApplicationResource.Teams, IsBasic: true),
-        new("Create Teams", ApplicationAction.Create, ApplicationResource.Teams),
-        new("Update Teams", ApplicationAction.Update, ApplicationResource.Teams),
-        new("Manage Team Memberships.  This includes adding, updating, and removing team memberships.", ApplicationAction.ManageTeamMemberships, ApplicationResource.Teams),
-        new("Delete Teams", ApplicationAction.Delete, ApplicationResource.Teams),
+        new("View Teams and Teams of Teams", ApplicationAction.View, ApplicationResource.Teams, OrganizationCategory, IsBasic: true),
+        new("Create Teams", ApplicationAction.Create, ApplicationResource.Teams, OrganizationCategory),
+        new("Update Teams", ApplicationAction.Update, ApplicationResource.Teams, OrganizationCategory),
+        new("Manage Team Memberships.  This includes adding, updating, and removing team memberships.", ApplicationAction.ManageTeamMemberships, ApplicationResource.Teams, OrganizationCategory),
+        new("Delete Teams", ApplicationAction.Delete, ApplicationResource.Teams, OrganizationCategory),
     ];
 
+    private const string PlanningCategory = "Planning";
     private static readonly ApplicationPermission[] _planning =
     [
-        new("View Planning Intervals", ApplicationAction.View, ApplicationResource.PlanningIntervals, IsBasic: true),
-        new("Create Planning Intervals", ApplicationAction.Create, ApplicationResource.PlanningIntervals),
-        new("Update Planning Intervals", ApplicationAction.Update, ApplicationResource.PlanningIntervals),
-        new("Delete Planning Intervals", ApplicationAction.Delete, ApplicationResource.PlanningIntervals),
+        new("View Planning Intervals", ApplicationAction.View, ApplicationResource.PlanningIntervals, PlanningCategory, IsBasic: true),
+        new("Create Planning Intervals", ApplicationAction.Create, ApplicationResource.PlanningIntervals, PlanningCategory),
+        new("Update Planning Intervals", ApplicationAction.Update, ApplicationResource.PlanningIntervals, PlanningCategory),
+        new("Delete Planning Intervals", ApplicationAction.Delete, ApplicationResource.PlanningIntervals, PlanningCategory),
 
-        new("View Planning Interval Objectives", ApplicationAction.View, ApplicationResource.PlanningIntervalObjectives, IsBasic: true),
-        new("Create, update, and delete Planning Interval Objectives", ApplicationAction.Manage, ApplicationResource.PlanningIntervalObjectives, IsBasic: true),
-        new("Import Planning Interval Objectives", ApplicationAction.Import, ApplicationResource.PlanningIntervalObjectives),
+        new("View Planning Interval Objectives", ApplicationAction.View, ApplicationResource.PlanningIntervalObjectives, PlanningCategory, IsBasic: true),
+        new("Create, update, and delete Planning Interval Objectives", ApplicationAction.Manage, ApplicationResource.PlanningIntervalObjectives, PlanningCategory, IsBasic: true),
+        new("Import Planning Interval Objectives", ApplicationAction.Import, ApplicationResource.PlanningIntervalObjectives, PlanningCategory),
 
-        new("View Risks", ApplicationAction.View, ApplicationResource.Risks, IsBasic: true),
-        new("Create Risks", ApplicationAction.Create, ApplicationResource.Risks, IsBasic: true),
-        new("Update Risks", ApplicationAction.Update, ApplicationResource.Risks, IsBasic: true),
-        new("Delete Risks", ApplicationAction.Delete, ApplicationResource.Risks, IsBasic: true),
-        new("Import Risks", ApplicationAction.Import, ApplicationResource.Risks),
+        new("View Risks", ApplicationAction.View, ApplicationResource.Risks, PlanningCategory, IsBasic: true),
+        new("Create Risks", ApplicationAction.Create, ApplicationResource.Risks, PlanningCategory, IsBasic: true),
+        new("Update Risks", ApplicationAction.Update, ApplicationResource.Risks, PlanningCategory, IsBasic: true),
+        new("Delete Risks", ApplicationAction.Delete, ApplicationResource.Risks, PlanningCategory, IsBasic: true),
+        new("Import Risks", ApplicationAction.Import, ApplicationResource.Risks, PlanningCategory),
 
-        new("View Roadmaps", ApplicationAction.View, ApplicationResource.Roadmaps, IsBasic: true),
-        new("Create Roadmaps", ApplicationAction.Create, ApplicationResource.Roadmaps, IsBasic: true),
-        new("Update Roadmaps", ApplicationAction.Update, ApplicationResource.Roadmaps, IsBasic: true),
-        new("Delete Roadmaps", ApplicationAction.Delete, ApplicationResource.Roadmaps, IsBasic: true),
+        new("View Roadmaps", ApplicationAction.View, ApplicationResource.Roadmaps, PlanningCategory, IsBasic: true),
+        new("Create Roadmaps", ApplicationAction.Create, ApplicationResource.Roadmaps, PlanningCategory, IsBasic: true),
+        new("Update Roadmaps", ApplicationAction.Update, ApplicationResource.Roadmaps, PlanningCategory, IsBasic: true),
+        new("Delete Roadmaps", ApplicationAction.Delete, ApplicationResource.Roadmaps, PlanningCategory, IsBasic: true),
 
-        new("View Iterations", ApplicationAction.View, ApplicationResource.Iterations, IsBasic: true),
+        new("View Iterations", ApplicationAction.View, ApplicationResource.Iterations, PlanningCategory, IsBasic: true),
     ];
 
+    private const string PpmCategory = "Project Portfolio Management";
     private static readonly ApplicationPermission[] _projectPortfolioManagement =
     [
-        new ("View Expenditure Categories", ApplicationAction.View, ApplicationResource.ExpenditureCategories),
-        new ("Create Expenditure Categories", ApplicationAction.Create, ApplicationResource.ExpenditureCategories),
-        new ("Update Expenditure Categories", ApplicationAction.Update, ApplicationResource.ExpenditureCategories),
-        new ("Delete Expenditure Categories", ApplicationAction.Delete, ApplicationResource.ExpenditureCategories),
+        new ("View Expenditure Categories", ApplicationAction.View, ApplicationResource.ExpenditureCategories, PpmCategory),
+        new ("Create Expenditure Categories", ApplicationAction.Create, ApplicationResource.ExpenditureCategories, PpmCategory),
+        new ("Update Expenditure Categories", ApplicationAction.Update, ApplicationResource.ExpenditureCategories, PpmCategory),
+        new ("Delete Expenditure Categories", ApplicationAction.Delete, ApplicationResource.ExpenditureCategories, PpmCategory),
 
-        new ("View PPM Strategic Themes", ApplicationAction.View, ApplicationResource.PpmStrategicThemes),
+        new ("View PPM Strategic Themes", ApplicationAction.View, ApplicationResource.PpmStrategicThemes, PpmCategory),
 
-        new ("View Portfolios", ApplicationAction.View, ApplicationResource.ProjectPortfolios),
-        new ("Create Portfolios", ApplicationAction.Create, ApplicationResource.ProjectPortfolios),
-        new ("Update Portfolios", ApplicationAction.Update, ApplicationResource.ProjectPortfolios),
-        new ("Delete Portfolios", ApplicationAction.Delete, ApplicationResource.ProjectPortfolios),
+        new ("View Portfolios", ApplicationAction.View, ApplicationResource.ProjectPortfolios, PpmCategory),
+        new ("Create Portfolios", ApplicationAction.Create, ApplicationResource.ProjectPortfolios, PpmCategory),
+        new ("Update Portfolios", ApplicationAction.Update, ApplicationResource.ProjectPortfolios, PpmCategory),
+        new ("Delete Portfolios", ApplicationAction.Delete, ApplicationResource.ProjectPortfolios, PpmCategory),
 
-        new ("View Programs", ApplicationAction.View, ApplicationResource.Programs),
-        new ("Create Programs", ApplicationAction.Create, ApplicationResource.Programs),
-        new ("Update Programs", ApplicationAction.Update, ApplicationResource.Programs),
-        new ("Delete Programs", ApplicationAction.Delete, ApplicationResource.Programs),
+        new ("View Programs", ApplicationAction.View, ApplicationResource.Programs, PpmCategory),
+        new ("Create Programs", ApplicationAction.Create, ApplicationResource.Programs, PpmCategory),
+        new ("Update Programs", ApplicationAction.Update, ApplicationResource.Programs, PpmCategory),
+        new ("Delete Programs", ApplicationAction.Delete, ApplicationResource.Programs, PpmCategory),
 
-        new ("View Projects", ApplicationAction.View, ApplicationResource.Projects),
-        new ("Create Projects", ApplicationAction.Create, ApplicationResource.Projects),
-        new ("Update Projects", ApplicationAction.Update, ApplicationResource.Projects),
-        new ("Delete Projects", ApplicationAction.Delete, ApplicationResource.Projects),
-        new ("Manage Project Work Items", ApplicationAction.ManageProjectWorkItems, ApplicationResource.Projects),
+        new ("View Projects", ApplicationAction.View, ApplicationResource.Projects, PpmCategory),
+        new ("Create Projects", ApplicationAction.Create, ApplicationResource.Projects, PpmCategory),
+        new ("Update Projects", ApplicationAction.Update, ApplicationResource.Projects, PpmCategory),
+        new ("Delete Projects", ApplicationAction.Delete, ApplicationResource.Projects, PpmCategory),
+        new ("Manage Project Work Items", ApplicationAction.ManageProjectWorkItems, ApplicationResource.Projects, PpmCategory),
 
-        new ("View Strategic Initiatives", ApplicationAction.View, ApplicationResource.StrategicInitiatives),
-        new ("Create Strategic Initiatives", ApplicationAction.Create, ApplicationResource.StrategicInitiatives),
-        new ("Update Strategic Initiatives", ApplicationAction.Update, ApplicationResource.StrategicInitiatives),
-        new ("Delete Strategic Initiatives", ApplicationAction.Delete, ApplicationResource.StrategicInitiatives),
+        new ("View Strategic Initiatives", ApplicationAction.View, ApplicationResource.StrategicInitiatives, PpmCategory),
+        new ("Create Strategic Initiatives", ApplicationAction.Create, ApplicationResource.StrategicInitiatives, PpmCategory),
+        new ("Update Strategic Initiatives", ApplicationAction.Update, ApplicationResource.StrategicInitiatives, PpmCategory),
+        new ("Delete Strategic Initiatives", ApplicationAction.Delete, ApplicationResource.StrategicInitiatives, PpmCategory),
     ];
 
+    private const string StrategicManagementCategory = "Strategic Management";
     private static readonly ApplicationPermission[] _strategicManagement =
     [
-        new ("View Strategic Themes", ApplicationAction.View, ApplicationResource.StrategicThemes),
-        new ("Create Strategic Themes", ApplicationAction.Create, ApplicationResource.StrategicThemes),
-        new ("Update Strategic Themes", ApplicationAction.Update, ApplicationResource.StrategicThemes),
-        new ("Delete Strategic Themes", ApplicationAction.Delete, ApplicationResource.StrategicThemes),
+        new ("View Strategic Themes", ApplicationAction.View, ApplicationResource.StrategicThemes, StrategicManagementCategory),
+        new ("Create Strategic Themes", ApplicationAction.Create, ApplicationResource.StrategicThemes, StrategicManagementCategory),
+        new ("Update Strategic Themes", ApplicationAction.Update, ApplicationResource.StrategicThemes, StrategicManagementCategory),
+        new ("Delete Strategic Themes", ApplicationAction.Delete, ApplicationResource.StrategicThemes, StrategicManagementCategory),
 
-        new ("View Strategies", ApplicationAction.View, ApplicationResource.Strategies),
-        new ("Create Strategies", ApplicationAction.Create, ApplicationResource.Strategies),
-        new ("Update Strategies", ApplicationAction.Update, ApplicationResource.Strategies),
-        new ("Delete Strategies", ApplicationAction.Delete, ApplicationResource.Strategies),
+        new ("View Strategies", ApplicationAction.View, ApplicationResource.Strategies, StrategicManagementCategory),
+        new ("Create Strategies", ApplicationAction.Create, ApplicationResource.Strategies, StrategicManagementCategory),
+        new ("Update Strategies", ApplicationAction.Update, ApplicationResource.Strategies, StrategicManagementCategory),
+        new ("Delete Strategies", ApplicationAction.Delete, ApplicationResource.Strategies, StrategicManagementCategory),
 
-        new ("View Visions", ApplicationAction.View, ApplicationResource.Visions),
-        new ("Create Visions", ApplicationAction.Create, ApplicationResource.Visions),
-        new ("Update Visions", ApplicationAction.Update, ApplicationResource.Visions),
-        new ("Delete Visions", ApplicationAction.Delete, ApplicationResource.Visions),
+        new ("View Visions", ApplicationAction.View, ApplicationResource.Visions, StrategicManagementCategory),
+        new ("Create Visions", ApplicationAction.Create, ApplicationResource.Visions, StrategicManagementCategory),
+        new ("Update Visions", ApplicationAction.Update, ApplicationResource.Visions, StrategicManagementCategory),
+        new ("Delete Visions", ApplicationAction.Delete, ApplicationResource.Visions, StrategicManagementCategory),
     ];
 
+    private const string WorkManagementCategory = "Work Management";
     private static readonly ApplicationPermission[] _work =
     [
-        new("View work type tiers", ApplicationAction.View, ApplicationResource.WorkTypeTiers, IsBasic: true),
+        new("View work type tiers", ApplicationAction.View, ApplicationResource.WorkTypeTiers, WorkManagementCategory, IsBasic: true),
 
-        new("View work type levels", ApplicationAction.View, ApplicationResource.WorkTypeLevels, IsBasic: true),
-        new("Create work type levels", ApplicationAction.Create, ApplicationResource.WorkTypeLevels),
-        new("Update work type levels", ApplicationAction.Update, ApplicationResource.WorkTypeLevels),
-        new("Delete work type levels", ApplicationAction.Delete, ApplicationResource.WorkTypeLevels),
+        new("View work type levels", ApplicationAction.View, ApplicationResource.WorkTypeLevels, WorkManagementCategory, IsBasic: true),
+        new("Create work type levels", ApplicationAction.Create, ApplicationResource.WorkTypeLevels, WorkManagementCategory),
+        new("Update work type levels", ApplicationAction.Update, ApplicationResource.WorkTypeLevels, WorkManagementCategory),
+        new("Delete work type levels", ApplicationAction.Delete, ApplicationResource.WorkTypeLevels, WorkManagementCategory),
 
-        new("View Workspaces", ApplicationAction.View, ApplicationResource.Workspaces, IsBasic: true),
-        new("Create Workspaces", ApplicationAction.Create, ApplicationResource.Workspaces),
-        new("Update Workspaces", ApplicationAction.Update, ApplicationResource.Workspaces),
-        new("Delete Workspaces", ApplicationAction.Delete, ApplicationResource.Workspaces),
+        new("View Workspaces", ApplicationAction.View, ApplicationResource.Workspaces, WorkManagementCategory, IsBasic: true),
+        new("Create Workspaces", ApplicationAction.Create, ApplicationResource.Workspaces, WorkManagementCategory),
+        new("Update Workspaces", ApplicationAction.Update, ApplicationResource.Workspaces, WorkManagementCategory),
+        new("Delete Workspaces", ApplicationAction.Delete, ApplicationResource.Workspaces, WorkManagementCategory),
 
-        new("View WorkItems", ApplicationAction.View, ApplicationResource.WorkItems, IsBasic: true),
-        new("Create WorkItems", ApplicationAction.Create, ApplicationResource.WorkItems),
-        new("Update WorkItems", ApplicationAction.Update, ApplicationResource.WorkItems),
-        new("Delete WorkItems", ApplicationAction.Delete, ApplicationResource.WorkItems),
+        new("View WorkItems", ApplicationAction.View, ApplicationResource.WorkItems, WorkManagementCategory, IsBasic: true),
+        new("Create WorkItems", ApplicationAction.Create, ApplicationResource.WorkItems, WorkManagementCategory),
+        new("Update WorkItems", ApplicationAction.Update, ApplicationResource.WorkItems, WorkManagementCategory),
+        new("Delete WorkItems", ApplicationAction.Delete, ApplicationResource.WorkItems, WorkManagementCategory),
 
-        new("View WorkTypes", ApplicationAction.View, ApplicationResource.WorkProcesses, IsBasic: true),
-        new("Create WorkTypes", ApplicationAction.Create, ApplicationResource.WorkProcesses),
-        new("Update WorkTypes", ApplicationAction.Update, ApplicationResource.WorkProcesses),
-        new("Delete WorkTypes", ApplicationAction.Delete, ApplicationResource.WorkProcesses),
+        new("View WorkTypes", ApplicationAction.View, ApplicationResource.WorkProcesses, WorkManagementCategory, IsBasic: true),
+        new("Create WorkTypes", ApplicationAction.Create, ApplicationResource.WorkProcesses, WorkManagementCategory),
+        new("Update WorkTypes", ApplicationAction.Update, ApplicationResource.WorkProcesses, WorkManagementCategory),
+        new("Delete WorkTypes", ApplicationAction.Delete, ApplicationResource.WorkProcesses, WorkManagementCategory),
 
-        new("View WorkStatusCategories", ApplicationAction.View, ApplicationResource.WorkStatusCategories, IsBasic: true),
+        new("View WorkStatusCategories", ApplicationAction.View, ApplicationResource.WorkStatusCategories, WorkManagementCategory, IsBasic: true),
 
-        new("View WorkStatuses", ApplicationAction.View, ApplicationResource.WorkStatuses, IsBasic: true),
-        new("Create WorkStatuses", ApplicationAction.Create, ApplicationResource.WorkStatuses),
-        new("Update WorkStatuses", ApplicationAction.Update, ApplicationResource.WorkStatuses),
-        new("Delete WorkStatuses", ApplicationAction.Delete, ApplicationResource.WorkStatuses),
+        new("View WorkStatuses", ApplicationAction.View, ApplicationResource.WorkStatuses, WorkManagementCategory, IsBasic: true),
+        new("Create WorkStatuses", ApplicationAction.Create, ApplicationResource.WorkStatuses, WorkManagementCategory),
+        new("Update WorkStatuses", ApplicationAction.Update, ApplicationResource.WorkStatuses, WorkManagementCategory),
+        new("Delete WorkStatuses", ApplicationAction.Delete, ApplicationResource.WorkStatuses, WorkManagementCategory),
 
-        new("View WorkTypes", ApplicationAction.View, ApplicationResource.WorkTypes, IsBasic: true),
-        new("Create WorkTypes", ApplicationAction.Create, ApplicationResource.WorkTypes),
-        new("Update WorkTypes", ApplicationAction.Update, ApplicationResource.WorkTypes),
-        new("Delete WorkTypes", ApplicationAction.Delete, ApplicationResource.WorkTypes),
+        new("View WorkTypes", ApplicationAction.View, ApplicationResource.WorkTypes, WorkManagementCategory, IsBasic: true),
+        new("Create WorkTypes", ApplicationAction.Create, ApplicationResource.WorkTypes, WorkManagementCategory),
+        new("Update WorkTypes", ApplicationAction.Update, ApplicationResource.WorkTypes, WorkManagementCategory),
+        new("Delete WorkTypes", ApplicationAction.Delete, ApplicationResource.WorkTypes, WorkManagementCategory),
     ];
 
     private static readonly ApplicationPermission[] _all = [.. _common
@@ -273,7 +283,7 @@ public static class ApplicationPermissions
     public static IReadOnlyList<ApplicationPermission> Basic { get; } = new ReadOnlyCollection<ApplicationPermission>([.. _all.Where(p => p.IsBasic)]);
 }
 
-public record ApplicationPermission(string Description, string Action, string Resource, bool IsBasic = false, bool IsRoot = false)
+public record ApplicationPermission(string Description, string Action, string Resource, string Category = "", bool IsBasic = false, bool IsRoot = false)
 {
     public string Name => NameFor(Action, Resource);
     public static string NameFor(string action, string resource) => $"Permissions.{resource}.{action}";

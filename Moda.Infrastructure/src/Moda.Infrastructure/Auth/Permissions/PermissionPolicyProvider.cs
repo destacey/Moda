@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 
@@ -50,10 +50,19 @@ internal class PermissionPolicyProvider : IAuthorizationPolicyProvider
 
     public Task<AuthorizationPolicy?> GetPolicyAsync(string policyName)
     {
+
         if (policyName.StartsWith(ApplicationClaims.Permission, StringComparison.OrdinalIgnoreCase))
         {
             var policy = new AuthorizationPolicyBuilder();
             policy.AddRequirements(new PermissionRequirement(policyName));
+            return Task.FromResult<AuthorizationPolicy?>(policy.Build());
+        }
+
+        if (policyName.StartsWith("MustHaveAnyPermission:", StringComparison.OrdinalIgnoreCase))
+        {
+            var permissions = policyName["MustHaveAnyPermission:".Length..].Split(',');
+            var policy = new AuthorizationPolicyBuilder();
+            policy.AddRequirements(new AnyPermissionRequirement(permissions));
             return Task.FromResult<AuthorizationPolicy?>(policy.Build());
         }
 

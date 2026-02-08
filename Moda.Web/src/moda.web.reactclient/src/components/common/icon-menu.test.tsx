@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import { SwapOutlined } from '@ant-design/icons'
 import IconMenu, { IconMenuProps } from './icon-menu'
 import useTheme from '../contexts/theme'
@@ -132,7 +132,9 @@ describe('IconMenu', () => {
       { label: 'Item 2', value: '2' },
     ]
     const onChange = jest.fn()
-    render(<IconMenu {...defaultProps} items={mixedItems} onChange={onChange} />)
+    render(
+      <IconMenu {...defaultProps} items={mixedItems} onChange={onChange} />,
+    )
     const button = screen.getByRole('button')
     expect(button).toBeInTheDocument()
   })

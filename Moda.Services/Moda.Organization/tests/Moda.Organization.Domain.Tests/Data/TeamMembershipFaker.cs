@@ -1,4 +1,4 @@
-using Moda.Organization.Domain.Models;
+﻿using Moda.Organization.Domain.Models;
 using Moda.Tests.Shared.Data;
 using NodaTime;
 
@@ -64,8 +64,8 @@ public static class TeamMembershipFakerExtensions
 
     public static TeamMembershipFaker AsPast(this TeamMembershipFaker faker)
     {
-        var start = LocalDate.FromDateTime(DateTime.UtcNow.AddMonths(-6));
-        var end = LocalDate.FromDateTime(DateTime.UtcNow.AddMonths(-1));
+        var start = new LocalDate(2025, 5, 20);
+        var end = start.PlusMonths(3);
         faker.RuleFor(x => x.DateRange, new MembershipDateRange(start, end));
         return faker;
     }

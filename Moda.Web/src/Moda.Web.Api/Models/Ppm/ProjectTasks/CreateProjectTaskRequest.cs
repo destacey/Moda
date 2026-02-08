@@ -31,6 +31,11 @@ public sealed record CreateProjectTaskRequest
     public int PriorityId { get; set; }
 
     /// <summary>
+    /// The assignees of the project task.
+    /// </summary>
+    public List<Guid>? AssigneeIds { get; set; } = [];
+
+    /// <summary>
     /// The progress of the task (optional). Ranges from 0.0 to 100.0. Milestones can not update progress directly.
     /// </summary>
     public decimal? Progress { get; set; }
@@ -60,20 +65,11 @@ public sealed record CreateProjectTaskRequest
     /// </summary>
     public decimal? EstimatedEffortHours { get; set; }
 
-    /// <summary>
-    /// The role-based assignments for this task (optional).
-    /// </summary>
-    public List<TaskRoleAssignmentRequest>? Assignments { get; set; }
-
     public CreateProjectTaskCommand ToCreateProjectTaskCommand(Guid projectId)
     {
         var plannedDateRange = PlannedStart is null || PlannedEnd is null
             ? null
             : new FlexibleDateRange((LocalDate)PlannedStart, (LocalDate)PlannedEnd);
-
-        var assignments = Assignments?
-            .Select(a => new TaskRoleAssignment(a.EmployeeId, a.Role))
-            .ToList();
 
         return new CreateProjectTaskCommand(
             projectId,
@@ -87,22 +83,9 @@ public sealed record CreateProjectTaskRequest
             plannedDateRange,
             PlannedDate,
             EstimatedEffortHours,
-            assignments
+            AssigneeIds
         );
     }
-}
-
-public sealed record TaskRoleAssignmentRequest
-{
-    /// <summary>
-    /// The ID of the employee.
-    /// </summary>
-    public Guid EmployeeId { get; set; }
-
-    /// <summary>
-    /// The role of the assignment (Assignee or Reviewer).
-    /// </summary>
-    public TaskRole Role { get; set; }
 }
 
 public sealed class CreateProjectTaskRequestValidator : CustomValidator<CreateProjectTaskRequest>
@@ -127,6 +110,10 @@ public sealed class CreateProjectTaskRequestValidator : CustomValidator<CreatePr
         RuleFor(x => x.PriorityId)
             .Must(priority => Enum.IsDefined(typeof(TaskPriority), priority))
             .WithMessage("Invalid task priority.");
+
+        RuleFor(x => x.AssigneeIds)
+            .Must(ids => ids == null || ids.All(id => id != Guid.Empty))
+            .WithMessage("AssigneeIds cannot contain empty GUIDs.");
 
         RuleFor(x => x.Progress)
             .NotNull()
@@ -171,9 +158,5 @@ public sealed class CreateProjectTaskRequestValidator : CustomValidator<CreatePr
         RuleFor(x => x.EstimatedEffortHours)
             .GreaterThan(0)
             .When(x => x.EstimatedEffortHours.HasValue);
-
-        RuleFor(x => x.Assignments)
-            .Must(assignments => assignments == null || assignments.All(a => a.EmployeeId != Guid.Empty))
-            .WithMessage("Assignment employee IDs cannot be empty GUIDs.");
     }
 }
