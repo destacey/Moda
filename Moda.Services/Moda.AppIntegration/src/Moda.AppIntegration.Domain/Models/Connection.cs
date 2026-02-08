@@ -26,6 +26,7 @@ public abstract class Connection : BaseSoftDeletableEntity<Guid>, IActivatable
         protected set => _description = value.NullIfWhiteSpacePlusTrim();
     }
 
+    // TODO: This not be on the generic connection, but rather on the specific connection details.  We will need to refactor this in the future to support that.
     /// <summary>
     /// The unique identifier for the system that this connection connects to.
     /// </summary>
@@ -50,6 +51,7 @@ public abstract class Connection : BaseSoftDeletableEntity<Guid>, IActivatable
     /// </summary>
     public bool IsValidConfiguration { get; protected set; } = false;
 
+    // TODO: This not be on the generic connection, but rather on the specific connection details.  We will need to refactor this in the future to support that.
     /// <summary>
     /// The indicator for whether the connection is enabled for synchronization.
     /// </summary>

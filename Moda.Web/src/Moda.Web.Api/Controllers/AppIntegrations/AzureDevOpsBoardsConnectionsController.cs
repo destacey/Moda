@@ -1,5 +1,4 @@
-﻿using CSharpFunctionalExtensions;
-using Moda.AppIntegration.Application.Interfaces;
+﻿using Moda.AppIntegration.Application.Interfaces;
 using Moda.AppIntegration.Domain.Models;
 using Moda.Common.Application.Interfaces;
 using Moda.Common.Domain.Enums.AppIntegrations;
@@ -9,27 +8,21 @@ using Moda.Web.Api.Models.AppIntegrations.Connections;
 
 namespace Moda.Web.Api.Controllers.AppIntegrations;
 
-[Route("api/app-integrations/azure-devops-boards-connections")]
+[Route("api/app-integrations/azure-devops")]
 [ApiVersionNeutral]
 [ApiController]
-public class AzureDevOpsBoardsConnectionsController : ControllerBase
+public class AzureDevOpsBoardsConnectionsController(ILogger<AzureDevOpsBoardsConnectionsController> logger, ISender sender) : ControllerBase
 {
-    private readonly ILogger<AzureDevOpsBoardsConnectionsController> _logger;
-    private readonly ISender _sender;
+    private readonly ILogger<AzureDevOpsBoardsConnectionsController> _logger = logger;
+    private readonly ISender _sender = sender;
     private readonly Connector _connector = Connector.AzureDevOps;
-
-    public AzureDevOpsBoardsConnectionsController(ILogger<AzureDevOpsBoardsConnectionsController> logger, ISender sender)
-    {
-        _logger = logger;
-        _sender = sender;
-    }
 
     [HttpGet]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Connections)]
-    [OpenApiOperation("Get a list of all Azure DevOps Boards connections.", "")]
+    [OpenApiOperation("Get a list of all Azure DevOps connections.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IReadOnlyList<ConnectionListDto>>> GetList(CancellationToken cancellationToken, bool includeDisabled = false)
+    public async Task<ActionResult<IEnumerable<ConnectionListDto>>> GetList(CancellationToken cancellationToken, bool includeDisabled = false)
     {
         var connections = await _sender.Send(new GetConnectionsQuery(includeDisabled, _connector), cancellationToken);
         return Ok(connections);
@@ -37,7 +30,7 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
 
     [HttpGet("{id}")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Connections)]
-    [OpenApiOperation("Get Azure DevOps Boards connection based on id.", "")]
+    [OpenApiOperation("Get Azure DevOps connection based on id.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -54,9 +47,9 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
 
     [HttpPost]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.Connections)]
-    [OpenApiOperation("Create an Azure DevOps Boards connection.", "")]
+    [OpenApiOperation("Create an Azure DevOps connection.", "")]
     [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201Guid))]
-    public async Task<ActionResult> Create(CreateAzureDevOpsBoardConnectionRequest request, CancellationToken cancellationToken)
+    public async Task<ActionResult> Create(CreateAzureDevOpsConnectionRequest request, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(request.ToCreateAzureDevOpsBoardsConnectionCommand(), cancellationToken);
 
@@ -67,11 +60,11 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
 
     [HttpPut("{id}")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Connections)]
-    [OpenApiOperation("Update an Azure DevOps Boards connection.", "")]
+    [OpenApiOperation("Update an Azure DevOps connection.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
-    public async Task<ActionResult> Update(Guid id, UpdateAzureDevOpsBoardConnectionRequest request, CancellationToken cancellationToken)
+    public async Task<ActionResult> Update(Guid id, UpdateAzureDevOpsConnectionRequest request, CancellationToken cancellationToken)
     {
         if (id != request.Id)
             return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(HttpContext));
@@ -100,7 +93,7 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
 
     [HttpDelete("{id}")]
     [MustHavePermission(ApplicationAction.Delete, ApplicationResource.Connections)]
-    [OpenApiOperation("Delete an Azure DevOps Boards connection.", "")]
+    [OpenApiOperation("Delete an Azure DevOps connection.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> Delete(Guid id, CancellationToken cancellationToken)
@@ -117,7 +110,7 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
     [OpenApiOperation("Get Azure DevOps connection teams based on id.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<List<AzureDevOpsBoardsWorkspaceTeamDto>>> GetConnectionTeams(Guid id, Guid? workspaceId, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<AzureDevOpsBoardsWorkspaceTeamDto>>> GetConnectionTeams(Guid id, Guid? workspaceId, CancellationToken cancellationToken)
     {
         var teams = await _sender.Send(new GetAzureDevOpsBoardsConnectionTeamsQuery(id, workspaceId), cancellationToken);
 
@@ -145,10 +138,10 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
 
     [HttpPost("test")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Connections)]
-    [OpenApiOperation("Test Azure DevOps Boards connection configuration.", "")]
+    [OpenApiOperation("Test Azure DevOps connection configuration.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult> TestConfig(TestAzureDevOpsBoardConnectionRequest request, [FromServices] IAzureDevOpsService azureDevOpsService)
+    public async Task<ActionResult> TestConfig(TestAzureDevOpsConnectionRequest request, [FromServices] IAzureDevOpsService azureDevOpsService)
     {
         if (request is null || string.IsNullOrWhiteSpace(request.Organization) || string.IsNullOrWhiteSpace(request.PersonalAccessToken))
         {

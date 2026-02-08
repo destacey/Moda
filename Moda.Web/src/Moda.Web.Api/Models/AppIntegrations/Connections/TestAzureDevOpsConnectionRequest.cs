@@ -1,6 +1,6 @@
 ﻿namespace Moda.Web.Api.Models.AppIntegrations.Connections;
 
-public class TestAzureDevOpsBoardConnectionRequest
+public class TestAzureDevOpsConnectionRequest
 {
     /// <summary>Gets the organization.</summary>
     /// <value>The Azure DevOps Organization name.</value>

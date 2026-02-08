@@ -17797,11 +17797,11 @@ export class AzureDevOpsBoardsConnectionsClient {
     }
 
     /**
-     * Get a list of all Azure DevOps Boards connections.
+     * Get a list of all Azure DevOps connections.
      * @param includeDisabled (optional) 
      */
     getList(includeDisabled?: boolean | undefined, cancelToken?: CancelToken): Promise<ConnectionListDto[]> {
-        let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections?";
+        let url_ = this.baseUrl + "/api/app-integrations/azure-devops?";
         if (includeDisabled === null)
             throw new globalThis.Error("The parameter 'includeDisabled' cannot be null.");
         else if (includeDisabled !== undefined)
@@ -17860,10 +17860,10 @@ export class AzureDevOpsBoardsConnectionsClient {
     }
 
     /**
-     * Create an Azure DevOps Boards connection.
+     * Create an Azure DevOps connection.
      */
-    create(request: CreateAzureDevOpsBoardConnectionRequest, cancelToken?: CancelToken): Promise<string> {
-        let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections";
+    create(request: CreateAzureDevOpsConnectionRequest, cancelToken?: CancelToken): Promise<string> {
+        let url_ = this.baseUrl + "/api/app-integrations/azure-devops";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(request);
@@ -17922,10 +17922,10 @@ export class AzureDevOpsBoardsConnectionsClient {
     }
 
     /**
-     * Get Azure DevOps Boards connection based on id.
+     * Get Azure DevOps connection based on id.
      */
     getById(id: string, cancelToken?: CancelToken): Promise<AzureDevOpsBoardsConnectionDetailsDto> {
-        let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections/{id}";
+        let url_ = this.baseUrl + "/api/app-integrations/azure-devops/{id}";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -17990,10 +17990,10 @@ export class AzureDevOpsBoardsConnectionsClient {
     }
 
     /**
-     * Update an Azure DevOps Boards connection.
+     * Update an Azure DevOps connection.
      */
-    update(id: string, request: UpdateAzureDevOpsBoardConnectionRequest, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections/{id}";
+    update(id: string, request: UpdateAzureDevOpsConnectionRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/app-integrations/azure-devops/{id}";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -18058,10 +18058,10 @@ export class AzureDevOpsBoardsConnectionsClient {
     }
 
     /**
-     * Delete an Azure DevOps Boards connection.
+     * Delete an Azure DevOps connection.
      */
     delete(id: string, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections/{id}";
+        let url_ = this.baseUrl + "/api/app-integrations/azure-devops/{id}";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -18119,7 +18119,7 @@ export class AzureDevOpsBoardsConnectionsClient {
      * @param isSyncEnabled (optional) 
      */
     updateSyncState(id: string, isSyncEnabled?: boolean | undefined, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections/{id}/sync-state?";
+        let url_ = this.baseUrl + "/api/app-integrations/azure-devops/{id}/sync-state?";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -18188,7 +18188,7 @@ export class AzureDevOpsBoardsConnectionsClient {
      * @param workspaceId (optional) 
      */
     getConnectionTeams(id: string, workspaceId?: string | null | undefined, cancelToken?: CancelToken): Promise<AzureDevOpsBoardsWorkspaceTeamDto[]> {
-        let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections/{id}/teams?";
+        let url_ = this.baseUrl + "/api/app-integrations/azure-devops/{id}/teams?";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -18251,7 +18251,7 @@ export class AzureDevOpsBoardsConnectionsClient {
      * Update Azure DevOps connection team mappings.
      */
     mapConnectionTeams(id: string, request: AzdoConnectionTeamMappingsRequest, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections/{id}/teams";
+        let url_ = this.baseUrl + "/api/app-integrations/azure-devops/{id}/teams";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -18309,10 +18309,10 @@ export class AzureDevOpsBoardsConnectionsClient {
     }
 
     /**
-     * Test Azure DevOps Boards connection configuration.
+     * Test Azure DevOps connection configuration.
      */
-    testConfig(request: TestAzureDevOpsBoardConnectionRequest, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections/test";
+    testConfig(request: TestAzureDevOpsConnectionRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/app-integrations/azure-devops/test";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(request);
@@ -18370,7 +18370,7 @@ export class AzureDevOpsBoardsConnectionsClient {
      * Sync Azure DevOps processes and projects.
      */
     syncOrganizationConfiguration(id: string, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections/{id}/sync-organization-configuration";
+        let url_ = this.baseUrl + "/api/app-integrations/azure-devops/{id}/sync-organization-configuration";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -18427,7 +18427,7 @@ export class AzureDevOpsBoardsConnectionsClient {
      * Initialize Azure DevOps project integration as a Moda workspace.
      */
     initWorkProcesssIntegration(id: string, request: InitWorkProcessIntegrationRequest, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections/{id}/init-work-process-integration";
+        let url_ = this.baseUrl + "/api/app-integrations/azure-devops/{id}/init-work-process-integration";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -18495,7 +18495,7 @@ export class AzureDevOpsBoardsConnectionsClient {
      * Initialize Azure DevOps project integration as a Moda workspace.
      */
     initWorkspaceIntegration(id: string, request: InitWorkspaceIntegrationRequest, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections/{id}/init-workspace-integration";
+        let url_ = this.baseUrl + "/api/app-integrations/azure-devops/{id}/init-workspace-integration";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -18560,7 +18560,7 @@ export class AzureDevOpsBoardsConnectionsClient {
     }
 }
 
-export class ConnectorsClient {
+export class ConnectionsClient {
     protected instance: AxiosInstance;
     protected baseUrl: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
@@ -18574,9 +18574,72 @@ export class ConnectorsClient {
     }
 
     /**
+     * Get a list of all connections.
+     * @param includeDisabled (optional) 
+     */
+    getConnections(includeDisabled?: boolean | undefined, cancelToken?: CancelToken): Promise<ConnectionListDto[]> {
+        let url_ = this.baseUrl + "/api/app-integrations?";
+        if (includeDisabled === null)
+            throw new globalThis.Error("The parameter 'includeDisabled' cannot be null.");
+        else if (includeDisabled !== undefined)
+            url_ += "includeDisabled=" + encodeURIComponent("" + includeDisabled) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetConnections(_response);
+        });
+    }
+
+    protected processGetConnections(response: AxiosResponse): Promise<ConnectionListDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<ConnectionListDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ConnectionListDto[]>(null as any);
+    }
+
+    /**
      * Get a list of all connectors.
      */
-    getList( cancelToken?: CancelToken): Promise<ConnectorListDto[]> {
+    getConnectors( cancelToken?: CancelToken): Promise<ConnectorListDto[]> {
         let url_ = this.baseUrl + "/api/app-integrations/connectors";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -18596,11 +18659,11 @@ export class ConnectorsClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processGetList(_response);
+            return this.processGetConnectors(_response);
         });
     }
 
-    protected processGetList(response: AxiosResponse): Promise<ConnectorListDto[]> {
+    protected processGetConnectors(response: AxiosResponse): Promise<ConnectorListDto[]> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -21181,7 +21244,7 @@ export interface AzureDevOpsBoardsWorkspaceTeamDto {
     internalTeamId?: string | undefined;
 }
 
-export interface CreateAzureDevOpsBoardConnectionRequest {
+export interface CreateAzureDevOpsConnectionRequest {
     /** The name of the connection. */
     name: string;
     /** The description of the connection. */
@@ -21192,7 +21255,7 @@ export interface CreateAzureDevOpsBoardConnectionRequest {
     personalAccessToken: string;
 }
 
-export interface UpdateAzureDevOpsBoardConnectionRequest {
+export interface UpdateAzureDevOpsConnectionRequest {
     /** Gets or sets the identifier. */
     id: string;
     /** Gets or sets the name of the connection. */
@@ -21221,7 +21284,7 @@ export interface AzdoWorkspaceTeamMappingRequest {
     internalTeamId?: string | undefined;
 }
 
-export interface TestAzureDevOpsBoardConnectionRequest {
+export interface TestAzureDevOpsConnectionRequest {
     /** Gets the organization. */
     organization: string;
     /** Gets the personal access token. */

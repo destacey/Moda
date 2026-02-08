@@ -15645,12 +15645,12 @@
         ]
       }
     },
-    "/api/app-integrations/azure-devops-boards-connections": {
+    "/api/app-integrations/azure-devops": {
       "get": {
         "tags": [
           "AzureDevOpsBoardsConnections"
         ],
-        "summary": "Get a list of all Azure DevOps Boards connections.",
+        "summary": "Get a list of all Azure DevOps connections.",
         "operationId": "AzureDevOpsBoardsConnections_GetList",
         "parameters": [
           {
@@ -15701,14 +15701,14 @@
         "tags": [
           "AzureDevOpsBoardsConnections"
         ],
-        "summary": "Create an Azure DevOps Boards connection.",
+        "summary": "Create an Azure DevOps connection.",
         "operationId": "AzureDevOpsBoardsConnections_Create",
         "requestBody": {
           "x-name": "request",
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateAzureDevOpsBoardConnectionRequest"
+                "$ref": "#/components/schemas/CreateAzureDevOpsConnectionRequest"
               }
             }
           },
@@ -15750,12 +15750,12 @@
         ]
       }
     },
-    "/api/app-integrations/azure-devops-boards-connections/{id}": {
+    "/api/app-integrations/azure-devops/{id}": {
       "get": {
         "tags": [
           "AzureDevOpsBoardsConnections"
         ],
-        "summary": "Get Azure DevOps Boards connection based on id.",
+        "summary": "Get Azure DevOps connection based on id.",
         "operationId": "AzureDevOpsBoardsConnections_GetById",
         "parameters": [
           {
@@ -15816,7 +15816,7 @@
         "tags": [
           "AzureDevOpsBoardsConnections"
         ],
-        "summary": "Update an Azure DevOps Boards connection.",
+        "summary": "Update an Azure DevOps connection.",
         "operationId": "AzureDevOpsBoardsConnections_Update",
         "parameters": [
           {
@@ -15837,7 +15837,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateAzureDevOpsBoardConnectionRequest"
+                "$ref": "#/components/schemas/UpdateAzureDevOpsConnectionRequest"
               }
             }
           },
@@ -15882,7 +15882,7 @@
         "tags": [
           "AzureDevOpsBoardsConnections"
         ],
-        "summary": "Delete an Azure DevOps Boards connection.",
+        "summary": "Delete an Azure DevOps connection.",
         "operationId": "AzureDevOpsBoardsConnections_Delete",
         "parameters": [
           {
@@ -15923,7 +15923,7 @@
         ]
       }
     },
-    "/api/app-integrations/azure-devops-boards-connections/{id}/sync-state": {
+    "/api/app-integrations/azure-devops/{id}/sync-state": {
       "post": {
         "tags": [
           "AzureDevOpsBoardsConnections"
@@ -15987,7 +15987,7 @@
         ]
       }
     },
-    "/api/app-integrations/azure-devops-boards-connections/{id}/teams": {
+    "/api/app-integrations/azure-devops/{id}/teams": {
       "get": {
         "tags": [
           "AzureDevOpsBoardsConnections"
@@ -16110,19 +16110,19 @@
         ]
       }
     },
-    "/api/app-integrations/azure-devops-boards-connections/test": {
+    "/api/app-integrations/azure-devops/test": {
       "post": {
         "tags": [
           "AzureDevOpsBoardsConnections"
         ],
-        "summary": "Test Azure DevOps Boards connection configuration.",
+        "summary": "Test Azure DevOps connection configuration.",
         "operationId": "AzureDevOpsBoardsConnections_TestConfig",
         "requestBody": {
           "x-name": "request",
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TestAzureDevOpsBoardConnectionRequest"
+                "$ref": "#/components/schemas/TestAzureDevOpsConnectionRequest"
               }
             }
           },
@@ -16154,7 +16154,7 @@
         ]
       }
     },
-    "/api/app-integrations/azure-devops-boards-connections/{id}/sync-organization-configuration": {
+    "/api/app-integrations/azure-devops/{id}/sync-organization-configuration": {
       "post": {
         "tags": [
           "AzureDevOpsBoardsConnections"
@@ -16200,7 +16200,7 @@
         ]
       }
     },
-    "/api/app-integrations/azure-devops-boards-connections/{id}/init-work-process-integration": {
+    "/api/app-integrations/azure-devops/{id}/init-work-process-integration": {
       "post": {
         "tags": [
           "AzureDevOpsBoardsConnections"
@@ -16268,7 +16268,7 @@
         ]
       }
     },
-    "/api/app-integrations/azure-devops-boards-connections/{id}/init-workspace-integration": {
+    "/api/app-integrations/azure-devops/{id}/init-workspace-integration": {
       "post": {
         "tags": [
           "AzureDevOpsBoardsConnections"
@@ -16336,13 +16336,66 @@
         ]
       }
     },
+    "/api/app-integrations": {
+      "get": {
+        "tags": [
+          "Connections"
+        ],
+        "summary": "Get a list of all connections.",
+        "operationId": "Connections_GetConnections",
+        "parameters": [
+          {
+            "name": "includeDisabled",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ConnectionListDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
     "/api/app-integrations/connectors": {
       "get": {
         "tags": [
-          "Connectors"
+          "Connections"
         ],
         "summary": "Get a list of all connectors.",
-        "operationId": "Connectors_GetList",
+        "operationId": "Connections_GetConnectors",
         "responses": {
           "200": {
             "description": "",
@@ -26019,7 +26072,7 @@
           }
         }
       },
-      "CreateAzureDevOpsBoardConnectionRequest": {
+      "CreateAzureDevOpsConnectionRequest": {
         "type": "object",
         "additionalProperties": false,
         "required": [
@@ -26058,7 +26111,7 @@
           }
         }
       },
-      "UpdateAzureDevOpsBoardConnectionRequest": {
+      "UpdateAzureDevOpsConnectionRequest": {
         "type": "object",
         "additionalProperties": false,
         "required": [
@@ -26163,7 +26216,7 @@
           }
         }
       },
-      "TestAzureDevOpsBoardConnectionRequest": {
+      "TestAzureDevOpsConnectionRequest": {
         "type": "object",
         "additionalProperties": false,
         "required": [

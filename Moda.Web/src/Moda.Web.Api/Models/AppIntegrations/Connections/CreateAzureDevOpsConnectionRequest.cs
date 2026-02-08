@@ -1,6 +1,6 @@
 ﻿namespace Moda.Web.Api.Models.AppIntegrations.Connections;
 
-public sealed record CreateAzureDevOpsBoardConnectionRequest
+public sealed record CreateAzureDevOpsConnectionRequest
 {
     /// <summary>
     /// The name of the connection.
@@ -26,9 +26,9 @@ public sealed record CreateAzureDevOpsBoardConnectionRequest
         => new(Name, Description, Organization, PersonalAccessToken);
 }
 
-public sealed class CreateAzureDevOpsBoardConnectionRequestValidator : CustomValidator<CreateAzureDevOpsBoardConnectionRequest>
+public sealed class CreateAzureDevOpsConnectionRequestValidator : CustomValidator<CreateAzureDevOpsConnectionRequest>
 {
-    public CreateAzureDevOpsBoardConnectionRequestValidator()
+    public CreateAzureDevOpsConnectionRequestValidator()
     {
         RuleLevelCascadeMode = CascadeMode.Stop;
 

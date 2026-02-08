@@ -1,6 +1,6 @@
 ﻿namespace Moda.Web.Api.Models.AppIntegrations.Connections;
 
-public sealed record UpdateAzureDevOpsBoardConnectionRequest
+public sealed record UpdateAzureDevOpsConnectionRequest
 {
     /// <summary>Gets or sets the identifier.</summary>
     /// <value>The identifier.</value>
@@ -19,16 +19,16 @@ public sealed record UpdateAzureDevOpsBoardConnectionRequest
     public string Organization { get; set; } = default!;
 
     /// <summary>Gets the personal access token.</summary>
-    /// <value>The personal access token that enables access to Azure DevOps Boards data.</value>
+    /// <value>The personal access token that enables access to Azure DevOps data.</value>
     public string PersonalAccessToken { get; set; } = default!;
 
     public UpdateAzureDevOpsBoardsConnectionCommand ToUpadateAzureDevOpsBoardsConnectionCommand()
         => new(Id, Name, Description, Organization, PersonalAccessToken);
 }
 
-public sealed class UpdateAzureDevOpsBoardConnectionRequestValidator : CustomValidator<UpdateAzureDevOpsBoardConnectionRequest>
+public sealed class UpdateAzureDevOpsConnectionRequestValidator : CustomValidator<UpdateAzureDevOpsConnectionRequest>
 {
-    public UpdateAzureDevOpsBoardConnectionRequestValidator()
+    public UpdateAzureDevOpsConnectionRequestValidator()
     {
         RuleLevelCascadeMode = CascadeMode.Stop;
 
