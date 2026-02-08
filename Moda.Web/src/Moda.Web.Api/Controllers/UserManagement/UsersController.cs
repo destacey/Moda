@@ -52,7 +52,7 @@ public class UsersController(IUserService userService) : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
-    public async Task<ActionResult> ManageRoles(string id, AssignUserRolesRequest request, CancellationToken cancellationToken)
+    public async Task<ActionResult> ManageUserRoles(string id, AssignUserRolesRequest request, CancellationToken cancellationToken)
     {
         if (id != request.UserId)
             return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(nameof(id), nameof(request.UserId), HttpContext));
@@ -61,6 +61,21 @@ public class UsersController(IUserService userService) : ControllerBase
 
         return result.IsSuccess
             ? Ok()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpPost("manage-role")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.UserRoles)]
+    [OpenApiOperation("Add or remove users from a role.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> ManageRoleUsers(ManageRoleUsersRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _userService.ManageRoleUsersAsync(request.ToManageRoleUsersCommand(), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
             : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 

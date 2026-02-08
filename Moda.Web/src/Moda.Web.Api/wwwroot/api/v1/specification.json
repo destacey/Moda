@@ -1183,7 +1183,7 @@
           "Users"
         ],
         "summary": "Update a user's assigned roles.",
-        "operationId": "Users_ManageRoles",
+        "operationId": "Users_ManageUserRoles",
         "parameters": [
           {
             "name": "id",
@@ -1206,6 +1206,60 @@
           },
           "required": true,
           "x-position": 2
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/user-management/users/manage-role": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Add or remove users from a role.",
+        "operationId": "Users_ManageRoleUsers",
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManageRoleUsersRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
         },
         "responses": {
           "204": {
@@ -16969,6 +17023,34 @@
             "type": "string"
           },
           "roleNames": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ManageRoleUsersRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "roleId",
+          "userIdsToAdd",
+          "userIdsToRemove"
+        ],
+        "properties": {
+          "roleId": {
+            "type": "string",
+            "minLength": 1,
+            "nullable": false
+          },
+          "userIdsToAdd": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "userIdsToRemove": {
             "type": "array",
             "items": {
               "type": "string"

@@ -90,7 +90,7 @@ public class RolesController(IRoleService roleService, IUserService userService,
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<List<UserDetailsDto>> GetUsers(string id, CancellationToken cancellationToken)
     {
-        return await _userService.GetListAsync(cancellationToken);
+        return await _userService.GetUsersWithRole(id, cancellationToken);
     }
 
     [HttpDelete("{id}")]
