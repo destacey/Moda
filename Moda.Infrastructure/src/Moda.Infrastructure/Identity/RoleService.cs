@@ -163,7 +163,7 @@ internal class RoleService(
 
         if ((await _userManager.GetUsersInRoleAsync(role.Name!)).Count > 0)
         {
-            throw new ConflictException(string.Format("Not allowed to delete the {0} Role as it is being used.", role.Name));
+            throw new ConflictException(string.Format("Not allowed to delete the {0} Role as it is currently assigned to users.", role.Name));
         }
 
         await _roleManager.DeleteAsync(role);

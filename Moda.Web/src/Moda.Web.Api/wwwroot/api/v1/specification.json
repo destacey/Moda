@@ -1005,6 +1005,57 @@
         ]
       }
     },
+    "/api/user-management/roles/{id}/users-count": {
+      "get": {
+        "tags": [
+          "Roles"
+        ],
+        "summary": "Get a count of all users with this role.",
+        "operationId": "Roles_GetUsersCount",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
     "/api/user-management/users": {
       "get": {
         "tags": [

@@ -173,6 +173,13 @@ internal partial class UserService(
         return userDtos;
     }
 
+    public Task<int> GetUsersWithRoleCount(string roleId, CancellationToken cancellationToken)
+    {
+        return _db.Users
+            .Where(u => u.UserRoles.Any(ur => ur.RoleId == roleId))
+            .CountAsync(cancellationToken);
+    }
+
     public async Task<string?> GetEmailAsync(string userId)
     {
         var user = await _userManager.Users

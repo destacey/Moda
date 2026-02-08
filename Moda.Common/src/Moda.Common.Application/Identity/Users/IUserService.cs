@@ -18,6 +18,8 @@ public interface IUserService : ITransientService
 
     Task<List<UserDetailsDto>> GetUsersWithRole(string roleId, CancellationToken cancellationToken);
 
+    Task<int> GetUsersWithRoleCount(string roleId, CancellationToken cancellationToken);
+
     Task<int> GetCountAsync(CancellationToken cancellationToken);
 
     Task<string?> GetEmailAsync(string userId);

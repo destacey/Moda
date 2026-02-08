@@ -93,6 +93,16 @@ public class RolesController(IRoleService roleService, IUserService userService,
         return await _userService.GetUsersWithRole(id, cancellationToken);
     }
 
+    [HttpGet("{id}/users-count")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Roles)]
+    [OpenApiOperation("Get a count of all users with this role.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<int> GetUsersCount(string id, CancellationToken cancellationToken)
+    {
+        return await _userService.GetUsersWithRoleCount(id, cancellationToken);
+    }
+
     [HttpDelete("{id}")]
     [MustHavePermission(ApplicationAction.Delete, ApplicationResource.Roles)]
     [OpenApiOperation("Delete a role.", "")]
@@ -108,7 +118,7 @@ public class RolesController(IRoleService roleService, IUserService userService,
         catch (ConflictException ex)
         {
             _logger.LogError(ex, "Error deleting role with id {id}", id);
-            return BadRequest(ProblemDetailsExtensions.ForBadRequest(ex.Message, HttpContext));
+            return Conflict(ProblemDetailsExtensions.ForConflict(ex.Message, HttpContext));
         }
 
         return NoContent();

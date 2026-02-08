@@ -25,6 +25,25 @@ public static class ProblemDetailsExtensions
         return problemDetails;
     }
 
+    public static ProblemDetails ForConflict(string error, HttpContext context)
+    {
+        Activity? activity = context.Features.Get<IHttpActivityFeature>()?.Activity;
+        var problemDetails = new ProblemDetails
+        {
+            Type = "https://tools.ietf.org/html/rfc7231#section-6.5.8",
+            Title = "Conflict",
+            Status = (int)HttpStatusCode.Conflict,
+            Detail = error,
+            Instance = $"{context.Request.Method} {context.Request.Path}",
+            Extensions =
+                {
+                    ["requestId"] = context.TraceIdentifier,
+                    ["traceId"] = activity?.Id
+                }
+        };
+        return problemDetails;
+    }
+
     public static ProblemDetails ForUnknownIdOrKeyType(HttpContext context)
     {
         return ForBadRequest("Unknown id or key type.", context);
