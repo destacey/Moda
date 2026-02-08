@@ -10,7 +10,10 @@ public class PermissionsController : ControllerBase
     }
 
     [HttpGet]
-    [MustHavePermission(ApplicationAction.View, ApplicationResource.Permissions)]
+    [MustHaveAnyPermission(
+        "Permissions.View",
+        "Permissions.Roles.View",
+        "Permissions.Users.View")]
     [OpenApiOperation("Get a list of all permissions.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]

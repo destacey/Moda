@@ -24,6 +24,7 @@ const { Title } = Typography
 interface PermissionsProps {
   role: RoleDto
   permissions: string[]
+  isSystemRole: boolean
   onDirtyChange?: (isDirty: boolean) => void
 }
 
@@ -43,28 +44,37 @@ interface PermissionCategory {
 }
 
 const Permissions = (props: PermissionsProps) => {
+  const sourcePermissions = useMemo(
+    () => props.permissions ?? [],
+    [props.permissions],
+  )
+  const [permissions, setPermissions] = useState<string[]>(sourcePermissions)
+  const [searchText, setSearchText] = useState('')
+  const [expandedKeys, setExpandedKeys] = useState<string[]>([])
+  const [isEditMode, setIsEditMode] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
+
+  const { onDirtyChange } = props
+
   const { hasPermissionClaim } = useAuth()
   const messageApi = useMessage()
   const theme = useTheme()
 
-  const editableRole =
-    props.role && props.role.name !== 'Admin' && props.role.name !== 'Basic'
-
   const canUpdate =
-    hasPermissionClaim('Permissions.Roles.Update') && editableRole
+    hasPermissionClaim('Permissions.Roles.Update') && !props.isSystemRole
 
-  const [permissions, setPermissions] = useState<string[]>(props.permissions)
-  const [searchText, setSearchText] = useState('')
-  const [expandedKeys, setExpandedKeys] = useState<string[]>([])
+  const { data: permissionsData, isLoading } = useGetPermissionsQuery()
+
+  const [updatePermissions] = useUpdatePermissionsMutation()
 
   const isDirty = useMemo(() => {
-    if (permissions.length !== props.permissions.length) return true
+    if (!isEditMode) return false
+    if (permissions.length !== sourcePermissions.length) return true
     const sorted = [...permissions].sort()
-    const sortedProps = [...props.permissions].sort()
+    const sortedProps = [...sourcePermissions].sort()
     return sorted.some((p, i) => p !== sortedProps[i])
-  }, [permissions, props.permissions])
+  }, [isEditMode, permissions, sourcePermissions])
 
-  const { onDirtyChange } = props
   useEffect(() => {
     onDirtyChange?.(isDirty)
   }, [isDirty, onDirtyChange])
@@ -107,16 +117,6 @@ const Permissions = (props: PermissionsProps) => {
     }
   }, [isDirty])
 
-  const {
-    data: permissionsData,
-    isLoading,
-    error,
-    refetch,
-  } = useGetPermissionsQuery()
-
-  const [updatePermissions, { error: updatePermissionsError }] =
-    useUpdatePermissionsMutation()
-
   const categories = useMemo(() => {
     if (!permissionsData) return []
     const categoryMap = new Map<string, Map<string, PermissionItem[]>>()
@@ -154,6 +154,14 @@ const Permissions = (props: PermissionsProps) => {
     [categories],
   )
 
+  const groupTotalCountMap = useMemo(() => {
+    const map = new Map<string, number>()
+    allGroups.forEach((group) => {
+      map.set(group.name, group.permissions.length)
+    })
+    return map
+  }, [allGroups])
+
   const filteredCategories = useMemo(() => {
     if (!searchText) return categories
     const lower = searchText.toLowerCase()
@@ -185,9 +193,35 @@ const Permissions = (props: PermissionsProps) => {
     [filteredCategories],
   )
 
+  const effectivePermissions = isEditMode ? permissions : sourcePermissions
+
+  const displayCategories = useMemo(() => {
+    if (isEditMode) return filteredCategories
+    return filteredCategories
+      .map((category) => {
+        const groups = category.groups
+          .map((group) => {
+            const permissionsInRole = group.permissions.filter((p) =>
+              effectivePermissions.includes(p.name),
+            )
+            if (permissionsInRole.length === 0) return null
+            return { ...group, permissions: permissionsInRole }
+          })
+          .filter(Boolean) as PermissionGroup[]
+        if (groups.length === 0) return null
+        return { ...category, groups }
+      })
+      .filter(Boolean) as PermissionCategory[]
+  }, [effectivePermissions, filteredCategories, isEditMode])
+
+  const allDisplayGroups = useMemo(
+    () => displayCategories.flatMap((c) => c.groups),
+    [displayCategories],
+  )
+
   const hasPermission = useCallback(
-    (permission: string) => permissions.includes(permission),
-    [permissions],
+    (permission: string) => effectivePermissions.includes(permission),
+    [effectivePermissions],
   )
 
   const handlePermissionChange = (item: PermissionItem) => {
@@ -225,7 +259,7 @@ const Permissions = (props: PermissionsProps) => {
   }
 
   const handleExpandAll = () => {
-    setExpandedKeys(allFilteredGroups.map((g) => g.name))
+    setExpandedKeys(allDisplayGroups.map((g) => g.name))
   }
 
   const handleCollapseAll = () => {
@@ -233,13 +267,14 @@ const Permissions = (props: PermissionsProps) => {
   }
 
   const isAllExpanded =
-    allFilteredGroups.length > 0 &&
-    expandedKeys.length === allFilteredGroups.length
+    allDisplayGroups.length > 0 &&
+    expandedKeys.length === allDisplayGroups.length
 
   const getGroupSelectedCount = (group: PermissionGroup) =>
     group.permissions.filter((p) => hasPermission(p.name)).length
 
   const handleSave = async () => {
+    setIsSaving(true)
     try {
       await updatePermissions({
         roleId: props.role.id,
@@ -247,9 +282,19 @@ const Permissions = (props: PermissionsProps) => {
       })
 
       messageApi.success('Permissions saved successfully')
+      setIsEditMode(false)
+      onDirtyChange?.(false)
     } catch (error) {
       messageApi.error('Failed to save permissions')
+    } finally {
+      setIsSaving(false)
     }
+  }
+
+  const handleCancelEdit = () => {
+    setIsEditMode(false)
+    setPermissions(sourcePermissions)
+    onDirtyChange?.(false)
   }
 
   if (isLoading) return <Spin size="small" />
@@ -257,35 +302,43 @@ const Permissions = (props: PermissionsProps) => {
   const buildCollapseItems = (groups: PermissionGroup[]) =>
     groups.map((group) => {
       const selectedCount = getGroupSelectedCount(group)
-      const totalCount = group.permissions.length
+      const totalCount =
+        groupTotalCountMap.get(group.name) ?? group.permissions.length
       const allSelected = selectedCount === totalCount
 
       return {
         key: group.name,
-        label: (
-          <Flex align="center">
-            <span style={{ fontWeight: 600 }}>{group.name}</span>
+        label: <span style={{ fontWeight: 600 }}>{group.name}</span>,
+        extra: (
+          <Flex align="center" gap={8} onClick={(e) => e.stopPropagation()}>
             <Tag
-              color={selectedCount > 0 ? 'blue' : undefined}
-              style={{ marginLeft: 8 }}
+              color={
+                selectedCount === totalCount
+                  ? 'success'
+                  : selectedCount > 0
+                    ? 'warning'
+                    : undefined
+              }
             >
               {selectedCount} of {totalCount}
             </Tag>
-          </Flex>
-        ),
-        extra: (
-          <Flex align="center" gap={8} onClick={(e) => e.stopPropagation()}>
-            <span
-              style={{ fontSize: 13, color: theme.token.colorTextSecondary }}
-            >
-              Toggle All
-            </span>
-            <Switch
-              size="small"
-              checked={allSelected}
-              disabled={!canUpdate}
-              onChange={(checked) => handleToggleGroup(group, checked)}
-            />
+            {isEditMode && canUpdate ? (
+              <>
+                <span
+                  style={{
+                    fontSize: 13,
+                    color: theme.token.colorTextSecondary,
+                  }}
+                >
+                  Toggle All
+                </span>
+                <Switch
+                  size="small"
+                  checked={allSelected}
+                  onChange={(checked) => handleToggleGroup(group, checked)}
+                />
+              </>
+            ) : null}
           </Flex>
         ),
         children: (
@@ -311,11 +364,12 @@ const Permissions = (props: PermissionsProps) => {
                       {permission.name}
                     </div>
                   </div>
-                  <Switch
-                    checked={hasPermission(permission.name)}
-                    disabled={!canUpdate}
-                    onChange={() => handlePermissionChange(permission)}
-                  />
+                  {isEditMode && canUpdate ? (
+                    <Switch
+                      checked={hasPermission(permission.name)}
+                      onChange={() => handlePermissionChange(permission)}
+                    />
+                  ) : null}
                 </Flex>
               </div>
             ))}
@@ -326,34 +380,59 @@ const Permissions = (props: PermissionsProps) => {
 
   return (
     <div>
-      <Flex justify="space-between" align="center" style={{ marginBottom: 16 }}>
+      <Flex
+        align="center"
+        justify="space-between"
+        style={{ marginBottom: 16, gap: 12, flexWrap: 'wrap' }}
+      >
         <Input
           placeholder="Search permissions..."
           prefix={<SearchOutlined />}
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
           allowClear
-          style={{ maxWidth: 300 }}
+          style={{ maxWidth: 300, flex: '1 1 220px' }}
         />
         <Space>
-          {canUpdate && (
+          {isEditMode && canUpdate ? (
             <>
               <a onClick={() => handleSelectAll(true)}>Select All</a>
               <a onClick={() => handleSelectAll(false)}>Unselect All</a>
+              <a onClick={isAllExpanded ? handleCollapseAll : handleExpandAll}>
+                {isAllExpanded ? 'Collapse All' : 'Expand All'}
+              </a>
+              <Button onClick={handleCancelEdit}>Cancel</Button>
+              <Button
+                type="primary"
+                loading={isSaving}
+                onClick={handleSave}
+                disabled={!isDirty}
+              >
+                Save Permissions
+              </Button>
             </>
-          )}
-          <a onClick={isAllExpanded ? handleCollapseAll : handleExpandAll}>
-            {isAllExpanded ? 'Collapse All' : 'Expand All'}
-          </a>
-          {canUpdate && (
-            <Button type="primary" onClick={handleSave} disabled={!isDirty}>
-              Save Permissions
-            </Button>
+          ) : (
+            <>
+              <a onClick={isAllExpanded ? handleCollapseAll : handleExpandAll}>
+                {isAllExpanded ? 'Collapse All' : 'Expand All'}
+              </a>
+              {canUpdate && (
+                <Button
+                  type="default"
+                  onClick={() => {
+                    setPermissions(sourcePermissions)
+                    setIsEditMode(true)
+                  }}
+                >
+                  Manage Permissions
+                </Button>
+              )}
+            </>
           )}
         </Space>
       </Flex>
 
-      {filteredCategories.map((category) => (
+      {displayCategories.map((category) => (
         <div key={category.name} style={{ marginBottom: 16 }}>
           <Title level={5} style={{ marginBottom: 8 }}>
             {category.name}

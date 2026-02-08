@@ -73,4 +73,84 @@ internal partial class UserService
 
         return Result.Success();
     }
+
+    public async Task<Result> ManageRoleUsersAsync(ManageRoleUsersCommand command, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(command, nameof(command));
+
+        var role = await _roleManager.FindByIdAsync(command.RoleId);
+        if (role is null)
+            return Result.Failure("Role not found.");
+
+        var roleName = role.Name!;
+        var usersUpdated = new List<string>();
+
+        // ADD USERS TO ROLE (first, so admin swap scenarios work correctly)
+        foreach (var userId in command.UserIdsToAdd)
+        {
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+            if (user is null)
+            {
+                _logger.LogWarning("User with ID {UserId} not found. Skipping addition.", userId);
+                continue;
+            }
+
+            if (await _userManager.IsInRoleAsync(user, roleName))
+                continue;
+
+            var result = await _userManager.AddToRoleAsync(user, roleName);
+            if (!result.Succeeded)
+            {
+                _logger.LogError("Failed to add user {UserId} to role {RoleName}.", userId, roleName);
+                return Result.Failure($"Failed to add user {userId} to role {roleName}.");
+            }
+
+            usersUpdated.Add(user.Id);
+        }
+
+        // REMOVE USERS FROM ROLE
+        if (command.UserIdsToRemove.Count > 0)
+        {
+            if (roleName == ApplicationRoles.Admin)
+            {
+                var adminCount = (await _userManager.GetUsersInRoleAsync(ApplicationRoles.Admin)).Count;
+                var removalCount = command.UserIdsToRemove.Count;
+                if (adminCount - removalCount < 1)
+                {
+                    _logger.LogWarning("Moda should have at least 1 Admin.");
+                    return Result.Failure("Moda should have at least 1 Admin.");
+                }
+            }
+
+            foreach (var userId in command.UserIdsToRemove)
+            {
+                var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+                if (user is null)
+                {
+                    _logger.LogWarning("User with ID {UserId} not found. Skipping removal.", userId);
+                    continue;
+                }
+
+                if (!await _userManager.IsInRoleAsync(user, roleName))
+                    continue;
+
+                var result = await _userManager.RemoveFromRoleAsync(user, roleName);
+                if (!result.Succeeded)
+                {
+                    _logger.LogError("Failed to remove user {UserId} from role {RoleName}.", userId, roleName);
+                    return Result.Failure($"Failed to remove user {userId} from role {roleName}.");
+                }
+
+                usersUpdated.Add(user.Id);
+            }
+        }
+
+        // PUBLISH EVENTS
+        foreach (var userId in usersUpdated)
+        {
+            await _events.PublishAsync(new ApplicationUserUpdatedEvent(userId, _dateTimeProvider.Now, true));
+        }
+
+        return Result.Success();
+    }
 }

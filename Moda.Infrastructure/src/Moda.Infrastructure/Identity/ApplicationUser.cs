@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Moda.Common.Domain.Employees;
 using NodaTime;
 
@@ -13,4 +13,6 @@ public class ApplicationUser : IdentityUser
     public Guid? EmployeeId { get; set; }
     public Employee? Employee { get; set; }
     public Instant? LastActivityAt { get; set; }
+
+    public ICollection<IdentityUserRole<string>> UserRoles { get; set; } = [];
 }

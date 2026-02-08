@@ -8,6 +8,7 @@ import {
   NavigationDto,
   PlanningIntervalObjectiveListDto,
   SimpleNavigationDto,
+  UserDetailsDto,
   WorkIterationNavigationDto,
 } from '@/src/services/moda-api'
 import Link from 'next/link'
@@ -349,6 +350,16 @@ export const AssignedToLinkCellRenderer = <
       prefetch={false}
     >
       {value}
+    </Link>
+  )
+}
+
+export const UserLinkCellRenderer = (
+  props: CustomCellRendererProps<UserDetailsDto>,
+) => {
+  return (
+    <Link href={`/settings/user-management/users/${props.data.id}`}>
+      {props.data.userName}
     </Link>
   )
 }

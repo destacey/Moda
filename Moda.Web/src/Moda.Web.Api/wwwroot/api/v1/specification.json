@@ -952,6 +952,110 @@
         ]
       }
     },
+    "/api/user-management/roles/{id}/users": {
+      "get": {
+        "tags": [
+          "Roles"
+        ],
+        "summary": "Get list of all users with this role.",
+        "operationId": "Roles_GetUsers",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserDetailsDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/user-management/roles/{id}/users-count": {
+      "get": {
+        "tags": [
+          "Roles"
+        ],
+        "summary": "Get a count of all users with this role.",
+        "operationId": "Roles_GetUsersCount",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
     "/api/user-management/users": {
       "get": {
         "tags": [
@@ -1130,7 +1234,7 @@
           "Users"
         ],
         "summary": "Update a user's assigned roles.",
-        "operationId": "Users_ManageRoles",
+        "operationId": "Users_ManageUserRoles",
         "parameters": [
           {
             "name": "id",
@@ -1153,6 +1257,60 @@
           },
           "required": true,
           "x-position": 2
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/user-management/users/manage-role": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Add or remove users from a role.",
+        "operationId": "Users_ManageRoleUsers",
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManageRoleUsersRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
         },
         "responses": {
           "204": {
@@ -16610,7 +16768,8 @@
         "additionalProperties": false,
         "required": [
           "id",
-          "isActive"
+          "isActive",
+          "roles"
         ],
         "properties": {
           "id": {
@@ -16651,6 +16810,12 @@
                 "$ref": "#/components/schemas/NavigationDto"
               }
             ]
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RoleListDto"
+            }
           }
         }
       },
@@ -16688,6 +16853,26 @@
           "name": {
             "type": "string",
             "minLength": 1
+          }
+        }
+      },
+      "RoleListDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
           }
         }
       },
@@ -16776,26 +16961,6 @@
             "nullable": true
           },
           "primaryKey": {
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
-      "RoleListDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "name"
-        ],
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "description": {
             "type": "string",
             "nullable": true
           }
@@ -16909,6 +17074,34 @@
             "type": "string"
           },
           "roleNames": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ManageRoleUsersRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "roleId",
+          "userIdsToAdd",
+          "userIdsToRemove"
+        ],
+        "properties": {
+          "roleId": {
+            "type": "string",
+            "minLength": 1,
+            "nullable": false
+          },
+          "userIdsToAdd": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "userIdsToRemove": {
             "type": "array",
             "items": {
               "type": "string"

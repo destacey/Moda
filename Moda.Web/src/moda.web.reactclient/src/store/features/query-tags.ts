@@ -96,7 +96,10 @@ export enum QueryTags {
   User = 'UserManagement.User',
   UserPermission = 'UserManagement.UserPermission',
   UserRole = 'UserManagement.UserRole',
+  UserOption = 'UserManagement.UserOption',
   Role = 'UserManagement.Role',
+  RoleUsers = 'UserManagement.RoleUsers',
+  RoleUsersCount = 'UserManagement.RoleUsersCount',
   Permission = 'UserManagement.Permission',
 
   // USER PROFILE

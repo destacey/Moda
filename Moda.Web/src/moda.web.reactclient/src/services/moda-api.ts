@@ -1256,6 +1256,128 @@ export class RolesClient {
         }
         return Promise.resolve<void>(null as any);
     }
+
+    /**
+     * Get list of all users with this role.
+     */
+    getUsers(id: string, cancelToken?: CancelToken): Promise<UserDetailsDto[]> {
+        let url_ = this.baseUrl + "/api/user-management/roles/{id}/users";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetUsers(_response);
+        });
+    }
+
+    protected processGetUsers(response: AxiosResponse): Promise<UserDetailsDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<UserDetailsDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<UserDetailsDto[]>(null as any);
+    }
+
+    /**
+     * Get a count of all users with this role.
+     */
+    getUsersCount(id: string, cancelToken?: CancelToken): Promise<number> {
+        let url_ = this.baseUrl + "/api/user-management/roles/{id}/users-count";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetUsersCount(_response);
+        });
+    }
+
+    protected processGetUsersCount(response: AxiosResponse): Promise<number> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<number>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<number>(null as any);
+    }
 }
 
 export class UsersClient {
@@ -1473,7 +1595,7 @@ export class UsersClient {
     /**
      * Update a user's assigned roles.
      */
-    manageRoles(id: string, request: AssignUserRolesRequest, cancelToken?: CancelToken): Promise<void> {
+    manageUserRoles(id: string, request: AssignUserRolesRequest, cancelToken?: CancelToken): Promise<void> {
         let url_ = this.baseUrl + "/api/user-management/users/{id}/roles";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
@@ -1499,11 +1621,76 @@ export class UsersClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processManageRoles(_response);
+            return this.processManageUserRoles(_response);
         });
     }
 
-    protected processManageRoles(response: AxiosResponse): Promise<void> {
+    protected processManageUserRoles(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 422) {
+            const _responseText = response.data;
+            let result422: any = null;
+            let resultData422  = _responseText;
+            result422 = JSON.parse(resultData422);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Add or remove users from a role.
+     */
+    manageRoleUsers(request: ManageRoleUsersRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/user-management/users/manage-role";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processManageRoleUsers(_response);
+        });
+    }
+
+    protected processManageRoleUsers(response: AxiosResponse): Promise<void> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -18761,6 +18948,7 @@ export interface UserDetailsDto {
     phoneNumber?: string | undefined;
     lastActivityAt?: Date | undefined;
     employee?: NavigationDto | undefined;
+    roles: RoleListDto[];
 }
 
 export interface NavigationDtoOfGuidAndInteger {
@@ -18770,6 +18958,12 @@ export interface NavigationDtoOfGuidAndInteger {
 }
 
 export interface NavigationDto extends NavigationDtoOfGuidAndInteger {
+}
+
+export interface RoleListDto {
+    id: string;
+    name: string;
+    description?: string | undefined;
 }
 
 export interface UpdateProfileRequest {
@@ -18790,12 +18984,6 @@ export interface AuditDto {
     newValues?: string | undefined;
     affectedColumns?: string | undefined;
     primaryKey?: string | undefined;
-}
-
-export interface RoleListDto {
-    id: string;
-    name: string;
-    description?: string | undefined;
 }
 
 export interface RoleDto {
@@ -18826,6 +19014,12 @@ export interface UserRoleDto {
 export interface AssignUserRolesRequest {
     userId: string;
     roleNames: string[];
+}
+
+export interface ManageRoleUsersRequest {
+    roleId: string;
+    userIdsToAdd: string[];
+    userIdsToRemove: string[];
 }
 
 export interface ToggleUserStatusRequest {

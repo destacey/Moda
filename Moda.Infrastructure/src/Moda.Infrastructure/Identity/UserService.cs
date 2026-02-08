@@ -1,59 +1,63 @@
-using Mapster;
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
-using Moda.Common.Application.BackgroundJobs;
+using Moda.Common.Application.Dtos;
 
 namespace Moda.Infrastructure.Identity;
 
-internal partial class UserService : IUserService
+internal partial class UserService(
+    ILogger<UserService> logger,
+    SignInManager<ApplicationUser> signInManager,
+    UserManager<ApplicationUser> userManager,
+    RoleManager<ApplicationRole> roleManager,
+    ModaDbContext db,
+    IEventPublisher events,
+    GraphServiceClient graphServiceClient,
+    ISender sender,
+    IDateTimeProvider dateTimeProvider) : IUserService
 {
-    private readonly ILogger<UserService> _logger;
-    private readonly SignInManager<ApplicationUser> _signInManager;
-    private readonly UserManager<ApplicationUser> _userManager;
-    private readonly RoleManager<ApplicationRole> _roleManager;
-    private readonly ModaDbContext _db;
-    private readonly IJobService _jobService;
-    private readonly IEventPublisher _events;
-    private readonly GraphServiceClient _graphServiceClient;
-    private readonly ISender _sender;
-    private readonly IDateTimeProvider _dateTimeProvider;
-
-    public UserService(
-        ILogger<UserService> logger,
-        SignInManager<ApplicationUser> signInManager,
-        UserManager<ApplicationUser> userManager,
-        RoleManager<ApplicationRole> roleManager,
-        ModaDbContext db,
-        IJobService jobService,
-        IEventPublisher events,
-        GraphServiceClient graphServiceClient,
-        ISender sender,
-        IDateTimeProvider dateTimeProvider)
-    {
-        _logger = logger;
-        _signInManager = signInManager;
-        _userManager = userManager;
-        _roleManager = roleManager;
-        _db = db;
-        _jobService = jobService;
-        _events = events;
-        _graphServiceClient = graphServiceClient;
-        _sender = sender;
-        _dateTimeProvider = dateTimeProvider;
-    }
+    private readonly ILogger<UserService> _logger = logger;
+    private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
+    private readonly UserManager<ApplicationUser> _userManager = userManager;
+    private readonly RoleManager<ApplicationRole> _roleManager = roleManager;
+    private readonly ModaDbContext _db = db;
+    private readonly IEventPublisher _events = events;
+    private readonly GraphServiceClient _graphServiceClient = graphServiceClient;
+    private readonly ISender _sender = sender;
+    private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
 
     public async Task<IReadOnlyList<UserDetailsDto>> SearchAsync(UserListFilter filter, CancellationToken cancellationToken)
     {
-        var users = await _userManager.Users
-            .Include(u => u.Employee)
+        var userDtos = await _db.Users
             .Where(u => u.IsActive == filter.IsActive)
-            .ProjectToType<UserDetailsDto>()
+            .Select(u => new UserDetailsDto
+            {
+                Id = u.Id,
+                UserName = u.UserName,
+                FirstName = u.FirstName,
+                LastName = u.LastName,
+                Email = u.Email,
+                IsActive = u.IsActive,
+                PhoneNumber = u.PhoneNumber,
+                LastActivityAt = u.LastActivityAt,
+                Employee = u.Employee == null ? null : NavigationDto.Create(u.Employee.Id, u.Employee.Key, u.Employee.Name.FullName),
+                Roles = u.UserRoles
+                    .Join(_db.Roles,
+                        ur => ur.RoleId,
+                        r => r.Id,
+                        (ur, r) => new RoleListDto
+                        {
+                            Id = r.Id,
+                            Name = r.Name!,
+                            Description = r.Description
+                        })
+                    .ToList()
+            })
             .ToListAsync(cancellationToken);
 
-        return users;
+        return userDtos;
     }
 
     public async Task<bool> ExistsWithNameAsync(string name)
@@ -71,23 +75,109 @@ internal partial class UserService : IUserService
         return await _userManager.Users.FirstOrDefaultAsync(x => x.PhoneNumber == phoneNumber) is ApplicationUser user && user.Id != exceptId;
     }
 
-    public async Task<List<UserDetailsDto>> GetListAsync(CancellationToken cancellationToken) =>
-        (await _userManager.Users
-            .Include(u => u.Employee)
-            .AsNoTracking()
-            .ToListAsync(cancellationToken))
-            .Adapt<List<UserDetailsDto>>();
+    public async Task<List<UserDetailsDto>> GetListAsync(CancellationToken cancellationToken)
+    {
+        var userDtos = await _db.Users
+            .Select(u => new UserDetailsDto
+            {
+                Id = u.Id,
+                UserName = u.UserName,
+                FirstName = u.FirstName,
+                LastName = u.LastName,
+                Email = u.Email,
+                IsActive = u.IsActive,
+                PhoneNumber = u.PhoneNumber,
+                LastActivityAt = u.LastActivityAt,
+                Employee = u.Employee == null ? null : NavigationDto.Create(u.Employee.Id, u.Employee.Key, u.Employee.Name.FullName),
+                Roles = u.UserRoles
+                    .Join(_db.Roles,
+                        ur => ur.RoleId,
+                        r => r.Id,
+                        (ur, r) => new RoleListDto
+                        {
+                            Id = r.Id,
+                            Name = r.Name!,
+                            Description = r.Description
+                        })
+                    .ToList()
+            })
+            .ToListAsync(cancellationToken);
+
+        return userDtos;
+    }
 
     public Task<int> GetCountAsync(CancellationToken cancellationToken) =>
         _userManager.Users.AsNoTracking().CountAsync(cancellationToken);
 
     public async Task<UserDetailsDto?> GetAsync(string userId, CancellationToken cancellationToken)
     {
-        return await _userManager.Users
-            .Include(u => u.Employee)
-            .AsNoTracking()
-            .ProjectToType<UserDetailsDto>()
-            .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+        var userDto = await _db.Users
+            .Where(u => u.Id == userId)
+            .Select(u => new UserDetailsDto
+            {
+                Id = u.Id,
+                UserName = u.UserName,
+                FirstName = u.FirstName,
+                LastName = u.LastName,
+                Email = u.Email,
+                IsActive = u.IsActive,
+                PhoneNumber = u.PhoneNumber,
+                LastActivityAt = u.LastActivityAt,
+                Employee = u.Employee == null ? null : NavigationDto.Create(u.Employee.Id, u.Employee.Key, u.Employee.Name.FullName),
+                Roles = u.UserRoles
+                    .Join(_db.Roles,
+                        ur => ur.RoleId,
+                        r => r.Id,
+                        (ur, r) => new RoleListDto
+                        {
+                            Id = r.Id,
+                            Name = r.Name!,
+                            Description = r.Description
+                        })
+                    .ToList()
+            })
+            .FirstOrDefaultAsync(cancellationToken);
+
+        return userDto;
+    }
+
+    public async Task<List<UserDetailsDto>> GetUsersWithRole(string roleId, CancellationToken cancellationToken)
+    {
+        var userDtos = await _db.Users
+            .Where(u => u.UserRoles.Any(ur => ur.RoleId == roleId))
+            .Select(u => new UserDetailsDto
+            {
+                Id = u.Id,
+                UserName = u.UserName,
+                FirstName = u.FirstName,
+                LastName = u.LastName,
+                Email = u.Email,
+                IsActive = u.IsActive,
+                PhoneNumber = u.PhoneNumber,
+                LastActivityAt = u.LastActivityAt,
+                Employee = u.Employee == null ? null : NavigationDto.Create(u.Employee.Id, u.Employee.Key, u.Employee.Name.FullName),
+                Roles = u.UserRoles
+                    .Join(_db.Roles,
+                        ur => ur.RoleId,
+                        r => r.Id,
+                        (ur, r) => new RoleListDto
+                        {
+                            Id = r.Id,
+                            Name = r.Name!,
+                            Description = r.Description
+                        })
+                    .ToList()
+            })
+            .ToListAsync(cancellationToken);
+
+        return userDtos;
+    }
+
+    public Task<int> GetUsersWithRoleCount(string roleId, CancellationToken cancellationToken)
+    {
+        return _db.Users
+            .Where(u => u.UserRoles.Any(ur => ur.RoleId == roleId))
+            .CountAsync(cancellationToken);
     }
 
     public async Task<string?> GetEmailAsync(string userId)
