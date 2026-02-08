@@ -4,6 +4,13 @@ import ManageRoleUsersForm, {
   ManageRoleUsersFormProps,
 } from './manage-role-users-form'
 
+// Mock window.getComputedStyle for Ant Design Modal
+Object.defineProperty(window, 'getComputedStyle', {
+  value: () => ({
+    getPropertyValue: () => '',
+  }),
+})
+
 // Mock dependencies
 const mockMessageSuccess = jest.fn()
 const mockMessageError = jest.fn()
@@ -45,7 +52,7 @@ const allUsers = [
     lastName: 'Doe',
     email: 'jane.doe@test.com',
     isActive: true,
-    roles: [],
+    roles: [{ id: 'role-2', name: 'User' }],
   },
   {
     id: 'user-2',
@@ -54,7 +61,10 @@ const allUsers = [
     lastName: 'Smith',
     email: 'john.smith@test.com',
     isActive: true,
-    roles: [],
+    roles: [
+      { id: 'role-2', name: 'User' },
+      { id: 'role-3', name: 'Viewer' },
+    ],
   },
   {
     id: 'user-3',
@@ -63,7 +73,7 @@ const allUsers = [
     lastName: 'Wilson',
     email: 'bob.wilson@test.com',
     isActive: false,
-    roles: [],
+    roles: [{ id: 'role-2', name: 'User' }],
   },
 ]
 
@@ -158,6 +168,26 @@ describe('ManageRoleUsersForm', () => {
 
     await waitFor(() => {
       expect(screen.getByText(/Bob Wilson \(Inactive\)/)).toBeInTheDocument()
+    })
+  })
+
+  it('renders user emails in transfer list', async () => {
+    render(<ManageRoleUsersForm {...defaultProps} />)
+
+    await waitFor(() => {
+      expect(screen.getByText('jane.doe@test.com')).toBeInTheDocument()
+      expect(screen.getByText('john.smith@test.com')).toBeInTheDocument()
+      expect(screen.getByText('bob.wilson@test.com')).toBeInTheDocument()
+    })
+  })
+
+  it('renders user roles as comma-separated list in transfer list', async () => {
+    render(<ManageRoleUsersForm {...defaultProps} />)
+
+    await waitFor(() => {
+      expect(screen.getByText('User, Viewer')).toBeInTheDocument()
+      const userRoles = screen.getAllByText('User')
+      expect(userRoles.length).toBeGreaterThan(0)
     })
   })
 

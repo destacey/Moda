@@ -3,8 +3,11 @@
 import useAuth from '@/src/components/contexts/auth'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { RoleDto } from '@/src/services/moda-api'
-import { useDeleteRoleMutation } from '@/src/store/features/user-management/roles-api'
-import { Modal } from 'antd'
+import {
+  useDeleteRoleMutation,
+  useGetRoleUsersCountQuery,
+} from '@/src/store/features/user-management/roles-api'
+import { Alert, Flex, Modal } from 'antd'
 import { useEffect, useState } from 'react'
 
 export interface DeleteRoleFormProps {
@@ -28,6 +31,10 @@ const DeleteRoleForm = (props: DeleteRoleFormProps) => {
   const canDeleteRole =
     hasClaim('Permission', 'Permissions.Roles.Delete') && editableRole
 
+  const { data: countData } = useGetRoleUsersCountQuery(props.role.id, {
+    skip: !props.role?.id,
+  })
+
   const formAction = async (role: RoleDto) => {
     try {
       const response = await deleteRoleMutation(role.id)
@@ -38,7 +45,7 @@ const DeleteRoleForm = (props: DeleteRoleFormProps) => {
 
       return true
     } catch (error: any) {
-      if (error.statusCode === 409 && error.detail) {
+      if (error.status === 409 && error.detail) {
         messageApi.error(error.detail)
       } else {
         messageApi.error(error?.messages?.join() ?? 'Failed to delete role')
@@ -69,13 +76,13 @@ const DeleteRoleForm = (props: DeleteRoleFormProps) => {
   }
 
   useEffect(() => {
-    if (!props.role) return
+    if (!props.role && !countData) return
     if (canDeleteRole) {
       setIsOpen(props.showForm)
     } else {
       props.onFormCancel()
     }
-  }, [canDeleteRole, props])
+  }, [canDeleteRole, countData, props])
 
   return (
     <Modal
@@ -84,6 +91,7 @@ const DeleteRoleForm = (props: DeleteRoleFormProps) => {
       onOk={handleOk}
       okText="Delete"
       okType="danger"
+      okButtonProps={{ disabled: countData !== undefined && countData > 0 }}
       confirmLoading={isSaving}
       onCancel={handleCancel}
       mask={{ blur: false }}
@@ -91,7 +99,16 @@ const DeleteRoleForm = (props: DeleteRoleFormProps) => {
       keyboard={false}
       destroyOnHidden={true}
     >
-      {props.role?.name}
+      <Flex vertical gap="small">
+        {props.role?.name}
+        {countData && countData > 0 && (
+          <Alert
+            title={`This role is assigned to ${countData} user${countData !== 1 ? 's' : ''}. Roles assigned to users cannot be deleted. Please remove the role from all users before attempting to delete.`}
+            type="error"
+            showIcon
+          />
+        )}
+      </Flex>
     </Modal>
   )
 }

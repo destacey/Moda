@@ -7,7 +7,7 @@ import {
   useGetUsersQuery,
   useManageRoleUsersMutation,
 } from '@/src/store/features/user-management/users-api'
-import { Modal, Spin, Transfer, Typography } from 'antd'
+import { Modal, Spin, Transfer, Typography, Flex, theme } from 'antd'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
 const { Text } = Typography
@@ -23,7 +23,8 @@ export interface ManageRoleUsersFormProps {
 interface TransferItem {
   key: string
   title: string
-  description: string
+  email: string
+  roles: string[]
 }
 
 const ManageRoleUsersForm: React.FC<ManageRoleUsersFormProps> = (props) => {
@@ -33,6 +34,7 @@ const ManageRoleUsersForm: React.FC<ManageRoleUsersFormProps> = (props) => {
   const [initialTargetKeys, setInitialTargetKeys] = useState<string[]>([])
   const [selectedKeys, setSelectedKeys] = useState<string[]>([])
 
+  const { token } = theme.useToken()
   const messageApi = useMessage()
 
   const {
@@ -92,7 +94,8 @@ const ManageRoleUsersForm: React.FC<ManageRoleUsersFormProps> = (props) => {
         title: user.isActive
           ? `${user.firstName} ${user.lastName}`
           : `${user.firstName} ${user.lastName} (Inactive)`,
-        description: user.email ?? '',
+        email: user.email ?? '',
+        roles: user.roles?.map((r) => r.name) ?? [],
       }))
       .sort((a, b) => a.title.localeCompare(b.title))
   }, [allUsersData])
@@ -145,9 +148,18 @@ const ManageRoleUsersForm: React.FC<ManageRoleUsersFormProps> = (props) => {
     props.onFormCancel()
   }, [props])
 
-  const onChange = useCallback((nextTargetKeys: string[]) => {
-    setTargetKeys(nextTargetKeys)
-  }, [])
+  const onChange = useCallback(
+    (nextTargetKeys: string[]) => {
+      // Sort target keys based on their order in dataSource to maintain sort
+      const sortedTargetKeys = nextTargetKeys.sort(
+        (a, b) =>
+          (dataSource.findIndex((item) => item.key === a) || 0) -
+          (dataSource.findIndex((item) => item.key === b) || 0),
+      )
+      setTargetKeys(sortedTargetKeys)
+    },
+    [dataSource],
+  )
 
   const onSelectChange = useCallback(
     (sourceSelectedKeys: string[], targetSelectedKeys: string[]) => {
@@ -161,12 +173,13 @@ const ManageRoleUsersForm: React.FC<ManageRoleUsersFormProps> = (props) => {
       const search = inputValue.toLowerCase()
       return (
         option.title.toLowerCase().includes(search) ||
-        option.description.toLowerCase().includes(search)
+        option.email.toLowerCase().includes(search)
       )
     },
     [],
   )
 
+  // TODO: transfer does not work well on mobile - consider alternative UI for smaller screens
   return (
     <Modal
       title={
@@ -190,61 +203,85 @@ const ManageRoleUsersForm: React.FC<ManageRoleUsersFormProps> = (props) => {
       width={'80vw'}
     >
       <Spin spinning={isLoading} size="large">
-        <Transfer
-          dataSource={dataSource}
-          targetKeys={targetKeys}
-          selectedKeys={selectedKeys}
-          onChange={onChange}
-          onSelectChange={onSelectChange}
-          render={(item) => (
-            <span>
-              {item.title}
-              {item.description && (
-                <span
-                  style={{
-                    color: 'rgba(255, 255, 255, 0.45)',
-                    marginLeft: 8,
-                    fontSize: 12,
-                  }}
+        <Flex vertical gap="small">
+          <Flex vertical style={{ width: '100%' }}>
+            <Transfer
+              dataSource={dataSource}
+              targetKeys={targetKeys}
+              selectedKeys={selectedKeys}
+              onChange={onChange}
+              onSelectChange={onSelectChange}
+              render={(item) => (
+                <Flex
+                  justify="space-between"
+                  wrap="wrap"
+                  align="flex-start"
+                  gap="small"
+                  style={{ width: '100%' }}
                 >
-                  {item.description}
-                </span>
+                  <Flex vertical style={{ flex: '1 1 auto' }}>
+                    <Text>{item.title}</Text>
+                    {item.email && (
+                      <Text
+                        type="secondary"
+                        style={{ fontSize: 12, marginTop: 4 }}
+                      >
+                        {item.email}
+                      </Text>
+                    )}
+                  </Flex>
+                  {item.roles.length > 0 && (
+                    <Text
+                      style={{
+                        fontSize: 12,
+                        whiteSpace: 'normal',
+                        textAlign: 'right',
+                        flex: '0 1 auto',
+                        color: token.colorTextSecondary,
+                      }}
+                    >
+                      {item.roles.join(', ')}
+                    </Text>
+                  )}
+                </Flex>
               )}
-            </span>
+              titles={['Available Users', 'Users with Role']}
+              showSearch
+              filterOption={filterOption}
+              showSelectAll
+              styles={{
+                section: { width: '100%', height: '60vh', minHeight: 300 },
+              }}
+            />
+          </Flex>
+          {hasChanges && (
+            <Flex vertical>
+              <Text strong style={{ color: token.colorPrimary }}>
+                Pending Changes
+              </Text>
+              <Flex wrap="wrap" gap="large">
+                {usersToAdd.length > 0 && (
+                  <Text style={{ color: token.colorSuccess }}>
+                    +{usersToAdd.length} user
+                    {usersToAdd.length !== 1 ? 's' : ''} will be added to this
+                    role
+                  </Text>
+                )}
+                {usersToRemove.length > 0 && (
+                  <Text style={{ color: token.colorError }}>
+                    -{usersToRemove.length} user
+                    {usersToRemove.length !== 1 ? 's' : ''} will be removed from
+                    this role
+                  </Text>
+                )}
+              </Flex>
+            </Flex>
           )}
-          titles={['Available Users', 'Users with Role']}
-          showSearch
-          filterOption={filterOption}
-          showSelectAll
-          styles={{
-            section: { width: '100%', height: '50vw' },
-          }}
-        />
-        {hasChanges && (
-          <div style={{ marginTop: 16 }}>
-            <Text strong style={{ color: '#1890ff' }}>
-              Pending Changes
-            </Text>
-            <div style={{ marginTop: 4 }}>
-              {usersToAdd.length > 0 && (
-                <Text style={{ color: '#52c41a', marginRight: 24 }}>
-                  +{usersToAdd.length} user{usersToAdd.length !== 1 ? 's' : ''}{' '}
-                  will be added to this role
-                </Text>
-              )}
-              {usersToRemove.length > 0 && (
-                <Text style={{ color: '#ff4d4f' }}>
-                  -{usersToRemove.length} user
-                  {usersToRemove.length !== 1 ? 's' : ''} will be removed from
-                  this role
-                </Text>
-              )}
-            </div>
-          </div>
-        )}
+        </Flex>
       </Spin>
     </Modal>
   )
 }
 
 export default ManageRoleUsersForm
+

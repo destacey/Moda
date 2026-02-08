@@ -78,7 +78,8 @@ export const usersApi = apiSlice.injectEndpoints({
           { type: QueryTags.UserRole, id: arg.userId },
           { type: QueryTags.User, id: arg.userId },
           { type: QueryTags.User, id: 'LIST' },
-          { type: QueryTags.RoleUsers, id: 'LIST' },
+          { type: QueryTags.RoleUsers },
+          { type: QueryTags.RoleUsersCount },
         ]
       },
     }),
@@ -93,9 +94,10 @@ export const usersApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
-      invalidatesTags: () => {
+      invalidatesTags: (result, error, arg) => {
         return [
-          { type: QueryTags.RoleUsers, id: 'LIST' },
+          { type: QueryTags.RoleUsers, id: arg.roleId },
+          { type: QueryTags.RoleUsersCount, id: arg.roleId },
           { type: QueryTags.User, id: 'LIST' },
           { type: QueryTags.UserRole, id: 'LIST' },
         ]

@@ -78,6 +78,7 @@ export const rolesApi = apiSlice.injectEndpoints({
         { type: QueryTags.Role, id: roleId },
       ],
     }),
+
     getRoleUsers: builder.query<UserDetailsDto[], string>({
       queryFn: async (id: string) => {
         try {
@@ -89,7 +90,24 @@ export const rolesApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
-      providesTags: () => [{ type: QueryTags.RoleUsers, id: 'LIST' }],
+      providesTags: (result, error, arg) => [
+        { type: QueryTags.RoleUsers, id: arg },
+      ],
+    }),
+
+    getRoleUsersCount: builder.query<number, string>({
+      queryFn: async (id: string) => {
+        try {
+          const data = await getRolesClient().getUsersCount(id)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: (result, error, arg) => [
+        { type: QueryTags.RoleUsersCount, id: arg },
+      ],
     }),
 
     deleteRole: builder.mutation<void, string>({
@@ -116,5 +134,6 @@ export const {
   useUpsertRoleMutation,
   useUpdatePermissionsMutation,
   useGetRoleUsersQuery,
+  useGetRoleUsersCountQuery,
   useDeleteRoleMutation,
 } = rolesApi

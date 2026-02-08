@@ -1,13 +1,16 @@
 'use client'
 
 import { PageActions, PageTitle } from '@/src/components/common'
-import { Card, MenuProps, Spin, Tag, Typography } from 'antd'
+import { Card, Flex, MenuProps, Spin, Tag, Typography } from 'antd'
 import { use, useCallback, useMemo, useState } from 'react'
 import useAuth from '@/src/components/contexts/auth'
 import { authorizePage } from '@/src/components/hoc'
 import { notFound, useRouter } from 'next/navigation'
 import BasicBreadcrumb from '@/src/components/common/basic-breadcrumb'
-import { useGetRoleQuery } from '@/src/store/features/user-management/roles-api'
+import {
+  useGetRoleQuery,
+  useGetRoleUsersCountQuery,
+} from '@/src/store/features/user-management/roles-api'
 import {
   DeleteRoleForm,
   EditRoleForm,
@@ -17,6 +20,7 @@ import {
 } from '../_components'
 import { ItemType } from 'antd/es/menu/interface'
 import { useDocumentTitle } from '@/src/hooks'
+import { TeamOutlined } from '@ant-design/icons'
 
 const { Text } = Typography
 
@@ -57,6 +61,8 @@ const RoleDetailsPage = (props: { params: Promise<{ id: string }> }) => {
     refetch: refetch,
   } = useGetRoleQuery(id)
 
+  const { data: countData } = useGetRoleUsersCountQuery(id)
+
   const title = roleData ? `${roleData.name} - Role Details` : 'Role Details'
   useDocumentTitle(title)
 
@@ -77,6 +83,7 @@ const RoleDetailsPage = (props: { params: Promise<{ id: string }> }) => {
   )
 
   const actionsMenuItems: MenuProps['items'] = useMemo(() => {
+    let includesDetailsSection = false
     const items: ItemType[] = []
     if (canUpdateRole) {
       items.push({
@@ -84,29 +91,36 @@ const RoleDetailsPage = (props: { params: Promise<{ id: string }> }) => {
         label: 'Edit',
         onClick: () => setOpenEditRoleForm(true),
       })
+      includesDetailsSection = true
     }
     if (canDeleteRole) {
       items.push({
         key: 'delete',
         label: 'Delete',
         onClick: () => setOpenDeleteRoleForm(true),
+        disabled: countData !== undefined && countData > 0,
+        title:
+          countData !== undefined && countData > 0
+            ? 'This role is assigned to users and cannot be deleted.'
+            : undefined,
       })
+      includesDetailsSection = true
     }
     if (canUpdateUserRoles) {
-      items.push(
-        {
+      if (includesDetailsSection) {
+        items.push({
           key: 'manage-divider',
           type: 'divider',
-        },
-        {
-          key: 'manage-users',
-          label: 'Manage Users',
-          onClick: () => setOpenManageRoleUsersForm(true),
-        },
-      )
+        })
+      }
+      items.push({
+        key: 'manage-users',
+        label: 'Manage Users',
+        onClick: () => setOpenManageRoleUsersForm(true),
+      })
     }
     return items
-  }, [canDeleteRole, canUpdateRole, canUpdateUserRoles])
+  }, [canDeleteRole, canUpdateRole, canUpdateUserRoles, countData])
 
   const renderTabContent = useCallback(() => {
     switch (activeTab) {
@@ -171,9 +185,17 @@ const RoleDetailsPage = (props: { params: Promise<{ id: string }> }) => {
         tags={isSystemRole ? <Tag color="warning">System Role</Tag> : undefined}
         actions={<PageActions actionItems={actionsMenuItems} />}
         extra={
-          roleData?.description && (
-            <Text type="secondary">{roleData?.description}</Text>
-          )
+          <Flex vertical gap="small">
+            {roleData?.description && (
+              <Text type="secondary">{roleData?.description}</Text>
+            )}
+            {!countData !== undefined && (
+              <Text type="secondary">
+                <TeamOutlined style={{ marginRight: 4 }} />
+                {countData} user{countData !== 1 ? 's' : ''} assigned
+              </Text>
+            )}
+          </Flex>
         }
       />
       <Card tabList={tabs} activeTabKey={activeTab} onTabChange={onTabChange}>
