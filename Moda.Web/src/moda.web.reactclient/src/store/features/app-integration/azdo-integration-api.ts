@@ -1,16 +1,16 @@
 import {
   AzdoConnectionTeamMappingsRequest,
-  AzureDevOpsBoardsConnectionDetailsDto,
-  AzureDevOpsBoardsWorkspaceTeamDto,
+  AzureDevOpsConnectionDetailsDto,
+  AzureDevOpsWorkspaceTeamDto,
   ConnectionListDto,
-  CreateAzureDevOpsBoardConnectionRequest,
+  CreateAzureDevOpsConnectionRequest,
   InitWorkProcessIntegrationRequest,
   InitWorkspaceIntegrationRequest,
-  TestAzureDevOpsBoardConnectionRequest,
-  UpdateAzureDevOpsBoardConnectionRequest,
+  TestAzureDevOpsConnectionRequest,
+  UpdateAzureDevOpsConnectionRequest,
 } from '@/src/services/moda-api'
 import { apiSlice } from '../apiSlice'
-import { getAzureDevOpsBoardsConnectionsClient } from '@/src/services/clients'
+import { getAzureDevOpsConnectionsClient } from '@/src/services/clients'
 import { QueryTags } from '../query-tags'
 
 export interface GetAzdoConnectionTeamsRequest {
@@ -24,9 +24,7 @@ export const azdoIntegrationApi = apiSlice.injectEndpoints({
       queryFn: async (includeDisabled: boolean = false) => {
         try {
           const data =
-            await getAzureDevOpsBoardsConnectionsClient().getList(
-              includeDisabled,
-            )
+            await getAzureDevOpsConnectionsClient().getList(includeDisabled)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -34,17 +32,15 @@ export const azdoIntegrationApi = apiSlice.injectEndpoints({
         }
       },
       providesTags: (result) => [
-        QueryTags.Connection,
-        ...result.map(({ id }) => ({ type: QueryTags.Connection, id })),
+        QueryTags.AzdoConnection,
+        ...result.map(({ id }) => ({ type: QueryTags.AzdoConnection, id })),
       ],
     }),
-    getAzdoConnection: builder.query<
-      AzureDevOpsBoardsConnectionDetailsDto,
-      string
-    >({
+
+    getAzdoConnection: builder.query<AzureDevOpsConnectionDetailsDto, string>({
       queryFn: async (id: string) => {
         try {
-          const data = await getAzureDevOpsBoardsConnectionsClient().getById(id)
+          const data = await getAzureDevOpsConnectionsClient().getById(id)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -52,18 +48,18 @@ export const azdoIntegrationApi = apiSlice.injectEndpoints({
         }
       },
       providesTags: (result, error, arg) => [
-        { type: QueryTags.ConnectionDetail, id: arg }, // typically arg is the key
-        { type: QueryTags.Connection, id: arg }, // typically arg is the key
+        { type: QueryTags.AzdoConnectionDetail, id: arg }, // typically arg is the key
+        { type: QueryTags.AzdoConnection, id: arg }, // typically arg is the key
       ],
     }),
+
     createAzdoConnection: builder.mutation<
       string,
-      CreateAzureDevOpsBoardConnectionRequest
+      CreateAzureDevOpsConnectionRequest
     >({
       queryFn: async (request) => {
         try {
-          const data =
-            await getAzureDevOpsBoardsConnectionsClient().create(request)
+          const data = await getAzureDevOpsConnectionsClient().create(request)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -71,16 +67,17 @@ export const azdoIntegrationApi = apiSlice.injectEndpoints({
         }
       },
       invalidatesTags: (result, error, arg) => {
-        return [{ type: QueryTags.Connection }]
+        return [{ type: QueryTags.AzdoConnection }]
       },
     }),
+
     updateAzdoConnection: builder.mutation<
       void,
-      UpdateAzureDevOpsBoardConnectionRequest
+      UpdateAzureDevOpsConnectionRequest
     >({
       queryFn: async (request) => {
         try {
-          const data = await getAzureDevOpsBoardsConnectionsClient().update(
+          const data = await getAzureDevOpsConnectionsClient().update(
             request.id,
             request,
           )
@@ -92,15 +89,16 @@ export const azdoIntegrationApi = apiSlice.injectEndpoints({
       },
       invalidatesTags: (result, error, arg) => {
         return [
-          { type: QueryTags.Connection, id: arg.id },
-          { type: QueryTags.ConnectionDetail, id: arg.id },
+          { type: QueryTags.AzdoConnection, id: arg.id },
+          { type: QueryTags.AzdoConnectionDetail, id: arg.id },
         ]
       },
     }),
+
     deleteAzdoConnection: builder.mutation<void, string>({
       queryFn: async (id) => {
         try {
-          const data = await getAzureDevOpsBoardsConnectionsClient().delete(id)
+          const data = await getAzureDevOpsConnectionsClient().delete(id)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -108,9 +106,10 @@ export const azdoIntegrationApi = apiSlice.injectEndpoints({
         }
       },
       invalidatesTags: (result, error, arg) => {
-        return [{ type: QueryTags.Connection }]
+        return [{ type: QueryTags.AzdoConnection }]
       },
     }),
+
     updateAzdoConnectionSyncState: builder.mutation<
       void,
       {
@@ -120,11 +119,10 @@ export const azdoIntegrationApi = apiSlice.injectEndpoints({
     >({
       queryFn: async (request) => {
         try {
-          const data =
-            await getAzureDevOpsBoardsConnectionsClient().updateSyncState(
-              request.connectionId,
-              request.isSyncEnabled,
-            )
+          const data = await getAzureDevOpsConnectionsClient().updateSyncState(
+            request.connectionId,
+            request.isSyncEnabled,
+          )
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -133,16 +131,17 @@ export const azdoIntegrationApi = apiSlice.injectEndpoints({
       },
       invalidatesTags: (result, error, arg) => {
         return [
-          { type: QueryTags.Connection, id: arg.connectionId },
-          { type: QueryTags.ConnectionDetail, id: arg.connectionId },
+          { type: QueryTags.AzdoConnection, id: arg.connectionId },
+          { type: QueryTags.AzdoConnectionDetail, id: arg.connectionId },
         ]
       },
     }),
+
     syncAzdoConnectionOrganization: builder.mutation<void, string>({
       queryFn: async (connectionId) => {
         try {
           const data =
-            await getAzureDevOpsBoardsConnectionsClient().syncOrganizationConfiguration(
+            await getAzureDevOpsConnectionsClient().syncOrganizationConfiguration(
               connectionId,
             )
           return { data }
@@ -152,9 +151,10 @@ export const azdoIntegrationApi = apiSlice.injectEndpoints({
         }
       },
       invalidatesTags: (result, error, arg) => {
-        return [{ type: QueryTags.ConnectionDetail, id: arg }]
+        return [{ type: QueryTags.AzdoConnectionDetail, id: arg }]
       },
     }),
+
     initAzdoConnectionWorkProcess: builder.mutation<
       void,
       InitWorkProcessIntegrationRequest
@@ -162,7 +162,7 @@ export const azdoIntegrationApi = apiSlice.injectEndpoints({
       queryFn: async (request) => {
         try {
           const data =
-            await getAzureDevOpsBoardsConnectionsClient().initWorkProcesssIntegration(
+            await getAzureDevOpsConnectionsClient().initWorkProcesssIntegration(
               request.id,
               request,
             )
@@ -173,9 +173,10 @@ export const azdoIntegrationApi = apiSlice.injectEndpoints({
         }
       },
       invalidatesTags: (result, error, arg) => {
-        return [{ type: QueryTags.ConnectionDetail, id: arg.id }]
+        return [{ type: QueryTags.AzdoConnectionDetail, id: arg.id }]
       },
     }),
+
     initAzdoConnectionWorkspace: builder.mutation<
       void,
       InitWorkspaceIntegrationRequest
@@ -183,7 +184,7 @@ export const azdoIntegrationApi = apiSlice.injectEndpoints({
       queryFn: async (request) => {
         try {
           const data =
-            await getAzureDevOpsBoardsConnectionsClient().initWorkspaceIntegration(
+            await getAzureDevOpsConnectionsClient().initWorkspaceIntegration(
               request.id,
               request,
             )
@@ -194,18 +195,18 @@ export const azdoIntegrationApi = apiSlice.injectEndpoints({
         }
       },
       invalidatesTags: (result, error, arg) => {
-        return [{ type: QueryTags.ConnectionDetail, id: arg.id }]
+        return [{ type: QueryTags.AzdoConnectionDetail, id: arg.id }]
       },
     }),
 
     getAzdoConnectionTeams: builder.query<
-      AzureDevOpsBoardsWorkspaceTeamDto[],
+      AzureDevOpsWorkspaceTeamDto[],
       GetAzdoConnectionTeamsRequest
     >({
       queryFn: async (request: GetAzdoConnectionTeamsRequest) => {
         try {
           const data =
-            await getAzureDevOpsBoardsConnectionsClient().getConnectionTeams(
+            await getAzureDevOpsConnectionsClient().getConnectionTeams(
               request.connectionId,
               request.workspaceId,
             )
@@ -223,6 +224,7 @@ export const azdoIntegrationApi = apiSlice.injectEndpoints({
         })),
       ],
     }),
+
     mapAzdoConnectionTeams: builder.mutation<
       void,
       AzdoConnectionTeamMappingsRequest
@@ -230,7 +232,7 @@ export const azdoIntegrationApi = apiSlice.injectEndpoints({
       queryFn: async (request) => {
         try {
           const data =
-            await getAzureDevOpsBoardsConnectionsClient().mapConnectionTeams(
+            await getAzureDevOpsConnectionsClient().mapConnectionTeams(
               request.connectionId,
               request,
             )
@@ -244,14 +246,15 @@ export const azdoIntegrationApi = apiSlice.injectEndpoints({
         return [{ type: QueryTags.AzdoConnectionTeam, id: arg.connectionId }]
       },
     }),
+
     testAzdoConfiguration: builder.mutation<
       void,
-      TestAzureDevOpsBoardConnectionRequest
+      TestAzureDevOpsConnectionRequest
     >({
       queryFn: async (request) => {
         try {
           const data =
-            await getAzureDevOpsBoardsConnectionsClient().testConfig(request)
+            await getAzureDevOpsConnectionsClient().testConfig(request)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
