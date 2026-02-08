@@ -141,6 +141,38 @@ internal partial class UserService(
         return userDto;
     }
 
+    public async Task<List<UserDetailsDto>> GetUsersWithRole(string roleId, CancellationToken cancellationToken)
+    {
+        var userDtos = await _db.Users
+            .Where(u => u.UserRoles.Any(ur => ur.RoleId == roleId))
+            .Select(u => new UserDetailsDto
+            {
+                Id = u.Id,
+                UserName = u.UserName,
+                FirstName = u.FirstName,
+                LastName = u.LastName,
+                Email = u.Email,
+                IsActive = u.IsActive,
+                PhoneNumber = u.PhoneNumber,
+                LastActivityAt = u.LastActivityAt,
+                Employee = u.Employee == null ? null : NavigationDto.Create(u.Employee.Id, u.Employee.Key, u.Employee.Name.FullName),
+                Roles = u.UserRoles
+                    .Join(_db.Roles,
+                        ur => ur.RoleId,
+                        r => r.Id,
+                        (ur, r) => new RoleListDto
+                        {
+                            Id = r.Id,
+                            Name = r.Name!,
+                            Description = r.Description
+                        })
+                    .ToList()
+            })
+            .ToListAsync(cancellationToken);
+
+        return userDtos;
+    }
+
     public async Task<string?> GetEmailAsync(string userId)
     {
         var user = await _userManager.Users

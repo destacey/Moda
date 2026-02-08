@@ -7,9 +7,10 @@ namespace Moda.Web.Api.Controllers.UserManagement;
 [Route("api/user-management/roles")]
 [ApiVersionNeutral]
 [ApiController]
-public class RolesController(IRoleService roleService, ILogger<RolesController> logger) : ControllerBase
+public class RolesController(IRoleService roleService, IUserService userService, ILogger<RolesController> logger) : ControllerBase
 {
     private readonly IRoleService _roleService = roleService;
+    private readonly IUserService _userService = userService;
     private readonly ILogger<RolesController> _logger = logger;
 
     [HttpGet]
@@ -80,6 +81,16 @@ public class RolesController(IRoleService roleService, ILogger<RolesController> 
         var id = await _roleService.CreateOrUpdate(request.ToCreateOrUpdateRoleCommand());
 
         return CreatedAtAction(nameof(GetById), new { id }, id);
+    }
+
+    [HttpGet("{id}/users")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Roles)]
+    [OpenApiOperation("Get list of all users with this role.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<List<UserDetailsDto>> GetUsers(string id, CancellationToken cancellationToken)
+    {
+        return await _userService.GetListAsync(cancellationToken);
     }
 
     [HttpDelete("{id}")]

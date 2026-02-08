@@ -1,4 +1,4 @@
-using System.Security.Claims;
+﻿using System.Security.Claims;
 
 namespace Moda.Common.Application.Identity.Users;
 
@@ -15,6 +15,8 @@ public interface IUserService : ITransientService
     Task<int> GetCountAsync(CancellationToken cancellationToken);
 
     Task<UserDetailsDto?> GetAsync(string userId, CancellationToken cancellationToken);
+
+    Task<List<UserDetailsDto>> GetUsersWithRole(string roleId, CancellationToken cancellationToken);
 
     Task<string?> GetEmailAsync(string userId);
 

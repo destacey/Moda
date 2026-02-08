@@ -1,4 +1,4 @@
-using CSharpFunctionalExtensions;
+﻿using CSharpFunctionalExtensions;
 using FluentValidation.Results;
 using Mapster;
 using Microsoft.AspNetCore.Identity;
@@ -6,30 +6,20 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Moda.Infrastructure.Identity;
 
-internal class RoleService : IRoleService
+internal class RoleService(
+    RoleManager<ApplicationRole> roleManager,
+    UserManager<ApplicationUser> userManager,
+    ModaDbContext db,
+    ICurrentUser currentUser,
+    IEventPublisher events,
+    IDateTimeProvider dateTimeProvider) : IRoleService
 {
-    private readonly RoleManager<ApplicationRole> _roleManager;
-    private readonly UserManager<ApplicationUser> _userManager;
-    private readonly ModaDbContext _db;
-    private readonly ICurrentUser _currentUser;
-    private readonly IEventPublisher _events;
-    private readonly IDateTimeProvider _dateTimeProvider;
-
-    public RoleService(
-        RoleManager<ApplicationRole> roleManager,
-        UserManager<ApplicationUser> userManager,
-        ModaDbContext db,
-        ICurrentUser currentUser,
-        IEventPublisher events,
-        IDateTimeProvider dateTimeProvider)
-    {
-        _roleManager = roleManager;
-        _userManager = userManager;
-        _db = db;
-        _currentUser = currentUser;
-        _events = events;
-        _dateTimeProvider = dateTimeProvider;
-    }
+    private readonly RoleManager<ApplicationRole> _roleManager = roleManager;
+    private readonly UserManager<ApplicationUser> _userManager = userManager;
+    private readonly ModaDbContext _db = db;
+    private readonly ICurrentUser _currentUser = currentUser;
+    private readonly IEventPublisher _events = events;
+    private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
 
     public async Task<List<RoleListDto>> GetList(CancellationToken cancellationToken)
         => await _roleManager.Roles.ProjectToType<RoleListDto>().ToListAsync(cancellationToken);
