@@ -88,7 +88,7 @@ const DeleteRoleForm = (props: DeleteRoleFormProps) => {
       onCancel={handleCancel}
       mask={{ blur: false }}
       maskClosable={false}
-      keyboard={false} // disable esc key to close modal
+      keyboard={false}
       destroyOnHidden={true}
     >
       {props.role?.name}
@@ -97,3 +97,4 @@ const DeleteRoleForm = (props: DeleteRoleFormProps) => {
 }
 
 export default DeleteRoleForm
+

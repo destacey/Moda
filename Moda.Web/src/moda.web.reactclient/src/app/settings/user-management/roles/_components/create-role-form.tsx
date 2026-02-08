@@ -152,8 +152,9 @@ const CreateRoleForm = ({
       okText="Create"
       confirmLoading={isSaving}
       onCancel={handleCancel}
+      mask={{ blur: false }}
       maskClosable={false}
-      keyboard={false} // disable esc key to close modal
+      keyboard={false}
       destroyOnHidden={true}
     >
       <Form form={form} size="small" layout="vertical" name="create-role-form">

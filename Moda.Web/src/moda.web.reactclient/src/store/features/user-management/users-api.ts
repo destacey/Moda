@@ -1,11 +1,13 @@
 import { apiSlice } from '../apiSlice'
 import {
   AssignUserRolesRequest,
+  ManageRoleUsersRequest,
   UserDetailsDto,
   UserRoleDto,
 } from '@/src/services/moda-api'
 import { getUsersClient } from '@/src/services/clients'
 import { QueryTags } from '../query-tags'
+import { BaseOptionType } from 'antd/es/select'
 
 export const usersApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -22,6 +24,7 @@ export const usersApi = apiSlice.injectEndpoints({
       },
       providesTags: () => [{ type: QueryTags.User, id: 'LIST' }],
     }),
+
     getUser: builder.query<UserDetailsDto, string>({
       queryFn: async (id: string) => {
         try {
@@ -34,6 +37,7 @@ export const usersApi = apiSlice.injectEndpoints({
       },
       providesTags: (result) => [{ type: QueryTags.User, id: result?.id }],
     }),
+
     getUserRoles: builder.query<
       UserRoleDto[],
       { id: string; includeUnassigned?: boolean }
@@ -55,10 +59,11 @@ export const usersApi = apiSlice.injectEndpoints({
         { type: QueryTags.UserRole, id: arg.id },
       ],
     }),
+
     manageUserRoles: builder.mutation<void, AssignUserRolesRequest>({
       queryFn: async (request) => {
         try {
-          const data = await getUsersClient().manageRoles(
+          const data = await getUsersClient().manageUserRoles(
             request.userId,
             request,
           )
@@ -77,6 +82,46 @@ export const usersApi = apiSlice.injectEndpoints({
         ]
       },
     }),
+
+    manageRoleUsers: builder.mutation<void, ManageRoleUsersRequest>({
+      queryFn: async (request) => {
+        try {
+          const data = await getUsersClient().manageRoleUsers(request)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: () => {
+        return [
+          { type: QueryTags.RoleUsers, id: 'LIST' },
+          { type: QueryTags.User, id: 'LIST' },
+          { type: QueryTags.UserRole, id: 'LIST' },
+        ]
+      },
+    }),
+
+    getUserOptions: builder.query<BaseOptionType[], void>({
+      queryFn: async () => {
+        try {
+          const users = await getUsersClient().getUsers()
+          const data: BaseOptionType[] = users
+            .map((user) => ({
+              label: user.isActive
+                ? `${user.firstName} ${user.lastName}`
+                : `${user.firstName} ${user.lastName} (Inactive)`,
+              value: user.id,
+            }))
+            .sort((a, b) => a.label.localeCompare(b.label))
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: () => [{ type: QueryTags.UserOption, id: 'LIST' }],
+    }),
   }),
 })
 
@@ -85,4 +130,6 @@ export const {
   useGetUserQuery,
   useGetUserRolesQuery,
   useManageUserRolesMutation,
+  useManageRoleUsersMutation,
+  useGetUserOptionsQuery,
 } = usersApi

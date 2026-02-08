@@ -11,6 +11,7 @@ import { useGetRoleQuery } from '@/src/store/features/user-management/roles-api'
 import {
   DeleteRoleForm,
   EditRoleForm,
+  ManageRoleUsersForm,
   Permissions,
   RoleUsersGrid,
 } from '../_components'
@@ -42,6 +43,8 @@ const RoleDetailsPage = (props: { params: Promise<{ id: string }> }) => {
   const [permissionsDirty, setPermissionsDirty] = useState(false)
   const [openEditRoleForm, setOpenEditRoleForm] = useState<boolean>(false)
   const [openDeleteRoleForm, setOpenDeleteRoleForm] = useState<boolean>(false)
+  const [openManageRoleUsersForm, setOpenManageRoleUsersForm] =
+    useState<boolean>(false)
 
   const router = useRouter()
 
@@ -66,6 +69,7 @@ const RoleDetailsPage = (props: { params: Promise<{ id: string }> }) => {
     hasPermissionClaim('Permissions.Roles.Update') && editableRole
   const canDeleteRole =
     hasPermissionClaim('Permissions.Roles.Delete') && editableRole
+  const canUpdateUserRoles = hasPermissionClaim('Permissions.UserRoles.Update')
 
   const tabs = useMemo(
     () => getRoleTabs(canViewPermissions),
@@ -88,8 +92,21 @@ const RoleDetailsPage = (props: { params: Promise<{ id: string }> }) => {
         onClick: () => setOpenDeleteRoleForm(true),
       })
     }
+    if (canUpdateUserRoles) {
+      items.push(
+        {
+          key: 'manage-divider',
+          type: 'divider',
+        },
+        {
+          key: 'manage-users',
+          label: 'Manage Users',
+          onClick: () => setOpenManageRoleUsersForm(true),
+        },
+      )
+    }
     return items
-  }, [canDeleteRole, canUpdateRole])
+  }, [canDeleteRole, canUpdateRole, canUpdateUserRoles])
 
   const renderTabContent = useCallback(() => {
     switch (activeTab) {
@@ -171,6 +188,15 @@ const RoleDetailsPage = (props: { params: Promise<{ id: string }> }) => {
             refetch()
           }}
           onFormCancel={() => setOpenEditRoleForm(false)}
+        />
+      )}
+      {openManageRoleUsersForm && roleData && (
+        <ManageRoleUsersForm
+          roleId={id}
+          roleName={roleData.name}
+          showForm={openManageRoleUsersForm}
+          onFormComplete={() => setOpenManageRoleUsersForm(false)}
+          onFormCancel={() => setOpenManageRoleUsersForm(false)}
         />
       )}
       {openDeleteRoleForm && (
