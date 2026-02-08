@@ -283,7 +283,7 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
 
             var workProcess = Configuration.WorkProcesses.FirstOrDefault(wp => wp.ExternalId == registration.ExternalId);
             if (workProcess is null)
-                return Result.Failure($"Unable to find work process with id {registration.ExternalId} in Azure DevOps Boards connection with id {Id}.");
+                return Result.Failure($"Unable to find work process with id {registration.ExternalId} in Azure DevOps connection with id {Id}.");
 
             // if already has integration, only update if the active flag changed
             if (workProcess.HasIntegration)
@@ -324,7 +324,7 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
 
             var workspace = Configuration.Workspaces.FirstOrDefault(wp => wp.ExternalId == registration.ExternalId);
             if (workspace is null)
-                return Result.Failure($"Unable to find workspace with id {registration.ExternalId} in Azure DevOps Boards connection with id {Id}.");
+                return Result.Failure($"Unable to find workspace with id {registration.ExternalId} in Azure DevOps connection with id {Id}.");
 
             // if already has integration, only update if the active flag changed
             if (workspace.HasIntegration)

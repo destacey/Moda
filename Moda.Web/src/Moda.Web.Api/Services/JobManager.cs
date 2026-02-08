@@ -21,7 +21,7 @@ namespace Moda.Web.Api.Services;
 public class JobManager(
     ILogger<JobManager> logger, 
     IEmployeeService employeeService, 
-    IAzureDevOpsBoardsSyncManager azdoBoardsSyncManager, 
+    IAzureDevOpsSyncManager azdoBoardsSyncManager, 
     ISender sender) 
     : IJobManager
 {
@@ -29,7 +29,7 @@ public class JobManager(
 
     private readonly ILogger<JobManager> _logger = logger;
     private readonly IEmployeeService _employeeService = employeeService;
-    private readonly IAzureDevOpsBoardsSyncManager _azdoBoardsSyncManager = azdoBoardsSyncManager;
+    private readonly IAzureDevOpsSyncManager _azdoBoardsSyncManager = azdoBoardsSyncManager;
     private readonly ISender _sender = sender;
 
     [DisableConcurrentExecution(60)]
@@ -54,8 +54,8 @@ public class JobManager(
         var result = await _azdoBoardsSyncManager.Sync(syncType, cancellationToken);
         if (result.IsFailure)
         {
-            _logger.LogError("Failed to sync Azure DevOps boards: {Error}", result.Error);
-            throw new InternalServerException($"Failed to sync Azure DevOps boards. Error: {result.Error}");
+            _logger.LogError("Failed to sync Azure DevOps: {Error}", result.Error);
+            throw new InternalServerException($"Failed to sync Azure DevOps. Error: {result.Error}");
         }
         _logger.LogInformation("Completed {BackgroundJob} job", nameof(RunSyncAzureDevOpsBoards));
     }

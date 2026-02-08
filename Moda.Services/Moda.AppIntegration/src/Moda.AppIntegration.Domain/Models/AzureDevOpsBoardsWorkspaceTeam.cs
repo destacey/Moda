@@ -17,17 +17,17 @@ public sealed class AzureDevOpsBoardsWorkspaceTeam
     }
 
     /// <summary>
-    /// WorkspaceId is the unique identifier for the project in the Azure DevOps Boards system.
+    /// WorkspaceId is the unique identifier for the project in the Azure DevOps system.
     /// </summary>
     public Guid WorkspaceId { get; private init; }
 
     /// <summary>
-    /// TeamId is the unique identifier for the team in the Azure DevOps Boards system.
+    /// TeamId is the unique identifier for the team in the Azure DevOps system.
     /// </summary>
     public Guid TeamId { get; private init; }
 
     /// <summary>
-    /// TeamName is the name of the team in the Azure DevOps Boards system.
+    /// TeamName is the name of the team in the Azure DevOps system.
     /// </summary>
     public string TeamName 
     { 

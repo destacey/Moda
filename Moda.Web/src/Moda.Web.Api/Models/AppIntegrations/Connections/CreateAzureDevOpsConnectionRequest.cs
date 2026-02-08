@@ -18,11 +18,11 @@ public sealed record CreateAzureDevOpsConnectionRequest
     public string Organization { get; set; } = default!;
 
     /// <summary>
-    /// The personal access token that enables access to Azure DevOps Boards data.
+    /// The personal access token that enables access to Azure DevOps data.
     /// </summary>
     public string PersonalAccessToken { get; set; } = default!;
 
-    public CreateAzureDevOpsBoardsConnectionCommand ToCreateAzureDevOpsBoardsConnectionCommand()
+    public CreateAzureDevOpsConnectionCommand ToCreateAzureDevOpsBoardsConnectionCommand()
         => new(Name, Description, Organization, PersonalAccessToken);
 }
 

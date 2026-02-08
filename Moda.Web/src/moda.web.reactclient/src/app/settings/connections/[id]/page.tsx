@@ -1,21 +1,21 @@
 'use client'
 
 import PageTitle from '@/src/components/common/page-title'
-import AzdoBoardsConnectionDetails from './azdo-boards-connection-details'
+import AzdoConnectionDetails from './azdo-connection-details'
 import { use, useCallback, useEffect, useMemo, useState } from 'react'
 import { Card } from 'antd'
 import { useDocumentTitle } from '@/src/hooks/use-document-title'
 import useAuth from '@/src/components/contexts/auth'
 import { authorizePage } from '@/src/components/hoc'
 import { notFound, usePathname, useRouter } from 'next/navigation'
-import EditConnectionForm from '../components/edit-connection-form'
-import AzdoBoardsOrganization from './azdo-boards-organization'
+import EditConnectionForm from '../_components/edit-connection-form'
+import AzdoOrganization from './azdo-organization'
 import { ExportOutlined } from '@ant-design/icons'
 import Link from 'next/link'
 import { useAppDispatch } from '@/src/hooks'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
-import { AzdoBoardsConnectionContext } from './azdo-boards-connection-context'
-import DeleteAzdoBoardsConnectionForm from '../components/delete-azdo-boards-connection-form'
+import { AzdoConnectionContext } from './azdo-connection-context'
+import DeleteAzdoConnectionForm from '../_components/delete-azdo-connection-form'
 import BasicBreadcrumb from '@/src/components/common/basic-breadcrumb'
 import { PageActions } from '@/src/components/common'
 import { ItemType } from 'antd/es/menu/interface'
@@ -89,10 +89,10 @@ const ConnectionDetailsPage = (props: { params: Promise<{ id: string }> }) => {
   const renderTabContent = useCallback(() => {
     switch (activeTab) {
       case ConnectionTabs.Details:
-        return <AzdoBoardsConnectionDetails connection={connectionData} />
+        return <AzdoConnectionDetails connection={connectionData} />
       case ConnectionTabs.OrganizationConfiguration:
         return (
-          <AzdoBoardsOrganization
+          <AzdoOrganization
             workProcesses={connectionData?.configuration?.workProcesses}
             workspaces={connectionData?.configuration?.workspaces}
           />
@@ -264,7 +264,7 @@ const ConnectionDetailsPage = (props: { params: Promise<{ id: string }> }) => {
         subtitle="Connection Details"
         actions={<PageActions actionItems={actionsMenuItems} />}
       />
-      <AzdoBoardsConnectionContext.Provider
+      <AzdoConnectionContext.Provider
         value={{
           connectionId: id,
           organizationUrl: azdoOrgUrl,
@@ -274,7 +274,7 @@ const ConnectionDetailsPage = (props: { params: Promise<{ id: string }> }) => {
         <Card tabList={tabs} activeTabKey={activeTab} onTabChange={onTabChange}>
           {renderTabContent()}
         </Card>
-      </AzdoBoardsConnectionContext.Provider>
+      </AzdoConnectionContext.Provider>
       {openEditConnectionForm && (
         <EditConnectionForm
           showForm={openEditConnectionForm}
@@ -284,7 +284,7 @@ const ConnectionDetailsPage = (props: { params: Promise<{ id: string }> }) => {
         />
       )}
       {openDeleteConnectionForm && (
-        <DeleteAzdoBoardsConnectionForm
+        <DeleteAzdoConnectionForm
           showForm={openDeleteConnectionForm}
           connection={connectionData}
           onFormSave={() => onDeleteConnectionFormClosed(true)}

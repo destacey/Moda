@@ -7,6 +7,6 @@ public class TestAzureDevOpsConnectionRequest
     public string Organization { get; set; } = default!;
 
     /// <summary>Gets the personal access token.</summary>
-    /// <value>The personal access token that enables access to Azure DevOps Boards data.</value>
+    /// <value>The personal access token that enables access to Azure DevOps data.</value>
     public string PersonalAccessToken { get; set; } = default!;
 }

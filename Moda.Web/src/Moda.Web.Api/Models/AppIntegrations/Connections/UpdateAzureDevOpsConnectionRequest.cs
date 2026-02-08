@@ -1,4 +1,6 @@
-﻿namespace Moda.Web.Api.Models.AppIntegrations.Connections;
+﻿using Moda.AppIntegration.Application.Connections.Commands.AzureDevOps;
+
+namespace Moda.Web.Api.Models.AppIntegrations.Connections;
 
 public sealed record UpdateAzureDevOpsConnectionRequest
 {
@@ -22,7 +24,7 @@ public sealed record UpdateAzureDevOpsConnectionRequest
     /// <value>The personal access token that enables access to Azure DevOps data.</value>
     public string PersonalAccessToken { get; set; } = default!;
 
-    public UpdateAzureDevOpsBoardsConnectionCommand ToUpadateAzureDevOpsBoardsConnectionCommand()
+    public UpdateAzureDevOpsConnectionCommand ToUpadateAzureDevOpsBoardsConnectionCommand()
         => new(Id, Name, Description, Organization, PersonalAccessToken);
 }
 

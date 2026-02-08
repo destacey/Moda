@@ -17783,7 +17783,7 @@ export class HealthChecksClient {
     }
 }
 
-export class AzureDevOpsBoardsConnectionsClient {
+export class AzureDevOpsConnectionsClient {
     protected instance: AxiosInstance;
     protected baseUrl: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
@@ -17924,7 +17924,7 @@ export class AzureDevOpsBoardsConnectionsClient {
     /**
      * Get Azure DevOps connection based on id.
      */
-    getById(id: string, cancelToken?: CancelToken): Promise<AzureDevOpsBoardsConnectionDetailsDto> {
+    getById(id: string, cancelToken?: CancelToken): Promise<AzureDevOpsConnectionDetailsDto> {
         let url_ = this.baseUrl + "/api/app-integrations/azure-devops/{id}";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
@@ -17951,7 +17951,7 @@ export class AzureDevOpsBoardsConnectionsClient {
         });
     }
 
-    protected processGetById(response: AxiosResponse): Promise<AzureDevOpsBoardsConnectionDetailsDto> {
+    protected processGetById(response: AxiosResponse): Promise<AzureDevOpsConnectionDetailsDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -17966,7 +17966,7 @@ export class AzureDevOpsBoardsConnectionsClient {
             let result200: any = null;
             let resultData200  = _responseText;
             result200 = JSON.parse(resultData200);
-            return Promise.resolve<AzureDevOpsBoardsConnectionDetailsDto>(result200);
+            return Promise.resolve<AzureDevOpsConnectionDetailsDto>(result200);
 
         } else if (status === 400) {
             const _responseText = response.data;
@@ -17986,7 +17986,7 @@ export class AzureDevOpsBoardsConnectionsClient {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<AzureDevOpsBoardsConnectionDetailsDto>(null as any);
+        return Promise.resolve<AzureDevOpsConnectionDetailsDto>(null as any);
     }
 
     /**
@@ -18115,7 +18115,7 @@ export class AzureDevOpsBoardsConnectionsClient {
     }
 
     /**
-     * Update an Azure DevOps Boards connection sync state.
+     * Update an Azure DevOps connection sync state.
      * @param isSyncEnabled (optional) 
      */
     updateSyncState(id: string, isSyncEnabled?: boolean | undefined, cancelToken?: CancelToken): Promise<void> {
@@ -18187,7 +18187,7 @@ export class AzureDevOpsBoardsConnectionsClient {
      * Get Azure DevOps connection teams based on id.
      * @param workspaceId (optional) 
      */
-    getConnectionTeams(id: string, workspaceId?: string | null | undefined, cancelToken?: CancelToken): Promise<AzureDevOpsBoardsWorkspaceTeamDto[]> {
+    getConnectionTeams(id: string, workspaceId?: string | null | undefined, cancelToken?: CancelToken): Promise<AzureDevOpsWorkspaceTeamDto[]> {
         let url_ = this.baseUrl + "/api/app-integrations/azure-devops/{id}/teams?";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
@@ -18216,7 +18216,7 @@ export class AzureDevOpsBoardsConnectionsClient {
         });
     }
 
-    protected processGetConnectionTeams(response: AxiosResponse): Promise<AzureDevOpsBoardsWorkspaceTeamDto[]> {
+    protected processGetConnectionTeams(response: AxiosResponse): Promise<AzureDevOpsWorkspaceTeamDto[]> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -18231,7 +18231,7 @@ export class AzureDevOpsBoardsConnectionsClient {
             let result200: any = null;
             let resultData200  = _responseText;
             result200 = JSON.parse(resultData200);
-            return Promise.resolve<AzureDevOpsBoardsWorkspaceTeamDto[]>(result200);
+            return Promise.resolve<AzureDevOpsWorkspaceTeamDto[]>(result200);
 
         } else if (status === 400) {
             const _responseText = response.data;
@@ -18244,7 +18244,7 @@ export class AzureDevOpsBoardsConnectionsClient {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<AzureDevOpsBoardsWorkspaceTeamDto[]>(null as any);
+        return Promise.resolve<AzureDevOpsWorkspaceTeamDto[]>(null as any);
     }
 
     /**
@@ -21191,28 +21191,28 @@ export interface ConnectionListDto {
     isSyncEnabled: boolean;
 }
 
-export interface AzureDevOpsBoardsConnectionDetailsDto {
+export interface AzureDevOpsConnectionDetailsDto {
     id: string;
     name: string;
     description?: string | undefined;
     systemId?: string | undefined;
     connector: SimpleNavigationDto;
-    configuration: AzureDevOpsBoardsConnectionConfigurationDto;
-    teamConfiguration: AzureDevOpsBoardsTeamConfigurationDto;
+    configuration: AzureDevOpsConnectionConfigurationDto;
+    teamConfiguration: AzureDevOpsTeamConfigurationDto;
     isActive: boolean;
     isValidConfiguration: boolean;
     isSyncEnabled: boolean;
 }
 
-export interface AzureDevOpsBoardsConnectionConfigurationDto {
+export interface AzureDevOpsConnectionConfigurationDto {
     organization: string;
     personalAccessToken: string;
     organizationUrl: string;
-    workProcesses: AzureDevOpsBoardsWorkProcessDto[];
-    workspaces: AzureDevOpsBoardsWorkspaceDto[];
+    workProcesses: AzureDevOpsWorkProcessDto[];
+    workspaces: AzureDevOpsWorkspaceDto[];
 }
 
-export interface AzureDevOpsBoardsWorkProcessDto {
+export interface AzureDevOpsWorkProcessDto {
     externalId: string;
     name: string;
     description?: string | undefined;
@@ -21224,7 +21224,7 @@ export interface IntegrationStateDto {
     isActive: boolean;
 }
 
-export interface AzureDevOpsBoardsWorkspaceDto {
+export interface AzureDevOpsWorkspaceDto {
     externalId: string;
     name: string;
     description?: string | undefined;
@@ -21232,11 +21232,11 @@ export interface AzureDevOpsBoardsWorkspaceDto {
     integrationState?: IntegrationStateDto | undefined;
 }
 
-export interface AzureDevOpsBoardsTeamConfigurationDto {
-    workspaceTeams: AzureDevOpsBoardsWorkspaceTeamDto[];
+export interface AzureDevOpsTeamConfigurationDto {
+    workspaceTeams: AzureDevOpsWorkspaceTeamDto[];
 }
 
-export interface AzureDevOpsBoardsWorkspaceTeamDto {
+export interface AzureDevOpsWorkspaceTeamDto {
     workspaceId: string;
     teamId: string;
     teamName: string;
@@ -21251,7 +21251,7 @@ export interface CreateAzureDevOpsConnectionRequest {
     description?: string | undefined;
     /** The Azure DevOps Organization name. */
     organization: string;
-    /** The personal access token that enables access to Azure DevOps Boards data. */
+    /** The personal access token that enables access to Azure DevOps data. */
     personalAccessToken: string;
 }
 
@@ -21276,9 +21276,9 @@ export interface AzdoConnectionTeamMappingsRequest {
 }
 
 export interface AzdoWorkspaceTeamMappingRequest {
-    /** The unique identifier for the workspace in the Azure DevOps Boards system. */
+    /** The unique identifier for the workspace in the Azure DevOps system. */
     workspaceId: string;
-    /** The unique identifier for the team in the Azure DevOps Boards system. */
+    /** The unique identifier for the team in the Azure DevOps system. */
     teamId: string;
     /** The unique identifier for the team within Moda. */
     internalTeamId?: string | undefined;
