@@ -73,6 +73,7 @@ export const usersApi = apiSlice.injectEndpoints({
           { type: QueryTags.UserRole, id: arg.userId },
           { type: QueryTags.User, id: arg.userId },
           { type: QueryTags.User, id: 'LIST' },
+          { type: QueryTags.RoleUsers, id: 'LIST' },
         ]
       },
     }),

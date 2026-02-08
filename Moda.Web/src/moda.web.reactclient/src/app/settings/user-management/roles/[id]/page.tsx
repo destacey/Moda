@@ -8,7 +8,12 @@ import { authorizePage } from '@/src/components/hoc'
 import { notFound, useRouter } from 'next/navigation'
 import BasicBreadcrumb from '@/src/components/common/basic-breadcrumb'
 import { useGetRoleQuery } from '@/src/store/features/user-management/roles-api'
-import { DeleteRoleForm, EditRoleForm, Permissions } from '../_components'
+import {
+  DeleteRoleForm,
+  EditRoleForm,
+  Permissions,
+  RoleUsersGrid,
+} from '../_components'
 import { ItemType } from 'antd/es/menu/interface'
 import { useDocumentTitle } from '@/src/hooks'
 
@@ -16,12 +21,17 @@ const { Text } = Typography
 
 enum RoleDetailsTabs {
   Permissions = 'permissions',
+  Users = 'users',
 }
 
 const getRoleTabs = (canViewPermissions: boolean) => [
   canViewPermissions && {
     key: RoleDetailsTabs.Permissions,
     tab: 'Permissions',
+  },
+  {
+    key: RoleDetailsTabs.Users,
+    tab: 'Users',
   },
 ]
 
@@ -92,10 +102,12 @@ const RoleDetailsPage = (props: { params: Promise<{ id: string }> }) => {
             onDirtyChange={setPermissionsDirty}
           />
         )
+      case RoleDetailsTabs.Users:
+        return <RoleUsersGrid roleId={id} />
       default:
         return null
     }
-  }, [activeTab, isSystemRole, roleData])
+  }, [activeTab, id, isSystemRole, roleData])
 
   const onTabChange = useCallback(
     (tabKey: string) => {
