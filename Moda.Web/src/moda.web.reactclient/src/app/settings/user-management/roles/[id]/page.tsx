@@ -1,7 +1,7 @@
 'use client'
 
 import { PageActions, PageTitle } from '@/src/components/common'
-import { Card, MenuProps, Spin, Typography } from 'antd'
+import { Card, MenuProps, Spin, Tag, Typography } from 'antd'
 import { use, useCallback, useMemo, useState } from 'react'
 import useAuth from '@/src/components/contexts/auth'
 import { authorizePage } from '@/src/components/hoc'
@@ -10,6 +10,7 @@ import BasicBreadcrumb from '@/src/components/common/basic-breadcrumb'
 import { useGetRoleQuery } from '@/src/store/features/user-management/roles-api'
 import { DeleteRoleForm, EditRoleForm, Permissions } from '../_components'
 import { ItemType } from 'antd/es/menu/interface'
+import { useDocumentTitle } from '@/src/hooks'
 
 const { Text } = Typography
 
@@ -36,9 +37,6 @@ const RoleDetailsPage = (props: { params: Promise<{ id: string }> }) => {
 
   const { hasPermissionClaim } = useAuth()
 
-  //const canUpdateRole = hasPermissionClaim('Permissions.Roles.Update')
-  const canViewPermissions = hasPermissionClaim('Permissions.Permissions.View')
-
   const {
     data: roleData,
     isLoading: isLoading,
@@ -46,17 +44,23 @@ const RoleDetailsPage = (props: { params: Promise<{ id: string }> }) => {
     refetch: refetch,
   } = useGetRoleQuery(id)
 
-  const tabs = useMemo(
-    () => getRoleTabs(canViewPermissions),
-    [canViewPermissions],
-  )
+  const title = roleData ? `${roleData.name} - Role Details` : 'Role Details'
+  useDocumentTitle(title)
 
-  const editableRole =
-    roleData && roleData.name !== 'Admin' && roleData.name !== 'Basic'
+  const isSystemRole =
+    !!roleData && (roleData.name === 'Admin' || roleData.name === 'Basic')
+  const editableRole = !!roleData && !isSystemRole
+
+  const canViewPermissions = hasPermissionClaim('Permissions.Permissions.View')
   const canUpdateRole =
     hasPermissionClaim('Permissions.Roles.Update') && editableRole
   const canDeleteRole =
     hasPermissionClaim('Permissions.Roles.Delete') && editableRole
+
+  const tabs = useMemo(
+    () => getRoleTabs(canViewPermissions),
+    [canViewPermissions],
+  )
 
   const actionsMenuItems: MenuProps['items'] = useMemo(() => {
     const items: ItemType[] = []
@@ -84,13 +88,14 @@ const RoleDetailsPage = (props: { params: Promise<{ id: string }> }) => {
           <Permissions
             role={roleData}
             permissions={roleData?.permissions}
+            isSystemRole={isSystemRole}
             onDirtyChange={setPermissionsDirty}
           />
         )
       default:
         return null
     }
-  }, [activeTab, roleData])
+  }, [activeTab, isSystemRole, roleData])
 
   const onTabChange = useCallback(
     (tabKey: string) => {
@@ -134,13 +139,14 @@ const RoleDetailsPage = (props: { params: Promise<{ id: string }> }) => {
       <PageTitle
         title={roleData?.name}
         subtitle="Role Details"
+        tags={isSystemRole ? <Tag color="warning">System Role</Tag> : undefined}
         actions={<PageActions actionItems={actionsMenuItems} />}
+        extra={
+          roleData?.description && (
+            <Text type="secondary">{roleData?.description}</Text>
+          )
+        }
       />
-      {roleData?.description && (
-        <div style={{ marginBottom: 16 }}>
-          <Text type="secondary">{roleData?.description}</Text>
-        </div>
-      )}
       <Card tabList={tabs} activeTabKey={activeTab} onTabChange={onTabChange}>
         <Spin spinning={isLoading}>{!isLoading && renderTabContent()}</Spin>
       </Card>
@@ -174,3 +180,4 @@ const RoleDetailsPageWithAuthorization = authorizePage(
 )
 
 export default RoleDetailsPageWithAuthorization
+
