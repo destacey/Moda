@@ -63,15 +63,9 @@ const Permissions = (props: PermissionsProps) => {
   const canUpdate =
     hasPermissionClaim('Permissions.Roles.Update') && !props.isSystemRole
 
-  const {
-    data: permissionsData,
-    isLoading,
-    error,
-    refetch,
-  } = useGetPermissionsQuery()
+  const { data: permissionsData, isLoading } = useGetPermissionsQuery()
 
-  const [updatePermissions, { error: updatePermissionsError }] =
-    useUpdatePermissionsMutation()
+  const [updatePermissions] = useUpdatePermissionsMutation()
 
   const isDirty = useMemo(() => {
     if (!isEditMode) return false

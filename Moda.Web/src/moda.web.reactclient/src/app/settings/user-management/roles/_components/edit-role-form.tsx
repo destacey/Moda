@@ -36,7 +36,7 @@ const EditRoleForm = ({
   const canUpdate =
     hasClaim('Permission', 'Permissions.Roles.Update') && editableRole
 
-  const [upsertRole, { error: upsertRoleError }] = useUpsertRoleMutation()
+  const [upsertRole] = useUpsertRoleMutation()
 
   useEffect(() => {
     if (!role) return

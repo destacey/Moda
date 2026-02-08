@@ -29,8 +29,8 @@ enum RoleDetailsTabs {
   Users = 'users',
 }
 
-const getRoleTabs = (canViewPermissions: boolean) => [
-  canViewPermissions && {
+const getRoleTabs = () => [
+  {
     key: RoleDetailsTabs.Permissions,
     tab: 'Permissions',
   },
@@ -70,17 +70,13 @@ const RoleDetailsPage = (props: { params: Promise<{ id: string }> }) => {
     !!roleData && (roleData.name === 'Admin' || roleData.name === 'Basic')
   const editableRole = !!roleData && !isSystemRole
 
-  const canViewPermissions = hasPermissionClaim('Permissions.Permissions.View')
   const canUpdateRole =
     hasPermissionClaim('Permissions.Roles.Update') && editableRole
   const canDeleteRole =
     hasPermissionClaim('Permissions.Roles.Delete') && editableRole
   const canUpdateUserRoles = hasPermissionClaim('Permissions.UserRoles.Update')
 
-  const tabs = useMemo(
-    () => getRoleTabs(canViewPermissions),
-    [canViewPermissions],
-  )
+  const tabs = useMemo(() => getRoleTabs(), [])
 
   const actionsMenuItems: MenuProps['items'] = useMemo(() => {
     let includesDetailsSection = false
@@ -189,7 +185,7 @@ const RoleDetailsPage = (props: { params: Promise<{ id: string }> }) => {
             {roleData?.description && (
               <Text type="secondary">{roleData?.description}</Text>
             )}
-            {!countData !== undefined && (
+            {countData !== undefined && (
               <Text type="secondary">
                 <TeamOutlined style={{ marginRight: 4 }} />
                 {countData} user{countData !== 1 ? 's' : ''} assigned

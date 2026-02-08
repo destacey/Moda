@@ -357,7 +357,11 @@ export const AssignedToLinkCellRenderer = <
 export const UserLinkCellRenderer = (
   props: CustomCellRendererProps<UserDetailsDto>,
 ) => {
-  return <Link href={`users/${props.data.id}`}>{props.data.userName}</Link>
+  return (
+    <Link href={`/settings/user-management/users/${props.data.id}`}>
+      {props.data.userName}
+    </Link>
+  )
 }
 
 // Helper utility functions for rendering links (can be used outside of cell renderers)

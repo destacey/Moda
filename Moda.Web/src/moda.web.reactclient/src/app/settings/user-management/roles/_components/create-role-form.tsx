@@ -46,18 +46,12 @@ const CreateRoleForm = ({
   const { hasClaim } = useAuth()
   const canCreate = hasClaim('Permission', 'Permissions.Roles.Create')
 
-  const {
-    data: roleData,
-    isLoading: roleIsLoading,
-    error: roleError,
-    refetch: roleRefetch,
-  } = useGetRoleQuery(roleIdToCopyPermissions, {
+  const { data: roleData } = useGetRoleQuery(roleIdToCopyPermissions, {
     skip: !roleIdToCopyPermissions,
   })
 
-  const [upsertRole, { error: upsertRoleError }] = useUpsertRoleMutation()
-  const [updatePermissions, { error: updatePermissionsError }] =
-    useUpdatePermissionsMutation()
+  const [upsertRole] = useUpsertRoleMutation()
+  const [updatePermissions] = useUpdatePermissionsMutation()
 
   useEffect(() => {
     if (canCreate) {

@@ -15,7 +15,6 @@ const RoleUsersGrid: FC<RoleUsersGridProps> = (props: RoleUsersGridProps) => {
   const {
     data: usersData,
     isLoading,
-    error,
     refetch,
   } = useGetRoleUsersQuery(props.roleId)
 
