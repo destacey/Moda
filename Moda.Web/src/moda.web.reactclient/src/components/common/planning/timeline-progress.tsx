@@ -22,7 +22,7 @@ const TimelineProgress: FC<TimelineProgressProps> = ({
   dateFormat = DATE_FORMAT,
 }: TimelineProgressProps) => {
   const screens = useBreakpoint()
-  const isMobile = !screens.md // Mobile/tablet for md and below (< 768px)
+  const isMobile = !screens.md // Mobile/tablet when viewport is below the md breakpoint (< 768px)
 
   if (!start || !end) return null
 

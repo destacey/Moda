@@ -6,9 +6,17 @@ import {
   MenuOutlined,
 } from '@ant-design/icons'
 import React, { FC, useMemo, useState } from 'react'
-import { Layout, Button, Typography, Flex, Drawer, Menu } from 'antd'
+import {
+  Layout,
+  Button,
+  Typography,
+  Flex,
+  Drawer,
+  Menu,
+  MenuProps,
+  Grid,
+} from 'antd'
 import useMenuToggle from '../../components/contexts/menu-toggle'
-import { useMediaQuery } from 'react-responsive'
 import { useAppMenuItems } from './menu'
 import ProfileMenu from './profile-menu'
 import { ItemType, MenuItemType } from 'antd/es/menu/interface'
@@ -16,6 +24,14 @@ import { useRouter } from 'next/navigation'
 
 const { Header } = Layout
 const { Title } = Typography
+const { useBreakpoint } = Grid
+
+// Menu item type with custom route property
+type MenuItemWithRoute = {
+  route?: string
+  children?: MenuItemWithRoute[]
+  [key: string]: any
+}
 
 // Flatten nested menu items for mobile display
 const flattenMenuItems = (
@@ -51,7 +67,8 @@ const flattenMenuItems = (
 
 const AppHeader: FC = React.memo(() => {
   const { menuCollapsed, setMenuCollapsed } = useMenuToggle()
-  const isMobile = useMediaQuery({ maxWidth: 768 })
+  const screens = useBreakpoint()
+  const isMobile = !screens.md // Mobile/tablet for md and below (< 768px)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const menuItems = useAppMenuItems()
   const router = useRouter()
@@ -65,12 +82,15 @@ const AppHeader: FC = React.memo(() => {
   // Avoid re-renders when authentication state changes
   const profileComponent = useMemo(() => <ProfileMenu />, [])
 
-  const handleMenuClick = (e: any) => {
-    // Find the clicked item and navigate if it has a route
-    const findItem = (items: any[], key: string): any => {
+  const handleMenuClick: MenuProps['onClick'] = (e) => {
+    // Find the clicked item and navigate using the custom route property
+    const findItem = (items: any[], key: string): MenuItemWithRoute | null => {
       for (const item of items) {
-        if (item?.key === key) return item
-        if (item?.children) {
+        if (!item || typeof item === 'string') continue
+
+        if (item.key === key) return item as MenuItemWithRoute
+
+        if (item.children) {
           const found = findItem(item.children, key)
           if (found) return found
         }
@@ -79,8 +99,8 @@ const AppHeader: FC = React.memo(() => {
     }
 
     const clickedItem = findItem(mobileMenuItems, e.key)
-    if (clickedItem?.label?.props?.href) {
-      router.push(clickedItem.label.props.href)
+    if (clickedItem?.route) {
+      router.push(clickedItem.route)
       setDrawerOpen(false)
     }
   }
@@ -103,6 +123,7 @@ const AppHeader: FC = React.memo(() => {
               icon={<MenuOutlined />}
               size="middle"
               onClick={() => setDrawerOpen(true)}
+              aria-label="Open navigation menu"
             />
             <Drawer
               title="Menu"
@@ -128,6 +149,7 @@ const AppHeader: FC = React.memo(() => {
             icon={menuCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
             size="middle"
             onClick={() => setMenuCollapsed(!menuCollapsed)}
+            aria-label={menuCollapsed ? 'Expand sidebar menu' : 'Collapse sidebar menu'}
           />
         )}
         <Title
