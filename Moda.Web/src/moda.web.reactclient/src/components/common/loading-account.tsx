@@ -1,4 +1,5 @@
 import styles from '@/src/app/logout/page.module.css'
+import { FC } from 'react'
 
 interface LoadingAccountProps {
   message?: string
@@ -26,7 +27,7 @@ function LoadingSpinner() {
   )
 }
 
-const LoadingAccount: React.FC<LoadingAccountProps> = (props) => {
+const LoadingAccount: FC<LoadingAccountProps> = (props) => {
   const message = props.message || 'Loading...'
 
   return (
@@ -42,11 +43,7 @@ const LoadingAccount: React.FC<LoadingAccountProps> = (props) => {
           {/* Logo */}
           <div className={styles.logo}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/moda-icon.png"
-              alt="Moda"
-              className={styles.logoIcon}
-            />
+            <img src="/moda-icon.png" alt="Moda" className={styles.logoIcon} />
             <div className={styles.logoDivider} />
             <span className={styles.logoText}>moda</span>
           </div>

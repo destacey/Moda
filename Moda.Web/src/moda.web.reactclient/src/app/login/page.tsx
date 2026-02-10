@@ -112,13 +112,13 @@ function AnalyticsIllustration() {
         </pattern>
       </defs>
 
-      <rect x="4" y="4" width="332" height="392" rx="20" fill="url(#bgGrad)" />
+      <rect x="4" y="4" width="332" height="392" rx="8" fill="url(#bgGrad)" />
       <rect
         x="4"
         y="4"
         width="332"
         height="392"
-        rx="20"
+        rx="8"
         fill="url(#gridPattern)"
       />
 
