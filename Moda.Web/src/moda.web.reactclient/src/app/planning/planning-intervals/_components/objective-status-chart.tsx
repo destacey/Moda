@@ -1,7 +1,12 @@
 'use client'
 
 import useTheme from '@/src/components/contexts/theme'
-import { Pie, PieConfig } from '@ant-design/charts'
+import dynamic from 'next/dynamic'
+const Pie = dynamic(
+  () => import('@ant-design/charts').then((mod) => mod.Pie) as any,
+  { ssr: false },
+)
+import { PieConfig } from '@ant-design/charts'
 import { Card } from 'antd'
 import { useMemo } from 'react'
 
@@ -65,7 +70,7 @@ const ObjectiveStatusChart = (props: ObjectiveStatusChartProps) => {
 
   return (
     <Card size="small">
-      <Pie {...config} />
+      <Pie {...(config as any)} />
     </Card>
   )
 }

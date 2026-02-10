@@ -146,7 +146,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     }
 
-    window.addEventListener('storage', handleStorageChange)
+    window.addEventListener('storage', handleStorageChange, { passive: true })
 
     return () => {
       if (callbackId) {
