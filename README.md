@@ -1,6 +1,6 @@
 # Moda
 
-**An intelligent delivery management platform designed to give engineering leaders and teams end-to-end visibility into software delivery**
+**An intelligent delivery management platform designed to give engineering leaders and teams end-to-end visibility into software delivery.**
 
 When delivery spans multiple teams, projects, and systems, visibility breaks down. Moda brings it all together — tracking work items, aligning teams to planning intervals and products, and surfacing dependencies across the organization.
 
@@ -10,7 +10,7 @@ When delivery spans multiple teams, projects, and systems, visibility breaks dow
 
 ## 📚 Documentation
 
-[Full Documentation](https://destacey.github.io/Moda) | [Contributing Guide](#-contributing)
+[Full Documentation](https://destacey.github.io/Moda) | [Contributing Guide](CONTRIBUTING.md)
 
 ## ✨ Key Features
 
@@ -225,7 +225,9 @@ See [CLAUDE.md](CLAUDE.md) for detailed architecture documentation.
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please:
+See our [Contributing Guide](CONTRIBUTING.md) for detailed instructions on how to contribute to Moda.
+
+**Quick checklist:**
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
@@ -270,7 +272,7 @@ SecuritySettings__AzureAd__RootIssuer={your root issuer/sts url for AAD}
 SecuritySettings__AzureAd__TenantId={your tenant ID}
 ```
 
-Additionally, by default Moda logs to the console via Serilog. If you wish to configure any of the other supported sinks (currently Seq, Datadog and Application Insights), provide the appropriate Serilog__Using__x and Serilog__WriteTo__x settings as env vars for your moda-api container. An example with DataDog (taken from some TF for the `azurerm_container_app` resource type):
+Additionally, by default Moda logs to the console via Serilog. If you wish to configure any of the other supported sinks (currently Seq, Datadog and Application Insights), provide the appropriate Serilog**Using**x and Serilog**WriteTo**x settings as env vars for your moda-api container. An example with DataDog (taken from some TF for the `azurerm_container_app` resource type):
 
 ```terraform
       env {
