@@ -14,20 +14,22 @@ jest.mock('./iteration-dates', () => ({
 }))
 
 // Mock Ant Design Grid useBreakpoint hook
+const mockUseBreakpoint = jest.fn(() => ({
+  xs: true,
+  sm: true,
+  md: true, // Default to desktop (md and above)
+  lg: true,
+  xl: true,
+  xxl: true,
+}))
+
 jest.mock('antd', () => {
   const actualAntd = jest.requireActual('antd')
   return {
     ...actualAntd,
     Grid: {
       ...actualAntd.Grid,
-      useBreakpoint: jest.fn(() => ({
-        xs: true,
-        sm: true,
-        md: true, // Default to desktop (md and above)
-        lg: true,
-        xl: true,
-        xxl: true,
-      })),
+      useBreakpoint: mockUseBreakpoint,
     },
   }
 })
@@ -212,9 +214,8 @@ describe('TimelineProgress', () => {
   })
 
   it('applies full width on mobile', () => {
-    const { Grid } = require('antd')
     // Mock mobile breakpoint (md is false when screen is < 768px)
-    Grid.useBreakpoint.mockReturnValueOnce({
+    mockUseBreakpoint.mockReturnValueOnce({
       xs: true,
       sm: true,
       md: false, // Mobile/tablet
