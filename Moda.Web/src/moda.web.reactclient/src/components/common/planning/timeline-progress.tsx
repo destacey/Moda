@@ -1,9 +1,10 @@
 import dayjs from 'dayjs'
 import { CSSProperties, FC } from 'react'
-import { Card, Flex, Progress, Typography } from 'antd'
+import { Card, Flex, Grid, Progress, Typography } from 'antd'
 import IterationDates from './iteration-dates'
 
 const { Text } = Typography
+const { useBreakpoint } = Grid
 
 const DATE_FORMAT = 'MMM D'
 
@@ -20,6 +21,9 @@ const TimelineProgress: FC<TimelineProgressProps> = ({
   style,
   dateFormat = DATE_FORMAT,
 }: TimelineProgressProps) => {
+  const screens = useBreakpoint()
+  const isMobile = !screens.md // Mobile/tablet for md and below (< 768px)
+
   if (!start || !end) return null
 
   const now = dayjs()
@@ -33,7 +37,12 @@ const TimelineProgress: FC<TimelineProgressProps> = ({
   // If start date is in the future, show iteration dates instead
   if (now.isBefore(startDay)) {
     return (
-      <IterationDates start={start} end={end} dateFormat={dateFormat} style={style} />
+      <IterationDates
+        start={start}
+        end={end}
+        dateFormat={dateFormat}
+        style={style}
+      />
     )
   }
 
@@ -44,11 +53,12 @@ const TimelineProgress: FC<TimelineProgressProps> = ({
   )
   const progressPercent = Math.round((currentDay / totalDays) * 100)
 
+  const cardStyle = isMobile
+    ? { width: '100%', ...style }
+    : { minWidth: 275, width: 'fit-content', ...style }
+
   return (
-    <Card
-      size="small"
-      style={{ minWidth: 300, width: 'fit-content', ...style }}
-    >
+    <Card size="small" style={cardStyle}>
       <Flex vertical gap={4}>
         <Text type="secondary">Timeline Progress</Text>
         <Progress

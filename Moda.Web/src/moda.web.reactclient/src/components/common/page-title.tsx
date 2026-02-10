@@ -1,7 +1,8 @@
-import { Col, Flex, Row, Space, Typography } from 'antd'
+import { Col, Flex, Grid, Row, Space, Typography } from 'antd'
 import { ReactNode } from 'react'
 
 const { Title, Text } = Typography
+const { useBreakpoint } = Grid
 
 export interface PageTitleProps {
   title: string | ReactNode
@@ -19,13 +20,16 @@ const PageTitle = ({
   actions,
   extra,
 }: PageTitleProps) => {
+  const screens = useBreakpoint()
+  const isSuperSmall = !screens.sm // xs screens (< 576px)
   const titleMdSize = actions ? 16 : 24
+
   return (
     <>
       <Flex vertical gap={8} style={{ marginBottom: 12 }}>
         <Row align={'middle'}>
           <Col xs={24} sm={24} md={titleMdSize}>
-            <Space>
+            <Flex vertical={isSuperSmall} gap={isSuperSmall ? 8 : 12} align={isSuperSmall ? 'flex-start' : 'center'}>
               <div>
                 <Title level={2} style={{ margin: '0px', fontWeight: '400' }}>
                   {title}
@@ -33,7 +37,7 @@ const PageTitle = ({
                 {subtitle && <Text>{subtitle}</Text>}
               </div>
               {tags && <div>{tags}</div>}
-            </Space>
+            </Flex>
           </Col>
           {actions && (
             <Col xs={24} sm={24} md={8}>

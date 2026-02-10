@@ -13,6 +13,25 @@ jest.mock('./iteration-dates', () => ({
   ),
 }))
 
+// Mock Ant Design Grid useBreakpoint hook
+jest.mock('antd', () => {
+  const actualAntd = jest.requireActual('antd')
+  return {
+    ...actualAntd,
+    Grid: {
+      ...actualAntd.Grid,
+      useBreakpoint: jest.fn(() => ({
+        xs: true,
+        sm: true,
+        md: true, // Default to desktop (md and above)
+        lg: true,
+        xl: true,
+        xxl: true,
+      })),
+    },
+  }
+})
+
 // Mock dayjs to control "now" for consistent tests
 jest.mock('dayjs', () => {
   const originalDayjs = jest.requireActual('dayjs')
@@ -183,13 +202,33 @@ describe('TimelineProgress', () => {
     expect(screen.getByText('Nov 8 2:45 PM')).toBeInTheDocument()
   })
 
-  it('applies default minWidth style', () => {
+  it('applies default minWidth style on desktop', () => {
     const { container } = render(
       <TimelineProgress start={startDate} end={endDate} />,
     )
 
     const card = container.querySelector('.ant-card')
-    expect(card).toHaveStyle({ minWidth: '300px' })
+    expect(card).toHaveStyle({ minWidth: '275px', width: 'fit-content' })
+  })
+
+  it('applies full width on mobile', () => {
+    const { Grid } = require('antd')
+    // Mock mobile breakpoint (md is false when screen is < 768px)
+    Grid.useBreakpoint.mockReturnValueOnce({
+      xs: true,
+      sm: true,
+      md: false, // Mobile/tablet
+      lg: false,
+      xl: false,
+      xxl: false,
+    })
+
+    const { container } = render(
+      <TimelineProgress start={startDate} end={endDate} />,
+    )
+
+    const card = container.querySelector('.ant-card')
+    expect(card).toHaveStyle({ width: '100%' })
   })
 
   it('applies custom styles', () => {
