@@ -14,25 +14,27 @@ jest.mock('./iteration-dates', () => ({
 }))
 
 // Mock Ant Design Grid useBreakpoint hook
-const mockUseBreakpoint = jest.fn(() => ({
-  xs: true,
-  sm: true,
-  md: true, // Default to desktop (md and above)
-  lg: true,
-  xl: true,
-  xxl: true,
-}))
-
 jest.mock('antd', () => {
   const actualAntd = jest.requireActual('antd')
   return {
     ...actualAntd,
     Grid: {
       ...actualAntd.Grid,
-      useBreakpoint: mockUseBreakpoint,
+      useBreakpoint: jest.fn(() => ({
+        xs: true,
+        sm: true,
+        md: true, // Default to desktop (md and above)
+        lg: true,
+        xl: true,
+        xxl: true,
+      })),
     },
   }
 })
+
+// Get reference to the mocked function after module is loaded
+const { Grid } = jest.requireMock<typeof import('antd')>('antd')
+const mockUseBreakpoint = Grid.useBreakpoint as jest.MockedFunction<typeof Grid.useBreakpoint>
 
 // Mock dayjs to control "now" for consistent tests
 jest.mock('dayjs', () => {
@@ -56,6 +58,16 @@ describe('TimelineProgress', () => {
   beforeEach(() => {
     // Set "now" to Nov 1, which is day 7 of 14 (50%)
     ;(dayjs as unknown as { mockedNow: string }).mockedNow = '2025-11-01T12:00:00'
+
+    // Reset the mock to default desktop breakpoints
+    mockUseBreakpoint.mockReturnValue({
+      xs: true,
+      sm: true,
+      md: true, // Default to desktop (md and above)
+      lg: true,
+      xl: true,
+      xxl: true,
+    })
   })
 
   it('renders title, dates, and progress info', () => {
