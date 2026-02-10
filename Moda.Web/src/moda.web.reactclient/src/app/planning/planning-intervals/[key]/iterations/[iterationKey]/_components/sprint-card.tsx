@@ -16,12 +16,13 @@ import {
   SprintMetricsSummary,
   TeamOperatingModelDetailsDto,
 } from '@/src/services/moda-api'
-import { Card, Col, Flex, Row, Tag, Tooltip, Typography } from 'antd'
+import { Card, Col, Flex, Grid, Row, Tag, Tooltip, Typography } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { FC } from 'react'
 
 const { Text } = Typography
+const { useBreakpoint } = Grid
 
 interface SprintCardProps {
   sprint: SprintMetricsSummary
@@ -34,6 +35,9 @@ const SprintCard: FC<SprintCardProps> = ({
   operatingModel,
   sizingMethod,
 }) => {
+  const screens = useBreakpoint()
+  const isXs = !screens.sm // xs screens (< 576px)
+
   const teamSupportsSP =
     operatingModel?.sizingMethod === SizingMethod.StoryPoints
   const useStoryPoints =
@@ -77,8 +81,8 @@ const SprintCard: FC<SprintCardProps> = ({
     >
       <Flex vertical gap="middle">
         {/* Header */}
-        <Flex justify="space-between" align="flex-start">
-          <Flex vertical gap={2}>
+        {isXs ? (
+          <Flex vertical gap={8}>
             <Link
               href={`/organizations/teams/${sprint.team.key}`}
               style={{ fontSize: 16, fontWeight: 600 }}
@@ -94,22 +98,55 @@ const SprintCard: FC<SprintCardProps> = ({
             <Text type="secondary" style={{ fontSize: 12 }}>
               {formatDateRange()}
             </Text>
+            <Flex gap={8} wrap>
+              <IterationHealthIndicator
+                startDate={new Date(sprint.start)}
+                endDate={new Date(sprint.end)}
+                total={displayTotal}
+                completed={displayCompleted}
+              />
+              {sizingMethod === SizingMethod.StoryPoints && !teamSupportsSP && (
+                <Tooltip title="This team does not support story point sizing. Values are based on work item counts.">
+                  <Tag>Count-based Metrics</Tag>
+                </Tooltip>
+              )}
+            </Flex>
           </Flex>
+        ) : (
+          <Flex justify="space-between" align="flex-start">
+            <Flex vertical gap={2}>
+              <Link
+                href={`/organizations/teams/${sprint.team.key}`}
+                style={{ fontSize: 16, fontWeight: 600 }}
+              >
+                {sprint.team.name}
+              </Link>
+              <Link
+                href={`/planning/sprints/${sprint.sprintKey}`}
+                style={{ fontSize: 13 }}
+              >
+                {sprint.sprintName}
+              </Link>
+              <Text type="secondary" style={{ fontSize: 12 }}>
+                {formatDateRange()}
+              </Text>
+            </Flex>
 
-          <Flex vertical gap={8} align="end">
-            <IterationHealthIndicator
-              startDate={new Date(sprint.start)}
-              endDate={new Date(sprint.end)}
-              total={displayTotal}
-              completed={displayCompleted}
-            />
-            {sizingMethod === SizingMethod.StoryPoints && !teamSupportsSP && (
-              <Tooltip title="This team does not support story point sizing. Values are based on work item counts.">
-                <Tag>Count-based Metrics</Tag>
-              </Tooltip>
-            )}
+            <Flex vertical gap={8} align="end">
+              <IterationHealthIndicator
+                startDate={new Date(sprint.start)}
+                endDate={new Date(sprint.end)}
+                total={displayTotal}
+                completed={displayCompleted}
+              />
+              {sizingMethod === SizingMethod.StoryPoints && !teamSupportsSP && (
+                <Tooltip title="This team does not support story point sizing. Values are based on work item counts.">
+                  <Tag>Count-based Metrics</Tag>
+                </Tooltip>
+              )}
+            </Flex>
           </Flex>
-        </Flex>
+        )}
 
         {/* Progress Bar - only show for active/completed sprints */}
         {!isFuture && (

@@ -1,14 +1,20 @@
 /* Page Background */
 .pageBackground {
-  min-height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
   font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
   background: linear-gradient(135deg, #42a5f5 0%, #2196f3 40%, #1976d2 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 40px 20px;
-  position: relative;
-  overflow: hidden;
 }
 
 /* Background decoration circles */
@@ -261,15 +267,24 @@
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
+  .pageBackground {
+    padding: 20px 0 60px;
+    align-items: flex-start;
+  }
+
   .card {
     flex-direction: column;
     min-width: auto;
-    width: 100%;
+    min-height: 0;
+    width: calc(100% - 40px);
     max-width: 500px;
+    margin: 20px 20px 40px 20px;
+    flex-shrink: 0;
   }
 
   .leftPanel {
     padding: 24px 16px;
+    min-height: 300px;
   }
 
   .illustrationWrapper {
@@ -278,5 +293,35 @@
 
   .rightPanel {
     padding: 32px 24px;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+  .pageBackground {
+    padding: 16px 0 60px;
+  }
+
+  .card {
+    width: calc(100% - 32px);
+    margin: 16px 16px 40px 16px;
+    flex-shrink: 0;
+  }
+
+  .rightPanel {
+    padding: 24px 20px;
+  }
+
+  .leftPanel {
+    padding: 20px 12px;
+    min-height: 280px;
+  }
+
+  .logoText {
+    font-size: 28px;
+  }
+
+  .title {
+    font-size: 22px;
   }
 }
