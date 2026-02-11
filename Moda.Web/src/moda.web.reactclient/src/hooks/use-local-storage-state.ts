@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useRef } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 
 export interface UseLocalStorageStateOptions {
   /**
@@ -78,21 +78,21 @@ export const useLocalStorageState = <T>(
   const version = options?.version
   const versionedKey = version !== undefined ? `${key}:v${version}` : key
 
-  // Track the previous versionedKey to detect changes
-  const prevVersionedKeyRef = useRef(versionedKey)
-
   const [value, setValue] = useState<T>(() =>
     readLocalStorage(key, versionedKey, version, defaultValue),
   )
 
-  // Re-initialize state when versionedKey changes (i.e., key or version prop changes)
-  useEffect(() => {
-    if (prevVersionedKeyRef.current !== versionedKey) {
-      const newValue = readLocalStorage(key, versionedKey, version, defaultValue)
-      setValue(newValue)
-      prevVersionedKeyRef.current = versionedKey
-    }
-  }, [key, versionedKey, version, defaultValue])
+  // Track the previous versionedKey in state to detect changes
+  // This is the recommended React pattern for resetting state when props change
+  // See: https://react.dev/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes
+  const [prevVersionedKey, setPrevVersionedKey] = useState(versionedKey)
+
+  // Re-initialize state when versionedKey changes using the "state during render" pattern
+  if (prevVersionedKey !== versionedKey) {
+    const newValue = readLocalStorage(key, versionedKey, version, defaultValue)
+    setPrevVersionedKey(versionedKey)
+    setValue(newValue)
+  }
 
   // Update localStorage when value changes.
   useEffect(() => {
