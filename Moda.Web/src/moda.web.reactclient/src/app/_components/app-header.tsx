@@ -130,7 +130,7 @@ const AppHeader: FC = React.memo(() => {
               placement="left"
               onClose={() => setDrawerOpen(false)}
               open={drawerOpen}
-              width={280}
+              size={280}
               styles={{
                 body: { padding: 0 },
               }}

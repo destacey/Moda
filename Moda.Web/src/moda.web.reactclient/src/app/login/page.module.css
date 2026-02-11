@@ -9,7 +9,11 @@
   height: 100vh;
   overflow-x: hidden;
   overflow-y: auto;
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-family:
+    'Segoe UI',
+    system-ui,
+    -apple-system,
+    sans-serif;
   background: linear-gradient(135deg, #42a5f5 0%, #2196f3 40%, #1976d2 100%);
   display: flex;
   align-items: center;
@@ -55,7 +59,7 @@
   width: min(66vw, 1100px);
   min-width: 680px;
   min-height: min(82vh, 600px);
-  border-radius: 20px;
+  border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 25px 60px rgba(13, 71, 161, 0.35);
 }
@@ -201,14 +205,18 @@
   gap: 12px;
   padding: 14px 24px;
   border: 1.5px solid #bbdefb;
-  border-radius: 10px;
+  border-radius: 4px;
   background: #fff;
   cursor: pointer;
   transition:
     border-color 0.2s,
     box-shadow 0.2s,
     transform 0.15s;
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-family:
+    'Segoe UI',
+    system-ui,
+    -apple-system,
+    sans-serif;
   font-size: 15px;
   font-weight: 600;
   color: #0d47a1;
@@ -268,8 +276,16 @@
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .pageBackground {
-    padding: 20px 0 60px;
+    padding: 20px 0 calc(60px + env(safe-area-inset-bottom, 0px));
     align-items: flex-start;
+    /* Hide scrollbar on mobile while keeping scroll functionality */
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+
+  /* Hide scrollbar for Chrome, Safari and Opera on mobile */
+  .pageBackground::-webkit-scrollbar {
+    display: none;
   }
 
   .card {
@@ -283,7 +299,7 @@
   }
 
   .leftPanel {
-    padding: 24px 16px;
+    padding: 24px 16px 40px;
     min-height: 300px;
   }
 
@@ -299,7 +315,7 @@
 /* Extra small screens */
 @media (max-width: 480px) {
   .pageBackground {
-    padding: 16px 0 60px;
+    padding: 16px 0 calc(60px + env(safe-area-inset-bottom, 0px));
   }
 
   .card {
@@ -313,7 +329,7 @@
   }
 
   .leftPanel {
-    padding: 20px 12px;
+    padding: 20px 12px 44px;
     min-height: 280px;
   }
 
