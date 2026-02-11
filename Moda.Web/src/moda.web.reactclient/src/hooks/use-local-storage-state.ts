@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 
 export interface UseLocalStorageStateOptions {
   /**
@@ -9,6 +9,67 @@ export interface UseLocalStorageStateOptions {
   version?: number
 }
 
+/**
+ * Helper function to read and initialize localStorage value
+ */
+function readLocalStorage<T>(
+  key: string,
+  versionedKey: string,
+  version: number | undefined,
+  defaultValue: T,
+): T {
+  if (typeof window === 'undefined') {
+    return defaultValue
+  }
+  try {
+    // Try to read versioned key first
+    const storedValue = window.localStorage.getItem(versionedKey)
+    if (storedValue !== null) {
+      return JSON.parse(storedValue)
+    }
+
+    // If versioned key not found and we're using versioning
+    if (version !== undefined) {
+      // Try to migrate from unversioned key
+      const unversionedValue = window.localStorage.getItem(key)
+      let valueToReturn = defaultValue
+
+      if (unversionedValue !== null) {
+        try {
+          valueToReturn = JSON.parse(unversionedValue)
+          // Save migrated value to versioned key
+          window.localStorage.setItem(versionedKey, unversionedValue)
+        } catch {
+          // If parsing fails, use default
+          valueToReturn = defaultValue
+        }
+      }
+
+      // Collect keys to remove (don't modify during iteration)
+      const keysToRemove: string[] = []
+      for (let i = 0; i < window.localStorage.length; i++) {
+        const storageKey = window.localStorage.key(i)
+        // Remove old versioned keys and unversioned key
+        if (
+          (storageKey?.startsWith(`${key}:v`) && storageKey !== versionedKey) ||
+          storageKey === key
+        ) {
+          keysToRemove.push(storageKey)
+        }
+      }
+      // Remove old keys
+      keysToRemove.forEach((k) => window.localStorage.removeItem(k))
+
+      return valueToReturn
+    }
+
+    return defaultValue
+  } catch (error) {
+    console.error(`Error reading localStorage key "${versionedKey}":`, error)
+    return defaultValue
+  }
+}
+
 export const useLocalStorageState = <T>(
   key: string,
   defaultValue: T,
@@ -17,37 +78,21 @@ export const useLocalStorageState = <T>(
   const version = options?.version
   const versionedKey = version !== undefined ? `${key}:v${version}` : key
 
-  const [value, setValue] = useState<T>(() => {
-    if (typeof window === 'undefined') {
-      return defaultValue
-    }
-    try {
-      // Try to read versioned key first
-      const storedValue = window.localStorage.getItem(versionedKey)
-      if (storedValue !== null) {
-        return JSON.parse(storedValue)
-      }
+  // Track the previous versionedKey to detect changes
+  const prevVersionedKeyRef = useRef(versionedKey)
 
-      // If versioned key not found and we're using versioning, clean up old versions
-      if (version !== undefined) {
-        // Collect keys to remove (don't modify during iteration)
-        const keysToRemove: string[] = []
-        for (let i = 0; i < window.localStorage.length; i++) {
-          const storageKey = window.localStorage.key(i)
-          if (storageKey?.startsWith(`${key}:v`) && storageKey !== versionedKey) {
-            keysToRemove.push(storageKey)
-          }
-        }
-        // Remove old versioned keys
-        keysToRemove.forEach((k) => window.localStorage.removeItem(k))
-      }
+  const [value, setValue] = useState<T>(() =>
+    readLocalStorage(key, versionedKey, version, defaultValue),
+  )
 
-      return defaultValue
-    } catch (error) {
-      console.error(`Error reading localStorage key "${versionedKey}":`, error)
-      return defaultValue
+  // Re-initialize state when versionedKey changes (i.e., key or version prop changes)
+  useEffect(() => {
+    if (prevVersionedKeyRef.current !== versionedKey) {
+      const newValue = readLocalStorage(key, versionedKey, version, defaultValue)
+      setValue(newValue)
+      prevVersionedKeyRef.current = versionedKey
     }
-  })
+  }, [key, versionedKey, version, defaultValue])
 
   // Update localStorage when value changes.
   useEffect(() => {
