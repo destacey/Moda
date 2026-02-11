@@ -1,7 +1,11 @@
 /* Page Background */
 .pageBackground {
   min-height: 100vh;
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-family:
+    'Segoe UI',
+    system-ui,
+    -apple-system,
+    sans-serif;
   background: linear-gradient(135deg, #42a5f5 0%, #2196f3 40%, #1976d2 100%);
   display: flex;
   align-items: center;
@@ -47,7 +51,7 @@
 .card {
   width: 100%;
   max-width: 420px;
-  border-radius: 20px;
+  border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 25px 60px rgba(13, 71, 161, 0.35);
   background: #fff;

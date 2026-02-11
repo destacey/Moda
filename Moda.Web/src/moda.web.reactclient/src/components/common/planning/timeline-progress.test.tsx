@@ -13,6 +13,29 @@ jest.mock('./iteration-dates', () => ({
   ),
 }))
 
+// Mock Ant Design Grid useBreakpoint hook
+jest.mock('antd', () => {
+  const actualAntd = jest.requireActual('antd')
+  return {
+    ...actualAntd,
+    Grid: {
+      ...actualAntd.Grid,
+      useBreakpoint: jest.fn(() => ({
+        xs: true,
+        sm: true,
+        md: true, // Default to desktop (md and above)
+        lg: true,
+        xl: true,
+        xxl: true,
+      })),
+    },
+  }
+})
+
+// Get reference to the mocked function after module is loaded
+const { Grid } = jest.requireMock<typeof import('antd')>('antd')
+const mockUseBreakpoint = Grid.useBreakpoint as jest.MockedFunction<typeof Grid.useBreakpoint>
+
 // Mock dayjs to control "now" for consistent tests
 jest.mock('dayjs', () => {
   const originalDayjs = jest.requireActual('dayjs')
@@ -35,6 +58,16 @@ describe('TimelineProgress', () => {
   beforeEach(() => {
     // Set "now" to Nov 1, which is day 7 of 14 (50%)
     ;(dayjs as unknown as { mockedNow: string }).mockedNow = '2025-11-01T12:00:00'
+
+    // Reset the mock to default desktop breakpoints
+    mockUseBreakpoint.mockReturnValue({
+      xs: true,
+      sm: true,
+      md: true, // Default to desktop (md and above)
+      lg: true,
+      xl: true,
+      xxl: true,
+    })
   })
 
   it('renders title, dates, and progress info', () => {
@@ -183,13 +216,32 @@ describe('TimelineProgress', () => {
     expect(screen.getByText('Nov 8 2:45 PM')).toBeInTheDocument()
   })
 
-  it('applies default minWidth style', () => {
+  it('applies default minWidth style on desktop', () => {
     const { container } = render(
       <TimelineProgress start={startDate} end={endDate} />,
     )
 
     const card = container.querySelector('.ant-card')
-    expect(card).toHaveStyle({ minWidth: '300px' })
+    expect(card).toHaveStyle({ minWidth: '275px', width: 'fit-content' })
+  })
+
+  it('applies full width on mobile', () => {
+    // Mock mobile breakpoint (md is false when screen is < 768px)
+    mockUseBreakpoint.mockReturnValueOnce({
+      xs: true,
+      sm: true,
+      md: false, // Mobile/tablet
+      lg: false,
+      xl: false,
+      xxl: false,
+    })
+
+    const { container } = render(
+      <TimelineProgress start={startDate} end={endDate} />,
+    )
+
+    const card = container.querySelector('.ant-card')
+    expect(card).toHaveStyle({ width: '100%' })
   })
 
   it('applies custom styles', () => {

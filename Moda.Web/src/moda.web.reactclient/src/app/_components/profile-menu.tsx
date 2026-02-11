@@ -1,6 +1,6 @@
 'use client'
 
-import { Avatar, Dropdown, MenuProps, Space, Typography } from 'antd'
+import { Avatar, Dropdown, Grid, MenuProps, Space, Typography } from 'antd'
 import {
   FileTextOutlined,
   LogoutOutlined,
@@ -12,11 +12,14 @@ import { useCallback, useMemo } from 'react'
 import useThemeToggleMenuItem from '../../hooks/theme/use-theme-toggle-menu-item'
 
 const { Text } = Typography
+const { useBreakpoint } = Grid
 
 const ProfileMenu = () => {
   const { logout, user } = useAuth()
   const router = useRouter()
   const themeToggleMenuItem = useThemeToggleMenuItem()
+  const screens = useBreakpoint()
+  const isXs = !screens.sm // xs screens (< 576px)
 
   const handleLogout = useCallback(async () => {
     try {
@@ -67,7 +70,7 @@ const ProfileMenu = () => {
   return (
     <>
       <Space>
-        {user?.name && <Text>Welcome, {user.name}</Text>}
+        {user?.name && !isXs && <Text>Welcome, {user.name}</Text>}
         <Dropdown menu={{ items: menuItems }} trigger={['click']}>
           <Avatar icon={<UserOutlined />} />
         </Dropdown>

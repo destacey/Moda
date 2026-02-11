@@ -1,25 +1,26 @@
 # Moda
 
-**Work management system for planning, tracking, and aligning work across organizations.**
+**An intelligent delivery management platform designed to give engineering leaders and teams end-to-end visibility into software delivery.**
 
-Moda helps organizations plan, manage, and create associations across work items, projects, teams, planning intervals, and products. It provides visibility into work execution, helps align teams, and delivers insights for better decision-making.
+When delivery spans multiple teams, projects, and systems, visibility breaks down. Moda brings it all together — tracking work items, aligning teams to planning intervals and products, and surfacing dependencies across the organization.
 
-**Core Philosophy:** Moda serves as a unified hub that synchronizes data from multiple business systems, combines it with capabilities those systems may lack, and connects the dots across all dimensions. This makes it easier to identify dependencies and issues, prioritize effectively, and execute on what matters most.
+**Core Philosophy:** Moda acts as a unified hub that synchronizes data from multiple business systems and combines it with capabilities those systems lack — connecting the dots so teams can see the full picture in one place.
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md)
 
 ## 📚 Documentation
 
-[Full Documentation](https://destacey.github.io/Moda) | [Architecture Overview](CLAUDE.md) | [Contributing Guide](#-contributing)
+[Full Documentation](https://destacey.github.io/Moda) | [Contributing Guide](CONTRIBUTING.md)
 
 ## ✨ Key Features
 
-- **Work Item Management** - Track tasks, bugs, user stories across multiple systems
-- **Team Organization** - Manage teams, team-of-teams, and organizational structure
-- **Planning** - Sprint planning, roadmaps, and planning intervals
-- **Portfolio Management** - Basic project and portfolio tracking (actively evolving)
-- **External Integrations** - Sync with Azure DevOps, Microsoft Graph
-- **Real-time Observability** - Built-in telemetry with .NET Aspire
+- Work Item Management - Track tasks, bugs, user stories, and dependencies across multiple systems
+- Team Organization - Manage teams, team-of-teams, and organizational structure
+- Planning - Planning intervals, sprint planning, and roadmaps
+- Dependency Tracking - Visualize and manage cross-team and cross-project dependencies
+- Portfolio Management - Project and portfolio tracking with organizational alignment
+- External Integrations - Sync teams, work items, iterations, and sprint data from external systems like Azure DevOps on automated cycles
+- Observability - Built-in OpenTelemetry support for tracing, metrics, and logging
 
 ## 🏗️ Technology Stack
 
@@ -233,7 +234,9 @@ See [CLAUDE.md](CLAUDE.md) for detailed architecture documentation.
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please:
+See our [Contributing Guide](CONTRIBUTING.md) for detailed instructions on how to contribute to Moda.
+
+**Quick checklist:**
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
@@ -278,7 +281,7 @@ SecuritySettings__AzureAd__RootIssuer={your root issuer/sts url for AAD}
 SecuritySettings__AzureAd__TenantId={your tenant ID}
 ```
 
-Additionally, by default Moda logs to the console via Serilog. If you wish to configure any of the other supported sinks (currently Seq, Datadog and Application Insights), provide the appropriate Serilog__Using__x and Serilog__WriteTo__x settings as env vars for your moda-api container. An example with DataDog (taken from some TF for the `azurerm_container_app` resource type):
+Additionally, by default Moda logs to the console via Serilog. If you wish to configure any of the other supported sinks (currently Seq, Datadog and Application Insights), provide the appropriate Serilog**Using**x and Serilog**WriteTo**x settings as env vars for your moda-api container. An example with DataDog (taken from some TF for the `azurerm_container_app` resource type):
 
 ```terraform
       env {

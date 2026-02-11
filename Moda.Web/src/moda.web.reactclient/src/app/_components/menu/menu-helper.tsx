@@ -91,6 +91,7 @@ function getItem(
     label: route ? <Link href={route}>{label}</Link> : label,
     type,
     title: null,
+    route, // Attach route as custom property for navigation
   } as MenuItem
 }
 
