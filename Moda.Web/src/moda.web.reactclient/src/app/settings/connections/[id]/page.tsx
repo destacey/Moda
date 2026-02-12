@@ -20,11 +20,12 @@ import BasicBreadcrumb from '@/src/components/common/basic-breadcrumb'
 import { PageActions } from '@/src/components/common'
 import { ItemType } from 'antd/es/menu/interface'
 import {
-  useGetAzdoConnectionQuery,
   useSyncAzdoConnectionOrganizationMutation,
   useUpdateAzdoConnectionSyncStateMutation,
 } from '@/src/store/features/app-integration/azdo-integration-api'
+import { useGetConnectionQuery } from '@/src/store/features/app-integration/connections-api'
 import { useMessage } from '@/src/components/contexts/messaging'
+import { AzureDevOpsConnectionDetailsDto } from '@/src/services/moda-api'
 
 enum ConnectionTabs {
   Details = 'details',
@@ -73,8 +74,15 @@ const ConnectionDetailsPage = (props: { params: Promise<{ id: string }> }) => {
     data: connectionData,
     isLoading,
     refetch,
-  } = useGetAzdoConnectionQuery(id)
-  const azdoOrgUrl = connectionData?.configuration?.organizationUrl
+  } = useGetConnectionQuery(id)
+
+  // Type narrow to AzureDevOpsConnectionDetailsDto
+  // Note: Using connector.name instead of $type because System.Text.Json doesn't add $type for root-level objects
+  const azdoConnection =
+    connectionData?.connector?.name === 'Azure DevOps'
+      ? (connectionData as AzureDevOpsConnectionDetailsDto)
+      : null
+  const azdoOrgUrl = azdoConnection?.configuration?.organizationUrl
 
   const [
     updateAzdoConnectionSyncState,
@@ -89,25 +97,25 @@ const ConnectionDetailsPage = (props: { params: Promise<{ id: string }> }) => {
   const renderTabContent = useCallback(() => {
     switch (activeTab) {
       case ConnectionTabs.Details:
-        return <AzdoConnectionDetails connection={connectionData} />
+        return <AzdoConnectionDetails connection={azdoConnection} />
       case ConnectionTabs.OrganizationConfiguration:
         return (
           <AzdoOrganization
-            workProcesses={connectionData?.configuration?.workProcesses}
-            workspaces={connectionData?.configuration?.workspaces}
+            workProcesses={azdoConnection?.configuration?.workProcesses}
+            workspaces={azdoConnection?.configuration?.workspaces}
           />
         )
       default:
         return null
     }
-  }, [activeTab, connectionData])
+  }, [activeTab, azdoConnection])
 
   const onTabChange = useCallback((tabKey: string) => {
     setActiveTab(tabKey as ConnectionTabs)
   }, [])
 
   useEffect(() => {
-    if (!connectionData) return
+    if (!azdoConnection) return
 
     const breadcrumbRoute: BreadcrumbItem[] = [
       {
@@ -118,12 +126,12 @@ const ConnectionDetailsPage = (props: { params: Promise<{ id: string }> }) => {
         title: 'Connections',
       },
       {
-        title: connectionData.name,
+        title: azdoConnection.name,
       },
     ]
     // TODO: for a split second, the breadcrumb shows the default path route, then the new one.
     dispatch(setBreadcrumbRoute({ route: breadcrumbRoute, pathname }))
-  }, [connectionData, dispatch, pathname])
+  }, [azdoConnection, dispatch, pathname])
 
   const onEditConnectionFormClosed = (wasSaved: boolean) => {
     setOpenEditConnectionForm(false)
@@ -144,14 +152,14 @@ const ConnectionDetailsPage = (props: { params: Promise<{ id: string }> }) => {
     try {
       const response = await updateAzdoConnectionSyncState({
         connectionId: id,
-        isSyncEnabled: !connectionData?.isSyncEnabled,
+        isSyncEnabled: !azdoConnection?.isSyncEnabled,
       })
       if (response.error) {
         throw response.error
       }
       messageApi.success(
         `Sync setting has been ${
-          connectionData?.isSyncEnabled ? 'disabled' : 'enabled'
+          azdoConnection?.isSyncEnabled ? 'disabled' : 'enabled'
         }`,
       )
     } catch (error) {
@@ -159,7 +167,7 @@ const ConnectionDetailsPage = (props: { params: Promise<{ id: string }> }) => {
       messageApi.error(`Failed to change sync setting. Error: ${error.detail}`)
     }
   }, [
-    connectionData?.isSyncEnabled,
+    azdoConnection?.isSyncEnabled,
     messageApi,
     id,
     updateAzdoConnectionSyncState,
@@ -209,14 +217,14 @@ const ConnectionDetailsPage = (props: { params: Promise<{ id: string }> }) => {
       items.push(
         {
           key: 'toggle-sync-setting',
-          label: connectionData?.isSyncEnabled ? 'Disable Sync' : 'Enable Sync',
-          disabled: connectionData && !connectionData.isValidConfiguration,
+          label: azdoConnection?.isSyncEnabled ? 'Disable Sync' : 'Enable Sync',
+          disabled: azdoConnection && !azdoConnection.isValidConfiguration,
           onClick: () => updateSyncState(),
         },
         {
           key: 'sync-organization',
           label: 'Sync Organization Configuration',
-          disabled: connectionData && !connectionData.isValidConfiguration,
+          disabled: azdoConnection && !azdoConnection.isValidConfiguration,
           onClick: () => {
             setIsSyncingOrganization(true)
             syncOrganizationConfiguration()
@@ -228,12 +236,12 @@ const ConnectionDetailsPage = (props: { params: Promise<{ id: string }> }) => {
   }, [
     canDeleteConnections,
     canUpdateConnections,
-    connectionData,
+    azdoConnection,
     syncOrganizationConfiguration,
     updateSyncState,
   ])
 
-  if (!isLoading && !connectionData) {
+  if (!isLoading && !azdoConnection) {
     return notFound()
   }
 
@@ -249,7 +257,7 @@ const ConnectionDetailsPage = (props: { params: Promise<{ id: string }> }) => {
       <PageTitle
         title={
           <>
-            {connectionData?.name}{' '}
+            {azdoConnection?.name}{' '}
             {azdoOrgUrl && (
               <Link
                 href={azdoOrgUrl}
@@ -278,7 +286,7 @@ const ConnectionDetailsPage = (props: { params: Promise<{ id: string }> }) => {
       {openEditConnectionForm && (
         <EditConnectionForm
           showForm={openEditConnectionForm}
-          id={connectionData?.id}
+          id={azdoConnection?.id}
           onFormUpdate={() => onEditConnectionFormClosed(true)}
           onFormCancel={() => onEditConnectionFormClosed(false)}
         />
@@ -286,7 +294,7 @@ const ConnectionDetailsPage = (props: { params: Promise<{ id: string }> }) => {
       {openDeleteConnectionForm && (
         <DeleteAzdoConnectionForm
           showForm={openDeleteConnectionForm}
-          connection={connectionData}
+          connection={azdoConnection}
           onFormSave={() => onDeleteConnectionFormClosed(true)}
           onFormCancel={() => onDeleteConnectionFormClosed(false)}
         />

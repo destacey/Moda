@@ -8,11 +8,11 @@ import {
   TestAzureDevOpsConnectionRequest,
   UpdateAzureDevOpsConnectionRequest,
 } from '@/src/services/moda-api'
+import { useTestAzdoConfigurationMutation } from '@/src/store/features/app-integration/azdo-integration-api'
 import {
-  useGetAzdoConnectionQuery,
-  useTestAzdoConfigurationMutation,
-  useUpdateAzdoConnectionMutation,
-} from '@/src/store/features/app-integration/azdo-integration-api'
+  useGetConnectionQuery,
+  useUpdateConnectionMutation,
+} from '@/src/store/features/app-integration/connections-api'
 import { toFormErrors } from '@/src/utils'
 import { Button, Divider, Form, Input, Modal, Typography } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
@@ -38,6 +38,7 @@ interface EditConnectionFormValues {
 
 const mapToRequestValues = (values: EditConnectionFormValues) => {
   return {
+    $type: 'azure-devops',
     id: values.id,
     name: values.name,
     description: values.description,
@@ -62,9 +63,17 @@ const EditConnectionForm = ({
     useState<string>()
   const [isTestingConfiguration, setTestingConfiguration] = useState(false)
 
-  const { data: connectionData } = useGetAzdoConnectionQuery(id)
+  const { data: connectionData } = useGetConnectionQuery(id)
+
+  // Type narrow to AzureDevOpsConnectionDetailsDto
+  // Note: Using connector.name instead of $type because System.Text.Json doesn't add $type for root-level objects
+  const azdoConnection =
+    connectionData?.connector?.name === 'Azure DevOps'
+      ? (connectionData as AzureDevOpsConnectionDetailsDto)
+      : null
+
   const [updateConnection, { error: updateConnectionError }] =
-    useUpdateAzdoConnectionMutation()
+    useUpdateConnectionMutation()
 
   const { hasClaim } = useAuth()
   const canUpdateConnection = hasClaim(
@@ -145,11 +154,11 @@ const EditConnectionForm = ({
   }, [onFormCancel, form])
 
   useEffect(() => {
-    if (!connectionData) return
+    if (!azdoConnection) return
     if (canUpdateConnection) {
       setIsOpen(showForm)
       if (showForm) {
-        mapToFormValues(connectionData)
+        mapToFormValues(azdoConnection)
       }
     } else {
       onFormCancel()
@@ -157,7 +166,7 @@ const EditConnectionForm = ({
     }
   }, [
     canUpdateConnection,
-    connectionData,
+    azdoConnection,
     mapToFormValues,
     messageApi,
     onFormCancel,

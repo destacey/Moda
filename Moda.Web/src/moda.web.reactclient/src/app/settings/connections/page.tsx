@@ -10,7 +10,7 @@ import Link from 'next/link'
 import { ConnectionListDto } from '@/src/services/moda-api'
 import { ColDef } from 'ag-grid-community'
 import { ItemType } from 'antd/es/menu/interface'
-import { useGetAzdoConnectionsQuery } from '@/src/store/features/app-integration/azdo-integration-api'
+import { useGetConnectionsQuery } from '@/src/store/features/app-integration/connections-api'
 import { ControlItemSwitch } from '../../../components/common/control-items-menu'
 
 const ConnectionLinkCellRenderer = ({ value, data }) => {
@@ -27,7 +27,7 @@ const ConnectionsPage = () => {
     data: connectionsData,
     isLoading,
     refetch,
-  } = useGetAzdoConnectionsQuery(includeDisabled)
+  } = useGetConnectionsQuery(includeDisabled)
 
   const { hasPermissionClaim } = useAuth()
   const canCreateConnection = hasPermissionClaim(
