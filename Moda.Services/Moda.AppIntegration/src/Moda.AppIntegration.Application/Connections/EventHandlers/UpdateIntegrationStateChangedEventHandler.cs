@@ -5,16 +5,10 @@ using Moda.Common.Domain.Events;
 using Serilog.Context;
 
 namespace Moda.AppIntegration.Application.Connections.EventHandlers;
-internal sealed class UpdateIntegrationStateChangedEventHandler : IEventNotificationHandler<IntegrationStateChangedEvent<Guid>>
+internal sealed class UpdateIntegrationStateChangedEventHandler(IAppIntegrationDbContext appIntegrationDbContext, ILogger<UpdateIntegrationStateChangedEventHandler> logger) : IEventNotificationHandler<IntegrationStateChangedEvent<Guid>>
 {
-    private readonly IAppIntegrationDbContext _appIntegrationDbContext;
-    private readonly ILogger<UpdateIntegrationStateChangedEventHandler> _logger;
-
-    public UpdateIntegrationStateChangedEventHandler(IAppIntegrationDbContext appIntegrationDbContext, ILogger<UpdateIntegrationStateChangedEventHandler> logger)
-    {
-        _appIntegrationDbContext = appIntegrationDbContext;
-        _logger = logger;
-    }
+    private readonly IAppIntegrationDbContext _appIntegrationDbContext = appIntegrationDbContext;
+    private readonly ILogger<UpdateIntegrationStateChangedEventHandler> _logger = logger;
 
     public async Task Handle(EventNotification<IntegrationStateChangedEvent<Guid>> notification, CancellationToken cancellationToken)
     {

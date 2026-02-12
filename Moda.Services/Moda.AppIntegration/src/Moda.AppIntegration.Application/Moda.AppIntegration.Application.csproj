@@ -13,4 +13,9 @@
         <ProjectReference Include="..\Moda.AppIntegration.Domain\Moda.AppIntegration.Domain.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <InternalsVisibleTo Include="Moda.AppIntegration.Application.Tests" />
+        <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+    </ItemGroup>
+
 </Project>

@@ -1,6 +1,5 @@
 import axios from 'axios'
 import {
-  AzureDevOpsBoardsConnectionsClient,
   BackgroundJobsClient,
   EmployeesClient,
   HealthChecksClient,
@@ -28,6 +27,8 @@ import {
   ProjectTasksClient,
   StrategicInitiativesClient,
   SprintsClient,
+  ConnectionsClient,
+  AzureDevOpsConnectionsClient,
 } from './moda-api'
 import { tokenRequest } from '@/auth-config'
 import { InteractionRequiredAuthError } from '@azure/msal-browser'
@@ -121,8 +122,10 @@ axiosClient.interceptors.request.use(
 )
 
 // API Clients
-export const getAzureDevOpsBoardsConnectionsClient = () =>
-  new AzureDevOpsBoardsConnectionsClient('', axiosClient)
+export const getConnectionsClient = () => new ConnectionsClient('', axiosClient)
+
+export const getAzureDevOpsConnectionsClient = () =>
+  new AzureDevOpsConnectionsClient('', axiosClient)
 
 export const getBackgroundJobsClient = () =>
   new BackgroundJobsClient('', axiosClient)

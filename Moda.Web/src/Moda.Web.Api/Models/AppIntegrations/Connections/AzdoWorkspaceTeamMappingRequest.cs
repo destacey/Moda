@@ -1,14 +1,16 @@
-﻿namespace Moda.Web.Api.Models.AppIntegrations.Connections;
+﻿using Moda.AppIntegration.Application.Connections.Dtos.AzureDevOps;
+
+namespace Moda.Web.Api.Models.AppIntegrations.Connections;
 
 public sealed record AzdoWorkspaceTeamMappingRequest
 {
     /// <summary>
-    /// The unique identifier for the workspace in the Azure DevOps Boards system.
+    /// The unique identifier for the workspace in the Azure DevOps system.
     /// </summary>
     public Guid WorkspaceId { get; set; }
 
     /// <summary>
-    /// The unique identifier for the team in the Azure DevOps Boards system.
+    /// The unique identifier for the team in the Azure DevOps system.
     /// </summary>
     public Guid TeamId { get; set; }
 

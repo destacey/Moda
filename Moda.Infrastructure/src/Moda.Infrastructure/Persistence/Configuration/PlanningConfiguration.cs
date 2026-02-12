@@ -6,6 +6,7 @@ using Moda.Common.Domain.Enums.Organization;
 using Moda.Common.Domain.Enums.Planning;
 using Moda.Common.Domain.Models;
 using Moda.Common.Domain.Models.Organizations;
+using Moda.Infrastructure.Persistence.Converters;
 using Moda.Planning.Domain.Enums;
 using Moda.Planning.Domain.Models;
 using Moda.Planning.Domain.Models.Iterations;
