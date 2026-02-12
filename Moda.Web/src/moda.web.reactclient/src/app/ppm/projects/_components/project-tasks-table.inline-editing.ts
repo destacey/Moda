@@ -12,6 +12,8 @@ interface UseProjectTasksInlineEditingParams {
   onUpdateTask: (taskId: string, updates: Record<string, any>) => Promise<any>
   fieldErrors: Record<string, string>
   setFieldErrors: (next: Record<string, string>) => void
+  onCancelDraft?: (taskId: string) => void
+  isSelectedRowMilestone?: boolean
 }
 
 export const useProjectTasksInlineEditing = ({
@@ -22,6 +24,8 @@ export const useProjectTasksInlineEditing = ({
   onUpdateTask,
   fieldErrors,
   setFieldErrors,
+  onCancelDraft,
+  isSelectedRowMilestone = false,
 }: UseProjectTasksInlineEditingParams) => {
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null)
   const [selectedCellId, setSelectedCellId] = useState<string | null>(null)
@@ -35,6 +39,7 @@ export const useProjectTasksInlineEditing = ({
   const editableColumns = useMemo(
     () => [
       'name',
+      'type',
       'status',
       'priority',
       'plannedStart',
@@ -55,11 +60,23 @@ export const useProjectTasksInlineEditing = ({
 
   const saveFormChanges = useCallback(
     async (taskId: string) => {
+      const isDraft = taskId.startsWith('draft-')
+      const hasTouchedFields = form.isFieldsTouched()
+
+      // Fast path for existing tasks: if nothing changed, skip validation
+      // and diffing to keep row-to-row navigation responsive.
+      if (!isDraft && !hasTouchedFields) {
+        return true
+      }
+
       try {
         await form.validateFields()
 
         const task = findProjectTaskById(tasks, taskId)
-        if (!task) {
+
+        // For draft tasks, task will be found in the merged tasks list
+        // We always need to save draft tasks
+        if (!task && !isDraft) {
           return false
         }
 
@@ -68,73 +85,106 @@ export const useProjectTasksInlineEditing = ({
         const updates: Record<string, any> = {}
         let hasChanges = false
 
-        if (values.name !== task.name) {
-          updates.name = values.name
-          hasChanges = true
-        }
-        if (values.statusId !== task.status?.id) {
+        // For draft tasks, always save all fields
+        if (isDraft) {
+          updates.name = values.name || ''
+          updates.typeId = values.typeId
           updates.statusId = values.statusId
-          hasChanges = true
-        }
-        if (values.priorityId !== task.priority?.id) {
           updates.priorityId = values.priorityId
-          hasChanges = true
-        }
+          updates.assigneeIds = values.assigneeIds ?? []
 
-        // Compare assignee IDs arrays
-        const taskAssigneeIds = task.assignees?.map((a) => a.id) ?? []
-        const formAssigneeIds = values.assigneeIds ?? []
-        const assigneesChanged =
-          taskAssigneeIds.length !== formAssigneeIds.length ||
-          !taskAssigneeIds.every((id: string) => formAssigneeIds.includes(id))
-        if (assigneesChanged) {
-          updates.assigneeIds = formAssigneeIds
+          // Milestones use plannedDate only; tasks use plannedStart/End only
+          if (isSelectedRowMilestone) {
+            updates.plannedStart = null
+            updates.plannedEnd = null
+            updates.plannedDate = values.plannedDate
+              ? values.plannedDate.format('YYYY-MM-DD')
+              : null
+            updates.progress = null
+            updates.estimatedEffortHours = null
+          } else {
+            updates.plannedStart = values.plannedStart
+              ? values.plannedStart.format('YYYY-MM-DD')
+              : null
+            updates.plannedEnd = values.plannedEnd
+              ? values.plannedEnd.format('YYYY-MM-DD')
+              : null
+            updates.plannedDate = null
+            updates.progress = values.progress ?? 0
+            updates.estimatedEffortHours = values.estimatedEffortHours
+              ? Number(values.estimatedEffortHours)
+              : null
+          }
           hasChanges = true
-        }
+        } else if (task) {
+          // For existing tasks, only send changed fields
+          if (values.name !== task.name) {
+            updates.name = values.name
+            hasChanges = true
+          }
+          if (values.statusId !== task.status?.id) {
+            updates.statusId = values.statusId
+            hasChanges = true
+          }
+          if (values.priorityId !== task.priority?.id) {
+            updates.priorityId = values.priorityId
+            hasChanges = true
+          }
+          // Compare assignee IDs arrays
+          const taskAssigneeIds = task.assignees?.map((a) => a.id) ?? []
+          const formAssigneeIds = values.assigneeIds ?? []
+          const assigneesChanged =
+            taskAssigneeIds.length !== formAssigneeIds.length ||
+            !taskAssigneeIds.every((id: string) => formAssigneeIds.includes(id))
+          if (assigneesChanged) {
+            updates.assigneeIds = formAssigneeIds
+            hasChanges = true
+          }
 
-        const taskPlannedStart = task.plannedStart
-          ? String(task.plannedStart).split('T')[0]
-          : null
-        const plannedStartFormatted = values.plannedStart
-          ? values.plannedStart.format('YYYY-MM-DD')
-          : null
-        if (plannedStartFormatted !== taskPlannedStart) {
-          updates.plannedStart = plannedStartFormatted
-          hasChanges = true
-        }
-
-        const taskPlannedEnd = task.plannedEnd
-          ? String(task.plannedEnd).split('T')[0]
-          : null
-        const plannedEndFormatted = values.plannedEnd
-          ? values.plannedEnd.format('YYYY-MM-DD')
-          : null
-        if (plannedEndFormatted !== taskPlannedEnd) {
-          updates.plannedEnd = plannedEndFormatted
-          hasChanges = true
-        }
-
-        const taskPlannedDate = task.plannedDate
-          ? String(task.plannedDate).split('T')[0]
-          : null
-        const plannedDateFormatted = values.plannedDate
-          ? values.plannedDate.format('YYYY-MM-DD')
-          : null
-        if (plannedDateFormatted !== taskPlannedDate) {
-          updates.plannedDate = plannedDateFormatted
-          hasChanges = true
-        }
-
-        if (values.progress !== task.progress) {
-          updates.progress = values.progress
-          hasChanges = true
-        }
-
-        if (values.estimatedEffortHours !== task.estimatedEffortHours) {
-          updates.estimatedEffortHours = values.estimatedEffortHours
-            ? Number(values.estimatedEffortHours)
+          const taskPlannedStart = task.plannedStart
+            ? String(task.plannedStart).split('T')[0]
             : null
-          hasChanges = true
+          const plannedStartFormatted = values.plannedStart
+            ? values.plannedStart.format('YYYY-MM-DD')
+            : null
+          if (plannedStartFormatted !== taskPlannedStart) {
+            updates.plannedStart = plannedStartFormatted
+            hasChanges = true
+          }
+
+          const taskPlannedEnd = task.plannedEnd
+            ? String(task.plannedEnd).split('T')[0]
+            : null
+          const plannedEndFormatted = values.plannedEnd
+            ? values.plannedEnd.format('YYYY-MM-DD')
+            : null
+          if (plannedEndFormatted !== taskPlannedEnd) {
+            updates.plannedEnd = plannedEndFormatted
+            hasChanges = true
+          }
+
+          const taskPlannedDate = task.plannedDate
+            ? String(task.plannedDate).split('T')[0]
+            : null
+          const plannedDateFormatted = values.plannedDate
+            ? values.plannedDate.format('YYYY-MM-DD')
+            : null
+          if (plannedDateFormatted !== taskPlannedDate) {
+            updates.plannedDate = plannedDateFormatted
+            hasChanges = true
+          }
+
+          if (values.progress !== task.progress) {
+            updates.progress = values.progress
+            hasChanges = true
+          }
+
+          if (values.estimatedEffortHours !== task.estimatedEffortHours) {
+            updates.estimatedEffortHours = values.estimatedEffortHours
+              ? Number(values.estimatedEffortHours)
+              : null
+            hasChanges = true
+          }
         }
 
         if (!hasChanges) {
@@ -150,7 +200,7 @@ export const useProjectTasksInlineEditing = ({
         return false
       }
     },
-    [form, onUpdateTask, tasks],
+    [form, isSelectedRowMilestone, onUpdateTask, tasks],
   )
 
   // Initialize form when row selection changes
@@ -159,22 +209,43 @@ export const useProjectTasksInlineEditing = ({
 
     if (selectedRowId) {
       const task = findProjectTaskById(tasks, selectedRowId)
-      if (task) {
+      const isDraft = selectedRowId.startsWith('draft-')
+
+      if (task || isDraft) {
         form.resetFields()
         setFieldErrors({})
-        const initialValues = {
-          name: task.name,
-          typeId: task.type?.id,
-          statusId: task.status?.id,
-          priorityId: task.priority?.id,
-          assigneeIds: task.assignees?.map((a) => a.id) ?? [],
-          progress: task.progress,
-          plannedStart: task.plannedStart ? dayjs(task.plannedStart) : null,
-          plannedEnd: task.plannedEnd ? dayjs(task.plannedEnd) : null,
-          plannedDate: task.plannedDate ? dayjs(task.plannedDate) : null,
-          estimatedEffortHours: task.estimatedEffortHours,
+
+        // For draft tasks, use default values
+        if (isDraft) {
+          const initialValues = {
+            name: '',
+            typeId: 1, // Task
+            statusId: 1, // Not Started
+            priorityId: 2, // Medium
+            assigneeIds: [],
+            progress: 0,
+            plannedStart: null,
+            plannedEnd: null,
+            plannedDate: null,
+            estimatedEffortHours: null,
+          }
+          form.setFieldsValue(initialValues)
+        } else if (task) {
+          // For existing tasks, load current values
+          const initialValues = {
+            name: task.name,
+            typeId: task.type?.id,
+            statusId: task.status?.id,
+            priorityId: task.priority?.id,
+            assigneeIds: task.assignees?.map((a) => a.id) ?? [],
+            progress: task.progress,
+            plannedStart: task.plannedStart ? dayjs(task.plannedStart) : null,
+            plannedEnd: task.plannedEnd ? dayjs(task.plannedEnd) : null,
+            plannedDate: task.plannedDate ? dayjs(task.plannedDate) : null,
+            estimatedEffortHours: task.estimatedEffortHours,
+          }
+          form.setFieldsValue(initialValues)
         }
-        form.setFieldsValue(initialValues)
         isInitializingRef.current = false
       }
     } else {
@@ -251,9 +322,11 @@ export const useProjectTasksInlineEditing = ({
       )
 
       if (clickedInFilterRow) {
-        await saveFormChanges(selectedRowId)
-        setSelectedRowId(null)
-        setSelectedCellId(null)
+        const saved = await saveFormChanges(selectedRowId)
+        if (saved) {
+          setSelectedRowId(null)
+          setSelectedCellId(null)
+        }
         clickedInTableRef.current = false
         return
       }
@@ -263,9 +336,11 @@ export const useProjectTasksInlineEditing = ({
       )
 
       if (!clickedInTableRef.current && !focusedInTable) {
-        await saveFormChanges(selectedRowId)
-        setSelectedRowId(null)
-        setSelectedCellId(null)
+        const saved = await saveFormChanges(selectedRowId)
+        if (saved) {
+          setSelectedRowId(null)
+          setSelectedCellId(null)
+        }
       }
       clickedInTableRef.current = false
     }
@@ -290,13 +365,26 @@ export const useProjectTasksInlineEditing = ({
         const cellId = currentCellElement.getAttribute('data-cell-id')
         if (!cellId) return
 
-        const parts = cellId.split('-')
-        const columnId = parts.slice(1).join('-')
+        // Extract column name by matching against known editable columns.
+        // Cannot split on '-' because task IDs (UUIDs) also contain hyphens.
+        let columnId = ''
+        for (const col of editableColumns) {
+          if (cellId.endsWith(`-${col}`)) {
+            columnId = col
+            break
+          }
+        }
         const currentColIndex = editableColumns.indexOf(columnId)
         if (currentColIndex === -1) return
 
         e.preventDefault()
         e.stopPropagation()
+
+        // Blur the active element to close any open Select dropdowns
+        // and commit their current value before navigating
+        if (activeElement instanceof HTMLElement) {
+          activeElement.blur()
+        }
 
         const rows = tableRef.current.getRowModel().rows
         const currentRowIndex = rows.findIndex(
@@ -307,21 +395,58 @@ export const useProjectTasksInlineEditing = ({
         let nextRowId: string | null = null
         let nextColId: string | null = null
 
+        // Helper to find the next column that has an editable input for the
+        // given row. Skips columns that render read-only for the row's type
+        // (e.g. milestones don't have plannedEnd, progress, estimatedEffortHours).
+        const findNextEditableCol = (
+          rowId: string,
+          startColIdx: number,
+          direction: 1 | -1,
+        ): string | null => {
+          let idx = startColIdx
+          while (idx >= 0 && idx < editableColumns.length) {
+            const col = editableColumns[idx]
+            const cell = document.querySelector(
+              `[data-cell-id="${rowId}-${col}"]`,
+            )
+            if (
+              cell &&
+              cell.querySelector('input, .ant-select, .ant-picker')
+            ) {
+              return col
+            }
+            idx += direction
+          }
+          return null
+        }
+
         if (e.shiftKey) {
-          if (currentColIndex > 0) {
-            nextColId = editableColumns[currentColIndex - 1]
+          const col = findNextEditableCol(selectedRowId, currentColIndex - 1, -1)
+          if (col) {
+            nextColId = col
             nextRowId = selectedRowId
           } else if (currentRowIndex > 0) {
-            nextColId = editableColumns[editableColumns.length - 1]
-            nextRowId = rows[currentRowIndex - 1].original.id
+            // Wrap to end of previous row — pick last editable column
+            const prevRowId = rows[currentRowIndex - 1].original.id
+            const col = findNextEditableCol(
+              prevRowId,
+              editableColumns.length - 1,
+              -1,
+            )
+            nextColId = col ?? editableColumns[editableColumns.length - 1]
+            nextRowId = prevRowId
           }
         } else {
-          if (currentColIndex < editableColumns.length - 1) {
-            nextColId = editableColumns[currentColIndex + 1]
+          const col = findNextEditableCol(selectedRowId, currentColIndex + 1, 1)
+          if (col) {
+            nextColId = col
             nextRowId = selectedRowId
           } else if (currentRowIndex < rows.length - 1) {
-            nextColId = editableColumns[0]
-            nextRowId = rows[currentRowIndex + 1].original.id
+            // Wrap to start of next row — pick first editable column
+            const nextRow = rows[currentRowIndex + 1].original.id
+            const col = findNextEditableCol(nextRow, 0, 1)
+            nextColId = col ?? editableColumns[0]
+            nextRowId = nextRow
           }
         }
 
@@ -353,10 +478,30 @@ export const useProjectTasksInlineEditing = ({
         (e.key === 'Enter' || e.key === 'ArrowUp' || e.key === 'ArrowDown') &&
         !currentCellElement
       ) {
+        // If a dropdown is still visible, the user is interacting with it
         if (
           document.querySelector(
             '.ant-select-dropdown:not(.ant-select-dropdown-hidden), .ant-picker-dropdown:not(.ant-picker-dropdown-hidden)',
           )
+        ) {
+          return
+        }
+
+        // If focus is still inside the table (e.g. on a Select that just
+        // closed its dropdown, or any other form control), don't navigate.
+        if (activeElement?.closest(`.${tableWrapperClassName}`)) {
+          return
+        }
+
+        // e.target is the original event target (doesn't change even if
+        // focus moves). If the keypress originated from inside a cell's
+        // Select or DatePicker, the user was confirming a selection — not
+        // requesting row navigation.
+        const eventTarget = e.target as HTMLElement
+        if (
+          eventTarget?.closest?.('[data-cell-id]') ||
+          eventTarget?.closest?.('.ant-select') ||
+          eventTarget?.closest?.('.ant-picker')
         ) {
           return
         }
@@ -382,7 +527,8 @@ export const useProjectTasksInlineEditing = ({
         }
 
         if (targetRowId) {
-          await saveFormChanges(selectedRowId)
+          const saved = await saveFormChanges(selectedRowId)
+          if (!saved) return
           setSelectedRowId(targetRowId)
           setSelectedCellId(`${targetRowId}-name`)
         }
@@ -393,7 +539,13 @@ export const useProjectTasksInlineEditing = ({
     return () => {
       document.removeEventListener('keydown', handleGlobalKeyDown, true)
     }
-  }, [editableColumns, isSaving, saveFormChanges, selectedRowId])
+  }, [
+    editableColumns,
+    isSaving,
+    saveFormChanges,
+    selectedRowId,
+    tableWrapperClassName,
+  ])
 
   const handleKeyDown = useCallback(
     async (e: React.KeyboardEvent, rowId: string, columnId: string) => {
@@ -418,25 +570,31 @@ export const useProjectTasksInlineEditing = ({
 
       switch (e.key) {
         case 'Enter':
+          // If a dropdown is open, Enter should confirm selection inside that
+          // control and must not trigger save/navigation.
           if (
             document.querySelector(
-              '.ant-select-dropdown:not(.ant-select-dropdown-hidden)',
+              '.ant-select-dropdown:not(.ant-select-dropdown-hidden), .ant-picker-dropdown:not(.ant-picker-dropdown-hidden)',
             )
           ) {
             return
           }
           e.preventDefault()
-          if (currentRowIndex < rows.length - 1) {
-            const saved = await saveFormChanges(selectedRowId)
-            if (saved) {
+          const saved = await saveFormChanges(selectedRowId)
+          if (saved) {
+            // If there's a next row, move to it
+            if (currentRowIndex < rows.length - 1) {
               nextRowId = rows[currentRowIndex + 1].original.id
               nextColId = editableColumns[0]
               setSelectedRowId(nextRowId)
               setSelectedCellId(`${nextRowId}-${nextColId}`)
+            } else {
+              // If this was the last row, exit edit mode
+              setSelectedRowId(null)
+              setSelectedCellId(null)
             }
-            return
           }
-          break
+          return
 
         case 'ArrowUp':
           if (
@@ -478,6 +636,10 @@ export const useProjectTasksInlineEditing = ({
 
         case 'Escape':
           e.preventDefault()
+          // If this is a draft task, cancel it
+          if (rowId.startsWith('draft-') && onCancelDraft) {
+            onCancelDraft(rowId)
+          }
           setSelectedRowId(null)
           setSelectedCellId(null)
           return
@@ -485,6 +647,12 @@ export const useProjectTasksInlineEditing = ({
         case 'Tab':
           e.preventDefault()
           e.stopPropagation()
+
+          // Blur the active element to close any open Select dropdowns
+          // and commit their current value before navigating
+          if (document.activeElement instanceof HTMLElement) {
+            document.activeElement.blur()
+          }
 
           const findNextAvailableField = (
             startRowId: string,
@@ -505,10 +673,16 @@ export const useProjectTasksInlineEditing = ({
                 const testRowId = rows[currentRowIdx].original.id
                 const testColId = editableColumns[currentColIdx]
                 const cellElement = document.querySelector(
-                  `[data-cell-id*="-${testColId}"]`,
+                  `[data-cell-id="${testRowId}-${testColId}"]`,
                 )
 
-                if (cellElement) {
+                // Only consider this cell if it has an actual editable input
+                if (
+                  cellElement &&
+                  cellElement.querySelector(
+                    'input, .ant-select, .ant-picker',
+                  )
+                ) {
                   return { rowId: testRowId, colId: testColId }
                 }
 
@@ -583,7 +757,7 @@ export const useProjectTasksInlineEditing = ({
         }, 10)
       }
     },
-    [editableColumns, isSaving, saveFormChanges, selectedRowId],
+    [editableColumns, isSaving, onCancelDraft, saveFormChanges, selectedRowId],
   )
 
   const handleRowClick = useCallback(
