@@ -1,4 +1,4 @@
-using Moda.Common.Extensions;
+﻿using Moda.Common.Extensions;
 
 namespace Moda.AppIntegration.Domain.Models.OpenAI;
 
@@ -11,40 +11,19 @@ public class OpenAIConnection : Connection<OpenAIConnectionConfiguration>
     private OpenAIConnection(
         string name,
         string? description,
-        string? systemId,
         bool configurationIsValid,
         OpenAIConnectionConfiguration configuration)
     {
         Name = name;
         Description = description;
-        SystemId = systemId;
         IsValidConfiguration = configurationIsValid;
-        Connector = Moda.Common.Domain.Enums.AppIntegrations.Connector.AzureOpenAI;
+        Connector = Moda.Common.Domain.Enums.AppIntegrations.Connector.OpenAI;
         Configuration = Guard.Against.Null(configuration, nameof(Configuration));
     }
 
     public override OpenAIConnectionConfiguration Configuration { get; protected set; }
 
     public override bool HasActiveIntegrationObjects => IsValidConfiguration;
-
-    public static OpenAIConnection Create(
-        string name,
-        string? description,
-        string? systemId,
-        OpenAIConnectionConfiguration configuration,
-        Instant timestamp)
-    {
-        var connection = new OpenAIConnection(
-            name,
-            description,
-            systemId,
-            configuration.ApiKey.Length > 0 && configuration.ModelName.Length > 0,
-            configuration);
-
-        connection.AddDomainEvent(EntityCreatedEvent.WithEntity(connection, timestamp));
-
-        return connection;
-    }
 
     public Result Update(string name, string? description, string apiKey, string organization, string project, string modelName, bool configurationIsValid, Instant timestamp)
     {
@@ -97,5 +76,22 @@ public class OpenAIConnection : Connection<OpenAIConnectionConfiguration>
             || Configuration.ProjectId != project.Trim()
             || Configuration.ModelName != modelName.Trim()
             || IsValidConfiguration != configurationIsValid; // Assuming OpenAIConnectionConfiguration has an appropriate Equals method
+    }
+
+    public static OpenAIConnection Create(
+        string name,
+        string? description,
+        OpenAIConnectionConfiguration configuration,
+        Instant timestamp)
+    {
+        var connection = new OpenAIConnection(
+            name,
+            description,
+            configuration.ApiKey.Length > 0 && configuration.ModelName.Length > 0,
+            configuration);
+
+        connection.AddDomainEvent(EntityCreatedEvent.WithEntity(connection, timestamp));
+
+        return connection;
     }
 }

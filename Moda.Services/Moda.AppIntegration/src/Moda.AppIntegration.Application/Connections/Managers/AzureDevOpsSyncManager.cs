@@ -52,14 +52,14 @@ public sealed class AzureDevOpsSyncManager(ILogger<AzureDevOpsSyncManager> logge
             try
             {
                 var connections = await _sender.Send(new GetConnectionsQuery(false, Connector.AzureDevOps), cancellationToken);
-                if (!connections.Any(c => c.IsValidConfiguration && c.IsSyncEnabled))
+                if (!connections.Any(c => c.IsValidConfiguration && c.IsSyncEnabled == true))
                 {
                     var message = "No active Azure DevOps connections found.";
                     _logger.LogInformation(message);
                     return Result.Failure(message);
                 }
 
-                var activeConnections = connections.Where(c => c.IsValidConfiguration && c.IsSyncEnabled).ToList();
+                var activeConnections = connections.Where(c => c.IsValidConfiguration && c.IsSyncEnabled == true).ToList();
 
                 // TODO: convert to a sync result object that can be returned to hangfire
                 var activeConnectionsCount = activeConnections.Count;

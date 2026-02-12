@@ -1,28 +1,16 @@
 ﻿using Mapster;
 using Microsoft.EntityFrameworkCore;
+using Moda.AppIntegration.Application.Connections.Dtos.AzureDevOps;
+using Moda.AppIntegration.Application.Connections.Dtos.AzureOpenAI;
+using Moda.AppIntegration.Domain.Models.AzureOpenAI;
 using Moda.Common.Domain.Enums.AppIntegrations;
 
 namespace Moda.AppIntegration.Application.Connections.Queries;
-public sealed record GetConnectionsQuery : IQuery<IReadOnlyList<ConnectionListDto>>
+public sealed record GetConnectionsQuery(bool IncludeInactive = false, Connector? Type = null) : IQuery<IReadOnlyList<ConnectionListDto>>;
+
+internal sealed class GetConnectionsQueryHandler(IAppIntegrationDbContext appIntegrationDbContext) : IQueryHandler<GetConnectionsQuery, IReadOnlyList<ConnectionListDto>>
 {
-    public GetConnectionsQuery(bool includeInactive = false, Connector? type = null)
-    {
-        IncludeInactive = includeInactive;
-        Type = type;
-    }
-
-    public bool IncludeInactive { get; }
-    public Connector? Type { get; }
-}
-
-internal sealed class GetConnectionsQueryHandler : IQueryHandler<GetConnectionsQuery, IReadOnlyList<ConnectionListDto>>
-{
-    private readonly IAppIntegrationDbContext _appIntegrationDbContext;
-
-    public GetConnectionsQueryHandler(IAppIntegrationDbContext appIntegrationDbContext)
-    {
-        _appIntegrationDbContext = appIntegrationDbContext;
-    }
+    private readonly IAppIntegrationDbContext _appIntegrationDbContext = appIntegrationDbContext;
 
     public async Task<IReadOnlyList<ConnectionListDto>> Handle(GetConnectionsQuery request, CancellationToken cancellationToken)
     {
@@ -34,6 +22,15 @@ internal sealed class GetConnectionsQueryHandler : IQueryHandler<GetConnectionsQ
         if (request.Type.HasValue)
             query = query.Where(c => c.Connector == request.Type.Value);
 
-        return await query.ProjectToType<ConnectionListDto>().ToListAsync(cancellationToken);
+        // Load to memory first to avoid Mapster projection issues with ISyncableConnection interface
+        var connections = await query.ToListAsync(cancellationToken);
+
+        // Map each connection to its appropriate derived DTO type for polymorphic serialization
+        return connections.Select(connection => connection switch
+        {
+            AzureDevOpsBoardsConnection azdo => (ConnectionListDto)azdo.Adapt<AzureDevOpsConnectionListDto>(),
+            AzureOpenAIConnection aoai => aoai.Adapt<AzureOpenAIConnectionListDto>(),
+            _ => connection.Adapt<ConnectionListDto>()
+        }).ToList();
     }
 }

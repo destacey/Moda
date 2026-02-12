@@ -8,10 +8,13 @@ using Moda.Common.Application.Dtos;
 
 namespace Moda.AppIntegration.Application.Connections.Dtos;
 
-[JsonDerivedType(typeof(ConnectionListDto), typeDiscriminator: "connection")]
-[JsonDerivedType(typeof(AzureDevOpsConnectionListDto), typeDiscriminator: "azure-devops")]
-[JsonDerivedType(typeof(AzureOpenAIConnectionListDto), typeDiscriminator: "azure-openai")]
-public record ConnectionListDto : IMapFrom<Connection>
+[JsonPolymorphic(TypeDiscriminatorPropertyName = "$type")]
+//[JsonDerivedType(typeof(ConnectionDetailsDto), typeDiscriminator: "connection")]
+[JsonDerivedType(typeof(AzureDevOpsConnectionDetailsDto), typeDiscriminator: "azure-devops")]
+[JsonDerivedType(typeof(AzureOpenAIConnectionDetailsDto), typeDiscriminator: "azure-openai")]
+// Note: OpenAI discriminator reserved for future implementation
+// [JsonDerivedType(typeof(OpenAIConnectionDetailsDto), typeDiscriminator: "openai")]
+public record ConnectionDetailsDto : IMapFrom<Connection>
 {
     /// <summary>
     /// The unique identifier for the connection.
@@ -24,10 +27,9 @@ public record ConnectionListDto : IMapFrom<Connection>
     public required string Name { get; set; }
 
     /// <summary>
-    /// The unique identifier for the system that this connection connects to.
-    /// Only applicable to syncable connections (Work Management connectors).
+    /// The connection description.
     /// </summary>
-    public string? SystemId { get; set; }
+    public string? Description { get; set; }
 
     /// <summary>
     /// The type of connector for the connection. This value cannot be changed once set.
@@ -45,26 +47,19 @@ public record ConnectionListDto : IMapFrom<Connection>
     public bool IsValidConfiguration { get; set; }
 
     /// <summary>
-    /// The indicator for whether the connection is enabled for synchronization.
-    /// Only applicable to syncable connections (Work Management connectors).
-    /// </summary>
-    public bool? IsSyncEnabled { get; set; }
-
-    /// <summary>
     /// Indicates whether the connection can currently sync.
     /// Only applicable to syncable connections (Work Management connectors).
+    /// Requires: IsActive && IsValidConfiguration && IsSyncEnabled && HasActiveIntegrationObjects
     /// </summary>
     public bool? CanSync { get; set; }
 
     public virtual void ConfigureMapping(TypeAdapterConfig config)
     {
-        // Configure base mapping with derived type includes
-        config.NewConfig<Connection, ConnectionListDto>()
-            .Include<AzureDevOpsBoardsConnection, AzureDevOpsConnectionListDto>()
-            .Include<AzureOpenAIConnection, AzureOpenAIConnectionListDto>()
+        config.NewConfig<Connection, ConnectionDetailsDto>()
+            .Include<AzureDevOpsBoardsConnection, AzureDevOpsConnectionDetailsDto>()
+            .Include<AzureOpenAIConnection, AzureOpenAIConnectionDetailsDto>()
+            // OpenAI mapping reserved for future: .Include<OpenAIConnection, OpenAIConnectionDetailsDto>()
             .Map(dest => dest.Connector, src => SimpleNavigationDto.FromEnum(src.Connector))
-            .Map(dest => dest.SystemId, src => (src as ISyncableConnection) != null ? ((ISyncableConnection)src).SystemId : null)
-            .Map(dest => dest.IsSyncEnabled, src => (src as ISyncableConnection) != null ? ((ISyncableConnection)src).IsSyncEnabled : (bool?)null)
             .Map(dest => dest.CanSync, src => (src as ISyncableConnection) != null ? ((ISyncableConnection)src).CanSync : (bool?)null);
     }
 }

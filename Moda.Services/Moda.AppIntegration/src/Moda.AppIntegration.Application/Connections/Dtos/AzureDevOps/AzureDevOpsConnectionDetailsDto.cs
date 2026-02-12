@@ -1,33 +1,19 @@
 ﻿using Mapster;
-using Moda.Common.Application.Dtos;
 
 namespace Moda.AppIntegration.Application.Connections.Dtos.AzureDevOps;
-public sealed record AzureDevOpsConnectionDetailsDto : IMapFrom<AzureDevOpsBoardsConnection>
+
+public sealed record AzureDevOpsConnectionDetailsDto : ConnectionDetailsDto, IMapFrom<AzureDevOpsBoardsConnection>
 {
-    /// <summary>
-    /// The unique identifier for the connection.
-    /// </summary>
-    public Guid Id { get; set; }
 
     /// <summary>
-    /// The name of the connection.
-    /// </summary>
-    public required string Name { get; set; }
-
-    /// <summary>
-    /// The connection description.
-    /// </summary>
-    public string? Description { get; set; }
-
-    /// <summary>
-    /// The unique identifier for the system that this connection connects to. 
+    /// The unique identifier for the external system that this connection connects to.
     /// </summary>
     public string? SystemId { get; set; }
 
     /// <summary>
-    /// The type of connector for the connection.  This value cannot be changed once set.
+    /// The indicator for whether the connection is enabled for synchronization.
     /// </summary>
-    public required SimpleNavigationDto Connector { get; set; }
+    public bool IsSyncEnabled { get; set; }
 
     /// <summary>
     /// The configuration for the connection.
@@ -39,24 +25,9 @@ public sealed record AzureDevOpsConnectionDetailsDto : IMapFrom<AzureDevOpsBoard
     /// </summary>
     public required AzureDevOpsTeamConfigurationDto TeamConfiguration { get; set; }
 
-    /// <summary>
-    /// Indicates whether the connection is active or not.  Inactive connections are not included in the synchronization process.
-    /// </summary>
-    public bool IsActive { get; set; }
-
-    /// <summary>
-    /// A flag indicating whether the connection configuration is valid.
-    /// </summary>
-    public bool IsValidConfiguration { get; set; }
-
-    /// <summary>
-    /// The indicator for whether the connection is enabled for synchronization.
-    /// </summary>
-    public bool IsSyncEnabled { get; set; }
-
-    public void ConfigureMapping(TypeAdapterConfig config)
+    public override void ConfigureMapping(TypeAdapterConfig config)
     {
         config.NewConfig<AzureDevOpsBoardsConnection, AzureDevOpsConnectionDetailsDto>()
-            .Map(dest => dest.Connector, src => SimpleNavigationDto.FromEnum(src.Connector));
+            .Inherits<Connection, ConnectionDetailsDto>();
     }
 }

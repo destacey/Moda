@@ -1,11 +1,13 @@
-﻿using Moda.Common.Application.Interfaces.ExternalWork;
+﻿using Moda.AppIntegration.Domain.Interfaces;
+using Moda.Common.Application.Interfaces.ExternalWork;
 using Moda.Common.Domain.Enums.AppIntegrations;
 using Moda.Common.Domain.Models;
 using Moda.Common.Extensions;
 
 namespace Moda.AppIntegration.Domain.Models;
-public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsConnectionConfiguration>
+public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsConnectionConfiguration>, ISyncableConnection
 {
+    private string? _systemId;
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     private AzureDevOpsBoardsConnection() { }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
@@ -25,9 +27,39 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
 
     public AzureDevOpsBoardsTeamConfiguration TeamConfiguration { get; private set; }
 
+    // ISyncableConnection implementation
+    public string? SystemId
+    {
+        get => _systemId;
+        private set => _systemId = value?.Trim();
+    }
+
+    public bool IsSyncEnabled { get; private set; } = false;
+
+    public bool CanSync => IsActive
+        && IsValidConfiguration
+        && IsSyncEnabled
+        && HasActiveIntegrationObjects;
+
     public override bool HasActiveIntegrationObjects => IsValidConfiguration
         && (Configuration.WorkProcesses.Any(p => p.IntegrationIsActive)
         || Configuration.Workspaces.Any(p => p.IntegrationIsActive));
+
+    public Result SetSyncState(bool isEnabled, Instant timestamp)
+    {
+        if (isEnabled)
+        {
+            if (!IsValidConfiguration)
+                return Result.Failure("Unable to enable sync. Configuration is invalid.");
+
+            if (!HasActiveIntegrationObjects)
+                return Result.Failure("Unable to enable sync. No active integration objects.");
+        }
+
+        IsSyncEnabled = isEnabled;
+        AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
+        return Result.Success();
+    }
 
     public Result Update(string name, string? description, string organization, string personalAccessToken, bool configurationIsValid, Instant timestamp)
     {
@@ -68,7 +100,7 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
     /// <returns></returns>
     public Result SetSystemId(string systemId)
     {
-        if (SystemId is not null)
+        if (!string.IsNullOrWhiteSpace(SystemId))
         {
             return SystemId == systemId?.Trim()
                 ? Result.Success()
