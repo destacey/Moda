@@ -1,28 +1,18 @@
 ﻿namespace Moda.Web.Api.Models.AppIntegrations.Connections;
 
-public sealed record CreateAzureDevOpsConnectionRequest
+public sealed record CreateAzureDevOpsConnectionRequest : CreateConnectionRequest
 {
-    /// <summary>
-    /// The name of the connection.
-    /// </summary>
-    public string Name { get; set; } = default!;
-
-    /// <summary>
-    /// The description of the connection.
-    /// </summary>
-    public string? Description { get; set; }
-
     /// <summary>
     /// The Azure DevOps Organization name.
     /// </summary>
-    public string Organization { get; set; } = default!;
+    public required string Organization { get; set; }
 
     /// <summary>
     /// The personal access token that enables access to Azure DevOps data.
     /// </summary>
-    public string PersonalAccessToken { get; set; } = default!;
+    public required string PersonalAccessToken { get; set; }
 
-    public CreateAzureDevOpsConnectionCommand ToCreateAzureDevOpsBoardsConnectionCommand()
+    public CreateAzureDevOpsConnectionCommand ToCommand()
         => new(Name, Description, Organization, PersonalAccessToken);
 }
 
@@ -32,12 +22,7 @@ public sealed class CreateAzureDevOpsConnectionRequestValidator : CustomValidato
     {
         RuleLevelCascadeMode = CascadeMode.Stop;
 
-        RuleFor(c => c.Name)
-            .NotEmpty()
-            .MaximumLength(256);
-
-        RuleFor(c => c.Description)
-            .MaximumLength(1024);
+        Include(new CreateConnectionRequestValidator());
 
         RuleFor(c => c.Organization)
             .NotEmpty()

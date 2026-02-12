@@ -2,29 +2,19 @@
 
 namespace Moda.Web.Api.Models.AppIntegrations.Connections;
 
-public sealed record UpdateAzureDevOpsConnectionRequest
+public sealed record UpdateAzureDevOpsConnectionRequest : UpdateConnectionRequest
 {
-    /// <summary>Gets or sets the identifier.</summary>
-    /// <value>The identifier.</value>
-    public Guid Id { get; set; }
+    /// <summary>
+    /// The Azure DevOps Organization name.
+    /// </summary>
+    public required string Organization { get; set; }
 
-    /// <summary>Gets or sets the name of the connection.</summary>
-    /// <value>The name of the connection.</value>
-    public string Name { get; set; } = default!;
+    /// <summary>
+    /// The personal access token that enables access to Azure DevOps data.
+    /// </summary>
+    public required string PersonalAccessToken { get; set; }
 
-    /// <summary>Gets or sets the description.</summary>
-    /// <value>The connection description.</value>
-    public string? Description { get; set; }
-
-    /// <summary>Gets the organization.</summary>
-    /// <value>The Azure DevOps Organization name.</value>
-    public string Organization { get; set; } = default!;
-
-    /// <summary>Gets the personal access token.</summary>
-    /// <value>The personal access token that enables access to Azure DevOps data.</value>
-    public string PersonalAccessToken { get; set; } = default!;
-
-    public UpdateAzureDevOpsConnectionCommand ToUpadateAzureDevOpsBoardsConnectionCommand()
+    public UpdateAzureDevOpsConnectionCommand ToCommand()
         => new(Id, Name, Description, Organization, PersonalAccessToken);
 }
 
@@ -34,12 +24,7 @@ public sealed class UpdateAzureDevOpsConnectionRequestValidator : CustomValidato
     {
         RuleLevelCascadeMode = CascadeMode.Stop;
 
-        RuleFor(c => c.Name)
-            .NotEmpty()
-            .MaximumLength(256);
-
-        RuleFor(c => c.Description)
-            .MaximumLength(1024);
+        Include(new UpdateConnectionRequestValidator());
 
         RuleFor(c => c.Organization)
             .NotEmpty()

@@ -17797,329 +17797,11 @@ export class AzureDevOpsConnectionsClient {
     }
 
     /**
-     * Get a list of all Azure DevOps connections.
-     * @param includeDisabled (optional) 
-     */
-    getList(includeDisabled?: boolean | undefined, cancelToken?: CancelToken): Promise<ConnectionListDto[]> {
-        let url_ = this.baseUrl + "/api/app-integrations/azure-devops?";
-        if (includeDisabled === null)
-            throw new globalThis.Error("The parameter 'includeDisabled' cannot be null.");
-        else if (includeDisabled !== undefined)
-            url_ += "includeDisabled=" + encodeURIComponent("" + includeDisabled) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "GET",
-            url: url_,
-            headers: {
-                "Accept": "application/json"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processGetList(_response);
-        });
-    }
-
-    protected processGetList(response: AxiosResponse): Promise<ConnectionListDto[]> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = JSON.parse(resultData200);
-            return Promise.resolve<ConnectionListDto[]>(result200);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = JSON.parse(resultData400);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<ConnectionListDto[]>(null as any);
-    }
-
-    /**
-     * Create an Azure DevOps connection.
-     */
-    create(request: CreateAzureDevOpsConnectionRequest, cancelToken?: CancelToken): Promise<string> {
-        let url_ = this.baseUrl + "/api/app-integrations/azure-devops";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(request);
-
-        let options_: AxiosRequestConfig = {
-            data: content_,
-            method: "POST",
-            url: url_,
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processCreate(_response);
-        });
-    }
-
-    protected processCreate(response: AxiosResponse): Promise<string> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 201) {
-            const _responseText = response.data;
-            let result201: any = null;
-            let resultData201  = _responseText;
-            result201 = JSON.parse(resultData201);
-            return Promise.resolve<string>(result201);
-
-        } else if (status === 422) {
-            const _responseText = response.data;
-            let result422: any = null;
-            let resultData422  = _responseText;
-            result422 = JSON.parse(resultData422);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<string>(null as any);
-    }
-
-    /**
-     * Get Azure DevOps connection based on id.
-     */
-    getById(id: string, cancelToken?: CancelToken): Promise<AzureDevOpsConnectionDetailsDto> {
-        let url_ = this.baseUrl + "/api/app-integrations/azure-devops/{id}";
-        if (id === undefined || id === null)
-            throw new globalThis.Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id));
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "GET",
-            url: url_,
-            headers: {
-                "Accept": "application/json"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processGetById(_response);
-        });
-    }
-
-    protected processGetById(response: AxiosResponse): Promise<AzureDevOpsConnectionDetailsDto> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = JSON.parse(resultData200);
-            return Promise.resolve<AzureDevOpsConnectionDetailsDto>(result200);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = JSON.parse(resultData400);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
-
-        } else if (status === 404) {
-            const _responseText = response.data;
-            let result404: any = null;
-            let resultData404  = _responseText;
-            result404 = JSON.parse(resultData404);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<AzureDevOpsConnectionDetailsDto>(null as any);
-    }
-
-    /**
-     * Update an Azure DevOps connection.
-     */
-    update(id: string, request: UpdateAzureDevOpsConnectionRequest, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/app-integrations/azure-devops/{id}";
-        if (id === undefined || id === null)
-            throw new globalThis.Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id));
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(request);
-
-        let options_: AxiosRequestConfig = {
-            data: content_,
-            method: "PUT",
-            url: url_,
-            headers: {
-                "Content-Type": "application/json",
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processUpdate(_response);
-        });
-    }
-
-    protected processUpdate(response: AxiosResponse): Promise<void> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 204) {
-            const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = JSON.parse(resultData400);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
-
-        } else if (status === 422) {
-            const _responseText = response.data;
-            let result422: any = null;
-            let resultData422  = _responseText;
-            result422 = JSON.parse(resultData422);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<void>(null as any);
-    }
-
-    /**
-     * Delete an Azure DevOps connection.
-     */
-    delete(id: string, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/app-integrations/azure-devops/{id}";
-        if (id === undefined || id === null)
-            throw new globalThis.Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id));
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "DELETE",
-            url: url_,
-            headers: {
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processDelete(_response);
-        });
-    }
-
-    protected processDelete(response: AxiosResponse): Promise<void> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 204) {
-            const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = JSON.parse(resultData400);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<void>(null as any);
-    }
-
-    /**
-     * Update an Azure DevOps connection sync state.
+     * Enable/disable sync for Azure DevOps connection.
      * @param isSyncEnabled (optional) 
      */
     updateSyncState(id: string, isSyncEnabled?: boolean | undefined, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/app-integrations/azure-devops/{id}/sync-state?";
+        let url_ = this.baseUrl + "/api/app-integrations/connections/azure-devops/{id}/sync-state?";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -18169,12 +17851,62 @@ export class AzureDevOpsConnectionsClient {
             result400 = JSON.parse(resultData400);
             return throwException("A server side error occurred.", status, _responseText, _headers, result400);
 
-        } else if (status === 422) {
+        } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
-            let result422: any = null;
-            let resultData422  = _responseText;
-            result422 = JSON.parse(resultData422);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Sync Azure DevOps organization processes and projects.
+     */
+    syncOrganizationConfiguration(id: string, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/app-integrations/connections/azure-devops/{id}/sync-organization";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "POST",
+            url: url_,
+            headers: {
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processSyncOrganizationConfiguration(_response);
+        });
+    }
+
+    protected processSyncOrganizationConfiguration(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
@@ -18184,11 +17916,133 @@ export class AzureDevOpsConnectionsClient {
     }
 
     /**
-     * Get Azure DevOps connection teams based on id.
+     * Initialize Azure DevOps work process integration.
+     */
+    initWorkProcessIntegration(id: string, request: InitWorkProcessIntegrationRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/app-integrations/connections/azure-devops/{id}/init-work-process";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processInitWorkProcessIntegration(_response);
+        });
+    }
+
+    protected processInitWorkProcessIntegration(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Initialize Azure DevOps workspace integration.
+     */
+    initWorkspaceIntegration(id: string, request: InitWorkspaceIntegrationRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/app-integrations/connections/azure-devops/{id}/init-workspace";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processInitWorkspaceIntegration(_response);
+        });
+    }
+
+    protected processInitWorkspaceIntegration(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Get Azure DevOps connection teams.
      * @param workspaceId (optional) 
      */
     getConnectionTeams(id: string, workspaceId?: string | null | undefined, cancelToken?: CancelToken): Promise<AzureDevOpsWorkspaceTeamDto[]> {
-        let url_ = this.baseUrl + "/api/app-integrations/azure-devops/{id}/teams?";
+        let url_ = this.baseUrl + "/api/app-integrations/connections/azure-devops/{id}/teams?";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -18248,10 +18102,10 @@ export class AzureDevOpsConnectionsClient {
     }
 
     /**
-     * Update Azure DevOps connection team mappings.
+     * Update Azure DevOps team mappings.
      */
     mapConnectionTeams(id: string, request: AzdoConnectionTeamMappingsRequest, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/app-integrations/azure-devops/{id}/teams";
+        let url_ = this.baseUrl + "/api/app-integrations/connections/azure-devops/{id}/teams";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -18312,7 +18166,7 @@ export class AzureDevOpsConnectionsClient {
      * Test Azure DevOps connection configuration.
      */
     testConfig(request: TestAzureDevOpsConnectionRequest, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/app-integrations/azure-devops/test";
+        let url_ = this.baseUrl + "/api/app-integrations/connections/azure-devops/test";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(request);
@@ -18365,72 +18219,26 @@ export class AzureDevOpsConnectionsClient {
         }
         return Promise.resolve<void>(null as any);
     }
+}
 
-    /**
-     * Sync Azure DevOps processes and projects.
-     */
-    syncOrganizationConfiguration(id: string, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/app-integrations/azure-devops/{id}/sync-organization-configuration";
-        if (id === undefined || id === null)
-            throw new globalThis.Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id));
-        url_ = url_.replace(/[?&]$/, "");
+export class AzureOpenAIConnectionsClient {
+    protected instance: AxiosInstance;
+    protected baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
-        let options_: AxiosRequestConfig = {
-            method: "POST",
-            url: url_,
-            headers: {
-            },
-            cancelToken
-        };
+    constructor(baseUrl?: string, instance?: AxiosInstance) {
 
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processSyncOrganizationConfiguration(_response);
-        });
-    }
+        this.instance = instance || axios.create();
 
-    protected processSyncOrganizationConfiguration(response: AxiosResponse): Promise<void> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 204) {
-            const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
+        this.baseUrl = baseUrl ?? "";
 
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = JSON.parse(resultData400);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<void>(null as any);
     }
 
     /**
-     * Initialize Azure DevOps project integration as a Moda workspace.
+     * Test Azure OpenAI connection configuration.
      */
-    initWorkProcesssIntegration(id: string, request: InitWorkProcessIntegrationRequest, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/app-integrations/azure-devops/{id}/init-work-process-integration";
-        if (id === undefined || id === null)
-            throw new globalThis.Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+    testConfig(request: TestAzureOpenAIConnectionRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/app-integrations/connections/azure-openai/test";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(request);
@@ -18452,11 +18260,11 @@ export class AzureDevOpsConnectionsClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processInitWorkProcesssIntegration(_response);
+            return this.processTestConfig(_response);
         });
     }
 
-    protected processInitWorkProcesssIntegration(response: AxiosResponse): Promise<void> {
+    protected processTestConfig(response: AxiosResponse): Promise<void> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -18476,81 +18284,6 @@ export class AzureDevOpsConnectionsClient {
             let resultData400  = _responseText;
             result400 = JSON.parse(resultData400);
             return throwException("A server side error occurred.", status, _responseText, _headers, result400);
-
-        } else if (status === 422) {
-            const _responseText = response.data;
-            let result422: any = null;
-            let resultData422  = _responseText;
-            result422 = JSON.parse(resultData422);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<void>(null as any);
-    }
-
-    /**
-     * Initialize Azure DevOps project integration as a Moda workspace.
-     */
-    initWorkspaceIntegration(id: string, request: InitWorkspaceIntegrationRequest, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/app-integrations/azure-devops/{id}/init-workspace-integration";
-        if (id === undefined || id === null)
-            throw new globalThis.Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id));
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(request);
-
-        let options_: AxiosRequestConfig = {
-            data: content_,
-            method: "POST",
-            url: url_,
-            headers: {
-                "Content-Type": "application/json",
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processInitWorkspaceIntegration(_response);
-        });
-    }
-
-    protected processInitWorkspaceIntegration(response: AxiosResponse): Promise<void> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 204) {
-            const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = JSON.parse(resultData400);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
-
-        } else if (status === 422) {
-            const _responseText = response.data;
-            let result422: any = null;
-            let resultData422  = _responseText;
-            result422 = JSON.parse(resultData422);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
@@ -18574,11 +18307,11 @@ export class ConnectionsClient {
     }
 
     /**
-     * Get a list of all connections.
+     * Get list of all connections.
      * @param includeDisabled (optional) 
      */
     getConnections(includeDisabled?: boolean | undefined, cancelToken?: CancelToken): Promise<ConnectionListDto[]> {
-        let url_ = this.baseUrl + "/api/app-integrations?";
+        let url_ = this.baseUrl + "/api/app-integrations/connections?";
         if (includeDisabled === null)
             throw new globalThis.Error("The parameter 'includeDisabled' cannot be null.");
         else if (includeDisabled !== undefined)
@@ -18622,13 +18355,6 @@ export class ConnectionsClient {
             result200 = JSON.parse(resultData200);
             return Promise.resolve<ConnectionListDto[]>(result200);
 
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = JSON.parse(resultData400);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
-
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
@@ -18637,10 +18363,72 @@ export class ConnectionsClient {
     }
 
     /**
-     * Get a list of all connectors.
+     * Create a new connection.
+     */
+    createConnection(request: CreateConnectionRequest, cancelToken?: CancelToken): Promise<string> {
+        let url_ = this.baseUrl + "/api/app-integrations/connections";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processCreateConnection(_response);
+        });
+    }
+
+    protected processCreateConnection(response: AxiosResponse): Promise<string> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 201) {
+            const _responseText = response.data;
+            let result201: any = null;
+            let resultData201  = _responseText;
+            result201 = JSON.parse(resultData201);
+            return Promise.resolve<string>(result201);
+
+        } else if (status === 422) {
+            const _responseText = response.data;
+            let result422: any = null;
+            let resultData422  = _responseText;
+            result422 = JSON.parse(resultData422);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<string>(null as any);
+    }
+
+    /**
+     * Get list of all connector types.
      */
     getConnectors( cancelToken?: CancelToken): Promise<ConnectorListDto[]> {
-        let url_ = this.baseUrl + "/api/app-integrations/connectors";
+        let url_ = this.baseUrl + "/api/app-integrations/connections/connectors";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -18680,6 +18468,121 @@ export class ConnectionsClient {
             result200 = JSON.parse(resultData200);
             return Promise.resolve<ConnectorListDto[]>(result200);
 
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ConnectorListDto[]>(null as any);
+    }
+
+    /**
+     * Get connection details by ID.
+     */
+    getConnection(id: string, cancelToken?: CancelToken): Promise<ConnectionDetailsDto> {
+        let url_ = this.baseUrl + "/api/app-integrations/connections/{id}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetConnection(_response);
+        });
+    }
+
+    protected processGetConnection(response: AxiosResponse): Promise<ConnectionDetailsDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<ConnectionDetailsDto>(result200);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ConnectionDetailsDto>(null as any);
+    }
+
+    /**
+     * Update a connection.
+     */
+    updateConnection(id: string, request: UpdateConnectionRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/app-integrations/connections/{id}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "PUT",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processUpdateConnection(_response);
+        });
+    }
+
+    protected processUpdateConnection(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
         } else if (status === 400) {
             const _responseText = response.data;
             let result400: any = null;
@@ -18691,7 +18594,71 @@ export class ConnectionsClient {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<ConnectorListDto[]>(null as any);
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Delete a connection.
+     */
+    deleteConnection(id: string, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/app-integrations/connections/{id}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "DELETE",
+            url: url_,
+            headers: {
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processDeleteConnection(_response);
+        });
+    }
+
+    protected processDeleteConnection(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
     }
 }
 
@@ -21181,6 +21148,66 @@ export interface HealthStatusDto {
     order: number;
 }
 
+export interface InitWorkProcessIntegrationRequest {
+    /** Connection Id. */
+    id: string;
+    /** External identifier for the work process. */
+    externalId: string;
+}
+
+export interface InitWorkspaceIntegrationRequest {
+    /** Connection Id. */
+    id: string;
+    /** External identifier for the workspace. */
+    externalId: string;
+    /** The key for the workspace. */
+    workspaceKey: string;
+    /** The name for the workspace. */
+    workspaceName: string;
+    /** A url template for external work items.  This template plus the work item external id will create a url to view the work item in the external system. */
+    externalViewWorkItemUrlTemplate?: string | undefined;
+}
+
+export interface AzureDevOpsWorkspaceTeamDto {
+    workspaceId: string;
+    teamId: string;
+    teamName: string;
+    boardId?: string | undefined;
+    internalTeamId?: string | undefined;
+}
+
+export interface AzdoConnectionTeamMappingsRequest {
+    /** The unique identifer for the connection. */
+    connectionId: string;
+    /** List of team mappings. */
+    teamMappings: AzdoWorkspaceTeamMappingRequest[];
+}
+
+export interface AzdoWorkspaceTeamMappingRequest {
+    /** The unique identifier for the workspace in the Azure DevOps system. */
+    workspaceId: string;
+    /** The unique identifier for the team in the Azure DevOps system. */
+    teamId: string;
+    /** The unique identifier for the team within Moda. */
+    internalTeamId?: string | undefined;
+}
+
+export interface TestAzureDevOpsConnectionRequest {
+    /** Gets the organization. */
+    organization: string;
+    /** Gets the personal access token. */
+    personalAccessToken: string;
+}
+
+export interface TestAzureOpenAIConnectionRequest {
+    /** Azure OpenAI resource URL. */
+    baseUrl: string;
+    /** The API key for Azure OpenAI resource. */
+    apiKey: string;
+    /** The OpenAI model deployment name to test. */
+    deploymentName: string;
+}
+
 export interface ConnectionListDto {
     id: string;
     name: string;
@@ -21188,20 +21215,39 @@ export interface ConnectionListDto {
     connector: SimpleNavigationDto;
     isActive: boolean;
     isValidConfiguration: boolean;
-    isSyncEnabled: boolean;
+    isSyncEnabled?: boolean | undefined;
+    canSync?: boolean | undefined;
+    $type: string;
 }
 
-export interface AzureDevOpsConnectionDetailsDto {
+export interface AzureDevOpsConnectionListDto extends ConnectionListDto {
+}
+
+export interface AzureOpenAIConnectionListDto extends ConnectionListDto {
+}
+
+export interface ConnectorListDto {
+    id: number;
+    name: string;
+    description?: string | undefined;
+}
+
+export interface ConnectionDetailsDto {
     id: string;
     name: string;
     description?: string | undefined;
-    systemId?: string | undefined;
     connector: SimpleNavigationDto;
-    configuration: AzureDevOpsConnectionConfigurationDto;
-    teamConfiguration: AzureDevOpsTeamConfigurationDto;
     isActive: boolean;
     isValidConfiguration: boolean;
-    isSyncEnabled: boolean;
+    canSync?: boolean | undefined;
+    $type: string;
+}
+
+export interface AzureDevOpsConnectionDetailsDto extends ConnectionDetailsDto {
+    systemId?: string | undefined;
+    isSyncEnabled?: boolean;
+    configuration?: AzureDevOpsConnectionConfigurationDto;
+    teamConfiguration?: AzureDevOpsTeamConfigurationDto;
 }
 
 export interface AzureDevOpsConnectionConfigurationDto {
@@ -21236,85 +21282,67 @@ export interface AzureDevOpsTeamConfigurationDto {
     workspaceTeams: AzureDevOpsWorkspaceTeamDto[];
 }
 
-export interface AzureDevOpsWorkspaceTeamDto {
-    workspaceId: string;
-    teamId: string;
-    teamName: string;
-    boardId?: string | undefined;
-    internalTeamId?: string | undefined;
+export interface AzureOpenAIConnectionDetailsDto extends ConnectionDetailsDto {
+    configuration?: AzureOpenAIConnectionConfigurationDto;
 }
 
-export interface CreateAzureDevOpsConnectionRequest {
+export interface AzureOpenAIConnectionConfigurationDto {
+    baseUrl: string;
+    apiKey: string;
+    deploymentName: string;
+    defaultTemperature: number;
+    defaultMaxOutputTokens: number;
+    jsonModePreferred: boolean;
+}
+
+export interface CreateConnectionRequest {
     /** The name of the connection. */
     name: string;
     /** The description of the connection. */
     description?: string | undefined;
+    $type: string;
+}
+
+export interface CreateAzureDevOpsConnectionRequest extends CreateConnectionRequest {
     /** The Azure DevOps Organization name. */
-    organization: string;
+    organization?: string;
     /** The personal access token that enables access to Azure DevOps data. */
-    personalAccessToken: string;
+    personalAccessToken?: string;
 }
 
-export interface UpdateAzureDevOpsConnectionRequest {
-    /** Gets or sets the identifier. */
+export interface CreateAzureOpenAIConnectionRequest extends CreateConnectionRequest {
+    /** Azure OpenAI resource URL. */
+    baseUrl?: string;
+    /** The API key for Azure OpenAI resource. */
+    apiKey?: string;
+    /** The OpenAI model deployment name to use for this connection (e.g. "gpt-4o") */
+    deploymentName?: string;
+}
+
+export interface UpdateConnectionRequest {
+    /** The unique identifier for the connection. */
     id: string;
-    /** Gets or sets the name of the connection. */
+    /** The name of the connection. */
     name: string;
-    /** Gets or sets the description. */
+    /** The description of the connection. */
     description?: string | undefined;
-    /** Gets the organization. */
-    organization: string;
-    /** Gets the personal access token. */
-    personalAccessToken: string;
+    $type: string;
 }
 
-export interface AzdoConnectionTeamMappingsRequest {
-    /** The unique identifer for the connection. */
-    connectionId: string;
-    /** List of team mappings. */
-    teamMappings: AzdoWorkspaceTeamMappingRequest[];
+export interface UpdateAzureDevOpsConnectionRequest extends UpdateConnectionRequest {
+    /** The Azure DevOps Organization name. */
+    organization?: string;
+    /** The personal access token that enables access to Azure DevOps data. */
+    personalAccessToken?: string;
 }
 
-export interface AzdoWorkspaceTeamMappingRequest {
-    /** The unique identifier for the workspace in the Azure DevOps system. */
-    workspaceId: string;
-    /** The unique identifier for the team in the Azure DevOps system. */
-    teamId: string;
-    /** The unique identifier for the team within Moda. */
-    internalTeamId?: string | undefined;
-}
-
-export interface TestAzureDevOpsConnectionRequest {
-    /** Gets the organization. */
-    organization: string;
-    /** Gets the personal access token. */
-    personalAccessToken: string;
-}
-
-export interface InitWorkProcessIntegrationRequest {
-    /** Connection Id. */
-    id: string;
-    /** External identifier for the work process. */
-    externalId: string;
-}
-
-export interface InitWorkspaceIntegrationRequest {
-    /** Connection Id. */
-    id: string;
-    /** External identifier for the workspace. */
-    externalId: string;
-    /** The key for the workspace. */
-    workspaceKey: string;
-    /** The name for the workspace. */
-    workspaceName: string;
-    /** A url template for external work items.  This template plus the work item external id will create a url to view the work item in the external system. */
-    externalViewWorkItemUrlTemplate?: string | undefined;
-}
-
-export interface ConnectorListDto {
-    id: number;
-    name: string;
-    description?: string | undefined;
+export interface UpdateAzureOpenAIConnectionRequest extends UpdateConnectionRequest {
+    /** Azure OpenAI resource URL. */
+    baseUrl?: string;
+    /** The API key for Azure OpenAI resource. */
+    apiKey?: string;
+    /** The OpenAI model deployment name to use for this connection (e.g. "gpt-4o") */
+    deploymentName?: string;
 }
 
 export interface BackgroundJobTypeDto {
