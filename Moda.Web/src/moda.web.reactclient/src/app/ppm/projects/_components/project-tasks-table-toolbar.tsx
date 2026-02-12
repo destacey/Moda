@@ -95,6 +95,8 @@ const ProjectTasksTableToolbar = ({
           content={<ProjectTasksHelp />}
           trigger="click"
           placement="bottomRight"
+          getPopupContainer={() => document.body}
+          overlayStyle={{ maxWidth: 'calc(100vw - 24px)' }}
         >
           <Tooltip title="Grid Actions Help">
             <Button
