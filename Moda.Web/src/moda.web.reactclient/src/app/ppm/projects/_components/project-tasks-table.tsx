@@ -13,6 +13,7 @@ import {
   Fragment,
   type ChangeEvent,
   useCallback,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -51,6 +52,7 @@ import {
   useGetTaskTypeOptionsQuery,
   usePatchProjectTaskMutation,
   useUpdateProjectTaskPlacementMutation,
+  useCreateProjectTaskMutation,
 } from '@/src/store/features/ppm/project-tasks-api'
 import { useGetEmployeeOptionsQuery } from '@/src/store/features/organizations/employee-api'
 
@@ -64,6 +66,10 @@ import { getProjectTasksTableColumns } from './project-tasks-table.columns'
 import { useProjectTasksInlineEditing } from './project-tasks-table.inline-editing'
 import { stringContainsFilter } from './project-tasks-table.filters'
 import { ProjectTaskSortableRow } from './project-task-sortable-row'
+import {
+  type DraftTask,
+  mergeDraftTasksIntoTree,
+} from './project-tasks-table.merge-drafts'
 import {
   flattenTree,
   getProjection,
@@ -115,11 +121,47 @@ const ProjectTasksTable = ({
   const { data: taskPriorityOptions = [] } = useGetTaskPriorityOptionsQuery()
 
   const { data: taskTypeOptions = [] } = useGetTaskTypeOptionsQuery()
+  const milestoneTypeValue = useMemo(
+    () => taskTypeOptions.find((opt) => opt.label === 'Milestone')?.value,
+    [taskTypeOptions],
+  )
 
   const { data: employeeOptions = [] } = useGetEmployeeOptionsQuery(false)
 
+  // Track the selected row's type to dynamically show/hide milestone-specific fields
+  const selectedTypeId = Form.useWatch('typeId', form)
+  const isSelectedRowMilestone = selectedTypeId === milestoneTypeValue
+
   const [patchProjectTask] = usePatchProjectTaskMutation()
   const [updateProjectTaskPlacement] = useUpdateProjectTaskPlacementMutation()
+  const [createProjectTask] = useCreateProjectTaskMutation()
+
+  // Reset status to "Not Started" if user switches to Milestone while "In Progress" is selected
+  useEffect(() => {
+    if (isSelectedRowMilestone) {
+      const currentStatus = form.getFieldValue('statusId')
+      const inProgressValue = taskStatusOptions.find(
+        (opt) => opt.label === 'In Progress',
+      )?.value
+      if (inProgressValue !== undefined && currentStatus === inProgressValue) {
+        const notStartedValue = taskStatusOptions.find(
+          (opt) => opt.label === 'Not Started',
+        )?.value
+        if (notStartedValue !== undefined) {
+          form.setFieldValue('statusId', notStartedValue)
+        }
+      }
+    }
+  }, [isSelectedRowMilestone, form, taskStatusOptions])
+
+  // Draft tasks state for inline creation
+  const [draftTasks, setDraftTasks] = useState<DraftTask[]>([])
+  const draftCounterRef = useRef(0)
+
+  // Merge draft tasks with real tasks early (before using in hooks)
+  const tasksWithDrafts = useMemo(() => {
+    return mergeDraftTasksIntoTree(tasks, draftTasks)
+  }, [tasks, draftTasks])
 
   // Flatten tree for drag-and-drop
   const flattenedTasks = useMemo(() => {
@@ -140,114 +182,308 @@ const ProjectTasksTable = ({
     async (taskId: string, updates: Partial<any>) => {
       if (!projectKey) return
 
-      const task = findProjectTaskById(tasks || [], taskId)
-      if (!task) return
+      // Check if this is a draft task (new task being created)
+      const isDraft = taskId.startsWith('draft-')
 
-      try {
-        const patchOperations = buildProjectTaskPatchOperations(updates)
+      if (isDraft) {
+        // This is a new task - use create API
+        try {
+          const draft = draftTasks.find((d) => d.id === taskId)
+          if (!draft) return false
 
-        const response = await patchProjectTask({
-          projectIdOrKey: projectKey,
-          taskId: taskId,
-          patchOperations,
-          cacheKey: taskId,
-        })
-        if (response.error) {
-          throw response.error
-        }
-        // Refetch to ensure UI has latest data before navigation
-        // DO NOT REMOVE THE AWAIT - the UI will show stale data in between api calls
-        await refetch()
-        return true
-      } catch (error: any) {
-        if (error?.status === 422 && error?.errors) {
-          const errorMap: Record<string, string> = {}
-          const errorFields: string[] = []
-          Object.entries(error.errors).forEach(([key, messages]) => {
-            const fieldName = key.charAt(0).toLowerCase() + key.slice(1)
-            errorMap[fieldName] = Array.isArray(messages)
-              ? messages[0]
-              : messages
-            errorFields.push(fieldName)
+          // Build create request from updates
+          // Note: progress must be null for milestones and a number for tasks.
+          // The saveFormChanges function sets the correct value based on type.
+          const request: any = {
+            name: updates.name || '',
+            typeId: updates.typeId || 1, // Default to Task type
+            statusId: updates.statusId || 1,
+            priorityId: updates.priorityId || 2,
+            assigneeIds: updates.assigneeIds || [],
+            progress: updates.progress,
+            parentId: draft.parentId,
+            plannedStart: updates.plannedStart,
+            plannedEnd: updates.plannedEnd,
+            plannedDate: updates.plannedDate,
+            estimatedEffortHours: updates.estimatedEffortHours,
+          }
+
+          const response = await createProjectTask({
+            projectIdOrKey: projectKey,
+            request,
           })
-          setFieldErrors(errorMap)
 
-          // Focus on the first mappable error field, or first editable column if none map
-          setTimeout(() => {
-            let focused = false
+          if (response.error) {
+            throw response.error
+          }
 
-            // Try each error field in order
-            for (const errorField of errorFields) {
-              const columnId =
-                errorField === 'plannedDate'
-                  ? 'plannedStart'
-                  : errorField.replace(/Id$/, '')
+          messageApi.success(`Task created: ${response.data.key}`)
 
-              const cellElement = document.querySelector(
-                `[data-cell-id="${taskId}-${columnId}"]`,
-              )
-              if (cellElement) {
-                const input = cellElement.querySelector(
-                  'input, .ant-select',
-                ) as HTMLElement
-                if (input) {
-                  input.focus()
-                  focused = true
-                  break
+          // Remove draft from state
+          setDraftTasks((prev) => prev.filter((d) => d.id !== taskId))
+
+          // Refetch to get the new task
+          await refetch()
+
+          return true
+        } catch (error: any) {
+          const status = error?.status ?? error?.data?.status
+          const errors = error?.errors ?? error?.data?.errors
+          const detail = error?.detail ?? error?.data?.detail
+
+          if (status === 422 && errors) {
+            const errorMap: Record<string, string> = {}
+            const errorFields: string[] = []
+            Object.entries(errors).forEach(([key, messages]) => {
+              const fieldName = key.charAt(0).toLowerCase() + key.slice(1)
+              errorMap[fieldName] = Array.isArray(messages)
+                ? messages[0]
+                : messages
+              errorFields.push(fieldName)
+            })
+            setFieldErrors(errorMap)
+
+            // Focus on the first mappable error field
+            setTimeout(() => {
+              let focused = false
+
+              for (const errorField of errorFields) {
+                const columnId =
+                  errorField === 'plannedDate'
+                    ? 'plannedStart'
+                    : errorField.replace(/Id$/, '')
+
+                const cellElement = document.querySelector(
+                  `[data-cell-id="${taskId}-${columnId}"]`,
+                )
+                if (cellElement) {
+                  const input = cellElement.querySelector(
+                    'input, .ant-select',
+                  ) as HTMLElement
+                  if (input) {
+                    input.focus()
+                    focused = true
+                    break
+                  }
                 }
               }
-            }
 
-            // If no error field could be mapped, focus first editable column
-            if (!focused) {
-              const cellElement = document.querySelector(
-                `[data-cell-id="${taskId}-name"]`,
-              )
-              if (cellElement) {
-                const input = cellElement.querySelector('input') as HTMLElement
-                if (input) {
-                  input.focus()
+              if (!focused) {
+                const cellElement = document.querySelector(
+                  `[data-cell-id="${taskId}-name"]`,
+                )
+                if (cellElement) {
+                  const input = cellElement.querySelector('input') as HTMLElement
+                  if (input) {
+                    input.focus()
+                  }
                 }
               }
-            }
-          }, 0)
+            }, 0)
 
-          messageApi.error('Correct the validation error(s) to continue.')
+            messageApi.error('Correct the validation error(s) to continue.')
+            return false
+          } else {
+            messageApi.error(
+              detail ??
+                'An error occurred while creating the project task. Please try again.',
+            )
+          }
           return false
-        } else {
-          messageApi.error(
-            error?.detail ??
-              'An error occurred while updating the project task. Please try again.',
-          )
         }
-        return false
+      } else {
+        // This is an existing task - use patch API
+        const task = findProjectTaskById(tasks || [], taskId)
+        if (!task) return
+
+        try {
+          const patchOperations = buildProjectTaskPatchOperations(updates)
+
+          const response = await patchProjectTask({
+            projectIdOrKey: projectKey,
+            taskId: taskId,
+            patchOperations,
+            cacheKey: taskId,
+          })
+          if (response.error) {
+            throw response.error
+          }
+          // Refetch to ensure UI has latest data before navigation
+          // DO NOT REMOVE THE AWAIT - the UI will show stale data in between api calls
+          await refetch()
+          return true
+        } catch (error: any) {
+          const status = error?.status ?? error?.data?.status
+          const errors = error?.errors ?? error?.data?.errors
+          const detail = error?.detail ?? error?.data?.detail
+
+          if (status === 422 && errors) {
+            const errorMap: Record<string, string> = {}
+            const errorFields: string[] = []
+            Object.entries(errors).forEach(([key, messages]) => {
+              const fieldName = key.charAt(0).toLowerCase() + key.slice(1)
+              errorMap[fieldName] = Array.isArray(messages)
+                ? messages[0]
+                : messages
+              errorFields.push(fieldName)
+            })
+            setFieldErrors(errorMap)
+
+            // Focus on the first mappable error field, or first editable column if none map
+            setTimeout(() => {
+              let focused = false
+
+              // Try each error field in order
+              for (const errorField of errorFields) {
+                const columnId =
+                  errorField === 'plannedDate'
+                    ? 'plannedStart'
+                    : errorField.replace(/Id$/, '')
+
+                const cellElement = document.querySelector(
+                  `[data-cell-id="${taskId}-${columnId}"]`,
+                )
+                if (cellElement) {
+                  const input = cellElement.querySelector(
+                    'input, .ant-select',
+                  ) as HTMLElement
+                  if (input) {
+                    input.focus()
+                    focused = true
+                    break
+                  }
+                }
+              }
+
+              // If no error field could be mapped, focus first editable column
+              if (!focused) {
+                const cellElement = document.querySelector(
+                  `[data-cell-id="${taskId}-name"]`,
+                )
+                if (cellElement) {
+                  const input = cellElement.querySelector('input') as HTMLElement
+                  if (input) {
+                    input.focus()
+                  }
+                }
+              }
+            }, 0)
+
+            messageApi.error('Correct the validation error(s) to continue.')
+            return false
+          } else {
+            messageApi.error(
+              detail ??
+                'An error occurred while updating the project task. Please try again.',
+            )
+          }
+          return false
+        }
       }
     },
-    [messageApi, projectKey, refetch, tasks, patchProjectTask],
+    [
+      messageApi,
+      projectKey,
+      refetch,
+      tasks,
+      patchProjectTask,
+      draftTasks,
+      createProjectTask,
+    ],
   )
 
   const {
     tableRef,
     selectedRowId,
     setSelectedRowId,
+    setSelectedCellId,
     getFieldError,
     editableColumns,
     handleKeyDown,
     handleRowClick,
   } = useProjectTasksInlineEditing({
-    tasks,
+    tasks: tasksWithDrafts,
     canManageTasks,
     form,
     tableWrapperClassName: styles.tableWrapper,
     onUpdateTask: handleUpdateTask,
     fieldErrors,
     setFieldErrors,
+    isSelectedRowMilestone,
+    onCancelDraft: (taskId: string) => {
+      // Remove draft task when user cancels
+      if (taskId.startsWith('draft-')) {
+        setDraftTasks((prev) => prev.filter((d) => d.id !== taskId))
+      }
+    },
   })
+
+  // Add a draft task at root level
+  const addDraftTaskAtRoot = useCallback(() => {
+    if (selectedRowId !== null || draftTasks.length > 0) {
+      return
+    }
+
+    draftCounterRef.current += 1
+    const newDraft: DraftTask = {
+      id: `draft-${Date.now()}-${draftCounterRef.current}`,
+      parentId: undefined,
+      order: 0,
+    }
+    setDraftTasks((prev) => [...prev, newDraft])
+
+    // Auto-select the new draft row for editing and focus the name field
+    // Use requestAnimationFrame + setTimeout to ensure DOM is fully rendered
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        setSelectedRowId(newDraft.id)
+        setSelectedCellId(`${newDraft.id}-name`)
+      }, 50)
+    })
+  }, [draftTasks.length, selectedRowId, setSelectedRowId, setSelectedCellId])
+
+  // Add a draft task as a child of a specific parent
+  const addDraftTaskAsChild = useCallback(
+    (parentId: string) => {
+      if (selectedRowId !== null || draftTasks.length > 0) {
+        return
+      }
+
+      draftCounterRef.current += 1
+      const newDraft: DraftTask = {
+        id: `draft-${Date.now()}-${draftCounterRef.current}`,
+        parentId,
+        order: 0,
+      }
+      setDraftTasks((prev) => [...prev, newDraft])
+
+      // Ensure parent is expanded
+      if (tableRef.current) {
+        const rows = tableRef.current.getRowModel().rows
+        const parentRow = rows.find((r: any) => r.original.id === parentId)
+        if (parentRow && !parentRow.getIsExpanded()) {
+          parentRow.toggleExpanded()
+        }
+      }
+
+      // Auto-select the new draft row for editing and focus the name field
+      // Use requestAnimationFrame + setTimeout to ensure DOM is fully rendered
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          setSelectedRowId(newDraft.id)
+          setSelectedCellId(`${newDraft.id}-name`)
+        }, 50)
+      })
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [draftTasks.length, selectedRowId, setSelectedRowId, setSelectedCellId], // tableRef is stable and doesn't need to be in deps
+  )
 
   // Task form handlers
   const handleCreateTask = useCallback(() => {
-    setOpenCreateTaskForm(true)
-  }, [])
+    // Instead of opening modal, add draft task inline
+    addDraftTaskAtRoot()
+  }, [addDraftTaskAtRoot])
 
   const handleEditTask = useCallback(
     (task: any) => {
@@ -339,13 +575,15 @@ const ProjectTasksTable = ({
   )
 
   const totalRowCount = useMemo(() => {
-    return countProjectTasks(tasks)
-  }, [tasks])
+    return countProjectTasks(tasks) + draftTasks.length
+  }, [tasks, draftTasks])
 
   // Early calculation for isDragEnabled (before columns definition)
   const hasFilters =
     !!searchValue || columnFilters.length > 0 || sorting.length > 0
   const isEditing = selectedRowId !== null
+  const canCreateDraftTask =
+    canManageTasks && !isEditing && draftTasks.length === 0
   const isDragEnabled = useMemo(() => {
     return (
       enableDragAndDrop !== false &&
@@ -369,9 +607,13 @@ const ProjectTasksTable = ({
         taskStatusOptions,
         taskStatusOptionsForMilestone,
         taskPriorityOptions,
+        taskTypeOptions,
         employeeOptions,
         isDragEnabled,
         enableDragAndDrop,
+        addDraftTaskAsChild,
+        canCreateTasks: canCreateDraftTask,
+        isSelectedRowMilestone,
       }),
     [
       canManageTasks,
@@ -384,14 +626,18 @@ const ProjectTasksTable = ({
       taskPriorityOptions,
       taskStatusOptions,
       taskStatusOptionsForMilestone,
+      taskTypeOptions,
       employeeOptions,
       isDragEnabled,
       enableDragAndDrop,
+      addDraftTaskAsChild,
+      canCreateDraftTask,
+      isSelectedRowMilestone,
     ],
   )
 
   const table = useReactTable({
-    data: tasks,
+    data: tasksWithDrafts,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -603,6 +849,7 @@ const ProjectTasksTable = ({
         <div className={styles.table}>
           <ProjectTasksTableToolbar
             canManageTasks={canManageTasks}
+            disableCreateTaskButton={!canCreateDraftTask}
             displayedRowCount={displayedRowCount}
             totalRowCount={totalRowCount}
             searchValue={searchValue}
@@ -839,11 +1086,12 @@ const ProjectTasksTable = ({
                       table.getRowModel().rows.flatMap((row, index) => {
                         const isSelected = selectedRowId === row.original.id
                         const isDragging = draggedTaskId === row.original.id
+                        const isDraftTask = row.original.id.startsWith('draft-')
                         const rowElements = [
                           <ProjectTaskSortableRow
                             key={row.id}
                             taskId={row.original.id}
-                            isDragEnabled={isDragEnabled}
+                            isDragEnabled={isDragEnabled && !isDraftTask}
                             isDragging={isDragging}
                             className={`${styles.tr}${index % 2 === 1 ? ` ${styles.trAlt}` : ''}${isSelected ? ` ${styles.trSelected}` : ''}`}
                             onClick={(e) => {

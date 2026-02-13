@@ -6,8 +6,18 @@ import {
   EditOutlined,
   HolderOutlined,
   MoreOutlined,
+  PlusOutlined,
 } from '@ant-design/icons'
-import { Button, DatePicker, Dropdown, Form, Input, Select, Tag } from 'antd'
+import {
+  Button,
+  DatePicker,
+  Dropdown,
+  Flex,
+  Form,
+  Input,
+  Select,
+  Tag,
+} from 'antd'
 import { BaseOptionType } from 'antd/es/select'
 import dayjs from 'dayjs'
 import { ColumnDef } from '@tanstack/react-table'
@@ -61,9 +71,13 @@ interface ProjectTasksTableColumnsParams {
   taskStatusOptions: any[]
   taskStatusOptionsForMilestone: any[]
   taskPriorityOptions: any[]
+  taskTypeOptions: any[]
   employeeOptions: BaseOptionType[]
   isDragEnabled?: boolean
   enableDragAndDrop?: boolean
+  addDraftTaskAsChild?: (parentId: string) => void
+  canCreateTasks?: boolean
+  isSelectedRowMilestone?: boolean
 }
 
 export const getProjectTasksTableColumns = ({
@@ -77,9 +91,13 @@ export const getProjectTasksTableColumns = ({
   taskStatusOptions,
   taskStatusOptionsForMilestone,
   taskPriorityOptions,
+  taskTypeOptions,
   employeeOptions,
   isDragEnabled = false,
   enableDragAndDrop = false,
+  addDraftTaskAsChild,
+  canCreateTasks = true,
+  isSelectedRowMilestone = false,
 }: ProjectTasksTableColumnsParams): ColumnDef<ProjectTaskTreeDto>[] => {
   return [
     ...(canManageTasks && enableDragAndDrop
@@ -106,34 +124,40 @@ export const getProjectTasksTableColumns = ({
             enableGlobalFilter: false,
             enableColumnFilter: false,
             enableExport: false,
-            cell: ({ row }: { row: any }) => (
-              <Dropdown
-                menu={{
-                  items: [
-                    {
-                      key: 'edit',
-                      label: 'Edit',
-                      icon: <EditOutlined />,
-                      onClick: () => handleEditTask(row.original),
-                    },
-                    {
-                      key: 'delete',
-                      label: 'Delete',
-                      icon: <DeleteOutlined />,
-                      onClick: () => handleDeleteTask(row.original),
-                    },
-                  ],
-                }}
-                trigger={['click']}
-              >
-                <Button
-                  type="text"
-                  size="small"
-                  icon={<MoreOutlined />}
-                  tabIndex={-1}
-                />
-              </Dropdown>
-            ),
+            cell: ({ row }: { row: any }) => {
+              const isDraft = row.original.id.startsWith('draft-')
+              // Don't show actions for draft tasks
+              if (isDraft) return null
+
+              return (
+                <Dropdown
+                  menu={{
+                    items: [
+                      {
+                        key: 'edit',
+                        label: 'Edit',
+                        icon: <EditOutlined />,
+                        onClick: () => handleEditTask(row.original),
+                      },
+                      {
+                        key: 'delete',
+                        label: 'Delete',
+                        icon: <DeleteOutlined />,
+                        onClick: () => handleDeleteTask(row.original),
+                      },
+                    ],
+                  }}
+                  trigger={['click']}
+                >
+                  <Button
+                    type="text"
+                    size="small"
+                    icon={<MoreOutlined />}
+                    tabIndex={-1}
+                  />
+                </Dropdown>
+              )
+            },
           } as ColumnDef<ProjectTaskTreeDto>,
         ]
       : []),
@@ -167,53 +191,89 @@ export const getProjectTasksTableColumns = ({
         const task = row.original as ProjectTaskTreeDto
         const isSelected = selectedRowId === task.id
         const cellId = `${task.id}-name`
+        const isDraft = task.id.startsWith('draft-')
+        const isMilestone = task.type?.name === 'Milestone'
 
         return (
-          <span className={styles.nameCell} data-cell-id={cellId}>
-            {Array.from({ length: depth }).map((_, index) => (
-              <span key={index} className={styles.indentSpacer} />
-            ))}
-            {row.getCanExpand() ? (
-              <Button
-                type="text"
-                size="small"
-                icon={
-                  row.getIsExpanded() ? (
-                    <CaretDownOutlined />
-                  ) : (
-                    <CaretRightOutlined />
-                  )
-                }
-                onClick={row.getToggleExpandedHandler()}
-                className={styles.expanderBtn}
-              />
-            ) : (
-              <span className={styles.indentSpacer} />
-            )}
-            {isSelected && handleUpdateTask ? (
-              <FormItem
-                name="name"
-                style={{ margin: 0, flex: 1, minWidth: 0 }}
-                rules={[
-                  { required: true, message: 'Name is required' },
-                  { max: 256, message: 'Name cannot exceed 256 characters' },
-                ]}
-                validateStatus={getFieldError('name') ? 'error' : ''}
-              >
-                <Input
+          <Flex
+            className={styles.nameCell}
+            data-cell-id={cellId}
+            align="center"
+            justify="space-between"
+            gap={4}
+            style={{ width: '100%' }}
+          >
+            <Flex align="center" gap={0} style={{ flex: 1, minWidth: 0 }}>
+              {Array.from({ length: depth }).map((_, index) => (
+                <span key={index} className={styles.indentSpacer} />
+              ))}
+              {row.getCanExpand() ? (
+                <Button
+                  type="text"
                   size="small"
-                  onPressEnter={(e) => {
-                    e.currentTarget.blur()
-                  }}
-                  onKeyDown={(e) => handleKeyDown(e, task.id, 'name')}
-                  style={{ flex: 1, minWidth: 0 }}
-                  status={getFieldError('name') ? 'error' : ''}
+                  icon={
+                    row.getIsExpanded() ? (
+                      <CaretDownOutlined />
+                    ) : (
+                      <CaretRightOutlined />
+                    )
+                  }
+                  onClick={row.getToggleExpandedHandler()}
+                  className={styles.expanderBtn}
                 />
-              </FormItem>
-            ) : (
-              <span>{task.name}</span>
-            )}
-          </span>
+              ) : (
+                <span className={styles.indentSpacer} />
+              )}
+              {isSelected && handleUpdateTask ? (
+                <FormItem
+                  name="name"
+                  style={{ margin: 0, flex: 1, minWidth: 0 }}
+                  rules={[
+                    { required: true, message: 'Name is required' },
+                    { max: 256, message: 'Name cannot exceed 256 characters' },
+                  ]}
+                  validateStatus={getFieldError('name') ? 'error' : ''}
+                >
+                  <Input
+                    size="small"
+                    onPressEnter={(e) => {
+                      e.currentTarget.blur()
+                    }}
+                    onKeyDown={(e) => handleKeyDown(e, task.id, 'name')}
+                    style={{ flex: 1, minWidth: 0 }}
+                    status={getFieldError('name') ? 'error' : ''}
+                  />
+                </FormItem>
+              ) : (
+                <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {task.name || (isDraft ? '(New Task)' : '')}
+                </span>
+              )}
+            </Flex>
+            {!isSelected &&
+              canManageTasks &&
+              !isDraft &&
+              !isMilestone &&
+              addDraftTaskAsChild && (
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<PlusOutlined />}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    addDraftTaskAsChild(task.id)
+                  }}
+                  disabled={!canCreateTasks}
+                  title="Add child task"
+                  style={{
+                    padding: '0 4px',
+                    height: 20,
+                    fontSize: 12,
+                    flexShrink: 0,
+                  }}
+                />
+              )}
+          </Flex>
         )
       },
     },
@@ -226,7 +286,51 @@ export const getProjectTasksTableColumns = ({
       enableColumnFilter: true,
       filterFn: setContainsFilter,
       sortingFn: 'text',
-      cell: (info) => info.getValue(),
+      cell: ({ row }: { row: any }) => {
+        const task = row.original as ProjectTaskTreeDto
+        const isSelected = selectedRowId === task.id
+        const isDraft = task.id.startsWith('draft-')
+        const cellId = `${task.id}-type`
+
+        if (isSelected && isDraft && handleUpdateTask) {
+          return (
+            <FormItem
+              name="typeId"
+              style={{ margin: 0 }}
+              validateStatus={getFieldError('typeId') ? 'error' : ''}
+            >
+              <Select
+                size="small"
+                options={taskTypeOptions}
+                style={{ width: '100%' }}
+                onKeyDown={(e) => handleKeyDown(e, task.id, 'type')}
+                status={getFieldError('typeId') ? 'error' : ''}
+                onOpenChange={(open) => {
+                  // When the dropdown closes after a selection, the Select
+                  // loses focus — especially when changing Task↔Milestone
+                  // which triggers a full column rebuild. Re-focus the
+                  // Select's search input after React re-renders.
+                  if (!open) {
+                    setTimeout(() => {
+                      const cell = document.querySelector(
+                        `[data-cell-id="${cellId}"]`,
+                      )
+                      if (cell) {
+                        const input = cell.querySelector(
+                          'input.ant-select-input',
+                        ) as HTMLElement
+                        input?.focus()
+                      }
+                    }, 10)
+                  }
+                }}
+              />
+            </FormItem>
+          )
+        }
+
+        return task.type?.name ?? ''
+      },
     },
     {
       id: 'status',
@@ -241,7 +345,7 @@ export const getProjectTasksTableColumns = ({
         const task = info.row.original as ProjectTaskTreeDto
         const status = (info.getValue() as string) ?? ''
         const isSelected = selectedRowId === task.id
-        const cellId = `${task.id}-status`
+        const isDraft = task.id.startsWith('draft-')
         const colorMap: Record<string, string> = {
           'Not Started': 'default',
           'In Progress': 'processing',
@@ -255,28 +359,30 @@ export const getProjectTasksTableColumns = ({
           )
         }
 
-        const isMilestone = task.type?.name === 'Milestone'
+        const isMilestone = isSelected
+          ? isDraft
+            ? isSelectedRowMilestone
+            : task.type?.name === 'Milestone'
+          : task.type?.name === 'Milestone'
         const availableStatusOptions = isMilestone
           ? taskStatusOptionsForMilestone
           : taskStatusOptions
 
         const error = getFieldError('statusId')
         return (
-          <div data-cell-id={cellId}>
-            <FormItem
-              name="statusId"
-              style={{ margin: 0 }}
-              rules={[{ required: true, message: 'Status is required' }]}
-              validateStatus={error ? 'error' : ''}
-            >
-              <Select
-                size="small"
-                options={availableStatusOptions}
-                onKeyDown={(e) => handleKeyDown(e, task.id, 'status')}
-                status={error ? 'error' : ''}
-              />
-            </FormItem>
-          </div>
+          <FormItem
+            name="statusId"
+            style={{ margin: 0 }}
+            rules={[{ required: true, message: 'Status is required' }]}
+            validateStatus={error ? 'error' : ''}
+          >
+            <Select
+              size="small"
+              options={availableStatusOptions}
+              onKeyDown={(e) => handleKeyDown(e, task.id, 'status')}
+              status={error ? 'error' : ''}
+            />
+          </FormItem>
         )
       },
     },
@@ -293,7 +399,6 @@ export const getProjectTasksTableColumns = ({
         const task = info.row.original as ProjectTaskTreeDto
         const priority = (info.getValue() as string) ?? ''
         const isSelected = selectedRowId === task.id
-        const cellId = `${task.id}-priority`
 
         if (!isSelected || !handleUpdateTask) {
           if (!priority) return '-'
@@ -308,21 +413,19 @@ export const getProjectTasksTableColumns = ({
 
         const error = getFieldError('priorityId')
         return (
-          <div data-cell-id={cellId}>
-            <FormItem
-              name="priorityId"
-              style={{ margin: 0 }}
-              rules={[{ required: true, message: 'Priority is required' }]}
-              validateStatus={error ? 'error' : ''}
-            >
-              <Select
-                size="small"
-                options={taskPriorityOptions}
-                onKeyDown={(e) => handleKeyDown(e, task.id, 'priority')}
-                status={error ? 'error' : ''}
-              />
-            </FormItem>
-          </div>
+          <FormItem
+            name="priorityId"
+            style={{ margin: 0 }}
+            rules={[{ required: true, message: 'Priority is required' }]}
+            validateStatus={error ? 'error' : ''}
+          >
+            <Select
+              size="small"
+              options={taskPriorityOptions}
+              onKeyDown={(e) => handleKeyDown(e, task.id, 'priority')}
+              status={error ? 'error' : ''}
+            />
+          </FormItem>
         )
       },
     },
@@ -348,8 +451,13 @@ export const getProjectTasksTableColumns = ({
         const task = info.row.original as ProjectTaskTreeDto
         const value = (info.getValue() as string) ?? ''
         const isSelected = selectedRowId === task.id
+        const isDraft = task.id.startsWith('draft-')
         const cellId = `${task.id}-plannedStart`
-        const isMilestone = task.type?.name === 'Milestone'
+        const isMilestone = isSelected
+          ? isDraft
+            ? isSelectedRowMilestone
+            : task.type?.name === 'Milestone'
+          : task.type?.name === 'Milestone'
 
         if (!isSelected || !handleUpdateTask) {
           return value
@@ -359,35 +467,33 @@ export const getProjectTasksTableColumns = ({
         const error = getFieldError(fieldName)
 
         return (
-          <div data-cell-id={cellId}>
-            <FormItem
-              name={fieldName}
-              style={{ margin: 0 }}
-              validateStatus={error ? 'error' : ''}
-            >
-              <DatePicker
-                size="small"
-                format="MMM D, YYYY"
-                onKeyDown={(e) => handleKeyDown(e, task.id, 'plannedStart')}
-                onOpenChange={(open) => {
-                  if (!open) {
-                    setTimeout(() => {
-                      const cell = document.querySelector(
-                        `[data-cell-id="${cellId}"]`,
-                      )
-                      if (cell) {
-                        const input = cell.querySelector('input') as
-                          | HTMLInputElement
-                          | undefined
-                        input?.focus()
-                      }
-                    }, 0)
-                  }
-                }}
-                status={error ? 'error' : ''}
-              />
-            </FormItem>
-          </div>
+          <FormItem
+            name={fieldName}
+            style={{ margin: 0 }}
+            validateStatus={error ? 'error' : ''}
+          >
+            <DatePicker
+              size="small"
+              format="MMM D, YYYY"
+              onKeyDown={(e) => handleKeyDown(e, task.id, 'plannedStart')}
+              onOpenChange={(open) => {
+                if (!open) {
+                  setTimeout(() => {
+                    const cell = document.querySelector(
+                      `[data-cell-id="${cellId}"]`,
+                    )
+                    if (cell) {
+                      const input = cell.querySelector('input') as
+                        | HTMLInputElement
+                        | undefined
+                      input?.focus()
+                    }
+                  }, 0)
+                }
+              }}
+              status={error ? 'error' : ''}
+            />
+          </FormItem>
         )
       },
     },
@@ -405,8 +511,13 @@ export const getProjectTasksTableColumns = ({
         const task = info.row.original as ProjectTaskTreeDto
         const value = (info.getValue() as string) ?? ''
         const isSelected = selectedRowId === task.id
+        const isDraft = task.id.startsWith('draft-')
         const cellId = `${task.id}-plannedEnd`
-        const isMilestone = task.type?.name === 'Milestone'
+        const isMilestone = isSelected
+          ? isDraft
+            ? isSelectedRowMilestone
+            : task.type?.name === 'Milestone'
+          : task.type?.name === 'Milestone'
 
         if (!isSelected || !handleUpdateTask || isMilestone) {
           return value
@@ -415,35 +526,33 @@ export const getProjectTasksTableColumns = ({
         const error = getFieldError('plannedEnd')
 
         return (
-          <div data-cell-id={cellId}>
-            <FormItem
-              name="plannedEnd"
-              style={{ margin: 0 }}
-              validateStatus={error ? 'error' : ''}
-            >
-              <DatePicker
-                size="small"
-                format="MMM D, YYYY"
-                onKeyDown={(e) => handleKeyDown(e, task.id, 'plannedEnd')}
-                onOpenChange={(open) => {
-                  if (!open) {
-                    setTimeout(() => {
-                      const cell = document.querySelector(
-                        `[data-cell-id="${cellId}"]`,
-                      )
-                      if (cell) {
-                        const input = cell.querySelector('input') as
-                          | HTMLInputElement
-                          | undefined
-                        input?.focus()
-                      }
-                    }, 0)
-                  }
-                }}
-                status={error ? 'error' : ''}
-              />
-            </FormItem>
-          </div>
+          <FormItem
+            name="plannedEnd"
+            style={{ margin: 0 }}
+            validateStatus={error ? 'error' : ''}
+          >
+            <DatePicker
+              size="small"
+              format="MMM D, YYYY"
+              onKeyDown={(e) => handleKeyDown(e, task.id, 'plannedEnd')}
+              onOpenChange={(open) => {
+                if (!open) {
+                  setTimeout(() => {
+                    const cell = document.querySelector(
+                      `[data-cell-id="${cellId}"]`,
+                    )
+                    if (cell) {
+                      const input = cell.querySelector('input') as
+                        | HTMLInputElement
+                        | undefined
+                      input?.focus()
+                    }
+                  }, 0)
+                }
+              }}
+              status={error ? 'error' : ''}
+            />
+          </FormItem>
         )
       },
     },
@@ -460,7 +569,6 @@ export const getProjectTasksTableColumns = ({
         const task = info.row.original as ProjectTaskTreeDto
         const assignees = task.assignees ?? []
         const isSelected = selectedRowId === task.id
-        const cellId = `${task.id}-assignees`
 
         if (!isSelected || !handleUpdateTask) {
           if (assignees.length === 0) return ''
@@ -469,31 +577,29 @@ export const getProjectTasksTableColumns = ({
 
         const error = getFieldError('assigneeIds')
         return (
-          <div data-cell-id={cellId}>
-            <FormItem
-              name="assigneeIds"
-              style={{ margin: 0 }}
-              validateStatus={error ? 'error' : ''}
-            >
-              <Select
-                size="small"
-                mode="multiple"
-                allowClear
-                placeholder="Select assignees"
-                optionFilterProp="label"
-                filterOption={(input, option) =>
-                  (option?.label?.toString().toLowerCase() ?? '').includes(
-                    input.toLowerCase(),
-                  )
-                }
-                options={employeeOptions}
-                onKeyDown={(e) => handleKeyDown(e, task.id, 'assignees')}
-                status={error ? 'error' : ''}
-                maxTagCount={1}
-                maxTagPlaceholder={(omitted) => `+${omitted.length}`}
-              />
-            </FormItem>
-          </div>
+          <FormItem
+            name="assigneeIds"
+            style={{ margin: 0 }}
+            validateStatus={error ? 'error' : ''}
+          >
+            <Select
+              size="small"
+              mode="multiple"
+              allowClear
+              placeholder="Select assignees"
+              optionFilterProp="label"
+              filterOption={(input, option) =>
+                (option?.label?.toString().toLowerCase() ?? '').includes(
+                  input.toLowerCase(),
+                )
+              }
+              options={employeeOptions}
+              onKeyDown={(e) => handleKeyDown(e, task.id, 'assignees')}
+              status={error ? 'error' : ''}
+              maxTagCount={1}
+              maxTagPlaceholder={(omitted) => `+${omitted.length}`}
+            />
+          </FormItem>
         )
       },
     },
@@ -509,8 +615,12 @@ export const getProjectTasksTableColumns = ({
         const task = info.row.original as ProjectTaskTreeDto
         const value = task.progress
         const isSelected = selectedRowId === task.id
-        const cellId = `${task.id}-progress`
-        const isMilestone = task.type?.name === 'Milestone'
+        const isDraft = task.id.startsWith('draft-')
+        const isMilestone = isSelected
+          ? isDraft
+            ? isSelectedRowMilestone
+            : task.type?.name === 'Milestone'
+          : task.type?.name === 'Milestone'
 
         if (!isSelected || !handleUpdateTask || isMilestone) {
           return value !== undefined ? `${value} %` : ''
@@ -518,23 +628,21 @@ export const getProjectTasksTableColumns = ({
 
         const error = getFieldError('progress')
         return (
-          <div data-cell-id={cellId}>
-            <FormItem
-              name="progress"
-              style={{ margin: 0 }}
-              validateStatus={error ? 'error' : ''}
-            >
-              <Input
-                size="small"
-                type="number"
-                min={0}
-                max={100}
-                suffix="%"
-                onKeyDown={(e) => handleKeyDown(e, task.id, 'progress')}
-                status={error ? 'error' : ''}
-              />
-            </FormItem>
-          </div>
+          <FormItem
+            name="progress"
+            style={{ margin: 0 }}
+            validateStatus={error ? 'error' : ''}
+          >
+            <Input
+              size="small"
+              type="number"
+              min={0}
+              max={100}
+              suffix="%"
+              onKeyDown={(e) => handleKeyDown(e, task.id, 'progress')}
+              status={error ? 'error' : ''}
+            />
+          </FormItem>
         )
       },
       sortingFn: 'basic',
@@ -552,8 +660,12 @@ export const getProjectTasksTableColumns = ({
         const task = info.row.original as ProjectTaskTreeDto
         const value = task.estimatedEffortHours
         const isSelected = selectedRowId === task.id
-        const cellId = `${task.id}-estimatedEffortHours`
-        const isMilestone = task.type?.name === 'Milestone'
+        const isDraft = task.id.startsWith('draft-')
+        const isMilestone = isSelected
+          ? isDraft
+            ? isSelectedRowMilestone
+            : task.type?.name === 'Milestone'
+          : task.type?.name === 'Milestone'
 
         if (!isSelected || !handleUpdateTask || isMilestone) {
           return value
@@ -561,25 +673,23 @@ export const getProjectTasksTableColumns = ({
 
         const error = getFieldError('estimatedEffortHours')
         return (
-          <div data-cell-id={cellId}>
-            <FormItem
-              name="estimatedEffortHours"
-              style={{ margin: 0 }}
-              validateStatus={error ? 'error' : ''}
-            >
-              <Input
-                size="small"
-                type="number"
-                min={0}
-                step={0.25}
-                suffix="h"
-                onKeyDown={(e) =>
-                  handleKeyDown(e, task.id, 'estimatedEffortHours')
-                }
-                status={error ? 'error' : ''}
-              />
-            </FormItem>
-          </div>
+          <FormItem
+            name="estimatedEffortHours"
+            style={{ margin: 0 }}
+            validateStatus={error ? 'error' : ''}
+          >
+            <Input
+              size="small"
+              type="number"
+              min={0}
+              step={0.25}
+              suffix="h"
+              onKeyDown={(e) =>
+                handleKeyDown(e, task.id, 'estimatedEffortHours')
+              }
+              status={error ? 'error' : ''}
+            />
+          </FormItem>
         )
       },
       sortingFn: 'basic',

@@ -15,6 +15,7 @@ const { Text } = Typography
 
 interface ProjectTasksTableToolbarProps {
   canManageTasks: boolean
+  disableCreateTaskButton?: boolean
   displayedRowCount: number
   totalRowCount: number
   searchValue: string
@@ -29,6 +30,7 @@ interface ProjectTasksTableToolbarProps {
 
 const ProjectTasksTableToolbar = ({
   canManageTasks,
+  disableCreateTaskButton = false,
   displayedRowCount,
   totalRowCount,
   searchValue,
@@ -44,7 +46,12 @@ const ProjectTasksTableToolbar = ({
     <div className={styles.toolbar}>
       <div>
         {canManageTasks && (
-          <Button type="primary" icon={<PlusOutlined />} onClick={onCreateTask}>
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={onCreateTask}
+            disabled={disableCreateTaskButton}
+          >
             Create Task
           </Button>
         )}
@@ -95,6 +102,8 @@ const ProjectTasksTableToolbar = ({
           content={<ProjectTasksHelp />}
           trigger="click"
           placement="bottomRight"
+          getPopupContainer={() => document.body}
+          overlayStyle={{ maxWidth: 'calc(100vw - 24px)' }}
         >
           <Tooltip title="Grid Actions Help">
             <Button
