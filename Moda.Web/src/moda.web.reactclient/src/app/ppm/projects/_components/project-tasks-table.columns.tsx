@@ -76,6 +76,7 @@ interface ProjectTasksTableColumnsParams {
   isDragEnabled?: boolean
   enableDragAndDrop?: boolean
   addDraftTaskAsChild?: (parentId: string) => void
+  canCreateTasks?: boolean
   isSelectedRowMilestone?: boolean
 }
 
@@ -95,6 +96,7 @@ export const getProjectTasksTableColumns = ({
   isDragEnabled = false,
   enableDragAndDrop = false,
   addDraftTaskAsChild,
+  canCreateTasks = true,
   isSelectedRowMilestone = false,
 }: ProjectTasksTableColumnsParams): ColumnDef<ProjectTaskTreeDto>[] => {
   return [
@@ -261,6 +263,7 @@ export const getProjectTasksTableColumns = ({
                     e.stopPropagation()
                     addDraftTaskAsChild(task.id)
                   }}
+                  disabled={!canCreateTasks}
                   title="Add child task"
                   style={{
                     padding: '0 4px',

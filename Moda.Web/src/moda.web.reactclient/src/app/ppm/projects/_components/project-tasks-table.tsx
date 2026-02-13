@@ -67,6 +67,10 @@ import { useProjectTasksInlineEditing } from './project-tasks-table.inline-editi
 import { stringContainsFilter } from './project-tasks-table.filters'
 import { ProjectTaskSortableRow } from './project-task-sortable-row'
 import {
+  type DraftTask,
+  mergeDraftTasksIntoTree,
+} from './project-tasks-table.merge-drafts'
+import {
   flattenTree,
   getProjection,
   calculateOrderInParent,
@@ -75,79 +79,6 @@ import {
 } from './project-task-tree-dnd-utils'
 
 const EMPTY_STRING_ARRAY: string[] = []
-
-interface DraftTask {
-  id: string
-  parentId?: string
-  order: number
-}
-
-// Helper function to merge draft tasks into the tree structure
-const mergeDraftTasksIntoTree = (
-  tasks: ProjectTaskTreeDto[],
-  draftTasks: DraftTask[],
-): ProjectTaskTreeDto[] => {
-  if (draftTasks.length === 0) return tasks
-
-  // Create draft task DTOs with default values
-  const createDraftTaskDto = (draft: DraftTask): ProjectTaskTreeDto => ({
-    id: draft.id,
-    projectId: '', // Will be set when created
-    key: '',
-    wbs: '',
-    name: '',
-    type: { id: 1, name: 'Task' }, // Default to Task type
-    status: { id: 1, name: 'Not Started' }, // Default to Not Started
-    priority: { id: 2, name: 'Medium' }, // Default to Medium
-    assignees: [],
-    progress: 0,
-    order: draft.order,
-    children: [],
-  })
-
-  // Helper to insert drafts into a tree level
-  const insertDraftsAtLevel = (
-    levelTasks: ProjectTaskTreeDto[],
-    parentId: string | undefined,
-  ): ProjectTaskTreeDto[] => {
-    // Create new task objects with processed children (to avoid mutating read-only objects)
-    const processedTasks = levelTasks.map((task) => {
-      const currentChildren = task.children ?? []
-      const nextChildren = insertDraftsAtLevel(currentChildren, task.id)
-
-      // Preserve object identity when nothing changed to avoid unnecessary re-renders.
-      if (
-        nextChildren.length === currentChildren.length &&
-        nextChildren.every((child, index) => child === currentChildren[index])
-      ) {
-        return task
-      }
-
-      // Create a new task object with recursively processed children.
-      // This also handles inserting draft children for parents that currently
-      // have zero children.
-      return {
-        ...task,
-        children: nextChildren,
-      }
-    })
-
-    // Find drafts for this level
-    const draftsForLevel = draftTasks.filter((d) => d.parentId === parentId)
-
-    // Add drafts at the end
-    if (draftsForLevel.length > 0) {
-      return [
-        ...processedTasks,
-        ...draftsForLevel.map((draft) => createDraftTaskDto(draft)),
-      ]
-    }
-
-    return processedTasks
-  }
-
-  return insertDraftsAtLevel(tasks, undefined)
-}
 
 interface ProjectTasksTableProps {
   projectKey: string
@@ -481,6 +412,10 @@ const ProjectTasksTable = ({
 
   // Add a draft task at root level
   const addDraftTaskAtRoot = useCallback(() => {
+    if (selectedRowId !== null || draftTasks.length > 0) {
+      return
+    }
+
     draftCounterRef.current += 1
     const newDraft: DraftTask = {
       id: `draft-${Date.now()}-${draftCounterRef.current}`,
@@ -497,11 +432,15 @@ const ProjectTasksTable = ({
         setSelectedCellId(`${newDraft.id}-name`)
       }, 50)
     })
-  }, [setSelectedRowId, setSelectedCellId])
+  }, [draftTasks.length, selectedRowId, setSelectedRowId, setSelectedCellId])
 
   // Add a draft task as a child of a specific parent
   const addDraftTaskAsChild = useCallback(
     (parentId: string) => {
+      if (selectedRowId !== null || draftTasks.length > 0) {
+        return
+      }
+
       draftCounterRef.current += 1
       const newDraft: DraftTask = {
         id: `draft-${Date.now()}-${draftCounterRef.current}`,
@@ -529,7 +468,7 @@ const ProjectTasksTable = ({
       })
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [setSelectedRowId, setSelectedCellId], // tableRef is stable and doesn't need to be in deps
+    [draftTasks.length, selectedRowId, setSelectedRowId, setSelectedCellId], // tableRef is stable and doesn't need to be in deps
   )
 
   // Task form handlers
@@ -635,6 +574,8 @@ const ProjectTasksTable = ({
   const hasFilters =
     !!searchValue || columnFilters.length > 0 || sorting.length > 0
   const isEditing = selectedRowId !== null
+  const canCreateDraftTask =
+    canManageTasks && !isEditing && draftTasks.length === 0
   const isDragEnabled = useMemo(() => {
     return (
       enableDragAndDrop !== false &&
@@ -663,6 +604,7 @@ const ProjectTasksTable = ({
         isDragEnabled,
         enableDragAndDrop,
         addDraftTaskAsChild,
+        canCreateTasks: canCreateDraftTask,
         isSelectedRowMilestone,
       }),
     [
@@ -681,6 +623,7 @@ const ProjectTasksTable = ({
       isDragEnabled,
       enableDragAndDrop,
       addDraftTaskAsChild,
+      canCreateDraftTask,
       isSelectedRowMilestone,
     ],
   )
@@ -898,6 +841,7 @@ const ProjectTasksTable = ({
         <div className={styles.table}>
           <ProjectTasksTableToolbar
             canManageTasks={canManageTasks}
+            disableCreateTaskButton={!canCreateDraftTask}
             displayedRowCount={displayedRowCount}
             totalRowCount={totalRowCount}
             searchValue={searchValue}

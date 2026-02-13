@@ -34,7 +34,6 @@ export const useProjectTasksInlineEditing = ({
   const tableRef = useRef<any>(null)
   const isInitializingRef = useRef(false)
   const lastFocusedCellRef = useRef<string | null>(null)
-  const clickedInTableRef = useRef(false)
 
   const editableColumns = useMemo(
     () => [
@@ -327,22 +326,22 @@ export const useProjectTasksInlineEditing = ({
           setSelectedRowId(null)
           setSelectedCellId(null)
         }
-        clickedInTableRef.current = false
         return
       }
 
-      const focusedInTable = document.activeElement?.closest(
+      const clickedInsideTable = target.closest(
         `.${tableWrapperClassName}`,
       )
 
-      if (!clickedInTableRef.current && !focusedInTable) {
-        const saved = await saveFormChanges(selectedRowId)
-        if (saved) {
-          setSelectedRowId(null)
-          setSelectedCellId(null)
-        }
+      if (clickedInsideTable) {
+        return
       }
-      clickedInTableRef.current = false
+
+      const saved = await saveFormChanges(selectedRowId)
+      if (saved) {
+        setSelectedRowId(null)
+        setSelectedCellId(null)
+      }
     }
 
     document.addEventListener('mousedown', handleClickOutside)
@@ -769,8 +768,6 @@ export const useProjectTasksInlineEditing = ({
         getClickedColumnId: (target: HTMLElement) => string | null
       },
     ) => {
-      clickedInTableRef.current = true
-
       if (isSaving || !canManageTasks) {
         return
       }
