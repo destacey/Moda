@@ -227,10 +227,14 @@ const ProjectTasksTable = ({
 
           return true
         } catch (error: any) {
-          if (error?.status === 422 && error?.errors) {
+          const status = error?.status ?? error?.data?.status
+          const errors = error?.errors ?? error?.data?.errors
+          const detail = error?.detail ?? error?.data?.detail
+
+          if (status === 422 && errors) {
             const errorMap: Record<string, string> = {}
             const errorFields: string[] = []
-            Object.entries(error.errors).forEach(([key, messages]) => {
+            Object.entries(errors).forEach(([key, messages]) => {
               const fieldName = key.charAt(0).toLowerCase() + key.slice(1)
               errorMap[fieldName] = Array.isArray(messages)
                 ? messages[0]
@@ -281,7 +285,7 @@ const ProjectTasksTable = ({
             return false
           } else {
             messageApi.error(
-              error?.detail ??
+              detail ??
                 'An error occurred while creating the project task. Please try again.',
             )
           }
@@ -309,10 +313,14 @@ const ProjectTasksTable = ({
           await refetch()
           return true
         } catch (error: any) {
-          if (error?.status === 422 && error?.errors) {
+          const status = error?.status ?? error?.data?.status
+          const errors = error?.errors ?? error?.data?.errors
+          const detail = error?.detail ?? error?.data?.detail
+
+          if (status === 422 && errors) {
             const errorMap: Record<string, string> = {}
             const errorFields: string[] = []
-            Object.entries(error.errors).forEach(([key, messages]) => {
+            Object.entries(errors).forEach(([key, messages]) => {
               const fieldName = key.charAt(0).toLowerCase() + key.slice(1)
               errorMap[fieldName] = Array.isArray(messages)
                 ? messages[0]
@@ -365,7 +373,7 @@ const ProjectTasksTable = ({
             return false
           } else {
             messageApi.error(
-              error?.detail ??
+              detail ??
                 'An error occurred while updating the project task. Please try again.',
             )
           }

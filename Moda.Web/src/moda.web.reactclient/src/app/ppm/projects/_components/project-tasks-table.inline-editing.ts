@@ -4,6 +4,18 @@ import dayjs from 'dayjs'
 import { ProjectTaskTreeDto } from '@/src/services/moda-api'
 import { findProjectTaskById } from './project-task-tree'
 
+const CELL_ID_COLUMN_MATCH_ORDER = [
+  'estimatedEffortHours',
+  'plannedStart',
+  'plannedEnd',
+  'assignees',
+  'priority',
+  'status',
+  'progress',
+  'type',
+  'name',
+] as const
+
 interface UseProjectTasksInlineEditingParams {
   tasks: ProjectTaskTreeDto[]
   canManageTasks: boolean
@@ -34,20 +46,170 @@ export const useProjectTasksInlineEditing = ({
   const tableRef = useRef<any>(null)
   const isInitializingRef = useRef(false)
   const lastFocusedCellRef = useRef<string | null>(null)
+  const focusRequestTokenRef = useRef(0)
+  const focusObserverRef = useRef<MutationObserver | null>(null)
+
+  const focusCellById = useCallback((cellId: string) => {
+    // Disconnect any previous MutationObserver from an earlier call
+    focusObserverRef.current?.disconnect()
+    focusObserverRef.current = null
+    const requestToken = ++focusRequestTokenRef.current
+    let columnId = ''
+    for (const col of CELL_ID_COLUMN_MATCH_ORDER) {
+      if (cellId.endsWith(`-${col}`)) {
+        columnId = col
+        break
+      }
+    }
+    const isDateColumn = columnId === 'plannedStart' || columnId === 'plannedEnd'
+
+    const isActiveElementInsideCell = () => {
+      const active = document.activeElement as HTMLElement | null
+      const activeCellId = active
+        ?.closest?.('[data-cell-id]')
+        ?.getAttribute('data-cell-id')
+      return activeCellId === cellId
+    }
+    const getActiveCellId = () => {
+      const active = document.activeElement as HTMLElement | null
+      return active?.closest?.('[data-cell-id]')?.getAttribute('data-cell-id')
+    }
+
+    const tryFocus = (attempt: number) => {
+      if (focusRequestTokenRef.current !== requestToken) {
+        return
+      }
+
+      let cellElement: Element | null = null
+      const allCells = document.querySelectorAll('[data-cell-id]')
+      for (const cell of allCells) {
+        if (cell.getAttribute('data-cell-id') === cellId) {
+          cellElement = cell
+          break
+        }
+      }
+
+      if (cellElement) {
+        let input: HTMLElement | null = null
+
+        if (columnId === 'plannedStart' || columnId === 'plannedEnd') {
+          const picker = cellElement.querySelector('.ant-picker') as
+            | HTMLElement
+            | null
+          const pickerInput = cellElement.querySelector(
+            '.ant-picker-input > input',
+          ) as HTMLElement | null
+
+          // Focus the DatePicker wrapper first so visual focus styles are applied.
+          picker?.focus()
+          input = pickerInput ?? picker
+        } else if (
+          columnId === 'status' ||
+          columnId === 'priority' ||
+          columnId === 'type' ||
+          columnId === 'assignees'
+        ) {
+          // The focusable element inside Ant Design Select is
+          // input.ant-select-input (role="combobox").
+          input = cellElement.querySelector(
+            'input.ant-select-input',
+          ) as HTMLElement | null
+        } else {
+          input = cellElement.querySelector('input')
+        }
+
+        if (!input && columnId !== 'assignees' && columnId !== 'status' && columnId !== 'priority' && columnId !== 'type') {
+          input = cellElement.querySelector('.ant-picker')
+        }
+
+        if (input instanceof HTMLElement) {
+          input.focus()
+          if (input instanceof HTMLInputElement) {
+            input.select()
+          }
+
+          if (!isActiveElementInsideCell()) {
+            if (attempt < 12) {
+              setTimeout(() => tryFocus(attempt + 1), 20)
+            }
+            return
+          }
+
+          // DatePicker inputs can be re-mounted during row/cell state updates.
+          // Re-check shortly after and re-focus if focus was lost.
+          if (isDateColumn) {
+            setTimeout(() => {
+              if (!isActiveElementInsideCell()) {
+                const activeCellId = getActiveCellId()
+                // If focus moved to another table cell (e.g., user pressed Tab),
+                // do not steal it back.
+                if (activeCellId && activeCellId !== cellId) {
+                  return
+                }
+                tryFocus(6)
+              }
+            }, 40)
+          }
+          return
+        }
+      }
+
+      if (attempt < 12) {
+        setTimeout(() => tryFocus(attempt + 1), 20)
+      }
+    }
+
+    // React may perform multiple render passes after row selection changes
+    // (e.g. form.setFieldsValue triggers a microtask re-render that
+    // unmounts and recreates Ant Design internals, blurring any focused
+    // element). Use a MutationObserver to wait for the DOM to stabilize
+    // before focusing. Once no mutations occur for 50ms, the DOM is
+    // considered stable and we attempt to focus.
+    const cellEl = document.querySelector(`[data-cell-id="${cellId}"]`)
+    const observeTarget = cellEl?.closest('tr') ?? document.body
+    let stabilityTimer: ReturnType<typeof setTimeout> | null = null
+    const observer = new MutationObserver(() => {
+      if (stabilityTimer) clearTimeout(stabilityTimer)
+      stabilityTimer = setTimeout(() => {
+        observer.disconnect()
+        focusObserverRef.current = null
+        tryFocus(0)
+      }, 50)
+    })
+    focusObserverRef.current = observer
+    observer.observe(observeTarget, {
+      childList: true,
+      subtree: true,
+    })
+    // Kick off the timer in case there are no mutations at all
+    // (e.g. clicking a cell that's already in the selected row).
+    stabilityTimer = setTimeout(() => {
+      observer.disconnect()
+      tryFocus(0)
+    }, 50)
+  }, [])
 
   const editableColumns = useMemo(
-    () => [
-      'name',
-      'type',
-      'status',
-      'priority',
-      'plannedStart',
-      'plannedEnd',
-      'assignees',
-      'progress',
-      'estimatedEffortHours',
-    ],
-    [],
+    () => {
+      const baseColumns = [
+        'name',
+        'status',
+        'priority',
+        'plannedStart',
+        'plannedEnd',
+        'assignees',
+        'progress',
+        'estimatedEffortHours',
+      ]
+
+      // Type is only editable for draft (new) tasks.
+      if (selectedRowId?.startsWith('draft-')) {
+        return ['name', 'type', ...baseColumns.slice(1)]
+      }
+
+      return baseColumns
+    },
+    [selectedRowId],
   )
 
   const getFieldError = useCallback(
@@ -56,6 +218,54 @@ export const useProjectTasksInlineEditing = ({
     },
     [fieldErrors],
   )
+  const watchedPlannedStart = Form.useWatch('plannedStart', form)
+  const watchedPlannedEnd = Form.useWatch('plannedEnd', form)
+
+  // Clear date-pair validation errors as soon as the user fixes the values.
+  useEffect(() => {
+    if (!selectedRowId) return
+    if (!fieldErrors.plannedStart && !fieldErrors.plannedEnd) return
+
+    const task = findProjectTaskById(tasks, selectedRowId)
+    const isDraft = selectedRowId.startsWith('draft-')
+    const isMilestone = isDraft
+      ? isSelectedRowMilestone
+      : task?.type?.name === 'Milestone'
+
+    let shouldClearDateErrors = false
+
+    if (isMilestone) {
+      shouldClearDateErrors = true
+    } else {
+      const hasPlannedStart = Boolean(watchedPlannedStart)
+      const hasPlannedEnd = Boolean(watchedPlannedEnd)
+      const bothOrNeither = hasPlannedStart === hasPlannedEnd
+      const endNotBeforeStart =
+        !hasPlannedStart ||
+        !hasPlannedEnd ||
+        !dayjs(watchedPlannedEnd).isBefore(dayjs(watchedPlannedStart), 'day')
+      shouldClearDateErrors = bothOrNeither && endNotBeforeStart
+    }
+
+    if (!shouldClearDateErrors) return
+
+    const nextErrors = { ...fieldErrors }
+    delete nextErrors.plannedStart
+    delete nextErrors.plannedEnd
+
+    if (Object.keys(nextErrors).length !== Object.keys(fieldErrors).length) {
+      setFieldErrors(nextErrors)
+    }
+  }, [
+    fieldErrors,
+    form,
+    isSelectedRowMilestone,
+    selectedRowId,
+    setFieldErrors,
+    tasks,
+    watchedPlannedEnd,
+    watchedPlannedStart,
+  ])
 
   const saveFormChanges = useCallback(
     async (taskId: string) => {
@@ -65,7 +275,82 @@ export const useProjectTasksInlineEditing = ({
       // Fast path for existing tasks: if nothing changed, skip validation
       // and diffing to keep row-to-row navigation responsive.
       if (!isDraft && !hasTouchedFields) {
-        return true
+        const task = findProjectTaskById(tasks, taskId)
+        if (!task) return false
+
+        const values = form.getFieldsValue() as any
+        const isMilestoneForValidation = isDraft
+          ? isSelectedRowMilestone
+          : task?.type?.name === 'Milestone'
+
+        // Client-side cross-field validation for Task rows.
+        if (!isMilestoneForValidation) {
+          const hasPlannedStart = Boolean(values.plannedStart)
+          const hasPlannedEnd = Boolean(values.plannedEnd)
+          const nextFieldErrors: Record<string, string> = {}
+
+          if (hasPlannedStart !== hasPlannedEnd) {
+            const message =
+              'Planned Start and Planned End must both have a value or both be empty.'
+            nextFieldErrors.plannedStart = message
+            nextFieldErrors.plannedEnd = message
+          }
+
+          if (hasPlannedStart && hasPlannedEnd) {
+            const plannedStart = dayjs(values.plannedStart)
+            const plannedEnd = dayjs(values.plannedEnd)
+            if (plannedEnd.isBefore(plannedStart, 'day')) {
+              nextFieldErrors.plannedEnd =
+                'Planned End cannot be earlier than Planned Start.'
+            }
+          }
+
+          if (Object.keys(nextFieldErrors).length > 0) {
+            setFieldErrors(nextFieldErrors)
+            return false
+          }
+        }
+        const taskAssigneeIds = task.assignees?.map((a) => a.id) ?? []
+        const formAssigneeIds = values.assigneeIds ?? []
+        const assigneesChanged =
+          taskAssigneeIds.length !== formAssigneeIds.length ||
+          !taskAssigneeIds.every((id: string) => formAssigneeIds.includes(id))
+
+        const taskPlannedStart = task.plannedStart
+          ? String(task.plannedStart).split('T')[0]
+          : null
+        const plannedStartFormatted = values.plannedStart
+          ? values.plannedStart.format('YYYY-MM-DD')
+          : null
+
+        const taskPlannedEnd = task.plannedEnd
+          ? String(task.plannedEnd).split('T')[0]
+          : null
+        const plannedEndFormatted = values.plannedEnd
+          ? values.plannedEnd.format('YYYY-MM-DD')
+          : null
+
+        const taskPlannedDate = task.plannedDate
+          ? String(task.plannedDate).split('T')[0]
+          : null
+        const plannedDateFormatted = values.plannedDate
+          ? values.plannedDate.format('YYYY-MM-DD')
+          : null
+
+        const hasValueChanges =
+          values.name !== task.name ||
+          values.statusId !== task.status?.id ||
+          values.priorityId !== task.priority?.id ||
+          assigneesChanged ||
+          plannedStartFormatted !== taskPlannedStart ||
+          plannedEndFormatted !== taskPlannedEnd ||
+          plannedDateFormatted !== taskPlannedDate ||
+          values.progress !== task.progress ||
+          values.estimatedEffortHours !== task.estimatedEffortHours
+
+        if (!hasValueChanges) {
+          return true
+        }
       }
 
       try {
@@ -80,6 +365,11 @@ export const useProjectTasksInlineEditing = ({
         }
 
         const values = form.getFieldsValue() as any
+
+        // Clear any prior inline errors once local validation passes.
+        if (Object.keys(fieldErrors).length > 0) {
+          setFieldErrors({})
+        }
 
         const updates: Record<string, any> = {}
         let hasChanges = false
@@ -199,7 +489,14 @@ export const useProjectTasksInlineEditing = ({
         return false
       }
     },
-    [form, isSelectedRowMilestone, onUpdateTask, tasks],
+    [
+      fieldErrors,
+      form,
+      isSelectedRowMilestone,
+      onUpdateTask,
+      setFieldErrors,
+      tasks,
+    ],
   )
 
   // Initialize form when row selection changes
@@ -255,50 +552,15 @@ export const useProjectTasksInlineEditing = ({
     lastFocusedCellRef.current = null
   }, [form, selectedRowId, setFieldErrors, tasks])
 
-  // Handle cell focusing separately - only focus when cell ID changes
+  // Focus the target cell when selectedCellId changes
   useEffect(() => {
     if (!selectedRowId || !selectedCellId) return
 
     if (lastFocusedCellRef.current === selectedCellId) return
 
     lastFocusedCellRef.current = selectedCellId
-
-    const timeout = setTimeout(() => {
-      let cellElement = document.querySelector(
-        `td[data-cell-id="${selectedCellId}"]`,
-      )
-
-      if (!cellElement) {
-        const rows = document.querySelectorAll('tr')
-        for (const row of rows) {
-          const cell = row.querySelector(`[data-cell-id="${selectedCellId}"]`)
-          if (cell) {
-            cellElement = cell
-            break
-          }
-        }
-      }
-
-      if (cellElement) {
-        let input = cellElement.querySelector('input') as HTMLElement
-
-        if (!input) {
-          input = cellElement.querySelector(
-            '.ant-select, .ant-picker',
-          ) as HTMLElement
-        }
-
-        if (input) {
-          input.focus()
-          if (input instanceof HTMLInputElement) {
-            input.select()
-          }
-        }
-      }
-    }, 10)
-
-    return () => clearTimeout(timeout)
-  }, [selectedRowId, selectedCellId])
+    focusCellById(selectedCellId)
+  }, [focusCellById, selectedRowId, selectedCellId])
 
   // Handle click outside table to save changes and exit edit mode
   useEffect(() => {
@@ -360,118 +622,8 @@ export const useProjectTasksInlineEditing = ({
       const activeElement = document.activeElement
       const currentCellElement = activeElement?.closest('[data-cell-id]')
 
-      if (e.key === 'Tab' && currentCellElement) {
-        const cellId = currentCellElement.getAttribute('data-cell-id')
-        if (!cellId) return
-
-        // Extract column name by matching against known editable columns.
-        // Cannot split on '-' because task IDs (UUIDs) also contain hyphens.
-        let columnId = ''
-        for (const col of editableColumns) {
-          if (cellId.endsWith(`-${col}`)) {
-            columnId = col
-            break
-          }
-        }
-        const currentColIndex = editableColumns.indexOf(columnId)
-        if (currentColIndex === -1) return
-
-        e.preventDefault()
-        e.stopPropagation()
-
-        // Blur the active element to close any open Select dropdowns
-        // and commit their current value before navigating
-        if (activeElement instanceof HTMLElement) {
-          activeElement.blur()
-        }
-
-        const rows = tableRef.current.getRowModel().rows
-        const currentRowIndex = rows.findIndex(
-          (r: any) => r.original.id === selectedRowId,
-        )
-        if (currentRowIndex === -1) return
-
-        let nextRowId: string | null = null
-        let nextColId: string | null = null
-
-        // Helper to find the next column that has an editable input for the
-        // given row. Skips columns that render read-only for the row's type
-        // (e.g. milestones don't have plannedEnd, progress, estimatedEffortHours).
-        const findNextEditableCol = (
-          rowId: string,
-          startColIdx: number,
-          direction: 1 | -1,
-        ): string | null => {
-          let idx = startColIdx
-          while (idx >= 0 && idx < editableColumns.length) {
-            const col = editableColumns[idx]
-            const cell = document.querySelector(
-              `[data-cell-id="${rowId}-${col}"]`,
-            )
-            if (
-              cell &&
-              cell.querySelector('input, .ant-select, .ant-picker')
-            ) {
-              return col
-            }
-            idx += direction
-          }
-          return null
-        }
-
-        if (e.shiftKey) {
-          const col = findNextEditableCol(selectedRowId, currentColIndex - 1, -1)
-          if (col) {
-            nextColId = col
-            nextRowId = selectedRowId
-          } else if (currentRowIndex > 0) {
-            // Wrap to end of previous row — pick last editable column
-            const prevRowId = rows[currentRowIndex - 1].original.id
-            const col = findNextEditableCol(
-              prevRowId,
-              editableColumns.length - 1,
-              -1,
-            )
-            nextColId = col ?? editableColumns[editableColumns.length - 1]
-            nextRowId = prevRowId
-          }
-        } else {
-          const col = findNextEditableCol(selectedRowId, currentColIndex + 1, 1)
-          if (col) {
-            nextColId = col
-            nextRowId = selectedRowId
-          } else if (currentRowIndex < rows.length - 1) {
-            // Wrap to start of next row — pick first editable column
-            const nextRow = rows[currentRowIndex + 1].original.id
-            const col = findNextEditableCol(nextRow, 0, 1)
-            nextColId = col ?? editableColumns[0]
-            nextRowId = nextRow
-          }
-        }
-
-        if (nextRowId && nextColId) {
-          setSelectedRowId(nextRowId)
-          setSelectedCellId(`${nextRowId}-${nextColId}`)
-
-          setTimeout(() => {
-            const nextCell = document.querySelector(
-              `[data-cell-id="${nextRowId}-${nextColId}"]`,
-            )
-            if (nextCell) {
-              const input = nextCell.querySelector(
-                'input, .ant-select, .ant-picker',
-              )
-              if (input instanceof HTMLElement) {
-                input.focus()
-                if (input instanceof HTMLInputElement) {
-                  input.select()
-                }
-              }
-            }
-          }, 10)
-        }
-        return
-      }
+      // Tab is handled exclusively by the per-cell handleKeyDown to avoid
+      // duplicate navigation and focus races. Do not handle Tab here.
 
       if (
         (e.key === 'Enter' || e.key === 'ArrowUp' || e.key === 'ArrowDown') &&
@@ -539,7 +691,6 @@ export const useProjectTasksInlineEditing = ({
       document.removeEventListener('keydown', handleGlobalKeyDown, true)
     }
   }, [
-    editableColumns,
     isSaving,
     saveFormChanges,
     selectedRowId,
@@ -643,84 +794,72 @@ export const useProjectTasksInlineEditing = ({
           setSelectedCellId(null)
           return
 
-        case 'Tab':
+        case 'Tab': {
           e.preventDefault()
           e.stopPropagation()
 
           // Blur the active element to close any open Select dropdowns
-          // and commit their current value before navigating
+          // and commit their current value before navigating.
           if (document.activeElement instanceof HTMLElement) {
             document.activeElement.blur()
           }
 
-          const findNextAvailableField = (
-            startRowId: string,
-            startColIndex: number,
-            direction: 'forward' | 'backward',
-          ): { rowId: string; colId: string } | null => {
-            let currentRowIdx = rows.findIndex(
-              (r: any) => r.original.id === startRowId,
-            )
-            let currentColIdx = startColIndex
-
-            while (currentRowIdx >= 0 && currentRowIdx < rows.length) {
-              while (
-                direction === 'forward'
-                  ? currentColIdx < editableColumns.length
-                  : currentColIdx >= 0
+          // Find next editable column within the CURRENT row by checking the
+          // DOM for rendered inputs. Only the selected row has edit controls,
+          // so we cannot DOM-query other rows for editability.
+          const findNextColInCurrentRow = (
+            startColIdx: number,
+            direction: 1 | -1,
+          ): string | null => {
+            let idx = startColIdx
+            while (idx >= 0 && idx < editableColumns.length) {
+              const col = editableColumns[idx]
+              const cell = document.querySelector(
+                `[data-cell-id="${rowId}-${col}"]`,
+              )
+              if (
+                cell &&
+                cell.querySelector('input, .ant-select, .ant-picker')
               ) {
-                const testRowId = rows[currentRowIdx].original.id
-                const testColId = editableColumns[currentColIdx]
-                const cellElement = document.querySelector(
-                  `[data-cell-id="${testRowId}-${testColId}"]`,
-                )
-
-                // Only consider this cell if it has an actual editable input
-                if (
-                  cellElement &&
-                  cellElement.querySelector(
-                    'input, .ant-select, .ant-picker',
-                  )
-                ) {
-                  return { rowId: testRowId, colId: testColId }
-                }
-
-                currentColIdx += direction === 'forward' ? 1 : -1
+                return col
               }
-
-              currentRowIdx += direction === 'forward' ? 1 : -1
-              currentColIdx =
-                direction === 'forward' ? 0 : editableColumns.length - 1
+              idx += direction
             }
-
             return null
           }
 
           if (e.shiftKey) {
-            const result = findNextAvailableField(
-              rowId,
-              currentColIndex - 1,
-              'backward',
-            )
-            if (result) {
-              nextRowId = result.rowId
-              nextColId = result.colId
+            // Try previous column in current row
+            const col = findNextColInCurrentRow(currentColIndex - 1, -1)
+            if (col) {
+              nextColId = col
+              nextRowId = rowId
+            } else if (currentRowIndex > 0) {
+              // Wrap to previous row, last editable column.
+              // The row isn't selected yet so we can't DOM-check which
+              // columns render inputs — use the last editable column and
+              // let focusCellById handle finding the actual input.
+              nextRowId = rows[currentRowIndex - 1].original.id
+              nextColId = editableColumns[editableColumns.length - 1]
             } else {
+              // Already at first column of first row — save and exit
               await saveFormChanges(rowId)
               setSelectedRowId(null)
               setSelectedCellId(null)
               return
             }
           } else {
-            const result = findNextAvailableField(
-              rowId,
-              currentColIndex + 1,
-              'forward',
-            )
-            if (result) {
-              nextRowId = result.rowId
-              nextColId = result.colId
+            // Try next column in current row
+            const col = findNextColInCurrentRow(currentColIndex + 1, 1)
+            if (col) {
+              nextColId = col
+              nextRowId = rowId
+            } else if (currentRowIndex < rows.length - 1) {
+              // Wrap to next row, first editable column
+              nextRowId = rows[currentRowIndex + 1].original.id
+              nextColId = editableColumns[0]
             } else {
+              // Already at last column of last row — save and exit
               await saveFormChanges(rowId)
               setSelectedRowId(null)
               setSelectedCellId(null)
@@ -728,32 +867,22 @@ export const useProjectTasksInlineEditing = ({
             }
           }
           break
+        }
       }
 
       if (nextRowId && nextColId) {
+        // If moving to a different row, save the current row first and
+        // wait for the save to complete before navigating. This ensures
+        // the refetch has finished and DOM is stable before focusing.
+        if (nextRowId !== rowId) {
+          const tabSaved = await saveFormChanges(rowId)
+          if (!tabSaved) return
+        }
+
         setSelectedRowId(nextRowId)
         setSelectedCellId(`${nextRowId}-${nextColId}`)
-
-        setTimeout(() => {
-          const cellId = `${nextRowId}-${nextColId}`
-          const nextCell = document.querySelector(`[data-cell-id="${cellId}"]`)
-          if (nextCell) {
-            let input = nextCell.querySelector('input') as HTMLElement
-
-            if (!input) {
-              input = nextCell.querySelector(
-                '.ant-select, .ant-picker',
-              ) as HTMLElement
-            }
-
-            if (input instanceof HTMLElement) {
-              input.focus()
-              if (input instanceof HTMLInputElement) {
-                input.select()
-              }
-            }
-          }
-        }, 10)
+        // Focus is handled by the useEffect that watches selectedCellId
+        // via focusCellById — no duplicate setTimeout needed here.
       }
     },
     [editableColumns, isSaving, onCancelDraft, saveFormChanges, selectedRowId],
@@ -787,10 +916,7 @@ export const useProjectTasksInlineEditing = ({
         return
       }
 
-      const clickedColumnId = args.getClickedColumnId(target)
-      if (!clickedColumnId) {
-        return
-      }
+      const clickedColumnId = args.getClickedColumnId(target) ?? 'name'
 
       const isEditable = args.isEditableColumn(clickedColumnId)
 
@@ -799,10 +925,16 @@ export const useProjectTasksInlineEditing = ({
           const targetCellId = `${args.rowId}-${clickedColumnId}`
           if (selectedCellId !== targetCellId) {
             setSelectedCellId(targetCellId)
+          } else {
+            focusCellById(targetCellId)
           }
         } else {
-          setSelectedRowId(null)
-          setSelectedCellId(null)
+          const targetCellId = `${args.rowId}-name`
+          if (selectedCellId !== targetCellId) {
+            setSelectedCellId(targetCellId)
+          } else {
+            focusCellById(targetCellId)
+          }
         }
       } else if (selectedRowId) {
         const saved = await saveFormChanges(selectedRowId)
@@ -821,7 +953,14 @@ export const useProjectTasksInlineEditing = ({
         setSelectedCellId(targetCellId)
       }
     },
-    [canManageTasks, isSaving, saveFormChanges, selectedCellId, selectedRowId],
+    [
+      canManageTasks,
+      focusCellById,
+      isSaving,
+      saveFormChanges,
+      selectedCellId,
+      selectedRowId,
+    ],
   )
 
   return {

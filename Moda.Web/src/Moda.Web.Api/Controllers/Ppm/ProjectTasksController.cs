@@ -1,3 +1,4 @@
+﻿using FluentValidation;
 using Microsoft.AspNetCore.JsonPatch.SystemTextJson;
 using Moda.Common.Domain.Models.ProjectPortfolioManagement;
 using Moda.ProjectPortfolioManagement.Application.Projects.Queries;
@@ -14,10 +15,11 @@ namespace Moda.Web.Api.Controllers.Ppm;
 [Route("api/ppm/projects/{projectIdOrKey}/tasks")]
 [ApiVersionNeutral]
 [ApiController]
-public class ProjectTasksController(ILogger<ProjectTasksController> logger, ISender sender) : ControllerBase
+public class ProjectTasksController(ILogger<ProjectTasksController> logger, ISender sender, IValidator<UpdateProjectTaskRequest> updateProjectTaskValidator) : ControllerBase
 {
     private readonly ILogger<ProjectTasksController> _logger = logger;
     private readonly ISender _sender = sender;
+    private readonly IValidator<UpdateProjectTaskRequest> _updateProjectTaskValidator = updateProjectTaskValidator;
 
     [HttpGet]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Projects)]
@@ -148,8 +150,21 @@ public class ProjectTasksController(ILogger<ProjectTasksController> logger, ISen
             ModelState.AddModelError(error.AffectedObject.GetType().Name, error.ErrorMessage);
         });
 
+        // Validate the patched request with FluentValidation
+        var validationResult = await _updateProjectTaskValidator.ValidateAsync(updateRequest, cancellationToken);
+        if (!validationResult.IsValid)
+        {
+            foreach (var error in validationResult.Errors)
+            {
+                ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+            }
+        }
+
+        // Return all validation errors (patch + business rules) as 422
         if (!ModelState.IsValid)
-            return ValidationProblem(ModelState);
+            return ValidationProblem(
+                modelStateDictionary: ModelState,
+                statusCode: StatusCodes.Status422UnprocessableEntity);
 
         var result = await _sender.Send(updateRequest.ToUpdateProjectTaskCommand(), cancellationToken);
 

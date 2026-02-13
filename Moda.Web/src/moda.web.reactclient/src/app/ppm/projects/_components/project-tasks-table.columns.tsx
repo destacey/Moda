@@ -294,40 +294,38 @@ export const getProjectTasksTableColumns = ({
 
         if (isSelected && isDraft && handleUpdateTask) {
           return (
-            <div data-cell-id={cellId}>
-              <FormItem
-                name="typeId"
-                style={{ margin: 0 }}
-                validateStatus={getFieldError('typeId') ? 'error' : ''}
-              >
-                <Select
-                  size="small"
-                  options={taskTypeOptions}
-                  style={{ width: '100%' }}
-                  onKeyDown={(e) => handleKeyDown(e, task.id, 'type')}
-                  status={getFieldError('typeId') ? 'error' : ''}
-                  onOpenChange={(open) => {
-                    // When the dropdown closes after a selection, the Select
-                    // loses focus — especially when changing Task↔Milestone
-                    // which triggers a full column rebuild. Re-focus the
-                    // Select's search input after React re-renders.
-                    if (!open) {
-                      setTimeout(() => {
-                        const cell = document.querySelector(
-                          `[data-cell-id="${cellId}"]`,
-                        )
-                        if (cell) {
-                          const input = cell.querySelector(
-                            '.ant-select-selection-search-input',
-                          ) as HTMLElement
-                          input?.focus()
-                        }
-                      }, 10)
-                    }
-                  }}
-                />
-              </FormItem>
-            </div>
+            <FormItem
+              name="typeId"
+              style={{ margin: 0 }}
+              validateStatus={getFieldError('typeId') ? 'error' : ''}
+            >
+              <Select
+                size="small"
+                options={taskTypeOptions}
+                style={{ width: '100%' }}
+                onKeyDown={(e) => handleKeyDown(e, task.id, 'type')}
+                status={getFieldError('typeId') ? 'error' : ''}
+                onOpenChange={(open) => {
+                  // When the dropdown closes after a selection, the Select
+                  // loses focus — especially when changing Task↔Milestone
+                  // which triggers a full column rebuild. Re-focus the
+                  // Select's search input after React re-renders.
+                  if (!open) {
+                    setTimeout(() => {
+                      const cell = document.querySelector(
+                        `[data-cell-id="${cellId}"]`,
+                      )
+                      if (cell) {
+                        const input = cell.querySelector(
+                          'input.ant-select-input',
+                        ) as HTMLElement
+                        input?.focus()
+                      }
+                    }, 10)
+                  }
+                }}
+              />
+            </FormItem>
           )
         }
 
@@ -348,7 +346,6 @@ export const getProjectTasksTableColumns = ({
         const status = (info.getValue() as string) ?? ''
         const isSelected = selectedRowId === task.id
         const isDraft = task.id.startsWith('draft-')
-        const cellId = `${task.id}-status`
         const colorMap: Record<string, string> = {
           'Not Started': 'default',
           'In Progress': 'processing',
@@ -373,21 +370,19 @@ export const getProjectTasksTableColumns = ({
 
         const error = getFieldError('statusId')
         return (
-          <div data-cell-id={cellId}>
-            <FormItem
-              name="statusId"
-              style={{ margin: 0 }}
-              rules={[{ required: true, message: 'Status is required' }]}
-              validateStatus={error ? 'error' : ''}
-            >
-              <Select
-                size="small"
-                options={availableStatusOptions}
-                onKeyDown={(e) => handleKeyDown(e, task.id, 'status')}
-                status={error ? 'error' : ''}
-              />
-            </FormItem>
-          </div>
+          <FormItem
+            name="statusId"
+            style={{ margin: 0 }}
+            rules={[{ required: true, message: 'Status is required' }]}
+            validateStatus={error ? 'error' : ''}
+          >
+            <Select
+              size="small"
+              options={availableStatusOptions}
+              onKeyDown={(e) => handleKeyDown(e, task.id, 'status')}
+              status={error ? 'error' : ''}
+            />
+          </FormItem>
         )
       },
     },
@@ -404,7 +399,6 @@ export const getProjectTasksTableColumns = ({
         const task = info.row.original as ProjectTaskTreeDto
         const priority = (info.getValue() as string) ?? ''
         const isSelected = selectedRowId === task.id
-        const cellId = `${task.id}-priority`
 
         if (!isSelected || !handleUpdateTask) {
           if (!priority) return '-'
@@ -419,21 +413,19 @@ export const getProjectTasksTableColumns = ({
 
         const error = getFieldError('priorityId')
         return (
-          <div data-cell-id={cellId}>
-            <FormItem
-              name="priorityId"
-              style={{ margin: 0 }}
-              rules={[{ required: true, message: 'Priority is required' }]}
-              validateStatus={error ? 'error' : ''}
-            >
-              <Select
-                size="small"
-                options={taskPriorityOptions}
-                onKeyDown={(e) => handleKeyDown(e, task.id, 'priority')}
-                status={error ? 'error' : ''}
-              />
-            </FormItem>
-          </div>
+          <FormItem
+            name="priorityId"
+            style={{ margin: 0 }}
+            rules={[{ required: true, message: 'Priority is required' }]}
+            validateStatus={error ? 'error' : ''}
+          >
+            <Select
+              size="small"
+              options={taskPriorityOptions}
+              onKeyDown={(e) => handleKeyDown(e, task.id, 'priority')}
+              status={error ? 'error' : ''}
+            />
+          </FormItem>
         )
       },
     },
@@ -475,35 +467,33 @@ export const getProjectTasksTableColumns = ({
         const error = getFieldError(fieldName)
 
         return (
-          <div data-cell-id={cellId}>
-            <FormItem
-              name={fieldName}
-              style={{ margin: 0 }}
-              validateStatus={error ? 'error' : ''}
-            >
-              <DatePicker
-                size="small"
-                format="MMM D, YYYY"
-                onKeyDown={(e) => handleKeyDown(e, task.id, 'plannedStart')}
-                onOpenChange={(open) => {
-                  if (!open) {
-                    setTimeout(() => {
-                      const cell = document.querySelector(
-                        `[data-cell-id="${cellId}"]`,
-                      )
-                      if (cell) {
-                        const input = cell.querySelector('input') as
-                          | HTMLInputElement
-                          | undefined
-                        input?.focus()
-                      }
-                    }, 0)
-                  }
-                }}
-                status={error ? 'error' : ''}
-              />
-            </FormItem>
-          </div>
+          <FormItem
+            name={fieldName}
+            style={{ margin: 0 }}
+            validateStatus={error ? 'error' : ''}
+          >
+            <DatePicker
+              size="small"
+              format="MMM D, YYYY"
+              onKeyDown={(e) => handleKeyDown(e, task.id, 'plannedStart')}
+              onOpenChange={(open) => {
+                if (!open) {
+                  setTimeout(() => {
+                    const cell = document.querySelector(
+                      `[data-cell-id="${cellId}"]`,
+                    )
+                    if (cell) {
+                      const input = cell.querySelector('input') as
+                        | HTMLInputElement
+                        | undefined
+                      input?.focus()
+                    }
+                  }, 0)
+                }
+              }}
+              status={error ? 'error' : ''}
+            />
+          </FormItem>
         )
       },
     },
@@ -536,35 +526,33 @@ export const getProjectTasksTableColumns = ({
         const error = getFieldError('plannedEnd')
 
         return (
-          <div data-cell-id={cellId}>
-            <FormItem
-              name="plannedEnd"
-              style={{ margin: 0 }}
-              validateStatus={error ? 'error' : ''}
-            >
-              <DatePicker
-                size="small"
-                format="MMM D, YYYY"
-                onKeyDown={(e) => handleKeyDown(e, task.id, 'plannedEnd')}
-                onOpenChange={(open) => {
-                  if (!open) {
-                    setTimeout(() => {
-                      const cell = document.querySelector(
-                        `[data-cell-id="${cellId}"]`,
-                      )
-                      if (cell) {
-                        const input = cell.querySelector('input') as
-                          | HTMLInputElement
-                          | undefined
-                        input?.focus()
-                      }
-                    }, 0)
-                  }
-                }}
-                status={error ? 'error' : ''}
-              />
-            </FormItem>
-          </div>
+          <FormItem
+            name="plannedEnd"
+            style={{ margin: 0 }}
+            validateStatus={error ? 'error' : ''}
+          >
+            <DatePicker
+              size="small"
+              format="MMM D, YYYY"
+              onKeyDown={(e) => handleKeyDown(e, task.id, 'plannedEnd')}
+              onOpenChange={(open) => {
+                if (!open) {
+                  setTimeout(() => {
+                    const cell = document.querySelector(
+                      `[data-cell-id="${cellId}"]`,
+                    )
+                    if (cell) {
+                      const input = cell.querySelector('input') as
+                        | HTMLInputElement
+                        | undefined
+                      input?.focus()
+                    }
+                  }, 0)
+                }
+              }}
+              status={error ? 'error' : ''}
+            />
+          </FormItem>
         )
       },
     },
@@ -581,7 +569,6 @@ export const getProjectTasksTableColumns = ({
         const task = info.row.original as ProjectTaskTreeDto
         const assignees = task.assignees ?? []
         const isSelected = selectedRowId === task.id
-        const cellId = `${task.id}-assignees`
 
         if (!isSelected || !handleUpdateTask) {
           if (assignees.length === 0) return ''
@@ -590,31 +577,29 @@ export const getProjectTasksTableColumns = ({
 
         const error = getFieldError('assigneeIds')
         return (
-          <div data-cell-id={cellId}>
-            <FormItem
-              name="assigneeIds"
-              style={{ margin: 0 }}
-              validateStatus={error ? 'error' : ''}
-            >
-              <Select
-                size="small"
-                mode="multiple"
-                allowClear
-                placeholder="Select assignees"
-                optionFilterProp="label"
-                filterOption={(input, option) =>
-                  (option?.label?.toString().toLowerCase() ?? '').includes(
-                    input.toLowerCase(),
-                  )
-                }
-                options={employeeOptions}
-                onKeyDown={(e) => handleKeyDown(e, task.id, 'assignees')}
-                status={error ? 'error' : ''}
-                maxTagCount={1}
-                maxTagPlaceholder={(omitted) => `+${omitted.length}`}
-              />
-            </FormItem>
-          </div>
+          <FormItem
+            name="assigneeIds"
+            style={{ margin: 0 }}
+            validateStatus={error ? 'error' : ''}
+          >
+            <Select
+              size="small"
+              mode="multiple"
+              allowClear
+              placeholder="Select assignees"
+              optionFilterProp="label"
+              filterOption={(input, option) =>
+                (option?.label?.toString().toLowerCase() ?? '').includes(
+                  input.toLowerCase(),
+                )
+              }
+              options={employeeOptions}
+              onKeyDown={(e) => handleKeyDown(e, task.id, 'assignees')}
+              status={error ? 'error' : ''}
+              maxTagCount={1}
+              maxTagPlaceholder={(omitted) => `+${omitted.length}`}
+            />
+          </FormItem>
         )
       },
     },
@@ -631,7 +616,6 @@ export const getProjectTasksTableColumns = ({
         const value = task.progress
         const isSelected = selectedRowId === task.id
         const isDraft = task.id.startsWith('draft-')
-        const cellId = `${task.id}-progress`
         const isMilestone = isSelected
           ? isDraft
             ? isSelectedRowMilestone
@@ -644,23 +628,21 @@ export const getProjectTasksTableColumns = ({
 
         const error = getFieldError('progress')
         return (
-          <div data-cell-id={cellId}>
-            <FormItem
-              name="progress"
-              style={{ margin: 0 }}
-              validateStatus={error ? 'error' : ''}
-            >
-              <Input
-                size="small"
-                type="number"
-                min={0}
-                max={100}
-                suffix="%"
-                onKeyDown={(e) => handleKeyDown(e, task.id, 'progress')}
-                status={error ? 'error' : ''}
-              />
-            </FormItem>
-          </div>
+          <FormItem
+            name="progress"
+            style={{ margin: 0 }}
+            validateStatus={error ? 'error' : ''}
+          >
+            <Input
+              size="small"
+              type="number"
+              min={0}
+              max={100}
+              suffix="%"
+              onKeyDown={(e) => handleKeyDown(e, task.id, 'progress')}
+              status={error ? 'error' : ''}
+            />
+          </FormItem>
         )
       },
       sortingFn: 'basic',
@@ -679,7 +661,6 @@ export const getProjectTasksTableColumns = ({
         const value = task.estimatedEffortHours
         const isSelected = selectedRowId === task.id
         const isDraft = task.id.startsWith('draft-')
-        const cellId = `${task.id}-estimatedEffortHours`
         const isMilestone = isSelected
           ? isDraft
             ? isSelectedRowMilestone
@@ -692,25 +673,23 @@ export const getProjectTasksTableColumns = ({
 
         const error = getFieldError('estimatedEffortHours')
         return (
-          <div data-cell-id={cellId}>
-            <FormItem
-              name="estimatedEffortHours"
-              style={{ margin: 0 }}
-              validateStatus={error ? 'error' : ''}
-            >
-              <Input
-                size="small"
-                type="number"
-                min={0}
-                step={0.25}
-                suffix="h"
-                onKeyDown={(e) =>
-                  handleKeyDown(e, task.id, 'estimatedEffortHours')
-                }
-                status={error ? 'error' : ''}
-              />
-            </FormItem>
-          </div>
+          <FormItem
+            name="estimatedEffortHours"
+            style={{ margin: 0 }}
+            validateStatus={error ? 'error' : ''}
+          >
+            <Input
+              size="small"
+              type="number"
+              min={0}
+              step={0.25}
+              suffix="h"
+              onKeyDown={(e) =>
+                handleKeyDown(e, task.id, 'estimatedEffortHours')
+              }
+              status={error ? 'error' : ''}
+            />
+          </FormItem>
         )
       },
       sortingFn: 'basic',
