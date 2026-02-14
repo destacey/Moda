@@ -23,6 +23,8 @@ import dayjs from 'dayjs'
 import { ColumnDef } from '@tanstack/react-table'
 import styles from '@/src/components/common/tree-grid/tree-grid.module.css'
 import {
+  type FilterOption,
+  type TreeGridColumnMeta,
   numberRangeFilter,
   setContainsFilter,
   dateSortBy,
@@ -78,6 +80,9 @@ interface ProjectTasksTableColumnsParams {
   addDraftTaskAsChild?: (parentId: string) => void
   canCreateTasks?: boolean
   isSelectedRowMilestone?: boolean
+  taskTypeFilterOptions?: FilterOption[]
+  taskStatusFilterOptions?: FilterOption[]
+  taskPriorityFilterOptions?: FilterOption[]
 }
 
 export const getProjectTasksTableColumns = ({
@@ -98,64 +103,59 @@ export const getProjectTasksTableColumns = ({
   addDraftTaskAsChild,
   canCreateTasks = true,
   isSelectedRowMilestone = false,
+  taskTypeFilterOptions = [],
+  taskStatusFilterOptions = [],
+  taskPriorityFilterOptions = [],
 }: ProjectTasksTableColumnsParams): ColumnDef<ProjectTaskTreeDto>[] => {
   return [
-    ...(canManageTasks && enableDragAndDrop
-      ? [
-          {
-            id: 'dragHandle',
-            header: '',
-            size: 32,
-            enableSorting: false,
-            enableGlobalFilter: false,
-            enableColumnFilter: false,
-            enableExport: false,
-            cell: () => <DragHandleCell isDragEnabled={isDragEnabled} />,
-          } as ColumnDef<ProjectTaskTreeDto>,
-        ]
-      : []),
     ...(canManageTasks
       ? [
           {
             id: 'actions',
             header: '',
-            size: 40,
+            size: enableDragAndDrop ? 64 : 36,
             enableSorting: false,
             enableGlobalFilter: false,
             enableColumnFilter: false,
-            enableExport: false,
+            enableResizing: false,
+            meta: { enableExport: false } satisfies TreeGridColumnMeta,
             cell: ({ row }: { row: any }) => {
               const isDraft = row.original.id.startsWith('draft-')
-              // Don't show actions for draft tasks
-              if (isDraft) return null
 
               return (
-                <Dropdown
-                  menu={{
-                    items: [
-                      {
-                        key: 'edit',
-                        label: 'Edit',
-                        icon: <EditOutlined />,
-                        onClick: () => handleEditTask(row.original),
-                      },
-                      {
-                        key: 'delete',
-                        label: 'Delete',
-                        icon: <DeleteOutlined />,
-                        onClick: () => handleDeleteTask(row.original),
-                      },
-                    ],
-                  }}
-                  trigger={['click']}
-                >
-                  <Button
-                    type="text"
-                    size="small"
-                    icon={<MoreOutlined />}
-                    tabIndex={-1}
-                  />
-                </Dropdown>
+                <Flex align="center" gap={4}>
+                  {enableDragAndDrop && (
+                    <DragHandleCell isDragEnabled={isDragEnabled} />
+                  )}
+                  {!isDraft && (
+                    <Dropdown
+                      menu={{
+                        items: [
+                          {
+                            key: 'edit',
+                            label: 'Edit',
+                            icon: <EditOutlined />,
+                            onClick: () => handleEditTask(row.original),
+                          },
+                          {
+                            key: 'delete',
+                            label: 'Delete',
+                            icon: <DeleteOutlined />,
+                            onClick: () => handleDeleteTask(row.original),
+                          },
+                        ],
+                      }}
+                      trigger={['click']}
+                    >
+                      <Button
+                        type="text"
+                        size="small"
+                        icon={<MoreOutlined />}
+                        tabIndex={-1}
+                      />
+                    </Dropdown>
+                  )}
+                </Flex>
               )
             },
           } as ColumnDef<ProjectTaskTreeDto>,
@@ -286,6 +286,10 @@ export const getProjectTasksTableColumns = ({
       enableColumnFilter: true,
       filterFn: setContainsFilter,
       sortingFn: 'text',
+      meta: {
+        filterType: 'select',
+        filterOptions: taskTypeFilterOptions,
+      } satisfies TreeGridColumnMeta,
       cell: ({ row }: { row: any }) => {
         const task = row.original as ProjectTaskTreeDto
         const isSelected = selectedRowId === task.id
@@ -341,6 +345,10 @@ export const getProjectTasksTableColumns = ({
       enableColumnFilter: true,
       filterFn: setContainsFilter,
       sortingFn: 'text',
+      meta: {
+        filterType: 'select',
+        filterOptions: taskStatusFilterOptions,
+      } satisfies TreeGridColumnMeta,
       cell: (info) => {
         const task = info.row.original as ProjectTaskTreeDto
         const status = (info.getValue() as string) ?? ''
@@ -395,6 +403,10 @@ export const getProjectTasksTableColumns = ({
       enableColumnFilter: true,
       filterFn: setContainsFilter,
       sortingFn: 'text',
+      meta: {
+        filterType: 'select',
+        filterOptions: taskPriorityFilterOptions,
+      } satisfies TreeGridColumnMeta,
       cell: (info) => {
         const task = info.row.original as ProjectTaskTreeDto
         const priority = (info.getValue() as string) ?? ''
@@ -441,6 +453,13 @@ export const getProjectTasksTableColumns = ({
       enableGlobalFilter: true,
       enableColumnFilter: true,
       filterFn: 'includesString',
+      meta: {
+        exportFormatter: (_value, row) => {
+          const isMilestone = row.type?.name === 'Milestone'
+          const date = isMilestone ? row.plannedDate : row.plannedStart
+          return date ? dayjs(date).format('MMM D, YYYY') : ''
+        },
+      } satisfies TreeGridColumnMeta,
       sortingFn: dateSortBy((row: any) => {
         const isMilestone = row.original.type?.name === 'Milestone'
         return isMilestone
@@ -506,6 +525,10 @@ export const getProjectTasksTableColumns = ({
       enableGlobalFilter: true,
       enableColumnFilter: true,
       filterFn: 'includesString',
+      meta: {
+        exportFormatter: (value) =>
+          value ? dayjs(value as string).format('MMM D, YYYY') : '',
+      } satisfies TreeGridColumnMeta,
       sortingFn: dateSortBy((row: any) => row.original.plannedEnd),
       cell: (info) => {
         const task = info.row.original as ProjectTaskTreeDto
@@ -611,6 +634,10 @@ export const getProjectTasksTableColumns = ({
       enableGlobalFilter: true,
       enableColumnFilter: true,
       filterFn: numberRangeFilter,
+      meta: {
+        filterType: 'numericRange',
+        filterPlaceholder: 'e.g. >=10 or 2-6',
+      } satisfies TreeGridColumnMeta,
       cell: (info) => {
         const task = info.row.original as ProjectTaskTreeDto
         const value = task.progress
@@ -656,6 +683,10 @@ export const getProjectTasksTableColumns = ({
       enableGlobalFilter: true,
       enableColumnFilter: true,
       filterFn: numberRangeFilter,
+      meta: {
+        filterType: 'numericRange',
+        filterPlaceholder: 'e.g. >=10 or 2-6',
+      } satisfies TreeGridColumnMeta,
       cell: (info) => {
         const task = info.row.original as ProjectTaskTreeDto
         const value = task.estimatedEffortHours

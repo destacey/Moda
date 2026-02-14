@@ -9,6 +9,11 @@ export type {
   RowClickArgs,
   TreeGridEditingConfig,
   TreeGridToolbarProps,
+  TreeGridColumnMeta,
+  TreeGridColumnContext,
+  TreeGridInlineEditingConfig,
+  TreeGridProps,
+  TreeGridHandle,
 } from './types'
 
 // Tree utilities
@@ -46,3 +51,6 @@ export { default as TreeGridToolbar } from './tree-grid-toolbar'
 
 // Hooks
 export { useTreeGridEditing } from './use-tree-grid-editing'
+
+// TreeGrid component
+export { default as TreeGrid } from './tree-grid'
