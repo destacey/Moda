@@ -1,6 +1,6 @@
 'use client'
 
-import { FC, useEffect, useMemo, useRef, useState } from 'react'
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   DatePicker,
   Flex,
@@ -17,8 +17,12 @@ import { WorkStatusCategory, WorkItemListDto } from '@/src/services/moda-api'
 import { useDebounce } from '@/src/hooks'
 import { CycleTimeAnalysisChart, WorkItemsGrid } from '.'
 import {
+  applyBalancedPercentileFilter,
   CycleTimeOutlierMethod,
-  filterCycleTimeWorkItems,
+  applyForecastingPercentileFilter,
+  getCycleTimeWorkItems,
+  normalizePercentile,
+  sortCycleTimeWorkItems,
 } from './cycle-time-report.filtering'
 import { InfoCircleOutlined } from '@ant-design/icons'
 import { AgGridReact } from 'ag-grid-react'
@@ -33,6 +37,7 @@ export interface CycleTimeReportProps {
 
 export const CycleTimeReport: FC<CycleTimeReportProps> = ({ teamCode }) => {
   const gridRef = useRef<AgGridReact<WorkItemListDto>>(null)
+  const filterAnimationFrameRef = useRef<number | null>(null)
   const defaultDoneFrom = useMemo(() => {
     return dayjs().utc().subtract(90, 'days').startOf('day')
   }, [])
@@ -59,26 +64,82 @@ export const CycleTimeReport: FC<CycleTimeReportProps> = ({ teamCode }) => {
     doneTo: null,
   })
 
-  const filteredWorkItems = useMemo(() => {
-    return filterCycleTimeWorkItems(workItemsData, percentile, method)
-  }, [method, percentile, workItemsData])
+  const cycleTimeItems = useMemo(() => {
+    return getCycleTimeWorkItems(workItemsData)
+  }, [workItemsData])
 
-  const onFilterChanged = () => {
-    if (gridRef.current?.api) {
-      const displayedRows: WorkItemListDto[] = []
-      gridRef.current.api.forEachNodeAfterFilterAndSort((node) => {
-        if (node.data) {
-          displayedRows.push(node.data)
-        }
-      })
-      setChartWorkItems(displayedRows)
+  const normalizedPercentile = useMemo(() => {
+    return normalizePercentile(percentile)
+  }, [percentile])
+
+  const sortedCycleTimeItems = useMemo(() => {
+    if (normalizedPercentile === 1 || normalizedPercentile === 0) {
+      return cycleTimeItems
     }
-  }
+    return sortCycleTimeWorkItems(cycleTimeItems)
+  }, [cycleTimeItems, normalizedPercentile])
+
+  const filteredWorkItems = useMemo(() => {
+    if (cycleTimeItems.length === 0) {
+      return []
+    }
+
+    if (normalizedPercentile === 1) {
+      return cycleTimeItems
+    }
+    if (normalizedPercentile === 0) {
+      return []
+    }
+
+    if (method === 'Balanced') {
+      return applyBalancedPercentileFilter(
+        sortedCycleTimeItems,
+        normalizedPercentile,
+      )
+    }
+
+    return applyForecastingPercentileFilter(
+      sortedCycleTimeItems,
+      normalizedPercentile,
+    )
+  }, [
+    cycleTimeItems,
+    method,
+    normalizedPercentile,
+    sortedCycleTimeItems,
+  ])
+
+  const onFilterChanged = useCallback(() => {
+    if (filterAnimationFrameRef.current !== null) {
+      return
+    }
+    filterAnimationFrameRef.current = window.requestAnimationFrame(() => {
+      filterAnimationFrameRef.current = null
+
+      if (gridRef.current?.api) {
+        const displayedRows: WorkItemListDto[] = []
+        gridRef.current.api.forEachNodeAfterFilterAndSort((node) => {
+          if (node.data) {
+            displayedRows.push(node.data)
+          }
+        })
+        setChartWorkItems(displayedRows)
+      }
+    })
+  }, [])
 
   // Initialize chart data when filtered work items change
   useEffect(() => {
     setChartWorkItems(filteredWorkItems)
   }, [filteredWorkItems])
+
+  useEffect(() => {
+    return () => {
+      if (filterAnimationFrameRef.current !== null) {
+        window.cancelAnimationFrame(filterAnimationFrameRef.current)
+      }
+    }
+  }, [])
 
   if (error) {
     return <div>Error loading work items</div>
@@ -163,10 +224,12 @@ export const CycleTimeReport: FC<CycleTimeReportProps> = ({ teamCode }) => {
           </Space>
         </Flex>
       </Flex>
-      <CycleTimeAnalysisChart
-        workItems={chartWorkItems}
-        isLoading={isLoading}
-      />
+      {workItemsData !== undefined && (
+        <CycleTimeAnalysisChart
+          workItems={chartWorkItems}
+          isLoading={isLoading}
+        />
+      )}
       <WorkItemsGrid
         ref={gridRef}
         workItems={filteredWorkItems}

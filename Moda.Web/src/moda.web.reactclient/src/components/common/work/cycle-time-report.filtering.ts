@@ -2,6 +2,19 @@ import { WorkItemListDto } from '@/src/services/moda-api'
 
 export type CycleTimeOutlierMethod = 'Balanced' | 'Forecasting'
 
+export const getCycleTimeWorkItems = (
+  workItemsData: WorkItemListDto[] | undefined,
+): WorkItemListDto[] =>
+  workItemsData?.filter((item) => item.cycleTime != null) ?? []
+
+export const normalizePercentile = (percentile: number): number =>
+  Math.max(0, Math.min(100, percentile)) / 100
+
+export const sortCycleTimeWorkItems = (
+  cycleTimeItems: WorkItemListDto[],
+): WorkItemListDto[] =>
+  [...cycleTimeItems].sort((a, b) => (a.cycleTime || 0) - (b.cycleTime || 0))
+
 export const applyBalancedPercentileFilter = (
   sortedItems: WorkItemListDto[],
   percentile: number,
@@ -27,12 +40,12 @@ export const filterCycleTimeWorkItems = (
   percentile: number,
   method: CycleTimeOutlierMethod,
 ): WorkItemListDto[] => {
-  const cycleTimeItems = workItemsData?.filter((item) => item.cycleTime != null) ?? []
+  const cycleTimeItems = getCycleTimeWorkItems(workItemsData)
   if (cycleTimeItems.length === 0) {
     return []
   }
 
-  const normalizedPercentile = Math.max(0, Math.min(100, percentile)) / 100
+  const normalizedPercentile = normalizePercentile(percentile)
   if (normalizedPercentile === 1) {
     return cycleTimeItems
   }
@@ -40,9 +53,7 @@ export const filterCycleTimeWorkItems = (
     return []
   }
 
-  const sorted = [...cycleTimeItems].sort(
-    (a, b) => (a.cycleTime || 0) - (b.cycleTime || 0),
-  )
+  const sorted = sortCycleTimeWorkItems(cycleTimeItems)
 
   if (method === 'Balanced') {
     return applyBalancedPercentileFilter(sorted, normalizedPercentile)
