@@ -5,21 +5,27 @@ import { CSS } from '@dnd-kit/utilities'
 import { createContext, useContext, CSSProperties, ReactNode } from 'react'
 
 // Context to share drag listeners with child components (drag handle)
-const DragHandleContext = createContext<{
+const TreeGridDragHandleContext = createContext<{
   listeners?: any
   attributes?: any
 } | null>(null)
 
-export function useDragHandle() {
-  const context = useContext(DragHandleContext)
+/**
+ * Hook to access drag handle listeners and attributes.
+ * Must be used within a TreeGridSortableRow.
+ */
+export function useTreeGridDragHandle() {
+  const context = useContext(TreeGridDragHandleContext)
   if (!context) {
-    throw new Error('useDragHandle must be used within ProjectTaskSortableRow')
+    throw new Error(
+      'useTreeGridDragHandle must be used within TreeGridSortableRow',
+    )
   }
   return context
 }
 
-interface ProjectTaskSortableRowProps {
-  taskId: string
+interface TreeGridSortableRowProps {
+  nodeId: string
   isDragEnabled: boolean
   isDragging?: boolean
   className?: string
@@ -31,14 +37,14 @@ interface ProjectTaskSortableRowProps {
  * Sortable table row wrapper for drag-and-drop functionality.
  * Uses @dnd-kit/sortable to make table rows draggable via a drag handle.
  */
-export function ProjectTaskSortableRow({
-  taskId,
+export function TreeGridSortableRow({
+  nodeId,
   isDragEnabled,
   isDragging: parentIsDragging,
   className = '',
   onClick,
   children,
-}: ProjectTaskSortableRowProps) {
+}: TreeGridSortableRowProps) {
   const {
     attributes,
     listeners,
@@ -47,11 +53,10 @@ export function ProjectTaskSortableRow({
     transition,
     isDragging,
   } = useSortable({
-    id: taskId,
+    id: nodeId,
     disabled: !isDragEnabled,
   })
 
-  // Combine transform and transition for smooth dragging
   const style: CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
@@ -61,18 +66,17 @@ export function ProjectTaskSortableRow({
   }
 
   return (
-    <DragHandleContext.Provider value={{ listeners, attributes }}>
+    <TreeGridDragHandleContext.Provider value={{ listeners, attributes }}>
       <tr
         ref={setNodeRef}
         style={style}
         className={className}
         onClick={onClick}
-        data-row-id={taskId}
+        data-row-id={nodeId}
         data-dragging={isDragging}
       >
         {children}
       </tr>
-    </DragHandleContext.Provider>
+    </TreeGridDragHandleContext.Provider>
   )
 }
-

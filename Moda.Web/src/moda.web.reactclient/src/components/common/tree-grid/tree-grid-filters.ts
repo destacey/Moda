@@ -1,10 +1,11 @@
 import type { FilterFn } from '@tanstack/react-table'
 
-// Mirrors TanStack's built-in `includesString` behavior (case-insensitive substring match),
-// but as a reusable function so we can share logic across columns.
+/**
+ * Case-insensitive substring match filter.
+ * Mirrors TanStack's built-in `includesString` behavior as a reusable function.
+ * Caches the normalized filter value for performance across row iterations.
+ */
 export const stringContainsFilter: FilterFn<any> = (() => {
-  // TanStack will call the filter function once per row. The filter value is usually
-  // stable across those calls, so cache the normalized form.
   let lastFilterValue: unknown = undefined
   let lastNeedle = ''
 
@@ -26,8 +27,10 @@ export const stringContainsFilter: FilterFn<any> = (() => {
   }
 })()
 
-// Useful for multi-select filters where the filter value is either an array
-// of values (a "set") or a single value.
+/**
+ * Multi-select filter where the filter value is either an array of values (a "set") or a single value.
+ * Caches parsed filter state for performance.
+ */
 export const setContainsFilter: FilterFn<any> = (() => {
   let lastFilterValue: unknown = undefined
   let lastMode: 'none' | 'single' | 'set' = 'none'
@@ -127,11 +130,13 @@ const parseNumberRangeFilter = (rawInput: unknown): ParsedNumberRangeFilter => {
   return { kind: 'eq', value }
 }
 
-// For numeric columns filtered via a text input supporting:
-// - exact: 4
-// - comparisons: >=4, < 10
-// - ranges: 2-6, 2..6, ..6, 2..
-// Blank => no filter; invalid input => no filter.
+/**
+ * Numeric column filter supporting:
+ * - exact: 4
+ * - comparisons: >=4, < 10
+ * - ranges: 2-6, 2..6, ..6, 2..
+ * Blank or invalid input passes all rows.
+ */
 export const numberRangeFilter: FilterFn<any> = (() => {
   const cache = new Map<
     string,

@@ -1,0 +1,816 @@
+'use client'
+
+import {
+  forwardRef,
+  Fragment,
+  type ChangeEvent,
+  type Ref,
+  useCallback,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+  ReactElement,
+  MouseEvent,
+  TouchEvent,
+} from 'react'
+import { Form, Input, Select, Spin } from 'antd'
+import {
+  ArrowUpOutlined,
+  ArrowDownOutlined,
+  FilterOutlined,
+} from '@ant-design/icons'
+import {
+  type ColumnFiltersState,
+  type ColumnSizingState,
+  type SortingState,
+  flexRender,
+  getCoreRowModel,
+  getExpandedRowModel,
+  getFilteredRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from '@tanstack/react-table'
+import {
+  DndContext,
+  type DragCancelEvent,
+  type DragEndEvent,
+  type DragStartEvent,
+  KeyboardSensor,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core'
+import { SortableContext } from '@dnd-kit/sortable'
+
+import { generateCsv, downloadCsvWithTimestamp } from '@/src/utils/csv-utils'
+import { ModaEmpty } from '@/src/components/common'
+
+import styles from './tree-grid.module.css'
+import type {
+  DraftItem,
+  TreeGridColumnContext,
+  TreeGridColumnMeta,
+  TreeGridHandle,
+  TreeGridProps,
+  TreeNode,
+} from './types'
+import { countTreeNodes, flattenTree } from './tree-utils'
+import { mergeDraftsIntoTree } from './draft-utils'
+import {
+  DRAG_ACTIVATION_DISTANCE,
+  INDENTATION_WIDTH,
+  calculateOrderInParent,
+  getProjection,
+} from './tree-dnd-utils'
+import { stringContainsFilter } from './tree-grid-filters'
+import { TreeGridSortableRow } from './tree-grid-sortable-row'
+import TreeGridToolbar from './tree-grid-toolbar'
+import { useTreeGridEditing } from './use-tree-grid-editing'
+
+const EMPTY_FIELD_ERRORS: Record<string, string> = {}
+
+function TreeGridInner<T extends TreeNode>(
+  props: TreeGridProps<T>,
+  ref: Ref<TreeGridHandle>,
+) {
+  const {
+    data,
+    getSubRows,
+    isLoading,
+    columns: columnsProp,
+    onRefresh,
+    leftSlot,
+    helpContent,
+    emptyMessage = 'No records found',
+    csvFileName = 'tree-grid-export',
+    enableDragAndDrop = false,
+    onNodeMove,
+    onMoveRejected,
+    moveValidator,
+    editingConfig,
+    fieldErrors: externalFieldErrors,
+    onFieldErrorsChange,
+    createDraftNode,
+    onDraftCancelled,
+    onDraftsChange,
+  } = props
+
+  // ─── State ───────────────────────────────────────────────
+  const [sorting, setSorting] = useState<SortingState>([])
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+  const [columnSizing, setColumnSizing] = useState<ColumnSizingState>({})
+  const [searchValue, setSearchValue] = useState('')
+  const [draggedNodeId, setDraggedNodeId] = useState<string | null>(null)
+  const [draftTasks, setDraftTasks] = useState<DraftItem[]>([])
+  const draftCounterRef = useRef(0)
+  const isResizingRef = useRef(false)
+
+  // Internal form for when editingConfig is not provided (hook must be called unconditionally)
+  const [internalForm] = Form.useForm()
+
+  // Field errors: delegate to external state when provided
+  const [internalFieldErrors, setInternalFieldErrors] =
+    useState<Record<string, string>>(EMPTY_FIELD_ERRORS)
+  const fieldErrors = externalFieldErrors ?? internalFieldErrors
+  const setFieldErrors = useCallback(
+    (errors: Record<string, string>) => {
+      if (onFieldErrorsChange) {
+        onFieldErrorsChange(errors)
+      } else {
+        setInternalFieldErrors(errors)
+      }
+    },
+    [onFieldErrorsChange],
+  )
+
+  // ─── Draft management ────────────────────────────────────
+  const dataWithDrafts = useMemo(() => {
+    if (!createDraftNode || draftTasks.length === 0) return data
+    return mergeDraftsIntoTree(data, draftTasks, createDraftNode)
+  }, [data, draftTasks, createDraftNode])
+
+  // ─── Editing hook ────────────────────────────────────────
+  const canEdit = editingConfig?.canEdit ?? false
+  const draftPrefix = editingConfig?.draftPrefix ?? 'draft-'
+
+  const editing = useTreeGridEditing<T>(
+    editingConfig
+      ? {
+          ...editingConfig,
+          data: dataWithDrafts,
+          tableWrapperClassName: styles.table,
+          fieldErrors,
+          setFieldErrors,
+          onSave: async (rowId: string, updates: Record<string, any>) => {
+            const success = await editingConfig.onSave(rowId, updates)
+            if (success && rowId.startsWith(draftPrefix)) {
+              setDraftTasks((prev) => {
+                const next = prev.filter((d) => d.id !== rowId)
+                onDraftsChange?.(next)
+                return next
+              })
+            }
+            return success
+          },
+          onCancelDraft: (draftId) => {
+            setDraftTasks((prev) => {
+              const next = prev.filter((d) => d.id !== draftId)
+              onDraftsChange?.(next)
+              return next
+            })
+            onDraftCancelled?.(draftId)
+          },
+        }
+      : {
+          data: dataWithDrafts,
+          canEdit: false,
+          form: internalForm,
+          tableWrapperClassName: styles.table,
+          editableColumnIds: [],
+          onSave: async () => false,
+          fieldErrors: EMPTY_FIELD_ERRORS,
+          setFieldErrors: () => {},
+          getFormValues: () => ({}),
+          computeChanges: () => null,
+          cellIdColumnMatchOrder: [],
+        },
+  )
+
+  const {
+    tableRef,
+    selectedRowId,
+    setSelectedRowId,
+    setSelectedCellId,
+    getFieldError,
+    editableColumns,
+    handleKeyDown,
+    handleRowClick,
+  } = editing
+
+  // ─── Draft helpers ───────────────────────────────────────
+  const isEditing = selectedRowId !== null
+  const canCreateDraft =
+    canEdit && !isEditing && draftTasks.length === 0 && !!createDraftNode
+
+  const addDraft = useCallback(
+    (parentId?: string): string | null => {
+      if (!canCreateDraft) return null
+
+      draftCounterRef.current += 1
+      const newDraft: DraftItem = {
+        id: `${draftPrefix}${Date.now()}-${draftCounterRef.current}`,
+        parentId,
+        order: 0,
+      }
+      setDraftTasks((prev) => {
+        const next = [...prev, newDraft]
+        onDraftsChange?.(next)
+        return next
+      })
+
+      // Ensure parent is expanded when adding a child draft
+      if (parentId && tableRef.current) {
+        const rows = tableRef.current.getRowModel().rows
+        const parentRow = rows.find((r: any) => r.original.id === parentId)
+        if (parentRow && !parentRow.getIsExpanded()) {
+          parentRow.toggleExpanded()
+        }
+      }
+
+      // Defer selection so the draft row renders first (unselected),
+      // then a second render mounts the editable input for focusing.
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          setSelectedRowId(newDraft.id)
+          setSelectedCellId(`${newDraft.id}-name`)
+        }, 50)
+      })
+
+      return newDraft.id
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      canCreateDraft,
+      draftPrefix,
+      onDraftsChange,
+      setSelectedRowId,
+      setSelectedCellId,
+    ], // tableRef is stable
+  )
+
+  const addDraftAtRoot = useCallback(
+    () => addDraft(),
+    [addDraft],
+  )
+
+  const addDraftAsChild = useCallback(
+    (parentId: string) => addDraft(parentId),
+    [addDraft],
+  )
+
+  // ─── Column context ──────────────────────────────────────
+  const columnContext: TreeGridColumnContext = useMemo(() => {
+    const hasFilters =
+      !!searchValue || columnFilters.length > 0 || sorting.length > 0
+    const dragEnabled =
+      enableDragAndDrop &&
+      !!onNodeMove &&
+      !hasFilters &&
+      !isLoading &&
+      !isEditing
+
+    return {
+      selectedRowId,
+      handleKeyDown,
+      getFieldError,
+      editableColumns,
+      isDragEnabled: dragEnabled,
+      canCreateDraft,
+      addDraftAtRoot,
+      addDraftAsChild,
+    }
+  }, [
+    searchValue,
+    columnFilters.length,
+    sorting.length,
+    enableDragAndDrop,
+    onNodeMove,
+    isLoading,
+    isEditing,
+    selectedRowId,
+    handleKeyDown,
+    getFieldError,
+    editableColumns,
+    canCreateDraft,
+    addDraftAtRoot,
+    addDraftAsChild,
+  ])
+
+  // ─── Resolved columns ───────────────────────────────────
+  const columns = useMemo(() => {
+    if (typeof columnsProp === 'function') {
+      return columnsProp(columnContext)
+    }
+    return columnsProp
+  }, [columnsProp, columnContext])
+
+  // ─── Flattened tree for DnD ──────────────────────────────
+  const flattenedNodes = useMemo(
+    () => flattenTree(dataWithDrafts),
+    [dataWithDrafts],
+  )
+
+  // ─── DnD setup ───────────────────────────────────────────
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: DRAG_ACTIVATION_DISTANCE },
+    }),
+    useSensor(KeyboardSensor),
+  )
+
+  const handleDragStart = useCallback(
+    (event: DragStartEvent) => {
+      setDraggedNodeId(event.active.id as string)
+      setSelectedRowId(null)
+    },
+    [setSelectedRowId],
+  )
+
+  const handleDragEnd = useCallback(
+    async (event: DragEndEvent) => {
+      const { active, over, delta } = event
+      setDraggedNodeId(null)
+
+      if (!over || !onNodeMove) return
+
+      const horizontalOffset = delta.x
+      const hasHorizontalMovement =
+        Math.abs(horizontalOffset) >= INDENTATION_WIDTH / 2
+
+      if (active.id === over.id && !hasHorizontalMovement) return
+
+      const projection = getProjection(
+        flattenedNodes,
+        active.id as string,
+        over.id as string,
+        horizontalOffset,
+        INDENTATION_WIDTH,
+        moveValidator,
+      )
+
+      if (!projection.canDrop) {
+        onMoveRejected?.(
+          projection.reason || 'Cannot move item to this location',
+        )
+        return
+      }
+
+      const overIndex = flattenedNodes.findIndex((t) => t.node.id === over.id)
+      const newOrder = calculateOrderInParent(
+        flattenedNodes,
+        active.id as string,
+        overIndex,
+        projection.parentId,
+      )
+
+      try {
+        await onNodeMove(active.id as string, projection.parentId, newOrder)
+      } catch (error) {
+        onMoveRejected?.(
+          error instanceof Error ? error.message : 'Failed to move item',
+        )
+      }
+    },
+    [flattenedNodes, moveValidator, onNodeMove, onMoveRejected],
+  )
+
+  const handleDragCancel = useCallback((_event: DragCancelEvent) => {
+    setDraggedNodeId(null)
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur()
+    }
+  }, [])
+
+  // ─── TanStack table ─────────────────────────────────────
+  const totalRowCount = useMemo(
+    () => countTreeNodes(data) + draftTasks.length,
+    [data, draftTasks.length],
+  )
+
+  const table = useReactTable({
+    data: dataWithDrafts,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getExpandedRowModel: getExpandedRowModel(),
+    getSubRows: getSubRows ?? ((row) => row.children as T[]),
+    filterFromLeafRows: true,
+    getColumnCanGlobalFilter: (column) => {
+      const colDef = column.columnDef as unknown as {
+        enableGlobalFilter?: boolean
+        accessorFn?: unknown
+        accessorKey?: unknown
+      }
+      if (colDef.enableGlobalFilter === false) return false
+      return Boolean(colDef.accessorFn || colDef.accessorKey)
+    },
+    globalFilterFn: stringContainsFilter,
+    enableMultiSort: true,
+    isMultiSortEvent: (e) =>
+      (e as unknown as { ctrlKey?: boolean } | null)?.ctrlKey === true,
+    enableColumnResizing: true,
+    columnResizeMode: 'onChange',
+    state: {
+      globalFilter: searchValue,
+      sorting,
+      columnFilters,
+      columnSizing,
+    },
+    onGlobalFilterChange: (value) => setSearchValue(String(value ?? '')),
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    onColumnSizingChange: setColumnSizing,
+    initialState: { expanded: true },
+  })
+
+  tableRef.current = table
+
+  const displayedRowCount = table.getRowModel().rows.length
+
+  // ─── Toolbar wiring ──────────────────────────────────────
+  const visibleColumnCount = table.getVisibleLeafColumns().length
+
+  const onSearchChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    setSearchValue(e.target.value)
+  }, [])
+
+  const onClearFilters = useCallback(() => {
+    setSearchValue('')
+    setSorting([])
+    setColumnFilters([])
+  }, [])
+
+  const hasActiveFilters =
+    !!searchValue || columnFilters.length > 0 || sorting.length > 0
+
+  // ─── CSV export ──────────────────────────────────────────
+  const onExportCsv = useCallback(() => {
+    const exportableColumns = columns.filter((col: any) => {
+      const meta = col.meta as TreeGridColumnMeta | undefined
+      if (meta?.enableExport === false) return false
+      // Also check top-level enableExport for backward compat
+      if (col.enableExport === false) return false
+      return Boolean(col.accessorFn || col.accessorKey)
+    })
+
+    const headers = exportableColumns.map((col: any) => {
+      const meta = col.meta as TreeGridColumnMeta | undefined
+      if (meta?.exportHeader) return meta.exportHeader
+      if (typeof col.header === 'string') return col.header
+      return col.id || ''
+    })
+
+    const rows = table.getRowModel().rows.map((row) => {
+      return exportableColumns.map((col: any) => {
+        const meta = col.meta as TreeGridColumnMeta | undefined
+        let value: unknown = ''
+
+        if (col.accessorFn) {
+          value = col.accessorFn(row.original, row.index)
+        } else if (col.accessorKey) {
+          value = (row.original as any)[col.accessorKey]
+        }
+
+        if (meta?.exportFormatter) {
+          return meta.exportFormatter(value, row.original)
+        }
+
+        return value ?? ''
+      })
+    })
+
+    const csv = generateCsv(headers, rows)
+    downloadCsvWithTimestamp(csv, csvFileName)
+  }, [table, columns, csvFileName])
+
+  // ─── Ref handle ──────────────────────────────────────────
+  useImperativeHandle(ref, () => ({
+    table,
+    selectedRowId,
+  }))
+
+  // ─── Resolved leftSlot ──────────────────────────────────
+  const resolvedLeftSlot =
+    typeof leftSlot === 'function' ? leftSlot(columnContext) : leftSlot
+
+  // ─── DnD wrapping ───────────────────────────────────────
+  const dndEnabled = columnContext.isDragEnabled
+
+  const { isDragEnabled } = columnContext
+
+  // ─── Render ──────────────────────────────────────────────
+  const tableContent = (
+    <div className={styles.tableWrapper}>
+      <table className={styles.tableElement}>
+        <colgroup>
+          {table.getVisibleLeafColumns().map((column) => (
+            <col key={column.id} width={column.getSize()} />
+          ))}
+        </colgroup>
+        <thead>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <Fragment key={headerGroup.id}>
+              {/* Header row */}
+              <tr key={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  const canSort = header.column.getCanSort()
+                  const sortState = header.column.getIsSorted()
+                  const canResize = header.column.getCanResize()
+
+                  const sortIcon =
+                    sortState === 'asc' ? (
+                      <ArrowUpOutlined />
+                    ) : sortState === 'desc' ? (
+                      <ArrowDownOutlined />
+                    ) : null
+
+                  const handleSortClick = canSort
+                    ? (e: MouseEvent) => {
+                        if (isResizingRef.current) {
+                          isResizingRef.current = false
+                          return
+                        }
+                        header.column.getToggleSortingHandler()?.(e)
+                      }
+                    : undefined
+
+                  const handleResizeStart = (e: MouseEvent | TouchEvent) => {
+                    isResizingRef.current = true
+                    header.getResizeHandler()(e)
+                  }
+
+                  return (
+                    <th
+                      key={header.id}
+                      className={`${styles.th}${
+                        canSort ? ` ${styles.thSortable}` : ''
+                      }${canResize ? ` ${styles.thResizable}` : ''}`}
+                      onClick={handleSortClick}
+                    >
+                      <span className={styles.thContent}>
+                        <span className={styles.thText}>
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(
+                                header.column.columnDef.header,
+                                header.getContext(),
+                              )}
+                        </span>
+                        {sortIcon}
+                      </span>
+
+                      {canResize && (
+                        <span
+                          role="separator"
+                          aria-orientation="vertical"
+                          onMouseDown={handleResizeStart}
+                          onTouchStart={handleResizeStart}
+                          onDoubleClick={() => header.column.resetSize()}
+                          onClick={(e) => e.stopPropagation()}
+                          className={`${styles.resizer}${
+                            header.column.getIsResizing()
+                              ? ` ${styles.resizerActive}`
+                              : ''
+                          }`}
+                        />
+                      )}
+                    </th>
+                  )
+                })}
+              </tr>
+
+              {/* Filter row */}
+              <tr key={`${headerGroup.id}-filters`} data-role="column-filters">
+                {headerGroup.headers.map((header) => {
+                  const column = header.column
+                  if (!column.getCanFilter() || header.isPlaceholder) {
+                    return (
+                      <th
+                        key={`${header.id}-filter`}
+                        className={styles.filterTh}
+                      />
+                    )
+                  }
+
+                  const meta = column.columnDef.meta as
+                    | TreeGridColumnMeta
+                    | undefined
+                  const filterType = meta?.filterType ?? 'text'
+                  const rawFilterValue = column.getFilterValue()
+
+                  if (filterType === 'select') {
+                    const options = meta?.filterOptions ?? []
+                    const selectValue = (
+                      Array.isArray(rawFilterValue) ? rawFilterValue : []
+                    ) as string[]
+
+                    return (
+                      <th
+                        key={`${header.id}-filter`}
+                        className={styles.filterTh}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Select
+                          size="small"
+                          mode="multiple"
+                          allowClear
+                          maxTagCount={0}
+                          maxTagPlaceholder={(values) => {
+                            const labels = values
+                              .map((v) => String(v.label ?? v.value ?? ''))
+                              .filter(Boolean)
+                            return labels.length === 1
+                              ? labels[0]
+                              : `${labels.length} selected`
+                          }}
+                          value={selectValue.length ? selectValue : undefined}
+                          options={options}
+                          suffixIcon={<FilterOutlined />}
+                          popupMatchSelectWidth={false}
+                          classNames={{
+                            popup: { root: styles.filterPopup },
+                          }}
+                          onChange={(v) =>
+                            column.setFilterValue(v && v.length ? v : undefined)
+                          }
+                          className={styles.filterControl}
+                        />
+                      </th>
+                    )
+                  }
+
+                  // text or numericRange — both render an Input
+                  const textValue = (rawFilterValue ?? '') as string
+                  return (
+                    <th
+                      key={`${header.id}-filter`}
+                      className={styles.filterTh}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Input
+                        size="small"
+                        allowClear
+                        placeholder={meta?.filterPlaceholder}
+                        value={textValue}
+                        onChange={(e) => {
+                          const next = e.target.value
+                          column.setFilterValue(next ? next : undefined)
+                        }}
+                        className={styles.filterControl}
+                      />
+                    </th>
+                  )
+                })}
+              </tr>
+            </Fragment>
+          ))}
+        </thead>
+        <tbody>
+          {isLoading ? (
+            <tr>
+              <td
+                colSpan={visibleColumnCount}
+                className={`${styles.td} ${styles.loading}`}
+              >
+                <Spin />
+              </td>
+            </tr>
+          ) : table.getRowModel().rows.length === 0 ? (
+            <tr>
+              <td
+                colSpan={visibleColumnCount}
+                className={`${styles.td} ${styles.empty}`}
+              >
+                <ModaEmpty message={emptyMessage} />
+              </td>
+            </tr>
+          ) : (
+            table.getRowModel().rows.flatMap((row, index) => {
+              const isSelected = selectedRowId === row.original.id
+              const isDragging = draggedNodeId === row.original.id
+              const isDraftRow = row.original.id.startsWith(draftPrefix)
+              const rowElements = [
+                <TreeGridSortableRow
+                  key={row.id}
+                  nodeId={row.original.id}
+                  isDragEnabled={isDragEnabled && !isDraftRow}
+                  isDragging={isDragging}
+                  className={`${styles.tr}${index % 2 === 1 ? ` ${styles.trAlt}` : ''}${isSelected ? ` ${styles.trSelected}` : ''}`}
+                  onClick={(e) => {
+                    void handleRowClick(e, {
+                      rowId: row.original.id,
+                      isEditableColumn: (columnId) =>
+                        editableColumns.includes(columnId),
+                      getClickedColumnId: (target) =>
+                        target.closest('td')?.getAttribute('data-column-id') ??
+                        null,
+                    })
+                  }}
+                >
+                  {row.getVisibleCells().map((cell) => {
+                    const isEditableCell =
+                      isSelected && editableColumns.includes(cell.column.id)
+
+                    return (
+                      <td
+                        key={cell.id}
+                        data-cell-id={`${row.original.id}-${cell.column.id}`}
+                        data-column-id={cell.column.id}
+                        className={`${styles.td}${isEditableCell ? ` ${styles.editableCell}` : ''}`}
+                        onClick={(e) => {
+                          const target = e.target as HTMLElement
+                          if (
+                            target.closest('input') ||
+                            target.closest('.ant-select') ||
+                            target.closest('.ant-picker')
+                          ) {
+                            e.stopPropagation()
+                          }
+                        }}
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )}
+                      </td>
+                    )
+                  })}
+                </TreeGridSortableRow>,
+              ]
+
+              // Add validation error row
+              if (isSelected && Object.keys(fieldErrors).length > 0) {
+                const errorItems = Object.entries(fieldErrors).map(
+                  ([field, error]) => (
+                    <div key={field} className={styles.validationErrorItem}>
+                      <span className={styles.validationErrorField}>
+                        {field}:
+                      </span>{' '}
+                      {error}
+                    </div>
+                  ),
+                )
+
+                rowElements.push(
+                  <tr
+                    key={`${row.id}-errors`}
+                    className={`${styles.tr} ${styles.validationErrorRow}`}
+                  >
+                    <td
+                      colSpan={visibleColumnCount}
+                      className={`${styles.td} ${styles.validationErrorCell}`}
+                    >
+                      {errorItems}
+                    </td>
+                  </tr>,
+                )
+              }
+
+              return rowElements
+            })
+          )}
+        </tbody>
+      </table>
+    </div>
+  )
+
+  return (
+    <div className={styles.table}>
+      <TreeGridToolbar
+        displayedRowCount={displayedRowCount}
+        totalRowCount={totalRowCount}
+        searchValue={searchValue}
+        onSearchChange={onSearchChange}
+        onRefresh={onRefresh}
+        onClearFilters={onClearFilters}
+        hasActiveFilters={hasActiveFilters}
+        onExportCsv={onExportCsv}
+        isLoading={isLoading}
+        leftSlot={resolvedLeftSlot}
+        helpContent={helpContent}
+      />
+
+      {dndEnabled ? (
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+          onDragCancel={handleDragCancel}
+        >
+          <SortableContext items={flattenedNodes.map((t) => t.node.id)}>
+            {tableContent}
+          </SortableContext>
+        </DndContext>
+      ) : (
+        tableContent
+      )}
+    </div>
+  )
+}
+
+/**
+ * Reusable tree grid component. Wraps TanStack React Table, @dnd-kit, and
+ * the tree-grid utility library into a single component with toolbar, inline
+ * editing, drag-and-drop reordering, column filtering, and CSV export.
+ *
+ * Analogous to ModaGrid for ag-grid, but for hierarchical (tree) data.
+ */
+const TreeGrid = forwardRef(TreeGridInner) as <T extends TreeNode>(
+  props: TreeGridProps<T> & { ref?: Ref<TreeGridHandle> },
+) => ReactElement | null
+
+export default TreeGrid

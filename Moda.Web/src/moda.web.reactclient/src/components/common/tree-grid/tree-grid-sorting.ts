@@ -4,11 +4,15 @@ import dayjs from 'dayjs'
 const compareNumbers = (a: number, b: number): number => {
   return a === b ? 0 : a > b ? 1 : -1
 }
+
 type DateSortOptions = {
   emptyValue?: number
 }
 
-// Custom sorting factory (sorts by derived date value)
+/**
+ * Custom sorting factory that sorts by a derived date value.
+ * Handles null/undefined values using a configurable emptyValue (default: -Infinity).
+ */
 export function dateSortBy(
   getDate: (row: any) => string | number | Date | null | undefined,
   options?: DateSortOptions,

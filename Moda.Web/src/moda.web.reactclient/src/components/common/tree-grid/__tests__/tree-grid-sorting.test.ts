@@ -1,7 +1,7 @@
-import { dateSortBy } from './project-tasks-table.sorting'
+import { dateSortBy } from '../tree-grid-sorting'
 import type { Row } from '@tanstack/react-table'
 
-describe('project-tasks-table.sorting', () => {
+describe('tree-grid-sorting', () => {
   describe('dateSortBy', () => {
     const row = (value?: string | number | Date | null): Row<any> =>
       ({ original: { value } }) as unknown as Row<any>
