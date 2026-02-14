@@ -45,6 +45,26 @@ export function useTreeGridEditing<T extends TreeNode>(
   const focusRequestTokenRef = useRef(0)
   const focusObserverRef = useRef<MutationObserver | null>(null)
 
+  // Store callback props in refs to avoid re-triggering effects when
+  // consumers pass inline functions (new reference each render).
+  const getFormValuesRef = useRef(getFormValues)
+  const computeChangesRef = useRef(computeChanges)
+  const validateFieldsRef = useRef(validateFields)
+  const onSaveRef = useRef(onSave)
+  const onCancelDraftRef = useRef(onCancelDraft)
+  const setFieldErrorsRef = useRef(setFieldErrors)
+  const fieldErrorsRef = useRef(fieldErrors)
+
+  useEffect(() => {
+    getFormValuesRef.current = getFormValues
+    computeChangesRef.current = computeChanges
+    validateFieldsRef.current = validateFields
+    onSaveRef.current = onSave
+    onCancelDraftRef.current = onCancelDraft
+    setFieldErrorsRef.current = setFieldErrors
+    fieldErrorsRef.current = fieldErrors
+  })
+
   // Resolve editable columns (may be static or dynamic based on selected row)
   const editableColumns = useMemo(() => {
     if (typeof editableColumnIds === 'function') {
@@ -201,10 +221,13 @@ export function useTreeGridEditing<T extends TreeNode>(
     async (rowId: string) => {
       try {
         // Run client-side validation if provided
-        if (validateFields) {
-          const validationErrors = validateFields(rowId, form.getFieldsValue())
+        if (validateFieldsRef.current) {
+          const validationErrors = validateFieldsRef.current(
+            rowId,
+            form.getFieldsValue(),
+          )
           if (Object.keys(validationErrors).length > 0) {
-            setFieldErrors(validationErrors)
+            setFieldErrorsRef.current(validationErrors)
             return false
           }
         }
@@ -214,18 +237,18 @@ export function useTreeGridEditing<T extends TreeNode>(
         const formValues = form.getFieldsValue()
 
         // Clear any prior inline errors once local validation passes
-        if (Object.keys(fieldErrors).length > 0) {
-          setFieldErrors({})
+        if (Object.keys(fieldErrorsRef.current).length > 0) {
+          setFieldErrorsRef.current({})
         }
 
         // Use domain-specific change detection
-        const changes = computeChanges(rowId, formValues, data)
+        const changes = computeChangesRef.current(rowId, formValues, data)
         if (changes === null) {
           return true // No changes, nothing to save
         }
 
         setIsSaving(true)
-        const success = await onSave(rowId, changes)
+        const success = await onSaveRef.current(rowId, changes)
         setIsSaving(false)
         return Boolean(success)
       } catch {
@@ -233,15 +256,7 @@ export function useTreeGridEditing<T extends TreeNode>(
         return false
       }
     },
-    [
-      computeChanges,
-      data,
-      fieldErrors,
-      form,
-      onSave,
-      setFieldErrors,
-      validateFields,
-    ],
+    [data, form],
   )
 
   // Initialize form when row selection changes
@@ -250,9 +265,9 @@ export function useTreeGridEditing<T extends TreeNode>(
 
     if (selectedRowId) {
       form.resetFields()
-      setFieldErrors({})
+      setFieldErrorsRef.current({})
 
-      const formValues = getFormValues(selectedRowId, data)
+      const formValues = getFormValuesRef.current(selectedRowId, data)
       form.setFieldsValue(formValues)
       isInitializingRef.current = false
     } else {
@@ -261,7 +276,7 @@ export function useTreeGridEditing<T extends TreeNode>(
     }
 
     lastFocusedCellRef.current = null
-  }, [data, form, getFormValues, selectedRowId, setFieldErrors])
+  }, [data, form, selectedRowId])
 
   // Focus the target cell when selectedCellId changes
   useEffect(() => {
@@ -487,8 +502,8 @@ export function useTreeGridEditing<T extends TreeNode>(
 
         case 'Escape':
           e.preventDefault()
-          if (rowId.startsWith(draftPrefix) && onCancelDraft) {
-            onCancelDraft(rowId)
+          if (rowId.startsWith(draftPrefix) && onCancelDraftRef.current) {
+            onCancelDraftRef.current(rowId)
           }
           setSelectedRowId(null)
           setSelectedCellId(null)
@@ -570,7 +585,6 @@ export function useTreeGridEditing<T extends TreeNode>(
       draftPrefix,
       editableColumns,
       isSaving,
-      onCancelDraft,
       saveFormChanges,
       selectedRowId,
     ],
@@ -594,7 +608,12 @@ export function useTreeGridEditing<T extends TreeNode>(
         return
       }
 
-      if (target.closest('button') || target.closest('.ant-btn')) {
+      if (
+        target.closest('button') ||
+        target.closest('.ant-btn') ||
+        target.closest('.ant-dropdown-trigger') ||
+        target.closest('.ant-dropdown-menu')
+      ) {
         return
       }
 

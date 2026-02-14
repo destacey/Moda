@@ -1,13 +1,14 @@
 'use client'
 
-import styles from './project-tasks-table.module.css'
+import styles from '@/src/components/common/tree-grid/tree-grid.module.css'
 import { ProjectTaskTreeDto } from '@/src/services/moda-api'
 import { ModaEmpty } from '@/src/components/common'
-import { Form, Input, Select, Spin } from 'antd'
+import { Button, Form, Input, Select, Spin } from 'antd'
 import {
   ArrowUpOutlined,
   ArrowDownOutlined,
   FilterOutlined,
+  PlusOutlined,
 } from '@ant-design/icons'
 import {
   Fragment,
@@ -56,27 +57,29 @@ import {
 } from '@/src/store/features/ppm/project-tasks-api'
 import { useGetEmployeeOptionsQuery } from '@/src/store/features/organizations/employee-api'
 
+import {
+  type DraftItem,
+  type MoveValidator,
+  countTreeNodes,
+  findNodeById,
+  flattenTree,
+  getProjection,
+  defaultMoveValidator,
+  calculateOrderInParent,
+  mergeDraftsIntoTree,
+  stringContainsFilter,
+  TreeGridSortableRow,
+  TreeGridToolbar,
+  useTreeGridEditing,
+  INDENTATION_WIDTH,
+  DRAG_ACTIVATION_DISTANCE,
+} from '@/src/components/common/tree-grid'
 import CreateProjectTaskForm from './create-project-task-form'
 import DeleteProjectTaskForm from './delete-project-task-form'
 import EditProjectTaskForm from './edit-project-task-form'
-import { countProjectTasks, findProjectTaskById } from './project-task-tree'
 import { buildProjectTaskPatchOperations } from './project-task-patch'
-import ProjectTasksTableToolbar from './project-tasks-table-toolbar'
 import { getProjectTasksTableColumns } from './project-tasks-table.columns'
-import { useProjectTasksInlineEditing } from './project-tasks-table.inline-editing'
-import { stringContainsFilter } from './project-tasks-table.filters'
-import { ProjectTaskSortableRow } from './project-task-sortable-row'
-import {
-  type DraftTask,
-  mergeDraftTasksIntoTree,
-} from './project-tasks-table.merge-drafts'
-import {
-  flattenTree,
-  getProjection,
-  calculateOrderInParent,
-  INDENTATION_WIDTH,
-  DRAG_ACTIVATION_DISTANCE,
-} from './project-task-tree-dnd-utils'
+import { ProjectTasksHelp } from './project-tasks-table.keyboard-shortcuts'
 
 const EMPTY_STRING_ARRAY: string[] = []
 
@@ -155,18 +158,49 @@ const ProjectTasksTable = ({
   }, [isSelectedRowMilestone, form, taskStatusOptions])
 
   // Draft tasks state for inline creation
-  const [draftTasks, setDraftTasks] = useState<DraftTask[]>([])
+  const [draftTasks, setDraftTasks] = useState<DraftItem[]>([])
   const draftCounterRef = useRef(0)
+
+  const createDraftProjectTask = useCallback(
+    (draft: DraftItem): ProjectTaskTreeDto => ({
+      id: draft.id,
+      projectId: '',
+      key: '',
+      wbs: '',
+      name: '',
+      type: { id: 1, name: 'Task' },
+      status: { id: 1, name: 'Not Started' },
+      priority: { id: 2, name: 'Medium' },
+      assignees: [],
+      progress: 0,
+      order: draft.order,
+      children: [],
+    }),
+    [],
+  )
 
   // Merge draft tasks with real tasks early (before using in hooks)
   const tasksWithDrafts = useMemo(() => {
-    return mergeDraftTasksIntoTree(tasks, draftTasks)
-  }, [tasks, draftTasks])
+    return mergeDraftsIntoTree(tasks, draftTasks, createDraftProjectTask)
+  }, [tasks, draftTasks, createDraftProjectTask])
 
   // Flatten tree for drag-and-drop
   const flattenedTasks = useMemo(() => {
     return flattenTree(tasks)
   }, [tasks])
+
+  // Domain-specific DnD move validator: milestones cannot have children
+  const projectTaskMoveValidator: MoveValidator<ProjectTaskTreeDto> = useCallback(
+    (activeNode, targetParentNode, targetParentId) => {
+      const result = defaultMoveValidator(activeNode, targetParentNode, targetParentId)
+      if (!result.canMove) return result
+      if (targetParentNode?.type?.name === 'Milestone') {
+        return { canMove: false, reason: 'Milestones cannot have child tasks' }
+      }
+      return { canMove: true }
+    },
+    [],
+  )
 
   // DnD sensors
   const sensors = useSensors(
@@ -179,8 +213,8 @@ const ProjectTasksTable = ({
   )
 
   const handleUpdateTask = useCallback(
-    async (taskId: string, updates: Partial<any>) => {
-      if (!projectKey) return
+    async (taskId: string, updates: Partial<any>): Promise<boolean> => {
+      if (!projectKey) return false
 
       // Check if this is a draft task (new task being created)
       const isDraft = taskId.startsWith('draft-')
@@ -293,8 +327,8 @@ const ProjectTasksTable = ({
         }
       } else {
         // This is an existing task - use patch API
-        const task = findProjectTaskById(tasks || [], taskId)
-        if (!task) return
+        const task = findNodeById(tasks || [], taskId)
+        if (!task) return false
 
         try {
           const patchOperations = buildProjectTaskPatchOperations(updates)
@@ -401,22 +435,280 @@ const ProjectTasksTable = ({
     editableColumns,
     handleKeyDown,
     handleRowClick,
-  } = useProjectTasksInlineEditing({
-    tasks: tasksWithDrafts,
-    canManageTasks,
+  } = useTreeGridEditing<ProjectTaskTreeDto>({
+    data: tasksWithDrafts,
+    canEdit: canManageTasks,
     form,
     tableWrapperClassName: styles.tableWrapper,
-    onUpdateTask: handleUpdateTask,
+    draftPrefix: 'draft-',
+
+    editableColumnIds: (rowId) => {
+      const base = [
+        'name',
+        'status',
+        'priority',
+        'plannedStart',
+        'plannedEnd',
+        'assignees',
+        'progress',
+        'estimatedEffortHours',
+      ]
+      // Type is only editable for draft (new) tasks
+      return rowId?.startsWith('draft-')
+        ? ['name', 'type', ...base.slice(1)]
+        : base
+    },
+
+    getFormValues: (rowId, data) => {
+      const task = findNodeById(data, rowId) as ProjectTaskTreeDto | null
+      const isDraft = rowId.startsWith('draft-')
+
+      if (isDraft || !task) {
+        return {
+          name: '',
+          typeId: 1,
+          statusId: 1,
+          priorityId: 2,
+          assigneeIds: [],
+          progress: 0,
+          plannedStart: null,
+          plannedEnd: null,
+          plannedDate: null,
+          estimatedEffortHours: null,
+        }
+      }
+
+      return {
+        name: task.name,
+        typeId: task.type?.id,
+        statusId: task.status?.id,
+        priorityId: task.priority?.id,
+        assigneeIds: task.assignees?.map((a) => a.id) ?? [],
+        progress: task.progress,
+        plannedStart: task.plannedStart ? dayjs(task.plannedStart) : null,
+        plannedEnd: task.plannedEnd ? dayjs(task.plannedEnd) : null,
+        plannedDate: task.plannedDate ? dayjs(task.plannedDate) : null,
+        estimatedEffortHours: task.estimatedEffortHours,
+      }
+    },
+
+    computeChanges: (rowId, formValues, data) => {
+      const isDraft = rowId.startsWith('draft-')
+      const values = formValues as any
+
+      if (isDraft) {
+        const updates: Record<string, any> = {
+          name: values.name || '',
+          typeId: values.typeId,
+          statusId: values.statusId,
+          priorityId: values.priorityId,
+          assigneeIds: values.assigneeIds ?? [],
+        }
+        // Milestones use plannedDate only; tasks use plannedStart/End only
+        if (isSelectedRowMilestone) {
+          updates.plannedStart = null
+          updates.plannedEnd = null
+          updates.plannedDate = values.plannedDate
+            ? values.plannedDate.format('YYYY-MM-DD')
+            : null
+          updates.progress = null
+          updates.estimatedEffortHours = null
+        } else {
+          updates.plannedStart = values.plannedStart
+            ? values.plannedStart.format('YYYY-MM-DD')
+            : null
+          updates.plannedEnd = values.plannedEnd
+            ? values.plannedEnd.format('YYYY-MM-DD')
+            : null
+          updates.plannedDate = null
+          updates.progress = values.progress ?? 0
+          updates.estimatedEffortHours = values.estimatedEffortHours
+            ? Number(values.estimatedEffortHours)
+            : null
+        }
+        return updates
+      }
+
+      // Existing task — diff fields individually
+      const task = findNodeById(data, rowId) as ProjectTaskTreeDto | null
+      if (!task) return null
+
+      const updates: Record<string, any> = {}
+      let hasChanges = false
+
+      if (values.name !== task.name) {
+        updates.name = values.name
+        hasChanges = true
+      }
+      if (values.statusId !== task.status?.id) {
+        updates.statusId = values.statusId
+        hasChanges = true
+      }
+      if (values.priorityId !== task.priority?.id) {
+        updates.priorityId = values.priorityId
+        hasChanges = true
+      }
+
+      const taskAssigneeIds = task.assignees?.map((a) => a.id) ?? []
+      const formAssigneeIds = values.assigneeIds ?? []
+      const assigneesChanged =
+        taskAssigneeIds.length !== formAssigneeIds.length ||
+        !taskAssigneeIds.every((id: string) => formAssigneeIds.includes(id))
+      if (assigneesChanged) {
+        updates.assigneeIds = formAssigneeIds
+        hasChanges = true
+      }
+
+      const taskPlannedStart = task.plannedStart
+        ? String(task.plannedStart).split('T')[0]
+        : null
+      const plannedStartFormatted = values.plannedStart
+        ? values.plannedStart.format('YYYY-MM-DD')
+        : null
+      if (plannedStartFormatted !== taskPlannedStart) {
+        updates.plannedStart = plannedStartFormatted
+        hasChanges = true
+      }
+
+      const taskPlannedEnd = task.plannedEnd
+        ? String(task.plannedEnd).split('T')[0]
+        : null
+      const plannedEndFormatted = values.plannedEnd
+        ? values.plannedEnd.format('YYYY-MM-DD')
+        : null
+      if (plannedEndFormatted !== taskPlannedEnd) {
+        updates.plannedEnd = plannedEndFormatted
+        hasChanges = true
+      }
+
+      const taskPlannedDate = task.plannedDate
+        ? String(task.plannedDate).split('T')[0]
+        : null
+      const plannedDateFormatted = values.plannedDate
+        ? values.plannedDate.format('YYYY-MM-DD')
+        : null
+      if (plannedDateFormatted !== taskPlannedDate) {
+        updates.plannedDate = plannedDateFormatted
+        hasChanges = true
+      }
+
+      if (values.progress !== task.progress) {
+        updates.progress = values.progress
+        hasChanges = true
+      }
+
+      if (values.estimatedEffortHours !== task.estimatedEffortHours) {
+        updates.estimatedEffortHours = values.estimatedEffortHours
+          ? Number(values.estimatedEffortHours)
+          : null
+        hasChanges = true
+      }
+
+      return hasChanges ? updates : null
+    },
+
+    validateFields: (rowId, formValues) => {
+      const isDraft = rowId.startsWith('draft-')
+      const task = findNodeById(tasksWithDrafts, rowId) as ProjectTaskTreeDto | null
+      const isMilestone = isDraft
+        ? isSelectedRowMilestone
+        : task?.type?.name === 'Milestone'
+
+      // Milestones don't have planned date pair validation
+      if (isMilestone) return {}
+
+      const errors: Record<string, string> = {}
+      const hasPlannedStart = Boolean(formValues.plannedStart)
+      const hasPlannedEnd = Boolean(formValues.plannedEnd)
+
+      if (hasPlannedStart !== hasPlannedEnd) {
+        const message =
+          'Planned Start and Planned End must both have a value or both be empty.'
+        errors.plannedStart = message
+        errors.plannedEnd = message
+      }
+
+      if (hasPlannedStart && hasPlannedEnd) {
+        const plannedStart = dayjs(formValues.plannedStart)
+        const plannedEnd = dayjs(formValues.plannedEnd)
+        if (plannedEnd.isBefore(plannedStart, 'day')) {
+          errors.plannedEnd =
+            'Planned End cannot be earlier than Planned Start.'
+        }
+      }
+
+      return errors
+    },
+
+    cellIdColumnMatchOrder: [
+      'estimatedEffortHours',
+      'plannedStart',
+      'plannedEnd',
+      'assignees',
+      'priority',
+      'status',
+      'progress',
+      'type',
+      'name',
+    ],
+
+    onSave: handleUpdateTask,
     fieldErrors,
     setFieldErrors,
-    isSelectedRowMilestone,
     onCancelDraft: (taskId: string) => {
-      // Remove draft task when user cancels
       if (taskId.startsWith('draft-')) {
         setDraftTasks((prev) => prev.filter((d) => d.id !== taskId))
       }
     },
   })
+
+  // Clear date-pair validation errors as soon as the user fixes the values
+  const watchedPlannedStart = Form.useWatch('plannedStart', form)
+  const watchedPlannedEnd = Form.useWatch('plannedEnd', form)
+
+  useEffect(() => {
+    if (!selectedRowId) return
+    if (!fieldErrors.plannedStart && !fieldErrors.plannedEnd) return
+
+    const task = findNodeById(tasksWithDrafts, selectedRowId) as ProjectTaskTreeDto | null
+    const isDraft = selectedRowId.startsWith('draft-')
+    const isMilestone = isDraft
+      ? isSelectedRowMilestone
+      : task?.type?.name === 'Milestone'
+
+    let shouldClearDateErrors = false
+
+    if (isMilestone) {
+      shouldClearDateErrors = true
+    } else {
+      const hasPlannedStart = Boolean(watchedPlannedStart)
+      const hasPlannedEnd = Boolean(watchedPlannedEnd)
+      const bothOrNeither = hasPlannedStart === hasPlannedEnd
+      const endNotBeforeStart =
+        !hasPlannedStart ||
+        !hasPlannedEnd ||
+        !dayjs(watchedPlannedEnd).isBefore(dayjs(watchedPlannedStart), 'day')
+      shouldClearDateErrors = bothOrNeither && endNotBeforeStart
+    }
+
+    if (!shouldClearDateErrors) return
+
+    const nextErrors = { ...fieldErrors }
+    delete nextErrors.plannedStart
+    delete nextErrors.plannedEnd
+
+    if (Object.keys(nextErrors).length !== Object.keys(fieldErrors).length) {
+      setFieldErrors(nextErrors)
+    }
+  }, [
+    fieldErrors,
+    isSelectedRowMilestone,
+    selectedRowId,
+    setFieldErrors,
+    tasksWithDrafts,
+    watchedPlannedEnd,
+    watchedPlannedStart,
+  ])
 
   // Add a draft task at root level
   const addDraftTaskAtRoot = useCallback(() => {
@@ -425,7 +717,7 @@ const ProjectTasksTable = ({
     }
 
     draftCounterRef.current += 1
-    const newDraft: DraftTask = {
+    const newDraft: DraftItem = {
       id: `draft-${Date.now()}-${draftCounterRef.current}`,
       parentId: undefined,
       order: 0,
@@ -450,7 +742,7 @@ const ProjectTasksTable = ({
       }
 
       draftCounterRef.current += 1
-      const newDraft: DraftTask = {
+      const newDraft: DraftItem = {
         id: `draft-${Date.now()}-${draftCounterRef.current}`,
         parentId,
         order: 0,
@@ -575,7 +867,7 @@ const ProjectTasksTable = ({
   )
 
   const totalRowCount = useMemo(() => {
-    return countProjectTasks(tasks) + draftTasks.length
+    return countTreeNodes(tasks) + draftTasks.length
   }, [tasks, draftTasks])
 
   // Early calculation for isDragEnabled (before columns definition)
@@ -737,6 +1029,7 @@ const ProjectTasksTable = ({
         over.id as string,
         horizontalOffset,
         INDENTATION_WIDTH,
+        projectTaskMoveValidator,
       )
 
       if (!projection.canDrop) {
@@ -747,7 +1040,7 @@ const ProjectTasksTable = ({
       }
 
       // Calculate new order
-      const overIndex = flattenedTasks.findIndex((t) => t.id === over.id)
+      const overIndex = flattenedTasks.findIndex((t) => t.node.id === over.id)
       const newOrder = calculateOrderInParent(
         flattenedTasks,
         active.id as string,
@@ -778,6 +1071,7 @@ const ProjectTasksTable = ({
     [
       flattenedTasks,
       projectKey,
+      projectTaskMoveValidator,
       updateProjectTaskPlacement,
       refetch,
       messageApi,
@@ -847,19 +1141,29 @@ const ProjectTasksTable = ({
     <>
       <Form form={form} component={false}>
         <div className={styles.table}>
-          <ProjectTasksTableToolbar
-            canManageTasks={canManageTasks}
-            disableCreateTaskButton={!canCreateDraftTask}
+          <TreeGridToolbar
             displayedRowCount={displayedRowCount}
             totalRowCount={totalRowCount}
             searchValue={searchValue}
             onSearchChange={onSearchChange}
-            refetch={refetch}
+            onRefresh={refetch}
             onClearFilters={onClearFilters}
             hasActiveFilters={hasActiveFilters}
             onExportCsv={onExportCsv}
             isLoading={isLoading}
-            onCreateTask={handleCreateTask}
+            leftSlot={
+              canManageTasks && (
+                <Button
+                  type="primary"
+                  icon={<PlusOutlined />}
+                  onClick={handleCreateTask}
+                  disabled={!canCreateDraftTask}
+                >
+                  Create Task
+                </Button>
+              )
+            }
+            helpContent={<ProjectTasksHelp />}
           />
 
           <DndContext
@@ -869,7 +1173,7 @@ const ProjectTasksTable = ({
             onDragEnd={handleDragEnd}
             onDragCancel={handleDragCancel}
           >
-            <SortableContext items={flattenedTasks.map((t) => t.id)}>
+            <SortableContext items={flattenedTasks.map((t) => t.node.id)}>
               <div className={styles.tableWrapper}>
                 <table className={styles.tableElement}>
                   <colgroup>
@@ -1088,9 +1392,9 @@ const ProjectTasksTable = ({
                         const isDragging = draggedTaskId === row.original.id
                         const isDraftTask = row.original.id.startsWith('draft-')
                         const rowElements = [
-                          <ProjectTaskSortableRow
+                          <TreeGridSortableRow
                             key={row.id}
-                            taskId={row.original.id}
+                            nodeId={row.original.id}
                             isDragEnabled={isDragEnabled && !isDraftTask}
                             isDragging={isDragging}
                             className={`${styles.tr}${index % 2 === 1 ? ` ${styles.trAlt}` : ''}${isSelected ? ` ${styles.trSelected}` : ''}`}
@@ -1145,7 +1449,7 @@ const ProjectTasksTable = ({
                                 </td>
                               )
                             })}
-                          </ProjectTaskSortableRow>,
+                          </TreeGridSortableRow>,
                         ]
 
                         // Add error row if row is selected and has field errors

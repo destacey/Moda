@@ -21,19 +21,19 @@ import {
 import { BaseOptionType } from 'antd/es/select'
 import dayjs from 'dayjs'
 import { ColumnDef } from '@tanstack/react-table'
-import styles from './project-tasks-table.module.css'
+import styles from '@/src/components/common/tree-grid/tree-grid.module.css'
 import {
   numberRangeFilter,
   setContainsFilter,
-} from './project-tasks-table.filters'
-import { dateSortBy } from './project-tasks-table.sorting'
-import { useDragHandle } from './project-task-sortable-row'
+  dateSortBy,
+  useTreeGridDragHandle,
+} from '@/src/components/common/tree-grid'
 
 const { Item: FormItem } = Form
 
 // Drag handle component that uses the context from the sortable row
 function DragHandleCell({ isDragEnabled }: { isDragEnabled: boolean }) {
-  const { listeners, attributes } = useDragHandle()
+  const { listeners, attributes } = useTreeGridDragHandle()
 
   if (!isDragEnabled) {
     return null
