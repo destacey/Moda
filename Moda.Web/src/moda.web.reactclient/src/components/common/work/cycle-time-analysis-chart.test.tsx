@@ -402,4 +402,5 @@ describe('CycleTimeAnalysisChart', () => {
       expect(categories).toEqual(['1', '2', '3', '5', 'No Story Points', 'Overall'])
     })
   })
+
 })
