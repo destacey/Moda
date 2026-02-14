@@ -41,6 +41,12 @@ export const CycleTimeReport: FC<CycleTimeReportProps> = ({ teamCode }) => {
   const defaultDoneFrom = useMemo(() => {
     return dayjs().utc().subtract(90, 'days').startOf('day')
   }, [])
+  const doneFromPresets = useMemo(() => {
+    return [30, 60, 90, 120, 180].map((days) => ({
+      label: `${days} Days`,
+      value: dayjs().utc().subtract(days, 'days').startOf('day'),
+    }))
+  }, [])
 
   const [selectedDate, setSelectedDate] = useState<Dayjs>(defaultDoneFrom)
   const [chartWorkItems, setChartWorkItems] = useState<WorkItemListDto[]>([])
@@ -177,6 +183,7 @@ export const CycleTimeReport: FC<CycleTimeReportProps> = ({ teamCode }) => {
               onChange={(date) =>
                 date && setSelectedDate(date.utc().startOf('day'))
               }
+              presets={doneFromPresets}
               format="YYYY-MM-DD"
               allowClear={false}
             />
