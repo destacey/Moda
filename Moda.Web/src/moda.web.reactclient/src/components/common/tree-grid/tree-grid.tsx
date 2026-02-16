@@ -15,6 +15,7 @@ import {
   TouchEvent,
 } from 'react'
 import { Form, Input, Select, Spin } from 'antd'
+import type { FormInstance } from 'antd'
 import {
   ArrowUpOutlined,
   ArrowDownOutlined,
@@ -70,6 +71,12 @@ import TreeGridToolbar from './tree-grid-toolbar'
 import { useTreeGridEditing } from './use-tree-grid-editing'
 
 const EMPTY_FIELD_ERRORS: Record<string, string> = {}
+const NOOP_FORM = {
+  validateFields: async () => ({}),
+  getFieldsValue: () => ({}),
+  setFieldsValue: () => {},
+  resetFields: () => {},
+} as unknown as FormInstance
 
 function TreeGridInner<T extends TreeNode>(
   props: TreeGridProps<T>,
@@ -107,9 +114,6 @@ function TreeGridInner<T extends TreeNode>(
   const [draftTasks, setDraftTasks] = useState<DraftItem[]>([])
   const draftCounterRef = useRef(0)
   const isResizingRef = useRef(false)
-
-  // Internal form for when editingConfig is not provided (hook must be called unconditionally)
-  const [internalForm] = Form.useForm()
 
   // Field errors: delegate to external state when provided
   const [internalFieldErrors, setInternalFieldErrors] =
@@ -167,7 +171,7 @@ function TreeGridInner<T extends TreeNode>(
       : {
           data: dataWithDrafts,
           canEdit: false,
-          form: internalForm,
+          form: NOOP_FORM,
           tableWrapperClassName: styles.table,
           editableColumnIds: [],
           onSave: async () => false,
