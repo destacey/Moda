@@ -30,6 +30,7 @@ const TreeGridToolbar = ({
   isLoading,
   leftSlot,
   helpContent,
+  rightSlot,
 }: TreeGridToolbarProps) => {
   return (
     <div className={styles.toolbar}>
@@ -94,6 +95,12 @@ const TreeGridToolbar = ({
               />
             </Tooltip>
           </Popover>
+        )}
+        {rightSlot && (
+          <>
+            <span className={styles.toolbarDivider} />
+            {rightSlot}
+          </>
         )}
       </div>
     </div>

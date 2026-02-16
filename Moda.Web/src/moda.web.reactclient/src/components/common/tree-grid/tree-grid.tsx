@@ -83,6 +83,7 @@ function TreeGridInner<T extends TreeNode>(
     onRefresh,
     leftSlot,
     helpContent,
+    rightSlot,
     emptyMessage = 'No records found',
     csvFileName = 'tree-grid-export',
     enableDragAndDrop = false,
@@ -781,6 +782,7 @@ function TreeGridInner<T extends TreeNode>(
         isLoading={isLoading}
         leftSlot={resolvedLeftSlot}
         helpContent={helpContent}
+        rightSlot={rightSlot}
       />
 
       {dndEnabled ? (
