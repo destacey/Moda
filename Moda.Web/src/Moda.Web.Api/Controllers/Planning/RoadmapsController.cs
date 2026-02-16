@@ -1,4 +1,6 @@
-﻿using Moda.Common.Application.Models;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.JsonPatch.SystemTextJson;
+using Moda.Common.Application.Models;
 using Moda.Common.Application.Requests;
 using Moda.Planning.Application.Roadmaps.Commands;
 using Moda.Planning.Application.Roadmaps.Dtos;
@@ -15,11 +17,22 @@ public class RoadmapsController : ControllerBase
 {
     private readonly ILogger<RoadmapsController> _logger;
     private readonly ISender _sender;
+    private readonly IValidator<UpdateRoadmapActivityRequest> _updateActivityValidator;
+    private readonly IValidator<UpdateRoadmapMilestoneRequest> _updateMilestoneValidator;
+    private readonly IValidator<UpdateRoadmapTimeboxRequest> _updateTimeboxValidator;
 
-    public RoadmapsController(ILogger<RoadmapsController> logger, ISender sender)
+    public RoadmapsController(
+        ILogger<RoadmapsController> logger, 
+        ISender sender,
+        IValidator<UpdateRoadmapActivityRequest> updateActivityValidator,
+        IValidator<UpdateRoadmapMilestoneRequest> updateMilestoneValidator,
+        IValidator<UpdateRoadmapTimeboxRequest> updateTimeboxValidator)
     {
         _logger = logger;
         _sender = sender;
+        _updateActivityValidator = updateActivityValidator;
+        _updateMilestoneValidator = updateMilestoneValidator;
+        _updateTimeboxValidator = updateTimeboxValidator;
     }
 
     [HttpGet]
@@ -183,6 +196,80 @@ public class RoadmapsController : ControllerBase
             UpdateRoadmapTimeboxRequest timebox => timebox.ToUpdateRoadmapItemCommand(),
             UpdateRoadmapMilestoneRequest milestone => milestone.ToUpdateRoadmapItemCommand(),
             _ => throw new ArgumentException("Invalid roadmap item type", nameof(request))
+        };
+
+        var result = await _sender.Send(command, cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpPatch("{roadmapId}/items/{itemId}")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Roadmaps)]
+    [OpenApiOperation("Partially update a roadmap item using JSON Patch (RFC 6902).", "Applies a JSON Patch document to update specific fields of an Activity, Timebox, or Milestone.")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> PatchRoadmapItem(
+        Guid roadmapId,
+        Guid itemId,
+        [FromBody] JsonPatchDocument<UpdateRoadmapItemRequest> patchDocument,
+        CancellationToken cancellationToken)
+    {
+        if (patchDocument == null)
+            return BadRequest("Patch document cannot be null.");
+
+        // Get the current item state
+        var itemDto = await _sender.Send(new GetRoadmapItemQuery(roadmapId.ToString(), itemId), cancellationToken);
+        if (itemDto is null)
+            return NotFound($"Roadmap item with ID '{itemId}' not found.");
+
+        // Convert DTO to the appropriate UpdateRoadmapItemRequest type
+        UpdateRoadmapItemRequest updateRequest = itemDto switch
+        {
+            RoadmapActivityDetailsDto activity => UpdateRoadmapActivityRequest.FromDto(activity),
+            RoadmapMilestoneDetailsDto milestone => UpdateRoadmapMilestoneRequest.FromDto(milestone),
+            RoadmapTimeboxDetailsDto timebox => UpdateRoadmapTimeboxRequest.FromDto(timebox),
+            _ => throw new ArgumentException("Invalid roadmap item type", nameof(itemDto))
+        };
+
+        // Apply the patch document to the update request
+        patchDocument.ApplyTo(updateRequest, error =>
+        {
+            ModelState.AddModelError(error.AffectedObject.GetType().Name, error.ErrorMessage);
+        });
+
+        // Validate the patched request with FluentValidation
+        var validationResult = updateRequest switch
+        {
+            UpdateRoadmapActivityRequest activity => await _updateActivityValidator.ValidateAsync(activity, cancellationToken),
+            UpdateRoadmapMilestoneRequest milestone => await _updateMilestoneValidator.ValidateAsync(milestone, cancellationToken),
+            UpdateRoadmapTimeboxRequest timebox => await _updateTimeboxValidator.ValidateAsync(timebox, cancellationToken),
+            _ => throw new ArgumentException("Invalid roadmap item type", nameof(updateRequest))
+        };
+
+        if (!validationResult.IsValid)
+        {
+            foreach (var error in validationResult.Errors)
+            {
+                ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+            }
+        }
+
+        // Return all validation errors (patch + business rules) as 422
+        if (!ModelState.IsValid)
+            return ValidationProblem(
+                modelStateDictionary: ModelState,
+                statusCode: StatusCodes.Status422UnprocessableEntity);
+
+        var command = updateRequest switch
+        {
+            UpdateRoadmapActivityRequest activity => activity.ToUpdateRoadmapItemCommand(),
+            UpdateRoadmapTimeboxRequest timebox => timebox.ToUpdateRoadmapItemCommand(),
+            UpdateRoadmapMilestoneRequest milestone => milestone.ToUpdateRoadmapItemCommand(),
+            _ => throw new ArgumentException("Invalid roadmap item type", nameof(updateRequest))
         };
 
         var result = await _sender.Send(command, cancellationToken);

@@ -52,20 +52,13 @@ public sealed class ReorganizeRoadmapActivityCommandValidator : CustomValidator<
     }
 }
 
-internal sealed class ReorganizeRoadmapActivityCommandHandler : ICommandHandler<ReorganizeRoadmapActivityCommand>
+internal sealed class ReorganizeRoadmapActivityCommandHandler(IPlanningDbContext planningDbContext, ICurrentUser currentUser, ILogger<ReorganizeRoadmapActivityCommandHandler> logger) : ICommandHandler<ReorganizeRoadmapActivityCommand>
 {
     private const string AppRequestName = nameof(ReorganizeRoadmapActivityCommand);
 
-    private readonly IPlanningDbContext _planningDbContext;
-    private readonly Guid _currentUserEmployeeId;
-    private readonly ILogger<ReorganizeRoadmapActivityCommandHandler> _logger;
-
-    public ReorganizeRoadmapActivityCommandHandler(IPlanningDbContext planningDbContext, ICurrentUser currentUser, ILogger<ReorganizeRoadmapActivityCommandHandler> logger)
-    {
-        _planningDbContext = planningDbContext;
-        _currentUserEmployeeId = Guard.Against.NullOrEmpty(currentUser.GetEmployeeId());
-        _logger = logger;
-    }
+    private readonly IPlanningDbContext _planningDbContext = planningDbContext;
+    private readonly Guid _currentUserEmployeeId = Guard.Against.NullOrEmpty(currentUser.GetEmployeeId());
+    private readonly ILogger<ReorganizeRoadmapActivityCommandHandler> _logger = logger;
 
     public async Task<Result> Handle(ReorganizeRoadmapActivityCommand request, CancellationToken cancellationToken)
     {

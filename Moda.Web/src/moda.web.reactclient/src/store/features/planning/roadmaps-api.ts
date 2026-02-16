@@ -25,6 +25,7 @@ import { apiSlice } from '../apiSlice'
 import { QueryTags } from '../query-tags'
 import { getRoadmapsClient } from '@/src/services/clients'
 import { OptionModel } from '@/src/components/types'
+import { authenticatedFetch } from '@/src/services/auth-fetch'
 
 export const roadmapApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -216,6 +217,71 @@ export const roadmapApi = apiSlice.injectEndpoints({
         ]
       },
     }),
+    patchRoadmapItem: builder.mutation<
+      void,
+      {
+        roadmapId: string
+        itemId: string
+        patchOperations: Array<{
+          op: 'replace' | 'add' | 'remove'
+          path: string
+          value?: any
+        }>
+      }
+    >({
+      queryFn: async ({ roadmapId, itemId, patchOperations }) => {
+        try {
+          const response = await authenticatedFetch(
+            `/api/planning/roadmaps/${roadmapId}/items/${itemId}`,
+            {
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/json-patch+json',
+              },
+              body: JSON.stringify(patchOperations),
+            },
+          )
+
+          if (!response.ok) {
+            let errorData: unknown
+            try {
+              errorData = await response.json()
+            } catch {
+              errorData = {
+                detail: await response.text(),
+              }
+            }
+
+            return {
+              error: {
+                status: response.status,
+                data: errorData,
+              },
+            }
+          }
+
+          return { data: null as any }
+        } catch (error: any) {
+          console.error('API Error:', error)
+          return {
+            error: {
+              status: 'FETCH_ERROR',
+              data: {
+                detail:
+                  error?.message ??
+                  'An error occurred while updating the roadmap item.',
+              },
+            },
+          }
+        }
+      },
+      invalidatesTags: (result, error, arg) => {
+        return [
+          { type: QueryTags.RoadmapItem, id: arg.roadmapId },
+          { type: QueryTags.RoadmapItem, id: arg.itemId },
+        ]
+      },
+    }),
     updateRoadmapItemDates: builder.mutation<
       void,
       | UpdateRoadmapActivityDatesRequest
@@ -327,6 +393,7 @@ export const {
   useGetRoadmapActivitiesQuery,
   useCreateRoadmapItemMutation,
   useUpdateRoadmapItemMutation,
+  usePatchRoadmapItemMutation,
   useUpdateRoadmapItemDatesMutation,
   useReorganizeRoadmapActivityMutation,
   useDeleteRoadmapItemMutation,

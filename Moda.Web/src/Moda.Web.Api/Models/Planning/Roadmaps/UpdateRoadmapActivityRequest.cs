@@ -1,4 +1,5 @@
 ﻿using Moda.Planning.Application.Roadmaps.Commands;
+using Moda.Planning.Application.Roadmaps.Dtos;
 using Moda.Planning.Domain.Interfaces.Roadmaps;
 using OneOf;
 
@@ -15,6 +16,24 @@ public sealed record UpdateRoadmapActivityRequest : UpdateRoadmapItemRequest
     /// The Roadmap Item end date.
     /// </summary>
     public LocalDate End { get; set; }
+
+    /// <summary>
+    /// Creates an UpdateRoadmapActivityRequest from a RoadmapActivityDetailsDto.
+    /// </summary>
+    public static UpdateRoadmapActivityRequest FromDto(RoadmapActivityDetailsDto dto)
+    {
+        return new UpdateRoadmapActivityRequest
+        {
+            RoadmapId = dto.RoadmapId,
+            ItemId = dto.Id,
+            Name = dto.Name,
+            Description = dto.Description,
+            ParentId = dto.Parent?.Id,
+            Color = dto.Color,
+            Start = dto.Start,
+            End = dto.End
+        };
+    }
 
     public UpdateRoadmapItemCommand ToUpdateRoadmapItemCommand()
     {

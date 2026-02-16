@@ -11311,6 +11311,84 @@ export class RoadmapsClient {
     }
 
     /**
+     * Partially update a roadmap item using JSON Patch (RFC 6902).
+     */
+    patchRoadmapItem(roadmapId: string, itemId: string, patchDocument: JsonPatchDocumentOfUpdateRoadmapItemRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/planning/roadmaps/{roadmapId}/items/{itemId}";
+        if (roadmapId === undefined || roadmapId === null)
+            throw new globalThis.Error("The parameter 'roadmapId' must be defined.");
+        url_ = url_.replace("{roadmapId}", encodeURIComponent("" + roadmapId));
+        if (itemId === undefined || itemId === null)
+            throw new globalThis.Error("The parameter 'itemId' must be defined.");
+        url_ = url_.replace("{itemId}", encodeURIComponent("" + itemId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(patchDocument);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "PATCH",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processPatchRoadmapItem(_response);
+        });
+    }
+
+    protected processPatchRoadmapItem(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status === 422) {
+            const _responseText = response.data;
+            let result422: any = null;
+            let resultData422  = _responseText;
+            result422 = JSON.parse(resultData422);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
      * Delete a roadmap item.
      */
     deleteItem(roadmapId: string, itemId: string, cancelToken?: CancelToken): Promise<void> {
@@ -20462,6 +20540,13 @@ export interface UpdateRoadmapTimeboxRequest extends UpdateRoadmapItemRequest {
     start?: Date;
     /** The Roadmap Item end date. */
     end?: Date;
+}
+
+export interface JsonPatchDocumentOfUpdateRoadmapItemRequest {
+    operations: OperationOfUpdateRoadmapItemRequest[] | undefined;
+}
+
+export interface OperationOfUpdateRoadmapItemRequest extends Operation {
 }
 
 export interface UpdateRoadmapItemDatesRequest {
