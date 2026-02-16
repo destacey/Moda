@@ -14,7 +14,7 @@ export const DRAG_ACTIVATION_DISTANCE = 8 // pixels before drag activates
  */
 export function defaultMoveValidator<T extends TreeNode>(
   activeNode: FlattenedTreeNode<T>,
-  targetParentNode: T | null,
+  targetParentNode: T | FlattenedTreeNode<T> | null,
   targetParentId: string | null,
 ): { canMove: boolean; reason?: string } {
   // No parent (root level) is always valid
@@ -32,12 +32,9 @@ export function defaultMoveValidator<T extends TreeNode>(
 
   // Check if target parent is a descendant of the active node
   // This prevents circular references
-  if (targetParentNode) {
-    // Look for the target parent in the flattened data to check its ancestors
-    // We check if the active node's id is in the target's ancestor chain
-    // The caller should pass a FlattenedTreeNode if ancestor checking is needed
-    const targetFlat = targetParentNode as unknown as FlattenedTreeNode<T>
-    if (targetFlat.ancestorIds && targetFlat.ancestorIds.includes(activeNode.node.id)) {
+  if (targetParentNode && 'ancestorIds' in targetParentNode) {
+    const ancestorIds = (targetParentNode as FlattenedTreeNode<T>).ancestorIds
+    if (ancestorIds && ancestorIds.includes(activeNode.node.id)) {
       return {
         canMove: false,
         reason:
@@ -174,23 +171,30 @@ export function getProjection<T extends TreeNode>(
 
   // Find the parent node for validation
   let parentNode: T | null = null
+  let parentFlat: FlattenedTreeNode<T> | null = null
   if (parentId) {
-    const parentFlat = findFlatNodeById(items, parentId)
+    parentFlat = findFlatNodeById(items, parentId)
     if (parentFlat) {
-      parentNode = parentFlat as unknown as T
+      parentNode = parentFlat.node
     }
   }
 
-  // Validate the projection
+  // Run structural validation (needs flattened node for ancestor check)
+  const structuralResult = defaultMoveValidator(activeNode, parentFlat, parentId)
+  // Run domain validation (consumer validator receives the actual T node)
   const validate = validator ?? defaultMoveValidator
-  const validation = validate(activeNode, parentNode as any, parentId)
+  const validation = validator
+    ? structuralResult.canMove
+      ? validate(activeNode, parentNode, parentId)
+      : structuralResult
+    : structuralResult
 
   return {
     depth,
     maxDepth,
     minDepth,
     parentId,
-    parentNode: parentNode ? (parentNode as any).node ?? parentNode : null,
+    parentNode,
     canDrop: validation.canMove,
     reason: validation.reason,
   }

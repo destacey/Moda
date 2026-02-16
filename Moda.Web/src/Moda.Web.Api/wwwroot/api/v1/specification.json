@@ -10058,13 +10058,13 @@
         ]
       }
     },
-    "/api/planning/roadmaps/{roadmapId}/items/{activityId}/reorganize": {
-      "post": {
+    "/api/planning/roadmaps/{roadmapId}/items/{itemId}/placement": {
+      "put": {
         "tags": [
           "Roadmaps"
         ],
-        "summary": "Reorganize a roadmap activity.",
-        "operationId": "Roadmaps_ReorganizeActivity",
+        "summary": "Update a roadmap activity's placement.",
+        "operationId": "Roadmaps_UpdateActivityPlacement",
         "parameters": [
           {
             "name": "roadmapId",
@@ -10079,7 +10079,7 @@
             "x-position": 1
           },
           {
-            "name": "activityId",
+            "name": "itemId",
             "in": "path",
             "required": true,
             "schema": {
@@ -10096,7 +10096,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ReorganizeRoadmapActivityRequest"
+                "$ref": "#/components/schemas/UpdateRoadmapActivityPlacementRequest"
               }
             }
           },
@@ -23268,12 +23268,12 @@
           }
         ]
       },
-      "ReorganizeRoadmapActivityRequest": {
+      "UpdateRoadmapActivityPlacementRequest": {
         "type": "object",
         "additionalProperties": false,
         "required": [
           "roadmapId",
-          "activityId",
+          "itemId",
           "order"
         ],
         "properties": {
@@ -23284,13 +23284,13 @@
             "nullable": false,
             "example": "00000000-0000-0000-0000-000000000000"
           },
-          "parentActivityId": {
+          "parentId": {
             "type": "string",
             "format": "guid",
             "nullable": true,
             "example": "00000000-0000-0000-0000-000000000000"
           },
-          "activityId": {
+          "itemId": {
             "type": "string",
             "format": "guid",
             "minLength": 1,

@@ -3,7 +3,7 @@ import {
   CreateRoadmapMilestoneRequest,
   CreateRoadmapTimeboxRequest,
   ObjectIdAndKey,
-  ReorganizeRoadmapActivityRequest,
+  UpdateRoadmapActivityPlacementRequest,
   RoadmapActivityListDto,
   RoadmapItemDetailsDto,
   RoadmapItemListDto,
@@ -23,9 +23,8 @@ import {
 } from '@/src/services/moda-api'
 import { apiSlice } from '../apiSlice'
 import { QueryTags } from '../query-tags'
-import { getRoadmapsClient } from '@/src/services/clients'
+import { authenticatedFetch, getRoadmapsClient } from '@/src/services/clients'
 import { OptionModel } from '@/src/components/types'
-import { authenticatedFetch } from '@/src/services/auth-fetch'
 
 export const roadmapApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -308,17 +307,17 @@ export const roadmapApi = apiSlice.injectEndpoints({
         ]
       },
     }),
-    reorganizeRoadmapActivity: builder.mutation<
+    updateRoadmapActivityPlacement: builder.mutation<
       void,
       {
-        request: ReorganizeRoadmapActivityRequest
+        request: UpdateRoadmapActivityPlacementRequest
       }
     >({
       queryFn: async (mutationRequest) => {
         try {
-          const data = await getRoadmapsClient().reorganizeActivity(
+          const data = await getRoadmapsClient().updateActivityPlacement(
             mutationRequest.request.roadmapId,
-            mutationRequest.request.activityId,
+            mutationRequest.request.itemId,
             mutationRequest.request,
           )
           return { data }
@@ -330,7 +329,7 @@ export const roadmapApi = apiSlice.injectEndpoints({
       invalidatesTags: (result, error, arg) => {
         return [
           { type: QueryTags.RoadmapItem, id: arg.request.roadmapId },
-          { type: QueryTags.RoadmapItem, id: arg.request.activityId },
+          { type: QueryTags.RoadmapItem, id: arg.request.itemId },
         ]
       },
     }),
@@ -395,7 +394,7 @@ export const {
   useUpdateRoadmapItemMutation,
   usePatchRoadmapItemMutation,
   useUpdateRoadmapItemDatesMutation,
-  useReorganizeRoadmapActivityMutation,
+  useUpdateRoadmapActivityPlacementMutation,
   useDeleteRoadmapItemMutation,
   useGetVisibilityOptionsQuery,
 } = roadmapApi

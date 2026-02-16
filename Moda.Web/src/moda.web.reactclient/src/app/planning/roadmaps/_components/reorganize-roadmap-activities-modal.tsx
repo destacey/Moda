@@ -8,7 +8,7 @@ import {
   RoadmapActivityListDto,
   RoadmapItemListDto,
 } from '@/src/services/moda-api'
-import { useReorganizeRoadmapActivityMutation } from '@/src/store/features/planning/roadmaps-api'
+import { useUpdateRoadmapActivityPlacementMutation } from '@/src/store/features/planning/roadmaps-api'
 import { Button, Modal, TreeDataNode } from 'antd'
 import { useEffect, useMemo } from 'react'
 
@@ -54,8 +54,8 @@ const ReorganizeRoadmapActivitiesModal: React.FC<
     'Permissions.Roadmaps.Update',
   )
 
-  const [reorganizeActivity, { error: reorganizeError }] =
-    useReorganizeRoadmapActivityMutation()
+  const [updateActivityPlacement, { error: updatePlacementError }] =
+    useUpdateRoadmapActivityPlacementMutation()
 
   // Derive tree data from props
   const activityTreeData = useMemo(() => {
@@ -82,13 +82,13 @@ const ReorganizeRoadmapActivitiesModal: React.FC<
   }, [props.showModal, canManageRoadmapItems, props, messageApi])
 
   useEffect(() => {
-    if (reorganizeError) {
-      console.error('reorganizeActivity error', reorganizeError)
+    if (updatePlacementError) {
+      console.error('updateActivityPlacement error', updatePlacementError)
       messageApi.error(
         'An error occurred while reorganizing the roadmap activities. Please refresh and try again.',
       )
     }
-  }, [reorganizeError, messageApi])
+  }, [updatePlacementError, messageApi])
 
   const onActivityChanged: NodeChangedCallback = async (
     changedKey,
@@ -96,11 +96,11 @@ const ReorganizeRoadmapActivitiesModal: React.FC<
     index,
   ) => {
     try {
-      await reorganizeActivity({
+      await updateActivityPlacement({
         request: {
           roadmapId: props.roadmapId,
-          parentActivityId: parentId?.toString(),
-          activityId: changedKey.toString(),
+          parentId: parentId?.toString(),
+          itemId: changedKey.toString(),
           order: index + 1,
         },
       })

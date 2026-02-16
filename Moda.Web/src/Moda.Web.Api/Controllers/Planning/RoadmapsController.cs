@@ -307,19 +307,19 @@ public class RoadmapsController : ControllerBase
             : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
-    [HttpPost("{roadmapId}/items/{activityId}/reorganize")]
+    [HttpPut("{roadmapId}/items/{itemId}/placement")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Roadmaps)]
-    [OpenApiOperation("Reorganize a roadmap activity.", "")]
+    [OpenApiOperation("Update a roadmap activity's placement.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult> ReorganizeActivity(Guid roadmapId, Guid activityId, [FromBody] ReorganizeRoadmapActivityRequest request, CancellationToken cancellationToken)
+    public async Task<ActionResult> UpdateActivityPlacement(Guid roadmapId, Guid itemId, [FromBody] UpdateRoadmapActivityPlacementRequest request, CancellationToken cancellationToken)
     {
         if (roadmapId != request.RoadmapId)
             return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(nameof(roadmapId), nameof(request.RoadmapId), HttpContext));
-        else if (activityId != request.ActivityId)
-            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(nameof(activityId), nameof(request.ActivityId), HttpContext));
+        else if (itemId != request.ItemId)
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(nameof(itemId), nameof(request.ItemId), HttpContext));
 
-        var result = await _sender.Send(request.ToReorganizeRoadmapActivityCommand(), cancellationToken);
+        var result = await _sender.Send(request.ToUpdateRoadmapActivityPlacementCommand(), cancellationToken);
 
         return result.IsSuccess
             ? NoContent()

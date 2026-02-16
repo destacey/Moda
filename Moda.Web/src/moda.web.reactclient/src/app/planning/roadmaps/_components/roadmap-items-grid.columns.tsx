@@ -5,6 +5,7 @@ import {
   CaretRightOutlined,
   DeleteOutlined,
   EditOutlined,
+  HolderOutlined,
   MoreOutlined,
 } from '@ant-design/icons'
 import { Button, ColorPicker, Dropdown, Flex } from 'antd'
@@ -16,8 +17,52 @@ import {
   type TreeGridColumnMeta,
   setContainsFilter,
   dateSortBy,
+  useTreeGridDragHandle,
 } from '@/src/components/common/tree-grid'
 import type { RoadmapItemTreeNode } from './roadmap-items-grid'
+
+const DATE_FORMAT = 'MMM D, YYYY'
+const DRAG_HANDLE_STYLE = {
+  cursor: 'grab',
+  touchAction: 'none',
+} as const
+const NAME_LINK_STYLE = {
+  flex: 1,
+  minWidth: 0,
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+} as const
+
+const formatDate = (dateValue?: Date | string | null) =>
+  dateValue ? dayjs(dateValue).format(DATE_FORMAT) : ''
+
+function DragHandleCell({
+  isDragEnabled,
+  isActivity,
+}: {
+  isDragEnabled: boolean
+  isActivity: boolean
+}) {
+  const { listeners, attributes } = useTreeGridDragHandle()
+
+  if (!isDragEnabled || !isActivity) {
+    return null
+  }
+
+  return (
+    <div
+      {...listeners}
+      {...attributes}
+      className={styles.dragHandle}
+      onClick={(e) => e.stopPropagation()}
+      title="Drag to reorder or change parent"
+      style={DRAG_HANDLE_STYLE}
+    >
+      <HolderOutlined style={{ fontSize: 14, color: '#8c8c8c' }} />
+    </div>
+  )
+}
 
 interface RoadmapItemsGridColumnsParams {
   isRoadmapManager: boolean
@@ -25,6 +70,8 @@ interface RoadmapItemsGridColumnsParams {
   onDeleteItem: (item: RoadmapItemTreeNode) => void
   openRoadmapItemDrawer: (itemId: string) => void
   typeFilterOptions: FilterOption[]
+  isDragEnabled: boolean
+  enableDragAndDrop: boolean
 }
 
 export const getRoadmapItemsGridColumns = ({
@@ -33,6 +80,8 @@ export const getRoadmapItemsGridColumns = ({
   onDeleteItem,
   openRoadmapItemDrawer,
   typeFilterOptions,
+  isDragEnabled,
+  enableDragAndDrop,
 }: RoadmapItemsGridColumnsParams): ColumnDef<RoadmapItemTreeNode>[] => {
   return [
     ...(isRoadmapManager
@@ -40,7 +89,7 @@ export const getRoadmapItemsGridColumns = ({
           {
             id: 'actions',
             header: '',
-            size: 36,
+            size: 50,
             enableSorting: false,
             enableGlobalFilter: false,
             enableColumnFilter: false,
@@ -49,32 +98,40 @@ export const getRoadmapItemsGridColumns = ({
             cell: ({ row }: { row: any }) => {
               const item = row.original as RoadmapItemTreeNode
               return (
-                <Dropdown
-                  menu={{
-                    items: [
-                      {
-                        key: 'edit',
-                        label: 'Edit',
-                        icon: <EditOutlined />,
-                        onClick: () => onEditItem(item),
-                      },
-                      {
-                        key: 'delete',
-                        label: 'Delete',
-                        icon: <DeleteOutlined />,
-                        onClick: () => onDeleteItem(item),
-                      },
-                    ],
-                  }}
-                  trigger={['click']}
-                >
-                  <Button
-                    type="text"
-                    size="small"
-                    icon={<MoreOutlined />}
-                    tabIndex={-1}
-                  />
-                </Dropdown>
+                <Flex justify="end" gap={8}>
+                  {enableDragAndDrop && (
+                    <DragHandleCell
+                      isDragEnabled={isDragEnabled}
+                      isActivity={item.type === 'Activity'}
+                    />
+                  )}
+                  <Dropdown
+                    menu={{
+                      items: [
+                        {
+                          key: 'edit',
+                          label: 'Edit',
+                          icon: <EditOutlined />,
+                          onClick: () => onEditItem(item),
+                        },
+                        {
+                          key: 'delete',
+                          label: 'Delete',
+                          icon: <DeleteOutlined />,
+                          onClick: () => onDeleteItem(item),
+                        },
+                      ],
+                    }}
+                    trigger={['click']}
+                  >
+                    <Button
+                      type="text"
+                      size="small"
+                      icon={<MoreOutlined />}
+                      tabIndex={-1}
+                    />
+                  </Dropdown>
+                </Flex>
               )
             },
           } as ColumnDef<RoadmapItemTreeNode>,
@@ -121,13 +178,7 @@ export const getRoadmapItemsGridColumns = ({
                 e.stopPropagation()
                 openRoadmapItemDrawer(item.id)
               }}
-              style={{
-                flex: 1,
-                minWidth: 0,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
+              style={NAME_LINK_STYLE}
             >
               {item.name}
             </a>
@@ -151,9 +202,8 @@ export const getRoadmapItemsGridColumns = ({
     {
       id: 'start',
       accessorFn: (row) => {
-        const dateValue =
-          row.type === 'Milestone' ? row.date : row.start
-        return dateValue ? dayjs(dateValue).format('MMM D, YYYY') : ''
+        const dateValue = row.type === 'Milestone' ? row.date : row.start
+        return formatDate(dateValue)
       },
       header: 'Start',
       size: 120,
@@ -166,16 +216,14 @@ export const getRoadmapItemsGridColumns = ({
       }),
       meta: {
         exportFormatter: (_value, row) => {
-          const dateValue =
-            row.type === 'Milestone' ? row.date : row.start
-          return dateValue ? dayjs(dateValue).format('MMM D, YYYY') : ''
+          const dateValue = row.type === 'Milestone' ? row.date : row.start
+          return formatDate(dateValue)
         },
       } satisfies TreeGridColumnMeta,
     },
     {
       id: 'end',
-      accessorFn: (row) =>
-        row.end ? dayjs(row.end).format('MMM D, YYYY') : '',
+      accessorFn: (row) => formatDate(row.end),
       header: 'End',
       size: 120,
       enableGlobalFilter: true,
@@ -183,8 +231,7 @@ export const getRoadmapItemsGridColumns = ({
       filterFn: 'includesString',
       sortingFn: dateSortBy((row: any) => row.original.end),
       meta: {
-        exportFormatter: (value) =>
-          value ? dayjs(value as string).format('MMM D, YYYY') : '',
+        exportFormatter: (value) => formatDate(value as string | null),
       } satisfies TreeGridColumnMeta,
     },
     {

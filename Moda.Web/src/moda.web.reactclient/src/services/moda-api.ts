@@ -11520,23 +11520,23 @@ export class RoadmapsClient {
     }
 
     /**
-     * Reorganize a roadmap activity.
+     * Update a roadmap activity's placement.
      */
-    reorganizeActivity(roadmapId: string, activityId: string, request: ReorganizeRoadmapActivityRequest, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/planning/roadmaps/{roadmapId}/items/{activityId}/reorganize";
+    updateActivityPlacement(roadmapId: string, itemId: string, request: UpdateRoadmapActivityPlacementRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/planning/roadmaps/{roadmapId}/items/{itemId}/placement";
         if (roadmapId === undefined || roadmapId === null)
             throw new globalThis.Error("The parameter 'roadmapId' must be defined.");
         url_ = url_.replace("{roadmapId}", encodeURIComponent("" + roadmapId));
-        if (activityId === undefined || activityId === null)
-            throw new globalThis.Error("The parameter 'activityId' must be defined.");
-        url_ = url_.replace("{activityId}", encodeURIComponent("" + activityId));
+        if (itemId === undefined || itemId === null)
+            throw new globalThis.Error("The parameter 'itemId' must be defined.");
+        url_ = url_.replace("{itemId}", encodeURIComponent("" + itemId));
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(request);
 
         let options_: AxiosRequestConfig = {
             data: content_,
-            method: "POST",
+            method: "PUT",
             url: url_,
             headers: {
                 "Content-Type": "application/json",
@@ -11551,11 +11551,11 @@ export class RoadmapsClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processReorganizeActivity(_response);
+            return this.processUpdateActivityPlacement(_response);
         });
     }
 
-    protected processReorganizeActivity(response: AxiosResponse): Promise<void> {
+    protected processUpdateActivityPlacement(response: AxiosResponse): Promise<void> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -20576,10 +20576,10 @@ export interface UpdateRoadmapTimeboxDatesRequest extends UpdateRoadmapItemDates
     end?: Date;
 }
 
-export interface ReorganizeRoadmapActivityRequest {
+export interface UpdateRoadmapActivityPlacementRequest {
     roadmapId: string;
-    parentActivityId?: string | undefined;
-    activityId: string;
+    parentId?: string | undefined;
+    itemId: string;
     order: number;
 }
 
