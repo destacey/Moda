@@ -1,38 +1,36 @@
 'use client'
 
-import { ModaEmpty } from '@/src/components/common'
 import {
   RoadmapActivityListDto,
-  RoadmapActivityNavigationDto,
   RoadmapItemListDto,
   RoadmapMilestoneListDto,
   RoadmapTimeboxListDto,
 } from '@/src/services/moda-api'
-import {
-  Button,
-  ColorPicker,
-  Dropdown,
-  Flex,
-  MenuProps,
-  Table,
-  TableColumnsType,
-} from 'antd'
-import { MoreOutlined } from '@ant-design/icons'
-import { ItemType } from 'antd/es/menu/interface'
-import dayjs from 'dayjs'
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { TreeGrid, type TreeNode, type FilterOption } from '@/src/components/common/tree-grid'
+import { FC, ReactNode, useCallback, useMemo, useState } from 'react'
 import EditRoadmapActivityForm from './edit-roadmap-activity-form'
 import DeleteRoadmapItemForm from './delete-roadmap-item-form'
 import EditRoadmapTimeboxForm from './edit-roadmap-timebox-form'
+import { getRoadmapItemsGridColumns } from './roadmap-items-grid.columns'
+
+export interface RoadmapItemTreeNode extends TreeNode {
+  id: string
+  children: RoadmapItemTreeNode[]
+  parentId?: string | null
+  name: string
+  type: string
+  start?: Date | null
+  end?: Date | null
+  date?: Date | null
+  color?: string | null
+}
 
 export interface RoadmapItemsGridProps {
   roadmapId: string
   roadmapItemsData: RoadmapItemListDto[]
   roadmapItemsIsLoading: boolean
   refreshRoadmapItems: () => void
-  gridHeight?: number | undefined
-  viewSelector?: React.ReactNode | undefined
-  enableRowDrag?: boolean | undefined
+  viewSelector?: ReactNode | undefined
   openRoadmapItemDrawer: (itemId: string) => void
   isRoadmapManager: boolean
 }
@@ -43,184 +41,73 @@ type RoadmapItemUnion =
   | RoadmapMilestoneListDto
   | RoadmapTimeboxListDto
 
-interface RoadmapItemDataType {
-  id: string
-  key: React.ReactNode
-  name: string
-  type: string
-  parent?: RoadmapActivityNavigationDto
-  start: string // TODO: Change to Date
-  end?: string // TODO: Change to Date
-  color?: string
-  children?: RoadmapItemDataType[]
-}
+const TYPE_FILTER_OPTIONS: FilterOption[] = [
+  { label: 'Activity', value: 'Activity' },
+  { label: 'Milestone', value: 'Milestone' },
+  { label: 'Timebox', value: 'Timebox' },
+]
 
-interface RowMenuProps extends MenuProps {
-  itemId: string
-  canUpdateRoadmap: boolean
-  onEditItemMenuClicked: (id: string) => void
-  onDeleteItemMenuClicked: (id: string) => void
-}
-
-const getRowMenuItems = (props: RowMenuProps) => {
-  if (
-    !props.canUpdateRoadmap ||
-    !props.itemId ||
-    !props.onEditItemMenuClicked
-  ) {
-    return []
-  }
-  return [
-    {
-      key: 'editItem',
-      label: 'Edit',
-      onClick: () => props.onEditItemMenuClicked(props.itemId),
-    },
-    {
-      key: 'deleteItem',
-      label: 'Delete',
-      onClick: () => props.onDeleteItemMenuClicked(props.itemId),
-    },
-  ] as ItemType[]
-}
-
-const MapRoadmapItem = (item: RoadmapItemUnion): RoadmapItemDataType => {
-  return {
+function mapToTreeNode(item: RoadmapItemUnion): RoadmapItemTreeNode {
+  const node: RoadmapItemTreeNode = {
     id: item.id,
-    key: item.id,
     name: item.name,
     type: item.type.name,
-    parent: item.parent,
+    parentId: item.parent?.id ?? null,
     start:
-      'start' in item && item.start // activity and timebox
-        ? dayjs(item.start).format('M/D/YYYY')
-        : 'date' in item && item.date // milestone
-          ? dayjs(item.date).format('M/D/YYYY')
-          : undefined,
-    end: 'end' in item && item.end ? dayjs(item.end).format('M/D/YYYY') : '',
-    color: item.color,
+      'start' in item && item.start ? new Date(item.start as any) : null,
+    end: 'end' in item && item.end ? new Date(item.end as any) : null,
+    date:
+      'date' in item && item.date ? new Date(item.date as any) : null,
+    color: item.color ?? null,
+    children: [],
   }
+
+  if ('children' in item && Array.isArray(item.children) && item.children.length > 0) {
+    node.children = item.children.map((child) => mapToTreeNode(child))
+  }
+
+  return node
 }
 
-const RoadmapItemsGrid: React.FC<RoadmapItemsGridProps> = (
-  props: RoadmapItemsGridProps,
-) => {
+const RoadmapItemsGrid: FC<RoadmapItemsGridProps> = (props) => {
   const [openUpdateRoadmapActivityForm, setOpenUpdateRoadmapActivityForm] =
-    useState<boolean>(false)
+    useState(false)
   const [openUpdateRoadmapTimeboxForm, setOpenUpdateRoadmapTimeboxForm] =
-    useState<boolean>(false)
+    useState(false)
   const [openDeleteRoadmapItemForm, setOpenDeleteRoadmapItemForm] =
-    useState<boolean>(false)
+    useState(false)
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
-  const tblRef: Parameters<typeof Table>[0]['ref'] = useRef(null)
 
-  const onEditItemMenuClicked = useCallback((record: RoadmapItemDataType) => {
-    setSelectedItemId(record.id)
-
-    if (record.type === 'Activity') {
+  const onEditItem = useCallback((item: RoadmapItemTreeNode) => {
+    setSelectedItemId(item.id)
+    if (item.type === 'Activity') {
       setOpenUpdateRoadmapActivityForm(true)
-    } else if (record.type === 'Timebox') {
+    } else if (item.type === 'Timebox') {
       setOpenUpdateRoadmapTimeboxForm(true)
     }
   }, [])
 
-  const onDeleteItemMenuClicked = useCallback((id: string) => {
-    setSelectedItemId(id)
+  const onDeleteItem = useCallback((item: RoadmapItemTreeNode) => {
+    setSelectedItemId(item.id)
     setOpenDeleteRoadmapItemForm(true)
   }, [])
 
-  const columnDefs = useMemo(() => {
-    const actionsColumn = {
-      dataIndex: '',
-      key: 'x',
-      width: 25,
-      render: (_: any, record: RoadmapItemDataType) => {
-        const menuItems = getRowMenuItems({
-          itemId: record.id,
-          canUpdateRoadmap: props.isRoadmapManager ?? false,
-          onEditItemMenuClicked: () => onEditItemMenuClicked(record),
-          onDeleteItemMenuClicked: () => onDeleteItemMenuClicked(record.id),
-        })
-        if (menuItems.length === 0) return null
-        return (
-          <Dropdown menu={{ items: menuItems }} trigger={['click']}>
-            <Button type="text" size="small" icon={<MoreOutlined />} />
-          </Dropdown>
-        )
-      },
-    }
-
-    return [
-      {
-        key: 'id',
-        dataIndex: 'id',
-        title: 'Id',
-        hidden: true,
-      },
-      {
-        key: 'name',
-        dataIndex: 'name',
-        title: 'Name',
-        sorter: (a, b) => a.name.localeCompare(b.name),
-        width: 350,
-        render: (text, record) => (
-          <a onClick={() => props.openRoadmapItemDrawer(record.id)}>{text}</a>
-        ),
-      },
-      // Only include actions column if isRoadmapManager is true
-      ...(props.isRoadmapManager ? [actionsColumn] : []),
-      {
-        key: 'type',
-        dataIndex: 'type',
-        title: 'Type',
-        sorter: (a, b) => a.type.localeCompare(b.type),
-        width: 100,
-      },
-      {
-        key: 'start',
-        dataIndex: 'start',
-        title: 'Start',
-        sorter: (a, b) => dayjs(a.start).unix() - dayjs(b.start).unix(),
-        width: 100,
-      },
-      {
-        key: 'end',
-        dataIndex: 'end',
-        title: 'End',
-        sorter: (a, b) => dayjs(a.end).unix() - dayjs(b.end).unix(),
-        width: 100,
-      },
-      {
-        key: 'color',
-        dataIndex: 'color',
-        title: 'Color',
-        sorter: (a, b) => a.color?.localeCompare(b.color),
-        render: (value) =>
-          value && <ColorPicker value={value} size="small" showText disabled />,
-        width: 100,
-      },
-    ] as TableColumnsType<RoadmapItemDataType>
-  }, [onDeleteItemMenuClicked, onEditItemMenuClicked, props])
-
-  const data = useMemo(() => {
+  const treeData = useMemo(() => {
     if (props.roadmapItemsIsLoading) return []
-
-    return props.roadmapItemsData.map((item: RoadmapItemUnion) => {
-      const mapItemWithChildren = (
-        item: RoadmapItemUnion,
-      ): RoadmapItemDataType => {
-        const roadmapItem = MapRoadmapItem(item)
-        if ('children' in item && item.children.length > 0) {
-          roadmapItem.children = item.children.map((child) =>
-            mapItemWithChildren(child),
-          )
-        }
-        return roadmapItem
-      }
-
-      return mapItemWithChildren(item)
-    })
+    return props.roadmapItemsData.map((item) => mapToTreeNode(item))
   }, [props.roadmapItemsData, props.roadmapItemsIsLoading])
+
+  const columns = useMemo(
+    () =>
+      getRoadmapItemsGridColumns({
+        isRoadmapManager: props.isRoadmapManager,
+        onEditItem,
+        onDeleteItem,
+        openRoadmapItemDrawer: props.openRoadmapItemDrawer,
+        typeFilterOptions: TYPE_FILTER_OPTIONS,
+      }),
+    [props.isRoadmapManager, props.openRoadmapItemDrawer, onEditItem, onDeleteItem],
+  )
 
   const onUpdateRoadmapActivityFormClosed = (wasSaved: boolean) => {
     setOpenUpdateRoadmapActivityForm(false)
@@ -248,20 +135,14 @@ const RoadmapItemsGrid: React.FC<RoadmapItemsGridProps> = (
 
   return (
     <>
-      <Flex
-        justify="end"
-        align="center"
-        style={{ paddingTop: '8px', paddingBottom: '4px' }}
-      >
-        {props.viewSelector}
-      </Flex>
-      <Table<RoadmapItemDataType>
-        ref={tblRef}
-        columns={columnDefs}
-        dataSource={data}
-        size="small"
-        pagination={false}
-        locale={{ emptyText: <ModaEmpty message="No Roadmap Items" /> }}
+      <TreeGrid<RoadmapItemTreeNode>
+        data={treeData}
+        isLoading={props.roadmapItemsIsLoading}
+        columns={columns}
+        rightSlot={props.viewSelector}
+        onRefresh={async () => props.refreshRoadmapItems()}
+        emptyMessage="No Roadmap Items"
+        csvFileName="roadmap-items"
       />
       {openUpdateRoadmapActivityForm && (
         <EditRoadmapActivityForm
