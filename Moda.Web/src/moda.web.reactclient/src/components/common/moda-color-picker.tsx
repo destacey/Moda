@@ -74,11 +74,11 @@ const ModaColorPicker = (props: ModaColorPickerProps) => {
     const colorValue = color?.toHexString()
     if (colorValue !== selectedColor) {
       setSelectedColor(colorValue)
-      props.onChange(colorValue)
+      props.onChange?.(colorValue)
     } else {
       // Clear the color if the same color is selected
       setSelectedColor(undefined)
-      props.onChange(undefined)
+      props.onChange?.(undefined)
     }
   }
 

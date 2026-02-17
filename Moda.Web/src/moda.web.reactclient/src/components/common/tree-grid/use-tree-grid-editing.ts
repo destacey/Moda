@@ -125,6 +125,12 @@ export function useTreeGridEditing<T extends TreeNode>(
         }
 
         if (cellElement) {
+          const cellElementNode = cellElement as HTMLElement
+          cellElementNode.scrollIntoView({
+            block: 'nearest',
+            inline: 'nearest',
+          })
+
           let input: HTMLElement | null = null
 
           // Try DatePicker first
@@ -153,6 +159,18 @@ export function useTreeGridEditing<T extends TreeNode>(
 
           if (!input) {
             input = cellElement.querySelector('.ant-picker')
+          }
+
+          if (!input) {
+            input = cellElement.querySelector(
+              '[data-color-picker-focus]',
+            ) as HTMLElement | null
+          }
+
+          if (!input) {
+            input = cellElement.querySelector(
+              '.ant-color-picker-trigger',
+            ) as HTMLElement | null
           }
 
           if (input instanceof HTMLElement) {
@@ -296,7 +314,8 @@ export function useTreeGridEditing<T extends TreeNode>(
 
       if (
         target.closest('.ant-select-dropdown') ||
-        target.closest('.ant-picker-dropdown')
+        target.closest('.ant-picker-dropdown') ||
+        target.closest('.ant-color-picker')
       ) {
         return
       }
@@ -529,7 +548,9 @@ export function useTreeGridEditing<T extends TreeNode>(
               )
               if (
                 cell &&
-                cell.querySelector('input, .ant-select, .ant-picker')
+                cell.querySelector(
+                  'input, .ant-select, .ant-picker, .ant-color-picker, .ant-color-picker-trigger, [data-color-picker-focus]',
+                )
               ) {
                 return col
               }
@@ -601,8 +622,10 @@ export function useTreeGridEditing<T extends TreeNode>(
       if (
         target.closest('.ant-select-dropdown') ||
         target.closest('.ant-picker-dropdown') ||
+        target.closest('.ant-color-picker') ||
         target.closest('input') ||
         target.closest('.ant-select-selector') ||
+        target.closest('.ant-color-picker-trigger') ||
         target.classList.contains('ant-select-item-option-content')
       ) {
         return

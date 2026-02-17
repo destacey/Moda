@@ -259,18 +259,13 @@ export const getProjectTasksTableColumns = ({
                   type="text"
                   size="small"
                   icon={<PlusOutlined />}
+                  className={`${styles.rowActionBtn} ${styles.inlineRowAction}`}
                   onClick={(e) => {
                     e.stopPropagation()
                     addDraftTaskAsChild(task.id)
                   }}
                   disabled={!canCreateTasks}
                   title="Add child task"
-                  style={{
-                    padding: '0 4px',
-                    height: 20,
-                    fontSize: 12,
-                    flexShrink: 0,
-                  }}
                 />
               )}
           </Flex>

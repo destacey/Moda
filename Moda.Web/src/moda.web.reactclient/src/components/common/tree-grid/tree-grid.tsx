@@ -720,7 +720,8 @@ function TreeGridInner<T extends TreeNode>(
                           if (
                             target.closest('input') ||
                             target.closest('.ant-select') ||
-                            target.closest('.ant-picker')
+                            target.closest('.ant-picker') ||
+                            target.closest('.ant-color-picker')
                           ) {
                             e.stopPropagation()
                           }

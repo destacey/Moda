@@ -7,10 +7,12 @@ import {
   EditOutlined,
   HolderOutlined,
   MoreOutlined,
+  PlusOutlined,
 } from '@ant-design/icons'
-import { Button, ColorPicker, Dropdown, Flex } from 'antd'
+import { Button, ColorPicker, DatePicker, Dropdown, Flex, Form, Input, Select } from 'antd'
 import dayjs from 'dayjs'
 import { ColumnDef } from '@tanstack/react-table'
+import { ModaColorPicker } from '@/src/components/common'
 import styles from '@/src/components/common/tree-grid/tree-grid.module.css'
 import {
   type FilterOption,
@@ -21,6 +23,7 @@ import {
 } from '@/src/components/common/tree-grid'
 import type { RoadmapItemTreeNode } from './roadmap-items-grid'
 
+const { Item: FormItem } = Form
 const DATE_FORMAT = 'MMM D, YYYY'
 const DRAG_HANDLE_STYLE = {
   cursor: 'grab',
@@ -64,24 +67,92 @@ function DragHandleCell({
   )
 }
 
+interface FocusableColorPickerFieldProps {
+  value?: string
+  onChange?: (value: string | undefined) => void
+  rowId: string
+  handleKeyDown: (
+    e: React.KeyboardEvent,
+    rowId: string,
+    columnId: string,
+  ) => Promise<void>
+}
+
+function FocusableColorPickerField({
+  value,
+  onChange,
+  rowId,
+  handleKeyDown,
+}: FocusableColorPickerFieldProps) {
+  return (
+    <div
+      tabIndex={0}
+      data-color-picker-focus
+      className={styles.colorPickerFocusTarget}
+      onKeyDown={(e) => {
+        if (e.key === ' ' || e.key === 'Spacebar' || e.key === 'Enter') {
+          e.preventDefault()
+          e.stopPropagation()
+          const trigger = (
+            e.currentTarget.querySelector('.ant-color-picker-trigger') ??
+            e.currentTarget
+              .closest('[data-cell-id]')
+              ?.querySelector('.ant-color-picker-trigger')
+          ) as HTMLElement | null
+          trigger?.focus()
+          trigger?.click()
+          return
+        }
+
+        void handleKeyDown(e, rowId, 'color')
+      }}
+    >
+      <ModaColorPicker value={value} onChange={onChange} />
+    </div>
+  )
+}
+
 interface RoadmapItemsGridColumnsParams {
   isRoadmapManager: boolean
+  selectedRowId: string | null
   onEditItem: (item: RoadmapItemTreeNode) => void
   onDeleteItem: (item: RoadmapItemTreeNode) => void
+  handleSaveRoadmapItem?: (
+    itemId: string,
+    updates: Record<string, any>,
+  ) => Promise<boolean>
+  getFieldError: (fieldName: string) => string | undefined
+  handleKeyDown: (
+    e: React.KeyboardEvent,
+    rowId: string,
+    columnId: string,
+  ) => Promise<void>
   openRoadmapItemDrawer: (itemId: string) => void
   typeFilterOptions: FilterOption[]
   isDragEnabled: boolean
   enableDragAndDrop: boolean
+  addDraftItemAsChild?: (parentId: string) => void
+  canCreateItems?: boolean
+  createTypeOptions?: Array<{ label: string; value: string }>
+  isSelectedDraftActivity?: boolean
 }
 
 export const getRoadmapItemsGridColumns = ({
   isRoadmapManager,
+  selectedRowId,
   onEditItem,
   onDeleteItem,
+  handleSaveRoadmapItem,
+  getFieldError,
+  handleKeyDown,
   openRoadmapItemDrawer,
   typeFilterOptions,
   isDragEnabled,
   enableDragAndDrop,
+  addDraftItemAsChild,
+  canCreateItems = true,
+  createTypeOptions = [],
+  isSelectedDraftActivity = true,
 }: RoadmapItemsGridColumnsParams): ColumnDef<RoadmapItemTreeNode>[] => {
   return [
     ...(isRoadmapManager
@@ -97,6 +168,7 @@ export const getRoadmapItemsGridColumns = ({
             meta: { enableExport: false } satisfies TreeGridColumnMeta,
             cell: ({ row }: { row: any }) => {
               const item = row.original as RoadmapItemTreeNode
+              const isDraft = item.id.startsWith('draft-')
               return (
                 <Flex justify="end" gap={8}>
                   {enableDragAndDrop && (
@@ -105,32 +177,34 @@ export const getRoadmapItemsGridColumns = ({
                       isActivity={item.type === 'Activity'}
                     />
                   )}
-                  <Dropdown
-                    menu={{
-                      items: [
-                        {
-                          key: 'edit',
-                          label: 'Edit',
-                          icon: <EditOutlined />,
-                          onClick: () => onEditItem(item),
-                        },
-                        {
-                          key: 'delete',
-                          label: 'Delete',
-                          icon: <DeleteOutlined />,
-                          onClick: () => onDeleteItem(item),
-                        },
-                      ],
-                    }}
-                    trigger={['click']}
-                  >
-                    <Button
-                      type="text"
-                      size="small"
-                      icon={<MoreOutlined />}
-                      tabIndex={-1}
-                    />
-                  </Dropdown>
+                  {!isDraft && (
+                    <Dropdown
+                      menu={{
+                        items: [
+                          {
+                            key: 'edit',
+                            label: 'Edit',
+                            icon: <EditOutlined />,
+                            onClick: () => onEditItem(item),
+                          },
+                          {
+                            key: 'delete',
+                            label: 'Delete',
+                            icon: <DeleteOutlined />,
+                            onClick: () => onDeleteItem(item),
+                          },
+                        ],
+                      }}
+                      trigger={['click']}
+                    >
+                      <Button
+                        type="text"
+                        size="small"
+                        icon={<MoreOutlined />}
+                        tabIndex={-1}
+                      />
+                    </Dropdown>
+                  )}
                 </Flex>
               )
             },
@@ -147,47 +221,103 @@ export const getRoadmapItemsGridColumns = ({
       cell: ({ row }: { row: any }) => {
         const item = row.original as RoadmapItemTreeNode
         const depth = row.depth
+        const isSelected = selectedRowId === item.id
+        const isDraft = item.id.startsWith('draft-')
+        const isActivity = item.type === 'Activity'
 
         return (
-          <Flex className={styles.nameCell} align="center" gap={0}>
-            {Array.from({ length: depth }).map((_, index) => (
-              <span key={index} className={styles.indentSpacer} />
-            ))}
-            {row.getCanExpand() ? (
-              <Button
-                type="text"
-                size="small"
-                icon={
-                  row.getIsExpanded() ? (
-                    <CaretDownOutlined />
-                  ) : (
-                    <CaretRightOutlined />
-                  )
-                }
-                onClick={(e) => {
-                  e.stopPropagation()
-                  row.getToggleExpandedHandler()()
-                }}
-                className={styles.expanderBtn}
-              />
-            ) : (
-              <span className={styles.indentSpacer} />
-            )}
-            <a
-              onClick={(e) => {
-                e.stopPropagation()
-                openRoadmapItemDrawer(item.id)
-              }}
-              style={NAME_LINK_STYLE}
-            >
-              {item.name}
-            </a>
+          <Flex
+            className={styles.nameCell}
+            align="center"
+            justify="space-between"
+            gap={4}
+            style={{ width: '100%' }}
+          >
+            <Flex align="center" gap={0} style={{ flex: 1, minWidth: 0 }}>
+              {Array.from({ length: depth }).map((_, index) => (
+                <span key={index} className={styles.indentSpacer} />
+              ))}
+              {row.getCanExpand() ? (
+                <Button
+                  type="text"
+                  size="small"
+                  icon={
+                    row.getIsExpanded() ? (
+                      <CaretDownOutlined />
+                    ) : (
+                      <CaretRightOutlined />
+                    )
+                  }
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    row.getToggleExpandedHandler()()
+                  }}
+                  className={styles.expanderBtn}
+                />
+              ) : (
+                <span className={styles.indentSpacer} />
+              )}
+              {isSelected && isDraft && handleSaveRoadmapItem ? (
+                <FormItem
+                  name="name"
+                  style={{ margin: 0, flex: 1, minWidth: 0 }}
+                  rules={[
+                    { required: true, message: 'Name is required' },
+                    { max: 128, message: 'Name cannot exceed 128 characters' },
+                  ]}
+                  validateStatus={getFieldError('name') ? 'error' : ''}
+                >
+                  <Input
+                    size="small"
+                    onPressEnter={(e) => {
+                      e.currentTarget.blur()
+                    }}
+                    onKeyDown={(e) => handleKeyDown(e, item.id, 'name')}
+                    style={{ flex: 1, minWidth: 0 }}
+                    status={getFieldError('name') ? 'error' : ''}
+                  />
+                </FormItem>
+              ) : isDraft ? (
+                <span style={{ ...NAME_LINK_STYLE }}>
+                  {item.name || '(New Item)'}
+                </span>
+              ) : (
+                <a
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    openRoadmapItemDrawer(item.id)
+                  }}
+                  style={NAME_LINK_STYLE}
+                >
+                  {item.name}
+                </a>
+              )}
+            </Flex>
+            {!isSelected &&
+              isRoadmapManager &&
+              !isDraft &&
+              isActivity &&
+              addDraftItemAsChild && (
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<PlusOutlined />}
+                  className={`${styles.rowActionBtn} ${styles.inlineRowAction}`}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    addDraftItemAsChild(item.id)
+                  }}
+                  disabled={!canCreateItems}
+                  title="Add child item"
+                />
+              )}
           </Flex>
         )
       },
     },
     {
-      accessorKey: 'type',
+      id: 'type',
+      accessorFn: (row) => row.type,
       header: 'Type',
       size: 110,
       enableGlobalFilter: true,
@@ -198,6 +328,31 @@ export const getRoadmapItemsGridColumns = ({
         filterType: 'select',
         filterOptions: typeFilterOptions,
       } satisfies TreeGridColumnMeta,
+      cell: ({ row }: { row: any }) => {
+        const item = row.original as RoadmapItemTreeNode
+        const isSelected = selectedRowId === item.id
+        const isDraft = item.id.startsWith('draft-')
+
+        if (isSelected && isDraft && handleSaveRoadmapItem) {
+          return (
+            <FormItem
+              name="itemType"
+              style={{ margin: 0 }}
+              validateStatus={getFieldError('itemType') ? 'error' : ''}
+            >
+              <Select
+                size="small"
+                options={createTypeOptions}
+                style={{ width: '100%' }}
+                onKeyDown={(e) => handleKeyDown(e, item.id, 'type')}
+                status={getFieldError('itemType') ? 'error' : ''}
+              />
+            </FormItem>
+          )
+        }
+
+        return item.type
+      },
     },
     {
       id: 'start',
@@ -220,6 +375,47 @@ export const getRoadmapItemsGridColumns = ({
           return formatDate(dateValue)
         },
       } satisfies TreeGridColumnMeta,
+      cell: ({ row }: { row: any }) => {
+        const item = row.original as RoadmapItemTreeNode
+        const isSelected = selectedRowId === item.id
+        const isDraft = item.id.startsWith('draft-')
+        const cellId = `${item.id}-start`
+
+        if (isSelected && isDraft && handleSaveRoadmapItem) {
+          return (
+            <FormItem
+              name="start"
+              style={{ margin: 0 }}
+              validateStatus={getFieldError('start') ? 'error' : ''}
+            >
+              <DatePicker
+                size="small"
+                style={{ width: '100%' }}
+                onKeyDown={(e) => handleKeyDown(e, item.id, 'start')}
+                onOpenChange={(open) => {
+                  if (!open) {
+                    setTimeout(() => {
+                      const cell = document.querySelector(
+                        `[data-cell-id="${cellId}"]`,
+                      )
+                      if (cell) {
+                        const input = cell.querySelector('input') as
+                          | HTMLInputElement
+                          | undefined
+                        input?.focus()
+                      }
+                    }, 0)
+                  }
+                }}
+                status={getFieldError('start') ? 'error' : ''}
+              />
+            </FormItem>
+          )
+        }
+
+        const dateValue = item.type === 'Milestone' ? item.date : item.start
+        return formatDate(dateValue)
+      },
     },
     {
       id: 'end',
@@ -233,6 +429,46 @@ export const getRoadmapItemsGridColumns = ({
       meta: {
         exportFormatter: (value) => formatDate(value as string | null),
       } satisfies TreeGridColumnMeta,
+      cell: ({ row }: { row: any }) => {
+        const item = row.original as RoadmapItemTreeNode
+        const isSelected = selectedRowId === item.id
+        const isDraft = item.id.startsWith('draft-')
+        const cellId = `${item.id}-end`
+
+        if (isSelected && isDraft && handleSaveRoadmapItem) {
+          return (
+            <FormItem
+              name="end"
+              style={{ margin: 0 }}
+              validateStatus={getFieldError('end') ? 'error' : ''}
+            >
+              <DatePicker
+                size="small"
+                style={{ width: '100%' }}
+                onKeyDown={(e) => handleKeyDown(e, item.id, 'end')}
+                onOpenChange={(open) => {
+                  if (!open) {
+                    setTimeout(() => {
+                      const cell = document.querySelector(
+                        `[data-cell-id="${cellId}"]`,
+                      )
+                      if (cell) {
+                        const input = cell.querySelector('input') as
+                          | HTMLInputElement
+                          | undefined
+                        input?.focus()
+                      }
+                    }, 0)
+                  }
+                }}
+                status={getFieldError('end') ? 'error' : ''}
+              />
+            </FormItem>
+          )
+        }
+
+        return formatDate(item.end)
+      },
     },
     {
       accessorKey: 'color',
@@ -244,8 +480,28 @@ export const getRoadmapItemsGridColumns = ({
       meta: {
         enableExport: false,
       } satisfies TreeGridColumnMeta,
-      cell: (info) => {
-        const value = info.getValue() as string | null | undefined
+      cell: ({ row, getValue }: { row: any; getValue: () => unknown }) => {
+        const item = row.original as RoadmapItemTreeNode
+        const isSelected = selectedRowId === item.id
+        const isDraft = item.id.startsWith('draft-')
+
+        if (
+          isSelected &&
+          isDraft &&
+          handleSaveRoadmapItem &&
+          isSelectedDraftActivity
+        ) {
+          return (
+            <FormItem name="color" style={{ margin: 0 }}>
+              <FocusableColorPickerField
+                rowId={item.id}
+                handleKeyDown={handleKeyDown}
+              />
+            </FormItem>
+          )
+        }
+
+        const value = getValue() as string | null | undefined
         if (!value) return null
         return <ColorPicker value={value} size="small" showText disabled />
       },
