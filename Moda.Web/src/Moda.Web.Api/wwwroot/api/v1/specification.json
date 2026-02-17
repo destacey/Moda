@@ -15734,291 +15734,13 @@
         ]
       }
     },
-    "/api/app-integrations/azure-devops-boards-connections": {
-      "get": {
-        "tags": [
-          "AzureDevOpsBoardsConnections"
-        ],
-        "summary": "Get a list of all Azure DevOps Boards connections.",
-        "operationId": "AzureDevOpsBoardsConnections_GetList",
-        "parameters": [
-          {
-            "name": "includeDisabled",
-            "in": "query",
-            "schema": {
-              "type": "boolean",
-              "default": false
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ConnectionListDto"
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": []
-          },
-          {
-            "ApiKey": []
-          }
-        ]
-      },
+    "/api/app-integrations/connections/azure-devops/{id}/sync-state": {
       "post": {
         "tags": [
-          "AzureDevOpsBoardsConnections"
+          "AzureDevOpsConnections"
         ],
-        "summary": "Create an Azure DevOps Boards connection.",
-        "operationId": "AzureDevOpsBoardsConnections_Create",
-        "requestBody": {
-          "x-name": "request",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateAzureDevOpsBoardConnectionRequest"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 1
-        },
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "string",
-                  "format": "guid",
-                  "nullable": false,
-                  "example": "00000000-0000-0000-0000-000000000000"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": []
-          },
-          {
-            "ApiKey": []
-          }
-        ]
-      }
-    },
-    "/api/app-integrations/azure-devops-boards-connections/{id}": {
-      "get": {
-        "tags": [
-          "AzureDevOpsBoardsConnections"
-        ],
-        "summary": "Get Azure DevOps Boards connection based on id.",
-        "operationId": "AzureDevOpsBoardsConnections_GetById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "guid",
-              "nullable": false,
-              "example": "00000000-0000-0000-0000-000000000000"
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AzureDevOpsBoardsConnectionDetailsDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": []
-          },
-          {
-            "ApiKey": []
-          }
-        ]
-      },
-      "put": {
-        "tags": [
-          "AzureDevOpsBoardsConnections"
-        ],
-        "summary": "Update an Azure DevOps Boards connection.",
-        "operationId": "AzureDevOpsBoardsConnections_Update",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "guid",
-              "nullable": false,
-              "example": "00000000-0000-0000-0000-000000000000"
-            },
-            "x-position": 1
-          }
-        ],
-        "requestBody": {
-          "x-name": "request",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateAzureDevOpsBoardConnectionRequest"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 2
-        },
-        "responses": {
-          "204": {
-            "description": ""
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": []
-          },
-          {
-            "ApiKey": []
-          }
-        ]
-      },
-      "delete": {
-        "tags": [
-          "AzureDevOpsBoardsConnections"
-        ],
-        "summary": "Delete an Azure DevOps Boards connection.",
-        "operationId": "AzureDevOpsBoardsConnections_Delete",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "guid",
-              "nullable": false,
-              "example": "00000000-0000-0000-0000-000000000000"
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": ""
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": []
-          },
-          {
-            "ApiKey": []
-          }
-        ]
-      }
-    },
-    "/api/app-integrations/azure-devops-boards-connections/{id}/sync-state": {
-      "post": {
-        "tags": [
-          "AzureDevOpsBoardsConnections"
-        ],
-        "summary": "Update an Azure DevOps Boards connection sync state.",
-        "operationId": "AzureDevOpsBoardsConnections_UpdateSyncState",
+        "summary": "Enable/disable sync for Azure DevOps connection.",
+        "operationId": "AzureDevOpsConnections_UpdateSyncState",
         "parameters": [
           {
             "name": "id",
@@ -16054,13 +15776,49 @@
                 }
               }
             }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
           },
-          "422": {
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/app-integrations/connections/azure-devops/{id}/sync-organization": {
+      "post": {
+        "tags": [
+          "AzureDevOpsConnections"
+        ],
+        "summary": "Sync Azure DevOps organization processes and projects.",
+        "operationId": "AzureDevOpsConnections_SyncOrganizationConfiguration",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
             "description": "",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -16076,13 +15834,129 @@
         ]
       }
     },
-    "/api/app-integrations/azure-devops-boards-connections/{id}/teams": {
+    "/api/app-integrations/connections/azure-devops/{id}/init-work-process": {
+      "post": {
+        "tags": [
+          "AzureDevOpsConnections"
+        ],
+        "summary": "Initialize Azure DevOps work process integration.",
+        "operationId": "AzureDevOpsConnections_InitWorkProcessIntegration",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InitWorkProcessIntegrationRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/app-integrations/connections/azure-devops/{id}/init-workspace": {
+      "post": {
+        "tags": [
+          "AzureDevOpsConnections"
+        ],
+        "summary": "Initialize Azure DevOps workspace integration.",
+        "operationId": "AzureDevOpsConnections_InitWorkspaceIntegration",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InitWorkspaceIntegrationRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/app-integrations/connections/azure-devops/{id}/teams": {
       "get": {
         "tags": [
-          "AzureDevOpsBoardsConnections"
+          "AzureDevOpsConnections"
         ],
-        "summary": "Get Azure DevOps connection teams based on id.",
-        "operationId": "AzureDevOpsBoardsConnections_GetConnectionTeams",
+        "summary": "Get Azure DevOps connection teams.",
+        "operationId": "AzureDevOpsConnections_GetConnectionTeams",
         "parameters": [
           {
             "name": "id",
@@ -16116,7 +15990,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/AzureDevOpsBoardsWorkspaceTeamDto"
+                    "$ref": "#/components/schemas/AzureDevOpsWorkspaceTeamDto"
                   }
                 }
               }
@@ -16144,10 +16018,10 @@
       },
       "post": {
         "tags": [
-          "AzureDevOpsBoardsConnections"
+          "AzureDevOpsConnections"
         ],
-        "summary": "Update Azure DevOps connection team mappings.",
-        "operationId": "AzureDevOpsBoardsConnections_MapConnectionTeams",
+        "summary": "Update Azure DevOps team mappings.",
+        "operationId": "AzureDevOpsConnections_MapConnectionTeams",
         "parameters": [
           {
             "name": "id",
@@ -16199,19 +16073,19 @@
         ]
       }
     },
-    "/api/app-integrations/azure-devops-boards-connections/test": {
+    "/api/app-integrations/connections/azure-devops/test": {
       "post": {
         "tags": [
-          "AzureDevOpsBoardsConnections"
+          "AzureDevOpsConnections"
         ],
-        "summary": "Test Azure DevOps Boards connection configuration.",
-        "operationId": "AzureDevOpsBoardsConnections_TestConfig",
+        "summary": "Test Azure DevOps connection configuration.",
+        "operationId": "AzureDevOpsConnections_TestConfig",
         "requestBody": {
           "x-name": "request",
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TestAzureDevOpsBoardConnectionRequest"
+                "$ref": "#/components/schemas/TestAzureDevOpsConnectionRequest"
               }
             }
           },
@@ -16243,84 +16117,24 @@
         ]
       }
     },
-    "/api/app-integrations/azure-devops-boards-connections/{id}/sync-organization-configuration": {
+    "/api/app-integrations/connections/azure-openai/test": {
       "post": {
         "tags": [
-          "AzureDevOpsBoardsConnections"
+          "AzureOpenAIConnections"
         ],
-        "summary": "Sync Azure DevOps processes and projects.",
-        "operationId": "AzureDevOpsBoardsConnections_SyncOrganizationConfiguration",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "guid",
-              "nullable": false,
-              "example": "00000000-0000-0000-0000-000000000000"
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": ""
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": []
-          },
-          {
-            "ApiKey": []
-          }
-        ]
-      }
-    },
-    "/api/app-integrations/azure-devops-boards-connections/{id}/init-work-process-integration": {
-      "post": {
-        "tags": [
-          "AzureDevOpsBoardsConnections"
-        ],
-        "summary": "Initialize Azure DevOps project integration as a Moda workspace.",
-        "operationId": "AzureDevOpsBoardsConnections_InitWorkProcesssIntegration",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "guid",
-              "nullable": false,
-              "example": "00000000-0000-0000-0000-000000000000"
-            },
-            "x-position": 1
-          }
-        ],
+        "summary": "Test Azure OpenAI connection configuration.",
+        "operationId": "AzureOpenAIConnections_TestConfig",
         "requestBody": {
           "x-name": "request",
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/InitWorkProcessIntegrationRequest"
+                "$ref": "#/components/schemas/TestAzureOpenAIConnectionRequest"
               }
             }
           },
           "required": true,
-          "x-position": 2
+          "x-position": 1
         },
         "responses": {
           "204": {
@@ -16332,16 +16146,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
                 }
               }
             }
@@ -16357,81 +16161,109 @@
         ]
       }
     },
-    "/api/app-integrations/azure-devops-boards-connections/{id}/init-workspace-integration": {
-      "post": {
-        "tags": [
-          "AzureDevOpsBoardsConnections"
-        ],
-        "summary": "Initialize Azure DevOps project integration as a Moda workspace.",
-        "operationId": "AzureDevOpsBoardsConnections_InitWorkspaceIntegration",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "guid",
-              "nullable": false,
-              "example": "00000000-0000-0000-0000-000000000000"
-            },
-            "x-position": 1
-          }
-        ],
-        "requestBody": {
-          "x-name": "request",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/InitWorkspaceIntegrationRequest"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 2
-        },
-        "responses": {
-          "204": {
-            "description": ""
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": []
-          },
-          {
-            "ApiKey": []
-          }
-        ]
-      }
-    },
-    "/api/app-integrations/connectors": {
+    "/api/app-integrations/connections": {
       "get": {
         "tags": [
-          "Connectors"
+          "Connections"
         ],
-        "summary": "Get a list of all connectors.",
-        "operationId": "Connectors_GetList",
+        "summary": "Get list of all connections.",
+        "operationId": "Connections_GetConnections",
+        "parameters": [
+          {
+            "name": "includeDisabled",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ConnectionListDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Connections"
+        ],
+        "summary": "Create a new connection.",
+        "description": "Accepts polymorphic request based on connector type.",
+        "operationId": "Connections_CreateConnection",
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateConnectionRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "guid",
+                  "nullable": false,
+                  "example": "00000000-0000-0000-0000-000000000000"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/app-integrations/connections/connectors": {
+      "get": {
+        "tags": [
+          "Connections"
+        ],
+        "summary": "Get list of all connector types.",
+        "operationId": "Connections_GetConnectors",
         "responses": {
           "200": {
             "description": "",
@@ -16445,8 +16277,164 @@
                 }
               }
             }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/app-integrations/connections/{id}": {
+      "get": {
+        "tags": [
+          "Connections"
+        ],
+        "summary": "Get connection details by ID.",
+        "description": "Returns polymorphic response based on connector type.",
+        "operationId": "Connections_GetConnection",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectionDetailsDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Connections"
+        ],
+        "summary": "Update a connection.",
+        "description": "Accepts polymorphic request based on connector type.",
+        "operationId": "Connections_UpdateConnection",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateConnectionRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "204": {
+            "description": ""
           },
           "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Connections"
+        ],
+        "summary": "Delete a connection.",
+        "description": "Works for all connector types.",
+        "operationId": "Connections_DeleteConnection",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
             "description": "",
             "content": {
               "application/json": {
@@ -25870,445 +25858,6 @@
           }
         }
       },
-      "ConnectionListDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "name",
-          "connector",
-          "isActive",
-          "isValidConfiguration",
-          "isSyncEnabled"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "guid",
-            "nullable": false,
-            "example": "00000000-0000-0000-0000-000000000000"
-          },
-          "name": {
-            "type": "string"
-          },
-          "systemId": {
-            "type": "string",
-            "nullable": true
-          },
-          "connector": {
-            "$ref": "#/components/schemas/SimpleNavigationDto"
-          },
-          "isActive": {
-            "type": "boolean"
-          },
-          "isValidConfiguration": {
-            "type": "boolean"
-          },
-          "isSyncEnabled": {
-            "type": "boolean"
-          }
-        }
-      },
-      "AzureDevOpsBoardsConnectionDetailsDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "name",
-          "connector",
-          "configuration",
-          "teamConfiguration",
-          "isActive",
-          "isValidConfiguration",
-          "isSyncEnabled"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "guid",
-            "nullable": false,
-            "example": "00000000-0000-0000-0000-000000000000"
-          },
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string",
-            "nullable": true
-          },
-          "systemId": {
-            "type": "string",
-            "nullable": true
-          },
-          "connector": {
-            "$ref": "#/components/schemas/SimpleNavigationDto"
-          },
-          "configuration": {
-            "$ref": "#/components/schemas/AzureDevOpsBoardsConnectionConfigurationDto"
-          },
-          "teamConfiguration": {
-            "$ref": "#/components/schemas/AzureDevOpsBoardsTeamConfigurationDto"
-          },
-          "isActive": {
-            "type": "boolean"
-          },
-          "isValidConfiguration": {
-            "type": "boolean"
-          },
-          "isSyncEnabled": {
-            "type": "boolean"
-          }
-        }
-      },
-      "AzureDevOpsBoardsConnectionConfigurationDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "organization",
-          "personalAccessToken",
-          "organizationUrl",
-          "workProcesses",
-          "workspaces"
-        ],
-        "properties": {
-          "organization": {
-            "type": "string"
-          },
-          "personalAccessToken": {
-            "type": "string"
-          },
-          "organizationUrl": {
-            "type": "string"
-          },
-          "workProcesses": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/AzureDevOpsBoardsWorkProcessDto"
-            }
-          },
-          "workspaces": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/AzureDevOpsBoardsWorkspaceDto"
-            }
-          }
-        }
-      },
-      "AzureDevOpsBoardsWorkProcessDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "externalId",
-          "name"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "guid",
-            "nullable": true,
-            "example": "00000000-0000-0000-0000-000000000000"
-          },
-          "externalId": {
-            "type": "string",
-            "format": "guid",
-            "nullable": false,
-            "example": "00000000-0000-0000-0000-000000000000"
-          },
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string",
-            "nullable": true
-          },
-          "integrationState": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/IntegrationStateDto"
-              }
-            ]
-          }
-        }
-      },
-      "IntegrationStateDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "internalId",
-          "isActive"
-        ],
-        "properties": {
-          "internalId": {
-            "type": "string",
-            "format": "guid",
-            "nullable": false,
-            "example": "00000000-0000-0000-0000-000000000000"
-          },
-          "isActive": {
-            "type": "boolean"
-          }
-        }
-      },
-      "AzureDevOpsBoardsWorkspaceDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "externalId",
-          "name",
-          "workProcessId"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "guid",
-            "nullable": true,
-            "example": "00000000-0000-0000-0000-000000000000"
-          },
-          "externalId": {
-            "type": "string",
-            "format": "guid",
-            "nullable": false,
-            "example": "00000000-0000-0000-0000-000000000000"
-          },
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string",
-            "nullable": true
-          },
-          "workProcessId": {
-            "type": "string",
-            "format": "guid",
-            "nullable": false,
-            "example": "00000000-0000-0000-0000-000000000000"
-          },
-          "integrationState": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/IntegrationStateDto"
-              }
-            ]
-          }
-        }
-      },
-      "AzureDevOpsBoardsTeamConfigurationDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "workspaceTeams"
-        ],
-        "properties": {
-          "workspaceTeams": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/AzureDevOpsBoardsWorkspaceTeamDto"
-            }
-          }
-        }
-      },
-      "AzureDevOpsBoardsWorkspaceTeamDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "workspaceId",
-          "teamId",
-          "teamName"
-        ],
-        "properties": {
-          "workspaceId": {
-            "type": "string",
-            "format": "guid",
-            "nullable": false,
-            "example": "00000000-0000-0000-0000-000000000000"
-          },
-          "teamId": {
-            "type": "string",
-            "format": "guid",
-            "nullable": false,
-            "example": "00000000-0000-0000-0000-000000000000"
-          },
-          "teamName": {
-            "type": "string"
-          },
-          "boardId": {
-            "type": "string",
-            "format": "guid",
-            "nullable": true,
-            "example": "00000000-0000-0000-0000-000000000000"
-          },
-          "internalTeamId": {
-            "type": "string",
-            "format": "guid",
-            "nullable": true,
-            "example": "00000000-0000-0000-0000-000000000000"
-          }
-        }
-      },
-      "CreateAzureDevOpsBoardConnectionRequest": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "name",
-          "organization",
-          "personalAccessToken"
-        ],
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "The name of the connection.",
-            "maxLength": 256,
-            "minLength": 1,
-            "nullable": false
-          },
-          "description": {
-            "type": "string",
-            "description": "The description of the connection.",
-            "maxLength": 1024,
-            "minLength": 0,
-            "nullable": true
-          },
-          "organization": {
-            "type": "string",
-            "description": "The Azure DevOps Organization name.",
-            "maxLength": 128,
-            "minLength": 1,
-            "nullable": false
-          },
-          "personalAccessToken": {
-            "type": "string",
-            "description": "The personal access token that enables access to Azure DevOps Boards data.",
-            "maxLength": 128,
-            "minLength": 1,
-            "nullable": false
-          }
-        }
-      },
-      "UpdateAzureDevOpsBoardConnectionRequest": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "name",
-          "organization",
-          "personalAccessToken"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Gets or sets the identifier.",
-            "format": "guid",
-            "nullable": false,
-            "example": "00000000-0000-0000-0000-000000000000"
-          },
-          "name": {
-            "type": "string",
-            "description": "Gets or sets the name of the connection.",
-            "maxLength": 256,
-            "minLength": 1,
-            "nullable": false
-          },
-          "description": {
-            "type": "string",
-            "description": "Gets or sets the description.",
-            "maxLength": 1024,
-            "minLength": 0,
-            "nullable": true
-          },
-          "organization": {
-            "type": "string",
-            "description": "Gets the organization.",
-            "maxLength": 128,
-            "minLength": 1,
-            "nullable": false
-          },
-          "personalAccessToken": {
-            "type": "string",
-            "description": "Gets the personal access token.",
-            "maxLength": 128,
-            "minLength": 1,
-            "nullable": false
-          }
-        }
-      },
-      "AzdoConnectionTeamMappingsRequest": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "connectionId",
-          "teamMappings"
-        ],
-        "properties": {
-          "connectionId": {
-            "type": "string",
-            "description": "The unique identifer for the connection.",
-            "format": "guid",
-            "minLength": 1,
-            "nullable": false,
-            "example": "00000000-0000-0000-0000-000000000000"
-          },
-          "teamMappings": {
-            "type": "array",
-            "description": "List of team mappings.",
-            "items": {
-              "$ref": "#/components/schemas/AzdoWorkspaceTeamMappingRequest"
-            }
-          }
-        }
-      },
-      "AzdoWorkspaceTeamMappingRequest": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "workspaceId",
-          "teamId"
-        ],
-        "properties": {
-          "workspaceId": {
-            "type": "string",
-            "description": "The unique identifier for the workspace in the Azure DevOps Boards system.",
-            "format": "guid",
-            "minLength": 1,
-            "nullable": false,
-            "example": "00000000-0000-0000-0000-000000000000"
-          },
-          "teamId": {
-            "type": "string",
-            "description": "The unique identifier for the team in the Azure DevOps Boards system.",
-            "format": "guid",
-            "minLength": 1,
-            "nullable": false,
-            "example": "00000000-0000-0000-0000-000000000000"
-          },
-          "internalTeamId": {
-            "type": "string",
-            "description": "The unique identifier for the team within Moda.",
-            "format": "guid",
-            "nullable": true,
-            "example": "00000000-0000-0000-0000-000000000000"
-          }
-        }
-      },
-      "TestAzureDevOpsBoardConnectionRequest": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "organization",
-          "personalAccessToken"
-        ],
-        "properties": {
-          "organization": {
-            "type": "string",
-            "description": "Gets the organization."
-          },
-          "personalAccessToken": {
-            "type": "string",
-            "description": "Gets the personal access token."
-          }
-        }
-      },
       "InitWorkProcessIntegrationRequest": {
         "type": "object",
         "additionalProperties": false,
@@ -26384,6 +25933,219 @@
           }
         }
       },
+      "AzureDevOpsWorkspaceTeamDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "workspaceId",
+          "teamId",
+          "teamName"
+        ],
+        "properties": {
+          "workspaceId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "teamId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "teamName": {
+            "type": "string"
+          },
+          "boardId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "internalTeamId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true,
+            "example": "00000000-0000-0000-0000-000000000000"
+          }
+        }
+      },
+      "AzdoConnectionTeamMappingsRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "connectionId",
+          "teamMappings"
+        ],
+        "properties": {
+          "connectionId": {
+            "type": "string",
+            "description": "The unique identifer for the connection.",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "teamMappings": {
+            "type": "array",
+            "description": "List of team mappings.",
+            "items": {
+              "$ref": "#/components/schemas/AzdoWorkspaceTeamMappingRequest"
+            }
+          }
+        }
+      },
+      "AzdoWorkspaceTeamMappingRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "workspaceId",
+          "teamId"
+        ],
+        "properties": {
+          "workspaceId": {
+            "type": "string",
+            "description": "The unique identifier for the workspace in the Azure DevOps system.",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "teamId": {
+            "type": "string",
+            "description": "The unique identifier for the team in the Azure DevOps system.",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "internalTeamId": {
+            "type": "string",
+            "description": "The unique identifier for the team within Moda.",
+            "format": "guid",
+            "nullable": true,
+            "example": "00000000-0000-0000-0000-000000000000"
+          }
+        }
+      },
+      "TestAzureDevOpsConnectionRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "organization",
+          "personalAccessToken"
+        ],
+        "properties": {
+          "organization": {
+            "type": "string",
+            "description": "Gets the organization."
+          },
+          "personalAccessToken": {
+            "type": "string",
+            "description": "Gets the personal access token."
+          }
+        }
+      },
+      "TestAzureOpenAIConnectionRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "baseUrl",
+          "apiKey",
+          "deploymentName"
+        ],
+        "properties": {
+          "baseUrl": {
+            "type": "string",
+            "description": "Azure OpenAI resource URL."
+          },
+          "apiKey": {
+            "type": "string",
+            "description": "The API key for Azure OpenAI resource."
+          },
+          "deploymentName": {
+            "type": "string",
+            "description": "The OpenAI model deployment name to test."
+          }
+        }
+      },
+      "ConnectionListDto": {
+        "type": "object",
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "azure-devops": "#/components/schemas/AzureDevOpsConnectionListDto",
+            "azure-openai": "#/components/schemas/AzureOpenAIConnectionListDto"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "$type",
+          "id",
+          "name",
+          "connector",
+          "isActive",
+          "isValidConfiguration"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "name": {
+            "type": "string"
+          },
+          "systemId": {
+            "type": "string",
+            "nullable": true
+          },
+          "connector": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "isValidConfiguration": {
+            "type": "boolean"
+          },
+          "isSyncEnabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "canSync": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "$type": {
+            "type": "string"
+          }
+        }
+      },
+      "AzureDevOpsConnectionListDto": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ConnectionListDto"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false
+          }
+        ]
+      },
+      "AzureOpenAIConnectionListDto": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ConnectionListDto"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false
+          }
+        ]
+      },
       "ConnectorListDto": {
         "type": "object",
         "additionalProperties": false,
@@ -26404,6 +26166,440 @@
             "nullable": true
           }
         }
+      },
+      "ConnectionDetailsDto": {
+        "type": "object",
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "azure-devops": "#/components/schemas/AzureDevOpsConnectionDetailsDto",
+            "azure-openai": "#/components/schemas/AzureOpenAIConnectionDetailsDto"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "$type",
+          "id",
+          "name",
+          "connector",
+          "isActive",
+          "isValidConfiguration"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "connector": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "isValidConfiguration": {
+            "type": "boolean"
+          },
+          "canSync": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "$type": {
+            "type": "string"
+          }
+        }
+      },
+      "AzureDevOpsConnectionDetailsDto": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ConnectionDetailsDto"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "systemId": {
+                "type": "string",
+                "nullable": true
+              },
+              "isSyncEnabled": {
+                "type": "boolean"
+              },
+              "configuration": {
+                "$ref": "#/components/schemas/AzureDevOpsConnectionConfigurationDto"
+              },
+              "teamConfiguration": {
+                "$ref": "#/components/schemas/AzureDevOpsTeamConfigurationDto"
+              }
+            }
+          }
+        ]
+      },
+      "AzureDevOpsConnectionConfigurationDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "organization",
+          "personalAccessToken",
+          "organizationUrl",
+          "workProcesses",
+          "workspaces"
+        ],
+        "properties": {
+          "organization": {
+            "type": "string"
+          },
+          "personalAccessToken": {
+            "type": "string"
+          },
+          "organizationUrl": {
+            "type": "string"
+          },
+          "workProcesses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AzureDevOpsWorkProcessDto"
+            }
+          },
+          "workspaces": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AzureDevOpsWorkspaceDto"
+            }
+          }
+        }
+      },
+      "AzureDevOpsWorkProcessDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "externalId",
+          "name"
+        ],
+        "properties": {
+          "externalId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "integrationState": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/IntegrationStateDto"
+              }
+            ]
+          }
+        }
+      },
+      "IntegrationStateDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "internalId",
+          "isActive"
+        ],
+        "properties": {
+          "internalId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        }
+      },
+      "AzureDevOpsWorkspaceDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "externalId",
+          "name",
+          "workProcessId"
+        ],
+        "properties": {
+          "externalId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "workProcessId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "integrationState": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/IntegrationStateDto"
+              }
+            ]
+          }
+        }
+      },
+      "AzureDevOpsTeamConfigurationDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "workspaceTeams"
+        ],
+        "properties": {
+          "workspaceTeams": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AzureDevOpsWorkspaceTeamDto"
+            }
+          }
+        }
+      },
+      "AzureOpenAIConnectionDetailsDto": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ConnectionDetailsDto"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "configuration": {
+                "$ref": "#/components/schemas/AzureOpenAIConnectionConfigurationDto"
+              }
+            }
+          }
+        ]
+      },
+      "AzureOpenAIConnectionConfigurationDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "baseUrl",
+          "apiKey",
+          "deploymentName",
+          "defaultTemperature",
+          "defaultMaxOutputTokens",
+          "jsonModePreferred"
+        ],
+        "properties": {
+          "baseUrl": {
+            "type": "string"
+          },
+          "apiKey": {
+            "type": "string"
+          },
+          "deploymentName": {
+            "type": "string"
+          },
+          "defaultTemperature": {
+            "type": "number",
+            "format": "double"
+          },
+          "defaultMaxOutputTokens": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "jsonModePreferred": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CreateConnectionRequest": {
+        "type": "object",
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "azure-devops": "#/components/schemas/CreateAzureDevOpsConnectionRequest",
+            "azure-openai": "#/components/schemas/CreateAzureOpenAIConnectionRequest"
+          }
+        },
+        "x-abstract": true,
+        "additionalProperties": false,
+        "required": [
+          "$type",
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the connection.",
+            "maxLength": 128,
+            "minLength": 1,
+            "nullable": false
+          },
+          "description": {
+            "type": "string",
+            "description": "The description of the connection.",
+            "maxLength": 1024,
+            "minLength": 0,
+            "nullable": true
+          },
+          "$type": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateAzureDevOpsConnectionRequest": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CreateConnectionRequest"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "organization": {
+                "type": "string",
+                "description": "The Azure DevOps Organization name."
+              },
+              "personalAccessToken": {
+                "type": "string",
+                "description": "The personal access token that enables access to Azure DevOps data."
+              }
+            }
+          }
+        ]
+      },
+      "CreateAzureOpenAIConnectionRequest": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CreateConnectionRequest"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "baseUrl": {
+                "type": "string",
+                "description": "Azure OpenAI resource URL."
+              },
+              "apiKey": {
+                "type": "string",
+                "description": "The API key for Azure OpenAI resource."
+              },
+              "deploymentName": {
+                "type": "string",
+                "description": "The OpenAI model deployment name to use for this connection (e.g. \"gpt-4o\")"
+              }
+            }
+          }
+        ]
+      },
+      "UpdateConnectionRequest": {
+        "type": "object",
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "azure-devops": "#/components/schemas/UpdateAzureDevOpsConnectionRequest",
+            "azure-openai": "#/components/schemas/UpdateAzureOpenAIConnectionRequest"
+          }
+        },
+        "x-abstract": true,
+        "additionalProperties": false,
+        "required": [
+          "$type",
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique identifier for the connection.",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the connection.",
+            "maxLength": 128,
+            "minLength": 1,
+            "nullable": false
+          },
+          "description": {
+            "type": "string",
+            "description": "The description of the connection.",
+            "maxLength": 1024,
+            "minLength": 0,
+            "nullable": true
+          },
+          "$type": {
+            "type": "string"
+          }
+        }
+      },
+      "UpdateAzureDevOpsConnectionRequest": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/UpdateConnectionRequest"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "organization": {
+                "type": "string",
+                "description": "The Azure DevOps Organization name."
+              },
+              "personalAccessToken": {
+                "type": "string",
+                "description": "The personal access token that enables access to Azure DevOps data."
+              }
+            }
+          }
+        ]
+      },
+      "UpdateAzureOpenAIConnectionRequest": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/UpdateConnectionRequest"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "baseUrl": {
+                "type": "string",
+                "description": "Azure OpenAI resource URL."
+              },
+              "apiKey": {
+                "type": "string",
+                "description": "The API key for Azure OpenAI resource."
+              },
+              "deploymentName": {
+                "type": "string",
+                "description": "The OpenAI model deployment name to use for this connection (e.g. \"gpt-4o\")"
+              }
+            }
+          }
+        ]
       },
       "BackgroundJobTypeDto": {
         "type": "object",

@@ -1,6 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Moda.AppIntegration.Domain.Models.AzureOpenAI;
+using Moda.AppIntegration.Domain.Models.OpenAI;
 using Moda.Common.Domain.Enums.AppIntegrations;
+using Moda.Infrastructure.Persistence.Converters;
+using Moda.Infrastructure.Persistence.Extensions;
 
 namespace Moda.Infrastructure.Persistence.Configuration;
 
@@ -12,7 +16,9 @@ public class ConnectionConfig : IEntityTypeConfiguration<Connection>
 
         builder.HasKey(c => c.Id);
         builder.HasDiscriminator(c => c.Connector)
-            .HasValue<AzureDevOpsBoardsConnection>(Connector.AzureDevOps);
+            .HasValue<AzureDevOpsBoardsConnection>(Connector.AzureDevOps)
+            .HasValue<AzureOpenAIConnection>(Connector.AzureOpenAI)
+            .HasValue<OpenAIConnection>(Connector.OpenAI);
 
         builder.HasIndex(c => new { c.Id, c.IsDeleted })
             .HasFilter("[IsDeleted] = 0");
@@ -24,16 +30,20 @@ public class ConnectionConfig : IEntityTypeConfiguration<Connection>
 
         builder.Property(c => c.Name).IsRequired().HasMaxLength(128);
         builder.Property(c => c.Description).HasMaxLength(1024);
-        builder.Property(c => c.SystemId)
-            .HasColumnType("varchar")
-            .HasMaxLength(64);
         builder.Property(w => w.Connector).IsRequired()
             .HasConversion<EnumConverter<Connector>>()
             .HasColumnType("varchar")
             .HasMaxLength(32);
         builder.Property(c => c.IsActive);
         builder.Property(c => c.IsValidConfiguration);
-        builder.Property(c => c.IsSyncEnabled);
+
+        //// SystemId and IsSyncEnabled are only for ISyncableConnection types (kept nullable for backwards compatibility)
+        //builder.Property<string>("SystemId")
+        //    .HasColumnType("varchar")
+        //    .HasMaxLength(64)
+        //    .IsRequired(false);
+        //builder.Property<bool?>("IsSyncEnabled")
+        //    .IsRequired(false);
 
         // Audit
         builder.Property(c => c.Created);
@@ -52,23 +62,42 @@ public class AzureDevOpsBoardsConnectionConfig : IEntityTypeConfiguration<AzureD
 {
     public void Configure(EntityTypeBuilder<AzureDevOpsBoardsConnection> builder)
     {
-        builder.OwnsOne(c => c.Configuration, ownedBuilder =>
-        {
-            ownedBuilder.ToJson();
-            ownedBuilder.OwnsMany(conf => conf.Workspaces, wb =>
-            {
-                wb.OwnsOne(w => w.IntegrationState);
-            });
-            ownedBuilder.OwnsMany(conf => conf.WorkProcesses, wb =>
-            {
-                wb.OwnsOne(w => w.IntegrationState);
-            });
-        });
+        builder.Property(c => c.Configuration)
+            .HasJsonConversion()
+            .HasColumnName("Configuration");
 
         builder.OwnsOne(c => c.TeamConfiguration, ownedBuilder =>
         {
             ownedBuilder.ToJson();
             ownedBuilder.OwnsMany(conf => conf.WorkspaceTeams);
         });
+
+        // ISyncableConnection properties
+        builder.Property(c => c.SystemId)
+            .HasColumnType("varchar")
+            .HasMaxLength(64)
+            .IsRequired(false);
+
+        builder.Property(c => c.IsSyncEnabled);
+    }
+}
+
+public class AzureOpenAIConnectionConfig : IEntityTypeConfiguration<AzureOpenAIConnection>
+{
+    public void Configure(EntityTypeBuilder<AzureOpenAIConnection> builder)
+    {
+        builder.Property(c => c.Configuration)
+            .HasJsonConversion()
+            .HasColumnName("Configuration");
+    }
+}
+
+public class OpenAIConnectionConfig : IEntityTypeConfiguration<OpenAIConnection>
+{
+    public void Configure(EntityTypeBuilder<OpenAIConnection> builder)
+    {
+        builder.Property(c => c.Configuration)
+            .HasJsonConversion()
+            .HasColumnName("Configuration");
     }
 }

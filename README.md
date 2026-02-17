@@ -92,6 +92,15 @@ cd Moda.AppHost
 dotnet run
 ```
 
+> **Note**: if you haven't trusted the developer certificate yet, on Windows/macOS you can run `dotnet dev-certs https --trust` to trust it. Otherwise, on Linux you should call
+>
+> ```bash
+> export ASPIRE_ALLOW_UNSECURED_TRANSPORT=true
+> dotnet run --launch-profile http
+> ```
+>
+> to run without HTTPS.
+
 **Access the application:**
 
 - **Aspire Dashboard**: <http://localhost:15888> (telemetry, logs, traces, metrics)

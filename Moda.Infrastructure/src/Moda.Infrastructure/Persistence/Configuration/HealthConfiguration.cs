@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Moda.Common.Domain.Enums;
 using Moda.Health.Models;
+using Moda.Infrastructure.Persistence.Converters;
 
 namespace Moda.Infrastructure.Persistence.Configuration;
 public class HealthCheckConfiguration : IEntityTypeConfiguration<HealthCheck>

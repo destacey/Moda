@@ -140,8 +140,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsSyncEnabled")
-                        .HasColumnType("bit");
+                    b.Property<bool?>("IsSyncEnabled")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsSyncEnabled");
 
                     b.Property<bool>("IsValidConfiguration")
                         .HasColumnType("bit");
@@ -159,7 +160,8 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                     b.Property<string>("SystemId")
                         .HasMaxLength(64)
-                        .HasColumnType("varchar");
+                        .HasColumnType("varchar")
+                        .HasColumnName("SystemId");
 
                     b.HasKey("Id");
 
@@ -3837,7 +3839,36 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                 {
                     b.HasBaseType("Moda.AppIntegration.Domain.Models.Connection");
 
+                    b.Property<string>("Configuration")
+                        .ValueGeneratedOnUpdateSometimes()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("Configuration");
+
                     b.HasDiscriminator().HasValue("AzureDevOps");
+                });
+
+            modelBuilder.Entity("Moda.AppIntegration.Domain.Models.AzureOpenAI.AzureOpenAIConnection", b =>
+                {
+                    b.HasBaseType("Moda.AppIntegration.Domain.Models.Connection");
+
+                    b.Property<string>("Configuration")
+                        .ValueGeneratedOnUpdateSometimes()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("Configuration");
+
+                    b.HasDiscriminator().HasValue("AzureOpenAI");
+                });
+
+            modelBuilder.Entity("Moda.AppIntegration.Domain.Models.OpenAI.OpenAIConnection", b =>
+                {
+                    b.HasBaseType("Moda.AppIntegration.Domain.Models.Connection");
+
+                    b.Property<string>("Configuration")
+                        .ValueGeneratedOnUpdateSometimes()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("Configuration");
+
+                    b.HasDiscriminator().HasValue("OpenAI");
                 });
 
             modelBuilder.Entity("Moda.Organization.Domain.Models.Team", b =>
@@ -3966,13 +3997,13 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
                     b.HasOne("Moda.Infrastructure.Identity.ApplicationRole", null)
-                        .WithMany()
+                        .WithMany("UserRoles")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Moda.Infrastructure.Identity.ApplicationUser", null)
-                        .WithMany()
+                        .WithMany("UserRoles")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -4874,118 +4905,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
             modelBuilder.Entity("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsConnection", b =>
                 {
-                    b.OwnsOne("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsConnectionConfiguration", "Configuration", b1 =>
-                        {
-                            b1.Property<Guid>("AzureDevOpsBoardsConnectionId");
-
-                            b1.Property<string>("Organization")
-                                .IsRequired();
-
-                            b1.Property<string>("PersonalAccessToken")
-                                .IsRequired();
-
-                            b1.HasKey("AzureDevOpsBoardsConnectionId");
-
-                            b1.ToTable("Connections", "AppIntegrations");
-
-                            b1
-                                .ToJson("Configuration")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.WithOwner()
-                                .HasForeignKey("AzureDevOpsBoardsConnectionId");
-
-                            b1.OwnsMany("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsWorkProcess", "WorkProcesses", b2 =>
-                                {
-                                    b2.Property<Guid>("AzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId");
-
-                                    b2.Property<int>("__synthesizedOrdinal")
-                                        .ValueGeneratedOnAddOrUpdate();
-
-                                    b2.Property<string>("Description");
-
-                                    b2.Property<Guid>("ExternalId");
-
-                                    b2.Property<string>("Name")
-                                        .IsRequired();
-
-                                    b2.HasKey("AzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId", "__synthesizedOrdinal");
-
-                                    b2.ToTable("Connections", "AppIntegrations");
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("AzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId");
-
-                                    b2.OwnsOne("Moda.Common.Domain.Models.IntegrationState<System.Guid>", "IntegrationState", b3 =>
-                                        {
-                                            b3.Property<Guid>("AzureDevOpsBoardsWorkProcessAzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId");
-
-                                            b3.Property<int>("AzureDevOpsBoardsWorkProcess__synthesizedOrdinal");
-
-                                            b3.Property<Guid>("InternalId");
-
-                                            b3.Property<bool>("IsActive");
-
-                                            b3.HasKey("AzureDevOpsBoardsWorkProcessAzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId", "AzureDevOpsBoardsWorkProcess__synthesizedOrdinal");
-
-                                            b3.ToTable("Connections", "AppIntegrations");
-
-                                            b3.WithOwner()
-                                                .HasForeignKey("AzureDevOpsBoardsWorkProcessAzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId", "AzureDevOpsBoardsWorkProcess__synthesizedOrdinal");
-                                        });
-
-                                    b2.Navigation("IntegrationState");
-                                });
-
-                            b1.OwnsMany("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsWorkspace", "Workspaces", b2 =>
-                                {
-                                    b2.Property<Guid>("AzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId");
-
-                                    b2.Property<int>("__synthesizedOrdinal")
-                                        .ValueGeneratedOnAddOrUpdate();
-
-                                    b2.Property<string>("Description");
-
-                                    b2.Property<Guid>("ExternalId");
-
-                                    b2.Property<string>("Name")
-                                        .IsRequired();
-
-                                    b2.Property<Guid?>("WorkProcessId");
-
-                                    b2.HasKey("AzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId", "__synthesizedOrdinal");
-
-                                    b2.ToTable("Connections", "AppIntegrations");
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("AzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId");
-
-                                    b2.OwnsOne("IntegrationState", "IntegrationState", b3 =>
-                                        {
-                                            b3.Property<Guid>("AzureDevOpsBoardsWorkspaceAzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId");
-
-                                            b3.Property<int>("AzureDevOpsBoardsWorkspace__synthesizedOrdinal");
-
-                                            b3.Property<Guid>("InternalId");
-
-                                            b3.Property<bool>("IsActive");
-
-                                            b3.HasKey("AzureDevOpsBoardsWorkspaceAzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId", "AzureDevOpsBoardsWorkspace__synthesizedOrdinal");
-
-                                            b3.ToTable("Connections", "AppIntegrations");
-
-                                            b3.WithOwner()
-                                                .HasForeignKey("AzureDevOpsBoardsWorkspaceAzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId", "AzureDevOpsBoardsWorkspace__synthesizedOrdinal");
-                                        });
-
-                                    b2.Navigation("IntegrationState");
-                                });
-
-                            b1.Navigation("WorkProcesses");
-
-                            b1.Navigation("Workspaces");
-                        });
-
                     b.OwnsOne("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsTeamConfiguration", "TeamConfiguration", b1 =>
                         {
                             b1.Property<Guid>("AzureDevOpsBoardsConnectionId");
@@ -5029,9 +4948,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                             b1.Navigation("WorkspaceTeams");
                         });
-
-                    b.Navigation("Configuration")
-                        .IsRequired();
 
                     b.Navigation("TeamConfiguration")
                         .IsRequired();
@@ -5078,6 +4994,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
             modelBuilder.Entity("Moda.Common.Domain.Employees.Employee", b =>
                 {
                     b.Navigation("DirectReports");
+                });
+
+            modelBuilder.Entity("Moda.Infrastructure.Identity.ApplicationRole", b =>
+                {
+                    b.Navigation("UserRoles");
+                });
+
+            modelBuilder.Entity("Moda.Infrastructure.Identity.ApplicationUser", b =>
+                {
+                    b.Navigation("UserRoles");
                 });
 
             modelBuilder.Entity("Moda.Organization.Application.Teams.Models.TeamNode", b =>

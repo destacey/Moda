@@ -6,6 +6,9 @@ export enum QueryTags {
   // APP INTEGRATION
   Connection = 'AppIntegration.Connection',
   ConnectionDetail = 'AppIntegration.ConnectionDetail',
+  Connectors = 'AppIntegration.Connectors',
+  AzdoConnection = 'AppIntegration.AzdoConnection',
+  AzdoConnectionDetail = 'AppIntegration.AzdoConnectionDetail',
   AzdoConnectionTeam = 'AppIntegration.AzdoConnectionTeam',
   AzdoConnectionsConfiguration = 'AppIntegration.AzdoConnectionsConfiguration',
   AzdoConnectionsConfigurationTest = 'AppIntegration.AzdoConnectionsConfigurationTest',

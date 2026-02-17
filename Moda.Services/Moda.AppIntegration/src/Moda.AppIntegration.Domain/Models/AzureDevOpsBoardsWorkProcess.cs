@@ -1,4 +1,5 @@
-﻿using Moda.Common.Domain.Models;
+﻿using System.Text.Json.Serialization;
+using Moda.Common.Domain.Models;
 using Moda.Common.Extensions;
 
 namespace Moda.AppIntegration.Domain.Models;
@@ -8,6 +9,8 @@ public sealed class AzureDevOpsBoardsWorkProcess : IntegrationObject<Guid>
     private string? _description;
 
     private AzureDevOpsBoardsWorkProcess() { }
+
+    [JsonConstructor]
     private AzureDevOpsBoardsWorkProcess(Guid externalId, string name, string? description, IntegrationState<Guid>? integrationState)
     {
         ExternalId = externalId;

@@ -16,6 +16,8 @@ public static class ConfigureServices
 
         TypeAdapterConfig.GlobalSettings.Scan(assembly);
         TypeAdapterConfig.GlobalSettings.ScanInheritedTypes(assembly);
+        TypeAdapterConfig.GlobalSettings.AllowImplicitSourceInheritance = true;
+        TypeAdapterConfig.GlobalSettings.AllowImplicitDestinationInheritance = true;
 
         return services;
     }

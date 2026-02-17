@@ -1,8 +1,13 @@
-﻿namespace Moda.AppIntegration.Domain.Models;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
+
+namespace Moda.AppIntegration.Domain.Models;
 public sealed class AzureDevOpsBoardsTeamConfiguration
 {
+    [JsonConstructor]
     private AzureDevOpsBoardsTeamConfiguration() { }
 
+    [SetsRequiredMembers]
     public AzureDevOpsBoardsTeamConfiguration(IEnumerable<AzureDevOpsBoardsWorkspaceTeam> workspaceTeams)
     {
         WorkspaceTeams = workspaceTeams?.ToList() ?? [];
@@ -11,6 +16,7 @@ public sealed class AzureDevOpsBoardsTeamConfiguration
     /// <summary>
     /// Gets or sets the workspace teams.
     /// </summary>
+    [JsonInclude]
     public List<AzureDevOpsBoardsWorkspaceTeam> WorkspaceTeams { get; private set; } = [];
 
     public Result UpsertWorkspaceTeam(Guid workspaceId, Guid teamId, string teamName, Guid? boardId)
