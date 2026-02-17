@@ -259,7 +259,7 @@ export const roadmapApi = apiSlice.injectEndpoints({
             }
           }
 
-          return { data: null as any }
+          return { data: undefined }
         } catch (error: any) {
           console.error('API Error:', error)
           return {

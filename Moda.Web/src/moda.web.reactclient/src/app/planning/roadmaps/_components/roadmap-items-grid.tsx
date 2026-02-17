@@ -65,7 +65,7 @@ type RoadmapItemUnion =
 
 const TYPE_FILTER_OPTIONS: FilterOption[] = [
   { label: 'Activity', value: 'Activity' },
-  { label: 'Milestone', value: 'Milestone' },
+  //{ label: 'Milestone', value: 'Milestone' },
   { label: 'Timebox', value: 'Timebox' },
 ]
 const CREATE_TYPE_OPTIONS = [
@@ -249,7 +249,10 @@ const RoadmapItemsGrid: FC<RoadmapItemsGridProps> = ({
           const response = await createRoadmapItem(request)
           if (response.error) throw response.error
         } else {
-          const item = findNodeById(treeData, itemId) as RoadmapItemTreeNode | null
+          const item = findNodeById(
+            treeData,
+            itemId,
+          ) as RoadmapItemTreeNode | null
           if (!item) return false
 
           const patchOperations: Array<{
@@ -321,7 +324,7 @@ const RoadmapItemsGrid: FC<RoadmapItemsGridProps> = ({
                 ? 'itemType'
                 : apiField === 'date'
                   ? 'start'
-                : apiField
+                  : apiField
             errorMap[fieldName] = Array.isArray(messages)
               ? String(messages[0] ?? '')
               : String(messages)
@@ -475,7 +478,9 @@ const RoadmapItemsGrid: FC<RoadmapItemsGridProps> = ({
       }
 
       if (item.type !== 'Milestone') {
-        const currentEnd = item.end ? dayjs(item.end).format('YYYY-MM-DD') : null
+        const currentEnd = item.end
+          ? dayjs(item.end).format('YYYY-MM-DD')
+          : null
         const nextEnd = values.end ? values.end.format('YYYY-MM-DD') : null
         if (nextEnd !== currentEnd) {
           updates.end = nextEnd
@@ -707,3 +712,4 @@ const RoadmapItemsGrid: FC<RoadmapItemsGridProps> = ({
 }
 
 export default RoadmapItemsGrid
+

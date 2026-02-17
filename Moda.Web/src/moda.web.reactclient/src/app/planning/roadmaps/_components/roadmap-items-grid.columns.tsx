@@ -100,29 +100,12 @@ function FocusableColorPickerField({
   const focusTargetRef = useRef<HTMLDivElement | null>(null)
   const onColorChange = useCallback(
     (nextValue: string | undefined) => {
-      console.debug('[RoadmapColorField] onColorChange', {
-        rowId,
-        nextValue,
-        activeElementTag: document.activeElement?.tagName,
-        activeElementClass: (document.activeElement as HTMLElement | null)
-          ?.className,
-      })
       onChange?.(nextValue)
       setTimeout(() => {
-        console.debug('[RoadmapColorField] refocus wrapper', {
-          rowId,
-          hasFocusTarget: Boolean(focusTargetRef.current),
-        })
         focusTargetRef.current?.focus()
-        console.debug('[RoadmapColorField] refocus wrapper after focus', {
-          rowId,
-          activeElementTag: document.activeElement?.tagName,
-          activeElementClass: (document.activeElement as HTMLElement | null)
-            ?.className,
-        })
       }, 0)
     },
-    [onChange, rowId],
+    [onChange],
   )
 
   return (
@@ -131,22 +114,7 @@ function FocusableColorPickerField({
       tabIndex={0}
       data-color-picker-focus
       className={styles.colorPickerFocusTarget}
-      onFocus={() => {
-        console.debug('[RoadmapColorField] wrapper focus', {
-          rowId,
-          activeElementTag: document.activeElement?.tagName,
-          activeElementClass: (document.activeElement as HTMLElement | null)
-            ?.className,
-        })
-      }}
       onKeyDown={(e) => {
-        console.debug('[RoadmapColorField] wrapper keydown', {
-          rowId,
-          key: e.key,
-          activeElementTag: document.activeElement?.tagName,
-          activeElementClass: (document.activeElement as HTMLElement | null)
-            ?.className,
-        })
         if (e.key === ' ' || e.key === 'Spacebar' || e.key === 'Enter') {
           e.preventDefault()
           e.stopPropagation()
@@ -156,10 +124,6 @@ function FocusableColorPickerField({
               .closest('[data-cell-id]')
               ?.querySelector('.ant-color-picker-trigger')
           ) as HTMLElement | null
-          console.debug('[RoadmapColorField] activating trigger', {
-            rowId,
-            hasTrigger: Boolean(trigger),
-          })
           trigger?.focus()
           trigger?.click()
           return
