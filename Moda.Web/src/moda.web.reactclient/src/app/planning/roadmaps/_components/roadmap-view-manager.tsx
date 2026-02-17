@@ -63,9 +63,7 @@ const RoadmapViewManager = (props: RoadmapViewManagerProps) => {
           roadmapItemsData={props.roadmapItems}
           roadmapItemsIsLoading={props.isRoadmapItemsLoading}
           refreshRoadmapItems={props.refreshRoadmapItems}
-          gridHeight={550}
           viewSelector={viewSelector}
-          enableRowDrag={props.canUpdateRoadmap}
           roadmapId={props.roadmap.id}
           openRoadmapItemDrawer={props.openRoadmapItemDrawer}
           isRoadmapManager={props.canUpdateRoadmap}

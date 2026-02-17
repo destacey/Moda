@@ -3,7 +3,7 @@ import {
   CreateRoadmapMilestoneRequest,
   CreateRoadmapTimeboxRequest,
   ObjectIdAndKey,
-  ReorganizeRoadmapActivityRequest,
+  UpdateRoadmapActivityPlacementRequest,
   RoadmapActivityListDto,
   RoadmapItemDetailsDto,
   RoadmapItemListDto,
@@ -23,7 +23,7 @@ import {
 } from '@/src/services/moda-api'
 import { apiSlice } from '../apiSlice'
 import { QueryTags } from '../query-tags'
-import { getRoadmapsClient } from '@/src/services/clients'
+import { authenticatedFetch, getRoadmapsClient } from '@/src/services/clients'
 import { OptionModel } from '@/src/components/types'
 
 export const roadmapApi = apiSlice.injectEndpoints({
@@ -216,6 +216,71 @@ export const roadmapApi = apiSlice.injectEndpoints({
         ]
       },
     }),
+    patchRoadmapItem: builder.mutation<
+      void,
+      {
+        roadmapId: string
+        itemId: string
+        patchOperations: Array<{
+          op: 'replace' | 'add' | 'remove'
+          path: string
+          value?: any
+        }>
+      }
+    >({
+      queryFn: async ({ roadmapId, itemId, patchOperations }) => {
+        try {
+          const response = await authenticatedFetch(
+            `/api/planning/roadmaps/${roadmapId}/items/${itemId}`,
+            {
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/json-patch+json',
+              },
+              body: JSON.stringify(patchOperations),
+            },
+          )
+
+          if (!response.ok) {
+            let errorData: unknown
+            try {
+              errorData = await response.json()
+            } catch {
+              errorData = {
+                detail: await response.text(),
+              }
+            }
+
+            return {
+              error: {
+                status: response.status,
+                data: errorData,
+              },
+            }
+          }
+
+          return { data: undefined }
+        } catch (error: any) {
+          console.error('API Error:', error)
+          return {
+            error: {
+              status: 'FETCH_ERROR',
+              data: {
+                detail:
+                  error?.message ??
+                  'An error occurred while updating the roadmap item.',
+              },
+            },
+          }
+        }
+      },
+      invalidatesTags: (result, error, arg) => {
+        return [
+          { type: QueryTags.RoadmapItem, id: arg.roadmapId },
+          { type: QueryTags.RoadmapItem, id: arg.itemId },
+        ]
+      },
+    }),
     updateRoadmapItemDates: builder.mutation<
       void,
       | UpdateRoadmapActivityDatesRequest
@@ -242,17 +307,17 @@ export const roadmapApi = apiSlice.injectEndpoints({
         ]
       },
     }),
-    reorganizeRoadmapActivity: builder.mutation<
+    updateRoadmapActivityPlacement: builder.mutation<
       void,
       {
-        request: ReorganizeRoadmapActivityRequest
+        request: UpdateRoadmapActivityPlacementRequest
       }
     >({
       queryFn: async (mutationRequest) => {
         try {
-          const data = await getRoadmapsClient().reorganizeActivity(
+          const data = await getRoadmapsClient().updateActivityPlacement(
             mutationRequest.request.roadmapId,
-            mutationRequest.request.activityId,
+            mutationRequest.request.itemId,
             mutationRequest.request,
           )
           return { data }
@@ -264,7 +329,7 @@ export const roadmapApi = apiSlice.injectEndpoints({
       invalidatesTags: (result, error, arg) => {
         return [
           { type: QueryTags.RoadmapItem, id: arg.request.roadmapId },
-          { type: QueryTags.RoadmapItem, id: arg.request.activityId },
+          { type: QueryTags.RoadmapItem, id: arg.request.itemId },
         ]
       },
     }),
@@ -327,8 +392,9 @@ export const {
   useGetRoadmapActivitiesQuery,
   useCreateRoadmapItemMutation,
   useUpdateRoadmapItemMutation,
+  usePatchRoadmapItemMutation,
   useUpdateRoadmapItemDatesMutation,
-  useReorganizeRoadmapActivityMutation,
+  useUpdateRoadmapActivityPlacementMutation,
   useDeleteRoadmapItemMutation,
   useGetVisibilityOptionsQuery,
 } = roadmapApi

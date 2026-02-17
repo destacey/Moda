@@ -9832,6 +9832,95 @@
           }
         ]
       },
+      "patch": {
+        "tags": [
+          "Roadmaps"
+        ],
+        "summary": "Partially update a roadmap item using JSON Patch (RFC 6902).",
+        "description": "Applies a JSON Patch document to update specific fields of an Activity, Timebox, or Milestone.",
+        "operationId": "Roadmaps_PatchRoadmapItem",
+        "parameters": [
+          {
+            "name": "roadmapId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "itemId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 2
+          }
+        ],
+        "requestBody": {
+          "x-name": "patchDocument",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatchDocumentOfUpdateRoadmapItemRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 3
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      },
       "delete": {
         "tags": [
           "Roadmaps"
@@ -9969,13 +10058,13 @@
         ]
       }
     },
-    "/api/planning/roadmaps/{roadmapId}/items/{activityId}/reorganize": {
-      "post": {
+    "/api/planning/roadmaps/{roadmapId}/items/{itemId}/placement": {
+      "put": {
         "tags": [
           "Roadmaps"
         ],
-        "summary": "Reorganize a roadmap activity.",
-        "operationId": "Roadmaps_ReorganizeActivity",
+        "summary": "Update a roadmap activity's placement.",
+        "operationId": "Roadmaps_UpdateActivityPlacement",
         "parameters": [
           {
             "name": "roadmapId",
@@ -9990,7 +10079,7 @@
             "x-position": 1
           },
           {
-            "name": "activityId",
+            "name": "itemId",
             "in": "path",
             "required": true,
             "schema": {
@@ -10007,7 +10096,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ReorganizeRoadmapActivityRequest"
+                "$ref": "#/components/schemas/UpdateRoadmapActivityPlacementRequest"
               }
             }
           },
@@ -23049,6 +23138,33 @@
           }
         ]
       },
+      "JsonPatchDocumentOfUpdateRoadmapItemRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operations"
+        ],
+        "properties": {
+          "operations": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/OperationOfUpdateRoadmapItemRequest"
+            }
+          }
+        }
+      },
+      "OperationOfUpdateRoadmapItemRequest": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Operation"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false
+          }
+        ]
+      },
       "UpdateRoadmapItemDatesRequest": {
         "type": "object",
         "discriminator": {
@@ -23152,12 +23268,12 @@
           }
         ]
       },
-      "ReorganizeRoadmapActivityRequest": {
+      "UpdateRoadmapActivityPlacementRequest": {
         "type": "object",
         "additionalProperties": false,
         "required": [
           "roadmapId",
-          "activityId",
+          "itemId",
           "order"
         ],
         "properties": {
@@ -23168,13 +23284,13 @@
             "nullable": false,
             "example": "00000000-0000-0000-0000-000000000000"
           },
-          "parentActivityId": {
+          "parentId": {
             "type": "string",
             "format": "guid",
             "nullable": true,
             "example": "00000000-0000-0000-0000-000000000000"
           },
-          "activityId": {
+          "itemId": {
             "type": "string",
             "format": "guid",
             "minLength": 1,

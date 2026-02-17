@@ -16,15 +16,32 @@ export interface RoadmapsGridProps {
   parentRoadmapId?: string | undefined
 }
 
+type RoadmapGridRow = RoadmapListDto & {
+  roadmapManagersDisplay: string
+}
+
 const RoadmapCellRenderer = ({ value, data }) => {
   return <Link href={`/planning/roadmaps/${data.key}`}>{value}</Link>
 }
 
-const dateOnlyValueFormatter = (params: ValueFormatterParams<RoadmapListDto>) =>
+const dateOnlyValueFormatter = (params: ValueFormatterParams<RoadmapGridRow>) =>
   params.value && dayjs(params.value).format('M/D/YYYY')
 
 const RoadmapsGrid: FC<RoadmapsGridProps> = (props: RoadmapsGridProps) => {
-  const columnDefs = useMemo<ColDef<RoadmapListDto>[]>(
+  const rowData = useMemo<RoadmapGridRow[]>(
+    () =>
+      props.roadmapsData.map((roadmap) => ({
+        ...roadmap,
+        roadmapManagersDisplay: roadmap.roadmapManagers
+          .slice()
+          .sort((a, b) => a.name.localeCompare(b.name))
+          .map((m) => m.name)
+          .join(', '),
+      })),
+    [props.roadmapsData],
+  )
+
+  const columnDefs = useMemo<ColDef<RoadmapGridRow>[]>(
     () => [
       { field: 'key', width: 90 },
       { field: 'name', width: 300, cellRenderer: RoadmapCellRenderer },
@@ -39,13 +56,7 @@ const RoadmapsGrid: FC<RoadmapsGridProps> = (props: RoadmapsGridProps) => {
         valueFormatter: dateOnlyValueFormatter,
       },
       {
-        field: 'roadmapManagers',
-        valueGetter: (params) =>
-          params.data.roadmapManagers
-            .slice()
-            .sort((a, b) => a.name.localeCompare(b.name))
-            .map((m) => m.name)
-            .join(', '),
+        field: 'roadmapManagersDisplay',
       },
       {
         field: 'visibility.name',
@@ -60,7 +71,7 @@ const RoadmapsGrid: FC<RoadmapsGridProps> = (props: RoadmapsGridProps) => {
     <ModaGrid
       height={props.gridHeight ?? 650}
       columnDefs={columnDefs}
-      rowData={props.roadmapsData}
+      rowData={rowData}
       loadData={props.refreshRoadmaps}
       loading={props.roadmapsLoading}
       toolbarActions={props.viewSelector}

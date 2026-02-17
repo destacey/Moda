@@ -163,6 +163,8 @@ export interface TreeGridToolbarProps {
   leftSlot?: React.ReactNode
   /** Content rendered inside the help popover. */
   helpContent?: React.ReactNode
+  /** Slot for actions rendered on the far right of the toolbar (e.g., view selector). */
+  rightSlot?: React.ReactNode
 }
 
 /**
@@ -255,6 +257,8 @@ export interface TreeGridProps<T extends TreeNode> {
     | React.ReactNode
     | ((context: TreeGridColumnContext) => React.ReactNode)
   helpContent?: React.ReactNode
+  /** Slot for actions rendered on the far right of the toolbar (e.g., view selector). */
+  rightSlot?: React.ReactNode
   emptyMessage?: string
   /** File name prefix for CSV export (e.g., 'project-tasks'). */
   csvFileName?: string

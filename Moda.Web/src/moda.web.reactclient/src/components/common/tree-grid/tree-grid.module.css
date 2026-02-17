@@ -242,6 +242,10 @@
   padding: 0 4px;
 }
 
+.expanderBtn :global(.anticon) {
+  font-size: 12px;
+}
+
 .nameCell {
   display: flex;
   align-items: center;
@@ -300,6 +304,43 @@
 
 .dragHandle:hover {
   opacity: 0.8;
+}
+
+.inlineRowAction {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+.rowActionBtn {
+  padding: 0 4px;
+  height: 20px;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.colorPickerFocusTarget {
+  display: inline-flex;
+  width: 100%;
+  outline: none;
+}
+
+.colorPickerFocusTarget:focus {
+  outline: none;
+}
+
+.colorPickerFocusTarget:focus-visible :global(.ant-color-picker-trigger),
+.colorPickerFocusTarget:focus-within :global(.ant-color-picker-trigger) {
+  border-color: var(--ant-color-primary);
+  box-shadow:
+    0 0 0 var(--ant-control-outline-width, 2px) var(--ant-control-outline);
+  outline: none;
+}
+
+.tr:hover .inlineRowAction,
+.trSelected .inlineRowAction {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .tr[data-dragging='true'] {
