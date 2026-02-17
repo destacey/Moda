@@ -6,6 +6,7 @@ import {
   type ChangeEvent,
   type Ref,
   useCallback,
+  useEffect,
   useImperativeHandle,
   useMemo,
   useRef,
@@ -71,6 +72,7 @@ import TreeGridToolbar from './tree-grid-toolbar'
 import { useTreeGridEditing } from './use-tree-grid-editing'
 
 const EMPTY_FIELD_ERRORS: Record<string, string> = {}
+const FILTER_DEBOUNCE_MS = 250
 const NOOP_FORM = {
   validateFields: async () => ({}),
   getFieldsValue: () => ({}),
@@ -112,8 +114,19 @@ function TreeGridInner<T extends TreeNode>(
   const [searchValue, setSearchValue] = useState('')
   const [draggedNodeId, setDraggedNodeId] = useState<string | null>(null)
   const [draftTasks, setDraftTasks] = useState<DraftItem[]>([])
+  const [textFilterDraftValues, setTextFilterDraftValues] = useState<
+    Record<string, string>
+  >({})
   const draftCounterRef = useRef(0)
   const isResizingRef = useRef(false)
+  const filterDebounceTimersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(
+    new Map(),
+  )
+  const pendingFilterFocusRef = useRef<{
+    inputId: string
+    selectionStart: number | null
+    selectionEnd: number | null
+  } | null>(null)
 
   // Field errors: delegate to external state when provided
   const [internalFieldErrors, setInternalFieldErrors] =
@@ -256,22 +269,20 @@ function TreeGridInner<T extends TreeNode>(
   )
 
   // ─── Column context ──────────────────────────────────────
+  const dragEnabledBase =
+    enableDragAndDrop && !!onNodeMove && !isLoading && !isEditing
+
   const columnContext: TreeGridColumnContext = useMemo(() => {
-    const hasFilters =
-      !!searchValue || columnFilters.length > 0 || sorting.length > 0
-    const dragEnabled =
-      enableDragAndDrop &&
-      !!onNodeMove &&
-      !hasFilters &&
-      !isLoading &&
-      !isEditing
+    const dragEnabledForColumns =
+      dragEnabledBase &&
+      !(!!searchValue || columnFilters.length > 0 || sorting.length > 0)
 
     return {
       selectedRowId,
       handleKeyDown,
       getFieldError,
       editableColumns,
-      isDragEnabled: dragEnabled,
+      isDragEnabled: dragEnabledForColumns,
       canCreateDraft,
       addDraftAtRoot,
       addDraftAsChild,
@@ -280,14 +291,11 @@ function TreeGridInner<T extends TreeNode>(
     searchValue,
     columnFilters.length,
     sorting.length,
-    enableDragAndDrop,
-    onNodeMove,
-    isLoading,
-    isEditing,
     selectedRowId,
     handleKeyDown,
     getFieldError,
     editableColumns,
+    dragEnabledBase,
     canCreateDraft,
     addDraftAtRoot,
     addDraftAsChild,
@@ -436,10 +444,41 @@ function TreeGridInner<T extends TreeNode>(
     setSearchValue('')
     setSorting([])
     setColumnFilters([])
+    setTextFilterDraftValues({})
+    filterDebounceTimersRef.current.forEach((timer) => clearTimeout(timer))
+    filterDebounceTimersRef.current.clear()
   }, [])
 
   const hasActiveFilters =
     !!searchValue || columnFilters.length > 0 || sorting.length > 0
+
+  useEffect(() => {
+    const pending = pendingFilterFocusRef.current
+    if (!pending) return
+
+    pendingFilterFocusRef.current = null
+    const input = document.getElementById(pending.inputId) as
+      | HTMLInputElement
+      | null
+    if (!input) return
+
+    input.focus({ preventScroll: true })
+    if (
+      pending.selectionStart !== null &&
+      pending.selectionEnd !== null &&
+      input.setSelectionRange
+    ) {
+      input.setSelectionRange(pending.selectionStart, pending.selectionEnd)
+    }
+  }, [columnFilters])
+
+  useEffect(() => {
+    const timers = filterDebounceTimersRef.current
+    return () => {
+      timers.forEach((timer) => clearTimeout(timer))
+      timers.clear()
+    }
+  }, [])
 
   // ─── CSV export ──────────────────────────────────────────
   const onExportCsv = useCallback(() => {
@@ -492,9 +531,8 @@ function TreeGridInner<T extends TreeNode>(
     typeof leftSlot === 'function' ? leftSlot(columnContext) : leftSlot
 
   // ─── DnD wrapping ───────────────────────────────────────
-  const dndEnabled = columnContext.isDragEnabled
-
-  const { isDragEnabled } = columnContext
+  const dndEnabled = dragEnabledBase && !hasActiveFilters
+  const isDragEnabled = dndEnabled
 
   // ─── Render ──────────────────────────────────────────────
   const tableContent = (
@@ -638,7 +676,11 @@ function TreeGridInner<T extends TreeNode>(
                   }
 
                   // text or numericRange — both render an Input
-                  const textValue = (rawFilterValue ?? '') as string
+                  const appliedFilterValue = (rawFilterValue ?? '') as string
+                  const draftValue = textFilterDraftValues[column.id]
+                  const textValue =
+                    draftValue !== undefined ? draftValue : appliedFilterValue
+                  const filterInputId = `tree-grid-filter-${header.id}`
                   return (
                     <th
                       key={`${header.id}-filter`}
@@ -646,13 +688,41 @@ function TreeGridInner<T extends TreeNode>(
                       onClick={(e) => e.stopPropagation()}
                     >
                       <Input
+                        id={filterInputId}
                         size="small"
                         allowClear
                         placeholder={meta?.filterPlaceholder}
                         value={textValue}
                         onChange={(e) => {
                           const next = e.target.value
-                          column.setFilterValue(next ? next : undefined)
+                          setTextFilterDraftValues((prev) => ({
+                            ...prev,
+                            [column.id]: next,
+                          }))
+
+                          const existingTimer =
+                            filterDebounceTimersRef.current.get(column.id)
+                          if (existingTimer) {
+                            clearTimeout(existingTimer)
+                          }
+
+                          const timer = setTimeout(() => {
+                            column.setFilterValue(next ? next : undefined)
+                            setTextFilterDraftValues((prev) => {
+                              if (!(column.id in prev)) return prev
+                              const updated = { ...prev }
+                              delete updated[column.id]
+                              return updated
+                            })
+                            filterDebounceTimersRef.current.delete(column.id)
+                          }, FILTER_DEBOUNCE_MS)
+                          filterDebounceTimersRef.current.set(column.id, timer)
+
+                          pendingFilterFocusRef.current = {
+                            inputId: filterInputId,
+                            selectionStart: e.target.selectionStart,
+                            selectionEnd: e.target.selectionEnd,
+                          }
                         }}
                         className={styles.filterControl}
                       />

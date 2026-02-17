@@ -9,14 +9,16 @@ import {
   MoreOutlined,
   PlusOutlined,
 } from '@ant-design/icons'
-import { Button, ColorPicker, DatePicker, Dropdown, Flex, Form, Input, Select } from 'antd'
+import { Button, DatePicker, Dropdown, Flex, Form, Input, Select } from 'antd'
 import dayjs from 'dayjs'
 import { ColumnDef } from '@tanstack/react-table'
 import { ModaColorPicker } from '@/src/components/common'
+import { useCallback, useRef } from 'react'
 import styles from '@/src/components/common/tree-grid/tree-grid.module.css'
 import {
   type FilterOption,
   type TreeGridColumnMeta,
+  stringContainsFilter,
   setContainsFilter,
   dateSortBy,
   useTreeGridDragHandle,
@@ -30,11 +32,22 @@ const DRAG_HANDLE_STYLE = {
   touchAction: 'none',
 } as const
 const NAME_LINK_STYLE = {
-  flex: 1,
-  minWidth: 0,
+  display: 'inline-block',
+  maxWidth: '100%',
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
+} as const
+const NAME_LINK_CONTAINER_STYLE = {
+  flex: 1,
+  minWidth: 0,
+} as const
+const COLOR_SWATCH_STYLE = {
+  width: 12,
+  height: 12,
+  borderRadius: 2,
+  border: '1px solid var(--ant-color-border)',
+  flexShrink: 0,
 } as const
 
 const formatDate = (dateValue?: Date | string | null) =>
@@ -84,12 +97,56 @@ function FocusableColorPickerField({
   rowId,
   handleKeyDown,
 }: FocusableColorPickerFieldProps) {
+  const focusTargetRef = useRef<HTMLDivElement | null>(null)
+  const onColorChange = useCallback(
+    (nextValue: string | undefined) => {
+      console.debug('[RoadmapColorField] onColorChange', {
+        rowId,
+        nextValue,
+        activeElementTag: document.activeElement?.tagName,
+        activeElementClass: (document.activeElement as HTMLElement | null)
+          ?.className,
+      })
+      onChange?.(nextValue)
+      setTimeout(() => {
+        console.debug('[RoadmapColorField] refocus wrapper', {
+          rowId,
+          hasFocusTarget: Boolean(focusTargetRef.current),
+        })
+        focusTargetRef.current?.focus()
+        console.debug('[RoadmapColorField] refocus wrapper after focus', {
+          rowId,
+          activeElementTag: document.activeElement?.tagName,
+          activeElementClass: (document.activeElement as HTMLElement | null)
+            ?.className,
+        })
+      }, 0)
+    },
+    [onChange, rowId],
+  )
+
   return (
     <div
+      ref={focusTargetRef}
       tabIndex={0}
       data-color-picker-focus
       className={styles.colorPickerFocusTarget}
+      onFocus={() => {
+        console.debug('[RoadmapColorField] wrapper focus', {
+          rowId,
+          activeElementTag: document.activeElement?.tagName,
+          activeElementClass: (document.activeElement as HTMLElement | null)
+            ?.className,
+        })
+      }}
       onKeyDown={(e) => {
+        console.debug('[RoadmapColorField] wrapper keydown', {
+          rowId,
+          key: e.key,
+          activeElementTag: document.activeElement?.tagName,
+          activeElementClass: (document.activeElement as HTMLElement | null)
+            ?.className,
+        })
         if (e.key === ' ' || e.key === 'Spacebar' || e.key === 'Enter') {
           e.preventDefault()
           e.stopPropagation()
@@ -99,6 +156,10 @@ function FocusableColorPickerField({
               .closest('[data-cell-id]')
               ?.querySelector('.ant-color-picker-trigger')
           ) as HTMLElement | null
+          console.debug('[RoadmapColorField] activating trigger', {
+            rowId,
+            hasTrigger: Boolean(trigger),
+          })
           trigger?.focus()
           trigger?.click()
           return
@@ -107,7 +168,7 @@ function FocusableColorPickerField({
         void handleKeyDown(e, rowId, 'color')
       }}
     >
-      <ModaColorPicker value={value} onChange={onChange} />
+      <ModaColorPicker value={value} onChange={onColorChange} />
     </div>
   )
 }
@@ -257,7 +318,7 @@ export const getRoadmapItemsGridColumns = ({
               ) : (
                 <span className={styles.indentSpacer} />
               )}
-              {isSelected && isDraft && handleSaveRoadmapItem ? (
+              {isSelected && handleSaveRoadmapItem ? (
                 <FormItem
                   name="name"
                   style={{ margin: 0, flex: 1, minWidth: 0 }}
@@ -282,15 +343,17 @@ export const getRoadmapItemsGridColumns = ({
                   {item.name || '(New Item)'}
                 </span>
               ) : (
-                <a
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    openRoadmapItemDrawer(item.id)
-                  }}
-                  style={NAME_LINK_STYLE}
-                >
-                  {item.name}
-                </a>
+                <span style={NAME_LINK_CONTAINER_STYLE}>
+                  <a
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      openRoadmapItemDrawer(item.id)
+                    }}
+                    style={NAME_LINK_STYLE}
+                  >
+                    {item.name}
+                  </a>
+                </span>
               )}
             </Flex>
             {!isSelected &&
@@ -381,7 +444,7 @@ export const getRoadmapItemsGridColumns = ({
         const isDraft = item.id.startsWith('draft-')
         const cellId = `${item.id}-start`
 
-        if (isSelected && isDraft && handleSaveRoadmapItem) {
+        if (isSelected && handleSaveRoadmapItem) {
           return (
             <FormItem
               name="start"
@@ -435,7 +498,7 @@ export const getRoadmapItemsGridColumns = ({
         const isDraft = item.id.startsWith('draft-')
         const cellId = `${item.id}-end`
 
-        if (isSelected && isDraft && handleSaveRoadmapItem) {
+        if (isSelected && handleSaveRoadmapItem && item.type !== 'Milestone') {
           return (
             <FormItem
               name="end"
@@ -471,25 +534,33 @@ export const getRoadmapItemsGridColumns = ({
       },
     },
     {
-      accessorKey: 'color',
+      id: 'color',
+      accessorFn: (row) => row.color ?? 'Transparent',
       header: 'Color',
       size: 100,
       enableSorting: false,
-      enableGlobalFilter: false,
-      enableColumnFilter: false,
+      enableGlobalFilter: true,
+      enableColumnFilter: true,
+      filterFn: stringContainsFilter,
       meta: {
-        enableExport: false,
+        exportFormatter: (_value, row) => {
+          if (row.type === 'Timebox') return ''
+          return row.color ?? 'Transparent'
+        },
       } satisfies TreeGridColumnMeta,
-      cell: ({ row, getValue }: { row: any; getValue: () => unknown }) => {
+      cell: ({ row }: { row: any }) => {
         const item = row.original as RoadmapItemTreeNode
         const isSelected = selectedRowId === item.id
         const isDraft = item.id.startsWith('draft-')
 
+        if (item.type === 'Timebox') {
+          return null
+        }
+
         if (
           isSelected &&
-          isDraft &&
           handleSaveRoadmapItem &&
-          isSelectedDraftActivity
+          (!isDraft || isSelectedDraftActivity)
         ) {
           return (
             <FormItem name="color" style={{ margin: 0 }}>
@@ -501,9 +572,31 @@ export const getRoadmapItemsGridColumns = ({
           )
         }
 
-        const value = getValue() as string | null | undefined
-        if (!value) return null
-        return <ColorPicker value={value} size="small" showText disabled />
+        const value = item.color
+        if (!value) {
+          return (
+            <Flex align="center" gap={6}>
+              <span
+                aria-hidden
+                style={{
+                  ...COLOR_SWATCH_STYLE,
+                  backgroundColor: 'transparent',
+                }}
+              />
+              <span>Transparent</span>
+            </Flex>
+          )
+        }
+
+        return (
+          <Flex align="center" gap={6}>
+            <span
+              aria-hidden
+              style={{ ...COLOR_SWATCH_STYLE, backgroundColor: value }}
+            />
+            <span>{value.toUpperCase()}</span>
+          </Flex>
+        )
       },
     },
   ]

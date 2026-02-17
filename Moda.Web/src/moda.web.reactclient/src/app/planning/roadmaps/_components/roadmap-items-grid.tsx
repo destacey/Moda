@@ -24,6 +24,7 @@ import {
 import { useMessage } from '@/src/components/contexts/messaging'
 import {
   useCreateRoadmapItemMutation,
+  usePatchRoadmapItemMutation,
   useUpdateRoadmapActivityPlacementMutation,
 } from '@/src/store/features/planning/roadmaps-api'
 import { FC, ReactNode, useCallback, useMemo, useRef, useState } from 'react'
@@ -71,6 +72,22 @@ const CREATE_TYPE_OPTIONS = [
   { label: 'Timebox', value: 'timebox' },
 ]
 
+const parseRoadmapCalendarDate = (value: unknown): Date | null => {
+  if (!value) return null
+
+  const raw = String(value)
+  // Roadmap dates are calendar dates; parse using the date portion only.
+  // This avoids timezone shifts for values like 2026-02-17T00:00:00Z.
+  const datePartMatch = raw.match(/^(\d{4}-\d{2}-\d{2})/)
+  if (datePartMatch) {
+    const [year, month, day] = datePartMatch[1].split('-').map(Number)
+    return new Date(year, month - 1, day)
+  }
+
+  const parsed = new Date(raw)
+  return Number.isNaN(parsed.getTime()) ? null : parsed
+}
+
 function mapToTreeNode(item: RoadmapItemUnion): RoadmapItemTreeNode {
   const node: RoadmapItemTreeNode = {
     id: item.id,
@@ -79,10 +96,9 @@ function mapToTreeNode(item: RoadmapItemUnion): RoadmapItemTreeNode {
     $type: item.$type,
     parentId: item.parent?.id ?? null,
     start:
-      'start' in item && item.start ? new Date(item.start as any) : null,
-    end: 'end' in item && item.end ? new Date(item.end as any) : null,
-    date:
-      'date' in item && item.date ? new Date(item.date as any) : null,
+      'start' in item ? parseRoadmapCalendarDate((item as any).start) : null,
+    end: 'end' in item ? parseRoadmapCalendarDate((item as any).end) : null,
+    date: 'date' in item ? parseRoadmapCalendarDate((item as any).date) : null,
     color: item.color ?? null,
     children: [],
   }
@@ -122,6 +138,7 @@ const RoadmapItemsGrid: FC<RoadmapItemsGridProps> = ({
   const draftsRef = useRef<DraftItem[]>([])
 
   const [createRoadmapItem] = useCreateRoadmapItemMutation()
+  const [patchRoadmapItem] = usePatchRoadmapItemMutation()
   const [updateActivityPlacement] = useUpdateRoadmapActivityPlacementMutation()
 
   const enableDragAndDrop = isRoadmapManager
@@ -207,36 +224,84 @@ const RoadmapItemsGrid: FC<RoadmapItemsGridProps> = ({
 
   const handleSaveRoadmapItem = useCallback(
     async (itemId: string, updates: Record<string, any>): Promise<boolean> => {
-      if (!itemId.startsWith('draft-')) {
-        return true
-      }
+      const isDraft = itemId.startsWith('draft-')
 
       try {
-        const draft = draftsRef.current.find((d) => d.id === itemId)
-        if (!draft) return false
+        if (isDraft) {
+          const draft = draftsRef.current.find((d) => d.id === itemId)
+          if (!draft) return false
 
-        const itemType =
-          updates.itemType === 'timebox' ? 'timebox' : 'activity'
-        const request:
-          | CreateRoadmapActivityRequest
-          | CreateRoadmapTimeboxRequest = {
-          $type: itemType,
-          roadmapId,
-          parentId: draft.parentId,
-          name: updates.name || '',
-          start: updates.start,
-          end: updates.end,
-          ...(itemType === 'activity' ? { color: updates.color } : {}),
-        } as CreateRoadmapActivityRequest | CreateRoadmapTimeboxRequest
+          const itemType =
+            updates.itemType === 'timebox' ? 'timebox' : 'activity'
+          const request:
+            | CreateRoadmapActivityRequest
+            | CreateRoadmapTimeboxRequest = {
+            $type: itemType,
+            roadmapId,
+            parentId: draft.parentId,
+            name: updates.name || '',
+            start: updates.start,
+            end: updates.end,
+            ...(itemType === 'activity' ? { color: updates.color } : {}),
+          } as CreateRoadmapActivityRequest | CreateRoadmapTimeboxRequest
 
-        const response = await createRoadmapItem(request)
-        if (response.error) throw response.error
+          const response = await createRoadmapItem(request)
+          if (response.error) throw response.error
+        } else {
+          const item = findNodeById(treeData, itemId) as RoadmapItemTreeNode | null
+          if (!item) return false
+
+          const patchOperations: Array<{
+            op: 'replace' | 'add' | 'remove'
+            path: string
+            value?: any
+          }> = []
+
+          if (updates.name !== undefined) {
+            patchOperations.push({
+              op: 'replace',
+              path: '/name',
+              value: updates.name,
+            })
+          }
+          if (updates.start !== undefined) {
+            patchOperations.push({
+              op: 'replace',
+              path: item.type === 'Milestone' ? '/date' : '/start',
+              value: updates.start,
+            })
+          }
+          if (updates.end !== undefined && item.type !== 'Milestone') {
+            patchOperations.push({
+              op: 'replace',
+              path: '/end',
+              value: updates.end,
+            })
+          }
+          if (updates.color !== undefined) {
+            patchOperations.push({
+              op: 'replace',
+              path: '/color',
+              value: updates.color,
+            })
+          }
+
+          if (patchOperations.length === 0) return true
+
+          await patchRoadmapItem({
+            roadmapId,
+            itemId,
+            patchOperations,
+          }).unwrap()
+        }
 
         setFieldErrors({})
         messageApi.success(
-          itemType === 'timebox'
-            ? 'Roadmap timebox created successfully.'
-            : 'Roadmap activity created successfully.',
+          isDraft
+            ? updates.itemType === 'timebox'
+              ? 'Roadmap timebox created successfully.'
+              : 'Roadmap activity created successfully.'
+            : 'Roadmap item updated successfully.',
         )
         refreshRoadmapItems()
         return true
@@ -253,6 +318,8 @@ const RoadmapItemsGrid: FC<RoadmapItemsGridProps> = ({
             const fieldName =
               apiField === 'type' || apiField === '$type'
                 ? 'itemType'
+                : apiField === 'date'
+                  ? 'start'
                 : apiField
             errorMap[fieldName] = Array.isArray(messages)
               ? String(messages[0] ?? '')
@@ -302,12 +369,19 @@ const RoadmapItemsGrid: FC<RoadmapItemsGridProps> = ({
 
         messageApi.error(
           detail ??
-            'An error occurred while creating the roadmap item. Please try again.',
+            `An error occurred while ${isDraft ? 'creating' : 'updating'} the roadmap item. Please try again.`,
         )
         return false
       }
     },
-    [createRoadmapItem, messageApi, refreshRoadmapItems, roadmapId],
+    [
+      createRoadmapItem,
+      messageApi,
+      patchRoadmapItem,
+      refreshRoadmapItems,
+      roadmapId,
+      treeData,
+    ],
   )
 
   const getFormValues = useCallback(
@@ -328,7 +402,14 @@ const RoadmapItemsGrid: FC<RoadmapItemsGridProps> = ({
       return {
         name: item.name,
         itemType: item.$type,
-        start: item.start ? dayjs(item.start) : null,
+        start:
+          item.type === 'Milestone'
+            ? item.date
+              ? dayjs(item.date)
+              : null
+            : item.start
+              ? dayjs(item.start)
+              : null,
         end: item.end ? dayjs(item.end) : null,
         color: item.color ?? null,
       }
@@ -356,6 +437,63 @@ const RoadmapItemsGrid: FC<RoadmapItemsGridProps> = ({
     [],
   )
 
+  const computeRoadmapItemChanges = useCallback(
+    (
+      rowId: string,
+      formValues: Record<string, any>,
+      data: RoadmapItemTreeNode[],
+    ) => {
+      if (rowId.startsWith('draft-')) {
+        return computeChanges(rowId, formValues, data)
+      }
+
+      const item = findNodeById(data, rowId) as RoadmapItemTreeNode | null
+      if (!item) return null
+
+      const values = formValues as any
+      const updates: Record<string, any> = {}
+      let hasChanges = false
+
+      if (values.name !== item.name) {
+        updates.name = values.name
+        hasChanges = true
+      }
+
+      const currentStart =
+        item.type === 'Milestone'
+          ? item.date
+            ? dayjs(item.date).format('YYYY-MM-DD')
+            : null
+          : item.start
+            ? dayjs(item.start).format('YYYY-MM-DD')
+            : null
+      const nextStart = values.start ? values.start.format('YYYY-MM-DD') : null
+      if (nextStart !== currentStart) {
+        updates.start = nextStart
+        hasChanges = true
+      }
+
+      if (item.type !== 'Milestone') {
+        const currentEnd = item.end ? dayjs(item.end).format('YYYY-MM-DD') : null
+        const nextEnd = values.end ? values.end.format('YYYY-MM-DD') : null
+        if (nextEnd !== currentEnd) {
+          updates.end = nextEnd
+          hasChanges = true
+        }
+      }
+
+      const currentColor = item.color ?? null
+      const nextColor = values.color ?? null
+      if (nextColor !== currentColor) {
+        updates.color = nextColor
+        hasChanges = true
+      }
+
+      return hasChanges ? updates : null
+    },
+    [computeChanges],
+  )
+
   const validateFields = useCallback(
     (rowId: string, formValues: Record<string, any>) => {
       if (!rowId.startsWith('draft-')) return {}
@@ -380,6 +518,44 @@ const RoadmapItemsGrid: FC<RoadmapItemsGridProps> = ({
       return errors
     },
     [],
+  )
+
+  const validateRoadmapItemFields = useCallback(
+    (rowId: string, formValues: Record<string, any>) => {
+      if (rowId.startsWith('draft-')) {
+        return validateFields(rowId, formValues)
+      }
+
+      const item = findNodeById(treeData, rowId) as RoadmapItemTreeNode | null
+      if (!item) return {}
+
+      const errors: Record<string, string> = {}
+      const name = String(formValues.name ?? '').trim()
+      const start = formValues.start
+      const end = formValues.end
+
+      if (!name) {
+        errors.name = 'Name is required.'
+      }
+
+      if (item.type === 'Milestone') {
+        if (!start) {
+          errors.start = 'Date is required.'
+        }
+        return errors
+      }
+
+      if (!start || !end) {
+        const message = 'Start and end dates are required.'
+        errors.start = message
+        errors.end = message
+      } else if (!dayjs(start).isBefore(dayjs(end), 'day')) {
+        errors.end = 'End date must be after start date.'
+      }
+
+      return errors
+    },
+    [treeData, validateFields],
   )
 
   const columns = useCallback(
@@ -456,14 +632,26 @@ const RoadmapItemsGrid: FC<RoadmapItemsGridProps> = ({
           editingConfig={{
             canEdit: isRoadmapManager,
             form,
-            editableColumnIds: (rowId) =>
-              rowId?.startsWith('draft-')
-                ? ['name', 'type', 'start', 'end', 'color']
-                : [],
+            editableColumnIds: (rowId) => {
+              if (rowId?.startsWith('draft-')) {
+                return selectedDraftItemType === 'timebox'
+                  ? ['name', 'type', 'start', 'end']
+                  : ['name', 'type', 'start', 'end', 'color']
+              }
+
+              const item = rowId
+                ? (findNodeById(treeData, rowId) as RoadmapItemTreeNode | null)
+                : null
+              if (item?.type === 'Timebox') {
+                return ['name', 'start', 'end']
+              }
+
+              return ['name', 'start', 'end', 'color']
+            },
             onSave: handleSaveRoadmapItem,
             getFormValues,
-            computeChanges,
-            validateFields,
+            computeChanges: computeRoadmapItemChanges,
+            validateFields: validateRoadmapItemFields,
             cellIdColumnMatchOrder: ['start', 'type', 'name', 'color', 'end'],
           }}
           fieldErrors={fieldErrors}

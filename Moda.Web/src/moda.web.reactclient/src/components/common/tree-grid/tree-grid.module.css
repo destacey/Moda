@@ -332,7 +332,8 @@
 .colorPickerFocusTarget:focus-visible :global(.ant-color-picker-trigger),
 .colorPickerFocusTarget:focus-within :global(.ant-color-picker-trigger) {
   border-color: var(--ant-color-primary);
-  box-shadow: 0 0 0 2px var(--ant-color-primary-border-hover);
+  box-shadow:
+    0 0 0 var(--ant-control-outline-width, 2px) var(--ant-control-outline);
   outline: none;
 }
 
