@@ -1,0 +1,33 @@
+{
+  "name": "moda-mcp",
+  "version": "v1",
+  "description": "MCP Server generated from OpenAPI spec for moda-mcp",
+  "private": true,
+  "type": "module",
+  "main": "build/index.js",
+  "files": [
+    "build",
+    "src"
+  ],
+  "scripts": {
+    "start": "node build/index.js",
+    "build": "tsc && shx chmod 755 build/index.js",
+    "typecheck": "tsc --noEmit",
+    "prestart": "npm run build"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.10.0",
+    "axios": "^1.9.0",
+    "dotenv": "^16.4.5",
+    "json-schema-to-zod": "^2.6.1",
+    "zod": "^3.24.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.2",
+    "shx": "^0.4.0",
+    "typescript": "^5.8.3"
+  }
+}
