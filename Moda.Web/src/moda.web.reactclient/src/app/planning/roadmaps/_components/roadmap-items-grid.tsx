@@ -32,6 +32,7 @@ import EditRoadmapActivityForm from './edit-roadmap-activity-form'
 import DeleteRoadmapItemForm from './delete-roadmap-item-form'
 import EditRoadmapTimeboxForm from './edit-roadmap-timebox-form'
 import { getRoadmapItemsGridColumns } from './roadmap-items-grid.columns'
+import { RoadmapItemsHelp } from './roadmap-items-grid.keyboard-shortcuts'
 
 export interface RoadmapItemTreeNode extends TreeNode {
   id: string
@@ -671,6 +672,7 @@ const RoadmapItemsGrid: FC<RoadmapItemsGridProps> = ({
               </Button>
             )
           }
+          helpContent={<RoadmapItemsHelp />}
         />
       </Form>
       {openUpdateRoadmapActivityForm && (
