@@ -94,8 +94,6 @@ const DeleteRoleForm = (props: DeleteRoleFormProps) => {
       okButtonProps={{ disabled: countData !== undefined && countData > 0 }}
       confirmLoading={isSaving}
       onCancel={handleCancel}
-      mask={{ blur: false }}
-      maskClosable={false}
       keyboard={false}
       destroyOnHidden={true}
     >

@@ -196,8 +196,6 @@ const ManageRoleUsersForm: React.FC<ManageRoleUsersFormProps> = (props) => {
       okButtonProps={{ disabled: !hasChanges }}
       confirmLoading={isSaving}
       onCancel={handleCancel}
-      mask={{ blur: false }}
-      maskClosable={false}
       keyboard={false}
       destroyOnHidden={true}
       width={'80vw'}

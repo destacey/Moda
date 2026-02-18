@@ -15,7 +15,7 @@ import {
   MouseEvent,
   TouchEvent,
 } from 'react'
-import { Form, Input, Select, Spin } from 'antd'
+import { Input, Select, Spin } from 'antd'
 import type { FormInstance } from 'antd'
 import {
   ArrowUpOutlined,
@@ -119,9 +119,9 @@ function TreeGridInner<T extends TreeNode>(
   >({})
   const draftCounterRef = useRef(0)
   const isResizingRef = useRef(false)
-  const filterDebounceTimersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(
-    new Map(),
-  )
+  const filterDebounceTimersRef = useRef<
+    Map<string, ReturnType<typeof setTimeout>>
+  >(new Map())
   const pendingFilterFocusRef = useRef<{
     inputId: string
     selectionStart: number | null
@@ -258,10 +258,7 @@ function TreeGridInner<T extends TreeNode>(
     ], // tableRef is stable
   )
 
-  const addDraftAtRoot = useCallback(
-    () => addDraft(),
-    [addDraft],
-  )
+  const addDraftAtRoot = useCallback(() => addDraft(), [addDraft])
 
   const addDraftAsChild = useCallback(
     (parentId: string) => addDraft(parentId),
@@ -457,9 +454,9 @@ function TreeGridInner<T extends TreeNode>(
     if (!pending) return
 
     pendingFilterFocusRef.current = null
-    const input = document.getElementById(pending.inputId) as
-      | HTMLInputElement
-      | null
+    const input = document.getElementById(
+      pending.inputId,
+    ) as HTMLInputElement | null
     if (!input) return
 
     input.focus({ preventScroll: true })

@@ -186,7 +186,6 @@ const MapAzdoWorkspaceTeamsForm = (props: MapAzdoWorkspaceTeamsFormProps) => {
         okText="Save"
         confirmLoading={isSaving}
         onCancel={handleCancel}
-        maskClosable={false}
         keyboard={false} // disable esc key to close modal
         destroyOnHidden={true}
       >

@@ -200,13 +200,15 @@ const ModaColorPicker = forwardRef<ModaColorPickerRef, ModaColorPickerProps>(
           requestAnimationFrame(() => focusTriggerWithRetry())
         })
       },
-      [clearPendingRefocus, focusTriggerWithRetry, isOpen, onChange, value],
+      [clearPendingRefocus, focusTriggerWithRetry, onChange, value],
     )
 
     return (
       <span ref={rootRef}>
         <ColorPicker
-          className={isTriggerFocused ? 'ant-color-picker-trigger-active' : undefined}
+          className={
+            isTriggerFocused ? 'ant-color-picker-trigger-active' : undefined
+          }
           open={isOpen}
           defaultFormat="hex"
           value={value}

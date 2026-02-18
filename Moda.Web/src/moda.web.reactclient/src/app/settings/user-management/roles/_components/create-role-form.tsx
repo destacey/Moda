@@ -146,8 +146,6 @@ const CreateRoleForm = ({
       okText="Create"
       confirmLoading={isSaving}
       onCancel={handleCancel}
-      mask={{ blur: false }}
-      maskClosable={false}
       keyboard={false}
       destroyOnHidden={true}
     >
@@ -196,3 +194,4 @@ const CreateRoleForm = ({
 }
 
 export default CreateRoleForm
+

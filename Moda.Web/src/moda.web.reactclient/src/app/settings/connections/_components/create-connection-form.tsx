@@ -157,7 +157,6 @@ const CreateConnectionForm = ({
       }}
       okText="Create"
       confirmLoading={isSaving}
-      maskClosable={false}
       keyboard={false}
       destroyOnClose={true}
       width={selectedConnector === null ? 600 : 800}

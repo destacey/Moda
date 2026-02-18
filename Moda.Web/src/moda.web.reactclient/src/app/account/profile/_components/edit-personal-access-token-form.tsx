@@ -119,7 +119,6 @@ const EditPersonalAccessTokenForm = ({
       okText="Save"
       confirmLoading={isSaving}
       onCancel={handleCancel}
-      maskClosable={false}
       keyboard={false}
       destroyOnHidden={true}
       width={600}

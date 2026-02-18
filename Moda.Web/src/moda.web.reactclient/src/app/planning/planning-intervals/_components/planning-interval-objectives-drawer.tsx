@@ -64,7 +64,6 @@ const PlanningIntervalObjectiveDetailsDrawer: FC<
         onClose={props.onDrawerClose}
         open={props.drawerOpen}
         loading={objectiveDataIsLoading}
-        mask={{ blur: false }}
         size={size}
         resizable={{
           onResize: (newSize) => setSize(newSize),

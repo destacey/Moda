@@ -142,7 +142,6 @@ const CreatePortfolioForm = (props: CreatePortfolioFormProps) => {
         okText="Create"
         confirmLoading={isSaving}
         onCancel={handleCancel}
-        maskClosable={false}
         keyboard={false} // disable esc key to close modal
         destroyOnHidden={true}
       >

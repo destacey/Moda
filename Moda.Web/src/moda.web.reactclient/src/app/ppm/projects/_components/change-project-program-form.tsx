@@ -159,8 +159,6 @@ const ChangeProjectProgramForm = (props: ChangeProjectProgramFormProps) => {
         okText="Save"
         confirmLoading={isSaving}
         onCancel={handleCancel}
-        mask={{ blur: false }}
-        maskClosable={false}
         keyboard={false}
         destroyOnHidden={true}
       >
@@ -197,3 +195,4 @@ const ChangeProjectProgramForm = (props: ChangeProjectProgramFormProps) => {
 }
 
 export default ChangeProjectProgramForm
+

@@ -123,8 +123,6 @@ const EditRoleForm = ({
       okText="Save"
       confirmLoading={isSaving}
       onCancel={handleCancel}
-      mask={{ blur: false }}
-      maskClosable={false}
       keyboard={false}
       destroyOnHidden={true}
     >
