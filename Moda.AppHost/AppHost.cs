@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
@@ -7,6 +7,7 @@ var builder = DistributedApplication.CreateBuilder(args);
 var databaseConfigPath = Path.Combine(builder.AppHostDirectory, "..", "Moda.Web", "src", "Moda.Web.Api", "Configurations", "database.json");
 var databaseConfig = new ConfigurationBuilder()
     .AddJsonFile(databaseConfigPath, optional: false)
+    .AddUserSecrets("ccaebfb8-fc4c-4b73-9da4-9bab70a12a1c") // ModaWebApi user secrets for local development
     .Build();
 
 var connectionString = databaseConfig["DatabaseSettings:ConnectionString"]
