@@ -182,7 +182,6 @@ const ConfigureTeamSprintMappingsForm = ({
       okText="Save Changes"
       confirmLoading={isSaving}
       onCancel={handleCancel}
-      maskClosable={false}
       keyboard={false}
       destroyOnHidden={true}
     >

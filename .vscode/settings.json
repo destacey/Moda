@@ -1,3 +1,4 @@
 {
-    "dotnet.defaultSolution": "Moda.slnx"
+  "dotnet.defaultSolution": "Moda.slnx",
+  "json.schemaDownload.enable": false
 }

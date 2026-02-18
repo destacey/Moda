@@ -96,8 +96,6 @@ const DeleteProjectTaskForm = (props: DeleteProjectTaskFormProps) => {
         okType="danger"
         confirmLoading={isSaving}
         onCancel={handleCancel}
-        mask={{ blur: false }}
-        maskClosable={false}
         keyboard={false}
         destroyOnHidden={true}
       >
@@ -108,3 +106,4 @@ const DeleteProjectTaskForm = (props: DeleteProjectTaskFormProps) => {
 }
 
 export default DeleteProjectTaskForm
+

@@ -87,8 +87,6 @@ const DeleteProjectForm = (props: DeleteProjectFormProps) => {
         okType="danger"
         confirmLoading={isSaving}
         onCancel={handleCancel}
-        mask={{ blur: false }}
-        maskClosable={false}
         keyboard={false} // disable esc key to close modal
         destroyOnHidden={true}
       >
@@ -99,3 +97,4 @@ const DeleteProjectForm = (props: DeleteProjectFormProps) => {
 }
 
 export default DeleteProjectForm
+

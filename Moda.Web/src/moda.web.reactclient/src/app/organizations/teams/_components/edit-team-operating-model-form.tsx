@@ -160,12 +160,10 @@ const EditTeamOperatingModelForm = (props: EditTeamOperatingModelFormProps) => {
       okText="Save"
       confirmLoading={isSaving}
       onCancel={handleCancel}
-      mask={{ blur: false }}
-      maskClosable={false}
       keyboard={false} // disable esc key to close modal
       destroyOnHidden={true}
     >
-      <Spin spinning={isLoadingData} tip="Loading operating model...">
+      <Spin spinning={isLoadingData} description="Loading operating model...">
         <Form
           form={form}
           size="small"
@@ -201,3 +199,4 @@ const EditTeamOperatingModelForm = (props: EditTeamOperatingModelFormProps) => {
 }
 
 export default EditTeamOperatingModelForm
+

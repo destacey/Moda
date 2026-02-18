@@ -45,7 +45,7 @@ const HierarchyPage = () => {
 
       <Spin
         spinning={workTiersIsLoading || workLevelsIsLoading}
-        tip="Loading work type tiers and levels..."
+        description="Loading work type tiers and levels..."
         size="large"
         style={{ paddingTop: 50 }}
       >

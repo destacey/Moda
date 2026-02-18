@@ -151,7 +151,6 @@ const EditWorkTypeForm = (props: EditWorkTypeFormProps) => {
       okText="Save"
       onCancel={handleCancel}
       confirmLoading={isSaving}
-      maskClosable={false}
       keyboard={false} // disable esc key to close modal
       destroyOnHidden={true}
     >

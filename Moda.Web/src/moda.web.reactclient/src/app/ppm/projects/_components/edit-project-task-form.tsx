@@ -234,8 +234,6 @@ const EditProjectTaskForm = (props: EditProjectTaskFormProps) => {
       okText="Save"
       confirmLoading={isSaving}
       onCancel={handleCancel}
-      mask={{ blur: false }}
-      maskClosable={false}
       keyboard={false}
       destroyOnHidden={true}
       width={500}
@@ -345,3 +343,4 @@ const EditProjectTaskForm = (props: EditProjectTaskFormProps) => {
 }
 
 export default EditProjectTaskForm
+

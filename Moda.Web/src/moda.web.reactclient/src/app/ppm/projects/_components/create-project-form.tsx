@@ -220,8 +220,6 @@ const CreateProjectForm = (props: CreateProjectFormProps) => {
         okText="Create"
         confirmLoading={isSaving}
         onCancel={handleCancel}
-        mask={{ blur: false }}
-        maskClosable={false}
         keyboard={false} // disable esc key to close modal
         destroyOnHidden={true}
       >
@@ -385,3 +383,4 @@ const CreateProjectForm = (props: CreateProjectFormProps) => {
 }
 
 export default CreateProjectForm
+

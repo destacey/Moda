@@ -41,7 +41,6 @@ const PersonalAccessTokenCreatedModal = ({
         </Button>,
       ]}
       closable={false}
-      maskClosable={false}
     >
       <Alert
         title="Save This Token Now!"

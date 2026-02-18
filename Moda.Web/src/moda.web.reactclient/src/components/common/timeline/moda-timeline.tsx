@@ -255,7 +255,9 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
       const currentStart = updatedOptions.start
         ? new Date(updatedOptions.start)
         : null
-      const currentEnd = updatedOptions.end ? new Date(updatedOptions.end) : null
+      const currentEnd = updatedOptions.end
+        ? new Date(updatedOptions.end)
+        : null
 
       const startChanged =
         !prevWindowBoundsRef.current ||
@@ -621,7 +623,7 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
   ])
 
   return (
-    <Spin spinning={isLoading} tip="Loading timeline..." size="large">
+    <Spin spinning={isLoading} description="Loading timeline..." size="large">
       <div
         ref={containerRef}
         style={{

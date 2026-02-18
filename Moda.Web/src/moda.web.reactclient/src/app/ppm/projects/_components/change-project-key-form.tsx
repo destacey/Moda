@@ -158,8 +158,6 @@ const ChangeProjectKeyForm = (props: ChangeProjectKeyFormProps) => {
         okText="Save"
         confirmLoading={isSaving}
         onCancel={handleCancel}
-        mask={{ blur: false }}
-        maskClosable={false}
         keyboard={false}
         destroyOnHidden={true}
       >
@@ -200,3 +198,4 @@ const ChangeProjectKeyForm = (props: ChangeProjectKeyFormProps) => {
 }
 
 export default ChangeProjectKeyForm
+

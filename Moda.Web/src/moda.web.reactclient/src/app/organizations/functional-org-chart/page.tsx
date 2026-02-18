@@ -135,7 +135,7 @@ const FunctionalOrgChartPage: React.FC = () => {
       <PageTitle title="Functional Org Chart" actions={actions()} />
       <Spin
         spinning={isLoading}
-        tip="Loading functional org chart..."
+        description="Loading functional org chart..."
         size="large"
       >
         {!isLoading && (

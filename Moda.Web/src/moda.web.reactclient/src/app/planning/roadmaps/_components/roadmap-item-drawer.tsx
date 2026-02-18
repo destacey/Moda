@@ -62,7 +62,6 @@ const RoadmapItemDrawer: FC<RoadmapItemDrawerProps> = (
         onClose={props.onDrawerClose}
         open={props.drawerOpen}
         loading={isLoading}
-        mask={{ blur: false }}
         size={size}
         resizable={{
           onResize: (newSize) => setSize(newSize),

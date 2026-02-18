@@ -202,8 +202,6 @@ const CreateProjectTaskForm = (props: CreateProjectTaskFormProps) => {
       okText="Create"
       confirmLoading={isSaving}
       onCancel={handleCancel}
-      mask={{ blur: false }}
-      maskClosable={false}
       keyboard={false}
       destroyOnHidden={true}
       width={500}
@@ -328,3 +326,4 @@ const CreateProjectTaskForm = (props: CreateProjectTaskFormProps) => {
 }
 
 export default CreateProjectTaskForm
+

@@ -104,7 +104,6 @@ const DeleteTeamMembershipForm = (props: DeleteTeamMembershipFormProps) => {
       okType="danger"
       confirmLoading={isSaving}
       onCancel={handleCancel}
-      maskClosable={false}
       keyboard={false} // disable esc key to close modal
       destroyOnHidden={true}
     >

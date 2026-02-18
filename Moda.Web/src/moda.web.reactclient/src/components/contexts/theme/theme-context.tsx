@@ -93,7 +93,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   }
 
   return (
-    <ConfigProvider theme={currentTheme}>
+    <ConfigProvider theme={currentTheme} modal={{ closable: true }}>
       <ThemeContent>{children}</ThemeContent>
     </ConfigProvider>
   )
