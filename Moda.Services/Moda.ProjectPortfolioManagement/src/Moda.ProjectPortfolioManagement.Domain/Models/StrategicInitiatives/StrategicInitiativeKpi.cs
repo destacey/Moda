@@ -56,7 +56,59 @@ public sealed class StrategicInitiativeKpi : Kpi, ISystemAuditable
         if (checkpoint.KpiId != Id)
             return Result.Failure("Checkpoint does not belong to this KPI.");
 
+        if (_checkpoints.Any(c => c.CheckpointDate == checkpoint.CheckpointDate))
+            return Result.Failure("Checkpoint dates must be unique within the KPI.");
+
         _checkpoints.Add(checkpoint);
+
+        return Result.Success();
+    }
+
+    public Result ManageCheckpointPlan(IEnumerable<UpsertStrategicInitiativeKpiCheckpoint> checkpoints)
+    {
+        Guard.Against.Null(checkpoints, nameof(checkpoints));
+
+        var checkpointList = checkpoints.ToList();
+
+        // verify no duplicate ids
+        var checkpointIds = checkpointList.Where(c => !c.IsNew).Select(c => c.Id!.Value).ToList();
+        if (checkpointIds.Distinct().Count() != checkpointIds.Count)
+            return Result.Failure("Checkpoint IDs must be unique within the KPI.");
+
+        // verify no duplicate checkpoint dates (this represents the final desired plan)
+        var checkpointDates = checkpointList.Select(c => c.CheckpointDate).ToList();
+        if (checkpointDates.Distinct().Count() != checkpointDates.Count)
+            return Result.Failure("Checkpoint dates must be unique within the KPI.");
+
+        // remove any checkpoints that are not in the list
+        var removedCheckpoints = _checkpoints.Where(c => !checkpointList.Any(x => x.Id == c.Id)).ToList();
+        foreach (var removedCheckpoint in removedCheckpoints)
+        {
+            var deleteResult = RemoveCheckpoint(removedCheckpoint.Id);
+            if (deleteResult.IsFailure)
+                return Result.Failure(deleteResult.Error);
+        }
+
+        // update existing checkpoints
+        foreach (var checkpoint in checkpointList.Where(c => !c.IsNew))
+        {
+            var existingCheckpoint = _checkpoints.FirstOrDefault(c => c.Id == checkpoint.Id);
+            if (existingCheckpoint is null)
+                return Result.Failure($"Checkpoint {checkpoint.Id} not found.");
+
+            var updateResult = existingCheckpoint.Update(checkpoint.TargetValue, checkpoint.CheckpointDate, checkpoint.DateLabel);
+            if (updateResult.IsFailure)
+                return Result.Failure(updateResult.Error);
+        }
+
+        // add new checkpoints
+        foreach (var checkpoint in checkpointList.Where(c => c.IsNew))
+        {
+            var checkpointToAdd = StrategicInitiativeKpiCheckpoint.Create(Id, checkpoint.TargetValue, checkpoint.CheckpointDate, checkpoint.DateLabel);
+            var addResult = AddCheckpoint(checkpointToAdd);
+            if (addResult.IsFailure)
+                return Result.Failure(addResult.Error);
+        }
 
         return Result.Success();
     }
@@ -89,6 +141,9 @@ public sealed class StrategicInitiativeKpi : Kpi, ISystemAuditable
 
         if (measurement.KpiId != Id)
             return Result.Failure("Measurement does not belong to this KPI.");
+
+        if (_measurements.Any(m => m.MeasurementDate == measurement.MeasurementDate))
+            return Result.Failure("Measurement dates must be unique within the KPI.");
 
         _measurements.Add(measurement);
 
