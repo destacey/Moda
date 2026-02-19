@@ -5,7 +5,9 @@ import { useMessage } from '@/src/components/contexts/messaging'
 import { KpiTrend, KpiUnit } from '@/src/services/moda-api'
 import {
   useGetStrategicInitiativeKpiCheckpointPlanQuery,
+  useGetStrategicInitiativeKpiMeasurementsQuery,
   useGetStrategicInitiativeKpiQuery,
+  useRemoveStrategicInitiativeKpiMeasurementMutation,
 } from '@/src/store/features/ppm/strategic-initiatives-api'
 import { getDrawerWidthPixels } from '@/src/utils'
 import {
@@ -13,16 +15,19 @@ import {
   ArrowUpOutlined,
   CheckCircleOutlined,
   CloseCircleOutlined,
+  DeleteOutlined,
   ExclamationCircleOutlined,
   MinusOutlined,
-  QuestionOutlined,
+  MoreOutlined,
 } from '@ant-design/icons'
 import {
   Button,
   Descriptions,
   Divider,
   Drawer,
+  Dropdown,
   Flex,
+  Popconfirm,
   Table,
   Tag,
   Typography,
@@ -55,12 +60,7 @@ const formatValue = (value: number | undefined, unit: string): string => {
 }
 
 const TrendTag: FC<{ trend: KpiTrend | undefined }> = ({ trend }) => {
-  if (!trend || trend === KpiTrend.NoData)
-    return (
-      <Tag icon={<QuestionOutlined />} color="default">
-        No Data
-      </Tag>
-    )
+  if (!trend || trend === KpiTrend.NoData) return undefined
   if (trend === KpiTrend.Improving)
     return (
       <Tag icon={<ArrowUpOutlined />} color="success">
@@ -86,12 +86,7 @@ const KPI_HEALTH_AT_RISK = 'AtRisk'
 const KPI_HEALTH_UNHEALTHY = 'Unhealthy'
 
 const KpiHealthTag: FC<{ health: string | undefined }> = ({ health }) => {
-  if (!health)
-    return (
-      <Tag icon={<QuestionOutlined />} color="default">
-        No Data
-      </Tag>
-    )
+  if (!health) return undefined
   if (health === KPI_HEALTH_HEALTHY)
     return (
       <Tag icon={<CheckCircleOutlined />} color="success">
@@ -151,6 +146,19 @@ const StrategicInitiativeKpiDetailsDrawer: FC<
     { skip: !drawerOpen },
   )
 
+  const {
+    data: measurementData,
+    isLoading: measurementsIsLoading,
+    error: measurementsError,
+    refetch: refetchMeasurements,
+  } = useGetStrategicInitiativeKpiMeasurementsQuery(
+    { strategicInitiativeId, kpiId },
+    { skip: !drawerOpen },
+  )
+
+  const [removeMeasurement] =
+    useRemoveStrategicInitiativeKpiMeasurementMutation()
+
   useEffect(() => {
     if (kpiError) {
       messageApi.error(
@@ -169,6 +177,15 @@ const StrategicInitiativeKpiDetailsDrawer: FC<
     }
   }, [checkpointsError, messageApi])
 
+  useEffect(() => {
+    if (measurementsError) {
+      messageApi.error(
+        measurementsError.detail ??
+          'An error occurred while loading measurement data. Please try again.',
+      )
+    }
+  }, [measurementsError, messageApi])
+
   const unit = kpiData?.unit as unknown as string
 
   const onEditFormClosed = (wasSaved: boolean) => {
@@ -183,7 +200,24 @@ const StrategicInitiativeKpiDetailsDrawer: FC<
     setOpenAddMeasurementForm(false)
     if (wasSaved) {
       refetchCheckpoints()
+      refetchMeasurements()
       onRefresh()
+    }
+  }
+
+  const onDeleteMeasurement = async (measurementId: string) => {
+    try {
+      await removeMeasurement({
+        strategicInitiativeId,
+        kpiId,
+        measurementId,
+      }).unwrap()
+      messageApi.success('Measurement deleted successfully.')
+      onRefresh()
+    } catch {
+      messageApi.error(
+        'An error occurred while deleting the measurement. Please try again.',
+      )
     }
   }
 
@@ -244,18 +278,87 @@ const StrategicInitiativeKpiDetailsDrawer: FC<
     },
   ]
 
-  const extraButtons = canManageKpis ? (
-    <Flex gap="small">
-      <Button size="small" onClick={() => setOpenManageCheckpointPlanForm(true)}>
-        Checkpoint Plan
-      </Button>
-      <Button size="small" onClick={() => setOpenAddMeasurementForm(true)}>
-        Add Measurement
-      </Button>
-      <Button size="small" onClick={() => setOpenEditKpiForm(true)}>
-        Edit
-      </Button>
-    </Flex>
+  const measurementColumns = [
+    {
+      title: 'Date',
+      dataIndex: 'measurementDate',
+      key: 'measurementDate',
+      width: 160,
+      render: (date: Date) =>
+        date ? dayjs(date).format('YYYY-MM-DD h:mm A') : '-',
+    },
+    {
+      title: 'Actual Value',
+      dataIndex: 'actualValue',
+      key: 'actualValue',
+      width: 110,
+      align: 'right' as const,
+      render: (value: number) => formatValue(value, unit),
+    },
+    {
+      title: 'Measured By',
+      key: 'measuredBy',
+      width: 140,
+      render: (_, record) => record.measuredBy?.name ?? '-',
+    },
+    {
+      title: 'Note',
+      dataIndex: 'note',
+      key: 'note',
+      render: (note: string | undefined) => note ?? '-',
+    },
+    ...(canManageKpis
+      ? [
+          {
+            key: 'actions',
+            width: 50,
+            align: 'center' as const,
+            render: (_, record) => (
+              <Popconfirm
+                title="Delete measurement?"
+                description="This action cannot be undone."
+                onConfirm={() => onDeleteMeasurement(record.id)}
+                okText="Delete"
+                okButtonProps={{ danger: true }}
+              >
+                <Button
+                  size="small"
+                  type="text"
+                  danger
+                  icon={<DeleteOutlined />}
+                />
+              </Popconfirm>
+            ),
+          },
+        ]
+      : []),
+  ]
+
+  const extraMenu = canManageKpis ? (
+    <Dropdown
+      menu={{
+        items: [
+          {
+            key: 'edit',
+            label: 'Edit',
+            onClick: () => setOpenEditKpiForm(true),
+          },
+          {
+            key: 'checkpoint-plan',
+            label: 'Checkpoint Plan',
+            onClick: () => setOpenManageCheckpointPlanForm(true),
+          },
+          {
+            key: 'add-measurement',
+            label: 'Add Measurement',
+            onClick: () => setOpenAddMeasurementForm(true),
+          },
+        ],
+      }}
+      trigger={['click']}
+    >
+      <Button type="text" size="small" icon={<MoreOutlined />} />
+    </Dropdown>
   ) : undefined
 
   return (
@@ -271,7 +374,7 @@ const StrategicInitiativeKpiDetailsDrawer: FC<
         destroyOnHidden={true}
         styles={{ body: { scrollbarWidth: 'auto' } as React.CSSProperties }}
         className="custom-drawer"
-        extra={extraButtons}
+        extra={extraMenu}
       >
         <Flex vertical gap="middle">
           <Descriptions column={1} size="small">
@@ -295,7 +398,7 @@ const StrategicInitiativeKpiDetailsDrawer: FC<
               </Item>
             </Descriptions>
           )}
-          <Divider orientation="left" orientationMargin={0}>
+          <Divider titlePlacement="start">
             <Text type="secondary" style={{ fontSize: 12 }}>
               Checkpoints
             </Text>
@@ -308,6 +411,21 @@ const StrategicInitiativeKpiDetailsDrawer: FC<
             loading={checkpointsIsLoading}
             pagination={false}
             locale={{ emptyText: 'No checkpoints defined' }}
+            scroll={{ x: 'max-content' }}
+          />
+          <Divider titlePlacement="start">
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              Measurements
+            </Text>
+          </Divider>
+          <Table
+            dataSource={measurementData ?? []}
+            columns={measurementColumns}
+            rowKey="id"
+            size="small"
+            loading={measurementsIsLoading}
+            pagination={false}
+            locale={{ emptyText: 'No measurements recorded' }}
             scroll={{ x: 'max-content' }}
           />
         </Flex>

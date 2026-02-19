@@ -5947,86 +5947,6 @@
         ]
       }
     },
-    "/api/ppm/strategic-initiatives/{id}/kpis/{kpiId}/measurements/{measurementId}": {
-      "delete": {
-        "tags": [
-          "StrategicInitiatives"
-        ],
-        "summary": "Remove a measurement from the strategic initiative KPI.",
-        "operationId": "StrategicInitiatives_RemoveKpiMeasurement",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "guid",
-              "nullable": false,
-              "example": "00000000-0000-0000-0000-000000000000"
-            },
-            "x-position": 1
-          },
-          {
-            "name": "kpiId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "guid",
-              "nullable": false,
-              "example": "00000000-0000-0000-0000-000000000000"
-            },
-            "x-position": 2
-          },
-          {
-            "name": "measurementId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "guid",
-              "nullable": false,
-              "example": "00000000-0000-0000-0000-000000000000"
-            },
-            "x-position": 3
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": ""
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": []
-          },
-          {
-            "ApiKey": []
-          }
-        ]
-      }
-    },
     "/api/ppm/strategic-initiatives/{id}/approve": {
       "post": {
         "tags": [
@@ -6773,6 +6693,66 @@
       }
     },
     "/api/ppm/strategic-initiatives/{id}/kpis/{kpiId}/measurements": {
+      "get": {
+        "tags": [
+          "StrategicInitiatives"
+        ],
+        "summary": "Get the measurements for a strategic initiative KPI.",
+        "operationId": "StrategicInitiatives_GetKpiMeasurements",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "kpiId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/StrategicInitiativeKpiMeasurementDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      },
       "post": {
         "tags": [
           "StrategicInitiatives"
@@ -6817,6 +6797,86 @@
           "required": true,
           "x-position": 3
         },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/ppm/strategic-initiatives/{id}/kpis/{kpiId}/measurements/{measurementId}": {
+      "delete": {
+        "tags": [
+          "StrategicInitiatives"
+        ],
+        "summary": "Remove a measurement from the strategic initiative KPI.",
+        "operationId": "StrategicInitiatives_RemoveKpiMeasurement",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "kpiId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 2
+          },
+          {
+            "name": "measurementId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 3
+          }
+        ],
         "responses": {
           "204": {
             "description": ""
@@ -20433,10 +20493,9 @@
         "required": [
           "strategicInitiativeId",
           "name",
-          "description",
           "targetValue",
-          "unitId",
-          "targetDirectionId"
+          "unit",
+          "targetDirection"
         ],
         "properties": {
           "strategicInitiativeId": {
@@ -20458,8 +20517,8 @@
             "type": "string",
             "description": "A description of what the KPI measures.",
             "maxLength": 512,
-            "minLength": 1,
-            "nullable": false
+            "minLength": 0,
+            "nullable": true
           },
           "targetValue": {
             "type": "number",
@@ -20468,15 +20527,21 @@
             "minLength": 1,
             "nullable": false
           },
-          "unitId": {
-            "type": "integer",
-            "description": "The ID of the unit of measurement for the KPI.",
-            "format": "int32"
+          "unit": {
+            "description": "The unit of measurement for the KPI.",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/KpiUnit"
+              }
+            ]
           },
-          "targetDirectionId": {
-            "type": "integer",
-            "description": "The ID of the target direction for the KPI.",
-            "format": "int32"
+          "targetDirection": {
+            "description": "The target direction for the KPI.",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/KpiTargetDirection"
+              }
+            ]
           }
         }
       },
@@ -20487,10 +20552,9 @@
           "strategicInitiativeId",
           "kpiId",
           "name",
-          "description",
           "targetValue",
-          "unitId",
-          "targetDirectionId"
+          "unit",
+          "targetDirection"
         ],
         "properties": {
           "strategicInitiativeId": {
@@ -20520,8 +20584,8 @@
             "type": "string",
             "description": "A description of what the KPI measures.",
             "maxLength": 512,
-            "minLength": 1,
-            "nullable": false
+            "minLength": 0,
+            "nullable": true
           },
           "targetValue": {
             "type": "number",
@@ -20530,15 +20594,21 @@
             "minLength": 1,
             "nullable": false
           },
-          "unitId": {
-            "type": "integer",
-            "description": "The ID of the unit of measurement for the KPI.",
-            "format": "int32"
+          "unit": {
+            "description": "The unit of measurement for the KPI.",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/KpiUnit"
+              }
+            ]
           },
-          "targetDirectionId": {
-            "type": "integer",
-            "description": "The ID of the target direction for the KPI.",
-            "format": "int32"
+          "targetDirection": {
+            "description": "The target direction for the KPI.",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/KpiTargetDirection"
+              }
+            ]
           }
         }
       },
@@ -20561,6 +20631,11 @@
           "targetValue": {
             "type": "number",
             "format": "double"
+          },
+          "atRiskValue": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
           },
           "checkpointDate": {
             "type": "string",

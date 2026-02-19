@@ -77,21 +77,6 @@ public class StrategicInitiativesController(ILogger<StrategicInitiativesControll
             : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
-    [HttpDelete("{id}/kpis/{kpiId}/measurements/{measurementId}")]
-    [MustHavePermission(ApplicationAction.Update, ApplicationResource.StrategicInitiatives)]
-    [OpenApiOperation("Remove a measurement from the strategic initiative KPI.", "")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
-    public async Task<ActionResult> RemoveKpiMeasurement(Guid id, Guid kpiId, Guid measurementId, CancellationToken cancellationToken)
-    {
-        var result = await _sender.Send(new RemoveStrategicInitiativeKpiMeasurementCommand(id, kpiId, measurementId), cancellationToken);
-
-        return result.IsSuccess
-            ? NoContent()
-            : BadRequest(result.ToBadRequestObject(HttpContext));
-    }
-
     [HttpPost("{id}/approve")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.StrategicInitiatives)]
     [OpenApiOperation("Approve a strategic initiative.", "")]
@@ -291,6 +276,20 @@ public class StrategicInitiativesController(ILogger<StrategicInitiativesControll
             : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
+    [HttpGet("{id}/kpis/{kpiId}/measurements")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.StrategicInitiatives)]
+    [OpenApiOperation("Get the measurements for a strategic initiative KPI.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<IEnumerable<StrategicInitiativeKpiMeasurementDto>>> GetKpiMeasurements(string id, string kpiId, CancellationToken cancellationToken)
+    {
+        var measurements = await _sender.Send(new GetStrategicInitiativeKpiMeasurementsQuery(id, kpiId), cancellationToken);
+
+        return measurements is not null
+            ? Ok(measurements)
+            : NotFound();
+    }
+
     [HttpPost("{id}/kpis/{kpiId}/measurements")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.StrategicInitiatives)]
     [OpenApiOperation("Add a measurement to the strategic initiative KPI.", "")]
@@ -303,6 +302,21 @@ public class StrategicInitiativesController(ILogger<StrategicInitiativesControll
             return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(HttpContext));
 
         var result = await _sender.Send(request.ToAddStrategicInitiativeKpiMeasurementCommand(), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpDelete("{id}/kpis/{kpiId}/measurements/{measurementId}")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.StrategicInitiatives)]
+    [OpenApiOperation("Remove a measurement from the strategic initiative KPI.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> RemoveKpiMeasurement(Guid id, Guid kpiId, Guid measurementId, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(new RemoveStrategicInitiativeKpiMeasurementCommand(id, kpiId, measurementId), cancellationToken);
 
         return result.IsSuccess
             ? NoContent()

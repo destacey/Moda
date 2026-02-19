@@ -1,4 +1,5 @@
-﻿using Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
+﻿using Moda.Common.Domain.Models.KeyPerformanceIndicators;
+using Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 
 namespace Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Commands.Kpis;
 
@@ -16,8 +17,12 @@ public sealed record ManageStrategicInitiativeKpiCheckpointPlanCommand(
 
 public sealed class ManageStrategicInitiativeKpiCheckpointPlanCommandValidator : AbstractValidator<ManageStrategicInitiativeKpiCheckpointPlanCommand>
 {
-    public ManageStrategicInitiativeKpiCheckpointPlanCommandValidator()
+    private readonly IProjectPortfolioManagementDbContext _dbContext;
+
+    public ManageStrategicInitiativeKpiCheckpointPlanCommandValidator(IProjectPortfolioManagementDbContext dbContext)
     {
+        _dbContext = dbContext;
+
         RuleFor(x => x.StrategicInitiativeId)
             .NotEmpty();
 
@@ -33,9 +38,41 @@ public sealed class ManageStrategicInitiativeKpiCheckpointPlanCommandValidator :
                 .Count() == checkpoints.Count(i => i.CheckpointId.HasValue))
             .WithMessage("Checkpoint IDs must be unique.");
 
-        RuleForEach(x => x.Checkpoints)
-            .SetValidator(new StrategicInitiativeKpiCheckpointPlanItemValidator());
+        RuleFor(x => x)
+            .MustAsync(HaveValidAtRiskValues)
+            .WithName("Checkpoints")
+            .WithMessage("At-risk values are invalid for the KPI's target direction.");
     }
+
+    private async Task<bool> HaveValidAtRiskValues(ManageStrategicInitiativeKpiCheckpointPlanCommand command, CancellationToken cancellationToken)
+    {
+        var itemsWithAtRiskValue = command.Checkpoints
+            .Where(c => c.AtRiskValue.HasValue)
+            .ToList();
+
+        if (itemsWithAtRiskValue.Count == 0)
+            return true;
+
+        var targetDirection = await _dbContext.StrategicInitiatives
+            .Where(i => i.Id == command.StrategicInitiativeId)
+            .SelectMany(i => i.Kpis)
+            .Where(k => k.Id == command.KpiId)
+            .Select(k => (KpiTargetDirection?)k.TargetDirection)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (targetDirection is null)
+            return true;
+
+        return itemsWithAtRiskValue.All(c => IsValidAtRiskValue(c.AtRiskValue!.Value, c.TargetValue, targetDirection.Value));
+    }
+
+    private static bool IsValidAtRiskValue(double atRiskValue, double targetValue, KpiTargetDirection direction)
+        => direction switch
+        {
+            KpiTargetDirection.Increase => atRiskValue < targetValue,
+            KpiTargetDirection.Decrease => atRiskValue > targetValue,
+            _ => true
+        };
 }
 
 public sealed class StrategicInitiativeKpiCheckpointPlanItemValidator : AbstractValidator<StrategicInitiativeKpiCheckpointPlanItem>

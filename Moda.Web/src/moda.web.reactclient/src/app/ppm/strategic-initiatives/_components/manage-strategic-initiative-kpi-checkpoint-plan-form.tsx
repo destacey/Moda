@@ -3,6 +3,7 @@
 import useAuth from '@/src/components/contexts/auth'
 import { useMessage } from '@/src/components/contexts/messaging'
 import {
+  KpiTargetDirection,
   ManageStrategicInitiativeKpiCheckpointPlanRequest,
   StrategicInitiativeKpiCheckpointPlanItem,
 } from '@/src/services/moda-api'
@@ -321,6 +322,41 @@ const ManageStrategicInitiativeKpiCheckpointPlanForm = (
                           {...restField}
                           style={{ margin: '0' }}
                           name={[name, 'atRiskValue']}
+                          rules={[
+                            {
+                              validator: (_, atRiskValue) => {
+                                if (atRiskValue == null) return Promise.resolve()
+                                const targetValue =
+                                  form.getFieldValue([
+                                    'checkpoints',
+                                    name,
+                                    'targetValue',
+                                  ]) as number | undefined
+                                if (targetValue == null) return Promise.resolve()
+                                if (atRiskValue === targetValue)
+                                  return Promise.reject(
+                                    'At risk value must differ from target value.',
+                                  )
+                                const direction =
+                                  kpiData?.targetDirection as unknown as string
+                                if (
+                                  direction === KpiTargetDirection.Increase &&
+                                  atRiskValue >= targetValue
+                                )
+                                  return Promise.reject(
+                                    'At risk value must be less than target value when direction is Increase.',
+                                  )
+                                if (
+                                  direction === KpiTargetDirection.Decrease &&
+                                  atRiskValue <= targetValue
+                                )
+                                  return Promise.reject(
+                                    'At risk value must be greater than target value when direction is Decrease.',
+                                  )
+                                return Promise.resolve()
+                              },
+                            },
+                          ]}
                         >
                           <InputNumber
                             placeholder="At Risk Value"

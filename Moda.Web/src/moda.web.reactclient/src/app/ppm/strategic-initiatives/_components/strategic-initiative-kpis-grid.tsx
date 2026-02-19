@@ -5,7 +5,7 @@ import { ModaStatisticNumber } from '@/src/components/common/metrics'
 import { RowMenuCellRenderer } from '@/src/components/common/moda-grid-cell-renderers'
 import { StrategicInitiativeKpiListDto } from '@/src/services/moda-api'
 import { ColDef, GetRowIdParams } from 'ag-grid-community'
-import { MenuProps } from 'antd'
+import { Button, MenuProps } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import { FC, useCallback, useMemo, useState } from 'react'
 import {
@@ -34,7 +34,6 @@ interface RowMenuProps extends MenuProps {
   kpiId: string
   strategicInitiativeId: string
   canManageKpis: boolean
-  onViewDetailsMenuClicked: (id: string) => void
   onEditKpiMenuClicked: (id: string) => void
   onDeleteKpiMenuClicked: (id: string) => void
   onAddMeasurementMenuClicked: (id: string) => void
@@ -42,52 +41,42 @@ interface RowMenuProps extends MenuProps {
 }
 
 const getRowMenuItems = (props: RowMenuProps): ItemType[] => {
-  if (!props.kpiId || !props.onViewDetailsMenuClicked) {
+  if (!props.kpiId || !props.canManageKpis) {
     return null
   }
 
-  const items: ItemType[] = [
-    {
-      key: 'view-details',
-      label: 'View Details',
-      onClick: () => props.onViewDetailsMenuClicked(props.kpiId),
-    },
-  ]
-
   if (
-    props.canManageKpis &&
-    props.onEditKpiMenuClicked &&
-    props.onDeleteKpiMenuClicked &&
-    props.onAddMeasurementMenuClicked &&
-    props.onManageCheckpointPlanMenuClicked
+    !props.onEditKpiMenuClicked ||
+    !props.onDeleteKpiMenuClicked ||
+    !props.onAddMeasurementMenuClicked ||
+    !props.onManageCheckpointPlanMenuClicked
   ) {
-    items.push(
-      { key: 'divider', type: 'divider' },
-      {
-        key: 'edit-kpi',
-        label: 'Edit KPI',
-        onClick: () => props.onEditKpiMenuClicked(props.kpiId),
-      },
-      {
-        key: 'delete-kpi',
-        label: 'Delete KPI',
-        onClick: () => props.onDeleteKpiMenuClicked(props.kpiId),
-      },
-      { key: 'divider2', type: 'divider' },
-      {
-        key: 'manage-checkpoint-plan',
-        label: 'Manage Checkpoint Plan',
-        onClick: () => props.onManageCheckpointPlanMenuClicked(props.kpiId),
-      },
-      {
-        key: 'add-measurement',
-        label: 'Add Measurement',
-        onClick: () => props.onAddMeasurementMenuClicked(props.kpiId),
-      },
-    )
+    return null
   }
 
-  return items
+  return [
+    {
+      key: 'edit-kpi',
+      label: 'Edit KPI',
+      onClick: () => props.onEditKpiMenuClicked(props.kpiId),
+    },
+    {
+      key: 'delete-kpi',
+      label: 'Delete KPI',
+      onClick: () => props.onDeleteKpiMenuClicked(props.kpiId),
+    },
+    { key: 'divider', type: 'divider' },
+    {
+      key: 'manage-checkpoint-plan',
+      label: 'Manage Checkpoint Plan',
+      onClick: () => props.onManageCheckpointPlanMenuClicked(props.kpiId),
+    },
+    {
+      key: 'add-measurement',
+      label: 'Add Measurement',
+      onClick: () => props.onAddMeasurementMenuClicked(props.kpiId),
+    },
+  ]
 }
 
 const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
@@ -182,7 +171,6 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
             kpiId: params.data.id,
             strategicInitiativeId: strategicInitiativeId,
             canManageKpis,
-            onViewDetailsMenuClicked,
             onEditKpiMenuClicked,
             onDeleteKpiMenuClicked,
             onAddMeasurementMenuClicked,
@@ -196,6 +184,16 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
       {
         field: 'name',
         width: 300,
+        cellRenderer: (params) => (
+          <Button
+            type="link"
+            size="small"
+            style={{ padding: 0 }}
+            onClick={() => onViewDetailsMenuClicked(params.data.id)}
+          >
+            {params.value}
+          </Button>
+        ),
       },
       {
         field: 'targetValue',

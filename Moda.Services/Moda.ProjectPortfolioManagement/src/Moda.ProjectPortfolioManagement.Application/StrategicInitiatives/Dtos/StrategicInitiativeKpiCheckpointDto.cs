@@ -6,6 +6,7 @@ public sealed record StrategicInitiativeKpiCheckpointDto : IMapFrom<StrategicIni
 {
     public Guid Id { get; set; }
     public double TargetValue { get; set; }
+    public double? AtRiskValue { get; set; }
     public Instant CheckpointDate { get; set; }
     public required string DateLabel { get; set; }
 

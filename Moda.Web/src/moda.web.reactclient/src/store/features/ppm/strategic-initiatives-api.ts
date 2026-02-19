@@ -8,6 +8,7 @@ import {
   StrategicInitiativeKpiCheckpointDto,
   StrategicInitiativeKpiDetailsDto,
   StrategicInitiativeKpiListDto,
+  StrategicInitiativeKpiMeasurementDto,
   UpdateStrategicInitiativeKpiRequest,
 } from './../../../services/moda-api'
 import { apiSlice } from './../apiSlice'
@@ -350,6 +351,10 @@ export const strategicInitiativesApi = apiSlice.injectEndpoints({
             type: QueryTags.StrategicInitiativeKpiCheckpointPlan,
             id: arg.kpiId,
           },
+          {
+            type: QueryTags.StrategicInitiativeKpiMeasurement,
+            id: arg.kpiId,
+          },
         ]
       },
     }),
@@ -463,6 +468,26 @@ export const strategicInitiativesApi = apiSlice.injectEndpoints({
         },
       ],
     }),
+    getStrategicInitiativeKpiMeasurements: builder.query<
+      StrategicInitiativeKpiMeasurementDto[],
+      { strategicInitiativeId: string; kpiId: string }
+    >({
+      queryFn: async (arg) => {
+        try {
+          const data = await getStrategicInitiativesClient().getKpiMeasurements(
+            arg.strategicInitiativeId,
+            arg.kpiId,
+          )
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: (result, error, arg) => [
+        { type: QueryTags.StrategicInitiativeKpiMeasurement, id: arg.kpiId },
+      ],
+    }),
     removeStrategicInitiativeKpiMeasurement: builder.mutation<
       void,
       { strategicInitiativeId: string; kpiId: string; measurementId: string }
@@ -515,6 +540,7 @@ export const {
   useUpdateStrategicInitiativeKpiMutation,
   useDeleteStrategicInitiativeKpiMutation,
   useAddStrategicInitiativeKpiMeasurementMutation,
+  useGetStrategicInitiativeKpiMeasurementsQuery,
   useGetStrategicInitiativeProjectsQuery,
   useManageStrategicInitiativeProjectsMutation,
   useGetStrategicInitiativeKpiCheckpointsQuery,
