@@ -20797,12 +20797,12 @@
             "description": "The list of planned KPI checkpoints.",
             "nullable": false,
             "items": {
-              "$ref": "#/components/schemas/StrategicInitiativeKpiCheckpointPlanItem"
+              "$ref": "#/components/schemas/KpiCheckpointPlanItemRequest"
             }
           }
         }
       },
-      "StrategicInitiativeKpiCheckpointPlanItem": {
+      "KpiCheckpointPlanItemRequest": {
         "type": "object",
         "additionalProperties": false,
         "required": [
@@ -20814,6 +20814,7 @@
         "properties": {
           "checkpointId": {
             "type": "string",
+            "description": "The ID of an existing checkpoint to update. Null for new checkpoints.",
             "format": "guid",
             "minLength": 1,
             "nullable": false,
@@ -20821,23 +20822,27 @@
           },
           "targetValue": {
             "type": "number",
+            "description": "The target value for this checkpoint.",
             "format": "double",
             "minLength": 1,
             "nullable": false
           },
           "atRiskValue": {
             "type": "number",
+            "description": "An optional at-risk threshold value for this checkpoint.",
             "format": "double",
             "nullable": true
           },
           "checkpointDate": {
             "type": "string",
+            "description": "The date and time of this checkpoint.",
             "format": "date-time",
             "minLength": 1,
             "nullable": false
           },
           "dateLabel": {
             "type": "string",
+            "description": "A short label describing this checkpoint (e.g. \"Q1 2025\").",
             "maxLength": 16,
             "minLength": 1,
             "nullable": false

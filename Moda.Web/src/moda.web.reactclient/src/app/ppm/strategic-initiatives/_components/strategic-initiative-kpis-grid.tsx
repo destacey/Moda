@@ -41,17 +41,15 @@ interface RowMenuProps extends MenuProps {
 }
 
 const getRowMenuItems = (props: RowMenuProps): ItemType[] => {
-  if (!props.kpiId || !props.canManageKpis) {
-    return null
-  }
-
   if (
+    !props.kpiId ||
+    !props.canManageKpis ||
     !props.onEditKpiMenuClicked ||
     !props.onDeleteKpiMenuClicked ||
     !props.onAddMeasurementMenuClicked ||
     !props.onManageCheckpointPlanMenuClicked
   ) {
-    return null
+    return []
   }
 
   return [
@@ -166,6 +164,7 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
         filter: false,
         sortable: false,
         resizable: false,
+        hide: !canManageKpis || isReadOnly,
         cellRenderer: (params) => {
           const menuItems = getRowMenuItems({
             kpiId: params.data.id,

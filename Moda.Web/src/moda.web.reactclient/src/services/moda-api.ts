@@ -20169,14 +20169,19 @@ export interface ManageStrategicInitiativeKpiCheckpointPlanRequest {
     /** The ID of the KPI. */
     kpiId: string;
     /** The list of planned KPI checkpoints. */
-    checkpoints: StrategicInitiativeKpiCheckpointPlanItem[];
+    checkpoints: KpiCheckpointPlanItemRequest[];
 }
 
-export interface StrategicInitiativeKpiCheckpointPlanItem {
+export interface KpiCheckpointPlanItemRequest {
+    /** The ID of an existing checkpoint to update. Null for new checkpoints. */
     checkpointId: string;
+    /** The target value for this checkpoint. */
     targetValue: number;
+    /** An optional at-risk threshold value for this checkpoint. */
     atRiskValue?: number | undefined;
+    /** The date and time of this checkpoint. */
     checkpointDate: Date;
+    /** A short label describing this checkpoint (e.g. "Q1 2025"). */
     dateLabel: string;
 }
 

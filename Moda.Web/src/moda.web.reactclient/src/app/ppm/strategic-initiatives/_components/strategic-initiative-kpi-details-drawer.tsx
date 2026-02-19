@@ -2,7 +2,7 @@
 
 import { MarkdownRenderer } from '@/src/components/common/markdown'
 import { useMessage } from '@/src/components/contexts/messaging'
-import { KpiTrend, KpiUnit } from '@/src/services/moda-api'
+import { KpiHealth, KpiTrend, KpiUnit } from '@/src/services/moda-api'
 import {
   useGetStrategicInitiativeKpiCheckpointPlanQuery,
   useGetStrategicInitiativeKpiMeasurementsQuery,
@@ -80,20 +80,15 @@ const TrendTag: FC<{ trend: KpiTrend | undefined }> = ({ trend }) => {
   )
 }
 
-// KpiHealth values (mirrors KpiHealth enum in backend)
-const KPI_HEALTH_HEALTHY = 'Healthy'
-const KPI_HEALTH_AT_RISK = 'AtRisk'
-const KPI_HEALTH_UNHEALTHY = 'Unhealthy'
-
-const KpiHealthTag: FC<{ health: string | undefined }> = ({ health }) => {
+const KpiHealthTag: FC<{ health: KpiHealth | undefined }> = ({ health }) => {
   if (!health) return undefined
-  if (health === KPI_HEALTH_HEALTHY)
+  if (health === KpiHealth.Healthy)
     return (
       <Tag icon={<CheckCircleOutlined />} color="success">
         Healthy
       </Tag>
     )
-  if (health === KPI_HEALTH_AT_RISK)
+  if (health === KpiHealth.AtRisk)
     return (
       <Tag icon={<ExclamationCircleOutlined />} color="warning">
         At Risk
@@ -267,7 +262,7 @@ const StrategicInitiativeKpiDetailsDrawer: FC<
       dataIndex: 'health',
       key: 'health',
       width: 110,
-      render: (health: string | undefined) => <KpiHealthTag health={health} />,
+      render: (health: KpiHealth | undefined) => <KpiHealthTag health={health} />,
     },
     {
       title: 'Trend',
