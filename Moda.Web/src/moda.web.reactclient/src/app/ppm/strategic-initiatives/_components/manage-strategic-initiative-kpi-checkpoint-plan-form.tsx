@@ -3,9 +3,9 @@
 import useAuth from '@/src/components/contexts/auth'
 import { useMessage } from '@/src/components/contexts/messaging'
 import {
+  KpiCheckpointPlanItemRequest,
   KpiTargetDirection,
   ManageStrategicInitiativeKpiCheckpointPlanRequest,
-  StrategicInitiativeKpiCheckpointPlanItem,
 } from '@/src/services/moda-api'
 import {
   useGetStrategicInitiativeKpiCheckpointsQuery,
@@ -62,13 +62,15 @@ const mapToRequestValues = (
   return {
     strategicInitiativeId,
     kpiId,
-    checkpoints: values.checkpoints.map((c) => ({
-      checkpointId: c.checkpointId,
-      targetValue: c.targetValue,
-      atRiskValue: c.atRiskValue ?? undefined,
-      checkpointDate: (c.checkpointDate as any)?.toISOString(),
-      dateLabel: c.dateLabel,
-    })) as StrategicInitiativeKpiCheckpointPlanItem[],
+    checkpoints: values.checkpoints.map(
+      (c): KpiCheckpointPlanItemRequest => ({
+        checkpointId: c.checkpointId,
+        targetValue: c.targetValue,
+        atRiskValue: c.atRiskValue ?? undefined,
+        checkpointDate: (c.checkpointDate as any)?.toISOString(),
+        dateLabel: c.dateLabel,
+      }),
+    ),
   }
 }
 
@@ -325,14 +327,15 @@ const ManageStrategicInitiativeKpiCheckpointPlanForm = (
                           rules={[
                             {
                               validator: (_, atRiskValue) => {
-                                if (atRiskValue == null) return Promise.resolve()
-                                const targetValue =
-                                  form.getFieldValue([
-                                    'checkpoints',
-                                    name,
-                                    'targetValue',
-                                  ]) as number | undefined
-                                if (targetValue == null) return Promise.resolve()
+                                if (atRiskValue == null)
+                                  return Promise.resolve()
+                                const targetValue = form.getFieldValue([
+                                  'checkpoints',
+                                  name,
+                                  'targetValue',
+                                ]) as number | undefined
+                                if (targetValue == null)
+                                  return Promise.resolve()
                                 if (atRiskValue === targetValue)
                                   return Promise.reject(
                                     'At risk value must differ from target value.',
