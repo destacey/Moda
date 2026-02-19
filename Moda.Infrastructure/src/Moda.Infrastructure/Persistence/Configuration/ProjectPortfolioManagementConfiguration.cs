@@ -309,6 +309,7 @@ public class StrategicInitiativeKpiCheckpointConfiguration : IEntityTypeConfigur
         builder.HasIndex(k => k.KpiId);
 
         builder.Property(k => k.TargetValue).IsRequired();
+        builder.Property(k => k.AtRiskValue);
         builder.Property(k => k.CheckpointDate).IsRequired();
         builder.Property(k => k.DateLabel).HasMaxLength(16).IsRequired();
     }

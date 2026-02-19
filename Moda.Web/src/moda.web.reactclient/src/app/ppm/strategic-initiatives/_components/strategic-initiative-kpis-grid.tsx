@@ -13,6 +13,7 @@ import {
   DeleteStrategicInitiativeKpiForm,
   EditStrategicInitiativeKpiForm,
   ManageStrategicInitiativeKpiCheckpointPlanForm,
+  StrategicInitiativeKpiDetailsDrawer,
 } from '.'
 
 export interface StrategicInitiativeKpisGridProps {
@@ -33,6 +34,7 @@ interface RowMenuProps extends MenuProps {
   kpiId: string
   strategicInitiativeId: string
   canManageKpis: boolean
+  onViewDetailsMenuClicked: (id: string) => void
   onEditKpiMenuClicked: (id: string) => void
   onDeleteKpiMenuClicked: (id: string) => void
   onAddMeasurementMenuClicked: (id: string) => void
@@ -40,43 +42,52 @@ interface RowMenuProps extends MenuProps {
 }
 
 const getRowMenuItems = (props: RowMenuProps): ItemType[] => {
-  if (
-    !props.canManageKpis ||
-    !props.kpiId ||
-    !props.onEditKpiMenuClicked ||
-    !props.onDeleteKpiMenuClicked ||
-    !props.onAddMeasurementMenuClicked ||
-    !props.onManageCheckpointPlanMenuClicked
-  ) {
+  if (!props.kpiId || !props.onViewDetailsMenuClicked) {
     return null
   }
 
-  return [
+  const items: ItemType[] = [
     {
-      key: 'edit-kpi',
-      label: 'Edit KPI',
-      onClick: () => props.onEditKpiMenuClicked(props.kpiId),
-    },
-    {
-      key: 'delete-kpi',
-      label: 'Delete KPI',
-      onClick: () => props.onDeleteKpiMenuClicked(props.kpiId),
-    },
-    {
-      key: 'divider',
-      type: 'divider',
-    },
-    {
-      key: 'manage-checkpoint-plan',
-      label: 'Manage Checkpoint Plan',
-      onClick: () => props.onManageCheckpointPlanMenuClicked(props.kpiId),
-    },
-    {
-      key: 'add-measurement',
-      label: 'Add Measurement',
-      onClick: () => props.onAddMeasurementMenuClicked(props.kpiId),
+      key: 'view-details',
+      label: 'View Details',
+      onClick: () => props.onViewDetailsMenuClicked(props.kpiId),
     },
   ]
+
+  if (
+    props.canManageKpis &&
+    props.onEditKpiMenuClicked &&
+    props.onDeleteKpiMenuClicked &&
+    props.onAddMeasurementMenuClicked &&
+    props.onManageCheckpointPlanMenuClicked
+  ) {
+    items.push(
+      { key: 'divider', type: 'divider' },
+      {
+        key: 'edit-kpi',
+        label: 'Edit KPI',
+        onClick: () => props.onEditKpiMenuClicked(props.kpiId),
+      },
+      {
+        key: 'delete-kpi',
+        label: 'Delete KPI',
+        onClick: () => props.onDeleteKpiMenuClicked(props.kpiId),
+      },
+      { key: 'divider2', type: 'divider' },
+      {
+        key: 'manage-checkpoint-plan',
+        label: 'Manage Checkpoint Plan',
+        onClick: () => props.onManageCheckpointPlanMenuClicked(props.kpiId),
+      },
+      {
+        key: 'add-measurement',
+        label: 'Add Measurement',
+        onClick: () => props.onAddMeasurementMenuClicked(props.kpiId),
+      },
+    )
+  }
+
+  return items
 }
 
 const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
@@ -93,12 +104,19 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
   } = props
 
   const [selectedKpiId, setSelectedKpiId] = useState<string | null>(null)
+  const [openKpiDetailsDrawer, setOpenKpiDetailsDrawer] =
+    useState<boolean>(false)
   const [openEditKpiForm, setOpenEditKpiForm] = useState<boolean>(false)
   const [openDeleteKpiForm, setOpenDeleteKpiForm] = useState<boolean>(false)
   const [openAddMeasurementForm, setOpenAddMeasurementForm] =
     useState<boolean>(false)
   const [openManageCheckpointPlanForm, setOpenManageCheckpointPlanForm] =
     useState<boolean>(false)
+
+  const onViewDetailsMenuClicked = useCallback((id: string) => {
+    setSelectedKpiId(id)
+    setOpenKpiDetailsDrawer(true)
+  }, [])
 
   const onEditKpiMenuClicked = useCallback((id: string) => {
     setSelectedKpiId(id)
@@ -159,12 +177,12 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
         filter: false,
         sortable: false,
         resizable: false,
-        hide: isReadOnly || !canManageKpis,
         cellRenderer: (params) => {
           const menuItems = getRowMenuItems({
             kpiId: params.data.id,
             strategicInitiativeId: strategicInitiativeId,
             canManageKpis,
+            onViewDetailsMenuClicked,
             onEditKpiMenuClicked,
             onDeleteKpiMenuClicked,
             onAddMeasurementMenuClicked,
@@ -205,9 +223,9 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
       },
     ],
     [
-      isReadOnly,
       canManageKpis,
       strategicInitiativeId,
+      onViewDetailsMenuClicked,
       onEditKpiMenuClicked,
       onDeleteKpiMenuClicked,
       onAddMeasurementMenuClicked,
@@ -235,6 +253,19 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
         emptyMessage="No KPIs found."
         getRowId={getRowId}
       />
+      {selectedKpiId && (
+        <StrategicInitiativeKpiDetailsDrawer
+          strategicInitiativeId={strategicInitiativeId}
+          kpiId={selectedKpiId}
+          drawerOpen={openKpiDetailsDrawer}
+          onDrawerClose={() => {
+            setOpenKpiDetailsDrawer(false)
+            setSelectedKpiId(null)
+          }}
+          canManageKpis={canManageKpis && !isReadOnly}
+          onRefresh={refresh}
+        />
+      )}
       {openEditKpiForm && selectedKpiId && (
         <EditStrategicInitiativeKpiForm
           strategicInitiativeId={strategicInitiativeId}

@@ -5,6 +5,7 @@ namespace Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Comma
 public sealed record StrategicInitiativeKpiCheckpointPlanItem(
     Guid? CheckpointId,
     double TargetValue,
+    double? AtRiskValue,
     Instant CheckpointDate,
     string DateLabel);
 
@@ -47,6 +48,11 @@ public sealed class StrategicInitiativeKpiCheckpointPlanItemValidator : Abstract
 
         RuleFor(x => x.TargetValue)
             .NotEmpty();
+
+        RuleFor(x => x.AtRiskValue)
+            .NotEqual(x => x.TargetValue)
+            .When(x => x.AtRiskValue.HasValue)
+            .WithMessage("At-risk value must differ from target value.");
 
         RuleFor(x => x.CheckpointDate)
             .NotEmpty();
@@ -97,7 +103,7 @@ internal sealed class ManageStrategicInitiativeKpiCheckpointPlanCommandHandler(
             }
 
             var checkpoints = request.Checkpoints
-                .Select(c => UpsertStrategicInitiativeKpiCheckpoint.Create(c.CheckpointId, c.TargetValue, c.CheckpointDate, c.DateLabel))
+                .Select(c => UpsertStrategicInitiativeKpiCheckpoint.Create(c.CheckpointId, c.TargetValue, c.CheckpointDate, c.DateLabel, c.AtRiskValue))
                 .ToList();
 
             var manageResult = kpi.ManageCheckpointPlan(checkpoints);

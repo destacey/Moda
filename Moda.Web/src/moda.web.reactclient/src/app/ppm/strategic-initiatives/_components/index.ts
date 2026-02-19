@@ -9,4 +9,5 @@ export { default as EditStrategicInitiativeKpiForm } from './edit-strategic-init
 export { default as ManageStrategicInitiativeKpiCheckpointPlanForm } from './manage-strategic-initiative-kpi-checkpoint-plan-form'
 export { default as ManageStrategicInitiativeProjectsForm } from './manage-strategic-initiative-projects-form'
 export { default as StrategicInitiativeDetails } from './strategic-initiative-details'
+export { default as StrategicInitiativeKpiDetailsDrawer } from './strategic-initiative-kpi-details-drawer'
 export { default as StrategicInitiativeKpisGrid } from './strategic-initiative-kpis-grid'

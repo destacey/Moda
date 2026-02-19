@@ -20591,6 +20591,11 @@
             "type": "number",
             "format": "double"
           },
+          "atRiskValue": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
           "checkpointDate": {
             "type": "string",
             "format": "date-time"
@@ -20606,9 +20611,13 @@
               }
             ]
           },
-          "targetMet": {
-            "type": "boolean",
-            "nullable": true
+          "health": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/KpiHealth"
+              }
+            ]
           },
           "trend": {
             "nullable": true,
@@ -20652,6 +20661,20 @@
             "nullable": true
           }
         }
+      },
+      "KpiHealth": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "Healthy",
+          "AtRisk",
+          "Unhealthy"
+        ],
+        "enum": [
+          "Healthy",
+          "AtRisk",
+          "Unhealthy"
+        ]
       },
       "KpiTrend": {
         "type": "string",
@@ -20726,6 +20749,11 @@
             "format": "double",
             "minLength": 1,
             "nullable": false
+          },
+          "atRiskValue": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
           },
           "checkpointDate": {
             "type": "string",

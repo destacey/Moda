@@ -96,7 +96,7 @@ public sealed class StrategicInitiativeKpi : Kpi, ISystemAuditable
             if (existingCheckpoint is null)
                 return Result.Failure($"Checkpoint {checkpoint.Id} not found.");
 
-            var updateResult = existingCheckpoint.Update(checkpoint.TargetValue, checkpoint.CheckpointDate, checkpoint.DateLabel);
+            var updateResult = existingCheckpoint.Update(checkpoint.TargetValue, checkpoint.CheckpointDate, checkpoint.DateLabel, checkpoint.AtRiskValue);
             if (updateResult.IsFailure)
                 return Result.Failure(updateResult.Error);
         }
@@ -104,7 +104,7 @@ public sealed class StrategicInitiativeKpi : Kpi, ISystemAuditable
         // add new checkpoints
         foreach (var checkpoint in checkpointList.Where(c => c.IsNew))
         {
-            var checkpointToAdd = StrategicInitiativeKpiCheckpoint.Create(Id, checkpoint.TargetValue, checkpoint.CheckpointDate, checkpoint.DateLabel);
+            var checkpointToAdd = StrategicInitiativeKpiCheckpoint.Create(Id, checkpoint.TargetValue, checkpoint.CheckpointDate, checkpoint.DateLabel, checkpoint.AtRiskValue);
             var addResult = AddCheckpoint(checkpointToAdd);
             if (addResult.IsFailure)
                 return Result.Failure(addResult.Error);

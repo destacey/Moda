@@ -20069,10 +20069,11 @@ export interface StrategicInitiativeKpiCheckpointDto {
 export interface StrategicInitiativeKpiCheckpointDetailsDto {
     id: string;
     targetValue: number;
+    atRiskValue?: number | undefined;
     checkpointDate: Date;
     dateLabel: string;
     measurement?: StrategicInitiativeKpiMeasurementDto | undefined;
-    targetMet?: boolean | undefined;
+    health?: KpiHealth | undefined;
     trend?: KpiTrend | undefined;
 }
 
@@ -20082,6 +20083,12 @@ export interface StrategicInitiativeKpiMeasurementDto {
     measurementDate: Date;
     measuredBy: EmployeeNavigationDto;
     note?: string | undefined;
+}
+
+export enum KpiHealth {
+    Healthy = "Healthy",
+    AtRisk = "AtRisk",
+    Unhealthy = "Unhealthy",
 }
 
 export enum KpiTrend {
@@ -20103,6 +20110,7 @@ export interface ManageStrategicInitiativeKpiCheckpointPlanRequest {
 export interface StrategicInitiativeKpiCheckpointPlanItem {
     checkpointId: string;
     targetValue: number;
+    atRiskValue?: number | undefined;
     checkpointDate: Date;
     dateLabel: string;
 }

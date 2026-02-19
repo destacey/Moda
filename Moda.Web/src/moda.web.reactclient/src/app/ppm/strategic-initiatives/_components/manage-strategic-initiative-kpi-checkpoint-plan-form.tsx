@@ -44,6 +44,7 @@ export interface ManageStrategicInitiativeKpiCheckpointPlanFormProps {
 interface CheckpointPlanItemFormValues {
   checkpointId?: string
   targetValue: number
+  atRiskValue?: number
   checkpointDate: Date
   dateLabel: string
 }
@@ -63,6 +64,7 @@ const mapToRequestValues = (
     checkpoints: values.checkpoints.map((c) => ({
       checkpointId: c.checkpointId,
       targetValue: c.targetValue,
+      atRiskValue: c.atRiskValue ?? undefined,
       checkpointDate: (c.checkpointDate as any)?.toISOString(),
       dateLabel: c.dateLabel,
     })) as StrategicInitiativeKpiCheckpointPlanItem[],
@@ -118,6 +120,7 @@ const ManageStrategicInitiativeKpiCheckpointPlanForm = (
       checkpoints: (checkpointPlanData ?? []).map((c) => ({
         checkpointId: c.id,
         targetValue: c.targetValue,
+        atRiskValue: c.atRiskValue ?? undefined,
         checkpointDate: dayjs(c.checkpointDate),
         dateLabel: c.dateLabel,
       })),
@@ -209,7 +212,7 @@ const ManageStrategicInitiativeKpiCheckpointPlanForm = (
       onCancel={handleCancel}
       keyboard={false}
       destroyOnHidden={true}
-      width={600}
+      width={750}
     >
       <Form
         form={form}
@@ -312,6 +315,18 @@ const ManageStrategicInitiativeKpiCheckpointPlanForm = (
                             prefix={targetValuePrefix}
                             suffix={targetValueSuffix}
                             style={{ width: 125 }}
+                          />
+                        </Item>
+                        <Item
+                          {...restField}
+                          style={{ margin: '0' }}
+                          name={[name, 'atRiskValue']}
+                        >
+                          <InputNumber
+                            placeholder="At Risk Value"
+                            prefix={targetValuePrefix}
+                            suffix={targetValueSuffix}
+                            style={{ width: 130 }}
                           />
                         </Item>
                       </Flex>

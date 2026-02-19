@@ -8,16 +8,17 @@ public sealed record StrategicInitiativeKpiCheckpointDetailsDto : IMapFrom<Strat
 {
     public Guid Id { get; set; }
     public double TargetValue { get; set; }
+    public double? AtRiskValue { get; set; }
     public Instant CheckpointDate { get; set; }
     public required string DateLabel { get; set; }
     public StrategicInitiativeKpiMeasurementDto? Measurement { get; set; }
-    public bool? TargetMet { get; set; }
+    public KpiHealth? Health { get; set; }
     public KpiTrend? Trend { get; set; }
 
     public void Enrich(StrategicInitiativeKpiMeasurementDto measurement, StrategicInitiativeKpiMeasurementDto? previousCheckpointMeasurement, KpiTargetDirection kpiTargetDirection)
     {
         Measurement = measurement;
-        TargetMet = KpiUtils.IsKpiOnTrack(measurement.ActualValue, TargetValue, kpiTargetDirection);
+        Health = KpiUtils.GetKpiHealth(measurement.ActualValue, TargetValue, AtRiskValue, kpiTargetDirection);
         Trend = KpiUtils.GetKpiTrend(previousCheckpointMeasurement?.ActualValue, measurement.ActualValue, kpiTargetDirection);
     }
 
