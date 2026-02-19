@@ -88,8 +88,6 @@ export enum QueryTags {
   StrategicInitiativeKpiCheckpoint = 'Ppm.StrategicInitiativeKpiCheckpoint',
   StrategicInitiativeKpiCheckpointPlan = 'Ppm.StrategicInitiativeKpiCheckpointPlan',
   StrategicInitiativeKpiMeasurement = 'Ppm.StrategicInitiativeKpiMeasurement',
-  StrategicInitiativeKpiUnit = 'Ppm.StrategicInitiativeKpiUnit',
-  StrategicInitiativeKpiTargetDirection = 'Ppm.StrategicInitiativeKpiTargetDirection',
   StrategicInitiativeProject = 'Ppm.StrategicInitiativeProject',
 
   // STRATEGIC MANAGEMENT

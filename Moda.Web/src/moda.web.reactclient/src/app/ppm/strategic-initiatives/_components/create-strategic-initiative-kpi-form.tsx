@@ -5,11 +5,7 @@ import { MarkdownEditor } from '@/src/components/common/markdown'
 import useAuth from '@/src/components/contexts/auth'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { CreateStrategicInitiativeKpiRequest } from '@/src/services/moda-api'
-import {
-  useCreateStrategicInitiativeKpiMutation,
-  useGetStrategicInitiativeKpiTargetDirectionOptionsQuery,
-  useGetStrategicInitiativeKpiUnitOptionsQuery,
-} from '@/src/store/features/ppm/strategic-initiatives-api'
+import { useCreateStrategicInitiativeKpiMutation } from '@/src/store/features/ppm/strategic-initiatives-api'
 import { toFormErrors } from '@/src/utils'
 import { Form, InputNumber, Modal, Select } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
@@ -32,6 +28,17 @@ interface CreateStrategicInitiativeKpiFormValues {
 
 const TypedFormItem =
   createTypedFormItem<CreateStrategicInitiativeKpiFormValues>()
+
+const kpiUnitOptions = [
+  { label: 'Percentage', value: 1 },
+  { label: 'Number', value: 2 },
+  { label: 'USD', value: 3 },
+]
+
+const kpiTargetDirectionOptions = [
+  { label: 'Increase', value: 1 },
+  { label: 'Decrease', value: 2 },
+]
 
 const mapToRequestValues = (
   values: CreateStrategicInitiativeKpiFormValues,
@@ -68,18 +75,6 @@ const CreateStrategicInitiativeKpiForm = (
 
   const [createKpi, { error: mutationError }] =
     useCreateStrategicInitiativeKpiMutation()
-
-  const {
-    data: unitData,
-    isLoading: unitsIsLoading,
-    error: unitsError,
-  } = useGetStrategicInitiativeKpiUnitOptionsQuery()
-
-  const {
-    data: targetDirectionData,
-    isLoading: targetDirectionIsLoading,
-    error: targetDirectionError,
-  } = useGetStrategicInitiativeKpiTargetDirectionOptionsQuery()
 
   const formAction = async (
     values: CreateStrategicInitiativeKpiFormValues,
@@ -146,18 +141,6 @@ const CreateStrategicInitiativeKpiForm = (
   }, [canCreateKpis, messageApi, onFormCancel, showForm])
 
   useEffect(() => {
-    if (unitsError || targetDirectionError) {
-      console.error(unitsError || targetDirectionError)
-      messageApi.error(
-        unitsError.detail ||
-          targetDirectionError.detail ||
-          'An error occurred while loading form data.',
-      )
-      onFormCancel()
-    }
-  }, [messageApi, onFormCancel, targetDirectionError, unitsError])
-
-  useEffect(() => {
     form.validateFields({ validateOnly: true }).then(
       () => setIsValid(true && form.isFieldsTouched()),
       () => setIsValid(false),
@@ -221,7 +204,7 @@ const CreateStrategicInitiativeKpiForm = (
           >
             <Select
               allowClear
-              options={unitData ?? []}
+              options={kpiUnitOptions}
               placeholder="Select Unit"
             />
           </TypedFormItem>
@@ -234,7 +217,7 @@ const CreateStrategicInitiativeKpiForm = (
           >
             <Select
               allowClear
-              options={targetDirectionData ?? []}
+              options={kpiTargetDirectionOptions}
               placeholder="Select Target Direction"
             />
           </TypedFormItem>

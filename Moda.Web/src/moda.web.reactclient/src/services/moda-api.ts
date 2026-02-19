@@ -7997,122 +7997,6 @@ export class StrategicInitiativesClient {
     }
 
     /**
-     * Get a list of KPI units.
-     */
-    getKpiUnits( cancelToken?: CancelToken): Promise<StrategicInitiativeKpiUnitDto[]> {
-        let url_ = this.baseUrl + "/api/ppm/strategic-initiatives/kpi-units";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "GET",
-            url: url_,
-            headers: {
-                "Accept": "application/json"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processGetKpiUnits(_response);
-        });
-    }
-
-    protected processGetKpiUnits(response: AxiosResponse): Promise<StrategicInitiativeKpiUnitDto[]> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = JSON.parse(resultData200);
-            return Promise.resolve<StrategicInitiativeKpiUnitDto[]>(result200);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = JSON.parse(resultData400);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<StrategicInitiativeKpiUnitDto[]>(null as any);
-    }
-
-    /**
-     * Get a list of KPI target directions.
-     */
-    getKpiTargetDirections( cancelToken?: CancelToken): Promise<StrategicInitiativeKpiTargetDirectionDto[]> {
-        let url_ = this.baseUrl + "/api/ppm/strategic-initiatives/kpi-target-directions";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "GET",
-            url: url_,
-            headers: {
-                "Accept": "application/json"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processGetKpiTargetDirections(_response);
-        });
-    }
-
-    protected processGetKpiTargetDirections(response: AxiosResponse): Promise<StrategicInitiativeKpiTargetDirectionDto[]> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = JSON.parse(resultData200);
-            return Promise.resolve<StrategicInitiativeKpiTargetDirectionDto[]>(result200);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = JSON.parse(resultData400);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<StrategicInitiativeKpiTargetDirectionDto[]>(null as any);
-    }
-
-    /**
      * Get a list of projects for the strategic initiative.
      */
     getProjects(idOrKey: string, cancelToken?: CancelToken): Promise<ProjectListDto[]> {
@@ -20117,8 +20001,19 @@ export interface StrategicInitiativeKpiListDto {
     name: string;
     targetValue: number;
     actualValue?: number | undefined;
-    unit: SimpleNavigationDto;
-    targetDirection: SimpleNavigationDto;
+    unit: KpiUnit;
+    targetDirection: KpiTargetDirection;
+}
+
+export enum KpiUnit {
+    Percentage = "Percentage",
+    Number = "Number",
+    USD = "USD",
+}
+
+export enum KpiTargetDirection {
+    Increase = "Increase",
+    Decrease = "Decrease",
 }
 
 export interface StrategicInitiativeKpiDetailsDto {
@@ -20128,8 +20023,8 @@ export interface StrategicInitiativeKpiDetailsDto {
     description?: string | undefined;
     targetValue: number;
     actualValue?: number | undefined;
-    unit: SimpleNavigationDto;
-    targetDirection: SimpleNavigationDto;
+    unit: KpiUnit;
+    targetDirection: KpiTargetDirection;
 }
 
 export interface CreateStrategicInitiativeKpiRequest {
@@ -20223,12 +20118,6 @@ export interface AddStrategicInitiativeKpiMeasurementRequest {
     measurementDate: Date;
     /** Optional note providing context for the measurement. */
     note?: string | undefined;
-}
-
-export interface StrategicInitiativeKpiUnitDto extends CommonEnumDto {
-}
-
-export interface StrategicInitiativeKpiTargetDirectionDto extends CommonEnumDto {
 }
 
 export interface ManageStrategicInitiativeProjectsRequest {

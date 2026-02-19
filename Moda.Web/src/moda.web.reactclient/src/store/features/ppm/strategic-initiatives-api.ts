@@ -20,7 +20,6 @@ import {
   StrategicInitiativeListDto,
   UpdateStrategicInitiativeRequest,
 } from '@/src/services/moda-api'
-import { BaseOptionType } from 'antd/es/select'
 
 export const strategicInitiativesApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -354,56 +353,6 @@ export const strategicInitiativesApi = apiSlice.injectEndpoints({
         ]
       },
     }),
-    getStrategicInitiativeKpiUnitOptions: builder.query<BaseOptionType[], void>(
-      {
-        queryFn: async () => {
-          try {
-            const units = await getStrategicInitiativesClient().getKpiUnits()
-
-            const data: BaseOptionType[] = units
-              .sort((a, b) => a.order - b.order)
-              .map((category) => ({
-                label: category.name,
-                value: category.id,
-              }))
-
-            return { data }
-          } catch (error) {
-            console.error('API Error:', error)
-            return { error }
-          }
-        },
-        providesTags: () => [
-          { type: QueryTags.StrategicInitiativeKpiUnit, id: 'LIST' },
-        ],
-      },
-    ),
-    getStrategicInitiativeKpiTargetDirectionOptions: builder.query<
-      BaseOptionType[],
-      void
-    >({
-      queryFn: async () => {
-        try {
-          const targetDirections =
-            await getStrategicInitiativesClient().getKpiTargetDirections()
-
-          const data: BaseOptionType[] = targetDirections
-            .sort((a, b) => a.order - b.order)
-            .map((category) => ({
-              label: category.name,
-              value: category.id,
-            }))
-
-          return { data }
-        } catch (error) {
-          console.error('API Error:', error)
-          return { error }
-        }
-      },
-      providesTags: () => [
-        { type: QueryTags.StrategicInitiativeKpiTargetDirection, id: 'LIST' },
-      ],
-    }),
     getStrategicInitiativeProjects: builder.query<ProjectListDto[], string>({
       queryFn: async (idOrKey) => {
         try {
@@ -566,8 +515,6 @@ export const {
   useUpdateStrategicInitiativeKpiMutation,
   useDeleteStrategicInitiativeKpiMutation,
   useAddStrategicInitiativeKpiMeasurementMutation,
-  useGetStrategicInitiativeKpiUnitOptionsQuery,
-  useGetStrategicInitiativeKpiTargetDirectionOptionsQuery,
   useGetStrategicInitiativeProjectsQuery,
   useManageStrategicInitiativeProjectsMutation,
   useGetStrategicInitiativeKpiCheckpointsQuery,
