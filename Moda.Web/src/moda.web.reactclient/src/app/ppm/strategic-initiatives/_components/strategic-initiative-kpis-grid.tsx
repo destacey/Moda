@@ -12,6 +12,7 @@ import {
   AddStrategicInitiativeKpiMeasurementForm,
   DeleteStrategicInitiativeKpiForm,
   EditStrategicInitiativeKpiForm,
+  ManageStrategicInitiativeKpiCheckpointPlanForm,
 } from '.'
 
 export interface StrategicInitiativeKpisGridProps {
@@ -35,6 +36,7 @@ interface RowMenuProps extends MenuProps {
   onEditKpiMenuClicked: (id: string) => void
   onDeleteKpiMenuClicked: (id: string) => void
   onAddMeasurementMenuClicked: (id: string) => void
+  onManageCheckpointPlanMenuClicked: (id: string) => void
 }
 
 const getRowMenuItems = (props: RowMenuProps): ItemType[] => {
@@ -43,7 +45,8 @@ const getRowMenuItems = (props: RowMenuProps): ItemType[] => {
     !props.kpiId ||
     !props.onEditKpiMenuClicked ||
     !props.onDeleteKpiMenuClicked ||
-    !props.onAddMeasurementMenuClicked
+    !props.onAddMeasurementMenuClicked ||
+    !props.onManageCheckpointPlanMenuClicked
   ) {
     return null
   }
@@ -62,6 +65,11 @@ const getRowMenuItems = (props: RowMenuProps): ItemType[] => {
     {
       key: 'divider',
       type: 'divider',
+    },
+    {
+      key: 'manage-checkpoint-plan',
+      label: 'Manage Checkpoint Plan',
+      onClick: () => props.onManageCheckpointPlanMenuClicked(props.kpiId),
     },
     {
       key: 'add-measurement',
@@ -88,6 +96,8 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
   const [openEditKpiForm, setOpenEditKpiForm] = useState<boolean>(false)
   const [openDeleteKpiForm, setOpenDeleteKpiForm] = useState<boolean>(false)
   const [openAddMeasurementForm, setOpenAddMeasurementForm] =
+    useState<boolean>(false)
+  const [openManageCheckpointPlanForm, setOpenManageCheckpointPlanForm] =
     useState<boolean>(false)
 
   const onEditKpiMenuClicked = useCallback((id: string) => {
@@ -129,6 +139,19 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
     }
   }
 
+  const onManageCheckpointPlanMenuClicked = useCallback((id: string) => {
+    setSelectedKpiId(id)
+    setOpenManageCheckpointPlanForm(true)
+  }, [])
+
+  const onManageCheckpointPlanFormClosed = (wasSaved: boolean) => {
+    setOpenManageCheckpointPlanForm(false)
+    setSelectedKpiId(null)
+    if (wasSaved) {
+      refresh()
+    }
+  }
+
   const columnDefs = useMemo<ColDef<StrategicInitiativeKpiListDto>[]>(
     () => [
       {
@@ -145,6 +168,7 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
             onEditKpiMenuClicked,
             onDeleteKpiMenuClicked,
             onAddMeasurementMenuClicked,
+            onManageCheckpointPlanMenuClicked,
           })
 
           return RowMenuCellRenderer({ ...params, menuItems })
@@ -170,12 +194,12 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
         cellRenderer: StatisticNumberCellRenderer,
       },
       {
-        field: 'unit.name',
+        field: 'unit',
         headerName: 'Unit',
         width: 125,
       },
       {
-        field: 'targetDirection.name',
+        field: 'targetDirection',
         headerName: 'Target Direction',
         width: 125,
       },
@@ -187,6 +211,7 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
       onEditKpiMenuClicked,
       onDeleteKpiMenuClicked,
       onAddMeasurementMenuClicked,
+      onManageCheckpointPlanMenuClicked,
     ],
   )
 
@@ -235,6 +260,15 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
           showForm={openAddMeasurementForm}
           onFormComplete={() => onAddMeasurementFormClosed(true)}
           onFormCancel={() => onAddMeasurementFormClosed(false)}
+        />
+      )}
+      {openManageCheckpointPlanForm && selectedKpiId && (
+        <ManageStrategicInitiativeKpiCheckpointPlanForm
+          strategicInitiativeId={strategicInitiativeId}
+          kpiId={selectedKpiId}
+          showForm={openManageCheckpointPlanForm}
+          onFormComplete={() => onManageCheckpointPlanFormClosed(true)}
+          onFormCancel={() => onManageCheckpointPlanFormClosed(false)}
         />
       )}
     </>
