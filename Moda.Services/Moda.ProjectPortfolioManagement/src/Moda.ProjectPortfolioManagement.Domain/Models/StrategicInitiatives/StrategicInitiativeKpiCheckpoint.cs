@@ -7,8 +7,8 @@ public sealed class StrategicInitiativeKpiCheckpoint : KpiCheckpoint, ISystemAud
 {
     private StrategicInitiativeKpiCheckpoint() : base() { }
 
-    private StrategicInitiativeKpiCheckpoint(Guid kpiId, double targetValue, Instant checkpointDate, string dateLabel)
-        : base(kpiId, targetValue, checkpointDate, dateLabel)
+    private StrategicInitiativeKpiCheckpoint(Guid kpiId, double targetValue, Instant checkpointDate, string dateLabel, double? atRiskValue = null)
+        : base(kpiId, targetValue, checkpointDate, dateLabel, atRiskValue)
     {
     }
 
@@ -19,9 +19,10 @@ public sealed class StrategicInitiativeKpiCheckpoint : KpiCheckpoint, ISystemAud
     /// <param name="targetValue">The planned target value for the KPI at this checkpoint.</param>
     /// <param name="checkpointDate">The date and time when this planned target is expected to be achieved.</param>
     /// <param name="dateLabel">A short label that describes the date of this checkpoint.</param>
+    /// <param name="atRiskValue">The optional at-risk threshold value for this checkpoint.</param>
     /// <returns></returns>
-    public static StrategicInitiativeKpiCheckpoint Create(Guid kpiId, double targetValue, Instant checkpointDate, string dateLabel)
+    public static StrategicInitiativeKpiCheckpoint Create(Guid kpiId, double targetValue, Instant checkpointDate, string dateLabel, double? atRiskValue = null)
     {
-        return new StrategicInitiativeKpiCheckpoint(kpiId, targetValue, checkpointDate, dateLabel);
+        return new StrategicInitiativeKpiCheckpoint(kpiId, targetValue, checkpointDate, dateLabel, atRiskValue);
     }
 }

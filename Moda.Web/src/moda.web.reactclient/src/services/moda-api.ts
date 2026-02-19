@@ -7657,6 +7657,269 @@ export class StrategicInitiativesClient {
     }
 
     /**
+     * Get the checkpoints for a strategic initiative KPI.
+     */
+    getKpiCheckpoints(id: string, kpiId: string, cancelToken?: CancelToken): Promise<StrategicInitiativeKpiCheckpointDto[]> {
+        let url_ = this.baseUrl + "/api/ppm/strategic-initiatives/{id}/kpis/{kpiId}/checkpoints";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        if (kpiId === undefined || kpiId === null)
+            throw new globalThis.Error("The parameter 'kpiId' must be defined.");
+        url_ = url_.replace("{kpiId}", encodeURIComponent("" + kpiId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetKpiCheckpoints(_response);
+        });
+    }
+
+    protected processGetKpiCheckpoints(response: AxiosResponse): Promise<StrategicInitiativeKpiCheckpointDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<StrategicInitiativeKpiCheckpointDto[]>(result200);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<StrategicInitiativeKpiCheckpointDto[]>(null as any);
+    }
+
+    /**
+     * Get the checkpoint plan for a strategic initiative KPI. The checkpoint plan provides the checkpoints and their corresponding measurements.
+     */
+    getKpiCheckpointPlan(id: string, kpiId: string, cancelToken?: CancelToken): Promise<StrategicInitiativeKpiCheckpointDetailsDto[]> {
+        let url_ = this.baseUrl + "/api/ppm/strategic-initiatives/{id}/kpis/{kpiId}/checkpoints/plan";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        if (kpiId === undefined || kpiId === null)
+            throw new globalThis.Error("The parameter 'kpiId' must be defined.");
+        url_ = url_.replace("{kpiId}", encodeURIComponent("" + kpiId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetKpiCheckpointPlan(_response);
+        });
+    }
+
+    protected processGetKpiCheckpointPlan(response: AxiosResponse): Promise<StrategicInitiativeKpiCheckpointDetailsDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<StrategicInitiativeKpiCheckpointDetailsDto[]>(result200);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<StrategicInitiativeKpiCheckpointDetailsDto[]>(null as any);
+    }
+
+    /**
+     * Manage the checkpoint plan for a strategic initiative KPI.
+     */
+    manageKpiCheckpointPlan(id: string, kpiId: string, request: ManageStrategicInitiativeKpiCheckpointPlanRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/ppm/strategic-initiatives/{id}/kpis/{kpiId}/checkpoints/plan";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        if (kpiId === undefined || kpiId === null)
+            throw new globalThis.Error("The parameter 'kpiId' must be defined.");
+        url_ = url_.replace("{kpiId}", encodeURIComponent("" + kpiId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processManageKpiCheckpointPlan(_response);
+        });
+    }
+
+    protected processManageKpiCheckpointPlan(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 422) {
+            const _responseText = response.data;
+            let result422: any = null;
+            let resultData422  = _responseText;
+            result422 = JSON.parse(resultData422);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Get the measurements for a strategic initiative KPI.
+     */
+    getKpiMeasurements(id: string, kpiId: string, cancelToken?: CancelToken): Promise<StrategicInitiativeKpiMeasurementDto[]> {
+        let url_ = this.baseUrl + "/api/ppm/strategic-initiatives/{id}/kpis/{kpiId}/measurements";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        if (kpiId === undefined || kpiId === null)
+            throw new globalThis.Error("The parameter 'kpiId' must be defined.");
+        url_ = url_.replace("{kpiId}", encodeURIComponent("" + kpiId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetKpiMeasurements(_response);
+        });
+    }
+
+    protected processGetKpiMeasurements(response: AxiosResponse): Promise<StrategicInitiativeKpiMeasurementDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<StrategicInitiativeKpiMeasurementDto[]>(result200);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<StrategicInitiativeKpiMeasurementDto[]>(null as any);
+    }
+
+    /**
      * Add a measurement to the strategic initiative KPI.
      */
     addKpiMeasurement(id: string, kpiId: string, request: AddStrategicInitiativeKpiMeasurementRequest, cancelToken?: CancelToken): Promise<void> {
@@ -7728,17 +7991,25 @@ export class StrategicInitiativesClient {
     }
 
     /**
-     * Get a list of KPI units.
+     * Remove a measurement from the strategic initiative KPI.
      */
-    getKpiUnits( cancelToken?: CancelToken): Promise<StrategicInitiativeKpiUnitDto[]> {
-        let url_ = this.baseUrl + "/api/ppm/strategic-initiatives/kpi-units";
+    removeKpiMeasurement(id: string, kpiId: string, measurementId: string, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/ppm/strategic-initiatives/{id}/kpis/{kpiId}/measurements/{measurementId}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        if (kpiId === undefined || kpiId === null)
+            throw new globalThis.Error("The parameter 'kpiId' must be defined.");
+        url_ = url_.replace("{kpiId}", encodeURIComponent("" + kpiId));
+        if (measurementId === undefined || measurementId === null)
+            throw new globalThis.Error("The parameter 'measurementId' must be defined.");
+        url_ = url_.replace("{measurementId}", encodeURIComponent("" + measurementId));
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
-            method: "GET",
+            method: "DELETE",
             url: url_,
             headers: {
-                "Accept": "application/json"
             },
             cancelToken
         };
@@ -7750,11 +8021,11 @@ export class StrategicInitiativesClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processGetKpiUnits(_response);
+            return this.processRemoveKpiMeasurement(_response);
         });
     }
 
-    protected processGetKpiUnits(response: AxiosResponse): Promise<StrategicInitiativeKpiUnitDto[]> {
+    protected processRemoveKpiMeasurement(response: AxiosResponse): Promise<void> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -7764,12 +8035,9 @@ export class StrategicInitiativesClient {
                 }
             }
         }
-        if (status === 200) {
+        if (status === 204) {
             const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = JSON.parse(resultData200);
-            return Promise.resolve<StrategicInitiativeKpiUnitDto[]>(result200);
+            return Promise.resolve<void>(null as any);
 
         } else if (status === 400) {
             const _responseText = response.data;
@@ -7778,69 +8046,18 @@ export class StrategicInitiativesClient {
             result400 = JSON.parse(resultData400);
             return throwException("A server side error occurred.", status, _responseText, _headers, result400);
 
-        } else if (status !== 200 && status !== 204) {
+        } else if (status === 422) {
             const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<StrategicInitiativeKpiUnitDto[]>(null as any);
-    }
-
-    /**
-     * Get a list of KPI target directions.
-     */
-    getKpiTargetDirections( cancelToken?: CancelToken): Promise<StrategicInitiativeKpiTargetDirectionDto[]> {
-        let url_ = this.baseUrl + "/api/ppm/strategic-initiatives/kpi-target-directions";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "GET",
-            url: url_,
-            headers: {
-                "Accept": "application/json"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processGetKpiTargetDirections(_response);
-        });
-    }
-
-    protected processGetKpiTargetDirections(response: AxiosResponse): Promise<StrategicInitiativeKpiTargetDirectionDto[]> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = JSON.parse(resultData200);
-            return Promise.resolve<StrategicInitiativeKpiTargetDirectionDto[]>(result200);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = JSON.parse(resultData400);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+            let result422: any = null;
+            let resultData422  = _responseText;
+            result422 = JSON.parse(resultData422);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<StrategicInitiativeKpiTargetDirectionDto[]>(null as any);
+        return Promise.resolve<void>(null as any);
     }
 
     /**
@@ -19848,8 +20065,19 @@ export interface StrategicInitiativeKpiListDto {
     name: string;
     targetValue: number;
     actualValue?: number | undefined;
-    unit: SimpleNavigationDto;
-    targetDirection: SimpleNavigationDto;
+    unit: KpiUnit;
+    targetDirection: KpiTargetDirection;
+}
+
+export enum KpiUnit {
+    Percentage = "Percentage",
+    Number = "Number",
+    USD = "USD",
+}
+
+export enum KpiTargetDirection {
+    Increase = "Increase",
+    Decrease = "Decrease",
 }
 
 export interface StrategicInitiativeKpiDetailsDto {
@@ -19859,8 +20087,8 @@ export interface StrategicInitiativeKpiDetailsDto {
     description?: string | undefined;
     targetValue: number;
     actualValue?: number | undefined;
-    unit: SimpleNavigationDto;
-    targetDirection: SimpleNavigationDto;
+    unit: KpiUnit;
+    targetDirection: KpiTargetDirection;
 }
 
 export interface CreateStrategicInitiativeKpiRequest {
@@ -19869,13 +20097,13 @@ export interface CreateStrategicInitiativeKpiRequest {
     /** The name of the KPI. */
     name: string;
     /** A description of what the KPI measures. */
-    description: string;
+    description?: string | undefined;
     /** The target value that defines success for the KPI. */
     targetValue: number;
-    /** The ID of the unit of measurement for the KPI. */
-    unitId: number;
-    /** The ID of the target direction for the KPI. */
-    targetDirectionId: number;
+    /** The unit of measurement for the KPI. */
+    unit: KpiUnit;
+    /** The target direction for the KPI. */
+    targetDirection: KpiTargetDirection;
 }
 
 export interface UpdateStrategicInitiativeKpiRequest {
@@ -19886,13 +20114,75 @@ export interface UpdateStrategicInitiativeKpiRequest {
     /** The name of the KPI. */
     name: string;
     /** A description of what the KPI measures. */
-    description: string;
+    description?: string | undefined;
     /** The target value that defines success for the KPI. */
     targetValue: number;
-    /** The ID of the unit of measurement for the KPI. */
-    unitId: number;
-    /** The ID of the target direction for the KPI. */
-    targetDirectionId: number;
+    /** The unit of measurement for the KPI. */
+    unit: KpiUnit;
+    /** The target direction for the KPI. */
+    targetDirection: KpiTargetDirection;
+}
+
+export interface StrategicInitiativeKpiCheckpointDto {
+    id: string;
+    targetValue: number;
+    atRiskValue?: number | undefined;
+    checkpointDate: Date;
+    dateLabel: string;
+}
+
+export interface StrategicInitiativeKpiCheckpointDetailsDto {
+    id: string;
+    targetValue: number;
+    atRiskValue?: number | undefined;
+    checkpointDate: Date;
+    dateLabel: string;
+    measurement?: StrategicInitiativeKpiMeasurementDto | undefined;
+    health?: KpiHealth | undefined;
+    trend?: KpiTrend | undefined;
+}
+
+export interface StrategicInitiativeKpiMeasurementDto {
+    id: string;
+    actualValue: number;
+    measurementDate: Date;
+    measuredBy: EmployeeNavigationDto;
+    note?: string | undefined;
+}
+
+export enum KpiHealth {
+    Healthy = "Healthy",
+    AtRisk = "AtRisk",
+    Unhealthy = "Unhealthy",
+}
+
+export enum KpiTrend {
+    NoData = "NoData",
+    Improving = "Improving",
+    Worsening = "Worsening",
+    Stable = "Stable",
+}
+
+export interface ManageStrategicInitiativeKpiCheckpointPlanRequest {
+    /** The ID of the strategic initiative to which this KPI belongs. */
+    strategicInitiativeId: string;
+    /** The ID of the KPI. */
+    kpiId: string;
+    /** The list of planned KPI checkpoints. */
+    checkpoints: KpiCheckpointPlanItemRequest[];
+}
+
+export interface KpiCheckpointPlanItemRequest {
+    /** The ID of an existing checkpoint to update. Null for new checkpoints. */
+    checkpointId: string;
+    /** The target value for this checkpoint. */
+    targetValue: number;
+    /** An optional at-risk threshold value for this checkpoint. */
+    atRiskValue?: number | undefined;
+    /** The date and time of this checkpoint. */
+    checkpointDate: Date;
+    /** A short label describing this checkpoint (e.g. "Q1 2025"). */
+    dateLabel: string;
 }
 
 export interface AddStrategicInitiativeKpiMeasurementRequest {
@@ -19906,12 +20196,6 @@ export interface AddStrategicInitiativeKpiMeasurementRequest {
     measurementDate: Date;
     /** Optional note providing context for the measurement. */
     note?: string | undefined;
-}
-
-export interface StrategicInitiativeKpiUnitDto extends CommonEnumDto {
-}
-
-export interface StrategicInitiativeKpiTargetDirectionDto extends CommonEnumDto {
 }
 
 export interface ManageStrategicInitiativeProjectsRequest {

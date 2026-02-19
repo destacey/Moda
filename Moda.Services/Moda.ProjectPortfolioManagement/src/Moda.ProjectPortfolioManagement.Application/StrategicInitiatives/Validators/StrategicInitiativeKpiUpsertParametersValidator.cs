@@ -11,7 +11,8 @@ public sealed class StrategicInitiativeKpiUpsertParametersValidator : CustomVali
             .MaximumLength(64);
 
         RuleFor(x => x.Description)
-            .MaximumLength(512);
+            .MaximumLength(512)
+            .When(x => x.Description is not null);
 
         RuleFor(x => x.TargetValue)
             .NotEmpty();

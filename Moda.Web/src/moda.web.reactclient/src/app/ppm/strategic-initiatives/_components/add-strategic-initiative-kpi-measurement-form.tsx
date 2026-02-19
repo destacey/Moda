@@ -182,15 +182,17 @@ const AddStrategicInitiativeKpiMeasurementForm = (
         >
           <Descriptions size="small" column={1}>
             <DescriptionItem label="KPI">{`${kpiData?.key} - ${kpiData?.name}`}</DescriptionItem>
+            <DescriptionItem label="Target Value">
+              {kpiData?.targetValue}
+            </DescriptionItem>
+            <DescriptionItem label="Unit">
+              {kpiData?.unit as unknown as string}
+            </DescriptionItem>
+            <DescriptionItem label="Target Direction">
+              {kpiData?.targetDirection as unknown as string}
+            </DescriptionItem>
           </Descriptions>
           <br />
-          <TypedFormItem
-            name="actualValue"
-            label="Actual Value"
-            rules={[{ required: true, message: 'Actual Value is required' }]}
-          >
-            <InputNumber style={{ width: 200 }} />
-          </TypedFormItem>
           <TypedFormItem
             name="measurementDate"
             label="Measurement Date"
@@ -211,6 +213,13 @@ const AddStrategicInitiativeKpiMeasurementForm = (
               format="YYYY-MM-DD h:mm A"
               disabledDate={(value) => value && value > dayjs()}
             />
+          </TypedFormItem>
+          <TypedFormItem
+            name="actualValue"
+            label="Actual Value"
+            rules={[{ required: true, message: 'Actual Value is required' }]}
+          >
+            <InputNumber style={{ width: 200 }} />
           </TypedFormItem>
           <TypedFormItem name="note" label="Note" rules={[{ max: 1024 }]}>
             <MarkdownEditor maxLength={1024} />

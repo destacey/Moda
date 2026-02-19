@@ -5,13 +5,13 @@ import { MarkdownEditor } from '@/src/components/common/markdown'
 import useAuth from '@/src/components/contexts/auth'
 import { useMessage } from '@/src/components/contexts/messaging'
 import {
+  KpiTargetDirection,
+  KpiUnit,
   StrategicInitiativeKpiDetailsDto,
   UpdateStrategicInitiativeKpiRequest,
 } from '@/src/services/moda-api'
 import {
   useGetStrategicInitiativeKpiQuery,
-  useGetStrategicInitiativeKpiTargetDirectionOptionsQuery,
-  useGetStrategicInitiativeKpiUnitOptionsQuery,
   useUpdateStrategicInitiativeKpiMutation,
 } from '@/src/store/features/ppm/strategic-initiatives-api'
 import { toFormErrors } from '@/src/utils'
@@ -31,14 +31,25 @@ export interface EditStrategicInitiativeKpiFormProps {
 
 interface EditStrategicInitiativeKpiFormValues {
   name: string
-  description: string
+  description?: string
   targetValue: number
-  unitId: number
-  targetDirectionId: number
+  unit: KpiUnit
+  targetDirection: KpiTargetDirection
 }
 
 const TypedFormItem =
   createTypedFormItem<EditStrategicInitiativeKpiFormValues>()
+
+const kpiUnitOptions = [
+  { label: 'Percentage', value: KpiUnit.Percentage },
+  { label: 'Number', value: KpiUnit.Number },
+  { label: 'USD', value: KpiUnit.USD },
+]
+
+const kpiTargetDirectionOptions = [
+  { label: 'Increase', value: KpiTargetDirection.Increase },
+  { label: 'Decrease', value: KpiTargetDirection.Decrease },
+]
 
 const mapToRequestValues = (
   values: EditStrategicInitiativeKpiFormValues,
@@ -51,8 +62,8 @@ const mapToRequestValues = (
     name: values.name,
     description: values.description,
     targetValue: values.targetValue,
-    unitId: values.unitId,
-    targetDirectionId: values.targetDirectionId,
+    unit: values.unit,
+    targetDirection: values.targetDirection,
   }
 }
 
@@ -89,18 +100,6 @@ const EditStrategicInitiativeKpiForm = (
   const [updateKpi, { error: mutationError }] =
     useUpdateStrategicInitiativeKpiMutation()
 
-  const {
-    data: unitData,
-    isLoading: unitsIsLoading,
-    error: unitsError,
-  } = useGetStrategicInitiativeKpiUnitOptionsQuery()
-
-  const {
-    data: targetDirectionData,
-    isLoading: targetDirectionIsLoading,
-    error: targetDirectionError,
-  } = useGetStrategicInitiativeKpiTargetDirectionOptionsQuery()
-
   const mapToFormValues = useCallback(
     (kpi: StrategicInitiativeKpiDetailsDto) => {
       if (!kpi) {
@@ -110,8 +109,8 @@ const EditStrategicInitiativeKpiForm = (
         name: kpi.name,
         description: kpi.description,
         targetValue: kpi.targetValue,
-        unitId: kpi.unit.id,
-        targetDirectionId: kpi.targetDirection.id,
+        unit: kpi.unit,
+        targetDirection: kpi.targetDirection,
       })
     },
     [form],
@@ -194,17 +193,14 @@ const EditStrategicInitiativeKpiForm = (
   ])
 
   useEffect(() => {
-    if (kpiError || unitsError || targetDirectionError) {
-      console.error(kpiError || unitsError || targetDirectionError)
+    if (kpiError) {
+      console.error(kpiError)
       messageApi.error(
-        kpiError ||
-          unitsError.detail ||
-          targetDirectionError.detail ||
-          'An error occurred while loading form data.',
+        kpiError || 'An error occurred while loading form data.',
       )
       onFormCancel()
     }
-  }, [kpiError, messageApi, onFormCancel, targetDirectionError, unitsError])
+  }, [kpiError, messageApi, onFormCancel])
 
   useEffect(() => {
     form.validateFields({ validateOnly: true }).then(
@@ -249,10 +245,7 @@ const EditStrategicInitiativeKpiForm = (
           <TypedFormItem
             name="description"
             label="Description"
-            rules={[
-              { required: true, message: 'Description is required' },
-              { max: 512 },
-            ]}
+            rules={[{ max: 512 }]}
           >
             <MarkdownEditor maxLength={512} />
           </TypedFormItem>
@@ -264,18 +257,18 @@ const EditStrategicInitiativeKpiForm = (
             <InputNumber style={{ width: 200 }} />
           </TypedFormItem>
           <TypedFormItem
-            name="unitId"
+            name="unit"
             label="Unit"
             rules={[{ required: true, message: 'Unit is required' }]}
           >
             <Select
               allowClear
-              options={unitData ?? []}
+              options={kpiUnitOptions}
               placeholder="Select Unit"
             />
           </TypedFormItem>
           <TypedFormItem
-            name="targetDirectionId"
+            name="targetDirection"
             label="Target Direction"
             rules={[
               { required: true, message: 'Target Direction is required' },
@@ -283,7 +276,7 @@ const EditStrategicInitiativeKpiForm = (
           >
             <Select
               allowClear
-              options={targetDirectionData ?? []}
+              options={kpiTargetDirectionOptions}
               placeholder="Select Target Direction"
             />
           </TypedFormItem>
