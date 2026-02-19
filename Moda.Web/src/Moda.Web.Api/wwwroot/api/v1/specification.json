@@ -5947,6 +5947,86 @@
         ]
       }
     },
+    "/api/ppm/strategic-initiatives/{id}/kpis/{kpiId}/measurements/{measurementId}": {
+      "delete": {
+        "tags": [
+          "StrategicInitiatives"
+        ],
+        "summary": "Remove a measurement from the strategic initiative KPI.",
+        "operationId": "StrategicInitiatives_RemoveKpiMeasurement",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "kpiId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 2
+          },
+          {
+            "name": "measurementId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 3
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
     "/api/ppm/strategic-initiatives/{id}/approve": {
       "post": {
         "tags": [
@@ -6475,6 +6555,208 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/ppm/strategic-initiatives/{id}/kpis/{kpiId}/checkpoints": {
+      "get": {
+        "tags": [
+          "StrategicInitiatives"
+        ],
+        "summary": "Get the checkpoints for a strategic initiative KPI.",
+        "operationId": "StrategicInitiatives_GetKpiCheckpoints",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "kpiId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/StrategicInitiativeKpiCheckpointDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/ppm/strategic-initiatives/{id}/kpis/{kpiId}/checkpoints/plan": {
+      "get": {
+        "tags": [
+          "StrategicInitiatives"
+        ],
+        "summary": "Get the checkpoint plan for a strategic initiative KPI. The checkpoint plan provides the checkpoints and their corresponding measurements.",
+        "operationId": "StrategicInitiatives_GetKpiCheckpointPlan",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "kpiId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/StrategicInitiativeKpiCheckpointDetailsDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "StrategicInitiatives"
+        ],
+        "summary": "Manage the checkpoint plan for a strategic initiative KPI.",
+        "operationId": "StrategicInitiatives_ManageKpiCheckpointPlan",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "kpiId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 2
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManageStrategicInitiativeKpiCheckpointPlanRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 3
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
                 }
               }
             }
@@ -20315,6 +20597,205 @@
             "type": "integer",
             "description": "The ID of the target direction for the KPI.",
             "format": "int32"
+          }
+        }
+      },
+      "StrategicInitiativeKpiCheckpointDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "targetValue",
+          "checkpointDate",
+          "dateLabel"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "targetValue": {
+            "type": "number",
+            "format": "double"
+          },
+          "checkpointDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "dateLabel": {
+            "type": "string"
+          }
+        }
+      },
+      "StrategicInitiativeKpiCheckpointDetailsDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "targetValue",
+          "checkpointDate",
+          "dateLabel"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "targetValue": {
+            "type": "number",
+            "format": "double"
+          },
+          "checkpointDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "dateLabel": {
+            "type": "string"
+          },
+          "measurement": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/StrategicInitiativeKpiMeasurementDto"
+              }
+            ]
+          },
+          "targetMet": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "trend": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/KpiTrend"
+              }
+            ]
+          }
+        }
+      },
+      "StrategicInitiativeKpiMeasurementDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "actualValue",
+          "measurementDate",
+          "measuredBy"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "actualValue": {
+            "type": "number",
+            "format": "double"
+          },
+          "measurementDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "measuredBy": {
+            "$ref": "#/components/schemas/EmployeeNavigationDto"
+          },
+          "note": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "KpiTrend": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "NoData",
+          "Improving",
+          "Worsening",
+          "Stable"
+        ],
+        "enum": [
+          "NoData",
+          "Improving",
+          "Worsening",
+          "Stable"
+        ]
+      },
+      "ManageStrategicInitiativeKpiCheckpointPlanRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "strategicInitiativeId",
+          "kpiId",
+          "checkpoints"
+        ],
+        "properties": {
+          "strategicInitiativeId": {
+            "type": "string",
+            "description": "The ID of the strategic initiative to which this KPI belongs.",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "kpiId": {
+            "type": "string",
+            "description": "The ID of the KPI.",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "checkpoints": {
+            "type": "array",
+            "description": "The list of planned KPI checkpoints.",
+            "nullable": false,
+            "items": {
+              "$ref": "#/components/schemas/StrategicInitiativeKpiCheckpointPlanItem"
+            }
+          }
+        }
+      },
+      "StrategicInitiativeKpiCheckpointPlanItem": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "targetValue",
+          "checkpointDate",
+          "dateLabel",
+          "checkpointId"
+        ],
+        "properties": {
+          "checkpointId": {
+            "type": "string",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "targetValue": {
+            "type": "number",
+            "format": "double",
+            "minLength": 1,
+            "nullable": false
+          },
+          "checkpointDate": {
+            "type": "string",
+            "format": "date-time",
+            "minLength": 1,
+            "nullable": false
+          },
+          "dateLabel": {
+            "type": "string",
+            "maxLength": 16,
+            "minLength": 1,
+            "nullable": false
           }
         }
       },

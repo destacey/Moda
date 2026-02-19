@@ -1,8 +1,11 @@
 import {
   AddStrategicInitiativeKpiMeasurementRequest,
   CreateStrategicInitiativeKpiRequest,
+  ManageStrategicInitiativeKpiCheckpointPlanRequest,
   ManageStrategicInitiativeProjectsRequest,
   ProjectListDto,
+  StrategicInitiativeKpiCheckpointDetailsDto,
+  StrategicInitiativeKpiCheckpointDto,
   StrategicInitiativeKpiDetailsDto,
   StrategicInitiativeKpiListDto,
   UpdateStrategicInitiativeKpiRequest,
@@ -344,6 +347,10 @@ export const strategicInitiativesApi = apiSlice.injectEndpoints({
             id: arg.strategicInitiativeId,
           },
           { type: QueryTags.StrategicInitiativeKpi, id: arg.kpiId },
+          {
+            type: QueryTags.StrategicInitiativeKpiCheckpointPlan,
+            id: arg.kpiId,
+          },
         ]
       },
     }),
@@ -434,6 +441,112 @@ export const strategicInitiativesApi = apiSlice.injectEndpoints({
         { type: QueryTags.StrategicInitiativeProject, id: arg.id },
       ],
     }),
+    getStrategicInitiativeKpiCheckpoints: builder.query<
+      StrategicInitiativeKpiCheckpointDto[],
+      { strategicInitiativeId: string; kpiId: string }
+    >({
+      queryFn: async (request) => {
+        try {
+          const data = await getStrategicInitiativesClient().getKpiCheckpoints(
+            request.strategicInitiativeId,
+            request.kpiId,
+          )
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: (result, error, arg) => [
+        { type: QueryTags.StrategicInitiativeKpiCheckpoint, id: arg.kpiId },
+      ],
+    }),
+    getStrategicInitiativeKpiCheckpointPlan: builder.query<
+      StrategicInitiativeKpiCheckpointDetailsDto[],
+      { strategicInitiativeId: string; kpiId: string }
+    >({
+      queryFn: async (request) => {
+        try {
+          const data =
+            await getStrategicInitiativesClient().getKpiCheckpointPlan(
+              request.strategicInitiativeId,
+              request.kpiId,
+            )
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: (result, error, arg) => [
+        {
+          type: QueryTags.StrategicInitiativeKpiCheckpointPlan,
+          id: arg.kpiId,
+        },
+      ],
+    }),
+    manageStrategicInitiativeKpiCheckpointPlan: builder.mutation<
+      void,
+      ManageStrategicInitiativeKpiCheckpointPlanRequest
+    >({
+      queryFn: async (request) => {
+        try {
+          const data =
+            await getStrategicInitiativesClient().manageKpiCheckpointPlan(
+              request.strategicInitiativeId,
+              request.kpiId,
+              request,
+            )
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, arg) => [
+        {
+          type: QueryTags.StrategicInitiativeKpiCheckpoint,
+          id: arg.kpiId,
+        },
+        {
+          type: QueryTags.StrategicInitiativeKpiCheckpointPlan,
+          id: arg.kpiId,
+        },
+      ],
+    }),
+    removeStrategicInitiativeKpiMeasurement: builder.mutation<
+      void,
+      { strategicInitiativeId: string; kpiId: string; measurementId: string }
+    >({
+      queryFn: async (request) => {
+        try {
+          const data =
+            await getStrategicInitiativesClient().removeKpiMeasurement(
+              request.strategicInitiativeId,
+              request.kpiId,
+              request.measurementId,
+            )
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, arg) => [
+        {
+          type: QueryTags.StrategicInitiativeKpiMeasurement,
+          id: arg.kpiId,
+        },
+        {
+          type: QueryTags.StrategicInitiativeKpi,
+          id: arg.kpiId,
+        },
+        {
+          type: QueryTags.StrategicInitiativeKpiCheckpointPlan,
+          id: arg.kpiId,
+        },
+      ],
+    }),
   }),
 })
 
@@ -457,4 +570,8 @@ export const {
   useGetStrategicInitiativeKpiTargetDirectionOptionsQuery,
   useGetStrategicInitiativeProjectsQuery,
   useManageStrategicInitiativeProjectsMutation,
+  useGetStrategicInitiativeKpiCheckpointsQuery,
+  useGetStrategicInitiativeKpiCheckpointPlanQuery,
+  useManageStrategicInitiativeKpiCheckpointPlanMutation,
+  useRemoveStrategicInitiativeKpiMeasurementMutation,
 } = strategicInitiativesApi
