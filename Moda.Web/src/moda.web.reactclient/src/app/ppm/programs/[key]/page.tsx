@@ -55,8 +55,6 @@ const ProgramDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const { key } = use(props.params)
   const programKey = Number(key)
 
-  useDocumentTitle('Program Details')
-
   const [activeTab, setActiveTab] = useState(ProgramTabs.Details)
   const [openEditProgramForm, setOpenEditProgramForm] = useState<boolean>(false)
   const [openActivateProgramForm, setOpenActivateProgramForm] =
@@ -92,6 +90,8 @@ const ProgramDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   } = useGetProgramProjectsQuery(programData?.key.toString(), {
     skip: !programData?.key,
   })
+
+  useDocumentTitle(`${programData?.name ?? programKey} - Program Details`)
 
   useEffect(() => {
     if (!programData) return
