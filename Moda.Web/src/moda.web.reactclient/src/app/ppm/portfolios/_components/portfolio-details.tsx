@@ -21,15 +21,15 @@ const PortfolioDetails: React.FC<PortfolioDetailsProps> = ({
   const sponsorNames =
     portfolio?.portfolioSponsors.length > 0
       ? getSortedNames(portfolio.portfolioSponsors)
-      : 'No sponsors assigned'
+      : 'No sponsor assigned'
   const ownerNames =
     portfolio?.portfolioOwners.length > 0
       ? getSortedNames(portfolio.portfolioOwners)
-      : 'No owners assigned'
+      : 'No owner assigned'
   const managerNames =
     portfolio?.portfolioManagers.length > 0
       ? getSortedNames(portfolio.portfolioManagers)
-      : 'No managers assigned'
+      : 'No manager assigned'
 
   return (
     <Flex vertical gap="middle">

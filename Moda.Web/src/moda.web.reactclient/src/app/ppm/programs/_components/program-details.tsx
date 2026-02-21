@@ -23,15 +23,15 @@ const ProgramDetails: FC<ProgramDetailsProps> = ({
   const sponsorNames =
     program?.programSponsors.length > 0
       ? getSortedNames(program.programSponsors)
-      : 'No sponsors assigned'
+      : 'No sponsor assigned'
   const ownerNames =
     program?.programOwners.length > 0
       ? getSortedNames(program.programOwners)
-      : 'No owners assigned'
+      : 'No owner assigned'
   const managerNames =
     program?.programManagers.length > 0
       ? getSortedNames(program.programManagers)
-      : 'No managers assigned'
+      : 'No manager assigned'
 
   const strategicThemes =
     program?.strategicThemes.length > 0
