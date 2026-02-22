@@ -1,4 +1,4 @@
-using Moda.Common.Domain.Models.KeyPerformanceIndicators;
+﻿using Moda.Common.Domain.Models.KeyPerformanceIndicators;
 using Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 
 namespace Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Dtos;
@@ -22,6 +22,11 @@ public sealed record StrategicInitiativeKpiDetailsDto : IMapFrom<StrategicInitia
     public string? Description { get; set; }
 
     /// <summary>
+    /// The starting (baseline) value of the KPI. Used to track progress relative to where the KPI began.
+    /// </summary>
+    public double? StartingValue { get; set; }
+
+    /// <summary>
     /// The target value that defines success for the KPI.
     /// </summary>
     public double TargetValue { get; set; }
@@ -30,6 +35,11 @@ public sealed record StrategicInitiativeKpiDetailsDto : IMapFrom<StrategicInitia
     /// The actual value of the KPI.
     /// </summary>
     public double? ActualValue { get; set; }
+
+    /// <summary>
+    /// The progress towards the KPI target, calculated based on the starting value, actual value, target value, and target direction.
+    /// </summary>
+    public double? Progress => KpiUtils.CalculateProgress(StartingValue, ActualValue, TargetValue, TargetDirection);
 
     /// <summary>
     /// Gets the unit of measurement for the KPI.

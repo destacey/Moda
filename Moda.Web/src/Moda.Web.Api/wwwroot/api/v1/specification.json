@@ -20398,11 +20398,21 @@
           "name": {
             "type": "string"
           },
+          "startingValue": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
           "targetValue": {
             "type": "number",
             "format": "double"
           },
           "actualValue": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "progress": {
             "type": "number",
             "format": "double",
             "nullable": true
@@ -20470,11 +20480,21 @@
             "type": "string",
             "nullable": true
           },
+          "startingValue": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
           "targetValue": {
             "type": "number",
             "format": "double"
           },
           "actualValue": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "progress": {
             "type": "number",
             "format": "double",
             "nullable": true
@@ -20526,6 +20546,12 @@
             "format": "double",
             "minLength": 1,
             "nullable": false
+          },
+          "startingValue": {
+            "type": "number",
+            "description": "The starting (baseline) value of the KPI.",
+            "format": "double",
+            "nullable": true
           },
           "unit": {
             "description": "The unit of measurement for the KPI.",
@@ -20593,6 +20619,12 @@
             "format": "double",
             "minLength": 1,
             "nullable": false
+          },
+          "startingValue": {
+            "type": "number",
+            "description": "The starting (baseline) value of the KPI.",
+            "format": "double",
+            "nullable": true
           },
           "unit": {
             "description": "The unit of measurement for the KPI.",

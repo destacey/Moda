@@ -73,4 +73,28 @@ public static class KpiUtils
             _ => throw new ArgumentOutOfRangeException(nameof(targetDirection), $"Unsupported target direction: {targetDirection}")
         };
     }
+
+    /// <summary>
+    /// Calculates the progress towards a KPI target based on the starting value, actual value, target value, and target direction.
+    /// </summary>
+    /// <param name="startingValue">The starting (baseline) value of the KPI.</param>
+    /// <param name="actualValue">The current actual value of the KPI.</param>
+    /// <param name="targetValue">The target value that defines success for the KPI.</param>
+    /// <param name="targetDirection">The desired direction of improvement for the KPI.</param>
+    /// <returns>The progress towards the KPI target as a percentage, or null if the starting value is not provided.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the specified targetDirection is not a valid value of the KpiTargetDirection enumeration.</exception>
+    public static double? CalculateProgress(double? startingValue, double? actualValue, double targetValue, KpiTargetDirection targetDirection)
+    {
+        if (!startingValue.HasValue) return null;
+        if (!actualValue.HasValue) return 0;
+
+        double progress = targetDirection switch
+        {
+            KpiTargetDirection.Increase => (actualValue.Value - startingValue.Value) / (targetValue - startingValue.Value),
+            KpiTargetDirection.Decrease => (startingValue.Value - actualValue.Value) / (startingValue.Value - targetValue),
+            _ => throw new ArgumentOutOfRangeException(nameof(targetDirection), $"Unsupported target direction: {targetDirection}")
+        };
+
+        return progress;
+    }
 }

@@ -5,6 +5,6 @@ public static class StrategicInitiativeKpiDataExtensions
 {
     public static StrategicInitiativeKpiUpsertParameters ToUpsertParameters(this StrategicInitiativeKpi kpi)
     {
-        return new StrategicInitiativeKpiUpsertParameters(kpi.Name, kpi.Description, kpi.TargetValue, kpi.Unit, kpi.TargetDirection);
+        return new StrategicInitiativeKpiUpsertParameters(kpi.Name, kpi.Description, kpi.StartingValue, kpi.TargetValue, kpi.Unit, kpi.TargetDirection);
     }
 }

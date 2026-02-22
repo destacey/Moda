@@ -112,4 +112,63 @@ public sealed class KpiUtilsTests
     }
 
     #endregion
+
+    #region CalculateProgress
+
+    [Theory]
+    [InlineData(KpiTargetDirection.Increase)]
+    [InlineData(KpiTargetDirection.Decrease)]
+    public void CalculateProgress_ShouldReturnNull_WhenStartingValueIsNull(KpiTargetDirection direction)
+    {
+        // Act
+        var result = KpiUtils.CalculateProgress(null, 50.0, 100.0, direction);
+
+        // Assert
+        result.Should().BeNull();
+    }
+
+    [Theory]
+    [InlineData(KpiTargetDirection.Increase)]
+    [InlineData(KpiTargetDirection.Decrease)]
+    public void CalculateProgress_ShouldReturnZero_WhenActualValueIsNull(KpiTargetDirection direction)
+    {
+        // Act
+        var result = KpiUtils.CalculateProgress(0.0, null, 100.0, direction);
+
+        // Assert
+        result.Should().Be(0);
+    }
+
+    [Theory]
+    //                       start   actual  target  direction                        expected  comment
+    [InlineData(              0.0,    0.0,   100.0, KpiTargetDirection.Increase,       0.0)]  // at start
+    [InlineData(              0.0,   50.0,   100.0, KpiTargetDirection.Increase,       0.5)]  // halfway
+    [InlineData(              0.0,  100.0,   100.0, KpiTargetDirection.Increase,       1.0)]  // at target
+    [InlineData(              0.0,  125.0,   100.0, KpiTargetDirection.Increase,       1.25)] // beyond target
+    [InlineData(              0.0,  -25.0,   100.0, KpiTargetDirection.Increase,      -0.25)] // regressed
+    [InlineData(            100.0,  100.0,     0.0, KpiTargetDirection.Decrease,       0.0)]  // at start
+    [InlineData(            100.0,   50.0,     0.0, KpiTargetDirection.Decrease,       0.5)]  // halfway
+    [InlineData(            100.0,    0.0,     0.0, KpiTargetDirection.Decrease,       1.0)]  // at target
+    [InlineData(            100.0,  -25.0,     0.0, KpiTargetDirection.Decrease,       1.25)] // beyond target
+    [InlineData(            100.0,  125.0,     0.0, KpiTargetDirection.Decrease,      -0.25)] // regressed
+    public void CalculateProgress_ShouldReturnExpected_ForDirectionAndValues(double startingValue, double actualValue, double targetValue, KpiTargetDirection direction, double expected)
+    {
+        // Act
+        var result = KpiUtils.CalculateProgress(startingValue, actualValue, targetValue, direction);
+
+        // Assert
+        result.Should().Be(expected);
+    }
+
+    [Fact]
+    public void CalculateProgress_ShouldThrow_WhenTargetDirectionIsInvalid()
+    {
+        // Act
+        var act = () => KpiUtils.CalculateProgress(0.0, 50.0, 100.0, (KpiTargetDirection)99);
+
+        // Assert
+        act.Should().Throw<ArgumentOutOfRangeException>().WithParameterName("targetDirection");
+    }
+
+    #endregion
 }
