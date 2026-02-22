@@ -59,42 +59,41 @@ const TimelineProgress: FC<TimelineProgressProps> = ({
 
   const fontSize = size === 'small' ? 11 : 12
 
-  const borderlessStyles = variant === 'borderless'
-    ? { boxShadow: 'none', background: 'transparent' }
-    : {}
+  const content = (
+    <Flex vertical gap={4} style={variant === 'borderless' ? style : undefined}>
+      <Text type="secondary" style={{ fontSize }}>Timeline</Text>
+      <Progress
+        percent={progressPercent}
+        showInfo={false}
+        style={{ margin: 0 }}
+      />
+      <Flex justify="space-between">
+        <Text type="secondary" style={{ fontSize }}>
+          {startDate.format(dateFormat)}
+        </Text>
+        <Text type="secondary" style={{ fontSize }}>
+          {endDate.format(dateFormat)}
+        </Text>
+      </Flex>
+      <Flex justify="center">
+        <Text type="secondary" style={{ fontSize }}>
+          Day {currentDay} of {totalDays} ({progressPercent}%)
+        </Text>
+      </Flex>
+    </Flex>
+  )
+
+  if (variant === 'borderless') {
+    return content
+  }
 
   const cardStyle = isMobile
-    ? { width: '100%', ...borderlessStyles, ...style }
-    : { minWidth: 275, width: 'fit-content', ...borderlessStyles, ...style }
-
-  const cardBodyStyle =
-    variant === 'borderless'
-      ? { background: 'transparent', padding: 0 }
-      : undefined
+    ? { width: '100%', ...style }
+    : { minWidth: 275, width: 'fit-content', ...style }
 
   return (
-    <Card size="small" style={cardStyle} variant={variant} styles={{ body: cardBodyStyle }}>
-      <Flex vertical gap={4}>
-        <Text type="secondary" style={{ fontSize }}>Timeline</Text>
-        <Progress
-          percent={progressPercent}
-          showInfo={false}
-          style={{ margin: 0 }}
-        />
-        <Flex justify="space-between">
-          <Text type="secondary" style={{ fontSize }}>
-            {startDate.format(dateFormat)}
-          </Text>
-          <Text type="secondary" style={{ fontSize }}>
-            {endDate.format(dateFormat)}
-          </Text>
-        </Flex>
-        <Flex justify="center">
-          <Text type="secondary" style={{ fontSize }}>
-            Day {currentDay} of {totalDays} ({progressPercent}%)
-          </Text>
-        </Flex>
-      </Flex>
+    <Card size="small" style={cardStyle} variant={variant}>
+      {content}
     </Card>
   )
 }

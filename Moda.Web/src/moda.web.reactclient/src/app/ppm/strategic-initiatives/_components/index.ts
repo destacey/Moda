@@ -11,3 +11,4 @@ export { default as ManageStrategicInitiativeProjectsForm } from './manage-strat
 export { default as StrategicInitiativeDetails } from './strategic-initiative-details'
 export { default as StrategicInitiativeKpiDetailsDrawer } from './strategic-initiative-kpi-details-drawer'
 export { default as StrategicInitiativeKpisGrid } from './strategic-initiative-kpis-grid'
+export { default as StrategicInitiativeKpiViewManager } from './strategic-initiative-kpi-view-manager'

@@ -1,14 +1,18 @@
 'use client'
 
-import { ModaDateRange, ResponsiveFlex } from '@/src/components/common'
+import { ModaDateRange } from '@/src/components/common'
+import {
+  ContentList,
+  ExpandableContent,
+  LabeledContent,
+} from '@/src/components/common/content'
 import LinksCard from '@/src/components/common/links/links-card'
 import { MarkdownRenderer } from '@/src/components/common/markdown'
+import TimelineProgress from '@/src/components/common/planning/timeline-progress'
 import { StrategicInitiativeDetailsDto } from '@/src/services/moda-api'
-import { getSortedNames } from '@/src/utils'
-import { Descriptions, Flex } from 'antd'
+import { Card, Divider, Flex } from 'antd'
+import dayjs from 'dayjs'
 import Link from 'next/link'
-
-const { Item } = Descriptions
 
 export interface StrategicInitiativeDetailsProps {
   strategicInitiative: StrategicInitiativeDetailsDto
@@ -16,46 +20,86 @@ export interface StrategicInitiativeDetailsProps {
 
 const StrategicInitiativeDetails: React.FC<StrategicInitiativeDetailsProps> = ({
   strategicInitiative,
-}: StrategicInitiativeDetailsProps) => {
+}) => {
   if (!strategicInitiative) return null
 
-  const sponsorNames =
-    strategicInitiative?.strategicInitiativeSponsors.length > 0
-      ? getSortedNames(strategicInitiative.strategicInitiativeSponsors)
-      : 'No sponsors assigned'
-  const ownerNames =
-    strategicInitiative?.strategicInitiativeOwners.length > 0
-      ? getSortedNames(strategicInitiative.strategicInitiativeOwners)
-      : 'No owners assigned'
+  const sponsorNames = [...strategicInitiative.strategicInitiativeSponsors]
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map((s) => s.name)
+
+  const ownerNames = [...strategicInitiative.strategicInitiativeOwners]
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map((o) => o.name)
+
+  const hasStarted =
+    strategicInitiative.start &&
+    dayjs(strategicInitiative.start).isBefore(dayjs(), 'day')
+
+  const timelineFormat =
+    strategicInitiative.start &&
+    strategicInitiative.end &&
+    new Date(strategicInitiative.start).getFullYear() ===
+      new Date().getFullYear()
+      ? 'MMM D'
+      : 'MMM D, YYYY'
 
   return (
-    <Flex vertical gap="middle">
-      <ResponsiveFlex gap="middle" align="start">
-        <Descriptions column={1} size="small">
-          <Item label="Portfolio">
+    <Card size="small">
+      <Flex vertical gap={0}>
+        <Flex vertical gap={10}>
+          <LabeledContent label="Portfolio">
             <Link href={`/ppm/portfolios/${strategicInitiative.portfolio.key}`}>
               {strategicInitiative.portfolio.name}
             </Link>
-          </Item>
-          <Item label="Dates">
+          </LabeledContent>
+
+          <LabeledContent label="Dates">
             <ModaDateRange
               dateRange={{
                 start: strategicInitiative.start,
                 end: strategicInitiative.end,
               }}
             />
-          </Item>
-          <Item label="Sponsors">{sponsorNames}</Item>
-          <Item label="Owners">{ownerNames}</Item>
-        </Descriptions>
-        <Descriptions layout="vertical" size="small">
-          <Item label="Description">
-            <MarkdownRenderer markdown={strategicInitiative.description} />
-          </Item>
-        </Descriptions>
-      </ResponsiveFlex>
-      <LinksCard objectId={strategicInitiative.id} />
-    </Flex>
+          </LabeledContent>
+
+          <LabeledContent label="Owners">
+            <ContentList items={ownerNames} emptyText="No owner assigned" />
+          </LabeledContent>
+
+          <LabeledContent label="Sponsors">
+            <ContentList items={sponsorNames} emptyText="No sponsor assigned" />
+          </LabeledContent>
+
+          {strategicInitiative.description && (
+            <LabeledContent label="Description">
+              <ExpandableContent>
+                <MarkdownRenderer markdown={strategicInitiative.description} />
+              </ExpandableContent>
+            </LabeledContent>
+          )}
+        </Flex>
+
+        {hasStarted && (
+          <>
+            <Divider />
+            <TimelineProgress
+              start={strategicInitiative.start}
+              end={strategicInitiative.end}
+              variant="borderless"
+              style={{ width: '100%' }}
+              dateFormat={timelineFormat}
+            />
+          </>
+        )}
+
+        <Divider />
+
+        {/* Links — uses its own card styling internally, remove outer card */}
+        <div style={{ padding: '0 16px 16px' }}>
+          <LinksCard objectId={strategicInitiative.id} width="100%" />
+        </div>
+      </Flex>
+    </Card>
   )
 }
 

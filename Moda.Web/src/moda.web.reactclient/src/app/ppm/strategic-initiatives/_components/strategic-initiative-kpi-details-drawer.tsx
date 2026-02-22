@@ -262,7 +262,9 @@ const StrategicInitiativeKpiDetailsDrawer: FC<
       dataIndex: 'health',
       key: 'health',
       width: 110,
-      render: (health: KpiHealth | undefined) => <KpiHealthTag health={health} />,
+      render: (health: KpiHealth | undefined) => (
+        <KpiHealthTag health={health} />
+      ),
     },
     {
       title: 'Trend',
@@ -373,6 +375,9 @@ const StrategicInitiativeKpiDetailsDrawer: FC<
       >
         <Flex vertical gap="middle">
           <Descriptions column={1} size="small">
+            <Item label="Starting Value">
+              {formatValue(kpiData?.startingValue, unit)}
+            </Item>
             <Item label="Target Value">
               {formatValue(kpiData?.targetValue, unit)}
             </Item>

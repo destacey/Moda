@@ -289,31 +289,33 @@ describe('TimelineProgress', () => {
     expect(card).toHaveStyle({ minWidth: '500px' })
   })
 
-  it('applies transparent background and no box shadow when borderless', () => {
+  it('does not render a card when borderless', () => {
     const { container } = render(
       <TimelineProgress start={startDate} end={endDate} variant="borderless" />,
     )
 
-    const card = container.querySelector('.ant-card')
-    expect(card).toHaveStyle({ background: 'transparent', boxShadow: 'none' })
+    expect(container.querySelector('.ant-card')).toBeNull()
   })
 
-  it('applies zero padding to card body when borderless', () => {
+  it('applies custom style to the flex wrapper when borderless', () => {
     const { container } = render(
-      <TimelineProgress start={startDate} end={endDate} variant="borderless" />,
+      <TimelineProgress
+        start={startDate}
+        end={endDate}
+        variant="borderless"
+        style={{ width: '100%' }}
+      />,
     )
 
-    const cardBody = container.querySelector('.ant-card-body')
-    expect(cardBody).toHaveStyle({ padding: '0' })
+    const flex = container.firstChild as HTMLElement
+    expect(flex).toHaveStyle({ width: '100%' })
   })
 
-  it('does not apply borderless styles when outlined', () => {
+  it('renders a card when outlined', () => {
     const { container } = render(
       <TimelineProgress start={startDate} end={endDate} variant="outlined" />,
     )
 
-    const card = container.querySelector('.ant-card')
-    expect(card).not.toHaveStyle({ background: 'transparent' })
-    expect(card).not.toHaveStyle({ boxShadow: 'none' })
+    expect(container.querySelector('.ant-card')).toBeInTheDocument()
   })
 })

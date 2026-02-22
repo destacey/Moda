@@ -1,5 +1,4 @@
 export { default as ContainerCard } from './container-card'
-export { default as ExpandableContent } from './expandable-content'
 export { default as IconMenu } from './icon-menu'
 export { default as InactiveTag } from './inactive-tag'
 export { default as LifecycleStatusTag } from './lifecycle-status-tag'
