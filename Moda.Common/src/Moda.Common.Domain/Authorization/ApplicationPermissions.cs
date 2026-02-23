@@ -35,6 +35,7 @@ public static class ApplicationResource
 
     public const string Connections = nameof(Connections);
     public const string Connectors = nameof(Connectors);
+    public const string AnalyticsViews = nameof(AnalyticsViews);
 
     public const string Employees = nameof(Employees);
     public const string Teams = nameof(Teams);
@@ -116,6 +117,17 @@ public static class ApplicationPermissions
         new("Delete Connections", ApplicationAction.Delete, ApplicationResource.Connections, IntegrationsCategory),
 
         new("View Connectors", ApplicationAction.View, ApplicationResource.Connectors, IntegrationsCategory),
+    ];
+
+    private const string AnalyticsCategory = "Analytics";
+    private static readonly ApplicationPermission[] _analytics =
+    [
+        new("View Analytics Views", ApplicationAction.View, ApplicationResource.AnalyticsViews, AnalyticsCategory, IsBasic: true),
+        new("Create Analytics Views", ApplicationAction.Create, ApplicationResource.AnalyticsViews, AnalyticsCategory),
+        new("Update Analytics Views", ApplicationAction.Update, ApplicationResource.AnalyticsViews, AnalyticsCategory),
+        new("Delete Analytics Views", ApplicationAction.Delete, ApplicationResource.AnalyticsViews, AnalyticsCategory),
+        new("Run Analytics Views", ApplicationAction.Run, ApplicationResource.AnalyticsViews, AnalyticsCategory, IsBasic: true),
+        new("Export Analytics Views", ApplicationAction.Export, ApplicationResource.AnalyticsViews, AnalyticsCategory),
     ];
 
     private const string HealthCategory = "Health";
@@ -268,6 +280,7 @@ public static class ApplicationPermissions
     private static readonly ApplicationPermission[] _all = [.. _common
         .Union(_backgroundJobs)
         .Union(_identity)
+        .Union(_analytics)
         .Union(_appIntegration)
         .Union(_healthChecks)
         .Union(_links)

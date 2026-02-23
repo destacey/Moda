@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using System.Text.Json.Serialization;
 using FluentValidation.AspNetCore;
+using Moda.Analytics.Application;
 using Moda.AppIntegration.Application;
 using Moda.Common.Application;
 using Moda.Common.Application.Interfaces;
@@ -59,6 +60,7 @@ try
     builder.Services.AddCommonApplication();
     builder.Services.AddInfrastructure(builder.Configuration);
 
+    builder.Services.AddAnalyticsApplication();
     builder.Services.AddAppIntegrationApplication();
     builder.Services.AddGoalsApplication();
     builder.Services.AddHealthApplication();

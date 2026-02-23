@@ -16713,6 +16713,336 @@
         ]
       }
     },
+    "/api/analytics/views": {
+      "get": {
+        "tags": [
+          "AnalyticsViews"
+        ],
+        "summary": "Get analytics views visible to the current user.",
+        "operationId": "AnalyticsViews_GetList",
+        "parameters": [
+          {
+            "name": "includeInactive",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AnalyticsViewListDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "AnalyticsViews"
+        ],
+        "summary": "Create an analytics view.",
+        "operationId": "AnalyticsViews_Create",
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAnalyticsViewRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "guid",
+                  "nullable": false,
+                  "example": "00000000-0000-0000-0000-000000000000"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/analytics/views/{id}": {
+      "get": {
+        "tags": [
+          "AnalyticsViews"
+        ],
+        "summary": "Get an analytics view by id.",
+        "operationId": "AnalyticsViews_GetById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalyticsViewDetailsDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "AnalyticsViews"
+        ],
+        "summary": "Update an analytics view.",
+        "operationId": "AnalyticsViews_Update",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAnalyticsViewRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalyticsViewDetailsDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "AnalyticsViews"
+        ],
+        "summary": "Delete an analytics view.",
+        "operationId": "AnalyticsViews_Delete",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/analytics/views/{id}/run": {
+      "post": {
+        "tags": [
+          "AnalyticsViews"
+        ],
+        "summary": "Run an analytics view.",
+        "operationId": "AnalyticsViews_Run",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunAnalyticsViewRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalyticsViewResultDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
     "/api/admin/background-jobs/job-types": {
       "get": {
         "tags": [
@@ -27141,6 +27471,311 @@
             }
           }
         ]
+      },
+      "AnalyticsViewListDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "dataset",
+          "visibility",
+          "ownerId",
+          "isActive",
+          "lastModified"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "dataset": {
+            "$ref": "#/components/schemas/AnalyticsDataset"
+          },
+          "visibility": {
+            "$ref": "#/components/schemas/Visibility"
+          },
+          "ownerId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "lastModified": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "AnalyticsDataset": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "WorkItems",
+          "Dependencies",
+          "PlanningIntervalObjectives"
+        ],
+        "enum": [
+          "WorkItems",
+          "Dependencies",
+          "PlanningIntervalObjectives"
+        ]
+      },
+      "Visibility": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "Public",
+          "Private"
+        ],
+        "enum": [
+          "Public",
+          "Private"
+        ]
+      },
+      "AnalyticsViewDetailsDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "dataset",
+          "definitionJson",
+          "visibility",
+          "ownerId",
+          "isActive",
+          "created",
+          "lastModified"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "dataset": {
+            "$ref": "#/components/schemas/AnalyticsDataset"
+          },
+          "definitionJson": {
+            "type": "string"
+          },
+          "visibility": {
+            "$ref": "#/components/schemas/Visibility"
+          },
+          "ownerId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "lastModified": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CreateAnalyticsViewRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "dataset",
+          "definitionJson",
+          "visibility",
+          "isActive"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1,
+            "nullable": false
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 2048,
+            "minLength": 0,
+            "nullable": true
+          },
+          "dataset": {
+            "$ref": "#/components/schemas/AnalyticsDataset"
+          },
+          "definitionJson": {
+            "type": "string",
+            "minLength": 1,
+            "nullable": false
+          },
+          "visibility": {
+            "$ref": "#/components/schemas/Visibility"
+          },
+          "ownerId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        }
+      },
+      "UpdateAnalyticsViewRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "dataset",
+          "definitionJson",
+          "visibility",
+          "isActive"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1,
+            "nullable": false
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 2048,
+            "minLength": 0,
+            "nullable": true
+          },
+          "dataset": {
+            "$ref": "#/components/schemas/AnalyticsDataset"
+          },
+          "definitionJson": {
+            "type": "string",
+            "minLength": 1,
+            "nullable": false
+          },
+          "visibility": {
+            "$ref": "#/components/schemas/Visibility"
+          },
+          "ownerId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        }
+      },
+      "AnalyticsViewResultDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "columns",
+          "rows",
+          "totalRows"
+        ],
+        "properties": {
+          "columns": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AnalyticsViewResultColumnDto"
+            }
+          },
+          "rows": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": {}
+            }
+          },
+          "totalRows": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "AnalyticsViewResultColumnDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "field",
+          "displayName",
+          "type"
+        ],
+        "properties": {
+          "field": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        }
+      },
+      "RunAnalyticsViewRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "pageNumber",
+          "pageSize"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0.0,
+            "exclusiveMinimum": true
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32",
+            "maximum": 500.0,
+            "minimum": 1.0
+          }
+        }
       },
       "BackgroundJobTypeDto": {
         "type": "object",

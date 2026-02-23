@@ -1,0 +1,13 @@
+global using CSharpFunctionalExtensions;
+global using FluentValidation;
+global using Mapster;
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.Extensions.Logging;
+global using Moda.Analytics.Domain.Enums;
+global using Moda.Analytics.Domain.Models;
+global using Moda.Common.Application.Interfaces;
+global using Moda.Common.Application.Persistence;
+global using Moda.Common.Application.Validation;
+global using Moda.Common.Domain.Enums;
+global using Moda.Work.Domain.Models;
+global using NodaTime;

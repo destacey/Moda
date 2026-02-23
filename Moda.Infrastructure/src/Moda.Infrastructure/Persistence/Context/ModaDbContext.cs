@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Moda.Analytics.Application.Persistence;
+using Moda.Analytics.Domain.Models;
 using Moda.AppIntegration.Domain.Models.AzureOpenAI;
 using Moda.Common.Domain.Employees;
 using Moda.Goals.Application.Persistence;
@@ -27,7 +29,7 @@ using StrategicTheme = Moda.StrategicManagement.Domain.Models.StrategicTheme;
 
 namespace Moda.Infrastructure.Persistence.Context;
 
-public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IGoalsDbContext, IHealthDbContext, ILinksDbContext, IOrganizationDbContext, IPlanningDbContext, IProjectPortfolioManagementDbContext, IStrategicManagementDbContext, IWorkDbContext
+public class ModaDbContext : BaseDbContext, IAnalyticsDbContext, IAppIntegrationDbContext, IGoalsDbContext, IHealthDbContext, ILinksDbContext, IOrganizationDbContext, IPlanningDbContext, IProjectPortfolioManagementDbContext, IStrategicManagementDbContext, IWorkDbContext
 {
     public ModaDbContext(DbContextOptions options, ICurrentUser currentUser, IDateTimeProvider dateTimeProvider, IOptions<DatabaseSettings> dbSettings, IEventPublisher events, IRequestCorrelationIdProvider requestCorrelationIdProvider)
         : base(options, currentUser, dateTimeProvider, dbSettings, events, requestCorrelationIdProvider)
@@ -40,6 +42,12 @@ public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IGoalsDbCo
     public DbSet<PersonalAccessToken> PersonalAccessTokens => Set<PersonalAccessToken>();
 
     #endregion Common
+
+    #region IAnalytics
+
+    public DbSet<AnalyticsView> AnalyticsViews => Set<AnalyticsView>();
+
+    #endregion IAnalytics
 
     #region IAppIntegration
 

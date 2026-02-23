@@ -12,6 +12,7 @@ Moda is a work management system used to plan, manage, and create associations a
 - [Project Portfolio Management](./project-portfolio-management.md)
 - Strategic Management
 - [App Integration](./app-integration.md)
+- [Analytics Views](./analytics-views.md)
 
 ## Ownership
 
@@ -21,3 +22,4 @@ Moda is built to allow data from external systems to be synchronized into Moda. 
 - Managed - The object is owned by an external system.
 
 Objects that are managed by Moda are read only and cannot be changed from within Moda.  Those objects can be associated or linked to other owned items within Moda.  An example of this would be a work item owned by Azure DevOps, and thus managed by Moda, can be linked to a Team Objective owned by Moda.
+

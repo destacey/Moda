@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <ItemGroup>
+        <PackageReference Include="CSharpFunctionalExtensions" />
+        <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
+        <PackageReference Include="Mapster" />
+        <PackageReference Include="MediatR" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" />
+        <PackageReference Include="NodaTime" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\..\Moda.Common\src\Moda.Common.Application\Moda.Common.Application.csproj" />
+      <ProjectReference Include="..\..\..\..\Moda.Common\src\Moda.Common\Moda.Common.csproj" />
+      <ProjectReference Include="..\Moda.Analytics.Domain\Moda.Analytics.Domain.csproj" />
+      <ProjectReference Include="..\..\..\Moda.Work\src\Moda.Work.Domain\Moda.Work.Domain.csproj" />
+    </ItemGroup>
+
+</Project>

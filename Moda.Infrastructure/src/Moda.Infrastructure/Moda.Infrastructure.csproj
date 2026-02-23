@@ -69,6 +69,8 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\..\Moda.Services\Moda.Analytics\src\Moda.Analytics.Application\Moda.Analytics.Application.csproj" />
+        <ProjectReference Include="..\..\..\Moda.Services\Moda.Analytics\src\Moda.Analytics.Domain\Moda.Analytics.Domain.csproj" />
         <ProjectReference Include="..\..\..\Moda.Services\Moda.AppIntegration\src\Moda.AppIntegration.Application\Moda.AppIntegration.Application.csproj" />
         <ProjectReference Include="..\..\..\Moda.Services\Moda.AppIntegration\src\Moda.AppIntegration.Domain\Moda.AppIntegration.Domain.csproj" />
         <ProjectReference Include="..\..\..\Moda.Common\src\Moda.Common.Application\Moda.Common.Application.csproj" />

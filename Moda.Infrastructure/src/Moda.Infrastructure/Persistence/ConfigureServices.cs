@@ -1,6 +1,7 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Moda.Analytics.Application.Persistence;
 using Moda.Goals.Application.Persistence;
 using Moda.Health;
 using Moda.Links;
@@ -76,6 +77,7 @@ internal static class ConfigureServices
     private static IServiceCollection AddDomainDbContexts(this IServiceCollection services)
     {
         services.AddScoped<IModaDbContext, ModaDbContext>();
+        services.AddScoped<IAnalyticsDbContext, ModaDbContext>();
         services.AddScoped<IAppIntegrationDbContext, ModaDbContext>();
         services.AddScoped<IGoalsDbContext, ModaDbContext>();
         services.AddScoped<IHealthDbContext, ModaDbContext>();
