@@ -8,6 +8,7 @@ import {
   CarryOutOutlined,
   ProjectOutlined,
   FundOutlined,
+  BarChartOutlined,
 } from '@ant-design/icons'
 import {
   filterAndTransformMenuItem,
@@ -25,6 +26,7 @@ const menuIcons = {
   home: <HomeOutlined />,
   org: <TeamOutlined />,
   planning: <ScheduleOutlined />,
+  analytics: <BarChartOutlined />,
   ppm: <ProjectOutlined />,
   strategy: <FundOutlined />,
   work: <CarryOutOutlined />,
@@ -70,6 +72,14 @@ const menuItems: (Item | MenuItem)[] = [
       'Workspaces',
       'work.workspaces',
       '/work/workspaces',
+    ),
+  ]),
+  restrictedMenuSection('Analytics', 'analytics', null, menuIcons.analytics, [
+    restrictedPermissionMenuItem(
+      'Permissions.AnalyticsViews.View',
+      'Views',
+      'analytics.views',
+      '/analytics/views',
     ),
   ]),
   // menuItem('Products', 'pdc', null, <DesktopOutlined />, [

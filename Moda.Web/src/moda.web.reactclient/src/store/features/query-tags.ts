@@ -12,6 +12,8 @@ export enum QueryTags {
   AzdoConnectionTeam = 'AppIntegration.AzdoConnectionTeam',
   AzdoConnectionsConfiguration = 'AppIntegration.AzdoConnectionsConfiguration',
   AzdoConnectionsConfigurationTest = 'AppIntegration.AzdoConnectionsConfigurationTest',
+  AnalyticsView = 'AppIntegration.AnalyticsView',
+  AnalyticsViewDetail = 'AppIntegration.AnalyticsViewDetail',
 
   // COMMON
   Links = 'Common.Links',

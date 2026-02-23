@@ -29,6 +29,7 @@ import {
   SprintsClient,
   ConnectionsClient,
   AzureDevOpsConnectionsClient,
+  AnalyticsViewsClient,
 } from './moda-api'
 import { tokenRequest } from '@/auth-config'
 import { InteractionRequiredAuthError } from '@azure/msal-browser'
@@ -126,6 +127,9 @@ export const getConnectionsClient = () => new ConnectionsClient('', axiosClient)
 
 export const getAzureDevOpsConnectionsClient = () =>
   new AzureDevOpsConnectionsClient('', axiosClient)
+
+export const getAnalyticsViewsClient = () =>
+  new AnalyticsViewsClient('', axiosClient)
 
 export const getBackgroundJobsClient = () =>
   new BackgroundJobsClient('', axiosClient)

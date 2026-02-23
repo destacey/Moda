@@ -74,6 +74,13 @@ const routes = {
   workspaces: {
     title: 'Workspaces',
   },
+  analytics: {
+    title: 'Analytics',
+    href: null,
+  },
+  views: {
+    title: 'Views',
+  },
 
   settings: {
     title: 'Settings',
