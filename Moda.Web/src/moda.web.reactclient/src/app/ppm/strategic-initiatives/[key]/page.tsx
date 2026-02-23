@@ -143,19 +143,6 @@ const StrategicInitiativeDetailsPage = (props: {
     dispatch(setBreadcrumbRoute({ route: breadcrumbRoute, pathname }))
   }, [dispatch, pathname, strategicInitiativeData])
 
-  useEffect(() => {
-    const mainContent = document.querySelector('.app-main-content')
-    if (!mainContent) return
-
-    mainContent.classList.add('app-main-content--strategic-initiative-details')
-
-    return () => {
-      mainContent.classList.remove(
-        'app-main-content--strategic-initiative-details',
-      )
-    }
-  }, [])
-
   const actionsMenuItems: MenuProps['items'] = useMemo(() => {
     const currentStatus = strategicInitiativeData?.status.name
     const availableActions =

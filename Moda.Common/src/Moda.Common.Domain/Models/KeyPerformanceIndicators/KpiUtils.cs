@@ -88,6 +88,9 @@ public static class KpiUtils
         if (!startingValue.HasValue) return null;
         if (!actualValue.HasValue) return 0;
 
+        // Guard against division by zero when starting value equals target value
+        if (startingValue.Value == targetValue) return null;
+
         double progress = targetDirection switch
         {
             KpiTargetDirection.Increase => (actualValue.Value - startingValue.Value) / (targetValue - startingValue.Value),

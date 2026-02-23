@@ -8,7 +8,7 @@ import { Card, Flex, Spin, Typography } from 'antd'
 import styles from './projects-card-view.module.css'
 import dayjs from 'dayjs'
 import Link from 'next/link'
-import { FC } from 'react'
+import { FC, ReactNode } from 'react'
 
 const { Text } = Typography
 
@@ -67,7 +67,7 @@ const ProjectCard: FC<ProjectCardProps> = ({ project, onCardClick }) => {
         </Flex>
 
         {/* Timeline */}
-        {hasStarted !== null && (
+        {hasStarted && (
           <TimelineProgress
             start={project.start}
             end={project.end}
@@ -85,7 +85,7 @@ const ProjectCard: FC<ProjectCardProps> = ({ project, onCardClick }) => {
 export interface ProjectsCardViewProps {
   projects: ProjectListDto[] | undefined
   isLoading: boolean
-  viewSelector?: React.ReactNode
+  viewSelector?: ReactNode
   onCardClick: (key: string) => void
 }
 

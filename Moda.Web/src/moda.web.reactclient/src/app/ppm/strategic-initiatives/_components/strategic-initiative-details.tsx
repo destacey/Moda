@@ -13,12 +13,13 @@ import { StrategicInitiativeDetailsDto } from '@/src/services/moda-api'
 import { Card, Divider, Flex } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
+import { FC } from 'react'
 
 export interface StrategicInitiativeDetailsProps {
   strategicInitiative: StrategicInitiativeDetailsDto
 }
 
-const StrategicInitiativeDetails: React.FC<StrategicInitiativeDetailsProps> = ({
+const StrategicInitiativeDetails: FC<StrategicInitiativeDetailsProps> = ({
   strategicInitiative,
 }) => {
   if (!strategicInitiative) return null

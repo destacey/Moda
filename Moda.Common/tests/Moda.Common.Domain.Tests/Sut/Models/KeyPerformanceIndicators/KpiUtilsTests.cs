@@ -160,6 +160,18 @@ public sealed class KpiUtilsTests
         result.Should().Be(expected);
     }
 
+    [Theory]
+    [InlineData(KpiTargetDirection.Increase)]
+    [InlineData(KpiTargetDirection.Decrease)]
+    public void CalculateProgress_ShouldReturnNull_WhenStartingValueEqualsTargetValue(KpiTargetDirection direction)
+    {
+        // Act
+        var result = KpiUtils.CalculateProgress(100.0, 100.0, 100.0, direction);
+
+        // Assert
+        result.Should().BeNull();
+    }
+
     [Fact]
     public void CalculateProgress_ShouldThrow_WhenTargetDirectionIsInvalid()
     {
