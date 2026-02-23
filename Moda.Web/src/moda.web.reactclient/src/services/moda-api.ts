@@ -20063,8 +20063,10 @@ export interface StrategicInitiativeKpiListDto {
     id: string;
     key: number;
     name: string;
+    startingValue?: number | undefined;
     targetValue: number;
     actualValue?: number | undefined;
+    progress?: number | undefined;
     unit: KpiUnit;
     targetDirection: KpiTargetDirection;
 }
@@ -20085,8 +20087,10 @@ export interface StrategicInitiativeKpiDetailsDto {
     key: number;
     name: string;
     description?: string | undefined;
+    startingValue?: number | undefined;
     targetValue: number;
     actualValue?: number | undefined;
+    progress?: number | undefined;
     unit: KpiUnit;
     targetDirection: KpiTargetDirection;
 }
@@ -20100,6 +20104,8 @@ export interface CreateStrategicInitiativeKpiRequest {
     description?: string | undefined;
     /** The target value that defines success for the KPI. */
     targetValue: number;
+    /** The starting (baseline) value of the KPI. */
+    startingValue?: number | undefined;
     /** The unit of measurement for the KPI. */
     unit: KpiUnit;
     /** The target direction for the KPI. */
@@ -20117,6 +20123,8 @@ export interface UpdateStrategicInitiativeKpiRequest {
     description?: string | undefined;
     /** The target value that defines success for the KPI. */
     targetValue: number;
+    /** The starting (baseline) value of the KPI. */
+    startingValue?: number | undefined;
     /** The unit of measurement for the KPI. */
     unit: KpiUnit;
     /** The target direction for the KPI. */

@@ -1,4 +1,4 @@
-import { createContext, useEffect, useMemo, useState } from 'react'
+import { createContext, ReactNode, useEffect, useMemo, useState } from 'react'
 import {
   themeBalham,
   colorSchemeDark,
@@ -15,7 +15,7 @@ export const ThemeContext = createContext<ThemeContextType | null>(null)
 const agGridLightTheme = themeBalham
 const agGridDarkTheme = themeBalham.withPart(colorSchemeDark)
 
-export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
+export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [currentThemeName, setCurrentThemeName] =
     useLocalStorageState<ThemeName>('modaTheme', 'light')
 
@@ -25,16 +25,10 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const [antvisG6ChartsTheme, setAntvisG6ChartsTheme] = useState('light')
 
   // Create the theme configuration
-  const currentTheme = useMemo(() => {
-    const baseTheme = currentThemeName === 'light' ? lightTheme : darkTheme
-    return {
-      ...baseTheme,
-      token: {
-        ...theme.defaultConfig.token,
-        ...baseTheme.token,
-      },
-    }
-  }, [currentThemeName])
+  const currentTheme = useMemo(
+    () => (currentThemeName === 'light' ? lightTheme : darkTheme),
+    [currentThemeName],
+  )
 
   useEffect(() => {
     setAgGridTheme(
@@ -47,7 +41,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   }, [currentThemeName])
 
   // Use theme.useToken() inside ConfigProvider
-  const ThemeContent = ({ children }: { children: React.ReactNode }) => {
+  const ThemeContent = ({ children }: { children: ReactNode }) => {
     const { token } = theme.useToken()
 
     useEffect(() => {

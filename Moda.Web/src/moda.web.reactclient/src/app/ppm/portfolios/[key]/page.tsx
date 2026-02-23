@@ -72,8 +72,6 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const { key } = use(props.params)
   const portfolioKey = Number(key)
 
-  useDocumentTitle('Portfolio Details')
-
   const [activeTab, setActiveTab] = useState(PortfolioTabs.Details)
   const [programsQueried, setProgramsQueried] = useState(false)
   const [projectsQueried, setProjectsQueried] = useState(false)

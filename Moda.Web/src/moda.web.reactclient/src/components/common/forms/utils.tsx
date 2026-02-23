@@ -1,4 +1,5 @@
 import { Form, FormItemProps } from 'antd'
+import { FC } from 'react'
 
 const { Item } = Form
 
@@ -11,7 +12,7 @@ export type TypedFormItemProps<T extends Record<string, any>> = Omit<
 }
 
 export function createTypedFormItem<T extends Record<string, any>>() {
-  const TypedFormItem: React.FC<TypedFormItemProps<T>> = (props) => {
+  const TypedFormItem: FC<TypedFormItemProps<T>> = (props) => {
     // Cast props to FormItemProps<T> to ensure the generic is forwarded correctly.
     return <Item {...(props as FormItemProps<T>)} />
   }

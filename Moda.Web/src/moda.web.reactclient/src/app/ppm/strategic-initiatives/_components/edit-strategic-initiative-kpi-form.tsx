@@ -32,6 +32,7 @@ export interface EditStrategicInitiativeKpiFormProps {
 interface EditStrategicInitiativeKpiFormValues {
   name: string
   description?: string
+  startingValue?: number
   targetValue: number
   unit: KpiUnit
   targetDirection: KpiTargetDirection
@@ -61,6 +62,7 @@ const mapToRequestValues = (
     kpiId: kpiId,
     name: values.name,
     description: values.description,
+    startingValue: values.startingValue,
     targetValue: values.targetValue,
     unit: values.unit,
     targetDirection: values.targetDirection,
@@ -108,6 +110,7 @@ const EditStrategicInitiativeKpiForm = (
       form.setFieldsValue({
         name: kpi.name,
         description: kpi.description,
+        startingValue: kpi.startingValue,
         targetValue: kpi.targetValue,
         unit: kpi.unit,
         targetDirection: kpi.targetDirection,
@@ -195,9 +198,7 @@ const EditStrategicInitiativeKpiForm = (
   useEffect(() => {
     if (kpiError) {
       console.error(kpiError)
-      messageApi.error(
-        kpiError || 'An error occurred while loading form data.',
-      )
+      messageApi.error(kpiError || 'An error occurred while loading form data.')
       onFormCancel()
     }
   }, [kpiError, messageApi, onFormCancel])
@@ -248,6 +249,9 @@ const EditStrategicInitiativeKpiForm = (
             rules={[{ max: 512 }]}
           >
             <MarkdownEditor maxLength={512} />
+          </TypedFormItem>
+          <TypedFormItem name="startingValue" label="Starting Value">
+            <InputNumber style={{ width: 200 }} />
           </TypedFormItem>
           <TypedFormItem
             name="targetValue"

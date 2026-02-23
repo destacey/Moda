@@ -8,8 +8,10 @@ import {
 import useAuth from '@/src/components/contexts/auth'
 import { authorizePage } from '@/src/components/hoc'
 import { useAppDispatch, useDocumentTitle } from '@/src/hooks'
-import { Card, MenuProps } from 'antd'
+import { Badge, Col, Flex, MenuProps, Row, Typography } from 'antd'
 import { notFound, usePathname, useRouter } from 'next/navigation'
+
+const { Text } = Typography
 import { use, useCallback, useEffect, useMemo, useState } from 'react'
 import StrategicInitiativeDetailsLoading from './loading'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
@@ -25,32 +27,11 @@ import {
   DeleteStrategicInitiativeForm,
   ManageStrategicInitiativeProjectsForm,
   StrategicInitiativeDetails,
-  StrategicInitiativeKpisGrid,
+  StrategicInitiativeKpiViewManager,
 } from '../_components'
 import EditStrategicInitiativeForm from '../_components/edit-strategic-initiative-form'
 import { StrategicInitiativeStatusAction } from '../_components/change-strategic-initiative-status-form'
 import { ProjectViewManager } from '../../_components'
-
-enum StrategicInitiativeTabs {
-  Details = 'details',
-  Kpis = 'kpis',
-  Projects = 'projects',
-}
-
-const tabs = [
-  {
-    key: StrategicInitiativeTabs.Details,
-    label: 'Details',
-  },
-  {
-    key: StrategicInitiativeTabs.Kpis,
-    label: 'KPIs',
-  },
-  {
-    key: StrategicInitiativeTabs.Projects,
-    label: 'Projects',
-  },
-]
 
 enum StrategicInitiativeAction {
   Edit = 'Edit',
@@ -68,10 +49,6 @@ const StrategicInitiativeDetailsPage = (props: {
   const siKey = Number(key)
 
   useDocumentTitle('Strategic Initiative Details')
-
-  const [activeTab, setActiveTab] = useState(StrategicInitiativeTabs.Details)
-  const [kpisQueried, setKpisQueried] = useState(false)
-  const [projectsQueried, setProjectsQueried] = useState(false)
 
   const [openEditStrategicInitiativeForm, setOpenEditStrategicInitiativeForm] =
     useState<boolean>(false)
@@ -121,20 +98,22 @@ const StrategicInitiativeDetailsPage = (props: {
   const {
     data: kpiData,
     isLoading: isLoadingKpis,
-    error: kpiError,
     refetch: refetchKpis,
   } = useGetStrategicInitiativeKpisQuery(strategicInitiativeData?.id, {
-    skip: !kpisQueried,
+    skip: !strategicInitiativeData?.id,
   })
 
   const {
     data: projectData,
     isLoading: isLoadingProjects,
-    error: errorProjects,
     refetch: refetchProjects,
   } = useGetStrategicInitiativeProjectsQuery(strategicInitiativeData?.id, {
-    skip: !projectsQueried,
+    skip: !strategicInitiativeData?.id,
   })
+
+  useDocumentTitle(
+    `${strategicInitiativeData?.name ?? siKey} - Strategic Initiative Details`,
+  )
 
   // Derive isReadOnly from strategic initiative status
   const isReadOnly = useMemo(() => {
@@ -163,68 +142,6 @@ const StrategicInitiativeDetailsPage = (props: {
 
     dispatch(setBreadcrumbRoute({ route: breadcrumbRoute, pathname }))
   }, [dispatch, pathname, strategicInitiativeData])
-
-  const renderTabContent = useCallback(() => {
-    switch (activeTab) {
-      case StrategicInitiativeTabs.Details:
-        return (
-          <StrategicInitiativeDetails
-            strategicInitiative={strategicInitiativeData}
-          />
-        )
-      case StrategicInitiativeTabs.Kpis:
-        return (
-          <StrategicInitiativeKpisGrid
-            strategicInitiativeId={strategicInitiativeData?.id}
-            kpis={kpiData}
-            canManageKpis={canUpdateStrategicInitiative}
-            isLoading={isLoadingKpis}
-            refetch={refetchKpis}
-            gridHeight={550}
-            isReadOnly={isReadOnly}
-          />
-        )
-      case StrategicInitiativeTabs.Projects:
-        return (
-          <ProjectViewManager
-            projects={projectData}
-            isLoading={isLoadingProjects}
-            refetch={refetchProjects}
-            hidePortfolio={true}
-            groupByProgram={true}
-          />
-        )
-      default:
-        return null
-    }
-  }, [
-    activeTab,
-    strategicInitiativeData,
-    kpiData,
-    canUpdateStrategicInitiative,
-    isLoadingKpis,
-    refetchKpis,
-    projectData,
-    isLoadingProjects,
-    refetchProjects,
-    isReadOnly,
-  ])
-
-  // doesn't trigger on first render
-  const onTabChange = useCallback(
-    (tabKey: string) => {
-      const tab = tabKey as StrategicInitiativeTabs
-
-      if (tab === StrategicInitiativeTabs.Kpis && !kpisQueried) {
-        setKpisQueried(true)
-      } else if (tab === StrategicInitiativeTabs.Projects && !projectsQueried) {
-        setProjectsQueried(true)
-      }
-
-      setActiveTab(tab)
-    },
-    [kpisQueried, projectsQueried],
-  )
 
   const actionsMenuItems: MenuProps['items'] = useMemo(() => {
     const currentStatus = strategicInitiativeData?.status.name
@@ -424,9 +341,13 @@ const StrategicInitiativeDetailsPage = (props: {
     [router],
   )
 
-  const onCreateKpiFormClosed = useCallback(() => {
-    setOpenCreateKpiForm(false)
-  }, [])
+  const onCreateKpiFormClosed = useCallback(
+    (wasSaved: boolean) => {
+      setOpenCreateKpiForm(false)
+      if (wasSaved) refetchKpis()
+    },
+    [refetchKpis],
+  )
 
   if (isLoading) {
     return <StrategicInitiativeDetailsLoading />
@@ -444,14 +365,52 @@ const StrategicInitiativeDetailsPage = (props: {
         tags={<LifecycleStatusTag status={strategicInitiativeData?.status} />}
         actions={<PageActions actionItems={actionsMenuItems} />}
       />
-      <Card
-        style={{ width: '100%' }}
-        tabList={tabs}
-        activeTabKey={activeTab}
-        onTabChange={onTabChange}
-      >
-        {renderTabContent()}
-      </Card>
+
+      <Row gutter={16}>
+        <Col xs={24} md={9} xxl={6}>
+          <StrategicInitiativeDetails
+            strategicInitiative={strategicInitiativeData}
+          />
+        </Col>
+        <Col xs={24} md={15} xxl={18}>
+          <Flex vertical gap="large">
+            <Flex vertical>
+              <Flex align="center" gap={8}>
+                <Text strong>KPIs</Text>
+                <Badge count={kpiData?.length ?? 0} showZero color="blue" />
+              </Flex>
+              <StrategicInitiativeKpiViewManager
+                strategicInitiativeId={strategicInitiativeData.id}
+                kpis={kpiData}
+                canManageKpis={canUpdateStrategicInitiative}
+                isLoading={isLoadingKpis}
+                refetch={refetchKpis}
+                gridHeight={400}
+                isReadOnly={isReadOnly}
+                onCreateKpi={
+                  !isReadOnly && canUpdateStrategicInitiative
+                    ? () => setOpenCreateKpiForm(true)
+                    : undefined
+                }
+              />
+            </Flex>
+            <Flex vertical>
+              <Flex align="center" gap={8}>
+                <Text strong>Projects</Text>
+                <Badge count={projectData?.length ?? 0} showZero color="blue" />
+              </Flex>
+              <ProjectViewManager
+                projects={projectData}
+                isLoading={isLoadingProjects}
+                refetch={refetchProjects}
+                hidePortfolio={true}
+                groupByProgram={true}
+                defaultView="Card"
+              />
+            </Flex>
+          </Flex>
+        </Col>
+      </Row>
 
       {openEditStrategicInitiativeForm && (
         <EditStrategicInitiativeForm
@@ -509,8 +468,8 @@ const StrategicInitiativeDetailsPage = (props: {
         <CreateStrategicInitiativeKpiForm
           strategicInitiativeId={strategicInitiativeData?.id}
           showForm={openCreateKpiForm}
-          onFormComplete={() => onCreateKpiFormClosed()}
-          onFormCancel={() => onCreateKpiFormClosed()}
+          onFormComplete={() => onCreateKpiFormClosed(true)}
+          onFormCancel={() => onCreateKpiFormClosed(false)}
         />
       )}
       {openManageProjectsForm && (

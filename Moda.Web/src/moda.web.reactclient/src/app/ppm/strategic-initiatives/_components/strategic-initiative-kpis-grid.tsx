@@ -24,6 +24,7 @@ export interface StrategicInitiativeKpisGridProps {
   refetch: () => void
   gridHeight?: number | undefined
   isReadOnly?: boolean
+  viewSelector?: React.ReactNode
 }
 
 const StatisticNumberCellRenderer = (params) => {
@@ -88,6 +89,7 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
     refetch,
     gridHeight,
     isReadOnly,
+    viewSelector,
   } = props
 
   const [selectedKpiId, setSelectedKpiId] = useState<string | null>(null)
@@ -249,6 +251,7 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
         height={gridHeight}
         emptyMessage="No KPIs found."
         getRowId={getRowId}
+        toolbarActions={viewSelector}
       />
       {selectedKpiId && (
         <StrategicInitiativeKpiDetailsDrawer

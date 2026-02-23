@@ -25,6 +25,7 @@ export interface CreateStrategicInitiativeKpiFormProps {
 interface CreateStrategicInitiativeKpiFormValues {
   name: string
   description?: string
+  startingValue?: number
   targetValue: number
   unit: KpiUnit
   targetDirection: KpiTargetDirection
@@ -52,6 +53,7 @@ const mapToRequestValues = (
     strategicInitiativeId: strategicInitiativeId,
     name: values.name,
     description: values.description,
+    startingValue: values.startingValue,
     targetValue: values.targetValue,
     unit: values.unit,
     targetDirection: values.targetDirection,
@@ -190,6 +192,9 @@ const CreateStrategicInitiativeKpiForm = (
             rules={[{ max: 512 }]}
           >
             <MarkdownEditor maxLength={512} />
+          </TypedFormItem>
+          <TypedFormItem name="startingValue" label="Starting Value">
+            <InputNumber style={{ width: 200 }} />
           </TypedFormItem>
           <TypedFormItem
             name="targetValue"

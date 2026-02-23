@@ -54,7 +54,7 @@ const ProgramDrawer: FC<ProgramDrawerProps> = (props: ProgramDrawerProps) => {
     () =>
       programData?.programSponsors.length > 0
         ? getSortedNames(programData.programSponsors)
-        : 'No sponsors assigned',
+        : 'No sponsor assigned',
     [programData],
   )
 
@@ -62,7 +62,7 @@ const ProgramDrawer: FC<ProgramDrawerProps> = (props: ProgramDrawerProps) => {
     () =>
       programData?.programOwners.length > 0
         ? getSortedNames(programData.programOwners)
-        : 'No owners assigned',
+        : 'No owner assigned',
     [programData],
   )
 
@@ -70,7 +70,7 @@ const ProgramDrawer: FC<ProgramDrawerProps> = (props: ProgramDrawerProps) => {
     () =>
       programData?.programManagers.length > 0
         ? getSortedNames(programData.programManagers)
-        : 'No managers assigned',
+        : 'No manager assigned',
     [programData],
   )
 

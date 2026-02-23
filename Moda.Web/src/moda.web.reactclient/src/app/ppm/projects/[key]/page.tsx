@@ -93,7 +93,7 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     refetch: refetchProject,
   } = useGetProjectQuery(projectKey)
 
-  useDocumentTitle(`${projectKey} - Project Details`)
+  useDocumentTitle(`${projectData?.name ?? projectKey} - Project Details`)
 
   const {
     data: workItemsData,

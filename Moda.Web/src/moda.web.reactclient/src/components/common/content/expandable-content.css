@@ -1,0 +1,17 @@
+.expandable-content-clamp {
+  position: relative;
+}
+
+.expandable-content-fade {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 32px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--expandable-content-bg, var(--ant-color-bg-container))
+  );
+  pointer-events: none;
+}

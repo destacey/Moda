@@ -1,4 +1,4 @@
-using Moda.Common.Domain.Models.KeyPerformanceIndicators;
+﻿using Moda.Common.Domain.Models.KeyPerformanceIndicators;
 using Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Commands.Kpis;
 using Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 
@@ -32,6 +32,11 @@ public sealed record UpdateStrategicInitiativeKpiRequest
     public double TargetValue { get; set; }
 
     /// <summary>
+    /// The starting (baseline) value of the KPI.
+    /// </summary>
+    public double? StartingValue { get; set; }
+
+    /// <summary>
     /// The unit of measurement for the KPI.
     /// </summary>
     public KpiUnit Unit { get; set; }
@@ -43,7 +48,7 @@ public sealed record UpdateStrategicInitiativeKpiRequest
 
     public UpdateStrategicInitiativeKpiCommand ToUpdateStrategicInitiativeKpiCommand()
     {
-        var parameters = new StrategicInitiativeKpiUpsertParameters(Name, Description, TargetValue, Unit, TargetDirection);
+        var parameters = new StrategicInitiativeKpiUpsertParameters(Name, Description, StartingValue, TargetValue, Unit, TargetDirection);
 
         return new UpdateStrategicInitiativeKpiCommand(StrategicInitiativeId, KpiId, parameters);
     }

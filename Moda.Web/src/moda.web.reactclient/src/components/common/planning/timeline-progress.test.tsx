@@ -73,7 +73,7 @@ describe('TimelineProgress', () => {
   it('renders title, dates, and progress info', () => {
     render(<TimelineProgress start={startDate} end={endDate} />)
 
-    expect(screen.getByText('Timeline Progress')).toBeInTheDocument()
+    expect(screen.getByText('Timeline')).toBeInTheDocument()
     expect(screen.getByText('Oct 26')).toBeInTheDocument()
     expect(screen.getByText('Nov 8')).toBeInTheDocument()
     expect(screen.getByText('Day 7 of 14 (50%)')).toBeInTheDocument()
@@ -131,7 +131,7 @@ describe('TimelineProgress', () => {
     render(<TimelineProgress start={startDate} end={endDate} />)
 
     expect(screen.getByTestId('iteration-dates')).toBeInTheDocument()
-    expect(screen.queryByText('Timeline Progress')).not.toBeInTheDocument()
+    expect(screen.queryByText('Timeline')).not.toBeInTheDocument()
   })
 
   it('passes props to IterationDates when falling back', () => {
@@ -258,6 +258,24 @@ describe('TimelineProgress', () => {
     expect(card).toHaveStyle({ padding: '10px' })
   })
 
+  it('uses fontSize 11 when size is small', () => {
+    render(<TimelineProgress start={startDate} end={endDate} size="small" />)
+
+    const textElements = screen.getAllByText(/Timeline|Oct 26|Nov 8|Day/)
+    textElements.forEach((el) => {
+      expect(el).toHaveStyle({ fontSize: '11px' })
+    })
+  })
+
+  it('uses fontSize 12 by default', () => {
+    render(<TimelineProgress start={startDate} end={endDate} />)
+
+    const textElements = screen.getAllByText(/Oct 26|Nov 8|Day/)
+    textElements.forEach((el) => {
+      expect(el).toHaveStyle({ fontSize: '12px' })
+    })
+  })
+
   it('custom styles override default styles', () => {
     const { container } = render(
       <TimelineProgress
@@ -269,5 +287,35 @@ describe('TimelineProgress', () => {
 
     const card = container.querySelector('.ant-card')
     expect(card).toHaveStyle({ minWidth: '500px' })
+  })
+
+  it('does not render a card when borderless', () => {
+    const { container } = render(
+      <TimelineProgress start={startDate} end={endDate} variant="borderless" />,
+    )
+
+    expect(container.querySelector('.ant-card')).toBeNull()
+  })
+
+  it('applies custom style to the flex wrapper when borderless', () => {
+    const { container } = render(
+      <TimelineProgress
+        start={startDate}
+        end={endDate}
+        variant="borderless"
+        style={{ width: '100%' }}
+      />,
+    )
+
+    const flex = container.firstChild as HTMLElement
+    expect(flex).toHaveStyle({ width: '100%' })
+  })
+
+  it('renders a card when outlined', () => {
+    const { container } = render(
+      <TimelineProgress start={startDate} end={endDate} variant="outlined" />,
+    )
+
+    expect(container.querySelector('.ant-card')).toBeInTheDocument()
   })
 })

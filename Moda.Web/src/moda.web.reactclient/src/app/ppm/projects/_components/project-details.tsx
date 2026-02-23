@@ -23,15 +23,15 @@ const ProjectDetails: FC<ProjectDetailsProps> = ({
   const sponsorNames =
     project?.projectSponsors.length > 0
       ? getSortedNames(project.projectSponsors)
-      : 'No sponsors assigned'
+      : 'No sponsor assigned'
   const ownerNames =
     project?.projectOwners.length > 0
       ? getSortedNames(project.projectOwners)
-      : 'No owners assigned'
+      : 'No owner assigned'
   const managerNames =
     project?.projectManagers.length > 0
       ? getSortedNames(project.projectManagers)
-      : 'No managers assigned'
+      : 'No manager assigned'
 
   const strategicThemes =
     project?.strategicThemes.length > 0

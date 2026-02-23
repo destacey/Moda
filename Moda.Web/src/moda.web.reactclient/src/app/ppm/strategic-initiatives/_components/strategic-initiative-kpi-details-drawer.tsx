@@ -39,6 +39,10 @@ import {
   EditStrategicInitiativeKpiForm,
   ManageStrategicInitiativeKpiCheckpointPlanForm,
 } from '.'
+import {
+  ExpandableContent,
+  LabeledContent,
+} from '@/src/components/common/content'
 
 const { Item } = Descriptions
 const { Text } = Typography
@@ -262,7 +266,9 @@ const StrategicInitiativeKpiDetailsDrawer: FC<
       dataIndex: 'health',
       key: 'health',
       width: 110,
-      render: (health: KpiHealth | undefined) => <KpiHealthTag health={health} />,
+      render: (health: KpiHealth | undefined) => (
+        <KpiHealthTag health={health} />
+      ),
     },
     {
       title: 'Trend',
@@ -372,27 +378,30 @@ const StrategicInitiativeKpiDetailsDrawer: FC<
         extra={extraMenu}
       >
         <Flex vertical gap="middle">
-          <Descriptions column={1} size="small">
-            <Item label="Target Value">
+          <Flex vertical gap={10}>
+            <LabeledContent label="Starting Value">
+              {formatValue(kpiData?.startingValue, unit)}
+            </LabeledContent>
+            <LabeledContent label="Target Value">
               {formatValue(kpiData?.targetValue, unit)}
-            </Item>
-            <Item label="Actual Value">
+            </LabeledContent>
+            <LabeledContent label="Actual Value">
               {kpiData?.actualValue !== undefined
                 ? formatValue(kpiData.actualValue, unit)
                 : '-'}
-            </Item>
-            <Item label="Unit">{unit}</Item>
-            <Item label="Target Direction">
+            </LabeledContent>
+            <LabeledContent label="Unit">{unit}</LabeledContent>
+            <LabeledContent label="Target Direction">
               {kpiData?.targetDirection as unknown as string}
-            </Item>
-          </Descriptions>
-          {kpiData?.description && (
-            <Descriptions column={1} layout="vertical" size="small">
-              <Item label="Description">
-                <MarkdownRenderer markdown={kpiData.description} />
-              </Item>
-            </Descriptions>
-          )}
+            </LabeledContent>
+            {kpiData?.description && (
+              <LabeledContent label="Description">
+                <ExpandableContent background="var(--ant-color-bg-elevated)">
+                  <MarkdownRenderer markdown={kpiData.description} />
+                </ExpandableContent>
+              </LabeledContent>
+            )}
+          </Flex>
           <Divider titlePlacement="start">
             <Text type="secondary" style={{ fontSize: 12 }}>
               Checkpoints
