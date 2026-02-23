@@ -11,7 +11,7 @@
   background: linear-gradient(
     to bottom,
     transparent,
-    var(--ant-color-bg-container)
+    var(--expandable-content-bg, var(--ant-color-bg-container))
   );
   pointer-events: none;
 }

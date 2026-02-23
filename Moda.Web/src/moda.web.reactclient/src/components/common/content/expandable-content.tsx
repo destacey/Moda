@@ -11,11 +11,14 @@ const LINE_HEIGHT_PX = 24
 interface ExpandableContentProps {
   children: ReactNode
   lines?: number
+  /** Background color for the fade gradient. Defaults to --ant-color-bg-container. */
+  background?: string
 }
 
 const ExpandableContent: FC<ExpandableContentProps> = ({
   children,
   lines = 4,
+  background,
 }) => {
   const [expanded, setExpanded] = useState(false)
   const [overflows, setOverflows] = useState(false)
@@ -32,7 +35,14 @@ const ExpandableContent: FC<ExpandableContentProps> = ({
 
   return (
     <div>
-      <div className="expandable-content-clamp">
+      <div
+        className="expandable-content-clamp"
+        style={
+          background
+            ? ({ '--expandable-content-bg': background } as React.CSSProperties)
+            : undefined
+        }
+      >
         <div
           ref={contentRef}
           style={{
