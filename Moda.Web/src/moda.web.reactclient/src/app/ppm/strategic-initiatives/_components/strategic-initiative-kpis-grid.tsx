@@ -62,6 +62,7 @@ const getRowMenuItems = (props: RowMenuProps): ItemType[] => {
     {
       key: 'delete-kpi',
       label: 'Delete KPI',
+      danger: true,
       onClick: () => props.onDeleteKpiMenuClicked(props.kpiId),
     },
     { key: 'divider', type: 'divider' },

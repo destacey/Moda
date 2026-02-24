@@ -33,9 +33,10 @@ import {
   Typography,
 } from 'antd'
 import dayjs from 'dayjs'
-import { FC, useEffect, useState } from 'react'
+import { CSSProperties, FC, useEffect, useState } from 'react'
 import {
   AddStrategicInitiativeKpiMeasurementForm,
+  DeleteStrategicInitiativeKpiForm,
   EditStrategicInitiativeKpiForm,
   ManageStrategicInitiativeKpiCheckpointPlanForm,
 } from '.'
@@ -121,6 +122,7 @@ const StrategicInitiativeKpiDetailsDrawer: FC<
 
   const [size, setSize] = useState(getDrawerWidthPixels())
   const [openEditKpiForm, setOpenEditKpiForm] = useState(false)
+  const [openDeleteKpiForm, setOpenDeleteKpiForm] = useState(false)
   const [openAddMeasurementForm, setOpenAddMeasurementForm] = useState(false)
   const [openManageCheckpointPlanForm, setOpenManageCheckpointPlanForm] =
     useState(false)
@@ -220,6 +222,14 @@ const StrategicInitiativeKpiDetailsDrawer: FC<
       messageApi.error(
         'An error occurred while deleting the measurement. Please try again.',
       )
+    }
+  }
+
+  const onDeleteKpiFormClosed = (wasSaved: boolean) => {
+    setOpenDeleteKpiForm(false)
+    if (wasSaved) {
+      onDrawerClose()
+      onRefresh()
     }
   }
 
@@ -348,6 +358,13 @@ const StrategicInitiativeKpiDetailsDrawer: FC<
             onClick: () => setOpenEditKpiForm(true),
           },
           {
+            key: 'delete',
+            label: 'Delete',
+            danger: true,
+            onClick: () => setOpenDeleteKpiForm(true),
+          },
+          { key: 'divider', type: 'divider' },
+          {
             key: 'checkpoint-plan',
             label: 'Checkpoint Plan',
             onClick: () => setOpenManageCheckpointPlanForm(true),
@@ -376,7 +393,7 @@ const StrategicInitiativeKpiDetailsDrawer: FC<
         size={size}
         resizable={{ onResize: (newSize) => setSize(newSize) }}
         destroyOnHidden={true}
-        styles={{ body: { scrollbarWidth: 'auto' } as React.CSSProperties }}
+        styles={{ body: { scrollbarWidth: 'auto' } as CSSProperties }}
         className="custom-drawer"
         extra={extraMenu}
       >
@@ -393,12 +410,8 @@ const StrategicInitiativeKpiDetailsDrawer: FC<
                 ? formatValue(kpiData.actualValue, prefix, suffix)
                 : '-'}
             </LabeledContent>
-            {prefix && (
-              <LabeledContent label="Prefix">{prefix}</LabeledContent>
-            )}
-            {suffix && (
-              <LabeledContent label="Suffix">{suffix}</LabeledContent>
-            )}
+            {prefix && <LabeledContent label="Prefix">{prefix}</LabeledContent>}
+            {suffix && <LabeledContent label="Suffix">{suffix}</LabeledContent>}
             <LabeledContent label="Target Direction">
               {kpiData?.targetDirection as unknown as string}
             </LabeledContent>
@@ -458,6 +471,15 @@ const StrategicInitiativeKpiDetailsDrawer: FC<
           showForm={openAddMeasurementForm}
           onFormComplete={() => onAddMeasurementFormClosed(true)}
           onFormCancel={() => onAddMeasurementFormClosed(false)}
+        />
+      )}
+      {openDeleteKpiForm && kpiData && (
+        <DeleteStrategicInitiativeKpiForm
+          strategicInitiativeId={strategicInitiativeId}
+          kpi={kpiData}
+          showForm={openDeleteKpiForm}
+          onFormComplete={() => onDeleteKpiFormClosed(true)}
+          onFormCancel={() => onDeleteKpiFormClosed(false)}
         />
       )}
       {openManageCheckpointPlanForm && (

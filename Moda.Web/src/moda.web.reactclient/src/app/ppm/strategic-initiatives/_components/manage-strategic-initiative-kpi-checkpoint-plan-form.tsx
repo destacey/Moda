@@ -25,6 +25,7 @@ import {
   InputNumber,
   InputRef,
   Modal,
+  Typography,
 } from 'antd'
 import dayjs from 'dayjs'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -33,6 +34,7 @@ type InputNumberRef = { focus: () => void } | null
 
 const { Item } = Form
 const { Item: DescriptionItem } = Descriptions
+const { Text } = Typography
 
 export interface ManageStrategicInitiativeKpiCheckpointPlanFormProps {
   strategicInitiativeId: string
@@ -246,6 +248,36 @@ const ManageStrategicInitiativeKpiCheckpointPlanForm = (
         <Form.List name="checkpoints">
           {(fields, { add, remove }) => (
             <>
+              {fields.length > 0 && (
+                <Flex style={{ width: '90%', marginBottom: 4 }}>
+                  <Flex gap="small" wrap>
+                    <Text
+                      type="secondary"
+                      style={{ width: 150, fontSize: 12 }}
+                    >
+                      Date Label
+                    </Text>
+                    <Text
+                      type="secondary"
+                      style={{ width: 200, fontSize: 12 }}
+                    >
+                      Checkpoint Date
+                    </Text>
+                    <Text
+                      type="secondary"
+                      style={{ width: 125, fontSize: 12 }}
+                    >
+                      Target Value
+                    </Text>
+                    <Text
+                      type="secondary"
+                      style={{ width: 130, fontSize: 12 }}
+                    >
+                      At Risk Value
+                    </Text>
+                  </Flex>
+                </Flex>
+              )}
               {fields.map(({ key, name, ...restField }, index) => (
                 <div key={key}>
                   <Flex align="center" justify="space-between">
@@ -312,6 +344,7 @@ const ManageStrategicInitiativeKpiCheckpointPlanForm = (
                           rules={[
                             {
                               required: true,
+                              type: 'number',
                               message: 'Target value is required',
                             },
                           ]}

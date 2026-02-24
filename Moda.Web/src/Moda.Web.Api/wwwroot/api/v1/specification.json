@@ -20859,9 +20859,7 @@
           "targetValue": {
             "type": "number",
             "description": "The target value for this checkpoint.",
-            "format": "double",
-            "minLength": 1,
-            "nullable": false
+            "format": "double"
           },
           "atRiskValue": {
             "type": "number",
