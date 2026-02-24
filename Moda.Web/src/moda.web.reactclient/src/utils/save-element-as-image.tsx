@@ -20,6 +20,7 @@ export const saveElementAsImage = async (
     // Capture the element using html2canvas
     const canvas = await html2canvas(element, {
       backgroundColor: null, // Default: transparent background
+      scale: Math.max(window.devicePixelRatio || 1, 2), // Always capture at minimum 2x for crisp images
       ...options, // Allow custom options to override defaults
     })
 
