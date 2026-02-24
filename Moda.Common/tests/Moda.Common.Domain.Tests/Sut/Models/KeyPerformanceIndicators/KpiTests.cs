@@ -1,4 +1,4 @@
-﻿using Moda.Common.Domain.Models.KeyPerformanceIndicators;
+using Moda.Common.Domain.Models.KeyPerformanceIndicators;
 using Moda.Common.Domain.Tests.Data;
 using Moda.Common.Domain.Tests.Data.Models;
 using Moda.Tests.Shared;
@@ -30,11 +30,12 @@ public sealed class KpiTests
         var description = "Test description";
         var startingValue = 25.0;
         var targetValue = 75.0;
-        var unit = KpiUnit.Percentage;
+        var prefix = "$";
+        var suffix = "M";
         var direction = KpiTargetDirection.Increase;
 
         // Act
-        var kpi = TestKpi.Create(name, description, startingValue, targetValue, unit, direction);
+        var kpi = TestKpi.Create(name, description, startingValue, targetValue, prefix, suffix, direction);
 
         // Assert
         kpi.Should().NotBeNull();
@@ -42,7 +43,8 @@ public sealed class KpiTests
         kpi.Description.Should().Be(description);
         kpi.StartingValue.Should().Be(startingValue);
         kpi.TargetValue.Should().Be(targetValue);
-        kpi.Unit.Should().Be(unit);
+        kpi.Prefix.Should().Be(prefix);
+        kpi.Suffix.Should().Be(suffix);
         kpi.TargetDirection.Should().Be(direction);
     }
 
@@ -55,11 +57,12 @@ public sealed class KpiTests
         var newDescription = "Updated description";
         var newStartingValue = 10.0;
         var newTargetValue = 85.0;
-        var newUnit = KpiUnit.Percentage;
+        var newPrefix = "€";
+        var newSuffix = "K";
         var newTargetDirection = KpiTargetDirection.Increase;
 
         // Act
-        var updateResult = kpi.Update(newName, newDescription, newStartingValue, newTargetValue, newUnit, newTargetDirection);
+        var updateResult = kpi.Update(newName, newDescription, newStartingValue, newTargetValue, newPrefix, newSuffix, newTargetDirection);
 
         // Assert
         updateResult.IsSuccess.Should().BeTrue();
@@ -67,7 +70,8 @@ public sealed class KpiTests
         kpi.Description.Should().Be(newDescription);
         kpi.StartingValue.Should().Be(newStartingValue);
         kpi.TargetValue.Should().Be(newTargetValue);
-        kpi.Unit.Should().Be(newUnit);
+        kpi.Prefix.Should().Be(newPrefix);
+        kpi.Suffix.Should().Be(newSuffix);
         kpi.TargetDirection.Should().Be(newTargetDirection);
     }
 
@@ -75,7 +79,7 @@ public sealed class KpiTests
     public void Create_ShouldSucceed_WhenStartingValueIsNull()
     {
         // Act
-        var kpi = TestKpi.Create("Test KPI", null, null, 75.0, KpiUnit.Percentage, KpiTargetDirection.Increase);
+        var kpi = TestKpi.Create("Test KPI", null, null, 75.0, null, null, KpiTargetDirection.Increase);
 
         // Assert
         kpi.StartingValue.Should().BeNull();
@@ -87,7 +91,7 @@ public sealed class KpiTests
     public void Create_ShouldSucceed_WhenStartingValueIsValid(double startingValue, double targetValue, KpiTargetDirection direction)
     {
         // Act
-        var kpi = TestKpi.Create("Test KPI", null, startingValue, targetValue, KpiUnit.Percentage, direction);
+        var kpi = TestKpi.Create("Test KPI", null, startingValue, targetValue, null, null, direction);
 
         // Assert
         kpi.StartingValue.Should().Be(startingValue);
@@ -101,7 +105,7 @@ public sealed class KpiTests
     public void Create_ShouldThrow_WhenStartingValueIsInvalid(double startingValue, double targetValue, KpiTargetDirection direction)
     {
         // Act
-        var act = () => TestKpi.Create("Test KPI", null, startingValue, targetValue, KpiUnit.Percentage, direction);
+        var act = () => TestKpi.Create("Test KPI", null, startingValue, targetValue, null, null, direction);
 
         // Assert
         act.Should().Throw<ArgumentException>().WithParameterName("startingValue");
@@ -114,7 +118,7 @@ public sealed class KpiTests
         var kpi = _kpiFaker.Generate();
 
         // Act
-        var result = kpi.Update("Test KPI", null, null, 75.0, KpiUnit.Percentage, KpiTargetDirection.Increase);
+        var result = kpi.Update("Test KPI", null, null, 75.0, null, null, KpiTargetDirection.Increase);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -130,7 +134,7 @@ public sealed class KpiTests
         var kpi = _kpiFaker.Generate();
 
         // Act
-        var result = kpi.Update("Test KPI", null, startingValue, targetValue, KpiUnit.Percentage, direction);
+        var result = kpi.Update("Test KPI", null, startingValue, targetValue, null, null, direction);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -148,10 +152,9 @@ public sealed class KpiTests
         var kpi = _kpiFaker.Generate();
 
         // Act
-        var result = kpi.Update("Test KPI", null, startingValue, targetValue, KpiUnit.Percentage, direction);
+        var result = kpi.Update("Test KPI", null, startingValue, targetValue, null, null, direction);
 
         // Assert
         result.IsFailure.Should().BeTrue();
     }
 }
-

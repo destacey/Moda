@@ -20067,14 +20067,9 @@ export interface StrategicInitiativeKpiListDto {
     targetValue: number;
     actualValue?: number | undefined;
     progress?: number | undefined;
-    unit: KpiUnit;
+    prefix?: string | undefined;
+    suffix?: string | undefined;
     targetDirection: KpiTargetDirection;
-}
-
-export enum KpiUnit {
-    Percentage = "Percentage",
-    Number = "Number",
-    USD = "USD",
 }
 
 export enum KpiTargetDirection {
@@ -20091,7 +20086,8 @@ export interface StrategicInitiativeKpiDetailsDto {
     targetValue: number;
     actualValue?: number | undefined;
     progress?: number | undefined;
-    unit: KpiUnit;
+    prefix?: string | undefined;
+    suffix?: string | undefined;
     targetDirection: KpiTargetDirection;
 }
 
@@ -20106,8 +20102,10 @@ export interface CreateStrategicInitiativeKpiRequest {
     targetValue: number;
     /** The starting (baseline) value of the KPI. */
     startingValue?: number | undefined;
-    /** The unit of measurement for the KPI. */
-    unit: KpiUnit;
+    /** An optional prefix symbol displayed before the numeric value (e.g. "$"). */
+    prefix?: string | undefined;
+    /** An optional suffix symbol displayed after the numeric value (e.g. "%", "M"). */
+    suffix?: string | undefined;
     /** The target direction for the KPI. */
     targetDirection: KpiTargetDirection;
 }
@@ -20125,8 +20123,10 @@ export interface UpdateStrategicInitiativeKpiRequest {
     targetValue: number;
     /** The starting (baseline) value of the KPI. */
     startingValue?: number | undefined;
-    /** The unit of measurement for the KPI. */
-    unit: KpiUnit;
+    /** An optional prefix symbol displayed before the numeric value (e.g. "$"). */
+    prefix?: string | undefined;
+    /** An optional suffix symbol displayed after the numeric value (e.g. "%", "M"). */
+    suffix?: string | undefined;
     /** The target direction for the KPI. */
     targetDirection: KpiTargetDirection;
 }

@@ -377,7 +377,8 @@ public sealed class StrategicInitiativeTests
         kpi.Name.Should().Be(expectedKpiParameters.Name);
         kpi.Description.Should().Be(expectedKpiParameters.Description);
         kpi.TargetValue.Should().Be(expectedKpiParameters.TargetValue);
-        kpi.Unit.Should().Be(expectedKpiParameters.Unit);
+        kpi.Prefix.Should().Be(expectedKpiParameters.Prefix);
+        kpi.Suffix.Should().Be(expectedKpiParameters.Suffix);
         kpi.TargetDirection.Should().Be(expectedKpiParameters.TargetDirection);
     }
 

@@ -275,10 +275,11 @@ public class StrategicInitiativeKpiConfiguration : IEntityTypeConfiguration<Stra
         builder.Property(k => k.TargetValue).IsRequired();
         builder.Property(k => k.ActualValue);
 
-        builder.Property(k => k.Unit).IsRequired()
-            .HasConversion<EnumConverter<KpiUnit>>()
-            .HasMaxLength(32)
-            .HasColumnType("varchar");
+        builder.Property(k => k.Prefix)
+            .HasMaxLength(8);
+
+        builder.Property(k => k.Suffix)
+            .HasMaxLength(8);
 
         builder.Property(k => k.TargetDirection).IsRequired()
             .HasConversion<EnumConverter<KpiTargetDirection>>()

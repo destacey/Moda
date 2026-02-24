@@ -37,9 +37,14 @@ public sealed record StrategicInitiativeKpiListDto : IMapFrom<StrategicInitiativ
     public double? Progress => KpiUtils.CalculateProgress(StartingValue, ActualValue, TargetValue, TargetDirection);
 
     /// <summary>
-    /// Gets the unit of measurement for the KPI.
+    /// An optional prefix symbol displayed before the numeric value (e.g. "$").
     /// </summary>
-    public KpiUnit Unit { get; set; }
+    public string? Prefix { get; set; }
+
+    /// <summary>
+    /// An optional suffix symbol displayed after the numeric value (e.g. "%", "M").
+    /// </summary>
+    public string? Suffix { get; set; }
 
     /// <summary>
     /// Gets the target direction for the KPI. This indicates whether the KPI is expected to increase or decrease.
