@@ -28,9 +28,13 @@ public sealed class StrategicInitiativeKpiUpsertParametersValidator : CustomVali
         RuleFor(x => x.TargetValue)
             .NotEmpty();
 
-        RuleFor(x => x.Unit)
-            .IsInEnum()
-            .WithMessage("A valid KPI unit must be selected.");
+        RuleFor(x => x.Prefix)
+            .MaximumLength(8)
+            .When(x => x.Prefix is not null);
+
+        RuleFor(x => x.Suffix)
+            .MaximumLength(8)
+            .When(x => x.Suffix is not null);
 
         RuleFor(x => x.TargetDirection)
             .IsInEnum()

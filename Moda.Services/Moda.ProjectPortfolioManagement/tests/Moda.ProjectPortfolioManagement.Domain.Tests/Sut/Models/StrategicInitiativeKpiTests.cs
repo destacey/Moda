@@ -41,7 +41,8 @@ public sealed class StrategicInitiativeKpiTests
         kpi.Description.Should().Be(expectedKpi.Description);
         kpi.TargetValue.Should().Be(expectedKpi.TargetValue);
         kpi.ActualValue.Should().BeNull();
-        kpi.Unit.Should().Be(expectedKpi.Unit);
+        kpi.Prefix.Should().Be(expectedKpi.Prefix);
+        kpi.Suffix.Should().Be(expectedKpi.Suffix);
         kpi.TargetDirection.Should().Be(expectedKpi.TargetDirection);
         kpi.StrategicInitiativeId.Should().Be(expectedKpi.StrategicInitiativeId);
     }
@@ -56,7 +57,8 @@ public sealed class StrategicInitiativeKpiTests
             Name = "Updated KPI",
             Description = "Updated description",
             TargetValue = 85.0,
-            Unit = KpiUnit.Percentage,
+            Prefix = "$",
+            Suffix = "M",
             TargetDirection = kpi.TargetDirection is KpiTargetDirection.Increase ? KpiTargetDirection.Decrease : KpiTargetDirection.Increase
         };
 
@@ -70,7 +72,8 @@ public sealed class StrategicInitiativeKpiTests
         kpi.Name.Should().Be(kpiParameters.Name);
         kpi.Description.Should().Be(kpiParameters.Description);
         kpi.TargetValue.Should().Be(kpiParameters.TargetValue);
-        kpi.Unit.Should().Be(kpiParameters.Unit);
+        kpi.Prefix.Should().Be(kpiParameters.Prefix);
+        kpi.Suffix.Should().Be(kpiParameters.Suffix);
         kpi.TargetDirection.Should().Be(kpiParameters.TargetDirection);
         kpi.StrategicInitiativeId.Should().Be(expectedStrategicInitiativeId);
     }

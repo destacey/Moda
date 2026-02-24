@@ -62,6 +62,7 @@ const getRowMenuItems = (props: RowMenuProps): ItemType[] => {
     {
       key: 'delete-kpi',
       label: 'Delete KPI',
+      danger: true,
       onClick: () => props.onDeleteKpiMenuClicked(props.kpiId),
     },
     { key: 'divider', type: 'divider' },
@@ -211,9 +212,12 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
         cellRenderer: StatisticNumberCellRenderer,
       },
       {
-        field: 'unit',
-        headerName: 'Unit',
+        headerName: 'Format',
         width: 125,
+        valueGetter: (params) =>
+          [params.data?.prefix, params.data?.suffix]
+            .filter(Boolean)
+            .join(' / ') || '-',
       },
       {
         field: 'targetDirection',
