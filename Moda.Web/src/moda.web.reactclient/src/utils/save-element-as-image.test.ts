@@ -79,23 +79,27 @@ describe('saveElementAsImage', () => {
   })
 
   test('uses devicePixelRatio when greater than 2', async () => {
-    const originalDpr = window.devicePixelRatio
+    const descriptor = Object.getOwnPropertyDescriptor(window, 'devicePixelRatio')
     Object.defineProperty(window, 'devicePixelRatio', {
       value: 3,
       writable: true,
+      configurable: true,
     })
 
-    await saveElementAsImage(element)
+    try {
+      await saveElementAsImage(element)
 
-    expect(html2canvas).toHaveBeenCalledWith(
-      element,
-      expect.objectContaining({ scale: 3 }),
-    )
-
-    Object.defineProperty(window, 'devicePixelRatio', {
-      value: originalDpr,
-      writable: true,
-    })
+      expect(html2canvas).toHaveBeenCalledWith(
+        element,
+        expect.objectContaining({ scale: 3 }),
+      )
+    } finally {
+      if (descriptor) {
+        Object.defineProperty(window, 'devicePixelRatio', descriptor)
+      } else {
+        delete (window as any).devicePixelRatio
+      }
+    }
   })
 
   test('allows custom options to override scale', async () => {
