@@ -2,7 +2,7 @@
 
 import { MarkdownRenderer } from '@/src/components/common/markdown'
 import { useMessage } from '@/src/components/contexts/messaging'
-import { KpiHealth, KpiTrend, KpiUnit } from '@/src/services/moda-api'
+import { KpiHealth, KpiTrend } from '@/src/services/moda-api'
 import {
   useGetStrategicInitiativeKpiCheckpointPlanQuery,
   useGetStrategicInitiativeKpiMeasurementsQuery,
@@ -33,9 +33,10 @@ import {
   Typography,
 } from 'antd'
 import dayjs from 'dayjs'
-import { FC, useEffect, useState } from 'react'
+import { CSSProperties, FC, useEffect, useState } from 'react'
 import {
   AddStrategicInitiativeKpiMeasurementForm,
+  DeleteStrategicInitiativeKpiForm,
   EditStrategicInitiativeKpiForm,
   ManageStrategicInitiativeKpiCheckpointPlanForm,
 } from '.'
@@ -56,11 +57,13 @@ export interface StrategicInitiativeKpiDetailsDrawerProps {
   onRefresh: () => void
 }
 
-const formatValue = (value: number | undefined, unit: string): string => {
+const formatValue = (
+  value: number | undefined,
+  prefix?: string,
+  suffix?: string,
+): string => {
   if (value === undefined || value === null) return '-'
-  if (unit === KpiUnit.USD) return `$${value.toLocaleString()}`
-  if (unit === KpiUnit.Percentage) return `${value}%`
-  return value.toLocaleString()
+  return `${prefix ?? ''}${value.toLocaleString()}${suffix ?? ''}`
 }
 
 const TrendTag: FC<{ trend: KpiTrend | undefined }> = ({ trend }) => {
@@ -119,6 +122,7 @@ const StrategicInitiativeKpiDetailsDrawer: FC<
 
   const [size, setSize] = useState(getDrawerWidthPixels())
   const [openEditKpiForm, setOpenEditKpiForm] = useState(false)
+  const [openDeleteKpiForm, setOpenDeleteKpiForm] = useState(false)
   const [openAddMeasurementForm, setOpenAddMeasurementForm] = useState(false)
   const [openManageCheckpointPlanForm, setOpenManageCheckpointPlanForm] =
     useState(false)
@@ -185,7 +189,8 @@ const StrategicInitiativeKpiDetailsDrawer: FC<
     }
   }, [measurementsError, messageApi])
 
-  const unit = kpiData?.unit as unknown as string
+  const prefix = kpiData?.prefix ?? undefined
+  const suffix = kpiData?.suffix ?? undefined
 
   const onEditFormClosed = (wasSaved: boolean) => {
     setOpenEditKpiForm(false)
@@ -220,6 +225,14 @@ const StrategicInitiativeKpiDetailsDrawer: FC<
     }
   }
 
+  const onDeleteKpiFormClosed = (wasSaved: boolean) => {
+    setOpenDeleteKpiForm(false)
+    if (wasSaved) {
+      onDrawerClose()
+      onRefresh()
+    }
+  }
+
   const onManageCheckpointPlanFormClosed = (wasSaved: boolean) => {
     setOpenManageCheckpointPlanForm(false)
     if (wasSaved) {
@@ -249,7 +262,7 @@ const StrategicInitiativeKpiDetailsDrawer: FC<
       key: 'targetValue',
       width: 90,
       align: 'right' as const,
-      render: (value: number) => formatValue(value, unit),
+      render: (value: number) => formatValue(value, prefix, suffix),
     },
     {
       title: 'Actual',
@@ -258,7 +271,7 @@ const StrategicInitiativeKpiDetailsDrawer: FC<
       align: 'right' as const,
       render: (_, record) =>
         record.measurement
-          ? formatValue(record.measurement.actualValue, unit)
+          ? formatValue(record.measurement.actualValue, prefix, suffix)
           : '-',
     },
     {
@@ -294,7 +307,7 @@ const StrategicInitiativeKpiDetailsDrawer: FC<
       key: 'actualValue',
       width: 110,
       align: 'right' as const,
-      render: (value: number) => formatValue(value, unit),
+      render: (value: number) => formatValue(value, prefix, suffix),
     },
     {
       title: 'Measured By',
@@ -345,6 +358,13 @@ const StrategicInitiativeKpiDetailsDrawer: FC<
             onClick: () => setOpenEditKpiForm(true),
           },
           {
+            key: 'delete',
+            label: 'Delete',
+            danger: true,
+            onClick: () => setOpenDeleteKpiForm(true),
+          },
+          { key: 'divider', type: 'divider' },
+          {
             key: 'checkpoint-plan',
             label: 'Checkpoint Plan',
             onClick: () => setOpenManageCheckpointPlanForm(true),
@@ -373,24 +393,25 @@ const StrategicInitiativeKpiDetailsDrawer: FC<
         size={size}
         resizable={{ onResize: (newSize) => setSize(newSize) }}
         destroyOnHidden={true}
-        styles={{ body: { scrollbarWidth: 'auto' } as React.CSSProperties }}
+        styles={{ body: { scrollbarWidth: 'auto' } as CSSProperties }}
         className="custom-drawer"
         extra={extraMenu}
       >
         <Flex vertical gap="middle">
           <Flex vertical gap={10}>
             <LabeledContent label="Starting Value">
-              {formatValue(kpiData?.startingValue, unit)}
+              {formatValue(kpiData?.startingValue, prefix, suffix)}
             </LabeledContent>
             <LabeledContent label="Target Value">
-              {formatValue(kpiData?.targetValue, unit)}
+              {formatValue(kpiData?.targetValue, prefix, suffix)}
             </LabeledContent>
             <LabeledContent label="Actual Value">
               {kpiData?.actualValue !== undefined
-                ? formatValue(kpiData.actualValue, unit)
+                ? formatValue(kpiData.actualValue, prefix, suffix)
                 : '-'}
             </LabeledContent>
-            <LabeledContent label="Unit">{unit}</LabeledContent>
+            {prefix && <LabeledContent label="Prefix">{prefix}</LabeledContent>}
+            {suffix && <LabeledContent label="Suffix">{suffix}</LabeledContent>}
             <LabeledContent label="Target Direction">
               {kpiData?.targetDirection as unknown as string}
             </LabeledContent>
@@ -450,6 +471,15 @@ const StrategicInitiativeKpiDetailsDrawer: FC<
           showForm={openAddMeasurementForm}
           onFormComplete={() => onAddMeasurementFormClosed(true)}
           onFormCancel={() => onAddMeasurementFormClosed(false)}
+        />
+      )}
+      {openDeleteKpiForm && kpiData && (
+        <DeleteStrategicInitiativeKpiForm
+          strategicInitiativeId={strategicInitiativeId}
+          kpi={kpiData}
+          showForm={openDeleteKpiForm}
+          onFormComplete={() => onDeleteKpiFormClosed(true)}
+          onFormCancel={() => onDeleteKpiFormClosed(false)}
         />
       )}
       {openManageCheckpointPlanForm && (

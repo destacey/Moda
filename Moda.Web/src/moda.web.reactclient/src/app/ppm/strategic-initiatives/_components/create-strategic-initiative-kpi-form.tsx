@@ -7,11 +7,10 @@ import { useMessage } from '@/src/components/contexts/messaging'
 import {
   CreateStrategicInitiativeKpiRequest,
   KpiTargetDirection,
-  KpiUnit,
 } from '@/src/services/moda-api'
 import { useCreateStrategicInitiativeKpiMutation } from '@/src/store/features/ppm/strategic-initiatives-api'
 import { toFormErrors } from '@/src/utils'
-import { Form, InputNumber, Modal, Select } from 'antd'
+import { Form, Input, InputNumber, Modal, Select } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
 import { useCallback, useEffect, useState } from 'react'
 
@@ -27,18 +26,13 @@ interface CreateStrategicInitiativeKpiFormValues {
   description?: string
   startingValue?: number
   targetValue: number
-  unit: KpiUnit
+  prefix?: string
+  suffix?: string
   targetDirection: KpiTargetDirection
 }
 
 const TypedFormItem =
   createTypedFormItem<CreateStrategicInitiativeKpiFormValues>()
-
-const kpiUnitOptions = [
-  { label: 'Percentage', value: KpiUnit.Percentage },
-  { label: 'Number', value: KpiUnit.Number },
-  { label: 'USD', value: KpiUnit.USD },
-]
 
 const kpiTargetDirectionOptions = [
   { label: 'Increase', value: KpiTargetDirection.Increase },
@@ -55,7 +49,8 @@ const mapToRequestValues = (
     description: values.description,
     startingValue: values.startingValue,
     targetValue: values.targetValue,
-    unit: values.unit,
+    prefix: values.prefix,
+    suffix: values.suffix,
     targetDirection: values.targetDirection,
   }
 }
@@ -204,14 +199,25 @@ const CreateStrategicInitiativeKpiForm = (
             <InputNumber style={{ width: 200 }} />
           </TypedFormItem>
           <TypedFormItem
-            name="unit"
-            label="Unit"
-            rules={[{ required: true, message: 'Unit is required' }]}
+            name="prefix"
+            label="Prefix"
+            rules={[{ max: 8 }]}
           >
-            <Select
-              allowClear
-              options={kpiUnitOptions}
-              placeholder="Select Unit"
+            <Input
+              placeholder="e.g. $, €"
+              maxLength={8}
+              style={{ width: 120 }}
+            />
+          </TypedFormItem>
+          <TypedFormItem
+            name="suffix"
+            label="Suffix"
+            rules={[{ max: 8 }]}
+          >
+            <Input
+              placeholder="e.g. %, K, M"
+              maxLength={8}
+              style={{ width: 120 }}
             />
           </TypedFormItem>
           <TypedFormItem

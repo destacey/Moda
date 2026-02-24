@@ -12,8 +12,8 @@ public sealed class StrategicInitiativeKpi : Kpi, ISystemAuditable
 
     private StrategicInitiativeKpi() : base() { }
 
-    private StrategicInitiativeKpi(string name, string? description, double? startingValue, double targetValue, KpiUnit unit, KpiTargetDirection direction, Guid strategicInitiativeId)
-        : base(name, description, startingValue, targetValue, unit, direction)
+    private StrategicInitiativeKpi(string name, string? description, double? startingValue, double targetValue, string? prefix, string? suffix, KpiTargetDirection direction, Guid strategicInitiativeId)
+        : base(name, description, startingValue, targetValue, prefix, suffix, direction)
     {
         StrategicInitiativeId = strategicInitiativeId;
     }
@@ -42,7 +42,7 @@ public sealed class StrategicInitiativeKpi : Kpi, ISystemAuditable
     {
         Guard.Against.Null(parameters, nameof(parameters));
 
-        return base.Update(parameters.Name, parameters.Description, parameters.StartingValue, parameters.TargetValue, parameters.Unit, parameters.TargetDirection);
+        return base.Update(parameters.Name, parameters.Description, parameters.StartingValue, parameters.TargetValue, parameters.Prefix, parameters.Suffix, parameters.TargetDirection);
     }
 
     /// <summary>
@@ -192,6 +192,6 @@ public sealed class StrategicInitiativeKpi : Kpi, ISystemAuditable
     /// <returns></returns>
     internal static StrategicInitiativeKpi Create(Guid strategicInitiativeId, StrategicInitiativeKpiUpsertParameters parameters)
     {
-        return new StrategicInitiativeKpi(parameters.Name, parameters.Description, parameters.StartingValue, parameters.TargetValue, parameters.Unit, parameters.TargetDirection, strategicInitiativeId);
+        return new StrategicInitiativeKpi(parameters.Name, parameters.Description, parameters.StartingValue, parameters.TargetValue, parameters.Prefix, parameters.Suffix, parameters.TargetDirection, strategicInitiativeId);
     }
 }

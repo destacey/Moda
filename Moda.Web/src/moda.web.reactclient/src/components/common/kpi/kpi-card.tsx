@@ -4,7 +4,6 @@ import {
   KpiHealth,
   KpiTargetDirection,
   KpiTrend,
-  KpiUnit,
 } from '@/src/services/moda-api'
 import useTheme from '@/src/components/contexts/theme'
 import {
@@ -32,7 +31,8 @@ export interface KpiCardData {
   startingValue?: number | undefined
   targetValue: number
   actualValue?: number | undefined
-  unit: KpiUnit
+  prefix?: string | undefined
+  suffix?: string | undefined
   targetDirection: KpiTargetDirection
   progress?: number | undefined
   health?: KpiHealth | undefined
@@ -129,15 +129,12 @@ function isRegressed(data: KpiCardData): boolean {
     : data.actualValue > data.startingValue
 }
 
-function formatValue(value: number, unit: KpiUnit): string {
-  switch (unit) {
-    case KpiUnit.USD:
-      return `$${value.toLocaleString()}`
-    case KpiUnit.Percentage:
-      return `${value}%`
-    default:
-      return `${value}`
-  }
+function formatValue(
+  value: number,
+  prefix?: string,
+  suffix?: string,
+): string {
+  return `${prefix ?? ''}${value.toLocaleString()}${suffix ?? ''}`
 }
 
 // ─── Progress state ───────────────────────────────────────────────────────────
@@ -231,11 +228,11 @@ const ProgressSection: FC<{ data: KpiCardData; healthColor: string }> = ({
     const pctDisplay = Math.round(state.pct * 100)
     const startStr =
       data.startingValue != null
-        ? formatValue(data.startingValue, data.unit)
+        ? formatValue(data.startingValue, data.prefix, data.suffix)
         : '—'
     const actualStr =
       data.actualValue != null
-        ? formatValue(data.actualValue, data.unit)
+        ? formatValue(data.actualValue, data.prefix, data.suffix)
         : '—'
     return (
       <Flex align="center" gap={6} className={styles.regression}>
@@ -250,7 +247,7 @@ const ProgressSection: FC<{ data: KpiCardData; healthColor: string }> = ({
   const pctDisplay = Math.round(state.pct * 100)
   const startStr =
     data.startingValue != null
-      ? formatValue(data.startingValue, data.unit)
+      ? formatValue(data.startingValue, data.prefix, data.suffix)
       : '—'
 
   if (state.type === 'slight') {
@@ -301,10 +298,11 @@ const ProgressSection: FC<{ data: KpiCardData; healthColor: string }> = ({
   )
 }
 
-const CheckpointStrip: FC<{ checkpoint: KpiCardCheckpoint; unit: KpiUnit }> = ({
-  checkpoint,
-  unit,
-}) => {
+const CheckpointStrip: FC<{
+  checkpoint: KpiCardCheckpoint
+  prefix?: string
+  suffix?: string
+}> = ({ checkpoint, prefix, suffix }) => {
   const hasActual = checkpoint.actualValue != null
   const dateStr = dayjs(checkpoint.date).format('MMM D')
 
@@ -315,13 +313,13 @@ const CheckpointStrip: FC<{ checkpoint: KpiCardCheckpoint; unit: KpiUnit }> = ({
     resultText = 'Upcoming'
   } else if (checkpoint.health === KpiHealth.Healthy) {
     resultClass = styles.checkpointResultHealthy
-    resultText = `✓ Met (${formatValue(checkpoint.actualValue!, unit)})`
+    resultText = `✓ Met (${formatValue(checkpoint.actualValue!, prefix, suffix)})`
   } else if (checkpoint.health === KpiHealth.AtRisk) {
     resultClass = styles.checkpointResultAtRisk
-    resultText = `! Missed (${formatValue(checkpoint.actualValue!, unit)} / ${formatValue(checkpoint.targetValue, unit)})`
+    resultText = `! Missed (${formatValue(checkpoint.actualValue!, prefix, suffix)} / ${formatValue(checkpoint.targetValue, prefix, suffix)})`
   } else {
     resultClass = styles.checkpointResultUnhealthy
-    resultText = `✕ Off Track (${formatValue(checkpoint.actualValue!, unit)} / ${formatValue(checkpoint.targetValue, unit)})`
+    resultText = `✕ Off Track (${formatValue(checkpoint.actualValue!, prefix, suffix)} / ${formatValue(checkpoint.targetValue, prefix, suffix)})`
   }
 
   return (
@@ -336,7 +334,7 @@ const CheckpointStrip: FC<{ checkpoint: KpiCardCheckpoint; unit: KpiUnit }> = ({
           {checkpoint.label}
         </Text>
         {' · '}
-        {dateStr} · Target: {formatValue(checkpoint.targetValue, unit)}
+        {dateStr} · Target: {formatValue(checkpoint.targetValue, prefix, suffix)}
       </Text>
       <Text className={`${styles.checkpointResult} ${resultClass}`}>
         {resultText}
@@ -483,7 +481,7 @@ const KpiCard: FC<KpiCardProps> = ({
             <Text className={styles.valueLabel}>ACTUAL</Text>
             <Flex align="baseline" gap={4}>
               <span className={styles.actualValue}>
-                {hasActual ? formatValue(data.actualValue!, data.unit) : '—'}
+                {hasActual ? formatValue(data.actualValue!, data.prefix, data.suffix) : '—'}
               </span>
               {hasActual && trendArrow && (
                 <span aria-hidden="true" className={styles.trendArrow}>
@@ -496,7 +494,7 @@ const KpiCard: FC<KpiCardProps> = ({
           <Flex vertical gap={2} className={styles.targetSegment}>
             <Text className={styles.valueLabel}>TARGET</Text>
             <span className={styles.targetValue}>
-              {formatValue(data.targetValue, data.unit)}
+              {formatValue(data.targetValue, data.prefix, data.suffix)}
             </span>
           </Flex>
         </Flex>
@@ -518,7 +516,7 @@ const KpiCard: FC<KpiCardProps> = ({
         {checkpointLoading ? (
           <SkeletonInput active className={styles.checkpointSkeleton} />
         ) : checkpoint ? (
-          <CheckpointStrip checkpoint={checkpoint} unit={data.unit} />
+          <CheckpointStrip checkpoint={checkpoint} prefix={data.prefix} suffix={data.suffix} />
         ) : null}
 
         {/* Footer */}
@@ -529,7 +527,7 @@ const KpiCard: FC<KpiCardProps> = ({
           {nextCheckpoint ? (
             <Text className={styles.footerNext}>
               Next checkpoint: {nextCheckpoint.label} →{' '}
-              {formatValue(nextCheckpoint.targetValue, data.unit)}
+              {formatValue(nextCheckpoint.targetValue, data.prefix, data.suffix)}
             </Text>
           ) : (
             <Text className={styles.footerMeta}>No checkpoints</Text>

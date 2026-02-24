@@ -20711,7 +20711,6 @@
           "key",
           "name",
           "targetValue",
-          "unit",
           "targetDirection"
         ],
         "properties": {
@@ -20747,27 +20746,18 @@
             "format": "double",
             "nullable": true
           },
-          "unit": {
-            "$ref": "#/components/schemas/KpiUnit"
+          "prefix": {
+            "type": "string",
+            "nullable": true
+          },
+          "suffix": {
+            "type": "string",
+            "nullable": true
           },
           "targetDirection": {
             "$ref": "#/components/schemas/KpiTargetDirection"
           }
         }
-      },
-      "KpiUnit": {
-        "type": "string",
-        "description": "",
-        "x-enumNames": [
-          "Percentage",
-          "Number",
-          "USD"
-        ],
-        "enum": [
-          "Percentage",
-          "Number",
-          "USD"
-        ]
       },
       "KpiTargetDirection": {
         "type": "string",
@@ -20789,7 +20779,6 @@
           "key",
           "name",
           "targetValue",
-          "unit",
           "targetDirection"
         ],
         "properties": {
@@ -20829,8 +20818,13 @@
             "format": "double",
             "nullable": true
           },
-          "unit": {
-            "$ref": "#/components/schemas/KpiUnit"
+          "prefix": {
+            "type": "string",
+            "nullable": true
+          },
+          "suffix": {
+            "type": "string",
+            "nullable": true
           },
           "targetDirection": {
             "$ref": "#/components/schemas/KpiTargetDirection"
@@ -20844,7 +20838,6 @@
           "strategicInitiativeId",
           "name",
           "targetValue",
-          "unit",
           "targetDirection"
         ],
         "properties": {
@@ -20883,13 +20876,19 @@
             "format": "double",
             "nullable": true
           },
-          "unit": {
-            "description": "The unit of measurement for the KPI.",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/KpiUnit"
-              }
-            ]
+          "prefix": {
+            "type": "string",
+            "description": "An optional prefix symbol displayed before the numeric value (e.g. \"$\").",
+            "maxLength": 8,
+            "minLength": 0,
+            "nullable": true
+          },
+          "suffix": {
+            "type": "string",
+            "description": "An optional suffix symbol displayed after the numeric value (e.g. \"%\", \"M\").",
+            "maxLength": 8,
+            "minLength": 0,
+            "nullable": true
           },
           "targetDirection": {
             "description": "The target direction for the KPI.",
@@ -20909,7 +20908,6 @@
           "kpiId",
           "name",
           "targetValue",
-          "unit",
           "targetDirection"
         ],
         "properties": {
@@ -20956,13 +20954,19 @@
             "format": "double",
             "nullable": true
           },
-          "unit": {
-            "description": "The unit of measurement for the KPI.",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/KpiUnit"
-              }
-            ]
+          "prefix": {
+            "type": "string",
+            "description": "An optional prefix symbol displayed before the numeric value (e.g. \"$\").",
+            "maxLength": 8,
+            "minLength": 0,
+            "nullable": true
+          },
+          "suffix": {
+            "type": "string",
+            "description": "An optional suffix symbol displayed after the numeric value (e.g. \"%\", \"M\").",
+            "maxLength": 8,
+            "minLength": 0,
+            "nullable": true
           },
           "targetDirection": {
             "description": "The target direction for the KPI.",
@@ -21185,9 +21189,7 @@
           "targetValue": {
             "type": "number",
             "description": "The target value for this checkpoint.",
-            "format": "double",
-            "minLength": 1,
-            "nullable": false
+            "format": "double"
           },
           "atRiskValue": {
             "type": "number",

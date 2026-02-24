@@ -89,9 +89,6 @@ public sealed class KpiCheckpointPlanItemRequestValidator : AbstractValidator<Kp
             .NotEmpty()
             .When(x => x.CheckpointId.HasValue);
 
-        RuleFor(x => x.TargetValue)
-            .NotEmpty();
-
         RuleFor(x => x.AtRiskValue)
             .NotEqual(x => x.TargetValue)
             .When(x => x.AtRiskValue.HasValue)

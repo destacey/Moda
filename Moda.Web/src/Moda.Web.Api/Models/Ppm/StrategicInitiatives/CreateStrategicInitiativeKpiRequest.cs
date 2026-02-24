@@ -32,9 +32,14 @@ public sealed record CreateStrategicInitiativeKpiRequest
     public double? StartingValue { get; set; }
 
     /// <summary>
-    /// The unit of measurement for the KPI.
+    /// An optional prefix symbol displayed before the numeric value (e.g. "$").
     /// </summary>
-    public KpiUnit Unit { get; set; }
+    public string? Prefix { get; set; }
+
+    /// <summary>
+    /// An optional suffix symbol displayed after the numeric value (e.g. "%", "M").
+    /// </summary>
+    public string? Suffix { get; set; }
 
     /// <summary>
     /// The target direction for the KPI.
@@ -43,7 +48,7 @@ public sealed record CreateStrategicInitiativeKpiRequest
 
     public CreateStrategicInitiativeKpiCommand ToCreateStrategicInitiativeKpiCommand()
     {
-        var parameters = new StrategicInitiativeKpiUpsertParameters(Name, Description, StartingValue, TargetValue, Unit, TargetDirection);
+        var parameters = new StrategicInitiativeKpiUpsertParameters(Name, Description, StartingValue, TargetValue, Prefix, Suffix, TargetDirection);
 
         return new CreateStrategicInitiativeKpiCommand(StrategicInitiativeId, parameters);
     }
@@ -67,9 +72,13 @@ public sealed class CreateStrategicInitiativeKpiRequestValidator : AbstractValid
         RuleFor(x => x.TargetValue)
             .NotEmpty();
 
-        RuleFor(x => x.Unit)
-            .IsInEnum()
-            .WithMessage("A valid KPI unit must be selected.");
+        RuleFor(x => x.Prefix)
+            .MaximumLength(8)
+            .When(x => x.Prefix is not null);
+
+        RuleFor(x => x.Suffix)
+            .MaximumLength(8)
+            .When(x => x.Suffix is not null);
 
         RuleFor(x => x.TargetDirection)
             .IsInEnum()

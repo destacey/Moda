@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Moda.Infrastructure.Persistence.Context;
 
@@ -12,9 +13,11 @@ using Moda.Infrastructure.Persistence.Context;
 namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 {
     [DbContext(typeof(ModaDbContext))]
-    partial class ModaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260224022919_Replace-KpiUnit-with-Prefix-and-Suffix")]
+    partial class ReplaceKpiUnitwithPrefixandSuffix
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -105,62 +108,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("UserTokens", "Identity");
-                });
-
-            modelBuilder.Entity("Moda.Analytics.Domain.Models.AnalyticsView", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Dataset")
-                        .HasColumnType("int");
-
-                    b.Property<string>("DefinitionJson")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(2048)
-                        .HasColumnType("nvarchar(2048)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
-
-                    b.Property<Guid>("OwnerId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("SystemCreated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("SystemCreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("SystemLastModified")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("SystemLastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Visibility")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Name");
-
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Name"), new[] { "Dataset", "Visibility", "OwnerId", "IsActive" });
-
-                    b.HasIndex("OwnerId");
-
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("OwnerId"), new[] { "Name", "Dataset", "Visibility", "IsActive" });
-
-                    b.ToTable("AnalyticsViews", "Analytics");
                 });
 
             modelBuilder.Entity("Moda.AppIntegration.Domain.Models.Connection", b =>
