@@ -105,9 +105,8 @@ const ManageStrategicInitiativeKpiCheckpointPlanForm = (
     kpiId,
   })
 
-  const unit = kpiData?.unit as unknown as string
-  const targetValuePrefix = unit === 'USD' ? '$' : undefined
-  const targetValueSuffix = unit === 'Percentage' ? '%' : undefined
+  const targetValuePrefix = kpiData?.prefix ?? undefined
+  const targetValueSuffix = kpiData?.suffix ?? undefined
 
   const { data: checkpointPlanData } =
     useGetStrategicInitiativeKpiCheckpointsQuery(
@@ -228,9 +227,16 @@ const ManageStrategicInitiativeKpiCheckpointPlanForm = (
           <DescriptionItem label="Target Value">
             {kpiData?.targetValue}
           </DescriptionItem>
-          <DescriptionItem label="Unit">
-            {kpiData?.unit as unknown as string}
-          </DescriptionItem>
+          {kpiData?.prefix && (
+            <DescriptionItem label="Prefix">
+              {kpiData.prefix}
+            </DescriptionItem>
+          )}
+          {kpiData?.suffix && (
+            <DescriptionItem label="Suffix">
+              {kpiData.suffix}
+            </DescriptionItem>
+          )}
           <DescriptionItem label="Target Direction">
             {kpiData?.targetDirection as unknown as string}
           </DescriptionItem>

@@ -185,9 +185,16 @@ const AddStrategicInitiativeKpiMeasurementForm = (
             <DescriptionItem label="Target Value">
               {kpiData?.targetValue}
             </DescriptionItem>
-            <DescriptionItem label="Unit">
-              {kpiData?.unit as unknown as string}
-            </DescriptionItem>
+            {kpiData?.prefix && (
+              <DescriptionItem label="Prefix">
+                {kpiData.prefix}
+              </DescriptionItem>
+            )}
+            {kpiData?.suffix && (
+              <DescriptionItem label="Suffix">
+                {kpiData.suffix}
+              </DescriptionItem>
+            )}
             <DescriptionItem label="Target Direction">
               {kpiData?.targetDirection as unknown as string}
             </DescriptionItem>

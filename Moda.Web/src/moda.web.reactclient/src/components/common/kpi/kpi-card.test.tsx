@@ -5,7 +5,6 @@ import {
   KpiHealth,
   KpiTargetDirection,
   KpiTrend,
-  KpiUnit,
 } from '@/src/services/moda-api'
 
 // ─── Mock dayjs ──────────────────────────────────────────────────────────────
@@ -57,7 +56,7 @@ function makeKpiData(overrides: Partial<KpiCardData> = {}): KpiCardData {
     key: 100,
     name: 'Test KPI',
     targetValue: 80,
-    unit: KpiUnit.Percentage,
+    suffix: '%',
     targetDirection: KpiTargetDirection.Increase,
     ...overrides,
   }
@@ -121,11 +120,12 @@ describe('KpiCard', () => {
 
   // ─── Value formatting ────────────────────────────────────────────────────
 
-  it('formats USD values with dollar sign', () => {
+  it('formats values with prefix', () => {
     render(
       <KpiCard
         data={makeKpiData({
-          unit: KpiUnit.USD,
+          prefix: '$',
+          suffix: undefined,
           targetValue: 1000,
           actualValue: 750,
         })}
@@ -136,7 +136,7 @@ describe('KpiCard', () => {
     expect(screen.getByText('$1,000')).toBeInTheDocument()
   })
 
-  it('formats Percentage values with % sign', () => {
+  it('formats values with suffix', () => {
     render(
       <KpiCard data={makeKpiData({ actualValue: 42 })} />,
     )
@@ -144,11 +144,12 @@ describe('KpiCard', () => {
     expect(screen.getByText('42%')).toBeInTheDocument()
   })
 
-  it('formats Numeric values without symbol', () => {
+  it('formats values without prefix or suffix', () => {
     render(
       <KpiCard
         data={makeKpiData({
-          unit: KpiUnit.Numeric,
+          prefix: undefined,
+          suffix: undefined,
           targetValue: 100,
           actualValue: 75,
         })}

@@ -211,9 +211,12 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
         cellRenderer: StatisticNumberCellRenderer,
       },
       {
-        field: 'unit',
-        headerName: 'Unit',
+        headerName: 'Format',
         width: 125,
+        valueGetter: (params) =>
+          [params.data?.prefix, params.data?.suffix]
+            .filter(Boolean)
+            .join(' / ') || '-',
       },
       {
         field: 'targetDirection',
