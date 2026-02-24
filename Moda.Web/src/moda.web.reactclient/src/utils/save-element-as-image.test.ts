@@ -68,6 +68,45 @@ describe('saveElementAsImage', () => {
     consoleErrorSpy.mockRestore()
   })
 
+  test('uses minimum 2x scale for crisp images', async () => {
+    // jsdom defaults devicePixelRatio to undefined
+    await saveElementAsImage(element)
+
+    expect(html2canvas).toHaveBeenCalledWith(
+      element,
+      expect.objectContaining({ scale: 2 }),
+    )
+  })
+
+  test('uses devicePixelRatio when greater than 2', async () => {
+    const originalDpr = window.devicePixelRatio
+    Object.defineProperty(window, 'devicePixelRatio', {
+      value: 3,
+      writable: true,
+    })
+
+    await saveElementAsImage(element)
+
+    expect(html2canvas).toHaveBeenCalledWith(
+      element,
+      expect.objectContaining({ scale: 3 }),
+    )
+
+    Object.defineProperty(window, 'devicePixelRatio', {
+      value: originalDpr,
+      writable: true,
+    })
+  })
+
+  test('allows custom options to override scale', async () => {
+    await saveElementAsImage(element, 'image.png', { scale: 4 })
+
+    expect(html2canvas).toHaveBeenCalledWith(
+      element,
+      expect.objectContaining({ scale: 4 }),
+    )
+  })
+
   test('logs an error if html2canvas fails', async () => {
     ;(html2canvas as jest.Mock).mockRejectedValue(new Error('Canvas error'))
     const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation()
