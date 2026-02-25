@@ -41,6 +41,7 @@ export interface FormValues {
   description?: string
   dataset: AnalyticsDataset
   visibility: Visibility
+  managerIds: string[]
   isActive: boolean
   includeInactive: boolean
   definition: BuilderDefinition

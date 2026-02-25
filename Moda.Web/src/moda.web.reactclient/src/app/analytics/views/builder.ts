@@ -87,6 +87,7 @@ export const makeDefaultFormValues = (): FormValues => ({
   description: '',
   dataset: AnalyticsDataset.WorkItems,
   visibility: Visibility.Private,
+  managerIds: [],
   isActive: true,
   includeInactive: false,
   definition: makeDefaultDefinition(),

@@ -46,7 +46,7 @@ const AnalyticsViewResultsCard = ({
   }, [result])
 
   return (
-    <Card style={{ marginTop: 16 }} title="Preview Result">
+    <Card style={{ marginTop: 16 }} title="Results">
       <Space style={{ marginBottom: 12 }}>
         <Text>Rows: {result?.totalRows ?? 0}</Text>
         <Button onClick={onPrev} disabled={runPage <= 1 || !result}>
@@ -76,7 +76,7 @@ const AnalyticsViewResultsCard = ({
         />
       ) : (
         <Title level={5} style={{ margin: 0 }}>
-          Run preview to view results.
+          Run to view results.
         </Title>
       )}
     </Card>

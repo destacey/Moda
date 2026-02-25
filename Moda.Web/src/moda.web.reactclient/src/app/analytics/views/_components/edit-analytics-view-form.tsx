@@ -1,103 +1,221 @@
 'use client'
 
-import { AnalyticsDataset, Visibility } from '@/src/services/moda-api'
+import { EmployeeSelect } from '@/src/components/common/organizations'
+import useAuth from '@/src/components/contexts/auth'
+import { useMessage } from '@/src/components/contexts/messaging'
+import {
+  AnalyticsDataset,
+  AnalyticsViewDetailsDto,
+  UpdateAnalyticsViewRequest,
+  Visibility,
+} from '@/src/services/moda-api'
+import { useUpdateAnalyticsViewMutation } from '@/src/store/features/analytics/analytics-views-api'
+import { useGetEmployeeOptionsQuery } from '@/src/store/features/organizations/employee-api'
+import { useGetInternalEmployeeIdQuery } from '@/src/store/features/user-management/profile-api'
+import { toFormErrors } from '@/src/utils'
 import {
   Button,
-  Card,
   Col,
   Divider,
   Form,
   Input,
   InputNumber,
-  Popconfirm,
+  Modal,
   Row,
   Select,
   Space,
 } from 'antd'
-import type { FormInstance } from 'antd/es/form'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   buildDefinitionJson,
+  fieldOptions,
   filterOperatorOptions,
   groupByOptions,
   makeDefaultDefinition,
   measureTypeOptions,
   numericFieldOptions,
+  parseDefinition,
 } from '../builder'
 import { FormValues } from '../types'
 
 const { TextArea } = Input
 
-interface AnalyticsViewEditorCardProps {
-  form: FormInstance<FormValues>
-  selectedId: string | null
-  isDetailLoading: boolean
-  isSaving: boolean
-  canCreate: boolean
-  canUpdate: boolean
-  canDelete: boolean
-  canRun: boolean
-  sortFieldOptions: Array<{ label: string; value: string }>
-  watchedDefinition: FormValues['definition'] | undefined
-  watchedDataset: AnalyticsDataset | undefined
-  onRun: () => void
-  onDelete: () => void
-  onSubmit: () => void
-  onFinish: (values: FormValues) => void
+export interface EditAnalyticsViewFormProps {
+  showForm: boolean
+  analyticsView: AnalyticsViewDetailsDto
+  onFormUpdate: () => void
+  onFormCancel: () => void
 }
 
-const AnalyticsViewEditorCard = ({
-  form,
-  selectedId,
-  isDetailLoading,
-  isSaving,
-  canCreate,
-  canUpdate,
-  canDelete,
-  canRun,
-  sortFieldOptions,
-  watchedDefinition,
-  watchedDataset,
-  onRun,
-  onDelete,
-  onSubmit,
-  onFinish,
-}: AnalyticsViewEditorCardProps) => {
-  return (
-    <Card
-      title={selectedId ? 'Edit View' : 'Create View'}
-      loading={isDetailLoading}
-      extra={
-        <Space>
-          <Button onClick={onRun} disabled={!canRun || !form.getFieldValue('id')}>
-            Run Preview
-          </Button>
-          {selectedId && (
-            <Popconfirm
-              title="Delete analytics view?"
-              onConfirm={onDelete}
-              okButtonProps={{ danger: true }}
-            >
-              <Button danger disabled={!canDelete}>
-                Delete
-              </Button>
-            </Popconfirm>
-          )}
-          <Button
-            type="primary"
-            loading={isSaving}
-            onClick={onSubmit}
-            disabled={selectedId ? !canUpdate : !canCreate}
-          >
-            {selectedId ? 'Update' : 'Create'}
-          </Button>
-        </Space>
+const EditAnalyticsViewForm = ({
+  showForm,
+  analyticsView,
+  onFormUpdate,
+  onFormCancel,
+}: EditAnalyticsViewFormProps) => {
+  const [isOpen, setIsOpen] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
+  const [isValid, setIsValid] = useState(false)
+  const [form] = Form.useForm<FormValues>()
+  const formValues = Form.useWatch([], form)
+  const messageApi = useMessage()
+
+  const { hasPermissionClaim } = useAuth()
+  const canUpdate = hasPermissionClaim('Permissions.AnalyticsViews.Update')
+
+  const { data: currentUserEmployeeId } = useGetInternalEmployeeIdQuery()
+  const { data: employeeOptions } = useGetEmployeeOptionsQuery(false)
+  const [updateAnalyticsView] = useUpdateAnalyticsViewMutation()
+
+  const selectedMeasureOptions = useMemo(() => {
+    const definition = formValues?.definition
+    return (
+      definition?.measures?.map((m) => ({
+        label: m.alias || `${m.type}_${m.field ?? 'id'}`,
+        value: m.alias || `${m.type}_${m.field ?? 'id'}`,
+      })) ?? []
+    )
+  }, [formValues])
+
+  const sortFieldOptions = useMemo(() => {
+    const definition = formValues?.definition
+    const fields = new Set<string>()
+    ;(definition?.columns ?? []).forEach((c) => {
+      if (c.field) fields.add(c.field)
+      if (c.alias) fields.add(c.alias)
+    })
+    ;(definition?.groupBy ?? []).forEach((g) => {
+      if (g) fields.add(g)
+    })
+    selectedMeasureOptions.forEach((m) => fields.add(m.value))
+
+    if (fields.size === 0) {
+      fieldOptions.forEach((f) => fields.add(f.value))
+    }
+
+    return [...fields].map((f) => ({ label: f, value: f }))
+  }, [selectedMeasureOptions, formValues])
+
+  const mapToFormValues = useCallback(
+    (view: AnalyticsViewDetailsDto) => {
+      const definition = parseDefinition(view.definitionJson, view.dataset)
+      form.setFieldsValue({
+        id: view.id,
+        name: view.name,
+        description: view.description,
+        dataset: view.dataset,
+        visibility: view.visibility,
+        managerIds: view.managerIds,
+        isActive: view.isActive,
+        includeInactive: false,
+        definition,
+      })
+    },
+    [form],
+  )
+
+  const update = async (values: FormValues): Promise<boolean> => {
+    const definitionJson = buildDefinitionJson(
+      values.definition,
+      values.dataset,
+    )
+
+    try {
+      const request: UpdateAnalyticsViewRequest = {
+        id: analyticsView.id,
+        name: values.name,
+        description: values.description,
+        dataset: values.dataset,
+        visibility: values.visibility,
+        managerIds: values.managerIds,
+        definitionJson,
+        isActive: values.isActive,
       }
+      const response = await updateAnalyticsView(request)
+      if ('error' in response) throw response.error
+      return true
+    } catch (error: any) {
+      if (error?.status === 422 && error.errors) {
+        form.setFields(toFormErrors(error.errors))
+        messageApi.error('Correct the validation error(s) to continue.')
+      } else {
+        messageApi.error('An error occurred updating the analytics view.')
+      }
+      return false
+    }
+  }
+
+  const handleOk = async () => {
+    setIsSaving(true)
+    try {
+      const values = await form.validateFields()
+      if (await update(values)) {
+        setIsOpen(false)
+        form.resetFields()
+        messageApi.success('Analytics view updated.')
+        onFormUpdate()
+      }
+    } catch {
+      messageApi.error('Correct the validation error(s) to continue.')
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  const handleCancel = () => {
+    setIsOpen(false)
+    onFormCancel()
+    form.resetFields()
+  }
+
+  useEffect(() => {
+    if (canUpdate) {
+      setIsOpen(showForm)
+      if (showForm && analyticsView) {
+        mapToFormValues(analyticsView)
+      }
+    } else {
+      onFormCancel()
+      messageApi.error(
+        'You do not have permission to update analytics views.',
+      )
+    }
+  }, [
+    canUpdate,
+    showForm,
+    analyticsView,
+    mapToFormValues,
+    messageApi,
+    onFormCancel,
+  ])
+
+  useEffect(() => {
+    form
+      .validateFields({ validateOnly: true })
+      .then(
+        () => setIsValid(true && form.isFieldsTouched()),
+        () => setIsValid(false),
+      )
+  }, [form, formValues])
+
+  return (
+    <Modal
+      title="Edit Analytics View"
+      open={isOpen}
+      onOk={handleOk}
+      okButtonProps={{ disabled: !isValid }}
+      okText="Save"
+      confirmLoading={isSaving}
+      onCancel={handleCancel}
+      keyboard={false}
+      destroyOnHidden={true}
+      width={900}
     >
-      <Form<FormValues>
+      <Form
         form={form}
+        size="small"
         layout="vertical"
-        preserve={false}
-        onFinish={onFinish}
+        name="edit-analytics-view-form"
       >
         <Form.Item name="id" hidden>
           <Input />
@@ -136,7 +254,7 @@ const AnalyticsViewEditorCard = ({
                     disabled: true,
                   },
                   {
-                    label: 'Planning Interval Objectives',
+                    label: 'PI Objectives',
                     value: AnalyticsDataset.PlanningIntervalObjectives,
                     disabled: true,
                   },
@@ -170,6 +288,38 @@ const AnalyticsViewEditorCard = ({
           </Col>
         </Row>
 
+        <Form.Item
+          label="Managers"
+          name="managerIds"
+          rules={[
+            {
+              required: true,
+              message: 'Select at least one manager.',
+            },
+            {
+              validator: async (_, value) => {
+                if (
+                  currentUserEmployeeId &&
+                  (!value || !value.includes(currentUserEmployeeId))
+                ) {
+                  return Promise.reject(
+                    new Error(
+                      'You must be a manager of the analytics view.',
+                    ),
+                  )
+                }
+                return Promise.resolve()
+              },
+            },
+          ]}
+        >
+          <EmployeeSelect
+            employees={employeeOptions ?? []}
+            allowMultiple={true}
+            placeholder="Select one or more managers"
+          />
+        </Form.Item>
+
         <Divider>Columns</Divider>
         <Form.List name={['definition', 'columns']}>
           {(fields, { add, remove }) => (
@@ -191,7 +341,10 @@ const AnalyticsViewEditorCard = ({
                     />
                   </Form.Item>
                   <Form.Item name={[field.name, 'alias']}>
-                    <Input style={{ width: 200 }} placeholder="Alias (optional)" />
+                    <Input
+                      style={{ width: 200 }}
+                      placeholder="Alias (optional)"
+                    />
                   </Form.Item>
                   <Button danger onClick={() => remove(field.name)}>
                     Remove
@@ -227,7 +380,9 @@ const AnalyticsViewEditorCard = ({
                   </Form.Item>
                   <Form.Item
                     name={[field.name, 'operator']}
-                    rules={[{ required: true, message: 'Operator required.' }]}
+                    rules={[
+                      { required: true, message: 'Operator required.' },
+                    ]}
                   >
                     <Select
                       style={{ width: 200 }}
@@ -313,7 +468,11 @@ const AnalyticsViewEditorCard = ({
                   </Button>
                 </Space>
               ))}
-              <Button onClick={() => add({ type: 'Count', field: 'id', alias: 'Count' })}>
+              <Button
+                onClick={() =>
+                  add({ type: 'Count', field: 'id', alias: 'Count' })
+                }
+              >
                 Add Measure
               </Button>
             </>
@@ -332,7 +491,9 @@ const AnalyticsViewEditorCard = ({
                 >
                   <Form.Item
                     name={[field.name, 'field']}
-                    rules={[{ required: true, message: 'Sort field required.' }]}
+                    rules={[
+                      { required: true, message: 'Sort field required.' },
+                    ]}
                   >
                     <Select
                       style={{ width: 260 }}
@@ -342,7 +503,9 @@ const AnalyticsViewEditorCard = ({
                   </Form.Item>
                   <Form.Item
                     name={[field.name, 'direction']}
-                    rules={[{ required: true, message: 'Direction required.' }]}
+                    rules={[
+                      { required: true, message: 'Direction required.' },
+                    ]}
                   >
                     <Select
                       style={{ width: 140 }}
@@ -367,15 +530,15 @@ const AnalyticsViewEditorCard = ({
         <Divider>Definition Preview</Divider>
         <TextArea
           value={buildDefinitionJson(
-            watchedDefinition ?? makeDefaultDefinition(),
-            watchedDataset ?? AnalyticsDataset.WorkItems,
+            formValues?.definition ?? makeDefaultDefinition(),
+            formValues?.dataset ?? AnalyticsDataset.WorkItems,
           )}
-          autoSize={{ minRows: 10, maxRows: 16 }}
+          autoSize={{ minRows: 6, maxRows: 12 }}
           readOnly
         />
       </Form>
-    </Card>
+    </Modal>
   )
 }
 
-export default AnalyticsViewEditorCard
+export default EditAnalyticsViewForm

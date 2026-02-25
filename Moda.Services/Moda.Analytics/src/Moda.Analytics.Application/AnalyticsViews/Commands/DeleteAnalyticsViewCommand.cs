@@ -1,3 +1,4 @@
+using Ardalis.GuardClauses;
 using Moda.Analytics.Application.Persistence;
 
 namespace Moda.Analytics.Application.AnalyticsViews.Commands;
@@ -19,7 +20,7 @@ internal sealed class DeleteAnalyticsViewCommandHandler(
     ILogger<DeleteAnalyticsViewCommandHandler> logger) : ICommandHandler<DeleteAnalyticsViewCommand>
 {
     private readonly IAnalyticsDbContext _analyticsDbContext = analyticsDbContext;
-    private readonly ICurrentUser _currentUser = currentUser;
+    private readonly Guid _currentUserEmployeeId = Guard.Against.NullOrEmpty(currentUser.GetEmployeeId());
     private readonly ILogger<DeleteAnalyticsViewCommandHandler> _logger = logger;
 
     public async Task<Result> Handle(DeleteAnalyticsViewCommand request, CancellationToken cancellationToken)
@@ -27,13 +28,14 @@ internal sealed class DeleteAnalyticsViewCommandHandler(
         try
         {
             var view = await _analyticsDbContext.AnalyticsViews
+                .Include(v => v.AnalyticsViewManagers)
                 .FirstOrDefaultAsync(v => v.Id == request.Id, cancellationToken);
 
             if (view is null)
                 return Result.Failure("Analytics view not found.");
 
-            var currentUserId = _currentUser.GetUserId();
-            if (view.Visibility == Visibility.Private && view.OwnerId != currentUserId)
+            var canManageResult = view.CanEmployeeManage(_currentUserEmployeeId);
+            if (canManageResult.IsFailure)
                 return Result.Failure("You do not have permission to delete this analytics view.");
 
             _analyticsDbContext.AnalyticsViews.Remove(view);

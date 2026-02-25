@@ -8,7 +8,7 @@ public sealed record AnalyticsViewDetailsDto
     public AnalyticsDataset Dataset { get; init; }
     public string DefinitionJson { get; init; } = default!;
     public Visibility Visibility { get; init; }
-    public Guid OwnerId { get; init; }
+    public List<Guid> ManagerIds { get; init; } = [];
     public bool IsActive { get; init; }
     public Instant Created { get; init; }
     public Instant LastModified { get; init; }

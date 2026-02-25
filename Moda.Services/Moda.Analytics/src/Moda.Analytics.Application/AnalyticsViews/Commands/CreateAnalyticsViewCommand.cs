@@ -1,5 +1,5 @@
 using System.Text.Json;
-using Moda.Analytics.Application.AnalyticsViews.Dtos;
+using Ardalis.GuardClauses;
 using Moda.Analytics.Application.Persistence;
 
 namespace Moda.Analytics.Application.AnalyticsViews.Commands;
@@ -10,13 +10,17 @@ public sealed record CreateAnalyticsViewCommand(
     AnalyticsDataset Dataset,
     string DefinitionJson,
     Visibility Visibility,
-    Guid? OwnerId,
+    List<Guid> ManagerIds,
     bool IsActive = true) : ICommand<Guid>;
 
 public sealed class CreateAnalyticsViewCommandValidator : CustomValidator<CreateAnalyticsViewCommand>
 {
-    public CreateAnalyticsViewCommandValidator()
+    private readonly ICurrentUser _currentUser;
+
+    public CreateAnalyticsViewCommandValidator(ICurrentUser currentUser)
     {
+        _currentUser = currentUser;
+
         RuleLevelCascadeMode = CascadeMode.Stop;
 
         RuleFor(v => v.Name)
@@ -31,9 +35,18 @@ public sealed class CreateAnalyticsViewCommandValidator : CustomValidator<Create
             .Must(BeValidJson)
             .WithMessage("DefinitionJson must contain valid JSON.");
 
-        RuleFor(v => v.OwnerId)
-            .Must(v => !v.HasValue || v.Value != Guid.Empty)
-            .WithMessage("OwnerId must be a valid guid when provided.");
+        RuleFor(v => v.ManagerIds)
+            .NotEmpty()
+            .Must(IncludeCurrentUser).WithMessage("The current user must be a manager of the Analytics View.");
+
+        RuleForEach(v => v.ManagerIds)
+            .NotEmpty();
+    }
+
+    private bool IncludeCurrentUser(IEnumerable<Guid> managerIds)
+    {
+        var employeeId = Guard.Against.NullOrEmpty(_currentUser.GetEmployeeId());
+        return managerIds.Contains(employeeId);
     }
 
     private static bool BeValidJson(string json)
@@ -52,32 +65,34 @@ public sealed class CreateAnalyticsViewCommandValidator : CustomValidator<Create
 
 internal sealed class CreateAnalyticsViewCommandHandler(
     IAnalyticsDbContext analyticsDbContext,
-    ICurrentUser currentUser,
     ILogger<CreateAnalyticsViewCommandHandler> logger) : ICommandHandler<CreateAnalyticsViewCommand, Guid>
 {
     private readonly IAnalyticsDbContext _analyticsDbContext = analyticsDbContext;
-    private readonly ICurrentUser _currentUser = currentUser;
     private readonly ILogger<CreateAnalyticsViewCommandHandler> _logger = logger;
 
     public async Task<Result<Guid>> Handle(CreateAnalyticsViewCommand request, CancellationToken cancellationToken)
     {
         try
         {
-            var ownerId = request.OwnerId ?? _currentUser.GetUserId();
-
-            var view = AnalyticsView.Create(
+            var result = AnalyticsView.Create(
                 request.Name,
                 request.Description,
                 request.Dataset,
                 request.DefinitionJson,
                 request.Visibility,
-                ownerId,
+                request.ManagerIds,
                 request.IsActive);
 
-            await _analyticsDbContext.AnalyticsViews.AddAsync(view, cancellationToken);
+            if (result.IsFailure)
+            {
+                _logger.LogError("Moda Request: Failure for Request {Name} {@Request}.  Error message: {Error}", request.GetType().Name, request, result.Error);
+                return Result.Failure<Guid>(result.Error);
+            }
+
+            await _analyticsDbContext.AnalyticsViews.AddAsync(result.Value, cancellationToken);
             await _analyticsDbContext.SaveChangesAsync(cancellationToken);
 
-            return Result.Success(view.Id);
+            return Result.Success(result.Value.Id);
         }
         catch (Exception ex)
         {

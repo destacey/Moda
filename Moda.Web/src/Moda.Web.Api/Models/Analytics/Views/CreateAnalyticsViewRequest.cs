@@ -11,11 +11,11 @@ public sealed record CreateAnalyticsViewRequest
     public AnalyticsDataset Dataset { get; set; } = AnalyticsDataset.WorkItems;
     public string DefinitionJson { get; set; } = default!;
     public Visibility Visibility { get; set; } = Visibility.Private;
-    public Guid? OwnerId { get; set; }
+    public List<Guid> ManagerIds { get; set; } = [];
     public bool IsActive { get; set; } = true;
 
     public CreateAnalyticsViewCommand ToCreateAnalyticsViewCommand()
-        => new(Name, Description, Dataset, DefinitionJson, Visibility, OwnerId, IsActive);
+        => new(Name, Description, Dataset, DefinitionJson, Visibility, ManagerIds, IsActive);
 }
 
 public sealed class CreateAnalyticsViewRequestValidator : CustomValidator<CreateAnalyticsViewRequest>
@@ -34,8 +34,10 @@ public sealed class CreateAnalyticsViewRequestValidator : CustomValidator<Create
         RuleFor(v => v.DefinitionJson)
             .NotEmpty();
 
-        RuleFor(v => v.OwnerId)
-            .Must(v => !v.HasValue || v.Value != Guid.Empty)
-            .WithMessage("OwnerId must be a valid guid when provided.");
+        RuleFor(v => v.ManagerIds)
+            .NotEmpty();
+
+        RuleForEach(v => v.ManagerIds)
+            .NotEmpty();
     }
 }

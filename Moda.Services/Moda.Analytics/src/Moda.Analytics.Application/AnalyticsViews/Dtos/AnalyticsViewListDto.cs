@@ -7,7 +7,7 @@ public sealed record AnalyticsViewListDto
     public string? Description { get; init; }
     public AnalyticsDataset Dataset { get; init; }
     public Visibility Visibility { get; init; }
-    public Guid OwnerId { get; init; }
+    public List<Guid> ManagerIds { get; init; } = [];
     public bool IsActive { get; init; }
     public Instant LastModified { get; init; }
 }

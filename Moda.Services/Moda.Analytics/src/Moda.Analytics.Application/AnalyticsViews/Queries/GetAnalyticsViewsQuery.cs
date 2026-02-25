@@ -1,3 +1,4 @@
+using Ardalis.GuardClauses;
 using Moda.Analytics.Application.AnalyticsViews.Dtos;
 using Moda.Analytics.Application.Persistence;
 
@@ -10,15 +11,13 @@ internal sealed class GetAnalyticsViewsQueryHandler(
     ICurrentUser currentUser) : IQueryHandler<GetAnalyticsViewsQuery, IReadOnlyList<AnalyticsViewListDto>>
 {
     private readonly IAnalyticsDbContext _analyticsDbContext = analyticsDbContext;
-    private readonly ICurrentUser _currentUser = currentUser;
+    private readonly Guid _currentUserEmployeeId = Guard.Against.NullOrEmpty(currentUser.GetEmployeeId());
 
     public async Task<IReadOnlyList<AnalyticsViewListDto>> Handle(GetAnalyticsViewsQuery request, CancellationToken cancellationToken)
     {
-        var currentUserId = _currentUser.GetUserId();
-
         var query = _analyticsDbContext.AnalyticsViews
             .AsNoTracking()
-            .Where(v => v.Visibility == Visibility.Public || v.OwnerId == currentUserId)
+            .Where(v => v.Visibility == Visibility.Public || v.AnalyticsViewManagers.Any(m => m.ManagerId == _currentUserEmployeeId))
             .AsQueryable();
 
         if (!request.IncludeInactive)
@@ -28,7 +27,17 @@ internal sealed class GetAnalyticsViewsQueryHandler(
 
         return await query
             .OrderBy(v => v.Name)
-            .ProjectToType<AnalyticsViewListDto>()
+            .Select(v => new AnalyticsViewListDto
+            {
+                Id = v.Id,
+                Name = v.Name,
+                Description = v.Description,
+                Dataset = v.Dataset,
+                Visibility = v.Visibility,
+                ManagerIds = v.AnalyticsViewManagers.Select(m => m.ManagerId).ToList(),
+                IsActive = v.IsActive,
+                LastModified = EF.Property<Instant>(v, "SystemLastModified")
+            })
             .ToListAsync(cancellationToken);
     }
 }

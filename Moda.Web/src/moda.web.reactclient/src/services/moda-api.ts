@@ -22115,7 +22115,7 @@ export interface AnalyticsViewListDto {
     description?: string | undefined;
     dataset: AnalyticsDataset;
     visibility: Visibility;
-    ownerId: string;
+    managerIds: string[];
     isActive: boolean;
     lastModified: Date;
 }
@@ -22138,7 +22138,7 @@ export interface AnalyticsViewDetailsDto {
     dataset: AnalyticsDataset;
     definitionJson: string;
     visibility: Visibility;
-    ownerId: string;
+    managerIds: string[];
     isActive: boolean;
     created: Date;
     lastModified: Date;
@@ -22150,7 +22150,7 @@ export interface CreateAnalyticsViewRequest {
     dataset: AnalyticsDataset;
     definitionJson: string;
     visibility: Visibility;
-    ownerId?: string | undefined;
+    managerIds: string[];
     isActive: boolean;
 }
 
@@ -22161,7 +22161,7 @@ export interface UpdateAnalyticsViewRequest {
     dataset: AnalyticsDataset;
     definitionJson: string;
     visibility: Visibility;
-    ownerId?: string | undefined;
+    managerIds: string[];
     isActive: boolean;
 }
 

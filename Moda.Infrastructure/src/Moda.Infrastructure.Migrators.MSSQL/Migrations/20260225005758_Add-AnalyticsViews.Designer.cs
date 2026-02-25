@@ -13,7 +13,7 @@ using Moda.Infrastructure.Persistence.Context;
 namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 {
     [DbContext(typeof(ModaDbContext))]
-    [Migration("20260223020021_Add-AnalyticsViews")]
+    [Migration("20260225005758_Add-AnalyticsViews")]
     partial class AddAnalyticsViews
     {
         /// <inheritdoc />
@@ -135,9 +135,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)");
 
-                    b.Property<Guid>("OwnerId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime>("SystemCreated")
                         .HasColumnType("datetime2");
 
@@ -157,13 +154,32 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                     b.HasIndex("Name");
 
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Name"), new[] { "Dataset", "Visibility", "OwnerId", "IsActive" });
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Name"), new[] { "Dataset", "Visibility", "IsActive" });
 
-                    b.HasIndex("OwnerId");
+                    b.HasIndex("Visibility");
 
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("OwnerId"), new[] { "Name", "Dataset", "Visibility", "IsActive" });
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Visibility"), new[] { "Id", "Name", "Dataset", "IsActive" });
 
                     b.ToTable("AnalyticsViews", "Analytics");
+                });
+
+            modelBuilder.Entity("Moda.Analytics.Domain.Models.AnalyticsViewManager", b =>
+                {
+                    b.Property<Guid>("AnalyticsViewId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ManagerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("AnalyticsViewId", "ManagerId");
+
+                    b.HasIndex("AnalyticsViewId");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("AnalyticsViewId"), new[] { "ManagerId" });
+
+                    b.HasIndex("AnalyticsViewId", "ManagerId");
+
+                    b.ToTable("AnalyticsViewManagers", "Analytics");
                 });
 
             modelBuilder.Entity("Moda.AppIntegration.Domain.Models.Connection", b =>
@@ -2548,11 +2564,19 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasMaxLength(64)
                         .HasColumnType("nvarchar(64)");
 
+                    b.Property<string>("Prefix")
+                        .HasMaxLength(8)
+                        .HasColumnType("nvarchar(8)");
+
                     b.Property<double?>("StartingValue")
                         .HasColumnType("float");
 
                     b.Property<Guid>("StrategicInitiativeId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Suffix")
+                        .HasMaxLength(8)
+                        .HasColumnType("nvarchar(8)");
 
                     b.Property<DateTime>("SystemCreated")
                         .HasColumnType("datetime2");
@@ -2573,11 +2597,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                     b.Property<double>("TargetValue")
                         .HasColumnType("float");
-
-                    b.Property<string>("Unit")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("varchar");
 
                     b.HasKey("Id");
 
@@ -4080,6 +4099,15 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Moda.Analytics.Domain.Models.AnalyticsViewManager", b =>
+                {
+                    b.HasOne("Moda.Analytics.Domain.Models.AnalyticsView", null)
+                        .WithMany("AnalyticsViewManagers")
+                        .HasForeignKey("AnalyticsViewId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Moda.Common.Domain.Employees.Employee", b =>
                 {
                     b.HasOne("Moda.Common.Domain.Employees.Employee", "Manager")
@@ -5051,6 +5079,11 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Source");
 
                     b.Navigation("Target");
+                });
+
+            modelBuilder.Entity("Moda.Analytics.Domain.Models.AnalyticsView", b =>
+                {
+                    b.Navigation("AnalyticsViewManagers");
                 });
 
             modelBuilder.Entity("Moda.Common.Domain.Employees.Employee", b =>

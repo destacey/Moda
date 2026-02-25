@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text.Json;
+using Ardalis.GuardClauses;
 using Moda.Analytics.Application.AnalyticsViews.Dtos;
 using Moda.Analytics.Application.Persistence;
 
@@ -64,20 +65,19 @@ internal sealed class RunAnalyticsViewQueryHandler(
     };
 
     private readonly IAnalyticsDbContext _analyticsDbContext = analyticsDbContext;
-    private readonly ICurrentUser _currentUser = currentUser;
+    private readonly Guid _currentUserEmployeeId = Guard.Against.NullOrEmpty(currentUser.GetEmployeeId());
 
     public async Task<Result<AnalyticsViewResultDto>> Handle(RunAnalyticsViewQuery request, CancellationToken cancellationToken)
     {
-        var currentUserId = _currentUser.GetUserId();
-
         var view = await _analyticsDbContext.AnalyticsViews
             .AsNoTracking()
+            .Include(v => v.AnalyticsViewManagers)
             .FirstOrDefaultAsync(v => v.Id == request.Id, cancellationToken);
 
         if (view is null)
             return Result.Failure<AnalyticsViewResultDto>("Analytics view not found.");
 
-        if (view.Visibility == Visibility.Private && view.OwnerId != currentUserId)
+        if (view.Visibility != Visibility.Public && !view.AnalyticsViewManagers.Any(m => m.ManagerId == _currentUserEmployeeId))
             return Result.Failure<AnalyticsViewResultDto>("You do not have permission to run this analytics view.");
 
         if (view.Dataset != AnalyticsDataset.WorkItems)

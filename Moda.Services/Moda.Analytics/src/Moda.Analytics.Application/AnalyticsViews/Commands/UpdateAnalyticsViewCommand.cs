@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Ardalis.GuardClauses;
 using Moda.Analytics.Application.AnalyticsViews.Dtos;
 using Moda.Analytics.Application.Persistence;
 
@@ -11,13 +12,17 @@ public sealed record UpdateAnalyticsViewCommand(
     AnalyticsDataset Dataset,
     string DefinitionJson,
     Visibility Visibility,
-    Guid? OwnerId,
+    List<Guid> ManagerIds,
     bool IsActive) : ICommand<AnalyticsViewDetailsDto>;
 
 public sealed class UpdateAnalyticsViewCommandValidator : CustomValidator<UpdateAnalyticsViewCommand>
 {
-    public UpdateAnalyticsViewCommandValidator()
+    private readonly ICurrentUser _currentUser;
+
+    public UpdateAnalyticsViewCommandValidator(ICurrentUser currentUser)
     {
+        _currentUser = currentUser;
+
         RuleLevelCascadeMode = CascadeMode.Stop;
 
         RuleFor(v => v.Id)
@@ -35,9 +40,18 @@ public sealed class UpdateAnalyticsViewCommandValidator : CustomValidator<Update
             .Must(BeValidJson)
             .WithMessage("DefinitionJson must contain valid JSON.");
 
-        RuleFor(v => v.OwnerId)
-            .Must(v => !v.HasValue || v.Value != Guid.Empty)
-            .WithMessage("OwnerId must be a valid guid when provided.");
+        RuleFor(v => v.ManagerIds)
+            .NotEmpty()
+            .Must(IncludeCurrentUser).WithMessage("The current user must be a manager of the Analytics View.");
+
+        RuleForEach(v => v.ManagerIds)
+            .NotEmpty();
+    }
+
+    private bool IncludeCurrentUser(IEnumerable<Guid> managerIds)
+    {
+        var employeeId = Guard.Against.NullOrEmpty(_currentUser.GetEmployeeId());
+        return managerIds.Contains(employeeId);
     }
 
     private static bool BeValidJson(string json)
@@ -60,7 +74,7 @@ internal sealed class UpdateAnalyticsViewCommandHandler(
     ILogger<UpdateAnalyticsViewCommandHandler> logger) : ICommandHandler<UpdateAnalyticsViewCommand, AnalyticsViewDetailsDto>
 {
     private readonly IAnalyticsDbContext _analyticsDbContext = analyticsDbContext;
-    private readonly ICurrentUser _currentUser = currentUser;
+    private readonly Guid _currentUserEmployeeId = Guard.Against.NullOrEmpty(currentUser.GetEmployeeId());
     private readonly ILogger<UpdateAnalyticsViewCommandHandler> _logger = logger;
 
     public async Task<Result<AnalyticsViewDetailsDto>> Handle(UpdateAnalyticsViewCommand request, CancellationToken cancellationToken)
@@ -68,32 +82,47 @@ internal sealed class UpdateAnalyticsViewCommandHandler(
         try
         {
             var view = await _analyticsDbContext.AnalyticsViews
+                .Include(v => v.AnalyticsViewManagers)
                 .FirstOrDefaultAsync(v => v.Id == request.Id, cancellationToken);
 
             if (view is null)
                 return Result.Failure<AnalyticsViewDetailsDto>("Analytics view not found.");
 
-            var currentUserId = _currentUser.GetUserId();
-            if (view.Visibility == Visibility.Private && view.OwnerId != currentUserId)
-                return Result.Failure<AnalyticsViewDetailsDto>("You do not have permission to update this analytics view.");
-
-            var ownerId = request.OwnerId ?? view.OwnerId;
-
-            var result = view.Update(
+            var updateResult = view.Update(
                 request.Name,
                 request.Description,
                 request.Dataset,
                 request.DefinitionJson,
                 request.Visibility,
-                ownerId,
-                request.IsActive);
+                request.ManagerIds,
+                request.IsActive,
+                _currentUserEmployeeId);
 
-            if (result.IsFailure)
-                return Result.Failure<AnalyticsViewDetailsDto>(result.Error);
+            if (updateResult.IsFailure)
+            {
+                // Reset the entity
+                await _analyticsDbContext.Entry(view).ReloadAsync(cancellationToken);
+
+                _logger.LogError("Unable to update Analytics View {AnalyticsViewId}.  Error message: {Error}", request.Id, updateResult.Error);
+                return Result.Failure<AnalyticsViewDetailsDto>(updateResult.Error);
+            }
 
             await _analyticsDbContext.SaveChangesAsync(cancellationToken);
 
-            return view.Adapt<AnalyticsViewDetailsDto>();
+            var entry = _analyticsDbContext.Entry(view);
+            return new AnalyticsViewDetailsDto
+            {
+                Id = view.Id,
+                Name = view.Name,
+                Description = view.Description,
+                Dataset = view.Dataset,
+                DefinitionJson = view.DefinitionJson,
+                Visibility = view.Visibility,
+                ManagerIds = view.AnalyticsViewManagers.Select(m => m.ManagerId).ToList(),
+                IsActive = view.IsActive,
+                Created = entry.Property<Instant>("SystemCreated").CurrentValue,
+                LastModified = entry.Property<Instant>("SystemLastModified").CurrentValue
+            };
         }
         catch (Exception ex)
         {

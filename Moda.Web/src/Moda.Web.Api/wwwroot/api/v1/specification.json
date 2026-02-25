@@ -27482,7 +27482,7 @@
           "name",
           "dataset",
           "visibility",
-          "ownerId",
+          "managerIds",
           "isActive",
           "lastModified"
         ],
@@ -27506,11 +27506,14 @@
           "visibility": {
             "$ref": "#/components/schemas/Visibility"
           },
-          "ownerId": {
-            "type": "string",
-            "format": "guid",
-            "nullable": false,
-            "example": "00000000-0000-0000-0000-000000000000"
+          "managerIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            }
           },
           "isActive": {
             "type": "boolean"
@@ -27556,7 +27559,7 @@
           "dataset",
           "definitionJson",
           "visibility",
-          "ownerId",
+          "managerIds",
           "isActive",
           "created",
           "lastModified"
@@ -27584,11 +27587,14 @@
           "visibility": {
             "$ref": "#/components/schemas/Visibility"
           },
-          "ownerId": {
-            "type": "string",
-            "format": "guid",
-            "nullable": false,
-            "example": "00000000-0000-0000-0000-000000000000"
+          "managerIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            }
           },
           "isActive": {
             "type": "boolean"
@@ -27611,6 +27617,7 @@
           "dataset",
           "definitionJson",
           "visibility",
+          "managerIds",
           "isActive"
         ],
         "properties": {
@@ -27637,11 +27644,16 @@
           "visibility": {
             "$ref": "#/components/schemas/Visibility"
           },
-          "ownerId": {
-            "type": "string",
-            "format": "guid",
-            "nullable": true,
-            "example": "00000000-0000-0000-0000-000000000000"
+          "managerIds": {
+            "type": "array",
+            "minLength": 1,
+            "nullable": false,
+            "items": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            }
           },
           "isActive": {
             "type": "boolean"
@@ -27657,6 +27669,7 @@
           "dataset",
           "definitionJson",
           "visibility",
+          "managerIds",
           "isActive"
         ],
         "properties": {
@@ -27690,11 +27703,16 @@
           "visibility": {
             "$ref": "#/components/schemas/Visibility"
           },
-          "ownerId": {
-            "type": "string",
-            "format": "guid",
-            "nullable": true,
-            "example": "00000000-0000-0000-0000-000000000000"
+          "managerIds": {
+            "type": "array",
+            "minLength": 1,
+            "nullable": false,
+            "items": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            }
           },
           "isActive": {
             "type": "boolean"
