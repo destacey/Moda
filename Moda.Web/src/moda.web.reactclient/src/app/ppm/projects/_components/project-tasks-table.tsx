@@ -240,6 +240,63 @@ const ProjectTasksTable = ({
     [projectKey, updateProjectTaskPlacement, refetch, messageApi],
   )
 
+  const handleTaskError = useCallback(
+    (error: any, taskId: string, fallbackMessage: string): false => {
+      const status = error?.status ?? error?.data?.status
+      const errors = error?.errors ?? error?.data?.errors
+      const detail = error?.detail ?? error?.data?.detail
+
+      if (status === 422 && errors) {
+        const errorMap: Record<string, string> = {}
+        const errorFields: string[] = []
+        Object.entries(errors).forEach(([key, messages]) => {
+          const fieldName = key.charAt(0).toLowerCase() + key.slice(1)
+          errorMap[fieldName] = Array.isArray(messages) ? messages[0] : messages
+          errorFields.push(fieldName)
+        })
+        setFieldErrors(errorMap)
+
+        setTimeout(() => {
+          let focused = false
+          for (const errorField of errorFields) {
+            const columnId =
+              errorField === 'plannedDate'
+                ? 'plannedStart'
+                : errorField.replace(/Id$/, '')
+            const cellElement = document.querySelector(
+              `[data-cell-id="${taskId}-${columnId}"]`,
+            )
+            if (cellElement) {
+              const input = cellElement.querySelector(
+                'input, .ant-select',
+              ) as HTMLElement
+              if (input) {
+                input.focus()
+                focused = true
+                break
+              }
+            }
+          }
+          if (!focused) {
+            const cellElement = document.querySelector(
+              `[data-cell-id="${taskId}-name"]`,
+            )
+            if (cellElement) {
+              const input = cellElement.querySelector('input') as HTMLElement
+              input?.focus()
+            }
+          }
+        }, 0)
+
+        messageApi.error('Correct the validation error(s) to continue.')
+      } else {
+        messageApi.error(detail ?? fallbackMessage)
+      }
+      return false
+    },
+    [messageApi, setFieldErrors],
+  )
+
   const handleUpdateTask = useCallback(
     async (taskId: string, updates: Partial<any>): Promise<boolean> => {
       if (!projectKey) return false
@@ -276,65 +333,11 @@ const ProjectTasksTable = ({
           await refetch()
           return true
         } catch (error: any) {
-          const status = error?.status ?? error?.data?.status
-          const errors = error?.errors ?? error?.data?.errors
-          const detail = error?.detail ?? error?.data?.detail
-
-          if (status === 422 && errors) {
-            const errorMap: Record<string, string> = {}
-            const errorFields: string[] = []
-            Object.entries(errors).forEach(([key, messages]) => {
-              const fieldName = key.charAt(0).toLowerCase() + key.slice(1)
-              errorMap[fieldName] = Array.isArray(messages)
-                ? messages[0]
-                : messages
-              errorFields.push(fieldName)
-            })
-            setFieldErrors(errorMap)
-
-            setTimeout(() => {
-              let focused = false
-              for (const errorField of errorFields) {
-                const columnId =
-                  errorField === 'plannedDate'
-                    ? 'plannedStart'
-                    : errorField.replace(/Id$/, '')
-                const cellElement = document.querySelector(
-                  `[data-cell-id="${taskId}-${columnId}"]`,
-                )
-                if (cellElement) {
-                  const input = cellElement.querySelector(
-                    'input, .ant-select',
-                  ) as HTMLElement
-                  if (input) {
-                    input.focus()
-                    focused = true
-                    break
-                  }
-                }
-              }
-              if (!focused) {
-                const cellElement = document.querySelector(
-                  `[data-cell-id="${taskId}-name"]`,
-                )
-                if (cellElement) {
-                  const input = cellElement.querySelector(
-                    'input',
-                  ) as HTMLElement
-                  input?.focus()
-                }
-              }
-            }, 0)
-
-            messageApi.error('Correct the validation error(s) to continue.')
-            return false
-          } else {
-            messageApi.error(
-              detail ??
-                'An error occurred while creating the project task. Please try again.',
-            )
-          }
-          return false
+          return handleTaskError(
+            error,
+            taskId,
+            'An error occurred while creating the project task. Please try again.',
+          )
         }
       } else {
         const task = findNodeById(tasks || [], taskId)
@@ -352,65 +355,11 @@ const ProjectTasksTable = ({
           await refetch()
           return true
         } catch (error: any) {
-          const status = error?.status ?? error?.data?.status
-          const errors = error?.errors ?? error?.data?.errors
-          const detail = error?.detail ?? error?.data?.detail
-
-          if (status === 422 && errors) {
-            const errorMap: Record<string, string> = {}
-            const errorFields: string[] = []
-            Object.entries(errors).forEach(([key, messages]) => {
-              const fieldName = key.charAt(0).toLowerCase() + key.slice(1)
-              errorMap[fieldName] = Array.isArray(messages)
-                ? messages[0]
-                : messages
-              errorFields.push(fieldName)
-            })
-            setFieldErrors(errorMap)
-
-            setTimeout(() => {
-              let focused = false
-              for (const errorField of errorFields) {
-                const columnId =
-                  errorField === 'plannedDate'
-                    ? 'plannedStart'
-                    : errorField.replace(/Id$/, '')
-                const cellElement = document.querySelector(
-                  `[data-cell-id="${taskId}-${columnId}"]`,
-                )
-                if (cellElement) {
-                  const input = cellElement.querySelector(
-                    'input, .ant-select',
-                  ) as HTMLElement
-                  if (input) {
-                    input.focus()
-                    focused = true
-                    break
-                  }
-                }
-              }
-              if (!focused) {
-                const cellElement = document.querySelector(
-                  `[data-cell-id="${taskId}-name"]`,
-                )
-                if (cellElement) {
-                  const input = cellElement.querySelector(
-                    'input',
-                  ) as HTMLElement
-                  input?.focus()
-                }
-              }
-            }, 0)
-
-            messageApi.error('Correct the validation error(s) to continue.')
-            return false
-          } else {
-            messageApi.error(
-              detail ??
-                'An error occurred while updating the project task. Please try again.',
-            )
-          }
-          return false
+          return handleTaskError(
+            error,
+            taskId,
+            'An error occurred while updating the project task. Please try again.',
+          )
         }
       }
     },
@@ -421,6 +370,7 @@ const ProjectTasksTable = ({
       tasks,
       patchProjectTask,
       createProjectTask,
+      handleTaskError,
     ],
   )
 
