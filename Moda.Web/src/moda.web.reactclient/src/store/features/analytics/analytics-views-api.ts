@@ -1,14 +1,32 @@
-import { getAnalyticsViewsClient } from '@/src/services/clients'
+import {
+  authenticatedFetch,
+  getAnalyticsViewsClient,
+} from '@/src/services/clients'
 import {
   AnalyticsViewDetailsDto,
   AnalyticsViewListDto,
-  AnalyticsViewResultDto,
   CreateAnalyticsViewRequest,
-  RunAnalyticsViewRequest,
   UpdateAnalyticsViewRequest,
 } from '@/src/services/moda-api'
 import { apiSlice } from '../apiSlice'
 import { QueryTags } from '../query-tags'
+
+export interface AnalyticsViewDataQueryParams {
+  id: string
+  pageNumber?: number
+  pageSize?: number
+}
+
+export interface AnalyticsViewColumnDto {
+  field: string
+  displayName: string
+}
+
+export interface AnalyticsViewDataResultDto {
+  columns: AnalyticsViewColumnDto[]
+  rows: Record<string, unknown>[]
+  totalCount: number
+}
 
 export const analyticsViewsApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -45,6 +63,43 @@ export const analyticsViewsApi = apiSlice.injectEndpoints({
         { type: QueryTags.AnalyticsViewDetail, id: arg },
         { type: QueryTags.AnalyticsView, id: arg },
       ],
+    }),
+
+    getAnalyticsViewData: builder.query<
+      AnalyticsViewDataResultDto,
+      AnalyticsViewDataQueryParams
+    >({
+      queryFn: async (params) => {
+        try {
+          const queryParts: string[] = []
+          if (params.pageNumber != null)
+            queryParts.push(`pageNumber=${params.pageNumber}`)
+          if (params.pageSize != null)
+            queryParts.push(`pageSize=${params.pageSize}`)
+
+          const queryString =
+            queryParts.length > 0 ? `?${queryParts.join('&')}` : ''
+          const response = await authenticatedFetch(
+            `/api/analytics/views/${params.id}/data${queryString}`,
+          )
+
+          if (!response.ok) {
+            const errorText = await response.text()
+            return {
+              error: {
+                status: response.status,
+                data: errorText,
+              },
+            }
+          }
+
+          const data: AnalyticsViewDataResultDto = await response.json()
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
     }),
 
     createAnalyticsView: builder.mutation<string, CreateAnalyticsViewRequest>({
@@ -92,27 +147,15 @@ export const analyticsViewsApi = apiSlice.injectEndpoints({
       invalidatesTags: [{ type: QueryTags.AnalyticsView }],
     }),
 
-    runAnalyticsView: builder.mutation<AnalyticsViewResultDto, RunAnalyticsViewRequest>(
-      {
-        queryFn: async (request) => {
-          try {
-            const data = await getAnalyticsViewsClient().run(request.id, request)
-            return { data }
-          } catch (error) {
-            console.error('API Error:', error)
-            return { error }
-          }
-        },
-      },
-    ),
   }),
 })
 
 export const {
   useGetAnalyticsViewsQuery,
   useGetAnalyticsViewQuery,
+  useGetAnalyticsViewDataQuery,
+  useLazyGetAnalyticsViewDataQuery,
   useCreateAnalyticsViewMutation,
   useUpdateAnalyticsViewMutation,
   useDeleteAnalyticsViewMutation,
-  useRunAnalyticsViewMutation,
 } = analyticsViewsApi

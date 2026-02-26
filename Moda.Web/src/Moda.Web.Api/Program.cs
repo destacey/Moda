@@ -1,7 +1,10 @@
 ﻿using System.Reflection;
 using System.Text.Json.Serialization;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.OData;
+using Microsoft.OData.ModelBuilder;
 using Moda.Analytics.Application;
+using Moda.Analytics.Application.AnalyticsViews.Dtos;
 using Moda.AppIntegration.Application;
 using Moda.Common.Application;
 using Moda.Common.Application.Interfaces;
@@ -38,7 +41,13 @@ try
             options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
             options.JsonSerializerOptions.AllowTrailingCommas = true;
-        });
+        })
+        .AddOData(options => options
+            .Select()
+            .Filter()
+            .OrderBy()
+            .Count()
+            .SetMaxTop(500));
 
     builder.Services.Configure<ApiBehaviorOptions>(options =>
     {

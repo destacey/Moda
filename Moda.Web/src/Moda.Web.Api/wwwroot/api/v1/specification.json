@@ -16978,13 +16978,13 @@
         ]
       }
     },
-    "/api/analytics/views/{id}/run": {
-      "post": {
+    "/api/analytics/views/{id}/data": {
+      "get": {
         "tags": [
           "AnalyticsViews"
         ],
-        "summary": "Run an analytics view.",
-        "operationId": "AnalyticsViews_Run",
+        "summary": "Get analytics view data.",
+        "operationId": "AnalyticsViews_GetData",
         "parameters": [
           {
             "name": "id",
@@ -16997,27 +16997,35 @@
               "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
+          },
+          {
+            "name": "pageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            },
+            "x-position": 2
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 50
+            },
+            "x-position": 3
           }
         ],
-        "requestBody": {
-          "x-name": "request",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RunAnalyticsViewRequest"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 2
-        },
         "responses": {
           "200": {
             "description": "",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AnalyticsViewResultDto"
+                  "$ref": "#/components/schemas/AnalyticsViewDataResultDto"
                 }
               }
             }
@@ -27719,19 +27727,19 @@
           }
         }
       },
-      "AnalyticsViewResultDto": {
+      "AnalyticsViewDataResultDto": {
         "type": "object",
         "additionalProperties": false,
         "required": [
           "columns",
           "rows",
-          "totalRows"
+          "totalCount"
         ],
         "properties": {
           "columns": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/AnalyticsViewResultColumnDto"
+              "$ref": "#/components/schemas/AnalyticsViewColumnDto"
             }
           },
           "rows": {
@@ -27741,19 +27749,18 @@
               "additionalProperties": {}
             }
           },
-          "totalRows": {
+          "totalCount": {
             "type": "integer",
             "format": "int32"
           }
         }
       },
-      "AnalyticsViewResultColumnDto": {
+      "AnalyticsViewColumnDto": {
         "type": "object",
         "additionalProperties": false,
         "required": [
           "field",
-          "displayName",
-          "type"
+          "displayName"
         ],
         "properties": {
           "field": {
@@ -27761,39 +27768,6 @@
           },
           "displayName": {
             "type": "string"
-          },
-          "type": {
-            "type": "string"
-          }
-        }
-      },
-      "RunAnalyticsViewRequest": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "pageNumber",
-          "pageSize"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "guid",
-            "minLength": 1,
-            "nullable": false,
-            "example": "00000000-0000-0000-0000-000000000000"
-          },
-          "pageNumber": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0.0,
-            "exclusiveMinimum": true
-          },
-          "pageSize": {
-            "type": "integer",
-            "format": "int32",
-            "maximum": 500.0,
-            "minimum": 1.0
           }
         }
       },

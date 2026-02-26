@@ -7,13 +7,11 @@ import { useMessage } from '@/src/components/contexts/messaging'
 import { authorizePage } from '@/src/components/hoc'
 import { useDocumentTitle } from '@/src/hooks'
 import {
-  AnalyticsViewResultDto,
-  RunAnalyticsViewRequest,
-} from '@/src/services/moda-api'
-import {
+  AnalyticsViewDataQueryParams,
+  AnalyticsViewDataResultDto,
   useDeleteAnalyticsViewMutation,
   useGetAnalyticsViewQuery,
-  useRunAnalyticsViewMutation,
+  useLazyGetAnalyticsViewDataQuery,
 } from '@/src/store/features/analytics/analytics-views-api'
 import { Button, Card, Descriptions, DescriptionsProps, Space, Tag } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
@@ -30,7 +28,8 @@ const AnalyticsViewDetailPage = (props: {
   const messageApi = useMessage()
 
   const [openEditForm, setOpenEditForm] = useState(false)
-  const [result, setResult] = useState<AnalyticsViewResultDto | null>(null)
+  const [dataResult, setDataResult] =
+    useState<AnalyticsViewDataResultDto | null>(null)
   const [runPage, setRunPage] = useState(1)
   const [runPageSize, setRunPageSize] = useState(25)
 
@@ -47,8 +46,8 @@ const AnalyticsViewDetailPage = (props: {
   } = useGetAnalyticsViewQuery(id)
 
   const [deleteAnalyticsView] = useDeleteAnalyticsViewMutation()
-  const [runAnalyticsView, { isLoading: isRunning }] =
-    useRunAnalyticsViewMutation()
+  const [fetchData, { isFetching: isRunning }] =
+    useLazyGetAnalyticsViewDataQuery()
 
   useDocumentTitle(analyticsView?.name ?? 'Analytics View')
 
@@ -109,19 +108,18 @@ const AnalyticsViewDetailPage = (props: {
       }
 
       try {
-        const request: RunAnalyticsViewRequest = {
+        const params: AnalyticsViewDataQueryParams = {
           id,
           pageNumber,
           pageSize,
         }
-        const response = await runAnalyticsView(request)
-        if ('error' in response) throw response.error
-        setResult(response.data)
+        const response = await fetchData(params).unwrap()
+        setDataResult(response)
       } catch {
         messageApi.error('Unable to run analytics view.')
       }
     },
-    [canRun, id, messageApi, runAnalyticsView, runPage, runPageSize],
+    [canRun, id, messageApi, fetchData, runPage, runPageSize],
   )
 
   const remove = useCallback(async () => {
@@ -184,10 +182,10 @@ const AnalyticsViewDetailPage = (props: {
       </Card>
 
       <AnalyticsViewResultsCard
-        result={result}
-        runPage={runPage}
-        runPageSize={runPageSize}
-        isRunning={isRunning}
+        data={dataResult}
+        page={runPage}
+        pageSize={runPageSize}
+        isLoading={isRunning}
         onPrev={() => {
           const nextPage = Math.max(runPage - 1, 1)
           setRunPage(nextPage)

@@ -19279,23 +19279,29 @@ export class AnalyticsViewsClient {
     }
 
     /**
-     * Run an analytics view.
+     * Get analytics view data.
+     * @param pageNumber (optional) 
+     * @param pageSize (optional) 
      */
-    run(id: string, request: RunAnalyticsViewRequest, cancelToken?: CancelToken): Promise<AnalyticsViewResultDto> {
-        let url_ = this.baseUrl + "/api/analytics/views/{id}/run";
+    getData(id: string, pageNumber?: number | undefined, pageSize?: number | undefined, cancelToken?: CancelToken): Promise<AnalyticsViewDataResultDto> {
+        let url_ = this.baseUrl + "/api/analytics/views/{id}/data?";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        if (pageNumber === null)
+            throw new globalThis.Error("The parameter 'pageNumber' cannot be null.");
+        else if (pageNumber !== undefined)
+            url_ += "pageNumber=" + encodeURIComponent("" + pageNumber) + "&";
+        if (pageSize === null)
+            throw new globalThis.Error("The parameter 'pageSize' cannot be null.");
+        else if (pageSize !== undefined)
+            url_ += "pageSize=" + encodeURIComponent("" + pageSize) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
-        const content_ = JSON.stringify(request);
-
         let options_: AxiosRequestConfig = {
-            data: content_,
-            method: "POST",
+            method: "GET",
             url: url_,
             headers: {
-                "Content-Type": "application/json",
                 "Accept": "application/json"
             },
             cancelToken
@@ -19308,11 +19314,11 @@ export class AnalyticsViewsClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processRun(_response);
+            return this.processGetData(_response);
         });
     }
 
-    protected processRun(response: AxiosResponse): Promise<AnalyticsViewResultDto> {
+    protected processGetData(response: AxiosResponse): Promise<AnalyticsViewDataResultDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -19327,7 +19333,7 @@ export class AnalyticsViewsClient {
             let result200: any = null;
             let resultData200  = _responseText;
             result200 = JSON.parse(resultData200);
-            return Promise.resolve<AnalyticsViewResultDto>(result200);
+            return Promise.resolve<AnalyticsViewDataResultDto>(result200);
 
         } else if (status === 400) {
             const _responseText = response.data;
@@ -19340,7 +19346,7 @@ export class AnalyticsViewsClient {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<AnalyticsViewResultDto>(null as any);
+        return Promise.resolve<AnalyticsViewDataResultDto>(null as any);
     }
 }
 
@@ -22165,22 +22171,15 @@ export interface UpdateAnalyticsViewRequest {
     isActive: boolean;
 }
 
-export interface AnalyticsViewResultDto {
-    columns: AnalyticsViewResultColumnDto[];
+export interface AnalyticsViewDataResultDto {
+    columns: AnalyticsViewColumnDto[];
     rows: { [key: string]: any; }[];
-    totalRows: number;
+    totalCount: number;
 }
 
-export interface AnalyticsViewResultColumnDto {
+export interface AnalyticsViewColumnDto {
     field: string;
     displayName: string;
-    type: string;
-}
-
-export interface RunAnalyticsViewRequest {
-    id: string;
-    pageNumber: number;
-    pageSize: number;
 }
 
 export interface BackgroundJobTypeDto {

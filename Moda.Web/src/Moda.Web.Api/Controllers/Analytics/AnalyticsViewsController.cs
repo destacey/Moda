@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.OData.Query;
 using Moda.Analytics.Application.AnalyticsViews.Commands;
 using Moda.Analytics.Application.AnalyticsViews.Dtos;
 using Moda.Analytics.Application.AnalyticsViews.Queries;
@@ -84,20 +85,24 @@ public class AnalyticsViewsController(ISender sender) : ControllerBase
             : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
-    [HttpPost("{id}/run")]
+    [HttpGet("{id}/data")]
     [MustHavePermission(ApplicationAction.Run, ApplicationResource.AnalyticsViews)]
-    [OpenApiOperation("Run an analytics view.", "")]
+    [OpenApiOperation("Get analytics view data.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<AnalyticsViewResultDto>> Run(Guid id, [FromBody] RunAnalyticsViewRequest request, CancellationToken cancellationToken)
+    public async Task<ActionResult<AnalyticsViewDataResultDto>> GetData(
+        Guid id,
+        CancellationToken cancellationToken,
+        int pageNumber = 1,
+        int pageSize = 50)
     {
-        if (id != request.Id)
-            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(HttpContext));
-
-        var result = await _sender.Send(request.ToRunAnalyticsViewQuery(), cancellationToken);
+        var result = await _sender.Send(
+            new GetWorkItemAnalyticsQuery(id, pageNumber, pageSize),
+            cancellationToken);
 
         return result.IsSuccess
             ? Ok(result.Value)
             : BadRequest(result.ToBadRequestObject(HttpContext));
     }
+
 }
