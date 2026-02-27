@@ -10,6 +10,11 @@ export type {
   UseModalFormOptions,
   UseModalFormReturn,
 } from './use-modal-form'
+export { default as useConfirmModal } from './use-confirm-modal'
+export type {
+  UseConfirmModalOptions,
+  UseConfirmModalReturn,
+} from './use-confirm-modal'
 
 export const useAppDispatch: () => AppDispatch = useDispatch
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
