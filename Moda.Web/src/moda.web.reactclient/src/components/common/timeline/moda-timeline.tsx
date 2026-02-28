@@ -27,7 +27,6 @@ import {
   UndoOutlined,
 } from '@ant-design/icons'
 import { saveElementAsImage } from '@/src/utils'
-import { Options } from 'html2canvas'
 import { TimelineOptionsItemCallbackFunction } from 'vis-timeline'
 import dayjs from 'dayjs'
 
@@ -549,7 +548,7 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
       // Wait for the timeline to re-render with full height
       await new Promise((resolve) => setTimeout(resolve, 300))
 
-      const canvasOptions: Partial<Options> = {
+      const canvasOptions: Record<string, unknown> = {
         backgroundColor: token.colorBgContainer,
       }
 

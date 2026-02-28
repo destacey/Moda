@@ -4,10 +4,16 @@ import { AppstoreOutlined, BuildOutlined, MenuOutlined } from '@ant-design/icons
 import Segmented, { SegmentedLabeledOption } from 'antd/es/segmented'
 import { memo, useMemo, useState } from 'react'
 import { ProjectListDto } from '@/src/services/moda-api'
+import { Spin } from 'antd'
+import dynamic from 'next/dynamic'
 import ProjectsGrid from './projects-grid'
-import { ProjectsTimeline } from '.'
 import ProjectsCardView from './projects-card-view'
 import ProjectDrawer from './project-drawer'
+
+const ProjectsTimeline = dynamic(() => import('./projects-timeline'), {
+  ssr: false,
+  loading: () => <Spin />,
+})
 
 type ProjectView = 'Card' | 'List' | 'Timeline'
 

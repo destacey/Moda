@@ -5,15 +5,21 @@ import { useDocumentTitle } from '@/src/hooks'
 import { BuildOutlined, MenuOutlined } from '@ant-design/icons'
 import Segmented, { SegmentedLabeledOption } from 'antd/es/segmented'
 import { use, useCallback, useMemo, useState } from 'react'
-import {
-  CreatePlanningIntervalObjectiveForm,
-  PlanningIntervalObjectivesTimeline,
-} from '../../_components'
+import { CreatePlanningIntervalObjectiveForm } from '../../_components'
 import { PageTitle } from '@/src/components/common'
 import { notFound } from 'next/navigation'
-import { Button } from 'antd'
+import { Button, Spin } from 'antd'
 import useAuth from '@/src/components/contexts/auth'
 import { authorizePage } from '@/src/components/hoc'
+import dynamic from 'next/dynamic'
+
+const PlanningIntervalObjectivesTimeline = dynamic(
+  () => import('../../_components/planning-interval-objectives-timeline'),
+  {
+    ssr: false,
+    loading: () => <Spin />,
+  },
+)
 import {
   useGetPlanningIntervalCalendarQuery,
   useGetPlanningIntervalObjectivesQuery,

@@ -4,8 +4,14 @@ import { BuildOutlined, MenuOutlined } from '@ant-design/icons'
 import Segmented, { SegmentedLabeledOption } from 'antd/es/segmented'
 import { memo, useMemo, useState } from 'react'
 import { ProgramListDto } from '@/src/services/moda-api'
+import { Spin } from 'antd'
+import dynamic from 'next/dynamic'
 import ProgramsGrid from './programs-grid'
-import { ProgramsTimeline } from '.'
+
+const ProgramsTimeline = dynamic(() => import('./programs-timeline'), {
+  ssr: false,
+  loading: () => <Spin />,
+})
 
 interface ProgramViewManagerProps {
   programs: ProgramListDto[]

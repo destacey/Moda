@@ -4,17 +4,14 @@ import {
   PlanningIntervalDetailsDto,
   PlanningIntervalTeamResponse,
 } from '@/src/services/moda-api'
-import { Col, Flex, Row, Segmented, Space, Tag, Typography } from 'antd'
+import { Col, Flex, Row, Segmented, Space, Spin, Tag, Typography } from 'antd'
 import { useMemo, useState } from 'react'
 import TeamObjectivesListCard from './team-objectives-list-card'
 import TeamRisksListCard from './team-risks-list-card'
 import Link from 'next/link'
 import { BarsOutlined, BuildOutlined } from '@ant-design/icons'
 import { SegmentedLabeledOption } from 'antd/es/segmented'
-import {
-  PlanningIntervalObjectiveDetailsDrawer,
-  PlanningIntervalObjectivesTimeline,
-} from '../../_components'
+import { PlanningIntervalObjectiveDetailsDrawer } from '../../_components'
 import {
   useGetPlanningIntervalCalendarQuery,
   useGetPlanningIntervalObjectivesQuery,
@@ -22,6 +19,15 @@ import {
   useGetPlanningIntervalRisksQuery,
 } from '@/src/store/features/planning/planning-interval-api'
 import useAuth from '@/src/components/contexts/auth'
+import dynamic from 'next/dynamic'
+
+const PlanningIntervalObjectivesTimeline = dynamic(
+  () => import('../../_components/planning-interval-objectives-timeline'),
+  {
+    ssr: false,
+    loading: () => <Spin />,
+  },
+)
 
 const { Title } = Typography
 

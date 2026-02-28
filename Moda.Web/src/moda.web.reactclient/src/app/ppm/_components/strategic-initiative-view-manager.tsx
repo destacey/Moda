@@ -4,7 +4,17 @@ import { BuildOutlined, MenuOutlined } from '@ant-design/icons'
 import Segmented, { SegmentedLabeledOption } from 'antd/es/segmented'
 import { memo, useMemo, useState } from 'react'
 import { StrategicInitiativeListDto } from '@/src/services/moda-api'
-import { StrategicInitiativesGrid, StrategicInitiativesTimeline } from '.'
+import { Spin } from 'antd'
+import dynamic from 'next/dynamic'
+import { StrategicInitiativesGrid } from '.'
+
+const StrategicInitiativesTimeline = dynamic(
+  () => import('./strategic-initiatives-timeline'),
+  {
+    ssr: false,
+    loading: () => <Spin />,
+  },
+)
 
 interface StrategicInitiativeViewManagerProps {
   strategicInitiatives: StrategicInitiativeListDto[]
