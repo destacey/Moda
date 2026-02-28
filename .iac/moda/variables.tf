@@ -50,3 +50,15 @@ variable "client_url" {
   description = "The client url for CORS for the API."
   default     = ""
 }
+
+variable "signalr_name" {
+  type        = string
+  description = "The name of the Azure SignalR Service instance."
+  default     = "sigr-moda-dev"
+}
+
+variable "signalr_sku" {
+  type        = string
+  description = "The SKU name for the Azure SignalR Service (e.g., Free_F1, Standard_S1)."
+  default     = "Free_F1"
+}
