@@ -14,6 +14,7 @@ using Moda.Organization.Domain.Models;
 using Moda.Planning.Application.Persistence;
 using Moda.Planning.Domain.Models;
 using Moda.Planning.Domain.Models.Iterations;
+using Moda.Planning.Domain.Models.PlanningPoker;
 using Moda.Planning.Domain.Models.Roadmaps;
 using Moda.ProjectPortfolioManagement.Application;
 using Moda.ProjectPortfolioManagement.Domain.Models;
@@ -85,6 +86,8 @@ public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IGoalsDbCo
     public DbSet<PlanningTeam> PlanningTeams => Set<PlanningTeam>();
     public DbSet<SimpleHealthCheck> PlanningHealthChecks => Set<SimpleHealthCheck>();
     public DbSet<Roadmap> Roadmaps => Set<Roadmap>();
+    public DbSet<EstimationScale> EstimationScales => Set<EstimationScale>();
+    public DbSet<PokerSession> PokerSessions => Set<PokerSession>();
 
     #endregion IPlanning
 
