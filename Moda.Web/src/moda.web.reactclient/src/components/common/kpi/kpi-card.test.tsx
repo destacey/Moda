@@ -322,10 +322,13 @@ describe('KpiCard', () => {
   // ─── Health badge ────────────────────────────────────────────────────────
 
   describe('health badge', () => {
-    it('shows "No Data" when no health available', () => {
+    it('does not show health badge when no health available', () => {
       render(<KpiCard data={makeKpiData()} />)
 
-      expect(screen.getByText('No Data')).toBeInTheDocument()
+      expect(screen.queryByText('No Data')).not.toBeInTheDocument()
+      expect(screen.queryByText('Healthy')).not.toBeInTheDocument()
+      expect(screen.queryByText('At Risk')).not.toBeInTheDocument()
+      expect(screen.queryByText('Unhealthy')).not.toBeInTheDocument()
     })
 
     it('shows "Healthy" when data.health is Healthy', () => {
@@ -513,7 +516,7 @@ describe('KpiCard', () => {
       expect(screen.getByText('Healthy')).toBeInTheDocument()
     })
 
-    it('shows "No Data" when no health source exists', () => {
+    it('does not show health badge when no health source exists', () => {
       const checkpoints: KpiCardCheckpoint[] = [
         makeCheckpoint({
           label: 'Feb',
@@ -530,7 +533,10 @@ describe('KpiCard', () => {
         />,
       )
 
-      expect(screen.getByText('No Data')).toBeInTheDocument()
+      expect(screen.queryByText('No Data')).not.toBeInTheDocument()
+      expect(screen.queryByText('Healthy')).not.toBeInTheDocument()
+      expect(screen.queryByText('At Risk')).not.toBeInTheDocument()
+      expect(screen.queryByText('Unhealthy')).not.toBeInTheDocument()
     })
   })
 

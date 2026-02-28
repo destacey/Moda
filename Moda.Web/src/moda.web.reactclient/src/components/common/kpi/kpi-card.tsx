@@ -178,15 +178,15 @@ const HealthBadge: FC<{
   health: KpiHealth | undefined
   token: GlobalToken
 }> = ({ health, token }) => {
+  if (health == null) return null
+
   const { tagColor } = getHealthTokens(health, token)
   const label =
     health === KpiHealth.Healthy
       ? 'Healthy'
       : health === KpiHealth.AtRisk
         ? 'At Risk'
-        : health === KpiHealth.Unhealthy
-          ? 'Unhealthy'
-          : 'No Data'
+        : 'Unhealthy'
   return (
     <Tag
       aria-label={`Health: ${label}`}
@@ -302,23 +302,21 @@ const CheckpointStrip: FC<{
   checkpoint: KpiCardCheckpoint
   prefix?: string
   suffix?: string
-}> = ({ checkpoint, prefix, suffix }) => {
+  token: GlobalToken
+}> = ({ checkpoint, prefix, suffix, token }) => {
   const hasActual = checkpoint.actualValue != null
   const dateStr = dayjs(checkpoint.date).format('MMM D')
 
-  let resultClass: string
+  const { text: resultColor } = getHealthTokens(checkpoint.health, token)
+
   let resultText: string
   if (!hasActual) {
-    resultClass = styles.checkpointResultUpcoming
     resultText = 'Upcoming'
   } else if (checkpoint.health === KpiHealth.Healthy) {
-    resultClass = styles.checkpointResultHealthy
     resultText = `✓ Met (${formatValue(checkpoint.actualValue!, prefix, suffix)})`
   } else if (checkpoint.health === KpiHealth.AtRisk) {
-    resultClass = styles.checkpointResultAtRisk
     resultText = `! Missed (${formatValue(checkpoint.actualValue!, prefix, suffix)} / ${formatValue(checkpoint.targetValue, prefix, suffix)})`
   } else {
-    resultClass = styles.checkpointResultUnhealthy
     resultText = `✕ Off Track (${formatValue(checkpoint.actualValue!, prefix, suffix)} / ${formatValue(checkpoint.targetValue, prefix, suffix)})`
   }
 
@@ -336,7 +334,7 @@ const CheckpointStrip: FC<{
         {' · '}
         {dateStr} · Target: {formatValue(checkpoint.targetValue, prefix, suffix)}
       </Text>
-      <Text className={`${styles.checkpointResult} ${resultClass}`}>
+      <Text className={styles.checkpointResult} style={{ color: resultColor }}>
         {resultText}
       </Text>
     </Flex>
@@ -516,7 +514,7 @@ const KpiCard: FC<KpiCardProps> = ({
         {checkpointLoading ? (
           <SkeletonInput active className={styles.checkpointSkeleton} />
         ) : checkpoint ? (
-          <CheckpointStrip checkpoint={checkpoint} prefix={data.prefix} suffix={data.suffix} />
+          <CheckpointStrip checkpoint={checkpoint} prefix={data.prefix} suffix={data.suffix} token={token} />
         ) : null}
 
         {/* Footer */}

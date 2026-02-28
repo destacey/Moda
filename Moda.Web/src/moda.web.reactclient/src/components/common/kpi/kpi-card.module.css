@@ -192,21 +192,6 @@
   white-space: nowrap;
 }
 
-.checkpointResultHealthy {
-  color: var(--kpi-health-text);
-}
-
-.checkpointResultAtRisk {
-  color: var(--kpi-error);
-}
-
-.checkpointResultUnhealthy {
-  color: var(--kpi-error);
-}
-
-.checkpointResultUpcoming {
-  color: var(--kpi-muted);
-}
 
 .checkpointSkeleton {
   height: 32px;
