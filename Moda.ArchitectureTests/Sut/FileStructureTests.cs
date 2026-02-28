@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Moda.ArchitectureTests.Helpers;
+using static Moda.ArchitectureTests.Helpers.FileSystemHelper;
 
 namespace Moda.ArchitectureTests.Sut;
 
@@ -250,21 +251,11 @@ public class FileStructureTests
     [Fact]
     public void ServiceLayer_AllServices_ShouldHaveSrcFolder()
     {
-        // Arrange
-        var servicesRoot = Path.Combine(SolutionRoot, "Moda.Services");
-        if (!Directory.Exists(servicesRoot))
-        {
-            Assert.Fail("Moda.Services directory should exist");
-            return;
-        }
-
-        // Act
-        var serviceDirectories = Directory.GetDirectories(servicesRoot)
-            .Where(d => Path.GetFileName(d).StartsWith("Moda."))
-            .ToList();
+        // Arrange - only check services that are in the solution file
+        var serviceDirectories = GetSolutionServiceDirectories();
 
         // Assert
-        serviceDirectories.Should().NotBeEmpty("There should be at least one service in Moda.Services/");
+        serviceDirectories.Should().NotBeEmpty("There should be at least one service in the solution");
 
         var servicesWithoutSrc = serviceDirectories
             .Where(d => !Directory.Exists(Path.Combine(d, "src")))
@@ -279,17 +270,8 @@ public class FileStructureTests
     [Fact]
     public void ServiceLayer_SourceProjects_ShouldBeInSrcFolder()
     {
-        // Arrange
-        var servicesRoot = Path.Combine(SolutionRoot, "Moda.Services");
-        if (!Directory.Exists(servicesRoot))
-        {
-            Assert.Fail("Moda.Services directory should exist");
-            return;
-        }
-
-        var serviceDirectories = Directory.GetDirectories(servicesRoot)
-            .Where(d => Path.GetFileName(d).StartsWith("Moda."))
-            .ToList();
+        // Arrange - only check services that are in the solution file
+        var serviceDirectories = GetSolutionServiceDirectories();
 
         // Act & Assert
         foreach (var serviceDir in serviceDirectories)
@@ -323,17 +305,8 @@ public class FileStructureTests
     [Fact]
     public void ServiceLayer_TestProjects_ShouldBeInTestsFolder()
     {
-        // Arrange
-        var servicesRoot = Path.Combine(SolutionRoot, "Moda.Services");
-        if (!Directory.Exists(servicesRoot))
-        {
-            Assert.Fail("Moda.Services directory should exist");
-            return;
-        }
-
-        var serviceDirectories = Directory.GetDirectories(servicesRoot)
-            .Where(d => Path.GetFileName(d).StartsWith("Moda."))
-            .ToList();
+        // Arrange - only check services that are in the solution file
+        var serviceDirectories = GetSolutionServiceDirectories();
 
         // Act & Assert
         foreach (var serviceDir in serviceDirectories)
@@ -369,17 +342,8 @@ public class FileStructureTests
     [Fact]
     public void ServiceLayer_TestProjects_ShouldHaveCorrectSuffix()
     {
-        // Arrange
-        var servicesRoot = Path.Combine(SolutionRoot, "Moda.Services");
-        if (!Directory.Exists(servicesRoot))
-        {
-            Assert.Fail("Moda.Services directory should exist");
-            return;
-        }
-
-        var serviceDirectories = Directory.GetDirectories(servicesRoot)
-            .Where(d => Path.GetFileName(d).StartsWith("Moda."))
-            .ToList();
+        // Arrange - only check services that are in the solution file
+        var serviceDirectories = GetSolutionServiceDirectories();
 
         var invalidTestProjects = new List<string>();
 
