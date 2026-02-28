@@ -35,6 +35,7 @@ const DeleteRoadmapItemForm = ({
 
   const { isOpen, isSaving, handleOk, handleCancel } = useConfirmModal({
     onSubmit: useCallback(async () => {
+      if (!itemData) return false
       try {
         await deleteRoadmapItemMutation({
           roadmapId: itemData.roadmapId,
@@ -74,6 +75,7 @@ const DeleteRoadmapItemForm = ({
       onOk={handleOk}
       okText="Delete"
       okType="danger"
+      okButtonProps={{ disabled: !itemData }}
       confirmLoading={isSaving}
       onCancel={handleCancel}
       keyboard={false} // disable esc key to close modal

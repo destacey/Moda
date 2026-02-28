@@ -28,6 +28,7 @@ const DeleteEmployeeForm = ({
 
   const { isOpen, isSaving, handleOk, handleCancel } = useConfirmModal({
     onSubmit: useCallback(async () => {
+      if (!employeeData) return false
       try {
         await deleteEmployeeMutation(employeeData.id)
         messageApi.success('Successfully deleted Employee.')
@@ -53,6 +54,7 @@ const DeleteEmployeeForm = ({
       onOk={handleOk}
       okText="Delete"
       okType="danger"
+      okButtonProps={{ disabled: !employeeData }}
       confirmLoading={isSaving}
       onCancel={handleCancel}
       keyboard={false} // disable esc key to close modal

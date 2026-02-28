@@ -392,8 +392,7 @@ describe('useModalForm', () => {
       )
     })
 
-    it('shows error message when form validation fails', async () => {
-      jest.spyOn(console, 'error').mockImplementation()
+    it('does not show error toast for client-side validation failures', async () => {
       mockValidateFields.mockRejectedValue({
         errorFields: [{ name: ['name'], errors: ['Required'] }],
       })
@@ -406,9 +405,23 @@ describe('useModalForm', () => {
         await result.current.handleOk()
       })
 
-      expect(mockMessageError).toHaveBeenCalledWith(
-        'An unexpected error occurred. Please try again.',
+      expect(mockMessageError).not.toHaveBeenCalled()
+    })
+
+    it('sets isSaving back to false after client-side validation failure', async () => {
+      mockValidateFields.mockRejectedValue({
+        errorFields: [{ name: ['name'], errors: ['Required'] }],
+      })
+
+      const { result } = renderHook(() =>
+        useModalForm<TestFormValues>(createDefaultOptions()),
       )
+
+      await act(async () => {
+        await result.current.handleOk()
+      })
+
+      expect(result.current.isSaving).toBe(false)
     })
   })
 

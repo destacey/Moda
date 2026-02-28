@@ -109,7 +109,16 @@ function useModalForm<TValues = Record<string, unknown>>({
         form.resetFields()
         onComplete()
       }
-    } catch (errorInfo) {
+    } catch (errorInfo: unknown) {
+      // Ant Design's validateFields rejects with { errorFields: [...] } for
+      // normal client-side validation failures — no need to toast for those.
+      if (
+        errorInfo &&
+        typeof errorInfo === 'object' &&
+        'errorFields' in errorInfo
+      ) {
+        return
+      }
       console.error('handleOk error', errorInfo)
       messageApi.error(errorMessage)
     } finally {
