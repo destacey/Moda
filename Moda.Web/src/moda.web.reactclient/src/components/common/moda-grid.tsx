@@ -1,5 +1,6 @@
 'use client'
 
+import './grid/ag-grid-init'
 import { AgGridReact, AgGridReactProps } from 'ag-grid-react'
 import {
   forwardRef,

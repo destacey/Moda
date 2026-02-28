@@ -1,3 +1,4 @@
+import './ag-grid-init'
 import {
   ColDef,
   GetRowIdParams,

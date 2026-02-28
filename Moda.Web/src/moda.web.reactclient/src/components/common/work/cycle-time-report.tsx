@@ -25,6 +25,7 @@ import {
   sortCycleTimeWorkItems,
 } from './cycle-time-report.filtering'
 import { InfoCircleOutlined } from '@ant-design/icons'
+import '../grid/ag-grid-init'
 import { AgGridReact } from 'ag-grid-react'
 
 const { Title, Text } = Typography
