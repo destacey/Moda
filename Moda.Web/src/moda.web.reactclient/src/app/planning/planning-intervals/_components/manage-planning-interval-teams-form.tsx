@@ -122,11 +122,10 @@ const ManagePlanningIntervalTeamsForm = ({
 
   // TODO: should this be in a custom hook? The teams index page has a similar call.
   const getTeams = useCallback(async () => {
-    const teamsClient = await getTeamsClient()
-    const teamsDtos = await teamsClient.getList(false)
-
-    const teamOfTeamsClient = await getTeamsOfTeamsClient()
-    const teamOfTeamsDtos = await teamOfTeamsClient.getList(false)
+    const [teamsDtos, teamOfTeamsDtos] = await Promise.all([
+      getTeamsClient().getList(false),
+      getTeamsOfTeamsClient().getList(false),
+    ])
 
     return [...teamsDtos, ...teamOfTeamsDtos].map((team: TeamListItem) => ({
       key: team.id,
@@ -138,8 +137,7 @@ const ManagePlanningIntervalTeamsForm = ({
   }, [])
 
   const getPlanningIntervalTeams = useCallback(async (id: string) => {
-    const piClient = await getPlanningIntervalsClient()
-    const piTeamsDtos = await piClient.getTeams(id)
+    const piTeamsDtos = await getPlanningIntervalsClient().getTeams(id)
 
     return piTeamsDtos.map((team: PlanningIntervalTeamResponse) => ({
       key: team.id,
@@ -153,12 +151,11 @@ const ManagePlanningIntervalTeamsForm = ({
   const { isOpen, isSaving, handleOk, handleCancel } = useConfirmModal({
     onSubmit: useCallback(async () => {
       try {
-        const piClient = await getPlanningIntervalsClient()
         const request: ManagePlanningIntervalTeamsRequest = {
           id: id,
           teamIds: targetKeys,
         }
-        await piClient.manageTeams(id, request)
+        await getPlanningIntervalsClient().manageTeams(id, request)
 
         messageApi.success(`Successfully updated PI teams.`)
         return true
@@ -182,8 +179,10 @@ const ManagePlanningIntervalTeamsForm = ({
     const loadData = async () => {
       try {
         setIsLoading(true)
-        const teamsData = await getTeams()
-        const piTeamsData = await getPlanningIntervalTeams(id)
+        const [teamsData, piTeamsData] = await Promise.all([
+          getTeams(),
+          getPlanningIntervalTeams(id),
+        ])
         if (!cancelled) {
           setTeams(teamsData)
           setTargetKeys(piTeamsData.map((team) => team.key))

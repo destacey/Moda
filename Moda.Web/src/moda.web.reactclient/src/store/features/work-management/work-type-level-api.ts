@@ -32,8 +32,10 @@ export const workTypeLevelApi = apiSlice.injectEndpoints({
     getWorkTypeLevelOptions: builder.query<BaseOptionType[], null>({
       queryFn: async () => {
         try {
-          const tiers = await getWorkTypeTiersClient().getList()
-          const levels = await getWorkTypeLevelsClient().getList()
+          const [tiers, levels] = await Promise.all([
+            getWorkTypeTiersClient().getList(),
+            getWorkTypeLevelsClient().getList(),
+          ])
 
           const data: BaseOptionType[] = tiers
             .sort((a, b) => a.order - b.order)
