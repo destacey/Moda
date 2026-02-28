@@ -44,6 +44,8 @@ public static class ApplicationResource
     public const string Risks = nameof(Risks);
     public const string Roadmaps = nameof(Roadmaps);
     public const string Iterations = nameof(Iterations);
+    public const string PokerSessions = nameof(PokerSessions);
+    public const string EstimationScales = nameof(EstimationScales);
 
     public const string ExpenditureCategories = nameof(ExpenditureCategories);
     public const string ProjectPortfolios = nameof(ProjectPortfolios);
@@ -174,6 +176,16 @@ public static class ApplicationPermissions
         new("Delete Roadmaps", ApplicationAction.Delete, ApplicationResource.Roadmaps, PlanningCategory, IsBasic: true),
 
         new("View Iterations", ApplicationAction.View, ApplicationResource.Iterations, PlanningCategory, IsBasic: true),
+
+        new("View Poker Sessions", ApplicationAction.View, ApplicationResource.PokerSessions, PlanningCategory, IsBasic: true),
+        new("Create Poker Sessions", ApplicationAction.Create, ApplicationResource.PokerSessions, PlanningCategory, IsBasic: true),
+        new("Update Poker Sessions", ApplicationAction.Update, ApplicationResource.PokerSessions, PlanningCategory, IsBasic: true),
+        new("Delete Poker Sessions", ApplicationAction.Delete, ApplicationResource.PokerSessions, PlanningCategory),
+
+        new("View Estimation Scales", ApplicationAction.View, ApplicationResource.EstimationScales, PlanningCategory, IsBasic: true),
+        new("Create Estimation Scales", ApplicationAction.Create, ApplicationResource.EstimationScales, PlanningCategory),
+        new("Update Estimation Scales", ApplicationAction.Update, ApplicationResource.EstimationScales, PlanningCategory),
+        new("Delete Estimation Scales", ApplicationAction.Delete, ApplicationResource.EstimationScales, PlanningCategory),
     ];
 
     private const string PpmCategory = "Project Portfolio Management";
