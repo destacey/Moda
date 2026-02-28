@@ -376,6 +376,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
    * Context value
    * -------------------------------------------------------------
    */
+  const permissionsSet = useMemo(
+    () => new Set(permissions ?? []),
+    [permissions],
+  )
+
   const authContext = useMemo<AuthContextType>(
     () => ({
       user,
@@ -384,12 +389,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       refreshUser,
       hasClaim: (type: string, value: string) =>
         user.claims.some((c) => c.type === type && c.value === value),
-      hasPermissionClaim: (value: string) =>
-        user.claims.some((c) => c.type === 'Permission' && c.value === value),
+      hasPermissionClaim: (value: string) => permissionsSet.has(value),
       login,
       logout,
     }),
-    [user, isLoading, acquireToken, refreshUser, login, logout],
+    [user, isLoading, acquireToken, refreshUser, permissionsSet, login, logout],
   )
 
   // Bypass all loading/error gates on logout route so logout executes promptly
