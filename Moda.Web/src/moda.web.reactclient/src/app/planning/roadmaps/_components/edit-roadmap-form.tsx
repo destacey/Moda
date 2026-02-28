@@ -1,10 +1,6 @@
 'use client'
 
-import useAuth from '@/src/components/contexts/auth'
-import {
-  RoadmapDetailsDto,
-  UpdateRoadmapRequest,
-} from '@/src/services/moda-api'
+import { UpdateRoadmapRequest } from '@/src/services/moda-api'
 import {
   useUpdateRoadmapMutation,
   useGetVisibilityOptionsQuery,
@@ -12,13 +8,14 @@ import {
 } from '@/src/store/features/planning/roadmaps-api'
 import { toFormErrors } from '@/src/utils'
 import { DatePicker, Form, Input, Modal, Radio } from 'antd'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect } from 'react'
 import dayjs from 'dayjs'
 import { useGetEmployeeOptionsQuery } from '@/src/store/features/organizations/employee-api'
 import { useGetInternalEmployeeIdQuery } from '@/src/store/features/user-management/profile-api'
 import { MarkdownEditor } from '@/src/components/common/markdown'
 import { EmployeeSelect } from '@/src/components/common/organizations'
 import { useMessage } from '@/src/components/contexts/messaging'
+import { useModalForm } from '@/src/hooks'
 
 const { Item } = Form
 const { TextArea } = Input
@@ -27,7 +24,6 @@ const { RangePicker } = DatePicker
 
 export interface EditRoadmapFormProps {
   roadmapKey: number
-  showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
 }
@@ -55,141 +51,79 @@ const mapToRequestValues = (
   } as UpdateRoadmapRequest
 }
 
-const EditRoadmapForm = (props: EditRoadmapFormProps) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-  const [isValid, setIsValid] = useState(false)
-  const [form] = Form.useForm<EditRoadmapFormValues>()
-  const formValues = Form.useWatch([], form)
-
+const EditRoadmapForm = ({
+  roadmapKey,
+  onFormComplete,
+  onFormCancel,
+}: EditRoadmapFormProps) => {
   const messageApi = useMessage()
 
-  const {
-    data: roadmapData,
-    isLoading,
-    error,
-  } = useGetRoadmapQuery(props.roadmapKey.toString())
+  const { data: roadmapData, error } = useGetRoadmapQuery(roadmapKey.toString())
 
-  const {
-    data: visibilityData,
-    isLoading: visibilityLoading,
-    error: visibilityError,
-  } = useGetVisibilityOptionsQuery()
-  const [updateRoadmap, { error: mutationError }] = useUpdateRoadmapMutation()
+  const { data: visibilityData, error: visibilityError } =
+    useGetVisibilityOptionsQuery()
+  const [updateRoadmap] = useUpdateRoadmapMutation()
 
-  const {
-    data: employeeData,
-    isLoading: employeeOptionsIsLoading,
-    error: employeeOptionsError,
-  } = useGetEmployeeOptionsQuery(true)
+  const { data: employeeData, error: employeeOptionsError } =
+    useGetEmployeeOptionsQuery(true)
 
   const {
     data: currentUserInternalEmployeeId,
     error: currentUserInternalEmployeeIdError,
   } = useGetInternalEmployeeIdQuery()
 
-  const { hasPermissionClaim } = useAuth()
-  const canUpdateRoadmap = hasPermissionClaim('Permissions.Roadmaps.Update')
-
-  const mapToFormValues = useCallback(
-    (roadmap: RoadmapDetailsDto) => {
-      if (!roadmap) {
-        throw new Error('Roadmap not found.')
-      }
-      form.setFieldsValue({
-        name: roadmap.name,
-        description: roadmap.description || '', // Ensure an empty string if description is undefined
-        range: [dayjs(roadmap.start), dayjs(roadmap.end)],
-        visibilityId: roadmap.visibility.id,
-        roadmapManagerIds: roadmap.roadmapManagers.map((rm) => rm.id),
-      })
-    },
-    [form],
-  )
-
-  const update = async (
-    values: EditRoadmapFormValues,
-    roadmap: RoadmapDetailsDto,
-  ) => {
-    try {
-      const request = mapToRequestValues(values, roadmap.id)
-      const response = await updateRoadmap({
-        request,
-        cacheKey: roadmap.key,
-      })
-      if (response.error) {
-        throw response.error
-      }
-      messageApi.success(`Roadmap updated successfully.`)
-      return true
-    } catch (error) {
-      console.error('update error', error)
-      if (error.status === 422 && error.errors) {
-        const formErrors = toFormErrors(error.errors)
-        form.setFields(formErrors)
-        messageApi.error('Correct the validation error(s) to continue.')
-      } else {
-        messageApi.error(
-          error.detail ??
-            'An error occurred while updating the roadmap. Please try again.',
-        )
-      }
-      return false
-    }
-  }
-
-  const handleOk = async () => {
-    setIsSaving(true)
-    try {
-      const values = await form.validateFields()
-      if (await update(values, roadmapData)) {
-        setIsOpen(false)
-        form.resetFields()
-        props.onFormComplete()
-      }
-    } catch (error) {
-      console.error('handleOk error', error)
-      messageApi.error(
+  const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
+    useModalForm<EditRoadmapFormValues>({
+      onSubmit: useCallback(
+        async (values: EditRoadmapFormValues, form) => {
+          try {
+            const request = mapToRequestValues(values, roadmapData.id)
+            const response = await updateRoadmap({
+              request,
+              cacheKey: roadmapData.key,
+            })
+            if (response.error) throw response.error
+            messageApi.success('Roadmap updated successfully.')
+            return true
+          } catch (error) {
+            console.error('update error', error)
+            if (error.status === 422 && error.errors) {
+              const formErrors = toFormErrors(error.errors)
+              form.setFields(formErrors)
+              messageApi.error('Correct the validation error(s) to continue.')
+            } else {
+              messageApi.error(
+                error.detail ??
+                  'An error occurred while updating the roadmap. Please try again.',
+              )
+            }
+            return false
+          }
+        },
+        [roadmapData, updateRoadmap, messageApi],
+      ),
+      onComplete: onFormComplete,
+      onCancel: onFormCancel,
+      errorMessage:
         'An error occurred while updating the roadmap. Please try again.',
-      )
-    } finally {
-      setIsSaving(false)
-    }
-  }
+      permission: 'Permissions.Roadmaps.Update',
+    })
 
-  const handleCancel = useCallback(() => {
-    setIsOpen(false)
-    form.resetFields()
-    props.onFormCancel()
-  }, [form, props])
-
+  // Initialize form values when data is loaded
   useEffect(() => {
     if (!roadmapData || !visibilityData) return
-    if (canUpdateRoadmap) {
-      setIsOpen(props.showForm)
-      if (props.showForm) {
-        mapToFormValues(roadmapData)
-      }
-    } else {
-      props.onFormCancel()
-      messageApi.error('You do not have permission to update roadmaps.')
-    }
-  }, [
-    canUpdateRoadmap,
-    mapToFormValues,
-    messageApi,
-    props,
-    roadmapData,
-    visibilityData,
-  ])
+    form.setFieldsValue({
+      name: roadmapData.name,
+      description: roadmapData.description || '',
+      range: [dayjs(roadmapData.start), dayjs(roadmapData.end)],
+      visibilityId: roadmapData.visibility.id,
+      roadmapManagerIds: roadmapData.roadmapManagers.map(
+        (rm: { id: string }) => rm.id,
+      ),
+    })
+  }, [roadmapData, visibilityData, form])
 
-  useEffect(() => {
-    form.validateFields({ validateOnly: true }).then(
-      () => setIsValid(true && form.isFieldsTouched()),
-      () => setIsValid(false),
-    )
-  }, [form, formValues])
-
+  // Query error display
   useEffect(() => {
     if (error) {
       messageApi.error(
@@ -220,113 +154,108 @@ const EditRoadmapForm = (props: EditRoadmapFormProps) => {
     employeeOptionsError,
     error,
     messageApi,
-    props,
     visibilityError,
   ])
 
   return (
-    <>
-      <Modal
-        title="Edit Roadmap"
-        open={isOpen}
-        width={'60vw'}
-        onOk={handleOk}
-        okButtonProps={{ disabled: !isValid }}
-        okText="Save"
-        confirmLoading={isSaving}
-        onCancel={handleCancel}
-        keyboard={false} // disable esc key to close modal
-        destroyOnHidden={true}
+    <Modal
+      title="Edit Roadmap"
+      open={isOpen}
+      width="60vw"
+      onOk={handleOk}
+      okButtonProps={{ disabled: !isValid }}
+      okText="Save"
+      confirmLoading={isSaving}
+      onCancel={handleCancel}
+      keyboard={false} // disable esc key to close modal
+      destroyOnHidden
+    >
+      <Form
+        form={form}
+        size="small"
+        layout="vertical"
+        name="update-roadmap-form"
       >
-        <Form
-          form={form}
-          size="small"
-          layout="vertical"
-          name="update-roadmap-form"
+        <Item label="Name" name="name" rules={[{ required: true }]}>
+          <TextArea
+            autoSize={{ minRows: 1, maxRows: 2 }}
+            showCount
+            maxLength={128}
+          />
+        </Item>
+        <Item name="description" label="Description" rules={[{ max: 2048 }]}>
+          <MarkdownEditor
+            value={form.getFieldValue('description')}
+            onChange={(value) => form.setFieldValue('description', value || '')}
+            maxLength={2048}
+          />
+        </Item>
+        <Item
+          name="range"
+          label="Dates"
+          rules={[
+            { required: true, message: 'Select start and end dates' },
+            {
+              validator: (_, value) => {
+                if (!value || !value[0] || !value[1]) {
+                  return Promise.reject(
+                    new Error('Start and end dates are required'),
+                  )
+                }
+                const [start, end] = value
+                if (!start || !end || !start.isBefore(end)) {
+                  return Promise.reject(
+                    new Error('End date must be after start date'),
+                  )
+                }
+                return Promise.resolve()
+              },
+            },
+          ]}
         >
-          <Item label="Name" name="name" rules={[{ required: true }]}>
-            <TextArea
-              autoSize={{ minRows: 1, maxRows: 2 }}
-              showCount
-              maxLength={128}
-            />
-          </Item>
-          <Item name="description" label="Description" rules={[{ max: 2048 }]}>
-            <MarkdownEditor
-              value={form.getFieldValue('description')}
-              onChange={(value) =>
-                form.setFieldValue('description', value || '')
-              }
-              maxLength={2048}
-            />
-          </Item>
-          <Item
-            name="range"
-            label="Dates"
-            rules={[
-              { required: true, message: 'Select start and end dates' },
-              {
-                validator: (_, value) => {
-                  if (!value || !value[0] || !value[1]) {
-                    return Promise.reject(
-                      new Error('Start and end dates are required'),
-                    )
-                  }
-                  const [start, end] = value
-                  if (!start || !end || !start.isBefore(end)) {
-                    return Promise.reject(
-                      new Error('End date must be after start date'),
-                    )
-                  }
-                  return Promise.resolve()
-                },
+          <RangePicker />
+        </Item>
+        <Item
+          name="roadmapManagerIds"
+          label="Roadmap Managers"
+          rules={[
+            {
+              required: true,
+              message: 'Select at least one roadmap manager',
+            },
+            {
+              validator: async (_, value) => {
+                if (!value.includes(currentUserInternalEmployeeId)) {
+                  return Promise.reject(
+                    new Error(
+                      'You must also be a roadmap manager to update this roadmap',
+                    ),
+                  )
+                }
+                return Promise.resolve()
               },
-            ]}
-          >
-            <RangePicker />
-          </Item>
-          <Item
-            name="roadmapManagerIds"
-            label="Roadmap Managers"
-            rules={[
-              {
-                required: true,
-                message: 'Select at least one roadmap manager',
-              },
-              {
-                validator: async (_, value) => {
-                  if (!value.includes(currentUserInternalEmployeeId)) {
-                    return Promise.reject(
-                      new Error(
-                        'You must also be a roadmap manager to update this roadmap',
-                      ),
-                    )
-                  }
-                  return Promise.resolve()
-                },
-              },
-            ]}
-          >
-            <EmployeeSelect
-              employees={employeeData ?? []}
-              allowMultiple={true}
-              placeholder="Select one or more roadmap managers"
-            />
-          </Item>
-          <Item
-            name="visibilityId"
-            label="Visibility"
-            rules={[{ required: true }]}
-          >
-            <RadioGroup
-              options={visibilityData}
-              optionType="button"
-              buttonStyle="solid"
-            />
-          </Item>
-        </Form>
-      </Modal>
-    </>
+            },
+          ]}
+        >
+          <EmployeeSelect
+            employees={employeeData ?? []}
+            allowMultiple={true}
+            placeholder="Select one or more roadmap managers"
+          />
+        </Item>
+        <Item
+          name="visibilityId"
+          label="Visibility"
+          rules={[{ required: true }]}
+        >
+          <RadioGroup
+            options={visibilityData}
+            optionType="button"
+            buttonStyle="solid"
+          />
+        </Item>
+      </Form>
+    </Modal>
   )
 }
 

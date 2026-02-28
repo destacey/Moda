@@ -201,7 +201,6 @@ const TeamOperatingModelsGrid = ({
         <EditTeamOperatingModelForm
           teamId={teamId}
           operatingModelId={selectedModelId}
-          showForm={showUpdateForm}
           onFormComplete={() => handleUpdateFormClose()}
           onFormCancel={() => handleUpdateFormClose()}
         />

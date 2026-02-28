@@ -682,7 +682,6 @@ const RoadmapItemsGrid: FC<RoadmapItemsGridProps> = ({
       </Form>
       {openUpdateRoadmapActivityForm && (
         <EditRoadmapActivityForm
-          showForm={openUpdateRoadmapActivityForm}
           activityId={selectedItemId}
           roadmapId={roadmapId}
           onFormComplete={() => onUpdateRoadmapActivityFormClosed(true)}
@@ -691,7 +690,6 @@ const RoadmapItemsGrid: FC<RoadmapItemsGridProps> = ({
       )}
       {openUpdateRoadmapTimeboxForm && (
         <EditRoadmapTimeboxForm
-          showForm={openUpdateRoadmapTimeboxForm}
           timeboxId={selectedItemId}
           roadmapId={roadmapId}
           onFormComplete={() => onUpdateRoadmapTimeboxFormClosed(true)}
@@ -702,7 +700,6 @@ const RoadmapItemsGrid: FC<RoadmapItemsGridProps> = ({
         <DeleteRoadmapItemForm
           roadmapId={roadmapId}
           roadmapItemId={selectedItemId}
-          showForm={openDeleteRoadmapItemForm}
           onFormComplete={() => onDeleteRoadmapItemFormClosed(true)}
           onFormCancel={() => onDeleteRoadmapItemFormClosed(false)}
         />

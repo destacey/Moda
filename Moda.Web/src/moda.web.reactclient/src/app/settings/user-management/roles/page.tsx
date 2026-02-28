@@ -68,7 +68,6 @@ const RoleListPage = () => {
 
       {openCreateRoleForm && (
         <CreateRoleForm
-          showForm={openCreateRoleForm}
           roles={roleData}
           onFormCreate={(id: string) => {
             setOpenCreateRoleForm(false)

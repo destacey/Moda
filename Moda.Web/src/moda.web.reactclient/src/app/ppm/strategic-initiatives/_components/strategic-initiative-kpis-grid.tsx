@@ -274,7 +274,6 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
         <EditStrategicInitiativeKpiForm
           strategicInitiativeId={strategicInitiativeId}
           kpiId={selectedKpiId}
-          showForm={openEditKpiForm}
           onFormComplete={() => onEditKpiFormClosed(true)}
           onFormCancel={() => onEditKpiFormClosed(false)}
         />
@@ -283,7 +282,6 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
         <DeleteStrategicInitiativeKpiForm
           strategicInitiativeId={strategicInitiativeId}
           kpi={kpis.find((kpi) => kpi.id === selectedKpiId)}
-          showForm={openDeleteKpiForm}
           onFormComplete={() => onDeleteKpiFormClosed(true)}
           onFormCancel={() => onDeleteKpiFormClosed(false)}
         />
@@ -292,7 +290,6 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
         <AddStrategicInitiativeKpiMeasurementForm
           strategicInitiativeId={strategicInitiativeId}
           kpiId={selectedKpiId}
-          showForm={openAddMeasurementForm}
           onFormComplete={() => onAddMeasurementFormClosed(true)}
           onFormCancel={() => onAddMeasurementFormClosed(false)}
         />
@@ -301,7 +298,6 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
         <ManageStrategicInitiativeKpiCheckpointPlanForm
           strategicInitiativeId={strategicInitiativeId}
           kpiId={selectedKpiId}
-          showForm={openManageCheckpointPlanForm}
           onFormComplete={() => onManageCheckpointPlanFormClosed(true)}
           onFormCancel={() => onManageCheckpointPlanFormClosed(false)}
         />

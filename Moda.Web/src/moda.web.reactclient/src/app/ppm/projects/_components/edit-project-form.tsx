@@ -2,11 +2,9 @@
 
 import { MarkdownEditor } from '@/src/components/common/markdown'
 import { EmployeeSelect } from '@/src/components/common/organizations'
-import useAuth from '@/src/components/contexts/auth'
-import {
-  ProjectDetailsDto,
-  UpdateProjectRequest,
-} from '@/src/services/moda-api'
+import { useMessage } from '@/src/components/contexts/messaging'
+import { useModalForm } from '@/src/hooks'
+import { UpdateProjectRequest } from '@/src/services/moda-api'
 import { useGetEmployeeOptionsQuery } from '@/src/store/features/organizations/employee-api'
 import { useGetExpenditureCategoryOptionsQuery } from '@/src/store/features/ppm/expenditure-categories-api'
 import {
@@ -14,18 +12,16 @@ import {
   useUpdateProjectMutation,
 } from '@/src/store/features/ppm/projects-api'
 import { useGetStrategicThemeOptionsQuery } from '@/src/store/features/strategic-management/strategic-themes-api'
+import { toFormErrors } from '@/src/utils'
 import { DatePicker, Form, Modal, Select } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
-import { useCallback, useEffect, useState } from 'react'
 import dayjs from 'dayjs'
-import { toFormErrors } from '@/src/utils'
-import { useMessage } from '@/src/components/contexts/messaging'
+import { useCallback, useEffect } from 'react'
 
 const { Item } = Form
 
 export interface EditProjectFormProps {
   projectKey: string
-  showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
 }
@@ -60,139 +56,79 @@ const mapToRequestValues = (
   } as UpdateProjectRequest
 }
 
-const EditProjectForm = (props: EditProjectFormProps) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-  const [isValid, setIsValid] = useState(false)
-  const [form] = Form.useForm<EditProjectFormValues>()
-  const formValues = Form.useWatch([], form)
-
+const EditProjectForm = ({
+  projectKey,
+  onFormComplete,
+  onFormCancel,
+}: EditProjectFormProps) => {
   const messageApi = useMessage()
 
-  const [updateProject, { error: mutationError }] = useUpdateProjectMutation()
+  const [updateProject] = useUpdateProjectMutation()
 
-  const {
-    data: projectData,
-    isLoading,
-    error,
-  } = useGetProjectQuery(props.projectKey)
+  const { data: projectData, isLoading, error } = useGetProjectQuery(projectKey)
 
-  const {
-    data: expenditureData,
-    isLoading: expenditureOptionsIsLoading,
-    error: expenditureOptionsError,
-  } = useGetExpenditureCategoryOptionsQuery(false)
+  const { data: expenditureData, error: expenditureOptionsError } =
+    useGetExpenditureCategoryOptionsQuery(false)
 
-  const {
-    data: employeeData,
-    isLoading: employeeOptionsIsLoading,
-    error: employeeOptionsError,
-  } = useGetEmployeeOptionsQuery(true)
+  const { data: employeeData, error: employeeOptionsError } =
+    useGetEmployeeOptionsQuery(true)
 
-  const {
-    data: strategicThemeData,
-    isLoading: strategicThemeOptionsIsLoading,
-    error: strategicThemeOptionsError,
-  } = useGetStrategicThemeOptionsQuery(false)
+  const { data: strategicThemeData, error: strategicThemeOptionsError } =
+    useGetStrategicThemeOptionsQuery(false)
 
-  const { hasPermissionClaim } = useAuth()
-  const canUpdateProject = hasPermissionClaim('Permissions.Projects.Update')
+  const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
+    useModalForm<EditProjectFormValues>({
+      onSubmit: useCallback(
+        async (values: EditProjectFormValues, form) => {
+          try {
+            const request = mapToRequestValues(values, projectData.id)
+            const response = await updateProject({
+              request,
+              cacheKey: projectData.key,
+            })
+            if (response.error) throw response.error
 
-  const mapToFormValues = useCallback(
-    (project: ProjectDetailsDto) => {
-      if (!project) {
-        throw new Error('Project not found')
-      }
-      form.setFieldsValue({
-        name: project.name,
-        description: project.description,
-        expenditureCategoryId: project.expenditureCategory.id,
-        start: project.start ? dayjs(project.start) : undefined,
-        end: project.end ? dayjs(project.end) : undefined,
-        sponsorIds: project.projectSponsors.map((s) => s.id),
-        ownerIds: project.projectOwners.map((o) => o.id),
-        managerIds: project.projectManagers.map((m) => m.id),
-        strategicThemeIds: project.strategicThemes.map((t) => t.id),
-      })
-    },
-    [form],
-  )
-
-  const update = async (
-    values: EditProjectFormValues,
-    project: ProjectDetailsDto,
-  ) => {
-    try {
-      const request = mapToRequestValues(values, project.id)
-      const response = await updateProject({
-        request,
-        cacheKey: project.key,
-      })
-      if (response.error) {
-        throw response.error
-      }
-      messageApi.success(`Project updated successfully.`)
-      return true
-    } catch (error) {
-      if (error.status === 422 && error.errors) {
-        const formErrors = toFormErrors(error.errors)
-        form.setFields(formErrors)
-        messageApi.error('Correct the validation error(s) to continue.')
-      } else {
-        messageApi.error(
-          error.detail ??
-            'An error occurred while updating the project. Please try again.',
-        )
-      }
-      return false
-    }
-  }
-
-  const handleOk = async () => {
-    setIsSaving(true)
-    try {
-      const values = await form.validateFields()
-      if (await update(values, projectData)) {
-        setIsOpen(false)
-        form.resetFields()
-        props.onFormComplete()
-      }
-    } catch (error) {
-      console.error('handleOk error', error)
-      messageApi.error(
+            messageApi.success('Project updated successfully.')
+            return true
+          } catch (error) {
+            if (error.status === 422 && error.errors) {
+              const formErrors = toFormErrors(error.errors)
+              form.setFields(formErrors)
+              messageApi.error('Correct the validation error(s) to continue.')
+            } else {
+              messageApi.error(
+                error.detail ??
+                  'An error occurred while updating the project. Please try again.',
+              )
+            }
+            return false
+          }
+        },
+        [updateProject, projectData, messageApi],
+      ),
+      onComplete: onFormComplete,
+      onCancel: onFormCancel,
+      errorMessage:
         'An error occurred while updating the project. Please try again.',
-      )
-    } finally {
-      setIsSaving(false)
-    }
-  }
+      permission: 'Permissions.Projects.Update',
+    })
 
-  const handleCancel = useCallback(() => {
-    setIsOpen(false)
-    form.resetFields()
-    props.onFormCancel()
-  }, [form, props])
-
+  // Initialize form values when data is loaded
   useEffect(() => {
     if (!projectData) return
 
-    if (canUpdateProject) {
-      setIsOpen(props.showForm)
-      if (props.showForm) {
-        mapToFormValues(projectData)
-      }
-    } else {
-      props.onFormCancel()
-      messageApi.error('You do not have permission to update projects.')
-    }
-  }, [canUpdateProject, mapToFormValues, messageApi, projectData, props])
-
-  useEffect(() => {
-    form.validateFields({ validateOnly: true }).then(
-      () => setIsValid(true && form.isFieldsTouched()),
-      () => setIsValid(false),
-    )
-  }, [form, formValues])
+    form.setFieldsValue({
+      name: projectData.name,
+      description: projectData.description,
+      expenditureCategoryId: projectData.expenditureCategory.id,
+      start: projectData.start ? dayjs(projectData.start) : undefined,
+      end: projectData.end ? dayjs(projectData.end) : undefined,
+      sponsorIds: projectData.projectSponsors.map((s) => s.id),
+      ownerIds: projectData.projectOwners.map((o) => o.id),
+      managerIds: projectData.projectManagers.map((m) => m.id),
+      strategicThemeIds: projectData.strategicThemes.map((t) => t.id),
+    })
+  }, [projectData, form])
 
   useEffect(() => {
     if (
@@ -224,162 +160,146 @@ const EditProjectForm = (props: EditProjectFormProps) => {
   ])
 
   return (
-    <>
-      <Modal
-        title="Edit Project"
-        open={isOpen}
-        width={'60vw'}
-        onOk={handleOk}
-        okButtonProps={{ disabled: !isValid }}
-        okText="Save"
-        confirmLoading={isSaving}
-        onCancel={handleCancel}
-        keyboard={false} // disable esc key to close modal
-        destroyOnHidden={true}
-      >
-        <Form
-          form={form}
-          size="small"
-          layout="vertical"
-          name="edit-project-form"
+    <Modal
+      title="Edit Project"
+      open={isOpen}
+      width={'60vw'}
+      onOk={handleOk}
+      okButtonProps={{ disabled: !isValid }}
+      okText="Save"
+      confirmLoading={isSaving}
+      onCancel={handleCancel}
+      keyboard={false} // disable esc key to close modal
+      destroyOnHidden
+    >
+      <Form form={form} size="small" layout="vertical" name="edit-project-form">
+        <Item
+          label="Name"
+          name="name"
+          rules={[
+            { required: true, message: 'Name is required' },
+            { max: 128 },
+          ]}
         >
-          <Item
-            label="Name"
-            name="name"
-            rules={[
-              { required: true, message: 'Name is required' },
-              { max: 128 },
-            ]}
-          >
-            <TextArea
-              autoSize={{ minRows: 1, maxRows: 2 }}
-              showCount
-              maxLength={128}
-            />
-          </Item>
-          <Item
-            name="description"
-            label="Description"
-            rules={[
-              { required: true, message: 'Description is required' },
-              { max: 2048 },
-            ]}
-          >
-            <MarkdownEditor maxLength={2048} />
-          </Item>
-          <Item
-            name="expenditureCategoryId"
-            label="Expenditure Category"
-            rules={[
-              { required: true, message: 'Expenditure Category is required' },
-            ]}
-          >
-            <Select
-              allowClear
-              options={expenditureData ?? []}
-              placeholder="Select Expenditure Category"
-            />
-          </Item>
-          <Item
-            name="start"
-            label="Start"
-            rules={[
-              {
-                validator: (_, value) => {
-                  const status = projectData?.status.name
-                  if (
-                    (status === 'Active' || status === 'Completed') &&
-                    !value
-                  ) {
-                    return Promise.reject(
-                      new Error(
-                        'Start date is required for active or completed projects',
-                      ),
-                    )
-                  }
-                  return Promise.resolve()
-                },
-              },
-            ]}
-          >
-            <DatePicker />
-          </Item>
-          <Item
-            name="end"
-            label="End"
-            dependencies={['start']}
-            rules={[
-              {
-                validator: (_, value) => {
-                  const status = projectData?.status.name
-                  if (
-                    (status === 'Active' || status === 'Completed') &&
-                    !value
-                  ) {
-                    return Promise.reject(
-                      new Error(
-                        'End date is required for active or completed projects',
-                      ),
-                    )
-                  }
-                  return Promise.resolve()
-                },
-              },
-              ({ getFieldValue }) => ({
-                validator(_, value) {
-                  const start = getFieldValue('start')
-                  if (!start || (start && start <= value)) {
-                    return Promise.resolve()
-                  }
+          <TextArea
+            autoSize={{ minRows: 1, maxRows: 2 }}
+            showCount
+            maxLength={128}
+          />
+        </Item>
+        <Item
+          name="description"
+          label="Description"
+          rules={[
+            { required: true, message: 'Description is required' },
+            { max: 2048 },
+          ]}
+        >
+          <MarkdownEditor maxLength={2048} />
+        </Item>
+        <Item
+          name="expenditureCategoryId"
+          label="Expenditure Category"
+          rules={[
+            { required: true, message: 'Expenditure Category is required' },
+          ]}
+        >
+          <Select
+            allowClear
+            options={expenditureData ?? []}
+            placeholder="Select Expenditure Category"
+          />
+        </Item>
+        <Item
+          name="start"
+          label="Start"
+          rules={[
+            {
+              validator: (_, value) => {
+                const status = projectData?.status.name
+                if ((status === 'Active' || status === 'Completed') && !value) {
                   return Promise.reject(
-                    new Error('End date must be on or after start date'),
+                    new Error(
+                      'Start date is required for active or completed projects',
+                    ),
                   )
-                },
-              }),
-            ]}
-          >
-            <DatePicker />
-          </Item>
-          <Item name="sponsorIds" label="Sponsors">
-            <EmployeeSelect
-              employees={employeeData ?? []}
-              allowMultiple={true}
-              placeholder="Select Sponsors"
-            />
-          </Item>
-          <Item name="ownerIds" label="Owners">
-            <EmployeeSelect
-              employees={employeeData ?? []}
-              allowMultiple={true}
-              placeholder="Select Owners"
-            />
-          </Item>
-          <Item name="managerIds" label="Managers">
-            <EmployeeSelect
-              employees={employeeData ?? []}
-              allowMultiple={true}
-              placeholder="Select Managers"
-            />
-          </Item>
-          <Item name="strategicThemeIds" label="Strategic Themes">
-            <Select
-              mode="multiple"
-              allowClear
-              options={strategicThemeData ?? []}
-              placeholder="Select Strategic Themes"
-              optionFilterProp="label"
-              filterOption={(input, option) =>
-                (option?.label?.toLowerCase() ?? '').includes(
-                  input.toLowerCase(),
+                }
+                return Promise.resolve()
+              },
+            },
+          ]}
+        >
+          <DatePicker />
+        </Item>
+        <Item
+          name="end"
+          label="End"
+          dependencies={['start']}
+          rules={[
+            {
+              validator: (_, value) => {
+                const status = projectData?.status.name
+                if ((status === 'Active' || status === 'Completed') && !value) {
+                  return Promise.reject(
+                    new Error(
+                      'End date is required for active or completed projects',
+                    ),
+                  )
+                }
+                return Promise.resolve()
+              },
+            },
+            ({ getFieldValue }) => ({
+              validator(_, value) {
+                const start = getFieldValue('start')
+                if (!start || (start && start <= value)) {
+                  return Promise.resolve()
+                }
+                return Promise.reject(
+                  new Error('End date must be on or after start date'),
                 )
-              }
-            />
-          </Item>
-        </Form>
-      </Modal>
-    </>
+              },
+            }),
+          ]}
+        >
+          <DatePicker />
+        </Item>
+        <Item name="sponsorIds" label="Sponsors">
+          <EmployeeSelect
+            employees={employeeData ?? []}
+            allowMultiple={true}
+            placeholder="Select Sponsors"
+          />
+        </Item>
+        <Item name="ownerIds" label="Owners">
+          <EmployeeSelect
+            employees={employeeData ?? []}
+            allowMultiple={true}
+            placeholder="Select Owners"
+          />
+        </Item>
+        <Item name="managerIds" label="Managers">
+          <EmployeeSelect
+            employees={employeeData ?? []}
+            allowMultiple={true}
+            placeholder="Select Managers"
+          />
+        </Item>
+        <Item name="strategicThemeIds" label="Strategic Themes">
+          <Select
+            mode="multiple"
+            allowClear
+            options={strategicThemeData ?? []}
+            placeholder="Select Strategic Themes"
+            optionFilterProp="label"
+            filterOption={(input, option) =>
+              (option?.label?.toLowerCase() ?? '').includes(input.toLowerCase())
+            }
+          />
+        </Item>
+      </Form>
+    </Modal>
   )
 }
 
 export default EditProjectForm
-

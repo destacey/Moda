@@ -242,7 +242,6 @@ const TeamOfTeamsDetailsPage = (props: {
       {isInEditMode && team && canUpdateTeam && <EditTeamForm team={team} />}
       {openCreateTeamMembershipForm && (
         <CreateTeamMembershipForm
-          showForm={openCreateTeamMembershipForm}
           teamId={team?.id}
           teamType={'Team of Teams'}
           onFormCreate={() => onCreateTeamMembershipFormClosed(true)}
@@ -252,7 +251,6 @@ const TeamOfTeamsDetailsPage = (props: {
       {openDeactivateTeamForm && (
         <DeactivateTeamOfTeamsForm
           team={team}
-          showForm={openDeactivateTeamForm}
           onFormComplete={() => onDeactivateTeamFormClosed(true)}
           onFormCancel={() => onDeactivateTeamFormClosed(false)}
         />

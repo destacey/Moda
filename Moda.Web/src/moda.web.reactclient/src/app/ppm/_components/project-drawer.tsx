@@ -19,7 +19,7 @@ export interface ProjectDrawerProps {
 }
 
 const ProjectDrawer: FC<ProjectDrawerProps> = (props: ProjectDrawerProps) => {
-  const [size, setSize] = useState(getDrawerWidthPixels())
+  const [size, setSize] = useState(() => getDrawerWidthPixels())
   const messageApi = useMessage()
 
   const {

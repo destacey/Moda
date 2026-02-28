@@ -73,6 +73,12 @@ import { useTreeGridEditing } from './use-tree-grid-editing'
 
 const EMPTY_FIELD_ERRORS: Record<string, string> = {}
 const FILTER_DEBOUNCE_MS = 250
+const formatTagPlaceholder = (values: { label?: unknown; value?: unknown }[]) => {
+  const labels = values
+    .map((v) => String(v.label ?? v.value ?? ''))
+    .filter(Boolean)
+  return labels.length === 1 ? labels[0] : `${labels.length} selected`
+}
 const NOOP_FORM = {
   validateFields: async () => ({}),
   getFieldsValue: () => ({}),
@@ -477,6 +483,45 @@ function TreeGridInner<T extends TreeNode>(
     }
   }, [])
 
+  const handleTextFilterChange = useCallback(
+    (
+      e: ChangeEvent<HTMLInputElement>,
+      columnId: string,
+      setFilterValue: (value: string | undefined) => void,
+      filterInputId: string,
+    ) => {
+      const next = e.target.value
+      setTextFilterDraftValues((prev) => ({
+        ...prev,
+        [columnId]: next,
+      }))
+
+      const existingTimer = filterDebounceTimersRef.current.get(columnId)
+      if (existingTimer) {
+        clearTimeout(existingTimer)
+      }
+
+      const timer = setTimeout(() => {
+        setFilterValue(next ? next : undefined)
+        setTextFilterDraftValues((prev) => {
+          if (!(columnId in prev)) return prev
+          const updated = { ...prev }
+          delete updated[columnId]
+          return updated
+        })
+        filterDebounceTimersRef.current.delete(columnId)
+      }, FILTER_DEBOUNCE_MS)
+      filterDebounceTimersRef.current.set(columnId, timer)
+
+      pendingFilterFocusRef.current = {
+        inputId: filterInputId,
+        selectionStart: e.target.selectionStart,
+        selectionEnd: e.target.selectionEnd,
+      }
+    },
+    [],
+  )
+
   // ─── CSV export ──────────────────────────────────────────
   const onExportCsv = useCallback(() => {
     const exportableColumns = columns.filter((col: any) => {
@@ -522,6 +567,31 @@ function TreeGridInner<T extends TreeNode>(
     table,
     selectedRowId,
   }))
+
+  // ─── Row/cell click handlers ────────────────────────────
+  const handleRowClickWithContext = useCallback(
+    (e: React.MouseEvent, rowId: string) => {
+      void handleRowClick(e, {
+        rowId,
+        isEditableColumn: (columnId) => editableColumns.includes(columnId),
+        getClickedColumnId: (target) =>
+          target.closest('td')?.getAttribute('data-column-id') ?? null,
+      })
+    },
+    [handleRowClick, editableColumns],
+  )
+
+  const handleCellClick = useCallback((e: React.MouseEvent) => {
+    const target = e.target as HTMLElement
+    if (
+      target.closest('input') ||
+      target.closest('.ant-select') ||
+      target.closest('.ant-picker') ||
+      target.closest('.ant-color-picker')
+    ) {
+      e.stopPropagation()
+    }
+  }, [])
 
   // ─── Resolved leftSlot ──────────────────────────────────
   const resolvedLeftSlot =
@@ -648,14 +718,7 @@ function TreeGridInner<T extends TreeNode>(
                           mode="multiple"
                           allowClear
                           maxTagCount={0}
-                          maxTagPlaceholder={(values) => {
-                            const labels = values
-                              .map((v) => String(v.label ?? v.value ?? ''))
-                              .filter(Boolean)
-                            return labels.length === 1
-                              ? labels[0]
-                              : `${labels.length} selected`
-                          }}
+                          maxTagPlaceholder={formatTagPlaceholder}
                           value={selectValue.length ? selectValue : undefined}
                           options={options}
                           suffixIcon={<FilterOutlined />}
@@ -690,37 +753,14 @@ function TreeGridInner<T extends TreeNode>(
                         allowClear
                         placeholder={meta?.filterPlaceholder}
                         value={textValue}
-                        onChange={(e) => {
-                          const next = e.target.value
-                          setTextFilterDraftValues((prev) => ({
-                            ...prev,
-                            [column.id]: next,
-                          }))
-
-                          const existingTimer =
-                            filterDebounceTimersRef.current.get(column.id)
-                          if (existingTimer) {
-                            clearTimeout(existingTimer)
-                          }
-
-                          const timer = setTimeout(() => {
-                            column.setFilterValue(next ? next : undefined)
-                            setTextFilterDraftValues((prev) => {
-                              if (!(column.id in prev)) return prev
-                              const updated = { ...prev }
-                              delete updated[column.id]
-                              return updated
-                            })
-                            filterDebounceTimersRef.current.delete(column.id)
-                          }, FILTER_DEBOUNCE_MS)
-                          filterDebounceTimersRef.current.set(column.id, timer)
-
-                          pendingFilterFocusRef.current = {
-                            inputId: filterInputId,
-                            selectionStart: e.target.selectionStart,
-                            selectionEnd: e.target.selectionEnd,
-                          }
-                        }}
+                        onChange={(e) =>
+                          handleTextFilterChange(
+                            e,
+                            column.id,
+                            column.setFilterValue,
+                            filterInputId,
+                          )
+                        }
                         className={styles.filterControl}
                       />
                     </th>
@@ -761,16 +801,7 @@ function TreeGridInner<T extends TreeNode>(
                   isDragEnabled={isDragEnabled && !isDraftRow}
                   isDragging={isDragging}
                   className={`${styles.tr}${index % 2 === 1 ? ` ${styles.trAlt}` : ''}${isSelected ? ` ${styles.trSelected}` : ''}`}
-                  onClick={(e) => {
-                    void handleRowClick(e, {
-                      rowId: row.original.id,
-                      isEditableColumn: (columnId) =>
-                        editableColumns.includes(columnId),
-                      getClickedColumnId: (target) =>
-                        target.closest('td')?.getAttribute('data-column-id') ??
-                        null,
-                    })
-                  }}
+                  onClick={(e) => handleRowClickWithContext(e, row.original.id)}
                 >
                   {row.getVisibleCells().map((cell) => {
                     const isEditableCell =
@@ -782,17 +813,7 @@ function TreeGridInner<T extends TreeNode>(
                         data-cell-id={`${row.original.id}-${cell.column.id}`}
                         data-column-id={cell.column.id}
                         className={`${styles.td}${isEditableCell ? ` ${styles.editableCell}` : ''}`}
-                        onClick={(e) => {
-                          const target = e.target as HTMLElement
-                          if (
-                            target.closest('input') ||
-                            target.closest('.ant-select') ||
-                            target.closest('.ant-picker') ||
-                            target.closest('.ant-color-picker')
-                          ) {
-                            e.stopPropagation()
-                          }
-                        }}
+                        onClick={handleCellClick}
                       >
                         {flexRender(
                           cell.column.columnDef.cell,

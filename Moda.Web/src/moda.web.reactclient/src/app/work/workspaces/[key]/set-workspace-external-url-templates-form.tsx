@@ -12,13 +12,13 @@ import {
 } from '@/src/store/features/work-management/workspace-api'
 import { toFormErrors } from '@/src/utils'
 import { Form, Input, Modal } from 'antd'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect } from 'react'
+import { useModalForm } from '@/src/hooks'
 
 const { Item } = Form
 const { TextArea } = Input
 
 export interface SetWorkspaceExternalUrlTemplatesFormProps {
-  showForm: boolean
   workspaceId: string
   onFormUpdate: () => void
   onFormCancel: () => void
@@ -43,11 +43,6 @@ const mapToRequestValues = (
 const SetWorkspaceExternalUrlTemplatesForm = (
   props: SetWorkspaceExternalUrlTemplatesFormProps,
 ) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-  const [isValid, setIsValid] = useState(false)
-  const [form] = Form.useForm<SetWorkspaceExternalUrlTemplatesFormValues>()
-  const formValues = Form.useWatch([], form)
   const messageApi = useMessage()
 
   const {
@@ -57,6 +52,45 @@ const SetWorkspaceExternalUrlTemplatesForm = (
   } = useGetWorkspaceQuery(props.workspaceId)
   const [setWorkspaceExternalUrlTemplatesMutation] =
     useSetWorkspaceExternalUrlTemplatesMutation()
+
+  const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
+    useModalForm<SetWorkspaceExternalUrlTemplatesFormValues>({
+      onSubmit: useCallback(
+        async (values: SetWorkspaceExternalUrlTemplatesFormValues, form) => {
+          try {
+            const request = mapToRequestValues(props.workspaceId, values)
+            const response =
+              await setWorkspaceExternalUrlTemplatesMutation(request)
+            if (response.error) {
+              throw response.error
+            }
+            messageApi.success('Successfully set external URL templates')
+            refetch()
+            return true
+          } catch (error) {
+            if (error.status === 422 && error.errors) {
+              const formErrors = toFormErrors(error.errors)
+              form.setFields(formErrors)
+              messageApi.error('Correct the validation error(s) to continue.')
+            } else {
+              messageApi.error(
+                'An unexpected error occurred while updating external URL templates.',
+              )
+              console.error(error)
+            }
+            return false
+          }
+        },
+        [
+          setWorkspaceExternalUrlTemplatesMutation,
+          props.workspaceId,
+          messageApi,
+          refetch,
+        ],
+      ),
+      onComplete: props.onFormUpdate,
+      onCancel: props.onFormCancel,
+    })
 
   const mapToFormValues = useCallback(
     (workspace: WorkspaceDto) => {
@@ -68,80 +102,10 @@ const SetWorkspaceExternalUrlTemplatesForm = (
     [form],
   )
 
-  const update = async (
-    values: SetWorkspaceExternalUrlTemplatesFormValues,
-  ): Promise<boolean> => {
-    try {
-      const request = mapToRequestValues(props.workspaceId, values)
-      const response = await setWorkspaceExternalUrlTemplatesMutation(request)
-      if (response.error) {
-        throw response.error
-      }
-      return true
-    } catch (error) {
-      if (error.status === 422 && error.errors) {
-        const formErrors = toFormErrors(error.errors)
-        form.setFields(formErrors)
-        messageApi.error('Correct the validation error(s) to continue.')
-      } else {
-        messageApi.error(
-          'An unexpected error occurred while updating external URL templates.',
-        )
-        console.error(error)
-      }
-      return false
-    }
-  }
-
-  const handleOk = async () => {
-    setIsSaving(true)
-    try {
-      const values = await form.validateFields()
-      if (await update(values)) {
-        setIsOpen(false)
-        form.resetFields()
-        props.onFormUpdate()
-        messageApi.success('Successfully set external URL templates')
-        refetch() // this makes sure the workspace data is updated if the form is opened again
-      }
-    } catch (errorInfo) {
-      console.log('handleOk error', errorInfo)
-    } finally {
-      setIsSaving(false)
-    }
-  }
-
-  const handleCancel = useCallback(() => {
-    setIsOpen(false)
-    props.onFormCancel()
-    form.resetFields()
-  }, [props, form])
-
-  const loadData = useCallback(async () => {
-    try {
-      mapToFormValues(workspaceData)
-      setIsValid(true)
-    } catch (error) {
-      handleCancel()
-      messageApi.error('An unexpected error occurred while loading form data.')
-      console.error(error)
-    }
-  }, [handleCancel, mapToFormValues, messageApi, workspaceData])
-
   useEffect(() => {
-    if (!workspaceData) return
-    setIsOpen(props.showForm)
-    if (props.showForm) {
-      loadData()
-    }
-  }, [isLoading, loadData, props.showForm, workspaceData])
-
-  useEffect(() => {
-    form.validateFields({ validateOnly: true }).then(
-      () => setIsValid(true && form.isFieldsTouched()),
-      () => setIsValid(false),
-    )
-  }, [form, formValues])
+    if (!workspaceData || !isOpen) return
+    mapToFormValues(workspaceData)
+  }, [workspaceData, isOpen, mapToFormValues])
 
   return (
     <Modal
@@ -152,8 +116,8 @@ const SetWorkspaceExternalUrlTemplatesForm = (
       okText="Save"
       confirmLoading={isSaving}
       onCancel={handleCancel}
-      keyboard={false} // disable esc key to close modal
-      destroyOnHidden={true}
+      keyboard={false}
+      destroyOnHidden
     >
       <Form form={form} layout="vertical">
         <Item

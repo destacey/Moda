@@ -8,14 +8,19 @@ import {
   useGetWorkItemsQuery,
   useGetWorkspaceQuery,
 } from '@/src/store/features/work-management/workspace-api'
-import { Button, Card } from 'antd'
+import { Button, Card, Spin } from 'antd'
 import { notFound, usePathname } from 'next/navigation'
 import { use, useCallback, useEffect, useState } from 'react'
 import WorkspaceDetailsLoading from './loading'
 import WorkspaceDetails from './workspace-details'
 import useAuth from '@/src/components/contexts/auth'
 import SetWorkspaceExternalUrlTemplatesForm from './set-workspace-external-url-templates-form'
-import { WorkItemsGrid } from '@/src/components/common/work'
+import dynamic from 'next/dynamic'
+
+const WorkItemsGrid = dynamic(
+  () => import('@/src/components/common/work/work-items-grid'),
+  { ssr: false, loading: () => <Spin /> },
+)
 
 enum WorkspaceTabs {
   Details = 'details',
@@ -144,7 +149,6 @@ const WorkspaceDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       </Card>
       {openSetWorkspaceExternalUrlTemplatesForm && (
         <SetWorkspaceExternalUrlTemplatesForm
-          showForm={openSetWorkspaceExternalUrlTemplatesForm}
           workspaceId={workspaceData.id}
           onFormUpdate={() =>
             onSetWorkspaceExternalUrlTemplatesFormClosed(true)

@@ -160,7 +160,6 @@ const WorkTypeTierCard = (props: WorkTypeTierCardProps) => {
       </Card>
       {openCreateWorkTypeLevelForm && (
         <CreateWorkTypeLevelForm
-          showForm={openCreateWorkTypeLevelForm}
           onFormSave={() => onCreateObjectiveFormClosed(true)}
           onFormCancel={() => onCreateObjectiveFormClosed(false)}
         />

@@ -1,7 +1,6 @@
 'use client'
 
 import { MarkdownEditor } from '@/src/components/common/markdown'
-import useAuth from '@/src/components/contexts/auth'
 import { useMessage } from '@/src/components/contexts/messaging'
 import {
   AzureDevOpsConnectionDetailsDto,
@@ -16,13 +15,13 @@ import {
 import { toFormErrors } from '@/src/utils'
 import { Button, Divider, Form, Input, Modal, Typography } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
+import { useModalForm } from '@/src/hooks'
 
 const { Item } = Form
 const { TextArea } = Input
 const { Text } = Typography
 
 export interface EditConnectionFormProps {
-  showForm: boolean
   id: string
   onFormUpdate: () => void
   onFormCancel: () => void
@@ -48,16 +47,10 @@ const mapToRequestValues = (values: EditConnectionFormValues) => {
 }
 
 const EditConnectionForm = ({
-  showForm,
   id,
   onFormUpdate,
   onFormCancel,
 }: EditConnectionFormProps) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-  const [isValid, setIsValid] = useState(false)
-  const [form] = Form.useForm<EditConnectionFormValues>()
-  const formValues = Form.useWatch([], form)
   const messageApi = useMessage()
   const [testConfigurationResult, setTestConfigurationResult] =
     useState<string>()
@@ -66,22 +59,15 @@ const EditConnectionForm = ({
   const { data: connectionData } = useGetConnectionQuery(id)
 
   // Type narrow to AzureDevOpsConnectionDetailsDto
-  // Note: Using connector.name instead of $type because System.Text.Json doesn't add $type for root-level objects
   const azdoConnection =
     connectionData?.connector?.name === 'Azure DevOps'
       ? (connectionData as AzureDevOpsConnectionDetailsDto)
       : null
 
-  const [updateConnection, { error: updateConnectionError }] =
+  const [updateConnection] =
     useUpdateConnectionMutation()
 
-  const { hasClaim } = useAuth()
-  const canUpdateConnection = hasClaim(
-    'Permission',
-    'Permissions.Connections.Update',
-  )
-
-  const [testConfig, { error: testConfigError }] =
+  const [testConfig] =
     useTestAzdoConfigurationMutation()
 
   const testConnectionConfiguration = useCallback(
@@ -98,87 +84,46 @@ const EditConnectionForm = ({
     [testConfig],
   )
 
-  const mapToFormValues = useCallback(
-    (connection: AzureDevOpsConnectionDetailsDto) => {
-      form.setFieldsValue({
-        id: connection.id,
-        name: connection.name,
-        description: connection.description || '',
-        organization: connection.configuration?.organization,
-        personalAccessToken: connection.configuration?.personalAccessToken,
-      })
-    },
-    [form],
-  )
-
-  const update = async (values: EditConnectionFormValues): Promise<boolean> => {
-    try {
-      const request = mapToRequestValues(values)
-      const response = await updateConnection(request)
-      if (response.error) throw response.error
-      return true
-    } catch (error) {
-      if (error.status === 422 && error.errors) {
-        const formErrors = toFormErrors(error.errors)
-        form.setFields(formErrors)
-        messageApi.error('Correct the validation error(s) to continue.')
-      } else {
-        messageApi.error('An error occurred while editing the connection.')
-        console.error(error)
-      }
-      return false
-    }
-  }
-
-  const handleOk = async () => {
-    setIsSaving(true)
-    try {
-      const values = await form.validateFields()
-      if (await update(values)) {
-        setIsOpen(false)
-        onFormUpdate()
-        form.resetFields()
-        messageApi.success('Successfully updated connection.')
-      }
-    } catch (errorInfo) {
-      console.error('handleOk error', errorInfo)
-    } finally {
-      setIsSaving(false)
-    }
-  }
-
-  const handleCancel = useCallback(() => {
-    setIsOpen(false)
-    onFormCancel()
-    form.resetFields()
-  }, [onFormCancel, form])
+  const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
+    useModalForm<EditConnectionFormValues>({
+      onSubmit: useCallback(
+        async (values: EditConnectionFormValues, form) => {
+          try {
+            const request = mapToRequestValues(values)
+            const response = await updateConnection(request)
+            if (response.error) throw response.error
+            messageApi.success('Successfully updated connection.')
+            return true
+          } catch (error) {
+            if (error.status === 422 && error.errors) {
+              const formErrors = toFormErrors(error.errors)
+              form.setFields(formErrors)
+              messageApi.error('Correct the validation error(s) to continue.')
+            } else {
+              messageApi.error('An error occurred while editing the connection.')
+              console.error(error)
+            }
+            return false
+          }
+        },
+        [updateConnection, messageApi],
+      ),
+      onComplete: onFormUpdate,
+      onCancel: onFormCancel,
+      errorMessage: 'An error occurred while editing the connection.',
+      permission: 'Permissions.Connections.Update',
+    })
 
   useEffect(() => {
     if (!azdoConnection) return
-    if (canUpdateConnection) {
-      setIsOpen(showForm)
-      if (showForm) {
-        mapToFormValues(azdoConnection)
-      }
-    } else {
-      onFormCancel()
-      messageApi.error('You do not have permission to edit connections.')
-    }
-  }, [
-    canUpdateConnection,
-    azdoConnection,
-    mapToFormValues,
-    messageApi,
-    onFormCancel,
-    showForm,
-  ])
-
-  useEffect(() => {
-    form.validateFields({ validateOnly: true }).then(
-      () => setIsValid(true && form.isFieldsTouched()),
-      () => setIsValid(false),
-    )
-  }, [form, formValues])
+    form.setFieldsValue({
+      id: azdoConnection.id,
+      name: azdoConnection.name,
+      description: azdoConnection.description || '',
+      organization: azdoConnection.configuration?.organization,
+      personalAccessToken: azdoConnection.configuration?.personalAccessToken,
+    })
+  }, [azdoConnection, form])
 
   return (
     <Modal
@@ -189,8 +134,8 @@ const EditConnectionForm = ({
       okText="Save"
       confirmLoading={isSaving}
       onCancel={handleCancel}
-      keyboard={false} // disable esc key to close modal
-      destroyOnHidden={true}
+      keyboard={false}
+      destroyOnHidden
     >
       <Form
         form={form}

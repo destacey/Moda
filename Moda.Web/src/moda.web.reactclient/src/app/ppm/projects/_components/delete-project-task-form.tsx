@@ -1,26 +1,27 @@
 'use client'
 
-import useAuth from '@/src/components/contexts/auth'
 import { useMessage } from '@/src/components/contexts/messaging'
+import { useConfirmModal } from '@/src/hooks'
 import {
   useDeleteProjectTaskMutation,
   useGetProjectTaskQuery,
 } from '@/src/store/features/ppm/project-tasks-api'
 import { Modal } from 'antd'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback } from 'react'
 
 export interface DeleteProjectTaskFormProps {
   projectIdOrKey: string
   taskIdOrKey: string
-  showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
 }
 
-const DeleteProjectTaskForm = (props: DeleteProjectTaskFormProps) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-
+const DeleteProjectTaskForm = ({
+  projectIdOrKey,
+  taskIdOrKey,
+  onFormComplete,
+  onFormCancel,
+}: DeleteProjectTaskFormProps) => {
   const messageApi = useMessage()
 
   const [deleteProjectTaskMutation] = useDeleteProjectTaskMutation()
@@ -28,82 +29,60 @@ const DeleteProjectTaskForm = (props: DeleteProjectTaskFormProps) => {
   const {
     data: taskData,
     isLoading,
-    error,
-  } = useGetProjectTaskQuery(
-    {
-      projectIdOrKey: props.projectIdOrKey,
-      taskIdOrKey: props.taskIdOrKey,
-    },
-    { skip: !props.showForm },
-  )
+  } = useGetProjectTaskQuery({
+    projectIdOrKey,
+    taskIdOrKey,
+  })
 
-  const { hasPermissionClaim } = useAuth()
-  const canDeleteTask = hasPermissionClaim('Permissions.Projects.Delete')
+  const { isOpen, isSaving, handleOk, handleCancel } = useConfirmModal({
+    onSubmit: useCallback(async () => {
+      if (!taskData) return false
 
-  const handleOk = async () => {
-    if (!taskData) return
+      try {
+        const response = await deleteProjectTaskMutation({
+          projectIdOrKey,
+          id: taskData.id,
+        })
 
-    setIsSaving(true)
-    try {
-      const response = await deleteProjectTaskMutation({
-        projectIdOrKey: props.projectIdOrKey,
-        id: taskData.id,
-      })
+        if (response.error) throw response.error
 
-      if (response.error) {
-        throw response.error
+        messageApi.success('Successfully deleted task.')
+        return true
+      } catch (error) {
+        console.log('delete task error', error)
+        messageApi.error(
+          error?.detail ??
+            'An unexpected error occurred while deleting the task.',
+        )
+        return false
       }
-
-      messageApi.success('Successfully deleted task.')
-      props.onFormComplete()
-      setIsOpen(false)
-    } catch (error) {
-      console.log('handleOk error', error)
-      messageApi.error(
-        error?.detail ??
-          'An unexpected error occurred while deleting the task.',
-      )
-    } finally {
-      setIsSaving(false)
-    }
-  }
-
-  const handleCancel = useCallback(() => {
-    setIsOpen(false)
-    props.onFormCancel()
-  }, [props])
-
-  useEffect(() => {
-    if (canDeleteTask) {
-      setIsOpen(props.showForm)
-    } else {
-      props.onFormCancel()
-      messageApi.error('You do not have permission to delete tasks.')
-    }
-  }, [canDeleteTask, messageApi, props])
+    }, [deleteProjectTaskMutation, taskData, projectIdOrKey, messageApi]),
+    onComplete: onFormComplete,
+    onCancel: onFormCancel,
+    errorMessage:
+      'An unexpected error occurred while deleting the task.',
+    permission: 'Permissions.Projects.Delete',
+  })
 
   if (isLoading) {
     return null
   }
 
   return (
-    <>
-      <Modal
-        title="Are you sure you want to delete this task?"
-        open={isOpen}
-        onOk={handleOk}
-        okText="Delete"
-        okType="danger"
-        confirmLoading={isSaving}
-        onCancel={handleCancel}
-        keyboard={false}
-        destroyOnHidden={true}
-      >
-        {taskData?.key} - {taskData?.name}
-      </Modal>
-    </>
+    <Modal
+      title="Are you sure you want to delete this task?"
+      open={isOpen}
+      onOk={handleOk}
+      okText="Delete"
+      okType="danger"
+      confirmLoading={isSaving}
+      onCancel={handleCancel}
+      keyboard={false}
+      destroyOnHidden
+    >
+      {taskData?.key} - {taskData?.name}
+    </Modal>
   )
 }
 
 export default DeleteProjectTaskForm
-

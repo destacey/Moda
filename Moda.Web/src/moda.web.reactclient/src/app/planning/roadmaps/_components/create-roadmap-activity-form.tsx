@@ -1,7 +1,7 @@
 import { ModaColorPicker } from '@/src/components/common'
 import { MarkdownEditor } from '@/src/components/common/markdown'
-import useAuth from '@/src/components/contexts/auth'
 import { useMessage } from '@/src/components/contexts/messaging'
+import { useModalForm } from '@/src/hooks'
 import { CreateRoadmapActivityRequest } from '@/src/services/moda-api'
 import {
   useCreateRoadmapItemMutation,
@@ -9,14 +9,13 @@ import {
 } from '@/src/store/features/planning/roadmaps-api'
 import { toFormErrors } from '@/src/utils'
 import { DatePicker, Form, Input, Modal, TreeSelect } from 'antd'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect } from 'react'
 
 const { Item } = Form
 const { TextArea } = Input
 const { RangePicker } = DatePicker
 
 export interface CreateRoadmapActivityFormProps {
-  showForm: boolean
   roadmapId: string
   onFormComplete: () => void
   onFormCancel: () => void
@@ -46,96 +45,55 @@ const mapToRequestValues = (
   } as CreateRoadmapActivityRequest
 }
 
-const CreateRoadmapActivityForm = (props: CreateRoadmapActivityFormProps) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-  const [isValid, setIsValid] = useState(false)
-  const [form] = Form.useForm<CreateRoadmapActivityFormValues>()
-  const formValues = Form.useWatch([], form)
-
+const CreateRoadmapActivityForm = ({
+  roadmapId,
+  onFormComplete,
+  onFormCancel,
+}: CreateRoadmapActivityFormProps) => {
   const messageApi = useMessage()
 
   const {
     data: activities,
-    isLoading: activitiesIsLoading,
     error: activitiesError,
-  } = useGetRoadmapActivitiesQuery(props.roadmapId)
+  } = useGetRoadmapActivitiesQuery(roadmapId)
 
-  const [createRoadmapActivity, { error: mutationError }] =
-    useCreateRoadmapItemMutation()
+  const [createRoadmapActivity] = useCreateRoadmapItemMutation()
 
-  const { hasPermissionClaim } = useAuth()
-  const canManageRoadmapItems = hasPermissionClaim(
-    'Permissions.Roadmaps.Update',
-  )
+  const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
+    useModalForm<CreateRoadmapActivityFormValues>({
+      onSubmit: useCallback(
+        async (values: CreateRoadmapActivityFormValues, form) => {
+          try {
+            const request = mapToRequestValues(values, roadmapId)
+            const response = await createRoadmapActivity(request)
+            if (response.error) throw response.error
 
-  const create = async (values: CreateRoadmapActivityFormValues, roadmapId) => {
-    try {
-      const request = mapToRequestValues(values, roadmapId)
-      const response = await createRoadmapActivity(request)
-      if (response.error) {
-        throw response.error
-      }
-
-      messageApi.success('Roadmap Activity created successfully.')
-
-      return true
-    } catch (error) {
-      if (error.status === 422 && error.errors) {
-        const formErrors = toFormErrors(error.errors)
-        form.setFields(formErrors)
-        messageApi.error('Correct the validation error(s) to continue.')
-      } else {
-        messageApi.error(
-          error.detail ??
-            'An error occurred while creating the roadmap activity. Please try again.',
-        )
-      }
-      return false
-    }
-  }
-
-  const handleOk = async () => {
-    setIsSaving(true)
-    try {
-      const values = await form.validateFields()
-      if (await create(values, props.roadmapId)) {
-        setIsOpen(false)
-        form.resetFields()
-        props.onFormComplete()
-      }
-    } catch (error) {
-      console.error('handleOk error', error)
-      messageApi.error(
+            messageApi.success('Roadmap Activity created successfully.')
+            return true
+          } catch (error) {
+            if (error.status === 422 && error.errors) {
+              const formErrors = toFormErrors(error.errors)
+              form.setFields(formErrors)
+              messageApi.error('Correct the validation error(s) to continue.')
+            } else {
+              messageApi.error(
+                error.detail ??
+                  'An error occurred while creating the roadmap activity. Please try again.',
+              )
+            }
+            return false
+          }
+        },
+        [createRoadmapActivity, roadmapId, messageApi],
+      ),
+      onComplete: onFormComplete,
+      onCancel: onFormCancel,
+      errorMessage:
         'An error occurred while creating the roadmap activity. Please try again.',
-      )
-    } finally {
-      setIsSaving(false)
-    }
-  }
+      permission: 'Permissions.Roadmaps.Update',
+    })
 
-  const handleCancel = useCallback(() => {
-    setIsOpen(false)
-    form.resetFields()
-    props.onFormCancel()
-  }, [form, props])
-
-  useEffect(() => {
-    if (canManageRoadmapItems) {
-      setIsOpen(props.showForm)
-    } else {
-      props.onFormCancel()
-      messageApi.error('You do not have permission to create roadmap items.')
-    }
-  }, [canManageRoadmapItems, messageApi, props])
-
-  useEffect(() => {
-    form.validateFields({ validateOnly: true }).then(
-      () => setIsValid(true && form.isFieldsTouched()),
-      () => setIsValid(false),
-    )
-  }, [form, formValues])
-
+  // Query error display
   useEffect(() => {
     if (activitiesError) {
       messageApi.error(
@@ -146,91 +104,89 @@ const CreateRoadmapActivityForm = (props: CreateRoadmapActivityFormProps) => {
   }, [activitiesError, messageApi])
 
   return (
-    <>
-      <Modal
-        title="Create Roadmap Activity"
-        open={isOpen}
-        onOk={handleOk}
-        okButtonProps={{ disabled: !isValid }}
-        okText="Create"
-        confirmLoading={isSaving}
-        onCancel={handleCancel}
-        keyboard={false} // disable esc key to close modal
-        destroyOnHidden={true}
+    <Modal
+      title="Create Roadmap Activity"
+      open={isOpen}
+      onOk={handleOk}
+      okButtonProps={{ disabled: !isValid }}
+      okText="Create"
+      confirmLoading={isSaving}
+      onCancel={handleCancel}
+      keyboard={false} // disable esc key to close modal
+      destroyOnHidden
+    >
+      <Form
+        form={form}
+        size="small"
+        layout="vertical"
+        name="create-roadmap-activity-form"
       >
-        <Form
-          form={form}
-          size="small"
-          layout="vertical"
-          name="create-roadmap-activity-form"
+        <Item
+          name="parentId"
+          label="Parent Activity"
+          hidden={activities?.length < 1}
         >
-          <Item
-            name="parentId"
-            label="Parent Activity"
-            hidden={activities?.length < 1}
-          >
-            <TreeSelect
-              //showSearch // TODO: not working
-              treeLine={true}
-              placeholder="Please select parent activity"
-              allowClear
-              treeDefaultExpandAll
-              treeData={activities}
-              fieldNames={{ label: 'name', value: 'id', children: 'children' }}
-            />
-          </Item>
-          <Item label="Name" name="name" rules={[{ required: true }]}>
-            <TextArea
-              autoSize={{ minRows: 1, maxRows: 2 }}
-              showCount
-              maxLength={128}
-            />
-          </Item>
-          <Item
-            name="description"
-            label="Description"
-            initialValue=""
-            rules={[{ max: 2048 }]}
-          >
-            <MarkdownEditor
-              value={form.getFieldValue('description')}
-              onChange={(value) =>
-                form.setFieldValue('description', value || '')
-              }
-              maxLength={2048}
-            />
-          </Item>
-          <Item
-            name="range"
-            label="Dates"
-            rules={[
-              { required: true, message: 'Select start and end dates' },
-              {
-                validator: (_, value) => {
-                  if (!value || !value[0] || !value[1]) {
-                    return Promise.reject(
-                      new Error('Start and end dates are required'),
-                    )
-                  }
-                  const [start, end] = value
-                  if (!start || !end || !start.isBefore(end)) {
-                    return Promise.reject(
-                      new Error('End date must be after start date'),
-                    )
-                  }
-                  return Promise.resolve()
-                },
+          <TreeSelect
+            //showSearch // TODO: not working
+            treeLine={true}
+            placeholder="Please select parent activity"
+            allowClear
+            treeDefaultExpandAll
+            treeData={activities}
+            fieldNames={{ label: 'name', value: 'id', children: 'children' }}
+          />
+        </Item>
+        <Item label="Name" name="name" rules={[{ required: true }]}>
+          <TextArea
+            autoSize={{ minRows: 1, maxRows: 2 }}
+            showCount
+            maxLength={128}
+          />
+        </Item>
+        <Item
+          name="description"
+          label="Description"
+          initialValue=""
+          rules={[{ max: 2048 }]}
+        >
+          <MarkdownEditor
+            value={form.getFieldValue('description')}
+            onChange={(value) =>
+              form.setFieldValue('description', value || '')
+            }
+            maxLength={2048}
+          />
+        </Item>
+        <Item
+          name="range"
+          label="Dates"
+          rules={[
+            { required: true, message: 'Select start and end dates' },
+            {
+              validator: (_, value) => {
+                if (!value || !value[0] || !value[1]) {
+                  return Promise.reject(
+                    new Error('Start and end dates are required'),
+                  )
+                }
+                const [start, end] = value
+                if (!start || !end || !start.isBefore(end)) {
+                  return Promise.reject(
+                    new Error('End date must be after start date'),
+                  )
+                }
+                return Promise.resolve()
               },
-            ]}
-          >
-            <RangePicker />
-          </Item>
-          <Item name="color" label="Color">
-            <ModaColorPicker />
-          </Item>
-        </Form>
-      </Modal>
-    </>
+            },
+          ]}
+        >
+          <RangePicker />
+        </Item>
+        <Item name="color" label="Color">
+          <ModaColorPicker />
+        </Item>
+      </Form>
+    </Modal>
   )
 }
 

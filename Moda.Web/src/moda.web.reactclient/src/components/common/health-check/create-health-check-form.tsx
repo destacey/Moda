@@ -20,7 +20,6 @@ const { Item } = Form
 const { Group: RadioGroup } = Radio
 
 export interface CreateHealthCheckFormProps {
-  showForm: boolean
   objectId: string
   context: SystemContext
   onFormCreate: () => void

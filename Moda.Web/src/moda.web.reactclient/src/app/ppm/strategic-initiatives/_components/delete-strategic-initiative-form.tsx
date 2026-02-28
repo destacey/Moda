@@ -1,96 +1,69 @@
 'use client'
 
 import { useMessage } from '@/src/components/contexts/messaging'
-import { authorizeFormWithPropCallback } from '@/src/components/hoc'
+import { useConfirmModal } from '@/src/hooks'
 import { StrategicInitiativeDetailsDto } from '@/src/services/moda-api'
 import { useDeleteStrategicInitiativeMutation } from '@/src/store/features/ppm/strategic-initiatives-api'
 import { Modal } from 'antd'
-import { useEffect, useState } from 'react'
+import { useCallback } from 'react'
 
 export interface DeleteStrategicInitiativeFormProps {
   strategicInitiative: StrategicInitiativeDetailsDto
-  showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
 }
 
-const DeleteStrategicInitiativeForm = (
-  props: DeleteStrategicInitiativeFormProps,
-) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-
+const DeleteStrategicInitiativeForm = ({
+  strategicInitiative,
+  onFormComplete,
+  onFormCancel,
+}: DeleteStrategicInitiativeFormProps) => {
   const messageApi = useMessage()
 
-  const [deleteStrategicInitiativeMutation, { error: mutationError }] =
+  const [deleteStrategicInitiativeMutation] =
     useDeleteStrategicInitiativeMutation()
 
-  const formAction = async (
-    strategicInitiative: StrategicInitiativeDetailsDto,
-  ) => {
-    const response = await deleteStrategicInitiativeMutation(
-      strategicInitiative.id,
-    )
+  const { isOpen, isSaving, handleOk, handleCancel } = useConfirmModal({
+    onSubmit: useCallback(async () => {
+      try {
+        const response = await deleteStrategicInitiativeMutation(
+          strategicInitiative.id,
+        )
+        if (response.error) throw response.error
 
-    if (response.error) {
-      throw response.error
-    }
-  }
-
-  const handleOk = async () => {
-    setIsSaving(true)
-    try {
-      await formAction(props.strategicInitiative)
-
-      messageApi.success('Successfully deleted strategic initiative.')
-      setIsOpen(false)
-      props.onFormComplete()
-    } catch (error) {
-      console.log('handleOk error', error)
-      messageApi.error(
-        error.detail ??
-          'An unexpected error occurred while deleting the strategic initiative.',
-      )
-    } finally {
-      setIsSaving(false)
-    }
-  }
-
-  const handleCancel = () => {
-    setIsOpen(false)
-    props.onFormCancel()
-  }
-
-  useEffect(() => {
-    if (!props.strategicInitiative) return
-
-    setIsOpen(props.showForm)
-  }, [props.showForm, props.strategicInitiative])
+        messageApi.success('Successfully deleted strategic initiative.')
+        return true
+      } catch (error) {
+        messageApi.error(
+          error.detail ??
+            'An unexpected error occurred while deleting the strategic initiative.',
+        )
+        console.log(error)
+        return false
+      }
+    }, [deleteStrategicInitiativeMutation, strategicInitiative, messageApi]),
+    onComplete: onFormComplete,
+    onCancel: onFormCancel,
+    errorMessage:
+      'An unexpected error occurred while deleting the strategic initiative.',
+    permission: 'Permissions.StrategicInitiatives.Delete',
+  })
 
   return (
-    <>
-      <Modal
-        title="Are you sure you want to delete this Strategic Initiative?"
-        open={isOpen}
-        onOk={handleOk}
-        okText="Delete"
-        okType="danger"
-        confirmLoading={isSaving}
-        onCancel={handleCancel}
-        keyboard={false} // disable esc key to close modal
-        destroyOnHidden={true}
-      >
-        {props.strategicInitiative?.key} - {props.strategicInitiative?.name}
-      </Modal>
-    </>
+    <Modal
+      title="Are you sure you want to delete this Strategic Initiative?"
+      open={isOpen}
+      onOk={handleOk}
+      okText="Delete"
+      okType="danger"
+      confirmLoading={isSaving}
+      onCancel={handleCancel}
+      keyboard={false} // disable esc key to close modal
+      destroyOnHidden
+    >
+      {strategicInitiative?.key} - {strategicInitiative?.name}
+    </Modal>
   )
 }
 
-// Wrap with authorization HOC - this is created outside render and reused
-const AuthorizedDeleteStrategicInitiativeForm = authorizeFormWithPropCallback(
-  DeleteStrategicInitiativeForm,
-  'Permission',
-  'Permissions.StrategicInitiatives.Delete',
-)
-
-export default AuthorizedDeleteStrategicInitiativeForm
+export default DeleteStrategicInitiativeForm

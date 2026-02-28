@@ -1,18 +1,18 @@
 'use client'
 
 import { Form, Input, Modal, DatePicker } from 'antd'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect } from 'react'
 import { useMessage } from '@/src/components/contexts/messaging'
 import dayjs, { Dayjs } from 'dayjs'
 import { useUpdatePersonalAccessTokenMutation } from '@/src/store/features/user-management/personal-access-tokens-api'
 import { PersonalAccessTokenDto } from '@/src/services/moda-api'
 import { toFormErrors } from '@/src/utils'
+import { useModalForm } from '@/src/hooks'
 
 const { Item } = Form
 
 export interface EditPersonalAccessTokenFormProps {
   token: PersonalAccessTokenDto
-  showForm: boolean
   onFormUpdate: () => void
   onFormCancel: () => void
 }
@@ -24,91 +24,59 @@ interface EditTokenFormValues {
 
 const EditPersonalAccessTokenForm = ({
   token,
-  showForm,
   onFormUpdate,
   onFormCancel,
 }: EditPersonalAccessTokenFormProps) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-  const [isValid, setIsValid] = useState(false)
-  const [form] = Form.useForm<EditTokenFormValues>()
-  const formValues = Form.useWatch([], form)
   const messageApi = useMessage()
 
   const [updateToken] = useUpdatePersonalAccessTokenMutation()
 
-  useEffect(() => {
-    setIsOpen(showForm)
-    if (showForm && token) {
-      form.setFieldsValue({
-        name: token.name!,
-        expiresAt: dayjs(token.expiresAt),
-      })
-    }
-  }, [showForm, token, form])
+  const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
+    useModalForm<EditTokenFormValues>({
+      onSubmit: useCallback(
+        async (values: EditTokenFormValues, form) => {
+          try {
+            const response = await updateToken({
+              id: token.id!,
+              request: {
+                name: values.name,
+                expiresAt: values.expiresAt.toDate(),
+              },
+            })
 
-  useEffect(() => {
-    form.validateFields({ validateOnly: true }).then(
-      () => setIsValid(true && form.isFieldsTouched()),
-      () => setIsValid(false),
-    )
-  }, [form, formValues])
+            if (response.error) {
+              throw response.error
+            }
 
-  const update = async (values: EditTokenFormValues): Promise<boolean> => {
-    try {
-      const response = await updateToken({
-        id: token.id!,
-        request: {
-          name: values.name,
-          expiresAt: values.expiresAt.toDate(),
+            messageApi.success('Personal access token updated successfully')
+            return true
+          } catch (error) {
+            if (error.status === 422 && error.errors) {
+              const formErrors = toFormErrors(error.errors)
+              form.setFields(formErrors)
+              messageApi.error('Correct the validation error(s) to continue.')
+            } else {
+              messageApi.error(
+                error.detail ??
+                  'An error occurred while updating the PAT. Please try again.',
+              )
+            }
+            return false
+          }
         },
-      })
+        [updateToken, token.id, messageApi],
+      ),
+      onComplete: onFormUpdate,
+      onCancel: onFormCancel,
+    })
 
-      if (response.error) {
-        throw response.error
-      }
-
-      return true
-    } catch (error) {
-      if (error.status === 422 && error.errors) {
-        const formErrors = toFormErrors(error.errors)
-        form.setFields(formErrors)
-        messageApi.error('Correct the validation error(s) to continue.')
-      } else {
-        messageApi.error(
-          error.detail ??
-            'An error occurred while updating the PAT. Please try again.',
-        )
-      }
-      return false
-    }
-  }
-
-  const handleOk = async () => {
-    setIsSaving(true)
-    try {
-      const values = await form.validateFields()
-      const success = await update(values)
-
-      if (success) {
-        setIsOpen(false)
-        setIsSaving(false)
-        form.resetFields()
-        onFormUpdate()
-        messageApi.success('Personal access token updated successfully')
-      } else {
-        setIsSaving(false)
-      }
-    } catch (errorInfo) {
-      setIsSaving(false)
-    }
-  }
-
-  const handleCancel = () => {
-    setIsOpen(false)
-    onFormCancel()
-    form.resetFields()
-  }
+  useEffect(() => {
+    if (!token || !isOpen) return
+    form.setFieldsValue({
+      name: token.name!,
+      expiresAt: dayjs(token.expiresAt),
+    })
+  }, [token, isOpen, form])
 
   return (
     <Modal
@@ -120,7 +88,7 @@ const EditPersonalAccessTokenForm = ({
       confirmLoading={isSaving}
       onCancel={handleCancel}
       keyboard={false}
-      destroyOnHidden={true}
+      destroyOnHidden
       width={600}
     >
       <Form

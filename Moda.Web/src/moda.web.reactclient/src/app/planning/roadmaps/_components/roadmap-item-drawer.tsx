@@ -30,7 +30,7 @@ const RoadmapItemDrawer: FC<RoadmapItemDrawerProps> = (
 ) => {
   const [openEditRoadmapItemForm, setOpenEditRoadmapItemForm] =
     useState<boolean>(false)
-  const [size, setSize] = useState(getDrawerWidthPixels())
+  const [size, setSize] = useState(() => getDrawerWidthPixels())
   const messageApi = useMessage()
 
   const {
@@ -96,7 +96,6 @@ const RoadmapItemDrawer: FC<RoadmapItemDrawerProps> = (
       </Drawer>
       {itemData?.type.name === 'Activity' && openEditRoadmapItemForm && (
         <EditRoadmapActivityForm
-          showForm={openEditRoadmapItemForm}
           activityId={itemData.id}
           roadmapId={props.roadmapId}
           onFormComplete={() => setOpenEditRoadmapItemForm(false)}
@@ -105,7 +104,6 @@ const RoadmapItemDrawer: FC<RoadmapItemDrawerProps> = (
       )}
       {itemData?.type.name === 'Timebox' && openEditRoadmapItemForm && (
         <EditRoadmapTimeboxForm
-          showForm={openEditRoadmapItemForm}
           timeboxId={itemData.id}
           roadmapId={props.roadmapId}
           onFormComplete={() => setOpenEditRoadmapItemForm(false)}

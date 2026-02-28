@@ -6,6 +6,7 @@ import {
   asDraggableColDefs,
 } from '@/src/components/common/grid/ag-grid-transfer'
 import { useMessage } from '@/src/components/contexts/messaging'
+import { useConfirmModal } from '@/src/hooks'
 import {
   ManageStrategicInitiativeProjectsRequest,
   ProjectListDto,
@@ -20,7 +21,6 @@ import { Modal } from 'antd'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
 export interface ManageStrategicInitiativeProjectsFormProps {
-  showForm: boolean
   strategicInitiativeId: string
   portfolioKey: number
   onFormComplete: () => void
@@ -51,19 +51,12 @@ const defaultSort = (a: ProjectListDto, b: ProjectListDto) => {
   return a.name.localeCompare(b.name)
 }
 
-const ManageStrategicInitiativeProjectsForm = (
-  props: ManageStrategicInitiativeProjectsFormProps,
-) => {
-  const {
-    showForm,
-    strategicInitiativeId,
-    portfolioKey,
-    onFormComplete,
-    onFormCancel,
-  } = props
-
-  const [isOpen, setIsOpen] = useState(showForm)
-  const [isSaving, setIsSaving] = useState(false)
+const ManageStrategicInitiativeProjectsForm = ({
+  strategicInitiativeId,
+  portfolioKey,
+  onFormComplete,
+  onFormCancel,
+}: ManageStrategicInitiativeProjectsFormProps) => {
   const [sourceProjects, setSourceProjects] = useState<ProjectListDto[]>([])
   const [targetProjects, setTargetProjects] = useState<ProjectListDto[]>([])
 
@@ -81,8 +74,37 @@ const ManageStrategicInitiativeProjectsForm = (
     error: projectsError,
   } = useGetPortfolioProjectsQuery(portfolioKey.toString())
 
-  const [manageProjects, { error: manageProjectsError }] =
+  const [manageProjects] =
     useManageStrategicInitiativeProjectsMutation()
+
+  const { isOpen, isSaving, handleOk, handleCancel } = useConfirmModal({
+    onSubmit: useCallback(async () => {
+      try {
+        const request: ManageStrategicInitiativeProjectsRequest = {
+          id: strategicInitiativeId,
+          projectIds: targetProjects.map((item) => item.id),
+        }
+
+        const response = await manageProjects(request)
+        if (response.error) throw response.error
+
+        messageApi.success('Projects updated successfully.')
+        return true
+      } catch (error) {
+        messageApi.error(
+          error.detail ??
+            'An error occurred while updating the projects. Please try again.',
+        )
+        console.error(error)
+        return false
+      }
+    }, [manageProjects, strategicInitiativeId, targetProjects, messageApi]),
+    onComplete: onFormComplete,
+    onCancel: onFormCancel,
+    errorMessage:
+      'An error occurred while managing the projects. Please try again.',
+    permission: 'Permissions.StrategicInitiatives.Update',
+  })
 
   useEffect(() => {
     if (!existingProjectsData) return
@@ -101,7 +123,6 @@ const ManageStrategicInitiativeProjectsForm = (
   }, [projectData, existingProjectsData])
 
   const onDragStop = useCallback((items: ProjectListDto[]) => {
-    // using the functional update form of setState to ensure we are using the latest state
     if (items.length === 0) return
 
     setSourceProjects((prevSource) =>
@@ -114,7 +135,6 @@ const ManageStrategicInitiativeProjectsForm = (
   }, [])
 
   const handleDelete = useCallback((item: ProjectListDto) => {
-    // using the functional update form of setState to ensure we are using the latest state
     if (!item) return
 
     setTargetProjects((prevTarget) =>
@@ -129,55 +149,6 @@ const ManageStrategicInitiativeProjectsForm = (
     [handleDelete],
   )
 
-  const formAction = async (): Promise<boolean> => {
-    try {
-      const request: ManageStrategicInitiativeProjectsRequest = {
-        id: strategicInitiativeId,
-        projectIds: targetProjects.map((item) => item.id),
-      }
-
-      const response = await manageProjects(request)
-
-      if (response.error) {
-        throw response.error
-      }
-
-      messageApi.success(`Projects updated successfully.`)
-
-      return true
-    } catch (error) {
-      messageApi.error(
-        error.detail ??
-          'An error occurred while updating the projects. Please try again.',
-      )
-      console.error(error)
-
-      return false
-    }
-  }
-
-  const handleOk = async () => {
-    setIsSaving(true)
-    try {
-      if (await formAction()) {
-        setIsOpen(false)
-        onFormComplete()
-      }
-    } catch (error) {
-      console.error(error)
-      messageApi.error(
-        'An error occurred while managing the projects. Please try again.',
-      )
-    } finally {
-      setIsSaving(false)
-    }
-  }
-
-  const handleCancel = useCallback(() => {
-    setIsOpen(false)
-    onFormCancel()
-  }, [onFormCancel])
-
   return (
     <Modal
       title="Manage Strategic Initiative Projects"
@@ -188,7 +159,7 @@ const ManageStrategicInitiativeProjectsForm = (
       confirmLoading={isSaving}
       onCancel={handleCancel}
       keyboard={false} // disable esc key to close modal
-      destroyOnHidden={true}
+      destroyOnHidden
     >
       {
         <AgGridTransfer

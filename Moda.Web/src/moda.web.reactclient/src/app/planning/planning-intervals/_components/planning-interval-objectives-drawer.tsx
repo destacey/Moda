@@ -26,7 +26,7 @@ const PlanningIntervalObjectiveDetailsDrawer: FC<
 > = (props: PlanningIntervalObjectiveDetailsDrawerProps) => {
   const [openEditObjectiveForm, setOpenEditObjectiveForm] =
     useState<boolean>(false)
-  const [size, setSize] = useState(getDrawerWidthPixels())
+  const [size, setSize] = useState(() => getDrawerWidthPixels())
   const messageApi = useMessage()
 
   const {
@@ -128,7 +128,6 @@ const PlanningIntervalObjectiveDetailsDrawer: FC<
       </Drawer>
       {openEditObjectiveForm && (
         <EditPlanningIntervalObjectiveForm
-          showForm={openEditObjectiveForm}
           objectiveKey={props.objectiveKey}
           planningIntervalKey={props.planningIntervalKey}
           onFormSave={() => setOpenEditObjectiveForm(false)}

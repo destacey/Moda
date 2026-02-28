@@ -281,7 +281,6 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       {openEditRoadmapForm && (
         <EditRoadmapForm
           roadmapKey={roadmapKey}
-          showForm={openEditRoadmapForm}
           onFormComplete={() => onEditRoadmapFormClosed(true)}
           onFormCancel={() => onEditRoadmapFormClosed(false)}
         />
@@ -290,7 +289,6 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
         <CopyRoadmapForm
           sourceRoadmapId={roadmapData?.id}
           sourceRoadmapName={roadmapData?.name}
-          showForm={openCopyRoadmapForm}
           onFormComplete={onCopyRoadmapFormClosed}
           onFormCancel={onCopyRoadmapFormClosed}
         />
@@ -298,14 +296,12 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       {openDeleteRoadmapForm && (
         <DeleteRoadmapForm
           roadmap={roadmapData}
-          showForm={openDeleteRoadmapForm}
           onFormComplete={() => onDeleteFormClosed(true)}
           onFormCancel={() => onDeleteFormClosed(false)}
         />
       )}
       {openCreateActivityForm && (
         <CreateRoadmapActivityForm
-          showForm={openCreateActivityForm}
           roadmapId={roadmapData?.id}
           onFormComplete={() => onCreateRoadmapActivityFormClosed(true)}
           onFormCancel={() => onCreateRoadmapActivityFormClosed(false)}
@@ -313,7 +309,6 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       )}
       {openCreateTimeboxForm && (
         <CreateRoadmapTimeboxForm
-          showForm={openCreateTimeboxForm}
           roadmapId={roadmapData?.id}
           onFormComplete={() => onCreateRoadmapTimeboxFormClosed(true)}
           onFormCancel={() => onCreateRoadmapTimeboxFormClosed(false)}

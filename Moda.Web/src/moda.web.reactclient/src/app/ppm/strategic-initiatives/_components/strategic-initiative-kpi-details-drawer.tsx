@@ -120,7 +120,7 @@ const StrategicInitiativeKpiDetailsDrawer: FC<
     onRefresh,
   } = props
 
-  const [size, setSize] = useState(getDrawerWidthPixels())
+  const [size, setSize] = useState(() => getDrawerWidthPixels())
   const [openEditKpiForm, setOpenEditKpiForm] = useState(false)
   const [openDeleteKpiForm, setOpenDeleteKpiForm] = useState(false)
   const [openAddMeasurementForm, setOpenAddMeasurementForm] = useState(false)
@@ -459,7 +459,6 @@ const StrategicInitiativeKpiDetailsDrawer: FC<
         <EditStrategicInitiativeKpiForm
           strategicInitiativeId={strategicInitiativeId}
           kpiId={kpiId}
-          showForm={openEditKpiForm}
           onFormComplete={() => onEditFormClosed(true)}
           onFormCancel={() => onEditFormClosed(false)}
         />
@@ -468,7 +467,6 @@ const StrategicInitiativeKpiDetailsDrawer: FC<
         <AddStrategicInitiativeKpiMeasurementForm
           strategicInitiativeId={strategicInitiativeId}
           kpiId={kpiId}
-          showForm={openAddMeasurementForm}
           onFormComplete={() => onAddMeasurementFormClosed(true)}
           onFormCancel={() => onAddMeasurementFormClosed(false)}
         />
@@ -477,7 +475,6 @@ const StrategicInitiativeKpiDetailsDrawer: FC<
         <DeleteStrategicInitiativeKpiForm
           strategicInitiativeId={strategicInitiativeId}
           kpi={kpiData}
-          showForm={openDeleteKpiForm}
           onFormComplete={() => onDeleteKpiFormClosed(true)}
           onFormCancel={() => onDeleteKpiFormClosed(false)}
         />
@@ -486,7 +483,6 @@ const StrategicInitiativeKpiDetailsDrawer: FC<
         <ManageStrategicInitiativeKpiCheckpointPlanForm
           strategicInitiativeId={strategicInitiativeId}
           kpiId={kpiId}
-          showForm={openManageCheckpointPlanForm}
           onFormComplete={() => onManageCheckpointPlanFormClosed(true)}
           onFormCancel={() => onManageCheckpointPlanFormClosed(false)}
         />

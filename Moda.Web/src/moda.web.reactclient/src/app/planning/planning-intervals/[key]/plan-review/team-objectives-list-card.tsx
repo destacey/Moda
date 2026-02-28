@@ -225,7 +225,6 @@ const TeamObjectivesListCard = ({
           planningIntervalKey={planningIntervalKey}
           teamId={teamId}
           order={newObjectiveOrderValue()}
-          showForm={openCreateObjectiveForm}
           onFormCreate={() => onCreateObjectiveFormClosed(true)}
           onFormCancel={() => onCreateObjectiveFormClosed(false)}
         />

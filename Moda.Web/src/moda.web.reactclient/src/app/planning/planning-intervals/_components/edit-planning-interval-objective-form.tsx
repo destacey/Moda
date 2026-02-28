@@ -11,12 +11,8 @@ import {
   Slider,
   Switch,
 } from 'antd'
-import { useCallback, useEffect, useState } from 'react'
-import useAuth from '../../../../components/contexts/auth'
-import {
-  PlanningIntervalObjectiveDetailsDto,
-  UpdatePlanningIntervalObjectiveRequest,
-} from '@/src/services/moda-api'
+import { useCallback, useEffect } from 'react'
+import { UpdatePlanningIntervalObjectiveRequest } from '@/src/services/moda-api'
 import { toFormErrors } from '@/src/utils'
 import dayjs from 'dayjs'
 import { RangePickerProps } from 'antd/es/date-picker'
@@ -28,6 +24,7 @@ import {
   useGetPlanningIntervalQuery,
   useUpdatePlanningIntervalObjectiveMutation,
 } from '@/src/store/features/planning/planning-interval-api'
+import { useModalForm } from '@/src/hooks'
 
 const { Item } = Descriptions
 const { Item: FormItem } = Form
@@ -35,7 +32,6 @@ const { TextArea } = Input
 const { Group: RadioGroup } = Radio
 
 export interface EditPlanningIntervalObjectiveFormProps {
-  showForm: boolean
   planningIntervalKey: number
   objectiveKey: number
   onFormSave: () => void
@@ -82,17 +78,11 @@ const mapToRequestValues = (
 }
 
 const EditPlanningIntervalObjectiveForm = ({
-  showForm,
   planningIntervalKey,
   objectiveKey,
   onFormSave,
   onFormCancel,
 }: EditPlanningIntervalObjectiveFormProps) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-  const [isValid, setIsValid] = useState(false)
-  const [form] = Form.useForm<EditPlanningIntervalObjectiveFormValues>()
-  const formValues = Form.useWatch([], form)
   const messageApi = useMessage()
 
   const { data: planningIntervalData } =
@@ -105,128 +95,73 @@ const EditPlanningIntervalObjectiveForm = ({
 
   const { data: statusOptions } =
     useGetPlanningIntervalObjectiveStatusOptionsQuery()
-  const [updateObjective, { error: mutationError }] =
-    useUpdatePlanningIntervalObjectiveMutation()
+  const [updateObjective] = useUpdatePlanningIntervalObjectiveMutation()
 
-  const { hasPermissionClaim } = useAuth()
-  const canManageObjectives = hasPermissionClaim(
-    'Permissions.PlanningIntervalObjectives.Manage',
-  )
-
-  const mapToFormValues = useCallback(
-    (objective: PlanningIntervalObjectiveDetailsDto) => {
-      if (!objective) {
-        throw new Error('Objective not found')
-      }
-      form.setFieldsValue({
-        objectiveId: objective.id,
-        planningIntervalId: objective.planningInterval.id,
-        teamId: objective.team.id,
-        statusId: objective.status.id,
-        name: objective.name,
-        description: objective.description || '',
-        startDate: objective.startDate ? dayjs(objective.startDate) : undefined,
-        targetDate: objective.targetDate
-          ? dayjs(objective.targetDate)
-          : undefined,
-        progress: objective.progress,
-        isStretch: objective.isStretch,
-      })
-    },
-    [form],
-  )
-
-  const update = async (
-    values: EditPlanningIntervalObjectiveFormValues,
-    objectiveKey: number,
-    planningIntervalKey: number,
-    teamId: string,
-  ) => {
-    try {
-      const request = mapToRequestValues(
-        values,
-        objectiveKey,
-        planningIntervalKey,
-        teamId,
-      )
-      const response = await updateObjective(request)
-      if (response.error) {
-        throw response.error
-      }
-
-      messageApi.success('PI objective updated successfully.')
-
-      return true
-    } catch (error) {
-      if (error.status === 422 && error.errors) {
-        const formErrors = toFormErrors(error.errors)
-        form.setFields(formErrors)
-        messageApi.error('Correct the validation error(s) to continue.')
-      } else {
-        messageApi.error(
-          'An unexpected error occurred while updating the PI objective.',
-        )
-        console.error(error)
-      }
-      return false
-    }
-  }
-
-  const handleOk = async () => {
-    setIsSaving(true)
-    try {
-      const values = await form.validateFields()
-      if (
-        await update(
-          values,
+  const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
+    useModalForm<EditPlanningIntervalObjectiveFormValues>({
+      onSubmit: useCallback(
+        async (values: EditPlanningIntervalObjectiveFormValues, form) => {
+          try {
+            const request = mapToRequestValues(
+              values,
+              objectiveKey,
+              planningIntervalKey,
+              objectiveData?.team.id,
+            )
+            const response = await updateObjective(request)
+            if (response.error) {
+              throw response.error
+            }
+            messageApi.success('PI objective updated successfully.')
+            return true
+          } catch (error) {
+            if (error.status === 422 && error.errors) {
+              const formErrors = toFormErrors(error.errors)
+              form.setFields(formErrors)
+              messageApi.error('Correct the validation error(s) to continue.')
+            } else {
+              messageApi.error(
+                'An unexpected error occurred while updating the PI objective.',
+              )
+              console.error(error)
+            }
+            return false
+          }
+        },
+        [
+          updateObjective,
           objectiveKey,
           planningIntervalKey,
           objectiveData?.team.id,
-        )
-      ) {
-        setIsOpen(false)
-        onFormSave()
-        form.resetFields()
-      }
-    } catch (errorInfo) {
-      console.error('handleOk error', errorInfo)
-    } finally {
-      setIsSaving(false)
-    }
-  }
-
-  const handleCancel = useCallback(() => {
-    setIsOpen(false)
-    onFormCancel()
-    form.resetFields()
-  }, [form, onFormCancel])
+          messageApi,
+        ],
+      ),
+      onComplete: onFormSave,
+      onCancel: onFormCancel,
+      errorMessage:
+        'An unexpected error occurred while updating the PI objective.',
+      permission: 'Permissions.PlanningIntervalObjectives.Manage',
+    })
 
   useEffect(() => {
     if (!objectiveData) return
-    if (canManageObjectives) {
-      setIsOpen(showForm)
-      if (showForm) {
-        mapToFormValues(objectiveData)
-      }
-    } else {
-      handleCancel()
-      messageApi.error('You do not have permission to update PI objectives.')
-    }
-  }, [
-    canManageObjectives,
-    handleCancel,
-    mapToFormValues,
-    messageApi,
-    objectiveData,
-    showForm,
-  ])
-
-  useEffect(() => {
-    form.validateFields({ validateOnly: true }).then(
-      () => setIsValid(true && form.isFieldsTouched()),
-      () => setIsValid(false),
-    )
-  }, [form, formValues])
+    form.setFieldsValue({
+      objectiveId: objectiveData.id,
+      planningIntervalId: objectiveData.planningInterval.id,
+      teamId: objectiveData.team.id,
+      statusId: objectiveData.status.id,
+      name: objectiveData.name,
+      description: objectiveData.description || '',
+      startDate: objectiveData.startDate
+        ? dayjs(objectiveData.startDate)
+        : undefined,
+      targetDate: objectiveData.targetDate
+        ? dayjs(objectiveData.targetDate)
+        : undefined,
+      progress: objectiveData.progress,
+      isStretch: objectiveData.isStretch,
+    })
+  }, [objectiveData, form])
 
   const disabledDate: RangePickerProps['disabledDate'] = useCallback(
     (current) => {
@@ -258,8 +193,8 @@ const EditPlanningIntervalObjectiveForm = ({
         okText="Save"
         confirmLoading={isSaving}
         onCancel={handleCancel}
-        keyboard={false} // disable esc key to close modal
-        destroyOnHidden={true}
+        keyboard={false}
+        destroyOnHidden
       >
         <Form
           form={form}

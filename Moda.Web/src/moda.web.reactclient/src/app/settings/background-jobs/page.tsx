@@ -155,7 +155,6 @@ const BackgroundJobsListPage = () => {
       />
       {openCreateRecurringJobForm && (
         <CreateRecurringJobForm
-          showForm={openCreateRecurringJobForm}
           jobTypes={jobTypeData}
           onFormCreate={() => onCreateRecurringJobFormClosed(true)}
           onFormCancel={() => onCreateRecurringJobFormClosed(false)}

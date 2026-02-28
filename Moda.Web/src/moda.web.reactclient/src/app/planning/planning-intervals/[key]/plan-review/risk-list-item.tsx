@@ -79,7 +79,6 @@ const RiskListItem = ({
       </Card>
       {openUpdateRiskForm && (
         <EditRiskForm
-          showForm={openUpdateRiskForm}
           riskKey={risk.key}
           onFormSave={() => onEditRiskFormClosed(true)}
           onFormCancel={() => onEditRiskFormClosed(false)}

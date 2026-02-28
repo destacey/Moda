@@ -1,17 +1,17 @@
 'use client'
 
 import { Form, Input, Modal, DatePicker, Alert } from 'antd'
-import { useEffect, useState } from 'react'
+import { useCallback } from 'react'
 import { useMessage } from '@/src/components/contexts/messaging'
 import dayjs, { Dayjs } from 'dayjs'
 import { ExclamationCircleOutlined } from '@ant-design/icons'
 import { useCreatePersonalAccessTokenMutation } from '@/src/store/features/user-management/personal-access-tokens-api'
 import { toFormErrors } from '@/src/utils'
+import { useModalForm } from '@/src/hooks'
 
 const { Item } = Form
 
 export interface CreatePersonalAccessTokenFormProps {
-  showForm: boolean
   onFormCreate: (token: string) => void
   onFormCancel: () => void
 }
@@ -22,84 +22,49 @@ interface CreateTokenFormValues {
 }
 
 const CreatePersonalAccessTokenForm = ({
-  showForm,
   onFormCreate,
   onFormCancel,
 }: CreatePersonalAccessTokenFormProps) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-  const [isValid, setIsValid] = useState(false)
-  const [form] = Form.useForm<CreateTokenFormValues>()
-  const formValues = Form.useWatch([], form)
   const messageApi = useMessage()
 
   const [createToken] = useCreatePersonalAccessTokenMutation()
 
-  useEffect(() => {
-    setIsOpen(showForm)
-  }, [showForm])
+  const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
+    useModalForm<CreateTokenFormValues>({
+      onSubmit: useCallback(
+        async (values: CreateTokenFormValues, form) => {
+          try {
+            const response = await createToken({
+              name: values.name,
+              expiresAt: values.expiresAt.toDate(),
+            })
 
-  useEffect(() => {
-    form.validateFields({ validateOnly: true }).then(
-      () => setIsValid(true && form.isFieldsTouched()),
-      () => setIsValid(false),
-    )
-  }, [form, formValues])
+            if (response.error) {
+              throw response.error
+            }
 
-  const create = async (
-    values: CreateTokenFormValues,
-  ): Promise<string | null> => {
-    try {
-      const response = await createToken({
-        name: values.name,
-        expiresAt: values.expiresAt.toDate(),
-      })
-
-      if (response.error) {
-        throw response.error
-      }
-
-      return response.data.token!
-    } catch (error) {
-      if (error.status === 422 && error.errors) {
-        const formErrors = toFormErrors(error.errors)
-        form.setFields(formErrors)
-        messageApi.error('Correct the validation error(s) to continue.')
-      } else {
-        messageApi.error(
-          error.detail ??
-            'An error occurred while creating the PAT. Please try again.',
-        )
-      }
-      return null
-    }
-  }
-
-  const handleOk = async () => {
-    setIsSaving(true)
-    try {
-      const values = await form.validateFields()
-      const token = await create(values)
-
-      if (token) {
-        setIsOpen(false)
-        setIsSaving(false)
-        form.resetFields()
-        onFormCreate(token)
-        messageApi.success('Personal access token created successfully')
-      } else {
-        setIsSaving(false)
-      }
-    } catch (errorInfo) {
-      setIsSaving(false)
-    }
-  }
-
-  const handleCancel = () => {
-    setIsOpen(false)
-    onFormCancel()
-    form.resetFields()
-  }
+            messageApi.success('Personal access token created successfully')
+            onFormCreate(response.data.token!)
+            return false
+          } catch (error) {
+            if (error.status === 422 && error.errors) {
+              const formErrors = toFormErrors(error.errors)
+              form.setFields(formErrors)
+              messageApi.error('Correct the validation error(s) to continue.')
+            } else {
+              messageApi.error(
+                error.detail ??
+                  'An error occurred while creating the PAT. Please try again.',
+              )
+            }
+            return false
+          }
+        },
+        [createToken, messageApi, onFormCreate],
+      ),
+      onComplete: () => {},
+      onCancel: onFormCancel,
+    })
 
   return (
     <Modal
@@ -111,7 +76,7 @@ const CreatePersonalAccessTokenForm = ({
       confirmLoading={isSaving}
       onCancel={handleCancel}
       keyboard={false}
-      destroyOnHidden={true}
+      destroyOnHidden
       width={600}
     >
       <Alert

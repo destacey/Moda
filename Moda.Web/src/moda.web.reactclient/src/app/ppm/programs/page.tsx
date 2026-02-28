@@ -65,7 +65,6 @@ const ProgramsPage: FC = () => {
       />
       {openCreateProgramForm && (
         <CreateProgramForm
-          showForm={openCreateProgramForm}
           onFormComplete={() => onCreateProgramFormClosed(true)}
           onFormCancel={() => onCreateProgramFormClosed(false)}
         />

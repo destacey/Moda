@@ -27,9 +27,10 @@ export const teamApi = apiSlice.injectEndpoints({
     getTeams: builder.query<TeamListItem[], boolean>({
       queryFn: async (includeInactive) => {
         try {
-          const teams = await getTeamsClient().getList(includeInactive)
-          const teamsOfTeams =
-            await getTeamsOfTeamsClient().getList(includeInactive)
+          const [teams, teamsOfTeams] = await Promise.all([
+            getTeamsClient().getList(includeInactive),
+            getTeamsOfTeamsClient().getList(includeInactive),
+          ])
           const data = [
             ...(teams as TeamListItem[]),
             ...(teamsOfTeams as TeamListItem[]),
@@ -108,9 +109,10 @@ export const teamApi = apiSlice.injectEndpoints({
     getTeamOptions: builder.query<BaseOptionType[], boolean>({
       queryFn: async (includeInactive) => {
         try {
-          const teams = await getTeamsClient().getList(includeInactive)
-          const teamsOfTeams =
-            await getTeamsOfTeamsClient().getList(includeInactive)
+          const [teams, teamsOfTeams] = await Promise.all([
+            getTeamsClient().getList(includeInactive),
+            getTeamsOfTeamsClient().getList(includeInactive),
+          ])
           const teamsData = [
             ...(teams as TeamListItem[]),
             ...(teamsOfTeams as TeamListItem[]),
