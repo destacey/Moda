@@ -1,73 +1,55 @@
 import { useMessage } from '@/src/components/contexts/messaging'
-import { authorizeFormWithPropCallback } from '@/src/components/hoc'
+import { useConfirmModal } from '@/src/hooks'
 import { PlanningIntervalObjectiveDetailsDto } from '@/src/services/moda-api'
 import { useDeletePlanningIntervalObjectiveMutation } from '@/src/store/features/planning/planning-interval-api'
 import { Modal } from 'antd'
-import { useEffect, useState } from 'react'
+import { useCallback } from 'react'
 
-interface DeletePlanningIntervalObjectiveFormProps {
-  showForm: boolean
+export interface DeletePlanningIntervalObjectiveFormProps {
   objective: PlanningIntervalObjectiveDetailsDto
   onFormSave: () => void
   onFormCancel: () => void
 }
 
 const DeletePlanningIntervalObjectiveForm = ({
-  showForm,
   objective,
   onFormSave,
   onFormCancel,
 }: DeletePlanningIntervalObjectiveFormProps) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-
   const messageApi = useMessage()
 
-  const [deleteObjective, { error: mutationError }] =
-    useDeletePlanningIntervalObjectiveMutation()
+  const [deleteObjective] = useDeletePlanningIntervalObjectiveMutation()
 
-  const formAction = async (objective: PlanningIntervalObjectiveDetailsDto) => {
-    const response = await deleteObjective({
-      planningIntervalId: objective.planningInterval.id,
-      planningIntervalKey: objective.planningInterval.key,
-      objectiveId: objective.id,
-      objectiveKey: objective.key,
-      teamId: objective.team.id,
-    })
-
-    if (response.error) {
-      throw response.error
-    }
-  }
-
-  const handleOk = async () => {
-    setIsSaving(true)
-    try {
-      await formAction(objective)
-      messageApi.success('Successfully deleted PI objective.')
-      setIsOpen(false)
-      onFormSave()
-    } catch (error) {
-      console.log('handleOk error', error)
-      messageApi.error(
-        error.detail ??
-          'An unexpected error occurred while deleting the objective.',
-      )
-    } finally {
-      setIsSaving(false)
-    }
-  }
-
-  const handleCancel = () => {
-    setIsOpen(false)
-    onFormCancel()
-  }
-
-  useEffect(() => {
-    if (!objective) return
-
-    setIsOpen(showForm)
-  }, [objective, showForm])
+  const { isOpen, isSaving, handleOk, handleCancel } = useConfirmModal({
+    onSubmit: useCallback(async () => {
+      try {
+        const response = await deleteObjective({
+          planningIntervalId: objective.planningInterval.id,
+          planningIntervalKey: objective.planningInterval.key,
+          objectiveId: objective.id,
+          objectiveKey: objective.key,
+          teamId: objective.team.id,
+        })
+        if (response.error) {
+          throw response.error
+        }
+        messageApi.success('Successfully deleted PI objective.')
+        return true
+      } catch (error) {
+        messageApi.error(
+          error.detail ??
+            'An unexpected error occurred while deleting the objective.',
+        )
+        console.error(error)
+        return false
+      }
+    }, [deleteObjective, objective, messageApi]),
+    onComplete: onFormSave,
+    onCancel: onFormCancel,
+    errorMessage:
+      'An unexpected error occurred while deleting the objective.',
+    permission: 'Permissions.PlanningIntervalObjectives.Manage',
+  })
 
   return (
     <Modal
@@ -78,19 +60,12 @@ const DeletePlanningIntervalObjectiveForm = ({
       okType="danger"
       confirmLoading={isSaving}
       onCancel={handleCancel}
-      keyboard={false} // disable esc key to close modal
-      destroyOnHidden={true}
+      keyboard={false}
+      destroyOnHidden
     >
       {objective?.key} - {objective?.name}
     </Modal>
   )
 }
 
-// Wrap with authorization HOC - this is created outside render and reused
-const AuthorizedDeletePlanningIntervalObjectiveForm = authorizeFormWithPropCallback(
-  DeletePlanningIntervalObjectiveForm,
-  'Permission',
-  'Permissions.PlanningIntervalObjectives.Manage',
-)
-
-export default AuthorizedDeletePlanningIntervalObjectiveForm
+export default DeletePlanningIntervalObjectiveForm

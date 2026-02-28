@@ -133,7 +133,6 @@ const AzdoProcess = (props: AzdoProcessProps) => {
       </Flex>
       {openInitWorkProcessIntegrationForm && (
         <InitWorkProcessIntegrationForm
-          showForm={openInitWorkProcessIntegrationForm}
           connectionId={azdoConnection.connectionId}
           externalId={props.workProcess.externalId}
           onFormSave={() => onInitWorkProcessIntegrationFormClosed(true)}

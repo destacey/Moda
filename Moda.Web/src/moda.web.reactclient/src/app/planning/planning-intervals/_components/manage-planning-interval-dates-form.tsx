@@ -10,13 +10,8 @@ import {
   Modal,
   Select,
 } from 'antd'
-import { useCallback, useEffect, useState } from 'react'
-import useAuth from '@/src/components/contexts/auth'
-import {
-  PlanningIntervalDetailsDto,
-  ManagePlanningIntervalDatesRequest,
-  PlanningIntervalIterationListDto,
-} from '@/src/services/moda-api'
+import { useCallback, useEffect } from 'react'
+import { ManagePlanningIntervalDatesRequest } from '@/src/services/moda-api'
 import { toFormErrors } from '@/src/utils'
 import dayjs from 'dayjs'
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons'
@@ -27,11 +22,11 @@ import {
   useGetPlanningIntervalQuery,
   useUpdatePlanningIntervalDatesMutation,
 } from '@/src/store/features/planning/planning-interval-api'
+import { useModalForm } from '@/src/hooks'
 
 const { Item, List } = Form
 
 export interface ManagePlanningIntervalDatesFormProps {
-  showForm: boolean
   id: string
   planningIntervalKey: number
   onFormSave: () => void
@@ -71,18 +66,11 @@ const mapToRequestValues = (
 }
 
 const ManagePlanningIntervalDatesForm = ({
-  showForm,
   id,
   planningIntervalKey,
   onFormSave,
   onFormCancel,
 }: ManagePlanningIntervalDatesFormProps) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-  const [isValid, setIsValid] = useState(false)
-
-  const [form] = Form.useForm<ManagePlanningIntervalDatesFormValues>()
-  const formValues = Form.useWatch([], form)
   const messageApi = useMessage()
 
   const { data: planningIntervalData } =
@@ -92,134 +80,61 @@ const ManagePlanningIntervalDatesForm = ({
   const { data: iterationCategoriesOptions } =
     useGetPlanningIntervalIterationCategoryOptionsQuery()
 
-  const [managePlanningIntervalDates, { error: mutationError }] =
-    useUpdatePlanningIntervalDatesMutation()
+  const [managePlanningIntervalDates] = useUpdatePlanningIntervalDatesMutation()
 
-  const { hasPermissionClaim } = useAuth()
-  const canUpdatePlanningInterval = hasPermissionClaim(
-    'Permissions.PlanningIntervals.Update',
-  )
-
-  const mapToFormValues = useCallback(
-    (
-      planningInterval: PlanningIntervalDetailsDto,
-      iterationsData: PlanningIntervalIterationListDto[],
-    ) => {
-      form.setFieldsValue({
-        start: dayjs(planningInterval.start),
-        end: dayjs(planningInterval.end),
-        iterations: iterationsData.map((iteration) => ({
-          iterationId: iteration.id,
-          name: iteration.name,
-          categoryId: iteration.category.id,
-          start: dayjs(iteration.start),
-          end: dayjs(iteration.end),
-        })),
-      })
-    },
-    [form],
-  )
-
-  const update = async (
-    values: ManagePlanningIntervalDatesFormValues,
-    id: string,
-  ): Promise<boolean> => {
-    try {
-      const request = mapToRequestValues(values, id)
-      const response = await managePlanningIntervalDates({
-        request,
-        cacheKey: planningIntervalKey,
-      })
-      if (response.error) {
-        throw response.error
-      }
-      messageApi.success('Planning interval dates updated successfully.')
-
-      return true
-    } catch (error) {
-      if (error.status === 422 && error.errors) {
-        const formErrors = toFormErrors(error.errors)
-        form.setFields(formErrors)
-        messageApi.error('Correct the validation error(s) to continue.')
-      } else {
-        messageApi.error(
-          error.detail ??
-            'An error occurred while updating the planning interval dates.',
-        )
-        console.error(error)
-      }
-      return false
-    }
-  }
-
-  const handleOk = async () => {
-    setIsSaving(true)
-    try {
-      const values = await form.validateFields()
-      if (await update(values, id)) {
-        setIsOpen(false)
-        form.resetFields()
-        onFormSave()
-      }
-    } catch (errorInfo) {
-      console.error('handleOk error', errorInfo)
-    } finally {
-      setIsSaving(false)
-    }
-  }
-
-  const handleCancel = useCallback(() => {
-    setIsOpen(false)
-    onFormCancel()
-    form.resetFields()
-  }, [onFormCancel, form])
-
-  const loadData = useCallback(async () => {
-    try {
-      mapToFormValues(planningIntervalData, iterationsData)
-      setIsValid(true)
-    } catch (error) {
-      handleCancel()
-      messageApi.error('An unexpected error occurred while loading form data.')
-      console.error(error)
-    }
-  }, [
-    handleCancel,
-    iterationsData,
-    mapToFormValues,
-    messageApi,
-    planningIntervalData,
-  ])
+  const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
+    useModalForm<ManagePlanningIntervalDatesFormValues>({
+      onSubmit: useCallback(
+        async (values: ManagePlanningIntervalDatesFormValues, form) => {
+          try {
+            const request = mapToRequestValues(values, id)
+            const response = await managePlanningIntervalDates({
+              request,
+              cacheKey: planningIntervalKey,
+            })
+            if (response.error) {
+              throw response.error
+            }
+            messageApi.success('Planning interval dates updated successfully.')
+            return true
+          } catch (error) {
+            if (error.status === 422 && error.errors) {
+              const formErrors = toFormErrors(error.errors)
+              form.setFields(formErrors)
+              messageApi.error('Correct the validation error(s) to continue.')
+            } else {
+              messageApi.error(
+                error.detail ??
+                  'An error occurred while updating the planning interval dates.',
+              )
+              console.error(error)
+            }
+            return false
+          }
+        },
+        [managePlanningIntervalDates, id, planningIntervalKey, messageApi],
+      ),
+      onComplete: onFormSave,
+      onCancel: onFormCancel,
+      errorMessage:
+        'An error occurred while updating the planning interval dates.',
+      permission: 'Permissions.PlanningIntervals.Update',
+    })
 
   useEffect(() => {
-    if (!planningIntervalData || !iterationsData || !iterationCategoriesOptions)
-      return
-    if (canUpdatePlanningInterval) {
-      setIsOpen(showForm)
-      if (showForm) {
-        loadData()
-      }
-    } else {
-      onFormCancel()
-      messageApi.error('You do not have permission to edit planning intervals.')
-    }
-  }, [
-    canUpdatePlanningInterval,
-    iterationCategoriesOptions,
-    iterationsData,
-    loadData,
-    messageApi,
-    onFormCancel,
-    planningIntervalData,
-    showForm,
-  ])
-
-  useEffect(() => {
-    form.validateFields({ validateOnly: true }).then(
-      () => setIsValid(true && form.isFieldsTouched()),
-      () => setIsValid(false),
-    )
-  }, [form, formValues])
+    if (!planningIntervalData || !iterationsData) return
+    form.setFieldsValue({
+      start: dayjs(planningIntervalData.start),
+      end: dayjs(planningIntervalData.end),
+      iterations: iterationsData.map((iteration) => ({
+        iterationId: iteration.id,
+        name: iteration.name,
+        categoryId: iteration.category.id,
+        start: dayjs(iteration.start),
+        end: dayjs(iteration.end),
+      })),
+    })
+  }, [planningIntervalData, iterationsData, form])
 
   return (
     <Modal
@@ -230,8 +145,8 @@ const ManagePlanningIntervalDatesForm = ({
       okText="Save"
       confirmLoading={isSaving}
       onCancel={handleCancel}
-      keyboard={false} // disable esc key to close modal
-      destroyOnHidden={true}
+      keyboard={false}
+      destroyOnHidden
     >
       <Form
         form={form}

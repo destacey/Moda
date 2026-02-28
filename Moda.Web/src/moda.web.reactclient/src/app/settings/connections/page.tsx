@@ -97,7 +97,6 @@ const ConnectionsPage = () => {
 
       {openCreateConnectionForm && (
         <CreateConnectionForm
-          showForm={openCreateConnectionForm}
           onFormCreate={() => setOpenCreateConnectionForm(false)}
           onFormCancel={() => setOpenCreateConnectionForm(false)}
         />

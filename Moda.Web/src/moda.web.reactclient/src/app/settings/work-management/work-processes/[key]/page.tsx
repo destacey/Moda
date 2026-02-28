@@ -123,7 +123,6 @@ const WorkProcessDetailsPage = (props: {
       </Card>
       {openChangeWorkProcessIsActiveForm && (
         <ChangeWorkProcessIsActiveForm
-          showForm={openChangeWorkProcessIsActiveForm}
           workProcessId={workProcessData?.id}
           workProcessName={workProcessData?.name}
           isActive={!!workProcessData?.isActive}

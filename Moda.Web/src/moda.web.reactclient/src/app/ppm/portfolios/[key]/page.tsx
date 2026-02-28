@@ -370,7 +370,6 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       {openEditPortfolioForm && (
         <EditPortfolioForm
           portfolioKey={portfolioData?.key}
-          showForm={openEditPortfolioForm}
           onFormComplete={() => onEditPortfolioFormClosed(true)}
           onFormCancel={() => onEditPortfolioFormClosed(false)}
         />
@@ -379,7 +378,6 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
         <ChangePortfolioStatusForm
           portfolio={portfolioData}
           statusAction={PortfolioStatusAction.Activate}
-          showForm={openActivatePortfolioForm}
           onFormComplete={() => onActivatePortfolioFormClosed(true)}
           onFormCancel={() => onActivatePortfolioFormClosed(false)}
         />
@@ -388,7 +386,6 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
         <ChangePortfolioStatusForm
           portfolio={portfolioData}
           statusAction={PortfolioStatusAction.Close}
-          showForm={openClosePortfolioForm}
           onFormComplete={() => onClosePortfolioFormClosed(true)}
           onFormCancel={() => onClosePortfolioFormClosed(false)}
         />
@@ -397,7 +394,6 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
         <ChangePortfolioStatusForm
           portfolio={portfolioData}
           statusAction={PortfolioStatusAction.Archive}
-          showForm={openArchivePortfolioForm}
           onFormComplete={() => onArchivePortfolioFormClosed(true)}
           onFormCancel={() => onArchivePortfolioFormClosed(false)}
         />
@@ -405,7 +401,6 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       {openDeletePortfolioForm && (
         <DeletePortfolioForm
           portfolio={portfolioData}
-          showForm={openDeletePortfolioForm}
           onFormComplete={() => onDeletePortfolioFormClosed(true)}
           onFormCancel={() => onDeletePortfolioFormClosed(false)}
         />

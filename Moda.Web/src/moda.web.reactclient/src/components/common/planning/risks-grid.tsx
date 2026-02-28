@@ -194,14 +194,12 @@ const RisksGrid = ({
       {openCreateRiskForm && (
         <CreateRiskForm
           createForTeamId={teamId}
-          showForm={openCreateRiskForm}
           onFormCreate={() => onCreateRiskFormClosed(true)}
           onFormCancel={() => onCreateRiskFormClosed(false)}
         />
       )}
       {openUpdateRiskForm && (
         <EditRiskForm
-          showForm={openUpdateRiskForm}
           riskKey={editRiskKey}
           onFormSave={() => onEditRiskFormClosed(true)}
           onFormCancel={() => onEditRiskFormClosed(false)}

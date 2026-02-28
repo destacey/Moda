@@ -144,7 +144,6 @@ const WorkspaceDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       </Card>
       {openSetWorkspaceExternalUrlTemplatesForm && (
         <SetWorkspaceExternalUrlTemplatesForm
-          showForm={openSetWorkspaceExternalUrlTemplatesForm}
           workspaceId={workspaceData.id}
           onFormUpdate={() =>
             onSetWorkspaceExternalUrlTemplatesFormClosed(true)

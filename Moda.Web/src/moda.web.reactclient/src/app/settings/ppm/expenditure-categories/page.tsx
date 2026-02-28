@@ -106,7 +106,6 @@ const ExpenditureCategoriesPage = () => {
       />
       {openCreateExpenditureCategoryForm && (
         <CreateExpenditureCategoryForm
-          showForm={openCreateExpenditureCategoryForm}
           onFormComplete={() => onCreateExpenditureCategoryFormClosed(true)}
           onFormCancel={() => onCreateExpenditureCategoryFormClosed(false)}
         />

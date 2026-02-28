@@ -1,7 +1,7 @@
 'use client'
 
-import useAuth from '@/src/components/contexts/auth'
 import { useMessage } from '@/src/components/contexts/messaging'
+import { useModalForm } from '@/src/hooks'
 import {
   KpiCheckpointPlanItemRequest,
   KpiTargetDirection,
@@ -28,7 +28,7 @@ import {
   Typography,
 } from 'antd'
 import dayjs from 'dayjs'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 
 type InputNumberRef = { focus: () => void } | null
 
@@ -39,7 +39,6 @@ const { Text } = Typography
 export interface ManageStrategicInitiativeKpiCheckpointPlanFormProps {
   strategicInitiativeId: string
   kpiId: string
-  showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
 }
@@ -76,31 +75,15 @@ const mapToRequestValues = (
   }
 }
 
-const ManageStrategicInitiativeKpiCheckpointPlanForm = (
-  props: ManageStrategicInitiativeKpiCheckpointPlanFormProps,
-) => {
-  const {
-    strategicInitiativeId,
-    kpiId,
-    showForm,
-    onFormComplete,
-    onFormCancel,
-  } = props
-
-  const [isOpen, setIsOpen] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-  const [isValid, setIsValid] = useState(false)
-
-  const [form] = Form.useForm<ManageKpiCheckpointPlanFormValues>()
-  const formValues = Form.useWatch([], form)
+const ManageStrategicInitiativeKpiCheckpointPlanForm = ({
+  strategicInitiativeId,
+  kpiId,
+  onFormComplete,
+  onFormCancel,
+}: ManageStrategicInitiativeKpiCheckpointPlanFormProps) => {
   const messageApi = useMessage()
   const newRowDateLabelRef = useRef<InputRef>(null)
   const targetValueRefs = useRef<InputNumberRef[]>([])
-
-  const { hasPermissionClaim } = useAuth()
-  const canUpdateKpis = hasPermissionClaim(
-    'Permissions.StrategicInitiatives.Update',
-  )
 
   const { data: kpiData } = useGetStrategicInitiativeKpiQuery({
     strategicInitiativeId,
@@ -110,100 +93,68 @@ const ManageStrategicInitiativeKpiCheckpointPlanForm = (
   const targetValuePrefix = kpiData?.prefix ?? undefined
   const targetValueSuffix = kpiData?.suffix ?? undefined
 
+  const [manageCheckpointPlan] =
+    useManageStrategicInitiativeKpiCheckpointPlanMutation()
+
+  const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
+    useModalForm<ManageKpiCheckpointPlanFormValues>({
+      onSubmit: useCallback(
+        async (values: ManageKpiCheckpointPlanFormValues, form) => {
+          try {
+            const request = mapToRequestValues(
+              values,
+              strategicInitiativeId,
+              kpiId,
+            )
+            const response = await manageCheckpointPlan(request)
+            if (response.error) throw response.error
+
+            messageApi.success('KPI checkpoint plan updated successfully.')
+            return true
+          } catch (error) {
+            if (error.status === 422 && error.errors) {
+              const formErrors = toFormErrors(error.errors)
+              form.setFields(formErrors)
+              messageApi.error('Correct the validation error(s) to continue.')
+            } else {
+              messageApi.error(
+                error.detail ??
+                  'An error occurred while updating the KPI checkpoint plan. Please try again.',
+              )
+              console.error(error)
+            }
+            return false
+          }
+        },
+        [manageCheckpointPlan, strategicInitiativeId, kpiId, messageApi],
+      ),
+      onComplete: onFormComplete,
+      onCancel: onFormCancel,
+      errorMessage:
+        'An error occurred while updating the KPI checkpoint plan. Please try again.',
+      permission: 'Permissions.StrategicInitiatives.Update',
+    })
+
   const { data: checkpointPlanData } =
     useGetStrategicInitiativeKpiCheckpointsQuery(
       { strategicInitiativeId, kpiId },
       { skip: !isOpen },
     )
 
-  const [manageCheckpointPlan] =
-    useManageStrategicInitiativeKpiCheckpointPlanMutation()
-
-  const mapToFormValues = useCallback(() => {
-    form.setFieldsValue({
-      checkpoints: (checkpointPlanData ?? []).map((c) => ({
-        checkpointId: c.id,
-        targetValue: c.targetValue,
-        atRiskValue: c.atRiskValue ?? undefined,
-        checkpointDate: dayjs(c.checkpointDate),
-        dateLabel: c.dateLabel,
-      })),
-    })
-  }, [form, checkpointPlanData])
-
-  const formAction = async (
-    values: ManageKpiCheckpointPlanFormValues,
-  ): Promise<boolean> => {
-    try {
-      const request = mapToRequestValues(values, strategicInitiativeId, kpiId)
-      const response = await manageCheckpointPlan(request)
-
-      if (response.error) {
-        throw response.error
-      }
-
-      messageApi.success('KPI checkpoint plan updated successfully.')
-      return true
-    } catch (error) {
-      if (error.status === 422 && error.errors) {
-        const formErrors = toFormErrors(error.errors)
-        form.setFields(formErrors)
-        messageApi.error('Correct the validation error(s) to continue.')
-      } else {
-        messageApi.error(
-          error.detail ??
-            'An error occurred while updating the KPI checkpoint plan. Please try again.',
-        )
-        console.error(error)
-      }
-      return false
-    }
-  }
-
-  const handleOk = async () => {
-    setIsSaving(true)
-    try {
-      const values = await form.validateFields()
-      if (await formAction(values)) {
-        setIsOpen(false)
-        form.resetFields()
-        onFormComplete()
-      }
-    } catch (error) {
-      console.error('handleOk error', error)
-    } finally {
-      setIsSaving(false)
-    }
-  }
-
-  const handleCancel = useCallback(() => {
-    setIsOpen(false)
-    form.resetFields()
-    onFormCancel()
-  }, [form, onFormCancel])
-
-  useEffect(() => {
-    if (!kpiData) return
-    if (canUpdateKpis) {
-      setIsOpen(showForm)
-    } else {
-      onFormCancel()
-      messageApi.error('You do not have permission to update KPIs.')
-    }
-  }, [canUpdateKpis, kpiData, messageApi, onFormCancel, showForm])
-
+  // Initialize form values when checkpoint data is loaded
   useEffect(() => {
     if (isOpen && checkpointPlanData !== undefined) {
-      mapToFormValues()
+      form.setFieldsValue({
+        checkpoints: (checkpointPlanData ?? []).map((c) => ({
+          checkpointId: c.id,
+          targetValue: c.targetValue,
+          atRiskValue: c.atRiskValue ?? undefined,
+          checkpointDate: dayjs(c.checkpointDate),
+          dateLabel: c.dateLabel,
+        })),
+      })
     }
-  }, [isOpen, checkpointPlanData, mapToFormValues])
-
-  useEffect(() => {
-    form.validateFields({ validateOnly: true }).then(
-      () => setIsValid(true && form.isFieldsTouched()),
-      () => setIsValid(false),
-    )
-  }, [form, formValues])
+  }, [isOpen, checkpointPlanData, form])
 
   return (
     <Modal
@@ -215,7 +166,7 @@ const ManageStrategicInitiativeKpiCheckpointPlanForm = (
       confirmLoading={isSaving}
       onCancel={handleCancel}
       keyboard={false}
-      destroyOnHidden={true}
+      destroyOnHidden
       width={750}
     >
       <Form

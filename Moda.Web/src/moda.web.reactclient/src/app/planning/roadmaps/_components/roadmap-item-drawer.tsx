@@ -96,7 +96,6 @@ const RoadmapItemDrawer: FC<RoadmapItemDrawerProps> = (
       </Drawer>
       {itemData?.type.name === 'Activity' && openEditRoadmapItemForm && (
         <EditRoadmapActivityForm
-          showForm={openEditRoadmapItemForm}
           activityId={itemData.id}
           roadmapId={props.roadmapId}
           onFormComplete={() => setOpenEditRoadmapItemForm(false)}
@@ -105,7 +104,6 @@ const RoadmapItemDrawer: FC<RoadmapItemDrawerProps> = (
       )}
       {itemData?.type.name === 'Timebox' && openEditRoadmapItemForm && (
         <EditRoadmapTimeboxForm
-          showForm={openEditRoadmapItemForm}
           timeboxId={itemData.id}
           roadmapId={props.roadmapId}
           onFormComplete={() => setOpenEditRoadmapItemForm(false)}

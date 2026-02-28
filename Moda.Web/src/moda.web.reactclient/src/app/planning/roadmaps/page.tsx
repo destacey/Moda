@@ -54,7 +54,6 @@ const RoadmapsPage: FC = () => {
       />
       {openCreateRoadmapForm && (
         <CreateRoadmapForm
-          showForm={openCreateRoadmapForm}
           onFormComplete={() => onCreateRoadmapFormClosed(true)}
           onFormCancel={() => onCreateRoadmapFormClosed(false)}
         />

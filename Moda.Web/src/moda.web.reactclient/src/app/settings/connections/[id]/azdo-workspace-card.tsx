@@ -75,7 +75,6 @@ const AzdoWorkspaceCard = (props: AzdoWorkspaceCardProps) => {
       </Card>
       {openInitWorkspaceIntegrationForm && (
         <InitWorkspaceIntegrationForm
-          showForm={openInitWorkspaceIntegrationForm}
           connectionId={azdoConnection.connectionId}
           externalId={props.workspace.externalId}
           workspaceName={props.workspace.name}
@@ -85,7 +84,6 @@ const AzdoWorkspaceCard = (props: AzdoWorkspaceCardProps) => {
       )}
       {openMapAzdoWorkspaceTeamsForm && (
         <MapAzdoWorkspaceTeamsForm
-          showForm={openMapAzdoWorkspaceTeamsForm}
           connectionId={azdoConnection.connectionId}
           workspaceId={props.workspace.externalId}
           workspaceName={props.workspace.name}

@@ -135,7 +135,6 @@ const LinksCard = ({ objectId, width = 300 }: LinksCardProps) => {
       {openCreateLinkForm && (
         <CreateLinkForm
           objectId={objectId}
-          showForm={openCreateLinkForm}
           onFormCreate={() => setOpenCreateLinkForm(false)}
           onFormCancel={() => setOpenCreateLinkForm(false)}
         />

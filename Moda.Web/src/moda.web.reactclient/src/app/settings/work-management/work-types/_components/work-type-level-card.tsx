@@ -80,7 +80,6 @@ const WorkTypeLevelCard = (props: WorkTypeLevelCardProps) => {
       {props.canUpdateWorkTypeLevels && (
         <EditWorkTypeLevelForm
           levelId={props.level.id}
-          showForm={openEditWorkTypeLevelForm}
           onFormSave={() => onEditObjectiveFormClosed(true)}
           onFormCancel={() => onEditObjectiveFormClosed(false)}
         />

@@ -363,7 +363,6 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       {openEditProjectForm && (
         <EditProjectForm
           projectKey={projectData?.key}
-          showForm={openEditProjectForm}
           onFormComplete={() => onEditProjectFormClosed(true)}
           onFormCancel={() => onEditProjectFormClosed(false)}
         />
@@ -371,7 +370,6 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       {openChangeProgramForm && (
         <ChangeProjectProgramForm
           project={projectData}
-          showForm={openChangeProgramForm}
           onFormComplete={() => onChangeProgramFormClosed(true)}
           onFormCancel={() => onChangeProgramFormClosed(false)}
         />
@@ -387,7 +385,6 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
         <ChangeProjectStatusForm
           project={projectData}
           statusAction={ProjectStatusAction.Activate}
-          showForm={openActivateProjectForm}
           onFormComplete={() => onActivateProjectFormClosed(true)}
           onFormCancel={() => onActivateProjectFormClosed(false)}
         />
@@ -396,7 +393,6 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
         <ChangeProjectStatusForm
           project={projectData}
           statusAction={ProjectStatusAction.Complete}
-          showForm={openCompleteProjectForm}
           onFormComplete={() => onCompleteProjectFormClosed(true)}
           onFormCancel={() => onCompleteProjectFormClosed(false)}
         />
@@ -405,7 +401,6 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
         <ChangeProjectStatusForm
           project={projectData}
           statusAction={ProjectStatusAction.Cancel}
-          showForm={openCancelProjectForm}
           onFormComplete={() => onCancelProjectFormClosed(true)}
           onFormCancel={() => onCancelProjectFormClosed(false)}
         />
@@ -413,7 +408,6 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       {openDeleteProjectForm && (
         <DeleteProjectForm
           project={projectData}
-          showForm={openDeleteProjectForm}
           onFormComplete={() => onDeleteProjectFormClosed(true)}
           onFormCancel={() => onDeleteProjectFormClosed(false)}
         />

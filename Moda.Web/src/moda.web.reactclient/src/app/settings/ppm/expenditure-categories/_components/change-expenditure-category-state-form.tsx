@@ -1,6 +1,5 @@
 'use client'
 
-import useAuth from '@/src/components/contexts/auth'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { ExpenditureCategoryDetailsDto } from '@/src/services/moda-api'
 import {
@@ -8,7 +7,8 @@ import {
   useArchiveExpenditureCategoryMutation,
 } from '@/src/store/features/ppm/expenditure-categories-api'
 import { Modal, Space } from 'antd'
-import { useEffect, useState } from 'react'
+import { useCallback } from 'react'
+import { useConfirmModal } from '@/src/hooks'
 
 export enum ExpenditureCategoryStateAction {
   Activate = 'Activate',
@@ -18,109 +18,80 @@ export enum ExpenditureCategoryStateAction {
 export interface ChangeExpenditureCategoryStateFormProps {
   expenditureCategory: ExpenditureCategoryDetailsDto
   stateAction: ExpenditureCategoryStateAction
-  showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
 }
 
-const ChangeExpenditureCategoryStateForm = (
-  props: ChangeExpenditureCategoryStateFormProps,
-) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-
+const ChangeExpenditureCategoryStateForm = ({
+  expenditureCategory,
+  stateAction,
+  onFormComplete,
+  onFormCancel,
+}: ChangeExpenditureCategoryStateFormProps) => {
   const messageApi = useMessage()
 
-  const [activateExpenditureCategoryMutation, { error: activateError }] =
+  const [activateExpenditureCategoryMutation] =
     useActivateExpenditureCategoryMutation()
-  const [archiveExpenditureCategoryMutation, { error: archiveError }] =
+  const [archiveExpenditureCategoryMutation] =
     useArchiveExpenditureCategoryMutation()
 
-  const { hasPermissionClaim } = useAuth()
-  const canUpdateExpenditureCategory = hasPermissionClaim(
-    'Permissions.ExpenditureCategories.Update',
-  )
+  const { isOpen, isSaving, handleOk, handleCancel } = useConfirmModal({
+    onSubmit: useCallback(async () => {
+      try {
+        let response = null
+        if (stateAction === ExpenditureCategoryStateAction.Activate) {
+          response = await activateExpenditureCategoryMutation(expenditureCategory.id)
+        } else if (stateAction === ExpenditureCategoryStateAction.Archive) {
+          response = await archiveExpenditureCategoryMutation(expenditureCategory.id)
+        }
 
-  const changeState = async (
-    id: number,
-    stateAction: ExpenditureCategoryStateAction,
-  ) => {
-    try {
-      let response = null
-      if (stateAction === ExpenditureCategoryStateAction.Activate) {
-        response = await activateExpenditureCategoryMutation(id)
-      } else if (stateAction === ExpenditureCategoryStateAction.Archive) {
-        response = await archiveExpenditureCategoryMutation(id)
-      }
+        if (response.error) {
+          throw response.error
+        }
 
-      if (response.error) {
-        throw response.error
-      }
-
-      return true
-    } catch (error) {
-      messageApi.error(
-        error.detail ??
-          `An unexpected error occurred while ${stateAction}ing the expenditure category.`,
-      )
-      console.log(error)
-      return false
-    }
-  }
-
-  const handleOk = async () => {
-    setIsSaving(true)
-    try {
-      if (await changeState(props.expenditureCategory.id, props.stateAction)) {
         messageApi.success(
-          `Successfully ${props.stateAction}d expenditure category.`,
+          `Successfully ${stateAction}d expenditure category.`,
         )
-        props.onFormComplete()
-        setIsOpen(false)
+        return true
+      } catch (error) {
+        messageApi.error(
+          error.detail ??
+            `An unexpected error occurred while ${stateAction}ing the expenditure category.`,
+        )
+        console.log(error)
+        return false
       }
-    } catch (errorInfo) {
-      console.log('handleOk error', errorInfo)
-      messageApi.error(
-        `An unexpected error occurred while ${props.stateAction}ing the expenditure category.`,
-      )
-    } finally {
-      setIsSaving(false)
-    }
-  }
-
-  const handleCancel = () => {
-    setIsOpen(false)
-    props.onFormCancel()
-  }
-
-  useEffect(() => {
-    if (canUpdateExpenditureCategory) {
-      setIsOpen(props.showForm)
-    } else {
-      props.onFormCancel()
-    }
-  }, [canUpdateExpenditureCategory, props])
+    }, [
+      activateExpenditureCategoryMutation,
+      archiveExpenditureCategoryMutation,
+      expenditureCategory,
+      stateAction,
+      messageApi,
+    ]),
+    onComplete: onFormComplete,
+    onCancel: onFormCancel,
+    errorMessage: `An unexpected error occurred while ${stateAction}ing the expenditure category.`,
+    permission: 'Permissions.ExpenditureCategories.Update',
+  })
 
   return (
-    <>
-      <Modal
-        title={`Are you sure you want to ${props.stateAction} this Expenditure Category?`}
-        open={isOpen}
-        onOk={handleOk}
-        okText={props.stateAction}
-        confirmLoading={isSaving}
-        onCancel={handleCancel}
-        keyboard={false} // disable esc key to close modal
-        destroyOnHidden={true}
-      >
-        <Space vertical>
-          <div>
-            {props.expenditureCategory?.id} - {props.expenditureCategory?.name}
-          </div>
-          {'This action cannot be undone.'}
-        </Space>
-      </Modal>
-    </>
+    <Modal
+      title={`Are you sure you want to ${stateAction} this Expenditure Category?`}
+      open={isOpen}
+      onOk={handleOk}
+      okText={stateAction}
+      confirmLoading={isSaving}
+      onCancel={handleCancel}
+      keyboard={false}
+      destroyOnHidden
+    >
+      <Space vertical>
+        <div>
+          {expenditureCategory?.id} - {expenditureCategory?.name}
+        </div>
+        {'This action cannot be undone.'}
+      </Space>
+    </Modal>
   )
 }
 

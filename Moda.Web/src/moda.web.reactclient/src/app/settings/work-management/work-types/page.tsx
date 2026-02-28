@@ -138,7 +138,6 @@ const WorkTypesPage = () => {
       />
       {openUpdateWorkTypeForm && (
         <EditWorkTypeForm
-          showForm={openUpdateWorkTypeForm}
           workTypeId={editWorkTypeId}
           onFormSave={() => onEditWorkTypeFormClosed(true)}
           onFormCancel={() => onEditWorkTypeFormClosed(false)}

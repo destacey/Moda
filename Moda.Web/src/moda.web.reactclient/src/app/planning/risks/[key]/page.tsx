@@ -120,7 +120,6 @@ const RiskDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       </Card>
       {openUpdateRiskForm && (
         <EditRiskForm
-          showForm={openUpdateRiskForm}
           riskKey={riskKey}
           onFormSave={() => onUpdateRiskFormClosed(true)}
           onFormCancel={() => onUpdateRiskFormClosed(false)}

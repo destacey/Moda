@@ -200,7 +200,6 @@ const RoleDetailsPage = (props: { params: Promise<{ id: string }> }) => {
       {openEditRoleForm && (
         <EditRoleForm
           role={roleData}
-          showForm={openEditRoleForm}
           onFormComplete={() => {
             setOpenEditRoleForm(false)
             refetch()
@@ -212,7 +211,6 @@ const RoleDetailsPage = (props: { params: Promise<{ id: string }> }) => {
         <ManageRoleUsersForm
           roleId={id}
           roleName={roleData.name}
-          showForm={openManageRoleUsersForm}
           onFormComplete={() => setOpenManageRoleUsersForm(false)}
           onFormCancel={() => setOpenManageRoleUsersForm(false)}
         />
@@ -220,7 +218,6 @@ const RoleDetailsPage = (props: { params: Promise<{ id: string }> }) => {
       {openDeleteRoleForm && (
         <DeleteRoleForm
           role={roleData}
-          showForm={openDeleteRoleForm}
           onFormComplete={() => onDeleteRoleFormClosed(true)}
           onFormCancel={() => onDeleteRoleFormClosed(false)}
         />

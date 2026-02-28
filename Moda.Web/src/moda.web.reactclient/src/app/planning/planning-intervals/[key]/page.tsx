@@ -265,7 +265,6 @@ const PlanningIntervalDetailsPage = (props: {
       </Card>
       {openEditPlanningIntervalForm && (
         <EditPlanningIntervalForm
-          showForm={openEditPlanningIntervalForm}
           planningIntervalKey={piKey}
           onFormUpdate={() => onEditFormClosed(true)}
           onFormCancel={() => onEditFormClosed(false)}
@@ -273,7 +272,6 @@ const PlanningIntervalDetailsPage = (props: {
       )}
       {openManagePlanningIntervalDatesForm && (
         <ManagePlanningIntervalDatesForm
-          showForm={openManagePlanningIntervalDatesForm}
           id={planningIntervalData?.id}
           planningIntervalKey={piKey}
           onFormSave={() => onManagePlanningIntervalDatesFormClosed(true)}
@@ -282,7 +280,6 @@ const PlanningIntervalDetailsPage = (props: {
       )}
       {openManageTeamsForm && (
         <ManagePlanningIntervalTeamsForm
-          showForm={openManageTeamsForm}
           id={planningIntervalData?.id}
           onFormSave={() => onManageTeamsFormClosed(true)}
           onFormCancel={() => onManageTeamsFormClosed(false)}

@@ -1,8 +1,7 @@
 'use client'
 
 import { Form, Modal, Radio, Spin } from 'antd'
-import { useCallback, useEffect, useState } from 'react'
-import useAuth from '../../../../components/contexts/auth'
+import { useCallback, useEffect } from 'react'
 import {
   Methodology,
   SizingMethod,
@@ -14,12 +13,12 @@ import {
   useUpdateTeamOperatingModelMutation,
 } from '@/src/store/features/organizations/team-api'
 import { useMessage } from '@/src/components/contexts/messaging'
+import { useModalForm } from '@/src/hooks'
 
 const { Item: FormItem } = Form
 const { Group: RadioGroup } = Radio
 
 export interface EditTeamOperatingModelFormProps {
-  showForm: boolean
   teamId: string
   operatingModelId: string
   onFormComplete: () => void
@@ -50,87 +49,57 @@ const mapToRequestValues = (
   } as UpdateTeamOperatingModelRequest
 }
 
-const EditTeamOperatingModelForm = (props: EditTeamOperatingModelFormProps) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-  const [isValid, setIsValid] = useState(false)
-  const [form] = Form.useForm<EditTeamOperatingModelFormValues>()
-  const formValues = Form.useWatch([], form)
+const EditTeamOperatingModelForm = ({
+  teamId,
+  operatingModelId,
+  onFormComplete,
+  onFormCancel,
+}: EditTeamOperatingModelFormProps) => {
   const messageApi = useMessage()
 
   const {
     data: operatingModel,
     isLoading,
     isFetching,
-  } = useGetTeamOperatingModelQuery(
-    { teamId: props.teamId, operatingModelId: props.operatingModelId },
-    { skip: !props.showForm },
-  )
+  } = useGetTeamOperatingModelQuery({ teamId, operatingModelId })
 
   const [updateOperatingModel] = useUpdateTeamOperatingModelMutation()
 
-  const { hasClaim } = useAuth()
-  const canUpdateTeam = hasClaim('Permission', 'Permissions.Teams.Update')
-
-  const update = async (
-    values: EditTeamOperatingModelFormValues,
-  ): Promise<boolean> => {
-    try {
-      const request = mapToRequestValues(values)
-      await updateOperatingModel({
-        teamId: props.teamId,
-        operatingModelId: props.operatingModelId,
-        request,
-      }).unwrap()
-      return true
-    } catch (error: any) {
-      if (error.status === 422 && error.errors) {
-        const formErrors = toFormErrors(error.errors)
-        form.setFields(formErrors)
-        messageApi.error('Correct the validation error(s) to continue.')
-      } else {
-        messageApi.error(
-          error.detail ??
-            'An unexpected error occurred while updating the operating model.',
-        )
-        console.error(error)
-      }
-      return false
-    }
-  }
-
-  const handleOk = async () => {
-    setIsSaving(true)
-    try {
-      const values = await form.validateFields()
-      if (await update(values)) {
-        setIsOpen(false)
-        form.resetFields()
-        props.onFormComplete()
-        messageApi.success('Successfully updated operating model.')
-      }
-    } catch (errorInfo) {
-      console.log('handleOk error', errorInfo)
-    } finally {
-      setIsSaving(false)
-    }
-  }
-
-  const handleCancel = useCallback(() => {
-    setIsOpen(false)
-    props.onFormCancel()
-    form.resetFields()
-  }, [form, props])
-
-  useEffect(() => {
-    if (!canUpdateTeam) {
-      handleCancel()
-      messageApi.error('You do not have permission to update teams.')
-      return
-    }
-
-    setIsOpen(props.showForm)
-  }, [canUpdateTeam, handleCancel, messageApi, props.showForm])
+  const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
+    useModalForm<EditTeamOperatingModelFormValues>({
+      onSubmit: useCallback(
+        async (values: EditTeamOperatingModelFormValues, form) => {
+          try {
+            const request = mapToRequestValues(values)
+            await updateOperatingModel({
+              teamId,
+              operatingModelId,
+              request,
+            }).unwrap()
+            messageApi.success('Successfully updated operating model.')
+            return true
+          } catch (error) {
+            if (error.status === 422 && error.errors) {
+              const formErrors = toFormErrors(error.errors)
+              form.setFields(formErrors)
+              messageApi.error('Correct the validation error(s) to continue.')
+            } else {
+              messageApi.error(
+                error.detail ??
+                  'An unexpected error occurred while updating the operating model.',
+              )
+            }
+            return false
+          }
+        },
+        [updateOperatingModel, teamId, operatingModelId, messageApi],
+      ),
+      onComplete: onFormComplete,
+      onCancel: onFormCancel,
+      errorMessage:
+        'An unexpected error occurred while updating the operating model.',
+      permission: 'Permissions.Teams.Update',
+    })
 
   // Set form values when operating model data is loaded
   useEffect(() => {
@@ -141,13 +110,6 @@ const EditTeamOperatingModelForm = (props: EditTeamOperatingModelFormProps) => {
       })
     }
   }, [operatingModel, isLoading, isFetching, form])
-
-  useEffect(() => {
-    form.validateFields({ validateOnly: true }).then(
-      () => setIsValid(true),
-      () => setIsValid(false),
-    )
-  }, [form, formValues])
 
   const isLoadingData = isLoading || isFetching
 
@@ -161,7 +123,7 @@ const EditTeamOperatingModelForm = (props: EditTeamOperatingModelFormProps) => {
       confirmLoading={isSaving}
       onCancel={handleCancel}
       keyboard={false} // disable esc key to close modal
-      destroyOnHidden={true}
+      destroyOnHidden
     >
       <Spin spinning={isLoadingData} description="Loading operating model...">
         <Form
@@ -199,4 +161,3 @@ const EditTeamOperatingModelForm = (props: EditTeamOperatingModelFormProps) => {
 }
 
 export default EditTeamOperatingModelForm
-

@@ -1,17 +1,16 @@
 import { MarkdownEditor } from '@/src/components/common/markdown'
-import useAuth from '@/src/components/contexts/auth'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { CreateWorkTypeLevelRequest } from '@/src/services/moda-api'
 import { useCreateWorkTypeLevelMutation } from '@/src/store/features/work-management/work-type-level-api'
 import { toFormErrors } from '@/src/utils'
 import { Form, Input, Modal } from 'antd'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback } from 'react'
+import { useModalForm } from '@/src/hooks'
 
 const { Item } = Form
 const { TextArea } = Input
 
 export interface CreateWorkTypeLevelFormProps {
-  showForm: boolean
   onFormSave: () => void
   onFormCancel: () => void
 }
@@ -31,88 +30,47 @@ const mapToRequestValues = (
 }
 
 const CreateWorkTypeLevelForm = ({
-  showForm,
   onFormSave,
   onFormCancel,
 }: CreateWorkTypeLevelFormProps) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-  const [isValid, setIsValid] = useState(false)
-  const [form] = Form.useForm<CreateWorkTypeLevelFormValues>()
-  const formValues = Form.useWatch([], form)
   const messageApi = useMessage()
 
   const [createWorkTypeLevelMutation] = useCreateWorkTypeLevelMutation()
 
-  const { hasClaim } = useAuth()
-  const canCreateWorkTypeLevel = hasClaim(
-    'Permission',
-    'Permissions.WorkTypeLevels.Create',
-  )
-
-  const create = async (
-    values: CreateWorkTypeLevelFormValues,
-  ): Promise<boolean> => {
-    try {
-      const request = mapToRequestValues(values)
-      const response = await createWorkTypeLevelMutation(request)
-      if (response.error) {
-        throw response.error
-      }
-      return true
-    } catch (error) {
-      if (error.status === 422 && error.errors) {
-        const formErrors = toFormErrors(error.errors)
-        form.setFields(formErrors)
-        messageApi.error('Correct the validation error(s) to continue.')
-      } else {
-        messageApi.error(
-          'An unexpected error occurred while creating the work type level.',
-        )
-        console.error(error)
-      }
-      return false
-    }
-  }
-
-  const handleOk = async () => {
-    setIsSaving(true)
-    try {
-      const values = await form.validateFields()
-      if (await create(values)) {
-        setIsOpen(false)
-        form.resetFields()
-        onFormSave()
-        messageApi.success('Successfully created work type level.')
-      }
-    } catch (errorInfo) {
-      console.log('handleOk error', errorInfo)
-    } finally {
-      setIsSaving(false)
-    }
-  }
-
-  const handleCancel = useCallback(() => {
-    setIsOpen(false)
-    form.resetFields()
-    onFormCancel()
-  }, [form, onFormCancel])
-
-  useEffect(() => {
-    if (canCreateWorkTypeLevel) {
-      setIsOpen(showForm)
-    } else {
-      onFormCancel()
-      messageApi.error('You do not have permission to create work type levels.')
-    }
-  }, [canCreateWorkTypeLevel, onFormCancel, showForm, messageApi])
-
-  useEffect(() => {
-    form.validateFields({ validateOnly: true }).then(
-      () => setIsValid(true && form.isFieldsTouched()),
-      () => setIsValid(false),
-    )
-  }, [form, formValues])
+  const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
+    useModalForm<CreateWorkTypeLevelFormValues>({
+      onSubmit: useCallback(
+        async (values: CreateWorkTypeLevelFormValues, form) => {
+          try {
+            const request = mapToRequestValues(values)
+            const response = await createWorkTypeLevelMutation(request)
+            if (response.error) {
+              throw response.error
+            }
+            messageApi.success('Successfully created work type level.')
+            return true
+          } catch (error) {
+            if (error.status === 422 && error.errors) {
+              const formErrors = toFormErrors(error.errors)
+              form.setFields(formErrors)
+              messageApi.error('Correct the validation error(s) to continue.')
+            } else {
+              messageApi.error(
+                'An unexpected error occurred while creating the work type level.',
+              )
+              console.error(error)
+            }
+            return false
+          }
+        },
+        [createWorkTypeLevelMutation, messageApi],
+      ),
+      onComplete: onFormSave,
+      onCancel: onFormCancel,
+      errorMessage:
+        'An unexpected error occurred while creating the work type level.',
+      permission: 'Permissions.WorkTypeLevels.Create',
+    })
 
   return (
     <Modal
@@ -123,8 +81,8 @@ const CreateWorkTypeLevelForm = ({
       okText="Create"
       confirmLoading={isSaving}
       onCancel={handleCancel}
-      keyboard={false} // disable esc key to close modal
-      destroyOnHidden={true}
+      keyboard={false}
+      destroyOnHidden
     >
       <Form
         form={form}

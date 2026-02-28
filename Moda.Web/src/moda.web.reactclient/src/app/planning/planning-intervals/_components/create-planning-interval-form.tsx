@@ -1,20 +1,19 @@
 'use client'
 
 import { DatePicker, Form, Input, InputNumber, Modal, Typography } from 'antd'
-import { useEffect, useState } from 'react'
-import useAuth from '../../../../components/contexts/auth'
+import { useCallback } from 'react'
 import { CreatePlanningIntervalRequest } from '@/src/services/moda-api'
 import { toFormErrors } from '@/src/utils'
 import { MarkdownEditor } from '@/src/components/common/markdown'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { useCreatePlanningIntervalMutation } from '@/src/store/features/planning/planning-interval-api'
+import { useModalForm } from '@/src/hooks'
 
 const { Item } = Form
 const { TextArea } = Input
 const { Text } = Typography
 
 export interface CreatePlanningIntervalFormProps {
-  showForm: boolean
   onFormCreate: () => void
   onFormCancel: () => void
 }
@@ -42,94 +41,49 @@ const mapToRequestValues = (
 }
 
 const CreatePlanningIntervalForm = ({
-  showForm,
   onFormCreate,
   onFormCancel,
 }: CreatePlanningIntervalFormProps) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-  const [isValid, setIsValid] = useState(false)
-  const [form] = Form.useForm<CreatePlanningIntervalFormValues>()
-  const formValues = Form.useWatch([], form)
   const messageApi = useMessage()
 
-  const [createPlanningInterval, { error: mutationError }] =
-    useCreatePlanningIntervalMutation()
+  const [createPlanningInterval] = useCreatePlanningIntervalMutation()
 
-  const { hasPermissionClaim } = useAuth()
-  const canCreatePlanningInterval = hasPermissionClaim(
-    'Permissions.PlanningIntervals.Create',
-  )
-
-  const create = async (
-    values: CreatePlanningIntervalFormValues,
-  ): Promise<boolean> => {
-    try {
-      const request = mapToRequestValues(values)
-      const response = await createPlanningInterval(request)
-      if (response.error) {
-        throw response.error
-      }
-      messageApi.success('Successfully created planning interval.')
-
-      return true
-    } catch (error) {
-      if (error.status === 422 && error.errors) {
-        const formErrors = toFormErrors(error.errors)
-        form.setFields(formErrors)
-        messageApi.error('Correct the validation error(s) to continue.')
-      } else {
-        messageApi.error(
-          'An error occurred while creating the planning interval. Please try again.',
-        )
-        console.error(error)
-      }
-      return false
-    }
-  }
-
-  const handleOk = async () => {
-    setIsSaving(true)
-    try {
-      const values = await form.validateFields()
-      if (await create(values)) {
-        setIsOpen(false)
-        form.resetFields()
-        onFormCreate()
-      }
-    } catch (errorInfo) {
-      console.log('handleOk error', errorInfo)
-      messageApi.error(
+  const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
+    useModalForm<CreatePlanningIntervalFormValues>({
+      onSubmit: useCallback(
+        async (values: CreatePlanningIntervalFormValues, form) => {
+          try {
+            const request = mapToRequestValues(values)
+            const response = await createPlanningInterval(request)
+            if (response.error) {
+              throw response.error
+            }
+            messageApi.success('Successfully created planning interval.')
+            return true
+          } catch (error) {
+            if (error.status === 422 && error.errors) {
+              const formErrors = toFormErrors(error.errors)
+              form.setFields(formErrors)
+              messageApi.error('Correct the validation error(s) to continue.')
+            } else {
+              messageApi.error(
+                'An error occurred while creating the planning interval. Please try again.',
+              )
+              console.error(error)
+            }
+            return false
+          }
+        },
+        [createPlanningInterval, messageApi],
+      ),
+      onComplete: onFormCreate,
+      onCancel: onFormCancel,
+      errorMessage:
         'An error occurred while creating the planning interval. Please try again.',
-      )
-    } finally {
-      setIsSaving(false)
-    }
-  }
+      permission: 'Permissions.PlanningIntervals.Create',
+    })
 
-  const handleCancel = () => {
-    setIsOpen(false)
-    onFormCancel()
-    form.resetFields()
-  }
-
-  useEffect(() => {
-    if (canCreatePlanningInterval) {
-      setIsOpen(showForm)
-    } else {
-      onFormCancel()
-      messageApi.error(
-        'You do not have permission to create planning intervals.',
-      )
-    }
-  }, [canCreatePlanningInterval, onFormCancel, showForm, messageApi])
-
-  useEffect(() => {
-    form.validateFields({ validateOnly: true }).then(
-      () => setIsValid(true && form.isFieldsTouched()),
-      () => setIsValid(false),
-    )
-  }, [form, formValues])
+  const formValues = Form.useWatch([], form)
 
   return (
     <Modal
@@ -140,8 +94,8 @@ const CreatePlanningIntervalForm = ({
       okText="Create"
       confirmLoading={isSaving}
       onCancel={handleCancel}
-      keyboard={false} // disable esc key to close modal
-      destroyOnHidden={true}
+      keyboard={false}
+      destroyOnHidden
     >
       <Form
         form={form}

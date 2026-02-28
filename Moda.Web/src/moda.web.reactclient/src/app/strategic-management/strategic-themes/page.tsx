@@ -64,7 +64,6 @@ const StrategicThemesPage: React.FC = () => {
       />
       {openCreateStrategicThemeForm && (
         <CreateStrategicThemeForm
-          showForm={openCreateStrategicThemeForm}
           onFormComplete={() => setOpenCreateStrategicThemeForm(false)}
           onFormCancel={() => setOpenCreateStrategicThemeForm(false)}
         />

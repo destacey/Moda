@@ -1,15 +1,14 @@
-import useAuth from '@/src/components/contexts/auth'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { ConnectorType, CONNECTOR_NAMES } from '@/src/types/connectors'
 import { toFormErrors } from '@/src/utils'
 import { Form, Modal } from 'antd'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { ConnectionFormBase } from './connection-form-base'
 import { ConnectorTypeSelector } from './connector-type-selector'
 import { useCreateConnectionMutation } from '@/src/store/features/app-integration/connections-api'
+import { useModalForm } from '@/src/hooks'
 
 export interface CreateConnectionFormProps {
-  showForm: boolean
   onFormCreate: () => void
   onFormCancel: () => void
 }
@@ -40,106 +39,65 @@ export const getDiscriminator = (connector: ConnectorType): string => {
 }
 
 const CreateConnectionForm = ({
-  showForm,
   onFormCreate,
   onFormCancel,
 }: CreateConnectionFormProps) => {
-  const [isOpen, setIsOpen] = useState(false)
   const [selectedConnector, setSelectedConnector] =
     useState<ConnectorType | null>(null)
-  const [isSaving, setIsSaving] = useState(false)
-  const [isValid, setIsValid] = useState(false)
-  const [form] = Form.useForm<CreateConnectionFormValues>()
-  const formValues = Form.useWatch([], form)
   const messageApi = useMessage()
 
   const [createConnection] = useCreateConnectionMutation()
 
-  const { hasClaim } = useAuth()
-  const canCreateConnection = hasClaim(
-    'Permission',
-    'Permissions.Connections.Create',
-  )
+  const { form, isOpen, isValid, isSaving, handleOk, handleCancel: hookCancel } =
+    useModalForm<CreateConnectionFormValues>({
+      onSubmit: useCallback(
+        async (values: CreateConnectionFormValues, form) => {
+          if (!selectedConnector) return false
 
-  const create = useCallback(
-    async (values: CreateConnectionFormValues): Promise<boolean> => {
-      if (!selectedConnector) return false
+          try {
+            const request = {
+              ...values,
+              $type: getDiscriminator(selectedConnector),
+            }
 
-      try {
-        // Build polymorphic request with $type discriminator
-        const request = {
-          ...values,
-          $type: getDiscriminator(selectedConnector),
-        }
-
-        const response = await createConnection(request)
-        if (response.error) {
-          throw response.error
-        }
-        return true
-      } catch (error: any) {
-        if (error.status === 422 && error.errors) {
-          const formErrors = toFormErrors(error.errors)
-          form.setFields(formErrors)
-          messageApi.error('Correct the validation error(s) to continue.')
-        } else {
-          messageApi.error('An error occurred while creating the connection.')
-        }
-        return false
-      }
-    },
-    [createConnection, form, messageApi, selectedConnector],
-  )
-
-  const handleOk = async () => {
-    setIsSaving(true)
-    try {
-      const values = await form.validateFields()
-      if (await create(values)) {
-        setIsOpen(false)
+            const response = await createConnection(request)
+            if (response.error) {
+              throw response.error
+            }
+            setSelectedConnector(null)
+            messageApi.success('Successfully created connection.')
+            return true
+          } catch (error: any) {
+            if (error.status === 422 && error.errors) {
+              const formErrors = toFormErrors(error.errors)
+              form.setFields(formErrors)
+              messageApi.error('Correct the validation error(s) to continue.')
+            } else {
+              messageApi.error('An error occurred while creating the connection.')
+            }
+            return false
+          }
+        },
+        [createConnection, messageApi, selectedConnector],
+      ),
+      onComplete: onFormCreate,
+      onCancel: () => {
         setSelectedConnector(null)
-        form.resetFields()
-        onFormCreate()
-        messageApi.success('Successfully created connection.')
-      }
-    } catch (errorInfo) {
-      console.log('handleOk error', errorInfo)
-    } finally {
-      setIsSaving(false)
-    }
-  }
-
-  const handleCancel = () => {
-    setIsOpen(false)
-    setSelectedConnector(null)
-    form.resetFields()
-    onFormCancel()
-  }
+        onFormCancel()
+      },
+      errorMessage: 'An error occurred while creating the connection.',
+      permission: 'Permissions.Connections.Create',
+    })
 
   const handleBack = () => {
     setSelectedConnector(null)
     form.resetFields()
   }
 
-  useEffect(() => {
-    if (canCreateConnection) {
-      setIsOpen(showForm)
-      if (!showForm) {
-        setSelectedConnector(null)
-        form.resetFields()
-      }
-    } else {
-      onFormCancel()
-      messageApi.error('You do not have permission to create connections.')
-    }
-  }, [canCreateConnection, onFormCancel, showForm, messageApi, form])
-
-  useEffect(() => {
-    form.validateFields({ validateOnly: true }).then(
-      () => setIsValid(true && form.isFieldsTouched()),
-      () => setIsValid(false),
-    )
-  }, [form, formValues])
+  const handleCancel = () => {
+    setSelectedConnector(null)
+    hookCancel()
+  }
 
   return (
     <Modal

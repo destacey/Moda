@@ -86,7 +86,6 @@ const UserDetails = (props: UserDetailsProps) => {
       {openManageUserRolesForm && (
         <ManageUserRolesForm
           userId={user.id}
-          showForm={openManageUserRolesForm}
           onFormComplete={() => onOpenManageUserRolesFormClosed(true)}
           onFormCancel={() => setOpenManageUserRolesForm(false)}
         />

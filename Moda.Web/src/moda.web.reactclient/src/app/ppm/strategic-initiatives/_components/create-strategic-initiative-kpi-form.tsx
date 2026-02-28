@@ -2,8 +2,8 @@
 
 import { createTypedFormItem } from '@/src/components/common/forms/utils'
 import { MarkdownEditor } from '@/src/components/common/markdown'
-import useAuth from '@/src/components/contexts/auth'
 import { useMessage } from '@/src/components/contexts/messaging'
+import { useModalForm } from '@/src/hooks'
 import {
   CreateStrategicInitiativeKpiRequest,
   KpiTargetDirection,
@@ -12,11 +12,10 @@ import { useCreateStrategicInitiativeKpiMutation } from '@/src/store/features/pp
 import { toFormErrors } from '@/src/utils'
 import { Form, Input, InputNumber, Modal, Select } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback } from 'react'
 
 export interface CreateStrategicInitiativeKpiFormProps {
   strategicInitiativeId: string
-  showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
 }
@@ -55,187 +54,137 @@ const mapToRequestValues = (
   }
 }
 
-const CreateStrategicInitiativeKpiForm = (
-  props: CreateStrategicInitiativeKpiFormProps,
-) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-  const [isValid, setIsValid] = useState(false)
-  const [form] = Form.useForm<CreateStrategicInitiativeKpiFormValues>()
-  const formValues = Form.useWatch([], form)
-
+const CreateStrategicInitiativeKpiForm = ({
+  strategicInitiativeId,
+  onFormComplete,
+  onFormCancel,
+}: CreateStrategicInitiativeKpiFormProps) => {
   const messageApi = useMessage()
 
-  const { strategicInitiativeId, showForm, onFormComplete, onFormCancel } =
-    props
+  const [createKpi] = useCreateStrategicInitiativeKpiMutation()
 
-  const { hasPermissionClaim } = useAuth()
-  const canCreateKpis = hasPermissionClaim(
-    'Permissions.StrategicInitiatives.Update',
-  )
+  const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
+    useModalForm<CreateStrategicInitiativeKpiFormValues>({
+      onSubmit: useCallback(
+        async (values: CreateStrategicInitiativeKpiFormValues, form) => {
+          try {
+            const request = mapToRequestValues(values, strategicInitiativeId)
+            const response = await createKpi(request)
+            if (response.error) throw response.error
 
-  const [createKpi, { error: mutationError }] =
-    useCreateStrategicInitiativeKpiMutation()
-
-  const formAction = async (
-    values: CreateStrategicInitiativeKpiFormValues,
-    strategicInitiativeId: string,
-  ) => {
-    try {
-      const request = mapToRequestValues(values, strategicInitiativeId)
-      const response = await createKpi(request)
-      if (response.error) {
-        throw response.error
-      }
-      messageApi.success(
-        'KPI created successfully. KPI key: ' + response.data.key,
-      )
-
-      return true
-    } catch (error) {
-      if (error.status === 422 && error.errors) {
-        const formErrors = toFormErrors(error.errors)
-        form.setFields(formErrors)
-        messageApi.error('Correct the validation error(s) to continue.')
-      } else {
-        messageApi.error(
-          error.detail ??
-            'An error occurred while creating the KPI. Please try again.',
-        )
-      }
-      return false
-    }
-  }
-
-  const handleOk = async () => {
-    setIsSaving(true)
-    try {
-      const values = await form.validateFields()
-      if (await formAction(values, strategicInitiativeId)) {
-        setIsOpen(false)
-        form.resetFields()
-        onFormComplete()
-      }
-    } catch (error) {
-      console.error('handleOk error', error)
-      messageApi.error(
+            messageApi.success(
+              'KPI created successfully. KPI key: ' + response.data.key,
+            )
+            return true
+          } catch (error) {
+            if (error.status === 422 && error.errors) {
+              const formErrors = toFormErrors(error.errors)
+              form.setFields(formErrors)
+              messageApi.error('Correct the validation error(s) to continue.')
+            } else {
+              messageApi.error(
+                error.detail ??
+                  'An error occurred while creating the KPI. Please try again.',
+              )
+            }
+            return false
+          }
+        },
+        [createKpi, strategicInitiativeId, messageApi],
+      ),
+      onComplete: onFormComplete,
+      onCancel: onFormCancel,
+      errorMessage:
         'An error occurred while creating the KPI. Please try again.',
-      )
-    } finally {
-      setIsSaving(false)
-    }
-  }
-
-  const handleCancel = useCallback(() => {
-    setIsOpen(false)
-    form.resetFields()
-    onFormCancel()
-  }, [form, onFormCancel])
-
-  useEffect(() => {
-    if (canCreateKpis) {
-      setIsOpen(showForm)
-    } else {
-      onFormCancel()
-      messageApi.error('You do not have permission to create KPIs.')
-    }
-  }, [canCreateKpis, messageApi, onFormCancel, showForm])
-
-  useEffect(() => {
-    form.validateFields({ validateOnly: true }).then(
-      () => setIsValid(true && form.isFieldsTouched()),
-      () => setIsValid(false),
-    )
-  }, [form, formValues])
+      permission: 'Permissions.StrategicInitiatives.Update',
+    })
 
   return (
-    <>
-      <Modal
-        title="Create Strategic Initiative KPI"
-        open={isOpen}
-        onOk={handleOk}
-        okButtonProps={{ disabled: !isValid }}
-        okText="Create"
-        confirmLoading={isSaving}
-        onCancel={handleCancel}
-        keyboard={false} // disable esc key to close modal
-        destroyOnHidden={true}
+    <Modal
+      title="Create Strategic Initiative KPI"
+      open={isOpen}
+      onOk={handleOk}
+      okButtonProps={{ disabled: !isValid }}
+      okText="Create"
+      confirmLoading={isSaving}
+      onCancel={handleCancel}
+      keyboard={false} // disable esc key to close modal
+      destroyOnHidden
+    >
+      <Form
+        form={form}
+        size="small"
+        layout="vertical"
+        name="create-strategic-initiative-kpi-form"
       >
-        <Form
-          form={form}
-          size="small"
-          layout="vertical"
-          name="create-strategic-initiative-kpi-form"
+        <TypedFormItem
+          name="name"
+          label="Name"
+          rules={[
+            { required: true, message: 'Name is required' },
+            { max: 64 },
+          ]}
         >
-          <TypedFormItem
-            name="name"
-            label="Name"
-            rules={[
-              { required: true, message: 'Name is required' },
-              { max: 64 },
-            ]}
-          >
-            <TextArea
-              autoSize={{ minRows: 1, maxRows: 2 }}
-              showCount
-              maxLength={64}
-            />
-          </TypedFormItem>
-          <TypedFormItem
-            name="description"
-            label="Description"
-            rules={[{ max: 512 }]}
-          >
-            <MarkdownEditor maxLength={512} />
-          </TypedFormItem>
-          <TypedFormItem name="startingValue" label="Starting Value">
-            <InputNumber style={{ width: 200 }} />
-          </TypedFormItem>
-          <TypedFormItem
-            name="targetValue"
-            label="Target Value"
-            rules={[{ required: true, message: 'Target Value is required' }]}
-          >
-            <InputNumber style={{ width: 200 }} />
-          </TypedFormItem>
-          <TypedFormItem
-            name="prefix"
-            label="Prefix"
-            rules={[{ max: 8 }]}
-          >
-            <Input
-              placeholder="e.g. $, €"
-              maxLength={8}
-              style={{ width: 120 }}
-            />
-          </TypedFormItem>
-          <TypedFormItem
-            name="suffix"
-            label="Suffix"
-            rules={[{ max: 8 }]}
-          >
-            <Input
-              placeholder="e.g. %, K, M"
-              maxLength={8}
-              style={{ width: 120 }}
-            />
-          </TypedFormItem>
-          <TypedFormItem
-            name="targetDirection"
-            label="Target Direction"
-            rules={[
-              { required: true, message: 'Target Direction is required' },
-            ]}
-          >
-            <Select
-              allowClear
-              options={kpiTargetDirectionOptions}
-              placeholder="Select Target Direction"
-            />
-          </TypedFormItem>
-        </Form>
-      </Modal>
-    </>
+          <TextArea
+            autoSize={{ minRows: 1, maxRows: 2 }}
+            showCount
+            maxLength={64}
+          />
+        </TypedFormItem>
+        <TypedFormItem
+          name="description"
+          label="Description"
+          rules={[{ max: 512 }]}
+        >
+          <MarkdownEditor maxLength={512} />
+        </TypedFormItem>
+        <TypedFormItem name="startingValue" label="Starting Value">
+          <InputNumber style={{ width: 200 }} />
+        </TypedFormItem>
+        <TypedFormItem
+          name="targetValue"
+          label="Target Value"
+          rules={[{ required: true, message: 'Target Value is required' }]}
+        >
+          <InputNumber style={{ width: 200 }} />
+        </TypedFormItem>
+        <TypedFormItem
+          name="prefix"
+          label="Prefix"
+          rules={[{ max: 8 }]}
+        >
+          <Input
+            placeholder="e.g. $, €"
+            maxLength={8}
+            style={{ width: 120 }}
+          />
+        </TypedFormItem>
+        <TypedFormItem
+          name="suffix"
+          label="Suffix"
+          rules={[{ max: 8 }]}
+        >
+          <Input
+            placeholder="e.g. %, K, M"
+            maxLength={8}
+            style={{ width: 120 }}
+          />
+        </TypedFormItem>
+        <TypedFormItem
+          name="targetDirection"
+          label="Target Direction"
+          rules={[
+            { required: true, message: 'Target Direction is required' },
+          ]}
+        >
+          <Select
+            allowClear
+            options={kpiTargetDirectionOptions}
+            placeholder="Select Target Direction"
+          />
+        </TypedFormItem>
+      </Form>
+    </Modal>
   )
 }
 

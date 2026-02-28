@@ -461,7 +461,6 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       {isInEditMode && team && canUpdateTeam && <EditTeamForm team={team} />}
       {openCreateTeamMembershipForm && (
         <CreateTeamMembershipForm
-          showForm={openCreateTeamMembershipForm}
           teamId={team?.id}
           teamType={'Team'}
           onFormCreate={() => onCreateTeamMembershipFormClosed(true)}
@@ -471,14 +470,12 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       {openDeactivateTeamForm && (
         <DeactivateTeamForm
           team={team}
-          showForm={openDeactivateTeamForm}
           onFormComplete={() => onDeactivateTeamFormClosed(true)}
           onFormCancel={() => onDeactivateTeamFormClosed(false)}
         />
       )}
       {openSetOperatingModelForm && team && (
         <SetTeamOperatingModelForm
-          showForm={openSetOperatingModelForm}
           teamId={team.id}
           onFormComplete={() => onSetOperatingModelFormClosed(true)}
           onFormCancel={() => onSetOperatingModelFormClosed(false)}
@@ -486,7 +483,6 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       )}
       {openUpdateOperatingModelForm && team?.operatingModel && (
         <EditTeamOperatingModelForm
-          showForm={openUpdateOperatingModelForm}
           teamId={team.id}
           operatingModelId={team.operatingModel.id}
           onFormComplete={() => onUpdateOperatingModelFormClosed(true)}

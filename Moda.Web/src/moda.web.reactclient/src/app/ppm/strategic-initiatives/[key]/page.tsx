@@ -415,7 +415,6 @@ const StrategicInitiativeDetailsPage = (props: {
       {openEditStrategicInitiativeForm && (
         <EditStrategicInitiativeForm
           strategicInitiativeKey={strategicInitiativeData?.key}
-          showForm={openEditStrategicInitiativeForm}
           onFormComplete={() => onEditStrategicInitiativeFormClosed(true)}
           onFormCancel={() => onEditStrategicInitiativeFormClosed(false)}
         />
@@ -424,7 +423,6 @@ const StrategicInitiativeDetailsPage = (props: {
         <ChangeStrategicInitiativeStatusForm
           strategicInitiative={strategicInitiativeData}
           statusAction={StrategicInitiativeStatusAction.Approve}
-          showForm={openApproveStrategicInitiativeForm}
           onFormComplete={() => onApproveStrategicInitiativeFormClosed(true)}
           onFormCancel={() => onApproveStrategicInitiativeFormClosed(false)}
         />
@@ -433,7 +431,6 @@ const StrategicInitiativeDetailsPage = (props: {
         <ChangeStrategicInitiativeStatusForm
           strategicInitiative={strategicInitiativeData}
           statusAction={StrategicInitiativeStatusAction.Activate}
-          showForm={openActivateStrategicInitiativeForm}
           onFormComplete={() => onActivateStrategicInitiativeFormClosed(true)}
           onFormCancel={() => onActivateStrategicInitiativeFormClosed(false)}
         />
@@ -442,7 +439,6 @@ const StrategicInitiativeDetailsPage = (props: {
         <ChangeStrategicInitiativeStatusForm
           strategicInitiative={strategicInitiativeData}
           statusAction={StrategicInitiativeStatusAction.Complete}
-          showForm={openCompleteStrategicInitiativeForm}
           onFormComplete={() => onCompleteStrategicInitiativeFormClosed(true)}
           onFormCancel={() => onCompleteStrategicInitiativeFormClosed(false)}
         />
@@ -451,7 +447,6 @@ const StrategicInitiativeDetailsPage = (props: {
         <ChangeStrategicInitiativeStatusForm
           strategicInitiative={strategicInitiativeData}
           statusAction={StrategicInitiativeStatusAction.Cancel}
-          showForm={openCancelStrategicInitiativeForm}
           onFormComplete={() => onCancelStrategicInitiativeFormClosed(true)}
           onFormCancel={() => onCancelStrategicInitiativeFormClosed(false)}
         />
@@ -459,7 +454,6 @@ const StrategicInitiativeDetailsPage = (props: {
       {openDeleteStrategicInitiativeForm && (
         <DeleteStrategicInitiativeForm
           strategicInitiative={strategicInitiativeData}
-          showForm={openDeleteStrategicInitiativeForm}
           onFormComplete={() => onDeleteStrategicInitiativeFormClosed(true)}
           onFormCancel={() => onDeleteStrategicInitiativeFormClosed(false)}
         />
@@ -467,7 +461,6 @@ const StrategicInitiativeDetailsPage = (props: {
       {openCreateKpiForm && (
         <CreateStrategicInitiativeKpiForm
           strategicInitiativeId={strategicInitiativeData?.id}
-          showForm={openCreateKpiForm}
           onFormComplete={() => onCreateKpiFormClosed(true)}
           onFormCancel={() => onCreateKpiFormClosed(false)}
         />
@@ -476,7 +469,6 @@ const StrategicInitiativeDetailsPage = (props: {
         <ManageStrategicInitiativeProjectsForm
           strategicInitiativeId={strategicInitiativeData?.id}
           portfolioKey={strategicInitiativeData?.portfolio.key}
-          showForm={openManageProjectsForm}
           onFormComplete={() => setOpenManageProjectsForm(false)}
           onFormCancel={() => setOpenManageProjectsForm(false)}
         />

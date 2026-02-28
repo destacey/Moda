@@ -1,8 +1,8 @@
 'use client'
 
 import { EmployeeSelect } from '@/src/components/common/organizations'
-import useAuth from '@/src/components/contexts/auth'
 import { useMessage } from '@/src/components/contexts/messaging'
+import { useModalForm } from '@/src/hooks'
 import { CopyRoadmapRequest } from '@/src/services/moda-api'
 import { useGetEmployeeOptionsQuery } from '@/src/store/features/organizations/employee-api'
 import {
@@ -13,7 +13,7 @@ import { useGetInternalEmployeeIdQuery } from '@/src/store/features/user-managem
 import { toFormErrors } from '@/src/utils'
 import { Form, Input, Modal, Radio } from 'antd'
 import { useRouter } from 'next/navigation'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect } from 'react'
 
 const { Item } = Form
 const { TextArea } = Input
@@ -22,7 +22,6 @@ const { Group: RadioGroup } = Radio
 export interface CopyRoadmapFormProps {
   sourceRoadmapId: string
   sourceRoadmapName: string
-  showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
 }
@@ -45,26 +44,23 @@ const mapToRequestValues = (
   } as CopyRoadmapRequest
 }
 
-const CopyRoadmapForm = (props: CopyRoadmapFormProps) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-  const [isValid, setIsValid] = useState(false)
-  const [form] = Form.useForm<CopyRoadmapFormValues>()
-  const formValues = Form.useWatch([], form)
+const CopyRoadmapForm = ({
+  sourceRoadmapId,
+  sourceRoadmapName,
+  onFormComplete,
+  onFormCancel,
+}: CopyRoadmapFormProps) => {
   const router = useRouter()
-
   const messageApi = useMessage()
 
   const {
     data: visibilityData,
-    isLoading,
     error,
   } = useGetVisibilityOptionsQuery()
-  const [copyRoadmap, { error: mutationError }] = useCopyRoadmapMutation()
+  const [copyRoadmap] = useCopyRoadmapMutation()
 
   const {
     data: employeeData,
-    isLoading: employeeOptionsIsLoading,
     error: employeeOptionsError,
   } = useGetEmployeeOptionsQuery(false)
 
@@ -73,100 +69,57 @@ const CopyRoadmapForm = (props: CopyRoadmapFormProps) => {
     error: currentUserInternalEmployeeIdError,
   } = useGetInternalEmployeeIdQuery()
 
-  const { hasPermissionClaim } = useAuth()
-  const canCreateRoadmap = hasPermissionClaim('Permissions.Roadmaps.Create')
+  const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
+    useModalForm<CopyRoadmapFormValues>({
+      onSubmit: useCallback(
+        async (values: CopyRoadmapFormValues, form) => {
+          try {
+            const request = mapToRequestValues(values, sourceRoadmapId)
+            const response = await copyRoadmap(request)
+            if (response.error) throw response.error
 
-  const mapToFormValues = useCallback(
-    (roadmapManagerIds: string[]) => {
-      form.setFieldsValue({
-        name: `Copy of ${props.sourceRoadmapName}`,
-        roadmapManagerIds: roadmapManagerIds,
-      })
-    },
-    [form, props.sourceRoadmapName],
-  )
+            messageApi.success(
+              `Roadmap copied successfully. Roadmap key ${response.data.key}`,
+            )
 
-  const copy = async (values: CopyRoadmapFormValues) => {
-    try {
-      const request = mapToRequestValues(values, props.sourceRoadmapId)
-      const response = await copyRoadmap(request)
-      if (response.error) {
-        throw response.error
-      }
+            // Navigate to the new roadmap
+            router.push(`/planning/roadmaps/${response.data.key}`)
 
-      messageApi.success(
-        `Roadmap copied successfully. Roadmap key ${response.data.key}`,
-      )
-
-      // Navigate to the new roadmap
-      router.push(`/planning/roadmaps/${response.data.key}`)
-
-      return true
-    } catch (error) {
-      if (error.status === 422 && error.errors) {
-        const formErrors = toFormErrors(error.errors)
-        form.setFields(formErrors)
-        messageApi.error('Correct the validation error(s) to continue.')
-      } else {
-        messageApi.error(
-          error.detail ??
-            'An error occurred while copying the roadmap. Please try again.',
-        )
-      }
-      return false
-    }
-  }
-
-  const handleOk = async () => {
-    setIsSaving(true)
-    try {
-      const values = await form.validateFields()
-      if (await copy(values)) {
-        setIsOpen(false)
-        form.resetFields()
-        props.onFormComplete()
-      }
-    } catch (error) {
-      console.error('handleOk error', error)
-      messageApi.error(
+            return true
+          } catch (error) {
+            if (error.status === 422 && error.errors) {
+              const formErrors = toFormErrors(error.errors)
+              form.setFields(formErrors)
+              messageApi.error('Correct the validation error(s) to continue.')
+            } else {
+              messageApi.error(
+                error.detail ??
+                  'An error occurred while copying the roadmap. Please try again.',
+              )
+            }
+            return false
+          }
+        },
+        [copyRoadmap, sourceRoadmapId, router, messageApi],
+      ),
+      onComplete: onFormComplete,
+      onCancel: onFormCancel,
+      errorMessage:
         'An error occurred while copying the roadmap. Please try again.',
-      )
-    } finally {
-      setIsSaving(false)
-    }
-  }
+      permission: 'Permissions.Roadmaps.Create',
+    })
 
-  const handleCancel = useCallback(() => {
-    setIsOpen(false)
-    form.resetFields()
-    props.onFormCancel()
-  }, [form, props])
-
+  // Initialize form defaults when opened
   useEffect(() => {
-    if (canCreateRoadmap) {
-      setIsOpen(props.showForm)
-      if (props.showForm) {
-        mapToFormValues([currentUserInternalEmployeeId])
-      }
-    } else {
-      props.onFormCancel()
-      messageApi.error('You do not have permission to copy roadmaps.')
+    if (isOpen && currentUserInternalEmployeeId) {
+      form.setFieldsValue({
+        name: `Copy of ${sourceRoadmapName}`,
+        roadmapManagerIds: [currentUserInternalEmployeeId],
+      })
     }
-  }, [
-    canCreateRoadmap,
-    currentUserInternalEmployeeId,
-    mapToFormValues,
-    messageApi,
-    props,
-  ])
+  }, [isOpen, currentUserInternalEmployeeId, sourceRoadmapName, form])
 
-  useEffect(() => {
-    form.validateFields({ validateOnly: true }).then(
-      () => setIsValid(true && form.isFieldsTouched()),
-      () => setIsValid(false),
-    )
-  }, [form, formValues])
-
+  // Query error display
   useEffect(() => {
     if (error) {
       messageApi.error(
@@ -191,78 +144,75 @@ const CopyRoadmapForm = (props: CopyRoadmapFormProps) => {
     employeeOptionsError,
     error,
     messageApi,
-    props,
   ])
 
   return (
-    <>
-      <Modal
-        title="Copy Roadmap"
-        open={isOpen}
-        width={'60vw'}
-        onOk={handleOk}
-        okButtonProps={{ disabled: !isValid }}
-        okText="Copy"
-        confirmLoading={isSaving}
-        onCancel={handleCancel}
-        keyboard={false} // disable esc key to close modal
-        destroyOnHidden={true}
+    <Modal
+      title="Copy Roadmap"
+      open={isOpen}
+      width={'60vw'}
+      onOk={handleOk}
+      okButtonProps={{ disabled: !isValid }}
+      okText="Copy"
+      confirmLoading={isSaving}
+      onCancel={handleCancel}
+      keyboard={false} // disable esc key to close modal
+      destroyOnHidden
+    >
+      <Form
+        form={form}
+        size="small"
+        layout="vertical"
+        name="copy-roadmap-form"
       >
-        <Form
-          form={form}
-          size="small"
-          layout="vertical"
-          name="copy-roadmap-form"
+        <Item label="Name" name="name" rules={[{ required: true }]}>
+          <TextArea
+            autoSize={{ minRows: 1, maxRows: 2 }}
+            showCount
+            maxLength={128}
+          />
+        </Item>
+        <Item
+          name="roadmapManagerIds"
+          label="Roadmap Managers"
+          rules={[
+            {
+              required: true,
+              message: 'Select at least one roadmap manager',
+            },
+            {
+              validator: async (_, value) => {
+                if (!value.includes(currentUserInternalEmployeeId)) {
+                  return Promise.reject(
+                    new Error(
+                      'You must also be a roadmap manager to copy this roadmap',
+                    ),
+                  )
+                }
+                return Promise.resolve()
+              },
+            },
+          ]}
         >
-          <Item label="Name" name="name" rules={[{ required: true }]}>
-            <TextArea
-              autoSize={{ minRows: 1, maxRows: 2 }}
-              showCount
-              maxLength={128}
-            />
-          </Item>
-          <Item
-            name="roadmapManagerIds"
-            label="Roadmap Managers"
-            rules={[
-              {
-                required: true,
-                message: 'Select at least one roadmap manager',
-              },
-              {
-                validator: async (_, value) => {
-                  if (!value.includes(currentUserInternalEmployeeId)) {
-                    return Promise.reject(
-                      new Error(
-                        'You must also be a roadmap manager to copy this roadmap',
-                      ),
-                    )
-                  }
-                  return Promise.resolve()
-                },
-              },
-            ]}
-          >
-            <EmployeeSelect
-              employees={employeeData ?? []}
-              allowMultiple={true}
-              placeholder="Select one or more roadmap managers"
-            />
-          </Item>
-          <Item
-            name="visibilityId"
-            label="Visibility"
-            rules={[{ required: true }]}
-          >
-            <RadioGroup
-              options={visibilityData}
-              optionType="button"
-              buttonStyle="solid"
-            />
-          </Item>
-        </Form>
-      </Modal>
-    </>
+          <EmployeeSelect
+            employees={employeeData ?? []}
+            allowMultiple={true}
+            placeholder="Select one or more roadmap managers"
+          />
+        </Item>
+        <Item
+          name="visibilityId"
+          label="Visibility"
+          rules={[{ required: true }]}
+        >
+          <RadioGroup
+            options={visibilityData}
+            optionType="button"
+            buttonStyle="solid"
+          />
+        </Item>
+      </Form>
+    </Modal>
   )
 }
 

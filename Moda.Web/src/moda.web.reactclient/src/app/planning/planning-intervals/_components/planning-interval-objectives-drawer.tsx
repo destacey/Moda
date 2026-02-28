@@ -128,7 +128,6 @@ const PlanningIntervalObjectiveDetailsDrawer: FC<
       </Drawer>
       {openEditObjectiveForm && (
         <EditPlanningIntervalObjectiveForm
-          showForm={openEditObjectiveForm}
           objectiveKey={props.objectiveKey}
           planningIntervalKey={props.planningIntervalKey}
           onFormSave={() => setOpenEditObjectiveForm(false)}

@@ -112,7 +112,6 @@ const LinkItem = ({
       {openEditLinkForm && (
         <EditLinkForm
           id={link.id}
-          showForm={openEditLinkForm}
           onFormUpdate={() => setOpenEditLinkForm(false)}
           onFormCancel={() => setOpenEditLinkForm(false)}
         />

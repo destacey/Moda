@@ -285,7 +285,6 @@ const ConnectionDetailsPage = (props: { params: Promise<{ id: string }> }) => {
       </AzdoConnectionContext.Provider>
       {openEditConnectionForm && (
         <EditConnectionForm
-          showForm={openEditConnectionForm}
           id={azdoConnection?.id}
           onFormUpdate={() => onEditConnectionFormClosed(true)}
           onFormCancel={() => onEditConnectionFormClosed(false)}
@@ -293,7 +292,6 @@ const ConnectionDetailsPage = (props: { params: Promise<{ id: string }> }) => {
       )}
       {openDeleteConnectionForm && (
         <DeleteAzdoConnectionForm
-          showForm={openDeleteConnectionForm}
           connection={azdoConnection}
           onFormSave={() => onDeleteConnectionFormClosed(true)}
           onFormCancel={() => onDeleteConnectionFormClosed(false)}

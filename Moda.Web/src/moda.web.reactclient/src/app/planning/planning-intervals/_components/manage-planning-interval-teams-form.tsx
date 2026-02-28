@@ -1,6 +1,6 @@
 'use client'
 
-import useAuth from '@/src/components/contexts/auth'
+import { useConfirmModal } from '@/src/hooks'
 import { TeamListItem } from '@/src/app/organizations/types'
 import {
   getPlanningIntervalsClient,
@@ -18,7 +18,6 @@ import type { ColumnsType, TableRowSelection } from 'antd/es/table/interface'
 import { useMessage } from '@/src/components/contexts/messaging'
 
 export interface ManagePlanningIntervalTeamsFormProps {
-  showForm: boolean
   id: string
   onFormSave: () => void
   onFormCancel: () => void
@@ -112,23 +111,14 @@ const tableColumns: ColumnsType<PlanningIntervalTeamModel> = [
 ]
 
 const ManagePlanningIntervalTeamsForm = ({
-  showForm,
   id,
   onFormSave,
   onFormCancel,
 }: ManagePlanningIntervalTeamsFormProps) => {
-  const [isOpen, setIsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
   const [teams, setTeams] = useState<PlanningIntervalTeamModel[]>([])
   const [targetKeys, setTargetKeys] = useState<string[]>([])
   const messageApi = useMessage()
-
-  const { hasClaim } = useAuth()
-  const canUpdatePI = hasClaim(
-    'Permission',
-    'Permissions.PlanningIntervals.Update',
-  )
 
   // TODO: should this be in a custom hook? The teams index page has a similar call.
   const getTeams = useCallback(async () => {
@@ -160,78 +150,62 @@ const ManagePlanningIntervalTeamsForm = ({
     }))
   }, [])
 
-  const loadData = useCallback(
-    async (id: string) => {
+  const { isOpen, isSaving, handleOk, handleCancel } = useConfirmModal({
+    onSubmit: useCallback(async () => {
       try {
-        setIsLoading(true)
-        setTeams(await getTeams())
-        const piTeamsData = await getPlanningIntervalTeams(id)
-        setTargetKeys(piTeamsData.map((team) => team.key))
+        const piClient = await getPlanningIntervalsClient()
+        const request: ManagePlanningIntervalTeamsRequest = {
+          id: id,
+          teamIds: targetKeys,
+        }
+        await piClient.manageTeams(id, request)
+
+        messageApi.success(`Successfully updated PI teams.`)
+        return true
       } catch (error) {
-        messageApi.error(
-          `An unexpected error occurred while retrieving PI teams.`,
-        )
+        messageApi.error(`An unexpected error occurred while saving.`)
         console.error(error)
+        return false
       }
-      setIsLoading(false)
-    },
-    [getPlanningIntervalTeams, getTeams, messageApi],
-  )
+    }, [id, targetKeys, messageApi]),
+    onComplete: onFormSave,
+    onCancel: onFormCancel,
+    errorMessage:
+      'An error occurred while updating PI teams. Please try again.',
+    permission: 'Permissions.PlanningIntervals.Update',
+  })
 
   useEffect(() => {
-    if (canUpdatePI) {
-      setIsOpen(showForm)
-      if (showForm) {
-        loadData(id)
+    if (!isOpen) return
+    let cancelled = false
+
+    const loadData = async () => {
+      try {
+        setIsLoading(true)
+        const teamsData = await getTeams()
+        const piTeamsData = await getPlanningIntervalTeams(id)
+        if (!cancelled) {
+          setTeams(teamsData)
+          setTargetKeys(piTeamsData.map((team) => team.key))
+        }
+      } catch (error) {
+        if (!cancelled) {
+          messageApi.error(
+            `An unexpected error occurred while retrieving PI teams.`,
+          )
+          console.error(error)
+        }
       }
-    } else {
-      onFormCancel()
-      messageApi.error(
-        'You do not have permission to update the Planning Interval.',
-      )
-    }
-  }, [canUpdatePI, id, loadData, messageApi, onFormCancel, showForm])
-
-  const savePITeams = async (): Promise<boolean> => {
-    try {
-      const piClient = await getPlanningIntervalsClient()
-      const request: ManagePlanningIntervalTeamsRequest = {
-        id: id,
-        teamIds: targetKeys,
+      if (!cancelled) {
+        setIsLoading(false)
       }
-      await piClient.manageTeams(id, request)
-
-      return true
-    } catch (error) {
-      messageApi.error(`An unexpected error occurred while saving.`)
-      console.error(error)
-
-      return false
     }
-  }
 
-  const handleOk = async () => {
-    setIsSaving(true)
-    try {
-      if (await savePITeams()) {
-        setIsOpen(false)
-        onFormSave()
-        messageApi.success(`Successfully updated PI teams.`)
-      }
-    } catch (error) {
-      console.error('handleOk error', error)
-      messageApi.error(
-        'An error occurred while updating PI teams. Please try again.',
-      )
-    } finally {
-      setIsSaving(false)
+    loadData()
+    return () => {
+      cancelled = true
     }
-  }
-
-  const handleCancel = () => {
-    setIsOpen(false)
-    onFormCancel()
-  }
+  }, [isOpen, id, getTeams, getPlanningIntervalTeams, messageApi])
 
   const onChange = (nextTargetKeys: string[]) => {
     setTargetKeys(nextTargetKeys)
@@ -246,8 +220,8 @@ const ManagePlanningIntervalTeamsForm = ({
       okText="Save"
       confirmLoading={isSaving}
       onCancel={handleCancel}
-      keyboard={false} // disable esc key to close modal
-      destroyOnHidden={true}
+      keyboard={false}
+      destroyOnHidden
     >
       {
         <Spin spinning={isLoading} size="large">

@@ -2,7 +2,6 @@
 
 import { DatePicker, Form, Input, Modal, Select, Switch } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
-import useAuth from '../../../../components/contexts/auth'
 import { CreatePlanningIntervalObjectiveRequest } from '@/src/services/moda-api'
 import { toFormErrors } from '@/src/utils'
 import dayjs from 'dayjs'
@@ -15,12 +14,12 @@ import {
   useGetPlanningIntervalQuery,
   useGetPlanningIntervalTeamsQuery,
 } from '@/src/store/features/planning/planning-interval-api'
+import { useModalForm } from '@/src/hooks'
 
 const { Item: FormItem } = Form
 const { TextArea } = Input
 
 export interface CreatePlanningIntervalObjectiveFormProps {
-  showForm: boolean
   planningIntervalKey: number
   teamId?: string
   order?: number
@@ -60,18 +59,12 @@ const mapToRequestValues = (
 }
 
 const CreatePlanningIntervalObjectiveForm = ({
-  showForm,
   planningIntervalKey,
   teamId,
   order,
   onFormCreate,
   onFormCancel,
 }: CreatePlanningIntervalObjectiveFormProps) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-  const [isValid, setIsValid] = useState(false)
-  const [form] = Form.useForm<CreatePlanningIntervalObjectiveFormValues>()
-  const formValues = Form.useWatch([], form)
   const messageApi = useMessage()
   const [teams, setTeams] = useState<PlanningIntervalTeamSelectItem[]>([])
 
@@ -81,122 +74,61 @@ const CreatePlanningIntervalObjectiveForm = ({
     useGetPlanningIntervalTeamsQuery(planningIntervalKey)
   const { data: statusData } = useGetPlanningIntervalObjectiveStatusesQuery()
 
-  const [createObjective, { error: mutationError }] =
-    useCreatePlanningIntervalObjectiveMutation()
+  const [createObjective] = useCreatePlanningIntervalObjectiveMutation()
 
-  const { hasPermissionClaim } = useAuth()
-  const canManageObjectives = hasPermissionClaim(
-    'Permissions.PlanningIntervalObjectives.Manage',
-  )
-
-  const mapToFormValues = useCallback(
-    (planningIntervalId: string, teamId?: string) => {
-      form.setFieldsValue({
-        planningIntervalId: planningIntervalId,
-        teamId: teamId,
-        isStretch: false,
-      })
-    },
-    [form],
-  )
-
-  const create = async (
-    values: CreatePlanningIntervalObjectiveFormValues,
-    planningIntervalKey: number,
-  ): Promise<boolean> => {
-    try {
-      const request = mapToRequestValues(values, order)
-      const response = await createObjective({
-        request,
-        planningIntervalKey,
-      })
-      if (response.error) {
-        throw response.error
-      }
-      messageApi.success('Successfully created PI objective.')
-
-      return true
-    } catch (error) {
-      if (error.status === 422 && error.errors) {
-        const formErrors = toFormErrors(error.errors)
-        form.setFields(formErrors)
-        messageApi.error('Correct the validation error(s) to continue.')
-      } else {
-        messageApi.error(
-          error.detail ??
-            'An unexpected error occurred while creating the PI objective.',
-        )
-        console.error(error)
-      }
-      return false
-    }
-  }
-
-  const handleOk = async () => {
-    setIsSaving(true)
-    try {
-      const values = await form.validateFields()
-      if (await create(values, planningIntervalData?.key)) {
-        setIsOpen(false)
-        form.resetFields()
-        onFormCreate()
-      }
-    } catch (errorInfo) {
-      console.log('handleOk error', errorInfo)
-    } finally {
-      setIsSaving(false)
-    }
-  }
-
-  const handleCancel = useCallback(() => {
-    setIsOpen(false)
-    onFormCancel()
-    form.resetFields()
-  }, [form, onFormCancel])
+  const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
+    useModalForm<CreatePlanningIntervalObjectiveFormValues>({
+      onSubmit: useCallback(
+        async (values: CreatePlanningIntervalObjectiveFormValues, form) => {
+          try {
+            const request = mapToRequestValues(values, order)
+            const response = await createObjective({
+              request,
+              planningIntervalKey: planningIntervalData?.key,
+            })
+            if (response.error) {
+              throw response.error
+            }
+            messageApi.success('Successfully created PI objective.')
+            return true
+          } catch (error) {
+            if (error.status === 422 && error.errors) {
+              const formErrors = toFormErrors(error.errors)
+              form.setFields(formErrors)
+              messageApi.error('Correct the validation error(s) to continue.')
+            } else {
+              messageApi.error(
+                error.detail ??
+                  'An unexpected error occurred while creating the PI objective.',
+              )
+              console.error(error)
+            }
+            return false
+          }
+        },
+        [createObjective, planningIntervalData?.key, order, messageApi],
+      ),
+      onComplete: onFormCreate,
+      onCancel: onFormCancel,
+      errorMessage:
+        'An unexpected error occurred while creating the PI objective.',
+      permission: 'Permissions.PlanningIntervalObjectives.Manage',
+    })
 
   useEffect(() => {
     if (!teamData || !statusData) return
 
-    if (canManageObjectives) {
-      setIsOpen(showForm)
-      if (showForm === true) {
-        try {
-          setTeams(
-            teamData
-              .filter((t) => t.type === 'Team')
-              .map((t) => ({ value: t.id, label: t.name })),
-          )
-          mapToFormValues(planningIntervalData?.id, teamId)
-        } catch (error) {
-          handleCancel()
-          messageApi.error(
-            'An unexpected error occurred while loading form data.',
-          )
-          console.error(error)
-        }
-      }
-    } else {
-      handleCancel()
-      messageApi.error('You do not have permission to create PI objectives.')
-    }
-  }, [
-    canManageObjectives,
-    handleCancel,
-    showForm,
-    messageApi,
-    mapToFormValues,
-    teamId,
-    statusData,
-    teamData,
-    planningIntervalData?.id,
-  ])
-
-  useEffect(() => {
-    form.validateFields({ validateOnly: true }).then(
-      () => setIsValid(true && form.isFieldsTouched()),
-      () => setIsValid(false),
+    setTeams(
+      teamData
+        .filter((t) => t.type === 'Team')
+        .map((t) => ({ value: t.id, label: t.name })),
     )
-  }, [form, formValues])
+    form.setFieldsValue({
+      planningIntervalId: planningIntervalData?.id,
+      teamId: teamId,
+      isStretch: false,
+    })
+  }, [teamData, statusData, planningIntervalData?.id, teamId, form])
 
   const disabledDate: RangePickerProps['disabledDate'] = useCallback(
     (current) => {
@@ -228,15 +160,15 @@ const CreatePlanningIntervalObjectiveForm = ({
         okText="Create"
         confirmLoading={isSaving}
         onCancel={handleCancel}
-        keyboard={false} // disable esc key to close modal
-        destroyOnHidden={true}
+        keyboard={false}
+        destroyOnHidden
       >
         <Form
           form={form}
           size="small"
           layout="vertical"
           name="create-objective-form"
-          initialValues={{ isStretch: false }} // used to set default value for switch
+          initialValues={{ isStretch: false }}
         >
           <FormItem name="planningIntervalId" hidden={true}>
             <Input />

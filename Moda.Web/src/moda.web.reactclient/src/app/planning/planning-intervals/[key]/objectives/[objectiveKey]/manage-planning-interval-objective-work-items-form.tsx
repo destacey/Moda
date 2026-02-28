@@ -1,6 +1,6 @@
 'use client'
 
-import { useDebounce } from '@/src/hooks'
+import { useConfirmModal, useDebounce } from '@/src/hooks'
 import {
   ManagePlanningIntervalObjectiveWorkItemsRequest,
   WorkItemListDto,
@@ -13,7 +13,7 @@ import {
 import { useSearchWorkItemsQuery } from '@/src/store/features/work-management/workspace-api'
 import { SearchOutlined } from '@ant-design/icons'
 import { Flex, Input, Modal, Typography } from 'antd'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { ColDef } from 'ag-grid-community'
 import {
   AgGridTransfer,
@@ -26,7 +26,6 @@ import { workItemKeyComparator } from '@/src/components/common/work'
 const { Text } = Typography
 
 export interface ManagePlanningIntervalObjectiveWorkItemsFormProps {
-  showForm: boolean
   planningIntervalKey: number
   objectiveKey: number
   onFormComplete: () => void
@@ -86,24 +85,17 @@ const defaultColDef: ColDef = {
   filter: false,
 }
 
-const ManagePlanningIntervalObjectiveWorkItemsForm = (
-  props: ManagePlanningIntervalObjectiveWorkItemsFormProps,
-) => {
-  const {
-    showForm,
-    planningIntervalKey,
-    objectiveKey,
-    onFormComplete,
-    onFormCancel,
-  } = props
-
-  const [isOpen, setIsOpen] = useState(showForm)
-  const [isSaving, setIsSaving] = useState(false)
-  const [searchResultWorkItems, setSearchResultWorkItems] = useState<
-    WorkItemListDto[]
-  >([])
-  const [sourceWorkItems, setSourceWorkItems] = useState<WorkItemListDto[]>([])
-  const [targetWorkItems, setTargetWorkItems] = useState<WorkItemListDto[]>([])
+const ManagePlanningIntervalObjectiveWorkItemsForm = ({
+  planningIntervalKey,
+  objectiveKey,
+  onFormComplete,
+  onFormCancel,
+}: ManagePlanningIntervalObjectiveWorkItemsFormProps) => {
+  // Track user modifications (drag/delete) separately from query data.
+  // addedItems: items dragged from source to target by the user.
+  // removedIds: ids of items deleted from target by the user.
+  const [addedItems, setAddedItems] = useState<WorkItemListDto[]>([])
+  const [removedIds, setRemovedIds] = useState<Set<string>>(new Set())
   const messageApi = useMessage()
 
   const [searchQuery, setSearchQuery] = useState<string>('')
@@ -127,106 +119,95 @@ const ManagePlanningIntervalObjectiveWorkItemsForm = (
     skip: debounceSearchQuery === '',
   })
 
-  const [manageObjectiveWorkItems, { error }] =
-    useManageObjectiveWorkItemsMutation()
+  const [manageObjectiveWorkItems] = useManageObjectiveWorkItemsMutation()
 
-  useEffect(() => {
-    if (!existingWorkItemsData) return
-    setTargetWorkItems(
-      existingWorkItemsData?.workItems?.slice().sort(defaultSort) ?? [],
-    )
-  }, [existingWorkItemsData])
+  // Derive target work items: existing items (minus removed) plus user-added items
+  const targetWorkItems = useMemo(() => {
+    const existing =
+      existingWorkItemsData?.workItems?.filter(
+        (item) => !removedIds.has(item.id),
+      ) ?? []
+    return [...existing, ...addedItems].sort(defaultSort)
+  }, [existingWorkItemsData, addedItems, removedIds])
 
-  useEffect(() => {
-    if (!searchResult) return
-
-    setSearchResultWorkItems(searchResult ?? [])
-  }, [searchResult])
-
-  useEffect(() => {
-    const selectedIds =
-      existingWorkItemsData?.workItems?.map((item) => item.id) ?? []
-
-    const filteredWorkItems = searchResultWorkItems
-      .filter((item) => !selectedIds.includes(item.id))
+  // Derive source work items: search results minus items already in target
+  const sourceWorkItems = useMemo(() => {
+    const targetIds = new Set(targetWorkItems.map((item) => item.id))
+    return (searchResult ?? [])
+      .filter((item) => !targetIds.has(item.id))
       .sort(defaultSort)
+  }, [searchResult, targetWorkItems])
 
-    setSourceWorkItems(filteredWorkItems)
-  }, [existingWorkItemsData, searchResultWorkItems])
+  const { isOpen, isSaving, handleOk, handleCancel } = useConfirmModal({
+    onSubmit: useCallback(async () => {
+      try {
+        const request: ManagePlanningIntervalObjectiveWorkItemsRequest = {
+          planningIntervalId: objectiveData?.planningInterval.id,
+          objectiveId: objectiveData?.id,
+          workItemIds: targetWorkItems.map((item) => item.id),
+        }
+        await manageObjectiveWorkItems({
+          request,
+          cacheKey: objectiveKey.toString(),
+        })
+        messageApi.success('Successfully updated objective work items.')
+        return true
+      } catch (error) {
+        messageApi.error(
+          `Failed to update objective work items. Error: ${error.detail}`,
+        )
+        console.error(error)
+        return false
+      }
+    }, [
+      manageObjectiveWorkItems,
+      objectiveData,
+      targetWorkItems,
+      objectiveKey,
+      messageApi,
+    ]),
+    onComplete: onFormComplete,
+    onCancel: onFormCancel,
+    errorMessage:
+      'An error occurred while managing the work items. Please try again.',
+  })
 
   const onDragStop = useCallback((items: WorkItemListDto[]) => {
-    // using the functional update form of setState to ensure we are using the latest state
     if (items.length === 0) return
 
-    setSourceWorkItems((prevSource) =>
-      prevSource.filter((p) => !items.some((i) => i.id === p.id)),
-    )
-
-    setTargetWorkItems((prevTarget) =>
-      [...prevTarget, ...items].sort(defaultSort),
-    )
+    // Items dragged from source to target: add them and un-remove if needed
+    setAddedItems((prev) => [...prev, ...items])
+    setRemovedIds((prev) => {
+      const next = new Set(prev)
+      for (const item of items) {
+        next.delete(item.id)
+      }
+      return next
+    })
   }, [])
 
-  const handleDelete = useCallback((item: WorkItemListDto) => {
-    // using the functional update form of setState to ensure we are using the latest state
-    if (!item) return
+  const handleDelete = useCallback(
+    (item: WorkItemListDto) => {
+      if (!item) return
 
-    setTargetWorkItems((prevTarget) =>
-      prevTarget.filter((p) => p.id !== item.id),
-    )
-
-    setSourceWorkItems((prevSource) => [...prevSource, item].sort(defaultSort))
-  }, [])
+      const isExistingItem = existingWorkItemsData?.workItems?.some(
+        (w) => w.id === item.id,
+      )
+      if (isExistingItem) {
+        // Mark existing item as removed
+        setRemovedIds((prev) => new Set(prev).add(item.id))
+      } else {
+        // Remove user-added item
+        setAddedItems((prev) => prev.filter((p) => p.id !== item.id))
+      }
+    },
+    [existingWorkItemsData],
+  )
 
   const rightColDefs = useMemo(
     () => asDeletableColDefs(workItemColDefs, handleDelete),
     [handleDelete],
   )
-
-  const formAction = async (): Promise<boolean> => {
-    try {
-      // TODO: get the objectiveData from the API and use it to get the work items
-      const request: ManagePlanningIntervalObjectiveWorkItemsRequest = {
-        planningIntervalId: objectiveData?.planningInterval.id,
-        objectiveId: objectiveData?.id,
-        workItemIds: targetWorkItems.map((item) => item.id),
-      }
-      await manageObjectiveWorkItems({
-        request,
-        cacheKey: objectiveKey.toString(),
-      })
-      messageApi.success('Successfully updated objective work items.')
-      return true
-    } catch (error) {
-      messageApi.error(
-        `Failed to update objective work items. Error: ${error.detail}`,
-      )
-      console.error(error)
-      return false
-    }
-  }
-
-  const handleOk = async () => {
-    setIsSaving(true)
-    try {
-      if (await formAction()) {
-        setIsOpen(false)
-        onFormComplete()
-      }
-    } catch (error) {
-      console.error(error)
-      messageApi.error(
-        'An error occurred while managing the work items. Please try again.',
-      )
-    } finally {
-      setIsSaving(false)
-    }
-  }
-
-  const handleCancel = useCallback(() => {
-    setIsOpen(false)
-    onFormCancel()
-  }, [onFormCancel])
 
   const handleSearch = (e) => {
     setSearchQuery(e.target.value)
@@ -241,8 +222,8 @@ const ManagePlanningIntervalObjectiveWorkItemsForm = (
       okText="Save"
       confirmLoading={isSaving}
       onCancel={handleCancel}
-      keyboard={false} // disable esc key to close modal
-      destroyOnHidden={true}
+      keyboard={false}
+      destroyOnHidden
     >
       {
         <Flex gap="small" vertical>

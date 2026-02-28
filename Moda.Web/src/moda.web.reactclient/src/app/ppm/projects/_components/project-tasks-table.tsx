@@ -699,7 +699,6 @@ const ProjectTasksTable = ({
       {openCreateTaskForm && (
         <CreateProjectTaskForm
           projectIdOrKey={projectKey}
-          showForm={openCreateTaskForm}
           onFormComplete={() => onCreateTaskFormClosed(true)}
           onFormCancel={() => onCreateTaskFormClosed(false)}
         />
@@ -708,7 +707,6 @@ const ProjectTasksTable = ({
         <EditProjectTaskForm
           projectIdOrKey={projectKey}
           taskIdOrKey={selectedTaskId}
-          showForm={openEditTaskForm}
           onFormComplete={() => onEditTaskFormClosed(true)}
           onFormCancel={() => onEditTaskFormClosed(false)}
         />
@@ -717,7 +715,6 @@ const ProjectTasksTable = ({
         <DeleteProjectTaskForm
           projectIdOrKey={projectKey}
           taskIdOrKey={selectedTaskId}
-          showForm={openDeleteTaskForm}
           onFormComplete={() => onDeleteTaskFormClosed(true)}
           onFormCancel={() => onDeleteTaskFormClosed(false)}
         />

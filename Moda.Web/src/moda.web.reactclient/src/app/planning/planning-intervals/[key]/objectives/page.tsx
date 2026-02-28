@@ -132,7 +132,6 @@ const PlanningIntervalObjectivesPage = (props: {
       )}
       {openCreateObjectiveForm && (
         <CreatePlanningIntervalObjectiveForm
-          showForm={openCreateObjectiveForm}
           planningIntervalKey={piKey}
           onFormCreate={() => onCreateObjectiveFormClosed(true)}
           onFormCancel={() => onCreateObjectiveFormClosed(false)}
