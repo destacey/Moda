@@ -21,7 +21,7 @@ export interface StrategicInitiativeDrawerProps {
 const StrategicInitiativeDrawer: FC<StrategicInitiativeDrawerProps> = (
   props: StrategicInitiativeDrawerProps,
 ) => {
-  const [size, setSize] = useState(getDrawerWidthPixels())
+  const [size, setSize] = useState(() => getDrawerWidthPixels())
   const messageApi = useMessage()
 
   const {

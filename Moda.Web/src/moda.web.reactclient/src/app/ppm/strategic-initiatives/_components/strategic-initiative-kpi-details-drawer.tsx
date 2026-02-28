@@ -120,7 +120,7 @@ const StrategicInitiativeKpiDetailsDrawer: FC<
     onRefresh,
   } = props
 
-  const [size, setSize] = useState(getDrawerWidthPixels())
+  const [size, setSize] = useState(() => getDrawerWidthPixels())
   const [openEditKpiForm, setOpenEditKpiForm] = useState(false)
   const [openDeleteKpiForm, setOpenDeleteKpiForm] = useState(false)
   const [openAddMeasurementForm, setOpenAddMeasurementForm] = useState(false)

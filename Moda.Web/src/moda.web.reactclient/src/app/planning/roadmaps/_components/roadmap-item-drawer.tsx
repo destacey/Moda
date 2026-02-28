@@ -30,7 +30,7 @@ const RoadmapItemDrawer: FC<RoadmapItemDrawerProps> = (
 ) => {
   const [openEditRoadmapItemForm, setOpenEditRoadmapItemForm] =
     useState<boolean>(false)
-  const [size, setSize] = useState(getDrawerWidthPixels())
+  const [size, setSize] = useState(() => getDrawerWidthPixels())
   const messageApi = useMessage()
 
   const {
