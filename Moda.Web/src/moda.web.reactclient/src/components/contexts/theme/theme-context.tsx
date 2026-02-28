@@ -1,8 +1,7 @@
-import { createContext, ReactNode, useEffect, useMemo, useState } from 'react'
+import { createContext, ReactNode, useEffect, useMemo } from 'react'
 import {
   themeBalham,
   colorSchemeDark,
-  type Theme as AgGridTheme,
 } from 'ag-grid-community'
 import { useLocalStorageState } from '@/src/hooks'
 import { ConfigProvider, theme } from 'antd'
@@ -19,10 +18,11 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [currentThemeName, setCurrentThemeName] =
     useLocalStorageState<ThemeName>('modaTheme', 'light')
 
-  const [agGridTheme, setAgGridTheme] = useState<AgGridTheme>(agGridLightTheme)
-  const [badgeColor, setBadgeColor] = useState<string | null>(null)
-  const [antDesignChartsTheme, setAntDesignChartsTheme] = useState('classic')
-  const [antvisG6ChartsTheme, setAntvisG6ChartsTheme] = useState('light')
+  const agGridTheme =
+    currentThemeName === 'light' ? agGridLightTheme : agGridDarkTheme
+  const antDesignChartsTheme =
+    currentThemeName === 'light' ? 'classic' : 'classicDark'
+  const antvisG6ChartsTheme = currentThemeName === 'light' ? 'light' : 'dark'
 
   // Create the theme configuration
   const currentTheme = useMemo(
@@ -30,23 +30,10 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     [currentThemeName],
   )
 
-  useEffect(() => {
-    setAgGridTheme(
-      currentThemeName === 'light' ? agGridLightTheme : agGridDarkTheme,
-    )
-    setAntDesignChartsTheme(
-      currentThemeName === 'light' ? 'classic' : 'classicDark',
-    )
-    setAntvisG6ChartsTheme(currentThemeName === 'light' ? 'light' : 'dark')
-  }, [currentThemeName])
-
   // Use theme.useToken() inside ConfigProvider
   const ThemeContent = ({ children }: { children: ReactNode }) => {
     const { token } = theme.useToken()
-
-    useEffect(() => {
-      setBadgeColor(token.colorPrimary)
-    }, [token.colorPrimary])
+    const badgeColor = token.colorPrimary
 
     useEffect(() => {
       // Set data-theme on document.documentElement (html element) for global theme access
