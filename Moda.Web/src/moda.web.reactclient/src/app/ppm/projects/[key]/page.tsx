@@ -12,10 +12,11 @@ import {
   useGetProjectQuery,
   useGetProjectWorkItemsQuery,
 } from '@/src/store/features/ppm/projects-api'
-import { Alert, Card, MenuProps } from 'antd'
+import { Alert, Card, MenuProps, Spin } from 'antd'
 import { notFound, usePathname, useRouter } from 'next/navigation'
 import { use, useCallback, useEffect, useMemo, useState } from 'react'
 import ProjectDetailsLoading from './loading'
+import dynamic from 'next/dynamic'
 import {
   ChangeProjectStatusForm,
   ChangeProjectProgramForm,
@@ -23,12 +24,20 @@ import {
   DeleteProjectForm,
   EditProjectForm,
   ProjectDetails,
-  ProjectPlan,
 } from '../_components'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import { ItemType } from 'antd/es/menu/interface'
 import { ProjectStatusAction } from '../_components/change-project-status-form'
-import { WorkItemsGrid } from '@/src/components/common/work'
+
+const ProjectPlan = dynamic(
+  () => import('../_components/project-plan'),
+  { ssr: false, loading: () => <Spin /> },
+)
+
+const WorkItemsGrid = dynamic(
+  () => import('@/src/components/common/work/work-items-grid'),
+  { ssr: false, loading: () => <Spin /> },
+)
 
 enum ProjectTabs {
   Details = 'details',

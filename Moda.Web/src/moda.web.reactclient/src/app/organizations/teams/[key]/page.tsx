@@ -1,7 +1,7 @@
 'use client'
 
 import PageTitle from '@/src/components/common/page-title'
-import { Card, MenuProps } from 'antd'
+import { Card, MenuProps, Spin } from 'antd'
 import { CloseOutlined } from '@ant-design/icons'
 import {
   createElement,
@@ -36,8 +36,7 @@ import { ItemType } from 'antd/es/menu/interface'
 import { InactiveTag, PageActions } from '@/src/components/common'
 import DeactivateTeamForm from '../../_components/deactivate-team-form'
 import TeamSprints from '../_components/team-sprints'
-import { CycleTimeReport } from '@/src/components/common/work/cycle-time-report'
-import TeamBacklog from '../_components/team-backlog'
+import dynamic from 'next/dynamic'
 import {
   SetTeamOperatingModelForm,
   TeamOperatingModelsGrid,
@@ -49,6 +48,19 @@ import {
   EditTeamForm,
   TeamMembershipsGrid,
 } from '../../_components'
+
+const CycleTimeReport = dynamic(
+  () =>
+    import('@/src/components/common/work/cycle-time-report').then((mod) => ({
+      default: mod.CycleTimeReport,
+    })),
+  { ssr: false, loading: () => <Spin /> },
+)
+
+const TeamBacklog = dynamic(
+  () => import('../_components/team-backlog'),
+  { ssr: false, loading: () => <Spin /> },
+)
 
 enum TeamTabs {
   Details = 'details',
