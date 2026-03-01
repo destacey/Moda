@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.SignalR;
 using Moda.Planning.Application.PokerSessions.Dtos;
 using Moda.Planning.Application.PokerSessions.Interfaces;
 
@@ -7,10 +7,6 @@ namespace Moda.Infrastructure.SignalR;
 internal sealed class PlanningPokerNotifier(IHubContext<PlanningPokerHub> hubContext) : IPokerSessionNotifier
 {
     private readonly IHubContext<PlanningPokerHub> _hubContext = hubContext;
-
-    public async Task NotifySessionActivated(Guid sessionId) =>
-        await _hubContext.Clients.Group(sessionId.ToString())
-            .SendAsync("SessionActivated", sessionId);
 
     public async Task NotifySessionCompleted(Guid sessionId) =>
         await _hubContext.Clients.Group(sessionId.ToString())
@@ -24,11 +20,7 @@ internal sealed class PlanningPokerNotifier(IHubContext<PlanningPokerHub> hubCon
         await _hubContext.Clients.Group(sessionId.ToString())
             .SendAsync("RoundRemoved", sessionId, roundId);
 
-    public async Task NotifyRoundStarted(Guid sessionId, Guid roundId, string label) =>
-        await _hubContext.Clients.Group(sessionId.ToString())
-            .SendAsync("RoundStarted", sessionId, roundId, label);
-
-    public async Task NotifyVotesRevealed(Guid sessionId, Guid roundId, IEnumerable<VoteDto> votes) =>
+    public async Task NotifyVotesRevealed(Guid sessionId, Guid roundId, IEnumerable<PokerVoteDto> votes) =>
         await _hubContext.Clients.Group(sessionId.ToString())
             .SendAsync("VotesRevealed", sessionId, roundId, votes);
 
