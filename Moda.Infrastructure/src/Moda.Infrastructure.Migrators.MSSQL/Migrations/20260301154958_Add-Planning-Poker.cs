@@ -19,7 +19,8 @@ public partial class AddPlanningPoker : Migration
                     .Annotation("SqlServer:Identity", "1, 1"),
                 Name = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
                 Description = table.Column<string>(type: "nvarchar(1024)", maxLength: 1024, nullable: true),
-                IsPreset = table.Column<bool>(type: "bit", nullable: false),
+                Values = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                IsActive = table.Column<bool>(type: "bit", nullable: false),
                 SystemCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
                 SystemCreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                 SystemLastModified = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -28,27 +29,6 @@ public partial class AddPlanningPoker : Migration
             constraints: table =>
             {
                 table.PrimaryKey("PK_EstimationScales", x => x.Id);
-            });
-
-        migrationBuilder.CreateTable(
-            name: "EstimationScaleValues",
-            schema: "Planning",
-            columns: table => new
-            {
-                EstimationScaleId = table.Column<int>(type: "int", nullable: false),
-                Order = table.Column<int>(type: "int", nullable: false),
-                Value = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false)
-            },
-            constraints: table =>
-            {
-                table.PrimaryKey("PK_EstimationScaleValues", x => new { x.EstimationScaleId, x.Order });
-                table.ForeignKey(
-                    name: "FK_EstimationScaleValues_EstimationScales_EstimationScaleId",
-                    column: x => x.EstimationScaleId,
-                    principalSchema: "Planning",
-                    principalTable: "EstimationScales",
-                    principalColumn: "Id",
-                    onDelete: ReferentialAction.Cascade);
             });
 
         migrationBuilder.CreateTable(
@@ -97,7 +77,7 @@ public partial class AddPlanningPoker : Migration
             {
                 Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                 PokerSessionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                Label = table.Column<string>(type: "nvarchar(512)", maxLength: 512, nullable: false),
+                Label = table.Column<string>(type: "nvarchar(512)", maxLength: 512, nullable: true),
                 Status = table.Column<string>(type: "varchar(32)", maxLength: 32, nullable: false),
                 ConsensusEstimate = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: true),
                 Order = table.Column<int>(type: "int", nullable: false)
@@ -185,10 +165,6 @@ public partial class AddPlanningPoker : Migration
     /// <inheritdoc />
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropTable(
-            name: "EstimationScaleValues",
-            schema: "Planning");
-
         migrationBuilder.DropTable(
             name: "PokerVotes",
             schema: "Planning");

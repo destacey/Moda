@@ -18,6 +18,6 @@ public sealed record EmployeeNavigationDto : NavigationDto, IMapFrom<Employee>
         config.NewConfig<Employee, EmployeeNavigationDto>()
             .Map(dest => dest.Id, src => src.Id)
             .Map(dest => dest.Key, src => src.Key)
-            .Map(dest => dest.Name, src => src.Name.DisplayName);
+            .Map(dest => dest.Name, src => src.Name.FirstName + " " + src.Name.LastName);
     }
 }

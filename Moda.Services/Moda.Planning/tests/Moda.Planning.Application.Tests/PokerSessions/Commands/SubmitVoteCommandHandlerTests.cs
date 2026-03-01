@@ -46,7 +46,7 @@ public class SubmitVoteCommandHandlerTests : IDisposable
 
         session.AddRound("Story");
         var round = session.Rounds.First();
-        session.StartRound(round.Id);
+
 
         var command = new SubmitVoteCommand(session.Id, round.Id, "8");
 
@@ -71,7 +71,7 @@ public class SubmitVoteCommandHandlerTests : IDisposable
 
         session.AddRound("Story");
         var round = session.Rounds.First();
-        session.StartRound(round.Id);
+
 
         // First vote
         session.SubmitVote(round.Id, _currentUserId, "5", Instant.FromUtc(2026, 1, 15, 9, 0));
@@ -112,7 +112,9 @@ public class SubmitVoteCommandHandlerTests : IDisposable
 
         session.AddRound("Story");
         var round = session.Rounds.First();
-        // Round is still Pending
+        session.SubmitVote(round.Id, Guid.NewGuid(), "3", Instant.FromUtc(2026, 1, 15, 9, 0));
+        session.RevealRound(round.Id);
+        // Round is now Revealed, not Voting
 
         var command = new SubmitVoteCommand(session.Id, round.Id, "5");
 

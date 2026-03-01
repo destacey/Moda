@@ -26,13 +26,7 @@ public class CreateEstimationScaleCommandHandlerTests : IDisposable
         var command = new CreateEstimationScaleCommand(
             "Fibonacci",
             "Fibonacci sequence for estimation",
-            [
-                new CreateEstimationScaleCommand.ScaleValue("1", 0),
-                new CreateEstimationScaleCommand.ScaleValue("2", 1),
-                new CreateEstimationScaleCommand.ScaleValue("3", 2),
-                new CreateEstimationScaleCommand.ScaleValue("5", 3),
-                new CreateEstimationScaleCommand.ScaleValue("8", 4),
-            ]);
+            ["1", "2", "3", "5", "8"]);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -43,17 +37,13 @@ public class CreateEstimationScaleCommandHandlerTests : IDisposable
     }
 
     [Fact]
-    public async Task Handle_ShouldCreateScaleAsNonPreset()
+    public async Task Handle_ShouldCreateScale_WhenNoDescription()
     {
         // Arrange
         var command = new CreateEstimationScaleCommand(
             "Custom Scale",
             null,
-            [
-                new CreateEstimationScaleCommand.ScaleValue("S", 0),
-                new CreateEstimationScaleCommand.ScaleValue("M", 1),
-                new CreateEstimationScaleCommand.ScaleValue("L", 2),
-            ]);
+            ["S", "M", "L"]);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -70,9 +60,7 @@ public class CreateEstimationScaleCommandHandlerTests : IDisposable
         var command = new CreateEstimationScaleCommand(
             "Bad Scale",
             null,
-            [
-                new CreateEstimationScaleCommand.ScaleValue("1", 0),
-            ]);
+            ["1"]);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -80,27 +68,6 @@ public class CreateEstimationScaleCommandHandlerTests : IDisposable
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Error.Should().Contain("at least 2 values");
-        _dbContext.SaveChangesCallCount.Should().Be(0);
-    }
-
-    [Fact]
-    public async Task Handle_ShouldFail_WhenDuplicateOrderValues()
-    {
-        // Arrange
-        var command = new CreateEstimationScaleCommand(
-            "Bad Scale",
-            null,
-            [
-                new CreateEstimationScaleCommand.ScaleValue("1", 0),
-                new CreateEstimationScaleCommand.ScaleValue("2", 0),
-            ]);
-
-        // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
-
-        // Assert
-        result.IsFailure.Should().BeTrue();
-        result.Error.Should().Contain("unique order");
         _dbContext.SaveChangesCallCount.Should().Be(0);
     }
 

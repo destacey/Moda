@@ -68,24 +68,6 @@ public class CompletePokerSessionCommandHandlerTests : IDisposable
     }
 
     [Fact]
-    public async Task Handle_ShouldFail_WhenSessionIsCreated()
-    {
-        // Arrange
-        var session = _sessionFaker.WithStatus(PokerSessionStatus.Created).Generate();
-        _dbContext.AddPokerSession(session);
-
-        var command = new CompletePokerSessionCommand(session.Id);
-
-        // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
-
-        // Assert
-        result.IsFailure.Should().BeTrue();
-        _dbContext.SaveChangesCallCount.Should().Be(0);
-        _mockNotifier.Verify(n => n.NotifySessionCompleted(It.IsAny<Guid>()), Times.Never);
-    }
-
-    [Fact]
     public async Task Handle_ShouldFail_WhenSessionIsAlreadyCompleted()
     {
         // Arrange

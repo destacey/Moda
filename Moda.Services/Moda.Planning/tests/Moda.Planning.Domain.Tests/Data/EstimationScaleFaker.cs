@@ -10,7 +10,7 @@ public class EstimationScaleFaker : PrivateConstructorFaker<EstimationScale>
         RuleFor(x => x.Id, f => f.Random.Int(1, 10000));
         RuleFor(x => x.Name, f => f.Lorem.Word());
         RuleFor(x => x.Description, f => f.Lorem.Sentence());
-        RuleFor(x => x.IsPreset, false);
+        RuleFor(x => x.IsActive, true);
     }
 }
 
@@ -34,9 +34,9 @@ public static class EstimationScaleFakerExtensions
         return faker;
     }
 
-    public static EstimationScaleFaker AsPreset(this EstimationScaleFaker faker)
+    public static EstimationScaleFaker WithIsActive(this EstimationScaleFaker faker, bool isActive)
     {
-        faker.RuleFor(x => x.IsPreset, true);
+        faker.RuleFor(x => x.IsActive, isActive);
         return faker;
     }
 }

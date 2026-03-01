@@ -1,4 +1,4 @@
-using Moda.Planning.Application.PokerSessions.Dtos;
+﻿using Moda.Planning.Application.PokerSessions.Dtos;
 using Moda.Planning.Application.PokerSessions.Interfaces;
 
 namespace Moda.Planning.Application.PokerSessions.Commands;
@@ -39,7 +39,7 @@ internal sealed class RevealPokerRoundCommandHandler(IPlanningDbContext planning
 
             await _planningDbContext.SaveChangesAsync(cancellationToken);
 
-            var voteDtos = result.Value.Votes.Adapt<List<VoteDto>>();
+            var voteDtos = result.Value.Votes.Adapt<List<PokerVoteDto>>();
             await _notifier.NotifyVotesRevealed(session.Id, result.Value.Id, voteDtos);
 
             return Result.Success();

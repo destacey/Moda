@@ -10,64 +10,6 @@
 import axios, { AxiosError } from 'axios';
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, CancelToken } from 'axios';
 
-export class Client {
-    protected instance: AxiosInstance;
-    protected baseUrl: string;
-    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
-
-    constructor(baseUrl?: string, instance?: AxiosInstance) {
-
-        this.instance = instance || axios.create();
-
-        this.baseUrl = baseUrl ?? "";
-
-    }
-
-    getStartup( cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/startup";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "GET",
-            url: url_,
-            headers: {
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processGetStartup(_response);
-        });
-    }
-
-    protected processGetStartup(response: AxiosResponse): Promise<void> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<void>(null as any);
-    }
-}
-
 export class PermissionsClient {
     protected instance: AxiosInstance;
     protected baseUrl: string;
@@ -8508,6 +8450,67 @@ export class EstimationScalesClient {
         }
         return Promise.resolve<void>(null as any);
     }
+
+    /**
+     * Set the active status of an estimation scale.
+     */
+    setActiveStatus(id: number, request: SetEstimationScaleActiveStatusRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/planning/estimation-scales/{id}/active-status";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "PUT",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processSetActiveStatus(_response);
+        });
+    }
+
+    protected processSetActiveStatus(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
 }
 
 export class PlanningIntervalsClient {
@@ -10758,63 +10761,6 @@ export class PokerSessionsClient {
     }
 
     /**
-     * Activate a poker session.
-     */
-    activate(id: string, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/planning/poker-sessions/{id}/activate";
-        if (id === undefined || id === null)
-            throw new globalThis.Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id));
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "PUT",
-            url: url_,
-            headers: {
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processActivate(_response);
-        });
-    }
-
-    protected processActivate(response: AxiosResponse): Promise<void> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 204) {
-            const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = JSON.parse(resultData400);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<void>(null as any);
-    }
-
-    /**
      * Complete a poker session.
      */
     complete(id: string, cancelToken?: CancelToken): Promise<void> {
@@ -10969,66 +10915,6 @@ export class PokerSessionsClient {
     }
 
     protected processRemoveRound(response: AxiosResponse): Promise<void> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 204) {
-            const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = JSON.parse(resultData400);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<void>(null as any);
-    }
-
-    /**
-     * Start voting for a round.
-     */
-    startRound(id: string, roundId: string, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/planning/poker-sessions/{id}/rounds/{roundId}/start";
-        if (id === undefined || id === null)
-            throw new globalThis.Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id));
-        if (roundId === undefined || roundId === null)
-            throw new globalThis.Error("The parameter 'roundId' must be defined.");
-        url_ = url_.replace("{roundId}", encodeURIComponent("" + roundId));
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "PUT",
-            url: url_,
-            headers: {
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processStartRound(_response);
-        });
-    }
-
-    protected processStartRound(response: AxiosResponse): Promise<void> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -21281,7 +21167,7 @@ export interface ManageStrategicInitiativeProjectsRequest {
 export interface EstimationScaleListDto {
     id: number;
     name: string;
-    isPreset: boolean;
+    isActive: boolean;
     valueCount: number;
 }
 
@@ -21289,31 +21175,26 @@ export interface EstimationScaleDetailsDto {
     id: number;
     name: string;
     description?: string | undefined;
-    isPreset: boolean;
-    values: EstimationScaleValueDto[];
-}
-
-export interface EstimationScaleValueDto {
-    value: string;
-    order: number;
+    isActive: boolean;
+    values: string[];
 }
 
 export interface CreateEstimationScaleRequest {
     name: string;
     description?: string | undefined;
-    values: ScaleValueRequest[];
-}
-
-export interface ScaleValueRequest {
-    value: string;
-    order: number;
+    values: string[];
 }
 
 export interface UpdateEstimationScaleRequest {
     estimationScaleId: number;
     name: string;
     description?: string | undefined;
-    values: ScaleValueRequest[];
+    values: string[];
+}
+
+export interface SetEstimationScaleActiveStatusRequest {
+    id: number;
+    isActive: boolean;
 }
 
 export interface PlanningIntervalListDto {
@@ -21715,12 +21596,11 @@ export interface PokerSessionListDto {
     key: number;
     name: string;
     status: string;
-    facilitatorName: string;
+    facilitator?: EmployeeNavigationDto | undefined;
     roundCount: number;
 }
 
 export enum PokerSessionStatus {
-    Created = "Created",
     Active = "Active",
     Completed = "Completed",
 }
@@ -21730,8 +21610,7 @@ export interface PokerSessionDetailsDto {
     key: number;
     name: string;
     status: string;
-    facilitatorId: string;
-    facilitatorName: string;
+    facilitator?: EmployeeNavigationDto | undefined;
     estimationScale?: EstimationScaleDetailsDto | undefined;
     activatedOn?: Date | undefined;
     completedOn?: Date | undefined;
@@ -21740,18 +21619,17 @@ export interface PokerSessionDetailsDto {
 
 export interface PokerRoundDto {
     id: string;
-    label: string;
+    label?: string | undefined;
     status: string;
     consensusEstimate?: string | undefined;
     order: number;
     voteCount: number;
-    votes: VoteDto[];
+    votes: PokerVoteDto[];
 }
 
-export interface VoteDto {
+export interface PokerVoteDto {
     id: string;
-    participantId: string;
-    participantName: string;
+    participant?: EmployeeNavigationDto | undefined;
     value: string;
     submittedOn: Date;
 }
@@ -21762,7 +21640,7 @@ export interface CreatePokerSessionRequest {
 }
 
 export interface AddPokerRoundRequest {
-    label: string;
+    label?: string | undefined;
 }
 
 export interface SetConsensusRequest {

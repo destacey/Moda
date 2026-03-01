@@ -12,9 +12,15 @@ import { QueryTags } from '@/src/store/features/query-tags'
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? ''
 
+export interface PresenceParticipant {
+  id: string
+  name: string
+}
+
 /**
  * Establishes a SignalR connection to the Planning Poker hub and
  * automatically invalidates RTK Query cache tags when events arrive.
+ * Also tracks participant presence via hub events.
  *
  * Falls back gracefully if the hub is not available (e.g., during local dev
  * without SignalR configured). The detail page also uses 5s polling as a
@@ -23,8 +29,21 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? ''
 export function usePokerSessionConnection(
   sessionId: string | undefined,
   sessionKey: number | undefined,
+  onPresenceChange?: (participants: PresenceParticipant[]) => void,
 ) {
   const connectionRef = useRef<HubConnection | null>(null)
+  const presenceMapRef = useRef(new Map<string, PresenceParticipant>())
+  const onPresenceChangeRef = useRef(onPresenceChange)
+
+  useEffect(() => {
+    onPresenceChangeRef.current = onPresenceChange
+  }, [onPresenceChange])
+
+  const emitPresence = useCallback(() => {
+    onPresenceChangeRef.current?.(
+      Array.from(presenceMapRef.current.values()),
+    )
+  }, [])
 
   const invalidateSession = useCallback(() => {
     if (sessionKey === undefined) return
@@ -59,14 +78,12 @@ export function usePokerSessionConnection(
           .configureLogging(LogLevel.Warning)
           .build()
 
-        // All server events trigger a cache invalidation so the UI refreshes
+        // Game events trigger cache invalidation so the UI refreshes
         const events = [
-          'RoundStarted',
           'VoteSubmitted',
           'VotesRevealed',
           'ConsensusSet',
           'RoundReset',
-          'SessionActivated',
           'SessionCompleted',
           'RoundAdded',
           'RoundRemoved',
@@ -75,6 +92,37 @@ export function usePokerSessionConnection(
           connection.on(event, invalidateSession)
         }
 
+        // Presence events
+        connection.on(
+          'ParticipantList',
+          (participants: { id: string; name: string }[]) => {
+            presenceMapRef.current.clear()
+            for (const p of participants) {
+              presenceMapRef.current.set(p.id, {
+                id: p.id,
+                name: p.name,
+              })
+            }
+            emitPresence()
+          },
+        )
+
+        connection.on(
+          'ParticipantJoined',
+          (participant: { id: string; name: string }) => {
+            presenceMapRef.current.set(participant.id, {
+              id: participant.id,
+              name: participant.name,
+            })
+            emitPresence()
+          },
+        )
+
+        connection.on('ParticipantLeft', (data: { id: string }) => {
+          presenceMapRef.current.delete(data.id)
+          emitPresence()
+        })
+
         await connection.start()
 
         if (cancelled) {
@@ -82,7 +130,7 @@ export function usePokerSessionConnection(
           return
         }
 
-        // Join the session group
+        // Join the session group — triggers ParticipantList event
         await connection.invoke('JoinSession', sessionId)
         connectionRef.current = connection
       } catch (error) {
@@ -96,8 +144,10 @@ export function usePokerSessionConnection(
 
     connect()
 
+    const presenceMap = presenceMapRef.current
     return () => {
       cancelled = true
+      presenceMap.clear()
       const conn = connectionRef.current
       if (conn) {
         conn
@@ -107,5 +157,5 @@ export function usePokerSessionConnection(
         connectionRef.current = null
       }
     }
-  }, [sessionId, invalidateSession])
+  }, [sessionId, invalidateSession, emitPresence])
 }

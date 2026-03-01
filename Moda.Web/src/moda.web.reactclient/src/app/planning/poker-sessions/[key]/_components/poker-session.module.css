@@ -1,0 +1,121 @@
+/* ─── Participant cards ─────────────────────────────────────────────────────── */
+
+.participantCard {
+  width: 80px;
+  min-height: 100px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  background-color: var(--poker-bg);
+}
+
+.participantCard:hover {
+  transform: translateY(-2px);
+}
+
+.participantCardVoted {
+  border: 2px solid var(--poker-primary);
+  background-color: var(--poker-primary-bg);
+}
+
+.participantCardPending {
+  border: 2px dashed var(--poker-border);
+}
+
+.participantCardRevealed {
+  border: 2px solid var(--poker-primary);
+  background-color: var(--poker-primary-bg);
+}
+
+.cardSymbol {
+  font-size: 28px;
+  color: var(--poker-primary);
+  line-height: 1;
+}
+
+.cardValue {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--poker-text);
+  line-height: 1;
+}
+
+.cardName {
+  font-size: 11px;
+  color: var(--poker-text-secondary);
+  text-align: center;
+  max-width: 72px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-top: 4px;
+}
+
+/* ─── Estimation card deck ─────────────────────────────────────────────────── */
+
+.estimationCard {
+  min-width: 56px;
+  height: 80px;
+  border-radius: 10px;
+  font-size: 20px;
+  font-weight: 600;
+  border: 2px solid var(--poker-border);
+  background-color: var(--poker-bg);
+  color: var(--poker-text);
+  cursor: pointer;
+  transition: transform 0.15s, border-color 0.15s, background-color 0.15s;
+}
+
+.estimationCard:hover {
+  transform: translateY(-4px);
+  border-color: var(--poker-primary);
+}
+
+.estimationCardSelected {
+  border-color: var(--poker-primary);
+  background-color: var(--poker-primary-bg);
+  color: var(--poker-primary);
+  box-shadow: 0 0 0 2px var(--poker-primary);
+}
+
+/* ─── Estimation history ───────────────────────────────────────────────────── */
+
+.historyList {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.historyItem {
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background-color 0.15s;
+}
+
+.historyItem:hover {
+  background-color: var(--poker-hover-bg);
+}
+
+.historyItemActive {
+  background-color: var(--poker-active-bg);
+}
+
+/* ─── Voting area ──────────────────────────────────────────────────────────── */
+
+.actionArea {
+  display: flex;
+  justify-content: center;
+  padding: 16px 0;
+}
+
+.yourEstimateLabel {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--poker-muted);
+}

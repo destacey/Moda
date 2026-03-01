@@ -6,7 +6,7 @@ public class EstimationScaleListDto : IMapFrom<EstimationScale>
 {
     public int Id { get; set; }
     public required string Name { get; set; }
-    public bool IsPreset { get; set; }
+    public bool IsActive { get; set; }
     public int ValueCount { get; set; }
 
     public void ConfigureMapping(TypeAdapterConfig config)

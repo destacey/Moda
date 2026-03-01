@@ -75,6 +75,28 @@ export const estimationScalesApi = apiSlice.injectEndpoints({
       },
     ),
 
+    setEstimationScaleActiveStatus: builder.mutation<
+      void,
+      { id: number; isActive: boolean }
+    >({
+      queryFn: async (request) => {
+        try {
+          const data = await getEstimationScalesClient().setActiveStatus(
+            request.id,
+            request,
+          )
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, arg) => [
+        { type: QueryTags.EstimationScale, id: 'LIST' },
+        { type: QueryTags.EstimationScale, id: arg.id },
+      ],
+    }),
+
     deleteEstimationScale: builder.mutation<void, number>({
       queryFn: async (id) => {
         try {
@@ -95,5 +117,6 @@ export const {
   useGetEstimationScaleQuery,
   useCreateEstimationScaleMutation,
   useUpdateEstimationScaleMutation,
+  useSetEstimationScaleActiveStatusMutation,
   useDeleteEstimationScaleMutation,
 } = estimationScalesApi

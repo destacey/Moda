@@ -1,4 +1,4 @@
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using Moda.Common.Application.Models;
 using Moda.Planning.Application.PokerSessions.Dtos;
 using Moda.Planning.Domain.Models.PlanningPoker;
@@ -21,9 +21,16 @@ internal sealed class GetPokerSessionQueryHandler(IPlanningDbContext planningDbC
 
     public async Task<PokerSessionDetailsDto?> Handle(GetPokerSessionQuery request, CancellationToken cancellationToken)
     {
-        return await _planningDbContext.PokerSessions
+        var session = await _planningDbContext.PokerSessions
             .Where(request.IdOrKeyFilter)
             .ProjectToType<PokerSessionDetailsDto>()
             .FirstOrDefaultAsync(cancellationToken);
+
+        if (session is not null)
+        {
+            session.HideUnrevealedVotes();
+        }
+
+        return session;
     }
 }

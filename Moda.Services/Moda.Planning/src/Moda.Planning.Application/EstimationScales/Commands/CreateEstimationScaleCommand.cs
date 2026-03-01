@@ -2,10 +2,7 @@ using Moda.Planning.Domain.Models.PlanningPoker;
 
 namespace Moda.Planning.Application.EstimationScales.Commands;
 
-public sealed record CreateEstimationScaleCommand(string Name, string? Description, List<CreateEstimationScaleCommand.ScaleValue> Values) : ICommand<int>
-{
-    public sealed record ScaleValue(string Value, int Order);
-}
+public sealed record CreateEstimationScaleCommand(string Name, string? Description, List<string> Values) : ICommand<int>;
 
 public sealed class CreateEstimationScaleCommandValidator : CustomValidator<CreateEstimationScaleCommand>
 {
@@ -24,11 +21,9 @@ public sealed class CreateEstimationScaleCommandValidator : CustomValidator<Crea
             .NotEmpty()
             .Must(v => v.Count >= 2).WithMessage("An estimation scale must have at least 2 values.");
 
-        RuleForEach(c => c.Values).ChildRules(v =>
-        {
-            v.RuleFor(x => x.Value).NotEmpty().MaximumLength(32);
-            v.RuleFor(x => x.Order).GreaterThanOrEqualTo(0);
-        });
+        RuleForEach(c => c.Values)
+            .NotEmpty()
+            .MaximumLength(32);
     }
 }
 
@@ -41,13 +36,10 @@ internal sealed class CreateEstimationScaleCommandHandler(IPlanningDbContext pla
     {
         try
         {
-            var values = request.Values.Select(v => (v.Value, v.Order));
-
             var scaleResult = EstimationScale.Create(
                 request.Name,
                 request.Description,
-                isPreset: false,
-                values);
+                request.Values);
 
             if (scaleResult.IsFailure)
                 return Result.Failure<int>(scaleResult.Error);

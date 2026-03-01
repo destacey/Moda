@@ -31,8 +31,7 @@ public class UpdateEstimationScaleCommandHandlerTests : IDisposable
         var scaleResult = EstimationScale.Create(
             "Original Name",
             "Original Description",
-            isPreset: false,
-            [("1", 0), ("2", 1), ("3", 2)]);
+            ["1", "2", "3"]);
         var scale = scaleResult.Value;
         _dbContext.AddEstimationScale(scale);
 
@@ -40,12 +39,7 @@ public class UpdateEstimationScaleCommandHandlerTests : IDisposable
             scale.Id,
             "Updated Name",
             "Updated Description",
-            [
-                new UpdateEstimationScaleCommand.ScaleValue("S", 0),
-                new UpdateEstimationScaleCommand.ScaleValue("M", 1),
-                new UpdateEstimationScaleCommand.ScaleValue("L", 2),
-                new UpdateEstimationScaleCommand.ScaleValue("XL", 3),
-            ]);
+            ["S", "M", "L", "XL"]);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -66,10 +60,7 @@ public class UpdateEstimationScaleCommandHandlerTests : IDisposable
             999,
             "Name",
             null,
-            [
-                new UpdateEstimationScaleCommand.ScaleValue("1", 0),
-                new UpdateEstimationScaleCommand.ScaleValue("2", 1),
-            ]);
+            ["1", "2"]);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -81,43 +72,13 @@ public class UpdateEstimationScaleCommandHandlerTests : IDisposable
     }
 
     [Fact]
-    public async Task Handle_ShouldFail_WhenScaleIsPreset()
-    {
-        // Arrange
-        var scaleResult = EstimationScale.CreatePreset(
-            "Fibonacci",
-            "Built-in preset",
-            [("1", 0), ("2", 1), ("3", 2), ("5", 3)]);
-        var scale = scaleResult.Value;
-        _dbContext.AddEstimationScale(scale);
-
-        var command = new UpdateEstimationScaleCommand(
-            scale.Id,
-            "Modified Fibonacci",
-            null,
-            [
-                new UpdateEstimationScaleCommand.ScaleValue("1", 0),
-                new UpdateEstimationScaleCommand.ScaleValue("2", 1),
-            ]);
-
-        // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
-
-        // Assert
-        result.IsFailure.Should().BeTrue();
-        result.Error.Should().Contain("Preset");
-        _dbContext.SaveChangesCallCount.Should().Be(0);
-    }
-
-    [Fact]
     public async Task Handle_ShouldFail_WhenLessThanTwoValues()
     {
         // Arrange
         var scaleResult = EstimationScale.Create(
             "My Scale",
             null,
-            isPreset: false,
-            [("1", 0), ("2", 1)]);
+            ["1", "2"]);
         var scale = scaleResult.Value;
         _dbContext.AddEstimationScale(scale);
 
@@ -125,9 +86,7 @@ public class UpdateEstimationScaleCommandHandlerTests : IDisposable
             scale.Id,
             "My Scale",
             null,
-            [
-                new UpdateEstimationScaleCommand.ScaleValue("1", 0),
-            ]);
+            ["1"]);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);

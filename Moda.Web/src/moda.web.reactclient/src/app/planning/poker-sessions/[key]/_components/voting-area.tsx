@@ -6,33 +6,33 @@ import {
 } from '@/src/services/moda-api'
 import { useMessage } from '@/src/components/contexts/messaging'
 import {
-  useStartPokerRoundMutation,
   useRevealPokerRoundMutation,
   useResetPokerRoundMutation,
   useSetPokerRoundConsensusMutation,
   useSubmitPokerVoteMutation,
 } from '@/src/store/features/planning/poker-sessions-api'
-import { Button, Card, Flex, Select, Space, Tag, Typography } from 'antd'
+import { Button, Divider, Flex, Select, Space, Tag } from 'antd'
 import { FC, useCallback, useState } from 'react'
+import ParticipantCards from './participant-cards'
 import EstimationCardDeck from './estimation-card-deck'
-import VoteResults from './vote-results'
+import styles from './poker-session.module.css'
 
-const { Title, Text } = Typography
-
-export interface CurrentRoundViewProps {
+export interface VotingAreaProps {
   round: PokerRoundDto
   sessionId: string
   sessionKey: number
   estimationScale?: EstimationScaleDetailsDto
   canManage: boolean
+  participants: { id: string; name: string }[]
 }
 
-const CurrentRoundView: FC<CurrentRoundViewProps> = ({
+const VotingArea: FC<VotingAreaProps> = ({
   round,
   sessionId,
   sessionKey,
   estimationScale,
   canManage,
+  participants,
 }) => {
   const messageApi = useMessage()
   const [selectedVote, setSelectedVote] = useState<string | undefined>()
@@ -40,7 +40,6 @@ const CurrentRoundView: FC<CurrentRoundViewProps> = ({
     round.consensusEstimate,
   )
 
-  const [startRound, { isLoading: isStarting }] = useStartPokerRoundMutation()
   const [revealRound, { isLoading: isRevealing }] =
     useRevealPokerRoundMutation()
   const [resetRound, { isLoading: isResetting }] =
@@ -49,19 +48,6 @@ const CurrentRoundView: FC<CurrentRoundViewProps> = ({
     useSetPokerRoundConsensusMutation()
   const [submitVote, { isLoading: isSubmitting }] =
     useSubmitPokerVoteMutation()
-
-  const handleStart = useCallback(async () => {
-    try {
-      const response = await startRound({
-        sessionId,
-        roundId: round.id,
-        sessionKey,
-      })
-      if (response.error) throw response.error
-    } catch {
-      messageApi.error('Failed to start round.')
-    }
-  }, [startRound, sessionId, round.id, sessionKey, messageApi])
 
   const handleReveal = useCallback(async () => {
     try {
@@ -133,99 +119,77 @@ const CurrentRoundView: FC<CurrentRoundViewProps> = ({
 
   const isVoting = round.status === 'Voting'
   const isRevealed = round.status === 'Revealed'
-  const isPending = round.status === 'Pending'
   const isAccepted = round.status === 'Accepted'
 
   const scaleValues = estimationScale?.values ?? []
   const scaleOptions = scaleValues.map((v) => ({
-    label: v.value,
-    value: v.value,
+    label: v,
+    value: v,
   }))
 
   return (
-    <Card>
-      <Flex vertical gap={16}>
-        <Flex justify="space-between" align="center">
-          <div>
-            <Title level={4} style={{ margin: 0 }}>
-              {round.label}
-            </Title>
-            <Tag
-              color={
-                isPending
-                  ? 'default'
-                  : isVoting
-                    ? 'processing'
-                    : isRevealed
-                      ? 'warning'
-                      : 'success'
-              }
-            >
-              {round.status}
-            </Tag>
-            {round.voteCount > 0 && (
-              <Text type="secondary">
-                {round.voteCount} vote{round.voteCount !== 1 ? 's' : ''}
-              </Text>
-            )}
-          </div>
-          {canManage && (
-            <Space>
-              {isPending && (
-                <Button type="primary" onClick={handleStart} loading={isStarting}>
-                  Start Voting
-                </Button>
-              )}
-              {isVoting && (
-                <Button type="primary" onClick={handleReveal} loading={isRevealing}>
-                  Reveal Votes
-                </Button>
-              )}
-              {isRevealed && (
-                <>
-                  <Button onClick={handleReset} loading={isResetting}>
-                    Re-vote
-                  </Button>
-                  <Select
-                    placeholder="Select consensus"
-                    style={{ width: 140 }}
-                    options={scaleOptions}
-                    value={consensusValue}
-                    onChange={setConsensusValue}
-                  />
-                  <Button
-                    type="primary"
-                    onClick={handleSetConsensus}
-                    loading={isSettingConsensus}
-                    disabled={!consensusValue}
-                  >
-                    Accept
-                  </Button>
-                </>
-              )}
-            </Space>
-          )}
-        </Flex>
+    <Flex vertical gap={16} align="center" style={{ padding: '24px 0' }}>
+      <ParticipantCards
+        participants={participants}
+        votes={round.votes}
+        isRevealed={isRevealed || isAccepted}
+      />
 
-        {isVoting && (
+      <div className={styles.actionArea}>
+        {canManage && isVoting && (
+          <Button
+            type="primary"
+            size="large"
+            onClick={handleReveal}
+            loading={isRevealing}
+          >
+            Reveal Cards
+          </Button>
+        )}
+        {canManage && isRevealed && (
+          <Space>
+            <Button onClick={handleReset} loading={isResetting}>
+              Re-vote
+            </Button>
+            <Select
+              placeholder="Select consensus"
+              style={{ width: 140 }}
+              options={scaleOptions}
+              value={consensusValue}
+              onChange={setConsensusValue}
+            />
+            <Button
+              type="primary"
+              onClick={handleSetConsensus}
+              loading={isSettingConsensus}
+              disabled={!consensusValue}
+            >
+              Accept
+            </Button>
+          </Space>
+        )}
+        {isAccepted && round.consensusEstimate && (
+          <Tag color="green" style={{ fontSize: 16, padding: '4px 12px' }}>
+            Consensus: {round.consensusEstimate}
+          </Tag>
+        )}
+      </div>
+
+      {isVoting && (
+        <>
+          <Divider style={{ margin: '8px 0' }}>
+            <span className={styles.yourEstimateLabel}>Your Estimate</span>
+          </Divider>
           <EstimationCardDeck
             values={scaleValues}
             selectedValue={selectedVote}
             onSelect={handleVote}
             disabled={isSubmitting}
           />
-        )}
-
-        {(isRevealed || isAccepted) && (
-          <VoteResults votes={round.votes} isRevealed />
-        )}
-
-        {isVoting && round.voteCount > 0 && (
-          <VoteResults votes={round.votes} isRevealed={false} />
-        )}
-      </Flex>
-    </Card>
+        </>
+      )}
+    </Flex>
   )
 }
 
-export default CurrentRoundView
+export default VotingArea

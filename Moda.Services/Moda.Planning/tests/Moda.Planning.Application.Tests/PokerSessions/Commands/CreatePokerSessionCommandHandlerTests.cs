@@ -4,6 +4,7 @@ using Moda.Planning.Application.PokerSessions.Commands;
 using Moda.Planning.Application.Tests.Infrastructure;
 using Moda.Planning.Domain.Tests.Data;
 using Moq;
+using NodaTime;
 
 namespace Moda.Planning.Application.Tests.PokerSessions.Commands;
 
@@ -13,6 +14,7 @@ public class CreatePokerSessionCommandHandlerTests : IDisposable
     private readonly CreatePokerSessionCommandHandler _handler;
     private readonly Mock<ILogger<CreatePokerSessionCommandHandler>> _mockLogger;
     private readonly Mock<ICurrentUser> _mockCurrentUser;
+    private readonly Mock<IDateTimeProvider> _mockDateTimeProvider;
 
     private readonly EstimationScaleFaker _estimationScaleFaker;
     private readonly Guid _currentUserId = Guid.NewGuid();
@@ -23,8 +25,10 @@ public class CreatePokerSessionCommandHandlerTests : IDisposable
         _mockLogger = new Mock<ILogger<CreatePokerSessionCommandHandler>>();
         _mockCurrentUser = new Mock<ICurrentUser>();
         _mockCurrentUser.Setup(u => u.GetEmployeeId()).Returns(_currentUserId);
+        _mockDateTimeProvider = new Mock<IDateTimeProvider>();
+        _mockDateTimeProvider.Setup(d => d.Now).Returns(Instant.FromUtc(2026, 1, 15, 10, 0));
 
-        _handler = new CreatePokerSessionCommandHandler(_dbContext, _mockCurrentUser.Object, _mockLogger.Object);
+        _handler = new CreatePokerSessionCommandHandler(_dbContext, _mockCurrentUser.Object, _mockDateTimeProvider.Object, _mockLogger.Object);
         _estimationScaleFaker = new EstimationScaleFaker();
     }
 

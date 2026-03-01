@@ -56,19 +56,6 @@ public class PokerSessionsController : ControllerBase
             : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
-    [HttpPut("{id}/activate")]
-    [MustHavePermission(ApplicationAction.Update, ApplicationResource.PokerSessions)]
-    [OpenApiOperation("Activate a poker session.", "")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult> Activate(Guid id, CancellationToken cancellationToken)
-    {
-        var result = await _sender.Send(new ActivatePokerSessionCommand(id), cancellationToken);
-        return result.IsSuccess
-            ? NoContent()
-            : BadRequest(result.ToBadRequestObject(HttpContext));
-    }
-
     [HttpPut("{id}/complete")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.PokerSessions)]
     [OpenApiOperation("Complete a poker session.", "")]
@@ -103,19 +90,6 @@ public class PokerSessionsController : ControllerBase
     public async Task<ActionResult> RemoveRound(Guid id, Guid roundId, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new RemovePokerRoundCommand(id, roundId), cancellationToken);
-        return result.IsSuccess
-            ? NoContent()
-            : BadRequest(result.ToBadRequestObject(HttpContext));
-    }
-
-    [HttpPut("{id}/rounds/{roundId}/start")]
-    [MustHavePermission(ApplicationAction.Update, ApplicationResource.PokerSessions)]
-    [OpenApiOperation("Start voting for a round.", "")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult> StartRound(Guid id, Guid roundId, CancellationToken cancellationToken)
-    {
-        var result = await _sender.Send(new StartPokerRoundCommand(id, roundId), cancellationToken);
         return result.IsSuccess
             ? NoContent()
             : BadRequest(result.ToBadRequestObject(HttpContext));

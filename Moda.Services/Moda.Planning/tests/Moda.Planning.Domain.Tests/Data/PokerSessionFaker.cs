@@ -13,7 +13,7 @@ public class PokerSessionFaker : PrivateConstructorFaker<PokerSession>
         RuleFor(x => x.Name, f => f.Lorem.Sentence(3));
         RuleFor(x => x.EstimationScaleId, f => f.Random.Int(1, 100));
         RuleFor(x => x.FacilitatorId, f => f.Random.Guid());
-        RuleFor(x => x.Status, PokerSessionStatus.Created);
+        RuleFor(x => x.Status, PokerSessionStatus.Active);
     }
 }
 

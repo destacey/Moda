@@ -26,14 +26,20 @@ internal sealed class DeleteEstimationScaleCommandHandler(IPlanningDbContext pla
             if (scale is null)
                 return Result.Failure("Estimation scale not found.");
 
-            if (scale.IsPreset)
-                return Result.Failure("Preset estimation scales cannot be deleted.");
-
             var isInUse = await _planningDbContext.PokerSessions
                 .AnyAsync(s => s.EstimationScaleId == request.Id, cancellationToken);
 
             if (isInUse)
                 return Result.Failure("Cannot delete an estimation scale that is in use by poker sessions.");
+
+            if (scale.IsActive)
+            {
+                var otherActiveCount = await _planningDbContext.EstimationScales
+                    .CountAsync(s => s.IsActive && s.Id != request.Id, cancellationToken);
+
+                if (otherActiveCount == 0)
+                    return Result.Failure("Cannot delete the last active estimation scale. At least one active estimation scale is required.");
+            }
 
             _planningDbContext.EstimationScales.Remove(scale);
             await _planningDbContext.SaveChangesAsync(cancellationToken);

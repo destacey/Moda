@@ -1,11 +1,11 @@
 'use client'
 
-import { EstimationScaleValueDto } from '@/src/services/moda-api'
-import { Button, Flex } from 'antd'
+import { Flex } from 'antd'
 import { FC } from 'react'
+import styles from './poker-session.module.css'
 
 export interface EstimationCardDeckProps {
-  values: EstimationScaleValueDto[]
+  values: string[]
   selectedValue?: string
   onSelect: (value: string) => void
   disabled?: boolean
@@ -18,19 +18,23 @@ const EstimationCardDeck: FC<EstimationCardDeckProps> = ({
   disabled = false,
 }) => {
   return (
-    <Flex wrap gap={8}>
-      {values.map((v) => (
-        <Button
-          key={v.value}
-          type={selectedValue === v.value ? 'primary' : 'default'}
-          size="large"
-          onClick={() => onSelect(v.value)}
-          disabled={disabled}
-          style={{ minWidth: 56, height: 72, fontSize: 20, fontWeight: 600 }}
-        >
-          {v.value}
-        </Button>
-      ))}
+    <Flex wrap gap={8} justify="center">
+      {values.map((v) => {
+        const isSelected = selectedValue === v
+        const className = `${styles.estimationCard}${isSelected ? ` ${styles.estimationCardSelected}` : ''}`
+
+        return (
+          <button
+            key={v}
+            type="button"
+            className={className}
+            onClick={() => onSelect(v)}
+            disabled={disabled}
+          >
+            {v}
+          </button>
+        )
+      })}
     </Flex>
   )
 }

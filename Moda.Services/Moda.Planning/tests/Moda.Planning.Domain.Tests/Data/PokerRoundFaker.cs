@@ -11,7 +11,7 @@ public class PokerRoundFaker : PrivateConstructorFaker<PokerRound>
         RuleFor(x => x.Id, f => f.Random.Guid());
         RuleFor(x => x.PokerSessionId, f => f.Random.Guid());
         RuleFor(x => x.Label, f => $"WI-{f.Random.Int(1, 999)}: {f.Lorem.Sentence(3)}");
-        RuleFor(x => x.Status, PokerRoundStatus.Pending);
+        RuleFor(x => x.Status, PokerRoundStatus.Voting);
         RuleFor(x => x.Order, f => f.Random.Int(0, 20));
     }
 }

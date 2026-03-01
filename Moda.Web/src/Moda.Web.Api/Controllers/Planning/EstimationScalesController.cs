@@ -71,6 +71,22 @@ public class EstimationScalesController : ControllerBase
             : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
+    [HttpPut("{id:int}/active-status")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.EstimationScales)]
+    [OpenApiOperation("Set the active status of an estimation scale.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> SetActiveStatus(int id, [FromBody] SetEstimationScaleActiveStatusRequest request, CancellationToken cancellationToken)
+    {
+        if (id != request.Id)
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(nameof(id), nameof(request.Id), HttpContext));
+
+        var result = await _sender.Send(new SetEstimationScaleActiveStatusCommand(id, request.IsActive), cancellationToken);
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
     [HttpDelete("{id:int}")]
     [MustHavePermission(ApplicationAction.Delete, ApplicationResource.EstimationScales)]
     [OpenApiOperation("Delete a custom estimation scale.", "")]

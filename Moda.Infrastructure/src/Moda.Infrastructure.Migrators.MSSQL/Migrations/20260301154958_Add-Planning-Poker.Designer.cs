@@ -13,7 +13,7 @@ using Moda.Infrastructure.Persistence.Context;
 namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 {
     [DbContext(typeof(ModaDbContext))]
-    [Migration("20260228143310_Add-Planning-Poker")]
+    [Migration("20260301154958_Add-Planning-Poker")]
     partial class AddPlanningPoker
     {
         /// <inheritdoc />
@@ -1541,7 +1541,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasMaxLength(1024)
                         .HasColumnType("nvarchar(1024)");
 
-                    b.Property<bool>("IsPreset")
+                    b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
@@ -1561,27 +1561,14 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<Guid?>("SystemLastModifiedBy")
                         .HasColumnType("uniqueidentifier");
 
+                    b.PrimitiveCollection<string>("Values")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("Values");
+
                     b.HasKey("Id");
 
                     b.ToTable("EstimationScales", "Planning");
-                });
-
-            modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningPoker.EstimationScaleValue", b =>
-                {
-                    b.Property<int>("EstimationScaleId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Order")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Value")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("nvarchar(32)");
-
-                    b.HasKey("EstimationScaleId", "Order");
-
-                    b.ToTable("EstimationScaleValues", "Planning");
                 });
 
             modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningPoker.PokerRound", b =>
@@ -1595,7 +1582,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasColumnType("nvarchar(32)");
 
                     b.Property<string>("Label")
-                        .IsRequired()
                         .HasMaxLength(512)
                         .HasColumnType("nvarchar(512)");
 
@@ -4394,15 +4380,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Team");
                 });
 
-            modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningPoker.EstimationScaleValue", b =>
-                {
-                    b.HasOne("Moda.Planning.Domain.Models.PlanningPoker.EstimationScale", null)
-                        .WithMany("Values")
-                        .HasForeignKey("EstimationScaleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningPoker.PokerRound", b =>
                 {
                     b.HasOne("Moda.Planning.Domain.Models.PlanningPoker.PokerSession", null)
@@ -5282,11 +5259,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
             modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningIntervalObjective", b =>
                 {
                     b.Navigation("HealthCheck");
-                });
-
-            modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningPoker.EstimationScale", b =>
-                {
-                    b.Navigation("Values");
                 });
 
             modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningPoker.PokerRound", b =>

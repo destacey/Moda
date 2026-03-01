@@ -62,13 +62,13 @@ const menuItems: (Item | MenuItem)[] = [
       'plan.roadmaps',
       '/planning/roadmaps',
     ),
+    { key: 'settings-planning-divider', type: 'divider' },
     restrictedPermissionMenuItem(
       'Permissions.PokerSessions.View',
       'Planning Poker',
       'plan.poker-sessions',
       '/planning/poker-sessions',
     ),
-    // menuItem('Increments', 'plan.increments'),
   ]),
   restrictedMenuSection('Work Management', 'work', null, menuIcons.work, [
     restrictedPermissionMenuItem(

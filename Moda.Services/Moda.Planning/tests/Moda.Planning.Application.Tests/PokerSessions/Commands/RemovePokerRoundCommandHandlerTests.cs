@@ -29,7 +29,7 @@ public class RemovePokerRoundCommandHandlerTests : IDisposable
     }
 
     [Fact]
-    public async Task Handle_ShouldRemoveRound_WhenRoundIsPending()
+    public async Task Handle_ShouldRemoveRound_WhenRoundExists()
     {
         // Arrange
         var session = _sessionFaker.WithStatus(PokerSessionStatus.Active).Generate();
@@ -84,33 +84,10 @@ public class RemovePokerRoundCommandHandlerTests : IDisposable
     }
 
     [Fact]
-    public async Task Handle_ShouldFail_WhenRoundIsVoting()
-    {
-        // Arrange
-        var session = _sessionFaker.WithStatus(PokerSessionStatus.Active).Generate();
-        _dbContext.AddPokerSession(session);
-
-        session.AddRound("Voting round");
-        var roundId = session.Rounds.First().Id;
-        session.StartRound(roundId);
-
-        var command = new RemovePokerRoundCommand(session.Id, roundId);
-
-        // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
-
-        // Assert
-        result.IsFailure.Should().BeTrue();
-        session.Rounds.Should().HaveCount(1);
-        _dbContext.SaveChangesCallCount.Should().Be(0);
-        _mockNotifier.Verify(n => n.NotifyRoundRemoved(It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Never);
-    }
-
-    [Fact]
     public async Task Handle_ShouldFail_WhenSessionIsNotActive()
     {
         // Arrange
-        var session = _sessionFaker.WithStatus(PokerSessionStatus.Created).Generate();
+        var session = _sessionFaker.WithStatus(PokerSessionStatus.Completed).Generate();
         _dbContext.AddPokerSession(session);
 
         var command = new RemovePokerRoundCommand(session.Id, Guid.NewGuid());

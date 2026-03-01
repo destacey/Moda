@@ -69,7 +69,7 @@ public class AddPokerRoundCommandHandlerTests : IDisposable
     public async Task Handle_ShouldFail_WhenSessionIsNotActive()
     {
         // Arrange
-        var session = _sessionFaker.WithStatus(PokerSessionStatus.Created).Generate();
+        var session = _sessionFaker.WithStatus(PokerSessionStatus.Completed).Generate();
         _dbContext.AddPokerSession(session);
 
         var command = new AddPokerRoundCommand(session.Id, "User Story #123");

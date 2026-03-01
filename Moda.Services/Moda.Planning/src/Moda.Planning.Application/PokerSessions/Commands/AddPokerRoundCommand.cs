@@ -1,9 +1,9 @@
-using Moda.Planning.Application.PokerSessions.Dtos;
+﻿using Moda.Planning.Application.PokerSessions.Dtos;
 using Moda.Planning.Application.PokerSessions.Interfaces;
 
 namespace Moda.Planning.Application.PokerSessions.Commands;
 
-public sealed record AddPokerRoundCommand(Guid SessionId, string Label) : ICommand<PokerRoundDto>;
+public sealed record AddPokerRoundCommand(Guid SessionId, string? Label) : ICommand<PokerRoundDto>;
 
 public sealed class AddPokerRoundCommandValidator : CustomValidator<AddPokerRoundCommand>
 {
@@ -12,7 +12,7 @@ public sealed class AddPokerRoundCommandValidator : CustomValidator<AddPokerRoun
         RuleLevelCascadeMode = CascadeMode.Stop;
 
         RuleFor(c => c.SessionId).NotEmpty();
-        RuleFor(c => c.Label).NotEmpty().MaximumLength(512);
+        RuleFor(c => c.Label).MaximumLength(512);
     }
 }
 
@@ -28,6 +28,8 @@ internal sealed class AddPokerRoundCommandHandler(IPlanningDbContext planningDbC
         {
             var session = await _planningDbContext.PokerSessions
                 .Include(s => s.Rounds)
+                    .ThenInclude(r => r.Votes)
+                        .ThenInclude(v => v.Participant)
                 .FirstOrDefaultAsync(s => s.Id == request.SessionId, cancellationToken);
 
             if (session is null)

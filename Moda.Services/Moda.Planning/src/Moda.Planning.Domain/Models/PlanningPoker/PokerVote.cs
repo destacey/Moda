@@ -1,4 +1,4 @@
-using Ardalis.GuardClauses;
+﻿using Ardalis.GuardClauses;
 using Moda.Common.Domain.Employees;
 using NodaTime;
 
@@ -10,7 +10,6 @@ public class PokerVote : BaseEntity<Guid>
 
     internal PokerVote(Guid pokerRoundId, Guid participantId, string value, Instant submittedOn)
     {
-        Id = Guid.CreateVersion7();
         PokerRoundId = pokerRoundId;
         ParticipantId = participantId;
         Value = Guard.Against.NullOrWhiteSpace(value, nameof(Value)).Trim();

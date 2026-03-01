@@ -18,7 +18,6 @@ public class PokerSession : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey
         Name = name;
         EstimationScaleId = estimationScaleId;
         FacilitatorId = facilitatorId;
-        Status = PokerSessionStatus.Created;
     }
 
     /// <summary>
@@ -65,22 +64,9 @@ public class PokerSession : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey
     public Instant? CompletedOn { get; private set; }
 
     /// <summary>
-    /// The rounds in this poker session, ordered by their display order.
+    /// The rounds in this poker session.
     /// </summary>
-    public IReadOnlyCollection<PokerRound> Rounds => _rounds.OrderBy(r => r.Order).ToList().AsReadOnly();
-
-    /// <summary>
-    /// Activate the session to begin accepting rounds and votes.
-    /// </summary>
-    public Result Activate(Instant timestamp)
-    {
-        if (Status != PokerSessionStatus.Created)
-            return Result.Failure("Session can only be activated from Created status.");
-
-        Status = PokerSessionStatus.Active;
-        ActivatedOn = timestamp;
-        return Result.Success();
-    }
+    public IReadOnlyCollection<PokerRound> Rounds => _rounds.AsReadOnly();
 
     /// <summary>
     /// Complete the session.
@@ -98,7 +84,7 @@ public class PokerSession : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey
     /// <summary>
     /// Add a new round to this session.
     /// </summary>
-    public Result<PokerRound> AddRound(string label)
+    public Result<PokerRound> AddRound(string? label)
     {
         if (Status != PokerSessionStatus.Active)
             return Result.Failure<PokerRound>("Rounds can only be added to an active session.");
@@ -108,6 +94,7 @@ public class PokerSession : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey
             int nextOrder = _rounds.Count > 0 ? _rounds.Max(r => r.Order) + 1 : 0;
             var round = new PokerRound(Id, label, nextOrder);
             _rounds.Add(round);
+
             return Result.Success(round);
         }
         catch (Exception ex)
@@ -128,29 +115,8 @@ public class PokerSession : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey
         if (round is null)
             return Result.Failure("Round not found.");
 
-        if (round.Status == PokerRoundStatus.Voting)
-            return Result.Failure("Cannot remove a round that is currently being voted on.");
-
         _rounds.Remove(round);
         return Result.Success();
-    }
-
-    /// <summary>
-    /// Start voting for a specific round.
-    /// </summary>
-    public Result<PokerRound> StartRound(Guid roundId)
-    {
-        if (Status != PokerSessionStatus.Active)
-            return Result.Failure<PokerRound>("Cannot start a round when the session is not active.");
-
-        var round = _rounds.FirstOrDefault(r => r.Id == roundId);
-        if (round is null)
-            return Result.Failure<PokerRound>("Round not found.");
-
-        var result = round.Start();
-        return result.IsFailure
-            ? Result.Failure<PokerRound>(result.Error)
-            : Result.Success(round);
     }
 
     /// <summary>
@@ -223,13 +189,15 @@ public class PokerSession : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey
     }
 
     /// <summary>
-    /// Create a new poker session.
+    /// Create a new poker session. The session is immediately activated and ready to accept rounds.
     /// </summary>
-    public static Result<PokerSession> Create(string name, int estimationScaleId, Guid facilitatorId)
+    public static Result<PokerSession> Create(string name, int estimationScaleId, Guid facilitatorId, Instant timestamp)
     {
         try
         {
             var session = new PokerSession(name, estimationScaleId, facilitatorId);
+            session.Status = PokerSessionStatus.Active;
+            session.ActivatedOn = timestamp;
             return Result.Success(session);
         }
         catch (Exception ex)

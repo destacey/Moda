@@ -37,7 +37,6 @@ public class ResetPokerRoundCommandHandlerTests : IDisposable
 
         session.AddRound("Story");
         var round = session.Rounds.First();
-        session.StartRound(round.Id);
         session.SubmitVote(round.Id, Guid.NewGuid(), "5", Instant.FromUtc(2026, 1, 15, 10, 0));
         session.RevealRound(round.Id);
 
@@ -63,7 +62,7 @@ public class ResetPokerRoundCommandHandlerTests : IDisposable
 
         session.AddRound("Story");
         var round = session.Rounds.First();
-        session.StartRound(round.Id);
+
 
         var command = new ResetPokerRoundCommand(session.Id, round.Id);
 
@@ -92,7 +91,7 @@ public class ResetPokerRoundCommandHandlerTests : IDisposable
     }
 
     [Fact]
-    public async Task Handle_ShouldFail_WhenRoundIsPending()
+    public async Task Handle_ShouldFail_WhenRoundIsAccepted()
     {
         // Arrange
         var session = _sessionFaker.WithStatus(PokerSessionStatus.Active).Generate();
@@ -100,6 +99,9 @@ public class ResetPokerRoundCommandHandlerTests : IDisposable
 
         session.AddRound("Story");
         var round = session.Rounds.First();
+        session.SubmitVote(round.Id, Guid.NewGuid(), "5", Instant.FromUtc(2026, 1, 15, 10, 0));
+        session.RevealRound(round.Id);
+        session.SetConsensus(round.Id, "5");
 
         var command = new ResetPokerRoundCommand(session.Id, round.Id);
 

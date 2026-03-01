@@ -21,9 +21,10 @@ public sealed class CreatePokerSessionCommandValidator : CustomValidator<CreateP
     }
 }
 
-internal sealed class CreatePokerSessionCommandHandler(IPlanningDbContext planningDbContext, ICurrentUser currentUser, ILogger<CreatePokerSessionCommandHandler> logger) : ICommandHandler<CreatePokerSessionCommand, ObjectIdAndKey>
+internal sealed class CreatePokerSessionCommandHandler(IPlanningDbContext planningDbContext, ICurrentUser currentUser, IDateTimeProvider dateTimeProvider, ILogger<CreatePokerSessionCommandHandler> logger) : ICommandHandler<CreatePokerSessionCommand, ObjectIdAndKey>
 {
     private readonly IPlanningDbContext _planningDbContext = planningDbContext;
+    private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
     private readonly ILogger<CreatePokerSessionCommandHandler> _logger = logger;
     private readonly Guid _currentUserEmployeeId = Guard.Against.NullOrEmpty(currentUser.GetEmployeeId());
 
@@ -40,7 +41,8 @@ internal sealed class CreatePokerSessionCommandHandler(IPlanningDbContext planni
             var sessionResult = PokerSession.Create(
                 request.Name,
                 request.EstimationScaleId,
-                _currentUserEmployeeId);
+                _currentUserEmployeeId,
+                _dateTimeProvider.Now);
 
             if (sessionResult.IsFailure)
                 return Result.Failure<ObjectIdAndKey>(sessionResult.Error);

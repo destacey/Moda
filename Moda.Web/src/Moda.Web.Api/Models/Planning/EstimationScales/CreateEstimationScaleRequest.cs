@@ -6,21 +6,12 @@ public class CreateEstimationScaleRequest
 {
     public string Name { get; set; } = default!;
     public string? Description { get; set; }
-    public List<ScaleValueRequest> Values { get; set; } = [];
+    public List<string> Values { get; set; } = [];
 
     public CreateEstimationScaleCommand ToCreateEstimationScaleCommand()
     {
-        return new CreateEstimationScaleCommand(
-            Name,
-            Description,
-            Values.Select(v => new CreateEstimationScaleCommand.ScaleValue(v.Value, v.Order)).ToList());
+        return new CreateEstimationScaleCommand(Name, Description, Values);
     }
-}
-
-public class ScaleValueRequest
-{
-    public string Value { get; set; } = default!;
-    public int Order { get; set; }
 }
 
 public sealed class CreateEstimationScaleRequestValidator : CustomValidator<CreateEstimationScaleRequest>
@@ -32,5 +23,6 @@ public sealed class CreateEstimationScaleRequestValidator : CustomValidator<Crea
         RuleFor(r => r.Name).NotEmpty().MaximumLength(128);
         RuleFor(r => r.Description).MaximumLength(1024);
         RuleFor(r => r.Values).NotEmpty().Must(v => v.Count >= 2).WithMessage("At least 2 values are required.");
+        RuleForEach(r => r.Values).NotEmpty().MaximumLength(32);
     }
 }

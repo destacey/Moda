@@ -16,6 +16,9 @@ enum SettingsTab {
   Users = 'users',
   Roles = 'roles',
 
+  // planning
+  EstimationScales = 'estimation-scales',
+
   // project portfolio management
   ExpenditureCategories = 'expenditure-categories',
 
@@ -121,6 +124,15 @@ const settingsMenuItems: ItemType[] = [
       'Roles',
       SettingsTab.Roles,
       '/settings/user-management/roles',
+    ),
+  ]),
+
+  getSectionMenuItem('Planning', 'planning', [
+    getRestrictedMenuItem(
+      'Permissions.EstimationScales.View',
+      'Estimation Scales',
+      SettingsTab.EstimationScales,
+      '/settings/planning/estimation-scales',
     ),
   ]),
 

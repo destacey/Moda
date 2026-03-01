@@ -30,7 +30,7 @@ const PokerSessionsGrid: FC<PokerSessionsGridProps> = ({
       { field: 'key', width: 90 },
       { field: 'name', width: 300, cellRenderer: sessionLinkCellRenderer },
       { field: 'status', width: 125 },
-      { field: 'facilitatorName', headerName: 'Facilitator', width: 200 },
+      { field: 'facilitator.name', headerName: 'Facilitator', width: 200 },
       { field: 'roundCount', headerName: 'Rounds', width: 110 },
     ],
     [],

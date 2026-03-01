@@ -46,6 +46,7 @@ const PokerSessionsPage = () => {
 
   return (
     <>
+      <br />
       <PageTitle title="Planning Poker" actions={canCreate && actions()} />
       <PokerSessionsGrid
         sessions={sessionsData}

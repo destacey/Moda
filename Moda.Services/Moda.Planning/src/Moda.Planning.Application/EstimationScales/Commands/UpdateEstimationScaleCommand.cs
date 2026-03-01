@@ -1,11 +1,6 @@
-using Moda.Planning.Domain.Models.PlanningPoker;
-
 namespace Moda.Planning.Application.EstimationScales.Commands;
 
-public sealed record UpdateEstimationScaleCommand(int Id, string Name, string? Description, List<UpdateEstimationScaleCommand.ScaleValue> Values) : ICommand
-{
-    public sealed record ScaleValue(string Value, int Order);
-}
+public sealed record UpdateEstimationScaleCommand(int Id, string Name, string? Description, List<string> Values) : ICommand;
 
 public sealed class UpdateEstimationScaleCommandValidator : CustomValidator<UpdateEstimationScaleCommand>
 {
@@ -27,11 +22,9 @@ public sealed class UpdateEstimationScaleCommandValidator : CustomValidator<Upda
             .NotEmpty()
             .Must(v => v.Count >= 2).WithMessage("An estimation scale must have at least 2 values.");
 
-        RuleForEach(c => c.Values).ChildRules(v =>
-        {
-            v.RuleFor(x => x.Value).NotEmpty().MaximumLength(32);
-            v.RuleFor(x => x.Order).GreaterThanOrEqualTo(0);
-        });
+        RuleForEach(c => c.Values)
+            .NotEmpty()
+            .MaximumLength(32);
     }
 }
 
@@ -45,7 +38,6 @@ internal sealed class UpdateEstimationScaleCommandHandler(IPlanningDbContext pla
         try
         {
             var scale = await _planningDbContext.EstimationScales
-                .Include(s => s.Values)
                 .FirstOrDefaultAsync(s => s.Id == request.Id, cancellationToken);
 
             if (scale is null)
@@ -55,8 +47,7 @@ internal sealed class UpdateEstimationScaleCommandHandler(IPlanningDbContext pla
             if (updateResult.IsFailure)
                 return updateResult;
 
-            var values = request.Values.Select(v => (v.Value, v.Order));
-            var setValuesResult = scale.SetValues(values);
+            var setValuesResult = scale.SetValues(request.Values);
             if (setValuesResult.IsFailure)
                 return setValuesResult;
 

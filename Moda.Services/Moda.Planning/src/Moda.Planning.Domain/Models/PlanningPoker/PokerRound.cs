@@ -1,4 +1,4 @@
-using Ardalis.GuardClauses;
+﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
 using Moda.Planning.Domain.Enums;
 using NodaTime;
@@ -11,13 +11,12 @@ public class PokerRound : BaseEntity<Guid>
 
     private PokerRound() { }
 
-    internal PokerRound(Guid pokerSessionId, string label, int order)
+    internal PokerRound(Guid pokerSessionId, string? label, int order)
     {
-        Id = Guid.CreateVersion7();
         PokerSessionId = pokerSessionId;
-        Label = Guard.Against.NullOrWhiteSpace(label, nameof(Label)).Trim();
+        Label = label?.Trim();
         Order = order;
-        Status = PokerRoundStatus.Pending;
+        Status = PokerRoundStatus.Voting;
     }
 
     public Guid PokerSessionId { get; private set; }
@@ -25,7 +24,7 @@ public class PokerRound : BaseEntity<Guid>
     /// <summary>
     /// Free-text label describing what is being estimated (e.g., a work item key + title, or any descriptive text).
     /// </summary>
-    public string Label { get; private set; } = default!;
+    public string? Label { get; private set; }
 
     public PokerRoundStatus Status { get; private set; }
 
@@ -40,18 +39,6 @@ public class PokerRound : BaseEntity<Guid>
     public int Order { get; private set; }
 
     public IReadOnlyCollection<PokerVote> Votes => _votes.AsReadOnly();
-
-    /// <summary>
-    /// Start voting for this round.
-    /// </summary>
-    internal Result Start()
-    {
-        if (Status != PokerRoundStatus.Pending)
-            return Result.Failure("Round can only be started from Pending status.");
-
-        Status = PokerRoundStatus.Voting;
-        return Result.Success();
-    }
 
     /// <summary>
     /// Reveal all votes for this round.

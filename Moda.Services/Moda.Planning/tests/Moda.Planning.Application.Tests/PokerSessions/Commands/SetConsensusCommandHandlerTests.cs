@@ -37,7 +37,6 @@ public class SetConsensusCommandHandlerTests : IDisposable
 
         session.AddRound("Story");
         var round = session.Rounds.First();
-        session.StartRound(round.Id);
         session.SubmitVote(round.Id, Guid.NewGuid(), "5", Instant.FromUtc(2026, 1, 15, 10, 0));
         session.RevealRound(round.Id);
 
@@ -78,7 +77,6 @@ public class SetConsensusCommandHandlerTests : IDisposable
 
         session.AddRound("Story");
         var round = session.Rounds.First();
-        session.StartRound(round.Id);
         // Round is Voting, not Revealed
 
         var command = new SetConsensusCommand(session.Id, round.Id, "5");

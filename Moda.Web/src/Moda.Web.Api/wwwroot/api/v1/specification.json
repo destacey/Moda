@@ -10,24 +10,6 @@
     "version": "v1"
   },
   "paths": {
-    "/startup": {
-      "get": {
-        "operationId": "GetStartup",
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "Bearer": []
-          },
-          {
-            "ApiKey": []
-          }
-        ]
-      }
-    },
     "/api/user-management/permissions": {
       "get": {
         "tags": [
@@ -7282,6 +7264,62 @@
         ]
       }
     },
+    "/api/planning/estimation-scales/{id}/active-status": {
+      "put": {
+        "tags": [
+          "EstimationScales"
+        ],
+        "summary": "Set the active status of an estimation scale.",
+        "operationId": "EstimationScales_SetActiveStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetEstimationScaleActiveStatusRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
     "/api/planning/planning-intervals": {
       "get": {
         "tags": [
@@ -9418,52 +9456,6 @@
         ]
       }
     },
-    "/api/planning/poker-sessions/{id}/activate": {
-      "put": {
-        "tags": [
-          "PokerSessions"
-        ],
-        "summary": "Activate a poker session.",
-        "operationId": "PokerSessions_Activate",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "guid",
-              "nullable": false,
-              "example": "00000000-0000-0000-0000-000000000000"
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": ""
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": []
-          },
-          {
-            "ApiKey": []
-          }
-        ]
-      }
-    },
     "/api/planning/poker-sessions/{id}/complete": {
       "put": {
         "tags": [
@@ -9582,64 +9574,6 @@
         ],
         "summary": "Remove a round from a poker session.",
         "operationId": "PokerSessions_RemoveRound",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "guid",
-              "nullable": false,
-              "example": "00000000-0000-0000-0000-000000000000"
-            },
-            "x-position": 1
-          },
-          {
-            "name": "roundId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "guid",
-              "nullable": false,
-              "example": "00000000-0000-0000-0000-000000000000"
-            },
-            "x-position": 2
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": ""
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": []
-          },
-          {
-            "ApiKey": []
-          }
-        ]
-      }
-    },
-    "/api/planning/poker-sessions/{id}/rounds/{roundId}/start": {
-      "put": {
-        "tags": [
-          "PokerSessions"
-        ],
-        "summary": "Start voting for a round.",
-        "operationId": "PokerSessions_StartRound",
         "parameters": [
           {
             "name": "id",
@@ -21905,7 +21839,7 @@
         "required": [
           "id",
           "name",
-          "isPreset",
+          "isActive",
           "valueCount"
         ],
         "properties": {
@@ -21916,7 +21850,7 @@
           "name": {
             "type": "string"
           },
-          "isPreset": {
+          "isActive": {
             "type": "boolean"
           },
           "valueCount": {
@@ -21931,7 +21865,7 @@
         "required": [
           "id",
           "name",
-          "isPreset",
+          "isActive",
           "values"
         ],
         "properties": {
@@ -21946,31 +21880,14 @@
             "type": "string",
             "nullable": true
           },
-          "isPreset": {
+          "isActive": {
             "type": "boolean"
           },
           "values": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/EstimationScaleValueDto"
+              "type": "string"
             }
-          }
-        }
-      },
-      "EstimationScaleValueDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "value",
-          "order"
-        ],
-        "properties": {
-          "value": {
-            "type": "string"
-          },
-          "order": {
-            "type": "integer",
-            "format": "int32"
           }
         }
       },
@@ -21996,28 +21913,12 @@
           },
           "values": {
             "type": "array",
+            "maxLength": 32,
             "minLength": 1,
             "nullable": false,
             "items": {
-              "$ref": "#/components/schemas/ScaleValueRequest"
+              "type": "string"
             }
-          }
-        }
-      },
-      "ScaleValueRequest": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "value",
-          "order"
-        ],
-        "properties": {
-          "value": {
-            "type": "string"
-          },
-          "order": {
-            "type": "integer",
-            "format": "int32"
           }
         }
       },
@@ -22050,11 +21951,31 @@
           },
           "values": {
             "type": "array",
+            "maxLength": 32,
             "minLength": 1,
             "nullable": false,
             "items": {
-              "$ref": "#/components/schemas/ScaleValueRequest"
+              "type": "string"
             }
+          }
+        }
+      },
+      "SetEstimationScaleActiveStatusRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "isActive"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0.0,
+            "exclusiveMinimum": true
+          },
+          "isActive": {
+            "type": "boolean"
           }
         }
       },
@@ -23692,7 +23613,6 @@
           "key",
           "name",
           "status",
-          "facilitatorName",
           "roundCount"
         ],
         "properties": {
@@ -23712,8 +23632,13 @@
           "status": {
             "type": "string"
           },
-          "facilitatorName": {
-            "type": "string"
+          "facilitator": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/EmployeeNavigationDto"
+              }
+            ]
           },
           "roundCount": {
             "type": "integer",
@@ -23725,12 +23650,10 @@
         "type": "string",
         "description": "",
         "x-enumNames": [
-          "Created",
           "Active",
           "Completed"
         ],
         "enum": [
-          "Created",
           "Active",
           "Completed"
         ]
@@ -23743,8 +23666,6 @@
           "key",
           "name",
           "status",
-          "facilitatorId",
-          "facilitatorName",
           "rounds"
         ],
         "properties": {
@@ -23764,14 +23685,13 @@
           "status": {
             "type": "string"
           },
-          "facilitatorId": {
-            "type": "string",
-            "format": "guid",
-            "nullable": false,
-            "example": "00000000-0000-0000-0000-000000000000"
-          },
-          "facilitatorName": {
-            "type": "string"
+          "facilitator": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/EmployeeNavigationDto"
+              }
+            ]
           },
           "estimationScale": {
             "nullable": true,
@@ -23804,7 +23724,6 @@
         "additionalProperties": false,
         "required": [
           "id",
-          "label",
           "status",
           "order",
           "voteCount",
@@ -23818,7 +23737,8 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "label": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "status": {
             "type": "string"
@@ -23838,18 +23758,16 @@
           "votes": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/VoteDto"
+              "$ref": "#/components/schemas/PokerVoteDto"
             }
           }
         }
       },
-      "VoteDto": {
+      "PokerVoteDto": {
         "type": "object",
         "additionalProperties": false,
         "required": [
           "id",
-          "participantId",
-          "participantName",
           "value",
           "submittedOn"
         ],
@@ -23860,14 +23778,13 @@
             "nullable": false,
             "example": "00000000-0000-0000-0000-000000000000"
           },
-          "participantId": {
-            "type": "string",
-            "format": "guid",
-            "nullable": false,
-            "example": "00000000-0000-0000-0000-000000000000"
-          },
-          "participantName": {
-            "type": "string"
+          "participant": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/EmployeeNavigationDto"
+              }
+            ]
           },
           "value": {
             "type": "string"
@@ -23903,15 +23820,12 @@
       "AddPokerRoundRequest": {
         "type": "object",
         "additionalProperties": false,
-        "required": [
-          "label"
-        ],
         "properties": {
           "label": {
             "type": "string",
             "maxLength": 512,
-            "minLength": 1,
-            "nullable": false
+            "minLength": 0,
+            "nullable": true
           }
         }
       },

@@ -70,10 +70,12 @@ const CreatePokerSessionForm = ({
       permission: 'Permissions.PokerSessions.Create',
     })
 
-  const scaleOptions = (estimationScales ?? []).map((s) => ({
-    label: `${s.name}${s.isPreset ? ' (Preset)' : ''}`,
-    value: s.id,
-  }))
+  const scaleOptions = (estimationScales ?? [])
+    .filter((s) => s.isActive)
+    .map((s) => ({
+      label: s.name,
+      value: s.id,
+    }))
 
   return (
     <Modal

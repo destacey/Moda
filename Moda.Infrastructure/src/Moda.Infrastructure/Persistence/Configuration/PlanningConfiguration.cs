@@ -641,27 +641,9 @@ public class EstimationScaleConfig : IEntityTypeConfiguration<EstimationScale>
         builder.Property(e => e.Id).ValueGeneratedOnAdd();
         builder.Property(e => e.Name).IsRequired().HasMaxLength(128);
         builder.Property(e => e.Description).HasMaxLength(1024);
-        builder.Property(e => e.IsPreset).IsRequired();
-
-        // Relationships
-        builder.HasMany(e => e.Values)
-            .WithOne()
-            .HasForeignKey(v => v.EstimationScaleId)
-            .OnDelete(DeleteBehavior.Cascade);
-    }
-}
-
-public class EstimationScaleValueConfig : IEntityTypeConfiguration<EstimationScaleValue>
-{
-    public void Configure(EntityTypeBuilder<EstimationScaleValue> builder)
-    {
-        builder.ToTable("EstimationScaleValues", SchemaNames.Planning);
-
-        builder.HasKey(v => new { v.EstimationScaleId, v.Order });
-
-        builder.Property(v => v.EstimationScaleId).IsRequired();
-        builder.Property(v => v.Value).IsRequired().HasMaxLength(32);
-        builder.Property(v => v.Order).IsRequired();
+        builder.Property(e => e.Values)
+            .HasColumnName("Values");
+        builder.Property(e => e.IsActive).IsRequired();
     }
 }
 
@@ -702,6 +684,9 @@ public class PokerSessionConfig : IEntityTypeConfiguration<PokerSession>
             .WithOne()
             .HasForeignKey(r => r.PokerSessionId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Navigation(s => s.Rounds)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }
 
@@ -716,7 +701,7 @@ public class PokerRoundConfig : IEntityTypeConfiguration<PokerRound>
         builder.HasIndex(r => r.PokerSessionId);
 
         builder.Property(r => r.PokerSessionId).IsRequired();
-        builder.Property(r => r.Label).IsRequired().HasMaxLength(512);
+        builder.Property(r => r.Label).HasMaxLength(512);
         builder.Property(r => r.Status).IsRequired()
             .HasConversion<EnumConverter<PokerRoundStatus>>()
             .HasColumnType("varchar")
@@ -729,6 +714,9 @@ public class PokerRoundConfig : IEntityTypeConfiguration<PokerRound>
             .WithOne()
             .HasForeignKey(v => v.PokerRoundId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        //builder.Navigation(r => r.Votes)
+        //    .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }
 

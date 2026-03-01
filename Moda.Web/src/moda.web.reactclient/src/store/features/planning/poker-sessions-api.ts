@@ -63,22 +63,6 @@ export const pokerSessionsApi = apiSlice.injectEndpoints({
       invalidatesTags: () => [{ type: QueryTags.PokerSession, id: 'LIST' }],
     }),
 
-    activatePokerSession: builder.mutation<void, { id: string; key: number }>({
-      queryFn: async ({ id }) => {
-        try {
-          const data = await getPokerSessionsClient().activate(id)
-          return { data }
-        } catch (error) {
-          console.error('API Error:', error)
-          return { error }
-        }
-      },
-      invalidatesTags: (result, error, arg) => [
-        { type: QueryTags.PokerSession, id: 'LIST' },
-        { type: QueryTags.PokerSession, id: arg.key },
-      ],
-    }),
-
     completePokerSession: builder.mutation<void, { id: string; key: number }>({
       queryFn: async ({ id }) => {
         try {
@@ -135,27 +119,6 @@ export const pokerSessionsApi = apiSlice.injectEndpoints({
       },
       invalidatesTags: (result, error, arg) => [
         { type: QueryTags.PokerSession, id: arg.sessionKey },
-        { type: QueryTags.PokerSessionRound, id: arg.sessionKey },
-      ],
-    }),
-
-    startPokerRound: builder.mutation<
-      void,
-      { sessionId: string; roundId: string; sessionKey: number }
-    >({
-      queryFn: async ({ sessionId, roundId }) => {
-        try {
-          const data = await getPokerSessionsClient().startRound(
-            sessionId,
-            roundId,
-          )
-          return { data }
-        } catch (error) {
-          console.error('API Error:', error)
-          return { error }
-        }
-      },
-      invalidatesTags: (result, error, arg) => [
         { type: QueryTags.PokerSessionRound, id: arg.sessionKey },
       ],
     }),
@@ -262,11 +225,9 @@ export const {
   useGetPokerSessionsQuery,
   useGetPokerSessionQuery,
   useCreatePokerSessionMutation,
-  useActivatePokerSessionMutation,
   useCompletePokerSessionMutation,
   useAddPokerRoundMutation,
   useRemovePokerRoundMutation,
-  useStartPokerRoundMutation,
   useRevealPokerRoundMutation,
   useResetPokerRoundMutation,
   useSetPokerRoundConsensusMutation,

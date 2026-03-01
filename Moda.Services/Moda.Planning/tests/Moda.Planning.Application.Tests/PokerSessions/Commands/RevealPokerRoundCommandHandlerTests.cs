@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Moda.Planning.Application.PokerSessions.Commands;
 using Moda.Planning.Application.PokerSessions.Dtos;
 using Moda.Planning.Application.PokerSessions.Interfaces;
@@ -38,7 +38,6 @@ public class RevealPokerRoundCommandHandlerTests : IDisposable
 
         session.AddRound("Story to estimate");
         var round = session.Rounds.First();
-        session.StartRound(round.Id);
         session.SubmitVote(round.Id, Guid.NewGuid(), "5", Instant.FromUtc(2026, 1, 15, 10, 0));
 
         var command = new RevealPokerRoundCommand(session.Id, round.Id);
@@ -50,7 +49,7 @@ public class RevealPokerRoundCommandHandlerTests : IDisposable
         result.IsSuccess.Should().BeTrue();
         round.Status.Should().Be(PokerRoundStatus.Revealed);
         _dbContext.SaveChangesCallCount.Should().Be(1);
-        _mockNotifier.Verify(n => n.NotifyVotesRevealed(session.Id, round.Id, It.IsAny<IEnumerable<VoteDto>>()), Times.Once);
+        _mockNotifier.Verify(n => n.NotifyVotesRevealed(session.Id, round.Id, It.IsAny<IEnumerable<PokerVoteDto>>()), Times.Once);
     }
 
     [Fact]
@@ -69,7 +68,7 @@ public class RevealPokerRoundCommandHandlerTests : IDisposable
     }
 
     [Fact]
-    public async Task Handle_ShouldFail_WhenRoundIsNotVoting()
+    public async Task Handle_ShouldFail_WhenRoundIsAlreadyRevealed()
     {
         // Arrange
         var session = _sessionFaker.WithStatus(PokerSessionStatus.Active).Generate();
@@ -77,7 +76,8 @@ public class RevealPokerRoundCommandHandlerTests : IDisposable
 
         session.AddRound("Story");
         var round = session.Rounds.First();
-        // Round is still Pending
+        session.SubmitVote(round.Id, Guid.NewGuid(), "5", Instant.FromUtc(2026, 1, 15, 10, 0));
+        session.RevealRound(round.Id);
 
         var command = new RevealPokerRoundCommand(session.Id, round.Id);
 
@@ -87,7 +87,7 @@ public class RevealPokerRoundCommandHandlerTests : IDisposable
         // Assert
         result.IsFailure.Should().BeTrue();
         _dbContext.SaveChangesCallCount.Should().Be(0);
-        _mockNotifier.Verify(n => n.NotifyVotesRevealed(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<IEnumerable<VoteDto>>()), Times.Never);
+        _mockNotifier.Verify(n => n.NotifyVotesRevealed(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<IEnumerable<PokerVoteDto>>()), Times.Never);
     }
 
     [Fact]

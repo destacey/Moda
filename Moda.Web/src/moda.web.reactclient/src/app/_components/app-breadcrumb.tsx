@@ -51,7 +51,8 @@ const AppBreadcrumb = () => {
     (pathItems.length >= 1 &&
       (pathItems[0].title === 'Settings' ||
         (pathItems[0].title === 'Planning' &&
-          pathItems[1].title === 'Planning Intervals')))
+          (pathItems[1].title === 'Planning Intervals' ||
+            pathItems[1]?.path === 'poker-sessions'))))
   )
     return null
 

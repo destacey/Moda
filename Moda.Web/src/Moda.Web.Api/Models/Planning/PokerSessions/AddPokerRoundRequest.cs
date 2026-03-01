@@ -4,7 +4,7 @@ namespace Moda.Web.Api.Models.Planning.PokerSessions;
 
 public class AddPokerRoundRequest
 {
-    public string Label { get; set; } = default!;
+    public string? Label { get; set; }
 
     public AddPokerRoundCommand ToAddPokerRoundCommand(Guid sessionId)
     {
@@ -16,6 +16,6 @@ public sealed class AddPokerRoundRequestValidator : CustomValidator<AddPokerRoun
 {
     public AddPokerRoundRequestValidator()
     {
-        RuleFor(r => r.Label).NotEmpty().MaximumLength(512);
+        RuleFor(r => r.Label).MaximumLength(512);
     }
 }
