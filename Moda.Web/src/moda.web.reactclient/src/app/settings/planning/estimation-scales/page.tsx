@@ -5,7 +5,7 @@ import { RowMenuCellRenderer } from '@/src/components/common/moda-grid-cell-rend
 import useAuth from '@/src/components/contexts/auth'
 import { authorizePage } from '@/src/components/hoc'
 import { useDocumentTitle } from '@/src/hooks'
-import { EstimationScaleListDto } from '@/src/services/moda-api'
+import { EstimationScaleDto } from '@/src/services/moda-api'
 import {
   useGetEstimationScalesQuery,
   useSetEstimationScaleActiveStatusMutation,
@@ -27,12 +27,12 @@ const EstimationScaleCellRenderer = ({ value, data }) => {
 }
 
 interface RowMenuProps {
-  scale: EstimationScaleListDto
+  scale: EstimationScaleDto
   canUpdate: boolean
   canDelete: boolean
   onEditClicked: (id: number) => void
-  onToggleActiveClicked: (scale: EstimationScaleListDto) => void
-  onDeleteClicked: (scale: EstimationScaleListDto) => void
+  onToggleActiveClicked: (scale: EstimationScaleDto) => void
+  onDeleteClicked: (scale: EstimationScaleDto) => void
 }
 
 const getRowMenuItems = (props: RowMenuProps): ItemType[] => {
@@ -70,7 +70,7 @@ const EstimationScalesPage = () => {
   const [openCreateForm, setOpenCreateForm] = useState<boolean>(false)
   const [editScaleId, setEditScaleId] = useState<number | null>(null)
   const [deleteScale, setDeleteScale] =
-    useState<EstimationScaleListDto | null>(null)
+    useState<EstimationScaleDto | null>(null)
 
   const messageApi = useMessage()
 
@@ -79,7 +79,7 @@ const EstimationScalesPage = () => {
     isLoading,
     error,
     refetch,
-  } = useGetEstimationScalesQuery()
+  } = useGetEstimationScalesQuery(true)
   const [setActiveStatus] = useSetEstimationScaleActiveStatusMutation()
 
   const { hasPermissionClaim } = useAuth()
@@ -108,7 +108,7 @@ const EstimationScalesPage = () => {
   }, [])
 
   const handleToggleActive = useCallback(
-    async (scale: EstimationScaleListDto) => {
+    async (scale: EstimationScaleDto) => {
       try {
         const response = await setActiveStatus({
           id: scale.id,
@@ -130,11 +130,11 @@ const EstimationScalesPage = () => {
     [setActiveStatus, messageApi],
   )
 
-  const handleDelete = useCallback((scale: EstimationScaleListDto) => {
+  const handleDelete = useCallback((scale: EstimationScaleDto) => {
     setDeleteScale(scale)
   }, [])
 
-  const columnDefs = useMemo<ColDef<EstimationScaleListDto>[]>(
+  const columnDefs = useMemo<ColDef<EstimationScaleDto>[]>(
     () => [
       {
         width: 50,
@@ -164,7 +164,12 @@ const EstimationScalesPage = () => {
         width: 100,
         cellRenderer: (params) => (params.value ? 'Yes' : 'No'),
       },
-      { field: 'valueCount', headerName: 'Values', width: 100 },
+      {
+        field: 'values',
+        headerName: 'Values',
+        width: 100,
+        valueGetter: (params) => params.data?.values?.length ?? 0,
+      },
     ],
     [
       showRowMenu,

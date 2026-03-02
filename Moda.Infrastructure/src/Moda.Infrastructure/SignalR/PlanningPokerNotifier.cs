@@ -8,6 +8,10 @@ internal sealed class PlanningPokerNotifier(IHubContext<PlanningPokerHub> hubCon
 {
     private readonly IHubContext<PlanningPokerHub> _hubContext = hubContext;
 
+    public async Task NotifySessionUpdated(Guid sessionId) =>
+        await _hubContext.Clients.Group(sessionId.ToString())
+            .SendAsync("SessionUpdated", sessionId);
+
     public async Task NotifySessionCompleted(Guid sessionId) =>
         await _hubContext.Clients.Group(sessionId.ToString())
             .SendAsync("SessionCompleted", sessionId);
@@ -35,4 +39,8 @@ internal sealed class PlanningPokerNotifier(IHubContext<PlanningPokerHub> hubCon
     public async Task NotifyVoteSubmitted(Guid sessionId, Guid roundId, Guid participantId, string participantName) =>
         await _hubContext.Clients.Group(sessionId.ToString())
             .SendAsync("VoteSubmitted", sessionId, roundId, participantId, participantName);
+
+    public async Task NotifyRoundLabelUpdated(Guid sessionId, Guid roundId, string? label) =>
+        await _hubContext.Clients.Group(sessionId.ToString())
+            .SendAsync("RoundLabelUpdated", sessionId, roundId, label);
 }

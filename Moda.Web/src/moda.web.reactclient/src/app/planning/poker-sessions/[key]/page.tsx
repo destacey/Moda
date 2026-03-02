@@ -1,6 +1,7 @@
 'use client'
 
 import { useDocumentTitle } from '@/src/hooks'
+import { getAvatarColor } from '@/src/utils'
 import { usePokerSessionConnection } from '@/src/hooks/use-poker-session-connection'
 import { authorizePage } from '@/src/components/hoc'
 import useAuth from '@/src/components/contexts/auth'
@@ -10,13 +11,26 @@ import {
   useGetPokerSessionQuery,
   useCompletePokerSessionMutation,
   useRemovePokerRoundMutation,
+  useSubmitPokerVoteMutation,
 } from '@/src/store/features/planning/poker-sessions-api'
-import { Avatar, Button, Col, Empty, Flex, Row, Spin, Tag, Tooltip } from 'antd'
+import { useGetInternalEmployeeIdQuery } from '@/src/store/features/user-management/profile-api'
+import { Avatar, Button, Divider, Empty, Flex, Spin, Tag, Tooltip } from 'antd'
+import { EditOutlined, LinkOutlined } from '@ant-design/icons'
 import { useParams } from 'next/navigation'
-import { LinkOutlined } from '@ant-design/icons'
 import { CSSProperties, FC, useCallback, useMemo, useState } from 'react'
 import { PresenceParticipant } from '@/src/hooks/use-poker-session-connection'
-import { SessionHeader, SessionSidebar, VotingArea } from './_components'
+import PageTitle from '@/src/components/common/page-title'
+import EditPokerSessionForm from './_components/edit-poker-session-form'
+import LobbyParticipants from './_components/lobby-participants'
+import PokerLobbyState from './_components/poker-lobby-state'
+import SessionSidebar from './_components/session-sidebar'
+import ParticipantCards from './_components/participant-cards'
+import EstimationCardDeck from './_components/estimation-card-deck'
+import VotingActions from './_components/voting-actions'
+import ResultsPanel from './_components/results-panel'
+import RoundLabelHeader from './_components/round-label-header'
+import PokerReviewView from './_components/poker-review-view'
+import styles from './_components/poker-session.module.css'
 
 interface PokerCssVars extends CSSProperties {
   '--poker-bg': string
@@ -29,6 +43,8 @@ interface PokerCssVars extends CSSProperties {
   '--poker-success': string
   '--poker-active-bg': string
   '--poker-hover-bg': string
+  '--poker-warning': string
+  '--poker-radius-lg': string
 }
 
 const PokerSessionDetailPage: FC = () => {
@@ -43,6 +59,7 @@ const PokerSessionDetailPage: FC = () => {
   const { data: session, isLoading } = useGetPokerSessionQuery(key, {
     pollingInterval: 5000,
   })
+  const { data: currentEmployeeId } = useGetInternalEmployeeIdQuery()
 
   const [connectedParticipants, setConnectedParticipants] = useState<
     PresenceParticipant[]
@@ -54,8 +71,11 @@ const PokerSessionDetailPage: FC = () => {
   const [completeSession, { isLoading: isCompleting }] =
     useCompletePokerSessionMutation()
   const [removeRound] = useRemovePokerRoundMutation()
+  const [submitVote, { isLoading: isSubmitting }] =
+    useSubmitPokerVoteMutation()
 
   const [selectedRoundId, setSelectedRoundId] = useState<string | undefined>()
+  const [openEditForm, setOpenEditForm] = useState(false)
 
   const handleComplete = useCallback(async () => {
     if (!session) return
@@ -103,6 +123,13 @@ const PokerSessionDetailPage: FC = () => {
         (r) => r.status === 'Voting' || r.status === 'Revealed',
       ) ?? rounds[0]
 
+  // Determine center column view mode
+  const centerViewMode = useMemo(() => {
+    if (!activeRound) return 'lobby' as const
+    if (activeRound.status === 'Accepted') return 'review' as const
+    return 'active' as const
+  }, [activeRound])
+
   // Merge connected participants with voters from the active round
   // so that votes from disconnected users still appear
   const roundParticipants = useMemo(() => {
@@ -122,6 +149,33 @@ const PokerSessionDetailPage: FC = () => {
     }
     return Array.from(map.values())
   }, [connectedParticipants, activeRound])
+
+  // Derive the current user's vote from the API data
+  const selectedVote = useMemo(() => {
+    if (!activeRound || !currentEmployeeId) return undefined
+    const myVote = activeRound.votes?.find(
+      (v) => v.participant?.id === currentEmployeeId,
+    )
+    return myVote?.value || undefined
+  }, [activeRound, currentEmployeeId])
+
+  const handleVote = useCallback(
+    async (value: string) => {
+      if (!session || !activeRound) return
+      try {
+        const response = await submitVote({
+          sessionId: session.id,
+          roundId: activeRound.id,
+          sessionKey: session.key,
+          request: { value },
+        })
+        if (response.error) throw response.error
+      } catch {
+        messageApi.error('Failed to submit vote.')
+      }
+    },
+    [submitVote, session, activeRound, messageApi],
+  )
 
   if (isLoading) {
     return <Spin size="large" />
@@ -144,75 +198,158 @@ const PokerSessionDetailPage: FC = () => {
     '--poker-success': token.colorSuccess,
     '--poker-active-bg': token.controlItemBgActive,
     '--poker-hover-bg': token.controlItemBgHover,
+    '--poker-warning': token.colorWarning,
+    '--poker-radius-lg': `${token.borderRadiusLG}px`,
   }
 
+  const sessionStatusColor: Record<string, string> = {
+    Active: 'processing',
+    Completed: 'success',
+  }
+
+  const pageTitleTags = (
+    <Flex align="center" gap={8}>
+      <Tag color={sessionStatusColor[session.status]}>{session.status}</Tag>
+      {session.estimationScale?.name && (
+        <Tag style={{ margin: 0 }}>{session.estimationScale.name}</Tag>
+      )}
+    </Flex>
+  )
+
+  const pageTitleActions = (
+    <Flex align="center" gap={12}>
+      {canManage && isActive && (
+        <Button icon={<EditOutlined />} onClick={() => setOpenEditForm(true)}>
+          Edit
+        </Button>
+      )}
+      <Button icon={<LinkOutlined />} onClick={handleCopyInviteLink}>
+        Copy Invite Link
+      </Button>
+      {connectedParticipants.length > 0 && (
+        <Avatar.Group
+          max={{
+            count: 5,
+            style: { backgroundColor: token.colorPrimary, fontSize: 12 },
+          }}
+          size="small"
+        >
+          {connectedParticipants.map((p) => (
+            <Tooltip key={p.id} title={p.name}>
+              <Avatar
+                size="small"
+                style={{ backgroundColor: getAvatarColor(p.id) }}
+              >
+                {p.name.charAt(0).toUpperCase()}
+              </Avatar>
+            </Tooltip>
+          ))}
+        </Avatar.Group>
+      )}
+    </Flex>
+  )
+
   return (
-    <div style={cssVars}>
-      <br />
-      <Flex justify="space-between" align="center" style={{ marginBottom: 16 }}>
-        <SessionHeader
-          round={activeRound}
-          totalParticipants={connectedParticipants.length}
-          sessionName={session.name}
-          sessionStatus={session.status}
-          facilitatorName={session.facilitator?.name ?? 'Unknown'}
-        />
-        <Flex align="center" gap={12}>
-          {session.estimationScale && (
-            <Tag>{session.estimationScale.name}</Tag>
+    <div className={styles.pageContainer} style={cssVars}>
+      <PageTitle
+        title={session.name}
+        subtitle="Planning Poker"
+        tags={pageTitleTags}
+        actions={pageTitleActions}
+      />
+
+      <div className={styles.pageLayout}>
+        <div className={styles.centerColumn}>
+          {centerViewMode === 'lobby' && (
+            <PokerLobbyState
+              isActive={isActive}
+              canManage={canManage}
+              sessionId={session.id}
+              sessionKey={session.key}
+            />
           )}
-          <Button
-            icon={<LinkOutlined />}
-            onClick={handleCopyInviteLink}
-          >
-            Copy Invite Link
-          </Button>
-          {connectedParticipants.length > 0 && (
-            <Avatar.Group
-              max={{
-                count: 8,
-                style: { backgroundColor: token.colorPrimary, fontSize: 12 },
-              }}
-              size="small"
+
+          {centerViewMode === 'active' && activeRound && (
+            <Flex
+              vertical
+              gap={16}
+              align="center"
+              style={{ padding: '24px 0' }}
             >
-              {connectedParticipants.map((p) => (
-                <Tooltip key={p.id} title={p.name}>
-                  <Avatar
-                    size="small"
-                    style={{ backgroundColor: token.colorPrimary }}
-                  >
-                    {p.name.charAt(0).toUpperCase()}
-                  </Avatar>
-                </Tooltip>
-              ))}
-            </Avatar.Group>
+              <RoundLabelHeader
+                round={activeRound}
+                sessionId={session.id}
+                sessionKey={session.key}
+                canManage={canManage && isActive}
+              />
+
+              <div className={styles.votingCardPanel}>
+                <ParticipantCards
+                  participants={roundParticipants}
+                  votes={activeRound.votes}
+                  isRevealed={
+                    activeRound.status === 'Revealed' ||
+                    activeRound.status === 'Accepted'
+                  }
+                />
+
+                <VotingActions
+                  round={activeRound}
+                  sessionId={session.id}
+                  sessionKey={session.key}
+                  estimationScaleValues={
+                    session.estimationScale?.values ?? []
+                  }
+                  canManage={canManage && isActive}
+                />
+              </div>
+
+              {(activeRound.status === 'Revealed' ||
+                activeRound.status === 'Accepted') && (
+                <ResultsPanel votes={activeRound.votes} />
+              )}
+
+              {activeRound.status === 'Voting' && (
+                <>
+                  <Divider style={{ margin: '8px 0' }}>
+                    <span className={styles.yourEstimateLabel}>
+                      Your Estimate
+                    </span>
+                  </Divider>
+                  <EstimationCardDeck
+                    values={session.estimationScale?.values ?? []}
+                    selectedValue={selectedVote}
+                    onSelect={handleVote}
+                    disabled={isSubmitting}
+                  />
+                </>
+              )}
+            </Flex>
           )}
-        </Flex>
-      </Flex>
-      <Row gutter={16}>
-        <Col xs={24} md={17}>
-          {activeRound ? (
-            <VotingArea
+
+          {centerViewMode === 'review' && activeRound && (
+            <PokerReviewView
               round={activeRound}
               sessionId={session.id}
               sessionKey={session.key}
-              estimationScale={session.estimationScale}
               canManage={canManage && isActive}
               participants={roundParticipants}
             />
-          ) : (
-            <Empty
-              description={
-                isActive ? 'Add a round to get started.' : 'No rounds.'
-              }
-              style={{ padding: '48px 0' }}
-            />
           )}
-        </Col>
-        <Col xs={24} md={7}>
+        </div>
+
+        {centerViewMode === 'lobby' ? (
+          <LobbyParticipants
+            participants={connectedParticipants}
+            canManage={canManage}
+            isActive={isActive}
+            onComplete={handleComplete}
+            isCompleting={isCompleting}
+          />
+        ) : (
           <SessionSidebar
             session={session}
-            activeRoundId={activeRound?.id}
+            selectedRoundId={activeRound?.id}
             onSelectRound={setSelectedRoundId}
             onRemoveRound={handleRemoveRound}
             onComplete={handleComplete}
@@ -220,8 +357,15 @@ const PokerSessionDetailPage: FC = () => {
             canManage={canManage}
             isActive={isActive}
           />
-        </Col>
-      </Row>
+        )}
+      </div>
+      {openEditForm && (
+        <EditPokerSessionForm
+          session={session}
+          onFormUpdate={() => setOpenEditForm(false)}
+          onFormCancel={() => setOpenEditForm(false)}
+        />
+      )}
     </div>
   )
 }

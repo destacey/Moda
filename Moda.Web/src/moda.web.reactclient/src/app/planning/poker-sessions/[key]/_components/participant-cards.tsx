@@ -2,7 +2,7 @@
 
 import { PokerVoteDto } from '@/src/services/moda-api'
 import { Flex } from 'antd'
-import { FC, useMemo } from 'react'
+import { CSSProperties, FC, useMemo } from 'react'
 import styles from './poker-session.module.css'
 
 export interface ParticipantCardsProps {
@@ -28,27 +28,52 @@ const ParticipantCards: FC<ParticipantCardsProps> = ({
 
   return (
     <Flex wrap gap={16} justify="center">
-      {participants.map((p) => {
+      {participants.map((p, index) => {
         const vote = voteMap.get(p.id)
         const hasVoted = vote !== undefined
 
-        let cardClass = styles.participantCard
-        if (isRevealed && hasVoted) {
-          cardClass += ` ${styles.participantCardRevealed}`
-        } else if (hasVoted) {
-          cardClass += ` ${styles.participantCardVoted}`
-        } else {
-          cardClass += ` ${styles.participantCardPending}`
-        }
+        const frontClass = `${styles.cardFront} ${
+          hasVoted ? styles.cardFrontVoted : styles.cardFrontPending
+        }`
+
+        const backClass = `${styles.cardBack} ${
+          !hasVoted ? styles.cardBackNoVote : ''
+        }`
+
+        const containerClass = `${styles.cardFlipContainer} ${
+          isRevealed ? styles.cardFlipRevealed : ''
+        }`
 
         return (
           <div key={p.id} style={{ textAlign: 'center' }}>
-            <div className={cardClass}>
-              {isRevealed && hasVoted ? (
-                <span className={styles.cardValue}>{vote}</span>
-              ) : hasVoted ? (
-                <span className={styles.cardSymbol}>&#9830;</span>
-              ) : null}
+            <div
+              className={containerClass}
+              style={
+                {
+                  '--stagger-delay': `${index * 100}ms`,
+                } as CSSProperties
+              }
+            >
+              <div className={styles.cardFlipInner}>
+                {/* Front face: shown during voting */}
+                <div className={frontClass}>
+                  {hasVoted && (
+                    <span className={styles.cardSymbol}>&#9824;</span>
+                  )}
+                </div>
+                {/* Back face: shown after reveal */}
+                <div className={backClass}>
+                  {hasVoted ? (
+                    <span className={styles.cardValue}>{vote}</span>
+                  ) : (
+                    <span
+                      style={{ fontSize: 20, color: 'var(--poker-muted)' }}
+                    >
+                      &mdash;
+                    </span>
+                  )}
+                </div>
+              </div>
             </div>
             <div className={styles.cardName}>{p.name}</div>
           </div>

@@ -11,7 +11,13 @@ import {
   PokerSessionStatus,
   SetConsensusRequest,
   SubmitVoteRequest,
+  UpdatePokerRoundLabelRequest,
 } from '@/src/services/moda-api'
+
+export interface UpdatePokerSessionRequest {
+  name: string
+  estimationScaleId: number
+}
 
 export const pokerSessionsApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -54,6 +60,39 @@ export const pokerSessionsApi = apiSlice.injectEndpoints({
       queryFn: async (request) => {
         try {
           const data = await getPokerSessionsClient().create(request)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: () => [{ type: QueryTags.PokerSession, id: 'LIST' }],
+    }),
+
+    updatePokerSession: builder.mutation<
+      void,
+      { id: string; key: number; request: UpdatePokerSessionRequest }
+    >({
+      queryFn: async ({ id, request }) => {
+        try {
+          const data = await getPokerSessionsClient().update(id, request)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, arg) => [
+        { type: QueryTags.PokerSession, id: 'LIST' },
+        { type: QueryTags.PokerSession, id: arg.key },
+        { type: QueryTags.PokerSessionRound, id: arg.key },
+      ],
+    }),
+
+    deletePokerSession: builder.mutation<void, string>({
+      queryFn: async (id) => {
+        try {
+          const data = await getPokerSessionsClient().delete(id)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -218,6 +257,33 @@ export const pokerSessionsApi = apiSlice.injectEndpoints({
         { type: QueryTags.PokerSessionRound, id: arg.sessionKey },
       ],
     }),
+
+    updatePokerRoundLabel: builder.mutation<
+      void,
+      {
+        sessionId: string
+        roundId: string
+        sessionKey: number
+        request: UpdatePokerRoundLabelRequest
+      }
+    >({
+      queryFn: async ({ sessionId, roundId, request }) => {
+        try {
+          const data = await getPokerSessionsClient().updateRoundLabel(
+            sessionId,
+            roundId,
+            request,
+          )
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, arg) => [
+        { type: QueryTags.PokerSessionRound, id: arg.sessionKey },
+      ],
+    }),
   }),
 })
 
@@ -225,6 +291,8 @@ export const {
   useGetPokerSessionsQuery,
   useGetPokerSessionQuery,
   useCreatePokerSessionMutation,
+  useUpdatePokerSessionMutation,
+  useDeletePokerSessionMutation,
   useCompletePokerSessionMutation,
   useAddPokerRoundMutation,
   useRemovePokerRoundMutation,
@@ -232,4 +300,5 @@ export const {
   useResetPokerRoundMutation,
   useSetPokerRoundConsensusMutation,
   useSubmitPokerVoteMutation,
+  useUpdatePokerRoundLabelMutation,
 } = pokerSessionsApi

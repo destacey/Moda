@@ -10,6 +10,64 @@
 import axios, { AxiosError } from 'axios';
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, CancelToken } from 'axios';
 
+export class Client {
+    protected instance: AxiosInstance;
+    protected baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, instance?: AxiosInstance) {
+
+        this.instance = instance || axios.create();
+
+        this.baseUrl = baseUrl ?? "";
+
+    }
+
+    getStartup( cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/startup";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetStartup(_response);
+        });
+    }
+
+    protected processGetStartup(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+}
+
 export class PermissionsClient {
     protected instance: AxiosInstance;
     protected baseUrl: string;
@@ -8147,9 +8205,14 @@ export class EstimationScalesClient {
 
     /**
      * Get a list of estimation scales.
+     * @param includeInactive (optional) 
      */
-    getList( cancelToken?: CancelToken): Promise<EstimationScaleListDto[]> {
-        let url_ = this.baseUrl + "/api/planning/estimation-scales";
+    getScales(includeInactive?: boolean | undefined, cancelToken?: CancelToken): Promise<EstimationScaleDto[]> {
+        let url_ = this.baseUrl + "/api/planning/estimation-scales?";
+        if (includeInactive === null)
+            throw new globalThis.Error("The parameter 'includeInactive' cannot be null.");
+        else if (includeInactive !== undefined)
+            url_ += "includeInactive=" + encodeURIComponent("" + includeInactive) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -8168,11 +8231,11 @@ export class EstimationScalesClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processGetList(_response);
+            return this.processGetScales(_response);
         });
     }
 
-    protected processGetList(response: AxiosResponse): Promise<EstimationScaleListDto[]> {
+    protected processGetScales(response: AxiosResponse): Promise<EstimationScaleDto[]> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -8187,7 +8250,7 @@ export class EstimationScalesClient {
             let result200: any = null;
             let resultData200  = _responseText;
             result200 = JSON.parse(resultData200);
-            return Promise.resolve<EstimationScaleListDto[]>(result200);
+            return Promise.resolve<EstimationScaleDto[]>(result200);
 
         } else if (status === 400) {
             const _responseText = response.data;
@@ -8200,7 +8263,7 @@ export class EstimationScalesClient {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<EstimationScaleListDto[]>(null as any);
+        return Promise.resolve<EstimationScaleDto[]>(null as any);
     }
 
     /**
@@ -8268,7 +8331,7 @@ export class EstimationScalesClient {
     /**
      * Get estimation scale details.
      */
-    getScale(id: number, cancelToken?: CancelToken): Promise<EstimationScaleDetailsDto> {
+    getScale(id: number, cancelToken?: CancelToken): Promise<EstimationScaleDto> {
         let url_ = this.baseUrl + "/api/planning/estimation-scales/{id}";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
@@ -8295,7 +8358,7 @@ export class EstimationScalesClient {
         });
     }
 
-    protected processGetScale(response: AxiosResponse): Promise<EstimationScaleDetailsDto> {
+    protected processGetScale(response: AxiosResponse): Promise<EstimationScaleDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -8310,7 +8373,7 @@ export class EstimationScalesClient {
             let result200: any = null;
             let resultData200  = _responseText;
             result200 = JSON.parse(resultData200);
-            return Promise.resolve<EstimationScaleDetailsDto>(result200);
+            return Promise.resolve<EstimationScaleDto>(result200);
 
         } else if (status === 404) {
             const _responseText = response.data;
@@ -8323,7 +8386,7 @@ export class EstimationScalesClient {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<EstimationScaleDetailsDto>(null as any);
+        return Promise.resolve<EstimationScaleDto>(null as any);
     }
 
     /**
@@ -10761,6 +10824,124 @@ export class PokerSessionsClient {
     }
 
     /**
+     * Update a poker session.
+     */
+    update(id: string, request: UpdatePokerSessionRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/planning/poker-sessions/{id}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "PUT",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processUpdate(_response);
+        });
+    }
+
+    protected processUpdate(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Delete a poker session.
+     */
+    delete(id: string, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/planning/poker-sessions/{id}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "DELETE",
+            url: url_,
+            headers: {
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processDelete(_response);
+        });
+    }
+
+    protected processDelete(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
      * Complete a poker session.
      */
     complete(id: string, cancelToken?: CancelToken): Promise<void> {
@@ -11099,6 +11280,70 @@ export class PokerSessionsClient {
     }
 
     protected processSetConsensus(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Update the label for a round.
+     */
+    updateRoundLabel(id: string, roundId: string, request: UpdatePokerRoundLabelRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/planning/poker-sessions/{id}/rounds/{roundId}/label";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        if (roundId === undefined || roundId === null)
+            throw new globalThis.Error("The parameter 'roundId' must be defined.");
+        url_ = url_.replace("{roundId}", encodeURIComponent("" + roundId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "PUT",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processUpdateRoundLabel(_response);
+        });
+    }
+
+    protected processUpdateRoundLabel(response: AxiosResponse): Promise<void> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -21164,14 +21409,7 @@ export interface ManageStrategicInitiativeProjectsRequest {
     projectIds: string[];
 }
 
-export interface EstimationScaleListDto {
-    id: number;
-    name: string;
-    isActive: boolean;
-    valueCount: number;
-}
-
-export interface EstimationScaleDetailsDto {
+export interface EstimationScaleDto {
     id: number;
     name: string;
     description?: string | undefined;
@@ -21611,7 +21849,7 @@ export interface PokerSessionDetailsDto {
     name: string;
     status: string;
     facilitator?: EmployeeNavigationDto | undefined;
-    estimationScale?: EstimationScaleDetailsDto | undefined;
+    estimationScale?: EstimationScaleDto | undefined;
     activatedOn?: Date | undefined;
     completedOn?: Date | undefined;
     rounds: PokerRoundDto[];
@@ -21639,12 +21877,21 @@ export interface CreatePokerSessionRequest {
     estimationScaleId: number;
 }
 
+export interface UpdatePokerSessionRequest {
+    name: string;
+    estimationScaleId: number;
+}
+
 export interface AddPokerRoundRequest {
     label?: string | undefined;
 }
 
 export interface SetConsensusRequest {
     estimate: string;
+}
+
+export interface UpdatePokerRoundLabelRequest {
+    label?: string | undefined;
 }
 
 export interface SubmitVoteRequest {

@@ -2,7 +2,7 @@ using Moda.Planning.Domain.Models.PlanningPoker;
 
 namespace Moda.Planning.Application.EstimationScales.Dtos;
 
-public class EstimationScaleDetailsDto : IMapFrom<EstimationScale>
+public class EstimationScaleDto : IMapFrom<EstimationScale>
 {
     public int Id { get; set; }
     public required string Name { get; set; }

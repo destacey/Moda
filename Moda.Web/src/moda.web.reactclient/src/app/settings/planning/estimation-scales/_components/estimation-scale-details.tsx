@@ -1,12 +1,12 @@
 'use client'
 
-import { EstimationScaleDetailsDto } from '@/src/services/moda-api'
+import { EstimationScaleDto } from '@/src/services/moda-api'
 import { Descriptions, Space, Tag } from 'antd'
 
 const { Item } = Descriptions
 
 interface EstimationScaleDetailsProps {
-  estimationScale: EstimationScaleDetailsDto
+  estimationScale: EstimationScaleDto
 }
 
 const EstimationScaleDetails = ({

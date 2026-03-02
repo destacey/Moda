@@ -79,6 +79,15 @@ public class PokerRound : BaseEntity<Guid>
     }
 
     /// <summary>
+    /// Update the label for this round.
+    /// </summary>
+    internal Result UpdateLabel(string? newLabel)
+    {
+        Label = newLabel?.Trim();
+        return Result.Success();
+    }
+
+    /// <summary>
     /// Submit or update a vote for this round.
     /// </summary>
     internal Result AddOrUpdateVote(Guid participantId, string value, Instant timestamp)

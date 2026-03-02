@@ -2,16 +2,23 @@ using Moda.Planning.Application.EstimationScales.Dtos;
 
 namespace Moda.Planning.Application.EstimationScales.Queries;
 
-public sealed record GetEstimationScalesQuery() : IQuery<IReadOnlyList<EstimationScaleListDto>>;
+public sealed record GetEstimationScalesQuery(bool IncludeInactive = false) : IQuery<IReadOnlyList<EstimationScaleDto>>;
 
-internal sealed class GetEstimationScalesQueryHandler(IPlanningDbContext planningDbContext) : IQueryHandler<GetEstimationScalesQuery, IReadOnlyList<EstimationScaleListDto>>
+internal sealed class GetEstimationScalesQueryHandler(IPlanningDbContext planningDbContext) : IQueryHandler<GetEstimationScalesQuery, IReadOnlyList<EstimationScaleDto>>
 {
     private readonly IPlanningDbContext _planningDbContext = planningDbContext;
 
-    public async Task<IReadOnlyList<EstimationScaleListDto>> Handle(GetEstimationScalesQuery request, CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<EstimationScaleDto>> Handle(GetEstimationScalesQuery request, CancellationToken cancellationToken)
     {
-        return await _planningDbContext.EstimationScales
-            .ProjectToType<EstimationScaleListDto>()
+        var query = _planningDbContext.EstimationScales.AsQueryable();
+
+        if (!request.IncludeInactive)
+        {
+            query = query.Where(s => s.IsActive);
+        }
+
+        return await query
+            .ProjectToType<EstimationScaleDto>()
             .ToListAsync(cancellationToken);
     }
 }

@@ -10,6 +10,24 @@
     "version": "v1"
   },
   "paths": {
+    "/startup": {
+      "get": {
+        "operationId": "GetStartup",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
     "/api/user-management/permissions": {
       "get": {
         "tags": [
@@ -7021,7 +7039,18 @@
           "EstimationScales"
         ],
         "summary": "Get a list of estimation scales.",
-        "operationId": "EstimationScales_GetList",
+        "operationId": "EstimationScales_GetScales",
+        "parameters": [
+          {
+            "name": "includeInactive",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "x-position": 1
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -7030,7 +7059,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/EstimationScaleListDto"
+                    "$ref": "#/components/schemas/EstimationScaleDto"
                   }
                 }
               }
@@ -7132,7 +7161,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/EstimationScaleDetailsDto"
+                  "$ref": "#/components/schemas/EstimationScaleDto"
                 }
               }
             }
@@ -9456,6 +9485,108 @@
         ]
       }
     },
+    "/api/planning/poker-sessions/{id}": {
+      "put": {
+        "tags": [
+          "PokerSessions"
+        ],
+        "summary": "Update a poker session.",
+        "operationId": "PokerSessions_Update",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePokerSessionRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "PokerSessions"
+        ],
+        "summary": "Delete a poker session.",
+        "operationId": "PokerSessions_Delete",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
     "/api/planning/poker-sessions/{id}/complete": {
       "put": {
         "tags": [
@@ -9780,6 +9911,76 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/SetConsensusRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 3
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/planning/poker-sessions/{id}/rounds/{roundId}/label": {
+      "put": {
+        "tags": [
+          "PokerSessions"
+        ],
+        "summary": "Update the label for a round.",
+        "operationId": "PokerSessions_UpdateRoundLabel",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "roundId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 2
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePokerRoundLabelRequest"
               }
             }
           },
@@ -21833,33 +22034,7 @@
           }
         }
       },
-      "EstimationScaleListDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "name",
-          "isActive",
-          "valueCount"
-        ],
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "name": {
-            "type": "string"
-          },
-          "isActive": {
-            "type": "boolean"
-          },
-          "valueCount": {
-            "type": "integer",
-            "format": "int32"
-          }
-        }
-      },
-      "EstimationScaleDetailsDto": {
+      "EstimationScaleDto": {
         "type": "object",
         "additionalProperties": false,
         "required": [
@@ -23697,7 +23872,7 @@
             "nullable": true,
             "oneOf": [
               {
-                "$ref": "#/components/schemas/EstimationScaleDetailsDto"
+                "$ref": "#/components/schemas/EstimationScaleDto"
               }
             ]
           },
@@ -23817,6 +23992,28 @@
           }
         }
       },
+      "UpdatePokerSessionRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "estimationScaleId"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 256,
+            "minLength": 1,
+            "nullable": false
+          },
+          "estimationScaleId": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0.0,
+            "exclusiveMinimum": true
+          }
+        }
+      },
       "AddPokerRoundRequest": {
         "type": "object",
         "additionalProperties": false,
@@ -23841,6 +24038,18 @@
             "maxLength": 32,
             "minLength": 1,
             "nullable": false
+          }
+        }
+      },
+      "UpdatePokerRoundLabelRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "label": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 0,
+            "nullable": true
           }
         }
       },

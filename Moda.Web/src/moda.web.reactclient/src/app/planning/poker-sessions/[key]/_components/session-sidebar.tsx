@@ -1,14 +1,15 @@
 'use client'
 
 import { PokerSessionDetailsDto } from '@/src/services/moda-api'
-import { Button, Card, Divider } from 'antd'
+import { Button, Divider } from 'antd'
 import { FC } from 'react'
 import SessionSummary from './session-summary'
-import EstimationHistory from './estimation-history'
+import SessionTimeline from './session-timeline'
+import styles from './poker-session.module.css'
 
 export interface SessionSidebarProps {
   session: PokerSessionDetailsDto
-  activeRoundId?: string
+  selectedRoundId?: string
   onSelectRound: (roundId: string) => void
   onRemoveRound: (roundId: string) => void
   onComplete: () => void
@@ -19,7 +20,7 @@ export interface SessionSidebarProps {
 
 const SessionSidebar: FC<SessionSidebarProps> = ({
   session,
-  activeRoundId,
+  selectedRoundId,
   onSelectRound,
   onRemoveRound,
   onComplete,
@@ -30,27 +31,13 @@ const SessionSidebar: FC<SessionSidebarProps> = ({
   const rounds = session.rounds ?? []
 
   return (
-    <Card size="small" title="Session Summary" styles={{ body: { padding: 0 } }}>
-      <div style={{ padding: '0 16px' }}>
+    <div className={styles.sidebar}>
+      <div className={styles.sidebarInner}>
         <SessionSummary rounds={rounds} />
-      </div>
-      <Divider style={{ margin: '0' }} />
-      <div style={{ padding: '8px 0' }}>
-        <div
-          style={{
-            padding: '0 16px 4px',
-            fontSize: 12,
-            fontWeight: 600,
-            textTransform: 'uppercase',
-            letterSpacing: '0.05em',
-            opacity: 0.6,
-          }}
-        >
-          Estimation History
-        </div>
-        <EstimationHistory
+        <Divider style={{ margin: 0 }} />
+        <SessionTimeline
           rounds={rounds}
-          activeRoundId={activeRoundId}
+          selectedRoundId={selectedRoundId}
           onSelectRound={onSelectRound}
           onRemoveRound={onRemoveRound}
           canManage={canManage}
@@ -58,23 +45,23 @@ const SessionSidebar: FC<SessionSidebarProps> = ({
           sessionKey={session.key}
           isActive={isActive}
         />
+        {canManage && isActive && (
+          <>
+            <Divider style={{ margin: 0 }} />
+            <div style={{ padding: '12px 16px' }}>
+              <Button
+                danger
+                block
+                onClick={onComplete}
+                loading={isCompleting}
+              >
+                Complete Session
+              </Button>
+            </div>
+          </>
+        )}
       </div>
-      {canManage && isActive && (
-        <>
-          <Divider style={{ margin: 0 }} />
-          <div style={{ padding: '12px 16px' }}>
-            <Button
-              danger
-              block
-              onClick={onComplete}
-              loading={isCompleting}
-            >
-              Complete Session
-            </Button>
-          </div>
-        </>
-      )}
-    </Card>
+    </div>
   )
 }
 

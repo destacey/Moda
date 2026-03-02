@@ -1,18 +1,18 @@
 'use client'
 
-import { Flex, Form, Input, Modal, Spin, Tag, Typography } from 'antd'
-import { CSSProperties, useCallback } from 'react'
-import {
-  CreatePokerSessionRequest,
-  EstimationScaleDto,
-} from '@/src/services/moda-api'
+import { Alert, Flex, Form, Input, Modal, Spin, Tag, Typography } from 'antd'
+import { CSSProperties, useCallback, useEffect } from 'react'
+import { EstimationScaleDto, PokerSessionDetailsDto } from '@/src/services/moda-api'
 import { toFormErrors } from '@/src/utils'
 import { useMessage } from '@/src/components/contexts/messaging'
 import useTheme from '@/src/components/contexts/theme'
-import { useCreatePokerSessionMutation } from '@/src/store/features/planning/poker-sessions-api'
+import {
+  UpdatePokerSessionRequest,
+  useUpdatePokerSessionMutation,
+} from '@/src/store/features/planning/poker-sessions-api'
 import { useGetEstimationScalesQuery } from '@/src/store/features/planning/estimation-scales-api'
 import { useModalForm } from '@/src/hooks'
-import styles from './poker-sessions.module.css'
+import createStyles from '../../_components/poker-sessions.module.css'
 
 const { Item } = Form
 const { TextArea } = Input
@@ -26,12 +26,13 @@ interface ScaleCssVars extends CSSProperties {
   '--scale-radius-lg': string
 }
 
-export interface CreatePokerSessionFormProps {
-  onFormCreate: () => void
+export interface EditPokerSessionFormProps {
+  session: PokerSessionDetailsDto
+  onFormUpdate: () => void
   onFormCancel: () => void
 }
 
-interface CreatePokerSessionFormValues {
+interface EditPokerSessionFormValues {
   name: string
   estimationScaleId: number
 }
@@ -39,29 +40,35 @@ interface CreatePokerSessionFormValues {
 interface EstimationScaleCardProps {
   scale: EstimationScaleDto
   selected: boolean
+  disabled: boolean
   onSelect: (id: number) => void
 }
 
 const EstimationScaleCard = ({
   scale,
   selected,
+  disabled,
   onSelect,
 }: EstimationScaleCardProps) => {
   const cardClass = selected
-    ? `${styles.scaleCard} ${styles.scaleCardSelected}`
-    : styles.scaleCard
+    ? `${createStyles.scaleCard} ${createStyles.scaleCardSelected}`
+    : createStyles.scaleCard
 
   return (
-    <div onClick={() => onSelect(scale.id)} className={cardClass}>
-      <Text strong className={styles.scaleCardName}>
+    <div
+      onClick={() => !disabled && onSelect(scale.id)}
+      className={cardClass}
+      style={disabled ? { opacity: 0.5, cursor: 'not-allowed' } : undefined}
+    >
+      <Text strong className={createStyles.scaleCardName}>
         {scale.name}
       </Text>
       {scale.description && (
-        <Text type="secondary" className={styles.scaleCardDescription}>
+        <Text type="secondary" className={createStyles.scaleCardDescription}>
           {scale.description}
         </Text>
       )}
-      <Flex wrap gap={4} className={styles.scaleCardValues}>
+      <Flex wrap gap={4} className={createStyles.scaleCardValues}>
         {scale.values.map((v) => (
           <Tag key={v} style={{ margin: 0 }}>
             {v}
@@ -72,31 +79,38 @@ const EstimationScaleCard = ({
   )
 }
 
-const CreatePokerSessionForm = ({
-  onFormCreate,
+const EditPokerSessionForm = ({
+  session,
+  onFormUpdate,
   onFormCancel,
-}: CreatePokerSessionFormProps) => {
+}: EditPokerSessionFormProps) => {
   const { token } = useTheme()
   const messageApi = useMessage()
 
-  const [createPokerSession] = useCreatePokerSessionMutation()
+  const [updatePokerSession] = useUpdatePokerSessionMutation()
   const { data: estimationScales, isLoading: scalesLoading } =
     useGetEstimationScalesQuery()
 
+  const hasRounds = (session.rounds?.length ?? 0) > 0
+
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
-    useModalForm<CreatePokerSessionFormValues>({
+    useModalForm<EditPokerSessionFormValues>({
       onSubmit: useCallback(
-        async (values: CreatePokerSessionFormValues, form) => {
+        async (values: EditPokerSessionFormValues, form) => {
           try {
-            const request: CreatePokerSessionRequest = {
+            const request: UpdatePokerSessionRequest = {
               name: values.name,
               estimationScaleId: values.estimationScaleId,
             }
-            const response = await createPokerSession(request)
+            const response = await updatePokerSession({
+              id: session.id,
+              key: session.key,
+              request,
+            })
             if (response.error) {
               throw response.error
             }
-            messageApi.success('Successfully created poker session.')
+            messageApi.success('Successfully updated poker session.')
             return true
           } catch (error) {
             if (error.status === 422 && error.errors) {
@@ -105,31 +119,41 @@ const CreatePokerSessionForm = ({
               messageApi.error('Correct the validation error(s) to continue.')
             } else {
               messageApi.error(
-                'An error occurred while creating the poker session. Please try again.',
+                'An error occurred while updating the poker session. Please try again.',
               )
               console.error(error)
             }
             return false
           }
         },
-        [createPokerSession, messageApi],
+        [updatePokerSession, session.id, session.key, messageApi],
       ),
-      onComplete: onFormCreate,
+      onComplete: onFormUpdate,
       onCancel: onFormCancel,
       errorMessage:
-        'An error occurred while creating the poker session. Please try again.',
-      permission: 'Permissions.PokerSessions.Create',
+        'An error occurred while updating the poker session. Please try again.',
+      permission: 'Permissions.PokerSessions.Update',
     })
 
-  const activeScales = estimationScales ?? []
+  useEffect(() => {
+    if (isOpen) {
+      form.setFieldsValue({
+        name: session.name,
+        estimationScaleId: session.estimationScale?.id,
+      })
+    }
+  }, [isOpen, session, form])
 
+  const activeScales = estimationScales ?? []
   const selectedScaleId = Form.useWatch('estimationScaleId', form)
 
   const handleScaleSelect = useCallback(
     (id: number) => {
-      form.setFieldsValue({ estimationScaleId: id })
+      if (!hasRounds) {
+        form.setFieldsValue({ estimationScaleId: id })
+      }
     },
-    [form],
+    [form, hasRounds],
   )
 
   const cssVars: ScaleCssVars = {
@@ -142,11 +166,11 @@ const CreatePokerSessionForm = ({
 
   return (
     <Modal
-      title="Create Poker Session"
+      title="Edit Poker Session"
       open={isOpen}
       onOk={handleOk}
       okButtonProps={{ disabled: !isValid }}
-      okText="Create"
+      okText="Save"
       confirmLoading={isSaving}
       onCancel={handleCancel}
       keyboard={false}
@@ -156,7 +180,7 @@ const CreatePokerSessionForm = ({
         form={form}
         size="small"
         layout="vertical"
-        name="create-poker-session-form"
+        name="edit-poker-session-form"
       >
         <Item label="Name" name="name" rules={[{ required: true }]}>
           <TextArea
@@ -174,11 +198,19 @@ const CreatePokerSessionForm = ({
         >
           <Input style={{ display: 'none' }} />
         </Item>
-        <div className={styles.scaleLabel}>
-          <span className={styles.scaleRequired}>*</span> Estimation Scale
+        <div className={createStyles.scaleLabel}>
+          <span className={createStyles.scaleRequired}>*</span> Estimation Scale
         </div>
+        {hasRounds && (
+          <Alert
+            message="Scale cannot be changed after rounds have started."
+            type="info"
+            showIcon
+            style={{ marginBottom: 8, fontSize: 12 }}
+          />
+        )}
         {scalesLoading ? (
-          <Flex justify="center" className={styles.scaleCardLoading}>
+          <Flex justify="center" className={createStyles.scaleCardLoading}>
             <Spin size="small" />
           </Flex>
         ) : (
@@ -188,6 +220,7 @@ const CreatePokerSessionForm = ({
                 key={scale.id}
                 scale={scale}
                 selected={selectedScaleId === scale.id}
+                disabled={hasRounds}
                 onSelect={handleScaleSelect}
               />
             ))}
@@ -198,4 +231,4 @@ const CreatePokerSessionForm = ({
   )
 }
 
-export default CreatePokerSessionForm
+export default EditPokerSessionForm

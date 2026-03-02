@@ -1,8 +1,9 @@
 'use client'
 
 import { PokerRoundDto } from '@/src/services/moda-api'
-import { Flex, Statistic } from 'antd'
+import { Statistic } from 'antd'
 import { FC, useMemo } from 'react'
+import styles from './poker-session.module.css'
 
 export interface SessionSummaryProps {
   rounds: PokerRoundDto[]
@@ -15,22 +16,18 @@ const SessionSummary: FC<SessionSummaryProps> = ({ rounds }) => {
       .map((r) => parseFloat(r.consensusEstimate ?? ''))
       .filter((v) => !isNaN(v))
     const total = numericValues.reduce((sum, v) => sum + v, 0)
-    const avg =
-      numericValues.length > 0 ? (total / numericValues.length).toFixed(1) : '-'
 
     return {
-      estimated: `${accepted.length}/${rounds.length}`,
+      completed: accepted.length,
       totalPoints: numericValues.length > 0 ? total : '-',
-      avgEstimate: avg,
     }
   }, [rounds])
 
   return (
-    <Flex gap={16} justify="space-around" style={{ padding: '12px 0' }}>
-      <Statistic title="Estimated" value={stats.estimated} />
+    <div className={styles.summaryGrid}>
+      <Statistic title="Completed" value={stats.completed} />
       <Statistic title="Total Points" value={stats.totalPoints} />
-      <Statistic title="Avg Estimate" value={stats.avgEstimate} />
-    </Flex>
+    </div>
   )
 }
 

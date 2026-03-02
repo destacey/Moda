@@ -3,16 +3,34 @@
 import PageTitle from '@/src/components/common/page-title'
 import { useCallback, useState } from 'react'
 import { useDocumentTitle } from '@/src/hooks'
-import { CreatePokerSessionForm, PokerSessionsGrid } from './_components'
+import {
+  CreatePokerSessionForm,
+  DeletePokerSessionForm,
+  PokerSessionsGrid,
+} from './_components'
+import EditPokerSessionForm from './[key]/_components/edit-poker-session-form'
 import useAuth from '@/src/components/contexts/auth'
+import { useMessage } from '@/src/components/contexts/messaging'
 import { Button } from 'antd'
 import { authorizePage } from '@/src/components/hoc'
-import { useGetPokerSessionsQuery } from '@/src/store/features/planning/poker-sessions-api'
+import { PokerSessionListDto } from '@/src/services/moda-api'
+import {
+  useGetPokerSessionsQuery,
+  useGetPokerSessionQuery,
+  useCompletePokerSessionMutation,
+} from '@/src/store/features/planning/poker-sessions-api'
 
 const PokerSessionsPage = () => {
   useDocumentTitle('Planning Poker')
 
   const [openCreateForm, setOpenCreateForm] = useState(false)
+  const [editSession, setEditSession] = useState<PokerSessionListDto | null>(
+    null,
+  )
+  const [deleteSession, setDeleteSession] =
+    useState<PokerSessionListDto | null>(null)
+
+  const messageApi = useMessage()
 
   const {
     data: sessionsData,
@@ -20,8 +38,18 @@ const PokerSessionsPage = () => {
     refetch,
   } = useGetPokerSessionsQuery(undefined)
 
+  // Fetch full session details when editing (form needs PokerSessionDetailsDto)
+  const { data: editSessionDetails } = useGetPokerSessionQuery(
+    editSession?.key?.toString(),
+    { skip: !editSession },
+  )
+
+  const [completeSession] = useCompletePokerSessionMutation()
+
   const { hasPermissionClaim } = useAuth()
   const canCreate = hasPermissionClaim('Permissions.PokerSessions.Create')
+  const canUpdate = hasPermissionClaim('Permissions.PokerSessions.Update')
+  const canDelete = hasPermissionClaim('Permissions.PokerSessions.Delete')
 
   const refresh = useCallback(() => {
     refetch()
@@ -33,6 +61,44 @@ const PokerSessionsPage = () => {
       refetch()
     }
   }
+
+  const handleEdit = useCallback((session: PokerSessionListDto) => {
+    setEditSession(session)
+  }, [])
+
+  const handleComplete = useCallback(
+    async (session: PokerSessionListDto) => {
+      try {
+        const response = await completeSession({
+          id: session.id,
+          key: session.key,
+        })
+        if (response.error) throw response.error
+        messageApi.success('Session completed.')
+      } catch {
+        messageApi.error('Failed to complete session.')
+      }
+    },
+    [completeSession, messageApi],
+  )
+
+  const handleDelete = useCallback((session: PokerSessionListDto) => {
+    setDeleteSession(session)
+  }, [])
+
+  const onEditFormClosed = useCallback(() => {
+    setEditSession(null)
+  }, [])
+
+  const onDeleteFormClosed = useCallback(
+    (wasDeleted: boolean) => {
+      setDeleteSession(null)
+      if (wasDeleted) {
+        refetch()
+      }
+    },
+    [refetch],
+  )
 
   const actions = () => (
     <>
@@ -52,11 +118,30 @@ const PokerSessionsPage = () => {
         sessions={sessionsData}
         isLoading={isLoading}
         refetch={refresh}
+        canUpdate={canUpdate}
+        canDelete={canDelete}
+        onEditClicked={handleEdit}
+        onCompleteClicked={handleComplete}
+        onDeleteClicked={handleDelete}
       />
       {openCreateForm && (
         <CreatePokerSessionForm
           onFormCreate={() => onCreateFormClosed(true)}
           onFormCancel={() => onCreateFormClosed(false)}
+        />
+      )}
+      {editSession && editSessionDetails && (
+        <EditPokerSessionForm
+          session={editSessionDetails}
+          onFormUpdate={() => onEditFormClosed()}
+          onFormCancel={() => onEditFormClosed()}
+        />
+      )}
+      {deleteSession && (
+        <DeletePokerSessionForm
+          session={deleteSession}
+          onFormComplete={() => onDeleteFormClosed(true)}
+          onFormCancel={() => onDeleteFormClosed(false)}
         />
       )}
     </>

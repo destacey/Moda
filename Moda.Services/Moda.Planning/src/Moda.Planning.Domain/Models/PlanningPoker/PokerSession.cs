@@ -174,6 +174,24 @@ public class PokerSession : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey
     }
 
     /// <summary>
+    /// Update the label for a specific round.
+    /// </summary>
+    public Result<PokerRound> UpdateRoundLabel(Guid roundId, string? newLabel)
+    {
+        if (Status != PokerSessionStatus.Active)
+            return Result.Failure<PokerRound>("Cannot update round label when the session is not active.");
+
+        var round = _rounds.FirstOrDefault(r => r.Id == roundId);
+        if (round is null)
+            return Result.Failure<PokerRound>("Round not found.");
+
+        var result = round.UpdateLabel(newLabel);
+        return result.IsFailure
+            ? Result.Failure<PokerRound>(result.Error)
+            : Result.Success(round);
+    }
+
+    /// <summary>
     /// Submit a vote for a specific round.
     /// </summary>
     public Result SubmitVote(Guid roundId, Guid participantId, string value, Instant timestamp)
@@ -186,6 +204,30 @@ public class PokerSession : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey
             return Result.Failure("Round not found.");
 
         return round.AddOrUpdateVote(participantId, value, timestamp);
+    }
+
+    /// <summary>
+    /// Update the session name and optionally the estimation scale.
+    /// The estimation scale can only be changed when no rounds have been started.
+    /// </summary>
+    public Result Update(string name, int estimationScaleId)
+    {
+        if (Status != PokerSessionStatus.Active)
+            return Result.Failure("Session can only be updated when active.");
+
+        if (estimationScaleId != EstimationScaleId && _rounds.Count > 0)
+            return Result.Failure("Estimation scale cannot be changed after rounds have been started.");
+
+        try
+        {
+            Name = name;
+            EstimationScaleId = estimationScaleId;
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure(ex.ToString());
+        }
     }
 
     /// <summary>

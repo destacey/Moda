@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 
 namespace Moda.Common.Domain.Authorization;
 
@@ -180,7 +180,7 @@ public static class ApplicationPermissions
         new("View Poker Sessions", ApplicationAction.View, ApplicationResource.PokerSessions, PlanningCategory, IsBasic: true),
         new("Create Poker Sessions", ApplicationAction.Create, ApplicationResource.PokerSessions, PlanningCategory, IsBasic: true),
         new("Update Poker Sessions", ApplicationAction.Update, ApplicationResource.PokerSessions, PlanningCategory, IsBasic: true),
-        new("Delete Poker Sessions", ApplicationAction.Delete, ApplicationResource.PokerSessions, PlanningCategory),
+        new("Delete Poker Sessions", ApplicationAction.Delete, ApplicationResource.PokerSessions, PlanningCategory, IsBasic: true),
 
         new("View Estimation Scales", ApplicationAction.View, ApplicationResource.EstimationScales, PlanningCategory, IsBasic: true),
         new("Create Estimation Scales", ApplicationAction.Create, ApplicationResource.EstimationScales, PlanningCategory),

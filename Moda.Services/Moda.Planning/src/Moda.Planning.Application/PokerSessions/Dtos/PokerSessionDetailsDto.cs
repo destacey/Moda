@@ -19,7 +19,7 @@ public sealed record PokerSessionDetailsDto : IMapFrom<PokerSession>
     public required string Name { get; set; }
     public required string Status { get; set; }
     public EmployeeNavigationDto? Facilitator { get; set; }
-    public EstimationScaleDetailsDto? EstimationScale { get; set; }
+    public EstimationScaleDto? EstimationScale { get; set; }
     public Instant? ActivatedOn { get; set; }
     public Instant? CompletedOn { get; set; }
     public List<PokerRoundDto> Rounds { get; set; } = [];
@@ -32,7 +32,8 @@ public sealed record PokerSessionDetailsDto : IMapFrom<PokerSession>
     }
 
     /// <summary>
-    /// Hides votes for rounds that have not yet been revealed.
+    /// Hides vote values for rounds that have not yet been revealed.
+    /// Participant identity is preserved so the UI can show who has voted.
     /// </summary>
     public void HideUnrevealedVotes()
     {
@@ -40,7 +41,10 @@ public sealed record PokerSessionDetailsDto : IMapFrom<PokerSession>
         {
             if (!_revealedStatuses.Contains(round.Status))
             {
-                round.Votes = [];
+                foreach (var vote in round.Votes)
+                {
+                    vote.Value = string.Empty;
+                }
             }
         }
     }

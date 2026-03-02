@@ -100,6 +100,26 @@ export const getLifecyclePhaseColorFromStatus = (
   return getLifecyclePhaseColor(phase, token)
 }
 
+const avatarColors = [
+  '#1677ff', '#722ed1', '#13c2c2', '#eb2f96', '#fa8c16',
+  '#52c41a', '#2f54eb', '#faad14', '#f5222d', '#a0d911',
+]
+
+/**
+ * Returns a deterministic color from a fixed palette based on the given string.
+ * Useful for assigning consistent avatar colors to users by ID or name.
+ *
+ * @param {string} value - A string to hash (e.g., user ID or name).
+ * @returns {string} A hex color string from the palette.
+ */
+export const getAvatarColor = (value: string): string => {
+  let hash = 0
+  for (let i = 0; i < value.length; i++) {
+    hash = (hash * 31 + value.charCodeAt(i)) | 0
+  }
+  return avatarColors[Math.abs(hash) % avatarColors.length]
+}
+
 export const getLifecyclePhaseTagColor = (
   phase: LifecyclePhase,
 ): string | undefined => {

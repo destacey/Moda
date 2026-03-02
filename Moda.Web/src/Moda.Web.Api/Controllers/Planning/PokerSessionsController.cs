@@ -56,6 +56,32 @@ public class PokerSessionsController : ControllerBase
             : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
+    [HttpPut("{id}")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.PokerSessions)]
+    [OpenApiOperation("Update a poker session.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> Update(Guid id, [FromBody] UpdatePokerSessionRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(request.ToUpdatePokerSessionCommand(id), cancellationToken);
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpDelete("{id}")]
+    [MustHavePermission(ApplicationAction.Delete, ApplicationResource.PokerSessions)]
+    [OpenApiOperation("Delete a poker session.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> Delete(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(new DeletePokerSessionCommand(id), cancellationToken);
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
     [HttpPut("{id}/complete")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.PokerSessions)]
     [OpenApiOperation("Complete a poker session.", "")]
@@ -129,6 +155,19 @@ public class PokerSessionsController : ControllerBase
     public async Task<ActionResult> SetConsensus(Guid id, Guid roundId, [FromBody] SetConsensusRequest request, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(request.ToSetConsensusCommand(id, roundId), cancellationToken);
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpPut("{id}/rounds/{roundId}/label")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.PokerSessions)]
+    [OpenApiOperation("Update the label for a round.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> UpdateRoundLabel(Guid id, Guid roundId, [FromBody] UpdatePokerRoundLabelRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(request.ToUpdatePokerRoundLabelCommand(id, roundId), cancellationToken);
         return result.IsSuccess
             ? NoContent()
             : BadRequest(result.ToBadRequestObject(HttpContext));

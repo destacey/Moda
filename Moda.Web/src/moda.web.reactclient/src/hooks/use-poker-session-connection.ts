@@ -84,9 +84,11 @@ export function usePokerSessionConnection(
           'VotesRevealed',
           'ConsensusSet',
           'RoundReset',
+          'SessionUpdated',
           'SessionCompleted',
           'RoundAdded',
           'RoundRemoved',
+          'RoundLabelUpdated',
         ]
         for (const event of events) {
           connection.on(event, invalidateSession)

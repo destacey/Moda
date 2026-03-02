@@ -1,4 +1,4 @@
-using Moda.Planning.Application.EstimationScales.Commands;
+﻿using Moda.Planning.Application.EstimationScales.Commands;
 using Moda.Planning.Application.EstimationScales.Dtos;
 using Moda.Planning.Application.EstimationScales.Queries;
 using Moda.Web.Api.Extensions;
@@ -23,10 +23,10 @@ public class EstimationScalesController : ControllerBase
     [OpenApiOperation("Get a list of estimation scales.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IEnumerable<EstimationScaleListDto>>> GetList(CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<EstimationScaleDto>>> GetScales(CancellationToken cancellationToken, [FromQuery] bool includeInactive = false)
     {
-        var scales = await _sender.Send(new GetEstimationScalesQuery(), cancellationToken);
-        return Ok(scales);
+        var scales = await _sender.Send(new GetEstimationScalesQuery(includeInactive), cancellationToken);
+        return Ok(scales.OrderBy(s => s.Name));
     }
 
     [HttpGet("{id:int}")]
@@ -34,7 +34,7 @@ public class EstimationScalesController : ControllerBase
     [OpenApiOperation("Get estimation scale details.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<EstimationScaleDetailsDto>> GetScale(int id, CancellationToken cancellationToken)
+    public async Task<ActionResult<EstimationScaleDto>> GetScale(int id, CancellationToken cancellationToken)
     {
         var scale = await _sender.Send(new GetEstimationScaleQuery(id), cancellationToken);
         return scale is not null

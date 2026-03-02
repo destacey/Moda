@@ -3,17 +3,21 @@ import { apiSlice } from '../apiSlice'
 import { QueryTags } from '../query-tags'
 import {
   CreateEstimationScaleRequest,
-  EstimationScaleDetailsDto,
-  EstimationScaleListDto,
+  EstimationScaleDto,
   UpdateEstimationScaleRequest,
 } from '@/src/services/moda-api'
 
 export const estimationScalesApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getEstimationScales: builder.query<EstimationScaleListDto[], void>({
-      queryFn: async () => {
+    getEstimationScales: builder.query<
+      EstimationScaleDto[],
+      boolean | void
+    >({
+      queryFn: async (includeInactive) => {
         try {
-          const data = await getEstimationScalesClient().getList()
+          const data = await getEstimationScalesClient().getScales(
+            includeInactive || undefined,
+          )
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -23,7 +27,7 @@ export const estimationScalesApi = apiSlice.injectEndpoints({
       providesTags: () => [{ type: QueryTags.EstimationScale, id: 'LIST' }],
     }),
 
-    getEstimationScale: builder.query<EstimationScaleDetailsDto, number>({
+    getEstimationScale: builder.query<EstimationScaleDto, number>({
       queryFn: async (id: number) => {
         try {
           const data = await getEstimationScalesClient().getScale(id)

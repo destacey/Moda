@@ -26,11 +26,6 @@ internal sealed class GetPokerSessionQueryHandler(IPlanningDbContext planningDbC
             .ProjectToType<PokerSessionDetailsDto>()
             .FirstOrDefaultAsync(cancellationToken);
 
-        if (session is not null)
-        {
-            session.HideUnrevealedVotes();
-        }
-
         return session;
     }
 }
