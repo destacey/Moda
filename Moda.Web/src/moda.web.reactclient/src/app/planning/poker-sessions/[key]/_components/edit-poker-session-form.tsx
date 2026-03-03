@@ -2,12 +2,13 @@
 
 import { Alert, Flex, Form, Input, Modal, Spin, Tag, Typography } from 'antd'
 import { CSSProperties, useCallback, useEffect } from 'react'
-import { EstimationScaleDto, PokerSessionDetailsDto } from '@/src/services/moda-api'
+import { EstimationScaleDto } from '@/src/services/moda-api'
 import { toFormErrors } from '@/src/utils'
 import { useMessage } from '@/src/components/contexts/messaging'
 import useTheme from '@/src/components/contexts/theme'
 import {
   UpdatePokerSessionRequest,
+  useGetPokerSessionQuery,
   useUpdatePokerSessionMutation,
 } from '@/src/store/features/planning/poker-sessions-api'
 import { useGetEstimationScalesQuery } from '@/src/store/features/planning/estimation-scales-api'
@@ -27,7 +28,7 @@ interface ScaleCssVars extends CSSProperties {
 }
 
 export interface EditPokerSessionFormProps {
-  session: PokerSessionDetailsDto
+  sessionKey: number
   onFormUpdate: () => void
   onFormCancel: () => void
 }
@@ -80,23 +81,27 @@ const EstimationScaleCard = ({
 }
 
 const EditPokerSessionForm = ({
-  session,
+  sessionKey,
   onFormUpdate,
   onFormCancel,
 }: EditPokerSessionFormProps) => {
   const { token } = useTheme()
   const messageApi = useMessage()
 
+  const { data: session, isLoading: sessionLoading } = useGetPokerSessionQuery(
+    sessionKey.toString(),
+  )
   const [updatePokerSession] = useUpdatePokerSessionMutation()
   const { data: estimationScales, isLoading: scalesLoading } =
     useGetEstimationScalesQuery()
 
-  const hasRounds = (session.rounds?.length ?? 0) > 0
+  const hasRounds = (session?.rounds?.length ?? 0) > 0
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<EditPokerSessionFormValues>({
       onSubmit: useCallback(
         async (values: EditPokerSessionFormValues, form) => {
+          if (!session) return false
           try {
             const request: UpdatePokerSessionRequest = {
               name: values.name,
@@ -126,7 +131,7 @@ const EditPokerSessionForm = ({
             return false
           }
         },
-        [updatePokerSession, session.id, session.key, messageApi],
+        [updatePokerSession, session, messageApi],
       ),
       onComplete: onFormUpdate,
       onCancel: onFormCancel,
@@ -136,7 +141,7 @@ const EditPokerSessionForm = ({
     })
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && session) {
       form.setFieldsValue({
         name: session.name,
         estimationScaleId: session.estimationScale?.id,
@@ -169,64 +174,66 @@ const EditPokerSessionForm = ({
       title="Edit Poker Session"
       open={isOpen}
       onOk={handleOk}
-      okButtonProps={{ disabled: !isValid }}
+      okButtonProps={{ disabled: !isValid || sessionLoading || !session }}
       okText="Save"
+      loading={sessionLoading}
       confirmLoading={isSaving}
       onCancel={handleCancel}
       keyboard={false}
       destroyOnHidden
     >
       <Form
-        form={form}
-        size="small"
-        layout="vertical"
-        name="edit-poker-session-form"
-      >
-        <Item label="Name" name="name" rules={[{ required: true }]}>
-          <TextArea
-            autoSize={{ minRows: 1, maxRows: 2 }}
-            showCount
-            maxLength={256}
-          />
-        </Item>
-        <Item
-          name="estimationScaleId"
-          noStyle
-          rules={[
-            { required: true, message: 'Please select an estimation scale' },
-          ]}
+          form={form}
+          size="small"
+          layout="vertical"
+          name="edit-poker-session-form"
         >
-          <Input style={{ display: 'none' }} />
-        </Item>
-        <div className={createStyles.scaleLabel}>
-          <span className={createStyles.scaleRequired}>*</span> Estimation Scale
-        </div>
-        {hasRounds && (
-          <Alert
-            message="Scale cannot be changed after rounds have started."
-            type="info"
-            showIcon
-            style={{ marginBottom: 8, fontSize: 12 }}
-          />
-        )}
-        {scalesLoading ? (
-          <Flex justify="center" className={createStyles.scaleCardLoading}>
-            <Spin size="small" />
-          </Flex>
-        ) : (
-          <Flex vertical gap={8} style={cssVars}>
-            {activeScales.map((scale) => (
-              <EstimationScaleCard
-                key={scale.id}
-                scale={scale}
-                selected={selectedScaleId === scale.id}
-                disabled={hasRounds}
-                onSelect={handleScaleSelect}
-              />
-            ))}
-          </Flex>
-        )}
-      </Form>
+          <Item label="Name" name="name" rules={[{ required: true }]}>
+            <TextArea
+              autoSize={{ minRows: 1, maxRows: 2 }}
+              showCount
+              maxLength={256}
+            />
+          </Item>
+          <Item
+            name="estimationScaleId"
+            noStyle
+            rules={[
+              { required: true, message: 'Please select an estimation scale' },
+            ]}
+          >
+            <Input style={{ display: 'none' }} />
+          </Item>
+          <div className={createStyles.scaleLabel}>
+            <span className={createStyles.scaleRequired}>*</span> Estimation
+            Scale
+          </div>
+          {hasRounds && (
+            <Alert
+              message="Scale cannot be changed after rounds have started."
+              type="info"
+              showIcon
+              style={{ marginBottom: 8, fontSize: 12 }}
+            />
+          )}
+          {scalesLoading ? (
+            <Flex justify="center" className={createStyles.scaleCardLoading}>
+              <Spin size="small" />
+            </Flex>
+          ) : (
+            <Flex vertical gap={8} style={cssVars}>
+              {activeScales.map((scale) => (
+                <EstimationScaleCard
+                  key={scale.id}
+                  scale={scale}
+                  selected={selectedScaleId === scale.id}
+                  disabled={hasRounds}
+                  onSelect={handleScaleSelect}
+                />
+              ))}
+            </Flex>
+          )}
+        </Form>
     </Modal>
   )
 }

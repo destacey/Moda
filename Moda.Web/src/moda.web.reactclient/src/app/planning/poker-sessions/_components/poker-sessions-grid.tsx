@@ -14,6 +14,7 @@ export interface PokerSessionsGridProps {
   refetch: () => void
   canUpdate: boolean
   canDelete: boolean
+  gridControlMenuItems?: ItemType[]
   onEditClicked: (session: PokerSessionListDto) => void
   onCompleteClicked: (session: PokerSessionListDto) => void
   onDeleteClicked: (session: PokerSessionListDto) => void
@@ -72,6 +73,7 @@ const PokerSessionsGrid: FC<PokerSessionsGridProps> = ({
   refetch,
   canUpdate,
   canDelete,
+  gridControlMenuItems,
   onEditClicked,
   onCompleteClicked,
   onDeleteClicked,
@@ -119,6 +121,7 @@ const PokerSessionsGrid: FC<PokerSessionsGridProps> = ({
   return (
     <ModaGrid
       columnDefs={columnDefs}
+      gridControlMenuItems={gridControlMenuItems}
       rowData={sessions}
       loadData={refetch}
       loading={isLoading}

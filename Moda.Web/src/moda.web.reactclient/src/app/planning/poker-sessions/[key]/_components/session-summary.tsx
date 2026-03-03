@@ -10,23 +10,14 @@ export interface SessionSummaryProps {
 }
 
 const SessionSummary: FC<SessionSummaryProps> = ({ rounds }) => {
-  const stats = useMemo(() => {
-    const accepted = rounds.filter((r) => r.status === 'Accepted')
-    const numericValues = accepted
-      .map((r) => parseFloat(r.consensusEstimate ?? ''))
-      .filter((v) => !isNaN(v))
-    const total = numericValues.reduce((sum, v) => sum + v, 0)
-
-    return {
-      completed: accepted.length,
-      totalPoints: numericValues.length > 0 ? total : '-',
-    }
-  }, [rounds])
+  const completedCount = useMemo(
+    () => rounds.filter((r) => r.status === 'Accepted').length,
+    [rounds],
+  )
 
   return (
     <div className={styles.summaryGrid}>
-      <Statistic title="Completed" value={stats.completed} />
-      <Statistic title="Total Points" value={stats.totalPoints} />
+      <Statistic title="Completed" value={`${completedCount} / ${rounds.length}`} />
     </div>
   )
 }

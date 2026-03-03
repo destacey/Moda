@@ -13,7 +13,7 @@ import TextArea from 'antd/es/input/TextArea'
 import { useCallback, useEffect } from 'react'
 import { useModalForm } from '@/src/hooks'
 
-const { Item, List } = Form
+const { Item, List, ErrorList } = Form
 
 export interface EditEstimationScaleFormProps {
   estimationScaleId: number
@@ -34,7 +34,8 @@ const EditEstimationScaleForm = ({
 }: EditEstimationScaleFormProps) => {
   const messageApi = useMessage()
 
-  const { data: scaleData } = useGetEstimationScaleQuery(estimationScaleId)
+  const { data: scaleData, isLoading: scaleLoading } =
+    useGetEstimationScaleQuery(estimationScaleId)
   const [updateEstimationScale] = useUpdateEstimationScaleMutation()
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
@@ -93,6 +94,7 @@ const EditEstimationScaleForm = ({
       onOk={handleOk}
       okButtonProps={{ disabled: !isValid }}
       okText="Save"
+      loading={scaleLoading}
       confirmLoading={isSaving}
       onCancel={handleCancel}
       keyboard={false}
@@ -119,11 +121,7 @@ const EditEstimationScaleForm = ({
             maxLength={128}
           />
         </Item>
-        <Item
-          name="description"
-          label="Description"
-          rules={[{ max: 1024 }]}
-        >
+        <Item name="description" label="Description" rules={[{ max: 1024 }]}>
           <TextArea
             autoSize={{ minRows: 3, maxRows: 6 }}
             showCount
@@ -180,7 +178,7 @@ const EditEstimationScaleForm = ({
                   >
                     Add Value
                   </Button>
-                  <Form.ErrorList errors={errors} />
+                  <ErrorList errors={errors} />
                 </Item>
               </>
             )}

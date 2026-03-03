@@ -33,8 +33,18 @@ const SessionSidebar: FC<SessionSidebarProps> = ({
   return (
     <div className={styles.sidebar}>
       <div className={styles.sidebarInner}>
+        {canManage && isActive && (
+          <>
+            <Divider style={{ margin: 0 }} />
+            <div style={{ padding: '12px 16px' }}>
+              <Button danger block onClick={onComplete} loading={isCompleting}>
+                Complete Session
+              </Button>
+            </div>
+          </>
+        )}
         <SessionSummary rounds={rounds} />
-        <Divider style={{ margin: 0 }} />
+        {isActive && <Divider style={{ margin: 0 }} />}
         <SessionTimeline
           rounds={rounds}
           selectedRoundId={selectedRoundId}
@@ -45,21 +55,6 @@ const SessionSidebar: FC<SessionSidebarProps> = ({
           sessionKey={session.key}
           isActive={isActive}
         />
-        {canManage && isActive && (
-          <>
-            <Divider style={{ margin: 0 }} />
-            <div style={{ padding: '12px 16px' }}>
-              <Button
-                danger
-                block
-                onClick={onComplete}
-                loading={isCompleting}
-              >
-                Complete Session
-              </Button>
-            </div>
-          </>
-        )}
       </div>
     </div>
   )

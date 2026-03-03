@@ -1,6 +1,4 @@
-using Moda.Planning.Application.PokerSessions.Interfaces;
-
-namespace Moda.Planning.Application.PokerSessions.Commands;
+﻿namespace Moda.Planning.Application.PokerSessions.Commands;
 
 public sealed record DeletePokerSessionCommand(Guid Id) : ICommand;
 

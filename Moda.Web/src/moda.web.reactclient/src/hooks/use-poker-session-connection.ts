@@ -81,6 +81,7 @@ export function usePokerSessionConnection(
         // Game events trigger cache invalidation so the UI refreshes
         const events = [
           'VoteSubmitted',
+          'VoteWithdrawn',
           'VotesRevealed',
           'ConsensusSet',
           'RoundReset',

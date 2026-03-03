@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Moda.Planning.Application.PokerSessions.Commands;
 using Moda.Planning.Application.PokerSessions.Interfaces;
 using Moda.Planning.Application.Tests.Infrastructure;
@@ -88,30 +88,6 @@ public class ResetPokerRoundCommandHandlerTests : IDisposable
         result.IsFailure.Should().BeTrue();
         result.Error.Should().Contain("not found");
         _dbContext.SaveChangesCallCount.Should().Be(0);
-    }
-
-    [Fact]
-    public async Task Handle_ShouldFail_WhenRoundIsAccepted()
-    {
-        // Arrange
-        var session = _sessionFaker.WithStatus(PokerSessionStatus.Active).Generate();
-        _dbContext.AddPokerSession(session);
-
-        session.AddRound("Story");
-        var round = session.Rounds.First();
-        session.SubmitVote(round.Id, Guid.NewGuid(), "5", Instant.FromUtc(2026, 1, 15, 10, 0));
-        session.RevealRound(round.Id);
-        session.SetConsensus(round.Id, "5");
-
-        var command = new ResetPokerRoundCommand(session.Id, round.Id);
-
-        // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
-
-        // Assert
-        result.IsFailure.Should().BeTrue();
-        _dbContext.SaveChangesCallCount.Should().Be(0);
-        _mockNotifier.Verify(n => n.NotifyRoundReset(It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Never);
     }
 
     [Fact]

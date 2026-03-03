@@ -258,6 +258,27 @@ export const pokerSessionsApi = apiSlice.injectEndpoints({
       ],
     }),
 
+    withdrawPokerVote: builder.mutation<
+      void,
+      { sessionId: string; roundId: string; sessionKey: number }
+    >({
+      queryFn: async ({ sessionId, roundId }) => {
+        try {
+          const data = await getPokerSessionsClient().withdrawVote(
+            sessionId,
+            roundId,
+          )
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, arg) => [
+        { type: QueryTags.PokerSessionRound, id: arg.sessionKey },
+      ],
+    }),
+
     updatePokerRoundLabel: builder.mutation<
       void,
       {
@@ -300,5 +321,6 @@ export const {
   useResetPokerRoundMutation,
   useSetPokerRoundConsensusMutation,
   useSubmitPokerVoteMutation,
+  useWithdrawPokerVoteMutation,
   useUpdatePokerRoundLabelMutation,
 } = pokerSessionsApi

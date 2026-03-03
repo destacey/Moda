@@ -40,6 +40,17 @@ const PokerLobbyState: FC<PokerLobbyStateProps> = ({
     }
   }, [addRound, sessionId, sessionKey, label, messageApi])
 
+  if (!isActive) {
+    return (
+      <div className={styles.lobbyState}>
+        <Title level={4} style={{ margin: '0 0 8px' }}>
+          Session Completed
+        </Title>
+        <Text type="secondary">No rounds were created in this session.</Text>
+      </div>
+    )
+  }
+
   return (
     <div className={styles.lobbyState}>
       <div className={styles.lobbyCards}>
@@ -50,7 +61,7 @@ const PokerLobbyState: FC<PokerLobbyStateProps> = ({
       <Title level={4} style={{ margin: '0 0 8px' }}>
         Ready to estimate
       </Title>
-      {isActive && canManage ? (
+      {canManage ? (
         <Flex gap={8} style={{ maxWidth: 360, width: '100%' }}>
           <Input
             placeholder="Work item ID or label (optional)"
@@ -70,9 +81,7 @@ const PokerLobbyState: FC<PokerLobbyStateProps> = ({
         </Flex>
       ) : (
         <Text type="secondary">
-          {isActive
-            ? 'Waiting for the facilitator to start a round.'
-            : 'No rounds in this session.'}
+          Waiting for the facilitator to start a round.
         </Text>
       )}
     </div>

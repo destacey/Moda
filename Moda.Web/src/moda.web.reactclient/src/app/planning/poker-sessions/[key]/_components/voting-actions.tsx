@@ -7,18 +7,21 @@ import {
   useResetPokerRoundMutation,
   useSetPokerRoundConsensusMutation,
 } from '@/src/store/features/planning/poker-sessions-api'
-import { Button, Dropdown } from 'antd'
+import { Button, Dropdown, Space } from 'antd'
 import type { MenuProps } from 'antd'
+import { DownOutlined } from '@ant-design/icons'
 import { FC, useCallback, useMemo } from 'react'
 import { calculateVoteStats } from './results-panel'
 import styles from './poker-session.module.css'
 
+const { Compact: SpaceCompact } = Space
 export interface VotingActionsProps {
   round: PokerRoundDto
   sessionId: string
   sessionKey: number
   estimationScaleValues: string[]
   canManage: boolean
+  onConsensusSet?: () => void
 }
 
 const VotingActions: FC<VotingActionsProps> = ({
@@ -27,13 +30,13 @@ const VotingActions: FC<VotingActionsProps> = ({
   sessionKey,
   estimationScaleValues,
   canManage,
+  onConsensusSet,
 }) => {
   const messageApi = useMessage()
 
   const [revealRound, { isLoading: isRevealing }] =
     useRevealPokerRoundMutation()
-  const [resetRound, { isLoading: isResetting }] =
-    useResetPokerRoundMutation()
+  const [resetRound, { isLoading: isResetting }] = useResetPokerRoundMutation()
   const [setConsensus, { isLoading: isSettingConsensus }] =
     useSetPokerRoundConsensusMutation()
 
@@ -74,11 +77,12 @@ const VotingActions: FC<VotingActionsProps> = ({
         })
         if (response.error) throw response.error
         messageApi.success('Consensus set.')
+        onConsensusSet?.()
       } catch {
         messageApi.error('Failed to set consensus.')
       }
     },
-    [setConsensus, sessionId, round.id, sessionKey, messageApi],
+    [setConsensus, sessionId, round.id, sessionKey, messageApi, onConsensusSet],
   )
 
   const modeValue = useMemo(() => {
@@ -124,18 +128,24 @@ const VotingActions: FC<VotingActionsProps> = ({
           <Button onClick={handleReset} loading={isResetting}>
             Re-vote
           </Button>
-          <Dropdown.Button
-            type="primary"
-            onClick={handleAcceptDefault}
-            disabled={!modeValue || modeValue === '-'}
-            loading={isSettingConsensus}
-            menu={{
-              items: overrideMenuItems,
-              onClick: handleAcceptOverride,
-            }}
-          >
-            Accept{modeValue && modeValue !== '-' ? ` (${modeValue})` : ''}
-          </Dropdown.Button>
+          <SpaceCompact>
+            <Button
+              type="primary"
+              onClick={handleAcceptDefault}
+              disabled={!modeValue || modeValue === '-'}
+              loading={isSettingConsensus}
+            >
+              Accept{modeValue && modeValue !== '-' ? ` (${modeValue})` : ''}
+            </Button>
+            <Dropdown
+              menu={{
+                items: overrideMenuItems,
+                onClick: handleAcceptOverride,
+              }}
+            >
+              <Button type="primary" icon={<DownOutlined />} />
+            </Dropdown>
+          </SpaceCompact>
         </>
       )}
     </div>

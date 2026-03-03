@@ -11,7 +11,9 @@ const ControlItemSwitch = (props: ControlItemSwitchProps) => {
   const { label, checked, onChange, ...rest } = props
   return (
     <Space>
-      <Switch size="small" checked={checked} onChange={onChange} {...rest} />
+      <span onClick={(e) => e.stopPropagation()}>
+        <Switch size="small" checked={checked} onChange={onChange} {...rest} />
+      </span>
       {label}
     </Space>
   )

@@ -1,6 +1,6 @@
 'use client'
 
-import { useDocumentTitle } from '@/src/hooks'
+import { useAppDispatch, useDocumentTitle } from '@/src/hooks'
 import { getAvatarColor } from '@/src/utils'
 import { usePokerSessionConnection } from '@/src/hooks/use-poker-session-connection'
 import { authorizePage } from '@/src/components/hoc'
@@ -10,27 +10,42 @@ import { useMessage } from '@/src/components/contexts/messaging'
 import {
   useGetPokerSessionQuery,
   useCompletePokerSessionMutation,
+  useAddPokerRoundMutation,
   useRemovePokerRoundMutation,
   useSubmitPokerVoteMutation,
+  useWithdrawPokerVoteMutation,
 } from '@/src/store/features/planning/poker-sessions-api'
-import { useGetInternalEmployeeIdQuery } from '@/src/store/features/user-management/profile-api'
-import { Avatar, Button, Divider, Empty, Flex, Spin, Tag, Tooltip } from 'antd'
+import { useGetProfileQuery } from '@/src/store/features/user-management/profile-api'
+import { Avatar, Button, Divider, Flex, Tag, Tooltip } from 'antd'
 import { EditOutlined, LinkOutlined } from '@ant-design/icons'
-import { useParams } from 'next/navigation'
-import { CSSProperties, FC, useCallback, useMemo, useState } from 'react'
+import { notFound, useParams, usePathname } from 'next/navigation'
+import {
+  CSSProperties,
+  FC,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 import { PresenceParticipant } from '@/src/hooks/use-poker-session-connection'
 import PageTitle from '@/src/components/common/page-title'
-import EditPokerSessionForm from './_components/edit-poker-session-form'
-import LobbyParticipants from './_components/lobby-participants'
-import PokerLobbyState from './_components/poker-lobby-state'
-import SessionSidebar from './_components/session-sidebar'
-import ParticipantCards from './_components/participant-cards'
-import EstimationCardDeck from './_components/estimation-card-deck'
-import VotingActions from './_components/voting-actions'
-import ResultsPanel from './_components/results-panel'
-import RoundLabelHeader from './_components/round-label-header'
-import PokerReviewView from './_components/poker-review-view'
+import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
 import styles from './_components/poker-session.module.css'
+import {
+  EditPokerSessionForm,
+  EstimationCardDeck,
+  LobbyParticipants,
+  ParticipantCards,
+  PokerLobbyState,
+  PokerReviewView,
+  ResultsPanel,
+  RoundLabelHeader,
+  SessionSidebar,
+  VotingActions,
+} from './_components'
+import PokerSessionDetailsLoading from './loading'
+
+const { Group: AvatarGroup } = Avatar
 
 interface PokerCssVars extends CSSProperties {
   '--poker-bg': string
@@ -49,6 +64,8 @@ interface PokerCssVars extends CSSProperties {
 
 const PokerSessionDetailPage: FC = () => {
   const { key } = useParams<{ key: string }>()
+  const pathname = usePathname()
+  const dispatch = useAppDispatch()
   useDocumentTitle(`Poker Session ${key}`)
 
   const { token } = useTheme()
@@ -56,23 +73,34 @@ const PokerSessionDetailPage: FC = () => {
   const { hasPermissionClaim } = useAuth()
   const canManage = hasPermissionClaim('Permissions.PokerSessions.Update')
 
-  const { data: session, isLoading } = useGetPokerSessionQuery(key, {
-    pollingInterval: 5000,
-  })
-  const { data: currentEmployeeId } = useGetInternalEmployeeIdQuery()
+  const { data: session, isLoading } = useGetPokerSessionQuery(key)
+  const { data: profile } = useGetProfileQuery()
+
+  useEffect(() => {
+    if (!session) return
+    dispatch(setBreadcrumbTitle({ title: session.name, pathname }))
+  }, [dispatch, pathname, session])
 
   const [connectedParticipants, setConnectedParticipants] = useState<
     PresenceParticipant[]
   >([])
 
   // Real-time updates via SignalR (falls back to polling above)
-  usePokerSessionConnection(session?.id, session?.key, setConnectedParticipants)
+  // Skip connection for completed sessions — no live updates needed.
+  const isSessionActive = session?.status === 'Active'
+  usePokerSessionConnection(
+    isSessionActive ? session?.id : undefined,
+    isSessionActive ? session?.key : undefined,
+    setConnectedParticipants,
+  )
 
   const [completeSession, { isLoading: isCompleting }] =
     useCompletePokerSessionMutation()
+  const [addRound] = useAddPokerRoundMutation()
   const [removeRound] = useRemovePokerRoundMutation()
-  const [submitVote, { isLoading: isSubmitting }] =
-    useSubmitPokerVoteMutation()
+  const [submitVote, { isLoading: isSubmitting }] = useSubmitPokerVoteMutation()
+  const [withdrawVote, { isLoading: isWithdrawing }] =
+    useWithdrawPokerVoteMutation()
 
   const [selectedRoundId, setSelectedRoundId] = useState<string | undefined>()
   const [openEditForm, setOpenEditForm] = useState(false)
@@ -116,12 +144,30 @@ const PokerSessionDetailPage: FC = () => {
     messageApi.success('Invite link copied to clipboard.')
   }, [messageApi])
 
-  const rounds = session?.rounds ?? []
+  const rounds = useMemo(() => session?.rounds ?? [], [session?.rounds])
   const activeRound = selectedRoundId
     ? rounds.find((r) => r.id === selectedRoundId)
-    : rounds.find(
-        (r) => r.status === 'Voting' || r.status === 'Revealed',
-      ) ?? rounds[0]
+    : (rounds.find((r) => r.status === 'Voting' || r.status === 'Revealed') ??
+      rounds[0])
+
+  const handleConsensusSet = useCallback(async () => {
+    if (!session) return
+    const hasNextVotingRound = rounds.some(
+      (r) => r.id !== activeRound?.id && r.status === 'Voting',
+    )
+    if (!hasNextVotingRound) {
+      try {
+        await addRound({
+          sessionId: session.id,
+          sessionKey: session.key,
+          request: { label: '' },
+        })
+      } catch {
+        // non-critical — the round list will still refresh via SignalR/polling
+      }
+    }
+    setSelectedRoundId(undefined)
+  }, [session, rounds, activeRound?.id, addRound])
 
   // Determine center column view mode
   const centerViewMode = useMemo(() => {
@@ -152,37 +198,46 @@ const PokerSessionDetailPage: FC = () => {
 
   // Derive the current user's vote from the API data
   const selectedVote = useMemo(() => {
-    if (!activeRound || !currentEmployeeId) return undefined
+    if (!activeRound || !profile?.id) return undefined
     const myVote = activeRound.votes?.find(
-      (v) => v.participant?.id === currentEmployeeId,
+      (v) => v.participant?.id === profile.id,
     )
     return myVote?.value || undefined
-  }, [activeRound, currentEmployeeId])
+  }, [activeRound, profile?.id])
 
   const handleVote = useCallback(
     async (value: string) => {
       if (!session || !activeRound) return
       try {
-        const response = await submitVote({
-          sessionId: session.id,
-          roundId: activeRound.id,
-          sessionKey: session.key,
-          request: { value },
-        })
-        if (response.error) throw response.error
+        if (selectedVote === value) {
+          const response = await withdrawVote({
+            sessionId: session.id,
+            roundId: activeRound.id,
+            sessionKey: session.key,
+          })
+          if (response.error) throw response.error
+        } else {
+          const response = await submitVote({
+            sessionId: session.id,
+            roundId: activeRound.id,
+            sessionKey: session.key,
+            request: { value },
+          })
+          if (response.error) throw response.error
+        }
       } catch {
         messageApi.error('Failed to submit vote.')
       }
     },
-    [submitVote, session, activeRound, messageApi],
+    [submitVote, withdrawVote, selectedVote, session, activeRound, messageApi],
   )
 
   if (isLoading) {
-    return <Spin size="large" />
+    return <PokerSessionDetailsLoading />
   }
 
   if (!session) {
-    return <Empty description="Poker session not found." />
+    return notFound()
   }
 
   const isActive = session.status === 'Active'
@@ -223,11 +278,13 @@ const PokerSessionDetailPage: FC = () => {
           Edit
         </Button>
       )}
-      <Button icon={<LinkOutlined />} onClick={handleCopyInviteLink}>
-        Copy Invite Link
-      </Button>
+      {isActive && (
+        <Button icon={<LinkOutlined />} onClick={handleCopyInviteLink}>
+          Copy Invite Link
+        </Button>
+      )}
       {connectedParticipants.length > 0 && (
-        <Avatar.Group
+        <AvatarGroup
           max={{
             count: 5,
             style: { backgroundColor: token.colorPrimary, fontSize: 12 },
@@ -244,7 +301,7 @@ const PokerSessionDetailPage: FC = () => {
               </Avatar>
             </Tooltip>
           ))}
-        </Avatar.Group>
+        </AvatarGroup>
       )}
     </Flex>
   )
@@ -297,10 +354,9 @@ const PokerSessionDetailPage: FC = () => {
                   round={activeRound}
                   sessionId={session.id}
                   sessionKey={session.key}
-                  estimationScaleValues={
-                    session.estimationScale?.values ?? []
-                  }
+                  estimationScaleValues={session.estimationScale?.values ?? []}
                   canManage={canManage && isActive}
+                  onConsensusSet={handleConsensusSet}
                 />
               </div>
 
@@ -320,7 +376,7 @@ const PokerSessionDetailPage: FC = () => {
                     values={session.estimationScale?.values ?? []}
                     selectedValue={selectedVote}
                     onSelect={handleVote}
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || isWithdrawing}
                   />
                 </>
               )}
@@ -338,7 +394,7 @@ const PokerSessionDetailPage: FC = () => {
           )}
         </div>
 
-        {centerViewMode === 'lobby' ? (
+        {centerViewMode === 'lobby' && isActive ? (
           <LobbyParticipants
             participants={connectedParticipants}
             canManage={canManage}
@@ -346,7 +402,7 @@ const PokerSessionDetailPage: FC = () => {
             onComplete={handleComplete}
             isCompleting={isCompleting}
           />
-        ) : (
+        ) : centerViewMode !== 'lobby' ? (
           <SessionSidebar
             session={session}
             selectedRoundId={activeRound?.id}
@@ -357,11 +413,11 @@ const PokerSessionDetailPage: FC = () => {
             canManage={canManage}
             isActive={isActive}
           />
-        )}
+        ) : null}
       </div>
       {openEditForm && (
         <EditPokerSessionForm
-          session={session}
+          sessionKey={session.key}
           onFormUpdate={() => setOpenEditForm(false)}
           onFormCancel={() => setOpenEditForm(false)}
         />

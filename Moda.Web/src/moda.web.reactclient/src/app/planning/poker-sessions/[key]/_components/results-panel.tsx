@@ -48,11 +48,13 @@ export function calculateVoteStats(votes: PokerVoteDto[]): VoteStats {
       ? String(numericVotes[numericVotes.length - 1])
       : '-'
 
-  // Consensus: spread <= 3
+  // Consensus: numeric scales use spread <= 3, non-numeric scales check unanimity
   const hasConsensus =
     numericVotes.length >= 2
       ? numericVotes[numericVotes.length - 1] - numericVotes[0] <= 3
       : numericVotes.length === 1
+        ? true
+        : votes.length > 0 && maxCount === votes.length
 
   return { average, mode: modeValue, low, high, hasConsensus }
 }
@@ -90,10 +92,10 @@ const ResultsPanel: FC<ResultsPanelProps> = ({ votes }) => {
       </Flex>
 
       <div className={styles.statsGrid}>
-        <Statistic title="Average" value={stats.average} valueStyle={{ fontSize: 18 }} />
-        <Statistic title="Mode" value={stats.mode} valueStyle={{ fontSize: 18 }} />
-        <Statistic title="Low" value={stats.low} valueStyle={{ fontSize: 18 }} />
-        <Statistic title="High" value={stats.high} valueStyle={{ fontSize: 18 }} />
+        <Statistic title="Average" value={stats.average} styles={{ content: { fontSize: 18 } }} />
+        <Statistic title="Mode" value={stats.mode} styles={{ content: { fontSize: 18 } }} />
+        <Statistic title="Low" value={stats.low} styles={{ content: { fontSize: 18 } }} />
+        <Statistic title="High" value={stats.high} styles={{ content: { fontSize: 18 } }} />
       </div>
 
       {distribution.length > 0 && (

@@ -68,7 +68,9 @@ const SessionTimeline: FC<SessionTimelineProps> = ({
 
   return (
     <div>
-      <div className={styles.sectionLabel}>Timeline</div>
+      {(activeRounds.length > 0 || isActive) && (
+        <div className={styles.sectionLabel}>Timeline</div>
+      )}
       <div className={styles.timelineList}>
         {activeRounds.map((round) => {
           const isSelected = round.id === selectedRoundId
@@ -97,13 +99,12 @@ const SessionTimeline: FC<SessionTimelineProps> = ({
                 </Flex>
               </Flex>
               <Flex align="center" gap={4}>
-                <Tag
-                  color="blue"
-                  style={{ margin: 0, fontSize: 11 }}
-                >
-                  {round.voteCount}/{totalParticipants || '?'}
-                </Tag>
-                {canManage && (
+                {(round.voteCount > 0 || round.status === 'Revealed') && (
+                  <Tag color="blue" style={{ margin: 0, fontSize: 11 }}>
+                    {round.voteCount}/{totalParticipants || '?'}
+                  </Tag>
+                )}
+                {canManage && isActive && (
                   <Popconfirm
                     title="Remove this round?"
                     onConfirm={(e) => {
@@ -126,7 +127,28 @@ const SessionTimeline: FC<SessionTimelineProps> = ({
           )
         })}
 
-        {activeRounds.length > 0 && completedRounds.length > 0 && (
+        {canManage && isActive && (
+          <Flex gap={8} style={{ padding: '8px 16px' }}>
+            <Input
+              size="small"
+              placeholder="Type a work item ID or description…"
+              value={newRoundLabel}
+              onChange={(e) => setNewRoundLabel(e.target.value)}
+              onPressEnter={handleAddRound}
+              maxLength={512}
+            />
+            <Button
+              size="small"
+              type="text"
+              icon={<PlusOutlined />}
+              onClick={handleAddRound}
+              loading={isAdding}
+              disabled={!newRoundLabel.trim()}
+            />
+          </Flex>
+        )}
+
+        {completedRounds.length > 0 && (
           <>
             <div className={styles.timelineDivider} />
             <div className={styles.timelineDividerLabel}>Completed</div>
@@ -157,7 +179,7 @@ const SessionTimeline: FC<SessionTimelineProps> = ({
                     {round.consensusEstimate}
                   </Tag>
                 )}
-                {canManage && (
+                {canManage && isActive && (
                   <Popconfirm
                     title="Remove this round?"
                     onConfirm={(e) => {
@@ -180,27 +202,6 @@ const SessionTimeline: FC<SessionTimelineProps> = ({
           )
         })}
       </div>
-
-      {canManage && isActive && (
-        <Flex gap={8} style={{ padding: '8px 16px' }}>
-          <Input
-            size="small"
-            placeholder="Type a work item ID or description…"
-            value={newRoundLabel}
-            onChange={(e) => setNewRoundLabel(e.target.value)}
-            onPressEnter={handleAddRound}
-            maxLength={512}
-          />
-          <Button
-            size="small"
-            type="text"
-            icon={<PlusOutlined />}
-            onClick={handleAddRound}
-            loading={isAdding}
-            disabled={!newRoundLabel.trim()}
-          />
-        </Flex>
-      )}
     </div>
   )
 }

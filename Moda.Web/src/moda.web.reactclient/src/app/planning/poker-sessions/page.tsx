@@ -1,7 +1,7 @@
 'use client'
 
 import PageTitle from '@/src/components/common/page-title'
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useDocumentTitle } from '@/src/hooks'
 import {
   CreatePokerSessionForm,
@@ -13,10 +13,11 @@ import useAuth from '@/src/components/contexts/auth'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { Button } from 'antd'
 import { authorizePage } from '@/src/components/hoc'
-import { PokerSessionListDto } from '@/src/services/moda-api'
+import { ControlItemSwitch } from '@/src/components/common/control-items-menu'
+import { ItemType } from 'antd/es/menu/interface'
+import { PokerSessionListDto, PokerSessionStatus } from '@/src/services/moda-api'
 import {
   useGetPokerSessionsQuery,
-  useGetPokerSessionQuery,
   useCompletePokerSessionMutation,
 } from '@/src/store/features/planning/poker-sessions-api'
 
@@ -24,9 +25,8 @@ const PokerSessionsPage = () => {
   useDocumentTitle('Planning Poker')
 
   const [openCreateForm, setOpenCreateForm] = useState(false)
-  const [editSession, setEditSession] = useState<PokerSessionListDto | null>(
-    null,
-  )
+  const [includeCompleted, setIncludeCompleted] = useState(false)
+  const [editSessionKey, setEditSessionKey] = useState<number | null>(null)
   const [deleteSession, setDeleteSession] =
     useState<PokerSessionListDto | null>(null)
 
@@ -36,12 +36,8 @@ const PokerSessionsPage = () => {
     data: sessionsData,
     isLoading,
     refetch,
-  } = useGetPokerSessionsQuery(undefined)
-
-  // Fetch full session details when editing (form needs PokerSessionDetailsDto)
-  const { data: editSessionDetails } = useGetPokerSessionQuery(
-    editSession?.key?.toString(),
-    { skip: !editSession },
+  } = useGetPokerSessionsQuery(
+    includeCompleted ? undefined : PokerSessionStatus.Active,
   )
 
   const [completeSession] = useCompletePokerSessionMutation()
@@ -50,6 +46,23 @@ const PokerSessionsPage = () => {
   const canCreate = hasPermissionClaim('Permissions.PokerSessions.Create')
   const canUpdate = hasPermissionClaim('Permissions.PokerSessions.Update')
   const canDelete = hasPermissionClaim('Permissions.PokerSessions.Delete')
+
+  const controlItems = useMemo<ItemType[]>(
+    () => [
+      {
+        label: (
+          <ControlItemSwitch
+            label="Include Completed"
+            checked={includeCompleted}
+            onChange={setIncludeCompleted}
+          />
+        ),
+        key: 'include-completed',
+        onClick: () => setIncludeCompleted((prev) => !prev),
+      },
+    ],
+    [includeCompleted],
+  )
 
   const refresh = useCallback(() => {
     refetch()
@@ -63,7 +76,7 @@ const PokerSessionsPage = () => {
   }
 
   const handleEdit = useCallback((session: PokerSessionListDto) => {
-    setEditSession(session)
+    setEditSessionKey(session.key)
   }, [])
 
   const handleComplete = useCallback(
@@ -87,7 +100,7 @@ const PokerSessionsPage = () => {
   }, [])
 
   const onEditFormClosed = useCallback(() => {
-    setEditSession(null)
+    setEditSessionKey(null)
   }, [])
 
   const onDeleteFormClosed = useCallback(
@@ -120,6 +133,7 @@ const PokerSessionsPage = () => {
         refetch={refresh}
         canUpdate={canUpdate}
         canDelete={canDelete}
+        gridControlMenuItems={controlItems}
         onEditClicked={handleEdit}
         onCompleteClicked={handleComplete}
         onDeleteClicked={handleDelete}
@@ -130,9 +144,9 @@ const PokerSessionsPage = () => {
           onFormCancel={() => onCreateFormClosed(false)}
         />
       )}
-      {editSession && editSessionDetails && (
+      {editSessionKey && (
         <EditPokerSessionForm
-          session={editSessionDetails}
+          sessionKey={editSessionKey}
           onFormUpdate={() => onEditFormClosed()}
           onFormCancel={() => onEditFormClosed()}
         />

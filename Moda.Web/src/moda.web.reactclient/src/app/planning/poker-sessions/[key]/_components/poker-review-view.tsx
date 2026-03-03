@@ -6,9 +6,10 @@ import { useResetPokerRoundMutation } from '@/src/store/features/planning/poker-
 import { Button, Flex, Tag, Typography } from 'antd'
 import { FC, useCallback, useMemo } from 'react'
 import ResultsPanel from './results-panel'
+import RoundLabelHeader from './round-label-header'
 import styles from './poker-session.module.css'
 
-const { Title, Text } = Typography
+const { Text } = Typography
 
 export interface PokerReviewViewProps {
   round: PokerRoundDto
@@ -76,9 +77,12 @@ const PokerReviewView: FC<PokerReviewViewProps> = ({
         <Flex align="center" gap={8} style={{ marginBottom: 8 }}>
           <Tag color="green">Estimated</Tag>
         </Flex>
-        <Title level={4} style={{ margin: '0 0 4px' }}>
-          {round.label || 'Untitled round'}
-        </Title>
+        <RoundLabelHeader
+          round={round}
+          sessionId={sessionId}
+          sessionKey={sessionKey}
+          canManage={canManage}
+        />
         {round.consensusEstimate && (
           <Text
             strong

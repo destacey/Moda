@@ -1,6 +1,6 @@
 'use client'
 
-import { Flex, Form, Input, Modal, Spin, Tag, Typography } from 'antd'
+import { Flex, Form, Input, Modal, Tag, Typography } from 'antd'
 import { CSSProperties, useCallback } from 'react'
 import {
   CreatePokerSessionRequest,
@@ -147,6 +147,7 @@ const CreatePokerSessionForm = ({
       onOk={handleOk}
       okButtonProps={{ disabled: !isValid }}
       okText="Create"
+      loading={scalesLoading}
       confirmLoading={isSaving}
       onCancel={handleCancel}
       keyboard={false}
@@ -177,22 +178,16 @@ const CreatePokerSessionForm = ({
         <div className={styles.scaleLabel}>
           <span className={styles.scaleRequired}>*</span> Estimation Scale
         </div>
-        {scalesLoading ? (
-          <Flex justify="center" className={styles.scaleCardLoading}>
-            <Spin size="small" />
-          </Flex>
-        ) : (
-          <Flex vertical gap={8} style={cssVars}>
-            {activeScales.map((scale) => (
-              <EstimationScaleCard
-                key={scale.id}
-                scale={scale}
-                selected={selectedScaleId === scale.id}
-                onSelect={handleScaleSelect}
-              />
-            ))}
-          </Flex>
-        )}
+        <Flex vertical gap={8} style={cssVars}>
+          {activeScales.map((scale) => (
+            <EstimationScaleCard
+              key={scale.id}
+              scale={scale}
+              selected={selectedScaleId === scale.id}
+              onSelect={handleScaleSelect}
+            />
+          ))}
+        </Flex>
       </Form>
     </Modal>
   )

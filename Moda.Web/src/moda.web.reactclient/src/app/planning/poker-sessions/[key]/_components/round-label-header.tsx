@@ -88,7 +88,7 @@ const RoundLabelHeader: FC<RoundLabelHeaderProps> = ({
     saveLabel(localValue)
   }, [saveLabel, localValue])
 
-  const isEditable = canManage && round.status !== 'Accepted'
+  const isEditable = canManage
 
   if (!isEditable) {
     return (
