@@ -13,8 +13,10 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Moda.Infrastructure.Logging;
 using Moda.Infrastructure.OpenTelemetry;
+using Moda.Infrastructure.SignalR;
 using Moda.Integrations.AzureDevOps;
 using Moda.Integrations.MicrosoftGraph;
+using Moda.Planning.Application.PokerSessions.Interfaces;
 using NodaTime;
 
 namespace Moda.Infrastructure;
@@ -62,6 +64,15 @@ public static class ConfigureServices
         // INTEGRATIONS
         services.AddTransient<IAzureDevOpsService, AzureDevOpsService>();
         services.AddScoped<IExternalEmployeeDirectoryService, MicrosoftGraphService>();
+
+        // SIGNALR
+        var signalRBuilder = services.AddSignalR();
+        var signalRConnectionString = config.GetValue<string>("Azure:SignalR:ConnectionString");
+        if (!string.IsNullOrWhiteSpace(signalRConnectionString))
+        {
+            signalRBuilder.AddAzureSignalR();
+        }
+        services.AddScoped<IPokerSessionNotifier, PlanningPokerNotifier>();
 
         return services
             .AddApiVersioning()
@@ -136,6 +147,7 @@ public static class ConfigureServices
     public static WebApplication MapDefaultEndpoints(this WebApplication app)
     {
         app.MapControllers().RequireAuthorization();
+        app.MapHub<PlanningPokerHub>("/hubs/planning-poker");
 
         if (app.Environment.IsDevelopment())
         {

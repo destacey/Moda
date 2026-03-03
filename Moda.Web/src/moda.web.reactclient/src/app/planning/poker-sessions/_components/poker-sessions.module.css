@@ -1,0 +1,48 @@
+/* ─── Estimation scale card selection ──────────────────────────────────────── */
+
+.scaleCard {
+  padding: 12px 16px;
+  border-radius: var(--scale-radius-lg);
+  border: 2px solid var(--scale-border);
+  background-color: var(--scale-bg);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.scaleCard:hover {
+  border-color: var(--scale-primary);
+}
+
+.scaleCardSelected {
+  border-color: var(--scale-primary);
+  background-color: var(--scale-primary-bg);
+}
+
+.scaleCardName {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.scaleCardDescription {
+  display: block;
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.scaleCardValues {
+  margin-top: 8px;
+}
+
+.scaleLabel {
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+.scaleRequired {
+  color: #ff4d4f;
+  margin-right: 4px;
+}
+
+.scaleCardLoading {
+  padding: 24px;
+}

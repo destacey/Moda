@@ -7,6 +7,7 @@ export {
   getLifecyclePhaseColor,
   getLifecyclePhaseTagColor,
   getLifecyclePhaseColorFromStatus,
+  getAvatarColor,
 } from './color-helper'
 export {
   calculateIterationHealth,

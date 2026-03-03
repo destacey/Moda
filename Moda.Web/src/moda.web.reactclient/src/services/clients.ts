@@ -27,6 +27,8 @@ import {
   ProjectTasksClient,
   StrategicInitiativesClient,
   SprintsClient,
+  EstimationScalesClient,
+  PokerSessionsClient,
   ConnectionsClient,
   AzureDevOpsConnectionsClient,
 } from './moda-api'
@@ -147,6 +149,10 @@ export const getPlanningIntervalsClient = () =>
 export const getRisksClient = () => new RisksClient('', axiosClient)
 export const getRoadmapsClient = () => new RoadmapsClient('', axiosClient)
 export const getSprintsClient = () => new SprintsClient('', axiosClient)
+export const getEstimationScalesClient = () =>
+  new EstimationScalesClient('', axiosClient)
+export const getPokerSessionsClient = () =>
+  new PokerSessionsClient('', axiosClient)
 
 // PPM
 export const getExpenditureCategoriesClient = () =>

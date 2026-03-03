@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Moda.Common.Domain.Employees;
+using Moda.Common.Domain.Identity;
 
 namespace Moda.Infrastructure.Persistence.Configuration;
 
@@ -86,6 +87,26 @@ public class IdentityUserTokenConfig : IEntityTypeConfiguration<IdentityUserToke
     public void Configure(EntityTypeBuilder<IdentityUserToken<string>> builder) =>
         builder
             .ToTable("UserTokens", SchemaNames.Identity);
+}
+
+public class ModaUserConfig : IEntityTypeConfiguration<User>
+{
+    public void Configure(EntityTypeBuilder<User> builder)
+    {
+        builder.ToView("vw_ModaUsers", SchemaNames.Identity);
+
+        builder.HasKey(u => u.Id);
+        builder.Property(u => u.Id)
+            .HasConversion(
+                guid => guid.ToString(),
+                str => Guid.Parse(str));
+        builder.Property(u => u.UserName).HasMaxLength(256);
+        builder.Property(u => u.FirstName).HasMaxLength(100);
+        builder.Property(u => u.LastName).HasMaxLength(100);
+        builder.Property(u => u.DisplayName).HasMaxLength(200);
+        builder.Property(u => u.Email).HasMaxLength(256);
+        builder.Property(u => u.IsActive);
+    }
 }
 
 public class PersonalAccessTokenConfig : IEntityTypeConfiguration<PersonalAccessToken>

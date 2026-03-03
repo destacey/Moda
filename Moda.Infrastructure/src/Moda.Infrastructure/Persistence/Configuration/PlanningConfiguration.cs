@@ -10,6 +10,7 @@ using Moda.Infrastructure.Persistence.Converters;
 using Moda.Planning.Domain.Enums;
 using Moda.Planning.Domain.Models;
 using Moda.Planning.Domain.Models.Iterations;
+using Moda.Planning.Domain.Models.PlanningPoker;
 using Moda.Planning.Domain.Models.Roadmaps;
 
 namespace Moda.Infrastructure.Persistence.Configuration;
@@ -625,3 +626,127 @@ public class SimpleHealthCheckConfig : IEntityTypeConfiguration<SimpleHealthChec
         builder.Property(h => h.Expiration).IsRequired();
     }
 }
+
+
+#region Planning Poker
+
+public class EstimationScaleConfig : IEntityTypeConfiguration<EstimationScale>
+{
+    public void Configure(EntityTypeBuilder<EstimationScale> builder)
+    {
+        builder.ToTable("EstimationScales", SchemaNames.Planning);
+
+        builder.HasKey(e => e.Id);
+
+        builder.Property(e => e.Id).ValueGeneratedOnAdd();
+        builder.Property(e => e.Name).IsRequired().HasMaxLength(128);
+        builder.Property(e => e.Description).HasMaxLength(1024);
+        builder.Property(e => e.Values)
+            .HasColumnName("Values");
+        builder.Property(e => e.IsActive).IsRequired();
+    }
+}
+
+public class PokerSessionConfig : IEntityTypeConfiguration<PokerSession>
+{
+    public void Configure(EntityTypeBuilder<PokerSession> builder)
+    {
+        builder.ToTable("PokerSessions", SchemaNames.Planning);
+
+        builder.HasKey(s => s.Id);
+        builder.HasAlternateKey(s => s.Key);
+
+        builder.HasIndex(s => s.Key);
+
+        builder.Property(s => s.Key).ValueGeneratedOnAdd();
+        builder.Property(s => s.Name).IsRequired().HasMaxLength(256);
+        builder.Property(s => s.EstimationScaleId).IsRequired();
+        builder.Property(s => s.FacilitatorId)
+            .IsRequired()
+            .HasConversion(guid => guid.ToString(), str => Guid.Parse(str))
+            .HasMaxLength(450);
+        builder.Property(s => s.Status).IsRequired()
+            .HasConversion<EnumConverter<PokerSessionStatus>>()
+            .HasColumnType("varchar")
+            .HasMaxLength(32);
+        builder.Property(s => s.ActivatedOn);
+        builder.Property(s => s.CompletedOn);
+
+        // Relationships
+        builder.HasOne(s => s.EstimationScale)
+            .WithMany()
+            .HasForeignKey(s => s.EstimationScaleId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(s => s.Facilitator)
+            .WithMany()
+            .HasForeignKey(s => s.FacilitatorId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasMany(s => s.Rounds)
+            .WithOne()
+            .HasForeignKey(r => r.PokerSessionId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Navigation(s => s.Rounds)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
+    }
+}
+
+public class PokerRoundConfig : IEntityTypeConfiguration<PokerRound>
+{
+    public void Configure(EntityTypeBuilder<PokerRound> builder)
+    {
+        builder.ToTable("PokerRounds", SchemaNames.Planning);
+
+        builder.HasKey(r => r.Id);
+
+        builder.HasIndex(r => r.PokerSessionId);
+
+        builder.Property(r => r.PokerSessionId).IsRequired();
+        builder.Property(r => r.Label).HasMaxLength(512);
+        builder.Property(r => r.Status).IsRequired()
+            .HasConversion<EnumConverter<PokerRoundStatus>>()
+            .HasColumnType("varchar")
+            .HasMaxLength(32);
+        builder.Property(r => r.ConsensusEstimate).HasMaxLength(32);
+        builder.Property(r => r.Order).IsRequired();
+
+        // Relationships
+        builder.HasMany(r => r.Votes)
+            .WithOne()
+            .HasForeignKey(v => v.PokerRoundId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        //builder.Navigation(r => r.Votes)
+        //    .UsePropertyAccessMode(PropertyAccessMode.Field);
+    }
+}
+
+public class PokerVoteConfig : IEntityTypeConfiguration<PokerVote>
+{
+    public void Configure(EntityTypeBuilder<PokerVote> builder)
+    {
+        builder.ToTable("PokerVotes", SchemaNames.Planning);
+
+        builder.HasKey(v => v.Id);
+
+        builder.HasIndex(v => new { v.PokerRoundId, v.ParticipantId }).IsUnique();
+
+        builder.Property(v => v.PokerRoundId).IsRequired();
+        builder.Property(v => v.ParticipantId)
+            .IsRequired()
+            .HasConversion(guid => guid.ToString(), str => Guid.Parse(str))
+            .HasMaxLength(450);
+        builder.Property(v => v.Value).IsRequired().HasMaxLength(32);
+        builder.Property(v => v.SubmittedOn).IsRequired();
+
+        // Relationships
+        builder.HasOne(v => v.Participant)
+            .WithMany()
+            .HasForeignKey(v => v.ParticipantId)
+            .OnDelete(DeleteBehavior.Restrict);
+    }
+}
+
+#endregion Planning Poker

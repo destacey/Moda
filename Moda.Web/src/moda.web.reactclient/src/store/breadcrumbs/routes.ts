@@ -33,6 +33,10 @@ const routes = {
   roadmaps: {
     title: 'Roadmaps',
   },
+  'poker-sessions': {
+    title: 'Planning Poker',
+    href: '/planning/poker-sessions',
+  },
   sprints: {
     title: 'Sprints',
   },

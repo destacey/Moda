@@ -1,4 +1,5 @@
 ﻿using Moda.Planning.Domain.Models.Iterations;
+using Moda.Planning.Domain.Models.PlanningPoker;
 using Moda.Planning.Domain.Models.Roadmaps;
 
 namespace Moda.Planning.Application.Persistence;
@@ -11,4 +12,6 @@ public interface IPlanningDbContext : IModaDbContext
     DbSet<PlanningTeam> PlanningTeams { get; }
     DbSet<SimpleHealthCheck> PlanningHealthChecks { get; }
     DbSet<Roadmap> Roadmaps { get; }
+    DbSet<EstimationScale> EstimationScales { get; }
+    DbSet<PokerSession> PokerSessions { get; }
 }

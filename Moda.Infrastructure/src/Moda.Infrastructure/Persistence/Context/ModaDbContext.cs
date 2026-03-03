@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Moda.AppIntegration.Domain.Models.AzureOpenAI;
 using Moda.Common.Domain.Employees;
+using Moda.Common.Domain.Identity;
 using Moda.Goals.Application.Persistence;
 using Moda.Goals.Domain.Models;
 using Moda.Health;
@@ -14,6 +15,7 @@ using Moda.Organization.Domain.Models;
 using Moda.Planning.Application.Persistence;
 using Moda.Planning.Domain.Models;
 using Moda.Planning.Domain.Models.Iterations;
+using Moda.Planning.Domain.Models.PlanningPoker;
 using Moda.Planning.Domain.Models.Roadmaps;
 using Moda.ProjectPortfolioManagement.Application;
 using Moda.ProjectPortfolioManagement.Domain.Models;
@@ -38,6 +40,7 @@ public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IGoalsDbCo
     public DbSet<Employee> Employees => Set<Employee>();
     public DbSet<ExternalEmployeeBlacklistItem> ExternalEmployeeBlacklistItems => Set<ExternalEmployeeBlacklistItem>();
     public DbSet<PersonalAccessToken> PersonalAccessTokens => Set<PersonalAccessToken>();
+    public DbSet<User> ModaUsers => Set<User>();
 
     #endregion Common
 
@@ -85,6 +88,8 @@ public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IGoalsDbCo
     public DbSet<PlanningTeam> PlanningTeams => Set<PlanningTeam>();
     public DbSet<SimpleHealthCheck> PlanningHealthChecks => Set<SimpleHealthCheck>();
     public DbSet<Roadmap> Roadmaps => Set<Roadmap>();
+    public DbSet<EstimationScale> EstimationScales => Set<EstimationScale>();
+    public DbSet<PokerSession> PokerSessions => Set<PokerSession>();
 
     #endregion IPlanning
 

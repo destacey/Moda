@@ -387,6 +387,33 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("PersonalAccessTokens", "Identity");
                 });
 
+            modelBuilder.Entity("Moda.Common.Domain.Identity.User", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("FirstName")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LastName")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable((string)null);
+
+                    b.ToView("vw_ModaUsers", "Identity");
+                });
+
             modelBuilder.Entity("Moda.Common.Domain.Models.KeyValueObjectMetadata", b =>
                 {
                     b.Property<Guid>("ObjectId")
@@ -1524,6 +1551,173 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.HasIndex("TeamId");
 
                     b.ToTable("PlanningIntervalTeams", "Planning");
+                });
+
+            modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningPoker.EstimationScale", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1024)
+                        .HasColumnType("nvarchar(1024)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<DateTime>("SystemCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("SystemCreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("SystemLastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("SystemLastModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.PrimitiveCollection<string>("Values")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("Values");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("EstimationScales", "Planning");
+                });
+
+            modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningPoker.PokerRound", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ConsensusEstimate")
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.Property<string>("Label")
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("PokerSessionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PokerSessionId");
+
+                    b.ToTable("PokerRounds", "Planning");
+                });
+
+            modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningPoker.PokerSession", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("ActivatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("CompletedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EstimationScaleId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("FacilitatorId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Key")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Key"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar");
+
+                    b.Property<DateTime>("SystemCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("SystemCreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("SystemLastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("SystemLastModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasAlternateKey("Key");
+
+                    b.HasIndex("EstimationScaleId");
+
+                    b.HasIndex("FacilitatorId");
+
+                    b.HasIndex("Key");
+
+                    b.ToTable("PokerSessions", "Planning");
+                });
+
+            modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningPoker.PokerVote", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ParticipantId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<Guid>("PokerRoundId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("SubmittedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ParticipantId");
+
+                    b.HasIndex("PokerRoundId", "ParticipantId")
+                        .IsUnique();
+
+                    b.ToTable("PokerVotes", "Planning");
                 });
 
             modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningTeam", b =>
@@ -4214,6 +4408,51 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Team");
                 });
 
+            modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningPoker.PokerRound", b =>
+                {
+                    b.HasOne("Moda.Planning.Domain.Models.PlanningPoker.PokerSession", null)
+                        .WithMany("Rounds")
+                        .HasForeignKey("PokerSessionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningPoker.PokerSession", b =>
+                {
+                    b.HasOne("Moda.Planning.Domain.Models.PlanningPoker.EstimationScale", "EstimationScale")
+                        .WithMany()
+                        .HasForeignKey("EstimationScaleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Moda.Common.Domain.Identity.User", "Facilitator")
+                        .WithMany()
+                        .HasForeignKey("FacilitatorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("EstimationScale");
+
+                    b.Navigation("Facilitator");
+                });
+
+            modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningPoker.PokerVote", b =>
+                {
+                    b.HasOne("Moda.Common.Domain.Identity.User", "Participant")
+                        .WithMany()
+                        .HasForeignKey("ParticipantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Moda.Planning.Domain.Models.PlanningPoker.PokerRound", null)
+                        .WithMany("Votes")
+                        .HasForeignKey("PokerRoundId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Participant");
+                });
+
             modelBuilder.Entity("Moda.Planning.Domain.Models.Risk", b =>
                 {
                     b.HasOne("Moda.Common.Domain.Employees.Employee", "Assignee")
@@ -5048,6 +5287,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
             modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningIntervalObjective", b =>
                 {
                     b.Navigation("HealthCheck");
+                });
+
+            modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningPoker.PokerRound", b =>
+                {
+                    b.Navigation("Votes");
+                });
+
+            modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningPoker.PokerSession", b =>
+                {
+                    b.Navigation("Rounds");
                 });
 
             modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningTeam", b =>

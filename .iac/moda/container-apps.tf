@@ -127,6 +127,11 @@ resource "azurerm_container_app" "moda_backend" {
     value = var.aad_api_client_secret
   }
 
+  secret {
+    name  = "signalr-conn-string"
+    value = azurerm_signalr_service.moda_signalr.primary_connection_string
+  }
+
   identity {
     type = "SystemAssigned"
   }
@@ -193,6 +198,11 @@ resource "azurerm_container_app" "moda_backend" {
       env {
         name        = "SecuritySettings__AzureAd__ClientSecret"
         secret_name = "aad-client-secret"
+      }
+
+      env {
+        name        = "Azure__SignalR__ConnectionString"
+        secret_name = "signalr-conn-string"
       }
 
       env {

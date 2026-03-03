@@ -115,6 +115,27 @@ public static class FileSystemHelper
             .ToList();
     }
 
+    /// <summary>
+    /// Gets service directories that are actually referenced in the solution file (Moda.slnx).
+    /// This filters out directories that may exist on disk from other branches but aren't part
+    /// of the current solution definition.
+    /// </summary>
+    public static List<string> GetSolutionServiceDirectories()
+    {
+        var solutionRoot = AssemblyHelper.GetSolutionRoot();
+        var slnxPath = Path.Combine(solutionRoot, "Moda.slnx");
+        var slnxContent = File.ReadAllText(slnxPath);
+
+        return GetServiceDirectories()
+            .Where(d =>
+            {
+                var serviceName = Path.GetFileName(d);
+                // Check if the solution file references this service (e.g., "Moda.Services/Moda.Planning/")
+                return slnxContent.Contains($"Moda.Services/{serviceName}/");
+            })
+            .ToList();
+    }
+
     #endregion
 
     #region Folder Structure Helpers
