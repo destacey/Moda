@@ -12,7 +12,7 @@ resource "azurerm_signalr_service" "moda_signalr" {
 
   cors {
     allowed_origins = [
-      "https://${azurerm_container_app.moda_frontend.ingress.0.fqdn}",
+      "https://moda-client.${azurerm_container_app_environment.moda_cae.default_domain}",
       "https://${azurerm_static_site.moda_swa.default_host_name}",
     ]
   }

@@ -61,18 +61,17 @@ export function usePokerSessionConnection(
 
     const connect = async () => {
       try {
-        const accounts = msalInstance.getAllAccounts()
-        const tokenResponse =
-          accounts.length > 0
-            ? await msalInstance.acquireTokenSilent({
+        const connection = new HubConnectionBuilder()
+          .withUrl(`${API_BASE_URL}/hubs/planning-poker`, {
+            accessTokenFactory: async () => {
+              const accounts = msalInstance.getAllAccounts()
+              if (accounts.length === 0) return ''
+              const tokenResponse = await msalInstance.acquireTokenSilent({
                 ...tokenRequest,
                 account: accounts[0],
               })
-            : null
-
-        const connection = new HubConnectionBuilder()
-          .withUrl(`${API_BASE_URL}/hubs/planning-poker`, {
-            accessTokenFactory: () => tokenResponse?.accessToken ?? '',
+              return tokenResponse?.accessToken ?? ''
+            },
           })
           .withAutomaticReconnect()
           .configureLogging(LogLevel.Warning)
