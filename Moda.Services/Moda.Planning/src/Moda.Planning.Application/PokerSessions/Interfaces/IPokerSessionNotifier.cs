@@ -9,6 +9,7 @@ public interface IPokerSessionNotifier
     Task NotifyRoundAdded(Guid sessionId, PokerRoundDto round);
     Task NotifyRoundRemoved(Guid sessionId, Guid roundId);
     Task NotifyVoteSubmitted(Guid sessionId, Guid roundId, Guid participantId, string participantName);
+    Task NotifyVoteWithdrawn(Guid sessionId, Guid roundId, Guid participantId);
     Task NotifyVotesRevealed(Guid sessionId, Guid roundId, IEnumerable<PokerVoteDto> votes);
     Task NotifyConsensusSet(Guid sessionId, Guid roundId, string estimate);
     Task NotifyRoundReset(Guid sessionId, Guid roundId);

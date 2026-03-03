@@ -2,29 +2,27 @@ using Moda.Planning.Application.PokerSessions.Interfaces;
 
 namespace Moda.Planning.Application.PokerSessions.Commands;
 
-public sealed record SubmitVoteCommand(Guid SessionId, Guid RoundId, string Value) : ICommand;
+public sealed record WithdrawVoteCommand(Guid SessionId, Guid RoundId) : ICommand;
 
-public sealed class SubmitVoteCommandValidator : CustomValidator<SubmitVoteCommand>
+public sealed class WithdrawVoteCommandValidator : CustomValidator<WithdrawVoteCommand>
 {
-    public SubmitVoteCommandValidator()
+    public WithdrawVoteCommandValidator()
     {
         RuleLevelCascadeMode = CascadeMode.Stop;
 
         RuleFor(c => c.SessionId).NotEmpty();
         RuleFor(c => c.RoundId).NotEmpty();
-        RuleFor(c => c.Value).NotEmpty().MaximumLength(32);
     }
 }
 
-internal sealed class SubmitVoteCommandHandler(IPlanningDbContext planningDbContext, IDateTimeProvider dateTimeProvider, ICurrentUser currentUser, IPokerSessionNotifier notifier, ILogger<SubmitVoteCommandHandler> logger) : ICommandHandler<SubmitVoteCommand>
+internal sealed class WithdrawVoteCommandHandler(IPlanningDbContext planningDbContext, ICurrentUser currentUser, IPokerSessionNotifier notifier, ILogger<WithdrawVoteCommandHandler> logger) : ICommandHandler<WithdrawVoteCommand>
 {
     private readonly IPlanningDbContext _planningDbContext = planningDbContext;
-    private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
     private readonly IPokerSessionNotifier _notifier = notifier;
-    private readonly ILogger<SubmitVoteCommandHandler> _logger = logger;
+    private readonly ILogger<WithdrawVoteCommandHandler> _logger = logger;
     private readonly Guid _currentUserId = currentUser.GetUserId();
 
-    public async Task<Result> Handle(SubmitVoteCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(WithdrawVoteCommand request, CancellationToken cancellationToken)
     {
         try
         {
@@ -36,14 +34,13 @@ internal sealed class SubmitVoteCommandHandler(IPlanningDbContext planningDbCont
             if (session is null)
                 return Result.Failure("Poker session not found.");
 
-            var result = session.SubmitVote(request.RoundId, _currentUserId, request.Value, _dateTimeProvider.Now);
+            var result = session.WithdrawVote(request.RoundId, _currentUserId);
             if (result.IsFailure)
                 return result;
 
             await _planningDbContext.SaveChangesAsync(cancellationToken);
 
-            var participantName = currentUser.Name ?? "Unknown";
-            await _notifier.NotifyVoteSubmitted(session.Id, request.RoundId, _currentUserId, participantName);
+            await _notifier.NotifyVoteWithdrawn(session.Id, request.RoundId, _currentUserId);
 
             return Result.Success();
         }

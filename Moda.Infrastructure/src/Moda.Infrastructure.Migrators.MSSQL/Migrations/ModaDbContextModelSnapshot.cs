@@ -387,6 +387,33 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("PersonalAccessTokens", "Identity");
                 });
 
+            modelBuilder.Entity("Moda.Common.Domain.Identity.User", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("FirstName")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LastName")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable((string)null);
+
+                    b.ToView("vw_ModaUsers", "Identity");
+                });
+
             modelBuilder.Entity("Moda.Common.Domain.Models.KeyValueObjectMetadata", b =>
                 {
                     b.Property<Guid>("ObjectId")
@@ -1615,8 +1642,10 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<int>("EstimationScaleId")
                         .HasColumnType("int");
 
-                    b.Property<Guid>("FacilitatorId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("FacilitatorId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("Key")
                         .ValueGeneratedOnAdd()
@@ -1665,8 +1694,10 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ParticipantId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("ParticipantId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<Guid>("PokerRoundId")
                         .HasColumnType("uniqueidentifier");
@@ -4394,7 +4425,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Moda.Common.Domain.Employees.Employee", "Facilitator")
+                    b.HasOne("Moda.Common.Domain.Identity.User", "Facilitator")
                         .WithMany()
                         .HasForeignKey("FacilitatorId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -4407,7 +4438,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
             modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningPoker.PokerVote", b =>
                 {
-                    b.HasOne("Moda.Common.Domain.Employees.Employee", "Participant")
+                    b.HasOne("Moda.Common.Domain.Identity.User", "Participant")
                         .WithMany()
                         .HasForeignKey("ParticipantId")
                         .OnDelete(DeleteBehavior.Restrict)

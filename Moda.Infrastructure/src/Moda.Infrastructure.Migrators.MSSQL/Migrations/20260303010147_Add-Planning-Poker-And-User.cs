@@ -5,11 +5,24 @@
 namespace Moda.Infrastructure.Migrators.MSSQL.Migrations;
 
 /// <inheritdoc />
-public partial class AddPlanningPoker : Migration
+public partial class AddPlanningPokerAndUser : Migration
 {
     /// <inheritdoc />
     protected override void Up(MigrationBuilder migrationBuilder)
-    {
+    {         
+        migrationBuilder.Sql("""
+                CREATE VIEW [Identity].[vw_ModaUsers] AS
+                SELECT
+                    u.Id,
+                    u.UserName,
+                    u.FirstName,
+                    u.LastName,
+                    CONCAT_WS(' ', u.FirstName, u.LastName) AS DisplayName,
+                    u.Email,
+                    u.IsActive
+                FROM [Identity].[Users] u
+                """);
+
         migrationBuilder.CreateTable(
             name: "EstimationScales",
             schema: "Planning",
@@ -19,8 +32,8 @@ public partial class AddPlanningPoker : Migration
                     .Annotation("SqlServer:Identity", "1, 1"),
                 Name = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
                 Description = table.Column<string>(type: "nvarchar(1024)", maxLength: 1024, nullable: true),
-                Values = table.Column<string>(type: "nvarchar(max)", nullable: false),
                 IsActive = table.Column<bool>(type: "bit", nullable: false),
+                Values = table.Column<string>(type: "nvarchar(max)", nullable: false),
                 SystemCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
                 SystemCreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                 SystemLastModified = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -41,7 +54,7 @@ public partial class AddPlanningPoker : Migration
                     .Annotation("SqlServer:Identity", "1, 1"),
                 Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
                 EstimationScaleId = table.Column<int>(type: "int", nullable: false),
-                FacilitatorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                FacilitatorId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
                 Status = table.Column<string>(type: "varchar(32)", maxLength: 32, nullable: false),
                 ActivatedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
                 CompletedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -54,13 +67,6 @@ public partial class AddPlanningPoker : Migration
             {
                 table.PrimaryKey("PK_PokerSessions", x => x.Id);
                 table.UniqueConstraint("AK_PokerSessions_Key", x => x.Key);
-                table.ForeignKey(
-                    name: "FK_PokerSessions_Employees_FacilitatorId",
-                    column: x => x.FacilitatorId,
-                    principalSchema: "Organization",
-                    principalTable: "Employees",
-                    principalColumn: "Id",
-                    onDelete: ReferentialAction.Restrict);
                 table.ForeignKey(
                     name: "FK_PokerSessions_EstimationScales_EstimationScaleId",
                     column: x => x.EstimationScaleId,
@@ -101,20 +107,13 @@ public partial class AddPlanningPoker : Migration
             {
                 Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                 PokerRoundId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                ParticipantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                ParticipantId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
                 Value = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false),
                 SubmittedOn = table.Column<DateTime>(type: "datetime2", nullable: false)
             },
             constraints: table =>
             {
                 table.PrimaryKey("PK_PokerVotes", x => x.Id);
-                table.ForeignKey(
-                    name: "FK_PokerVotes_Employees_ParticipantId",
-                    column: x => x.ParticipantId,
-                    principalSchema: "Organization",
-                    principalTable: "Employees",
-                    principalColumn: "Id",
-                    onDelete: ReferentialAction.Restrict);
                 table.ForeignKey(
                     name: "FK_PokerVotes_PokerRounds_PokerRoundId",
                     column: x => x.PokerRoundId,
@@ -180,5 +179,9 @@ public partial class AddPlanningPoker : Migration
         migrationBuilder.DropTable(
             name: "EstimationScales",
             schema: "Planning");
+
+        migrationBuilder.Sql("""
+            DROP VIEW [Identity].[vw_ModaUsers]
+            """);
     }
 }

@@ -1,4 +1,4 @@
-﻿using Moda.Common.Application.Employees.Dtos;
+﻿using Moda.Common.Application.Identity.Users;
 using Moda.Common.Extensions;
 using Moda.Planning.Application.EstimationScales.Dtos;
 using Moda.Planning.Domain.Enums;
@@ -18,7 +18,7 @@ public sealed record PokerSessionDetailsDto : IMapFrom<PokerSession>
     public int Key { get; set; }
     public required string Name { get; set; }
     public required string Status { get; set; }
-    public EmployeeNavigationDto? Facilitator { get; set; }
+    public UserNavigationDto? Facilitator { get; set; }
     public EstimationScaleDto? EstimationScale { get; set; }
     public Instant? ActivatedOn { get; set; }
     public Instant? CompletedOn { get; set; }

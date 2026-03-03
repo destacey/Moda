@@ -10080,6 +10080,62 @@
             "ApiKey": []
           }
         ]
+      },
+      "delete": {
+        "tags": [
+          "PokerSessions"
+        ],
+        "summary": "Withdraw a vote from a round.",
+        "operationId": "PokerSessions_WithdrawVote",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "roundId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
       }
     },
     "/api/planning/risks": {
@@ -23811,13 +23867,36 @@
             "nullable": true,
             "oneOf": [
               {
-                "$ref": "#/components/schemas/EmployeeNavigationDto"
+                "$ref": "#/components/schemas/UserNavigationDto"
               }
             ]
           },
           "roundCount": {
             "type": "integer",
             "format": "int32"
+          }
+        }
+      },
+      "UserNavigationDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "userName"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "userName": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
           }
         }
       },
@@ -23864,7 +23943,7 @@
             "nullable": true,
             "oneOf": [
               {
-                "$ref": "#/components/schemas/EmployeeNavigationDto"
+                "$ref": "#/components/schemas/UserNavigationDto"
               }
             ]
           },
@@ -23957,7 +24036,7 @@
             "nullable": true,
             "oneOf": [
               {
-                "$ref": "#/components/schemas/EmployeeNavigationDto"
+                "$ref": "#/components/schemas/UserNavigationDto"
               }
             ]
           },

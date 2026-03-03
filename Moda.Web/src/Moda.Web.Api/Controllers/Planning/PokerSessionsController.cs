@@ -1,4 +1,4 @@
-using Moda.Common.Application.Models;
+﻿using Moda.Common.Application.Models;
 using Moda.Planning.Application.PokerSessions.Commands;
 using Moda.Planning.Application.PokerSessions.Dtos;
 using Moda.Planning.Application.PokerSessions.Queries;
@@ -11,14 +11,9 @@ namespace Moda.Web.Api.Controllers.Planning;
 [Route("api/planning/poker-sessions")]
 [ApiVersionNeutral]
 [ApiController]
-public class PokerSessionsController : ControllerBase
+public class PokerSessionsController(ISender sender) : ControllerBase
 {
-    private readonly ISender _sender;
-
-    public PokerSessionsController(ISender sender)
-    {
-        _sender = sender;
-    }
+    private readonly ISender _sender = sender;
 
     [HttpGet]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.PokerSessions)]
@@ -181,6 +176,19 @@ public class PokerSessionsController : ControllerBase
     public async Task<ActionResult> SubmitVote(Guid id, Guid roundId, [FromBody] SubmitVoteRequest request, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(request.ToSubmitVoteCommand(id, roundId), cancellationToken);
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpDelete("{id}/rounds/{roundId}/vote")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.PokerSessions)]
+    [OpenApiOperation("Withdraw a vote from a round.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> WithdrawVote(Guid id, Guid roundId, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(new WithdrawVoteCommand(id, roundId), cancellationToken);
         return result.IsSuccess
             ? NoContent()
             : BadRequest(result.ToBadRequestObject(HttpContext));

@@ -57,10 +57,11 @@ public class PokerRound : BaseEntity<Guid>
     /// </summary>
     internal Result Reset()
     {
-        if (Status is not (PokerRoundStatus.Voting or PokerRoundStatus.Revealed))
-            return Result.Failure("Round can only be reset from Voting or Revealed status.");
+        if (Status is not (PokerRoundStatus.Voting or PokerRoundStatus.Revealed or PokerRoundStatus.Accepted))
+            return Result.Failure("Round can only be reset from Voting, Revealed, or Accepted status.");
 
         _votes.Clear();
+        ConsensusEstimate = null;
         Status = PokerRoundStatus.Voting;
         return Result.Success();
     }
@@ -84,6 +85,22 @@ public class PokerRound : BaseEntity<Guid>
     internal Result UpdateLabel(string? newLabel)
     {
         Label = newLabel?.Trim();
+        return Result.Success();
+    }
+
+    /// <summary>
+    /// Remove a participant's vote from this round.
+    /// </summary>
+    internal Result RemoveVote(Guid participantId)
+    {
+        if (Status != PokerRoundStatus.Voting)
+            return Result.Failure("Votes can only be withdrawn when the round is in Voting status.");
+
+        var vote = _votes.FirstOrDefault(v => v.ParticipantId == participantId);
+        if (vote is null)
+            return Result.Failure("No vote found for this participant.");
+
+        _votes.Remove(vote);
         return Result.Success();
     }
 

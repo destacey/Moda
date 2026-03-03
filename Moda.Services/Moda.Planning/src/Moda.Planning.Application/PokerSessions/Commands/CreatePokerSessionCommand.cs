@@ -1,4 +1,3 @@
-using Ardalis.GuardClauses;
 using Moda.Common.Application.Models;
 using Moda.Planning.Domain.Models.PlanningPoker;
 
@@ -26,7 +25,7 @@ internal sealed class CreatePokerSessionCommandHandler(IPlanningDbContext planni
     private readonly IPlanningDbContext _planningDbContext = planningDbContext;
     private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
     private readonly ILogger<CreatePokerSessionCommandHandler> _logger = logger;
-    private readonly Guid _currentUserEmployeeId = Guard.Against.NullOrEmpty(currentUser.GetEmployeeId());
+    private readonly Guid _currentUserId = currentUser.GetUserId();
 
     public async Task<Result<ObjectIdAndKey>> Handle(CreatePokerSessionCommand request, CancellationToken cancellationToken)
     {
@@ -41,7 +40,7 @@ internal sealed class CreatePokerSessionCommandHandler(IPlanningDbContext planni
             var sessionResult = PokerSession.Create(
                 request.Name,
                 request.EstimationScaleId,
-                _currentUserEmployeeId,
+                _currentUserId,
                 _dateTimeProvider.Now);
 
             if (sessionResult.IsFailure)

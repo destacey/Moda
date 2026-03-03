@@ -661,7 +661,10 @@ public class PokerSessionConfig : IEntityTypeConfiguration<PokerSession>
         builder.Property(s => s.Key).ValueGeneratedOnAdd();
         builder.Property(s => s.Name).IsRequired().HasMaxLength(256);
         builder.Property(s => s.EstimationScaleId).IsRequired();
-        builder.Property(s => s.FacilitatorId).IsRequired();
+        builder.Property(s => s.FacilitatorId)
+            .IsRequired()
+            .HasConversion(guid => guid.ToString(), str => Guid.Parse(str))
+            .HasMaxLength(450);
         builder.Property(s => s.Status).IsRequired()
             .HasConversion<EnumConverter<PokerSessionStatus>>()
             .HasColumnType("varchar")
@@ -731,7 +734,10 @@ public class PokerVoteConfig : IEntityTypeConfiguration<PokerVote>
         builder.HasIndex(v => new { v.PokerRoundId, v.ParticipantId }).IsUnique();
 
         builder.Property(v => v.PokerRoundId).IsRequired();
-        builder.Property(v => v.ParticipantId).IsRequired();
+        builder.Property(v => v.ParticipantId)
+            .IsRequired()
+            .HasConversion(guid => guid.ToString(), str => Guid.Parse(str))
+            .HasMaxLength(450);
         builder.Property(v => v.Value).IsRequired().HasMaxLength(32);
         builder.Property(v => v.SubmittedOn).IsRequired();
 

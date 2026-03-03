@@ -224,6 +224,76 @@ public class PokerSessionTests
 
     #endregion
 
+    #region WithdrawVote
+
+    [Fact]
+    public void WithdrawVote_ExistingVote_ShouldRemoveVote()
+    {
+        // Arrange
+        var session = CreateActiveSession();
+        var round = session.AddRound("WI-1: Test").Value;
+        var participantId = Guid.NewGuid();
+        session.SubmitVote(round.Id, participantId, "5", Now);
+
+        // Act
+        var result = session.WithdrawVote(round.Id, participantId);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        round.Votes.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void WithdrawVote_NoVote_ShouldReturnFailure()
+    {
+        // Arrange
+        var session = CreateActiveSession();
+        var round = session.AddRound("WI-1: Test").Value;
+
+        // Act
+        var result = session.WithdrawVote(round.Id, Guid.NewGuid());
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Contain("No vote found");
+    }
+
+    [Fact]
+    public void WithdrawVote_RevealedRound_ShouldReturnFailure()
+    {
+        // Arrange
+        var session = CreateActiveSession();
+        var round = session.AddRound("WI-1: Test").Value;
+        var participantId = Guid.NewGuid();
+        session.SubmitVote(round.Id, participantId, "5", Now);
+        session.RevealRound(round.Id);
+
+        // Act
+        var result = session.WithdrawVote(round.Id, participantId);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+    }
+
+    [Fact]
+    public void WithdrawVote_CompletedSession_ShouldReturnFailure()
+    {
+        // Arrange
+        var session = CreateActiveSession();
+        var round = session.AddRound("WI-1: Test").Value;
+        var participantId = Guid.NewGuid();
+        session.SubmitVote(round.Id, participantId, "5", Now);
+        session.Complete(Now);
+
+        // Act
+        var result = session.WithdrawVote(round.Id, participantId);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+    }
+
+    #endregion
+
     #region RevealRound
 
     [Fact]
@@ -282,7 +352,7 @@ public class PokerSessionTests
     }
 
     [Fact]
-    public void ResetRound_AcceptedRound_ShouldReturnFailure()
+    public void ResetRound_AcceptedRound_ShouldClearVotesAndConsensusAndReturnToVoting()
     {
         // Arrange
         var session = CreateActiveSession();
@@ -295,7 +365,10 @@ public class PokerSessionTests
         var result = session.ResetRound(round.Id);
 
         // Assert
-        result.IsFailure.Should().BeTrue();
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Status.Should().Be(PokerRoundStatus.Voting);
+        result.Value.Votes.Should().BeEmpty();
+        result.Value.ConsensusEstimate.Should().BeNull();
     }
 
     #endregion

@@ -28,7 +28,7 @@ public class SubmitVoteCommandHandlerTests : IDisposable
         _mockLogger = new Mock<ILogger<SubmitVoteCommandHandler>>();
         _mockNotifier = new Mock<IPokerSessionNotifier>();
         _mockCurrentUser = new Mock<ICurrentUser>();
-        _mockCurrentUser.Setup(u => u.GetEmployeeId()).Returns(_currentUserId);
+        _mockCurrentUser.Setup(u => u.GetUserId()).Returns(_currentUserId);
         _mockCurrentUser.Setup(u => u.Name).Returns("Test User");
         _mockDateTimeProvider = new Mock<IDateTimeProvider>();
         _mockDateTimeProvider.Setup(d => d.Now).Returns(Instant.FromUtc(2026, 1, 15, 10, 0));

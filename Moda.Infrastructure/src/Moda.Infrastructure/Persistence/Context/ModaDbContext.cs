@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Moda.AppIntegration.Domain.Models.AzureOpenAI;
 using Moda.Common.Domain.Employees;
+using Moda.Common.Domain.Identity;
 using Moda.Goals.Application.Persistence;
 using Moda.Goals.Domain.Models;
 using Moda.Health;
@@ -39,6 +40,7 @@ public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IGoalsDbCo
     public DbSet<Employee> Employees => Set<Employee>();
     public DbSet<ExternalEmployeeBlacklistItem> ExternalEmployeeBlacklistItems => Set<ExternalEmployeeBlacklistItem>();
     public DbSet<PersonalAccessToken> PersonalAccessTokens => Set<PersonalAccessToken>();
+    public DbSet<User> ModaUsers => Set<User>();
 
     #endregion Common
 

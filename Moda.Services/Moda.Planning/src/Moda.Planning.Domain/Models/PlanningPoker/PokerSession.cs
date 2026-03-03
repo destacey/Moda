@@ -1,6 +1,6 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
-using Moda.Common.Domain.Employees;
+using Moda.Common.Domain.Identity;
 using Moda.Common.Domain.Interfaces;
 using Moda.Planning.Domain.Enums;
 using NodaTime;
@@ -42,11 +42,11 @@ public class PokerSession : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey
     public EstimationScale? EstimationScale { get; private set; }
 
     /// <summary>
-    /// The employee who facilitates this session.
+    /// The user who facilitates this session.
     /// </summary>
     public Guid FacilitatorId { get; private set; }
 
-    public Employee? Facilitator { get; private set; }
+    public User? Facilitator { get; private set; }
 
     /// <summary>
     /// The current status of the poker session.
@@ -204,6 +204,21 @@ public class PokerSession : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey
             return Result.Failure("Round not found.");
 
         return round.AddOrUpdateVote(participantId, value, timestamp);
+    }
+
+    /// <summary>
+    /// Withdraw a vote from a specific round.
+    /// </summary>
+    public Result WithdrawVote(Guid roundId, Guid participantId)
+    {
+        if (Status != PokerSessionStatus.Active)
+            return Result.Failure("Cannot withdraw vote when the session is not active.");
+
+        var round = _rounds.FirstOrDefault(r => r.Id == roundId);
+        if (round is null)
+            return Result.Failure("Round not found.");
+
+        return round.RemoveVote(participantId);
     }
 
     /// <summary>

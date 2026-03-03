@@ -24,7 +24,7 @@ public class CreatePokerSessionCommandHandlerTests : IDisposable
         _dbContext = new FakePlanningDbContext();
         _mockLogger = new Mock<ILogger<CreatePokerSessionCommandHandler>>();
         _mockCurrentUser = new Mock<ICurrentUser>();
-        _mockCurrentUser.Setup(u => u.GetEmployeeId()).Returns(_currentUserId);
+        _mockCurrentUser.Setup(u => u.GetUserId()).Returns(_currentUserId);
         _mockDateTimeProvider = new Mock<IDateTimeProvider>();
         _mockDateTimeProvider.Setup(d => d.Now).Returns(Instant.FromUtc(2026, 1, 15, 10, 0));
 
@@ -78,7 +78,7 @@ public class CreatePokerSessionCommandHandlerTests : IDisposable
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        _mockCurrentUser.Verify(u => u.GetEmployeeId(), Times.Once);
+        _mockCurrentUser.Verify(u => u.GetUserId(), Times.Once);
     }
 
     public void Dispose()

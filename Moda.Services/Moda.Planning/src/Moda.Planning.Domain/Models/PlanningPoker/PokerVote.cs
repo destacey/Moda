@@ -1,5 +1,5 @@
 ﻿using Ardalis.GuardClauses;
-using Moda.Common.Domain.Employees;
+using Moda.Common.Domain.Identity;
 using NodaTime;
 
 namespace Moda.Planning.Domain.Models.PlanningPoker;
@@ -20,7 +20,7 @@ public class PokerVote : BaseEntity<Guid>
 
     public Guid ParticipantId { get; private set; }
 
-    public Employee? Participant { get; private set; }
+    public User? Participant { get; private set; }
 
     public string Value { get; private set; } = default!;
 

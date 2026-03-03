@@ -9,14 +9,9 @@ namespace Moda.Web.Api.Controllers.Planning;
 [Route("api/planning/estimation-scales")]
 [ApiVersionNeutral]
 [ApiController]
-public class EstimationScalesController : ControllerBase
+public class EstimationScalesController(ISender sender) : ControllerBase
 {
-    private readonly ISender _sender;
-
-    public EstimationScalesController(ISender sender)
-    {
-        _sender = sender;
-    }
+    private readonly ISender _sender = sender;
 
     [HttpGet]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.EstimationScales)]
