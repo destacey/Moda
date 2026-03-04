@@ -527,10 +527,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
+                  "$ref": "#/components/schemas/UserPermissionsResponse"
                 }
               }
             }
@@ -18376,6 +18373,27 @@
           "phoneNumber": {
             "type": "string",
             "nullable": true
+          }
+        }
+      },
+      "UserPermissionsResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "permissions"
+        ],
+        "properties": {
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "employeeId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true,
+            "example": "00000000-0000-0000-0000-000000000000"
           }
         }
       },

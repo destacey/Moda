@@ -49,11 +49,15 @@ public class ProfileController : ControllerBase
     [OpenApiOperation("Get permissions of currently logged in user.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<List<string>>> GetPermissions(CancellationToken cancellationToken)
+    public async Task<ActionResult<UserPermissionsResponse>> GetPermissions(CancellationToken cancellationToken)
     {
-        return User.GetUserId() is not { } userId || string.IsNullOrEmpty(userId)
-            ? Unauthorized()
-            : Ok(await _userService.GetPermissionsAsync(userId, cancellationToken));
+        if (User.GetUserId() is not { } userId || string.IsNullOrEmpty(userId))
+            return Unauthorized();
+
+        var permissions = await _userService.GetPermissionsAsync(userId, cancellationToken);
+        var employeeId = _currentUser.GetEmployeeId();
+
+        return Ok(new UserPermissionsResponse(permissions, employeeId));
     }
 
     [HttpGet("internal-employee-id")]

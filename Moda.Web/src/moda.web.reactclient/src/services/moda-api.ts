@@ -691,7 +691,7 @@ export class ProfileClient {
     /**
      * Get permissions of currently logged in user.
      */
-    getPermissions( cancelToken?: CancelToken): Promise<string[]> {
+    getPermissions( cancelToken?: CancelToken): Promise<UserPermissionsResponse> {
         let url_ = this.baseUrl + "/api/user-management/profiles/permissions";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -715,7 +715,7 @@ export class ProfileClient {
         });
     }
 
-    protected processGetPermissions(response: AxiosResponse): Promise<string[]> {
+    protected processGetPermissions(response: AxiosResponse): Promise<UserPermissionsResponse> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -730,7 +730,7 @@ export class ProfileClient {
             let result200: any = null;
             let resultData200  = _responseText;
             result200 = JSON.parse(resultData200);
-            return Promise.resolve<string[]>(result200);
+            return Promise.resolve<UserPermissionsResponse>(result200);
 
         } else if (status === 400) {
             const _responseText = response.data;
@@ -743,7 +743,7 @@ export class ProfileClient {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<string[]>(null as any);
+        return Promise.resolve<UserPermissionsResponse>(null as any);
     }
 
     /**
@@ -20553,6 +20553,11 @@ export interface UpdateProfileRequest {
     lastName: string;
     email: string;
     phoneNumber?: string | undefined;
+}
+
+export interface UserPermissionsResponse {
+    permissions: string[];
+    employeeId?: string | undefined;
 }
 
 export interface AuditDto {

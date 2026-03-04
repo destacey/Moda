@@ -1,6 +1,6 @@
 import { getProfileClient } from '@/src/services/clients'
 import { apiSlice } from '../apiSlice'
-import { UserDetailsDto } from '@/src/services/moda-api'
+import { UserDetailsDto, UserPermissionsResponse } from '@/src/services/moda-api'
 import { QueryTags } from '../query-tags'
 
 export const profileApi = apiSlice.injectEndpoints({
@@ -16,7 +16,7 @@ export const profileApi = apiSlice.injectEndpoints({
         }
       },
     }),
-    getUserPermissions: builder.query<string[], void>({
+    getUserPermissions: builder.query<UserPermissionsResponse, void>({
       queryFn: async () => {
         try {
           const data = await getProfileClient().getPermissions()

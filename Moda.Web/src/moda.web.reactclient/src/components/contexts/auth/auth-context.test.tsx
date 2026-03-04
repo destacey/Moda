@@ -313,7 +313,7 @@ describe('AuthContext', () => {
         .mockReturnValueOnce(null) // First call returns null (before setActiveAccount)
         .mockReturnValue(mockAccount) // Subsequent calls return the account
       mockUseGetUserPermissionsQuery.mockReturnValue({
-        data: ['Permission.Read'],
+        data: { permissions: ['Permission.Read'], employeeId: null },
         isLoading: false,
         error: undefined,
       })
@@ -343,7 +343,7 @@ describe('AuthContext', () => {
       mockUseIsAuthenticated.mockReturnValue(true)
       mockInstance.getActiveAccount.mockReturnValue(mockAccount)
       mockUseGetUserPermissionsQuery.mockReturnValue({
-        data: ['Permission.Read'],
+        data: { permissions: ['Permission.Read'], employeeId: null },
         isLoading: false,
         error: undefined,
       })
@@ -386,7 +386,7 @@ describe('AuthContext', () => {
       mockUseIsAuthenticated.mockReturnValue(true)
       mockInstance.getActiveAccount.mockReturnValue(mockAccount)
       mockUseGetUserPermissionsQuery.mockReturnValue({
-        data: ['Permission.Read', 'Permission.Write'],
+        data: { permissions: ['Permission.Read', 'Permission.Write'], employeeId: null },
         isLoading: false,
         error: undefined,
       })
@@ -451,7 +451,7 @@ describe('AuthContext', () => {
       mockUseIsAuthenticated.mockReturnValue(true)
       mockInstance.getActiveAccount.mockReturnValue(mockAccount)
       mockUseGetUserPermissionsQuery.mockReturnValue({
-        data: ['Permission.Read'],
+        data: { permissions: ['Permission.Read'], employeeId: null },
         isLoading: false,
         error: undefined,
       })
@@ -480,7 +480,7 @@ describe('AuthContext', () => {
       mockUseIsAuthenticated.mockReturnValue(true)
       mockInstance.getActiveAccount.mockReturnValue(mockAccount)
       mockUseGetUserPermissionsQuery.mockReturnValue({
-        data: ['Permission.Read'],
+        data: { permissions: ['Permission.Read'], employeeId: null },
         isLoading: false,
         error: undefined,
       })
@@ -511,7 +511,7 @@ describe('AuthContext', () => {
       mockUseIsAuthenticated.mockReturnValue(true)
       mockInstance.getActiveAccount.mockReturnValue(mockAccount)
       mockUseGetUserPermissionsQuery.mockReturnValue({
-        data: ['Permission.Read', 'Permission.Write'],
+        data: { permissions: ['Permission.Read', 'Permission.Write'], employeeId: null },
         isLoading: false,
         error: undefined,
       })
@@ -572,7 +572,7 @@ describe('AuthContext', () => {
       mockUseIsAuthenticated.mockReturnValue(true)
       mockInstance.getActiveAccount.mockReturnValue(mockAccount)
       mockUseGetUserPermissionsQuery.mockReturnValue({
-        data: [],
+        data: { permissions: [], employeeId: null },
         isLoading: false,
         error: undefined,
       })
@@ -612,7 +612,7 @@ describe('AuthContext', () => {
         accessToken: 'test-token',
       })
       mockUseGetUserPermissionsQuery.mockReturnValue({
-        data: [],
+        data: { permissions: [], employeeId: null },
         isLoading: false,
         error: undefined,
       })
@@ -660,7 +660,7 @@ describe('AuthContext', () => {
         accessToken: 'popup-token',
       })
       mockUseGetUserPermissionsQuery.mockReturnValue({
-        data: [],
+        data: { permissions: [], employeeId: null },
         isLoading: false,
         error: undefined,
       })
@@ -692,7 +692,7 @@ describe('AuthContext', () => {
       mockInstance.getActiveAccount.mockReturnValue(mockAccount)
       mockInstance.getAllAccounts.mockReturnValue([]) // No accounts
       mockUseGetUserPermissionsQuery.mockReturnValue({
-        data: [],
+        data: { permissions: [], employeeId: null },
         isLoading: false,
         error: undefined,
       })
@@ -726,7 +726,7 @@ describe('AuthContext', () => {
       mockUseIsAuthenticated.mockReturnValue(true)
       mockInstance.getActiveAccount.mockReturnValue(mockAccount)
       mockUseGetUserPermissionsQuery.mockReturnValue({
-        data: ['Permission.Read'],
+        data: { permissions: ['Permission.Read'], employeeId: null },
         isLoading: false,
         error: undefined,
       })
@@ -1087,7 +1087,7 @@ describe('AuthContext', () => {
       mockUseIsAuthenticated.mockReturnValue(true)
       mockInstance.getActiveAccount.mockReturnValue(mockAccount)
       mockUseGetUserPermissionsQuery.mockReturnValue({
-        data: ['Permission.Read'],
+        data: { permissions: ['Permission.Read'], employeeId: null },
         isLoading: false,
         error: undefined,
         refetch: jest.fn(),
@@ -1257,7 +1257,7 @@ describe('AuthContext', () => {
       mockInstance.getActiveAccount.mockReturnValue(mockAccount)
       mockInstance.getAllAccounts.mockReturnValue([mockAccount])
       mockUseGetUserPermissionsQuery.mockReturnValue({
-        data: ['Permission.Read'],
+        data: { permissions: ['Permission.Read'], employeeId: null },
         isLoading: false,
         error: undefined,
         refetch: jest.fn(),
@@ -1348,7 +1348,7 @@ describe('AuthContext', () => {
       mockInstance.getActiveAccount.mockReturnValue(mockAccount)
       mockInstance.getAllAccounts.mockReturnValue([mockAccount])
       mockUseGetUserPermissionsQuery.mockReturnValue({
-        data: ['Permission.Read'],
+        data: { permissions: ['Permission.Read'], employeeId: null },
         isLoading: false,
         error: undefined,
         refetch: jest.fn(),
@@ -1396,7 +1396,7 @@ describe('AuthContext', () => {
       mockInstance.getActiveAccount.mockReturnValue(mockAccount)
       mockInstance.getAllAccounts.mockReturnValue([mockAccount])
       mockUseGetUserPermissionsQuery.mockReturnValue({
-        data: ['Permission.Read'],
+        data: { permissions: ['Permission.Read'], employeeId: null },
         isLoading: false,
         error: undefined,
         refetch: jest.fn(),
