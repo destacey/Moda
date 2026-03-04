@@ -10,7 +10,7 @@ import {
   useCreateRoadmapMutation,
   useGetVisibilityOptionsQuery,
 } from '@/src/store/features/planning/roadmaps-api'
-import { useGetInternalEmployeeIdQuery } from '@/src/store/features/user-management/profile-api'
+import useAuth from '@/src/components/contexts/auth'
 import { toFormErrors } from '@/src/utils'
 import { DatePicker, Form, Input, Modal, Radio } from 'antd'
 import { useCallback, useEffect } from 'react'
@@ -51,17 +51,14 @@ const CreateRoadmapForm = ({
   onFormCancel,
 }: CreateRoadmapFormProps) => {
   const messageApi = useMessage()
+  const { user } = useAuth()
+  const currentUserInternalEmployeeId = user?.employeeId
 
   const { data: visibilityData, error } = useGetVisibilityOptionsQuery()
   const [createRoadmap] = useCreateRoadmapMutation()
 
   const { data: employeeData, error: employeeOptionsError } =
     useGetEmployeeOptionsQuery(false)
-
-  const {
-    data: currentUserInternalEmployeeId,
-    error: currentUserInternalEmployeeIdError,
-  } = useGetInternalEmployeeIdQuery()
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<CreateRoadmapFormValues>({
@@ -123,14 +120,7 @@ const CreateRoadmapForm = ({
           'An error occurred while loading employee options. Please try again.',
       )
     }
-    if (currentUserInternalEmployeeIdError) {
-      messageApi.error(
-        currentUserInternalEmployeeIdError.supportMessage ??
-          'An error occurred while loading current user profile data. Please try again.',
-      )
-    }
   }, [
-    currentUserInternalEmployeeIdError,
     employeeOptionsError,
     error,
     messageApi,

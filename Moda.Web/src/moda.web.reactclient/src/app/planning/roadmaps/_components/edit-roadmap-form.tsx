@@ -11,7 +11,7 @@ import { DatePicker, Form, Input, Modal, Radio } from 'antd'
 import { useCallback, useEffect } from 'react'
 import dayjs from 'dayjs'
 import { useGetEmployeeOptionsQuery } from '@/src/store/features/organizations/employee-api'
-import { useGetInternalEmployeeIdQuery } from '@/src/store/features/user-management/profile-api'
+import useAuth from '@/src/components/contexts/auth'
 import { MarkdownEditor } from '@/src/components/common/markdown'
 import { EmployeeSelect } from '@/src/components/common/organizations'
 import { useMessage } from '@/src/components/contexts/messaging'
@@ -57,6 +57,8 @@ const EditRoadmapForm = ({
   onFormCancel,
 }: EditRoadmapFormProps) => {
   const messageApi = useMessage()
+  const { user } = useAuth()
+  const currentUserInternalEmployeeId = user?.employeeId
 
   const { data: roadmapData, error } = useGetRoadmapQuery(roadmapKey.toString())
 
@@ -66,11 +68,6 @@ const EditRoadmapForm = ({
 
   const { data: employeeData, error: employeeOptionsError } =
     useGetEmployeeOptionsQuery(true)
-
-  const {
-    data: currentUserInternalEmployeeId,
-    error: currentUserInternalEmployeeIdError,
-  } = useGetInternalEmployeeIdQuery()
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<EditRoadmapFormValues>({
@@ -143,14 +140,7 @@ const EditRoadmapForm = ({
           'An error occurred while loading employee options. Please try again.',
       )
     }
-    if (currentUserInternalEmployeeIdError) {
-      messageApi.error(
-        currentUserInternalEmployeeIdError.supportMessage ??
-          'An error occurred while loading current user profile data. Please try again.',
-      )
-    }
   }, [
-    currentUserInternalEmployeeIdError,
     employeeOptionsError,
     error,
     messageApi,

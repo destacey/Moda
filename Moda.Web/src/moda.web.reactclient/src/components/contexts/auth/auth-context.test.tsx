@@ -420,6 +420,7 @@ describe('AuthContext', () => {
 
       expect(mockUseGetUserPermissionsQuery).toHaveBeenCalledWith(undefined, {
         skip: true,
+        pollingInterval: 5 * 60 * 1000,
       })
     })
 
@@ -439,6 +440,7 @@ describe('AuthContext', () => {
 
       expect(mockUseGetUserPermissionsQuery).toHaveBeenCalledWith(undefined, {
         skip: true,
+        pollingInterval: 5 * 60 * 1000,
       })
     })
 
@@ -465,6 +467,7 @@ describe('AuthContext', () => {
       await waitFor(() => {
         expect(mockUseGetUserPermissionsQuery).toHaveBeenCalledWith(undefined, {
           skip: false,
+          pollingInterval: 5 * 60 * 1000,
         })
       })
     })

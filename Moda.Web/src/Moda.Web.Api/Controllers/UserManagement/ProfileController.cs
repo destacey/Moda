@@ -60,17 +60,7 @@ public class ProfileController : ControllerBase
         return Ok(new UserPermissionsResponse(permissions, employeeId));
     }
 
-    [HttpGet("internal-employee-id")]
-    [OpenApiOperation("Get internal employee id of currently logged in user.", "")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public Task<ActionResult<string>> GetInternalEmployeeId()
-    {
-        // TODO: move this to a claim
-        return Task.FromResult<ActionResult<string>>(Ok(_currentUser.GetEmployeeId()));
-    }
-
-    [HttpGet("logs")]
+[HttpGet("logs")]
     [OpenApiOperation("Get audit logs of currently logged in user.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
