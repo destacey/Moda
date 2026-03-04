@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Identity.Web;
@@ -57,9 +58,20 @@ internal class AzureAdJwtBearerEvents : JwtBearerEvents
         var identity = principal.Identities.First();
 
         // Lookup local user or create one if none exist.
-        var userData = await context.HttpContext.RequestServices.GetRequiredService<IUserService>()
-            .GetOrCreateFromPrincipalAsync(principal);
-        // TODO: Call Graph here
+        (string Id, string? EmployeeId) userData;
+        try
+        {
+            userData = await context.HttpContext.RequestServices.GetRequiredService<IUserService>()
+                .GetOrCreateFromPrincipalAsync(principal);
+        }
+        catch (ForbiddenException ex)
+        {
+            _logger.RegistrationDenied(objectId, ex.Message);
+            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+            await context.Response.WriteAsJsonAsync(new { message = ex.Message });
+            context.Fail(ex);
+            return;
+        }
 
         // We use the nameidentifier claim to store the user id.
         var idClaim = principal.FindFirst(ClaimTypes.NameIdentifier);
@@ -111,4 +123,7 @@ internal static class AzureAdJwtBearerEventsLoggingExtensions
 
     public static void TokenValidationSucceeded(this ILogger logger, string userId, string issuer) =>
         logger.Debug("Token validation succeeded: User: {userId} Issuer: {issuer}", userId, issuer);
+
+    public static void RegistrationDenied(this ILogger logger, string objectId, string reason) =>
+        logger.Warning("Registration denied for ObjectId: {ObjectId}. Reason: {Reason}", objectId, reason);
 }

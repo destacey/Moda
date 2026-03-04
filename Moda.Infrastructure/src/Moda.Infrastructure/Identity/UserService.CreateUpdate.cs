@@ -29,12 +29,12 @@ internal partial class UserService
             throw new InternalServerException("Invalid objectId");
         }
 
-        var existingUsers = await _userManager.Users.Select(u => true).FirstOrDefaultAsync();
+        var isFirstUser = !await _userManager.Users.AnyAsync();
 
         var user = await _userManager.Users.Where(u => u.ObjectId == objectId).FirstOrDefaultAsync()
-            ?? await CreateOrUpdateFromPrincipalAsync(principal);
+            ?? await CreateOrUpdateFromPrincipalAsync(principal, isFirstUser);
 
-        if (!existingUsers)
+        if (isFirstUser)
         {
             await _userManager.AddToRoleAsync(user, "Admin");
             await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id, _dateTimeProvider.Now, true));
@@ -52,7 +52,7 @@ internal partial class UserService
         return (user.Id, user.EmployeeId?.ToString());
     }
 
-    private async Task<ApplicationUser> CreateOrUpdateFromPrincipalAsync(ClaimsPrincipal principal)
+    private async Task<ApplicationUser> CreateOrUpdateFromPrincipalAsync(ClaimsPrincipal principal, bool isFirstUser)
     {
         string principalObjectId = principal.GetObjectId() ?? throw new InternalServerException("Principal ObjectId is missing or null.");
 
@@ -93,6 +93,15 @@ internal partial class UserService
         }
         else
         {
+            var employeeId = await GetEmployeeId(principalObjectId);
+
+            if (!employeeId.HasValue && !isFirstUser)
+            {
+                _logger.LogWarning("Registration denied for user {Username} (ObjectId: {ObjectId}). No matching employee record found.",
+                    username, principalObjectId);
+                throw new ForbiddenException("Registration is restricted to users with an employee record in Moda.");
+            }
+
             user = new ApplicationUser
             {
                 ObjectId = principalObjectId,
@@ -105,7 +114,7 @@ internal partial class UserService
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
                 IsActive = true,
-                EmployeeId = await GetEmployeeId(principalObjectId)
+                EmployeeId = employeeId
             };
             result = await _userManager.CreateAsync(user);
 
