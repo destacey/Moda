@@ -25,7 +25,7 @@ internal sealed class CreatePokerSessionCommandHandler(IPlanningDbContext planni
     private readonly IPlanningDbContext _planningDbContext = planningDbContext;
     private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
     private readonly ILogger<CreatePokerSessionCommandHandler> _logger = logger;
-    private readonly Guid _currentUserId = currentUser.GetUserId();
+    private readonly string _currentUserId = currentUser.GetUserId();
 
     public async Task<Result<ObjectIdAndKey>> Handle(CreatePokerSessionCommand request, CancellationToken cancellationToken)
     {

@@ -7,7 +7,7 @@ public class CurrentUser : ICurrentUser, ICurrentUserInitializer
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
     private ClaimsPrincipal? _user;
-    private Guid _userId = Guid.Empty;
+    private string _userId = string.Empty;
 
     public CurrentUser(IHttpContextAccessor httpContextAccessor)
     {
@@ -19,9 +19,9 @@ public class CurrentUser : ICurrentUser, ICurrentUserInitializer
 
     public string? Name => User?.Identity?.Name;
 
-    public Guid GetUserId() =>
+    public string GetUserId() =>
         IsAuthenticated()
-            ? Guid.Parse(User?.GetUserId() ?? Guid.Empty.ToString())
+            ? User?.GetUserId() ?? string.Empty
             : _userId;
 
     public Guid? GetEmployeeId()
@@ -65,14 +65,14 @@ public class CurrentUser : ICurrentUser, ICurrentUserInitializer
 
     public void SetCurrentUserId(string userId)
     {
-        if (_userId != Guid.Empty)
+        if (!string.IsNullOrEmpty(_userId))
         {
             throw new Exception("Method reserved for in-scope initialization");
         }
 
         if (!string.IsNullOrEmpty(userId))
         {
-            _userId = Guid.Parse(userId);
+            _userId = userId;
         }
     }
 }

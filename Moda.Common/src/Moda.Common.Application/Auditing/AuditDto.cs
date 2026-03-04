@@ -1,9 +1,9 @@
-namespace Moda.Common.Application.Auditing;
+﻿namespace Moda.Common.Application.Auditing;
 
-public record AuditDto
+public sealed record AuditDto
 {
     public Guid Id { get; set; }
-    public Guid UserId { get; set; }
+    public required string UserId { get; set; }
     public string? Type { get; set; }
     public string? TableName { get; set; }
     public Instant DateTime { get; set; }

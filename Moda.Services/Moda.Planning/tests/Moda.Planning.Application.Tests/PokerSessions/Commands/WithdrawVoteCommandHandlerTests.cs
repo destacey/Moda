@@ -19,7 +19,7 @@ public class WithdrawVoteCommandHandlerTests : IDisposable
     private readonly Mock<ICurrentUser> _mockCurrentUser;
 
     private readonly PokerSessionFaker _sessionFaker;
-    private readonly Guid _currentUserId = Guid.NewGuid();
+    private readonly string _currentUserId = Guid.NewGuid().ToString();
 
     public WithdrawVoteCommandHandlerTests()
     {

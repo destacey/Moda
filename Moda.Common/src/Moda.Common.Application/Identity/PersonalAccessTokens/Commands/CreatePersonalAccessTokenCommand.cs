@@ -47,7 +47,7 @@ public sealed class CreatePersonalAccessTokenCommandValidator : CustomValidator<
 
     private async Task<bool> BeUniqueTokenName(string name, CancellationToken cancellationToken)
     {
-        var userId = _currentUser.GetUserId().ToString();
+        var userId = _currentUser.GetUserId();
         return !await _dbContext.PersonalAccessTokens
             .AnyAsync(t => t.UserId == userId && t.Name == name && t.RevokedAt == null, cancellationToken);
     }
@@ -81,7 +81,7 @@ internal sealed class CreatePersonalAccessTokenCommandHandler(
     {
         try
         {
-            var userId = _currentUser.GetUserId().ToString();
+            var userId = _currentUser.GetUserId();
             var employeeId = _currentUser.GetEmployeeId();
             var now = _dateTimeProvider.Now;
 

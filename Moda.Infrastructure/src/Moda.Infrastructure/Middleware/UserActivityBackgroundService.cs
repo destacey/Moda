@@ -10,7 +10,7 @@ public class UserActivityBackgroundService(
     IServiceProvider serviceProvider,
     ILogger<UserActivityBackgroundService> logger) : BackgroundService
 {
-    private readonly Channel<Guid> _channel = Channel.CreateBounded<Guid>(
+    private readonly Channel<string> _channel = Channel.CreateBounded<string>(
         new BoundedChannelOptions(1000)
         {
             FullMode = BoundedChannelFullMode.DropOldest,
@@ -20,7 +20,7 @@ public class UserActivityBackgroundService(
     private readonly IServiceProvider _serviceProvider = serviceProvider;
     private readonly ILogger<UserActivityBackgroundService> _logger = logger;
 
-    public void QueueUpdate(Guid userId)
+    public void QueueUpdate(string userId)
     {
         _channel.Writer.TryWrite(userId);
     }
@@ -36,7 +36,7 @@ public class UserActivityBackgroundService(
                 var dateTimeProvider = scope.ServiceProvider.GetRequiredService<IDateTimeProvider>();
 
                 var user = await dbContext.Users
-                    .FirstOrDefaultAsync(u => u.Id == userId.ToString(), stoppingToken);
+                    .FirstOrDefaultAsync(u => u.Id == userId, stoppingToken);
 
                 if (user != null)
                 {

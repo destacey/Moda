@@ -27,7 +27,7 @@ public class UserActivityTrackingMiddleware(
     private void TrackUserActivity()
     {
         var userId = _currentUser.GetUserId();
-        if (userId == Guid.Empty)
+        if (string.IsNullOrEmpty(userId))
             return;
 
         var cacheKey = $"user-activity:{userId}";

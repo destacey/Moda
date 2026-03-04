@@ -131,7 +131,7 @@ public sealed class PersonalAccessTokenTests
     public void ValidateForUse_ShouldReturnFailure_WhenTokenIsRevoked()
     {
         // Arrange
-        var revokedBy = Guid.NewGuid();
+        var revokedBy = Guid.NewGuid().ToString();
         var token = _tokenFaker.WithRevokedToken(revokedBy, _now).Generate();
 
         // Act
@@ -161,7 +161,7 @@ public sealed class PersonalAccessTokenTests
     {
         // Arrange
         var token = _tokenFaker.Generate();
-        var revokedBy = Guid.NewGuid();
+        var revokedBy = Guid.NewGuid().ToString();
         var revokeTime = _now.Plus(Duration.FromDays(1));
 
         // Act
@@ -179,11 +179,11 @@ public sealed class PersonalAccessTokenTests
     public void Revoke_ShouldReturnFailure_WhenAlreadyRevoked()
     {
         // Arrange
-        var revokedBy = Guid.NewGuid();
+        var revokedBy = Guid.NewGuid().ToString();
         var token = _tokenFaker.WithRevokedToken(revokedBy, _now).Generate();
 
         // Act
-        var result = token.Revoke(Guid.NewGuid(), _now.Plus(Duration.FromDays(1)));
+        var result = token.Revoke(Guid.NewGuid().ToString(), _now.Plus(Duration.FromDays(1)));
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -209,7 +209,7 @@ public sealed class PersonalAccessTokenTests
     public void UpdateName_ShouldReturnFailure_WhenTokenIsRevoked()
     {
         // Arrange
-        var revokedBy = Guid.NewGuid();
+        var revokedBy = Guid.NewGuid().ToString();
         var token = _tokenFaker.WithRevokedToken(revokedBy, _now).Generate();
 
         // Act
@@ -239,7 +239,7 @@ public sealed class PersonalAccessTokenTests
     public void UpdateExpiresAt_ShouldReturnFailure_WhenTokenIsRevoked()
     {
         // Arrange
-        var revokedBy = Guid.NewGuid();
+        var revokedBy = Guid.NewGuid().ToString();
         var token = _tokenFaker.WithRevokedToken(revokedBy, _now).Generate();
         var newExpiresAt = _now.Plus(Duration.FromDays(180));
 
@@ -304,7 +304,7 @@ public sealed class PersonalAccessTokenTests
     public void IsActive_ShouldReturnFalse_WhenTokenIsExpiredOrRevoked()
     {
         // Arrange - Revoked token
-        var revokedBy = Guid.NewGuid();
+        var revokedBy = Guid.NewGuid().ToString();
         var revokedToken = _tokenFaker.WithRevokedToken(revokedBy, _now).Generate();
 
         // Assert

@@ -18395,10 +18395,7 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "userId": {
-            "type": "string",
-            "format": "guid",
-            "nullable": false,
-            "example": "00000000-0000-0000-0000-000000000000"
+            "type": "string"
           },
           "type": {
             "type": "string",

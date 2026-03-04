@@ -14,7 +14,7 @@ public class AuditTrailConfig : IEntityTypeConfiguration<Trail>
         builder.HasIndex(x => x.PrimaryKey);
 
         builder.Property(x => x.Id).ValueGeneratedOnAdd();
-        builder.Property(x => x.UserId).IsRequired();
+        builder.Property(x => x.UserId).IsRequired().HasMaxLength(450);
         builder.Property(x => x.Type).HasMaxLength(32).HasColumnType("varchar");
         builder.Property(x => x.SchemaName).HasMaxLength(64).HasColumnType("varchar");
         builder.Property(x => x.TableName).HasMaxLength(128).HasColumnType("varchar");

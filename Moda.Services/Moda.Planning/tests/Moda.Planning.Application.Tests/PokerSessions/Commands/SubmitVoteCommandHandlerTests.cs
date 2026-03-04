@@ -20,7 +20,7 @@ public class SubmitVoteCommandHandlerTests : IDisposable
     private readonly Mock<IDateTimeProvider> _mockDateTimeProvider;
 
     private readonly PokerSessionFaker _sessionFaker;
-    private readonly Guid _currentUserId = Guid.NewGuid();
+    private readonly string _currentUserId = Guid.NewGuid().ToString();
 
     public SubmitVoteCommandHandlerTests()
     {
@@ -112,7 +112,7 @@ public class SubmitVoteCommandHandlerTests : IDisposable
 
         session.AddRound("Story");
         var round = session.Rounds.First();
-        session.SubmitVote(round.Id, Guid.NewGuid(), "3", Instant.FromUtc(2026, 1, 15, 9, 0));
+        session.SubmitVote(round.Id, Guid.NewGuid().ToString(), "3", Instant.FromUtc(2026, 1, 15, 9, 0));
         session.RevealRound(round.Id);
         // Round is now Revealed, not Voting
 
@@ -124,7 +124,7 @@ public class SubmitVoteCommandHandlerTests : IDisposable
         // Assert
         result.IsFailure.Should().BeTrue();
         _dbContext.SaveChangesCallCount.Should().Be(0);
-        _mockNotifier.Verify(n => n.NotifyVoteSubmitted(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<string>()), Times.Never);
+        _mockNotifier.Verify(n => n.NotifyVoteSubmitted(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
     }
 
     [Fact]

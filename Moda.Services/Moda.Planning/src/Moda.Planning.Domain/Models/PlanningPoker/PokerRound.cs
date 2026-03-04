@@ -91,7 +91,7 @@ public class PokerRound : BaseEntity<Guid>
     /// <summary>
     /// Remove a participant's vote from this round.
     /// </summary>
-    internal Result RemoveVote(Guid participantId)
+    internal Result RemoveVote(string participantId)
     {
         if (Status != PokerRoundStatus.Voting)
             return Result.Failure("Votes can only be withdrawn when the round is in Voting status.");
@@ -107,7 +107,7 @@ public class PokerRound : BaseEntity<Guid>
     /// <summary>
     /// Submit or update a vote for this round.
     /// </summary>
-    internal Result AddOrUpdateVote(Guid participantId, string value, Instant timestamp)
+    internal Result AddOrUpdateVote(string participantId, string value, Instant timestamp)
     {
         if (Status != PokerRoundStatus.Voting)
             return Result.Failure("Votes can only be submitted when the round is in Voting status.");

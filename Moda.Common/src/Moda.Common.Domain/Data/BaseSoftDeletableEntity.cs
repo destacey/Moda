@@ -12,7 +12,7 @@ public abstract class BaseSoftDeletableEntity<TId> : BaseAuditableEntity<TId>, I
     /// <summary>
     /// The employee that deleted this record.
     /// </summary>
-    public Guid? DeletedBy { get; set; }
+    public string? DeletedBy { get; set; }
 
     /// <summary>
     /// Flag to determine if the entity is deleted.

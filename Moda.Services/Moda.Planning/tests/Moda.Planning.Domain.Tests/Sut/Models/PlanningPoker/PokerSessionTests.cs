@@ -10,7 +10,7 @@ public class PokerSessionTests
 
     private static PokerSession CreateActiveSession()
     {
-        return PokerSession.Create("Sprint 1 Refinement", 1, Guid.NewGuid(), Now).Value;
+        return PokerSession.Create("Sprint 1 Refinement", 1, Guid.NewGuid().ToString(), Now).Value;
     }
 
     #region Create
@@ -20,7 +20,7 @@ public class PokerSessionTests
     {
         // Arrange
         var scaleId = 1;
-        var facilitatorId = Guid.NewGuid();
+        var facilitatorId = Guid.NewGuid().ToString();
 
         // Act
         var result = PokerSession.Create("Sprint 1 Refinement", scaleId, facilitatorId, Now);
@@ -40,7 +40,7 @@ public class PokerSessionTests
     public void Create_WhitespaceName_ShouldReturnFailure()
     {
         // Act
-        var result = PokerSession.Create("  ", 1, Guid.NewGuid(), Now);
+        var result = PokerSession.Create("  ", 1, Guid.NewGuid().ToString(), Now);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -174,7 +174,7 @@ public class PokerSessionTests
         // Arrange
         var session = CreateActiveSession();
         var round = session.AddRound("WI-1: Test").Value;
-        var participantId = Guid.NewGuid();
+        var participantId = Guid.NewGuid().ToString();
 
         // Act
         var result = session.SubmitVote(round.Id, participantId, "5", Now);
@@ -192,7 +192,7 @@ public class PokerSessionTests
         // Arrange
         var session = CreateActiveSession();
         var round = session.AddRound("WI-1: Test").Value;
-        var participantId = Guid.NewGuid();
+        var participantId = Guid.NewGuid().ToString();
         session.SubmitVote(round.Id, participantId, "3", Now);
 
         // Act
@@ -212,11 +212,11 @@ public class PokerSessionTests
         // Arrange
         var session = CreateActiveSession();
         var round = session.AddRound("WI-1: Test").Value;
-        session.SubmitVote(round.Id, Guid.NewGuid(), "5", Now);
+        session.SubmitVote(round.Id, Guid.NewGuid().ToString(), "5", Now);
         session.RevealRound(round.Id);
 
         // Act
-        var result = session.SubmitVote(round.Id, Guid.NewGuid(), "5", Now);
+        var result = session.SubmitVote(round.Id, Guid.NewGuid().ToString(), "5", Now);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -232,7 +232,7 @@ public class PokerSessionTests
         // Arrange
         var session = CreateActiveSession();
         var round = session.AddRound("WI-1: Test").Value;
-        var participantId = Guid.NewGuid();
+        var participantId = Guid.NewGuid().ToString();
         session.SubmitVote(round.Id, participantId, "5", Now);
 
         // Act
@@ -251,7 +251,7 @@ public class PokerSessionTests
         var round = session.AddRound("WI-1: Test").Value;
 
         // Act
-        var result = session.WithdrawVote(round.Id, Guid.NewGuid());
+        var result = session.WithdrawVote(round.Id, Guid.NewGuid().ToString());
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -264,7 +264,7 @@ public class PokerSessionTests
         // Arrange
         var session = CreateActiveSession();
         var round = session.AddRound("WI-1: Test").Value;
-        var participantId = Guid.NewGuid();
+        var participantId = Guid.NewGuid().ToString();
         session.SubmitVote(round.Id, participantId, "5", Now);
         session.RevealRound(round.Id);
 
@@ -281,7 +281,7 @@ public class PokerSessionTests
         // Arrange
         var session = CreateActiveSession();
         var round = session.AddRound("WI-1: Test").Value;
-        var participantId = Guid.NewGuid();
+        var participantId = Guid.NewGuid().ToString();
         session.SubmitVote(round.Id, participantId, "5", Now);
         session.Complete(Now);
 
@@ -302,7 +302,7 @@ public class PokerSessionTests
         // Arrange
         var session = CreateActiveSession();
         var round = session.AddRound("WI-1: Test").Value;
-        session.SubmitVote(round.Id, Guid.NewGuid(), "5", Now);
+        session.SubmitVote(round.Id, Guid.NewGuid().ToString(), "5", Now);
 
         // Act
         var result = session.RevealRound(round.Id);
@@ -318,7 +318,7 @@ public class PokerSessionTests
         // Arrange
         var session = CreateActiveSession();
         var round = session.AddRound("WI-1: Test").Value;
-        session.SubmitVote(round.Id, Guid.NewGuid(), "5", Now);
+        session.SubmitVote(round.Id, Guid.NewGuid().ToString(), "5", Now);
         session.RevealRound(round.Id);
         session.SetConsensus(round.Id, "5");
 
@@ -339,7 +339,7 @@ public class PokerSessionTests
         // Arrange
         var session = CreateActiveSession();
         var round = session.AddRound("WI-1: Test").Value;
-        session.SubmitVote(round.Id, Guid.NewGuid(), "5", Now);
+        session.SubmitVote(round.Id, Guid.NewGuid().ToString(), "5", Now);
         session.RevealRound(round.Id);
 
         // Act
@@ -357,7 +357,7 @@ public class PokerSessionTests
         // Arrange
         var session = CreateActiveSession();
         var round = session.AddRound("WI-1: Test").Value;
-        session.SubmitVote(round.Id, Guid.NewGuid(), "5", Now);
+        session.SubmitVote(round.Id, Guid.NewGuid().ToString(), "5", Now);
         session.RevealRound(round.Id);
         session.SetConsensus(round.Id, "5");
 
@@ -381,7 +381,7 @@ public class PokerSessionTests
         // Arrange
         var session = CreateActiveSession();
         var round = session.AddRound("WI-1: Test").Value;
-        session.SubmitVote(round.Id, Guid.NewGuid(), "5", Now);
+        session.SubmitVote(round.Id, Guid.NewGuid().ToString(), "5", Now);
         session.RevealRound(round.Id);
 
         // Act

@@ -6,7 +6,7 @@ namespace Moda.Common.Domain.Identity;
 /// Read-only domain representation of an application user.
 /// Backed by a database view over the Identity.Users table.
 /// </summary>
-public sealed class User : BaseEntity<Guid>
+public sealed class User : BaseEntity<string>
 {
     private User() { }
 

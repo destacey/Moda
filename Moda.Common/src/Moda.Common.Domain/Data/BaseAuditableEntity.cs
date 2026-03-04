@@ -6,9 +6,9 @@ public abstract class BaseAuditableEntity<TId> : BaseEntity<TId>, IAuditable
 {
     public Instant Created { get; set; }
 
-    public Guid? CreatedBy { get; set; }
+    public string? CreatedBy { get; set; }
 
     public Instant LastModified { get; set; }
 
-    public Guid? LastModifiedBy { get; set; }
+    public string? LastModifiedBy { get; set; }
 }
