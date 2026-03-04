@@ -9,7 +9,7 @@ import {
   useCopyRoadmapMutation,
   useGetVisibilityOptionsQuery,
 } from '@/src/store/features/planning/roadmaps-api'
-import { useGetInternalEmployeeIdQuery } from '@/src/store/features/user-management/profile-api'
+import useAuth from '@/src/components/contexts/auth'
 import { toFormErrors } from '@/src/utils'
 import { Form, Input, Modal, Radio } from 'antd'
 import { useRouter } from 'next/navigation'
@@ -52,6 +52,8 @@ const CopyRoadmapForm = ({
 }: CopyRoadmapFormProps) => {
   const router = useRouter()
   const messageApi = useMessage()
+  const { user } = useAuth()
+  const currentUserInternalEmployeeId = user?.employeeId
 
   const {
     data: visibilityData,
@@ -63,11 +65,6 @@ const CopyRoadmapForm = ({
     data: employeeData,
     error: employeeOptionsError,
   } = useGetEmployeeOptionsQuery(false)
-
-  const {
-    data: currentUserInternalEmployeeId,
-    error: currentUserInternalEmployeeIdError,
-  } = useGetInternalEmployeeIdQuery()
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<CopyRoadmapFormValues>({
@@ -133,14 +130,7 @@ const CopyRoadmapForm = ({
           'An error occurred while loading employee options. Please try again.',
       )
     }
-    if (currentUserInternalEmployeeIdError) {
-      messageApi.error(
-        currentUserInternalEmployeeIdError.supportMessage ??
-          'An error occurred while loading current user profile data. Please try again.',
-      )
-    }
   }, [
-    currentUserInternalEmployeeIdError,
     employeeOptionsError,
     error,
     messageApi,

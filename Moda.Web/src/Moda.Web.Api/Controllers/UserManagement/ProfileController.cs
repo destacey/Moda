@@ -1,4 +1,4 @@
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using Moda.Common.Application.Interfaces;
 using Moda.Web.Api.Models.UserManagement.Profiles;
 
@@ -7,18 +7,11 @@ namespace Moda.Web.Api.Controllers.UserManagement;
 [Route("api/user-management/profiles")]
 [ApiVersionNeutral]
 [ApiController]
-public class ProfileController : ControllerBase
+public class ProfileController(IUserService userService, ISender sender, ICurrentUser currentUser) : ControllerBase
 {
-    private readonly IUserService _userService;
-    private readonly ISender _sender;
-    private readonly ICurrentUser _currentUser;
-
-    public ProfileController(IUserService userService, ISender sender, ICurrentUser currentUser)
-    {
-        _userService = userService;
-        _sender = sender;
-        _currentUser = currentUser;
-    }
+    private readonly IUserService _userService = userService;
+    private readonly ISender _sender = sender;
+    private readonly ICurrentUser _currentUser = currentUser;
 
     [HttpGet]
     [OpenApiOperation("Get profile details of currently logged in user.", "")]
@@ -49,21 +42,15 @@ public class ProfileController : ControllerBase
     [OpenApiOperation("Get permissions of currently logged in user.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<List<string>>> GetPermissions(CancellationToken cancellationToken)
+    public async Task<ActionResult<UserPermissionsResponse>> GetPermissions(CancellationToken cancellationToken)
     {
-        return User.GetUserId() is not { } userId || string.IsNullOrEmpty(userId)
-            ? Unauthorized()
-            : Ok(await _userService.GetPermissionsAsync(userId, cancellationToken));
-    }
+        if (User.GetUserId() is not { } userId || string.IsNullOrEmpty(userId))
+            return Unauthorized();
 
-    [HttpGet("internal-employee-id")]
-    [OpenApiOperation("Get internal employee id of currently logged in user.", "")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public Task<ActionResult<string>> GetInternalEmployeeId()
-    {
-        // TODO: move this to a claim
-        return Task.FromResult<ActionResult<string>>(Ok(_currentUser.GetEmployeeId()));
+        var permissions = await _userService.GetPermissionsAsync(userId, cancellationToken);
+        var employeeId = _currentUser.GetEmployeeId();
+
+        return Ok(new UserPermissionsResponse(permissions, employeeId));
     }
 
     [HttpGet("logs")]

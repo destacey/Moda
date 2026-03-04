@@ -25,7 +25,6 @@ import {
 import { MarkdownRenderer } from '@/src/components/common/markdown'
 import CreateRoadmapActivityForm from '../_components/create-roadmap-activity-form'
 import CreateRoadmapTimeboxForm from '../_components/create-roadmap-timebox-form'
-import { useGetInternalEmployeeIdQuery } from '@/src/store/features/user-management/profile-api'
 
 const { Item } = Descriptions
 
@@ -53,7 +52,8 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
 
   const router = useRouter()
 
-  const { hasPermissionClaim } = useAuth()
+  const { user, hasPermissionClaim } = useAuth()
+  const currentUserInternalEmployeeId = user?.employeeId
   const canUpdateRoadmap = hasPermissionClaim('Permissions.Roadmaps.Update')
   const canDeleteRoadmap = hasPermissionClaim('Permissions.Roadmaps.Delete')
   const canCreateRoadmap = hasPermissionClaim('Permissions.Roadmaps.Create')
@@ -66,11 +66,6 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   } = useGetRoadmapQuery(roadmapKey.toString())
 
   useDocumentTitle(`${roadmapData?.name ?? roadmapKey} - Roadmap Details`)
-
-  const {
-    data: currentUserInternalEmployeeId,
-    error: currentUserInternalEmployeeIdError,
-  } = useGetInternalEmployeeIdQuery()
 
   const {
     data: roadmapItems,

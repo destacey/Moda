@@ -57,6 +57,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     name: '',
     username: '',
     isAuthenticated: false,
+    employeeId: null,
     claims: [],
   })
 
@@ -162,12 +163,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
    * -------------------------------------------------------------
    */
   const {
-    data: permissions,
+    data: permissionsData,
     isLoading: permissionsLoading,
     error: permissionsError,
     refetch: refetchPermissions,
   } = useGetUserPermissionsQuery(undefined, {
     skip: !isReady || !isAuthenticated || !activeAccount,
+    pollingInterval: 5 * 60 * 1000, // Re-fetch permissions every 5 minutes
   })
 
   /**
@@ -224,6 +226,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         name: '',
         username: '',
         isAuthenticated: false,
+        employeeId: null,
         claims: [],
       })
       setIsLoading(false)
@@ -244,9 +247,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
       }
 
-      if (permissions) {
+      if (permissionsData) {
+        if (permissionsData.employeeId) {
+          claims.push({
+            type: 'EmployeeId',
+            value: permissionsData.employeeId,
+          })
+        }
         claims.push(
-          ...permissions.map((p) => ({
+          ...permissionsData.permissions.map((p) => ({
             type: 'Permission',
             value: p,
           })),
@@ -300,6 +309,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         name: activeAccount.name ?? '',
         username: activeAccount.username,
         isAuthenticated: true,
+        employeeId: permissionsData?.employeeId ?? null,
         claims,
       })
     } catch (error) {
@@ -308,6 +318,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         name: '',
         username: '',
         isAuthenticated: false,
+        employeeId: null,
         claims: [],
       })
     } finally {
@@ -316,7 +327,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, [
     activeAccount,
     permissionsLoading,
-    permissions,
+    permissionsData,
     permissionsError,
     inProgress,
     instance,
@@ -377,8 +388,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
    * -------------------------------------------------------------
    */
   const permissionsSet = useMemo(
-    () => new Set(permissions ?? []),
-    [permissions],
+    () => new Set(permissionsData?.permissions ?? []),
+    [permissionsData],
   )
 
   const authContext = useMemo<AuthContextType>(

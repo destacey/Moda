@@ -109,7 +109,6 @@ export enum QueryTags {
 
   // USER PROFILE
   Profile = 'UserManagement.Profile',
-  InternalEmployeeId = 'UserManagement.InternalEmployeeId',
   PersonalAccessTokens = 'UserManagement.PersonalAccessTokens',
 
   // WORK MANAGEMENT

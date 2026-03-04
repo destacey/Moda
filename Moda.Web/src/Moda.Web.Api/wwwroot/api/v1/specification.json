@@ -527,49 +527,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": []
-          },
-          {
-            "ApiKey": []
-          }
-        ]
-      }
-    },
-    "/api/user-management/profiles/internal-employee-id": {
-      "get": {
-        "tags": [
-          "Profile"
-        ],
-        "summary": "Get internal employee id of currently logged in user.",
-        "operationId": "Profile_GetInternalEmployeeId",
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "string"
+                  "$ref": "#/components/schemas/UserPermissionsResponse"
                 }
               }
             }
@@ -18376,6 +18334,27 @@
           "phoneNumber": {
             "type": "string",
             "nullable": true
+          }
+        }
+      },
+      "UserPermissionsResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "permissions"
+        ],
+        "properties": {
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "employeeId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true,
+            "example": "00000000-0000-0000-0000-000000000000"
           }
         }
       },
