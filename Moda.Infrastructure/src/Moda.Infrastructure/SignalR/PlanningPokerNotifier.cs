@@ -36,11 +36,11 @@ internal sealed class PlanningPokerNotifier(IHubContext<PlanningPokerHub> hubCon
         await _hubContext.Clients.Group(sessionId.ToString())
             .SendAsync("ConsensusSet", sessionId, roundId, estimate);
 
-    public async Task NotifyVoteSubmitted(Guid sessionId, Guid roundId, Guid participantId, string participantName) =>
+    public async Task NotifyVoteSubmitted(Guid sessionId, Guid roundId, string participantId, string participantName) =>
         await _hubContext.Clients.Group(sessionId.ToString())
             .SendAsync("VoteSubmitted", sessionId, roundId, participantId, participantName);
 
-    public async Task NotifyVoteWithdrawn(Guid sessionId, Guid roundId, Guid participantId) =>
+    public async Task NotifyVoteWithdrawn(Guid sessionId, Guid roundId, string participantId) =>
         await _hubContext.Clients.Group(sessionId.ToString())
             .SendAsync("VoteWithdrawn", sessionId, roundId, participantId);
 

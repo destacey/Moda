@@ -37,16 +37,15 @@ internal sealed class RevokePersonalAccessTokenCommandHandler(
         try
         {
             var userId = _currentUser.GetUserId();
-            var userIdString = userId.ToString();
 
             var token = await _dbContext.PersonalAccessTokens
-                .FirstOrDefaultAsync(t => t.Id == request.TokenId && t.UserId == userIdString, cancellationToken);
+                .FirstOrDefaultAsync(t => t.Id == request.TokenId && t.UserId == userId, cancellationToken);
 
             if (token == null)
             {
                 _logger.LogWarning(
                     "Attempt to revoke personal access token failed. Token not found or no permission. UserId: {UserId}, TokenId: {TokenId}",
-                    userIdString, request.TokenId);
+                    userId, request.TokenId);
                 return Result.Failure("Token not found or you do not have permission to revoke it.");
             }
 
@@ -60,7 +59,7 @@ internal sealed class RevokePersonalAccessTokenCommandHandler(
 
             _logger.LogInformation(
                 "Personal access token revoked. UserId: {UserId}, TokenId: {TokenId}, TokenName: {TokenName}",
-                userIdString, token.Id, token.Name);
+                userId, token.Id, token.Name);
 
             return Result.Success();
         }

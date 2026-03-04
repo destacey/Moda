@@ -19,7 +19,7 @@ public sealed class PersonalAccessTokenFaker : PrivateConstructorFaker<PersonalA
         RuleFor(x => x.Scopes, f => f.Random.Bool() ? null : $"[\"Permissions.{f.PickRandom("WorkItems", "Teams", "Projects")}.{f.PickRandom("View", "Create", "Update")}\"]");
         RuleFor(x => x.LastUsedAt, (Instant?)null);
         RuleFor(x => x.RevokedAt, (Instant?)null);
-        RuleFor(x => x.RevokedBy, (Guid?)null);
+        RuleFor(x => x.RevokedBy, (string?)null);
     }
 }
 
@@ -79,7 +79,7 @@ public static class PersonalAccessTokenFakerExtensions
         return faker;
     }
 
-    public static PersonalAccessTokenFaker WithRevokedToken(this PersonalAccessTokenFaker faker, Guid revokedBy, Instant? revokedAt = null)
+    public static PersonalAccessTokenFaker WithRevokedToken(this PersonalAccessTokenFaker faker, string revokedBy, Instant? revokedAt = null)
     {
         var now = revokedAt ?? SystemClock.Instance.GetCurrentInstant();
 
@@ -88,10 +88,10 @@ public static class PersonalAccessTokenFakerExtensions
         return faker;
     }
 
-    public static PersonalAccessTokenFaker AsRevoked(this PersonalAccessTokenFaker faker, Guid? revokedBy = null, Instant? revokedAt = null)
+    public static PersonalAccessTokenFaker AsRevoked(this PersonalAccessTokenFaker faker, string? revokedBy = null, Instant? revokedAt = null)
     {
         var now = revokedAt ?? SystemClock.Instance.GetCurrentInstant();
-        var revokedById = revokedBy ?? Guid.NewGuid();
+        var revokedById = revokedBy ?? Guid.NewGuid().ToString();
 
         faker.RuleFor(x => x.RevokedAt, now);
         faker.RuleFor(x => x.RevokedBy, revokedById);
@@ -125,7 +125,7 @@ public static class PersonalAccessTokenFakerExtensions
         faker.WithExpiresAt(now.Plus(Duration.FromDays(30)));
 
         faker.RuleFor(x => x.RevokedAt, (Instant?)null);
-        faker.RuleFor(x => x.RevokedBy, (Guid?)null);
+        faker.RuleFor(x => x.RevokedBy, (string?)null);
 
         return faker;
     }

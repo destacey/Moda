@@ -663,7 +663,6 @@ public class PokerSessionConfig : IEntityTypeConfiguration<PokerSession>
         builder.Property(s => s.EstimationScaleId).IsRequired();
         builder.Property(s => s.FacilitatorId)
             .IsRequired()
-            .HasConversion(guid => guid.ToString(), str => Guid.Parse(str))
             .HasMaxLength(450);
         builder.Property(s => s.Status).IsRequired()
             .HasConversion<EnumConverter<PokerSessionStatus>>()
@@ -736,7 +735,6 @@ public class PokerVoteConfig : IEntityTypeConfiguration<PokerVote>
         builder.Property(v => v.PokerRoundId).IsRequired();
         builder.Property(v => v.ParticipantId)
             .IsRequired()
-            .HasConversion(guid => guid.ToString(), str => Guid.Parse(str))
             .HasMaxLength(450);
         builder.Property(v => v.Value).IsRequired().HasMaxLength(32);
         builder.Property(v => v.SubmittedOn).IsRequired();

@@ -22,7 +22,7 @@ internal sealed class SubmitVoteCommandHandler(IPlanningDbContext planningDbCont
     private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
     private readonly IPokerSessionNotifier _notifier = notifier;
     private readonly ILogger<SubmitVoteCommandHandler> _logger = logger;
-    private readonly Guid _currentUserId = currentUser.GetUserId();
+    private readonly string _currentUserId = currentUser.GetUserId();
 
     public async Task<Result> Handle(SubmitVoteCommand request, CancellationToken cancellationToken)
     {

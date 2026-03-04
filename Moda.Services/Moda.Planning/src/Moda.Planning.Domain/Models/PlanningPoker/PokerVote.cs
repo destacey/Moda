@@ -8,7 +8,7 @@ public class PokerVote : BaseEntity<Guid>
 {
     private PokerVote() { }
 
-    internal PokerVote(Guid pokerRoundId, Guid participantId, string value, Instant submittedOn)
+    internal PokerVote(Guid pokerRoundId, string participantId, string value, Instant submittedOn)
     {
         PokerRoundId = pokerRoundId;
         ParticipantId = participantId;
@@ -18,7 +18,7 @@ public class PokerVote : BaseEntity<Guid>
 
     public Guid PokerRoundId { get; private set; }
 
-    public Guid ParticipantId { get; private set; }
+    public string ParticipantId { get; private set; } = null!;
 
     public User? Participant { get; private set; }
 

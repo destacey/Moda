@@ -4,8 +4,8 @@ namespace Moda.Common.Domain.Interfaces;
 
 public interface IAuditable
 {
-    public Guid? CreatedBy { get; set; }
+    public string? CreatedBy { get; set; }
     public Instant Created { get; set; }
-    public Guid? LastModifiedBy { get; set; }
+    public string? LastModifiedBy { get; set; }
     public Instant LastModified { get; set; }
 }

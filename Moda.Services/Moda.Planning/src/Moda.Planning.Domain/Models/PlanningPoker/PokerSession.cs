@@ -13,7 +13,7 @@ public class PokerSession : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey
 
     private PokerSession() { }
 
-    private PokerSession(string name, int estimationScaleId, Guid facilitatorId)
+    private PokerSession(string name, int estimationScaleId, string facilitatorId)
     {
         Name = name;
         EstimationScaleId = estimationScaleId;
@@ -44,7 +44,7 @@ public class PokerSession : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey
     /// <summary>
     /// The user who facilitates this session.
     /// </summary>
-    public Guid FacilitatorId { get; private set; }
+    public string FacilitatorId { get; private set; } = null!;
 
     public User? Facilitator { get; private set; }
 
@@ -194,7 +194,7 @@ public class PokerSession : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey
     /// <summary>
     /// Submit a vote for a specific round.
     /// </summary>
-    public Result SubmitVote(Guid roundId, Guid participantId, string value, Instant timestamp)
+    public Result SubmitVote(Guid roundId, string participantId, string value, Instant timestamp)
     {
         if (Status != PokerSessionStatus.Active)
             return Result.Failure("Cannot vote when the session is not active.");
@@ -209,7 +209,7 @@ public class PokerSession : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey
     /// <summary>
     /// Withdraw a vote from a specific round.
     /// </summary>
-    public Result WithdrawVote(Guid roundId, Guid participantId)
+    public Result WithdrawVote(Guid roundId, string participantId)
     {
         if (Status != PokerSessionStatus.Active)
             return Result.Failure("Cannot withdraw vote when the session is not active.");
@@ -248,7 +248,7 @@ public class PokerSession : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey
     /// <summary>
     /// Create a new poker session. The session is immediately activated and ready to accept rounds.
     /// </summary>
-    public static Result<PokerSession> Create(string name, int estimationScaleId, Guid facilitatorId, Instant timestamp)
+    public static Result<PokerSession> Create(string name, int estimationScaleId, string facilitatorId, Instant timestamp)
     {
         try
         {

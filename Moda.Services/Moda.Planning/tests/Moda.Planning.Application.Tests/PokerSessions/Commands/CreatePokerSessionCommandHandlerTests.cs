@@ -17,7 +17,7 @@ public class CreatePokerSessionCommandHandlerTests : IDisposable
     private readonly Mock<IDateTimeProvider> _mockDateTimeProvider;
 
     private readonly EstimationScaleFaker _estimationScaleFaker;
-    private readonly Guid _currentUserId = Guid.NewGuid();
+    private readonly string _currentUserId = Guid.NewGuid().ToString();
 
     public CreatePokerSessionCommandHandlerTests()
     {

@@ -13,7 +13,7 @@ public class PokerVoteFaker : PrivateConstructorFaker<PokerVote>
     {
         RuleFor(x => x.Id, f => f.Random.Guid());
         RuleFor(x => x.PokerRoundId, f => f.Random.Guid());
-        RuleFor(x => x.ParticipantId, f => f.Random.Guid());
+        RuleFor(x => x.ParticipantId, f => f.Random.Guid().ToString());
         RuleFor(x => x.Value, f => f.PickRandom(ScaleValues));
         RuleFor(x => x.SubmittedOn, f => f.Date.Recent().ToUniversalTime().ToInstant());
     }
@@ -33,7 +33,7 @@ public static class PokerVoteFakerExtensions
         return faker;
     }
 
-    public static PokerVoteFaker WithParticipantId(this PokerVoteFaker faker, Guid participantId)
+    public static PokerVoteFaker WithParticipantId(this PokerVoteFaker faker, string participantId)
     {
         faker.RuleFor(x => x.ParticipantId, participantId);
         return faker;

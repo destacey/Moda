@@ -139,7 +139,7 @@ internal class RoleService(
                     RoleId = role.Id,
                     ClaimType = ApplicationClaims.Permission,
                     ClaimValue = permission,
-                    CreatedBy = _currentUser.GetUserId().ToString()
+                    CreatedBy = _currentUser.GetUserId()
                 });
                 await _db.SaveChangesAsync(cancellationToken);
             }

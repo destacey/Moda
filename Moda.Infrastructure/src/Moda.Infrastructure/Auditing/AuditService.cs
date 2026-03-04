@@ -1,15 +1,13 @@
-using Mapster;
+﻿using Mapster;
 using Microsoft.EntityFrameworkCore;
 
 namespace Moda.Infrastructure.Auditing;
 
-public class AuditService : IAuditService
+public class AuditService(ModaDbContext context) : IAuditService
 {
-    private readonly ModaDbContext _context;
+    private readonly ModaDbContext _context = context;
 
-    public AuditService(ModaDbContext context) => _context = context;
-
-    public async Task<List<AuditDto>> GetUserTrailsAsync(Guid userId)
+    public async Task<List<AuditDto>> GetUserTrailsAsync(string userId)
     {
         var trails = await _context.AuditTrails
             .AsNoTracking()

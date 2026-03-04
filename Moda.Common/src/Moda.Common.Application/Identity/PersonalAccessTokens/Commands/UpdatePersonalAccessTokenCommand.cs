@@ -42,7 +42,7 @@ public sealed class UpdatePersonalAccessTokenCommandValidator : CustomValidator<
 
     private async Task<bool> BeUniqueTokenName(UpdatePersonalAccessTokenCommand command, string name, CancellationToken cancellationToken)
     {
-        var userId = _currentUser.GetUserId().ToString();
+        var userId = _currentUser.GetUserId();
         return !await _dbContext.PersonalAccessTokens
             .AnyAsync(t => t.UserId == userId && t.Name == name && t.RevokedAt == null && t.Id != command.TokenId, cancellationToken);
     }
@@ -74,7 +74,7 @@ internal sealed class UpdatePersonalAccessTokenCommandHandler(
     {
         try
         {
-            var userIdString = _currentUser.GetUserId().ToString();
+            var userIdString = _currentUser.GetUserId();
             var now = _dateTimeProvider.Now;
 
             var token = await _dbContext.PersonalAccessTokens

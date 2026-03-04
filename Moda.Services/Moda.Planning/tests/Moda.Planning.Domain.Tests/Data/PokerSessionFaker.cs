@@ -12,7 +12,7 @@ public class PokerSessionFaker : PrivateConstructorFaker<PokerSession>
         RuleFor(x => x.Key, f => f.Random.Int(1, 10000));
         RuleFor(x => x.Name, f => f.Lorem.Sentence(3));
         RuleFor(x => x.EstimationScaleId, f => f.Random.Int(1, 100));
-        RuleFor(x => x.FacilitatorId, f => f.Random.Guid());
+        RuleFor(x => x.FacilitatorId, f => f.Random.Guid().ToString());
         RuleFor(x => x.Status, PokerSessionStatus.Active);
     }
 }
@@ -43,7 +43,7 @@ public static class PokerSessionFakerExtensions
         return faker;
     }
 
-    public static PokerSessionFaker WithFacilitatorId(this PokerSessionFaker faker, Guid facilitatorId)
+    public static PokerSessionFaker WithFacilitatorId(this PokerSessionFaker faker, string facilitatorId)
     {
         faker.RuleFor(x => x.FacilitatorId, facilitatorId);
         return faker;

@@ -1,10 +1,10 @@
-using NodaTime;
+﻿using NodaTime;
 
 namespace Moda.Infrastructure.Auditing;
 
-public class Trail : BaseEntity<Guid>
+public sealed class Trail : BaseEntity<Guid>
 {
-    public Guid UserId { get; set; }
+    public required string UserId { get; set; }
     public string? Type { get; set; }
     public string? SchemaName { get; set; }
     public string? TableName { get; set; }

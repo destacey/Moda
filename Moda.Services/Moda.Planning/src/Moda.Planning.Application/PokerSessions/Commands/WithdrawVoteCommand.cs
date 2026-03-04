@@ -20,7 +20,7 @@ internal sealed class WithdrawVoteCommandHandler(IPlanningDbContext planningDbCo
     private readonly IPlanningDbContext _planningDbContext = planningDbContext;
     private readonly IPokerSessionNotifier _notifier = notifier;
     private readonly ILogger<WithdrawVoteCommandHandler> _logger = logger;
-    private readonly Guid _currentUserId = currentUser.GetUserId();
+    private readonly string _currentUserId = currentUser.GetUserId();
 
     public async Task<Result> Handle(WithdrawVoteCommand request, CancellationToken cancellationToken)
     {
