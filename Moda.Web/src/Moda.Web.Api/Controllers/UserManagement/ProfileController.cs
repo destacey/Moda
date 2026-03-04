@@ -1,4 +1,4 @@
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using Moda.Common.Application.Interfaces;
 using Moda.Web.Api.Models.UserManagement.Profiles;
 
@@ -7,18 +7,11 @@ namespace Moda.Web.Api.Controllers.UserManagement;
 [Route("api/user-management/profiles")]
 [ApiVersionNeutral]
 [ApiController]
-public class ProfileController : ControllerBase
+public class ProfileController(IUserService userService, ISender sender, ICurrentUser currentUser) : ControllerBase
 {
-    private readonly IUserService _userService;
-    private readonly ISender _sender;
-    private readonly ICurrentUser _currentUser;
-
-    public ProfileController(IUserService userService, ISender sender, ICurrentUser currentUser)
-    {
-        _userService = userService;
-        _sender = sender;
-        _currentUser = currentUser;
-    }
+    private readonly IUserService _userService = userService;
+    private readonly ISender _sender = sender;
+    private readonly ICurrentUser _currentUser = currentUser;
 
     [HttpGet]
     [OpenApiOperation("Get profile details of currently logged in user.", "")]
@@ -60,7 +53,7 @@ public class ProfileController : ControllerBase
         return Ok(new UserPermissionsResponse(permissions, employeeId));
     }
 
-[HttpGet("logs")]
+    [HttpGet("logs")]
     [OpenApiOperation("Get audit logs of currently logged in user.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]

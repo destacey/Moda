@@ -36,6 +36,19 @@ internal class AzureAdJwtBearerEvents : JwtBearerEvents
         return base.MessageReceived(context);
     }
 
+    public override async Task Challenge(JwtBearerChallengeContext context)
+    {
+        if (context.HttpContext.Items.TryGetValue("RegistrationDenied", out var message))
+        {
+            context.HandleResponse();
+            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+            await context.Response.WriteAsJsonAsync(new { message });
+            return;
+        }
+
+        await base.Challenge(context);
+    }
+
     /// <summary>
     /// This method contains the logic that validates the user and normalizes claims.
     /// </summary>
@@ -67,8 +80,10 @@ internal class AzureAdJwtBearerEvents : JwtBearerEvents
         catch (ForbiddenException ex)
         {
             _logger.RegistrationDenied(objectId, ex.Message);
-            context.Response.StatusCode = StatusCodes.Status403Forbidden;
-            await context.Response.WriteAsJsonAsync(new { message = ex.Message });
+            // Store the exception so OnChallenge can write the 403 response.
+            // Writing the response here and calling Fail() can race with the
+            // handler's default challenge, so we defer to OnChallenge instead.
+            context.HttpContext.Items["RegistrationDenied"] = ex.Message;
             context.Fail(ex);
             return;
         }
