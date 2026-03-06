@@ -2,7 +2,6 @@
 
 import '@/styles/globals.css'
 import React, { memo, PropsWithChildren, useMemo } from 'react'
-import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community'
 import { Provider } from 'react-redux'
 import { Inter } from 'next/font/google'
 import { App, Grid, Layout } from 'antd'
@@ -32,9 +31,6 @@ import { usePathname } from 'next/navigation'
 const { Content } = Layout
 
 const inter = Inter({ subsets: ['latin'] })
-
-// Register all community features for ag-grid
-ModuleRegistry.registerModules([AllCommunityModule])
 
 /**
  * Shows the appropriate page for unauthenticated users based on route

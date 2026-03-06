@@ -1,11 +1,21 @@
 'use client'
 
-import { BuildOutlined, MenuOutlined } from '@ant-design/icons'
+import { AppstoreOutlined, BuildOutlined, MenuOutlined } from '@ant-design/icons'
 import Segmented, { SegmentedLabeledOption } from 'antd/es/segmented'
 import { memo, useMemo, useState } from 'react'
 import { ProjectListDto } from '@/src/services/moda-api'
+import { Spin } from 'antd'
+import dynamic from 'next/dynamic'
 import ProjectsGrid from './projects-grid'
-import { ProjectsTimeline } from '.'
+import ProjectsCardView from './projects-card-view'
+import ProjectDrawer from './project-drawer'
+
+const ProjectsTimeline = dynamic(() => import('./projects-timeline'), {
+  ssr: false,
+  loading: () => <Spin />,
+})
+
+type ProjectView = 'Card' | 'List' | 'Timeline'
 
 interface ProjectViewManagerProps {
   projects: ProjectListDto[]
@@ -14,9 +24,14 @@ interface ProjectViewManagerProps {
   hidePortfolio?: boolean
   hideProgram?: boolean
   groupByProgram?: boolean
+  defaultView?: ProjectView
 }
 
 const viewSelectorOptions: SegmentedLabeledOption[] = [
+  {
+    value: 'Card',
+    icon: <AppstoreOutlined title="Card view" />,
+  },
   {
     value: 'List',
     icon: <MenuOutlined alt="List" title="List" />,
@@ -28,7 +43,16 @@ const viewSelectorOptions: SegmentedLabeledOption[] = [
 ]
 
 const ProjectViewManager = (props: ProjectViewManagerProps) => {
-  const [currentView, setCurrentView] = useState<string | number>('List')
+  const [currentView, setCurrentView] = useState<string | number>(
+    props.defaultView ?? 'List',
+  )
+  const [selectedProjectKey, setSelectedProjectKey] = useState<string | null>(null)
+  const [drawerOpen, setDrawerOpen] = useState(false)
+
+  const onCardClick = (key: string) => {
+    setSelectedProjectKey(key)
+    setDrawerOpen(true)
+  }
 
   const viewSelector = useMemo(
     () => (
@@ -43,6 +67,14 @@ const ProjectViewManager = (props: ProjectViewManagerProps) => {
 
   return (
     <>
+      {currentView === 'Card' && (
+        <ProjectsCardView
+          projects={props.projects}
+          isLoading={props.isLoading}
+          viewSelector={viewSelector}
+          onCardClick={onCardClick}
+        />
+      )}
       {currentView === 'List' && (
         <ProjectsGrid
           projects={props.projects}
@@ -61,6 +93,16 @@ const ProjectViewManager = (props: ProjectViewManagerProps) => {
           refetch={props.refetch}
           viewSelector={viewSelector}
           groupByProgram={props.groupByProgram}
+        />
+      )}
+      {selectedProjectKey && (
+        <ProjectDrawer
+          projectKey={selectedProjectKey}
+          drawerOpen={drawerOpen}
+          onDrawerClose={() => {
+            setDrawerOpen(false)
+            setSelectedProjectKey(null)
+          }}
         />
       )}
     </>

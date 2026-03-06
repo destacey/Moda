@@ -8,10 +8,10 @@ public enum BackgroundJobType
     [Display(Name = "Employee Sync", Description = "Synchronize employees from external directory service.", Order = 1, GroupName = "Integration Jobs")]
     EmployeeSync = 0,
 
-    [Display(Name = "Azure DevOps Boards Full Sync", Description = "Synchronize active connectors for Azure DevOps Boards and return all work items.", Order = 2, GroupName = "Integration Jobs")]
+    [Display(Name = "Azure DevOps Full Sync", Description = "Synchronize active connectors for Azure DevOps and return all work items.", Order = 2, GroupName = "Integration Jobs")]
     AzdoBoardsFullSync = 1,
 
-    [Display(Name = "Azure DevOps Boards Differential Sync", Description = "Synchronize active connectors for Azure DevOps Boards and return work items that have changed since the last sync.", Order = 3, GroupName = "Integration Jobs")]
+    [Display(Name = "Azure DevOps Differential Sync", Description = "Synchronize active connectors for Azure DevOps and return work items that have changed since the last sync.", Order = 3, GroupName = "Integration Jobs")]
     AzdoBoardsDiffSync = 2,
 
 

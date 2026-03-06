@@ -1,95 +1,63 @@
 'use client'
 
-import useAuth from '@/src/components/contexts/auth'
 import { useMessage } from '@/src/components/contexts/messaging'
+import { useConfirmModal } from '@/src/hooks'
 import { RoadmapDetailsDto } from '@/src/services/moda-api'
 import { useDeleteRoadmapMutation } from '@/src/store/features/planning/roadmaps-api'
 import { Modal } from 'antd'
-import { useEffect, useState } from 'react'
+import { useCallback } from 'react'
 
 export interface DeleteRoadmapFormProps {
   roadmap: RoadmapDetailsDto
-  showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
 }
 
-const DeleteRoadmapForm = (props: DeleteRoadmapFormProps) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-
+const DeleteRoadmapForm = ({
+  roadmap,
+  onFormComplete,
+  onFormCancel,
+}: DeleteRoadmapFormProps) => {
   const messageApi = useMessage()
 
-  const [deleteRoadmapMutation, { error: mutationError }] =
-    useDeleteRoadmapMutation()
+  const [deleteRoadmapMutation] = useDeleteRoadmapMutation()
 
-  const { hasPermissionClaim } = useAuth()
-  const canDeleteRoadmap = hasPermissionClaim('Permissions.Roadmaps.Delete')
-
-  useEffect(() => {
-    if (!props.roadmap) return
-    if (canDeleteRoadmap) {
-      setIsOpen(props.showForm)
-    } else {
-      props.onFormCancel()
-      messageApi.error('You do not have permission to delete roadmaps.')
-    }
-  }, [canDeleteRoadmap, messageApi, props])
-
-  const deleteRoadmap = async (roadmap: RoadmapDetailsDto) => {
-    try {
-      await deleteRoadmapMutation(roadmap.id)
-      return true
-    } catch (error) {
-      messageApi.error(
-        'An unexpected error occurred while deleting the roadmap.',
-      )
-      console.log(error)
-      return false
-    }
-  }
-
-  const handleOk = async () => {
-    setIsSaving(true)
-    try {
-      if (await deleteRoadmap(props.roadmap)) {
+  const { isOpen, isSaving, handleOk, handleCancel } = useConfirmModal({
+    onSubmit: useCallback(async () => {
+      try {
+        await deleteRoadmapMutation(roadmap.id)
         // TODO: not working because the parent page is gone
         messageApi.success('Successfully deleted Roadmap.')
-        props.onFormComplete()
-        setIsOpen(false)
+        return true
+      } catch (error) {
+        messageApi.error(
+          'An unexpected error occurred while deleting the roadmap.',
+        )
+        console.log(error)
+        return false
       }
-    } catch (errorInfo) {
-      console.log('handleOk error', errorInfo)
-      messageApi.error(
-        'An unexpected error occurred while deleting the roadmap.',
-      )
-    } finally {
-      setIsSaving(false)
-    }
-  }
-
-  const handleCancel = () => {
-    setIsOpen(false)
-    props.onFormCancel()
-  }
+    }, [deleteRoadmapMutation, roadmap, messageApi]),
+    onComplete: onFormComplete,
+    onCancel: onFormCancel,
+    errorMessage:
+      'An unexpected error occurred while deleting the roadmap.',
+    permission: 'Permissions.Roadmaps.Delete',
+  })
 
   return (
-    <>
-      <Modal
-        title="Are you sure you want to delete this Roadmap?"
-        open={isOpen}
-        onOk={handleOk}
-        okText="Delete"
-        okType="danger"
-        confirmLoading={isSaving}
-        onCancel={handleCancel}
-        maskClosable={false}
-        keyboard={false} // disable esc key to close modal
-        destroyOnHidden={true}
-      >
-        {props.roadmap?.key} - {props.roadmap?.name}
-      </Modal>
-    </>
+    <Modal
+      title="Are you sure you want to delete this Roadmap?"
+      open={isOpen}
+      onOk={handleOk}
+      okText="Delete"
+      okType="danger"
+      confirmLoading={isSaving}
+      onCancel={handleCancel}
+      keyboard={false} // disable esc key to close modal
+      destroyOnHidden
+    >
+      {roadmap?.key} - {roadmap?.name}
+    </Modal>
   )
 }
 

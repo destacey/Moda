@@ -1,4 +1,4 @@
-﻿using Ardalis.GuardClauses;
+using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
 using Moda.Common.Domain.Data;
 using NodaTime;
@@ -21,12 +21,14 @@ public abstract class KpiCheckpoint : BaseEntity<Guid>
     /// <param name="targetValue">The planned target value for the KPI at this checkpoint.</param>
     /// <param name="checkpointDate">The date and time when this planned target is expected to be achieved.</param>
     /// <param name="dateLabel">A short label that describes the date of this checkpoint.</param>
-    protected KpiCheckpoint(Guid kpiId, double targetValue, Instant checkpointDate, string dateLabel)
+    /// <param name="atRiskValue">The optional at-risk threshold value for this checkpoint.</param>
+    protected KpiCheckpoint(Guid kpiId, double targetValue, Instant checkpointDate, string dateLabel, double? atRiskValue = null)
     {
         KpiId = kpiId;
         TargetValue = targetValue;
         CheckpointDate = checkpointDate;
         DateLabel = dateLabel;
+        AtRiskValue = atRiskValue;
     }
 
     /// <summary>
@@ -40,6 +42,12 @@ public abstract class KpiCheckpoint : BaseEntity<Guid>
     public double TargetValue { get; protected set; }
 
     /// <summary>
+    /// The optional at-risk threshold value for this checkpoint. When set, enables 3-zone health assessment:
+    /// Healthy (actual met target), AtRisk (actual between AtRiskValue and TargetValue), Unhealthy (actual missed AtRiskValue).
+    /// </summary>
+    public double? AtRiskValue { get; protected set; }
+
+    /// <summary>
     /// The date and time when the planned target is expected to be achieved.
     /// </summary>
     public Instant CheckpointDate { get; protected set; }
@@ -47,24 +55,26 @@ public abstract class KpiCheckpoint : BaseEntity<Guid>
     /// <summary>
     /// A short label that describes the date of this checkpoint. For example, "Q1" or "Jan".
     /// </summary>
-    public string DateLabel 
-    { 
-        get => _dateLabel; 
+    public string DateLabel
+    {
+        get => _dateLabel;
         protected set => _dateLabel = Guard.Against.NullOrWhiteSpace(value, nameof(DateLabel)).Trim();
     }
 
     /// <summary>
-    /// Updates the target value and checkpoint date for this KPI checkpoint.
+    /// Updates the target value, checkpoint date, date label, and optional at-risk value for this KPI checkpoint.
     /// </summary>
     /// <param name="targetValue"></param>
     /// <param name="checkpointDate"></param>
     /// <param name="dateLabel"></param>
+    /// <param name="atRiskValue"></param>
     /// <returns></returns>
-    public virtual Result Update(double targetValue, Instant checkpointDate, string dateLabel)
+    public virtual Result Update(double targetValue, Instant checkpointDate, string dateLabel, double? atRiskValue = null)
     {
         TargetValue = targetValue;
         CheckpointDate = checkpointDate;
         DateLabel = dateLabel;
+        AtRiskValue = atRiskValue;
 
         return Result.Success();
     }

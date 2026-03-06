@@ -1,5 +1,6 @@
 /* General Reset */
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   height: 100%;
@@ -18,8 +19,10 @@ html, body {
   height: calc(100vh - 50px); /* Adjust height for the header */
 }
 
-.app-side-nav  {
-  height: calc(100vh - 50px); /* Adjust height to account for the fixed header */
+.app-side-nav {
+  height: calc(
+    100vh - 50px
+  ); /* Adjust height to account for the fixed header */
   overflow: hidden; /* Ensure the sidebar is fixed and does not scroll */
 }
 
@@ -30,7 +33,9 @@ html, body {
   padding: 0 24px 24px; /* 0 top, 24px left/right/bottom */
 }
 
-/* Utility Classes */
+.app-main-content > .app-breadcrumb {
+  margin: 16px 0;
+}
 
 /* Flex container with column layout */
 .flex-column {
@@ -57,7 +62,7 @@ html, body {
       scrollbar-color: #d0d0d0 #f0f0f0; /* Thumb color and track color for light mode */
     }
 
-    [data-theme="dark"] * {
+    [data-theme='dark'] * {
       scrollbar-width: thin;
       scrollbar-color: #656565 #2a2a2a; /* Thumb color and track color for dark mode */
     }
@@ -68,7 +73,7 @@ html, body {
       scrollbar-color: #d0d0d0 #f0f0f0;
     }
 
-    [data-theme="dark"] .ant-drawer-body {
+    [data-theme='dark'] .ant-drawer-body {
       scrollbar-width: thin;
       scrollbar-color: #656565 #2a2a2a;
     }
@@ -94,12 +99,12 @@ html, body {
   }
 
   /* Scrollbar Styling for Dark Mode */
-  [data-theme="dark"] ::-webkit-scrollbar-thumb {
+  [data-theme='dark'] ::-webkit-scrollbar-thumb {
     background-color: #656565; /* Dark thumb color */
     border: 3px solid #2a2a2a; /* Matches the track background color */
   }
 
-  [data-theme="dark"] ::-webkit-scrollbar-track {
+  [data-theme='dark'] ::-webkit-scrollbar-track {
     background-color: #2a2a2a; /* Dark track color */
   }
 
@@ -121,16 +126,15 @@ html, body {
   }
 
   /* Ant Design Drawer Body Scrollbar - Dark Mode (override) */
-  html[data-theme="dark"] .ant-drawer-body::-webkit-scrollbar-thumb {
+  html[data-theme='dark'] .ant-drawer-body::-webkit-scrollbar-thumb {
     background-color: #656565 !important;
     border: 2px solid #2a2a2a !important;
   }
 
-  html[data-theme="dark"] .ant-drawer-body::-webkit-scrollbar-track {
+  html[data-theme='dark'] .ant-drawer-body::-webkit-scrollbar-track {
     background-color: #2a2a2a !important;
   }
 }
-
 
 /* Responsive Adjustments */
 @media (max-width: 768px) {
@@ -141,8 +145,6 @@ html, body {
     padding: 0 16px 16px; /* Reduce padding for smaller screens */
   }
 }
-
-
 
 /* Other Custom Styles */
 

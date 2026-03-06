@@ -1,32 +1,56 @@
-// src/__tests__/ModaColorPicker.test.tsx
-import React from 'react'
-import { render, fireEvent } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import ModaColorPicker from './moda-color-picker'
 
-// Mock the antd components used by the component
+const latestColorPickerProps: { current: any | null } = { current: null }
+
 jest.mock('antd', () => {
   return {
-    // Replace the ColorPicker with a button that simulates color selection
     ColorPicker: (props: any) => {
-      const handleClick = () => {
-        // Create a dummy color object that implements toHexString
-        const dummyColor = { toHexString: () => '#123456' }
-        if (props.onChange) {
-          props.onChange(dummyColor)
-        }
-      }
+      latestColorPickerProps.current = props
+
       return (
-        <button data-testid="color-picker" onClick={handleClick}>
-          ColorPicker
-        </button>
+        <div>
+          <button
+            type="button"
+            data-testid="color-picker-trigger"
+            className="ant-color-picker-trigger"
+            tabIndex={0}
+          >
+            Trigger
+          </button>
+          <button
+            type="button"
+            data-testid="color-picker-open"
+            onClick={() => props.onOpenChange?.(true)}
+          >
+            Open
+          </button>
+          <button
+            type="button"
+            data-testid="color-picker-close"
+            onClick={() => props.onOpenChange?.(false)}
+          >
+            Close
+          </button>
+          <button
+            type="button"
+            data-testid="color-picker-select"
+            onClick={() =>
+              props.onChange?.({ toHexString: () => '#123456' } as any)
+            }
+          >
+            Select
+          </button>
+          <div data-testid="color-picker-open-state">
+            {props.open ? 'open' : 'closed'}
+          </div>
+        </div>
       )
     },
-    // Simply render children for Space
     Space: (props: any) => <div>{props.children}</div>,
   }
 })
 
-// Mock the useTheme hook to supply a token for generating palettes
 jest.mock('../contexts/theme', () => ({
   __esModule: true,
   default: () => ({
@@ -36,34 +60,79 @@ jest.mock('../contexts/theme', () => ({
   }),
 }))
 
-describe('ModaColorPicker Component', () => {
-  it('renders the color picker button', () => {
-    const { getByTestId } = render(
-      <ModaColorPicker value="#abcdef" onChange={() => {}} />,
-    )
-    const button = getByTestId('color-picker')
-    expect(button).toBeInTheDocument()
+describe('ModaColorPicker', () => {
+  beforeEach(() => {
+    latestColorPickerProps.current = null
+    jest
+      .spyOn(window, 'requestAnimationFrame')
+      .mockImplementation((cb: FrameRequestCallback) => {
+        cb(0)
+        return 1
+      })
   })
 
-  it('calls onChange with the new color when a different color is selected', () => {
-    const onChangeMock = jest.fn()
-    // Provide an initial value different from our dummy value "#123456"
-    const { getByTestId } = render(
-      <ModaColorPicker value="#000000" onChange={onChangeMock} />,
-    )
-    const button = getByTestId('color-picker')
-    fireEvent.click(button)
-    expect(onChangeMock).toHaveBeenCalledWith('#123456')
+  afterEach(() => {
+    jest.restoreAllMocks()
   })
 
-  it('clears the color (calls onChange with undefined) when the same color is selected', () => {
-    const onChangeMock = jest.fn()
-    // Set the initial value to the dummy color "#123456"
-    const { getByTestId } = render(
-      <ModaColorPicker value="#123456" onChange={onChangeMock} />,
+  it('renders closed by default', () => {
+    render(<ModaColorPicker value="#abcdef" onChange={jest.fn()} />)
+
+    expect(screen.getByTestId('color-picker-trigger')).toBeInTheDocument()
+    expect(screen.getByTestId('color-picker-open-state')).toHaveTextContent(
+      'closed',
     )
-    const button = getByTestId('color-picker')
-    fireEvent.click(button)
-    expect(onChangeMock).toHaveBeenCalledWith(undefined)
+  })
+
+  it('calls onChange with selected color when different from current value', () => {
+    const onChange = jest.fn()
+    render(<ModaColorPicker value="#000000" onChange={onChange} />)
+
+    fireEvent.click(screen.getByTestId('color-picker-select'))
+
+    expect(onChange).toHaveBeenCalledWith('#123456')
+  })
+
+  it('clears color when selecting same value', () => {
+    const onChange = jest.fn()
+    render(<ModaColorPicker value="#123456" onChange={onChange} />)
+
+    fireEvent.click(screen.getByTestId('color-picker-select'))
+
+    expect(onChange).toHaveBeenCalledWith(undefined)
+  })
+
+  it('supports usage without onChange handler', () => {
+    render(<ModaColorPicker value="#000000" />)
+
+    expect(() => {
+      fireEvent.click(screen.getByTestId('color-picker-select'))
+    }).not.toThrow()
+  })
+
+  it('closes after selection and refocuses trigger', async () => {
+    render(<ModaColorPicker value={undefined} onChange={jest.fn()} />)
+
+    fireEvent.click(screen.getByTestId('color-picker-open'))
+    expect(screen.getByTestId('color-picker-open-state')).toHaveTextContent('open')
+
+    fireEvent.click(screen.getByTestId('color-picker-select'))
+
+    await waitFor(() => {
+      expect(screen.getByTestId('color-picker-open-state')).toHaveTextContent(
+        'closed',
+      )
+    })
+
+    await waitFor(() => {
+      expect(document.activeElement).toBe(screen.getByTestId('color-picker-trigger'))
+    })
+  })
+
+  it('keeps open state controlled by ModaColorPicker', () => {
+    render(<ModaColorPicker value={undefined} onChange={jest.fn()} />)
+
+    expect(latestColorPickerProps.current).toBeTruthy()
+    expect(latestColorPickerProps.current.open).toBe(false)
   })
 })

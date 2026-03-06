@@ -6,6 +6,9 @@ export enum QueryTags {
   // APP INTEGRATION
   Connection = 'AppIntegration.Connection',
   ConnectionDetail = 'AppIntegration.ConnectionDetail',
+  Connectors = 'AppIntegration.Connectors',
+  AzdoConnection = 'AppIntegration.AzdoConnection',
+  AzdoConnectionDetail = 'AppIntegration.AzdoConnectionDetail',
   AzdoConnectionTeam = 'AppIntegration.AzdoConnectionTeam',
   AzdoConnectionsConfiguration = 'AppIntegration.AzdoConnectionsConfiguration',
   AzdoConnectionsConfigurationTest = 'AppIntegration.AzdoConnectionsConfigurationTest',
@@ -59,6 +62,9 @@ export enum QueryTags {
   RoadmapItem = 'Planning.RoadmapItem',
   RoadmapActivity = 'Planning.RoadmapActivity',
   RoadmapVisibility = 'Planning.RoadmapVisibility',
+  PokerSession = 'Planning.PokerSession',
+  PokerSessionRound = 'Planning.PokerSession.Round',
+  EstimationScale = 'Planning.EstimationScale',
   Sprint = 'Planning.Sprint',
   SprintBacklog = 'Planning.Sprint.Backlog',
   SprintMetrics = 'Planning.Sprint.Metrics',
@@ -83,9 +89,8 @@ export enum QueryTags {
   StrategicInitiative = 'Ppm.StrategicInitiative',
   StrategicInitiativeKpi = 'Ppm.StrategicInitiativeKpi',
   StrategicInitiativeKpiCheckpoint = 'Ppm.StrategicInitiativeKpiCheckpoint',
+  StrategicInitiativeKpiCheckpointPlan = 'Ppm.StrategicInitiativeKpiCheckpointPlan',
   StrategicInitiativeKpiMeasurement = 'Ppm.StrategicInitiativeKpiMeasurement',
-  StrategicInitiativeKpiUnit = 'Ppm.StrategicInitiativeKpiUnit',
-  StrategicInitiativeKpiTargetDirection = 'Ppm.StrategicInitiativeKpiTargetDirection',
   StrategicInitiativeProject = 'Ppm.StrategicInitiativeProject',
 
   // STRATEGIC MANAGEMENT
@@ -104,7 +109,6 @@ export enum QueryTags {
 
   // USER PROFILE
   Profile = 'UserManagement.Profile',
-  InternalEmployeeId = 'UserManagement.InternalEmployeeId',
   PersonalAccessTokens = 'UserManagement.PersonalAccessTokens',
 
   // WORK MANAGEMENT

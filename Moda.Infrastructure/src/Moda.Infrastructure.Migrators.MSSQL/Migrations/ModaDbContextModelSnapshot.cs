@@ -19,7 +19,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("Work")
-                .HasAnnotation("ProductVersion", "10.0.2")
+                .HasAnnotation("ProductVersion", "10.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -121,14 +121,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime?>("Deleted")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Description")
                         .HasMaxLength(1024)
@@ -140,26 +142,20 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsSyncEnabled")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("IsValidConfiguration")
                         .HasColumnType("bit");
 
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("LastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("LastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)");
-
-                    b.Property<string>("SystemId")
-                        .HasMaxLength(64)
-                        .HasColumnType("varchar");
 
                     b.HasKey("Id");
 
@@ -190,14 +186,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime?>("Deleted")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Department")
                         .HasMaxLength(256)
@@ -235,8 +233,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("LastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("LastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<Guid?>("ManagerId")
                         .HasColumnType("uniqueidentifier");
@@ -337,8 +336,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime?>("RevokedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("RevokedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("RevokedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Scopes")
                         .HasMaxLength(4000)
@@ -347,14 +347,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("SystemCreated")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemCreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemCreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("SystemLastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemLastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemLastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("TokenHash")
                         .IsRequired()
@@ -394,6 +396,43 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("PersonalAccessTokens", "Identity");
                 });
 
+            modelBuilder.Entity("Moda.Common.Domain.Identity.User", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("DisplayName")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("FirstName")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LastName")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable((string)null);
+
+                    b.ToView("vw_ModaUsers", "Identity");
+                });
+
             modelBuilder.Entity("Moda.Common.Domain.Models.KeyValueObjectMetadata", b =>
                 {
                     b.Property<Guid>("ObjectId")
@@ -406,14 +445,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("SystemCreated")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemCreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemCreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("SystemLastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemLastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemLastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Value")
                         .HasMaxLength(4000)
@@ -440,14 +481,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime?>("Deleted")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Description")
                         .HasMaxLength(1024)
@@ -465,8 +508,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("LastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("LastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -542,14 +586,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime?>("Deleted")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("Expiration")
                         .HasColumnType("datetime2");
@@ -560,8 +606,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("LastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("LastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Note")
                         .HasMaxLength(1024)
@@ -634,8 +681,10 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasMaxLength(32)
                         .HasColumnType("varchar");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -944,14 +993,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime?>("Deleted")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Description")
                         .HasMaxLength(1024)
@@ -975,8 +1026,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("LastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("LastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -1029,14 +1081,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime?>("Deleted")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -1044,8 +1098,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("LastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("LastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<Guid>("SourceId")
                         .HasColumnType("uniqueidentifier");
@@ -1105,14 +1160,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("SystemCreated")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemCreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemCreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("SystemLastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemLastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemLastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<Guid>("TeamId")
                         .HasColumnType("uniqueidentifier");
@@ -1166,14 +1223,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("SystemCreated")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemCreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemCreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("SystemLastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemLastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemLastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<Guid?>("TeamId")
                         .HasColumnType("uniqueidentifier");
@@ -1240,14 +1299,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime?>("Deleted")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Description")
                         .HasMaxLength(2048)
@@ -1265,8 +1326,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("LastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("LastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -1318,14 +1380,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime?>("Deleted")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -1339,8 +1403,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("LastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("LastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -1403,14 +1468,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("SystemCreated")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemCreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemCreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("SystemLastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemLastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemLastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -1439,14 +1506,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime?>("Deleted")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -1463,8 +1532,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("LastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("LastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<Guid>("ObjectiveId")
                         .HasColumnType("uniqueidentifier");
@@ -1531,6 +1601,177 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.HasIndex("TeamId");
 
                     b.ToTable("PlanningIntervalTeams", "Planning");
+                });
+
+            modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningPoker.EstimationScale", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1024)
+                        .HasColumnType("nvarchar(1024)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<DateTime>("SystemCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SystemCreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("SystemLastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SystemLastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.PrimitiveCollection<string>("Values")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("Values");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("EstimationScales", "Planning");
+                });
+
+            modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningPoker.PokerRound", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ConsensusEstimate")
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.Property<string>("Label")
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("PokerSessionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PokerSessionId");
+
+                    b.ToTable("PokerRounds", "Planning");
+                });
+
+            modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningPoker.PokerSession", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("ActivatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("CompletedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EstimationScaleId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("FacilitatorId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Key")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Key"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar");
+
+                    b.Property<DateTime>("SystemCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SystemCreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("SystemLastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SystemLastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasAlternateKey("Key");
+
+                    b.HasIndex("EstimationScaleId");
+
+                    b.HasIndex("FacilitatorId");
+
+                    b.HasIndex("Key");
+
+                    b.ToTable("PokerSessions", "Planning");
+                });
+
+            modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningPoker.PokerVote", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ParticipantId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<Guid>("PokerRoundId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("SubmittedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ParticipantId");
+
+                    b.HasIndex("PokerRoundId", "ParticipantId")
+                        .IsUnique();
+
+                    b.ToTable("PokerVotes", "Planning");
                 });
 
             modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningTeam", b =>
@@ -1603,14 +1844,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime?>("Deleted")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Description")
                         .HasMaxLength(1024)
@@ -1636,8 +1879,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("LastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("LastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Likelihood")
                         .IsRequired()
@@ -1716,14 +1960,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("SystemCreated")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemCreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemCreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("SystemLastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemLastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemLastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("Type")
                         .HasColumnType("int");
@@ -1750,8 +1996,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Description")
                         .HasMaxLength(2048)
@@ -1766,8 +2013,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("LastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("LastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -1894,14 +2142,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("SystemCreated")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemCreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemCreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("SystemLastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemLastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemLastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -1991,14 +2241,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("SystemCreated")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemCreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemCreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("SystemLastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemLastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemLastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -2049,14 +2301,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("SystemCreated")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemCreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemCreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("SystemLastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemLastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemLastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -2104,14 +2358,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("SystemCreated")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemCreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemCreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("SystemLastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemLastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemLastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -2177,14 +2433,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("SystemCreated")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemCreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemCreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("SystemLastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemLastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemLastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Type")
                         .IsRequired()
@@ -2228,14 +2486,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("SystemCreated")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemCreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemCreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("SystemLastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemLastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemLastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Type")
                         .IsRequired()
@@ -2268,14 +2528,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("SystemCreated")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemCreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemCreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("SystemLastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemLastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemLastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("ObjectId", "EmployeeId", "Role");
 
@@ -2301,14 +2563,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("SystemCreated")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemCreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemCreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("SystemLastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemLastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemLastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("ObjectId", "EmployeeId", "Role");
 
@@ -2334,14 +2598,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("SystemCreated")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemCreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemCreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("SystemLastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemLastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemLastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("ObjectId", "EmployeeId", "Role");
 
@@ -2367,14 +2633,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("SystemCreated")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemCreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemCreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("SystemLastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemLastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemLastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("ObjectId", "EmployeeId", "Role");
 
@@ -2400,14 +2668,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("SystemCreated")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemCreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemCreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("SystemLastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemLastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemLastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("ObjectId", "EmployeeId", "Role");
 
@@ -2451,14 +2721,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("SystemCreated")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemCreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemCreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("SystemLastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemLastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemLastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -2481,7 +2753,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasColumnType("float");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasMaxLength(512)
                         .HasColumnType("nvarchar(512)");
 
@@ -2497,20 +2768,33 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasMaxLength(64)
                         .HasColumnType("nvarchar(64)");
 
+                    b.Property<string>("Prefix")
+                        .HasMaxLength(8)
+                        .HasColumnType("nvarchar(8)");
+
+                    b.Property<double?>("StartingValue")
+                        .HasColumnType("float");
+
                     b.Property<Guid>("StrategicInitiativeId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Suffix")
+                        .HasMaxLength(8)
+                        .HasColumnType("nvarchar(8)");
 
                     b.Property<DateTime>("SystemCreated")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemCreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemCreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("SystemLastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemLastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemLastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("TargetDirection")
                         .IsRequired()
@@ -2519,11 +2803,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                     b.Property<double>("TargetValue")
                         .HasColumnType("float");
-
-                    b.Property<string>("Unit")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("varchar");
 
                     b.HasKey("Id");
 
@@ -2542,6 +2821,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<double?>("AtRiskValue")
+                        .HasColumnType("float");
+
                     b.Property<DateTime>("CheckpointDate")
                         .HasColumnType("datetime2");
 
@@ -2556,14 +2838,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("SystemCreated")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemCreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemCreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("SystemLastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemLastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemLastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<double>("TargetValue")
                         .HasColumnType("float");
@@ -2602,14 +2886,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("SystemCreated")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemCreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemCreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("SystemLastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemLastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemLastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -2682,14 +2968,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("SystemCreated")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemCreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemCreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("SystemLastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemLastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemLastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("ObjectId", "StrategicThemeId");
 
@@ -2711,14 +2999,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("SystemCreated")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemCreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemCreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("SystemLastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemLastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemLastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("ObjectId", "StrategicThemeId");
 
@@ -2759,14 +3049,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("SystemCreated")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemCreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemCreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("SystemLastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemLastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemLastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -2806,14 +3098,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("SystemCreated")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemCreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemCreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("SystemLastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemLastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemLastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -2849,14 +3143,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("SystemCreated")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemCreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemCreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("SystemLastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemLastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemLastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -2934,14 +3230,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("SystemCreated")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemCreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemCreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("SystemLastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemLastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemLastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<Guid?>("TeamId")
                         .HasColumnType("uniqueidentifier");
@@ -3064,14 +3362,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("SystemCreated")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemCreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemCreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("SystemLastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemLastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemLastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<Guid>("TargetId")
                         .HasColumnType("uniqueidentifier");
@@ -3118,14 +3418,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("SystemCreated")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemCreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemCreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("SystemLastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemLastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemLastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("WorkItemId", "ObjectId");
 
@@ -3197,14 +3499,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime?>("Deleted")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Description")
                         .HasMaxLength(1024)
@@ -3228,8 +3532,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("LastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("LastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -3267,14 +3572,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime?>("Deleted")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -3285,8 +3592,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("LastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("LastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<Guid>("WorkProcessId")
                         .HasColumnType("uniqueidentifier");
@@ -3350,14 +3658,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime?>("Deleted")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Description")
                         .HasMaxLength(1024)
@@ -3372,8 +3682,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("LastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("LastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -3457,14 +3768,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime?>("Deleted")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Description")
                         .HasMaxLength(1024)
@@ -3479,8 +3792,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("LastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("LastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("LevelId")
                         .HasColumnType("int");
@@ -3530,14 +3844,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("SystemCreated")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemCreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemCreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("SystemLastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemLastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemLastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -3572,14 +3888,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("SystemCreated")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemCreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemCreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("SystemLastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SystemLastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SystemLastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Tier")
                         .IsRequired()
@@ -3611,14 +3929,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime?>("Deleted")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Description")
                         .HasMaxLength(1024)
@@ -3639,8 +3959,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("LastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("LastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -3679,14 +4000,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime?>("Deleted")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -3697,8 +4020,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("LastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("LastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("Order")
                         .HasColumnType("int");
@@ -3738,14 +4062,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime?>("Deleted")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Description")
                         .HasMaxLength(1024)
@@ -3769,8 +4095,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("LastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("LastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -3837,7 +4164,43 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                 {
                     b.HasBaseType("Moda.AppIntegration.Domain.Models.Connection");
 
+                    b.Property<string>("Configuration")
+                        .ValueGeneratedOnUpdateSometimes()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("Configuration");
+
+                    b.Property<bool>("IsSyncEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("SystemId")
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar");
+
                     b.HasDiscriminator().HasValue("AzureDevOps");
+                });
+
+            modelBuilder.Entity("Moda.AppIntegration.Domain.Models.AzureOpenAI.AzureOpenAIConnection", b =>
+                {
+                    b.HasBaseType("Moda.AppIntegration.Domain.Models.Connection");
+
+                    b.Property<string>("Configuration")
+                        .ValueGeneratedOnUpdateSometimes()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("Configuration");
+
+                    b.HasDiscriminator().HasValue("AzureOpenAI");
+                });
+
+            modelBuilder.Entity("Moda.AppIntegration.Domain.Models.OpenAI.OpenAIConnection", b =>
+                {
+                    b.HasBaseType("Moda.AppIntegration.Domain.Models.Connection");
+
+                    b.Property<string>("Configuration")
+                        .ValueGeneratedOnUpdateSometimes()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("Configuration");
+
+                    b.HasDiscriminator().HasValue("OpenAI");
                 });
 
             modelBuilder.Entity("Moda.Organization.Domain.Models.Team", b =>
@@ -3966,13 +4329,13 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
                     b.HasOne("Moda.Infrastructure.Identity.ApplicationRole", null)
-                        .WithMany()
+                        .WithMany("UserRoles")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Moda.Infrastructure.Identity.ApplicationUser", null)
-                        .WithMany()
+                        .WithMany("UserRoles")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -4175,6 +4538,51 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .IsRequired();
 
                     b.Navigation("Team");
+                });
+
+            modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningPoker.PokerRound", b =>
+                {
+                    b.HasOne("Moda.Planning.Domain.Models.PlanningPoker.PokerSession", null)
+                        .WithMany("Rounds")
+                        .HasForeignKey("PokerSessionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningPoker.PokerSession", b =>
+                {
+                    b.HasOne("Moda.Planning.Domain.Models.PlanningPoker.EstimationScale", "EstimationScale")
+                        .WithMany()
+                        .HasForeignKey("EstimationScaleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Moda.Common.Domain.Identity.User", "Facilitator")
+                        .WithMany()
+                        .HasForeignKey("FacilitatorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("EstimationScale");
+
+                    b.Navigation("Facilitator");
+                });
+
+            modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningPoker.PokerVote", b =>
+                {
+                    b.HasOne("Moda.Common.Domain.Identity.User", "Participant")
+                        .WithMany()
+                        .HasForeignKey("ParticipantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Moda.Planning.Domain.Models.PlanningPoker.PokerRound", null)
+                        .WithMany("Votes")
+                        .HasForeignKey("PokerRoundId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Participant");
                 });
 
             modelBuilder.Entity("Moda.Planning.Domain.Models.Risk", b =>
@@ -4874,118 +5282,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
             modelBuilder.Entity("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsConnection", b =>
                 {
-                    b.OwnsOne("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsConnectionConfiguration", "Configuration", b1 =>
-                        {
-                            b1.Property<Guid>("AzureDevOpsBoardsConnectionId");
-
-                            b1.Property<string>("Organization")
-                                .IsRequired();
-
-                            b1.Property<string>("PersonalAccessToken")
-                                .IsRequired();
-
-                            b1.HasKey("AzureDevOpsBoardsConnectionId");
-
-                            b1.ToTable("Connections", "AppIntegrations");
-
-                            b1
-                                .ToJson("Configuration")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.WithOwner()
-                                .HasForeignKey("AzureDevOpsBoardsConnectionId");
-
-                            b1.OwnsMany("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsWorkProcess", "WorkProcesses", b2 =>
-                                {
-                                    b2.Property<Guid>("AzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId");
-
-                                    b2.Property<int>("__synthesizedOrdinal")
-                                        .ValueGeneratedOnAddOrUpdate();
-
-                                    b2.Property<string>("Description");
-
-                                    b2.Property<Guid>("ExternalId");
-
-                                    b2.Property<string>("Name")
-                                        .IsRequired();
-
-                                    b2.HasKey("AzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId", "__synthesizedOrdinal");
-
-                                    b2.ToTable("Connections", "AppIntegrations");
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("AzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId");
-
-                                    b2.OwnsOne("Moda.Common.Domain.Models.IntegrationState<System.Guid>", "IntegrationState", b3 =>
-                                        {
-                                            b3.Property<Guid>("AzureDevOpsBoardsWorkProcessAzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId");
-
-                                            b3.Property<int>("AzureDevOpsBoardsWorkProcess__synthesizedOrdinal");
-
-                                            b3.Property<Guid>("InternalId");
-
-                                            b3.Property<bool>("IsActive");
-
-                                            b3.HasKey("AzureDevOpsBoardsWorkProcessAzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId", "AzureDevOpsBoardsWorkProcess__synthesizedOrdinal");
-
-                                            b3.ToTable("Connections", "AppIntegrations");
-
-                                            b3.WithOwner()
-                                                .HasForeignKey("AzureDevOpsBoardsWorkProcessAzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId", "AzureDevOpsBoardsWorkProcess__synthesizedOrdinal");
-                                        });
-
-                                    b2.Navigation("IntegrationState");
-                                });
-
-                            b1.OwnsMany("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsWorkspace", "Workspaces", b2 =>
-                                {
-                                    b2.Property<Guid>("AzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId");
-
-                                    b2.Property<int>("__synthesizedOrdinal")
-                                        .ValueGeneratedOnAddOrUpdate();
-
-                                    b2.Property<string>("Description");
-
-                                    b2.Property<Guid>("ExternalId");
-
-                                    b2.Property<string>("Name")
-                                        .IsRequired();
-
-                                    b2.Property<Guid?>("WorkProcessId");
-
-                                    b2.HasKey("AzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId", "__synthesizedOrdinal");
-
-                                    b2.ToTable("Connections", "AppIntegrations");
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("AzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId");
-
-                                    b2.OwnsOne("IntegrationState", "IntegrationState", b3 =>
-                                        {
-                                            b3.Property<Guid>("AzureDevOpsBoardsWorkspaceAzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId");
-
-                                            b3.Property<int>("AzureDevOpsBoardsWorkspace__synthesizedOrdinal");
-
-                                            b3.Property<Guid>("InternalId");
-
-                                            b3.Property<bool>("IsActive");
-
-                                            b3.HasKey("AzureDevOpsBoardsWorkspaceAzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId", "AzureDevOpsBoardsWorkspace__synthesizedOrdinal");
-
-                                            b3.ToTable("Connections", "AppIntegrations");
-
-                                            b3.WithOwner()
-                                                .HasForeignKey("AzureDevOpsBoardsWorkspaceAzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId", "AzureDevOpsBoardsWorkspace__synthesizedOrdinal");
-                                        });
-
-                                    b2.Navigation("IntegrationState");
-                                });
-
-                            b1.Navigation("WorkProcesses");
-
-                            b1.Navigation("Workspaces");
-                        });
-
                     b.OwnsOne("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsTeamConfiguration", "TeamConfiguration", b1 =>
                         {
                             b1.Property<Guid>("AzureDevOpsBoardsConnectionId");
@@ -5029,9 +5325,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                             b1.Navigation("WorkspaceTeams");
                         });
-
-                    b.Navigation("Configuration")
-                        .IsRequired();
 
                     b.Navigation("TeamConfiguration")
                         .IsRequired();
@@ -5080,6 +5373,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("DirectReports");
                 });
 
+            modelBuilder.Entity("Moda.Infrastructure.Identity.ApplicationRole", b =>
+                {
+                    b.Navigation("UserRoles");
+                });
+
+            modelBuilder.Entity("Moda.Infrastructure.Identity.ApplicationUser", b =>
+                {
+                    b.Navigation("UserRoles");
+                });
+
             modelBuilder.Entity("Moda.Organization.Application.Teams.Models.TeamNode", b =>
                 {
                     b.Navigation("ChildMemberships");
@@ -5116,6 +5419,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
             modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningIntervalObjective", b =>
                 {
                     b.Navigation("HealthCheck");
+                });
+
+            modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningPoker.PokerRound", b =>
+                {
+                    b.Navigation("Votes");
+                });
+
+            modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningPoker.PokerSession", b =>
+                {
+                    b.Navigation("Rounds");
                 });
 
             modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningTeam", b =>

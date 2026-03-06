@@ -1,12 +1,10 @@
 'use client'
 
 import { DatePicker, Form, Input, Modal, Radio, Select } from 'antd'
-import { useCallback, useEffect, useState } from 'react'
-import useAuth from '../../contexts/auth'
+import { useCallback, useEffect } from 'react'
 import { CreateRiskRequest } from '@/src/services/moda-api'
 import { toFormErrors } from '@/src/utils'
 import { MarkdownEditor } from '../markdown'
-import { useMessage } from '../../contexts/messaging'
 import {
   useCreateRiskMutation,
   useGetRiskCategoryOptionsQuery,
@@ -14,13 +12,13 @@ import {
 } from '@/src/store/features/planning/risks-api'
 import { useGetEmployeeOptionsQuery } from '@/src/store/features/organizations/employee-api'
 import { useGetTeamOptionsQuery } from '@/src/store/features/organizations/team-api'
+import { useModalForm } from '@/src/hooks'
 
 const { Item } = Form
 const { TextArea } = Input
 const { Group: RadioGroup } = Radio
 
 export interface CreateRiskFormProps {
-  showForm: boolean
   createForTeamId?: string | undefined
   onFormCreate: () => void
   onFormCancel: () => void
@@ -53,23 +51,11 @@ const mapToRequestValues = (values: CreateRiskFormValues) => {
 }
 
 const CreateRiskForm = ({
-  showForm,
   createForTeamId,
   onFormCreate,
   onFormCancel,
 }: CreateRiskFormProps) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-  const [isValid, setIsValid] = useState(false)
-  const [form] = Form.useForm<CreateRiskFormValues>()
-  const formValues = Form.useWatch([], form)
-
-  const messageApi = useMessage()
-
-  const { hasPermissionClaim } = useAuth()
-  const canCreateRisks = hasPermissionClaim('Permissions.Risks.Create')
-
-  const [createRisk, { error: mutationError }] = useCreateRiskMutation()
+  const [createRisk] = useCreateRiskMutation()
   const { data: riskCategoryOptions } = useGetRiskCategoryOptionsQuery()
   const { data: riskGradeOptions } = useGetRiskGradeOptionsQuery()
   const { data: employeeOptions } = useGetEmployeeOptionsQuery(false)
@@ -77,102 +63,45 @@ const CreateRiskForm = ({
   const { data: teamOptions, isLoading: isTeamsLoading } =
     useGetTeamOptionsQuery(false)
 
-  const mapToFormValues = useCallback(
-    (teamId: string | undefined) => {
-      form.setFieldsValue({
-        teamId: teamId,
-        description: '',
-        response: '',
-      })
-    },
-    [form],
-  )
+  const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
+    useModalForm<CreateRiskFormValues>({
+      onSubmit: useCallback(
+        async (values: CreateRiskFormValues, form) => {
+          try {
+            const request = mapToRequestValues(values)
+            const response = await createRisk(request)
+            if (response.error) {
+              throw response.error
+            }
 
-  const formAction = async (values: CreateRiskFormValues) => {
-    try {
-      const request = mapToRequestValues(values)
-      const response = await createRisk(request)
-      if (response.error) {
-        throw response.error
-      }
-
-      messageApi.success(
-        `Successfully created Risk. Risk key: ${response.data.key}`,
-      )
-
-      return true
-    } catch (error) {
-      if (error.status === 422 && error.errors) {
-        const formErrors = toFormErrors(error.errors)
-        form.setFields(formErrors)
-        messageApi.error('Correct the validation error(s) to continue.')
-      } else {
-        messageApi.error(
-          error.detail ??
-            'An error occurred while creating the risk. Please try again.',
-        )
-      }
-      return false
-    }
-  }
-
-  const handleOk = async () => {
-    setIsSaving(true)
-    try {
-      const values = await form.validateFields()
-      if (await formAction(values)) {
-        setIsOpen(false)
-        form.resetFields()
-        onFormCreate()
-      }
-    } catch (error) {
-      console.error('handleOk error', error)
-      messageApi.error(
+            return true
+          } catch (error) {
+            if (error.status === 422 && error.errors) {
+              const formErrors = toFormErrors(error.errors)
+              form.setFields(formErrors)
+            } else {
+              throw error
+            }
+            return false
+          }
+        },
+        [createRisk],
+      ),
+      onComplete: onFormCreate,
+      onCancel: onFormCancel,
+      errorMessage:
         'An error occurred while creating the risk. Please try again.',
-      )
-    } finally {
-      setIsSaving(false)
-    }
-  }
-  const handleCancel = useCallback(() => {
-    setIsOpen(false)
-    onFormCancel()
-    form.resetFields()
-  }, [form, onFormCancel])
+      permission: 'Permissions.Risks.Create',
+    })
 
   useEffect(() => {
-    if (canCreateRisks) {
-      setIsOpen(showForm)
-      if (showForm === true) {
-        try {
-          mapToFormValues(createForTeamId)
-        } catch (error) {
-          handleCancel()
-          messageApi.error(
-            'An unexpected error occurred while loading form data.',
-          )
-          console.error(error)
-        }
-      }
-    } else {
-      handleCancel()
-      messageApi.error('You do not have permission to create Risks.')
-    }
-  }, [
-    canCreateRisks,
-    createForTeamId,
-    handleCancel,
-    mapToFormValues,
-    messageApi,
-    showForm,
-  ])
-
-  useEffect(() => {
-    form.validateFields({ validateOnly: true }).then(
-      () => setIsValid(true && form.isFieldsTouched()),
-      () => setIsValid(false),
-    )
-  }, [form, formValues])
+    if (!isOpen) return
+    form.setFieldsValue({
+      teamId: createForTeamId,
+      description: '',
+      response: '',
+    })
+  }, [form, isOpen, createForTeamId])
 
   return (
     <Modal
@@ -183,9 +112,8 @@ const CreateRiskForm = ({
       okText="Create"
       confirmLoading={isSaving}
       onCancel={handleCancel}
-      maskClosable={false}
-      keyboard={false} // disable esc key to close modal
-      destroyOnHidden={true}
+      keyboard={false}
+      destroyOnHidden
     >
       <Form form={form} size="small" layout="vertical" name="create-risk-form">
         <Item name="teamId" label="Team" rules={[{ required: true }]}>

@@ -1,11 +1,10 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import dayjs from 'dayjs'
 import { Flex, Modal, Select, Spin, Typography } from 'antd'
 import {
   MapPlanningIntervalSprintsRequest,
-  PlanningIntervalIterationSprintsDto,
   SprintListDto,
 } from '@/src/services/moda-api'
 import {
@@ -14,11 +13,11 @@ import {
 } from '@/src/store/features/planning/planning-interval-api'
 import { useGetTeamSprintsQuery } from '@/src/store/features/organizations/team-api'
 import { useMessage } from '@/src/components/contexts/messaging'
+import { useConfirmModal } from '@/src/hooks'
 
 const { Text } = Typography
 
 export interface ConfigureTeamSprintMappingsFormProps {
-  showForm: boolean
   planningIntervalId: string
   planningIntervalKey: number
   teamId: string
@@ -46,7 +45,6 @@ const formatSprintOption = (sprint: SprintListDto): string => {
 }
 
 const ConfigureTeamSprintMappingsForm = ({
-  showForm,
   planningIntervalId,
   planningIntervalKey,
   teamId,
@@ -55,25 +53,24 @@ const ConfigureTeamSprintMappingsForm = ({
   onFormSave,
   onFormCancel,
 }: ConfigureTeamSprintMappingsFormProps) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-  const [mappings, setMappings] = useState<IterationSprintMapping[]>([])
+  // Track user overrides separately so mappings can be derived via useMemo
+  const [sprintOverrides, setSprintOverrides] = useState<
+    Record<string, string | null>
+  >({})
   const messageApi = useMessage()
 
   const { data: iterationSprintsData, isLoading: iterationsLoading } =
-    useGetIterationSprintsQuery(
-      { idOrKey: planningIntervalKey.toString() },
-      { skip: !showForm },
-    )
+    useGetIterationSprintsQuery({
+      idOrKey: planningIntervalKey.toString(),
+    })
 
   const { data: teamSprintsData, isLoading: sprintsLoading } =
-    useGetTeamSprintsQuery(teamId, { skip: !showForm })
+    useGetTeamSprintsQuery(teamId)
 
   const [mapTeamSprints] = useMapTeamSprintsMutation()
 
   const isLoading = iterationsLoading || sprintsLoading
 
-  // Build sprint options for the select dropdown
   const sprintOptions = useMemo(() => {
     if (!teamSprintsData) return []
 
@@ -85,93 +82,86 @@ const ConfigureTeamSprintMappingsForm = ({
       }))
   }, [teamSprintsData])
 
-  // Initialize mappings from iteration sprints data
-  const initializeMappings = useCallback(
-    (iterations: PlanningIntervalIterationSprintsDto[]) => {
-      const initialMappings: IterationSprintMapping[] = iterations.map(
-        (iteration) => {
-          // Find sprint for this team in this iteration
-          const existingSprint = iteration.sprints?.find(
-            (s) => s.team.id === teamId,
-          )
+  // Derive mappings from query data + user overrides
+  const mappings = useMemo<IterationSprintMapping[]>(() => {
+    if (!iterationSprintsData) return []
 
-          return {
-            iterationId: iteration.id,
-            iterationName: iteration.name,
-            iterationStart: iteration.start,
-            iterationEnd: iteration.end,
-            iterationCategory: iteration.category?.name ?? '',
-            sprintId: existingSprint?.id ?? null,
-          }
-        },
+    return iterationSprintsData.map((iteration) => {
+      const existingSprint = iteration.sprints?.find(
+        (s) => s.team.id === teamId,
       )
+      const defaultSprintId = existingSprint?.id ?? null
+      const sprintId =
+        iteration.id in sprintOverrides
+          ? sprintOverrides[iteration.id]
+          : defaultSprintId
 
-      setMappings(initialMappings)
-    },
-    [teamId],
-  )
+      return {
+        iterationId: iteration.id,
+        iterationName: iteration.name,
+        iterationStart: iteration.start,
+        iterationEnd: iteration.end,
+        iterationCategory: iteration.category?.name ?? '',
+        sprintId,
+      }
+    })
+  }, [iterationSprintsData, teamId, sprintOverrides])
 
-  useEffect(() => {
-    setIsOpen(showForm)
-    if (showForm && iterationSprintsData) {
-      initializeMappings(iterationSprintsData)
-    }
-  }, [showForm, iterationSprintsData, initializeMappings])
+  const { isOpen, isSaving, handleOk, handleCancel } = useConfirmModal({
+    onSubmit: useCallback(async () => {
+      try {
+        const iterationSprintMappings: { [key: string]: string } = {}
+        mappings.forEach((m) => {
+          if (m.sprintId) {
+            iterationSprintMappings[m.iterationId] = m.sprintId
+          }
+        })
+
+        const request: MapPlanningIntervalSprintsRequest = {
+          id: planningIntervalId,
+          teamId: teamId,
+          iterationSprintMappings,
+        }
+
+        await mapTeamSprints({
+          planningIntervalId,
+          teamId,
+          request,
+          cacheKey: planningIntervalKey,
+        }).unwrap()
+
+        messageApi.success(
+          `Successfully updated sprint mappings for ${teamName}.`,
+        )
+        return true
+      } catch (error) {
+        console.error('Error saving sprint mappings:', error)
+        messageApi.error(
+          'An error occurred while saving sprint mappings. Please try again.',
+        )
+        return false
+      }
+    }, [
+      mapTeamSprints,
+      mappings,
+      planningIntervalId,
+      planningIntervalKey,
+      teamId,
+      teamName,
+      messageApi,
+    ]),
+    onComplete: onFormSave,
+    onCancel: onFormCancel,
+    errorMessage:
+      'An error occurred while saving sprint mappings. Please try again.',
+  })
 
   const handleSprintChange = useCallback(
     (iterationId: string, sprintId: string | null) => {
-      setMappings((prev) =>
-        prev.map((m) =>
-          m.iterationId === iterationId ? { ...m, sprintId } : m,
-        ),
-      )
+      setSprintOverrides((prev) => ({ ...prev, [iterationId]: sprintId }))
     },
     [],
   )
-
-  const handleOk = async () => {
-    setIsSaving(true)
-    try {
-      // Build the mapping dictionary
-      const iterationSprintMappings: { [key: string]: string } = {}
-      mappings.forEach((m) => {
-        if (m.sprintId) {
-          iterationSprintMappings[m.iterationId] = m.sprintId
-        }
-      })
-
-      const request: MapPlanningIntervalSprintsRequest = {
-        id: planningIntervalId,
-        teamId: teamId,
-        iterationSprintMappings,
-      }
-
-      await mapTeamSprints({
-        planningIntervalId,
-        teamId,
-        request,
-        cacheKey: planningIntervalKey,
-      }).unwrap()
-
-      setIsOpen(false)
-      onFormSave()
-      messageApi.success(
-        `Successfully updated sprint mappings for ${teamName}.`,
-      )
-    } catch (error) {
-      console.error('Error saving sprint mappings:', error)
-      messageApi.error(
-        'An error occurred while saving sprint mappings. Please try again.',
-      )
-    } finally {
-      setIsSaving(false)
-    }
-  }
-
-  const handleCancel = () => {
-    setIsOpen(false)
-    onFormCancel()
-  }
 
   return (
     <Modal
@@ -182,9 +172,8 @@ const ConfigureTeamSprintMappingsForm = ({
       okText="Save Changes"
       confirmLoading={isSaving}
       onCancel={handleCancel}
-      maskClosable={false}
       keyboard={false}
-      destroyOnHidden={true}
+      destroyOnHidden
     >
       <Spin spinning={isLoading} size="large">
         {teamOfTeamsName && (

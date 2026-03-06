@@ -193,7 +193,10 @@ const Permissions = (props: PermissionsProps) => {
     [filteredCategories],
   )
 
-  const effectivePermissions = isEditMode ? permissions : sourcePermissions
+  const effectivePermissionsSet = useMemo(
+    () => new Set(isEditMode ? permissions : sourcePermissions),
+    [isEditMode, permissions, sourcePermissions],
+  )
 
   const displayCategories = useMemo(() => {
     if (isEditMode) return filteredCategories
@@ -202,7 +205,7 @@ const Permissions = (props: PermissionsProps) => {
         const groups = category.groups
           .map((group) => {
             const permissionsInRole = group.permissions.filter((p) =>
-              effectivePermissions.includes(p.name),
+              effectivePermissionsSet.has(p.name),
             )
             if (permissionsInRole.length === 0) return null
             return { ...group, permissions: permissionsInRole }
@@ -212,7 +215,7 @@ const Permissions = (props: PermissionsProps) => {
         return { ...category, groups }
       })
       .filter(Boolean) as PermissionCategory[]
-  }, [effectivePermissions, filteredCategories, isEditMode])
+  }, [effectivePermissionsSet, filteredCategories, isEditMode])
 
   const allDisplayGroups = useMemo(
     () => displayCategories.flatMap((c) => c.groups),
@@ -220,8 +223,8 @@ const Permissions = (props: PermissionsProps) => {
   )
 
   const hasPermission = useCallback(
-    (permission: string) => effectivePermissions.includes(permission),
-    [effectivePermissions],
+    (permission: string) => effectivePermissionsSet.has(permission),
+    [effectivePermissionsSet],
   )
 
   const handlePermissionChange = (item: PermissionItem) => {

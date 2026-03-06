@@ -8,12 +8,12 @@ import {
 import { useCreateRecurringJobMutation } from '@/src/store/features/admin/background-jobs-api'
 import { toFormErrors } from '@/src/utils'
 import { Form, Input, Modal, Select } from 'antd'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback } from 'react'
+import { useModalForm } from '@/src/hooks'
 
 const { Item } = Form
 
 export interface CreateRecurringJobFormProps {
-  showForm: boolean
   jobTypes: BackgroundJobTypeDto[]
   onFormCreate: () => void
   onFormCancel: () => void
@@ -34,74 +34,50 @@ const mapToRequestValues = (values: CreateRecurringJobRequest) => {
   return request
 }
 
-const CreateRecurringJobForm = (props: CreateRecurringJobFormProps) => {
-  const [isOpen, setIsOpen] = useState(props.showForm)
-  const [isSaving, setIsSaving] = useState(false)
-  const [isValid, setIsValid] = useState(false)
-  const [form] = Form.useForm<CreateRecurringJobFormValues>()
-  const formValues = Form.useWatch([], form)
+const CreateRecurringJobForm = ({
+  jobTypes,
+  onFormCreate,
+  onFormCancel,
+}: CreateRecurringJobFormProps) => {
   const messageApi = useMessage()
 
-  const [createRecurringJob, { error: mutationError }] =
+  const [createRecurringJob] =
     useCreateRecurringJobMutation()
 
-  const create = async (values: CreateRecurringJobFormValues) => {
-    setIsSaving(true)
-    try {
-      const request = mapToRequestValues(values)
-      const response = await createRecurringJob(request)
-      if (response.error) {
-        throw response.error
-      }
-
-      return true
-    } catch (error) {
-      if (error.status === 422 && error.errors) {
-        const formErrors = toFormErrors(error.errors)
-        form.setFields(formErrors)
-        messageApi.error('Correct the validation error(s) to continue.')
-      } else {
-        console.error('Mutation error:', mutationError)
-        messageApi.error(
-          error.detail ??
-            'An unexpected error occurred while creating a recurring job.',
-        )
-        console.error(error)
-      }
-      return false
-    }
-  }
-
-  const handleOk = async () => {
-    setIsSaving(true)
-    try {
-      const values = await form.validateFields()
-      if (await create(values)) {
-        setIsOpen(false)
-        form.resetFields()
-        props.onFormCreate()
-
-        messageApi.success('Successfully created recurring job.')
-      }
-    } catch (errorInfo) {
-      console.log('handleOk error', errorInfo)
-    } finally {
-      setIsSaving(false)
-    }
-  }
-
-  const handleCancel = useCallback(() => {
-    setIsOpen(false)
-    props.onFormCancel()
-    form.resetFields()
-  }, [form, props])
-
-  useEffect(() => {
-    form.validateFields({ validateOnly: true }).then(
-      () => setIsValid(true && form.isFieldsTouched()),
-      () => setIsValid(false),
-    )
-  }, [form, formValues])
+  const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
+    useModalForm<CreateRecurringJobFormValues>({
+      onSubmit: useCallback(
+        async (values: CreateRecurringJobFormValues, form) => {
+          try {
+            const request = mapToRequestValues(values)
+            const response = await createRecurringJob(request)
+            if (response.error) {
+              throw response.error
+            }
+            messageApi.success('Successfully created recurring job.')
+            return true
+          } catch (error) {
+            if (error.status === 422 && error.errors) {
+              const formErrors = toFormErrors(error.errors)
+              form.setFields(formErrors)
+              messageApi.error('Correct the validation error(s) to continue.')
+            } else {
+              messageApi.error(
+                error.detail ??
+                  'An unexpected error occurred while creating a recurring job.',
+              )
+              console.error(error)
+            }
+            return false
+          }
+        },
+        [createRecurringJob, messageApi],
+      ),
+      onComplete: onFormCreate,
+      onCancel: onFormCancel,
+      errorMessage:
+        'An unexpected error occurred while creating a recurring job.',
+    })
 
   return (
     <Modal
@@ -112,9 +88,8 @@ const CreateRecurringJobForm = (props: CreateRecurringJobFormProps) => {
       okText="Create"
       confirmLoading={isSaving}
       onCancel={handleCancel}
-      maskClosable={false}
-      keyboard={false} // disable esc key to close modal
-      destroyOnHidden={true}
+      keyboard={false}
+      destroyOnHidden
     >
       <Form
         form={form}
@@ -138,7 +113,7 @@ const CreateRecurringJobForm = (props: CreateRecurringJobFormProps) => {
                 .toLowerCase()
                 .localeCompare((optionB?.label ?? '').toLowerCase())
             }
-            options={props.jobTypes.map((jobType) => ({
+            options={jobTypes.map((jobType) => ({
               value: jobType.id,
               label: jobType.name,
             }))}

@@ -109,7 +109,6 @@ const PortfoliosPage: FC = () => {
       )}
       {openCreatePortfolioForm && (
         <CreatePortfolioForm
-          showForm={openCreatePortfolioForm}
           onFormComplete={() => onCreatePortfolioFormClosed(true)}
           onFormCancel={() => onCreatePortfolioFormClosed(false)}
         />

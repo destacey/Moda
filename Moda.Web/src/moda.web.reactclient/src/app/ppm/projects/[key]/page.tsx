@@ -12,10 +12,11 @@ import {
   useGetProjectQuery,
   useGetProjectWorkItemsQuery,
 } from '@/src/store/features/ppm/projects-api'
-import { Alert, Card, MenuProps } from 'antd'
+import { Alert, Card, MenuProps, Spin } from 'antd'
 import { notFound, usePathname, useRouter } from 'next/navigation'
 import { use, useCallback, useEffect, useMemo, useState } from 'react'
 import ProjectDetailsLoading from './loading'
+import dynamic from 'next/dynamic'
 import {
   ChangeProjectStatusForm,
   ChangeProjectProgramForm,
@@ -23,12 +24,20 @@ import {
   DeleteProjectForm,
   EditProjectForm,
   ProjectDetails,
-  ProjectPlan,
 } from '../_components'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import { ItemType } from 'antd/es/menu/interface'
 import { ProjectStatusAction } from '../_components/change-project-status-form'
-import { WorkItemsGrid } from '@/src/components/common/work'
+
+const ProjectPlan = dynamic(
+  () => import('../_components/project-plan'),
+  { ssr: false, loading: () => <Spin /> },
+)
+
+const WorkItemsGrid = dynamic(
+  () => import('@/src/components/common/work/work-items-grid'),
+  { ssr: false, loading: () => <Spin /> },
+)
 
 enum ProjectTabs {
   Details = 'details',
@@ -93,7 +102,7 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     refetch: refetchProject,
   } = useGetProjectQuery(projectKey)
 
-  useDocumentTitle(`${projectKey} - Project Details`)
+  useDocumentTitle(`${projectData?.name ?? projectKey} - Project Details`)
 
   const {
     data: workItemsData,
@@ -363,7 +372,6 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       {openEditProjectForm && (
         <EditProjectForm
           projectKey={projectData?.key}
-          showForm={openEditProjectForm}
           onFormComplete={() => onEditProjectFormClosed(true)}
           onFormCancel={() => onEditProjectFormClosed(false)}
         />
@@ -371,7 +379,6 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       {openChangeProgramForm && (
         <ChangeProjectProgramForm
           project={projectData}
-          showForm={openChangeProgramForm}
           onFormComplete={() => onChangeProgramFormClosed(true)}
           onFormCancel={() => onChangeProgramFormClosed(false)}
         />
@@ -387,7 +394,6 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
         <ChangeProjectStatusForm
           project={projectData}
           statusAction={ProjectStatusAction.Activate}
-          showForm={openActivateProjectForm}
           onFormComplete={() => onActivateProjectFormClosed(true)}
           onFormCancel={() => onActivateProjectFormClosed(false)}
         />
@@ -396,7 +402,6 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
         <ChangeProjectStatusForm
           project={projectData}
           statusAction={ProjectStatusAction.Complete}
-          showForm={openCompleteProjectForm}
           onFormComplete={() => onCompleteProjectFormClosed(true)}
           onFormCancel={() => onCompleteProjectFormClosed(false)}
         />
@@ -405,7 +410,6 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
         <ChangeProjectStatusForm
           project={projectData}
           statusAction={ProjectStatusAction.Cancel}
-          showForm={openCancelProjectForm}
           onFormComplete={() => onCancelProjectFormClosed(true)}
           onFormCancel={() => onCancelProjectFormClosed(false)}
         />
@@ -413,7 +417,6 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       {openDeleteProjectForm && (
         <DeleteProjectForm
           project={projectData}
-          showForm={openDeleteProjectForm}
           onFormComplete={() => onDeleteProjectFormClosed(true)}
           onFormCancel={() => onDeleteProjectFormClosed(false)}
         />

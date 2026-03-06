@@ -1,6 +1,5 @@
 'use client'
 
-import useAuth from '@/src/components/contexts/auth'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { useGetRoleUsersQuery } from '@/src/store/features/user-management/roles-api'
 import {
@@ -9,13 +8,13 @@ import {
 } from '@/src/store/features/user-management/users-api'
 import { Modal, Spin, Transfer, Typography, Flex, theme } from 'antd'
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useConfirmModal } from '@/src/hooks'
 
 const { Text } = Typography
 
 export interface ManageRoleUsersFormProps {
   roleId: string
   roleName: string
-  showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
 }
@@ -27,9 +26,12 @@ interface TransferItem {
   roles: string[]
 }
 
-const ManageRoleUsersForm: React.FC<ManageRoleUsersFormProps> = (props) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
+const ManageRoleUsersForm: React.FC<ManageRoleUsersFormProps> = ({
+  roleId,
+  roleName,
+  onFormComplete,
+  onFormCancel,
+}) => {
   const [targetKeys, setTargetKeys] = useState<string[]>([])
   const [initialTargetKeys, setInitialTargetKeys] = useState<string[]>([])
   const [selectedKeys, setSelectedKeys] = useState<string[]>([])
@@ -47,24 +49,58 @@ const ManageRoleUsersForm: React.FC<ManageRoleUsersFormProps> = (props) => {
     data: roleUsersData,
     isLoading: roleUsersLoading,
     error: roleUsersError,
-  } = useGetRoleUsersQuery(props.roleId)
+  } = useGetRoleUsersQuery(roleId)
 
   const [manageRoleUsers] = useManageRoleUsersMutation()
 
-  const { hasPermissionClaim } = useAuth()
-  const canUpdateUserRoles = hasPermissionClaim('Permissions.UserRoles.Update')
-
   const isLoading = allUsersLoading || roleUsersLoading
 
-  // Permission check
-  useEffect(() => {
-    if (canUpdateUserRoles) {
-      setIsOpen(props.showForm)
-    } else {
-      messageApi.error('You do not have permission to manage role users.')
-      props.onFormCancel()
-    }
-  }, [canUpdateUserRoles, messageApi, props])
+  // Compute pending changes
+  const usersToAdd = useMemo(
+    () => targetKeys.filter((key) => !initialTargetKeys.includes(key)),
+    [targetKeys, initialTargetKeys],
+  )
+
+  const usersToRemove = useMemo(
+    () => initialTargetKeys.filter((key) => !targetKeys.includes(key)),
+    [targetKeys, initialTargetKeys],
+  )
+
+  const hasChanges = usersToAdd.length > 0 || usersToRemove.length > 0
+
+  const { isOpen, isSaving, handleOk, handleCancel } = useConfirmModal({
+    onSubmit: useCallback(async () => {
+      try {
+        const response = await manageRoleUsers({
+          roleId: roleId,
+          userIdsToAdd: usersToAdd,
+          userIdsToRemove: usersToRemove,
+        })
+
+        if (response.error) {
+          throw response.error
+        }
+
+        messageApi.success('Successfully updated role users.')
+        return true
+      } catch (error: any) {
+        if (error.status === 422 && error.errors) {
+          messageApi.error('Correct the validation error(s) to continue.')
+        } else {
+          messageApi.error(
+            error.detail ??
+              'An error occurred while updating role users. Please try again.',
+          )
+        }
+        return false
+      }
+    }, [manageRoleUsers, roleId, usersToAdd, usersToRemove, messageApi]),
+    onComplete: onFormComplete,
+    onCancel: onFormCancel,
+    errorMessage:
+      'An error occurred while updating role users. Please try again.',
+    permission: 'Permissions.UserRoles.Update',
+  })
 
   // Initialize transfer data when role users load
   useEffect(() => {
@@ -79,10 +115,9 @@ const ManageRoleUsersForm: React.FC<ManageRoleUsersFormProps> = (props) => {
   useEffect(() => {
     if (allUsersError || roleUsersError) {
       messageApi.error('Failed to load users.')
-      setIsOpen(false)
-      props.onFormCancel()
+      onFormCancel()
     }
-  }, [allUsersError, roleUsersError, props, messageApi])
+  }, [allUsersError, roleUsersError, onFormCancel, messageApi])
 
   // Map all users to Transfer data source
   const dataSource = useMemo<TransferItem[]>(() => {
@@ -100,57 +135,8 @@ const ManageRoleUsersForm: React.FC<ManageRoleUsersFormProps> = (props) => {
       .sort((a, b) => a.title.localeCompare(b.title))
   }, [allUsersData])
 
-  // Compute pending changes
-  const usersToAdd = useMemo(
-    () => targetKeys.filter((key) => !initialTargetKeys.includes(key)),
-    [targetKeys, initialTargetKeys],
-  )
-
-  const usersToRemove = useMemo(
-    () => initialTargetKeys.filter((key) => !targetKeys.includes(key)),
-    [targetKeys, initialTargetKeys],
-  )
-
-  const hasChanges = usersToAdd.length > 0 || usersToRemove.length > 0
-
-  const handleOk = useCallback(async () => {
-    setIsSaving(true)
-    try {
-      const response = await manageRoleUsers({
-        roleId: props.roleId,
-        userIdsToAdd: usersToAdd,
-        userIdsToRemove: usersToRemove,
-      })
-
-      if (response.error) {
-        throw response.error
-      }
-
-      messageApi.success('Successfully updated role users.')
-      setIsOpen(false)
-      props.onFormComplete()
-    } catch (error: any) {
-      if (error.status === 422 && error.errors) {
-        messageApi.error('Correct the validation error(s) to continue.')
-      } else {
-        messageApi.error(
-          error.detail ??
-            'An error occurred while updating role users. Please try again.',
-        )
-      }
-    } finally {
-      setIsSaving(false)
-    }
-  }, [manageRoleUsers, messageApi, props, usersToAdd, usersToRemove])
-
-  const handleCancel = useCallback(() => {
-    setIsOpen(false)
-    props.onFormCancel()
-  }, [props])
-
   const onChange = useCallback(
     (nextTargetKeys: string[]) => {
-      // Sort target keys based on their order in dataSource to maintain sort
       const sortedTargetKeys = nextTargetKeys.sort(
         (a, b) =>
           (dataSource.findIndex((item) => item.key === a) || 0) -
@@ -179,14 +165,13 @@ const ManageRoleUsersForm: React.FC<ManageRoleUsersFormProps> = (props) => {
     [],
   )
 
-  // TODO: transfer does not work well on mobile - consider alternative UI for smaller screens
   return (
     <Modal
       title={
         <>
           <div>Manage Role Users</div>
           <Text type="secondary" style={{ fontSize: 14, fontWeight: 'normal' }}>
-            {props.roleName}
+            {roleName}
           </Text>
         </>
       }
@@ -196,10 +181,8 @@ const ManageRoleUsersForm: React.FC<ManageRoleUsersFormProps> = (props) => {
       okButtonProps={{ disabled: !hasChanges }}
       confirmLoading={isSaving}
       onCancel={handleCancel}
-      mask={{ blur: false }}
-      maskClosable={false}
       keyboard={false}
-      destroyOnHidden={true}
+      destroyOnHidden
       width={'80vw'}
     >
       <Spin spinning={isLoading} size="large">
@@ -284,4 +267,3 @@ const ManageRoleUsersForm: React.FC<ManageRoleUsersFormProps> = (props) => {
 }
 
 export default ManageRoleUsersForm
-

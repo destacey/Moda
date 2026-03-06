@@ -162,14 +162,36 @@ export const projectTasksApi = apiSlice.injectEndpoints({
           )
 
           if (!response.ok) {
-            const errorText = await response.text()
-            throw new Error(`HTTP ${response.status}: ${errorText}`)
+            let errorData: unknown
+            try {
+              errorData = await response.json()
+            } catch {
+              errorData = {
+                detail: await response.text(),
+              }
+            }
+
+            return {
+              error: {
+                status: response.status,
+                data: errorData,
+              },
+            }
           }
 
           return { data: null as any }
-        } catch (error) {
+        } catch (error: any) {
           console.error('API Error:', error)
-          return { error }
+          return {
+            error: {
+              status: 'FETCH_ERROR',
+              data: {
+                detail:
+                  error?.message ??
+                  'An error occurred while updating the project task.',
+              },
+            },
+          }
         }
       },
       invalidatesTags: (_result, _error, { projectIdOrKey, cacheKey }) => [

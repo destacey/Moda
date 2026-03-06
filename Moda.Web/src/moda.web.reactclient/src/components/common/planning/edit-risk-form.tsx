@@ -11,12 +11,10 @@ import {
   Select,
 } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
-import useAuth from '../../contexts/auth'
 import { RiskDetailsDto, UpdateRiskRequest } from '@/src/services/moda-api'
 import { toFormErrors } from '@/src/utils'
 import dayjs from 'dayjs'
 import { MarkdownEditor } from '../markdown'
-import { useMessage } from '../../contexts/messaging'
 import {
   useGetRiskCategoryOptionsQuery,
   useGetRiskGradeOptionsQuery,
@@ -25,6 +23,7 @@ import {
   useUpdateRiskMutation,
 } from '@/src/store/features/planning/risks-api'
 import { useGetEmployeeOptionsQuery } from '@/src/store/features/organizations/employee-api'
+import { useModalForm } from '@/src/hooks'
 
 const { Item } = Descriptions
 const { Item: FormItem } = Form
@@ -32,7 +31,6 @@ const { TextArea } = Input
 const { Group: RadioGroup } = Radio
 
 export interface EditRiskFormProps {
-  showForm: boolean
   riskKey: number
   onFormSave: () => void
   onFormCancel: () => void
@@ -69,31 +67,52 @@ const mapToRequestValues = (values: EditRiskFormValues) => {
 }
 
 const EditRiskForm = ({
-  showForm,
   riskKey,
   onFormSave,
   onFormCancel,
 }: EditRiskFormProps) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-  const [isValid, setIsValid] = useState(false)
-  const [form] = Form.useForm<EditRiskFormValues>()
-  const formValues = Form.useWatch([], form)
-  const messageApi = useMessage()
-
   const [teamName, setTeamName] = useState<string>('')
 
   const { data: riskData } = useGetRiskQuery(riskKey)
 
-  const [updateRisk, { error: mutationError }] = useUpdateRiskMutation()
+  const [updateRisk] = useUpdateRiskMutation()
 
   const { data: riskStatusOptions } = useGetRiskStatusOptionsQuery()
   const { data: riskCategoryOptions } = useGetRiskCategoryOptionsQuery()
   const { data: riskGradeOptions } = useGetRiskGradeOptionsQuery()
   const { data: employeeOptions } = useGetEmployeeOptionsQuery(true)
 
-  const { hasPermissionClaim } = useAuth()
-  const canUpdateRisks = hasPermissionClaim('Permissions.Risks.Update')
+  const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
+    useModalForm<EditRiskFormValues>({
+      onSubmit: useCallback(
+        async (values: EditRiskFormValues, form) => {
+          try {
+            const request = mapToRequestValues(values)
+            const response = await updateRisk({ request, cacheKey: riskKey })
+
+            if (response.error) {
+              throw response.error
+            }
+
+            return true
+          } catch (error) {
+            if (error.status === 422 && error.errors) {
+              const formErrors = toFormErrors(error.errors)
+              form.setFields(formErrors)
+            } else {
+              throw error
+            }
+            return false
+          }
+        },
+        [updateRisk, riskKey],
+      ),
+      onComplete: onFormSave,
+      onCancel: onFormCancel,
+      errorMessage:
+        'An error occurred while updating the risk. Please try again.',
+      permission: 'Permissions.Risks.Update',
+    })
 
   const mapToFormValues = useCallback(
     (risk: RiskDetailsDto) => {
@@ -114,85 +133,11 @@ const EditRiskForm = ({
     [form],
   )
 
-  const formAction = async (values: EditRiskFormValues) => {
-    try {
-      const request = mapToRequestValues(values)
-      const response = await updateRisk({ request, cacheKey: riskKey })
-
-      if (response.error) {
-        throw response.error
-      }
-
-      messageApi.success(`Risk updated successfully.`)
-
-      return true
-    } catch (error) {
-      if (error.status === 422 && error.errors) {
-        const formErrors = toFormErrors(error.errors)
-        form.setFields(formErrors)
-        messageApi.error('Correct the validation error(s) to continue.')
-      } else {
-        messageApi.error(
-          error.detail ??
-            'An error occurred while updating the risk. Please try again.',
-        )
-      }
-      return false
-    }
-  }
-
-  const handleOk = async () => {
-    setIsSaving(true)
-    try {
-      const values = await form.validateFields()
-      if (await formAction(values)) {
-        setIsOpen(false)
-        onFormSave()
-        form.resetFields()
-      }
-    } catch (error) {
-      console.error('handleOk error', error)
-      messageApi.error(
-        'An error occurred while updating the risk. Please try again.',
-      )
-    } finally {
-      setIsSaving(false)
-    }
-  }
-
-  const handleCancel = useCallback(() => {
-    setIsOpen(false)
-    onFormCancel()
-    form.resetFields()
-  }, [form, onFormCancel])
-
   useEffect(() => {
-    if (!riskData) return
-    if (canUpdateRisks) {
-      setIsOpen(showForm)
-      if (showForm) {
-        setTeamName(riskData?.team.name)
-        mapToFormValues(riskData)
-      }
-    } else {
-      onFormCancel()
-      messageApi.error('You do not have permission to update Risks.')
-    }
-  }, [
-    canUpdateRisks,
-    onFormCancel,
-    mapToFormValues,
-    messageApi,
-    riskData,
-    showForm,
-  ])
-
-  useEffect(() => {
-    form.validateFields({ validateOnly: true }).then(
-      () => setIsValid(true && form.isFieldsTouched()),
-      () => setIsValid(false),
-    )
-  }, [form, formValues])
+    if (!riskData || !isOpen) return
+    setTeamName(riskData.team.name)
+    mapToFormValues(riskData)
+  }, [riskData, isOpen, mapToFormValues])
 
   return (
     <Modal
@@ -203,9 +148,8 @@ const EditRiskForm = ({
       okText="Save"
       confirmLoading={isSaving}
       onCancel={handleCancel}
-      maskClosable={false}
-      keyboard={false} // disable esc key to close modal
-      destroyOnHidden={true}
+      keyboard={false}
+      destroyOnHidden
     >
       <Flex vertical gap="small">
         <Descriptions size="small" column={1}>

@@ -98,7 +98,7 @@ public sealed class PersonalAccessToken : BaseEntity<Guid>, ISystemAuditable
     /// <summary>
     /// Gets the ID of the user who revoked this token, if applicable.
     /// </summary>
-    public Guid? RevokedBy { get; private set; }
+    public string? RevokedBy { get; private set; }
 
     /// <summary>
     /// Indicates whether this token is currently active (not expired and not revoked).
@@ -150,7 +150,7 @@ public sealed class PersonalAccessToken : BaseEntity<Guid>, ISystemAuditable
     /// <param name="revokedBy">The ID of the user revoking the token.</param>
     /// <param name="timestamp">The timestamp for the revocation.</param>
     /// <returns>A Result indicating success or failure.</returns>
-    public Result Revoke(Guid revokedBy, Instant timestamp)
+    public Result Revoke(string revokedBy, Instant timestamp)
     {
         if (IsRevoked)
         {

@@ -223,7 +223,6 @@ const ObjectiveListItem = ({
       </Card>
       {openUpdateObjectiveForm && (
         <EditPlanningIntervalObjectiveForm
-          showForm={openUpdateObjectiveForm}
           objectiveKey={objective?.key}
           planningIntervalKey={objective?.planningInterval?.key}
           onFormSave={() => onEditObjectiveFormClosed(true)}

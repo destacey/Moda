@@ -1,4 +1,3 @@
-import useAuth from '@/src/components/contexts/auth'
 import {
   RoadmapTimeboxDetailsDto,
   RoadmapTimeboxListDto,
@@ -15,13 +14,13 @@ import { useCallback, useEffect, useState } from 'react'
 import dayjs from 'dayjs'
 import { MarkdownEditor } from '@/src/components/common/markdown'
 import { useMessage } from '@/src/components/contexts/messaging'
+import { useModalForm } from '@/src/hooks'
 
 const { Item } = Form
 const { TextArea } = Input
 const { RangePicker } = DatePicker
 
 export interface EditRoadmapTimeboxFormProps {
-  showForm: boolean
   timeboxId: string
   roadmapId: string
   onFormComplete: () => void
@@ -54,12 +53,12 @@ const mapToRequestValues = (
   } as UpdateRoadmapTimeboxRequest
 }
 
-const EditRoadmapTimeboxForm = (props: EditRoadmapTimeboxFormProps) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-  const [isValid, setIsValid] = useState(false)
-  const [form] = Form.useForm<EditRoadmapTimeboxFormValues>()
-  const formValues = Form.useWatch([], form)
+const EditRoadmapTimeboxForm = ({
+  timeboxId,
+  roadmapId,
+  onFormComplete,
+  onFormCancel,
+}: EditRoadmapTimeboxFormProps) => {
   const [activitiesTree, setActivitiesTree] = useState<RoadmapTimeboxListDto[]>(
     [],
   )
@@ -71,125 +70,69 @@ const EditRoadmapTimeboxForm = (props: EditRoadmapTimeboxFormProps) => {
     isLoading: timeboxDataIsLoading,
     error: timeboxDataError,
   } = useGetRoadmapItemQuery({
-    roadmapId: props.roadmapId,
-    itemId: props.timeboxId,
+    roadmapId: roadmapId,
+    itemId: timeboxId,
   })
 
   const {
     data: activities,
     isLoading: activitiesIsLoading,
     error: activitiesError,
-  } = useGetRoadmapActivitiesQuery(props.roadmapId)
+  } = useGetRoadmapActivitiesQuery(roadmapId)
 
-  const [updateRoadmapTimebox, { error: mutationError }] =
-    useUpdateRoadmapItemMutation()
+  const [updateRoadmapTimebox] = useUpdateRoadmapItemMutation()
 
-  const { hasPermissionClaim } = useAuth()
-  const canManageRoadmapItems = hasPermissionClaim(
-    'Permissions.Roadmaps.Update',
-  )
+  const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
+    useModalForm<EditRoadmapTimeboxFormValues>({
+      onSubmit: useCallback(
+        async (values: EditRoadmapTimeboxFormValues, form) => {
+          try {
+            const request = mapToRequestValues(values, timeboxId, roadmapId)
+            const response = await updateRoadmapTimebox(request)
+            if (response.error) throw response.error
 
-  const mapToFormValues = useCallback(
-    (activity: RoadmapTimeboxDetailsDto) => {
-      if (!activity) return
-
-      form.setFieldsValue({
-        parentActivityId: activity.parent?.id,
-        name: activity.name,
-        description: activity.description || '',
-        range: [dayjs(activity.start), dayjs(activity.end)],
-        color: activity.color,
-      })
-    },
-    [form],
-  )
-
-  const update = async (
-    values: EditRoadmapTimeboxFormValues,
-    itemId: string,
-    roadmapId: string,
-  ) => {
-    try {
-      const request = mapToRequestValues(values, itemId, roadmapId)
-      const response = await updateRoadmapTimebox(request)
-      if (response.error) {
-        throw response.error
-      }
-
-      messageApi.success('Roadmap Timebox updated successfully.')
-
-      return true
-    } catch (error) {
-      if (error.status === 422 && error.errors) {
-        const formErrors = toFormErrors(error.errors)
-        form.setFields(formErrors)
-        messageApi.error('Correct the validation error(s) to continue.')
-      } else {
-        messageApi.error(
-          error.detail ??
-            'An error occurred while updating the roadmap timebox. Please try again.',
-        )
-      }
-      return false
-    }
-  }
-
-  const handleOk = async () => {
-    setIsSaving(true)
-    try {
-      const values = await form.validateFields()
-      if (await update(values, props.timeboxId, props.roadmapId)) {
-        setIsOpen(false)
-        form.resetFields()
-        props.onFormComplete()
-      }
-    } catch (error) {
-      console.error('handleOk error', error)
-      messageApi.error(
+            messageApi.success('Roadmap Timebox updated successfully.')
+            return true
+          } catch (error) {
+            if (error.status === 422 && error.errors) {
+              const formErrors = toFormErrors(error.errors)
+              form.setFields(formErrors)
+              messageApi.error('Correct the validation error(s) to continue.')
+            } else {
+              messageApi.error(
+                error.detail ??
+                  'An error occurred while updating the roadmap timebox. Please try again.',
+              )
+            }
+            return false
+          }
+        },
+        [updateRoadmapTimebox, timeboxId, roadmapId, messageApi],
+      ),
+      onComplete: onFormComplete,
+      onCancel: onFormCancel,
+      errorMessage:
         'An error occurred while updating the roadmap timebox. Please try again.',
-      )
-    } finally {
-      setIsSaving(false)
-    }
-  }
+      permission: 'Permissions.Roadmaps.Update',
+    })
 
-  const handleCancel = useCallback(() => {
-    setIsOpen(false)
-    form.resetFields()
-    props.onFormCancel()
-  }, [form, props])
-
+  // Initialize form values when data is loaded
   useEffect(() => {
     if (!timeboxData || !activities || activitiesIsLoading) return
 
     setActivitiesTree(activities)
 
-    if (canManageRoadmapItems) {
-      setIsOpen(props.showForm)
-      if (props.showForm) {
-        mapToFormValues(timeboxData)
-      }
-    } else {
-      props.onFormCancel()
-      messageApi.error('You do not have permission to update roadmap items.')
-    }
-  }, [
-    activities,
-    activitiesIsLoading,
-    timeboxData,
-    canManageRoadmapItems,
-    mapToFormValues,
-    props,
-    messageApi,
-  ])
+    const timebox = timeboxData as RoadmapTimeboxDetailsDto
+    form.setFieldsValue({
+      parentActivityId: timebox.parent?.id,
+      name: timebox.name,
+      description: timebox.description || '',
+      range: [dayjs(timebox.start), dayjs(timebox.end)],
+      color: timebox.color,
+    })
+  }, [activities, activitiesIsLoading, timeboxData, form])
 
-  useEffect(() => {
-    form.validateFields({ validateOnly: true }).then(
-      () => setIsValid(true && form.isFieldsTouched()),
-      () => setIsValid(false),
-    )
-  }, [form, formValues])
-
+  // Query error display
   useEffect(() => {
     if (timeboxDataError) {
       messageApi.error(
@@ -206,82 +149,79 @@ const EditRoadmapTimeboxForm = (props: EditRoadmapTimeboxFormProps) => {
   }, [activitiesError, timeboxDataError, messageApi])
 
   return (
-    <>
-      <Modal
-        title="Edit Roadmap Timebox"
-        open={isOpen}
-        onOk={handleOk}
-        okButtonProps={{ disabled: !isValid }}
-        okText="Save"
-        confirmLoading={isSaving}
-        onCancel={handleCancel}
-        maskClosable={false}
-        keyboard={false} // disable esc key to close modal
-        destroyOnHidden={true}
+    <Modal
+      title="Edit Roadmap Timebox"
+      open={isOpen}
+      onOk={handleOk}
+      okButtonProps={{ disabled: !isValid }}
+      okText="Save"
+      confirmLoading={isSaving}
+      onCancel={handleCancel}
+      keyboard={false} // disable esc key to close modal
+      destroyOnHidden
+    >
+      <Form
+        form={form}
+        size="small"
+        layout="vertical"
+        name="update-roadmap-timebox-form"
       >
-        <Form
-          form={form}
-          size="small"
-          layout="vertical"
-          name="update-roadmap-timebox-form"
-        >
-          <Item name="parentActivityId" label="Parent Activity">
-            <TreeSelect
-              //showSearch // TODO: not working
-              loading={activitiesIsLoading}
-              treeLine={true}
-              placeholder="Select parent activity"
-              allowClear
-              treeDefaultExpandAll
-              treeData={activitiesTree}
-              fieldNames={{ label: 'name', value: 'id', children: 'children' }}
-              value={form.getFieldValue('parentActivityId')}
-            />
-          </Item>
-          <Item label="Name" name="name" rules={[{ required: true }]}>
-            <TextArea
-              autoSize={{ minRows: 1, maxRows: 2 }}
-              showCount
-              maxLength={128}
-            />
-          </Item>
-          <Item name="description" label="Description" rules={[{ max: 2048 }]}>
-            <MarkdownEditor
-              value={form.getFieldValue('description')}
-              onChange={(value) =>
-                form.setFieldValue('description', value || '')
-              }
-              maxLength={2048}
-            />
-          </Item>
-          <Item
-            name="range"
-            label="Dates"
-            rules={[
-              { required: true, message: 'Select start and end dates' },
-              {
-                validator: (_, value) => {
-                  if (!value || !value[0] || !value[1]) {
-                    return Promise.reject(
-                      new Error('Start and end dates are required'),
-                    )
-                  }
-                  const [start, end] = value
-                  if (!start || !end || !start.isBefore(end)) {
-                    return Promise.reject(
-                      new Error('End date must be after start date'),
-                    )
-                  }
-                  return Promise.resolve()
-                },
+        <Item name="parentActivityId" label="Parent Activity">
+          <TreeSelect
+            //showSearch // TODO: not working
+            loading={activitiesIsLoading}
+            treeLine={true}
+            placeholder="Select parent activity"
+            allowClear
+            treeDefaultExpandAll
+            treeData={activitiesTree}
+            fieldNames={{ label: 'name', value: 'id', children: 'children' }}
+            value={form.getFieldValue('parentActivityId')}
+          />
+        </Item>
+        <Item label="Name" name="name" rules={[{ required: true }]}>
+          <TextArea
+            autoSize={{ minRows: 1, maxRows: 2 }}
+            showCount
+            maxLength={128}
+          />
+        </Item>
+        <Item name="description" label="Description" rules={[{ max: 2048 }]}>
+          <MarkdownEditor
+            value={form.getFieldValue('description')}
+            onChange={(value) =>
+              form.setFieldValue('description', value || '')
+            }
+            maxLength={2048}
+          />
+        </Item>
+        <Item
+          name="range"
+          label="Dates"
+          rules={[
+            { required: true, message: 'Select start and end dates' },
+            {
+              validator: (_, value) => {
+                if (!value || !value[0] || !value[1]) {
+                  return Promise.reject(
+                    new Error('Start and end dates are required'),
+                  )
+                }
+                const [start, end] = value
+                if (!start || !end || !start.isBefore(end)) {
+                  return Promise.reject(
+                    new Error('End date must be after start date'),
+                  )
+                }
+                return Promise.resolve()
               },
-            ]}
-          >
-            <RangePicker />
-          </Item>
-        </Form>
-      </Modal>
-    </>
+            },
+          ]}
+        >
+          <RangePicker />
+        </Item>
+      </Form>
+    </Modal>
   )
 }
 

@@ -34,7 +34,7 @@ internal sealed class DeletePersonalAccessTokenCommandHandler(
     {
         try
         {
-            var userIdString = _currentUser.GetUserId().ToString();
+            var userIdString = _currentUser.GetUserId();
 
             var token = await _dbContext.PersonalAccessTokens
                 .FirstOrDefaultAsync(t => t.Id == request.TokenId && t.UserId == userIdString, cancellationToken);

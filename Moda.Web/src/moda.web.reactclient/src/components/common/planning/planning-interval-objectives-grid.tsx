@@ -304,7 +304,6 @@ const PlanningIntervalObjectivesGrid = ({
       />
       {openUpdateObjectiveForm && (
         <EditPlanningIntervalObjectiveForm
-          showForm={openUpdateObjectiveForm}
           objectiveKey={selectedObjective.key}
           planningIntervalKey={planningIntervalKey}
           onFormSave={() => onEditObjectiveFormClosed(true)}

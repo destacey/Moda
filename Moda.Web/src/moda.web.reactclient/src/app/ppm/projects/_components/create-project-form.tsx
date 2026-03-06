@@ -2,8 +2,8 @@
 
 import { MarkdownEditor } from '@/src/components/common/markdown'
 import { EmployeeSelect } from '@/src/components/common/organizations'
-import useAuth from '@/src/components/contexts/auth'
 import { useMessage } from '@/src/components/contexts/messaging'
+import { useModalForm } from '@/src/hooks'
 import { CreateProjectRequest } from '@/src/services/moda-api'
 import { useGetEmployeeOptionsQuery } from '@/src/store/features/organizations/employee-api'
 import { useGetExpenditureCategoryOptionsQuery } from '@/src/store/features/ppm/expenditure-categories-api'
@@ -16,12 +16,11 @@ import { useGetStrategicThemeOptionsQuery } from '@/src/store/features/strategic
 import { toFormErrors } from '@/src/utils'
 import { DatePicker, Form, Input, Modal, Select } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect } from 'react'
 
 const { Item } = Form
 
 export interface CreateProjectFormProps {
-  showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
 }
@@ -62,32 +61,63 @@ const mapToRequestValues = (
 
 const keyPattern = /^[A-Z0-9]{2,20}$/
 
-const CreateProjectForm = (props: CreateProjectFormProps) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-  const [isValid, setIsValid] = useState(false)
-  const [form] = Form.useForm<CreateProjectFormValues>()
-  const formValues = Form.useWatch([], form)
-
+const CreateProjectForm = ({
+  onFormComplete,
+  onFormCancel,
+}: CreateProjectFormProps) => {
   const messageApi = useMessage()
 
-  const [createProject, { error: mutationError }] = useCreateProjectMutation()
+  const [createProject] = useCreateProjectMutation()
 
   const {
     data: expenditureData,
-    isLoading: expenditureOptionsIsLoading,
     error: expenditureOptionsError,
   } = useGetExpenditureCategoryOptionsQuery(false)
 
   const {
     data: portfolioData,
-    isLoading: portfolioOptionsIsLoading,
     error: portfolioOptionsError,
   } = useGetPortfolioOptionsQuery()
 
+  const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
+    useModalForm<CreateProjectFormValues>({
+      onSubmit: useCallback(
+        async (values: CreateProjectFormValues, form) => {
+          try {
+            const request = mapToRequestValues(values)
+            const response = await createProject(request)
+            if (response.error) throw response.error
+
+            messageApi.success(
+              'Project created successfully. Project key: ' +
+                response.data.key,
+            )
+            return true
+          } catch (error) {
+            if (error.status === 422 && error.errors) {
+              const formErrors = toFormErrors(error.errors)
+              form.setFields(formErrors)
+              messageApi.error('Correct the validation error(s) to continue.')
+            } else {
+              messageApi.error(
+                error.detail ??
+                  'An error occurred while creating the project. Please try again.',
+              )
+            }
+            return false
+          }
+        },
+        [createProject, messageApi],
+      ),
+      onComplete: onFormComplete,
+      onCancel: onFormCancel,
+      errorMessage:
+        'An error occurred while creating the project. Please try again.',
+      permission: 'Permissions.Projects.Create',
+    })
+
   const {
     data: programData,
-    isLoading: programOptionsIsLoading,
     error: programOptionsError,
   } = useGetPortfolioProgramOptionsQuery(form.getFieldValue('portfolioId'), {
     skip: !form.getFieldValue('portfolioId'),
@@ -95,18 +125,13 @@ const CreateProjectForm = (props: CreateProjectFormProps) => {
 
   const {
     data: employeeData,
-    isLoading: employeeOptionsIsLoading,
     error: employeeOptionsError,
   } = useGetEmployeeOptionsQuery(false)
 
   const {
     data: strategicThemeData,
-    isLoading: strategicThemeOptionsIsLoading,
     error: strategicThemeOptionsError,
   } = useGetStrategicThemeOptionsQuery(false)
-
-  const { hasPermissionClaim } = useAuth()
-  const canCreateProject = hasPermissionClaim('Permissions.Projects.Create')
 
   useEffect(() => {
     if (
@@ -141,246 +166,174 @@ const CreateProjectForm = (props: CreateProjectFormProps) => {
     strategicThemeOptionsError,
   ])
 
-  const create = async (values: CreateProjectFormValues) => {
-    try {
-      const request = mapToRequestValues(values)
-      const response = await createProject(request)
-      if (response.error) {
-        throw response.error
-      }
-      messageApi.success(
-        'Project created successfully. Project key: ' + response.data.key,
-      )
-
-      return true
-    } catch (error) {
-      if (error.status === 422 && error.errors) {
-        const formErrors = toFormErrors(error.errors)
-        form.setFields(formErrors)
-        messageApi.error('Correct the validation error(s) to continue.')
-      } else {
-        messageApi.error(
-          error.detail ??
-            'An error occurred while creating the project. Please try again.',
-        )
-      }
-      return false
-    }
-  }
-
-  const handleOk = async () => {
-    setIsSaving(true)
-    try {
-      const values = await form.validateFields()
-      if (await create(values)) {
-        setIsOpen(false)
-        form.resetFields()
-        props.onFormComplete()
-      }
-    } catch (error) {
-      console.error('handleOk error', error)
-      messageApi.error(
-        'An error occurred while creating the project. Please try again.',
-      )
-    } finally {
-      setIsSaving(false)
-    }
-  }
-
-  const handleCancel = useCallback(() => {
-    setIsOpen(false)
-    form.resetFields()
-    props.onFormCancel()
-  }, [form, props])
-
-  useEffect(() => {
-    if (canCreateProject) {
-      setIsOpen(props.showForm)
-    } else {
-      props.onFormCancel()
-      messageApi.error('You do not have permission to create projects.')
-    }
-  }, [canCreateProject, messageApi, props])
-
-  useEffect(() => {
-    form.validateFields({ validateOnly: true }).then(
-      () => setIsValid(true && form.isFieldsTouched()),
-      () => setIsValid(false),
-    )
-  }, [form, formValues])
-
   return (
-    <>
-      <Modal
-        title="Create Project"
-        open={isOpen}
-        width={'60vw'}
-        onOk={handleOk}
-        okButtonProps={{ disabled: !isValid }}
-        okText="Create"
-        confirmLoading={isSaving}
-        onCancel={handleCancel}
-        mask={{ blur: false }}
-        maskClosable={false}
-        keyboard={false} // disable esc key to close modal
-        destroyOnHidden={true}
+    <Modal
+      title="Create Project"
+      open={isOpen}
+      width={'60vw'}
+      onOk={handleOk}
+      okButtonProps={{ disabled: !isValid }}
+      okText="Create"
+      confirmLoading={isSaving}
+      onCancel={handleCancel}
+      keyboard={false} // disable esc key to close modal
+      destroyOnHidden
+    >
+      <Form
+        form={form}
+        size="small"
+        layout="vertical"
+        name="create-project-form"
       >
-        <Form
-          form={form}
-          size="small"
-          layout="vertical"
-          name="create-project-form"
+        <Item
+          name="portfolioId"
+          label="Portfolio"
+          rules={[{ required: true, message: 'Portfolio is required' }]}
         >
-          <Item
-            name="portfolioId"
-            label="Portfolio"
-            rules={[{ required: true, message: 'Portfolio is required' }]}
-          >
-            <Select
-              allowClear
-              options={portfolioData ?? []}
-              placeholder="Select Portfolio"
-            />
-          </Item>
-          <Item name="programId" label="Program">
-            <Select
-              allowClear
-              options={programData ?? []}
-              placeholder="Select Program"
-              disabled={!form.getFieldValue('portfolioId')}
-            />
-          </Item>
-          <Item
-            name="key"
-            label="Key"
-            extra="2-20 uppercase alphanumeric characters (A-Z, 0-9)"
-            rules={[
-              { required: true, message: 'Key is required.' },
-              {
-                pattern: keyPattern,
-                message:
-                  'Key must be 2-20 uppercase alphanumeric characters (A-Z, 0-9).',
-              },
-            ]}
-            normalize={(value) => (value ?? '').toUpperCase()}
-          >
-            <Input
-              placeholder="Enter new key"
-              autoComplete="off"
-              showCount
-              maxLength={20}
-            />
-          </Item>
-          <Item
-            label="Name"
-            name="name"
-            rules={[
-              { required: true, message: 'Name is required' },
-              { max: 128 },
-            ]}
-          >
-            <TextArea
-              autoSize={{ minRows: 1, maxRows: 2 }}
-              showCount
-              maxLength={128}
-            />
-          </Item>
-          <Item
-            name="description"
-            label="Description"
-            rules={[
-              { required: true, message: 'Description is required' },
-              { max: 2048 },
-            ]}
-          >
-            <MarkdownEditor maxLength={2048} />
-          </Item>
-          <Item
-            name="expenditureCategoryId"
-            label="Expenditure Category"
-            rules={[
-              { required: true, message: 'Expenditure Category is required' },
-            ]}
-          >
-            <Select
-              allowClear
-              options={expenditureData ?? []}
-              placeholder="Select Expenditure Category"
-              optionFilterProp="children"
-              filterOption={(input, option) =>
-                (option?.label?.toLowerCase() ?? '').includes(
-                  input.toLowerCase(),
-                )
-              }
-            />
-          </Item>
-          <Item name="start" label="Start">
-            <DatePicker />
-          </Item>
-          <Item
-            name="end"
-            label="End"
-            dependencies={['start']}
-            rules={[
-              ({ getFieldValue }) => ({
-                validator(_, value) {
-                  const start = getFieldValue('start')
-                  if ((!start && !value) || (start && start <= value)) {
-                    return Promise.resolve()
-                  } else if ((!start && value) || (start && !value)) {
-                    return Promise.reject(
-                      new Error(
-                        'Start and end date must be selected together or both left empty',
-                      ),
-                    )
-                  }
+          <Select
+            allowClear
+            options={portfolioData ?? []}
+            placeholder="Select Portfolio"
+          />
+        </Item>
+        <Item name="programId" label="Program">
+          <Select
+            allowClear
+            options={programData ?? []}
+            placeholder="Select Program"
+            disabled={!form.getFieldValue('portfolioId')}
+          />
+        </Item>
+        <Item
+          name="key"
+          label="Key"
+          extra="2-20 uppercase alphanumeric characters (A-Z, 0-9)"
+          rules={[
+            { required: true, message: 'Key is required.' },
+            {
+              pattern: keyPattern,
+              message:
+                'Key must be 2-20 uppercase alphanumeric characters (A-Z, 0-9).',
+            },
+          ]}
+          normalize={(value) => (value ?? '').toUpperCase()}
+        >
+          <Input
+            placeholder="Enter new key"
+            autoComplete="off"
+            showCount
+            maxLength={20}
+          />
+        </Item>
+        <Item
+          label="Name"
+          name="name"
+          rules={[
+            { required: true, message: 'Name is required' },
+            { max: 128 },
+          ]}
+        >
+          <TextArea
+            autoSize={{ minRows: 1, maxRows: 2 }}
+            showCount
+            maxLength={128}
+          />
+        </Item>
+        <Item
+          name="description"
+          label="Description"
+          rules={[
+            { required: true, message: 'Description is required' },
+            { max: 2048 },
+          ]}
+        >
+          <MarkdownEditor maxLength={2048} />
+        </Item>
+        <Item
+          name="expenditureCategoryId"
+          label="Expenditure Category"
+          rules={[
+            { required: true, message: 'Expenditure Category is required' },
+          ]}
+        >
+          <Select
+            allowClear
+            options={expenditureData ?? []}
+            placeholder="Select Expenditure Category"
+            optionFilterProp="children"
+            filterOption={(input, option) =>
+              (option?.label?.toLowerCase() ?? '').includes(
+                input.toLowerCase(),
+              )
+            }
+          />
+        </Item>
+        <Item name="start" label="Start">
+          <DatePicker />
+        </Item>
+        <Item
+          name="end"
+          label="End"
+          dependencies={['start']}
+          rules={[
+            ({ getFieldValue }) => ({
+              validator(_, value) {
+                const start = getFieldValue('start')
+                if ((!start && !value) || (start && start <= value)) {
+                  return Promise.resolve()
+                } else if ((!start && value) || (start && !value)) {
                   return Promise.reject(
-                    new Error('End date must be on or after start date'),
+                    new Error(
+                      'Start and end date must be selected together or both left empty',
+                    ),
                   )
-                },
-              }),
-            ]}
-          >
-            <DatePicker />
-          </Item>
-          <Item name="sponsorIds" label="Sponsors">
-            <EmployeeSelect
-              employees={employeeData ?? []}
-              allowMultiple={true}
-              placeholder="Select Sponsors"
-            />
-          </Item>
-          <Item name="ownerIds" label="Owners">
-            <EmployeeSelect
-              employees={employeeData ?? []}
-              allowMultiple={true}
-              placeholder="Select Owners"
-            />
-          </Item>
-          <Item name="managerIds" label="Managers">
-            <EmployeeSelect
-              employees={employeeData ?? []}
-              allowMultiple={true}
-              placeholder="Select Managers"
-            />
-          </Item>
-          <Item name="strategicThemeIds" label="Strategic Themes">
-            <Select
-              mode="multiple"
-              allowClear
-              options={strategicThemeData ?? []}
-              placeholder="Select Strategic Themes"
-              optionFilterProp="label"
-              filterOption={(input, option) =>
-                (option?.label?.toLowerCase() ?? '').includes(
-                  input.toLowerCase(),
+                }
+                return Promise.reject(
+                  new Error('End date must be on or after start date'),
                 )
-              }
-            />
-          </Item>
-        </Form>
-      </Modal>
-    </>
+              },
+            }),
+          ]}
+        >
+          <DatePicker />
+        </Item>
+        <Item name="sponsorIds" label="Sponsors">
+          <EmployeeSelect
+            employees={employeeData ?? []}
+            allowMultiple={true}
+            placeholder="Select Sponsors"
+          />
+        </Item>
+        <Item name="ownerIds" label="Owners">
+          <EmployeeSelect
+            employees={employeeData ?? []}
+            allowMultiple={true}
+            placeholder="Select Owners"
+          />
+        </Item>
+        <Item name="managerIds" label="Managers">
+          <EmployeeSelect
+            employees={employeeData ?? []}
+            allowMultiple={true}
+            placeholder="Select Managers"
+          />
+        </Item>
+        <Item name="strategicThemeIds" label="Strategic Themes">
+          <Select
+            mode="multiple"
+            allowClear
+            options={strategicThemeData ?? []}
+            placeholder="Select Strategic Themes"
+            optionFilterProp="label"
+            filterOption={(input, option) =>
+              (option?.label?.toLowerCase() ?? '').includes(
+                input.toLowerCase(),
+              )
+            }
+          />
+        </Item>
+      </Form>
+    </Modal>
   )
 }
 

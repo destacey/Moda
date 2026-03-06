@@ -39,17 +39,13 @@ internal sealed class GetRoadmapItemQueryHandler(IPlanningDbContext planningDbCo
             return null;
         }
 
-        switch (item)
+        return item switch
         {
-            case RoadmapActivity activity:
-                return activity.Adapt<RoadmapActivityDetailsDto>();
-            case RoadmapMilestone milestone:
-                return milestone.Adapt<RoadmapMilestoneDetailsDto>();
-            case RoadmapTimebox timebox:
-                return timebox.Adapt<RoadmapTimeboxDetailsDto>();
-            default:
-                return item.Adapt<RoadmapItemDetailsDto>();
-        }
+            RoadmapActivity activity => activity.Adapt<RoadmapActivityDetailsDto>(),
+            RoadmapMilestone milestone => milestone.Adapt<RoadmapMilestoneDetailsDto>(),
+            RoadmapTimebox timebox => timebox.Adapt<RoadmapTimeboxDetailsDto>(),
+            _ => item.Adapt<RoadmapItemDetailsDto>(),
+        };
 
         //return item.Adapt<RoadmapItemDetailsDto>();  // TODO: this is not working, it's always returning only the BaseRoadmapItem properties
     }

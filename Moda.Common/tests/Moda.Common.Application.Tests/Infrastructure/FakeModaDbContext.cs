@@ -18,11 +18,13 @@ public class FakeModaDbContext : IModaDbContext, IDisposable
     private readonly List<Employee> _employees = [];
     private readonly List<ExternalEmployeeBlacklistItem> _externalEmployeeBlacklistItems = [];
     private readonly List<PersonalAccessToken> _personalAccessTokens = [];
+    private readonly List<User> _modaUsers = [];
 
     // DbSet properties
     public DbSet<Employee> Employees => _employees.AsDbSet();
     public DbSet<ExternalEmployeeBlacklistItem> ExternalEmployeeBlacklistItems => _externalEmployeeBlacklistItems.AsDbSet();
     public DbSet<PersonalAccessToken> PersonalAccessTokens => _personalAccessTokens.AsDbSet();
+    public DbSet<User> ModaUsers => _modaUsers.AsDbSet();
 
     // ChangeTracker - we can't create a real one, so we return null and the handler uses defensive coding (_dbContext.ChangeTracker?.Clear())
     public ChangeTracker ChangeTracker => null!;

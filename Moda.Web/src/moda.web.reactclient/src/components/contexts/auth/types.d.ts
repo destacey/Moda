@@ -7,6 +7,7 @@ export interface User {
   name: string
   username: string
   isAuthenticated: boolean
+  employeeId: string | null
   claims: Claim[]
 }
 

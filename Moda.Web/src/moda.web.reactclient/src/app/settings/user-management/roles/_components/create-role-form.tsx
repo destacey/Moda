@@ -1,8 +1,7 @@
 'use client'
 
 import { Form, Input, Modal, Select } from 'antd'
-import { useEffect, useState } from 'react'
-import useAuth from '@/src/components/contexts/auth'
+import { useState } from 'react'
 import { toFormErrors } from '@/src/utils'
 import { RoleDto, UpdateRolePermissionsRequest } from '@/src/services/moda-api'
 import {
@@ -11,12 +10,13 @@ import {
   useUpsertRoleMutation,
 } from '@/src/store/features/user-management/roles-api'
 import { useMessage } from '@/src/components/contexts/messaging'
+import { useModalForm } from '@/src/hooks'
+import { useCallback } from 'react'
 
 const { Item } = Form
 const { TextArea } = Input
 
 export interface CreateRoleFormProps {
-  showForm: boolean
   roles: RoleDto[]
   onFormCreate: (id: string) => void
   onFormCancel: () => void
@@ -28,23 +28,14 @@ interface CreateRoleFormValues {
 }
 
 const CreateRoleForm = ({
-  showForm,
   roles,
   onFormCreate,
   onFormCancel,
 }: CreateRoleFormProps) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-  const [isValid, setIsValid] = useState(false)
   const [roleIdToCopyPermissions, setRoleIdToCopyPermissions] = useState<
     string | null
   >(null)
-  const [form] = Form.useForm<CreateRoleFormValues>()
-  const formValues = Form.useWatch([], form)
   const messageApi = useMessage()
-
-  const { hasClaim } = useAuth()
-  const canCreate = hasClaim('Permission', 'Permissions.Roles.Create')
 
   const { data: roleData } = useGetRoleQuery(roleIdToCopyPermissions, {
     skip: !roleIdToCopyPermissions,
@@ -53,89 +44,56 @@ const CreateRoleForm = ({
   const [upsertRole] = useUpsertRoleMutation()
   const [updatePermissions] = useUpdatePermissionsMutation()
 
-  useEffect(() => {
-    if (canCreate) {
-      setIsOpen(showForm)
-    } else {
-      onFormCancel()
-      messageApi.error('You do not have permission to create role.')
-    }
-  }, [canCreate, onFormCancel, showForm, messageApi])
+  const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
+    useModalForm<CreateRoleFormValues>({
+      onSubmit: useCallback(
+        async (values: CreateRoleFormValues, form) => {
+          try {
+            const response = await upsertRole({
+              name: values.name,
+              description: values.description,
+            })
 
-  useEffect(() => {
-    form.validateFields({ validateOnly: true }).then(
-      () => setIsValid(true && form.isFieldsTouched()),
-      () => setIsValid(false),
-    )
-  }, [form, formValues])
+            if (response.error) {
+              throw response.error
+            }
 
-  const create = async (
-    values: CreateRoleFormValues,
-  ): Promise<string | null> => {
-    try {
-      const response = await upsertRole({
-        name: values.name,
-        description: values.description,
-      })
+            if (roleIdToCopyPermissions && roleData.permissions) {
+              const request: UpdateRolePermissionsRequest = {
+                roleId: response.data,
+                permissions: roleData.permissions,
+              }
+              const updatePermissionsResponse = await updatePermissions(request)
+              if (response.error) {
+                console.error(
+                  `Role created but an error was thrown while saving the permissions. Error: ${updatePermissionsResponse.error}`,
+                )
+              }
+            }
 
-      if (response.error) {
-        throw response.error
-      }
-
-      if (roleIdToCopyPermissions && roleData.permissions) {
-        const request: UpdateRolePermissionsRequest = {
-          roleId: response.data,
-          permissions: roleData.permissions,
-        }
-        const updatePermissionsResponse = await updatePermissions(request)
-        if (response.error) {
-          console.error(
-            `Role created but an error was thrown while saving the permissions. Error: ${updatePermissionsResponse.error}`,
-          )
-        }
-      }
-
-      return response.data
-    } catch (error: any) {
-      if (error.status === 422 && error.errors) {
-        const formErrors = toFormErrors(error.errors)
-        form.setFields(formErrors)
-        messageApi.error('Correct the validation error(s) to continue.')
-      } else {
-        messageApi.error(
-          'An unexpected error occurred while creating the role.',
-        )
-      }
-
-      return null
-    }
-  }
-
-  const handleOk = async () => {
-    setIsSaving(true)
-    try {
-      const values = await form.validateFields()
-      const id = await create(values)
-
-      if (id) {
-        setIsOpen(false)
-        setIsSaving(false)
-        form.resetFields()
-        onFormCreate(id)
-        messageApi.success(`Successfully created Role.`)
-      } else {
-        setIsSaving(false)
-      }
-    } catch (errorInfo) {
-      setIsSaving(false)
-    }
-  }
-
-  const handleCancel = () => {
-    setIsOpen(false)
-    onFormCancel()
-    form.resetFields()
-  }
+            messageApi.success('Successfully created Role.')
+            onFormCreate(response.data)
+            return false // Don't call onComplete — we already called onFormCreate
+          } catch (error: any) {
+            if (error.status === 422 && error.errors) {
+              const formErrors = toFormErrors(error.errors)
+              form.setFields(formErrors)
+              messageApi.error('Correct the validation error(s) to continue.')
+            } else {
+              messageApi.error(
+                'An unexpected error occurred while creating the role.',
+              )
+            }
+            return false
+          }
+        },
+        [upsertRole, updatePermissions, roleIdToCopyPermissions, roleData, messageApi, onFormCreate],
+      ),
+      onComplete: () => {}, // handled in onSubmit via onFormCreate(id)
+      onCancel: onFormCancel,
+      errorMessage: 'An unexpected error occurred while creating the role.',
+      permission: 'Permissions.Roles.Create',
+    })
 
   return (
     <Modal
@@ -146,10 +104,8 @@ const CreateRoleForm = ({
       okText="Create"
       confirmLoading={isSaving}
       onCancel={handleCancel}
-      mask={{ blur: false }}
-      maskClosable={false}
       keyboard={false}
-      destroyOnHidden={true}
+      destroyOnHidden
     >
       <Form form={form} size="small" layout="vertical" name="create-role-form">
         <Item label="Name" name="name" rules={[{ required: true }]}>

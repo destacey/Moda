@@ -187,7 +187,6 @@ const ObjectiveDetailsPage = (props: {
       </Card>
       {openUpdateObjectiveForm && (
         <EditPlanningIntervalObjectiveForm
-          showForm={openUpdateObjectiveForm}
           objectiveKey={objectiveData?.key}
           planningIntervalKey={objectiveData?.planningInterval?.key}
           onFormSave={() => onUpdateObjectiveFormClosed(true)}
@@ -196,7 +195,6 @@ const ObjectiveDetailsPage = (props: {
       )}
       {openDeleteObjectiveForm && (
         <DeletePlanningIntervalObjectiveForm
-          showForm={openDeleteObjectiveForm}
           objective={objectiveData}
           onFormSave={() => onDeleteObjectiveFormClosed(true)}
           onFormCancel={() => onDeleteObjectiveFormClosed(false)}

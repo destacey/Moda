@@ -70,7 +70,6 @@ const StrategicInitiativesPage: React.FC = () => {
       />
       {openCreateStrategicInitiativeForm && (
         <CreateStrategicInitiativeForm
-          showForm={openCreateStrategicInitiativeForm}
           onFormComplete={() => onCreateStrategicInitiativeFormClosed(true)}
           onFormCancel={() => onCreateStrategicInitiativeFormClosed(false)}
         />

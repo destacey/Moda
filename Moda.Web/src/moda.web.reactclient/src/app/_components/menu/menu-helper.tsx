@@ -1,6 +1,7 @@
 import { MenuProps } from 'antd'
 import { ItemType, MenuItemType } from 'antd/es/menu/interface'
 import Link from 'next/link'
+import { Key, ReactNode } from 'react'
 
 export type MenuItem = Required<MenuProps>['items'][number]
 
@@ -8,7 +9,7 @@ export interface Item {
   display: string
   key: string
   route?: string
-  icon?: React.ReactNode
+  icon?: ReactNode
   children?: (Item | MenuItem)[]
   authClaimValue?: string
   authClaimType?: string
@@ -19,7 +20,7 @@ export const menuItem = (
   display: string,
   key: string,
   route?: string,
-  icon?: React.ReactNode,
+  icon?: ReactNode,
   children?: (Item | MenuItem)[],
   restrictedSection?: boolean,
 ) => {
@@ -37,7 +38,7 @@ export const restrictedMenuSection = (
   display: string,
   key: string,
   route?: string,
-  icon?: React.ReactNode,
+  icon?: ReactNode,
   children?: (Item | MenuItem)[],
 ) => {
   return {
@@ -51,7 +52,7 @@ export const restrictedMenuItem = (
   display: string,
   key: string,
   route?: string,
-  icon?: React.ReactNode,
+  icon?: ReactNode,
   children?: (Item | MenuItem)[],
 ) => {
   return {
@@ -66,7 +67,7 @@ export const restrictedPermissionMenuItem = (
   display: string,
   key: string,
   route?: string,
-  icon?: React.ReactNode,
+  icon?: ReactNode,
   children?: Item[],
 ) => {
   return {
@@ -78,9 +79,9 @@ export const restrictedPermissionMenuItem = (
 
 function getItem(
   label: string,
-  key: React.Key,
+  key: Key,
   route?: string,
-  icon?: React.ReactNode,
+  icon?: ReactNode,
   children?: MenuItem[],
   type?: 'group',
 ): MenuItem {

@@ -19,7 +19,7 @@ export interface ProjectDrawerProps {
 }
 
 const ProjectDrawer: FC<ProjectDrawerProps> = (props: ProjectDrawerProps) => {
-  const [size, setSize] = useState(getDrawerWidthPixels())
+  const [size, setSize] = useState(() => getDrawerWidthPixels())
   const messageApi = useMessage()
 
   const {
@@ -54,7 +54,7 @@ const ProjectDrawer: FC<ProjectDrawerProps> = (props: ProjectDrawerProps) => {
     () =>
       projectData?.projectSponsors.length > 0
         ? getSortedNames(projectData.projectSponsors)
-        : 'No sponsors assigned',
+        : 'No sponsor assigned',
     [projectData],
   )
 
@@ -62,7 +62,7 @@ const ProjectDrawer: FC<ProjectDrawerProps> = (props: ProjectDrawerProps) => {
     () =>
       projectData?.projectOwners.length > 0
         ? getSortedNames(projectData.projectOwners)
-        : 'No owners assigned',
+        : 'No owner assigned',
     [projectData],
   )
 
@@ -70,7 +70,7 @@ const ProjectDrawer: FC<ProjectDrawerProps> = (props: ProjectDrawerProps) => {
     () =>
       projectData?.projectManagers.length > 0
         ? getSortedNames(projectData.projectManagers)
-        : 'No managers assigned',
+        : 'No manager assigned',
     [projectData],
   )
 
@@ -89,7 +89,6 @@ const ProjectDrawer: FC<ProjectDrawerProps> = (props: ProjectDrawerProps) => {
       onClose={props.onDrawerClose}
       open={props.drawerOpen}
       loading={isLoading}
-      mask={{ blur: false }}
       size={size}
       resizable={{
         onResize: (newSize) => setSize(newSize),

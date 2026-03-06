@@ -65,7 +65,6 @@ const ProjectsPage: React.FC = () => {
       />
       {openCreateProjectForm && (
         <CreateProjectForm
-          showForm={openCreateProjectForm}
           onFormComplete={() => onCreateProjectFormClosed(true)}
           onFormCancel={() => onCreateProjectFormClosed(false)}
         />

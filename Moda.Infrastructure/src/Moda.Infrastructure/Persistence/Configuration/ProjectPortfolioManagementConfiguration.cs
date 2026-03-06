@@ -6,6 +6,7 @@ using Moda.Common.Domain.Models.KeyPerformanceIndicators;
 using Moda.Common.Domain.Models.Organizations;
 using Moda.Common.Domain.Models.ProjectPortfolioManagement;
 using Moda.Common.Models;
+using Moda.Infrastructure.Persistence.Converters;
 using Moda.ProjectPortfolioManagement.Domain.Enums;
 using Moda.ProjectPortfolioManagement.Domain.Models;
 using Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
@@ -269,14 +270,16 @@ public class StrategicInitiativeKpiConfiguration : IEntityTypeConfiguration<Stra
 
         builder.Property(k => k.Key).ValueGeneratedOnAdd();
         builder.Property(k => k.Name).HasMaxLength(64).IsRequired();
-        builder.Property(k => k.Description).HasMaxLength(512).IsRequired();
+        builder.Property(k => k.Description).HasMaxLength(512);
+        builder.Property(k => k.StartingValue);
         builder.Property(k => k.TargetValue).IsRequired();
         builder.Property(k => k.ActualValue);
 
-        builder.Property(k => k.Unit).IsRequired()
-            .HasConversion<EnumConverter<KpiUnit>>()
-            .HasMaxLength(32)
-            .HasColumnType("varchar");
+        builder.Property(k => k.Prefix)
+            .HasMaxLength(8);
+
+        builder.Property(k => k.Suffix)
+            .HasMaxLength(8);
 
         builder.Property(k => k.TargetDirection).IsRequired()
             .HasConversion<EnumConverter<KpiTargetDirection>>()
@@ -308,6 +311,7 @@ public class StrategicInitiativeKpiCheckpointConfiguration : IEntityTypeConfigur
         builder.HasIndex(k => k.KpiId);
 
         builder.Property(k => k.TargetValue).IsRequired();
+        builder.Property(k => k.AtRiskValue);
         builder.Property(k => k.CheckpointDate).IsRequired();
         builder.Property(k => k.DateLabel).HasMaxLength(16).IsRequired();
     }

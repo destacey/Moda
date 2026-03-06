@@ -92,7 +92,6 @@ const roleUsers = [
 const defaultProps: ManageRoleUsersFormProps = {
   roleId: 'role-1',
   roleName: 'Admin',
-  showForm: true,
   onFormComplete: jest.fn(),
   onFormCancel: jest.fn(),
 }
@@ -201,7 +200,7 @@ describe('ManageRoleUsersForm', () => {
 
     await waitFor(() => {
       expect(mockMessageError).toHaveBeenCalledWith(
-        'You do not have permission to manage role users.',
+        'You do not have permission to perform this action.',
       )
       expect(onFormCancel).toHaveBeenCalled()
     })
@@ -504,11 +503,11 @@ describe('ManageRoleUsersForm', () => {
     })
   })
 
-  it('does not render modal when showForm is false', () => {
-    render(<ManageRoleUsersForm {...defaultProps} showForm={false} />)
+  it('renders modal when component is mounted with permission', async () => {
+    render(<ManageRoleUsersForm {...defaultProps} />)
 
-    // The modal should not be visible since isOpen won't be set to true
-    // when showForm is false (permission check sets isOpen = props.showForm)
-    expect(screen.queryByText('Manage Role Users')).not.toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByText('Manage Role Users')).toBeInTheDocument()
+    })
   })
 })

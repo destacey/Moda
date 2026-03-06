@@ -246,12 +246,11 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, IHasIdAndKey
 
         foreach (var child in RootActivities)
         {
-            if (!childActivities.ContainsKey(child.Id))
+            if (!childActivities.TryGetValue(child.Id, out int order))
             {
                 return Result.Failure("Not all child roadmaps provided were found.");
             }
 
-            var order = childActivities[child.Id];
             if (order < 1)
             {
                 return Result.Failure("Order must be greater than 0.");

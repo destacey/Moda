@@ -88,6 +88,23 @@ public class IdentityUserTokenConfig : IEntityTypeConfiguration<IdentityUserToke
             .ToTable("UserTokens", SchemaNames.Identity);
 }
 
+public class ModaUserConfig : IEntityTypeConfiguration<User>
+{
+    public void Configure(EntityTypeBuilder<User> builder)
+    {
+        builder.ToView("vw_ModaUsers", SchemaNames.Identity);
+
+        builder.HasKey(u => u.Id);
+        builder.Property(u => u.Id).HasMaxLength(450);
+        builder.Property(u => u.UserName).HasMaxLength(256);
+        builder.Property(u => u.FirstName).HasMaxLength(100);
+        builder.Property(u => u.LastName).HasMaxLength(100);
+        builder.Property(u => u.DisplayName).HasMaxLength(200);
+        builder.Property(u => u.Email).HasMaxLength(256);
+        builder.Property(u => u.IsActive);
+    }
+}
+
 public class PersonalAccessTokenConfig : IEntityTypeConfiguration<PersonalAccessToken>
 {
     public void Configure(EntityTypeBuilder<PersonalAccessToken> builder)
@@ -143,7 +160,7 @@ public class PersonalAccessTokenConfig : IEntityTypeConfiguration<PersonalAccess
 
         builder.Property(p => p.RevokedAt);
 
-        builder.Property(p => p.RevokedBy);
+        builder.Property(p => p.RevokedBy).HasMaxLength(450);
 
         // Relationships
         builder.HasOne<ApplicationUser>()

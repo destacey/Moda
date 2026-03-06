@@ -1,8 +1,7 @@
 'use client'
 
 import { DatePicker, Descriptions, Form, Modal } from 'antd'
-import { useCallback, useEffect, useState } from 'react'
-import useAuth from '../../../components/contexts/auth'
+import { useCallback, useEffect } from 'react'
 import {
   TeamMembershipDto,
   UpdateTeamMembershipRequest,
@@ -12,12 +11,12 @@ import { useUpdateTeamMembershipMutation } from '@/src/store/features/organizati
 import { TeamTypeName } from '../types'
 import dayjs from 'dayjs'
 import { useMessage } from '@/src/components/contexts/messaging'
+import { useModalForm } from '@/src/hooks'
 
 const { Item } = Descriptions
 const { Item: FormItem } = Form
 
 export interface UpdateTeamMembershipFormProps {
-  showForm: boolean
   membership: TeamMembershipDto
   teamType: TeamTypeName
   onFormSave: () => void
@@ -47,112 +46,56 @@ const mapToRequestValues = (
   }
 }
 
-const EditTeamMembershipForm = (props: UpdateTeamMembershipFormProps) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-  const [isValid, setIsValid] = useState(false)
-  const [form] = Form.useForm<UpdateTeamMembershipFormValues>()
-  const formValues = Form.useWatch([], form)
+const EditTeamMembershipForm = ({
+  membership,
+  teamType,
+  onFormSave,
+  onFormCancel,
+}: UpdateTeamMembershipFormProps) => {
   const messageApi = useMessage()
 
   const [updateTeamMembership] = useUpdateTeamMembershipMutation()
 
-  const { hasClaim } = useAuth()
-  const canManageTeamMemberships = hasClaim(
-    'Permission',
-    'Permissions.Teams.ManageTeamMemberships',
-  )
+  const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
+    useModalForm<UpdateTeamMembershipFormValues>({
+      onSubmit: useCallback(
+        async (values: UpdateTeamMembershipFormValues, form) => {
+          try {
+            const request = mapToRequestValues(values, membership, teamType)
+            await updateTeamMembership(request).unwrap()
+            messageApi.success('Successfully updated team membership.')
+            return true
+          } catch (error) {
+            if (error.status === 422 && error.errors) {
+              const formErrors = toFormErrors(error.errors)
+              form.setFields(formErrors)
+              messageApi.error('Correct the validation error(s) to continue.')
+            } else {
+              messageApi.error(
+                error.detail ??
+                  'An unexpected error occurred while updating the team membership.',
+              )
+            }
+            return false
+          }
+        },
+        [updateTeamMembership, membership, teamType, messageApi],
+      ),
+      onComplete: onFormSave,
+      onCancel: onFormCancel,
+      errorMessage:
+        'An unexpected error occurred while updating the team membership.',
+      permission: 'Permissions.Teams.ManageTeamMemberships',
+    })
 
-  const mapToFormValues = useCallback(
-    (membership: TeamMembershipDto) => {
-      if (!membership) {
-        throw new Error('Membership is required.')
-      }
-      form.setFieldsValue({
-        start: membership.start ? dayjs(membership.start) : null,
-        end: membership.end ? dayjs(membership.end) : null,
-      })
-    },
-    [form],
-  )
-
-  const update = async (
-    values: UpdateTeamMembershipFormValues,
-  ): Promise<boolean> => {
-    try {
-      const request = mapToRequestValues(
-        values,
-        props.membership,
-        props.teamType,
-      )
-      await updateTeamMembership(request).unwrap()
-      return true
-    } catch (error) {
-      if (error.status === 422 && error.errors) {
-        const formErrors = toFormErrors(error.errors)
-        form.setFields(formErrors)
-        messageApi.error('Correct the validation error(s) to continue.')
-      } else {
-        messageApi.error(
-          error.detail ??
-            'An unexpected error occurred while updating the team membership.',
-        )
-        console.error(error)
-      }
-      return false
-    }
-  }
-
-  const handleOk = async () => {
-    setIsSaving(true)
-    try {
-      const values = await form.validateFields()
-      if (await update(values)) {
-        setIsOpen(false)
-        form.resetFields()
-        props.onFormSave()
-
-        messageApi.success('Successfully updated team membership.')
-      }
-    } catch (errorInfo) {
-      console.log('handleOk error', errorInfo)
-    } finally {
-      setIsSaving(false)
-    }
-  }
-
-  const handleCancel = useCallback(() => {
-    setIsOpen(false)
-    props.onFormCancel()
-    form.resetFields()
-  }, [form, props])
-
+  // Initialize form values when membership data is available
   useEffect(() => {
-    if (!props.membership) return
-    if (canManageTeamMemberships) {
-      setIsOpen(props.showForm)
-      if (props.showForm) {
-        mapToFormValues(props.membership)
-      }
-    } else {
-      handleCancel()
-      messageApi.error('You do not have permission to manage team memberships.')
-    }
-  }, [
-    canManageTeamMemberships,
-    handleCancel,
-    mapToFormValues,
-    messageApi,
-    props.membership,
-    props.showForm,
-  ])
-
-  useEffect(() => {
-    form.validateFields({ validateOnly: true }).then(
-      () => setIsValid(true && form.isFieldsTouched()),
-      () => setIsValid(false),
-    )
-  }, [form, formValues])
+    if (!membership) return
+    form.setFieldsValue({
+      start: membership.start ? dayjs(membership.start) : null,
+      end: membership.end ? dayjs(membership.end) : null,
+    })
+  }, [membership, form])
 
   return (
     <Modal
@@ -163,9 +106,8 @@ const EditTeamMembershipForm = (props: UpdateTeamMembershipFormProps) => {
       okText="Save"
       confirmLoading={isSaving}
       onCancel={handleCancel}
-      maskClosable={false}
       keyboard={false} // disable esc key to close modal
-      destroyOnHidden={true}
+      destroyOnHidden
     >
       <Form
         form={form}
@@ -174,8 +116,8 @@ const EditTeamMembershipForm = (props: UpdateTeamMembershipFormProps) => {
         name="edit-team-membership-form"
       >
         <Descriptions size="small" column={1}>
-          <Item label="Team">{props.membership?.child.name}</Item>
-          <Item label="Parent Team">{props.membership?.parent.name}</Item>
+          <Item label="Team">{membership?.child.name}</Item>
+          <Item label="Parent Team">{membership?.parent.name}</Item>
         </Descriptions>
         <FormItem label="Start" name="start" rules={[{ required: true }]}>
           <DatePicker />

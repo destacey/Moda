@@ -19,7 +19,7 @@ export interface ProgramDrawerProps {
 }
 
 const ProgramDrawer: FC<ProgramDrawerProps> = (props: ProgramDrawerProps) => {
-  const [size, setSize] = useState(getDrawerWidthPixels())
+  const [size, setSize] = useState(() => getDrawerWidthPixels())
   const messageApi = useMessage()
 
   const {
@@ -54,7 +54,7 @@ const ProgramDrawer: FC<ProgramDrawerProps> = (props: ProgramDrawerProps) => {
     () =>
       programData?.programSponsors.length > 0
         ? getSortedNames(programData.programSponsors)
-        : 'No sponsors assigned',
+        : 'No sponsor assigned',
     [programData],
   )
 
@@ -62,7 +62,7 @@ const ProgramDrawer: FC<ProgramDrawerProps> = (props: ProgramDrawerProps) => {
     () =>
       programData?.programOwners.length > 0
         ? getSortedNames(programData.programOwners)
-        : 'No owners assigned',
+        : 'No owner assigned',
     [programData],
   )
 
@@ -70,7 +70,7 @@ const ProgramDrawer: FC<ProgramDrawerProps> = (props: ProgramDrawerProps) => {
     () =>
       programData?.programManagers.length > 0
         ? getSortedNames(programData.programManagers)
-        : 'No managers assigned',
+        : 'No manager assigned',
     [programData],
   )
 
@@ -89,7 +89,6 @@ const ProgramDrawer: FC<ProgramDrawerProps> = (props: ProgramDrawerProps) => {
       onClose={props.onDrawerClose}
       open={props.drawerOpen}
       loading={isLoading}
-      mask={{ blur: false }}
       size={size}
       resizable={{
         onResize: (newSize) => setSize(newSize),

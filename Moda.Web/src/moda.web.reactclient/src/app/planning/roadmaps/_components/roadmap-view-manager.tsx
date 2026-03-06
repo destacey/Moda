@@ -4,8 +4,14 @@ import { RoadmapDetailsDto, RoadmapItemListDto } from '@/src/services/moda-api'
 import { BuildOutlined, MenuOutlined } from '@ant-design/icons'
 import Segmented, { SegmentedLabeledOption } from 'antd/es/segmented'
 import { memo, useMemo, useState } from 'react'
-import { RoadmapsTimeline } from '.'
+import dynamic from 'next/dynamic'
+import { Spin } from 'antd'
 import RoadmapItemsGrid from './roadmap-items-grid'
+
+const RoadmapsTimeline = dynamic(() => import('./roadmaps-timeline'), {
+  ssr: false,
+  loading: () => <Spin />,
+})
 
 interface RoadmapViewManagerProps {
   roadmap: RoadmapDetailsDto
@@ -63,9 +69,7 @@ const RoadmapViewManager = (props: RoadmapViewManagerProps) => {
           roadmapItemsData={props.roadmapItems}
           roadmapItemsIsLoading={props.isRoadmapItemsLoading}
           refreshRoadmapItems={props.refreshRoadmapItems}
-          gridHeight={550}
           viewSelector={viewSelector}
-          enableRowDrag={props.canUpdateRoadmap}
           roadmapId={props.roadmap.id}
           openRoadmapItemDrawer={props.openRoadmapItemDrawer}
           isRoadmapManager={props.canUpdateRoadmap}

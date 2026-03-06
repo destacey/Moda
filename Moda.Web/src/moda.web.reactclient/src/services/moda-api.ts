@@ -691,7 +691,7 @@ export class ProfileClient {
     /**
      * Get permissions of currently logged in user.
      */
-    getPermissions( cancelToken?: CancelToken): Promise<string[]> {
+    getPermissions( cancelToken?: CancelToken): Promise<UserPermissionsResponse> {
         let url_ = this.baseUrl + "/api/user-management/profiles/permissions";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -715,7 +715,7 @@ export class ProfileClient {
         });
     }
 
-    protected processGetPermissions(response: AxiosResponse): Promise<string[]> {
+    protected processGetPermissions(response: AxiosResponse): Promise<UserPermissionsResponse> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -730,7 +730,7 @@ export class ProfileClient {
             let result200: any = null;
             let resultData200  = _responseText;
             result200 = JSON.parse(resultData200);
-            return Promise.resolve<string[]>(result200);
+            return Promise.resolve<UserPermissionsResponse>(result200);
 
         } else if (status === 400) {
             const _responseText = response.data;
@@ -743,65 +743,7 @@ export class ProfileClient {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<string[]>(null as any);
-    }
-
-    /**
-     * Get internal employee id of currently logged in user.
-     */
-    getInternalEmployeeId( cancelToken?: CancelToken): Promise<string> {
-        let url_ = this.baseUrl + "/api/user-management/profiles/internal-employee-id";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "GET",
-            url: url_,
-            headers: {
-                "Accept": "application/json"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processGetInternalEmployeeId(_response);
-        });
-    }
-
-    protected processGetInternalEmployeeId(response: AxiosResponse): Promise<string> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = JSON.parse(resultData200);
-            return Promise.resolve<string>(result200);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = JSON.parse(resultData400);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<string>(null as any);
+        return Promise.resolve<UserPermissionsResponse>(null as any);
     }
 
     /**
@@ -7657,6 +7599,269 @@ export class StrategicInitiativesClient {
     }
 
     /**
+     * Get the checkpoints for a strategic initiative KPI.
+     */
+    getKpiCheckpoints(id: string, kpiId: string, cancelToken?: CancelToken): Promise<StrategicInitiativeKpiCheckpointDto[]> {
+        let url_ = this.baseUrl + "/api/ppm/strategic-initiatives/{id}/kpis/{kpiId}/checkpoints";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        if (kpiId === undefined || kpiId === null)
+            throw new globalThis.Error("The parameter 'kpiId' must be defined.");
+        url_ = url_.replace("{kpiId}", encodeURIComponent("" + kpiId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetKpiCheckpoints(_response);
+        });
+    }
+
+    protected processGetKpiCheckpoints(response: AxiosResponse): Promise<StrategicInitiativeKpiCheckpointDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<StrategicInitiativeKpiCheckpointDto[]>(result200);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<StrategicInitiativeKpiCheckpointDto[]>(null as any);
+    }
+
+    /**
+     * Get the checkpoint plan for a strategic initiative KPI. The checkpoint plan provides the checkpoints and their corresponding measurements.
+     */
+    getKpiCheckpointPlan(id: string, kpiId: string, cancelToken?: CancelToken): Promise<StrategicInitiativeKpiCheckpointDetailsDto[]> {
+        let url_ = this.baseUrl + "/api/ppm/strategic-initiatives/{id}/kpis/{kpiId}/checkpoints/plan";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        if (kpiId === undefined || kpiId === null)
+            throw new globalThis.Error("The parameter 'kpiId' must be defined.");
+        url_ = url_.replace("{kpiId}", encodeURIComponent("" + kpiId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetKpiCheckpointPlan(_response);
+        });
+    }
+
+    protected processGetKpiCheckpointPlan(response: AxiosResponse): Promise<StrategicInitiativeKpiCheckpointDetailsDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<StrategicInitiativeKpiCheckpointDetailsDto[]>(result200);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<StrategicInitiativeKpiCheckpointDetailsDto[]>(null as any);
+    }
+
+    /**
+     * Manage the checkpoint plan for a strategic initiative KPI.
+     */
+    manageKpiCheckpointPlan(id: string, kpiId: string, request: ManageStrategicInitiativeKpiCheckpointPlanRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/ppm/strategic-initiatives/{id}/kpis/{kpiId}/checkpoints/plan";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        if (kpiId === undefined || kpiId === null)
+            throw new globalThis.Error("The parameter 'kpiId' must be defined.");
+        url_ = url_.replace("{kpiId}", encodeURIComponent("" + kpiId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processManageKpiCheckpointPlan(_response);
+        });
+    }
+
+    protected processManageKpiCheckpointPlan(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 422) {
+            const _responseText = response.data;
+            let result422: any = null;
+            let resultData422  = _responseText;
+            result422 = JSON.parse(resultData422);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Get the measurements for a strategic initiative KPI.
+     */
+    getKpiMeasurements(id: string, kpiId: string, cancelToken?: CancelToken): Promise<StrategicInitiativeKpiMeasurementDto[]> {
+        let url_ = this.baseUrl + "/api/ppm/strategic-initiatives/{id}/kpis/{kpiId}/measurements";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        if (kpiId === undefined || kpiId === null)
+            throw new globalThis.Error("The parameter 'kpiId' must be defined.");
+        url_ = url_.replace("{kpiId}", encodeURIComponent("" + kpiId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetKpiMeasurements(_response);
+        });
+    }
+
+    protected processGetKpiMeasurements(response: AxiosResponse): Promise<StrategicInitiativeKpiMeasurementDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<StrategicInitiativeKpiMeasurementDto[]>(result200);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<StrategicInitiativeKpiMeasurementDto[]>(null as any);
+    }
+
+    /**
      * Add a measurement to the strategic initiative KPI.
      */
     addKpiMeasurement(id: string, kpiId: string, request: AddStrategicInitiativeKpiMeasurementRequest, cancelToken?: CancelToken): Promise<void> {
@@ -7728,17 +7933,25 @@ export class StrategicInitiativesClient {
     }
 
     /**
-     * Get a list of KPI units.
+     * Remove a measurement from the strategic initiative KPI.
      */
-    getKpiUnits( cancelToken?: CancelToken): Promise<StrategicInitiativeKpiUnitDto[]> {
-        let url_ = this.baseUrl + "/api/ppm/strategic-initiatives/kpi-units";
+    removeKpiMeasurement(id: string, kpiId: string, measurementId: string, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/ppm/strategic-initiatives/{id}/kpis/{kpiId}/measurements/{measurementId}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        if (kpiId === undefined || kpiId === null)
+            throw new globalThis.Error("The parameter 'kpiId' must be defined.");
+        url_ = url_.replace("{kpiId}", encodeURIComponent("" + kpiId));
+        if (measurementId === undefined || measurementId === null)
+            throw new globalThis.Error("The parameter 'measurementId' must be defined.");
+        url_ = url_.replace("{measurementId}", encodeURIComponent("" + measurementId));
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
-            method: "GET",
+            method: "DELETE",
             url: url_,
             headers: {
-                "Accept": "application/json"
             },
             cancelToken
         };
@@ -7750,11 +7963,11 @@ export class StrategicInitiativesClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processGetKpiUnits(_response);
+            return this.processRemoveKpiMeasurement(_response);
         });
     }
 
-    protected processGetKpiUnits(response: AxiosResponse): Promise<StrategicInitiativeKpiUnitDto[]> {
+    protected processRemoveKpiMeasurement(response: AxiosResponse): Promise<void> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -7764,12 +7977,9 @@ export class StrategicInitiativesClient {
                 }
             }
         }
-        if (status === 200) {
+        if (status === 204) {
             const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = JSON.parse(resultData200);
-            return Promise.resolve<StrategicInitiativeKpiUnitDto[]>(result200);
+            return Promise.resolve<void>(null as any);
 
         } else if (status === 400) {
             const _responseText = response.data;
@@ -7778,69 +7988,18 @@ export class StrategicInitiativesClient {
             result400 = JSON.parse(resultData400);
             return throwException("A server side error occurred.", status, _responseText, _headers, result400);
 
-        } else if (status !== 200 && status !== 204) {
+        } else if (status === 422) {
             const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<StrategicInitiativeKpiUnitDto[]>(null as any);
-    }
-
-    /**
-     * Get a list of KPI target directions.
-     */
-    getKpiTargetDirections( cancelToken?: CancelToken): Promise<StrategicInitiativeKpiTargetDirectionDto[]> {
-        let url_ = this.baseUrl + "/api/ppm/strategic-initiatives/kpi-target-directions";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "GET",
-            url: url_,
-            headers: {
-                "Accept": "application/json"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processGetKpiTargetDirections(_response);
-        });
-    }
-
-    protected processGetKpiTargetDirections(response: AxiosResponse): Promise<StrategicInitiativeKpiTargetDirectionDto[]> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = JSON.parse(resultData200);
-            return Promise.resolve<StrategicInitiativeKpiTargetDirectionDto[]>(result200);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = JSON.parse(resultData400);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+            let result422: any = null;
+            let resultData422  = _responseText;
+            result422 = JSON.parse(resultData422);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<StrategicInitiativeKpiTargetDirectionDto[]>(null as any);
+        return Promise.resolve<void>(null as any);
     }
 
     /**
@@ -7964,6 +8123,392 @@ export class StrategicInitiativesClient {
             let resultData422  = _responseText;
             result422 = JSON.parse(resultData422);
             return throwException("A server side error occurred.", status, _responseText, _headers, result422);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+}
+
+export class EstimationScalesClient {
+    protected instance: AxiosInstance;
+    protected baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, instance?: AxiosInstance) {
+
+        this.instance = instance || axios.create();
+
+        this.baseUrl = baseUrl ?? "";
+
+    }
+
+    /**
+     * Get a list of estimation scales.
+     * @param includeInactive (optional) 
+     */
+    getScales(includeInactive?: boolean | undefined, cancelToken?: CancelToken): Promise<EstimationScaleDto[]> {
+        let url_ = this.baseUrl + "/api/planning/estimation-scales?";
+        if (includeInactive === null)
+            throw new globalThis.Error("The parameter 'includeInactive' cannot be null.");
+        else if (includeInactive !== undefined)
+            url_ += "includeInactive=" + encodeURIComponent("" + includeInactive) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetScales(_response);
+        });
+    }
+
+    protected processGetScales(response: AxiosResponse): Promise<EstimationScaleDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<EstimationScaleDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<EstimationScaleDto[]>(null as any);
+    }
+
+    /**
+     * Create a custom estimation scale.
+     */
+    create(request: CreateEstimationScaleRequest, cancelToken?: CancelToken): Promise<number> {
+        let url_ = this.baseUrl + "/api/planning/estimation-scales";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processCreate(_response);
+        });
+    }
+
+    protected processCreate(response: AxiosResponse): Promise<number> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 201) {
+            const _responseText = response.data;
+            let result201: any = null;
+            let resultData201  = _responseText;
+            result201 = JSON.parse(resultData201);
+            return Promise.resolve<number>(result201);
+
+        } else if (status === 422) {
+            const _responseText = response.data;
+            let result422: any = null;
+            let resultData422  = _responseText;
+            result422 = JSON.parse(resultData422);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<number>(null as any);
+    }
+
+    /**
+     * Get estimation scale details.
+     */
+    getScale(id: number, cancelToken?: CancelToken): Promise<EstimationScaleDto> {
+        let url_ = this.baseUrl + "/api/planning/estimation-scales/{id}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetScale(_response);
+        });
+    }
+
+    protected processGetScale(response: AxiosResponse): Promise<EstimationScaleDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<EstimationScaleDto>(result200);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<EstimationScaleDto>(null as any);
+    }
+
+    /**
+     * Update a custom estimation scale.
+     */
+    update(id: number, request: UpdateEstimationScaleRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/planning/estimation-scales/{id}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "PUT",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processUpdate(_response);
+        });
+    }
+
+    protected processUpdate(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 422) {
+            const _responseText = response.data;
+            let result422: any = null;
+            let resultData422  = _responseText;
+            result422 = JSON.parse(resultData422);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Delete a custom estimation scale.
+     */
+    delete(id: number, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/planning/estimation-scales/{id}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "DELETE",
+            url: url_,
+            headers: {
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processDelete(_response);
+        });
+    }
+
+    protected processDelete(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Set the active status of an estimation scale.
+     */
+    setActiveStatus(id: number, request: SetEstimationScaleActiveStatusRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/planning/estimation-scales/{id}/active-status";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "PUT",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processSetActiveStatus(_response);
+        });
+    }
+
+    protected processSetActiveStatus(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
@@ -10023,6 +10568,876 @@ export class PlanningIntervalsClient {
     }
 }
 
+export class PokerSessionsClient {
+    protected instance: AxiosInstance;
+    protected baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, instance?: AxiosInstance) {
+
+        this.instance = instance || axios.create();
+
+        this.baseUrl = baseUrl ?? "";
+
+    }
+
+    /**
+     * Get a list of poker sessions.
+     * @param status (optional) 
+     */
+    getList(status?: PokerSessionStatus | null | undefined, cancelToken?: CancelToken): Promise<PokerSessionListDto[]> {
+        let url_ = this.baseUrl + "/api/planning/poker-sessions?";
+        if (status !== undefined && status !== null)
+            url_ += "status=" + encodeURIComponent("" + status) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetList(_response);
+        });
+    }
+
+    protected processGetList(response: AxiosResponse): Promise<PokerSessionListDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<PokerSessionListDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<PokerSessionListDto[]>(null as any);
+    }
+
+    /**
+     * Create a poker session.
+     */
+    create(request: CreatePokerSessionRequest, cancelToken?: CancelToken): Promise<ObjectIdAndKey> {
+        let url_ = this.baseUrl + "/api/planning/poker-sessions";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processCreate(_response);
+        });
+    }
+
+    protected processCreate(response: AxiosResponse): Promise<ObjectIdAndKey> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 201) {
+            const _responseText = response.data;
+            let result201: any = null;
+            let resultData201  = _responseText;
+            result201 = JSON.parse(resultData201);
+            return Promise.resolve<ObjectIdAndKey>(result201);
+
+        } else if (status === 422) {
+            const _responseText = response.data;
+            let result422: any = null;
+            let resultData422  = _responseText;
+            result422 = JSON.parse(resultData422);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ObjectIdAndKey>(null as any);
+    }
+
+    /**
+     * Get poker session details using the Id or key.
+     */
+    getSession(idOrKey: string, cancelToken?: CancelToken): Promise<PokerSessionDetailsDto> {
+        let url_ = this.baseUrl + "/api/planning/poker-sessions/{idOrKey}";
+        if (idOrKey === undefined || idOrKey === null)
+            throw new globalThis.Error("The parameter 'idOrKey' must be defined.");
+        url_ = url_.replace("{idOrKey}", encodeURIComponent("" + idOrKey));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetSession(_response);
+        });
+    }
+
+    protected processGetSession(response: AxiosResponse): Promise<PokerSessionDetailsDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<PokerSessionDetailsDto>(result200);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<PokerSessionDetailsDto>(null as any);
+    }
+
+    /**
+     * Update a poker session.
+     */
+    update(id: string, request: UpdatePokerSessionRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/planning/poker-sessions/{id}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "PUT",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processUpdate(_response);
+        });
+    }
+
+    protected processUpdate(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Delete a poker session.
+     */
+    delete(id: string, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/planning/poker-sessions/{id}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "DELETE",
+            url: url_,
+            headers: {
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processDelete(_response);
+        });
+    }
+
+    protected processDelete(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Complete a poker session.
+     */
+    complete(id: string, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/planning/poker-sessions/{id}/complete";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "PUT",
+            url: url_,
+            headers: {
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processComplete(_response);
+        });
+    }
+
+    protected processComplete(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Add a round to a poker session.
+     */
+    addRound(id: string, request: AddPokerRoundRequest, cancelToken?: CancelToken): Promise<PokerRoundDto> {
+        let url_ = this.baseUrl + "/api/planning/poker-sessions/{id}/rounds";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processAddRound(_response);
+        });
+    }
+
+    protected processAddRound(response: AxiosResponse): Promise<PokerRoundDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<PokerRoundDto>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<PokerRoundDto>(null as any);
+    }
+
+    /**
+     * Remove a round from a poker session.
+     */
+    removeRound(id: string, roundId: string, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/planning/poker-sessions/{id}/rounds/{roundId}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        if (roundId === undefined || roundId === null)
+            throw new globalThis.Error("The parameter 'roundId' must be defined.");
+        url_ = url_.replace("{roundId}", encodeURIComponent("" + roundId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "DELETE",
+            url: url_,
+            headers: {
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processRemoveRound(_response);
+        });
+    }
+
+    protected processRemoveRound(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Reveal votes for a round.
+     */
+    revealRound(id: string, roundId: string, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/planning/poker-sessions/{id}/rounds/{roundId}/reveal";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        if (roundId === undefined || roundId === null)
+            throw new globalThis.Error("The parameter 'roundId' must be defined.");
+        url_ = url_.replace("{roundId}", encodeURIComponent("" + roundId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "PUT",
+            url: url_,
+            headers: {
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processRevealRound(_response);
+        });
+    }
+
+    protected processRevealRound(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Reset a round to allow re-voting.
+     */
+    resetRound(id: string, roundId: string, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/planning/poker-sessions/{id}/rounds/{roundId}/reset";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        if (roundId === undefined || roundId === null)
+            throw new globalThis.Error("The parameter 'roundId' must be defined.");
+        url_ = url_.replace("{roundId}", encodeURIComponent("" + roundId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "PUT",
+            url: url_,
+            headers: {
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processResetRound(_response);
+        });
+    }
+
+    protected processResetRound(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Set the consensus estimate for a round.
+     */
+    setConsensus(id: string, roundId: string, request: SetConsensusRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/planning/poker-sessions/{id}/rounds/{roundId}/consensus";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        if (roundId === undefined || roundId === null)
+            throw new globalThis.Error("The parameter 'roundId' must be defined.");
+        url_ = url_.replace("{roundId}", encodeURIComponent("" + roundId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "PUT",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processSetConsensus(_response);
+        });
+    }
+
+    protected processSetConsensus(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Update the label for a round.
+     */
+    updateRoundLabel(id: string, roundId: string, request: UpdatePokerRoundLabelRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/planning/poker-sessions/{id}/rounds/{roundId}/label";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        if (roundId === undefined || roundId === null)
+            throw new globalThis.Error("The parameter 'roundId' must be defined.");
+        url_ = url_.replace("{roundId}", encodeURIComponent("" + roundId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "PUT",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processUpdateRoundLabel(_response);
+        });
+    }
+
+    protected processUpdateRoundLabel(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Submit a vote for a round.
+     */
+    submitVote(id: string, roundId: string, request: SubmitVoteRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/planning/poker-sessions/{id}/rounds/{roundId}/vote";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        if (roundId === undefined || roundId === null)
+            throw new globalThis.Error("The parameter 'roundId' must be defined.");
+        url_ = url_.replace("{roundId}", encodeURIComponent("" + roundId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processSubmitVote(_response);
+        });
+    }
+
+    protected processSubmitVote(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Withdraw a vote from a round.
+     */
+    withdrawVote(id: string, roundId: string, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/planning/poker-sessions/{id}/rounds/{roundId}/vote";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        if (roundId === undefined || roundId === null)
+            throw new globalThis.Error("The parameter 'roundId' must be defined.");
+        url_ = url_.replace("{roundId}", encodeURIComponent("" + roundId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "DELETE",
+            url: url_,
+            headers: {
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processWithdrawVote(_response);
+        });
+    }
+
+    protected processWithdrawVote(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+}
+
 export class RisksClient {
     protected instance: AxiosInstance;
     protected baseUrl: string;
@@ -11311,6 +12726,84 @@ export class RoadmapsClient {
     }
 
     /**
+     * Partially update a roadmap item using JSON Patch (RFC 6902).
+     */
+    patchRoadmapItem(roadmapId: string, itemId: string, patchDocument: JsonPatchDocumentOfUpdateRoadmapItemRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/planning/roadmaps/{roadmapId}/items/{itemId}";
+        if (roadmapId === undefined || roadmapId === null)
+            throw new globalThis.Error("The parameter 'roadmapId' must be defined.");
+        url_ = url_.replace("{roadmapId}", encodeURIComponent("" + roadmapId));
+        if (itemId === undefined || itemId === null)
+            throw new globalThis.Error("The parameter 'itemId' must be defined.");
+        url_ = url_.replace("{itemId}", encodeURIComponent("" + itemId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(patchDocument);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "PATCH",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processPatchRoadmapItem(_response);
+        });
+    }
+
+    protected processPatchRoadmapItem(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status === 422) {
+            const _responseText = response.data;
+            let result422: any = null;
+            let resultData422  = _responseText;
+            result422 = JSON.parse(resultData422);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
      * Delete a roadmap item.
      */
     deleteItem(roadmapId: string, itemId: string, cancelToken?: CancelToken): Promise<void> {
@@ -11442,23 +12935,23 @@ export class RoadmapsClient {
     }
 
     /**
-     * Reorganize a roadmap activity.
+     * Update a roadmap activity's placement.
      */
-    reorganizeActivity(roadmapId: string, activityId: string, request: ReorganizeRoadmapActivityRequest, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/planning/roadmaps/{roadmapId}/items/{activityId}/reorganize";
+    updateActivityPlacement(roadmapId: string, itemId: string, request: UpdateRoadmapActivityPlacementRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/planning/roadmaps/{roadmapId}/items/{itemId}/placement";
         if (roadmapId === undefined || roadmapId === null)
             throw new globalThis.Error("The parameter 'roadmapId' must be defined.");
         url_ = url_.replace("{roadmapId}", encodeURIComponent("" + roadmapId));
-        if (activityId === undefined || activityId === null)
-            throw new globalThis.Error("The parameter 'activityId' must be defined.");
-        url_ = url_.replace("{activityId}", encodeURIComponent("" + activityId));
+        if (itemId === undefined || itemId === null)
+            throw new globalThis.Error("The parameter 'itemId' must be defined.");
+        url_ = url_.replace("{itemId}", encodeURIComponent("" + itemId));
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(request);
 
         let options_: AxiosRequestConfig = {
             data: content_,
-            method: "POST",
+            method: "PUT",
             url: url_,
             headers: {
                 "Content-Type": "application/json",
@@ -11473,11 +12966,11 @@ export class RoadmapsClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processReorganizeActivity(_response);
+            return this.processUpdateActivityPlacement(_response);
         });
     }
 
-    protected processReorganizeActivity(response: AxiosResponse): Promise<void> {
+    protected processUpdateActivityPlacement(response: AxiosResponse): Promise<void> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -17783,7 +19276,7 @@ export class HealthChecksClient {
     }
 }
 
-export class AzureDevOpsBoardsConnectionsClient {
+export class AzureDevOpsConnectionsClient {
     protected instance: AxiosInstance;
     protected baseUrl: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
@@ -17797,329 +19290,11 @@ export class AzureDevOpsBoardsConnectionsClient {
     }
 
     /**
-     * Get a list of all Azure DevOps Boards connections.
-     * @param includeDisabled (optional) 
-     */
-    getList(includeDisabled?: boolean | undefined, cancelToken?: CancelToken): Promise<ConnectionListDto[]> {
-        let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections?";
-        if (includeDisabled === null)
-            throw new globalThis.Error("The parameter 'includeDisabled' cannot be null.");
-        else if (includeDisabled !== undefined)
-            url_ += "includeDisabled=" + encodeURIComponent("" + includeDisabled) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "GET",
-            url: url_,
-            headers: {
-                "Accept": "application/json"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processGetList(_response);
-        });
-    }
-
-    protected processGetList(response: AxiosResponse): Promise<ConnectionListDto[]> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = JSON.parse(resultData200);
-            return Promise.resolve<ConnectionListDto[]>(result200);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = JSON.parse(resultData400);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<ConnectionListDto[]>(null as any);
-    }
-
-    /**
-     * Create an Azure DevOps Boards connection.
-     */
-    create(request: CreateAzureDevOpsBoardConnectionRequest, cancelToken?: CancelToken): Promise<string> {
-        let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(request);
-
-        let options_: AxiosRequestConfig = {
-            data: content_,
-            method: "POST",
-            url: url_,
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processCreate(_response);
-        });
-    }
-
-    protected processCreate(response: AxiosResponse): Promise<string> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 201) {
-            const _responseText = response.data;
-            let result201: any = null;
-            let resultData201  = _responseText;
-            result201 = JSON.parse(resultData201);
-            return Promise.resolve<string>(result201);
-
-        } else if (status === 422) {
-            const _responseText = response.data;
-            let result422: any = null;
-            let resultData422  = _responseText;
-            result422 = JSON.parse(resultData422);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<string>(null as any);
-    }
-
-    /**
-     * Get Azure DevOps Boards connection based on id.
-     */
-    getById(id: string, cancelToken?: CancelToken): Promise<AzureDevOpsBoardsConnectionDetailsDto> {
-        let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections/{id}";
-        if (id === undefined || id === null)
-            throw new globalThis.Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id));
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "GET",
-            url: url_,
-            headers: {
-                "Accept": "application/json"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processGetById(_response);
-        });
-    }
-
-    protected processGetById(response: AxiosResponse): Promise<AzureDevOpsBoardsConnectionDetailsDto> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = JSON.parse(resultData200);
-            return Promise.resolve<AzureDevOpsBoardsConnectionDetailsDto>(result200);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = JSON.parse(resultData400);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
-
-        } else if (status === 404) {
-            const _responseText = response.data;
-            let result404: any = null;
-            let resultData404  = _responseText;
-            result404 = JSON.parse(resultData404);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<AzureDevOpsBoardsConnectionDetailsDto>(null as any);
-    }
-
-    /**
-     * Update an Azure DevOps Boards connection.
-     */
-    update(id: string, request: UpdateAzureDevOpsBoardConnectionRequest, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections/{id}";
-        if (id === undefined || id === null)
-            throw new globalThis.Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id));
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(request);
-
-        let options_: AxiosRequestConfig = {
-            data: content_,
-            method: "PUT",
-            url: url_,
-            headers: {
-                "Content-Type": "application/json",
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processUpdate(_response);
-        });
-    }
-
-    protected processUpdate(response: AxiosResponse): Promise<void> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 204) {
-            const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = JSON.parse(resultData400);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
-
-        } else if (status === 422) {
-            const _responseText = response.data;
-            let result422: any = null;
-            let resultData422  = _responseText;
-            result422 = JSON.parse(resultData422);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<void>(null as any);
-    }
-
-    /**
-     * Delete an Azure DevOps Boards connection.
-     */
-    delete(id: string, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections/{id}";
-        if (id === undefined || id === null)
-            throw new globalThis.Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id));
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "DELETE",
-            url: url_,
-            headers: {
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processDelete(_response);
-        });
-    }
-
-    protected processDelete(response: AxiosResponse): Promise<void> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 204) {
-            const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = JSON.parse(resultData400);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<void>(null as any);
-    }
-
-    /**
-     * Update an Azure DevOps Boards connection sync state.
+     * Enable/disable sync for Azure DevOps connection.
      * @param isSyncEnabled (optional) 
      */
     updateSyncState(id: string, isSyncEnabled?: boolean | undefined, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections/{id}/sync-state?";
+        let url_ = this.baseUrl + "/api/app-integrations/connections/azure-devops/{id}/sync-state?";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -18169,12 +19344,62 @@ export class AzureDevOpsBoardsConnectionsClient {
             result400 = JSON.parse(resultData400);
             return throwException("A server side error occurred.", status, _responseText, _headers, result400);
 
-        } else if (status === 422) {
+        } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
-            let result422: any = null;
-            let resultData422  = _responseText;
-            result422 = JSON.parse(resultData422);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Sync Azure DevOps organization processes and projects.
+     */
+    syncOrganizationConfiguration(id: string, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/app-integrations/connections/azure-devops/{id}/sync-organization";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "POST",
+            url: url_,
+            headers: {
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processSyncOrganizationConfiguration(_response);
+        });
+    }
+
+    protected processSyncOrganizationConfiguration(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
@@ -18184,11 +19409,133 @@ export class AzureDevOpsBoardsConnectionsClient {
     }
 
     /**
-     * Get Azure DevOps connection teams based on id.
+     * Initialize Azure DevOps work process integration.
+     */
+    initWorkProcessIntegration(id: string, request: InitWorkProcessIntegrationRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/app-integrations/connections/azure-devops/{id}/init-work-process";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processInitWorkProcessIntegration(_response);
+        });
+    }
+
+    protected processInitWorkProcessIntegration(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Initialize Azure DevOps workspace integration.
+     */
+    initWorkspaceIntegration(id: string, request: InitWorkspaceIntegrationRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/app-integrations/connections/azure-devops/{id}/init-workspace";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processInitWorkspaceIntegration(_response);
+        });
+    }
+
+    protected processInitWorkspaceIntegration(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Get Azure DevOps connection teams.
      * @param workspaceId (optional) 
      */
-    getConnectionTeams(id: string, workspaceId?: string | null | undefined, cancelToken?: CancelToken): Promise<AzureDevOpsBoardsWorkspaceTeamDto[]> {
-        let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections/{id}/teams?";
+    getConnectionTeams(id: string, workspaceId?: string | null | undefined, cancelToken?: CancelToken): Promise<AzureDevOpsWorkspaceTeamDto[]> {
+        let url_ = this.baseUrl + "/api/app-integrations/connections/azure-devops/{id}/teams?";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -18216,7 +19563,7 @@ export class AzureDevOpsBoardsConnectionsClient {
         });
     }
 
-    protected processGetConnectionTeams(response: AxiosResponse): Promise<AzureDevOpsBoardsWorkspaceTeamDto[]> {
+    protected processGetConnectionTeams(response: AxiosResponse): Promise<AzureDevOpsWorkspaceTeamDto[]> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -18231,7 +19578,7 @@ export class AzureDevOpsBoardsConnectionsClient {
             let result200: any = null;
             let resultData200  = _responseText;
             result200 = JSON.parse(resultData200);
-            return Promise.resolve<AzureDevOpsBoardsWorkspaceTeamDto[]>(result200);
+            return Promise.resolve<AzureDevOpsWorkspaceTeamDto[]>(result200);
 
         } else if (status === 400) {
             const _responseText = response.data;
@@ -18244,14 +19591,14 @@ export class AzureDevOpsBoardsConnectionsClient {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<AzureDevOpsBoardsWorkspaceTeamDto[]>(null as any);
+        return Promise.resolve<AzureDevOpsWorkspaceTeamDto[]>(null as any);
     }
 
     /**
-     * Update Azure DevOps connection team mappings.
+     * Update Azure DevOps team mappings.
      */
     mapConnectionTeams(id: string, request: AzdoConnectionTeamMappingsRequest, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections/{id}/teams";
+        let url_ = this.baseUrl + "/api/app-integrations/connections/azure-devops/{id}/teams";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -18309,10 +19656,10 @@ export class AzureDevOpsBoardsConnectionsClient {
     }
 
     /**
-     * Test Azure DevOps Boards connection configuration.
+     * Test Azure DevOps connection configuration.
      */
-    testConfig(request: TestAzureDevOpsBoardConnectionRequest, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections/test";
+    testConfig(request: TestAzureDevOpsConnectionRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/app-integrations/connections/azure-devops/test";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(request);
@@ -18365,202 +19712,9 @@ export class AzureDevOpsBoardsConnectionsClient {
         }
         return Promise.resolve<void>(null as any);
     }
-
-    /**
-     * Sync Azure DevOps processes and projects.
-     */
-    syncOrganizationConfiguration(id: string, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections/{id}/sync-organization-configuration";
-        if (id === undefined || id === null)
-            throw new globalThis.Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id));
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "POST",
-            url: url_,
-            headers: {
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processSyncOrganizationConfiguration(_response);
-        });
-    }
-
-    protected processSyncOrganizationConfiguration(response: AxiosResponse): Promise<void> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 204) {
-            const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = JSON.parse(resultData400);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<void>(null as any);
-    }
-
-    /**
-     * Initialize Azure DevOps project integration as a Moda workspace.
-     */
-    initWorkProcesssIntegration(id: string, request: InitWorkProcessIntegrationRequest, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections/{id}/init-work-process-integration";
-        if (id === undefined || id === null)
-            throw new globalThis.Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id));
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(request);
-
-        let options_: AxiosRequestConfig = {
-            data: content_,
-            method: "POST",
-            url: url_,
-            headers: {
-                "Content-Type": "application/json",
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processInitWorkProcesssIntegration(_response);
-        });
-    }
-
-    protected processInitWorkProcesssIntegration(response: AxiosResponse): Promise<void> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 204) {
-            const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = JSON.parse(resultData400);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
-
-        } else if (status === 422) {
-            const _responseText = response.data;
-            let result422: any = null;
-            let resultData422  = _responseText;
-            result422 = JSON.parse(resultData422);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<void>(null as any);
-    }
-
-    /**
-     * Initialize Azure DevOps project integration as a Moda workspace.
-     */
-    initWorkspaceIntegration(id: string, request: InitWorkspaceIntegrationRequest, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections/{id}/init-workspace-integration";
-        if (id === undefined || id === null)
-            throw new globalThis.Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id));
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(request);
-
-        let options_: AxiosRequestConfig = {
-            data: content_,
-            method: "POST",
-            url: url_,
-            headers: {
-                "Content-Type": "application/json",
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processInitWorkspaceIntegration(_response);
-        });
-    }
-
-    protected processInitWorkspaceIntegration(response: AxiosResponse): Promise<void> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 204) {
-            const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = JSON.parse(resultData400);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
-
-        } else if (status === 422) {
-            const _responseText = response.data;
-            let result422: any = null;
-            let resultData422  = _responseText;
-            result422 = JSON.parse(resultData422);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<void>(null as any);
-    }
 }
 
-export class ConnectorsClient {
+export class AzureOpenAIConnectionsClient {
     protected instance: AxiosInstance;
     protected baseUrl: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
@@ -18574,10 +19728,87 @@ export class ConnectorsClient {
     }
 
     /**
-     * Get a list of all connectors.
+     * Test Azure OpenAI connection configuration.
      */
-    getList( cancelToken?: CancelToken): Promise<ConnectorListDto[]> {
-        let url_ = this.baseUrl + "/api/app-integrations/connectors";
+    testConfig(request: TestAzureOpenAIConnectionRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/app-integrations/connections/azure-openai/test";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processTestConfig(_response);
+        });
+    }
+
+    protected processTestConfig(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+}
+
+export class ConnectionsClient {
+    protected instance: AxiosInstance;
+    protected baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, instance?: AxiosInstance) {
+
+        this.instance = instance || axios.create();
+
+        this.baseUrl = baseUrl ?? "";
+
+    }
+
+    /**
+     * Get list of all connections.
+     * @param includeDisabled (optional) 
+     */
+    getConnections(includeDisabled?: boolean | undefined, cancelToken?: CancelToken): Promise<ConnectionListDto[]> {
+        let url_ = this.baseUrl + "/api/app-integrations/connections?";
+        if (includeDisabled === null)
+            throw new globalThis.Error("The parameter 'includeDisabled' cannot be null.");
+        else if (includeDisabled !== undefined)
+            url_ += "includeDisabled=" + encodeURIComponent("" + includeDisabled) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -18596,11 +19827,124 @@ export class ConnectorsClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processGetList(_response);
+            return this.processGetConnections(_response);
         });
     }
 
-    protected processGetList(response: AxiosResponse): Promise<ConnectorListDto[]> {
+    protected processGetConnections(response: AxiosResponse): Promise<ConnectionListDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<ConnectionListDto[]>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ConnectionListDto[]>(null as any);
+    }
+
+    /**
+     * Create a new connection.
+     */
+    createConnection(request: CreateConnectionRequest, cancelToken?: CancelToken): Promise<string> {
+        let url_ = this.baseUrl + "/api/app-integrations/connections";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processCreateConnection(_response);
+        });
+    }
+
+    protected processCreateConnection(response: AxiosResponse): Promise<string> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 201) {
+            const _responseText = response.data;
+            let result201: any = null;
+            let resultData201  = _responseText;
+            result201 = JSON.parse(resultData201);
+            return Promise.resolve<string>(result201);
+
+        } else if (status === 422) {
+            const _responseText = response.data;
+            let result422: any = null;
+            let resultData422  = _responseText;
+            result422 = JSON.parse(resultData422);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<string>(null as any);
+    }
+
+    /**
+     * Get list of all connector types.
+     */
+    getConnectors( cancelToken?: CancelToken): Promise<ConnectorListDto[]> {
+        let url_ = this.baseUrl + "/api/app-integrations/connections/connectors";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetConnectors(_response);
+        });
+    }
+
+    protected processGetConnectors(response: AxiosResponse): Promise<ConnectorListDto[]> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -18617,6 +19961,121 @@ export class ConnectorsClient {
             result200 = JSON.parse(resultData200);
             return Promise.resolve<ConnectorListDto[]>(result200);
 
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ConnectorListDto[]>(null as any);
+    }
+
+    /**
+     * Get connection details by ID.
+     */
+    getConnection(id: string, cancelToken?: CancelToken): Promise<ConnectionDetailsDto> {
+        let url_ = this.baseUrl + "/api/app-integrations/connections/{id}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetConnection(_response);
+        });
+    }
+
+    protected processGetConnection(response: AxiosResponse): Promise<ConnectionDetailsDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<ConnectionDetailsDto>(result200);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ConnectionDetailsDto>(null as any);
+    }
+
+    /**
+     * Update a connection.
+     */
+    updateConnection(id: string, request: UpdateConnectionRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/app-integrations/connections/{id}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "PUT",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processUpdateConnection(_response);
+        });
+    }
+
+    protected processUpdateConnection(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
         } else if (status === 400) {
             const _responseText = response.data;
             let result400: any = null;
@@ -18628,7 +20087,71 @@ export class ConnectorsClient {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<ConnectorListDto[]>(null as any);
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Delete a connection.
+     */
+    deleteConnection(id: string, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/app-integrations/connections/{id}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "DELETE",
+            url: url_,
+            headers: {
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processDeleteConnection(_response);
+        });
+    }
+
+    protected processDeleteConnection(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
     }
 }
 
@@ -18972,6 +20495,11 @@ export interface UpdateProfileRequest {
     lastName: string;
     email: string;
     phoneNumber?: string | undefined;
+}
+
+export interface UserPermissionsResponse {
+    permissions: string[];
+    employeeId?: string | undefined;
 }
 
 export interface AuditDto {
@@ -19738,10 +21266,18 @@ export interface StrategicInitiativeKpiListDto {
     id: string;
     key: number;
     name: string;
+    startingValue?: number | undefined;
     targetValue: number;
     actualValue?: number | undefined;
-    unit: SimpleNavigationDto;
-    targetDirection: SimpleNavigationDto;
+    progress?: number | undefined;
+    prefix?: string | undefined;
+    suffix?: string | undefined;
+    targetDirection: KpiTargetDirection;
+}
+
+export enum KpiTargetDirection {
+    Increase = "Increase",
+    Decrease = "Decrease",
 }
 
 export interface StrategicInitiativeKpiDetailsDto {
@@ -19749,10 +21285,13 @@ export interface StrategicInitiativeKpiDetailsDto {
     key: number;
     name: string;
     description?: string | undefined;
+    startingValue?: number | undefined;
     targetValue: number;
     actualValue?: number | undefined;
-    unit: SimpleNavigationDto;
-    targetDirection: SimpleNavigationDto;
+    progress?: number | undefined;
+    prefix?: string | undefined;
+    suffix?: string | undefined;
+    targetDirection: KpiTargetDirection;
 }
 
 export interface CreateStrategicInitiativeKpiRequest {
@@ -19761,13 +21300,17 @@ export interface CreateStrategicInitiativeKpiRequest {
     /** The name of the KPI. */
     name: string;
     /** A description of what the KPI measures. */
-    description: string;
+    description?: string | undefined;
     /** The target value that defines success for the KPI. */
     targetValue: number;
-    /** The ID of the unit of measurement for the KPI. */
-    unitId: number;
-    /** The ID of the target direction for the KPI. */
-    targetDirectionId: number;
+    /** The starting (baseline) value of the KPI. */
+    startingValue?: number | undefined;
+    /** An optional prefix symbol displayed before the numeric value (e.g. "$"). */
+    prefix?: string | undefined;
+    /** An optional suffix symbol displayed after the numeric value (e.g. "%", "M"). */
+    suffix?: string | undefined;
+    /** The target direction for the KPI. */
+    targetDirection: KpiTargetDirection;
 }
 
 export interface UpdateStrategicInitiativeKpiRequest {
@@ -19778,13 +21321,79 @@ export interface UpdateStrategicInitiativeKpiRequest {
     /** The name of the KPI. */
     name: string;
     /** A description of what the KPI measures. */
-    description: string;
+    description?: string | undefined;
     /** The target value that defines success for the KPI. */
     targetValue: number;
-    /** The ID of the unit of measurement for the KPI. */
-    unitId: number;
-    /** The ID of the target direction for the KPI. */
-    targetDirectionId: number;
+    /** The starting (baseline) value of the KPI. */
+    startingValue?: number | undefined;
+    /** An optional prefix symbol displayed before the numeric value (e.g. "$"). */
+    prefix?: string | undefined;
+    /** An optional suffix symbol displayed after the numeric value (e.g. "%", "M"). */
+    suffix?: string | undefined;
+    /** The target direction for the KPI. */
+    targetDirection: KpiTargetDirection;
+}
+
+export interface StrategicInitiativeKpiCheckpointDto {
+    id: string;
+    targetValue: number;
+    atRiskValue?: number | undefined;
+    checkpointDate: Date;
+    dateLabel: string;
+}
+
+export interface StrategicInitiativeKpiCheckpointDetailsDto {
+    id: string;
+    targetValue: number;
+    atRiskValue?: number | undefined;
+    checkpointDate: Date;
+    dateLabel: string;
+    measurement?: StrategicInitiativeKpiMeasurementDto | undefined;
+    health?: KpiHealth | undefined;
+    trend?: KpiTrend | undefined;
+}
+
+export interface StrategicInitiativeKpiMeasurementDto {
+    id: string;
+    actualValue: number;
+    measurementDate: Date;
+    measuredBy: EmployeeNavigationDto;
+    note?: string | undefined;
+}
+
+export enum KpiHealth {
+    Healthy = "Healthy",
+    AtRisk = "AtRisk",
+    Unhealthy = "Unhealthy",
+}
+
+export enum KpiTrend {
+    NoData = "NoData",
+    Improving = "Improving",
+    Worsening = "Worsening",
+    Stable = "Stable",
+}
+
+export interface ManageStrategicInitiativeKpiCheckpointPlanRequest {
+    /** The ID of the strategic initiative to which this KPI belongs. */
+    strategicInitiativeId: string;
+    /** The ID of the KPI. */
+    kpiId: string;
+    /** The list of planned KPI checkpoints. */
+    checkpoints: KpiCheckpointPlanItemRequest[];
+}
+
+export interface KpiCheckpointPlanItemRequest {
+    /** The ID of an existing checkpoint to update. Null for new checkpoints. */
+    checkpointId: string;
+    /** The target value for this checkpoint. */
+    targetValue: number;
+    /** An optional at-risk threshold value for this checkpoint. */
+    atRiskValue?: number | undefined;
+    /** The date and time of this checkpoint. */
+    checkpointDate: Date;
+    /** A short label describing this checkpoint (e.g. "Q1 2025"). */
+    dateLabel: string;
 }
 
 export interface AddStrategicInitiativeKpiMeasurementRequest {
@@ -19800,17 +21409,37 @@ export interface AddStrategicInitiativeKpiMeasurementRequest {
     note?: string | undefined;
 }
 
-export interface StrategicInitiativeKpiUnitDto extends CommonEnumDto {
-}
-
-export interface StrategicInitiativeKpiTargetDirectionDto extends CommonEnumDto {
-}
-
 export interface ManageStrategicInitiativeProjectsRequest {
     /** The ID of the strategic initiative to manage projects for. */
     id: string;
     /** The list of project IDs to be associated with the strategic initiative. */
     projectIds: string[];
+}
+
+export interface EstimationScaleDto {
+    id: number;
+    name: string;
+    description?: string | undefined;
+    isActive: boolean;
+    values: string[];
+}
+
+export interface CreateEstimationScaleRequest {
+    name: string;
+    description?: string | undefined;
+    values: string[];
+}
+
+export interface UpdateEstimationScaleRequest {
+    estimationScaleId: number;
+    name: string;
+    description?: string | undefined;
+    values: string[];
+}
+
+export interface SetEstimationScaleActiveStatusRequest {
+    id: number;
+    isActive: boolean;
 }
 
 export interface PlanningIntervalListDto {
@@ -20207,6 +21836,81 @@ export interface RiskListDto {
     followUpDate?: Date | undefined;
 }
 
+export interface PokerSessionListDto {
+    id: string;
+    key: number;
+    name: string;
+    status: string;
+    facilitator?: UserNavigationDto | undefined;
+    roundCount: number;
+}
+
+export interface UserNavigationDto {
+    id: string;
+    userName: string;
+    name?: string | undefined;
+}
+
+export enum PokerSessionStatus {
+    Active = "Active",
+    Completed = "Completed",
+}
+
+export interface PokerSessionDetailsDto {
+    id: string;
+    key: number;
+    name: string;
+    status: string;
+    facilitator?: UserNavigationDto | undefined;
+    estimationScale?: EstimationScaleDto | undefined;
+    activatedOn?: Date | undefined;
+    completedOn?: Date | undefined;
+    rounds: PokerRoundDto[];
+}
+
+export interface PokerRoundDto {
+    id: string;
+    label?: string | undefined;
+    status: string;
+    consensusEstimate?: string | undefined;
+    order: number;
+    voteCount: number;
+    votes: PokerVoteDto[];
+}
+
+export interface PokerVoteDto {
+    id: string;
+    participant?: UserNavigationDto | undefined;
+    value: string;
+    submittedOn: Date;
+}
+
+export interface CreatePokerSessionRequest {
+    name: string;
+    estimationScaleId: number;
+}
+
+export interface UpdatePokerSessionRequest {
+    name: string;
+    estimationScaleId: number;
+}
+
+export interface AddPokerRoundRequest {
+    label?: string | undefined;
+}
+
+export interface SetConsensusRequest {
+    estimate: string;
+}
+
+export interface UpdatePokerRoundLabelRequest {
+    label?: string | undefined;
+}
+
+export interface SubmitVoteRequest {
+    value: string;
+}
+
 export interface RiskDetailsDto {
     id: string;
     key: number;
@@ -20464,6 +22168,13 @@ export interface UpdateRoadmapTimeboxRequest extends UpdateRoadmapItemRequest {
     end?: Date;
 }
 
+export interface JsonPatchDocumentOfUpdateRoadmapItemRequest {
+    operations: OperationOfUpdateRoadmapItemRequest[] | undefined;
+}
+
+export interface OperationOfUpdateRoadmapItemRequest extends Operation {
+}
+
 export interface UpdateRoadmapItemDatesRequest {
     /** The Roadmap Id the Roadmap Item belongs to. */
     roadmapId: string;
@@ -20491,10 +22202,10 @@ export interface UpdateRoadmapTimeboxDatesRequest extends UpdateRoadmapItemDates
     end?: Date;
 }
 
-export interface ReorganizeRoadmapActivityRequest {
+export interface UpdateRoadmapActivityPlacementRequest {
     roadmapId: string;
-    parentActivityId?: string | undefined;
-    activityId: string;
+    parentId?: string | undefined;
+    itemId: string;
     order: number;
 }
 
@@ -21118,118 +22829,6 @@ export interface HealthStatusDto {
     order: number;
 }
 
-export interface ConnectionListDto {
-    id: string;
-    name: string;
-    systemId?: string | undefined;
-    connector: SimpleNavigationDto;
-    isActive: boolean;
-    isValidConfiguration: boolean;
-    isSyncEnabled: boolean;
-}
-
-export interface AzureDevOpsBoardsConnectionDetailsDto {
-    id: string;
-    name: string;
-    description?: string | undefined;
-    systemId?: string | undefined;
-    connector: SimpleNavigationDto;
-    configuration: AzureDevOpsBoardsConnectionConfigurationDto;
-    teamConfiguration: AzureDevOpsBoardsTeamConfigurationDto;
-    isActive: boolean;
-    isValidConfiguration: boolean;
-    isSyncEnabled: boolean;
-}
-
-export interface AzureDevOpsBoardsConnectionConfigurationDto {
-    organization: string;
-    personalAccessToken: string;
-    organizationUrl: string;
-    workProcesses: AzureDevOpsBoardsWorkProcessDto[];
-    workspaces: AzureDevOpsBoardsWorkspaceDto[];
-}
-
-export interface AzureDevOpsBoardsWorkProcessDto {
-    id?: string | undefined;
-    externalId: string;
-    name: string;
-    description?: string | undefined;
-    integrationState?: IntegrationStateDto | undefined;
-}
-
-export interface IntegrationStateDto {
-    internalId: string;
-    isActive: boolean;
-}
-
-export interface AzureDevOpsBoardsWorkspaceDto {
-    id?: string | undefined;
-    externalId: string;
-    name: string;
-    description?: string | undefined;
-    workProcessId: string;
-    integrationState?: IntegrationStateDto | undefined;
-}
-
-export interface AzureDevOpsBoardsTeamConfigurationDto {
-    workspaceTeams: AzureDevOpsBoardsWorkspaceTeamDto[];
-}
-
-export interface AzureDevOpsBoardsWorkspaceTeamDto {
-    workspaceId: string;
-    teamId: string;
-    teamName: string;
-    boardId?: string | undefined;
-    internalTeamId?: string | undefined;
-}
-
-export interface CreateAzureDevOpsBoardConnectionRequest {
-    /** The name of the connection. */
-    name: string;
-    /** The description of the connection. */
-    description?: string | undefined;
-    /** The Azure DevOps Organization name. */
-    organization: string;
-    /** The personal access token that enables access to Azure DevOps Boards data. */
-    personalAccessToken: string;
-}
-
-export interface UpdateAzureDevOpsBoardConnectionRequest {
-    /** Gets or sets the identifier. */
-    id: string;
-    /** Gets or sets the name of the connection. */
-    name: string;
-    /** Gets or sets the description. */
-    description?: string | undefined;
-    /** Gets the organization. */
-    organization: string;
-    /** Gets the personal access token. */
-    personalAccessToken: string;
-}
-
-export interface AzdoConnectionTeamMappingsRequest {
-    /** The unique identifer for the connection. */
-    connectionId: string;
-    /** List of team mappings. */
-    teamMappings: AzdoWorkspaceTeamMappingRequest[];
-}
-
-export interface AzdoWorkspaceTeamMappingRequest {
-    /** The unique identifier for the workspace in the Azure DevOps Boards system. */
-    workspaceId: string;
-    /** The unique identifier for the team in the Azure DevOps Boards system. */
-    teamId: string;
-    /** The unique identifier for the team within Moda. */
-    internalTeamId?: string | undefined;
-}
-
-export interface TestAzureDevOpsBoardConnectionRequest {
-    /** Gets the organization. */
-    organization: string;
-    /** Gets the personal access token. */
-    personalAccessToken: string;
-}
-
 export interface InitWorkProcessIntegrationRequest {
     /** Connection Id. */
     id: string;
@@ -21250,10 +22849,181 @@ export interface InitWorkspaceIntegrationRequest {
     externalViewWorkItemUrlTemplate?: string | undefined;
 }
 
+export interface AzureDevOpsWorkspaceTeamDto {
+    workspaceId: string;
+    teamId: string;
+    teamName: string;
+    boardId?: string | undefined;
+    internalTeamId?: string | undefined;
+}
+
+export interface AzdoConnectionTeamMappingsRequest {
+    /** The unique identifer for the connection. */
+    connectionId: string;
+    /** List of team mappings. */
+    teamMappings: AzdoWorkspaceTeamMappingRequest[];
+}
+
+export interface AzdoWorkspaceTeamMappingRequest {
+    /** The unique identifier for the workspace in the Azure DevOps system. */
+    workspaceId: string;
+    /** The unique identifier for the team in the Azure DevOps system. */
+    teamId: string;
+    /** The unique identifier for the team within Moda. */
+    internalTeamId?: string | undefined;
+}
+
+export interface TestAzureDevOpsConnectionRequest {
+    /** Gets the organization. */
+    organization: string;
+    /** Gets the personal access token. */
+    personalAccessToken: string;
+}
+
+export interface TestAzureOpenAIConnectionRequest {
+    /** Azure OpenAI resource URL. */
+    baseUrl: string;
+    /** The API key for Azure OpenAI resource. */
+    apiKey: string;
+    /** The OpenAI model deployment name to test. */
+    deploymentName: string;
+}
+
+export interface ConnectionListDto {
+    id: string;
+    name: string;
+    systemId?: string | undefined;
+    connector: SimpleNavigationDto;
+    isActive: boolean;
+    isValidConfiguration: boolean;
+    isSyncEnabled?: boolean | undefined;
+    canSync?: boolean | undefined;
+    $type: string;
+}
+
+export interface AzureDevOpsConnectionListDto extends ConnectionListDto {
+}
+
+export interface AzureOpenAIConnectionListDto extends ConnectionListDto {
+}
+
 export interface ConnectorListDto {
     id: number;
     name: string;
     description?: string | undefined;
+}
+
+export interface ConnectionDetailsDto {
+    id: string;
+    name: string;
+    description?: string | undefined;
+    connector: SimpleNavigationDto;
+    isActive: boolean;
+    isValidConfiguration: boolean;
+    canSync?: boolean | undefined;
+    $type: string;
+}
+
+export interface AzureDevOpsConnectionDetailsDto extends ConnectionDetailsDto {
+    systemId?: string | undefined;
+    isSyncEnabled?: boolean;
+    configuration?: AzureDevOpsConnectionConfigurationDto;
+    teamConfiguration?: AzureDevOpsTeamConfigurationDto;
+}
+
+export interface AzureDevOpsConnectionConfigurationDto {
+    organization: string;
+    personalAccessToken: string;
+    organizationUrl: string;
+    workProcesses: AzureDevOpsWorkProcessDto[];
+    workspaces: AzureDevOpsWorkspaceDto[];
+}
+
+export interface AzureDevOpsWorkProcessDto {
+    externalId: string;
+    name: string;
+    description?: string | undefined;
+    integrationState?: IntegrationStateDto | undefined;
+}
+
+export interface IntegrationStateDto {
+    internalId: string;
+    isActive: boolean;
+}
+
+export interface AzureDevOpsWorkspaceDto {
+    externalId: string;
+    name: string;
+    description?: string | undefined;
+    workProcessId: string;
+    integrationState?: IntegrationStateDto | undefined;
+}
+
+export interface AzureDevOpsTeamConfigurationDto {
+    workspaceTeams: AzureDevOpsWorkspaceTeamDto[];
+}
+
+export interface AzureOpenAIConnectionDetailsDto extends ConnectionDetailsDto {
+    configuration?: AzureOpenAIConnectionConfigurationDto;
+}
+
+export interface AzureOpenAIConnectionConfigurationDto {
+    baseUrl: string;
+    apiKey: string;
+    deploymentName: string;
+    defaultTemperature: number;
+    defaultMaxOutputTokens: number;
+    jsonModePreferred: boolean;
+}
+
+export interface CreateConnectionRequest {
+    /** The name of the connection. */
+    name: string;
+    /** The description of the connection. */
+    description?: string | undefined;
+    $type: string;
+}
+
+export interface CreateAzureDevOpsConnectionRequest extends CreateConnectionRequest {
+    /** The Azure DevOps Organization name. */
+    organization?: string;
+    /** The personal access token that enables access to Azure DevOps data. */
+    personalAccessToken?: string;
+}
+
+export interface CreateAzureOpenAIConnectionRequest extends CreateConnectionRequest {
+    /** Azure OpenAI resource URL. */
+    baseUrl?: string;
+    /** The API key for Azure OpenAI resource. */
+    apiKey?: string;
+    /** The OpenAI model deployment name to use for this connection (e.g. "gpt-4o") */
+    deploymentName?: string;
+}
+
+export interface UpdateConnectionRequest {
+    /** The unique identifier for the connection. */
+    id: string;
+    /** The name of the connection. */
+    name: string;
+    /** The description of the connection. */
+    description?: string | undefined;
+    $type: string;
+}
+
+export interface UpdateAzureDevOpsConnectionRequest extends UpdateConnectionRequest {
+    /** The Azure DevOps Organization name. */
+    organization?: string;
+    /** The personal access token that enables access to Azure DevOps data. */
+    personalAccessToken?: string;
+}
+
+export interface UpdateAzureOpenAIConnectionRequest extends UpdateConnectionRequest {
+    /** Azure OpenAI resource URL. */
+    baseUrl?: string;
+    /** The API key for Azure OpenAI resource. */
+    apiKey?: string;
+    /** The OpenAI model deployment name to use for this connection (e.g. "gpt-4o") */
+    deploymentName?: string;
 }
 
 export interface BackgroundJobTypeDto {

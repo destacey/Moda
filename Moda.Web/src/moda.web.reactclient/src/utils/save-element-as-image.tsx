@@ -1,10 +1,10 @@
-import html2canvas, { Options } from 'html2canvas'
+import type { Options } from 'html2canvas'
 
 /**
  * Generic function to save a DOM element as an image.
  * @param {HTMLElement} element - The DOM element to capture.
  * @param {string} [fileName='image.png'] - The name of the saved image file.
- * @param {Object} [options={}] - Additional options for html2canvas.
+ * @param {Partial<Options>} [options={}] - Additional options for html2canvas.
  */
 export const saveElementAsImage = async (
   element: HTMLElement,
@@ -17,9 +17,12 @@ export const saveElementAsImage = async (
   }
 
   try {
+    const { default: html2canvas } = await import('html2canvas')
+
     // Capture the element using html2canvas
     const canvas = await html2canvas(element, {
       backgroundColor: null, // Default: transparent background
+      scale: Math.max(window.devicePixelRatio || 1, 2), // Always capture at minimum 2x for crisp images
       ...options, // Allow custom options to override defaults
     })
 

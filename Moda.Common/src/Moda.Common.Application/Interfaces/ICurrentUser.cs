@@ -6,7 +6,7 @@ public interface ICurrentUser
 {
     string? Name { get; }
 
-    Guid GetUserId();
+    string GetUserId();
 
     Guid? GetEmployeeId();
 

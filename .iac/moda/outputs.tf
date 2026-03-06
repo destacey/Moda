@@ -19,3 +19,7 @@ output "swa_token" {
 output "swa_hostname" {
   value = azurerm_static_site.moda_swa.default_host_name
 }
+
+output "signalr_hostname" {
+  value = azurerm_signalr_service.moda_signalr.hostname
+}

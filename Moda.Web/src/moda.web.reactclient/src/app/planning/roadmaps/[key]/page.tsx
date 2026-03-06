@@ -23,10 +23,8 @@ import {
   RoadmapViewManager,
 } from '../_components'
 import { MarkdownRenderer } from '@/src/components/common/markdown'
-import ReorganizeRoadmapActivitiesModal from '../_components/reorganize-roadmap-activities-modal'
 import CreateRoadmapActivityForm from '../_components/create-roadmap-activity-form'
 import CreateRoadmapTimeboxForm from '../_components/create-roadmap-timebox-form'
-import { useGetInternalEmployeeIdQuery } from '@/src/store/features/user-management/profile-api'
 
 const { Item } = Descriptions
 
@@ -46,8 +44,6 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const [openCopyRoadmapForm, setOpenCopyRoadmapForm] = useState<boolean>(false)
   const [openDeleteRoadmapForm, setOpenDeleteRoadmapForm] =
     useState<boolean>(false)
-  const [openReorganizeActivitiesModal, setOpenReorganizeActivitiesModal] =
-    useState<boolean>(false)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
 
@@ -56,7 +52,8 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
 
   const router = useRouter()
 
-  const { hasPermissionClaim } = useAuth()
+  const { user, hasPermissionClaim } = useAuth()
+  const currentUserInternalEmployeeId = user?.employeeId
   const canUpdateRoadmap = hasPermissionClaim('Permissions.Roadmaps.Update')
   const canDeleteRoadmap = hasPermissionClaim('Permissions.Roadmaps.Delete')
   const canCreateRoadmap = hasPermissionClaim('Permissions.Roadmaps.Create')
@@ -71,13 +68,8 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   useDocumentTitle(`${roadmapData?.name ?? roadmapKey} - Roadmap Details`)
 
   const {
-    data: currentUserInternalEmployeeId,
-    error: currentUserInternalEmployeeIdError,
-  } = useGetInternalEmployeeIdQuery()
-
-  const {
     data: roadmapItems,
-    isFetching: isRoadmapItemsLoading,
+    isLoading: isRoadmapItemsLoading,
     refetch: refetchRoadmapItems,
   } = useGetRoadmapItemsQuery(roadmapData?.id, {
     skip: !roadmapData,
@@ -149,15 +141,6 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     }
     if (canUpdateRoadmap) {
       items.push(
-        {
-          key: 'manage-divider',
-          type: 'divider',
-        },
-        {
-          key: 'reorganize-activities',
-          label: 'Reorganize Activities',
-          onClick: () => setOpenReorganizeActivitiesModal(true),
-        },
         {
           key: 'create-divider',
           type: 'divider',
@@ -249,11 +232,6 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     [showDrawer],
   )
 
-  const onReorganizeActivitiesModalClose = useCallback(() => {
-    setOpenReorganizeActivitiesModal(false)
-    refetchRoadmapItems()
-  }, [refetchRoadmapItems])
-
   if (isLoading) {
     return <RoadmapDetailsLoading />
   }
@@ -298,7 +276,6 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       {openEditRoadmapForm && (
         <EditRoadmapForm
           roadmapKey={roadmapKey}
-          showForm={openEditRoadmapForm}
           onFormComplete={() => onEditRoadmapFormClosed(true)}
           onFormCancel={() => onEditRoadmapFormClosed(false)}
         />
@@ -307,7 +284,6 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
         <CopyRoadmapForm
           sourceRoadmapId={roadmapData?.id}
           sourceRoadmapName={roadmapData?.name}
-          showForm={openCopyRoadmapForm}
           onFormComplete={onCopyRoadmapFormClosed}
           onFormCancel={onCopyRoadmapFormClosed}
         />
@@ -315,22 +291,12 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       {openDeleteRoadmapForm && (
         <DeleteRoadmapForm
           roadmap={roadmapData}
-          showForm={openDeleteRoadmapForm}
           onFormComplete={() => onDeleteFormClosed(true)}
           onFormCancel={() => onDeleteFormClosed(false)}
         />
       )}
-      {openReorganizeActivitiesModal && (
-        <ReorganizeRoadmapActivitiesModal
-          showModal={openReorganizeActivitiesModal}
-          roadmapId={roadmapData?.id}
-          roadmapItems={roadmapItems}
-          onClose={onReorganizeActivitiesModalClose}
-        />
-      )}
       {openCreateActivityForm && (
         <CreateRoadmapActivityForm
-          showForm={openCreateActivityForm}
           roadmapId={roadmapData?.id}
           onFormComplete={() => onCreateRoadmapActivityFormClosed(true)}
           onFormCancel={() => onCreateRoadmapActivityFormClosed(false)}
@@ -338,7 +304,6 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       )}
       {openCreateTimeboxForm && (
         <CreateRoadmapTimeboxForm
-          showForm={openCreateTimeboxForm}
           roadmapId={roadmapData?.id}
           onFormComplete={() => onCreateRoadmapTimeboxFormClosed(true)}
           onFormCancel={() => onCreateRoadmapTimeboxFormClosed(false)}

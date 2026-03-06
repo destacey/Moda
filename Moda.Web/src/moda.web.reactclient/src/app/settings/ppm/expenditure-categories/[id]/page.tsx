@@ -244,7 +244,6 @@ const ExpenditureCategoryDetailsPage = (props: {
       {openEditExpenditureCategoryForm && (
         <EditExpenditureCategoryForm
           expenditureCategoryId={categoryData?.id}
-          showForm={openEditExpenditureCategoryForm}
           onFormComplete={() => onEditExpenditureCategoryFormClosed(true)}
           onFormCancel={() => onEditExpenditureCategoryFormClosed(false)}
         />
@@ -253,7 +252,6 @@ const ExpenditureCategoryDetailsPage = (props: {
         <ChangeExpenditureCategoryStateForm
           expenditureCategory={categoryData}
           stateAction={ExpenditureCategoryStateAction.Activate}
-          showForm={openActivateExpenditureCategoryForm}
           onFormComplete={() => onActivateExpenditureCategoryFormClosed(true)}
           onFormCancel={() => onActivateExpenditureCategoryFormClosed(false)}
         />
@@ -262,7 +260,6 @@ const ExpenditureCategoryDetailsPage = (props: {
         <ChangeExpenditureCategoryStateForm
           expenditureCategory={categoryData}
           stateAction={ExpenditureCategoryStateAction.Archive}
-          showForm={openArchiveExpenditureCategoryForm}
           onFormComplete={() => onArchiveExpenditureCategoryFormClosed(true)}
           onFormCancel={() => onArchiveExpenditureCategoryFormClosed(false)}
         />
@@ -270,7 +267,6 @@ const ExpenditureCategoryDetailsPage = (props: {
       {openDeleteExpenditureCategoryForm && (
         <DeleteExpenditureCategoryForm
           expenditureCategory={categoryData}
-          showForm={openDeleteExpenditureCategoryForm}
           onFormComplete={() => onDeleteExpenditureCategoryFormClosed(true)}
           onFormCancel={() => onDeleteExpenditureCategoryFormClosed(false)}
         />

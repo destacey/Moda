@@ -1,6 +1,5 @@
 'use client'
 
-import useAuth from '@/src/components/contexts/auth'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { UpdateWorkItemProjectRequest } from '@/src/services/moda-api'
 import { useGetProjectOptionsQuery } from '@/src/store/features/ppm/projects-api'
@@ -10,7 +9,8 @@ import {
 } from '@/src/store/features/work-management/workspace-api'
 import { toFormErrors } from '@/src/utils'
 import { Form, Modal, Select, Space, Typography } from 'antd'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect } from 'react'
+import { useModalForm } from '@/src/hooks'
 
 const { Item } = Form
 const { Text } = Typography
@@ -38,12 +38,6 @@ const mapToRequestValues = (
 }
 
 const EditWorkItemProjectForm = (props: EditWorkItemProjectFormProps) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-  const [isValid, setIsValid] = useState(false)
-  const [form] = Form.useForm<EditWorkItemProjectFormValues>()
-  const formValues = Form.useWatch([], form)
-
   const messageApi = useMessage()
 
   const [updateWorkItemProject] = useUpdateWorkItemProjectMutation()
@@ -63,110 +57,61 @@ const EditWorkItemProjectForm = (props: EditWorkItemProjectFormProps) => {
     error: projectOptionsError,
   } = useGetProjectOptionsQuery()
 
-  const { hasPermissionClaim } = useAuth()
-  const canManageProjectWorkItems = hasPermissionClaim(
-    'Permissions.Projects.ManageProjectWorkItems',
-  )
+  const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
+    useModalForm<EditWorkItemProjectFormValues>({
+      onSubmit: useCallback(
+        async (values: EditWorkItemProjectFormValues, form) => {
+          try {
+            const request = mapToRequestValues(values, props.workItemId)
 
-  const mapToFormValues = useCallback(
-    (projectId: string | null) => {
-      form.setFieldsValue({
-        projectId: projectId,
-      })
-    },
-    [form],
-  )
+            const response = await updateWorkItemProject({
+              workspaceId: props.workspaceId,
+              request: request,
+              cacheKey: props.workItemKey,
+            })
 
-  const update = async (
-    values: EditWorkItemProjectFormValues,
-    workItemId: string,
-    workItemKey: string,
-    workspaceId: string,
-  ) => {
-    try {
-      const request = mapToRequestValues(values, workItemId)
+            if (response.error) {
+              throw response.error
+            }
 
-      const response = await updateWorkItemProject({
-        workspaceId: workspaceId,
-        request: request,
-        cacheKey: workItemKey,
-      })
-
-      if (response.error) {
-        throw response.error
-      }
-
-      messageApi.success('Work item project updated successfully.')
-      return true
-    } catch (error) {
-      console.error('update error', error)
-      if (error.status === 422 && error.errors) {
-        const formErrors = toFormErrors(error.errors)
-        form.setFields(formErrors)
-        messageApi.error('Correct the validation error(s) to continue.')
-      } else {
-        messageApi.error(
-          error.detail ??
-            'An error occurred while updating the work item. Please try again.',
-        )
-      }
-      return false
-    }
-  }
-
-  const handleOk = async () => {
-    setIsSaving(true)
-    try {
-      const values = await form.validateFields()
-      if (
-        await update(
-          values,
+            messageApi.success('Work item project updated successfully.')
+            return true
+          } catch (error) {
+            if (error.status === 422 && error.errors) {
+              const formErrors = toFormErrors(error.errors)
+              form.setFields(formErrors)
+              messageApi.error('Correct the validation error(s) to continue.')
+            } else {
+              messageApi.error(
+                error.detail ??
+                  'An error occurred while updating the work item. Please try again.',
+              )
+            }
+            return false
+          }
+        },
+        [
+          updateWorkItemProject,
           props.workItemId,
           props.workItemKey,
           props.workspaceId,
-        )
-      ) {
-        setIsOpen(false)
-        form.resetFields()
-        props.onFormComplete()
-      }
-    } catch (error) {
-      console.error('handleOk error', error)
-      messageApi.error(
+          messageApi,
+        ],
+      ),
+      onComplete: props.onFormComplete,
+      onCancel: props.onFormCancel,
+      errorMessage:
         'An error occurred while updating the work item. Please try again.',
-      )
-    } finally {
-      setIsSaving(false)
-    }
-  }
-
-  const handleCancel = useCallback(() => {
-    setIsOpen(false)
-    form.resetFields()
-    props.onFormCancel()
-  }, [form, props])
+      permission: 'Permissions.Projects.ManageProjectWorkItems',
+    })
 
   useEffect(() => {
-    if (!workItemProjectInfoData) return
-    if (canManageProjectWorkItems) {
-      setIsOpen(true)
-      const projectId =
-        workItemProjectInfoData.project?.id ??
-        workItemProjectInfoData.parentProject?.id
-      mapToFormValues(projectId)
-    } else {
-      props.onFormCancel()
-      messageApi.error(
-        'You do not have permission to update the project on work items.',
-      )
-    }
-  }, [
-    canManageProjectWorkItems,
-    mapToFormValues,
-    messageApi,
-    props,
-    workItemProjectInfoData,
-  ])
+    if (!workItemProjectInfoData || !isOpen) return
+    const projectId =
+      workItemProjectInfoData.project?.id ??
+      workItemProjectInfoData.parentProject?.id
+    form.setFieldsValue({ projectId })
+  }, [workItemProjectInfoData, isOpen, form])
 
   useEffect(() => {
     if (error || projectOptionsError) {
@@ -178,13 +123,6 @@ const EditWorkItemProjectForm = (props: EditWorkItemProjectFormProps) => {
       )
     }
   }, [error, messageApi, projectOptionsError])
-
-  useEffect(() => {
-    form.validateFields({ validateOnly: true }).then(
-      () => setIsValid(true && form.isFieldsTouched()),
-      () => setIsValid(false),
-    )
-  }, [form, formValues])
 
   const projectSourceText =
     workItemProjectInfoData &&
@@ -204,9 +142,8 @@ const EditWorkItemProjectForm = (props: EditWorkItemProjectFormProps) => {
         okText="Save"
         confirmLoading={isSaving}
         onCancel={handleCancel}
-        maskClosable={false}
-        keyboard={false} // disable esc key to close modal
-        destroyOnHidden={true}
+        keyboard={false}
+        destroyOnHidden
       >
         <Space vertical>
           {projectSourceText && <Text italic>{projectSourceText}</Text>}

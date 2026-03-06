@@ -2,8 +2,8 @@
 
 import { MarkdownEditor } from '@/src/components/common/markdown'
 import { EmployeeSelect } from '@/src/components/common/organizations'
-import useAuth from '@/src/components/contexts/auth'
 import { useMessage } from '@/src/components/contexts/messaging'
+import { useModalForm } from '@/src/hooks'
 import { UpdateProjectTaskRequest } from '@/src/services/moda-api'
 import { useGetEmployeeOptionsQuery } from '@/src/store/features/organizations/employee-api'
 import {
@@ -24,7 +24,7 @@ import {
   TreeSelect,
 } from 'antd'
 import dayjs from 'dayjs'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect } from 'react'
 
 const { Item } = Form
 const { TextArea } = Input
@@ -34,7 +34,6 @@ const { RangePicker } = DatePicker
 export interface EditProjectTaskFormProps {
   projectIdOrKey: string
   taskIdOrKey: string
-  showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
 }
@@ -72,25 +71,22 @@ const mapToRequestValues = (
   } as UpdateProjectTaskRequest
 }
 
-const EditProjectTaskForm = (props: EditProjectTaskFormProps) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-  const [isValid, setIsValid] = useState(false)
-  const [form] = Form.useForm<EditProjectTaskFormValues>()
-  const formValues = Form.useWatch([], form)
-
+const EditProjectTaskForm = ({
+  projectIdOrKey,
+  taskIdOrKey,
+  onFormComplete,
+  onFormCancel,
+}: EditProjectTaskFormProps) => {
   const messageApi = useMessage()
 
-  const [updateProjectTask, { error: mutationError }] =
-    useUpdateProjectTaskMutation()
+  const [updateProjectTask] = useUpdateProjectTaskMutation()
 
   const {
     data: taskData,
     isLoading,
-    error,
   } = useGetProjectTaskQuery({
-    projectIdOrKey: props.projectIdOrKey,
-    taskIdOrKey: props.taskIdOrKey,
+    projectIdOrKey,
+    taskIdOrKey,
   })
 
   const taskType = taskData?.type?.name
@@ -98,8 +94,6 @@ const EditProjectTaskForm = (props: EditProjectTaskFormProps) => {
 
   const {
     data: employeeData,
-    isLoading: employeeOptionsIsLoading,
-    error: employeeOptionsError,
   } = useGetEmployeeOptionsQuery(true)
 
   const { data: statusOptions = [] } = useGetTaskStatusOptionsQuery({
@@ -109,117 +103,77 @@ const EditProjectTaskForm = (props: EditProjectTaskFormProps) => {
   const { data: priorityOptions = [] } = useGetTaskPriorityOptionsQuery()
 
   const { data: parentTaskOptions = [] } = useGetParentTaskOptionsQuery({
-    projectIdOrKey: props.projectIdOrKey,
+    projectIdOrKey,
     excludeTaskId: taskData?.id,
   })
 
-  const { hasPermissionClaim } = useAuth()
-  const canUpdateTask = hasPermissionClaim('Permissions.Projects.Update')
+  const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
+    useModalForm<EditProjectTaskFormValues>({
+      onSubmit: useCallback(
+        async (values: EditProjectTaskFormValues, form) => {
+          if (!taskData) {
+            messageApi.error('Task data is not loaded.')
+            return false
+          }
 
-  const mapToFormValues = useCallback(
-    (task: any) => {
-      if (!task) {
-        throw new Error('Task not found')
-      }
-      const plannedRange =
-        task.plannedStart && task.plannedEnd
-          ? [dayjs(task.plannedStart), dayjs(task.plannedEnd)]
-          : undefined
+          try {
+            const request = mapToRequestValues(values, taskData.id)
+            const response = await updateProjectTask({
+              projectIdOrKey,
+              request,
+              cacheKey: taskIdOrKey,
+            })
+            if (response.error) throw response.error
 
-      form.setFieldsValue({
-        name: task.name,
-        description: task.description,
-        status: task.status.id,
-        priority: task.priority?.id,
-        assigneeIds: task.assignees.map((a: any) => a.id),
-        progress: task.progress,
-        parentId: task.parent?.id,
-        plannedRange,
-        plannedDate: task.plannedDate ? dayjs(task.plannedDate) : undefined,
-        estimatedEffortHours: task.estimatedEffortHours,
-      })
-    },
-    [form],
-  )
-
-  useEffect(() => {
-    form.validateFields({ validateOnly: true }).then(
-      () => setIsValid(true && form.isFieldsTouched()),
-      () => setIsValid(false),
-    )
-  }, [form, formValues])
-
-  const update = async (values: EditProjectTaskFormValues) => {
-    if (!taskData) {
-      messageApi.error('Task data is not loaded.')
-      return false
-    }
-
-    try {
-      const request = mapToRequestValues(values, taskData.id)
-      const response = await updateProjectTask({
-        projectIdOrKey: props.projectIdOrKey,
-        request,
-        cacheKey: props.taskIdOrKey,
-      })
-      if (response.error) {
-        throw response.error
-      }
-      messageApi.success('Task updated successfully.')
-
-      return true
-    } catch (error) {
-      if (error.status === 422 && error.errors) {
-        const formErrors = toFormErrors(error.errors)
-        form.setFields(formErrors)
-        messageApi.error('Correct the validation error(s) to continue.')
-      } else {
-        messageApi.error(
-          error.detail ??
-            'An error occurred while update the project task. Please try again.',
-        )
-      }
-      return false
-    }
-  }
-
-  const handleOk = async () => {
-    setIsSaving(true)
-    try {
-      const values = await form.validateFields()
-      if (await update(values)) {
-        setIsOpen(false)
-        form.resetFields()
-        props.onFormComplete()
-      }
-    } catch (error) {
-      console.error('handleOk error', error)
-      messageApi.error(
+            messageApi.success('Task updated successfully.')
+            return true
+          } catch (error) {
+            if (error.status === 422 && error.errors) {
+              const formErrors = toFormErrors(error.errors)
+              form.setFields(formErrors)
+              messageApi.error('Correct the validation error(s) to continue.')
+            } else {
+              messageApi.error(
+                error.detail ??
+                  'An error occurred while update the project task. Please try again.',
+              )
+            }
+            return false
+          }
+        },
+        [updateProjectTask, taskData, projectIdOrKey, taskIdOrKey, messageApi],
+      ),
+      onComplete: onFormComplete,
+      onCancel: onFormCancel,
+      errorMessage:
         'An error occurred while updating the task. Please try again.',
-      )
-    } finally {
-      setIsSaving(false)
-    }
-  }
+      permission: 'Permissions.Projects.Update',
+    })
 
-  const handleCancel = useCallback(() => {
-    setIsOpen(false)
-    form.resetFields()
-    props.onFormCancel()
-  }, [form, props])
-
+  // Initialize form values when data is loaded
   useEffect(() => {
     if (!taskData) return
-    if (canUpdateTask) {
-      setIsOpen(props.showForm)
-      if (props.showForm) {
-        mapToFormValues(taskData)
-      }
-    } else {
-      props.onFormCancel()
-      messageApi.error('You do not have permission to update tasks.')
-    }
-  }, [canUpdateTask, mapToFormValues, messageApi, taskData, props])
+
+    const plannedRange =
+      taskData.plannedStart && taskData.plannedEnd
+        ? [dayjs(taskData.plannedStart), dayjs(taskData.plannedEnd)]
+        : undefined
+
+    form.setFieldsValue({
+      name: taskData.name,
+      description: taskData.description,
+      status: taskData.status.id,
+      priority: taskData.priority?.id,
+      assigneeIds: taskData.assignees.map((a: any) => a.id),
+      progress: taskData.progress,
+      parentId: taskData.parent?.id,
+      plannedRange,
+      plannedDate: taskData.plannedDate
+        ? dayjs(taskData.plannedDate)
+        : undefined,
+      estimatedEffortHours: taskData.estimatedEffortHours,
+    })
+  }, [taskData, form])
 
   if (isLoading) {
     return null
@@ -234,10 +188,8 @@ const EditProjectTaskForm = (props: EditProjectTaskFormProps) => {
       okText="Save"
       confirmLoading={isSaving}
       onCancel={handleCancel}
-      mask={{ blur: false }}
-      maskClosable={false}
       keyboard={false}
-      destroyOnHidden={true}
+      destroyOnHidden
       width={500}
     >
       <Form

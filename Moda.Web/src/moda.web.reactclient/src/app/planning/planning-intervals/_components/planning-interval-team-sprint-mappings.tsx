@@ -277,7 +277,6 @@ export const PlanningIntervalTeamSprintMappings = ({
       />
       {editingTeam && (
         <ConfigureTeamSprintMappingsForm
-          showForm={!!editingTeam}
           planningIntervalId={planningInterval.id}
           planningIntervalKey={planningInterval.key}
           teamId={editingTeam.teamId}

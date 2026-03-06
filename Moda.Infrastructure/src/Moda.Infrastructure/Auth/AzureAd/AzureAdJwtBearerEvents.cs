@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Identity.Web;
@@ -23,8 +24,29 @@ internal class AzureAdJwtBearerEvents : JwtBearerEvents
 
     public override Task MessageReceived(MessageReceivedContext context)
     {
+        // SignalR sends the access token as a query parameter for WebSocket connections
+        var accessToken = context.Request.Query["access_token"];
+        var path = context.HttpContext.Request.Path;
+        if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
+        {
+            context.Token = accessToken;
+        }
+
         _logger.TokenReceived();
         return base.MessageReceived(context);
+    }
+
+    public override async Task Challenge(JwtBearerChallengeContext context)
+    {
+        if (context.HttpContext.Items.TryGetValue("RegistrationDenied", out var message))
+        {
+            context.HandleResponse();
+            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+            await context.Response.WriteAsJsonAsync(new { message });
+            return;
+        }
+
+        await base.Challenge(context);
     }
 
     /// <summary>
@@ -49,9 +71,22 @@ internal class AzureAdJwtBearerEvents : JwtBearerEvents
         var identity = principal.Identities.First();
 
         // Lookup local user or create one if none exist.
-        var userData = await context.HttpContext.RequestServices.GetRequiredService<IUserService>()
-            .GetOrCreateFromPrincipalAsync(principal);
-        // TODO: Call Graph here
+        (string Id, string? EmployeeId) userData;
+        try
+        {
+            userData = await context.HttpContext.RequestServices.GetRequiredService<IUserService>()
+                .GetOrCreateFromPrincipalAsync(principal);
+        }
+        catch (ForbiddenException ex)
+        {
+            _logger.RegistrationDenied(objectId, ex.Message);
+            // Store the exception so OnChallenge can write the 403 response.
+            // Writing the response here and calling Fail() can race with the
+            // handler's default challenge, so we defer to OnChallenge instead.
+            context.HttpContext.Items["RegistrationDenied"] = ex.Message;
+            context.Fail(ex);
+            return;
+        }
 
         // We use the nameidentifier claim to store the user id.
         var idClaim = principal.FindFirst(ClaimTypes.NameIdentifier);
@@ -103,4 +138,7 @@ internal static class AzureAdJwtBearerEventsLoggingExtensions
 
     public static void TokenValidationSucceeded(this ILogger logger, string userId, string issuer) =>
         logger.Debug("Token validation succeeded: User: {userId} Issuer: {issuer}", userId, issuer);
+
+    public static void RegistrationDenied(this ILogger logger, string objectId, string reason) =>
+        logger.Warning("Registration denied for ObjectId: {ObjectId}. Reason: {Reason}", objectId, reason);
 }

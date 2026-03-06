@@ -17,4 +17,5 @@ public interface IModaDbContext
     DbSet<Employee> Employees { get; }
     DbSet<ExternalEmployeeBlacklistItem> ExternalEmployeeBlacklistItems { get; }
     DbSet<PersonalAccessToken> PersonalAccessTokens { get; }
+    DbSet<User> ModaUsers { get; }
 }

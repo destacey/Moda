@@ -279,7 +279,6 @@ const PersonalAccessTokens: FC = () => {
 
       {isCreateFormVisible && (
         <CreatePersonalAccessTokenForm
-          showForm={isCreateFormVisible}
           onFormCreate={handleFormCreate}
           onFormCancel={handleFormCancel}
         />
@@ -288,7 +287,6 @@ const PersonalAccessTokens: FC = () => {
       {isEditFormVisible && editingToken && (
         <EditPersonalAccessTokenForm
           token={editingToken}
-          showForm={isEditFormVisible}
           onFormUpdate={handleEditFormUpdate}
           onFormCancel={handleEditFormCancel}
         />

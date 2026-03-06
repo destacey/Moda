@@ -6,6 +6,7 @@ using Moda.Common.Domain.Identity;
 using Moda.Planning.Application.Persistence;
 using Moda.Planning.Domain.Models;
 using Moda.Planning.Domain.Models.Iterations;
+using Moda.Planning.Domain.Models.PlanningPoker;
 using Moda.Planning.Domain.Models.Roadmaps;
 using Moda.Tests.Shared.Infrastructure;
 
@@ -25,11 +26,14 @@ public class FakePlanningDbContext : IPlanningDbContext, IDisposable
     private readonly List<PlanningTeam> _planningTeams = [];
     private readonly List<SimpleHealthCheck> _planningHealthChecks = [];
     private readonly List<Roadmap> _roadmaps = [];
-    
+    private readonly List<EstimationScale> _estimationScales = [];
+    private readonly List<PokerSession> _pokerSessions = [];
+
     // Common domain entities
     private readonly List<Employee> _employees = [];
     private readonly List<ExternalEmployeeBlacklistItem> _externalEmployeeBlacklistItems = [];
     private readonly List<PersonalAccessToken> _personalAccessTokens = [];
+    private readonly List<User> _modaUsers = [];
 
     // DbSet properties
     public DbSet<Iteration> Iterations => _iterations.AsDbSet();
@@ -39,9 +43,12 @@ public class FakePlanningDbContext : IPlanningDbContext, IDisposable
     public DbSet<PlanningTeam> PlanningTeams => _planningTeams.AsDbSet();
     public DbSet<SimpleHealthCheck> PlanningHealthChecks => _planningHealthChecks.AsDbSet();
     public DbSet<Roadmap> Roadmaps => _roadmaps.AsDbSet();
+    public DbSet<EstimationScale> EstimationScales => _estimationScales.AsDbSet();
+    public DbSet<PokerSession> PokerSessions => _pokerSessions.AsDbSet();
     public DbSet<Employee> Employees => _employees.AsDbSet();
     public DbSet<ExternalEmployeeBlacklistItem> ExternalEmployeeBlacklistItems => _externalEmployeeBlacklistItems.AsDbSet();
     public DbSet<PersonalAccessToken> PersonalAccessTokens => _personalAccessTokens.AsDbSet();
+    public DbSet<User> ModaUsers => _modaUsers.AsDbSet();
 
     // ChangeTracker - we can't create a real one, so we return null and the handler uses defensive coding
     public ChangeTracker ChangeTracker => null!;
@@ -61,6 +68,7 @@ public class FakePlanningDbContext : IPlanningDbContext, IDisposable
         // Return the total number of entities as a simple success indicator
         var count = _iterations.Count + _planningIntervals.Count + _risks.Count +
                     _planningTeams.Count + _planningHealthChecks.Count + _roadmaps.Count +
+                    _estimationScales.Count + _pokerSessions.Count +
                     _employees.Count + _externalEmployeeBlacklistItems.Count + _personalAccessTokens.Count;
         return Task.FromResult(count);
     }
@@ -101,6 +109,14 @@ public class FakePlanningDbContext : IPlanningDbContext, IDisposable
     public void AddRoadmap(Roadmap roadmap) => _roadmaps.Add(roadmap);
     public void AddRoadmaps(IEnumerable<Roadmap> roadmaps) => _roadmaps.AddRange(roadmaps);
     
+    // EstimationScale
+    public void AddEstimationScale(EstimationScale scale) => _estimationScales.Add(scale);
+    public void AddEstimationScales(IEnumerable<EstimationScale> scales) => _estimationScales.AddRange(scales);
+
+    // PokerSession
+    public void AddPokerSession(PokerSession session) => _pokerSessions.Add(session);
+    public void AddPokerSessions(IEnumerable<PokerSession> sessions) => _pokerSessions.AddRange(sessions);
+
     // Employee
     public void AddEmployee(Employee employee) => _employees.Add(employee);
     public void AddEmployees(IEnumerable<Employee> employees) => _employees.AddRange(employees);
@@ -117,6 +133,8 @@ public class FakePlanningDbContext : IPlanningDbContext, IDisposable
         _planningTeams.Clear();
         _planningHealthChecks.Clear();
         _roadmaps.Clear();
+        _estimationScales.Clear();
+        _pokerSessions.Clear();
         _employees.Clear();
         _externalEmployeeBlacklistItems.Clear();
         _personalAccessTokens.Clear();

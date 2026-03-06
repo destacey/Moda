@@ -1,6 +1,5 @@
 import axios from 'axios'
 import {
-  AzureDevOpsBoardsConnectionsClient,
   BackgroundJobsClient,
   EmployeesClient,
   HealthChecksClient,
@@ -28,6 +27,10 @@ import {
   ProjectTasksClient,
   StrategicInitiativesClient,
   SprintsClient,
+  EstimationScalesClient,
+  PokerSessionsClient,
+  ConnectionsClient,
+  AzureDevOpsConnectionsClient,
 } from './moda-api'
 import { tokenRequest } from '@/auth-config'
 import { InteractionRequiredAuthError } from '@azure/msal-browser'
@@ -121,8 +124,10 @@ axiosClient.interceptors.request.use(
 )
 
 // API Clients
-export const getAzureDevOpsBoardsConnectionsClient = () =>
-  new AzureDevOpsBoardsConnectionsClient('', axiosClient)
+export const getConnectionsClient = () => new ConnectionsClient('', axiosClient)
+
+export const getAzureDevOpsConnectionsClient = () =>
+  new AzureDevOpsConnectionsClient('', axiosClient)
 
 export const getBackgroundJobsClient = () =>
   new BackgroundJobsClient('', axiosClient)
@@ -144,6 +149,10 @@ export const getPlanningIntervalsClient = () =>
 export const getRisksClient = () => new RisksClient('', axiosClient)
 export const getRoadmapsClient = () => new RoadmapsClient('', axiosClient)
 export const getSprintsClient = () => new SprintsClient('', axiosClient)
+export const getEstimationScalesClient = () =>
+  new EstimationScalesClient('', axiosClient)
+export const getPokerSessionsClient = () =>
+  new PokerSessionsClient('', axiosClient)
 
 // PPM
 export const getExpenditureCategoriesClient = () =>

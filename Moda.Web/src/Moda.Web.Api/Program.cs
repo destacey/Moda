@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 using System.Text.Json.Serialization;
 using FluentValidation.AspNetCore;
 using Moda.AppIntegration.Application;
@@ -36,6 +36,7 @@ try
             options.JsonSerializerOptions.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
             options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+            options.JsonSerializerOptions.AllowTrailingCommas = true;
         });
 
     builder.Services.Configure<ApiBehaviorOptions>(options =>

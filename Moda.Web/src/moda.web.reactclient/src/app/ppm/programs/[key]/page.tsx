@@ -55,8 +55,6 @@ const ProgramDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const { key } = use(props.params)
   const programKey = Number(key)
 
-  useDocumentTitle('Program Details')
-
   const [activeTab, setActiveTab] = useState(ProgramTabs.Details)
   const [openEditProgramForm, setOpenEditProgramForm] = useState<boolean>(false)
   const [openActivateProgramForm, setOpenActivateProgramForm] =
@@ -92,6 +90,8 @@ const ProgramDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   } = useGetProgramProjectsQuery(programData?.key.toString(), {
     skip: !programData?.key,
   })
+
+  useDocumentTitle(`${programData?.name ?? programKey} - Program Details`)
 
   useEffect(() => {
     if (!programData) return
@@ -310,7 +310,6 @@ const ProgramDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       {openEditProgramForm && (
         <EditProgramForm
           programKey={programData?.key}
-          showForm={openEditProgramForm}
           onFormComplete={() => onEditProgramFormClosed(true)}
           onFormCancel={() => onEditProgramFormClosed(false)}
         />
@@ -319,7 +318,6 @@ const ProgramDetailsPage = (props: { params: Promise<{ key: string }> }) => {
         <ChangeProgramStatusForm
           program={programData}
           statusAction={ProgramStatusAction.Activate}
-          showForm={openActivateProgramForm}
           onFormComplete={() => onActivateProgramFormClosed(true)}
           onFormCancel={() => onActivateProgramFormClosed(false)}
         />
@@ -328,7 +326,6 @@ const ProgramDetailsPage = (props: { params: Promise<{ key: string }> }) => {
         <ChangeProgramStatusForm
           program={programData}
           statusAction={ProgramStatusAction.Complete}
-          showForm={openCompleteProgramForm}
           onFormComplete={() => onCompleteProgramFormClosed(true)}
           onFormCancel={() => onCompleteProgramFormClosed(false)}
         />
@@ -337,7 +334,6 @@ const ProgramDetailsPage = (props: { params: Promise<{ key: string }> }) => {
         <ChangeProgramStatusForm
           program={programData}
           statusAction={ProgramStatusAction.Cancel}
-          showForm={openCancelProgramForm}
           onFormComplete={() => onCancelProgramFormClosed(true)}
           onFormCancel={() => onCancelProgramFormClosed(false)}
         />
@@ -345,7 +341,6 @@ const ProgramDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       {openDeleteProgramForm && (
         <DeleteProgramForm
           program={programData}
-          showForm={openDeleteProgramForm}
           onFormComplete={() => onDeleteProgramFormClosed(true)}
           onFormCancel={() => onDeleteProgramFormClosed(false)}
         />

@@ -178,7 +178,6 @@ const TeamMembershipsGrid = ({
       />
       {openEditTeamMembershipForm && (
         <EditTeamMembershipForm
-          showForm={openEditTeamMembershipForm}
           membership={selectedTeamMembership}
           teamType={teamType}
           onFormSave={() => onEditTeamMembershipFormClosed(true)}
@@ -187,7 +186,6 @@ const TeamMembershipsGrid = ({
       )}
       {openDeleteTeamMembershipForm && (
         <DeleteTeamMembershipForm
-          showForm={openDeleteTeamMembershipForm}
           membership={selectedTeamMembership}
           teamType={teamType}
           onFormSave={() => onDeleteTeamMembershipFormClosed(true)}

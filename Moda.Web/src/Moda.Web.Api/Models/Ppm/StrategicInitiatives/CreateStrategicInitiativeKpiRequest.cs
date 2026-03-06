@@ -19,7 +19,7 @@ public sealed record CreateStrategicInitiativeKpiRequest
     /// <summary>
     /// A description of what the KPI measures.
     /// </summary>
-    public string Description { get; set; } = default!;
+    public string? Description { get; set; }
 
     /// <summary>
     /// The target value that defines success for the KPI.
@@ -27,18 +27,28 @@ public sealed record CreateStrategicInitiativeKpiRequest
     public double TargetValue { get; set; }
 
     /// <summary>
-    /// The ID of the unit of measurement for the KPI.
+    /// The starting (baseline) value of the KPI.
     /// </summary>
-    public int UnitId { get; set; }
+    public double? StartingValue { get; set; }
 
     /// <summary>
-    /// The ID of the target direction for the KPI.
+    /// An optional prefix symbol displayed before the numeric value (e.g. "$").
     /// </summary>
-    public int TargetDirectionId { get; set; }
+    public string? Prefix { get; set; }
+
+    /// <summary>
+    /// An optional suffix symbol displayed after the numeric value (e.g. "%", "M").
+    /// </summary>
+    public string? Suffix { get; set; }
+
+    /// <summary>
+    /// The target direction for the KPI.
+    /// </summary>
+    public KpiTargetDirection TargetDirection { get; set; }
 
     public CreateStrategicInitiativeKpiCommand ToCreateStrategicInitiativeKpiCommand()
     {
-        var parameters = new StrategicInitiativeKpiUpsertParameters(Name, Description, TargetValue, (KpiUnit)UnitId, (KpiTargetDirection)TargetDirectionId);
+        var parameters = new StrategicInitiativeKpiUpsertParameters(Name, Description, StartingValue, TargetValue, Prefix, Suffix, TargetDirection);
 
         return new CreateStrategicInitiativeKpiCommand(StrategicInitiativeId, parameters);
     }
@@ -56,17 +66,21 @@ public sealed class CreateStrategicInitiativeKpiRequestValidator : AbstractValid
             .MaximumLength(64);
 
         RuleFor(x => x.Description)
-            .NotEmpty()
-            .MaximumLength(512);
+            .MaximumLength(512)
+            .When(x => x.Description is not null);
 
         RuleFor(x => x.TargetValue)
             .NotEmpty();
 
-        RuleFor(x => (KpiUnit)x.UnitId)
-            .IsInEnum()
-            .WithMessage("A valid KPI unit must be selected.");
+        RuleFor(x => x.Prefix)
+            .MaximumLength(8)
+            .When(x => x.Prefix is not null);
 
-        RuleFor(x => (KpiTargetDirection)x.TargetDirectionId)
+        RuleFor(x => x.Suffix)
+            .MaximumLength(8)
+            .When(x => x.Suffix is not null);
+
+        RuleFor(x => x.TargetDirection)
             .IsInEnum()
             .WithMessage("A valid KPI direction must be selected.");
     }

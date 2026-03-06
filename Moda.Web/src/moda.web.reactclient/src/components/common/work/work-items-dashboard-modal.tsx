@@ -38,7 +38,6 @@ const WorkItemsDashboardModal = (props: WorkItemsDashboardModalProps) => {
         footer={null}
         okText="Close"
         confirmLoading={isLoading}
-        maskClosable={false}
         destroyOnHidden={true}
       >
         <WorkItemsCumulativeFlowChart

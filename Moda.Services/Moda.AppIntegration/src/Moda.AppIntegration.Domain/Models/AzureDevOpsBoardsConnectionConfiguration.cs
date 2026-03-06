@@ -25,7 +25,7 @@ public sealed class AzureDevOpsBoardsConnectionConfiguration
     public required string Organization { get; set; }
 
     /// <summary>Gets the personal access token.</summary>
-    /// <value>The personal access token that enables access to Azure DevOps Boards data.</value>
+    /// <value>The personal access token that enables access to Azure DevOps data.</value>
     public required string PersonalAccessToken { get; set; }
 
     public string OrganizationUrl

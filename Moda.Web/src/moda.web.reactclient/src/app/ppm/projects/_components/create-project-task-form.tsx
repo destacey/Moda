@@ -2,8 +2,8 @@
 
 import { MarkdownEditor } from '@/src/components/common/markdown'
 import { EmployeeSelect } from '@/src/components/common/organizations'
-import useAuth from '@/src/components/contexts/auth'
 import { useMessage } from '@/src/components/contexts/messaging'
+import { useModalForm } from '@/src/hooks'
 import { CreateProjectTaskRequest } from '@/src/services/moda-api'
 import { useGetEmployeeOptionsQuery } from '@/src/store/features/organizations/employee-api'
 import {
@@ -23,7 +23,7 @@ import {
   Radio,
   TreeSelect,
 } from 'antd'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect } from 'react'
 
 const { Item } = Form
 const { TextArea } = Input
@@ -33,7 +33,6 @@ const { RangePicker } = DatePicker
 export interface CreateProjectTaskFormProps {
   projectIdOrKey: string
   parentTaskId?: string
-  showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
 }
@@ -71,19 +70,60 @@ const mapToRequestValues = (
   } as CreateProjectTaskRequest
 }
 
-const CreateProjectTaskForm = (props: CreateProjectTaskFormProps) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-  const [isValid, setIsValid] = useState(false)
-  const [form] = Form.useForm<CreateProjectTaskFormValues>()
-  const formValues = Form.useWatch([], form)
-
+const CreateProjectTaskForm = ({
+  projectIdOrKey,
+  parentTaskId,
+  onFormComplete,
+  onFormCancel,
+}: CreateProjectTaskFormProps) => {
   const messageApi = useMessage()
 
-  const [createProjectTask, { error: mutationError }] =
-    useCreateProjectTaskMutation()
+  const [createProjectTask] = useCreateProjectTaskMutation()
 
   const { data: typeOptions = [] } = useGetTaskTypeOptionsQuery()
+
+  const {
+    data: employeeData,
+  } = useGetEmployeeOptionsQuery(false)
+
+  const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
+    useModalForm<CreateProjectTaskFormValues>({
+      onSubmit: useCallback(
+        async (values: CreateProjectTaskFormValues, form) => {
+          try {
+            const request = mapToRequestValues(values)
+            const response = await createProjectTask({
+              projectIdOrKey,
+              request,
+            })
+            if (response.error) throw response.error
+
+            messageApi.success(
+              'Task created successfully. Task key: ' + response.data.key,
+            )
+            return true
+          } catch (error) {
+            if (error.status === 422 && error.errors) {
+              const formErrors = toFormErrors(error.errors)
+              form.setFields(formErrors)
+              messageApi.error('Correct the validation error(s) to continue.')
+            } else {
+              messageApi.error(
+                error.detail ??
+                  'An error occurred while creating the project task. Please try again.',
+              )
+            }
+            return false
+          }
+        },
+        [createProjectTask, projectIdOrKey, messageApi],
+      ),
+      onComplete: onFormComplete,
+      onCancel: onFormCancel,
+      errorMessage:
+        'An error occurred while creating the task. Please try again.',
+      permission: 'Permissions.Projects.Create',
+    })
 
   const selectedType = Form.useWatch('type', form)
   // Find the Milestone value dynamically from options
@@ -92,12 +132,6 @@ const CreateProjectTaskForm = (props: CreateProjectTaskFormProps) => {
   )?.value
   const isMilestone = selectedType === milestoneValue
 
-  const {
-    data: employeeData,
-    isLoading: employeeOptionsIsLoading,
-    error: employeeOptionsError,
-  } = useGetEmployeeOptionsQuery(false)
-
   const { data: statusOptions = [] } = useGetTaskStatusOptionsQuery({
     forMilestone: isMilestone,
   })
@@ -105,11 +139,15 @@ const CreateProjectTaskForm = (props: CreateProjectTaskFormProps) => {
   const { data: priorityOptions = [] } = useGetTaskPriorityOptionsQuery()
 
   const { data: parentTaskOptions = [] } = useGetParentTaskOptionsQuery({
-    projectIdOrKey: props.projectIdOrKey,
+    projectIdOrKey,
   })
 
-  const { hasPermissionClaim } = useAuth()
-  const canCreateTask = hasPermissionClaim('Permissions.Projects.Create')
+  // Set parentTaskId if provided
+  useEffect(() => {
+    if (parentTaskId) {
+      form.setFieldValue('parentId', parentTaskId)
+    }
+  }, [parentTaskId, form])
 
   // Reset status to "Not Started" (1) if user changes type to Milestone while status is "In Progress" (2)
   useEffect(() => {
@@ -118,80 +156,6 @@ const CreateProjectTaskForm = (props: CreateProjectTaskFormProps) => {
       form.setFieldValue('status', 1)
     }
   }, [isMilestone, form])
-
-  useEffect(() => {
-    form.validateFields({ validateOnly: true }).then(
-      () => setIsValid(true && form.isFieldsTouched()),
-      () => setIsValid(false),
-    )
-  }, [form, formValues])
-
-  const create = async (values: CreateProjectTaskFormValues) => {
-    try {
-      const request = mapToRequestValues(values)
-      const response = await createProjectTask({
-        projectIdOrKey: props.projectIdOrKey,
-        request,
-      })
-      if (response.error) {
-        throw response.error
-      }
-      messageApi.success(
-        'Task created successfully. Task key: ' + response.data.key,
-      )
-
-      return true
-    } catch (error) {
-      if (error.status === 422 && error.errors) {
-        const formErrors = toFormErrors(error.errors)
-        form.setFields(formErrors)
-        messageApi.error('Correct the validation error(s) to continue.')
-      } else {
-        messageApi.error(
-          error.detail ??
-            'An error occurred while creating the project task. Please try again.',
-        )
-      }
-      return false
-    }
-  }
-
-  const handleOk = async () => {
-    setIsSaving(true)
-    try {
-      const values = await form.validateFields()
-      if (await create(values)) {
-        setIsOpen(false)
-        form.resetFields()
-        props.onFormComplete()
-      }
-    } catch (error) {
-      console.error('handleOk error', error)
-      messageApi.error(
-        'An error occurred while creating the task. Please try again.',
-      )
-    } finally {
-      setIsSaving(false)
-    }
-  }
-
-  const handleCancel = useCallback(() => {
-    setIsOpen(false)
-    form.resetFields()
-    props.onFormCancel()
-  }, [form, props])
-
-  useEffect(() => {
-    if (canCreateTask) {
-      setIsOpen(props.showForm)
-      if (props.showForm && props.parentTaskId) {
-        form.setFieldValue('parentId', props.parentTaskId)
-      }
-    } else {
-      props.onFormCancel()
-      messageApi.error('You do not have permission to create tasks.')
-    }
-  }, [canCreateTask, form, messageApi, props])
 
   return (
     <Modal
@@ -202,10 +166,8 @@ const CreateProjectTaskForm = (props: CreateProjectTaskFormProps) => {
       okText="Create"
       confirmLoading={isSaving}
       onCancel={handleCancel}
-      mask={{ blur: false }}
-      maskClosable={false}
       keyboard={false}
-      destroyOnHidden={true}
+      destroyOnHidden
       width={500}
     >
       <Form
@@ -217,7 +179,7 @@ const CreateProjectTaskForm = (props: CreateProjectTaskFormProps) => {
           type: 1, // Default to 'Task' type
           status: 1, // Default to 'Not Started' status
           priority: 2, // Default to 'Medium' priority
-          parentId: props.parentTaskId,
+          parentId: parentTaskId,
           progress: 0,
         }}
       >

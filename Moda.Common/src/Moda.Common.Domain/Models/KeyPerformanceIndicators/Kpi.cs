@@ -12,6 +12,8 @@ public abstract class Kpi : BaseEntity<Guid>, IHasIdAndKey
 {
     protected string _name = default!;
     protected string? _description;
+    protected string? _prefix;
+    protected string? _suffix;
 
     // TODO: commented out the relationship parts because they weren't playing well with EF Core (TPC)
     //protected readonly HashSet<KpiCheckpoint> _checkpoints = [];
@@ -19,12 +21,18 @@ public abstract class Kpi : BaseEntity<Guid>, IHasIdAndKey
 
     protected Kpi() { }
 
-    protected Kpi(string name, string? description, double targetValue, KpiUnit unit, KpiTargetDirection targetDirection)
+    protected Kpi(string name, string? description, double? startingValue, double targetValue, string? prefix, string? suffix, KpiTargetDirection targetDirection)
     {
+        var startingValueError = ValidateStartingValue(startingValue, targetValue, targetDirection);
+        if (startingValueError is not null)
+            throw new ArgumentException(startingValueError, nameof(startingValue));
+
         Name = name;
         Description = description;
+        StartingValue = startingValue;
         TargetValue = targetValue;
-        Unit = unit;
+        Prefix = prefix;
+        Suffix = suffix;
         TargetDirection = targetDirection;
     }
 
@@ -52,6 +60,11 @@ public abstract class Kpi : BaseEntity<Guid>, IHasIdAndKey
     }
 
     /// <summary>
+    /// The starting (baseline) value of the KPI. Used to track progress relative to where the KPI began.
+    /// </summary>
+    public double? StartingValue { get; protected set; }
+
+    /// <summary>
     /// The target value that defines success for the KPI.
     /// </summary>
     public double TargetValue { get; protected set; }
@@ -62,9 +75,22 @@ public abstract class Kpi : BaseEntity<Guid>, IHasIdAndKey
     public double? ActualValue { get; protected set; }
 
     /// <summary>
-    /// Gets the unit of measurement for the KPI.
+    /// An optional prefix symbol displayed before the numeric value (e.g. "$", "€").
     /// </summary>
-    public KpiUnit Unit { get; protected set; }
+    public string? Prefix
+    {
+        get => _prefix;
+        protected set => _prefix = value.NullIfWhiteSpacePlusTrim();
+    }
+
+    /// <summary>
+    /// An optional suffix symbol displayed after the numeric value (e.g. "%", "M", "users").
+    /// </summary>
+    public string? Suffix
+    {
+        get => _suffix;
+        protected set => _suffix = value.NullIfWhiteSpacePlusTrim();
+    }
 
     /// <summary>
     /// Gets the target direction for the KPI. This indicates whether the KPI is expected to increase or decrease.
@@ -91,21 +117,36 @@ public abstract class Kpi : BaseEntity<Guid>, IHasIdAndKey
     /// <summary>
     /// Updates the KPI properties.
     /// </summary>
-    /// <param name="name"></param>
-    /// <param name="description"></param>
-    /// <param name="targetValue"></param>
-    /// <param name="unit"></param>
-    /// <param name="targetDirection"></param>
-    /// <returns></returns>
-    protected virtual Result Update(string name, string? description, double targetValue, KpiUnit unit, KpiTargetDirection targetDirection)
+    protected virtual Result Update(string name, string? description, double? startingValue, double targetValue, string? prefix, string? suffix, KpiTargetDirection targetDirection)
     {
+        var startingValueError = ValidateStartingValue(startingValue, targetValue, targetDirection);
+        if (startingValueError is not null)
+            return Result.Failure(startingValueError);
+
         Name = name;
         Description = description;
+        StartingValue = startingValue;
         TargetValue = targetValue;
-        Unit = unit;
+        Prefix = prefix;
+        Suffix = suffix;
         TargetDirection = targetDirection;
 
         return Result.Success();
+    }
+
+    private static string? ValidateStartingValue(double? startingValue, double targetValue, KpiTargetDirection targetDirection)
+    {
+        if (!startingValue.HasValue)
+            return null;
+
+        return targetDirection switch
+        {
+            KpiTargetDirection.Increase when startingValue.Value >= targetValue =>
+                "Starting value must be less than the target value when the target direction is Increase.",
+            KpiTargetDirection.Decrease when startingValue.Value <= targetValue =>
+                "Starting value must be greater than the target value when the target direction is Decrease.",
+            _ => null
+        };
     }
 
     ///// <summary>

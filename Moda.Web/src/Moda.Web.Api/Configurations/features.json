@@ -1,0 +1,13 @@
+{
+    "feature_management": {
+        "feature_flags": [
+            {
+                "id": "AI.ObjectiveHealthCheck",
+                "enabled": false,
+                "telemetry": {
+                    "enabled": true
+                }
+            }
+        ]
+    }
+}

@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using NodaTime;
@@ -17,7 +17,7 @@ public class AuditTrail
     }
 
     public EntityEntry Entry { get; }
-    public Guid UserId { get; set; }
+    public required string UserId { get; set; }
     public string? SchemaName { get; set; }
     public string? TableName { get; set; }
     public Dictionary<string, object?> KeyValues { get; } = new();

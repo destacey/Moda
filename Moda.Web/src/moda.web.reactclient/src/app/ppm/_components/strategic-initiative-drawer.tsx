@@ -21,7 +21,7 @@ export interface StrategicInitiativeDrawerProps {
 const StrategicInitiativeDrawer: FC<StrategicInitiativeDrawerProps> = (
   props: StrategicInitiativeDrawerProps,
 ) => {
-  const [size, setSize] = useState(getDrawerWidthPixels())
+  const [size, setSize] = useState(() => getDrawerWidthPixels())
   const messageApi = useMessage()
 
   const {
@@ -77,7 +77,6 @@ const StrategicInitiativeDrawer: FC<StrategicInitiativeDrawerProps> = (
       onClose={props.onDrawerClose}
       open={props.drawerOpen}
       loading={isLoading}
-      mask={{ blur: false }}
       size={size}
       resizable={{
         onResize: (newSize) => setSize(newSize),

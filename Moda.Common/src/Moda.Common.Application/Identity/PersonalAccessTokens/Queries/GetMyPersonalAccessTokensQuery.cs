@@ -16,7 +16,7 @@ internal sealed class GetMyPersonalAccessTokensQueryHandler(IModaDbContext dbCon
 
     public async Task<Result<List<PersonalAccessTokenDto>>> Handle(GetMyPersonalAccessTokensQuery request, CancellationToken cancellationToken)
     {
-        var userId = _currentUser.GetUserId().ToString();
+        var userId = _currentUser.GetUserId();
 
         var tokens = await _dbContext.PersonalAccessTokens
             .Where(t => t.UserId == userId)

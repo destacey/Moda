@@ -110,7 +110,6 @@ const PlanningIntervalListPage = () => {
       />
       {openCreatePlanningIntervalForm && (
         <CreatePlanningIntervalForm
-          showForm={openCreatePlanningIntervalForm}
           onFormCreate={() => onCreatePlanningIntervalFormClosed(true)}
           onFormCancel={() => onCreatePlanningIntervalFormClosed(false)}
         />

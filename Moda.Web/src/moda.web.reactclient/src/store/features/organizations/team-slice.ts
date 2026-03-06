@@ -33,10 +33,10 @@ const teamSlice = createCrudSlice({
   getData: async (arg, { getState, rejectWithValue }) => {
     try {
       const { team: teamState } = getState() as { team: TeamState }
-      const teams = await getTeamsClient().getList(teamState.includeInactive)
-      const teamsOfTeams = await getTeamsOfTeamsClient().getList(
-        teamState.includeInactive,
-      )
+      const [teams, teamsOfTeams] = await Promise.all([
+        getTeamsClient().getList(teamState.includeInactive),
+        getTeamsOfTeamsClient().getList(teamState.includeInactive),
+      ])
       return [...(teams as TeamListItem[]), ...(teamsOfTeams as TeamListItem[])]
     } catch (error) {
       return rejectWithValue({ error })

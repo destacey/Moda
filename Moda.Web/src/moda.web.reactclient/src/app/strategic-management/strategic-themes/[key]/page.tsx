@@ -226,7 +226,6 @@ const StrategicThemeDetailsPage = (props: {
       {openEditStrategicThemeForm && (
         <EditStrategicThemeForm
           strategicThemeKey={strategicThemeData?.key}
-          showForm={openEditStrategicThemeForm}
           onFormComplete={() => onEditStrategicThemeFormClosed(true)}
           onFormCancel={() => onEditStrategicThemeFormClosed(false)}
         />
@@ -235,7 +234,6 @@ const StrategicThemeDetailsPage = (props: {
         <ChangeStrategicThemeStateForm
           strategicTheme={strategicThemeData}
           stateAction={StrategicThemeStateAction.Activate}
-          showForm={openActivateStrategicThemeForm}
           onFormComplete={() => onActivateStrategicThemeFormClosed(true)}
           onFormCancel={() => onActivateStrategicThemeFormClosed(false)}
         />
@@ -244,7 +242,6 @@ const StrategicThemeDetailsPage = (props: {
         <ChangeStrategicThemeStateForm
           strategicTheme={strategicThemeData}
           stateAction={StrategicThemeStateAction.Archive}
-          showForm={openArchiveStrategicThemeForm}
           onFormComplete={() => onArchiveStrategicThemeFormClosed(true)}
           onFormCancel={() => onArchiveStrategicThemeFormClosed(false)}
         />
@@ -252,7 +249,6 @@ const StrategicThemeDetailsPage = (props: {
       {openDeleteStrategicThemeForm && (
         <DeleteStrategicThemeForm
           strategicTheme={strategicThemeData}
-          showForm={openDeleteStrategicThemeForm}
           onFormComplete={() => onDeleteStrategicThemeFormClosed(true)}
           onFormCancel={() => onDeleteStrategicThemeFormClosed(false)}
         />

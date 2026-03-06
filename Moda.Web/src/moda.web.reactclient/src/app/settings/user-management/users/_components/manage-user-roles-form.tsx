@@ -1,17 +1,16 @@
 'use client'
 
-import useAuth from '@/src/components/contexts/auth'
 import { useMessage } from '@/src/components/contexts/messaging'
 import {
   useGetUserRolesQuery,
   useManageUserRolesMutation,
 } from '@/src/store/features/user-management/users-api'
 import { Modal, Spin, Transfer, TransferProps } from 'antd'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+import { useConfirmModal } from '@/src/hooks'
 
 export interface ManageUserRolesFormProps {
   userId: string
-  showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
 }
@@ -21,11 +20,11 @@ interface RecordType {
   title: string
 }
 
-const ManageUserRolesForm: React.FC<ManageUserRolesFormProps> = (
-  props: ManageUserRolesFormProps,
-) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
+const ManageUserRolesForm: React.FC<ManageUserRolesFormProps> = ({
+  userId,
+  onFormComplete,
+  onFormCancel,
+}) => {
   const [roles, setRoles] = useState<RecordType[]>([])
   const [targetKeys, setTargetKeys] = useState<string[]>([])
   const [selectedKeys, setSelectedKeys] = useState<TransferProps['targetKeys']>(
@@ -39,24 +38,43 @@ const ManageUserRolesForm: React.FC<ManageUserRolesFormProps> = (
     isLoading: userRolesLoading,
     error: userRolesError,
   } = useGetUserRolesQuery({
-    id: props.userId,
+    id: userId,
     includeUnassigned: true,
   })
 
-  const [manageUserRoles, { error: mutationError }] =
+  const [manageUserRoles] =
     useManageUserRolesMutation()
 
-  const { hasPermissionClaim } = useAuth()
-  const canUpdateUserRoles = hasPermissionClaim('Permissions.UserRoles.Update')
-
-  useEffect(() => {
-    if (canUpdateUserRoles) {
-      setIsOpen(props.showForm)
-    } else {
-      messageApi.error('You do not have permission to update user roles.')
-      props.onFormCancel()
-    }
-  }, [canUpdateUserRoles, messageApi, props])
+  const { isOpen, isSaving, handleOk, handleCancel } = useConfirmModal({
+    onSubmit: useCallback(async () => {
+      try {
+        const response = await manageUserRoles({
+          userId: userId,
+          roleNames: targetKeys,
+        })
+        if (response.error) {
+          throw response.error
+        }
+        messageApi.success('Successfully updated user roles.')
+        return true
+      } catch (error) {
+        if (error.status === 422 && error.errors) {
+          messageApi.error('Correct the validation error(s) to continue.')
+        } else {
+          messageApi.error(
+            error.detail ??
+              'An error occurred while updating the user roles. Please try again.',
+          )
+        }
+        return false
+      }
+    }, [manageUserRoles, userId, targetKeys, messageApi]),
+    onComplete: onFormComplete,
+    onCancel: onFormCancel,
+    errorMessage:
+      'An error occurred while updating user roles. Please try again.',
+    permission: 'Permissions.UserRoles.Update',
+  })
 
   useEffect(() => {
     if (!userRolesData) return
@@ -87,62 +105,13 @@ const ManageUserRolesForm: React.FC<ManageUserRolesFormProps> = (
   useEffect(() => {
     if (userRolesError) {
       messageApi.error('Failed to load user roles.')
-      setIsOpen(false)
-      props.onFormCancel()
+      onFormCancel()
     }
-  }, [userRolesError, props, messageApi])
+  }, [userRolesError, onFormCancel, messageApi])
 
   useEffect(() => {
     setSelectedKeys([])
   }, [userRolesData])
-
-  const updateRoles = async (userId: string, roleNames: string[]) => {
-    try {
-      const response = await manageUserRoles({
-        userId: userId,
-        roleNames: roleNames,
-      })
-      if (response.error) {
-        throw response.error
-      }
-
-      return true
-    } catch (error) {
-      if (error.status === 422 && error.errors) {
-        messageApi.error('Correct the validation error(s) to continue.')
-      } else {
-        messageApi.error(
-          error.detail ??
-            'An error occurred while updating the user roles. Please try again.',
-        )
-      }
-
-      return false
-    }
-  }
-
-  const handleOk = async () => {
-    setIsSaving(true)
-    try {
-      if (await updateRoles(props.userId, targetKeys)) {
-        messageApi.success('Successfully updated user roles.')
-        setIsOpen(false)
-        props.onFormComplete()
-      }
-    } catch (error) {
-      console.error('handleOk error', error)
-      messageApi.error(
-        'An error occurred while updating user roles. Please try again.',
-      )
-    } finally {
-      setIsSaving(false)
-    }
-  }
-
-  const handleCancel = () => {
-    setIsOpen(false)
-    props.onFormCancel()
-  }
 
   const onChange = (nextTargetKeys: string[]) => {
     const sortedTargetKeys = nextTargetKeys.sort((a, b) => {
@@ -169,9 +138,8 @@ const ManageUserRolesForm: React.FC<ManageUserRolesFormProps> = (
       okText="Save"
       confirmLoading={isSaving}
       onCancel={handleCancel}
-      maskClosable={false}
-      keyboard={false} // disable esc key to close modal
-      destroyOnHidden={true}
+      keyboard={false}
+      destroyOnHidden
     >
       <Spin spinning={userRolesLoading} size="large">
         <Transfer

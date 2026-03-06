@@ -56,9 +56,23 @@ public abstract class BaseDbContext : IdentityDbContext<ApplicationUser, Applica
             if (typeof(ISystemAuditable).IsAssignableFrom(entityType.ClrType))
             {
                 modelBuilder.Entity(entityType.ClrType).Property<Instant>("SystemCreated");
-                modelBuilder.Entity(entityType.ClrType).Property<Guid?>("SystemCreatedBy");
+                modelBuilder.Entity(entityType.ClrType).Property<string?>("SystemCreatedBy").HasMaxLength(450);
                 modelBuilder.Entity(entityType.ClrType).Property<Instant>("SystemLastModified");
-                modelBuilder.Entity(entityType.ClrType).Property<Guid?>("SystemLastModifiedBy");
+                modelBuilder.Entity(entityType.ClrType).Property<string?>("SystemLastModifiedBy").HasMaxLength(450);
+            }
+        }
+
+        // configure max length for user ID columns on auditable and soft-deletable entities
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            if (typeof(IAuditable).IsAssignableFrom(entityType.ClrType))
+            {
+                modelBuilder.Entity(entityType.ClrType).Property(nameof(IAuditable.CreatedBy)).HasMaxLength(450);
+                modelBuilder.Entity(entityType.ClrType).Property(nameof(IAuditable.LastModifiedBy)).HasMaxLength(450);
+            }
+            if (typeof(ISoftDelete).IsAssignableFrom(entityType.ClrType))
+            {
+                modelBuilder.Entity(entityType.ClrType).Property(nameof(ISoftDelete.DeletedBy)).HasMaxLength(450);
             }
         }
     }
@@ -94,7 +108,7 @@ public abstract class BaseDbContext : IdentityDbContext<ApplicationUser, Applica
         return result;
     }
 
-    private List<AuditTrail> HandleAuditingBeforeSaveChanges(Guid userId, string correlationId)
+    private List<AuditTrail> HandleAuditingBeforeSaveChanges(string userId, string correlationId)
     {
         var timestamp = _dateTimeProvider.Now;
         foreach (var entry in ChangeTracker.Entries()

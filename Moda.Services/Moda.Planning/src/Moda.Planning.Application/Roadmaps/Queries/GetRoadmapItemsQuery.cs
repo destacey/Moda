@@ -34,7 +34,7 @@ internal sealed class GetRoadmapItemsQueryHandler(IPlanningDbContext planningDbC
 
         var dtos = items.Adapt<List<RoadmapItemListDto>>();
 
-        return OrderItems(dtos.Where(r => r.Parent == null).ToList());
+        return OrderItems([.. dtos.Where(r => r.Parent == null)]);
     }
 
     private static List<RoadmapItemListDto> OrderItems(List<RoadmapItemListDto> items)

@@ -1,8 +1,7 @@
 'use client'
 
 import { DatePicker, Form, Modal, Select } from 'antd'
-import { useCallback, useEffect, useState } from 'react'
-import useAuth from '../../../components/contexts/auth'
+import { useCallback } from 'react'
 import { AddTeamMembershipRequest } from '@/src/services/moda-api'
 import { toFormErrors } from '@/src/utils'
 import {
@@ -11,11 +10,11 @@ import {
 } from '@/src/store/features/organizations/team-api'
 import { TeamTypeName } from '../types'
 import { useMessage } from '@/src/components/contexts/messaging'
+import { useModalForm } from '@/src/hooks'
 
 const { Item: FormItem } = Form
 
 export interface CreateTeamMembershipFormProps {
-  showForm: boolean
   teamId: string
   teamType: TeamTypeName
   onFormCreate: () => void
@@ -42,93 +41,49 @@ const mapToRequestValues = (
   return { membership, teamType }
 }
 
-const CreateTeamMembershipForm = (props: CreateTeamMembershipFormProps) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-  const [isValid, setIsValid] = useState(false)
-  const [form] = Form.useForm<CreateTeamMembershipFormValues>()
-  const formValues = Form.useWatch([], form)
+const CreateTeamMembershipForm = ({
+  teamId,
+  teamType,
+  onFormCreate,
+  onFormCancel,
+}: CreateTeamMembershipFormProps) => {
   const messageApi = useMessage()
   // TODO: only get teams that are not in the hierarchy
   const { data: teamOptions } = useGetTeamOfTeamsOptionsQuery(false)
 
   const [createTeamMembership] = useCreateTeamMembershipMutation()
 
-  const { hasClaim } = useAuth()
-  const canManageTeamMemberships = hasClaim(
-    'Permission',
-    'Permissions.Teams.ManageTeamMemberships',
-  )
-
-  const create = async (
-    values: CreateTeamMembershipFormValues,
-  ): Promise<boolean> => {
-    try {
-      const request = mapToRequestValues(values, props.teamType, props.teamId)
-      await createTeamMembership(request).unwrap()
-      return true
-    } catch (error) {
-      if (error.status === 422 && error.errors) {
-        const formErrors = toFormErrors(error.errors)
-        form.setFields(formErrors)
-        messageApi.error('Correct the validation error(s) to continue.')
-      } else {
-        messageApi.error(
-          error.detail ??
-            'An unexpected error occurred while creating the team membership.',
-        )
-        console.error(error)
-      }
-      return false
-    }
-  }
-
-  const handleOk = async () => {
-    setIsSaving(true)
-    try {
-      const values = await form.validateFields()
-      if (await create(values)) {
-        setIsOpen(false)
-        form.resetFields()
-        props.onFormCreate()
-        messageApi.success('Successfully created team membership.')
-      }
-    } catch (errorInfo) {
-      console.log('handleOk error', errorInfo)
-    } finally {
-      setIsSaving(false)
-    }
-  }
-
-  const handleCancel = useCallback(() => {
-    setIsOpen(false)
-    props.onFormCancel()
-    form.resetFields()
-  }, [form, props])
-
-  useEffect(() => {
-    if (!teamOptions) return
-
-    if (canManageTeamMemberships) {
-      setIsOpen(props.showForm)
-    } else {
-      handleCancel()
-      messageApi.error('You do not have permission to manage Team Memberships.')
-    }
-  }, [
-    canManageTeamMemberships,
-    handleCancel,
-    messageApi,
-    props.showForm,
-    teamOptions,
-  ])
-
-  useEffect(() => {
-    form.validateFields({ validateOnly: true }).then(
-      () => setIsValid(true && form.isFieldsTouched()),
-      () => setIsValid(false),
-    )
-  }, [form, formValues])
+  const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
+    useModalForm<CreateTeamMembershipFormValues>({
+      onSubmit: useCallback(
+        async (values: CreateTeamMembershipFormValues, form) => {
+          try {
+            const request = mapToRequestValues(values, teamType, teamId)
+            await createTeamMembership(request).unwrap()
+            messageApi.success('Successfully created team membership.')
+            return true
+          } catch (error) {
+            if (error.status === 422 && error.errors) {
+              const formErrors = toFormErrors(error.errors)
+              form.setFields(formErrors)
+              messageApi.error('Correct the validation error(s) to continue.')
+            } else {
+              messageApi.error(
+                error.detail ??
+                  'An unexpected error occurred while creating the team membership.',
+              )
+            }
+            return false
+          }
+        },
+        [createTeamMembership, teamType, teamId, messageApi],
+      ),
+      onComplete: onFormCreate,
+      onCancel: onFormCancel,
+      errorMessage:
+        'An unexpected error occurred while creating the team membership.',
+      permission: 'Permissions.Teams.ManageTeamMemberships',
+    })
 
   return (
     <Modal
@@ -139,9 +94,8 @@ const CreateTeamMembershipForm = (props: CreateTeamMembershipFormProps) => {
       okText="Create"
       confirmLoading={isSaving}
       onCancel={handleCancel}
-      maskClosable={false}
       keyboard={false} // disable esc key to close modal
-      destroyOnHidden={true}
+      destroyOnHidden
     >
       <Form
         form={form}
@@ -166,7 +120,7 @@ const CreateTeamMembershipForm = (props: CreateTeamMembershipFormProps) => {
                 .toLowerCase()
                 .localeCompare((optionB?.label ?? '').toLowerCase())
             }
-            options={teamOptions?.filter((t) => t.value !== props.teamId)}
+            options={teamOptions?.filter((t) => t.value !== teamId)}
           />
         </FormItem>
         <FormItem label="Start" name="start" rules={[{ required: true }]}>
