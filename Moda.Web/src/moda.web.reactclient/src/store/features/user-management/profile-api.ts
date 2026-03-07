@@ -1,9 +1,8 @@
-import { authenticatedFetch, getProfileClient } from '@/src/services/clients'
+import { getProfileClient } from '@/src/services/clients'
 import { apiSlice } from '../apiSlice'
-import { UserDetailsDto, UserPermissionsResponse } from '@/src/services/moda-api'
+import { ChangePasswordRequest, UserDetailsDto, UserPermissionsResponse } from '@/src/services/moda-api'
 import { QueryTags } from '../query-tags'
 
-const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL
 
 export const profileApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -42,29 +41,10 @@ export const profileApi = apiSlice.injectEndpoints({
       // Cache current user permissions for 1 minute since they don't change often
       keepUnusedDataFor: 60,
     }),
-    changePassword: builder.mutation<
-      void,
-      { currentPassword: string; newPassword: string }
-    >({
+    changePassword: builder.mutation<void, ChangePasswordRequest>({
       queryFn: async (args) => {
         try {
-          const response = await authenticatedFetch(
-            `${apiUrl}/api/user-management/profiles/change-password`,
-            {
-              method: 'PUT',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(args),
-            },
-          )
-          if (!response.ok) {
-            const errorData = await response.json()
-            return {
-              error: {
-                status: response.status,
-                data: errorData,
-              },
-            }
-          }
+          await getProfileClient().changePassword(args)
           return { data: null }
         } catch (error) {
           console.error('API Error:', error)

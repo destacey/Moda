@@ -16,7 +16,7 @@
             "AllEmployeesGroupObjectId": null
         },
         "LocalJwt": {
-            "Secret": "CHANGE-THIS-TO-A-SECRET-KEY-AT-LEAST-32-CHARS!",
+            "Secret": "DEV-ONLY-SECRET-REPLACE-IN-PRODUCTION!!",
             "Issuer": "Moda",
             "Audience": "ModaApi",
             "TokenExpirationInMinutes": 60,

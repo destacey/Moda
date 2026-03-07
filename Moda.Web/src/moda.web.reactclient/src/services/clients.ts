@@ -53,7 +53,9 @@ const LOCAL_AUTH_REMEMBER_KEY = 'moda.local.rememberMe'
  * localStorage (remember me) or sessionStorage (ephemeral session).
  */
 export function getAuthStorage(): Storage {
-  if (typeof window === 'undefined') return localStorage
+  if (typeof window === 'undefined') {
+    throw new Error('getAuthStorage() cannot be called during SSR')
+  }
   return localStorage.getItem(LOCAL_AUTH_REMEMBER_KEY) === 'false'
     ? sessionStorage
     : localStorage

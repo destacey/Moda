@@ -1,7 +1,6 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
-using System.Text;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -18,38 +17,44 @@ internal class TokenService(
     IDateTimeProvider dateTimeProvider,
     ILogger<TokenService> logger) : ITokenService
 {
+    private readonly UserManager<ApplicationUser> _userManager = userManager;
+    private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
+    private readonly IConfiguration _config = config;
+    private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
+    private readonly ILogger<TokenService> _logger = logger;
+
     public async Task<TokenResponse> GetTokenAsync(LoginCommand command, CancellationToken cancellationToken)
     {
-        var user = await userManager.FindByNameAsync(command.UserName);
+        var user = await _userManager.FindByNameAsync(command.UserName);
         if (user is null)
         {
-            logger.LogWarning("Login failed: user {UserName} not found.", command.UserName);
+            _logger.LogWarning("Login failed: user {UserName} not found.", command.UserName);
             throw new UnauthorizedException("Invalid credentials.");
         }
 
         if (user.LoginProvider != LoginProviders.Moda)
         {
-            logger.LogWarning("Login failed: user {UserName} is not a Moda account (provider: {LoginProvider}).", command.UserName, user.LoginProvider);
+            _logger.LogWarning("Login failed: user {UserName} is not a Moda account (provider: {LoginProvider}).", command.UserName, user.LoginProvider);
             throw new UnauthorizedException("Invalid credentials.");
         }
 
-        var signInResult = await signInManager.CheckPasswordSignInAsync(user, command.Password, lockoutOnFailure: true);
+        var signInResult = await _signInManager.CheckPasswordSignInAsync(user, command.Password, lockoutOnFailure: true);
         if (signInResult.IsLockedOut)
         {
-            logger.LogWarning("Login failed: user {UserName} is locked out.", command.UserName);
+            _logger.LogWarning("Login failed: user {UserName} is locked out.", command.UserName);
             throw new UnauthorizedException("Account is locked due to multiple failed login attempts. Please try again later.");
         }
 
         if (!signInResult.Succeeded)
         {
-            logger.LogWarning("Login failed: invalid password for user {UserName}.", command.UserName);
+            _logger.LogWarning("Login failed: invalid password for user {UserName}.", command.UserName);
             throw new UnauthorizedException("Invalid credentials.");
         }
 
         // Check inactive status only after credentials are validated
         if (!user.IsActive)
         {
-            logger.LogWarning("Login failed: user {UserName} is inactive.", command.UserName);
+            _logger.LogWarning("Login failed: user {UserName} is inactive.", command.UserName);
             throw new UnauthorizedException("Your account has been deactivated. Please contact an administrator.");
         }
 
@@ -65,7 +70,7 @@ internal class TokenService(
             throw new UnauthorizedException("Invalid token.");
         }
 
-        var user = await userManager.FindByIdAsync(userId);
+        var user = await _userManager.FindByIdAsync(userId);
         if (user is null)
         {
             throw new UnauthorizedException("Invalid token.");
@@ -76,7 +81,7 @@ internal class TokenService(
             throw new UnauthorizedException("User account is inactive.");
         }
 
-        if (user.RefreshToken != command.RefreshToken || user.RefreshTokenExpiryTime <= dateTimeProvider.Now.ToDateTimeUtc())
+        if (user.RefreshToken != command.RefreshToken || user.RefreshTokenExpiryTime is not { } expiry || expiry <= _dateTimeProvider.Now.ToDateTimeUtc())
         {
             throw new UnauthorizedException("Invalid or expired refresh token.");
         }
@@ -89,20 +94,20 @@ internal class TokenService(
         var settings = GetSettings();
         var token = GenerateJwt(user, settings);
         var refreshToken = GenerateRefreshToken();
-        var refreshTokenExpiry = dateTimeProvider.Now.ToDateTimeUtc().AddDays(settings.RefreshTokenExpirationInDays);
+        var refreshTokenExpiry = _dateTimeProvider.Now.ToDateTimeUtc().AddDays(settings.RefreshTokenExpirationInDays);
 
         user.RefreshToken = refreshToken;
         user.RefreshTokenExpiryTime = refreshTokenExpiry;
-        await userManager.UpdateAsync(user);
+        await _userManager.UpdateAsync(user);
 
-        var tokenExpiry = dateTimeProvider.Now.ToDateTimeUtc().AddMinutes(settings.TokenExpirationInMinutes);
+        var tokenExpiry = _dateTimeProvider.Now.ToDateTimeUtc().AddMinutes(settings.TokenExpirationInMinutes);
 
         return new TokenResponse(token, refreshToken, tokenExpiry, user.MustChangePassword);
     }
 
     private string GenerateJwt(ApplicationUser user, LocalJwtSettings settings)
     {
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(settings.Secret));
+        var key = ConfigureServices.CreateSigningKey(settings.Secret);
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var claims = new List<Claim>
@@ -122,7 +127,7 @@ internal class TokenService(
             issuer: settings.Issuer,
             audience: settings.Audience,
             claims: claims,
-            expires: dateTimeProvider.Now.ToDateTimeUtc().AddMinutes(settings.TokenExpirationInMinutes),
+            expires: _dateTimeProvider.Now.ToDateTimeUtc().AddMinutes(settings.TokenExpirationInMinutes),
             signingCredentials: credentials);
 
         return new JwtSecurityTokenHandler().WriteToken(token);
@@ -139,7 +144,6 @@ internal class TokenService(
     private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
     {
         var settings = GetSettings();
-        var key = Encoding.UTF8.GetBytes(settings.Secret);
 
         var tokenValidationParameters = new TokenValidationParameters
         {
@@ -148,7 +152,7 @@ internal class TokenService(
             ValidateAudience = true,
             ValidAudience = settings.Audience,
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(key),
+            IssuerSigningKey = ConfigureServices.CreateSigningKey(settings.Secret),
             ValidateLifetime = false, // Allow expired tokens for refresh
         };
 
@@ -166,7 +170,7 @@ internal class TokenService(
 
     private LocalJwtSettings GetSettings()
     {
-        var settings = config.GetSection(LocalJwtSettings.SectionName).Get<LocalJwtSettings>();
+        var settings = _config.GetSection(LocalJwtSettings.SectionName).Get<LocalJwtSettings>();
         if (settings is null || string.IsNullOrWhiteSpace(settings.Secret))
         {
             throw new InvalidOperationException("Local JWT settings are not configured.");

@@ -42,6 +42,7 @@ describe('withAuthorization', () => {
       hasClaim: mockHasClaim,
       hasPermissionClaim: mockHasClaim,
       authMethod: null,
+      mustChangePassword: false,
       localLogin: () => Promise.resolve(),
     }
 

@@ -127,8 +127,13 @@ export const usersApi = apiSlice.injectEndpoints({
             },
           )
           if (!response.ok) {
-            const error = await response.json()
-            return { error }
+            const errorData = await response.json()
+            return {
+              error: {
+                status: response.status,
+                data: errorData,
+              },
+            }
           }
           return { data: null }
         } catch (error) {
