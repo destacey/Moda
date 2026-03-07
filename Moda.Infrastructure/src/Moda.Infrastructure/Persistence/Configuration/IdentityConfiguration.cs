@@ -22,6 +22,11 @@ public class ApplicationUserConfig : IEntityTypeConfiguration<ApplicationUser>
 
         builder.Property(u => u.LastActivityAt);
 
+        builder.Property(u => u.LoginProvider).HasMaxLength(50).IsRequired();
+
+        builder.Property(u => u.RefreshToken).HasMaxLength(256);
+        builder.Property(u => u.RefreshTokenExpiryTime);
+
         // Relationships
         builder.HasOne(e => e.Employee).WithMany().HasForeignKey(e => e.EmployeeId).OnDelete(DeleteBehavior.NoAction);
 

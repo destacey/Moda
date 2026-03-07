@@ -19,6 +19,8 @@ public sealed record UserDetailsDto
 
     public string? PhoneNumber { get; set; }
 
+    public string LoginProvider { get; set; } = null!;
+
     public Instant? LastActivityAt { get; set; }
 
     public NavigationDto? Employee { get; set; }

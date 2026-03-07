@@ -40,6 +40,8 @@ public interface IUserService : ITransientService
 
     Task UpdateAsync(UpdateUserCommand command, string userId);
 
+    Task<Result<string>> CreateAsync(CreateUserCommand command, CancellationToken cancellationToken);
+
     Task<Result> UpdateMissingEmployeeIds(CancellationToken cancellationToken);
 
     Task<Result> SyncUsersFromEmployeeRecords(List<IExternalEmployee> externalEmployees, CancellationToken cancellationToken);

@@ -10,6 +10,21 @@ public class UsersController(IUserService userService) : ControllerBase
 {
     private readonly IUserService _userService = userService;
 
+    [HttpPost]
+    [MustHavePermission(ApplicationAction.Create, ApplicationResource.Users)]
+    [OpenApiOperation("Create a new user.", "")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult<string>> CreateUser(CreateUserRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _userService.CreateAsync(request.ToCreateUserCommand(), cancellationToken);
+
+        return result.IsSuccess
+            ? CreatedAtAction(nameof(GetUser), new { id = result.Value }, result.Value)
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
     [HttpGet]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Users)]
     [OpenApiOperation("Get list of all users.", "")]
@@ -33,6 +48,22 @@ public class UsersController(IUserService userService) : ControllerBase
         return user is null
             ? NotFound()
             : user;
+    }
+
+    [HttpPut("{id}")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Users)]
+    [OpenApiOperation("Update a user's details.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> UpdateUser(string id, UpdateUserRequest request)
+    {
+        if (id != request.Id)
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(nameof(id), nameof(request.Id), HttpContext));
+
+        await _userService.UpdateAsync(request.ToUpdateUserCommand(), id);
+        return NoContent();
     }
 
     [HttpGet("{id}/roles")]

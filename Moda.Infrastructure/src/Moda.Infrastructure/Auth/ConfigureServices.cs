@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moda.Infrastructure.Auth.AzureAd;
+using Moda.Infrastructure.Auth.Local;
 using Moda.Infrastructure.Auth.Permissions;
 using Moda.Infrastructure.Auth.PersonalAccessToken;
 
@@ -18,6 +19,7 @@ internal static class ConfigureServices
             // Must add identity before adding auth!
             .AddIdentity()
             .AddAzureAdAuth(config)
+            .AddLocalJwtAuth(config)
             .AddPersonalAccessTokenAuth()
             .AddAuthorizationPolicies();
     }

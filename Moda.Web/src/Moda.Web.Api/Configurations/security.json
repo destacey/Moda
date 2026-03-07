@@ -15,6 +15,13 @@
             "Scopes": ".default",
             "AllEmployeesGroupObjectId": null
         },
+        "LocalJwt": {
+            "Secret": "CHANGE-THIS-TO-A-SECRET-KEY-AT-LEAST-32-CHARS!",
+            "Issuer": "Moda",
+            "Audience": "ModaApi",
+            "TokenExpirationInMinutes": 60,
+            "RefreshTokenExpirationInDays": 7
+        },
         "Swagger": {
             "AuthorizationUrl": "https://login.microsoftonline.com/<Your TenantId of the AzureAd Server App Registration>/oauth2/v2.0/authorize",
             "TokenUrl": "https://login.microsoftonline.com/<Your TenantId of the AzureAd Server App Registration>/oauth2/v2.0/token",

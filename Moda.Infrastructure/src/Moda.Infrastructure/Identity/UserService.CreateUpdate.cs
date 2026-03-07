@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Web;
 using Moda.Common.Application.Employees.Queries;
+using Moda.Common.Application.Identity;
 using Moda.Common.Extensions;
 using NotFoundException = Moda.Common.Application.Exceptions.NotFoundException;
 
@@ -114,7 +115,8 @@ internal partial class UserService
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
                 IsActive = true,
-                EmployeeId = employeeId
+                EmployeeId = employeeId,
+                LoginProvider = LoginProviders.MicrosoftEntraId,
             };
             result = await _userManager.CreateAsync(user);
 
@@ -130,6 +132,43 @@ internal partial class UserService
         return user;
     }
 
+    public async Task<Result<string>> CreateAsync(CreateUserCommand command, CancellationToken cancellationToken)
+    {
+        // Use email as the username for admin-created users
+        var user = new ApplicationUser
+        {
+            FirstName = command.FirstName,
+            LastName = command.LastName,
+            Email = command.Email,
+            NormalizedEmail = command.Email.ToUpperInvariant(),
+            UserName = command.Email,
+            NormalizedUserName = command.Email.ToUpperInvariant(),
+            EmailConfirmed = true,
+            PhoneNumberConfirmed = true,
+            IsActive = true,
+            EmployeeId = command.EmployeeId,
+            PhoneNumber = command.PhoneNumber,
+            LoginProvider = command.LoginProvider,
+        };
+
+        IdentityResult result = command.LoginProvider == LoginProviders.Moda
+            ? await _userManager.CreateAsync(user, command.Password!)
+            : await _userManager.CreateAsync(user);
+
+        if (!result.Succeeded)
+        {
+            var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+            _logger.LogError("Error creating user: {Errors}", errors);
+            return Result.Failure<string>(errors);
+        }
+
+        await _userManager.AddToRoleAsync(user, ApplicationRoles.Basic);
+        await _events.PublishAsync(new ApplicationUserCreatedEvent(user.Id, _dateTimeProvider.Now));
+
+        _logger.LogInformation("User {UserId} created successfully.", user.Id);
+        return Result.Success(user.Id);
+    }
+
     public async Task UpdateAsync(UpdateUserCommand command, string userId)
     {
         var user = await _userManager.FindByIdAsync(userId);
@@ -142,6 +181,15 @@ internal partial class UserService
         user.FirstName = command.FirstName;
         user.LastName = command.LastName;
         user.PhoneNumber = command.PhoneNumber;
+        user.EmployeeId = command.EmployeeId;
+
+        if (!string.Equals(user.Email, command.Email, StringComparison.OrdinalIgnoreCase))
+        {
+            user.Email = command.Email;
+            user.NormalizedEmail = command.Email.ToUpperInvariant();
+            user.UserName = command.Email;
+            user.NormalizedUserName = command.Email.ToUpperInvariant();
+        }
 
         string? phoneNumber = await _userManager.GetPhoneNumberAsync(user);
         if (command.PhoneNumber != phoneNumber)

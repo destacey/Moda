@@ -14,6 +14,7 @@ public class IdentityMappingConfig : IRegister
                 .Map(dest => dest.LastName, src => src.LastName)
                 .Map(dest => dest.Email, src => src.Email)
                 .Map(dest => dest.PhoneNumber, src => src.PhoneNumber)
+                .Map(dest => dest.LoginProvider, src => src.LoginProvider)
                 .Map(dest => dest.IsActive, src => src.IsActive)
                 .Map(dest => dest.LastActivityAt, src => src.LastActivityAt)
                 .Map(dest => dest.Employee, src => src.Employee == null

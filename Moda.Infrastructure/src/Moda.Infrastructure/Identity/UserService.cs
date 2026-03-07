@@ -87,6 +87,7 @@ internal partial class UserService(
                 Email = u.Email,
                 IsActive = u.IsActive,
                 PhoneNumber = u.PhoneNumber,
+                LoginProvider = u.LoginProvider,
                 LastActivityAt = u.LastActivityAt,
                 Employee = u.Employee == null ? null : NavigationDto.Create(u.Employee.Id, u.Employee.Key, u.Employee.Name.FullName),
                 Roles = u.UserRoles
@@ -122,6 +123,7 @@ internal partial class UserService(
                 Email = u.Email,
                 IsActive = u.IsActive,
                 PhoneNumber = u.PhoneNumber,
+                LoginProvider = u.LoginProvider,
                 LastActivityAt = u.LastActivityAt,
                 Employee = u.Employee == null ? null : NavigationDto.Create(u.Employee.Id, u.Employee.Key, u.Employee.Name.FullName),
                 Roles = u.UserRoles
@@ -154,6 +156,7 @@ internal partial class UserService(
                 Email = u.Email,
                 IsActive = u.IsActive,
                 PhoneNumber = u.PhoneNumber,
+                LoginProvider = u.LoginProvider,
                 LastActivityAt = u.LastActivityAt,
                 Employee = u.Employee == null ? null : NavigationDto.Create(u.Employee.Id, u.Employee.Key, u.Employee.Name.FullName),
                 Roles = u.UserRoles
