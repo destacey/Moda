@@ -1,4 +1,4 @@
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -84,7 +84,7 @@ public class TokenServiceTests
         var command = new LoginCommand("testuser", "Password123!");
 
         _mockUserManager.Setup(x => x.FindByNameAsync("testuser")).ReturnsAsync(user);
-        _mockSignInManager.Setup(x => x.CheckPasswordSignInAsync(user, "Password123!", false))
+        _mockSignInManager.Setup(x => x.CheckPasswordSignInAsync(user, "Password123!", true))
             .ReturnsAsync(SignInResult.Success);
         _mockUserManager.Setup(x => x.UpdateAsync(user)).ReturnsAsync(IdentityResult.Success);
 
@@ -116,7 +116,7 @@ public class TokenServiceTests
         var command = new LoginCommand("testuser", "Password123!");
 
         _mockUserManager.Setup(x => x.FindByNameAsync("testuser")).ReturnsAsync(user);
-        _mockSignInManager.Setup(x => x.CheckPasswordSignInAsync(user, "Password123!", false))
+        _mockSignInManager.Setup(x => x.CheckPasswordSignInAsync(user, "Password123!", true))
             .ReturnsAsync(SignInResult.Success);
         _mockUserManager.Setup(x => x.UpdateAsync(user)).ReturnsAsync(IdentityResult.Success);
 
@@ -183,7 +183,7 @@ public class TokenServiceTests
         // Arrange
         var user = CreateLocalUser();
         _mockUserManager.Setup(x => x.FindByNameAsync("testuser")).ReturnsAsync(user);
-        _mockSignInManager.Setup(x => x.CheckPasswordSignInAsync(user, "wrong", false))
+        _mockSignInManager.Setup(x => x.CheckPasswordSignInAsync(user, "wrong", true))
             .ReturnsAsync(SignInResult.Failed);
         var command = new LoginCommand("testuser", "wrong");
 
@@ -196,6 +196,24 @@ public class TokenServiceTests
     }
 
     [Fact]
+    public async Task GetTokenAsync_ShouldThrowUnauthorized_WhenUserIsLockedOut()
+    {
+        // Arrange
+        var user = CreateLocalUser();
+        _mockUserManager.Setup(x => x.FindByNameAsync("testuser")).ReturnsAsync(user);
+        _mockSignInManager.Setup(x => x.CheckPasswordSignInAsync(user, "Password123!", true))
+            .ReturnsAsync(SignInResult.LockedOut);
+        var command = new LoginCommand("testuser", "Password123!");
+
+        // Act
+        var act = () => _sut.GetTokenAsync(command, CancellationToken.None);
+
+        // Assert
+        await act.Should().ThrowAsync<UnauthorizedException>()
+            .WithMessage("*locked*");
+    }
+
+    [Fact]
     public async Task GetTokenAsync_ShouldUpdateRefreshToken_WhenLoginSucceeds()
     {
         // Arrange
@@ -203,7 +221,7 @@ public class TokenServiceTests
         var command = new LoginCommand("testuser", "Password123!");
 
         _mockUserManager.Setup(x => x.FindByNameAsync("testuser")).ReturnsAsync(user);
-        _mockSignInManager.Setup(x => x.CheckPasswordSignInAsync(user, "Password123!", false))
+        _mockSignInManager.Setup(x => x.CheckPasswordSignInAsync(user, "Password123!", true))
             .ReturnsAsync(SignInResult.Success);
         _mockUserManager.Setup(x => x.UpdateAsync(user)).ReturnsAsync(IdentityResult.Success);
 
@@ -230,7 +248,7 @@ public class TokenServiceTests
 
         var command = new LoginCommand("testuser", "Password123!");
         _mockUserManager.Setup(x => x.FindByNameAsync("testuser")).ReturnsAsync(user);
-        _mockSignInManager.Setup(x => x.CheckPasswordSignInAsync(user, "Password123!", false))
+        _mockSignInManager.Setup(x => x.CheckPasswordSignInAsync(user, "Password123!", true))
             .ReturnsAsync(SignInResult.Success);
         _mockUserManager.Setup(x => x.UpdateAsync(user)).ReturnsAsync(IdentityResult.Success);
 
@@ -264,7 +282,7 @@ public class TokenServiceTests
         user.RefreshTokenExpiryTime = _dateTimeProvider.Now.ToDateTimeUtc().AddDays(7);
 
         _mockUserManager.Setup(x => x.FindByNameAsync("testuser")).ReturnsAsync(user);
-        _mockSignInManager.Setup(x => x.CheckPasswordSignInAsync(user, "Password123!", false))
+        _mockSignInManager.Setup(x => x.CheckPasswordSignInAsync(user, "Password123!", true))
             .ReturnsAsync(SignInResult.Success);
         _mockUserManager.Setup(x => x.UpdateAsync(user)).ReturnsAsync(IdentityResult.Success);
 
@@ -290,7 +308,7 @@ public class TokenServiceTests
         var user = CreateLocalUser();
 
         _mockUserManager.Setup(x => x.FindByNameAsync("testuser")).ReturnsAsync(user);
-        _mockSignInManager.Setup(x => x.CheckPasswordSignInAsync(user, "Password123!", false))
+        _mockSignInManager.Setup(x => x.CheckPasswordSignInAsync(user, "Password123!", true))
             .ReturnsAsync(SignInResult.Success);
         _mockUserManager.Setup(x => x.UpdateAsync(user)).ReturnsAsync(IdentityResult.Success);
 
@@ -319,7 +337,7 @@ public class TokenServiceTests
         var user = CreateLocalUser();
 
         _mockUserManager.Setup(x => x.FindByNameAsync("testuser")).ReturnsAsync(user);
-        _mockSignInManager.Setup(x => x.CheckPasswordSignInAsync(user, "Password123!", false))
+        _mockSignInManager.Setup(x => x.CheckPasswordSignInAsync(user, "Password123!", true))
             .ReturnsAsync(SignInResult.Success);
         _mockUserManager.Setup(x => x.UpdateAsync(user)).ReturnsAsync(IdentityResult.Success);
 
@@ -358,7 +376,7 @@ public class TokenServiceTests
 
         var user = CreateLocalUser();
         _mockUserManager.Setup(x => x.FindByNameAsync("testuser")).ReturnsAsync(user);
-        _mockSignInManager.Setup(x => x.CheckPasswordSignInAsync(user, "Password123!", false))
+        _mockSignInManager.Setup(x => x.CheckPasswordSignInAsync(user, "Password123!", true))
             .ReturnsAsync(SignInResult.Success);
 
         var command = new LoginCommand("testuser", "Password123!");

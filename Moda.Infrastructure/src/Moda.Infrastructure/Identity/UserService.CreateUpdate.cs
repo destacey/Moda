@@ -146,6 +146,7 @@ internal partial class UserService
             EmailConfirmed = true,
             PhoneNumberConfirmed = true,
             IsActive = true,
+            LockoutEnabled = true,
             EmployeeId = command.EmployeeId,
             PhoneNumber = command.PhoneNumber,
             LoginProvider = command.LoginProvider,
@@ -267,7 +268,35 @@ internal partial class UserService
         user.MustChangePassword = true;
         await _userManager.UpdateAsync(user);
 
+        if (await _userManager.IsLockedOutAsync(user))
+        {
+            await _userManager.SetLockoutEndDateAsync(user, null);
+            await _userManager.ResetAccessFailedCountAsync(user);
+            _logger.LogInformation("Lockout cleared for user {UserId} during password reset.", command.UserId);
+        }
+
         _logger.LogInformation("Password reset successfully for user {UserId}.", command.UserId);
+        return Result.Success();
+    }
+
+    public async Task<Result> UnlockUserAsync(string userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user is null)
+        {
+            _logger.LogError("User with id {UserId} not found.", userId);
+            throw new NotFoundException("User Not Found.");
+        }
+
+        if (!await _userManager.IsLockedOutAsync(user))
+        {
+            return Result.Failure("User is not currently locked out.");
+        }
+
+        await _userManager.SetLockoutEndDateAsync(user, null);
+        await _userManager.ResetAccessFailedCountAsync(user);
+
+        _logger.LogInformation("User {UserId} unlocked by admin.", userId);
         return Result.Success();
     }
 

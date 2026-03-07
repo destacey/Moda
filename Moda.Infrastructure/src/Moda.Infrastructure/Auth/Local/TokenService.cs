@@ -39,7 +39,13 @@ internal class TokenService(
             throw new UnauthorizedException("Invalid credentials.");
         }
 
-        var signInResult = await signInManager.CheckPasswordSignInAsync(user, command.Password, lockoutOnFailure: false);
+        var signInResult = await signInManager.CheckPasswordSignInAsync(user, command.Password, lockoutOnFailure: true);
+        if (signInResult.IsLockedOut)
+        {
+            logger.LogWarning("Login failed: user {UserName} is locked out.", command.UserName);
+            throw new UnauthorizedException("Account is locked due to multiple failed login attempts. Please try again later.");
+        }
+
         if (!signInResult.Succeeded)
         {
             logger.LogWarning("Login failed: invalid password for user {UserName}.", command.UserName);

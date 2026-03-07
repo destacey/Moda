@@ -1,9 +1,10 @@
-﻿using MediatR;
+﻿using Mapster;
+using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
-using Moda.Common.Application.Dtos;
+using NodaTime;
 
 namespace Moda.Infrastructure.Identity;
 
@@ -30,34 +31,10 @@ internal partial class UserService(
 
     public async Task<IReadOnlyList<UserDetailsDto>> SearchAsync(UserListFilter filter, CancellationToken cancellationToken)
     {
-        var userDtos = await _db.Users
+        return await _db.Users
             .Where(u => u.IsActive == filter.IsActive)
-            .Select(u => new UserDetailsDto
-            {
-                Id = u.Id,
-                UserName = u.UserName,
-                FirstName = u.FirstName,
-                LastName = u.LastName,
-                Email = u.Email,
-                IsActive = u.IsActive,
-                PhoneNumber = u.PhoneNumber,
-                LastActivityAt = u.LastActivityAt,
-                Employee = u.Employee == null ? null : NavigationDto.Create(u.Employee.Id, u.Employee.Key, u.Employee.Name.FullName),
-                Roles = u.UserRoles
-                    .Join(_db.Roles,
-                        ur => ur.RoleId,
-                        r => r.Id,
-                        (ur, r) => new RoleListDto
-                        {
-                            Id = r.Id,
-                            Name = r.Name!,
-                            Description = r.Description
-                        })
-                    .ToList()
-            })
+            .ProjectToType<UserDetailsDto>()
             .ToListAsync(cancellationToken);
-
-        return userDtos;
     }
 
     public async Task<bool> ExistsWithNameAsync(string name)
@@ -77,34 +54,9 @@ internal partial class UserService(
 
     public async Task<List<UserDetailsDto>> GetListAsync(CancellationToken cancellationToken)
     {
-        var userDtos = await _db.Users
-            .Select(u => new UserDetailsDto
-            {
-                Id = u.Id,
-                UserName = u.UserName,
-                FirstName = u.FirstName,
-                LastName = u.LastName,
-                Email = u.Email,
-                IsActive = u.IsActive,
-                PhoneNumber = u.PhoneNumber,
-                LoginProvider = u.LoginProvider,
-                LastActivityAt = u.LastActivityAt,
-                Employee = u.Employee == null ? null : NavigationDto.Create(u.Employee.Id, u.Employee.Key, u.Employee.Name.FullName),
-                Roles = u.UserRoles
-                    .Join(_db.Roles,
-                        ur => ur.RoleId,
-                        r => r.Id,
-                        (ur, r) => new RoleListDto
-                        {
-                            Id = r.Id,
-                            Name = r.Name!,
-                            Description = r.Description
-                        })
-                    .ToList()
-            })
+        return await _db.Users
+            .ProjectToType<UserDetailsDto>()
             .ToListAsync(cancellationToken);
-
-        return userDtos;
     }
 
     public Task<int> GetCountAsync(CancellationToken cancellationToken) =>
@@ -112,68 +64,18 @@ internal partial class UserService(
 
     public async Task<UserDetailsDto?> GetAsync(string userId, CancellationToken cancellationToken)
     {
-        var userDto = await _db.Users
+        return await _db.Users
             .Where(u => u.Id == userId)
-            .Select(u => new UserDetailsDto
-            {
-                Id = u.Id,
-                UserName = u.UserName,
-                FirstName = u.FirstName,
-                LastName = u.LastName,
-                Email = u.Email,
-                IsActive = u.IsActive,
-                PhoneNumber = u.PhoneNumber,
-                LoginProvider = u.LoginProvider,
-                LastActivityAt = u.LastActivityAt,
-                Employee = u.Employee == null ? null : NavigationDto.Create(u.Employee.Id, u.Employee.Key, u.Employee.Name.FullName),
-                Roles = u.UserRoles
-                    .Join(_db.Roles,
-                        ur => ur.RoleId,
-                        r => r.Id,
-                        (ur, r) => new RoleListDto
-                        {
-                            Id = r.Id,
-                            Name = r.Name!,
-                            Description = r.Description
-                        })
-                    .ToList()
-            })
+            .ProjectToType<UserDetailsDto>()
             .FirstOrDefaultAsync(cancellationToken);
-
-        return userDto;
     }
 
     public async Task<List<UserDetailsDto>> GetUsersWithRole(string roleId, CancellationToken cancellationToken)
     {
-        var userDtos = await _db.Users
+        return await _db.Users
             .Where(u => u.UserRoles.Any(ur => ur.RoleId == roleId))
-            .Select(u => new UserDetailsDto
-            {
-                Id = u.Id,
-                UserName = u.UserName,
-                FirstName = u.FirstName,
-                LastName = u.LastName,
-                Email = u.Email,
-                IsActive = u.IsActive,
-                PhoneNumber = u.PhoneNumber,
-                LoginProvider = u.LoginProvider,
-                LastActivityAt = u.LastActivityAt,
-                Employee = u.Employee == null ? null : NavigationDto.Create(u.Employee.Id, u.Employee.Key, u.Employee.Name.FullName),
-                Roles = u.UserRoles
-                    .Join(_db.Roles,
-                        ur => ur.RoleId,
-                        r => r.Id,
-                        (ur, r) => new RoleListDto
-                        {
-                            Id = r.Id,
-                            Name = r.Name!,
-                            Description = r.Description
-                        })
-                    .ToList()
-            })
+            .ProjectToType<UserDetailsDto>()
             .ToListAsync(cancellationToken);
-
-        return userDtos;
     }
 
     public Task<int> GetUsersWithRoleCount(string roleId, CancellationToken cancellationToken)

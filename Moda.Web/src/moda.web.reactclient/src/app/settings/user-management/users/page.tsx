@@ -5,10 +5,14 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import ModaGrid from '@/src/components/common/moda-grid'
 import { authorizePage } from '@/src/components/hoc'
 import Link from 'next/link'
-import { Button } from 'antd'
+import { Button, Modal, Tag, Tooltip } from 'antd'
 import useAuth from '@/src/components/contexts/auth'
 import { useDocumentTitle } from '@/src/hooks'
-import { useGetUsersQuery } from '@/src/store/features/user-management/users-api'
+import { useMessage } from '@/src/components/contexts/messaging'
+import {
+  useGetUsersQuery,
+  useUnlockUserMutation,
+} from '@/src/store/features/user-management/users-api'
 import { RoleListDto, UserDetailsDto } from '@/src/services/moda-api'
 import { ColDef, ValueFormatterParams } from 'ag-grid-community'
 import dayjs from 'dayjs'
@@ -53,7 +57,9 @@ const UsersListPage = () => {
   )
   const showRowActions = canUpdateUser || canUpdateUserRoles
 
+  const messageApi = useMessage()
   const { data: usersData, isLoading, error, refetch } = useGetUsersQuery()
+  const [unlockUser] = useUnlockUserMutation()
 
   const columnDefs = useMemo<ColDef<UserDetailsDto>[]>(
     () => [
@@ -76,6 +82,37 @@ const UsersListPage = () => {
                 key: 'reset-password',
                 label: 'Reset Password',
                 onClick: () => setResettingPasswordUser(params.data),
+              })
+            }
+            if (
+              params.data.lockoutEnd &&
+              new Date(params.data.lockoutEnd) > new Date()
+            ) {
+              menuItems.push({
+                key: 'unlock',
+                label: 'Unlock Account',
+                onClick: () => {
+                  const user = params.data
+                  Modal.confirm({
+                    title: 'Unlock Account',
+                    content: `Are you sure you want to unlock ${user.firstName} ${user.lastName}?`,
+                    okText: 'Unlock',
+                    onOk: async () => {
+                      try {
+                        const result = await unlockUser(user.id)
+                        if ('error' in result) {
+                          throw result.error
+                        }
+                        messageApi.success('Account unlocked successfully.')
+                      } catch (error: any) {
+                        messageApi.error(
+                          error?.data?.detail ??
+                            'Failed to unlock the account.',
+                        )
+                      }
+                    },
+                  })
+                },
               })
             }
           }
@@ -116,13 +153,26 @@ const UsersListPage = () => {
             .join(', ') ?? '',
       },
       {
+        field: 'lockoutEnd',
+        headerName: 'Locked Out',
+        width: 120,
+        cellRenderer: (params: { value: Date | undefined }) =>
+          params.value && new Date(params.value) > new Date() ? (
+            <Tooltip
+              title={`Locked until ${dayjs(params.value).format('MMM D, YYYY h:mm A')}`}
+            >
+              <Tag color="error">Locked</Tag>
+            </Tooltip>
+          ) : null,
+      },
+      {
         field: 'lastActivityAt',
         headerName: 'Last Activity',
         valueFormatter: dateTimeValueFormatter,
       },
       { field: 'isActive' }, // TODO: convert to yes/no
     ],
-    [canUpdateUser, canUpdateUserRoles, showRowActions],
+    [canUpdateUser, canUpdateUserRoles, showRowActions, messageApi, unlockUser],
   )
 
   useEffect(() => {

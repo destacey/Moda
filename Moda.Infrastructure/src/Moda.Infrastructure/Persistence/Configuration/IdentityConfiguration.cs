@@ -55,9 +55,9 @@ public class ApplicationRoleClaimConfig : IEntityTypeConfiguration<ApplicationRo
             .ToTable("RoleClaims", SchemaNames.Identity);
 }
 
-public class IdentityUserRoleConfig : IEntityTypeConfiguration<IdentityUserRole<string>>
+public class ApplicationUserRoleConfig : IEntityTypeConfiguration<ApplicationUserRole>
 {
-    public void Configure(EntityTypeBuilder<IdentityUserRole<string>> builder)
+    public void Configure(EntityTypeBuilder<ApplicationUserRole> builder)
     {
         builder.ToTable("UserRoles", SchemaNames.Identity);
 
@@ -67,7 +67,7 @@ public class IdentityUserRoleConfig : IEntityTypeConfiguration<IdentityUserRole<
             .HasForeignKey(ur => ur.UserId)
             .IsRequired();
 
-        builder.HasOne<ApplicationRole>()
+        builder.HasOne(ur => ur.Role)
             .WithMany(r => r.UserRoles)
             .HasForeignKey(ur => ur.RoleId)
             .IsRequired();

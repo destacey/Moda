@@ -2,7 +2,7 @@
 
 import { UserDetailsDto } from '@/src/services/moda-api'
 import { InfoCircleOutlined } from '@ant-design/icons'
-import { Card, Descriptions, Flex, List } from 'antd'
+import { Card, Descriptions, Flex, List, Tag } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 
@@ -44,6 +44,13 @@ const UserDetails = (props: UserDetailsProps) => {
             : null}
         </Item>
         <Item label="Is Active?">{user.isActive?.toString()}</Item>
+        {user.lockoutEnd && new Date(user.lockoutEnd) > new Date() && (
+          <Item label="Account Status">
+            <Tag color="error">
+              Locked until {dayjs(user.lockoutEnd).format('MMM D, YYYY h:mm A')}
+            </Tag>
+          </Item>
+        )}
       </Descriptions>
       <Card size="small" title="Roles" style={{ width: 300 }}>
         <List

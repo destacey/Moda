@@ -124,6 +124,20 @@ public class UsersController(IUserService userService) : ControllerBase
             : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
+    [HttpPut("{id}/unlock")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Users)]
+    [OpenApiOperation("Unlock a locked user account.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> UnlockUser(string id)
+    {
+        var result = await _userService.UnlockUserAsync(id);
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
     [HttpPost("{id}/toggle-status")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Users)]
     [OpenApiOperation("Toggle a user's active status.", "")]

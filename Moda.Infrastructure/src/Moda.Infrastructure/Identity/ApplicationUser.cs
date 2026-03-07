@@ -22,5 +22,5 @@ public class ApplicationUser : IdentityUser
     public string? RefreshToken { get; set; }
     public DateTime? RefreshTokenExpiryTime { get; set; }
 
-    public ICollection<IdentityUserRole<string>> UserRoles { get; set; } = [];
+    public ICollection<ApplicationUserRole> UserRoles { get; set; } = [];
 }

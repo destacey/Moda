@@ -46,6 +46,8 @@ public interface IUserService : ITransientService
 
     Task<Result> ResetPasswordAsync(ResetPasswordCommand command);
 
+    Task<Result> UnlockUserAsync(string userId);
+
     Task<Result> UpdateMissingEmployeeIds(CancellationToken cancellationToken);
 
     Task<Result> SyncUsersFromEmployeeRecords(List<IExternalEmployee> externalEmployees, CancellationToken cancellationToken);

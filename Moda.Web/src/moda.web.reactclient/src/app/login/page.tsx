@@ -417,6 +417,7 @@ function LocalLoginTab() {
         window.location.href = '/'
       } catch (err: any) {
         const message =
+          err?.detail ||
           err?.response?.data?.message ||
           err?.message ||
           'Invalid email or password.'

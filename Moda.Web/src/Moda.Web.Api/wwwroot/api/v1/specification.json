@@ -1632,6 +1632,59 @@
         ]
       }
     },
+    "/api/user-management/users/{id}/unlock": {
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Unlock a locked user account.",
+        "operationId": "Users_UnlockUser",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
     "/api/user-management/users/{id}/toggle-status": {
       "post": {
         "tags": [
@@ -18600,6 +18653,11 @@
           },
           "isActive": {
             "type": "boolean"
+          },
+          "lockoutEnd": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
           },
           "phoneNumber": {
             "type": "string",

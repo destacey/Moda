@@ -6,10 +6,14 @@ import { authorizePage } from '@/src/components/hoc'
 import { notFound } from 'next/navigation'
 import UserDetailsLoading from './loading'
 import { use, useCallback, useEffect, useMemo, useState } from 'react'
-import { Card, MenuProps } from 'antd'
+import { Card, MenuProps, Modal } from 'antd'
 import BasicBreadcrumb from '@/src/components/common/basic-breadcrumb'
 import useAuth from '@/src/components/contexts/auth'
-import { useGetUserQuery } from '@/src/store/features/user-management/users-api'
+import { useMessage } from '@/src/components/contexts/messaging'
+import {
+  useGetUserQuery,
+  useUnlockUserMutation,
+} from '@/src/store/features/user-management/users-api'
 import {
   EditUserForm,
   ManageUserRolesForm,
@@ -41,9 +45,13 @@ const UserDetailsPage = (props: { params: Promise<{ id: string }> }) => {
   const canUpdateUser = hasPermissionClaim('Permissions.Users.Update')
   const canUpdateUserRoles = hasPermissionClaim('Permissions.UserRoles.Update')
 
+  const messageApi = useMessage()
   const { data: userData, isLoading, error } = useGetUserQuery(id)
+  const [unlockUser] = useUnlockUserMutation()
 
   const isLocalUser = userData?.loginProvider === 'Moda'
+  const isLockedOut =
+    !!userData?.lockoutEnd && new Date(userData.lockoutEnd) > new Date()
 
   const actionsMenuItems: MenuProps['items'] = useMemo(() => {
     const items: ItemType[] = []
@@ -60,6 +68,32 @@ const UserDetailsPage = (props: { params: Promise<{ id: string }> }) => {
           onClick: () => setOpenResetPasswordForm(true),
         })
       }
+      if (isLockedOut) {
+        items.push({
+          key: 'unlock',
+          label: 'Unlock Account',
+          onClick: () => {
+            Modal.confirm({
+              title: 'Unlock Account',
+              content: `Are you sure you want to unlock ${userData?.firstName} ${userData?.lastName}?`,
+              okText: 'Unlock',
+              onOk: async () => {
+                try {
+                  const result = await unlockUser(id)
+                  if ('error' in result) {
+                    throw result.error
+                  }
+                  messageApi.success('Account unlocked successfully.')
+                } catch (error: any) {
+                  messageApi.error(
+                    error?.data?.detail ?? 'Failed to unlock the account.',
+                  )
+                }
+              },
+            })
+          },
+        })
+      }
     }
     if (canUpdateUserRoles) {
       if (items.length > 0) {
@@ -72,7 +106,7 @@ const UserDetailsPage = (props: { params: Promise<{ id: string }> }) => {
       })
     }
     return items
-  }, [canUpdateUser, canUpdateUserRoles, isLocalUser])
+  }, [canUpdateUser, canUpdateUserRoles, isLocalUser, isLockedOut, id, userData, messageApi, unlockUser])
 
   const renderTabContent = useCallback(() => {
     switch (activeTab) {

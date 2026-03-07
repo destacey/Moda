@@ -69,7 +69,7 @@ public class UserServiceTests
             _dateTimeProvider);
     }
 
-    private static ApplicationUser CreateUser(string id = "user-1", string userName = "testuser", bool isActive = true)
+    private static ApplicationUser CreateUser(string id = "user-1", string userName = "testuser", bool isActive = true, string loginProvider = LoginProviders.MicrosoftEntraId)
     {
         return new ApplicationUser
         {
@@ -79,7 +79,7 @@ public class UserServiceTests
             FirstName = "Test",
             LastName = "User",
             IsActive = isActive,
-            LoginProvider = LoginProviders.MicrosoftEntraId,
+            LoginProvider = loginProvider,
         };
     }
 
@@ -427,6 +427,299 @@ public class UserServiceTests
 
         // Act
         var act = () => sut.AssignRolesAsync(command, CancellationToken.None);
+
+        // Assert
+        await act.Should().ThrowAsync<NotFoundException>();
+    }
+
+    #endregion
+
+    #region ChangePasswordAsync
+
+    [Fact]
+    public async Task ChangePasswordAsync_ShouldSucceed_WhenLocalUserWithValidPassword()
+    {
+        // Arrange
+        var user = CreateUser(loginProvider: LoginProviders.Moda);
+        _mockUserManager.Setup(x => x.FindByIdAsync("user-1")).ReturnsAsync(user);
+        _mockUserManager.Setup(x => x.ChangePasswordAsync(user, "OldPass123!", "NewPass456!"))
+            .ReturnsAsync(IdentityResult.Success);
+
+        var command = new ChangePasswordCommand("OldPass123!", "NewPass456!");
+        var sut = CreateSut();
+
+        // Act
+        var result = await sut.ChangePasswordAsync("user-1", command);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        _mockUserManager.Verify(x => x.ChangePasswordAsync(user, "OldPass123!", "NewPass456!"), Times.Once);
+    }
+
+    [Fact]
+    public async Task ChangePasswordAsync_ShouldClearMustChangePassword_WhenFlagIsSet()
+    {
+        // Arrange
+        var user = CreateUser(loginProvider: LoginProviders.Moda);
+        user.MustChangePassword = true;
+        _mockUserManager.Setup(x => x.FindByIdAsync("user-1")).ReturnsAsync(user);
+        _mockUserManager.Setup(x => x.ChangePasswordAsync(user, "OldPass123!", "NewPass456!"))
+            .ReturnsAsync(IdentityResult.Success);
+        _mockUserManager.Setup(x => x.UpdateAsync(user)).ReturnsAsync(IdentityResult.Success);
+
+        var command = new ChangePasswordCommand("OldPass123!", "NewPass456!");
+        var sut = CreateSut();
+
+        // Act
+        var result = await sut.ChangePasswordAsync("user-1", command);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        user.MustChangePassword.Should().BeFalse();
+        _mockUserManager.Verify(x => x.UpdateAsync(user), Times.Once);
+    }
+
+    [Fact]
+    public async Task ChangePasswordAsync_ShouldReturnFailure_WhenUserIsNotLocal()
+    {
+        // Arrange
+        var user = CreateUser(); // Default is MicrosoftEntraId
+        _mockUserManager.Setup(x => x.FindByIdAsync("user-1")).ReturnsAsync(user);
+
+        var command = new ChangePasswordCommand("OldPass123!", "NewPass456!");
+        var sut = CreateSut();
+
+        // Act
+        var result = await sut.ChangePasswordAsync("user-1", command);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Contain("only available for local accounts");
+    }
+
+    [Fact]
+    public async Task ChangePasswordAsync_ShouldReturnFailure_WhenIdentityFails()
+    {
+        // Arrange
+        var user = CreateUser(loginProvider: LoginProviders.Moda);
+        _mockUserManager.Setup(x => x.FindByIdAsync("user-1")).ReturnsAsync(user);
+        _mockUserManager.Setup(x => x.ChangePasswordAsync(user, "wrong", "NewPass456!"))
+            .ReturnsAsync(IdentityResult.Failed(new IdentityError { Description = "Incorrect password." }));
+
+        var command = new ChangePasswordCommand("wrong", "NewPass456!");
+        var sut = CreateSut();
+
+        // Act
+        var result = await sut.ChangePasswordAsync("user-1", command);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Contain("Incorrect password.");
+    }
+
+    [Fact]
+    public async Task ChangePasswordAsync_ShouldThrowNotFound_WhenUserDoesNotExist()
+    {
+        // Arrange
+        _mockUserManager.Setup(x => x.FindByIdAsync("missing")).ReturnsAsync((ApplicationUser?)null);
+
+        var command = new ChangePasswordCommand("OldPass123!", "NewPass456!");
+        var sut = CreateSut();
+
+        // Act
+        var act = () => sut.ChangePasswordAsync("missing", command);
+
+        // Assert
+        await act.Should().ThrowAsync<NotFoundException>();
+    }
+
+    #endregion
+
+    #region ResetPasswordAsync
+
+    [Fact]
+    public async Task ResetPasswordAsync_ShouldSucceed_AndSetMustChangePassword()
+    {
+        // Arrange
+        var user = CreateUser(loginProvider: LoginProviders.Moda);
+        _mockUserManager.Setup(x => x.FindByIdAsync("user-1")).ReturnsAsync(user);
+        _mockUserManager.Setup(x => x.GeneratePasswordResetTokenAsync(user)).ReturnsAsync("reset-token");
+        _mockUserManager.Setup(x => x.ResetPasswordAsync(user, "reset-token", "NewPass456!"))
+            .ReturnsAsync(IdentityResult.Success);
+        _mockUserManager.Setup(x => x.UpdateAsync(user)).ReturnsAsync(IdentityResult.Success);
+        _mockUserManager.Setup(x => x.IsLockedOutAsync(user)).ReturnsAsync(false);
+
+        var command = new ResetPasswordCommand("user-1", "NewPass456!");
+        var sut = CreateSut();
+
+        // Act
+        var result = await sut.ResetPasswordAsync(command);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        user.MustChangePassword.Should().BeTrue();
+        _mockUserManager.Verify(x => x.UpdateAsync(user), Times.Once);
+    }
+
+    [Fact]
+    public async Task ResetPasswordAsync_ShouldClearLockout_WhenUserIsLockedOut()
+    {
+        // Arrange
+        var user = CreateUser(loginProvider: LoginProviders.Moda);
+        _mockUserManager.Setup(x => x.FindByIdAsync("user-1")).ReturnsAsync(user);
+        _mockUserManager.Setup(x => x.GeneratePasswordResetTokenAsync(user)).ReturnsAsync("reset-token");
+        _mockUserManager.Setup(x => x.ResetPasswordAsync(user, "reset-token", "NewPass456!"))
+            .ReturnsAsync(IdentityResult.Success);
+        _mockUserManager.Setup(x => x.UpdateAsync(user)).ReturnsAsync(IdentityResult.Success);
+        _mockUserManager.Setup(x => x.IsLockedOutAsync(user)).ReturnsAsync(true);
+        _mockUserManager.Setup(x => x.SetLockoutEndDateAsync(user, null)).ReturnsAsync(IdentityResult.Success);
+        _mockUserManager.Setup(x => x.ResetAccessFailedCountAsync(user)).ReturnsAsync(IdentityResult.Success);
+
+        var command = new ResetPasswordCommand("user-1", "NewPass456!");
+        var sut = CreateSut();
+
+        // Act
+        var result = await sut.ResetPasswordAsync(command);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        _mockUserManager.Verify(x => x.SetLockoutEndDateAsync(user, null), Times.Once);
+        _mockUserManager.Verify(x => x.ResetAccessFailedCountAsync(user), Times.Once);
+    }
+
+    [Fact]
+    public async Task ResetPasswordAsync_ShouldNotClearLockout_WhenUserIsNotLockedOut()
+    {
+        // Arrange
+        var user = CreateUser(loginProvider: LoginProviders.Moda);
+        _mockUserManager.Setup(x => x.FindByIdAsync("user-1")).ReturnsAsync(user);
+        _mockUserManager.Setup(x => x.GeneratePasswordResetTokenAsync(user)).ReturnsAsync("reset-token");
+        _mockUserManager.Setup(x => x.ResetPasswordAsync(user, "reset-token", "NewPass456!"))
+            .ReturnsAsync(IdentityResult.Success);
+        _mockUserManager.Setup(x => x.UpdateAsync(user)).ReturnsAsync(IdentityResult.Success);
+        _mockUserManager.Setup(x => x.IsLockedOutAsync(user)).ReturnsAsync(false);
+
+        var command = new ResetPasswordCommand("user-1", "NewPass456!");
+        var sut = CreateSut();
+
+        // Act
+        var result = await sut.ResetPasswordAsync(command);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        _mockUserManager.Verify(x => x.SetLockoutEndDateAsync(It.IsAny<ApplicationUser>(), It.IsAny<DateTimeOffset?>()), Times.Never);
+        _mockUserManager.Verify(x => x.ResetAccessFailedCountAsync(It.IsAny<ApplicationUser>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task ResetPasswordAsync_ShouldReturnFailure_WhenUserIsNotLocal()
+    {
+        // Arrange
+        var user = CreateUser(); // Default is MicrosoftEntraId
+        _mockUserManager.Setup(x => x.FindByIdAsync("user-1")).ReturnsAsync(user);
+
+        var command = new ResetPasswordCommand("user-1", "NewPass456!");
+        var sut = CreateSut();
+
+        // Act
+        var result = await sut.ResetPasswordAsync(command);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Contain("only available for local accounts");
+    }
+
+    [Fact]
+    public async Task ResetPasswordAsync_ShouldReturnFailure_WhenIdentityFails()
+    {
+        // Arrange
+        var user = CreateUser(loginProvider: LoginProviders.Moda);
+        _mockUserManager.Setup(x => x.FindByIdAsync("user-1")).ReturnsAsync(user);
+        _mockUserManager.Setup(x => x.GeneratePasswordResetTokenAsync(user)).ReturnsAsync("reset-token");
+        _mockUserManager.Setup(x => x.ResetPasswordAsync(user, "reset-token", "weak"))
+            .ReturnsAsync(IdentityResult.Failed(new IdentityError { Description = "Password too short." }));
+
+        var command = new ResetPasswordCommand("user-1", "weak");
+        var sut = CreateSut();
+
+        // Act
+        var result = await sut.ResetPasswordAsync(command);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Contain("Password too short.");
+    }
+
+    [Fact]
+    public async Task ResetPasswordAsync_ShouldThrowNotFound_WhenUserDoesNotExist()
+    {
+        // Arrange
+        _mockUserManager.Setup(x => x.FindByIdAsync("missing")).ReturnsAsync((ApplicationUser?)null);
+
+        var command = new ResetPasswordCommand("missing", "NewPass456!");
+        var sut = CreateSut();
+
+        // Act
+        var act = () => sut.ResetPasswordAsync(command);
+
+        // Assert
+        await act.Should().ThrowAsync<NotFoundException>();
+    }
+
+    #endregion
+
+    #region UnlockUserAsync
+
+    [Fact]
+    public async Task UnlockUserAsync_ShouldSucceed_WhenUserIsLockedOut()
+    {
+        // Arrange
+        var user = CreateUser(loginProvider: LoginProviders.Moda);
+        _mockUserManager.Setup(x => x.FindByIdAsync("user-1")).ReturnsAsync(user);
+        _mockUserManager.Setup(x => x.IsLockedOutAsync(user)).ReturnsAsync(true);
+        _mockUserManager.Setup(x => x.SetLockoutEndDateAsync(user, null)).ReturnsAsync(IdentityResult.Success);
+        _mockUserManager.Setup(x => x.ResetAccessFailedCountAsync(user)).ReturnsAsync(IdentityResult.Success);
+
+        var sut = CreateSut();
+
+        // Act
+        var result = await sut.UnlockUserAsync("user-1");
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        _mockUserManager.Verify(x => x.SetLockoutEndDateAsync(user, null), Times.Once);
+        _mockUserManager.Verify(x => x.ResetAccessFailedCountAsync(user), Times.Once);
+    }
+
+    [Fact]
+    public async Task UnlockUserAsync_ShouldReturnFailure_WhenUserIsNotLockedOut()
+    {
+        // Arrange
+        var user = CreateUser(loginProvider: LoginProviders.Moda);
+        _mockUserManager.Setup(x => x.FindByIdAsync("user-1")).ReturnsAsync(user);
+        _mockUserManager.Setup(x => x.IsLockedOutAsync(user)).ReturnsAsync(false);
+
+        var sut = CreateSut();
+
+        // Act
+        var result = await sut.UnlockUserAsync("user-1");
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Contain("not currently locked out");
+        _mockUserManager.Verify(x => x.SetLockoutEndDateAsync(It.IsAny<ApplicationUser>(), It.IsAny<DateTimeOffset?>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task UnlockUserAsync_ShouldThrowNotFound_WhenUserDoesNotExist()
+    {
+        // Arrange
+        _mockUserManager.Setup(x => x.FindByIdAsync("missing")).ReturnsAsync((ApplicationUser?)null);
+
+        var sut = CreateSut();
+
+        // Act
+        var act = () => sut.UnlockUserAsync("missing");
 
         // Assert
         await act.Should().ThrowAsync<NotFoundException>();

@@ -188,6 +188,40 @@ export const usersApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
+      invalidatesTags: (result, error, arg) => [
+        { type: QueryTags.User, id: arg.userId },
+        { type: QueryTags.User, id: 'LIST' },
+      ],
+    }),
+
+    unlockUser: builder.mutation<void, string>({
+      queryFn: async (userId) => {
+        try {
+          const response = await authenticatedFetch(
+            `/api/user-management/users/${userId}/unlock`,
+            {
+              method: 'PUT',
+            },
+          )
+          if (!response.ok) {
+            const errorData = await response.json()
+            return {
+              error: {
+                status: response.status,
+                data: errorData,
+              },
+            }
+          }
+          return { data: null }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, arg) => [
+        { type: QueryTags.User, id: arg },
+        { type: QueryTags.User, id: 'LIST' },
+      ],
     }),
 
     getUserOptions: builder.query<BaseOptionType[], void>({
@@ -222,5 +256,6 @@ export const {
   useUpdateUserMutation,
   useCreateUserMutation,
   useResetUserPasswordMutation,
+  useUnlockUserMutation,
   useGetUserOptionsQuery,
 } = usersApi
