@@ -413,7 +413,8 @@ function LocalLoginTab() {
         if (tokenResponse.mustChangePassword) {
           storage.setItem(LOCAL_AUTH_MUST_CHANGE_PASSWORD_KEY, 'true')
         }
-        // Reload to trigger LocalOrMsalAuthGate to pick up the local token
+        // Reload to trigger LocalOrMsalAuthGate to pick up the local token.
+        // AppContent will handle redirecting to any stored return URL.
         window.location.href = '/'
       } catch (err: any) {
         const message =

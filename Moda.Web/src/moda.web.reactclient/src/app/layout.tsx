@@ -1,7 +1,7 @@
 'use client'
 
 import '@/styles/globals.css'
-import React, { memo, PropsWithChildren, useMemo, useSyncExternalStore } from 'react'
+import React, { memo, PropsWithChildren, useEffect, useMemo, useSyncExternalStore } from 'react'
 import { Provider } from 'react-redux'
 import { Inter } from 'next/font/google'
 import { App, Grid, Layout } from 'antd'
@@ -25,7 +25,7 @@ import LoginPage from './login/page'
 import LogoutPage from './logout/page'
 import logoutStyles from './logout/page.module.css'
 // Note: LogoutPage is only used in UnauthenticatedView (after MSAL determines auth state)
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { isLocalAuthActive } from '../services/clients'
 
 const { Content } = Layout
@@ -35,6 +35,8 @@ const inter = Inter({ subsets: ['latin'] })
 /**
  * Shows the appropriate page for unauthenticated users based on route
  */
+const RETURN_URL_KEY = 'moda.returnUrl'
+
 const UnauthenticatedView = () => {
   const pathname = usePathname()
 
@@ -46,6 +48,11 @@ const UnauthenticatedView = () => {
   // If locally authenticated, don't show login page — AuthProvider handles it
   if (isLocalAuthActive()) {
     return null
+  }
+
+  // Preserve the intended URL so login can redirect back after authentication
+  if (pathname && pathname !== '/' && pathname !== '/login') {
+    sessionStorage.setItem(RETURN_URL_KEY, pathname)
   }
 
   return <LoginPage />
@@ -114,6 +121,16 @@ const MsalInitializingView = () => {
 const AppContent = memo(({ children }: PropsWithChildren) => {
   const screens = Grid.useBreakpoint()
   const isMobile = useMemo(() => !screens.md, [screens.md]) // md breakpoint is 768px in Ant Design
+  const router = useRouter()
+
+  // After authentication, redirect to the originally requested URL if one was stored
+  useEffect(() => {
+    const returnUrl = sessionStorage.getItem(RETURN_URL_KEY)
+    if (returnUrl) {
+      sessionStorage.removeItem(RETURN_URL_KEY)
+      router.replace(returnUrl)
+    }
+  }, [router])
 
   return (
     <Layout>
