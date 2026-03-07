@@ -210,7 +210,8 @@ The solution is organized into 5 main areas:
 3. **Moda.Infrastructure** - Cross-cutting concerns
 
    - Database (ModaDbContext - single shared context for all services)
-   - Authentication (Azure AD)
+   - Authentication (Azure AD and local JWT)
+   - Identity (ASP.NET Core Identity for user management)
    - Background jobs (Hangfire)
    - Logging (Serilog with multiple sinks)
    - OpenAPI/Swagger configuration
@@ -276,7 +277,8 @@ Moda.Work.Application/
 - Hangfire (background jobs)
 - Serilog (structured logging)
 - NSwag (OpenAPI/Swagger)
-- Azure AD authentication
+- Azure AD and local JWT authentication
+- ASP.NET Core Identity (user management)
 
 **Frontend:**
 
@@ -285,7 +287,7 @@ Moda.Work.Application/
 - TypeScript
 - Ant Design (UI components)
 - Redux Toolkit (state management)
-- Azure MSAL (authentication)
+- Azure MSAL or local JWT authentication
 - AG Grid (data tables)
 
 **Testing:**
@@ -338,9 +340,28 @@ Moda.Work.Application/
 
 ### Authentication
 
-The application requires Azure AD (Microsoft Entra ID) for authentication. For local development:
+Moda supports two authentication methods, configured per user via `LoginProvider`:
 
-1. Create a `.env` file in the repository root with:
+1. **Microsoft Entra ID (Azure AD)** - Directory-based SSO. Requires Azure AD app registration and `.env` configuration (see README).
+2. **Moda (Local)** - Self-contained username/password auth with JWT tokens. Requires `SecuritySettings:LocalJwt:Secret` in API configuration.
+
+**Local Auth Configuration** (`Moda.Web/src/Moda.Web.Api/Configurations/security.json` or user secrets):
+
+```json
+{
+  "SecuritySettings": {
+    "LocalJwt": {
+      "Secret": "<strong-random-secret-at-least-32-chars>",
+      "Issuer": "Moda",
+      "Audience": "ModaApi",
+      "TokenExpirationInMinutes": 60,
+      "RefreshTokenExpirationInDays": 7
+    }
+  }
+}
+```
+
+**Azure AD Configuration** - Create a `.env` file in the repository root:
 
 ```env
 AAD_CLIENT_ID='{your AAD client ID}'
@@ -350,7 +371,28 @@ API_SCOPE='{scope to attach to API requests; for AAD this is usually api://{clie
 API_BASE_URL='https://localhost:5001'
 ```
 
-1. Use User Secrets for API configuration (right-click `Moda.Web.Api` project → Manage User Secrets)
+Use User Secrets for API configuration (right-click `Moda.Web.Api` project → Manage User Secrets)
+
+### User Management
+
+User management lives in `Moda.Common.Application/Identity/Users/` (commands/interfaces) and `Moda.Infrastructure/Identity/` (implementation).
+
+**Key concepts:**
+
+- `LoginProvider` - Each user is either `MicrosoftEntraId` or `Moda` (set at creation, immutable)
+- `MustChangePassword` - Local users created with this flag; cleared after first password change
+- Account lifecycle: activate, deactivate, unlock (locked after failed login attempts)
+- Password management: users change their own password; admins can reset passwords (forces change on next login)
+
+**Key files:**
+
+- `Moda.Common.Application/Identity/Users/IUserService.cs` - User management interface
+- `Moda.Infrastructure/Identity/UserService.CreateUpdate.cs` - User CRUD and account operations
+- `Moda.Infrastructure/Auth/Local/TokenService.cs` - JWT token generation and refresh
+- `Moda.Web.Api/Controllers/UserManagement/` - Auth, Profile, and Users API controllers
+- `moda.web.reactclient/src/app/settings/user-management/users/` - User management UI
+- `moda.web.reactclient/src/app/account/profile/` - User profile and password change
+- `moda.web.reactclient/src/components/contexts/auth/auth-context.tsx` - Auth state (supports both MSAL and local JWT)
 
 ### Background Jobs
 

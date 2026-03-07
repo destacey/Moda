@@ -1,9 +1,13 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import dynamic from 'next/dynamic'
 import { Button, Result, Space, Typography } from 'antd'
 import { LogoutOutlined, ReloadOutlined } from '@ant-design/icons'
 import styles from './page.module.css'
+
+const DiagnosticTransition = dynamic(() => import('./diagnostic-transition'), { ssr: false })
+const DiagnosticCanvas = dynamic(() => import('./diagnostic-canvas'), { ssr: false })
 
 const { Paragraph } = Typography
 
@@ -59,6 +63,9 @@ export default function ServiceUnavailablePage({
       window.location.href = '/logout'
     }
   }
+
+  const [dotClicks, setDotClicks] = useState(0)
+  const [diagnosticPhase, setDiagnosticPhase] = useState<'idle' | 'transition' | 'diagnostic'>('idle')
 
   const isAuthIssue = apiReachable === true
 
@@ -133,15 +140,34 @@ export default function ServiceUnavailablePage({
           )}
         </div>
       </Result>
-      <div className={styles.decorativeDots}>
+      <div
+        className={styles.decorativeDots}
+        onClick={() =>
+          setDotClicks((prev) => {
+            const next = Math.min(prev + 1, 5)
+            if (next === 5) setDiagnosticPhase('transition')
+            return next
+          })
+        }
+      >
         {[0, 1, 2, 3, 4].map((i) => (
           <div
             key={i}
-            className={`${styles.dot} ${i === 2 ? styles.dotActive : ''}`}
+            className={`${styles.dot} ${
+              dotClicks === 0
+                ? i === 2 ? styles.dotActive : ''
+                : i < dotClicks ? styles.dotClicked : ''
+            }`}
           />
         ))}
       </div>
       </div>
+      {(diagnosticPhase === 'transition' || diagnosticPhase === 'diagnostic') && (
+        <DiagnosticCanvas onClose={() => { setDiagnosticPhase('idle'); setDotClicks(0) }} />
+      )}
+      {diagnosticPhase === 'transition' && (
+        <DiagnosticTransition onComplete={() => setDiagnosticPhase('diagnostic')} />
+      )}
     </div>
   )
 }

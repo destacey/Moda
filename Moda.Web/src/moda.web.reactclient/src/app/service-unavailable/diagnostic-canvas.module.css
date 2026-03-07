@@ -1,0 +1,126 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  animation: overlayFadeIn 3s ease-in forwards;
+}
+
+@keyframes overlayFadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.diagnostic {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  font-family: 'Courier New', monospace;
+}
+
+.closeButton {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: none;
+  border: none;
+  color: #4ade80;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  line-height: 1;
+  opacity: 0.6;
+}
+
+.closeButton:hover {
+  opacity: 1;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  width: 320px;
+  font-size: 0.875rem;
+  color: #166534;
+}
+
+.val {
+  color: #4ade80;
+}
+
+.canvas {
+  border: 1px solid #1a1a1a;
+  border-radius: 4px;
+  display: block;
+  image-rendering: pixelated;
+}
+
+.message {
+  font-size: 0.85rem;
+  color: #166534;
+  letter-spacing: 0.1em;
+  text-align: center;
+  min-height: 1.4em;
+}
+
+.link {
+  color: #4ade80;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.dpad {
+  display: none;
+  grid-template-columns: repeat(3, 44px);
+  grid-template-rows: repeat(3, 44px);
+  gap: 4px;
+}
+
+@media (pointer: coarse) {
+  .dpad {
+    display: grid;
+  }
+}
+
+.dpadBtn {
+  background: #1e1e1e;
+  border: 1px solid #2a2a2a;
+  border-radius: 6px;
+  color: #4ade80;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: manipulation;
+  user-select: none;
+}
+
+.dpadBtn:active {
+  background: #2a2a2a;
+}
+
+.dpadBlank {
+  background: none;
+  border: none;
+}
+
+.matrixCanvas {
+  position: fixed;
+  inset: 0;
+  z-index: 1001;
+  width: 100%;
+  height: 100%;
+}
+
+.matrixFadeOut {
+  opacity: 0;
+  transition: opacity 0.8s ease-out;
+}

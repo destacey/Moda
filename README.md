@@ -20,6 +20,7 @@ When delivery spans multiple teams, projects, and systems, visibility breaks dow
 - Dependency Tracking - Visualize and manage cross-team and cross-project dependencies
 - Portfolio Management - Project and portfolio tracking with organizational alignment
 - External Integrations - Sync teams, work items, iterations, and sprint data from external systems like Azure DevOps on automated cycles
+- User Management - Local user accounts with JWT auth, role-based access control, password management, and account lifecycle (activate/deactivate/unlock)
 - Observability - Built-in OpenTelemetry support for tracing, metrics, and logging
 
 ## 🏗️ Technology Stack
@@ -38,7 +39,7 @@ When delivery spans multiple teams, projects, and systems, visibility breaks dow
 - Next.js 16 (React 19, TypeScript)
 - Ant Design UI components
 - Redux Toolkit + RTK Query
-- Azure AD (MSAL) authentication
+- Azure AD (MSAL) or local JWT authentication
 
 ## 🚀 Quick Start
 
@@ -72,6 +73,32 @@ Create or update `Moda.Web/src/Moda.Web.Api/Configurations/database.json`:
 ```
 
 ### 3. Configure Authentication
+
+Moda supports two authentication methods: **Microsoft Entra ID (Azure AD)** for directory-based SSO, and **Moda (Local)** for self-contained username/password authentication with JWT tokens. You can use either or both — each user is assigned a login provider at creation time.
+
+#### Option A: Local Authentication (Simplest)
+
+No external identity provider needed. Configure a JWT signing secret in `Moda.Web/src/Moda.Web.Api/Configurations/security.json` (or user secrets):
+
+```json
+{
+  "SecuritySettings": {
+    "LocalJwt": {
+      "Secret": "<generate-a-strong-random-secret-at-least-32-chars>"
+    }
+  }
+}
+```
+
+On first run, the database seeder creates a default admin user (`admin@moda.local` / `Password1!`). You will be prompted to change the password on first login.
+
+Create a `.env` file in the repository root:
+
+```env
+API_BASE_URL='http://localhost:5000'
+```
+
+#### Option B: Microsoft Entra ID (Azure AD)
 
 You'll need an Azure AD app registration. Create a `.env` file in the repository root:
 
@@ -217,6 +244,14 @@ See [CLAUDE.md](CLAUDE.md) for detailed architecture documentation.
 
 ### Authentication Issues
 
+**Local Auth:**
+
+- Ensure `SecuritySettings:LocalJwt:Secret` is configured (at least 32 characters)
+- Default admin credentials: `admin@moda.local` / `Password1!` (must change on first login)
+- If locked out, an admin can unlock accounts via Settings > User Management
+
+**Azure AD:**
+
 - Verify Azure AD app registration configuration
 - Check `.env` file values match your Azure AD setup
 - Ensure redirect URIs are configured in Azure AD
@@ -274,11 +309,31 @@ The API container needs the following:
 CorsSettings__WebClient={your client URL}
 DatabaseSettings__ConnectionString={connection string to your database}
 HangfireSettings__Storage__ConnectionString={connection string to your database}
+```
+
+**For Azure AD authentication:**
+
+```env
 SecuritySettings__AzureAd__ClientSecret={client secret to your API app reg}
 SecuritySettings__AzureAd__ClientId={client ID to your API app reg}
 SecuritySettings__AzureAd__Domain={your domain}
 SecuritySettings__AzureAd__RootIssuer={your root issuer/sts url for AAD}
 SecuritySettings__AzureAd__TenantId={your tenant ID}
+```
+
+**For local (Moda) authentication:**
+
+```env
+SecuritySettings__LocalJwt__Secret={strong random secret, at least 32 chars}
+```
+
+Optional local JWT settings (with defaults):
+
+```env
+SecuritySettings__LocalJwt__Issuer=Moda
+SecuritySettings__LocalJwt__Audience=ModaApi
+SecuritySettings__LocalJwt__TokenExpirationInMinutes=60
+SecuritySettings__LocalJwt__RefreshTokenExpirationInDays=7
 ```
 
 Additionally, by default Moda logs to the console via Serilog. If you wish to configure any of the other supported sinks (currently Seq, Datadog and Application Insights), provide the appropriate Serilog**Using**x and Serilog**WriteTo**x settings as env vars for your moda-api container. An example with DataDog (taken from some TF for the `azurerm_container_app` resource type):
