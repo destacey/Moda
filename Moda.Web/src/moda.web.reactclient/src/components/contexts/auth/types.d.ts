@@ -11,13 +11,17 @@ export interface User {
   claims: Claim[]
 }
 
+export type AuthMethod = 'msal' | 'local' | null
+
 export interface AuthContextType {
   user: User | null
   isLoading: boolean
+  authMethod: AuthMethod
   hasClaim: (claimType: string, claimValue: string) => boolean
   hasPermissionClaim: (claimValue: string) => boolean
   acquireToken: () => Promise<string>
   refreshUser: () => Promise<void>
   login: () => Promise<void>
+  localLogin: (username: string, password: string) => Promise<void>
   logout: () => Promise<void>
 }

@@ -1,7 +1,7 @@
 'use client'
 
 import '@/styles/globals.css'
-import React, { memo, PropsWithChildren, useMemo } from 'react'
+import React, { memo, PropsWithChildren, useEffect, useMemo, useState } from 'react'
 import { Provider } from 'react-redux'
 import { Inter } from 'next/font/google'
 import { App, Grid, Layout } from 'antd'
@@ -27,6 +27,7 @@ import logoutStyles from './logout/page.module.css'
 // Note: LogoutPage is only used in UnauthenticatedView (after MSAL determines auth state)
 // SsrFallback and MsalInitializingView use inline markup to avoid hydration mismatch
 import { usePathname } from 'next/navigation'
+import { isLocalAuthActive } from '../services/clients'
 
 const { Content } = Layout
 
@@ -41,6 +42,11 @@ const UnauthenticatedView = () => {
   // Show logout page if on logout route
   if (pathname === '/logout') {
     return <LogoutPage />
+  }
+
+  // If locally authenticated, don't show login page — AuthProvider handles it
+  if (isLocalAuthActive()) {
+    return null
   }
 
   return <LoginPage />
@@ -190,6 +196,57 @@ const SsrFallback = () => {
   )
 }
 
+/**
+ * Auth gate that renders the full app for locally-authenticated users
+ * or falls through to MSAL Authenticated/Unauthenticated templates.
+ */
+const LocalOrMsalAuthGate = ({ children }: PropsWithChildren) => {
+  // Defer local auth check to after hydration to avoid SSR mismatch.
+  // During SSR and initial client render, localAuth is false so the tree
+  // matches SsrFallback. After mount, we check localStorage for local tokens.
+  const [localAuth, setLocalAuth] = useState(false)
+  useEffect(() => {
+    setLocalAuth(isLocalAuthActive())
+  }, [])
+
+  if (localAuth) {
+    return (
+      <AuthProvider>
+        <ThemeProvider>
+          <MenuToggleProvider>
+            <App>
+              <MessageProvider>
+                <AppContent>{children}</AppContent>
+              </MessageProvider>
+            </App>
+          </MenuToggleProvider>
+        </ThemeProvider>
+      </AuthProvider>
+    )
+  }
+
+  return (
+    <>
+      <AuthenticatedTemplate>
+        <AuthProvider>
+          <ThemeProvider>
+            <MenuToggleProvider>
+              <App>
+                <MessageProvider>
+                  <AppContent>{children}</AppContent>
+                </MessageProvider>
+              </App>
+            </MenuToggleProvider>
+          </ThemeProvider>
+        </AuthProvider>
+      </AuthenticatedTemplate>
+      <UnauthenticatedTemplate>
+        <UnauthenticatedView />
+      </UnauthenticatedTemplate>
+    </>
+  )
+}
+
 const RootLayout = ({ children }: React.PropsWithChildren) => {
   // Guard against SSR where msalInstance is null - show appropriate page based on route
   if (!msalInstance) {
@@ -220,22 +277,9 @@ const RootLayout = ({ children }: React.PropsWithChildren) => {
         <AntdRegistry>
           <Provider store={store}>
             <MsalProvider instance={msalInstance}>
-              <AuthenticatedTemplate>
-                <AuthProvider>
-                  <ThemeProvider>
-                    <MenuToggleProvider>
-                      <App>
-                        <MessageProvider>
-                          <AppContent>{children}</AppContent>
-                        </MessageProvider>
-                      </App>
-                    </MenuToggleProvider>
-                  </ThemeProvider>
-                </AuthProvider>
-              </AuthenticatedTemplate>
-              <UnauthenticatedTemplate>
-                <UnauthenticatedView />
-              </UnauthenticatedTemplate>
+              <LocalOrMsalAuthGate>
+                {children}
+              </LocalOrMsalAuthGate>
               <MsalInitializingView />
             </MsalProvider>
           </Provider>

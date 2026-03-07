@@ -1,2 +1,4 @@
+export { default as CreateUserForm } from './create-user-form'
+export { default as EditUserForm } from './edit-user-form'
 export { default as ManageUserRolesForm } from './manage-user-roles-form'
 export { default as UserDetails } from './user-details'

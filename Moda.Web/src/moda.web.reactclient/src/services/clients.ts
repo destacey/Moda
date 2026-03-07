@@ -1,5 +1,6 @@
 import axios from 'axios'
 import {
+  AuthClient,
   BackgroundJobsClient,
   EmployeesClient,
   HealthChecksClient,
@@ -31,12 +32,43 @@ import {
   PokerSessionsClient,
   ConnectionsClient,
   AzureDevOpsConnectionsClient,
+  PersonalAccessTokensClient,
 } from './moda-api'
 import { tokenRequest } from '@/auth-config'
 import { InteractionRequiredAuthError } from '@azure/msal-browser'
 import { msalInstance } from '../components/contexts/auth'
 
 const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL
+
+// Local auth storage keys
+export const LOCAL_AUTH_TOKEN_KEY = 'moda.local.token'
+export const LOCAL_AUTH_REFRESH_TOKEN_KEY = 'moda.local.refreshToken'
+export const LOCAL_AUTH_TOKEN_EXPIRY_KEY = 'moda.local.tokenExpiry'
+
+export function getLocalAuthToken(): string | null {
+  if (typeof window === 'undefined') return null
+  return localStorage.getItem(LOCAL_AUTH_TOKEN_KEY)
+}
+
+export function isLocalAuthActive(): boolean {
+  return !!getLocalAuthToken()
+}
+
+export function clearLocalAuth(): void {
+  localStorage.removeItem(LOCAL_AUTH_TOKEN_KEY)
+  localStorage.removeItem(LOCAL_AUTH_REFRESH_TOKEN_KEY)
+  localStorage.removeItem(LOCAL_AUTH_TOKEN_EXPIRY_KEY)
+}
+
+// Unauthenticated axios client for login/refresh (no token interceptors)
+const unauthAxiosClient = axios.create({
+  baseURL: apiUrl,
+  timeout: 30000,
+  transformResponse: (data) => data,
+})
+
+// Auth client uses unauthenticated axios (login endpoints are [AllowAnonymous])
+export const getAuthClient = () => new AuthClient('', unauthAxiosClient)
 
 const axiosClient = axios.create({
   baseURL: apiUrl,
@@ -46,10 +78,6 @@ const axiosClient = axios.create({
 })
 
 // Response interceptor with automatic 401 token refresh and retry.
-// When a request returns 401, we attempt one silent token refresh with
-// forceRefresh and retry the request. This handles the common multi-tab
-// scenario where the cached token expired between the request interceptor's
-// acquireTokenSilent call and the server validating the token.
 axiosClient.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -58,25 +86,49 @@ axiosClient.interceptors.response.use(
     if (
       error.response?.status === 401 &&
       originalRequest &&
-      !(originalRequest as any)._retry &&
-      msalInstance
+      !(originalRequest as any)._retry
     ) {
       ;(originalRequest as any)._retry = true
 
-      try {
-        const accounts = msalInstance.getAllAccounts()
-        if (accounts.length > 0) {
-          const response = await msalInstance.acquireTokenSilent({
-            ...tokenRequest,
-            account: accounts[0],
-            forceRefresh: true,
+      // Try local JWT refresh first
+      const localRefreshToken = localStorage.getItem(LOCAL_AUTH_REFRESH_TOKEN_KEY)
+      const localToken = getLocalAuthToken()
+      if (localToken && localRefreshToken) {
+        try {
+          const authClient = getAuthClient()
+          const tokenResponse = await authClient.refreshToken({
+            token: localToken,
+            refreshToken: localRefreshToken,
           })
+          localStorage.setItem(LOCAL_AUTH_TOKEN_KEY, tokenResponse.token)
+          localStorage.setItem(LOCAL_AUTH_REFRESH_TOKEN_KEY, tokenResponse.refreshToken)
+          localStorage.setItem(LOCAL_AUTH_TOKEN_EXPIRY_KEY, new Date(tokenResponse.tokenExpiresAt).toISOString())
           originalRequest.headers = originalRequest.headers || {}
-          originalRequest.headers.Authorization = `Bearer ${response.accessToken}`
+          originalRequest.headers.Authorization = `Bearer ${tokenResponse.token}`
           return axiosClient(originalRequest)
+        } catch (refreshError) {
+          console.error('Local token refresh on 401 failed:', refreshError)
+          clearLocalAuth()
         }
-      } catch (refreshError) {
-        console.error('Token refresh on 401 failed:', refreshError)
+      }
+
+      // Fall back to MSAL refresh
+      if (msalInstance) {
+        try {
+          const accounts = msalInstance.getAllAccounts()
+          if (accounts.length > 0) {
+            const response = await msalInstance.acquireTokenSilent({
+              ...tokenRequest,
+              account: accounts[0],
+              forceRefresh: true,
+            })
+            originalRequest.headers = originalRequest.headers || {}
+            originalRequest.headers.Authorization = `Bearer ${response.accessToken}`
+            return axiosClient(originalRequest)
+          }
+        } catch (refreshError) {
+          console.error('MSAL token refresh on 401 failed:', refreshError)
+        }
       }
     }
 
@@ -85,13 +137,20 @@ axiosClient.interceptors.response.use(
   },
 )
 
-// Use the shared MSAL instance to acquire tokens for outgoing requests.
+// Request interceptor: attach auth token (local JWT or MSAL) to outgoing requests.
 axiosClient.interceptors.request.use(
   async (config) => {
+    // Check for local JWT first
+    const localToken = getLocalAuthToken()
+    if (localToken) {
+      config.headers.Authorization = `Bearer ${localToken}`
+      return config
+    }
+
+    // Fall back to MSAL token acquisition
     let token: string | null = null
     try {
-      // MSAL v5 requires account parameter for silent token acquisition
-      const accounts = msalInstance.getAllAccounts()
+      const accounts = msalInstance?.getAllAccounts() ?? []
 
       if (accounts.length > 0) {
         const response = await msalInstance.acquireTokenSilent({
@@ -116,8 +175,6 @@ axiosClient.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
-    // If no token, let request proceed - API will return 401 which is handled gracefully
-    // This handles edge cases like MSAL transitional states (block_iframe_reload, timed_out)
     return config
   },
   (error) => Promise.reject(error),
@@ -186,6 +243,8 @@ export const getPermissionsClient = () => new PermissionsClient('', axiosClient)
 export const getProfileClient = () => new ProfileClient('', axiosClient)
 export const getRolesClient = () => new RolesClient('', axiosClient)
 export const getUsersClient = () => new UsersClient('', axiosClient)
+export const getPersonalAccessTokensClient = () =>
+  new PersonalAccessTokensClient('', axiosClient)
 
 /**
  * Performs an authenticated fetch request with automatic token acquisition.
@@ -206,28 +265,30 @@ export async function authenticatedFetch(
   url: string,
   options: RequestInit = {},
 ): Promise<Response> {
-  // Acquire auth token
-  let token: string | null = null
-  try {
-    // MSAL v5 requires account parameter for silent token acquisition
-    const accounts = msalInstance.getAllAccounts()
-    if (accounts.length > 0) {
-      const response = await msalInstance.acquireTokenSilent({
-        ...tokenRequest,
-        account: accounts[0],
-      })
-      token = response.accessToken
-    }
-  } catch (error: any) {
-    if (error instanceof InteractionRequiredAuthError) {
-      try {
-        const response = await msalInstance.acquireTokenPopup(tokenRequest)
+  // Acquire auth token — check local JWT first, then fall back to MSAL
+  let token: string | null = getLocalAuthToken()
+
+  if (!token) {
+    try {
+      const accounts = msalInstance?.getAllAccounts() ?? []
+      if (accounts.length > 0) {
+        const response = await msalInstance.acquireTokenSilent({
+          ...tokenRequest,
+          account: accounts[0],
+        })
         token = response.accessToken
-      } catch (popupError) {
-        console.error('Token popup failed:', popupError)
       }
-    } else {
-      console.error('Token acquisition error:', error)
+    } catch (error: any) {
+      if (error instanceof InteractionRequiredAuthError) {
+        try {
+          const response = await msalInstance.acquireTokenPopup(tokenRequest)
+          token = response.accessToken
+        } catch (popupError) {
+          console.error('Token popup failed:', popupError)
+        }
+      } else {
+        console.error('Token acquisition error:', error)
+      }
     }
   }
 
@@ -236,8 +297,6 @@ export async function authenticatedFetch(
   if (token) {
     headers.set('Authorization', `Bearer ${token}`)
   }
-  // If no token, let request proceed - API will return 401 which caller should handle
-  // This handles edge cases like MSAL transitional states (block_iframe_reload, timed_out)
 
   // Add Accept header if not present
   if (!headers.has('Accept')) {

@@ -2,9 +2,10 @@
 
 import { useMsal, useIsAuthenticated } from '@azure/msal-react'
 import { InteractionStatus } from '@azure/msal-browser'
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import styles from './page.module.css'
+import { isLocalAuthActive, getAuthClient, LOCAL_AUTH_TOKEN_KEY, LOCAL_AUTH_REFRESH_TOKEN_KEY, LOCAL_AUTH_TOKEN_EXPIRY_KEY } from '@/src/services/clients'
 
 const pulseAnimation = `
 @keyframes pulse {
@@ -340,23 +341,145 @@ function LoadingSpinner() {
   )
 }
 
-export default function LoginPage() {
+function MicrosoftLoginTab() {
   const { instance, inProgress } = useMsal()
-  const isAuthenticated = useIsAuthenticated()
-  const router = useRouter()
 
   const isInitializing = inProgress === InteractionStatus.Startup
   const isLoggingIn = inProgress === InteractionStatus.HandleRedirect
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      router.replace('/')
-    }
-  }, [isAuthenticated, router])
-
   const handleLogin = useCallback(async () => {
     await instance.loginRedirect()
   }, [instance])
+
+  return (
+    <>
+      <p className={styles.subtitle}>
+        Sign in with your organizational account to access your delivery
+        platform.
+      </p>
+
+      <button
+        type="button"
+        onClick={handleLogin}
+        disabled={isInitializing || isLoggingIn}
+        className={styles.loginButton}
+      >
+        {isInitializing || isLoggingIn ? (
+          <>
+            <LoadingSpinner />
+            {isLoggingIn ? 'Signing in...' : 'Loading...'}
+          </>
+        ) : (
+          <>
+            <MicrosoftLogo />
+            Sign in with Microsoft
+          </>
+        )}
+      </button>
+    </>
+  )
+}
+
+function LocalLoginTab() {
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault()
+      setError('')
+      setIsSubmitting(true)
+
+      try {
+        const authClient = getAuthClient()
+        const tokenResponse = await authClient.login({
+          userName: username,
+          password,
+        })
+        localStorage.setItem(LOCAL_AUTH_TOKEN_KEY, tokenResponse.token)
+        localStorage.setItem(
+          LOCAL_AUTH_REFRESH_TOKEN_KEY,
+          tokenResponse.refreshToken,
+        )
+        localStorage.setItem(
+          LOCAL_AUTH_TOKEN_EXPIRY_KEY,
+          new Date(tokenResponse.tokenExpiresAt).toISOString(),
+        )
+        // Reload to trigger LocalOrMsalAuthGate to pick up the local token
+        window.location.href = '/'
+      } catch (err: any) {
+        const message =
+          err?.response?.data?.message ||
+          err?.message ||
+          'Invalid email or password.'
+        setError(message)
+        setIsSubmitting(false)
+      }
+    },
+    [username, password],
+  )
+
+  return (
+    <>
+      <p className={styles.subtitle}>
+        Sign in with your email and password.
+      </p>
+
+      <form onSubmit={handleSubmit} className={styles.localForm}>
+        <input
+          type="email"
+          placeholder="Email"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          className={styles.input}
+          autoComplete="email"
+          required
+          disabled={isSubmitting}
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className={styles.input}
+          autoComplete="current-password"
+          required
+          disabled={isSubmitting}
+        />
+
+        {error && <div className={styles.errorMessage}>{error}</div>}
+
+        <button
+          type="submit"
+          disabled={isSubmitting || !username || !password}
+          className={styles.loginButton}
+        >
+          {isSubmitting ? (
+            <>
+              <LoadingSpinner />
+              Signing in...
+            </>
+          ) : (
+            'Sign in'
+          )}
+        </button>
+      </form>
+    </>
+  )
+}
+
+export default function LoginPage() {
+  const isAuthenticated = useIsAuthenticated()
+  const router = useRouter()
+  const [activeTab, setActiveTab] = useState<'microsoft' | 'local'>('microsoft')
+
+  useEffect(() => {
+    if (isAuthenticated || isLocalAuthActive()) {
+      router.replace('/')
+    }
+  }, [isAuthenticated, router])
 
   if (isAuthenticated) {
     return null
@@ -364,12 +487,10 @@ export default function LoginPage() {
 
   return (
     <div className={styles.pageBackground}>
-      {/* Background decoration circles */}
       <div className={`${styles.bgCircle} ${styles.bgCircle1}`} />
       <div className={`${styles.bgCircle} ${styles.bgCircle2}`} />
       <div className={`${styles.bgCircle} ${styles.bgCircle3}`} />
 
-      {/* Main card */}
       <div className={styles.card}>
         {/* Left Panel */}
         <div className={styles.leftPanel}>
@@ -385,7 +506,6 @@ export default function LoginPage() {
             </p>
           </div>
 
-          {/* Bottom decorative dots */}
           <div className={styles.decorativeDots}>
             {[0, 1, 2, 3, 4].map((i) => (
               <div
@@ -411,41 +531,31 @@ export default function LoginPage() {
               <span className={styles.logoText}>moda</span>
             </div>
 
-            {/* Header */}
             <h1 className={styles.title}>Welcome</h1>
-            <p className={styles.subtitle}>
-              Sign in with your organizational account to access your delivery
-              platform.
-            </p>
 
-            {/* Microsoft Sign In Button */}
-            <button
-              type="button"
-              onClick={handleLogin}
-              disabled={isInitializing || isLoggingIn}
-              className={styles.loginButton}
-            >
-              {isInitializing || isLoggingIn ? (
-                <>
-                  <LoadingSpinner />
-                  {isLoggingIn ? 'Signing in...' : 'Loading...'}
-                </>
-              ) : (
-                <>
-                  <MicrosoftLogo />
-                  Sign in with Microsoft
-                </>
-              )}
-            </button>
-
-            {/* Divider */}
-            <div className={styles.divider}>
-              <div className={styles.dividerLine} />
-              <span className={styles.dividerText}>
-                organizational accounts only
-              </span>
-              <div className={styles.dividerLine} />
+            {/* Auth method tabs */}
+            <div className={styles.tabs}>
+              <button
+                type="button"
+                className={`${styles.tab} ${activeTab === 'microsoft' ? styles.tabActive : ''}`}
+                onClick={() => setActiveTab('microsoft')}
+              >
+                Microsoft
+              </button>
+              <button
+                type="button"
+                className={`${styles.tab} ${activeTab === 'local' ? styles.tabActive : ''}`}
+                onClick={() => setActiveTab('local')}
+              >
+                Email &amp; Password
+              </button>
             </div>
+
+            {activeTab === 'microsoft' ? (
+              <MicrosoftLoginTab />
+            ) : (
+              <LocalLoginTab />
+            )}
           </div>
         </div>
       </div>
