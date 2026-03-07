@@ -42,7 +42,7 @@ describe('ServiceUnavailablePage', () => {
         render(<ServiceUnavailablePage />)
       })
 
-      expect(screen.getByText('Service Unavailable')).toBeInTheDocument()
+      expect(screen.getByText('Moda API Unavailable')).toBeInTheDocument()
     })
 
     it('shows server connectivity messaging', async () => {
