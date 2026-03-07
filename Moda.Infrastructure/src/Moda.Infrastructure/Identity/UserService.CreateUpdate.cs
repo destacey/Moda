@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Web;
 using Moda.Common.Application.Employees.Queries;
+using Moda.Common.Application.Identity;
 using Moda.Common.Extensions;
 using NotFoundException = Moda.Common.Application.Exceptions.NotFoundException;
 
@@ -114,7 +115,8 @@ internal partial class UserService
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
                 IsActive = true,
-                EmployeeId = employeeId
+                EmployeeId = employeeId,
+                LoginProvider = LoginProviders.MicrosoftEntraId,
             };
             result = await _userManager.CreateAsync(user);
 
@@ -130,6 +132,45 @@ internal partial class UserService
         return user;
     }
 
+    public async Task<Result<string>> CreateAsync(CreateUserCommand command, CancellationToken cancellationToken)
+    {
+        // Use email as the username for admin-created users
+        var user = new ApplicationUser
+        {
+            FirstName = command.FirstName,
+            LastName = command.LastName,
+            Email = command.Email,
+            NormalizedEmail = command.Email.ToUpperInvariant(),
+            UserName = command.Email,
+            NormalizedUserName = command.Email.ToUpperInvariant(),
+            EmailConfirmed = true,
+            PhoneNumberConfirmed = true,
+            IsActive = true,
+            LockoutEnabled = true,
+            EmployeeId = command.EmployeeId,
+            PhoneNumber = command.PhoneNumber,
+            LoginProvider = command.LoginProvider,
+            MustChangePassword = command.LoginProvider == LoginProviders.Moda,
+        };
+
+        IdentityResult result = command.LoginProvider == LoginProviders.Moda
+            ? await _userManager.CreateAsync(user, command.Password!)
+            : await _userManager.CreateAsync(user);
+
+        if (!result.Succeeded)
+        {
+            var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+            _logger.LogError("Error creating user: {Errors}", errors);
+            return Result.Failure<string>(errors);
+        }
+
+        await _userManager.AddToRoleAsync(user, ApplicationRoles.Basic);
+        await _events.PublishAsync(new ApplicationUserCreatedEvent(user.Id, _dateTimeProvider.Now));
+
+        _logger.LogInformation("User {UserId} created successfully.", user.Id);
+        return Result.Success(user.Id);
+    }
+
     public async Task UpdateAsync(UpdateUserCommand command, string userId)
     {
         var user = await _userManager.FindByIdAsync(userId);
@@ -142,6 +183,15 @@ internal partial class UserService
         user.FirstName = command.FirstName;
         user.LastName = command.LastName;
         user.PhoneNumber = command.PhoneNumber;
+        user.EmployeeId = command.EmployeeId;
+
+        if (!string.Equals(user.Email, command.Email, StringComparison.OrdinalIgnoreCase))
+        {
+            user.Email = command.Email;
+            user.NormalizedEmail = command.Email.ToUpperInvariant();
+            user.UserName = command.Email;
+            user.NormalizedUserName = command.Email.ToUpperInvariant();
+        }
 
         string? phoneNumber = await _userManager.GetPhoneNumberAsync(user);
         if (command.PhoneNumber != phoneNumber)
@@ -158,6 +208,96 @@ internal partial class UserService
             _logger.LogError("Error updating user: {Errors}", result.Errors.Select(e => e.Description));
             throw new InternalServerException("Update profile failed");
         }
+    }
+
+    public async Task<Result> ChangePasswordAsync(string userId, ChangePasswordCommand command)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user is null)
+        {
+            _logger.LogError("User with id {UserId} not found.", userId);
+            throw new NotFoundException("User Not Found.");
+        }
+
+        if (user.LoginProvider != LoginProviders.Moda)
+        {
+            return Result.Failure("Password change is only available for local accounts.");
+        }
+
+        var result = await _userManager.ChangePasswordAsync(user, command.CurrentPassword, command.NewPassword);
+        if (!result.Succeeded)
+        {
+            var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+            _logger.LogWarning("Password change failed for user {UserId}: {Errors}", userId, errors);
+            return Result.Failure(errors);
+        }
+
+        if (user.MustChangePassword)
+        {
+            user.MustChangePassword = false;
+            await _userManager.UpdateAsync(user);
+        }
+
+        _logger.LogInformation("Password changed successfully for user {UserId}.", userId);
+        return Result.Success();
+    }
+
+    public async Task<Result> ResetPasswordAsync(ResetPasswordCommand command)
+    {
+        var user = await _userManager.FindByIdAsync(command.UserId);
+        if (user is null)
+        {
+            _logger.LogError("User with id {UserId} not found.", command.UserId);
+            throw new NotFoundException("User Not Found.");
+        }
+
+        if (user.LoginProvider != LoginProviders.Moda)
+        {
+            return Result.Failure("Password reset is only available for local accounts.");
+        }
+
+        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+        var result = await _userManager.ResetPasswordAsync(user, token, command.NewPassword);
+        if (!result.Succeeded)
+        {
+            var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+            _logger.LogWarning("Password reset failed for user {UserId}: {Errors}", command.UserId, errors);
+            return Result.Failure(errors);
+        }
+
+        user.MustChangePassword = true;
+        await _userManager.UpdateAsync(user);
+
+        if (await _userManager.IsLockedOutAsync(user))
+        {
+            await _userManager.SetLockoutEndDateAsync(user, null);
+            await _userManager.ResetAccessFailedCountAsync(user);
+            _logger.LogInformation("Lockout cleared for user {UserId} during password reset.", command.UserId);
+        }
+
+        _logger.LogInformation("Password reset successfully for user {UserId}.", command.UserId);
+        return Result.Success();
+    }
+
+    public async Task<Result> UnlockUserAsync(string userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user is null)
+        {
+            _logger.LogError("User with id {UserId} not found.", userId);
+            throw new NotFoundException("User Not Found.");
+        }
+
+        if (!await _userManager.IsLockedOutAsync(user))
+        {
+            return Result.Failure("User is not currently locked out.");
+        }
+
+        await _userManager.SetLockoutEndDateAsync(user, null);
+        await _userManager.ResetAccessFailedCountAsync(user);
+
+        _logger.LogInformation("User {UserId} unlocked by admin.", userId);
+        return Result.Success();
     }
 
     public async Task<Result> UpdateMissingEmployeeIds(CancellationToken cancellationToken)

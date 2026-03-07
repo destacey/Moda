@@ -64,6 +64,17 @@ jest.mock('@azure/msal-react', () => ({
 }))
 
 jest.mock('@azure/msal-browser', () => ({
+  PublicClientApplication: jest.fn().mockImplementation(() => ({
+    getActiveAccount: jest.fn(),
+    setActiveAccount: jest.fn(),
+    getAllAccounts: jest.fn().mockReturnValue([]),
+    acquireTokenSilent: jest.fn(),
+    acquireTokenPopup: jest.fn(),
+    loginRedirect: jest.fn(),
+    logoutRedirect: jest.fn(),
+    addEventCallback: jest.fn().mockReturnValue('callback-id'),
+    removeEventCallback: jest.fn(),
+  })),
   InteractionRequiredAuthError: class InteractionRequiredAuthError extends Error {
     constructor(message: string) {
       super(message)
@@ -76,6 +87,26 @@ jest.mock('@azure/msal-browser', () => ({
     LOGOUT_SUCCESS: 'msal:logoutSuccess',
     ACTIVE_ACCOUNT_CHANGED: 'msal:activeAccountChanged',
   },
+}))
+
+// Mock ChangePasswordForm (imported by auth-context for forced password change)
+jest.mock('../../../app/account/profile/change-password-form', () => ({
+  __esModule: true,
+  default: ({ onFormComplete, onFormCancel, required }: any) => (
+    <div data-testid="change-password-form" data-required={required}>
+      <button onClick={onFormComplete} data-testid="change-password-complete">Complete</button>
+      <button onClick={onFormCancel} data-testid="change-password-cancel">Cancel</button>
+    </div>
+  ),
+}))
+
+// Mock useTheme (imported by auth-context for themed background)
+jest.mock('./../../contexts/theme/use-theme', () => ({
+  __esModule: true,
+  default: () => ({
+    token: { colorBgContainer: '#ffffff' },
+    currentThemeName: 'light',
+  }),
 }))
 
 // Import after mocks

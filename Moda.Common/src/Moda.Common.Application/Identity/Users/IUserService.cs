@@ -34,11 +34,21 @@ public interface IUserService : ITransientService
 
     Task<bool> HasPermissionAsync(string userId, string permission, CancellationToken cancellationToken = default);
 
-    Task ToggleStatusAsync(ToggleUserStatusCommand command, CancellationToken cancellationToken);
+    Task<Result> ActivateUserAsync(ActivateUserCommand command, CancellationToken cancellationToken);
+
+    Task<Result> DeactivateUserAsync(DeactivateUserCommand command, CancellationToken cancellationToken);
 
     Task<(string Id, string? EmployeeId)> GetOrCreateFromPrincipalAsync(ClaimsPrincipal principal);
 
     Task UpdateAsync(UpdateUserCommand command, string userId);
+
+    Task<Result<string>> CreateAsync(CreateUserCommand command, CancellationToken cancellationToken);
+
+    Task<Result> ChangePasswordAsync(string userId, ChangePasswordCommand command);
+
+    Task<Result> ResetPasswordAsync(ResetPasswordCommand command);
+
+    Task<Result> UnlockUserAsync(string userId);
 
     Task<Result> UpdateMissingEmployeeIds(CancellationToken cancellationToken);
 

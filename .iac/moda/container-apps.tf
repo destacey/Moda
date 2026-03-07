@@ -132,6 +132,11 @@ resource "azurerm_container_app" "moda_backend" {
     value = azurerm_signalr_service.moda_signalr.primary_connection_string
   }
 
+  secret {
+    name  = "local-jwt-secret"
+    value = var.local_jwt_secret
+  }
+
   identity {
     type = "SystemAssigned"
   }
@@ -243,6 +248,31 @@ resource "azurerm_container_app" "moda_backend" {
       env {
         name  = "SecuritySettings__Swagger__TokenUrl"
         value = "https://login.microsoftonline.com/f399216f-be6b-4062-8700-54952e44e7ef/oauth2/v2.0/token"
+      }
+
+      env {
+        name        = "SecuritySettings__LocalJwt__Secret"
+        secret_name = "local-jwt-secret"
+      }
+
+      env {
+        name  = "SecuritySettings__LocalJwt__Issuer"
+        value = "Moda"
+      }
+
+      env {
+        name  = "SecuritySettings__LocalJwt__Audience"
+        value = "ModaApi"
+      }
+
+      env {
+        name  = "SecuritySettings__LocalJwt__TokenExpirationInMinutes"
+        value = tostring(var.local_jwt_token_expiration_minutes)
+      }
+
+      env {
+        name  = "SecuritySettings__LocalJwt__RefreshTokenExpirationInDays"
+        value = tostring(var.local_jwt_refresh_token_expiration_days)
       }
 
       env {

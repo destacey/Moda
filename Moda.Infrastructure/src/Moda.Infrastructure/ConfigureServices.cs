@@ -51,7 +51,7 @@ public static class ConfigureServices
         return builder;
     }
 
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration config)
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration config, IHostEnvironment environment)
     {
         var assembly = Assembly.GetExecutingAssembly();
         TypeAdapterConfig.GlobalSettings.Scan(assembly);
@@ -76,7 +76,7 @@ public static class ConfigureServices
 
         return services
             .AddApiVersioning()
-            .AddAuth(config)
+            .AddAuth(config, environment)
             .AddBackgroundJobs(config)
             .AddCorsPolicy(config)
             .AddUserActivityTracking()

@@ -1,0 +1,40 @@
+.container {
+  height: 100vh;
+  overflow: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--ant-color-bg-layout);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.container :global(.ant-result-body) {
+  background-color: var(--ant-color-bg-container);
+}
+
+.decorativeDots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ant-color-text-quaternary);
+}
+
+.dotActive {
+  background: var(--ant-color-primary);
+}
+
+.dotClicked {
+  background: var(--ant-color-success);
+}

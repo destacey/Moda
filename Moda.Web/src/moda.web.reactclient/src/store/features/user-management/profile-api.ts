@@ -1,7 +1,8 @@
 import { getProfileClient } from '@/src/services/clients'
 import { apiSlice } from '../apiSlice'
-import { UserDetailsDto, UserPermissionsResponse } from '@/src/services/moda-api'
+import { ChangePasswordRequest, UserDetailsDto, UserPermissionsResponse } from '@/src/services/moda-api'
 import { QueryTags } from '../query-tags'
+
 
 export const profileApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -40,10 +41,22 @@ export const profileApi = apiSlice.injectEndpoints({
       // Cache current user permissions for 1 minute since they don't change often
       keepUnusedDataFor: 60,
     }),
+    changePassword: builder.mutation<void, ChangePasswordRequest>({
+      queryFn: async (args) => {
+        try {
+          await getProfileClient().changePassword(args)
+          return { data: null }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+    }),
   }),
 })
 
 export const {
   useGetProfileQuery,
   useGetUserPermissionsQuery,
+  useChangePasswordMutation,
 } = profileApi

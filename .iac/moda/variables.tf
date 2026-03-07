@@ -39,6 +39,25 @@ variable "aad_tenant_id" {
   sensitive   = true
 }
 
+variable "local_jwt_secret" {
+  type        = string
+  description = "The secret key for signing local JWT tokens. Must be at least 32 characters."
+  default     = ""
+  sensitive   = true
+}
+
+variable "local_jwt_token_expiration_minutes" {
+  type        = number
+  description = "The expiration time in minutes for local JWT tokens."
+  default     = 60
+}
+
+variable "local_jwt_refresh_token_expiration_days" {
+  type        = number
+  description = "The expiration time in days for local JWT refresh tokens."
+  default     = 7
+}
+
 variable "docker_tag" {
   type        = string
   description = "The tag for the Docker image."

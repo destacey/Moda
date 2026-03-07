@@ -13,7 +13,7 @@ public class ApplicationRole : IdentityRole
 
     public string? Description { get; set; }
 
-    public ICollection<IdentityUserRole<string>> UserRoles { get; set; } = [];
+    public ICollection<ApplicationUserRole> UserRoles { get; set; } = [];
 
     public void Update(string name, string? description = null)
     {

@@ -1,10 +1,11 @@
 'use client'
 
 import React, { useCallback, useEffect, useState } from 'react'
-import { Card } from 'antd'
+import { Button, Card } from 'antd'
 import { usePathname } from 'next/navigation'
 import PageTitle from '../../../components/common/page-title'
 import ProfileForm from './profile-form'
+import ChangePasswordForm from './change-password-form'
 import ClaimsGrid from './claims-grid'
 import PersonalAccessTokens from './personal-access-tokens'
 import useAuth from '../../../components/contexts/auth'
@@ -21,10 +22,7 @@ enum AccountTabs {
 }
 
 const tabs = [
-  {
-    key: AccountTabs.Profile,
-    tab: 'Profile',
-  },
+  { key: AccountTabs.Profile, tab: 'Profile' },
   { key: AccountTabs.PersonalAccessTokens, tab: 'PATs' },
   { key: AccountTabs.Claims, tab: 'Claims' },
 ]
@@ -32,9 +30,10 @@ const tabs = [
 const AccountProfilePage = () => {
   useDocumentTitle('Account Profile')
   const [activeTab, setActiveTab] = useState(AccountTabs.Profile)
+  const [openChangePasswordForm, setOpenChangePasswordForm] = useState(false)
 
   const messageApi = useMessage()
-  const { user, isLoading, refreshUser } = useAuth()
+  const { user, isLoading, authMethod } = useAuth()
 
   const dispatch = useAppDispatch()
   const pathname = usePathname()
@@ -44,6 +43,8 @@ const AccountProfilePage = () => {
     isLoading: profileLoading,
     error: profileError,
   } = useGetProfileQuery(null, { skip: !user })
+
+  const isLocalUser = authMethod === 'local'
 
   const renderTabContent = useCallback(() => {
     switch (activeTab) {
@@ -75,9 +76,15 @@ const AccountProfilePage = () => {
     }
   }, [profileError, messageApi])
 
+  const actions = isLocalUser ? (
+    <Button onClick={() => setOpenChangePasswordForm(true)}>
+      Change Password
+    </Button>
+  ) : undefined
+
   return (
     <>
-      <PageTitle title="Account" subtitle="Manage your account" />
+      <PageTitle title="Account" subtitle="Manage your account" actions={actions} />
       <Card
         style={{ width: '100%' }}
         tabList={tabs}
@@ -86,6 +93,12 @@ const AccountProfilePage = () => {
       >
         {renderTabContent()}
       </Card>
+      {openChangePasswordForm && (
+        <ChangePasswordForm
+          onFormComplete={() => setOpenChangePasswordForm(false)}
+          onFormCancel={() => setOpenChangePasswordForm(false)}
+        />
+      )}
     </>
   )
 }

@@ -1,14 +1,23 @@
 'use client'
 
+import { PageActions } from '@/src/components/common'
 import PageTitle from '@/src/components/common/page-title'
 import { authorizePage } from '@/src/components/hoc'
 import { notFound } from 'next/navigation'
 import UserDetailsLoading from './loading'
-import { use, useCallback, useEffect, useState } from 'react'
-import { Card } from 'antd'
+import { use, useCallback, useEffect, useMemo, useState } from 'react'
+import { Card, MenuProps } from 'antd'
 import BasicBreadcrumb from '@/src/components/common/basic-breadcrumb'
+import useAuth from '@/src/components/contexts/auth'
 import { useGetUserQuery } from '@/src/store/features/user-management/users-api'
-import { UserDetails } from '../_components'
+import {
+  EditUserForm,
+  ManageUserRolesForm,
+  ResetPasswordForm,
+  useUserAccountActions,
+  UserDetails,
+} from '../_components'
+import { ItemType } from 'antd/es/menu/interface'
 
 enum UserDetailsTabs {
   Details = 'details',
@@ -25,8 +34,63 @@ const UserDetailsPage = (props: { params: Promise<{ id: string }> }) => {
   const { id } = use(props.params)
 
   const [activeTab, setActiveTab] = useState(UserDetailsTabs.Details)
+  const [openEditUserForm, setOpenEditUserForm] = useState(false)
+  const [openManageUserRolesForm, setOpenManageUserRolesForm] = useState(false)
+  const [openResetPasswordForm, setOpenResetPasswordForm] = useState(false)
 
-  const { data: userData, isLoading, error, refetch } = useGetUserQuery(id)
+  const { hasPermissionClaim } = useAuth()
+  const canUpdateUser = hasPermissionClaim('Permissions.Users.Update')
+  const canUpdateUserRoles = hasPermissionClaim('Permissions.UserRoles.Update')
+
+  const { getAccountActionMenuItems } = useUserAccountActions()
+  const { data: userData, isLoading, error } = useGetUserQuery(id)
+
+  const isLocalUser = userData?.loginProvider === 'Moda'
+
+  const actionsMenuItems: MenuProps['items'] = useMemo(() => {
+    if (!userData) return []
+
+    const items: ItemType[] = []
+    if (canUpdateUser) {
+      items.push({
+        key: 'edit',
+        label: 'Edit',
+        onClick: () => setOpenEditUserForm(true),
+      })
+      items.push(
+        ...getAccountActionMenuItems({
+          id: userData.id,
+          userName: userData.userName,
+          firstName: userData.firstName,
+          lastName: userData.lastName,
+          isActive: userData.isActive,
+          isLockedOut:
+            !!userData.lockoutEnd &&
+            new Date(userData.lockoutEnd) > new Date(),
+        }),
+      )
+    }
+    const secondaryItems: ItemType[] = []
+    if (canUpdateUser && isLocalUser) {
+      secondaryItems.push({
+        key: 'reset-password',
+        label: 'Reset Password',
+        onClick: () => setOpenResetPasswordForm(true),
+      })
+    }
+    if (canUpdateUserRoles) {
+      secondaryItems.push({
+        key: 'manage-roles',
+        label: 'Manage Roles',
+        onClick: () => setOpenManageUserRolesForm(true),
+      })
+    }
+    if (secondaryItems.length > 0 && items.length > 0) {
+      items.push({ key: 'divider', type: 'divider' })
+    }
+    items.push(...secondaryItems)
+    return items
+  }, [canUpdateUser, canUpdateUserRoles, isLocalUser, userData, getAccountActionMenuItems])
 
   const renderTabContent = useCallback(() => {
     switch (activeTab) {
@@ -65,7 +129,11 @@ const UserDetailsPage = (props: { params: Promise<{ id: string }> }) => {
           { title: 'Details' },
         ]}
       />
-      <PageTitle title={fullName} subtitle="User Details" />
+      <PageTitle
+        title={fullName}
+        subtitle="User Details"
+        actions={<PageActions actionItems={actionsMenuItems} />}
+      />
       <Card
         style={{ width: '100%' }}
         tabList={tabs}
@@ -74,6 +142,28 @@ const UserDetailsPage = (props: { params: Promise<{ id: string }> }) => {
       >
         {renderTabContent()}
       </Card>
+      {openEditUserForm && (
+        <EditUserForm
+          user={userData}
+          onFormUpdate={() => setOpenEditUserForm(false)}
+          onFormCancel={() => setOpenEditUserForm(false)}
+        />
+      )}
+      {openManageUserRolesForm && (
+        <ManageUserRolesForm
+          userId={userData.id}
+          onFormComplete={() => setOpenManageUserRolesForm(false)}
+          onFormCancel={() => setOpenManageUserRolesForm(false)}
+        />
+      )}
+      {openResetPasswordForm && (
+        <ResetPasswordForm
+          userId={userData.id}
+          userName={fullName}
+          onFormComplete={() => setOpenResetPasswordForm(false)}
+          onFormCancel={() => setOpenResetPasswordForm(false)}
+        />
+      )}
     </>
   )
 }

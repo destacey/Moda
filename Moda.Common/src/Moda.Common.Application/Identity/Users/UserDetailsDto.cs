@@ -17,7 +17,11 @@ public sealed record UserDetailsDto
 
     public bool IsActive { get; set; } = true;
 
+    public Instant? LockoutEnd { get; set; }
+
     public string? PhoneNumber { get; set; }
+
+    public string LoginProvider { get; set; } = null!;
 
     public Instant? LastActivityAt { get; set; }
 
