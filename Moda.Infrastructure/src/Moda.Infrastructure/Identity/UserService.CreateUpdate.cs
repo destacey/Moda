@@ -149,6 +149,7 @@ internal partial class UserService
             EmployeeId = command.EmployeeId,
             PhoneNumber = command.PhoneNumber,
             LoginProvider = command.LoginProvider,
+            MustChangePassword = command.LoginProvider == LoginProviders.Moda,
         };
 
         IdentityResult result = command.LoginProvider == LoginProviders.Moda
@@ -206,6 +207,68 @@ internal partial class UserService
             _logger.LogError("Error updating user: {Errors}", result.Errors.Select(e => e.Description));
             throw new InternalServerException("Update profile failed");
         }
+    }
+
+    public async Task<Result> ChangePasswordAsync(string userId, ChangePasswordCommand command)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user is null)
+        {
+            _logger.LogError("User with id {UserId} not found.", userId);
+            throw new NotFoundException("User Not Found.");
+        }
+
+        if (user.LoginProvider != LoginProviders.Moda)
+        {
+            return Result.Failure("Password change is only available for local accounts.");
+        }
+
+        var result = await _userManager.ChangePasswordAsync(user, command.CurrentPassword, command.NewPassword);
+        if (!result.Succeeded)
+        {
+            var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+            _logger.LogWarning("Password change failed for user {UserId}: {Errors}", userId, errors);
+            return Result.Failure(errors);
+        }
+
+        if (user.MustChangePassword)
+        {
+            user.MustChangePassword = false;
+            await _userManager.UpdateAsync(user);
+        }
+
+        _logger.LogInformation("Password changed successfully for user {UserId}.", userId);
+        return Result.Success();
+    }
+
+    public async Task<Result> ResetPasswordAsync(ResetPasswordCommand command)
+    {
+        var user = await _userManager.FindByIdAsync(command.UserId);
+        if (user is null)
+        {
+            _logger.LogError("User with id {UserId} not found.", command.UserId);
+            throw new NotFoundException("User Not Found.");
+        }
+
+        if (user.LoginProvider != LoginProviders.Moda)
+        {
+            return Result.Failure("Password reset is only available for local accounts.");
+        }
+
+        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+        var result = await _userManager.ResetPasswordAsync(user, token, command.NewPassword);
+        if (!result.Succeeded)
+        {
+            var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+            _logger.LogWarning("Password reset failed for user {UserId}: {Errors}", command.UserId, errors);
+            return Result.Failure(errors);
+        }
+
+        user.MustChangePassword = true;
+        await _userManager.UpdateAsync(user);
+
+        _logger.LogInformation("Password reset successfully for user {UserId}.", command.UserId);
+        return Result.Success();
     }
 
     public async Task<Result> UpdateMissingEmployeeIds(CancellationToken cancellationToken)

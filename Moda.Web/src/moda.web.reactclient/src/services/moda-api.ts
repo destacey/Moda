@@ -827,6 +827,64 @@ export class ProfileClient {
     }
 
     /**
+     * Change password for the currently logged in local user.
+     */
+    changePassword(request: ChangePasswordRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/user-management/profiles/change-password";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "PUT",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processChangePassword(_response);
+        });
+    }
+
+    protected processChangePassword(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
      * Get permissions of currently logged in user.
      */
     getPermissions( cancelToken?: CancelToken): Promise<UserPermissionsResponse> {
@@ -1941,6 +1999,74 @@ export class UsersClient {
             let resultData422  = _responseText;
             result422 = JSON.parse(resultData422);
             return throwException("A server side error occurred.", status, _responseText, _headers, result422);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Reset a local user's password.
+     */
+    resetPassword(id: string, request: ResetPasswordRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/user-management/users/{id}/reset-password";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "PUT",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processResetPassword(_response);
+        });
+    }
+
+    protected processResetPassword(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
@@ -20688,6 +20814,7 @@ export interface TokenResponse {
     token: string;
     refreshToken: string;
     tokenExpiresAt: Date;
+    mustChangePassword: boolean;
 }
 
 export interface ProblemDetails {
@@ -20796,6 +20923,11 @@ export interface UpdateProfileRequest {
     phoneNumber?: string | undefined;
 }
 
+export interface ChangePasswordRequest {
+    currentPassword: string;
+    newPassword: string;
+}
+
 export interface UserPermissionsResponse {
     permissions: string[];
     employeeId?: string | undefined;
@@ -20866,6 +20998,10 @@ export interface ManageRoleUsersRequest {
     roleId: string;
     userIdsToAdd: string[];
     userIdsToRemove: string[];
+}
+
+export interface ResetPasswordRequest {
+    newPassword: string;
 }
 
 export interface ToggleUserStatusRequest {

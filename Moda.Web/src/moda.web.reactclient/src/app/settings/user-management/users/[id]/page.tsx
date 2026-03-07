@@ -10,7 +10,12 @@ import { Card, MenuProps } from 'antd'
 import BasicBreadcrumb from '@/src/components/common/basic-breadcrumb'
 import useAuth from '@/src/components/contexts/auth'
 import { useGetUserQuery } from '@/src/store/features/user-management/users-api'
-import { EditUserForm, ManageUserRolesForm, UserDetails } from '../_components'
+import {
+  EditUserForm,
+  ManageUserRolesForm,
+  ResetPasswordForm,
+  UserDetails,
+} from '../_components'
 import { ItemType } from 'antd/es/menu/interface'
 
 enum UserDetailsTabs {
@@ -30,12 +35,15 @@ const UserDetailsPage = (props: { params: Promise<{ id: string }> }) => {
   const [activeTab, setActiveTab] = useState(UserDetailsTabs.Details)
   const [openEditUserForm, setOpenEditUserForm] = useState(false)
   const [openManageUserRolesForm, setOpenManageUserRolesForm] = useState(false)
+  const [openResetPasswordForm, setOpenResetPasswordForm] = useState(false)
 
   const { hasPermissionClaim } = useAuth()
   const canUpdateUser = hasPermissionClaim('Permissions.Users.Update')
   const canUpdateUserRoles = hasPermissionClaim('Permissions.UserRoles.Update')
 
   const { data: userData, isLoading, error } = useGetUserQuery(id)
+
+  const isLocalUser = userData?.loginProvider === 'Moda'
 
   const actionsMenuItems: MenuProps['items'] = useMemo(() => {
     const items: ItemType[] = []
@@ -45,6 +53,13 @@ const UserDetailsPage = (props: { params: Promise<{ id: string }> }) => {
         label: 'Edit',
         onClick: () => setOpenEditUserForm(true),
       })
+      if (isLocalUser) {
+        items.push({
+          key: 'reset-password',
+          label: 'Reset Password',
+          onClick: () => setOpenResetPasswordForm(true),
+        })
+      }
     }
     if (canUpdateUserRoles) {
       if (items.length > 0) {
@@ -57,7 +72,7 @@ const UserDetailsPage = (props: { params: Promise<{ id: string }> }) => {
       })
     }
     return items
-  }, [canUpdateUser, canUpdateUserRoles])
+  }, [canUpdateUser, canUpdateUserRoles, isLocalUser])
 
   const renderTabContent = useCallback(() => {
     switch (activeTab) {
@@ -121,6 +136,14 @@ const UserDetailsPage = (props: { params: Promise<{ id: string }> }) => {
           userId={userData.id}
           onFormComplete={() => setOpenManageUserRolesForm(false)}
           onFormCancel={() => setOpenManageUserRolesForm(false)}
+        />
+      )}
+      {openResetPasswordForm && (
+        <ResetPasswordForm
+          userId={userData.id}
+          userName={fullName}
+          onFormComplete={() => setOpenResetPasswordForm(false)}
+          onFormCancel={() => setOpenResetPasswordForm(false)}
         />
       )}
     </>

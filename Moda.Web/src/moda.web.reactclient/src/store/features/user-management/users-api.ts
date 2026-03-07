@@ -130,7 +130,7 @@ export const usersApi = apiSlice.injectEndpoints({
             const error = await response.json()
             return { error }
           }
-          return { data: undefined }
+          return { data: null }
         } catch (error) {
           console.error('API Error:', error)
           return { error }
@@ -157,6 +157,37 @@ export const usersApi = apiSlice.injectEndpoints({
         { type: QueryTags.User, id: 'LIST' },
         { type: QueryTags.UserOption, id: 'LIST' },
       ],
+    }),
+
+    resetUserPassword: builder.mutation<
+      void,
+      { userId: string; newPassword: string }
+    >({
+      queryFn: async ({ userId, newPassword }) => {
+        try {
+          const response = await authenticatedFetch(
+            `/api/user-management/users/${userId}/reset-password`,
+            {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ newPassword }),
+            },
+          )
+          if (!response.ok) {
+            const errorData = await response.json()
+            return {
+              error: {
+                status: response.status,
+                data: errorData,
+              },
+            }
+          }
+          return { data: null }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
     }),
 
     getUserOptions: builder.query<BaseOptionType[], void>({
@@ -190,5 +221,6 @@ export const {
   useManageRoleUsersMutation,
   useUpdateUserMutation,
   useCreateUserMutation,
+  useResetUserPasswordMutation,
   useGetUserOptionsQuery,
 } = usersApi

@@ -42,6 +42,10 @@ public interface IUserService : ITransientService
 
     Task<Result<string>> CreateAsync(CreateUserCommand command, CancellationToken cancellationToken);
 
+    Task<Result> ChangePasswordAsync(string userId, ChangePasswordCommand command);
+
+    Task<Result> ResetPasswordAsync(ResetPasswordCommand command);
+
     Task<Result> UpdateMissingEmployeeIds(CancellationToken cancellationToken);
 
     Task<Result> SyncUsersFromEmployeeRecords(List<IExternalEmployee> externalEmployees, CancellationToken cancellationToken);

@@ -110,6 +110,20 @@ public class UsersController(IUserService userService) : ControllerBase
             : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
+    [HttpPut("{id}/reset-password")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Users)]
+    [OpenApiOperation("Reset a local user's password.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> ResetPassword(string id, ResetPasswordRequest request)
+    {
+        var result = await _userService.ResetPasswordAsync(new ResetPasswordCommand(id, request.NewPassword));
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
     [HttpPost("{id}/toggle-status")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Users)]
     [OpenApiOperation("Toggle a user's active status.", "")]

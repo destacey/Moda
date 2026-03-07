@@ -59,7 +59,7 @@ const ProfileMenu = () => {
         : []),
       {
         key: 'logout',
-        label: 'Logout',
+        label: 'Sign Out',
         icon: <LogoutOutlined />,
         onClick: handleLogout,
       },

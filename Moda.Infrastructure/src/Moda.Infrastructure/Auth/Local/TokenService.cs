@@ -90,7 +90,7 @@ internal class TokenService(
 
         var tokenExpiry = dateTimeProvider.Now.ToDateTimeUtc().AddMinutes(settings.TokenExpirationInMinutes);
 
-        return new TokenResponse(token, refreshToken, tokenExpiry);
+        return new TokenResponse(token, refreshToken, tokenExpiry, user.MustChangePassword);
     }
 
     private string GenerateJwt(ApplicationUser user, LocalJwtSettings settings)

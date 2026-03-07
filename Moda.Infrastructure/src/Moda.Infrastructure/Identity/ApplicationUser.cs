@@ -17,6 +17,8 @@ public class ApplicationUser : IdentityUser
 
     public string LoginProvider { get; set; } = null!;
 
+    public bool MustChangePassword { get; set; }
+
     public string? RefreshToken { get; set; }
     public DateTime? RefreshTokenExpiryTime { get; set; }
 

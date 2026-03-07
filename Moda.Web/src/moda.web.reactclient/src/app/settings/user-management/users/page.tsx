@@ -20,6 +20,7 @@ import {
   CreateUserForm,
   EditUserForm,
   ManageUserRolesForm,
+  ResetPasswordForm,
 } from './_components'
 import { ItemType } from 'antd/es/menu/interface'
 
@@ -40,6 +41,8 @@ const UsersListPage = () => {
   const [managingRolesUserId, setManagingRolesUserId] = useState<string | null>(
     null,
   )
+  const [resettingPasswordUser, setResettingPasswordUser] =
+    useState<UserDetailsDto | null>(null)
 
   const { hasClaim } = useAuth()
   const canCreateUser = hasClaim('Permission', 'Permissions.Users.Create')
@@ -68,6 +71,13 @@ const UsersListPage = () => {
               label: 'Edit',
               onClick: () => setEditingUser(params.data),
             })
+            if (params.data.loginProvider === 'Moda') {
+              menuItems.push({
+                key: 'reset-password',
+                label: 'Reset Password',
+                onClick: () => setResettingPasswordUser(params.data),
+              })
+            }
           }
           if (canUpdateUserRoles) {
             menuItems.push({
@@ -168,6 +178,14 @@ const UsersListPage = () => {
           userId={managingRolesUserId}
           onFormComplete={() => setManagingRolesUserId(null)}
           onFormCancel={() => setManagingRolesUserId(null)}
+        />
+      )}
+      {resettingPasswordUser && (
+        <ResetPasswordForm
+          userId={resettingPasswordUser.id}
+          userName={`${resettingPasswordUser.firstName} ${resettingPasswordUser.lastName}`}
+          onFormComplete={() => setResettingPasswordUser(null)}
+          onFormCancel={() => setResettingPasswordUser(null)}
         />
       )}
     </>

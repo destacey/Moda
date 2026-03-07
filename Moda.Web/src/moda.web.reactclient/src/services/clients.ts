@@ -44,6 +44,7 @@ const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL
 export const LOCAL_AUTH_TOKEN_KEY = 'moda.local.token'
 export const LOCAL_AUTH_REFRESH_TOKEN_KEY = 'moda.local.refreshToken'
 export const LOCAL_AUTH_TOKEN_EXPIRY_KEY = 'moda.local.tokenExpiry'
+export const LOCAL_AUTH_MUST_CHANGE_PASSWORD_KEY = 'moda.local.mustChangePassword'
 
 export function getLocalAuthToken(): string | null {
   if (typeof window === 'undefined') return null
@@ -58,6 +59,7 @@ export function clearLocalAuth(): void {
   localStorage.removeItem(LOCAL_AUTH_TOKEN_KEY)
   localStorage.removeItem(LOCAL_AUTH_REFRESH_TOKEN_KEY)
   localStorage.removeItem(LOCAL_AUTH_TOKEN_EXPIRY_KEY)
+  localStorage.removeItem(LOCAL_AUTH_MUST_CHANGE_PASSWORD_KEY)
 }
 
 // Unauthenticated axios client for login/refresh (no token interceptors)

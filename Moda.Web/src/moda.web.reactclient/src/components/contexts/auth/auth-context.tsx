@@ -21,6 +21,9 @@ import { tokenRequest } from '@/auth-config'
 import { useGetUserPermissionsQuery } from '@/src/store/features/user-management/profile-api'
 import UnauthorizedPage from '@/src/app/unauthorized/page'
 import ServiceUnavailablePage from '@/src/app/service-unavailable/page'
+import ChangePasswordForm from '@/src/app/account/profile/change-password-form'
+import useTheme from '@/src/components/contexts/theme/use-theme'
+import styles from './auth-provider.module.css'
 import {
   getAuthClient,
   isLocalAuthActive,
@@ -29,6 +32,7 @@ import {
   LOCAL_AUTH_TOKEN_KEY,
   LOCAL_AUTH_REFRESH_TOKEN_KEY,
   LOCAL_AUTH_TOKEN_EXPIRY_KEY,
+  LOCAL_AUTH_MUST_CHANGE_PASSWORD_KEY,
 } from '@/src/services/clients'
 
 export const AuthContext = createContext<AuthContextType | null>(null)
@@ -47,6 +51,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { instance, accounts, inProgress } = useMsal()
   const isAuthenticated = useIsAuthenticated()
   const pathname = usePathname()
+  const { token } = useTheme()
 
   // Bypass loading/error gates on logout route so logout always executes promptly
   const isLogoutRoute = pathname === '/logout'
@@ -64,6 +69,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const [authMethod, setAuthMethod] = useState<AuthMethod>(
     typeof window !== 'undefined' && isLocalAuthActive() ? 'local' : null,
+  )
+
+  const [mustChangePassword, setMustChangePassword] = useState(
+    typeof window !== 'undefined' &&
+      localStorage.getItem(LOCAL_AUTH_MUST_CHANGE_PASSWORD_KEY) === 'true',
   )
 
   const [user, setUser] = useState<User>({
@@ -478,6 +488,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       localStorage.setItem(LOCAL_AUTH_TOKEN_KEY, tokenResponse.token)
       localStorage.setItem(LOCAL_AUTH_REFRESH_TOKEN_KEY, tokenResponse.refreshToken)
       localStorage.setItem(LOCAL_AUTH_TOKEN_EXPIRY_KEY, new Date(tokenResponse.tokenExpiresAt).toISOString())
+      if (tokenResponse.mustChangePassword) {
+        localStorage.setItem(LOCAL_AUTH_MUST_CHANGE_PASSWORD_KEY, 'true')
+        setMustChangePassword(true)
+      }
       setAuthMethod('local')
       refetchPermissions()
     } catch (error) {
@@ -488,15 +502,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = useCallback(async () => {
     if (authMethod === 'local') {
+      // Clear tokens and redirect immediately without updating React state.
+      // Updating state before redirect causes a re-render that briefly shows
+      // the app behind the forced change password gate.
       clearLocalAuth()
-      setAuthMethod(null)
-      setUser({
-        name: '',
-        username: '',
-        isAuthenticated: false,
-        employeeId: null,
-        claims: [],
-      })
       window.location.href = '/login'
       return
     }
@@ -519,6 +528,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       user,
       isLoading,
       authMethod,
+      mustChangePassword,
       acquireToken,
       refreshUser,
       hasClaim: (type: string, value: string) =>
@@ -528,7 +538,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       localLogin,
       logout,
     }),
-    [user, isLoading, authMethod, acquireToken, refreshUser, permissionsSet, login, localLogin, logout],
+    [user, isLoading, authMethod, mustChangePassword, acquireToken, refreshUser, permissionsSet, login, localLogin, logout],
   )
 
   // Bypass all loading/error gates on logout route so logout executes promptly
@@ -546,6 +556,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (isServiceUnavailable) {
       return <ServiceUnavailablePage onRetry={handleRetry} onLogout={logout} />
     }
+  }
+
+  // Force password change for users who must change their password
+  if (mustChangePassword && authMethod === 'local' && user.isAuthenticated) {
+    return (
+      <AuthContext.Provider value={authContext}>
+        <div
+          className={styles.changePasswordBackground}
+          style={{ '--auth-bg-color': token.colorBgContainer } as React.CSSProperties}
+        >
+          <ChangePasswordForm
+            required
+            onFormComplete={() => {
+              // Password changed successfully — logout happens in the form
+            }}
+            onFormCancel={() => logout()}
+          />
+        </div>
+      </AuthContext.Provider>
+    )
   }
 
   return (

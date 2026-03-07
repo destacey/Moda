@@ -600,6 +600,50 @@
         ]
       }
     },
+    "/api/user-management/profiles/change-password": {
+      "put": {
+        "tags": [
+          "Profile"
+        ],
+        "summary": "Change password for the currently logged in local user.",
+        "operationId": "Profile_ChangePassword",
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
     "/api/user-management/profiles/permissions": {
       "get": {
         "tags": [
@@ -1508,6 +1552,71 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/user-management/users/{id}/reset-password": {
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Reset a local user's password.",
+        "operationId": "Users_ResetPassword",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -18198,7 +18307,8 @@
         "required": [
           "token",
           "refreshToken",
-          "tokenExpiresAt"
+          "tokenExpiresAt",
+          "mustChangePassword"
         ],
         "properties": {
           "token": {
@@ -18210,6 +18320,9 @@
           "tokenExpiresAt": {
             "type": "string",
             "format": "date-time"
+          },
+          "mustChangePassword": {
+            "type": "boolean"
           }
         }
       },
@@ -18612,6 +18725,22 @@
           }
         }
       },
+      "ChangePasswordRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "currentPassword",
+          "newPassword"
+        ],
+        "properties": {
+          "currentPassword": {
+            "type": "string"
+          },
+          "newPassword": {
+            "type": "string"
+          }
+        }
+      },
       "UserPermissionsResponse": {
         "type": "object",
         "additionalProperties": false,
@@ -18893,6 +19022,18 @@
             "items": {
               "type": "string"
             }
+          }
+        }
+      },
+      "ResetPasswordRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "newPassword"
+        ],
+        "properties": {
+          "newPassword": {
+            "type": "string"
           }
         }
       },

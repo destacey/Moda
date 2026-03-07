@@ -1,0 +1,4 @@
+.changePasswordBackground {
+  min-height: 100vh;
+  background-color: var(--auth-bg-color);
+}

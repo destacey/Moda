@@ -22,6 +22,14 @@ public partial class AbilityToCreateUsers : Migration
         // Ensure all existing rows have the correct value
         migrationBuilder.Sql("UPDATE [Identity].[Users] SET [LoginProvider] = 'MicrosoftEntraId' WHERE [LoginProvider] = '' OR [LoginProvider] IS NULL;");
 
+        migrationBuilder.AddColumn<bool>(
+            name: "MustChangePassword",
+            schema: "Identity",
+            table: "Users",
+            type: "bit",
+            nullable: false,
+            defaultValue: false);
+
         migrationBuilder.AddColumn<string>(
             name: "RefreshToken",
             schema: "Identity",
@@ -43,6 +51,11 @@ public partial class AbilityToCreateUsers : Migration
     {
         migrationBuilder.DropColumn(
             name: "LoginProvider",
+            schema: "Identity",
+            table: "Users");
+
+        migrationBuilder.DropColumn(
+            name: "MustChangePassword",
             schema: "Identity",
             table: "Users");
 

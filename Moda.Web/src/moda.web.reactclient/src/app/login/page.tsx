@@ -5,7 +5,7 @@ import { InteractionStatus } from '@azure/msal-browser'
 import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import styles from './page.module.css'
-import { isLocalAuthActive, getAuthClient, LOCAL_AUTH_TOKEN_KEY, LOCAL_AUTH_REFRESH_TOKEN_KEY, LOCAL_AUTH_TOKEN_EXPIRY_KEY } from '@/src/services/clients'
+import { isLocalAuthActive, getAuthClient, LOCAL_AUTH_TOKEN_KEY, LOCAL_AUTH_REFRESH_TOKEN_KEY, LOCAL_AUTH_TOKEN_EXPIRY_KEY, LOCAL_AUTH_MUST_CHANGE_PASSWORD_KEY } from '@/src/services/clients'
 
 const pulseAnimation = `
 @keyframes pulse {
@@ -407,6 +407,9 @@ function LocalLoginTab() {
           LOCAL_AUTH_TOKEN_EXPIRY_KEY,
           new Date(tokenResponse.tokenExpiresAt).toISOString(),
         )
+        if (tokenResponse.mustChangePassword) {
+          localStorage.setItem(LOCAL_AUTH_MUST_CHANGE_PASSWORD_KEY, 'true')
+        }
         // Reload to trigger LocalOrMsalAuthGate to pick up the local token
         window.location.href = '/'
       } catch (err: any) {

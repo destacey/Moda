@@ -1,7 +1,7 @@
 'use client'
 
 import '@/styles/globals.css'
-import React, { memo, PropsWithChildren, useEffect, useMemo, useState } from 'react'
+import React, { memo, PropsWithChildren, useMemo, useSyncExternalStore } from 'react'
 import { Provider } from 'react-redux'
 import { Inter } from 'next/font/google'
 import { App, Grid, Layout } from 'antd'
@@ -25,7 +25,6 @@ import LoginPage from './login/page'
 import LogoutPage from './logout/page'
 import logoutStyles from './logout/page.module.css'
 // Note: LogoutPage is only used in UnauthenticatedView (after MSAL determines auth state)
-// SsrFallback and MsalInitializingView use inline markup to avoid hydration mismatch
 import { usePathname } from 'next/navigation'
 import { isLocalAuthActive } from '../services/clients'
 
@@ -62,7 +61,18 @@ const MsalInitializingView = () => {
   const isLogoutRoute = pathname === '/logout'
 
   // Only show during MSAL startup - once ready, Auth/Unauth templates take over
-  if (inProgress === InteractionStatus.Startup) {
+  // Skip for local auth users (MSAL isn't relevant) and users with no cached accounts
+  let hasCachedAccounts = false
+  try {
+    hasCachedAccounts = (msalInstance?.getAllAccounts().length ?? 0) > 0
+  } catch {
+    // MSAL may not be fully initialized yet — treat as no cached accounts
+  }
+  if (
+    inProgress === InteractionStatus.Startup &&
+    !isLocalAuthActive() &&
+    hasCachedAccounts
+  ) {
     // Render same markup as SsrFallback to avoid hydration mismatch
     return (
       <div className={logoutStyles.pageBackground}>
@@ -145,100 +155,62 @@ const LoadingSpinner = () => (
 )
 
 /**
- * Component to handle SSR fallback when msalInstance is null
- * Shows loading state during initial hydration to avoid login page flash
- * IMPORTANT: This must render identical markup to MsalInitializingView to avoid hydration mismatch
+ * SSR fallback when msalInstance is null (server-side).
+ * Renders nothing — the client will immediately hydrate with the MsalProvider branch,
+ * which handles its own loading state via MsalInitializingView.
  */
-const SsrFallback = () => {
-  const pathname = usePathname()
-  const isLogoutRoute = pathname === '/logout'
+const SsrFallback = () => null
 
-  // Render identical markup to MsalInitializingView to avoid hydration mismatch
-  // Both components show the same loading state during SSR and client initialization
-  return (
-    <div className={logoutStyles.pageBackground}>
-      {/* Background decoration circles */}
-      <div className={`${logoutStyles.bgCircle} ${logoutStyles.bgCircle1}`} />
-      <div className={`${logoutStyles.bgCircle} ${logoutStyles.bgCircle2}`} />
-      <div className={`${logoutStyles.bgCircle} ${logoutStyles.bgCircle3}`} />
-
-      {/* Main card */}
-      <div className={logoutStyles.card}>
-        <div className={logoutStyles.content}>
-          {/* Logo */}
-          <div className={logoutStyles.logo}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/moda-icon.png"
-              alt="Moda"
-              className={logoutStyles.logoIcon}
-            />
-            <div className={logoutStyles.logoDivider} />
-            <span className={logoutStyles.logoText}>moda</span>
-          </div>
-
-          {/* Loading state */}
-          <div className={logoutStyles.spinnerWrapper}>
-            <LoadingSpinner />
-          </div>
-
-          <h1 className={logoutStyles.title}>
-            {isLogoutRoute ? 'Signing out...' : 'Loading...'}
-          </h1>
-          <p className={logoutStyles.subtitle}>
-            {isLogoutRoute
-              ? 'Please wait while we sign you out of your account.'
-              : 'Please wait while we initialize the application.'}
-          </p>
-        </div>
-      </div>
-    </div>
-  )
-}
+/**
+ * Shared UI provider stack (theme, menu, Ant Design App, messaging).
+ * Extracted to avoid duplicating across local auth and MSAL branches.
+ */
+const AppProviders = ({ children }: PropsWithChildren) => (
+  <ThemeProvider>
+    <MenuToggleProvider>
+      <App>
+        <MessageProvider>{children}</MessageProvider>
+      </App>
+    </MenuToggleProvider>
+  </ThemeProvider>
+)
 
 /**
  * Auth gate that renders the full app for locally-authenticated users
  * or falls through to MSAL Authenticated/Unauthenticated templates.
  */
+// useSyncExternalStore helpers for reading localStorage without SSR mismatch.
+// subscribe is a no-op because we only need the value once on mount — the
+// component tree fully remounts on login/logout via window.location.href.
+const subscribeNoop = () => () => {}
+const getLocalAuthSnapshot = () => isLocalAuthActive()
+const getLocalAuthServerSnapshot = () => false
+
 const LocalOrMsalAuthGate = ({ children }: PropsWithChildren) => {
-  // Defer local auth check to after hydration to avoid SSR mismatch.
-  // During SSR and initial client render, localAuth is false so the tree
-  // matches SsrFallback. After mount, we check localStorage for local tokens.
-  const [localAuth, setLocalAuth] = useState(false)
-  useEffect(() => {
-    setLocalAuth(isLocalAuthActive())
-  }, [])
+  const localAuth = useSyncExternalStore(
+    subscribeNoop,
+    getLocalAuthSnapshot,
+    getLocalAuthServerSnapshot,
+  )
 
   if (localAuth) {
     return (
-      <AuthProvider>
-        <ThemeProvider>
-          <MenuToggleProvider>
-            <App>
-              <MessageProvider>
-                <AppContent>{children}</AppContent>
-              </MessageProvider>
-            </App>
-          </MenuToggleProvider>
-        </ThemeProvider>
-      </AuthProvider>
+      <AppProviders>
+        <AuthProvider>
+          <AppContent>{children}</AppContent>
+        </AuthProvider>
+      </AppProviders>
     )
   }
 
   return (
     <>
       <AuthenticatedTemplate>
-        <AuthProvider>
-          <ThemeProvider>
-            <MenuToggleProvider>
-              <App>
-                <MessageProvider>
-                  <AppContent>{children}</AppContent>
-                </MessageProvider>
-              </App>
-            </MenuToggleProvider>
-          </ThemeProvider>
-        </AuthProvider>
+        <AppProviders>
+          <AuthProvider>
+            <AppContent>{children}</AppContent>
+          </AuthProvider>
+        </AppProviders>
       </AuthenticatedTemplate>
       <UnauthenticatedTemplate>
         <UnauthenticatedView />
