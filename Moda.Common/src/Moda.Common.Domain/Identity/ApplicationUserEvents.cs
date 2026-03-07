@@ -26,3 +26,19 @@ public record ApplicationUserUpdatedEvent : ApplicationUserEvent
         : base(userId, timestamp) =>
         RolesUpdated = rolesUpdated;
 }
+
+public record ApplicationUserActivatedEvent : ApplicationUserEvent
+{
+    public ApplicationUserActivatedEvent(string userId, Instant timestamp)
+        : base(userId, timestamp)
+    {
+    }
+}
+
+public record ApplicationUserDeactivatedEvent : ApplicationUserEvent
+{
+    public ApplicationUserDeactivatedEvent(string userId, Instant timestamp)
+        : base(userId, timestamp)
+    {
+    }
+}

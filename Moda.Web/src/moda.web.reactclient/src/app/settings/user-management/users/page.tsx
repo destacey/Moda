@@ -5,14 +5,10 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import ModaGrid from '@/src/components/common/moda-grid'
 import { authorizePage } from '@/src/components/hoc'
 import Link from 'next/link'
-import { Button, Modal, Tag, Tooltip } from 'antd'
+import { Button, Tag, Tooltip } from 'antd'
 import useAuth from '@/src/components/contexts/auth'
 import { useDocumentTitle } from '@/src/hooks'
-import { useMessage } from '@/src/components/contexts/messaging'
-import {
-  useGetUsersQuery,
-  useUnlockUserMutation,
-} from '@/src/store/features/user-management/users-api'
+import { useGetUsersQuery } from '@/src/store/features/user-management/users-api'
 import { RoleListDto, UserDetailsDto } from '@/src/services/moda-api'
 import { ColDef, ValueFormatterParams } from 'ag-grid-community'
 import dayjs from 'dayjs'
@@ -25,6 +21,7 @@ import {
   EditUserForm,
   ManageUserRolesForm,
   ResetPasswordForm,
+  useUserAccountActions,
 } from './_components'
 import { ItemType } from 'antd/es/menu/interface'
 
@@ -57,9 +54,8 @@ const UsersListPage = () => {
   )
   const showRowActions = canUpdateUser || canUpdateUserRoles
 
-  const messageApi = useMessage()
+  const { getAccountActionMenuItems } = useUserAccountActions()
   const { data: usersData, isLoading, error, refetch } = useGetUsersQuery()
-  const [unlockUser] = useUnlockUserMutation()
 
   const columnDefs = useMemo<ColDef<UserDetailsDto>[]>(
     () => [
@@ -77,52 +73,38 @@ const UsersListPage = () => {
               label: 'Edit',
               onClick: () => setEditingUser(params.data),
             })
-            if (params.data.loginProvider === 'Moda') {
-              menuItems.push({
-                key: 'reset-password',
-                label: 'Reset Password',
-                onClick: () => setResettingPasswordUser(params.data),
-              })
-            }
-            if (
-              params.data.lockoutEnd &&
-              new Date(params.data.lockoutEnd) > new Date()
-            ) {
-              menuItems.push({
-                key: 'unlock',
-                label: 'Unlock Account',
-                onClick: () => {
-                  const user = params.data
-                  Modal.confirm({
-                    title: 'Unlock Account',
-                    content: `Are you sure you want to unlock ${user.firstName} ${user.lastName}?`,
-                    okText: 'Unlock',
-                    onOk: async () => {
-                      try {
-                        const result = await unlockUser(user.id)
-                        if ('error' in result) {
-                          throw result.error
-                        }
-                        messageApi.success('Account unlocked successfully.')
-                      } catch (error: any) {
-                        messageApi.error(
-                          error?.data?.detail ??
-                            'Failed to unlock the account.',
-                        )
-                      }
-                    },
-                  })
-                },
-              })
-            }
+            menuItems.push(
+              ...getAccountActionMenuItems({
+                id: params.data.id,
+                userName: params.data.userName,
+                firstName: params.data.firstName,
+                lastName: params.data.lastName,
+                isActive: params.data.isActive,
+                isLockedOut:
+                  !!params.data.lockoutEnd &&
+                  new Date(params.data.lockoutEnd) > new Date(),
+              }),
+            )
+          }
+          const secondaryItems: ItemType[] = []
+          if (canUpdateUser && params.data.loginProvider === 'Moda') {
+            secondaryItems.push({
+              key: 'reset-password',
+              label: 'Reset Password',
+              onClick: () => setResettingPasswordUser(params.data),
+            })
           }
           if (canUpdateUserRoles) {
-            menuItems.push({
+            secondaryItems.push({
               key: 'manage-roles',
               label: 'Manage Roles',
               onClick: () => setManagingRolesUserId(params.data.id),
             })
           }
+          if (secondaryItems.length > 0 && menuItems.length > 0) {
+            menuItems.push({ key: 'divider', type: 'divider' })
+          }
+          menuItems.push(...secondaryItems)
           return <RowMenuCellRenderer {...params} menuItems={menuItems} />
         },
       },
@@ -170,9 +152,19 @@ const UsersListPage = () => {
         headerName: 'Last Activity',
         valueFormatter: dateTimeValueFormatter,
       },
-      { field: 'isActive' }, // TODO: convert to yes/no
+      {
+        field: 'isActive',
+        headerName: 'Active',
+        width: 100,
+        cellRenderer: (params: { value: boolean | undefined }) =>
+          params.value ? (
+            <Tag color="success">Active</Tag>
+          ) : (
+            <Tag color="error">Inactive</Tag>
+          ),
+      },
     ],
-    [canUpdateUser, canUpdateUserRoles, showRowActions, messageApi, unlockUser],
+    [canUpdateUser, canUpdateUserRoles, showRowActions, getAccountActionMenuItems],
   )
 
   useEffect(() => {

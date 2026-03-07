@@ -1685,13 +1685,13 @@
         ]
       }
     },
-    "/api/user-management/users/{id}/toggle-status": {
-      "post": {
+    "/api/user-management/users/{id}/activate": {
+      "put": {
         "tags": [
           "Users"
         ],
-        "summary": "Toggle a user's active status.",
-        "operationId": "Users_ToggleStatus",
+        "summary": "Activate a user account.",
+        "operationId": "Users_ActivateUser",
         "parameters": [
           {
             "name": "id",
@@ -1703,28 +1703,79 @@
             "x-position": 1
           }
         ],
-        "requestBody": {
-          "x-name": "request",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ToggleUserStatusRequest"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 2
-        },
         "responses": {
           "204": {
             "description": ""
           },
-          "422": {
+          "400": {
             "description": "",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/user-management/users/{id}/deactivate": {
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Deactivate a user account.",
+        "operationId": "Users_DeactivateUser",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -19092,22 +19143,6 @@
         "properties": {
           "newPassword": {
             "type": "string"
-          }
-        }
-      },
-      "ToggleUserStatusRequest": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "userId",
-          "activateUser"
-        ],
-        "properties": {
-          "userId": {
-            "type": "string"
-          },
-          "activateUser": {
-            "type": "boolean"
           }
         }
       },

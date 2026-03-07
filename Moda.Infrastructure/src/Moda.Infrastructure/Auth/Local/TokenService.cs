@@ -27,12 +27,6 @@ internal class TokenService(
             throw new UnauthorizedException("Invalid credentials.");
         }
 
-        if (!user.IsActive)
-        {
-            logger.LogWarning("Login failed: user {UserName} is inactive.", command.UserName);
-            throw new UnauthorizedException("User account is inactive.");
-        }
-
         if (user.LoginProvider != LoginProviders.Moda)
         {
             logger.LogWarning("Login failed: user {UserName} is not a Moda account (provider: {LoginProvider}).", command.UserName, user.LoginProvider);
@@ -50,6 +44,13 @@ internal class TokenService(
         {
             logger.LogWarning("Login failed: invalid password for user {UserName}.", command.UserName);
             throw new UnauthorizedException("Invalid credentials.");
+        }
+
+        // Check inactive status only after credentials are validated
+        if (!user.IsActive)
+        {
+            logger.LogWarning("Login failed: user {UserName} is inactive.", command.UserName);
+            throw new UnauthorizedException("Your account has been deactivated. Please contact an administrator.");
         }
 
         return await GenerateTokensAndUpdateUser(user);

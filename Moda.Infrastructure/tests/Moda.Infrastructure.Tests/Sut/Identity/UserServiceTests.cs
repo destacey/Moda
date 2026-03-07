@@ -26,6 +26,7 @@ public class UserServiceTests
     private readonly Mock<ILogger<UserService>> _mockLogger;
     private readonly TestingDateTimeProvider _dateTimeProvider;
     private readonly Mock<ISender> _mockSender;
+    private readonly Mock<ICurrentUser> _mockCurrentUser;
 
     // UserService depends on ModaDbContext and GraphServiceClient which are hard to mock.
     // We test the methods that primarily use UserManager.
@@ -50,12 +51,14 @@ public class UserServiceTests
         _mockLogger = new Mock<ILogger<UserService>>();
         _dateTimeProvider = new TestingDateTimeProvider(DateTime.UtcNow);
         _mockSender = new Mock<ISender>();
+        _mockCurrentUser = new Mock<ICurrentUser>();
+        _mockCurrentUser.Setup(x => x.GetUserId()).Returns("current-user-id");
     }
 
     private UserService CreateSut()
     {
         // ModaDbContext and GraphServiceClient are required but not used by the methods we test
-        // (CreateAsync, UpdateAsync, ToggleStatusAsync, AssignRolesAsync).
+        // (CreateAsync, UpdateAsync, ActivateUserAsync, DeactivateUserAsync, AssignRolesAsync).
         // We pass null! for them since those methods don't touch them.
         return new UserService(
             _mockLogger.Object,
@@ -66,7 +69,8 @@ public class UserServiceTests
             _mockEvents.Object,
             null!, // GraphServiceClient - not used by these methods
             _mockSender.Object,
-            _dateTimeProvider);
+            _dateTimeProvider,
+            _mockCurrentUser.Object);
     }
 
     private static ApplicationUser CreateUser(string id = "user-1", string userName = "testuser", bool isActive = true, string loginProvider = LoginProviders.MicrosoftEntraId)
@@ -309,58 +313,164 @@ public class UserServiceTests
 
     #endregion
 
-    #region ToggleStatusAsync
+    #region ActivateUserAsync
 
     [Fact]
-    public async Task ToggleStatusAsync_ShouldDeactivateUser_WhenUserIsNotAdmin()
+    public async Task ActivateUserAsync_ShouldActivateUser_WhenUserIsInactive()
     {
         // Arrange
         var user = CreateUser();
+        user.IsActive = false;
         _mockUserManager.Setup(x => x.Users).Returns(new[] { user }.AsQueryable().BuildMockDbSet().Object);
-        _mockUserManager.Setup(x => x.IsInRoleAsync(user, ApplicationRoles.Admin)).ReturnsAsync(false);
         _mockUserManager.Setup(x => x.UpdateAsync(user)).ReturnsAsync(IdentityResult.Success);
 
-        var command = new ToggleUserStatusCommand("user-1", false);
+        var command = new ActivateUserCommand("user-1");
         var sut = CreateSut();
 
         // Act
-        await sut.ToggleStatusAsync(command, CancellationToken.None);
+        var result = await sut.ActivateUserAsync(command, CancellationToken.None);
 
         // Assert
-        user.IsActive.Should().BeFalse();
+        result.IsSuccess.Should().BeTrue();
+        user.IsActive.Should().BeTrue();
         _mockUserManager.Verify(x => x.UpdateAsync(user), Times.Once);
-        _mockEvents.Verify(x => x.PublishAsync(It.IsAny<ApplicationUserUpdatedEvent>()), Times.Once);
+        _mockEvents.Verify(x => x.PublishAsync(It.IsAny<ApplicationUserActivatedEvent>()), Times.Once);
     }
 
     [Fact]
-    public async Task ToggleStatusAsync_ShouldThrowConflict_WhenUserIsAdmin()
+    public async Task ActivateUserAsync_ShouldFail_WhenUserIsAlreadyActive()
     {
         // Arrange
         var user = CreateUser();
+        user.IsActive = true;
         _mockUserManager.Setup(x => x.Users).Returns(new[] { user }.AsQueryable().BuildMockDbSet().Object);
-        _mockUserManager.Setup(x => x.IsInRoleAsync(user, ApplicationRoles.Admin)).ReturnsAsync(true);
 
-        var command = new ToggleUserStatusCommand("user-1", false);
+        var command = new ActivateUserCommand("user-1");
         var sut = CreateSut();
 
         // Act
-        var act = () => sut.ToggleStatusAsync(command, CancellationToken.None);
+        var result = await sut.ActivateUserAsync(command, CancellationToken.None);
 
         // Assert
-        await act.Should().ThrowAsync<ConflictException>();
+        result.IsFailure.Should().BeTrue();
+        _mockUserManager.Verify(x => x.UpdateAsync(It.IsAny<ApplicationUser>()), Times.Never);
     }
 
     [Fact]
-    public async Task ToggleStatusAsync_ShouldThrowNotFound_WhenUserDoesNotExist()
+    public async Task ActivateUserAsync_ShouldThrowNotFound_WhenUserDoesNotExist()
     {
         // Arrange
         _mockUserManager.Setup(x => x.Users).Returns(Array.Empty<ApplicationUser>().AsQueryable().BuildMockDbSet().Object);
 
-        var command = new ToggleUserStatusCommand("missing", false);
+        var command = new ActivateUserCommand("missing");
         var sut = CreateSut();
 
         // Act
-        var act = () => sut.ToggleStatusAsync(command, CancellationToken.None);
+        var act = () => sut.ActivateUserAsync(command, CancellationToken.None);
+
+        // Assert
+        await act.Should().ThrowAsync<NotFoundException>();
+    }
+
+    #endregion
+
+    #region DeactivateUserAsync
+
+    [Fact]
+    public async Task DeactivateUserAsync_ShouldDeactivateUser_WhenUserIsActive()
+    {
+        // Arrange
+        var user = CreateUser();
+        user.IsActive = true;
+        _mockUserManager.Setup(x => x.Users).Returns(new[] { user }.AsQueryable().BuildMockDbSet().Object);
+        _mockUserManager.Setup(x => x.UpdateAsync(user)).ReturnsAsync(IdentityResult.Success);
+
+        var command = new DeactivateUserCommand("user-1");
+        var sut = CreateSut();
+
+        // Act
+        var result = await sut.DeactivateUserAsync(command, CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        user.IsActive.Should().BeFalse();
+        _mockUserManager.Verify(x => x.UpdateAsync(user), Times.Once);
+        _mockEvents.Verify(x => x.PublishAsync(It.IsAny<ApplicationUserDeactivatedEvent>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task DeactivateUserAsync_ShouldSucceed_WhenDeactivatingAnotherAdmin()
+    {
+        // Arrange
+        var adminUser = CreateUser(id: "other-admin");
+        adminUser.IsActive = true;
+        _mockUserManager.Setup(x => x.Users).Returns(new[] { adminUser }.AsQueryable().BuildMockDbSet().Object);
+        _mockUserManager.Setup(x => x.UpdateAsync(adminUser)).ReturnsAsync(IdentityResult.Success);
+
+        var command = new DeactivateUserCommand("other-admin");
+        var sut = CreateSut();
+
+        // Act
+        var result = await sut.DeactivateUserAsync(command, CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        adminUser.IsActive.Should().BeFalse();
+        _mockUserManager.Verify(x => x.UpdateAsync(adminUser), Times.Once);
+        _mockEvents.Verify(x => x.PublishAsync(It.IsAny<ApplicationUserDeactivatedEvent>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task DeactivateUserAsync_ShouldFail_WhenUserIsAlreadyInactive()
+    {
+        // Arrange
+        var user = CreateUser();
+        user.IsActive = false;
+        _mockUserManager.Setup(x => x.Users).Returns(new[] { user }.AsQueryable().BuildMockDbSet().Object);
+
+        var command = new DeactivateUserCommand("user-1");
+        var sut = CreateSut();
+
+        // Act
+        var result = await sut.DeactivateUserAsync(command, CancellationToken.None);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        _mockUserManager.Verify(x => x.UpdateAsync(It.IsAny<ApplicationUser>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task DeactivateUserAsync_ShouldFail_WhenDeactivatingSelf()
+    {
+        // Arrange
+        var user = CreateUser(id: "current-user-id");
+        user.IsActive = true;
+        _mockUserManager.Setup(x => x.Users).Returns(new[] { user }.AsQueryable().BuildMockDbSet().Object);
+
+        var command = new DeactivateUserCommand("current-user-id");
+        var sut = CreateSut();
+
+        // Act
+        var result = await sut.DeactivateUserAsync(command, CancellationToken.None);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Contain("cannot deactivate your own account");
+        user.IsActive.Should().BeTrue();
+        _mockUserManager.Verify(x => x.UpdateAsync(It.IsAny<ApplicationUser>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task DeactivateUserAsync_ShouldThrowNotFound_WhenUserDoesNotExist()
+    {
+        // Arrange
+        _mockUserManager.Setup(x => x.Users).Returns(Array.Empty<ApplicationUser>().AsQueryable().BuildMockDbSet().Object);
+
+        var command = new DeactivateUserCommand("missing");
+        var sut = CreateSut();
+
+        // Act
+        var act = () => sut.DeactivateUserAsync(command, CancellationToken.None);
 
         // Assert
         await act.Should().ThrowAsync<NotFoundException>();

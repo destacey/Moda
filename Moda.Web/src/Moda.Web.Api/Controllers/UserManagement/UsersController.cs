@@ -138,17 +138,32 @@ public class UsersController(IUserService userService) : ControllerBase
             : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
-    [HttpPost("{id}/toggle-status")]
+    [HttpPut("{id}/activate")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Users)]
-    [OpenApiOperation("Toggle a user's active status.", "")]
-    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.Toggle))]
-    public async Task<ActionResult> ToggleStatus(string id, ToggleUserStatusRequest request, CancellationToken cancellationToken)
+    [OpenApiOperation("Activate a user account.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> ActivateUser(string id, CancellationToken cancellationToken)
     {
-        if (id != request.UserId)
-            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(nameof(id), nameof(request.UserId), HttpContext));
+        var result = await _userService.ActivateUserAsync(new ActivateUserCommand(id), cancellationToken);
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
 
-        await _userService.ToggleStatusAsync(request.ToToggleUserStatusCommand(), cancellationToken);
-        return NoContent();
+    [HttpPut("{id}/deactivate")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Users)]
+    [OpenApiOperation("Deactivate a user account.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> DeactivateUser(string id, CancellationToken cancellationToken)
+    {
+        var result = await _userService.DeactivateUserAsync(new DeactivateUserCommand(id), cancellationToken);
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     private string GetOriginFromRequest() => $"{Request.Scheme}://{Request.Host.Value}{Request.PathBase.Value}";

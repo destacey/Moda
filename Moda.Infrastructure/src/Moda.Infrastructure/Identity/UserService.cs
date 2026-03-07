@@ -1,4 +1,5 @@
-﻿using Mapster;
+﻿using CSharpFunctionalExtensions;
+using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -17,7 +18,8 @@ internal partial class UserService(
     IEventPublisher events,
     GraphServiceClient graphServiceClient,
     ISender sender,
-    IDateTimeProvider dateTimeProvider) : IUserService
+    IDateTimeProvider dateTimeProvider,
+    ICurrentUser currentUser) : IUserService
 {
     private readonly ILogger<UserService> _logger = logger;
     private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
@@ -27,6 +29,7 @@ internal partial class UserService(
     private readonly IEventPublisher _events = events;
     private readonly GraphServiceClient _graphServiceClient = graphServiceClient;
     private readonly ISender _sender = sender;
+    private readonly ICurrentUser _currentUser = currentUser;
     private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
 
     public async Task<IReadOnlyList<UserDetailsDto>> SearchAsync(UserListFilter filter, CancellationToken cancellationToken)
@@ -100,26 +103,40 @@ internal partial class UserService(
         return user.Email;
     }
 
-    public async Task ToggleStatusAsync(ToggleUserStatusCommand command, CancellationToken cancellationToken)
+    public async Task<Result> ActivateUserAsync(ActivateUserCommand command, CancellationToken cancellationToken)
     {
         var user = await _userManager.Users.Where(u => u.Id == command.UserId).FirstOrDefaultAsync(cancellationToken);
         if (user is null)
-        {
-            _logger.LogError("UserId {UserId} not found", command.UserId);
             throw new NotFoundException("User Not Found.");
-        }
 
-        bool isAdmin = await _userManager.IsInRoleAsync(user, ApplicationRoles.Admin);
-        if (isAdmin)
-        {
-            _logger.LogError("Administrators Profile's Status cannot be toggled");
-            throw new ConflictException("Administrators Profile's Status cannot be toggled");
-        }
+        if (user.IsActive)
+            return Result.Failure("User is already active.");
 
-        user.IsActive = command.ActivateUser;
-
+        user.IsActive = true;
         await _userManager.UpdateAsync(user);
+        await _events.PublishAsync(new ApplicationUserActivatedEvent(user.Id, _dateTimeProvider.Now));
 
-        await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id, _dateTimeProvider.Now));
+        _logger.LogInformation("User {UserId} activated.", command.UserId);
+        return Result.Success();
+    }
+
+    public async Task<Result> DeactivateUserAsync(DeactivateUserCommand command, CancellationToken cancellationToken)
+    {
+        var user = await _userManager.Users.Where(u => u.Id == command.UserId).FirstOrDefaultAsync(cancellationToken);
+        if (user is null)
+            throw new NotFoundException("User Not Found.");
+
+        if (!user.IsActive)
+            return Result.Failure("User is already inactive.");
+
+        if (command.UserId == _currentUser.GetUserId())
+            return Result.Failure("You cannot deactivate your own account.");
+
+        user.IsActive = false;
+        await _userManager.UpdateAsync(user);
+        await _events.PublishAsync(new ApplicationUserDeactivatedEvent(user.Id, _dateTimeProvider.Now));
+
+        _logger.LogInformation("User {UserId} deactivated.", command.UserId);
+        return Result.Success();
     }
 }

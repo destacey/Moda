@@ -6,18 +6,15 @@ import { authorizePage } from '@/src/components/hoc'
 import { notFound } from 'next/navigation'
 import UserDetailsLoading from './loading'
 import { use, useCallback, useEffect, useMemo, useState } from 'react'
-import { Card, MenuProps, Modal } from 'antd'
+import { Card, MenuProps } from 'antd'
 import BasicBreadcrumb from '@/src/components/common/basic-breadcrumb'
 import useAuth from '@/src/components/contexts/auth'
-import { useMessage } from '@/src/components/contexts/messaging'
-import {
-  useGetUserQuery,
-  useUnlockUserMutation,
-} from '@/src/store/features/user-management/users-api'
+import { useGetUserQuery } from '@/src/store/features/user-management/users-api'
 import {
   EditUserForm,
   ManageUserRolesForm,
   ResetPasswordForm,
+  useUserAccountActions,
   UserDetails,
 } from '../_components'
 import { ItemType } from 'antd/es/menu/interface'
@@ -45,15 +42,14 @@ const UserDetailsPage = (props: { params: Promise<{ id: string }> }) => {
   const canUpdateUser = hasPermissionClaim('Permissions.Users.Update')
   const canUpdateUserRoles = hasPermissionClaim('Permissions.UserRoles.Update')
 
-  const messageApi = useMessage()
+  const { getAccountActionMenuItems } = useUserAccountActions()
   const { data: userData, isLoading, error } = useGetUserQuery(id)
-  const [unlockUser] = useUnlockUserMutation()
 
   const isLocalUser = userData?.loginProvider === 'Moda'
-  const isLockedOut =
-    !!userData?.lockoutEnd && new Date(userData.lockoutEnd) > new Date()
 
   const actionsMenuItems: MenuProps['items'] = useMemo(() => {
+    if (!userData) return []
+
     const items: ItemType[] = []
     if (canUpdateUser) {
       items.push({
@@ -61,52 +57,40 @@ const UserDetailsPage = (props: { params: Promise<{ id: string }> }) => {
         label: 'Edit',
         onClick: () => setOpenEditUserForm(true),
       })
-      if (isLocalUser) {
-        items.push({
-          key: 'reset-password',
-          label: 'Reset Password',
-          onClick: () => setOpenResetPasswordForm(true),
-        })
-      }
-      if (isLockedOut) {
-        items.push({
-          key: 'unlock',
-          label: 'Unlock Account',
-          onClick: () => {
-            Modal.confirm({
-              title: 'Unlock Account',
-              content: `Are you sure you want to unlock ${userData?.firstName} ${userData?.lastName}?`,
-              okText: 'Unlock',
-              onOk: async () => {
-                try {
-                  const result = await unlockUser(id)
-                  if ('error' in result) {
-                    throw result.error
-                  }
-                  messageApi.success('Account unlocked successfully.')
-                } catch (error: any) {
-                  messageApi.error(
-                    error?.data?.detail ?? 'Failed to unlock the account.',
-                  )
-                }
-              },
-            })
-          },
-        })
-      }
+      items.push(
+        ...getAccountActionMenuItems({
+          id: userData.id,
+          userName: userData.userName,
+          firstName: userData.firstName,
+          lastName: userData.lastName,
+          isActive: userData.isActive,
+          isLockedOut:
+            !!userData.lockoutEnd &&
+            new Date(userData.lockoutEnd) > new Date(),
+        }),
+      )
+    }
+    const secondaryItems: ItemType[] = []
+    if (canUpdateUser && isLocalUser) {
+      secondaryItems.push({
+        key: 'reset-password',
+        label: 'Reset Password',
+        onClick: () => setOpenResetPasswordForm(true),
+      })
     }
     if (canUpdateUserRoles) {
-      if (items.length > 0) {
-        items.push({ key: 'divider', type: 'divider' })
-      }
-      items.push({
+      secondaryItems.push({
         key: 'manage-roles',
         label: 'Manage Roles',
         onClick: () => setOpenManageUserRolesForm(true),
       })
     }
+    if (secondaryItems.length > 0 && items.length > 0) {
+      items.push({ key: 'divider', type: 'divider' })
+    }
+    items.push(...secondaryItems)
     return items
-  }, [canUpdateUser, canUpdateUserRoles, isLocalUser, isLockedOut, id, userData, messageApi, unlockUser])
+  }, [canUpdateUser, canUpdateUserRoles, isLocalUser, userData, getAccountActionMenuItems])
 
   const renderTabContent = useCallback(() => {
     switch (activeTab) {

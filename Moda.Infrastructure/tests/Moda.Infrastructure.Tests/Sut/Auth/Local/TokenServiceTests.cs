@@ -150,6 +150,8 @@ public class TokenServiceTests
         // Arrange
         var user = CreateLocalUser(isActive: false);
         _mockUserManager.Setup(x => x.FindByNameAsync("testuser")).ReturnsAsync(user);
+        _mockSignInManager.Setup(x => x.CheckPasswordSignInAsync(user, "Password123!", true))
+            .ReturnsAsync(SignInResult.Success);
         var command = new LoginCommand("testuser", "Password123!");
 
         // Act
@@ -157,7 +159,7 @@ public class TokenServiceTests
 
         // Assert
         await act.Should().ThrowAsync<UnauthorizedException>()
-            .WithMessage("User account is inactive.");
+            .WithMessage("*deactivated*");
     }
 
     [Fact]

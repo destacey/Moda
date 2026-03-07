@@ -194,6 +194,64 @@ export const usersApi = apiSlice.injectEndpoints({
       ],
     }),
 
+    activateUser: builder.mutation<void, string>({
+      queryFn: async (userId) => {
+        try {
+          const response = await authenticatedFetch(
+            `/api/user-management/users/${userId}/activate`,
+            { method: 'PUT' },
+          )
+          if (!response.ok) {
+            const errorData = await response.json()
+            return {
+              error: {
+                status: response.status,
+                data: errorData,
+              },
+            }
+          }
+          return { data: null }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, arg) => [
+        { type: QueryTags.User, id: arg },
+        { type: QueryTags.User, id: 'LIST' },
+        { type: QueryTags.UserOption, id: 'LIST' },
+      ],
+    }),
+
+    deactivateUser: builder.mutation<void, string>({
+      queryFn: async (userId) => {
+        try {
+          const response = await authenticatedFetch(
+            `/api/user-management/users/${userId}/deactivate`,
+            { method: 'PUT' },
+          )
+          if (!response.ok) {
+            const errorData = await response.json()
+            return {
+              error: {
+                status: response.status,
+                data: errorData,
+              },
+            }
+          }
+          return { data: null }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, arg) => [
+        { type: QueryTags.User, id: arg },
+        { type: QueryTags.User, id: 'LIST' },
+        { type: QueryTags.UserOption, id: 'LIST' },
+      ],
+    }),
+
     unlockUser: builder.mutation<void, string>({
       queryFn: async (userId) => {
         try {
@@ -256,6 +314,8 @@ export const {
   useUpdateUserMutation,
   useCreateUserMutation,
   useResetUserPasswordMutation,
+  useActivateUserMutation,
+  useDeactivateUserMutation,
   useUnlockUserMutation,
   useGetUserOptionsQuery,
 } = usersApi
