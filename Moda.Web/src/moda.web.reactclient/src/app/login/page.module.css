@@ -321,6 +321,29 @@
   color: #b0b8c8;
 }
 
+/* Remember me */
+.rememberMeRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.rememberMeCheckbox {
+  accent-color: #1976d2;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  margin: 0;
+}
+
+.rememberMeLabel {
+  font-size: 13.5px;
+  color: #546e7a;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
 .errorMessage {
   color: #d32f2f;
   font-size: 13px;

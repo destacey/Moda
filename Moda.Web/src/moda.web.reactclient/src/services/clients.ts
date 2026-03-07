@@ -45,21 +45,48 @@ export const LOCAL_AUTH_TOKEN_KEY = 'moda.local.token'
 export const LOCAL_AUTH_REFRESH_TOKEN_KEY = 'moda.local.refreshToken'
 export const LOCAL_AUTH_TOKEN_EXPIRY_KEY = 'moda.local.tokenExpiry'
 export const LOCAL_AUTH_MUST_CHANGE_PASSWORD_KEY = 'moda.local.mustChangePassword'
+const LOCAL_AUTH_REMEMBER_KEY = 'moda.local.rememberMe'
+
+/**
+ * Returns the storage backend for local auth tokens.
+ * The routing flag in localStorage determines whether tokens live in
+ * localStorage (remember me) or sessionStorage (ephemeral session).
+ */
+export function getAuthStorage(): Storage {
+  if (typeof window === 'undefined') return localStorage
+  return localStorage.getItem(LOCAL_AUTH_REMEMBER_KEY) === 'false'
+    ? sessionStorage
+    : localStorage
+}
+
+/** Sets the remember-me routing flag (always in localStorage). */
+export function setRememberMe(remember: boolean): void {
+  localStorage.setItem(LOCAL_AUTH_REMEMBER_KEY, remember ? 'true' : 'false')
+}
 
 export function getLocalAuthToken(): string | null {
   if (typeof window === 'undefined') return null
-  return localStorage.getItem(LOCAL_AUTH_TOKEN_KEY)
+  return getAuthStorage().getItem(LOCAL_AUTH_TOKEN_KEY)
 }
 
 export function isLocalAuthActive(): boolean {
-  return !!getLocalAuthToken()
+  if (typeof window === 'undefined') return false
+  // Check both storages since we don't know which was used until we read the flag
+  return !!(
+    localStorage.getItem(LOCAL_AUTH_TOKEN_KEY) ||
+    sessionStorage.getItem(LOCAL_AUTH_TOKEN_KEY)
+  )
 }
 
 export function clearLocalAuth(): void {
-  localStorage.removeItem(LOCAL_AUTH_TOKEN_KEY)
-  localStorage.removeItem(LOCAL_AUTH_REFRESH_TOKEN_KEY)
-  localStorage.removeItem(LOCAL_AUTH_TOKEN_EXPIRY_KEY)
-  localStorage.removeItem(LOCAL_AUTH_MUST_CHANGE_PASSWORD_KEY)
+  // Clear from both storages to ensure clean state
+  for (const storage of [localStorage, sessionStorage]) {
+    storage.removeItem(LOCAL_AUTH_TOKEN_KEY)
+    storage.removeItem(LOCAL_AUTH_REFRESH_TOKEN_KEY)
+    storage.removeItem(LOCAL_AUTH_TOKEN_EXPIRY_KEY)
+    storage.removeItem(LOCAL_AUTH_MUST_CHANGE_PASSWORD_KEY)
+  }
+  localStorage.removeItem(LOCAL_AUTH_REMEMBER_KEY)
 }
 
 // Unauthenticated axios client for login/refresh (no token interceptors)
@@ -93,7 +120,8 @@ axiosClient.interceptors.response.use(
       ;(originalRequest as any)._retry = true
 
       // Try local JWT refresh first
-      const localRefreshToken = localStorage.getItem(LOCAL_AUTH_REFRESH_TOKEN_KEY)
+      const storage = getAuthStorage()
+      const localRefreshToken = storage.getItem(LOCAL_AUTH_REFRESH_TOKEN_KEY)
       const localToken = getLocalAuthToken()
       if (localToken && localRefreshToken) {
         try {
@@ -102,9 +130,9 @@ axiosClient.interceptors.response.use(
             token: localToken,
             refreshToken: localRefreshToken,
           })
-          localStorage.setItem(LOCAL_AUTH_TOKEN_KEY, tokenResponse.token)
-          localStorage.setItem(LOCAL_AUTH_REFRESH_TOKEN_KEY, tokenResponse.refreshToken)
-          localStorage.setItem(LOCAL_AUTH_TOKEN_EXPIRY_KEY, new Date(tokenResponse.tokenExpiresAt).toISOString())
+          storage.setItem(LOCAL_AUTH_TOKEN_KEY, tokenResponse.token)
+          storage.setItem(LOCAL_AUTH_REFRESH_TOKEN_KEY, tokenResponse.refreshToken)
+          storage.setItem(LOCAL_AUTH_TOKEN_EXPIRY_KEY, new Date(tokenResponse.tokenExpiresAt).toISOString())
           originalRequest.headers = originalRequest.headers || {}
           originalRequest.headers.Authorization = `Bearer ${tokenResponse.token}`
           return axiosClient(originalRequest)

@@ -5,7 +5,7 @@ import { InteractionStatus } from '@azure/msal-browser'
 import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import styles from './page.module.css'
-import { isLocalAuthActive, getAuthClient, LOCAL_AUTH_TOKEN_KEY, LOCAL_AUTH_REFRESH_TOKEN_KEY, LOCAL_AUTH_TOKEN_EXPIRY_KEY, LOCAL_AUTH_MUST_CHANGE_PASSWORD_KEY } from '@/src/services/clients'
+import { isLocalAuthActive, getAuthClient, getAuthStorage, setRememberMe as persistRememberMe, LOCAL_AUTH_TOKEN_KEY, LOCAL_AUTH_REFRESH_TOKEN_KEY, LOCAL_AUTH_TOKEN_EXPIRY_KEY, LOCAL_AUTH_MUST_CHANGE_PASSWORD_KEY } from '@/src/services/clients'
 
 const pulseAnimation = `
 @keyframes pulse {
@@ -383,6 +383,7 @@ function MicrosoftLoginTab() {
 function LocalLoginTab() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [rememberMe, setRememberMe] = useState(true)
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -398,17 +399,19 @@ function LocalLoginTab() {
           userName: username,
           password,
         })
-        localStorage.setItem(LOCAL_AUTH_TOKEN_KEY, tokenResponse.token)
-        localStorage.setItem(
+        persistRememberMe(rememberMe)
+        const storage = getAuthStorage()
+        storage.setItem(LOCAL_AUTH_TOKEN_KEY, tokenResponse.token)
+        storage.setItem(
           LOCAL_AUTH_REFRESH_TOKEN_KEY,
           tokenResponse.refreshToken,
         )
-        localStorage.setItem(
+        storage.setItem(
           LOCAL_AUTH_TOKEN_EXPIRY_KEY,
           new Date(tokenResponse.tokenExpiresAt).toISOString(),
         )
         if (tokenResponse.mustChangePassword) {
-          localStorage.setItem(LOCAL_AUTH_MUST_CHANGE_PASSWORD_KEY, 'true')
+          storage.setItem(LOCAL_AUTH_MUST_CHANGE_PASSWORD_KEY, 'true')
         }
         // Reload to trigger LocalOrMsalAuthGate to pick up the local token
         window.location.href = '/'
@@ -421,7 +424,7 @@ function LocalLoginTab() {
         setIsSubmitting(false)
       }
     },
-    [username, password],
+    [username, password, rememberMe],
   )
 
   return (
@@ -451,6 +454,17 @@ function LocalLoginTab() {
           required
           disabled={isSubmitting}
         />
+
+        <label className={styles.rememberMeRow}>
+          <input
+            type="checkbox"
+            checked={rememberMe}
+            onChange={(e) => setRememberMe(e.target.checked)}
+            className={styles.rememberMeCheckbox}
+            disabled={isSubmitting}
+          />
+          <span className={styles.rememberMeLabel}>Remember me</span>
+        </label>
 
         {error && <div className={styles.errorMessage}>{error}</div>}
 

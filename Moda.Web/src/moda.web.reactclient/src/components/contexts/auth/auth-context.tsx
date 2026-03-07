@@ -26,6 +26,7 @@ import useTheme from '@/src/components/contexts/theme/use-theme'
 import styles from './auth-provider.module.css'
 import {
   getAuthClient,
+  getAuthStorage,
   isLocalAuthActive,
   clearLocalAuth,
   getLocalAuthToken,
@@ -73,7 +74,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const [mustChangePassword, setMustChangePassword] = useState(
     typeof window !== 'undefined' &&
-      localStorage.getItem(LOCAL_AUTH_MUST_CHANGE_PASSWORD_KEY) === 'true',
+      getAuthStorage().getItem(LOCAL_AUTH_MUST_CHANGE_PASSWORD_KEY) === 'true',
   )
 
   const [user, setUser] = useState<User>({
@@ -485,11 +486,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const authClient = getAuthClient()
       const tokenResponse = await authClient.login({ userName: username, password })
-      localStorage.setItem(LOCAL_AUTH_TOKEN_KEY, tokenResponse.token)
-      localStorage.setItem(LOCAL_AUTH_REFRESH_TOKEN_KEY, tokenResponse.refreshToken)
-      localStorage.setItem(LOCAL_AUTH_TOKEN_EXPIRY_KEY, new Date(tokenResponse.tokenExpiresAt).toISOString())
+      const storage = getAuthStorage()
+      storage.setItem(LOCAL_AUTH_TOKEN_KEY, tokenResponse.token)
+      storage.setItem(LOCAL_AUTH_REFRESH_TOKEN_KEY, tokenResponse.refreshToken)
+      storage.setItem(LOCAL_AUTH_TOKEN_EXPIRY_KEY, new Date(tokenResponse.tokenExpiresAt).toISOString())
       if (tokenResponse.mustChangePassword) {
-        localStorage.setItem(LOCAL_AUTH_MUST_CHANGE_PASSWORD_KEY, 'true')
+        storage.setItem(LOCAL_AUTH_MUST_CHANGE_PASSWORD_KEY, 'true')
         setMustChangePassword(true)
       }
       setAuthMethod('local')
