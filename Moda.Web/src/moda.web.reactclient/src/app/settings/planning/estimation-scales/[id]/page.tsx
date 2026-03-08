@@ -3,7 +3,7 @@
 import { PageActions, PageTitle } from '@/src/components/common'
 import BasicBreadcrumb from '@/src/components/common/basic-breadcrumb'
 import useAuth from '@/src/components/contexts/auth'
-import { authorizePage } from '@/src/components/hoc'
+import { authorizePage, requireFeatureFlag } from '@/src/components/hoc'
 import { Card, MenuProps } from 'antd'
 import { use, useCallback, useEffect, useMemo, useState } from 'react'
 import EstimationScaleDetailsLoading from './loading'
@@ -212,10 +212,9 @@ const EstimationScaleDetailsPage = (props: {
   )
 }
 
-const EstimationScaleDetailsPageWithAuthorization = authorizePage(
-  EstimationScaleDetailsPage,
-  'Permission',
-  'Permissions.EstimationScales.View',
+const EstimationScaleDetailsPageWithAuthorization = requireFeatureFlag(
+  authorizePage(EstimationScaleDetailsPage, 'Permission', 'Permissions.EstimationScales.View'),
+  'planning-poker',
 )
 
 export default EstimationScaleDetailsPageWithAuthorization

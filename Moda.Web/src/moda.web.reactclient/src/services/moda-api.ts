@@ -68,6 +68,381 @@ export class Client {
     }
 }
 
+export class FeatureFlagsClient {
+    protected instance: AxiosInstance;
+    protected baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, instance?: AxiosInstance) {
+
+        this.instance = instance || axios.create();
+
+        this.baseUrl = baseUrl ?? "";
+
+    }
+
+    /**
+     * Get all enabled feature flags for the current user.
+     */
+    getEnabledFeatureFlags( cancelToken?: CancelToken): Promise<ClientFeatureFlagDto[]> {
+        let url_ = this.baseUrl + "/api/feature-flags";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetEnabledFeatureFlags(_response);
+        });
+    }
+
+    protected processGetEnabledFeatureFlags(response: AxiosResponse): Promise<ClientFeatureFlagDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<ClientFeatureFlagDto[]>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ClientFeatureFlagDto[]>(null as any);
+    }
+
+    /**
+     * Get a list of all feature flags.
+     * @param includeArchived (optional) 
+     */
+    featureFlags(includeArchived?: boolean | undefined, cancelToken?: CancelToken): Promise<FeatureFlagListDto[]> {
+        let url_ = this.baseUrl + "/api/admin/feature-flags?";
+        if (includeArchived === null)
+            throw new globalThis.Error("The parameter 'includeArchived' cannot be null.");
+        else if (includeArchived !== undefined)
+            url_ += "includeArchived=" + encodeURIComponent("" + includeArchived) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processFeatureFlags(_response);
+        });
+    }
+
+    protected processFeatureFlags(response: AxiosResponse): Promise<FeatureFlagListDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<FeatureFlagListDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<FeatureFlagListDto[]>(null as any);
+    }
+
+    /**
+     * Get feature flag details.
+     */
+    featureFlag(id: number, cancelToken?: CancelToken): Promise<FeatureFlagDto> {
+        let url_ = this.baseUrl + "/api/admin/feature-flags/{id}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processFeatureFlag(_response);
+        });
+    }
+
+    protected processFeatureFlag(response: AxiosResponse): Promise<FeatureFlagDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<FeatureFlagDto>(result200);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<FeatureFlagDto>(null as any);
+    }
+
+    /**
+     * Update a feature flag.
+     */
+    update(id: number, request: UpdateFeatureFlagRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/admin/feature-flags/{id}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "PUT",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processUpdate(_response);
+        });
+    }
+
+    protected processUpdate(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 422) {
+            const _responseText = response.data;
+            let result422: any = null;
+            let resultData422  = _responseText;
+            result422 = JSON.parse(resultData422);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Toggle a feature flag on or off.
+     */
+    toggle(id: number, request: ToggleFeatureFlagRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/admin/feature-flags/{id}/toggle";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "PUT",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processToggle(_response);
+        });
+    }
+
+    protected processToggle(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Archive a feature flag.
+     */
+    archive(id: number, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/admin/feature-flags/{id}/archive";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "PUT",
+            url: url_,
+            headers: {
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processArchive(_response);
+        });
+    }
+
+    protected processArchive(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+}
+
 export class AuthClient {
     protected instance: AxiosInstance;
     protected baseUrl: string;
@@ -20941,6 +21316,11 @@ export class BackgroundJobsClient {
     }
 }
 
+export interface ClientFeatureFlagDto {
+    name: string;
+    isEnabled: boolean;
+}
+
 export interface TokenResponse {
     token: string;
     refreshToken: string;
@@ -23629,6 +24009,38 @@ export interface CreateRecurringJobRequest {
     jobId: string;
     jobTypeId: number;
     cronExpression: string;
+}
+
+export interface FeatureFlagListDto {
+    id: number;
+    name: string;
+    displayName: string;
+    isEnabled: boolean;
+    isArchived: boolean;
+    isSystem: boolean;
+}
+
+export interface FeatureFlagDto {
+    id: number;
+    name: string;
+    displayName: string;
+    description?: string | undefined;
+    isEnabled: boolean;
+    isArchived: boolean;
+    isSystem: boolean;
+    created: Date;
+    lastModified: Date;
+}
+
+export interface UpdateFeatureFlagRequest {
+    id: number;
+    displayName: string;
+    description?: string | undefined;
+}
+
+export interface ToggleFeatureFlagRequest {
+    id: number;
+    isEnabled: boolean;
 }
 
 export class ApiException extends Error {

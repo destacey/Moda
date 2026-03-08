@@ -70,6 +70,8 @@ public static class ApplicationResource
     public const string Links = nameof(Links);
 
     public const string HealthChecks = nameof(HealthChecks);
+
+    public const string FeatureFlags = nameof(FeatureFlags);
 }
 
 public static class ApplicationPermissions
@@ -277,8 +279,18 @@ public static class ApplicationPermissions
         new("Delete WorkTypes", ApplicationAction.Delete, ApplicationResource.WorkTypes, WorkManagementCategory),
     ];
 
+    private const string FeatureManagementCategory = "Feature Management";
+    private static readonly ApplicationPermission[] _featureManagement =
+    [
+        new("View Feature Flags", ApplicationAction.View, ApplicationResource.FeatureFlags, FeatureManagementCategory),
+        new("Create Feature Flags", ApplicationAction.Create, ApplicationResource.FeatureFlags, FeatureManagementCategory),
+        new("Update Feature Flags", ApplicationAction.Update, ApplicationResource.FeatureFlags, FeatureManagementCategory),
+        new("Delete Feature Flags", ApplicationAction.Delete, ApplicationResource.FeatureFlags, FeatureManagementCategory),
+    ];
+
     private static readonly ApplicationPermission[] _all = [.. _common
         .Union(_backgroundJobs)
+        .Union(_featureManagement)
         .Union(_identity)
         .Union(_appIntegration)
         .Union(_healthChecks)

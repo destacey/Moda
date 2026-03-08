@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
+using Moda.Infrastructure.FeatureManagement;
 using Moda.Infrastructure.Logging;
 using Moda.Infrastructure.OpenTelemetry;
 using Moda.Infrastructure.SignalR;
@@ -92,6 +93,7 @@ public static class ConfigureServices
                 };
             })
             .AddExceptionMiddleware()
+            .AddModaFeatureManagement()
             .AddMediatR(options => options.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
             .AddOpenApiDocumentation(config)
             .AddPersistence(config)

@@ -3,7 +3,7 @@
 import { ModaGrid, PageTitle } from '@/src/components/common'
 import { RowMenuCellRenderer } from '@/src/components/common/moda-grid-cell-renderers'
 import useAuth from '@/src/components/contexts/auth'
-import { authorizePage } from '@/src/components/hoc'
+import { authorizePage, requireFeatureFlag } from '@/src/components/hoc'
 import { useDocumentTitle } from '@/src/hooks'
 import { EstimationScaleDto } from '@/src/services/moda-api'
 import {
@@ -256,10 +256,9 @@ const EstimationScalesPage = () => {
   )
 }
 
-const EstimationScalesPageWithAuthorization = authorizePage(
-  EstimationScalesPage,
-  'Permission',
-  'Permissions.EstimationScales.View',
+const EstimationScalesPageWithAuthorization = requireFeatureFlag(
+  authorizePage(EstimationScalesPage, 'Permission', 'Permissions.EstimationScales.View'),
+  'planning-poker',
 )
 
 export default EstimationScalesPageWithAuthorization

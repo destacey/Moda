@@ -2,6 +2,10 @@ export enum QueryTags {
   // ADMIN
   BackgroundJob = 'Admin.BackgroundJob',
   BackgroundJobType = 'Admin.BackgroundJobType',
+  FeatureFlag = 'Admin.FeatureFlag',
+
+  // CLIENT FEATURE FLAGS
+  ClientFeatureFlag = 'Client.FeatureFlag',
 
   // APP INTEGRATION
   Connection = 'AppIntegration.Connection',

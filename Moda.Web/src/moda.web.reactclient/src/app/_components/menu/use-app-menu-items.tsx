@@ -20,6 +20,7 @@ import {
 import { useMemo } from 'react'
 import { ItemType, MenuItemType } from 'antd/es/menu/interface'
 import useAuth from '../../../components/contexts/auth'
+import { useFeatureFlag } from '../../../hooks'
 
 const menuIcons = {
   home: <HomeOutlined />,
@@ -31,7 +32,9 @@ const menuIcons = {
   settings: <SettingOutlined />,
 }
 
-const menuItems: (Item | MenuItem)[] = [
+const buildMenuItems = (
+  featureFlags: { planningPoker: boolean },
+): (Item | MenuItem)[] => [
   menuItem('Home', 'home', '/', menuIcons.home),
   menuItem('Organizations', 'org', null, menuIcons.org, [
     menuItem('Teams', 'org.teams', '/organizations/teams'),
@@ -62,13 +65,17 @@ const menuItems: (Item | MenuItem)[] = [
       'plan.roadmaps',
       '/planning/roadmaps',
     ),
-    { key: 'settings-planning-divider', type: 'divider' },
-    restrictedPermissionMenuItem(
-      'Permissions.PokerSessions.View',
-      'Planning Poker',
-      'plan.poker-sessions',
-      '/planning/poker-sessions',
-    ),
+    ...(featureFlags.planningPoker
+      ? [
+          { key: 'settings-planning-divider', type: 'divider' as const },
+          restrictedPermissionMenuItem(
+            'Permissions.PokerSessions.View',
+            'Planning Poker',
+            'plan.poker-sessions',
+            '/planning/poker-sessions',
+          ),
+        ]
+      : []),
   ]),
   restrictedMenuSection('Work Management', 'work', null, menuIcons.work, [
     restrictedPermissionMenuItem(
@@ -141,14 +148,15 @@ const menuItems: (Item | MenuItem)[] = [
 
 const useAppMenuItems = () => {
   const { hasClaim } = useAuth()
+  const { isEnabled: planningPoker } = useFeatureFlag('planning-poker')
 
   const filteredMenuItems = useMemo(
     () =>
-      menuItems.reduce(
+      buildMenuItems({ planningPoker }).reduce(
         (acc, item) => filterAndTransformMenuItem(acc, item, hasClaim),
         [] as ItemType<MenuItemType>[],
       ),
-    [hasClaim],
+    [hasClaim, planningPoker],
   )
 
   return filteredMenuItems
