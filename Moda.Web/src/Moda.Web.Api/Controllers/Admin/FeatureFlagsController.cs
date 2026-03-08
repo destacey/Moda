@@ -1,4 +1,4 @@
-using Moda.Common.Application.FeatureManagement.Commands;
+﻿using Moda.Common.Application.FeatureManagement.Commands;
 using Moda.Common.Application.FeatureManagement.Dtos;
 using Moda.Common.Application.FeatureManagement.Queries;
 using Moda.Web.Api.Extensions;
@@ -18,7 +18,7 @@ public class FeatureFlagsController(ISender sender) : ControllerBase
     [OpenApiOperation("Get a list of all feature flags.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IEnumerable<FeatureFlagListDto>>> GetFeatureFlags(CancellationToken cancellationToken, [FromQuery] bool includeArchived = false)
+    public async Task<ActionResult<IEnumerable<FeatureFlagListDto>>> FeatureFlags(CancellationToken cancellationToken, [FromQuery] bool includeArchived = false)
     {
         var flags = await _sender.Send(new GetFeatureFlagsQuery(includeArchived), cancellationToken);
         return Ok(flags);
@@ -29,24 +29,12 @@ public class FeatureFlagsController(ISender sender) : ControllerBase
     [OpenApiOperation("Get feature flag details.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<FeatureFlagDto>> GetFeatureFlag(int id, CancellationToken cancellationToken)
+    public async Task<ActionResult<FeatureFlagDto>> FeatureFlag(int id, CancellationToken cancellationToken)
     {
         var flag = await _sender.Send(new GetFeatureFlagQuery(id), cancellationToken);
         return flag is not null
             ? Ok(flag)
             : NotFound();
-    }
-
-    [HttpPost]
-    [MustHavePermission(ApplicationAction.Create, ApplicationResource.FeatureFlags)]
-    [OpenApiOperation("Create a feature flag.", "")]
-    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201Int))]
-    public async Task<ActionResult<int>> Create([FromBody] CreateFeatureFlagRequest request, CancellationToken cancellationToken)
-    {
-        var result = await _sender.Send(request.ToCreateFeatureFlagCommand(), cancellationToken);
-        return result.IsSuccess
-            ? CreatedAtAction(nameof(GetFeatureFlag), new { id = result.Value }, result.Value)
-            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     [HttpPut("{id:int}")]

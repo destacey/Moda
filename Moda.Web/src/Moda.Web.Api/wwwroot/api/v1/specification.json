@@ -18440,7 +18440,7 @@
           "FeatureFlags"
         ],
         "summary": "Get a list of all feature flags.",
-        "operationId": "FeatureFlags_GetFeatureFlags",
+        "operationId": "FeatureFlags_FeatureFlags",
         "parameters": [
           {
             "name": "includeArchived",
@@ -18485,56 +18485,6 @@
             "ApiKey": []
           }
         ]
-      },
-      "post": {
-        "tags": [
-          "FeatureFlags"
-        ],
-        "summary": "Create a feature flag.",
-        "operationId": "FeatureFlags_Create",
-        "requestBody": {
-          "x-name": "request",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateFeatureFlagRequest"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 1
-        },
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int32"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": []
-          },
-          {
-            "ApiKey": []
-          }
-        ]
       }
     },
     "/api/admin/feature-flags/{id}": {
@@ -18543,7 +18493,7 @@
           "FeatureFlags"
         ],
         "summary": "Get feature flag details.",
-        "operationId": "FeatureFlags_GetFeatureFlag",
+        "operationId": "FeatureFlags_FeatureFlag",
         "parameters": [
           {
             "name": "id",
@@ -29792,38 +29742,6 @@
           "lastModified": {
             "type": "string",
             "format": "date-time"
-          }
-        }
-      },
-      "CreateFeatureFlagRequest": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "name",
-          "displayName",
-          "isEnabled"
-        ],
-        "properties": {
-          "name": {
-            "type": "string",
-            "maxLength": 128,
-            "minLength": 1,
-            "nullable": false
-          },
-          "displayName": {
-            "type": "string",
-            "maxLength": 128,
-            "minLength": 1,
-            "nullable": false
-          },
-          "description": {
-            "type": "string",
-            "maxLength": 1024,
-            "minLength": 0,
-            "nullable": true
-          },
-          "isEnabled": {
-            "type": "boolean"
           }
         }
       },

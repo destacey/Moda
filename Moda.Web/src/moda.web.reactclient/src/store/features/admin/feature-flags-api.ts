@@ -1,7 +1,6 @@
 import { apiSlice } from '../apiSlice'
 import { QueryTags } from '../query-tags'
 import {
-  CreateFeatureFlagRequest,
   FeatureFlagDto,
   FeatureFlagListDto,
   ToggleFeatureFlagRequest,
@@ -17,8 +16,8 @@ export const featureFlagsApi = apiSlice.injectEndpoints({
     >({
       queryFn: async (args) => {
         try {
-          const data = await getFeatureFlagsClient().getFeatureFlags(
-            args?.includeArchived,
+          const data = await getFeatureFlagsClient().featureFlags(
+            args ? args.includeArchived : undefined,
           )
           return { data }
         } catch (error) {
@@ -40,7 +39,7 @@ export const featureFlagsApi = apiSlice.injectEndpoints({
     getFeatureFlag: builder.query<FeatureFlagDto, number>({
       queryFn: async (id) => {
         try {
-          const data = await getFeatureFlagsClient().getFeatureFlag(id)
+          const data = await getFeatureFlagsClient().featureFlag(id)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -50,18 +49,6 @@ export const featureFlagsApi = apiSlice.injectEndpoints({
       providesTags: (_result, _error, id) => [
         { type: QueryTags.FeatureFlag, id },
       ],
-    }),
-    createFeatureFlag: builder.mutation<number, CreateFeatureFlagRequest>({
-      queryFn: async (request) => {
-        try {
-          const data = await getFeatureFlagsClient().create(request)
-          return { data }
-        } catch (error) {
-          console.error('API Error:', error)
-          return { error }
-        }
-      },
-      invalidatesTags: [QueryTags.FeatureFlag, QueryTags.ClientFeatureFlag],
     }),
     updateFeatureFlag: builder.mutation<void, UpdateFeatureFlagRequest>({
       queryFn: async (request) => {
@@ -112,7 +99,6 @@ export const featureFlagsApi = apiSlice.injectEndpoints({
 export const {
   useGetFeatureFlagsQuery,
   useGetFeatureFlagQuery,
-  useCreateFeatureFlagMutation,
   useUpdateFeatureFlagMutation,
   useToggleFeatureFlagMutation,
   useArchiveFeatureFlagMutation,

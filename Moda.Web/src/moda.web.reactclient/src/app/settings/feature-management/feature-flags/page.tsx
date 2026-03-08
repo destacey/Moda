@@ -5,40 +5,27 @@ import ModaGrid from '../../../../components/common/moda-grid'
 import { useCallback, useMemo, useState } from 'react'
 import { authorizePage } from '../../../../components/hoc'
 import useAuth from '../../../../components/contexts/auth'
-import { MenuProps } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import { useDocumentTitle } from '../../../../hooks'
-import { PageActions } from '../../../../components/common'
 import { ControlItemSwitch } from '../../../../components/common/control-items-menu'
 import { RowMenuCellRenderer } from '../../../../components/common/moda-grid-cell-renderers'
 import { FeatureFlagListDto } from '@/src/services/moda-api'
 import { useGetFeatureFlagsQuery } from '@/src/store/features/admin/feature-flags-api'
-import CreateFeatureFlagForm from './_components/create-feature-flag-form'
 import EditFeatureFlagForm from './_components/edit-feature-flag-form'
 import FeatureFlagDetailsDrawer from './_components/feature-flag-details-drawer'
 import useFeatureFlagActions from './_components/use-feature-flag-actions'
 import { ColDef } from 'ag-grid-community'
+import { CustomCellRendererProps } from 'ag-grid-react'
 const FeatureFlagsListPage = () => {
   useDocumentTitle('Feature Flags')
-  const [openCreateForm, setOpenCreateForm] = useState(false)
   const [editingFlagId, setEditingFlagId] = useState<number | null>(null)
   const [viewingFlagId, setViewingFlagId] = useState<number | null>(null)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [includeArchived, setIncludeArchived] = useState(false)
 
-  const { hasClaim } = useAuth()
-  const canCreate = hasClaim(
-    'Permission',
-    'Permissions.FeatureFlags.Create',
-  )
-  const canUpdate = hasClaim(
-    'Permission',
-    'Permissions.FeatureFlags.Update',
-  )
-  const canDelete = hasClaim(
-    'Permission',
-    'Permissions.FeatureFlags.Delete',
-  )
+  const { hasPermissionClaim } = useAuth()
+  const canUpdate = hasPermissionClaim('Permissions.FeatureFlags.Update')
+  const canDelete = hasPermissionClaim('Permissions.FeatureFlags.Delete')
   const showRowActions = canUpdate || canDelete
 
   const {
@@ -48,6 +35,10 @@ const FeatureFlagsListPage = () => {
   } = useGetFeatureFlagsQuery({ includeArchived })
 
   const { handleToggle, handleArchive } = useFeatureFlagActions()
+
+  const refresh = useCallback(() => {
+    refetch()
+  }, [refetch])
 
   const openDetailsDrawer = useCallback((id: number) => {
     setViewingFlagId(id)
@@ -68,7 +59,7 @@ const FeatureFlagsListPage = () => {
         resizable: false,
         hide: !showRowActions,
         suppressHeaderMenuButton: true,
-        cellRenderer: (params: { data: FeatureFlagListDto }) => {
+        cellRenderer: (params: CustomCellRendererProps<FeatureFlagListDto>) => {
           const flag = params.data
           if (!flag) return null
           const items: ItemType[] = []
@@ -86,11 +77,7 @@ const FeatureFlagsListPage = () => {
             })
           }
 
-          if (
-            canDelete &&
-            !flag.isSystem &&
-            !flag.isArchived
-          ) {
+          if (canDelete && !flag.isSystem && !flag.isArchived) {
             if (items.length > 0) {
               items.push({ key: 'divider', type: 'divider' })
             }
@@ -109,7 +96,9 @@ const FeatureFlagsListPage = () => {
         field: 'name',
         headerName: 'Name',
         width: 250,
-        cellRenderer: ({ data }: { data: FeatureFlagListDto }) =>
+        cellRenderer: ({
+          data,
+        }: CustomCellRendererProps<FeatureFlagListDto>) =>
           data ? (
             <a onClick={() => openDetailsDrawer(data.id)}>{data.name}</a>
           ) : null,
@@ -136,20 +125,16 @@ const FeatureFlagsListPage = () => {
         hide: !includeArchived,
       },
     ],
-    [canUpdate, canDelete, showRowActions, openDetailsDrawer, handleToggle, handleArchive, includeArchived],
+    [
+      canUpdate,
+      canDelete,
+      showRowActions,
+      openDetailsDrawer,
+      handleToggle,
+      handleArchive,
+      includeArchived,
+    ],
   )
-
-  const actionsMenuItems: MenuProps['items'] = useMemo(() => {
-    const items: ItemType[] = []
-    if (canCreate) {
-      items.push({
-        label: 'Create Feature Flag',
-        key: 'create-feature-flag',
-        onClick: () => setOpenCreateForm(true),
-      })
-    }
-    return items
-  }, [canCreate])
 
   const controlItems = useMemo<ItemType[]>(
     () => [
@@ -170,24 +155,15 @@ const FeatureFlagsListPage = () => {
 
   return (
     <>
-      <PageTitle
-        title="Feature Flags"
-        actions={<PageActions actionItems={actionsMenuItems} />}
-      />
+      <PageTitle title="Feature Flags" />
       <ModaGrid
         height={600}
         columnDefs={columnDefs}
         rowData={featureFlags}
-        loadData={refetch}
+        loadData={refresh}
         loading={isLoading}
         gridControlMenuItems={controlItems}
       />
-      {openCreateForm && (
-        <CreateFeatureFlagForm
-          onFormCreate={() => setOpenCreateForm(false)}
-          onFormCancel={() => setOpenCreateForm(false)}
-        />
-      )}
       {editingFlagId !== null && (
         <EditFeatureFlagForm
           featureFlagId={editingFlagId}

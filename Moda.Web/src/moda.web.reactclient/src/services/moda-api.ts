@@ -136,7 +136,7 @@ export class FeatureFlagsClient {
      * Get a list of all feature flags.
      * @param includeArchived (optional) 
      */
-    getFeatureFlags(includeArchived?: boolean | undefined, cancelToken?: CancelToken): Promise<FeatureFlagListDto[]> {
+    featureFlags(includeArchived?: boolean | undefined, cancelToken?: CancelToken): Promise<FeatureFlagListDto[]> {
         let url_ = this.baseUrl + "/api/admin/feature-flags?";
         if (includeArchived === null)
             throw new globalThis.Error("The parameter 'includeArchived' cannot be null.");
@@ -160,11 +160,11 @@ export class FeatureFlagsClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processGetFeatureFlags(_response);
+            return this.processFeatureFlags(_response);
         });
     }
 
-    protected processGetFeatureFlags(response: AxiosResponse): Promise<FeatureFlagListDto[]> {
+    protected processFeatureFlags(response: AxiosResponse): Promise<FeatureFlagListDto[]> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -196,71 +196,9 @@ export class FeatureFlagsClient {
     }
 
     /**
-     * Create a feature flag.
-     */
-    create(request: CreateFeatureFlagRequest, cancelToken?: CancelToken): Promise<number> {
-        let url_ = this.baseUrl + "/api/admin/feature-flags";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(request);
-
-        let options_: AxiosRequestConfig = {
-            data: content_,
-            method: "POST",
-            url: url_,
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processCreate(_response);
-        });
-    }
-
-    protected processCreate(response: AxiosResponse): Promise<number> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 201) {
-            const _responseText = response.data;
-            let result201: any = null;
-            let resultData201  = _responseText;
-            result201 = JSON.parse(resultData201);
-            return Promise.resolve<number>(result201);
-
-        } else if (status === 422) {
-            const _responseText = response.data;
-            let result422: any = null;
-            let resultData422  = _responseText;
-            result422 = JSON.parse(resultData422);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<number>(null as any);
-    }
-
-    /**
      * Get feature flag details.
      */
-    getFeatureFlag(id: number, cancelToken?: CancelToken): Promise<FeatureFlagDto> {
+    featureFlag(id: number, cancelToken?: CancelToken): Promise<FeatureFlagDto> {
         let url_ = this.baseUrl + "/api/admin/feature-flags/{id}";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
@@ -283,11 +221,11 @@ export class FeatureFlagsClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processGetFeatureFlag(_response);
+            return this.processFeatureFlag(_response);
         });
     }
 
-    protected processGetFeatureFlag(response: AxiosResponse): Promise<FeatureFlagDto> {
+    protected processFeatureFlag(response: AxiosResponse): Promise<FeatureFlagDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -24092,13 +24030,6 @@ export interface FeatureFlagDto {
     isSystem: boolean;
     created: Date;
     lastModified: Date;
-}
-
-export interface CreateFeatureFlagRequest {
-    name: string;
-    displayName: string;
-    description?: string | undefined;
-    isEnabled: boolean;
 }
 
 export interface UpdateFeatureFlagRequest {

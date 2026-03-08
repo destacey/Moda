@@ -6,11 +6,9 @@ import { toFormErrors } from '@/src/utils'
 import {
   useGetFeatureFlagQuery,
   useUpdateFeatureFlagMutation,
-  useArchiveFeatureFlagMutation,
 } from '@/src/store/features/admin/feature-flags-api'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { useModalForm } from '@/src/hooks'
-import useAuth from '@/src/components/contexts/auth'
 
 const { Item } = Form
 const { TextArea } = Input
@@ -32,14 +30,10 @@ const EditFeatureFlagForm = ({
   onFormCancel,
 }: EditFeatureFlagFormProps) => {
   const messageApi = useMessage()
-  const { hasPermissionClaim } = useAuth()
-
-  const canDelete = hasPermissionClaim('Permissions.FeatureFlags.Delete')
 
   const { data: featureFlag, isLoading } =
     useGetFeatureFlagQuery(featureFlagId)
   const [updateFeatureFlag] = useUpdateFeatureFlagMutation()
-  const [archiveFeatureFlag] = useArchiveFeatureFlagMutation()
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<EditFeatureFlagFormValues>({
@@ -91,19 +85,6 @@ const EditFeatureFlagForm = ({
     }
   }, [featureFlag, form])
 
-  const handleArchive = useCallback(async () => {
-    try {
-      const response = await archiveFeatureFlag(featureFlagId)
-      if (response.error) {
-        throw response.error
-      }
-      messageApi.success('Feature flag archived.')
-      onFormSave()
-    } catch {
-      messageApi.error('Failed to archive feature flag.')
-    }
-  }, [archiveFeatureFlag, featureFlagId, messageApi, onFormSave])
-
   if (isLoading) {
     return <Spin />
   }
@@ -119,22 +100,6 @@ const EditFeatureFlagForm = ({
       onCancel={handleCancel}
       keyboard={false}
       destroyOnHidden
-      footer={(_, { OkBtn, CancelBtn }) => (
-        <>
-          {canDelete && !featureFlag?.isArchived && !featureFlag?.isSystem && (
-            <button
-              type="button"
-              className="ant-btn ant-btn-default ant-btn-dangerous ant-btn-sm"
-              onClick={handleArchive}
-              style={{ float: 'left' }}
-            >
-              Archive
-            </button>
-          )}
-          <CancelBtn />
-          <OkBtn />
-        </>
-      )}
     >
       <Form
         form={form}
