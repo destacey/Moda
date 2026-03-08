@@ -1,9 +1,10 @@
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Moda.Infrastructure.Auth.Local;
@@ -58,6 +59,46 @@ internal static class ConfigureServices
                         if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
                         {
                             context.Token = accessToken;
+                        }
+
+                        // Skip this scheme early for tokens not intended for it.
+                        // Peeking at the issuer before validation prevents IdentityModel
+                        // from emitting IDX10205 diagnostic noise during cross-scheme attempts.
+                        var token = context.Token;
+                        if (token is null)
+                        {
+                            var authHeader = context.Request.Headers.Authorization.FirstOrDefault();
+                            if (authHeader?.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase) == true)
+                            {
+                                token = authHeader["Bearer ".Length..];
+                            }
+                        }
+
+                        if (token is not null)
+                        {
+                            try
+                            {
+                                var jwt = new JsonWebToken(token);
+                                if (!string.Equals(jwt.Issuer, settings.Issuer, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    context.NoResult();
+                                }
+                            }
+                            catch (ArgumentException)
+                            {
+                                // Malformed token — let normal validation surface the error
+                            }
+                        }
+
+                        return Task.CompletedTask;
+                    },
+                    OnAuthenticationFailed = context =>
+                    {
+                        // Safety net: if a cross-scheme token somehow reaches validation,
+                        // suppress the issuer mismatch so the correct scheme can handle it.
+                        if (context.Exception is SecurityTokenInvalidIssuerException)
+                        {
+                            context.NoResult();
                         }
 
                         return Task.CompletedTask;
