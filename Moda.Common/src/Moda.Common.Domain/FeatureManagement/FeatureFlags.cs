@@ -7,8 +7,15 @@ namespace Moda.Common.Domain.FeatureManagement;
 /// </summary>
 public static class FeatureFlags
 {
-    // Example:
-    // public static readonly FeatureFlagDefinition PlanningPoker = new("planning-poker", "Planning Poker", "Controls visibility of the Planning Poker feature.");
+    public static readonly FeatureFlagDefinition PlanningPoker = new(Names.PlanningPoker, "Planning Poker", "Controls visibility of the Planning Poker feature.");
+
+    /// <summary>
+    /// Compile-time constant names for use in attributes (e.g., [FeatureGate]).
+    /// </summary>
+    public static class Names
+    {
+        public const string PlanningPoker = "planning-poker";
+    }
 }
 
 /// <summary>

@@ -10,6 +10,7 @@ import useAuth from '../../../components/contexts/auth'
 import { useMemo } from 'react'
 import { Menu } from 'antd'
 import Link from 'next/link'
+import { useFeatureFlag } from '../../../hooks'
 
 enum SettingsTab {
   // user-management
@@ -114,7 +115,9 @@ const getRegularMenuItem = (
   } as SubMenuType
 }
 
-const settingsMenuItems: ItemType[] = [
+const buildSettingsMenuItems = (featureFlags: {
+  planningPoker: boolean
+}): ItemType[] => [
   getSectionMenuItem('User Management', 'user-management', [
     getRestrictedMenuItem(
       'Permissions.Users.View',
@@ -139,14 +142,18 @@ const settingsMenuItems: ItemType[] = [
     ),
   ]),
 
-  getSectionMenuItem('Planning', 'planning', [
-    getRestrictedMenuItem(
-      'Permissions.EstimationScales.View',
-      'Estimation Scales',
-      SettingsTab.EstimationScales,
-      '/settings/planning/estimation-scales',
-    ),
-  ]),
+  ...(featureFlags.planningPoker
+    ? [
+        getSectionMenuItem('Planning', 'planning', [
+          getRestrictedMenuItem(
+            'Permissions.EstimationScales.View',
+            'Estimation Scales',
+            SettingsTab.EstimationScales,
+            '/settings/planning/estimation-scales',
+          ),
+        ]),
+      ]
+    : []),
 
   getSectionMenuItem('Work Management', 'work-management', [
     getRegularMenuItem(
@@ -197,16 +204,16 @@ const settingsMenuItems: ItemType[] = [
 // TODO: improve style and layout for smaller screens
 export default function SettingsMenu() {
   const { hasPermissionClaim } = useAuth()
+  const planningPoker = useFeatureFlag('planning-poker')
 
-  // Derive menu items based on user's permissions
+  // Derive menu items based on user's permissions and feature flags
   const menuItems = useMemo(() => {
-    // Reduce the menu items based on the user's claims and transformed into antd menu items using the getItem function
-    return settingsMenuItems.reduce(
+    return buildSettingsMenuItems({ planningPoker }).reduce(
       (acc: ItemType<MenuItemType>[], item: SectionMenuItem) =>
         authorizeMenuItems(acc, item, hasPermissionClaim),
       [],
     )
-  }, [hasPermissionClaim])
+  }, [hasPermissionClaim, planningPoker])
 
   return (
     <Menu

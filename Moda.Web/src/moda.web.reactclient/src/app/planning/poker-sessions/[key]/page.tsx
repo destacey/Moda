@@ -3,7 +3,7 @@
 import { useAppDispatch, useDocumentTitle } from '@/src/hooks'
 import { getAvatarColor } from '@/src/utils'
 import { usePokerSessionConnection } from '@/src/hooks/use-poker-session-connection'
-import { authorizePage } from '@/src/components/hoc'
+import { authorizePage, requireFeatureFlag } from '@/src/components/hoc'
 import useAuth from '@/src/components/contexts/auth'
 import useTheme from '@/src/components/contexts/theme'
 import { useMessage } from '@/src/components/contexts/messaging'
@@ -426,10 +426,9 @@ const PokerSessionDetailPage: FC = () => {
   )
 }
 
-const PokerSessionDetailPageWithAuthorization = authorizePage(
-  PokerSessionDetailPage,
-  'Permission',
-  'Permissions.PokerSessions.View',
+const PokerSessionDetailPageWithAuthorization = requireFeatureFlag(
+  authorizePage(PokerSessionDetailPage, 'Permission', 'Permissions.PokerSessions.View'),
+  'planning-poker',
 )
 
 export default PokerSessionDetailPageWithAuthorization
