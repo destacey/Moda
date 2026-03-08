@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
+using Moda.Infrastructure.Auth.Local;
 using Serilog;
 
 namespace Moda.Infrastructure.Auth.AzureAd;
@@ -45,7 +46,8 @@ internal class AzureAdJwtBearerEvents : JwtBearerEvents
         // Skip this scheme early for tokens not intended for it.
         // Peeking at the issuer before validation prevents IdentityModel
         // from emitting IDX10205 diagnostic noise during cross-scheme attempts.
-        var localIssuer = _config.GetValue<string>("SecuritySettings:LocalJwt:Issuer") ?? "Moda";
+        var localJwtSettings = _config.GetSection(LocalJwtSettings.SectionName).Get<LocalJwtSettings>();
+        var localIssuer = localJwtSettings?.Issuer ?? "Moda";
         var token = context.Token;
         if (token is null)
         {
@@ -67,7 +69,7 @@ internal class AzureAdJwtBearerEvents : JwtBearerEvents
                     return Task.CompletedTask;
                 }
             }
-            catch
+            catch (ArgumentException)
             {
                 // Malformed token — let normal validation surface the error
             }

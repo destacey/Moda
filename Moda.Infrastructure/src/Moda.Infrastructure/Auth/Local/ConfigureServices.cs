@@ -84,7 +84,7 @@ internal static class ConfigureServices
                                     context.NoResult();
                                 }
                             }
-                            catch
+                            catch (ArgumentException)
                             {
                                 // Malformed token — let normal validation surface the error
                             }
