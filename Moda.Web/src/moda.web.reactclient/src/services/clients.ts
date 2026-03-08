@@ -32,6 +32,7 @@ import {
   PokerSessionsClient,
   ConnectionsClient,
   AzureDevOpsConnectionsClient,
+  FeatureFlagsClient,
   PersonalAccessTokensClient,
 } from './moda-api'
 import { tokenRequest } from '@/auth-config'
@@ -269,6 +270,10 @@ export const getWorkTypeLevelsClient = () =>
 export const getWorkTypesClient = () => new WorkTypesClient('', axiosClient)
 export const getWorkTypeTiersClient = () =>
   new WorkTypeTiersClient('', axiosClient)
+
+// FEATURE MANAGEMENT
+export const getFeatureFlagsClient = () =>
+  new FeatureFlagsClient('', axiosClient)
 
 // USER MANAGEMENT
 export const getPermissionsClient = () => new PermissionsClient('', axiosClient)

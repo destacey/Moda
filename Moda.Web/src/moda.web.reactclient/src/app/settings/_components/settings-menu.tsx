@@ -16,6 +16,9 @@ enum SettingsTab {
   Users = 'users',
   Roles = 'roles',
 
+  // feature management
+  FeatureFlags = 'feature-flags',
+
   // planning
   EstimationScales = 'estimation-scales',
 
@@ -124,6 +127,15 @@ const settingsMenuItems: ItemType[] = [
       'Roles',
       SettingsTab.Roles,
       '/settings/user-management/roles',
+    ),
+  ]),
+
+  getSectionMenuItem('Feature Management', 'feature-management', [
+    getRestrictedMenuItem(
+      'Permissions.FeatureFlags.View',
+      'Feature Flags',
+      SettingsTab.FeatureFlags,
+      '/settings/feature-management/feature-flags',
     ),
   ]),
 

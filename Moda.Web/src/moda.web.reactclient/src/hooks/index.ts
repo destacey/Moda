@@ -5,6 +5,7 @@ import type { AppDispatch, RootState } from '@/src/store'
 export { useLocalStorageState } from './use-local-storage-state'
 export { useDocumentTitle } from './use-document-title'
 export { useDebounce } from './use-debounce'
+export { useFeatureFlag } from './use-feature-flag'
 export { default as useModalForm } from './use-modal-form'
 export type {
   UseModalFormOptions,
