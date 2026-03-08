@@ -67,7 +67,7 @@ export const featureFlagsApi = apiSlice.injectEndpoints({
       queryFn: async (request) => {
         try {
           await getFeatureFlagsClient().update(request.id, request)
-          return { data: undefined }
+          return { data: null }
         } catch (error) {
           console.error('API Error:', error)
           return { error }
@@ -82,7 +82,7 @@ export const featureFlagsApi = apiSlice.injectEndpoints({
       queryFn: async (request) => {
         try {
           await getFeatureFlagsClient().toggle(request.id, request)
-          return { data: undefined }
+          return { data: null }
         } catch (error) {
           console.error('API Error:', error)
           return { error }
@@ -98,7 +98,7 @@ export const featureFlagsApi = apiSlice.injectEndpoints({
       queryFn: async (id) => {
         try {
           await getFeatureFlagsClient().archive(id)
-          return { data: undefined }
+          return { data: null }
         } catch (error) {
           console.error('API Error:', error)
           return { error }
