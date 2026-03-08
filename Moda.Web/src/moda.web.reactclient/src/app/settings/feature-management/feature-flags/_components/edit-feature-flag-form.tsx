@@ -121,7 +121,7 @@ const EditFeatureFlagForm = ({
       destroyOnHidden
       footer={(_, { OkBtn, CancelBtn }) => (
         <>
-          {canDelete && !featureFlag?.isArchived && (
+          {canDelete && !featureFlag?.isArchived && !featureFlag?.isSystem && (
             <button
               type="button"
               className="ant-btn ant-btn-default ant-btn-dangerous ant-btn-sm"

@@ -24079,6 +24079,7 @@ export interface FeatureFlagListDto {
     displayName: string;
     isEnabled: boolean;
     isArchived: boolean;
+    isSystem: boolean;
 }
 
 export interface FeatureFlagDto {
@@ -24088,6 +24089,7 @@ export interface FeatureFlagDto {
     description?: string | undefined;
     isEnabled: boolean;
     isArchived: boolean;
+    isSystem: boolean;
     created: Date;
     lastModified: Date;
 }

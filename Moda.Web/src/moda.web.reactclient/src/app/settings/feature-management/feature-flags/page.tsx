@@ -73,6 +73,12 @@ const FeatureFlagsListPage = () => {
       },
       { field: 'displayName', headerName: 'Display Name', width: 250 },
       {
+        field: 'isSystem',
+        headerName: 'Type',
+        width: 120,
+        valueFormatter: ({ value }) => (value ? 'System' : 'User'),
+      },
+      {
         field: 'isEnabled',
         headerName: 'Enabled',
         width: 120,

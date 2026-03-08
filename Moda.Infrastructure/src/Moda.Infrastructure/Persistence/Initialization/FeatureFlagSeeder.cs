@@ -24,7 +24,7 @@ public class FeatureFlagSeeder : ICustomSeeder
             if (existingNamesSet.Contains(definition.Name))
                 continue;
 
-            var result = FeatureFlag.Create(definition.Name, definition.DisplayName, definition.Description, false);
+            var result = FeatureFlag.Create(definition.Name, definition.DisplayName, definition.Description, false, isSystem: true);
             if (result.IsSuccess)
             {
                 dbContext.FeatureFlags.Add(result.Value);

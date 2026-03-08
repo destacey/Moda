@@ -10,4 +10,5 @@ public sealed record FeatureFlagListDto : IMapFrom<FeatureFlag>
     public string DisplayName { get; set; } = default!;
     public bool IsEnabled { get; set; }
     public bool IsArchived { get; set; }
+    public bool IsSystem { get; set; }
 }

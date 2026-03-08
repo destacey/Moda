@@ -11,6 +11,7 @@ public sealed record FeatureFlagDto : IMapFrom<FeatureFlag>
     public string? Description { get; set; }
     public bool IsEnabled { get; set; }
     public bool IsArchived { get; set; }
+    public bool IsSystem { get; set; }
     public Instant Created { get; set; }
     public Instant LastModified { get; set; }
 }

@@ -29723,7 +29723,8 @@
           "name",
           "displayName",
           "isEnabled",
-          "isArchived"
+          "isArchived",
+          "isSystem"
         ],
         "properties": {
           "id": {
@@ -29741,6 +29742,9 @@
           },
           "isArchived": {
             "type": "boolean"
+          },
+          "isSystem": {
+            "type": "boolean"
           }
         }
       },
@@ -29753,6 +29757,7 @@
           "displayName",
           "isEnabled",
           "isArchived",
+          "isSystem",
           "created",
           "lastModified"
         ],
@@ -29775,6 +29780,9 @@
             "type": "boolean"
           },
           "isArchived": {
+            "type": "boolean"
+          },
+          "isSystem": {
             "type": "boolean"
           },
           "created": {

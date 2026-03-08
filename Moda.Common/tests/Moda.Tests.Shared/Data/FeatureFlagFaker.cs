@@ -12,6 +12,7 @@ public sealed class FeatureFlagFaker : PrivateConstructorFaker<FeatureFlag>
         RuleFor(x => x.Description, f => f.Random.Bool() ? f.Lorem.Sentence() : null);
         RuleFor(x => x.IsEnabled, f => f.Random.Bool());
         RuleFor(x => x.IsArchived, false);
+        RuleFor(x => x.IsSystem, false);
         RuleFor(x => x.FiltersJson, (string?)null);
     }
 }
@@ -58,6 +59,12 @@ public static class FeatureFlagFakerExtensions
     {
         faker.RuleFor(x => x.IsArchived, true);
         faker.RuleFor(x => x.IsEnabled, false);
+        return faker;
+    }
+
+    public static FeatureFlagFaker AsSystem(this FeatureFlagFaker faker)
+    {
+        faker.RuleFor(x => x.IsSystem, true);
         return faker;
     }
 }

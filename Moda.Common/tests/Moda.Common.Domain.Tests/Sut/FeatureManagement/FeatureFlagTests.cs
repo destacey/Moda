@@ -28,7 +28,30 @@ public sealed class FeatureFlagTests
         flag.Description.Should().Be(description);
         flag.IsEnabled.Should().BeTrue();
         flag.IsArchived.Should().BeFalse();
+        flag.IsSystem.Should().BeFalse();
         flag.FiltersJson.Should().BeNull();
+    }
+
+    [Fact]
+    public void Create_ShouldSetIsSystemTrue_WhenSpecified()
+    {
+        // Act
+        var result = FeatureFlag.Create("system-flag", "System Flag", null, false, isSystem: true);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.IsSystem.Should().BeTrue();
+    }
+
+    [Fact]
+    public void Create_ShouldDefaultIsSystemToFalse()
+    {
+        // Act
+        var result = FeatureFlag.Create("user-flag", "User Flag", null, false);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.IsSystem.Should().BeFalse();
     }
 
     [Fact]
@@ -280,6 +303,20 @@ public sealed class FeatureFlagTests
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Error.Should().Contain("already archived");
+    }
+
+    [Fact]
+    public void Archive_ShouldReturnFailure_WhenSystemFlag()
+    {
+        // Arrange
+        var flag = FeatureFlag.Create("system-flag", "System Flag", null, true, isSystem: true).Value;
+
+        // Act
+        var result = flag.Archive();
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Contain("System feature flags cannot be archived");
     }
 
     #endregion Archive

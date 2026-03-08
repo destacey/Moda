@@ -13,7 +13,7 @@ using Moda.Infrastructure.Persistence.Context;
 namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 {
     [DbContext(typeof(ModaDbContext))]
-    [Migration("20260308162211_Add-Feature-Flags")]
+    [Migration("20260308182531_Add-Feature-Flags")]
     partial class AddFeatureFlags
     {
         /// <inheritdoc />
@@ -325,6 +325,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsSystem")
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")

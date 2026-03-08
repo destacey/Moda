@@ -31,6 +31,9 @@ public class FeatureFlagConfiguration : IEntityTypeConfiguration<FeatureFlag>
         builder.Property(f => f.IsArchived)
             .IsRequired();
 
+        builder.Property(f => f.IsSystem)
+            .IsRequired();
+
         builder.Property(f => f.FiltersJson)
             .HasColumnType("nvarchar(max)");
     }
