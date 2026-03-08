@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Identity.Web;
+using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.IdentityModel.Tokens;
 using Serilog;
 
 namespace Moda.Infrastructure.Auth.AzureAd;
@@ -18,6 +20,14 @@ internal class AzureAdJwtBearerEvents : JwtBearerEvents
 
     public override Task AuthenticationFailed(AuthenticationFailedContext context)
     {
+        // Safety net: if a cross-scheme token somehow reaches validation,
+        // suppress the issuer mismatch so the correct scheme can handle it.
+        if (context.Exception is SecurityTokenInvalidIssuerException)
+        {
+            context.NoResult();
+            return Task.CompletedTask;
+        }
+
         _logger.AuthenticationFailed(context.Exception);
         return base.AuthenticationFailed(context);
     }
@@ -30,6 +40,37 @@ internal class AzureAdJwtBearerEvents : JwtBearerEvents
         if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
         {
             context.Token = accessToken;
+        }
+
+        // Skip this scheme early for tokens not intended for it.
+        // Peeking at the issuer before validation prevents IdentityModel
+        // from emitting IDX10205 diagnostic noise during cross-scheme attempts.
+        var localIssuer = _config.GetValue<string>("SecuritySettings:LocalJwt:Issuer") ?? "Moda";
+        var token = context.Token;
+        if (token is null)
+        {
+            var authHeader = context.Request.Headers.Authorization.FirstOrDefault();
+            if (authHeader?.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase) == true)
+            {
+                token = authHeader["Bearer ".Length..];
+            }
+        }
+
+        if (token is not null)
+        {
+            try
+            {
+                var jwt = new JsonWebToken(token);
+                if (string.Equals(jwt.Issuer, localIssuer, StringComparison.OrdinalIgnoreCase))
+                {
+                    context.NoResult();
+                    return Task.CompletedTask;
+                }
+            }
+            catch
+            {
+                // Malformed token — let normal validation surface the error
+            }
         }
 
         _logger.TokenReceived();
