@@ -148,7 +148,7 @@ const buildMenuItems = (
 
 const useAppMenuItems = () => {
   const { hasClaim } = useAuth()
-  const planningPoker = useFeatureFlag('planning-poker')
+  const { isEnabled: planningPoker } = useFeatureFlag('planning-poker')
 
   const filteredMenuItems = useMemo(
     () =>

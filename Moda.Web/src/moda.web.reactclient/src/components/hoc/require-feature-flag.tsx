@@ -20,7 +20,11 @@ const requireFeatureFlag = <P extends object>(
     WrappedPage.displayName || WrappedPage.name || 'Component'
 
   const RequireFeatureFlag: ComponentType<P> = ({ ...props }) => {
-    const isEnabled = useFeatureFlag(featureFlagName)
+    const { isEnabled, isLoading } = useFeatureFlag(featureFlagName)
+
+    if (isLoading) {
+      return null
+    }
 
     if (!isEnabled) {
       notFound()

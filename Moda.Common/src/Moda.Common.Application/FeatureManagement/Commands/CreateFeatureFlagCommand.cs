@@ -35,7 +35,7 @@ internal sealed class CreateFeatureFlagCommandHandler(
         try
         {
             var existingFlag = await _dbContext.FeatureFlags
-                .AnyAsync(f => f.Name.Equals(request.Name.Trim(), StringComparison.CurrentCultureIgnoreCase), cancellationToken);
+                .AnyAsync(f => f.Name.Equals(request.Name.Trim(), StringComparison.OrdinalIgnoreCase), cancellationToken);
 
             if (existingFlag)
                 return Result.Failure<int>($"A feature flag with the name '{request.Name}' already exists.");

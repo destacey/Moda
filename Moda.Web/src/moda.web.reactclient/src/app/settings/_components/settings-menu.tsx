@@ -204,7 +204,7 @@ const buildSettingsMenuItems = (featureFlags: {
 // TODO: improve style and layout for smaller screens
 export default function SettingsMenu() {
   const { hasPermissionClaim } = useAuth()
-  const planningPoker = useFeatureFlag('planning-poker')
+  const { isEnabled: planningPoker } = useFeatureFlag('planning-poker')
 
   // Derive menu items based on user's permissions and feature flags
   const menuItems = useMemo(() => {
