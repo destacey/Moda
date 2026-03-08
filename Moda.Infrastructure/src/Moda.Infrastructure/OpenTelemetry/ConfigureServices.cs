@@ -29,6 +29,7 @@ internal static class ConfigureServices
             .WithTracing(tracing =>
             {
                 tracing.AddSource(builder.Environment.ApplicationName)
+                    .AddSource("Microsoft.FeatureManagement")
                     .AddAspNetCoreInstrumentation(options =>
                     {
                         // Exclude health check requests from tracing

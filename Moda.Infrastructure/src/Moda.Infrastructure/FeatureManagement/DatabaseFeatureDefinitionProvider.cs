@@ -89,7 +89,8 @@ internal sealed class DatabaseFeatureDefinitionProvider(
     {
         var definition = new FeatureDefinition
         {
-            Name = flag.Name
+            Name = flag.Name,
+            Telemetry = new TelemetryConfiguration { Enabled = true }
         };
 
         if (flag.IsEnabled)
