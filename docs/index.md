@@ -12,6 +12,7 @@ Moda is a work management system used to plan, manage, and create associations a
 - [Project Portfolio Management](./project-portfolio-management.md)
 - Strategic Management
 - [App Integration](./app-integration.md)
+- [Feature Management](./feature-management.md)
 
 ## Ownership
 

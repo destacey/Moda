@@ -394,6 +394,26 @@ User management lives in `Moda.Common.Application/Identity/Users/` (commands/int
 - `moda.web.reactclient/src/app/account/profile/` - User profile and password change
 - `moda.web.reactclient/src/components/contexts/auth/auth-context.tsx` - Auth state (supports both MSAL and local JWT)
 
+### Feature Management
+
+Moda uses Microsoft.FeatureManagement to control feature visibility. Feature flags are stored in the database, seeded from code, and managed via the Settings UI. See [docs/feature-management.md](docs/feature-management.md) for full documentation.
+
+**Adding a new feature flag:**
+
+1. Define in `Moda.Common.Domain/FeatureManagement/FeatureFlags.cs` (add both a `FeatureFlagDefinition` field and a `Names` constant)
+2. Gate backend: `[FeatureGate(FeatureFlags.Names.MyFlag)]` on controllers/actions, or `IFeatureManager.IsEnabledAsync()` in handlers
+3. Gate frontend: `requireFeatureFlag` HOC for pages, `useFeatureFlag` hook for conditional rendering
+4. Gate menus: pass flag state into menu builder functions
+5. Deploy — seeder creates the flag as disabled; admin enables it from the UI
+
+**Key files:**
+
+- `Moda.Common.Domain/FeatureManagement/FeatureFlags.cs` - Flag definitions and compile-time name constants
+- `Moda.Infrastructure/Persistence/Initialization/FeatureFlagSeeder.cs` - Auto-seeds flags from code
+- `Moda.Infrastructure/FeatureManagement/DatabaseFeatureDefinitionProvider.cs` - Database-backed provider with caching
+- `moda.web.reactclient/src/hooks/use-feature-flag.ts` - Frontend hook for checking flags
+- `moda.web.reactclient/src/components/hoc/require-feature-flag.tsx` - Page-level feature gate HOC
+
 ### Background Jobs
 
 Hangfire runs recurring jobs for external system synchronization. Dashboard available at `/hangfire` with basic auth.
