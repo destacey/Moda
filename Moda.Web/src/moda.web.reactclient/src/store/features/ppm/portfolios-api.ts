@@ -7,7 +7,6 @@ import {
   ProjectListDto,
   ProjectPortfolioDetailsDto,
   ProjectPortfolioListDto,
-  ProjectPortfolioStatusDto,
   StrategicInitiativeListDto,
   UpdatePortfolioRequest,
 } from '@/src/services/moda-api'
@@ -17,21 +16,21 @@ import { OptionModel } from '@/src/components/types'
 
 export const portfoliosApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getPortfolios: builder.query<ProjectPortfolioListDto[], number[] | undefined>(
-      {
-        queryFn: async (portfolioState = undefined) => {
-          try {
-            const data =
-              await getPortfoliosClient().getPortfolios(portfolioState)
-            return { data }
-          } catch (error) {
-            console.error('API Error:', error)
-            return { error }
-          }
-        },
-        providesTags: () => [{ type: QueryTags.Portfolio, id: 'LIST' }],
+    getPortfolios: builder.query<
+      ProjectPortfolioListDto[],
+      number[] | undefined
+    >({
+      queryFn: async (portfolioState = undefined) => {
+        try {
+          const data = await getPortfoliosClient().getPortfolios(portfolioState)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
       },
-    ),
+      providesTags: () => [{ type: QueryTags.Portfolio, id: 'LIST' }],
+    }),
     getPortfolio: builder.query<ProjectPortfolioDetailsDto, number>({
       queryFn: async (key) => {
         try {
@@ -165,19 +164,25 @@ export const portfoliosApi = apiSlice.injectEndpoints({
         { type: QueryTags.PortfolioPrograms, id: arg },
       ],
     }),
-    getPortfolioProjects: builder.query<ProjectListDto[], string>({
-      queryFn: async (portfolioIdOrKey) => {
+    getPortfolioProjects: builder.query<
+      ProjectListDto[],
+      { portfolioIdOrKey: string; status?: number[] }
+    >({
+      queryFn: async ({ portfolioIdOrKey, status }) => {
         try {
-          const data = await getPortfoliosClient().getProjects(portfolioIdOrKey)
+          const data = await getPortfoliosClient().getProjects(
+            portfolioIdOrKey,
+            status,
+          )
           return { data }
         } catch (error) {
           console.error('API Error:', error)
           return { error }
         }
       },
-      providesTags: (result, error, arg) => [
+      providesTags: (result, error, { portfolioIdOrKey }) => [
         { type: QueryTags.PortfolioProjects, id: 'LIST' },
-        { type: QueryTags.PortfolioProjects, id: arg },
+        { type: QueryTags.PortfolioProjects, id: portfolioIdOrKey },
       ],
     }),
     getPortfolioStrategicInitiatives: builder.query<
@@ -247,7 +252,7 @@ export const portfoliosApi = apiSlice.injectEndpoints({
           // TODO: hard coding status for now.  Need status values from the client.
           const programs = await getPortfoliosClient().getPrograms(
             portfolioIdOrKey,
-            2,
+            [2],
           )
 
           const data: BaseOptionType[] = programs

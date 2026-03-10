@@ -5,7 +5,6 @@ import {
   ObjectIdAndKey,
   ProgramListDto,
   ProgramDetailsDto,
-  ProgramStatusDto,
   UpdateProgramRequest,
   ProjectListDto,
 } from '@/src/services/moda-api'
@@ -150,19 +149,25 @@ export const programsApi = apiSlice.injectEndpoints({
         ]
       },
     }),
-    getProgramProjects: builder.query<ProjectListDto[], string>({
-      queryFn: async (idOrKey) => {
+    getProgramProjects: builder.query<
+      ProjectListDto[],
+      { programIdOrKey: string; status?: number[] }
+    >({
+      queryFn: async ({ programIdOrKey, status }) => {
         try {
-          const data = await getProgramsClient().getProjects(idOrKey, null)
+          const data = await getProgramsClient().getProjects(
+            programIdOrKey,
+            status?.length > 0 ? status : null,
+          )
           return { data }
         } catch (error) {
           console.error('API Error:', error)
           return { error }
         }
       },
-      providesTags: (result) => [
-        QueryTags.ProgramProjects,
-        ...result.map(({ key }) => ({ type: QueryTags.ProgramProjects, key })),
+      providesTags: (result, error, { programIdOrKey }) => [
+        { type: QueryTags.ProgramProjects, id: 'LIST' },
+        { type: QueryTags.ProgramProjects, id: programIdOrKey },
       ],
     }),
     getProgramStatusOptions: builder.query<OptionModel<number>[], void>({

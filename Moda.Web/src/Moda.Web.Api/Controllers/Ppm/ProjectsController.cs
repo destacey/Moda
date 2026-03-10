@@ -23,13 +23,17 @@ public class ProjectsController(ILogger<ProjectsController> logger, ISender send
     [OpenApiOperation("Get a list of projects.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IEnumerable<ProjectListDto>>> GetProjects([FromQuery] int[]? status, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<ProjectListDto>>> GetProjects([FromQuery] int[]? status, [FromQuery] Guid? portfolioId, CancellationToken cancellationToken)
     {
         ProjectStatus[]? filter = status is { Length: > 0 }
             ? [.. status.Select(s => (ProjectStatus)s)]
             : null;
 
-        var projects = await _sender.Send(new GetProjectsQuery(StatusFilter: filter), cancellationToken);
+        IdOrKey? portfolioIdOrKey = portfolioId.HasValue
+            ? new IdOrKey(portfolioId.Value)
+            : null;
+
+        var projects = await _sender.Send(new GetProjectsQuery(StatusFilter: filter, PortfolioIdOrKey: portfolioIdOrKey), cancellationToken);
 
         return Ok(projects);
     }

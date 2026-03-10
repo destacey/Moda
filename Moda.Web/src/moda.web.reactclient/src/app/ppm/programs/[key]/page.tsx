@@ -25,7 +25,7 @@ import {
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import { ItemType } from 'antd/es/menu/interface'
 import { ProgramStatusAction } from '../_components/change-program-status-form'
-import { ProjectViewManager } from '@/src/app/ppm/_components'
+import { ProjectsFilterBar, ProjectViewManager } from '@/src/app/ppm/_components'
 
 enum ProgramTabs {
   Details = 'details',
@@ -56,6 +56,10 @@ const ProgramDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const programKey = Number(key)
 
   const [activeTab, setActiveTab] = useState(ProgramTabs.Details)
+  const [projectsQueried, setProjectsQueried] = useState(false)
+  const [selectedProjectStatuses, setSelectedProjectStatuses] = useState<
+    number[]
+  >([1, 2]) // Proposed, Active
   const [openEditProgramForm, setOpenEditProgramForm] = useState<boolean>(false)
   const [openActivateProgramForm, setOpenActivateProgramForm] =
     useState<boolean>(false)
@@ -87,9 +91,16 @@ const ProgramDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     isLoading: projectsDataIsLoading,
     error: projectsDataError,
     refetch: refetchProjectsData,
-  } = useGetProgramProjectsQuery(programData?.key.toString(), {
-    skip: !programData?.key,
-  })
+  } = useGetProgramProjectsQuery(
+    {
+      programIdOrKey: programKey.toString(),
+      status:
+        selectedProjectStatuses.length > 0
+          ? selectedProjectStatuses
+          : undefined,
+    },
+    { skip: !projectsQueried },
+  )
 
   useDocumentTitle(`${programData?.name ?? programKey} - Program Details`)
 
@@ -113,19 +124,35 @@ const ProgramDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     dispatch(setBreadcrumbRoute({ route: breadcrumbRoute, pathname }))
   }, [dispatch, pathname, programData])
 
+  const toggleProjectStatus = useCallback((statusId: number) => {
+    setSelectedProjectStatuses((prev) => {
+      if (prev.includes(statusId)) {
+        return prev.filter((s) => s !== statusId)
+      }
+      return [...prev, statusId]
+    })
+  }, [])
+
   const renderTabContent = useCallback(() => {
     switch (activeTab) {
       case ProgramTabs.Details:
         return <ProgramDetails program={programData} />
       case ProgramTabs.Projects:
         return (
-          <ProjectViewManager
-            projects={projectsData}
-            isLoading={projectsDataIsLoading}
-            refetch={refetchProjectsData}
-            hidePortfolio={true}
-            hideProgram={true}
-          />
+          <>
+            <ProjectsFilterBar
+              selectedStatuses={selectedProjectStatuses}
+              onToggleStatus={toggleProjectStatus}
+              showPortfolioFilter={false}
+            />
+            <ProjectViewManager
+              projects={projectsData}
+              isLoading={projectsDataIsLoading}
+              refetch={refetchProjectsData}
+              hidePortfolio={true}
+              hideProgram={true}
+            />
+          </>
         )
       default:
         return null
@@ -133,15 +160,24 @@ const ProgramDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   }, [
     activeTab,
     programData,
-    refetchProjectsData,
     projectsData,
     projectsDataIsLoading,
+    refetchProjectsData,
+    selectedProjectStatuses,
+    toggleProjectStatus,
   ])
 
   // doesn't trigger on first render
-  const onTabChange = useCallback((tabKey: string) => {
-    setActiveTab(tabKey as ProgramTabs)
-  }, [])
+  const onTabChange = useCallback(
+    (tabKey: string) => {
+      const tab = tabKey as ProgramTabs
+      if (tab === ProgramTabs.Projects && !projectsQueried) {
+        setProjectsQueried(true)
+      }
+      setActiveTab(tab)
+    },
+    [projectsQueried],
+  )
 
   const missingDates = programData?.start === null || programData?.end === null
 

@@ -6,15 +6,33 @@ import { authorizePage } from '@/src/components/hoc'
 import { useDocumentTitle } from '@/src/hooks'
 import { useGetProjectsQuery } from '@/src/store/features/ppm/projects-api'
 import { Button } from 'antd'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { CreateProjectForm } from './_components'
-import { ProjectsGrid } from '../_components'
+import { ProjectsFilterBar, ProjectsGrid } from '../_components'
 import { useMessage } from '@/src/components/contexts/messaging'
+
+// Project status enum values matching the backend
+const PROJECT_STATUS = {
+  Proposed: 1,
+  Active: 2,
+  Completed: 3,
+  Cancelled: 4,
+} as const
+
+const DEFAULT_STATUSES = [
+  PROJECT_STATUS.Proposed,
+  PROJECT_STATUS.Active,
+]
 
 const ProjectsPage: React.FC = () => {
   useDocumentTitle('Projects')
   const [openCreateProjectForm, setOpenCreateProjectForm] =
     useState<boolean>(false)
+  const [selectedStatuses, setSelectedStatuses] =
+    useState<number[]>(DEFAULT_STATUSES)
+  const [selectedPortfolioId, setSelectedPortfolioId] = useState<
+    string | undefined
+  >(undefined)
   const messageApi = useMessage()
 
   const { hasPermissionClaim } = useAuth()
@@ -26,7 +44,10 @@ const ProjectsPage: React.FC = () => {
     isLoading,
     error,
     refetch,
-  } = useGetProjectsQuery(undefined)
+  } = useGetProjectsQuery({
+    status: selectedStatuses.length > 0 ? selectedStatuses : undefined,
+    portfolioId: selectedPortfolioId,
+  })
 
   useEffect(() => {
     if (error) {
@@ -34,6 +55,15 @@ const ProjectsPage: React.FC = () => {
       messageApi.error('Failed to load projects.')
     }
   }, [error, messageApi])
+
+  const toggleStatus = useCallback((statusId: number) => {
+    setSelectedStatuses((prev) => {
+      if (prev.includes(statusId)) {
+        return prev.filter((s) => s !== statusId)
+      }
+      return [...prev, statusId]
+    })
+  }, [])
 
   const actions = useMemo(() => {
     if (!showActions) return null
@@ -58,6 +88,12 @@ const ProjectsPage: React.FC = () => {
   return (
     <>
       <PageTitle title="Projects" actions={actions} />
+      <ProjectsFilterBar
+        selectedStatuses={selectedStatuses}
+        onToggleStatus={toggleStatus}
+        selectedPortfolioId={selectedPortfolioId}
+        onPortfolioChange={setSelectedPortfolioId}
+      />
       <ProjectsGrid
         projects={projectData}
         isLoading={isLoading}

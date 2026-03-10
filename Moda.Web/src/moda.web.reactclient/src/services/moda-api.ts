@@ -6088,11 +6088,14 @@ export class ProjectsClient {
     /**
      * Get a list of projects.
      * @param status (optional) 
+     * @param portfolioId (optional) 
      */
-    getProjects(status?: number[] | null | undefined, cancelToken?: CancelToken): Promise<ProjectListDto[]> {
+    getProjects(status?: number[] | null | undefined, portfolioId?: string | null | undefined, cancelToken?: CancelToken): Promise<ProjectListDto[]> {
         let url_ = this.baseUrl + "/api/ppm/projects?";
         if (status !== undefined && status !== null)
             status && status.forEach(item => { url_ += "status=" + encodeURIComponent("" + item) + "&"; });
+        if (portfolioId !== undefined && portfolioId !== null)
+            url_ += "portfolioId=" + encodeURIComponent("" + portfolioId) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {

@@ -5,7 +5,6 @@ import {
   ObjectIdAndKey,
   ProjectListDto,
   ProjectDetailsDto,
-  ProjectStatusDto,
   UpdateProjectRequest,
   WorkItemListDto,
   ChangeProjectProgramRequest,
@@ -15,12 +14,23 @@ import { QueryTags } from '../query-tags'
 import { BaseOptionType } from 'antd/es/select'
 import { OptionModel } from '@/src/components/types'
 
+export interface GetProjectsRequest {
+  status?: number[]
+  portfolioId?: string
+}
+
 export const projectsApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getProjects: builder.query<ProjectListDto[], number[] | undefined>({
-      queryFn: async (status = undefined) => {
+    getProjects: builder.query<
+      ProjectListDto[],
+      GetProjectsRequest | undefined
+    >({
+      queryFn: async (request = undefined) => {
         try {
-          const data = await getProjectsClient().getProjects(status)
+          const data = await getProjectsClient().getProjects(
+            request?.status,
+            request?.portfolioId,
+          )
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -59,6 +69,7 @@ export const projectsApi = apiSlice.injectEndpoints({
         return [
           { type: QueryTags.Project, id: 'LIST' },
           { type: QueryTags.PortfolioProjects, id: 'LIST' },
+          { type: QueryTags.ProgramProjects, id: 'LIST' },
         ]
       },
     }),
@@ -81,6 +92,7 @@ export const projectsApi = apiSlice.injectEndpoints({
           { type: QueryTags.Project, id: 'LIST' },
           { type: QueryTags.Project, id: cacheKey },
           { type: QueryTags.PortfolioProjects, id: 'LIST' },
+          { type: QueryTags.ProgramProjects, id: 'LIST' },
         ]
       },
     }),
@@ -148,6 +160,7 @@ export const projectsApi = apiSlice.injectEndpoints({
           { type: QueryTags.Project, id: 'LIST' },
           { type: QueryTags.Project, id: cacheKey },
           { type: QueryTags.PortfolioProjects, id: 'LIST' },
+          { type: QueryTags.ProgramProjects, id: 'LIST' },
         ]
       },
     }),
@@ -167,6 +180,7 @@ export const projectsApi = apiSlice.injectEndpoints({
           { type: QueryTags.Project, id: 'LIST' },
           { type: QueryTags.Project, id: cacheKey },
           { type: QueryTags.PortfolioProjects, id: 'LIST' },
+          { type: QueryTags.ProgramProjects, id: 'LIST' },
         ]
       },
     }),
@@ -186,6 +200,7 @@ export const projectsApi = apiSlice.injectEndpoints({
           { type: QueryTags.Project, id: 'LIST' },
           { type: QueryTags.Project, id: cacheKey },
           { type: QueryTags.PortfolioProjects, id: 'LIST' },
+          { type: QueryTags.ProgramProjects, id: 'LIST' },
         ]
       },
     }),
@@ -204,6 +219,7 @@ export const projectsApi = apiSlice.injectEndpoints({
         return [
           { type: QueryTags.Project, id: 'LIST' },
           { type: QueryTags.PortfolioProjects, id: 'LIST' },
+          { type: QueryTags.ProgramProjects, id: 'LIST' },
         ]
       },
     }),

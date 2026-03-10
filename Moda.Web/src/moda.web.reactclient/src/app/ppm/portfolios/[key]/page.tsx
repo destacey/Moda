@@ -30,6 +30,7 @@ import ChangePortfolioStatusForm, {
 } from '../_components/change-portfolio-status-form'
 import {
   ProgramViewManager,
+  ProjectsFilterBar,
   ProjectViewManager,
   StrategicInitiativeViewManager,
 } from '../../_components'
@@ -75,6 +76,9 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const [activeTab, setActiveTab] = useState(PortfolioTabs.Details)
   const [programsQueried, setProgramsQueried] = useState(false)
   const [projectsQueried, setProjectsQueried] = useState(false)
+  const [selectedProjectStatuses, setSelectedProjectStatuses] = useState<
+    number[]
+  >([1, 2]) // Proposed, Active
   const [strategicInitiativesQueried, setStrategicInitiativesQueried] =
     useState(false)
 
@@ -123,9 +127,16 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     isLoading: isLoadingProjects,
     error: errorProjects,
     refetch: refetchProjects,
-  } = useGetPortfolioProjectsQuery(portfolioKey.toString(), {
-    skip: !projectsQueried,
-  })
+  } = useGetPortfolioProjectsQuery(
+    {
+      portfolioIdOrKey: portfolioKey.toString(),
+      status:
+        selectedProjectStatuses.length > 0
+          ? selectedProjectStatuses
+          : undefined,
+    },
+    { skip: !projectsQueried },
+  )
 
   const {
     data: strategicInitiativeData,
@@ -158,6 +169,15 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     dispatch(setBreadcrumbRoute({ route: breadcrumbRoute, pathname }))
   }, [dispatch, pathname, portfolioData])
 
+  const toggleProjectStatus = useCallback((statusId: number) => {
+    setSelectedProjectStatuses((prev) => {
+      if (prev.includes(statusId)) {
+        return prev.filter((s) => s !== statusId)
+      }
+      return [...prev, statusId]
+    })
+  }, [])
+
   const renderTabContent = useCallback(() => {
     switch (activeTab) {
       case PortfolioTabs.Details:
@@ -172,12 +192,19 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
         )
       case PortfolioTabs.Projects:
         return (
-          <ProjectViewManager
-            projects={projectData}
-            isLoading={isLoadingProjects}
-            refetch={refetchProjects}
-            groupByProgram={true}
-          />
+          <>
+            <ProjectsFilterBar
+              selectedStatuses={selectedProjectStatuses}
+              onToggleStatus={toggleProjectStatus}
+              showPortfolioFilter={false}
+            />
+            <ProjectViewManager
+              projects={projectData}
+              isLoading={isLoadingProjects}
+              refetch={refetchProjects}
+              groupByProgram={true}
+            />
+          </>
         )
       case PortfolioTabs.StrategicInitiatives:
         return (
@@ -202,6 +229,8 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     refetchPrograms,
     refetchProjects,
     refetchStrategicInitiatives,
+    selectedProjectStatuses,
+    toggleProjectStatus,
   ])
 
   const actionsMenuItems: MenuProps['items'] = useMemo(() => {
