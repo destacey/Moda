@@ -47,6 +47,7 @@ const ProjectCard: FC<ProjectCardProps> = ({ project, onCardClick }) => {
             <Link
               href={`/ppm/projects/${project.key}`}
               onClick={(e) => e.stopPropagation()}
+              style={{ width: 'fit-content' }}
             >
               {project.name}
             </Link>
