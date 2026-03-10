@@ -25,6 +25,7 @@ const STATUS_LIFECYCLE_PHASE: Record<string, LifecyclePhase> = {
   'On Hold': LifecyclePhase.Active,
   Completed: LifecyclePhase.Done,
   Cancelled: LifecyclePhase.Done,
+  Archived: LifecyclePhase.Done,
 }
 
 const hasPortfolioFilter = (
