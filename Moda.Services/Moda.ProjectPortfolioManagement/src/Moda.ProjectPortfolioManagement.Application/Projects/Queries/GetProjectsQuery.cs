@@ -4,14 +4,14 @@ using Moda.ProjectPortfolioManagement.Domain.Enums;
 
 namespace Moda.ProjectPortfolioManagement.Application.Projects.Queries;
 
-public sealed record GetProjectsQuery(ProjectStatus[]? StatusFilter = null, IdOrKey? PortfolioIdOrKey = null, IdOrKey? ProgramIdOrKey = null) : IQuery<List<ProjectListDto>?>;
+public sealed record GetProjectsQuery(ProjectStatus[]? StatusFilter = null, IdOrKey? PortfolioIdOrKey = null, IdOrKey? ProgramIdOrKey = null) : IQuery<List<ProjectListDto>>;
 
 internal sealed class GetProjectsQueryHandler(IProjectPortfolioManagementDbContext ppmDbContext) 
-    : IQueryHandler<GetProjectsQuery, List<ProjectListDto>?>
+    : IQueryHandler<GetProjectsQuery, List<ProjectListDto>>
 {
     private readonly IProjectPortfolioManagementDbContext _ppmDbContext = ppmDbContext;
 
-    public async Task<List<ProjectListDto>?> Handle(GetProjectsQuery request, CancellationToken cancellationToken)
+    public async Task<List<ProjectListDto>> Handle(GetProjectsQuery request, CancellationToken cancellationToken)
     {
         var query = _ppmDbContext.Projects.AsQueryable();
 
@@ -32,7 +32,7 @@ internal sealed class GetProjectsQueryHandler(IProjectPortfolioManagementDbConte
 
             if (portfolioId is null)
             {
-                return null;
+                return [];
             }
 
             query = query.Where(pp => pp.PortfolioId == portfolioId);
@@ -49,7 +49,7 @@ internal sealed class GetProjectsQueryHandler(IProjectPortfolioManagementDbConte
 
             if (programId is null)
             {
-                return null;
+                return [];
             }
 
             query = query.Where(pp => pp.ProgramId == programId);

@@ -10,24 +10,6 @@
     "version": "v1"
   },
   "paths": {
-    "/startup": {
-      "get": {
-        "operationId": "GetStartup",
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "Bearer": []
-          },
-          {
-            "ApiKey": []
-          }
-        ]
-      }
-    },
     "/api/feature-flags": {
       "get": {
         "tags": [
@@ -30181,10 +30163,10 @@
         "description": "OAuth2.0 Auth Code with PKCE",
         "flows": {
           "authorizationCode": {
-            "authorizationUrl": "https://login.microsoftonline.com/f399216f-be6b-4062-8700-54952e44e7ef/oauth2/v2.0/authorize",
-            "tokenUrl": "https://login.microsoftonline.com/f399216f-be6b-4062-8700-54952e44e7ef/oauth2/v2.0/token",
+            "authorizationUrl": "https://login.microsoftonline.com/<Your TenantId of the AzureAd Server App Registration>/oauth2/v2.0/authorize",
+            "tokenUrl": "https://login.microsoftonline.com/<Your TenantId of the AzureAd Server App Registration>/oauth2/v2.0/token",
             "scopes": {
-              "api://fdca5e6f-46a2-455c-b2f3-06a9a6877190/access_as_user": "access the api"
+              "api://<Your ClientId of the AzureAd Server App Registration>/access_as_user": "access the api"
             }
           }
         }

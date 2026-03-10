@@ -35,9 +35,7 @@ public class ProgramsController(ILogger<ProgramsController> logger, ISender send
 
         var programs = await _sender.Send(new GetProgramsQuery(StatusFilter: filter, PortfolioIdOrKey: portfolioIdOrKey), cancellationToken);
 
-        return programs is not null
-            ? Ok(programs)
-            : NotFound();
+        return Ok(programs);
     }
 
     [HttpGet("{idOrKey}")]
