@@ -7,7 +7,7 @@ namespace Moda.ProjectPortfolioManagement.Application.Portfolios.Queries;
 /// Retrieves a list of ProjectPortfolios based on the provided filter.  Returns all ProjectPortfolios if no filter is provided.
 /// </summary>
 /// <param name="StatusFilter"></param>
-public sealed record GetProjectPortfoliosQuery(ProjectPortfolioStatus? StatusFilter) : IQuery<List<ProjectPortfolioListDto>>;
+public sealed record GetProjectPortfoliosQuery(ProjectPortfolioStatus[]? StatusFilter = null) : IQuery<List<ProjectPortfolioListDto>>;
 
 internal sealed class GetProjectPortfoliosQueryHandler(IProjectPortfolioManagementDbContext projectPortfolioManagementDbContext) 
     : IQueryHandler<GetProjectPortfoliosQuery, List<ProjectPortfolioListDto>>
@@ -18,9 +18,9 @@ internal sealed class GetProjectPortfoliosQueryHandler(IProjectPortfolioManageme
     {
         var query = _projectPortfolioManagementDbContext.Portfolios.AsQueryable();
 
-        if (request.StatusFilter.HasValue)
+        if (request.StatusFilter is { Length: > 0 })
         {
-            query = query.Where(pp => pp.Status == request.StatusFilter.Value);
+            query = query.Where(pp => request.StatusFilter.Contains(pp.Status));
         }
 
         return await query.ProjectToType<ProjectPortfolioListDto>().ToListAsync(cancellationToken);

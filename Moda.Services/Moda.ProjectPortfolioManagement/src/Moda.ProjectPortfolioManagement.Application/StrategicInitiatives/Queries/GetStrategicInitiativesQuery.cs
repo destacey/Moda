@@ -9,7 +9,7 @@ namespace Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Queri
 /// </summary>
 /// <param name="StatusFilter"></param>
 /// <param name="PortfolioIdOrKey"></param>
-public sealed record GetStrategicInitiativesQuery(StrategicInitiativeStatus? StatusFilter = null, IdOrKey? PortfolioIdOrKey = null) : IQuery<List<StrategicInitiativeListDto>>;
+public sealed record GetStrategicInitiativesQuery(StrategicInitiativeStatus[]? StatusFilter = null, IdOrKey? PortfolioIdOrKey = null) : IQuery<List<StrategicInitiativeListDto>>;
 
 internal sealed class GetStrategicInitiativesQueryHandler(IProjectPortfolioManagementDbContext projectPortfolioManagementDbContext)
     : IQueryHandler<GetStrategicInitiativesQuery, List<StrategicInitiativeListDto>>
@@ -20,9 +20,9 @@ internal sealed class GetStrategicInitiativesQueryHandler(IProjectPortfolioManag
     {
         var query = _projectPortfolioManagementDbContext.StrategicInitiatives.AsQueryable();
 
-        if (request.StatusFilter.HasValue)
+        if (request.StatusFilter is { Length: > 0 })
         {
-            query = query.Where(si => si.Status == request.StatusFilter.Value);
+            query = query.Where(si => request.StatusFilter.Contains(si.Status));
         }
 
         if (request.PortfolioIdOrKey is not null)

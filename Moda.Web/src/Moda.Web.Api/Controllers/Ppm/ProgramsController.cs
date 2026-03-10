@@ -23,9 +23,11 @@ public class ProgramsController(ILogger<ProgramsController> logger, ISender send
     [OpenApiOperation("Get a list of programs.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IEnumerable<ProgramListDto>>> GetPrograms([FromQuery] int? status, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<ProgramListDto>>> GetPrograms([FromQuery] int[]? status, CancellationToken cancellationToken)
     {
-        ProgramStatus? filter = status.HasValue ? (ProgramStatus)status.Value : null;
+        ProgramStatus[]? filter = status is { Length: > 0 }
+            ? [.. status.Select(s => (ProgramStatus)s)]
+            : null;
 
         var programs = await _sender.Send(new GetProgramsQuery(StatusFilter: filter), cancellationToken);
 
@@ -154,9 +156,11 @@ public class ProgramsController(ILogger<ProgramsController> logger, ISender send
     [OpenApiOperation("Get a list of projects.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IEnumerable<ProjectListDto>>> GetProjects(string idOrKey, [FromQuery] int? status, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<ProjectListDto>>> GetProjects(string idOrKey, [FromQuery] int[]? status, CancellationToken cancellationToken)
     {
-        ProjectStatus? filter = status.HasValue ? (ProjectStatus)status.Value : null;
+        ProjectStatus[]? filter = status is { Length: > 0 }
+            ? [.. status.Select(s => (ProjectStatus)s)]
+            : null;
 
         var projects = await _sender.Send(new GetProjectsQuery(StatusFilter: filter, ProgramIdOrKey: idOrKey), cancellationToken);
 

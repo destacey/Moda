@@ -28,7 +28,7 @@ export const strategicInitiativesApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getStrategicInitiatives: builder.query<
       StrategicInitiativeListDto[],
-      number | undefined
+      number[] | undefined
     >({
       queryFn: async (status = undefined) => {
         try {

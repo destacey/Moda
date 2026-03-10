@@ -2660,10 +2660,10 @@ export class StrategicThemesClient {
      * Get a list of strategic themes.
      * @param state (optional) 
      */
-    getStrategicThemes(state?: number | null | undefined, cancelToken?: CancelToken): Promise<StrategicThemeListDto[]> {
+    getStrategicThemes(state?: number[] | null | undefined, cancelToken?: CancelToken): Promise<StrategicThemeListDto[]> {
         let url_ = this.baseUrl + "/api/strategic-management/strategic-themes?";
         if (state !== undefined && state !== null)
-            url_ += "state=" + encodeURIComponent("" + state) + "&";
+            state && state.forEach(item => { url_ += "state=" + encodeURIComponent("" + item) + "&"; });
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -4629,10 +4629,10 @@ export class PortfoliosClient {
      * Get a list of project portfolios.
      * @param status (optional) 
      */
-    getPortfolios(status?: number | null | undefined, cancelToken?: CancelToken): Promise<ProjectPortfolioListDto[]> {
+    getPortfolios(status?: number[] | null | undefined, cancelToken?: CancelToken): Promise<ProjectPortfolioListDto[]> {
         let url_ = this.baseUrl + "/api/ppm/portfolios?";
         if (status !== undefined && status !== null)
-            url_ += "status=" + encodeURIComponent("" + status) + "&";
+            status && status.forEach(item => { url_ += "status=" + encodeURIComponent("" + item) + "&"; });
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -5130,13 +5130,13 @@ export class PortfoliosClient {
      * Get a list of programs for the portfolio.
      * @param status (optional) 
      */
-    getPrograms(idOrKey: string, status?: number | null | undefined, cancelToken?: CancelToken): Promise<ProgramListDto[]> {
+    getPrograms(idOrKey: string, status?: number[] | null | undefined, cancelToken?: CancelToken): Promise<ProgramListDto[]> {
         let url_ = this.baseUrl + "/api/ppm/portfolios/{idOrKey}/programs?";
         if (idOrKey === undefined || idOrKey === null)
             throw new globalThis.Error("The parameter 'idOrKey' must be defined.");
         url_ = url_.replace("{idOrKey}", encodeURIComponent("" + idOrKey));
         if (status !== undefined && status !== null)
-            url_ += "status=" + encodeURIComponent("" + status) + "&";
+            status && status.forEach(item => { url_ += "status=" + encodeURIComponent("" + item) + "&"; });
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -5192,12 +5192,15 @@ export class PortfoliosClient {
 
     /**
      * Get a list of projects for the portfolio.
+     * @param status (optional) 
      */
-    getProjects(idOrKey: string, cancelToken?: CancelToken): Promise<ProjectListDto[]> {
-        let url_ = this.baseUrl + "/api/ppm/portfolios/{idOrKey}/projects";
+    getProjects(idOrKey: string, status?: number[] | null | undefined, cancelToken?: CancelToken): Promise<ProjectListDto[]> {
+        let url_ = this.baseUrl + "/api/ppm/portfolios/{idOrKey}/projects?";
         if (idOrKey === undefined || idOrKey === null)
             throw new globalThis.Error("The parameter 'idOrKey' must be defined.");
         url_ = url_.replace("{idOrKey}", encodeURIComponent("" + idOrKey));
+        if (status !== undefined && status !== null)
+            status && status.forEach(item => { url_ += "status=" + encodeURIComponent("" + item) + "&"; });
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -5255,13 +5258,13 @@ export class PortfoliosClient {
      * Get a list of strategic initiatives for the portfolio.
      * @param status (optional) 
      */
-    getStrategicInitiatives(idOrKey: string, status?: number | null | undefined, cancelToken?: CancelToken): Promise<StrategicInitiativeListDto[]> {
+    getStrategicInitiatives(idOrKey: string, status?: number[] | null | undefined, cancelToken?: CancelToken): Promise<StrategicInitiativeListDto[]> {
         let url_ = this.baseUrl + "/api/ppm/portfolios/{idOrKey}/strategic-initiatives?";
         if (idOrKey === undefined || idOrKey === null)
             throw new globalThis.Error("The parameter 'idOrKey' must be defined.");
         url_ = url_.replace("{idOrKey}", encodeURIComponent("" + idOrKey));
         if (status !== undefined && status !== null)
-            url_ += "status=" + encodeURIComponent("" + status) + "&";
+            status && status.forEach(item => { url_ += "status=" + encodeURIComponent("" + item) + "&"; });
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -5449,10 +5452,10 @@ export class ProgramsClient {
      * Get a list of programs.
      * @param status (optional) 
      */
-    getPrograms(status?: number | null | undefined, cancelToken?: CancelToken): Promise<ProgramListDto[]> {
+    getPrograms(status?: number[] | null | undefined, cancelToken?: CancelToken): Promise<ProgramListDto[]> {
         let url_ = this.baseUrl + "/api/ppm/programs?";
         if (status !== undefined && status !== null)
-            url_ += "status=" + encodeURIComponent("" + status) + "&";
+            status && status.forEach(item => { url_ += "status=" + encodeURIComponent("" + item) + "&"; });
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -6008,13 +6011,13 @@ export class ProgramsClient {
      * Get a list of projects.
      * @param status (optional) 
      */
-    getProjects(idOrKey: string, status?: number | null | undefined, cancelToken?: CancelToken): Promise<ProjectListDto[]> {
+    getProjects(idOrKey: string, status?: number[] | null | undefined, cancelToken?: CancelToken): Promise<ProjectListDto[]> {
         let url_ = this.baseUrl + "/api/ppm/programs/{idOrKey}/projects?";
         if (idOrKey === undefined || idOrKey === null)
             throw new globalThis.Error("The parameter 'idOrKey' must be defined.");
         url_ = url_.replace("{idOrKey}", encodeURIComponent("" + idOrKey));
         if (status !== undefined && status !== null)
-            url_ += "status=" + encodeURIComponent("" + status) + "&";
+            status && status.forEach(item => { url_ += "status=" + encodeURIComponent("" + item) + "&"; });
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -6086,10 +6089,10 @@ export class ProjectsClient {
      * Get a list of projects.
      * @param status (optional) 
      */
-    getProjects(status?: number | null | undefined, cancelToken?: CancelToken): Promise<ProjectListDto[]> {
+    getProjects(status?: number[] | null | undefined, cancelToken?: CancelToken): Promise<ProjectListDto[]> {
         let url_ = this.baseUrl + "/api/ppm/projects?";
         if (status !== undefined && status !== null)
-            url_ += "status=" + encodeURIComponent("" + status) + "&";
+            status && status.forEach(item => { url_ += "status=" + encodeURIComponent("" + item) + "&"; });
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -7797,10 +7800,10 @@ export class StrategicInitiativesClient {
      * Get a list of strategic initiatives.
      * @param status (optional) 
      */
-    getStrategicInitiatives(status?: number | null | undefined, cancelToken?: CancelToken): Promise<StrategicInitiativeListDto[]> {
+    getStrategicInitiatives(status?: number[] | null | undefined, cancelToken?: CancelToken): Promise<StrategicInitiativeListDto[]> {
         let url_ = this.baseUrl + "/api/ppm/strategic-initiatives?";
         if (status !== undefined && status !== null)
-            url_ += "status=" + encodeURIComponent("" + status) + "&";
+            status && status.forEach(item => { url_ += "status=" + encodeURIComponent("" + item) + "&"; });
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {

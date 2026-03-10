@@ -26,7 +26,7 @@ const ProjectsPage: React.FC = () => {
     isLoading,
     error,
     refetch,
-  } = useGetProjectsQuery(null)
+  } = useGetProjectsQuery(undefined)
 
   useEffect(() => {
     if (error) {

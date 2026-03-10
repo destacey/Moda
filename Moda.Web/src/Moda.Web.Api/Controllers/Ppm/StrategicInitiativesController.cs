@@ -23,9 +23,11 @@ public class StrategicInitiativesController(ILogger<StrategicInitiativesControll
     [OpenApiOperation("Get a list of strategic initiatives.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IEnumerable<StrategicInitiativeListDto>>> GetStrategicInitiatives([FromQuery] int? status, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<StrategicInitiativeListDto>>> GetStrategicInitiatives([FromQuery] int[]? status, CancellationToken cancellationToken)
     {
-        StrategicInitiativeStatus? filter = status.HasValue ? (StrategicInitiativeStatus)status.Value : null;
+        StrategicInitiativeStatus[]? filter = status is { Length: > 0 }
+            ? [.. status.Select(s => (StrategicInitiativeStatus)s)]
+            : null;
 
         var initiatives = await _sender.Send(new GetStrategicInitiativesQuery(filter), cancellationToken);
 

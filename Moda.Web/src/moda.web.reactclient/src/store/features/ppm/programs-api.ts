@@ -15,7 +15,7 @@ import { OptionModel } from '@/src/components/types'
 
 export const programsApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getPrograms: builder.query<ProgramListDto[], number | undefined>({
+    getPrograms: builder.query<ProgramListDto[], number[] | undefined>({
       queryFn: async (status = undefined) => {
         try {
           const data = await getProgramsClient().getPrograms(status)
@@ -189,7 +189,7 @@ export const programsApi = apiSlice.injectEndpoints({
     getProgramOptions: builder.query<BaseOptionType[], void>({
       queryFn: async () => {
         try {
-          const programs = await getProgramsClient().getPrograms(null)
+          const programs = await getProgramsClient().getPrograms(undefined)
 
           const data: BaseOptionType[] = programs
             .sort((a, b) => a.name.localeCompare(b.name))

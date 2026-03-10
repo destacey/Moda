@@ -17,7 +17,7 @@ import { OptionModel } from '@/src/components/types'
 
 export const projectsApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getProjects: builder.query<ProjectListDto[], number | undefined>({
+    getProjects: builder.query<ProjectListDto[], number[] | undefined>({
       queryFn: async (status = undefined) => {
         try {
           const data = await getProjectsClient().getProjects(status)
@@ -248,7 +248,7 @@ export const projectsApi = apiSlice.injectEndpoints({
     getProjectOptions: builder.query<BaseOptionType[], void>({
       queryFn: async () => {
         try {
-          const portfolios = await getProjectsClient().getProjects(null)
+          const portfolios = await getProjectsClient().getProjects(undefined)
 
           const data: BaseOptionType[] = portfolios
             .sort((a, b) => a.name.localeCompare(b.name))

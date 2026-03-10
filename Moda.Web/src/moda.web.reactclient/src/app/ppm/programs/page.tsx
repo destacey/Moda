@@ -26,7 +26,7 @@ const ProgramsPage: FC = () => {
     isLoading,
     error,
     refetch,
-  } = useGetProgramsQuery(null)
+  } = useGetProgramsQuery(undefined)
 
   useEffect(() => {
     if (error) {

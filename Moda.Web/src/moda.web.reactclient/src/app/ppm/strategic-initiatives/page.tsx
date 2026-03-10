@@ -31,7 +31,7 @@ const StrategicInitiativesPage: React.FC = () => {
     isLoading,
     error,
     refetch,
-  } = useGetStrategicInitiativesQuery(null)
+  } = useGetStrategicInitiativesQuery(undefined)
 
   useEffect(() => {
     if (error) {

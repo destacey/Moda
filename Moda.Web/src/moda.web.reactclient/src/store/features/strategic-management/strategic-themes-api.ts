@@ -15,7 +15,7 @@ export const strategicThemesApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getStrategicThemes: builder.query<
       StrategicThemeListDto[],
-      number | undefined
+      number[] | undefined
     >({
       queryFn: async (strategicThemeState = undefined) => {
         try {

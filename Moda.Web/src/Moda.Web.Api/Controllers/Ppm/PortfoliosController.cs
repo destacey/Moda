@@ -28,9 +28,11 @@ public class PortfoliosController(ILogger<PortfoliosController> logger, ISender 
     [OpenApiOperation("Get a list of project portfolios.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IEnumerable<ProjectPortfolioListDto>>> GetPortfolios(CancellationToken cancellationToken, [FromQuery] int? status = null)
+    public async Task<ActionResult<IEnumerable<ProjectPortfolioListDto>>> GetPortfolios(CancellationToken cancellationToken, [FromQuery] int[]? status = null)
     {
-        ProjectPortfolioStatus? filter = status.HasValue ? (ProjectPortfolioStatus)status.Value : null;
+        ProjectPortfolioStatus[]? filter = status is { Length: > 0 }
+            ? [.. status.Select(s => (ProjectPortfolioStatus)s)]
+            : null;
 
         var portfolios = await _sender.Send(new GetProjectPortfoliosQuery(filter), cancellationToken);
 
@@ -146,9 +148,11 @@ public class PortfoliosController(ILogger<PortfoliosController> logger, ISender 
     [OpenApiOperation("Get a list of programs for the portfolio.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IEnumerable<ProgramListDto>>> GetPrograms(string idOrKey, [FromQuery] int? status, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<ProgramListDto>>> GetPrograms(string idOrKey, [FromQuery] int[]? status, CancellationToken cancellationToken)
     {
-        ProgramStatus? filter = status.HasValue ? (ProgramStatus)status.Value : null;
+        ProgramStatus[]? filter = status is { Length: > 0 }
+            ? [.. status.Select(s => (ProgramStatus)s)]
+            : null;
 
         var programs = await _sender.Send(new GetProgramsQuery(PortfolioIdOrKey: idOrKey, StatusFilter: filter), cancellationToken);
 
@@ -160,9 +164,13 @@ public class PortfoliosController(ILogger<PortfoliosController> logger, ISender 
     [OpenApiOperation("Get a list of projects for the portfolio.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IEnumerable<ProjectListDto>>> GetProjects(string idOrKey, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<ProjectListDto>>> GetProjects(string idOrKey, [FromQuery] int[]? status, CancellationToken cancellationToken)
     {
-        var projects = await _sender.Send(new GetProjectsQuery(PortfolioIdOrKey: idOrKey), cancellationToken);
+        ProjectStatus[]? filter = status is { Length: > 0 }
+            ? [.. status.Select(s => (ProjectStatus)s)]
+            : null;
+
+        var projects = await _sender.Send(new GetProjectsQuery(StatusFilter: filter, PortfolioIdOrKey: idOrKey), cancellationToken);
 
         return Ok(projects);
     }
@@ -172,9 +180,11 @@ public class PortfoliosController(ILogger<PortfoliosController> logger, ISender 
     [OpenApiOperation("Get a list of strategic initiatives for the portfolio.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IEnumerable<StrategicInitiativeListDto>>> GetStrategicInitiatives(string idOrKey, [FromQuery] int? status, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<StrategicInitiativeListDto>>> GetStrategicInitiatives(string idOrKey, [FromQuery] int[]? status, CancellationToken cancellationToken)
     {
-        StrategicInitiativeStatus? filter = status.HasValue ? (StrategicInitiativeStatus)status.Value : null;
+        StrategicInitiativeStatus[]? filter = status is { Length: > 0 }
+            ? [.. status.Select(s => (StrategicInitiativeStatus)s)]
+            : null;
 
         var initiatives = await _sender.Send(new GetStrategicInitiativesQuery(filter, idOrKey), cancellationToken);
 

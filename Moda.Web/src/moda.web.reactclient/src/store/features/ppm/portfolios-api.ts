@@ -17,7 +17,7 @@ import { OptionModel } from '@/src/components/types'
 
 export const portfoliosApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getPortfolios: builder.query<ProjectPortfolioListDto[], number | undefined>(
+    getPortfolios: builder.query<ProjectPortfolioListDto[], number[] | undefined>(
       {
         queryFn: async (portfolioState = undefined) => {
           try {

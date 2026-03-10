@@ -4,7 +4,7 @@ using Moda.ProjectPortfolioManagement.Domain.Enums;
 
 namespace Moda.ProjectPortfolioManagement.Application.Programs.Queries;
 
-public sealed record GetProgramsQuery(ProgramStatus? StatusFilter = null, IdOrKey? PortfolioIdOrKey = null) : IQuery<List<ProgramListDto>>;
+public sealed record GetProgramsQuery(ProgramStatus[]? StatusFilter = null, IdOrKey? PortfolioIdOrKey = null) : IQuery<List<ProgramListDto>>;
 
 internal sealed class GetProgramsQueryHandler(IProjectPortfolioManagementDbContext ppmDbContext) 
     : IQueryHandler<GetProgramsQuery, List<ProgramListDto>>
@@ -15,9 +15,9 @@ internal sealed class GetProgramsQueryHandler(IProjectPortfolioManagementDbConte
     {
         var query = _ppmDbContext.Programs.AsQueryable();
 
-        if (request.StatusFilter.HasValue)
+        if (request.StatusFilter is { Length: > 0 })
         {
-            query = query.Where(pp => pp.Status == request.StatusFilter.Value);
+            query = query.Where(pp => request.StatusFilter.Contains(pp.Status));
         }
 
         if (request.PortfolioIdOrKey is not null)
