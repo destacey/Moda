@@ -28,13 +28,14 @@ export const strategicInitiativesApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getStrategicInitiatives: builder.query<
       StrategicInitiativeListDto[],
-      number[] | undefined
+      { status?: number[]; portfolioId?: string } | undefined
     >({
-      queryFn: async (status = undefined) => {
+      queryFn: async (request = undefined) => {
         try {
           const data =
             await getStrategicInitiativesClient().getStrategicInitiatives(
-              status,
+              request?.status?.length > 0 ? request.status : undefined,
+              request?.portfolioId,
             )
           return { data }
         } catch (error) {

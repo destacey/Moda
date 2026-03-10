@@ -193,13 +193,13 @@ export const portfoliosApi = apiSlice.injectEndpoints({
     }),
     getPortfolioStrategicInitiatives: builder.query<
       StrategicInitiativeListDto[],
-      string
+      { portfolioIdOrKey: string; status?: number[] }
     >({
-      queryFn: async (portfolioIdOrKey) => {
+      queryFn: async ({ portfolioIdOrKey, status }) => {
         try {
           const data = await getPortfoliosClient().getStrategicInitiatives(
             portfolioIdOrKey,
-            null,
+            status?.length > 0 ? status : undefined,
           )
           return { data }
         } catch (error) {
@@ -207,9 +207,9 @@ export const portfoliosApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
-      providesTags: (result, error, arg) => [
+      providesTags: (result, error, { portfolioIdOrKey }) => [
         { type: QueryTags.PortfolioStrategicInitiatives, id: 'LIST' },
-        { type: QueryTags.PortfolioStrategicInitiatives, id: arg },
+        { type: QueryTags.PortfolioStrategicInitiatives, id: portfolioIdOrKey },
       ],
     }),
     getPortfolioStatusOptions: builder.query<OptionModel<number>[], void>({

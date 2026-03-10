@@ -33,6 +33,7 @@ import {
   ProgramViewManager,
   ProjectsFilterBar,
   ProjectViewManager,
+  StrategicInitiativesFilterBar,
   StrategicInitiativeViewManager,
 } from '../../_components'
 
@@ -85,6 +86,9 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   >([1, 2]) // Proposed, Active
   const [strategicInitiativesQueried, setStrategicInitiativesQueried] =
     useState(false)
+  const [selectedSIStatuses, setSelectedSIStatuses] = useState<number[]>([
+    1, 2, 3,
+  ]) // Proposed, Approved, Active
 
   const [openEditPortfolioForm, setOpenEditPortfolioForm] =
     useState<boolean>(false)
@@ -154,9 +158,14 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     isLoading: isLoadingStrategicInitiatives,
     error: errorStrategicInitiatives,
     refetch: refetchStrategicInitiatives,
-  } = useGetPortfolioStrategicInitiativesQuery(portfolioKey.toString(), {
-    skip: !strategicInitiativesQueried,
-  })
+  } = useGetPortfolioStrategicInitiativesQuery(
+    {
+      portfolioIdOrKey: portfolioKey.toString(),
+      status:
+        selectedSIStatuses.length > 0 ? selectedSIStatuses : undefined,
+    },
+    { skip: !strategicInitiativesQueried },
+  )
 
   useDocumentTitle(`${portfolioData?.name ?? portfolioKey} - Portfolio Details`)
 
@@ -182,6 +191,15 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
 
   const toggleProgramStatus = useCallback((statusId: number) => {
     setSelectedProgramStatuses((prev) => {
+      if (prev.includes(statusId)) {
+        return prev.filter((s) => s !== statusId)
+      }
+      return [...prev, statusId]
+    })
+  }, [])
+
+  const toggleSIStatus = useCallback((statusId: number) => {
+    setSelectedSIStatuses((prev) => {
       if (prev.includes(statusId)) {
         return prev.filter((s) => s !== statusId)
       }
@@ -235,11 +253,18 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
         )
       case PortfolioTabs.StrategicInitiatives:
         return (
-          <StrategicInitiativeViewManager
-            strategicInitiatives={strategicInitiativeData}
-            isLoading={isLoadingStrategicInitiatives}
-            refetch={refetchStrategicInitiatives}
-          />
+          <>
+            <StrategicInitiativesFilterBar
+              selectedStatuses={selectedSIStatuses}
+              onToggleStatus={toggleSIStatus}
+              showPortfolioFilter={false}
+            />
+            <StrategicInitiativeViewManager
+              strategicInitiatives={strategicInitiativeData}
+              isLoading={isLoadingStrategicInitiatives}
+              refetch={refetchStrategicInitiatives}
+            />
+          </>
         )
       default:
         return null
@@ -258,8 +283,10 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     refetchStrategicInitiatives,
     selectedProgramStatuses,
     selectedProjectStatuses,
+    selectedSIStatuses,
     toggleProgramStatus,
     toggleProjectStatus,
+    toggleSIStatus,
   ])
 
   const actionsMenuItems: MenuProps['items'] = useMemo(() => {

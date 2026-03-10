@@ -7805,11 +7805,14 @@ export class StrategicInitiativesClient {
     /**
      * Get a list of strategic initiatives.
      * @param status (optional) 
+     * @param portfolioId (optional) 
      */
-    getStrategicInitiatives(status?: number[] | null | undefined, cancelToken?: CancelToken): Promise<StrategicInitiativeListDto[]> {
+    getStrategicInitiatives(status?: number[] | null | undefined, portfolioId?: string | null | undefined, cancelToken?: CancelToken): Promise<StrategicInitiativeListDto[]> {
         let url_ = this.baseUrl + "/api/ppm/strategic-initiatives?";
         if (status !== undefined && status !== null)
             status && status.forEach(item => { url_ += "status=" + encodeURIComponent("" + item) + "&"; });
+        if (portfolioId !== undefined && portfolioId !== null)
+            url_ += "portfolioId=" + encodeURIComponent("" + portfolioId) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {

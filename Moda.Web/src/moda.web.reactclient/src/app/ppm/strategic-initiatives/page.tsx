@@ -6,17 +6,42 @@ import { authorizePage } from '@/src/components/hoc'
 import { useDocumentTitle } from '@/src/hooks'
 import { useGetStrategicInitiativesQuery } from '@/src/store/features/ppm/strategic-initiatives-api'
 import { Button } from 'antd'
-import { useEffect, useMemo, useState } from 'react'
+import { FC, useCallback, useEffect, useMemo, useState } from 'react'
 import { CreateStrategicInitiativeForm } from './_components'
-import { StrategicInitiativesGrid } from '../_components'
+import {
+  StrategicInitiativesFilterBar,
+  StrategicInitiativesGrid,
+} from '../_components'
 import { useMessage } from '@/src/components/contexts/messaging'
 
-const StrategicInitiativesPage: React.FC = () => {
+// Strategic Initiative status enum values matching the backend
+const SI_STATUS = {
+  Proposed: 1,
+  Approved: 2,
+  Active: 3,
+  OnHold: 4,
+  Completed: 5,
+  Cancelled: 6,
+} as const
+
+const DEFAULT_STATUSES = [
+  SI_STATUS.Proposed,
+  SI_STATUS.Approved,
+  SI_STATUS.Active,
+  SI_STATUS.OnHold,
+]
+
+const StrategicInitiativesPage: FC = () => {
   useDocumentTitle('Strategic Initiatives')
   const [
     openCreateStrategicInitiativeForm,
     setOpenCreateStrategicInitiativeForm,
   ] = useState<boolean>(false)
+  const [selectedStatuses, setSelectedStatuses] =
+    useState<number[]>(DEFAULT_STATUSES)
+  const [selectedPortfolioId, setSelectedPortfolioId] = useState<
+    string | undefined
+  >(undefined)
 
   const messageApi = useMessage()
 
@@ -31,7 +56,10 @@ const StrategicInitiativesPage: React.FC = () => {
     isLoading,
     error,
     refetch,
-  } = useGetStrategicInitiativesQuery(undefined)
+  } = useGetStrategicInitiativesQuery({
+    status: selectedStatuses.length > 0 ? selectedStatuses : undefined,
+    portfolioId: selectedPortfolioId,
+  })
 
   useEffect(() => {
     if (error) {
@@ -39,6 +67,15 @@ const StrategicInitiativesPage: React.FC = () => {
       messageApi.error('Failed to load strategic initiatives.')
     }
   }, [error, messageApi])
+
+  const toggleStatus = useCallback((statusId: number) => {
+    setSelectedStatuses((prev) => {
+      if (prev.includes(statusId)) {
+        return prev.filter((s) => s !== statusId)
+      }
+      return [...prev, statusId]
+    })
+  }, [])
 
   const actions = useMemo(() => {
     if (!showActions) return null
@@ -63,6 +100,12 @@ const StrategicInitiativesPage: React.FC = () => {
   return (
     <>
       <PageTitle title="Strategic Initiatives" actions={actions} />
+      <StrategicInitiativesFilterBar
+        selectedStatuses={selectedStatuses}
+        onToggleStatus={toggleStatus}
+        selectedPortfolioId={selectedPortfolioId}
+        onPortfolioChange={setSelectedPortfolioId}
+      />
       <StrategicInitiativesGrid
         strategicInitiatives={strategicInitiativeData}
         isLoading={isLoading}

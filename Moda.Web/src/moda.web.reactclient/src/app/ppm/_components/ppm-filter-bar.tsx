@@ -20,10 +20,11 @@ export interface PpmFilterBarProps {
 // Map status names to lifecycle phases for tag coloring
 const STATUS_LIFECYCLE_PHASE: Record<string, LifecyclePhase> = {
   Proposed: LifecyclePhase.NotStarted,
+  Approved: LifecyclePhase.NotStarted,
   Active: LifecyclePhase.Active,
+  'On Hold': LifecyclePhase.Active,
   Completed: LifecyclePhase.Done,
   Cancelled: LifecyclePhase.Done,
-  'On Hold': LifecyclePhase.NotStarted,
 }
 
 const hasPortfolioFilter = (
