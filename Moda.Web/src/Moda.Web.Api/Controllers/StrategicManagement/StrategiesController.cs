@@ -1,6 +1,4 @@
 ﻿using Moda.Common.Application.Models;
-using Moda.StrategicManagement.Application.StrategicThemes.Commands;
-using Moda.StrategicManagement.Application.StrategicThemes.Queries;
 using Moda.StrategicManagement.Application.Strategies.Commands;
 using Moda.StrategicManagement.Application.Strategies.Dtos;
 using Moda.StrategicManagement.Application.Strategies.Queries;
@@ -13,23 +11,17 @@ namespace Moda.Web.Api.Controllers.StrategicManagement;
 [Route("api/strategic-management/[controller]")]
 [ApiVersionNeutral]
 [ApiController]
-public class StrategiesController : ControllerBase
+public class StrategiesController(ILogger<StrategiesController> logger, ISender sender) : ControllerBase
 {
-    private readonly ILogger<StrategiesController> _logger;
-    private readonly ISender _sender;
-
-    public StrategiesController(ILogger<StrategiesController> logger, ISender sender)
-    {
-        _logger = logger;
-        _sender = sender;
-    }
+    private readonly ILogger<StrategiesController> _logger = logger;
+    private readonly ISender _sender = sender;
 
     [HttpGet]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Strategies)]
     [OpenApiOperation("Get a list of strategies.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IEnumerable<StrategyListDto>>> GetStrategies(CancellationToken cancellationToken, [FromQuery] int? status = null)
+    public async Task<ActionResult<IEnumerable<StrategyListDto>>> GetStrategies([FromQuery] int? status, CancellationToken cancellationToken)
     {
         StrategyStatus? filter = status.HasValue ? (StrategyStatus)status.Value : null;
 

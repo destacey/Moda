@@ -1,6 +1,4 @@
 ﻿using Moda.Common.Application.Models;
-using Moda.ProjectPortfolioManagement.Application.ExpenditureCategories.Dtos;
-using Moda.ProjectPortfolioManagement.Application.ExpenditureCategories.Queries;
 using Moda.ProjectPortfolioManagement.Application.Portfolios.Command;
 using Moda.ProjectPortfolioManagement.Application.Portfolios.Dtos;
 using Moda.ProjectPortfolioManagement.Application.Portfolios.Queries;
@@ -174,13 +172,24 @@ public class PortfoliosController(ILogger<PortfoliosController> logger, ISender 
     [OpenApiOperation("Get a list of strategic initiatives for the portfolio.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IEnumerable<StrategicInitiativeListDto>>> GetStrategicInitiatives(string idOrKey, CancellationToken cancellationToken, [FromQuery] int? status = null)
+    public async Task<ActionResult<IEnumerable<StrategicInitiativeListDto>>> GetStrategicInitiatives(string idOrKey, [FromQuery] int? status, CancellationToken cancellationToken)
     {
         StrategicInitiativeStatus? filter = status.HasValue ? (StrategicInitiativeStatus)status.Value : null;
 
         var initiatives = await _sender.Send(new GetStrategicInitiativesQuery(filter, idOrKey), cancellationToken);
 
         return Ok(initiatives);
+    }
+
+    [HttpGet("statuses")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.ProjectPortfolios)]
+    [OpenApiOperation("Get a list of all project portfolio statuses.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IEnumerable<ProjectPortfolioStatusDto>>> GetPortfolioStatuses(CancellationToken cancellationToken)
+    {
+        var items = await _sender.Send(new GetProjectPortfolioStatusesQuery(), cancellationToken);
+        return Ok(items.OrderBy(c => c.Order));
     }
 
     [HttpGet("options")]

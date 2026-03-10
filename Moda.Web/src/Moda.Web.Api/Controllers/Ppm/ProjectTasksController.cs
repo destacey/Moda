@@ -1,5 +1,4 @@
-﻿using FluentValidation;
-using Microsoft.AspNetCore.JsonPatch.SystemTextJson;
+﻿using Microsoft.AspNetCore.JsonPatch.SystemTextJson;
 using Moda.Common.Domain.Models.ProjectPortfolioManagement;
 using Moda.ProjectPortfolioManagement.Application.Projects.Queries;
 using Moda.ProjectPortfolioManagement.Application.ProjectTasks.Commands;

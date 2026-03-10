@@ -4043,6 +4043,48 @@
         ]
       }
     },
+    "/api/ppm/portfolios/statuses": {
+      "get": {
+        "tags": [
+          "Portfolios"
+        ],
+        "summary": "Get a list of all project portfolio statuses.",
+        "operationId": "Portfolios_GetPortfolioStatuses",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProjectPortfolioStatusDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
     "/api/ppm/portfolios/options": {
       "get": {
         "tags": [
@@ -4503,6 +4545,48 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/ppm/programs/statuses": {
+      "get": {
+        "tags": [
+          "Programs"
+        ],
+        "summary": "Get a list of all program statuses.",
+        "operationId": "Programs_GetProgramStatuses",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProgramStatusDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -5135,6 +5219,48 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/ppm/projects/statuses": {
+      "get": {
+        "tags": [
+          "Projects"
+        ],
+        "summary": "Get a list of all project statuses.",
+        "operationId": "Projects_GetProjectStatuses",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProjectStatusDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -6577,6 +6703,48 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/ppm/strategic-initiatives/statuses": {
+      "get": {
+        "tags": [
+          "StrategicInitiatives"
+        ],
+        "summary": "Get a list of all strategic initiative statuses.",
+        "operationId": "StrategicInitiatives_GetStrategicInitiativeStatuses",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/StrategicInitiativeStatusDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -20184,9 +20352,9 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
           "name",
-          "lifecyclePhase"
+          "lifecyclePhase",
+          "id"
         ],
         "properties": {
           "id": {
@@ -20593,6 +20761,38 @@
           }
         }
       },
+      "ProjectPortfolioStatusDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "lifecyclePhase",
+          "id",
+          "order"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "order": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "lifecyclePhase": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
       "ProjectPortfolioOptionDto": {
         "type": "object",
         "additionalProperties": false,
@@ -20861,6 +21061,38 @@
               "nullable": false,
               "example": "00000000-0000-0000-0000-000000000000"
             }
+          }
+        }
+      },
+      "ProgramStatusDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "lifecyclePhase",
+          "id",
+          "order"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "order": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "lifecyclePhase": {
+            "type": "string",
+            "minLength": 1
           }
         }
       },
@@ -21182,6 +21414,38 @@
             "description": "The new key to assign to the Project (2-20 uppercase alphanumeric characters).",
             "pattern": "^([A-Z0-9]){2,20}$",
             "nullable": false
+          }
+        }
+      },
+      "ProjectStatusDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "lifecyclePhase",
+          "id",
+          "order"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "order": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "lifecyclePhase": {
+            "type": "string",
+            "minLength": 1
           }
         }
       },
@@ -22372,6 +22636,38 @@
               "nullable": false,
               "example": "00000000-0000-0000-0000-000000000000"
             }
+          }
+        }
+      },
+      "StrategicInitiativeStatusDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "lifecyclePhase",
+          "id",
+          "order"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "order": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "lifecyclePhase": {
+            "type": "string",
+            "minLength": 1
           }
         }
       },

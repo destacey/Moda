@@ -7,11 +7,13 @@ import {
   ProjectListDto,
   ProjectPortfolioDetailsDto,
   ProjectPortfolioListDto,
+  ProjectPortfolioStatusDto,
   StrategicInitiativeListDto,
   UpdatePortfolioRequest,
 } from '@/src/services/moda-api'
 import { QueryTags } from '../query-tags'
 import { BaseOptionType } from 'antd/es/select'
+import { OptionModel } from '@/src/components/types'
 
 export const portfoliosApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -199,6 +201,27 @@ export const portfoliosApi = apiSlice.injectEndpoints({
         { type: QueryTags.PortfolioStrategicInitiatives, id: arg },
       ],
     }),
+    getPortfolioStatusOptions: builder.query<OptionModel<number>[], void>({
+      queryFn: async () => {
+        try {
+          const statuses = await getPortfoliosClient().getPortfolioStatuses()
+
+          const data: OptionModel<number>[] = statuses
+            .sort((a, b) => a.order - b.order)
+            .map((s) => ({
+              value: s.id,
+              label: s.name,
+            }))
+
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: () => [QueryTags.PortfolioStatusOptions],
+    }),
+
     getPortfolioOptions: builder.query<BaseOptionType[], void>({
       queryFn: async () => {
         try {
@@ -262,4 +285,5 @@ export const {
   useGetPortfolioStrategicInitiativesQuery,
   useGetPortfolioOptionsQuery,
   useGetPortfolioProgramOptionsQuery,
+  useGetPortfolioStatusOptionsQuery,
 } = portfoliosApi

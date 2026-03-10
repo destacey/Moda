@@ -23,7 +23,7 @@ public class StrategicInitiativesController(ILogger<StrategicInitiativesControll
     [OpenApiOperation("Get a list of strategic initiatives.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IEnumerable<StrategicInitiativeListDto>>> GetStrategicInitiatives(CancellationToken cancellationToken, [FromQuery] int? status = null)
+    public async Task<ActionResult<IEnumerable<StrategicInitiativeListDto>>> GetStrategicInitiatives([FromQuery] int? status, CancellationToken cancellationToken)
     {
         StrategicInitiativeStatus? filter = status.HasValue ? (StrategicInitiativeStatus)status.Value : null;
 
@@ -149,6 +149,17 @@ public class StrategicInitiativesController(ILogger<StrategicInitiativesControll
         return result.IsSuccess
             ? NoContent()
             : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpGet("statuses")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.StrategicInitiatives)]
+    [OpenApiOperation("Get a list of all strategic initiative statuses.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IEnumerable<StrategicInitiativeStatusDto>>> GetStrategicInitiativeStatuses(CancellationToken cancellationToken)
+    {
+        var items = await _sender.Send(new GetStrategicInitiativeStatusesQuery(), cancellationToken);
+        return Ok(items.OrderBy(c => c.Order));
     }
 
     #region KPIs

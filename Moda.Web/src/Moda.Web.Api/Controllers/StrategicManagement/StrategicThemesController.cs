@@ -11,23 +11,17 @@ namespace Moda.Web.Api.Controllers.StrategicManagement;
 [Route("api/strategic-management/strategic-themes")]
 [ApiVersionNeutral]
 [ApiController]
-public class StrategicThemesController : ControllerBase
+public class StrategicThemesController(ILogger<StrategicThemesController> logger, ISender sender) : ControllerBase
 {
-    private readonly ILogger<StrategicThemesController> _logger;
-    private readonly ISender _sender;
-
-    public StrategicThemesController(ILogger<StrategicThemesController> logger, ISender sender)
-    {
-        _logger = logger;
-        _sender = sender;
-    }
+    private readonly ILogger<StrategicThemesController> _logger = logger;
+    private readonly ISender _sender = sender;
 
     [HttpGet]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.StrategicThemes)]
     [OpenApiOperation("Get a list of strategic themes.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IEnumerable<StrategicThemeListDto>>> GetStrategicThemes(CancellationToken cancellationToken, [FromQuery] int? state = null)
+    public async Task<ActionResult<IEnumerable<StrategicThemeListDto>>> GetStrategicThemes([FromQuery] int? state, CancellationToken cancellationToken)
     {
         StrategicThemeState? filter = state.HasValue ? (StrategicThemeState)state.Value : null;
 
@@ -130,7 +124,7 @@ public class StrategicThemesController : ControllerBase
     [OpenApiOperation("Get a list of strategic theme options.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IEnumerable<StrategicThemeOptionDto>>> GetStrategicThemeOptions(CancellationToken cancellationToken, [FromQuery] bool? includeArchived)
+    public async Task<ActionResult<IEnumerable<StrategicThemeOptionDto>>> GetStrategicThemeOptions([FromQuery] bool? includeArchived, CancellationToken cancellationToken)
     {
         var options = await _sender.Send(new GetStrategicThemeOptionsQuery(includeArchived), cancellationToken);
 

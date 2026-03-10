@@ -23,7 +23,7 @@ public class ProjectsController(ILogger<ProjectsController> logger, ISender send
     [OpenApiOperation("Get a list of projects.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IEnumerable<ProjectListDto>>> GetProjects(CancellationToken cancellationToken, [FromQuery] int? status = null)
+    public async Task<ActionResult<IEnumerable<ProjectListDto>>> GetProjects([FromQuery] int? status, CancellationToken cancellationToken)
     {
         ProjectStatus? filter = status.HasValue ? (ProjectStatus)status.Value : null;
 
@@ -165,6 +165,17 @@ public class ProjectsController(ILogger<ProjectsController> logger, ISender send
         return result.IsSuccess
             ? NoContent()
             : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpGet("statuses")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Projects)]
+    [OpenApiOperation("Get a list of all project statuses.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IEnumerable<ProjectStatusDto>>> GetProjectStatuses(CancellationToken cancellationToken)
+    {
+        var items = await _sender.Send(new GetProjectStatusesQuery(), cancellationToken);
+        return Ok(items.OrderBy(c => c.Order));
     }
 
     [HttpGet("{id}/work-items")]

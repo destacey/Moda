@@ -5,11 +5,13 @@ import {
   ObjectIdAndKey,
   ProgramListDto,
   ProgramDetailsDto,
+  ProgramStatusDto,
   UpdateProgramRequest,
   ProjectListDto,
 } from '@/src/services/moda-api'
 import { QueryTags } from '../query-tags'
 import { BaseOptionType } from 'antd/es/select'
+import { OptionModel } from '@/src/components/types'
 
 export const programsApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -163,6 +165,27 @@ export const programsApi = apiSlice.injectEndpoints({
         ...result.map(({ key }) => ({ type: QueryTags.ProgramProjects, key })),
       ],
     }),
+    getProgramStatusOptions: builder.query<OptionModel<number>[], void>({
+      queryFn: async () => {
+        try {
+          const statuses = await getProgramsClient().getProgramStatuses()
+
+          const data: OptionModel<number>[] = statuses
+            .sort((a, b) => a.order - b.order)
+            .map((s) => ({
+              value: s.id,
+              label: s.name,
+            }))
+
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: () => [QueryTags.ProgramStatusOptions],
+    }),
+
     getProgramOptions: builder.query<BaseOptionType[], void>({
       queryFn: async () => {
         try {
@@ -196,4 +219,5 @@ export const {
   useDeleteProgramMutation,
   useGetProgramProjectsQuery,
   useGetProgramOptionsQuery,
+  useGetProgramStatusOptionsQuery,
 } = programsApi

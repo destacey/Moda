@@ -5,6 +5,7 @@ import {
   ObjectIdAndKey,
   ProjectListDto,
   ProjectDetailsDto,
+  ProjectStatusDto,
   UpdateProjectRequest,
   WorkItemListDto,
   ChangeProjectProgramRequest,
@@ -12,6 +13,7 @@ import {
 } from '@/src/services/moda-api'
 import { QueryTags } from '../query-tags'
 import { BaseOptionType } from 'antd/es/select'
+import { OptionModel } from '@/src/components/types'
 
 export const projectsApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -222,6 +224,27 @@ export const projectsApi = apiSlice.injectEndpoints({
       ],
     }),
 
+    getProjectStatusOptions: builder.query<OptionModel<number>[], void>({
+      queryFn: async () => {
+        try {
+          const statuses = await getProjectsClient().getProjectStatuses()
+
+          const data: OptionModel<number>[] = statuses
+            .sort((a, b) => a.order - b.order)
+            .map((s) => ({
+              value: s.id,
+              label: s.name,
+            }))
+
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: () => [QueryTags.ProjectStatusOptions],
+    }),
+
     getProjectOptions: builder.query<BaseOptionType[], void>({
       queryFn: async () => {
         try {
@@ -257,4 +280,5 @@ export const {
   useDeleteProjectMutation,
   useGetProjectWorkItemsQuery,
   useGetProjectOptionsQuery,
+  useGetProjectStatusOptionsQuery,
 } = projectsApi

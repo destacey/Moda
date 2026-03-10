@@ -3,7 +3,6 @@
 namespace Moda.Common.Application.Dtos;
 public record LifecycleNavigationDto
 {
-    [Required]
     public int Id { get; set; }
 
     [Required]
