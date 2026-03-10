@@ -349,6 +349,7 @@ public class StrategicInitiativesController(ILogger<StrategicInitiativesControll
     [OpenApiOperation("Get a list of projects for the strategic initiative.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<IEnumerable<ProjectListDto>>> GetProjects(string idOrKey, CancellationToken cancellationToken)
     {
         var projects = await _sender.Send(new GetStrategicInitiativeProjectsQuery(idOrKey), cancellationToken);

@@ -148,6 +148,7 @@ public class PortfoliosController(ILogger<PortfoliosController> logger, ISender 
     [OpenApiOperation("Get a list of programs for the portfolio.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<IEnumerable<ProgramListDto>>> GetPrograms(string idOrKey, [FromQuery] int[]? status, CancellationToken cancellationToken)
     {
         ProgramStatus[]? filter = status is { Length: > 0 }
@@ -166,6 +167,7 @@ public class PortfoliosController(ILogger<PortfoliosController> logger, ISender 
     [OpenApiOperation("Get a list of projects for the portfolio.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<IEnumerable<ProjectListDto>>> GetProjects(string idOrKey, [FromQuery] int[]? status, CancellationToken cancellationToken)
     {
         ProjectStatus[]? filter = status is { Length: > 0 }

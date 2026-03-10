@@ -37,7 +37,11 @@ const hasPortfolioFilter = (
       'portfolioOptions' | 'selectedPortfolioId' | 'onPortfolioChange'
     >
   > => {
-  return props.onPortfolioChange !== undefined
+  return (
+    props.onPortfolioChange !== undefined &&
+    props.portfolioOptions !== undefined &&
+    props.selectedPortfolioId !== undefined
+  )
 }
 
 const PpmFilterBar: FC<PpmFilterBarProps> = (props) => {
@@ -84,6 +88,15 @@ const PpmFilterBar: FC<PpmFilterBarProps> = (props) => {
                 key={status.value}
                 color={isSelected ? color : undefined}
                 onClick={() => onToggleStatus(status.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    onToggleStatus(status.value)
+                  }
+                }}
+                role="button"
+                tabIndex={0}
+                aria-pressed={isSelected}
                 className={
                   isSelected ? styles.statusTag : styles.statusTagInactive
                 }

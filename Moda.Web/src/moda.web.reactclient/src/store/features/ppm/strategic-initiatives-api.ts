@@ -19,7 +19,6 @@ import {
   ObjectIdAndKey,
   StrategicInitiativeDetailsDto,
   StrategicInitiativeListDto,
-  StrategicInitiativeStatusDto,
   UpdateStrategicInitiativeRequest,
 } from '@/src/services/moda-api'
 import { OptionModel } from '@/src/components/types'

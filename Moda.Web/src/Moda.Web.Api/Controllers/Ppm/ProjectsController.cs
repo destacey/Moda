@@ -23,6 +23,7 @@ public class ProjectsController(ILogger<ProjectsController> logger, ISender send
     [OpenApiOperation("Get a list of projects.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<IEnumerable<ProjectListDto>>> GetProjects([FromQuery] int[]? status, [FromQuery] Guid? portfolioId, CancellationToken cancellationToken)
     {
         ProjectStatus[]? filter = status is { Length: > 0 }
