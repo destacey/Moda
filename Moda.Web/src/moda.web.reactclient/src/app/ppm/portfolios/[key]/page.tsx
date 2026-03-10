@@ -29,6 +29,7 @@ import ChangePortfolioStatusForm, {
   PortfolioStatusAction,
 } from '../_components/change-portfolio-status-form'
 import {
+  ProgramsFilterBar,
   ProgramViewManager,
   ProjectsFilterBar,
   ProjectViewManager,
@@ -75,6 +76,9 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
 
   const [activeTab, setActiveTab] = useState(PortfolioTabs.Details)
   const [programsQueried, setProgramsQueried] = useState(false)
+  const [selectedProgramStatuses, setSelectedProgramStatuses] = useState<
+    number[]
+  >([1, 2]) // Proposed, Active
   const [projectsQueried, setProjectsQueried] = useState(false)
   const [selectedProjectStatuses, setSelectedProjectStatuses] = useState<
     number[]
@@ -118,9 +122,16 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     isLoading: isLoadingPrograms,
     error: errorPrograms,
     refetch: refetchPrograms,
-  } = useGetPortfolioProgramsQuery(portfolioKey.toString(), {
-    skip: !programsQueried,
-  })
+  } = useGetPortfolioProgramsQuery(
+    {
+      portfolioIdOrKey: portfolioKey.toString(),
+      status:
+        selectedProgramStatuses.length > 0
+          ? selectedProgramStatuses
+          : undefined,
+    },
+    { skip: !programsQueried },
+  )
 
   const {
     data: projectData,
@@ -169,6 +180,15 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     dispatch(setBreadcrumbRoute({ route: breadcrumbRoute, pathname }))
   }, [dispatch, pathname, portfolioData])
 
+  const toggleProgramStatus = useCallback((statusId: number) => {
+    setSelectedProgramStatuses((prev) => {
+      if (prev.includes(statusId)) {
+        return prev.filter((s) => s !== statusId)
+      }
+      return [...prev, statusId]
+    })
+  }, [])
+
   const toggleProjectStatus = useCallback((statusId: number) => {
     setSelectedProjectStatuses((prev) => {
       if (prev.includes(statusId)) {
@@ -184,11 +204,18 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
         return <PortfolioDetails portfolio={portfolioData} />
       case PortfolioTabs.Programs:
         return (
-          <ProgramViewManager
-            programs={programData}
-            isLoading={isLoadingPrograms}
-            refetch={refetchPrograms}
-          />
+          <>
+            <ProgramsFilterBar
+              selectedStatuses={selectedProgramStatuses}
+              onToggleStatus={toggleProgramStatus}
+              showPortfolioFilter={false}
+            />
+            <ProgramViewManager
+              programs={programData}
+              isLoading={isLoadingPrograms}
+              refetch={refetchPrograms}
+            />
+          </>
         )
       case PortfolioTabs.Projects:
         return (
@@ -229,7 +256,9 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     refetchPrograms,
     refetchProjects,
     refetchStrategicInitiatives,
+    selectedProgramStatuses,
     selectedProjectStatuses,
+    toggleProgramStatus,
     toggleProjectStatus,
   ])
 

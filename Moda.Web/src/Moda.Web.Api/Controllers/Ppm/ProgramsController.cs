@@ -23,15 +23,21 @@ public class ProgramsController(ILogger<ProgramsController> logger, ISender send
     [OpenApiOperation("Get a list of programs.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IEnumerable<ProgramListDto>>> GetPrograms([FromQuery] int[]? status, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<ProgramListDto>>> GetPrograms([FromQuery] int[]? status, [FromQuery] Guid? portfolioId, CancellationToken cancellationToken)
     {
         ProgramStatus[]? filter = status is { Length: > 0 }
             ? [.. status.Select(s => (ProgramStatus)s)]
             : null;
 
-        var programs = await _sender.Send(new GetProgramsQuery(StatusFilter: filter), cancellationToken);
+        IdOrKey? portfolioIdOrKey = portfolioId.HasValue
+            ? new IdOrKey(portfolioId.Value)
+            : null;
 
-        return Ok(programs);
+        var programs = await _sender.Send(new GetProgramsQuery(StatusFilter: filter, PortfolioIdOrKey: portfolioIdOrKey), cancellationToken);
+
+        return programs is not null
+            ? Ok(programs)
+            : NotFound();
     }
 
     [HttpGet("{idOrKey}")]
@@ -164,6 +170,8 @@ public class ProgramsController(ILogger<ProgramsController> logger, ISender send
 
         var projects = await _sender.Send(new GetProjectsQuery(StatusFilter: filter, ProgramIdOrKey: idOrKey), cancellationToken);
 
-        return Ok(projects);
+        return projects is not null
+            ? Ok(projects)
+            : NotFound();
     }
 }

@@ -35,7 +35,9 @@ public class ProjectsController(ILogger<ProjectsController> logger, ISender send
 
         var projects = await _sender.Send(new GetProjectsQuery(StatusFilter: filter, PortfolioIdOrKey: portfolioIdOrKey), cancellationToken);
 
-        return Ok(projects);
+        return projects is not null
+            ? Ok(projects)
+            : NotFound();
     }
 
     [HttpGet("{idOrKey}")]

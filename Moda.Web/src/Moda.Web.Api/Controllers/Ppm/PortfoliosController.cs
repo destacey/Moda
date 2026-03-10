@@ -28,7 +28,7 @@ public class PortfoliosController(ILogger<PortfoliosController> logger, ISender 
     [OpenApiOperation("Get a list of project portfolios.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IEnumerable<ProjectPortfolioListDto>>> GetPortfolios(CancellationToken cancellationToken, [FromQuery] int[]? status = null)
+    public async Task<ActionResult<IEnumerable<ProjectPortfolioListDto>>> GetPortfolios([FromQuery] int[]? status, CancellationToken cancellationToken)
     {
         ProjectPortfolioStatus[]? filter = status is { Length: > 0 }
             ? [.. status.Select(s => (ProjectPortfolioStatus)s)]
@@ -156,7 +156,9 @@ public class PortfoliosController(ILogger<PortfoliosController> logger, ISender 
 
         var programs = await _sender.Send(new GetProgramsQuery(PortfolioIdOrKey: idOrKey, StatusFilter: filter), cancellationToken);
 
-        return Ok(programs);
+        return programs is not null
+            ? Ok(programs)
+            : NotFound();
     }
 
     [HttpGet("{idOrKey}/projects")]
@@ -172,7 +174,9 @@ public class PortfoliosController(ILogger<PortfoliosController> logger, ISender 
 
         var projects = await _sender.Send(new GetProjectsQuery(StatusFilter: filter, PortfolioIdOrKey: idOrKey), cancellationToken);
 
-        return Ok(projects);
+        return projects is not null
+            ? Ok(projects)
+            : NotFound();
     }
 
     [HttpGet("{idOrKey}/strategic-initiatives")]

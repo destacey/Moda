@@ -149,19 +149,25 @@ export const portfoliosApi = apiSlice.injectEndpoints({
         return [{ type: QueryTags.Portfolio, id: 'LIST' }]
       },
     }),
-    getPortfolioPrograms: builder.query<ProgramListDto[], string>({
-      queryFn: async (portfolioIdOrKey) => {
+    getPortfolioPrograms: builder.query<
+      ProgramListDto[],
+      { portfolioIdOrKey: string; status?: number[] }
+    >({
+      queryFn: async ({ portfolioIdOrKey, status }) => {
         try {
-          const data = await getPortfoliosClient().getPrograms(portfolioIdOrKey)
+          const data = await getPortfoliosClient().getPrograms(
+            portfolioIdOrKey,
+            status?.length > 0 ? status : undefined,
+          )
           return { data }
         } catch (error) {
           console.error('API Error:', error)
           return { error }
         }
       },
-      providesTags: (result, error, arg) => [
+      providesTags: (result, error, { portfolioIdOrKey }) => [
         { type: QueryTags.PortfolioPrograms, id: 'LIST' },
-        { type: QueryTags.PortfolioPrograms, id: arg },
+        { type: QueryTags.PortfolioPrograms, id: portfolioIdOrKey },
       ],
     }),
     getPortfolioProjects: builder.query<

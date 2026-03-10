@@ -14,10 +14,16 @@ import { OptionModel } from '@/src/components/types'
 
 export const programsApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getPrograms: builder.query<ProgramListDto[], number[] | undefined>({
-      queryFn: async (status = undefined) => {
+    getPrograms: builder.query<
+      ProgramListDto[],
+      { status?: number[]; portfolioId?: string } | undefined
+    >({
+      queryFn: async (request = undefined) => {
         try {
-          const data = await getProgramsClient().getPrograms(status)
+          const data = await getProgramsClient().getPrograms(
+            request?.status?.length > 0 ? request.status : undefined,
+            request?.portfolioId,
+          )
           return { data }
         } catch (error) {
           console.error('API Error:', error)
