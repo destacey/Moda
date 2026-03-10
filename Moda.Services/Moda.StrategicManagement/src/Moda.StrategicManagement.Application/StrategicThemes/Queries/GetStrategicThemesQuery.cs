@@ -7,7 +7,7 @@ namespace Moda.StrategicManagement.Application.StrategicThemes.Queries;
 /// Retrieves a list of StrategicThemes based on the provided filter.  Returns all StrategicThemes if no filter is provided.
 /// </summary>
 /// <param name="StateFilter"></param>
-public sealed record GetStrategicThemesQuery(StrategicThemeState? StateFilter) : IQuery<List<StrategicThemeListDto>>;
+public sealed record GetStrategicThemesQuery(StrategicThemeState[]? StateFilter = null) : IQuery<List<StrategicThemeListDto>>;
 
 internal sealed class GetStrategicThemesQueryHandler(IStrategicManagementDbContext strategicManagementDbContext) : IQueryHandler<GetStrategicThemesQuery, List<StrategicThemeListDto>>
 {
@@ -17,9 +17,9 @@ internal sealed class GetStrategicThemesQueryHandler(IStrategicManagementDbConte
     {
         var query = _strategicManagementDbContext.StrategicThemes.AsQueryable();
 
-        if (request.StateFilter.HasValue)
+        if (request.StateFilter is { Length: > 0 })
         {
-            query = query.Where(st => st.State == request.StateFilter.Value);
+            query = query.Where(st => request.StateFilter.Contains(st.State));
         }
 
         return await query.ProjectToType<StrategicThemeListDto>().ToListAsync(cancellationToken);

@@ -31,6 +31,7 @@ public class EmployeesController(ILogger<EmployeesController> logger, ISender se
     [OpenApiOperation("Get employee details using the Id or key.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<EmployeeDetailsDto>> GetEmployee(string idOrKey, CancellationToken cancellationToken)
     {
         var employee = await _sender.Send(new GetEmployeeQuery(idOrKey), cancellationToken);

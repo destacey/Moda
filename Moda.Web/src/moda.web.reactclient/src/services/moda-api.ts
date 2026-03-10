@@ -2660,10 +2660,10 @@ export class StrategicThemesClient {
      * Get a list of strategic themes.
      * @param state (optional) 
      */
-    getStrategicThemes(state?: number | null | undefined, cancelToken?: CancelToken): Promise<StrategicThemeListDto[]> {
+    getStrategicThemes(state?: number[] | null | undefined, cancelToken?: CancelToken): Promise<StrategicThemeListDto[]> {
         let url_ = this.baseUrl + "/api/strategic-management/strategic-themes?";
         if (state !== undefined && state !== null)
-            url_ += "state=" + encodeURIComponent("" + state) + "&";
+            state && state.forEach(item => { url_ += "state=" + encodeURIComponent("" + item) + "&"; });
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -4629,10 +4629,10 @@ export class PortfoliosClient {
      * Get a list of project portfolios.
      * @param status (optional) 
      */
-    getPortfolios(status?: number | null | undefined, cancelToken?: CancelToken): Promise<ProjectPortfolioListDto[]> {
+    getPortfolios(status?: number[] | null | undefined, cancelToken?: CancelToken): Promise<ProjectPortfolioListDto[]> {
         let url_ = this.baseUrl + "/api/ppm/portfolios?";
         if (status !== undefined && status !== null)
-            url_ += "status=" + encodeURIComponent("" + status) + "&";
+            status && status.forEach(item => { url_ += "status=" + encodeURIComponent("" + item) + "&"; });
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -5130,13 +5130,13 @@ export class PortfoliosClient {
      * Get a list of programs for the portfolio.
      * @param status (optional) 
      */
-    getPrograms(idOrKey: string, status?: number | null | undefined, cancelToken?: CancelToken): Promise<ProgramListDto[]> {
+    getPrograms(idOrKey: string, status?: number[] | null | undefined, cancelToken?: CancelToken): Promise<ProgramListDto[]> {
         let url_ = this.baseUrl + "/api/ppm/portfolios/{idOrKey}/programs?";
         if (idOrKey === undefined || idOrKey === null)
             throw new globalThis.Error("The parameter 'idOrKey' must be defined.");
         url_ = url_.replace("{idOrKey}", encodeURIComponent("" + idOrKey));
         if (status !== undefined && status !== null)
-            url_ += "status=" + encodeURIComponent("" + status) + "&";
+            status && status.forEach(item => { url_ += "status=" + encodeURIComponent("" + item) + "&"; });
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -5183,6 +5183,13 @@ export class PortfoliosClient {
             result400 = JSON.parse(resultData400);
             return throwException("A server side error occurred.", status, _responseText, _headers, result400);
 
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
@@ -5192,12 +5199,15 @@ export class PortfoliosClient {
 
     /**
      * Get a list of projects for the portfolio.
+     * @param status (optional) 
      */
-    getProjects(idOrKey: string, cancelToken?: CancelToken): Promise<ProjectListDto[]> {
-        let url_ = this.baseUrl + "/api/ppm/portfolios/{idOrKey}/projects";
+    getProjects(idOrKey: string, status?: number[] | null | undefined, cancelToken?: CancelToken): Promise<ProjectListDto[]> {
+        let url_ = this.baseUrl + "/api/ppm/portfolios/{idOrKey}/projects?";
         if (idOrKey === undefined || idOrKey === null)
             throw new globalThis.Error("The parameter 'idOrKey' must be defined.");
         url_ = url_.replace("{idOrKey}", encodeURIComponent("" + idOrKey));
+        if (status !== undefined && status !== null)
+            status && status.forEach(item => { url_ += "status=" + encodeURIComponent("" + item) + "&"; });
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -5244,6 +5254,13 @@ export class PortfoliosClient {
             result400 = JSON.parse(resultData400);
             return throwException("A server side error occurred.", status, _responseText, _headers, result400);
 
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
@@ -5255,13 +5272,13 @@ export class PortfoliosClient {
      * Get a list of strategic initiatives for the portfolio.
      * @param status (optional) 
      */
-    getStrategicInitiatives(idOrKey: string, status?: number | null | undefined, cancelToken?: CancelToken): Promise<StrategicInitiativeListDto[]> {
+    getStrategicInitiatives(idOrKey: string, status?: number[] | null | undefined, cancelToken?: CancelToken): Promise<StrategicInitiativeListDto[]> {
         let url_ = this.baseUrl + "/api/ppm/portfolios/{idOrKey}/strategic-initiatives?";
         if (idOrKey === undefined || idOrKey === null)
             throw new globalThis.Error("The parameter 'idOrKey' must be defined.");
         url_ = url_.replace("{idOrKey}", encodeURIComponent("" + idOrKey));
         if (status !== undefined && status !== null)
-            url_ += "status=" + encodeURIComponent("" + status) + "&";
+            status && status.forEach(item => { url_ += "status=" + encodeURIComponent("" + item) + "&"; });
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -5313,6 +5330,64 @@ export class PortfoliosClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
         return Promise.resolve<StrategicInitiativeListDto[]>(null as any);
+    }
+
+    /**
+     * Get a list of all project portfolio statuses.
+     */
+    getPortfolioStatuses( cancelToken?: CancelToken): Promise<ProjectPortfolioStatusDto[]> {
+        let url_ = this.baseUrl + "/api/ppm/portfolios/statuses";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetPortfolioStatuses(_response);
+        });
+    }
+
+    protected processGetPortfolioStatuses(response: AxiosResponse): Promise<ProjectPortfolioStatusDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<ProjectPortfolioStatusDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ProjectPortfolioStatusDto[]>(null as any);
     }
 
     /**
@@ -5390,11 +5465,14 @@ export class ProgramsClient {
     /**
      * Get a list of programs.
      * @param status (optional) 
+     * @param portfolioId (optional) 
      */
-    getPrograms(status?: number | null | undefined, cancelToken?: CancelToken): Promise<ProgramListDto[]> {
+    getPrograms(status?: number[] | null | undefined, portfolioId?: string | null | undefined, cancelToken?: CancelToken): Promise<ProgramListDto[]> {
         let url_ = this.baseUrl + "/api/ppm/programs?";
         if (status !== undefined && status !== null)
-            url_ += "status=" + encodeURIComponent("" + status) + "&";
+            status && status.forEach(item => { url_ += "status=" + encodeURIComponent("" + item) + "&"; });
+        if (portfolioId !== undefined && portfolioId !== null)
+            url_ += "portfolioId=" + encodeURIComponent("" + portfolioId) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -5440,6 +5518,13 @@ export class ProgramsClient {
             let resultData400  = _responseText;
             result400 = JSON.parse(resultData400);
             return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
@@ -5889,16 +5974,74 @@ export class ProgramsClient {
     }
 
     /**
+     * Get a list of all program statuses.
+     */
+    getProgramStatuses( cancelToken?: CancelToken): Promise<ProgramStatusDto[]> {
+        let url_ = this.baseUrl + "/api/ppm/programs/statuses";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetProgramStatuses(_response);
+        });
+    }
+
+    protected processGetProgramStatuses(response: AxiosResponse): Promise<ProgramStatusDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<ProgramStatusDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ProgramStatusDto[]>(null as any);
+    }
+
+    /**
      * Get a list of projects.
      * @param status (optional) 
      */
-    getProjects(idOrKey: string, status?: number | null | undefined, cancelToken?: CancelToken): Promise<ProjectListDto[]> {
+    getProjects(idOrKey: string, status?: number[] | null | undefined, cancelToken?: CancelToken): Promise<ProjectListDto[]> {
         let url_ = this.baseUrl + "/api/ppm/programs/{idOrKey}/projects?";
         if (idOrKey === undefined || idOrKey === null)
             throw new globalThis.Error("The parameter 'idOrKey' must be defined.");
         url_ = url_.replace("{idOrKey}", encodeURIComponent("" + idOrKey));
         if (status !== undefined && status !== null)
-            url_ += "status=" + encodeURIComponent("" + status) + "&";
+            status && status.forEach(item => { url_ += "status=" + encodeURIComponent("" + item) + "&"; });
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -5944,6 +6087,13 @@ export class ProgramsClient {
             let resultData400  = _responseText;
             result400 = JSON.parse(resultData400);
             return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
@@ -5969,11 +6119,14 @@ export class ProjectsClient {
     /**
      * Get a list of projects.
      * @param status (optional) 
+     * @param portfolioId (optional) 
      */
-    getProjects(status?: number | null | undefined, cancelToken?: CancelToken): Promise<ProjectListDto[]> {
+    getProjects(status?: number[] | null | undefined, portfolioId?: string | null | undefined, cancelToken?: CancelToken): Promise<ProjectListDto[]> {
         let url_ = this.baseUrl + "/api/ppm/projects?";
         if (status !== undefined && status !== null)
-            url_ += "status=" + encodeURIComponent("" + status) + "&";
+            status && status.forEach(item => { url_ += "status=" + encodeURIComponent("" + item) + "&"; });
+        if (portfolioId !== undefined && portfolioId !== null)
+            url_ += "portfolioId=" + encodeURIComponent("" + portfolioId) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -6019,6 +6172,13 @@ export class ProjectsClient {
             let resultData400  = _responseText;
             result400 = JSON.parse(resultData400);
             return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
@@ -6601,6 +6761,64 @@ export class ProjectsClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
         return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Get a list of all project statuses.
+     */
+    getProjectStatuses( cancelToken?: CancelToken): Promise<ProjectStatusDto[]> {
+        let url_ = this.baseUrl + "/api/ppm/projects/statuses";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetProjectStatuses(_response);
+        });
+    }
+
+    protected processGetProjectStatuses(response: AxiosResponse): Promise<ProjectStatusDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<ProjectStatusDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ProjectStatusDto[]>(null as any);
     }
 
     /**
@@ -7622,11 +7840,14 @@ export class StrategicInitiativesClient {
     /**
      * Get a list of strategic initiatives.
      * @param status (optional) 
+     * @param portfolioId (optional) 
      */
-    getStrategicInitiatives(status?: number | null | undefined, cancelToken?: CancelToken): Promise<StrategicInitiativeListDto[]> {
+    getStrategicInitiatives(status?: number[] | null | undefined, portfolioId?: string | null | undefined, cancelToken?: CancelToken): Promise<StrategicInitiativeListDto[]> {
         let url_ = this.baseUrl + "/api/ppm/strategic-initiatives?";
         if (status !== undefined && status !== null)
-            url_ += "status=" + encodeURIComponent("" + status) + "&";
+            status && status.forEach(item => { url_ += "status=" + encodeURIComponent("" + item) + "&"; });
+        if (portfolioId !== undefined && portfolioId !== null)
+            url_ += "portfolioId=" + encodeURIComponent("" + portfolioId) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -8182,6 +8403,64 @@ export class StrategicInitiativesClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
         return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Get a list of all strategic initiative statuses.
+     */
+    getStrategicInitiativeStatuses( cancelToken?: CancelToken): Promise<StrategicInitiativeStatusDto[]> {
+        let url_ = this.baseUrl + "/api/ppm/strategic-initiatives/statuses";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetStrategicInitiativeStatuses(_response);
+        });
+    }
+
+    protected processGetStrategicInitiativeStatuses(response: AxiosResponse): Promise<StrategicInitiativeStatusDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<StrategicInitiativeStatusDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<StrategicInitiativeStatusDto[]>(null as any);
     }
 
     /**
@@ -8969,6 +9248,13 @@ export class StrategicInitiativesClient {
             let resultData400  = _responseText;
             result400 = JSON.parse(resultData400);
             return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
@@ -16589,6 +16875,13 @@ export class EmployeesClient {
             result400 = JSON.parse(resultData400);
             return throwException("A server side error occurred.", status, _responseText, _headers, result400);
 
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
@@ -21799,6 +22092,14 @@ export interface StrategicInitiativeListDto {
     strategicInitiativeOwners: EmployeeNavigationDto[];
 }
 
+export interface ProjectPortfolioStatusDto {
+    id: number;
+    name: string;
+    description?: string | undefined;
+    order: number;
+    lifecyclePhase: string;
+}
+
 export interface ProjectPortfolioOptionDto {
     id: string;
     name: string;
@@ -21859,6 +22160,14 @@ export interface UpdateProgramRequest {
     managerIds?: string[] | undefined;
     /** The strategic themes associated with this program. */
     strategicThemeIds?: string[] | undefined;
+}
+
+export interface ProgramStatusDto {
+    id: number;
+    name: string;
+    description?: string | undefined;
+    order: number;
+    lifecyclePhase: string;
 }
 
 export interface ProjectDetailsDto {
@@ -21936,6 +22245,14 @@ export interface ChangeProjectProgramRequest {
 export interface ChangeProjectKeyRequest {
     /** The new key to assign to the Project (2-20 uppercase alphanumeric characters). */
     key: string;
+}
+
+export interface ProjectStatusDto {
+    id: number;
+    name: string;
+    description?: string | undefined;
+    order: number;
+    lifecyclePhase: string;
 }
 
 export interface WorkItemListDto {
@@ -22221,6 +22538,14 @@ export interface UpdateStrategicInitiativeRequest {
     sponsorIds?: string[] | undefined;
     /** The Owners of the strategic initiative. */
     ownerIds?: string[] | undefined;
+}
+
+export interface StrategicInitiativeStatusDto {
+    id: number;
+    name: string;
+    description?: string | undefined;
+    order: number;
+    lifecyclePhase: string;
 }
 
 export interface StrategicInitiativeKpiListDto {

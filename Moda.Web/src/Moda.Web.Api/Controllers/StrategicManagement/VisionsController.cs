@@ -4,7 +4,6 @@ using Moda.StrategicManagement.Application.Visions.Dtos;
 using Moda.StrategicManagement.Application.Visions.Queries;
 using Moda.StrategicManagement.Domain.Enums;
 using Moda.Web.Api.Extensions;
-using Moda.Web.Api.Models.StrategicManagement.Strategies;
 using Moda.Web.Api.Models.StrategicManagement.Visions;
 
 namespace Moda.Web.Api.Controllers.StrategicManagement;
@@ -12,23 +11,17 @@ namespace Moda.Web.Api.Controllers.StrategicManagement;
 [Route("api/strategic-management/[controller]")]
 [ApiVersionNeutral]
 [ApiController]
-public class VisionsController : ControllerBase
+public class VisionsController(ILogger<VisionsController> logger, ISender sender) : ControllerBase
 {
-    private readonly ILogger<VisionsController> _logger;
-    private readonly ISender _sender;
-
-    public VisionsController(ILogger<VisionsController> logger, ISender sender)
-    {
-        _logger = logger;
-        _sender = sender;
-    }
+    private readonly ILogger<VisionsController> _logger = logger;
+    private readonly ISender _sender = sender;
 
     [HttpGet]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Visions)]
     [OpenApiOperation("Get a list of visions.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IEnumerable<VisionDto>>> GetVisions(CancellationToken cancellationToken, [FromQuery] int? state = null)
+    public async Task<ActionResult<IEnumerable<VisionDto>>> GetVisions([FromQuery] int? state, CancellationToken cancellationToken)
     {
         VisionState? filter = state.HasValue ? (VisionState)state.Value : null;
 

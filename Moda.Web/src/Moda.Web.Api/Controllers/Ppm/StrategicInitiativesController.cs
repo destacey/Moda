@@ -23,11 +23,17 @@ public class StrategicInitiativesController(ILogger<StrategicInitiativesControll
     [OpenApiOperation("Get a list of strategic initiatives.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IEnumerable<StrategicInitiativeListDto>>> GetStrategicInitiatives(CancellationToken cancellationToken, [FromQuery] int? status = null)
+    public async Task<ActionResult<IEnumerable<StrategicInitiativeListDto>>> GetStrategicInitiatives([FromQuery] int[]? status, [FromQuery] Guid? portfolioId, CancellationToken cancellationToken)
     {
-        StrategicInitiativeStatus? filter = status.HasValue ? (StrategicInitiativeStatus)status.Value : null;
+        StrategicInitiativeStatus[]? filter = status is { Length: > 0 }
+            ? [.. status.Select(s => (StrategicInitiativeStatus)s)]
+            : null;
 
-        var initiatives = await _sender.Send(new GetStrategicInitiativesQuery(filter), cancellationToken);
+        IdOrKey? portfolioIdOrKey = portfolioId.HasValue
+            ? new IdOrKey(portfolioId.Value)
+            : null;
+
+        var initiatives = await _sender.Send(new GetStrategicInitiativesQuery(StatusFilter: filter, PortfolioIdOrKey: portfolioIdOrKey), cancellationToken);
 
         return Ok(initiatives);
     }
@@ -149,6 +155,17 @@ public class StrategicInitiativesController(ILogger<StrategicInitiativesControll
         return result.IsSuccess
             ? NoContent()
             : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpGet("statuses")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.StrategicInitiatives)]
+    [OpenApiOperation("Get a list of all strategic initiative statuses.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IEnumerable<StrategicInitiativeStatusDto>>> GetStrategicInitiativeStatuses(CancellationToken cancellationToken)
+    {
+        var items = await _sender.Send(new GetStrategicInitiativeStatusesQuery(), cancellationToken);
+        return Ok(items.OrderBy(c => c.Order));
     }
 
     #region KPIs
@@ -332,6 +349,7 @@ public class StrategicInitiativesController(ILogger<StrategicInitiativesControll
     [OpenApiOperation("Get a list of projects for the strategic initiative.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<IEnumerable<ProjectListDto>>> GetProjects(string idOrKey, CancellationToken cancellationToken)
     {
         var projects = await _sender.Send(new GetStrategicInitiativeProjectsQuery(idOrKey), cancellationToken);

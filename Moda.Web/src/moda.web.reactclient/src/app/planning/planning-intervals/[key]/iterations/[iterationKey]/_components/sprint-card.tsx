@@ -85,13 +85,13 @@ const SprintCard: FC<SprintCardProps> = ({
           <Flex vertical gap={8}>
             <Link
               href={`/organizations/teams/${sprint.team.key}`}
-              style={{ fontSize: 16, fontWeight: 600 }}
+              style={{ fontSize: 16, fontWeight: 600, width: 'fit-content' }}
             >
               {sprint.team.name}
             </Link>
             <Link
               href={`/planning/sprints/${sprint.sprintKey}`}
-              style={{ fontSize: 13 }}
+              style={{ fontSize: 13, width: 'fit-content' }}
             >
               {sprint.sprintName}
             </Link>
@@ -117,13 +117,13 @@ const SprintCard: FC<SprintCardProps> = ({
             <Flex vertical gap={2}>
               <Link
                 href={`/organizations/teams/${sprint.team.key}`}
-                style={{ fontSize: 16, fontWeight: 600 }}
+                style={{ fontSize: 16, fontWeight: 600, width: 'fit-content' }}
               >
                 {sprint.team.name}
               </Link>
               <Link
                 href={`/planning/sprints/${sprint.sprintKey}`}
-                style={{ fontSize: 13 }}
+                style={{ fontSize: 13, width: 'fit-content' }}
               >
                 {sprint.sprintName}
               </Link>

@@ -50,7 +50,7 @@ const PortfoliosPage: FC = () => {
     isLoading,
     error,
     refetch,
-  } = useGetPortfoliosQuery(null)
+  } = useGetPortfoliosQuery(undefined)
 
   useEffect(() => {
     if (error) {
