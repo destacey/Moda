@@ -117,6 +117,21 @@ public class ProjectsController(ILogger<ProjectsController> logger, ISender send
             : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
+    [HttpPost("{id}/approve")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Projects)]
+    [OpenApiOperation("Approve a project.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> Approve(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(new ApproveProjectCommand(id), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
     [HttpPost("{id}/activate")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Projects)]
     [OpenApiOperation("Activate a project.", "")]

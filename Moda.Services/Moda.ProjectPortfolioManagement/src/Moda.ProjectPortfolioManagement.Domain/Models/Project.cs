@@ -287,13 +287,28 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey<P
     #region Lifecycle
 
     /// <summary>
+    /// Approves the project.
+    /// </summary>
+    public Result Approve()
+    {
+        if (Status != ProjectStatus.Proposed)
+        {
+            return Result.Failure("Only proposed projects can be approved.");
+        }
+
+        Status = ProjectStatus.Approved;
+
+        return Result.Success();
+    }
+
+    /// <summary>
     /// Activates the project.
     /// </summary>
     public Result Activate()
     {
-        if (Status != ProjectStatus.Proposed)
+        if (Status is not (ProjectStatus.Proposed or ProjectStatus.Approved))
         {
-            return Result.Failure("Only proposed projects can be activated.");
+            return Result.Failure("Only proposed or approved projects can be activated.");
         }
 
         if (DateRange is null)

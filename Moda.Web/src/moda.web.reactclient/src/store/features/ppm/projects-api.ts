@@ -145,6 +145,26 @@ export const projectsApi = apiSlice.injectEndpoints({
       },
     }),
 
+    approveProject: builder.mutation<void, { id: string; cacheKey: string }>({
+      queryFn: async ({ id }) => {
+        try {
+          const data = await getProjectsClient().approve(id)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, { cacheKey }) => {
+        return [
+          { type: QueryTags.Project, id: 'LIST' },
+          { type: QueryTags.Project, id: cacheKey },
+          { type: QueryTags.PortfolioProjects, id: 'LIST' },
+          { type: QueryTags.ProgramProjects, id: 'LIST' },
+        ]
+      },
+    }),
+
     activateProject: builder.mutation<void, { id: string; cacheKey: string }>({
       queryFn: async ({ id }) => {
         try {
@@ -290,6 +310,7 @@ export const {
   useUpdateProjectMutation,
   useChangeProjectProgramMutation,
   useChangeProjectKeyMutation,
+  useApproveProjectMutation,
   useActivateProjectMutation,
   useCompleteProjectMutation,
   useCancelProjectMutation,

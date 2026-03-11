@@ -95,6 +95,23 @@ public static class ProjectFakerExtensions
     }
 
     /// <summary>
+    /// Generates an approved project with a start date 10 days from now and an end date 5 months from now.
+    /// </summary>
+    public static Project AsApproved(this ProjectFaker faker, TestingDateTimeProvider dateTimeProvider, Guid? portfolioId = null, Guid? programId = null)
+    {
+        var now = dateTimeProvider.Today;
+        var startDate = now.PlusDays(10);
+        var endDate = startDate.PlusMonths(5);
+
+        return faker.WithData(
+            status: ProjectStatus.Approved,
+            dateRange: new LocalDateRange(startDate, endDate),
+            portfolioId: portfolioId,
+            programId: programId
+        ).Generate();
+    }
+
+    /// <summary>
     /// Generates an active project with a start date 10 days ago.
     /// </summary>
     public static Project AsActive(this ProjectFaker faker, TestingDateTimeProvider dateTimeProvider, Guid? portfolioId = null, Guid? programId = null)

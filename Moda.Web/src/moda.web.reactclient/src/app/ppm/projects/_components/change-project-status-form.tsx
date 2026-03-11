@@ -4,6 +4,7 @@ import { useMessage } from '@/src/components/contexts/messaging'
 import { useConfirmModal } from '@/src/hooks'
 import { ProjectDetailsDto } from '@/src/services/moda-api'
 import {
+  useApproveProjectMutation,
   useActivateProjectMutation,
   useCancelProjectMutation,
   useCompleteProjectMutation,
@@ -12,6 +13,7 @@ import { Modal, Space } from 'antd'
 import { useCallback } from 'react'
 
 export enum ProjectStatusAction {
+  Approve = 'Approve',
   Activate = 'Activate',
   Complete = 'Complete',
   Cancel = 'Cancel',
@@ -19,6 +21,8 @@ export enum ProjectStatusAction {
 
 const statusActionToPastTense = (statusAction: ProjectStatusAction) => {
   switch (statusAction) {
+    case ProjectStatusAction.Approve:
+      return 'approved'
     case ProjectStatusAction.Activate:
       return 'activated'
     case ProjectStatusAction.Complete:
@@ -32,6 +36,8 @@ const statusActionToPastTense = (statusAction: ProjectStatusAction) => {
 
 const statusActionToPresentTense = (statusAction: ProjectStatusAction) => {
   switch (statusAction) {
+    case ProjectStatusAction.Approve:
+      return 'approving'
     case ProjectStatusAction.Activate:
       return 'activating'
     case ProjectStatusAction.Complete:
@@ -58,6 +64,7 @@ const ChangeProjectStatusForm = ({
 }: ChangeProjectStatusFormProps) => {
   const messageApi = useMessage()
 
+  const [approveProjectMutation] = useApproveProjectMutation()
   const [activateProjectMutation] = useActivateProjectMutation()
   const [completeProjectMutation] = useCompleteProjectMutation()
   const [cancelProjectMutation] = useCancelProjectMutation()
@@ -78,7 +85,9 @@ const ChangeProjectStatusForm = ({
       try {
         const request = { id: project.id, cacheKey: project.key }
         let response = null
-        if (statusAction === ProjectStatusAction.Activate) {
+        if (statusAction === ProjectStatusAction.Approve) {
+          response = await approveProjectMutation(request)
+        } else if (statusAction === ProjectStatusAction.Activate) {
           response = await activateProjectMutation(request)
         } else if (statusAction === ProjectStatusAction.Complete) {
           response = await completeProjectMutation(request)
@@ -103,6 +112,7 @@ const ChangeProjectStatusForm = ({
     }, [
       project,
       statusAction,
+      approveProjectMutation,
       activateProjectMutation,
       completeProjectMutation,
       cancelProjectMutation,
