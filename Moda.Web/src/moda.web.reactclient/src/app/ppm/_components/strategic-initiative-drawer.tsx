@@ -11,7 +11,7 @@ import { MarkdownRenderer } from '@/src/components/common/markdown'
 import useAuth from '@/src/components/contexts/auth'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { useGetStrategicInitiativeQuery } from '@/src/store/features/ppm/strategic-initiatives-api'
-import { getDrawerWidthPixels } from '@/src/utils'
+import { getDrawerWidthPixels, getSortedNameList } from '@/src/utils'
 import { Drawer, Flex } from 'antd'
 import Link from 'next/link'
 import { FC, useEffect, useMemo, useState } from 'react'
@@ -60,17 +60,17 @@ const StrategicInitiativeDrawer: FC<StrategicInitiativeDrawerProps> = (
 
   const sponsorNames = useMemo(
     () =>
-      [...(strategicInitiativeData?.strategicInitiativeSponsors ?? [])]
-        .sort((a, b) => a.name.localeCompare(b.name))
-        .map((s) => s.name),
+      getSortedNameList(
+        strategicInitiativeData?.strategicInitiativeSponsors ?? [],
+      ),
     [strategicInitiativeData],
   )
 
   const ownerNames = useMemo(
     () =>
-      [...(strategicInitiativeData?.strategicInitiativeOwners ?? [])]
-        .sort((a, b) => a.name.localeCompare(b.name))
-        .map((s) => s.name),
+      getSortedNameList(
+        strategicInitiativeData?.strategicInitiativeOwners ?? [],
+      ),
     [strategicInitiativeData],
   )
 

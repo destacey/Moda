@@ -11,7 +11,7 @@ import { MarkdownRenderer } from '@/src/components/common/markdown'
 import useAuth from '@/src/components/contexts/auth'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { useGetProjectQuery } from '@/src/store/features/ppm/projects-api'
-import { getDrawerWidthPixels } from '@/src/utils'
+import { getDrawerWidthPixels, getSortedNameList } from '@/src/utils'
 import { Drawer, Flex } from 'antd'
 import Link from 'next/link'
 import { FC, useEffect, useMemo, useState } from 'react'
@@ -55,42 +55,27 @@ const ProjectDrawer: FC<ProjectDrawerProps> = (props: ProjectDrawerProps) => {
   }, [error, messageApi])
 
   const sponsorNames = useMemo(
-    () =>
-      [...(projectData?.projectSponsors ?? [])]
-        .sort((a, b) => a.name.localeCompare(b.name))
-        .map((s) => s.name),
+    () => getSortedNameList(projectData?.projectSponsors ?? []),
     [projectData],
   )
 
   const ownerNames = useMemo(
-    () =>
-      [...(projectData?.projectOwners ?? [])]
-        .sort((a, b) => a.name.localeCompare(b.name))
-        .map((s) => s.name),
+    () => getSortedNameList(projectData?.projectOwners ?? []),
     [projectData],
   )
 
   const managerNames = useMemo(
-    () =>
-      [...(projectData?.projectManagers ?? [])]
-        .sort((a, b) => a.name.localeCompare(b.name))
-        .map((s) => s.name),
+    () => getSortedNameList(projectData?.projectManagers ?? []),
     [projectData],
   )
 
   const memberNames = useMemo(
-    () =>
-      [...(projectData?.projectMembers ?? [])]
-        .sort((a, b) => a.name.localeCompare(b.name))
-        .map((s) => s.name),
+    () => getSortedNameList(projectData?.projectMembers ?? []),
     [projectData],
   )
 
   const strategicThemes = useMemo(
-    () =>
-      [...(projectData?.strategicThemes ?? [])]
-        .sort((a, b) => a.name.localeCompare(b.name))
-        .map((s) => s.name),
+    () => getSortedNameList(projectData?.strategicThemes ?? []),
     [projectData],
   )
 

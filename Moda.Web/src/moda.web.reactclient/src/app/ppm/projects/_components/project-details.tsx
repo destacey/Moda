@@ -35,7 +35,7 @@ const ProjectDetails: FC<ProjectDetailsProps> = ({
   const memberNames =
     project?.projectMembers.length > 0
       ? getSortedNames(project.projectMembers)
-      : null
+      : 'No members assigned'
 
   const strategicThemes =
     project?.strategicThemes.length > 0

@@ -11,7 +11,7 @@ import { MarkdownRenderer } from '@/src/components/common/markdown'
 import useAuth from '@/src/components/contexts/auth'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { useGetProgramQuery } from '@/src/store/features/ppm/programs-api'
-import { getDrawerWidthPixels } from '@/src/utils'
+import { getDrawerWidthPixels, getSortedNameList } from '@/src/utils'
 import { Drawer, Flex } from 'antd'
 import Link from 'next/link'
 import { FC, useEffect, useMemo, useState } from 'react'
@@ -55,34 +55,22 @@ const ProgramDrawer: FC<ProgramDrawerProps> = (props: ProgramDrawerProps) => {
   }, [error, messageApi])
 
   const sponsorNames = useMemo(
-    () =>
-      [...(programData?.programSponsors ?? [])]
-        .sort((a, b) => a.name.localeCompare(b.name))
-        .map((s) => s.name),
+    () => getSortedNameList(programData?.programSponsors ?? []),
     [programData],
   )
 
   const ownerNames = useMemo(
-    () =>
-      [...(programData?.programOwners ?? [])]
-        .sort((a, b) => a.name.localeCompare(b.name))
-        .map((s) => s.name),
+    () => getSortedNameList(programData?.programOwners ?? []),
     [programData],
   )
 
   const managerNames = useMemo(
-    () =>
-      [...(programData?.programManagers ?? [])]
-        .sort((a, b) => a.name.localeCompare(b.name))
-        .map((s) => s.name),
+    () => getSortedNameList(programData?.programManagers ?? []),
     [programData],
   )
 
   const strategicThemes = useMemo(
-    () =>
-      [...(programData?.strategicThemes ?? [])]
-        .sort((a, b) => a.name.localeCompare(b.name))
-        .map((s) => s.name),
+    () => getSortedNameList(programData?.strategicThemes ?? []),
     [programData],
   )
 
