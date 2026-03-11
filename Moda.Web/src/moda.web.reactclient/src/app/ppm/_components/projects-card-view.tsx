@@ -6,7 +6,6 @@ import { ProjectListDto } from '@/src/services/moda-api'
 import { getSortedNames } from '@/src/utils'
 import { Card, Flex, Spin, Typography } from 'antd'
 import styles from './projects-card-view.module.css'
-import dayjs from 'dayjs'
 import Link from 'next/link'
 import { FC, ReactNode } from 'react'
 
@@ -19,9 +18,6 @@ interface ProjectCardProps {
 
 const ProjectCard: FC<ProjectCardProps> = ({ project, onCardClick }) => {
   const managerNames = getSortedNames(project.projectManagers)
-
-  const hasStarted =
-    project.start && dayjs(project.start).isBefore(dayjs(), 'day')
 
   const timelineFormat =
     project.start &&
@@ -68,7 +64,7 @@ const ProjectCard: FC<ProjectCardProps> = ({ project, onCardClick }) => {
         </Flex>
 
         {/* Timeline */}
-        {hasStarted && (
+        {project.start && project.end && (
           <TimelineProgress
             start={project.start}
             end={project.end}

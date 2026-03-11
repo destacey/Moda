@@ -1,17 +1,6 @@
-import React from 'react'
 import { render, screen } from '@testing-library/react'
 import dayjs from 'dayjs'
 import TimelineProgress from './timeline-progress'
-
-// Mock IterationDates
-jest.mock('./iteration-dates', () => ({
-  __esModule: true,
-  default: ({ start, end, dateFormat, style }: { start: Date; end: Date; dateFormat?: string; style?: React.CSSProperties }) => (
-    <div data-testid="iteration-dates" data-dateformat={dateFormat} data-style={JSON.stringify(style)}>
-      Iteration Dates Mock
-    </div>
-  ),
-}))
 
 // Mock Ant Design Grid useBreakpoint hook
 jest.mock('antd', () => {
@@ -124,32 +113,25 @@ describe('TimelineProgress', () => {
     expect(screen.getByText('Day 1 of 1 (100%)')).toBeInTheDocument()
   })
 
-  it('renders IterationDates when start date is in the future', () => {
-    // Set "now" to before the start date
+  it('renders future timeline with 0% progress and starts-in text', () => {
+    // Set "now" to 6 days before the start date
     ;(dayjs as unknown as { mockedNow: string }).mockedNow = '2025-10-20T12:00:00'
 
     render(<TimelineProgress start={startDate} end={endDate} />)
 
-    expect(screen.getByTestId('iteration-dates')).toBeInTheDocument()
-    expect(screen.queryByText('Timeline')).not.toBeInTheDocument()
+    expect(screen.getByText('Timeline')).toBeInTheDocument()
+    expect(screen.getByText('Oct 26')).toBeInTheDocument()
+    expect(screen.getByText('Nov 8')).toBeInTheDocument()
+    expect(screen.getByText('Starts in 6 days · 14 day project')).toBeInTheDocument()
   })
 
-  it('passes props to IterationDates when falling back', () => {
-    // Set "now" to before the start date
-    ;(dayjs as unknown as { mockedNow: string }).mockedNow = '2025-10-20T12:00:00'
+  it('renders singular day for future timeline starting tomorrow', () => {
+    // Set "now" to 1 day before the start date
+    ;(dayjs as unknown as { mockedNow: string }).mockedNow = '2025-10-25T12:00:00'
 
-    render(
-      <TimelineProgress
-        start={startDate}
-        end={endDate}
-        dateFormat="MMM D - h:mm A"
-        style={{ width: '100%' }}
-      />,
-    )
+    render(<TimelineProgress start={startDate} end={endDate} />)
 
-    const iterationDates = screen.getByTestId('iteration-dates')
-    expect(iterationDates).toHaveAttribute('data-dateformat', 'MMM D - h:mm A')
-    expect(iterationDates).toHaveAttribute('data-style', JSON.stringify({ width: '100%' }))
+    expect(screen.getByText('Starts in 1 day · 14 day project')).toBeInTheDocument()
   })
 
   it('clamps current day to total when after end date', () => {
