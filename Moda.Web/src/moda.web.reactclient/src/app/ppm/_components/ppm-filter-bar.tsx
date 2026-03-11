@@ -5,8 +5,6 @@ import { BaseOptionType } from 'antd/es/select'
 import { FC } from 'react'
 import styles from './ppm-filter-bar.module.css'
 
-const { Compact: SpaceCompact } = Space
-
 export interface PpmFilterBarProps {
   statusOptions: { value: number; label: string }[] | undefined
   selectedStatuses: number[]
@@ -61,7 +59,7 @@ const PpmFilterBar: FC<PpmFilterBarProps> = (props) => {
 
         <Space size="small" align="center">
           <span className={styles.filterLabel}>Status:</span>
-          <SpaceCompact>
+          <Flex gap={2}>
             {statusOptions?.map((status) => {
               const isSelected = selectedStatuses.includes(status.value)
               return (
@@ -69,7 +67,8 @@ const PpmFilterBar: FC<PpmFilterBarProps> = (props) => {
                   key={status.value}
                   size="small"
                   className={styles.statusButton}
-                  type={isSelected ? 'primary' : 'default'}
+                  color={isSelected ? 'primary' : 'default'}
+                  variant="outlined"
                   onClick={() => {
                     const next = isSelected
                       ? selectedStatuses.filter((s) => s !== status.value)
@@ -81,7 +80,7 @@ const PpmFilterBar: FC<PpmFilterBarProps> = (props) => {
                 </Button>
               )
             })}
-          </SpaceCompact>
+          </Flex>
         </Space>
       </Flex>
     </div>
