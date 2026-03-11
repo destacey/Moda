@@ -1,16 +1,20 @@
 'use client'
 
 import { ModaDateRange } from '@/src/components/common'
+import {
+  ContentList,
+  ExpandableContent,
+  LabeledContent,
+} from '@/src/components/common/content'
+import LinksCard from '@/src/components/common/links/links-card'
 import { MarkdownRenderer } from '@/src/components/common/markdown'
 import useAuth from '@/src/components/contexts/auth'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { useGetProgramQuery } from '@/src/store/features/ppm/programs-api'
-import { getDrawerWidthPixels, getSortedNames } from '@/src/utils'
-import { Descriptions, Drawer, Flex } from 'antd'
+import { getDrawerWidthPixels } from '@/src/utils'
+import { Drawer, Flex } from 'antd'
 import Link from 'next/link'
 import { FC, useEffect, useMemo, useState } from 'react'
-
-const { Item } = Descriptions
 
 export interface ProgramDrawerProps {
   programKey: number
@@ -39,7 +43,7 @@ const ProgramDrawer: FC<ProgramDrawerProps> = (props: ProgramDrawerProps) => {
       messageApi.error('You do not have permission to view programs.')
       props.onDrawerClose()
     }
-  }, [canViewProgram, messageApi, props])
+  }, [canViewProgram, messageApi, props.onDrawerClose])
 
   useEffect(() => {
     if (error) {
@@ -52,39 +56,39 @@ const ProgramDrawer: FC<ProgramDrawerProps> = (props: ProgramDrawerProps) => {
 
   const sponsorNames = useMemo(
     () =>
-      programData?.programSponsors.length > 0
-        ? getSortedNames(programData.programSponsors)
-        : 'No sponsor assigned',
+      [...(programData?.programSponsors ?? [])]
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map((s) => s.name),
     [programData],
   )
 
   const ownerNames = useMemo(
     () =>
-      programData?.programOwners.length > 0
-        ? getSortedNames(programData.programOwners)
-        : 'No owner assigned',
+      [...(programData?.programOwners ?? [])]
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map((s) => s.name),
     [programData],
   )
 
   const managerNames = useMemo(
     () =>
-      programData?.programManagers.length > 0
-        ? getSortedNames(programData.programManagers)
-        : 'No manager assigned',
+      [...(programData?.programManagers ?? [])]
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map((s) => s.name),
     [programData],
   )
 
   const strategicThemes = useMemo(
     () =>
-      programData?.strategicThemes.length > 0
-        ? getSortedNames(programData.strategicThemes)
-        : null,
+      [...(programData?.strategicThemes ?? [])]
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map((s) => s.name),
     [programData],
   )
 
   return (
     <Drawer
-      title="Program Details"
+      title={programData?.name ?? 'Program Details'}
       placement="right"
       onClose={props.onDrawerClose}
       open={props.drawerOpen}
@@ -96,29 +100,51 @@ const ProgramDrawer: FC<ProgramDrawerProps> = (props: ProgramDrawerProps) => {
       destroyOnHidden={true}
     >
       <Flex vertical gap="middle">
-        <Descriptions column={1} size="small">
-          <Item label="Name">
+        <Flex vertical gap={10}>
+          <LabeledContent label="Key">
             <Link href={`/ppm/programs/${programData?.key}`}>
-              {programData?.name}
+              {programData?.key}
             </Link>
-          </Item>
-          <Item label="Key">{programData?.key}</Item>
-          <Item label="Status">{programData?.status.name}</Item>
-          <Item label="Dates">
+          </LabeledContent>
+          <LabeledContent label="Status">
+            {programData?.status.name}
+          </LabeledContent>
+          <LabeledContent label="Dates">
             <ModaDateRange
               dateRange={{ start: programData?.start, end: programData?.end }}
             />
-          </Item>
-          <Item label="Sponsors">{sponsorNames}</Item>
-          <Item label="Owners">{ownerNames}</Item>
-          <Item label="Managers">{managerNames}</Item>
-          <Item label="Strategic Themes">{strategicThemes}</Item>
-        </Descriptions>
-        <Descriptions layout="vertical" size="small">
-          <Item label="Description">
-            <MarkdownRenderer markdown={programData?.description} />
-          </Item>
-        </Descriptions>
+          </LabeledContent>
+          <LabeledContent label="Sponsors">
+            <ContentList
+              items={sponsorNames}
+              emptyText="No sponsor assigned"
+            />
+          </LabeledContent>
+          <LabeledContent label="Owners">
+            <ContentList items={ownerNames} emptyText="No owner assigned" />
+          </LabeledContent>
+          <LabeledContent label="Managers">
+            <ContentList
+              items={managerNames}
+              emptyText="No manager assigned"
+            />
+          </LabeledContent>
+          {strategicThemes.length > 0 && (
+            <LabeledContent label="Strategic Themes">
+              {strategicThemes.join(', ')}
+            </LabeledContent>
+          )}
+          {programData?.description && (
+            <LabeledContent label="Description">
+              <ExpandableContent background="var(--ant-color-bg-elevated)">
+                <MarkdownRenderer markdown={programData.description} />
+              </ExpandableContent>
+            </LabeledContent>
+          )}
+        </Flex>
+        {programData?.id && (
+          <LinksCard objectId={programData.id} width="100%" />
+        )}
       </Flex>
     </Drawer>
   )

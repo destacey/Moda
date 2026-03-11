@@ -1,16 +1,20 @@
 'use client'
 
 import { ModaDateRange } from '@/src/components/common'
+import {
+  ContentList,
+  ExpandableContent,
+  LabeledContent,
+} from '@/src/components/common/content'
+import LinksCard from '@/src/components/common/links/links-card'
 import { MarkdownRenderer } from '@/src/components/common/markdown'
 import useAuth from '@/src/components/contexts/auth'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { useGetProjectQuery } from '@/src/store/features/ppm/projects-api'
-import { getDrawerWidthPixels, getSortedNames } from '@/src/utils'
-import { Descriptions, Drawer, Flex } from 'antd'
+import { getDrawerWidthPixels } from '@/src/utils'
+import { Drawer, Flex } from 'antd'
 import Link from 'next/link'
 import { FC, useEffect, useMemo, useState } from 'react'
-
-const { Item } = Descriptions
 
 export interface ProjectDrawerProps {
   projectKey: string
@@ -39,7 +43,7 @@ const ProjectDrawer: FC<ProjectDrawerProps> = (props: ProjectDrawerProps) => {
       messageApi.error('You do not have permission to view projects.')
       props.onDrawerClose()
     }
-  }, [canViewProject, messageApi, props])
+  }, [canViewProject, messageApi, props.onDrawerClose])
 
   useEffect(() => {
     if (error) {
@@ -52,47 +56,47 @@ const ProjectDrawer: FC<ProjectDrawerProps> = (props: ProjectDrawerProps) => {
 
   const sponsorNames = useMemo(
     () =>
-      projectData?.projectSponsors.length > 0
-        ? getSortedNames(projectData.projectSponsors)
-        : 'No sponsor assigned',
+      [...(projectData?.projectSponsors ?? [])]
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map((s) => s.name),
     [projectData],
   )
 
   const ownerNames = useMemo(
     () =>
-      projectData?.projectOwners.length > 0
-        ? getSortedNames(projectData.projectOwners)
-        : 'No owner assigned',
+      [...(projectData?.projectOwners ?? [])]
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map((s) => s.name),
     [projectData],
   )
 
   const managerNames = useMemo(
     () =>
-      projectData?.projectManagers.length > 0
-        ? getSortedNames(projectData.projectManagers)
-        : 'No manager assigned',
+      [...(projectData?.projectManagers ?? [])]
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map((s) => s.name),
     [projectData],
   )
 
   const memberNames = useMemo(
     () =>
-      projectData?.projectMembers.length > 0
-        ? getSortedNames(projectData.projectMembers)
-        : null,
+      [...(projectData?.projectMembers ?? [])]
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map((s) => s.name),
     [projectData],
   )
 
   const strategicThemes = useMemo(
     () =>
-      projectData?.strategicThemes.length > 0
-        ? getSortedNames(projectData.strategicThemes)
-        : null,
+      [...(projectData?.strategicThemes ?? [])]
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map((s) => s.name),
     [projectData],
   )
 
   return (
     <Drawer
-      title="Project Details"
+      title={projectData?.name ?? 'Project Details'}
       placement="right"
       onClose={props.onDrawerClose}
       open={props.drawerOpen}
@@ -104,38 +108,61 @@ const ProjectDrawer: FC<ProjectDrawerProps> = (props: ProjectDrawerProps) => {
       destroyOnHidden={true}
     >
       <Flex vertical gap="middle">
-        <Descriptions column={1} size="small">
-          <Item label="Name">
+        <Flex vertical gap={10}>
+          <LabeledContent label="Key">
             <Link href={`/ppm/projects/${projectData?.key}`}>
-              {projectData?.name}
+              {projectData?.key}
             </Link>
-          </Item>
-          <Item label="Key">{projectData?.key}</Item>
-          <Item label="Status">{projectData?.status.name}</Item>
-
+          </LabeledContent>
+          <LabeledContent label="Status">
+            {projectData?.status.name}
+          </LabeledContent>
           {projectData?.program && (
-            <Item label="Program">
+            <LabeledContent label="Program">
               <Link href={`/ppm/programs/${projectData.program.key}`}>
                 {projectData.program.name}
               </Link>
-            </Item>
+            </LabeledContent>
           )}
-          <Item label="Dates">
+          <LabeledContent label="Dates">
             <ModaDateRange
               dateRange={{ start: projectData?.start, end: projectData?.end }}
             />
-          </Item>
-          <Item label="Sponsors">{sponsorNames}</Item>
-          <Item label="Owners">{ownerNames}</Item>
-          <Item label="Managers">{managerNames}</Item>
-          <Item label="Members">{memberNames}</Item>
-          <Item label="Strategic Themes">{strategicThemes}</Item>
-        </Descriptions>
-        <Descriptions layout="vertical" size="small">
-          <Item label="Description">
-            <MarkdownRenderer markdown={projectData?.description} />
-          </Item>
-        </Descriptions>
+          </LabeledContent>
+          <LabeledContent label="Sponsors">
+            <ContentList
+              items={sponsorNames}
+              emptyText="No sponsor assigned"
+            />
+          </LabeledContent>
+          <LabeledContent label="Owners">
+            <ContentList items={ownerNames} emptyText="No owner assigned" />
+          </LabeledContent>
+          <LabeledContent label="Managers">
+            <ContentList
+              items={managerNames}
+              emptyText="No manager assigned"
+            />
+          </LabeledContent>
+          <LabeledContent label="Members">
+            <ContentList items={memberNames} emptyText="No members assigned" />
+          </LabeledContent>
+          {strategicThemes.length > 0 && (
+            <LabeledContent label="Strategic Themes">
+              {strategicThemes.join(', ')}
+            </LabeledContent>
+          )}
+          {projectData?.description && (
+            <LabeledContent label="Description">
+              <ExpandableContent background="var(--ant-color-bg-elevated)">
+                <MarkdownRenderer markdown={projectData.description} />
+              </ExpandableContent>
+            </LabeledContent>
+          )}
+        </Flex>
+        {projectData?.id && (
+          <LinksCard objectId={projectData.id} width="100%" />
+        )}
       </Flex>
     </Drawer>
   )
