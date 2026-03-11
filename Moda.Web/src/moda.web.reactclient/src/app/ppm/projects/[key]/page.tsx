@@ -65,6 +65,7 @@ enum ProjectAction {
   ChangeProgram = 'Change Program',
   ChangeKey = 'Change Key',
   Delete = 'Delete',
+  Approve = 'Approve',
   Activate = 'Activate',
   Complete = 'Complete',
   Cancel = 'Cancel',
@@ -78,6 +79,8 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const [openChangeProgramForm, setOpenChangeProgramForm] =
     useState<boolean>(false)
   const [openChangeKeyForm, setOpenChangeKeyForm] = useState<boolean>(false)
+  const [openApproveProjectForm, setOpenApproveProjectForm] =
+    useState<boolean>(false)
   const [openActivateProjectForm, setOpenActivateProjectForm] =
     useState<boolean>(false)
   const [openCompleteProjectForm, setOpenCompleteProjectForm] =
@@ -177,13 +180,27 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
           ? [
               ProjectAction.Edit,
               ProjectAction.Delete,
+              ProjectAction.Approve,
               ProjectAction.Activate,
               ProjectAction.Cancel,
             ]
-          : [ProjectAction.Edit, ProjectAction.Delete, ProjectAction.Cancel]
-        : currentStatus === 'Active'
-          ? [ProjectAction.Edit, ProjectAction.Complete, ProjectAction.Cancel]
-          : []
+          : [
+              ProjectAction.Edit,
+              ProjectAction.Delete,
+              ProjectAction.Approve,
+              ProjectAction.Cancel,
+            ]
+        : currentStatus === 'Approved'
+          ? !missingDates
+            ? [
+                ProjectAction.Edit,
+                ProjectAction.Activate,
+                ProjectAction.Cancel,
+              ]
+            : [ProjectAction.Edit, ProjectAction.Cancel]
+          : currentStatus === 'Active'
+            ? [ProjectAction.Edit, ProjectAction.Complete, ProjectAction.Cancel]
+            : []
 
     // TODO: Implement On Hold status
 
@@ -217,13 +234,22 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
 
     if (
       canUpdateProject &&
-      (availableActions.includes(ProjectAction.Activate) ||
+      (availableActions.includes(ProjectAction.Approve) ||
+        availableActions.includes(ProjectAction.Activate) ||
         availableActions.includes(ProjectAction.Complete) ||
         availableActions.includes(ProjectAction.Cancel))
     ) {
       items.push({
         key: 'manage-divider',
         type: 'divider',
+      })
+    }
+
+    if (canUpdateProject && availableActions.includes(ProjectAction.Approve)) {
+      items.push({
+        key: 'approve',
+        label: ProjectAction.Approve,
+        onClick: () => setOpenApproveProjectForm(true),
       })
     }
 
@@ -293,6 +319,16 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     [projectData?.key, refetchProject, router],
   )
 
+  const onApproveProjectFormClosed = useCallback(
+    (wasSaved: boolean) => {
+      setOpenApproveProjectForm(false)
+      if (wasSaved) {
+        refetchProject()
+      }
+    },
+    [refetchProject],
+  )
+
   const onActivateProjectFormClosed = useCallback(
     (wasSaved: boolean) => {
       setOpenActivateProjectForm(false)
@@ -350,7 +386,9 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
         actions={<PageActions actionItems={actionsMenuItems} />}
       />
 
-      {missingDates === true && (
+      {missingDates === true &&
+        (projectData?.status.name === 'Proposed' ||
+          projectData?.status.name === 'Approved') && (
         <>
           <Alert
             title="Project Dates are required before activating."
@@ -388,6 +426,14 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
           projectKey={projectData.key}
           onFormComplete={(newKey) => onChangeKeyFormClosed(true, newKey)}
           onFormCancel={() => onChangeKeyFormClosed(false)}
+        />
+      )}
+      {openApproveProjectForm && (
+        <ChangeProjectStatusForm
+          project={projectData}
+          statusAction={ProjectStatusAction.Approve}
+          onFormComplete={() => onApproveProjectFormClosed(true)}
+          onFormCancel={() => onApproveProjectFormClosed(false)}
         />
       )}
       {openActivateProjectForm && (

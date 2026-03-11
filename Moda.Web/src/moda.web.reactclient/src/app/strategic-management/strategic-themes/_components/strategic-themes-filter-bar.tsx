@@ -6,12 +6,12 @@ import { PpmFilterBar } from '@/src/app/ppm/_components'
 
 export interface StrategicThemesFilterBarProps {
   selectedStates: number[]
-  onToggleState: (stateId: number) => void
+  onStateChange: (states: number[]) => void
 }
 
 const StrategicThemesFilterBar: FC<StrategicThemesFilterBarProps> = ({
   selectedStates,
-  onToggleState,
+  onStateChange,
 }) => {
   const { data: stateOptions, isLoading } = useGetStateOptionsQuery()
 
@@ -19,7 +19,7 @@ const StrategicThemesFilterBar: FC<StrategicThemesFilterBarProps> = ({
     <PpmFilterBar
       statusOptions={stateOptions}
       selectedStatuses={selectedStates}
-      onToggleStatus={onToggleState}
+      onStatusChange={onStateChange}
       loading={isLoading}
     />
   )

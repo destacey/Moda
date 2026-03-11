@@ -24,12 +24,7 @@ const SI_STATUS = {
   Cancelled: 6,
 } as const
 
-const DEFAULT_STATUSES = [
-  SI_STATUS.Proposed,
-  SI_STATUS.Approved,
-  SI_STATUS.Active,
-  SI_STATUS.OnHold,
-]
+const DEFAULT_STATUSES = [SI_STATUS.Approved, SI_STATUS.Active, SI_STATUS.OnHold]
 
 const StrategicInitiativesPage: FC = () => {
   useDocumentTitle('Strategic Initiatives')
@@ -68,13 +63,8 @@ const StrategicInitiativesPage: FC = () => {
     }
   }, [error, messageApi])
 
-  const toggleStatus = useCallback((statusId: number) => {
-    setSelectedStatuses((prev) => {
-      if (prev.includes(statusId)) {
-        return prev.filter((s) => s !== statusId)
-      }
-      return [...prev, statusId]
-    })
+  const handleStatusChange = useCallback((statuses: number[]) => {
+    setSelectedStatuses(statuses)
   }, [])
 
   const actions = useMemo(() => {
@@ -102,7 +92,7 @@ const StrategicInitiativesPage: FC = () => {
       <PageTitle title="Strategic Initiatives" actions={actions} />
       <StrategicInitiativesFilterBar
         selectedStatuses={selectedStatuses}
-        onToggleStatus={toggleStatus}
+        onStatusChange={handleStatusChange}
         selectedPortfolioId={selectedPortfolioId}
         onPortfolioChange={setSelectedPortfolioId}
       />

@@ -54,13 +54,8 @@ const StrategicThemesPage: FC = () => {
     }
   }, [error, messageApi])
 
-  const toggleState = useCallback((stateId: number) => {
-    setSelectedStates((prev) => {
-      if (prev.includes(stateId)) {
-        return prev.filter((s) => s !== stateId)
-      }
-      return [...prev, stateId]
-    })
+  const handleStateChange = useCallback((states: number[]) => {
+    setSelectedStates(states)
   }, [])
 
   const refresh = useCallback(async () => {
@@ -84,7 +79,7 @@ const StrategicThemesPage: FC = () => {
       <PageTitle title="Strategic Themes" actions={showActions && actions} />
       <StrategicThemesFilterBar
         selectedStates={selectedStates}
-        onToggleState={toggleState}
+        onStateChange={handleStateChange}
       />
       <StrategicThemesGrid
         strategicThemesData={strategicThemesData || []}

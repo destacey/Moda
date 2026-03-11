@@ -25,7 +25,10 @@ import {
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import { ItemType } from 'antd/es/menu/interface'
 import { ProgramStatusAction } from '../_components/change-program-status-form'
-import { ProjectsFilterBar, ProjectViewManager } from '@/src/app/ppm/_components'
+import {
+  ProjectsFilterBar,
+  ProjectViewManager,
+} from '@/src/app/ppm/_components'
 
 enum ProgramTabs {
   Details = 'details',
@@ -59,7 +62,7 @@ const ProgramDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const [projectsQueried, setProjectsQueried] = useState(false)
   const [selectedProjectStatuses, setSelectedProjectStatuses] = useState<
     number[]
-  >([1, 2]) // Proposed, Active
+  >([5, 2]) // Approved, Active
   const [openEditProgramForm, setOpenEditProgramForm] = useState<boolean>(false)
   const [openActivateProgramForm, setOpenActivateProgramForm] =
     useState<boolean>(false)
@@ -124,13 +127,8 @@ const ProgramDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     dispatch(setBreadcrumbRoute({ route: breadcrumbRoute, pathname }))
   }, [dispatch, pathname, programData])
 
-  const toggleProjectStatus = useCallback((statusId: number) => {
-    setSelectedProjectStatuses((prev) => {
-      if (prev.includes(statusId)) {
-        return prev.filter((s) => s !== statusId)
-      }
-      return [...prev, statusId]
-    })
+  const handleProjectStatusChange = useCallback((statuses: number[]) => {
+    setSelectedProjectStatuses(statuses)
   }, [])
 
   const renderTabContent = useCallback(() => {
@@ -142,7 +140,7 @@ const ProgramDetailsPage = (props: { params: Promise<{ key: string }> }) => {
           <>
             <ProjectsFilterBar
               selectedStatuses={selectedProjectStatuses}
-              onToggleStatus={toggleProjectStatus}
+              onStatusChange={handleProjectStatusChange}
               showPortfolioFilter={false}
             />
             <ProjectViewManager
@@ -164,7 +162,7 @@ const ProgramDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     projectsDataIsLoading,
     refetchProjectsData,
     selectedProjectStatuses,
-    toggleProjectStatus,
+    handleProjectStatusChange,
   ])
 
   // doesn't trigger on first render
