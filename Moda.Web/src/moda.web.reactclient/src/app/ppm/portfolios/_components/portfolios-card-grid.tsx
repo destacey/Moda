@@ -48,7 +48,7 @@ const PortfoliosCardGrid: React.FC<PortfoliosCardGridProps> = (
         grid={gridConfig}
         loading={{
           spinning: props.isLoading,
-          tip: 'Loading portfolios...',
+          description: 'Loading portfolios...',
           size: 'large',
         }}
         locale={{
