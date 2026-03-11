@@ -6,7 +6,7 @@ import { authorizePage } from '@/src/components/hoc'
 import { useDocumentTitle } from '@/src/hooks'
 import { useGetProjectsQuery } from '@/src/store/features/ppm/projects-api'
 import { Button } from 'antd'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { FC, useCallback, useEffect, useMemo, useState } from 'react'
 import { CreateProjectForm } from './_components'
 import { ProjectsFilterBar, ProjectsGrid } from '../_components'
 import { useMessage } from '@/src/components/contexts/messaging'
@@ -14,6 +14,7 @@ import { useMessage } from '@/src/components/contexts/messaging'
 // Project status enum values matching the backend
 const PROJECT_STATUS = {
   Proposed: 1,
+  Approved: 5,
   Active: 2,
   Completed: 3,
   Cancelled: 4,
@@ -21,10 +22,11 @@ const PROJECT_STATUS = {
 
 const DEFAULT_STATUSES = [
   PROJECT_STATUS.Proposed,
+  PROJECT_STATUS.Approved,
   PROJECT_STATUS.Active,
 ]
 
-const ProjectsPage: React.FC = () => {
+const ProjectsPage: FC = () => {
   useDocumentTitle('Projects')
   const [openCreateProjectForm, setOpenCreateProjectForm] =
     useState<boolean>(false)

@@ -83,7 +83,7 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const [projectsQueried, setProjectsQueried] = useState(false)
   const [selectedProjectStatuses, setSelectedProjectStatuses] = useState<
     number[]
-  >([1, 2]) // Proposed, Active
+  >([1, 5, 2]) // Proposed, Approved, Active
   const [strategicInitiativesQueried, setStrategicInitiativesQueried] =
     useState(false)
   const [selectedSIStatuses, setSelectedSIStatuses] = useState<number[]>([
@@ -161,8 +161,7 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   } = useGetPortfolioStrategicInitiativesQuery(
     {
       portfolioIdOrKey: portfolioKey.toString(),
-      status:
-        selectedSIStatuses.length > 0 ? selectedSIStatuses : undefined,
+      status: selectedSIStatuses.length > 0 ? selectedSIStatuses : undefined,
     },
     { skip: !strategicInitiativesQueried },
   )

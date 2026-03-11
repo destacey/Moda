@@ -25,7 +25,10 @@ import {
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import { ItemType } from 'antd/es/menu/interface'
 import { ProgramStatusAction } from '../_components/change-program-status-form'
-import { ProjectsFilterBar, ProjectViewManager } from '@/src/app/ppm/_components'
+import {
+  ProjectsFilterBar,
+  ProjectViewManager,
+} from '@/src/app/ppm/_components'
 
 enum ProgramTabs {
   Details = 'details',
@@ -59,7 +62,7 @@ const ProgramDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const [projectsQueried, setProjectsQueried] = useState(false)
   const [selectedProjectStatuses, setSelectedProjectStatuses] = useState<
     number[]
-  >([1, 2]) // Proposed, Active
+  >([1, 5, 2]) // Proposed, Approved, Active
   const [openEditProgramForm, setOpenEditProgramForm] = useState<boolean>(false)
   const [openActivateProgramForm, setOpenActivateProgramForm] =
     useState<boolean>(false)

@@ -31,16 +31,10 @@ const STATUS_LIFECYCLE_PHASE: Record<string, LifecyclePhase> = {
 const hasPortfolioFilter = (
   props: PpmFilterBarProps,
 ): props is PpmFilterBarProps &
-  Required<
-    Pick<
-      PpmFilterBarProps,
-      'portfolioOptions' | 'selectedPortfolioId' | 'onPortfolioChange'
-    >
-  > => {
+  Required<Pick<PpmFilterBarProps, 'portfolioOptions' | 'onPortfolioChange'>> => {
   return (
     props.onPortfolioChange !== undefined &&
-    props.portfolioOptions !== undefined &&
-    props.selectedPortfolioId !== undefined
+    props.portfolioOptions !== undefined
   )
 }
 
