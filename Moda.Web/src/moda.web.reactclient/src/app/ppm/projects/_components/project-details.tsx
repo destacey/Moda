@@ -32,6 +32,10 @@ const ProjectDetails: FC<ProjectDetailsProps> = ({
     project?.projectManagers.length > 0
       ? getSortedNames(project.projectManagers)
       : 'No manager assigned'
+  const memberNames =
+    project?.projectMembers.length > 0
+      ? getSortedNames(project.projectMembers)
+      : 'No members assigned'
 
   const strategicThemes =
     project?.strategicThemes.length > 0
@@ -65,6 +69,7 @@ const ProjectDetails: FC<ProjectDetailsProps> = ({
           <Item label="Sponsors">{sponsorNames}</Item>
           <Item label="Owners">{ownerNames}</Item>
           <Item label="Managers">{managerNames}</Item>
+          <Item label="Members">{memberNames}</Item>
           <Item label="Strategic Themes">{strategicThemes}</Item>
         </Descriptions>
         <Descriptions layout="vertical" size="small">

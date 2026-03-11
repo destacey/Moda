@@ -22,12 +22,17 @@ const PortfoliosGrid: React.FC<PortfoliosGridProps> = (
   const columnDefs = useMemo<ColDef<ProjectPortfolioListDto>[]>(
     () => [
       { field: 'key', width: 90 },
-      { field: 'name', cellRenderer: PortfolioLinkCellRenderer },
+      {
+        field: 'name',
+        cellRenderer: PortfolioLinkCellRenderer,
+        width: 200,
+        initialSort: 'asc',
+      },
       { field: 'status.name', headerName: 'Status' },
       {
-        field: 'portfolioSponsors',
-        headerName: 'Sponsors',
-        valueGetter: (params) => getSortedNames(params.data.portfolioSponsors),
+        field: 'portfolioManagers',
+        headerName: 'Managers',
+        valueGetter: (params) => getSortedNames(params.data.portfolioManagers),
       },
       {
         field: 'portfolioOwners',
@@ -35,9 +40,9 @@ const PortfoliosGrid: React.FC<PortfoliosGridProps> = (
         valueGetter: (params) => getSortedNames(params.data.portfolioOwners),
       },
       {
-        field: 'portfolioManagers',
-        headerName: 'Managers',
-        valueGetter: (params) => getSortedNames(params.data.portfolioManagers),
+        field: 'portfolioSponsors',
+        headerName: 'Sponsors',
+        valueGetter: (params) => getSortedNames(params.data.portfolioSponsors),
       },
     ],
     [],

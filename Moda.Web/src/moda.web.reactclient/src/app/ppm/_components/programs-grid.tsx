@@ -51,18 +51,18 @@ const ProgramsGrid: FC<ProgramsGridProps> = (props: ProgramsGridProps) => {
         field: 'start',
         width: 125,
         valueGetter: (params) =>
-          params.data.start && dayjs(params.data.start).format('M/D/YYYY'),
+          params.data.start && dayjs(params.data.start).format('MMM D, YYYY'),
       },
       {
         field: 'end',
         width: 125,
         valueGetter: (params) =>
-          params.data.end && dayjs(params.data.end).format('M/D/YYYY'),
+          params.data.end && dayjs(params.data.end).format('MMM D, YYYY'),
       },
       {
-        field: 'programSponsors',
-        headerName: 'Sponsors',
-        valueGetter: (params) => getSortedNames(params.data.programSponsors),
+        field: 'programManagers',
+        headerName: 'Managers',
+        valueGetter: (params) => getSortedNames(params.data.programManagers),
       },
       {
         field: 'programOwners',
@@ -70,9 +70,9 @@ const ProgramsGrid: FC<ProgramsGridProps> = (props: ProgramsGridProps) => {
         valueGetter: (params) => getSortedNames(params.data.programOwners),
       },
       {
-        field: 'programManagers',
-        headerName: 'Managers',
-        valueGetter: (params) => getSortedNames(params.data.programManagers),
+        field: 'programSponsors',
+        headerName: 'Sponsors',
+        valueGetter: (params) => getSortedNames(params.data.programSponsors),
       },
       {
         field: 'strategicThemes',

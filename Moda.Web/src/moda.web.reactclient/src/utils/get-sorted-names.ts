@@ -10,9 +10,23 @@
  * console.log(result); // Output: 'Alice, Bob, Charlie'
  */
 export function getSortedNames(items: { name: string }[]): string {
+  return getSortedNameList(items).join(', ')
+}
+
+/**
+ * Sorts an array of objects by the 'name' property and returns a sorted array of name strings.
+ *
+ * @param {Array<{ name: string }>} items - The array of objects to be sorted.
+ * @returns {string[]} A sorted array of name strings.
+ *
+ * @example
+ * const items = [{ name: 'Charlie' }, { name: 'Alice' }, { name: 'Bob' }];
+ * const result = getSortedNameList(items);
+ * console.log(result); // Output: ['Alice', 'Bob', 'Charlie']
+ */
+export function getSortedNameList(items: { name: string }[]): string[] {
   return items
     .slice()
     .sort((a, b) => a.name.localeCompare(b.name))
     .map((m) => m.name)
-    .join(', ')
 }

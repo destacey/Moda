@@ -64,18 +64,18 @@ const ProjectsGrid: React.FC<ProjectsGridProps> = (
         field: 'start',
         width: 125,
         valueGetter: (params) =>
-          params.data.start && dayjs(params.data.start).format('M/D/YYYY'),
+          params.data.start && dayjs(params.data.start).format('MMM D, YYYY'),
       },
       {
         field: 'end',
         width: 125,
         valueGetter: (params) =>
-          params.data.end && dayjs(params.data.end).format('M/D/YYYY'),
+          params.data.end && dayjs(params.data.end).format('MMM D, YYYY'),
       },
       {
-        field: 'projectSponsors',
-        headerName: 'Sponsors',
-        valueGetter: (params) => getSortedNames(params.data.projectSponsors),
+        field: 'projectManagers',
+        headerName: 'Managers',
+        valueGetter: (params) => getSortedNames(params.data.projectManagers),
       },
       {
         field: 'projectOwners',
@@ -83,9 +83,9 @@ const ProjectsGrid: React.FC<ProjectsGridProps> = (
         valueGetter: (params) => getSortedNames(params.data.projectOwners),
       },
       {
-        field: 'projectManagers',
-        headerName: 'Managers',
-        valueGetter: (params) => getSortedNames(params.data.projectManagers),
+        field: 'projectSponsors',
+        headerName: 'Sponsors',
+        valueGetter: (params) => getSortedNames(params.data.projectSponsors),
       },
       {
         field: 'strategicThemes',

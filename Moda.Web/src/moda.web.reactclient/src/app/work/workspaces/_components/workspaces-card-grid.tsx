@@ -43,7 +43,7 @@ const WorkspacesCardGrid: React.FC<WorkspacesCardGridProps> = (
         grid={gridConfig}
         loading={{
           spinning: props.isLoading,
-          tip: 'Loading workspaces...',
+          description: 'Loading workspaces...',
           size: 'large',
         }}
         locale={{ emptyText: <ModaEmpty message="No workspaces found" /> }}

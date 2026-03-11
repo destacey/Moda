@@ -1,7 +1,6 @@
 import dayjs from 'dayjs'
 import { CSSProperties, FC } from 'react'
 import { Card, Flex, Grid, Progress, Typography } from 'antd'
-import IterationDates from './iteration-dates'
 
 const { Text } = Typography
 const { useBreakpoint } = Grid
@@ -37,25 +36,18 @@ const TimelineProgress: FC<TimelineProgressProps> = ({
   // For calendar day counting, ignore time and count inclusive days
   const startDay = startDate.startOf('day')
   const endDay = endDate.startOf('day')
-
-  // If start date is in the future, show iteration dates instead
-  if (now.isBefore(startDay)) {
-    return (
-      <IterationDates
-        start={start}
-        end={end}
-        dateFormat={dateFormat}
-        style={style}
-      />
-    )
-  }
+  const today = now.startOf('day')
 
   const totalDays = endDay.diff(startDay, 'day') + 1
-  const currentDay = Math.min(
-    Math.max(now.diff(startDay, 'day') + 1, 0),
-    totalDays,
-  )
-  const progressPercent = Math.round((currentDay / totalDays) * 100)
+  const isFuture = now.isBefore(startDay)
+  const daysUntilStart = isFuture ? startDay.diff(today, 'day') : 0
+
+  const currentDay = isFuture
+    ? 0
+    : Math.min(Math.max(now.diff(startDay, 'day') + 1, 0), totalDays)
+  const progressPercent = isFuture
+    ? 0
+    : Math.round((currentDay / totalDays) * 100)
 
   const fontSize = size === 'small' ? 11 : 12
 
@@ -77,7 +69,9 @@ const TimelineProgress: FC<TimelineProgressProps> = ({
       </Flex>
       <Flex justify="center">
         <Text type="secondary" style={{ fontSize }}>
-          Day {currentDay} of {totalDays} ({progressPercent}%)
+          {isFuture
+            ? `Starts in ${daysUntilStart} day${daysUntilStart !== 1 ? 's' : ''} · ${totalDays} day project`
+            : `Day ${currentDay} of ${totalDays} (${progressPercent}%)`}
         </Text>
       </Flex>
     </Flex>

@@ -50,6 +50,11 @@ public sealed record UpdateProjectRequest
     public List<Guid>? ManagerIds { get; set; } = [];
 
     /// <summary>
+    /// The members of the project team.
+    /// </summary>
+    public List<Guid>? MemberIds { get; set; } = [];
+
+    /// <summary>
     /// The strategic themes associated with this project.
     /// </summary>
     public List<Guid>? StrategicThemeIds { get; set; } = [];
@@ -58,7 +63,7 @@ public sealed record UpdateProjectRequest
     {
         var dateRange = Start is null || End is null ? null : new LocalDateRange((LocalDate)Start, (LocalDate)End);
 
-        return new UpdateProjectCommand(Id, Name, Description, ExpenditureCategoryId, dateRange, SponsorIds, OwnerIds, ManagerIds, StrategicThemeIds);
+        return new UpdateProjectCommand(Id, Name, Description, ExpenditureCategoryId, dateRange, SponsorIds, OwnerIds, ManagerIds, MemberIds, StrategicThemeIds);
     }
 }
 
@@ -99,6 +104,10 @@ public sealed class UpdateProjectProjectRequestValidator : CustomValidator<Updat
         RuleFor(x => x.ManagerIds)
             .Must(ids => ids == null || ids.All(id => id != Guid.Empty))
             .WithMessage("ManagerIds cannot contain empty GUIDs.");
+
+        RuleFor(x => x.MemberIds)
+            .Must(ids => ids == null || ids.All(id => id != Guid.Empty))
+            .WithMessage("MemberIds cannot contain empty GUIDs.");
 
         RuleFor(p => p.StrategicThemeIds)
             .Must(ids => ids == null || ids.All(id => id != Guid.Empty))

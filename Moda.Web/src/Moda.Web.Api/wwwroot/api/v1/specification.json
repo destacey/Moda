@@ -21324,6 +21324,7 @@
           "projectSponsors",
           "projectOwners",
           "projectManagers",
+          "projectMembers",
           "strategicThemes"
         ],
         "properties": {
@@ -21382,6 +21383,12 @@
             }
           },
           "projectManagers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmployeeNavigationDto"
+            }
+          },
+          "projectMembers": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/EmployeeNavigationDto"
@@ -21493,6 +21500,17 @@
               "example": "00000000-0000-0000-0000-000000000000"
             }
           },
+          "memberIds": {
+            "type": "array",
+            "description": "The members of the project team.",
+            "nullable": true,
+            "items": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            }
+          },
           "strategicThemeIds": {
             "type": "array",
             "description": "The strategic themes associated with this project.",
@@ -21582,6 +21600,17 @@
           "managerIds": {
             "type": "array",
             "description": "The managers of the project.",
+            "nullable": true,
+            "items": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            }
+          },
+          "memberIds": {
+            "type": "array",
+            "description": "The members of the project team.",
             "nullable": true,
             "items": {
               "type": "string",

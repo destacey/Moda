@@ -1,16 +1,20 @@
 'use client'
 
 import { ModaDateRange } from '@/src/components/common'
+import {
+  ContentList,
+  ExpandableContent,
+  LabeledContent,
+} from '@/src/components/common/content'
+import LinksCard from '@/src/components/common/links/links-card'
 import { MarkdownRenderer } from '@/src/components/common/markdown'
 import useAuth from '@/src/components/contexts/auth'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { useGetStrategicInitiativeQuery } from '@/src/store/features/ppm/strategic-initiatives-api'
-import { getDrawerWidthPixels, getSortedNames } from '@/src/utils'
-import { Descriptions, Drawer, Flex } from 'antd'
+import { getDrawerWidthPixels, getSortedNameList } from '@/src/utils'
+import { Drawer, Flex } from 'antd'
 import Link from 'next/link'
 import { FC, useEffect, useMemo, useState } from 'react'
-
-const { Item } = Descriptions
 
 export interface StrategicInitiativeDrawerProps {
   strategicInitiativeKey: number
@@ -43,7 +47,7 @@ const StrategicInitiativeDrawer: FC<StrategicInitiativeDrawerProps> = (
       )
       props.onDrawerClose()
     }
-  }, [canViewStrategicInitiative, messageApi, props])
+  }, [canViewStrategicInitiative, messageApi, props.onDrawerClose])
 
   useEffect(() => {
     if (error) {
@@ -56,23 +60,23 @@ const StrategicInitiativeDrawer: FC<StrategicInitiativeDrawerProps> = (
 
   const sponsorNames = useMemo(
     () =>
-      strategicInitiativeData?.strategicInitiativeSponsors.length > 0
-        ? getSortedNames(strategicInitiativeData.strategicInitiativeSponsors)
-        : 'No sponsors assigned',
+      getSortedNameList(
+        strategicInitiativeData?.strategicInitiativeSponsors ?? [],
+      ),
     [strategicInitiativeData],
   )
 
   const ownerNames = useMemo(
     () =>
-      strategicInitiativeData?.strategicInitiativeOwners.length > 0
-        ? getSortedNames(strategicInitiativeData.strategicInitiativeOwners)
-        : 'No owners assigned',
+      getSortedNameList(
+        strategicInitiativeData?.strategicInitiativeOwners ?? [],
+      ),
     [strategicInitiativeData],
   )
 
   return (
     <Drawer
-      title="Strategic Initiative Details"
+      title={strategicInitiativeData?.name ?? 'Strategic Initiative Details'}
       placement="right"
       onClose={props.onDrawerClose}
       open={props.drawerOpen}
@@ -84,32 +88,47 @@ const StrategicInitiativeDrawer: FC<StrategicInitiativeDrawerProps> = (
       destroyOnHidden={true}
     >
       <Flex vertical gap="middle">
-        <Descriptions column={1} size="small">
-          <Item label="Name">
+        <Flex vertical gap={10}>
+          <LabeledContent label="Key">
             <Link
               href={`/ppm/strategic-initiatives/${strategicInitiativeData?.key}`}
             >
-              {strategicInitiativeData?.name}
+              {strategicInitiativeData?.key}
             </Link>
-          </Item>
-          <Item label="Key">{strategicInitiativeData?.key}</Item>
-          <Item label="Status">{strategicInitiativeData?.status.name}</Item>
-          <Item label="Dates">
+          </LabeledContent>
+          <LabeledContent label="Status">
+            {strategicInitiativeData?.status.name}
+          </LabeledContent>
+          <LabeledContent label="Dates">
             <ModaDateRange
               dateRange={{
                 start: strategicInitiativeData?.start,
                 end: strategicInitiativeData?.end,
               }}
             />
-          </Item>
-          <Item label="Sponsors">{sponsorNames}</Item>
-          <Item label="Owners">{ownerNames}</Item>
-        </Descriptions>
-        <Descriptions column={1} layout="vertical" size="small">
-          <Item label="Description">
-            <MarkdownRenderer markdown={strategicInitiativeData?.description} />
-          </Item>
-        </Descriptions>
+          </LabeledContent>
+          <LabeledContent label="Sponsors">
+            <ContentList
+              items={sponsorNames}
+              emptyText="No sponsors assigned"
+            />
+          </LabeledContent>
+          <LabeledContent label="Owners">
+            <ContentList items={ownerNames} emptyText="No owners assigned" />
+          </LabeledContent>
+          {strategicInitiativeData?.description && (
+            <LabeledContent label="Description">
+              <ExpandableContent background="var(--ant-color-bg-elevated)">
+                <MarkdownRenderer
+                  markdown={strategicInitiativeData.description}
+                />
+              </ExpandableContent>
+            </LabeledContent>
+          )}
+        </Flex>
+        {strategicInitiativeData?.id && (
+          <LinksCard objectId={strategicInitiativeData.id} width="100%" />
+        )}
       </Flex>
     </Drawer>
   )
