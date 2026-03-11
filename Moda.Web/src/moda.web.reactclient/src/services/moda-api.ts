@@ -22248,6 +22248,7 @@ export interface ProjectDetailsDto {
     projectSponsors: EmployeeNavigationDto[];
     projectOwners: EmployeeNavigationDto[];
     projectManagers: EmployeeNavigationDto[];
+    projectMembers: EmployeeNavigationDto[];
     strategicThemes: NavigationDto[];
 }
 
@@ -22274,6 +22275,8 @@ export interface CreateProjectRequest {
     ownerIds?: string[] | undefined;
     /** The managers of the project. */
     managerIds?: string[] | undefined;
+    /** The members of the project team. */
+    memberIds?: string[] | undefined;
     /** The strategic themes associated with this project. */
     strategicThemeIds?: string[] | undefined;
 }
@@ -22297,6 +22300,8 @@ export interface UpdateProjectRequest {
     ownerIds?: string[] | undefined;
     /** The managers of the project. */
     managerIds?: string[] | undefined;
+    /** The members of the project team. */
+    memberIds?: string[] | undefined;
     /** The strategic themes associated with this project. */
     strategicThemeIds?: string[] | undefined;
 }

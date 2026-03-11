@@ -74,6 +74,14 @@ const ProjectDrawer: FC<ProjectDrawerProps> = (props: ProjectDrawerProps) => {
     [projectData],
   )
 
+  const memberNames = useMemo(
+    () =>
+      projectData?.projectMembers.length > 0
+        ? getSortedNames(projectData.projectMembers)
+        : null,
+    [projectData],
+  )
+
   const strategicThemes = useMemo(
     () =>
       projectData?.strategicThemes.length > 0
@@ -120,6 +128,7 @@ const ProjectDrawer: FC<ProjectDrawerProps> = (props: ProjectDrawerProps) => {
           <Item label="Sponsors">{sponsorNames}</Item>
           <Item label="Owners">{ownerNames}</Item>
           <Item label="Managers">{managerNames}</Item>
+          <Item label="Members">{memberNames}</Item>
           <Item label="Strategic Themes">{strategicThemes}</Item>
         </Descriptions>
         <Descriptions layout="vertical" size="small">
