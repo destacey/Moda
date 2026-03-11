@@ -20,11 +20,7 @@ const PROJECT_STATUS = {
   Cancelled: 4,
 } as const
 
-const DEFAULT_STATUSES = [
-  PROJECT_STATUS.Proposed,
-  PROJECT_STATUS.Approved,
-  PROJECT_STATUS.Active,
-]
+const DEFAULT_STATUSES = [PROJECT_STATUS.Approved, PROJECT_STATUS.Active]
 
 const ProjectsPage: FC = () => {
   useDocumentTitle('Projects')
@@ -58,13 +54,8 @@ const ProjectsPage: FC = () => {
     }
   }, [error, messageApi])
 
-  const toggleStatus = useCallback((statusId: number) => {
-    setSelectedStatuses((prev) => {
-      if (prev.includes(statusId)) {
-        return prev.filter((s) => s !== statusId)
-      }
-      return [...prev, statusId]
-    })
+  const handleStatusChange = useCallback((statuses: number[]) => {
+    setSelectedStatuses(statuses)
   }, [])
 
   const actions = useMemo(() => {
@@ -92,7 +83,7 @@ const ProjectsPage: FC = () => {
       <PageTitle title="Projects" actions={actions} />
       <ProjectsFilterBar
         selectedStatuses={selectedStatuses}
-        onToggleStatus={toggleStatus}
+        onStatusChange={handleStatusChange}
         selectedPortfolioId={selectedPortfolioId}
         onPortfolioChange={setSelectedPortfolioId}
       />

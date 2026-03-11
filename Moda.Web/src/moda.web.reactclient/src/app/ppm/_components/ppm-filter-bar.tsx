@@ -1,37 +1,28 @@
 'use client'
 
-import { LifecyclePhase } from '@/src/components/types'
-import { getLifecyclePhaseTagColor } from '@/src/utils'
-import { Card, Flex, Select, Skeleton, Space, Tag } from 'antd'
+import { Button, Card, Flex, Select, Skeleton, Space } from 'antd'
 import { BaseOptionType } from 'antd/es/select'
 import { FC } from 'react'
 import styles from './ppm-filter-bar.module.css'
 
+const { Compact: SpaceCompact } = Space
+
 export interface PpmFilterBarProps {
   statusOptions: { value: number; label: string }[] | undefined
   selectedStatuses: number[]
-  onToggleStatus: (statusId: number) => void
+  onStatusChange: (statuses: number[]) => void
   portfolioOptions?: BaseOptionType[] | undefined
   selectedPortfolioId?: string | undefined
   onPortfolioChange?: (portfolioId: string | undefined) => void
   loading?: boolean
 }
 
-// Map status names to lifecycle phases for tag coloring
-const STATUS_LIFECYCLE_PHASE: Record<string, LifecyclePhase> = {
-  Proposed: LifecyclePhase.NotStarted,
-  Approved: LifecyclePhase.NotStarted,
-  Active: LifecyclePhase.Active,
-  'On Hold': LifecyclePhase.Active,
-  Completed: LifecyclePhase.Done,
-  Cancelled: LifecyclePhase.Done,
-  Archived: LifecyclePhase.Done,
-}
-
 const hasPortfolioFilter = (
   props: PpmFilterBarProps,
 ): props is PpmFilterBarProps &
-  Required<Pick<PpmFilterBarProps, 'portfolioOptions' | 'onPortfolioChange'>> => {
+  Required<
+    Pick<PpmFilterBarProps, 'portfolioOptions' | 'onPortfolioChange'>
+  > => {
   return (
     props.onPortfolioChange !== undefined &&
     props.portfolioOptions !== undefined
@@ -39,7 +30,7 @@ const hasPortfolioFilter = (
 }
 
 const PpmFilterBar: FC<PpmFilterBarProps> = (props) => {
-  const { statusOptions, selectedStatuses, onToggleStatus, loading } = props
+  const { statusOptions, selectedStatuses, onStatusChange, loading } = props
 
   if (loading) {
     return (
@@ -50,13 +41,14 @@ const PpmFilterBar: FC<PpmFilterBarProps> = (props) => {
   }
 
   return (
-    <Card className={styles.filterCard}>
+    <div className={styles.filterCard}>
       <Flex align="center" gap={16} wrap>
         {hasPortfolioFilter(props) && (
           <Space size="middle" align="center">
             <span className={styles.filterLabel}>Portfolio:</span>
             <Select
               placeholder="All Portfolios"
+              size="small"
               allowClear
               value={props.selectedPortfolioId}
               onChange={(value) => props.onPortfolioChange(value)}
@@ -69,39 +61,30 @@ const PpmFilterBar: FC<PpmFilterBarProps> = (props) => {
 
         <Space size="small" align="center">
           <span className={styles.filterLabel}>Status:</span>
-          {statusOptions?.map((status) => {
-            const isSelected = selectedStatuses.includes(status.value)
-            const phase =
-              STATUS_LIFECYCLE_PHASE[status.label] ?? LifecyclePhase.NotStarted
-            const color = isSelected
-              ? getLifecyclePhaseTagColor(phase)
-              : undefined
-
-            return (
-              <Tag
-                key={status.value}
-                color={isSelected ? color : undefined}
-                onClick={() => onToggleStatus(status.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault()
-                    onToggleStatus(status.value)
-                  }
-                }}
-                role="button"
-                tabIndex={0}
-                aria-pressed={isSelected}
-                className={
-                  isSelected ? styles.statusTag : styles.statusTagInactive
-                }
-              >
-                {status.label.toUpperCase()}
-              </Tag>
-            )
-          })}
+          <SpaceCompact>
+            {statusOptions?.map((status) => {
+              const isSelected = selectedStatuses.includes(status.value)
+              return (
+                <Button
+                  key={status.value}
+                  size="small"
+                  className={styles.statusButton}
+                  type={isSelected ? 'primary' : 'default'}
+                  onClick={() => {
+                    const next = isSelected
+                      ? selectedStatuses.filter((s) => s !== status.value)
+                      : [...selectedStatuses, status.value]
+                    onStatusChange(next)
+                  }}
+                >
+                  {status.label}
+                </Button>
+              )
+            })}
+          </SpaceCompact>
         </Space>
       </Flex>
-    </Card>
+    </div>
   )
 }
 

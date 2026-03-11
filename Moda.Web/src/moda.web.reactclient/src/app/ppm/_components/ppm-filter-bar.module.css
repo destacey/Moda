@@ -12,21 +12,14 @@
   text-transform: uppercase;
 }
 
-.statusTag {
-  cursor: pointer;
-  -webkit-user-select: none;
-  user-select: none;
-}
 
-.statusTagInactive {
-  cursor: pointer;
-  -webkit-user-select: none;
-  user-select: none;
-  opacity: 0.5;
+.statusButton {
+  font-size: 12px;
 }
 
 .portfolioSelect {
   min-width: 180px;
+  font-size: 12px;
 }
 
 .skeleton {

@@ -7,7 +7,7 @@ import PpmFilterBar from './ppm-filter-bar'
 
 export interface ProgramsFilterBarProps {
   selectedStatuses: number[]
-  onToggleStatus: (statusId: number) => void
+  onStatusChange: (statuses: number[]) => void
   selectedPortfolioId?: string | undefined
   onPortfolioChange?: (portfolioId: string | undefined) => void
   showPortfolioFilter?: boolean
@@ -15,7 +15,7 @@ export interface ProgramsFilterBarProps {
 
 const ProgramsFilterBar: FC<ProgramsFilterBarProps> = ({
   selectedStatuses,
-  onToggleStatus,
+  onStatusChange,
   selectedPortfolioId,
   onPortfolioChange,
   showPortfolioFilter = true,
@@ -33,7 +33,7 @@ const ProgramsFilterBar: FC<ProgramsFilterBarProps> = ({
     <PpmFilterBar
       statusOptions={statusOptions}
       selectedStatuses={selectedStatuses}
-      onToggleStatus={onToggleStatus}
+      onStatusChange={onStatusChange}
       portfolioOptions={showPortfolioFilter ? portfolioOptions : undefined}
       selectedPortfolioId={showPortfolioFilter ? selectedPortfolioId : undefined}
       onPortfolioChange={showPortfolioFilter ? onPortfolioChange : undefined}

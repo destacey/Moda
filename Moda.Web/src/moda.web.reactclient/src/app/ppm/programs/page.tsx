@@ -19,7 +19,7 @@ const PROGRAM_STATUS = {
   Cancelled: 4,
 } as const
 
-const DEFAULT_STATUSES = [PROGRAM_STATUS.Proposed, PROGRAM_STATUS.Active]
+const DEFAULT_STATUSES = [PROGRAM_STATUS.Active]
 
 const ProgramsPage: FC = () => {
   useDocumentTitle('Programs')
@@ -53,13 +53,8 @@ const ProgramsPage: FC = () => {
     }
   }, [error, messageApi])
 
-  const toggleStatus = useCallback((statusId: number) => {
-    setSelectedStatuses((prev) => {
-      if (prev.includes(statusId)) {
-        return prev.filter((s) => s !== statusId)
-      }
-      return [...prev, statusId]
-    })
+  const handleStatusChange = useCallback((statuses: number[]) => {
+    setSelectedStatuses(statuses)
   }, [])
 
   const actions = useMemo(() => {
@@ -87,7 +82,7 @@ const ProgramsPage: FC = () => {
       <PageTitle title="Programs" actions={actions} />
       <ProgramsFilterBar
         selectedStatuses={selectedStatuses}
-        onToggleStatus={toggleStatus}
+        onStatusChange={handleStatusChange}
         selectedPortfolioId={selectedPortfolioId}
         onPortfolioChange={setSelectedPortfolioId}
       />

@@ -79,16 +79,16 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const [programsQueried, setProgramsQueried] = useState(false)
   const [selectedProgramStatuses, setSelectedProgramStatuses] = useState<
     number[]
-  >([1, 2]) // Proposed, Active
+  >([2]) // Active
   const [projectsQueried, setProjectsQueried] = useState(false)
   const [selectedProjectStatuses, setSelectedProjectStatuses] = useState<
     number[]
-  >([1, 5, 2]) // Proposed, Approved, Active
+  >([5, 2]) // Approved, Active
   const [strategicInitiativesQueried, setStrategicInitiativesQueried] =
     useState(false)
   const [selectedSIStatuses, setSelectedSIStatuses] = useState<number[]>([
-    1, 2, 3,
-  ]) // Proposed, Approved, Active
+    2, 3,
+  ]) // Approved, Active
 
   const [openEditPortfolioForm, setOpenEditPortfolioForm] =
     useState<boolean>(false)
@@ -188,31 +188,16 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     dispatch(setBreadcrumbRoute({ route: breadcrumbRoute, pathname }))
   }, [dispatch, pathname, portfolioData])
 
-  const toggleProgramStatus = useCallback((statusId: number) => {
-    setSelectedProgramStatuses((prev) => {
-      if (prev.includes(statusId)) {
-        return prev.filter((s) => s !== statusId)
-      }
-      return [...prev, statusId]
-    })
+  const handleProgramStatusChange = useCallback((statuses: number[]) => {
+    setSelectedProgramStatuses(statuses)
   }, [])
 
-  const toggleSIStatus = useCallback((statusId: number) => {
-    setSelectedSIStatuses((prev) => {
-      if (prev.includes(statusId)) {
-        return prev.filter((s) => s !== statusId)
-      }
-      return [...prev, statusId]
-    })
+  const handleSIStatusChange = useCallback((statuses: number[]) => {
+    setSelectedSIStatuses(statuses)
   }, [])
 
-  const toggleProjectStatus = useCallback((statusId: number) => {
-    setSelectedProjectStatuses((prev) => {
-      if (prev.includes(statusId)) {
-        return prev.filter((s) => s !== statusId)
-      }
-      return [...prev, statusId]
-    })
+  const handleProjectStatusChange = useCallback((statuses: number[]) => {
+    setSelectedProjectStatuses(statuses)
   }, [])
 
   const renderTabContent = useCallback(() => {
@@ -224,7 +209,7 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
           <>
             <ProgramsFilterBar
               selectedStatuses={selectedProgramStatuses}
-              onToggleStatus={toggleProgramStatus}
+              onStatusChange={handleProgramStatusChange}
               showPortfolioFilter={false}
             />
             <ProgramViewManager
@@ -239,7 +224,7 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
           <>
             <ProjectsFilterBar
               selectedStatuses={selectedProjectStatuses}
-              onToggleStatus={toggleProjectStatus}
+              onStatusChange={handleProjectStatusChange}
               showPortfolioFilter={false}
             />
             <ProjectViewManager
@@ -255,7 +240,7 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
           <>
             <StrategicInitiativesFilterBar
               selectedStatuses={selectedSIStatuses}
-              onToggleStatus={toggleSIStatus}
+              onStatusChange={handleSIStatusChange}
               showPortfolioFilter={false}
             />
             <StrategicInitiativeViewManager
@@ -283,9 +268,9 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     selectedProgramStatuses,
     selectedProjectStatuses,
     selectedSIStatuses,
-    toggleProgramStatus,
-    toggleProjectStatus,
-    toggleSIStatus,
+    handleProgramStatusChange,
+    handleProjectStatusChange,
+    handleSIStatusChange,
   ])
 
   const actionsMenuItems: MenuProps['items'] = useMemo(() => {
