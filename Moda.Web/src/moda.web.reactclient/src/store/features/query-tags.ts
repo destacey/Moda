@@ -2,6 +2,10 @@ export enum QueryTags {
   // ADMIN
   BackgroundJob = 'Admin.BackgroundJob',
   BackgroundJobType = 'Admin.BackgroundJobType',
+  FeatureFlag = 'Admin.FeatureFlag',
+
+  // CLIENT FEATURE FLAGS
+  ClientFeatureFlag = 'Client.FeatureFlag',
 
   // APP INTEGRATION
   Connection = 'AppIntegration.Connection',
@@ -92,6 +96,10 @@ export enum QueryTags {
   StrategicInitiativeKpiCheckpointPlan = 'Ppm.StrategicInitiativeKpiCheckpointPlan',
   StrategicInitiativeKpiMeasurement = 'Ppm.StrategicInitiativeKpiMeasurement',
   StrategicInitiativeProject = 'Ppm.StrategicInitiativeProject',
+  StrategicInitiativeStatusOptions = 'Ppm.StrategicInitiative.StatusOptions',
+  ProjectStatusOptions = 'Ppm.Project.StatusOptions',
+  ProgramStatusOptions = 'Ppm.Program.StatusOptions',
+  PortfolioStatusOptions = 'Ppm.Portfolio.StatusOptions',
 
   // STRATEGIC MANAGEMENT
   StrategicTheme = 'StrategicManagement.StrategicTheme',

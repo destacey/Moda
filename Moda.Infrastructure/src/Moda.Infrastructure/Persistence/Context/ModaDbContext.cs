@@ -1,8 +1,9 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Moda.AppIntegration.Domain.Models.AzureOpenAI;
+using Moda.Common.Application.FeatureManagement;
 using Moda.Common.Domain.Employees;
-using Moda.Common.Domain.Identity;
+using Moda.Common.Domain.FeatureManagement;
 using Moda.Goals.Application.Persistence;
 using Moda.Goals.Domain.Models;
 using Moda.Health;
@@ -11,7 +12,6 @@ using Moda.Infrastructure.Common.Services;
 using Moda.Links;
 using Moda.Links.Models;
 using Moda.Organization.Application.Teams.Models;
-using Moda.Organization.Domain.Models;
 using Moda.Planning.Application.Persistence;
 using Moda.Planning.Domain.Models;
 using Moda.Planning.Domain.Models.Iterations;
@@ -29,7 +29,7 @@ using StrategicTheme = Moda.StrategicManagement.Domain.Models.StrategicTheme;
 
 namespace Moda.Infrastructure.Persistence.Context;
 
-public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IGoalsDbContext, IHealthDbContext, ILinksDbContext, IOrganizationDbContext, IPlanningDbContext, IProjectPortfolioManagementDbContext, IStrategicManagementDbContext, IWorkDbContext
+public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IFeatureManagementDbContext, IGoalsDbContext, IHealthDbContext, ILinksDbContext, IOrganizationDbContext, IPlanningDbContext, IProjectPortfolioManagementDbContext, IStrategicManagementDbContext, IWorkDbContext
 {
     public ModaDbContext(DbContextOptions options, ICurrentUser currentUser, IDateTimeProvider dateTimeProvider, IOptions<DatabaseSettings> dbSettings, IEventPublisher events, IRequestCorrelationIdProvider requestCorrelationIdProvider)
         : base(options, currentUser, dateTimeProvider, dbSettings, events, requestCorrelationIdProvider)
@@ -43,6 +43,12 @@ public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IGoalsDbCo
     public DbSet<User> ModaUsers => Set<User>();
 
     #endregion Common
+
+    #region IFeatureManagement
+
+    public DbSet<FeatureFlag> FeatureFlags => Set<FeatureFlag>();
+
+    #endregion IFeatureManagement
 
     #region IAppIntegration
 

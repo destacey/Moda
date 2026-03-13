@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Moda.Infrastructure.Auth.AzureAd;
+using Moda.Infrastructure.Auth.Local;
 using Moda.Infrastructure.Auth.Permissions;
 using Moda.Infrastructure.Auth.PersonalAccessToken;
 
@@ -9,7 +11,7 @@ namespace Moda.Infrastructure.Auth;
 
 internal static class ConfigureServices
 {
-    internal static IServiceCollection AddAuth(this IServiceCollection services, IConfiguration config)
+    internal static IServiceCollection AddAuth(this IServiceCollection services, IConfiguration config, IHostEnvironment environment)
     {
         return services
             .AddCurrentUser()
@@ -18,6 +20,7 @@ internal static class ConfigureServices
             // Must add identity before adding auth!
             .AddIdentity()
             .AddAzureAdAuth(config)
+            .AddLocalJwtAuth(config, environment)
             .AddPersonalAccessTokenAuth()
             .AddAuthorizationPolicies();
     }

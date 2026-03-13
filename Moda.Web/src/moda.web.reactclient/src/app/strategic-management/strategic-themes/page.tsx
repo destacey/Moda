@@ -6,15 +6,29 @@ import { authorizePage } from '@/src/components/hoc'
 import { useDocumentTitle } from '@/src/hooks'
 import { useGetStrategicThemesQuery } from '@/src/store/features/strategic-management/strategic-themes-api'
 import { Button } from 'antd'
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { CreateStrategicThemeForm, StrategicThemesGrid } from './_components'
+import { FC, useCallback, useEffect, useMemo, useState } from 'react'
+import {
+  CreateStrategicThemeForm,
+  StrategicThemesFilterBar,
+  StrategicThemesGrid,
+} from './_components'
 import { useMessage } from '@/src/components/contexts/messaging'
 
-const StrategicThemesPage: React.FC = () => {
+// Strategic Theme state enum values matching the backend
+const THEME_STATE = {
+  Proposed: 1,
+  Active: 2,
+  Archived: 3,
+} as const
+
+const DEFAULT_STATES = [THEME_STATE.Active]
+
+const StrategicThemesPage: FC = () => {
   useDocumentTitle('Strategic Themes')
 
   const [openCreateStrategicThemeForm, setOpenCreateStrategicThemeForm] =
     useState<boolean>(false)
+  const [selectedStates, setSelectedStates] = useState<number[]>(DEFAULT_STATES)
 
   const messageApi = useMessage()
 
@@ -29,7 +43,9 @@ const StrategicThemesPage: React.FC = () => {
     isLoading,
     error,
     refetch,
-  } = useGetStrategicThemesQuery(undefined)
+  } = useGetStrategicThemesQuery({
+    state: selectedStates.length > 0 ? selectedStates : undefined,
+  })
 
   useEffect(() => {
     if (error) {
@@ -37,6 +53,10 @@ const StrategicThemesPage: React.FC = () => {
       messageApi.error('Failed to load strategic themes.')
     }
   }, [error, messageApi])
+
+  const handleStateChange = useCallback((states: number[]) => {
+    setSelectedStates(states)
+  }, [])
 
   const refresh = useCallback(async () => {
     refetch()
@@ -57,6 +77,10 @@ const StrategicThemesPage: React.FC = () => {
   return (
     <>
       <PageTitle title="Strategic Themes" actions={showActions && actions} />
+      <StrategicThemesFilterBar
+        selectedStates={selectedStates}
+        onStateChange={handleStateChange}
+      />
       <StrategicThemesGrid
         strategicThemesData={strategicThemesData || []}
         strategicThemesLoading={isLoading}

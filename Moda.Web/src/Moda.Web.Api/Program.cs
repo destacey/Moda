@@ -57,7 +57,7 @@ try
     builder.Services.AddFluentValidationClientsideAdapters();
 
     builder.Services.AddCommonApplication();
-    builder.Services.AddInfrastructure(builder.Configuration);
+    builder.Services.AddInfrastructure(builder.Configuration, builder.Environment);
 
     builder.Services.AddAppIntegrationApplication();
     builder.Services.AddGoalsApplication();

@@ -1,4 +1,6 @@
-﻿using Moda.Planning.Application.EstimationScales.Commands;
+﻿using Microsoft.FeatureManagement.Mvc;
+using Moda.Common.Domain.FeatureManagement;
+using Moda.Planning.Application.EstimationScales.Commands;
 using Moda.Planning.Application.EstimationScales.Dtos;
 using Moda.Planning.Application.EstimationScales.Queries;
 using Moda.Web.Api.Extensions;
@@ -9,6 +11,7 @@ namespace Moda.Web.Api.Controllers.Planning;
 [Route("api/planning/estimation-scales")]
 [ApiVersionNeutral]
 [ApiController]
+[FeatureGate(FeatureFlags.Names.PlanningPoker)]
 public class EstimationScalesController(ISender sender) : ControllerBase
 {
     private readonly ISender _sender = sender;

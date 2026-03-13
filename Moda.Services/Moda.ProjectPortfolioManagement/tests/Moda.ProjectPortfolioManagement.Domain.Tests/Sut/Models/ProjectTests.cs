@@ -351,7 +351,21 @@ public class ProjectTests
     }
 
     [Fact]
-    public void Activate_ShouldFail_WhenProjectIsNotProposed()
+    public void Activate_ShouldActivateApprovedProjectSuccessfully()
+    {
+        // Arrange
+        var project = _projectFaker.AsApproved(_dateTimeProvider, Guid.NewGuid());
+
+        // Act
+        var result = project.Activate();
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        project.Status.Should().Be(ProjectStatus.Active);
+    }
+
+    [Fact]
+    public void Activate_ShouldFail_WhenProjectIsNotProposedOrApproved()
     {
         // Arrange
         var project = _projectFaker.AsActive(_dateTimeProvider, Guid.NewGuid());
@@ -361,7 +375,49 @@ public class ProjectTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Should().Be("Only proposed projects can be activated.");
+        result.Error.Should().Be("Only proposed or approved projects can be activated.");
+    }
+
+    [Fact]
+    public void Approve_ShouldApproveProposedProjectSuccessfully()
+    {
+        // Arrange
+        var project = _projectFaker.Generate();
+
+        // Act
+        var result = project.Approve();
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        project.Status.Should().Be(ProjectStatus.Approved);
+    }
+
+    [Fact]
+    public void Approve_ShouldFail_WhenProjectIsNotProposed()
+    {
+        // Arrange
+        var project = _projectFaker.AsActive(_dateTimeProvider, Guid.NewGuid());
+
+        // Act
+        var result = project.Approve();
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("Only proposed projects can be approved.");
+    }
+
+    [Fact]
+    public void Cancel_ShouldCancelApprovedProjectSuccessfully()
+    {
+        // Arrange
+        var project = _projectFaker.AsApproved(_dateTimeProvider, Guid.NewGuid());
+
+        // Act
+        var result = project.Cancel();
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        project.Status.Should().Be(ProjectStatus.Cancelled);
     }
 
     [Fact]

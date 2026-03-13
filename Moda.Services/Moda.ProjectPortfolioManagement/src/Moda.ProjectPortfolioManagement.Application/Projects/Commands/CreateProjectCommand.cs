@@ -6,7 +6,7 @@ using Moda.ProjectPortfolioManagement.Domain.Enums;
 
 namespace Moda.ProjectPortfolioManagement.Application.Projects.Commands;
 
-public sealed record CreateProjectCommand(string Name, string Description, ProjectKey Key, int ExpenditureCategoryId, LocalDateRange? DateRange, Guid PortfolioId, Guid? ProgramId, List<Guid>? SponsorIds, List<Guid>? OwnerIds, List<Guid>? ManagerIds, List<Guid>? StrategicThemeIds) : ICommand<ProjectIdAndKey>;
+public sealed record CreateProjectCommand(string Name, string Description, ProjectKey Key, int ExpenditureCategoryId, LocalDateRange? DateRange, Guid PortfolioId, Guid? ProgramId, List<Guid>? SponsorIds, List<Guid>? OwnerIds, List<Guid>? ManagerIds, List<Guid>? MemberIds, List<Guid>? StrategicThemeIds) : ICommand<ProjectIdAndKey>;
 
 public sealed class CreateProjectCommandValidator : AbstractValidator<CreateProjectCommand>
 {
@@ -45,6 +45,10 @@ public sealed class CreateProjectCommandValidator : AbstractValidator<CreateProj
         RuleFor(x => x.ManagerIds)
             .Must(ids => ids == null || ids.All(id => id != Guid.Empty))
             .WithMessage("ManagerIds cannot contain empty GUIDs.");
+
+        RuleFor(x => x.MemberIds)
+            .Must(ids => ids == null || ids.All(id => id != Guid.Empty))
+            .WithMessage("MemberIds cannot contain empty GUIDs.");
 
         RuleFor(x => x.StrategicThemeIds)
             .Must(ids => ids == null || ids.All(id => id != Guid.Empty))
@@ -158,6 +162,10 @@ internal sealed class CreateProjectCommandHandler(
         if (request.ManagerIds != null && request.ManagerIds.Count != 0)
         {
             roles.Add(ProjectRole.Manager, [.. request.ManagerIds]);
+        }
+        if (request.MemberIds != null && request.MemberIds.Count != 0)
+        {
+            roles.Add(ProjectRole.Member, [.. request.MemberIds]);
         }
 
         return roles;

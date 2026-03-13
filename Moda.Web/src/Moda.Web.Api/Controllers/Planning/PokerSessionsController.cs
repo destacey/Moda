@@ -1,4 +1,6 @@
-﻿using Moda.Common.Application.Models;
+﻿using Microsoft.FeatureManagement.Mvc;
+using Moda.Common.Application.Models;
+using Moda.Common.Domain.FeatureManagement;
 using Moda.Planning.Application.PokerSessions.Commands;
 using Moda.Planning.Application.PokerSessions.Dtos;
 using Moda.Planning.Application.PokerSessions.Queries;
@@ -11,6 +13,7 @@ namespace Moda.Web.Api.Controllers.Planning;
 [Route("api/planning/poker-sessions")]
 [ApiVersionNeutral]
 [ApiController]
+[FeatureGate(FeatureFlags.Names.PlanningPoker)]
 public class PokerSessionsController(ISender sender) : ControllerBase
 {
     private readonly ISender _sender = sender;

@@ -68,6 +68,519 @@ export class Client {
     }
 }
 
+export class FeatureFlagsClient {
+    protected instance: AxiosInstance;
+    protected baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, instance?: AxiosInstance) {
+
+        this.instance = instance || axios.create();
+
+        this.baseUrl = baseUrl ?? "";
+
+    }
+
+    /**
+     * Get all enabled feature flags for the current user.
+     */
+    getEnabledFeatureFlags( cancelToken?: CancelToken): Promise<ClientFeatureFlagDto[]> {
+        let url_ = this.baseUrl + "/api/feature-flags";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetEnabledFeatureFlags(_response);
+        });
+    }
+
+    protected processGetEnabledFeatureFlags(response: AxiosResponse): Promise<ClientFeatureFlagDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<ClientFeatureFlagDto[]>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ClientFeatureFlagDto[]>(null as any);
+    }
+
+    /**
+     * Get a list of all feature flags.
+     * @param includeArchived (optional) 
+     */
+    featureFlags(includeArchived?: boolean | undefined, cancelToken?: CancelToken): Promise<FeatureFlagListDto[]> {
+        let url_ = this.baseUrl + "/api/admin/feature-flags?";
+        if (includeArchived === null)
+            throw new globalThis.Error("The parameter 'includeArchived' cannot be null.");
+        else if (includeArchived !== undefined)
+            url_ += "includeArchived=" + encodeURIComponent("" + includeArchived) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processFeatureFlags(_response);
+        });
+    }
+
+    protected processFeatureFlags(response: AxiosResponse): Promise<FeatureFlagListDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<FeatureFlagListDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<FeatureFlagListDto[]>(null as any);
+    }
+
+    /**
+     * Get feature flag details.
+     */
+    featureFlag(id: number, cancelToken?: CancelToken): Promise<FeatureFlagDto> {
+        let url_ = this.baseUrl + "/api/admin/feature-flags/{id}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processFeatureFlag(_response);
+        });
+    }
+
+    protected processFeatureFlag(response: AxiosResponse): Promise<FeatureFlagDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<FeatureFlagDto>(result200);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<FeatureFlagDto>(null as any);
+    }
+
+    /**
+     * Update a feature flag.
+     */
+    update(id: number, request: UpdateFeatureFlagRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/admin/feature-flags/{id}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "PUT",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processUpdate(_response);
+        });
+    }
+
+    protected processUpdate(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 422) {
+            const _responseText = response.data;
+            let result422: any = null;
+            let resultData422  = _responseText;
+            result422 = JSON.parse(resultData422);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Toggle a feature flag on or off.
+     */
+    toggle(id: number, request: ToggleFeatureFlagRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/admin/feature-flags/{id}/toggle";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "PUT",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processToggle(_response);
+        });
+    }
+
+    protected processToggle(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Archive a feature flag.
+     */
+    archive(id: number, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/admin/feature-flags/{id}/archive";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "PUT",
+            url: url_,
+            headers: {
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processArchive(_response);
+        });
+    }
+
+    protected processArchive(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+}
+
+export class AuthClient {
+    protected instance: AxiosInstance;
+    protected baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, instance?: AxiosInstance) {
+
+        this.instance = instance || axios.create();
+
+        this.baseUrl = baseUrl ?? "";
+
+    }
+
+    /**
+     * Authenticate with username and password.
+     */
+    login(command: LoginCommand, cancelToken?: CancelToken): Promise<TokenResponse> {
+        let url_ = this.baseUrl + "/api/auth/login";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(command);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processLogin(_response);
+        });
+    }
+
+    protected processLogin(response: AxiosResponse): Promise<TokenResponse> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<TokenResponse>(result200);
+
+        } else if (status === 401) {
+            const _responseText = response.data;
+            let result401: any = null;
+            let resultData401  = _responseText;
+            result401 = JSON.parse(resultData401);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result401);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<TokenResponse>(null as any);
+    }
+
+    /**
+     * Refresh an expired JWT token.
+     */
+    refreshToken(command: RefreshTokenCommand, cancelToken?: CancelToken): Promise<TokenResponse> {
+        let url_ = this.baseUrl + "/api/auth/refresh-token";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(command);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processRefreshToken(_response);
+        });
+    }
+
+    protected processRefreshToken(response: AxiosResponse): Promise<TokenResponse> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<TokenResponse>(result200);
+
+        } else if (status === 401) {
+            const _responseText = response.data;
+            let result401: any = null;
+            let resultData401  = _responseText;
+            result401 = JSON.parse(resultData401);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result401);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<TokenResponse>(null as any);
+    }
+}
+
 export class PermissionsClient {
     protected instance: AxiosInstance;
     protected baseUrl: string;
@@ -680,6 +1193,64 @@ export class ProfileClient {
             let resultData422  = _responseText;
             result422 = JSON.parse(resultData422);
             return throwException("A server side error occurred.", status, _responseText, _headers, result422);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Change password for the currently logged in local user.
+     */
+    changePassword(request: ChangePasswordRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/user-management/profiles/change-password";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "PUT",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processChangePassword(_response);
+        });
+    }
+
+    protected processChangePassword(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
@@ -1336,6 +1907,75 @@ export class UsersClient {
     }
 
     /**
+     * Create a new user.
+     */
+    createUser(request: CreateUserRequest, cancelToken?: CancelToken): Promise<string> {
+        let url_ = this.baseUrl + "/api/user-management/users";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processCreateUser(_response);
+        });
+    }
+
+    protected processCreateUser(response: AxiosResponse): Promise<string> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 201) {
+            const _responseText = response.data;
+            let result201: any = null;
+            let resultData201  = _responseText;
+            result201 = JSON.parse(resultData201);
+            return Promise.resolve<string>(result201);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 422) {
+            const _responseText = response.data;
+            let result422: any = null;
+            let resultData422  = _responseText;
+            result422 = JSON.parse(resultData422);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<string>(null as any);
+    }
+
+    /**
      * Get list of all users.
      */
     getUsers( cancelToken?: CancelToken): Promise<UserDetailsDto[]> {
@@ -1459,6 +2099,81 @@ export class UsersClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
         return Promise.resolve<UserDetailsDto>(null as any);
+    }
+
+    /**
+     * Update a user's details.
+     */
+    updateUser(id: string, request: UpdateUserRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/user-management/users/{id}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "PUT",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processUpdateUser(_response);
+        });
+    }
+
+    protected processUpdateUser(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status === 422) {
+            const _responseText = response.data;
+            let result422: any = null;
+            let resultData422  = _responseText;
+            result422 = JSON.parse(resultData422);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
     }
 
     /**
@@ -1668,10 +2383,10 @@ export class UsersClient {
     }
 
     /**
-     * Toggle a user's active status.
+     * Reset a local user's password.
      */
-    toggleStatus(id: string, request: ToggleUserStatusRequest, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/user-management/users/{id}/toggle-status";
+    resetPassword(id: string, request: ResetPasswordRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/user-management/users/{id}/reset-password";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -1681,7 +2396,7 @@ export class UsersClient {
 
         let options_: AxiosRequestConfig = {
             data: content_,
-            method: "POST",
+            method: "PUT",
             url: url_,
             headers: {
                 "Content-Type": "application/json",
@@ -1696,11 +2411,11 @@ export class UsersClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processToggleStatus(_response);
+            return this.processResetPassword(_response);
         });
     }
 
-    protected processToggleStatus(response: AxiosResponse): Promise<void> {
+    protected processResetPassword(response: AxiosResponse): Promise<void> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -1714,12 +2429,211 @@ export class UsersClient {
             const _responseText = response.data;
             return Promise.resolve<void>(null as any);
 
-        } else if (status === 422) {
+        } else if (status === 400) {
             const _responseText = response.data;
-            let result422: any = null;
-            let resultData422  = _responseText;
-            result422 = JSON.parse(resultData422);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Unlock a locked user account.
+     */
+    unlockUser(id: string, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/user-management/users/{id}/unlock";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "PUT",
+            url: url_,
+            headers: {
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processUnlockUser(_response);
+        });
+    }
+
+    protected processUnlockUser(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Activate a user account.
+     */
+    activateUser(id: string, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/user-management/users/{id}/activate";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "PUT",
+            url: url_,
+            headers: {
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processActivateUser(_response);
+        });
+    }
+
+    protected processActivateUser(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Deactivate a user account.
+     */
+    deactivateUser(id: string, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/user-management/users/{id}/deactivate";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "PUT",
+            url: url_,
+            headers: {
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processDeactivateUser(_response);
+        });
+    }
+
+    protected processDeactivateUser(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
@@ -1746,10 +2660,10 @@ export class StrategicThemesClient {
      * Get a list of strategic themes.
      * @param state (optional) 
      */
-    getStrategicThemes(state?: number | null | undefined, cancelToken?: CancelToken): Promise<StrategicThemeListDto[]> {
+    getStrategicThemes(state?: number[] | null | undefined, cancelToken?: CancelToken): Promise<StrategicThemeListDto[]> {
         let url_ = this.baseUrl + "/api/strategic-management/strategic-themes?";
         if (state !== undefined && state !== null)
-            url_ += "state=" + encodeURIComponent("" + state) + "&";
+            state && state.forEach(item => { url_ += "state=" + encodeURIComponent("" + item) + "&"; });
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -3715,10 +4629,10 @@ export class PortfoliosClient {
      * Get a list of project portfolios.
      * @param status (optional) 
      */
-    getPortfolios(status?: number | null | undefined, cancelToken?: CancelToken): Promise<ProjectPortfolioListDto[]> {
+    getPortfolios(status?: number[] | null | undefined, cancelToken?: CancelToken): Promise<ProjectPortfolioListDto[]> {
         let url_ = this.baseUrl + "/api/ppm/portfolios?";
         if (status !== undefined && status !== null)
-            url_ += "status=" + encodeURIComponent("" + status) + "&";
+            status && status.forEach(item => { url_ += "status=" + encodeURIComponent("" + item) + "&"; });
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -4216,13 +5130,13 @@ export class PortfoliosClient {
      * Get a list of programs for the portfolio.
      * @param status (optional) 
      */
-    getPrograms(idOrKey: string, status?: number | null | undefined, cancelToken?: CancelToken): Promise<ProgramListDto[]> {
+    getPrograms(idOrKey: string, status?: number[] | null | undefined, cancelToken?: CancelToken): Promise<ProgramListDto[]> {
         let url_ = this.baseUrl + "/api/ppm/portfolios/{idOrKey}/programs?";
         if (idOrKey === undefined || idOrKey === null)
             throw new globalThis.Error("The parameter 'idOrKey' must be defined.");
         url_ = url_.replace("{idOrKey}", encodeURIComponent("" + idOrKey));
         if (status !== undefined && status !== null)
-            url_ += "status=" + encodeURIComponent("" + status) + "&";
+            status && status.forEach(item => { url_ += "status=" + encodeURIComponent("" + item) + "&"; });
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -4269,6 +5183,13 @@ export class PortfoliosClient {
             result400 = JSON.parse(resultData400);
             return throwException("A server side error occurred.", status, _responseText, _headers, result400);
 
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
@@ -4278,12 +5199,15 @@ export class PortfoliosClient {
 
     /**
      * Get a list of projects for the portfolio.
+     * @param status (optional) 
      */
-    getProjects(idOrKey: string, cancelToken?: CancelToken): Promise<ProjectListDto[]> {
-        let url_ = this.baseUrl + "/api/ppm/portfolios/{idOrKey}/projects";
+    getProjects(idOrKey: string, status?: number[] | null | undefined, cancelToken?: CancelToken): Promise<ProjectListDto[]> {
+        let url_ = this.baseUrl + "/api/ppm/portfolios/{idOrKey}/projects?";
         if (idOrKey === undefined || idOrKey === null)
             throw new globalThis.Error("The parameter 'idOrKey' must be defined.");
         url_ = url_.replace("{idOrKey}", encodeURIComponent("" + idOrKey));
+        if (status !== undefined && status !== null)
+            status && status.forEach(item => { url_ += "status=" + encodeURIComponent("" + item) + "&"; });
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -4330,6 +5254,13 @@ export class PortfoliosClient {
             result400 = JSON.parse(resultData400);
             return throwException("A server side error occurred.", status, _responseText, _headers, result400);
 
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
@@ -4341,13 +5272,13 @@ export class PortfoliosClient {
      * Get a list of strategic initiatives for the portfolio.
      * @param status (optional) 
      */
-    getStrategicInitiatives(idOrKey: string, status?: number | null | undefined, cancelToken?: CancelToken): Promise<StrategicInitiativeListDto[]> {
+    getStrategicInitiatives(idOrKey: string, status?: number[] | null | undefined, cancelToken?: CancelToken): Promise<StrategicInitiativeListDto[]> {
         let url_ = this.baseUrl + "/api/ppm/portfolios/{idOrKey}/strategic-initiatives?";
         if (idOrKey === undefined || idOrKey === null)
             throw new globalThis.Error("The parameter 'idOrKey' must be defined.");
         url_ = url_.replace("{idOrKey}", encodeURIComponent("" + idOrKey));
         if (status !== undefined && status !== null)
-            url_ += "status=" + encodeURIComponent("" + status) + "&";
+            status && status.forEach(item => { url_ += "status=" + encodeURIComponent("" + item) + "&"; });
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -4399,6 +5330,64 @@ export class PortfoliosClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
         return Promise.resolve<StrategicInitiativeListDto[]>(null as any);
+    }
+
+    /**
+     * Get a list of all project portfolio statuses.
+     */
+    getPortfolioStatuses( cancelToken?: CancelToken): Promise<ProjectPortfolioStatusDto[]> {
+        let url_ = this.baseUrl + "/api/ppm/portfolios/statuses";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetPortfolioStatuses(_response);
+        });
+    }
+
+    protected processGetPortfolioStatuses(response: AxiosResponse): Promise<ProjectPortfolioStatusDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<ProjectPortfolioStatusDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ProjectPortfolioStatusDto[]>(null as any);
     }
 
     /**
@@ -4476,11 +5465,14 @@ export class ProgramsClient {
     /**
      * Get a list of programs.
      * @param status (optional) 
+     * @param portfolioId (optional) 
      */
-    getPrograms(status?: number | null | undefined, cancelToken?: CancelToken): Promise<ProgramListDto[]> {
+    getPrograms(status?: number[] | null | undefined, portfolioId?: string | null | undefined, cancelToken?: CancelToken): Promise<ProgramListDto[]> {
         let url_ = this.baseUrl + "/api/ppm/programs?";
         if (status !== undefined && status !== null)
-            url_ += "status=" + encodeURIComponent("" + status) + "&";
+            status && status.forEach(item => { url_ += "status=" + encodeURIComponent("" + item) + "&"; });
+        if (portfolioId !== undefined && portfolioId !== null)
+            url_ += "portfolioId=" + encodeURIComponent("" + portfolioId) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -4526,6 +5518,13 @@ export class ProgramsClient {
             let resultData400  = _responseText;
             result400 = JSON.parse(resultData400);
             return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
@@ -4975,16 +5974,74 @@ export class ProgramsClient {
     }
 
     /**
+     * Get a list of all program statuses.
+     */
+    getProgramStatuses( cancelToken?: CancelToken): Promise<ProgramStatusDto[]> {
+        let url_ = this.baseUrl + "/api/ppm/programs/statuses";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetProgramStatuses(_response);
+        });
+    }
+
+    protected processGetProgramStatuses(response: AxiosResponse): Promise<ProgramStatusDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<ProgramStatusDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ProgramStatusDto[]>(null as any);
+    }
+
+    /**
      * Get a list of projects.
      * @param status (optional) 
      */
-    getProjects(idOrKey: string, status?: number | null | undefined, cancelToken?: CancelToken): Promise<ProjectListDto[]> {
+    getProjects(idOrKey: string, status?: number[] | null | undefined, cancelToken?: CancelToken): Promise<ProjectListDto[]> {
         let url_ = this.baseUrl + "/api/ppm/programs/{idOrKey}/projects?";
         if (idOrKey === undefined || idOrKey === null)
             throw new globalThis.Error("The parameter 'idOrKey' must be defined.");
         url_ = url_.replace("{idOrKey}", encodeURIComponent("" + idOrKey));
         if (status !== undefined && status !== null)
-            url_ += "status=" + encodeURIComponent("" + status) + "&";
+            status && status.forEach(item => { url_ += "status=" + encodeURIComponent("" + item) + "&"; });
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -5030,6 +6087,13 @@ export class ProgramsClient {
             let resultData400  = _responseText;
             result400 = JSON.parse(resultData400);
             return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
@@ -5055,11 +6119,14 @@ export class ProjectsClient {
     /**
      * Get a list of projects.
      * @param status (optional) 
+     * @param portfolioId (optional) 
      */
-    getProjects(status?: number | null | undefined, cancelToken?: CancelToken): Promise<ProjectListDto[]> {
+    getProjects(status?: number[] | null | undefined, portfolioId?: string | null | undefined, cancelToken?: CancelToken): Promise<ProjectListDto[]> {
         let url_ = this.baseUrl + "/api/ppm/projects?";
         if (status !== undefined && status !== null)
-            url_ += "status=" + encodeURIComponent("" + status) + "&";
+            status && status.forEach(item => { url_ += "status=" + encodeURIComponent("" + item) + "&"; });
+        if (portfolioId !== undefined && portfolioId !== null)
+            url_ += "portfolioId=" + encodeURIComponent("" + portfolioId) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -5105,6 +6172,13 @@ export class ProjectsClient {
             let resultData400  = _responseText;
             result400 = JSON.parse(resultData400);
             return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
@@ -5498,6 +6572,70 @@ export class ProjectsClient {
     }
 
     /**
+     * Approve a project.
+     */
+    approve(id: string, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/ppm/projects/{id}/approve";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "POST",
+            url: url_,
+            headers: {
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processApprove(_response);
+        });
+    }
+
+    protected processApprove(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 422) {
+            const _responseText = response.data;
+            let result422: any = null;
+            let resultData422  = _responseText;
+            result422 = JSON.parse(resultData422);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
      * Activate a project.
      */
     activate(id: string, cancelToken?: CancelToken): Promise<void> {
@@ -5687,6 +6825,64 @@ export class ProjectsClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
         return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Get a list of all project statuses.
+     */
+    getProjectStatuses( cancelToken?: CancelToken): Promise<ProjectStatusDto[]> {
+        let url_ = this.baseUrl + "/api/ppm/projects/statuses";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetProjectStatuses(_response);
+        });
+    }
+
+    protected processGetProjectStatuses(response: AxiosResponse): Promise<ProjectStatusDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<ProjectStatusDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ProjectStatusDto[]>(null as any);
     }
 
     /**
@@ -6708,11 +7904,14 @@ export class StrategicInitiativesClient {
     /**
      * Get a list of strategic initiatives.
      * @param status (optional) 
+     * @param portfolioId (optional) 
      */
-    getStrategicInitiatives(status?: number | null | undefined, cancelToken?: CancelToken): Promise<StrategicInitiativeListDto[]> {
+    getStrategicInitiatives(status?: number[] | null | undefined, portfolioId?: string | null | undefined, cancelToken?: CancelToken): Promise<StrategicInitiativeListDto[]> {
         let url_ = this.baseUrl + "/api/ppm/strategic-initiatives?";
         if (status !== undefined && status !== null)
-            url_ += "status=" + encodeURIComponent("" + status) + "&";
+            status && status.forEach(item => { url_ += "status=" + encodeURIComponent("" + item) + "&"; });
+        if (portfolioId !== undefined && portfolioId !== null)
+            url_ += "portfolioId=" + encodeURIComponent("" + portfolioId) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -7268,6 +8467,64 @@ export class StrategicInitiativesClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
         return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Get a list of all strategic initiative statuses.
+     */
+    getStrategicInitiativeStatuses( cancelToken?: CancelToken): Promise<StrategicInitiativeStatusDto[]> {
+        let url_ = this.baseUrl + "/api/ppm/strategic-initiatives/statuses";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetStrategicInitiativeStatuses(_response);
+        });
+    }
+
+    protected processGetStrategicInitiativeStatuses(response: AxiosResponse): Promise<StrategicInitiativeStatusDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<StrategicInitiativeStatusDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<StrategicInitiativeStatusDto[]>(null as any);
     }
 
     /**
@@ -8055,6 +9312,13 @@ export class StrategicInitiativesClient {
             let resultData400  = _responseText;
             result400 = JSON.parse(resultData400);
             return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
@@ -15675,6 +16939,13 @@ export class EmployeesClient {
             result400 = JSON.parse(resultData400);
             return throwException("A server side error occurred.", status, _responseText, _headers, result400);
 
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
@@ -20402,14 +21673,16 @@ export class BackgroundJobsClient {
     }
 }
 
-export interface ApplicationPermission {
-    description: string;
-    action: string;
-    resource: string;
-    category: string;
-    isBasic: boolean;
-    isRoot: boolean;
+export interface ClientFeatureFlagDto {
     name: string;
+    isEnabled: boolean;
+}
+
+export interface TokenResponse {
+    token: string;
+    refreshToken: string;
+    tokenExpiresAt: Date;
+    mustChangePassword: boolean;
 }
 
 export interface ProblemDetails {
@@ -20420,6 +21693,26 @@ export interface ProblemDetails {
     instance?: string | undefined;
 
     [key: string]: any;
+}
+
+export interface LoginCommand {
+    userName: string;
+    password: string;
+}
+
+export interface RefreshTokenCommand {
+    token: string;
+    refreshToken: string;
+}
+
+export interface ApplicationPermission {
+    description: string;
+    action: string;
+    resource: string;
+    category: string;
+    isBasic: boolean;
+    isRoot: boolean;
+    name: string;
 }
 
 export interface PersonalAccessTokenDto {
@@ -20468,7 +21761,9 @@ export interface UserDetailsDto {
     lastName?: string | undefined;
     email?: string | undefined;
     isActive: boolean;
+    lockoutEnd?: Date | undefined;
     phoneNumber?: string | undefined;
+    loginProvider: string;
     lastActivityAt?: Date | undefined;
     employee?: NavigationDto | undefined;
     roles: RoleListDto[];
@@ -20495,6 +21790,11 @@ export interface UpdateProfileRequest {
     lastName: string;
     email: string;
     phoneNumber?: string | undefined;
+}
+
+export interface ChangePasswordRequest {
+    currentPassword: string;
+    newPassword: string;
 }
 
 export interface UserPermissionsResponse {
@@ -20532,6 +21832,25 @@ export interface CreateOrUpdateRoleRequest {
     description?: string | undefined;
 }
 
+export interface CreateUserRequest {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phoneNumber?: string | undefined;
+    employeeId?: string | undefined;
+    loginProvider: string;
+    password?: string | undefined;
+}
+
+export interface UpdateUserRequest {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    phoneNumber?: string | undefined;
+    employeeId?: string | undefined;
+}
+
 export interface UserRoleDto {
     roleId?: string | undefined;
     roleName?: string | undefined;
@@ -20550,9 +21869,8 @@ export interface ManageRoleUsersRequest {
     userIdsToRemove: string[];
 }
 
-export interface ToggleUserStatusRequest {
-    userId: string;
-    activateUser: boolean;
+export interface ResetPasswordRequest {
+    newPassword: string;
 }
 
 export interface StrategicThemeListDto {
@@ -20838,6 +22156,14 @@ export interface StrategicInitiativeListDto {
     strategicInitiativeOwners: EmployeeNavigationDto[];
 }
 
+export interface ProjectPortfolioStatusDto {
+    id: number;
+    name: string;
+    description?: string | undefined;
+    order: number;
+    lifecyclePhase: string;
+}
+
 export interface ProjectPortfolioOptionDto {
     id: string;
     name: string;
@@ -20900,6 +22226,14 @@ export interface UpdateProgramRequest {
     strategicThemeIds?: string[] | undefined;
 }
 
+export interface ProgramStatusDto {
+    id: number;
+    name: string;
+    description?: string | undefined;
+    order: number;
+    lifecyclePhase: string;
+}
+
 export interface ProjectDetailsDto {
     id: string;
     key: string;
@@ -20914,6 +22248,7 @@ export interface ProjectDetailsDto {
     projectSponsors: EmployeeNavigationDto[];
     projectOwners: EmployeeNavigationDto[];
     projectManagers: EmployeeNavigationDto[];
+    projectMembers: EmployeeNavigationDto[];
     strategicThemes: NavigationDto[];
 }
 
@@ -20940,6 +22275,8 @@ export interface CreateProjectRequest {
     ownerIds?: string[] | undefined;
     /** The managers of the project. */
     managerIds?: string[] | undefined;
+    /** The members of the project team. */
+    memberIds?: string[] | undefined;
     /** The strategic themes associated with this project. */
     strategicThemeIds?: string[] | undefined;
 }
@@ -20963,6 +22300,8 @@ export interface UpdateProjectRequest {
     ownerIds?: string[] | undefined;
     /** The managers of the project. */
     managerIds?: string[] | undefined;
+    /** The members of the project team. */
+    memberIds?: string[] | undefined;
     /** The strategic themes associated with this project. */
     strategicThemeIds?: string[] | undefined;
 }
@@ -20975,6 +22314,14 @@ export interface ChangeProjectProgramRequest {
 export interface ChangeProjectKeyRequest {
     /** The new key to assign to the Project (2-20 uppercase alphanumeric characters). */
     key: string;
+}
+
+export interface ProjectStatusDto {
+    id: number;
+    name: string;
+    description?: string | undefined;
+    order: number;
+    lifecyclePhase: string;
 }
 
 export interface WorkItemListDto {
@@ -21260,6 +22607,14 @@ export interface UpdateStrategicInitiativeRequest {
     sponsorIds?: string[] | undefined;
     /** The Owners of the strategic initiative. */
     ownerIds?: string[] | undefined;
+}
+
+export interface StrategicInitiativeStatusDto {
+    id: number;
+    name: string;
+    description?: string | undefined;
+    order: number;
+    lifecyclePhase: string;
 }
 
 export interface StrategicInitiativeKpiListDto {
@@ -23048,6 +24403,38 @@ export interface CreateRecurringJobRequest {
     jobId: string;
     jobTypeId: number;
     cronExpression: string;
+}
+
+export interface FeatureFlagListDto {
+    id: number;
+    name: string;
+    displayName: string;
+    isEnabled: boolean;
+    isArchived: boolean;
+    isSystem: boolean;
+}
+
+export interface FeatureFlagDto {
+    id: number;
+    name: string;
+    displayName: string;
+    description?: string | undefined;
+    isEnabled: boolean;
+    isArchived: boolean;
+    isSystem: boolean;
+    created: Date;
+    lastModified: Date;
+}
+
+export interface UpdateFeatureFlagRequest {
+    id: number;
+    displayName: string;
+    description?: string | undefined;
+}
+
+export interface ToggleFeatureFlagRequest {
+    id: number;
+    isEnabled: boolean;
 }
 
 export class ApiException extends Error {

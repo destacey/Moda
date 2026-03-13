@@ -29,8 +29,11 @@ import ChangePortfolioStatusForm, {
   PortfolioStatusAction,
 } from '../_components/change-portfolio-status-form'
 import {
+  ProgramsFilterBar,
   ProgramViewManager,
+  ProjectsFilterBar,
   ProjectViewManager,
+  StrategicInitiativesFilterBar,
   StrategicInitiativeViewManager,
 } from '../../_components'
 
@@ -74,9 +77,18 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
 
   const [activeTab, setActiveTab] = useState(PortfolioTabs.Details)
   const [programsQueried, setProgramsQueried] = useState(false)
+  const [selectedProgramStatuses, setSelectedProgramStatuses] = useState<
+    number[]
+  >([2]) // Active
   const [projectsQueried, setProjectsQueried] = useState(false)
+  const [selectedProjectStatuses, setSelectedProjectStatuses] = useState<
+    number[]
+  >([5, 2]) // Approved, Active
   const [strategicInitiativesQueried, setStrategicInitiativesQueried] =
     useState(false)
+  const [selectedSIStatuses, setSelectedSIStatuses] = useState<number[]>([
+    2, 3,
+  ]) // Approved, Active
 
   const [openEditPortfolioForm, setOpenEditPortfolioForm] =
     useState<boolean>(false)
@@ -114,27 +126,45 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     isLoading: isLoadingPrograms,
     error: errorPrograms,
     refetch: refetchPrograms,
-  } = useGetPortfolioProgramsQuery(portfolioKey.toString(), {
-    skip: !programsQueried,
-  })
+  } = useGetPortfolioProgramsQuery(
+    {
+      portfolioIdOrKey: portfolioKey.toString(),
+      status:
+        selectedProgramStatuses.length > 0
+          ? selectedProgramStatuses
+          : undefined,
+    },
+    { skip: !programsQueried },
+  )
 
   const {
     data: projectData,
     isLoading: isLoadingProjects,
     error: errorProjects,
     refetch: refetchProjects,
-  } = useGetPortfolioProjectsQuery(portfolioKey.toString(), {
-    skip: !projectsQueried,
-  })
+  } = useGetPortfolioProjectsQuery(
+    {
+      portfolioIdOrKey: portfolioKey.toString(),
+      status:
+        selectedProjectStatuses.length > 0
+          ? selectedProjectStatuses
+          : undefined,
+    },
+    { skip: !projectsQueried },
+  )
 
   const {
     data: strategicInitiativeData,
     isLoading: isLoadingStrategicInitiatives,
     error: errorStrategicInitiatives,
     refetch: refetchStrategicInitiatives,
-  } = useGetPortfolioStrategicInitiativesQuery(portfolioKey.toString(), {
-    skip: !strategicInitiativesQueried,
-  })
+  } = useGetPortfolioStrategicInitiativesQuery(
+    {
+      portfolioIdOrKey: portfolioKey.toString(),
+      status: selectedSIStatuses.length > 0 ? selectedSIStatuses : undefined,
+    },
+    { skip: !strategicInitiativesQueried },
+  )
 
   useDocumentTitle(`${portfolioData?.name ?? portfolioKey} - Portfolio Details`)
 
@@ -158,34 +188,67 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     dispatch(setBreadcrumbRoute({ route: breadcrumbRoute, pathname }))
   }, [dispatch, pathname, portfolioData])
 
+  const handleProgramStatusChange = useCallback((statuses: number[]) => {
+    setSelectedProgramStatuses(statuses)
+  }, [])
+
+  const handleSIStatusChange = useCallback((statuses: number[]) => {
+    setSelectedSIStatuses(statuses)
+  }, [])
+
+  const handleProjectStatusChange = useCallback((statuses: number[]) => {
+    setSelectedProjectStatuses(statuses)
+  }, [])
+
   const renderTabContent = useCallback(() => {
     switch (activeTab) {
       case PortfolioTabs.Details:
         return <PortfolioDetails portfolio={portfolioData} />
       case PortfolioTabs.Programs:
         return (
-          <ProgramViewManager
-            programs={programData}
-            isLoading={isLoadingPrograms}
-            refetch={refetchPrograms}
-          />
+          <>
+            <ProgramsFilterBar
+              selectedStatuses={selectedProgramStatuses}
+              onStatusChange={handleProgramStatusChange}
+              showPortfolioFilter={false}
+            />
+            <ProgramViewManager
+              programs={programData}
+              isLoading={isLoadingPrograms}
+              refetch={refetchPrograms}
+            />
+          </>
         )
       case PortfolioTabs.Projects:
         return (
-          <ProjectViewManager
-            projects={projectData}
-            isLoading={isLoadingProjects}
-            refetch={refetchProjects}
-            groupByProgram={true}
-          />
+          <>
+            <ProjectsFilterBar
+              selectedStatuses={selectedProjectStatuses}
+              onStatusChange={handleProjectStatusChange}
+              showPortfolioFilter={false}
+            />
+            <ProjectViewManager
+              projects={projectData}
+              isLoading={isLoadingProjects}
+              refetch={refetchProjects}
+              groupByProgram={true}
+            />
+          </>
         )
       case PortfolioTabs.StrategicInitiatives:
         return (
-          <StrategicInitiativeViewManager
-            strategicInitiatives={strategicInitiativeData}
-            isLoading={isLoadingStrategicInitiatives}
-            refetch={refetchStrategicInitiatives}
-          />
+          <>
+            <StrategicInitiativesFilterBar
+              selectedStatuses={selectedSIStatuses}
+              onStatusChange={handleSIStatusChange}
+              showPortfolioFilter={false}
+            />
+            <StrategicInitiativeViewManager
+              strategicInitiatives={strategicInitiativeData}
+              isLoading={isLoadingStrategicInitiatives}
+              refetch={refetchStrategicInitiatives}
+            />
+          </>
         )
       default:
         return null
@@ -202,6 +265,12 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     refetchPrograms,
     refetchProjects,
     refetchStrategicInitiatives,
+    selectedProgramStatuses,
+    selectedProjectStatuses,
+    selectedSIStatuses,
+    handleProgramStatusChange,
+    handleProjectStatusChange,
+    handleSIStatusChange,
   ])
 
   const actionsMenuItems: MenuProps['items'] = useMemo(() => {

@@ -120,7 +120,7 @@ public class ExpenditureCategoriesController(ILogger<ExpenditureCategoriesContro
     [OpenApiOperation("Get a list of expenditure categories options.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IEnumerable<ExpenditureCategoryOptionDto>>> GetExpenditureCategoryOptions(CancellationToken cancellationToken, [FromQuery] bool? includeArchived)
+    public async Task<ActionResult<IEnumerable<ExpenditureCategoryOptionDto>>> GetExpenditureCategoryOptions([FromQuery] bool? includeArchived, CancellationToken cancellationToken)
     {
         var options = await _sender.Send(new GetExpenditureCategoryOptionsQuery(includeArchived), cancellationToken);
 

@@ -14,4 +14,7 @@ public enum ProjectRole
 
     [Display(Name = "Project Manager", Description = "Responsible for planning, execution, and successful delivery of the project.", Order = 3)]
     Manager = 3,
+
+    [Display(Name = "Project Member", Description = "A team member contributing to the project's work and deliverables.", Order = 4)]
+    Member = 4,
 }

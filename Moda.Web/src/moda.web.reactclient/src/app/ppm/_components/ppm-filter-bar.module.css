@@ -1,0 +1,27 @@
+.filterCard {
+  margin-bottom: 16px;
+}
+
+.filterCard :global(.ant-card-body) {
+  padding: 8px;
+}
+
+.filterLabel {
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+
+.statusButton {
+  font-size: 12px;
+}
+
+.portfolioSelect {
+  min-width: 180px;
+  font-size: 12px;
+}
+
+.skeleton {
+  width: 300px;
+}

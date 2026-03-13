@@ -15,13 +15,15 @@ export const strategicThemesApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getStrategicThemes: builder.query<
       StrategicThemeListDto[],
-      number | undefined
+      { state?: number[] } | undefined
     >({
-      queryFn: async (strategicThemeState = undefined) => {
+      queryFn: async (request = undefined) => {
         try {
           const data = await (
             await getStrategicThemesClient()
-          ).getStrategicThemes(strategicThemeState)
+          ).getStrategicThemes(
+            request?.state?.length > 0 ? request.state : undefined,
+          )
           return { data }
         } catch (error) {
           console.error('API Error:', error)

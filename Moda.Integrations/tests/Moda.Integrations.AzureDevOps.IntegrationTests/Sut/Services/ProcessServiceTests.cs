@@ -113,6 +113,7 @@ public class ProcessServiceTests
         var expectedErrorMessage1 = "Connection Error - The SSL connection could not be established, see inner exception.";
         var expectedErrorMessage2 = "Connection Error - A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond. (www.test12345678.com:443)";
         var expectedErrorMessage3 = "Connection Error - No connection could be made because the target machine actively refused it. (www.test12345678.com:443)";
+        var expectedErrorMessage4 = "Connection Error - The remote certificate is invalid according to the validation procedure: RemoteCertificateNameMismatch";
 
         var service = new ProcessService(
             organizationUrl,
@@ -127,7 +128,7 @@ public class ProcessServiceTests
         result.Should().NotBeNull();
         result.IsFailure.Should().BeTrue();
         result.Error.Should().NotBeNullOrEmpty();
-        result.Error.Should().BeOneOf(expectedErrorMessage1, expectedErrorMessage2, expectedErrorMessage3);
+        result.Error.Should().BeOneOf(expectedErrorMessage1, expectedErrorMessage2, expectedErrorMessage3, expectedErrorMessage4);
 
         _mockLogger.Verify(
             x => x.Log(

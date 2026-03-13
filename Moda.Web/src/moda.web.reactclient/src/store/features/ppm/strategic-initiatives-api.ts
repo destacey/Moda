@@ -21,18 +21,20 @@ import {
   StrategicInitiativeListDto,
   UpdateStrategicInitiativeRequest,
 } from '@/src/services/moda-api'
+import { OptionModel } from '@/src/components/types'
 
 export const strategicInitiativesApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getStrategicInitiatives: builder.query<
       StrategicInitiativeListDto[],
-      number | undefined
+      { status?: number[]; portfolioId?: string } | undefined
     >({
-      queryFn: async (status = undefined) => {
+      queryFn: async (request = undefined) => {
         try {
           const data =
             await getStrategicInitiativesClient().getStrategicInitiatives(
-              status,
+              request?.status?.length > 0 ? request.status : undefined,
+              request?.portfolioId,
             )
           return { data }
         } catch (error) {
@@ -207,6 +209,31 @@ export const strategicInitiativesApi = apiSlice.injectEndpoints({
         ]
       },
     }),
+    getStrategicInitiativeStatusOptions: builder.query<
+      OptionModel<number>[],
+      void
+    >({
+      queryFn: async () => {
+        try {
+          const statuses =
+            await getStrategicInitiativesClient().getStrategicInitiativeStatuses()
+
+          const data: OptionModel<number>[] = statuses
+            .sort((a, b) => a.order - b.order)
+            .map((s) => ({
+              value: s.id,
+              label: s.name,
+            }))
+
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: () => [QueryTags.StrategicInitiativeStatusOptions],
+    }),
+
     getStrategicInitiativeKpis: builder.query<
       StrategicInitiativeKpiListDto[],
       string
@@ -534,6 +561,7 @@ export const {
   useCompleteStrategicInitiativeMutation,
   useCancelStrategicInitiativeMutation,
   useDeleteStrategicInitiativeMutation,
+  useGetStrategicInitiativeStatusOptionsQuery,
   useGetStrategicInitiativeKpisQuery,
   useGetStrategicInitiativeKpiQuery,
   useCreateStrategicInitiativeKpiMutation,

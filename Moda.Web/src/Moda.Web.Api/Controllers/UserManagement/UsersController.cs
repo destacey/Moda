@@ -10,6 +10,21 @@ public class UsersController(IUserService userService) : ControllerBase
 {
     private readonly IUserService _userService = userService;
 
+    [HttpPost]
+    [MustHavePermission(ApplicationAction.Create, ApplicationResource.Users)]
+    [OpenApiOperation("Create a new user.", "")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult<string>> CreateUser(CreateUserRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _userService.CreateAsync(request.ToCreateUserCommand(), cancellationToken);
+
+        return result.IsSuccess
+            ? CreatedAtAction(nameof(GetUser), new { id = result.Value }, result.Value)
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
     [HttpGet]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Users)]
     [OpenApiOperation("Get list of all users.", "")]
@@ -33,6 +48,22 @@ public class UsersController(IUserService userService) : ControllerBase
         return user is null
             ? NotFound()
             : user;
+    }
+
+    [HttpPut("{id}")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Users)]
+    [OpenApiOperation("Update a user's details.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> UpdateUser(string id, UpdateUserRequest request)
+    {
+        if (id != request.Id)
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(nameof(id), nameof(request.Id), HttpContext));
+
+        await _userService.UpdateAsync(request.ToUpdateUserCommand(), id);
+        return NoContent();
     }
 
     [HttpGet("{id}/roles")]
@@ -79,17 +110,60 @@ public class UsersController(IUserService userService) : ControllerBase
             : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
-    [HttpPost("{id}/toggle-status")]
+    [HttpPut("{id}/reset-password")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Users)]
-    [OpenApiOperation("Toggle a user's active status.", "")]
-    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.Toggle))]
-    public async Task<ActionResult> ToggleStatus(string id, ToggleUserStatusRequest request, CancellationToken cancellationToken)
+    [OpenApiOperation("Reset a local user's password.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> ResetPassword(string id, ResetPasswordRequest request)
     {
-        if (id != request.UserId)
-            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(nameof(id), nameof(request.UserId), HttpContext));
+        var result = await _userService.ResetPasswordAsync(new ResetPasswordCommand(id, request.NewPassword));
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
 
-        await _userService.ToggleStatusAsync(request.ToToggleUserStatusCommand(), cancellationToken);
-        return NoContent();
+    [HttpPut("{id}/unlock")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Users)]
+    [OpenApiOperation("Unlock a locked user account.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> UnlockUser(string id)
+    {
+        var result = await _userService.UnlockUserAsync(id);
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpPut("{id}/activate")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Users)]
+    [OpenApiOperation("Activate a user account.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> ActivateUser(string id, CancellationToken cancellationToken)
+    {
+        var result = await _userService.ActivateUserAsync(new ActivateUserCommand(id), cancellationToken);
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpPut("{id}/deactivate")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Users)]
+    [OpenApiOperation("Deactivate a user account.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> DeactivateUser(string id, CancellationToken cancellationToken)
+    {
+        var result = await _userService.DeactivateUserAsync(new DeactivateUserCommand(id), cancellationToken);
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     private string GetOriginFromRequest() => $"{Request.Scheme}://{Request.Host.Value}{Request.PathBase.Value}";

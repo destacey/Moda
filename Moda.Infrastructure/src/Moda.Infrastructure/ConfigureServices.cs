@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
+using Moda.Infrastructure.FeatureManagement;
 using Moda.Infrastructure.Logging;
 using Moda.Infrastructure.OpenTelemetry;
 using Moda.Infrastructure.SignalR;
@@ -51,7 +52,7 @@ public static class ConfigureServices
         return builder;
     }
 
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration config)
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration config, IHostEnvironment environment)
     {
         var assembly = Assembly.GetExecutingAssembly();
         TypeAdapterConfig.GlobalSettings.Scan(assembly);
@@ -76,7 +77,7 @@ public static class ConfigureServices
 
         return services
             .AddApiVersioning()
-            .AddAuth(config)
+            .AddAuth(config, environment)
             .AddBackgroundJobs(config)
             .AddCorsPolicy(config)
             .AddUserActivityTracking()
@@ -92,6 +93,7 @@ public static class ConfigureServices
                 };
             })
             .AddExceptionMiddleware()
+            .AddModaFeatureManagement()
             .AddMediatR(options => options.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
             .AddOpenApiDocumentation(config)
             .AddPersistence(config)

@@ -2,20 +2,12 @@ namespace Moda.Common.Application.Identity.Users;
 
 public sealed record UpdateUserCommand
 {
-    public UpdateUserCommand(string id, string firstName, string lastName, string email, string? phoneNumber)
-    {
-        Id = id;
-        FirstName = firstName;
-        LastName = lastName;
-        Email = email;
-        PhoneNumber = phoneNumber;
-    }
-
     public string Id { get; set; } = null!;
     public string FirstName { get; set; } = null!;
     public string LastName { get; set; } = null!;
     public string Email { get; set; } = null!;
     public string? PhoneNumber { get; set; }
+    public Guid? EmployeeId { get; set; }
 }
 
 public sealed class UpdateUserCommandValidator : CustomValidator<UpdateUserCommand>

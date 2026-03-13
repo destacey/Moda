@@ -23,13 +23,22 @@ public class ProjectsController(ILogger<ProjectsController> logger, ISender send
     [OpenApiOperation("Get a list of projects.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IEnumerable<ProjectListDto>>> GetProjects(CancellationToken cancellationToken, [FromQuery] int? status = null)
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<IEnumerable<ProjectListDto>>> GetProjects([FromQuery] int[]? status, [FromQuery] Guid? portfolioId, CancellationToken cancellationToken)
     {
-        ProjectStatus? filter = status.HasValue ? (ProjectStatus)status.Value : null;
+        ProjectStatus[]? filter = status is { Length: > 0 }
+            ? [.. status.Select(s => (ProjectStatus)s)]
+            : null;
 
-        var projects = await _sender.Send(new GetProjectsQuery(StatusFilter: filter), cancellationToken);
+        IdOrKey? portfolioIdOrKey = portfolioId.HasValue
+            ? new IdOrKey(portfolioId.Value)
+            : null;
 
-        return Ok(projects);
+        var projects = await _sender.Send(new GetProjectsQuery(StatusFilter: filter, PortfolioIdOrKey: portfolioIdOrKey), cancellationToken);
+
+        return projects is not null
+            ? Ok(projects)
+            : NotFound();
     }
 
     [HttpGet("{idOrKey}")]
@@ -108,6 +117,21 @@ public class ProjectsController(ILogger<ProjectsController> logger, ISender send
             : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
+    [HttpPost("{id}/approve")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Projects)]
+    [OpenApiOperation("Approve a project.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> Approve(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(new ApproveProjectCommand(id), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
     [HttpPost("{id}/activate")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Projects)]
     [OpenApiOperation("Activate a project.", "")]
@@ -165,6 +189,17 @@ public class ProjectsController(ILogger<ProjectsController> logger, ISender send
         return result.IsSuccess
             ? NoContent()
             : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpGet("statuses")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Projects)]
+    [OpenApiOperation("Get a list of all project statuses.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IEnumerable<ProjectStatusDto>>> GetProjectStatuses(CancellationToken cancellationToken)
+    {
+        var items = await _sender.Send(new GetProjectStatusesQuery(), cancellationToken);
+        return Ok(items.OrderBy(c => c.Order));
     }
 
     [HttpGet("{id}/work-items")]

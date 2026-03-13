@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using Moda.Common.Application.Interfaces;
+using Moda.Web.Api.Extensions;
 using Moda.Web.Api.Models.UserManagement.Profiles;
 
 namespace Moda.Web.Api.Controllers.UserManagement;
@@ -36,6 +37,21 @@ public class ProfileController(IUserService userService, ISender sender, ICurren
 
         await _userService.UpdateAsync(request.ToUpdateUserCommand(), userId);
         return NoContent();
+    }
+
+    [HttpPut("change-password")]
+    [OpenApiOperation("Change password for the currently logged in local user.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> ChangePassword(ChangePasswordRequest request)
+    {
+        if (User.GetUserId() is not { } userId || string.IsNullOrEmpty(userId))
+            return Unauthorized();
+
+        var result = await _userService.ChangePasswordAsync(userId, request.ToChangePasswordCommand());
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     [HttpGet("permissions")]

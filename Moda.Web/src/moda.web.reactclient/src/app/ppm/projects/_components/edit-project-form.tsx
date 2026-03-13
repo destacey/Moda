@@ -35,6 +35,7 @@ interface EditProjectFormValues {
   sponsorIds: string[]
   ownerIds: string[]
   managerIds: string[]
+  memberIds: string[]
   strategicThemeIds: string[]
 }
 
@@ -52,6 +53,7 @@ const mapToRequestValues = (
     sponsorIds: values.sponsorIds,
     ownerIds: values.ownerIds,
     managerIds: values.managerIds,
+    memberIds: values.memberIds,
     strategicThemeIds: values.strategicThemeIds,
   } as UpdateProjectRequest
 }
@@ -126,6 +128,7 @@ const EditProjectForm = ({
       sponsorIds: projectData.projectSponsors.map((s) => s.id),
       ownerIds: projectData.projectOwners.map((o) => o.id),
       managerIds: projectData.projectManagers.map((m) => m.id),
+      memberIds: projectData.projectMembers.map((m) => m.id),
       strategicThemeIds: projectData.strategicThemes.map((t) => t.id),
     })
   }, [projectData, form])
@@ -283,6 +286,13 @@ const EditProjectForm = ({
             employees={employeeData ?? []}
             allowMultiple={true}
             placeholder="Select Managers"
+          />
+        </Item>
+        <Item name="memberIds" label="Members">
+          <EmployeeSelect
+            employees={employeeData ?? []}
+            allowMultiple={true}
+            placeholder="Select Members"
           />
         </Item>
         <Item name="strategicThemeIds" label="Strategic Themes">

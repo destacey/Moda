@@ -12,7 +12,7 @@ import EditPokerSessionForm from './[key]/_components/edit-poker-session-form'
 import useAuth from '@/src/components/contexts/auth'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { Button } from 'antd'
-import { authorizePage } from '@/src/components/hoc'
+import { authorizePage, requireFeatureFlag } from '@/src/components/hoc'
 import { ControlItemSwitch } from '@/src/components/common/control-items-menu'
 import { ItemType } from 'antd/es/menu/interface'
 import { PokerSessionListDto, PokerSessionStatus } from '@/src/services/moda-api'
@@ -162,10 +162,9 @@ const PokerSessionsPage = () => {
   )
 }
 
-const PokerSessionsPageWithAuthorization = authorizePage(
-  PokerSessionsPage,
-  'Permission',
-  'Permissions.PokerSessions.View',
+const PokerSessionsPageWithAuthorization = requireFeatureFlag(
+  authorizePage(PokerSessionsPage, 'Permission', 'Permissions.PokerSessions.View'),
+  'planning-poker',
 )
 
 export default PokerSessionsPageWithAuthorization

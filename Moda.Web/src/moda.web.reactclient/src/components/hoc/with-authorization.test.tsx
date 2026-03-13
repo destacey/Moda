@@ -41,6 +41,9 @@ describe('withAuthorization', () => {
       logout: () => Promise.resolve(),
       hasClaim: mockHasClaim,
       hasPermissionClaim: mockHasClaim,
+      authMethod: null,
+      mustChangePassword: false,
+      localLogin: () => Promise.resolve(),
     }
 
     return render(

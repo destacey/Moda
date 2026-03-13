@@ -16,7 +16,9 @@
     <Project Path="Moda.Infrastructure/src/Moda.Infrastructure.Migrators.MSSQL/Moda.Infrastructure.Migrators.MSSQL.csproj" />
     <Project Path="Moda.Infrastructure/src/Moda.Infrastructure/Moda.Infrastructure.csproj" />
   </Folder>
-  <Folder Name="/Moda.Infrastructure/tests/" />
+  <Folder Name="/Moda.Infrastructure/tests/">
+    <Project Path="Moda.Infrastructure/tests/Moda.Infrastructure.Tests/Moda.Infrastructure.Tests.csproj" />
+  </Folder>
   <Folder Name="/Moda.Integrations/" />
   <Folder Name="/Moda.Integrations/src/">
     <Project Path="Moda.Integrations/src/Moda.Integrations.AzureDevOps/Moda.Integrations.AzureDevOps.csproj" />

@@ -9,7 +9,14 @@ public sealed record UpdateProfileRequest
     public string? PhoneNumber { get; set; }
 
     public UpdateUserCommand ToUpdateUserCommand()
-        => new(Id, FirstName, LastName, Email, PhoneNumber);
+        => new()
+        {
+            Id = Id,
+            FirstName = FirstName,
+            LastName = LastName,
+            Email = Email,
+            PhoneNumber = PhoneNumber
+        };
 }
 
 public sealed class UpdateProfileRequestValidator : CustomValidator<UpdateProfileRequest>

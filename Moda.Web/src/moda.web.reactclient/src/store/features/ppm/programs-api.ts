@@ -10,13 +10,20 @@ import {
 } from '@/src/services/moda-api'
 import { QueryTags } from '../query-tags'
 import { BaseOptionType } from 'antd/es/select'
+import { OptionModel } from '@/src/components/types'
 
 export const programsApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getPrograms: builder.query<ProgramListDto[], number | undefined>({
-      queryFn: async (status = undefined) => {
+    getPrograms: builder.query<
+      ProgramListDto[],
+      { status?: number[]; portfolioId?: string } | undefined
+    >({
+      queryFn: async (request = undefined) => {
         try {
-          const data = await getProgramsClient().getPrograms(status)
+          const data = await getProgramsClient().getPrograms(
+            request?.status?.length > 0 ? request.status : undefined,
+            request?.portfolioId,
+          )
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -148,25 +155,52 @@ export const programsApi = apiSlice.injectEndpoints({
         ]
       },
     }),
-    getProgramProjects: builder.query<ProjectListDto[], string>({
-      queryFn: async (idOrKey) => {
+    getProgramProjects: builder.query<
+      ProjectListDto[],
+      { programIdOrKey: string; status?: number[] }
+    >({
+      queryFn: async ({ programIdOrKey, status }) => {
         try {
-          const data = await getProgramsClient().getProjects(idOrKey, null)
+          const data = await getProgramsClient().getProjects(
+            programIdOrKey,
+            status?.length > 0 ? status : null,
+          )
           return { data }
         } catch (error) {
           console.error('API Error:', error)
           return { error }
         }
       },
-      providesTags: (result) => [
-        QueryTags.ProgramProjects,
-        ...result.map(({ key }) => ({ type: QueryTags.ProgramProjects, key })),
+      providesTags: (result, error, { programIdOrKey }) => [
+        { type: QueryTags.ProgramProjects, id: 'LIST' },
+        { type: QueryTags.ProgramProjects, id: programIdOrKey },
       ],
     }),
+    getProgramStatusOptions: builder.query<OptionModel<number>[], void>({
+      queryFn: async () => {
+        try {
+          const statuses = await getProgramsClient().getProgramStatuses()
+
+          const data: OptionModel<number>[] = statuses
+            .sort((a, b) => a.order - b.order)
+            .map((s) => ({
+              value: s.id,
+              label: s.name,
+            }))
+
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: () => [QueryTags.ProgramStatusOptions],
+    }),
+
     getProgramOptions: builder.query<BaseOptionType[], void>({
       queryFn: async () => {
         try {
-          const programs = await getProgramsClient().getPrograms(null)
+          const programs = await getProgramsClient().getPrograms(undefined)
 
           const data: BaseOptionType[] = programs
             .sort((a, b) => a.name.localeCompare(b.name))
@@ -196,4 +230,5 @@ export const {
   useDeleteProgramMutation,
   useGetProgramProjectsQuery,
   useGetProgramOptionsQuery,
+  useGetProgramStatusOptionsQuery,
 } = programsApi

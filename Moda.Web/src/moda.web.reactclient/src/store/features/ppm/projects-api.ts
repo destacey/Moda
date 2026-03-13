@@ -12,13 +12,25 @@ import {
 } from '@/src/services/moda-api'
 import { QueryTags } from '../query-tags'
 import { BaseOptionType } from 'antd/es/select'
+import { OptionModel } from '@/src/components/types'
+
+export interface GetProjectsRequest {
+  status?: number[]
+  portfolioId?: string
+}
 
 export const projectsApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getProjects: builder.query<ProjectListDto[], number | undefined>({
-      queryFn: async (status = undefined) => {
+    getProjects: builder.query<
+      ProjectListDto[],
+      GetProjectsRequest | undefined
+    >({
+      queryFn: async (request = undefined) => {
         try {
-          const data = await getProjectsClient().getProjects(status)
+          const data = await getProjectsClient().getProjects(
+            request?.status,
+            request?.portfolioId,
+          )
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -57,6 +69,7 @@ export const projectsApi = apiSlice.injectEndpoints({
         return [
           { type: QueryTags.Project, id: 'LIST' },
           { type: QueryTags.PortfolioProjects, id: 'LIST' },
+          { type: QueryTags.ProgramProjects, id: 'LIST' },
         ]
       },
     }),
@@ -79,6 +92,7 @@ export const projectsApi = apiSlice.injectEndpoints({
           { type: QueryTags.Project, id: 'LIST' },
           { type: QueryTags.Project, id: cacheKey },
           { type: QueryTags.PortfolioProjects, id: 'LIST' },
+          { type: QueryTags.ProgramProjects, id: 'LIST' },
         ]
       },
     }),
@@ -131,6 +145,26 @@ export const projectsApi = apiSlice.injectEndpoints({
       },
     }),
 
+    approveProject: builder.mutation<void, { id: string; cacheKey: string }>({
+      queryFn: async ({ id }) => {
+        try {
+          const data = await getProjectsClient().approve(id)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, { cacheKey }) => {
+        return [
+          { type: QueryTags.Project, id: 'LIST' },
+          { type: QueryTags.Project, id: cacheKey },
+          { type: QueryTags.PortfolioProjects, id: 'LIST' },
+          { type: QueryTags.ProgramProjects, id: 'LIST' },
+        ]
+      },
+    }),
+
     activateProject: builder.mutation<void, { id: string; cacheKey: string }>({
       queryFn: async ({ id }) => {
         try {
@@ -146,6 +180,7 @@ export const projectsApi = apiSlice.injectEndpoints({
           { type: QueryTags.Project, id: 'LIST' },
           { type: QueryTags.Project, id: cacheKey },
           { type: QueryTags.PortfolioProjects, id: 'LIST' },
+          { type: QueryTags.ProgramProjects, id: 'LIST' },
         ]
       },
     }),
@@ -165,6 +200,7 @@ export const projectsApi = apiSlice.injectEndpoints({
           { type: QueryTags.Project, id: 'LIST' },
           { type: QueryTags.Project, id: cacheKey },
           { type: QueryTags.PortfolioProjects, id: 'LIST' },
+          { type: QueryTags.ProgramProjects, id: 'LIST' },
         ]
       },
     }),
@@ -184,6 +220,7 @@ export const projectsApi = apiSlice.injectEndpoints({
           { type: QueryTags.Project, id: 'LIST' },
           { type: QueryTags.Project, id: cacheKey },
           { type: QueryTags.PortfolioProjects, id: 'LIST' },
+          { type: QueryTags.ProgramProjects, id: 'LIST' },
         ]
       },
     }),
@@ -202,6 +239,7 @@ export const projectsApi = apiSlice.injectEndpoints({
         return [
           { type: QueryTags.Project, id: 'LIST' },
           { type: QueryTags.PortfolioProjects, id: 'LIST' },
+          { type: QueryTags.ProgramProjects, id: 'LIST' },
         ]
       },
     }),
@@ -222,10 +260,31 @@ export const projectsApi = apiSlice.injectEndpoints({
       ],
     }),
 
+    getProjectStatusOptions: builder.query<OptionModel<number>[], void>({
+      queryFn: async () => {
+        try {
+          const statuses = await getProjectsClient().getProjectStatuses()
+
+          const data: OptionModel<number>[] = statuses
+            .sort((a, b) => a.order - b.order)
+            .map((s) => ({
+              value: s.id,
+              label: s.name,
+            }))
+
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: () => [QueryTags.ProjectStatusOptions],
+    }),
+
     getProjectOptions: builder.query<BaseOptionType[], void>({
       queryFn: async () => {
         try {
-          const portfolios = await getProjectsClient().getProjects(null)
+          const portfolios = await getProjectsClient().getProjects(undefined)
 
           const data: BaseOptionType[] = portfolios
             .sort((a, b) => a.name.localeCompare(b.name))
@@ -251,10 +310,12 @@ export const {
   useUpdateProjectMutation,
   useChangeProjectProgramMutation,
   useChangeProjectKeyMutation,
+  useApproveProjectMutation,
   useActivateProjectMutation,
   useCompleteProjectMutation,
   useCancelProjectMutation,
   useDeleteProjectMutation,
   useGetProjectWorkItemsQuery,
   useGetProjectOptionsQuery,
+  useGetProjectStatusOptionsQuery,
 } = projectsApi

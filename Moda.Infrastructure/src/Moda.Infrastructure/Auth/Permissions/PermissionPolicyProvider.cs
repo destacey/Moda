@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
+using Moda.Infrastructure.Auth.Local;
 
 namespace Moda.Infrastructure.Auth.Permissions;
 
@@ -36,11 +37,11 @@ internal class PermissionPolicyProvider : IAuthorizationPolicyProvider
         }
         else
         {
-            // If no PAT header, only use JWT bearer
-            // This prevents the PAT authentication handler from being invoked and logging
+            // If no PAT header, use both Azure AD JWT bearer and Local JWT schemes
             policy = new AuthorizationPolicyBuilder()
                 .AddAuthenticationSchemes(
-                    Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme)
+                    Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme,
+                    Local.ConfigureServices.LocalJwtScheme)
                 .RequireAuthenticatedUser()
                 .Build();
         }

@@ -72,7 +72,7 @@ const ManageStrategicInitiativeProjectsForm = ({
     data: projectData,
     isLoading: projectsIsLoading,
     error: projectsError,
-  } = useGetPortfolioProjectsQuery(portfolioKey.toString())
+  } = useGetPortfolioProjectsQuery({ portfolioIdOrKey: portfolioKey.toString() })
 
   const [manageProjects] =
     useManageStrategicInitiativeProjectsMutation()

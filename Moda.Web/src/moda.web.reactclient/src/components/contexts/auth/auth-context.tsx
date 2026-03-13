@@ -16,11 +16,25 @@ import {
   SilentRequest,
 } from '@azure/msal-browser'
 import { LoadingAccount } from '@/src/components/common'
-import { AuthContextType, Claim, User } from './types'
+import { AuthContextType, AuthMethod, Claim, User } from './types'
 import { tokenRequest } from '@/auth-config'
 import { useGetUserPermissionsQuery } from '@/src/store/features/user-management/profile-api'
 import UnauthorizedPage from '@/src/app/unauthorized/page'
 import ServiceUnavailablePage from '@/src/app/service-unavailable/page'
+import ChangePasswordForm from '@/src/app/account/profile/change-password-form'
+import useTheme from '@/src/components/contexts/theme/use-theme'
+import styles from './auth-provider.module.css'
+import {
+  getAuthClient,
+  getAuthStorage,
+  isLocalAuthActive,
+  clearLocalAuth,
+  getLocalAuthToken,
+  LOCAL_AUTH_TOKEN_KEY,
+  LOCAL_AUTH_REFRESH_TOKEN_KEY,
+  LOCAL_AUTH_TOKEN_EXPIRY_KEY,
+  LOCAL_AUTH_MUST_CHANGE_PASSWORD_KEY,
+} from '@/src/services/clients'
 
 export const AuthContext = createContext<AuthContextType | null>(null)
 
@@ -38,6 +52,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { instance, accounts, inProgress } = useMsal()
   const isAuthenticated = useIsAuthenticated()
   const pathname = usePathname()
+  const { token } = useTheme()
 
   // Bypass loading/error gates on logout route so logout always executes promptly
   const isLogoutRoute = pathname === '/logout'
@@ -51,6 +66,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [authStatus, setAuthStatus] = useState('Initializing authentication...')
   const [activeAccount, setActiveAccountState] = useState<AccountInfo | null>(
     null,
+  )
+
+  const [authMethod, setAuthMethod] = useState<AuthMethod>(
+    typeof window !== 'undefined' && isLocalAuthActive() ? 'local' : null,
+  )
+
+  const [mustChangePassword, setMustChangePassword] = useState(
+    typeof window !== 'undefined' &&
+      getAuthStorage().getItem(LOCAL_AUTH_MUST_CHANGE_PASSWORD_KEY) === 'true',
   )
 
   const [user, setUser] = useState<User>({
@@ -168,7 +192,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     error: permissionsError,
     refetch: refetchPermissions,
   } = useGetUserPermissionsQuery(undefined, {
-    skip: !isReady || !isAuthenticated || !activeAccount,
+    skip: authMethod === 'local'
+      ? false // Local auth: always fetch (token is in localStorage)
+      : !isReady || !isAuthenticated || !activeAccount,
     pollingInterval: 5 * 60 * 1000, // Re-fetch permissions every 5 minutes
   })
 
@@ -190,6 +216,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
    */
   const acquireToken = useCallback(
     async (requestOverrides?: Partial<SilentRequest>): Promise<string> => {
+      // For local auth, return the stored token
+      if (authMethod === 'local') {
+        const token = getLocalAuthToken()
+        if (token) return token
+        throw new Error('No local auth token found')
+      }
+
       const request = { ...tokenRequest, ...requestOverrides }
 
       try {
@@ -201,7 +234,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
         const response = await instance.acquireTokenSilent({
           ...request,
-          account: request.account || accounts[0], // Use provided account or first available
+          account: request.account || accounts[0],
         })
         return response.accessToken
       } catch (error) {
@@ -212,7 +245,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         throw error
       }
     },
-    [instance],
+    [instance, authMethod],
   )
 
   /**
@@ -221,6 +254,76 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
    * -------------------------------------------------------------
    */
   const refreshUser = useCallback(async () => {
+    // Handle local auth users
+    if (authMethod === 'local') {
+      if (permissionsLoading) return
+
+      try {
+        setAuthStatus('Loading user profile...')
+        const claims: Claim[] = []
+
+        if (permissionsData) {
+          if (permissionsData.employeeId) {
+            claims.push({ type: 'EmployeeId', value: permissionsData.employeeId })
+          }
+          claims.push(
+            ...permissionsData.permissions.map((p) => ({
+              type: 'Permission',
+              value: p,
+            })),
+          )
+
+          // Decode JWT to get user info
+          const token = getLocalAuthToken()
+          let name = ''
+          let username = ''
+          if (token) {
+            try {
+              const payload = JSON.parse(atob(token.split('.')[1]))
+              name = [
+                payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'],
+                payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname'],
+              ].filter(Boolean).join(' ')
+              username = payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'] ?? ''
+            } catch {
+              // Token decode failed, use empty values
+            }
+          }
+
+          setUser({
+            name,
+            username,
+            isAuthenticated: true,
+            employeeId: permissionsData.employeeId ?? null,
+            claims,
+          })
+        } else if (permissionsError) {
+          const errorStatus = (permissionsError as any)?.status
+          if (errorStatus === 401) {
+            // Local token expired and refresh failed
+            clearLocalAuth()
+            setAuthMethod(null)
+            setIsLoading(false)
+            return
+          }
+          if (errorStatus === 403) {
+            setIsUnauthorized(true)
+            setIsLoading(false)
+            return
+          }
+          setIsServiceUnavailable(true)
+          setIsLoading(false)
+          return
+        }
+      } catch (error) {
+        console.error('[Auth] Error building local user profile', error)
+      } finally {
+        setIsLoading(false)
+      }
+      return
+    }
+
+    // Handle MSAL auth users
     if (!activeAccount) {
       setUser({
         name: '',
@@ -263,17 +366,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       } else if (permissionsError) {
         const errorStatus = (permissionsError as any)?.status
         if (errorStatus === 403) {
-          // User is authenticated but not authorized in Moda
           setIsUnauthorized(true)
           setIsLoading(false)
           return
         }
         if (errorStatus === 401) {
-          // Token is invalid or expired - redirect to re-authenticate.
-          // This typically happens in multi-tab scenarios where the token
-          // was revoked or expired and silent refresh failed.
-
-          // Check if redirect is already in progress (either from us or MSAL)
           if (isRedirectInProgress || inProgress !== 'none') {
             console.log(
               '[Auth] Redirect already in progress, skipping duplicate redirect',
@@ -293,13 +390,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               loginError,
             )
             isRedirectInProgress = false
-            // If redirect fails (e.g., interaction already in progress),
-            // stop loading so the user isn't stuck on a spinner
             setIsLoading(false)
           }
           return
         }
-        // For other errors (timeout, network issues, 5xx), show service unavailable
         setIsServiceUnavailable(true)
         setIsLoading(false)
         return
@@ -325,6 +419,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setIsLoading(false)
     }
   }, [
+    authMethod,
     activeAccount,
     permissionsLoading,
     permissionsData,
@@ -339,8 +434,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
    * -------------------------------------------------------------
    */
   useEffect(() => {
+    // Handle local auth separately
+    if (authMethod === 'local') {
+      if (permissionsLoading) {
+        setAuthStatus('Loading user permissions...')
+        return
+      }
+      refreshUser()
+      return
+    }
+
     if (!isReady) {
-      // Show loading state during MSAL operations (redirect handling, etc.)
       setIsLoading(true)
       setAuthStatus('Authenticating...')
       return
@@ -353,7 +457,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
 
     // Wait for activeAccount to be set (happens in separate useEffect)
-    // Don't set isLoading to false here - keep showing loading state
     if (!activeAccount) {
       setAuthStatus('Loading account...')
       return
@@ -366,7 +469,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     // Only proceed when permissions have loaded or errored
     refreshUser()
-  }, [isReady, isAuthenticated, activeAccount, permissionsLoading, refreshUser])
+  }, [authMethod, isReady, isAuthenticated, activeAccount, permissionsLoading, refreshUser])
 
   /**
    * -------------------------------------------------------------
@@ -377,10 +480,40 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     await instance.loginRedirect()
   }, [instance])
 
+  const localLogin = useCallback(async (username: string, password: string) => {
+    setIsLoading(true)
+    setAuthStatus('Signing in...')
+    try {
+      const authClient = getAuthClient()
+      const tokenResponse = await authClient.login({ userName: username, password })
+      const storage = getAuthStorage()
+      storage.setItem(LOCAL_AUTH_TOKEN_KEY, tokenResponse.token)
+      storage.setItem(LOCAL_AUTH_REFRESH_TOKEN_KEY, tokenResponse.refreshToken)
+      storage.setItem(LOCAL_AUTH_TOKEN_EXPIRY_KEY, new Date(tokenResponse.tokenExpiresAt).toISOString())
+      if (tokenResponse.mustChangePassword) {
+        storage.setItem(LOCAL_AUTH_MUST_CHANGE_PASSWORD_KEY, 'true')
+        setMustChangePassword(true)
+      }
+      setAuthMethod('local')
+      refetchPermissions()
+    } catch (error) {
+      setIsLoading(false)
+      throw error
+    }
+  }, [refetchPermissions])
+
   const logout = useCallback(async () => {
+    if (authMethod === 'local') {
+      // Clear tokens and redirect immediately without updating React state.
+      // Updating state before redirect causes a re-render that briefly shows
+      // the app behind the forced change password gate.
+      clearLocalAuth()
+      window.location.href = '/login'
+      return
+    }
     // Navigate to logout page which handles the Microsoft logout redirect
     window.location.href = '/logout'
-  }, [])
+  }, [authMethod])
 
   /**
    * -------------------------------------------------------------
@@ -396,23 +529,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     () => ({
       user,
       isLoading,
+      authMethod,
+      mustChangePassword,
       acquireToken,
       refreshUser,
       hasClaim: (type: string, value: string) =>
         user.claims.some((c) => c.type === type && c.value === value),
       hasPermissionClaim: (value: string) => permissionsSet.has(value),
       login,
+      localLogin,
       logout,
     }),
-    [user, isLoading, acquireToken, refreshUser, permissionsSet, login, logout],
+    [user, isLoading, authMethod, mustChangePassword, acquireToken, refreshUser, permissionsSet, login, localLogin, logout],
   )
 
   // Bypass all loading/error gates on logout route so logout executes promptly
   // This ensures users can always sign out, even if permissions call is slow/failed
   if (!isLogoutRoute) {
-    // Only show loading state for authenticated users loading permissions
-    // Unauthenticated users should see the login page immediately via UnauthenticatedTemplate
-    if (isLoading && isAuthenticated) {
+    // Show loading state for authenticated users (MSAL or local)
+    if (isLoading && (isAuthenticated || authMethod === 'local')) {
       return <LoadingAccount message={authStatus} />
     }
 
@@ -423,6 +558,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (isServiceUnavailable) {
       return <ServiceUnavailablePage onRetry={handleRetry} onLogout={logout} />
     }
+  }
+
+  // Force password change for users who must change their password
+  if (mustChangePassword && authMethod === 'local' && user.isAuthenticated) {
+    return (
+      <AuthContext.Provider value={authContext}>
+        <div
+          className={styles.changePasswordBackground}
+          style={{ '--auth-bg-color': token.colorBgContainer } as React.CSSProperties}
+        >
+          <ChangePasswordForm
+            required
+            onFormComplete={() => {
+              // Password changed successfully — logout happens in the form
+            }}
+            onFormCancel={() => logout()}
+          />
+        </div>
+      </AuthContext.Provider>
+    )
   }
 
   return (

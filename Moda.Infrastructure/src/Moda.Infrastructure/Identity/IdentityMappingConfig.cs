@@ -1,5 +1,6 @@
 ﻿using Mapster;
 using Moda.Common.Application.Dtos;
+using NodaTime;
 
 namespace Moda.Infrastructure.Identity;
 public class IdentityMappingConfig : IRegister
@@ -14,12 +15,21 @@ public class IdentityMappingConfig : IRegister
                 .Map(dest => dest.LastName, src => src.LastName)
                 .Map(dest => dest.Email, src => src.Email)
                 .Map(dest => dest.PhoneNumber, src => src.PhoneNumber)
+                .Map(dest => dest.LoginProvider, src => src.LoginProvider)
                 .Map(dest => dest.IsActive, src => src.IsActive)
+                .Map(dest => dest.LockoutEnd, src => src.LockoutEnd != null && src.LockoutEnd > DateTimeOffset.UtcNow
+                    ? Instant.FromDateTimeOffset(src.LockoutEnd.Value)
+                    : (Instant?)null)
                 .Map(dest => dest.LastActivityAt, src => src.LastActivityAt)
                 .Map(dest => dest.Employee, src => src.Employee == null
                     ? null
                     : NavigationDto.Create(src.Employee.Id, src.Employee.Key, src.Employee.Name.FullName))
-                .Map(dest => dest.Roles, src => new List<RoleListDto>()); // Initialize empty, will be populated separately
+                .Map(dest => dest.Roles, src => src.UserRoles.Select(ur => new RoleListDto
+                {
+                    Id = ur.Role.Id,
+                    Name = ur.Role.Name!,
+                    Description = ur.Role.Description
+                }).ToList());
 
         config
             .NewConfig<ApplicationRole, RoleListDto>()
