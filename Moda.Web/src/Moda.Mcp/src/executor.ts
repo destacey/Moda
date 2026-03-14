@@ -1,6 +1,6 @@
 import { z, ZodError } from 'zod';
-import { jsonSchemaToZod } from 'json-schema-to-zod';
 import axios, { type AxiosRequestConfig, type AxiosError } from 'axios';
+import { zodSchemas } from './generated/zod-schemas.js';
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { API_BASE_URL, MODA_API_KEY } from './config.js';
 import type { McpToolDefinition, JsonObject } from './types.js';
@@ -27,7 +27,7 @@ export async function executeApiTool(
     // Validate arguments against the input schema
     let validatedArgs: JsonObject;
     try {
-      const zodSchema = getZodSchemaFromJsonSchema(definition.inputSchema, toolName);
+      const zodSchema = zodSchemas.get(toolName) ?? z.object({}).passthrough();
       const argsToParse = (typeof toolArgs === 'object' && toolArgs !== null) ? toolArgs : {};
       validatedArgs = zodSchema.parse(argsToParse);
     } catch (error: unknown) {
@@ -167,24 +167,4 @@ export function formatApiError(error: AxiosError): string {
     message += `API Request Setup Error: ${error.message}`;
   }
   return message;
-}
-
-/**
- * Converts a JSON Schema to a Zod schema for runtime validation.
- */
-export function getZodSchemaFromJsonSchema(jsonSchema: any, toolName: string): z.ZodTypeAny {
-  if (typeof jsonSchema !== 'object' || jsonSchema === null) {
-    return z.object({}).passthrough();
-  }
-  try {
-    const zodSchemaString = jsonSchemaToZod(jsonSchema);
-    const zodSchema = eval(zodSchemaString);
-    if (typeof zodSchema?.parse !== 'function') {
-      throw new Error('Eval did not produce a valid Zod schema.');
-    }
-    return zodSchema as z.ZodTypeAny;
-  } catch (err: any) {
-    console.error(`Failed to generate/evaluate Zod schema for '${toolName}':`, err);
-    return z.object({}).passthrough();
-  }
 }

@@ -6,6 +6,7 @@ node_modules
 # Build outputs
 dist
 build
+src/generated
 logs
 *.log
 npm-debug.log*

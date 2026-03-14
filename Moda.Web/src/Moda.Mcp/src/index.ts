@@ -13,8 +13,6 @@ import { SERVER_NAME, SERVER_VERSION, API_BASE_URL } from './config.js';
 import { toolDefinitionMap } from './tools/index.js';
 import { executeApiTool, securitySchemes } from './executor.js';
 
-console.error(`API_BASE_URL: ${API_BASE_URL}`);
-
 const server = new Server(
   { name: SERVER_NAME, version: SERVER_VERSION },
   { capabilities: { tools: {} } }
@@ -40,6 +38,11 @@ server.setRequestHandler(CallToolRequestSchema, async (request: CallToolRequest)
 });
 
 async function main() {
+  if (!API_BASE_URL) {
+    console.error('Error: MODA_API_BASE_URL environment variable or --base-url argument is required.');
+    process.exit(1);
+  }
+
   try {
     const transport = new StdioServerTransport();
     await server.connect(transport);
