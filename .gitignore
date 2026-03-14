@@ -356,4 +356,4 @@ docker_access_token
 nul
 
 # AI config files
-.claude/
+.claude/settings.local.json
