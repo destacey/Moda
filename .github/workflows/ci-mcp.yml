@@ -1,0 +1,36 @@
+name: CI - MCP Server
+
+on:
+    push:
+        branches:
+            - main
+        paths:
+            - "Moda.Web/src/Moda.Mcp/**"
+    pull_request:
+        paths:
+            - "Moda.Web/src/Moda.Mcp/**"
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        defaults:
+            run:
+                working-directory: Moda.Web/src/Moda.Mcp
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Lint
+              run: npm run lint
+
+            - name: Type check
+              run: npm run typecheck
+
+            - name: Build
+              run: npm run build
