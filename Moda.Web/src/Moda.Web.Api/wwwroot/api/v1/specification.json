@@ -10,24 +10,6 @@
     "version": "v1"
   },
   "paths": {
-    "/startup": {
-      "get": {
-        "operationId": "GetStartup",
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "Bearer": []
-          },
-          {
-            "ApiKey": []
-          }
-        ]
-      }
-    },
     "/api/feature-flags": {
       "get": {
         "tags": [
@@ -22193,7 +22175,8 @@
           "priority",
           "assignees",
           "progress",
-          "order"
+          "order",
+          "projectPhaseId"
         ],
         "properties": {
           "id": {
@@ -22245,6 +22228,12 @@
             "type": "string",
             "format": "guid",
             "nullable": true,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "projectPhaseId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "parent": {
@@ -22304,6 +22293,7 @@
           "typeId",
           "statusId",
           "priorityId",
+          "parentId",
           "progress",
           "plannedDate"
         ],
@@ -22356,9 +22346,10 @@
           },
           "parentId": {
             "type": "string",
-            "description": "The ID of the parent task (optional).",
+            "description": "The ID of the parent phase or task. If it matches a phase, the task becomes a root task in that phase.\nIf it matches a task, the new task becomes a child of that task and inherits the phase.",
             "format": "guid",
-            "nullable": true,
+            "minLength": 1,
+            "nullable": false,
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "plannedStart": {
@@ -22396,7 +22387,8 @@
           "id",
           "name",
           "statusId",
-          "priorityId"
+          "priorityId",
+          "parentId"
         ],
         "properties": {
           "id": {
@@ -22450,9 +22442,9 @@
           },
           "parentId": {
             "type": "string",
-            "description": "The ID of the parent task (optional).",
+            "description": "The ID of the parent phase or task.",
             "format": "guid",
-            "nullable": true,
+            "nullable": false,
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "plannedStart": {
@@ -22553,7 +22545,8 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "taskId"
+          "taskId",
+          "parentId"
         ],
         "properties": {
           "taskId": {
@@ -22566,9 +22559,10 @@
           },
           "parentId": {
             "type": "string",
-            "description": "The ID of the new parent task. If null, the task will be moved to the root level.",
+            "description": "The ID of the parent phase or task. If it matches a phase, the task becomes a root task in that phase.\nIf it matches a task, the task becomes a child of that task.",
             "format": "guid",
-            "nullable": true,
+            "minLength": 1,
+            "nullable": false,
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "order": {

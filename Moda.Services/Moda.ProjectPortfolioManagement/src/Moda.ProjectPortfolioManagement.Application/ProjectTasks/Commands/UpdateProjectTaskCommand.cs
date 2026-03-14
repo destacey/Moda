@@ -10,7 +10,7 @@ public sealed record UpdateProjectTaskCommand(
     Domain.Enums.TaskStatus Status,
     TaskPriority Priority,
     Progress? Progress,
-    Guid? ParentId,
+    Guid ParentId,
     FlexibleDateRange? PlannedDateRange,
     LocalDate? PlannedDate,
     decimal? EstimatedEffortHours,
@@ -38,8 +38,8 @@ public sealed class UpdateProjectTaskCommandValidator : AbstractValidator<Update
             .IsInEnum();
 
         RuleFor(x => x.ParentId)
-            .Must(id => id == null || id != Guid.Empty)
-            .WithMessage("ParentId cannot be an empty GUID.");
+            .NotEmpty()
+            .WithMessage("ParentId is required and cannot be an empty GUID.");
 
         RuleFor(x => x.EstimatedEffortHours)
             .GreaterThan(0)
@@ -76,32 +76,11 @@ internal sealed class UpdateProjectTaskCommandHandler(
                 return Result.Failure("Project task not found.");
             }
 
-            // Validate parent if specified
-            if (request.ParentId.HasValue)
+            // Validate parent — ParentId can be a phase or task, domain handles full validation
+            if (request.ParentId == request.Id)
             {
-                // Cannot set self as parent
-                if (request.ParentId.Value == request.Id)
-                {
-                    _logger.LogInformation("Cannot set task {TaskId} as its own parent.", request.Id);
-                    return Result.Failure("A task cannot be its own parent.");
-                }
-
-                var parentExists = await _ppmDbContext.ProjectTasks
-                    .AnyAsync(t => t.Id == request.ParentId.Value, cancellationToken);
-                if (!parentExists)
-                {
-                    _logger.LogInformation("Parent task {ParentId} not found.", request.ParentId);
-                    return Result.Failure("Parent task not found.");
-                }
-
-                // Check for circular reference (would create a cycle in the hierarchy)
-                // Need to check if the new parent is a descendant of the current task
-                var descendants = await GetDescendantIds(request.Id, cancellationToken);
-                if (descendants.Contains(request.ParentId.Value))
-                {
-                    _logger.LogInformation("Cannot set task {ParentId} as parent of {TaskId} - would create circular reference.", request.ParentId, request.Id);
-                    return Result.Failure("Cannot set a descendant task as parent - this would create a circular reference.");
-                }
+                _logger.LogInformation("Cannot set task {TaskId} as its own parent.", request.Id);
+                return Result.Failure("A task cannot be its own parent.");
             }
 
             // Update basic details
@@ -148,11 +127,14 @@ internal sealed class UpdateProjectTaskCommandHandler(
                 return await HandleDomainFailure(task, effortResult, cancellationToken);
             }
 
-            // Update parent if changed
-            if (request.ParentId != task.ParentId)
+            // Update parent/phase if changed
+            // For root tasks, the effective parent is the phase; for child tasks, it's the parent task
+            var effectiveCurrentParentId = task.ParentId ?? task.ProjectPhaseId;
+            if (request.ParentId != effectiveCurrentParentId)
             {
-                // get the project with all tasks to perform the parent change
+                // get the project with all tasks and phases to perform the parent change
                 var project = await _ppmDbContext.Projects
+                    .Include(p => p.Phases)
                     .Include(p => p.Tasks)
                     .FirstOrDefaultAsync(p => p.Id == task.ProjectId, cancellationToken);
                 if (project is null)

@@ -6,9 +6,9 @@ namespace Moda.ProjectPortfolioManagement.Application.ProjectTasks.Commands;
 /// </summary>
 /// <param name="ProjectId">The unique identifier of the project containing the task.</param>
 /// <param name="TaskId">The unique identifier of the task to update.</param>
-/// <param name="ParentId">The unique identifier of the existing/new parent task, or null to place the task at the root level.</param>
+/// <param name="ParentId">The unique identifier of the parent phase or task. If it matches a phase, the task becomes a root task in that phase. If it matches a task, the task becomes a child of that task.</param>
 /// <param name="Order">The one-based position to assign to the task among its siblings, or null to set the order last within the parent.</param>
-public sealed record UpdateProjectTaskPlacementCommand(Guid ProjectId, Guid TaskId,  Guid? ParentId, int? Order) : ICommand;
+public sealed record UpdateProjectTaskPlacementCommand(Guid ProjectId, Guid TaskId, Guid ParentId, int? Order) : ICommand;
 
 public sealed class UpdateProjectTaskPlacementCommandValidator : CustomValidator<UpdateProjectTaskPlacementCommand>
 {
@@ -21,8 +21,8 @@ public sealed class UpdateProjectTaskPlacementCommandValidator : CustomValidator
             .NotEmpty();
 
         RuleFor(x => x.ParentId)
-            .Must(id => id == null || id != Guid.Empty)
-            .WithMessage("NewParentId cannot be an empty GUID.");
+            .NotEmpty()
+            .WithMessage("ParentId is required and cannot be an empty GUID.");
 
         RuleFor(x => x.Order)
             .GreaterThan(0)
@@ -54,6 +54,7 @@ internal sealed class UpdateProjectTaskPlacementCommandHandler(
             }
 
             var project = await _ppmDbContext.Projects
+                .Include(p => p.Phases)
                 .Include(p => p.Tasks)
                 .FirstOrDefaultAsync(p => p.Id == request.ProjectId, cancellationToken);
             if (project is null)

@@ -139,7 +139,7 @@ public class Objective : BaseSoftDeletableEntity<Guid>, IHasIdAndKey
         if (Status == status) return;
 
         if (Status is ObjectiveStatus.Completed or ObjectiveStatus.Canceled or ObjectiveStatus.Missed
-            && status is not ObjectiveStatus.Completed or ObjectiveStatus.Canceled or ObjectiveStatus.Missed)
+            && status is not (ObjectiveStatus.Completed or ObjectiveStatus.Canceled or ObjectiveStatus.Missed))
         {
             ClosedDate = null;
         }

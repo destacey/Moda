@@ -31,6 +31,7 @@ public sealed class ProjectTask : BaseEntity<Guid>, ISystemAuditable, IHasIdAndK
         Progress progress,
         int order,
         Guid? parentId,
+        Guid projectPhaseId,
         FlexibleDateRange? plannedDateRange,
         LocalDate? plannedDate,
         decimal? estimatedEffortHours,
@@ -55,6 +56,7 @@ public sealed class ProjectTask : BaseEntity<Guid>, ISystemAuditable, IHasIdAndK
         Progress = progress;
         Order = order;
         ParentId = parentId;
+        ProjectPhaseId = projectPhaseId;
         PlannedDateRange = plannedDateRange;
         PlannedDate = plannedDate;
         EstimatedEffortHours = estimatedEffortHours;
@@ -136,6 +138,17 @@ public sealed class ProjectTask : BaseEntity<Guid>, ISystemAuditable, IHasIdAndK
     /// The parent task.
     /// </summary>
     public ProjectTask? Parent { get; private set; }
+
+    /// <summary>
+    /// The ID of the project phase this task belongs to.
+    /// All tasks belong to a phase. Child tasks inherit the phase from their root ancestor.
+    /// </summary>
+    public Guid ProjectPhaseId { get; private set; }
+
+    /// <summary>
+    /// The project phase this task belongs to.
+    /// </summary>
+    public ProjectPhase? ProjectPhase { get; private set; }
 
     /// <summary>
     /// The child tasks.
@@ -313,7 +326,7 @@ public sealed class ProjectTask : BaseEntity<Guid>, ISystemAuditable, IHasIdAndK
         {
             return Result.Failure("A task cannot be its own parent.");
         }
-        else if (newParentId.HasValue && IsDescendant(newParentId.Value))
+        else if (newParentId.HasValue && IsDescendantOf(newParentId.Value))
         {
             return Result.Failure("A task cannot be moved under one of its descendants.");
         }
@@ -440,9 +453,9 @@ public sealed class ProjectTask : BaseEntity<Guid>, ISystemAuditable, IHasIdAndK
     /// <summary>
     /// Checks if a given task ID is a descendant of this task.
     /// </summary>
-    private bool IsDescendant(Guid taskId)
+    internal bool IsDescendantOf(Guid taskId)
     {
-        return _children.Any(c => c.Id == taskId || c.IsDescendant(taskId));
+        return _children.Any(c => c.Id == taskId || c.IsDescendantOf(taskId));
     }
 
     #endregion
@@ -467,6 +480,15 @@ public sealed class ProjectTask : BaseEntity<Guid>, ISystemAuditable, IHasIdAndK
     /// <param name="estimatedEffortHours">The estimated effort required to complete the task, in hours, or null if not specified.</param>
     /// <param name="roles">A mapping of task roles to sets of user identifiers assigned to each role, or null if no roles are assigned.</param>
     /// <returns>A new ProjectTask instance initialized with the specified values.</returns>
+    /// <summary>
+    /// Changes the project phase assignment for this task.
+    /// </summary>
+    internal Result ChangePhase(Guid projectPhaseId)
+    {
+        ProjectPhaseId = projectPhaseId;
+        return Result.Success();
+    }
+
     internal static ProjectTask Create(
         Guid projectId,
         ProjectTaskKey key,
@@ -478,6 +500,7 @@ public sealed class ProjectTask : BaseEntity<Guid>, ISystemAuditable, IHasIdAndK
         Progress? progress,
         int order,
         Guid? parentId,
+        Guid projectPhaseId,
         FlexibleDateRange? plannedDateRange,
         LocalDate? plannedDate,
         decimal? estimatedEffortHours,
@@ -494,6 +517,7 @@ public sealed class ProjectTask : BaseEntity<Guid>, ISystemAuditable, IHasIdAndK
             progress ?? Progress.NotStarted(),
             order,
             parentId,
+            projectPhaseId,
             plannedDateRange,
             plannedDate,
             estimatedEffortHours,

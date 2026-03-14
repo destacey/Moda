@@ -179,7 +179,7 @@ public sealed class StrategicInitiative : BaseEntity<Guid>, ISystemAuditable, IH
     /// </summary>
     public Result Complete()
     {
-        if (Status is not StrategicInitiativeStatus.Active or StrategicInitiativeStatus.OnHold)
+        if (Status is not (StrategicInitiativeStatus.Active or StrategicInitiativeStatus.OnHold))
         {
             return Result.Failure("Only active strategic initiatives can be completed.");
         }

@@ -41,9 +41,10 @@ public sealed record CreateProjectTaskRequest
     public decimal? Progress { get; set; }
 
     /// <summary>
-    /// The ID of the parent task (optional).
+    /// The ID of the parent phase or task. If it matches a phase, the task becomes a root task in that phase.
+    /// If it matches a task, the new task becomes a child of that task and inherits the phase.
     /// </summary>
-    public Guid? ParentId { get; set; }
+    public Guid ParentId { get; set; }
 
     /// <summary>
     /// The planned start date for the task (for tasks, not milestones).
@@ -126,8 +127,8 @@ public sealed class CreateProjectTaskRequestValidator : CustomValidator<CreatePr
             .WithMessage("Progress is not applicable for milestones.");
 
         RuleFor(x => x.ParentId)
-            .Must(id => id == null || id != Guid.Empty)
-            .WithMessage("ParentId cannot be an empty GUID.");
+            .NotEmpty()
+            .WithMessage("ParentId is required and cannot be an empty GUID.");
 
         // Milestone-specific validations
         RuleFor(x => x.PlannedDate)

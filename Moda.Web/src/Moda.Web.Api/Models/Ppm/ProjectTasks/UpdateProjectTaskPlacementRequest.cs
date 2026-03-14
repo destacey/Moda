@@ -10,9 +10,10 @@ public sealed record UpdateProjectTaskPlacementRequest
     public Guid TaskId { get; set; }
 
     /// <summary>
-    /// The ID of the new parent task. If null, the task will be moved to the root level.
+    /// The ID of the parent phase or task. If it matches a phase, the task becomes a root task in that phase.
+    /// If it matches a task, the task becomes a child of that task.
     /// </summary>
-    public Guid? ParentId { get; set; }
+    public Guid ParentId { get; set; }
 
     /// <summary>
     /// The new order/position of the task within its parent.
@@ -31,8 +32,8 @@ public sealed class UpdateProjectTaskPlacementRequestValidator : CustomValidator
             .NotEmpty();
 
         RuleFor(x => x.ParentId)
-            .Must(id => id == null || id != Guid.Empty)
-            .WithMessage("ParentId cannot be an empty GUID.");
+            .NotEmpty()
+            .WithMessage("ParentId is required and cannot be an empty GUID.");
 
         RuleFor(x => x.Order)
             .GreaterThan(0)
