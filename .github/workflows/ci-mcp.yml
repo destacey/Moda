@@ -1,5 +1,8 @@
 name: CI - MCP Server
 
+permissions:
+    contents: read
+
 on:
     push:
         branches:

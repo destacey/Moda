@@ -1,5 +1,8 @@
 name: Publish MCP to npm
 
+permissions:
+    contents: read
+
 on:
     push:
         tags:

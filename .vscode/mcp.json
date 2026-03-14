@@ -7,14 +7,6 @@
         "mcp",
         "start"
       ]
-    },
-    "moda": {
-        "type": "stdio",
-        "command": "npm",
-        "args": [
-            "start"
-        ],
-        "cwd": "Moda.MCP"
     }
   }
 }
