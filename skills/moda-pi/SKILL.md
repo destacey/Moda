@@ -13,9 +13,49 @@ description: Guides agents working with Moda Planning Intervals — iterations, 
 - Generating PI health reports or predictability summaries
 - Reviewing PI risks
 
-## Domain context
+---
 
-Read `.skills/moda-domain.md` for entity definitions, the PI → Iteration → Sprint hierarchy, objective lifecycle, and common patterns (idOrKey, teamId scoping, includeClosed behavior).
+## Entity context
+
+### Hierarchy
+
+```
+Planning Interval (PI)
+├── Iterations
+│   └── Sprints (mapped from external systems, e.g. Azure DevOps)
+├── Teams
+│   └── Objectives
+│       └── Work Items (linked)
+└── Risks
+```
+
+### Planning Interval
+
+- A time-boxed planning period (analogous to a Program Increment in SAFe)
+- Contains iterations and has teams participating
+
+### Iteration
+
+- Sub-period within a PI (e.g. Sprint 1, Sprint 2)
+- Has a category (call `PlanningIntervals_GetIterationCategories` to resolve values)
+- Maps to external sprints for metrics aggregation
+
+### Objective
+
+- Team-scoped goal for a PI
+- Has a status (call `PlanningIntervals_GetObjectiveStatuses` to resolve values)
+- Can have linked work items with daily metrics
+
+### Risk
+
+- Scoped to a PI; optionally scoped to a team
+- Open risks returned by default; closed risks must be explicitly requested (`includeClosed: true`)
+
+### Common patterns
+
+- **`idOrKey`** — most GET endpoints accept either a UUID or a string key
+- **`teamId`** — optional filter on many PI endpoints; omit to get all teams, include to scope to one
+- **`includeClosed`** on `GetRisks` — defaults to `false`; pass `true` to include resolved risks
 
 ---
 
@@ -31,8 +71,6 @@ Read `.skills/moda-domain.md` for entity definitions, the PI → Iteration → S
 6. Resolve iteration category values: `PlanningIntervals_GetIterationCategories`
 
 ### Sprint mappings and iteration metrics
-
-These require the PI resolved first:
 
 | Goal | Tool | Required params |
 |---|---|---|
@@ -65,11 +103,11 @@ The health report is a dedicated endpoint — do not attempt to derive it from o
 
 ### Risks
 
-- `PlanningIntervals_GetRisks` — defaults to open risks only (`includeClosed` defaults to `false`)
+- `PlanningIntervals_GetRisks` — defaults to open risks only
 - Pass `includeClosed: true` to include resolved/closed risks
 - Pass `teamId` to scope to one team
 
-**Reminder**: if the user asks "why aren't there more risks" or seems to be missing risks, suggest adding `includeClosed: true`.
+If the user seems to be missing risks, suggest adding `includeClosed: true`.
 
 ### PI health report recipe (compound task)
 
@@ -78,4 +116,4 @@ When the user asks for a comprehensive PI health summary, run these in parallel 
 1. `PlanningIntervals_GetPlanningInterval` — PI dates, name, metadata
 2. `PlanningIntervals_GetObjectivesHealthReport` — objective status across teams
 3. `PlanningIntervals_GetPredictability` — predictability scores per team
-4. `PlanningIntervals_GetRisks` — active risks (add `includeClosed: true` if full picture needed)
+4. `PlanningIntervals_GetRisks` — active risks (add `includeClosed: true` if a full picture is needed)

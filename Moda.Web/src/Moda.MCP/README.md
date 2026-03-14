@@ -97,12 +97,34 @@ npm install -g @modanpm/moda-mcp
 
 Then use `moda-mcp` as the command instead of `npx -y @modanpm/moda-mcp` in any of the configs above.
 
+## Agent Skills (Claude Code)
+
+Skills are prompt files that guide Claude on how to efficiently use the Moda MCP tools — which tools to call in sequence, how to resolve IDs, and what the entity relationships look like. Without them, agents tend to make redundant calls or miss non-obvious patterns (e.g. project lifecycle transitions use separate action endpoints, not a status field).
+
+Three self-contained skills are available:
+
+| Skill | Trigger |
+| --- | --- |
+| `moda-ppm` | Portfolios, programs, projects — lookup, create, update, lifecycle |
+| `moda-pi` | Planning intervals, iterations, objectives, health reports, risks |
+| `moda-roadmaps` | Roadmap exploration — activities, timeboxes, milestones |
+
+### Installing the skills
+
+From your project root:
+
+```bash
+npx skills add destacey/moda
+```
+
+Once installed, activate a skill in Claude Code with `/moda-ppm`, `/moda-pi`, or `/moda-roadmaps`.
+
 ## Available Tools
 
 ### Project Portfolio Management
 
 | Category | Operations |
-|---|---|
+| --- | --- |
 | **Portfolios** | List, get details, get programs, get projects |
 | **Programs** | List, get details, get projects |
 | **Projects** | List, get details, create, update, approve, activate, complete, change program/key |
@@ -110,7 +132,7 @@ Then use `moda-mcp` as the command instead of `npx -y @modanpm/moda-mcp` in any 
 ### Planning
 
 | Category | Operations |
-|---|---|
+| --- | --- |
 | **Planning Intervals** | List, get details, calendar, predictability, teams, iterations, objectives, risks |
 | **Roadmaps** | List, get details, get items and activities |
 

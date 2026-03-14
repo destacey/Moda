@@ -13,9 +13,52 @@ description: Guides agents working with Moda Portfolio, Program, and Project man
 - Understanding what projects or programs are in a portfolio
 - Changing a project's program assignment or key
 
-## Domain context
+---
 
-Read `.skills/moda-domain.md` for entity definitions, the Portfolio → Program → Project hierarchy, status lifecycle, and common patterns (idOrKey, integer status filters, UUID references).
+## Entity context
+
+### Hierarchy
+
+```
+Portfolio
+└── Program (optional grouping)
+    └── Project
+        └── Work Items
+```
+
+### Portfolio
+
+- Top-level container for programs and projects
+- Has a status (integer enum — call `Portfolios_GetPortfolioStatuses` to resolve values)
+
+### Program
+
+- Groups related projects under a portfolio; projects can exist without one
+- Has a status (integer enum — call `Programs_GetProgramStatuses` to resolve values)
+
+### Project
+
+- Must belong to a portfolio; optionally belongs to a program
+- Has a unique string `key` (2–20 uppercase alphanumeric, e.g. `MYPROJ`)
+- Has a status (integer enum — call `Projects_GetStatuses` to resolve values)
+- Team roles: `sponsorIds`, `ownerIds`, `managerIds`, `memberIds` (UUID arrays, all optional)
+- `expenditureCategoryId` — required integer on create; ask the user if unknown
+- `strategicThemeIds` — optional UUID array
+
+**Lifecycle — action endpoints, not a patchable status field:**
+
+```
+Proposed → Approved → Active → Completed
+         ↑           ↑         ↑
+  Projects_Approve  Projects_Activate  Projects_Complete
+```
+
+### Common patterns
+
+- **`idOrKey`** — most GET endpoints accept either a UUID or a string key
+- **Status filters** — take integer arrays; always call the matching `GetStatuses` endpoint first to resolve enum values
+- **UUID references** — `portfolioId`, `programId`, etc. are always UUIDs; resolve name → UUID with list/options endpoints
+- **`Portfolios_GetPortfolioOptions`** — lightweight `{ id, name }` list; prefer this over `GetPortfolios` when you only need a UUID lookup
 
 ---
 
@@ -48,21 +91,21 @@ Required fields: `name`, `description`, `key`, `expenditureCategoryId`, `portfol
 
 `Projects_Update` updates core fields: `name`, `description`, `expenditureCategoryId`, `start`, `end`, and team role arrays.
 
-**Important splits — these are separate endpoints:**
+**These are separate endpoints — not part of `Projects_Update`:**
 
 - Change the project's `key`: `Projects_ChangeKey` with `{ key: "NEWKEY" }`
 - Change or remove the program: `Projects_ChangeProgram` with `{ programId: "<uuid>" }` or `{ programId: null }` to remove
 
 ### Project lifecycle transitions
 
-Projects move through states via dedicated action endpoints. You **cannot** patch the status field directly.
+Projects move through states via dedicated action endpoints. You cannot patch the status field directly.
 
 ```
 Proposed → Approved   →   Active   →   Completed
          Projects_Approve  Projects_Activate  Projects_Complete
 ```
 
-Each action endpoint takes only the project `id` (UUID). Resolve the UUID first with `Projects_GetProject` or `Projects_GetProjects` if needed.
+Each action endpoint takes only the project `id` (UUID). Resolve it first with `Projects_GetProject` or `Projects_GetProjects` if needed.
 
 ### Getting work items for a project
 
