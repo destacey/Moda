@@ -10,7 +10,7 @@ jobs:
         runs-on: ubuntu-latest
         defaults:
             run:
-                working-directory: Moda.Web/src/Moda.MCP
+                working-directory: Moda.Web/src/Moda.Mcp
         steps:
             - uses: actions/checkout@v4
 
