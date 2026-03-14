@@ -1,19 +1,42 @@
 {
-  "name": "moda-mcp",
-  "version": "v1",
-  "description": "MCP Server generated from OpenAPI spec for moda-mcp",
-  "private": true,
+  "name": "@modanpm/moda-mcp",
+  "version": "0.0.1",
+  "description": "MCP server for the Moda work management API",
   "type": "module",
   "main": "build/index.js",
+  "bin": {
+    "moda-mcp": "./build/index.js"
+  },
   "files": [
     "build",
-    "src"
+    "src",
+    "README.md"
   ],
   "scripts": {
     "start": "node build/index.js",
     "build": "tsc && shx chmod 755 build/index.js",
     "typecheck": "tsc --noEmit",
-    "prestart": "npm run build"
+    "prepare": "npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "moda",
+    "model-context-protocol",
+    "work-management",
+    "project-management"
+  ],
+  "license": "MIT",
+  "homepage": "https://destacey.github.io/Moda",
+  "bugs": {
+    "url": "https://github.com/destacey/Moda/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/destacey/Moda.git",
+    "directory": "Moda.Web/src/Moda.Mcp"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "engines": {
     "node": ">=20.0.0"
