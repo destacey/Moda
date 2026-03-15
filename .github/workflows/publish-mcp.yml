@@ -1,21 +1,42 @@
 name: Publish MCP to npm
 
 permissions:
-    contents: read
+    contents: write
+    id-token: write
 
 on:
-    push:
-        tags:
-            - "v*"
+    workflow_dispatch:
+        inputs:
+            bump_type:
+                description: "Version bump type"
+                required: true
+                type: choice
+                default: minor
+                options:
+                    - patch
+                    - minor
+                    - major
+                    - premajor
+                    - preminor
+                    - prepatch
+                    - prerelease
+            preid:
+                description: "Prerelease identifier (only used for pre* bump types)"
+                required: false
+                default: next
 
 jobs:
     publish:
         runs-on: ubuntu-latest
+        if: github.ref == 'refs/heads/main'
         defaults:
             run:
                 working-directory: Moda.Web/src/Moda.Mcp
         steps:
             - uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+                  ref: main
 
             - uses: actions/setup-node@v4
               with:
@@ -25,15 +46,43 @@ jobs:
             - name: Install dependencies
               run: npm ci
 
-            - name: Set version from tag
+            - name: Bump version
+              id: version
               run: |
-                  TAG="${GITHUB_REF_NAME#v}"
-                  npm version "$TAG" --no-git-tag-version
+                  BUMP="${{ inputs.bump_type }}"
+                  if [[ "$BUMP" == pre* ]]; then
+                      npm version "$BUMP" --preid "${{ inputs.preid }}" --no-git-tag-version --no-package-lock
+                  else
+                      npm version "$BUMP" --no-git-tag-version --no-package-lock
+                  fi
+                  VERSION=$(node -p "require('./package.json').version")
+                  echo "version=${VERSION}" >> $GITHUB_OUTPUT
+                  if [[ "$VERSION" == *"-"* ]]; then
+                      echo "is_prerelease=true" >> $GITHUB_OUTPUT
+                  else
+                      echo "is_prerelease=false" >> $GITHUB_OUTPUT
+                  fi
 
             - name: Build
               run: npm run build
 
             - name: Publish
-              run: npm publish --access public
-              env:
-                  NODE_AUTH_TOKEN: ${{ secrets.NPM_PASSWORD }}
+              run: |
+                  if [[ "${{ steps.version.outputs.is_prerelease }}" == "true" ]]; then
+                      npm publish --access public --tag next
+                  else
+                      npm publish --access public
+                  fi
+
+            - name: Tag and reconcile to main
+              if: steps.version.outputs.is_prerelease == 'false'
+              working-directory: ${{ github.workspace }}
+              run: |
+                  VERSION="${{ steps.version.outputs.version }}"
+                  git config user.name "github-actions[bot]"
+                  git config user.email "github-actions[bot]@users.noreply.github.com"
+                  git add Moda.Web/src/Moda.Mcp/package.json
+                  git commit -m "chore: bump mcp package version to ${VERSION} [skip ci]"
+                  git push origin HEAD:main
+                  git tag "mcp-v${VERSION}"
+                  git push origin "mcp-v${VERSION}"
