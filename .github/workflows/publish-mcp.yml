@@ -1,12 +1,14 @@
 name: Publish MCP to npm
 
 permissions:
-    contents: read
+    contents: write
 
 on:
     push:
         tags:
             - "v*"
+        branches:
+            - main
 
 jobs:
     publish:
@@ -16,6 +18,8 @@ jobs:
                 working-directory: Moda.Web/src/Moda.Mcp
         steps:
             - uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
 
             - uses: actions/setup-node@v4
               with:
@@ -26,14 +30,45 @@ jobs:
               run: npm ci
 
             - name: Set version from tag
+              if: startsWith(github.ref, 'refs/tags/')
               run: |
                   TAG="${GITHUB_REF_NAME#v}"
                   npm version "$TAG" --no-git-tag-version
+
+            - name: Set prerelease version for main
+              if: github.ref == 'refs/heads/main'
+              run: |
+                  LATEST_TAG=$(git describe --tags --abbrev=0)
+                  BASE_VERSION="${LATEST_TAG#v}"
+                  npm version "${BASE_VERSION}-dev.${{ github.run_number }}" --no-git-tag-version
 
             - name: Build
               run: npm run build
 
             - name: Publish
+              if: startsWith(github.ref, 'refs/tags/')
               run: npm publish --access public
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_PASSWORD }}
+
+            - name: Publish prerelease
+              if: github.ref == 'refs/heads/main'
+              run: npm publish --access public --tag next
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_PASSWORD }}
+
+            - name: Write version back to main
+              if: startsWith(github.ref, 'refs/tags/')
+              working-directory: ${{ github.workspace }}
+              run: |
+                  TAG="${GITHUB_REF_NAME#v}"
+                  git config user.name "github-actions[bot]"
+                  git config user.email "github-actions[bot]@users.noreply.github.com"
+                  git fetch origin main
+                  git checkout main
+                  cd Moda.Web/src/Moda.Mcp
+                  npm version "$TAG" --no-git-tag-version
+                  cd ${{ github.workspace }}
+                  git add Moda.Web/src/Moda.Mcp/package.json
+                  git commit -m "chore: sync package version to $TAG [skip ci]"
+                  git push origin main
