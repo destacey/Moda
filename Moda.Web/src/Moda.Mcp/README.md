@@ -44,6 +44,19 @@ CLI args enable the `inputs` pattern, which prompts for values at connection tim
 
 ```json
 {
+  "inputs": [
+    {
+      "id": "modaBaseUrl",
+      "description": "Moda base URL",
+      "type": "promptString"
+    },
+    {
+      "id": "modaApiKey",
+      "description": "Moda API key (Personal Access Token)",
+      "type": "promptString",
+      "password": true
+    }
+  ],
   "servers": {
     "moda": {
       "type": "stdio",
@@ -52,19 +65,6 @@ CLI args enable the `inputs` pattern, which prompts for values at connection tim
         "-y", "@modanpm/moda-mcp",
         "--base-url", "${input:modaBaseUrl}",
         "--api-key",  "${input:modaApiKey}"
-      ],
-      "inputs": [
-        {
-          "id": "modaBaseUrl",
-          "description": "Moda base URL",
-          "type": "promptString"
-        },
-        {
-          "id": "modaApiKey",
-          "description": "Moda API key (Personal Access Token)",
-          "type": "promptString",
-          "password": true
-        }
       ]
     }
   }
