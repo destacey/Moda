@@ -9,6 +9,7 @@ import {
   WorkItemListDto,
   ChangeProjectProgramRequest,
   ChangeProjectKeyRequest,
+  AssignProjectLifecycleRequest,
 } from '@/src/services/moda-api'
 import { QueryTags } from '../query-tags'
 import { BaseOptionType } from 'antd/es/select'
@@ -300,6 +301,29 @@ export const projectsApi = apiSlice.injectEndpoints({
         }
       },
     }),
+
+    assignProjectLifecycle: builder.mutation<
+      void,
+      { id: string; request: AssignProjectLifecycleRequest; cacheKey: string }
+    >({
+      queryFn: async ({ id, request }) => {
+        try {
+          const data = await getProjectsClient().assignLifecycle(id, request)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, { cacheKey }) => {
+        return [
+          { type: QueryTags.Project, id: 'LIST' },
+          { type: QueryTags.Project, id: cacheKey },
+          { type: QueryTags.PortfolioProjects, id: 'LIST' },
+          { type: QueryTags.ProgramProjects, id: 'LIST' },
+        ]
+      },
+    }),
   }),
 })
 
@@ -318,4 +342,5 @@ export const {
   useGetProjectWorkItemsQuery,
   useGetProjectOptionsQuery,
   useGetProjectStatusOptionsQuery,
+  useAssignProjectLifecycleMutation,
 } = projectsApi

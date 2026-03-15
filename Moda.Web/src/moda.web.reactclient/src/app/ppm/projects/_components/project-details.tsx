@@ -5,7 +5,7 @@ import LinksCard from '@/src/components/common/links/links-card'
 import { MarkdownRenderer } from '@/src/components/common/markdown'
 import { ProjectDetailsDto } from '@/src/services/moda-api'
 import { getSortedNames } from '@/src/utils'
-import { Descriptions, Flex } from 'antd'
+import { Descriptions, Flex, Tooltip } from 'antd'
 import Link from 'next/link'
 import { FC } from 'react'
 
@@ -65,6 +65,15 @@ const ProjectDetails: FC<ProjectDetailsProps> = ({
           </Item>
           <Item label="Expenditure Category">
             {project.expenditureCategory.name}
+          </Item>
+          <Item label="Lifecycle">
+            {project.projectLifecycle ? (
+              <Tooltip title={project.projectLifecycle.description}>
+                {project.projectLifecycle.name}
+              </Tooltip>
+            ) : (
+              'Not lifecycle assigned'
+            )}
           </Item>
           <Item label="Sponsors">{sponsorNames}</Item>
           <Item label="Owners">{ownerNames}</Item>

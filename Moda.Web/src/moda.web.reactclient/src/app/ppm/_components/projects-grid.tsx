@@ -92,6 +92,10 @@ const ProjectsGrid: React.FC<ProjectsGridProps> = (
         headerName: 'Strategic Themes',
         valueGetter: (params) => getSortedNames(params.data.strategicThemes),
       },
+      {
+        field: 'projectLifecycle.name',
+        headerName: 'Lifecycle',
+      },
     ],
     [props.hidePortfolio, props.hideProgram],
   )

@@ -82,7 +82,7 @@ public sealed record ProjectDetailsDto : IMapFrom<Project>
     /// <summary>
     /// The project lifecycle assigned to this project.
     /// </summary>
-    public NavigationDto? ProjectLifecycle { get; set; }
+    public DescriptiveNavigationDto? ProjectLifecycle { get; set; }
 
     /// <summary>
     /// The project phases, ordered by display order.
@@ -104,7 +104,7 @@ public sealed record ProjectDetailsDto : IMapFrom<Project>
             .Map(dest => dest.ProjectManagers, src => src.Roles.Where(r => r.Role == ProjectRole.Manager).Select(x => EmployeeNavigationDto.From(x.Employee!)).ToList())
             .Map(dest => dest.ProjectMembers, src => src.Roles.Where(r => r.Role == ProjectRole.Member).Select(x => EmployeeNavigationDto.From(x.Employee!)).ToList())
             .Map(dest => dest.StrategicThemes, src => src.StrategicThemeTags.Select(x => NavigationDto.Create(x.StrategicTheme!.Id, x.StrategicTheme.Key, x.StrategicTheme.Name)).ToList())
-            .Map(dest => dest.ProjectLifecycle, src => src.ProjectLifecycle != null ? NavigationDto.Create(src.ProjectLifecycle.Id, src.ProjectLifecycle.Key, src.ProjectLifecycle.Name) : null)
+            .Map(dest => dest.ProjectLifecycle, src => src.ProjectLifecycle != null ? DescriptiveNavigationDto.Create(src.ProjectLifecycle.Id, src.ProjectLifecycle.Key, src.ProjectLifecycle.Name, src.ProjectLifecycle.Description) : null)
             .Map(dest => dest.Phases, src => src.Phases.OrderBy(p => p.Order));
     }
 }

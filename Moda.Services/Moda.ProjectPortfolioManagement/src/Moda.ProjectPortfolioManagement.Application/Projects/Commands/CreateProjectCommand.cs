@@ -6,7 +6,7 @@ using Moda.ProjectPortfolioManagement.Domain.Enums;
 
 namespace Moda.ProjectPortfolioManagement.Application.Projects.Commands;
 
-public sealed record CreateProjectCommand(string Name, string Description, ProjectKey Key, int ExpenditureCategoryId, LocalDateRange? DateRange, Guid PortfolioId, Guid? ProgramId, List<Guid>? SponsorIds, List<Guid>? OwnerIds, List<Guid>? ManagerIds, List<Guid>? MemberIds, List<Guid>? StrategicThemeIds) : ICommand<ProjectIdAndKey>;
+public sealed record CreateProjectCommand(string Name, string Description, ProjectKey Key, int ExpenditureCategoryId, LocalDateRange? DateRange, Guid PortfolioId, Guid? ProgramId, Guid? ProjectLifecycleId, List<Guid>? SponsorIds, List<Guid>? OwnerIds, List<Guid>? ManagerIds, List<Guid>? MemberIds, List<Guid>? StrategicThemeIds) : ICommand<ProjectIdAndKey>;
 
 public sealed class CreateProjectCommandValidator : AbstractValidator<CreateProjectCommand>
 {
@@ -33,6 +33,10 @@ public sealed class CreateProjectCommandValidator : AbstractValidator<CreateProj
         RuleFor(x => x.ProgramId)
             .Must(id => id == null || id != Guid.Empty)
             .WithMessage("ProgramId cannot be an empty GUID.");
+
+        RuleFor(x => x.ProjectLifecycleId)
+            .Must(id => id == null || id != Guid.Empty)
+            .WithMessage("ProjectLifecycleId cannot be an empty GUID.");
 
         RuleFor(x => x.SponsorIds)
             .Must(ids => ids == null || ids.All(id => id != Guid.Empty))
@@ -135,6 +139,28 @@ internal sealed class CreateProjectCommandHandler(
             await _projectPortfolioManagementDbContext.SaveChangesAsync(cancellationToken);
 
             var project = createResult.Value;
+
+            if (request.ProjectLifecycleId.HasValue)
+            {
+                var lifecycle = await _projectPortfolioManagementDbContext.ProjectLifecycles
+                    .Include(l => l.Phases)
+                    .FirstOrDefaultAsync(l => l.Id == request.ProjectLifecycleId.Value, cancellationToken);
+
+                if (lifecycle is null)
+                {
+                    _logger.LogInformation("Project Lifecycle {LifecycleId} not found.", request.ProjectLifecycleId);
+                    return Result.Failure<ProjectIdAndKey>("Project Lifecycle not found.");
+                }
+
+                var assignResult = project.AssignLifecycle(lifecycle);
+                if (assignResult.IsFailure)
+                {
+                    _logger.LogWarning("Unable to assign lifecycle to project {ProjectId}. Error: {Error}", project.Id, assignResult.Error);
+                    return Result.Failure<ProjectIdAndKey>(assignResult.Error);
+                }
+
+                await _projectPortfolioManagementDbContext.SaveChangesAsync(cancellationToken);
+            }
 
             _logger.LogInformation("Project {ProjectId} created with Key {ProjectKey}.", project.Id, project.Key.Value);
 

@@ -23293,8 +23293,18 @@ export interface ProjectDetailsDto {
     projectManagers: EmployeeNavigationDto[];
     projectMembers: EmployeeNavigationDto[];
     strategicThemes: NavigationDto[];
-    projectLifecycle?: NavigationDto | undefined;
+    projectLifecycle?: DescriptiveNavigationDto | undefined;
     phases: ProjectPhaseListDto[];
+}
+
+export interface DescriptiveNavigationDtoOfGuidAndInteger {
+    id: string;
+    key: number;
+    name: string;
+    description?: string | undefined;
+}
+
+export interface DescriptiveNavigationDto extends DescriptiveNavigationDtoOfGuidAndInteger {
 }
 
 export interface CreateProjectRequest {
@@ -23314,6 +23324,8 @@ export interface CreateProjectRequest {
     portfolioId: string;
     /** The ID of the program to which this project belongs (optional). */
     programId?: string | undefined;
+    /** The ID of the project lifecycle to assign (optional). */
+    projectLifecycleId?: string | undefined;
     /** The sponsors of the project. */
     sponsorIds?: string[] | undefined;
     /** The owners of the project. */
