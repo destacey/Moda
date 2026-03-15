@@ -53,6 +53,7 @@ public static class ApplicationResource
     public const string Programs = nameof(Programs);
     public const string PpmStrategicThemes = nameof(PpmStrategicThemes);
     public const string StrategicInitiatives = nameof(StrategicInitiatives);
+    public const string ProjectLifecycles = nameof(ProjectLifecycles);
 
     public const string StrategicThemes = nameof(StrategicThemes);
     public const string Strategies = nameof(Strategies);
@@ -220,6 +221,11 @@ public static class ApplicationPermissions
         new ("Create Strategic Initiatives", ApplicationAction.Create, ApplicationResource.StrategicInitiatives, PpmCategory),
         new ("Update Strategic Initiatives", ApplicationAction.Update, ApplicationResource.StrategicInitiatives, PpmCategory),
         new ("Delete Strategic Initiatives", ApplicationAction.Delete, ApplicationResource.StrategicInitiatives, PpmCategory),
+
+        new ("View Project Lifecycles", ApplicationAction.View, ApplicationResource.ProjectLifecycles, PpmCategory),
+        new ("Create Project Lifecycles", ApplicationAction.Create, ApplicationResource.ProjectLifecycles, PpmCategory),
+        new ("Update Project Lifecycles", ApplicationAction.Update, ApplicationResource.ProjectLifecycles, PpmCategory),
+        new ("Delete Project Lifecycles", ApplicationAction.Delete, ApplicationResource.ProjectLifecycles, PpmCategory),
     ];
 
     private const string StrategicManagementCategory = "Strategic Management";

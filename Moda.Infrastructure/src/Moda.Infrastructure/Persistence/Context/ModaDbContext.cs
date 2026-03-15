@@ -110,6 +110,8 @@ public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IFeatureMa
     public DbSet<PpmTeam> PpmTeams => Set<PpmTeam>();
     public DbSet<PpmStrategicTheme> PpmStrategicThemes => Set<PpmStrategicTheme>();
     public DbSet<StrategicInitiative> StrategicInitiatives => Set<StrategicInitiative>();
+    public DbSet<ProjectLifecycle> ProjectLifecycles => Set<ProjectLifecycle>();
+    public DbSet<ProjectPhase> ProjectPhases => Set<ProjectPhase>();
 
     #endregion IProjectPortfolioManagementDbContext
 

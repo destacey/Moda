@@ -4,6 +4,7 @@ using Moda.ProjectPortfolioManagement.Application.Projects.Dtos;
 using Moda.ProjectPortfolioManagement.Application.Projects.Queries;
 using Moda.ProjectPortfolioManagement.Domain.Enums;
 using Moda.Web.Api.Extensions;
+using Moda.Web.Api.Models.Ppm.ProjectLifecycles;
 using Moda.Web.Api.Models.Ppm.Projects;
 using Moda.Work.Application.WorkItems.Dtos;
 using Moda.Work.Application.WorkItems.Queries;
@@ -214,6 +215,60 @@ public class ProjectsController(ILogger<ProjectsController> logger, ISender send
 
         return result.IsSuccess
             ? Ok(result.Value.OrderBy(w => w.StackRank))
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpPost("{id}/lifecycle")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Projects)]
+    [OpenApiOperation("Assign a lifecycle to a project.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> AssignLifecycle(Guid id, [FromBody] AssignProjectLifecycleRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(request.ToCommand(id), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpGet("{id}/phases")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Projects)]
+    [OpenApiOperation("Get phases for a project.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IEnumerable<ProjectPhaseListDto>>> GetProjectPhases(Guid id, CancellationToken cancellationToken)
+    {
+        var phases = await _sender.Send(new GetProjectPhasesQuery(id), cancellationToken);
+
+        return Ok(phases);
+    }
+
+    [HttpGet("{id}/phases/{phaseId}")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Projects)]
+    [OpenApiOperation("Get project phase details.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<ProjectPhaseDetailsDto>> GetProjectPhase(Guid id, Guid phaseId, CancellationToken cancellationToken)
+    {
+        var phase = await _sender.Send(new GetProjectPhaseQuery(id, phaseId), cancellationToken);
+
+        return phase is not null
+            ? Ok(phase)
+            : NotFound();
+    }
+
+    [HttpPut("{id}/phases/{phaseId}")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Projects)]
+    [OpenApiOperation("Update a project phase.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> UpdateProjectPhase(Guid id, Guid phaseId, [FromBody] UpdateProjectPhaseRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(request.ToCommand(id, phaseId), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
             : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 }

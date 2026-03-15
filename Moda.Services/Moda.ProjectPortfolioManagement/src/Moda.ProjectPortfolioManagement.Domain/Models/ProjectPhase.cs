@@ -11,7 +11,7 @@ namespace Moda.ProjectPortfolioManagement.Domain.Models;
 /// </summary>
 public sealed class ProjectPhase : BaseEntity<Guid>, ISystemAuditable
 {
-    private readonly HashSet<RoleAssignment<TaskRole>> _roles = [];
+    private readonly HashSet<RoleAssignment<ProjectPhaseRole>> _roles = [];
 
     private ProjectPhase() { }
 
@@ -78,7 +78,7 @@ public sealed class ProjectPhase : BaseEntity<Guid>, ISystemAuditable
     /// <summary>
     /// The role assignments for this phase (e.g., assignees, reviewers).
     /// </summary>
-    public IReadOnlyCollection<RoleAssignment<TaskRole>> Roles => _roles;
+    public IReadOnlyCollection<RoleAssignment<ProjectPhaseRole>> Roles => _roles;
 
     /// <summary>
     /// Updates the description of the phase.
@@ -121,7 +121,7 @@ public sealed class ProjectPhase : BaseEntity<Guid>, ISystemAuditable
     /// <summary>
     /// Updates all role assignments for this phase.
     /// </summary>
-    public Result UpdateRoles(Dictionary<TaskRole, HashSet<Guid>> updatedRoles)
+    public Result UpdateRoles(Dictionary<ProjectPhaseRole, HashSet<Guid>> updatedRoles)
     {
         return RoleManager.UpdateRoles(_roles, Id, updatedRoles);
     }
