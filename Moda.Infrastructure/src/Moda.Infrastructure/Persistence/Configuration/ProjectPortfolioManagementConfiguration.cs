@@ -388,6 +388,7 @@ public class ProjectLifecycleConfiguration : IEntityTypeConfiguration<ProjectLif
 
         builder.HasIndex(l => l.State);
 
+        builder.Property(l => l.Id).ValueGeneratedNever();
         builder.Property(l => l.Key).ValueGeneratedOnAdd();
         builder.Property(l => l.Name).HasMaxLength(128).IsRequired();
         builder.Property(l => l.Description).HasMaxLength(1024).IsRequired();
@@ -415,6 +416,7 @@ public class ProjectLifecyclePhaseConfiguration : IEntityTypeConfiguration<Proje
 
         builder.HasIndex(p => p.ProjectLifecycleId);
 
+        builder.Property(p => p.Id).ValueGeneratedNever();
         builder.Property(p => p.Name).HasMaxLength(32).IsRequired();
         builder.Property(p => p.Description).HasMaxLength(1024).IsRequired();
         builder.Property(p => p.Order).IsRequired();
@@ -432,6 +434,7 @@ public class ProjectPhaseConfiguration : IEntityTypeConfiguration<ProjectPhase>
         builder.HasIndex(p => p.ProjectId);
         builder.HasIndex(p => p.ProjectLifecyclePhaseId);
 
+        builder.Property(p => p.Id).ValueGeneratedNever();
         builder.Property(p => p.Name).HasMaxLength(32).IsRequired();
         builder.Property(p => p.Description).HasMaxLength(1024).IsRequired();
         builder.Property(p => p.Order).IsRequired();

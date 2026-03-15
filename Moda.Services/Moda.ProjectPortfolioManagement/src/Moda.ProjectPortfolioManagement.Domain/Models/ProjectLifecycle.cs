@@ -16,6 +16,7 @@ public sealed class ProjectLifecycle : BaseEntity<Guid>, ISystemAuditable, IHasI
 
     private ProjectLifecycle(string name, string description)
     {
+        Id = Guid.CreateVersion7();
         Name = name;
         Description = description;
         State = ProjectLifecycleState.Proposed;
