@@ -73,8 +73,6 @@ jobs:
                   else
                       npm publish --access public
                   fi
-              env:
-                  NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
             - name: Tag and reconcile to main
               if: steps.version.outputs.is_prerelease == 'false'
