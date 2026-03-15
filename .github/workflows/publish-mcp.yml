@@ -4,11 +4,25 @@ permissions:
     contents: write
 
 on:
-    push:
-        tags:
-            - "v*"
-        branches:
-            - main
+    workflow_dispatch:
+        inputs:
+            bump_type:
+                description: "Version bump type"
+                required: true
+                type: choice
+                default: minor
+                options:
+                    - patch
+                    - minor
+                    - major
+                    - premajor
+                    - preminor
+                    - prepatch
+                    - prerelease
+            preid:
+                description: "Prerelease identifier (only used for pre* bump types)"
+                required: false
+                default: next
 
 jobs:
     publish:
@@ -18,8 +32,6 @@ jobs:
                 working-directory: Moda.Web/src/Moda.Mcp
         steps:
             - uses: actions/checkout@v4
-              with:
-                  fetch-depth: 0
 
             - uses: actions/setup-node@v4
               with:
@@ -29,46 +41,45 @@ jobs:
             - name: Install dependencies
               run: npm ci
 
-            - name: Set version from tag
-              if: startsWith(github.ref, 'refs/tags/')
+            - name: Bump version
+              id: version
               run: |
-                  TAG="${GITHUB_REF_NAME#v}"
-                  npm version "$TAG" --no-git-tag-version
-
-            - name: Set prerelease version for main
-              if: github.ref == 'refs/heads/main'
-              run: |
-                  LATEST_TAG=$(git describe --tags --abbrev=0)
-                  BASE_VERSION="${LATEST_TAG#v}"
-                  npm version "${BASE_VERSION}-dev.${{ github.run_number }}" --no-git-tag-version
+                  BUMP="${{ inputs.bump_type }}"
+                  if [[ "$BUMP" == pre* ]]; then
+                      npm version "$BUMP" --preid "${{ inputs.preid }}" --no-git-tag-version
+                  else
+                      npm version "$BUMP" --no-git-tag-version
+                  fi
+                  VERSION=$(node -p "require('./package.json').version")
+                  echo "version=${VERSION}" >> $GITHUB_OUTPUT
+                  if [[ "$VERSION" == *"-"* ]]; then
+                      echo "is_prerelease=true" >> $GITHUB_OUTPUT
+                  else
+                      echo "is_prerelease=false" >> $GITHUB_OUTPUT
+                  fi
 
             - name: Build
               run: npm run build
 
             - name: Publish
-              if: startsWith(github.ref, 'refs/tags/')
-              run: npm publish --access public
+              run: |
+                  if [[ "${{ steps.version.outputs.is_prerelease }}" == "true" ]]; then
+                      npm publish --access public --tag next
+                  else
+                      npm publish --access public
+                  fi
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_PASSWORD }}
 
-            - name: Publish prerelease
-              if: github.ref == 'refs/heads/main'
-              run: npm publish --access public --tag next
-              env:
-                  NODE_AUTH_TOKEN: ${{ secrets.NPM_PASSWORD }}
-
-            - name: Write version back to main
-              if: startsWith(github.ref, 'refs/tags/')
+            - name: Tag and reconcile to main
+              if: steps.version.outputs.is_prerelease == 'false'
               working-directory: ${{ github.workspace }}
               run: |
-                  TAG="${GITHUB_REF_NAME#v}"
+                  VERSION="${{ steps.version.outputs.version }}"
                   git config user.name "github-actions[bot]"
                   git config user.email "github-actions[bot]@users.noreply.github.com"
-                  git fetch origin main
-                  git checkout main
-                  cd Moda.Web/src/Moda.Mcp
-                  npm version "$TAG" --no-git-tag-version
-                  cd ${{ github.workspace }}
                   git add Moda.Web/src/Moda.Mcp/package.json
-                  git commit -m "chore: sync package version to $TAG [skip ci]"
-                  git push origin main
+                  git commit -m "chore: bump mcp package version to ${VERSION} [skip ci]"
+                  git push origin HEAD:main
+                  git tag "mcp-v${VERSION}"
+                  git push origin "mcp-v${VERSION}"

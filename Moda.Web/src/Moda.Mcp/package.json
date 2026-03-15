@@ -1,6 +1,6 @@
 {
   "name": "@modanpm/moda-mcp",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "MCP server for the Moda work management API",
   "type": "module",
   "main": "build/index.js",
