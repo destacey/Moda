@@ -2,6 +2,7 @@ name: Publish MCP to npm
 
 permissions:
     contents: write
+    id-token: write
 
 on:
     workflow_dispatch:
@@ -27,11 +28,15 @@ on:
 jobs:
     publish:
         runs-on: ubuntu-latest
+        if: github.ref == 'refs/heads/main'
         defaults:
             run:
                 working-directory: Moda.Web/src/Moda.Mcp
         steps:
             - uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+                  ref: main
 
             - uses: actions/setup-node@v4
               with:
@@ -46,9 +51,9 @@ jobs:
               run: |
                   BUMP="${{ inputs.bump_type }}"
                   if [[ "$BUMP" == pre* ]]; then
-                      npm version "$BUMP" --preid "${{ inputs.preid }}" --no-git-tag-version
+                      npm version "$BUMP" --preid "${{ inputs.preid }}" --no-git-tag-version --no-package-lock
                   else
-                      npm version "$BUMP" --no-git-tag-version
+                      npm version "$BUMP" --no-git-tag-version --no-package-lock
                   fi
                   VERSION=$(node -p "require('./package.json').version")
                   echo "version=${VERSION}" >> $GITHUB_OUTPUT
@@ -69,7 +74,7 @@ jobs:
                       npm publish --access public
                   fi
               env:
-                  NODE_AUTH_TOKEN: ${{ secrets.NPM_PASSWORD }}
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
             - name: Tag and reconcile to main
               if: steps.version.outputs.is_prerelease == 'false'
