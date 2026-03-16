@@ -37,5 +37,5 @@ description: Guides agents working with Moda Teams via the Moda MCP server. Use 
 
 ### Common usage patterns
 
-- **PI team filters** — `PlanningIntervals_GetTeams`, `PlanningIntervals_GetPredictability`, and related endpoints take a `teamId` (UUID from the PI context, not the organization team integer ID). Use `PlanningIntervals_GetTeams` for those — reserve `Teams_GetTeams` for organization-level team lookups.
+- **PI team filters** — many PI endpoints (e.g. `PlanningIntervals_GetObjectives`, `PlanningIntervals_GetRisks`) accept an optional `teamId` (UUID from the PI context, not the organization team integer ID). To get predictability for a single team, use `PlanningIntervals_GetTeamPredictability` with a `teamId`; `PlanningIntervals_GetPredictability` returns all teams and does not accept a `teamId`. Use `PlanningIntervals_GetTeams` to resolve PI team UUIDs — reserve `Teams_GetTeams` for organization-level team lookups.
 - **Project team roles** — `sponsorIds`, `ownerIds`, `managerIds`, `memberIds` on projects take user UUIDs, not team IDs. Use `Users_GetUsers` to resolve those.

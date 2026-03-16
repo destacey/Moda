@@ -36,5 +36,5 @@ description: Guides agents working with Moda Users via the Moda MCP server. Use 
 ### Common usage patterns
 
 - **Task assignees** — `Tasks_CreateProjectTask` and `Tasks_UpdateProjectTask` accept `assigneeIds` (UUID array). Resolve names → UUIDs with `Users_GetUsers` before calling.
-- **Project team roles** — `sponsorIds`, `ownerIds`, `managerIds`, `memberIds` on `Projects_Create` / `Projects_Update` all take UUID arrays. Use `Users_GetUsers` to resolve.
+- **Project team roles** — project team role fields (`sponsorIds`, `ownerIds`, `managerIds`, `memberIds`) take UUID arrays. Use `Users_GetUsers` to resolve user names → UUIDs before passing them to any tool that accepts these fields.
 - When multiple users need resolving, make a single `Users_GetUsers` call and filter the result — do not make individual `Users_GetUser` calls per person.

@@ -16,7 +16,7 @@ export const definitions: [string, McpToolDefinition][] = [
   ['Users_GetUser', {
     name: 'Users_GetUser',
     description: `Get a user's details.`,
-    inputSchema: {"type":"object","properties":{"id":{"type":"string"}},"required":["id"]},
+    inputSchema: {"type":"object","properties":{"id":{"type":"string","format":"uuid"}},"required":["id"]},
     method: 'get',
     pathTemplate: '/api/user-management/users/{id}',
     executionParameters: [{"name":"id","in":"path"}],

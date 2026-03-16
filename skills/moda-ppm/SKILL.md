@@ -49,10 +49,10 @@ Portfolio
 
 - Scoped to a project; accessed via `projectIdOrKey` (UUID or string key)
 - Has a **type** (call `Tasks_GetTaskTypes` to resolve), **status** (`Tasks_GetTaskStatuses`), and **priority** (`Tasks_GetTaskPriorities`)
-- Three task types exist: regular tasks, subtasks, and milestones — behavior differs slightly per type:
-  - Regular tasks and subtasks: use `plannedStart`/`plannedEnd` and `progress` (0.0–100.0)
+- Two task types: `Task` and `Milestone` — behavior differs per type:
+  - Tasks: use `plannedStart`/`plannedEnd` and `progress` (0.0–100.0); can be nested under another task via `parentId` (this is how subtasks are modelled, not a separate type)
   - Milestones: use `plannedDate` instead; `progress` is not applicable
-- Supports parent/child nesting via `parentId` (UUID of the parent task)
+- Supports parent/child nesting via `parentId` (UUID of the parent task); nesting does not change the `typeId`
 - `assigneeIds` — optional UUID array; resolve user names → UUIDs with `Users_GetUsers`
 - `estimatedEffortHours` — optional decimal
 - Dependencies are finish-to-start: predecessor must complete before successor starts
@@ -109,7 +109,7 @@ Required fields: `name`, `typeId`, `statusId`, `priorityId`
    - `Tasks_GetTaskStatuses` → `statusId`
    - `Tasks_GetTaskPriorities` → `priorityId`
 2. For assignees, resolve user name → UUID with `Users_GetUsers`.
-3. For subtasks, provide `parentId` (UUID of the parent task).
+3. To nest a task under another (subtask pattern), provide `parentId` (UUID of the parent task) — the `typeId` stays `Task`.
 4. For milestones: use `plannedDate`; omit `plannedStart`/`plannedEnd` and `progress`.
 5. Call `Tasks_CreateProjectTask` with the assembled `requestBody`.
 
