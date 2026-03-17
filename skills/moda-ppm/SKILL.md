@@ -1,17 +1,18 @@
 ---
 name: moda-ppm
-description: Guides agents working with Moda Portfolio, Program, and Project management via the Moda MCP server. Use when looking up, creating, updating, or transitioning projects, programs, or portfolios.
+description: Guides agents working with Moda Portfolio, Program, Project, and Task management via the Moda MCP server. Use when looking up portfolios, programs, or projects, or when creating, updating, or managing tasks within a project.
 ---
 
-# Moda PPM (Portfolio / Program / Project Management)
+# Moda PPM (Portfolio / Program / Project / Task Management)
 
 ## When to use
 
 - Finding or listing portfolios, programs, or projects
-- Creating or updating a project
-- Transitioning a project through its lifecycle (approve, activate, complete)
 - Understanding what projects or programs are in a portfolio
-- Changing a project's program assignment or key
+- Listing, creating, updating, or deleting tasks within a project
+- Managing task hierarchies, dependencies, or the critical path
+
+> **Note:** Portfolios, programs, and projects are **read-only** via MCP — only GET and LIST operations are exposed. Task management (create, update, delete) is fully supported.
 
 ---
 
@@ -23,7 +24,9 @@ description: Guides agents working with Moda Portfolio, Program, and Project man
 Portfolio
 └── Program (optional grouping)
     └── Project
-        └── Work Items
+        ├── Work Items
+        └── Tasks
+            └── Subtasks (nested via parentId)
 ```
 
 ### Portfolio
@@ -41,17 +44,19 @@ Portfolio
 - Must belong to a portfolio; optionally belongs to a program
 - Has a unique string `key` (2–20 uppercase alphanumeric, e.g. `MYPROJ`)
 - Has a status (integer enum — call `Projects_GetStatuses` to resolve values)
-- Team roles: `sponsorIds`, `ownerIds`, `managerIds`, `memberIds` (UUID arrays, all optional)
-- `expenditureCategoryId` — required integer on create; ask the user if unknown
-- `strategicThemeIds` — optional UUID array
 
-**Lifecycle — action endpoints, not a patchable status field:**
+### Task
 
-```
-Proposed → Approved → Active → Completed
-         ↑           ↑         ↑
-  Projects_Approve  Projects_Activate  Projects_Complete
-```
+- Scoped to a project; accessed via `projectIdOrKey` (UUID or string key)
+- Has a **type** (call `Tasks_GetTaskTypes` to resolve), **status** (`Tasks_GetTaskStatuses`), and **priority** (`Tasks_GetTaskPriorities`)
+- Two task types: `Task` and `Milestone` — behavior differs per type:
+  - Tasks: use `plannedStart`/`plannedEnd` and `progress` (0.0–100.0); can be nested under another task via `parentId` (this is how subtasks are modelled, not a separate type)
+  - Milestones: use `plannedDate` instead; `progress` is not applicable
+- Supports parent/child nesting via `parentId` (UUID of the parent task); nesting does not change the `typeId`
+- `assigneeIds` — optional UUID array; resolve user names → UUIDs with `Users_GetUsers`
+- `estimatedEffortHours` — optional decimal
+- Dependencies are finish-to-start: predecessor must complete before successor starts
+- `taskIdOrKey` — GET endpoints accept either a UUID or a string key
 
 ### Common patterns
 
@@ -69,44 +74,54 @@ Proposed → Approved → Active → Completed
 | Goal | Tool |
 |---|---|
 | All portfolios (optionally by status) | `Portfolios_GetPortfolios` |
+| Portfolio details | `Portfolios_GetPortfolio` |
 | Portfolio name → UUID lookup | `Portfolios_GetPortfolioOptions` |
 | Programs in a portfolio | `Portfolios_GetPortfolioPrograms` |
 | Projects in a portfolio | `Portfolios_GetPortfolioProjects` |
+| All programs (cross-portfolio) | `Programs_GetPrograms` |
 | Projects in a program | `Programs_GetProgramProjects` |
 | All projects (cross-portfolio) | `Projects_GetProjects` |
+| Project details | `Projects_GetProject` |
 
 Before filtering by status, call `Projects_GetStatuses` (or `Programs_GetProgramStatuses` / `Portfolios_GetPortfolioStatuses`) to resolve the integer enum values.
-
-### Creating a project
-
-Required fields: `name`, `description`, `key`, `expenditureCategoryId`, `portfolioId`
-
-1. If `portfolioId` is not known, call `Portfolios_GetPortfolioOptions` to resolve portfolio name → UUID.
-2. `key` must be 2–20 uppercase alphanumeric characters (e.g. `ALPHA`, `PROJ01`). Ask the user if not provided.
-3. `expenditureCategoryId` is a required integer. If unknown, ask the user — there is no dedicated lookup endpoint exposed via MCP.
-4. Optional: `programId`, `start`, `end` (ISO date strings `YYYY-MM-DD`), `sponsorIds`, `ownerIds`, `managerIds`, `memberIds`, `strategicThemeIds` (all UUIDs).
-5. Call `Projects_Create` with the assembled `requestBody`.
-
-### Updating a project
-
-`Projects_Update` updates core fields: `name`, `description`, `expenditureCategoryId`, `start`, `end`, and team role arrays.
-
-**These are separate endpoints — not part of `Projects_Update`:**
-
-- Change the project's `key`: `Projects_ChangeKey` with `{ key: "NEWKEY" }`
-- Change or remove the program: `Projects_ChangeProgram` with `{ programId: "<uuid>" }` or `{ programId: null }` to remove
-
-### Project lifecycle transitions
-
-Projects move through states via dedicated action endpoints. You cannot patch the status field directly.
-
-```
-Proposed → Approved   →   Active   →   Completed
-         Projects_Approve  Projects_Activate  Projects_Complete
-```
-
-Each action endpoint takes only the project `id` (UUID). Resolve it first with `Projects_GetProject` or `Projects_GetProjects` if needed.
 
 ### Getting work items for a project
 
 `Projects_GetWorkItems` — takes the project `id` (UUID, not idOrKey).
+
+### Listing and navigating tasks
+
+| Goal | Tool | Notes |
+|---|---|---|
+| All tasks in a project | `Tasks_GetProjectTasks` | Optional `status` (int) and `parentId` (UUID) filters |
+| Task hierarchy with WBS codes | `Tasks_GetProjectTaskTree` | Returns nested structure |
+| Single task details | `Tasks_GetProjectTask` | `taskIdOrKey` accepts UUID or string key |
+| Critical path | `Tasks_GetCriticalPath` | Returns ordered list of task UUIDs |
+
+Before filtering by status, call `Tasks_GetTaskStatuses` to resolve the integer enum values.
+
+### Creating a task
+
+Required fields: `name`, `typeId`, `statusId`, `priorityId`
+
+1. Resolve reference values first (can be done in parallel):
+   - `Tasks_GetTaskTypes` → `typeId`
+   - `Tasks_GetTaskStatuses` → `statusId`
+   - `Tasks_GetTaskPriorities` → `priorityId`
+2. For assignees, resolve user name → UUID with `Users_GetUsers`.
+3. To nest a task under another (subtask pattern), provide `parentId` (UUID of the parent task) — the `typeId` stays `Task`.
+4. For milestones: use `plannedDate`; omit `plannedStart`/`plannedEnd` and `progress`.
+5. Call `Tasks_CreateProjectTask` with the assembled `requestBody`.
+
+### Updating a task
+
+`Tasks_UpdateProjectTask` — requires `id` (UUID), `name`, `statusId`, `priorityId` in the request body. All other fields are optional patches.
+
+### Deleting a task
+
+`Tasks_DeleteProjectTask` — requires `projectIdOrKey` and `id` (UUID).
+
+### Managing dependencies
+
+- **Add** (finish-to-start): `Tasks_AddTaskDependency` with `{ predecessorId, successorId }` — both UUIDs. Also pass the predecessor task's `id` as the path parameter.
+- **Remove**: `Tasks_RemoveTaskDependency` with path params `id` (predecessor UUID) and `successorId`.

@@ -89,6 +89,38 @@ Or with environment variables directly:
 }
 ```
 
+### Claude Code
+
+Claude Code doesn't support the `inputs` prompt pattern, so the recommended way to keep your PAT out of config files is to store it in an environment variable in your shell profile and reference it in the MCP config.
+
+Add to `~/.zshrc` / `~/.bashrc` (or equivalent):
+
+```bash
+export MODA_API_BASE_URL="https://your-moda-instance.com"
+export MODA_API_KEY="your-personal-access-token"
+```
+
+Then register the server via the CLI (values are read from your environment at connection time):
+
+```bash
+claude mcp add moda -- npx -y @modanpm/moda-mcp
+```
+
+Or add it to a project-level `.mcp.json` that reads from the same environment variables:
+
+```json
+{
+  "mcpServers": {
+    "moda": {
+      "command": "npx",
+      "args": ["-y", "@modanpm/moda-mcp"]
+    }
+  }
+}
+```
+
+Because the server reads `MODA_API_BASE_URL` and `MODA_API_KEY` from the environment automatically, no credentials appear in any config file.
+
 ### Global install
 
 ```bash
@@ -127,7 +159,8 @@ Once installed, activate a skill in Claude Code with `/moda-ppm`, `/moda-pi`, or
 | --- | --- |
 | **Portfolios** | List, get details, get programs, get projects |
 | **Programs** | List, get details, get projects |
-| **Projects** | List, get details, create, update, approve, activate, complete, change program/key |
+| **Projects** | List, get details |
+| **Tasks** | List, get details, get tree, get critical path, get types/statuses/priorities, create, update, delete, add/remove dependencies |
 
 ### Planning
 
@@ -135,6 +168,13 @@ Once installed, activate a skill in Claude Code with `/moda-ppm`, `/moda-pi`, or
 | --- | --- |
 | **Planning Intervals** | List, get details, calendar, predictability, teams, iterations, objectives, risks |
 | **Roadmaps** | List, get details, get items and activities |
+
+### Organization
+
+| Category | Operations |
+| --- | --- |
+| **Teams** | List, get details |
+| **Users** | List, get details |
 
 ## Links
 
