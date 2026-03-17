@@ -12,36 +12,27 @@ public class FeatureFlagSeeder : ICustomSeeder
         if (definitions.Length == 0)
             return;
 
-        var existingFlags = await dbContext.FeatureFlags
+        var existingNames = await dbContext.FeatureFlags
+            .Select(f => f.Name)
             .ToListAsync(cancellationToken);
 
-        var existingByName = existingFlags.ToDictionary(f => f.Name, StringComparer.OrdinalIgnoreCase);
-        var hasChanges = false;
+        var existingNamesSet = new HashSet<string>(existingNames, StringComparer.OrdinalIgnoreCase);
+        var hasNew = false;
 
         foreach (var definition in definitions)
         {
-            if (existingByName.TryGetValue(definition.Name, out var existing))
+            if (existingNamesSet.Contains(definition.Name))
+                continue;
+
+            var result = FeatureFlag.Create(definition.Name, definition.DisplayName, definition.Description, false, isSystem: true);
+            if (result.IsSuccess)
             {
-                // Sync metadata from the code definition without touching IsEnabled.
-                // IsEnabled is admin-controlled and must never be reset by the seeder.
-                if (existing.DisplayName != definition.DisplayName || existing.Description != definition.Description)
-                {
-                    existing.Update(definition.DisplayName, definition.Description);
-                    hasChanges = true;
-                }
-            }
-            else
-            {
-                var result = FeatureFlag.Create(definition.Name, definition.DisplayName, definition.Description, false, isSystem: true);
-                if (result.IsSuccess)
-                {
-                    dbContext.FeatureFlags.Add(result.Value);
-                    hasChanges = true;
-                }
+                dbContext.FeatureFlags.Add(result.Value);
+                hasNew = true;
             }
         }
 
-        if (hasChanges)
+        if (hasNew)
         {
             await dbContext.SaveChangesAsync(cancellationToken);
         }

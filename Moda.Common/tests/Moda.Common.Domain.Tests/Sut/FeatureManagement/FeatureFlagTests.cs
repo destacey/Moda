@@ -219,7 +219,7 @@ public sealed class FeatureFlagTests
         // Act
         flag.Update("Updated Name", "Updated description");
 
-        // Assert - IsEnabled must be preserved; the seeder relies on this guarantee
+        // Assert
         flag.IsEnabled.Should().BeTrue();
     }
 
@@ -233,7 +233,7 @@ public sealed class FeatureFlagTests
         // Act
         flag.Update("Updated Name", "Updated description");
 
-        // Assert - IsEnabled must be preserved; the seeder relies on this guarantee
+        // Assert
         flag.IsEnabled.Should().BeFalse();
     }
 
