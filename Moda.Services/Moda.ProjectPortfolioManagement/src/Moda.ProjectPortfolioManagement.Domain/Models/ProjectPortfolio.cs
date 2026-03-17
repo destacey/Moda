@@ -235,7 +235,7 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, IHasI
     {
         Guard.Against.Null(endDate, nameof(endDate));
 
-        if (Status is not ProjectPortfolioStatus.Active or ProjectPortfolioStatus.OnHold)
+        if (Status is not (ProjectPortfolioStatus.Active or ProjectPortfolioStatus.OnHold))
         {
             return Result.Failure("Only active or on hold portfolios can be closed.");
         }

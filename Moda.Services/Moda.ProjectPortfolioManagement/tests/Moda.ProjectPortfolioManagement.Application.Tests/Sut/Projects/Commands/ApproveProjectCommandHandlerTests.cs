@@ -51,6 +51,8 @@ public class ApproveProjectCommandHandlerTests : IDisposable
     {
         // Arrange
         var project = _projectFaker.AsProposed(_dateTimeProvider, Guid.NewGuid());
+        var lifecycle = new ProjectLifecycleFaker().AsActiveWithPhases(("Plan", "Planning"), ("Execute", "Execution"));
+        project.AssignLifecycle(lifecycle);
         _dbContext.AddProject(project);
 
         var command = new ApproveProjectCommand(project.Id);

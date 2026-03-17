@@ -4,7 +4,14 @@ import { MarkdownEditor } from '@/src/components/common/markdown'
 import { EmployeeSelect } from '@/src/components/common/organizations'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { useModalForm } from '@/src/hooks'
-import { CreateProjectRequest } from '@/src/services/moda-api'
+import {
+  CreateProjectRequest,
+  ProjectLifecycleState,
+} from '@/src/services/moda-api'
+import {
+  useGetProjectLifecycleQuery,
+  useGetProjectLifecyclesQuery,
+} from '@/src/store/features/ppm/project-lifecycles-api'
 import { useGetEmployeeOptionsQuery } from '@/src/store/features/organizations/employee-api'
 import { useGetExpenditureCategoryOptionsQuery } from '@/src/store/features/ppm/expenditure-categories-api'
 import {
@@ -14,11 +21,13 @@ import {
 import { useCreateProjectMutation } from '@/src/store/features/ppm/projects-api'
 import { useGetStrategicThemeOptionsQuery } from '@/src/store/features/strategic-management/strategic-themes-api'
 import { toFormErrors } from '@/src/utils'
-import { DatePicker, Form, Input, Modal, Select } from 'antd'
+import { Card, DatePicker, Form, Input, Modal, Select, Timeline, Typography } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
-import { useCallback, useEffect } from 'react'
+import dayjs from 'dayjs'
+import { useCallback, useEffect, useMemo } from 'react'
 
 const { Item } = Form
+const { RangePicker } = DatePicker
 
 export interface CreateProjectFormProps {
   onFormComplete: () => void
@@ -28,12 +37,12 @@ export interface CreateProjectFormProps {
 interface CreateProjectFormValues {
   portfolioId: string
   programId?: string
+  lifecycleId?: string
   key: string
   name: string
   description: string
   expenditureCategoryId: number
-  start?: Date
-  end?: Date
+  dateRange?: [dayjs.Dayjs, dayjs.Dayjs] | null
   sponsorIds: string[]
   ownerIds: string[]
   managerIds: string[]
@@ -49,10 +58,11 @@ const mapToRequestValues = (
     description: values.description,
     key: values.key,
     expenditureCategoryId: values.expenditureCategoryId,
-    start: (values.start as any)?.format('YYYY-MM-DD'),
-    end: (values.end as any)?.format('YYYY-MM-DD'),
+    start: (values.dateRange?.[0] as any)?.format('YYYY-MM-DD'),
+    end: (values.dateRange?.[1] as any)?.format('YYYY-MM-DD'),
     portfolioId: values.portfolioId,
     programId: values.programId,
+    projectLifecycleId: values.lifecycleId,
     sponsorIds: values.sponsorIds,
     ownerIds: values.ownerIds,
     managerIds: values.managerIds,
@@ -70,6 +80,21 @@ const CreateProjectForm = ({
   const messageApi = useMessage()
 
   const [createProject] = useCreateProjectMutation()
+
+  const {
+    data: lifecycleData,
+    error: lifecycleOptionsError,
+  } = useGetProjectLifecyclesQuery(ProjectLifecycleState.Active)
+
+  const lifecycleOptions = useMemo(() => {
+    if (!lifecycleData) return []
+    return [...lifecycleData]
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map((lc) => ({
+        label: lc.name,
+        value: lc.id,
+      }))
+  }, [lifecycleData])
 
   const {
     data: expenditureData,
@@ -136,37 +161,51 @@ const CreateProjectForm = ({
   } = useGetStrategicThemeOptionsQuery(false)
 
   useEffect(() => {
-    if (
-      expenditureOptionsError ||
-      portfolioOptionsError ||
-      programOptionsError ||
-      employeeOptionsError ||
-      strategicThemeOptionsError
-    ) {
-      console.error(
-        expenditureOptionsError ??
-          portfolioOptionsError ??
-          programOptionsError ??
-          employeeOptionsError ??
-          strategicThemeOptionsError,
-      )
+    const firstError =
+      expenditureOptionsError ??
+      portfolioOptionsError ??
+      programOptionsError ??
+      employeeOptionsError ??
+      strategicThemeOptionsError ??
+      lifecycleOptionsError
+    if (firstError) {
+      console.error(firstError)
       messageApi.error(
-        expenditureOptionsError.detail ??
-          portfolioOptionsError.detail ??
-          programOptionsError.detail ??
-          employeeOptionsError.detail ??
-          strategicThemeOptionsError.detail ??
+        firstError.detail ??
           'An error occurred while loading form data. Please try again.',
       )
     }
   }, [
     employeeOptionsError,
     expenditureOptionsError,
+    lifecycleOptionsError,
     portfolioOptionsError,
     programOptionsError,
     messageApi,
     strategicThemeOptionsError,
   ])
+
+  const selectedLifecycleId = Form.useWatch('lifecycleId', form)
+
+  const { data: selectedLifecycle } = useGetProjectLifecycleQuery(
+    selectedLifecycleId,
+    { skip: !selectedLifecycleId },
+  )
+
+  const phaseItems = useMemo(() => {
+    if (!selectedLifecycle?.phases) return []
+    return [...selectedLifecycle.phases]
+      .sort((a, b) => a.order - b.order)
+      .map((phase) => ({
+        content: (
+          <>
+            <Typography.Text strong>{phase.name}</Typography.Text>
+            <br />
+            <Typography.Text type="secondary">{phase.description}</Typography.Text>
+          </>
+        ),
+      }))
+  }, [selectedLifecycle?.phases])
 
   return (
     <Modal
@@ -270,34 +309,8 @@ const CreateProjectForm = ({
             }
           />
         </Item>
-        <Item name="start" label="Start">
-          <DatePicker />
-        </Item>
-        <Item
-          name="end"
-          label="End"
-          dependencies={['start']}
-          rules={[
-            ({ getFieldValue }) => ({
-              validator(_, value) {
-                const start = getFieldValue('start')
-                if ((!start && !value) || (start && start <= value)) {
-                  return Promise.resolve()
-                } else if ((!start && value) || (start && !value)) {
-                  return Promise.reject(
-                    new Error(
-                      'Start and end date must be selected together or both left empty',
-                    ),
-                  )
-                }
-                return Promise.reject(
-                  new Error('End date must be on or after start date'),
-                )
-              },
-            }),
-          ]}
-        >
-          <DatePicker />
+        <Item name="dateRange" label="Planned Date Range">
+          <RangePicker style={{ width: '60%' }} format="MMM D, YYYY" />
         </Item>
         <Item name="sponsorIds" label="Sponsors">
           <EmployeeSelect
@@ -341,7 +354,19 @@ const CreateProjectForm = ({
             }
           />
         </Item>
+        <Item name="lifecycleId" label="Lifecycle">
+          <Select
+            allowClear
+            options={lifecycleOptions}
+            placeholder="Select Lifecycle"
+          />
+        </Item>
       </Form>
+      {phaseItems.length > 0 && (
+        <Card size="small" title="Phases">
+          <Timeline items={phaseItems} />
+        </Card>
+      )}
     </Modal>
   )
 }

@@ -29,6 +29,7 @@ public sealed class ProjectTaskFaker : PrivateConstructorFaker<ProjectTask>
         RuleFor(x => x.Progress, f => Progress.NotStarted());
         RuleFor(x => x.Order, f => f.Random.Int(1, 10));
         RuleFor(x => x.ParentId, f => null); // No parent by default
+        RuleFor(x => x.ProjectPhaseId, f => Guid.Empty); // Default; set via WithData for tests needing phases
         RuleFor(x => x.PlannedDateRange, f => null);
         RuleFor(x => x.EstimatedEffortHours, f => f.Random.Decimal(1, 100));
     }
@@ -49,13 +50,14 @@ public static class ProjectTaskFakerExtensions
         Progress? progress = null,
         int? order = null,
         Guid? parentId = null,
+        Guid? projectPhaseId = null,
         FlexibleDateRange? plannedDateRange = null,
         LocalDate? plannedDate = null,
         decimal? estimatedEffortHours = null)
     {
         if (id.HasValue) { faker.RuleFor(x => x.Id, id.Value); }
-        if (key is not null) 
-        { 
+        if (key is not null)
+        {
             faker.RuleFor(x => x.Key, key);
             faker.RuleFor(x => x.Number, key.TaskNumber);
         }
@@ -68,6 +70,7 @@ public static class ProjectTaskFakerExtensions
         if (progress is not null) { faker.RuleFor(x => x.Progress, progress); }
         if (order.HasValue) { faker.RuleFor(x => x.Order, order.Value); }
         if (parentId.HasValue) { faker.RuleFor(x => x.ParentId, parentId); }
+        if (projectPhaseId.HasValue) { faker.RuleFor(x => x.ProjectPhaseId, projectPhaseId.Value); }
         if (plannedDateRange is not null) { faker.RuleFor(x => x.PlannedDateRange, plannedDateRange); }
         if (plannedDate.HasValue) { faker.RuleFor(x => x.PlannedDate, plannedDate); }
         if (estimatedEffortHours.HasValue) { faker.RuleFor(x => x.EstimatedEffortHours, estimatedEffortHours); }

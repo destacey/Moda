@@ -25,14 +25,16 @@ import {
   EditProjectForm,
   ProjectDetails,
 } from '../_components'
+import AssignProjectLifecycleForm from '../_components/assign-project-lifecycle-form'
+import ChangeProjectLifecycleForm from '../_components/change-project-lifecycle-form'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import { ItemType } from 'antd/es/menu/interface'
 import { ProjectStatusAction } from '../_components/change-project-status-form'
 
-const ProjectPlan = dynamic(
-  () => import('../_components/project-plan'),
-  { ssr: false, loading: () => <Spin /> },
-)
+const ProjectPlan = dynamic(() => import('../_components/project-plan'), {
+  ssr: false,
+  loading: () => <Spin />,
+})
 
 const WorkItemsGrid = dynamic(
   () => import('@/src/components/common/work/work-items-grid'),
@@ -45,23 +47,10 @@ enum ProjectTabs {
   WorkItems = 'workItems',
 }
 
-const tabs = [
-  {
-    key: ProjectTabs.Details,
-    label: 'Details',
-  },
-  {
-    key: ProjectTabs.Plan,
-    label: 'Plan',
-  },
-  {
-    key: ProjectTabs.WorkItems,
-    label: 'Work Items',
-  },
-]
-
 enum ProjectAction {
   Edit = 'Edit',
+  AssignLifecycle = 'Assign Lifecycle',
+  ChangeLifecycle = 'Change Lifecycle',
   ChangeProgram = 'Change Program',
   ChangeKey = 'Change Key',
   Delete = 'Delete',
@@ -89,6 +78,10 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     useState<boolean>(false)
   const [openDeleteProjectForm, setOpenDeleteProjectForm] =
     useState<boolean>(false)
+  const [openAssignLifecycleForm, setOpenAssignLifecycleForm] =
+    useState<boolean>(false)
+  const [openChangeLifecycleForm, setOpenChangeLifecycleForm] =
+    useState<boolean>(false)
 
   const pathname = usePathname()
   const dispatch = useAppDispatch()
@@ -106,6 +99,15 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   } = useGetProjectQuery(projectKey)
 
   useDocumentTitle(`${projectData?.name ?? projectKey} - Project Details`)
+
+  const tabs = useMemo(() => {
+    const items = [{ key: ProjectTabs.Details, label: 'Details' }]
+    if (projectData?.projectLifecycle) {
+      items.push({ key: ProjectTabs.Plan, label: 'Plan' })
+    }
+    items.push({ key: ProjectTabs.WorkItems, label: 'Work Items' })
+    return items
+  }, [projectData?.projectLifecycle])
 
   const {
     data: workItemsData,
@@ -192,11 +194,7 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
             ]
         : currentStatus === 'Approved'
           ? !missingDates
-            ? [
-                ProjectAction.Edit,
-                ProjectAction.Activate,
-                ProjectAction.Cancel,
-              ]
+            ? [ProjectAction.Edit, ProjectAction.Activate, ProjectAction.Cancel]
             : [ProjectAction.Edit, ProjectAction.Cancel]
           : currentStatus === 'Active'
             ? [ProjectAction.Edit, ProjectAction.Complete, ProjectAction.Cancel]
@@ -223,11 +221,25 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
         label: ProjectAction.ChangeKey,
         onClick: () => setOpenChangeKeyForm(true),
       })
+      if (!projectData?.projectLifecycle) {
+        items.push({
+          key: 'assign-lifecycle',
+          label: ProjectAction.AssignLifecycle,
+          onClick: () => setOpenAssignLifecycleForm(true),
+        })
+      } else {
+        items.push({
+          key: 'change-lifecycle',
+          label: ProjectAction.ChangeLifecycle,
+          onClick: () => setOpenChangeLifecycleForm(true),
+        })
+      }
     }
     if (canDeleteProject && availableActions.includes(ProjectAction.Delete)) {
       items.push({
         key: 'delete',
         label: ProjectAction.Delete,
+        danger: true,
         onClick: () => setOpenDeleteProjectForm(true),
       })
     }
@@ -283,11 +295,32 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     canUpdateProject,
     missingDates,
     projectData?.status.name,
+    projectData?.projectLifecycle,
   ])
 
   const onEditProjectFormClosed = useCallback(
     (wasSaved: boolean) => {
       setOpenEditProjectForm(false)
+      if (wasSaved) {
+        refetchProject()
+      }
+    },
+    [refetchProject],
+  )
+
+  const onAssignLifecycleFormClosed = useCallback(
+    (wasSaved: boolean) => {
+      setOpenAssignLifecycleForm(false)
+      if (wasSaved) {
+        refetchProject()
+      }
+    },
+    [refetchProject],
+  )
+
+  const onChangeLifecycleFormClosed = useCallback(
+    (wasSaved: boolean) => {
+      setOpenChangeLifecycleForm(false)
       if (wasSaved) {
         refetchProject()
       }
@@ -386,16 +419,25 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
         actions={<PageActions actionItems={actionsMenuItems} />}
       />
 
-      {missingDates === true &&
-        (projectData?.status.name === 'Proposed' ||
-          projectData?.status.name === 'Approved') && (
+      {(projectData?.status.name === 'Proposed' ||
+        projectData?.status.name === 'Approved') && (
         <>
-          <Alert
-            title="Project Dates are required before activating."
-            type="warning"
-            showIcon
-          />
-          <br />
+          {missingDates && (
+            <Alert
+              title="Project Dates are required before activating."
+              type="warning"
+              showIcon
+            />
+          )}
+          {!projectData?.projectLifecycle && (
+            <Alert
+              title="A Project Lifecycle is required before approving."
+              type="warning"
+              showIcon
+              style={missingDates ? { marginTop: 8 } : undefined}
+            />
+          )}
+          {(missingDates || !projectData?.projectLifecycle) && <br />}
         </>
       )}
       <Card
@@ -465,6 +507,20 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
           project={projectData}
           onFormComplete={() => onDeleteProjectFormClosed(true)}
           onFormCancel={() => onDeleteProjectFormClosed(false)}
+        />
+      )}
+      {openAssignLifecycleForm && (
+        <AssignProjectLifecycleForm
+          project={projectData}
+          onFormComplete={() => onAssignLifecycleFormClosed(true)}
+          onFormCancel={() => onAssignLifecycleFormClosed(false)}
+        />
+      )}
+      {openChangeLifecycleForm && (
+        <ChangeProjectLifecycleForm
+          project={projectData}
+          onFormComplete={() => onChangeLifecycleFormClosed(true)}
+          onFormCancel={() => onChangeLifecycleFormClosed(false)}
         />
       )}
     </>

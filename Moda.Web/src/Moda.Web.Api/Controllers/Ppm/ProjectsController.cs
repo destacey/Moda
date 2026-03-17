@@ -1,9 +1,11 @@
-﻿using Moda.Common.Application.Models;
+﻿using Microsoft.AspNetCore.JsonPatch.SystemTextJson;
+using Moda.Common.Application.Models;
 using Moda.ProjectPortfolioManagement.Application.Projects.Commands;
 using Moda.ProjectPortfolioManagement.Application.Projects.Dtos;
 using Moda.ProjectPortfolioManagement.Application.Projects.Queries;
 using Moda.ProjectPortfolioManagement.Domain.Enums;
 using Moda.Web.Api.Extensions;
+using Moda.Web.Api.Models.Ppm.ProjectLifecycles;
 using Moda.Web.Api.Models.Ppm.Projects;
 using Moda.Work.Application.WorkItems.Dtos;
 using Moda.Work.Application.WorkItems.Queries;
@@ -214,6 +216,131 @@ public class ProjectsController(ILogger<ProjectsController> logger, ISender send
 
         return result.IsSuccess
             ? Ok(result.Value.OrderBy(w => w.StackRank))
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpPost("{id}/lifecycle")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Projects)]
+    [OpenApiOperation("Assign a lifecycle to a project.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> AssignLifecycle(Guid id, [FromBody] AssignProjectLifecycleRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(request.ToCommand(id), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpPost("{id}/lifecycle/change")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Projects)]
+    [OpenApiOperation("Change a project's lifecycle, remapping tasks between phases.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> ChangeProjectLifecycle(
+        Guid id,
+        [FromBody] ChangeProjectLifecycleRequest request,
+        CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(request.ToCommand(id), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpGet("{id}/phases")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Projects)]
+    [OpenApiOperation("Get phases for a project.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IEnumerable<ProjectPhaseListDto>>> GetProjectPhases(Guid id, CancellationToken cancellationToken)
+    {
+        var phases = await _sender.Send(new GetProjectPhasesQuery(id), cancellationToken);
+
+        return Ok(phases);
+    }
+
+    [HttpGet("{idOrKey}/plan-tree")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Projects)]
+    [OpenApiOperation("Get a unified plan tree with phases as top-level nodes and tasks nested within.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IEnumerable<ProjectPlanNodeDto>>> GetProjectPlanTree(string idOrKey, CancellationToken cancellationToken)
+    {
+        var nodes = await _sender.Send(new GetProjectPlanTreeQuery(idOrKey), cancellationToken);
+
+        return Ok(nodes);
+    }
+
+    [HttpGet("{id}/phases/{phaseId}")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Projects)]
+    [OpenApiOperation("Get project phase details.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<ProjectPhaseDetailsDto>> GetProjectPhase(Guid id, Guid phaseId, CancellationToken cancellationToken)
+    {
+        var phase = await _sender.Send(new GetProjectPhaseQuery(id, phaseId), cancellationToken);
+
+        return phase is not null
+            ? Ok(phase)
+            : NotFound();
+    }
+
+    [HttpPut("{id}/phases/{phaseId}")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Projects)]
+    [OpenApiOperation("Update a project phase.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> UpdateProjectPhase(Guid id, Guid phaseId, [FromBody] UpdateProjectPhaseRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(request.ToCommand(id, phaseId), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpPatch("{id}/phases/{phaseId}")]
+    [Consumes("application/json", "application/json-patch+json")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Projects)]
+    [OpenApiOperation("Partially update a project phase using JSON Patch (RFC 6902).", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> PatchProjectPhase(
+        Guid id,
+        Guid phaseId,
+        [FromBody] JsonPatchDocument<UpdateProjectPhaseRequest> patchDocument,
+        CancellationToken cancellationToken)
+    {
+        if (patchDocument == null)
+            return BadRequest("Patch document cannot be null.");
+
+        var phaseDto = await _sender.Send(new GetProjectPhaseQuery(id, phaseId), cancellationToken);
+        if (phaseDto is null)
+            return NotFound($"Project phase with ID '{phaseId}' not found.");
+
+        var updateRequest = UpdateProjectPhaseRequest.FromDto(phaseDto);
+
+        patchDocument.ApplyTo(updateRequest, error =>
+        {
+            ModelState.AddModelError(error.AffectedObject.GetType().Name, error.ErrorMessage);
+        });
+
+        if (!ModelState.IsValid)
+            return ValidationProblem(ModelState);
+
+        if (!TryValidateModel(updateRequest))
+            return ValidationProblem(ModelState);
+
+        var result = await _sender.Send(updateRequest.ToCommand(id, phaseId), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
             : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 }

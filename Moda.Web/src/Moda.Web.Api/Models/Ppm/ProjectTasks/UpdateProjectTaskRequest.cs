@@ -43,9 +43,9 @@ public sealed record UpdateProjectTaskRequest
     public decimal? Progress { get; set; }
 
     /// <summary>
-    /// The ID of the parent task (optional).
+    /// The ID of the parent phase or task.
     /// </summary>
-    public Guid? ParentId { get; set; }
+    public Guid ParentId { get; set; }
 
     /// <summary>
     /// The planned start date for the task.
@@ -80,7 +80,7 @@ public sealed record UpdateProjectTaskRequest
             StatusId = dto.Status.Id,
             PriorityId = dto.Priority.Id,
             Progress = dto.Progress,
-            ParentId = dto.ParentId,
+            ParentId = dto.ParentId ?? dto.ProjectPhaseId,
             PlannedStart = dto.PlannedStart,
             PlannedEnd = dto.PlannedEnd,
             PlannedDate = dto.PlannedDate,

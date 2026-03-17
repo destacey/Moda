@@ -25,6 +25,7 @@ enum SettingsTab {
 
   // project portfolio management
   ExpenditureCategories = 'expenditure-categories',
+  ProjectLifecycles = 'project-lifecycles',
 
   // work-management
   WorkTypes = 'work-types',
@@ -179,6 +180,12 @@ const buildSettingsMenuItems = (featureFlags: {
       'Expenditure Categories',
       SettingsTab.ExpenditureCategories,
       '/settings/ppm/expenditure-categories',
+    ),
+    getRestrictedMenuItem(
+      'Permissions.ProjectLifecycles.View',
+      'Project Lifecycles',
+      SettingsTab.ProjectLifecycles,
+      '/settings/ppm/project-lifecycles',
     ),
   ]),
 

@@ -65,13 +65,22 @@ export function useTreeGridEditing<T extends TreeNode>(
     fieldErrorsRef.current = fieldErrors
   })
 
+  // Resolve editable columns for a given row (or the currently selected row)
+  const resolveEditableColumns = useCallback(
+    (rowId: string | null) => {
+      if (typeof editableColumnIds === 'function') {
+        return editableColumnIds(rowId)
+      }
+      return editableColumnIds
+    },
+    [editableColumnIds],
+  )
+
   // Resolve editable columns (may be static or dynamic based on selected row)
-  const editableColumns = useMemo(() => {
-    if (typeof editableColumnIds === 'function') {
-      return editableColumnIds(selectedRowId)
-    }
-    return editableColumnIds
-  }, [editableColumnIds, selectedRowId])
+  const editableColumns = useMemo(
+    () => resolveEditableColumns(selectedRowId),
+    [resolveEditableColumns, selectedRowId],
+  )
 
   const getFieldError = useCallback(
     (fieldName: string): string | undefined => {
@@ -470,7 +479,8 @@ export function useTreeGridEditing<T extends TreeNode>(
             if (saved) {
               if (currentRowIndex < rows.length - 1) {
                 nextRowId = rows[currentRowIndex + 1].original.id
-                nextColId = editableColumns[0]
+                const targetCols = resolveEditableColumns(nextRowId)
+                nextColId = targetCols[0]
                 setSelectedRowId(nextRowId)
                 setSelectedCellId(`${nextRowId}-${nextColId}`)
               } else {
@@ -492,7 +502,8 @@ export function useTreeGridEditing<T extends TreeNode>(
           e.preventDefault()
           if (currentRowIndex > 0) {
             nextRowId = rows[currentRowIndex - 1].original.id
-            nextColId = editableColumns[0]
+            const targetCols = resolveEditableColumns(nextRowId)
+            nextColId = targetCols[0]
             await saveFormChanges(selectedRowId)
             setSelectedRowId(nextRowId)
             setSelectedCellId(`${nextRowId}-${nextColId}`)
@@ -511,7 +522,8 @@ export function useTreeGridEditing<T extends TreeNode>(
           e.preventDefault()
           if (currentRowIndex < rows.length - 1) {
             nextRowId = rows[currentRowIndex + 1].original.id
-            nextColId = columnId
+            const targetCols = resolveEditableColumns(nextRowId)
+            nextColId = targetCols.includes(columnId) ? columnId : targetCols[0]
             await saveFormChanges(selectedRowId)
             setSelectedRowId(nextRowId)
             setSelectedCellId(`${nextRowId}-${nextColId}`)
@@ -566,7 +578,8 @@ export function useTreeGridEditing<T extends TreeNode>(
               nextRowId = rowId
             } else if (currentRowIndex > 0) {
               nextRowId = rows[currentRowIndex - 1].original.id
-              nextColId = editableColumns[editableColumns.length - 1]
+              const targetCols = resolveEditableColumns(nextRowId)
+              nextColId = targetCols[targetCols.length - 1]
             } else {
               await saveFormChanges(rowId)
               setSelectedRowId(null)
@@ -580,7 +593,8 @@ export function useTreeGridEditing<T extends TreeNode>(
               nextRowId = rowId
             } else if (currentRowIndex < rows.length - 1) {
               nextRowId = rows[currentRowIndex + 1].original.id
-              nextColId = editableColumns[0]
+              const targetCols = resolveEditableColumns(nextRowId)
+              nextColId = targetCols[0]
             } else {
               await saveFormChanges(rowId)
               setSelectedRowId(null)
@@ -606,6 +620,7 @@ export function useTreeGridEditing<T extends TreeNode>(
       draftPrefix,
       editableColumns,
       isSaving,
+      resolveEditableColumns,
       saveFormChanges,
       selectedRowId,
     ],
@@ -662,17 +677,21 @@ export function useTreeGridEditing<T extends TreeNode>(
       } else if (selectedRowId) {
         const saved = await saveFormChanges(selectedRowId)
         if (saved) {
+          const targetColumns = resolveEditableColumns(args.rowId)
+          const targetIsEditable = targetColumns.includes(clickedColumnId)
           setSelectedRowId(args.rowId)
-          const targetCellId = isEditable
+          const targetCellId = targetIsEditable
             ? `${args.rowId}-${clickedColumnId}`
-            : `${args.rowId}-${editableColumns[0]}`
+            : `${args.rowId}-${targetColumns[0]}`
           setSelectedCellId(targetCellId)
         }
       } else {
+        const targetColumns = resolveEditableColumns(args.rowId)
+        const targetIsEditable = targetColumns.includes(clickedColumnId)
         setSelectedRowId(args.rowId)
-        const targetCellId = isEditable
+        const targetCellId = targetIsEditable
           ? `${args.rowId}-${clickedColumnId}`
-          : `${args.rowId}-${editableColumns[0]}`
+          : `${args.rowId}-${targetColumns[0]}`
         setSelectedCellId(targetCellId)
       }
     },
@@ -681,6 +700,7 @@ export function useTreeGridEditing<T extends TreeNode>(
       editableColumns,
       focusCellById,
       isSaving,
+      resolveEditableColumns,
       saveFormChanges,
       selectedCellId,
       selectedRowId,

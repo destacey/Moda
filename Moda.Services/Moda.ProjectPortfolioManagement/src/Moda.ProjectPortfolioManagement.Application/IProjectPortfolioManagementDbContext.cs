@@ -13,4 +13,6 @@ public interface IProjectPortfolioManagementDbContext : IModaDbContext
     DbSet<PpmTeam> PpmTeams { get; }
     DbSet<StrategicTheme> PpmStrategicThemes { get; }
     DbSet<StrategicInitiative> StrategicInitiatives { get; }
+    DbSet<ProjectLifecycle> ProjectLifecycles { get; }
+    DbSet<ProjectPhase> ProjectPhases { get; }
 }

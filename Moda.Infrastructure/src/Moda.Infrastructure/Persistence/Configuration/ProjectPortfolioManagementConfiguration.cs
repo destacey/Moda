@@ -214,6 +214,16 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
             .WithOne(t => t.Project)
             .HasForeignKey(t => t.ProjectId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(p => p.ProjectLifecycle)
+            .WithMany()
+            .HasForeignKey(p => p.ProjectLifecycleId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.HasMany(p => p.Phases)
+            .WithOne()
+            .HasForeignKey(p => p.ProjectId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
 
@@ -365,6 +375,104 @@ public class StrategicInitiativeProjectConfiguration : IEntityTypeConfiguration<
     }
 }
 
+#region Project Lifecycles
+
+public class ProjectLifecycleConfiguration : IEntityTypeConfiguration<ProjectLifecycle>
+{
+    public void Configure(EntityTypeBuilder<ProjectLifecycle> builder)
+    {
+        builder.ToTable("ProjectLifecycles", SchemaNames.ProjectPortfolioManagement);
+
+        builder.HasKey(l => l.Id);
+        builder.HasAlternateKey(l => l.Key);
+
+        builder.HasIndex(l => l.State);
+
+        builder.Property(l => l.Id).ValueGeneratedNever();
+        builder.Property(l => l.Key).ValueGeneratedOnAdd();
+        builder.Property(l => l.Name).HasMaxLength(128).IsRequired();
+        builder.Property(l => l.Description).HasMaxLength(1024).IsRequired();
+
+        builder.Property(l => l.State).IsRequired()
+            .HasConversion<EnumConverter<ProjectLifecycleState>>()
+            .HasMaxLength(32)
+            .HasColumnType("varchar");
+
+        // Relationships
+        builder.HasMany(l => l.Phases)
+            .WithOne()
+            .HasForeignKey(p => p.ProjectLifecycleId)
+            .OnDelete(DeleteBehavior.Cascade);
+    }
+}
+
+public class ProjectLifecyclePhaseConfiguration : IEntityTypeConfiguration<ProjectLifecyclePhase>
+{
+    public void Configure(EntityTypeBuilder<ProjectLifecyclePhase> builder)
+    {
+        builder.ToTable("ProjectLifecyclePhases", SchemaNames.ProjectPortfolioManagement);
+
+        builder.HasKey(p => p.Id);
+
+        builder.HasIndex(p => p.ProjectLifecycleId);
+
+        builder.Property(p => p.Id).ValueGeneratedNever();
+        builder.Property(p => p.Name).HasMaxLength(32).IsRequired();
+        builder.Property(p => p.Description).HasMaxLength(1024).IsRequired();
+        builder.Property(p => p.Order).IsRequired();
+    }
+}
+
+public class ProjectPhaseConfiguration : IEntityTypeConfiguration<ProjectPhase>
+{
+    public void Configure(EntityTypeBuilder<ProjectPhase> builder)
+    {
+        builder.ToTable("ProjectPhases", SchemaNames.ProjectPortfolioManagement);
+
+        builder.HasKey(p => p.Id);
+
+        builder.HasIndex(p => p.ProjectId);
+        builder.HasIndex(p => p.ProjectLifecyclePhaseId);
+
+        builder.Property(p => p.Id).ValueGeneratedNever();
+        builder.Property(p => p.Name).HasMaxLength(32).IsRequired();
+        builder.Property(p => p.Description).HasMaxLength(1024).IsRequired();
+        builder.Property(p => p.Order).IsRequired();
+
+        builder.Property(p => p.Status).IsRequired()
+            .HasConversion<EnumConverter<ProjectPortfolioManagement.Domain.Enums.TaskStatus>>()
+            .HasMaxLength(32)
+            .HasColumnType("varchar");
+
+        builder.Property(p => p.Progress)
+            .HasConversion(
+                k => k.Value,
+                k => new Progress(k))
+            .HasColumnType("decimal(5,2)")
+            .IsRequired();
+
+        // Value Objects
+        builder.OwnsOne(p => p.DateRange, options =>
+        {
+            options.Property(d => d.Start).HasColumnName("Start");
+            options.Property(d => d.End).HasColumnName("End");
+        });
+
+        // Relationships
+        builder.HasOne<ProjectLifecyclePhase>()
+            .WithMany()
+            .HasForeignKey(p => p.ProjectLifecyclePhaseId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.HasMany(p => p.Roles)
+            .WithOne()
+            .HasForeignKey(r => r.ObjectId)
+            .OnDelete(DeleteBehavior.Cascade);
+    }
+}
+
+#endregion Project Lifecycles
+
 #region Role Assignments
 
 public class ProjectPortfolioRoleAssignmentConfiguration : IEntityTypeConfiguration<RoleAssignment<ProjectPortfolioRole>>
@@ -452,6 +560,30 @@ public class StrategicInitiativeRoleAssignmentConfiguration : IEntityTypeConfigu
 
         builder.Property(p => p.Role).IsRequired()
             .HasConversion<EnumConverter<StrategicInitiativeRole>>()
+            .HasMaxLength(32)
+            .HasColumnType("varchar");
+
+        // Relationships
+        builder.HasOne(rm => rm.Employee)
+            .WithMany()
+            .HasForeignKey(rm => rm.EmployeeId)
+            .OnDelete(DeleteBehavior.NoAction);
+    }
+}
+
+public class ProjectPhaseRoleAssignmentConfiguration : IEntityTypeConfiguration<RoleAssignment<ProjectPhaseRole>>
+{
+    public void Configure(EntityTypeBuilder<RoleAssignment<ProjectPhaseRole>> builder)
+    {
+        builder.ToTable("ProjectPhaseAssignments", SchemaNames.ProjectPortfolioManagement);
+
+        builder.HasKey(r => new { r.ObjectId, r.EmployeeId, r.Role });
+
+        builder.HasIndex(r => r.ObjectId);
+        builder.HasIndex(r => r.EmployeeId);
+
+        builder.Property(p => p.Role).IsRequired()
+            .HasConversion<EnumConverter<ProjectPhaseRole>>()
             .HasMaxLength(32)
             .HasColumnType("varchar");
 
@@ -618,6 +750,12 @@ public class ProjectTaskConfiguration : IEntityTypeConfiguration<ProjectTask>
             .WithMany(t => t.Children)
             .HasForeignKey(t => t.ParentId)
             .OnDelete(DeleteBehavior.ClientSetNull);
+
+        // Relationship to ProjectPhase
+        builder.HasOne(t => t.ProjectPhase)
+            .WithMany()
+            .HasForeignKey(t => t.ProjectPhaseId)
+            .OnDelete(DeleteBehavior.NoAction);
 
         // Relationship to Roles
         builder.HasMany(t => t.Roles)

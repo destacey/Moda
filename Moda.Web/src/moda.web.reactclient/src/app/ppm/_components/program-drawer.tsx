@@ -22,7 +22,11 @@ export interface ProgramDrawerProps {
   onDrawerClose: () => void
 }
 
-const ProgramDrawer: FC<ProgramDrawerProps> = (props: ProgramDrawerProps) => {
+const ProgramDrawer: FC<ProgramDrawerProps> = ({
+  programKey,
+  drawerOpen,
+  onDrawerClose,
+}: ProgramDrawerProps) => {
   const [size, setSize] = useState(() => getDrawerWidthPixels())
   const messageApi = useMessage()
 
@@ -30,7 +34,7 @@ const ProgramDrawer: FC<ProgramDrawerProps> = (props: ProgramDrawerProps) => {
     data: programData,
     isLoading,
     error,
-  } = useGetProgramQuery(props.programKey)
+  } = useGetProgramQuery(programKey)
 
   const { hasPermissionClaim } = useAuth()
   const canViewProgram = useMemo(
@@ -41,9 +45,9 @@ const ProgramDrawer: FC<ProgramDrawerProps> = (props: ProgramDrawerProps) => {
   useEffect(() => {
     if (!canViewProgram) {
       messageApi.error('You do not have permission to view programs.')
-      props.onDrawerClose()
+      onDrawerClose()
     }
-  }, [canViewProgram, messageApi, props.onDrawerClose])
+  }, [canViewProgram, messageApi, onDrawerClose])
 
   useEffect(() => {
     if (error) {
@@ -78,8 +82,8 @@ const ProgramDrawer: FC<ProgramDrawerProps> = (props: ProgramDrawerProps) => {
     <Drawer
       title={programData?.name ?? 'Program Details'}
       placement="right"
-      onClose={props.onDrawerClose}
-      open={props.drawerOpen}
+      onClose={onDrawerClose}
+      open={drawerOpen}
       loading={isLoading}
       size={size}
       resizable={{

@@ -52,36 +52,8 @@ public class ChangeProjectKeyCommandHandlerTests : IDisposable
         // Arrange
         var project = _projectFaker.Generate();
 
-        // Create a couple tasks so we can assert cascading key updates
-        var createTask1Result = project.CreateTask(
-            nextNumber: 1,
-            name: "Task 1",
-            description: null,
-            type: ProjectTaskType.Task,
-            status: Domain.Enums.TaskStatus.NotStarted,
-            priority: TaskPriority.Medium,
-            progress: null,
-            parentId: null,
-            plannedDateRange: null,
-            plannedDate: null,
-            estimatedEffortHours: null,
-            roles: null);
-        createTask1Result.IsSuccess.Should().BeTrue();
-
-        var createTask2Result = project.CreateTask(
-            nextNumber: 2,
-            name: "Task 2",
-            description: null,
-            type: ProjectTaskType.Task,
-            status: Domain.Enums.TaskStatus.NotStarted,
-            priority: TaskPriority.Medium,
-            progress: null,
-            parentId: null,
-            plannedDateRange: null,
-            plannedDate: null,
-            estimatedEffortHours: null,
-            roles: null);
-        createTask2Result.IsSuccess.Should().BeTrue();
+        // Set up tasks using faker (need real IDs for key cascade verification)
+        var tasks = project.WithTasks(2);
 
         _dbContext.AddProject(project);
 

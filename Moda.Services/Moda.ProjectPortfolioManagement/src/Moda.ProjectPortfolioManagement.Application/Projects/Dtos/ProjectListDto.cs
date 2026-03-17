@@ -64,6 +64,16 @@ public sealed record ProjectListDto : IMapFrom<Project>
     /// </summary>
     public required List<NavigationDto> StrategicThemes { get; set; } = [];
 
+    /// <summary>
+    /// The project lifecycle assigned to this project.
+    /// </summary>
+    public NavigationDto? ProjectLifecycle { get; set; }
+
+    /// <summary>
+    /// The project phases, ordered by display order.
+    /// </summary>
+    public List<ProjectPhaseListDto> Phases { get; set; } = [];
+
     public void ConfigureMapping(TypeAdapterConfig config)
     {
         config.NewConfig<Project, ProjectListDto>()
@@ -76,6 +86,8 @@ public sealed record ProjectListDto : IMapFrom<Project>
             .Map(dest => dest.ProjectSponsors, src => src.Roles.Where(r => r.Role == ProjectRole.Sponsor).Select(x => EmployeeNavigationDto.From(x.Employee!)).ToList())
             .Map(dest => dest.ProjectOwners, src => src.Roles.Where(r => r.Role == ProjectRole.Owner).Select(x => EmployeeNavigationDto.From(x.Employee!)).ToList())
             .Map(dest => dest.ProjectManagers, src => src.Roles.Where(r => r.Role == ProjectRole.Manager).Select(x => EmployeeNavigationDto.From(x.Employee!)).ToList())
-            .Map(dest => dest.StrategicThemes, src => src.StrategicThemeTags.Select(x => NavigationDto.Create(x.StrategicTheme!.Id, x.StrategicTheme.Key, x.StrategicTheme.Name)).ToList());
+            .Map(dest => dest.StrategicThemes, src => src.StrategicThemeTags.Select(x => NavigationDto.Create(x.StrategicTheme!.Id, x.StrategicTheme.Key, x.StrategicTheme.Name)).ToList())
+            .Map(dest => dest.ProjectLifecycle, src => src.ProjectLifecycle != null ? NavigationDto.Create(src.ProjectLifecycle.Id, src.ProjectLifecycle.Key, src.ProjectLifecycle.Name) : null)
+            .Map(dest => dest.Phases, src => src.Phases.OrderBy(p => p.Order));
     }
 }

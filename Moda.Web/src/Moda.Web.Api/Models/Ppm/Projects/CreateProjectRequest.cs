@@ -46,6 +46,11 @@ public sealed record CreateProjectRequest
     public Guid? ProgramId { get; set; }
 
     /// <summary>
+    /// The ID of the project lifecycle to assign (optional).
+    /// </summary>
+    public Guid? ProjectLifecycleId { get; set; }
+
+    /// <summary>
     /// The sponsors of the project.
     /// </summary>
     public List<Guid>? SponsorIds { get; set; } = [];
@@ -74,7 +79,7 @@ public sealed record CreateProjectRequest
     {
         var dateRange = Start is null || End is null ? null : new LocalDateRange((LocalDate)Start, (LocalDate)End);
 
-        return new CreateProjectCommand(Name, Description, new ProjectKey(Key), ExpenditureCategoryId, dateRange, PortfolioId, ProgramId, SponsorIds, OwnerIds, ManagerIds, MemberIds, StrategicThemeIds);
+        return new CreateProjectCommand(Name, Description, new ProjectKey(Key), ExpenditureCategoryId, dateRange, PortfolioId, ProgramId, ProjectLifecycleId, SponsorIds, OwnerIds, ManagerIds, MemberIds, StrategicThemeIds);
     }
 }
 

@@ -1,12 +1,12 @@
 import {
   getProjectTasksClient,
+  getProjectsClient,
   authenticatedFetch,
 } from '@/src/services/clients'
 import { apiSlice } from '../apiSlice'
 import {
   ProjectTaskListDto,
   ProjectTaskDto,
-  ProjectTaskTreeDto,
   CreateProjectTaskRequest,
   UpdateProjectTaskRequest,
   AddTaskDependencyRequest,
@@ -44,25 +44,6 @@ export const projectTasksApi = apiSlice.injectEndpoints({
         ],
       },
     ),
-
-    getProjectTaskTree: builder.query<
-      ProjectTaskTreeDto[],
-      { projectIdOrKey: string }
-    >({
-      queryFn: async ({ projectIdOrKey }) => {
-        try {
-          const data =
-            await getProjectTasksClient().getProjectTaskTree(projectIdOrKey)
-          return { data }
-        } catch (error) {
-          console.error('API Error:', error)
-          return { error }
-        }
-      },
-      providesTags: (result, error, { projectIdOrKey }) => [
-        { type: QueryTags.ProjectTaskTree, id: `TREE-${projectIdOrKey}` },
-      ],
-    }),
 
     getProjectTask: builder.query<
       ProjectTaskDto,
@@ -409,6 +390,7 @@ export const projectTasksApi = apiSlice.injectEndpoints({
       Array<{
         value: string
         title: string
+        selectable?: boolean
         children?: Array<{
           value: string
           title: string
@@ -419,41 +401,65 @@ export const projectTasksApi = apiSlice.injectEndpoints({
     >({
       queryFn: async ({ projectIdOrKey, excludeTaskId }) => {
         try {
-          const treeData =
-            await getProjectTasksClient().getProjectTaskTree(projectIdOrKey)
+          const planData =
+            await getProjectsClient().getProjectPlanTree(projectIdOrKey)
 
-          // Recursively convert tree to TreeSelect format, excluding a specific task
-          const convertToTreeSelect = (
-            tasks: ProjectTaskTreeDto[],
+          // Convert task nodes to TreeSelect format, excluding milestones and a specific task
+          const convertTasksToTreeSelect = (
+            nodes: any[],
           ): Array<{
             value: string
             title: string
             children?: any[]
           }> => {
-            return tasks
+            return nodes
               .filter(
-                (t) => t.id !== excludeTaskId && t.type.name !== 'Milestone',
+                (t: any) =>
+                  t.id !== excludeTaskId &&
+                  t.nodeType !== 'Phase' &&
+                  t.type?.name !== 'Milestone',
               )
-              .map((t) => ({
+              .map((t: any) => ({
                 value: t.id,
                 title: `${t.key} - ${t.name}`,
                 children:
                   t.children && t.children.length > 0
-                    ? convertToTreeSelect(t.children)
+                    ? convertTasksToTreeSelect(t.children)
                     : undefined,
               }))
           }
 
-          return {
-            data: convertToTreeSelect(treeData),
-          }
+          // Build tree with phases as top-level selectable parents
+          const data = planData.map((node: any) => {
+            if (node.nodeType === 'Phase') {
+              return {
+                value: node.id,
+                title: node.name,
+                children:
+                  node.children && node.children.length > 0
+                    ? convertTasksToTreeSelect(node.children)
+                    : undefined,
+              }
+            }
+            // Non-phase root nodes (shouldn't happen with lifecycle, but handle gracefully)
+            return {
+              value: node.id,
+              title: `${node.key} - ${node.name}`,
+              children:
+                node.children && node.children.length > 0
+                  ? convertTasksToTreeSelect(node.children)
+                  : undefined,
+            }
+          })
+
+          return { data }
         } catch (error) {
           console.error('API Error:', error)
           return { error }
         }
       },
       providesTags: (result, error, { projectIdOrKey }) => [
-        { type: QueryTags.ProjectTaskTree, id: `TREE-${projectIdOrKey}` },
+        { type: QueryTags.ProjectPlanTree, id: projectIdOrKey },
       ],
     }),
   }),
@@ -461,7 +467,6 @@ export const projectTasksApi = apiSlice.injectEndpoints({
 
 export const {
   useGetProjectTasksQuery,
-  useGetProjectTaskTreeQuery,
   useGetProjectTaskQuery,
   useCreateProjectTaskMutation,
   useUpdateProjectTaskMutation,

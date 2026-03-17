@@ -12,7 +12,7 @@ import useAuth from '@/src/components/contexts/auth'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { useGetProjectQuery } from '@/src/store/features/ppm/projects-api'
 import { getDrawerWidthPixels, getSortedNameList } from '@/src/utils'
-import { Drawer, Flex } from 'antd'
+import { Drawer, Flex, Tooltip } from 'antd'
 import Link from 'next/link'
 import { FC, useEffect, useMemo, useState } from 'react'
 
@@ -22,7 +22,11 @@ export interface ProjectDrawerProps {
   onDrawerClose: () => void
 }
 
-const ProjectDrawer: FC<ProjectDrawerProps> = (props: ProjectDrawerProps) => {
+const ProjectDrawer: FC<ProjectDrawerProps> = ({
+  projectKey,
+  drawerOpen,
+  onDrawerClose,
+}: ProjectDrawerProps) => {
   const [size, setSize] = useState(() => getDrawerWidthPixels())
   const messageApi = useMessage()
 
@@ -30,7 +34,7 @@ const ProjectDrawer: FC<ProjectDrawerProps> = (props: ProjectDrawerProps) => {
     data: projectData,
     isLoading,
     error,
-  } = useGetProjectQuery(props.projectKey)
+  } = useGetProjectQuery(projectKey)
 
   const { hasPermissionClaim } = useAuth()
   const canViewProject = useMemo(
@@ -41,9 +45,9 @@ const ProjectDrawer: FC<ProjectDrawerProps> = (props: ProjectDrawerProps) => {
   useEffect(() => {
     if (!canViewProject) {
       messageApi.error('You do not have permission to view projects.')
-      props.onDrawerClose()
+      onDrawerClose()
     }
-  }, [canViewProject, messageApi, props.onDrawerClose])
+  }, [canViewProject, messageApi, onDrawerClose])
 
   useEffect(() => {
     if (error) {
@@ -83,8 +87,8 @@ const ProjectDrawer: FC<ProjectDrawerProps> = (props: ProjectDrawerProps) => {
     <Drawer
       title={projectData?.name ?? 'Project Details'}
       placement="right"
-      onClose={props.onDrawerClose}
-      open={props.drawerOpen}
+      onClose={onDrawerClose}
+      open={drawerOpen}
       loading={isLoading}
       size={size}
       resizable={{
@@ -114,20 +118,26 @@ const ProjectDrawer: FC<ProjectDrawerProps> = (props: ProjectDrawerProps) => {
               dateRange={{ start: projectData?.start, end: projectData?.end }}
             />
           </LabeledContent>
+          <LabeledContent label="Expenditure Category">
+            {projectData?.expenditureCategory.name}
+          </LabeledContent>
+          <LabeledContent label="Lifecycle">
+            {projectData?.projectLifecycle ? (
+              <Tooltip title={projectData.projectLifecycle.description}>
+                {projectData.projectLifecycle.name}
+              </Tooltip>
+            ) : (
+              'Not lifecycle assigned'
+            )}
+          </LabeledContent>
           <LabeledContent label="Sponsors">
-            <ContentList
-              items={sponsorNames}
-              emptyText="No sponsor assigned"
-            />
+            <ContentList items={sponsorNames} emptyText="No sponsor assigned" />
           </LabeledContent>
           <LabeledContent label="Owners">
             <ContentList items={ownerNames} emptyText="No owner assigned" />
           </LabeledContent>
           <LabeledContent label="Managers">
-            <ContentList
-              items={managerNames}
-              emptyText="No manager assigned"
-            />
+            <ContentList items={managerNames} emptyText="No manager assigned" />
           </LabeledContent>
           <LabeledContent label="Members">
             <ContentList items={memberNames} emptyText="No members assigned" />

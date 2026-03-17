@@ -2366,6 +2366,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<Guid?>("ProgramId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("ProjectLifecycleId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(32)
@@ -2396,9 +2399,157 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                     b.HasIndex("ProgramId");
 
+                    b.HasIndex("ProjectLifecycleId");
+
                     b.HasIndex("Status");
 
                     b.ToTable("Projects", "Ppm");
+                });
+
+            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.ProjectLifecycle", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(1024)
+                        .HasColumnType("nvarchar(1024)");
+
+                    b.Property<int>("Key")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Key"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar");
+
+                    b.Property<DateTime>("SystemCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SystemCreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("SystemLastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SystemLastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasAlternateKey("Key");
+
+                    b.HasIndex("State");
+
+                    b.ToTable("ProjectLifecycles", "Ppm");
+                });
+
+            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.ProjectLifecyclePhase", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(1024)
+                        .HasColumnType("nvarchar(1024)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("ProjectLifecycleId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("SystemCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SystemCreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("SystemLastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SystemLastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProjectLifecycleId");
+
+                    b.ToTable("ProjectLifecyclePhases", "Ppm");
+                });
+
+            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.ProjectPhase", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(1024)
+                        .HasColumnType("nvarchar(1024)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Progress")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<Guid>("ProjectId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ProjectLifecyclePhaseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar");
+
+                    b.Property<DateTime>("SystemCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SystemCreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("SystemLastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SystemLastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProjectId");
+
+                    b.HasIndex("ProjectLifecyclePhaseId");
+
+                    b.ToTable("ProjectPhases", "Ppm");
                 });
 
             modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.ProjectPortfolio", b =>
@@ -2498,6 +2649,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<Guid>("ProjectId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("ProjectPhaseId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(32)
@@ -2532,6 +2686,8 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.HasIndex("ParentId");
 
                     b.HasIndex("ProjectId");
+
+                    b.HasIndex("ProjectPhaseId");
 
                     b.HasIndex("Status");
 
@@ -2619,6 +2775,41 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.HasIndex("ObjectId");
 
                     b.ToTable("ProgramRoleAssignments", "Ppm");
+                });
+
+            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.RoleAssignment<Moda.ProjectPortfolioManagement.Domain.Enums.ProjectPhaseRole>", b =>
+                {
+                    b.Property<Guid>("ObjectId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("EmployeeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Role")
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar");
+
+                    b.Property<DateTime>("SystemCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SystemCreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("SystemLastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SystemLastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("ObjectId", "EmployeeId", "Role");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.HasIndex("ObjectId");
+
+                    b.ToTable("ProjectPhaseAssignments", "Ppm");
                 });
 
             modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.RoleAssignment<Moda.ProjectPortfolioManagement.Domain.Enums.ProjectPortfolioRole>", b =>
@@ -4780,6 +4971,11 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasForeignKey("ProgramId")
                         .OnDelete(DeleteBehavior.NoAction);
 
+                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.ProjectLifecycle", "ProjectLifecycle")
+                        .WithMany()
+                        .HasForeignKey("ProjectLifecycleId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.OwnsOne("Moda.Common.Models.LocalDateRange", "DateRange", b1 =>
                         {
                             b1.Property<Guid>("ProjectId")
@@ -4808,6 +5004,55 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Portfolio");
 
                     b.Navigation("Program");
+
+                    b.Navigation("ProjectLifecycle");
+                });
+
+            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.ProjectLifecyclePhase", b =>
+                {
+                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.ProjectLifecycle", null)
+                        .WithMany("Phases")
+                        .HasForeignKey("ProjectLifecycleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.ProjectPhase", b =>
+                {
+                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.Project", null)
+                        .WithMany("Phases")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.ProjectLifecyclePhase", null)
+                        .WithMany()
+                        .HasForeignKey("ProjectLifecyclePhaseId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.OwnsOne("Moda.Common.Models.FlexibleDateRange", "DateRange", b1 =>
+                        {
+                            b1.Property<Guid>("ProjectPhaseId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<DateTime?>("End")
+                                .HasColumnType("date")
+                                .HasColumnName("End");
+
+                            b1.Property<DateTime>("Start")
+                                .HasColumnType("date")
+                                .HasColumnName("Start");
+
+                            b1.HasKey("ProjectPhaseId");
+
+                            b1.ToTable("ProjectPhases", "Ppm");
+
+                            b1.WithOwner()
+                                .HasForeignKey("ProjectPhaseId");
+                        });
+
+                    b.Navigation("DateRange");
                 });
 
             modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.ProjectPortfolio", b =>
@@ -4848,6 +5093,12 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.ProjectPhase", "ProjectPhase")
+                        .WithMany()
+                        .HasForeignKey("ProjectPhaseId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.OwnsOne("Moda.Common.Models.FlexibleDateRange", "PlannedDateRange", b1 =>
                         {
                             b1.Property<Guid>("ProjectTaskId")
@@ -4874,6 +5125,8 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("PlannedDateRange");
 
                     b.Navigation("Project");
+
+                    b.Navigation("ProjectPhase");
                 });
 
             modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.ProjectTaskDependency", b =>
@@ -4904,6 +5157,23 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .IsRequired();
 
                     b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.Program", null)
+                        .WithMany("Roles")
+                        .HasForeignKey("ObjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.RoleAssignment<Moda.ProjectPortfolioManagement.Domain.Enums.ProjectPhaseRole>", b =>
+                {
+                    b.HasOne("Moda.Common.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.ProjectPhase", null)
                         .WithMany("Roles")
                         .HasForeignKey("ObjectId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -5531,6 +5801,8 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
             modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.Project", b =>
                 {
+                    b.Navigation("Phases");
+
                     b.Navigation("Roles");
 
                     b.Navigation("StrategicInitiativeProjects");
@@ -5538,6 +5810,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("StrategicThemeTags");
 
                     b.Navigation("Tasks");
+                });
+
+            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.ProjectLifecycle", b =>
+                {
+                    b.Navigation("Phases");
+                });
+
+            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.ProjectPhase", b =>
+                {
+                    b.Navigation("Roles");
                 });
 
             modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.ProjectPortfolio", b =>

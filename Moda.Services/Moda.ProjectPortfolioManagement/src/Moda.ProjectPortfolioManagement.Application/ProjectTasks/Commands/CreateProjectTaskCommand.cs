@@ -1,6 +1,5 @@
-using Moda.ProjectPortfolioManagement.Application.ProjectTasks.Models;
+﻿using Moda.ProjectPortfolioManagement.Application.ProjectTasks.Models;
 using Moda.ProjectPortfolioManagement.Domain.Enums;
-using Moda.ProjectPortfolioManagement.Domain.Models;
 
 namespace Moda.ProjectPortfolioManagement.Application.ProjectTasks.Commands;
 
@@ -8,11 +7,11 @@ public sealed record CreateProjectTaskCommand(
     Guid ProjectId,
     string Name,
     string? Description,
-    ProjectTaskType Type, 
+    ProjectTaskType Type,
     Domain.Enums.TaskStatus Status,
     TaskPriority Priority,
     Progress? Progress,
-    Guid? ParentId,
+    Guid ParentId,
     FlexibleDateRange? PlannedDateRange,
     LocalDate? PlannedDate,
     decimal? EstimatedEffortHours,
@@ -53,8 +52,8 @@ public sealed class CreateProjectTaskCommandValidator : AbstractValidator<Create
             .WithMessage("Progress is not applicable for milestones.");
 
         RuleFor(x => x.ParentId)
-            .Must(id => id == null || id != Guid.Empty)
-            .WithMessage("ParentId cannot be an empty GUID.");
+            .NotEmpty()
+            .WithMessage("ParentId is required and cannot be an empty GUID.");
 
         // Milestone-specific validations
         RuleFor(x => x.PlannedDate)
@@ -97,41 +96,15 @@ internal sealed class CreateProjectTaskCommandHandler(
     {
         try
         {
-            // Load the project
+            // Load the project with phases and tasks so the domain can resolve parentId
             var project = await _ppmDbContext.Projects
+                .Include(p => p.Phases)
+                .Include(p => p.Tasks)
                 .FirstOrDefaultAsync(p => p.Id == request.ProjectId, cancellationToken);
             if (project is null)
             {
                 _logger.LogInformation("Project with Id {ProjectId} not found.", request.ProjectId);
                 return Result.Failure<ProjectTaskIdAndKey>("Project not found.");
-            }
-
-            // Validate parent task if specified
-            ProjectTask? parentTask = null;
-            if (request.ParentId.HasValue)
-            {
-                parentTask = await _ppmDbContext.ProjectTasks
-                    .Include(p => p.Children)
-                    .FirstOrDefaultAsync(t => t.Id == request.ParentId.Value && t.ProjectId == request.ProjectId, cancellationToken);
-                if (parentTask is null)
-                {
-                    _logger.LogInformation("Parent task {ParentId} not found in project {ProjectId}.", request.ParentId, request.ProjectId);
-                    return Result.Failure<ProjectTaskIdAndKey>("Parent task not found in this project.");
-                }
-
-                // Milestones cannot have children
-                if (parentTask.Type == ProjectTaskType.Milestone)
-                {
-                    _logger.LogInformation("Cannot create child task under milestone {ParentId}.", request.ParentId);
-                    return Result.Failure<ProjectTaskIdAndKey>("Milestones cannot have child tasks.");
-                }
-            }
-            else
-            {
-                // load root tasks to the project to validate order later
-                _ = await _ppmDbContext.ProjectTasks
-                    .Where(t => t.ProjectId == request.ProjectId && t.ParentId == null)
-                    .ToListAsync(cancellationToken);
             }
 
             var roles = GetRoles(request);

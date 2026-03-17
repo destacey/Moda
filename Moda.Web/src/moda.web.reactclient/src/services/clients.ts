@@ -27,6 +27,7 @@ import {
   ProjectsClient,
   ProjectTasksClient,
   StrategicInitiativesClient,
+  ProjectLifecyclesClient,
   SprintsClient,
   EstimationScalesClient,
   PokerSessionsClient,
@@ -254,6 +255,8 @@ export const getProjectTasksClient = () =>
   new ProjectTasksClient('', axiosClient)
 export const getStrategicInitiativesClient = () =>
   new StrategicInitiativesClient('', axiosClient)
+export const getProjectLifecyclesClient = () =>
+  new ProjectLifecyclesClient('', axiosClient)
 
 // STRATEGIC MANAGEMENT
 export const getStrategicThemesClient = () =>

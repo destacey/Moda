@@ -25,7 +25,9 @@ public class FakeProjectPortfolioManagementDbContext : IProjectPortfolioManageme
     private readonly List<PpmTeam> _ppmTeams = [];
     private readonly List<StrategicTheme> _ppmStrategicThemes = [];
     private readonly List<StrategicInitiative> _strategicInitiatives = [];
-    
+    private readonly List<ProjectLifecycle> _projectLifecycles = [];
+    private readonly List<ProjectPhase> _projectPhases = [];
+
     // Common domain entities
     private readonly List<Employee> _employees = [];
     private readonly List<ExternalEmployeeBlacklistItem> _externalEmployeeBlacklistItems = [];
@@ -42,6 +44,8 @@ public class FakeProjectPortfolioManagementDbContext : IProjectPortfolioManageme
     public DbSet<PpmTeam> PpmTeams => _ppmTeams.AsDbSet();
     public DbSet<StrategicTheme> PpmStrategicThemes => _ppmStrategicThemes.AsDbSet();
     public DbSet<StrategicInitiative> StrategicInitiatives => _strategicInitiatives.AsDbSet();
+    public DbSet<ProjectLifecycle> ProjectLifecycles => _projectLifecycles.AsDbSet();
+    public DbSet<ProjectPhase> ProjectPhases => _projectPhases.AsDbSet();
     public DbSet<Employee> Employees => _employees.AsDbSet();
     public DbSet<ExternalEmployeeBlacklistItem> ExternalEmployeeBlacklistItems => _externalEmployeeBlacklistItems.AsDbSet();
     public DbSet<PersonalAccessToken> PersonalAccessTokens => _personalAccessTokens.AsDbSet();
@@ -117,7 +121,15 @@ public class FakeProjectPortfolioManagementDbContext : IProjectPortfolioManageme
     // StrategicInitiative
     public void AddStrategicInitiative(StrategicInitiative initiative) => _strategicInitiatives.Add(initiative);
     public void AddStrategicInitiatives(IEnumerable<StrategicInitiative> initiatives) => _strategicInitiatives.AddRange(initiatives);
-    
+
+    // ProjectLifecycle
+    public void AddProjectLifecycle(ProjectLifecycle lifecycle) => _projectLifecycles.Add(lifecycle);
+    public void AddProjectLifecycles(IEnumerable<ProjectLifecycle> lifecycles) => _projectLifecycles.AddRange(lifecycles);
+
+    // ProjectPhase
+    public void AddProjectPhase(ProjectPhase phase) => _projectPhases.Add(phase);
+    public void AddProjectPhases(IEnumerable<ProjectPhase> phases) => _projectPhases.AddRange(phases);
+
     // Employee
     public void AddEmployee(Employee employee) => _employees.Add(employee);
     public void AddEmployees(IEnumerable<Employee> employees) => _employees.AddRange(employees);
@@ -137,6 +149,8 @@ public class FakeProjectPortfolioManagementDbContext : IProjectPortfolioManageme
         _ppmTeams.Clear();
         _ppmStrategicThemes.Clear();
         _strategicInitiatives.Clear();
+        _projectLifecycles.Clear();
+        _projectPhases.Clear();
         _employees.Clear();
         _externalEmployeeBlacklistItems.Clear();
         _personalAccessTokens.Clear();

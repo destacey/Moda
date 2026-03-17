@@ -168,8 +168,9 @@ public static class ProjectFakerExtensions
     /// </summary>
     /// <param name="project">The project to add tasks to.</param>
     /// <param name="taskCount">The number of tasks to create.</param>
+    /// <param name="projectPhaseId">Optional phase ID to assign to all tasks.</param>
     /// <returns>The list of created tasks, also accessible via project.Tasks.</returns>
-    public static List<ProjectTask> WithTasks(this Project project, int taskCount)
+    public static List<ProjectTask> WithTasks(this Project project, int taskCount, Guid? projectPhaseId = null)
     {
         var tasks = new List<ProjectTask>();
         var taskFaker = new ProjectTaskFaker();
@@ -180,7 +181,8 @@ public static class ProjectFakerExtensions
                 id: Guid.NewGuid(),
                 projectId: project.Id,
                 key: new ProjectTaskKey(project.Key, i),
-                order: i
+                order: i,
+                projectPhaseId: projectPhaseId
             ).Generate();
 
             tasks.Add(task);

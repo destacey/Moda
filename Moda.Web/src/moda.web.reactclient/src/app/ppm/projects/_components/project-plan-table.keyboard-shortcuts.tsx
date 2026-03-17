@@ -3,7 +3,7 @@ import { Descriptions, Flex, Typography } from 'antd'
 const { Title, Text } = Typography
 const { Item: DescriptionItem } = Descriptions
 
-export const ProjectTasksHelp = () => (
+export const ProjectPlanHelp = () => (
   <div
     style={{
       width: 400,
@@ -88,4 +88,3 @@ export const ProjectTasksHelp = () => (
     </Flex>
   </div>
 )
-

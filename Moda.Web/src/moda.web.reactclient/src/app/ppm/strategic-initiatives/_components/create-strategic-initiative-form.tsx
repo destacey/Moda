@@ -11,9 +11,11 @@ import { useCreateStrategicInitiativeMutation } from '@/src/store/features/ppm/s
 import { toFormErrors } from '@/src/utils'
 import { DatePicker, Form, Modal, Select } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
+import dayjs from 'dayjs'
 import { useCallback, useEffect } from 'react'
 
 const { Item } = Form
+const { RangePicker } = DatePicker
 
 export interface CreateStrategicInitiativeFormProps {
   onFormComplete: () => void
@@ -24,8 +26,7 @@ interface CreateStrategicInitiativeFormValues {
   portfolioId: string
   name: string
   description: string
-  start: Date
-  end: Date
+  dateRange: [dayjs.Dayjs, dayjs.Dayjs]
   sponsorIds: string[]
   ownerIds: string[]
 }
@@ -36,8 +37,8 @@ const mapToRequestValues = (
   return {
     name: values.name,
     description: values.description,
-    start: (values.start as any).format('YYYY-MM-DD'),
-    end: (values.end as any).format('YYYY-MM-DD'),
+    start: (values.dateRange?.[0] as any)?.format('YYYY-MM-DD'),
+    end: (values.dateRange?.[1] as any)?.format('YYYY-MM-DD'),
     portfolioId: values.portfolioId,
     sponsorIds: values.sponsorIds,
     ownerIds: values.ownerIds,
@@ -165,29 +166,12 @@ const CreateStrategicInitiativeForm = ({
         >
           <MarkdownEditor maxLength={2048} />
         </Item>
-        <Item name="start" label="Start" rules={[{ required: true }]}>
-          <DatePicker />
-        </Item>
         <Item
-          name="end"
-          label="End"
-          dependencies={['start']}
-          rules={[
-            { required: true },
-            ({ getFieldValue }) => ({
-              validator(_, value) {
-                const start = getFieldValue('start')
-                if (!value || !start || start < value) {
-                  return Promise.resolve()
-                }
-                return Promise.reject(
-                  new Error('End date must be after start date'),
-                )
-              },
-            }),
-          ]}
+          name="dateRange"
+          label="Planned Date Range"
+          rules={[{ required: true, message: 'Date range is required' }]}
         >
-          <DatePicker />
+          <RangePicker style={{ width: '60%' }} format="MMM D, YYYY" />
         </Item>
         <Item name="sponsorIds" label="Sponsors">
           <EmployeeSelect

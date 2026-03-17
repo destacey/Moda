@@ -17,6 +17,7 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey<P
     private readonly HashSet<RoleAssignment<ProjectRole>> _roles = [];
     private readonly HashSet<StrategicThemeTag<Project>> _strategicThemeTags = [];
     private readonly HashSet<StrategicInitiativeProject> _strategicInitiativeProjects = [];
+    private readonly List<ProjectPhase> _phases = [];
     private readonly List<ProjectTask> _tasks = [];
 
     private Project() { }
@@ -119,6 +120,17 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey<P
     public Program? Program { get; private set; }
 
     /// <summary>
+    /// The Id of the project lifecycle assigned to this project.
+    /// Required before a project can be approved.
+    /// </summary>
+    public Guid? ProjectLifecycleId { get; private set; }
+
+    /// <summary>
+    /// The project lifecycle assigned to this project.
+    /// </summary>
+    public ProjectLifecycle? ProjectLifecycle { get; private set; }
+
+    /// <summary>
     /// Indicates if the project is in a closed state.
     /// </summary>
     public bool IsClosed => Status is ProjectStatus.Completed or ProjectStatus.Cancelled;
@@ -132,6 +144,11 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey<P
     /// The strategic initiatives associated with this project.
     /// </summary>
     public IReadOnlyCollection<StrategicInitiativeProject> StrategicInitiativeProjects => _strategicInitiativeProjects;
+
+    /// <summary>
+    /// The phases associated with this project, created from the assigned lifecycle.
+    /// </summary>
+    public IReadOnlyCollection<ProjectPhase> Phases => _phases.AsReadOnly();
 
     /// <summary>
     /// The tasks associated with this project.
@@ -287,13 +304,152 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey<P
     #region Lifecycle
 
     /// <summary>
-    /// Approves the project.
+    /// Assigns a project lifecycle to this project, creating phase instances from the lifecycle template.
+    /// Only allowed when the project is in Proposed or Approved state and no lifecycle is currently assigned.
+    /// </summary>
+    /// <param name="lifecycle">The lifecycle to assign. Must be in Active state.</param>
+    public Result AssignLifecycle(ProjectLifecycle lifecycle)
+    {
+        Guard.Against.Null(lifecycle, nameof(lifecycle));
+
+        if (IsClosed)
+        {
+            return Result.Failure("Cannot assign a lifecycle to a closed project.");
+        }
+
+        if (lifecycle.State != ProjectLifecycleState.Active)
+        {
+            return Result.Failure("Only active lifecycles can be assigned to projects.");
+        }
+
+        if (ProjectLifecycleId.HasValue)
+        {
+            return Result.Failure("A lifecycle is already assigned to this project. Use ChangeLifecycle to switch lifecycles.");
+        }
+
+        ProjectLifecycleId = lifecycle.Id;
+
+        foreach (var lifecyclePhase in lifecycle.Phases.OrderBy(p => p.Order))
+        {
+            _phases.Add(ProjectPhase.Create(Id, lifecyclePhase));
+        }
+
+        return Result.Success();
+    }
+
+    /// <summary>
+    /// Changes the project's lifecycle to a new one, remapping tasks from old phases to new phases.
+    /// </summary>
+    /// <param name="newLifecycle">The new lifecycle to assign.</param>
+    /// <param name="phaseMapping">Maps old phase IDs to new lifecycle phase IDs (template phase IDs from the new lifecycle).</param>
+    public Result ChangeLifecycle(ProjectLifecycle newLifecycle, Dictionary<Guid, Guid> phaseMapping)
+    {
+        Guard.Against.Null(newLifecycle, nameof(newLifecycle));
+        Guard.Against.Null(phaseMapping, nameof(phaseMapping));
+
+        if (IsClosed)
+        {
+            return Result.Failure("Cannot change the lifecycle of a closed project.");
+        }
+
+        if (!ProjectLifecycleId.HasValue)
+        {
+            return Result.Failure("No lifecycle is currently assigned. Use AssignLifecycle instead.");
+        }
+
+        if (newLifecycle.State != ProjectLifecycleState.Active)
+        {
+            return Result.Failure("Only active lifecycles can be assigned to projects.");
+        }
+
+        if (newLifecycle.Id == ProjectLifecycleId.Value)
+        {
+            return Result.Failure("The new lifecycle must be different from the current lifecycle.");
+        }
+
+        // Validate that every phase with tasks is included in the mapping
+        var phasesWithTasks = _phases
+            .Where(p => _tasks.Any(t => t.ProjectPhaseId == p.Id))
+            .ToList();
+
+        foreach (var phase in phasesWithTasks)
+        {
+            if (!phaseMapping.ContainsKey(phase.Id))
+            {
+                return Result.Failure($"Phase '{phase.Name}' has tasks but is not included in the phase mapping.");
+            }
+        }
+
+        // Validate that every mapping target is a valid phase in the new lifecycle
+        var newLifecyclePhaseIds = newLifecycle.Phases.Select(p => p.Id).ToHashSet();
+        foreach (var (oldPhaseId, newLifecyclePhaseId) in phaseMapping)
+        {
+            if (!newLifecyclePhaseIds.Contains(newLifecyclePhaseId))
+            {
+                return Result.Failure($"Target lifecycle phase '{newLifecyclePhaseId}' does not exist in the new lifecycle.");
+            }
+        }
+
+        // Create new project phases from the new lifecycle
+        var newPhases = new List<ProjectPhase>();
+        foreach (var lifecyclePhase in newLifecycle.Phases.OrderBy(p => p.Order))
+        {
+            newPhases.Add(ProjectPhase.Create(Id, lifecyclePhase));
+        }
+
+        // Build lookup: old phase ID → new project phase ID (via lifecycle phase ID mapping)
+        // phaseMapping: oldProjectPhaseId → newLifecyclePhaseId
+        // newPhases: each has ProjectLifecyclePhaseId matching the lifecycle phase
+        var oldToNewPhaseMap = new Dictionary<Guid, Guid>();
+        foreach (var (oldPhaseId, newLifecyclePhaseId) in phaseMapping)
+        {
+            var newPhase = newPhases.FirstOrDefault(p => p.ProjectLifecyclePhaseId == newLifecyclePhaseId);
+            if (newPhase is null)
+            {
+                return Result.Failure($"Could not find new phase for lifecycle phase '{newLifecyclePhaseId}'.");
+            }
+            oldToNewPhaseMap[oldPhaseId] = newPhase.Id;
+        }
+
+        // Remap all tasks to new phases
+        foreach (var task in _tasks)
+        {
+            if (oldToNewPhaseMap.TryGetValue(task.ProjectPhaseId, out var newPhaseId))
+            {
+                task.ChangePhase(newPhaseId);
+            }
+            else
+            {
+                // Phase had no tasks (wasn't in the mapping), assign to first new phase
+                task.ChangePhase(newPhases.First().Id);
+            }
+        }
+
+        // Remove old phases and add new ones
+        _phases.Clear();
+        foreach (var newPhase in newPhases)
+        {
+            _phases.Add(newPhase);
+        }
+
+        ProjectLifecycleId = newLifecycle.Id;
+
+        return Result.Success();
+    }
+
+    /// <summary>
+    /// Approves the project. A lifecycle must be assigned before approval.
     /// </summary>
     public Result Approve()
     {
         if (Status != ProjectStatus.Proposed)
         {
             return Result.Failure("Only proposed projects can be approved.");
+        }
+
+        if (!ProjectLifecycleId.HasValue)
+        {
+            return Result.Failure("A project lifecycle must be assigned before the project can be approved.");
         }
 
         Status = ProjectStatus.Approved;
@@ -372,26 +528,23 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey<P
 
     /// <summary>
     /// Creates a new project task with the specified details and adds it to the project.
+    /// A lifecycle must be assigned before tasks can be created. The parentId can reference either
+    /// a project phase (for root-level tasks) or an existing task (for child tasks).
     /// </summary>
-    /// <remarks>The project must have a key assigned before tasks can be created. If a parent task is
-    /// specified, it must exist and cannot be a milestone, as milestones cannot have child tasks. The new task is
-    /// assigned an order value based on its siblings under the same parent.</remarks>
-    /// <param name="nextNumber">The next available task number to assign to the new task. Must be unique within the project.</param>
+    /// <param name="nextNumber">The next available task number to assign to the new task.</param>
     /// <param name="name">The name of the task. Cannot be null or empty.</param>
     /// <param name="description">An optional description providing additional details about the task.</param>
-    /// <param name="type">The type of the task to create. Determines the task's category, such as standard task or milestone.</param>
+    /// <param name="type">The type of the task to create (Task or Milestone).</param>
     /// <param name="status">The initial status to assign to the new task.</param>
-    /// <param name="priority">The priority level of the task, indicating its relative importance.</param>
+    /// <param name="priority">The priority level of the task.</param>
     /// <param name="progress">The current progress of the task, or null if not specified.</param>
-    /// <param name="parentId">The unique identifier of the parent task, or null if the new task is a top-level task. If specified, the parent
-    /// task must exist and cannot be a milestone.</param>
+    /// <param name="parentId">The ID of the parent phase or task. If it matches a phase, the task becomes a root task
+    /// in that phase. If it matches a task, the new task becomes a child of that task and inherits the phase.</param>
     /// <param name="plannedDateRange">The planned date range for the task, or null if not specified.</param>
     /// <param name="plannedDate">The planned date for the task, or null if not specified.</param>
-    /// <param name="estimatedEffortHours">The estimated effort required to complete the task, in hours. Can be null if not specified.</param>
-    /// <param name="roles">A mapping of task roles to sets of user identifiers assigned to each role, or null if no assignments are
-    /// specified.</param>
-    /// <returns>A result containing the newly created project task if successful; otherwise, a failure result with an error
-    /// message.</returns>
+    /// <param name="estimatedEffortHours">The estimated effort required to complete the task, in hours.</param>
+    /// <param name="roles">A mapping of task roles to sets of employee identifiers assigned to each role.</param>
+    /// <returns>A result containing the newly created project task if successful; otherwise, a failure result.</returns>
     public Result<ProjectTask> CreateTask(
         int nextNumber,
         string name,
@@ -400,7 +553,7 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey<P
         Enums.TaskStatus status,
         TaskPriority priority,
         Progress? progress,
-        Guid? parentId,
+        Guid parentId,
         FlexibleDateRange? plannedDateRange,
         LocalDate? plannedDate,
         decimal? estimatedEffortHours,
@@ -411,25 +564,26 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey<P
             return Result.Failure<ProjectTask>("Project must have a key before tasks can be created.");
         }
 
-        ProjectTask? parent = null;
-        if (parentId.HasValue)
+        if (!ProjectLifecycleId.HasValue)
         {
-            parent = _tasks.FirstOrDefault(t => t.Id == parentId);
-            if (parent is null)
-            {
-                return Result.Failure<ProjectTask>("Parent task not found.");
-            }
-
-            if (parent.Type == ProjectTaskType.Milestone)
-            {
-                return Result.Failure<ProjectTask>("Milestones cannot have child tasks.");
-            }
+            return Result.Failure<ProjectTask>("A lifecycle must be assigned before tasks can be created.");
         }
 
-        // Calculate order
-        var siblings = parentId.HasValue
-            ? _tasks.Where(t => t.ParentId == parentId)
-            : _tasks.Where(t => t.ParentId is null);
+        // Resolve parentId — could be a phase or a task
+        var resolveResult = ResolveParent(parentId);
+        if (resolveResult.IsFailure)
+        {
+            return Result.Failure<ProjectTask>(resolveResult.Error);
+        }
+
+        var (phase, parentTask) = resolveResult.Value;
+        var projectPhaseId = phase.Id;
+        Guid? taskParentId = parentTask?.Id;
+
+        // Calculate order — root tasks scoped to phase, child tasks scoped to parent
+        var siblings = taskParentId.HasValue
+            ? _tasks.Where(t => t.ParentId == taskParentId)
+            : _tasks.Where(t => t.ParentId is null && t.ProjectPhaseId == projectPhaseId);
         var order = siblings.Any() ? siblings.Max(t => t.Order) + 1 : 1;
 
         var task = ProjectTask.Create(
@@ -442,7 +596,8 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey<P
             priority,
             progress,
             order,
-            parentId,
+            taskParentId,
+            projectPhaseId,
             plannedDateRange,
             plannedDate,
             estimatedEffortHours,
@@ -450,14 +605,21 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey<P
 
         _tasks.Add(task);
 
-        parent?.AddChild(task);
+        parentTask?.AddChild(task);
 
         return Result.Success(task);
     }
 
-    public Result ChangeTaskPlacement(Guid taskId, Guid? parentId, int? order)
+    /// <summary>
+    /// Changes the placement of a task within the project hierarchy. The newParentId can reference
+    /// either a project phase (moving the task to root level in that phase) or another task (making it a child).
+    /// When a task moves across phases, all its descendants are updated to the new phase.
+    /// </summary>
+    /// <param name="taskId">The ID of the task to move.</param>
+    /// <param name="newParentId">The ID of the target phase or parent task.</param>
+    /// <param name="order">The desired position within the new parent's children, or null to append at the end.</param>
+    public Result ChangeTaskPlacement(Guid taskId, Guid newParentId, int? order)
     {
-        // get the current task
         var task = _tasks.FirstOrDefault(t => t.Id == taskId);
         if (task is null)
         {
@@ -469,65 +631,113 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey<P
             return Result.Failure("Order must be greater than zero.");
         }
 
-        // get the parent task
-        ProjectTask? parentTask = null;
-        if (parentId.HasValue)
+        // Resolve newParentId — could be a phase or a task
+        var resolveResult = ResolveParent(newParentId);
+        if (resolveResult.IsFailure)
         {
-            parentTask = _tasks.FirstOrDefault(t => t.Id == parentId);
-            if (parentTask is null)
-            {
-                return Result.Failure("New parent task not found.");
-            }
+            return Result.Failure(resolveResult.Error);
+        }
 
-            if (parentTask.Type == ProjectTaskType.Milestone)
-            {
-                return Result.Failure("Milestones cannot have child tasks.");
-            }
+        var (targetPhase, newParentTask) = resolveResult.Value;
+        Guid? newTaskParentId = newParentTask?.Id;
+        var newPhaseId = targetPhase.Id;
+
+        // Validate: milestone cannot have children
+        if (newParentTask?.Type == ProjectTaskType.Milestone)
+        {
+            return Result.Failure("Milestones cannot have child tasks.");
+        }
+
+        // Validate: prevent circular references
+        if (newTaskParentId.HasValue && newTaskParentId == taskId)
+        {
+            return Result.Failure("A task cannot be its own parent.");
+        }
+        if (newTaskParentId.HasValue && task.IsDescendantOf(newTaskParentId.Value))
+        {
+            return Result.Failure("A task cannot be moved under one of its descendants.");
         }
 
         var origParentId = task.ParentId;
-        var isChangingParent = origParentId != parentId;
+        var origPhaseId = task.ProjectPhaseId;
+        var isChangingParent = origParentId != newTaskParentId;
+        var isChangingPhase = origPhaseId != newPhaseId;
 
-        // set order in new parent
-        var parentChildrenQuery = parentId.HasValue
-                ? _tasks.Where(t => t.ParentId == parentId)
-                : _tasks.Where(t => t.ParentId is null);
+        // Determine siblings in the target location
+        var siblingsQuery = newTaskParentId.HasValue
+            ? _tasks.Where(t => t.ParentId == newTaskParentId)
+            : _tasks.Where(t => t.ParentId is null && t.ProjectPhaseId == newPhaseId);
 
         if (!isChangingParent)
         {
-            // Exclude the task being moved from the siblings list
-            parentChildrenQuery = parentChildrenQuery.Where(t => t.Id != taskId);
+            siblingsQuery = siblingsQuery.Where(t => t.Id != taskId);
         }
 
-        // Calculate new order
-        var childrenCount = parentChildrenQuery.Count() + 1;
+        var childrenCount = siblingsQuery.Count() + 1;
         var newOrder = Math.Min(order ?? childrenCount, childrenCount);
 
         Result changeResult;
         if (isChangingParent)
         {
-            // Update Old Parent and Children
+            // Remove from old parent
             if (origParentId.HasValue)
             {
                 var oldParent = _tasks.FirstOrDefault(t => t.Id == origParentId);
                 oldParent?.RemoveChild(task);
             }
 
-            // Update New Parent and Children
-            foreach (var sibling in parentChildrenQuery.Where(t => t.Order >= newOrder))
+            // Shift siblings in target to make room
+            foreach (var sibling in siblingsQuery.Where(t => t.Order >= newOrder))
             {
                 sibling.ChangeOrder(sibling.Order + 1);
             }
 
-            changeResult = task.ChangeParent(parentId, newOrder);
+            changeResult = task.ChangeParent(newTaskParentId, newOrder);
 
-            parentTask?.AddChild(task);
+            newParentTask?.AddChild(task);
 
-            // Reset order for old parent's remaining children after the task has been moved
-            ResetOrderForChildTasks(origParentId);
+            // Update phase if changed
+            if (isChangingPhase)
+            {
+                task.ChangePhase(newPhaseId);
+                foreach (var descendant in GetDescendants(task))
+                {
+                    descendant.ChangePhase(newPhaseId);
+                }
+            }
+
+            // Reorder old parent's remaining children
+            if (origParentId.HasValue)
+            {
+                ResetOrderForChildTasks(origParentId);
+            }
+            else
+            {
+                ResetOrderForRootTasksInPhase(origPhaseId);
+            }
+        }
+        else if (isChangingPhase)
+        {
+            // Same parent (null) but different phase — moving root task between phases
+            // Shift siblings in target phase
+            foreach (var sibling in siblingsQuery.Where(t => t.Order >= newOrder))
+            {
+                sibling.ChangeOrder(sibling.Order + 1);
+            }
+
+            task.ChangePhase(newPhaseId);
+            task.ChangeOrder(newOrder);
+            foreach (var descendant in GetDescendants(task))
+            {
+                descendant.ChangePhase(newPhaseId);
+            }
+
+            // Reorder old phase
+            ResetOrderForRootTasksInPhase(origPhaseId);
         }
         else
         {
+            // Same parent, same phase — just reordering
             var previousOrder = task.Order;
 
             if (newOrder == previousOrder)
@@ -535,26 +745,24 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey<P
 
             if (newOrder < previousOrder)
             {
-                // Moving up: Increment orders of siblings between new and old order
-                foreach (var sibling in parentChildrenQuery.Where(t => t.Order >= newOrder && t.Order < previousOrder))
+                foreach (var sibling in siblingsQuery.Where(t => t.Order >= newOrder && t.Order < previousOrder))
                 {
                     sibling.ChangeOrder(sibling.Order + 1);
                 }
             }
             else
             {
-                // Moving down: Decrement orders of siblings between old and new order
-                foreach (var sibling in parentChildrenQuery.Where(t => t.Order > previousOrder && t.Order <= newOrder))
+                foreach (var sibling in siblingsQuery.Where(t => t.Order > previousOrder && t.Order <= newOrder))
                 {
                     sibling.ChangeOrder(sibling.Order - 1);
                 }
             }
 
             changeResult = task.ChangeOrder(newOrder);
-
+            return changeResult;
         }
 
-        return changeResult;
+        return Result.Success();
     }
 
     /// <summary>
@@ -592,6 +800,66 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey<P
         ResetOrderForChildTasks(parentId);
 
         return Result.Success();
+    }
+
+    /// <summary>
+    /// Resolves a parentId to either a phase (root task) or a parent task (child task).
+    /// Returns the resolved phase and optional parent task.
+    /// </summary>
+    private Result<(ProjectPhase Phase, ProjectTask? ParentTask)> ResolveParent(Guid parentId)
+    {
+        // Check if parentId is a phase
+        var phase = _phases.FirstOrDefault(p => p.Id == parentId);
+        if (phase is not null)
+        {
+            return Result.Success<(ProjectPhase, ProjectTask?)>((phase, null));
+        }
+
+        // Check if parentId is a task
+        var parentTask = _tasks.FirstOrDefault(t => t.Id == parentId);
+        if (parentTask is null)
+        {
+            return Result.Failure<(ProjectPhase, ProjectTask?)>("The specified parent was not found. It must be a valid phase or task within this project.");
+        }
+
+        // Resolve the phase from the parent task
+        var taskPhase = _phases.FirstOrDefault(p => p.Id == parentTask.ProjectPhaseId);
+        if (taskPhase is null)
+        {
+            return Result.Failure<(ProjectPhase, ProjectTask?)>("Unable to resolve the phase for the parent task.");
+        }
+
+        return Result.Success<(ProjectPhase, ProjectTask?)>((taskPhase, parentTask));
+    }
+
+    private List<ProjectTask> GetDescendants(ProjectTask task)
+    {
+        var descendants = new List<ProjectTask>();
+        var queue = new Queue<Guid>();
+        queue.Enqueue(task.Id);
+
+        while (queue.Count > 0)
+        {
+            var parentId = queue.Dequeue();
+            foreach (var child in _tasks.Where(t => t.ParentId == parentId))
+            {
+                descendants.Add(child);
+                queue.Enqueue(child.Id);
+            }
+        }
+
+        return descendants;
+    }
+
+    private void ResetOrderForRootTasksInPhase(Guid phaseId)
+    {
+        var siblings = _tasks.Where(t => t.ParentId is null && t.ProjectPhaseId == phaseId).OrderBy(t => t.Order);
+        int order = 1;
+        foreach (var sibling in siblings)
+        {
+            sibling.ChangeOrder(order);
+            order++;
+        }
     }
 
     // TODO: this really belongs on the ProjectTask so a parent can reset its own children, but root tasks have no parent

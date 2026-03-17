@@ -66,9 +66,14 @@ public sealed record ProjectTaskDto : IMapFrom<ProjectTask>
     public int Order { get; set; }
 
     /// <summary>
-    /// The unique identifier of the parent task.
+    /// The unique identifier of the parent task (null for root tasks).
     /// </summary>
     public Guid? ParentId { get; set; }
+
+    /// <summary>
+    /// The unique identifier of the project phase this task belongs to.
+    /// </summary>
+    public Guid ProjectPhaseId { get; set; }
 
     /// <summary>
     /// The parent task navigation information.

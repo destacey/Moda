@@ -2,8 +2,8 @@
 
 import { ProjectDetailsDto } from '@/src/services/moda-api'
 import { FC } from 'react'
-import { ProjectTasksTable } from '.'
-import { useGetProjectTaskTreeQuery } from '@/src/store/features/ppm/project-tasks-api'
+import { ProjectPlanTable } from '.'
+import { useGetProjectPlanTreeQuery } from '@/src/store/features/ppm/projects-api'
 
 export interface ProjectPlanProps {
   project: ProjectDetailsDto
@@ -15,26 +15,25 @@ const ProjectPlan: FC<ProjectPlanProps> = ({
   canManageTasks,
 }: ProjectPlanProps) => {
   const {
-    data: tasksData,
-    isLoading: tasksDataIsLoading,
-    refetch: refetchTasksData,
-  } = useGetProjectTaskTreeQuery(
-    { projectIdOrKey: project?.key || '' },
-    { skip: !project?.key },
-  )
+    data: planData,
+    isLoading,
+    refetch,
+  } = useGetProjectPlanTreeQuery(project?.key || '', {
+    skip: !project?.key || !project?.projectLifecycle,
+  })
 
   if (!project) return null
 
   return (
-    <ProjectTasksTable
+    <ProjectPlanTable
+      projectId={project.id}
       projectKey={project.key}
-      tasks={tasksData}
-      isLoading={tasksDataIsLoading}
+      tasks={planData ?? []}
+      isLoading={isLoading}
       canManageTasks={canManageTasks}
-      refetch={refetchTasksData}
+      refetch={refetch}
     />
   )
 }
 
 export default ProjectPlan
-

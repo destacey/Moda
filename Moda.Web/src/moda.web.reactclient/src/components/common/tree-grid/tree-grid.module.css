@@ -260,6 +260,13 @@
   flex: 0 0 24px;
 }
 
+.phaseName {
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .empty {
   padding: var(--ant-padding-lg);
 }

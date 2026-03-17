@@ -270,6 +270,8 @@ export interface TreeGridProps<T extends TreeNode> {
     nodeId: string,
     parentId: string | null,
     order: number,
+    overNodeId?: string,
+    overIndex?: number,
   ) => Promise<void>
   /** Called when a DnD move is rejected by the projection/validator. */
   onMoveRejected?: (reason: string) => void

@@ -40,20 +40,6 @@ public class ProjectTasksController(ILogger<ProjectTasksController> logger, ISen
         return Ok(tasks);
     }
 
-    [HttpGet("tree")]
-    [MustHavePermission(ApplicationAction.View, ApplicationResource.Projects)]
-    [OpenApiOperation("Get a hierarchical tree of project tasks with WBS codes.", "")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IEnumerable<ProjectTaskTreeDto>>> GetProjectTaskTree(
-        string projectIdOrKey,
-        CancellationToken cancellationToken)
-    {
-        var tasks = await _sender.Send(new GetProjectTaskTreeQuery(projectIdOrKey), cancellationToken);
-
-        return Ok(tasks);
-    }
-
     [HttpGet("{taskIdOrKey}")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Projects)]
     [OpenApiOperation("Get project task details.", "")]

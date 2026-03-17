@@ -46,7 +46,7 @@ public sealed class AzureDevOpsSyncManager(ILogger<AzureDevOpsSyncManager> logge
     {
         _syncStarted(_logger, null);
 
-        var syncId = Guid.NewGuid();
+        var syncId = Guid.CreateVersion7();
         using (_logger.BeginScope(new Dictionary<string, object> { ["SyncId"] = syncId }))
         {
             try

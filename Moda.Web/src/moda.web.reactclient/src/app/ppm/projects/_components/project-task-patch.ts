@@ -18,6 +18,67 @@ export type JsonPatchReplaceOperation = {
 }
 
 // Note: ASP.NET Core JsonPatch expects PascalCase paths matching the C# property names
+export type ProjectPhaseUpdate = {
+  description?: string
+  statusId?: number
+  progress?: number
+  plannedStart?: string | null
+  plannedEnd?: string | null
+  assigneeIds?: string[]
+}
+
+// Note: ASP.NET Core JsonPatch expects PascalCase paths matching the C# property names
+export const buildProjectPhasePatchOperations = (
+  updates: ProjectPhaseUpdate,
+): JsonPatchReplaceOperation[] => {
+  const patchOperations: JsonPatchReplaceOperation[] = []
+
+  if (updates.description !== undefined) {
+    patchOperations.push({
+      op: 'replace',
+      path: '/Description',
+      value: updates.description,
+    })
+  }
+  if (updates.statusId !== undefined) {
+    patchOperations.push({
+      op: 'replace',
+      path: '/Status',
+      value: updates.statusId,
+    })
+  }
+  if (updates.progress !== undefined) {
+    patchOperations.push({
+      op: 'replace',
+      path: '/Progress',
+      value: updates.progress,
+    })
+  }
+  if (updates.plannedStart !== undefined) {
+    patchOperations.push({
+      op: 'replace',
+      path: '/PlannedStart',
+      value: updates.plannedStart,
+    })
+  }
+  if (updates.plannedEnd !== undefined) {
+    patchOperations.push({
+      op: 'replace',
+      path: '/PlannedEnd',
+      value: updates.plannedEnd,
+    })
+  }
+  if (updates.assigneeIds !== undefined) {
+    patchOperations.push({
+      op: 'replace',
+      path: '/AssigneeIds',
+      value: updates.assigneeIds,
+    })
+  }
+
+  return patchOperations
+}
+
 export const buildProjectTaskPatchOperations = (
   updates: ProjectTaskUpdate,
 ): JsonPatchReplaceOperation[] => {

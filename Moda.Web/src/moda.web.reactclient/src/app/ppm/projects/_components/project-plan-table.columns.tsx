@@ -1,9 +1,7 @@
-import { ProjectTaskTreeDto } from '@/src/services/moda-api'
+import { ProjectPlanNodeDto } from '@/src/services/moda-api'
 import {
   CaretDownOutlined,
   CaretRightOutlined,
-  DeleteOutlined,
-  EditOutlined,
   HolderOutlined,
   MoreOutlined,
   PlusOutlined,
@@ -58,11 +56,11 @@ function DragHandleCell({ isDragEnabled }: { isDragEnabled: boolean }) {
   )
 }
 
-interface ProjectTasksTableColumnsParams {
+interface ProjectPlanTableColumnsParams {
   canManageTasks: boolean
   selectedRowId: string | null
-  handleEditTask: (task: ProjectTaskTreeDto) => void
-  handleDeleteTask: (task: ProjectTaskTreeDto) => void
+  handleEditTask: (task: ProjectPlanNodeDto) => void
+  handleDeleteTask: (task: ProjectPlanNodeDto) => void
   handleUpdateTask?: (taskId: string, updates: Record<string, any>) => unknown
   getFieldError: (fieldName: string) => string | undefined
   handleKeyDown: (
@@ -83,9 +81,11 @@ interface ProjectTasksTableColumnsParams {
   taskTypeFilterOptions?: FilterOption[]
   taskStatusFilterOptions?: FilterOption[]
   taskPriorityFilterOptions?: FilterOption[]
+  isPhaseNode?: (node: ProjectPlanNodeDto | null | undefined) => boolean
+  handleEditPhase?: (phase: ProjectPlanNodeDto) => void
 }
 
-export const getProjectTasksTableColumns = ({
+export const getProjectPlanTableColumns = ({
   canManageTasks,
   selectedRowId,
   handleEditTask,
@@ -106,7 +106,9 @@ export const getProjectTasksTableColumns = ({
   taskTypeFilterOptions = [],
   taskStatusFilterOptions = [],
   taskPriorityFilterOptions = [],
-}: ProjectTasksTableColumnsParams): ColumnDef<ProjectTaskTreeDto>[] => {
+  isPhaseNode = () => false,
+  handleEditPhase,
+}: ProjectPlanTableColumnsParams): ColumnDef<ProjectPlanNodeDto>[] => {
   return [
     ...(canManageTasks
       ? [
@@ -121,6 +123,41 @@ export const getProjectTasksTableColumns = ({
             meta: { enableExport: false } satisfies TreeGridColumnMeta,
             cell: ({ row }: { row: any }) => {
               const isDraft = row.original.id.startsWith('draft-')
+              const isPhase = isPhaseNode(row.original)
+
+              if (isPhase) {
+                // Phase rows: no drag handle, show edit and add task options
+                const phaseMenuItems = []
+                if (handleEditPhase && canManageTasks) {
+                  phaseMenuItems.push({
+                    key: 'edit-phase',
+                    label: 'Edit',
+                    onClick: () => handleEditPhase(row.original),
+                  })
+                }
+                if (canCreateTasks && addDraftTaskAsChild) {
+                  phaseMenuItems.push({
+                    key: 'add-task',
+                    label: 'Add Task',
+                    onClick: () => addDraftTaskAsChild(row.original.id),
+                  })
+                }
+                return phaseMenuItems.length > 0 ? (
+                  <Flex align="center" gap={4}>
+                    <Dropdown
+                      menu={{ items: phaseMenuItems }}
+                      trigger={['click']}
+                    >
+                      <Button
+                        type="text"
+                        size="small"
+                        icon={<MoreOutlined />}
+                        tabIndex={-1}
+                      />
+                    </Dropdown>
+                  </Flex>
+                ) : null
+              }
 
               return (
                 <Flex align="center" gap={4}>
@@ -134,13 +171,23 @@ export const getProjectTasksTableColumns = ({
                           {
                             key: 'edit',
                             label: 'Edit',
-                            icon: <EditOutlined />,
                             onClick: () => handleEditTask(row.original),
                           },
+                          ...(canCreateTasks && addDraftTaskAsChild
+                            ? [
+                                {
+                                  key: 'add-child',
+                                  label: 'Add Child Task',
+                                  onClick: () =>
+                                    addDraftTaskAsChild(row.original.id),
+                                },
+                              ]
+                            : []),
+                          { key: 'divider', type: 'divider' as const },
                           {
                             key: 'delete',
                             label: 'Delete',
-                            icon: <DeleteOutlined />,
+                            danger: true,
                             onClick: () => handleDeleteTask(row.original),
                           },
                         ],
@@ -158,7 +205,7 @@ export const getProjectTasksTableColumns = ({
                 </Flex>
               )
             },
-          } as ColumnDef<ProjectTaskTreeDto>,
+          } as ColumnDef<ProjectPlanNodeDto>,
         ]
       : []),
     {
@@ -188,11 +235,12 @@ export const getProjectTasksTableColumns = ({
       sortingFn: 'alphanumeric',
       cell: ({ row }: { row: any }) => {
         const depth = row.depth
-        const task = row.original as ProjectTaskTreeDto
+        const task = row.original as ProjectPlanNodeDto
         const isSelected = selectedRowId === task.id
         const cellId = `${task.id}-name`
         const isDraft = task.id.startsWith('draft-')
         const isMilestone = task.type?.name === 'Milestone'
+        const isPhase = isPhaseNode(task)
 
         return (
           <Flex
@@ -224,7 +272,11 @@ export const getProjectTasksTableColumns = ({
               ) : (
                 <span className={styles.indentSpacer} />
               )}
-              {isSelected && handleUpdateTask ? (
+              {isPhase ? (
+                <span className={styles.phaseName}>
+                  {task.name}
+                </span>
+              ) : isSelected && handleUpdateTask ? (
                 <FormItem
                   name="name"
                   style={{ margin: 0, flex: 1, minWidth: 0 }}
@@ -274,7 +326,7 @@ export const getProjectTasksTableColumns = ({
     },
     {
       id: 'type',
-      accessorFn: (row) => row.type?.name ?? '',
+      accessorFn: (row) => row.type?.name ?? row.nodeType ?? '',
       header: 'Type',
       size: 110,
       enableGlobalFilter: true,
@@ -286,7 +338,7 @@ export const getProjectTasksTableColumns = ({
         filterOptions: taskTypeFilterOptions,
       } satisfies TreeGridColumnMeta,
       cell: ({ row }: { row: any }) => {
-        const task = row.original as ProjectTaskTreeDto
+        const task = row.original as ProjectPlanNodeDto
         const isSelected = selectedRowId === task.id
         const isDraft = task.id.startsWith('draft-')
         const cellId = `${task.id}-type`
@@ -328,7 +380,7 @@ export const getProjectTasksTableColumns = ({
           )
         }
 
-        return task.type?.name ?? ''
+        return task.type?.name ?? task.nodeType ?? ''
       },
     },
     {
@@ -345,7 +397,7 @@ export const getProjectTasksTableColumns = ({
         filterOptions: taskStatusFilterOptions,
       } satisfies TreeGridColumnMeta,
       cell: (info) => {
-        const task = info.row.original as ProjectTaskTreeDto
+        const task = info.row.original as ProjectPlanNodeDto
         const status = (info.getValue() as string) ?? ''
         const isSelected = selectedRowId === task.id
         const isDraft = task.id.startsWith('draft-')
@@ -403,12 +455,12 @@ export const getProjectTasksTableColumns = ({
         filterOptions: taskPriorityFilterOptions,
       } satisfies TreeGridColumnMeta,
       cell: (info) => {
-        const task = info.row.original as ProjectTaskTreeDto
+        const task = info.row.original as ProjectPlanNodeDto
         const priority = (info.getValue() as string) ?? ''
         const isSelected = selectedRowId === task.id
 
-        if (!isSelected || !handleUpdateTask) {
-          if (!priority) return '-'
+        if (!isSelected || !handleUpdateTask || task.nodeType === 'Phase') {
+          if (!priority) return task.nodeType === 'Phase' ? null : '-'
           const colorMap: Record<string, string> = {
             Low: 'green',
             Medium: 'orange',
@@ -440,7 +492,7 @@ export const getProjectTasksTableColumns = ({
       id: 'plannedStart',
       accessorFn: (row) => {
         const isMilestone = row.type?.name === 'Milestone'
-        const dateValue = isMilestone ? row.plannedDate : row.plannedStart
+        const dateValue = isMilestone ? row.plannedDate : row.start
         return dateValue ? dayjs(dateValue).format('MMM D, YYYY') : ''
       },
       header: 'Planned Start',
@@ -451,7 +503,7 @@ export const getProjectTasksTableColumns = ({
       meta: {
         exportFormatter: (_value, row) => {
           const isMilestone = row.type?.name === 'Milestone'
-          const date = isMilestone ? row.plannedDate : row.plannedStart
+          const date = isMilestone ? row.plannedDate : row.start
           return date ? dayjs(date).format('MMM D, YYYY') : ''
         },
       } satisfies TreeGridColumnMeta,
@@ -459,10 +511,10 @@ export const getProjectTasksTableColumns = ({
         const isMilestone = row.original.type?.name === 'Milestone'
         return isMilestone
           ? row.original.plannedDate
-          : row.original.plannedStart
+          : row.original.start
       }),
       cell: (info) => {
-        const task = info.row.original as ProjectTaskTreeDto
+        const task = info.row.original as ProjectPlanNodeDto
         const value = (info.getValue() as string) ?? ''
         const isSelected = selectedRowId === task.id
         const isDraft = task.id.startsWith('draft-')
@@ -514,7 +566,7 @@ export const getProjectTasksTableColumns = ({
     {
       id: 'plannedEnd',
       accessorFn: (row) =>
-        row.plannedEnd ? dayjs(row.plannedEnd).format('MMM D, YYYY') : '',
+        row.end ? dayjs(row.end).format('MMM D, YYYY') : '',
       header: 'Planned End',
       size: 130,
       enableGlobalFilter: true,
@@ -524,9 +576,9 @@ export const getProjectTasksTableColumns = ({
         exportFormatter: (value) =>
           value ? dayjs(value as string).format('MMM D, YYYY') : '',
       } satisfies TreeGridColumnMeta,
-      sortingFn: dateSortBy((row: any) => row.original.plannedEnd),
+      sortingFn: dateSortBy((row: any) => row.original.end),
       cell: (info) => {
-        const task = info.row.original as ProjectTaskTreeDto
+        const task = info.row.original as ProjectPlanNodeDto
         const value = (info.getValue() as string) ?? ''
         const isSelected = selectedRowId === task.id
         const isDraft = task.id.startsWith('draft-')
@@ -584,7 +636,7 @@ export const getProjectTasksTableColumns = ({
       filterFn: 'includesString',
       sortingFn: 'text',
       cell: (info) => {
-        const task = info.row.original as ProjectTaskTreeDto
+        const task = info.row.original as ProjectPlanNodeDto
         const assignees = task.assignees ?? []
         const isSelected = selectedRowId === task.id
 
@@ -603,7 +655,6 @@ export const getProjectTasksTableColumns = ({
             <Select
               size="small"
               mode="multiple"
-              allowClear
               placeholder="Select assignees"
               optionFilterProp="label"
               filterOption={(input, option) =>
@@ -634,7 +685,7 @@ export const getProjectTasksTableColumns = ({
         filterPlaceholder: 'e.g. >=10 or 2-6',
       } satisfies TreeGridColumnMeta,
       cell: (info) => {
-        const task = info.row.original as ProjectTaskTreeDto
+        const task = info.row.original as ProjectPlanNodeDto
         const value = task.progress
         const isSelected = selectedRowId === task.id
         const isDraft = task.id.startsWith('draft-')
@@ -683,7 +734,7 @@ export const getProjectTasksTableColumns = ({
         filterPlaceholder: 'e.g. >=10 or 2-6',
       } satisfies TreeGridColumnMeta,
       cell: (info) => {
-        const task = info.row.original as ProjectTaskTreeDto
+        const task = info.row.original as ProjectPlanNodeDto
         const value = task.estimatedEffortHours
         const isSelected = selectedRowId === task.id
         const isDraft = task.id.startsWith('draft-')
@@ -693,7 +744,7 @@ export const getProjectTasksTableColumns = ({
             : task.type?.name === 'Milestone'
           : task.type?.name === 'Milestone'
 
-        if (!isSelected || !handleUpdateTask || isMilestone) {
+        if (!isSelected || !handleUpdateTask || isMilestone || task.nodeType === 'Phase') {
           return value
         }
 
