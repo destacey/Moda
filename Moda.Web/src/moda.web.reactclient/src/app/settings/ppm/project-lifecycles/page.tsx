@@ -14,7 +14,9 @@ import CreateProjectLifecycleForm from './_components/create-project-lifecycle-f
 import { useMessage } from '@/src/components/contexts/messaging'
 
 const ProjectLifecycleCellRenderer = ({ value, data }) => {
-  return <Link href={`./${data.key}`}>{value}</Link>
+  return (
+    <Link href={`/settings/ppm/project-lifecycles/${data.key}`}>{value}</Link>
+  )
 }
 
 const ProjectLifecyclesPage = () => {
