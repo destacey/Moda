@@ -29,7 +29,7 @@ export interface EditProgramFormProps {
 interface EditProgramFormValues {
   name: string
   description: string
-  dateRange?: any[]
+  dateRange?: [dayjs.Dayjs, dayjs.Dayjs] | null
   sponsorIds: string[]
   ownerIds: string[]
   managerIds: string[]

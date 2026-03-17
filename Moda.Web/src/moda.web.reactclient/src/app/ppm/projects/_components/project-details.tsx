@@ -72,7 +72,7 @@ const ProjectDetails: FC<ProjectDetailsProps> = ({
                 {project.projectLifecycle.name}
               </Tooltip>
             ) : (
-              'Not lifecycle assigned'
+              'No lifecycle assigned'
             )}
           </Item>
           <Item label="Sponsors">{sponsorNames}</Item>

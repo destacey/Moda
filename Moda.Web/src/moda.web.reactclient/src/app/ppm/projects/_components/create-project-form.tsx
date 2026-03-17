@@ -23,6 +23,7 @@ import { useGetStrategicThemeOptionsQuery } from '@/src/store/features/strategic
 import { toFormErrors } from '@/src/utils'
 import { Card, DatePicker, Form, Input, Modal, Select, Timeline, Typography } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
+import dayjs from 'dayjs'
 import { useCallback, useEffect, useMemo } from 'react'
 
 const { Item } = Form
@@ -41,7 +42,7 @@ interface CreateProjectFormValues {
   name: string
   description: string
   expenditureCategoryId: number
-  dateRange?: any[]
+  dateRange?: [dayjs.Dayjs, dayjs.Dayjs] | null
   sponsorIds: string[]
   ownerIds: string[]
   managerIds: string[]

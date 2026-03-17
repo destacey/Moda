@@ -11,6 +11,7 @@ import { useCreateStrategicInitiativeMutation } from '@/src/store/features/ppm/s
 import { toFormErrors } from '@/src/utils'
 import { DatePicker, Form, Modal, Select } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
+import dayjs from 'dayjs'
 import { useCallback, useEffect } from 'react'
 
 const { Item } = Form
@@ -25,7 +26,7 @@ interface CreateStrategicInitiativeFormValues {
   portfolioId: string
   name: string
   description: string
-  dateRange: any[]
+  dateRange: [dayjs.Dayjs, dayjs.Dayjs]
   sponsorIds: string[]
   ownerIds: string[]
 }

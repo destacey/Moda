@@ -49,14 +49,16 @@ const ChangeProjectLifecycleStateForm = ({
           throw response.error
         }
 
+        const pastTense = stateAction === ProjectLifecycleStateAction.Activate ? 'activated' : 'archived'
         messageApi.success(
-          `Successfully ${stateAction}d project lifecycle.`,
+          `Successfully ${pastTense} project lifecycle.`,
         )
         return true
       } catch (error) {
+        const gerund = stateAction === ProjectLifecycleStateAction.Activate ? 'activating' : 'archiving'
         messageApi.error(
           error.detail ??
-            `An unexpected error occurred while ${stateAction}ing the project lifecycle.`,
+            `An unexpected error occurred while ${gerund} the project lifecycle.`,
         )
         console.log(error)
         return false

@@ -31,7 +31,7 @@ interface EditProjectFormValues {
   name: string
   description: string
   expenditureCategoryId: number
-  dateRange?: any[]
+  dateRange?: [dayjs.Dayjs, dayjs.Dayjs] | null
   sponsorIds: string[]
   ownerIds: string[]
   managerIds: string[]

@@ -28,7 +28,7 @@ export interface EditStrategicInitiativeFormProps {
 interface EditStrategicInitiativeFormValues {
   name: string
   description: string
-  dateRange: any[]
+  dateRange: [dayjs.Dayjs, dayjs.Dayjs]
   sponsorIds: string[]
   ownerIds: string[]
 }
