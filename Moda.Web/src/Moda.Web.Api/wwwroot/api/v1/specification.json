@@ -6233,6 +6233,74 @@
         ]
       }
     },
+    "/api/ppm/projects/{id}/lifecycle/change": {
+      "post": {
+        "tags": [
+          "Projects"
+        ],
+        "summary": "Change a project's lifecycle, remapping tasks between phases.",
+        "operationId": "Projects_ChangeProjectLifecycle",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeProjectLifecycleRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
     "/api/ppm/projects/{id}/phases": {
       "get": {
         "tags": [
@@ -23326,6 +23394,34 @@
             "minLength": 1,
             "nullable": false,
             "example": "00000000-0000-0000-0000-000000000000"
+          }
+        }
+      },
+      "ChangeProjectLifecycleRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "lifecycleId",
+          "phaseMapping"
+        ],
+        "properties": {
+          "lifecycleId": {
+            "type": "string",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "phaseMapping": {
+            "type": "object",
+            "minLength": 1,
+            "nullable": false,
+            "additionalProperties": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            }
           }
         }
       },

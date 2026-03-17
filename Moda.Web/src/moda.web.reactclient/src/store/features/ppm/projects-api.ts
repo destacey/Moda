@@ -409,6 +409,34 @@ export const projectsApi = apiSlice.injectEndpoints({
         return [{ type: QueryTags.ProjectPlanTree, id: cacheKey }]
       },
     }),
+
+    changeProjectLifecycle: builder.mutation<
+      void,
+      {
+        projectId: string
+        request: {
+          lifecycleId: string
+          phaseMapping: Record<string, string>
+        }
+      }
+    >({
+      queryFn: async ({ projectId, request }) => {
+        try {
+          const data = await getProjectsClient().changeProjectLifecycle(
+            projectId,
+            request as any,
+          )
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: () => [
+        { type: QueryTags.Project, id: 'LIST' },
+        { type: QueryTags.ProjectPlanTree },
+      ],
+    }),
   }),
 })
 
@@ -431,4 +459,5 @@ export const {
   useGetProjectPlanTreeQuery,
   useGetProjectPhaseQuery,
   usePatchProjectPhaseMutation,
+  useChangeProjectLifecycleMutation,
 } = projectsApi

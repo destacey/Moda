@@ -233,6 +233,24 @@ public class ProjectsController(ILogger<ProjectsController> logger, ISender send
             : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
+    [HttpPost("{id}/lifecycle/change")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Projects)]
+    [OpenApiOperation("Change a project's lifecycle, remapping tasks between phases.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> ChangeProjectLifecycle(
+        Guid id,
+        [FromBody] ChangeProjectLifecycleRequest request,
+        CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(request.ToCommand(id), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
     [HttpGet("{id}/phases")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Projects)]
     [OpenApiOperation("Get phases for a project.", "")]

@@ -26,6 +26,7 @@ import {
   ProjectDetails,
 } from '../_components'
 import AssignProjectLifecycleForm from '../_components/assign-project-lifecycle-form'
+import ChangeProjectLifecycleForm from '../_components/change-project-lifecycle-form'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import { ItemType } from 'antd/es/menu/interface'
 import { ProjectStatusAction } from '../_components/change-project-status-form'
@@ -49,6 +50,7 @@ enum ProjectTabs {
 enum ProjectAction {
   Edit = 'Edit',
   AssignLifecycle = 'Assign Lifecycle',
+  ChangeLifecycle = 'Change Lifecycle',
   ChangeProgram = 'Change Program',
   ChangeKey = 'Change Key',
   Delete = 'Delete',
@@ -77,6 +79,8 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const [openDeleteProjectForm, setOpenDeleteProjectForm] =
     useState<boolean>(false)
   const [openAssignLifecycleForm, setOpenAssignLifecycleForm] =
+    useState<boolean>(false)
+  const [openChangeLifecycleForm, setOpenChangeLifecycleForm] =
     useState<boolean>(false)
 
   const pathname = usePathname()
@@ -223,6 +227,12 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
           label: ProjectAction.AssignLifecycle,
           onClick: () => setOpenAssignLifecycleForm(true),
         })
+      } else {
+        items.push({
+          key: 'change-lifecycle',
+          label: ProjectAction.ChangeLifecycle,
+          onClick: () => setOpenChangeLifecycleForm(true),
+        })
       }
     }
     if (canDeleteProject && availableActions.includes(ProjectAction.Delete)) {
@@ -301,6 +311,16 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const onAssignLifecycleFormClosed = useCallback(
     (wasSaved: boolean) => {
       setOpenAssignLifecycleForm(false)
+      if (wasSaved) {
+        refetchProject()
+      }
+    },
+    [refetchProject],
+  )
+
+  const onChangeLifecycleFormClosed = useCallback(
+    (wasSaved: boolean) => {
+      setOpenChangeLifecycleForm(false)
       if (wasSaved) {
         refetchProject()
       }
@@ -494,6 +514,13 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
           project={projectData}
           onFormComplete={() => onAssignLifecycleFormClosed(true)}
           onFormCancel={() => onAssignLifecycleFormClosed(false)}
+        />
+      )}
+      {openChangeLifecycleForm && (
+        <ChangeProjectLifecycleForm
+          project={projectData}
+          onFormComplete={() => onChangeLifecycleFormClosed(true)}
+          onFormCancel={() => onChangeLifecycleFormClosed(false)}
         />
       )}
     </>

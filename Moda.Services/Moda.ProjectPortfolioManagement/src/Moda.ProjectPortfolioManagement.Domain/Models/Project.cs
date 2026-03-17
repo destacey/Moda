@@ -338,6 +338,106 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey<P
     }
 
     /// <summary>
+    /// Changes the project's lifecycle to a new one, remapping tasks from old phases to new phases.
+    /// </summary>
+    /// <param name="newLifecycle">The new lifecycle to assign.</param>
+    /// <param name="phaseMapping">Maps old phase IDs to new lifecycle phase IDs (template phase IDs from the new lifecycle).</param>
+    public Result ChangeLifecycle(ProjectLifecycle newLifecycle, Dictionary<Guid, Guid> phaseMapping)
+    {
+        Guard.Against.Null(newLifecycle, nameof(newLifecycle));
+        Guard.Against.Null(phaseMapping, nameof(phaseMapping));
+
+        if (IsClosed)
+        {
+            return Result.Failure("Cannot change the lifecycle of a closed project.");
+        }
+
+        if (!ProjectLifecycleId.HasValue)
+        {
+            return Result.Failure("No lifecycle is currently assigned. Use AssignLifecycle instead.");
+        }
+
+        if (newLifecycle.State != ProjectLifecycleState.Active)
+        {
+            return Result.Failure("Only active lifecycles can be assigned to projects.");
+        }
+
+        if (newLifecycle.Id == ProjectLifecycleId.Value)
+        {
+            return Result.Failure("The new lifecycle must be different from the current lifecycle.");
+        }
+
+        // Validate that every phase with tasks is included in the mapping
+        var phasesWithTasks = _phases
+            .Where(p => _tasks.Any(t => t.ProjectPhaseId == p.Id))
+            .ToList();
+
+        foreach (var phase in phasesWithTasks)
+        {
+            if (!phaseMapping.ContainsKey(phase.Id))
+            {
+                return Result.Failure($"Phase '{phase.Name}' has tasks but is not included in the phase mapping.");
+            }
+        }
+
+        // Validate that every mapping target is a valid phase in the new lifecycle
+        var newLifecyclePhaseIds = newLifecycle.Phases.Select(p => p.Id).ToHashSet();
+        foreach (var (oldPhaseId, newLifecyclePhaseId) in phaseMapping)
+        {
+            if (!newLifecyclePhaseIds.Contains(newLifecyclePhaseId))
+            {
+                return Result.Failure($"Target lifecycle phase '{newLifecyclePhaseId}' does not exist in the new lifecycle.");
+            }
+        }
+
+        // Create new project phases from the new lifecycle
+        var newPhases = new List<ProjectPhase>();
+        foreach (var lifecyclePhase in newLifecycle.Phases.OrderBy(p => p.Order))
+        {
+            newPhases.Add(ProjectPhase.Create(Id, lifecyclePhase));
+        }
+
+        // Build lookup: old phase ID → new project phase ID (via lifecycle phase ID mapping)
+        // phaseMapping: oldProjectPhaseId → newLifecyclePhaseId
+        // newPhases: each has ProjectLifecyclePhaseId matching the lifecycle phase
+        var oldToNewPhaseMap = new Dictionary<Guid, Guid>();
+        foreach (var (oldPhaseId, newLifecyclePhaseId) in phaseMapping)
+        {
+            var newPhase = newPhases.FirstOrDefault(p => p.ProjectLifecyclePhaseId == newLifecyclePhaseId);
+            if (newPhase is null)
+            {
+                return Result.Failure($"Could not find new phase for lifecycle phase '{newLifecyclePhaseId}'.");
+            }
+            oldToNewPhaseMap[oldPhaseId] = newPhase.Id;
+        }
+
+        // Remap all tasks to new phases
+        foreach (var task in _tasks)
+        {
+            if (oldToNewPhaseMap.TryGetValue(task.ProjectPhaseId, out var newPhaseId))
+            {
+                task.ChangePhase(newPhaseId);
+            }
+            else
+            {
+                // Phase had no tasks (wasn't in the mapping), assign to first new phase
+                task.ChangePhase(newPhases.First().Id);
+            }
+        }
+
+        // Remove old phases and add new ones
+        _phases.Clear();
+        foreach (var newPhase in newPhases)
+        {
+            _phases.Add(newPhase);
+        }
+
+        ProjectLifecycleId = newLifecycle.Id;
+
+        return Result.Success();
+    }
+
+    /// <summary>
     /// Approves the project. A lifecycle must be assigned before approval.
     /// </summary>
     public Result Approve()

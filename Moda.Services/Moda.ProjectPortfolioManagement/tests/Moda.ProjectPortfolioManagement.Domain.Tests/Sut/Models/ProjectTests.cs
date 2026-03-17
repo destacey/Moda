@@ -1468,4 +1468,227 @@ public class ProjectTests
     }
 
     #endregion ChangeTaskPlacement Phase Tests
+
+    #region ChangeLifecycle Tests
+
+    [Fact]
+    public void ChangeLifecycle_ShouldSucceed_WhenMappingIsValid()
+    {
+        // Arrange
+        var (project, oldPhases) = CreateProjectWithLifecycle(
+            ("Plan", "Planning phase"),
+            ("Execute", "Execution phase"),
+            ("Deliver", "Delivery phase"));
+
+        var oldPhase1 = oldPhases[0];
+        var oldPhase2 = oldPhases[1];
+
+        // Create tasks in the first two phases
+        project.CreateTask(1, "Task 1", null, ProjectTaskType.Task, Enums.TaskStatus.NotStarted, TaskPriority.Medium, null, oldPhase1.Id, null, null, null, null);
+        project.CreateTask(2, "Task 2", null, ProjectTaskType.Task, Enums.TaskStatus.NotStarted, TaskPriority.Medium, null, oldPhase2.Id, null, null, null, null);
+
+        var newLifecycle = new ProjectLifecycleFaker().AsActiveWithPhases(
+            ("Discovery", "Discovery phase"),
+            ("Build", "Build phase"),
+            ("Launch", "Launch phase"));
+
+        var newLifecyclePhases = newLifecycle.Phases.OrderBy(p => p.Order).ToList();
+
+        var phaseMapping = new Dictionary<Guid, Guid>
+        {
+            { oldPhase1.Id, newLifecyclePhases[0].Id },
+            { oldPhase2.Id, newLifecyclePhases[1].Id },
+        };
+
+        // Act
+        var result = project.ChangeLifecycle(newLifecycle, phaseMapping);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        project.ProjectLifecycleId.Should().Be(newLifecycle.Id);
+        project.Phases.Should().HaveCount(3);
+        project.Phases.Select(p => p.Name).Should().BeEquivalentTo("Discovery", "Build", "Launch");
+
+        var tasks = project.Tasks.ToList();
+        tasks.Should().HaveCount(2);
+
+        // Task 1 should be in the Discovery phase (mapped from Plan)
+        var newDiscoveryPhase = project.Phases.First(p => p.Name == "Discovery");
+        tasks.First(t => t.Name == "Task 1").ProjectPhaseId.Should().Be(newDiscoveryPhase.Id);
+
+        // Task 2 should be in the Build phase (mapped from Execute)
+        var newBuildPhase = project.Phases.First(p => p.Name == "Build");
+        tasks.First(t => t.Name == "Task 2").ProjectPhaseId.Should().Be(newBuildPhase.Id);
+    }
+
+    [Fact]
+    public void ChangeLifecycle_ShouldFail_WhenProjectIsClosed()
+    {
+        // Arrange
+        var project = _projectFaker.AsCompleted(_dateTimeProvider);
+        var newLifecycle = new ProjectLifecycleFaker().AsActiveWithPhases(("Phase 1", "First phase"));
+
+        // Act
+        var result = project.ChangeLifecycle(newLifecycle, new Dictionary<Guid, Guid>());
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Contain("closed");
+    }
+
+    [Fact]
+    public void ChangeLifecycle_ShouldFail_WhenNoLifecycleAssigned()
+    {
+        // Arrange
+        var project = _projectFaker.Generate();
+        var newLifecycle = new ProjectLifecycleFaker().AsActiveWithPhases(("Phase 1", "First phase"));
+
+        // Act
+        var result = project.ChangeLifecycle(newLifecycle, new Dictionary<Guid, Guid>());
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Contain("No lifecycle is currently assigned");
+    }
+
+    [Fact]
+    public void ChangeLifecycle_ShouldFail_WhenNewLifecycleIsNotActive()
+    {
+        // Arrange
+        var (project, _) = CreateProjectWithLifecycle(("Plan", "Planning phase"));
+        var newLifecycle = new ProjectLifecycleFaker().AsProposedWithPhases(("Phase 1", "First phase"));
+
+        // Act
+        var result = project.ChangeLifecycle(newLifecycle, new Dictionary<Guid, Guid>());
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Contain("active");
+    }
+
+    [Fact]
+    public void ChangeLifecycle_ShouldFail_WhenSameLifecycle()
+    {
+        // Arrange
+        var lifecycle = new ProjectLifecycleFaker().AsActiveWithPhases(("Plan", "Planning phase"), ("Execute", "Execution phase"));
+        var project = _projectFaker.Generate();
+        project.AssignLifecycle(lifecycle);
+
+        // Act
+        var result = project.ChangeLifecycle(lifecycle, new Dictionary<Guid, Guid>());
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Contain("different");
+    }
+
+    [Fact]
+    public void ChangeLifecycle_ShouldFail_WhenPhaseWithTasksNotMapped()
+    {
+        // Arrange
+        var (project, oldPhases) = CreateProjectWithLifecycle(
+            ("Plan", "Planning phase"),
+            ("Execute", "Execution phase"));
+
+        // Create a task in the Execute phase
+        project.CreateTask(1, "Task 1", null, ProjectTaskType.Task, Enums.TaskStatus.NotStarted, TaskPriority.Medium, null, oldPhases[1].Id, null, null, null, null);
+
+        var newLifecycle = new ProjectLifecycleFaker().AsActiveWithPhases(("Phase 1", "First phase"));
+        var newPhases = newLifecycle.Phases.ToList();
+
+        // Only map Plan, but Execute has tasks
+        var phaseMapping = new Dictionary<Guid, Guid>
+        {
+            { oldPhases[0].Id, newPhases[0].Id },
+        };
+
+        // Act
+        var result = project.ChangeLifecycle(newLifecycle, phaseMapping);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Contain("Execute");
+    }
+
+    [Fact]
+    public void ChangeLifecycle_ShouldFail_WhenMappingTargetInvalid()
+    {
+        // Arrange
+        var (project, oldPhases) = CreateProjectWithLifecycle(("Plan", "Planning phase"));
+        project.CreateTask(1, "Task 1", null, ProjectTaskType.Task, Enums.TaskStatus.NotStarted, TaskPriority.Medium, null, oldPhases[0].Id, null, null, null, null);
+
+        var newLifecycle = new ProjectLifecycleFaker().AsActiveWithPhases(("Phase 1", "First phase"));
+
+        var phaseMapping = new Dictionary<Guid, Guid>
+        {
+            { oldPhases[0].Id, Guid.NewGuid() }, // Invalid target
+        };
+
+        // Act
+        var result = project.ChangeLifecycle(newLifecycle, phaseMapping);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Contain("does not exist");
+    }
+
+    [Fact]
+    public void ChangeLifecycle_ShouldSucceed_WithEmptyPhasesNoTasks()
+    {
+        // Arrange
+        var (project, _) = CreateProjectWithLifecycle(("Plan", "Planning phase"), ("Execute", "Execution phase"));
+
+        var newLifecycle = new ProjectLifecycleFaker().AsActiveWithPhases(
+            ("Discovery", "Discovery phase"),
+            ("Build", "Build phase"));
+
+        // No tasks, so no mapping needed for phases with tasks
+        var phaseMapping = new Dictionary<Guid, Guid>();
+
+        // Act
+        var result = project.ChangeLifecycle(newLifecycle, phaseMapping);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        project.ProjectLifecycleId.Should().Be(newLifecycle.Id);
+        project.Phases.Should().HaveCount(2);
+        project.Phases.Select(p => p.Name).Should().BeEquivalentTo("Discovery", "Build");
+    }
+
+    [Fact]
+    public void ChangeLifecycle_ShouldMapMultipleTasksToSamePhase()
+    {
+        // Arrange
+        var (project, oldPhases) = CreateProjectWithLifecycle(
+            ("Plan", "Planning phase"),
+            ("Execute", "Execution phase"),
+            ("Deliver", "Delivery phase"));
+
+        project.CreateTask(1, "Task A", null, ProjectTaskType.Task, Enums.TaskStatus.NotStarted, TaskPriority.Medium, null, oldPhases[0].Id, null, null, null, null);
+        project.CreateTask(2, "Task B", null, ProjectTaskType.Task, Enums.TaskStatus.NotStarted, TaskPriority.Medium, null, oldPhases[1].Id, null, null, null, null);
+        project.CreateTask(3, "Task C", null, ProjectTaskType.Task, Enums.TaskStatus.NotStarted, TaskPriority.Medium, null, oldPhases[2].Id, null, null, null, null);
+
+        var newLifecycle = new ProjectLifecycleFaker().AsActiveWithPhases(("Single Phase", "The only phase"));
+        var newPhases = newLifecycle.Phases.ToList();
+
+        // Map all old phases to the single new phase
+        var phaseMapping = new Dictionary<Guid, Guid>
+        {
+            { oldPhases[0].Id, newPhases[0].Id },
+            { oldPhases[1].Id, newPhases[0].Id },
+            { oldPhases[2].Id, newPhases[0].Id },
+        };
+
+        // Act
+        var result = project.ChangeLifecycle(newLifecycle, phaseMapping);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        project.Phases.Should().HaveCount(1);
+
+        var singlePhase = project.Phases.First();
+        project.Tasks.Should().OnlyContain(t => t.ProjectPhaseId == singlePhase.Id);
+    }
+
+    #endregion ChangeLifecycle Tests
 }
