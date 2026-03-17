@@ -1,8 +1,5 @@
 name: CI - MCP Server
 
-permissions:
-    contents: read
-
 on:
     push:
         branches:
@@ -16,6 +13,8 @@ on:
 jobs:
     build:
         runs-on: ubuntu-latest
+        permissions:
+            contents: read
         defaults:
             run:
                 working-directory: Moda.Web/src/Moda.Mcp
@@ -37,3 +36,30 @@ jobs:
 
             - name: Build
               run: npm run build
+
+    release-pr:
+        needs: [build]
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+            pull-requests: write
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+
+            - name: Install dependencies
+              run: npm ci
+              working-directory: Moda.Web/src/Moda.Mcp
+
+            - name: Open or update release PR
+              uses: changesets/action@v1
+              with:
+                  cwd: Moda.Web/src/Moda.Mcp
+                  title: "chore: release @modanpm/moda-mcp"
+                  commit: "chore: version mcp package"
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
