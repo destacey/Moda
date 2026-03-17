@@ -18,7 +18,10 @@
     "generate": "tsx scripts/generate-zod-schemas.ts",
     "lint": "eslint src",
     "typecheck": "tsc --noEmit",
-    "prepare": "npm run build"
+    "prepare": "npm run build",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "npm run build && changeset publish"
   },
   "keywords": [
     "mcp",
