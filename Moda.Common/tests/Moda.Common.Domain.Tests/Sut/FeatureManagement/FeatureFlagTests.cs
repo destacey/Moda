@@ -209,6 +209,34 @@ public sealed class FeatureFlagTests
         flag.Description.Should().BeNull();
     }
 
+    [Fact]
+    public void Update_ShouldNotChangeIsEnabled_WhenFlagIsEnabled()
+    {
+        // Arrange
+        var flag = FeatureFlag.Create("test-flag", "Original Name", null, true).Value;
+        flag.IsEnabled.Should().BeTrue();
+
+        // Act
+        flag.Update("Updated Name", "Updated description");
+
+        // Assert - IsEnabled must be preserved; the seeder relies on this guarantee
+        flag.IsEnabled.Should().BeTrue();
+    }
+
+    [Fact]
+    public void Update_ShouldNotChangeIsEnabled_WhenFlagIsDisabled()
+    {
+        // Arrange
+        var flag = FeatureFlag.Create("test-flag", "Original Name", null, false).Value;
+        flag.IsEnabled.Should().BeFalse();
+
+        // Act
+        flag.Update("Updated Name", "Updated description");
+
+        // Assert - IsEnabled must be preserved; the seeder relies on this guarantee
+        flag.IsEnabled.Should().BeFalse();
+    }
+
     [Theory]
     [InlineData("")]
     [InlineData("  ")]
