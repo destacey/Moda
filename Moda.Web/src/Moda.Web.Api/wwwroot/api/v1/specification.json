@@ -6289,6 +6289,59 @@
         ]
       }
     },
+    "/api/ppm/projects/{idOrKey}/plan-tree": {
+      "get": {
+        "tags": [
+          "Projects"
+        ],
+        "summary": "Get a unified plan tree with phases as top-level nodes and tasks nested within.",
+        "operationId": "Projects_GetProjectPlanTree",
+        "parameters": [
+          {
+            "name": "idOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProjectPlanNodeDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
     "/api/ppm/projects/{id}/phases/{phaseId}": {
       "get": {
         "tags": [
@@ -6407,6 +6460,94 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Projects"
+        ],
+        "summary": "Partially update a project phase using JSON Patch (RFC 6902).",
+        "operationId": "Projects_PatchProjectPhase",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "phaseId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 2
+          }
+        ],
+        "requestBody": {
+          "x-name": "patchDocument",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonPatchDocumentOfUpdateProjectPhaseRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 3
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
                 }
               }
             }
@@ -6550,59 +6691,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/HttpValidationProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": []
-          },
-          {
-            "ApiKey": []
-          }
-        ]
-      }
-    },
-    "/api/ppm/projects/{projectIdOrKey}/tasks/tree": {
-      "get": {
-        "tags": [
-          "ProjectTasks"
-        ],
-        "summary": "Get a hierarchical tree of project tasks with WBS codes.",
-        "operationId": "ProjectTasks_GetProjectTaskTree",
-        "parameters": [
-          {
-            "name": "projectIdOrKey",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ProjectTaskTreeDto"
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -23241,6 +23329,113 @@
           }
         }
       },
+      "ProjectPlanNodeDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "nodeType",
+          "name",
+          "status",
+          "order",
+          "wbs",
+          "progress",
+          "assignees",
+          "children"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "nodeType": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "order": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "wbs": {
+            "type": "string"
+          },
+          "start": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "end": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "progress": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "assignees": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmployeeNavigationDto"
+            }
+          },
+          "children": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProjectPlanNodeDto"
+            }
+          },
+          "key": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/SimpleNavigationDto"
+              }
+            ]
+          },
+          "priority": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/SimpleNavigationDto"
+              }
+            ]
+          },
+          "parentId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "projectPhaseId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "plannedDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "estimatedEffortHours": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          }
+        }
+      },
       "ProjectPhaseDetailsDto": {
         "type": "object",
         "additionalProperties": false,
@@ -23250,7 +23445,8 @@
           "description",
           "status",
           "order",
-          "progress"
+          "progress",
+          "assignees"
         ],
         "properties": {
           "id": {
@@ -23285,6 +23481,12 @@
           "progress": {
             "type": "number",
             "format": "decimal"
+          },
+          "assignees": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmployeeNavigationDto"
+            }
           }
         }
       },
@@ -23298,7 +23500,10 @@
         ],
         "properties": {
           "description": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 1024,
+            "minLength": 1,
+            "nullable": false
           },
           "status": {
             "type": "integer",
@@ -23316,7 +23521,85 @@
           },
           "progress": {
             "type": "number",
-            "format": "decimal"
+            "format": "decimal",
+            "maximum": 100.0,
+            "minimum": 0.0
+          },
+          "assigneeIds": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            }
+          }
+        }
+      },
+      "JsonPatchDocumentOfUpdateProjectPhaseRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operations"
+        ],
+        "properties": {
+          "operations": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/OperationOfUpdateProjectPhaseRequest"
+            }
+          }
+        }
+      },
+      "OperationOfUpdateProjectPhaseRequest": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Operation"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false
+          }
+        ]
+      },
+      "Operation": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/OperationBase"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "value": {
+                "nullable": true
+              }
+            }
+          }
+        ]
+      },
+      "OperationBase": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "op",
+          "from"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "nullable": true
+          },
+          "op": {
+            "type": "string",
+            "nullable": true
+          },
+          "from": {
+            "type": "string",
+            "nullable": true
           }
         }
       },
@@ -23433,106 +23716,6 @@
           },
           "name": {
             "type": "string"
-          }
-        }
-      },
-      "ProjectTaskTreeDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "key",
-          "projectId",
-          "name",
-          "type",
-          "status",
-          "assignees",
-          "progress",
-          "order",
-          "wbs",
-          "children"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "guid",
-            "nullable": false,
-            "example": "00000000-0000-0000-0000-000000000000"
-          },
-          "key": {
-            "type": "string"
-          },
-          "projectId": {
-            "type": "string",
-            "format": "guid",
-            "nullable": false,
-            "example": "00000000-0000-0000-0000-000000000000"
-          },
-          "name": {
-            "type": "string"
-          },
-          "type": {
-            "$ref": "#/components/schemas/SimpleNavigationDto"
-          },
-          "status": {
-            "$ref": "#/components/schemas/SimpleNavigationDto"
-          },
-          "priority": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/SimpleNavigationDto"
-              }
-            ]
-          },
-          "assignees": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/EmployeeNavigationDto"
-            }
-          },
-          "progress": {
-            "type": "number",
-            "format": "decimal"
-          },
-          "order": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "parentId": {
-            "type": "string",
-            "format": "guid",
-            "nullable": true,
-            "example": "00000000-0000-0000-0000-000000000000"
-          },
-          "wbs": {
-            "type": "string"
-          },
-          "plannedStart": {
-            "type": "string",
-            "format": "date",
-            "nullable": true
-          },
-          "plannedEnd": {
-            "type": "string",
-            "format": "date",
-            "nullable": true
-          },
-          "plannedDate": {
-            "type": "string",
-            "format": "date",
-            "nullable": true
-          },
-          "estimatedEffortHours": {
-            "type": "number",
-            "format": "decimal",
-            "nullable": true
-          },
-          "children": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ProjectTaskTreeDto"
-            }
           }
         }
       },
@@ -23875,45 +24058,6 @@
             "additionalProperties": false
           }
         ]
-      },
-      "Operation": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/OperationBase"
-          },
-          {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-              "value": {
-                "nullable": true
-              }
-            }
-          }
-        ]
-      },
-      "OperationBase": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "path",
-          "op",
-          "from"
-        ],
-        "properties": {
-          "path": {
-            "type": "string",
-            "nullable": true
-          },
-          "op": {
-            "type": "string",
-            "nullable": true
-          },
-          "from": {
-            "type": "string",
-            "nullable": true
-          }
-        }
       },
       "UpdateProjectTaskPlacementRequest": {
         "type": "object",

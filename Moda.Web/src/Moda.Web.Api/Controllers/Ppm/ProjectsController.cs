@@ -1,4 +1,5 @@
-﻿using Moda.Common.Application.Models;
+﻿using Microsoft.AspNetCore.JsonPatch.SystemTextJson;
+using Moda.Common.Application.Models;
 using Moda.ProjectPortfolioManagement.Application.Projects.Commands;
 using Moda.ProjectPortfolioManagement.Application.Projects.Dtos;
 using Moda.ProjectPortfolioManagement.Application.Projects.Queries;
@@ -244,6 +245,18 @@ public class ProjectsController(ILogger<ProjectsController> logger, ISender send
         return Ok(phases);
     }
 
+    [HttpGet("{idOrKey}/plan-tree")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Projects)]
+    [OpenApiOperation("Get a unified plan tree with phases as top-level nodes and tasks nested within.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IEnumerable<ProjectPlanNodeDto>>> GetProjectPlanTree(string idOrKey, CancellationToken cancellationToken)
+    {
+        var nodes = await _sender.Send(new GetProjectPlanTreeQuery(idOrKey), cancellationToken);
+
+        return Ok(nodes);
+    }
+
     [HttpGet("{id}/phases/{phaseId}")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Projects)]
     [OpenApiOperation("Get project phase details.", "")]
@@ -266,6 +279,47 @@ public class ProjectsController(ILogger<ProjectsController> logger, ISender send
     public async Task<ActionResult> UpdateProjectPhase(Guid id, Guid phaseId, [FromBody] UpdateProjectPhaseRequest request, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(request.ToCommand(id, phaseId), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpPatch("{id}/phases/{phaseId}")]
+    [Consumes("application/json", "application/json-patch+json")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Projects)]
+    [OpenApiOperation("Partially update a project phase using JSON Patch (RFC 6902).", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> PatchProjectPhase(
+        Guid id,
+        Guid phaseId,
+        [FromBody] JsonPatchDocument<UpdateProjectPhaseRequest> patchDocument,
+        CancellationToken cancellationToken)
+    {
+        if (patchDocument == null)
+            return BadRequest("Patch document cannot be null.");
+
+        var phaseDto = await _sender.Send(new GetProjectPhaseQuery(id, phaseId), cancellationToken);
+        if (phaseDto is null)
+            return NotFound($"Project phase with ID '{phaseId}' not found.");
+
+        var updateRequest = UpdateProjectPhaseRequest.FromDto(phaseDto);
+
+        patchDocument.ApplyTo(updateRequest, error =>
+        {
+            ModelState.AddModelError(error.AffectedObject.GetType().Name, error.ErrorMessage);
+        });
+
+        if (!ModelState.IsValid)
+            return ValidationProblem(ModelState);
+
+        if (!TryValidateModel(updateRequest))
+            return ValidationProblem(ModelState);
+
+        var result = await _sender.Send(updateRequest.ToCommand(id, phaseId), cancellationToken);
 
         return result.IsSuccess
             ? NoContent()

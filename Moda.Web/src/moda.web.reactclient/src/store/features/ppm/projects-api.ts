@@ -1,4 +1,7 @@
-import { getProjectsClient } from '@/src/services/clients'
+import {
+  authenticatedFetch,
+  getProjectsClient,
+} from '@/src/services/clients'
 import { apiSlice } from '../apiSlice'
 import {
   CreateProjectRequest,
@@ -10,6 +13,8 @@ import {
   ChangeProjectProgramRequest,
   ChangeProjectKeyRequest,
   AssignProjectLifecycleRequest,
+  ProjectPlanNodeDto,
+  ProjectPhaseDetailsDto,
 } from '@/src/services/moda-api'
 import { QueryTags } from '../query-tags'
 import { BaseOptionType } from 'antd/es/select'
@@ -324,6 +329,86 @@ export const projectsApi = apiSlice.injectEndpoints({
         ]
       },
     }),
+
+    getProjectPlanTree: builder.query<ProjectPlanNodeDto[], string>({
+      queryFn: async (idOrKey) => {
+        try {
+          const data = await getProjectsClient().getProjectPlanTree(idOrKey)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: (result, error, arg) => [
+        { type: QueryTags.ProjectPlanTree, id: arg },
+      ],
+    }),
+
+    getProjectPhase: builder.query<
+      ProjectPhaseDetailsDto,
+      { projectId: string; phaseId: string }
+    >({
+      queryFn: async ({ projectId, phaseId }) => {
+        try {
+          const data = await getProjectsClient().getProjectPhase(
+            projectId,
+            phaseId,
+          )
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+    }),
+
+    patchProjectPhase: builder.mutation<
+      void,
+      {
+        projectId: string
+        phaseId: string
+        patchOperations: Array<{
+          op: 'replace' | 'add' | 'remove'
+          path: string
+          value?: any
+        }>
+        cacheKey: string
+      }
+    >({
+      queryFn: async ({ projectId, phaseId, patchOperations }) => {
+        try {
+          const response = await authenticatedFetch(
+            `/api/ppm/projects/${projectId}/phases/${phaseId}`,
+            {
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/json-patch+json',
+              },
+              body: JSON.stringify(patchOperations),
+            },
+          )
+
+          if (!response.ok) {
+            let errorData: unknown
+            try {
+              errorData = await response.json()
+            } catch {
+              errorData = { detail: await response.text() }
+            }
+            return { error: { status: response.status, data: errorData } }
+          }
+
+          return { data: null as any }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, { cacheKey }) => {
+        return [{ type: QueryTags.ProjectPlanTree, id: cacheKey }]
+      },
+    }),
   }),
 })
 
@@ -343,4 +428,7 @@ export const {
   useGetProjectOptionsQuery,
   useGetProjectStatusOptionsQuery,
   useAssignProjectLifecycleMutation,
+  useGetProjectPlanTreeQuery,
+  useGetProjectPhaseQuery,
+  usePatchProjectPhaseMutation,
 } = projectsApi

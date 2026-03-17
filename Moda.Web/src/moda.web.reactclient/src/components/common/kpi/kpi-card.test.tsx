@@ -1,5 +1,4 @@
 import { render, screen, fireEvent } from '@testing-library/react'
-import dayjs from 'dayjs'
 import KpiCard, { AddKpiCard, KpiCardData, KpiCardCheckpoint } from './kpi-card'
 import {
   KpiHealth,

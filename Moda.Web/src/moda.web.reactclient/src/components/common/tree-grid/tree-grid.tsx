@@ -44,7 +44,7 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core'
-import { SortableContext } from '@dnd-kit/sortable'
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 
 import { generateCsv, downloadCsvWithTimestamp } from '@/src/utils/csv-utils'
 import { ModaEmpty } from '@/src/components/common'
@@ -372,7 +372,7 @@ function TreeGridInner<T extends TreeNode>(
       )
 
       try {
-        await onNodeMove(active.id as string, projection.parentId, newOrder)
+        await onNodeMove(active.id as string, projection.parentId, newOrder, over.id as string, overIndex)
       } catch (error) {
         onMoveRejected?.(
           error instanceof Error ? error.message : 'Failed to move item',
@@ -886,7 +886,7 @@ function TreeGridInner<T extends TreeNode>(
           onDragEnd={handleDragEnd}
           onDragCancel={handleDragCancel}
         >
-          <SortableContext items={flattenedNodes.map((t) => t.node.id)}>
+          <SortableContext items={flattenedNodes.map((t) => t.node.id)} strategy={verticalListSortingStrategy}>
             {tableContent}
           </SortableContext>
         </DndContext>

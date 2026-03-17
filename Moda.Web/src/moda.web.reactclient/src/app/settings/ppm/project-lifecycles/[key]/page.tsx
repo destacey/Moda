@@ -85,7 +85,7 @@ const ProjectLifecycleDetailsPage = (props: {
       default:
         return null
     }
-  }, [activeTab, lifecycleData, canUpdate])
+  }, [activeTab, lifecycleData, canUpdate, refetch])
 
   const onTabChange = useCallback((tabKey: string) => {
     setActiveTab(tabKey as ProjectLifecycleTabs)

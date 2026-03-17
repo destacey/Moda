@@ -227,6 +227,7 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
     ],
     [
       canManageKpis,
+      isReadOnly,
       strategicInitiativeId,
       onViewDetailsMenuClicked,
       onEditKpiMenuClicked,

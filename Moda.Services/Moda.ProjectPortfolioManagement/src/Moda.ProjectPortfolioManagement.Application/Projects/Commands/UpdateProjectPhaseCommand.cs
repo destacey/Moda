@@ -1,4 +1,5 @@
 using Moda.Common.Models;
+using Moda.ProjectPortfolioManagement.Domain.Enums;
 using Moda.ProjectPortfolioManagement.Domain.Models;
 using TaskStatus = Moda.ProjectPortfolioManagement.Domain.Enums.TaskStatus;
 
@@ -11,7 +12,8 @@ public sealed record UpdateProjectPhaseCommand(
     int Status,
     LocalDate? PlannedStart,
     LocalDate? PlannedEnd,
-    decimal Progress) : ICommand;
+    decimal Progress,
+    List<Guid>? AssigneeIds) : ICommand;
 
 public sealed class UpdateProjectPhaseCommandValidator : CustomValidator<UpdateProjectPhaseCommand>
 {
@@ -41,6 +43,7 @@ internal sealed class UpdateProjectPhaseCommandHandler(
         try
         {
             var phase = await _ppmDbContext.ProjectPhases
+                .Include(p => p.Roles)
                 .FirstOrDefaultAsync(p => p.ProjectId == request.ProjectId && p.Id == request.PhaseId, cancellationToken);
 
             if (phase is null)
@@ -68,6 +71,18 @@ internal sealed class UpdateProjectPhaseCommandHandler(
             var progressResult = phase.UpdateProgress(new Progress(request.Progress));
             if (progressResult.IsFailure)
                 return progressResult;
+
+            if (request.AssigneeIds is not null)
+            {
+                var updatedRoles = new Dictionary<ProjectPhaseRole, HashSet<Guid>>
+                {
+                    { ProjectPhaseRole.Assignee, [.. request.AssigneeIds] }
+                };
+
+                var rolesResult = phase.UpdateRoles(updatedRoles);
+                if (rolesResult.IsFailure)
+                    return rolesResult;
+            }
 
             await _ppmDbContext.SaveChangesAsync(cancellationToken);
 

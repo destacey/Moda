@@ -7791,6 +7791,67 @@ export class ProjectsClient {
     }
 
     /**
+     * Get a unified plan tree with phases as top-level nodes and tasks nested within.
+     */
+    getProjectPlanTree(idOrKey: string, cancelToken?: CancelToken): Promise<ProjectPlanNodeDto[]> {
+        let url_ = this.baseUrl + "/api/ppm/projects/{idOrKey}/plan-tree";
+        if (idOrKey === undefined || idOrKey === null)
+            throw new globalThis.Error("The parameter 'idOrKey' must be defined.");
+        url_ = url_.replace("{idOrKey}", encodeURIComponent("" + idOrKey));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetProjectPlanTree(_response);
+        });
+    }
+
+    protected processGetProjectPlanTree(response: AxiosResponse): Promise<ProjectPlanNodeDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<ProjectPlanNodeDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ProjectPlanNodeDto[]>(null as any);
+    }
+
+    /**
      * Get project phase details.
      */
     getProjectPhase(id: string, phaseId: string, cancelToken?: CancelToken): Promise<ProjectPhaseDetailsDto> {
@@ -7910,6 +7971,84 @@ export class ProjectsClient {
             let resultData400  = _responseText;
             result400 = JSON.parse(resultData400);
             return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Partially update a project phase using JSON Patch (RFC 6902).
+     */
+    patchProjectPhase(id: string, phaseId: string, patchDocument: JsonPatchDocumentOfUpdateProjectPhaseRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/ppm/projects/{id}/phases/{phaseId}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        if (phaseId === undefined || phaseId === null)
+            throw new globalThis.Error("The parameter 'phaseId' must be defined.");
+        url_ = url_.replace("{phaseId}", encodeURIComponent("" + phaseId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(patchDocument);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "PATCH",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processPatchProjectPhase(_response);
+        });
+    }
+
+    protected processPatchProjectPhase(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status === 422) {
+            const _responseText = response.data;
+            let result422: any = null;
+            let resultData422  = _responseText;
+            result422 = JSON.parse(resultData422);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
@@ -8069,67 +8208,6 @@ export class ProjectTasksClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
         return Promise.resolve<ProjectTaskIdAndKey>(null as any);
-    }
-
-    /**
-     * Get a hierarchical tree of project tasks with WBS codes.
-     */
-    getProjectTaskTree(projectIdOrKey: string, cancelToken?: CancelToken): Promise<ProjectTaskTreeDto[]> {
-        let url_ = this.baseUrl + "/api/ppm/projects/{projectIdOrKey}/tasks/tree";
-        if (projectIdOrKey === undefined || projectIdOrKey === null)
-            throw new globalThis.Error("The parameter 'projectIdOrKey' must be defined.");
-        url_ = url_.replace("{projectIdOrKey}", encodeURIComponent("" + projectIdOrKey));
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "GET",
-            url: url_,
-            headers: {
-                "Accept": "application/json"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processGetProjectTaskTree(_response);
-        });
-    }
-
-    protected processGetProjectTaskTree(response: AxiosResponse): Promise<ProjectTaskTreeDto[]> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = JSON.parse(resultData200);
-            return Promise.resolve<ProjectTaskTreeDto[]>(result200);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = JSON.parse(resultData400);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<ProjectTaskTreeDto[]>(null as any);
     }
 
     /**
@@ -23447,6 +23525,27 @@ export interface AssignProjectLifecycleRequest {
     lifecycleId: string;
 }
 
+export interface ProjectPlanNodeDto {
+    id: string;
+    nodeType: string;
+    name: string;
+    status: SimpleNavigationDto;
+    order: number;
+    wbs: string;
+    start?: Date | undefined;
+    end?: Date | undefined;
+    progress: number;
+    assignees: EmployeeNavigationDto[];
+    children: ProjectPlanNodeDto[];
+    key?: string | undefined;
+    type?: SimpleNavigationDto | undefined;
+    priority?: SimpleNavigationDto | undefined;
+    parentId?: string | undefined;
+    projectPhaseId?: string | undefined;
+    plannedDate?: Date | undefined;
+    estimatedEffortHours?: number | undefined;
+}
+
 export interface ProjectPhaseDetailsDto {
     id: string;
     name: string;
@@ -23456,6 +23555,7 @@ export interface ProjectPhaseDetailsDto {
     start?: Date | undefined;
     end?: Date | undefined;
     progress: number;
+    assignees: EmployeeNavigationDto[];
 }
 
 export interface UpdateProjectPhaseRequest {
@@ -23464,6 +23564,24 @@ export interface UpdateProjectPhaseRequest {
     plannedStart?: Date | undefined;
     plannedEnd?: Date | undefined;
     progress: number;
+    assigneeIds?: string[] | undefined;
+}
+
+export interface JsonPatchDocumentOfUpdateProjectPhaseRequest {
+    operations: OperationOfUpdateProjectPhaseRequest[] | undefined;
+}
+
+export interface OperationBase {
+    path: string | undefined;
+    op: string | undefined;
+    from: string | undefined;
+}
+
+export interface Operation extends OperationBase {
+    value?: any | undefined;
+}
+
+export interface OperationOfUpdateProjectPhaseRequest extends Operation {
 }
 
 export interface ProjectTaskListDto {
@@ -23489,26 +23607,6 @@ export interface ProjectTaskNavigationDto {
     id: string;
     key: string;
     name: string;
-}
-
-export interface ProjectTaskTreeDto {
-    id: string;
-    key: string;
-    projectId: string;
-    name: string;
-    type: SimpleNavigationDto;
-    status: SimpleNavigationDto;
-    priority?: SimpleNavigationDto | undefined;
-    assignees: EmployeeNavigationDto[];
-    progress: number;
-    order: number;
-    parentId?: string | undefined;
-    wbs: string;
-    plannedStart?: Date | undefined;
-    plannedEnd?: Date | undefined;
-    plannedDate?: Date | undefined;
-    estimatedEffortHours?: number | undefined;
-    children: ProjectTaskTreeDto[];
 }
 
 export interface ProjectTaskDto {
@@ -23594,16 +23692,6 @@ export interface UpdateProjectTaskRequest {
 
 export interface JsonPatchDocumentOfUpdateProjectTaskRequest {
     operations: OperationOfUpdateProjectTaskRequest[] | undefined;
-}
-
-export interface OperationBase {
-    path: string | undefined;
-    op: string | undefined;
-    from: string | undefined;
-}
-
-export interface Operation extends OperationBase {
-    value?: any | undefined;
 }
 
 export interface OperationOfUpdateProjectTaskRequest extends Operation {

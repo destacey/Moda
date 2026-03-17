@@ -46,21 +46,6 @@ enum ProjectTabs {
   WorkItems = 'workItems',
 }
 
-const tabs = [
-  {
-    key: ProjectTabs.Details,
-    label: 'Details',
-  },
-  {
-    key: ProjectTabs.Plan,
-    label: 'Plan',
-  },
-  {
-    key: ProjectTabs.WorkItems,
-    label: 'Work Items',
-  },
-]
-
 enum ProjectAction {
   Edit = 'Edit',
   AssignLifecycle = 'Assign Lifecycle',
@@ -110,6 +95,15 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   } = useGetProjectQuery(projectKey)
 
   useDocumentTitle(`${projectData?.name ?? projectKey} - Project Details`)
+
+  const tabs = useMemo(() => {
+    const items = [{ key: ProjectTabs.Details, label: 'Details' }]
+    if (projectData?.projectLifecycle) {
+      items.push({ key: ProjectTabs.Plan, label: 'Plan' })
+    }
+    items.push({ key: ProjectTabs.WorkItems, label: 'Work Items' })
+    return items
+  }, [projectData?.projectLifecycle])
 
   const {
     data: workItemsData,

@@ -22,9 +22,11 @@ export interface StrategicInitiativeDrawerProps {
   onDrawerClose: () => void
 }
 
-const StrategicInitiativeDrawer: FC<StrategicInitiativeDrawerProps> = (
-  props: StrategicInitiativeDrawerProps,
-) => {
+const StrategicInitiativeDrawer: FC<StrategicInitiativeDrawerProps> = ({
+  strategicInitiativeKey,
+  drawerOpen,
+  onDrawerClose,
+}: StrategicInitiativeDrawerProps) => {
   const [size, setSize] = useState(() => getDrawerWidthPixels())
   const messageApi = useMessage()
 
@@ -32,7 +34,7 @@ const StrategicInitiativeDrawer: FC<StrategicInitiativeDrawerProps> = (
     data: strategicInitiativeData,
     isLoading,
     error,
-  } = useGetStrategicInitiativeQuery(props.strategicInitiativeKey)
+  } = useGetStrategicInitiativeQuery(strategicInitiativeKey)
 
   const { hasPermissionClaim } = useAuth()
   const canViewStrategicInitiative = useMemo(
@@ -45,9 +47,9 @@ const StrategicInitiativeDrawer: FC<StrategicInitiativeDrawerProps> = (
       messageApi.error(
         'You do not have permission to view strategic initiatives.',
       )
-      props.onDrawerClose()
+      onDrawerClose()
     }
-  }, [canViewStrategicInitiative, messageApi, props.onDrawerClose])
+  }, [canViewStrategicInitiative, messageApi, onDrawerClose])
 
   useEffect(() => {
     if (error) {
@@ -78,8 +80,8 @@ const StrategicInitiativeDrawer: FC<StrategicInitiativeDrawerProps> = (
     <Drawer
       title={strategicInitiativeData?.name ?? 'Strategic Initiative Details'}
       placement="right"
-      onClose={props.onDrawerClose}
-      open={props.drawerOpen}
+      onClose={onDrawerClose}
+      open={drawerOpen}
       loading={isLoading}
       size={size}
       resizable={{
