@@ -1,0 +1,35 @@
+name: Release MCP - Open Version PR
+
+permissions:
+    contents: write
+    pull-requests: write
+
+on:
+    push:
+        branches: [main]
+        paths:
+            - "Moda.Web/src/Moda.Mcp/**"
+            - ".changeset/**"
+
+jobs:
+    release-pr:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+
+            - name: Install dependencies
+              run: npm ci
+              working-directory: Moda.Web/src/Moda.Mcp
+
+            - name: Open or update release PR
+              uses: changesets/action@v1
+              with:
+                  cwd: Moda.Web/src/Moda.Mcp
+                  title: "chore: release @modanpm/moda-mcp"
+                  commit: "chore: version mcp package"
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
