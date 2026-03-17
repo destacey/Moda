@@ -18,6 +18,7 @@ import { useCallback, useEffect } from 'react'
 import dayjs from 'dayjs'
 
 const { Item } = Form
+const { RangePicker } = DatePicker
 
 export interface EditProgramFormProps {
   programKey: number
@@ -28,8 +29,7 @@ export interface EditProgramFormProps {
 interface EditProgramFormValues {
   name: string
   description: string
-  start?: Date
-  end?: Date
+  dateRange?: any[]
   sponsorIds: string[]
   ownerIds: string[]
   managerIds: string[]
@@ -44,8 +44,8 @@ const mapToRequestValues = (
     id: programId,
     name: values.name,
     description: values.description,
-    start: (values.start as any)?.format('YYYY-MM-DD'),
-    end: (values.end as any)?.format('YYYY-MM-DD'),
+    start: (values.dateRange?.[0] as any)?.format('YYYY-MM-DD'),
+    end: (values.dateRange?.[1] as any)?.format('YYYY-MM-DD'),
     sponsorIds: values.sponsorIds,
     ownerIds: values.ownerIds,
     managerIds: values.managerIds,
@@ -112,8 +112,10 @@ const EditProgramForm = ({
     form.setFieldsValue({
       name: programData.name,
       description: programData.description,
-      start: programData.start ? dayjs(programData.start) : undefined,
-      end: programData.end ? dayjs(programData.end) : undefined,
+      dateRange:
+        programData.start && programData.end
+          ? [dayjs(programData.start), dayjs(programData.end)]
+          : undefined,
       sponsorIds: programData.programSponsors.map((s) => s.id),
       ownerIds: programData.programOwners.map((o) => o.id),
       managerIds: programData.programManagers.map((m) => m.id),
@@ -159,34 +161,8 @@ const EditProgramForm = ({
         >
           <MarkdownEditor maxLength={2048} />
         </Item>
-        <Item name="start" label="Start">
-          <DatePicker />
-        </Item>
-        <Item
-          name="end"
-          label="End"
-          dependencies={['start']}
-          rules={[
-            ({ getFieldValue }) => ({
-              validator(_, value) {
-                const start = getFieldValue('start')
-                if ((!start && !value) || (start && start <= value)) {
-                  return Promise.resolve()
-                } else if ((!start && value) || (start && !value)) {
-                  return Promise.reject(
-                    new Error(
-                      'Start and end date must be selected together or both left empty',
-                    ),
-                  )
-                }
-                return Promise.reject(
-                  new Error('End date must be on or after start date'),
-                )
-              },
-            }),
-          ]}
-        >
-          <DatePicker />
+        <Item name="dateRange" label="Planned Date Range">
+          <RangePicker style={{ width: '60%' }} format="MMM D, YYYY" />
         </Item>
         <Item name="sponsorIds" label="Sponsors">
           <EmployeeSelect

@@ -45,7 +45,8 @@ public class UpdateProjectPhaseCommandHandlerTests : IDisposable
             (int)TaskStatus.InProgress,
             null,
             null,
-            50m);
+            50m,
+            null);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -77,7 +78,8 @@ public class UpdateProjectPhaseCommandHandlerTests : IDisposable
             (int)TaskStatus.InProgress,
             plannedStart,
             plannedEnd,
-            45m);
+            45m,
+            null);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -112,7 +114,8 @@ public class UpdateProjectPhaseCommandHandlerTests : IDisposable
             (int)TaskStatus.NotStarted,
             null,
             null,
-            0m);
+            0m,
+            null);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);

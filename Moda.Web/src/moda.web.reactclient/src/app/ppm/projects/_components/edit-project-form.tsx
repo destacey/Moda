@@ -19,6 +19,7 @@ import dayjs from 'dayjs'
 import { useCallback, useEffect } from 'react'
 
 const { Item } = Form
+const { RangePicker } = DatePicker
 
 export interface EditProjectFormProps {
   projectKey: string
@@ -30,8 +31,7 @@ interface EditProjectFormValues {
   name: string
   description: string
   expenditureCategoryId: number
-  start?: Date
-  end?: Date
+  dateRange?: any[]
   sponsorIds: string[]
   ownerIds: string[]
   managerIds: string[]
@@ -48,8 +48,8 @@ const mapToRequestValues = (
     name: values.name,
     description: values.description,
     expenditureCategoryId: values.expenditureCategoryId,
-    start: (values.start as any)?.format('YYYY-MM-DD'),
-    end: (values.end as any)?.format('YYYY-MM-DD'),
+    start: (values.dateRange?.[0] as any)?.format('YYYY-MM-DD'),
+    end: (values.dateRange?.[1] as any)?.format('YYYY-MM-DD'),
     sponsorIds: values.sponsorIds,
     ownerIds: values.ownerIds,
     managerIds: values.managerIds,
@@ -123,8 +123,10 @@ const EditProjectForm = ({
       name: projectData.name,
       description: projectData.description,
       expenditureCategoryId: projectData.expenditureCategory.id,
-      start: projectData.start ? dayjs(projectData.start) : undefined,
-      end: projectData.end ? dayjs(projectData.end) : undefined,
+      dateRange:
+        projectData.start && projectData.end
+          ? [dayjs(projectData.start), dayjs(projectData.end)]
+          : undefined,
       sponsorIds: projectData.projectSponsors.map((s) => s.id),
       ownerIds: projectData.projectOwners.map((o) => o.id),
       managerIds: projectData.projectManagers.map((m) => m.id),
@@ -214,16 +216,19 @@ const EditProjectForm = ({
           />
         </Item>
         <Item
-          name="start"
-          label="Start"
+          name="dateRange"
+          label="Planned Date Range"
           rules={[
             {
               validator: (_, value) => {
                 const status = projectData?.status.name
-                if ((status === 'Active' || status === 'Completed') && !value) {
+                if (
+                  (status === 'Active' || status === 'Completed') &&
+                  (!value || !value[0] || !value[1])
+                ) {
                   return Promise.reject(
                     new Error(
-                      'Start date is required for active or completed projects',
+                      'Dates are required for active or completed projects',
                     ),
                   )
                 }
@@ -232,40 +237,7 @@ const EditProjectForm = ({
             },
           ]}
         >
-          <DatePicker />
-        </Item>
-        <Item
-          name="end"
-          label="End"
-          dependencies={['start']}
-          rules={[
-            {
-              validator: (_, value) => {
-                const status = projectData?.status.name
-                if ((status === 'Active' || status === 'Completed') && !value) {
-                  return Promise.reject(
-                    new Error(
-                      'End date is required for active or completed projects',
-                    ),
-                  )
-                }
-                return Promise.resolve()
-              },
-            },
-            ({ getFieldValue }) => ({
-              validator(_, value) {
-                const start = getFieldValue('start')
-                if (!start || (start && start <= value)) {
-                  return Promise.resolve()
-                }
-                return Promise.reject(
-                  new Error('End date must be on or after start date'),
-                )
-              },
-            }),
-          ]}
-        >
-          <DatePicker />
+          <RangePicker style={{ width: '60%' }} format="MMM D, YYYY" />
         </Item>
         <Item name="sponsorIds" label="Sponsors">
           <EmployeeSelect

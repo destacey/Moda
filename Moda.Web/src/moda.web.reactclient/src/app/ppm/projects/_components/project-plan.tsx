@@ -19,7 +19,7 @@ const ProjectPlan: FC<ProjectPlanProps> = ({
     isLoading,
     refetch,
   } = useGetProjectPlanTreeQuery(project?.key || '', {
-    skip: !project?.key,
+    skip: !project?.key || !project?.projectLifecycle,
   })
 
   if (!project) return null

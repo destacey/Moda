@@ -17,6 +17,7 @@ import dayjs from 'dayjs'
 import { useCallback, useEffect } from 'react'
 
 const { Item } = Form
+const { RangePicker } = DatePicker
 
 export interface EditStrategicInitiativeFormProps {
   strategicInitiativeKey: number
@@ -27,8 +28,7 @@ export interface EditStrategicInitiativeFormProps {
 interface EditStrategicInitiativeFormValues {
   name: string
   description: string
-  start: Date
-  end: Date
+  dateRange: any[]
   sponsorIds: string[]
   ownerIds: string[]
 }
@@ -41,8 +41,8 @@ const mapToRequestValues = (
     id: strategicInitiativeId,
     name: values.name,
     description: values.description,
-    start: (values.start as any).format('YYYY-MM-DD'),
-    end: (values.end as any).format('YYYY-MM-DD'),
+    start: (values.dateRange?.[0] as any)?.format('YYYY-MM-DD'),
+    end: (values.dateRange?.[1] as any)?.format('YYYY-MM-DD'),
     sponsorIds: values.sponsorIds,
     ownerIds: values.ownerIds,
   }
@@ -113,8 +113,10 @@ const EditStrategicInitiativeForm = ({
     form.setFieldsValue({
       name: strategicInitiativeData.name,
       description: strategicInitiativeData.description,
-      start: dayjs(strategicInitiativeData.start),
-      end: dayjs(strategicInitiativeData.end),
+      dateRange: [
+        dayjs(strategicInitiativeData.start),
+        dayjs(strategicInitiativeData.end),
+      ],
       sponsorIds: strategicInitiativeData.strategicInitiativeSponsors.map(
         (s) => s.id,
       ),
@@ -178,29 +180,12 @@ const EditStrategicInitiativeForm = ({
         >
           <MarkdownEditor maxLength={2048} />
         </Item>
-        <Item name="start" label="Start" rules={[{ required: true }]}>
-          <DatePicker />
-        </Item>
         <Item
-          name="end"
-          label="End"
-          dependencies={['start']}
-          rules={[
-            { required: true },
-            ({ getFieldValue }) => ({
-              validator(_, value) {
-                const start = getFieldValue('start')
-                if (!value || !start || start < value) {
-                  return Promise.resolve()
-                }
-                return Promise.reject(
-                  new Error('End date must be after start date'),
-                )
-              },
-            }),
-          ]}
+          name="dateRange"
+          label="Planned Date Range"
+          rules={[{ required: true, message: 'Date range is required' }]}
         >
-          <DatePicker />
+          <RangePicker style={{ width: '60%' }} format="MMM D, YYYY" />
         </Item>
         <Item name="sponsorIds" label="Sponsors">
           <EmployeeSelect

@@ -399,18 +399,27 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
         actions={<PageActions actionItems={actionsMenuItems} />}
       />
 
-      {missingDates === true &&
-        (projectData?.status.name === 'Proposed' ||
-          projectData?.status.name === 'Approved') && (
-          <>
+      {(projectData?.status.name === 'Proposed' ||
+        projectData?.status.name === 'Approved') && (
+        <>
+          {missingDates && (
             <Alert
               title="Project Dates are required before activating."
               type="warning"
               showIcon
             />
-            <br />
-          </>
-        )}
+          )}
+          {!projectData?.projectLifecycle && (
+            <Alert
+              title="A Project Lifecycle is required before approving."
+              type="warning"
+              showIcon
+              style={missingDates ? { marginTop: 8 } : undefined}
+            />
+          )}
+          {(missingDates || !projectData?.projectLifecycle) && <br />}
+        </>
+      )}
       <Card
         style={{ width: '100%' }}
         tabList={tabs}

@@ -26,6 +26,15 @@ internal sealed class GetProjectPlanTreeQueryHandler(IProjectPortfolioManagement
 
     public async Task<IReadOnlyList<ProjectPlanNodeDto>> Handle(GetProjectPlanTreeQuery request, CancellationToken cancellationToken)
     {
+        // Check if the project has a lifecycle before loading the full plan tree
+        var hasLifecycle = await _ppmDbContext.Projects
+            .AsNoTracking()
+            .Where(request.ProjectIdOrKeyFilter)
+            .AnyAsync(p => p.ProjectLifecycleId != null, cancellationToken);
+
+        if (!hasLifecycle)
+            return [];
+
         var project = await _ppmDbContext.Projects
             .AsNoTracking()
             .Where(request.ProjectIdOrKeyFilter)

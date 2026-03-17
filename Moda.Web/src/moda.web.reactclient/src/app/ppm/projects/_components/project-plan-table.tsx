@@ -212,8 +212,7 @@ const ProjectPlanTable = ({
   )
 
   const isPhaseNode = useCallback(
-    (node: ProjectPlanNodeDto | null | undefined) =>
-      node?.nodeType === 'Phase',
+    (node: ProjectPlanNodeDto | null | undefined) => node?.nodeType === 'Phase',
     [],
   )
 
@@ -254,9 +253,7 @@ const ProjectPlanTable = ({
       // When parentId is null (task dropped at root level), resolve to
       // the nearest phase above the drop position in the flat tree.
       if (resolvedParentId === null && overNodeId) {
-        const flatten = (
-          nodes: ProjectPlanNodeDto[],
-        ): ProjectPlanNodeDto[] => {
+        const flatten = (nodes: ProjectPlanNodeDto[]): ProjectPlanNodeDto[] => {
           const result: ProjectPlanNodeDto[] = []
           for (const node of nodes) {
             result.push(node)
@@ -423,7 +420,10 @@ const ProjectPlanTable = ({
           )
         }
       } else {
-        const node = findNodeById(tasks || [], taskId) as ProjectPlanNodeDto | null
+        const node = findNodeById(
+          tasks || [],
+          taskId,
+        ) as ProjectPlanNodeDto | null
         if (!node) return false
 
         try {
@@ -640,9 +640,7 @@ const ProjectPlanTable = ({
         hasChanges = true
       }
 
-      const taskPlannedEnd = task.end
-        ? String(task.end).split('T')[0]
-        : null
+      const taskPlannedEnd = task.end ? String(task.end).split('T')[0] : null
       const plannedEndFormatted = values.plannedEnd
         ? values.plannedEnd.format('YYYY-MM-DD')
         : null
@@ -818,7 +816,7 @@ const ProjectPlanTable = ({
           csvFileName="project-tasks"
           leftSlot={() => null}
           helpContent={<ProjectPlanHelp />}
-          emptyMessage="No tasks found"
+          emptyMessage="No plan found"
         />
       </Form>
 

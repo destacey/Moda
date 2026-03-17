@@ -164,7 +164,7 @@ public partial class AddProjectPhases : Migration
 			INSERT INTO [Ppm].[ProjectLifecycles] (Id, Name, Description, [State], SystemCreated, SystemLastModified)
 			VALUES (@StandardId, N'Standard Project',
 			N'A traditional project lifecycle designed for initiatives that require structured planning, defined scope, and formal oversight. This template progresses from initiation through planning, execution, monitoring, and closure.',
-			'Active', {now}, {now});
+			'Proposed', {now}, {now});
 
 			INSERT INTO [Ppm].[ProjectLifecyclePhases] (Id, ProjectLifecycleId, Name, Description, [Order], SystemCreated, SystemLastModified) VALUES
 			(@StandardPhase1, @StandardId, N'Initiation', N'Define the business case, objectives, and project charter.', 1, {now}, {now}),
@@ -184,7 +184,7 @@ public partial class AddProjectPhases : Migration
 			INSERT INTO [Ppm].[ProjectLifecycles] (Id, Name, Description, [State], SystemCreated, SystemLastModified)
 			VALUES (@SoftwareId, N'Software Delivery',
 			N'A lifecycle tailored for delivering software products or digital solutions. It emphasizes discovery, solution design, iterative development, validation, and release.',
-			'Active', {now}, {now});
+			'Proposed', {now}, {now});
 
 			INSERT INTO [Ppm].[ProjectLifecyclePhases] (Id, ProjectLifecycleId, Name, Description, [Order], SystemCreated, SystemLastModified) VALUES
 			(@SoftwarePhase1, @SoftwareId, N'Discovery', N'Research the problem space and validate requirements.', 1, {now}, {now}),
@@ -204,7 +204,7 @@ public partial class AddProjectPhases : Migration
 			INSERT INTO [Ppm].[ProjectLifecycles] (Id, Name, Description, [State], SystemCreated, SystemLastModified)
 			VALUES (@AgileId, N'Agile Initiative',
 			N'A lightweight lifecycle for initiatives delivered primarily through Agile teams. Planning occurs at a high level while detailed execution is managed within team backlogs and iterations.',
-			'Active', {now}, {now});
+			'Proposed', {now}, {now});
 
 			INSERT INTO [Ppm].[ProjectLifecyclePhases] (Id, ProjectLifecycleId, Name, Description, [Order], SystemCreated, SystemLastModified) VALUES
 			(@AgilePhase1, @AgileId, N'Funnel', N'Capture the idea or opportunity for consideration.', 1, {now}, {now}),
@@ -240,7 +240,7 @@ public partial class AddProjectPhases : Migration
 			INSERT INTO [Ppm].[ProjectLifecycles] (Id, Name, Description, [State], SystemCreated, SystemLastModified)
 			VALUES (@InfraId, N'Infrastructure Implementation',
 			N'A lifecycle designed for deploying or upgrading infrastructure and technical platforms, including planning, deployment, validation, and transition to operations.',
-			'Active', {now}, {now});
+			'Proposed', {now}, {now});
 
 			INSERT INTO [Ppm].[ProjectLifecyclePhases] (Id, ProjectLifecycleId, Name, Description, [Order], SystemCreated, SystemLastModified) VALUES
 			(@InfraPhase1, @InfraId, N'Assessment', N'Evaluate the current environment and requirements.', 1, {now}, {now}),

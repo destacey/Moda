@@ -15,6 +15,7 @@ import TextArea from 'antd/es/input/TextArea'
 import { useCallback } from 'react'
 
 const { Item } = Form
+const { RangePicker } = DatePicker
 
 export interface CreateProgramFormProps {
   onFormComplete: () => void
@@ -25,8 +26,7 @@ interface CreateProgramFormValues {
   portfolioId: string
   name: string
   description: string
-  start?: Date
-  end?: Date
+  dateRange?: any[]
   sponsorIds: string[]
   ownerIds: string[]
   managerIds: string[]
@@ -39,8 +39,8 @@ const mapToRequestValues = (
   return {
     name: values.name,
     description: values.description,
-    start: (values.start as any)?.format('YYYY-MM-DD'),
-    end: (values.end as any)?.format('YYYY-MM-DD'),
+    start: (values.dateRange?.[0] as any)?.format('YYYY-MM-DD'),
+    end: (values.dateRange?.[1] as any)?.format('YYYY-MM-DD'),
     portfolioId: values.portfolioId,
     sponsorIds: values.sponsorIds,
     ownerIds: values.ownerIds,
@@ -154,34 +154,8 @@ const CreateProgramForm = ({
         >
           <MarkdownEditor maxLength={2048} />
         </Item>
-        <Item name="start" label="Start">
-          <DatePicker />
-        </Item>
-        <Item
-          name="end"
-          label="End"
-          dependencies={['start']}
-          rules={[
-            ({ getFieldValue }) => ({
-              validator(_, value) {
-                const start = getFieldValue('start')
-                if ((!start && !value) || (start && start <= value)) {
-                  return Promise.resolve()
-                } else if ((!start && value) || (start && !value)) {
-                  return Promise.reject(
-                    new Error(
-                      'Start and end date must be selected together or both left empty',
-                    ),
-                  )
-                }
-                return Promise.reject(
-                  new Error('End date must be on or after start date'),
-                )
-              },
-            }),
-          ]}
-        >
-          <DatePicker />
+        <Item name="dateRange" label="Planned Date Range">
+          <RangePicker style={{ width: '60%' }} format="MMM D, YYYY" />
         </Item>
         <Item name="sponsorIds" label="Sponsors">
           <EmployeeSelect
