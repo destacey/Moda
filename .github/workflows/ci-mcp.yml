@@ -56,7 +56,7 @@ jobs:
               working-directory: Moda.Web/src/Moda.Mcp
 
             - name: Open or update release PR
-              uses: changesets/action@v1
+              uses: changesets/action@v1.5.1
               with:
                   cwd: Moda.Web/src/Moda.Mcp
                   title: "chore: release @modanpm/moda-mcp"
