@@ -91,6 +91,7 @@ const ProjectsPage: FC = () => {
         projects={projectData}
         isLoading={isLoading}
         refetch={refetch}
+        gridHeight={600}
       />
       {openCreateProjectForm && (
         <CreateProjectForm
