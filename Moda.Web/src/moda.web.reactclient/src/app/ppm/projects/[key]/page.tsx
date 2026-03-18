@@ -173,12 +173,13 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   }, [])
 
   const missingDates = projectData?.start === null || projectData?.end === null
+  const missingLifecycle = !projectData?.projectLifecycle
 
   const actionsMenuItems: MenuProps['items'] = useMemo(() => {
     const currentStatus = projectData?.status.name
     const availableActions =
       currentStatus === 'Proposed'
-        ? !missingDates
+        ? !missingDates && !missingLifecycle
           ? [
               ProjectAction.Edit,
               ProjectAction.Delete,
@@ -186,12 +187,14 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
               ProjectAction.Activate,
               ProjectAction.Cancel,
             ]
-          : [
-              ProjectAction.Edit,
-              ProjectAction.Delete,
-              ProjectAction.Approve,
-              ProjectAction.Cancel,
-            ]
+          : missingLifecycle
+            ? [ProjectAction.Edit, ProjectAction.Delete, ProjectAction.Cancel]
+            : [
+                ProjectAction.Edit,
+                ProjectAction.Delete,
+                ProjectAction.Approve,
+                ProjectAction.Cancel,
+              ]
         : currentStatus === 'Approved'
           ? !missingDates
             ? [ProjectAction.Edit, ProjectAction.Activate, ProjectAction.Cancel]
@@ -294,6 +297,7 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     canDeleteProject,
     canUpdateProject,
     missingDates,
+    missingLifecycle,
     projectData?.status.name,
     projectData?.projectLifecycle,
   ])
