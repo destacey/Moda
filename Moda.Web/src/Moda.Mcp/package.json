@@ -1,6 +1,6 @@
 {
   "name": "@modanpm/moda-mcp",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "MCP server for the Moda work management API",
   "type": "module",
   "main": "build/index.js",
@@ -18,7 +18,10 @@
     "generate": "tsx scripts/generate-zod-schemas.ts",
     "lint": "eslint src",
     "typecheck": "tsc --noEmit",
-    "prepare": "npm run build"
+    "prepare": "npm run build",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "npm run build && changeset publish"
   },
   "keywords": [
     "mcp",
@@ -50,6 +53,7 @@
     "zod": "^3.24.3"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.27.0",
     "@eslint/js": "^9.0.0",
     "@types/node": "^22.15.2",
     "eslint": "^9.0.0",
