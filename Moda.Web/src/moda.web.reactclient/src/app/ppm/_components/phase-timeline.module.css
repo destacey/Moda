@@ -1,0 +1,26 @@
+.dot {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+}
+
+.dotInProgress {
+  composes: dot;
+  background-color: var(--ant-color-primary);
+}
+
+.dotNotStarted {
+  composes: dot;
+  border: 1px solid var(--ant-color-border);
+}
+
+.iconCompleted {
+  color: var(--ant-color-success);
+  font-size: 14px;
+}
+
+.iconCancelled {
+  color: var(--ant-color-error);
+  font-size: 14px;
+}
