@@ -1,70 +1,119 @@
 'use client'
 
-import { ModaDateRange, ResponsiveFlex } from '@/src/components/common'
+import { ModaDateRange } from '@/src/components/common'
+import {
+  ContentList,
+  ExpandableContent,
+  LabeledContent,
+} from '@/src/components/common/content'
 import LinksCard from '@/src/components/common/links/links-card'
 import { MarkdownRenderer } from '@/src/components/common/markdown'
+import TimelineProgress from '@/src/components/common/planning/timeline-progress'
 import { ProgramDetailsDto } from '@/src/services/moda-api'
-import { getSortedNames } from '@/src/utils'
-import { Descriptions, Flex } from 'antd'
+import { getSortedNameList } from '@/src/utils'
+import { Card, Divider, Flex } from 'antd'
+import dayjs from 'dayjs'
 import Link from 'next/link'
-import { FC } from 'react'
-
-const { Item } = Descriptions
+import { FC, useMemo } from 'react'
 
 export interface ProgramDetailsProps {
   program: ProgramDetailsDto
 }
 
-const ProgramDetails: FC<ProgramDetailsProps> = ({
-  program,
-}: ProgramDetailsProps) => {
+const ProgramDetails: FC<ProgramDetailsProps> = ({ program }) => {
+  const sponsorNames = useMemo(
+    () => (program ? getSortedNameList(program.programSponsors) : []),
+    [program],
+  )
+  const ownerNames = useMemo(
+    () => (program ? getSortedNameList(program.programOwners) : []),
+    [program],
+  )
+  const managerNames = useMemo(
+    () => (program ? getSortedNameList(program.programManagers) : []),
+    [program],
+  )
+  const strategicThemes = useMemo(
+    () => (program ? getSortedNameList(program.strategicThemes) : []),
+    [program],
+  )
+
   if (!program) return null
 
-  const sponsorNames =
-    program?.programSponsors.length > 0
-      ? getSortedNames(program.programSponsors)
-      : 'No sponsor assigned'
-  const ownerNames =
-    program?.programOwners.length > 0
-      ? getSortedNames(program.programOwners)
-      : 'No owner assigned'
-  const managerNames =
-    program?.programManagers.length > 0
-      ? getSortedNames(program.programManagers)
-      : 'No manager assigned'
+  const hasStarted =
+    program.start && dayjs(program.start).isBefore(dayjs(), 'day')
 
-  const strategicThemes =
-    program?.strategicThemes.length > 0
-      ? getSortedNames(program.strategicThemes)
-      : null
+  const timelineFormat =
+    program.start &&
+    program.end &&
+    new Date(program.start).getFullYear() === new Date().getFullYear()
+      ? 'MMM D'
+      : 'MMM D, YYYY'
 
   return (
-    <Flex vertical gap="middle">
-      <ResponsiveFlex gap="middle" align="start">
-        <Descriptions column={1} size="small">
-          <Item label="Portfolio">
+    <Card size="small">
+      <Flex vertical gap={0}>
+        <Flex vertical gap={10}>
+          <LabeledContent label="Portfolio">
             <Link href={`/ppm/portfolios/${program.portfolio.key}`}>
               {program.portfolio.name}
             </Link>
-          </Item>
-          <Item label="Dates">
+          </LabeledContent>
+
+          <LabeledContent label="Dates">
             <ModaDateRange
               dateRange={{ start: program.start, end: program.end }}
             />
-          </Item>
-          <Item label="Sponsors">{sponsorNames}</Item>
-          <Item label="Owners">{ownerNames}</Item>
-          <Item label="Managers">{managerNames}</Item>
-          <Item label="Strategic Themes">{strategicThemes}</Item>
-        </Descriptions>
-        <Descriptions layout="vertical" size="small">
-          <Item label="Description">
-            <MarkdownRenderer markdown={program.description} />
-          </Item>
-        </Descriptions>
-      </ResponsiveFlex>
-      <LinksCard objectId={program.id} />
-    </Flex>
+          </LabeledContent>
+
+          <LabeledContent label="Sponsors">
+            <ContentList items={sponsorNames} emptyText="No sponsor assigned" />
+          </LabeledContent>
+
+          <LabeledContent label="Owners">
+            <ContentList items={ownerNames} emptyText="No owner assigned" />
+          </LabeledContent>
+
+          <LabeledContent label="Managers">
+            <ContentList
+              items={managerNames}
+              emptyText="No manager assigned"
+            />
+          </LabeledContent>
+
+          {strategicThemes.length > 0 && (
+            <LabeledContent label="Strategic Themes">
+              {strategicThemes.join(', ')}
+            </LabeledContent>
+          )}
+
+          {program.description && (
+            <LabeledContent label="Description">
+              <ExpandableContent>
+                <MarkdownRenderer markdown={program.description} />
+              </ExpandableContent>
+            </LabeledContent>
+          )}
+        </Flex>
+
+        {hasStarted && (
+          <>
+            <Divider />
+            <TimelineProgress
+              start={program.start}
+              end={program.end}
+              variant="borderless"
+              style={{ width: '100%' }}
+              dateFormat={timelineFormat}
+            />
+          </>
+        )}
+
+        <Divider />
+
+        <LinksCard objectId={program.id} width="100%" />
+      </Flex>
+    </Card>
   )
 }
 

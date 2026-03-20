@@ -12,7 +12,7 @@ import {
   useGetProjectQuery,
   useGetProjectWorkItemsQuery,
 } from '@/src/store/features/ppm/projects-api'
-import { Alert, Card, MenuProps, Spin } from 'antd'
+import { Alert, MenuProps, Tabs } from 'antd'
 import { notFound, usePathname, useRouter } from 'next/navigation'
 import { use, useCallback, useEffect, useMemo, useState } from 'react'
 import ProjectDetailsLoading from './loading'
@@ -23,7 +23,7 @@ import {
   ChangeProjectKeyForm,
   DeleteProjectForm,
   EditProjectForm,
-  ProjectDetails,
+  ProjectDetailsTab,
 } from '../_components'
 import AssignProjectLifecycleForm from '../_components/assign-project-lifecycle-form'
 import ChangeProjectLifecycleForm from '../_components/change-project-lifecycle-form'
@@ -33,16 +33,21 @@ import { ProjectStatusAction } from '../_components/change-project-status-form'
 
 const ProjectPlan = dynamic(() => import('../_components/project-plan'), {
   ssr: false,
-  loading: () => <Spin />,
 })
+
+const ProjectTeamGrid = dynamic(
+  () => import('../_components/project-team-grid'),
+  { ssr: false },
+)
 
 const WorkItemsGrid = dynamic(
   () => import('@/src/components/common/work/work-items-grid'),
-  { ssr: false, loading: () => <Spin /> },
+  { ssr: false },
 )
 
 enum ProjectTabs {
   Details = 'details',
+  Team = 'team',
   Plan = 'tasks',
   WorkItems = 'workItems',
 }
@@ -101,7 +106,10 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   useDocumentTitle(`${projectData?.name ?? projectKey} - Project Details`)
 
   const tabs = useMemo(() => {
-    const items = [{ key: ProjectTabs.Details, label: 'Details' }]
+    const items = [
+      { key: ProjectTabs.Details, label: 'Details' },
+      { key: ProjectTabs.Team, label: 'Team' },
+    ]
     if (projectData?.projectLifecycle) {
       items.push({ key: ProjectTabs.Plan, label: 'Plan' })
     }
@@ -138,7 +146,9 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const renderTabContent = useCallback(() => {
     switch (activeTab) {
       case ProjectTabs.Details:
-        return <ProjectDetails project={projectData} />
+        return <ProjectDetailsTab project={projectData} />
+      case ProjectTabs.Team:
+        return <ProjectTeamGrid projectIdOrKey={projectKey} />
       case ProjectTabs.Plan:
         return (
           <ProjectPlan
@@ -162,6 +172,7 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     activeTab,
     canUpdateProject,
     projectData,
+    projectKey,
     refetchWorkItemsData,
     workItemsData,
     workItemsDataIsLoading,
@@ -444,14 +455,13 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
           {(missingDates || !projectData?.projectLifecycle) && <br />}
         </>
       )}
-      <Card
-        style={{ width: '100%' }}
-        tabList={tabs}
-        activeTabKey={activeTab}
-        onTabChange={onTabChange}
-      >
-        {renderTabContent()}
-      </Card>
+      <Tabs
+        size="large"
+        items={tabs}
+        activeKey={activeTab}
+        onChange={onTabChange}
+      />
+      {renderTabContent()}
 
       {openEditProjectForm && (
         <EditProjectForm

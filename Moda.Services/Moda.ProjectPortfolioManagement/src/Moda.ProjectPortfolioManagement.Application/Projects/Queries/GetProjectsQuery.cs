@@ -4,12 +4,13 @@ using Moda.ProjectPortfolioManagement.Domain.Enums;
 
 namespace Moda.ProjectPortfolioManagement.Application.Projects.Queries;
 
-public sealed record GetProjectsQuery(ProjectStatus[]? StatusFilter = null, IdOrKey? PortfolioIdOrKey = null, IdOrKey? ProgramIdOrKey = null) : IQuery<List<ProjectListDto>?>;
+public sealed record GetProjectsQuery(ProjectStatus[]? StatusFilter = null, IdOrKey? PortfolioIdOrKey = null, IdOrKey? ProgramIdOrKey = null, ProjectRole[]? RoleFilter = null) : IQuery<List<ProjectListDto>?>;
 
-internal sealed class GetProjectsQueryHandler(IProjectPortfolioManagementDbContext ppmDbContext) 
+internal sealed class GetProjectsQueryHandler(IProjectPortfolioManagementDbContext ppmDbContext, ICurrentUser currentUser)
     : IQueryHandler<GetProjectsQuery, List<ProjectListDto>?>
 {
     private readonly IProjectPortfolioManagementDbContext _ppmDbContext = ppmDbContext;
+    private readonly ICurrentUser _currentUser = currentUser;
 
     public async Task<List<ProjectListDto>?> Handle(GetProjectsQuery request, CancellationToken cancellationToken)
     {
@@ -23,8 +24,8 @@ internal sealed class GetProjectsQueryHandler(IProjectPortfolioManagementDbConte
         if (request.PortfolioIdOrKey is not null)
         {
             // TODO: make this reusable
-            Guid? portfolioId = request.PortfolioIdOrKey.IsId 
-                ? request.PortfolioIdOrKey.AsId 
+            Guid? portfolioId = request.PortfolioIdOrKey.IsId
+                ? request.PortfolioIdOrKey.AsId
                 : await _ppmDbContext.Portfolios
                     .Where(p => p.Key == request.PortfolioIdOrKey.AsKey)
                     .Select(p => (Guid?)p.Id)
@@ -53,6 +54,18 @@ internal sealed class GetProjectsQueryHandler(IProjectPortfolioManagementDbConte
             }
 
             query = query.Where(pp => pp.ProgramId == programId);
+        }
+
+        if (request.RoleFilter is { Length: > 0 })
+        {
+            var employeeId = _currentUser.GetEmployeeId();
+            if (!employeeId.HasValue)
+            {
+                return [];
+            }
+
+            query = query.Where(pp => pp.Roles.Any(r =>
+                r.EmployeeId == employeeId.Value && request.RoleFilter.Contains(r.Role)));
         }
 
         return await query.ProjectToType<ProjectListDto>().ToListAsync(cancellationToken);

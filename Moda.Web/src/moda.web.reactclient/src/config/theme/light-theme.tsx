@@ -12,6 +12,9 @@ const lightTheme: ThemeConfig = {
     Layout: {
       headerBg: '#2196f3',
     },
+    Tabs: {
+      colorBorderSecondary: '#d9d9d9',
+    },
   },
 }
 

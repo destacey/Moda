@@ -5449,6 +5449,21 @@
               "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 2
+          },
+          {
+            "name": "role",
+            "in": "query",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            "x-position": 3
           }
         ],
         "responses": {
@@ -6109,6 +6124,59 @@
         ]
       }
     },
+    "/api/ppm/projects/{idOrKey}/team": {
+      "get": {
+        "tags": [
+          "Projects"
+        ],
+        "summary": "Get the team members for a project.",
+        "operationId": "Projects_GetProjectTeam",
+        "parameters": [
+          {
+            "name": "idOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProjectTeamMemberDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
     "/api/ppm/projects/{id}/work-items": {
       "get": {
         "tags": [
@@ -6385,6 +6453,67 @@
                   "items": {
                     "$ref": "#/components/schemas/ProjectPlanNodeDto"
                   }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/ppm/projects/{idOrKey}/plan-summary": {
+      "get": {
+        "tags": [
+          "Projects"
+        ],
+        "summary": "Get summary metrics for a project's plan, computed from leaf tasks.",
+        "operationId": "Projects_GetProjectPlanSummary",
+        "parameters": [
+          {
+            "name": "idOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "employeeId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": true,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectPlanSummaryDto"
                 }
               }
             }
@@ -23108,6 +23237,37 @@
           }
         }
       },
+      "ProjectTeamMemberDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "employee",
+          "roles",
+          "assignedPhases",
+          "activeWorkItemCount"
+        ],
+        "properties": {
+          "employee": {
+            "$ref": "#/components/schemas/EmployeeNavigationDto"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "assignedPhases": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "activeWorkItemCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
       "WorkItemListDto": {
         "type": "object",
         "additionalProperties": false,
@@ -23529,6 +23689,34 @@
             "type": "number",
             "format": "decimal",
             "nullable": true
+          }
+        }
+      },
+      "ProjectPlanSummaryDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "overdue",
+          "dueThisWeek",
+          "upcoming",
+          "totalLeafTasks"
+        ],
+        "properties": {
+          "overdue": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "dueThisWeek": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "upcoming": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalLeafTasks": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },

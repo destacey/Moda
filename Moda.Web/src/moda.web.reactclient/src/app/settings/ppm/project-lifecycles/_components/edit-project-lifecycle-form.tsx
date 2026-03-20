@@ -136,7 +136,10 @@ const EditProjectLifecycleForm = ({
         <Item
           name="description"
           label="Description"
-          rules={[{ max: 1024 }]}
+          rules={[
+            { required: true, message: 'Description is required' },
+            { max: 1024 },
+          ]}
         >
           <TextArea
             autoSize={{ minRows: 6, maxRows: 8 }}

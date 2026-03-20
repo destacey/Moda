@@ -26,7 +26,7 @@ public class ProjectsController(ILogger<ProjectsController> logger, ISender send
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<IEnumerable<ProjectListDto>>> GetProjects([FromQuery] int[]? status, [FromQuery] Guid? portfolioId, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<ProjectListDto>>> GetProjects([FromQuery] int[]? status, [FromQuery] Guid? portfolioId, [FromQuery] int[]? role, CancellationToken cancellationToken)
     {
         ProjectStatus[]? filter = status is { Length: > 0 }
             ? [.. status.Select(s => (ProjectStatus)s)]
@@ -36,7 +36,11 @@ public class ProjectsController(ILogger<ProjectsController> logger, ISender send
             ? new IdOrKey(portfolioId.Value)
             : null;
 
-        var projects = await _sender.Send(new GetProjectsQuery(StatusFilter: filter, PortfolioIdOrKey: portfolioIdOrKey), cancellationToken);
+        ProjectRole[]? roleFilter = role is { Length: > 0 }
+            ? [.. role.Select(r => (ProjectRole)r)]
+            : null;
+
+        var projects = await _sender.Send(new GetProjectsQuery(StatusFilter: filter, PortfolioIdOrKey: portfolioIdOrKey, RoleFilter: roleFilter), cancellationToken);
 
         return projects is not null
             ? Ok(projects)
@@ -204,6 +208,20 @@ public class ProjectsController(ILogger<ProjectsController> logger, ISender send
         return Ok(items.OrderBy(c => c.Order));
     }
 
+    [HttpGet("{idOrKey}/team")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Projects)]
+    [OpenApiOperation("Get the team members for a project.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<IEnumerable<ProjectTeamMemberDto>>> GetProjectTeam(string idOrKey, CancellationToken cancellationToken)
+    {
+        var team = await _sender.Send(new GetProjectTeamQuery(idOrKey), cancellationToken);
+
+        return team is not null
+            ? Ok(team)
+            : NotFound();
+    }
+
     [HttpGet("{id}/work-items")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Projects)]
     [OpenApiOperation("Get work items for a project.", "")]
@@ -273,6 +291,18 @@ public class ProjectsController(ILogger<ProjectsController> logger, ISender send
         var nodes = await _sender.Send(new GetProjectPlanTreeQuery(idOrKey), cancellationToken);
 
         return Ok(nodes);
+    }
+
+    [HttpGet("{idOrKey}/plan-summary")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Projects)]
+    [OpenApiOperation("Get summary metrics for a project's plan, computed from leaf tasks.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<ProjectPlanSummaryDto>> GetProjectPlanSummary(string idOrKey, [FromQuery] Guid? employeeId, CancellationToken cancellationToken)
+    {
+        var summary = await _sender.Send(new GetProjectPlanSummaryQuery(idOrKey, employeeId), cancellationToken);
+
+        return Ok(summary);
     }
 
     [HttpGet("{id}/phases/{phaseId}")]

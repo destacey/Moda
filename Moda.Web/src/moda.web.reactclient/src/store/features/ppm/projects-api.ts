@@ -15,6 +15,8 @@ import {
   AssignProjectLifecycleRequest,
   ProjectPlanNodeDto,
   ProjectPhaseDetailsDto,
+  ProjectPlanSummaryDto,
+  ProjectTeamMemberDto,
 } from '@/src/services/moda-api'
 import { QueryTags } from '../query-tags'
 import { BaseOptionType } from 'antd/es/select'
@@ -23,6 +25,7 @@ import { OptionModel } from '@/src/components/types'
 export interface GetProjectsRequest {
   status?: number[]
   portfolioId?: string
+  role?: number[]
 }
 
 export const projectsApi = apiSlice.injectEndpoints({
@@ -36,6 +39,7 @@ export const projectsApi = apiSlice.injectEndpoints({
           const data = await getProjectsClient().getProjects(
             request?.status,
             request?.portfolioId,
+            request?.role,
           )
           return { data }
         } catch (error) {
@@ -437,6 +441,45 @@ export const projectsApi = apiSlice.injectEndpoints({
         { type: QueryTags.ProjectPlanTree },
       ],
     }),
+
+    getProjectPlanSummary: builder.query<
+      ProjectPlanSummaryDto,
+      { projectKey: string; employeeId?: string }
+    >({
+      queryFn: async ({ projectKey, employeeId }) => {
+        try {
+          const data = await getProjectsClient().getProjectPlanSummary(
+            projectKey,
+            employeeId,
+          )
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: (result, error, arg) => [
+        { type: QueryTags.ProjectPlanTree, id: arg.projectKey },
+      ],
+    }),
+
+    getProjectTeam: builder.query<
+      ProjectTeamMemberDto[],
+      string
+    >({
+      queryFn: async (idOrKey) => {
+        try {
+          const data = await getProjectsClient().getProjectTeam(idOrKey)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: (_result, _error, idOrKey) => [
+        { type: QueryTags.Project, id: `TEAM-${idOrKey}` },
+      ],
+    }),
   }),
 })
 
@@ -460,4 +503,6 @@ export const {
   useGetProjectPhaseQuery,
   usePatchProjectPhaseMutation,
   useChangeProjectLifecycleMutation,
+  useGetProjectPlanSummaryQuery,
+  useGetProjectTeamQuery,
 } = projectsApi

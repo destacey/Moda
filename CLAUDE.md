@@ -456,6 +456,8 @@ NSwag generates OpenAPI specification and TypeScript client on build (Debug conf
 
 **Entity configuration** uses fluent API in separate configuration classes implementing `IEntityTypeConfiguration<T>`
 
+**Frontend theming** uses Ant Design theme tokens — never hardcode colors (e.g., `#1677ff`, `#52c41a`). Prefer antd's CSS variables (e.g., `var(--ant-color-primary)`, `var(--ant-color-success)`, `var(--ant-color-error)`, `var(--ant-color-border)`) in CSS modules over `theme.useToken()` in JS. Only fall back to `theme.useToken()` when you need token values in JS logic (e.g., conditional color computation). See `tree-grid.module.css` and `phase-timeline.module.css` for examples.
+
 ## Important Considerations
 
 ### Package Management

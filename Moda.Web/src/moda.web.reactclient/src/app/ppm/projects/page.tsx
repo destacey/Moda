@@ -3,7 +3,7 @@
 import { PageTitle } from '@/src/components/common'
 import useAuth from '@/src/components/contexts/auth'
 import { authorizePage } from '@/src/components/hoc'
-import { useDocumentTitle } from '@/src/hooks'
+import { useDocumentTitle, useLocalStorageState } from '@/src/hooks'
 import { useGetProjectsQuery } from '@/src/store/features/ppm/projects-api'
 import { Button } from 'antd'
 import { FC, useCallback, useEffect, useMemo, useState } from 'react'
@@ -22,15 +22,28 @@ const PROJECT_STATUS = {
 
 const DEFAULT_STATUSES = [PROJECT_STATUS.Approved, PROJECT_STATUS.Active]
 
+const ALL_ROLES = [1, 2, 3, 4]
+
+const getRoleFilterValues = (
+  selectedRole: string | undefined,
+): number[] | undefined => {
+  if (!selectedRole) return undefined
+  if (selectedRole === 'all') return ALL_ROLES
+  return [parseInt(selectedRole)]
+}
+
 const ProjectsPage: FC = () => {
   useDocumentTitle('Projects')
   const [openCreateProjectForm, setOpenCreateProjectForm] =
     useState<boolean>(false)
   const [selectedStatuses, setSelectedStatuses] =
-    useState<number[]>(DEFAULT_STATUSES)
-  const [selectedPortfolioId, setSelectedPortfolioId] = useState<
+    useLocalStorageState<number[]>('projects-filter-statuses', DEFAULT_STATUSES)
+  const [selectedPortfolioId, setSelectedPortfolioId] = useLocalStorageState<
     string | undefined
-  >(undefined)
+  >('projects-filter-portfolio', undefined)
+  const [selectedRole, setSelectedRole] = useLocalStorageState<
+    string | undefined
+  >('projects-filter-role', undefined)
   const messageApi = useMessage()
 
   const { hasPermissionClaim } = useAuth()
@@ -45,6 +58,7 @@ const ProjectsPage: FC = () => {
   } = useGetProjectsQuery({
     status: selectedStatuses.length > 0 ? selectedStatuses : undefined,
     portfolioId: selectedPortfolioId,
+    role: getRoleFilterValues(selectedRole),
   })
 
   useEffect(() => {
@@ -54,9 +68,11 @@ const ProjectsPage: FC = () => {
     }
   }, [error, messageApi])
 
-  const handleStatusChange = useCallback((statuses: number[]) => {
-    setSelectedStatuses(statuses)
-  }, [])
+  const handleResetFilters = useCallback(() => {
+    setSelectedStatuses(DEFAULT_STATUSES)
+    setSelectedPortfolioId(undefined)
+    setSelectedRole(undefined)
+  }, [setSelectedStatuses, setSelectedPortfolioId, setSelectedRole])
 
   const actions = useMemo(() => {
     if (!showActions) return null
@@ -83,9 +99,12 @@ const ProjectsPage: FC = () => {
       <PageTitle title="Projects" actions={actions} />
       <ProjectsFilterBar
         selectedStatuses={selectedStatuses}
-        onStatusChange={handleStatusChange}
+        onStatusChange={setSelectedStatuses}
         selectedPortfolioId={selectedPortfolioId}
         onPortfolioChange={setSelectedPortfolioId}
+        selectedRole={selectedRole}
+        onRoleChange={setSelectedRole}
+        onReset={handleResetFilters}
       />
       <ProjectsGrid
         projects={projectData}

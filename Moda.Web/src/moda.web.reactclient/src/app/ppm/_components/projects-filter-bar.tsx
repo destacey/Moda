@@ -11,6 +11,10 @@ export interface ProjectsFilterBarProps {
   selectedPortfolioId?: string | undefined
   onPortfolioChange?: (portfolioId: string | undefined) => void
   showPortfolioFilter?: boolean
+  selectedRole?: string | undefined
+  onRoleChange?: (role: string | undefined) => void
+  showRoleFilter?: boolean
+  onReset?: () => void
 }
 
 const ProjectsFilterBar: FC<ProjectsFilterBarProps> = ({
@@ -19,6 +23,10 @@ const ProjectsFilterBar: FC<ProjectsFilterBarProps> = ({
   selectedPortfolioId,
   onPortfolioChange,
   showPortfolioFilter = true,
+  selectedRole,
+  onRoleChange,
+  showRoleFilter = true,
+  onReset,
 }) => {
   const { data: statusOptions, isLoading: statusOptionsLoading } =
     useGetProjectStatusOptionsQuery()
@@ -37,6 +45,10 @@ const ProjectsFilterBar: FC<ProjectsFilterBarProps> = ({
       portfolioOptions={showPortfolioFilter ? portfolioOptions : undefined}
       selectedPortfolioId={showPortfolioFilter ? selectedPortfolioId : undefined}
       onPortfolioChange={showPortfolioFilter ? onPortfolioChange : undefined}
+      selectedRole={showRoleFilter ? selectedRole : undefined}
+      onRoleChange={showRoleFilter ? onRoleChange : undefined}
+      showRoleFilter={showRoleFilter}
+      onReset={onReset}
       loading={loading}
     />
   )

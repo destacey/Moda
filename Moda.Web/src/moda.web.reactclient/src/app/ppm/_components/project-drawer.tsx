@@ -7,12 +7,13 @@ import {
   LabeledContent,
 } from '@/src/components/common/content'
 import LinksCard from '@/src/components/common/links/links-card'
+import PhaseTimeline from './phase-timeline'
 import { MarkdownRenderer } from '@/src/components/common/markdown'
 import useAuth from '@/src/components/contexts/auth'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { useGetProjectQuery } from '@/src/store/features/ppm/projects-api'
 import { getDrawerWidthPixels, getSortedNameList } from '@/src/utils'
-import { Drawer, Flex, Tooltip } from 'antd'
+import { Divider, Drawer, Flex, Tooltip } from 'antd'
 import Link from 'next/link'
 import { FC, useEffect, useMemo, useState } from 'react'
 
@@ -30,11 +31,7 @@ const ProjectDrawer: FC<ProjectDrawerProps> = ({
   const [size, setSize] = useState(() => getDrawerWidthPixels())
   const messageApi = useMessage()
 
-  const {
-    data: projectData,
-    isLoading,
-    error,
-  } = useGetProjectQuery(projectKey)
+  const { data: projectData, isLoading, error } = useGetProjectQuery(projectKey)
 
   const { hasPermissionClaim } = useAuth()
   const canViewProject = useMemo(
@@ -127,9 +124,18 @@ const ProjectDrawer: FC<ProjectDrawerProps> = ({
                 {projectData.projectLifecycle.name}
               </Tooltip>
             ) : (
-              'Not lifecycle assigned'
+              'No lifecycle assigned'
             )}
           </LabeledContent>
+
+          {strategicThemes.length > 0 && (
+            <LabeledContent label="Strategic Themes">
+              {strategicThemes.join(', ')}
+            </LabeledContent>
+          )}
+
+          <Divider size="small" />
+
           <LabeledContent label="Sponsors">
             <ContentList items={sponsorNames} emptyText="No sponsor assigned" />
           </LabeledContent>
@@ -142,11 +148,9 @@ const ProjectDrawer: FC<ProjectDrawerProps> = ({
           <LabeledContent label="Members">
             <ContentList items={memberNames} emptyText="No members assigned" />
           </LabeledContent>
-          {strategicThemes.length > 0 && (
-            <LabeledContent label="Strategic Themes">
-              {strategicThemes.join(', ')}
-            </LabeledContent>
-          )}
+
+          <Divider size="small" />
+
           {projectData?.description && (
             <LabeledContent label="Description">
               <ExpandableContent background="var(--ant-color-bg-elevated)">
@@ -155,6 +159,11 @@ const ProjectDrawer: FC<ProjectDrawerProps> = ({
             </LabeledContent>
           )}
         </Flex>
+
+        {projectData?.phases?.length > 0 && (
+          <PhaseTimeline phases={projectData.phases} size="small" />
+        )}
+
         {projectData?.id && (
           <LinksCard objectId={projectData.id} width="100%" />
         )}

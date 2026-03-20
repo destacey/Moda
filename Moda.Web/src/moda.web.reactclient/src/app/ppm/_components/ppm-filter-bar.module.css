@@ -22,6 +22,11 @@
   font-size: 12px;
 }
 
+.roleSelect {
+  min-width: 120px;
+  font-size: 12px;
+}
+
 .skeleton {
   width: 300px;
 }

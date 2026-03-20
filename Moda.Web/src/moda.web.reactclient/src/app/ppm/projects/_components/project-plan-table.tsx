@@ -540,6 +540,7 @@ const ProjectPlanTable = ({
           assigneeIds: task.assignees?.map((a) => a.id) ?? [],
           plannedStart: task.start ? dayjs(task.start) : null,
           plannedEnd: task.end ? dayjs(task.end) : null,
+          progress: task.progress,
         }
       }
 
@@ -728,6 +729,7 @@ const ProjectPlanTable = ({
               handleUpdateTask,
               getFieldError: ctx.getFieldError,
               handleKeyDown: ctx.handleKeyDown,
+              createSelectInputKeyDown: ctx.createSelectInputKeyDown,
               taskStatusOptions,
               taskStatusOptionsForMilestone,
               taskPriorityOptions,
@@ -775,7 +777,7 @@ const ProjectPlanTable = ({
                 rowId,
               ) as ProjectPlanNodeDto | null
               if (node && isPhaseNode(node)) {
-                return ['status', 'plannedStart', 'plannedEnd', 'assignees']
+                return ['status', 'plannedStart', 'plannedEnd', 'assignees', 'progress']
               }
               const base = [
                 'name',

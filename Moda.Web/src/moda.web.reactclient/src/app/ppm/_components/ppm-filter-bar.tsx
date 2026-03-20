@@ -1,6 +1,7 @@
 'use client'
 
-import { Button, Card, Flex, Select, Skeleton, Space } from 'antd'
+import { ClearOutlined } from '@ant-design/icons'
+import { Button, Card, Flex, Select, Skeleton, Space, Tooltip } from 'antd'
 import { BaseOptionType } from 'antd/es/select'
 import { FC } from 'react'
 import styles from './ppm-filter-bar.module.css'
@@ -12,8 +13,20 @@ export interface PpmFilterBarProps {
   portfolioOptions?: BaseOptionType[] | undefined
   selectedPortfolioId?: string | undefined
   onPortfolioChange?: (portfolioId: string | undefined) => void
+  selectedRole?: string | undefined
+  onRoleChange?: (role: string | undefined) => void
+  showRoleFilter?: boolean
+  onReset?: () => void
   loading?: boolean
 }
+
+const ROLE_OPTIONS: BaseOptionType[] = [
+  { label: 'All', value: 'all' },
+  { label: 'Sponsor', value: '1' },
+  { label: 'Owner', value: '2' },
+  { label: 'PM', value: '3' },
+  { label: 'Member', value: '4' },
+]
 
 const hasPortfolioFilter = (
   props: PpmFilterBarProps,
@@ -25,6 +38,13 @@ const hasPortfolioFilter = (
     props.onPortfolioChange !== undefined &&
     props.portfolioOptions !== undefined
   )
+}
+
+const hasRoleFilter = (
+  props: PpmFilterBarProps,
+): props is PpmFilterBarProps &
+  Required<Pick<PpmFilterBarProps, 'onRoleChange'>> => {
+  return props.showRoleFilter === true && props.onRoleChange !== undefined
 }
 
 const PpmFilterBar: FC<PpmFilterBarProps> = (props) => {
@@ -42,7 +62,7 @@ const PpmFilterBar: FC<PpmFilterBarProps> = (props) => {
     <div className={styles.filterCard}>
       <Flex align="center" gap={16} wrap>
         {hasPortfolioFilter(props) && (
-          <Space size="middle" align="center">
+          <Space size="small" align="center">
             <span className={styles.filterLabel}>Portfolio:</span>
             <Select
               placeholder="All Portfolios"
@@ -82,6 +102,34 @@ const PpmFilterBar: FC<PpmFilterBarProps> = (props) => {
             })}
           </Flex>
         </Space>
+
+        {hasRoleFilter(props) && (
+          <Space size="small" align="center">
+            <span className={styles.filterLabel}>Role:</span>
+            <Select
+              placeholder="No Filter"
+              size="small"
+              allowClear
+              value={props.selectedRole}
+              onChange={(value) => props.onRoleChange(value)}
+              options={ROLE_OPTIONS}
+              className={styles.roleSelect}
+              popupMatchSelectWidth={false}
+            />
+          </Space>
+        )}
+
+        {props.onReset && (
+          <Tooltip title="Reset Filters">
+            <Button
+              type="text"
+              shape="circle"
+              icon={<ClearOutlined />}
+              aria-label="Reset filters"
+              onClick={props.onReset}
+            />
+          </Tooltip>
+        )}
       </Flex>
     </div>
   )

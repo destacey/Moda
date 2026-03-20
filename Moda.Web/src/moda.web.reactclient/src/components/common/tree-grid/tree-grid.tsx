@@ -210,6 +210,7 @@ function TreeGridInner<T extends TreeNode>(
     getFieldError,
     editableColumns,
     handleKeyDown,
+    createSelectInputKeyDown,
     handleRowClick,
   } = editing
 
@@ -283,6 +284,7 @@ function TreeGridInner<T extends TreeNode>(
     return {
       selectedRowId,
       handleKeyDown,
+      createSelectInputKeyDown,
       getFieldError,
       editableColumns,
       isDragEnabled: dragEnabledForColumns,
@@ -296,6 +298,7 @@ function TreeGridInner<T extends TreeNode>(
     sorting.length,
     selectedRowId,
     handleKeyDown,
+    createSelectInputKeyDown,
     getFieldError,
     editableColumns,
     dragEnabledBase,
