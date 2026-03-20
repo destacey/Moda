@@ -18,6 +18,7 @@ import ChangeProjectLifecycleStateForm, {
   ProjectLifecycleStateAction,
 } from '../_components/change-project-lifecycle-state-form'
 import ProjectLifecyclePhasesList from '../_components/project-lifecycle-phases-list'
+import { useDocumentTitle } from '@/src/hooks/use-document-title'
 
 enum ProjectLifecycleTabs {
   Details = 'details',
@@ -67,6 +68,11 @@ const ProjectLifecycleDetailsPage = (props: {
   const { hasPermissionClaim } = useAuth()
   const canUpdate = hasPermissionClaim('Permissions.ProjectLifecycles.Update')
   const canDelete = hasPermissionClaim('Permissions.ProjectLifecycles.Delete')
+
+  const title = lifecycleData
+    ? `${lifecycleData.name} - Project Lifecycle Details`
+    : 'Project Lifecycle   Details'
+  useDocumentTitle(title)
 
   const renderTabContent = useCallback(() => {
     switch (activeTab) {

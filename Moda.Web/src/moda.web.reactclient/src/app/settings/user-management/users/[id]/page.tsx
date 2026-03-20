@@ -18,6 +18,7 @@ import {
   UserDetails,
 } from '../_components'
 import { ItemType } from 'antd/es/menu/interface'
+import { useDocumentTitle } from '@/src/hooks'
 
 enum UserDetailsTabs {
   Details = 'details',
@@ -47,6 +48,12 @@ const UserDetailsPage = (props: { params: Promise<{ id: string }> }) => {
 
   const isLocalUser = userData?.loginProvider === 'Moda'
 
+  const fullName = userData
+    ? `${userData?.firstName} ${userData?.lastName}`
+    : ''
+  const title = userData ? `${fullName} - User Details` : 'User Details'
+  useDocumentTitle(title)
+
   const actionsMenuItems: MenuProps['items'] = useMemo(() => {
     if (!userData) return []
 
@@ -65,8 +72,7 @@ const UserDetailsPage = (props: { params: Promise<{ id: string }> }) => {
           lastName: userData.lastName,
           isActive: userData.isActive,
           isLockedOut:
-            !!userData.lockoutEnd &&
-            new Date(userData.lockoutEnd) > new Date(),
+            !!userData.lockoutEnd && new Date(userData.lockoutEnd) > new Date(),
         }),
       )
     }
@@ -90,7 +96,13 @@ const UserDetailsPage = (props: { params: Promise<{ id: string }> }) => {
     }
     items.push(...secondaryItems)
     return items
-  }, [canUpdateUser, canUpdateUserRoles, isLocalUser, userData, getAccountActionMenuItems])
+  }, [
+    canUpdateUser,
+    canUpdateUserRoles,
+    isLocalUser,
+    userData,
+    getAccountActionMenuItems,
+  ])
 
   const renderTabContent = useCallback(() => {
     switch (activeTab) {
@@ -116,8 +128,6 @@ const UserDetailsPage = (props: { params: Promise<{ id: string }> }) => {
   if (!userData) {
     return notFound()
   }
-
-  const fullName = `${userData?.firstName} ${userData?.lastName}`
 
   return (
     <>
