@@ -1,10 +1,8 @@
 'use client'
 
 import { ModaGrid } from '@/src/components/common'
-import {
-  ProjectTeamMemberDto,
-  useGetProjectTeamQuery,
-} from '@/src/store/features/ppm/projects-api'
+import { ProjectTeamMemberDto } from '@/src/services/moda-api'
+import { useGetProjectTeamQuery } from '@/src/store/features/ppm/projects-api'
 import { ColDef } from 'ag-grid-community'
 import { CustomCellRendererProps } from 'ag-grid-react'
 import Link from 'next/link'

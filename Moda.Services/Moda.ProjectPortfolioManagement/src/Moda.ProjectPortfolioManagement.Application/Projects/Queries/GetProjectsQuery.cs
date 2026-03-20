@@ -59,11 +59,13 @@ internal sealed class GetProjectsQueryHandler(IProjectPortfolioManagementDbConte
         if (request.RoleFilter is { Length: > 0 })
         {
             var employeeId = _currentUser.GetEmployeeId();
-            if (employeeId.HasValue)
+            if (!employeeId.HasValue)
             {
-                query = query.Where(pp => pp.Roles.Any(r =>
-                    r.EmployeeId == employeeId.Value && request.RoleFilter.Contains(r.Role)));
+                return [];
             }
+
+            query = query.Where(pp => pp.Roles.Any(r =>
+                r.EmployeeId == employeeId.Value && request.RoleFilter.Contains(r.Role)));
         }
 
         return await query.ProjectToType<ProjectListDto>().ToListAsync(cancellationToken);

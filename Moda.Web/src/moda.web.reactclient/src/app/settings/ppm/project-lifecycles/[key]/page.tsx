@@ -71,7 +71,7 @@ const ProjectLifecycleDetailsPage = (props: {
 
   const title = lifecycleData
     ? `${lifecycleData.name} - Project Lifecycle Details`
-    : 'Project Lifecycle   Details'
+    : 'Project Lifecycle Details'
   useDocumentTitle(title)
 
   const renderTabContent = useCallback(() => {

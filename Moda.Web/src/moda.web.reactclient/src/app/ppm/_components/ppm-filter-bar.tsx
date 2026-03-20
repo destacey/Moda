@@ -125,6 +125,7 @@ const PpmFilterBar: FC<PpmFilterBarProps> = (props) => {
               type="text"
               shape="circle"
               icon={<ClearOutlined />}
+              aria-label="Reset filters"
               onClick={props.onReset}
             />
           </Tooltip>

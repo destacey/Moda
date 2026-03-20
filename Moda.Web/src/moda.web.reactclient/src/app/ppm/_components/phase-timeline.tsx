@@ -118,7 +118,7 @@ const PhaseTimeline: FC<PhaseTimelineProps> = ({ phases, size = 'default' }) => 
   return (
     <Steps
       items={items}
-      size="small"
+      size={size}
       titlePlacement="vertical"
     />
   )

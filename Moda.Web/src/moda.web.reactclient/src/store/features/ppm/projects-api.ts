@@ -15,6 +15,8 @@ import {
   AssignProjectLifecycleRequest,
   ProjectPlanNodeDto,
   ProjectPhaseDetailsDto,
+  ProjectPlanSummaryDto,
+  ProjectTeamMemberDto,
 } from '@/src/services/moda-api'
 import { QueryTags } from '../query-tags'
 import { BaseOptionType } from 'antd/es/select'
@@ -26,24 +28,6 @@ export interface GetProjectsRequest {
   role?: number[]
 }
 
-export interface ProjectPlanSummaryDto {
-  overdue: number
-  dueThisWeek: number
-  upcoming: number
-  totalLeafTasks: number
-}
-
-export interface ProjectTeamMemberDto {
-  employee: {
-    id: string
-    key: string
-    name: string
-  }
-  roles: string[]
-  assignedPhases: string[]
-  activeWorkItemCount: number
-}
-
 export const projectsApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getProjects: builder.query<
@@ -52,16 +36,11 @@ export const projectsApi = apiSlice.injectEndpoints({
     >({
       queryFn: async (request = undefined) => {
         try {
-          const params = new URLSearchParams()
-          request?.status?.forEach((s) => params.append('status', s.toString()))
-          if (request?.portfolioId) {
-            params.append('portfolioId', request.portfolioId)
-          }
-          request?.role?.forEach((r) => params.append('role', r.toString()))
-          const queryString = params.toString()
-          const url = `/api/ppm/projects${queryString ? `?${queryString}` : ''}`
-          const response = await authenticatedFetch(url)
-          const data: ProjectListDto[] = await response.json()
+          const data = await getProjectsClient().getProjects(
+            request?.status,
+            request?.portfolioId,
+            request?.role,
+          )
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -469,11 +448,10 @@ export const projectsApi = apiSlice.injectEndpoints({
     >({
       queryFn: async ({ projectKey, employeeId }) => {
         try {
-          const params = employeeId ? `?employeeId=${employeeId}` : ''
-          const response = await authenticatedFetch(
-            `/api/ppm/projects/${projectKey}/plan-summary${params}`,
+          const data = await getProjectsClient().getProjectPlanSummary(
+            projectKey,
+            employeeId,
           )
-          const data = await response.json()
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -487,21 +465,20 @@ export const projectsApi = apiSlice.injectEndpoints({
 
     getProjectTeam: builder.query<
       ProjectTeamMemberDto[],
-      string | undefined
+      string
     >({
       queryFn: async (idOrKey) => {
         try {
-          const response = await authenticatedFetch(
-            `/api/ppm/projects/${idOrKey}/team`,
-          )
-          const data: ProjectTeamMemberDto[] = await response.json()
+          const data = await getProjectsClient().getProjectTeam(idOrKey)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
           return { error }
         }
       },
-      providesTags: () => [{ type: QueryTags.Project, id: 'TEAM' }],
+      providesTags: (_result, _error, idOrKey) => [
+        { type: QueryTags.Project, id: `TEAM-${idOrKey}` },
+      ],
     }),
   }),
 })
