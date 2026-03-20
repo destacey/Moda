@@ -37,17 +37,16 @@ function mapStepStatus(
   }
 }
 
-function getIcon(status: PhaseStatus) {
-  const tooltip = buildTooltip(status)
+function getIcon(status: PhaseStatus, tooltipContent: React.ReactNode) {
   switch (status) {
     case 'completed':
-      return <Tooltip title={tooltip}><CheckCircleFilled className={styles.iconCompleted} /></Tooltip>
+      return <Tooltip title={tooltipContent}><CheckCircleFilled className={styles.iconCompleted} /></Tooltip>
     case 'in-progress':
-      return <Tooltip title={tooltip}><span className={styles.dotInProgress} /></Tooltip>
+      return <Tooltip title={tooltipContent}><span className={styles.dotInProgress} /></Tooltip>
     case 'cancelled':
-      return <Tooltip title={tooltip}><CloseCircleFilled className={styles.iconCancelled} /></Tooltip>
+      return <Tooltip title={tooltipContent}><CloseCircleFilled className={styles.iconCancelled} /></Tooltip>
     default:
-      return <Tooltip title={tooltip}><span className={styles.dotNotStarted} /></Tooltip>
+      return <Tooltip title={tooltipContent}><span className={styles.dotNotStarted} /></Tooltip>
   }
 }
 
@@ -64,30 +63,43 @@ function formatDateRange(start?: Date, end?: Date): string | null {
   return `Ends ${dayjs(end).format(format)}`
 }
 
-function buildTooltip(status: PhaseStatus) {
+function buildTooltip(phase: ProjectPhaseListDto, status: PhaseStatus, isSmall: boolean) {
   const statusLabel = status.replace('-', ' ').replace(/\b\w/g, (c) => c.toUpperCase())
-  return statusLabel
+  if (!isSmall) return statusLabel
+
+  const dateRange = formatDateRange(phase.start, phase.end)
+  return (
+    <div>
+      <div>{statusLabel}</div>
+      {dateRange && <div>{dateRange}</div>}
+      {phase.progress != null && <div>Progress: {phase.progress}%</div>}
+    </div>
+  )
 }
 
 export interface PhaseTimelineProps {
   phases: ProjectPhaseListDto[]
+  size?: 'default' | 'small'
 }
 
-const PhaseTimeline: FC<PhaseTimelineProps> = ({ phases }) => {
+const PhaseTimeline: FC<PhaseTimelineProps> = ({ phases, size = 'default' }) => {
   if (phases.length === 0) return null
 
+  const isSmall = size === 'small'
   const sorted = [...phases].sort((a, b) => a.order - b.order)
 
   const items = sorted.map((phase) => {
-    const status = mapPhaseStatus(phase.status.name)
-    const tooltip = buildTooltip(status)
+    const status = mapPhaseStatus(phase.status?.name)
+    const tooltip = buildTooltip(phase, status, isSmall)
     return {
       title: (
         <Tooltip title={tooltip}>
-          {phase.name}
+          <span className={isSmall ? styles.titleSmall : undefined}>
+            {phase.name}
+          </span>
         </Tooltip>
       ),
-      content: (() => {
+      content: !isSmall ? (() => {
         const dateRange = formatDateRange(phase.start, phase.end)
         const hasContent = dateRange || phase.progress != null
         if (!hasContent) return undefined
@@ -97,9 +109,9 @@ const PhaseTimeline: FC<PhaseTimelineProps> = ({ phases }) => {
             {phase.progress != null && <div className={styles.progress}>{phase.progress}%</div>}
           </div>
         )
-      })(),
+      })() : undefined,
       status: mapStepStatus(status),
-      icon: getIcon(status),
+      icon: getIcon(status, tooltip),
     }
   })
 

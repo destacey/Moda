@@ -21,7 +21,7 @@ const ProjectDetailsTab: FC<ProjectDetailsTabProps> = ({ project }) => {
         <ProjectDetails project={project} />
       </Col>
       <Col xs={24} md={15} xxl={18}>
-        {project.projectLifecycle && (
+        {project.phases?.length > 0 && (
           <Flex vertical gap="large">
             <Flex align="center" gap={8}>
               <Text strong>Phases</Text>

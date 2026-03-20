@@ -2,6 +2,7 @@
 
 import { LifecycleStatusTag } from '@/src/components/common'
 import TimelineProgress from '@/src/components/common/planning/timeline-progress'
+import PhaseTimeline from './phase-timeline'
 import { ProjectListDto } from '@/src/services/moda-api'
 import { getSortedNames } from '@/src/utils'
 import { Card, Flex, Spin, Typography } from 'antd'
@@ -30,10 +31,10 @@ const ProjectCard: FC<ProjectCardProps> = ({ project, onCardClick }) => {
     <Card
       size="small"
       hoverable
-      style={{ height: '100%', minWidth: 300, cursor: 'pointer' }}
+      className={styles.card}
       onClick={() => onCardClick(project.key)}
     >
-      <Flex vertical gap={8}>
+      <Flex vertical gap={8} style={{ flex: 1 }}>
         {/* Header */}
         <Flex justify="space-between" align="flex-start" gap={4}>
           <Flex vertical gap={2} style={{ flex: 1, minWidth: 0 }}>
@@ -63,6 +64,15 @@ const ProjectCard: FC<ProjectCardProps> = ({ project, onCardClick }) => {
           </Flex>
         </Flex>
 
+        {/* Phases */}
+        {project.phases?.length > 0 ? (
+          <PhaseTimeline phases={project.phases} size="small" />
+        ) : (
+          <Text type="secondary" style={{ fontSize: 12 }}>
+            No lifecycle defined
+          </Text>
+        )}
+
         {/* Timeline */}
         {project.start && project.end && (
           <TimelineProgress
@@ -70,7 +80,7 @@ const ProjectCard: FC<ProjectCardProps> = ({ project, onCardClick }) => {
             end={project.end}
             variant="borderless"
             size="small"
-            style={{ width: '100%' }}
+            style={{ width: '100%', marginTop: 'auto' }}
             dateFormat={timelineFormat}
           />
         )}

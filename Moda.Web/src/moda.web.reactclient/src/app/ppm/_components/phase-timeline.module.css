@@ -25,6 +25,10 @@
   font-size: 14px;
 }
 
+.titleSmall {
+  font-size: 11px;
+}
+
 .description {
   display: flex;
   flex-direction: column;
