@@ -172,6 +172,7 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     activeTab,
     canUpdateProject,
     projectData,
+    projectKey,
     refetchWorkItemsData,
     workItemsData,
     workItemsDataIsLoading,

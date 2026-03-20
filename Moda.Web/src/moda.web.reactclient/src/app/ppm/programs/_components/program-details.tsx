@@ -21,24 +21,24 @@ export interface ProgramDetailsProps {
 }
 
 const ProgramDetails: FC<ProgramDetailsProps> = ({ program }) => {
-  if (!program) return null
-
   const sponsorNames = useMemo(
-    () => getSortedNameList(program.programSponsors),
+    () => (program ? getSortedNameList(program.programSponsors) : []),
     [program],
   )
   const ownerNames = useMemo(
-    () => getSortedNameList(program.programOwners),
+    () => (program ? getSortedNameList(program.programOwners) : []),
     [program],
   )
   const managerNames = useMemo(
-    () => getSortedNameList(program.programManagers),
+    () => (program ? getSortedNameList(program.programManagers) : []),
     [program],
   )
   const strategicThemes = useMemo(
-    () => getSortedNameList(program.strategicThemes),
+    () => (program ? getSortedNameList(program.strategicThemes) : []),
     [program],
   )
+
+  if (!program) return null
 
   const hasStarted =
     program.start && dayjs(program.start).isBefore(dayjs(), 'day')
