@@ -197,6 +197,13 @@ export interface TreeGridColumnContext {
     rowId: string,
     columnId: string,
   ) => Promise<void>
+  /** Creates an `onInputKeyDown` handler for antd Select that prevents Tab
+   *  from triggering rc-select's built-in "select on Tab" behavior while
+   *  still forwarding the event to handleKeyDown for navigation. */
+  createSelectInputKeyDown: (
+    rowId: string,
+    columnId: string,
+  ) => React.KeyboardEventHandler<HTMLInputElement | HTMLTextAreaElement>
   getFieldError: (fieldName: string) => string | undefined
   editableColumns: string[]
   isDragEnabled: boolean

@@ -68,6 +68,10 @@ interface ProjectPlanTableColumnsParams {
     rowId: string,
     columnId: string,
   ) => Promise<void>
+  createSelectInputKeyDown: (
+    rowId: string,
+    columnId: string,
+  ) => React.KeyboardEventHandler<HTMLInputElement | HTMLTextAreaElement>
   taskStatusOptions: any[]
   taskStatusOptionsForMilestone: any[]
   taskPriorityOptions: any[]
@@ -93,6 +97,7 @@ export const getProjectPlanTableColumns = ({
   handleUpdateTask,
   getFieldError,
   handleKeyDown,
+  createSelectInputKeyDown,
   taskStatusOptions,
   taskStatusOptionsForMilestone,
   taskPriorityOptions,
@@ -355,6 +360,7 @@ export const getProjectPlanTableColumns = ({
                 options={taskTypeOptions}
                 style={{ width: '100%' }}
                 onKeyDown={(e) => handleKeyDown(e, task.id, 'type')}
+                onInputKeyDown={createSelectInputKeyDown(task.id, 'type')}
                 status={getFieldError('typeId') ? 'error' : ''}
                 onOpenChange={(open) => {
                   // When the dropdown closes after a selection, the Select
@@ -435,6 +441,7 @@ export const getProjectPlanTableColumns = ({
               size="small"
               options={availableStatusOptions}
               onKeyDown={(e) => handleKeyDown(e, task.id, 'status')}
+              onInputKeyDown={createSelectInputKeyDown(task.id, 'status')}
               status={error ? 'error' : ''}
             />
           </FormItem>
@@ -482,6 +489,7 @@ export const getProjectPlanTableColumns = ({
               size="small"
               options={taskPriorityOptions}
               onKeyDown={(e) => handleKeyDown(e, task.id, 'priority')}
+              onInputKeyDown={createSelectInputKeyDown(task.id, 'priority')}
               status={error ? 'error' : ''}
             />
           </FormItem>
@@ -664,6 +672,7 @@ export const getProjectPlanTableColumns = ({
               }
               options={employeeOptions}
               onKeyDown={(e) => handleKeyDown(e, task.id, 'assignees')}
+              onInputKeyDown={createSelectInputKeyDown(task.id, 'assignees')}
               status={error ? 'error' : ''}
               maxTagCount={1}
               maxTagPlaceholder={(omitted) => `+${omitted.length}`}

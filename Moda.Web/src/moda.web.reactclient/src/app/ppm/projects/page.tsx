@@ -68,15 +68,11 @@ const ProjectsPage: FC = () => {
     }
   }, [error, messageApi])
 
-  const handleStatusChange = useCallback((statuses: number[]) => {
-    setSelectedStatuses(statuses)
-  }, [])
-
   const handleResetFilters = useCallback(() => {
     setSelectedStatuses(DEFAULT_STATUSES)
     setSelectedPortfolioId(undefined)
     setSelectedRole(undefined)
-  }, [])
+  }, [setSelectedStatuses, setSelectedPortfolioId, setSelectedRole])
 
   const actions = useMemo(() => {
     if (!showActions) return null
@@ -103,7 +99,7 @@ const ProjectsPage: FC = () => {
       <PageTitle title="Projects" actions={actions} />
       <ProjectsFilterBar
         selectedStatuses={selectedStatuses}
-        onStatusChange={handleStatusChange}
+        onStatusChange={setSelectedStatuses}
         selectedPortfolioId={selectedPortfolioId}
         onPortfolioChange={setSelectedPortfolioId}
         selectedRole={selectedRole}

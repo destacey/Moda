@@ -707,6 +707,29 @@ export function useTreeGridEditing<T extends TreeNode>(
     ],
   )
 
+  // Intercept Tab on the Select's inner <input> to prevent rc-select from
+  // treating Tab as a selection key (it handles Tab identically to Enter).
+  // rc-select processes keydown on its container *after* the input's keydown
+  // bubbles up, so stopping propagation here prevents the unwanted selection.
+  //
+  // Because stopPropagation also blocks our own onKeyDown handler on the
+  // Select container, we call handleKeyDown directly for Tab events.
+  const createSelectInputKeyDown = useCallback(
+    (rowId: string, columnId: string) =>
+      (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        if (e.key === 'Tab') {
+          e.stopPropagation()
+          // Synthesize the call that stopPropagation blocked
+          handleKeyDown(
+            e as unknown as React.KeyboardEvent,
+            rowId,
+            columnId,
+          )
+        }
+      },
+    [handleKeyDown],
+  )
+
   return {
     tableRef,
     selectedRowId,
@@ -718,6 +741,7 @@ export function useTreeGridEditing<T extends TreeNode>(
     editableColumns,
     saveFormChanges,
     handleKeyDown,
+    createSelectInputKeyDown,
     handleRowClick,
   }
 }
