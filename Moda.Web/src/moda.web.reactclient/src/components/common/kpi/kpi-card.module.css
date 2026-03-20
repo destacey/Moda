@@ -39,6 +39,10 @@
   font-size: 10px;
 }
 
+.directionTag {
+  color: var(--kpi-secondary);
+}
+
 .name {
   font-size: 13px;
   font-weight: 600;
@@ -91,7 +95,7 @@
 
 .trendLabel {
   font-size: 11px;
-  color: var(--kpi-trend-color);
+  color: var(--kpi-secondary);
 }
 
 .trendArrowChar {

@@ -167,7 +167,6 @@ const DirectionBadge: FC<{ direction: KpiTargetDirection }> = ({
         <ArrowDownOutlined />
       )
     }
-    color={direction === KpiTargetDirection.Increase ? 'success' : 'processing'}
     className={styles.directionTag}
   >
     {direction}
