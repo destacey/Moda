@@ -1,72 +1,86 @@
 'use client'
 
-import { ModaDateRange, ResponsiveFlex } from '@/src/components/common'
+import { ModaDateRange } from '@/src/components/common'
+import {
+  ContentList,
+  ExpandableContent,
+  LabeledContent,
+} from '@/src/components/common/content'
 import LinksCard from '@/src/components/common/links/links-card'
 import { MarkdownRenderer } from '@/src/components/common/markdown'
+import TimelineProgress from '@/src/components/common/planning/timeline-progress'
 import { ProjectDetailsDto } from '@/src/services/moda-api'
-import { getSortedNames } from '@/src/utils'
-import { Descriptions, Flex, Tooltip } from 'antd'
+import { Card, Divider, Flex, Tooltip } from 'antd'
+import dayjs from 'dayjs'
 import Link from 'next/link'
 import { FC } from 'react'
-
-const { Item } = Descriptions
 
 export interface ProjectDetailsProps {
   project: ProjectDetailsDto
 }
 
-const ProjectDetails: FC<ProjectDetailsProps> = ({
-  project,
-}: ProjectDetailsProps) => {
+const ProjectDetails: FC<ProjectDetailsProps> = ({ project }) => {
   if (!project) return null
 
-  const sponsorNames =
-    project?.projectSponsors.length > 0
-      ? getSortedNames(project.projectSponsors)
-      : 'No sponsor assigned'
-  const ownerNames =
-    project?.projectOwners.length > 0
-      ? getSortedNames(project.projectOwners)
-      : 'No owner assigned'
-  const managerNames =
-    project?.projectManagers.length > 0
-      ? getSortedNames(project.projectManagers)
-      : 'No manager assigned'
-  const memberNames =
-    project?.projectMembers.length > 0
-      ? getSortedNames(project.projectMembers)
-      : 'No members assigned'
+  const sponsorNames = [...project.projectSponsors]
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map((s) => s.name)
 
-  const strategicThemes =
-    project?.strategicThemes.length > 0
-      ? getSortedNames(project.strategicThemes)
-      : null
+  const ownerNames = [...project.projectOwners]
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map((o) => o.name)
+
+  const managerNames = [...project.projectManagers]
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map((m) => m.name)
+
+  const memberNames = [...project.projectMembers]
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map((m) => m.name)
+
+  const strategicThemeNames = [...project.strategicThemes]
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map((t) => t.name)
+
+  const hasStarted =
+    project.start && dayjs(project.start).isBefore(dayjs(), 'day')
+
+  const timelineFormat =
+    project.start &&
+    project.end &&
+    new Date(project.start).getFullYear() === new Date().getFullYear()
+      ? 'MMM D'
+      : 'MMM D, YYYY'
 
   return (
-    <Flex vertical gap="middle">
-      <ResponsiveFlex gap="middle" align="start">
-        <Descriptions column={1} size="small">
-          <Item label="Portfolio">
+    <Card size="small">
+      <Flex vertical gap={0}>
+        <Flex vertical gap={10}>
+          <LabeledContent label="Portfolio">
             <Link href={`/ppm/portfolios/${project.portfolio.key}`}>
               {project.portfolio.name}
             </Link>
-          </Item>
-          <Item label="Program">
-            {project.program && (
+          </LabeledContent>
+
+          {project.program && (
+            <LabeledContent label="Program">
               <Link href={`/ppm/programs/${project.program.key}`}>
                 {project.program.name}
               </Link>
-            )}
-          </Item>
-          <Item label="Dates">
+            </LabeledContent>
+          )}
+
+          <LabeledContent label="Dates">
             <ModaDateRange
               dateRange={{ start: project.start, end: project.end }}
             />
-          </Item>
-          <Item label="Expenditure Category">
+          </LabeledContent>
+
+          <LabeledContent label="Expenditure Category">
             {project.expenditureCategory.name}
-          </Item>
-          <Item label="Lifecycle">
+          </LabeledContent>
+
+          <LabeledContent label="Lifecycle">
             {project.projectLifecycle ? (
               <Tooltip title={project.projectLifecycle.description}>
                 {project.projectLifecycle.name}
@@ -74,22 +88,65 @@ const ProjectDetails: FC<ProjectDetailsProps> = ({
             ) : (
               'No lifecycle assigned'
             )}
-          </Item>
-          <Item label="Sponsors">{sponsorNames}</Item>
-          <Item label="Owners">{ownerNames}</Item>
-          <Item label="Managers">{managerNames}</Item>
-          <Item label="Members">{memberNames}</Item>
-          <Item label="Strategic Themes">{strategicThemes}</Item>
-        </Descriptions>
-        <Descriptions layout="vertical" size="small">
-          <Item label="Description">
-            <MarkdownRenderer markdown={project.description} />
-          </Item>
-        </Descriptions>
-      </ResponsiveFlex>
-      <LinksCard objectId={project.id} />
-    </Flex>
+          </LabeledContent>
+
+          {strategicThemeNames.length > 0 && (
+            <LabeledContent label="Strategic Themes">
+              <ContentList items={strategicThemeNames} />
+            </LabeledContent>
+          )}
+
+          <Divider size="small" />
+
+          <LabeledContent label="Sponsors">
+            <ContentList items={sponsorNames} emptyText="No sponsor assigned" />
+          </LabeledContent>
+
+          <LabeledContent label="Owners">
+            <ContentList items={ownerNames} emptyText="No owner assigned" />
+          </LabeledContent>
+
+          <LabeledContent label="Managers">
+            <ContentList items={managerNames} emptyText="No manager assigned" />
+          </LabeledContent>
+
+          <LabeledContent label="Members">
+            <ContentList items={memberNames} emptyText="No members assigned" />
+          </LabeledContent>
+
+          <Divider size="small" />
+
+          {project.description && (
+            <LabeledContent label="Description">
+              <ExpandableContent>
+                <MarkdownRenderer markdown={project.description} />
+              </ExpandableContent>
+            </LabeledContent>
+          )}
+        </Flex>
+
+        {hasStarted && (
+          <>
+            <Divider />
+            <TimelineProgress
+              start={project.start}
+              end={project.end}
+              variant="borderless"
+              style={{ width: '100%' }}
+              dateFormat={timelineFormat}
+            />
+          </>
+        )}
+
+        <Divider />
+
+        <div style={{ padding: '0 16px 16px' }}>
+          <LinksCard objectId={project.id} width="100%" />
+        </div>
+      </Flex>
+    </Card>
   )
 }
 
 export default ProjectDetails
+

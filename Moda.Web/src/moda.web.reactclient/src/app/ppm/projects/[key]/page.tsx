@@ -12,7 +12,7 @@ import {
   useGetProjectQuery,
   useGetProjectWorkItemsQuery,
 } from '@/src/store/features/ppm/projects-api'
-import { Alert, Card, MenuProps, Spin } from 'antd'
+import { Alert, MenuProps, Tabs } from 'antd'
 import { notFound, usePathname, useRouter } from 'next/navigation'
 import { use, useCallback, useEffect, useMemo, useState } from 'react'
 import ProjectDetailsLoading from './loading'
@@ -23,7 +23,7 @@ import {
   ChangeProjectKeyForm,
   DeleteProjectForm,
   EditProjectForm,
-  ProjectDetails,
+  ProjectDetailsTab,
 } from '../_components'
 import AssignProjectLifecycleForm from '../_components/assign-project-lifecycle-form'
 import ChangeProjectLifecycleForm from '../_components/change-project-lifecycle-form'
@@ -33,12 +33,11 @@ import { ProjectStatusAction } from '../_components/change-project-status-form'
 
 const ProjectPlan = dynamic(() => import('../_components/project-plan'), {
   ssr: false,
-  loading: () => <Spin />,
 })
 
 const WorkItemsGrid = dynamic(
   () => import('@/src/components/common/work/work-items-grid'),
-  { ssr: false, loading: () => <Spin /> },
+  { ssr: false },
 )
 
 enum ProjectTabs {
@@ -138,7 +137,7 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const renderTabContent = useCallback(() => {
     switch (activeTab) {
       case ProjectTabs.Details:
-        return <ProjectDetails project={projectData} />
+        return <ProjectDetailsTab project={projectData} />
       case ProjectTabs.Plan:
         return (
           <ProjectPlan
@@ -444,14 +443,13 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
           {(missingDates || !projectData?.projectLifecycle) && <br />}
         </>
       )}
-      <Card
-        style={{ width: '100%' }}
-        tabList={tabs}
-        activeTabKey={activeTab}
-        onTabChange={onTabChange}
-      >
-        {renderTabContent()}
-      </Card>
+      <Tabs
+        size="large"
+        items={tabs}
+        activeKey={activeTab}
+        onChange={onTabChange}
+      />
+      {renderTabContent()}
 
       {openEditProjectForm && (
         <EditProjectForm

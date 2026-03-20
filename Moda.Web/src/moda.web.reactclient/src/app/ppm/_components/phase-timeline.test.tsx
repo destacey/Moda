@@ -165,7 +165,7 @@ describe('PhaseTimeline', () => {
     expect(await screen.findByText('In Progress')).toBeInTheDocument()
   })
 
-  it('shows tooltip with dates on hover', async () => {
+  it('shows dates inline below phase name', () => {
     const phases = [
       createPhase({
         name: 'Discovery',
@@ -178,14 +178,10 @@ describe('PhaseTimeline', () => {
 
     render(<PhaseTimeline phases={phases} />)
 
-    await userEvent.hover(screen.getByText('Discovery'))
-
-    expect(
-      await screen.findByText('Jan 15 - Mar 15, 2026'),
-    ).toBeInTheDocument()
+    expect(screen.getByText('Jan 15 - Mar 15, 2026')).toBeInTheDocument()
   })
 
-  it('shows tooltip with progress on hover', async () => {
+  it('shows progress inline below phase name', () => {
     const phases = [
       createPhase({
         name: 'Discovery',
@@ -197,12 +193,10 @@ describe('PhaseTimeline', () => {
 
     render(<PhaseTimeline phases={phases} />)
 
-    await userEvent.hover(screen.getByText('Discovery'))
-
-    expect(await screen.findByText('Progress: 45%')).toBeInTheDocument()
+    expect(screen.getByText('45%')).toBeInTheDocument()
   })
 
-  it('does not show dates in tooltip when dates are not set', async () => {
+  it('does not show dates when dates are not set', () => {
     const phases = [
       createPhase({
         name: 'Discovery',
@@ -213,13 +207,10 @@ describe('PhaseTimeline', () => {
 
     render(<PhaseTimeline phases={phases} />)
 
-    await userEvent.hover(screen.getByText('Discovery'))
-
-    expect(await screen.findByText('Not Started')).toBeInTheDocument()
     expect(screen.queryByText(/Jan|Feb|Mar/)).not.toBeInTheDocument()
   })
 
-  it('shows start-only date in tooltip', async () => {
+  it('shows start-only date inline', () => {
     const phases = [
       createPhase({
         name: 'Discovery',
@@ -231,14 +222,10 @@ describe('PhaseTimeline', () => {
 
     render(<PhaseTimeline phases={phases} />)
 
-    await userEvent.hover(screen.getByText('Discovery'))
-
-    expect(
-      await screen.findByText('Starts Feb 1, 2026'),
-    ).toBeInTheDocument()
+    expect(screen.getByText('Starts Feb 1, 2026')).toBeInTheDocument()
   })
 
-  it('shows end-only date in tooltip', async () => {
+  it('shows end-only date inline', () => {
     const phases = [
       createPhase({
         name: 'Discovery',
@@ -250,11 +237,7 @@ describe('PhaseTimeline', () => {
 
     render(<PhaseTimeline phases={phases} />)
 
-    await userEvent.hover(screen.getByText('Discovery'))
-
-    expect(
-      await screen.findByText('Ends Jun 30, 2026'),
-    ).toBeInTheDocument()
+    expect(screen.getByText('Ends Jun 30, 2026')).toBeInTheDocument()
   })
 
   it('does not mutate the original phases array', () => {

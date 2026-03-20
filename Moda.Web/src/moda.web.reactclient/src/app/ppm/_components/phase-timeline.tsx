@@ -37,8 +37,8 @@ function mapStepStatus(
   }
 }
 
-function getIcon(phase: ProjectPhaseListDto, status: PhaseStatus) {
-  const tooltip = buildTooltip(phase, status)
+function getIcon(status: PhaseStatus) {
+  const tooltip = buildTooltip(status)
   switch (status) {
     case 'completed':
       return <Tooltip title={tooltip}><CheckCircleFilled className={styles.iconCompleted} /></Tooltip>
@@ -64,16 +64,9 @@ function formatDateRange(start?: Date, end?: Date): string | null {
   return `Ends ${dayjs(end).format(format)}`
 }
 
-function buildTooltip(phase: ProjectPhaseListDto, status: PhaseStatus) {
+function buildTooltip(status: PhaseStatus) {
   const statusLabel = status.replace('-', ' ').replace(/\b\w/g, (c) => c.toUpperCase())
-  const dateRange = formatDateRange(phase.start, phase.end)
-  return (
-    <div>
-      <div>{statusLabel}</div>
-      {dateRange && <div>{dateRange}</div>}
-      {phase.progress != null && <div>Progress: {phase.progress}%</div>}
-    </div>
-  )
+  return statusLabel
 }
 
 export interface PhaseTimelineProps {
@@ -87,15 +80,26 @@ const PhaseTimeline: FC<PhaseTimelineProps> = ({ phases }) => {
 
   const items = sorted.map((phase) => {
     const status = mapPhaseStatus(phase.status.name)
-    const tooltip = buildTooltip(phase, status)
+    const tooltip = buildTooltip(status)
     return {
       title: (
         <Tooltip title={tooltip}>
           {phase.name}
         </Tooltip>
       ),
+      content: (() => {
+        const dateRange = formatDateRange(phase.start, phase.end)
+        const hasContent = dateRange || phase.progress != null
+        if (!hasContent) return undefined
+        return (
+          <div className={styles.description}>
+            {dateRange && <div className={styles.dates}>{dateRange}</div>}
+            {phase.progress != null && <div className={styles.progress}>{phase.progress}%</div>}
+          </div>
+        )
+      })(),
       status: mapStepStatus(status),
-      icon: getIcon(phase, status),
+      icon: getIcon(status),
     }
   })
 

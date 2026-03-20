@@ -25,6 +25,13 @@ export interface GetProjectsRequest {
   portfolioId?: string
 }
 
+export interface ProjectPlanSummaryDto {
+  overdue: number
+  dueThisWeek: number
+  upcoming: number
+  totalLeafTasks: number
+}
+
 export const projectsApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getProjects: builder.query<
@@ -437,6 +444,28 @@ export const projectsApi = apiSlice.injectEndpoints({
         { type: QueryTags.ProjectPlanTree },
       ],
     }),
+
+    getProjectPlanSummary: builder.query<
+      ProjectPlanSummaryDto,
+      { projectKey: string; employeeId?: string }
+    >({
+      queryFn: async ({ projectKey, employeeId }) => {
+        try {
+          const params = employeeId ? `?employeeId=${employeeId}` : ''
+          const response = await authenticatedFetch(
+            `/api/ppm/projects/${projectKey}/plan-summary${params}`,
+          )
+          const data = await response.json()
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: (result, error, arg) => [
+        { type: QueryTags.ProjectPlanTree, id: arg.projectKey },
+      ],
+    }),
   }),
 })
 
@@ -460,4 +489,5 @@ export const {
   useGetProjectPhaseQuery,
   usePatchProjectPhaseMutation,
   useChangeProjectLifecycleMutation,
+  useGetProjectPlanSummaryQuery,
 } = projectsApi

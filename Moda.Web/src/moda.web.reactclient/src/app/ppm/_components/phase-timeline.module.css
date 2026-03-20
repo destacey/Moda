@@ -24,3 +24,19 @@
   color: var(--ant-color-error);
   font-size: 14px;
 }
+
+.description {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dates {
+  font-size: 10px;
+  color: var(--ant-color-text-secondary);
+}
+
+.progress {
+  font-size: 10px;
+  color: var(--ant-color-text-secondary);
+}

@@ -275,6 +275,18 @@ public class ProjectsController(ILogger<ProjectsController> logger, ISender send
         return Ok(nodes);
     }
 
+    [HttpGet("{idOrKey}/plan-summary")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Projects)]
+    [OpenApiOperation("Get summary metrics for a project's plan, computed from leaf tasks.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<ProjectPlanSummaryDto>> GetProjectPlanSummary(string idOrKey, [FromQuery] Guid? employeeId, CancellationToken cancellationToken)
+    {
+        var summary = await _sender.Send(new GetProjectPlanSummaryQuery(idOrKey, employeeId), cancellationToken);
+
+        return Ok(summary);
+    }
+
     [HttpGet("{id}/phases/{phaseId}")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Projects)]
     [OpenApiOperation("Get project phase details.", "")]

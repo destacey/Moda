@@ -6410,6 +6410,67 @@
         ]
       }
     },
+    "/api/ppm/projects/{idOrKey}/plan-summary": {
+      "get": {
+        "tags": [
+          "Projects"
+        ],
+        "summary": "Get summary metrics for a project's plan, computed from leaf tasks.",
+        "operationId": "Projects_GetProjectPlanSummary",
+        "parameters": [
+          {
+            "name": "idOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "employeeId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": true,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectPlanSummaryDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
     "/api/ppm/projects/{id}/phases/{phaseId}": {
       "get": {
         "tags": [
@@ -23529,6 +23590,34 @@
             "type": "number",
             "format": "decimal",
             "nullable": true
+          }
+        }
+      },
+      "ProjectPlanSummaryDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "overdue",
+          "dueThisWeek",
+          "upcoming",
+          "totalLeafTasks"
+        ],
+        "properties": {
+          "overdue": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "dueThisWeek": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "upcoming": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalLeafTasks": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
