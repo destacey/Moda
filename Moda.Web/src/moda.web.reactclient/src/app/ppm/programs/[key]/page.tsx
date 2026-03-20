@@ -12,7 +12,9 @@ import {
   useGetProgramQuery,
   useGetProgramProjectsQuery,
 } from '@/src/store/features/ppm/programs-api'
-import { Alert, Card, MenuProps } from 'antd'
+import { Alert, Badge, Col, Flex, MenuProps, Row, Typography } from 'antd'
+
+const { Text } = Typography
 import { notFound, usePathname, useRouter } from 'next/navigation'
 import { use, useCallback, useEffect, useMemo, useState } from 'react'
 import ProgramDetailsLoading from './loading'
@@ -25,26 +27,7 @@ import {
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import { ItemType } from 'antd/es/menu/interface'
 import { ProgramStatusAction } from '../_components/change-program-status-form'
-import {
-  ProjectsFilterBar,
-  ProjectViewManager,
-} from '@/src/app/ppm/_components'
-
-enum ProgramTabs {
-  Details = 'details',
-  Projects = 'projects',
-}
-
-const tabs = [
-  {
-    key: ProgramTabs.Details,
-    label: 'Details',
-  },
-  {
-    key: ProgramTabs.Projects,
-    label: 'Projects',
-  },
-]
+import { ProjectViewManager } from '@/src/app/ppm/_components'
 
 enum ProgramAction {
   Edit = 'Edit',
@@ -58,11 +41,6 @@ const ProgramDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const { key } = use(props.params)
   const programKey = Number(key)
 
-  const [activeTab, setActiveTab] = useState(ProgramTabs.Details)
-  const [projectsQueried, setProjectsQueried] = useState(false)
-  const [selectedProjectStatuses, setSelectedProjectStatuses] = useState<
-    number[]
-  >([5, 2]) // Approved, Active
   const [openEditProgramForm, setOpenEditProgramForm] = useState<boolean>(false)
   const [openActivateProgramForm, setOpenActivateProgramForm] =
     useState<boolean>(false)
@@ -85,24 +63,18 @@ const ProgramDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const {
     data: programData,
     isLoading,
-    error,
     refetch: refetchProgram,
   } = useGetProgramQuery(programKey)
 
   const {
     data: projectsData,
     isLoading: projectsDataIsLoading,
-    error: projectsDataError,
     refetch: refetchProjectsData,
   } = useGetProgramProjectsQuery(
     {
       programIdOrKey: programKey.toString(),
-      status:
-        selectedProjectStatuses.length > 0
-          ? selectedProjectStatuses
-          : undefined,
     },
-    { skip: !projectsQueried },
+    { skip: !programData },
   )
 
   useDocumentTitle(`${programData?.name ?? programKey} - Program Details`)
@@ -126,56 +98,6 @@ const ProgramDetailsPage = (props: { params: Promise<{ key: string }> }) => {
 
     dispatch(setBreadcrumbRoute({ route: breadcrumbRoute, pathname }))
   }, [dispatch, pathname, programData])
-
-  const handleProjectStatusChange = useCallback((statuses: number[]) => {
-    setSelectedProjectStatuses(statuses)
-  }, [])
-
-  const renderTabContent = useCallback(() => {
-    switch (activeTab) {
-      case ProgramTabs.Details:
-        return <ProgramDetails program={programData} />
-      case ProgramTabs.Projects:
-        return (
-          <>
-            <ProjectsFilterBar
-              selectedStatuses={selectedProjectStatuses}
-              onStatusChange={handleProjectStatusChange}
-              showPortfolioFilter={false}
-            />
-            <ProjectViewManager
-              projects={projectsData}
-              isLoading={projectsDataIsLoading}
-              refetch={refetchProjectsData}
-              hidePortfolio={true}
-              hideProgram={true}
-            />
-          </>
-        )
-      default:
-        return null
-    }
-  }, [
-    activeTab,
-    programData,
-    projectsData,
-    projectsDataIsLoading,
-    refetchProjectsData,
-    selectedProjectStatuses,
-    handleProjectStatusChange,
-  ])
-
-  // doesn't trigger on first render
-  const onTabChange = useCallback(
-    (tabKey: string) => {
-      const tab = tabKey as ProgramTabs
-      if (tab === ProgramTabs.Projects && !projectsQueried) {
-        setProjectsQueried(true)
-      }
-      setActiveTab(tab)
-    },
-    [projectsQueried],
-  )
 
   const missingDates = programData?.start === null || programData?.end === null
 
@@ -332,14 +254,34 @@ const ProgramDetailsPage = (props: { params: Promise<{ key: string }> }) => {
           <br />
         </>
       )}
-      <Card
-        style={{ width: '100%' }}
-        tabList={tabs}
-        activeTabKey={activeTab}
-        onTabChange={onTabChange}
-      >
-        {renderTabContent()}
-      </Card>
+
+      <Row gutter={16}>
+        <Col xs={24} md={9} xxl={6}>
+          <ProgramDetails program={programData} />
+        </Col>
+        <Col xs={24} md={15} xxl={18}>
+          <Flex vertical gap="large">
+            <Flex vertical>
+              <Flex align="center" gap={8}>
+                <Text strong>Projects</Text>
+                <Badge
+                  count={projectsData?.length ?? 0}
+                  showZero
+                  color="blue"
+                />
+              </Flex>
+              <ProjectViewManager
+                projects={projectsData}
+                isLoading={projectsDataIsLoading}
+                refetch={refetchProjectsData}
+                hidePortfolio={true}
+                hideProgram={true}
+                defaultView="Card"
+              />
+            </Flex>
+          </Flex>
+        </Col>
+      </Row>
 
       {openEditProgramForm && (
         <EditProgramForm
