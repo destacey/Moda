@@ -1,6 +1,6 @@
 ---
 name: moda-ppm
-description: Guides agents working with Moda Portfolio, Program, Project, and Task management via the Moda MCP server. Use when looking up portfolios, programs, or projects, or when creating, updating, or managing tasks within a project.
+description: Guides agents working with Moda Portfolio, Program, Project, and Task management via the Moda MCP server. Use when looking up portfolios, programs, or projects, exploring project lifecycles and phases, viewing the project plan or team, or creating, updating, or managing tasks within a project.
 ---
 
 # Moda PPM (Portfolio / Program / Project / Task Management)
@@ -9,10 +9,12 @@ description: Guides agents working with Moda Portfolio, Program, Project, and Ta
 
 - Finding or listing portfolios, programs, or projects
 - Understanding what projects or programs are in a portfolio
+- Exploring project lifecycles and their phases
+- Viewing a project's plan tree, phases, team, or plan summary metrics
 - Listing, creating, updating, or deleting tasks within a project
 - Managing task hierarchies, dependencies, or the critical path
 
-> **Note:** Portfolios, programs, and projects are **read-only** via MCP — only GET and LIST operations are exposed. Task management (create, update, delete) is fully supported.
+> **Note:** Portfolios, programs, projects, lifecycles, and phases are **read-only** via MCP — only GET and LIST operations are exposed. Task management (create, update, delete) is fully supported.
 
 ---
 
@@ -24,6 +26,10 @@ description: Guides agents working with Moda Portfolio, Program, Project, and Ta
 Portfolio
 └── Program (optional grouping)
     └── Project
+        ├── Lifecycle (optional — defines the phases a project moves through)
+        │   └── Phases (ordered stages of the project plan)
+        │       └── Tasks (leaf tasks assigned to a phase)
+        ├── Team Members (employees with project roles)
         ├── Work Items
         └── Tasks
             └── Subtasks (nested via parentId)
@@ -44,6 +50,20 @@ Portfolio
 - Must belong to a portfolio; optionally belongs to a program
 - Has a unique string `key` (2–20 uppercase alphanumeric, e.g. `MYPROJ`)
 - Has a status (integer enum — call `Projects_GetStatuses` to resolve values)
+- May have an assigned lifecycle that defines its phases
+
+### Project Lifecycle
+
+- A reusable template that defines an ordered set of named phases
+- Has a **state**: `1=Proposed`, `2=Active`, `3=Archived`
+- Only `Active` lifecycles can be assigned to projects
+- Phases within a lifecycle are ordered and named (e.g. Initiation, Planning, Execution, Closure)
+
+### Project Phase
+
+- A stage of a specific project's plan, derived from its assigned lifecycle
+- Has a **status**, date range, progress, and assignees
+- Tasks in the project are associated with a phase
 
 ### Task
 
@@ -61,7 +81,7 @@ Portfolio
 ### Common patterns
 
 - **`idOrKey`** — most GET endpoints accept either a UUID or a string key
-- **Status filters** — take integer arrays; always call the matching `GetStatuses` endpoint first to resolve enum values
+- **Status/role filters** — take integer arrays; always call the matching `GetStatuses` endpoint first to resolve enum values
 - **UUID references** — `portfolioId`, `programId`, etc. are always UUIDs; resolve name → UUID with list/options endpoints
 - **`Portfolios_GetPortfolioOptions`** — lightweight `{ id, name }` list; prefer this over `GetPortfolios` when you only need a UUID lookup
 
@@ -71,30 +91,40 @@ Portfolio
 
 ### Listing and filtering
 
-| Goal | Tool |
-|---|---|
-| All portfolios (optionally by status) | `Portfolios_GetPortfolios` |
-| Portfolio details | `Portfolios_GetPortfolio` |
-| Portfolio name → UUID lookup | `Portfolios_GetPortfolioOptions` |
-| Programs in a portfolio | `Portfolios_GetPortfolioPrograms` |
-| Projects in a portfolio | `Portfolios_GetPortfolioProjects` |
-| All programs (cross-portfolio) | `Programs_GetPrograms` |
-| Projects in a program | `Programs_GetProgramProjects` |
-| All projects (cross-portfolio) | `Projects_GetProjects` |
-| Project details | `Projects_GetProject` |
+| Goal | Tool | Notes |
+|---|---|---|
+| All portfolios (optionally by status) | `Portfolios_GetPortfolios` | |
+| Portfolio details | `Portfolios_GetPortfolio` | |
+| Portfolio name → UUID lookup | `Portfolios_GetPortfolioOptions` | |
+| Programs in a portfolio | `Portfolios_GetPortfolioPrograms` | |
+| Projects in a portfolio | `Portfolios_GetPortfolioProjects` | |
+| All programs (cross-portfolio) | `Programs_GetPrograms` | |
+| Projects in a program | `Programs_GetProgramProjects` | |
+| All projects (cross-portfolio) | `Projects_GetProjects` | Optional `role` filter: `1=Sponsor, 2=Owner, 3=Manager, 4=Member` |
+| Project details | `Projects_GetProject` | |
+| All project lifecycles | `ProjectLifecycles_GetProjectLifecycles` | Optional `state` filter: `1=Proposed, 2=Active, 3=Archived` |
+| Project lifecycle details (with phases) | `ProjectLifecycles_GetProjectLifecycle` | `idOrKey` accepts UUID or integer key |
 
 Before filtering by status, call `Projects_GetStatuses` (or `Programs_GetProgramStatuses` / `Portfolios_GetPortfolioStatuses`) to resolve the integer enum values.
 
-### Getting work items for a project
+### Exploring a project's plan and team
 
-`Projects_GetWorkItems` — takes the project `id` (UUID, not idOrKey).
+| Goal | Tool | Notes |
+|---|---|---|
+| Project team members | `Projects_GetProjectTeam` | Returns roles, assigned phases, and active task count per member |
+| All phases for a project | `Projects_GetProjectPhases` | Takes project `id` (UUID) |
+| Single phase details | `Projects_GetProjectPhase` | Takes project `id` and `phaseId` (both UUIDs) |
+| Unified plan tree (phases + tasks) | `Projects_GetProjectPlanTree` | Top-level nodes are phases; tasks nested within with WBS codes |
+| Plan summary metrics | `Projects_GetProjectPlanSummary` | Returns overdue, due this week, upcoming, and total task counts; optional `employeeId` to scope to one person |
+| Work items linked to a project | `Projects_GetWorkItems` | Takes project `id` (UUID) |
+
+Prefer `Projects_GetProjectPlanTree` over `Tasks_GetProjectTasks` when you need a full hierarchical view of the project plan including phases.
 
 ### Listing and navigating tasks
 
 | Goal | Tool | Notes |
 |---|---|---|
 | All tasks in a project | `Tasks_GetProjectTasks` | Optional `status` (int) and `parentId` (UUID) filters |
-| Task hierarchy with WBS codes | `Tasks_GetProjectTaskTree` | Returns nested structure |
 | Single task details | `Tasks_GetProjectTask` | `taskIdOrKey` accepts UUID or string key |
 | Critical path | `Tasks_GetCriticalPath` | Returns ordered list of task UUIDs |
 

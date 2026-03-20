@@ -46,17 +46,6 @@ export const definitions: [string, McpToolDefinition][] = [
     securityRequirements: [{"ApiKey":[]}],
   }],
 
-  ['Tasks_GetProjectTaskTree', {
-    name: 'Tasks_GetProjectTaskTree',
-    description: `Get a hierarchical tree of project tasks with WBS codes.`,
-    inputSchema: {"type":"object","properties":{"projectIdOrKey":{"type":"string"}},"required":["projectIdOrKey"]},
-    method: 'get',
-    pathTemplate: '/api/ppm/projects/{projectIdOrKey}/tasks/tree',
-    executionParameters: [{"name":"projectIdOrKey","in":"path"}],
-    requestBodyContentType: undefined,
-    securityRequirements: [{"ApiKey":[]}],
-  }],
-
   ['Tasks_GetProjectTask', {
     name: 'Tasks_GetProjectTask',
     description: `Get project task details.`,
