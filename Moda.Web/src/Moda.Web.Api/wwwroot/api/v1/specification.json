@@ -5449,6 +5449,21 @@
               "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 2
+          },
+          {
+            "name": "role",
+            "in": "query",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            "x-position": 3
           }
         ],
         "responses": {

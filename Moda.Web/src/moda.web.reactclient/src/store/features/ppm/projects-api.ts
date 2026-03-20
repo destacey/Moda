@@ -23,6 +23,7 @@ import { OptionModel } from '@/src/components/types'
 export interface GetProjectsRequest {
   status?: number[]
   portfolioId?: string
+  role?: number[]
 }
 
 export interface ProjectPlanSummaryDto {
@@ -40,10 +41,16 @@ export const projectsApi = apiSlice.injectEndpoints({
     >({
       queryFn: async (request = undefined) => {
         try {
-          const data = await getProjectsClient().getProjects(
-            request?.status,
-            request?.portfolioId,
-          )
+          const params = new URLSearchParams()
+          request?.status?.forEach((s) => params.append('status', s.toString()))
+          if (request?.portfolioId) {
+            params.append('portfolioId', request.portfolioId)
+          }
+          request?.role?.forEach((r) => params.append('role', r.toString()))
+          const queryString = params.toString()
+          const url = `/api/ppm/projects${queryString ? `?${queryString}` : ''}`
+          const response = await authenticatedFetch(url)
+          const data: ProjectListDto[] = await response.json()
           return { data }
         } catch (error) {
           console.error('API Error:', error)

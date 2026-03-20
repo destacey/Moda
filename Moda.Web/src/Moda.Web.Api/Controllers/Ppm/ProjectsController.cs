@@ -26,7 +26,7 @@ public class ProjectsController(ILogger<ProjectsController> logger, ISender send
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<IEnumerable<ProjectListDto>>> GetProjects([FromQuery] int[]? status, [FromQuery] Guid? portfolioId, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<ProjectListDto>>> GetProjects([FromQuery] int[]? status, [FromQuery] Guid? portfolioId, [FromQuery] int[]? role, CancellationToken cancellationToken)
     {
         ProjectStatus[]? filter = status is { Length: > 0 }
             ? [.. status.Select(s => (ProjectStatus)s)]
@@ -36,7 +36,11 @@ public class ProjectsController(ILogger<ProjectsController> logger, ISender send
             ? new IdOrKey(portfolioId.Value)
             : null;
 
-        var projects = await _sender.Send(new GetProjectsQuery(StatusFilter: filter, PortfolioIdOrKey: portfolioIdOrKey), cancellationToken);
+        ProjectRole[]? roleFilter = role is { Length: > 0 }
+            ? [.. role.Select(r => (ProjectRole)r)]
+            : null;
+
+        var projects = await _sender.Send(new GetProjectsQuery(StatusFilter: filter, PortfolioIdOrKey: portfolioIdOrKey, RoleFilter: roleFilter), cancellationToken);
 
         return projects is not null
             ? Ok(projects)
