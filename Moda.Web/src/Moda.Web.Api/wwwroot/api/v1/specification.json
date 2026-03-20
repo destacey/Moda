@@ -6124,6 +6124,59 @@
         ]
       }
     },
+    "/api/ppm/projects/{idOrKey}/team": {
+      "get": {
+        "tags": [
+          "Projects"
+        ],
+        "summary": "Get the team members for a project.",
+        "operationId": "Projects_GetProjectTeam",
+        "parameters": [
+          {
+            "name": "idOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProjectTeamMemberDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
     "/api/ppm/projects/{id}/work-items": {
       "get": {
         "tags": [
@@ -23181,6 +23234,37 @@
           "lifecyclePhase": {
             "type": "string",
             "minLength": 1
+          }
+        }
+      },
+      "ProjectTeamMemberDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "employee",
+          "roles",
+          "assignedPhases",
+          "activeWorkItemCount"
+        ],
+        "properties": {
+          "employee": {
+            "$ref": "#/components/schemas/EmployeeNavigationDto"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "assignedPhases": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "activeWorkItemCount": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },

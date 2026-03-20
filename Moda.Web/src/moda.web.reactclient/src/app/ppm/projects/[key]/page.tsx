@@ -35,6 +35,11 @@ const ProjectPlan = dynamic(() => import('../_components/project-plan'), {
   ssr: false,
 })
 
+const ProjectTeamGrid = dynamic(
+  () => import('../_components/project-team-grid'),
+  { ssr: false },
+)
+
 const WorkItemsGrid = dynamic(
   () => import('@/src/components/common/work/work-items-grid'),
   { ssr: false },
@@ -42,6 +47,7 @@ const WorkItemsGrid = dynamic(
 
 enum ProjectTabs {
   Details = 'details',
+  Team = 'team',
   Plan = 'tasks',
   WorkItems = 'workItems',
 }
@@ -100,7 +106,10 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   useDocumentTitle(`${projectData?.name ?? projectKey} - Project Details`)
 
   const tabs = useMemo(() => {
-    const items = [{ key: ProjectTabs.Details, label: 'Details' }]
+    const items = [
+      { key: ProjectTabs.Details, label: 'Details' },
+      { key: ProjectTabs.Team, label: 'Team' },
+    ]
     if (projectData?.projectLifecycle) {
       items.push({ key: ProjectTabs.Plan, label: 'Plan' })
     }
@@ -138,6 +147,8 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     switch (activeTab) {
       case ProjectTabs.Details:
         return <ProjectDetailsTab project={projectData} />
+      case ProjectTabs.Team:
+        return <ProjectTeamGrid projectIdOrKey={projectKey} />
       case ProjectTabs.Plan:
         return (
           <ProjectPlan

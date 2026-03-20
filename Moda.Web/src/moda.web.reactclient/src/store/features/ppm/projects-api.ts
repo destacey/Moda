@@ -33,6 +33,17 @@ export interface ProjectPlanSummaryDto {
   totalLeafTasks: number
 }
 
+export interface ProjectTeamMemberDto {
+  employee: {
+    id: string
+    key: string
+    name: string
+  }
+  roles: string[]
+  assignedPhases: string[]
+  activeWorkItemCount: number
+}
+
 export const projectsApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getProjects: builder.query<
@@ -473,6 +484,25 @@ export const projectsApi = apiSlice.injectEndpoints({
         { type: QueryTags.ProjectPlanTree, id: arg.projectKey },
       ],
     }),
+
+    getProjectTeam: builder.query<
+      ProjectTeamMemberDto[],
+      string | undefined
+    >({
+      queryFn: async (idOrKey) => {
+        try {
+          const response = await authenticatedFetch(
+            `/api/ppm/projects/${idOrKey}/team`,
+          )
+          const data: ProjectTeamMemberDto[] = await response.json()
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: () => [{ type: QueryTags.Project, id: 'TEAM' }],
+    }),
   }),
 })
 
@@ -497,4 +527,5 @@ export const {
   usePatchProjectPhaseMutation,
   useChangeProjectLifecycleMutation,
   useGetProjectPlanSummaryQuery,
+  useGetProjectTeamQuery,
 } = projectsApi

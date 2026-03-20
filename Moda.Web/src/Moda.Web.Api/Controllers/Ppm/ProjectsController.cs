@@ -208,6 +208,20 @@ public class ProjectsController(ILogger<ProjectsController> logger, ISender send
         return Ok(items.OrderBy(c => c.Order));
     }
 
+    [HttpGet("{idOrKey}/team")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Projects)]
+    [OpenApiOperation("Get the team members for a project.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<IEnumerable<ProjectTeamMemberDto>>> GetProjectTeam(string idOrKey, CancellationToken cancellationToken)
+    {
+        var team = await _sender.Send(new GetProjectTeamQuery(idOrKey), cancellationToken);
+
+        return team is not null
+            ? Ok(team)
+            : NotFound();
+    }
+
     [HttpGet("{id}/work-items")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Projects)]
     [OpenApiOperation("Get work items for a project.", "")]
