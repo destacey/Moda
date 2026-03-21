@@ -36,8 +36,8 @@ public class ProjectsController(ILogger<ProjectsController> logger, ISender send
             ? new IdOrKey(portfolioId.Value)
             : null;
 
-        ProjectRole[]? roleFilter = role is { Length: > 0 }
-            ? [.. role.Select(r => (ProjectRole)r)]
+        ProjectMemberRole[]? roleFilter = role is { Length: > 0 }
+            ? [.. role.Select(r => (ProjectMemberRole)r)]
             : null;
 
         var projects = await _sender.Send(new GetProjectsQuery(StatusFilter: filter, PortfolioIdOrKey: portfolioIdOrKey, RoleFilter: roleFilter), cancellationToken);

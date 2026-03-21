@@ -22041,6 +22041,7 @@
           "projectSponsors",
           "projectOwners",
           "projectManagers",
+          "projectMembers",
           "strategicThemes",
           "phases"
         ],
@@ -22094,6 +22095,12 @@
             }
           },
           "projectManagers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmployeeNavigationDto"
+            }
+          },
+          "projectMembers": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/EmployeeNavigationDto"

@@ -23380,6 +23380,7 @@ export interface ProjectListDto {
     projectSponsors: EmployeeNavigationDto[];
     projectOwners: EmployeeNavigationDto[];
     projectManagers: EmployeeNavigationDto[];
+    projectMembers: EmployeeNavigationDto[];
     strategicThemes: NavigationDto[];
     projectLifecycle?: NavigationDto | undefined;
     phases: ProjectPhaseListDto[];

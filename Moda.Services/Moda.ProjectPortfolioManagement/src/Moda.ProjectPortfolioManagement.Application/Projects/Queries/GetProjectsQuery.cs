@@ -4,7 +4,7 @@ using Moda.ProjectPortfolioManagement.Domain.Enums;
 
 namespace Moda.ProjectPortfolioManagement.Application.Projects.Queries;
 
-public sealed record GetProjectsQuery(ProjectStatus[]? StatusFilter = null, IdOrKey? PortfolioIdOrKey = null, IdOrKey? ProgramIdOrKey = null, ProjectRole[]? RoleFilter = null) : IQuery<List<ProjectListDto>?>;
+public sealed record GetProjectsQuery(ProjectStatus[]? StatusFilter = null, IdOrKey? PortfolioIdOrKey = null, IdOrKey? ProgramIdOrKey = null, ProjectMemberRole[]? RoleFilter = null) : IQuery<List<ProjectListDto>?>;
 
 internal sealed class GetProjectsQueryHandler(IProjectPortfolioManagementDbContext ppmDbContext, ICurrentUser currentUser)
     : IQueryHandler<GetProjectsQuery, List<ProjectListDto>?>
@@ -64,8 +64,29 @@ internal sealed class GetProjectsQueryHandler(IProjectPortfolioManagementDbConte
                 return [];
             }
 
-            query = query.Where(pp => pp.Roles.Any(r =>
-                r.EmployeeId == employeeId.Value && request.RoleFilter.Contains(r.Role)));
+            var projectRoles = request.RoleFilter
+                .Where(r => r != ProjectMemberRole.Assignee)
+                .Select(r => (ProjectRole)(int)r)
+                .ToArray();
+
+            var includeTaskAssignees = request.RoleFilter.Contains(ProjectMemberRole.Assignee);
+
+            if (projectRoles.Length > 0 && includeTaskAssignees)
+            {
+                query = query.Where(pp =>
+                    pp.Roles.Any(r => r.EmployeeId == employeeId.Value && projectRoles.Contains(r.Role))
+                    || pp.Tasks.Any(t => t.Roles.Any(r => r.EmployeeId == employeeId.Value && r.Role == TaskRole.Assignee)));
+            }
+            else if (projectRoles.Length > 0)
+            {
+                query = query.Where(pp =>
+                    pp.Roles.Any(r => r.EmployeeId == employeeId.Value && projectRoles.Contains(r.Role)));
+            }
+            else if (includeTaskAssignees)
+            {
+                query = query.Where(pp =>
+                    pp.Tasks.Any(t => t.Roles.Any(r => r.EmployeeId == employeeId.Value && r.Role == TaskRole.Assignee)));
+            }
         }
 
         return await query.ProjectToType<ProjectListDto>().ToListAsync(cancellationToken);
