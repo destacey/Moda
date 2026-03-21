@@ -5,12 +5,13 @@ import useTheme from '@/src/components/contexts/theme'
 import { getProjectsClient } from '@/src/services/clients'
 import { ProjectListDto, ProjectPlanSummaryDto } from '@/src/services/moda-api'
 import { Col, Row, Skeleton } from 'antd'
-import { FC, useEffect, useMemo, useRef, useState } from 'react'
+import { FC, RefObject, useEffect, useMemo, useRef, useState } from 'react'
 import styles from '../my-projects-dashboard.module.css'
 
 export interface MyProjectsSummaryBarProps {
   projects: ProjectListDto[] | undefined
   isLoading: boolean
+  containerRef?: RefObject<HTMLDivElement | null>
 }
 
 interface AggregatedMetrics {
@@ -22,6 +23,7 @@ interface AggregatedMetrics {
 const MyProjectsSummaryBar: FC<MyProjectsSummaryBarProps> = ({
   projects,
   isLoading,
+  containerRef,
 }) => {
   const { token } = useTheme()
   const [metrics, setMetrics] = useState<AggregatedMetrics>({
@@ -37,17 +39,26 @@ const MyProjectsSummaryBar: FC<MyProjectsSummaryBarProps> = ({
     [projects],
   )
 
-  useEffect(() => {
+  const EMPTY_METRICS: AggregatedMetrics = { overdue: 0, dueThisWeek: 0, upcoming: 0 }
+
+  // Reset state synchronously during render when projectKeys change
+  const [prevProjectKeys, setPrevProjectKeys] = useState(projectKeys)
+  if (prevProjectKeys !== projectKeys) {
+    setPrevProjectKeys(projectKeys)
     if (projectKeys.length === 0) {
-      setMetrics({ overdue: 0, dueThisWeek: 0, upcoming: 0 })
-      return
+      setMetrics(EMPTY_METRICS)
+      setMetricsLoading(false)
+    } else {
+      setMetricsLoading(true)
     }
+  }
+
+  useEffect(() => {
+    if (projectKeys.length === 0) return
 
     abortRef.current?.abort()
     const controller = new AbortController()
     abortRef.current = controller
-
-    setMetricsLoading(true)
 
     const client = getProjectsClient()
     const promises = projectKeys.map((key) =>
@@ -80,7 +91,7 @@ const MyProjectsSummaryBar: FC<MyProjectsSummaryBarProps> = ({
 
   if (isLoading) {
     return (
-      <div className={styles.summaryBar}>
+      <div ref={containerRef} className={styles.summaryBar}>
         <Skeleton active paragraph={{ rows: 1 }} />
       </div>
     )
@@ -89,7 +100,7 @@ const MyProjectsSummaryBar: FC<MyProjectsSummaryBarProps> = ({
   const projectCount = projects?.length ?? 0
 
   return (
-    <div className={styles.summaryBar}>
+    <div ref={containerRef} className={styles.summaryBar}>
       <Row gutter={[8, 8]}>
         <Col xs={8} sm={6} md={4} lg={3}>
           <MetricCard title="Projects" value={projectCount} />

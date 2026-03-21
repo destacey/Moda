@@ -10,12 +10,15 @@ import {
 } from '@/src/hooks'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import { useGetProjectsQuery } from '@/src/store/features/ppm/projects-api'
+import { QuestionCircleOutlined } from '@ant-design/icons'
+import { Button, Tooltip, Tour } from 'antd'
 import { usePathname } from 'next/navigation'
 import { FC, useCallback, useEffect, useRef, useState } from 'react'
 import MyProjectsDashboardFilterBar from './_components/filter-bar'
 import MyProjectsSummaryBar from './_components/summary-bar'
 import PortfolioGroupList from './_components/portfolio-group-list'
 import ProjectDetailPanel from './_components/project-detail-panel'
+import { useMyProjectsTour } from './_components/use-my-projects-tour'
 import styles from './my-projects-dashboard.module.css'
 import { useMessage } from '@/src/components/contexts/messaging'
 
@@ -40,7 +43,6 @@ const MyProjectsPage: FC = () => {
   const dispatch = useAppDispatch()
   const pathname = usePathname()
   const messageApi = useMessage()
-
   const [selectedStatuses, setSelectedStatuses] = useLocalStorageState<
     number[]
   >('my-projects-filter-statuses', DEFAULT_STATUSES)
@@ -56,6 +58,15 @@ const MyProjectsPage: FC = () => {
   )
 
   const {
+    refs: { filterBarRef, summaryBarRef, leftPanelRef, rightPanelRef },
+    tourOpen,
+    tourSteps,
+    onTourClose,
+    onTourStart,
+    detailStepIndex,
+  } = useMyProjectsTour()
+
+  const {
     data: projects,
     isLoading,
     error,
@@ -64,6 +75,15 @@ const MyProjectsPage: FC = () => {
     status: selectedStatuses.length > 0 ? selectedStatuses : undefined,
     role: getRoleFilterValues(selectedRoles),
   })
+
+  const handleTourStepChange = useCallback(
+    (current: number) => {
+      if (current === detailStepIndex && !selectedProjectKey && projects?.length) {
+        setSelectedProjectKey(projects[0].key)
+      }
+    },
+    [detailStepIndex, selectedProjectKey, projects, setSelectedProjectKey],
+  )
 
   useEffect(() => {
     if (error) {
@@ -88,7 +108,20 @@ const MyProjectsPage: FC = () => {
 
   return (
     <>
-      <PageTitle title="My Projects" />
+      <PageTitle
+        title="My Projects"
+        actions={
+          <Tooltip title="Take a tour">
+            <Button
+              type="text"
+              shape="circle"
+              icon={<QuestionCircleOutlined />}
+              aria-label="Start dashboard tour"
+              onClick={onTourStart}
+            />
+          </Tooltip>
+        }
+      />
       <MyProjectsDashboardFilterBar
         selectedRoles={selectedRoles}
         onRoleChange={setSelectedRoles}
@@ -96,10 +129,15 @@ const MyProjectsPage: FC = () => {
         onStatusChange={setSelectedStatuses}
         onReset={handleResetFilters}
         onRefresh={refetch}
+        containerRef={filterBarRef}
       />
-      <MyProjectsSummaryBar projects={projects} isLoading={isLoading} />
+      <MyProjectsSummaryBar
+        projects={projects}
+        isLoading={isLoading}
+        containerRef={summaryBarRef}
+      />
       <div ref={layoutRef} className={styles.layout} style={{ height: layoutHeight }}>
-        <div className={styles.leftPanel}>
+        <div ref={leftPanelRef} className={styles.leftPanel}>
           <PortfolioGroupList
             projects={projects}
             isLoading={isLoading}
@@ -107,10 +145,16 @@ const MyProjectsPage: FC = () => {
             onSelectProject={setSelectedProjectKey}
           />
         </div>
-        <div className={styles.rightPanel}>
+        <div ref={rightPanelRef} className={styles.rightPanel}>
           <ProjectDetailPanel projectKey={selectedProjectKey} />
         </div>
       </div>
+      <Tour
+        open={tourOpen}
+        onClose={onTourClose}
+        onChange={handleTourStepChange}
+        steps={tourSteps}
+      />
     </>
   )
 }

@@ -3,7 +3,7 @@
 import { ClearOutlined, ReloadOutlined } from '@ant-design/icons'
 import { useGetProjectStatusOptionsQuery } from '@/src/store/features/ppm/projects-api'
 import { Button, Flex, Skeleton, Space, Tooltip } from 'antd'
-import { FC } from 'react'
+import { FC, RefObject } from 'react'
 import styles from '../my-projects-dashboard.module.css'
 
 const ROLE_OPTIONS = [
@@ -21,6 +21,7 @@ export interface MyProjectsDashboardFilterBarProps {
   onStatusChange: (statuses: number[]) => void
   onReset: () => void
   onRefresh: () => void
+  containerRef?: RefObject<HTMLDivElement | null>
 }
 
 const MyProjectsDashboardFilterBar: FC<MyProjectsDashboardFilterBarProps> = ({
@@ -30,13 +31,14 @@ const MyProjectsDashboardFilterBar: FC<MyProjectsDashboardFilterBarProps> = ({
   onStatusChange,
   onReset,
   onRefresh,
+  containerRef,
 }) => {
   const { data: statusOptions, isLoading } =
     useGetProjectStatusOptionsQuery()
 
   if (isLoading) {
     return (
-      <div className={styles.filterBar}>
+      <div ref={containerRef} className={styles.filterBar}>
         <Skeleton.Input active size="small" style={{ width: 300 }} />
       </div>
     )
@@ -57,7 +59,7 @@ const MyProjectsDashboardFilterBar: FC<MyProjectsDashboardFilterBarProps> = ({
   }
 
   return (
-    <div className={styles.filterBar}>
+    <div ref={containerRef} className={styles.filterBar}>
       <Flex align="center" gap={16} wrap>
         <Space size="small" align="center">
           <span className={styles.filterLabel}>My Role:</span>
