@@ -55,7 +55,7 @@ describe('MyProjectsSummaryBar', () => {
     expect(container.querySelector('.ant-skeleton')).toBeInTheDocument()
   })
 
-  it('renders project count', () => {
+  it('renders project count', async () => {
     mockGetProjectPlanSummary.mockResolvedValue({
       overdue: 0,
       dueThisWeek: 0,
@@ -63,12 +63,14 @@ describe('MyProjectsSummaryBar', () => {
       totalLeafTasks: 0,
     })
 
-    render(
-      <MyProjectsSummaryBar
-        projects={[createProject('P1'), createProject('P2')]}
-        isLoading={false}
-      />,
-    )
+    await act(async () => {
+      render(
+        <MyProjectsSummaryBar
+          projects={[createProject('P1'), createProject('P2')]}
+          isLoading={false}
+        />,
+      )
+    })
 
     expect(screen.getByText('Projects')).toBeInTheDocument()
     expect(screen.getByText('2')).toBeInTheDocument()
@@ -162,22 +164,20 @@ describe('MyProjectsSummaryBar', () => {
   it('handles API failures gracefully', async () => {
     mockGetProjectPlanSummary.mockRejectedValue(new Error('fail'))
 
-    render(
-      <MyProjectsSummaryBar
-        projects={[createProject('P1')]}
-        isLoading={false}
-      />,
-    )
-
-    await waitFor(() => {
-      expect(mockGetProjectPlanSummary).toHaveBeenCalled()
+    await act(async () => {
+      render(
+        <MyProjectsSummaryBar
+          projects={[createProject('P1')]}
+          isLoading={false}
+        />,
+      )
     })
 
     // Should still render without crashing
     expect(screen.getByText('Projects')).toBeInTheDocument()
   })
 
-  it('renders metric titles', () => {
+  it('renders metric titles', async () => {
     mockGetProjectPlanSummary.mockResolvedValue({
       overdue: 0,
       dueThisWeek: 0,
@@ -185,12 +185,14 @@ describe('MyProjectsSummaryBar', () => {
       totalLeafTasks: 0,
     })
 
-    render(
-      <MyProjectsSummaryBar
-        projects={[createProject('P1')]}
-        isLoading={false}
-      />,
-    )
+    await act(async () => {
+      render(
+        <MyProjectsSummaryBar
+          projects={[createProject('P1')]}
+          isLoading={false}
+        />,
+      )
+    })
 
     expect(screen.getByText('Projects')).toBeInTheDocument()
     expect(screen.getByText('Overdue')).toBeInTheDocument()

@@ -1,7 +1,4 @@
-import {
-  authenticatedFetch,
-  getProjectsClient,
-} from '@/src/services/clients'
+import { authenticatedFetch, getProjectsClient } from '@/src/services/clients'
 import { apiSlice } from '../apiSlice'
 import {
   CreateProjectRequest,
@@ -17,6 +14,7 @@ import {
   ProjectPhaseDetailsDto,
   ProjectPlanSummaryDto,
   ProjectTeamMemberDto,
+  MyProjectsSummaryDto,
 } from '@/src/services/moda-api'
 import { QueryTags } from '../query-tags'
 import { BaseOptionType } from 'antd/es/select'
@@ -410,7 +408,14 @@ export const projectsApi = apiSlice.injectEndpoints({
         }
       },
       invalidatesTags: (result, error, { cacheKey }) => {
-        return [{ type: QueryTags.ProjectPlanTree, id: cacheKey }]
+        return [
+          { type: QueryTags.ProjectPlanTree, id: cacheKey },
+          { type: QueryTags.Project, id: 'LIST' },
+          { type: QueryTags.Project, id: cacheKey },
+          { type: QueryTags.Project, id: 'MY_SUMMARY' },
+          { type: QueryTags.PortfolioProjects, id: 'LIST' },
+          { type: QueryTags.ProgramProjects, id: 'LIST' },
+        ]
       },
     }),
 
@@ -437,7 +442,7 @@ export const projectsApi = apiSlice.injectEndpoints({
         }
       },
       invalidatesTags: () => [
-        { type: QueryTags.Project, id: 'LIST' },
+        { type: QueryTags.Project },
         { type: QueryTags.ProjectPlanTree },
       ],
     }),
@@ -463,10 +468,25 @@ export const projectsApi = apiSlice.injectEndpoints({
       ],
     }),
 
-    getProjectTeam: builder.query<
-      ProjectTeamMemberDto[],
-      string
+    getMyProjectsSummary: builder.query<
+      MyProjectsSummaryDto,
+      { status?: number[] } | void
     >({
+      queryFn: async (request = undefined) => {
+        try {
+          const status =
+            request && 'status' in request ? request.status : undefined
+          const data = await getProjectsClient().getMyProjectsSummary(status)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: () => [{ type: QueryTags.Project, id: 'MY_SUMMARY' }],
+    }),
+
+    getProjectTeam: builder.query<ProjectTeamMemberDto[], string>({
       queryFn: async (idOrKey) => {
         try {
           const data = await getProjectsClient().getProjectTeam(idOrKey)
@@ -504,5 +524,6 @@ export const {
   usePatchProjectPhaseMutation,
   useChangeProjectLifecycleMutation,
   useGetProjectPlanSummaryQuery,
+  useGetMyProjectsSummaryQuery,
   useGetProjectTeamQuery,
 } = projectsApi

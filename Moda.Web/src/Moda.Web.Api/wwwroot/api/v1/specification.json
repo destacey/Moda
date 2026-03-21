@@ -5560,6 +5560,52 @@
         ]
       }
     },
+    "/api/ppm/projects/my-summary": {
+      "get": {
+        "tags": [
+          "Projects"
+        ],
+        "summary": "Get a summary of the current user's project involvement.",
+        "operationId": "Projects_GetMyProjectsSummary",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyProjectsSummaryDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
     "/api/ppm/projects/{idOrKey}": {
       "get": {
         "tags": [
@@ -22796,6 +22842,44 @@
               "nullable": false,
               "example": "00000000-0000-0000-0000-000000000000"
             }
+          }
+        }
+      },
+      "MyProjectsSummaryDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "totalCount",
+          "sponsorCount",
+          "ownerCount",
+          "managerCount",
+          "memberCount",
+          "assigneeCount"
+        ],
+        "properties": {
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sponsorCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ownerCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "managerCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "memberCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "assigneeCount": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },

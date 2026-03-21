@@ -47,6 +47,23 @@ public class ProjectsController(ILogger<ProjectsController> logger, ISender send
             : NotFound();
     }
 
+    [HttpGet("my-summary")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Projects)]
+    [OpenApiOperation("Get a summary of the current user's project involvement.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult<MyProjectsSummaryDto>> GetMyProjectsSummary([FromQuery] int[]? status, CancellationToken cancellationToken)
+    {
+        ProjectStatus[]? statusFilter = status is { Length: > 0 }
+            ? [.. status.Select(s => (ProjectStatus)s)]
+            : null;
+
+        var summary = await _sender.Send(new GetMyProjectsSummaryQuery(StatusFilter: statusFilter), cancellationToken);
+
+        return summary is not null
+            ? Ok(summary)
+            : Ok(new MyProjectsSummaryDto());
+    }
+
     [HttpGet("{idOrKey}")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Projects)]
     [OpenApiOperation("Get project details.", "")]

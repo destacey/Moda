@@ -6968,6 +6968,60 @@ export class ProjectsClient {
     }
 
     /**
+     * Get a summary of the current user's project involvement.
+     * @param status (optional) 
+     */
+    getMyProjectsSummary(status?: number[] | null | undefined, cancelToken?: CancelToken): Promise<MyProjectsSummaryDto> {
+        let url_ = this.baseUrl + "/api/ppm/projects/my-summary?";
+        if (status !== undefined && status !== null)
+            status && status.forEach(item => { url_ += "status=" + encodeURIComponent("" + item) + "&"; });
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetMyProjectsSummary(_response);
+        });
+    }
+
+    protected processGetMyProjectsSummary(response: AxiosResponse): Promise<MyProjectsSummaryDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<MyProjectsSummaryDto>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<MyProjectsSummaryDto>(null as any);
+    }
+
+    /**
      * Get project details.
      */
     getProject(idOrKey: string, cancelToken?: CancelToken): Promise<ProjectDetailsDto> {
@@ -23550,6 +23604,15 @@ export interface ProjectLifecyclePhaseRequest {
 export interface ReorderProjectLifecyclePhasesRequest {
     /** The ordered list of phase IDs representing the desired order. */
     orderedPhaseIds: string[];
+}
+
+export interface MyProjectsSummaryDto {
+    totalCount: number;
+    sponsorCount: number;
+    ownerCount: number;
+    managerCount: number;
+    memberCount: number;
+    assigneeCount: number;
 }
 
 export interface ProjectDetailsDto {
