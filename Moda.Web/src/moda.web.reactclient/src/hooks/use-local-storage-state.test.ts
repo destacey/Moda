@@ -70,6 +70,7 @@ describe('useLocalStorageState', () => {
   })
 
   it('does not write undefined to localStorage', () => {
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation()
     const { result } = renderHook(() =>
       useLocalStorageState<string | undefined>('key', undefined),
     )
@@ -78,6 +79,7 @@ describe('useLocalStorageState', () => {
     // Setting to undefined should also not write
     act(() => result.current[1](undefined))
     expect(localStorage.getItem('key')).toBeNull()
+    warnSpy.mockRestore()
   })
 
   it('avoids redundant updates to localStorage', () => {

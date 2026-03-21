@@ -9,9 +9,11 @@ import { useGetProjectPlanTreeQuery } from '@/src/store/features/ppm/projects-ap
 import {
   CheckCircleFilled,
   ClockCircleOutlined,
+  MinusCircleOutlined,
   RightOutlined,
+  SyncOutlined,
 } from '@ant-design/icons'
-import { Avatar, Flex, Progress, Skeleton, Tag, Tooltip, Typography } from 'antd'
+import { Avatar, Flex, Popover, Progress, Skeleton, Tag, Tooltip, Typography } from 'antd'
 import dayjs from 'dayjs'
 import { FC, useState } from 'react'
 import { getInitials } from './project-card-helpers'
@@ -118,6 +120,39 @@ const TaskAssignees: FC<{ assignees: EmployeeNavigationDto[] }> = ({
 
 // --- Task Row ---
 
+function getTaskIcon(statusName: string | undefined) {
+  switch (statusName) {
+    case 'Completed':
+      return <CheckCircleFilled style={{ color: 'var(--ant-color-success)', fontSize: 14 }} />
+    case 'In Progress':
+      return <SyncOutlined style={{ color: 'var(--ant-color-primary)', fontSize: 14 }} />
+    case 'Cancelled':
+      return <MinusCircleOutlined style={{ color: 'var(--ant-color-success)', fontSize: 14 }} />
+    default:
+      return <ClockCircleOutlined style={{ color: 'var(--ant-color-text-quaternary)', fontSize: 14 }} />
+  }
+}
+
+function buildTaskTooltip(task: ProjectPlanNodeDto) {
+  const startDate = task.start ? dayjs(task.start).format('MMM D, YYYY') : null
+  const endDate = task.end ? dayjs(task.end).format('MMM D, YYYY') : null
+  const plannedDate = task.plannedDate
+    ? dayjs(task.plannedDate).format('MMM D, YYYY')
+    : null
+  const assigneeNames = task.assignees?.map((a) => a.name).join(', ')
+
+  return (
+    <div>
+      {task.status?.name && <div>Status: {task.status.name}</div>}
+      {task.priority?.name && <div>Priority: {task.priority.name}</div>}
+      {startDate && endDate && <div>Dates: {startDate} - {endDate}</div>}
+      {plannedDate && <div>Planned: {plannedDate}</div>}
+      {assigneeNames && <div>Assignees: {assigneeNames}</div>}
+      {task.progress > 0 && <div>Progress: {task.progress}%</div>}
+    </div>
+  )
+}
+
 const TaskRow: FC<{ task: ProjectPlanNodeDto }> = ({ task }) => {
   const isCompleted = task.status?.name === 'Completed'
   const statusLabel = getTaskStatusLabel(task)
@@ -125,45 +160,43 @@ const TaskRow: FC<{ task: ProjectPlanNodeDto }> = ({ task }) => {
   const priorityColor = getPriorityColor(task.priority?.name)
 
   return (
-    <div
-      className={`${styles.taskRow} ${isCompleted ? styles.taskRowCompleted : ''}`}
-    >
-      {isCompleted ? (
-        <CheckCircleFilled style={{ color: 'var(--ant-color-success)', fontSize: 14 }} />
-      ) : (
-        <ClockCircleOutlined style={{ color: 'var(--ant-color-text-quaternary)', fontSize: 14 }} />
-      )}
-      {priorityColor && (
-        <span
-          style={{
-            width: 6,
-            height: 6,
-            borderRadius: '50%',
-            backgroundColor: priorityColor,
-            flexShrink: 0,
-          }}
-        />
-      )}
-      <Text
-        ellipsis
-        className={`${styles.taskTitle} ${isCompleted ? styles.taskTitleCompleted : ''}`}
+    <Popover content={buildTaskTooltip(task)} trigger="click" placement="top">
+      <div
+        className={`${styles.taskRow} ${isCompleted ? styles.taskRowCompleted : ''}`}
       >
-        {task.name}
-      </Text>
-      <TaskAssignees assignees={task.assignees} />
-      {dueDate && (
-        <span className={styles.taskDueDate}>
-          {dayjs(dueDate).format('MMM D')}
-        </span>
-      )}
-      {statusLabel && (
-        <span
-          className={`${styles.taskStatusBadge} ${getTaskStatusClass(statusLabel)}`}
+        {getTaskIcon(task.status?.name)}
+        {priorityColor && (
+          <span
+            style={{
+              width: 6,
+              height: 6,
+              borderRadius: '50%',
+              backgroundColor: priorityColor,
+              flexShrink: 0,
+            }}
+          />
+        )}
+        <Text
+          ellipsis
+          className={`${styles.taskTitle} ${isCompleted ? styles.taskTitleCompleted : ''}`}
         >
-          {statusLabel}
-        </span>
-      )}
-    </div>
+          {task.name}
+        </Text>
+        <TaskAssignees assignees={task.assignees} />
+        {dueDate && (
+          <span className={styles.taskDueDate}>
+            {dayjs(dueDate).format('MMM D')}
+          </span>
+        )}
+        {statusLabel && (
+          <span
+            className={`${styles.taskStatusBadge} ${getTaskStatusClass(statusLabel)}`}
+          >
+            {statusLabel}
+          </span>
+        )}
+      </div>
+    </Popover>
   )
 }
 

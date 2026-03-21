@@ -29,6 +29,9 @@ const config: Config = {
     'node_modules/(?!(rehype-raw|react-markdown|remark-gfm|remark-parse|unified|mdast-util-to-string)/)',
   ],
   testPathIgnorePatterns: ['./.next/', './node_modules/'],
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/$1',
+  },
 }
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async

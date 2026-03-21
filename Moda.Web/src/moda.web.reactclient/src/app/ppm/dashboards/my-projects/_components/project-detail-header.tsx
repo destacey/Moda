@@ -28,12 +28,24 @@ const ProjectDetailHeader: FC<ProjectDetailHeaderProps> = ({ project }) => {
           </Title>
           <Tooltip title="Open project details">
             <Link href={`/ppm/projects/${project.key}`}>
-              <Button type="text" size="small" icon={<LinkOutlined style={{ fontSize: 11 }} />} />
+              <Button
+                type="text"
+                size="small"
+                icon={<LinkOutlined style={{ fontSize: 11 }} />}
+              />
             </Link>
           </Tooltip>
           <LifecycleStatusTag status={project.status} />
         </Flex>
         <Flex gap={12} align="center" wrap>
+          {project.program && (
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              Program:{' '}
+              <Link href={`/ppm/programs/${project.program.key}`}>
+                {project.program.name}
+              </Link>
+            </Text>
+          )}
           {ownerNames && (
             <Text type="secondary" style={{ fontSize: 12 }}>
               Owner: {ownerNames}
@@ -46,11 +58,14 @@ const ProjectDetailHeader: FC<ProjectDetailHeaderProps> = ({ project }) => {
           )}
           {(project.start || project.end) && (
             <Text type="secondary" style={{ fontSize: 12 }}>
-              <ModaDateRange dateRange={{ start: project.start, end: project.end }} />
+              <ModaDateRange
+                dateRange={{ start: project.start, end: project.end }}
+              />
             </Text>
           )}
           <Text type="secondary" style={{ fontSize: 12 }}>
-            Lifecycle: {project.projectLifecycle?.name ?? 'No lifecycle assigned'}
+            Lifecycle:{' '}
+            {project.projectLifecycle?.name ?? 'No lifecycle assigned'}
           </Text>
         </Flex>
       </Flex>
@@ -59,3 +74,4 @@ const ProjectDetailHeader: FC<ProjectDetailHeaderProps> = ({ project }) => {
 }
 
 export default ProjectDetailHeader
+
