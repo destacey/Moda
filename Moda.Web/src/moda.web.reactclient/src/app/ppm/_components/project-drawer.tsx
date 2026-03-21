@@ -161,7 +161,7 @@ const ProjectDrawer: FC<ProjectDrawerProps> = ({
         </Flex>
 
         {projectData?.phases?.length > 0 && (
-          <PhaseTimeline phases={projectData.phases} size="small" />
+          <PhaseTimeline phases={projectData.phases} />
         )}
 
         {projectData?.id && (
