@@ -2,7 +2,7 @@
 
 import {
   DeactivateTeamRequest as DeactivateTeamOfTeamsRequest,
-  TeamDetailsDto,
+  TeamOfTeamsDetailsDto,
 } from '@/src/services/moda-api'
 import { useDeactivateTeamOfTeamsMutation } from '@/src/store/features/organizations/team-api'
 import { toFormErrors } from '@/src/utils'
@@ -14,7 +14,7 @@ import { useModalForm } from '@/src/hooks'
 const { Item } = Form
 
 interface DeactivateTeamOfTeamsFormProps {
-  team: TeamDetailsDto
+  team: TeamOfTeamsDetailsDto
   onFormComplete: () => void
   onFormCancel: () => void
 }
@@ -71,8 +71,7 @@ const DeactivateTeamOfTeamsForm = ({
       ),
       onComplete: onFormComplete,
       onCancel: onFormCancel,
-      errorMessage:
-        'An unexpected error occurred while deactivating the team.',
+      errorMessage: 'An unexpected error occurred while deactivating the team.',
       permission: 'Permissions.Teams.Update',
     })
 
