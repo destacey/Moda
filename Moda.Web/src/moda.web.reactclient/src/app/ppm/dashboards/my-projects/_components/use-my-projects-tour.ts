@@ -51,7 +51,7 @@ export const useMyProjectsTour = (): MyProjectsTourResult => {
       title: 'Filter Your Projects',
       description:
         'Use these filters to narrow down projects by your role (Sponsor, Owner, PM, Member, or Task Assignee) and by project status. Your filter selections are saved automatically.',
-      target: () => filterBarRef.current!,
+      target: () => filterBarRef.current,
       placement: 'bottom',
       style: stepStyle,
     },
@@ -59,7 +59,7 @@ export const useMyProjectsTour = (): MyProjectsTourResult => {
       title: 'Summary Metrics',
       description:
         'See aggregated task metrics across all visible projects at a glance — total project count, overdue tasks, tasks due this week, and upcoming tasks.',
-      target: () => summaryBarRef.current!,
+      target: () => summaryBarRef.current,
       placement: 'bottom',
       style: stepStyle,
     },
@@ -67,7 +67,7 @@ export const useMyProjectsTour = (): MyProjectsTourResult => {
       title: 'Project List',
       description:
         'Your projects are grouped by portfolio. Each card shows your role, project status, phase timeline, task statistics, and team members.',
-      target: () => leftPanelRef.current!,
+      target: () => leftPanelRef.current,
       placement: 'right',
       style: stepStyle,
     },
@@ -75,7 +75,7 @@ export const useMyProjectsTour = (): MyProjectsTourResult => {
       title: 'Project Details',
       description:
         'Clicking a project card opens its details here, including phases, task summary, and the full project plan with deliverables and tasks. Click any task row to view additional task details.',
-      target: () => rightPanelRef.current!,
+      target: () => rightPanelRef.current,
       placement: 'left',
       style: stepStyle,
     },

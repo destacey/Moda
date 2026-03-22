@@ -127,7 +127,7 @@ function getTaskIcon(statusName: string | undefined) {
     case 'In Progress':
       return <SyncOutlined style={{ color: 'var(--ant-color-primary)', fontSize: 14 }} />
     case 'Cancelled':
-      return <MinusCircleOutlined style={{ color: 'var(--ant-color-success)', fontSize: 14 }} />
+      return <MinusCircleOutlined style={{ color: 'var(--ant-color-text-quaternary)', fontSize: 14 }} />
     default:
       return <ClockCircleOutlined style={{ color: 'var(--ant-color-text-quaternary)', fontSize: 14 }} />
   }

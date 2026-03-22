@@ -188,10 +188,11 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
 
   const onTabChange = useCallback((tabKey: string) => {
     setActiveTab(tabKey as ProjectTabs)
+    const base = window.location.pathname + window.location.search
     if (tabKey === ProjectTabs.Details) {
-      window.history.replaceState(null, '', window.location.pathname)
+      window.history.replaceState(null, '', base)
     } else {
-      window.history.replaceState(null, '', `#${tabKey}`)
+      window.history.replaceState(null, '', `${base}#${tabKey}`)
     }
   }, [])
 

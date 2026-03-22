@@ -29,35 +29,23 @@ internal sealed class GetMyProjectsSummaryQueryHandler(IProjectPortfolioManageme
             query = query.Where(p => request.StatusFilter.Contains(p.Status));
         }
 
-        var sponsorCount = await query
-            .CountAsync(p => p.Roles.Any(r => r.EmployeeId == eid && r.Role == ProjectRole.Sponsor), cancellationToken);
-
-        var ownerCount = await query
-            .CountAsync(p => p.Roles.Any(r => r.EmployeeId == eid && r.Role == ProjectRole.Owner), cancellationToken);
-
-        var managerCount = await query
-            .CountAsync(p => p.Roles.Any(r => r.EmployeeId == eid && r.Role == ProjectRole.Manager), cancellationToken);
-
-        var memberCount = await query
-            .CountAsync(p => p.Roles.Any(r => r.EmployeeId == eid && r.Role == ProjectRole.Member), cancellationToken);
-
-        var assigneeCount = await query
-            .CountAsync(p => p.Tasks.Any(t => t.Roles.Any(r => r.EmployeeId == eid && r.Role == TaskRole.Assignee)), cancellationToken);
-
-        // Total is distinct projects (a user with multiple roles on the same project should count once)
-        var totalCount = await query
-            .CountAsync(p =>
+        // Single query to compute all role counts and total in one DB round-trip
+        var summary = await query
+            .Where(p =>
                 p.Roles.Any(r => r.EmployeeId == eid)
-                || p.Tasks.Any(t => t.Roles.Any(r => r.EmployeeId == eid && r.Role == TaskRole.Assignee)), cancellationToken);
+                || p.Tasks.Any(t => t.Roles.Any(r => r.EmployeeId == eid && r.Role == TaskRole.Assignee)))
+            .GroupBy(_ => 1)
+            .Select(g => new MyProjectsSummaryDto
+            {
+                TotalCount = g.Count(),
+                SponsorCount = g.Count(p => p.Roles.Any(r => r.EmployeeId == eid && r.Role == ProjectRole.Sponsor)),
+                OwnerCount = g.Count(p => p.Roles.Any(r => r.EmployeeId == eid && r.Role == ProjectRole.Owner)),
+                ManagerCount = g.Count(p => p.Roles.Any(r => r.EmployeeId == eid && r.Role == ProjectRole.Manager)),
+                MemberCount = g.Count(p => p.Roles.Any(r => r.EmployeeId == eid && r.Role == ProjectRole.Member)),
+                AssigneeCount = g.Count(p => p.Tasks.Any(t => t.Roles.Any(r => r.EmployeeId == eid && r.Role == TaskRole.Assignee))),
+            })
+            .FirstOrDefaultAsync(cancellationToken);
 
-        return new MyProjectsSummaryDto
-        {
-            TotalCount = totalCount,
-            SponsorCount = sponsorCount,
-            OwnerCount = ownerCount,
-            ManagerCount = managerCount,
-            MemberCount = memberCount,
-            AssigneeCount = assigneeCount,
-        };
+        return summary ?? new MyProjectsSummaryDto();
     }
 }

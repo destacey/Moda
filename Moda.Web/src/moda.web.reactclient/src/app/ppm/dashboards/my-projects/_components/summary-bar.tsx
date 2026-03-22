@@ -32,7 +32,7 @@ const MyProjectsSummaryBar: FC<MyProjectsSummaryBarProps> = ({
     upcoming: 0,
   })
   const [metricsLoading, setMetricsLoading] = useState(false)
-  const abortRef = useRef<AbortController | null>(null)
+  const staleRef = useRef(false)
 
   const projectKeys = useMemo(
     () => (projects ?? []).map((p) => p.key),
@@ -56,9 +56,7 @@ const MyProjectsSummaryBar: FC<MyProjectsSummaryBarProps> = ({
   useEffect(() => {
     if (projectKeys.length === 0) return
 
-    abortRef.current?.abort()
-    const controller = new AbortController()
-    abortRef.current = controller
+    staleRef.current = false
 
     const client = getProjectsClient()
     const promises = projectKeys.map((key) =>
@@ -68,7 +66,7 @@ const MyProjectsSummaryBar: FC<MyProjectsSummaryBarProps> = ({
     )
 
     Promise.all(promises).then((results) => {
-      if (controller.signal.aborted) return
+      if (staleRef.current) return
 
       const aggregated = results.reduce<AggregatedMetrics>(
         (acc, summary) => {
@@ -86,7 +84,7 @@ const MyProjectsSummaryBar: FC<MyProjectsSummaryBarProps> = ({
       setMetricsLoading(false)
     })
 
-    return () => controller.abort()
+    return () => { staleRef.current = true }
   }, [projectKeys])
 
   if (isLoading) {
