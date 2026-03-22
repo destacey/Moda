@@ -10,20 +10,8 @@ const createJestConfig = nextJest({
 const config: Config = {
   coverageProvider: 'v8',
   testEnvironment: 'jsdom',
-  collectCoverage: true,
   // Add more setup options before each test is run
   setupFilesAfterEnv: ['./src/jest.setup.ts'],
-  // Run tests serially to avoid race conditions in React 19
-  maxWorkers: 1,
-  transform: {
-    '^.+\\.(ts|tsx|js|jsx)$': [
-      'ts-jest',
-      {
-        useESM: true,
-        jsx: 'react-jsx', // nextjs needs the main setting to be "preserve". This is a workaround.
-      } as Record<string, unknown>,
-    ],
-  },
   // Add other ESM packages here if needed
   transformIgnorePatterns: [
     'node_modules/(?!(rehype-raw|react-markdown|remark-gfm|remark-parse|unified|mdast-util-to-string)/)',
