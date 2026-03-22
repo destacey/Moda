@@ -1,6 +1,5 @@
-import { render, screen, act } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import MyProjectsSummaryBar from './summary-bar'
-import { ProjectListDto } from '@/src/services/moda-api'
 
 global.ResizeObserver = class {
   observe() {}
@@ -18,29 +17,13 @@ jest.mock('@/src/components/contexts/theme', () => ({
   }),
 }))
 
-const mockGetProjectPlanSummary = jest.fn()
-
-jest.mock('@/src/services/clients', () => ({
-  getProjectsClient: jest.fn(() => ({
-    getProjectPlanSummary: mockGetProjectPlanSummary,
-  })),
+jest.mock('@/src/store/features/ppm/projects-api', () => ({
+  useGetMyProjectsTaskMetricsQuery: jest.fn(),
 }))
 
-function createProject(key: string): ProjectListDto {
-  return {
-    id: `id-${key}`,
-    key,
-    name: `Project ${key}`,
-    status: { name: 'Active', lifecyclePhase: 'Active' } as any,
-    portfolio: { id: 'port-1', key: 1, name: 'Portfolio' } as any,
-    projectSponsors: [],
-    projectOwners: [],
-    projectManagers: [],
-    projectMembers: [],
-    strategicThemes: [],
-    phases: [],
-  } as ProjectListDto
-}
+import { useGetMyProjectsTaskMetricsQuery } from '@/src/store/features/ppm/projects-api'
+
+const mockQuery = useGetMyProjectsTaskMetricsQuery as jest.Mock
 
 describe('MyProjectsSummaryBar', () => {
   beforeEach(() => {
@@ -48,43 +31,55 @@ describe('MyProjectsSummaryBar', () => {
   })
 
   it('renders loading skeleton when isLoading is true', () => {
+    mockQuery.mockReturnValue({ data: undefined, isLoading: true })
+
     const { container } = render(
-      <MyProjectsSummaryBar projects={undefined} isLoading={true} />,
+      <MyProjectsSummaryBar
+        projectCount={0}
+        selectedStatuses={[]}
+        selectedRoles={[]}
+        isLoading={true}
+      />,
     )
 
     expect(container.querySelector('.ant-skeleton')).toBeInTheDocument()
   })
 
-  it('renders project count', async () => {
-    mockGetProjectPlanSummary.mockResolvedValue({
-      overdue: 0,
-      dueThisWeek: 0,
-      upcoming: 0,
-      totalLeafTasks: 0,
+  it('renders project count', () => {
+    mockQuery.mockReturnValue({
+      data: { overdue: 0, dueThisWeek: 0, upcoming: 0 },
+      isLoading: false,
     })
 
-    await act(async () => {
-      render(
-        <MyProjectsSummaryBar
-          projects={[createProject('P1'), createProject('P2')]}
-          isLoading={false}
-        />,
-      )
-    })
+    render(
+      <MyProjectsSummaryBar
+        projectCount={5}
+        selectedStatuses={[]}
+        selectedRoles={[]}
+        isLoading={false}
+      />,
+    )
 
     expect(screen.getByText('Projects')).toBeInTheDocument()
-    expect(screen.getByText('2')).toBeInTheDocument()
+    expect(screen.getByText('5')).toBeInTheDocument()
   })
 
-  it('renders zero project count when no projects', async () => {
-    await act(async () => {
-      render(
-        <MyProjectsSummaryBar projects={[]} isLoading={false} />,
-      )
+  it('renders zero project count', () => {
+    mockQuery.mockReturnValue({
+      data: { overdue: 0, dueThisWeek: 0, upcoming: 0 },
+      isLoading: false,
     })
 
+    render(
+      <MyProjectsSummaryBar
+        projectCount={0}
+        selectedStatuses={[]}
+        selectedRoles={[]}
+        isLoading={false}
+      />,
+    )
+
     expect(screen.getByText('Projects')).toBeInTheDocument()
-    // Statistic renders value in content span
     const statValues = document.querySelectorAll(
       '.ant-statistic-content-value',
     )
@@ -94,109 +89,152 @@ describe('MyProjectsSummaryBar', () => {
     expect(projectValue).toBeTruthy()
   })
 
-  it('aggregates overdue across projects', async () => {
-    mockGetProjectPlanSummary
-      .mockResolvedValueOnce({
-        overdue: 3,
-        dueThisWeek: 0,
-        upcoming: 0,
-        totalLeafTasks: 5,
-      })
-      .mockResolvedValueOnce({
-        overdue: 2,
-        dueThisWeek: 0,
-        upcoming: 0,
-        totalLeafTasks: 5,
-      })
-
-    await act(async () => {
-      render(
-        <MyProjectsSummaryBar
-          projects={[createProject('P1'), createProject('P2')]}
-          isLoading={false}
-        />,
-      )
+  it('renders overdue count from query', () => {
+    mockQuery.mockReturnValue({
+      data: { overdue: 5, dueThisWeek: 0, upcoming: 0 },
+      isLoading: false,
     })
 
-    expect(screen.getByText('5')).toBeInTheDocument() // 3 + 2
+    render(
+      <MyProjectsSummaryBar
+        projectCount={3}
+        selectedStatuses={[]}
+        selectedRoles={[]}
+        isLoading={false}
+      />,
+    )
+
+    expect(screen.getByText('5')).toBeInTheDocument()
   })
 
-  it('aggregates dueThisWeek across projects', async () => {
-    mockGetProjectPlanSummary.mockResolvedValue({
-      overdue: 0,
-      dueThisWeek: 4,
-      upcoming: 0,
-      totalLeafTasks: 5,
+  it('renders dueThisWeek count from query', () => {
+    mockQuery.mockReturnValue({
+      data: { overdue: 0, dueThisWeek: 4, upcoming: 0 },
+      isLoading: false,
     })
 
-    await act(async () => {
-      render(
-        <MyProjectsSummaryBar
-          projects={[createProject('P1')]}
-          isLoading={false}
-        />,
-      )
-    })
+    render(
+      <MyProjectsSummaryBar
+        projectCount={1}
+        selectedStatuses={[]}
+        selectedRoles={[]}
+        isLoading={false}
+      />,
+    )
 
     expect(screen.getByText('4')).toBeInTheDocument()
   })
 
-  it('aggregates upcoming across projects', async () => {
-    mockGetProjectPlanSummary.mockResolvedValue({
-      overdue: 0,
-      dueThisWeek: 0,
-      upcoming: 7,
-      totalLeafTasks: 10,
+  it('renders upcoming count from query', () => {
+    mockQuery.mockReturnValue({
+      data: { overdue: 0, dueThisWeek: 0, upcoming: 7 },
+      isLoading: false,
     })
 
-    await act(async () => {
-      render(
-        <MyProjectsSummaryBar
-          projects={[createProject('P1')]}
-          isLoading={false}
-        />,
-      )
-    })
+    render(
+      <MyProjectsSummaryBar
+        projectCount={1}
+        selectedStatuses={[]}
+        selectedRoles={[]}
+        isLoading={false}
+      />,
+    )
 
     expect(screen.getByText('7')).toBeInTheDocument()
   })
 
-  it('handles API failures gracefully', async () => {
-    mockGetProjectPlanSummary.mockRejectedValue(new Error('fail'))
+  it('shows dash placeholders when metrics are loading', () => {
+    mockQuery.mockReturnValue({ data: undefined, isLoading: true })
 
-    await act(async () => {
-      render(
-        <MyProjectsSummaryBar
-          projects={[createProject('P1')]}
-          isLoading={false}
-        />,
-      )
-    })
+    render(
+      <MyProjectsSummaryBar
+        projectCount={2}
+        selectedStatuses={[]}
+        selectedRoles={[]}
+        isLoading={false}
+      />,
+    )
 
-    // Should still render without crashing
-    expect(screen.getByText('Projects')).toBeInTheDocument()
+    const dashes = screen.getAllByText('-')
+    expect(dashes).toHaveLength(3)
   })
 
-  it('renders metric titles', async () => {
-    mockGetProjectPlanSummary.mockResolvedValue({
-      overdue: 0,
-      dueThisWeek: 0,
-      upcoming: 0,
-      totalLeafTasks: 0,
+  it('renders all metric titles', () => {
+    mockQuery.mockReturnValue({
+      data: { overdue: 0, dueThisWeek: 0, upcoming: 0 },
+      isLoading: false,
     })
 
-    await act(async () => {
-      render(
-        <MyProjectsSummaryBar
-          projects={[createProject('P1')]}
-          isLoading={false}
-        />,
-      )
-    })
+    render(
+      <MyProjectsSummaryBar
+        projectCount={1}
+        selectedStatuses={[]}
+        selectedRoles={[]}
+        isLoading={false}
+      />,
+    )
 
     expect(screen.getByText('Projects')).toBeInTheDocument()
     expect(screen.getByText('Overdue')).toBeInTheDocument()
     expect(screen.getByText('Due This Week')).toBeInTheDocument()
     expect(screen.getByText('Upcoming')).toBeInTheDocument()
+  })
+
+  it('passes status filter to the query', () => {
+    mockQuery.mockReturnValue({
+      data: { overdue: 0, dueThisWeek: 0, upcoming: 0 },
+      isLoading: false,
+    })
+
+    render(
+      <MyProjectsSummaryBar
+        projectCount={1}
+        selectedStatuses={[2, 5]}
+        selectedRoles={[]}
+        isLoading={false}
+      />,
+    )
+
+    expect(mockQuery).toHaveBeenCalledWith({ status: [2, 5] })
+  })
+
+  it('passes undefined to query when no statuses selected', () => {
+    mockQuery.mockReturnValue({
+      data: { overdue: 0, dueThisWeek: 0, upcoming: 0 },
+      isLoading: false,
+    })
+
+    render(
+      <MyProjectsSummaryBar
+        projectCount={1}
+        selectedStatuses={[]}
+        selectedRoles={[]}
+        isLoading={false}
+      />,
+    )
+
+    expect(mockQuery).toHaveBeenCalledWith(undefined)
+  })
+
+  it('defaults to zero when metrics data is undefined', () => {
+    mockQuery.mockReturnValue({ data: undefined, isLoading: false })
+
+    render(
+      <MyProjectsSummaryBar
+        projectCount={1}
+        selectedStatuses={[]}
+        selectedRoles={[]}
+        isLoading={false}
+      />,
+    )
+
+    const statValues = document.querySelectorAll(
+      '.ant-statistic-content-value',
+    )
+    const zeros = Array.from(statValues).filter(
+      (el) => el.textContent === '0',
+    )
+    // Projects (0 wouldn't be here since projectCount=1), Overdue, DueThisWeek, Upcoming
+    expect(zeros.length).toBeGreaterThanOrEqual(3)
   })
 })

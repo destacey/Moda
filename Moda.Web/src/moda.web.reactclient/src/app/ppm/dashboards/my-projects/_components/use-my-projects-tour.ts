@@ -50,7 +50,7 @@ export const useMyProjectsTour = (): MyProjectsTourResult => {
     {
       title: 'Filter Your Projects',
       description:
-        'Use these filters to narrow down projects by your role (Sponsor, Owner, PM, Member, or Task Assignee) and by project status. Your filter selections are saved automatically.',
+        'Use these filters to narrow down projects by your role (Sponsor, Owner, PM, Member, or Task Assignee) and by project status. Leadership roles (Sponsor, Owner, PM) show all tasks, while Member and Task Assignee show only your assigned tasks. Your filter selections are saved automatically.',
       target: () => filterBarRef.current,
       placement: 'bottom',
       style: stepStyle,
@@ -58,7 +58,7 @@ export const useMyProjectsTour = (): MyProjectsTourResult => {
     {
       title: 'Summary Metrics',
       description:
-        'See aggregated task metrics across all visible projects at a glance — total project count, overdue tasks, tasks due this week, and upcoming tasks.',
+        'See aggregated task metrics across your visible projects at a glance. These counts update based on your role and status filters.',
       target: () => summaryBarRef.current,
       placement: 'bottom',
       style: stepStyle,
@@ -66,7 +66,7 @@ export const useMyProjectsTour = (): MyProjectsTourResult => {
     {
       title: 'Project List',
       description:
-        'Your projects are grouped by portfolio. Each card shows your role, project status, phase timeline, task statistics, and team members.',
+        'Your projects are grouped by portfolio. Each card shows your role, project status, phase timeline, task statistics, and team members. Task statistics on each card reflect your role filters, not your actual roles on the project.',
       target: () => leftPanelRef.current,
       placement: 'right',
       style: stepStyle,

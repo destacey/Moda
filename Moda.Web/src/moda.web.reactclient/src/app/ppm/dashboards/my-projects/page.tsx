@@ -13,13 +13,14 @@ import { useGetProjectsQuery } from '@/src/store/features/ppm/projects-api'
 import { QuestionCircleOutlined } from '@ant-design/icons'
 import { Button, Tooltip, Tour } from 'antd'
 import { usePathname } from 'next/navigation'
-import { FC, useCallback, useEffect, useRef, useState } from 'react'
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import MyProjectsDashboardFilterBar from './_components/filter-bar'
 import MyProjectsSummaryBar from './_components/summary-bar'
 import PortfolioGroupList from './_components/portfolio-group-list'
 import ProjectDetailPanel from './_components/project-detail-panel'
 import { useMyProjectsTour } from './_components/use-my-projects-tour'
 import styles from './my-projects-dashboard.module.css'
+import useAuth from '@/src/components/contexts/auth'
 import { useMessage } from '@/src/components/contexts/messaging'
 
 const PROJECT_STATUS = {
@@ -38,10 +39,13 @@ const getRoleFilterValues = (selectedRoles: number[]): number[] | undefined => {
   return selectedRoles
 }
 
+const LEADERSHIP_ROLES = [1, 2, 3] // Sponsor, Owner, PM
+
 const MyProjectsPage: FC = () => {
   useDocumentTitle('My Projects')
   const dispatch = useAppDispatch()
   const pathname = usePathname()
+  const { user } = useAuth()
   const messageApi = useMessage()
   const [selectedStatuses, setSelectedStatuses] = useLocalStorageState<
     number[]
@@ -50,6 +54,14 @@ const MyProjectsPage: FC = () => {
     'my-projects-filter-roles',
     [],
   )
+  // When role filter includes only non-leadership roles (Member/Assignee),
+  // scope task metrics to the user's assigned tasks only
+  const taskMetricsEmployeeId = useMemo(() => {
+    if (selectedRoles.length === 0) return undefined // "All" — use default behavior
+    const hasLeadership = selectedRoles.some((r) => LEADERSHIP_ROLES.includes(r))
+    return hasLeadership ? undefined : user.employeeId ?? undefined
+  }, [selectedRoles, user.employeeId])
+
   const layoutRef = useRef<HTMLDivElement>(null)
   const layoutHeight = useRemainingHeight(layoutRef)
 
@@ -101,9 +113,26 @@ const MyProjectsPage: FC = () => {
     dispatch(setBreadcrumbRoute({ route: breadcrumbRoute, pathname }))
   }, [dispatch, pathname])
 
+  const handleStatusChange = useCallback(
+    (statuses: number[]) => {
+      setSelectedStatuses(statuses)
+      setSelectedProjectKey(null)
+    },
+    [setSelectedStatuses],
+  )
+
+  const handleRoleChange = useCallback(
+    (roles: number[]) => {
+      setSelectedRoles(roles)
+      setSelectedProjectKey(null)
+    },
+    [setSelectedRoles],
+  )
+
   const handleResetFilters = useCallback(() => {
     setSelectedStatuses(DEFAULT_STATUSES)
     setSelectedRoles([])
+    setSelectedProjectKey(null)
   }, [setSelectedStatuses, setSelectedRoles])
 
   return (
@@ -124,15 +153,17 @@ const MyProjectsPage: FC = () => {
       />
       <MyProjectsDashboardFilterBar
         selectedRoles={selectedRoles}
-        onRoleChange={setSelectedRoles}
+        onRoleChange={handleRoleChange}
         selectedStatuses={selectedStatuses}
-        onStatusChange={setSelectedStatuses}
+        onStatusChange={handleStatusChange}
         onReset={handleResetFilters}
         onRefresh={refetch}
         containerRef={filterBarRef}
       />
       <MyProjectsSummaryBar
-        projects={projects}
+        projectCount={projects?.length ?? 0}
+        selectedStatuses={selectedStatuses}
+        selectedRoles={selectedRoles}
         isLoading={isLoading}
         containerRef={summaryBarRef}
       />
@@ -142,6 +173,7 @@ const MyProjectsPage: FC = () => {
             projects={projects}
             isLoading={isLoading}
             selectedProjectKey={selectedProjectKey}
+            taskMetricsEmployeeId={taskMetricsEmployeeId}
             onSelectProject={setSelectedProjectKey}
           />
         </div>

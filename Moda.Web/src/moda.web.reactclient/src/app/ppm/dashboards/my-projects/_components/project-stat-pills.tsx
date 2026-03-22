@@ -6,13 +6,16 @@ import { Flex } from 'antd'
 import { FC, useEffect, useState } from 'react'
 import styles from '../my-projects-dashboard.module.css'
 
-const ProjectStatPills: FC<{ projectKey: string }> = ({ projectKey }) => {
+const ProjectStatPills: FC<{ projectKey: string; employeeId?: string }> = ({
+  projectKey,
+  employeeId,
+}) => {
   const [summary, setSummary] = useState<ProjectPlanSummaryDto | null>(null)
 
   useEffect(() => {
     let cancelled = false
     getProjectsClient()
-      .getProjectPlanSummary(projectKey)
+      .getProjectPlanSummary(projectKey, employeeId)
       .then((data) => {
         if (!cancelled) setSummary(data)
       })
@@ -20,7 +23,7 @@ const ProjectStatPills: FC<{ projectKey: string }> = ({ projectKey }) => {
     return () => {
       cancelled = true
     }
-  }, [projectKey])
+  }, [projectKey, employeeId])
 
   if (!summary) return null
 

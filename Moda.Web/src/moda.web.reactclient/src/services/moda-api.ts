@@ -7138,6 +7138,63 @@ export class ProjectsClient {
     }
 
     /**
+     * Get aggregated task metrics across the current user's projects.
+     * @param status (optional) 
+     * @param role (optional) 
+     */
+    getMyProjectsTaskMetrics(status?: number[] | null | undefined, role?: number[] | null | undefined, cancelToken?: CancelToken): Promise<MyProjectsTaskMetricsDto> {
+        let url_ = this.baseUrl + "/api/ppm/projects/my-task-metrics?";
+        if (status !== undefined && status !== null)
+            status && status.forEach(item => { url_ += "status=" + encodeURIComponent("" + item) + "&"; });
+        if (role !== undefined && role !== null)
+            role && role.forEach(item => { url_ += "role=" + encodeURIComponent("" + item) + "&"; });
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetMyProjectsTaskMetrics(_response);
+        });
+    }
+
+    protected processGetMyProjectsTaskMetrics(response: AxiosResponse): Promise<MyProjectsTaskMetricsDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<MyProjectsTaskMetricsDto>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<MyProjectsTaskMetricsDto>(null as any);
+    }
+
+    /**
      * Get project details.
      */
     getProject(idOrKey: string, cancelToken?: CancelToken): Promise<ProjectDetailsDto> {
@@ -23733,6 +23790,12 @@ export interface MyProjectsSummaryDto {
     managerCount: number;
     memberCount: number;
     assigneeCount: number;
+}
+
+export interface MyProjectsTaskMetricsDto {
+    overdue: number;
+    dueThisWeek: number;
+    upcoming: number;
 }
 
 export interface ProjectDetailsDto {

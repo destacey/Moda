@@ -1,19 +1,19 @@
 'use client'
 
+import { ModaEmpty } from '@/src/components/common'
 import useAuth from '@/src/components/contexts/auth'
 import { ProjectListDto } from '@/src/services/moda-api'
-import { Flex, Spin, Typography } from 'antd'
+import { Flex, Spin } from 'antd'
 import { FC, useMemo } from 'react'
 import { PortfolioGroup, sortProjects } from './project-card-helpers'
 import PortfolioGroupSection from './portfolio-group-section'
 import styles from '../my-projects-dashboard.module.css'
 
-const { Text } = Typography
-
 export interface PortfolioGroupListProps {
   projects: ProjectListDto[] | undefined
   isLoading: boolean
   selectedProjectKey: string | null
+  taskMetricsEmployeeId?: string
   onSelectProject: (key: string) => void
 }
 
@@ -21,6 +21,7 @@ const PortfolioGroupList: FC<PortfolioGroupListProps> = ({
   projects,
   isLoading,
   selectedProjectKey,
+  taskMetricsEmployeeId,
   onSelectProject,
 }) => {
   const { user } = useAuth()
@@ -55,11 +56,7 @@ const PortfolioGroupList: FC<PortfolioGroupListProps> = ({
   }
 
   if (groups.length === 0) {
-    return (
-      <Flex justify="center" className={styles.emptyState}>
-        <Text type="secondary">No projects found</Text>
-      </Flex>
-    )
+    return <ModaEmpty message="No projects found" />
   }
 
   return (
@@ -70,6 +67,7 @@ const PortfolioGroupList: FC<PortfolioGroupListProps> = ({
           group={group}
           selectedProjectKey={selectedProjectKey}
           employeeId={user.employeeId}
+          taskMetricsEmployeeId={taskMetricsEmployeeId}
           onSelectProject={onSelectProject}
         />
       ))}

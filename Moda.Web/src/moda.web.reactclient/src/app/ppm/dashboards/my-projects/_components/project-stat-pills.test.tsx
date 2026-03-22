@@ -101,7 +101,7 @@ describe('ProjectStatPills', () => {
     const { container } = render(<ProjectStatPills projectKey="P1" />)
 
     await waitFor(() => {
-      expect(mockGetProjectPlanSummary).toHaveBeenCalledWith('P1')
+      expect(mockGetProjectPlanSummary).toHaveBeenCalledWith('P1', undefined)
     })
 
     expect(container).toBeEmptyDOMElement()
@@ -117,5 +117,64 @@ describe('ProjectStatPills', () => {
     })
 
     expect(container).toBeEmptyDOMElement()
+  })
+
+  it('passes employeeId to API when provided', async () => {
+    mockGetProjectPlanSummary.mockResolvedValue({
+      overdue: 1,
+      dueThisWeek: 0,
+      upcoming: 0,
+      totalLeafTasks: 5,
+    })
+
+    await act(async () => {
+      render(<ProjectStatPills projectKey="P1" employeeId="emp-123" />)
+    })
+
+    expect(mockGetProjectPlanSummary).toHaveBeenCalledWith('P1', 'emp-123')
+  })
+
+  it('does not pass employeeId when not provided', async () => {
+    mockGetProjectPlanSummary.mockResolvedValue({
+      overdue: 1,
+      dueThisWeek: 0,
+      upcoming: 0,
+      totalLeafTasks: 5,
+    })
+
+    await act(async () => {
+      render(<ProjectStatPills projectKey="P1" />)
+    })
+
+    expect(mockGetProjectPlanSummary).toHaveBeenCalledWith('P1', undefined)
+  })
+
+  it('refetches when employeeId changes', async () => {
+    mockGetProjectPlanSummary.mockResolvedValue({
+      overdue: 2,
+      dueThisWeek: 0,
+      upcoming: 0,
+      totalLeafTasks: 5,
+    })
+
+    const { rerender } = render(<ProjectStatPills projectKey="P1" />)
+
+    await waitFor(() => {
+      expect(mockGetProjectPlanSummary).toHaveBeenCalledWith('P1', undefined)
+    })
+
+    mockGetProjectPlanSummary.mockClear()
+    mockGetProjectPlanSummary.mockResolvedValue({
+      overdue: 1,
+      dueThisWeek: 0,
+      upcoming: 0,
+      totalLeafTasks: 5,
+    })
+
+    await act(async () => {
+      rerender(<ProjectStatPills projectKey="P1" employeeId="emp-456" />)
+    })
+
+    expect(mockGetProjectPlanSummary).toHaveBeenCalledWith('P1', 'emp-456')
   })
 })

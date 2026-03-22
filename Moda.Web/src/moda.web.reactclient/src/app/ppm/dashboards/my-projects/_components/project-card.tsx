@@ -17,6 +17,7 @@ export interface ProjectCardProps {
   project: ProjectListDto
   isSelected: boolean
   employeeId: string | null
+  taskMetricsEmployeeId?: string
   onSelect: (key: string) => void
 }
 
@@ -24,6 +25,7 @@ const ProjectCard: FC<ProjectCardProps> = ({
   project,
   isSelected,
   employeeId,
+  taskMetricsEmployeeId,
   onSelect,
 }) => {
   const roles = useMemo(
@@ -70,7 +72,7 @@ const ProjectCard: FC<ProjectCardProps> = ({
         )}
 
         {/* Stat pills */}
-        <ProjectStatPills projectKey={project.key} />
+        <ProjectStatPills projectKey={project.key} employeeId={taskMetricsEmployeeId} />
 
         {/* Footer: avatars + end date */}
         <div className={styles.cardFooter}>

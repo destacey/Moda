@@ -1,10 +1,8 @@
 ﻿using FluentAssertions;
 using Moda.Common.Application.Interfaces;
-using Moda.Common.Domain.Tests.Data;
 using Moda.ProjectPortfolioManagement.Application.Projects.Queries;
 using Moda.ProjectPortfolioManagement.Application.Tests.Infrastructure;
 using Moda.ProjectPortfolioManagement.Domain.Enums;
-using Moda.ProjectPortfolioManagement.Domain.Models;
 using Moda.ProjectPortfolioManagement.Domain.Tests.Data;
 using Moda.Tests.Shared.Extensions;
 using Moq;
@@ -17,8 +15,6 @@ public class GetMyProjectsSummaryQueryHandlerTests : IDisposable
     private readonly FakeProjectPortfolioManagementDbContext _dbContext;
     private readonly Mock<ICurrentUser> _currentUserMock;
     private readonly GetMyProjectsSummaryQueryHandler _handler;
-    private readonly ProjectFaker _projectFaker;
-    private readonly EmployeeFaker _employeeFaker;
     private readonly Guid _employeeId = Guid.NewGuid();
 
     public GetMyProjectsSummaryQueryHandlerTests()
@@ -27,21 +23,6 @@ public class GetMyProjectsSummaryQueryHandlerTests : IDisposable
         _currentUserMock = new Mock<ICurrentUser>();
         _currentUserMock.Setup(u => u.GetEmployeeId()).Returns(_employeeId);
         _handler = new GetMyProjectsSummaryQueryHandler(_dbContext, _currentUserMock.Object);
-        _projectFaker = new ProjectFaker();
-        _employeeFaker = new EmployeeFaker();
-    }
-
-    private static HashSet<RoleAssignment<TaskRole>> CreateTaskAssigneeRoles(Guid taskId, Guid employeeId)
-    {
-        var employee = new EmployeeFaker().Generate();
-        employee.SetPrivateField("_id", employeeId);
-        var role = new RoleAssignmentFaker<TaskRole>()
-            .WithObjectId(taskId)
-            .WithRole(TaskRole.Assignee)
-            .WithEmployeeId(employeeId)
-            .Generate();
-        role.Employee = employee;
-        return [role];
     }
 
     [Fact]
@@ -82,7 +63,7 @@ public class GetMyProjectsSummaryQueryHandlerTests : IDisposable
     public async Task Handle_ShouldCountSponsorRole()
     {
         // Arrange
-        var project = _projectFaker.WithData(
+        var project = new ProjectFaker().WithData(
             roles: new Dictionary<ProjectRole, HashSet<Guid>>
             {
                 { ProjectRole.Sponsor, [_employeeId] },
@@ -104,7 +85,7 @@ public class GetMyProjectsSummaryQueryHandlerTests : IDisposable
     public async Task Handle_ShouldCountOwnerRole()
     {
         // Arrange
-        var project = _projectFaker.WithData(
+        var project = new ProjectFaker().WithData(
             roles: new Dictionary<ProjectRole, HashSet<Guid>>
             {
                 { ProjectRole.Owner, [_employeeId] },
@@ -126,7 +107,7 @@ public class GetMyProjectsSummaryQueryHandlerTests : IDisposable
     public async Task Handle_ShouldCountManagerRole()
     {
         // Arrange
-        var project = _projectFaker.WithData(
+        var project = new ProjectFaker().WithData(
             roles: new Dictionary<ProjectRole, HashSet<Guid>>
             {
                 { ProjectRole.Manager, [_employeeId] },
@@ -148,7 +129,7 @@ public class GetMyProjectsSummaryQueryHandlerTests : IDisposable
     public async Task Handle_ShouldCountMemberRole()
     {
         // Arrange
-        var project = _projectFaker.WithData(
+        var project = new ProjectFaker().WithData(
             roles: new Dictionary<ProjectRole, HashSet<Guid>>
             {
                 { ProjectRole.Member, [_employeeId] },
@@ -170,14 +151,13 @@ public class GetMyProjectsSummaryQueryHandlerTests : IDisposable
     public async Task Handle_ShouldCountTaskAssignee()
     {
         // Arrange
-        var project = _projectFaker.Generate();
+        var project = new ProjectFaker().Generate();
 
         var task = new ProjectTaskFaker().WithData(
             projectId: project.Id,
             status: TaskStatus.InProgress
-        ).Generate();
-        task.SetPrivateField("_roles", CreateTaskAssigneeRoles(task.Id, _employeeId));
-        project.SetPrivateField("_tasks", new List<ProjectTask> { task });
+        ).Generate().WithAssignees(_employeeId);
+        project.AddToPrivateList("_tasks", task);
 
         _dbContext.AddProject(project);
 
@@ -195,7 +175,7 @@ public class GetMyProjectsSummaryQueryHandlerTests : IDisposable
     public async Task Handle_ShouldCountMultipleRolesOnSameProject()
     {
         // Arrange — user is both Sponsor and Manager on same project
-        var project = _projectFaker.WithData(
+        var project = new ProjectFaker().WithData(
             roles: new Dictionary<ProjectRole, HashSet<Guid>>
             {
                 { ProjectRole.Sponsor, [_employeeId] },
@@ -219,14 +199,14 @@ public class GetMyProjectsSummaryQueryHandlerTests : IDisposable
     public async Task Handle_ShouldCountAcrossMultipleProjects()
     {
         // Arrange
-        var project1 = _projectFaker.WithData(
+        var project1 = new ProjectFaker().WithData(
             roles: new Dictionary<ProjectRole, HashSet<Guid>>
             {
                 { ProjectRole.Sponsor, [_employeeId] },
             }
         ).Generate();
 
-        var project2 = _projectFaker.WithData(
+        var project2 = new ProjectFaker().WithData(
             roles: new Dictionary<ProjectRole, HashSet<Guid>>
             {
                 { ProjectRole.Manager, [_employeeId] },
@@ -251,7 +231,7 @@ public class GetMyProjectsSummaryQueryHandlerTests : IDisposable
     {
         // Arrange
         var otherId = Guid.NewGuid();
-        var project = _projectFaker.WithData(
+        var project = new ProjectFaker().WithData(
             roles: new Dictionary<ProjectRole, HashSet<Guid>>
             {
                 { ProjectRole.Sponsor, [otherId] },
@@ -273,7 +253,7 @@ public class GetMyProjectsSummaryQueryHandlerTests : IDisposable
     public async Task Handle_ShouldFilterByStatus()
     {
         // Arrange
-        var activeProject = _projectFaker.WithData(
+        var activeProject = new ProjectFaker().WithData(
             status: ProjectStatus.Active,
             roles: new Dictionary<ProjectRole, HashSet<Guid>>
             {
@@ -281,7 +261,7 @@ public class GetMyProjectsSummaryQueryHandlerTests : IDisposable
             }
         ).Generate();
 
-        var proposedProject = _projectFaker.WithData(
+        var proposedProject = new ProjectFaker().WithData(
             status: ProjectStatus.Proposed,
             roles: new Dictionary<ProjectRole, HashSet<Guid>>
             {
@@ -305,7 +285,7 @@ public class GetMyProjectsSummaryQueryHandlerTests : IDisposable
     public async Task Handle_ShouldReturnAllStatuses_WhenNoStatusFilter()
     {
         // Arrange
-        var activeProject = _projectFaker.WithData(
+        var activeProject = new ProjectFaker().WithData(
             status: ProjectStatus.Active,
             roles: new Dictionary<ProjectRole, HashSet<Guid>>
             {
@@ -313,7 +293,7 @@ public class GetMyProjectsSummaryQueryHandlerTests : IDisposable
             }
         ).Generate();
 
-        var proposedProject = _projectFaker.WithData(
+        var proposedProject = new ProjectFaker().WithData(
             status: ProjectStatus.Proposed,
             roles: new Dictionary<ProjectRole, HashSet<Guid>>
             {
@@ -338,7 +318,7 @@ public class GetMyProjectsSummaryQueryHandlerTests : IDisposable
     public async Task Handle_ShouldCountAssigneeWhoAlsoHasProjectRole()
     {
         // Arrange — user is a Manager AND has task assignments on same project
-        var project = _projectFaker.WithData(
+        var project = new ProjectFaker().WithData(
             roles: new Dictionary<ProjectRole, HashSet<Guid>>
             {
                 { ProjectRole.Manager, [_employeeId] },
@@ -348,9 +328,8 @@ public class GetMyProjectsSummaryQueryHandlerTests : IDisposable
         var task = new ProjectTaskFaker().WithData(
             projectId: project.Id,
             status: TaskStatus.InProgress
-        ).Generate();
-        task.SetPrivateField("_roles", CreateTaskAssigneeRoles(task.Id, _employeeId));
-        project.SetPrivateField("_tasks", new List<ProjectTask> { task });
+        ).Generate().WithAssignees(_employeeId);
+        project.AddToPrivateList("_tasks", task);
 
         _dbContext.AddProject(project);
 

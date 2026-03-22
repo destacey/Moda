@@ -2,10 +2,10 @@ import { RefObject, useCallback, useEffect, useState } from 'react'
 
 /**
  * Returns the remaining viewport height below the top of the referenced element.
- * Recalculates on window resize and can be manually recalculated via `recalculate`.
+ * Recalculates on window resize.
  *
  * @param ref - A ref attached to the element whose top edge defines the start of the remaining space.
- * @param bottomOffset - Optional pixel padding to subtract from the bottom (e.g., for page margins). Defaults to 16.
+ * @param bottomOffset - Optional pixel padding to subtract from the bottom (e.g., for page margins). Defaults to 30.
  * @returns The remaining height in pixels.
  *
  * @example

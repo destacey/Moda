@@ -15,6 +15,7 @@ import {
   ProjectPlanSummaryDto,
   ProjectTeamMemberDto,
   MyProjectsSummaryDto,
+  MyProjectsTaskMetricsDto,
 } from '@/src/services/moda-api'
 import { QueryTags } from '../query-tags'
 import { BaseOptionType } from 'antd/es/select'
@@ -486,6 +487,27 @@ export const projectsApi = apiSlice.injectEndpoints({
       providesTags: () => [{ type: QueryTags.Project, id: 'MY_SUMMARY' }],
     }),
 
+    getMyProjectsTaskMetrics: builder.query<
+      MyProjectsTaskMetricsDto,
+      { status?: number[]; role?: number[] } | void
+    >({
+      queryFn: async (request = undefined) => {
+        try {
+          const status =
+            request && 'status' in request ? request.status : undefined
+          const role =
+            request && 'role' in request ? request.role : undefined
+          const data =
+            await getProjectsClient().getMyProjectsTaskMetrics(status, role)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: () => [{ type: QueryTags.Project, id: 'MY_TASK_METRICS' }],
+    }),
+
     getProjectTeam: builder.query<ProjectTeamMemberDto[], string>({
       queryFn: async (idOrKey) => {
         try {
@@ -525,5 +547,6 @@ export const {
   useChangeProjectLifecycleMutation,
   useGetProjectPlanSummaryQuery,
   useGetMyProjectsSummaryQuery,
+  useGetMyProjectsTaskMetricsQuery,
   useGetProjectTeamQuery,
 } = projectsApi

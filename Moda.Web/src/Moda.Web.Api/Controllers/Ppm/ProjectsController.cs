@@ -64,6 +64,23 @@ public class ProjectsController(ILogger<ProjectsController> logger, ISender send
             : Ok(new MyProjectsSummaryDto());
     }
 
+    [HttpGet("my-task-metrics")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Projects)]
+    [OpenApiOperation("Get aggregated task metrics across the current user's projects.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult<MyProjectsTaskMetricsDto>> GetMyProjectsTaskMetrics([FromQuery] int[]? status, [FromQuery] int[]? role, CancellationToken cancellationToken)
+    {
+        ProjectStatus[]? statusFilter = status is { Length: > 0 }
+            ? [.. status.Select(s => (ProjectStatus)s)]
+            : null;
+
+        ProjectMemberRole[]? roleFilter = role is { Length: > 0 }
+            ? [.. role.Select(r => (ProjectMemberRole)r)]
+            : null;
+
+        return Ok(await _sender.Send(new GetMyProjectsTaskMetricsQuery(StatusFilter: statusFilter, RoleFilter: roleFilter), cancellationToken));
+    }
+
     [HttpGet("{idOrKey}")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Projects)]
     [OpenApiOperation("Get project details.", "")]
