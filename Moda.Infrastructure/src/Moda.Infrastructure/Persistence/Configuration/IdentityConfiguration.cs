@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.Text.Json;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Moda.Common.Application.Identity.Users;
 using Moda.Common.Domain.Employees;
 
 namespace Moda.Infrastructure.Persistence.Configuration;
@@ -28,6 +30,17 @@ public class ApplicationUserConfig : IEntityTypeConfiguration<ApplicationUser>
 
         builder.Property(u => u.RefreshToken).HasMaxLength(256);
         builder.Property(u => u.RefreshTokenExpiryTime);
+
+        builder.OwnsOne(u => u.Preferences, prefs =>
+        {
+            prefs.ToJson();
+            prefs.Property(p => p.Tours)
+                 .HasConversion(
+                     v => JsonSerializer.Serialize(v, JsonSerializerOptions.Default),
+                     v => JsonSerializer.Deserialize<Dictionary<string, bool>>(v, JsonSerializerOptions.Default)
+                           ?? new Dictionary<string, bool>()
+                 );
+        });
 
         // Relationships
         builder.HasOne(e => e.Employee).WithMany().HasForeignKey(e => e.EmployeeId).OnDelete(DeleteBehavior.NoAction);

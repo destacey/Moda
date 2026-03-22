@@ -1,10 +1,10 @@
 'use client'
 
-import { useLocalStorageState } from '@/src/hooks'
+import { useTourCompleted } from '@/src/hooks'
 import { TourProps } from 'antd'
-import { useCallback, useRef } from 'react'
+import { useRef } from 'react'
 
-const TOUR_SEEN_KEY = 'my-projects-tour-seen'
+const TOUR_KEY = 'myProjectsDashboard'
 
 export interface MyProjectsTourRefs {
   filterBarRef: React.RefObject<HTMLDivElement | null>
@@ -24,32 +24,28 @@ export interface MyProjectsTourResult {
 }
 
 export const useMyProjectsTour = (): MyProjectsTourResult => {
-  const [tourSeen, setTourSeen] = useLocalStorageState(TOUR_SEEN_KEY, false)
+  const { isCompleted, isLoading, markCompleted, resetTour } =
+    useTourCompleted(TOUR_KEY)
 
   const filterBarRef = useRef<HTMLDivElement>(null)
   const summaryBarRef = useRef<HTMLDivElement>(null)
   const leftPanelRef = useRef<HTMLDivElement>(null)
   const rightPanelRef = useRef<HTMLDivElement>(null)
 
-  const tourOpen = !tourSeen
-
-  const onTourClose = useCallback(() => {
-    setTourSeen(true)
-  }, [setTourSeen])
-
-  const onTourStart = useCallback(() => {
-    setTourSeen(false)
-  }, [setTourSeen])
+  const tourOpen = !isLoading && !isCompleted
 
   const detailStepIndex = 4
+
+  const stepStyle: React.CSSProperties = { maxWidth: 360 }
 
   const tourSteps: TourProps['steps'] = [
     {
       title: 'Welcome to My Projects',
       description:
-        'This dashboard gives you a personalized view of all projects you are involved in. Let\'s walk through the key areas.',
+        "This dashboard gives you a personalized view of all projects you are involved in. Let's walk through the key areas.",
       cover: null,
       target: null,
+      style: stepStyle,
     },
     {
       title: 'Filter Your Projects',
@@ -57,6 +53,7 @@ export const useMyProjectsTour = (): MyProjectsTourResult => {
         'Use these filters to narrow down projects by your role (Sponsor, Owner, PM, Member, or Task Assignee) and by project status. Your filter selections are saved automatically.',
       target: () => filterBarRef.current!,
       placement: 'bottom',
+      style: stepStyle,
     },
     {
       title: 'Summary Metrics',
@@ -64,6 +61,7 @@ export const useMyProjectsTour = (): MyProjectsTourResult => {
         'See aggregated task metrics across all visible projects at a glance — total project count, overdue tasks, tasks due this week, and upcoming tasks.',
       target: () => summaryBarRef.current!,
       placement: 'bottom',
+      style: stepStyle,
     },
     {
       title: 'Project List',
@@ -71,13 +69,15 @@ export const useMyProjectsTour = (): MyProjectsTourResult => {
         'Your projects are grouped by portfolio. Each card shows your role, project status, phase timeline, task statistics, and team members.',
       target: () => leftPanelRef.current!,
       placement: 'right',
+      style: stepStyle,
     },
     {
       title: 'Project Details',
       description:
-        'Clicking a project card opens its details here, including phases, task summary, and the full project plan with deliverables and tasks.',
+        'Clicking a project card opens its details here, including phases, task summary, and the full project plan with deliverables and tasks. Click any task row to view additional task details.',
       target: () => rightPanelRef.current!,
       placement: 'left',
+      style: stepStyle,
     },
   ]
 
@@ -85,8 +85,9 @@ export const useMyProjectsTour = (): MyProjectsTourResult => {
     refs: { filterBarRef, summaryBarRef, leftPanelRef, rightPanelRef },
     tourOpen,
     tourSteps,
-    onTourClose,
-    onTourStart,
+    onTourClose: markCompleted,
+    onTourStart: resetTour,
     detailStepIndex,
   }
 }
+

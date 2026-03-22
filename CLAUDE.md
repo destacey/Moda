@@ -480,6 +480,8 @@ When using Docker Compose for local development:
 
 The TypeScript client for the frontend is auto-generated from the API's OpenAPI spec. Configuration in `nswag.json`.
 
+**IMPORTANT: Always use the NSwag-generated typed client** (e.g., `getProfileClient()`, `getProjectsClient()`) for API calls in RTK Query endpoints. **Do NOT use `authenticatedFetch()` directly** unless there is no generated client method available (e.g., the endpoint doesn't exist in the generated client yet). If the generated client is missing a method for a new endpoint, define the TypeScript type manually and write the `queryFn` using the NSwag client pattern — then ask the developer for help regenerating the client. The generated clients are located in `moda.web.reactclient/src/services/moda-api.ts` and factory functions in `moda.web.reactclient/src/services/clients.ts`.
+
 ### OpenTelemetry and Observability
 
 **Backend (.NET API):**

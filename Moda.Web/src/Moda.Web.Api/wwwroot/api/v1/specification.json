@@ -715,6 +715,87 @@
         ]
       }
     },
+    "/api/user-management/profiles/preferences": {
+      "get": {
+        "tags": [
+          "Profile"
+        ],
+        "summary": "Get preferences of currently logged in user.",
+        "operationId": "Profile_GetPreferences",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserPreferencesDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Profile"
+        ],
+        "summary": "Update preferences of currently logged in user.",
+        "operationId": "Profile_UpdatePreferences",
+        "requestBody": {
+          "x-name": "preferences",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserPreferencesDto"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
     "/api/user-management/profiles/logs": {
       "get": {
         "tags": [
@@ -20799,6 +20880,21 @@
             "format": "guid",
             "nullable": true,
             "example": "00000000-0000-0000-0000-000000000000"
+          }
+        }
+      },
+      "UserPreferencesDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "tours"
+        ],
+        "properties": {
+          "tours": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "boolean"
+            }
           }
         }
       },

@@ -10,9 +10,11 @@ global.ResizeObserver = class {
 } as unknown as typeof ResizeObserver
 
 // Mock child components that make API calls
-jest.mock('./project-stat-pills', () => () => (
-  <div data-testid="stat-pills" />
-))
+jest.mock('./project-stat-pills', () => {
+  const MockStatPills = () => <div data-testid="stat-pills" />
+  MockStatPills.displayName = 'MockStatPills'
+  return MockStatPills
+})
 
 function createProject(
   overrides?: Partial<ProjectListDto>,

@@ -1,4 +1,4 @@
-import { render, screen, waitFor, act } from '@testing-library/react'
+import { render, screen, act } from '@testing-library/react'
 import MyProjectsSummaryBar from './summary-bar'
 import { ProjectListDto } from '@/src/services/moda-api'
 

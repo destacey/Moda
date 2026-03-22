@@ -25,27 +25,35 @@ jest.mock('@/src/components/contexts/theme', () => ({
 
 // Mock child components to isolate panel logic
 jest.mock('./project-detail-header', () => {
-  return ({ project }: any) => (
+  const MockDetailHeader = ({ project }: any) => (
     <div data-testid="detail-header">{project.name}</div>
   )
+  MockDetailHeader.displayName = 'MockDetailHeader'
+  return MockDetailHeader
 })
 
 jest.mock('./project-plan-view', () => {
-  return ({ projectKey }: any) => (
+  const MockPlanView = ({ projectKey }: any) => (
     <div data-testid="plan-view">{projectKey}</div>
   )
+  MockPlanView.displayName = 'MockPlanView'
+  return MockPlanView
 })
 
 jest.mock('@/src/app/ppm/_components/phase-timeline', () => {
-  return ({ phases }: any) => (
+  const MockPhaseTimeline = ({ phases }: any) => (
     <div data-testid="phase-timeline">{phases.length} phases</div>
   )
+  MockPhaseTimeline.displayName = 'MockPhaseTimeline'
+  return MockPhaseTimeline
 })
 
 jest.mock('@/src/app/ppm/projects/_components/project-task-metrics', () => {
-  return ({ projectKey }: any) => (
+  const MockTaskMetrics = ({ projectKey }: any) => (
     <div data-testid="task-metrics">{projectKey}</div>
   )
+  MockTaskMetrics.displayName = 'MockTaskMetrics'
+  return MockTaskMetrics
 })
 
 import { useGetProjectQuery } from '@/src/store/features/ppm/projects-api'

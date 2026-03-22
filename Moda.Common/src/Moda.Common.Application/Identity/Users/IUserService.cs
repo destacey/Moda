@@ -54,4 +54,8 @@ public interface IUserService : ITransientService
 
     Task<Result> SyncUsersFromEmployeeRecords(List<IExternalEmployee> externalEmployees, CancellationToken cancellationToken);
 
+    Task<UserPreferencesDto> GetPreferences(string userId, CancellationToken cancellationToken);
+
+    Task<Result> UpdatePreferences(string userId, UserPreferencesDto preferences, CancellationToken cancellationToken);
+
 }

@@ -12,7 +12,7 @@ global.ResizeObserver = class {
 
 // Mock ProjectCard to avoid deep rendering
 jest.mock('./project-card', () => {
-  return ({ project, isSelected, onSelect }: any) => (
+  const MockProjectCard = ({ project, isSelected, onSelect }: any) => (
     <div
       data-testid={`project-card-${project.key}`}
       data-selected={isSelected}
@@ -21,6 +21,8 @@ jest.mock('./project-card', () => {
       {project.name}
     </div>
   )
+  MockProjectCard.displayName = 'MockProjectCard'
+  return MockProjectCard
 })
 
 function createProject(

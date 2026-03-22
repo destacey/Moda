@@ -19,11 +19,13 @@ jest.mock('@/src/components/contexts/auth', () => ({
 
 // Mock PortfolioGroupSection to avoid deep rendering
 jest.mock('./portfolio-group-section', () => {
-  return ({ group }: any) => (
+  const MockPortfolioGroupSection = ({ group }: any) => (
     <div data-testid={`group-${group.portfolioId}`}>
       {group.portfolioName} ({group.projects.length})
     </div>
   )
+  MockPortfolioGroupSection.displayName = 'MockPortfolioGroupSection'
+  return MockPortfolioGroupSection
 })
 
 function createProject(
