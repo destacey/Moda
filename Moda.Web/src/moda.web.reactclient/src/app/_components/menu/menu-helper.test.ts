@@ -85,7 +85,16 @@ describe('findMenuKeysByPathname', () => {
     expect(result.openKeys).toEqual(['ppm'])
   })
 
-  it('should return empty arrays for unmatched pathname', () => {
+  it('should match by shared segments when no exact prefix match exists', () => {
+    // /organizations/team-of-teams/5 shares the /organizations segment
+    // with org.teams, so it selects Teams and opens the org submenu
+    const result = findMenuKeysByPathname('/organizations/team-of-teams/5', routeKeyMap)
+
+    expect(result.selectedKeys).toEqual(['org.teams'])
+    expect(result.openKeys).toEqual(['org'])
+  })
+
+  it('should return empty arrays for completely unknown pathname', () => {
     const result = findMenuKeysByPathname('/unknown/page', routeKeyMap)
 
     expect(result.selectedKeys).toEqual([])

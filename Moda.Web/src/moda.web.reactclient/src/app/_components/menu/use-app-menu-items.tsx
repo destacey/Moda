@@ -172,7 +172,13 @@ const useAppMenuItems = () => {
     [items, hasClaim],
   )
 
-  const routeKeyMap = useMemo(() => buildRouteKeyMap(items), [items])
+  const routeKeyMap = useMemo(
+    () =>
+      buildRouteKeyMap(
+        items.filter((item): item is Item => 'display' in item),
+      ),
+    [items],
+  )
 
   return { menuItems: filteredMenuItems, routeKeyMap }
 }
