@@ -69,6 +69,33 @@ public class ProfileController(IUserService userService, ISender sender, ICurren
         return Ok(new UserPermissionsResponse(permissions, employeeId));
     }
 
+    [HttpGet("preferences")]
+    [OpenApiOperation("Get preferences of currently logged in user.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<UserPreferencesDto>> GetPreferences(CancellationToken cancellationToken)
+    {
+        if (User.GetUserId() is not { } userId || string.IsNullOrEmpty(userId))
+            return Unauthorized();
+
+        return Ok(await _userService.GetPreferences(userId, cancellationToken));
+    }
+
+    [HttpPut("preferences")]
+    [OpenApiOperation("Update preferences of currently logged in user.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> UpdatePreferences(UserPreferencesDto preferences, CancellationToken cancellationToken)
+    {
+        if (User.GetUserId() is not { } userId || string.IsNullOrEmpty(userId))
+            return Unauthorized();
+
+        var result = await _userService.UpdatePreferences(userId, preferences, cancellationToken);
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
     [HttpGet("logs")]
     [OpenApiOperation("Get audit logs of currently logged in user.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]

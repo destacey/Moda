@@ -26,6 +26,7 @@ const ROLE_OPTIONS: BaseOptionType[] = [
   { label: 'Owner', value: '2' },
   { label: 'PM', value: '3' },
   { label: 'Member', value: '4' },
+  { label: 'Task Assignee', value: '5' },
 ]
 
 const hasPortfolioFilter = (

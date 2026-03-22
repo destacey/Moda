@@ -4,6 +4,7 @@ using Moda.ProjectPortfolioManagement.Domain.Enums;
 using Moda.ProjectPortfolioManagement.Domain.Models;
 using Moda.Tests.Shared;
 using Moda.Tests.Shared.Data;
+using Moda.Tests.Shared.Extensions;
 using NodaTime;
 using TaskStatus = Moda.ProjectPortfolioManagement.Domain.Enums.TaskStatus;
 
@@ -149,5 +150,23 @@ public static class ProjectTaskFakerExtensions
             type: ProjectTaskType.Milestone,
             plannedDate: milestoneDate
         ).Generate();
+    }
+
+    /// <summary>
+    /// Adds assignee role assignments to a generated task.
+    /// </summary>
+    /// <param name="task">The task to add assignees to.</param>
+    /// <param name="employeeIds">The employee IDs to assign as task assignees.</param>
+    /// <returns>The task with assignees added.</returns>
+    public static ProjectTask WithAssignees(this ProjectTask task, params Guid[] employeeIds)
+    {
+        var roles = new HashSet<RoleAssignment<TaskRole>>();
+        foreach (var employeeId in employeeIds)
+        {
+            roles.Add(new RoleAssignment<TaskRole>(task.Id, TaskRole.Assignee, employeeId));
+        }
+
+        task.SetPrivateField("_roles", roles);
+        return task;
     }
 }

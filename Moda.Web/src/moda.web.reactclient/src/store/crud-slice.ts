@@ -385,21 +385,30 @@ const createCrudSlice = <
       options.extraReducers && options.extraReducers(builder)
     },
   })
+  type Detail = DetailState<TDetail>
+  const selectSlice = (state: any): State => state[options.name]
+  const selectDetailState = (state: any): Detail => selectSlice(state).detail
+
   const allSelectors = {
     selectData: itemsAdapter.getSelectors(
-      (state: any): any => state[options.name].data,
+      (state: any): any => selectSlice(state).data,
     ).selectAll,
-    selectIsLoading: (state: any) => state[options.name].isLoading,
-    selectError: (state: any) => state[options.name].error,
-    selectDetail: (state: any) => state[options.name].detail.item,
-    selectDetailIsLoading: (state: any) => state[options.name].detail.isLoading,
-    selectDetailNotFound: (state: any) => state[options.name].detail.notFound,
-    selectDetailError: (state: any) => state[options.name].detail.error,
-    selectDetailIsSaving: (state: any) => state[options.name].detail.isSaving,
-    selectDetailIsInEditMode: (state: any) =>
-      state[options.name].detail.isInEditMode,
-    selectDetailValidationErrors: (state: any) =>
-      state[options.name].detail.validationErrors,
+    selectIsLoading: (state: any): boolean => selectSlice(state).isLoading,
+    selectError: (state: any): any | null => selectSlice(state).error,
+    selectDetail: (state: any): Detail['item'] =>
+      selectDetailState(state).item,
+    selectDetailIsLoading: (state: any): boolean =>
+      selectDetailState(state).isLoading,
+    selectDetailNotFound: (state: any): boolean =>
+      selectDetailState(state).notFound,
+    selectDetailError: (state: any): any | null =>
+      selectDetailState(state).error,
+    selectDetailIsSaving: (state: any): boolean =>
+      selectDetailState(state).isSaving,
+    selectDetailIsInEditMode: (state: any): boolean =>
+      selectDetailState(state).isInEditMode,
+    selectDetailValidationErrors: (state: any): FieldData[] =>
+      selectDetailState(state).validationErrors,
   }
 
   return {

@@ -187,6 +187,7 @@ public static class ProjectFakerExtensions
 
             tasks.Add(task);
             project.AddToPrivateList("_tasks", task);
+            SetProjectNavigation(task, project);
         }
 
         return tasks;
@@ -218,8 +219,16 @@ public static class ProjectFakerExtensions
             var task = taskFaker.Generate();
             tasks.Add(task);
             project.AddToPrivateList("_tasks", task);
+            SetProjectNavigation(task, project);
         }
 
         return tasks;
+    }
+
+    private static void SetProjectNavigation(ProjectTask task, Project project)
+    {
+        typeof(ProjectTask)
+            .GetProperty(nameof(ProjectTask.Project))!
+            .SetValue(task, project);
     }
 }

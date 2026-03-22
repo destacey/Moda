@@ -32,9 +32,9 @@ const menuIcons = {
   settings: <SettingOutlined />,
 }
 
-const buildMenuItems = (
-  featureFlags: { planningPoker: boolean },
-): (Item | MenuItem)[] => [
+const buildMenuItems = (featureFlags: {
+  planningPoker: boolean
+}): (Item | MenuItem)[] => [
   menuItem('Home', 'home', '/', menuIcons.home),
   menuItem('Organizations', 'org', null, menuIcons.org, [
     menuItem('Teams', 'org.teams', '/organizations/teams'),
@@ -96,6 +96,13 @@ const buildMenuItems = (
   //     menuItem('Requirements Management', 'pdc.requirements-management'),
   // ]),
   restrictedMenuSection('PPM', 'ppm', null, menuIcons.ppm, [
+    restrictedPermissionMenuItem(
+      'Permissions.Projects.View',
+      'My Projects',
+      'ppm.dashboards.my-projects',
+      '/ppm/dashboards/my-projects',
+    ),
+    { key: 'ppm-dashboards-divider', type: 'divider' },
     restrictedPermissionMenuItem(
       'Permissions.ProjectPortfolios.View',
       'Portfolios',

@@ -48,7 +48,7 @@ const WorkItemsGrid = dynamic(
 enum ProjectTabs {
   Details = 'details',
   Team = 'team',
-  Plan = 'tasks',
+  Plan = 'plan',
   WorkItems = 'workItems',
 }
 
@@ -68,7 +68,15 @@ enum ProjectAction {
 const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const { key: projectKey } = use(props.params)
 
-  const [activeTab, setActiveTab] = useState(ProjectTabs.Details)
+  const [activeTab, setActiveTab] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash.replace('#', '')
+      if (Object.values(ProjectTabs).includes(hash as ProjectTabs)) {
+        return hash as ProjectTabs
+      }
+    }
+    return ProjectTabs.Details
+  })
   const [openEditProjectForm, setOpenEditProjectForm] = useState<boolean>(false)
   const [openChangeProgramForm, setOpenChangeProgramForm] =
     useState<boolean>(false)
@@ -178,9 +186,14 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     workItemsDataIsLoading,
   ])
 
-  // doesn't trigger on first render
   const onTabChange = useCallback((tabKey: string) => {
     setActiveTab(tabKey as ProjectTabs)
+    const base = window.location.pathname + window.location.search
+    if (tabKey === ProjectTabs.Details) {
+      window.history.replaceState(null, '', base)
+    } else {
+      window.history.replaceState(null, '', `${base}#${tabKey}`)
+    }
   }, [])
 
   const missingDates = projectData?.start === null || projectData?.end === null

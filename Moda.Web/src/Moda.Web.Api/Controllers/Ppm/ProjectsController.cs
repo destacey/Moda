@@ -36,8 +36,8 @@ public class ProjectsController(ILogger<ProjectsController> logger, ISender send
             ? new IdOrKey(portfolioId.Value)
             : null;
 
-        ProjectRole[]? roleFilter = role is { Length: > 0 }
-            ? [.. role.Select(r => (ProjectRole)r)]
+        ProjectMemberRole[]? roleFilter = role is { Length: > 0 }
+            ? [.. role.Select(r => (ProjectMemberRole)r)]
             : null;
 
         var projects = await _sender.Send(new GetProjectsQuery(StatusFilter: filter, PortfolioIdOrKey: portfolioIdOrKey, RoleFilter: roleFilter), cancellationToken);
@@ -45,6 +45,40 @@ public class ProjectsController(ILogger<ProjectsController> logger, ISender send
         return projects is not null
             ? Ok(projects)
             : NotFound();
+    }
+
+    [HttpGet("my-summary")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Projects)]
+    [OpenApiOperation("Get a summary of the current user's project involvement.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult<MyProjectsSummaryDto>> GetMyProjectsSummary([FromQuery] int[]? status, CancellationToken cancellationToken)
+    {
+        ProjectStatus[]? statusFilter = status is { Length: > 0 }
+            ? [.. status.Select(s => (ProjectStatus)s)]
+            : null;
+
+        var summary = await _sender.Send(new GetMyProjectsSummaryQuery(StatusFilter: statusFilter), cancellationToken);
+
+        return summary is not null
+            ? Ok(summary)
+            : Ok(new MyProjectsSummaryDto());
+    }
+
+    [HttpGet("my-task-metrics")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Projects)]
+    [OpenApiOperation("Get aggregated task metrics across the current user's projects.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult<MyProjectsTaskMetricsDto>> GetMyProjectsTaskMetrics([FromQuery] int[]? status, [FromQuery] int[]? role, CancellationToken cancellationToken)
+    {
+        ProjectStatus[]? statusFilter = status is { Length: > 0 }
+            ? [.. status.Select(s => (ProjectStatus)s)]
+            : null;
+
+        ProjectMemberRole[]? roleFilter = role is { Length: > 0 }
+            ? [.. role.Select(r => (ProjectMemberRole)r)]
+            : null;
+
+        return Ok(await _sender.Send(new GetMyProjectsTaskMetricsQuery(StatusFilter: statusFilter, RoleFilter: roleFilter), cancellationToken));
     }
 
     [HttpGet("{idOrKey}")]

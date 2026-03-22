@@ -24,7 +24,7 @@ function readLocalStorage<T>(
   try {
     // Try to read versioned key first
     const storedValue = window.localStorage.getItem(versionedKey)
-    if (storedValue !== null) {
+    if (storedValue !== null && storedValue !== 'undefined') {
       return JSON.parse(storedValue)
     }
 
@@ -97,7 +97,14 @@ export const useLocalStorageState = <T>(
   // Update localStorage when value changes.
   useEffect(() => {
     try {
-      window.localStorage.setItem(versionedKey, JSON.stringify(value))
+      const serialized = JSON.stringify(value)
+      if (serialized === undefined) {
+        console.warn(
+          `Cannot store non-serializable value in localStorage key "${versionedKey}". Use null instead of undefined.`,
+        )
+        return
+      }
+      window.localStorage.setItem(versionedKey, serialized)
     } catch (error) {
       console.error(`Error writing localStorage key "${versionedKey}":`, error)
     }

@@ -22,7 +22,7 @@ const PROJECT_STATUS = {
 
 const DEFAULT_STATUSES = [PROJECT_STATUS.Approved, PROJECT_STATUS.Active]
 
-const ALL_ROLES = [1, 2, 3, 4]
+const ALL_ROLES = [1, 2, 3, 4, 5]
 
 const getRoleFilterValues = (
   selectedRole: string | undefined,
@@ -39,11 +39,11 @@ const ProjectsPage: FC = () => {
   const [selectedStatuses, setSelectedStatuses] =
     useLocalStorageState<number[]>('projects-filter-statuses', DEFAULT_STATUSES)
   const [selectedPortfolioId, setSelectedPortfolioId] = useLocalStorageState<
-    string | undefined
-  >('projects-filter-portfolio', undefined)
+    string | null
+  >('projects-filter-portfolio', null)
   const [selectedRole, setSelectedRole] = useLocalStorageState<
-    string | undefined
-  >('projects-filter-role', undefined)
+    string | null
+  >('projects-filter-role', null)
   const messageApi = useMessage()
 
   const { hasPermissionClaim } = useAuth()
@@ -70,8 +70,8 @@ const ProjectsPage: FC = () => {
 
   const handleResetFilters = useCallback(() => {
     setSelectedStatuses(DEFAULT_STATUSES)
-    setSelectedPortfolioId(undefined)
-    setSelectedRole(undefined)
+    setSelectedPortfolioId(null)
+    setSelectedRole(null)
   }, [setSelectedStatuses, setSelectedPortfolioId, setSelectedRole])
 
   const actions = useMemo(() => {

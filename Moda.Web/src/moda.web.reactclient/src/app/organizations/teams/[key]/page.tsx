@@ -42,7 +42,7 @@ import {
   TeamOperatingModelsGrid,
   EditTeamOperatingModelForm,
 } from '../_components'
-import { Methodology } from '@/src/services/moda-api'
+import { Methodology, TeamDetailsDto } from '@/src/services/moda-api'
 import {
   CreateTeamMembershipForm,
   EditTeamForm,
@@ -57,10 +57,10 @@ const CycleTimeReport = dynamic(
   { ssr: false, loading: () => <Spin /> },
 )
 
-const TeamBacklog = dynamic(
-  () => import('../_components/team-backlog'),
-  { ssr: false, loading: () => <Spin /> },
-)
+const TeamBacklog = dynamic(() => import('../_components/team-backlog'), {
+  ssr: false,
+  loading: () => <Spin />,
+})
 
 enum TeamTabs {
   Details = 'details',
@@ -138,11 +138,12 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   )
 
   const {
-    item: team,
+    item,
     error,
     isInEditMode,
     notFound: teamNotFound,
   } = useAppSelector(selectEditTeamContext)
+  const team = item as TeamDetailsDto | null
   const dispatch = useAppDispatch()
   const pathname = usePathname()
   const isScrumTeam = team?.operatingModel?.methodology === Methodology.Scrum

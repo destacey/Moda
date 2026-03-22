@@ -4,8 +4,10 @@ import type { AppDispatch, RootState } from '@/src/store'
 
 export { useLocalStorageState } from './use-local-storage-state'
 export { useDocumentTitle } from './use-document-title'
+export { useRemainingHeight } from './use-remaining-height'
 export { useDebounce } from './use-debounce'
 export { useFeatureFlag } from './use-feature-flag'
+export { useUserPreferences, useTourCompleted } from './use-user-preferences'
 export { default as useModalForm } from './use-modal-form'
 export type {
   UseModalFormOptions,

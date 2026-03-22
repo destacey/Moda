@@ -119,6 +119,7 @@ export enum QueryTags {
 
   // USER PROFILE
   Profile = 'UserManagement.Profile',
+  UserPreferences = 'UserManagement.UserPreferences',
   PersonalAccessTokens = 'UserManagement.PersonalAccessTokens',
 
   // WORK MANAGEMENT

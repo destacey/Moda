@@ -4659,7 +4659,29 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.NoAction);
 
+                    b.OwnsOne("Moda.Common.Application.Identity.Users.UserPreferences", "Preferences", b1 =>
+                        {
+                            b1.Property<string>("ApplicationUserId");
+
+                            b1.Property<string>("Tours")
+                                .IsRequired();
+
+                            b1.HasKey("ApplicationUserId");
+
+                            b1.ToTable("Users", "Identity");
+
+                            b1
+                                .ToJson("Preferences")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.WithOwner()
+                                .HasForeignKey("ApplicationUserId");
+                        });
+
                     b.Navigation("Employee");
+
+                    b.Navigation("Preferences")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Moda.Infrastructure.Identity.ApplicationUserRole", b =>

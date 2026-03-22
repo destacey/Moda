@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Moda.ProjectPortfolioManagement.Domain.Enums;
 
@@ -12,10 +12,4 @@ public enum TaskRole
     /// </summary>
     [Display(Name = "Assignee", Description = "Responsible for completing the task.", Order = 1)]
     Assignee = 1,
-
-    /// <summary>
-    /// Reviews the completed task.
-    /// </summary>
-    [Display(Name = "Reviewer", Description = "Reviews the completed task.", Order = 2)]
-    Reviewer = 2
 }

@@ -34,6 +34,7 @@ import { CreateTeamMembershipForm } from '../../_components'
 import { InactiveTag, PageActions } from '@/src/components/common'
 import { ItemType } from 'antd/es/menu/interface'
 import DeactivateTeamOfTeamsForm from '../../_components/deactivate-team-of-teams-form'
+import { TeamOfTeamsDetailsDto } from '@/src/services/moda-api'
 
 enum TeamOfTeamsTabs {
   Details = 'details',
@@ -82,11 +83,12 @@ const TeamOfTeamsDetailsPage = (props: {
   )
 
   const {
-    item: team,
+    item,
     isInEditMode,
     notFound: teamNotFound,
     error,
   } = useAppSelector(selectTeamContext)
+  const team = item as TeamOfTeamsDetailsDto | null
   const dispatch = useAppDispatch()
   const pathname = usePathname()
   const teamMembershipsQuery = useGetTeamOfTeamsMembershipsQuery(
