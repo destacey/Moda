@@ -176,7 +176,6 @@ const EditProjectForm = ({
       title="Edit Project"
       open={isOpen}
       width="min(90vw, 900px)"
-      centered
       onOk={handleOk}
       okButtonProps={{ disabled: !isValid }}
       okText="Save"
