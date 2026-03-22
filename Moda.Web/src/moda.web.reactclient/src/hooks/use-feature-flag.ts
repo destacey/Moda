@@ -1,3 +1,4 @@
+import { usePathname } from 'next/navigation'
 import { useGetClientFeatureFlagsQuery } from '@/src/store/features/feature-flags-api'
 
 interface UseFeatureFlagResult {
@@ -18,10 +19,14 @@ interface UseFeatureFlagResult {
  * return <LegacyDashboard />
  */
 export function useFeatureFlag(featureName: string): UseFeatureFlagResult {
+  const pathname = usePathname()
+  const isLoggingOut = pathname === '/logout'
+
   const { data: features, isLoading } = useGetClientFeatureFlagsQuery(
     undefined,
     {
-      pollingInterval: 60_000, // Refresh every 60 seconds
+      pollingInterval: 10 * 60_000, // Refresh every 10 minutes
+      skip: isLoggingOut,
     },
   )
 

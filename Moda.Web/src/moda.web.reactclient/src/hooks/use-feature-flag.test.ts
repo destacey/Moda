@@ -1,6 +1,11 @@
 import { renderHook } from '@testing-library/react'
+import { usePathname } from 'next/navigation'
 import { useFeatureFlag } from './use-feature-flag'
 import { useGetClientFeatureFlagsQuery } from '../store/features/feature-flags-api'
+
+jest.mock('next/navigation', () => ({
+  usePathname: jest.fn(() => '/'),
+}))
 
 jest.mock('../store/features/feature-flags-api', () => ({
   useGetClientFeatureFlagsQuery: jest.fn(),
@@ -100,7 +105,24 @@ describe('useFeatureFlag', () => {
     renderHook(() => useFeatureFlag('my-feature'))
 
     expect(mockUseGetClientFeatureFlagsQuery).toHaveBeenCalledWith(undefined, {
-      pollingInterval: 60_000,
+      pollingInterval: 600_000,
+      skip: false,
     })
+  })
+
+  it('skips the query on the logout route', () => {
+    ;(usePathname as jest.Mock).mockReturnValue('/logout')
+    mockUseGetClientFeatureFlagsQuery.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+    })
+
+    const { result } = renderHook(() => useFeatureFlag('my-feature'))
+
+    expect(mockUseGetClientFeatureFlagsQuery).toHaveBeenCalledWith(undefined, {
+      pollingInterval: 600_000,
+      skip: true,
+    })
+    expect(result.current.isEnabled).toBe(false)
   })
 })
