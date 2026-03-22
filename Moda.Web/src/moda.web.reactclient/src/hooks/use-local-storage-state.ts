@@ -97,8 +97,11 @@ export const useLocalStorageState = <T>(
   // Update localStorage when value changes.
   useEffect(() => {
     try {
-      const valueToStore = value === undefined ? null : value
-      window.localStorage.setItem(versionedKey, JSON.stringify(valueToStore))
+      if (value === undefined) {
+        window.localStorage.removeItem(versionedKey)
+        return
+      }
+      window.localStorage.setItem(versionedKey, JSON.stringify(value))
     } catch (error) {
       console.error(`Error writing localStorage key "${versionedKey}":`, error)
     }

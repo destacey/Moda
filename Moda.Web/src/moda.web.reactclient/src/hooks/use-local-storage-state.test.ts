@@ -69,15 +69,18 @@ describe('useLocalStorageState', () => {
     expect(result.current[0]).toBe('default')
   })
 
-  it('stores undefined as null in localStorage', () => {
+  it('does not write undefined to localStorage and clears existing value', () => {
     const { result } = renderHook(() =>
       useLocalStorageState<string | undefined>('key', undefined),
     )
-    // undefined should be stored as null
-    expect(localStorage.getItem('key')).toBe('null')
-    // Setting to undefined should also store as null
+    // undefined is not valid JSON, so it should not be stored
+    expect(localStorage.getItem('key')).toBeNull()
+
+    // Set a value, then clear it with undefined
+    act(() => result.current[1]('hello'))
+    expect(localStorage.getItem('key')).toBe('"hello"')
     act(() => result.current[1](undefined))
-    expect(localStorage.getItem('key')).toBe('null')
+    expect(localStorage.getItem('key')).toBeNull()
   })
 
   it('avoids redundant updates to localStorage', () => {

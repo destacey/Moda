@@ -25,7 +25,7 @@ const DEFAULT_STATUSES = [PROJECT_STATUS.Approved, PROJECT_STATUS.Active]
 const ALL_ROLES = [1, 2, 3, 4, 5]
 
 const getRoleFilterValues = (
-  selectedRole: string | undefined,
+  selectedRole: string | null,
 ): number[] | undefined => {
   if (!selectedRole) return undefined
   if (selectedRole === 'all') return ALL_ROLES
