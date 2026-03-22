@@ -69,17 +69,15 @@ describe('useLocalStorageState', () => {
     expect(result.current[0]).toBe('default')
   })
 
-  it('does not write undefined to localStorage', () => {
-    const warnSpy = jest.spyOn(console, 'warn').mockImplementation()
+  it('stores undefined as null in localStorage', () => {
     const { result } = renderHook(() =>
       useLocalStorageState<string | undefined>('key', undefined),
     )
-    // undefined is not valid JSON, so it should not be stored
-    expect(localStorage.getItem('key')).toBeNull()
-    // Setting to undefined should also not write
+    // undefined should be stored as null
+    expect(localStorage.getItem('key')).toBe('null')
+    // Setting to undefined should also store as null
     act(() => result.current[1](undefined))
-    expect(localStorage.getItem('key')).toBeNull()
-    warnSpy.mockRestore()
+    expect(localStorage.getItem('key')).toBe('null')
   })
 
   it('avoids redundant updates to localStorage', () => {

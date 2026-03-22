@@ -97,14 +97,8 @@ export const useLocalStorageState = <T>(
   // Update localStorage when value changes.
   useEffect(() => {
     try {
-      const serialized = JSON.stringify(value)
-      if (serialized === undefined) {
-        console.warn(
-          `Cannot store non-serializable value in localStorage key "${versionedKey}". Use null instead of undefined.`,
-        )
-        return
-      }
-      window.localStorage.setItem(versionedKey, serialized)
+      const valueToStore = value === undefined ? null : value
+      window.localStorage.setItem(versionedKey, JSON.stringify(valueToStore))
     } catch (error) {
       console.error(`Error writing localStorage key "${versionedKey}":`, error)
     }
