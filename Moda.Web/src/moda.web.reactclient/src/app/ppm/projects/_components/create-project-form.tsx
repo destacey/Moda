@@ -38,6 +38,7 @@ import { useCallback, useEffect, useMemo } from 'react'
 
 const { Item } = Form
 const { RangePicker } = DatePicker
+const { Text } = Typography
 
 export interface CreateProjectFormProps {
   onFormComplete: () => void
@@ -200,11 +201,9 @@ const CreateProjectForm = ({
       .map((phase) => ({
         content: (
           <>
-            <Typography.Text strong>{phase.name}</Typography.Text>
+            <Text strong>{phase.name}</Text>
             <br />
-            <Typography.Text type="secondary">
-              {phase.description}
-            </Typography.Text>
+            <Text type="secondary">{phase.description}</Text>
           </>
         ),
       }))
