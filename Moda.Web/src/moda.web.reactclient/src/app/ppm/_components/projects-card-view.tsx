@@ -66,7 +66,7 @@ const ProjectCard: FC<ProjectCardProps> = ({ project, onCardClick }) => {
 
         {/* Phases */}
         {project.phases?.length > 0 ? (
-          <PhaseTimeline phases={project.phases} size="small" />
+          <PhaseTimeline phases={project.phases} displayMode="small" />
         ) : (
           <Text type="secondary" style={{ fontSize: 12 }}>
             No lifecycle defined

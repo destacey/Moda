@@ -139,16 +139,16 @@ function getDisplayMode(
 
 export interface PhaseTimelineProps {
   phases: ProjectPhaseListDto[]
-  size?: 'default' | 'small'
+  displayMode?: 'default' | 'small'
 }
 
-const PhaseTimeline: FC<PhaseTimelineProps> = ({ phases, size }) => {
+const PhaseTimeline: FC<PhaseTimelineProps> = ({ phases, displayMode }) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const [autoMode, setAutoMode] = useState<DisplayMode>('default')
   const stepCount = phases.length
 
   useEffect(() => {
-    if (size) return
+    if (displayMode) return
 
     const el = containerRef.current
     if (!el) return
@@ -160,13 +160,13 @@ const PhaseTimeline: FC<PhaseTimelineProps> = ({ phases, size }) => {
 
     observer.observe(el)
     return () => observer.disconnect()
-  }, [size, stepCount])
+  }, [displayMode, stepCount])
 
   if (phases.length === 0) return null
 
-  const mode: DisplayMode = size ?? autoMode
+  const mode: DisplayMode = displayMode ?? autoMode
   const isVertical = mode === 'vertical'
-  const stepsSize = mode === 'default' ? 'default' : 'small'
+  const stepsSize = mode === 'default' ? 'medium' : 'small'
   const sorted = [...phases].sort((a, b) => a.order - b.order)
 
   const items = sorted.map((phase) => {
