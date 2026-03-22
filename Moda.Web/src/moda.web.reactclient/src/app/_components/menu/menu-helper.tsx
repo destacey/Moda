@@ -96,6 +96,62 @@ function getItem(
   } as MenuItem
 }
 
+export const buildRouteKeyMap = (
+  items: (Item | MenuItem)[],
+): Map<string, string> => {
+  const map = new Map<string, string>()
+  for (const item of items) {
+    if ('display' in item) {
+      const menuItemItem = item as Item
+      if (menuItemItem.route) {
+        map.set(menuItemItem.route, menuItemItem.key)
+      }
+      if (menuItemItem.children) {
+        const childMap = buildRouteKeyMap(menuItemItem.children)
+        childMap.forEach((value, key) => map.set(key, value))
+      }
+    }
+  }
+  return map
+}
+
+export const findMenuKeysByPathname = (
+  pathname: string,
+  routeKeyMap: Map<string, string>,
+): { selectedKeys: string[]; openKeys: string[] } => {
+  let bestRoute = ''
+  let bestKey = ''
+
+  for (const [route, key] of routeKeyMap) {
+    if (route === '/') {
+      if (pathname === '/') {
+        bestRoute = route
+        bestKey = key
+      }
+    } else if (
+      pathname === route ||
+      pathname.startsWith(route + '/')
+    ) {
+      if (route.length > bestRoute.length) {
+        bestRoute = route
+        bestKey = key
+      }
+    }
+  }
+
+  if (!bestKey) {
+    return { selectedKeys: [], openKeys: [] }
+  }
+
+  const openKeys: string[] = []
+  const parts = bestKey.split('.')
+  if (parts.length > 1) {
+    openKeys.push(parts[0])
+  }
+
+  return { selectedKeys: [bestKey], openKeys }
+}
+
 export const filterAndTransformMenuItem = (
   acc: ItemType<MenuItemType>[],
   item: Item | MenuItem,

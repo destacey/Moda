@@ -70,7 +70,7 @@ const AppHeader: FC = React.memo(() => {
   const screens = useBreakpoint()
   const isMobile = !screens.md // Mobile/tablet for md and below (< 768px)
   const [drawerOpen, setDrawerOpen] = useState(false)
-  const menuItems = useAppMenuItems()
+  const { menuItems } = useAppMenuItems()
   const router = useRouter()
 
   // Flatten menu for mobile
