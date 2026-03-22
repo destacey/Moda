@@ -13,13 +13,15 @@ import {
 } from '@/src/store/features/ppm/projects-api'
 import { useGetStrategicThemeOptionsQuery } from '@/src/store/features/strategic-management/strategic-themes-api'
 import { toFormErrors } from '@/src/utils'
-import { DatePicker, Form, Modal, Select } from 'antd'
+import { projectHelpText } from './project-help-text'
+import { DatePicker, Form, Modal, Select, Typography } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
 import dayjs from 'dayjs'
 import { useCallback, useEffect } from 'react'
 
 const { Item } = Form
 const { RangePicker } = DatePicker
+const { Text } = Typography
 
 export interface EditProjectFormProps {
   projectKey: string
@@ -30,6 +32,8 @@ export interface EditProjectFormProps {
 interface EditProjectFormValues {
   name: string
   description: string
+  businessCase?: string
+  expectedBenefits?: string
   expenditureCategoryId: number
   dateRange?: [dayjs.Dayjs, dayjs.Dayjs] | null
   sponsorIds: string[]
@@ -47,6 +51,8 @@ const mapToRequestValues = (
     id: projectId,
     name: values.name,
     description: values.description,
+    businessCase: values.businessCase || undefined,
+    expectedBenefits: values.expectedBenefits || undefined,
     expenditureCategoryId: values.expenditureCategoryId,
     start: (values.dateRange?.[0] as any)?.format('YYYY-MM-DD'),
     end: (values.dateRange?.[1] as any)?.format('YYYY-MM-DD'),
@@ -122,6 +128,8 @@ const EditProjectForm = ({
     form.setFieldsValue({
       name: projectData.name,
       description: projectData.description,
+      businessCase: projectData.businessCase,
+      expectedBenefits: projectData.expectedBenefits,
       expenditureCategoryId: projectData.expenditureCategory.id,
       dateRange:
         projectData.start && projectData.end
@@ -168,7 +176,8 @@ const EditProjectForm = ({
     <Modal
       title="Edit Project"
       open={isOpen}
-      width={'60vw'}
+      width="min(90vw, 900px)"
+      centered
       onOk={handleOk}
       okButtonProps={{ disabled: !isValid }}
       okText="Save"
@@ -177,7 +186,13 @@ const EditProjectForm = ({
       keyboard={false} // disable esc key to close modal
       destroyOnHidden
     >
-      <Form form={form} size="small" layout="vertical" name="edit-project-form">
+      <Form
+        form={form}
+        size="small"
+        layout="vertical"
+        name="edit-project-form"
+        style={{ paddingTop: 16, paddingBottom: 16 }}
+      >
         <Item
           label="Name"
           name="name"
@@ -197,10 +212,29 @@ const EditProjectForm = ({
           label="Description"
           rules={[
             { required: true, message: 'Description is required' },
-            { max: 2048 },
+            { max: 4096 },
           ]}
         >
-          <MarkdownEditor maxLength={2048} />
+          <Text type="secondary" style={{ fontSize: 12 }}>
+            {projectHelpText.description}
+          </Text>
+          <MarkdownEditor maxLength={4096} />
+        </Item>
+        <Item name="businessCase" label="Business Case" rules={[{ max: 4096 }]}>
+          <Text type="secondary" style={{ fontSize: 12 }}>
+            {projectHelpText.businessCase}
+          </Text>
+          <MarkdownEditor maxLength={4096} />
+        </Item>
+        <Item
+          name="expectedBenefits"
+          label="Expected Benefits"
+          rules={[{ max: 4096 }]}
+        >
+          <Text type="secondary" style={{ fontSize: 12 }}>
+            {projectHelpText.expectedBenefits}
+          </Text>
+          <MarkdownEditor maxLength={4096} />
         </Item>
         <Item
           name="expenditureCategoryId"

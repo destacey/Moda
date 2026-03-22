@@ -23097,6 +23097,14 @@
           "description": {
             "type": "string"
           },
+          "businessCase": {
+            "type": "string",
+            "nullable": true
+          },
+          "expectedBenefits": {
+            "type": "string",
+            "nullable": true
+          },
           "status": {
             "$ref": "#/components/schemas/LifecycleNavigationDto"
           },
@@ -23231,10 +23239,24 @@
           },
           "description": {
             "type": "string",
-            "description": "A detailed description of the project's purpose.",
-            "maxLength": 2048,
+            "description": "A concise summary of what the project delivers and its scope.\nServes as the elevator pitch — what is being built or delivered.",
+            "maxLength": 4096,
             "minLength": 1,
             "nullable": false
+          },
+          "businessCase": {
+            "type": "string",
+            "description": "The strategic justification for the project — why it should be funded.\nCaptures the problem being solved or opportunity being pursued and the strategic rationale.",
+            "maxLength": 4096,
+            "minLength": 0,
+            "nullable": true
+          },
+          "expectedBenefits": {
+            "type": "string",
+            "description": "The specific, measurable outcomes expected upon successful delivery.\nExamples: revenue growth, cost savings, compliance achievement, efficiency improvements.",
+            "maxLength": 4096,
+            "minLength": 0,
+            "nullable": true
           },
           "key": {
             "type": "string",
@@ -23367,10 +23389,24 @@
           },
           "description": {
             "type": "string",
-            "description": "A detailed description of the project’s purpose.",
-            "maxLength": 2048,
+            "description": "A concise summary of what the project delivers and its scope.\nServes as the elevator pitch — what is being built or delivered.",
+            "maxLength": 4096,
             "minLength": 1,
             "nullable": false
+          },
+          "businessCase": {
+            "type": "string",
+            "description": "The strategic justification for the project — why it should be funded.\nCaptures the problem being solved or opportunity being pursued and the strategic rationale.",
+            "maxLength": 4096,
+            "minLength": 0,
+            "nullable": true
+          },
+          "expectedBenefits": {
+            "type": "string",
+            "description": "The specific, measurable outcomes expected upon successful delivery.\nExamples: revenue growth, cost savings, compliance achievement, efficiency improvements.",
+            "maxLength": 4096,
+            "minLength": 0,
+            "nullable": true
           },
           "expenditureCategoryId": {
             "type": "integer",

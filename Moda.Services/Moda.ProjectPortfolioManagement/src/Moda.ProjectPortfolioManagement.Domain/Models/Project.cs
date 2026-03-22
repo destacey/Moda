@@ -22,7 +22,7 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey<P
 
     private Project() { }
 
-    private Project(string name, string description, ProjectKey key, ProjectStatus status, int expenditureCategoryId, LocalDateRange? dateRange, Guid portfolioId, Guid? programId = null, Dictionary<ProjectRole, HashSet<Guid>>? roles = null, HashSet<Guid>? strategicThemes = null)
+    private Project(string name, string description, ProjectKey key, ProjectStatus status, int expenditureCategoryId, LocalDateRange? dateRange, Guid portfolioId, Guid? programId = null, string? businessCase = null, string? expectedBenefits = null, Dictionary<ProjectRole, HashSet<Guid>>? roles = null, HashSet<Guid>? strategicThemes = null)
     {
         if (Status is ProjectStatus.Active or ProjectStatus.Completed && dateRange is null)
         {
@@ -35,6 +35,8 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey<P
         Status = status;
         ExpenditureCategoryId = expenditureCategoryId;
         DateRange = dateRange;
+        BusinessCase = businessCase?.Trim();
+        ExpectedBenefits = expectedBenefits?.Trim();
 
         PortfolioId = portfolioId;
         ProgramId = programId;
@@ -66,13 +68,28 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey<P
     } = default!;
 
     /// <summary>
-    /// A detailed description of the project's purpose and scope.
+    /// A concise summary of what the project delivers and its scope.
+    /// Serves as the elevator pitch — what is being built or delivered.
     /// </summary>
     public string Description
     {
         get;
         private set => field = Guard.Against.NullOrWhiteSpace(value, nameof(Description)).Trim();
     } = default!;
+
+    /// <summary>
+    /// The strategic justification for the project — why it should be funded.
+    /// Captures the problem being solved or opportunity being pursued, the strategic rationale,
+    /// and key assumptions underpinning the investment decision.
+    /// </summary>
+    public string? BusinessCase { get; private set; }
+
+    /// <summary>
+    /// The specific, measurable outcomes expected upon successful delivery of the project.
+    /// Examples include revenue growth, cost savings, compliance achievement, or efficiency improvements.
+    /// Used to evaluate project success during and after completion.
+    /// </summary>
+    public string? ExpectedBenefits { get; private set; }
 
     /// <summary>
     /// The current status of the project.
@@ -169,10 +186,12 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey<P
     /// <param name="expenditureCategoryId">The new expenditure category ID to assign to the project.</param>
     /// <param name="timestamp">The timestamp indicating when the update occurred.</param>
     /// <returns></returns>
-    public Result UpdateDetails(string name, string description, int expenditureCategoryId, Instant timestamp)
+    public Result UpdateDetails(string name, string description, string? businessCase, string? expectedBenefits, int expenditureCategoryId, Instant timestamp)
     {
         Name = name;
         Description = description;
+        BusinessCase = businessCase?.Trim();
+        ExpectedBenefits = expectedBenefits?.Trim();
         ExpenditureCategoryId = expenditureCategoryId;
 
         AddDomainEvent(new ProjectDetailsUpdatedEvent(this, ExpenditureCategoryId, timestamp));
@@ -895,9 +914,9 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey<P
     /// <param name="strategicThemes"></param>
     /// <param name="timestamp"></param>
     /// <returns></returns>
-    internal static Project Create(string name, string description, ProjectKey key, int expenditureCategoryId, LocalDateRange? dateRange, Guid portfolioId, Guid? programId, Dictionary<ProjectRole, HashSet<Guid>>? roles, HashSet<Guid>? strategicThemes, Instant timestamp)
+    internal static Project Create(string name, string description, ProjectKey key, int expenditureCategoryId, LocalDateRange? dateRange, Guid portfolioId, Guid? programId, string? businessCase, string? expectedBenefits, Dictionary<ProjectRole, HashSet<Guid>>? roles, HashSet<Guid>? strategicThemes, Instant timestamp)
     {
-        var project = new Project(name, description, key, ProjectStatus.Proposed, expenditureCategoryId, dateRange, portfolioId, programId, roles, strategicThemes);
+        var project = new Project(name, description, key, ProjectStatus.Proposed, expenditureCategoryId, dateRange, portfolioId, programId, businessCase, expectedBenefits, roles, strategicThemes);
 
         project.AddPostPersistenceAction(() => project.AddDomainEvent(
             new ProjectCreatedEvent

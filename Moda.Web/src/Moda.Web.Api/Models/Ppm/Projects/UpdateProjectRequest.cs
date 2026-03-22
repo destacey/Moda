@@ -15,9 +15,22 @@ public sealed record UpdateProjectRequest
     public string Name { get; set; } = default!;
 
     /// <summary>
-    /// A detailed description of the project’s purpose.
+    /// A concise summary of what the project delivers and its scope.
+    /// Serves as the elevator pitch — what is being built or delivered.
     /// </summary>
     public string Description { get; set; } = default!;
+
+    /// <summary>
+    /// The strategic justification for the project — why it should be funded.
+    /// Captures the problem being solved or opportunity being pursued and the strategic rationale.
+    /// </summary>
+    public string? BusinessCase { get; set; }
+
+    /// <summary>
+    /// The specific, measurable outcomes expected upon successful delivery.
+    /// Examples: revenue growth, cost savings, compliance achievement, efficiency improvements.
+    /// </summary>
+    public string? ExpectedBenefits { get; set; }
 
     /// <summary>
     /// The ID of the expenditure category associated with the project.
@@ -63,7 +76,7 @@ public sealed record UpdateProjectRequest
     {
         var dateRange = Start is null || End is null ? null : new LocalDateRange((LocalDate)Start, (LocalDate)End);
 
-        return new UpdateProjectCommand(Id, Name, Description, ExpenditureCategoryId, dateRange, SponsorIds, OwnerIds, ManagerIds, MemberIds, StrategicThemeIds);
+        return new UpdateProjectCommand(Id, Name, Description, BusinessCase, ExpectedBenefits, ExpenditureCategoryId, dateRange, SponsorIds, OwnerIds, ManagerIds, MemberIds, StrategicThemeIds);
     }
 }
 
@@ -80,7 +93,13 @@ public sealed class UpdateProjectProjectRequestValidator : CustomValidator<Updat
 
         RuleFor(p => p.Description)
             .NotEmpty()
-            .MaximumLength(2048);
+            .MaximumLength(4096);
+
+        RuleFor(p => p.BusinessCase)
+            .MaximumLength(4096);
+
+        RuleFor(p => p.ExpectedBenefits)
+            .MaximumLength(4096);
 
         RuleFor(p => p.ExpenditureCategoryId)
             .GreaterThan(0);

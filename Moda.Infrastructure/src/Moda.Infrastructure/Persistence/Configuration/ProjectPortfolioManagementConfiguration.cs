@@ -167,7 +167,9 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
         builder.HasIndex(p => p.Status);
 
         builder.Property(p => p.Name).HasMaxLength(128).IsRequired();
-        builder.Property(p => p.Description).HasMaxLength(2048).IsRequired();
+        builder.Property(p => p.Description).HasMaxLength(4096).IsRequired();
+        builder.Property(p => p.BusinessCase).HasMaxLength(4096);
+        builder.Property(p => p.ExpectedBenefits).HasMaxLength(4096);
 
         // Value Object for Key
         builder.Property(p => p.Key).IsRequired()

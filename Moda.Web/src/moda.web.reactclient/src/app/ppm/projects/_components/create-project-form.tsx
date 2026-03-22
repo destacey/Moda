@@ -21,13 +21,24 @@ import {
 import { useCreateProjectMutation } from '@/src/store/features/ppm/projects-api'
 import { useGetStrategicThemeOptionsQuery } from '@/src/store/features/strategic-management/strategic-themes-api'
 import { toFormErrors } from '@/src/utils'
-import { Card, DatePicker, Form, Input, Modal, Select, Timeline, Typography } from 'antd'
+import { projectHelpText } from './project-help-text'
+import {
+  Card,
+  DatePicker,
+  Form,
+  Input,
+  Modal,
+  Select,
+  Timeline,
+  Typography,
+} from 'antd'
 import TextArea from 'antd/es/input/TextArea'
 import dayjs from 'dayjs'
 import { useCallback, useEffect, useMemo } from 'react'
 
 const { Item } = Form
 const { RangePicker } = DatePicker
+const { Text } = Typography
 
 export interface CreateProjectFormProps {
   onFormComplete: () => void
@@ -41,6 +52,8 @@ interface CreateProjectFormValues {
   key: string
   name: string
   description: string
+  businessCase?: string
+  expectedBenefits?: string
   expenditureCategoryId: number
   dateRange?: [dayjs.Dayjs, dayjs.Dayjs] | null
   sponsorIds: string[]
@@ -56,6 +69,8 @@ const mapToRequestValues = (
   return {
     name: values.name,
     description: values.description,
+    businessCase: values.businessCase || undefined,
+    expectedBenefits: values.expectedBenefits || undefined,
     key: values.key,
     expenditureCategoryId: values.expenditureCategoryId,
     start: (values.dateRange?.[0] as any)?.format('YYYY-MM-DD'),
@@ -81,10 +96,8 @@ const CreateProjectForm = ({
 
   const [createProject] = useCreateProjectMutation()
 
-  const {
-    data: lifecycleData,
-    error: lifecycleOptionsError,
-  } = useGetProjectLifecyclesQuery(ProjectLifecycleState.Active)
+  const { data: lifecycleData, error: lifecycleOptionsError } =
+    useGetProjectLifecyclesQuery(ProjectLifecycleState.Active)
 
   const lifecycleOptions = useMemo(() => {
     if (!lifecycleData) return []
@@ -96,15 +109,11 @@ const CreateProjectForm = ({
       }))
   }, [lifecycleData])
 
-  const {
-    data: expenditureData,
-    error: expenditureOptionsError,
-  } = useGetExpenditureCategoryOptionsQuery(false)
+  const { data: expenditureData, error: expenditureOptionsError } =
+    useGetExpenditureCategoryOptionsQuery(false)
 
-  const {
-    data: portfolioData,
-    error: portfolioOptionsError,
-  } = useGetPortfolioOptionsQuery()
+  const { data: portfolioData, error: portfolioOptionsError } =
+    useGetPortfolioOptionsQuery()
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<CreateProjectFormValues>({
@@ -116,8 +125,7 @@ const CreateProjectForm = ({
             if (response.error) throw response.error
 
             messageApi.success(
-              'Project created successfully. Project key: ' +
-                response.data.key,
+              'Project created successfully. Project key: ' + response.data.key,
             )
             return true
           } catch (error) {
@@ -143,22 +151,16 @@ const CreateProjectForm = ({
       permission: 'Permissions.Projects.Create',
     })
 
-  const {
-    data: programData,
-    error: programOptionsError,
-  } = useGetPortfolioProgramOptionsQuery(form.getFieldValue('portfolioId'), {
-    skip: !form.getFieldValue('portfolioId'),
-  })
+  const { data: programData, error: programOptionsError } =
+    useGetPortfolioProgramOptionsQuery(form.getFieldValue('portfolioId'), {
+      skip: !form.getFieldValue('portfolioId'),
+    })
 
-  const {
-    data: employeeData,
-    error: employeeOptionsError,
-  } = useGetEmployeeOptionsQuery(false)
+  const { data: employeeData, error: employeeOptionsError } =
+    useGetEmployeeOptionsQuery(false)
 
-  const {
-    data: strategicThemeData,
-    error: strategicThemeOptionsError,
-  } = useGetStrategicThemeOptionsQuery(false)
+  const { data: strategicThemeData, error: strategicThemeOptionsError } =
+    useGetStrategicThemeOptionsQuery(false)
 
   useEffect(() => {
     const firstError =
@@ -201,7 +203,9 @@ const CreateProjectForm = ({
           <>
             <Typography.Text strong>{phase.name}</Typography.Text>
             <br />
-            <Typography.Text type="secondary">{phase.description}</Typography.Text>
+            <Typography.Text type="secondary">
+              {phase.description}
+            </Typography.Text>
           </>
         ),
       }))
@@ -211,7 +215,7 @@ const CreateProjectForm = ({
     <Modal
       title="Create Project"
       open={isOpen}
-      width={'60vw'}
+      width="min(90vw, 900px)"
       onOk={handleOk}
       okButtonProps={{ disabled: !isValid }}
       okText="Create"
@@ -225,6 +229,7 @@ const CreateProjectForm = ({
         size="small"
         layout="vertical"
         name="create-project-form"
+        style={{ paddingTop: 16, paddingBottom: 16 }}
       >
         <Item
           name="portfolioId"
@@ -285,10 +290,29 @@ const CreateProjectForm = ({
           label="Description"
           rules={[
             { required: true, message: 'Description is required' },
-            { max: 2048 },
+            { max: 4096 },
           ]}
         >
-          <MarkdownEditor maxLength={2048} />
+          <Text type="secondary" style={{ fontSize: 12 }}>
+            {projectHelpText.description}
+          </Text>
+          <MarkdownEditor maxLength={4096} />
+        </Item>
+        <Item name="businessCase" label="Business Case" rules={[{ max: 4096 }]}>
+          <Text type="secondary" style={{ fontSize: 12 }}>
+            {projectHelpText.businessCase}
+          </Text>
+          <MarkdownEditor maxLength={4096} />
+        </Item>
+        <Item
+          name="expectedBenefits"
+          label="Expected Benefits"
+          rules={[{ max: 4096 }]}
+        >
+          <Text type="secondary" style={{ fontSize: 12 }}>
+            {projectHelpText.expectedBenefits}
+          </Text>
+          <MarkdownEditor maxLength={4096} />
         </Item>
         <Item
           name="expenditureCategoryId"
@@ -303,9 +327,7 @@ const CreateProjectForm = ({
             placeholder="Select Expenditure Category"
             optionFilterProp="children"
             filterOption={(input, option) =>
-              (option?.label?.toLowerCase() ?? '').includes(
-                input.toLowerCase(),
-              )
+              (option?.label?.toLowerCase() ?? '').includes(input.toLowerCase())
             }
           />
         </Item>
@@ -348,9 +370,7 @@ const CreateProjectForm = ({
             placeholder="Select Strategic Themes"
             optionFilterProp="label"
             filterOption={(input, option) =>
-              (option?.label?.toLowerCase() ?? '').includes(
-                input.toLowerCase(),
-              )
+              (option?.label?.toLowerCase() ?? '').includes(input.toLowerCase())
             }
           />
         </Item>

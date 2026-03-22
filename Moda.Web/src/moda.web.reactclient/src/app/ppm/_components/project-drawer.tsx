@@ -14,6 +14,7 @@ import { useMessage } from '@/src/components/contexts/messaging'
 import { useGetProjectQuery } from '@/src/store/features/ppm/projects-api'
 import { getDrawerWidthPixels, getSortedNameList } from '@/src/utils'
 import { Divider, Drawer, Flex, Tooltip } from 'antd'
+import { projectHelpText } from '../projects/_components/project-help-text'
 import Link from 'next/link'
 import { FC, useEffect, useMemo, useState } from 'react'
 
@@ -152,9 +153,25 @@ const ProjectDrawer: FC<ProjectDrawerProps> = ({
           <Divider size="small" />
 
           {projectData?.description && (
-            <LabeledContent label="Description">
+            <LabeledContent label="Description" tooltip={projectHelpText.description}>
               <ExpandableContent background="var(--ant-color-bg-elevated)">
                 <MarkdownRenderer markdown={projectData.description} />
+              </ExpandableContent>
+            </LabeledContent>
+          )}
+
+          {projectData?.businessCase && (
+            <LabeledContent label="Business Case" tooltip={projectHelpText.businessCase}>
+              <ExpandableContent background="var(--ant-color-bg-elevated)">
+                <MarkdownRenderer markdown={projectData.businessCase} />
+              </ExpandableContent>
+            </LabeledContent>
+          )}
+
+          {projectData?.expectedBenefits && (
+            <LabeledContent label="Expected Benefits" tooltip={projectHelpText.expectedBenefits}>
+              <ExpandableContent background="var(--ant-color-bg-elevated)">
+                <MarkdownRenderer markdown={projectData.expectedBenefits} />
               </ExpandableContent>
             </LabeledContent>
           )}

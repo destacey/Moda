@@ -20,10 +20,22 @@ public sealed record ProjectDetailsDto : IMapFrom<Project>
     public required string Name { get; set; }
 
     /// <summary>
-    /// A detailed description of the project's purpose and scope.
+    /// A concise summary of what the project delivers and its scope.
     /// </summary>
     public required string Description { get; set; }
-    
+
+    /// <summary>
+    /// The strategic justification for the project — why it should be funded.
+    /// Captures the problem being solved or opportunity being pursued and the strategic rationale.
+    /// </summary>
+    public string? BusinessCase { get; set; }
+
+    /// <summary>
+    /// The specific, measurable outcomes expected upon successful delivery.
+    /// Examples: revenue growth, cost savings, compliance achievement, efficiency improvements.
+    /// </summary>
+    public string? ExpectedBenefits { get; set; }
+
     /// <summary>
     /// The current status of the project.
     /// </summary>

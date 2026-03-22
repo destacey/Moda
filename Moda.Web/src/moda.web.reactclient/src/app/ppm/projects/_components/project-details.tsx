@@ -11,6 +11,7 @@ import { MarkdownRenderer } from '@/src/components/common/markdown'
 import TimelineProgress from '@/src/components/common/planning/timeline-progress'
 import { ProjectDetailsDto } from '@/src/services/moda-api'
 import { Card, Divider, Flex, Tooltip } from 'antd'
+import { projectHelpText } from './project-help-text'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { FC } from 'react'
@@ -117,9 +118,25 @@ const ProjectDetails: FC<ProjectDetailsProps> = ({ project }) => {
           <Divider size="small" />
 
           {project.description && (
-            <LabeledContent label="Description">
+            <LabeledContent label="Description" tooltip={projectHelpText.description}>
               <ExpandableContent>
                 <MarkdownRenderer markdown={project.description} />
+              </ExpandableContent>
+            </LabeledContent>
+          )}
+
+          {project.businessCase && (
+            <LabeledContent label="Business Case" tooltip={projectHelpText.businessCase}>
+              <ExpandableContent>
+                <MarkdownRenderer markdown={project.businessCase} />
+              </ExpandableContent>
+            </LabeledContent>
+          )}
+
+          {project.expectedBenefits && (
+            <LabeledContent label="Expected Benefits" tooltip={projectHelpText.expectedBenefits}>
+              <ExpandableContent>
+                <MarkdownRenderer markdown={project.expectedBenefits} />
               </ExpandableContent>
             </LabeledContent>
           )}
