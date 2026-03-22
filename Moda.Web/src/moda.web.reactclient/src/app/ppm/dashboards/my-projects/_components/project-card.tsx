@@ -33,9 +33,7 @@ const ProjectCard: FC<ProjectCardProps> = ({
     [project, employeeId],
   )
   const teamMembers = useMemo(() => collectTeamMembers(project), [project])
-  const endDate = project.end
-    ? dayjs(project.end).format('MMM D, YYYY')
-    : null
+  const endDate = project.end ? dayjs(project.end).format('MMM D, YYYY') : null
 
   return (
     <Card
@@ -68,11 +66,14 @@ const ProjectCard: FC<ProjectCardProps> = ({
 
         {/* Phase timeline */}
         {project.phases?.length > 0 && (
-          <PhaseTimeline phases={project.phases} size="small" />
+          <PhaseTimeline phases={project.phases} displayMode="small" />
         )}
 
         {/* Stat pills */}
-        <ProjectStatPills projectKey={project.key} employeeId={taskMetricsEmployeeId} />
+        <ProjectStatPills
+          projectKey={project.key}
+          employeeId={taskMetricsEmployeeId}
+        />
 
         {/* Footer: avatars + end date */}
         <div className={styles.cardFooter}>

@@ -108,13 +108,13 @@ Object.defineProperty(window, 'localStorage', {
 
 // Mock next/navigation
 jest.mock('next/navigation', () => ({
-  useRouter() {
-    return {
-      push: jest.fn(),
-      replace: jest.fn(),
-      prefetch: jest.fn(),
-    }
-  },
+  useRouter: () => ({
+    push: jest.fn(),
+    replace: jest.fn(),
+    prefetch: jest.fn(),
+  }),
+  usePathname: jest.fn(() => '/'),
+  useSearchParams: jest.fn(() => new URLSearchParams()),
 }))
 
 jest.mock('react-markdown', () => ({

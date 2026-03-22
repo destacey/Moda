@@ -18,7 +18,7 @@ export interface IterationProgressBarProps {
   /** Completed points/items */
   completed: number
   /** Size of the progress bar (default: 'small') */
-  size?: 'small' | 'default'
+  size?: 'small' | 'medium'
   /** Whether to show the percentage info (default: false) */
   showInfo?: boolean
 }

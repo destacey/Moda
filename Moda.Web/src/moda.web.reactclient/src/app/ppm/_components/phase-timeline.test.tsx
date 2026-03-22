@@ -127,7 +127,9 @@ describe('PhaseTimeline', () => {
 
     const { container } = render(<PhaseTimeline phases={phases} />)
 
-    expect(container.querySelector('.ant-steps-item-finish')).toBeInTheDocument()
+    expect(
+      container.querySelector('.ant-steps-item-finish'),
+    ).toBeInTheDocument()
   })
 
   it('renders in-progress phases with process status', () => {
@@ -195,7 +197,9 @@ describe('PhaseTimeline', () => {
 
     const { container } = render(<PhaseTimeline phases={phases} />)
 
-    expect(container.querySelector('.ant-steps-item-finish')).toBeInTheDocument()
+    expect(
+      container.querySelector('.ant-steps-item-finish'),
+    ).toBeInTheDocument()
     expect(
       container.querySelector('.ant-steps-item-process'),
     ).toBeInTheDocument()
@@ -215,7 +219,7 @@ describe('PhaseTimeline', () => {
       }),
     ]
 
-    render(<PhaseTimeline phases={phases} size="default" />)
+    render(<PhaseTimeline phases={phases} displayMode="default" />)
 
     expect(screen.getByText('Jan 15 - Mar 15, 2026')).toBeInTheDocument()
   })
@@ -230,7 +234,7 @@ describe('PhaseTimeline', () => {
       }),
     ]
 
-    render(<PhaseTimeline phases={phases} size="default" />)
+    render(<PhaseTimeline phases={phases} displayMode="default" />)
 
     expect(screen.getByText('45%')).toBeInTheDocument()
   })
@@ -244,7 +248,7 @@ describe('PhaseTimeline', () => {
       }),
     ]
 
-    render(<PhaseTimeline phases={phases} size="default" />)
+    render(<PhaseTimeline phases={phases} displayMode="default" />)
 
     expect(screen.queryByText(/Jan|Feb|Mar/)).not.toBeInTheDocument()
   })
@@ -259,7 +263,7 @@ describe('PhaseTimeline', () => {
       }),
     ]
 
-    render(<PhaseTimeline phases={phases} size="default" />)
+    render(<PhaseTimeline phases={phases} displayMode="default" />)
 
     expect(screen.getByText('Starts Feb 1, 2026')).toBeInTheDocument()
   })
@@ -274,7 +278,7 @@ describe('PhaseTimeline', () => {
       }),
     ]
 
-    render(<PhaseTimeline phases={phases} size="default" />)
+    render(<PhaseTimeline phases={phases} displayMode="default" />)
 
     expect(screen.getByText('Ends Jun 30, 2026')).toBeInTheDocument()
   })
@@ -293,11 +297,9 @@ describe('PhaseTimeline', () => {
       }),
     ]
 
-    render(<PhaseTimeline phases={phases} size="small" />)
+    render(<PhaseTimeline phases={phases} displayMode="small" />)
 
-    expect(
-      screen.queryByText('Jan 15 - Mar 15, 2026'),
-    ).not.toBeInTheDocument()
+    expect(screen.queryByText('Jan 15 - Mar 15, 2026')).not.toBeInTheDocument()
     expect(screen.queryByText('45%')).not.toBeInTheDocument()
   })
 
@@ -313,14 +315,12 @@ describe('PhaseTimeline', () => {
       }),
     ]
 
-    render(<PhaseTimeline phases={phases} size="small" />)
+    render(<PhaseTimeline phases={phases} displayMode="small" />)
 
     await userEvent.hover(screen.getByText('Discovery'))
 
     expect(await screen.findByText('In Progress')).toBeInTheDocument()
-    expect(
-      await screen.findByText('Jan 15 - Mar 15, 2026'),
-    ).toBeInTheDocument()
+    expect(await screen.findByText('Jan 15 - Mar 15, 2026')).toBeInTheDocument()
     expect(await screen.findByText('Progress: 45%')).toBeInTheDocument()
   })
 
@@ -338,7 +338,7 @@ describe('PhaseTimeline', () => {
       }),
     ]
 
-    render(<PhaseTimeline phases={phases} size="default" />)
+    render(<PhaseTimeline phases={phases} displayMode="default" />)
 
     await userEvent.hover(screen.getByText('Discovery'))
 
@@ -379,9 +379,7 @@ describe('PhaseTimeline', () => {
       const { container } = render(<PhaseTimeline phases={threePhases} />)
       triggerResize(150)
 
-      expect(
-        container.querySelector('.ant-steps-vertical'),
-      ).toBeInTheDocument()
+      expect(container.querySelector('.ant-steps-vertical')).toBeInTheDocument()
     })
 
     it('shows inline content in vertical mode', () => {
@@ -407,14 +405,12 @@ describe('PhaseTimeline', () => {
       const { container } = render(<PhaseTimeline phases={threePhases} />)
       triggerResize(800) // container is wide, but page is narrow
 
-      expect(
-        container.querySelector('.ant-steps-vertical'),
-      ).toBeInTheDocument()
+      expect(container.querySelector('.ant-steps-vertical')).toBeInTheDocument()
     })
 
     it('skips auto-detection when size is explicitly set', () => {
       const { container } = render(
-        <PhaseTimeline phases={threePhases} size="small" />,
+        <PhaseTimeline phases={threePhases} displayMode="small" />,
       )
       triggerResize(800)
 
@@ -433,9 +429,7 @@ describe('PhaseTimeline', () => {
       const { container } = render(<PhaseTimeline phases={sixPhases} />)
       triggerResize(400)
 
-      expect(
-        container.querySelector('.ant-steps-vertical'),
-      ).toBeInTheDocument()
+      expect(container.querySelector('.ant-steps-vertical')).toBeInTheDocument()
     })
 
     it('stays horizontal for few phases at same width', () => {

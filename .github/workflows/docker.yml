@@ -59,8 +59,8 @@ jobs:
             - name: npm run build
               run: npm run build
 
-            - name: npm run test
-              run: npm run test
+            - name: npm run test:coverage
+              run: npm run test:coverage
 
     build-and-push-image:
         runs-on: ubuntu-latest

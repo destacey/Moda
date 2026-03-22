@@ -163,7 +163,7 @@ describe('IterationProgressBar', () => {
     })
 
     const { container } = render(
-      <IterationProgressBar {...baseProps} size="default" />,
+      <IterationProgressBar {...baseProps} size="medium" />,
     )
 
     const progress = container.querySelector('.ant-progress')
