@@ -14,14 +14,13 @@ import {
 import { useGetStrategicThemeOptionsQuery } from '@/src/store/features/strategic-management/strategic-themes-api'
 import { toFormErrors } from '@/src/utils'
 import { projectHelpText } from './project-help-text'
-import { DatePicker, Form, Modal, Select, Typography } from 'antd'
+import { DatePicker, Form, Modal, Select } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
 import dayjs from 'dayjs'
 import { useCallback, useEffect } from 'react'
 
 const { Item } = Form
 const { RangePicker } = DatePicker
-const { Text } = Typography
 
 export interface EditProjectFormProps {
   projectKey: string
@@ -210,30 +209,28 @@ const EditProjectForm = ({
         <Item
           name="description"
           label="Description"
+          extra={projectHelpText.description}
           rules={[
             { required: true, message: 'Description is required' },
             { max: 4096 },
           ]}
         >
-          <Text type="secondary" style={{ fontSize: 12 }}>
-            {projectHelpText.description}
-          </Text>
           <MarkdownEditor maxLength={4096} />
         </Item>
-        <Item name="businessCase" label="Business Case" rules={[{ max: 4096 }]}>
-          <Text type="secondary" style={{ fontSize: 12 }}>
-            {projectHelpText.businessCase}
-          </Text>
+        <Item
+          name="businessCase"
+          label="Business Case"
+          extra={projectHelpText.businessCase}
+          rules={[{ max: 4096 }]}
+        >
           <MarkdownEditor maxLength={4096} />
         </Item>
         <Item
           name="expectedBenefits"
           label="Expected Benefits"
+          extra={projectHelpText.expectedBenefits}
           rules={[{ max: 4096 }]}
         >
-          <Text type="secondary" style={{ fontSize: 12 }}>
-            {projectHelpText.expectedBenefits}
-          </Text>
           <MarkdownEditor maxLength={4096} />
         </Item>
         <Item

@@ -38,7 +38,6 @@ import { useCallback, useEffect, useMemo } from 'react'
 
 const { Item } = Form
 const { RangePicker } = DatePicker
-const { Text } = Typography
 
 export interface CreateProjectFormProps {
   onFormComplete: () => void
@@ -288,30 +287,28 @@ const CreateProjectForm = ({
         <Item
           name="description"
           label="Description"
+          extra={projectHelpText.description}
           rules={[
             { required: true, message: 'Description is required' },
             { max: 4096 },
           ]}
         >
-          <Text type="secondary" style={{ fontSize: 12 }}>
-            {projectHelpText.description}
-          </Text>
           <MarkdownEditor maxLength={4096} />
         </Item>
-        <Item name="businessCase" label="Business Case" rules={[{ max: 4096 }]}>
-          <Text type="secondary" style={{ fontSize: 12 }}>
-            {projectHelpText.businessCase}
-          </Text>
+        <Item
+          name="businessCase"
+          label="Business Case"
+          extra={projectHelpText.businessCase}
+          rules={[{ max: 4096 }]}
+        >
           <MarkdownEditor maxLength={4096} />
         </Item>
         <Item
           name="expectedBenefits"
           label="Expected Benefits"
+          extra={projectHelpText.expectedBenefits}
           rules={[{ max: 4096 }]}
         >
-          <Text type="secondary" style={{ fontSize: 12 }}>
-            {projectHelpText.expectedBenefits}
-          </Text>
           <MarkdownEditor maxLength={4096} />
         </Item>
         <Item
