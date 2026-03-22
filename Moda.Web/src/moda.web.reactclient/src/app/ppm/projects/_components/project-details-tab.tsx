@@ -1,5 +1,6 @@
 import PhaseTimeline from '../../_components/phase-timeline'
 import { ProjectDetailsDto } from '@/src/services/moda-api'
+import { useGetProjectPlanSummaryQuery } from '@/src/store/features/ppm/projects-api'
 import { Col, Flex, Row, Typography } from 'antd'
 import { ProjectDetails } from '.'
 import ProjectTaskMetrics from './project-task-metrics'
@@ -13,6 +14,12 @@ export interface ProjectDetailsTabProps {
 }
 
 const ProjectDetailsTab: FC<ProjectDetailsTabProps> = ({ project }) => {
+  const { data: planSummary } = useGetProjectPlanSummaryQuery(
+    { projectKey: project?.key },
+    { skip: !project?.phases?.length },
+  )
+  const hasTasks = (planSummary?.totalLeafTasks ?? 0) > 0
+
   if (!project) return null
 
   return (
@@ -27,10 +34,14 @@ const ProjectDetailsTab: FC<ProjectDetailsTabProps> = ({ project }) => {
               <Text strong>Phases</Text>
             </Flex>
             <PhaseTimeline phases={project.phases} />
-            <Flex align="center" gap={8}>
-              <Text strong>Task Summary</Text>
-            </Flex>
-            <ProjectTaskMetrics projectKey={project.key} />
+            {hasTasks && (
+              <>
+                <Flex align="center" gap={8}>
+                  <Text strong>Task Summary</Text>
+                </Flex>
+                <ProjectTaskMetrics projectKey={project.key} />
+              </>
+            )}
           </Flex>
         )}
 
@@ -43,4 +54,3 @@ const ProjectDetailsTab: FC<ProjectDetailsTabProps> = ({ project }) => {
 }
 
 export default ProjectDetailsTab
-
