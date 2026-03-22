@@ -4,7 +4,7 @@ using Moda.ProjectPortfolioManagement.Domain.Models;
 
 namespace Moda.ProjectPortfolioManagement.Application.Projects.Commands;
 
-public sealed record UpdateProjectCommand(Guid Id, string Name, string Description, int ExpenditureCategoryId, LocalDateRange? DateRange, List<Guid>? SponsorIds, List<Guid>? OwnerIds, List<Guid>? ManagerIds, List<Guid>? MemberIds, List<Guid>? StrategicThemeIds) : ICommand;
+public sealed record UpdateProjectCommand(Guid Id, string Name, string Description, string? BusinessCase, string? ExpectedBenefits, int ExpenditureCategoryId, LocalDateRange? DateRange, List<Guid>? SponsorIds, List<Guid>? OwnerIds, List<Guid>? ManagerIds, List<Guid>? MemberIds, List<Guid>? StrategicThemeIds) : ICommand;
 
 public sealed class UpdateProjectCommandValidator : AbstractValidator<UpdateProjectCommand>
 {
@@ -19,7 +19,13 @@ public sealed class UpdateProjectCommandValidator : AbstractValidator<UpdateProj
 
         RuleFor(x => x.Description)
             .NotEmpty()
-            .MaximumLength(2048);
+            .MaximumLength(4096);
+
+        RuleFor(x => x.BusinessCase)
+            .MaximumLength(4096);
+
+        RuleFor(x => x.ExpectedBenefits)
+            .MaximumLength(4096);
 
         RuleFor(x => x.ExpenditureCategoryId)
             .GreaterThan(0);
@@ -75,6 +81,8 @@ internal sealed class UpdateProjectCommandHandler(
             var updateResult = project.UpdateDetails(
                 request.Name,
                 request.Description,
+                request.BusinessCase,
+                request.ExpectedBenefits,
                 request.ExpenditureCategoryId,
                 _dateTimeProvider.Now
             );

@@ -3,11 +3,9 @@
 import { ModaDateRange } from '@/src/components/common'
 import {
   ContentList,
-  ExpandableContent,
   LabeledContent,
 } from '@/src/components/common/content'
 import LinksCard from '@/src/components/common/links/links-card'
-import { MarkdownRenderer } from '@/src/components/common/markdown'
 import TimelineProgress from '@/src/components/common/planning/timeline-progress'
 import { ProjectDetailsDto } from '@/src/services/moda-api'
 import { Card, Divider, Flex, Tooltip } from 'antd'
@@ -114,15 +112,6 @@ const ProjectDetails: FC<ProjectDetailsProps> = ({ project }) => {
             <ContentList items={memberNames} emptyText="No members assigned" />
           </LabeledContent>
 
-          <Divider size="small" />
-
-          {project.description && (
-            <LabeledContent label="Description">
-              <ExpandableContent>
-                <MarkdownRenderer markdown={project.description} />
-              </ExpandableContent>
-            </LabeledContent>
-          )}
         </Flex>
 
         {hasStarted && (

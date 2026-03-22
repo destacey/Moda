@@ -8,11 +8,11 @@ import PpmFilterBar from './ppm-filter-bar'
 export interface ProjectsFilterBarProps {
   selectedStatuses: number[]
   onStatusChange: (statuses: number[]) => void
-  selectedPortfolioId?: string | undefined
-  onPortfolioChange?: (portfolioId: string | undefined) => void
+  selectedPortfolioId?: string | null
+  onPortfolioChange?: (portfolioId: string | null) => void
   showPortfolioFilter?: boolean
-  selectedRole?: string | undefined
-  onRoleChange?: (role: string | undefined) => void
+  selectedRole?: string | null
+  onRoleChange?: (role: string | null) => void
   showRoleFilter?: boolean
   onReset?: () => void
 }

@@ -6,7 +6,7 @@ using Moda.ProjectPortfolioManagement.Domain.Enums;
 
 namespace Moda.ProjectPortfolioManagement.Application.Projects.Commands;
 
-public sealed record CreateProjectCommand(string Name, string Description, ProjectKey Key, int ExpenditureCategoryId, LocalDateRange? DateRange, Guid PortfolioId, Guid? ProgramId, Guid? ProjectLifecycleId, List<Guid>? SponsorIds, List<Guid>? OwnerIds, List<Guid>? ManagerIds, List<Guid>? MemberIds, List<Guid>? StrategicThemeIds) : ICommand<ProjectIdAndKey>;
+public sealed record CreateProjectCommand(string Name, string Description, string? BusinessCase, string? ExpectedBenefits, ProjectKey Key, int ExpenditureCategoryId, LocalDateRange? DateRange, Guid PortfolioId, Guid? ProgramId, Guid? ProjectLifecycleId, List<Guid>? SponsorIds, List<Guid>? OwnerIds, List<Guid>? ManagerIds, List<Guid>? MemberIds, List<Guid>? StrategicThemeIds) : ICommand<ProjectIdAndKey>;
 
 public sealed class CreateProjectCommandValidator : AbstractValidator<CreateProjectCommand>
 {
@@ -18,7 +18,13 @@ public sealed class CreateProjectCommandValidator : AbstractValidator<CreateProj
 
         RuleFor(x => x.Description)
             .NotEmpty()
-            .MaximumLength(2048);
+            .MaximumLength(4096);
+
+        RuleFor(x => x.BusinessCase)
+            .MaximumLength(4096);
+
+        RuleFor(x => x.ExpectedBenefits)
+            .MaximumLength(4096);
 
         RuleFor(x => x.Key)
             .NotEmpty()
@@ -126,6 +132,8 @@ internal sealed class CreateProjectCommandHandler(
                 request.ExpenditureCategoryId,
                 request.DateRange,
                 request.ProgramId,
+                request.BusinessCase,
+                request.ExpectedBenefits,
                 roles,
                 [.. strategicThemes.Select(st => st.Id)],
                 _dateTimeProvider.Now

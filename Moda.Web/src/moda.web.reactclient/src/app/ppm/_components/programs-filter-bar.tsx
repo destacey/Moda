@@ -8,8 +8,8 @@ import PpmFilterBar from './ppm-filter-bar'
 export interface ProgramsFilterBarProps {
   selectedStatuses: number[]
   onStatusChange: (statuses: number[]) => void
-  selectedPortfolioId?: string | undefined
-  onPortfolioChange?: (portfolioId: string | undefined) => void
+  selectedPortfolioId?: string | null
+  onPortfolioChange?: (portfolioId: string | null) => void
   showPortfolioFilter?: boolean
 }
 

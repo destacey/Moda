@@ -23803,6 +23803,8 @@ export interface ProjectDetailsDto {
     key: string;
     name: string;
     description: string;
+    businessCase?: string | undefined;
+    expectedBenefits?: string | undefined;
     status: LifecycleNavigationDto;
     expenditureCategory: SimpleNavigationDto;
     start?: Date | undefined;
@@ -23831,8 +23833,15 @@ export interface DescriptiveNavigationDto extends DescriptiveNavigationDtoOfGuid
 export interface CreateProjectRequest {
     /** The name of the project. */
     name: string;
-    /** A detailed description of the project's purpose. */
+    /** A concise summary of what the project delivers and its scope.
+Serves as the elevator pitch — what is being built or delivered. */
     description: string;
+    /** The strategic justification for the project — why it should be funded.
+Captures the problem being solved or opportunity being pursued and the strategic rationale. */
+    businessCase?: string | undefined;
+    /** The specific, measurable outcomes expected upon successful delivery.
+Examples: revenue growth, cost savings, compliance achievement, efficiency improvements. */
+    expectedBenefits?: string | undefined;
     /** The unique key for the project (2-20 uppercase alphanumeric characters). */
     key: string;
     /** The ID of the expenditure category associated with the project. */
@@ -23864,8 +23873,15 @@ export interface UpdateProjectRequest {
     id: string;
     /** The name of the project. */
     name: string;
-    /** A detailed description of the project’s purpose. */
+    /** A concise summary of what the project delivers and its scope.
+Serves as the elevator pitch — what is being built or delivered. */
     description: string;
+    /** The strategic justification for the project — why it should be funded.
+Captures the problem being solved or opportunity being pursued and the strategic rationale. */
+    businessCase?: string | undefined;
+    /** The specific, measurable outcomes expected upon successful delivery.
+Examples: revenue growth, cost savings, compliance achievement, efficiency improvements. */
+    expectedBenefits?: string | undefined;
     /** The ID of the expenditure category associated with the project. */
     expenditureCategoryId: number;
     /** The Project start date. */

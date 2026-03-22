@@ -315,11 +315,13 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, IHasI
     /// <param name="expenditureCategory">The Id of the expenditure category associated with the project.</param>
     /// <param name="dateRange">The date range of the project.</param>
     /// <param name="programId">The Id of the program the project should be associated with (optional).</param>
+    /// <param name="businessCase">The strategic justification for the project (optional).</param>
+    /// <param name="expectedBenefits">The measurable outcomes expected from the project (optional).</param>
     /// <param name="roles">The roles associated with the project (optional).</param>
     /// <param name="strategicThemes">The strategic themes associated with the project (optional).</param>
     /// <param name="timestamp"></param>
     /// <returns>A result containing the created project or an error.</returns>
-    public Result<Project> CreateProject(string name, string description, ProjectKey key, int expenditureCategory, LocalDateRange? dateRange, Guid? programId, Dictionary<ProjectRole, HashSet<Guid>>? roles, HashSet<Guid>? strategicThemes, Instant timestamp)
+    public Result<Project> CreateProject(string name, string description, ProjectKey key, int expenditureCategory, LocalDateRange? dateRange, Guid? programId, string? businessCase, string? expectedBenefits, Dictionary<ProjectRole, HashSet<Guid>>? roles, HashSet<Guid>? strategicThemes, Instant timestamp)
     {
         if (!IsActive)
         {
@@ -343,7 +345,7 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, IHasI
         }
 
         // Create the project
-        var project = Project.Create(name, description, key, expenditureCategory, dateRange, Id, programId, roles, strategicThemes, timestamp);
+        var project = Project.Create(name, description, key, expenditureCategory, dateRange, Id, programId, businessCase, expectedBenefits, roles, strategicThemes, timestamp);
 
         // Add the project to the portfolio's project list
         _projects.Add(project);

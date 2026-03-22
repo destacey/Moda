@@ -568,6 +568,10 @@ const ProjectPlanTable = ({
     ) => {
       const isDraft = rowId.startsWith('draft-')
       const values = formValues as any
+      const completedStatusValue = taskStatusOptions.find(
+        (opt) => opt.label === 'Completed',
+      )?.value
+      const isCompleted = values.statusId === completedStatusValue
 
       if (isDraft) {
         const updates: Record<string, any> = {
@@ -593,7 +597,7 @@ const ProjectPlanTable = ({
             ? values.plannedEnd.format('YYYY-MM-DD')
             : null
           updates.plannedDate = null
-          updates.progress = values.progress ?? 0
+          updates.progress = isCompleted ? 100 : (values.progress ?? 0)
           updates.estimatedEffortHours = values.estimatedEffortHours
             ? Number(values.estimatedEffortHours)
             : null
@@ -661,8 +665,9 @@ const ProjectPlanTable = ({
         hasChanges = true
       }
 
-      if (values.progress !== task.progress) {
-        updates.progress = values.progress
+      const effectiveProgress = isCompleted ? 100 : values.progress
+      if (effectiveProgress !== task.progress) {
+        updates.progress = effectiveProgress
         hasChanges = true
       }
 
@@ -675,7 +680,7 @@ const ProjectPlanTable = ({
 
       return hasChanges ? updates : null
     },
-    [isSelectedRowMilestone],
+    [isSelectedRowMilestone, taskStatusOptions],
   )
 
   const validateFields = useCallback(

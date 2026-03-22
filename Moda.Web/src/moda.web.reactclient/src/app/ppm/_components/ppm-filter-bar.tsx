@@ -11,10 +11,10 @@ export interface PpmFilterBarProps {
   selectedStatuses: number[]
   onStatusChange: (statuses: number[]) => void
   portfolioOptions?: BaseOptionType[] | undefined
-  selectedPortfolioId?: string | undefined
-  onPortfolioChange?: (portfolioId: string | undefined) => void
-  selectedRole?: string | undefined
-  onRoleChange?: (role: string | undefined) => void
+  selectedPortfolioId?: string | null
+  onPortfolioChange?: (portfolioId: string | null) => void
+  selectedRole?: string | null
+  onRoleChange?: (role: string | null) => void
   showRoleFilter?: boolean
   onReset?: () => void
   loading?: boolean
@@ -70,7 +70,7 @@ const PpmFilterBar: FC<PpmFilterBarProps> = (props) => {
               size="small"
               allowClear
               value={props.selectedPortfolioId}
-              onChange={(value) => props.onPortfolioChange(value)}
+              onChange={(value) => props.onPortfolioChange(value ?? null)}
               options={props.portfolioOptions}
               className={styles.portfolioSelect}
               popupMatchSelectWidth={false}
@@ -112,7 +112,7 @@ const PpmFilterBar: FC<PpmFilterBarProps> = (props) => {
               size="small"
               allowClear
               value={props.selectedRole}
-              onChange={(value) => props.onRoleChange(value)}
+              onChange={(value) => props.onRoleChange(value ?? null)}
               options={ROLE_OPTIONS}
               className={styles.roleSelect}
               popupMatchSelectWidth={false}

@@ -11,9 +11,22 @@ public sealed record CreateProjectRequest
     public string Name { get; set; } = default!;
 
     /// <summary>
-    /// A detailed description of the project's purpose.
+    /// A concise summary of what the project delivers and its scope.
+    /// Serves as the elevator pitch — what is being built or delivered.
     /// </summary>
     public string Description { get; set; } = default!;
+
+    /// <summary>
+    /// The strategic justification for the project — why it should be funded.
+    /// Captures the problem being solved or opportunity being pursued and the strategic rationale.
+    /// </summary>
+    public string? BusinessCase { get; set; }
+
+    /// <summary>
+    /// The specific, measurable outcomes expected upon successful delivery.
+    /// Examples: revenue growth, cost savings, compliance achievement, efficiency improvements.
+    /// </summary>
+    public string? ExpectedBenefits { get; set; }
 
     /// <summary>
     /// The unique key for the project (2-20 uppercase alphanumeric characters).
@@ -79,7 +92,7 @@ public sealed record CreateProjectRequest
     {
         var dateRange = Start is null || End is null ? null : new LocalDateRange((LocalDate)Start, (LocalDate)End);
 
-        return new CreateProjectCommand(Name, Description, new ProjectKey(Key), ExpenditureCategoryId, dateRange, PortfolioId, ProgramId, ProjectLifecycleId, SponsorIds, OwnerIds, ManagerIds, MemberIds, StrategicThemeIds);
+        return new CreateProjectCommand(Name, Description, BusinessCase, ExpectedBenefits, new ProjectKey(Key), ExpenditureCategoryId, dateRange, PortfolioId, ProgramId, ProjectLifecycleId, SponsorIds, OwnerIds, ManagerIds, MemberIds, StrategicThemeIds);
     }
 }
 
@@ -93,7 +106,13 @@ public sealed class CreateProjectRequestValidator : CustomValidator<CreateProjec
 
         RuleFor(p => p.Description)
             .NotEmpty()
-            .MaximumLength(2048);
+            .MaximumLength(4096);
+
+        RuleFor(p => p.BusinessCase)
+            .MaximumLength(4096);
+
+        RuleFor(p => p.ExpectedBenefits)
+            .MaximumLength(4096);
 
         RuleFor(p => p.Key)
             .NotNull()

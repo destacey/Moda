@@ -32,4 +32,34 @@ describe('LabeledContent', () => {
     expect(screen.getByText('Alpha')).toBeInTheDocument()
     expect(screen.getByText('Beta')).toBeInTheDocument()
   })
+
+  it('renders label without tooltip when tooltip is not provided', () => {
+    render(<LabeledContent label="Status">value</LabeledContent>)
+    const label = screen.getByText('Status')
+    expect(label).toBeInTheDocument()
+    expect(label).not.toHaveStyle({ cursor: 'help' })
+  })
+
+  it('renders label with help cursor when tooltip is provided', () => {
+    render(
+      <LabeledContent label="Description" tooltip="Some help text">
+        value
+      </LabeledContent>,
+    )
+    const label = screen.getByText('Description')
+    expect(label).toBeInTheDocument()
+    expect(label).toHaveStyle({ cursor: 'help' })
+  })
+
+  it('wraps label in tooltip when tooltip is provided', () => {
+    render(
+      <LabeledContent label="Business Case" tooltip="Why this project matters">
+        value
+      </LabeledContent>,
+    )
+    // The label should still render
+    expect(screen.getByText('Business Case')).toBeInTheDocument()
+    // The tooltip text is not visible until hover, but the label should have cursor: help
+    expect(screen.getByText('Business Case')).toHaveStyle({ cursor: 'help' })
+  })
 })

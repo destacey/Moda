@@ -37,7 +37,7 @@ public class CreateProjectCommandHandlerTests : IDisposable
         _dbContext.AddPortfolio(portfolio);
 
         var command = new CreateProjectCommand(
-            "Test Project", "Description", new ProjectKey("TEST"), 999,
+            "Test Project", "Description", null, null, new ProjectKey("TEST"), 999,
             null, portfolio.Id, null, null, null, null, null, null, null);
 
         // Act
@@ -59,7 +59,7 @@ public class CreateProjectCommandHandlerTests : IDisposable
         _dbContext.AddExpenditureCategory(expenditureCategory);
 
         var command = new CreateProjectCommand(
-            "Test Project", "Description", new ProjectKey("TEST"), expenditureCategory.Id,
+            "Test Project", "Description", null, null, new ProjectKey("TEST"), expenditureCategory.Id,
             null, portfolio.Id, null, null, null, null, null, null, null);
 
         // Act
@@ -79,7 +79,7 @@ public class CreateProjectCommandHandlerTests : IDisposable
         _dbContext.AddExpenditureCategory(expenditureCategory);
 
         var command = new CreateProjectCommand(
-            "Test Project", "Description", new ProjectKey("TEST"), expenditureCategory.Id,
+            "Test Project", "Description", null, null, new ProjectKey("TEST"), expenditureCategory.Id,
             null, Guid.NewGuid(), null, null, null, null, null, null, null);
 
         // Act
@@ -101,7 +101,7 @@ public class CreateProjectCommandHandlerTests : IDisposable
         _dbContext.AddExpenditureCategory(expenditureCategory);
 
         var command = new CreateProjectCommand(
-            "Test Project", "Description", new ProjectKey("TEST"), expenditureCategory.Id,
+            "Test Project", "Description", null, null, new ProjectKey("TEST"), expenditureCategory.Id,
             null, portfolio.Id, null, null, null, null, null, null, null);
 
         // Act
@@ -128,7 +128,7 @@ public class CreateProjectCommandHandlerTests : IDisposable
         _dbContext.AddProjectLifecycle(lifecycle);
 
         var command = new CreateProjectCommand(
-            "Test Project", "Description", new ProjectKey("TEST"), expenditureCategory.Id,
+            "Test Project", "Description", null, null, new ProjectKey("TEST"), expenditureCategory.Id,
             null, portfolio.Id, null, lifecycle.Id, null, null, null, null, null);
 
         // Act
@@ -154,7 +154,7 @@ public class CreateProjectCommandHandlerTests : IDisposable
         _dbContext.AddExpenditureCategory(expenditureCategory);
 
         var command = new CreateProjectCommand(
-            "Test Project", "Description", new ProjectKey("TEST"), expenditureCategory.Id,
+            "Test Project", "Description", null, null, new ProjectKey("TEST"), expenditureCategory.Id,
             null, portfolio.Id, null, Guid.NewGuid(), null, null, null, null, null);
 
         // Act
@@ -178,7 +178,7 @@ public class CreateProjectCommandHandlerTests : IDisposable
         _dbContext.AddProjectLifecycle(lifecycle);
 
         var command = new CreateProjectCommand(
-            "Test Project", "Description", new ProjectKey("TEST"), expenditureCategory.Id,
+            "Test Project", "Description", null, null, new ProjectKey("TEST"), expenditureCategory.Id,
             null, portfolio.Id, null, lifecycle.Id, null, null, null, null, null);
 
         // Act

@@ -74,7 +74,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   }
 
   return (
-    <ConfigProvider theme={currentTheme} modal={{ closable: true }}>
+    <ConfigProvider theme={currentTheme} modal={{ closable: true, mask: { closable: false } }}>
       <ThemeContent>{children}</ThemeContent>
     </ConfigProvider>
   )

@@ -129,7 +129,11 @@ const ChangeProjectStatusForm = ({
       title={`Are you sure you want to ${statusAction} this Project?`}
       open={isOpen}
       onOk={handleOk}
-      okText={statusAction}
+      okText={
+        statusAction === ProjectStatusAction.Cancel
+          ? 'Cancel Project'
+          : statusAction
+      }
       confirmLoading={isSaving}
       onCancel={handleCancel}
       keyboard={false} // disable esc key to close modal
