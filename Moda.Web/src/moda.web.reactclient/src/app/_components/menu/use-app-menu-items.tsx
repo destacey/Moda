@@ -10,6 +10,7 @@ import {
   FundOutlined,
 } from '@ant-design/icons'
 import {
+  buildRouteKeyMap,
   filterAndTransformMenuItem,
   Item,
   menuItem,
@@ -157,16 +158,29 @@ const useAppMenuItems = () => {
   const { hasClaim } = useAuth()
   const { isEnabled: planningPoker } = useFeatureFlag('planning-poker')
 
+  const items = useMemo(
+    () => buildMenuItems({ planningPoker }),
+    [planningPoker],
+  )
+
   const filteredMenuItems = useMemo(
     () =>
-      buildMenuItems({ planningPoker }).reduce(
+      items.reduce(
         (acc, item) => filterAndTransformMenuItem(acc, item, hasClaim),
         [] as ItemType<MenuItemType>[],
       ),
-    [hasClaim, planningPoker],
+    [items, hasClaim],
   )
 
-  return filteredMenuItems
+  const routeKeyMap = useMemo(
+    () =>
+      buildRouteKeyMap(
+        items.filter((item): item is Item => 'display' in item),
+      ),
+    [items],
+  )
+
+  return { menuItems: filteredMenuItems, routeKeyMap }
 }
 
 export default useAppMenuItems

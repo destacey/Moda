@@ -96,6 +96,84 @@ function getItem(
   } as MenuItem
 }
 
+export const buildRouteKeyMap = (items: Item[]): Map<string, string> => {
+  const map = new Map<string, string>()
+  for (const item of items) {
+    if (item.route) {
+      map.set(item.route, item.key)
+    }
+    if (item.children) {
+      const childItems = item.children.filter(
+        (child): child is Item => 'display' in child,
+      )
+      const childMap = buildRouteKeyMap(childItems)
+      childMap.forEach((value, key) => map.set(key, value))
+    }
+  }
+  return map
+}
+
+const countSharedSegments = (pathname: string, route: string): number => {
+  const pathSegments = pathname.split('/').filter(Boolean)
+  const routeSegments = route.split('/').filter(Boolean)
+  let count = 0
+  for (let i = 0; i < Math.min(pathSegments.length, routeSegments.length); i++) {
+    if (pathSegments[i] === routeSegments[i]) {
+      count++
+    } else {
+      break
+    }
+  }
+  return count
+}
+
+export const findMenuKeysByPathname = (
+  pathname: string,
+  routeKeyMap: Map<string, string>,
+): { selectedKeys: string[]; openKeys: string[] } => {
+  let bestScore = 0
+  let bestKey = ''
+  let exactMatch = false
+
+  for (const [route, key] of routeKeyMap) {
+    if (route === '/') {
+      if (pathname === '/') {
+        return { selectedKeys: [key], openKeys: [] }
+      }
+      continue
+    }
+
+    // Exact match or full route prefix match (e.g. /ppm/projects matches /ppm/projects/X)
+    if (pathname === route || pathname.startsWith(route + '/')) {
+      const score = route.split('/').filter(Boolean).length
+      if (!exactMatch || score > bestScore) {
+        bestScore = score
+        bestKey = key
+        exactMatch = true
+      }
+    } else if (!exactMatch) {
+      // Segment-based match (e.g. /organizations/team-of-teams → /organizations/teams)
+      const shared = countSharedSegments(pathname, route)
+      if (shared > 0 && shared > bestScore) {
+        bestScore = shared
+        bestKey = key
+      }
+    }
+  }
+
+  if (!bestKey) {
+    return { selectedKeys: [], openKeys: [] }
+  }
+
+  const openKeys: string[] = []
+  const parts = bestKey.split('.')
+  if (parts.length > 1) {
+    openKeys.push(parts[0])
+  }
+
+  return { selectedKeys: [bestKey], openKeys }
+}
+
 export const filterAndTransformMenuItem = (
   acc: ItemType<MenuItemType>[],
   item: Item | MenuItem,
