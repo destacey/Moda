@@ -159,8 +159,9 @@ Once installed, activate a skill in Claude Code with `/moda-ppm`, `/moda-pi`, or
 | --- | --- |
 | **Portfolios** | List, get details, get programs, get projects |
 | **Programs** | List, get details, get projects |
-| **Projects** | List, get details |
-| **Tasks** | List, get details, get tree, get critical path, get types/statuses/priorities, create, update, delete, add/remove dependencies |
+| **Project Lifecycles** | List (with state filter), get details |
+| **Projects** | List (with role filter), get details, get team, get phases, get phase details, get plan tree, get plan summary |
+| **Tasks** | List, get details, get critical path, get types/statuses/priorities, create, update, delete, add/remove dependencies |
 
 ### Planning
 
