@@ -81,7 +81,8 @@ Portfolio
 ### Common patterns
 
 - **`idOrKey`** — most GET endpoints accept either a UUID or a string key
-- **Status/role filters** — take integer arrays; always call the matching `GetStatuses` endpoint first to resolve enum values
+- **Status filters** — take integer arrays; call the matching `*_GetStatuses` endpoint (e.g., portfolios, programs, projects, tasks) to resolve enum values
+- **Role filters** — also take integer arrays; use the documented mapping `1=Sponsor, 2=Owner, 3=Manager, 4=Member` for project team roles (there is no `GetStatuses` endpoint for roles)
 - **UUID references** — `portfolioId`, `programId`, etc. are always UUIDs; resolve name → UUID with list/options endpoints
 - **`Portfolios_GetPortfolioOptions`** — lightweight `{ id, name }` list; prefer this over `GetPortfolios` when you only need a UUID lookup
 
