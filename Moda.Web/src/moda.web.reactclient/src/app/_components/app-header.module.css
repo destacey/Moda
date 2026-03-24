@@ -1,0 +1,15 @@
+.searchTrigger {
+  min-width: 200px;
+  text-align: left;
+}
+
+.searchTriggerKbd {
+  font-size: 11px;
+  font-family: monospace;
+  padding: 1px 5px;
+  border-radius: 3px;
+  border: 1px solid var(--ant-color-border);
+  background: var(--ant-color-bg-layout);
+  color: var(--ant-color-text-tertiary);
+  margin-left: auto;
+}

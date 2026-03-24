@@ -60,6 +60,65 @@
         ]
       }
     },
+    "/api/search": {
+      "get": {
+        "tags": [
+          "Search"
+        ],
+        "summary": "Global search across all modules.",
+        "operationId": "Search_Search",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "maxResultsPerCategory",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 5
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GlobalSearchResultDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
     "/api/auth/login": {
       "post": {
         "tags": [
@@ -20478,28 +20537,74 @@
           }
         }
       },
-      "TokenResponse": {
+      "GlobalSearchResultDto": {
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "token",
-          "refreshToken",
-          "tokenExpiresAt",
-          "mustChangePassword"
+          "categories"
         ],
         "properties": {
-          "token": {
+          "categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GlobalSearchCategoryDto"
+            }
+          }
+        }
+      },
+      "GlobalSearchCategoryDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "slug",
+          "items",
+          "totalCount"
+        ],
+        "properties": {
+          "name": {
             "type": "string"
           },
-          "refreshToken": {
+          "slug": {
             "type": "string"
           },
-          "tokenExpiresAt": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GlobalSearchResultItemDto"
+            }
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "GlobalSearchResultItemDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "title",
+          "key",
+          "entityType"
+        ],
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "subtitle": {
             "type": "string",
-            "format": "date-time"
+            "nullable": true
           },
-          "mustChangePassword": {
-            "type": "boolean"
+          "key": {
+            "type": "string"
+          },
+          "entityType": {
+            "type": "string"
+          },
+          "auxKey": {
+            "type": "string",
+            "nullable": true
           }
         }
       },
@@ -20529,6 +20634,31 @@
           "instance": {
             "type": "string",
             "nullable": true
+          }
+        }
+      },
+      "TokenResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "token",
+          "refreshToken",
+          "tokenExpiresAt",
+          "mustChangePassword"
+        ],
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "refreshToken": {
+            "type": "string"
+          },
+          "tokenExpiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "mustChangePassword": {
+            "type": "boolean"
           }
         }
       },

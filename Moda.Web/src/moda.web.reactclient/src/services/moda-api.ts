@@ -443,6 +443,88 @@ export class FeatureFlagsClient {
     }
 }
 
+export class SearchClient {
+    protected instance: AxiosInstance;
+    protected baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, instance?: AxiosInstance) {
+
+        this.instance = instance || axios.create();
+
+        this.baseUrl = baseUrl ?? "";
+
+    }
+
+    /**
+     * Global search across all modules.
+     * @param query (optional) 
+     * @param maxResultsPerCategory (optional) 
+     */
+    search(query?: string | undefined, maxResultsPerCategory?: number | undefined, cancelToken?: CancelToken): Promise<GlobalSearchResultDto> {
+        let url_ = this.baseUrl + "/api/search?";
+        if (query === null)
+            throw new globalThis.Error("The parameter 'query' cannot be null.");
+        else if (query !== undefined)
+            url_ += "query=" + encodeURIComponent("" + query) + "&";
+        if (maxResultsPerCategory === null)
+            throw new globalThis.Error("The parameter 'maxResultsPerCategory' cannot be null.");
+        else if (maxResultsPerCategory !== undefined)
+            url_ += "maxResultsPerCategory=" + encodeURIComponent("" + maxResultsPerCategory) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processSearch(_response);
+        });
+    }
+
+    protected processSearch(response: AxiosResponse): Promise<GlobalSearchResultDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<GlobalSearchResultDto>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<GlobalSearchResultDto>(null as any);
+    }
+}
+
 export class AuthClient {
     protected instance: AxiosInstance;
     protected baseUrl: string;
@@ -23144,11 +23226,23 @@ export interface ClientFeatureFlagDto {
     isEnabled: boolean;
 }
 
-export interface TokenResponse {
-    token: string;
-    refreshToken: string;
-    tokenExpiresAt: Date;
-    mustChangePassword: boolean;
+export interface GlobalSearchResultDto {
+    categories: GlobalSearchCategoryDto[];
+}
+
+export interface GlobalSearchCategoryDto {
+    name: string;
+    slug: string;
+    items: GlobalSearchResultItemDto[];
+    totalCount: number;
+}
+
+export interface GlobalSearchResultItemDto {
+    title: string;
+    subtitle?: string | undefined;
+    key: string;
+    entityType: string;
+    auxKey?: string | undefined;
 }
 
 export interface ProblemDetails {
@@ -23159,6 +23253,13 @@ export interface ProblemDetails {
     instance?: string | undefined;
 
     [key: string]: any;
+}
+
+export interface TokenResponse {
+    token: string;
+    refreshToken: string;
+    tokenExpiresAt: Date;
+    mustChangePassword: boolean;
 }
 
 export interface LoginCommand {
