@@ -28,8 +28,10 @@ export function getSearchResultUrl(item: GlobalSearchResultItemDto): string {
     case 'PlanningIntervalObjective':
       return `/planning/planning-intervals/${auxKey}/objectives/${key}`
     case 'PiTeam': {
-      const [piKey, teamCode] = (auxKey ?? '').split('|')
-      return `/planning/planning-intervals/${piKey}/plan-review#${teamCode}`
+      const parts = auxKey?.split('|')
+      if (!parts || parts.length !== 2 || !parts[0] || !parts[1])
+        return '/planning/planning-intervals'
+      return `/planning/planning-intervals/${parts[0]}/plan-review#${parts[1]}`
     }
 
     // PPM

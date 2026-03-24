@@ -11,6 +11,7 @@ internal sealed class SearchObjectivesByNameQueryHandler(IGoalsDbContext goalsDb
     {
         return await goalsDbContext.Objectives
             .Where(o => o.PlanId.HasValue && o.Name.Contains(request.SearchTerm))
+            .OrderBy(o => o.Name)
             .Select(o => new ObjectiveSearchResultDto
             {
                 Id = o.Id,

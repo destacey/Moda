@@ -19,6 +19,7 @@ internal sealed class SearchWorkForGlobalSearchQueryHandler(IWorkDbContext workD
 
         var workItemCount = await workItemQuery.CountAsync(cancellationToken);
         var workItems = await workItemQuery
+            .OrderByDescending(w => (string)w.Key)
             .Select(w => new GlobalSearchResultItemDto
             {
                 Title = w.Title,
@@ -45,6 +46,7 @@ internal sealed class SearchWorkForGlobalSearchQueryHandler(IWorkDbContext workD
 
         var workspaceCount = await workspaceQuery.CountAsync(cancellationToken);
         var workspaces = await workspaceQuery
+            .OrderBy(ws => ws.Name)
             .Select(ws => new GlobalSearchResultItemDto
             {
                 Title = ws.Name,

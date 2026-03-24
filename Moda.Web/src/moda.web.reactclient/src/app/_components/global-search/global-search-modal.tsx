@@ -49,9 +49,6 @@ const GlobalSearchModal: FC<GlobalSearchModalProps> = memo(
     const debounceTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
     const activeItemRef = useRef<HTMLDivElement>(null)
     const isKeyboardNavRef = useRef(false)
-    // Track previous search context to reset activeIndex synchronously during render
-    // instead of via a useEffect (avoids cascading state update that breaks tests)
-    const prevContextRef = useRef({ searchTerm: '', activeTab: 'all' })
 
     const [triggerSearch, { data, isFetching }] = useLazyGlobalSearchQuery()
 
@@ -95,14 +92,10 @@ const GlobalSearchModal: FC<GlobalSearchModalProps> = memo(
       )
     }, [data, activeTab])
 
-    // Reset activeIndex synchronously during render when search context changes.
-    // Using a ref comparison avoids a useEffect that would trigger a secondary
-    // render (cascading state update).
-    const prev = prevContextRef.current
-    if (prev.searchTerm !== searchTerm || prev.activeTab !== activeTab) {
-      prevContextRef.current = { searchTerm, activeTab }
-      if (activeIndex !== 0) setActiveIndex(0)
-    }
+    // Reset active index when search term or tab changes
+    useEffect(() => {
+      setActiveIndex(0)
+    }, [searchTerm, activeTab])
 
     // Scroll active item into view on keyboard navigation
     useEffect(() => {
@@ -126,13 +119,13 @@ const GlobalSearchModal: FC<GlobalSearchModalProps> = memo(
     // Keyboard navigation
     const handleKeyDown = useCallback(
       (e: React.KeyboardEvent) => {
-        if (e.key === 'ArrowDown') {
+        if (e.key === 'ArrowDown' && visibleItems.length > 0) {
           e.preventDefault()
           isKeyboardNavRef.current = true
           setActiveIndex((prev) =>
             prev < visibleItems.length - 1 ? prev + 1 : 0,
           )
-        } else if (e.key === 'ArrowUp') {
+        } else if (e.key === 'ArrowUp' && visibleItems.length > 0) {
           e.preventDefault()
           isKeyboardNavRef.current = true
           setActiveIndex((prev) =>
@@ -140,7 +133,8 @@ const GlobalSearchModal: FC<GlobalSearchModalProps> = memo(
           )
         } else if (e.key === 'Enter' && visibleItems.length > 0) {
           e.preventDefault()
-          handleNavigate(visibleItems[activeIndex])
+          const item = visibleItems[Math.min(activeIndex, visibleItems.length - 1)]
+          handleNavigate(item)
         } else if (e.key === 'Escape') {
           e.preventDefault()
           onClose()
@@ -179,9 +173,11 @@ const GlobalSearchModal: FC<GlobalSearchModalProps> = memo(
     ) => (
       <Flex
         key={`${item.entityType}-${item.key}-${index}`}
+        id={`search-result-${index}`}
         ref={index === activeIndex ? activeItemRef : undefined}
         align="center"
         gap={12}
+        tabIndex={-1}
         className={`${styles.resultItem} ${index === activeIndex ? styles.resultItemActive : ''}`}
         onClick={() => handleNavigate(item)}
         onMouseEnter={() => {
@@ -205,7 +201,7 @@ const GlobalSearchModal: FC<GlobalSearchModalProps> = memo(
     const renderAllResults = (categories: GlobalSearchCategoryDto[]) => {
       let globalIndex = 0
       return categories.map((category) => (
-        <div key={category.slug}>
+        <div key={category.slug} aria-label={category.name}>
           <Title level={5} type="secondary" className={styles.categoryHeader}>
             {category.name}
           </Title>
@@ -249,6 +245,14 @@ const GlobalSearchModal: FC<GlobalSearchModalProps> = memo(
             variant="borderless"
             size="large"
             allowClear
+            role="combobox"
+            aria-expanded={visibleItems.length > 0}
+            aria-controls="global-search-listbox"
+            aria-activedescendant={
+              visibleItems.length > 0
+                ? `search-result-${activeIndex}`
+                : undefined
+            }
           />
 
           {isFetching && !data && (
@@ -271,10 +275,12 @@ const GlobalSearchModal: FC<GlobalSearchModalProps> = memo(
                     description={`No results found for "${searchTerm}"`}
                     image={Empty.PRESENTED_IMAGE_SIMPLE}
                   />
-                ) : activeTab === 'all' && groupedResults ? (
-                  renderAllResults(groupedResults)
                 ) : (
-                  renderTabResults()
+                  <div id="global-search-listbox">
+                    {activeTab === 'all' && groupedResults
+                      ? renderAllResults(groupedResults)
+                      : renderTabResults()}
+                  </div>
                 )}
               </div>
             </div>

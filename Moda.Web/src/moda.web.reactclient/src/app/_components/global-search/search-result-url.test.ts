@@ -76,7 +76,7 @@ describe('getSearchResultUrl', () => {
 
     it('returns PI team url with missing auxKey gracefully', () => {
       expect(getSearchResultUrl(item('PiTeam', 'JUICE', undefined))).toBe(
-        '/planning/planning-intervals//plan-review#undefined',
+        '/planning/planning-intervals',
       )
     })
   })

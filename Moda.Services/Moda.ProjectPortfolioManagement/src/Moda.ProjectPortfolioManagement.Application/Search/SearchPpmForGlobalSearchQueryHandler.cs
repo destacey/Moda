@@ -24,6 +24,7 @@ internal sealed class SearchPpmForGlobalSearchQueryHandler(IProjectPortfolioMana
 
         var projectCount = await projectQuery.CountAsync(cancellationToken);
         var projectData = await projectQuery
+            .OrderBy(p => p.Name)
             .Select(p => new { p.Name, Key = (string)p.Key, p.Status })
             .Take(max)
             .ToListAsync(cancellationToken);
@@ -48,6 +49,7 @@ internal sealed class SearchPpmForGlobalSearchQueryHandler(IProjectPortfolioMana
 
         var programCount = await programQuery.CountAsync(cancellationToken);
         var programData = await programQuery
+            .OrderBy(p => p.Name)
             .Select(p => new { p.Name, p.Key, p.Status })
             .Take(max)
             .ToListAsync(cancellationToken);
@@ -72,6 +74,7 @@ internal sealed class SearchPpmForGlobalSearchQueryHandler(IProjectPortfolioMana
 
         var portfolioCount = await portfolioQuery.CountAsync(cancellationToken);
         var portfolioData = await portfolioQuery
+            .OrderBy(p => p.Name)
             .Select(p => new { p.Name, p.Key, p.Status })
             .Take(max)
             .ToListAsync(cancellationToken);
@@ -96,6 +99,7 @@ internal sealed class SearchPpmForGlobalSearchQueryHandler(IProjectPortfolioMana
 
         var siCount = await siQuery.CountAsync(cancellationToken);
         var siData = await siQuery
+            .OrderBy(si => si.Name)
             .Select(si => new { si.Name, si.Key, si.Status })
             .Take(max)
             .ToListAsync(cancellationToken);

@@ -21,6 +21,7 @@ internal sealed class SearchOrganizationForGlobalSearchQueryHandler(IOrganizatio
 
         var teamCount = await teamQuery.CountAsync(cancellationToken);
         var teams = await teamQuery
+            .OrderBy(t => t.Name)
             .Select(t => new GlobalSearchResultItemDto
             {
                 Title = t.Name,
@@ -48,6 +49,8 @@ internal sealed class SearchOrganizationForGlobalSearchQueryHandler(IOrganizatio
 
         var employeeCount = await employeeQuery.CountAsync(cancellationToken);
         var employees = await employeeQuery
+            .OrderBy(e => e.Name.LastName)
+            .ThenBy(e => e.Name.FirstName)
             .Select(e => new GlobalSearchResultItemDto
             {
                 Title = e.Name.FirstName + " " + e.Name.LastName,

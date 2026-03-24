@@ -17,13 +17,16 @@ jest.mock('@ant-design/icons', () => ({
 
 // Mock antd to avoid jsdom animation/state issues with React 19 + @testing-library/react 16
 jest.mock('antd', () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const React = require('react')
+  // eslint-disable-next-line react/display-name
+  const MockInput = React.forwardRef(({ placeholder, value, onChange }: any, ref: any) =>
+    React.createElement('input', { ref, placeholder, value, onChange })
+  )
   return {
     Modal: ({ open, children }: any) =>
       open ? React.createElement('div', { 'data-testid': 'modal' }, children) : null,
-    Input: React.forwardRef(({ placeholder, value, onChange }: any, ref: any) =>
-      React.createElement('input', { ref, placeholder, value, onChange })
-    ),
+    Input: MockInput,
     Spin: ({ children }: any) =>
       React.createElement('div', { className: 'ant-spin' }, children),
     Tabs: ({ activeKey, onChange, items }: any) =>

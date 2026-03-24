@@ -18,8 +18,10 @@ export const searchApi = apiSlice.injectEndpoints({
           )
           return { data }
         } catch (error) {
-          console.error('API Error:', error)
-          return { error }
+          const message =
+            error instanceof Error ? error.message : 'Unknown error'
+          console.error('API Error:', message)
+          return { error: { status: 'CUSTOM_ERROR', error: message } }
         }
       },
     }),

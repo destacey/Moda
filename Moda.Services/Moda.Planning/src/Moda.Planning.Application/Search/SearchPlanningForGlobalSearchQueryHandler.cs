@@ -22,6 +22,7 @@ internal sealed class SearchPlanningForGlobalSearchQueryHandler(IPlanningDbConte
 
         var piCount = await piQuery.CountAsync(cancellationToken);
         var pis = await piQuery
+            .OrderBy(pi => pi.Name)
             .Select(pi => new GlobalSearchResultItemDto
             {
                 Title = pi.Name,
@@ -47,6 +48,8 @@ internal sealed class SearchPlanningForGlobalSearchQueryHandler(IPlanningDbConte
 
         var iterationCount = await iterationQuery.CountAsync(cancellationToken);
         var iterations = await iterationQuery
+            .OrderBy(x => x.pi.Name)
+            .ThenBy(x => x.iter.Name)
             .Select(x => new GlobalSearchResultItemDto
             {
                 Title = x.iter.Name,
@@ -72,6 +75,7 @@ internal sealed class SearchPlanningForGlobalSearchQueryHandler(IPlanningDbConte
 
         var sprintCount = await sprintQuery.CountAsync(cancellationToken);
         var sprints = await sprintQuery
+            .OrderBy(i => i.Name)
             .Select(i => new GlobalSearchResultItemDto
             {
                 Title = i.Name,

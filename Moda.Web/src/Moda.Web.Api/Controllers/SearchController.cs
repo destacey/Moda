@@ -18,7 +18,7 @@ public class SearchController(ISender sender) : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<GlobalSearchResultDto>> Search(
-        string query, CancellationToken cancellationToken, int maxResultsPerCategory = 5)
+        [FromQuery] string query, CancellationToken cancellationToken, [FromQuery] int maxResultsPerCategory = 5)
     {
         var result = await _sender.Send(
             new GlobalSearchQuery(query, maxResultsPerCategory), cancellationToken);
