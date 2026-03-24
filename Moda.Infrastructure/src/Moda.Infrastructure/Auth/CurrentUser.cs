@@ -1,18 +1,19 @@
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Moda.Common.Application.Identity.Users;
 
 namespace Moda.Infrastructure.Auth;
 
-public class CurrentUser : ICurrentUser, ICurrentUserInitializer
+public class CurrentUser(IHttpContextAccessor httpContextAccessor, IServiceProvider serviceProvider) : ICurrentUser, ICurrentUserInitializer
 {
-    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
+    private readonly IServiceProvider _serviceProvider = serviceProvider;
+    
     private ClaimsPrincipal? _user;
     private string _userId = string.Empty;
 
-    public CurrentUser(IHttpContextAccessor httpContextAccessor)
-    {
-        _httpContextAccessor = httpContextAccessor;
-    }
+    private HashSet<string>? _permissionsCache;
 
     // Lazily access user from HttpContext when available, otherwise use _user set via SetCurrentUser
     private ClaimsPrincipal? User => _user ?? _httpContextAccessor.HttpContext?.User;
@@ -52,6 +53,19 @@ public class CurrentUser : ICurrentUser, ICurrentUserInitializer
 
     public IEnumerable<Claim>? GetUserClaims() =>
         User?.Claims;
+
+
+    public async Task<bool> HasPermission(string permission, CancellationToken cancellationToken = default)
+    {
+        if (_permissionsCache is null)
+        {
+            var userService = _serviceProvider.GetRequiredService<IUserService>();
+            var permissions = await userService.GetPermissionsAsync(GetUserId(), cancellationToken);
+            _permissionsCache = [.. permissions];
+        }
+
+        return _permissionsCache.Contains(permission);
+    }
 
     public void SetCurrentUser(ClaimsPrincipal user)
     {
