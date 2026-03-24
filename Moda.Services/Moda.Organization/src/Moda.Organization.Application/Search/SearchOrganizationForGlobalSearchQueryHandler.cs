@@ -16,7 +16,7 @@ internal sealed class SearchOrganizationForGlobalSearchQueryHandler(IOrganizatio
 
         // Teams (includes Teams and TeamsOfTeams via BaseTeams)
         var teamQuery = organizationDbContext.BaseTeams
-            .Where(t => !t.IsDeleted)
+            .Where(t => !t.IsDeleted && t.IsActive)
             .Where(t => t.Name.Contains(term) || ((string)t.Code).Contains(term));
 
         var teamCount = await teamQuery.CountAsync(cancellationToken);
@@ -25,7 +25,7 @@ internal sealed class SearchOrganizationForGlobalSearchQueryHandler(IOrganizatio
             .Select(t => new GlobalSearchResultItemDto
             {
                 Title = t.Name,
-                Subtitle = t.IsActive ? null : "Inactive",
+                Subtitle = null,
                 Key = ((string)t.Code),
                 EntityType = t.Type == TeamType.TeamOfTeams ? nameof(TeamOfTeams) : nameof(Team),
                 AuxKey = t.Key.ToString()
@@ -43,7 +43,7 @@ internal sealed class SearchOrganizationForGlobalSearchQueryHandler(IOrganizatio
 
         // Employees
         var employeeQuery = organizationDbContext.Employees
-            .Where(e => !e.IsDeleted)
+            .Where(e => !e.IsDeleted && e.IsActive)
             .Where(e => e.Name.FirstName.Contains(term)
                 || e.Name.LastName.Contains(term));
 
@@ -54,7 +54,7 @@ internal sealed class SearchOrganizationForGlobalSearchQueryHandler(IOrganizatio
             .Select(e => new GlobalSearchResultItemDto
             {
                 Title = e.Name.FirstName + " " + e.Name.LastName,
-                Subtitle = e.IsActive ? null : "Inactive",
+                Subtitle = null,
                 Key = e.Key.ToString(),
                 EntityType = nameof(Employee)
             })
