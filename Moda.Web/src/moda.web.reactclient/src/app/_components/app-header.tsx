@@ -4,6 +4,7 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   MenuOutlined,
+  SearchOutlined,
 } from '@ant-design/icons'
 import React, { FC, useMemo, useState } from 'react'
 import {
@@ -19,11 +20,14 @@ import {
 import useMenuToggle from '../../components/contexts/menu-toggle'
 import { useAppMenuItems } from './menu'
 import ProfileMenu from './profile-menu'
+import GlobalSearchModal from './global-search/global-search-modal'
+import { useGlobalSearch } from './global-search/use-global-search'
 import { ItemType, MenuItemType } from 'antd/es/menu/interface'
 import { useRouter } from 'next/navigation'
+import styles from './app-header.module.css'
 
 const { Header } = Layout
-const { Title } = Typography
+const { Title, Text } = Typography
 const { useBreakpoint } = Grid
 
 // Menu item type with custom route property
@@ -72,6 +76,7 @@ const AppHeader: FC = React.memo(() => {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const { menuItems } = useAppMenuItems()
   const router = useRouter()
+  const { open: searchOpen, openSearch, closeSearch } = useGlobalSearch()
 
   // Flatten menu for mobile
   const mobileMenuItems = useMemo(
@@ -149,7 +154,9 @@ const AppHeader: FC = React.memo(() => {
             icon={menuCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
             size="middle"
             onClick={() => setMenuCollapsed(!menuCollapsed)}
-            aria-label={menuCollapsed ? 'Expand sidebar menu' : 'Collapse sidebar menu'}
+            aria-label={
+              menuCollapsed ? 'Expand sidebar menu' : 'Collapse sidebar menu'
+            }
           />
         )}
         <Title
@@ -164,7 +171,19 @@ const AppHeader: FC = React.memo(() => {
           Moda
         </Title>
       </Flex>
-      {profileComponent}
+      <Flex align="center" gap={8}>
+        <Button
+          icon={<SearchOutlined />}
+          onClick={openSearch}
+          aria-label="Search (Ctrl+K)"
+          className={styles.searchTrigger}
+        >
+          <Text type="secondary">Search...</Text>
+          <kbd className={styles.searchTriggerKbd}>Ctrl+K</kbd>
+        </Button>
+        {profileComponent}
+      </Flex>
+      <GlobalSearchModal open={searchOpen} onClose={closeSearch} />
     </Header>
   )
 })

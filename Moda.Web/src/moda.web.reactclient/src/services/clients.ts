@@ -35,6 +35,7 @@ import {
   AzureDevOpsConnectionsClient,
   FeatureFlagsClient,
   PersonalAccessTokensClient,
+  SearchClient,
 } from './moda-api'
 import { tokenRequest } from '@/auth-config'
 import { InteractionRequiredAuthError } from '@azure/msal-browser'
@@ -257,6 +258,9 @@ export const getStrategicInitiativesClient = () =>
   new StrategicInitiativesClient('', axiosClient)
 export const getProjectLifecyclesClient = () =>
   new ProjectLifecyclesClient('', axiosClient)
+
+// SEARCH
+export const getSearchClient = () => new SearchClient('', axiosClient)
 
 // STRATEGIC MANAGEMENT
 export const getStrategicThemesClient = () =>
