@@ -9,76 +9,135 @@ audience: [agent]
 
 This glossary defines the key terms and concepts used throughout Moda. It is designed to help AI agents and developers understand the domain language.
 
-## Work Management
-
-| Term | Definition |
-|------|-----------|
-| **Work Item** | The fundamental unit of work in Moda. Represents a task, bug, user story, feature, epic, or any trackable unit of work. Has a type, status, priority, and optional assignee. |
-| **Work Type** | A category of work item defined by a work process (e.g., Epic, Feature, User Story, Task, Bug). Determines available fields and hierarchy rules. |
-| **Workflow** | A state machine that defines the valid statuses and transitions for a work type. Each work type has exactly one workflow. |
-| **Workflow State** | A status within a workflow (e.g., New, Active, Resolved, Closed). Belongs to a state category. |
-| **State Category** | A grouping of workflow states for reporting: Proposed, Active, Done, Removed. |
-| **Work Process** | A template that defines which work types and workflows are available. Assigned to workspaces. |
-| **Workspace** | A container for work items that uses a specific work process. Can be Owned (Moda) or Managed (external system). |
-| **Backlog** | A prioritized list of work items in a workspace, typically ordered by business value. |
-
 ## Organization
 
 | Term | Definition |
 |------|-----------|
-| **Team** | A group of people that work together to deliver value. Can be a standard team or a team of teams. |
-| **Team of Teams** | A team that coordinates multiple child teams, providing hierarchy and rollup capabilities. |
-| **Employee** | An individual in the organization. Can be a member of multiple teams. May be synced from Azure AD. |
-| **Team Membership** | The association between an employee and a team, representing active membership. |
+| **Team** | A group of people that work together to deliver value. Has a Name, Code (unique 2-10 char identifier), Active Date, and Operating Model. Can be a member of a Team of Teams. |
+| **Team of Teams** | A higher-level organizational unit that contains child teams and other teams of teams, forming the organizational hierarchy. Provides rollup visibility. Does not have backlogs or sprints. |
+| **Team Code** | A unique 2-10 character uppercase alphanumeric identifier for a team (e.g., `PLATFORM`, `MOBILE`). |
+| **Operating Model** | Defines how a team works: Methodology (Scrum or Kanban) and Sizing Method (Story Points or Count). Has a date range creating a history of changes. |
+| **Methodology** | The team's delivery approach. Scrum = sprint-based with time-boxed iterations. Kanban = continuous flow from product backlog. |
+| **Sizing Method** | How the team estimates work. Story Points = relative sizing. Count = each item counts as 1. |
+| **Team Membership** | A date-ranged parent-child relationship between a team and a Team of Teams. States: Past, Active, Future. Only one active parent per team. |
+| **Employee** | An individual in the organization. Can be a member of multiple teams. May be synced from Azure AD via Microsoft Graph. |
+| **Functional Organization Chart** | A visualization of the complete team hierarchy as of a specific date. |
 
 ## Planning
 
 | Term | Definition |
 |------|-----------|
-| **Planning Interval (PI)** | A fixed time period (typically 8-12 weeks) used to plan and track work across teams. Contains multiple iterations. |
-| **Iteration** | A shorter time-boxed period (typically 2-4 weeks) within a planning interval. Teams commit to delivering work within iterations. |
-| **Iteration Cadence** | The recurring pattern of iteration lengths within a planning interval. |
+| **Planning Interval (PI)** | A fixed timeframe (typically 8-12 weeks) during which teams deliver value toward committed objectives. Contains iterations, objectives, and team associations. States: Future, Active, Completed. |
+| **Iteration** | A time-boxed period within a PI. Has a Name, Category (Development or Innovation and Planning), and Date Range. Aggregates sprint metrics across all mapped team sprints. |
+| **Sprint** | A short time-boxed period (typically 2 weeks) owned by a team. Type: Sprint or Iteration. State: Future, Active, Completed. Can be Owned (Moda) or Managed (external system). |
+| **Sprint Mapping** | The association of a team's sprint to a PI iteration. One sprint per team per iteration. Enables cross-team aggregate views. |
+| **Planning Interval Objective** | A team's commitment to deliver a specific outcome within a PI. Has Status (NotStarted, InProgress, Completed, Canceled, Missed), IsStretch flag, and optional Health Check. |
+| **Stretch Objective** | An aspirational goal that is not counted toward predictability. Contrasts with committed objectives. |
+| **Predictability** | The percentage of committed (non-stretch) objectives completed in a PI. Formula: (Completed committed / Total committed) × 100. Stretch objectives excluded. |
+| **Objectives Locked** | A PI flag that prevents creating new objectives or changing the stretch flag. Used after PI planning is complete. |
+| **Plan Review** | A team-by-team view of the PI for planning ceremonies. Shows objectives and risks per team with list and timeline views. |
+| **Risk** | A potential circumstance that could impact delivery. Tracked with Status (Open/Closed), ROAM Category, Impact, Likelihood, Exposure, Assignee, and Follow-Up Date. |
+| **ROAM** | Risk categorization model: Resolved (eliminated), Owned (being managed), Accepted (acknowledged), Mitigated (impact reduced). |
+| **Exposure** | Calculated risk severity from Impact × Likelihood. Low (<4), Medium (=4), High (>4). Each dimension is Low=1, Medium=2, High=3. |
+| **Roadmap** | A visual timeline for planning work. Has Visibility (Public/Private), Managers (min 1), and hierarchical Items (Activities, Milestones, Timeboxes). Can be copied. |
+| **Activity** | A roadmap item with a date range that can contain child items (other activities, milestones, timeboxes). Ordered within parent. |
+| **Milestone** | A roadmap item representing a single point in time (key date or achievement). |
+| **Timebox** | A roadmap item representing a fixed time period (e.g., a sprint or phase). |
+| **Planning Poker** | Collaborative estimation using estimation scales and real-time voting via SignalR. Behind `planning-poker` feature flag. |
+| **Estimation Scale** | A named set of values for estimation (e.g., Fibonacci: 1, 2, 3, 5, 8, 13). Minimum 2 values. |
+| **Poker Session** | A real-time estimation event with a facilitator, estimation scale, and rounds. Immediately Active on creation. |
+| **Poker Round** | One estimation within a session. Workflow: Voting → Revealed → Accepted. Can be Reset to re-vote. |
 
-## Goals
+## Planning Metrics
 
 | Term | Definition |
 |------|-----------|
-| **Objective** | A qualitative goal that describes what you want to achieve. Time-bound and owned by a team or individual. Measured through key results. |
-| **Key Result** | A quantitative, measurable outcome that indicates progress toward an objective. Has a target value and current value for tracking. |
-| **OKR** | Objectives and Key Results - the goal-setting framework used by Moda. |
+| **Total** | Sum of all work items (or story points) in a sprint. |
+| **Completed** | Items where status category is Done OR Removed. Includes both. |
+| **Remaining** | Total minus Completed. |
+| **Completion Rate** | (Completed / Total) × 100. Target: 80%. |
+| **Velocity** | Completed count (story points or items delivered). |
+| **Average Cycle Time** | Mean days from Activated to Done for eligible items. Only Done items (not Removed) with both timestamps. |
+| **Missing Story Points** | Count of items with null or zero story points. Indicates estimation gaps. |
+| **Time to Start** | Days from work item creation to activation (how long work waited). |
+| **Cycle Time** | Days from activation to completion. Formula: DoneTimestamp − ActivatedTimestamp. |
+| **Lead Time** | Days from creation to completion (total request-to-delivery time). |
+
+## Work Management
+
+| Term | Definition |
+|------|-----------|
+| **Work Item** | The fundamental unit of work. Has a Key ({WorkspaceKey}-{Number}), Title (immutable), Type, Status, StatusCategory, Priority, StoryPoints, Assignee, Team, Parent, Sprint, Project. |
+| **Work Item Key** | Unique identifier in format `{WorkspaceKey}-{Number}` (e.g., `PLAT-1234`). Workspace key is 2-20 uppercase alphanumeric starting with a letter. |
+| **Workspace** | A container for work items using a specific work process. Has a Key, Name, Ownership (Owned/Managed), and IsActive flag. |
+| **Work Process** | A configuration linking work types to workflows. Assigned to workspaces. Requires at least one work type. Each type appears once. |
+| **Work Process Scheme** | A mapping of a work type to a workflow within a work process. |
+| **Work Type** | A category of work item (e.g., Epic, Feature, User Story, Task, Bug). Name is immutable. Assigned to a tier and level. |
+| **Work Type Tier** | Grouping of work types by purpose: Portfolio (container, multi-level), Requirement (team work), Task (child items), Other (non-standard). |
+| **Work Type Level** | Hierarchical ordering within a tier. System defaults: Epics (Portfolio L1), Features (Portfolio L2), Stories (Requirement L1), Tasks (Task L1). Custom Portfolio levels can be added. |
+| **Workflow** | A sequence of statuses defining how work items progress. Contains a workflow scheme mapping statuses to categories and order. |
+| **Workflow Scheme** | A mapping of a work status to a position in a workflow, with a status category and order. |
+| **Work Status** | A specific state within a workflow (e.g., "New", "In Progress", "Done"). Name is immutable. Reusable across workflows. |
+| **Work Status Category** | Fixed normalization set: Proposed (not started), Active (in progress), Done (completed), Removed (removed without completion). Enables cross-workflow metrics. |
+| **Work Item Dependency** | A predecessor/successor relationship between work items. Tracks State (ToDo/InProgress/Done/Removed/Deleted), Health (Healthy/AtRisk/Unhealthy), and Scope (IntraTeam/CrossTeam). |
+| **Dependency Health** | Automatically calculated from planned dates. Healthy = predecessor before successor. AtRisk = unplanned. Unhealthy = predecessor after successor or scheduling conflict. |
+| **Work Item Revision** | An audit trail entry: revision number, who, when, and field-level changes (old/new values). |
+| **Work Item Hierarchy** | Parent-child relationship. Only Portfolio tier types can be parents. Parent must be higher level than child. |
+| **Backlog** | A team's unified view of all assigned work items across all workspaces. Visible on the team's Backlog tab. |
 
 ## Project Portfolio Management
 
 | Term | Definition |
 |------|-----------|
-| **Project** | A distinct initiative with defined scope, timeline, and deliverables. Tracked through lifecycle phases. |
-| **Portfolio** | A collection of related projects managed together for strategic alignment and resource optimization. |
-| **Project Phase** | A stage in the project lifecycle (e.g., Initiation, Planning, Execution, Closing). |
+| **Portfolio** | Top-level container for programs, projects, and strategic initiatives. Status lifecycle: Proposed → Active → OnHold ↔ Active → Closed → Archived. |
+| **Program** | Groups related projects within a portfolio. Status: Proposed → Active → Completed/Cancelled. Only active programs accept new projects. |
+| **Project** | A timed endeavor with scope, timeline, and deliverables. Key is 2-20 uppercase alphanumeric. Status: Proposed → Approved (requires lifecycle) → Active (requires dates) → Completed/Cancelled. |
+| **Project Key** | A unique 2-20 character uppercase alphanumeric code identifying a project (e.g., `APOLLO`). Can be changed (cascades to task keys). |
+| **Project Lifecycle** | A template of phases that projects go through. States: Proposed (editable) → Active (locked) → Archived. Must have min 1 phase to activate. |
+| **Project Lifecycle Phase** | A template phase within a lifecycle (e.g., Initiation, Planning, Execution, Closing). Ordered. Immutable after lifecycle activation. |
+| **Project Phase** | A concrete instance of a lifecycle phase on a project. Has Status (NotStarted/InProgress/Completed/Cancelled), Date Range, Progress (0-100%), and Assignee roles. Name copied from template (not editable). |
+| **Project Task** | An actionable work item within a project phase. Key: {ProjectKey}-{Number}. Type: Task (date range, 0-100% progress) or Milestone (single date, 0 or 100% only). Supports hierarchy (WBS) and Finish-to-Start dependencies. |
+| **Task Priority** | Low, Medium, High, or Critical. Shown as color indicators in the UI. |
+| **Task Dependency** | Finish-to-Start relationship between project tasks. Soft-deleted (marked as removed, not permanently deleted). |
+| **Strategic Initiative** | A high-level strategic effort within a portfolio, tracked with KPIs. Status: Proposed → Approved → Active → OnHold ↔ Active → Completed/Cancelled. |
+| **KPI** | Key Performance Indicator on a strategic initiative. Has StartingValue, TargetValue, ActualValue (from latest measurement), Direction (Increase/Decrease), Checkpoints, and Measurements. |
+| **KPI Checkpoint** | A planned target value at a specific date within a KPI. Has TargetValue and optional AtRiskValue threshold. |
+| **KPI Measurement** | An actual recorded value at a specific date. Most recent becomes the KPI's ActualValue. |
+| **Expenditure Category** | Classifies project spending. Has IsCapitalizable, RequiresDepreciation, AccountingCode. Settings frozen after activation. |
+| **My Projects Dashboard** | Personalized view of projects where the user has a role. Two-panel layout: portfolio-grouped project cards (left) and selected project detail with phase timeline and task summary (right). |
 
 ## Strategic Management
 
 | Term | Definition |
 |------|-----------|
-| **Strategic Theme** | A high-level organizational priority that guides investment decisions and work prioritization. |
-| **Strategic Alignment** | The degree to which team objectives, projects, and work items support organizational strategy. |
+| **Vision** | The desired future state of the organization. Only ONE can be Active at any time. States: Proposed → Active (start date) → Archived (end date). Archived visions cannot overlap in dates. |
+| **Strategy** | The approach for achieving the vision. States: Draft → Active → Completed → Archived. Independent of visions. |
+| **Strategic Theme** | A high-level organizational priority guiding investment decisions. States: Proposed → Active → Archived. Only Proposed deletable. Cross-domain: tags Projects, Programs, Strategic Initiatives in PPM. |
 
 ## Cross-Cutting Concepts
 
 | Term | Definition |
 |------|-----------|
-| **Ownership** | Whether an object is "Owned" (created/managed in Moda) or "Managed" (synced from an external system and read-only in Moda). |
-| **Link** | A cross-entity association between any two objects in Moda (e.g., a work item linked to an objective). |
-| **Connection** | A configured integration with an external system (e.g., Azure DevOps, Microsoft Graph). |
-| **Feature Flag** | A toggle that controls visibility of a feature. Defined in code, stored in database, managed via Settings UI. |
+| **Ownership** | Whether an object is Owned (Moda-managed), Managed (external system, read-only in Moda), or System (immutable Moda defaults). |
+| **Link** | A cross-entity association between any Moda object and an external URL. Simple name + URL pair. |
+| **Connection** | A configured integration with an external system via a Connector (e.g., Azure DevOps). Includes auth and endpoint config. |
+| **Connector** | An API enabling a specific external service to integrate with Moda (e.g., AzureDevOps, MicrosoftGraph). Multiple connections per connector allowed. |
+| **Feature Flag** | A toggle controlling feature visibility. Defined in code, stored in database, managed via Settings UI. New flags seeded as disabled on startup. |
+| **Health Check** | A status indicator (Healthy, AtRisk, Unhealthy/Critical) with expiration. Used on objectives, initiatives, and other entities. |
+| **SystemContext** | Identifies which domain references a work item (e.g., Goals, Projects). Used for work item references. |
 
 ## Technical Terms
 
 | Term | Definition |
 |------|-----------|
-| **Bounded Context** | A DDD concept - each domain service (Work, Organization, etc.) is a bounded context with its own ubiquitous language. |
-| **Aggregate Root** | The primary entity in a cluster of related objects that ensures consistency. Feature folders are organized by aggregate root. |
-| **Value Object** | An immutable object defined by its attributes, not identity (e.g., a date range, an email address). |
-| **Domain Event** | A notification that something significant happened in the domain, published for cross-context communication. |
-| **Command** | A request to change state (write operation). Handled by command handlers via MediatR. |
-| **Query** | A request to read state (read operation). Handled by query handlers via MediatR. |
-| **Result** | A functional return type (`Result<T>`) that explicitly represents success or failure without exceptions. |
+| **Bounded Context** | Each domain service (Work, Organization, etc.) is a bounded context with its own ubiquitous language and models. |
+| **Aggregate Root** | The primary entity ensuring consistency in a cluster of related objects. Feature folders organized by aggregate root. |
+| **Value Object** | An immutable object defined by attributes, not identity (e.g., WorkItemKey, ProjectKey, FlexibleDateRange, Progress). |
+| **Domain Event** | A notification that something significant happened in a domain, published for cross-context communication (e.g., TeamCreatedEvent, StrategicThemeUpdatedEvent). |
+| **Command** | A request to change state (write operation). Handled via MediatR. Returns Result<T>. |
+| **Query** | A request to read state (read operation). Handled via MediatR. Returns Result<T>. |
+| **Result** | A functional return type (`Result<T>`) from CSharpFunctionalExtensions. Explicitly represents success or failure without exceptions. |
+| **Work Process Scheme** | Links a work type to a workflow within a work process. |
+| **Workflow Scheme** | Maps a work status to a position (order) and category within a workflow. |
+| **FlexibleDateRange** | A value object with required start date and optional end date. Used by portfolios, programs, and other entities with open-ended timelines. |
+| **LocalDateRange** | A value object with required start and end dates. Used by PIs, iterations, sprints, and roadmaps. |
