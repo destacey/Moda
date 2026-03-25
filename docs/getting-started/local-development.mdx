@@ -1,0 +1,68 @@
+---
+title: Local Development
+description: Day-to-day development workflow, debugging, and common tasks.
+sidebar_position: 7
+audience: [developer]
+---
+
+# Local Development
+
+## Running with Aspire (Recommended)
+
+.NET Aspire provides a unified dashboard for all services:
+
+```bash
+cd Moda.AppHost
+dotnet run
+```
+
+**Benefits:**
+- Unified telemetry dashboard (traces, metrics, logs)
+- Automatic OpenTelemetry instrumentation
+- Dynamic port assignment with service discovery
+
+## Common Tasks
+
+### Adding a Database Migration
+
+```bash
+dotnet ef migrations add <MigrationName> \
+  --project "Moda.Infrastructure/src/Moda.Infrastructure.Migrators.MSSQL" \
+  --startup-project "Moda.Web/src/Moda.Web.Api"
+```
+
+### Running Tests
+
+```bash
+# All tests
+dotnet test Moda.slnx
+
+# Specific project
+dotnet test "Moda.Services/Moda.Work/tests/Moda.Work.Application.Tests/Moda.Work.Application.Tests.csproj"
+
+# Filtered tests
+dotnet test --filter "FullyQualifiedName~ProjectServiceTests"
+
+# Frontend tests
+cd Moda.Web/src/moda.web.reactclient
+npm test
+```
+
+### Architecture Tests
+
+```bash
+dotnet test Moda.ArchitectureTests/Moda.ArchitectureTests.csproj
+```
+
+These tests enforce Clean Architecture dependency rules across the solution.
+
+## VS Code Launch Configurations
+
+- **Compound: Launch Moda on Host** - Runs API and client natively
+- **Compound: Launch Moda with Compose** - Full stack via Docker Compose
+
+## Debugging
+
+- Backend: Attach to the `Moda.Web.Api` process or use VS Code launch config
+- Frontend: Use browser DevTools or VS Code debugger
+- Logs: Check Aspire dashboard or Seq (Docker) for structured logs

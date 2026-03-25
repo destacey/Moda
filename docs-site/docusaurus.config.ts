@@ -1,0 +1,128 @@
+import {themes as prismThemes} from 'prism-react-renderer';
+import type {Config} from '@docusaurus/types';
+import type * as Preset from '@docusaurus/preset-classic';
+
+const config: Config = {
+  title: 'Moda',
+  tagline: 'Work management for planning, managing, and delivering across teams',
+  favicon: 'img/favicon.ico',
+
+  future: {
+    v4: true,
+  },
+
+  // GitHub Pages deployment
+  // Use DOCS_BASE_URL env var for local dev (defaults to /Moda/ for GitHub Pages)
+  url: 'https://destacey.github.io',
+  baseUrl: process.env.DOCS_BASE_URL || '/Moda/',
+  organizationName: 'destacey',
+  projectName: 'Moda',
+  trailingSlash: false,
+
+  onBrokenLinks: 'warn',
+  onBrokenMarkdownLinks: 'warn',
+
+  i18n: {
+    defaultLocale: 'en',
+    locales: ['en'],
+  },
+
+  // Enable Mermaid diagram support
+  markdown: {
+    mermaid: true,
+  },
+  themes: ['@docusaurus/theme-mermaid'],
+
+  presets: [
+    [
+      'classic',
+      {
+        docs: {
+          // Point to the shared docs/ folder in the repo root
+          path: '../docs',
+          sidebarPath: './sidebars.ts',
+          routeBasePath: 'docs',
+          editUrl: 'https://github.com/destacey/Moda/edit/main/docs/',
+          showLastUpdateTime: true,
+        },
+        blog: false, // Disable blog for now
+        theme: {
+          customCss: './src/css/custom.css',
+        },
+      } satisfies Preset.Options,
+    ],
+  ],
+
+  themeConfig: {
+    colorMode: {
+      defaultMode: 'light',
+      respectPrefersColorScheme: true,
+    },
+    navbar: {
+      title: 'Moda',
+      items: [
+        {
+          type: 'docSidebar',
+          sidebarId: 'docsSidebar',
+          position: 'left',
+          label: 'Documentation',
+        },
+        {
+          type: 'docSidebar',
+          sidebarId: 'contributingSidebar',
+          position: 'left',
+          label: 'Contributing',
+        },
+        {
+          type: 'docSidebar',
+          sidebarId: 'referenceSidebar',
+          position: 'left',
+          label: 'Reference',
+        },
+        {
+          href: 'https://github.com/destacey/Moda',
+          label: 'GitHub',
+          position: 'right',
+        },
+      ],
+    },
+    footer: {
+      style: 'dark',
+      links: [
+        {
+          title: 'Documentation',
+          items: [
+            {label: 'Getting Started', to: '/docs/getting-started'},
+            {label: 'User Guide', to: '/docs/user-guide'},
+            {label: 'Contributing', to: '/docs/contributing'},
+          ],
+        },
+        {
+          title: 'Reference',
+          items: [
+            {label: 'Domain Model', to: '/docs/reference/domain-model'},
+            {label: 'API Reference', to: '/docs/reference/api'},
+            {label: 'Technology Stack', to: '/docs/reference/technology-stack'},
+          ],
+        },
+        {
+          title: 'More',
+          items: [
+            {
+              label: 'GitHub',
+              href: 'https://github.com/destacey/Moda',
+            },
+          ],
+        },
+      ],
+      copyright: `Copyright \u00a9 ${new Date().getFullYear()} Moda. Built with Docusaurus.`,
+    },
+    prism: {
+      theme: prismThemes.github,
+      darkTheme: prismThemes.dracula,
+      additionalLanguages: ['csharp', 'bash', 'json', 'typescript'],
+    },
+  } satisfies Preset.ThemeConfig,
+};
+
+export default config;

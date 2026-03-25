@@ -1,0 +1,66 @@
+---
+title: Coding Standards
+description: Code conventions, naming standards, and best practices for Moda development.
+sidebar_position: 2
+audience: [developer, agent]
+---
+
+# Coding Standards
+
+## .NET Backend
+
+### Naming Conventions
+
+- **Classes/Methods** - PascalCase
+- **Parameters/Local Variables** - camelCase
+- **Private Fields** - _camelCase with underscore prefix
+- **Constants** - PascalCase
+- **Async Methods** - Do NOT use `Async` suffix for new methods
+
+### Time Handling
+
+Always use **NodaTime** types instead of `DateTime`:
+- `Instant` for timestamps
+- `LocalDate` for dates without time
+- `LocalDateTime` for date+time without timezone
+
+Never use `DateTime.UtcNow`. Always inject `IDateTimeProvider` for the current time.
+
+### Result Pattern
+
+Return `Result<T>` or `Result` from command/query handlers. Never throw exceptions for business logic failures.
+
+### Package Management
+
+Uses **Central Package Management** via `Directory.Packages.props`. All package versions are defined centrally - do not specify versions in individual project files.
+
+### Entity Configuration
+
+Use fluent API in separate configuration classes implementing `IEntityTypeConfiguration<T>`. Never use data annotations on entities.
+
+## Frontend (React/Next.js)
+
+### Theming
+
+Always use Ant Design theme tokens. **Never hardcode colors**.
+
+Prefer CSS variables in CSS modules:
+```css
+.container {
+  border-color: var(--ant-color-border);
+  color: var(--ant-color-primary);
+}
+```
+
+Only use `theme.useToken()` when you need token values in JS logic.
+
+### API Calls
+
+Always use the NSwag-generated typed client (e.g., `getProjectsClient()`). Never use `authenticatedFetch()` directly.
+
+### Component Patterns
+
+- Use functional components with hooks
+- Prefer CSS Modules for styling
+- Use `next/dynamic` with `ssr: false` for heavy client-only components
+- Use direct imports instead of barrel imports where possible

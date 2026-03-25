@@ -1,0 +1,62 @@
+---
+title: API Development
+description: API endpoint patterns, controller conventions, and OpenAPI generation.
+sidebar_position: 7
+audience: [developer, agent]
+---
+
+# API Development
+
+The Moda API is an ASP.NET Core Web API using thin controllers that delegate to MediatR handlers.
+
+## Controller Pattern
+
+Controllers should be thin and contain no business logic:
+
+```csharp
+[ApiController]
+[Route("api/work-management/work-items")]
+public class WorkItemsController : ControllerBase
+{
+    private readonly ISender _sender;
+
+    public WorkItemsController(ISender sender) => _sender = sender;
+
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult<WorkItemDto>> GetById(Guid id, CancellationToken ct)
+    {
+        var result = await _sender.Send(new GetWorkItemQuery(id), ct);
+        return result.IsSuccess
+            ? Ok(result.Value)
+            : NotFound(result.Error);
+    }
+
+    [HttpPost]
+    public async Task<ActionResult<Guid>> Create(CreateWorkItemRequest request, CancellationToken ct)
+    {
+        var result = await _sender.Send(request.ToCommand(), ct);
+        return result.IsSuccess
+            ? CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value)
+            : BadRequest(result.Error);
+    }
+}
+```
+
+## Authentication
+
+Controllers are protected by default. Use `[AllowAnonymous]` only for public endpoints.
+
+Feature-gated endpoints use `[FeatureGate(FeatureFlags.Names.MyFlag)]`.
+
+## OpenAPI / Swagger
+
+NSwag generates the OpenAPI specification and TypeScript client automatically during Debug builds. Configuration is in `nswag.json`.
+
+Access Swagger UI at `/swagger` when the API is running.
+
+## API Conventions
+
+- Use RESTful route patterns
+- Return appropriate HTTP status codes
+- Use `CancellationToken` in all async endpoints
+- Validate input through FluentValidation (automatically via MediatR pipeline)

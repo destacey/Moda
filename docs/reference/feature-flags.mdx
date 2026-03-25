@@ -1,0 +1,78 @@
+---
+title: Feature Flags
+description: Feature management system for controlling feature visibility in Moda.
+sidebar_position: 3
+audience: [developer, agent]
+---
+
+# Feature Flags
+
+Moda uses Microsoft.FeatureManagement to control feature visibility. Feature flags are defined in code, stored in the database, and managed through the Settings UI.
+
+## How It Works
+
+1. Flags are **defined in code** (`FeatureFlags.cs`)
+2. On startup, the **seeder** creates any new flags in the database (disabled by default)
+3. Admins **enable/disable** flags through the Settings UI
+4. A **database-backed provider** serves flag state with caching
+
+## Adding a New Feature Flag
+
+### 1. Define the Flag
+
+In `Moda.Common.Domain/FeatureManagement/FeatureFlags.cs`:
+
+```csharp
+public static class FeatureFlags
+{
+    public static readonly FeatureFlagDefinition MyNewFeature =
+        new("MyNewFeature", "Description of the feature");
+
+    public static class Names
+    {
+        public const string MyNewFeature = nameof(FeatureFlags.MyNewFeature);
+    }
+}
+```
+
+### 2. Gate the Backend
+
+On a controller or action:
+```csharp
+[FeatureGate(FeatureFlags.Names.MyNewFeature)]
+[HttpGet]
+public async Task<ActionResult<MyDto>> Get() { ... }
+```
+
+Or in a handler:
+```csharp
+if (!await _featureManager.IsEnabledAsync(FeatureFlags.Names.MyNewFeature))
+    return Result.Failure("Feature is not enabled.");
+```
+
+### 3. Gate the Frontend
+
+Page-level gate:
+```typescript
+export default requireFeatureFlag('MyNewFeature')(MyPage)
+```
+
+Conditional rendering:
+```typescript
+const isEnabled = useFeatureFlag('MyNewFeature')
+if (!isEnabled) return null
+```
+
+### 4. Gate Menus
+
+Pass flag state into menu builder functions to conditionally show navigation items.
+
+## Key Files
+
+| File | Purpose |
+|------|---------|
+| `Moda.Common.Domain/FeatureManagement/FeatureFlags.cs` | Flag definitions |
+| `Moda.Infrastructure/Persistence/Initialization/FeatureFlagSeeder.cs` | Auto-seeds flags |
+| `Moda.Infrastructure/FeatureManagement/DatabaseFeatureDefinitionProvider.cs` | Database provider |
+| `moda.web.reactclient/src/hooks/use-feature-flag.ts` | Frontend hook |
+| `moda.web.reactclient/src/components/hoc/require-feature-flag.tsx` | Page-level gate |

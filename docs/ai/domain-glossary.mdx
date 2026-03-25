@@ -1,0 +1,84 @@
+---
+title: Domain Glossary
+description: Comprehensive glossary of domain terms, concepts, and their relationships in Moda.
+sidebar_position: 1
+audience: [agent]
+---
+
+# Domain Glossary
+
+This glossary defines the key terms and concepts used throughout Moda. It is designed to help AI agents and developers understand the domain language.
+
+## Work Management
+
+| Term | Definition |
+|------|-----------|
+| **Work Item** | The fundamental unit of work in Moda. Represents a task, bug, user story, feature, epic, or any trackable unit of work. Has a type, status, priority, and optional assignee. |
+| **Work Type** | A category of work item defined by a work process (e.g., Epic, Feature, User Story, Task, Bug). Determines available fields and hierarchy rules. |
+| **Workflow** | A state machine that defines the valid statuses and transitions for a work type. Each work type has exactly one workflow. |
+| **Workflow State** | A status within a workflow (e.g., New, Active, Resolved, Closed). Belongs to a state category. |
+| **State Category** | A grouping of workflow states for reporting: Proposed, Active, Done, Removed. |
+| **Work Process** | A template that defines which work types and workflows are available. Assigned to workspaces. |
+| **Workspace** | A container for work items that uses a specific work process. Can be Owned (Moda) or Managed (external system). |
+| **Backlog** | A prioritized list of work items in a workspace, typically ordered by business value. |
+
+## Organization
+
+| Term | Definition |
+|------|-----------|
+| **Team** | A group of people that work together to deliver value. Can be a standard team or a team of teams. |
+| **Team of Teams** | A team that coordinates multiple child teams, providing hierarchy and rollup capabilities. |
+| **Employee** | An individual in the organization. Can be a member of multiple teams. May be synced from Azure AD. |
+| **Team Membership** | The association between an employee and a team, representing active membership. |
+
+## Planning
+
+| Term | Definition |
+|------|-----------|
+| **Planning Interval (PI)** | A fixed time period (typically 8-12 weeks) used to plan and track work across teams. Contains multiple iterations. |
+| **Iteration** | A shorter time-boxed period (typically 2-4 weeks) within a planning interval. Teams commit to delivering work within iterations. |
+| **Iteration Cadence** | The recurring pattern of iteration lengths within a planning interval. |
+
+## Goals
+
+| Term | Definition |
+|------|-----------|
+| **Objective** | A qualitative goal that describes what you want to achieve. Time-bound and owned by a team or individual. Measured through key results. |
+| **Key Result** | A quantitative, measurable outcome that indicates progress toward an objective. Has a target value and current value for tracking. |
+| **OKR** | Objectives and Key Results - the goal-setting framework used by Moda. |
+
+## Project Portfolio Management
+
+| Term | Definition |
+|------|-----------|
+| **Project** | A distinct initiative with defined scope, timeline, and deliverables. Tracked through lifecycle phases. |
+| **Portfolio** | A collection of related projects managed together for strategic alignment and resource optimization. |
+| **Project Phase** | A stage in the project lifecycle (e.g., Initiation, Planning, Execution, Closing). |
+
+## Strategic Management
+
+| Term | Definition |
+|------|-----------|
+| **Strategic Theme** | A high-level organizational priority that guides investment decisions and work prioritization. |
+| **Strategic Alignment** | The degree to which team objectives, projects, and work items support organizational strategy. |
+
+## Cross-Cutting Concepts
+
+| Term | Definition |
+|------|-----------|
+| **Ownership** | Whether an object is "Owned" (created/managed in Moda) or "Managed" (synced from an external system and read-only in Moda). |
+| **Link** | A cross-entity association between any two objects in Moda (e.g., a work item linked to an objective). |
+| **Connection** | A configured integration with an external system (e.g., Azure DevOps, Microsoft Graph). |
+| **Feature Flag** | A toggle that controls visibility of a feature. Defined in code, stored in database, managed via Settings UI. |
+
+## Technical Terms
+
+| Term | Definition |
+|------|-----------|
+| **Bounded Context** | A DDD concept - each domain service (Work, Organization, etc.) is a bounded context with its own ubiquitous language. |
+| **Aggregate Root** | The primary entity in a cluster of related objects that ensures consistency. Feature folders are organized by aggregate root. |
+| **Value Object** | An immutable object defined by its attributes, not identity (e.g., a date range, an email address). |
+| **Domain Event** | A notification that something significant happened in the domain, published for cross-context communication. |
+| **Command** | A request to change state (write operation). Handled by command handlers via MediatR. |
+| **Query** | A request to read state (read operation). Handled by query handlers via MediatR. |
+| **Result** | A functional return type (`Result<T>`) that explicitly represents success or failure without exceptions. |
