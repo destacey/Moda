@@ -1,13 +1,13 @@
 ---
 title: Logging In
-description: How to log in to Moda using Microsoft Entra ID or local authentication.
+description: How to log in to Moda using Microsoft Entra ID, local authentication, or personal access tokens.
 sidebar_position: 1
 audience: [user]
 ---
 
 # Logging In
 
-Moda supports two authentication methods. Your administrator will tell you which one to use.
+Moda supports two interactive authentication methods. Your administrator will tell you which one to use.
 
 ## Microsoft Entra ID (Azure AD)
 
@@ -23,13 +23,21 @@ If your organization uses Microsoft Entra ID:
 If your instance uses local authentication:
 
 1. Navigate to your Moda instance URL
-2. Enter your **username** and **password**
-3. Click **Sign In**
+2. Select **Email & Password**
+3. Enter your **username** and **password**
+4. Click **Sign In**
 
-If this is your first login, you may be prompted to change your password.
+If this is your first login, you may be prompted to change your password before continuing.
+
+## API Access with Personal Access Tokens
+
+For scripts, automations, and integrations that need to access the Moda API without interactive login, you can use a **Personal Access Token (PAT)**.
+
+PATs are created from your [Profile](./your-profile#personal-access-tokens) page and included in API request headers. See [Your Profile > Personal Access Tokens](./your-profile#personal-access-tokens) for details on creating tokens, and the [API Reference](../reference/api#personal-access-tokens-pats) for how to use them.
 
 ## Troubleshooting
 
-- **Account locked?** - Contact your administrator to unlock your account
-- **Forgot password?** - Contact your administrator for a password reset
-- **Can't access?** - Verify you have an active account with your administrator
+- **Account locked?** — Contact your administrator to unlock your account. Accounts are locked after multiple failed login attempts.
+- **Forgot password?** — Contact your administrator for a password reset (local authentication only). You'll be required to set a new password on next login.
+- **Can't access?** — Verify you have an active account with your administrator.
+- **Must change password?** — Local users created by an administrator are required to set a new password on first login. This is a one-time prompt.

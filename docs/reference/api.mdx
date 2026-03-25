@@ -16,16 +16,16 @@ The Moda API is a RESTful ASP.NET Core Web API.
 
 ## Authentication
 
-All API requests require authentication via Bearer token (Azure AD or local JWT).
+All API requests require authentication via Bearer token. Moda supports three authentication methods:
 
-### Azure AD
+### Azure AD (Microsoft Entra ID)
 
 Include the access token from MSAL in the Authorization header:
 ```
 Authorization: Bearer {access_token}
 ```
 
-### Local JWT
+### Local JWT (Username/Password)
 
 Authenticate via the login endpoint to receive a JWT token:
 ```
@@ -35,6 +35,38 @@ POST /api/account/login
   "password": "your-password"
 }
 ```
+
+The response includes an `accessToken` and `refreshToken`. Include the access token in subsequent requests:
+```
+Authorization: Bearer {accessToken}
+```
+
+When the access token expires, use the refresh endpoint to get a new one:
+```
+POST /api/account/refresh
+{
+  "accessToken": "your-expired-token",
+  "refreshToken": "your-refresh-token"
+}
+```
+
+### Personal Access Tokens (PATs)
+
+**Personal Access Tokens** provide a way to authenticate API requests without interactive login. They are ideal for scripts, CI/CD pipelines, and integrations.
+
+To use a PAT, include it in the Authorization header:
+```
+Authorization: Bearer {personal-access-token}
+```
+
+**Managing PATs:**
+- Navigate to your [Profile](../getting-started/your-profile#personal-access-tokens) page
+- Click **Personal Access Tokens**
+- **Create** a new token with a name and optional expiration date
+- Copy the token immediately — it cannot be retrieved after creation
+- **Revoke** tokens that are no longer needed
+
+PATs inherit the permissions of the user who created them. See [Your Profile](../getting-started/your-profile#personal-access-tokens) for details on creating and managing tokens.
 
 ## API Areas
 

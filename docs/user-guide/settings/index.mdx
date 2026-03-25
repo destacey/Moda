@@ -69,7 +69,7 @@ Feature flags gate both backend API endpoints and frontend UI elements. When a f
 
 ### Work Types
 
-**Work Types** define the categories of work items available in the system (e.g., Epic, Feature, User Story, Task, Bug). See [Work Management](../work-management/index.mdx) for details on how work types are used.
+**Work Types** define the categories of work items available in the system (e.g., Epic, Feature, User Story, Task, Bug). See [Work Management](../work-management/index) for details on how work types are used.
 
 ### Work Statuses
 
@@ -84,7 +84,7 @@ Feature flags gate both backend API endpoints and frontend UI elements. When a f
 
 ### Work Processes
 
-**Work Processes** define the configuration of work types, workflows, and hierarchies used within workspaces. See [Work Management](../work-management/index.mdx) for details.
+**Work Processes** define the configuration of work types, workflows, and hierarchies used within workspaces. See [Work Management](../work-management/index) for details.
 
 ## PPM Settings
 
@@ -99,11 +99,22 @@ Feature flags gate both backend API endpoints and frontend UI elements. When a f
 
 ### Project Lifecycles
 
-**Project Lifecycles** define the template of phases that projects go through. See [Project Portfolio Management](../project-portfolios/index.mdx) for details.
+**Project Lifecycles** define the template of phases that projects go through. See [Project Portfolio Management](../ppm/index) for details.
 
 ## Integrations
 
 Moda integrates with external systems to synchronize data. Integrations are configured through **Connections**.
+
+### Ownership Model
+
+When data is synchronized from an external system, the objects created in Moda have a **Managed** ownership. This distinguishes them from objects created directly in Moda:
+
+- **Owned** — The object is created and managed within Moda. Users can edit it freely.
+- **Managed** — The object is owned by an external system and is **read-only** in Moda. Changes must be made in the source system and will be reflected in Moda on the next sync.
+
+Managed objects can still be associated or linked to owned items. For example, a [work item](../work-management/work-items#work-items) synced from Azure DevOps (managed in Moda) can be linked to a team [objective](../planning/planning-intervals#objectives) owned by Moda.
+
+The ownership model applies to [workspaces](../work-management/work-items#workspaces), [work items](../work-management/work-items#work-items), [work processes](../work-management/work-configuration#work-processes), [workflows](../work-management/work-configuration#workflows), and [sprints](../planning/sprints).
 
 ### Connections
 

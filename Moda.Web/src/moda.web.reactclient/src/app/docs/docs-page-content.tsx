@@ -1,15 +1,40 @@
 'use client'
 
 import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
+import Link from 'next/link'
 import { Typography } from 'antd'
 import MermaidDiagram from './mermaid-diagram'
 
 const { Title, Paragraph } = Typography
 
-// Custom component to intercept mermaid code blocks
+function DocsLink({
+  href,
+  children,
+  ...props
+}: React.AnchorHTMLAttributes<HTMLAnchorElement>) {
+  if (!href) return <a {...props}>{children}</a>
+
+  // External links — open in new tab
+  if (href.startsWith('http://') || href.startsWith('https://')) {
+    return (
+      <a href={href} target="_blank" rel="noopener noreferrer" {...props}>
+        {children}
+      </a>
+    )
+  }
+
+  // Internal links (absolute paths from remark plugin, or anchors)
+  return (
+    <Link href={href} {...props}>
+      {children}
+    </Link>
+  )
+}
+
+// Custom components for MDX rendering
 const mdxComponents = {
+  a: DocsLink,
   pre: ({ children, ...props }: React.HTMLAttributes<HTMLPreElement>) => {
-    // Check if the child is a <code> with mermaid language
     const child = children as React.ReactElement<{
       className?: string
       children?: string

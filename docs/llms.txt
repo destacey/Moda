@@ -27,11 +27,11 @@ Moda supports:
 - [Work Management Overview](docs/user-guide/work-management/index.mdx): How work items connect to teams, sprints, and projects
 - [Work Items & Workspaces](docs/user-guide/work-management/work-items.mdx): Work items, workspaces, dependencies, revisions, hierarchy
 - [Work Configuration](docs/user-guide/work-management/work-configuration.mdx): Work processes, types, tiers, levels, workflows, statuses
-- [PPM Overview](docs/user-guide/project-portfolios/index.mdx): How PPM connects strategy and execution
-- [Portfolios & Programs](docs/user-guide/project-portfolios/portfolios-programs.mdx): Portfolio lifecycle, programs, roles
-- [Projects](docs/user-guide/project-portfolios/projects.mdx): Project lifecycle, phases, tasks, dependencies, plan tab
-- [Strategic Initiatives](docs/user-guide/project-portfolios/strategic-initiatives.mdx): Initiatives, KPIs, checkpoints, measurements
-- [My Projects Dashboard](docs/user-guide/project-portfolios/my-projects.mdx): Personalized project view with task metrics
+- [PPM Overview](docs/user-guide/ppm/index.mdx): How PPM connects strategy and execution
+- [Portfolios & Programs](docs/user-guide/ppm/portfolios-programs.mdx): Portfolio lifecycle, programs, roles
+- [Projects](docs/user-guide/ppm/projects.mdx): Project lifecycle, phases, tasks, dependencies, plan tab
+- [Strategic Initiatives](docs/user-guide/ppm/strategic-initiatives.mdx): Initiatives, KPIs, checkpoints, measurements
+- [My Projects Dashboard](docs/user-guide/ppm/my-projects.mdx): Personalized project view with task metrics
 - [Strategic Management](docs/user-guide/strategic-management/index.mdx): Visions, strategies, strategic themes, cross-domain alignment
 - [Administration](docs/user-guide/settings/index.mdx): Users, roles, feature flags, integrations, background jobs
 - [Architecture](docs/contributing/architecture.mdx): Clean Architecture, DDD, CQRS, vertical slices
@@ -41,7 +41,6 @@ Moda supports:
 - [Database & Migrations](docs/contributing/database.mdx): EF Core, shared DbContext, migrations
 - [Frontend Development](docs/contributing/frontend.mdx): Next.js, React, Ant Design, RTK Query
 - [API Development](docs/contributing/api.mdx): Controller patterns, authentication, OpenAPI
-- [Domain Model](docs/reference/domain-model.mdx): Entity relationships across all bounded contexts
 - [API Reference](docs/reference/api.mdx): REST API areas and endpoints
 - [Feature Flags](docs/reference/feature-flags.mdx): Feature management system
 - [Integrations](docs/reference/integrations.mdx): Azure DevOps, Microsoft Graph

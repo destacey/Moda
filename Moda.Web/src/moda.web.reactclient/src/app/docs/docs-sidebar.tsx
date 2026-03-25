@@ -55,7 +55,13 @@ export default function DocsSidebar({ navigation }: DocsSidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
 
-  const menuItems = useMemo(() => buildMenuItems(navigation), [navigation])
+  const menuItems = useMemo(() => {
+    const homeItem: MenuItem = {
+      key: '/docs',
+      label: 'Welcome',
+    }
+    return [homeItem, ...buildMenuItems(navigation)]
+  }, [navigation])
 
   const defaultOpenKeys = useMemo(
     () => findOpenKeys(navigation, pathname),

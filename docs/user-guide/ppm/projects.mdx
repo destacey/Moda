@@ -14,10 +14,10 @@ Every project has:
 - **Name**, **Description**, **Business Case**, **Expected Benefits**
 - **Status** — Proposed, Approved, Active, Completed, or Cancelled
 - **Date Range** — Start and optional end date
-- **[Expenditure Category](../settings/index.mdx#expenditure-categories)** — Budget classification
+- **[Expenditure Category](../settings/index#expenditure-categories)** — Budget classification
 - **[Lifecycle](#project-lifecycles)** — Defines the phases the project goes through
 - **Roles** — Sponsor, Owner, Manager, Member
-- **[Strategic Theme Tags](../strategic-management/index.mdx#strategic-themes)** — Links to strategic themes
+- **[Strategic Theme Tags](../strategic-management/index#strategic-themes)** — Links to strategic themes
 
 ## Project Status Lifecycle
 
@@ -36,7 +36,7 @@ stateDiagram-v2
 - A [lifecycle](#project-lifecycles) must be assigned before a project can be approved
 - Active/Completed projects require a date range
 - Only Proposed projects can be deleted
-- A project can belong to at most one [program](./portfolios-programs.mdx#programs) (or none)
+- A project can belong to at most one [program](./portfolios-programs#programs) (or none)
 - The project key can be changed (cascades to all [task](#project-tasks) keys)
 
 ## Project Detail Page
@@ -45,7 +45,7 @@ The project detail page adapts based on the project's status:
 
 **Details Tab** (two-column layout):
 
-*Left sidebar* — [Portfolio](./portfolios-programs.mdx#portfolios) link, [Program](./portfolios-programs.mdx#programs) link (if assigned), date range, [Expenditure Category](../settings/index.mdx#expenditure-categories), Lifecycle name with tooltip, [Strategic Themes](../strategic-management/index.mdx#strategic-themes), Sponsors/Owners/Managers/Members, timeline progress bar, and links.
+*Left sidebar* — [Portfolio](./portfolios-programs#portfolios) link, [Program](./portfolios-programs#programs) link (if assigned), date range, [Expenditure Category](../settings/index#expenditure-categories), Lifecycle name with tooltip, [Strategic Themes](../strategic-management/index#strategic-themes), Sponsors/Owners/Managers/Members, timeline progress bar, and links.
 
 *Right content area* — Changes based on status:
 - **Pre-Execution** (Proposed/Approved): Shows **Project Definition** first (Description, Business Case, Expected Benefits as expandable Markdown sections), then [Phases](#project-phases)/[Tasks](#project-tasks)
@@ -57,7 +57,7 @@ Warning alerts appear when requirements are missing:
 - *"Project Dates are required before activating"*
 - *"A Project Lifecycle is required before approving"*
 
-**Team Tab** — Grid of all [team](../organizations/index.mdx#teams) members with their roles, showing the people assigned across all project roles.
+**Team Tab** — Grid of all [team](../organizations/index#teams) members with their roles, showing the people assigned across all project roles.
 
 **Plan Tab** (only visible if lifecycle is assigned) — This is the project's work breakdown structure:
 
@@ -68,11 +68,11 @@ Warning alerts appear when requirements are missing:
 - **Filtering** by task type, status, and priority
 - **Keyboard shortcuts** for efficient navigation
 
-**Work Items Tab** — Grid of [work items](../work-management/index.mdx#work-items) from Work Management that are associated with this project.
+**Work Items Tab** — Grid of [work items](../work-management/index#work-items) from Work Management that are associated with this project.
 
 ## Project Lifecycles
 
-A **Project Lifecycle** defines the template of phases that a project goes through from inception to completion. Lifecycles are configured in [Settings > PPM > Project Lifecycles](../settings/index.mdx#project-lifecycles).
+A **Project Lifecycle** defines the template of phases that a project goes through from inception to completion. Lifecycles are configured in [Settings > PPM > Project Lifecycles](../settings/index#project-lifecycles).
 
 Lifecycles have a state:
 - **Proposed** — Being defined; phases can be added, modified, reordered
@@ -153,18 +153,18 @@ graph TD
 
 Tasks support **Finish-to-Start** dependencies — a predecessor task must complete before its successor can start. Dependencies are soft-deleted (marked as removed rather than permanently deleted).
 
-> **Note:** These are project task dependencies within PPM. For work item dependencies across [workspaces](../work-management/index.mdx#workspaces), see [Work Item Dependencies](../work-management/index.mdx#work-item-dependencies).
+> **Note:** These are project task dependencies within PPM. For work item dependencies across [workspaces](../work-management/index#workspaces), see [Work Item Dependencies](../work-management/index#work-item-dependencies).
 
 ## Common Tasks
 
 ### Creating a Project
 
-1. Navigate to a [portfolio's](./portfolios-programs.mdx#portfolios) detail page, or **PPM > Projects**
+1. Navigate to a [portfolio's](./portfolios-programs#portfolios) detail page, or **PPM > Projects**
 2. Click **Create Project**
 3. Enter **Name**, **Key** (project code), and **Description**
-4. Optionally set **Business Case**, **Expected Benefits**, and **[Expenditure Category](../settings/index.mdx#expenditure-categories)**
+4. Optionally set **Business Case**, **Expected Benefits**, and **[Expenditure Category](../settings/index#expenditure-categories)**
 5. Assign a **[Lifecycle](#project-lifecycles)** to enable approval
-6. Add **Roles** to assign [team](../organizations/index.mdx#teams) members
+6. Add **Roles** to assign [team](../organizations/index#teams) members
 7. **Approve** the project (requires lifecycle), then **Activate** (requires date range)
 
 ### Managing Project Phases and Tasks
@@ -179,7 +179,7 @@ Tasks support **Finish-to-Start** dependencies — a predecessor task must compl
 
 ### Setting Up a Project Lifecycle
 
-1. Navigate to [Settings > PPM > Project Lifecycles](../settings/index.mdx#project-lifecycles)
+1. Navigate to [Settings > PPM > Project Lifecycles](../settings/index#project-lifecycles)
 2. Click **Create Lifecycle**
 3. Add **Phases** in order (e.g., Initiation, Planning, Execution, Closing)
 4. **Activate** the lifecycle when the phase list is complete

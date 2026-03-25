@@ -1,15 +1,19 @@
 ---
 title: Welcome to Moda
-description: Moda is a work management system for planning, managing, and creating associations across work items, projects, teams, and products.
+description: An intelligent delivery management platform designed to give engineering leaders and teams end-to-end visibility into software delivery.
 sidebar_position: 1
 audience: [user, developer, agent]
 ---
 
 # Welcome to Moda
 
-Moda is a work management system used to plan, manage, and create associations across work items, projects, teams, planning, and products. It helps organizations track, align, and deliver work at scale.
+Moda is an intelligent delivery management platform designed to give engineering leaders and teams end-to-end visibility into software delivery.
 
-## What is Moda?
+When delivery spans multiple teams, projects, and systems, visibility breaks down. Moda brings it all together — tracking work items, aligning teams to planning intervals and products, and surfacing dependencies across the organization.
+
+**Core Philosophy:** Moda acts as a unified hub that synchronizes data from multiple business systems and combines it with capabilities those systems lack — connecting the dots so teams can see the full picture in one place.
+
+## What Can You Do with Moda?
 
 Moda provides a unified platform for organizations to:
 
@@ -20,36 +24,26 @@ Moda provides a unified platform for organizations to:
 - **Align Strategy** — Define strategic themes that guide investment decisions and work prioritization
 - **Integrate** — Synchronize data from Azure DevOps and Microsoft Entra ID
 
-## Ownership Model
-
-Moda is built to allow data from external systems to be synchronized into the platform. Objects in Moda that can come from external systems have an **Ownership** attribute:
-
-- **Owned** — The object is created and managed within Moda
-- **Managed** — The object is owned by an external system and is read-only in Moda
-
-Managed objects can still be associated or linked to owned items. For example, a work item owned by Azure DevOps (managed in Moda) can be linked to a team objective owned by Moda.
-
 ## Documentation Sections
 
 ### For Users
 
-- [Organizations](./user-guide/organizations/index.mdx) — Teams, teams of teams, and organizational hierarchy
-- [Planning](./user-guide/planning/index.mdx) — Planning intervals, increments, sprints, objectives, and risks
-- [Work Management](./user-guide/work-management/index.mdx) — Workspaces, work items, work processes, and workflows
-- [Project Portfolios](./user-guide/project-portfolios/index.mdx) — Portfolios, programs, and projects
-- [Strategic Management](./user-guide/strategic-management/index.mdx) — Strategic themes and alignment
-- [Administration](./user-guide/settings/index.mdx) — User management, feature flags, integrations, and configuration
+- [Organizations](./user-guide/organizations/index) — Teams, teams of teams, and organizational hierarchy
+- [Planning](./user-guide/planning/index) — Planning intervals, increments, sprints, objectives, and risks
+- [Work Management](./user-guide/work-management/index) — Workspaces, work items, work processes, and workflows
+- [Project Portfolios](./user-guide/ppm/index) — Portfolios, programs, and projects
+- [Strategic Management](./user-guide/strategic-management/index) — Strategic themes and alignment
+- [Administration](./user-guide/settings/index) — User management, feature flags, integrations, and configuration
 
 ### For Developers
 
-- [Architecture](./contributing/architecture.mdx) — System design and patterns
-- [Getting Started](./getting-started/prerequisites.mdx) — Development environment setup
-- [Coding Standards](./contributing/coding-standards.mdx) — Code conventions and best practices
-- [Testing](./contributing/testing.mdx) — Testing strategies and patterns
+- [Architecture](./contributing/architecture) — System design and patterns
+- [Development Setup](./contributing/prerequisites) — Prerequisites, installation, and configuration
+- [Coding Standards](./contributing/coding-standards) — Code conventions and best practices
+- [Testing](./contributing/testing) — Testing strategies and patterns
 
 ### Reference
 
-- [Domain Model](./reference/domain-model.mdx) — Core domain concepts and relationships
-- [API Reference](./reference/api.mdx) — REST API documentation
-- [Feature Flags](./reference/feature-flags.mdx) — Feature management system
-- [Integrations](./reference/integrations.mdx) — External system integrations
+- [API Reference](./reference/api) — REST API documentation
+- [Feature Flags](./reference/feature-flags) — Feature management system
+- [Integrations](./reference/integrations) — External system integrations

@@ -1,0 +1,42 @@
+---
+title: My Projects Dashboard
+description: Personalized project overview with task metrics and phase tracking in Moda.
+sidebar_position: 4
+audience: [user, agent]
+---
+
+# My Projects Dashboard
+
+The **My Projects** dashboard (**PPM > My Projects**) is a personalized view of [projects](./projects) where you have an assigned role. It provides a quick overview of your project portfolio with task metrics and phase progress.
+
+## Filters
+
+- **Status** — Multi-select: Proposed, Approved, Active, Completed, Cancelled (defaults to Approved and Active)
+- **Role** — Multi-select: Sponsor, Owner, PM, Member, Assignee (defaults to all)
+- **Reset** and **Refresh** buttons
+
+## Two-Panel Layout
+
+### Left Panel — Portfolio Groups List
+
+[Projects](./projects) are grouped by [portfolio](./portfolios-programs#portfolios), sorted by portfolio name then project status. Each project card shows:
+- Project key and name
+- Current [phase](./projects#project-phases) status
+- Project status
+- Sponsors and Owners (as avatars)
+- **Task metrics** (if you are a team member or leadership role):
+  - Total [tasks](./projects#project-tasks), Completed tasks, Overdue tasks, Tasks due this week
+
+Click a project card to select it and view details in the right panel.
+
+### Right Panel — Project Detail
+
+When a project is selected, shows:
+- Project header with key, name, status, [portfolio](./portfolios-programs#portfolios), [program](./portfolios-programs#programs), sponsors/owners, dates
+- **[Phase Timeline](./projects#project-phases)** — Step-based visualization of all phases with status indicators, date ranges, and progress percentages
+- **Task Summary** — Completion percentage and counts by status
+- **Project Plan (collapsed view)** — Hierarchical view organized by [phase](./projects#project-phases):
+  - Each phase shows as a collapsible section with status tag, progress bar, and counts (overdue, due this week, upcoming)
+  - Within each phase, [tasks](./projects#project-tasks) are listed with status icon, priority color dot, name, assignee avatars, due date, and status badge (Complete, Overdue, Due Today, Upcoming)
+  - Deliverables (grouping tasks) show progress bars with completion ratios
+  - The currently active phase is auto-expanded on load
