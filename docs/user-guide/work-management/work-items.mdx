@@ -1,0 +1,167 @@
+---
+title: Work Items & Workspaces
+description: Creating, viewing, and managing work items within workspaces in Moda.
+sidebar_position: 1
+audience: [user, agent]
+---
+
+# Work Items & Workspaces
+
+## Workspaces
+
+A **Workspace** is a container for work items. Each workspace uses a specific [work process](./work-configuration.mdx#work-processes) that defines what types of work items can be created and what [workflows](./work-configuration.mdx#workflows) they follow.
+
+Every workspace has:
+- **Key** — A unique 2-20 character uppercase alphanumeric identifier (e.g., `PLAT`, `MOBILE`)
+- **Name** and optional **Description**
+- **[Work Process](./work-configuration.mdx#work-processes)** — The configuration that defines available [work types](./work-configuration.mdx#work-types) and [workflows](./work-configuration.mdx#workflows)
+- **Ownership** — How the workspace is managed:
+  - **Owned** — Created and managed within Moda
+  - **Managed** — Synchronized from an external system (e.g., an Azure DevOps project) and read-only in Moda. See [Administration > Integrations](../settings/index.mdx#integrations).
+
+### Workspace List Page
+
+Navigate to **Work Management > Workspaces** to see all workspaces. The page supports two views:
+
+**Card View** (default) — Responsive grid of workspace cards showing:
+- Workspace name (clickable) and key
+- Description (or "No description provided")
+- Tags: "Inactive" (if inactive), "Managed" (if externally owned, with tooltip)
+
+**List View** — Grid with Key, Name, Description, Ownership, and Is Active columns.
+
+Click a workspace to view its work items.
+
+### Workspace Detail Page
+
+The workspace detail page has two tabs:
+
+**Details Tab:**
+- Key, [Work Process](./work-configuration.mdx#work-processes) (link to process configuration), Ownership type, Is Active status
+- Description
+
+**Work Items Tab:**
+- Sortable, filterable grid of all work items in the workspace
+- Columns: Key, Title, Type, Status, Status Category, Story Points, [Team](../organizations/index.mdx#teams), [Sprint](../planning/sprints.mdx), Parent, Assigned To, [Project](../project-portfolios/projects.mdx)
+- Click a work item to navigate to its detail page
+
+Actions: Set External URLs (for managed workspaces)
+
+## Work Items
+
+A **Work Item** is the fundamental unit of work in Moda. It represents any piece of work that needs to be tracked — tasks, bugs, user stories, features, epics, or any other type defined by the [work process](./work-configuration.mdx#work-processes).
+
+Every work item has:
+- **Key** — Unique identifier in format `{WorkspaceKey}-{Number}` (e.g., `PLAT-1234`). See [Work Item Keys](#work-item-keys).
+- **Title** — A brief description of the work (immutable after creation)
+- **[Type](./work-configuration.mdx#work-types)** — The category of work (defined by the workspace's work process)
+- **[Status](./work-configuration.mdx#work-statuses)** — Current position in the [workflow](./work-configuration.mdx#workflows)
+- **[Status Category](./work-configuration.mdx#work-status-categories)** — Normalized grouping (Proposed, Active, Done, Removed)
+- **Priority** — Relative importance
+- **Stack Rank** — Ordering value for backlog prioritization
+- **Story Points** — Optional effort estimate
+- **Assignee** — The person responsible for the work
+- **[Team](../organizations/index.mdx#teams)** — The team responsible for delivery
+- **Parent** — Optional hierarchical link to a parent work item. See [Hierarchy Rules](#work-item-hierarchy-rules).
+- **[Sprint/Iteration](../planning/sprints.mdx)** — Time-boxed period the work is planned for
+- **[Project](../project-portfolios/projects.mdx)** — Optional association with a PPM project ([Portfolio tier](./work-configuration.mdx#work-type-tiers) only)
+- **Activated Timestamp** — When work moved to Active status
+- **Done Timestamp** — When work moved to Done or Removed status
+
+Work items support:
+- **Parent/Child hierarchy** — Work items can be nested (e.g., Epic > Feature > User Story > Task). See [Hierarchy Rules](#work-item-hierarchy-rules).
+- **[Dependencies](#work-item-dependencies)** — Predecessor/successor relationships with planning health tracking
+- **[Revisions](#work-item-revisions)** — Change history tracking what changed, when, and by whom
+- **Links** — Cross-entity associations to other objects in Moda
+- **References** — Tracked references from other domains (e.g., linked to an [objective](../planning/planning-intervals.mdx#objectives) or [project](../project-portfolios/projects.mdx))
+
+> **Note:** Work items in **Managed** workspaces (synced from Azure DevOps) are read-only. They can be viewed and linked to other Moda objects, but cannot be edited directly.
+
+### Work Item Detail Page
+
+The work item detail page has multiple tabs that adapt based on the work item's type and status:
+
+**Details Tab:**
+- All core properties: Key, [Type](./work-configuration.mdx#work-types), [Status](./work-configuration.mdx#work-statuses), [Status Category](./work-configuration.mdx#work-status-categories), Priority, Story Points, [Team](../organizations/index.mdx#teams) (link), [Sprint](../planning/sprints.mdx) (link, shows "Backlog" if unassigned), Parent (link), [Project](../project-portfolios/projects.mdx) (link), Assigned To, Created By, Last Modified By
+- **Progress Steps** — Visual lifecycle indicator showing Proposed → Active → Done/Removed with timestamps for each transition
+- Timestamps: Created, Activated, Done (formatted with date and time)
+
+**Dashboard Tab** (hidden for Removed items):
+- **Time to Start** — Days from creation to activation (how long work waited before starting)
+- **Cycle Time** — Days from activation to completion (shows "Time Active" while still in progress). Calculated as `Done Timestamp − Activated Timestamp`. See also [Cycle Time Report](../organizations/index.mdx#cycle-time-report-report) for team-level analysis.
+- **Lead Time** — Total days from creation to completion (only shown for Done items)
+- For **[Portfolio tier](./work-configuration.mdx#work-type-tiers)** items (Epics, Features), also shows:
+  - **Progress Pie Chart** — Distribution of child items by [status category](./work-configuration.mdx#work-status-categories) (Proposed, Active, Done) with percentages
+  - **Cumulative Flow Chart** — Stacked area chart showing daily count of child items in each status category over time
+
+**Work Items Tab** ([Portfolio tier](./work-configuration.mdx#work-type-tiers) only):
+- Grid of child work items belonging to this parent
+
+**Dependencies Tab:**
+- Two-column grouped grid:
+  - **Dependency Info**: Type (Predecessor/Successor with tooltip), State, Health (color-coded), Scope (Intra-Team/Cross-Team with explanation)
+  - **Work Item Info**: Key (linked), Title, Type, Status, [Team](../organizations/index.mdx#teams) (link), [Sprint](../planning/sprints.mdx) (link)
+- Support for external work item links (icon linking to integrated system)
+
+### Where Work Items Appear
+
+Work items are visible in multiple places throughout Moda:
+- **[Workspace detail page](#workspace-detail-page)** — All work items in the workspace
+- **[Team Backlog tab](../organizations/index.mdx#backlog-tab)** — All work items assigned to a team across all workspaces
+- **[Team Dependency Management tab](../organizations/index.mdx#dependency-management-tab)** — Dependencies involving the team
+- **[Sprint Backlog](../planning/sprints.mdx#sprint-detail-page)** — Work items assigned to a specific sprint
+- **[PI Iteration Backlog](../planning/planning-intervals.mdx#pi-iteration-detail-page)** — Work items in a PI iteration
+- **[Project Work Items tab](../project-portfolios/projects.mdx#project-detail-page)** — Work items associated with a project
+
+## Work Item Dependencies
+
+Work items can have **dependency** relationships — predecessor/successor links that model "this work must finish before that work can start."
+
+Each dependency tracks:
+- **Predecessor** — The work item that must complete first
+- **Successor** — The work item that depends on the predecessor
+- **Comment** — Optional context about the dependency
+- **State** — Automatically calculated from the predecessor's [status category](./work-configuration.mdx#work-status-categories):
+  - **To Do** — Predecessor is Proposed
+  - **In Progress** — Predecessor is Active
+  - **Done** — Predecessor is Done or Removed
+- **Planning Health** — Automatically calculated from planned dates ([sprint](../planning/sprints.mdx) end dates):
+
+| Health | Condition |
+|--------|-----------|
+| **Healthy** | Predecessor is planned before successor, or predecessor is already Done |
+| **At Risk** | One or both items are unplanned |
+| **Unhealthy** | Predecessor is planned after successor, or successor is already active while predecessor hasn't completed |
+
+- **Scope** — Whether the dependency is within a team (Intra-Team) or across teams (Cross-Team)
+
+Dependencies are visible on:
+- **[Team Dependency Management tab](../organizations/index.mdx#dependency-management-tab)** — All dependencies involving a team
+- **[Work Item detail page](#work-item-detail-page)** — Predecessor and successor lists
+
+## Work Item Keys
+
+Every work item has a unique **Key** in the format `{WorkspaceKey}-{Number}` (e.g., `PLAT-1234`). The workspace key is a 2-20 character uppercase alphanumeric code starting with a letter. The number is auto-incremented within the workspace.
+
+## Work Item Revisions
+
+**Revisions** provide an audit trail for work items. Each revision records:
+- **Revision number** — Sequential within the work item
+- **Who** made the change
+- **When** the change occurred
+- **Field-level changes** — Old value and new value for each modified field
+
+## Work Item Hierarchy Rules
+
+Work items follow strict hierarchy rules based on their [work type tier](./work-configuration.mdx#work-type-tiers):
+- Only **[Portfolio tier](./work-configuration.mdx#work-type-tiers)** work items (e.g., Epic, Feature) can be parents
+- A parent must be a **higher [level](./work-configuration.mdx#work-type-levels)** than the child (e.g., Epic > Feature > Story)
+- Work items cannot be linked to themselves
+- Portfolio-tier work items can be directly associated with PPM **[Projects](../project-portfolios/projects.mdx)**. Child work items inherit the project assignment from their parent.
+
+## Ownership Model
+
+Workspaces, [work processes](./work-configuration.mdx#work-processes), and [workflows](./work-configuration.mdx#workflows) all follow the same ownership model:
+
+- **Owned** — Created and fully managed within Moda
+- **Managed** — Synchronized from an external system (e.g., Azure DevOps). The external system is the source of truth. Changes in the external system are reflected in Moda via [background synchronization](../settings/index.mdx#background-jobs). Managed entities display an external URL template for linking back to the source. See [Administration > Integrations](../settings/index.mdx#integrations) for configuration details.

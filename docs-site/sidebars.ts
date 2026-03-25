@@ -27,35 +27,41 @@ const sidebars: SidebarsConfig = {
       link: {type: 'doc', id: 'user-guide/index'},
       items: [
         {
-          type: 'category',
-          label: 'Work Management',
-          link: {type: 'doc', id: 'user-guide/work-management/index'},
-          items: [
-            'user-guide/work-management/creating-work-items',
-            'user-guide/work-management/managing-work-items',
-            'user-guide/work-management/work-processes',
-            'user-guide/work-management/workspaces',
-          ],
-        },
-        {
-          type: 'doc',
-          id: 'user-guide/planning/index',
-          label: 'Planning',
-        },
-        {
           type: 'doc',
           id: 'user-guide/organizations/index',
           label: 'Organizations',
         },
         {
-          type: 'doc',
-          id: 'user-guide/goals/index',
-          label: 'Goals',
+          type: 'category',
+          label: 'Planning',
+          link: {type: 'doc', id: 'user-guide/planning/index'},
+          items: [
+            'user-guide/planning/planning-intervals',
+            'user-guide/planning/sprints',
+            'user-guide/planning/risks',
+            'user-guide/planning/roadmaps',
+            'user-guide/planning/planning-poker',
+          ],
         },
         {
-          type: 'doc',
-          id: 'user-guide/project-portfolios/index',
+          type: 'category',
+          label: 'Work Management',
+          link: {type: 'doc', id: 'user-guide/work-management/index'},
+          items: [
+            'user-guide/work-management/work-items',
+            'user-guide/work-management/work-configuration',
+          ],
+        },
+        {
+          type: 'category',
           label: 'Project Portfolios',
+          link: {type: 'doc', id: 'user-guide/project-portfolios/index'},
+          items: [
+            'user-guide/project-portfolios/portfolios-programs',
+            'user-guide/project-portfolios/projects',
+            'user-guide/project-portfolios/strategic-initiatives',
+            'user-guide/project-portfolios/my-projects',
+          ],
         },
         {
           type: 'doc',
@@ -65,7 +71,7 @@ const sidebars: SidebarsConfig = {
         {
           type: 'doc',
           id: 'user-guide/settings/index',
-          label: 'Settings',
+          label: 'Administration',
         },
       ],
     },

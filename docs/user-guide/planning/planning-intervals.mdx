@@ -1,0 +1,224 @@
+---
+title: Planning Intervals
+description: Planning intervals, iterations, sprint mapping, objectives, predictability, and plan review in Moda.
+sidebar_position: 1
+audience: [user, agent]
+---
+
+# Planning Intervals
+
+A **Planning Interval** (PI) is a fixed timeframe — typically 8-12 weeks — during which a group of teams delivers value toward committed objectives. It is the primary unit of scaled planning in Moda.
+
+Every planning interval has:
+- **Name** and optional **Description**
+- **Date Range** — Start and end date for the PI
+- **Teams** — The [teams](../organizations/index.mdx#teams) and [teams of teams](../organizations/index.mdx#teams-of-teams) participating
+- **Iterations** — Time-boxed periods within the PI (typically 2-week sprints)
+- **[Objectives](#objectives)** — Team commitments for the PI
+- **Objectives Locked** — Flag to prevent changes to objectives after PI planning
+
+A PI has a state based on the current date:
+- **Future** — Start date hasn't arrived yet
+- **Active** — Currently in progress
+- **Completed** — End date has passed
+
+## PI Detail Page
+
+The PI detail page is the command center for a planning interval. It provides several views:
+
+**Details Tab:**
+- Start/End dates and Objectives Locked status
+- PI Description (Markdown)
+- **Iteration cards** — Each iteration is shown as a clickable card. Click an iteration to navigate to its detail page, where you can see the aggregated sprint backlog and metrics across all participating teams.
+- **Metrics and Charts:**
+  - **Days Countdown** — Days remaining in the PI (based on state)
+  - **PI [Predictability](#predictability)** — Percentage of committed (non-stretch) objectives completed
+  - **Team Predictability Radar Chart** — Multi-axis radar showing each team's predictability score
+  - **Objective Status Chart** — Pie chart grouping objectives by status
+  - **Objective Health Chart** — Pie chart grouping objectives by health check status
+
+**Teams Tab:**
+- Grid of all [teams](../organizations/index.mdx#teams) assigned to the PI
+
+**Sprint Mappings Tab:**
+- Configuration grid mapping each team's [sprints](./sprints.mdx) to PI iterations
+- Each team can have one sprint per iteration
+
+**Horizontal navigation** across the PI provides quick access to:
+- PI Details
+- [Plan Review](#plan-review)
+- [Objectives](#objectives)
+- [Risks](./risks.mdx)
+- Reports (Health Report)
+
+## Iterations within a PI
+
+Each PI contains **Iterations** that define the sprint schedule. Iterations have:
+- **Name** — Descriptive name (e.g., "Sprint 1", "IP Sprint")
+- **Category** — Purpose of the iteration:
+  - **Development** — Standard delivery sprint
+  - **Innovation and Planning** — Time for planning, innovation, and technical debt
+- **Date Range** — Must fall within the PI's date range
+
+Iterations can be auto-generated using **Initialize Iterations** which creates evenly spaced iterations by week length, or added individually.
+
+### PI Iteration Detail Page
+
+A PI iteration groups all matching [sprints](./sprints.mdx) from participating teams into a single aggregate view. When multiple teams participate in a PI, each team's sprint is mapped to the corresponding iteration (see [Sprint Mapping](#sprint-mapping)). The iteration detail page rolls up metrics from all mapped sprints, giving you a cross-team view of progress.
+
+**Summary Tab:**
+- **Timeline progress bar** — Visual indicator of time elapsed from start to end date
+- **Team Count** — Number of distinct teams with sprints mapped to this iteration
+- **Sprint Count** — Total number of sprints included in the aggregation
+- **Aggregate Metrics** (for Active/Completed iterations, see [Sprint Metrics](./sprints.mdx#sprint-metrics) for definitions):
+  - Total/Completed/Remaining story points (or item counts)
+  - Completion Rate percentage
+  - Velocity
+  - Average Cycle Time across all teams' sprints
+  - Missing Story Points count
+- Metrics can be toggled between **Story Points** and **Count** sizing methods
+
+**Backlog Tab:**
+- Combined sprint backlog grid showing [work items](../work-management/index.mdx#work-items) from all mapped sprints
+- Columns: Rank, Key, Type, Title, Story Points, Status, Status Category, Team
+
+> **Tip:** Click on an iteration card on the PI Details tab to navigate directly to its detail page.
+
+**Business rules:**
+- Iteration names must be unique within a PI
+- Iteration dates must fall within the PI's date range
+- Iteration dates cannot overlap with each other
+
+## Sprint Mapping
+
+Team [Sprints](./sprints.mdx) are mapped to PI iterations. This mapping connects each team's delivery cadence to the broader PI schedule, enabling aggregate views and cross-team coordination.
+
+**Rules:**
+- A team can only have one sprint per iteration
+- The sprint must belong to a team that is part of the PI
+- Removing a team from a PI also removes its sprint mappings
+
+## Objectives
+
+**Planning Interval Objectives** represent commitments from teams to deliver specific outcomes within a PI. They are the core mechanism for PI-level planning and tracking.
+
+```mermaid
+graph LR
+    subgraph "Planning Interval"
+        O1["Objective: Launch API v2<br/>(Committed)"]
+        O2["Objective: Reduce Latency<br/>(Stretch)"]
+    end
+
+    subgraph "Team: Platform"
+        S1["Sprint 1"]
+        S2["Sprint 2"]
+    end
+
+    subgraph "Work Items"
+        W1["PLAT-101: Design API"]
+        W2["PLAT-102: Build Endpoints"]
+        W3["PLAT-103: Load Testing"]
+        W4["PLAT-104: Cache Layer"]
+    end
+
+    O1 -->|linked to| W1 & W2 & W3
+    O2 -->|linked to| W4
+    S1 -->|contains| W1 & W2
+    S2 -->|contains| W3 & W4
+```
+
+Objectives bridge the gap between strategic intent and execution. A team commits to objectives during PI planning, then links [work items](../work-management/index.mdx#work-items) that fulfill those objectives. As work items are completed in [sprints](./sprints.mdx), objective progress is tracked.
+
+Each objective has:
+- **Team** — The [team](../organizations/index.mdx#teams) committing to the objective
+- **Type** — Team objective or Team of Teams objective
+- **Status**:
+  - **Not Started** — Work hasn't begun
+  - **In Progress** — Actively being worked on
+  - **Completed** — Successfully delivered
+  - **Canceled** — Removed from scope
+  - **Missed** — Not delivered by PI end
+- **Is Stretch** — Whether this is a stretch goal (aspirational) vs. a committed objective
+- **Health Check** — Optional health indicator (Healthy, At Risk, Unhealthy) with expiration
+
+**Business rules:**
+- Objectives can only be created when the PI's `ObjectivesLocked` flag is false
+- When objectives are locked, the stretch flag cannot be changed
+
+### Objectives Page
+
+The objectives page for a PI offers two views:
+
+**List View** — AG Grid with columns: Key, Name, Is Stretch, Status, Team, Health, Progress (bar), Start Date, Target Date, Order
+
+**Timeline View** — Visual timeline grouped by team, showing objectives as bars across the PI timeline. Only shows delivery teams (not Teams of Teams).
+
+### Objective Detail Page
+
+Each objective has its own detail page showing:
+- Progress bar (colored red for Canceled/Missed objectives)
+- PI link, Team link, Status, Is Stretch flag, Start/Target/Closed dates, Type
+- Description (Markdown)
+- **Health Report Chart** — Historical health check status over time
+- **Work Items Card** — Grid of linked [work items](../work-management/index.mdx#work-items) with ability to link/unlink
+- **Links Card** — Cross-entity associations
+
+Actions: Edit, Delete, Create Health Check
+
+### Objectives Health Report
+
+The health report page (**Reports > Health Report**) shows all PI objectives in a grid with Key, Name, Is Stretch, Status, Team, Progress, Health Status, Note, Reported On, and Expiration. This provides a single view of objective health across all teams.
+
+### Predictability
+
+Moda calculates **Predictability** for each PI — the percentage of committed (non-stretch) objectives that were completed.
+
+```
+Predictability = (Completed committed objectives / Total committed objectives) × 100
+```
+
+> **Stretch objectives are excluded** from the predictability calculation. Only committed (non-stretch) objectives count. This ensures predictability measures reliable delivery, not aspirational targets.
+
+Predictability can be calculated:
+- **Per-team** — How well did this team deliver on their commitments?
+- **Across the PI** — How well did all teams collectively deliver?
+
+Predictability is only calculated for Active or Completed PIs (not Future). It is shown on the PI Details tab as a metric and visualized per-team in the **Team Predictability Radar Chart**.
+
+## Plan Review
+
+The **Plan Review** page provides a team-by-team view of the PI, with one tab per participating team. This is designed for PI planning ceremonies and plan review sessions.
+
+Each team tab shows:
+- **Team Predictability** metric (if available from prior PIs)
+- Two view modes:
+  - **List View** — Objective cards and [risk](./risks.mdx) cards for the team
+  - **Timeline View** — Objectives displayed on a timeline
+
+The plan review only shows delivery teams (not Teams of Teams). URL hash navigation (`#team-code`) allows linking directly to a specific team's tab.
+
+## Common Tasks
+
+### Creating a Planning Interval
+
+1. Navigate to **Planning > Planning Intervals**
+2. Click **Create Planning Interval**
+3. Enter **Name**, **Date Range**, and optional **Description**
+4. Use **Manage Dates > Initialize Iterations** to auto-generate sprints by week length, or add them individually
+5. Use **Manage Teams** to add participating teams
+
+### Managing Team Objectives
+
+1. Navigate to the PI detail page
+2. Click **Objectives** in the horizontal nav
+3. Click **Create Objective** for a team
+4. Set whether it is a **Stretch** goal
+5. Update status as the PI progresses
+6. Add **Health Checks** to track objective health over time
+
+### Reviewing the PI Plan
+
+1. Navigate to the PI detail page
+2. Click **Plan Review** in the horizontal nav
+3. Review each team's objectives and [risks](./risks.mdx) tab-by-tab
+4. Switch between List and Timeline views for different perspectives

@@ -1,6 +1,7 @@
 'use client'
 
 import { Menu } from 'antd'
+import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useMemo } from 'react'
 import type { DocNavItem } from '@/src/services/docs'
@@ -14,15 +15,16 @@ interface DocsSidebarProps {
 
 function buildMenuItems(items: DocNavItem[]): MenuItem[] {
   return items.map((item) => {
+    const key = `/docs/${item.slug}`
     if (item.children && item.children.length > 0) {
       return {
-        key: `/docs/${item.slug}`,
-        label: item.title,
+        key,
+        label: <Link href={key}>{item.title}</Link>,
         children: buildMenuItems(item.children),
       }
     }
     return {
-      key: `/docs/${item.slug}`,
+      key,
       label: item.title,
     }
   })

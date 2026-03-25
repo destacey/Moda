@@ -1,0 +1,60 @@
+---
+title: Risks
+description: Risk identification and management using the ROAM model in Moda.
+sidebar_position: 3
+audience: [user, agent]
+---
+
+# Risks
+
+A **Risk** is the potential that a circumstance could arise that alters the outcome of a project, objective, or work item. Risks are tracked at the [team](../organizations/index.mdx#teams) level and within [Planning Intervals](./planning-intervals.mdx).
+
+Every risk has:
+- **Summary** and optional **Description**
+- **Team** — Associated [team](../organizations/index.mdx#teams) (optional)
+- **Reported By** — The employee who identified the risk
+- **Reported On** — When the risk was identified
+- **Status** — Open or Closed
+- **Category** (ROAM) — How the risk is being handled:
+  - **Resolved** — The risk has been eliminated; no further action needed
+  - **Owned** — Someone is actively managing the risk
+  - **Accepted** — The risk is acknowledged and accepted as-is
+  - **Mitigated** — Actions have been taken to reduce impact or likelihood
+- **Impact** — Severity if the risk materializes (Low, Medium, High)
+- **Likelihood** — Probability the risk will occur (Low, Medium, High)
+- **Exposure** — Automatically calculated from Impact + Likelihood:
+
+| | Low Impact | Medium Impact | High Impact |
+|---|---|---|---|
+| **Low Likelihood** | Low | Low | Medium |
+| **Medium Likelihood** | Low | Medium | High |
+| **High Likelihood** | Medium | High | High |
+
+- **Assignee** — Person responsible for managing the risk
+- **Follow-Up Date** — When to review the risk next
+- **Response** — Planned mitigation actions
+- **Closed Date** — Automatically set when status changes to Closed
+
+## Where Risks Appear
+
+Risks are visible in multiple places:
+
+- **[PI Risks tab](./planning-intervals.mdx)** — All risks associated with the PI's teams, with an **Include Closed Risks** toggle. Grid columns: Key, Summary, Team, Status, Category, Exposure, Follow-up Date, Assignee, Reported On.
+- **[Team Risk Management tab](../organizations/index.mdx#risk-management-tab)** — Risks for a specific team, with the same toggle and create capability.
+- **[Plan Review](./planning-intervals.mdx#plan-review)** — Within each team's tab during PI planning ceremonies.
+
+## Common Tasks
+
+### Creating a Risk
+
+1. Navigate to a PI's Risks tab, or a team's Risk Management tab
+2. Click **Create Risk**
+3. Enter **Summary**, **Impact**, **Likelihood**, and **Category**
+4. Optionally assign to a person and set a follow-up date
+
+### Managing Risks
+
+- Update **Category** as risk handling evolves (e.g., from Owned to Mitigated)
+- Update **Status** to Closed when the risk is resolved — the Closed Date is set automatically
+- Use the **Follow-Up Date** to schedule periodic reviews
+- Use the **Include Closed Risks** toggle to review historical risks

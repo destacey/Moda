@@ -1,34 +1,77 @@
 ---
-title: Project Portfolios
-description: Project and portfolio management in Moda.
-sidebar_position: 5
+title: Project Portfolio Management
+description: Managing portfolios, programs, projects, strategic initiatives, lifecycles, phases, tasks, and KPIs in Moda.
+sidebar_position: 4
 audience: [user, agent]
 ---
 
-# Project Portfolios
+# Project Portfolio Management
 
-The Project Portfolio Management domain provides tools for managing projects and organizing them into portfolios.
+Project Portfolio Management (PPM) is a systematic approach to managing an organization's portfolio of projects and programs. It involves the selection, prioritization, and management of projects to align with strategic goals, maximize value, and ensure efficient resource utilization.
 
-## Key Concepts
+## How PPM Connects Across Moda
 
-### Projects
+PPM sits at the intersection of strategy and execution:
 
-Projects represent distinct initiatives with defined scope, timeline, and deliverables. They can be:
-- Tracked through lifecycle phases
-- Associated with teams and work items
-- Organized into portfolios
+```mermaid
+graph LR
+    subgraph "Strategic Management"
+        ST["Strategic Themes"]
+    end
+    subgraph "PPM"
+        PF["Portfolios"]
+        Prog["Programs"]
+        Proj["Projects"]
+        SI["Strategic Initiatives"]
+        KPI["KPIs"]
+        Phase["Phases"]
+        Task["Tasks"]
+    end
+    subgraph "Work Management"
+        WI["Work Items"]
+    end
+    subgraph "Organization"
+        Team["Teams"]
+    end
 
-### Portfolios
+    ST -->|tags| Proj
+    ST -->|tags| Prog
+    ST -->|tags| SI
+    PF -->|contains| Prog
+    PF -->|contains| Proj
+    PF -->|contains| SI
+    Prog -->|groups| Proj
+    Proj -->|has| Phase
+    Phase -->|has| Task
+    SI -->|tracks| KPI
+    SI -->|links to| Proj
+    WI -->|associated with| Proj
+    Team -->|assigned roles on| Proj
+```
 
-Portfolios are collections of related projects that are managed together for strategic alignment and resource optimization.
+- **[Strategic Themes](../strategic-management/index.mdx#strategic-themes)** tag projects, programs, and initiatives for alignment. See [how themes connect to PPM](../strategic-management/index.mdx#how-strategic-themes-connect-to-other-domains).
+- **[Work Items](../work-management/index.mdx#work-items)** from [workspaces](../work-management/index.mdx#workspaces) can be associated with projects on the [Project Work Items tab](./projects.mdx#project-detail-page).
+- **[Teams](../organizations/index.mdx#teams)** are assigned roles on projects (Sponsor, Owner, Manager, Member).
 
-### Portfolio Status
+## Sections
 
-Portfolios and projects have status tracking that provides visibility into health and progress.
+- **[Portfolios & Programs](./portfolios-programs.mdx)** — Top-level containers, program management, and portfolio governance
+- **[Projects](./projects.mdx)** — Project lifecycle, phases, tasks, dependencies, and the plan tab
+- **[Strategic Initiatives](./strategic-initiatives.mdx)** — Initiative tracking with KPIs, checkpoints, and measurements
+- **[My Projects Dashboard](./my-projects.mdx)** — Personalized project overview with task metrics
 
-## Common Tasks
+## Business Rules Summary
 
-- Creating and managing projects
-- Organizing projects into portfolios
-- Tracking project status and health
-- Viewing portfolio-level dashboards
+| Rule | Description |
+|------|-------------|
+| Portfolio close | All [programs](./portfolios-programs.mdx#programs)/[projects](./projects.mdx) must be closed first |
+| Program close | All [projects](./projects.mdx) must be completed/cancelled first |
+| Project approval | [Lifecycle](./projects.mdx#project-lifecycles) must be assigned before approval |
+| Project activation | Date range required before activation |
+| Project deletion | Only Proposed projects can be deleted |
+| Task hierarchy | Milestones cannot have children |
+| Task deletion | Cannot delete tasks with children or active dependencies |
+| Dependencies | Cannot create circular task dependencies |
+| Lifecycle lock | Phases cannot be modified after lifecycle activation |
+| Financial freeze | [Expenditure category](../settings/index.mdx#expenditure-categories) settings frozen after activation |
+| Initiative read-only | Completed/Cancelled [initiatives](./strategic-initiatives.mdx) cannot be modified |

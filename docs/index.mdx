@@ -7,49 +7,49 @@ audience: [user, developer, agent]
 
 # Welcome to Moda
 
-Moda is a work management system used to plan, manage, and create associations across work items, projects, teams, planning, and products. It helps track, align, and deliver work across organizations.
+Moda is a work management system used to plan, manage, and create associations across work items, projects, teams, planning, and products. It helps organizations track, align, and deliver work at scale.
 
 ## What is Moda?
 
 Moda provides a unified platform for organizations to:
 
-- **Manage Work** - Track work items, bugs, user stories, and tasks across teams
-- **Plan Strategically** - Define objectives, key results, and strategic initiatives
-- **Organize Teams** - Structure teams, employees, and organizational hierarchies
-- **Portfolio Management** - Manage projects and portfolios with full lifecycle tracking
-- **Integrate External Systems** - Synchronize data from Azure DevOps and other platforms
+- **Organize** — Structure teams into hierarchies of teams and teams of teams, track operating models and team memberships over time
+- **Plan** — Define planning intervals, increments, and sprints; manage objectives and risks across teams
+- **Manage Work** — Track work items across workspaces with configurable work processes, workflows, and work types
+- **Manage Portfolios** — Organize projects into portfolios and programs, track lifecycle status and strategic alignment
+- **Align Strategy** — Define strategic themes that guide investment decisions and work prioritization
+- **Integrate** — Synchronize data from Azure DevOps and Microsoft Entra ID
+
+## Ownership Model
+
+Moda is built to allow data from external systems to be synchronized into the platform. Objects in Moda that can come from external systems have an **Ownership** attribute:
+
+- **Owned** — The object is created and managed within Moda
+- **Managed** — The object is owned by an external system and is read-only in Moda
+
+Managed objects can still be associated or linked to owned items. For example, a work item owned by Azure DevOps (managed in Moda) can be linked to a team objective owned by Moda.
 
 ## Documentation Sections
 
 ### For Users
 
-- [Getting Started](./getting-started/index.mdx) - Set up your account and learn the basics
-- [Work Management](./user-guide/work-management/index.mdx) - Creating and managing work items
-- [Planning](./user-guide/planning/index.mdx) - Planning intervals and iterations
-- [Organizations](./user-guide/organizations/index.mdx) - Teams and organizational structure
-- [Goals](./user-guide/goals/index.mdx) - Objectives and key results
-- [Project Portfolios](./user-guide/project-portfolios/index.mdx) - Project and portfolio management
-- [Settings](./user-guide/settings/index.mdx) - Configuration and administration
+- [Organizations](./user-guide/organizations/index.mdx) — Teams, teams of teams, and organizational hierarchy
+- [Planning](./user-guide/planning/index.mdx) — Planning intervals, increments, sprints, objectives, and risks
+- [Work Management](./user-guide/work-management/index.mdx) — Workspaces, work items, work processes, and workflows
+- [Project Portfolios](./user-guide/project-portfolios/index.mdx) — Portfolios, programs, and projects
+- [Strategic Management](./user-guide/strategic-management/index.mdx) — Strategic themes and alignment
+- [Administration](./user-guide/settings/index.mdx) — User management, feature flags, integrations, and configuration
 
 ### For Developers
 
-- [Architecture](./contributing/architecture.mdx) - System design and patterns
-- [Getting Started](./getting-started/prerequisites.mdx) - Development environment setup
-- [Coding Standards](./contributing/coding-standards.mdx) - Code conventions and best practices
-- [Testing](./contributing/testing.mdx) - Testing strategies and patterns
+- [Architecture](./contributing/architecture.mdx) — System design and patterns
+- [Getting Started](./getting-started/prerequisites.mdx) — Development environment setup
+- [Coding Standards](./contributing/coding-standards.mdx) — Code conventions and best practices
+- [Testing](./contributing/testing.mdx) — Testing strategies and patterns
 
 ### Reference
 
-- [Domain Model](./reference/domain-model.mdx) - Core domain concepts and relationships
-- [API Reference](./reference/api.mdx) - REST API documentation
-- [Feature Flags](./reference/feature-flags.mdx) - Feature management system
-- [Integrations](./reference/integrations.mdx) - External system integrations
-
-## Ownership Model
-
-Moda allows data from external systems to be synchronized into the platform. Objects in Moda have an **Ownership** attribute:
-
-- **Owned** - The object is owned and managed within Moda
-- **Managed** - The object is owned by an external system and is read-only in Moda
-
-Managed objects can still be associated or linked to owned items. For example, a work item owned by Azure DevOps (managed in Moda) can be linked to a Team Objective owned by Moda.
+- [Domain Model](./reference/domain-model.mdx) — Core domain concepts and relationships
+- [API Reference](./reference/api.mdx) — REST API documentation
+- [Feature Flags](./reference/feature-flags.mdx) — Feature management system
+- [Integrations](./reference/integrations.mdx) — External system integrations
