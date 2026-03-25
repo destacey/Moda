@@ -15,6 +15,7 @@ const sidebars: SidebarsConfig = {
         'getting-started/logging-in',
         'getting-started/your-profile',
         'getting-started/navigation',
+        'getting-started/mcp-server',
       ],
     },
     {

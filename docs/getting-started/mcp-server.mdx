@@ -1,0 +1,205 @@
+---
+title: MCP Server
+description: Connect AI assistants like Claude to Moda using the Model Context Protocol (MCP) server.
+sidebar_position: 4
+audience: [user, developer, agent]
+---
+
+# MCP Server
+
+Moda provides an [MCP (Model Context Protocol)](https://modelcontextprotocol.io) server that lets AI assistants like Claude interact directly with your Moda instance. The MCP server exposes Moda's API as structured tools that AI agents can call to read and manage your delivery data.
+
+**Package:** [`@modanpm/moda-mcp`](https://www.npmjs.com/package/@modanpm/moda-mcp)
+
+## What Can It Do?
+
+The MCP server exposes 50+ tools across Moda's core modules:
+
+| Module | Capabilities |
+|--------|-------------|
+| **[PPM](../user-guide/ppm/index)** | List/view portfolios, programs, projects, phases, tasks. Create and update tasks. View project plan tree and summary metrics. Get critical path. Manage task dependencies. |
+| **[Planning](../user-guide/planning/index)** | List/view planning intervals, iterations, objectives, risks. Get PI predictability and health reports. View calendars. |
+| **[Roadmaps](../user-guide/planning/roadmaps)** | List/view roadmaps and their items (activities, milestones, timeboxes). |
+| **[Organizations](../user-guide/organizations/index)** | List/view teams and users. |
+
+## Prerequisites
+
+1. A running Moda instance with API access
+2. A **[Personal Access Token (PAT)](./your-profile#personal-access-tokens)** — create one from your profile page
+3. **Node.js 20+** installed on your machine
+
+## Setup
+
+### Claude Desktop
+
+Add the following to your Claude Desktop configuration file:
+
+- **macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
+
+```json
+{
+  "mcpServers": {
+    "moda": {
+      "command": "npx",
+      "args": ["-y", "@modanpm/moda-mcp"],
+      "env": {
+        "MODA_API_BASE_URL": "https://your-moda-instance.com",
+        "MODA_API_KEY": "your-personal-access-token"
+      }
+    }
+  }
+}
+```
+
+### Claude Code
+
+Add a `.mcp.json` file to your project root:
+
+```json
+{
+  "mcpServers": {
+    "moda": {
+      "command": "npx",
+      "args": ["-y", "@modanpm/moda-mcp"],
+      "env": {
+        "MODA_API_BASE_URL": "https://your-moda-instance.com",
+        "MODA_API_KEY": "your-personal-access-token"
+      }
+    }
+  }
+}
+```
+
+Or set environment variables in your shell and omit the `env` block:
+
+```bash
+export MODA_API_BASE_URL="https://your-moda-instance.com"
+export MODA_API_KEY="your-personal-access-token"
+```
+
+### VS Code / Cursor
+
+Add to your `.vscode/mcp.json` or workspace settings:
+
+```json
+{
+  "inputs": [
+    {
+      "id": "modaBaseUrl",
+      "description": "Moda API base URL",
+      "type": "promptString"
+    },
+    {
+      "id": "modaApiKey",
+      "description": "Moda API key (Personal Access Token)",
+      "type": "promptString",
+      "password": true
+    }
+  ],
+  "servers": {
+    "moda": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y", "@modanpm/moda-mcp",
+        "--base-url", "${input:modaBaseUrl}",
+        "--api-key", "${input:modaApiKey}"
+      ]
+    }
+  }
+}
+```
+
+## Configuration
+
+The MCP server accepts configuration via environment variables or CLI arguments:
+
+| Environment Variable | CLI Argument | Description |
+|---------------------|-------------|-------------|
+| `MODA_API_BASE_URL` | `--base-url` | The base URL of your Moda API instance |
+| `MODA_API_KEY` | `--api-key` | Your [Personal Access Token](./your-profile#personal-access-tokens) |
+
+CLI arguments take precedence over environment variables.
+
+## Agent Skills
+
+For Claude Code users, three pre-built skills provide guided workflows:
+
+- **`/moda-ppm`** — Portfolio, program, and project operations
+- **`/moda-pi`** — Planning intervals, iterations, objectives, and risks
+- **`/moda-roadmaps`** — Roadmap exploration with activities and milestones
+
+Install the skills:
+
+```bash
+npx skills add destacey/moda
+```
+
+## Available Tools
+
+### Project Portfolio Management
+
+| Tool | Description |
+|------|-------------|
+| `Portfolios_GetPortfolios` | List portfolios with optional status filter |
+| `Portfolios_GetPortfolio` | Get portfolio details by ID or key |
+| `Portfolios_GetPortfolioPrograms` | List programs in a portfolio |
+| `Portfolios_GetPortfolioProjects` | List projects in a portfolio |
+| `Programs_GetPrograms` | List programs with status/portfolio filters |
+| `Programs_GetProgram` | Get program details |
+| `Programs_GetProgramProjects` | List projects in a program |
+| `Projects_GetProjects` | List projects with status/portfolio/role filters |
+| `Projects_GetProject` | Get project details |
+| `Projects_GetProjectTeam` | Get team members with roles |
+| `Projects_GetProjectPhases` | Get all project phases |
+| `Projects_GetProjectPlanTree` | Get full plan as a hierarchical tree (WBS) |
+| `Projects_GetProjectPlanSummary` | Get plan metrics (overdue, due this week, totals) |
+| `ProjectLifecycles_GetProjectLifecycles` | List lifecycles with state filter |
+
+### Tasks
+
+| Tool | Description |
+|------|-------------|
+| `Tasks_GetProjectTasks` | List tasks with status/parent filters |
+| `Tasks_GetProjectTask` | Get task details |
+| `Tasks_GetCriticalPath` | Get critical path task IDs |
+| `Tasks_CreateProjectTask` | Create a new task or milestone |
+| `Tasks_UpdateProjectTask` | Update task fields |
+| `Tasks_DeleteProjectTask` | Delete a task |
+| `Tasks_AddTaskDependency` | Add finish-to-start dependency |
+| `Tasks_RemoveTaskDependency` | Remove a dependency |
+
+### Planning
+
+| Tool | Description |
+|------|-------------|
+| `PlanningIntervals_GetList` | List all planning intervals |
+| `PlanningIntervals_GetPlanningInterval` | Get PI details |
+| `PlanningIntervals_GetCalendar` | Get PI calendar |
+| `PlanningIntervals_GetPredictability` | Get predictability scores |
+| `PlanningIntervals_GetTeams` | Get teams in a PI |
+| `PlanningIntervals_GetIterations` | Get iterations |
+| `PlanningIntervals_GetObjectives` | Get team objectives |
+| `PlanningIntervals_GetRisks` | Get risks |
+| `PlanningIntervals_GetHealthReport` | Get health report |
+| `Roadmaps_GetRoadmaps` | List all roadmaps |
+| `Roadmaps_GetRoadmap` | Get roadmap details |
+| `Roadmaps_GetItems` | Get all roadmap items |
+
+### Organization
+
+| Tool | Description |
+|------|-------------|
+| `Teams_GetTeams` | List teams with optional inactive filter |
+| `Teams_GetTeam` | Get team details |
+| `Users_GetUsers` | List all users |
+| `Users_GetUser` | Get user details |
+
+## Security
+
+The MCP server authenticates using your [Personal Access Token](./your-profile#personal-access-tokens). The token inherits your permissions — the MCP server can only access what you can access.
+
+- Store your API key securely — don't commit it to version control
+- Use environment variables rather than hardcoding in config files
+- Revoke tokens from your [profile page](./your-profile#personal-access-tokens) if compromised
