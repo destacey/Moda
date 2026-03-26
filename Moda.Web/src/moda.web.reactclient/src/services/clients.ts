@@ -39,7 +39,7 @@ import {
 } from './moda-api'
 import { tokenRequest } from '@/auth-config'
 import { InteractionRequiredAuthError } from '@azure/msal-browser'
-import { msalInstance } from '../components/contexts/auth'
+import { msalInstance } from '../components/contexts/auth/msal-instance'
 
 const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL
 

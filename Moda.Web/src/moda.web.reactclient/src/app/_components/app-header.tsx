@@ -5,6 +5,7 @@ import {
   MenuUnfoldOutlined,
   MenuOutlined,
   SearchOutlined,
+  ReadOutlined,
 } from '@ant-design/icons'
 import React, { FC, useMemo, useState } from 'react'
 import {
@@ -16,6 +17,7 @@ import {
   Menu,
   MenuProps,
   Grid,
+  Tooltip,
 } from 'antd'
 import useMenuToggle from '../../components/contexts/menu-toggle'
 import { useAppMenuItems } from './menu'
@@ -76,7 +78,12 @@ const AppHeader: FC = React.memo(() => {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const { menuItems } = useAppMenuItems()
   const router = useRouter()
-  const { open: searchOpen, openSearch, closeSearch } = useGlobalSearch()
+  const {
+    open: searchOpen,
+    openSearch,
+    closeSearch,
+    consumeRequestedScope,
+  } = useGlobalSearch()
 
   // Flatten menu for mobile
   const mobileMenuItems = useMemo(
@@ -179,11 +186,30 @@ const AppHeader: FC = React.memo(() => {
           className={styles.searchTrigger}
         >
           <Text type="secondary">Search...</Text>
-          <kbd className={styles.searchTriggerKbd}>Ctrl+K</kbd>
+          <Flex gap={4} className={styles.searchTriggerKbdGroup}>
+            <Tooltip title="Search app data">
+              <kbd className={styles.searchTriggerKbd}>Ctrl+K</kbd>
+            </Tooltip>
+            <Tooltip title="Search documentation">
+              <kbd className={styles.searchTriggerKbd}>Ctrl+K D</kbd>
+            </Tooltip>
+          </Flex>
         </Button>
+        <Tooltip title="Documentation">
+          <Button
+            type="text"
+            icon={<ReadOutlined />}
+            href="/docs"
+            aria-label="Documentation"
+          />
+        </Tooltip>
         {profileComponent}
       </Flex>
-      <GlobalSearchModal open={searchOpen} onClose={closeSearch} />
+      <GlobalSearchModal
+        open={searchOpen}
+        onClose={closeSearch}
+        consumeRequestedScope={consumeRequestedScope}
+      />
     </Header>
   )
 })

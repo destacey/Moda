@@ -1,6 +1,10 @@
 .searchTrigger {
-  min-width: 200px;
+  min-width: 280px;
   text-align: left;
+}
+
+.searchTriggerKbdGroup {
+  margin-left: auto;
 }
 
 .searchTriggerKbd {
@@ -11,5 +15,4 @@
   border: 1px solid var(--ant-color-border);
   background: var(--ant-color-bg-layout);
   color: var(--ant-color-text-tertiary);
-  margin-left: auto;
 }

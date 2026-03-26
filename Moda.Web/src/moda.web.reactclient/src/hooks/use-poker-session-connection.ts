@@ -5,7 +5,7 @@ import {
   LogLevel,
 } from '@microsoft/signalr'
 import { tokenRequest } from '@/auth-config'
-import { msalInstance } from '@/src/components/contexts/auth'
+import { msalInstance } from '@/src/components/contexts/auth/msal-instance'
 import { store } from '@/src/store/store'
 import { pokerSessionsApi } from '@/src/store/features/planning/poker-sessions-api'
 import { QueryTags } from '@/src/store/features/query-tags'

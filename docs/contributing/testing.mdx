@@ -1,0 +1,69 @@
+---
+title: Testing
+description: Testing strategies, patterns, and conventions in Moda.
+sidebar_position: 3
+audience: [developer, agent]
+---
+
+# Testing
+
+## Test Projects
+
+Test projects mirror the source structure:
+- `Moda.\{ServiceName\}.Domain.Tests` - Domain logic tests
+- `Moda.\{ServiceName\}.Application.Tests` - Handler and validator tests
+- `Moda.ArchitectureTests` - Enforce Clean Architecture dependency rules
+
+## Frameworks and Libraries
+
+| Library | Purpose |
+|---------|---------|
+| xUnit | Test framework |
+| FluentAssertions | Assertion library |
+| Moq | Mocking framework |
+| Moq.AutoMock | Automatic dependency mocking |
+| Bogus | Fake data generation |
+| NetArchTest.Rules | Architecture rule validation |
+
+## Test Naming
+
+Test projects: `\{ProjectName\}.Tests`
+
+Test classes and methods should clearly describe the scenario being tested.
+
+## Fake Data
+
+Domain fakers are located in `Moda.Tests.Shared`. Use Bogus to generate realistic test data:
+
+```csharp
+var faker = new WorkItemFaker();
+var workItem = faker.Generate();
+```
+
+Fake DbContext implementations are available for each application area for integration-style tests.
+
+## Running Tests
+
+```bash
+# All tests
+dotnet test Moda.slnx
+
+# Specific project
+dotnet test "Moda.Services/Moda.Work/tests/Moda.Work.Application.Tests/Moda.Work.Application.Tests.csproj"
+
+# By class name
+dotnet test --filter "FullyQualifiedName~ProjectServiceTests"
+
+# Architecture tests
+dotnet test Moda.ArchitectureTests/Moda.ArchitectureTests.csproj
+```
+
+## Frontend Tests
+
+```bash
+cd Moda.Web/src/moda.web.reactclient
+npm test
+npm run test:coverage
+```
+
+Uses Jest with React Testing Library.

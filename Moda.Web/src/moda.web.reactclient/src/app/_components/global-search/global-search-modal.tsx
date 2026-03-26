@@ -16,6 +16,7 @@ import {
   Input,
   Modal,
   Radio,
+  Segmented,
   Spin,
   Tabs,
   Typography,
@@ -25,6 +26,7 @@ import { useRouter } from 'next/navigation'
 import { useLazyGlobalSearchQuery } from '@/src/store/features/search/search-api'
 import {
   GlobalSearchCategoryDto,
+  GlobalSearchResultDto,
   GlobalSearchResultItemDto,
 } from '@/src/services/moda-api'
 import { getSearchResultUrl } from './search-result-url'
@@ -33,45 +35,165 @@ import styles from './global-search-modal.module.css'
 const { Title, Text } = Typography
 const { Group: RadioGroup } = Radio
 
+type SearchScope = 'app' | 'docs'
+
+interface DocSearchEntry {
+  slug: string
+  title: string
+  description: string
+  content: string
+}
+
+function searchDocsLocally(
+  entries: DocSearchEntry[],
+  query: string,
+  maxResults: number,
+): GlobalSearchResultDto {
+  if (!query || query.length < 2) return { categories: [] }
+
+  const terms = query.toLowerCase().split(/\s+/).filter(Boolean)
+  const scored: { entry: DocSearchEntry; score: number }[] = []
+
+  for (const entry of entries) {
+    const titleLower = entry.title.toLowerCase()
+    const descLower = entry.description.toLowerCase()
+    const contentLower = entry.content.toLowerCase()
+
+    let score = 0
+    for (const term of terms) {
+      if (titleLower.includes(term)) score += 10
+      if (descLower.includes(term)) score += 5
+      if (contentLower.includes(term)) score += 1
+    }
+
+    if (score > 0) {
+      scored.push({ entry, score })
+    }
+  }
+
+  scored.sort((a, b) => b.score - a.score)
+
+  const items: GlobalSearchResultItemDto[] = scored
+    .slice(0, maxResults)
+    .map(({ entry }) => ({
+      title: entry.title,
+      subtitle: entry.description,
+      key: entry.slug,
+      entityType: 'Doc',
+    }))
+
+  if (items.length === 0) return { categories: [] }
+
+  return {
+    categories: [
+      {
+        name: 'Documentation',
+        slug: 'docs',
+        items,
+        totalCount: scored.length,
+      },
+    ],
+  }
+}
+
 interface GlobalSearchModalProps {
   open: boolean
   onClose: () => void
+  consumeRequestedScope?: () => SearchScope | null
 }
 
 const GlobalSearchModal: FC<GlobalSearchModalProps> = memo(
-  ({ open, onClose }) => {
+  ({ open, onClose, consumeRequestedScope }) => {
     const router = useRouter()
+    const [scope, setScope] = useState<SearchScope>('app')
     const [searchTerm, setSearchTerm] = useState('')
     const [activeTab, setActiveTab] = useState('all')
-    const [activeIndex, setActiveIndex] = useState(0)
+    const [activeIndex, setActiveIndex] = useState(-1)
     const [maxResults, setMaxResults] = useState(5)
     const inputRef = useRef<any>(null)
     const debounceTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
     const activeItemRef = useRef<HTMLDivElement>(null)
     const isKeyboardNavRef = useRef(false)
 
-    const [triggerSearch, { data, isFetching }] = useLazyGlobalSearchQuery()
+    // App search (backend)
+    const [triggerSearch, { data: appData, isFetching: appFetching }] =
+      useLazyGlobalSearchQuery()
+
+    // Docs search (client-side)
+    const [docsIndex, setDocsIndex] = useState<DocSearchEntry[]>([])
+    const [docsData, setDocsData] = useState<GlobalSearchResultDto | null>(null)
+    const [docsFetching, setDocsFetching] = useState(false)
+    const docsIndexLoadedRef = useRef(false)
+
+    // Load docs index on first use
+    useEffect(() => {
+      if (scope === 'docs' && !docsIndexLoadedRef.current) {
+        docsIndexLoadedRef.current = true
+        setDocsFetching(true)
+        fetch('/docs/api/search-index')
+          .then((res) => res.json())
+          .then((data: DocSearchEntry[]) => {
+            setDocsIndex(data)
+            setDocsFetching(false)
+          })
+          .catch(() => setDocsFetching(false))
+      }
+    }, [scope])
+
+    // Active data based on scope
+    const data = scope === 'app' ? appData : docsData
+    const isFetching = scope === 'app' ? appFetching : docsFetching
 
     // Debounced search
     useEffect(() => {
       if (!searchTerm || searchTerm.length < 2) return
 
       debounceTimerRef.current = setTimeout(() => {
-        triggerSearch({ query: searchTerm, maxResultsPerCategory: maxResults })
+        if (scope === 'app') {
+          triggerSearch({
+            query: searchTerm,
+            maxResultsPerCategory: maxResults,
+          })
+        } else {
+          setDocsData(searchDocsLocally(docsIndex, searchTerm, maxResults))
+        }
       }, 300)
 
       return () => clearTimeout(debounceTimerRef.current)
-    }, [searchTerm, maxResults, triggerSearch])
+    }, [searchTerm, maxResults, scope, triggerSearch, docsIndex])
 
     // Reset state when opening
     useEffect(() => {
       if (open) {
+        // If opened via keyboard shortcut, use the requested scope
+        const requested = consumeRequestedScope?.()
+        if (requested) {
+          setScope(requested)
+        }
+        // Otherwise keep the current scope (remembers last selection)
         setSearchTerm('')
         setActiveTab('all')
-        setActiveIndex(0)
+        setActiveIndex(-1)
         setTimeout(() => inputRef.current?.focus(), 100)
       }
-    }, [open])
+    }, [open, consumeRequestedScope])
+
+    // Reset results when scope changes
+    useEffect(() => {
+      setActiveTab('all')
+      setActiveIndex(-1)
+      // Re-trigger search if there's a term
+      if (searchTerm.length >= 2) {
+        if (scope === 'app') {
+          triggerSearch({
+            query: searchTerm,
+            maxResultsPerCategory: maxResults,
+          })
+        } else {
+          setDocsData(searchDocsLocally(docsIndex, searchTerm, maxResults))
+        }
+      }
+    }, [scope]) // eslint-disable-line react-hooks/exhaustive-deps
 
     // Compute visible items based on active tab
     const visibleItems = useMemo(() => {
@@ -94,14 +216,13 @@ const GlobalSearchModal: FC<GlobalSearchModalProps> = memo(
 
     // Reset active index when search term or tab changes
     useEffect(() => {
-      setActiveIndex(0)
+      setActiveIndex(-1)
     }, [searchTerm, activeTab])
 
     // Scroll active item into view on keyboard navigation
     useEffect(() => {
       if (isKeyboardNavRef.current) {
         activeItemRef.current?.scrollIntoView({ block: 'nearest' })
-        // Reset after a frame so the scroll event doesn't trigger mouse hover
         requestAnimationFrame(() => {
           isKeyboardNavRef.current = false
         })
@@ -119,6 +240,18 @@ const GlobalSearchModal: FC<GlobalSearchModalProps> = memo(
     // Keyboard navigation
     const handleKeyDown = useCallback(
       (e: React.KeyboardEvent) => {
+        // Scope switching: Ctrl+D for docs, Ctrl+K for app (chord shortcut)
+        if ((e.metaKey || e.ctrlKey) && e.key === 'd') {
+          e.preventDefault()
+          setScope('docs')
+          return
+        }
+        if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+          e.preventDefault()
+          setScope('app')
+          return
+        }
+
         if (e.key === 'ArrowDown' && visibleItems.length > 0) {
           e.preventDefault()
           isKeyboardNavRef.current = true
@@ -131,10 +264,9 @@ const GlobalSearchModal: FC<GlobalSearchModalProps> = memo(
           setActiveIndex((prev) =>
             prev > 0 ? prev - 1 : visibleItems.length - 1,
           )
-        } else if (e.key === 'Enter' && visibleItems.length > 0) {
+        } else if (e.key === 'Enter' && activeIndex >= 0 && visibleItems[activeIndex]) {
           e.preventDefault()
-          const item = visibleItems[Math.min(activeIndex, visibleItems.length - 1)]
-          handleNavigate(item)
+          handleNavigate(visibleItems[activeIndex])
         } else if (e.key === 'Escape') {
           e.preventDefault()
           onClose()
@@ -184,9 +316,11 @@ const GlobalSearchModal: FC<GlobalSearchModalProps> = memo(
           if (!isKeyboardNavRef.current) setActiveIndex(index)
         }}
       >
-        <Text code className={styles.resultKey}>
-          {item.key}
-        </Text>
+        {scope === 'app' && (
+          <Text code className={styles.resultKey}>
+            {item.key}
+          </Text>
+        )}
         <Flex vertical className={styles.resultItemContent}>
           <Text ellipsis>{item.title}</Text>
           {item.subtitle && (
@@ -231,14 +365,29 @@ const GlobalSearchModal: FC<GlobalSearchModalProps> = memo(
         width={600}
         className={styles.searchModal}
         styles={{
+          container: { padding: '10px 12px' },
           body: { padding: 0 },
         }}
       >
         <div onKeyDown={handleKeyDown}>
+          <Flex className={styles.scopeToggle}>
+            <Segmented
+              size="small"
+              value={scope}
+              onChange={(val) => setScope(val as SearchScope)}
+              options={[
+                { value: 'app', label: 'App' },
+                { value: 'docs', label: 'Docs' },
+              ]}
+            />
+          </Flex>
+
           <Input
             ref={inputRef}
             prefix={<SearchOutlined />}
-            placeholder="Search Moda..."
+            placeholder={
+              scope === 'app' ? 'Search Moda...' : 'Search documentation...'
+            }
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className={styles.searchInput}
@@ -263,12 +412,14 @@ const GlobalSearchModal: FC<GlobalSearchModalProps> = memo(
 
           {!isFetching && searchTerm.length >= 2 && data && (
             <div className={styles.tabsContainer}>
-              <Tabs
-                activeKey={activeTab}
-                onChange={setActiveTab}
-                size="small"
-                items={tabItems}
-              />
+              {data.categories.length > 1 && (
+                <Tabs
+                  activeKey={activeTab}
+                  onChange={setActiveTab}
+                  size="small"
+                  items={tabItems}
+                />
+              )}
               <div className={styles.resultsList}>
                 {visibleItems.length === 0 ? (
                   <Empty
@@ -313,22 +464,24 @@ const GlobalSearchModal: FC<GlobalSearchModalProps> = memo(
                 <kbd className={styles.kbd}>esc</kbd> close
               </Text>
             </Flex>
-            <Flex align="center" gap={6}>
-              <Text type="secondary">Per Category:</Text>
-              <RadioGroup
-                size="small"
-                value={maxResults}
-                onChange={(e) => setMaxResults(e.target.value)}
-                optionType="button"
-                buttonStyle="outline"
-                options={[
-                  { value: 5, label: '5' },
-                  { value: 10, label: '10' },
-                  { value: 20, label: '20' },
-                ]}
-                className={styles.resultsRadioGroup}
-              />
-            </Flex>
+            {scope === 'app' && (
+              <Flex align="center" gap={6}>
+                <Text type="secondary">Per Category:</Text>
+                <RadioGroup
+                  size="small"
+                  value={maxResults}
+                  onChange={(e) => setMaxResults(e.target.value)}
+                  optionType="button"
+                  buttonStyle="outline"
+                  options={[
+                    { value: 5, label: '5' },
+                    { value: 10, label: '10' },
+                    { value: 20, label: '20' },
+                  ]}
+                  className={styles.resultsRadioGroup}
+                />
+              </Flex>
+            )}
           </Flex>
         </div>
       </Modal>

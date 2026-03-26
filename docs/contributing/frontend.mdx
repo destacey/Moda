@@ -1,0 +1,73 @@
+---
+title: Frontend Development
+description: Next.js, React, and Ant Design patterns for Moda frontend development.
+sidebar_position: 6
+audience: [developer, agent]
+---
+
+# Frontend Development
+
+The Moda frontend is built with **Next.js 16** (App Router), **React 19**, **TypeScript**, and **Ant Design**.
+
+## Project Structure
+
+```
+moda.web.reactclient/
+  src/
+    app/              # Next.js App Router pages and layouts
+    components/       # Shared components
+      common/         # Generic reusable components
+      contexts/       # React context providers (auth, theme, messaging)
+      hoc/            # Higher-order components (feature flags)
+    hooks/            # Custom React hooks
+    services/         # API clients and services
+      moda-api.ts     # NSwag-generated TypeScript client
+      clients.ts      # Client factory functions
+    store/            # Redux Toolkit store and slices
+    styles/           # Global styles and CSS modules
+```
+
+## API Calls
+
+**Always use the NSwag-generated typed client:**
+
+```typescript
+import { getWorkItemsClient } from '@/src/services/clients'
+
+const client = await getWorkItemsClient()
+const workItems = await client.getList(workspaceId)
+```
+
+**Never use `authenticatedFetch()` directly** unless the generated client doesn't have the method yet.
+
+## Styling
+
+Use **Ant Design theme tokens**. Never hardcode colors.
+
+Prefer CSS variables in CSS modules:
+```css
+/* good */
+.header { color: var(--ant-color-primary); }
+
+/* bad */
+.header { color: #1677ff; }
+```
+
+Only use `theme.useToken()` when you need token values in JavaScript logic.
+
+## State Management
+
+- **Redux Toolkit** for global application state
+- **React Context** for auth, theme, and messaging
+- **Local state** (`useState`) for component-specific state
+
+## Key Libraries
+
+| Library | Purpose |
+|---------|---------|
+| Ant Design | UI component library |
+| AG Grid | Advanced data tables |
+| Redux Toolkit | State management |
+| react-markdown | Markdown rendering |
+| dayjs | Date formatting |
+| MSAL React | Azure AD authentication |

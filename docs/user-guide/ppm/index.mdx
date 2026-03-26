@@ -1,0 +1,77 @@
+---
+title: Project Portfolio Management
+description: Managing portfolios, programs, projects, strategic initiatives, lifecycles, phases, tasks, and KPIs in Moda.
+sidebar_position: 4
+audience: [user, agent]
+---
+
+# Project Portfolio Management
+
+Project Portfolio Management (PPM) is a systematic approach to managing an organization's portfolio of projects and programs. It involves the selection, prioritization, and management of projects to align with strategic goals, maximize value, and ensure efficient resource utilization.
+
+## How PPM Connects Across Moda
+
+PPM sits at the intersection of strategy and execution:
+
+```mermaid
+graph LR
+    subgraph "Strategic Management"
+        ST["Strategic Themes"]
+    end
+    subgraph "PPM"
+        PF["Portfolios"]
+        Prog["Programs"]
+        Proj["Projects"]
+        SI["Strategic Initiatives"]
+        KPI["KPIs"]
+        Phase["Phases"]
+        Task["Tasks"]
+    end
+    subgraph "Work Management"
+        WI["Work Items"]
+    end
+    subgraph "Organization"
+        Team["Teams"]
+    end
+
+    ST -->|tags| Proj
+    ST -->|tags| Prog
+    ST -->|tags| SI
+    PF -->|contains| Prog
+    PF -->|contains| Proj
+    PF -->|contains| SI
+    Prog -->|groups| Proj
+    Proj -->|has| Phase
+    Phase -->|has| Task
+    SI -->|tracks| KPI
+    SI -->|links to| Proj
+    WI -->|associated with| Proj
+    Team -->|assigned roles on| Proj
+```
+
+- **[Strategic Themes](../strategic-management/index#strategic-themes)** tag projects, programs, and initiatives for alignment. See [how themes connect to PPM](../strategic-management/index#how-strategic-themes-connect-to-other-domains).
+- **[Work Items](../work-management/index#work-items)** from [workspaces](../work-management/index#workspaces) can be associated with projects on the [Project Work Items tab](./projects#project-detail-page).
+- **[Teams](../organizations/index#teams)** are assigned roles on projects (Sponsor, Owner, Manager, Member).
+
+## Sections
+
+- **[Portfolios & Programs](./portfolios-programs)** — Top-level containers, program management, and portfolio governance
+- **[Projects](./projects)** — Project lifecycle, phases, tasks, dependencies, and the plan tab
+- **[Strategic Initiatives](./strategic-initiatives)** — Initiative tracking with KPIs, checkpoints, and measurements
+- **[My Projects Dashboard](./my-projects)** — Personalized project overview with task metrics
+
+## Business Rules Summary
+
+| Rule | Description |
+|------|-------------|
+| Portfolio close | All [programs](./portfolios-programs#programs)/[projects](./projects) must be closed first |
+| Program close | All [projects](./projects) must be completed/cancelled first |
+| Project approval | [Lifecycle](./projects#project-lifecycles) must be assigned before approval |
+| Project activation | Date range required before activation |
+| Project deletion | Only Proposed projects can be deleted |
+| Task hierarchy | Milestones cannot have children |
+| Task deletion | Cannot delete tasks with children or active dependencies |
+| Dependencies | Cannot create circular task dependencies |
+| Lifecycle lock | Phases cannot be modified after lifecycle activation |
+| Financial freeze | [Expenditure category](../settings/index#expenditure-categories) settings frozen after activation |
+| Initiative read-only | Completed/Cancelled [initiatives](./strategic-initiatives) cannot be modified |

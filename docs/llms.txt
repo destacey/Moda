@@ -1,0 +1,52 @@
+# Moda
+
+> An intelligent delivery management platform designed to give engineering leaders and teams end-to-end visibility into software delivery.
+
+## Overview
+
+When delivery spans multiple teams, projects, and systems, visibility breaks down. Moda brings it all together — tracking work items, aligning teams to planning intervals and products, and surfacing dependencies across the organization. It acts as a unified hub that synchronizes data from multiple business systems and combines it with capabilities those systems lack.
+
+Moda supports:
+
+- **Organizations** — Teams and teams of teams with operating models, memberships, and hierarchy
+- **Planning** — Planning intervals (PIs), sprints, objectives, risks, roadmaps, and planning poker
+- **Work Management** — Workspaces, work items, work processes, workflows, and work types
+- **Project Portfolio Management** — Portfolios, programs, projects with lifecycles/phases/tasks, strategic initiatives with KPIs
+- **Strategic Management** — Visions, strategies, and strategic themes for organizational alignment
+
+## Documentation
+
+- [Welcome](docs/index.mdx): Overview of Moda and documentation structure
+- [Organizations](docs/user-guide/organizations/index.mdx): Teams, teams of teams, operating models, and organizational hierarchy
+- [Planning Overview](docs/user-guide/planning/index.mdx): How planning connects teams, sprints, objectives, and work items
+- [Planning Intervals](docs/user-guide/planning/planning-intervals.mdx): PIs, iterations, sprint mapping, objectives, predictability, plan review
+- [Sprints & Metrics](docs/user-guide/planning/sprints.mdx): Sprint management, metric definitions, cycle time, completion rate
+- [Risks](docs/user-guide/planning/risks.mdx): ROAM model, exposure matrix, risk management
+- [Roadmaps](docs/user-guide/planning/roadmaps.mdx): Activities, milestones, timeboxes, timeline views
+- [Planning Poker](docs/user-guide/planning/planning-poker.mdx): Collaborative estimation with real-time voting
+- [Work Management Overview](docs/user-guide/work-management/index.mdx): How work items connect to teams, sprints, and projects
+- [Work Items & Workspaces](docs/user-guide/work-management/work-items.mdx): Work items, workspaces, dependencies, revisions, hierarchy
+- [Work Configuration](docs/user-guide/work-management/work-configuration.mdx): Work processes, types, tiers, levels, workflows, statuses
+- [PPM Overview](docs/user-guide/ppm/index.mdx): How PPM connects strategy and execution
+- [Portfolios & Programs](docs/user-guide/ppm/portfolios-programs.mdx): Portfolio lifecycle, programs, roles
+- [Projects](docs/user-guide/ppm/projects.mdx): Project lifecycle, phases, tasks, dependencies, plan tab
+- [Strategic Initiatives](docs/user-guide/ppm/strategic-initiatives.mdx): Initiatives, KPIs, checkpoints, measurements
+- [My Projects Dashboard](docs/user-guide/ppm/my-projects.mdx): Personalized project view with task metrics
+- [Strategic Management](docs/user-guide/strategic-management/index.mdx): Visions, strategies, strategic themes, cross-domain alignment
+- [Administration](docs/user-guide/settings/index.mdx): Users, roles, feature flags, integrations, background jobs
+- [Architecture](docs/contributing/architecture.mdx): Clean Architecture, DDD, CQRS, vertical slices
+- [Coding Standards](docs/contributing/coding-standards.mdx): Naming, NodaTime, Result pattern, theming
+- [Testing](docs/contributing/testing.mdx): xUnit, FluentAssertions, Moq, architecture tests
+- [Adding a Feature](docs/contributing/adding-a-feature.mdx): Step-by-step feature implementation guide
+- [Database & Migrations](docs/contributing/database.mdx): EF Core, shared DbContext, migrations
+- [Frontend Development](docs/contributing/frontend.mdx): Next.js, React, Ant Design, RTK Query
+- [API Development](docs/contributing/api.mdx): Controller patterns, authentication, OpenAPI
+- [API Reference](docs/reference/api.mdx): REST API areas and endpoints
+- [Feature Flags](docs/reference/feature-flags.mdx): Feature management system
+- [Integrations](docs/reference/integrations.mdx): Azure DevOps, Microsoft Graph
+- [Technology Stack](docs/reference/technology-stack.mdx): All libraries and frameworks
+- [Domain Glossary](docs/ai/domain-glossary.mdx): Comprehensive glossary of all domain terms
+
+## Optional
+
+- [llms-full.txt](docs/llms-full.txt): Complete domain context for LLMs (all entities, relationships, business rules)

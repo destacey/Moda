@@ -1,0 +1,174 @@
+---
+title: Administration
+description: User management, feature flags, integrations, and application configuration in Moda.
+sidebar_position: 7
+audience: [user, agent]
+---
+
+# Administration
+
+The Administration area provides tools for configuring Moda, managing users, controlling feature visibility, and connecting to external systems.
+
+## User Management
+
+### Users
+
+User accounts control access to Moda. Each user has:
+- **Display Name** and **Email**
+- **Login Provider** — How the user authenticates (set at creation, immutable):
+  - **Microsoft Entra ID** — Single sign-on via Azure Active Directory
+  - **Moda (Local)** — Username/password authentication with JWT tokens
+- **Roles** — Permission groups that control what the user can see and do
+- **Status** — Active, Inactive, or Locked
+
+**Account operations:**
+- **Activate** — Enable a user account
+- **Deactivate** — Disable a user account
+- **Unlock** — Unlock an account locked due to failed login attempts
+- **Reset Password** — Admin-initiated password reset (local auth only, forces change on next login)
+
+Local users created by an administrator have a **Must Change Password** flag that requires them to set a new password on first login.
+
+### Roles
+
+Roles define permission groups. Users are assigned to roles to control access to features, pages, and actions throughout the application.
+
+Permissions follow a hierarchical pattern:
+- `Permissions.\{Domain\}.View` — View entities
+- `Permissions.\{Domain\}.Create` — Create new entities
+- `Permissions.\{Domain\}.Update` — Modify existing entities
+- `Permissions.\{Domain\}.Delete` — Remove entities
+
+### Personal Access Tokens
+
+Users can generate **Personal Access Tokens (PATs)** for API access. These are managed from the user's profile page.
+
+## Feature Management
+
+Moda uses **feature flags** to control the visibility of features across the application. Feature flags allow new functionality to be deployed but hidden until ready for use.
+
+### How Feature Flags Work
+
+1. Flags are **defined in code** by developers
+2. On application startup, new flags are **automatically seeded** into the database (disabled by default)
+3. Administrators **enable or disable** flags through the Settings UI
+4. The application checks flag state to **show or hide** features
+
+### Managing Feature Flags
+
+1. Navigate to **Settings > Feature Management > Feature Flags**
+2. View all available feature flags with their current state
+3. Toggle flags on or off as needed
+
+Feature flags gate both backend API endpoints and frontend UI elements. When a flag is disabled:
+- API endpoints return 404 or are unavailable
+- UI pages and menu items are hidden
+- Related functionality is completely inaccessible
+
+## Work Management Settings
+
+### Work Types
+
+**Work Types** define the categories of work items available in the system (e.g., Epic, Feature, User Story, Task, Bug). See [Work Management](../work-management/index) for details on how work types are used.
+
+### Work Statuses
+
+**Work Statuses** represent the states within a workflow (e.g., New, Active, Resolved, Closed). Each status belongs to a **Work Status Category** that normalizes statuses across workflows:
+
+| Category | Purpose |
+|----------|---------|
+| **Proposed** | Work has been proposed but not started |
+| **Active** | Work is currently being performed |
+| **Done** | Work has been completed |
+| **Removed** | Work has been removed without completion |
+
+### Work Processes
+
+**Work Processes** define the configuration of work types, workflows, and hierarchies used within workspaces. See [Work Management](../work-management/index) for details.
+
+## PPM Settings
+
+### Expenditure Categories
+
+**Expenditure Categories** classify project spending for financial tracking and reporting. Categories have:
+- **Name** and **Description**
+- **Capitalizable** flag — Whether the expenditure can be capitalized
+- **Requires Depreciation** flag — Whether depreciation tracking is needed
+- **Accounting Code** — Code for integration with accounting systems
+- **State** — Proposed, Active, or Archived
+
+### Project Lifecycles
+
+**Project Lifecycles** define the template of phases that projects go through. See [Project Portfolio Management](../ppm/index) for details.
+
+## Integrations
+
+Moda integrates with external systems to synchronize data. Integrations are configured through **Connections**.
+
+### Ownership Model
+
+When data is synchronized from an external system, the objects created in Moda have a **Managed** ownership. This distinguishes them from objects created directly in Moda:
+
+- **Owned** — The object is created and managed within Moda. Users can edit it freely.
+- **Managed** — The object is owned by an external system and is **read-only** in Moda. Changes must be made in the source system and will be reflected in Moda on the next sync.
+
+Managed objects can still be associated or linked to owned items. For example, a [work item](../work-management/work-items#work-items) synced from Azure DevOps (managed in Moda) can be linked to a team [objective](../planning/planning-intervals#objectives) owned by Moda.
+
+The ownership model applies to [workspaces](../work-management/work-items#workspaces), [work items](../work-management/work-items#work-items), [work processes](../work-management/work-configuration#work-processes), [workflows](../work-management/work-configuration#workflows), and [sprints](../planning/sprints).
+
+### Connections
+
+A **Connection** represents a configured integration with an external application via a Moda **Connector**. Each connection includes authentication and endpoint configuration needed to establish the link.
+
+A **Connector** is an API that allows a specific external service to integrate with Moda. Multiple connections for the same connector can be configured — for example, when an organization has multiple Azure DevOps instances.
+
+### Azure DevOps Boards
+
+The Azure DevOps Boards connector enables one-way synchronization of work data from Azure DevOps into Moda.
+
+**Data mapping:**
+
+| Azure DevOps | Moda |
+|-------------|------|
+| Project | Workspace |
+| Work Item | Work Item |
+| Work Item Type | Work Type |
+| Area | Team ↔ Work Item association |
+| Iteration | Sprint / Planning Interval association |
+
+**Configuration requirements:**
+- **Organization** — The Azure DevOps organization name
+- **Personal Access Token** — A PAT with Work Items Read scope
+
+**Business rules:**
+- Each Azure DevOps organization can only be linked by one connection
+- Synchronized items have **Managed** ownership and are read-only in Moda
+- Sync is controlled by workspace-level integration state (active/inactive)
+- Background jobs (Hangfire) perform synchronization on a recurring schedule
+
+### Microsoft Graph
+
+The Microsoft Graph integration synchronizes employee and user data from Microsoft Entra ID (Azure Active Directory) into Moda's Organization domain.
+
+**Capabilities:**
+- Import employees from Azure AD
+- Keep employee information up to date
+- Map AD users to Moda employees
+
+## Background Jobs
+
+Moda uses **Hangfire** for background job processing. The background jobs dashboard is available at **Settings > Background Jobs** and provides:
+- List of recurring jobs and their schedules
+- Job execution history
+- Manual job triggering
+
+Background jobs are primarily used for:
+- Azure DevOps work item synchronization
+- Microsoft Graph employee synchronization
+- Other periodic maintenance tasks
+
+## Estimation Scales
+
+> This feature is behind the `planning-poker` feature flag.
+
+**Estimation Scales** define the sets of values used for story point estimation in Planning Poker sessions. Scales are configured in **Settings > Planning > Estimation Scales**.

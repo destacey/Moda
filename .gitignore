@@ -357,3 +357,6 @@ nul
 
 # AI config files
 .claude/settings.local.json
+
+# Playwright MCP screenshots
+.playwright-mcp/

@@ -1,0 +1,91 @@
+---
+title: Sprints & Metrics
+description: Sprint management and delivery metrics including velocity, cycle time, and completion rate in Moda.
+sidebar_position: 2
+audience: [user, agent]
+---
+
+# Sprints & Metrics
+
+## Sprints
+
+A **Sprint** (also called an Iteration in some contexts) is a short time-boxed period — typically 2 weeks — during which a team implements and delivers [work items](../work-management/index#work-items).
+
+Every sprint has:
+- **Name** — Sprint identifier
+- **Type** — Sprint or Iteration
+- **State** — Future, Active, or Completed
+- **Date Range** — Start and end dates
+- **Team** — The owning [team](../organizations/index#teams) (optional)
+- **Ownership** — Owned (by Moda) or Managed (from external system like Azure DevOps)
+
+Managed sprints may have **External Metadata** such as the Azure DevOps iteration path.
+
+Sprints are [mapped to PI iterations](./planning-intervals#sprint-mapping) to connect team delivery cadence to the broader planning schedule.
+
+### Sprint Detail Page
+
+The sprint detail page shows:
+- **Team** link and timeline progress bar
+- **Sprint Metrics** (for Active/Completed sprints) — see [Sprint Metrics](#sprint-metrics) below
+- **Backlog grid** — [Work items](../work-management/index#work-items) in the sprint with Rank, Key, Type, Title, Story Points, Status, Status Category, and Team
+- **Links** section
+
+A **Switch Sprint** dropdown lets you quickly navigate between other sprints on the same team.
+
+### Sprints List Page
+
+The sprints list (**Planning > Sprints**) shows all sprints across all [teams](../organizations/index#teams) in a grid with Key, Name, Team, State, Start Date, and End Date, sorted by most recent start date.
+
+Teams also see their sprints on the [Sprints tab](../organizations/index#sprints-tab) of their detail page.
+
+## Sprint Metrics
+
+Sprint metrics provide quantitative insight into a sprint's progress and delivery. Metrics are available for both individual sprints and [PI iterations](./planning-intervals#pi-iteration-detail-page) (which aggregate across all mapped sprints).
+
+All metrics can be viewed using either **Story Points** or **Count** sizing, toggled via a selector.
+
+### Metric Definitions
+
+| Metric | Formula | Description |
+|--------|---------|-------------|
+| **Total** | Sum of all work items (or story points) in the sprint | Everything committed to the sprint |
+| **Completed** | Items where status category is **Done** or **Removed** | Work that is finished or removed from scope |
+| **In Progress** | Items where status category is **Active** | Work currently being performed |
+| **Not Started** | Items where status category is **Proposed** | Work that hasn't begun yet |
+| **Remaining** | Total − Completed | Work still to be done |
+| **Completion Rate** | `(Completed / Total) × 100` | Percentage of sprint work completed. Target: 80% |
+| **Velocity** | Completed count (story points or items) | How much work the team delivered. Percentage of total shown alongside. |
+| **Avg Cycle Time** | `Sum(Done − Activated) / Count` for Done items with both timestamps | Average days from start to completion. Only includes items that moved through Active to Done. |
+| **Missing Story Points** | Count of items with null or zero story points | Indicates estimation gaps. Highlighted red if any exist. |
+
+### How "Completed" Is Defined
+
+**Completed** includes both **Done** and **Removed** [status categories](../work-management/index#work-status-categories). Removed items are counted as completed because they represent work that has been resolved (even if by removal from scope) and is no longer in progress.
+
+This means:
+- `Remaining = Total − (Done + Removed)`
+- `Completion Rate = (Done + Removed) / Total × 100`
+
+### Cycle Time in Sprint Context
+
+**Average Cycle Time** is only calculated from work items that:
+1. Have a **Done** status category (not Removed)
+2. Have both an **Activated Timestamp** and a **Done Timestamp**
+3. The Done timestamp is after the Activated timestamp
+
+```
+Per item: Cycle Time = Done Timestamp − Activated Timestamp (in days)
+Sprint average: Sum(all item cycle times) / Count(eligible Done items)
+```
+
+Items that were moved directly to Done without being Activated, or items that were Removed, are excluded from the cycle time calculation.
+
+For a deeper analysis of cycle time patterns over longer periods, use the [Cycle Time Report](../organizations/index#cycle-time-report-report) on individual team pages.
+
+### PI Iteration Metric Aggregation
+
+When viewing a [PI iteration](./planning-intervals#pi-iteration-detail-page), metrics are aggregated from all mapped team sprints:
+- **Counts and story points** are summed across all sprints (Total, Completed, In Progress, Not Started, Missing)
+- **Average Cycle Time** is the average of each sprint's average cycle time (simple average, not weighted)
+- **Team Count** and **Sprint Count** show how many teams and sprints are included

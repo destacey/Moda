@@ -20,7 +20,7 @@ describe('useGlobalSearch', () => {
     expect(result.current.open).toBe(false)
   })
 
-  it('toggles open on Ctrl+K', () => {
+  it('opens on Ctrl+K and stays open on subsequent Ctrl+K', () => {
     const { result } = renderHook(() => useGlobalSearch())
     act(() => {
       document.dispatchEvent(
@@ -29,12 +29,13 @@ describe('useGlobalSearch', () => {
     })
     expect(result.current.open).toBe(true)
 
+    // Second Ctrl+K while open does not close (modal handles it for scope switching)
     act(() => {
       document.dispatchEvent(
         new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }),
       )
     })
-    expect(result.current.open).toBe(false)
+    expect(result.current.open).toBe(true)
   })
 
   it('toggles open on Cmd+K', () => {

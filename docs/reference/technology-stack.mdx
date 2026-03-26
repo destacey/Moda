@@ -1,0 +1,68 @@
+---
+title: Technology Stack
+description: Complete list of libraries, frameworks, and tools used in Moda.
+sidebar_position: 5
+audience: [developer, agent]
+---
+
+# Technology Stack
+
+## Backend (.NET)
+
+| Technology | Purpose |
+|-----------|---------|
+| .NET 10.0 | Runtime and SDK |
+| ASP.NET Core | Web API framework |
+| Entity Framework Core | ORM and database access |
+| SQL Server | Database |
+| MediatR | CQRS command/query dispatch |
+| FluentValidation | Input validation |
+| Mapster | Object mapping (DTOs) |
+| NodaTime | Date/time handling |
+| CSharpFunctionalExtensions | Result pattern |
+| Hangfire | Background job processing |
+| Serilog | Structured logging |
+| NSwag | OpenAPI spec and client generation |
+| Microsoft.FeatureManagement | Feature flags |
+| ASP.NET Core Identity | User management |
+| Azure AD / Local JWT | Authentication |
+| OpenTelemetry | Observability |
+
+## Frontend (Next.js)
+
+| Technology | Purpose |
+|-----------|---------|
+| Next.js 16 | React framework (App Router) |
+| React 19 | UI library |
+| TypeScript | Type safety |
+| Ant Design 6 | UI component library |
+| Redux Toolkit | State management |
+| AG Grid | Advanced data tables |
+| MSAL React | Azure AD authentication |
+| react-markdown | Markdown rendering |
+| dayjs | Date formatting |
+| @dnd-kit | Drag and drop |
+| SignalR | Real-time communication |
+
+## Testing
+
+| Technology | Purpose |
+|-----------|---------|
+| xUnit | .NET test framework |
+| FluentAssertions | .NET assertion library |
+| Moq + Moq.AutoMock | .NET mocking |
+| Bogus | Fake data generation |
+| NetArchTest.Rules | Architecture rule validation |
+| Jest | JavaScript test framework |
+| React Testing Library | React component testing |
+
+## Infrastructure
+
+| Technology | Purpose |
+|-----------|---------|
+| Docker / Docker Compose | Containerization |
+| .NET Aspire | Local development orchestration |
+| GitHub Actions | CI/CD |
+| Terraform | Infrastructure as code |
+| Seq | Log aggregation (local dev) |
+| OpenTelemetry | Distributed tracing |

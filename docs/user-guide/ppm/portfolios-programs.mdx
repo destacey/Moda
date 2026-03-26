@@ -1,0 +1,109 @@
+---
+title: Portfolios & Programs
+description: Managing portfolios and programs — top-level containers for projects and strategic initiatives in Moda.
+sidebar_position: 1
+audience: [user, agent]
+---
+
+# Portfolios & Programs
+
+## Portfolios
+
+A **Portfolio** is the top-level container for [projects](./projects), programs, and [strategic initiatives](./strategic-initiatives). It represents a collection of related work managed together to achieve strategic objectives.
+
+Every portfolio has:
+- **Name** and **Description**
+- **Status** — Lifecycle state (see [Portfolio Status Lifecycle](#portfolio-status-lifecycle))
+- **Date Range** — Start and optional end date
+- **Roles** — People assigned to portfolio-level roles
+
+Portfolios contain:
+- **Programs** — Groups of related [projects](./projects)
+- **[Projects](./projects)** — Individual initiatives
+- **[Strategic Initiatives](./strategic-initiatives)** — High-level strategic efforts tracked with [KPIs](./strategic-initiatives#kpis)
+
+### Portfolio Roles
+
+| Role | Description |
+|------|-------------|
+| Sponsor | Executive sponsor of the portfolio |
+| Owner | Person responsible for portfolio outcomes |
+| Manager | Manages portfolio execution |
+| Portfolio Manager | Oversees portfolio governance |
+| Stakeholder Manager | Manages stakeholder relationships |
+| Governance Reviewer | Reviews portfolio governance |
+| Capacity Planner | Plans resource capacity |
+
+### Portfolio Status Lifecycle
+
+```mermaid
+stateDiagram-v2
+    [*] --> Proposed
+    Proposed --> Active : Start date required
+    Active --> OnHold : Temporary pause
+    Active --> Closed : All children closed
+    OnHold --> Active : Resume
+    Closed --> Archived : Historical record
+```
+
+| Status | Description | Date Requirements |
+|--------|-------------|-------------------|
+| **Proposed** | Early planning stage | None |
+| **Active** | Approved and operational | Start date required |
+| **On Hold** | Temporarily paused | Start date required |
+| **Closed** | All work done | Start and end date required |
+| **Archived** | Retired, read-only | Start and end date required |
+
+**Transition rules:**
+- All [programs](#programs) and [projects](./projects) must be closed before closing a portfolio
+- Only Proposed portfolios can be deleted
+- Archived portfolios are read-only
+
+### Portfolio Detail Page
+
+The portfolio detail page has four tabs:
+
+**Details Tab** — Shows sponsors, owners, and managers (sorted alphabetically), description (Markdown), and links to related entities.
+
+**Programs Tab** — Grid of [programs](#programs) with Key, Name, Status, Start/End dates, Managers, Owners, Sponsors, and [Strategic Themes](../strategic-management/index#strategic-themes). Supports List and Timeline views. Filtered to show Active programs by default.
+
+**Projects Tab** — Grid of [projects](./projects) with Key, Name, Status, Portfolio, Program, Start/End dates, Managers, Owners, Sponsors, Strategic Themes, and Lifecycle. Supports **Card**, **List**, and **Timeline** views. Filtered to show Approved and Active projects by default. The Timeline view groups projects by program.
+
+**Strategic Initiatives Tab** — Grid of [strategic initiatives](./strategic-initiatives) with Key, Name, Status, Start/End dates, Managers, Owners, Sponsors, and Strategic Themes. Supports List and Timeline views. Filtered to show Approved and Active by default.
+
+## Programs
+
+A **Program** groups related [projects](./projects) within a portfolio for coordinated management.
+
+Every program has:
+- **Name** and **Description**
+- **Status** — Proposed, Active, Completed, or Cancelled
+- **Date Range** — Start and optional end date
+- **Roles** — Sponsor, Owner, Manager
+- **Strategic Theme Tags** — Links to [strategic themes](../strategic-management/index#strategic-themes) for alignment
+
+**Business rules:**
+- Only active programs accept new [projects](./projects)
+- All projects must be completed or cancelled before completing a program
+- Only Proposed programs can be deleted
+- Active status requires a date range
+
+### Program Detail Page
+
+The program detail page uses a two-column layout:
+
+**Left sidebar** — Portfolio link, date range, timeline progress bar, sponsors/owners/managers, [strategic themes](../strategic-management/index#strategic-themes), description (Markdown), and links.
+
+**Right content area** — Badge showing project count, with project cards that can be expanded or clicked to open a project drawer.
+
+A warning alert appears if dates are missing: *"Program Dates are required before activating."*
+
+## Common Tasks
+
+### Creating a Portfolio
+
+1. Navigate to **PPM > Portfolios**
+2. Click **Create Portfolio**
+3. Enter **Name** and **Description**
+4. The portfolio is created in **Proposed** status
+5. **Activate** the portfolio (requires a start date)

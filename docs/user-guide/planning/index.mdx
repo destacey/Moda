@@ -1,0 +1,111 @@
+---
+title: Planning
+description: Planning intervals, iterations, sprints, objectives, risks, roadmaps, and planning poker in Moda.
+sidebar_position: 2
+audience: [user, agent]
+---
+
+# Planning
+
+The Planning domain provides the capabilities to plan, organize, and execute work across periods of time. It supports scaled agile planning with planning intervals, iterations, sprints, team objectives, risk management, roadmaps, and collaborative estimation.
+
+## How Planning Connects Across Moda
+
+Planning is where teams, work, and strategy come together:
+
+```mermaid
+graph LR
+    subgraph "Organization"
+        Team["Teams"]
+    end
+    subgraph "Planning"
+        PI["Planning Intervals"]
+        Iter["Iterations"]
+        Sprint["Sprints"]
+        Obj["Objectives"]
+        Risk["Risks"]
+        RM["Roadmaps"]
+    end
+    subgraph "Work Management"
+        WI["Work Items"]
+    end
+
+    Team -->|participates in| PI
+    PI -->|contains| Iter
+    Team -->|owns| Sprint
+    Sprint -->|mapped to| Iter
+    Team -->|commits| Obj
+    WI -->|assigned to| Sprint
+    Team -->|tracks| Risk
+```
+
+- **[Teams](../organizations/index#teams)** participate in Planning Intervals and own Sprints. Teams see their sprints on the [Sprints tab](../organizations/index#sprints-tab) and risks on the [Risk Management tab](../organizations/index#risk-management-tab).
+- **[Work Items](../work-management/index#work-items)** are assigned to Sprints for execution. Sprint assignment is visible on the [work item detail page](../work-management/index#work-item-detail-page).
+- **[Objectives](./planning-intervals#objectives)** link team commitments to strategic outcomes.
+
+## The Big Picture
+
+A Planning Interval brings together teams, objectives, sprints, and work items into a coordinated delivery cycle:
+
+```mermaid
+graph TD
+    PI["Planning Interval<br/>(8-12 weeks)"]
+
+    subgraph "Time Structure"
+        I1["Iteration 1<br/>(2 weeks)"]
+        I2["Iteration 2<br/>(2 weeks)"]
+        I3["Iteration 3<br/>(2 weeks)"]
+        IP["IP Iteration<br/>(Innovation)"]
+    end
+
+    subgraph "Team A (Scrum)"
+        SA1["Sprint A-1"]
+        SA2["Sprint A-2"]
+        SA3["Sprint A-3"]
+        OA["Objective:<br/>Launch API v2"]
+        WA1["PLAT-101<br/>Story"]
+        WA2["PLAT-102<br/>Story"]
+    end
+
+    subgraph "Team B (Scrum)"
+        SB1["Sprint B-1"]
+        SB2["Sprint B-2"]
+        SB3["Sprint B-3"]
+        OB["Objective:<br/>Migrate Database"]
+        WB1["DATA-201<br/>Story"]
+    end
+
+    PI --> I1 & I2 & I3 & IP
+    PI -.->|participates| SA1 & SB1
+    I1 -->|mapped to| SA1
+    I1 -->|mapped to| SB1
+    I2 -->|mapped to| SA2
+    I2 -->|mapped to| SB2
+    I3 -->|mapped to| SA3
+    I3 -->|mapped to| SB3
+
+    SA1 -->|contains| WA1
+    SA2 -->|contains| WA2
+    SB1 -->|contains| WB1
+
+    OA -.->|tracked via| WA1 & WA2
+    OB -.->|tracked via| WB1
+```
+
+**How it fits together:**
+1. A **[Planning Interval](./planning-intervals)** defines the overall timeframe and contains **[Iterations](./planning-intervals#iterations-within-a-pi)** (the schedule)
+2. **[Teams](../organizations/index#teams)** participate in the PI and each team owns **[Sprints](./sprints)**
+3. Each team's sprints are **[mapped](./planning-intervals#sprint-mapping)** to PI iterations (one sprint per team per iteration)
+4. Teams commit to **[Objectives](./planning-intervals#objectives)** — what they will deliver during the PI
+5. **[Work Items](../work-management/index#work-items)** live in sprints and represent the actual work being done
+6. Objectives are tracked by linking them to the work items that fulfill them
+
+The PI iteration view aggregates all mapped sprints, giving you a cross-team view of what's happening in each time period.
+
+## Sections
+
+- **[Planning Intervals](./planning-intervals)** — PIs, iterations, sprint mapping, objectives, predictability, and plan review
+- **[Sprints & Metrics](./sprints)** — Sprint management and delivery metrics (velocity, cycle time, completion rate)
+- **[Risks](./risks)** — Risk identification and management using the ROAM model
+- **[Roadmaps](./roadmaps)** — Visual timeline planning with activities, milestones, and timeboxes
+- **[Planning Poker](./planning-poker)** — Collaborative estimation with real-time voting

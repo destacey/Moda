@@ -1,0 +1,58 @@
+---
+title: Configuration
+description: Database, authentication, and environment configuration for Moda.
+sidebar_position: 6
+audience: [developer]
+---
+
+# Configuration
+
+## Database
+
+Database connection strings are configured in:
+
+```
+Moda.Web/src/Moda.Web.Api/Configurations/database.json
+```
+
+## Authentication
+
+Moda supports two authentication providers:
+
+### Microsoft Entra ID (Azure AD)
+
+Create a `.env` file in the repository root:
+
+```env
+AAD_CLIENT_ID='{your AAD client ID}'
+AAD_TENANT_ID='{your AAD tenant ID}'
+AAD_LOGON_AUTHORITY='https://login.microsoftonline.com/{your AAD tenant ID}'
+API_SCOPE='{scope, usually api://{client ID}/access_as_user}'
+API_BASE_URL='https://localhost:5001'
+```
+
+### Local Authentication
+
+Configure in `Moda.Web/src/Moda.Web.Api/Configurations/security.json` or User Secrets:
+
+```json
+{
+  "SecuritySettings": {
+    "LocalJwt": {
+      "Secret": "<strong-random-secret-at-least-32-chars>",
+      "Issuer": "Moda",
+      "Audience": "ModaApi",
+      "TokenExpirationInMinutes": 60,
+      "RefreshTokenExpirationInDays": 7
+    }
+  }
+}
+```
+
+## Environment Variables
+
+| Variable | Purpose |
+|----------|---------|
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | OpenTelemetry collector endpoint |
+| `APPLICATIONINSIGHTS_CONNECTION_STRING` | Azure Application Insights |
+| `ASPNETCORE_ENVIRONMENT` | Runtime environment (Development, Production) |

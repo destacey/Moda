@@ -1,0 +1,64 @@
+---
+title: Adding a Feature
+description: Step-by-step guide for implementing new features in Moda.
+sidebar_position: 4
+audience: [developer, agent]
+---
+
+# Adding a Feature
+
+This guide walks through the typical process of adding a new feature to Moda, touching all layers of the architecture.
+
+## 1. Domain Layer
+
+Start with the domain model:
+
+1. Define or update entities in `Moda.\{Service\}.Domain/Models/`
+2. Add value objects if needed
+3. Define domain events for significant state changes
+4. Write domain tests
+
+## 2. Application Layer
+
+Add commands, queries, and handlers:
+
+1. Create the **command/query** record in `\{Feature\}/Commands/` or `\{Feature\}/Queries/`
+2. Create the **handler** implementing `ICommandHandler&lt;T&gt;` or `IQueryHandler&lt;T&gt;`
+3. Create the **validator** using FluentValidation
+4. Create **DTOs** for data transfer
+5. Add Mapster mapping configuration if needed
+6. Write application tests
+
+## 3. Infrastructure Layer
+
+If the feature requires database changes:
+
+1. Add entity configuration in `Moda.Infrastructure/Persistence/Configuration/`
+2. Create a database migration
+3. Update seed data if necessary
+
+## 4. API Layer
+
+Expose the feature through the API:
+
+1. Add controller actions in `Moda.Web.Api/Controllers/`
+2. Controllers should be thin - delegate to MediatR
+3. Return appropriate HTTP status codes
+
+## 5. Frontend
+
+Build the UI:
+
+1. Add pages in the appropriate route directory
+2. Use the NSwag-generated client for API calls
+3. Follow Ant Design patterns and theme tokens
+4. Add to the sidebar navigation if needed
+
+## 6. Feature Flag (Optional)
+
+If the feature should be gradually rolled out:
+
+1. Add flag definition in `FeatureFlags.cs`
+2. Gate the controller with `[FeatureGate]`
+3. Gate the UI with `useFeatureFlag` or `requireFeatureFlag`
+4. See [Feature Flags](../reference/feature-flags) for details

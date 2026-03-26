@@ -1,0 +1,87 @@
+---
+title: Database & Migrations
+description: Database patterns, Entity Framework Core usage, and migration management.
+sidebar_position: 5
+audience: [developer, agent]
+---
+
+# Database & Migrations
+
+## Database Architecture
+
+Moda uses a **single shared database** accessed through `ModaDbContext`. All domain services share this context.
+
+Entity configurations are organized by domain area in:
+```
+Moda.Infrastructure/src/Moda.Infrastructure/Persistence/Configuration/
+```
+
+## Entity Framework Core
+
+### Direct DbContext Usage
+
+Moda does **not** use the Repository pattern. Application handlers access `ModaDbContext` directly:
+
+```csharp
+public class GetWorkItemQueryHandler : IQueryHandler<GetWorkItemQuery, WorkItemDto>
+{
+    private readonly ModaDbContext _context;
+
+    public async Task<Result<WorkItemDto>> Handle(GetWorkItemQuery request, CancellationToken ct)
+    {
+        var workItem = await _context.WorkItems
+            .Where(w => w.Id == request.Id)
+            .ProjectToType<WorkItemDto>()
+            .FirstOrDefaultAsync(ct);
+
+        return workItem is null
+            ? Result.Failure<WorkItemDto>("Work item not found.")
+            : Result.Success(workItem);
+    }
+}
+```
+
+### Entity Configuration
+
+Use fluent API in separate configuration classes:
+
+```csharp
+public class WorkItemConfiguration : IEntityTypeConfiguration<WorkItem>
+{
+    public void Configure(EntityTypeBuilder<WorkItem> builder)
+    {
+        builder.ToTable("WorkItems", SchemaNames.Work);
+        builder.HasKey(w => w.Id);
+        // ...
+    }
+}
+```
+
+## Migrations
+
+Migrations are managed in `Moda.Infrastructure.Migrators.MSSQL`.
+
+### Creating a Migration
+
+```bash
+dotnet ef migrations add <MigrationName> \
+  --project "Moda.Infrastructure/src/Moda.Infrastructure.Migrators.MSSQL" \
+  --startup-project "Moda.Web/src/Moda.Web.Api"
+```
+
+### Applying Migrations
+
+```bash
+dotnet ef database update \
+  --project "Moda.Infrastructure/src/Moda.Infrastructure.Migrators.MSSQL" \
+  --startup-project "Moda.Web/src/Moda.Web.Api"
+```
+
+Migrations also run automatically on application startup via `app.Services.InitializeDatabases()`.
+
+## Database Initialization
+
+On startup, the application:
+1. Applies pending migrations
+2. Seeds feature flags from code definitions
+3. Runs any data initialization logic
