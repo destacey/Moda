@@ -1,4 +1,5 @@
-import { Flex, Tooltip, Typography } from 'antd'
+import { Flex, Typography } from 'antd'
+import ModaTooltip from '@/src/components/common/moda-tooltip'
 import { ReactNode } from 'react'
 
 const { Text } = Typography
@@ -12,11 +13,11 @@ interface LabeledContentProps {
 const LabeledContent = ({ label, tooltip, children }: LabeledContentProps) => (
   <Flex vertical gap={2}>
     {tooltip ? (
-      <Tooltip title={tooltip}>
+      <ModaTooltip title={tooltip}>
         <Text type="secondary" style={{ fontSize: 12, paddingTop: 1, cursor: 'help' }}>
           {label}
         </Text>
-      </Tooltip>
+      </ModaTooltip>
     ) : (
       <Text type="secondary" style={{ fontSize: 12, paddingTop: 1 }}>
         {label}

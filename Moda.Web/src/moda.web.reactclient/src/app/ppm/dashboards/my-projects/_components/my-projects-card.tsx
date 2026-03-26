@@ -3,7 +3,8 @@
 import useAuth from '@/src/components/contexts/auth'
 import { useGetMyProjectsSummaryQuery } from '@/src/store/features/ppm/projects-api'
 import { RightOutlined } from '@ant-design/icons'
-import { Badge, Card, Divider, Flex, Skeleton, Tag, Tooltip, Typography } from 'antd'
+import { Badge, Card, Divider, Flex, Skeleton, Tag, Typography } from 'antd'
+import { ModaTooltip } from '@/src/components/common'
 import { useRouter } from 'next/navigation'
 import { FC, useMemo } from 'react'
 
@@ -92,7 +93,7 @@ const MyProjectsCard: FC = () => {
 
           <Flex gap={6} wrap>
             {roleCounts.map(({ label, count }) => (
-              <Tooltip
+              <ModaTooltip
                 key={label}
                 title={`You are a ${label} on ${count} ${count === 1 ? 'project' : 'projects'}`}
               >
@@ -104,7 +105,7 @@ const MyProjectsCard: FC = () => {
                     size="small"
                   />
                 </Tag>
-              </Tooltip>
+              </ModaTooltip>
             ))}
           </Flex>
         </Flex>

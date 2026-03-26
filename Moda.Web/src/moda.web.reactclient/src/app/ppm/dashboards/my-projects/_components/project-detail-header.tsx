@@ -4,7 +4,8 @@ import { LifecycleStatusTag, ModaDateRange } from '@/src/components/common'
 import { LinkOutlined } from '@ant-design/icons'
 import { ProjectDetailsDto } from '@/src/services/moda-api'
 import { getSortedNames } from '@/src/utils'
-import { Button, Flex, Tooltip, Typography } from 'antd'
+import { Button, Flex, Typography } from 'antd'
+import { ModaTooltip } from '@/src/components/common'
 import Link from 'next/link'
 import { FC } from 'react'
 import styles from '../my-projects-dashboard.module.css'
@@ -26,7 +27,7 @@ const ProjectDetailHeader: FC<ProjectDetailHeaderProps> = ({ project }) => {
           <Title level={4} style={{ margin: 0 }}>
             {project.name}
           </Title>
-          <Tooltip title="Open project details">
+          <ModaTooltip title="Open project details">
             <Link href={`/ppm/projects/${project.key}`}>
               <Button
                 type="text"
@@ -34,7 +35,7 @@ const ProjectDetailHeader: FC<ProjectDetailHeaderProps> = ({ project }) => {
                 icon={<LinkOutlined style={{ fontSize: 11 }} />}
               />
             </Link>
-          </Tooltip>
+          </ModaTooltip>
           <LifecycleStatusTag status={project.status} />
         </Flex>
         <Flex gap={12} align="center" wrap>

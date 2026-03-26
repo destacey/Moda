@@ -1,5 +1,6 @@
-import { Button, Dropdown, Tooltip } from 'antd'
+import { Button, Dropdown } from 'antd'
 import type { MenuProps } from 'antd'
+import ModaTooltip from '@/src/components/common/moda-tooltip'
 import { FC, ReactNode, useCallback, useMemo } from 'react'
 import useTheme from '../contexts/theme'
 
@@ -65,7 +66,7 @@ const IconMenu: FC<IconMenuProps> = ({
   if (!icon || !items || items.length === 0) return null
 
   return (
-    <Tooltip title={tooltip}>
+    <ModaTooltip title={tooltip}>
       <Dropdown
         menu={{
           items: menuItems,
@@ -83,7 +84,7 @@ const IconMenu: FC<IconMenuProps> = ({
       >
         <Button type="text" shape="circle" icon={icon} />
       </Dropdown>
-    </Tooltip>
+    </ModaTooltip>
   )
 }
 

@@ -13,7 +13,8 @@ import useAuth from '@/src/components/contexts/auth'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { useGetProjectQuery } from '@/src/store/features/ppm/projects-api'
 import { getDrawerWidthPixels, getSortedNameList } from '@/src/utils'
-import { Divider, Drawer, Flex, Tooltip } from 'antd'
+import { Divider, Drawer, Flex } from 'antd'
+import { ModaTooltip } from '@/src/components/common'
 import { projectHelpText } from '../projects/_components/project-help-text'
 import Link from 'next/link'
 import { FC, useEffect, useMemo, useState } from 'react'
@@ -121,9 +122,9 @@ const ProjectDrawer: FC<ProjectDrawerProps> = ({
           </LabeledContent>
           <LabeledContent label="Lifecycle">
             {projectData?.projectLifecycle ? (
-              <Tooltip title={projectData.projectLifecycle.description}>
+              <ModaTooltip title={projectData.projectLifecycle.description}>
                 {projectData.projectLifecycle.name}
-              </Tooltip>
+              </ModaTooltip>
             ) : (
               'No lifecycle assigned'
             )}

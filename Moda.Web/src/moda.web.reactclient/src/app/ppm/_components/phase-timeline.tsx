@@ -2,7 +2,8 @@
 
 import { CheckCircleFilled, CloseCircleFilled } from '@ant-design/icons'
 import { ProjectPhaseListDto } from '@/src/services/moda-api'
-import { Steps, Tooltip } from 'antd'
+import { Steps } from 'antd'
+import { ModaTooltip } from '@/src/components/common'
 import dayjs from 'dayjs'
 import { FC, useEffect, useRef, useState } from 'react'
 import styles from './phase-timeline.module.css'
@@ -41,27 +42,27 @@ function getIcon(status: PhaseStatus, tooltipContent: React.ReactNode) {
   switch (status) {
     case 'completed':
       return (
-        <Tooltip title={tooltipContent}>
+        <ModaTooltip title={tooltipContent}>
           <CheckCircleFilled className={styles.iconCompleted} />
-        </Tooltip>
+        </ModaTooltip>
       )
     case 'in-progress':
       return (
-        <Tooltip title={tooltipContent}>
+        <ModaTooltip title={tooltipContent}>
           <span className={styles.dotInProgress} />
-        </Tooltip>
+        </ModaTooltip>
       )
     case 'cancelled':
       return (
-        <Tooltip title={tooltipContent}>
+        <ModaTooltip title={tooltipContent}>
           <CloseCircleFilled className={styles.iconCancelled} />
-        </Tooltip>
+        </ModaTooltip>
       )
     default:
       return (
-        <Tooltip title={tooltipContent}>
+        <ModaTooltip title={tooltipContent}>
           <span className={styles.dotNotStarted} />
-        </Tooltip>
+        </ModaTooltip>
       )
   }
 }
@@ -174,11 +175,11 @@ const PhaseTimeline: FC<PhaseTimelineProps> = ({ phases, displayMode }) => {
     const tooltip = buildTooltip(phase, status, mode)
     return {
       title: (
-        <Tooltip title={tooltip}>
+        <ModaTooltip title={tooltip}>
           <span className={mode === 'small' ? styles.titleSmall : undefined}>
             {phase.name}
           </span>
-        </Tooltip>
+        </ModaTooltip>
       ),
       content: buildContent(phase, mode),
       status: mapStepStatus(status),

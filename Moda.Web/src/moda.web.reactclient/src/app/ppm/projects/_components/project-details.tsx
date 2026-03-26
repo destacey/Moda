@@ -8,7 +8,8 @@ import {
 import LinksCard from '@/src/components/common/links/links-card'
 import TimelineProgress from '@/src/components/common/planning/timeline-progress'
 import { ProjectDetailsDto } from '@/src/services/moda-api'
-import { Card, Divider, Flex, Tooltip } from 'antd'
+import { Card, Divider, Flex } from 'antd'
+import { ModaTooltip } from '@/src/components/common'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { FC } from 'react'
@@ -80,9 +81,9 @@ const ProjectDetails: FC<ProjectDetailsProps> = ({ project }) => {
 
           <LabeledContent label="Lifecycle">
             {project.projectLifecycle ? (
-              <Tooltip title={project.projectLifecycle.description}>
+              <ModaTooltip title={project.projectLifecycle.description}>
                 {project.projectLifecycle.name}
-              </Tooltip>
+              </ModaTooltip>
             ) : (
               'No lifecycle assigned'
             )}

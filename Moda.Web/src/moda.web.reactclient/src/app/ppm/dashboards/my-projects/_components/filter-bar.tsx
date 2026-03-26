@@ -2,7 +2,8 @@
 
 import { ClearOutlined, ReloadOutlined } from '@ant-design/icons'
 import { useGetProjectStatusOptionsQuery } from '@/src/store/features/ppm/projects-api'
-import { Button, Flex, Skeleton, Space, Tooltip } from 'antd'
+import { Button, Flex, Skeleton, Space } from 'antd'
+import { ModaTooltip } from '@/src/components/common'
 import { FC, RefObject } from 'react'
 import styles from '../my-projects-dashboard.module.css'
 
@@ -113,7 +114,7 @@ const MyProjectsDashboardFilterBar: FC<MyProjectsDashboardFilterBarProps> = ({
         </Space>
 
         <Flex gap={2}>
-          <Tooltip title="Refresh Data">
+          <ModaTooltip title="Refresh Data">
             <Button
               type="text"
               shape="circle"
@@ -121,8 +122,8 @@ const MyProjectsDashboardFilterBar: FC<MyProjectsDashboardFilterBarProps> = ({
               aria-label="Refresh data"
               onClick={onRefresh}
             />
-          </Tooltip>
-          <Tooltip title="Reset Filters">
+          </ModaTooltip>
+          <ModaTooltip title="Reset Filters">
             <Button
               type="text"
               shape="circle"
@@ -130,7 +131,7 @@ const MyProjectsDashboardFilterBar: FC<MyProjectsDashboardFilterBarProps> = ({
               aria-label="Reset filters"
               onClick={onReset}
             />
-          </Tooltip>
+          </ModaTooltip>
         </Flex>
       </Flex>
     </div>

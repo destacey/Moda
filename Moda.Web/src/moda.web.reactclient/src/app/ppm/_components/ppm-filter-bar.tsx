@@ -1,7 +1,8 @@
 'use client'
 
 import { ClearOutlined } from '@ant-design/icons'
-import { Button, Card, Flex, Select, Skeleton, Space, Tooltip } from 'antd'
+import { Button, Card, Flex, Select, Skeleton, Space } from 'antd'
+import { ModaTooltip } from '@/src/components/common'
 import { BaseOptionType } from 'antd/es/select'
 import { FC } from 'react'
 import styles from './ppm-filter-bar.module.css'
@@ -121,7 +122,7 @@ const PpmFilterBar: FC<PpmFilterBarProps> = (props) => {
         )}
 
         {props.onReset && (
-          <Tooltip title="Reset Filters">
+          <ModaTooltip title="Reset Filters">
             <Button
               type="text"
               shape="circle"
@@ -129,7 +130,7 @@ const PpmFilterBar: FC<PpmFilterBarProps> = (props) => {
               aria-label="Reset filters"
               onClick={props.onReset}
             />
-          </Tooltip>
+          </ModaTooltip>
         )}
       </Flex>
     </div>

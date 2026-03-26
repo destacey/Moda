@@ -1,7 +1,8 @@
 'use client'
 
 import styles from './tree-grid.module.css'
-import { Button, Input, Popover, Tooltip, Typography } from 'antd'
+import { Button, Input, Popover, Typography } from 'antd'
+import ModaTooltip from '@/src/components/common/moda-tooltip'
 import {
   ClearOutlined,
   DownloadOutlined,
@@ -49,16 +50,16 @@ const TreeGridToolbar = ({
           className={styles.toolbarSearch}
         />
         {onRefresh && (
-          <Tooltip title="Refresh">
+          <ModaTooltip title="Refresh">
             <Button
               type="text"
               shape="circle"
               icon={<ReloadOutlined />}
               onClick={onRefresh}
             />
-          </Tooltip>
+          </ModaTooltip>
         )}
-        <Tooltip title="Clear Filters and Sorting">
+        <ModaTooltip title="Clear Filters and Sorting">
           <Button
             type="text"
             shape="circle"
@@ -66,10 +67,10 @@ const TreeGridToolbar = ({
             onClick={onClearFilters}
             disabled={!hasActiveFilters}
           />
-        </Tooltip>
+        </ModaTooltip>
         <span className={styles.toolbarDivider} />
         {onExportCsv && (
-          <Tooltip title="Export to CSV">
+          <ModaTooltip title="Export to CSV">
             <Button
               type="text"
               shape="circle"
@@ -77,7 +78,7 @@ const TreeGridToolbar = ({
               onClick={onExportCsv}
               disabled={isLoading || displayedRowCount === 0}
             />
-          </Tooltip>
+          </ModaTooltip>
         )}
         {helpContent && (
           <Popover
@@ -87,13 +88,13 @@ const TreeGridToolbar = ({
             getPopupContainer={() => document.body}
             overlayStyle={{ maxWidth: 'calc(100vw - 24px)' }}
           >
-            <Tooltip title="Grid Actions Help">
+            <ModaTooltip title="Grid Actions Help">
               <Button
                 type="text"
                 shape="circle"
                 icon={<QuestionCircleOutlined />}
               />
-            </Tooltip>
+            </ModaTooltip>
           </Popover>
         )}
         {rightSlot && (

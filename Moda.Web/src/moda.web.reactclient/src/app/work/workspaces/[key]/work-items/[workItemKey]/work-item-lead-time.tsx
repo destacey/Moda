@@ -1,7 +1,8 @@
 'use client'
 
 import { WorkItemDetailsDto } from '@/src/services/moda-api'
-import { Card, Statistic, Tooltip } from 'antd'
+import { Card, Statistic } from 'antd'
+import { ModaTooltip } from '@/src/components/common'
 import dayjs from 'dayjs'
 
 export interface WorkItemLeadTimeProps {
@@ -22,14 +23,14 @@ const WorkItemLeadTime = ({ workItem }: WorkItemLeadTimeProps) => {
 
   return (
     <Card>
-      <Tooltip title={tooltip}>
+      <ModaTooltip title={tooltip}>
         <Statistic
           title={metricName}
           value={metricValue}
           suffix="days"
           precision={2}
         />
-      </Tooltip>
+      </ModaTooltip>
     </Card>
   )
 }
