@@ -26,11 +26,11 @@ In `Moda.Common.Domain/FeatureManagement/FeatureFlags.cs`:
 public static class FeatureFlags
 {
     public static readonly FeatureFlagDefinition MyNewFeature =
-        new("MyNewFeature", "Description of the feature");
+        new(Names.MyNewFeature, "My New Feature", "Description of what this feature does.");
 
     public static class Names
     {
-        public const string MyNewFeature = nameof(FeatureFlags.MyNewFeature);
+        public const string MyNewFeature = "my-new-feature";
     }
 }
 ```

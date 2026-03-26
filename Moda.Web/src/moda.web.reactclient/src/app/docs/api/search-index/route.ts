@@ -12,7 +12,7 @@ export interface DocSearchEntry {
  * Strip markdown syntax to get plain text for search indexing.
  */
 function stripMarkdown(md: string): string {
-  return md
+  let result = md
     // Remove frontmatter (already stripped by gray-matter, but just in case)
     .replace(/^---[\s\S]*?---\n?/, '')
     // Remove mermaid code blocks entirely
@@ -29,11 +29,21 @@ function stripMarkdown(md: string): string {
     .replace(/#{1,6}\s+/g, '')
     // Remove bold/italic
     .replace(/\*{1,3}([^*]+)\*{1,3}/g, '$1')
-    // Remove HTML tags
-    .replace(/<[^>]+>/g, '')
     // Remove table formatting
     .replace(/\|/g, ' ')
     .replace(/-{3,}/g, '')
+
+  // Sanitize HTML: repeatedly strip tags until stable to prevent
+  // multi-character bypass (e.g., "<scr<script>ipt>")
+  let prev = ''
+  while (prev !== result) {
+    prev = result
+    result = result.replace(/<[^>]*>/g, '')
+  }
+  // Remove any remaining angle brackets as a final safety pass
+  result = result.replace(/[<>]/g, '')
+
+  return result
     // Collapse whitespace
     .replace(/\s+/g, ' ')
     .trim()
