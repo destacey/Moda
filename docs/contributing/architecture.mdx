@@ -88,7 +88,7 @@ public sealed record GetWorkItemQuery(Guid Id) : IQuery<WorkItemDto>;
 
 ### Result Pattern
 
-Handlers return `Result<T>` from CSharpFunctionalExtensions instead of throwing exceptions:
+Handlers return `Result&lt;T&gt;` from CSharpFunctionalExtensions instead of throwing exceptions:
 
 ```csharp
 public async Task<Result<Guid>> Handle(CreateWorkItemCommand request, CancellationToken ct)
@@ -111,13 +111,13 @@ Application handlers use EF Core `DbContext` directly for data access. There is 
 Each service follows consistent Domain/Application layering:
 
 ```
-Moda.Services/Moda.{ServiceName}/
+Moda.Services/Moda.\{ServiceName\}/
   src/
-    Moda.{ServiceName}.Domain/        # Entities, value objects, interfaces
-    Moda.{ServiceName}.Application/   # Commands, queries, DTOs, validators
+    Moda.\{ServiceName\}.Domain/        # Entities, value objects, interfaces
+    Moda.\{ServiceName\}.Application/   # Commands, queries, DTOs, validators
   tests/
-    Moda.{ServiceName}.Domain.Tests/
-    Moda.{ServiceName}.Application.Tests/
+    Moda.\{ServiceName\}.Domain.Tests/
+    Moda.\{ServiceName\}.Application.Tests/
 ```
 
 ### Feature Folders

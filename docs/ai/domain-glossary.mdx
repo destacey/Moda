@@ -38,7 +38,7 @@ This glossary defines the key terms and concepts used throughout Moda. It is des
 | **Plan Review** | A team-by-team view of the PI for planning ceremonies. Shows objectives and risks per team with list and timeline views. |
 | **Risk** | A potential circumstance that could impact delivery. Tracked with Status (Open/Closed), ROAM Category, Impact, Likelihood, Exposure, Assignee, and Follow-Up Date. |
 | **ROAM** | Risk categorization model: Resolved (eliminated), Owned (being managed), Accepted (acknowledged), Mitigated (impact reduced). |
-| **Exposure** | Calculated risk severity from Impact × Likelihood. Low (<4), Medium (=4), High (>4). Each dimension is Low=1, Medium=2, High=3. |
+| **Exposure** | Calculated risk severity from Impact × Likelihood. Low (less than 4), Medium (equals 4), High (greater than 4). Each dimension is Low=1, Medium=2, High=3. |
 | **Roadmap** | A visual timeline for planning work. Has Visibility (Public/Private), Managers (min 1), and hierarchical Items (Activities, Milestones, Timeboxes). Can be copied. |
 | **Activity** | A roadmap item with a date range that can contain child items (other activities, milestones, timeboxes). Ordered within parent. |
 | **Milestone** | A roadmap item representing a single point in time (key date or achievement). |
@@ -67,8 +67,8 @@ This glossary defines the key terms and concepts used throughout Moda. It is des
 
 | Term | Definition |
 |------|-----------|
-| **Work Item** | The fundamental unit of work. Has a Key ({WorkspaceKey}-{Number}), Title (immutable), Type, Status, StatusCategory, Priority, StoryPoints, Assignee, Team, Parent, Sprint, Project. |
-| **Work Item Key** | Unique identifier in format `{WorkspaceKey}-{Number}` (e.g., `PLAT-1234`). Workspace key is 2-20 uppercase alphanumeric starting with a letter. |
+| **Work Item** | The fundamental unit of work. Has a Key (WorkspaceKey-Number), Title (immutable), Type, Status, StatusCategory, Priority, StoryPoints, Assignee, Team, Parent, Sprint, Project. |
+| **Work Item Key** | Unique identifier in format `WorkspaceKey-Number` (e.g., `PLAT-1234`). Workspace key is 2-20 uppercase alphanumeric starting with a letter. |
 | **Workspace** | A container for work items using a specific work process. Has a Key, Name, Ownership (Owned/Managed), and IsActive flag. |
 | **Work Process** | A configuration linking work types to workflows. Assigned to workspaces. Requires at least one work type. Each type appears once. |
 | **Work Process Scheme** | A mapping of a work type to a workflow within a work process. |
@@ -96,7 +96,7 @@ This glossary defines the key terms and concepts used throughout Moda. It is des
 | **Project Lifecycle** | A template of phases that projects go through. States: Proposed (editable) → Active (locked) → Archived. Must have min 1 phase to activate. |
 | **Project Lifecycle Phase** | A template phase within a lifecycle (e.g., Initiation, Planning, Execution, Closing). Ordered. Immutable after lifecycle activation. |
 | **Project Phase** | A concrete instance of a lifecycle phase on a project. Has Status (NotStarted/InProgress/Completed/Cancelled), Date Range, Progress (0-100%), and Assignee roles. Name copied from template (not editable). |
-| **Project Task** | An actionable work item within a project phase. Key: {ProjectKey}-{Number}. Type: Task (date range, 0-100% progress) or Milestone (single date, 0 or 100% only). Supports hierarchy (WBS) and Finish-to-Start dependencies. |
+| **Project Task** | An actionable work item within a project phase. Key: ProjectKey-Number. Type: Task (date range, 0-100% progress) or Milestone (single date, 0 or 100% only). Supports hierarchy (WBS) and Finish-to-Start dependencies. |
 | **Task Priority** | Low, Medium, High, or Critical. Shown as color indicators in the UI. |
 | **Task Dependency** | Finish-to-Start relationship between project tasks. Soft-deleted (marked as removed, not permanently deleted). |
 | **Strategic Initiative** | A high-level strategic effort within a portfolio, tracked with KPIs. Status: Proposed → Approved → Active → OnHold ↔ Active → Completed/Cancelled. |
@@ -134,9 +134,9 @@ This glossary defines the key terms and concepts used throughout Moda. It is des
 | **Aggregate Root** | The primary entity ensuring consistency in a cluster of related objects. Feature folders organized by aggregate root. |
 | **Value Object** | An immutable object defined by attributes, not identity (e.g., WorkItemKey, ProjectKey, FlexibleDateRange, Progress). |
 | **Domain Event** | A notification that something significant happened in a domain, published for cross-context communication (e.g., TeamCreatedEvent, StrategicThemeUpdatedEvent). |
-| **Command** | A request to change state (write operation). Handled via MediatR. Returns Result<T>. |
-| **Query** | A request to read state (read operation). Handled via MediatR. Returns Result<T>. |
-| **Result** | A functional return type (`Result<T>`) from CSharpFunctionalExtensions. Explicitly represents success or failure without exceptions. |
+| **Command** | A request to change state (write operation). Handled via MediatR. Returns `Result&lt;T&gt;`. |
+| **Query** | A request to read state (read operation). Handled via MediatR. Returns `Result&lt;T&gt;`. |
+| **Result** | A functional return type (`Result&lt;T&gt;`) from CSharpFunctionalExtensions. Explicitly represents success or failure without exceptions. |
 | **Work Process Scheme** | Links a work type to a workflow within a work process. |
 | **Workflow Scheme** | Maps a work status to a position (order) and category within a workflow. |
 | **FlexibleDateRange** | A value object with required start date and optional end date. Used by portfolios, programs, and other entities with open-ended timelines. |

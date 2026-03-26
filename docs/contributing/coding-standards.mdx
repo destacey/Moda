@@ -28,7 +28,7 @@ Never use `DateTime.UtcNow`. Always inject `IDateTimeProvider` for the current t
 
 ### Result Pattern
 
-Return `Result<T>` or `Result` from command/query handlers. Never throw exceptions for business logic failures.
+Return `Result&lt;T&gt;` or `Result` from command/query handlers. Never throw exceptions for business logic failures.
 
 ### Package Management
 
@@ -36,7 +36,7 @@ Uses **Central Package Management** via `Directory.Packages.props`. All package 
 
 ### Entity Configuration
 
-Use fluent API in separate configuration classes implementing `IEntityTypeConfiguration<T>`. Never use data annotations on entities.
+Use fluent API in separate configuration classes implementing `IEntityTypeConfiguration&lt;T&gt;`. Never use data annotations on entities.
 
 ## Frontend (React/Next.js)
 

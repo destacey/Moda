@@ -13,7 +13,7 @@ This guide walks through the typical process of adding a new feature to Moda, to
 
 Start with the domain model:
 
-1. Define or update entities in `Moda.{Service}.Domain/Models/`
+1. Define or update entities in `Moda.\{Service\}.Domain/Models/`
 2. Add value objects if needed
 3. Define domain events for significant state changes
 4. Write domain tests
@@ -22,8 +22,8 @@ Start with the domain model:
 
 Add commands, queries, and handlers:
 
-1. Create the **command/query** record in `{Feature}/Commands/` or `{Feature}/Queries/`
-2. Create the **handler** implementing `ICommandHandler<T>` or `IQueryHandler<T>`
+1. Create the **command/query** record in `\{Feature\}/Commands/` or `\{Feature\}/Queries/`
+2. Create the **handler** implementing `ICommandHandler&lt;T&gt;` or `IQueryHandler&lt;T&gt;`
 3. Create the **validator** using FluentValidation
 4. Create **DTOs** for data transfer
 5. Add Mapster mapping configuration if needed
