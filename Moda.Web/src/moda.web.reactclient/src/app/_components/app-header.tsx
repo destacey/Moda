@@ -5,6 +5,7 @@ import {
   MenuUnfoldOutlined,
   MenuOutlined,
   SearchOutlined,
+  ReadOutlined,
 } from '@ant-design/icons'
 import React, { FC, useMemo, useState } from 'react'
 import {
@@ -77,7 +78,12 @@ const AppHeader: FC = React.memo(() => {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const { menuItems } = useAppMenuItems()
   const router = useRouter()
-  const { open: searchOpen, openSearch, closeSearch, consumeRequestedScope } = useGlobalSearch()
+  const {
+    open: searchOpen,
+    openSearch,
+    closeSearch,
+    consumeRequestedScope,
+  } = useGlobalSearch()
 
   // Flatten menu for mobile
   const mobileMenuItems = useMemo(
@@ -189,9 +195,21 @@ const AppHeader: FC = React.memo(() => {
             </Tooltip>
           </Flex>
         </Button>
+        <Tooltip title="Documentation">
+          <Button
+            type="text"
+            icon={<ReadOutlined />}
+            href="/docs"
+            aria-label="Documentation"
+          />
+        </Tooltip>
         {profileComponent}
       </Flex>
-      <GlobalSearchModal open={searchOpen} onClose={closeSearch} consumeRequestedScope={consumeRequestedScope} />
+      <GlobalSearchModal
+        open={searchOpen}
+        onClose={closeSearch}
+        consumeRequestedScope={consumeRequestedScope}
+      />
     </Header>
   )
 })

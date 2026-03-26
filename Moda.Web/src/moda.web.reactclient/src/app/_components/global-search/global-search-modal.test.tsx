@@ -52,6 +52,16 @@ jest.mock('antd', () => {
       React.createElement('div', rest, children),
     Empty: ({ description }: any) => React.createElement('div', null, description),
     Divider: () => React.createElement('hr', null),
+    Segmented: ({ value, onChange, options }: any) =>
+      React.createElement('div', { 'data-testid': 'scope-toggle' },
+        (options ?? []).map((opt: any) =>
+          React.createElement('button', {
+            key: typeof opt === 'string' ? opt : opt.value,
+            'aria-pressed': value === (typeof opt === 'string' ? opt : opt.value),
+            onClick: () => onChange?.(typeof opt === 'string' ? opt : opt.value),
+          }, typeof opt === 'string' ? opt : opt.label)
+        )
+      ),
     Radio: {
       Group: ({ value, onChange, options, className }: any) =>
         React.createElement('div', { className },
@@ -114,6 +124,9 @@ function setupMock(overrides: Partial<ReturnType<typeof useLazyGlobalSearchQuery
     { data: undefined, isFetching: false, ...overrides },
   ])
 }
+
+// jsdom doesn't implement scrollIntoView
+Element.prototype.scrollIntoView = jest.fn()
 
 describe('GlobalSearchModal', () => {
   beforeEach(() => {
@@ -266,7 +279,13 @@ describe('GlobalSearchModal', () => {
         jest.runAllTimers()
       })
 
-      fireEvent.keyDown(screen.getByPlaceholderText('Search Moda...'), { key: 'Enter' })
+      // Select first item with ArrowDown, then press Enter
+      await act(async () => {
+        fireEvent.keyDown(screen.getByPlaceholderText('Search Moda...'), { key: 'ArrowDown' })
+      })
+      await act(async () => {
+        fireEvent.keyDown(screen.getByPlaceholderText('Search Moda...'), { key: 'Enter' })
+      })
       expect(mockPush).toHaveBeenCalled()
       expect(onClose).toHaveBeenCalled()
     })

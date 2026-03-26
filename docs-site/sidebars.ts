@@ -117,6 +117,7 @@ const sidebars: SidebarsConfig = {
         'reference/feature-flags',
         'reference/integrations',
         'reference/technology-stack',
+        'reference/attribution',
       ],
     },
     {
