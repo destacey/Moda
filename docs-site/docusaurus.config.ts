@@ -101,7 +101,6 @@ const config: Config = {
         {
           title: "Reference",
           items: [
-            { label: "Domain Model", to: "/docs/reference/domain-model" },
             { label: "API Reference", to: "/docs/reference/api" },
             {
               label: "Technology Stack",
