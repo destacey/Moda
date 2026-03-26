@@ -72,7 +72,7 @@ const ProjectsGrid: FC<ProjectsGridProps> = (props: ProjectsGridProps) => {
       },
       {
         field: 'projectManagers',
-        headerName: 'Managers',
+        headerName: 'PMs',
         valueGetter: (params) => getSortedNames(params.data.projectManagers),
       },
       {

@@ -31,7 +31,7 @@ const PortfoliosGrid: React.FC<PortfoliosGridProps> = (
       { field: 'status.name', headerName: 'Status' },
       {
         field: 'portfolioManagers',
-        headerName: 'Managers',
+        headerName: 'PMs',
         valueGetter: (params) => getSortedNames(params.data.portfolioManagers),
       },
       {

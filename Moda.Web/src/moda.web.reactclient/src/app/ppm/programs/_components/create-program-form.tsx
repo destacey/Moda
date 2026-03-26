@@ -172,11 +172,11 @@ const CreateProgramForm = ({
             placeholder="Select Owners"
           />
         </Item>
-        <Item name="managerIds" label="Managers">
+        <Item name="managerIds" label="Program Managers">
           <EmployeeSelect
             employees={employeeData ?? []}
             allowMultiple={true}
-            placeholder="Select Managers"
+            placeholder="Select Program Managers"
           />
         </Item>
         <Item name="strategicThemeIds" label="Strategic Themes">

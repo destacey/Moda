@@ -30,11 +30,7 @@ const ProgramDrawer: FC<ProgramDrawerProps> = ({
   const [size, setSize] = useState(() => getDrawerWidthPixels())
   const messageApi = useMessage()
 
-  const {
-    data: programData,
-    isLoading,
-    error,
-  } = useGetProgramQuery(programKey)
+  const { data: programData, isLoading, error } = useGetProgramQuery(programKey)
 
   const { hasPermissionClaim } = useAuth()
   const canViewProgram = useMemo(
@@ -107,19 +103,13 @@ const ProgramDrawer: FC<ProgramDrawerProps> = ({
             />
           </LabeledContent>
           <LabeledContent label="Sponsors">
-            <ContentList
-              items={sponsorNames}
-              emptyText="No sponsor assigned"
-            />
+            <ContentList items={sponsorNames} emptyText="No sponsor assigned" />
           </LabeledContent>
           <LabeledContent label="Owners">
             <ContentList items={ownerNames} emptyText="No owner assigned" />
           </LabeledContent>
-          <LabeledContent label="Managers">
-            <ContentList
-              items={managerNames}
-              emptyText="No manager assigned"
-            />
+          <LabeledContent label="PMs" tooltip="Program Managers">
+            <ContentList items={managerNames} emptyText="No PM assigned" />
           </LabeledContent>
           {strategicThemes.length > 0 && (
             <LabeledContent label="Strategic Themes">

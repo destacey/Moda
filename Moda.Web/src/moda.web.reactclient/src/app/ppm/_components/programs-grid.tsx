@@ -61,7 +61,7 @@ const ProgramsGrid: FC<ProgramsGridProps> = (props: ProgramsGridProps) => {
       },
       {
         field: 'programManagers',
-        headerName: 'Managers',
+        headerName: 'PMs',
         valueGetter: (params) => getSortedNames(params.data.programManagers),
       },
       {

@@ -1,3 +1,4 @@
+import { ModaTooltip } from '@/src/components/common'
 import { MarkdownRenderer } from '@/src/components/common/markdown'
 import { ProjectPortfolioListDto } from '@/src/services/moda-api'
 import { getSortedNames } from '@/src/utils'
@@ -31,9 +32,11 @@ const PortfolioCard: React.FC<PortfolioCardProps> = ({
           </Item>
         )}
         {portfolio?.portfolioManagers.length > 0 && (
-          <Item label="Managers">
-            {getSortedNames(portfolio.portfolioManagers)}
-          </Item>
+          <ModaTooltip title="Portfolio Managers">
+            <Item label="PMs">
+              {getSortedNames(portfolio.portfolioManagers)}
+            </Item>
+          </ModaTooltip>
         )}
         <Item>
           <MarkdownRenderer markdown={portfolio.description} />

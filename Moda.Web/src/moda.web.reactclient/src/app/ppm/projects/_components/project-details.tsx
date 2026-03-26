@@ -1,10 +1,7 @@
 'use client'
 
 import { ModaDateRange } from '@/src/components/common'
-import {
-  ContentList,
-  LabeledContent,
-} from '@/src/components/common/content'
+import { ContentList, LabeledContent } from '@/src/components/common/content'
 import LinksCard from '@/src/components/common/links/links-card'
 import TimelineProgress from '@/src/components/common/planning/timeline-progress'
 import { ProjectDetailsDto } from '@/src/services/moda-api'
@@ -105,14 +102,13 @@ const ProjectDetails: FC<ProjectDetailsProps> = ({ project }) => {
             <ContentList items={ownerNames} emptyText="No owner assigned" />
           </LabeledContent>
 
-          <LabeledContent label="Managers">
-            <ContentList items={managerNames} emptyText="No manager assigned" />
+          <LabeledContent label="PMs" tooltip="Project Managers">
+            <ContentList items={managerNames} emptyText="No PM assigned" />
           </LabeledContent>
 
           <LabeledContent label="Members">
             <ContentList items={memberNames} emptyText="No members assigned" />
           </LabeledContent>
-
         </Flex>
 
         {hasStarted && (

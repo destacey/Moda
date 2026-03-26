@@ -283,11 +283,11 @@ const EditProjectForm = ({
             placeholder="Select Owners"
           />
         </Item>
-        <Item name="managerIds" label="Managers">
+        <Item name="managerIds" label="Project Managers">
           <EmployeeSelect
             employees={employeeData ?? []}
             allowMultiple={true}
-            placeholder="Select Managers"
+            placeholder="Select Project Managers"
           />
         </Item>
         <Item name="memberIds" label="Members">
