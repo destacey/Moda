@@ -14,7 +14,8 @@ import useTheme from '@/src/components/contexts/theme'
 import { IterationState } from '@/src/components/types'
 import { SizingMethod, SprintDetailsDto } from '@/src/services/moda-api'
 import { useGetSprintMetricsQuery } from '@/src/store/features/planning/sprints-api'
-import { Col, Flex, Row, Segmented, Skeleton, Tooltip } from 'antd'
+import { Col, Flex, Row, Segmented, Skeleton } from 'antd'
+import { ModaTooltip } from '@/src/components/common'
 import { FC, ReactNode, useEffect, useMemo, useState } from 'react'
 
 export interface SprintMetricsProps {
@@ -106,7 +107,7 @@ const SprintMetrics: FC<SprintMetricsProps> = ({
   return (
     <Flex vertical gap="small">
       <Flex gap="small" justify="flex-end">
-        <Tooltip title="Switch between counting work items and summing story points for metrics">
+        <ModaTooltip title="Switch between counting work items and summing story points for metrics">
           <Segmented<string>
             options={['Count', 'Story Points']}
             value={useStoryPoints ? 'Story Points' : 'Count'}
@@ -118,7 +119,7 @@ const SprintMetrics: FC<SprintMetricsProps> = ({
               )
             }
           />
-        </Tooltip>
+        </ModaTooltip>
       </Flex>
       <Row gutter={[8, 8]}>
         {sprint.state.id !== IterationState.Completed && (

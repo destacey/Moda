@@ -37,7 +37,7 @@ const PortfolioDetails: React.FC<PortfolioDetailsProps> = ({
         <Descriptions column={1} size="small">
           <Item label="Sponsors">{sponsorNames}</Item>
           <Item label="Owners">{ownerNames}</Item>
-          <Item label="Managers">{managerNames}</Item>
+          <Item label="PMs">{managerNames}</Item>
         </Descriptions>
         <Descriptions layout="vertical" size="small">
           <Item label="Description">

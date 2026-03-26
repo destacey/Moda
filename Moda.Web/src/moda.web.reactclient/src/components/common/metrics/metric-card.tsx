@@ -1,4 +1,5 @@
-import { Card, Flex, Statistic, StatisticProps, Tooltip } from 'antd'
+import { Card, Flex, Statistic, StatisticProps } from 'antd'
+import ModaTooltip from '@/src/components/common/moda-tooltip'
 import { FC } from 'react'
 
 const { Meta } = Card
@@ -42,7 +43,7 @@ const MetricCard: FC<MetricCardProps> = ({
     </Card>
   )
 
-  return tooltip ? <Tooltip title={tooltip}>{card}</Tooltip> : card
+  return tooltip ? <ModaTooltip title={tooltip}>{card}</ModaTooltip> : card
 }
 
 export default MetricCard

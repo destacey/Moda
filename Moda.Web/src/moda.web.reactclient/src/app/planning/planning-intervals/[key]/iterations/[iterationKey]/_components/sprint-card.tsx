@@ -16,7 +16,8 @@ import {
   SprintMetricsSummary,
   TeamOperatingModelDetailsDto,
 } from '@/src/services/moda-api'
-import { Card, Col, Flex, Grid, Row, Tag, Tooltip, Typography } from 'antd'
+import { Card, Col, Flex, Grid, Row, Tag, Typography } from 'antd'
+import { ModaTooltip } from '@/src/components/common'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { FC } from 'react'
@@ -106,9 +107,9 @@ const SprintCard: FC<SprintCardProps> = ({
                 completed={displayCompleted}
               />
               {sizingMethod === SizingMethod.StoryPoints && !teamSupportsSP && (
-                <Tooltip title="This team does not support story point sizing. Values are based on work item counts.">
+                <ModaTooltip title="This team does not support story point sizing. Values are based on work item counts.">
                   <Tag>Count-based Metrics</Tag>
-                </Tooltip>
+                </ModaTooltip>
               )}
             </Flex>
           </Flex>
@@ -140,9 +141,9 @@ const SprintCard: FC<SprintCardProps> = ({
                 completed={displayCompleted}
               />
               {sizingMethod === SizingMethod.StoryPoints && !teamSupportsSP && (
-                <Tooltip title="This team does not support story point sizing. Values are based on work item counts.">
+                <ModaTooltip title="This team does not support story point sizing. Values are based on work item counts.">
                   <Tag>Count-based Metrics</Tag>
-                </Tooltip>
+                </ModaTooltip>
               )}
             </Flex>
           </Flex>

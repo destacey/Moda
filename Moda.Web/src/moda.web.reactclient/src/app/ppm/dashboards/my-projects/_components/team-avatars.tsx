@@ -1,7 +1,8 @@
 'use client'
 
 import { getAvatarColor } from '@/src/utils'
-import { Avatar, Tooltip } from 'antd'
+import { Avatar } from 'antd'
+import { ModaTooltip } from '@/src/components/common'
 import { FC } from 'react'
 import { getInitials, TeamMemberWithRoles } from './project-card-helpers'
 
@@ -16,7 +17,7 @@ const TeamAvatars: FC<{ members: TeamMemberWithRoles[] }> = ({ members }) => {
   return (
     <AvatarGroup size="small">
       {visible.map(({ employee, roles }) => (
-        <Tooltip
+        <ModaTooltip
           key={employee.id}
           title={`${employee.name} (${roles.join(', ')})`}
         >
@@ -30,7 +31,7 @@ const TeamAvatars: FC<{ members: TeamMemberWithRoles[] }> = ({ members }) => {
           >
             {getInitials(employee.name)}
           </Avatar>
-        </Tooltip>
+        </ModaTooltip>
       ))}
       {overflow > 0 && (
         <Avatar

@@ -16,7 +16,8 @@ import {
   useWithdrawPokerVoteMutation,
 } from '@/src/store/features/planning/poker-sessions-api'
 import { useGetProfileQuery } from '@/src/store/features/user-management/profile-api'
-import { Avatar, Button, Divider, Flex, Tag, Tooltip } from 'antd'
+import { Avatar, Button, Divider, Flex, Tag } from 'antd'
+import { ModaTooltip } from '@/src/components/common'
 import { EditOutlined, LinkOutlined } from '@ant-design/icons'
 import { notFound, useParams, usePathname } from 'next/navigation'
 import {
@@ -292,14 +293,14 @@ const PokerSessionDetailPage: FC = () => {
           size="small"
         >
           {connectedParticipants.map((p) => (
-            <Tooltip key={p.id} title={p.name}>
+            <ModaTooltip key={p.id} title={p.name}>
               <Avatar
                 size="small"
                 style={{ backgroundColor: getAvatarColor(p.id) }}
               >
                 {p.name.charAt(0).toUpperCase()}
               </Avatar>
-            </Tooltip>
+            </ModaTooltip>
           ))}
         </AvatarGroup>
       )}

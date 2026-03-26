@@ -1,7 +1,8 @@
 'use client'
 
 import { WorkItemProgressRollupDto } from '@/src/services/moda-api'
-import { Progress, Tooltip } from 'antd'
+import { Progress } from 'antd'
+import ModaTooltip from '@/src/components/common/moda-tooltip'
 import { round } from 'lodash'
 import { memo, useMemo } from 'react'
 
@@ -74,7 +75,7 @@ const WorkProgress = memo(({ progress }: WorkProgressProps) => {
   return (
     <>
       {progressSummary.total > 0 && (
-        <Tooltip title={titleText}>
+        <ModaTooltip title={titleText}>
           <Progress
             percent={
               progressSummary.activePercentage + progressSummary.donePercentage
@@ -83,7 +84,7 @@ const WorkProgress = memo(({ progress }: WorkProgressProps) => {
             percentPosition={{ align: 'center', type: 'outer' }}
             success={{ percent: progressSummary.donePercentage }}
           />
-        </Tooltip>
+        </ModaTooltip>
       )}
     </>
   )

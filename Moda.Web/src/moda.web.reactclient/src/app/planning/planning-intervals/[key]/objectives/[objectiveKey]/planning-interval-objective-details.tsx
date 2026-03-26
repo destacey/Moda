@@ -2,7 +2,8 @@
 
 import LinksCard from '@/src/components/common/links/links-card'
 import { PlanningIntervalObjectiveDetailsDto } from '@/src/services/moda-api'
-import { Col, Descriptions, Progress, Row, Space, Tooltip } from 'antd'
+import { Col, Descriptions, Progress, Row, Space } from 'antd'
+import { ModaTooltip } from '@/src/components/common'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import PlanningIntervalObjectiveWorkItemsCard from './planning-interval-objective-work-items-card'
@@ -35,9 +36,9 @@ const PlanningIntervalObjectiveDetails = ({
     <>
       <Row>
         <Col span={12} offset={6}>
-          <Tooltip title="Progress">
+          <ModaTooltip title="Progress">
             <Progress percent={objective.progress} status={progressStatus} />
-          </Tooltip>
+          </ModaTooltip>
         </Col>
       </Row>
       <Row>

@@ -1,7 +1,7 @@
 'use client'
 
-import { Tooltip } from 'antd'
 import { DependencyHealth } from '../../types'
+import ModaTooltip from '@/src/components/common/moda-tooltip'
 import { FC, memo, ReactNode } from 'react'
 
 export interface DependencyHealthTooltipProps {
@@ -28,7 +28,7 @@ const DependencyHealthTooltip: FC<DependencyHealthTooltipProps> = ({
 }) => {
   const description = getHealthDescription(health)
 
-  return <Tooltip title={description}>{children}</Tooltip>
+  return <ModaTooltip title={description}>{children}</ModaTooltip>
 }
 
 export default memo(DependencyHealthTooltip)

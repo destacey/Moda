@@ -74,11 +74,8 @@ const ProgramDetails: FC<ProgramDetailsProps> = ({ program }) => {
             <ContentList items={ownerNames} emptyText="No owner assigned" />
           </LabeledContent>
 
-          <LabeledContent label="Managers">
-            <ContentList
-              items={managerNames}
-              emptyText="No manager assigned"
-            />
+          <LabeledContent label="PMs" tooltip="Program Managers">
+            <ContentList items={managerNames} emptyText="No PM assigned" />
           </LabeledContent>
 
           {strategicThemes.length > 0 && (

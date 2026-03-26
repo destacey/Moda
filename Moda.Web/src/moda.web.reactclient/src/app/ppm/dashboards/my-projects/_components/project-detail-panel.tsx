@@ -5,7 +5,8 @@ import PhaseTimeline from '@/src/app/ppm/_components/phase-timeline'
 import ProjectTaskMetrics from '@/src/app/ppm/projects/_components/project-task-metrics'
 import { useGetProjectQuery } from '@/src/store/features/ppm/projects-api'
 import { LinkOutlined } from '@ant-design/icons'
-import { Button, Card, Flex, Skeleton, Tooltip, Typography } from 'antd'
+import { Button, Card, Flex, Skeleton, Typography } from 'antd'
+import { ModaTooltip } from '@/src/components/common'
 import Link from 'next/link'
 import { FC } from 'react'
 import ProjectDetailHeader from './project-detail-header'
@@ -69,11 +70,11 @@ const ProjectDetailContent: FC<{ projectKey: string }> = ({ projectKey }) => {
           <Flex vertical gap={8}>
             <Flex align="center" gap={4}>
               <Text strong style={{ fontSize: 13 }}>Project Plan</Text>
-              <Tooltip title="Open full project plan">
+              <ModaTooltip title="Open full project plan">
                 <Link href={`/ppm/projects/${project.key}#plan`}>
                   <Button type="text" size="small" icon={<LinkOutlined style={{ fontSize: 11 }} />} />
                 </Link>
-              </Tooltip>
+              </ModaTooltip>
             </Flex>
             <ProjectPlanView projectKey={project.key} />
           </Flex>

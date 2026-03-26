@@ -211,11 +211,11 @@ const EditPortfolioForm = ({
             placeholder="Select Owners"
           />
         </Item>
-        <Item name="managerIds" label="Managers">
+        <Item name="managerIds" label="Portfolio Managers">
           <EmployeeSelect
             employees={employees}
             allowMultiple={true}
-            placeholder="Select Managers"
+            placeholder="Select Portfolio Managers"
           />
         </Item>
       </Form>

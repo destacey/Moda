@@ -1,3 +1,5 @@
+'use client'
+
 import { MarkdownRenderer } from '@/src/components/common/markdown'
 import { ProjectPortfolioListDto } from '@/src/services/moda-api'
 import { getSortedNames } from '@/src/utils'
@@ -31,9 +33,7 @@ const PortfolioCard: React.FC<PortfolioCardProps> = ({
           </Item>
         )}
         {portfolio?.portfolioManagers.length > 0 && (
-          <Item label="Managers">
-            {getSortedNames(portfolio.portfolioManagers)}
-          </Item>
+          <Item label="PMs">{getSortedNames(portfolio.portfolioManagers)}</Item>
         )}
         <Item>
           <MarkdownRenderer markdown={portfolio.description} />

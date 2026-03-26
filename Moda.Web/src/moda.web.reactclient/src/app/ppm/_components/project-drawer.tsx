@@ -13,7 +13,8 @@ import useAuth from '@/src/components/contexts/auth'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { useGetProjectQuery } from '@/src/store/features/ppm/projects-api'
 import { getDrawerWidthPixels, getSortedNameList } from '@/src/utils'
-import { Divider, Drawer, Flex, Tooltip } from 'antd'
+import { Divider, Drawer, Flex } from 'antd'
+import { ModaTooltip } from '@/src/components/common'
 import { projectHelpText } from '../projects/_components/project-help-text'
 import Link from 'next/link'
 import { FC, useEffect, useMemo, useState } from 'react'
@@ -121,9 +122,9 @@ const ProjectDrawer: FC<ProjectDrawerProps> = ({
           </LabeledContent>
           <LabeledContent label="Lifecycle">
             {projectData?.projectLifecycle ? (
-              <Tooltip title={projectData.projectLifecycle.description}>
+              <ModaTooltip title={projectData.projectLifecycle.description}>
                 {projectData.projectLifecycle.name}
-              </Tooltip>
+              </ModaTooltip>
             ) : (
               'No lifecycle assigned'
             )}
@@ -143,8 +144,8 @@ const ProjectDrawer: FC<ProjectDrawerProps> = ({
           <LabeledContent label="Owners">
             <ContentList items={ownerNames} emptyText="No owner assigned" />
           </LabeledContent>
-          <LabeledContent label="Managers">
-            <ContentList items={managerNames} emptyText="No manager assigned" />
+          <LabeledContent label="PMs" tooltip="Project Managers">
+            <ContentList items={managerNames} emptyText="No PM assigned" />
           </LabeledContent>
           <LabeledContent label="Members">
             <ContentList items={memberNames} emptyText="No members assigned" />
@@ -153,7 +154,10 @@ const ProjectDrawer: FC<ProjectDrawerProps> = ({
           <Divider size="small" />
 
           {projectData?.description && (
-            <LabeledContent label="Description" tooltip={projectHelpText.description}>
+            <LabeledContent
+              label="Description"
+              tooltip={projectHelpText.description}
+            >
               <ExpandableContent background="var(--ant-color-bg-elevated)">
                 <MarkdownRenderer markdown={projectData.description} />
               </ExpandableContent>
@@ -161,7 +165,10 @@ const ProjectDrawer: FC<ProjectDrawerProps> = ({
           )}
 
           {projectData?.businessCase && (
-            <LabeledContent label="Business Case" tooltip={projectHelpText.businessCase}>
+            <LabeledContent
+              label="Business Case"
+              tooltip={projectHelpText.businessCase}
+            >
               <ExpandableContent background="var(--ant-color-bg-elevated)">
                 <MarkdownRenderer markdown={projectData.businessCase} />
               </ExpandableContent>
@@ -169,7 +176,10 @@ const ProjectDrawer: FC<ProjectDrawerProps> = ({
           )}
 
           {projectData?.expectedBenefits && (
-            <LabeledContent label="Expected Benefits" tooltip={projectHelpText.expectedBenefits}>
+            <LabeledContent
+              label="Expected Benefits"
+              tooltip={projectHelpText.expectedBenefits}
+            >
               <ExpandableContent background="var(--ant-color-bg-elevated)">
                 <MarkdownRenderer markdown={projectData.expectedBenefits} />
               </ExpandableContent>
@@ -190,3 +200,4 @@ const ProjectDrawer: FC<ProjectDrawerProps> = ({
 }
 
 export default ProjectDrawer
+

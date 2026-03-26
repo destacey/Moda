@@ -129,9 +129,7 @@ const CreatePortfolioForm = ({
         >
           <MarkdownEditor
             value={form.getFieldValue('description')}
-            onChange={(value) =>
-              form.setFieldValue('description', value || '')
-            }
+            onChange={(value) => form.setFieldValue('description', value || '')}
             maxLength={1024}
           />
         </Item>
@@ -149,11 +147,11 @@ const CreatePortfolioForm = ({
             placeholder="Select Owners"
           />
         </Item>
-        <Item name="managerIds" label="Managers">
+        <Item name="managerIds" label="Portfolio Managers">
           <EmployeeSelect
             employees={employeeData ?? []}
             allowMultiple={true}
-            placeholder="Select Managers"
+            placeholder="Select Portfolio Managers"
           />
         </Item>
       </Form>

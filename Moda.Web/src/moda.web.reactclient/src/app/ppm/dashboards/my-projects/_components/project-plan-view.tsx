@@ -13,7 +13,8 @@ import {
   RightOutlined,
   SyncOutlined,
 } from '@ant-design/icons'
-import { Avatar, Flex, Popover, Progress, Skeleton, Tag, Tooltip, Typography } from 'antd'
+import { Avatar, Flex, Popover, Progress, Skeleton, Tag, Typography } from 'antd'
+import { ModaTooltip } from '@/src/components/common'
 import dayjs from 'dayjs'
 import { FC, useState } from 'react'
 import { getInitials } from './project-card-helpers'
@@ -101,7 +102,7 @@ const TaskAssignees: FC<{ assignees: EmployeeNavigationDto[] }> = ({
   return (
     <Avatar.Group size={20}>
       {assignees.slice(0, 3).map((a) => (
-        <Tooltip key={a.id} title={a.name}>
+        <ModaTooltip key={a.id} title={a.name}>
           <Avatar
             size={20}
             style={{
@@ -112,7 +113,7 @@ const TaskAssignees: FC<{ assignees: EmployeeNavigationDto[] }> = ({
           >
             {getInitials(a.name)}
           </Avatar>
-        </Tooltip>
+        </ModaTooltip>
       ))}
     </Avatar.Group>
   )
@@ -288,25 +289,25 @@ const PhaseSection: FC<PhaseSectionProps> = ({ phase, isActive }) => {
         )}
         <Flex align="center" gap={8} style={{ marginLeft: 'auto' }}>
           {taskCounts.overdue > 0 && (
-            <Tooltip title={`${taskCounts.overdue} overdue ${taskCounts.overdue === 1 ? 'task' : 'tasks'}`}>
+            <ModaTooltip title={`${taskCounts.overdue} overdue ${taskCounts.overdue === 1 ? 'task' : 'tasks'}`}>
               <span className={`${styles.statPill} ${styles.statPillOverdue}`}>
                 {taskCounts.overdue} overdue
               </span>
-            </Tooltip>
+            </ModaTooltip>
           )}
           {taskCounts.dueThisWeek > 0 && (
-            <Tooltip title={`${taskCounts.dueThisWeek} ${taskCounts.dueThisWeek === 1 ? 'task' : 'tasks'} due this week`}>
+            <ModaTooltip title={`${taskCounts.dueThisWeek} ${taskCounts.dueThisWeek === 1 ? 'task' : 'tasks'} due this week`}>
               <span className={`${styles.statPill} ${styles.statPillDueThisWeek}`}>
                 {taskCounts.dueThisWeek} this week
               </span>
-            </Tooltip>
+            </ModaTooltip>
           )}
           {taskCounts.upcoming > 0 && (
-            <Tooltip title={`${taskCounts.upcoming} upcoming ${taskCounts.upcoming === 1 ? 'task' : 'tasks'}`}>
+            <ModaTooltip title={`${taskCounts.upcoming} upcoming ${taskCounts.upcoming === 1 ? 'task' : 'tasks'}`}>
               <span className={`${styles.statPill} ${styles.statPillUpcoming}`}>
                 {taskCounts.upcoming} upcoming
               </span>
-            </Tooltip>
+            </ModaTooltip>
           )}
           <Progress
             percent={phase.progress}
