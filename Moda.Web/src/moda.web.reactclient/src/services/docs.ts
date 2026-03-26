@@ -83,7 +83,9 @@ export function getAllDocSlugs(): string[][] {
     const entries = fs.readdirSync(dir, { withFileTypes: true })
 
     for (const entry of entries) {
-      // Skip hidden files, _legacy, node_modules, ai folder (agent-only)
+      // Skip hidden files, _legacy folders, and node_modules.
+      // Note: ai/ folder IS included here (pages are generated) but is
+      // excluded from getDocsNavigation() so it doesn't appear in the sidebar.
       if (
         entry.name.startsWith('.') ||
         entry.name.startsWith('_') ||

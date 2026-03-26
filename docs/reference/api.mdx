@@ -54,9 +54,9 @@ POST /api/account/refresh
 
 **Personal Access Tokens** provide a way to authenticate API requests without interactive login. They are ideal for scripts, CI/CD pipelines, and integrations.
 
-To use a PAT, include it in the Authorization header:
+To use a PAT, include it in the `x-api-key` header:
 ```
-Authorization: Bearer {personal-access-token}
+x-api-key: your-personal-access-token
 ```
 
 **Managing PATs:**

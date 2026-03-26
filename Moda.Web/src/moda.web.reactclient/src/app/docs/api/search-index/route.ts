@@ -43,13 +43,16 @@ function stripMarkdown(md: string): string {
   // Remove any remaining angle brackets as a final safety pass
   result = result.replace(/[<>]/g, '')
 
-  return result
-    // Collapse whitespace
-    .replace(/\s+/g, ' ')
-    .trim()
+  // Collapse whitespace
+  return result.replace(/\s+/g, ' ').trim()
 }
 
-export async function GET() {
+// Cache the search index in memory — docs don't change at runtime.
+let cachedEntries: DocSearchEntry[] | null = null
+
+function buildSearchIndex(): DocSearchEntry[] {
+  if (cachedEntries) return cachedEntries
+
   const slugs = getAllDocSlugs()
   const entries: DocSearchEntry[] = []
 
@@ -70,5 +73,11 @@ export async function GET() {
     })
   }
 
+  cachedEntries = entries
+  return entries
+}
+
+export async function GET() {
+  const entries = buildSearchIndex()
   return NextResponse.json(entries)
 }

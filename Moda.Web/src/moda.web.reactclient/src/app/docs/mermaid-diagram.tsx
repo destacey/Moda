@@ -6,7 +6,7 @@ import mermaid from 'mermaid'
 mermaid.initialize({
   startOnLoad: false,
   theme: 'dark',
-  securityLevel: 'loose',
+  securityLevel: 'strict',
 })
 
 interface MermaidDiagramProps {

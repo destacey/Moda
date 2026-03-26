@@ -1,41 +1,29 @@
-# Website
+# Moda Documentation Site
 
-This website is built using [Docusaurus](https://docusaurus.io/), a modern static website generator.
+This site is built using [Docusaurus](https://docusaurus.io/) and deployed to GitHub Pages. It reads MDX content from the shared `docs/` folder at the repository root.
 
 ## Installation
 
 ```bash
-yarn
+npm install
 ```
 
 ## Local Development
 
 ```bash
-yarn start
+npm start
 ```
 
-This command starts a local development server and opens up a browser window. Most changes are reflected live without having to restart the server.
+This starts a local development server. Most changes are reflected live without restarting.
 
 ## Build
 
 ```bash
-yarn build
+npm run build
 ```
 
-This command generates static content into the `build` directory and can be served using any static contents hosting service.
+Generates static content into the `build` directory.
 
 ## Deployment
 
-Using SSH:
-
-```bash
-USE_SSH=true yarn deploy
-```
-
-Not using SSH:
-
-```bash
-GIT_USER=<Your GitHub username> yarn deploy
-```
-
-If you are using GitHub pages for hosting, this command is a convenient way to build the website and push to the `gh-pages` branch.
+The site is automatically deployed to GitHub Pages via the `deploy-docs.yml` GitHub Actions workflow when changes are pushed to `main` in the `docs/` or `docs-site/` directories.
