@@ -6,8 +6,8 @@
  *
  * Output: public/docs-search-index.json
  */
-import fs from 'fs'
-import path from 'path'
+import * as fs from 'node:fs'
+import * as path from 'node:path'
 import matter from 'gray-matter'
 
 const DOCS_ROOT = process.env.DOCS_PATH
