@@ -14,7 +14,10 @@ const LabeledContent = ({ label, tooltip, children }: LabeledContentProps) => (
   <Flex vertical gap={2}>
     {tooltip ? (
       <ModaTooltip title={tooltip}>
-        <Text type="secondary" style={{ fontSize: 12, paddingTop: 1, cursor: 'help' }}>
+        <Text
+          type="secondary"
+          style={{ fontSize: 12, paddingTop: 1, cursor: 'help', width: 'fit-content' }}
+        >
           {label}
         </Text>
       </ModaTooltip>
