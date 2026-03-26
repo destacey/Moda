@@ -53,19 +53,11 @@ interface DocsPageContentProps {
 }
 
 export default function DocsPageContent({
-  title,
-  description,
   mdxSource,
 }: DocsPageContentProps) {
   return (
-    <>
-      <Title>{title}</Title>
-      {description && (
-        <Paragraph type="secondary">{description}</Paragraph>
-      )}
-      <div className="docs-content">
-        <MDXRemote {...mdxSource} components={mdxComponents} />
-      </div>
-    </>
+    <div className="docs-content">
+      <MDXRemote {...mdxSource} components={mdxComponents} />
+    </div>
   )
 }

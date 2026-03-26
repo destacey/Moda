@@ -1,9 +1,10 @@
-.searchModal :global(.ant-modal-content) {
+.searchModal :global(.ant-modal-body) {
   padding: 0;
 }
 
-.searchModal :global(.ant-modal-body) {
-  padding: 0;
+.scopeToggle {
+  padding: 4px 4px 0;
+  justify-content: flex-start;
 }
 
 .searchInput {

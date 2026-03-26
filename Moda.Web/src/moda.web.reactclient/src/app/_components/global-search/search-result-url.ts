@@ -44,6 +44,10 @@ export function getSearchResultUrl(item: GlobalSearchResultItemDto): string {
     case 'StrategicInitiative':
       return `/ppm/strategic-initiatives/${key}`
 
+    // Docs
+    case 'Doc':
+      return key
+
     default:
       return '/'
   }
