@@ -2,6 +2,9 @@
 
 # dependencies
 /node_modules
+
+# generated at build time
+/public/docs-search-index.json
 /.pnp
 .pnp.js
 

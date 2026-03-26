@@ -130,7 +130,7 @@ const GlobalSearchModal: FC<GlobalSearchModalProps> = memo(
       if (scope === 'docs' && !docsIndexLoadedRef.current) {
         docsIndexLoadedRef.current = true
         setDocsFetching(true)
-        fetch('/docs/api/search-index')
+        fetch('/docs-search-index.json')
           .then((res) => res.json())
           .then((data: DocSearchEntry[]) => {
             setDocsIndex(data)
