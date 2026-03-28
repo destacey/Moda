@@ -69,14 +69,14 @@ describe('useRemainingHeight', () => {
     expect(result.current).toBe(750)
   })
 
-  it('enforces minimum height of 200', () => {
-    setWindowHeight(300)
+  it('enforces minimum height of 300', () => {
+    setWindowHeight(400)
     const ref = createMockRef(250)
 
     const { result } = renderHook(() => useRemainingHeight(ref))
 
-    // 300 - 250 - 30 = 20, but min is 200
-    expect(result.current).toBe(200)
+    // 400 - 250 - 30 = 120, but min is 300
+    expect(result.current).toBe(300)
   })
 
   it('recalculates on window resize', () => {
