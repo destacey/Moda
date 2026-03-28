@@ -6786,6 +6786,71 @@
         ]
       }
     },
+    "/api/ppm/projects/plan-summaries": {
+      "get": {
+        "tags": [
+          "Projects"
+        ],
+        "summary": "Get plan summary metrics for multiple projects in a single request.",
+        "operationId": "Projects_GetProjectsPlanSummaries",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "query",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "guid",
+                "nullable": false,
+                "example": "00000000-0000-0000-0000-000000000000"
+              }
+            },
+            "x-position": 1
+          },
+          {
+            "name": "role",
+            "in": "query",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/ProjectPlanSummaryDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
     "/api/ppm/projects/{id}/phases/{phaseId}": {
       "get": {
         "tags": [

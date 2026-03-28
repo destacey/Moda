@@ -2,7 +2,7 @@
 
 import { LifecycleStatusTag } from '@/src/components/common'
 import PhaseTimeline from '@/src/app/ppm/_components/phase-timeline'
-import { ProjectListDto } from '@/src/services/moda-api'
+import { ProjectListDto, ProjectPlanSummaryDto } from '@/src/services/moda-api'
 import { Card, Flex, Typography } from 'antd'
 import dayjs from 'dayjs'
 import { FC, useMemo } from 'react'
@@ -17,7 +17,7 @@ export interface ProjectCardProps {
   project: ProjectListDto
   isSelected: boolean
   employeeId: string | null
-  taskMetricsEmployeeId?: string
+  planSummary?: ProjectPlanSummaryDto
   onSelect: (key: string) => void
 }
 
@@ -25,7 +25,7 @@ const ProjectCard: FC<ProjectCardProps> = ({
   project,
   isSelected,
   employeeId,
-  taskMetricsEmployeeId,
+  planSummary,
   onSelect,
 }) => {
   const roles = useMemo(
@@ -70,10 +70,7 @@ const ProjectCard: FC<ProjectCardProps> = ({
         )}
 
         {/* Stat pills */}
-        <ProjectStatPills
-          projectKey={project.key}
-          employeeId={taskMetricsEmployeeId}
-        />
+        <ProjectStatPills summary={planSummary} />
 
         {/* Footer: avatars + end date */}
         <div className={styles.cardFooter}>

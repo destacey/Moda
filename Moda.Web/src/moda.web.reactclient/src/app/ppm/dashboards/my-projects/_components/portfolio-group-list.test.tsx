@@ -8,6 +8,10 @@ global.ResizeObserver = class {
   disconnect() {}
 } as unknown as typeof ResizeObserver
 
+jest.mock('@/src/store/features/ppm/projects-api', () => ({
+  useGetProjectsPlanSummariesQuery: jest.fn(() => ({ data: undefined })),
+}))
+
 jest.mock('@/src/components/contexts/auth', () => ({
   __esModule: true,
   default: () => ({
@@ -54,6 +58,7 @@ describe('PortfolioGroupList', () => {
   const defaultProps = {
     isLoading: false,
     selectedProjectKey: null as string | null,
+    selectedRoles: [] as number[],
     onSelectProject: jest.fn(),
   }
 

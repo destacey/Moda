@@ -14,7 +14,7 @@ import { QuestionCircleOutlined } from '@ant-design/icons'
 import { Button, Tour } from 'antd'
 import { ModaTooltip } from '@/src/components/common'
 import { usePathname } from 'next/navigation'
-import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { FC, useCallback, useEffect, useRef, useState } from 'react'
 import MyProjectsDashboardFilterBar from './_components/filter-bar'
 import MyProjectsSummaryBar from './_components/summary-bar'
 import PortfolioGroupList from './_components/portfolio-group-list'
@@ -40,8 +40,6 @@ const getRoleFilterValues = (selectedRoles: number[]): number[] | undefined => {
   return selectedRoles
 }
 
-const LEADERSHIP_ROLES = [1, 2, 3] // Sponsor, Owner, PM
-
 const MyProjectsPage: FC = () => {
   useDocumentTitle('My Projects')
   const dispatch = useAppDispatch()
@@ -55,14 +53,6 @@ const MyProjectsPage: FC = () => {
     'my-projects-filter-roles',
     [],
   )
-  // When role filter includes only non-leadership roles (Member/Assignee),
-  // scope task metrics to the user's assigned tasks only
-  const taskMetricsEmployeeId = useMemo(() => {
-    if (selectedRoles.length === 0) return undefined // "All" — use default behavior
-    const hasLeadership = selectedRoles.some((r) => LEADERSHIP_ROLES.includes(r))
-    return hasLeadership ? undefined : user.employeeId ?? undefined
-  }, [selectedRoles, user.employeeId])
-
   const layoutRef = useRef<HTMLDivElement>(null)
   const layoutHeight = useRemainingHeight(layoutRef)
 
@@ -91,7 +81,11 @@ const MyProjectsPage: FC = () => {
 
   const handleTourStepChange = useCallback(
     (current: number) => {
-      if (current === detailStepIndex && !selectedProjectKey && projects?.length) {
+      if (
+        current === detailStepIndex &&
+        !selectedProjectKey &&
+        projects?.length
+      ) {
         setSelectedProjectKey(projects[0].key)
       }
     },
@@ -168,13 +162,17 @@ const MyProjectsPage: FC = () => {
         isLoading={isLoading}
         containerRef={summaryBarRef}
       />
-      <div ref={layoutRef} className={styles.layout} style={{ height: layoutHeight }}>
+      <div
+        ref={layoutRef}
+        className={styles.layout}
+        style={{ height: layoutHeight }}
+      >
         <div ref={leftPanelRef} className={styles.leftPanel}>
           <PortfolioGroupList
             projects={projects}
             isLoading={isLoading}
             selectedProjectKey={selectedProjectKey}
-            taskMetricsEmployeeId={taskMetricsEmployeeId}
+            selectedRoles={selectedRoles}
             onSelectProject={setSelectedProjectKey}
           />
         </div>

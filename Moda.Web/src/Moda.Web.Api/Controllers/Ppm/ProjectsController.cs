@@ -28,16 +28,11 @@ public class ProjectsController(ILogger<ProjectsController> logger, ISender send
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<IEnumerable<ProjectListDto>>> GetProjects([FromQuery] int[]? status, [FromQuery] Guid? portfolioId, [FromQuery] int[]? role, CancellationToken cancellationToken)
     {
-        ProjectStatus[]? filter = status is { Length: > 0 }
-            ? [.. status.Select(s => (ProjectStatus)s)]
-            : null;
+        var filter = ParseStatusFilter(status);
+        var roleFilter = ParseRoleFilter(role);
 
         IdOrKey? portfolioIdOrKey = portfolioId.HasValue
             ? new IdOrKey(portfolioId.Value)
-            : null;
-
-        ProjectMemberRole[]? roleFilter = role is { Length: > 0 }
-            ? [.. role.Select(r => (ProjectMemberRole)r)]
             : null;
 
         var projects = await _sender.Send(new GetProjectsQuery(StatusFilter: filter, PortfolioIdOrKey: portfolioIdOrKey, RoleFilter: roleFilter), cancellationToken);
@@ -53,9 +48,7 @@ public class ProjectsController(ILogger<ProjectsController> logger, ISender send
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<MyProjectsSummaryDto>> GetMyProjectsSummary([FromQuery] int[]? status, CancellationToken cancellationToken)
     {
-        ProjectStatus[]? statusFilter = status is { Length: > 0 }
-            ? [.. status.Select(s => (ProjectStatus)s)]
-            : null;
+        var statusFilter = ParseStatusFilter(status);
 
         var summary = await _sender.Send(new GetMyProjectsSummaryQuery(StatusFilter: statusFilter), cancellationToken);
 
@@ -70,13 +63,8 @@ public class ProjectsController(ILogger<ProjectsController> logger, ISender send
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<MyProjectsTaskMetricsDto>> GetMyProjectsTaskMetrics([FromQuery] int[]? status, [FromQuery] int[]? role, CancellationToken cancellationToken)
     {
-        ProjectStatus[]? statusFilter = status is { Length: > 0 }
-            ? [.. status.Select(s => (ProjectStatus)s)]
-            : null;
-
-        ProjectMemberRole[]? roleFilter = role is { Length: > 0 }
-            ? [.. role.Select(r => (ProjectMemberRole)r)]
-            : null;
+        var statusFilter = ParseStatusFilter(status);
+        var roleFilter = ParseRoleFilter(role);
 
         return Ok(await _sender.Send(new GetMyProjectsTaskMetricsQuery(StatusFilter: statusFilter, RoleFilter: roleFilter), cancellationToken));
     }
@@ -339,6 +327,19 @@ public class ProjectsController(ILogger<ProjectsController> logger, ISender send
         return Ok(summary);
     }
 
+    [HttpGet("plan-summaries")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Projects)]
+    [OpenApiOperation("Get plan summary metrics for multiple projects in a single request.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult<Dictionary<Guid, ProjectPlanSummaryDto>>> GetProjectsPlanSummaries([FromQuery] Guid[] projectId, [FromQuery] int[]? role, CancellationToken cancellationToken)
+    {
+        var roleFilter = ParseRoleFilter(role);
+
+        var summaries = await _sender.Send(new GetProjectsPlanSummariesQuery(projectId, roleFilter), cancellationToken);
+
+        return Ok(summaries);
+    }
+
     [HttpGet("{id}/phases/{phaseId}")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Projects)]
     [OpenApiOperation("Get project phase details.", "")]
@@ -406,5 +407,33 @@ public class ProjectsController(ILogger<ProjectsController> logger, ISender send
         return result.IsSuccess
             ? NoContent()
             : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    private static ProjectStatus[]? ParseStatusFilter(int[]? values)
+    {
+        if (values is not { Length: > 0 }) return null;
+
+        var parsed = new ProjectStatus[values.Length];
+        for (var i = 0; i < values.Length; i++)
+        {
+            if (!Enum.IsDefined(typeof(ProjectStatus), values[i]))
+                return null;
+            parsed[i] = (ProjectStatus)values[i];
+        }
+        return parsed;
+    }
+
+    private static ProjectMemberRole[]? ParseRoleFilter(int[]? values)
+    {
+        if (values is not { Length: > 0 }) return null;
+
+        var parsed = new ProjectMemberRole[values.Length];
+        for (var i = 0; i < values.Length; i++)
+        {
+            if (!Enum.IsDefined(typeof(ProjectMemberRole), values[i]))
+                return null;
+            parsed[i] = (ProjectMemberRole)values[i];
+        }
+        return parsed;
     }
 }
