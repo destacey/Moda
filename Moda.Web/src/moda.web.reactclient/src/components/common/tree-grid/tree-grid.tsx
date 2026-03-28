@@ -810,7 +810,7 @@ function TreeGridInner<T extends TreeNode>(
                   nodeId={row.original.id}
                   isDragEnabled={isDragEnabled && !isDraftRow}
                   isDragging={isDragging}
-                  className={`${styles.tr}${index % 2 === 1 ? ` ${styles.trAlt}` : ''}${isSelected ? ` ${styles.trSelected}` : ''}`}
+                  className={`${styles.tr}${canEdit ? ` ${styles.trEditable}` : ''}${index % 2 === 1 ? ` ${styles.trAlt}` : ''}${isSelected ? ` ${styles.trSelected}` : ''}`}
                   onClick={(e) => handleRowClickWithContext(e, row.original.id)}
                 >
                   {row.getVisibleCells().map((cell) => {
