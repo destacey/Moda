@@ -39,7 +39,6 @@ describe('ProjectCard', () => {
   const defaultProps = {
     isSelected: false,
     employeeId: 'emp-1',
-    selectedRoles: [] as number[],
     onSelect: jest.fn(),
   }
 

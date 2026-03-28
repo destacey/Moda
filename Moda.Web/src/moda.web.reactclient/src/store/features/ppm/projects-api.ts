@@ -469,6 +469,30 @@ export const projectsApi = apiSlice.injectEndpoints({
       ],
     }),
 
+    getProjectsPlanSummaries: builder.query<
+      Record<string, ProjectPlanSummaryDto>,
+      { projectIds: string[]; role?: number[] }
+    >({
+      queryFn: async ({ projectIds, role }) => {
+        try {
+          const data = await getProjectsClient().getProjectsPlanSummaries(
+            projectIds,
+            role,
+          )
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: (result, error, arg) => [
+        ...arg.projectIds.map((id) => ({
+          type: QueryTags.ProjectPlanTree as const,
+          id,
+        })),
+      ],
+    }),
+
     getMyProjectsSummary: builder.query<
       MyProjectsSummaryDto,
       { status?: number[] } | void
@@ -546,6 +570,7 @@ export const {
   usePatchProjectPhaseMutation,
   useChangeProjectLifecycleMutation,
   useGetProjectPlanSummaryQuery,
+  useGetProjectsPlanSummariesQuery,
   useGetMyProjectsSummaryQuery,
   useGetMyProjectsTaskMetricsQuery,
   useGetProjectTeamQuery,

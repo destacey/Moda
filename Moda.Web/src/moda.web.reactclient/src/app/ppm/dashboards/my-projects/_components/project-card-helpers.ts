@@ -50,34 +50,6 @@ export function getUserRoles(
   return roles
 }
 
-// Role filter values that correspond to leadership roles on a project
-const LEADERSHIP_ROLE_FILTERS: Record<number, (p: ProjectListDto) => EmployeeNavigationDto[]> = {
-  1: (p) => p.projectSponsors ?? [], // Sponsor
-  2: (p) => p.projectOwners ?? [],   // Owner
-  3: (p) => p.projectManagers ?? [], // PM
-}
-
-/**
- * Determines whether task metrics should be scoped to the user's assigned tasks
- * for a specific project. Returns the employeeId when the user does NOT have any
- * selected leadership role on the project, undefined otherwise.
- */
-export function getTaskMetricsEmployeeId(
-  project: ProjectListDto,
-  employeeId: string | null,
-  selectedRoles: number[],
-): string | undefined {
-  if (!employeeId || selectedRoles.length === 0) return undefined
-
-  const hasSelectedLeadershipRole = selectedRoles.some((role) => {
-    const getMembers = LEADERSHIP_ROLE_FILTERS[role]
-    if (!getMembers) return false
-    return getMembers(project).some((e) => e.id === employeeId)
-  })
-
-  return hasSelectedLeadershipRole ? undefined : employeeId
-}
-
 export function getInitials(name: string): string {
   const parts = name.trim().split(/\s+/)
   if (parts.length >= 2)

@@ -1,19 +1,13 @@
 'use client'
 
-import { useGetProjectPlanSummaryQuery } from '@/src/store/features/ppm/projects-api'
+import { ProjectPlanSummaryDto } from '@/src/services/moda-api'
 import { Flex } from 'antd'
 import { FC } from 'react'
 import styles from '../my-projects-dashboard.module.css'
 
-const ProjectStatPills: FC<{ projectKey: string; employeeId?: string }> = ({
-  projectKey,
-  employeeId,
+const ProjectStatPills: FC<{ summary?: ProjectPlanSummaryDto }> = ({
+  summary,
 }) => {
-  const { data: summary } = useGetProjectPlanSummaryQuery({
-    projectKey,
-    employeeId,
-  })
-
   if (!summary) return null
 
   const { overdue, dueThisWeek, upcoming } = summary

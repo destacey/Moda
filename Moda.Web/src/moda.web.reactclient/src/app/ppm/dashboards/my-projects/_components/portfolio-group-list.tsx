@@ -3,6 +3,7 @@
 import { ModaEmpty } from '@/src/components/common'
 import useAuth from '@/src/components/contexts/auth'
 import { ProjectListDto } from '@/src/services/moda-api'
+import { useGetProjectsPlanSummariesQuery } from '@/src/store/features/ppm/projects-api'
 import { Flex, Spin } from 'antd'
 import { FC, useMemo } from 'react'
 import { PortfolioGroup, sortProjects } from './project-card-helpers'
@@ -25,6 +26,19 @@ const PortfolioGroupList: FC<PortfolioGroupListProps> = ({
   onSelectProject,
 }) => {
   const { user } = useAuth()
+
+  const projectIds = useMemo(
+    () => projects?.map((p) => p.id) ?? [],
+    [projects],
+  )
+
+  const { data: planSummaries } = useGetProjectsPlanSummariesQuery(
+    {
+      projectIds,
+      role: selectedRoles.length > 0 ? selectedRoles : undefined,
+    },
+    { skip: projectIds.length === 0 },
+  )
 
   const groups = useMemo<PortfolioGroup[]>(() => {
     if (!projects) return []
@@ -67,7 +81,7 @@ const PortfolioGroupList: FC<PortfolioGroupListProps> = ({
           group={group}
           selectedProjectKey={selectedProjectKey}
           employeeId={user.employeeId}
-          selectedRoles={selectedRoles}
+          planSummaries={planSummaries}
           onSelectProject={onSelectProject}
         />
       ))}

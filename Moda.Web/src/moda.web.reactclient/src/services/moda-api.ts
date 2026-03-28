@@ -8357,6 +8357,65 @@ export class ProjectsClient {
     }
 
     /**
+     * Get plan summary metrics for multiple projects in a single request.
+     * @param projectId (optional) 
+     * @param role (optional) 
+     */
+    getProjectsPlanSummaries(projectId?: string[] | undefined, role?: number[] | null | undefined, cancelToken?: CancelToken): Promise<{ [key: string]: ProjectPlanSummaryDto; }> {
+        let url_ = this.baseUrl + "/api/ppm/projects/plan-summaries?";
+        if (projectId === null)
+            throw new globalThis.Error("The parameter 'projectId' cannot be null.");
+        else if (projectId !== undefined)
+            projectId && projectId.forEach(item => { url_ += "projectId=" + encodeURIComponent("" + item) + "&"; });
+        if (role !== undefined && role !== null)
+            role && role.forEach(item => { url_ += "role=" + encodeURIComponent("" + item) + "&"; });
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetProjectsPlanSummaries(_response);
+        });
+    }
+
+    protected processGetProjectsPlanSummaries(response: AxiosResponse): Promise<{ [key: string]: ProjectPlanSummaryDto; }> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<{ [key: string]: ProjectPlanSummaryDto; }>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<{ [key: string]: ProjectPlanSummaryDto; }>(null as any);
+    }
+
+    /**
      * Get project phase details.
      */
     getProjectPhase(id: string, phaseId: string, cancelToken?: CancelToken): Promise<ProjectPhaseDetailsDto> {

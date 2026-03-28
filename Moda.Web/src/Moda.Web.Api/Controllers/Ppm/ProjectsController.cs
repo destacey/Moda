@@ -339,6 +339,21 @@ public class ProjectsController(ILogger<ProjectsController> logger, ISender send
         return Ok(summary);
     }
 
+    [HttpGet("plan-summaries")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Projects)]
+    [OpenApiOperation("Get plan summary metrics for multiple projects in a single request.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult<Dictionary<Guid, ProjectPlanSummaryDto>>> GetProjectsPlanSummaries([FromQuery] Guid[] projectId, [FromQuery] int[]? role, CancellationToken cancellationToken)
+    {
+        ProjectMemberRole[]? roleFilter = role is { Length: > 0 }
+            ? [.. role.Select(r => (ProjectMemberRole)r)]
+            : null;
+
+        var summaries = await _sender.Send(new GetProjectsPlanSummariesQuery(projectId, roleFilter), cancellationToken);
+
+        return Ok(summaries);
+    }
+
     [HttpGet("{id}/phases/{phaseId}")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Projects)]
     [OpenApiOperation("Get project phase details.", "")]

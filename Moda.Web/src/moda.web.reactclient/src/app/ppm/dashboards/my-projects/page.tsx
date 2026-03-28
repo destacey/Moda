@@ -14,7 +14,7 @@ import { QuestionCircleOutlined } from '@ant-design/icons'
 import { Button, Tour } from 'antd'
 import { ModaTooltip } from '@/src/components/common'
 import { usePathname } from 'next/navigation'
-import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { FC, useCallback, useEffect, useRef, useState } from 'react'
 import MyProjectsDashboardFilterBar from './_components/filter-bar'
 import MyProjectsSummaryBar from './_components/summary-bar'
 import PortfolioGroupList from './_components/portfolio-group-list'
@@ -81,7 +81,11 @@ const MyProjectsPage: FC = () => {
 
   const handleTourStepChange = useCallback(
     (current: number) => {
-      if (current === detailStepIndex && !selectedProjectKey && projects?.length) {
+      if (
+        current === detailStepIndex &&
+        !selectedProjectKey &&
+        projects?.length
+      ) {
         setSelectedProjectKey(projects[0].key)
       }
     },
@@ -158,7 +162,11 @@ const MyProjectsPage: FC = () => {
         isLoading={isLoading}
         containerRef={summaryBarRef}
       />
-      <div ref={layoutRef} className={styles.layout} style={{ height: layoutHeight }}>
+      <div
+        ref={layoutRef}
+        className={styles.layout}
+        style={{ height: layoutHeight }}
+      >
         <div ref={leftPanelRef} className={styles.leftPanel}>
           <PortfolioGroupList
             projects={projects}

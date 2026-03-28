@@ -3,6 +3,7 @@
 import { RightOutlined } from '@ant-design/icons'
 import { Flex, Typography } from 'antd'
 import { FC, useState } from 'react'
+import { ProjectPlanSummaryDto } from '@/src/services/moda-api'
 import { PortfolioGroup } from './project-card-helpers'
 import ProjectCard from './project-card'
 import styles from '../my-projects-dashboard.module.css'
@@ -13,7 +14,7 @@ export interface PortfolioGroupSectionProps {
   group: PortfolioGroup
   selectedProjectKey: string | null
   employeeId: string | null
-  selectedRoles: number[]
+  planSummaries?: Record<string, ProjectPlanSummaryDto>
   onSelectProject: (key: string) => void
 }
 
@@ -21,7 +22,7 @@ const PortfolioGroupSection: FC<PortfolioGroupSectionProps> = ({
   group,
   selectedProjectKey,
   employeeId,
-  selectedRoles,
+  planSummaries,
   onSelectProject,
 }) => {
   const [collapsed, setCollapsed] = useState(false)
@@ -51,7 +52,7 @@ const PortfolioGroupSection: FC<PortfolioGroupSectionProps> = ({
               project={project}
               isSelected={selectedProjectKey === project.key}
               employeeId={employeeId}
-              selectedRoles={selectedRoles}
+              planSummary={planSummaries?.[project.id]}
               onSelect={onSelectProject}
             />
           ))}

@@ -2,11 +2,11 @@
 
 import { LifecycleStatusTag } from '@/src/components/common'
 import PhaseTimeline from '@/src/app/ppm/_components/phase-timeline'
-import { ProjectListDto } from '@/src/services/moda-api'
+import { ProjectListDto, ProjectPlanSummaryDto } from '@/src/services/moda-api'
 import { Card, Flex, Typography } from 'antd'
 import dayjs from 'dayjs'
 import { FC, useMemo } from 'react'
-import { collectTeamMembers, getTaskMetricsEmployeeId, getUserRoles } from './project-card-helpers'
+import { collectTeamMembers, getUserRoles } from './project-card-helpers'
 import ProjectStatPills from './project-stat-pills'
 import TeamAvatars from './team-avatars'
 import styles from '../my-projects-dashboard.module.css'
@@ -17,7 +17,7 @@ export interface ProjectCardProps {
   project: ProjectListDto
   isSelected: boolean
   employeeId: string | null
-  selectedRoles: number[]
+  planSummary?: ProjectPlanSummaryDto
   onSelect: (key: string) => void
 }
 
@@ -25,16 +25,12 @@ const ProjectCard: FC<ProjectCardProps> = ({
   project,
   isSelected,
   employeeId,
-  selectedRoles,
+  planSummary,
   onSelect,
 }) => {
   const roles = useMemo(
     () => getUserRoles(project, employeeId),
     [project, employeeId],
-  )
-  const taskMetricsEmployeeId = useMemo(
-    () => getTaskMetricsEmployeeId(project, employeeId, selectedRoles),
-    [project, employeeId, selectedRoles],
   )
   const teamMembers = useMemo(() => collectTeamMembers(project), [project])
   const endDate = project.end ? dayjs(project.end).format('MMM D, YYYY') : null
@@ -74,10 +70,7 @@ const ProjectCard: FC<ProjectCardProps> = ({
         )}
 
         {/* Stat pills */}
-        <ProjectStatPills
-          projectKey={project.key}
-          employeeId={taskMetricsEmployeeId}
-        />
+        <ProjectStatPills summary={planSummary} />
 
         {/* Footer: avatars + end date */}
         <div className={styles.cardFooter}>
