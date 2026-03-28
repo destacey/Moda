@@ -39,7 +39,7 @@ const StrategicThemesGrid: React.FC<StrategicThemesGridProps> = (
 
   return (
     <ModaGrid
-      height={props.gridHeight ?? 650}
+      height={props.gridHeight}
       columnDefs={columnDefs}
       rowData={props.strategicThemesData}
       loadData={props.refreshStrategicThemes}

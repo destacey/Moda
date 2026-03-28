@@ -52,7 +52,6 @@ const ProgramViewManager = (props: ProgramViewManagerProps) => {
           isLoading={props.isLoading}
           refetch={props.refetch}
           hidePortfolio={true}
-          gridHeight={550}
           viewSelector={viewSelector}
         />
       )}

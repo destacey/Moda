@@ -88,7 +88,6 @@ const ProjectViewManager = (props: ProjectViewManagerProps) => {
           refetch={props.refetch}
           hidePortfolio={props.hidePortfolio}
           hideProgram={props.hideProgram}
-          gridHeight={550}
           viewSelector={viewSelector}
         />
       )}
