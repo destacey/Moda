@@ -6,7 +6,7 @@ import { ProjectListDto } from '@/src/services/moda-api'
 import { Card, Flex, Typography } from 'antd'
 import dayjs from 'dayjs'
 import { FC, useMemo } from 'react'
-import { collectTeamMembers, getUserRoles } from './project-card-helpers'
+import { collectTeamMembers, getTaskMetricsEmployeeId, getUserRoles } from './project-card-helpers'
 import ProjectStatPills from './project-stat-pills'
 import TeamAvatars from './team-avatars'
 import styles from '../my-projects-dashboard.module.css'
@@ -17,7 +17,7 @@ export interface ProjectCardProps {
   project: ProjectListDto
   isSelected: boolean
   employeeId: string | null
-  taskMetricsEmployeeId?: string
+  selectedRoles: number[]
   onSelect: (key: string) => void
 }
 
@@ -25,12 +25,16 @@ const ProjectCard: FC<ProjectCardProps> = ({
   project,
   isSelected,
   employeeId,
-  taskMetricsEmployeeId,
+  selectedRoles,
   onSelect,
 }) => {
   const roles = useMemo(
     () => getUserRoles(project, employeeId),
     [project, employeeId],
+  )
+  const taskMetricsEmployeeId = useMemo(
+    () => getTaskMetricsEmployeeId(project, employeeId, selectedRoles),
+    [project, employeeId, selectedRoles],
   )
   const teamMembers = useMemo(() => collectTeamMembers(project), [project])
   const endDate = project.end ? dayjs(project.end).format('MMM D, YYYY') : null

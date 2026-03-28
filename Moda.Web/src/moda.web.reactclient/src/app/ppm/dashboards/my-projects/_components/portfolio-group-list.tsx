@@ -13,7 +13,7 @@ export interface PortfolioGroupListProps {
   projects: ProjectListDto[] | undefined
   isLoading: boolean
   selectedProjectKey: string | null
-  taskMetricsEmployeeId?: string
+  selectedRoles: number[]
   onSelectProject: (key: string) => void
 }
 
@@ -21,7 +21,7 @@ const PortfolioGroupList: FC<PortfolioGroupListProps> = ({
   projects,
   isLoading,
   selectedProjectKey,
-  taskMetricsEmployeeId,
+  selectedRoles,
   onSelectProject,
 }) => {
   const { user } = useAuth()
@@ -67,7 +67,7 @@ const PortfolioGroupList: FC<PortfolioGroupListProps> = ({
           group={group}
           selectedProjectKey={selectedProjectKey}
           employeeId={user.employeeId}
-          taskMetricsEmployeeId={taskMetricsEmployeeId}
+          selectedRoles={selectedRoles}
           onSelectProject={onSelectProject}
         />
       ))}

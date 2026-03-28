@@ -58,6 +58,7 @@ describe('PortfolioGroupSection', () => {
     group: defaultGroup,
     selectedProjectKey: null as string | null,
     employeeId: 'emp-1',
+    selectedRoles: [] as number[],
     onSelectProject: jest.fn(),
   }
 

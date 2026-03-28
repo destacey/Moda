@@ -54,6 +54,7 @@ describe('PortfolioGroupList', () => {
   const defaultProps = {
     isLoading: false,
     selectedProjectKey: null as string | null,
+    selectedRoles: [] as number[],
     onSelectProject: jest.fn(),
   }
 

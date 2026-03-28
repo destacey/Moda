@@ -1,29 +1,18 @@
 'use client'
 
-import { getProjectsClient } from '@/src/services/clients'
-import { ProjectPlanSummaryDto } from '@/src/services/moda-api'
+import { useGetProjectPlanSummaryQuery } from '@/src/store/features/ppm/projects-api'
 import { Flex } from 'antd'
-import { FC, useEffect, useState } from 'react'
+import { FC } from 'react'
 import styles from '../my-projects-dashboard.module.css'
 
 const ProjectStatPills: FC<{ projectKey: string; employeeId?: string }> = ({
   projectKey,
   employeeId,
 }) => {
-  const [summary, setSummary] = useState<ProjectPlanSummaryDto | null>(null)
-
-  useEffect(() => {
-    let cancelled = false
-    getProjectsClient()
-      .getProjectPlanSummary(projectKey, employeeId)
-      .then((data) => {
-        if (!cancelled) setSummary(data)
-      })
-      .catch(() => {})
-    return () => {
-      cancelled = true
-    }
-  }, [projectKey, employeeId])
+  const { data: summary } = useGetProjectPlanSummaryQuery({
+    projectKey,
+    employeeId,
+  })
 
   if (!summary) return null
 

@@ -13,7 +13,7 @@ export interface PortfolioGroupSectionProps {
   group: PortfolioGroup
   selectedProjectKey: string | null
   employeeId: string | null
-  taskMetricsEmployeeId?: string
+  selectedRoles: number[]
   onSelectProject: (key: string) => void
 }
 
@@ -21,7 +21,7 @@ const PortfolioGroupSection: FC<PortfolioGroupSectionProps> = ({
   group,
   selectedProjectKey,
   employeeId,
-  taskMetricsEmployeeId,
+  selectedRoles,
   onSelectProject,
 }) => {
   const [collapsed, setCollapsed] = useState(false)
@@ -51,7 +51,7 @@ const PortfolioGroupSection: FC<PortfolioGroupSectionProps> = ({
               project={project}
               isSelected={selectedProjectKey === project.key}
               employeeId={employeeId}
-              taskMetricsEmployeeId={taskMetricsEmployeeId}
+              selectedRoles={selectedRoles}
               onSelect={onSelectProject}
             />
           ))}
