@@ -3,7 +3,7 @@
 import { ModaGrid } from '@/src/components/common'
 import { WorkItemListDto } from '@/src/services/moda-api'
 import { ColDef, ICellRendererParams } from 'ag-grid-community'
-import { forwardRef, useCallback, useMemo } from 'react'
+import { forwardRef, ReactNode, useCallback, useMemo } from 'react'
 import { AgGridReact } from 'ag-grid-react'
 import {
   AssignedToLinkCellRenderer,
@@ -29,6 +29,7 @@ export interface WorkItemsGridProps {
   hideProjectColumn?: boolean
   showStats?: boolean
   onFilterChanged?: () => void
+  viewSelector?: ReactNode | undefined
 }
 
 const WorkItemsGrid = forwardRef<
@@ -144,6 +145,7 @@ const WorkItemsGrid = forwardRef<
       loadData={refresh}
       loading={props.isLoading}
       onFilterChanged={props.onFilterChanged}
+      toolbarActions={props.viewSelector}
     />
   )
 })

@@ -1,7 +1,11 @@
 'use client'
 
-import { AppstoreOutlined, BuildOutlined, MenuOutlined } from '@ant-design/icons'
-import Segmented, { SegmentedLabeledOption } from 'antd/es/segmented'
+import {
+  AppstoreOutlined,
+  BuildOutlined,
+  MenuOutlined,
+} from '@ant-design/icons'
+import { Segmented } from 'antd'
 import { memo, useMemo, useState } from 'react'
 import { ProjectListDto } from '@/src/services/moda-api'
 import { Spin } from 'antd'
@@ -17,17 +21,7 @@ const ProjectsTimeline = dynamic(() => import('./projects-timeline'), {
 
 type ProjectView = 'Card' | 'List' | 'Timeline'
 
-interface ProjectViewManagerProps {
-  projects: ProjectListDto[]
-  isLoading: boolean
-  refetch: () => void
-  hidePortfolio?: boolean
-  hideProgram?: boolean
-  groupByProgram?: boolean
-  defaultView?: ProjectView
-}
-
-const viewSelectorOptions: SegmentedLabeledOption[] = [
+const viewSelectorOptions = [
   {
     value: 'Card',
     icon: <AppstoreOutlined title="Card view" />,
@@ -42,11 +36,23 @@ const viewSelectorOptions: SegmentedLabeledOption[] = [
   },
 ]
 
+interface ProjectViewManagerProps {
+  projects: ProjectListDto[]
+  isLoading: boolean
+  refetch: () => void
+  hidePortfolio?: boolean
+  hideProgram?: boolean
+  groupByProgram?: boolean
+  defaultView?: ProjectView
+}
+
 const ProjectViewManager = (props: ProjectViewManagerProps) => {
   const [currentView, setCurrentView] = useState<string | number>(
     props.defaultView ?? 'List',
   )
-  const [selectedProjectKey, setSelectedProjectKey] = useState<string | null>(null)
+  const [selectedProjectKey, setSelectedProjectKey] = useState<string | null>(
+    null,
+  )
   const [drawerOpen, setDrawerOpen] = useState(false)
 
   const onCardClick = (key: string) => {

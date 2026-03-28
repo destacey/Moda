@@ -40,8 +40,8 @@ const ProjectTeamGrid = dynamic(
   { ssr: false },
 )
 
-const WorkItemsGrid = dynamic(
-  () => import('@/src/components/common/work/work-items-grid'),
+const ProjectWorkItemsViewManager = dynamic(
+  () => import('../_components/project-work-items-view-manager'),
   { ssr: false },
 )
 
@@ -166,7 +166,7 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
         )
       case ProjectTabs.WorkItems:
         return (
-          <WorkItemsGrid
+          <ProjectWorkItemsViewManager
             workItems={workItemsData}
             isLoading={workItemsDataIsLoading}
             refetch={refetchWorkItemsData}
