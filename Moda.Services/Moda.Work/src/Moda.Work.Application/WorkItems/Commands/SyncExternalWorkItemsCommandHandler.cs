@@ -170,7 +170,7 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
                         {
                             missingParents.TryAdd(externalWorkItem.Id, externalWorkItem.ParentId.Value);
                         }
-                        else if (workType.Level is null || workType.Level.Order >= parentWorkItemInfo.LevelOrder)
+                        else if (workType.Level is null || (workType.Level.Tier == WorkTypeTier.Portfolio && workType.Level.Order <= parentWorkItemInfo.LevelOrder))
                         {
                             if (_logger.IsEnabled(LogLevel.Debug))
                                 _logger.LogDebug("The parent must be a higher level than the work item {ExternalId} in workspace {WorkspaceId}.", externalWorkItem.Id, workspace.Id);
