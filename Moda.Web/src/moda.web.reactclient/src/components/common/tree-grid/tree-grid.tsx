@@ -49,6 +49,7 @@ import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { generateCsv, downloadCsvWithTimestamp } from '@/src/utils/csv-utils'
 import { ModaEmpty } from '@/src/components/common'
 
+import { useRemainingHeight } from '@/src/hooks'
 import styles from './tree-grid.module.css'
 import type {
   DraftItem,
@@ -101,6 +102,7 @@ function TreeGridInner<T extends TreeNode>(
     rightSlot,
     emptyMessage = 'No records found',
     csvFileName = 'tree-grid-export',
+    height,
     enableDragAndDrop = false,
     onNodeMove,
     onMoveRejected,
@@ -112,6 +114,11 @@ function TreeGridInner<T extends TreeNode>(
     onDraftCancelled,
     onDraftsChange,
   } = props
+
+  // ─── Auto-height ─────────────────────────────────────────
+  const treeGridContainerRef = useRef<HTMLDivElement>(null)
+  const autoHeight = useRemainingHeight(treeGridContainerRef)
+  const resolvedHeight = height ?? autoHeight
 
   // ─── State ───────────────────────────────────────────────
   const [sorting, setSorting] = useState<SortingState>([])
@@ -803,7 +810,7 @@ function TreeGridInner<T extends TreeNode>(
                   nodeId={row.original.id}
                   isDragEnabled={isDragEnabled && !isDraftRow}
                   isDragging={isDragging}
-                  className={`${styles.tr}${index % 2 === 1 ? ` ${styles.trAlt}` : ''}${isSelected ? ` ${styles.trSelected}` : ''}`}
+                  className={`${styles.tr}${canEdit ? ` ${styles.trEditable}` : ''}${index % 2 === 1 ? ` ${styles.trAlt}` : ''}${isSelected ? ` ${styles.trSelected}` : ''}`}
                   onClick={(e) => handleRowClickWithContext(e, row.original.id)}
                 >
                   {row.getVisibleCells().map((cell) => {
@@ -865,7 +872,7 @@ function TreeGridInner<T extends TreeNode>(
   )
 
   return (
-    <div className={styles.table}>
+    <div ref={treeGridContainerRef} className={styles.table} style={{ height: resolvedHeight }}>
       <TreeGridToolbar
         displayedRowCount={displayedRowCount}
         totalRowCount={totalRowCount}

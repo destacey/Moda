@@ -36,14 +36,16 @@ const ProjectsPage: FC = () => {
   useDocumentTitle('Projects')
   const [openCreateProjectForm, setOpenCreateProjectForm] =
     useState<boolean>(false)
-  const [selectedStatuses, setSelectedStatuses] =
-    useLocalStorageState<number[]>('projects-filter-statuses', DEFAULT_STATUSES)
+  const [selectedStatuses, setSelectedStatuses] = useLocalStorageState<
+    number[]
+  >('projects-filter-statuses', DEFAULT_STATUSES)
   const [selectedPortfolioId, setSelectedPortfolioId] = useLocalStorageState<
     string | null
   >('projects-filter-portfolio', null)
-  const [selectedRole, setSelectedRole] = useLocalStorageState<
-    string | null
-  >('projects-filter-role', null)
+  const [selectedRole, setSelectedRole] = useLocalStorageState<string | null>(
+    'projects-filter-role',
+    null,
+  )
   const messageApi = useMessage()
 
   const { hasPermissionClaim } = useAuth()
@@ -110,7 +112,6 @@ const ProjectsPage: FC = () => {
         projects={projectData}
         isLoading={isLoading}
         refetch={refetch}
-        gridHeight={600}
       />
       {openCreateProjectForm && (
         <CreateProjectForm
