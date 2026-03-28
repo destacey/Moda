@@ -218,6 +218,10 @@
 }
 
 .tr {
+  cursor: default;
+}
+
+.trEditable {
   cursor: pointer;
 }
 

@@ -25,7 +25,7 @@ export function buildWorkItemTree(
     nodeMap.set(item.id, {
       ...item,
       children: [],
-      parentId: idSet.has(parentId) ? parentId : null,
+      parentId: parentId && idSet.has(parentId) ? parentId : null,
     })
   }
 
