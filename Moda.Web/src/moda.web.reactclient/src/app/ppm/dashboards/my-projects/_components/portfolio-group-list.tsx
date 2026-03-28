@@ -3,9 +3,11 @@
 import { ModaEmpty } from '@/src/components/common'
 import useAuth from '@/src/components/contexts/auth'
 import { ProjectListDto } from '@/src/services/moda-api'
+import { useDebounce } from '@/src/hooks'
 import { useGetProjectsPlanSummariesQuery } from '@/src/store/features/ppm/projects-api'
-import { Flex, Spin } from 'antd'
-import { FC, useMemo } from 'react'
+import { SearchOutlined } from '@ant-design/icons'
+import { Flex, Input, Spin } from 'antd'
+import { FC, useMemo, useState } from 'react'
 import { PortfolioGroup, sortProjects } from './project-card-helpers'
 import PortfolioGroupSection from './portfolio-group-section'
 import styles from '../my-projects-dashboard.module.css'
@@ -26,6 +28,8 @@ const PortfolioGroupList: FC<PortfolioGroupListProps> = ({
   onSelectProject,
 }) => {
   const { user } = useAuth()
+  const [searchTerm, setSearchTerm] = useState('')
+  const debouncedSearch = useDebounce(searchTerm, 300)
 
   const projectIds = useMemo(
     () => projects?.map((p) => p.id) ?? [],
@@ -43,8 +47,13 @@ const PortfolioGroupList: FC<PortfolioGroupListProps> = ({
   const groups = useMemo<PortfolioGroup[]>(() => {
     if (!projects) return []
 
+    const needle = debouncedSearch.toLowerCase().trim()
+    const filtered = needle
+      ? projects.filter((p) => p.name.toLowerCase().includes(needle))
+      : projects
+
     const map = new Map<string, PortfolioGroup>()
-    for (const project of projects) {
+    for (const project of filtered) {
       const portfolioId = project.portfolio?.id ?? 'unassigned'
       const portfolioName = project.portfolio?.name ?? 'Unassigned'
       if (!map.has(portfolioId)) {
@@ -59,7 +68,7 @@ const PortfolioGroupList: FC<PortfolioGroupListProps> = ({
         projects: sortProjects(group.projects),
       }))
       .sort((a, b) => a.portfolioName.localeCompare(b.portfolioName))
-  }, [projects])
+  }, [projects, debouncedSearch])
 
   if (isLoading) {
     return (
@@ -69,22 +78,34 @@ const PortfolioGroupList: FC<PortfolioGroupListProps> = ({
     )
   }
 
-  if (groups.length === 0) {
+  if (!projects || projects.length === 0) {
     return <ModaEmpty message="No projects found" />
   }
 
   return (
     <Flex vertical gap={4}>
-      {groups.map((group) => (
-        <PortfolioGroupSection
-          key={group.portfolioId}
-          group={group}
-          selectedProjectKey={selectedProjectKey}
-          employeeId={user.employeeId}
-          planSummaries={planSummaries}
-          onSelectProject={onSelectProject}
-        />
-      ))}
+      <Input
+        prefix={<SearchOutlined />}
+        placeholder="Search projects..."
+        allowClear
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        size="small"
+      />
+      {groups.length === 0 ? (
+        <ModaEmpty message="No matching projects" />
+      ) : (
+        groups.map((group) => (
+          <PortfolioGroupSection
+            key={group.portfolioId}
+            group={group}
+            selectedProjectKey={selectedProjectKey}
+            employeeId={user.employeeId}
+            planSummaries={planSummaries}
+            onSelectProject={onSelectProject}
+          />
+        ))
+      )}
     </Flex>
   )
 }

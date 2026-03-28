@@ -1,4 +1,5 @@
-import { render, screen } from '@testing-library/react'
+import { act, render, screen } from '@testing-library/react'
+import { userEvent } from '@testing-library/user-event'
 import PortfolioGroupList from './portfolio-group-list'
 import { ProjectListDto } from '@/src/services/moda-api'
 
@@ -55,6 +56,14 @@ function createProject(
 }
 
 describe('PortfolioGroupList', () => {
+  beforeEach(() => {
+    jest.useFakeTimers()
+  })
+
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+
   const defaultProps = {
     isLoading: false,
     selectedProjectKey: null as string | null,
@@ -120,5 +129,84 @@ describe('PortfolioGroupList', () => {
     )
 
     expect(screen.getByText('No projects found')).toBeInTheDocument()
+  })
+
+  it('renders search input when projects exist', () => {
+    const projects = [
+      createProject('P1', 'Alpha', 'port-1', 'Product Delivery'),
+    ]
+
+    render(<PortfolioGroupList {...defaultProps} projects={projects} />)
+
+    expect(
+      screen.getByPlaceholderText('Search projects...'),
+    ).toBeInTheDocument()
+  })
+
+  it('does not render search input when no projects', () => {
+    render(<PortfolioGroupList {...defaultProps} projects={[]} />)
+
+    expect(
+      screen.queryByPlaceholderText('Search projects...'),
+    ).not.toBeInTheDocument()
+  })
+
+  it('filters projects by name when searching', async () => {
+    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime })
+    const projects = [
+      createProject('P1', 'Alpha', 'port-1', 'Product Delivery'),
+      createProject('P2', 'Beta', 'port-1', 'Product Delivery'),
+      createProject('P3', 'Gamma', 'port-2', 'Data Analytics'),
+    ]
+
+    render(<PortfolioGroupList {...defaultProps} projects={projects} />)
+
+    await user.type(
+      screen.getByPlaceholderText('Search projects...'),
+      'Alpha',
+    )
+    act(() => jest.advanceTimersByTime(300))
+
+    expect(screen.getByTestId('group-port-1')).toHaveTextContent(
+      'Product Delivery (1)',
+    )
+    expect(screen.queryByTestId('group-port-2')).not.toBeInTheDocument()
+  })
+
+  it('filters case-insensitively', async () => {
+    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime })
+    const projects = [
+      createProject('P1', 'Alpha', 'port-1', 'Product Delivery'),
+      createProject('P2', 'Beta', 'port-1', 'Product Delivery'),
+    ]
+
+    render(<PortfolioGroupList {...defaultProps} projects={projects} />)
+
+    await user.type(
+      screen.getByPlaceholderText('Search projects...'),
+      'alpha',
+    )
+    act(() => jest.advanceTimersByTime(300))
+
+    expect(screen.getByTestId('group-port-1')).toHaveTextContent(
+      'Product Delivery (1)',
+    )
+  })
+
+  it('shows no matching message when search has no results', async () => {
+    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime })
+    const projects = [
+      createProject('P1', 'Alpha', 'port-1', 'Product Delivery'),
+    ]
+
+    render(<PortfolioGroupList {...defaultProps} projects={projects} />)
+
+    await user.type(
+      screen.getByPlaceholderText('Search projects...'),
+      'xyz',
+    )
+    act(() => jest.advanceTimersByTime(300))
+
+    expect(screen.getByText('No matching projects')).toBeInTheDocument()
   })
 })
