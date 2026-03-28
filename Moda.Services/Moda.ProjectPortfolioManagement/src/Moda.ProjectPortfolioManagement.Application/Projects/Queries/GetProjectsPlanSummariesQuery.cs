@@ -1,4 +1,4 @@
-using Moda.ProjectPortfolioManagement.Application.Projects.Dtos;
+﻿using Moda.ProjectPortfolioManagement.Application.Projects.Dtos;
 using Moda.ProjectPortfolioManagement.Domain.Enums;
 
 namespace Moda.ProjectPortfolioManagement.Application.Projects.Queries;
@@ -50,10 +50,9 @@ internal sealed class GetProjectsPlanSummariesQueryHandler(
         var allLeadershipRoles = new[] { ProjectRole.Sponsor, ProjectRole.Owner, ProjectRole.Manager };
 
         var activeLeadershipRoles = request.RoleFilter is { Length: > 0 }
-            ? request.RoleFilter
+            ? [.. request.RoleFilter
                 .Where(r => r != ProjectMemberRole.Assignee && r != ProjectMemberRole.Member)
-                .Select(r => (ProjectRole)(int)r)
-                .ToArray()
+                .Select(r => (ProjectRole)(int)r)]
             : allLeadershipRoles;
 
         // All leaf tasks across requested projects
@@ -61,37 +60,40 @@ internal sealed class GetProjectsPlanSummariesQueryHandler(
             .Where(t => request.ProjectIds.Contains(t.ProjectId))
             .Where(t => !_ppmDbContext.ProjectTasks.Any(child => child.ParentId == t.Id));
 
-        // Open leaf tasks with a planned end date
-        var openLeafTasks = leafTasks
-            .Where(t => openStatuses.Contains(t.Status))
-            .Where(t => t.PlannedDateRange != null && t.PlannedDateRange.End != null);
-
-        IQueryable<Domain.Models.ProjectTask> relevantTasks;
+        // Apply role-based visibility to leaf tasks
+        IQueryable<Domain.Models.ProjectTask> visibleLeafTasks;
 
         if (activeLeadershipRoles.Length > 0)
         {
-            var leadershipTasks = openLeafTasks
+            var leadershipTasks = leafTasks
                 .Where(t => t.Project.Roles.Any(r => r.EmployeeId == eid && activeLeadershipRoles.Contains(r.Role)));
 
-            var assigneeTasks = openLeafTasks
+            var assigneeTasks = leafTasks
                 .Where(t => !t.Project.Roles.Any(r => r.EmployeeId == eid && activeLeadershipRoles.Contains(r.Role)))
                 .Where(t => t.Roles.Any(r => r.EmployeeId == eid && r.Role == TaskRole.Assignee));
 
-            relevantTasks = leadershipTasks.Concat(assigneeTasks);
+            visibleLeafTasks = leadershipTasks.Concat(assigneeTasks);
         }
         else
         {
-            relevantTasks = openLeafTasks
+            visibleLeafTasks = leafTasks
                 .Where(t => t.Roles.Any(r => r.EmployeeId == eid && r.Role == TaskRole.Assignee));
         }
 
-        // Project the minimal data needed, then group in memory.
-        // EF Core cannot translate GroupBy with conditional counts on owned type properties.
-        var taskData = await relevantTasks
+        // Open visible leaf tasks with a planned end date (for date-based metrics)
+        var openVisibleTasks = visibleLeafTasks
+            .Where(t => openStatuses.Contains(t.Status))
+            .Where(t => t.PlannedDateRange != null && t.PlannedDateRange.End != null);
+
+        // EF Core cannot translate GroupBy with conditional counts on owned type
+        // properties (PlannedDateRange.End). Materialize the minimal projection
+        // (ProjectId + EndDate) and aggregate in memory. The data set is small —
+        // only open leaf tasks with end dates across the user's visible projects.
+        var taskData = await openVisibleTasks
             .Select(t => new { t.ProjectId, EndDate = t.PlannedDateRange!.End })
             .ToListAsync(cancellationToken);
 
-        var totalLeafCounts = await leafTasks
+        var totalLeafCounts = await visibleLeafTasks
             .GroupBy(t => t.ProjectId)
             .Select(g => new { ProjectId = g.Key, Count = g.Count() })
             .ToListAsync(cancellationToken);
