@@ -259,17 +259,16 @@ const ProjectWorkItemsTreeGrid: FC<ProjectWorkItemsTreeGridProps> = ({
   )
 
   return (
-    <div className={styles.container} style={{ height: gridHeight }}>
-      <TreeGrid<WorkItemTreeNode>
-        data={treeData}
-        columns={columns}
-        isLoading={isLoading}
-        onRefresh={async () => refetch()}
-        rightSlot={viewSelector}
-        csvFileName="project-work-items"
-        emptyMessage="No work items found"
-      />
-    </div>
+    <TreeGrid<WorkItemTreeNode>
+      data={treeData}
+      columns={columns}
+      isLoading={isLoading}
+      height={gridHeight}
+      onRefresh={async () => refetch()}
+      rightSlot={viewSelector}
+      csvFileName="project-work-items"
+      emptyMessage="No work items found"
+    />
   )
 }
 

@@ -139,7 +139,7 @@ const WorkItemsGrid = forwardRef<
   return (
     <ModaGrid
       ref={ref}
-      height={props.gridHeight ?? 550}
+      height={props.gridHeight}
       columnDefs={columnDefs}
       rowData={props.workItems}
       loadData={refresh}

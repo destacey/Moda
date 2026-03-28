@@ -1,8 +1,3 @@
-.container {
-  display: flex;
-  flex-direction: column;
-}
-
 .titleText {
   flex: 1;
   min-width: 0;

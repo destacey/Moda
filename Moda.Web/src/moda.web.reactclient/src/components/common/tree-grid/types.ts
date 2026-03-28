@@ -267,6 +267,8 @@ export interface TreeGridProps<T extends TreeNode> {
   /** Slot for actions rendered on the far right of the toolbar (e.g., view selector). */
   rightSlot?: React.ReactNode
   emptyMessage?: string
+  /** Fixed height in pixels. When omitted, the grid auto-sizes to fill the remaining viewport height. */
+  height?: number
   /** File name prefix for CSV export (e.g., 'project-tasks'). */
   csvFileName?: string
 

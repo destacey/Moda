@@ -30,6 +30,7 @@ import { ItemType } from 'antd/es/menu/interface'
 import useTheme from '../contexts/theme'
 import ModaEmpty from './moda-empty'
 import { ControlItemsMenu } from './control-items-menu'
+import { useRemainingHeight } from '@/src/hooks'
 
 const { Text } = Typography
 
@@ -78,6 +79,11 @@ const ModaGrid = forwardRef<AgGridReact, ModaGridProps>(
     const showGridControls = gridControlMenuItems?.length > 0
 
     const gridRef = useRef<AgGridReact>(null)
+    const gridContainerRef = useRef<HTMLDivElement>(null)
+    const autoHeight = useRemainingHeight(gridContainerRef)
+
+    // Use explicit height if provided, otherwise fill remaining viewport space
+    const resolvedHeight = height ?? autoHeight
 
     // Forward the ref to parent components
     useImperativeHandle(ref, () => gridRef.current as AgGridReact, [])
@@ -177,7 +183,7 @@ const ModaGrid = forwardRef<AgGridReact, ModaGridProps>(
             </Col>
           </Row>
 
-          <div {...(height !== -1 && { style: { height: height ?? 700 } })}>
+          <div ref={gridContainerRef} {...(resolvedHeight !== -1 && { style: { height: resolvedHeight } })}>
             <AgGridReact
               ref={gridRef}
               theme={agGridTheme}
@@ -194,7 +200,7 @@ const ModaGrid = forwardRef<AgGridReact, ModaGridProps>(
               )}
               enableCellTextSelection={true}
               ensureDomOrder={true}
-              {...(height === -1 && { domLayout: 'autoHeight' })}
+              {...(resolvedHeight === -1 && { domLayout: 'autoHeight' })}
               {...props}
             ></AgGridReact>
           </div>

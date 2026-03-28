@@ -29,7 +29,7 @@ export function useRemainingHeight(
   const calculate = useCallback(() => {
     if (!ref.current) return
     const top = ref.current.getBoundingClientRect().top
-    setHeight(Math.max(200, window.innerHeight - top - bottomOffset))
+    setHeight(Math.max(300, window.innerHeight - top - bottomOffset))
   }, [ref, bottomOffset])
 
   useEffect(() => {
