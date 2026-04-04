@@ -125,6 +125,7 @@ Architecture tests in `Moda.ArchitectureTests` enforce these dependency rules.
 - **API calls**: Always use NSwag-generated typed client (e.g., `getProjectsClient()`). Never use `authenticatedFetch()` directly. Clients in `moda.web.reactclient/src/services/clients.ts`.
 - **Theming**: Ant Design theme tokens only — never hardcode colors. Prefer CSS variables (`var(--ant-color-primary)`) in CSS modules over `theme.useToken()` in JS. Only use `theme.useToken()` when values are needed in JS logic.
 - **State**: Redux Toolkit + RTK Query for API data. React Context for auth/theme. `useState` for local UI state.
+- **PWA**: Installable via Serwist (`@serwist/turbopack`). See [Frontend Development docs](docs/contributing/frontend.mdx#pwa-progressive-web-app) for details.
 
 ## Development Notes
 

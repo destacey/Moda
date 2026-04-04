@@ -29,5 +29,21 @@ export default function manifest(): MetadataRoute.Manifest {
         purpose: 'maskable',
       },
     ],
+    screenshots: [
+      {
+        src: '/screenshots/desktop.png',
+        sizes: '1169x693',
+        type: 'image/png',
+        form_factor: 'wide',
+        label: 'Moda dashboard showing planning intervals and projects',
+      },
+      {
+        src: '/screenshots/mobile.png',
+        sizes: '374x567',
+        type: 'image/png',
+        form_factor: 'narrow',
+        label: 'Moda mobile view showing planning intervals and projects',
+      },
+    ],
   }
 }

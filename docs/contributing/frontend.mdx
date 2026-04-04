@@ -61,6 +61,27 @@ Only use `theme.useToken()` when you need token values in JavaScript logic.
 - **React Context** for auth, theme, and messaging
 - **Local state** (`useState`) for component-specific state
 
+## PWA (Progressive Web App)
+
+The client app is installable as a PWA, providing a native app-like experience with app shell caching and network-first API strategy.
+
+**Key files:**
+
+| File | Purpose |
+|------|---------|
+| `src/app/manifest.ts` | Web app manifest (name, icons, screenshots, theme color) |
+| `src/app/sw.ts` | Service worker source (precaching + runtime caching) |
+| `src/app/serwist/[path]/route.ts` | Turbopack route handler that builds and serves the SW |
+| `src/config/theme/theme-constants.ts` | Shared brand color used by manifest and light theme |
+| `public/icons/` | PWA icons (192x192, 512x512) |
+| `public/screenshots/` | Install dialog screenshots (desktop and mobile) |
+
+**Tooling:** [Serwist](https://serwist.pages.dev) (`@serwist/turbopack`) — handles service worker compilation and precache manifest injection via a Next.js route handler.
+
+**Development:** The service worker is only active in production builds. To test PWA features locally, run `npm run build && npm start`.
+
+**Caching strategy:** `defaultCache` from Serwist provides network-first for navigations and API calls, and cache-first for static assets (JS, CSS, images, fonts).
+
 ## Key Libraries
 
 | Library | Purpose |
