@@ -46,10 +46,10 @@ const MyProjectsSummaryBar: FC<MyProjectsSummaryBarProps> = ({
   return (
     <div ref={containerRef} className={styles.summaryBar}>
       <Row gutter={[8, 8]}>
-        <Col xs={8} sm={6} md={4} lg={3}>
+        <Col xs={12} sm={6} md={4} lg={3}>
           <MetricCard title="Projects" value={projectCount} />
         </Col>
-        <Col xs={8} sm={6} md={4} lg={3}>
+        <Col xs={12} sm={6} md={4} lg={3}>
           <MetricCard
             title="Overdue"
             value={metricsLoading ? '-' : (metrics?.overdue ?? 0)}
@@ -61,7 +61,7 @@ const MyProjectsSummaryBar: FC<MyProjectsSummaryBarProps> = ({
             tooltip="Sum of overdue tasks across visible projects"
           />
         </Col>
-        <Col xs={8} sm={6} md={4} lg={3}>
+        <Col xs={12} sm={6} md={4} lg={3}>
           <MetricCard
             title="Due This Week"
             value={metricsLoading ? '-' : (metrics?.dueThisWeek ?? 0)}
@@ -73,7 +73,7 @@ const MyProjectsSummaryBar: FC<MyProjectsSummaryBarProps> = ({
             tooltip="Sum of tasks due this week across visible projects"
           />
         </Col>
-        <Col xs={8} sm={6} md={4} lg={3}>
+        <Col xs={12} sm={6} md={4} lg={3}>
           <MetricCard
             title="Upcoming"
             value={metricsLoading ? '-' : (metrics?.upcoming ?? 0)}

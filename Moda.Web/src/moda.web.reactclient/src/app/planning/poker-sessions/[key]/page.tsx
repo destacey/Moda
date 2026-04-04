@@ -16,7 +16,7 @@ import {
   useWithdrawPokerVoteMutation,
 } from '@/src/store/features/planning/poker-sessions-api'
 import { useGetProfileQuery } from '@/src/store/features/user-management/profile-api'
-import { Avatar, Button, Divider, Flex, Tag } from 'antd'
+import { Avatar, Button, Divider, Drawer, Flex, Grid, Tag } from 'antd'
 import { ModaTooltip } from '@/src/components/common'
 import { EditOutlined, LinkOutlined } from '@ant-design/icons'
 import { notFound, useParams, usePathname } from 'next/navigation'
@@ -47,6 +47,7 @@ import {
 import PokerSessionDetailsLoading from './loading'
 
 const { Group: AvatarGroup } = Avatar
+const { useBreakpoint } = Grid
 
 interface PokerCssVars extends CSSProperties {
   '--poker-bg': string
@@ -70,6 +71,8 @@ const PokerSessionDetailPage: FC = () => {
   useDocumentTitle(`Poker Session ${key}`)
 
   const { token } = useTheme()
+  const screens = useBreakpoint()
+  const isMobile = useMemo(() => !screens.md, [screens.md])
   const messageApi = useMessage()
   const { hasPermissionClaim } = useAuth()
   const canManage = hasPermissionClaim('Permissions.PokerSessions.Update')
@@ -105,6 +108,7 @@ const PokerSessionDetailPage: FC = () => {
 
   const [selectedRoundId, setSelectedRoundId] = useState<string | undefined>()
   const [openEditForm, setOpenEditForm] = useState(false)
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
 
   const handleComplete = useCallback(async () => {
     if (!session) return
@@ -264,7 +268,7 @@ const PokerSessionDetailPage: FC = () => {
   }
 
   const pageTitleTags = (
-    <Flex align="center" gap={8}>
+    <Flex align="center" gap={8} wrap>
       <Tag color={sessionStatusColor[session.status]}>{session.status}</Tag>
       {session.estimationScale?.name && (
         <Tag style={{ margin: 0 }}>{session.estimationScale.name}</Tag>
@@ -273,7 +277,7 @@ const PokerSessionDetailPage: FC = () => {
   )
 
   const pageTitleActions = (
-    <Flex align="center" gap={12}>
+    <Flex align="center" gap={8} wrap>
       {canManage && isActive && (
         <Button icon={<EditOutlined />} onClick={() => setOpenEditForm(true)}>
           Edit
@@ -316,7 +320,9 @@ const PokerSessionDetailPage: FC = () => {
         actions={pageTitleActions}
       />
 
-      <div className={styles.pageLayout}>
+      <div
+        className={`${styles.pageLayout} ${isMobile ? styles.pageLayoutMobile : ''}`}
+      >
         <div className={styles.centerColumn}>
           {centerViewMode === 'lobby' && (
             <PokerLobbyState
@@ -332,7 +338,7 @@ const PokerSessionDetailPage: FC = () => {
               vertical
               gap={16}
               align="center"
-              style={{ padding: '24px 0' }}
+              style={{ padding: isMobile ? '12px 0' : '24px 0' }}
             >
               <RoundLabelHeader
                 round={activeRound}
@@ -393,28 +399,75 @@ const PokerSessionDetailPage: FC = () => {
               participants={roundParticipants}
             />
           )}
+
+          {isMobile && centerViewMode !== 'lobby' && (
+            <div style={{ padding: '12px 0' }}>
+              <Button block onClick={() => setMobileSidebarOpen(true)}>
+                Session Timeline
+              </Button>
+            </div>
+          )}
         </div>
 
-        {centerViewMode === 'lobby' && isActive ? (
-          <LobbyParticipants
-            participants={connectedParticipants}
-            canManage={canManage}
-            isActive={isActive}
-            onComplete={handleComplete}
-            isCompleting={isCompleting}
-          />
-        ) : centerViewMode !== 'lobby' ? (
-          <SessionSidebar
-            session={session}
-            selectedRoundId={activeRound?.id}
-            onSelectRound={setSelectedRoundId}
-            onRemoveRound={handleRemoveRound}
-            onComplete={handleComplete}
-            isCompleting={isCompleting}
-            canManage={canManage}
-            isActive={isActive}
-          />
-        ) : null}
+        {isMobile ? (
+          <>
+            {centerViewMode === 'lobby' && isActive && (
+              <LobbyParticipants
+                participants={connectedParticipants}
+                canManage={canManage}
+                isActive={isActive}
+                onComplete={handleComplete}
+                isCompleting={isCompleting}
+              />
+            )}
+            <Drawer
+              title="Session Timeline"
+              placement="bottom"
+              size="70vh"
+              onClose={() => setMobileSidebarOpen(false)}
+              open={mobileSidebarOpen}
+              styles={{ body: { padding: 0 } }}
+            >
+              <SessionSidebar
+                session={session}
+                selectedRoundId={activeRound?.id}
+                onSelectRound={(roundId) => {
+                  setSelectedRoundId(roundId)
+                  setMobileSidebarOpen(false)
+                }}
+                onRemoveRound={handleRemoveRound}
+                onComplete={handleComplete}
+                isCompleting={isCompleting}
+                canManage={canManage}
+                isActive={isActive}
+                inline
+              />
+            </Drawer>
+          </>
+        ) : (
+          <>
+            {centerViewMode === 'lobby' && isActive ? (
+              <LobbyParticipants
+                participants={connectedParticipants}
+                canManage={canManage}
+                isActive={isActive}
+                onComplete={handleComplete}
+                isCompleting={isCompleting}
+              />
+            ) : centerViewMode !== 'lobby' ? (
+              <SessionSidebar
+                session={session}
+                selectedRoundId={activeRound?.id}
+                onSelectRound={setSelectedRoundId}
+                onRemoveRound={handleRemoveRound}
+                onComplete={handleComplete}
+                isCompleting={isCompleting}
+                canManage={canManage}
+                isActive={isActive}
+              />
+            ) : null}
+          </>
+        )}
       </div>
       {openEditForm && (
         <EditPokerSessionForm
@@ -428,7 +481,11 @@ const PokerSessionDetailPage: FC = () => {
 }
 
 const PokerSessionDetailPageWithAuthorization = requireFeatureFlag(
-  authorizePage(PokerSessionDetailPage, 'Permission', 'Permissions.PokerSessions.View'),
+  authorizePage(
+    PokerSessionDetailPage,
+    'Permission',
+    'Permissions.PokerSessions.View',
+  ),
   'planning-poker',
 )
 

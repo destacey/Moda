@@ -2,7 +2,7 @@
 
 import { ClearOutlined, ReloadOutlined } from '@ant-design/icons'
 import { useGetProjectStatusOptionsQuery } from '@/src/store/features/ppm/projects-api'
-import { Button, Flex, Skeleton, Space } from 'antd'
+import { Button, Flex, Skeleton } from 'antd'
 import { ModaTooltip } from '@/src/components/common'
 import { FC, RefObject } from 'react'
 import styles from '../my-projects-dashboard.module.css'
@@ -62,56 +62,52 @@ const MyProjectsDashboardFilterBar: FC<MyProjectsDashboardFilterBarProps> = ({
   return (
     <div ref={containerRef} className={styles.filterBar}>
       <Flex align="center" gap={16} wrap>
-        <Space size="small" align="center">
+        <Flex gap={2} wrap align="center">
           <span className={styles.filterLabel}>My Role:</span>
-          <Flex gap={2}>
-            <Button
-              size="small"
-              className={styles.chipButton}
-              color={selectedRoles.length === 0 ? 'primary' : 'default'}
-              variant="outlined"
-              onClick={() => onRoleChange([])}
-            >
-              All
-            </Button>
-            {ROLE_OPTIONS.map((role) => {
-              const isSelected = selectedRoles.includes(role.value)
-              return (
-                <Button
-                  key={role.value}
-                  size="small"
-                  className={styles.chipButton}
-                  color={isSelected ? 'primary' : 'default'}
-                  variant="outlined"
-                  onClick={() => toggleRole(role.value)}
-                >
-                  {role.label}
-                </Button>
-              )
-            })}
-          </Flex>
-        </Space>
+          <Button
+            size="small"
+            className={styles.chipButton}
+            color={selectedRoles.length === 0 ? 'primary' : 'default'}
+            variant="outlined"
+            onClick={() => onRoleChange([])}
+          >
+            All
+          </Button>
+          {ROLE_OPTIONS.map((role) => {
+            const isSelected = selectedRoles.includes(role.value)
+            return (
+              <Button
+                key={role.value}
+                size="small"
+                className={styles.chipButton}
+                color={isSelected ? 'primary' : 'default'}
+                variant="outlined"
+                onClick={() => toggleRole(role.value)}
+              >
+                {role.label}
+              </Button>
+            )
+          })}
+        </Flex>
 
-        <Space size="small" align="center">
+        <Flex gap={2} wrap align="center">
           <span className={styles.filterLabel}>Status:</span>
-          <Flex gap={2}>
-            {statusOptions?.map((status) => {
-              const isSelected = selectedStatuses.includes(status.value)
-              return (
-                <Button
-                  key={status.value}
-                  size="small"
-                  className={styles.chipButton}
-                  color={isSelected ? 'primary' : 'default'}
-                  variant="outlined"
-                  onClick={() => toggleStatus(status.value)}
-                >
-                  {status.label}
-                </Button>
-              )
-            })}
-          </Flex>
-        </Space>
+          {statusOptions?.map((status) => {
+            const isSelected = selectedStatuses.includes(status.value)
+            return (
+              <Button
+                key={status.value}
+                size="small"
+                className={styles.chipButton}
+                color={isSelected ? 'primary' : 'default'}
+                variant="outlined"
+                onClick={() => toggleStatus(status.value)}
+              >
+                {status.label}
+              </Button>
+            )
+          })}
+        </Flex>
 
         <Flex gap={2}>
           <ModaTooltip title="Refresh Data">
