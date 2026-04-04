@@ -1,16 +1,17 @@
 import { ThemeConfig, theme } from 'antd'
+import { ThemeConstants } from './theme-constants'
 const { defaultAlgorithm } = theme
 
 const lightTheme: ThemeConfig = {
   algorithm: defaultAlgorithm,
   token: {
-    colorPrimary: '#2196f3',
+    colorPrimary: ThemeConstants.COLOR_PRIMARY,
     borderRadius: 4,
     wireframe: false,
   },
   components: {
     Layout: {
-      headerBg: '#2196f3',
+      headerBg: ThemeConstants.COLOR_PRIMARY,
     },
     Tabs: {
       colorBorderSecondary: '#d9d9d9',

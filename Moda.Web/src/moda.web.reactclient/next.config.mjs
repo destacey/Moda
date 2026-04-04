@@ -1,3 +1,5 @@
+import { withSerwist } from '@serwist/turbopack'
+
 /**
  * @type {import('next').NextConfig}
  */
@@ -8,4 +10,4 @@ const nextConfig = {
   },
 }
 
-export default nextConfig
+export default withSerwist(nextConfig)
