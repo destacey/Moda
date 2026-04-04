@@ -1,9 +1,18 @@
-import { spawnSync } from 'node:child_process'
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { createSerwistRoute } from '@serwist/turbopack'
 
-const revision =
-  spawnSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf-8' }).stdout?.trim() ??
-  crypto.randomUUID()
+// Use the Next.js build ID for stable cache revisions across cold starts.
+// Falls back to a UUID only during development when no build exists.
+let revision: string
+try {
+  revision = readFileSync(
+    join(process.cwd(), '.next', 'BUILD_ID'),
+    'utf-8',
+  ).trim()
+} catch {
+  revision = crypto.randomUUID()
+}
 
 export const { dynamic, dynamicParams, revalidate, generateStaticParams, GET } =
   createSerwistRoute({
@@ -11,3 +20,4 @@ export const { dynamic, dynamicParams, revalidate, generateStaticParams, GET } =
     swSrc: 'src/app/sw.ts',
     useNativeEsbuild: true,
   })
+
