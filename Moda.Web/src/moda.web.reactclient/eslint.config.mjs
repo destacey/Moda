@@ -23,7 +23,7 @@ const eslintConfig = [
     },
   }),
   {
-    ignores: ['coverage/**'],
+    ignores: ['coverage/**', 'src/services/moda-api.ts'],
   },
 ]
 
