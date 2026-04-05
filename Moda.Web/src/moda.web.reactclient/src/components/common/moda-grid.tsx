@@ -79,8 +79,7 @@ const ModaGrid = forwardRef<AgGridReact, ModaGridProps>(
     const showGridControls = gridControlMenuItems?.length > 0
 
     const gridRef = useRef<AgGridReact>(null)
-    const gridContainerRef = useRef<HTMLDivElement>(null)
-    const autoHeight = useRemainingHeight(gridContainerRef)
+    const [gridContainerRef, autoHeight] = useRemainingHeight()
 
     // Use explicit height if provided, otherwise fill remaining viewport space
     const resolvedHeight = height ?? autoHeight

@@ -116,8 +116,7 @@ function TreeGridInner<T extends TreeNode>(
   } = props
 
   // ─── Auto-height ─────────────────────────────────────────
-  const treeGridContainerRef = useRef<HTMLDivElement>(null)
-  const autoHeight = useRemainingHeight(treeGridContainerRef)
+  const [treeGridContainerRef, autoHeight] = useRemainingHeight()
   const resolvedHeight = height ?? autoHeight
 
   // ─── State ───────────────────────────────────────────────

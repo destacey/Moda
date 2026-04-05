@@ -14,7 +14,7 @@ import { QuestionCircleOutlined } from '@ant-design/icons'
 import { Button, Drawer, Grid, Tour } from 'antd'
 import { ModaTooltip } from '@/src/components/common'
 import { usePathname } from 'next/navigation'
-import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { FC, useCallback, useEffect, useMemo, useState } from 'react'
 import MyProjectsDashboardFilterBar from './_components/filter-bar'
 import MyProjectsSummaryBar from './_components/summary-bar'
 import PortfolioGroupList from './_components/portfolio-group-list'
@@ -55,8 +55,7 @@ const MyProjectsPage: FC = () => {
   )
   const screens = useBreakpoint()
   const isMobile = useMemo(() => !screens.md, [screens.md])
-  const layoutRef = useRef<HTMLDivElement>(null)
-  const layoutHeight = useRemainingHeight(layoutRef)
+  const [layoutRef, layoutHeight] = useRemainingHeight()
 
   const [selectedProjectKey, setSelectedProjectKey] = useState<string | null>(
     null,
