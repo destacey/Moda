@@ -29,6 +29,7 @@ function setWindowHeight(height: number) {
 
 // Store original values
 const originalInnerHeight = window.innerHeight
+const originalResizeObserver = global.ResizeObserver
 
 // Minimal ResizeObserver mock
 class MockResizeObserver {
@@ -45,6 +46,14 @@ class MockResizeObserver {
 
 beforeAll(() => {
   global.ResizeObserver = MockResizeObserver as unknown as typeof ResizeObserver
+})
+
+afterAll(() => {
+  if (originalResizeObserver) {
+    global.ResizeObserver = originalResizeObserver
+  } else {
+    delete (global as any).ResizeObserver
+  }
 })
 
 afterEach(() => {
@@ -140,7 +149,7 @@ describe('useRemainingHeight', () => {
     removeSpy.mockRestore()
   })
 
-  it('resets height when ref is detached (null)', () => {
+  it('retains last height when ref is detached', () => {
     setWindowHeight(1000)
     const el = createMockElement(200)
 
