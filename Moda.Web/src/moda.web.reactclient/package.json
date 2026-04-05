@@ -54,6 +54,7 @@
     "@opentelemetry/exporter-trace-otlp-grpc": "^0.213.0",
     "@opentelemetry/sdk-node": "^0.213.0",
     "@reduxjs/toolkit": "2.11.2",
+    "@swc/core": "1.15.18",
     "@tanstack/react-table": "^8.21.3",
     "@uiw/react-md-editor": "^4.0.11",
     "ag-grid-community": "35.1.0",
