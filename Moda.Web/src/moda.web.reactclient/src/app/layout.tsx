@@ -6,6 +6,7 @@ import React, {
   PropsWithChildren,
   useEffect,
   useMemo,
+  useState,
   useSyncExternalStore,
 } from 'react'
 import { Provider } from 'react-redux'
@@ -66,13 +67,22 @@ const UnauthenticatedView = () => {
 }
 
 /**
- * Shows loading state during MSAL initialization (before auth state is determined)
- * Must render the same markup as SsrFallback to avoid hydration mismatch
+ * Shows loading state during MSAL initialization (before auth state is determined).
+ * Renders null on the first pass to match the server-rendered HTML, then shows
+ * the loading UI on the client once mounted (avoids hydration mismatch).
  */
 const MsalInitializingView = () => {
   const { inProgress } = useMsal()
   const pathname = usePathname()
   const isLogoutRoute = pathname === '/logout'
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  // On the server (and first client render), return null to match SSR output
+  if (!isMounted) return null
 
   // Only show during MSAL startup - once ready, Auth/Unauth templates take over
   // Skip for local auth users (MSAL isn't relevant) and users with no cached accounts
@@ -87,7 +97,6 @@ const MsalInitializingView = () => {
     !isLocalAuthActive() &&
     hasCachedAccounts
   ) {
-    // Render same markup as SsrFallback to avoid hydration mismatch
     return (
       <div className={logoutStyles.pageBackground}>
         <div className={`${logoutStyles.bgCircle} ${logoutStyles.bgCircle1}`} />

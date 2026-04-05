@@ -39,7 +39,7 @@ import {
 } from './moda-api'
 import { tokenRequest } from '@/auth-config'
 import { InteractionRequiredAuthError } from '@azure/msal-browser'
-import { msalInstance } from '../components/contexts/auth/msal-instance'
+import { msalInstance, msalReady } from '../components/contexts/auth/msal-instance'
 
 const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL
 
@@ -150,6 +150,7 @@ axiosClient.interceptors.response.use(
       // Fall back to MSAL refresh
       if (msalInstance) {
         try {
+          await msalReady
           const accounts = msalInstance.getAllAccounts()
           if (accounts.length > 0) {
             const response = await msalInstance.acquireTokenSilent({
@@ -182,9 +183,13 @@ axiosClient.interceptors.request.use(
       return config
     }
 
-    // Fall back to MSAL token acquisition
+    // Fall back to MSAL token acquisition.
+    // Wait for MSAL to finish initializing and processing any pending redirect
+    // before attempting silent token acquisition, otherwise acquireTokenSilent
+    // throws block_iframe_reload during the startup window.
     let token: string | null = null
     try {
+      await msalReady
       const accounts = msalInstance?.getAllAccounts() ?? []
 
       if (accounts.length > 0) {
