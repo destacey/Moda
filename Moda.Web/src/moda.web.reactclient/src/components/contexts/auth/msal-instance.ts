@@ -14,12 +14,17 @@ export const msalInstance: IPublicClientApplication | null =
 // Resolves once MSAL has fully initialized and processed any pending redirect.
 // Axios interceptors must await this before calling acquireTokenSilent to avoid
 // block_iframe_reload errors during the startup window.
-// Both initialize() and handleRedirectPromise() return cached promises on
-// subsequent calls, so this is safe alongside MsalProvider's own initialization.
-export const msalReady: Promise<void> =
-  msalInstance
-    ? msalInstance
-        .initialize()
-        .then(() => msalInstance.handleRedirectPromise())
-        .then(() => {})
-    : Promise.resolve()
+// Lazy: only starts initialization on first await, so merely importing this
+// module in tests won't trigger crypto.subtle calls that jsdom doesn't support.
+let _msalReady: Promise<void> | null = null
+
+export function getMsalReady(): Promise<void> {
+  if (!msalInstance) return Promise.resolve()
+  if (!_msalReady) {
+    _msalReady = msalInstance
+      .initialize()
+      .then(() => msalInstance.handleRedirectPromise())
+      .then(() => {})
+  }
+  return _msalReady
+}
