@@ -1,7 +1,13 @@
 'use client'
 
 import '@/styles/globals.css'
-import React, { memo, PropsWithChildren, useEffect, useMemo, useSyncExternalStore } from 'react'
+import React, {
+  memo,
+  PropsWithChildren,
+  useEffect,
+  useMemo,
+  useSyncExternalStore,
+} from 'react'
 import { Provider } from 'react-redux'
 import { Inter } from 'next/font/google'
 import { App, Grid, Layout } from 'antd'
@@ -29,6 +35,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { isLocalAuthActive } from '../services/clients'
 
 const { Content } = Layout
+const { useBreakpoint } = Grid
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -119,7 +126,7 @@ const MsalInitializingView = () => {
 }
 
 const AppContent = memo(({ children }: PropsWithChildren) => {
-  const screens = Grid.useBreakpoint()
+  const screens = useBreakpoint()
   const isMobile = useMemo(() => !screens.md, [screens.md]) // md breakpoint is 768px in Ant Design
   const router = useRouter()
 
@@ -246,6 +253,12 @@ const RootLayout = ({ children }: React.PropsWithChildren) => {
             name="viewport"
             content="width=device-width, initial-scale=1, viewport-fit=cover"
           />
+          <link rel="apple-touch-icon" href="/moda-icon.png" />
+          <meta name="mobile-web-app-capable" content="yes" />
+          <meta
+            name="apple-mobile-web-app-status-bar-style"
+            content="default"
+          />
         </head>
         <body className={inter.className}>
           <SsrFallback />
@@ -261,14 +274,15 @@ const RootLayout = ({ children }: React.PropsWithChildren) => {
           name="viewport"
           content="width=device-width, initial-scale=1, viewport-fit=cover"
         />
+        <link rel="apple-touch-icon" href="/moda-icon.png" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       </head>
       <body className={inter.className}>
         <AntdRegistry>
           <Provider store={store}>
             <MsalProvider instance={msalInstance}>
-              <LocalOrMsalAuthGate>
-                {children}
-              </LocalOrMsalAuthGate>
+              <LocalOrMsalAuthGate>{children}</LocalOrMsalAuthGate>
               <MsalInitializingView />
             </MsalProvider>
           </Provider>

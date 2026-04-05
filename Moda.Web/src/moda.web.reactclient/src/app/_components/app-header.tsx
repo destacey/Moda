@@ -179,22 +179,33 @@ const AppHeader: FC = React.memo(() => {
         </Title>
       </Flex>
       <Flex align="center" gap={8}>
-        <Button
-          icon={<SearchOutlined />}
-          onClick={openSearch}
-          aria-label="Search (Ctrl+K)"
-          className={styles.searchTrigger}
-        >
-          <Text type="secondary">Search...</Text>
-          <Flex gap={4} className={styles.searchTriggerKbdGroup}>
-            <Tooltip title="Search app data">
-              <kbd className={styles.searchTriggerKbd}>Ctrl+K</kbd>
-            </Tooltip>
-            <Tooltip title="Search documentation">
-              <kbd className={styles.searchTriggerKbd}>Ctrl+K D</kbd>
-            </Tooltip>
-          </Flex>
-        </Button>
+        {isMobile ? (
+          <Tooltip title="Search (Ctrl+K)">
+            <Button
+              type="text"
+              icon={<SearchOutlined />}
+              onClick={openSearch}
+              aria-label="Search (Ctrl+K)"
+            />
+          </Tooltip>
+        ) : (
+          <Button
+            icon={<SearchOutlined />}
+            onClick={openSearch}
+            aria-label="Search (Ctrl+K)"
+            className={styles.searchTrigger}
+          >
+            <Text type="secondary">Search...</Text>
+            <Flex gap={4} className={styles.searchTriggerKbdGroup}>
+              <Tooltip title="Search app data">
+                <kbd className={styles.searchTriggerKbd}>Ctrl+K</kbd>
+              </Tooltip>
+              <Tooltip title="Search documentation">
+                <kbd className={styles.searchTriggerKbd}>Ctrl+K D</kbd>
+              </Tooltip>
+            </Flex>
+          </Button>
+        )}
         <Tooltip title="Documentation">
           <Button
             type="text"

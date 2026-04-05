@@ -1,8 +1,5 @@
 {
-  "extends": [
-    "development"
-  ],
   "hints": {
-    "typescript-config/strict": "off"
+    "apple-touch-icons": "off"
   }
 }

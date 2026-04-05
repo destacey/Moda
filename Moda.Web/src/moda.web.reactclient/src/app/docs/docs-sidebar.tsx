@@ -11,6 +11,7 @@ type MenuItem = Required<MenuProps>['items'][number]
 
 interface DocsSidebarProps {
   navigation: DocNavItem[]
+  onNavigate?: () => void
 }
 
 function buildMenuItems(items: DocNavItem[]): MenuItem[] {
@@ -51,7 +52,10 @@ function findOpenKeys(
   return []
 }
 
-export default function DocsSidebar({ navigation }: DocsSidebarProps) {
+export default function DocsSidebar({
+  navigation,
+  onNavigate,
+}: DocsSidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
 
@@ -70,6 +74,7 @@ export default function DocsSidebar({ navigation }: DocsSidebarProps) {
 
   const handleClick: MenuProps['onClick'] = ({ key }) => {
     router.push(key)
+    onNavigate?.()
   }
 
   return (

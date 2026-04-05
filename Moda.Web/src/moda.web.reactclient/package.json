@@ -14,6 +14,7 @@
     "test:docs": "jest --config jest.docs.config.ts --no-coverage"
   },
   "devDependencies": {
+    "@serwist/turbopack": "^9.5.7",
     "@testing-library/dom": "10.4.1",
     "@testing-library/jest-dom": "6.9.1",
     "@testing-library/react": "16.3.2",
@@ -25,6 +26,7 @@
     "@types/react-dom": "19.2.3",
     "@types/react-redux": "7.1.34",
     "baseline-browser-mapping": "^2.10.10",
+    "esbuild": "^0.28.0",
     "eslint": "9.39.2",
     "eslint-config-next": "16.2.1",
     "eslint-config-prettier": "10.1.8",
@@ -32,6 +34,7 @@
     "jest": "30.3.0",
     "jest-environment-jsdom": "30.3.0",
     "prettier": "3.8.1",
+    "serwist": "^9.5.7",
     "typescript": "5.9.3"
   },
   "dependencies": {
@@ -51,6 +54,7 @@
     "@opentelemetry/exporter-trace-otlp-grpc": "^0.213.0",
     "@opentelemetry/sdk-node": "^0.213.0",
     "@reduxjs/toolkit": "2.11.2",
+    "@swc/core": "1.15.18",
     "@tanstack/react-table": "^8.21.3",
     "@uiw/react-md-editor": "^4.0.11",
     "ag-grid-community": "35.1.0",

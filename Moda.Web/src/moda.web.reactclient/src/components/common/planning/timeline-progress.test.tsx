@@ -23,7 +23,9 @@ jest.mock('antd', () => {
 
 // Get reference to the mocked function after module is loaded
 const { Grid } = jest.requireMock<typeof import('antd')>('antd')
-const mockUseBreakpoint = Grid.useBreakpoint as jest.MockedFunction<typeof Grid.useBreakpoint>
+const mockUseBreakpoint = Grid.useBreakpoint as jest.MockedFunction<
+  typeof Grid.useBreakpoint
+>
 
 // Mock dayjs to control "now" for consistent tests
 jest.mock('dayjs', () => {
@@ -46,7 +48,8 @@ describe('TimelineProgress', () => {
 
   beforeEach(() => {
     // Set "now" to Nov 1, which is day 7 of 14 (50%)
-    ;(dayjs as unknown as { mockedNow: string }).mockedNow = '2025-11-01T12:00:00'
+    ;(dayjs as unknown as { mockedNow: string }).mockedNow =
+      '2025-11-01T12:00:00'
 
     // Reset the mock to default desktop breakpoints
     mockUseBreakpoint.mockReturnValue({
@@ -115,28 +118,35 @@ describe('TimelineProgress', () => {
 
   it('renders future timeline with 0% progress and starts-in text', () => {
     // Set "now" to 6 days before the start date
-    ;(dayjs as unknown as { mockedNow: string }).mockedNow = '2025-10-20T12:00:00'
+    ;(dayjs as unknown as { mockedNow: string }).mockedNow =
+      '2025-10-20T12:00:00'
 
     render(<TimelineProgress start={startDate} end={endDate} />)
 
     expect(screen.getByText('Timeline')).toBeInTheDocument()
     expect(screen.getByText('Oct 26')).toBeInTheDocument()
     expect(screen.getByText('Nov 8')).toBeInTheDocument()
-    expect(screen.getByText('Starts in 6 days · 14 day project')).toBeInTheDocument()
+    expect(
+      screen.getByText('Starts in 6 days · 14 day project'),
+    ).toBeInTheDocument()
   })
 
   it('renders singular day for future timeline starting tomorrow', () => {
     // Set "now" to 1 day before the start date
-    ;(dayjs as unknown as { mockedNow: string }).mockedNow = '2025-10-25T12:00:00'
+    ;(dayjs as unknown as { mockedNow: string }).mockedNow =
+      '2025-10-25T12:00:00'
 
     render(<TimelineProgress start={startDate} end={endDate} />)
 
-    expect(screen.getByText('Starts in 1 day · 14 day project')).toBeInTheDocument()
+    expect(
+      screen.getByText('Starts in 1 day · 14 day project'),
+    ).toBeInTheDocument()
   })
 
   it('clamps current day to total when after end date', () => {
     // Set "now" to after the end date
-    ;(dayjs as unknown as { mockedNow: string }).mockedNow = '2025-11-15T12:00:00'
+    ;(dayjs as unknown as { mockedNow: string }).mockedNow =
+      '2025-11-15T12:00:00'
 
     render(<TimelineProgress start={startDate} end={endDate} />)
 
@@ -145,7 +155,8 @@ describe('TimelineProgress', () => {
 
   it('calculates progress at start of timeline', () => {
     // Set "now" to start date
-    ;(dayjs as unknown as { mockedNow: string }).mockedNow = '2025-10-26T12:00:00'
+    ;(dayjs as unknown as { mockedNow: string }).mockedNow =
+      '2025-10-26T12:00:00'
 
     render(<TimelineProgress start={startDate} end={endDate} />)
 
@@ -154,7 +165,8 @@ describe('TimelineProgress', () => {
 
   it('calculates progress at end of timeline', () => {
     // Set "now" to end date
-    ;(dayjs as unknown as { mockedNow: string }).mockedNow = '2025-11-08T12:00:00'
+    ;(dayjs as unknown as { mockedNow: string }).mockedNow =
+      '2025-11-08T12:00:00'
 
     render(<TimelineProgress start={startDate} end={endDate} />)
 

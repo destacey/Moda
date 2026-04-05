@@ -449,6 +449,7 @@ const GlobalSearchModal: FC<GlobalSearchModalProps> = memo(
             justify="space-between"
             align="center"
             gap={16}
+            wrap
             style={{ padding: '6px 16px' }}
             className={styles.shortcutHint}
           >

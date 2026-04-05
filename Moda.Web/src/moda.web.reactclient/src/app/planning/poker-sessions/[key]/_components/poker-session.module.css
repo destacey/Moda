@@ -390,3 +390,67 @@
   align-items: center;
   gap: 16px;
 }
+
+/* ─── Mobile responsive ───────────────────────────────────────────────────── */
+
+.pageLayoutMobile {
+  flex-direction: column;
+}
+
+.pageLayoutMobile .sidebar {
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .votingCardPanel {
+    padding: 12px;
+  }
+
+  .cardFlipContainer {
+    width: 56px;
+  }
+
+  .cardFlipInner {
+    min-height: 72px;
+  }
+
+  .cardSymbol {
+    font-size: 20px;
+  }
+
+  .cardValue {
+    font-size: 18px;
+  }
+
+  .cardName {
+    font-size: 10px;
+    max-width: 52px;
+  }
+
+  .participantCard {
+    width: 56px;
+    min-height: 72px;
+  }
+
+  .estimationCard {
+    min-width: 44px;
+    height: 64px;
+    font-size: 16px;
+  }
+
+  .resultsPanel {
+    width: 100%;
+  }
+
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .lobbyState {
+    padding: 40px 16px;
+  }
+
+  .reviewHeader {
+    padding: 12px;
+  }
+}

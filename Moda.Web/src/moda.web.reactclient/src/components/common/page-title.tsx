@@ -1,4 +1,4 @@
-import { Col, Flex, Grid, Row, Space, Typography } from 'antd'
+import { Col, Flex, Grid, Row, Typography } from 'antd'
 import { ReactNode } from 'react'
 
 const { Title, Text } = Typography
@@ -27,7 +27,7 @@ const PageTitle = ({
   return (
     <>
       <Flex vertical gap={8} style={{ marginBottom: 12 }}>
-        <Row align={'middle'}>
+        <Row align={'middle'} gutter={[0, 8]}>
           <Col xs={24} sm={24} md={titleMdSize}>
             <Flex vertical={isSuperSmall} gap={isSuperSmall ? 8 : 12} align={isSuperSmall ? 'flex-start' : 'center'}>
               <div>
@@ -41,9 +41,14 @@ const PageTitle = ({
           </Col>
           {actions && (
             <Col xs={24} sm={24} md={8}>
-              <Space style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <Flex
+                wrap
+                gap={8}
+                justify={isSuperSmall ? 'flex-start' : 'flex-end'}
+                align="center"
+              >
                 {actions}
-              </Space>
+              </Flex>
             </Col>
           )}
         </Row>

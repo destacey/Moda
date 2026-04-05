@@ -29,6 +29,7 @@ body {
 /* Content layout adjustments */
 .app-main-content {
   flex: 1; /* Allows the content to grow and occupy remaining space */
+  overflow-x: hidden; /* Prevent horizontal scroll from negative-margin children (e.g. docs layout) */
   overflow-y: auto; /* Enable vertical scrolling for breadcrumb and content */
   padding: 0 24px 24px; /* 0 top, 24px left/right/bottom */
 }

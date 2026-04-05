@@ -16,6 +16,8 @@ export interface SessionSidebarProps {
   isCompleting: boolean
   canManage: boolean
   isActive: boolean
+  /** When true, renders content without the outer sidebar wrapper (for use inside a Drawer). */
+  inline?: boolean
 }
 
 const SessionSidebar: FC<SessionSidebarProps> = ({
@@ -27,35 +29,42 @@ const SessionSidebar: FC<SessionSidebarProps> = ({
   isCompleting,
   canManage,
   isActive,
+  inline,
 }) => {
   const rounds = session.rounds ?? []
 
+  const content = (
+    <>
+      {canManage && isActive && (
+        <>
+          <Divider style={{ margin: 0 }} />
+          <div style={{ padding: '12px 16px' }}>
+            <Button danger block onClick={onComplete} loading={isCompleting}>
+              Complete Session
+            </Button>
+          </div>
+        </>
+      )}
+      <SessionSummary rounds={rounds} />
+      {isActive && <Divider style={{ margin: 0 }} />}
+      <SessionTimeline
+        rounds={rounds}
+        selectedRoundId={selectedRoundId}
+        onSelectRound={onSelectRound}
+        onRemoveRound={onRemoveRound}
+        canManage={canManage}
+        sessionId={session.id}
+        sessionKey={session.key}
+        isActive={isActive}
+      />
+    </>
+  )
+
+  if (inline) return content
+
   return (
     <div className={styles.sidebar}>
-      <div className={styles.sidebarInner}>
-        {canManage && isActive && (
-          <>
-            <Divider style={{ margin: 0 }} />
-            <div style={{ padding: '12px 16px' }}>
-              <Button danger block onClick={onComplete} loading={isCompleting}>
-                Complete Session
-              </Button>
-            </div>
-          </>
-        )}
-        <SessionSummary rounds={rounds} />
-        {isActive && <Divider style={{ margin: 0 }} />}
-        <SessionTimeline
-          rounds={rounds}
-          selectedRoundId={selectedRoundId}
-          onSelectRound={onSelectRound}
-          onRemoveRound={onRemoveRound}
-          canManage={canManage}
-          sessionId={session.id}
-          sessionKey={session.key}
-          isActive={isActive}
-        />
-      </div>
+      <div className={styles.sidebarInner}>{content}</div>
     </div>
   )
 }

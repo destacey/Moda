@@ -11,18 +11,19 @@ import {
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import { useGetProjectsQuery } from '@/src/store/features/ppm/projects-api'
 import { QuestionCircleOutlined } from '@ant-design/icons'
-import { Button, Tour } from 'antd'
+import { Button, Drawer, Grid, Tour } from 'antd'
 import { ModaTooltip } from '@/src/components/common'
 import { usePathname } from 'next/navigation'
-import { FC, useCallback, useEffect, useRef, useState } from 'react'
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import MyProjectsDashboardFilterBar from './_components/filter-bar'
 import MyProjectsSummaryBar from './_components/summary-bar'
 import PortfolioGroupList from './_components/portfolio-group-list'
 import ProjectDetailPanel from './_components/project-detail-panel'
 import { useMyProjectsTour } from './_components/use-my-projects-tour'
 import styles from './my-projects-dashboard.module.css'
-import useAuth from '@/src/components/contexts/auth'
 import { useMessage } from '@/src/components/contexts/messaging'
+
+const { useBreakpoint } = Grid
 
 const PROJECT_STATUS = {
   Proposed: 1,
@@ -44,7 +45,6 @@ const MyProjectsPage: FC = () => {
   useDocumentTitle('My Projects')
   const dispatch = useAppDispatch()
   const pathname = usePathname()
-  const { user } = useAuth()
   const messageApi = useMessage()
   const [selectedStatuses, setSelectedStatuses] = useLocalStorageState<
     number[]
@@ -53,6 +53,8 @@ const MyProjectsPage: FC = () => {
     'my-projects-filter-roles',
     [],
   )
+  const screens = useBreakpoint()
+  const isMobile = useMemo(() => !screens.md, [screens.md])
   const layoutRef = useRef<HTMLDivElement>(null)
   const layoutHeight = useRemainingHeight(layoutRef)
 
@@ -162,24 +164,50 @@ const MyProjectsPage: FC = () => {
         isLoading={isLoading}
         containerRef={summaryBarRef}
       />
-      <div
-        ref={layoutRef}
-        className={styles.layout}
-        style={{ height: layoutHeight }}
-      >
-        <div ref={leftPanelRef} className={styles.leftPanel}>
-          <PortfolioGroupList
-            projects={projects}
-            isLoading={isLoading}
-            selectedProjectKey={selectedProjectKey}
-            selectedRoles={selectedRoles}
-            onSelectProject={setSelectedProjectKey}
-          />
+      {isMobile ? (
+        <>
+          <div ref={leftPanelRef}>
+            <PortfolioGroupList
+              projects={projects}
+              isLoading={isLoading}
+              selectedProjectKey={selectedProjectKey}
+              selectedRoles={selectedRoles}
+              onSelectProject={setSelectedProjectKey}
+            />
+          </div>
+          <Drawer
+            title="Project Details"
+            placement="bottom"
+            size="85vh"
+            onClose={() => setSelectedProjectKey(null)}
+            open={!!selectedProjectKey}
+            styles={{ body: { padding: 12 } }}
+          >
+            <div ref={rightPanelRef}>
+              <ProjectDetailPanel projectKey={selectedProjectKey} />
+            </div>
+          </Drawer>
+        </>
+      ) : (
+        <div
+          ref={layoutRef}
+          className={styles.layout}
+          style={{ height: layoutHeight }}
+        >
+          <div ref={leftPanelRef} className={styles.leftPanel}>
+            <PortfolioGroupList
+              projects={projects}
+              isLoading={isLoading}
+              selectedProjectKey={selectedProjectKey}
+              selectedRoles={selectedRoles}
+              onSelectProject={setSelectedProjectKey}
+            />
+          </div>
+          <div ref={rightPanelRef} className={styles.rightPanel}>
+            <ProjectDetailPanel projectKey={selectedProjectKey} />
+          </div>
         </div>
-        <div ref={rightPanelRef} className={styles.rightPanel}>
-          <ProjectDetailPanel projectKey={selectedProjectKey} />
-        </div>
-      </div>
+      )}
       <Tour
         open={tourOpen}
         onClose={onTourClose}
