@@ -29,7 +29,7 @@ public class CreateEstimationScaleCommandHandlerTests : IDisposable
             ["1", "2", "3", "5", "8"]);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -46,7 +46,7 @@ public class CreateEstimationScaleCommandHandlerTests : IDisposable
             ["S", "M", "L"]);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -63,7 +63,7 @@ public class CreateEstimationScaleCommandHandlerTests : IDisposable
             ["1"]);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();

@@ -43,7 +43,7 @@ public class SetConsensusCommandHandlerTests : IDisposable
         var command = new SetConsensusCommand(session.Id, round.Id, "5");
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -60,7 +60,7 @@ public class SetConsensusCommandHandlerTests : IDisposable
         var command = new SetConsensusCommand(Guid.NewGuid(), Guid.NewGuid(), "5");
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -82,7 +82,7 @@ public class SetConsensusCommandHandlerTests : IDisposable
         var command = new SetConsensusCommand(session.Id, round.Id, "5");
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -100,7 +100,7 @@ public class SetConsensusCommandHandlerTests : IDisposable
         var command = new SetConsensusCommand(session.Id, Guid.NewGuid(), "5");
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();

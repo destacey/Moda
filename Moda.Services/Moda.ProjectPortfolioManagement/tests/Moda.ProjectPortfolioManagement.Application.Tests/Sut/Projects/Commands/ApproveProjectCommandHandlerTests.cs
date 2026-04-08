@@ -38,7 +38,7 @@ public class ApproveProjectCommandHandlerTests : IDisposable
         var command = new ApproveProjectCommand(Guid.NewGuid());
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -58,7 +58,7 @@ public class ApproveProjectCommandHandlerTests : IDisposable
         var command = new ApproveProjectCommand(project.Id);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -76,7 +76,7 @@ public class ApproveProjectCommandHandlerTests : IDisposable
         var command = new ApproveProjectCommand(project.Id);
 
         // Act & Assert - the handler calls Entry().ReloadAsync() on failure which throws in fake context
-        var act = () => _handler.Handle(command, CancellationToken.None);
+        var act = () => _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // The handler catches the NotImplementedException from Entry() and returns a generic error
         var result = await act();
@@ -94,7 +94,7 @@ public class ApproveProjectCommandHandlerTests : IDisposable
         var command = new ApproveProjectCommand(project.Id);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert - handler catches NotImplementedException from Entry() and returns generic error
         result.IsFailure.Should().BeTrue();
@@ -111,7 +111,7 @@ public class ApproveProjectCommandHandlerTests : IDisposable
         var command = new ApproveProjectCommand(project.Id);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert - handler catches NotImplementedException from Entry() and returns generic error
         result.IsFailure.Should().BeTrue();
@@ -128,7 +128,7 @@ public class ApproveProjectCommandHandlerTests : IDisposable
         var command = new ApproveProjectCommand(project.Id);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert - handler catches NotImplementedException from Entry() and returns generic error
         result.IsFailure.Should().BeTrue();

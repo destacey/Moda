@@ -42,7 +42,7 @@ public class DeletePokerSessionCommandHandlerTests : IDisposable
         var command = new DeletePokerSessionCommand(session.Id);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -65,7 +65,7 @@ public class DeletePokerSessionCommandHandlerTests : IDisposable
         var command = new DeletePokerSessionCommand(session.Id);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -79,7 +79,7 @@ public class DeletePokerSessionCommandHandlerTests : IDisposable
         var command = new DeletePokerSessionCommand(Guid.NewGuid());
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();

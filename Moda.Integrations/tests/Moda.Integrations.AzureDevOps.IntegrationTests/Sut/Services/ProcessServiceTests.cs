@@ -35,7 +35,7 @@ public class ProcessServiceTests
             _mockLogger.Object);
 
         // Act
-        var result = await service.GetProcesses(CancellationToken.None);
+        var result = await service.GetProcesses(TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeNull();
@@ -60,7 +60,7 @@ public class ProcessServiceTests
             _mockLogger.Object);
 
         // Act
-        var result = await service.GetProcess(processId, CancellationToken.None);
+        var result = await service.GetProcess(processId, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeNull();
@@ -86,7 +86,7 @@ public class ProcessServiceTests
             _mockLogger.Object);
 
         // Act
-        var result = await service.GetProcess(processId, CancellationToken.None);
+        var result = await service.GetProcess(processId, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeNull();
@@ -122,7 +122,7 @@ public class ProcessServiceTests
             _mockLogger.Object);
 
         // Act
-        var result = await service.GetProcess(processId, CancellationToken.None);
+        var result = await service.GetProcess(processId, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeNull();
@@ -156,7 +156,7 @@ public class ProcessServiceTests
             _mockLogger.Object);
 
         // Act
-        var result = await service.GetProcess(processId, CancellationToken.None);
+        var result = await service.GetProcess(processId, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeNull();

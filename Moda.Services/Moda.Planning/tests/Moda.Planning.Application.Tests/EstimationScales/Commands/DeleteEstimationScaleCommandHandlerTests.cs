@@ -32,7 +32,7 @@ public class DeleteEstimationScaleCommandHandlerTests : IDisposable
         var command = new DeleteEstimationScaleCommand(scale.Id);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -51,7 +51,7 @@ public class DeleteEstimationScaleCommandHandlerTests : IDisposable
         var command = new DeleteEstimationScaleCommand(inactiveScale.Id);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -65,7 +65,7 @@ public class DeleteEstimationScaleCommandHandlerTests : IDisposable
         var command = new DeleteEstimationScaleCommand(999);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -88,7 +88,7 @@ public class DeleteEstimationScaleCommandHandlerTests : IDisposable
         var command = new DeleteEstimationScaleCommand(scale.Id);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -108,7 +108,7 @@ public class DeleteEstimationScaleCommandHandlerTests : IDisposable
         var command = new DeleteEstimationScaleCommand(scale.Id);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();

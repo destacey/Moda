@@ -32,7 +32,7 @@ public class SetEstimationScaleActiveStatusCommandHandlerTests : IDisposable
         var command = new SetEstimationScaleActiveStatusCommand(scale.Id, false);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -50,7 +50,7 @@ public class SetEstimationScaleActiveStatusCommandHandlerTests : IDisposable
         var command = new SetEstimationScaleActiveStatusCommand(inactiveScale.Id, true);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -65,7 +65,7 @@ public class SetEstimationScaleActiveStatusCommandHandlerTests : IDisposable
         var command = new SetEstimationScaleActiveStatusCommand(999, false);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -85,7 +85,7 @@ public class SetEstimationScaleActiveStatusCommandHandlerTests : IDisposable
         var command = new SetEstimationScaleActiveStatusCommand(scale.Id, false);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -104,7 +104,7 @@ public class SetEstimationScaleActiveStatusCommandHandlerTests : IDisposable
         var command = new SetEstimationScaleActiveStatusCommand(scale.Id, true);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -124,7 +124,7 @@ public class SetEstimationScaleActiveStatusCommandHandlerTests : IDisposable
         var command = new SetEstimationScaleActiveStatusCommand(inactiveScale.Id, false);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();

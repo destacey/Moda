@@ -38,7 +38,7 @@ public class GetCriticalPathQueryHandlerTests : IDisposable
         var query = new GetCriticalPathQuery(projectKey.Value);
 
         // Act
-        var result = await _handler.Handle(query, CancellationToken.None);
+        var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeNull();
@@ -52,7 +52,7 @@ public class GetCriticalPathQueryHandlerTests : IDisposable
         var query = new GetCriticalPathQuery("NONEXISTENT");
 
         // Act
-        var result = await _handler.Handle(query, CancellationToken.None);
+        var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeNull();
@@ -69,7 +69,7 @@ public class GetCriticalPathQueryHandlerTests : IDisposable
         var query = new GetCriticalPathQuery(project.Id.ToString());
 
         // Act
-        var result = await _handler.Handle(query, CancellationToken.None);
+        var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeNull();
@@ -87,7 +87,7 @@ public class GetCriticalPathQueryHandlerTests : IDisposable
         var query = new GetCriticalPathQuery("APOLLO");
 
         // Act
-        var result = await _handler.Handle(query, CancellationToken.None);
+        var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeNull();

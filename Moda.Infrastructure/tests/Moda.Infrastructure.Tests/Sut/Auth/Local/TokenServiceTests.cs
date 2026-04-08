@@ -89,7 +89,7 @@ public class TokenServiceTests
         _mockUserManager.Setup(x => x.UpdateAsync(user)).ReturnsAsync(IdentityResult.Success);
 
         // Act
-        var result = await _sut.GetTokenAsync(command, CancellationToken.None);
+        var result = await _sut.GetTokenAsync(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeNull();
@@ -121,7 +121,7 @@ public class TokenServiceTests
         _mockUserManager.Setup(x => x.UpdateAsync(user)).ReturnsAsync(IdentityResult.Success);
 
         // Act
-        var result = await _sut.GetTokenAsync(command, CancellationToken.None);
+        var result = await _sut.GetTokenAsync(command, TestContext.Current.CancellationToken);
 
         // Assert
         var handler = new JwtSecurityTokenHandler();
@@ -137,7 +137,7 @@ public class TokenServiceTests
         var command = new LoginCommand("unknown", "Password123!");
 
         // Act
-        var act = () => _sut.GetTokenAsync(command, CancellationToken.None);
+        var act = () => _sut.GetTokenAsync(command, TestContext.Current.CancellationToken);
 
         // Assert
         await act.Should().ThrowAsync<UnauthorizedException>()
@@ -155,7 +155,7 @@ public class TokenServiceTests
         var command = new LoginCommand("testuser", "Password123!");
 
         // Act
-        var act = () => _sut.GetTokenAsync(command, CancellationToken.None);
+        var act = () => _sut.GetTokenAsync(command, TestContext.Current.CancellationToken);
 
         // Assert
         await act.Should().ThrowAsync<UnauthorizedException>()
@@ -172,7 +172,7 @@ public class TokenServiceTests
         var command = new LoginCommand("testuser", "Password123!");
 
         // Act
-        var act = () => _sut.GetTokenAsync(command, CancellationToken.None);
+        var act = () => _sut.GetTokenAsync(command, TestContext.Current.CancellationToken);
 
         // Assert
         await act.Should().ThrowAsync<UnauthorizedException>()
@@ -190,7 +190,7 @@ public class TokenServiceTests
         var command = new LoginCommand("testuser", "wrong");
 
         // Act
-        var act = () => _sut.GetTokenAsync(command, CancellationToken.None);
+        var act = () => _sut.GetTokenAsync(command, TestContext.Current.CancellationToken);
 
         // Assert
         await act.Should().ThrowAsync<UnauthorizedException>()
@@ -208,7 +208,7 @@ public class TokenServiceTests
         var command = new LoginCommand("testuser", "Password123!");
 
         // Act
-        var act = () => _sut.GetTokenAsync(command, CancellationToken.None);
+        var act = () => _sut.GetTokenAsync(command, TestContext.Current.CancellationToken);
 
         // Assert
         await act.Should().ThrowAsync<UnauthorizedException>()
@@ -228,7 +228,7 @@ public class TokenServiceTests
         _mockUserManager.Setup(x => x.UpdateAsync(user)).ReturnsAsync(IdentityResult.Success);
 
         // Act
-        await _sut.GetTokenAsync(command, CancellationToken.None);
+        await _sut.GetTokenAsync(command, TestContext.Current.CancellationToken);
 
         // Assert
         user.RefreshToken.Should().NotBeNullOrWhiteSpace();
@@ -254,7 +254,7 @@ public class TokenServiceTests
             .ReturnsAsync(SignInResult.Success);
         _mockUserManager.Setup(x => x.UpdateAsync(user)).ReturnsAsync(IdentityResult.Success);
 
-        var initialTokenResponse = await _sut.GetTokenAsync(command, CancellationToken.None);
+        var initialTokenResponse = await _sut.GetTokenAsync(command, TestContext.Current.CancellationToken);
 
         // Update the user's refresh token to match what was generated
         var currentRefreshToken = user.RefreshToken;
@@ -266,7 +266,7 @@ public class TokenServiceTests
         var refreshCommand = new RefreshTokenCommand(initialTokenResponse.Token, currentRefreshToken!);
 
         // Act
-        var result = await _sut.RefreshTokenAsync(refreshCommand, CancellationToken.None);
+        var result = await _sut.RefreshTokenAsync(refreshCommand, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeNull();
@@ -288,7 +288,7 @@ public class TokenServiceTests
             .ReturnsAsync(SignInResult.Success);
         _mockUserManager.Setup(x => x.UpdateAsync(user)).ReturnsAsync(IdentityResult.Success);
 
-        var tokenResponse = await _sut.GetTokenAsync(new LoginCommand("testuser", "Password123!"), CancellationToken.None);
+        var tokenResponse = await _sut.GetTokenAsync(new LoginCommand("testuser", "Password123!"), TestContext.Current.CancellationToken);
         _mockUserManager.Setup(x => x.FindByIdAsync("user-1")).ReturnsAsync(user);
 
         // Force the stored refresh token to differ
@@ -296,7 +296,7 @@ public class TokenServiceTests
         var refreshCommand = new RefreshTokenCommand(tokenResponse.Token, "wrong-refresh-token");
 
         // Act
-        var act = () => _sut.RefreshTokenAsync(refreshCommand, CancellationToken.None);
+        var act = () => _sut.RefreshTokenAsync(refreshCommand, TestContext.Current.CancellationToken);
 
         // Assert
         await act.Should().ThrowAsync<UnauthorizedException>()
@@ -314,7 +314,7 @@ public class TokenServiceTests
             .ReturnsAsync(SignInResult.Success);
         _mockUserManager.Setup(x => x.UpdateAsync(user)).ReturnsAsync(IdentityResult.Success);
 
-        var tokenResponse = await _sut.GetTokenAsync(new LoginCommand("testuser", "Password123!"), CancellationToken.None);
+        var tokenResponse = await _sut.GetTokenAsync(new LoginCommand("testuser", "Password123!"), TestContext.Current.CancellationToken);
         var currentRefreshToken = user.RefreshToken;
 
         _mockUserManager.Setup(x => x.FindByIdAsync("user-1")).ReturnsAsync(user);
@@ -325,7 +325,7 @@ public class TokenServiceTests
         var refreshCommand = new RefreshTokenCommand(tokenResponse.Token, currentRefreshToken!);
 
         // Act
-        var act = () => _sut.RefreshTokenAsync(refreshCommand, CancellationToken.None);
+        var act = () => _sut.RefreshTokenAsync(refreshCommand, TestContext.Current.CancellationToken);
 
         // Assert
         await act.Should().ThrowAsync<UnauthorizedException>()
@@ -343,7 +343,7 @@ public class TokenServiceTests
             .ReturnsAsync(SignInResult.Success);
         _mockUserManager.Setup(x => x.UpdateAsync(user)).ReturnsAsync(IdentityResult.Success);
 
-        var tokenResponse = await _sut.GetTokenAsync(new LoginCommand("testuser", "Password123!"), CancellationToken.None);
+        var tokenResponse = await _sut.GetTokenAsync(new LoginCommand("testuser", "Password123!"), TestContext.Current.CancellationToken);
         var currentRefreshToken = user.RefreshToken;
 
         // Deactivate user after login
@@ -353,7 +353,7 @@ public class TokenServiceTests
         var refreshCommand = new RefreshTokenCommand(tokenResponse.Token, currentRefreshToken!);
 
         // Act
-        var act = () => _sut.RefreshTokenAsync(refreshCommand, CancellationToken.None);
+        var act = () => _sut.RefreshTokenAsync(refreshCommand, TestContext.Current.CancellationToken);
 
         // Assert
         await act.Should().ThrowAsync<UnauthorizedException>()
@@ -384,7 +384,7 @@ public class TokenServiceTests
         var command = new LoginCommand("testuser", "Password123!");
 
         // Act
-        var act = () => sut.GetTokenAsync(command, CancellationToken.None);
+        var act = () => sut.GetTokenAsync(command, TestContext.Current.CancellationToken);
 
         // Assert
         await act.Should().ThrowAsync<InvalidOperationException>()

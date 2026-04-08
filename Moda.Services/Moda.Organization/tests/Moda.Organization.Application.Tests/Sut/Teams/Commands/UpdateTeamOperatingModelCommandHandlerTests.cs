@@ -51,7 +51,7 @@ public class UpdateTeamOperatingModelCommandHandlerTests : IDisposable
             SizingMethod.Count);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -80,7 +80,7 @@ public class UpdateTeamOperatingModelCommandHandlerTests : IDisposable
             SizingMethod.StoryPoints);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -109,7 +109,7 @@ public class UpdateTeamOperatingModelCommandHandlerTests : IDisposable
             SizingMethod.Count);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -138,7 +138,7 @@ public class UpdateTeamOperatingModelCommandHandlerTests : IDisposable
             SizingMethod.StoryPoints);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -161,7 +161,7 @@ public class UpdateTeamOperatingModelCommandHandlerTests : IDisposable
             SizingMethod.Count);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -190,7 +190,7 @@ public class UpdateTeamOperatingModelCommandHandlerTests : IDisposable
             SizingMethod.Count);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -228,7 +228,7 @@ public class UpdateTeamOperatingModelCommandHandlerTests : IDisposable
             SizingMethod.Count);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -264,7 +264,7 @@ public class UpdateTeamOperatingModelCommandHandlerTests : IDisposable
             SizingMethod.Count);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();

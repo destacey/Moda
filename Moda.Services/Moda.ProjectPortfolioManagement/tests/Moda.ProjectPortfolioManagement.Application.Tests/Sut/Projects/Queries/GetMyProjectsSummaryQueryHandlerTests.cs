@@ -33,7 +33,7 @@ public class GetMyProjectsSummaryQueryHandlerTests : IDisposable
         var query = new GetMyProjectsSummaryQuery();
 
         // Act
-        var result = await _handler.Handle(query, CancellationToken.None);
+        var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeNull();
@@ -47,7 +47,7 @@ public class GetMyProjectsSummaryQueryHandlerTests : IDisposable
         var query = new GetMyProjectsSummaryQuery();
 
         // Act
-        var result = await _handler.Handle(query, CancellationToken.None);
+        var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeNull();
@@ -74,7 +74,7 @@ public class GetMyProjectsSummaryQueryHandlerTests : IDisposable
         var query = new GetMyProjectsSummaryQuery();
 
         // Act
-        var result = await _handler.Handle(query, CancellationToken.None);
+        var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
         // Assert
         result!.SponsorCount.Should().Be(1);
@@ -96,7 +96,7 @@ public class GetMyProjectsSummaryQueryHandlerTests : IDisposable
         var query = new GetMyProjectsSummaryQuery();
 
         // Act
-        var result = await _handler.Handle(query, CancellationToken.None);
+        var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
         // Assert
         result!.OwnerCount.Should().Be(1);
@@ -118,7 +118,7 @@ public class GetMyProjectsSummaryQueryHandlerTests : IDisposable
         var query = new GetMyProjectsSummaryQuery();
 
         // Act
-        var result = await _handler.Handle(query, CancellationToken.None);
+        var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
         // Assert
         result!.ManagerCount.Should().Be(1);
@@ -140,7 +140,7 @@ public class GetMyProjectsSummaryQueryHandlerTests : IDisposable
         var query = new GetMyProjectsSummaryQuery();
 
         // Act
-        var result = await _handler.Handle(query, CancellationToken.None);
+        var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
         // Assert
         result!.MemberCount.Should().Be(1);
@@ -164,7 +164,7 @@ public class GetMyProjectsSummaryQueryHandlerTests : IDisposable
         var query = new GetMyProjectsSummaryQuery();
 
         // Act
-        var result = await _handler.Handle(query, CancellationToken.None);
+        var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
         // Assert
         result!.AssigneeCount.Should().Be(1);
@@ -187,7 +187,7 @@ public class GetMyProjectsSummaryQueryHandlerTests : IDisposable
         var query = new GetMyProjectsSummaryQuery();
 
         // Act
-        var result = await _handler.Handle(query, CancellationToken.None);
+        var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
         // Assert
         result!.SponsorCount.Should().Be(1);
@@ -218,7 +218,7 @@ public class GetMyProjectsSummaryQueryHandlerTests : IDisposable
         var query = new GetMyProjectsSummaryQuery();
 
         // Act
-        var result = await _handler.Handle(query, CancellationToken.None);
+        var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
         // Assert
         result!.SponsorCount.Should().Be(1);
@@ -242,7 +242,7 @@ public class GetMyProjectsSummaryQueryHandlerTests : IDisposable
         var query = new GetMyProjectsSummaryQuery();
 
         // Act
-        var result = await _handler.Handle(query, CancellationToken.None);
+        var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
         // Assert
         result!.TotalCount.Should().Be(0);
@@ -274,7 +274,7 @@ public class GetMyProjectsSummaryQueryHandlerTests : IDisposable
         var query = new GetMyProjectsSummaryQuery(StatusFilter: [ProjectStatus.Active]);
 
         // Act
-        var result = await _handler.Handle(query, CancellationToken.None);
+        var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
         // Assert
         result!.TotalCount.Should().Be(1);
@@ -306,7 +306,7 @@ public class GetMyProjectsSummaryQueryHandlerTests : IDisposable
         var query = new GetMyProjectsSummaryQuery();
 
         // Act
-        var result = await _handler.Handle(query, CancellationToken.None);
+        var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
         // Assert
         result!.TotalCount.Should().Be(2);
@@ -336,7 +336,7 @@ public class GetMyProjectsSummaryQueryHandlerTests : IDisposable
         var query = new GetMyProjectsSummaryQuery();
 
         // Act
-        var result = await _handler.Handle(query, CancellationToken.None);
+        var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
         // Assert
         result!.ManagerCount.Should().Be(1);

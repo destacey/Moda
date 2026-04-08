@@ -40,7 +40,7 @@ public class AssignProjectLifecycleCommandHandlerTests : IDisposable
         var command = new AssignProjectLifecycleCommand(Guid.NewGuid(), Guid.NewGuid());
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -58,7 +58,7 @@ public class AssignProjectLifecycleCommandHandlerTests : IDisposable
         var command = new AssignProjectLifecycleCommand(project.Id, Guid.NewGuid());
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -79,7 +79,7 @@ public class AssignProjectLifecycleCommandHandlerTests : IDisposable
         var command = new AssignProjectLifecycleCommand(project.Id, lifecycle.Id);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -103,7 +103,7 @@ public class AssignProjectLifecycleCommandHandlerTests : IDisposable
         var command = new AssignProjectLifecycleCommand(project.Id, secondLifecycle.Id);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -124,7 +124,7 @@ public class AssignProjectLifecycleCommandHandlerTests : IDisposable
         var command = new AssignProjectLifecycleCommand(project.Id, lifecycle.Id);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
