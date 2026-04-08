@@ -1,6 +1,5 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Moda.Integrations.AzureDevOps.Utils;
-using Xunit.Abstractions;
 
 namespace Moda.Integrations.AzureDevOps.Tests.Sut.Utils;
 
