@@ -64,7 +64,7 @@ public class GetProjectsPlanSummariesQueryHandlerTests : IDisposable
     {
         var result = await _handler.Handle(
             new GetProjectsPlanSummariesQuery([]),
-            CancellationToken.None);
+            TestContext.Current.CancellationToken);
 
         result.Should().BeEmpty();
     }
@@ -79,7 +79,7 @@ public class GetProjectsPlanSummariesQueryHandlerTests : IDisposable
 
         var result = await _handler.Handle(
             new GetProjectsPlanSummariesQuery([project.Id]),
-            CancellationToken.None);
+            TestContext.Current.CancellationToken);
 
         result.Should().BeEmpty();
     }
@@ -107,7 +107,7 @@ public class GetProjectsPlanSummariesQueryHandlerTests : IDisposable
         // Act
         var result = await _handler.Handle(
             new GetProjectsPlanSummariesQuery([project.Id]),
-            CancellationToken.None);
+            TestContext.Current.CancellationToken);
 
         // Assert: PM should see ALL overdue tasks on the project
         result.Should().ContainKey(project.Id);
@@ -135,7 +135,7 @@ public class GetProjectsPlanSummariesQueryHandlerTests : IDisposable
         // Act
         var result = await _handler.Handle(
             new GetProjectsPlanSummariesQuery([project.Id]),
-            CancellationToken.None);
+            TestContext.Current.CancellationToken);
 
         // Assert: user is only a task assignee, should only see their 1 task
         result.Should().ContainKey(project.Id);
@@ -181,7 +181,7 @@ public class GetProjectsPlanSummariesQueryHandlerTests : IDisposable
         // Act
         var result = await _handler.Handle(
             new GetProjectsPlanSummariesQuery([projectA.Id, projectB.Id]),
-            CancellationToken.None);
+            TestContext.Current.CancellationToken);
 
         // Assert: per-project results
         result.Should().ContainKey(projectA.Id);
@@ -215,7 +215,7 @@ public class GetProjectsPlanSummariesQueryHandlerTests : IDisposable
         // Act — filtered to Task Assignee role only
         var result = await _handler.Handle(
             new GetProjectsPlanSummariesQuery([project.Id], RoleFilter: [ProjectMemberRole.Assignee]),
-            CancellationToken.None);
+            TestContext.Current.CancellationToken);
 
         // Assert: even though user is Owner, filter says Assignee only — count only assigned tasks
         result.Should().ContainKey(project.Id);
@@ -247,7 +247,7 @@ public class GetProjectsPlanSummariesQueryHandlerTests : IDisposable
         // Act — filtered to PM + Task Assignee (user is Owner, not PM)
         var result = await _handler.Handle(
             new GetProjectsPlanSummariesQuery([project.Id], RoleFilter: [ProjectMemberRole.Manager, ProjectMemberRole.Assignee]),
-            CancellationToken.None);
+            TestContext.Current.CancellationToken);
 
         // Assert: user is Owner but PM is the selected leadership role — Owner doesn't match,
         // so tasks are scoped to assignee only
@@ -279,7 +279,7 @@ public class GetProjectsPlanSummariesQueryHandlerTests : IDisposable
         // Act — filtered to Owner + Task Assignee
         var result = await _handler.Handle(
             new GetProjectsPlanSummariesQuery([project.Id], RoleFilter: [ProjectMemberRole.Owner, ProjectMemberRole.Assignee]),
-            CancellationToken.None);
+            TestContext.Current.CancellationToken);
 
         // Assert: Owner is in the selected leadership roles — all tasks counted
         result.Should().ContainKey(project.Id);
@@ -316,7 +316,7 @@ public class GetProjectsPlanSummariesQueryHandlerTests : IDisposable
         // Act
         var result = await _handler.Handle(
             new GetProjectsPlanSummariesQuery([project.Id]),
-            CancellationToken.None);
+            TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().ContainKey(project.Id);
@@ -345,7 +345,7 @@ public class GetProjectsPlanSummariesQueryHandlerTests : IDisposable
         // Act
         var result = await _handler.Handle(
             new GetProjectsPlanSummariesQuery([project.Id]),
-            CancellationToken.None);
+            TestContext.Current.CancellationToken);
 
         // Assert: TotalLeafTasks should be scoped to visible tasks (1, not 3)
         result.Should().ContainKey(project.Id);

@@ -41,7 +41,7 @@ public class CreateProjectCommandHandlerTests : IDisposable
             null, portfolio.Id, null, null, null, null, null, null, null);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -63,7 +63,7 @@ public class CreateProjectCommandHandlerTests : IDisposable
             null, portfolio.Id, null, null, null, null, null, null, null);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -83,7 +83,7 @@ public class CreateProjectCommandHandlerTests : IDisposable
             null, Guid.NewGuid(), null, null, null, null, null, null, null);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -105,7 +105,7 @@ public class CreateProjectCommandHandlerTests : IDisposable
             null, portfolio.Id, null, null, null, null, null, null, null);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -132,7 +132,7 @@ public class CreateProjectCommandHandlerTests : IDisposable
             null, portfolio.Id, null, lifecycle.Id, null, null, null, null, null);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -158,7 +158,7 @@ public class CreateProjectCommandHandlerTests : IDisposable
             null, portfolio.Id, null, Guid.NewGuid(), null, null, null, null, null);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -182,7 +182,7 @@ public class CreateProjectCommandHandlerTests : IDisposable
             null, portfolio.Id, null, lifecycle.Id, null, null, null, null, null);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();

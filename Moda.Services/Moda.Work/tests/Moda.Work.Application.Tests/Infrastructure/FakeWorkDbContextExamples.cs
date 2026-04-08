@@ -19,8 +19,8 @@ public class FakeWorkDbContextExamples
 
         // Act
         context.AddWorkspace(workspace);
-        var count1 = await context.SaveChangesAsync();
-        var count2 = await context.SaveChangesAsync();
+        var count1 = await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+        var count2 = await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Assert
         context.SaveChangesCallCount.Should().Be(2);
@@ -36,7 +36,7 @@ public class FakeWorkDbContextExamples
         var workspace = new WorkspaceFaker().AsExternal().Generate();
         
         context.AddWorkspace(workspace);
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
         context.SaveChangesCallCount.Should().Be(1);
 
         // Act
@@ -55,7 +55,7 @@ public class FakeWorkDbContextExamples
         var workspace = new WorkspaceFaker().AsExternal().Generate();
         
         context.AddWorkspace(workspace);
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
         context.Dispose();

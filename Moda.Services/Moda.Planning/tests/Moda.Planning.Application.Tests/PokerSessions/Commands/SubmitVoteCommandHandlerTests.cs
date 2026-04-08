@@ -51,7 +51,7 @@ public class SubmitVoteCommandHandlerTests : IDisposable
         var command = new SubmitVoteCommand(session.Id, round.Id, "8");
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -79,7 +79,7 @@ public class SubmitVoteCommandHandlerTests : IDisposable
         var command = new SubmitVoteCommand(session.Id, round.Id, "8");
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -95,7 +95,7 @@ public class SubmitVoteCommandHandlerTests : IDisposable
         var command = new SubmitVoteCommand(Guid.NewGuid(), Guid.NewGuid(), "5");
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -119,7 +119,7 @@ public class SubmitVoteCommandHandlerTests : IDisposable
         var command = new SubmitVoteCommand(session.Id, round.Id, "5");
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -137,7 +137,7 @@ public class SubmitVoteCommandHandlerTests : IDisposable
         var command = new SubmitVoteCommand(session.Id, Guid.NewGuid(), "5");
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();

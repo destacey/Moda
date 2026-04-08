@@ -55,7 +55,7 @@ public class SyncExternalWorkItemsCommandHandlerTests : IDisposable
             []);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -73,7 +73,7 @@ public class SyncExternalWorkItemsCommandHandlerTests : IDisposable
         // No workspace added - simulates non-existent workspace
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -96,7 +96,7 @@ public class SyncExternalWorkItemsCommandHandlerTests : IDisposable
         // No work process added - simulates workspace without work process
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -133,7 +133,7 @@ public class SyncExternalWorkItemsCommandHandlerTests : IDisposable
         _fakeWorkDbContext.AddWorkProcess(updatedWorkProcess);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -171,7 +171,7 @@ public class SyncExternalWorkItemsCommandHandlerTests : IDisposable
         _fakeWorkDbContext.AddWorkProcess(updatedWorkProcess);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -195,7 +195,7 @@ public class SyncExternalWorkItemsCommandHandlerTests : IDisposable
 
         // Act & Assert
         await Assert.ThrowsAsync<InvalidOperationException>(async () =>
-            await handlerWithMock.Handle(command, CancellationToken.None));
+            await handlerWithMock.Handle(command, TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -209,7 +209,7 @@ public class SyncExternalWorkItemsCommandHandlerTests : IDisposable
         // No workspace added - simulates not found
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -240,7 +240,7 @@ public class SyncExternalWorkItemsCommandHandlerTests : IDisposable
 
         // Act
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
-            await handlerWithMock.Handle(command, CancellationToken.None));
+            await handlerWithMock.Handle(command, TestContext.Current.CancellationToken));
 
         // Assert
         exception.Message.Should().Be("Database error");

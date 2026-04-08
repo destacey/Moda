@@ -40,7 +40,7 @@ public class UpdatePokerRoundLabelCommandHandlerTests : IDisposable
         var command = new UpdatePokerRoundLabelCommand(session.Id, round.Id, "Updated Label");
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -62,7 +62,7 @@ public class UpdatePokerRoundLabelCommandHandlerTests : IDisposable
         var command = new UpdatePokerRoundLabelCommand(session.Id, round.Id, null);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -84,7 +84,7 @@ public class UpdatePokerRoundLabelCommandHandlerTests : IDisposable
         var command = new UpdatePokerRoundLabelCommand(session.Id, round.Id, "  Trimmed Label  ");
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -98,7 +98,7 @@ public class UpdatePokerRoundLabelCommandHandlerTests : IDisposable
         var command = new UpdatePokerRoundLabelCommand(Guid.NewGuid(), Guid.NewGuid(), "Label");
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -116,7 +116,7 @@ public class UpdatePokerRoundLabelCommandHandlerTests : IDisposable
         var command = new UpdatePokerRoundLabelCommand(session.Id, Guid.NewGuid(), "Label");
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -133,7 +133,7 @@ public class UpdatePokerRoundLabelCommandHandlerTests : IDisposable
         var command = new UpdatePokerRoundLabelCommand(session.Id, Guid.NewGuid(), "Label");
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();

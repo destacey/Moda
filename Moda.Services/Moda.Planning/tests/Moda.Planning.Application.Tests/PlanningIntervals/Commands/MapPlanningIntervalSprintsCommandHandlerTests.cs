@@ -39,7 +39,7 @@ public class MapPlanningIntervalSprintsCommandHandlerTests : IDisposable
             new Dictionary<Guid, Guid?>());
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -69,7 +69,7 @@ public class MapPlanningIntervalSprintsCommandHandlerTests : IDisposable
             new Dictionary<Guid, Guid?>());
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -109,7 +109,7 @@ public class MapPlanningIntervalSprintsCommandHandlerTests : IDisposable
             });
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -159,7 +159,7 @@ public class MapPlanningIntervalSprintsCommandHandlerTests : IDisposable
             });
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -216,7 +216,7 @@ public class MapPlanningIntervalSprintsCommandHandlerTests : IDisposable
             });
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -252,7 +252,7 @@ public class MapPlanningIntervalSprintsCommandHandlerTests : IDisposable
             });
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -288,7 +288,7 @@ public class MapPlanningIntervalSprintsCommandHandlerTests : IDisposable
             });
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -325,7 +325,7 @@ public class MapPlanningIntervalSprintsCommandHandlerTests : IDisposable
             });
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -361,8 +361,8 @@ public class MapPlanningIntervalSprintsCommandHandlerTests : IDisposable
             });
 
         // Act
-        var result1 = await _handler.Handle(command, CancellationToken.None);
-        var result2 = await _handler.Handle(command, CancellationToken.None);
+        var result1 = await _handler.Handle(command, TestContext.Current.CancellationToken);
+        var result2 = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result1.IsSuccess.Should().BeTrue();
@@ -415,7 +415,7 @@ public class MapPlanningIntervalSprintsCommandHandlerTests : IDisposable
             new Dictionary<Guid, Guid?>());
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();

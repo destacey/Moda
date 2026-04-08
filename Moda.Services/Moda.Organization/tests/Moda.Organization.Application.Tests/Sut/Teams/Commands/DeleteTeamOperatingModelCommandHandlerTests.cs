@@ -44,7 +44,7 @@ public class DeleteTeamOperatingModelCommandHandlerTests : IDisposable
         var command = new DeleteTeamOperatingModelCommand(team.Id, operatingModelId);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert - Cannot remove the last operating model
         result.IsFailure.Should().BeTrue();
@@ -63,7 +63,7 @@ public class DeleteTeamOperatingModelCommandHandlerTests : IDisposable
         var command = new DeleteTeamOperatingModelCommand(nonExistentTeamId, operatingModelId);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -86,7 +86,7 @@ public class DeleteTeamOperatingModelCommandHandlerTests : IDisposable
         var command = new DeleteTeamOperatingModelCommand(team.Id, nonExistentOperatingModelId);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -126,7 +126,7 @@ public class DeleteTeamOperatingModelCommandHandlerTests : IDisposable
         var command = new DeleteTeamOperatingModelCommand(team.Id, secondModelId);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();

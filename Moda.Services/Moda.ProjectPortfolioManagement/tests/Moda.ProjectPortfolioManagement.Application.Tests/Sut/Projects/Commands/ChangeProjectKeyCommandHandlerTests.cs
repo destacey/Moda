@@ -38,7 +38,7 @@ public class ChangeProjectKeyCommandHandlerTests : IDisposable
         var command = new ChangeProjectKeyCommand(Guid.NewGuid(), new ProjectKey("NEWKEY"));
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -60,7 +60,7 @@ public class ChangeProjectKeyCommandHandlerTests : IDisposable
         var command = new ChangeProjectKeyCommand(project.Id, new ProjectKey("CHANGED"));
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();

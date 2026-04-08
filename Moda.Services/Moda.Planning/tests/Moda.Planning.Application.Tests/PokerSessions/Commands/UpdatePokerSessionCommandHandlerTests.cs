@@ -47,7 +47,7 @@ public class UpdatePokerSessionCommandHandlerTests : IDisposable
         var command = new UpdatePokerSessionCommand(session.Id, "Updated Name", newScale.Id);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -75,7 +75,7 @@ public class UpdatePokerSessionCommandHandlerTests : IDisposable
         var command = new UpdatePokerSessionCommand(session.Id, "Updated Name", scale.Id);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -105,7 +105,7 @@ public class UpdatePokerSessionCommandHandlerTests : IDisposable
         var command = new UpdatePokerSessionCommand(session.Id, "Updated Name", newScale.Id);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -122,7 +122,7 @@ public class UpdatePokerSessionCommandHandlerTests : IDisposable
         var command = new UpdatePokerSessionCommand(Guid.NewGuid(), "Name", 1);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -146,7 +146,7 @@ public class UpdatePokerSessionCommandHandlerTests : IDisposable
         var command = new UpdatePokerSessionCommand(session.Id, "Updated Name", 999);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -170,7 +170,7 @@ public class UpdatePokerSessionCommandHandlerTests : IDisposable
         var command = new UpdatePokerSessionCommand(session.Id, "Updated Name", scale.Id);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();

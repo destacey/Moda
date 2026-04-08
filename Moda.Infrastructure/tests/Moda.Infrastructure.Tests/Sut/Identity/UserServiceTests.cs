@@ -112,7 +112,7 @@ public class UserServiceTests
         var sut = CreateSut();
 
         // Act
-        var result = await sut.CreateAsync(command, CancellationToken.None);
+        var result = await sut.CreateAsync(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -150,7 +150,7 @@ public class UserServiceTests
         var sut = CreateSut();
 
         // Act
-        var result = await sut.CreateAsync(command, CancellationToken.None);
+        var result = await sut.CreateAsync(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -180,7 +180,7 @@ public class UserServiceTests
         var sut = CreateSut();
 
         // Act
-        var result = await sut.CreateAsync(command, CancellationToken.None);
+        var result = await sut.CreateAsync(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -213,7 +213,7 @@ public class UserServiceTests
         var sut = CreateSut();
 
         // Act
-        var result = await sut.CreateAsync(command, CancellationToken.None);
+        var result = await sut.CreateAsync(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -328,7 +328,7 @@ public class UserServiceTests
         var sut = CreateSut();
 
         // Act
-        var result = await sut.ActivateUserAsync(command, CancellationToken.None);
+        var result = await sut.ActivateUserAsync(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -349,7 +349,7 @@ public class UserServiceTests
         var sut = CreateSut();
 
         // Act
-        var result = await sut.ActivateUserAsync(command, CancellationToken.None);
+        var result = await sut.ActivateUserAsync(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -366,7 +366,7 @@ public class UserServiceTests
         var sut = CreateSut();
 
         // Act
-        var act = () => sut.ActivateUserAsync(command, CancellationToken.None);
+        var act = () => sut.ActivateUserAsync(command, TestContext.Current.CancellationToken);
 
         // Assert
         await act.Should().ThrowAsync<NotFoundException>();
@@ -389,7 +389,7 @@ public class UserServiceTests
         var sut = CreateSut();
 
         // Act
-        var result = await sut.DeactivateUserAsync(command, CancellationToken.None);
+        var result = await sut.DeactivateUserAsync(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -411,7 +411,7 @@ public class UserServiceTests
         var sut = CreateSut();
 
         // Act
-        var result = await sut.DeactivateUserAsync(command, CancellationToken.None);
+        var result = await sut.DeactivateUserAsync(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -432,7 +432,7 @@ public class UserServiceTests
         var sut = CreateSut();
 
         // Act
-        var result = await sut.DeactivateUserAsync(command, CancellationToken.None);
+        var result = await sut.DeactivateUserAsync(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -451,7 +451,7 @@ public class UserServiceTests
         var sut = CreateSut();
 
         // Act
-        var result = await sut.DeactivateUserAsync(command, CancellationToken.None);
+        var result = await sut.DeactivateUserAsync(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -470,7 +470,7 @@ public class UserServiceTests
         var sut = CreateSut();
 
         // Act
-        var act = () => sut.DeactivateUserAsync(command, CancellationToken.None);
+        var act = () => sut.DeactivateUserAsync(command, TestContext.Current.CancellationToken);
 
         // Assert
         await act.Should().ThrowAsync<NotFoundException>();
@@ -496,7 +496,7 @@ public class UserServiceTests
         var sut = CreateSut();
 
         // Act
-        var result = await sut.AssignRolesAsync(command, CancellationToken.None);
+        var result = await sut.AssignRolesAsync(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -519,7 +519,7 @@ public class UserServiceTests
         var sut = CreateSut();
 
         // Act
-        var act = () => sut.AssignRolesAsync(command, CancellationToken.None);
+        var act = () => sut.AssignRolesAsync(command, TestContext.Current.CancellationToken);
 
         // Assert
         await act.Should().ThrowAsync<ConflictException>()
@@ -536,7 +536,7 @@ public class UserServiceTests
         var sut = CreateSut();
 
         // Act
-        var act = () => sut.AssignRolesAsync(command, CancellationToken.None);
+        var act = () => sut.AssignRolesAsync(command, TestContext.Current.CancellationToken);
 
         // Assert
         await act.Should().ThrowAsync<NotFoundException>();

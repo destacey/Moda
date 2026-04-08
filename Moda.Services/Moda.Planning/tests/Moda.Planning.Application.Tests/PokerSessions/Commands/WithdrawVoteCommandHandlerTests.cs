@@ -47,7 +47,7 @@ public class WithdrawVoteCommandHandlerTests : IDisposable
         var command = new WithdrawVoteCommand(session.Id, round.Id);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -69,7 +69,7 @@ public class WithdrawVoteCommandHandlerTests : IDisposable
         var command = new WithdrawVoteCommand(session.Id, round.Id);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -84,7 +84,7 @@ public class WithdrawVoteCommandHandlerTests : IDisposable
         var command = new WithdrawVoteCommand(Guid.NewGuid(), Guid.NewGuid());
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();

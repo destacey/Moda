@@ -80,7 +80,7 @@ public class GetMyProjectsTaskMetricsQueryHandlerTests : IDisposable
         _dbContext.AddProjectTasks(tasks);
 
         // Act
-        var result = await _handler.Handle(new GetMyProjectsTaskMetricsQuery(), CancellationToken.None);
+        var result = await _handler.Handle(new GetMyProjectsTaskMetricsQuery(), TestContext.Current.CancellationToken);
 
         // Assert: PM should see ALL overdue tasks on the project, not just their own
         result.Overdue.Should().Be(2);
@@ -105,7 +105,7 @@ public class GetMyProjectsTaskMetricsQueryHandlerTests : IDisposable
         _dbContext.AddProjectTasks(tasks);
 
         // Act
-        var result = await _handler.Handle(new GetMyProjectsTaskMetricsQuery(), CancellationToken.None);
+        var result = await _handler.Handle(new GetMyProjectsTaskMetricsQuery(), TestContext.Current.CancellationToken);
 
         // Assert: user is only a task assignee (no project role), should only see their 1 task
         result.Overdue.Should().Be(1);
@@ -132,7 +132,7 @@ public class GetMyProjectsTaskMetricsQueryHandlerTests : IDisposable
         _dbContext.AddProjectTasks(tasks);
 
         // Act
-        var result = await _handler.Handle(new GetMyProjectsTaskMetricsQuery(), CancellationToken.None);
+        var result = await _handler.Handle(new GetMyProjectsTaskMetricsQuery(), TestContext.Current.CancellationToken);
 
         // Assert: PM sees all tasks, the task they're assigned to should not be double-counted
         result.Overdue.Should().Be(2);
@@ -175,7 +175,7 @@ public class GetMyProjectsTaskMetricsQueryHandlerTests : IDisposable
         _dbContext.AddProjectTasks(tasksB);
 
         // Act
-        var result = await _handler.Handle(new GetMyProjectsTaskMetricsQuery(), CancellationToken.None);
+        var result = await _handler.Handle(new GetMyProjectsTaskMetricsQuery(), TestContext.Current.CancellationToken);
 
         // Assert:
         // Project A (PM): all 3 tasks counted
@@ -205,7 +205,7 @@ public class GetMyProjectsTaskMetricsQueryHandlerTests : IDisposable
         _dbContext.AddProjectTasks(tasks);
 
         // Act
-        var result = await _handler.Handle(new GetMyProjectsTaskMetricsQuery(), CancellationToken.None);
+        var result = await _handler.Handle(new GetMyProjectsTaskMetricsQuery(), TestContext.Current.CancellationToken);
 
         // Assert: Member should only see their assigned tasks, not all tasks on the project
         result.Overdue.Should().Be(1);
@@ -234,7 +234,7 @@ public class GetMyProjectsTaskMetricsQueryHandlerTests : IDisposable
         _dbContext.AddProjectTasks(tasks);
 
         // Act
-        var result = await _handler.Handle(new GetMyProjectsTaskMetricsQuery(), CancellationToken.None);
+        var result = await _handler.Handle(new GetMyProjectsTaskMetricsQuery(), TestContext.Current.CancellationToken);
 
         // Assert
         result.Overdue.Should().Be(1);
@@ -260,7 +260,7 @@ public class GetMyProjectsTaskMetricsQueryHandlerTests : IDisposable
         _dbContext.AddProjectTasks(tasks);
 
         // Act
-        var result = await _handler.Handle(new GetMyProjectsTaskMetricsQuery(), CancellationToken.None);
+        var result = await _handler.Handle(new GetMyProjectsTaskMetricsQuery(), TestContext.Current.CancellationToken);
 
         // Assert
         result.Upcoming.Should().Be(1);
@@ -291,7 +291,7 @@ public class GetMyProjectsTaskMetricsQueryHandlerTests : IDisposable
         // Act — filtered to Task Assignee role only
         var result = await _handler.Handle(
             new GetMyProjectsTaskMetricsQuery(RoleFilter: [ProjectMemberRole.Assignee]),
-            CancellationToken.None);
+            TestContext.Current.CancellationToken);
 
         // Assert: even though user is Owner, filter says Assignee only — count only assigned tasks
         result.Overdue.Should().Be(1);
@@ -322,7 +322,7 @@ public class GetMyProjectsTaskMetricsQueryHandlerTests : IDisposable
         // Act — filtered to Owner + Task Assignee
         var result = await _handler.Handle(
             new GetMyProjectsTaskMetricsQuery(RoleFilter: [ProjectMemberRole.Owner, ProjectMemberRole.Assignee]),
-            CancellationToken.None);
+            TestContext.Current.CancellationToken);
 
         // Assert: Owner is leadership — all tasks counted
         result.Overdue.Should().Be(3);

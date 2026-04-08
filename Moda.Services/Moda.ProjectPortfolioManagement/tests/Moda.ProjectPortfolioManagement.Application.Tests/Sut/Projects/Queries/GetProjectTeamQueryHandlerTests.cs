@@ -46,7 +46,7 @@ public class GetProjectTeamQueryHandlerTests : IDisposable
         var query = new GetProjectTeamQuery("NONEXISTENT");
 
         // Act
-        var result = await _handler.Handle(query, CancellationToken.None);
+        var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().BeNull();
@@ -63,7 +63,7 @@ public class GetProjectTeamQueryHandlerTests : IDisposable
         var query = new GetProjectTeamQuery(projectKey.Value);
 
         // Act
-        var result = await _handler.Handle(query, CancellationToken.None);
+        var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeNull();
@@ -98,7 +98,7 @@ public class GetProjectTeamQueryHandlerTests : IDisposable
         var query = new GetProjectTeamQuery(projectKey.Value);
 
         // Act
-        var result = await _handler.Handle(query, CancellationToken.None);
+        var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeNull();
@@ -136,7 +136,7 @@ public class GetProjectTeamQueryHandlerTests : IDisposable
         var query = new GetProjectTeamQuery(projectKey.Value);
 
         // Act
-        var result = await _handler.Handle(query, CancellationToken.None);
+        var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeNull();
@@ -178,7 +178,7 @@ public class GetProjectTeamQueryHandlerTests : IDisposable
         var query = new GetProjectTeamQuery(projectKey.Value);
 
         // Act
-        var result = await _handler.Handle(query, CancellationToken.None);
+        var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeNull();
@@ -248,7 +248,7 @@ public class GetProjectTeamQueryHandlerTests : IDisposable
         var query = new GetProjectTeamQuery(projectKey.Value);
 
         // Act
-        var result = await _handler.Handle(query, CancellationToken.None);
+        var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeNull();
@@ -287,7 +287,7 @@ public class GetProjectTeamQueryHandlerTests : IDisposable
         var query = new GetProjectTeamQuery(projectKey.Value);
 
         // Act
-        var result = await _handler.Handle(query, CancellationToken.None);
+        var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeNull();
@@ -317,7 +317,7 @@ public class GetProjectTeamQueryHandlerTests : IDisposable
         var query = new GetProjectTeamQuery(project.Id.ToString());
 
         // Act
-        var result = await _handler.Handle(query, CancellationToken.None);
+        var result = await _handler.Handle(query, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeNull();

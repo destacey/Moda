@@ -40,7 +40,7 @@ public class AddProjectTaskDependencyCommandHandlerTests : IDisposable
         var command = new AddProjectTaskDependencyCommand(projectId, predecessor.Id, successor.Id);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -60,7 +60,7 @@ public class AddProjectTaskDependencyCommandHandlerTests : IDisposable
         var command = new AddProjectTaskDependencyCommand(successor.ProjectId, nonExistentPredecessorId, successor.Id);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -80,7 +80,7 @@ public class AddProjectTaskDependencyCommandHandlerTests : IDisposable
         var command = new AddProjectTaskDependencyCommand(predecessor.ProjectId, predecessor.Id, nonExistentSuccessorId);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -104,7 +104,7 @@ public class AddProjectTaskDependencyCommandHandlerTests : IDisposable
         var command = new AddProjectTaskDependencyCommand(project1Id, predecessor.Id, successor.Id);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -128,7 +128,7 @@ public class AddProjectTaskDependencyCommandHandlerTests : IDisposable
         var command = new AddProjectTaskDependencyCommand(projectId, task2.Id, task1.Id);
 
         // Act - Try to create reverse dependency: task2 -> task1 (creates circular reference)
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -146,7 +146,7 @@ public class AddProjectTaskDependencyCommandHandlerTests : IDisposable
         var command = new AddProjectTaskDependencyCommand(task.ProjectId, task.Id, task.Id);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -170,7 +170,7 @@ public class AddProjectTaskDependencyCommandHandlerTests : IDisposable
         var command = new AddProjectTaskDependencyCommand(projectId, predecessor.Id, successor.Id);
 
         // Act - Try to add same dependency again
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();

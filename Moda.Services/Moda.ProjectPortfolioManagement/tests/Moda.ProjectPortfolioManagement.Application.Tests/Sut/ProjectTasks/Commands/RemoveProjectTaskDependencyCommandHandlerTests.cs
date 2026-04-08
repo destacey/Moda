@@ -46,7 +46,7 @@ public class RemoveProjectTaskDependencyCommandHandlerTests : IDisposable
         var command = new RemoveProjectTaskDependencyCommand(projectId, predecessor.Id, successor.Id);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -65,7 +65,7 @@ public class RemoveProjectTaskDependencyCommandHandlerTests : IDisposable
         var command = new RemoveProjectTaskDependencyCommand(successor.ProjectId, nonExistentPredecessorId, successor.Id);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -85,7 +85,7 @@ public class RemoveProjectTaskDependencyCommandHandlerTests : IDisposable
         var command = new RemoveProjectTaskDependencyCommand(predecessor.ProjectId, predecessor.Id, nonExistentSuccessorId);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -107,7 +107,7 @@ public class RemoveProjectTaskDependencyCommandHandlerTests : IDisposable
         var command = new RemoveProjectTaskDependencyCommand(projectId, predecessor.Id, successor.Id);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -131,9 +131,9 @@ public class RemoveProjectTaskDependencyCommandHandlerTests : IDisposable
         predecessor.AddDependency(successor2);
 
         // Act - Remove first dependency
-        var result1 = await _handler.Handle(new RemoveProjectTaskDependencyCommand(projectId, predecessor.Id, successor1.Id), CancellationToken.None);
+        var result1 = await _handler.Handle(new RemoveProjectTaskDependencyCommand(projectId, predecessor.Id, successor1.Id), TestContext.Current.CancellationToken);
         // Remove second dependency
-        var result2 = await _handler.Handle(new RemoveProjectTaskDependencyCommand(projectId, predecessor.Id, successor2.Id), CancellationToken.None);
+        var result2 = await _handler.Handle(new RemoveProjectTaskDependencyCommand(projectId, predecessor.Id, successor2.Id), TestContext.Current.CancellationToken);
 
         // Assert
         result1.IsSuccess.Should().BeTrue();

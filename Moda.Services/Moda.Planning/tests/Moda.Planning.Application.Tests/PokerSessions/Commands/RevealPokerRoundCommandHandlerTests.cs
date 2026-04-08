@@ -43,7 +43,7 @@ public class RevealPokerRoundCommandHandlerTests : IDisposable
         var command = new RevealPokerRoundCommand(session.Id, round.Id);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -59,7 +59,7 @@ public class RevealPokerRoundCommandHandlerTests : IDisposable
         var command = new RevealPokerRoundCommand(Guid.NewGuid(), Guid.NewGuid());
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -82,7 +82,7 @@ public class RevealPokerRoundCommandHandlerTests : IDisposable
         var command = new RevealPokerRoundCommand(session.Id, round.Id);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -100,7 +100,7 @@ public class RevealPokerRoundCommandHandlerTests : IDisposable
         var command = new RevealPokerRoundCommand(session.Id, Guid.NewGuid());
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();

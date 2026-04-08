@@ -41,7 +41,7 @@ public class RemovePokerRoundCommandHandlerTests : IDisposable
         var command = new RemovePokerRoundCommand(session.Id, roundId);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -57,7 +57,7 @@ public class RemovePokerRoundCommandHandlerTests : IDisposable
         var command = new RemovePokerRoundCommand(Guid.NewGuid(), Guid.NewGuid());
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -75,7 +75,7 @@ public class RemovePokerRoundCommandHandlerTests : IDisposable
         var command = new RemovePokerRoundCommand(session.Id, Guid.NewGuid());
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -93,7 +93,7 @@ public class RemovePokerRoundCommandHandlerTests : IDisposable
         var command = new RemovePokerRoundCommand(session.Id, Guid.NewGuid());
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();

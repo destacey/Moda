@@ -42,7 +42,7 @@ public class CreatePokerSessionCommandHandlerTests : IDisposable
         var command = new CreatePokerSessionCommand("Sprint Planning", scale.Id);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -56,7 +56,7 @@ public class CreatePokerSessionCommandHandlerTests : IDisposable
         var command = new CreatePokerSessionCommand("Sprint Planning", 999);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -74,7 +74,7 @@ public class CreatePokerSessionCommandHandlerTests : IDisposable
         var command = new CreatePokerSessionCommand("Sprint Planning", scale.Id);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();

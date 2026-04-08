@@ -40,7 +40,7 @@ public class AddPokerRoundCommandHandlerTests : IDisposable
         var command = new AddPokerRoundCommand(session.Id, "User Story #123");
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -57,7 +57,7 @@ public class AddPokerRoundCommandHandlerTests : IDisposable
         var command = new AddPokerRoundCommand(Guid.NewGuid(), "User Story #123");
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -75,7 +75,7 @@ public class AddPokerRoundCommandHandlerTests : IDisposable
         var command = new AddPokerRoundCommand(session.Id, "User Story #123");
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -94,8 +94,8 @@ public class AddPokerRoundCommandHandlerTests : IDisposable
         var command2 = new AddPokerRoundCommand(session.Id, "Round 2");
 
         // Act
-        var result1 = await _handler.Handle(command1, CancellationToken.None);
-        var result2 = await _handler.Handle(command2, CancellationToken.None);
+        var result1 = await _handler.Handle(command1, TestContext.Current.CancellationToken);
+        var result2 = await _handler.Handle(command2, TestContext.Current.CancellationToken);
 
         // Assert
         result1.IsSuccess.Should().BeTrue();
