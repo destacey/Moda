@@ -322,8 +322,9 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
     return processedData.maxLevel > 1 ? 2 : 1
   }, [processedData])
 
-  // User's choice takes precedence over auto-drill
-  const currentLevel = userSelectedLevel ?? autoLevel
+  // User's choice takes precedence over auto-drill, clamped to valid range
+  const maxLevel = processedData?.maxLevel ?? 0
+  const currentLevel = Math.min(userSelectedLevel ?? autoLevel, Math.max(maxLevel, 1))
 
   const processedGroups = useMemo(() => {
     if (!processedData || currentLevel <= 1) return undefined

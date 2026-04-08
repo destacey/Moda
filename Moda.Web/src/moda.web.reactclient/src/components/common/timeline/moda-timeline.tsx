@@ -437,7 +437,8 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
         // Clear cached template so it re-renders with updated data
         const mapId = item.id ?? 0
         if (elementMapRef.current[mapId]) {
-          const { root } = elementMapRef.current[mapId]
+          const { container, root } = elementMapRef.current[mapId]
+          container.remove()
           setTimeout(() => {
             try {
               root.unmount()
