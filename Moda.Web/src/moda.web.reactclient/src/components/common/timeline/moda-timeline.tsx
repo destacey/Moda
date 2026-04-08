@@ -434,6 +434,20 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
     processedItems.forEach((item) => {
       const existing = datasetItemsRef.current!.get(item.id)
       if (existing) {
+        // Clear cached template so it re-renders with updated data
+        const mapId = item.id ?? 0
+        if (elementMapRef.current[mapId]) {
+          const { container, root } = elementMapRef.current[mapId]
+          container.remove()
+          setTimeout(() => {
+            try {
+              root.unmount()
+            } catch (error) {
+              console.error('Error unmounting root:', error)
+            }
+          }, 0)
+          delete elementMapRef.current[mapId]
+        }
         datasetItemsRef.current!.update(item as any)
       } else {
         datasetItemsRef.current!.add(item as any)
@@ -477,6 +491,9 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
       // Exclude start/end to prevent window reset
       const { start, end, ...optionsWithoutWindow } = dynamicOptionsRef.current
       timelineInstanceRef.current.setOptions(optionsWithoutWindow)
+
+      // Force redraw to ensure items render correctly with newly added groups
+      timelineInstanceRef.current.redraw()
       return
     }
 
