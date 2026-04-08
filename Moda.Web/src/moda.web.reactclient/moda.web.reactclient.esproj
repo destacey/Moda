@@ -8,7 +8,17 @@
     <ProductionBuildCommand>npm run build</ProductionBuildCommand>
     <!-- Folder where production build objects will be placed -->
     <BuildOutputFolder>$(MSBuildProjectDirectory)\build</BuildOutputFolder>
+    <!-- Exclude heavy folders from Visual Studio project scanning -->
+    <ShouldRunNpmInstall>false</ShouldRunNpmInstall>
   </PropertyGroup>
+  <ItemGroup>
+    <Folder Remove="node_modules\**" />
+    <Content Remove="node_modules\**" />
+    <None Remove="node_modules\**" />
+    <Folder Remove=".next\**" />
+    <Content Remove=".next\**" />
+    <None Remove=".next\**" />
+  </ItemGroup>
   <ItemGroup>
     <None Include=".docker\Dockerfile" />
   </ItemGroup>
