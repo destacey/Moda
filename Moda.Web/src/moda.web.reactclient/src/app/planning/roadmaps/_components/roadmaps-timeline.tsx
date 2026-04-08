@@ -1,6 +1,6 @@
 'use client'
 
-import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
+import { ReactNode, useCallback, useMemo, useState } from 'react'
 import { Button, Card, Divider, Flex, Space, Switch, Typography } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import {
@@ -264,8 +264,9 @@ export const RoadmapRangeItemTemplate: TimelineTemplate<
 
 const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
   // timelineStart / timelineEnd are derived synchronously from props below
-  const [currentLevel, setCurrentLevel] = useState<number | undefined>(1)
-  const [hasUserChangedLevel, setHasUserChangedLevel] = useState(false)
+  const [userSelectedLevel, setUserSelectedLevel] = useState<
+    number | undefined
+  >(undefined)
 
   const [showCurrentTime, setShowCurrentTime] = useState<boolean>(true)
 
@@ -315,6 +316,15 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
     props.roadmapItems,
   ])
 
+  // Compute auto-drill level synchronously to avoid race condition with groups
+  const autoLevel = useMemo(() => {
+    if (!processedData) return 1
+    return processedData.maxLevel > 1 ? 2 : 1
+  }, [processedData])
+
+  // User's choice takes precedence over auto-drill
+  const currentLevel = userSelectedLevel ?? autoLevel
+
   const processedGroups = useMemo(() => {
     if (!processedData || currentLevel <= 1) return undefined
 
@@ -338,12 +348,6 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
       ) ?? []
     )
   }, [processedData?.items, currentLevel])
-
-  useEffect(() => {
-    if (processedData && processedData.maxLevel > 1 && !hasUserChangedLevel) {
-      setCurrentLevel(2) // TODO: make this configurable
-    }
-  }, [processedData, hasUserChangedLevel])
 
   // Compute timeline window synchronously from props so the timeline receives values on first render
   const timelineWindow = useMemo(() => {
@@ -395,8 +399,7 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
   }, [showCurrentTime])
 
   const onLevelChange = (treeLevel: number) => {
-    setCurrentLevel(treeLevel)
-    setHasUserChangedLevel(true)
+    setUserSelectedLevel(treeLevel)
   }
 
   const onMove = useCallback(
