@@ -30,6 +30,7 @@
     "eslint": "9.39.2",
     "eslint-config-next": "16.2.2",
     "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-react-compiler": "^19.1.0-rc.2",
     "eslint-plugin-unused-imports": "^4.4.1",
     "jest": "30.3.0",
     "jest-environment-jsdom": "30.3.0",
