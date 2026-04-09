@@ -4,7 +4,6 @@ import { CreateWorkTypeLevelRequest } from '@/src/services/moda-api'
 import { useCreateWorkTypeLevelMutation } from '@/src/store/features/work-management/work-type-level-api'
 import { toFormErrors } from '@/src/utils'
 import { Form, Input, Modal } from 'antd'
-import { useCallback } from 'react'
 import { useModalForm } from '@/src/hooks'
 
 const { Item } = Form
@@ -39,8 +38,7 @@ const CreateWorkTypeLevelForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<CreateWorkTypeLevelFormValues>({
-      onSubmit: useCallback(
-        async (values: CreateWorkTypeLevelFormValues, form) => {
+      onSubmit: async (values: CreateWorkTypeLevelFormValues, form) => {
           try {
             const request = mapToRequestValues(values)
             const response = await createWorkTypeLevelMutation(request)
@@ -63,8 +61,6 @@ const CreateWorkTypeLevelForm = ({
             return false
           }
         },
-        [createWorkTypeLevelMutation, messageApi],
-      ),
       onComplete: onFormSave,
       onCancel: onFormCancel,
       errorMessage:

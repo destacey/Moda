@@ -14,7 +14,7 @@ import { toFormErrors } from '@/src/utils'
 import { DatePicker, Form, Modal } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
 import dayjs from 'dayjs'
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 
 const { Item } = Form
 const { RangePicker } = DatePicker
@@ -68,37 +68,34 @@ const EditStrategicInitiativeForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<EditStrategicInitiativeFormValues>({
-      onSubmit: useCallback(
-        async (values: EditStrategicInitiativeFormValues, form) => {
-          try {
-            const request = mapToRequestValues(
-              values,
-              strategicInitiativeData.id,
-            )
-            const response = await updateStrategicInitiative({
-              request,
-              cacheKey: strategicInitiativeData.key,
-            })
-            if (response.error) throw response.error
+      onSubmit: async (values: EditStrategicInitiativeFormValues, form) => {
+        try {
+          const request = mapToRequestValues(
+            values,
+            strategicInitiativeData.id,
+          )
+          const response = await updateStrategicInitiative({
+            request,
+            cacheKey: strategicInitiativeData.key,
+          })
+          if (response.error) throw response.error
 
-            messageApi.success('Strategic initiative updated successfully.')
-            return true
-          } catch (error) {
-            if (error.status === 422 && error.errors) {
-              const formErrors = toFormErrors(error.errors)
-              form.setFields(formErrors)
-              messageApi.error('Correct the validation error(s) to continue.')
-            } else {
-              messageApi.error(
-                error.detail ??
-                  'An error occurred while updating the strategic initiative. Please try again.',
-              )
-            }
-            return false
+          messageApi.success('Strategic initiative updated successfully.')
+          return true
+        } catch (error) {
+          if (error.status === 422 && error.errors) {
+            const formErrors = toFormErrors(error.errors)
+            form.setFields(formErrors)
+            messageApi.error('Correct the validation error(s) to continue.')
+          } else {
+            messageApi.error(
+              error.detail ??
+                'An error occurred while updating the strategic initiative. Please try again.',
+            )
           }
-        },
-        [updateStrategicInitiative, strategicInitiativeData, messageApi],
-      ),
+          return false
+        }
+      },
       onComplete: onFormComplete,
       onCancel: onFormCancel,
       errorMessage:

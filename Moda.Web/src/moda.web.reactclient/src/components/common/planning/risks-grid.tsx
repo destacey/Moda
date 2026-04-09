@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { useCallback, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import ModaGrid from '../moda-grid'
 import { RiskListDto } from '@/src/services/moda-api'
 import { ItemType } from 'antd/es/menu/interface'
@@ -64,14 +64,6 @@ const RisksGrid = ({
     setHideTeam(checked)
   }
 
-  const editRiskButtonClicked = useCallback(
-    (key: number) => {
-      setEditRiskKey(key)
-      setOpenUpdateRiskForm(true)
-    },
-    [setOpenUpdateRiskForm],
-  )
-
   const onEditRiskFormClosed = (wasSaved: boolean) => {
     setOpenUpdateRiskForm(false)
     setEditRiskKey(null)
@@ -125,59 +117,62 @@ const RisksGrid = ({
   ]
 
   // TODO: dates are formatted correctly and filter, but the filter is string based, not date based
-  const columnDefs = useMemo<ColDef<RiskListDto>[]>(
-    () => [
-      {
-        width: 50,
-        filter: false,
-        sortable: false,
-        resizable: false,
-        hide: !canUpdateRisks,
-        cellRenderer: (params) => {
-          return (
-            canUpdateRisks && (
-              <Button
-                type="text"
-                size="small"
-                icon={<EditOutlined />}
-                onClick={() => editRiskButtonClicked(params.data.key)}
-              />
-            )
+  const columnDefs = useMemo<ColDef<RiskListDto>[]>(() => {
+    const editRiskButtonClicked = (key: number) => {
+      setEditRiskKey(key)
+      setOpenUpdateRiskForm(true)
+    }
+
+    return [
+    {
+      width: 50,
+      filter: false,
+      sortable: false,
+      resizable: false,
+      hide: !canUpdateRisks,
+      cellRenderer: (params) => {
+        return (
+          canUpdateRisks && (
+            <Button
+              type="text"
+              size="small"
+              icon={<EditOutlined />}
+              onClick={() => editRiskButtonClicked(params.data.key)}
+            />
           )
-        },
+        )
       },
-      { field: 'id', hide: true },
-      { field: 'key', width: 90 },
-      { field: 'summary', width: 300, cellRenderer: RiskLinkCellRenderer },
-      {
-        field: 'team.name',
-        headerName: 'Team',
-        cellRenderer: NestedTeamNameLinkCellRenderer,
-        hide: hideTeam,
-      },
-      { field: 'status', width: 125, hide: includeClosed === false },
-      { field: 'category', width: 125 },
-      { field: 'exposure', width: 125 },
-      {
-        field: 'followUpDate',
-        valueGetter: (params) =>
-          params.data.followUpDate
-            ? dayjs(params.data.followUpDate).format('M/D/YYYY')
-            : null,
-      },
-      {
-        field: 'assignee.name',
-        headerName: 'Assignee',
-        cellRenderer: AssigneeLinkCellRenderer,
-      },
-      {
-        field: 'reportedOn',
-        valueGetter: (params) =>
-          dayjs(params.data.reportedOn).format('M/D/YYYY'),
-      },
-    ],
-    [canUpdateRisks, editRiskButtonClicked, hideTeam, includeClosed],
-  )
+    },
+    { field: 'id', hide: true },
+    { field: 'key', width: 90 },
+    { field: 'summary', width: 300, cellRenderer: RiskLinkCellRenderer },
+    {
+      field: 'team.name',
+      headerName: 'Team',
+      cellRenderer: NestedTeamNameLinkCellRenderer,
+      hide: hideTeam,
+    },
+    { field: 'status', width: 125, hide: includeClosed === false },
+    { field: 'category', width: 125 },
+    { field: 'exposure', width: 125 },
+    {
+      field: 'followUpDate',
+      valueGetter: (params) =>
+        params.data.followUpDate
+          ? dayjs(params.data.followUpDate).format('M/D/YYYY')
+          : null,
+    },
+    {
+      field: 'assignee.name',
+      headerName: 'Assignee',
+      cellRenderer: AssigneeLinkCellRenderer,
+    },
+    {
+      field: 'reportedOn',
+      valueGetter: (params) =>
+        dayjs(params.data.reportedOn).format('M/D/YYYY'),
+    },
+  ]}, [canUpdateRisks, hideTeam, includeClosed])
 
   return (
     <>

@@ -4,7 +4,6 @@ import LinksCard from '@/src/components/common/links/links-card'
 import { PlanningIntervalDetailsDto } from '@/src/services/moda-api'
 import { Col, Descriptions, DescriptionsProps, Divider, Row, Space } from 'antd'
 import dayjs from 'dayjs'
-import { useMemo } from 'react'
 import {
   DaysCountdownMetric,
   MetricCard,
@@ -72,7 +71,7 @@ const PlanningIntervalDetails = ({
     },
   ]
 
-  const { objectiveStatusData, objectiveHealthData } = useMemo(() => {
+  const { objectiveStatusData, objectiveHealthData } = (() => {
     if (!objectivesData)
       return { objectiveStatusData: [], objectiveHealthData: [] }
     const objectives = objectivesData.map((o) => ({
@@ -112,7 +111,7 @@ const PlanningIntervalDetails = ({
     ).map(([health, count]) => ({ type: health, count }))
 
     return { objectiveStatusData, objectiveHealthData }
-  }, [objectivesData])
+  })()
 
   if (!planningInterval) return null
 

@@ -24,18 +24,15 @@ const StrategicThemeCellRenderer = ({ value, data }) => {
 const StrategicThemesGrid: React.FC<StrategicThemesGridProps> = (
   props: StrategicThemesGridProps,
 ) => {
-  const columnDefs = useMemo<ColDef<StrategicThemeListDto>[]>(
-    () => [
-      { field: 'key', width: 90 },
-      { field: 'name', width: 350, cellRenderer: StrategicThemeCellRenderer },
-      {
-        field: 'state.name',
-        headerName: 'State',
-        width: 125,
-      },
-    ],
-    [],
-  )
+  const columnDefs = useMemo<ColDef<StrategicThemeListDto>[]>(() => [
+    { field: 'key', width: 90 },
+    { field: 'name', width: 350, cellRenderer: StrategicThemeCellRenderer },
+    {
+      field: 'state.name',
+      headerName: 'State',
+      width: 125,
+    },
+  ], [])
 
   return (
     <ModaGrid

@@ -1,7 +1,7 @@
 import { Button, Dropdown } from 'antd'
 import type { MenuProps } from 'antd'
 import ModaTooltip from '@/src/components/common/moda-tooltip'
-import { FC, ReactNode, useCallback, useMemo } from 'react'
+import { FC, ReactNode } from 'react'
 import useTheme from '../contexts/theme'
 
 export interface IconMenuOption {
@@ -29,15 +29,12 @@ const IconMenu: FC<IconMenuProps> = ({
 }: IconMenuProps) => {
   const { token } = useTheme()
 
-  const menuItems: MenuProps['items'] = useMemo(
-    () =>
-      items?.map((item) => ({
-        key: item.value.toString(),
-        label: item.label,
-        extra: item.extra,
-      })) || [],
-    [items],
-  )
+  const menuItems: MenuProps['items'] =
+    items?.map((item) => ({
+      key: item.value.toString(),
+      label: item.label,
+      extra: item.extra,
+    })) || []
 
   const handleMenuClick: MenuProps['onClick'] = (info) => {
     const selectedItem = items?.find(
@@ -48,20 +45,17 @@ const IconMenu: FC<IconMenuProps> = ({
     }
   }
 
-  const handleOpenChange = useCallback(
-    (open: boolean) => {
-      if (open && selectedKeys?.length) {
-        // Use setTimeout to wait for the dropdown to render
-        setTimeout(() => {
-          const selectedElement = document.querySelector(
-            `.ant-dropdown-menu-item-selected`,
-          )
-          selectedElement?.scrollIntoView({ block: 'center' })
-        }, 0)
-      }
-    },
-    [selectedKeys],
-  )
+  const handleOpenChange = (open: boolean) => {
+    if (open && selectedKeys?.length) {
+      // Use setTimeout to wait for the dropdown to render
+      setTimeout(() => {
+        const selectedElement = document.querySelector(
+          `.ant-dropdown-menu-item-selected`,
+        )
+        selectedElement?.scrollIntoView({ block: 'center' })
+      }, 0)
+    }
+  }
 
   if (!icon || !items || items.length === 0) return null
 

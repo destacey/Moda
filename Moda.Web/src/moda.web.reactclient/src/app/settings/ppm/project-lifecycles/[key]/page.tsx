@@ -5,7 +5,7 @@ import BasicBreadcrumb from '@/src/components/common/basic-breadcrumb'
 import useAuth from '@/src/components/contexts/auth'
 import { authorizePage } from '@/src/components/hoc'
 import { Card, MenuProps } from 'antd'
-import { use, useCallback, useEffect, useMemo, useState } from 'react'
+import { use, useEffect, useState } from 'react'
 import ProjectLifecycleDetailsLoading from './loading'
 import { notFound, useRouter } from 'next/navigation'
 import ProjectLifecycleDetails from '../_components/project-lifecycle-details'
@@ -74,7 +74,7 @@ const ProjectLifecycleDetailsPage = (props: {
     : 'Project Lifecycle Details'
   useDocumentTitle(title)
 
-  const renderTabContent = useCallback(() => {
+  const renderTabContent = () => {
     switch (activeTab) {
       case ProjectLifecycleTabs.Details:
         return <ProjectLifecycleDetails lifecycle={lifecycleData} />
@@ -91,13 +91,13 @@ const ProjectLifecycleDetailsPage = (props: {
       default:
         return null
     }
-  }, [activeTab, lifecycleData, canUpdate, refetch])
+  }
 
-  const onTabChange = useCallback((tabKey: string) => {
+  const onTabChange = (tabKey: string) => {
     setActiveTab(tabKey as ProjectLifecycleTabs)
-  }, [])
+  }
 
-  const actionsMenuItems: MenuProps['items'] = useMemo(() => {
+  const actionsMenuItems: MenuProps['items'] = (() => {
     const currentState = lifecycleData?.state?.name
     const availableActions =
       currentState === 'Proposed'
@@ -150,7 +150,7 @@ const ProjectLifecycleDetailsPage = (props: {
     }
 
     return items
-  }, [lifecycleData?.state?.name, canUpdate, canDelete])
+  })()
 
   useEffect(() => {
     if (error) {
@@ -162,45 +162,33 @@ const ProjectLifecycleDetailsPage = (props: {
     }
   }, [error, messageApi])
 
-  const onEditFormClosed = useCallback(
-    (wasSaved: boolean) => {
-      setOpenEditForm(false)
-      if (wasSaved) {
-        refetch()
-      }
-    },
-    [refetch],
-  )
+  const onEditFormClosed = (wasSaved: boolean) => {
+    setOpenEditForm(false)
+    if (wasSaved) {
+      refetch()
+    }
+  }
 
-  const onActivateFormClosed = useCallback(
-    (wasSaved: boolean) => {
-      setOpenActivateForm(false)
-      if (wasSaved) {
-        refetch()
-      }
-    },
-    [refetch],
-  )
+  const onActivateFormClosed = (wasSaved: boolean) => {
+    setOpenActivateForm(false)
+    if (wasSaved) {
+      refetch()
+    }
+  }
 
-  const onArchiveFormClosed = useCallback(
-    (wasSaved: boolean) => {
-      setOpenArchiveForm(false)
-      if (wasSaved) {
-        refetch()
-      }
-    },
-    [refetch],
-  )
+  const onArchiveFormClosed = (wasSaved: boolean) => {
+    setOpenArchiveForm(false)
+    if (wasSaved) {
+      refetch()
+    }
+  }
 
-  const onDeleteFormClosed = useCallback(
-    (wasDeleted: boolean) => {
-      setOpenDeleteForm(false)
-      if (wasDeleted) {
-        router.push('/settings/ppm/project-lifecycles')
-      }
-    },
-    [router],
-  )
+  const onDeleteFormClosed = (wasDeleted: boolean) => {
+    setOpenDeleteForm(false)
+    if (wasDeleted) {
+      router.push('/settings/ppm/project-lifecycles')
+    }
+  }
 
   if (isLoading) {
     return <ProjectLifecycleDetailsLoading />

@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { Button, Drawer, Grid, Layout } from 'antd'
 import { MenuOutlined } from '@ant-design/icons'
 import DocsSidebar from './docs-sidebar'
@@ -19,7 +19,7 @@ export default function DocsLayoutShell({
   children,
 }: DocsLayoutShellProps) {
   const screens = useBreakpoint()
-  const isMobile = useMemo(() => !screens.md, [screens.md])
+  const isMobile = !screens.md
   const [drawerOpen, setDrawerOpen] = useState(false)
 
   if (isMobile) {

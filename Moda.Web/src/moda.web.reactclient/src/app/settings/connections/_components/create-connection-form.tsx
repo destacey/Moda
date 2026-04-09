@@ -2,7 +2,7 @@ import { useMessage } from '@/src/components/contexts/messaging'
 import { ConnectorType, CONNECTOR_NAMES } from '@/src/types/connectors'
 import { toFormErrors } from '@/src/utils'
 import { Form, Modal } from 'antd'
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 import { ConnectionFormBase } from './connection-form-base'
 import { ConnectorTypeSelector } from './connector-type-selector'
 import { useCreateConnectionMutation } from '@/src/store/features/app-integration/connections-api'
@@ -50,8 +50,7 @@ const CreateConnectionForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel: hookCancel } =
     useModalForm<CreateConnectionFormValues>({
-      onSubmit: useCallback(
-        async (values: CreateConnectionFormValues, form) => {
+      onSubmit: async (values: CreateConnectionFormValues, form) => {
           if (!selectedConnector) return false
 
           try {
@@ -78,8 +77,6 @@ const CreateConnectionForm = ({
             return false
           }
         },
-        [createConnection, messageApi, selectedConnector],
-      ),
       onComplete: onFormCreate,
       onCancel: () => {
         setSelectedConnector(null)

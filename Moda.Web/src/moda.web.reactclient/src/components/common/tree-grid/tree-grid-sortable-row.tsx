@@ -2,7 +2,7 @@
 
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { createContext, useContext, CSSProperties, ReactNode } from 'react'
+import { createContext, useContext, useMemo, CSSProperties, ReactNode } from 'react'
 
 // Context to share drag listeners with child components (drag handle)
 const TreeGridDragHandleContext = createContext<{
@@ -65,8 +65,13 @@ export function TreeGridSortableRow({
     zIndex: isDragging ? 999 : 'auto',
   }
 
+  const dragHandleContextValue = useMemo(
+    () => ({ listeners, attributes }),
+    [listeners, attributes],
+  )
+
   return (
-    <TreeGridDragHandleContext.Provider value={{ listeners, attributes }}>
+    <TreeGridDragHandleContext.Provider value={dragHandleContextValue}>
       <tr
         ref={setNodeRef}
         style={style}

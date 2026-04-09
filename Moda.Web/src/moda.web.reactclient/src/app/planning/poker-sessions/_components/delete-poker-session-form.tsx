@@ -3,7 +3,6 @@
 import { useMessage } from '@/src/components/contexts/messaging'
 import { useDeletePokerSessionMutation } from '@/src/store/features/planning/poker-sessions-api'
 import { Modal } from 'antd'
-import { useCallback } from 'react'
 import { useConfirmModal } from '@/src/hooks'
 
 export interface DeletePokerSessionFormProps {
@@ -22,7 +21,7 @@ const DeletePokerSessionForm = ({
   const [deletePokerSession] = useDeletePokerSessionMutation()
 
   const { isOpen, isSaving, handleOk, handleCancel } = useConfirmModal({
-    onSubmit: useCallback(async () => {
+    onSubmit: async () => {
       try {
         const response = await deletePokerSession(session.id)
         if (response.error) {
@@ -37,7 +36,7 @@ const DeletePokerSessionForm = ({
         )
         return false
       }
-    }, [deletePokerSession, session, messageApi]),
+    },
     onComplete: onFormComplete,
     onCancel: onFormCancel,
     permission: 'Permissions.PokerSessions.Delete',

@@ -1,7 +1,7 @@
 'use client'
 
 import PageTitle from '@/src/components/common/page-title'
-import { useCallback, useMemo, useState } from 'react'
+import { useState } from 'react'
 import { useDocumentTitle } from '@/src/hooks'
 import {
   CreatePokerSessionForm,
@@ -47,26 +47,23 @@ const PokerSessionsPage = () => {
   const canUpdate = hasPermissionClaim('Permissions.PokerSessions.Update')
   const canDelete = hasPermissionClaim('Permissions.PokerSessions.Delete')
 
-  const controlItems = useMemo<ItemType[]>(
-    () => [
-      {
-        label: (
-          <ControlItemSwitch
-            label="Include Completed"
-            checked={includeCompleted}
-            onChange={setIncludeCompleted}
-          />
-        ),
-        key: 'include-completed',
-        onClick: () => setIncludeCompleted((prev) => !prev),
-      },
-    ],
-    [includeCompleted],
-  )
+  const controlItems: ItemType[] = [
+    {
+      label: (
+        <ControlItemSwitch
+          label="Include Completed"
+          checked={includeCompleted}
+          onChange={setIncludeCompleted}
+        />
+      ),
+      key: 'include-completed',
+      onClick: () => setIncludeCompleted((prev) => !prev),
+    },
+  ]
 
-  const refresh = useCallback(() => {
+  const refresh = () => {
     refetch()
-  }, [refetch])
+  }
 
   const onCreateFormClosed = (wasCreated: boolean) => {
     setOpenCreateForm(false)
@@ -75,43 +72,37 @@ const PokerSessionsPage = () => {
     }
   }
 
-  const handleEdit = useCallback((session: PokerSessionListDto) => {
+  const handleEdit = (session: PokerSessionListDto) => {
     setEditSessionKey(session.key)
-  }, [])
+  }
 
-  const handleComplete = useCallback(
-    async (session: PokerSessionListDto) => {
-      try {
-        const response = await completeSession({
-          id: session.id,
-          key: session.key,
-        })
-        if (response.error) throw response.error
-        messageApi.success('Session completed.')
-      } catch {
-        messageApi.error('Failed to complete session.')
-      }
-    },
-    [completeSession, messageApi],
-  )
+  const handleComplete = async (session: PokerSessionListDto) => {
+    try {
+      const response = await completeSession({
+        id: session.id,
+        key: session.key,
+      })
+      if (response.error) throw response.error
+      messageApi.success('Session completed.')
+    } catch {
+      messageApi.error('Failed to complete session.')
+    }
+  }
 
-  const handleDelete = useCallback((session: PokerSessionListDto) => {
+  const handleDelete = (session: PokerSessionListDto) => {
     setDeleteSession(session)
-  }, [])
+  }
 
-  const onEditFormClosed = useCallback(() => {
+  const onEditFormClosed = () => {
     setEditSessionKey(null)
-  }, [])
+  }
 
-  const onDeleteFormClosed = useCallback(
-    (wasDeleted: boolean) => {
-      setDeleteSession(null)
-      if (wasDeleted) {
-        refetch()
-      }
-    },
-    [refetch],
-  )
+  const onDeleteFormClosed = (wasDeleted: boolean) => {
+    setDeleteSession(null)
+    if (wasDeleted) {
+      refetch()
+    }
+  }
 
   const actions = () => (
     <>

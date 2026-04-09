@@ -7,7 +7,7 @@ import {
 } from '@/src/store/features/work-management/work-type-level-api'
 import { toFormErrors } from '@/src/utils'
 import { Form, Input, Modal } from 'antd'
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useModalForm } from '@/src/hooks'
 
 const { Item } = Form
@@ -47,8 +47,7 @@ const EditWorkTypeLevelForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<EditWorkTypeLevelFormValues>({
-      onSubmit: useCallback(
-        async (values: EditWorkTypeLevelFormValues, form) => {
+      onSubmit: async (values: EditWorkTypeLevelFormValues, form) => {
           try {
             const request = mapToRequestValues(levelId, values)
             const response = await updateLevelMutation(request)
@@ -71,8 +70,6 @@ const EditWorkTypeLevelForm = ({
             return false
           }
         },
-        [updateLevelMutation, levelId, messageApi],
-      ),
       onComplete: onFormSave,
       onCancel: onFormCancel,
       errorMessage:

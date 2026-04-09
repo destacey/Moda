@@ -5,7 +5,6 @@ import { useConfirmModal } from '@/src/hooks'
 import { ProjectDetailsDto } from '@/src/services/moda-api'
 import { useDeleteProjectMutation } from '@/src/store/features/ppm/projects-api'
 import { Modal } from 'antd'
-import { useCallback } from 'react'
 
 export interface DeleteProjectFormProps {
   project: ProjectDetailsDto
@@ -23,7 +22,7 @@ const DeleteProjectForm = ({
   const [deleteProjectMutation] = useDeleteProjectMutation()
 
   const { isOpen, isSaving, handleOk, handleCancel } = useConfirmModal({
-    onSubmit: useCallback(async () => {
+    onSubmit: async () => {
       try {
         const response = await deleteProjectMutation(project.id)
         if (response.error) throw response.error
@@ -38,7 +37,7 @@ const DeleteProjectForm = ({
         console.log(error)
         return false
       }
-    }, [deleteProjectMutation, project, messageApi]),
+    },
     onComplete: onFormComplete,
     onCancel: onFormCancel,
     errorMessage:

@@ -11,7 +11,7 @@ import { StrategicInitiativeListDto } from '@/src/services/moda-api'
 import { Card, Divider, Flex, Space, Switch, theme, Typography } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import dayjs from 'dayjs'
-import { FC, ReactNode, useCallback, useMemo, useState } from 'react'
+import { FC, ReactNode, useState } from 'react'
 import { StrategicInitiativeDrawer } from '.'
 import { getLifecyclePhaseColorFromStatus, getLuminance } from '@/src/utils'
 
@@ -63,48 +63,41 @@ const StrategicInitiativesTimeline: FC<StrategicInitiativesTimelineProps> = (
   const [showCurrentTime, setShowCurrentTime] = useState<boolean>(true)
   const { token } = useToken()
 
-  const showDrawer = useCallback(() => {
+  const showDrawer = () => {
     setDrawerOpen(true)
-  }, [])
+  }
 
-  const onDrawerClose = useCallback(() => {
+  const onDrawerClose = () => {
     setDrawerOpen(false)
     setSelectedItemKey(null)
-  }, [])
+  }
 
-  const openStrategicInitiativeDrawer = useCallback(
-    (strategicInitiativeKey: number) => {
-      setSelectedItemKey(strategicInitiativeKey)
-      showDrawer()
-    },
-    [showDrawer],
-  )
+  const openStrategicInitiativeDrawer = (strategicInitiativeKey: number) => {
+    setSelectedItemKey(strategicInitiativeKey)
+    showDrawer()
+  }
 
-  const processedStrategicInitiatives =
-    useMemo((): StrategicInitiativeTimelineItem[] => {
-      if (props.isLoading || !props.strategicInitiatives) return []
+  const processedStrategicInitiatives: StrategicInitiativeTimelineItem[] =
+    props.isLoading || !props.strategicInitiatives
+      ? []
+      : props.strategicInitiatives
+          .filter((initiative) => initiative.start && initiative.end)
+          .map((initiative) => ({
+            id: String(initiative.id),
+            title: initiative.name,
+            content: initiative.name,
+            itemColor: getLifecyclePhaseColorFromStatus(
+              initiative.status,
+              token,
+            ),
+            objectData: initiative,
+            type: 'range',
+            start: new Date(initiative.start),
+            end: new Date(initiative.end),
+            openStrategicInitiativeDrawer: openStrategicInitiativeDrawer,
+          }))
 
-      return props.strategicInitiatives
-        .filter((initiative) => initiative.start && initiative.end)
-        .map((initiative) => ({
-          id: String(initiative.id),
-          title: initiative.name,
-          content: initiative.name,
-          itemColor: getLifecyclePhaseColorFromStatus(initiative.status, token),
-          objectData: initiative,
-          type: 'range',
-          start: new Date(initiative.start),
-          end: new Date(initiative.end),
-          openStrategicInitiativeDrawer: openStrategicInitiativeDrawer,
-        }))
-    }, [
-      openStrategicInitiativeDrawer,
-      props.isLoading,
-      props.strategicInitiatives,
-      token,
-    ])
-
-  const timelineWindow = useMemo(() => {
+  const timelineWindow = (() => {
     let minDate = dayjs()
     let maxDate = dayjs()
 
@@ -121,25 +114,23 @@ const StrategicInitiativesTimeline: FC<StrategicInitiativesTimelineProps> = (
     maxDate = maxDate.add(1, 'month')
 
     return { start: minDate.toDate(), end: maxDate.toDate() }
-  }, [processedStrategicInitiatives])
+  })()
 
-  const timelineOptions = useMemo(
-    (): ModaTimelineOptions<StrategicInitiativeTimelineItem> => ({
+  const timelineOptions: ModaTimelineOptions<StrategicInitiativeTimelineItem> =
+    {
       showCurrentTime: showCurrentTime,
       maxHeight: 650,
       start: timelineWindow.start,
       end: timelineWindow.end,
       min: timelineWindow.start,
       max: timelineWindow.end,
-    }),
-    [showCurrentTime, timelineWindow.end, timelineWindow.start],
-  )
+    }
 
-  const onShowCurrentTimeChange = useCallback((checked: boolean) => {
+  const onShowCurrentTimeChange = (checked: boolean) => {
     setShowCurrentTime(checked)
-  }, [])
+  }
 
-  const controlItems = useCallback((): ItemType[] => {
+  const controlItems = (): ItemType[] => {
     const items: ItemType[] = []
 
     items.push({
@@ -158,7 +149,7 @@ const StrategicInitiativesTimeline: FC<StrategicInitiativesTimelineProps> = (
     })
 
     return items
-  }, [showCurrentTime, onShowCurrentTimeChange])
+  }
 
   return (
     <>

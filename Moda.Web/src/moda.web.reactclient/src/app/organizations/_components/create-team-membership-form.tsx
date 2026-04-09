@@ -1,7 +1,6 @@
 'use client'
 
 import { DatePicker, Form, Modal, Select } from 'antd'
-import { useCallback } from 'react'
 import { AddTeamMembershipRequest } from '@/src/services/moda-api'
 import { toFormErrors } from '@/src/utils'
 import {
@@ -55,29 +54,26 @@ const CreateTeamMembershipForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<CreateTeamMembershipFormValues>({
-      onSubmit: useCallback(
-        async (values: CreateTeamMembershipFormValues, form) => {
-          try {
-            const request = mapToRequestValues(values, teamType, teamId)
-            await createTeamMembership(request).unwrap()
-            messageApi.success('Successfully created team membership.')
-            return true
-          } catch (error) {
-            if (error.status === 422 && error.errors) {
-              const formErrors = toFormErrors(error.errors)
-              form.setFields(formErrors)
-              messageApi.error('Correct the validation error(s) to continue.')
-            } else {
-              messageApi.error(
-                error.detail ??
-                  'An unexpected error occurred while creating the team membership.',
-              )
-            }
-            return false
+      onSubmit: async (values: CreateTeamMembershipFormValues, form) => {
+        try {
+          const request = mapToRequestValues(values, teamType, teamId)
+          await createTeamMembership(request).unwrap()
+          messageApi.success('Successfully created team membership.')
+          return true
+        } catch (error) {
+          if (error.status === 422 && error.errors) {
+            const formErrors = toFormErrors(error.errors)
+            form.setFields(formErrors)
+            messageApi.error('Correct the validation error(s) to continue.')
+          } else {
+            messageApi.error(
+              error.detail ??
+                'An unexpected error occurred while creating the team membership.',
+            )
           }
-        },
-        [createTeamMembership, teamType, teamId, messageApi],
-      ),
+          return false
+        }
+      },
       onComplete: onFormCreate,
       onCancel: onFormCancel,
       errorMessage:

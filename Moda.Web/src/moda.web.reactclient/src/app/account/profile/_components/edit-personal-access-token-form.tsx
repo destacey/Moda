@@ -1,7 +1,7 @@
 'use client'
 
 import { Form, Input, Modal, DatePicker } from 'antd'
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useMessage } from '@/src/components/contexts/messaging'
 import dayjs, { Dayjs } from 'dayjs'
 import { useUpdatePersonalAccessTokenMutation } from '@/src/store/features/user-management/personal-access-tokens-api'
@@ -33,39 +33,36 @@ const EditPersonalAccessTokenForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<EditTokenFormValues>({
-      onSubmit: useCallback(
-        async (values: EditTokenFormValues, form) => {
-          try {
-            const response = await updateToken({
-              id: token.id!,
-              request: {
-                name: values.name,
-                expiresAt: values.expiresAt.toDate(),
-              },
-            })
+      onSubmit: async (values: EditTokenFormValues, form) => {
+        try {
+          const response = await updateToken({
+            id: token.id!,
+            request: {
+              name: values.name,
+              expiresAt: values.expiresAt.toDate(),
+            },
+          })
 
-            if (response.error) {
-              throw response.error
-            }
-
-            messageApi.success('Personal access token updated successfully')
-            return true
-          } catch (error) {
-            if (error.status === 422 && error.errors) {
-              const formErrors = toFormErrors(error.errors)
-              form.setFields(formErrors)
-              messageApi.error('Correct the validation error(s) to continue.')
-            } else {
-              messageApi.error(
-                error.detail ??
-                  'An error occurred while updating the PAT. Please try again.',
-              )
-            }
-            return false
+          if (response.error) {
+            throw response.error
           }
-        },
-        [updateToken, token.id, messageApi],
-      ),
+
+          messageApi.success('Personal access token updated successfully')
+          return true
+        } catch (error) {
+          if (error.status === 422 && error.errors) {
+            const formErrors = toFormErrors(error.errors)
+            form.setFields(formErrors)
+            messageApi.error('Correct the validation error(s) to continue.')
+          } else {
+            messageApi.error(
+              error.detail ??
+                'An error occurred while updating the PAT. Please try again.',
+            )
+          }
+          return false
+        }
+      },
       onComplete: onFormUpdate,
       onCancel: onFormCancel,
     })

@@ -13,7 +13,7 @@ import {
 import { toFormErrors } from '@/src/utils'
 import { Form, Input, Modal } from 'antd'
 import { BaseOptionType } from 'antd/es/select'
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 const { Item } = Form
 
@@ -66,34 +66,31 @@ const EditPortfolioForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<UpdatePortfolioFormValues>({
-      onSubmit: useCallback(
-        async (values: UpdatePortfolioFormValues, form) => {
-          try {
-            const request = mapToRequestValues(values, portfolioData.id)
-            const response = await updatePortfolio({
-              request,
-              cacheKey: portfolioData.key,
-            })
-            if (response.error) throw response.error
+      onSubmit: async (values: UpdatePortfolioFormValues, form) => {
+        try {
+          const request = mapToRequestValues(values, portfolioData.id)
+          const response = await updatePortfolio({
+            request,
+            cacheKey: portfolioData.key,
+          })
+          if (response.error) throw response.error
 
-            messageApi.success('Portfolio updated successfully.')
-            return true
-          } catch (error) {
-            if (error.status === 422 && error.errors) {
-              const formErrors = toFormErrors(error.errors)
-              form.setFields(formErrors)
-              messageApi.error('Correct the validation error(s) to continue.')
-            } else {
-              messageApi.error(
-                error.detail ??
-                  'An error occurred while updating the Portfolio. Please try again.',
-              )
-            }
-            return false
+          messageApi.success('Portfolio updated successfully.')
+          return true
+        } catch (error) {
+          if (error.status === 422 && error.errors) {
+            const formErrors = toFormErrors(error.errors)
+            form.setFields(formErrors)
+            messageApi.error('Correct the validation error(s) to continue.')
+          } else {
+            messageApi.error(
+              error.detail ??
+                'An error occurred while updating the Portfolio. Please try again.',
+            )
           }
-        },
-        [updatePortfolio, portfolioData, messageApi],
-      ),
+          return false
+        }
+      },
       onComplete: onFormComplete,
       onCancel: onFormCancel,
       errorMessage:

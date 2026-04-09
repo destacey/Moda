@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useMemo, useState } from 'react'
+import { useState, useMemo } from 'react'
 import ModaGrid from '@/src/components/common/moda-grid'
 import {
   useDeleteTeamOperatingModelMutation,
@@ -96,43 +96,41 @@ const TeamOperatingModelsGrid = ({
   } = useGetTeamOperatingModelsQuery(teamId)
   const [deleteOperatingModel] = useDeleteTeamOperatingModelMutation()
 
-  const refresh = useCallback(() => {
+  const refresh = () => {
     refetch()
-  }, [refetch])
+  }
 
-  const handleDelete = useCallback(
-    async (model: TeamOperatingModelDetailsDto) => {
-      try {
-        await deleteOperatingModel({
-          teamId,
-          operatingModelId: model.id,
-        }).unwrap()
-        messageApi.success('Successfully deleted operating model.')
-      } catch (error: any) {
-        messageApi.error(
-          error.detail ??
-            'An unexpected error occurred while deleting the operating model.',
-        )
-        console.error(error)
-      }
-    },
-    [deleteOperatingModel, messageApi, teamId],
-  )
-
-  const handleEdit = useCallback((model: TeamOperatingModelDetailsDto) => {
-    setSelectedModelId(model.id)
-    setShowUpdateForm(true)
-  }, [])
-
-  const handleUpdateFormClose = useCallback(() => {
+  const handleUpdateFormClose = () => {
     setShowUpdateForm(false)
     setSelectedModelId(null)
-  }, [])
+  }
 
   const totalModelsCount = operatingModelsData?.length ?? 0
 
   const columnDefs = useMemo<ColDef<TeamOperatingModelDetailsDto>[]>(
-    () => [
+    () => {
+      const handleEdit = (model: TeamOperatingModelDetailsDto) => {
+        setSelectedModelId(model.id)
+        setShowUpdateForm(true)
+      }
+
+      const handleDelete = async (model: TeamOperatingModelDetailsDto) => {
+        try {
+          await deleteOperatingModel({
+            teamId,
+            operatingModelId: model.id,
+          }).unwrap()
+          messageApi.success('Successfully deleted operating model.')
+        } catch (error: any) {
+          messageApi.error(
+            error.detail ??
+              'An unexpected error occurred while deleting the operating model.',
+          )
+          console.error(error)
+        }
+      }
+
+      return [
       {
         width: 50,
         filter: false,
@@ -164,7 +162,9 @@ const TeamOperatingModelsGrid = ({
         field: 'end',
         headerName: 'End Date',
         valueGetter: (params) =>
-          params.data?.end ? dayjs(params.data.end).format('MMM D, YYYY') : '-',
+          params.data?.end
+            ? dayjs(params.data.end).format('MMM D, YYYY')
+            : '-',
       },
       {
         field: 'methodology',
@@ -183,8 +183,8 @@ const TeamOperatingModelsGrid = ({
         headerName: 'Status',
         cellRenderer: StatusCellRenderer,
       },
-    ],
-    [canUpdate, handleDelete, handleEdit, totalModelsCount],
+    ]},
+    [canUpdate, totalModelsCount, teamId, deleteOperatingModel, messageApi],
   )
 
   return (

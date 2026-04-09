@@ -7,7 +7,6 @@ import { toFormErrors } from '@/src/utils'
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons'
 import { Button, Form, Input, Modal, Space } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
-import { useCallback } from 'react'
 import { useModalForm } from '@/src/hooks'
 
 const { Item, List } = Form
@@ -33,8 +32,7 @@ const CreateEstimationScaleForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<CreateEstimationScaleFormValues>({
-      onSubmit: useCallback(
-        async (values: CreateEstimationScaleFormValues, form) => {
+      onSubmit: async (values: CreateEstimationScaleFormValues, form) => {
           try {
             const request: CreateEstimationScaleRequest = {
               name: values.name,
@@ -61,8 +59,6 @@ const CreateEstimationScaleForm = ({
             return false
           }
         },
-        [createEstimationScale, messageApi],
-      ),
       onComplete: onFormComplete,
       onCancel: onFormCancel,
       errorMessage:

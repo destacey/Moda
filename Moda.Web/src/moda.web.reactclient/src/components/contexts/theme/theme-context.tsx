@@ -33,10 +33,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     currentThemeName === 'light' ? 'classic' : 'classicDark'
   const antvisG6ChartsTheme = currentThemeName === 'light' ? 'light' : 'dark'
 
-  const currentTheme = useMemo(
-    () => (currentThemeName === 'light' ? lightTheme : darkTheme),
-    [currentThemeName],
-  )
+  const currentTheme = currentThemeName === 'light' ? lightTheme : darkTheme
 
   useLayoutEffect(() => {
     const root = document.documentElement

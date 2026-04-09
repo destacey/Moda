@@ -9,7 +9,7 @@ import {
 } from '@/src/store/features/strategic-management/strategic-themes-api'
 import { toFormErrors } from '@/src/utils'
 import { Form, Input, Modal } from 'antd'
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useModalForm } from '@/src/hooks'
 
 const { Item } = Form
@@ -50,8 +50,7 @@ const EditStrategicThemeForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<UpdateStrategicThemeFormValues>({
-      onSubmit: useCallback(
-        async (values: UpdateStrategicThemeFormValues, form) => {
+      onSubmit: async (values: UpdateStrategicThemeFormValues, form) => {
           try {
             const request = mapToRequestValues(values, strategicThemeData.id)
             const response = await updateStrategicTheme({
@@ -77,8 +76,6 @@ const EditStrategicThemeForm = ({
             return false
           }
         },
-        [updateStrategicTheme, strategicThemeData, messageApi],
-      ),
       onComplete: onFormComplete,
       onCancel: onFormCancel,
       errorMessage:

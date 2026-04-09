@@ -5,7 +5,7 @@ import BasicBreadcrumb from '@/src/components/common/basic-breadcrumb'
 import useAuth from '@/src/components/contexts/auth'
 import { authorizePage, requireFeatureFlag } from '@/src/components/hoc'
 import { Card, MenuProps } from 'antd'
-import { use, useCallback, useEffect, useMemo, useState } from 'react'
+import { use, useEffect, useState } from 'react'
 import EstimationScaleDetailsLoading from './loading'
 import { notFound, useRouter } from 'next/navigation'
 import {
@@ -64,20 +64,20 @@ const EstimationScaleDetailsPage = (props: {
     'Permissions.EstimationScales.Delete',
   )
 
-  const renderTabContent = useCallback(() => {
+  const renderTabContent = () => {
     switch (activeTab) {
       case EstimationScaleTabs.Details:
         return <EstimationScaleDetails estimationScale={scaleData} />
       default:
         return null
     }
-  }, [activeTab, scaleData])
+  }
 
-  const onTabChange = useCallback((tabKey: string) => {
+  const onTabChange = (tabKey: string) => {
     setActiveTab(tabKey as EstimationScaleTabs)
-  }, [])
+  }
 
-  const handleToggleActive = useCallback(async () => {
+  const handleToggleActive = async () => {
     if (!scaleData) return
     try {
       const response = await setActiveStatus({
@@ -96,9 +96,9 @@ const EstimationScaleDetailsPage = (props: {
       )
       console.error(error)
     }
-  }, [scaleData, setActiveStatus, messageApi])
+  }
 
-  const actionsMenuItems: MenuProps['items'] = useMemo(() => {
+  const actionsMenuItems: MenuProps['items'] = (() => {
     const items: ItemType[] = []
     if (canUpdateEstimationScales) {
       items.push({
@@ -121,12 +121,7 @@ const EstimationScaleDetailsPage = (props: {
     }
 
     return items
-  }, [
-    canUpdateEstimationScales,
-    canDeleteEstimationScales,
-    scaleData?.isActive,
-    handleToggleActive,
-  ])
+  })()
 
   useEffect(() => {
     if (error) {
@@ -138,25 +133,19 @@ const EstimationScaleDetailsPage = (props: {
     }
   }, [error, messageApi])
 
-  const onEditFormClosed = useCallback(
-    (wasSaved: boolean) => {
-      setOpenEditForm(false)
-      if (wasSaved) {
-        refetch()
-      }
-    },
-    [refetch],
-  )
+  const onEditFormClosed = (wasSaved: boolean) => {
+    setOpenEditForm(false)
+    if (wasSaved) {
+      refetch()
+    }
+  }
 
-  const onDeleteFormClosed = useCallback(
-    (wasDeleted: boolean) => {
-      setOpenDeleteForm(false)
-      if (wasDeleted) {
-        router.push('/settings/planning/estimation-scales')
-      }
-    },
-    [router],
-  )
+  const onDeleteFormClosed = (wasDeleted: boolean) => {
+    setOpenDeleteForm(false)
+    if (wasDeleted) {
+      router.push('/settings/planning/estimation-scales')
+    }
+  }
 
   if (isLoading) {
     return <EstimationScaleDetailsLoading />

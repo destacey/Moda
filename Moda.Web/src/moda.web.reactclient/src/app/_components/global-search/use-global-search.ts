@@ -8,8 +8,8 @@ export function useGlobalSearch() {
   const [open, setOpen] = useState(false)
   const requestedScopeRef = useRef<SearchScope | null>(null)
 
-  const openSearch = useCallback(() => setOpen(true), [])
-  const closeSearch = useCallback(() => setOpen(false), [])
+  const openSearch = () => setOpen(true)
+  const closeSearch = () => setOpen(false)
 
   // Ctrl+K opens modal (if closed) and sets scope to 'app'
   // If already open, the modal's own keydown handler catches Ctrl+K to switch scope

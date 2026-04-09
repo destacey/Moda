@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useMemo, useState } from 'react'
+import { useState, useMemo } from 'react'
 import ModaGrid from '../../../components/common/moda-grid'
 import { TeamMembershipDto } from '@/src/services/moda-api'
 import dayjs from 'dayjs'
@@ -78,28 +78,23 @@ const TeamMembershipsGrid = ({
   )
   const showRowActions = canManageTeamMemberships
 
-  const refresh = useCallback(async () => {
+  const refresh = async () => {
     refetch()
-  }, [refetch])
-
-  const onEditTeamMembershipMenuClicked = useCallback(
-    (membership: TeamMembershipDto) => {
-      setSelectedTeamMembership(membership)
-      setOpenEditTeamMembershipForm(true)
-    },
-    [],
-  )
-
-  const onDeleteTeamMembershipMenuClicked = useCallback(
-    (membership: TeamMembershipDto) => {
-      setSelectedTeamMembership(membership)
-      setOpenDeleteTeamMembershipForm(true)
-    },
-    [],
-  )
+  }
 
   const columnDefs = useMemo<ColDef<TeamMembershipDto>[]>(
-    () => [
+    () => {
+      const onEditTeamMembershipMenuClicked = (membership: TeamMembershipDto) => {
+        setSelectedTeamMembership(membership)
+        setOpenEditTeamMembershipForm(true)
+      }
+
+      const onDeleteTeamMembershipMenuClicked = (membership: TeamMembershipDto) => {
+        setSelectedTeamMembership(membership)
+        setOpenDeleteTeamMembershipForm(true)
+      }
+
+      return [
       {
         width: 50,
         filter: false,
@@ -141,13 +136,11 @@ const TeamMembershipsGrid = ({
         valueGetter: (params) =>
           params.data.end ? dayjs(params.data.end).format('M/D/YYYY') : null,
       },
-    ],
+    ]},
     [
-      canManageTeamMemberships,
-      onDeleteTeamMembershipMenuClicked,
-      onEditTeamMembershipMenuClicked,
       showRowActions,
       teamId,
+      canManageTeamMemberships,
     ],
   )
 

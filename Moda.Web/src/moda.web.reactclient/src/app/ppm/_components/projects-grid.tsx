@@ -11,7 +11,7 @@ import { ProjectListDto } from '@/src/services/moda-api'
 import { getSortedNames } from '@/src/utils'
 import { ColDef } from 'ag-grid-community'
 import dayjs from 'dayjs'
-import { FC, ReactNode, useCallback, useMemo } from 'react'
+import { FC, ReactNode, useMemo } from 'react'
 
 export interface ProjectsGridProps {
   projects: ProjectListDto[]
@@ -98,9 +98,9 @@ const ProjectsGrid: FC<ProjectsGridProps> = (props: ProjectsGridProps) => {
     [props.hidePortfolio, props.hideProgram],
   )
 
-  const refresh = useCallback(async () => {
+  const refresh = async () => {
     refetch()
-  }, [refetch])
+  }
 
   return (
     <>

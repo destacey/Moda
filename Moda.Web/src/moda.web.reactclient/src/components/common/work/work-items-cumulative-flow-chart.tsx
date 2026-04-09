@@ -7,7 +7,6 @@ const Area = dynamic(
 )
 import { AreaConfig } from '@ant-design/charts'
 import useTheme from '../../contexts/theme'
-import { useMemo } from 'react'
 import { WorkItemProgressDailyRollupDto } from '@/src/services/moda-api'
 import ModaEmpty from '../moda-empty'
 import { Spin, Typography } from 'antd'
@@ -26,7 +25,7 @@ const WorkItemsCumulativeFlowChart = (
   const { antDesignChartsTheme } = useTheme()
 
   // Derive chart data from work items
-  const data = useMemo(() => {
+  const data = (() => {
     if (!props.workItems) return []
 
     const workItems = props.workItems
@@ -50,53 +49,51 @@ const WorkItemsCumulativeFlowChart = (
     }))
 
     return [...doneData, ...activeData, ...proposedData]
-  }, [props.workItems])
+  })()
 
-  const config = useMemo(() => {
-    return {
-      title: 'Cumulative Flow',
-      theme: antDesignChartsTheme,
-      data: data,
-      xField: 'date',
-      yField: 'value',
-      //seriesField: 'category', // not sure when to use seriesField vs colorField
-      colorField: 'category',
-      legend: {
-        color: { layout: { justifyContent: 'center' }, itemMarker: 'square' },
-      },
-      stack: true,
-      // style: {
-      //   fill: (data) => {
-      //     if (data[0].category === 'Done') {
-      //       return '#49aa19' // 52c41a
-      //     }
-      //     if (data[0].category === 'Active') {
-      //       return '#1668dc' // 1677ff
-      //     }
-      //     if (data[0].category === 'Proposed') {
-      //       return '#f5f5f5'
-      //     }
-      //     return '#FFC107'
-      //   },
-      // },
-      //stackField: 'category',
-      // stack: {
-      //   field: 'order',
-      //   reverse: false,
-      //   // orderBy: (a, b) => {
-      //   //   const order = ['Done', 'Active', 'Proposed']
-      //   //   return order.indexOf(a) - order.indexOf(b)
-      //   // },
-      // },
-      //shapeField: 'smooth',
-      // stack: {
-      //   orderBy: 'total',
-      //   reverse: true,
-      // },
+  const config = {
+    title: 'Cumulative Flow',
+    theme: antDesignChartsTheme,
+    data: data,
+    xField: 'date',
+    yField: 'value',
+    //seriesField: 'category', // not sure when to use seriesField vs colorField
+    colorField: 'category',
+    legend: {
+      color: { layout: { justifyContent: 'center' }, itemMarker: 'square' },
+    },
+    stack: true,
+    // style: {
+    //   fill: (data) => {
+    //     if (data[0].category === 'Done') {
+    //       return '#49aa19' // 52c41a
+    //     }
+    //     if (data[0].category === 'Active') {
+    //       return '#1668dc' // 1677ff
+    //     }
+    //     if (data[0].category === 'Proposed') {
+    //       return '#f5f5f5'
+    //     }
+    //     return '#FFC107'
+    //   },
+    // },
+    //stackField: 'category',
+    // stack: {
+    //   field: 'order',
+    //   reverse: false,
+    //   // orderBy: (a, b) => {
+    //   //   const order = ['Done', 'Active', 'Proposed']
+    //   //   return order.indexOf(a) - order.indexOf(b)
+    //   // },
+    // },
+    //shapeField: 'smooth',
+    // stack: {
+    //   orderBy: 'total',
+    //   reverse: true,
+    // },
 
-      // update the tooltip to show the date with this format 'MMM D, YYYY'
-    } as AreaConfig
-  }, [antDesignChartsTheme, data])
+    // update the tooltip to show the date with this format 'MMM D, YYYY'
+  } as AreaConfig
 
   if (props.isLoading) return <Spin />
 

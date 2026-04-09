@@ -9,7 +9,7 @@ import {
 import { toFormErrors } from '@/src/utils'
 import { Form, Modal } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useModalForm } from '@/src/hooks'
 
 const { Item } = Form
@@ -48,8 +48,7 @@ const EditProjectLifecycleForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<UpdateProjectLifecycleFormValues>({
-      onSubmit: useCallback(
-        async (values: UpdateProjectLifecycleFormValues, form) => {
+      onSubmit: async (values: UpdateProjectLifecycleFormValues, form) => {
           try {
             const request = mapToRequestValues(values)
             const response = await updateProjectLifecycle({
@@ -75,8 +74,6 @@ const EditProjectLifecycleForm = ({
             return false
           }
         },
-        [updateProjectLifecycle, lifecycleData, messageApi],
-      ),
       onComplete: onFormComplete,
       onCancel: onFormCancel,
       errorMessage:

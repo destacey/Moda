@@ -10,7 +10,7 @@ import { authenticatedFetch } from '@/src/services/clients'
 import { toFormErrors } from '@/src/utils'
 import { DatePicker, Form, InputNumber, Modal, Radio } from 'antd'
 import dayjs from 'dayjs'
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 
 const { Item } = Form
 const { RangePicker } = DatePicker
@@ -47,8 +47,7 @@ const EditProjectPhaseForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<EditPhaseFormValues>({
-      onSubmit: useCallback(
-        async (values: EditPhaseFormValues, form: any): Promise<boolean> => {
+      onSubmit: async (values: EditPhaseFormValues, form: any): Promise<boolean> => {
           const patchOperations: Array<{
             op: 'replace'
             path: string
@@ -146,8 +145,6 @@ const EditProjectPhaseForm = ({
 
           return true
         },
-        [phaseData, projectId, phaseId],
-      ),
       onComplete: onFormComplete,
       onCancel: onFormCancel,
       errorMessage: 'Failed to update phase. Please try again.',

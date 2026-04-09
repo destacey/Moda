@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useCallback, FC } from 'react'
+import { useState, FC, useMemo } from 'react'
 import { Button, Tag, Alert, Flex, Typography, App, Space } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import {
@@ -126,37 +126,6 @@ const PersonalAccessTokens: FC = () => {
   const [revokeToken] = useRevokePersonalAccessTokenMutation()
   const [deleteToken] = useDeletePersonalAccessTokenMutation()
 
-  const handleEdit = useCallback((token: PersonalAccessTokenDto) => {
-    setEditingToken(token)
-    setIsEditFormVisible(true)
-  }, [])
-
-  const handleRevoke = useCallback(
-    async (id: string, name: string) => {
-      try {
-        await revokeToken(id).unwrap()
-        messageApi.success(`Token "${name}" revoked successfully`)
-      } catch (error) {
-        console.error('Failed to revoke token:', error)
-        messageApi.error('Failed to revoke token')
-      }
-    },
-    [revokeToken, messageApi],
-  )
-
-  const handleDelete = useCallback(
-    async (id: string, name: string) => {
-      try {
-        await deleteToken(id).unwrap()
-        messageApi.success(`Token "${name}" deleted successfully`)
-      } catch (error) {
-        console.error('Failed to delete token:', error)
-        messageApi.error('Failed to delete token')
-      }
-    },
-    [deleteToken, messageApi],
-  )
-
   const handleFormCreate = (token: string) => {
     setNewToken(token)
   }
@@ -180,12 +149,38 @@ const PersonalAccessTokens: FC = () => {
     setIsCreateFormVisible(false)
   }
 
-  const refresh = useCallback(async () => {
+  const refresh = async () => {
     refetch()
-  }, [refetch])
+  }
 
   const columnDefs = useMemo<ColDef<PersonalAccessTokenDto>[]>(
-    () => [
+    () => {
+      const handleEdit = (token: PersonalAccessTokenDto) => {
+        setEditingToken(token)
+        setIsEditFormVisible(true)
+      }
+
+      const handleRevoke = async (id: string, name: string) => {
+        try {
+          await revokeToken(id).unwrap()
+          messageApi.success(`Token "${name}" revoked successfully`)
+        } catch (error) {
+          console.error('Failed to revoke token:', error)
+          messageApi.error('Failed to revoke token')
+        }
+      }
+
+      const handleDelete = async (id: string, name: string) => {
+        try {
+          await deleteToken(id).unwrap()
+          messageApi.success(`Token "${name}" deleted successfully`)
+        } catch (error) {
+          console.error('Failed to delete token:', error)
+          messageApi.error('Failed to delete token')
+        }
+      }
+
+      return [
       {
         width: 50,
         filter: false,
@@ -230,8 +225,8 @@ const PersonalAccessTokens: FC = () => {
         headerTooltip:
           'The last time this token was used for authentication. Updates at most once per hour.',
       },
-    ],
-    [handleEdit, handleRevoke, handleDelete, modal],
+    ]},
+    [modal, revokeToken, deleteToken, messageApi],
   )
 
   if (error) {

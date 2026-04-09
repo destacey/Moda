@@ -1,7 +1,7 @@
 'use client'
 
 import { Alert, Flex, Form, Input, Modal, Spin, Tag, Typography } from 'antd'
-import { CSSProperties, useCallback, useEffect } from 'react'
+import { CSSProperties, useEffect } from 'react'
 import { EstimationScaleDto } from '@/src/services/moda-api'
 import { toFormErrors } from '@/src/utils'
 import { useMessage } from '@/src/components/contexts/messaging'
@@ -99,8 +99,7 @@ const EditPokerSessionForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<EditPokerSessionFormValues>({
-      onSubmit: useCallback(
-        async (values: EditPokerSessionFormValues, form) => {
+      onSubmit: async (values: EditPokerSessionFormValues, form) => {
           if (!session) return false
           try {
             const request: UpdatePokerSessionRequest = {
@@ -131,8 +130,6 @@ const EditPokerSessionForm = ({
             return false
           }
         },
-        [updatePokerSession, session, messageApi],
-      ),
       onComplete: onFormUpdate,
       onCancel: onFormCancel,
       errorMessage:
@@ -152,14 +149,11 @@ const EditPokerSessionForm = ({
   const activeScales = estimationScales ?? []
   const selectedScaleId = Form.useWatch('estimationScaleId', form)
 
-  const handleScaleSelect = useCallback(
-    (id: number) => {
-      if (!hasRounds) {
-        form.setFieldsValue({ estimationScaleId: id })
-      }
-    },
-    [form, hasRounds],
-  )
+  const handleScaleSelect = (id: number) => {
+    if (!hasRounds) {
+      form.setFieldsValue({ estimationScaleId: id })
+    }
+  }
 
   const cssVars: ScaleCssVars = {
     '--scale-border': token.colorBorderSecondary,

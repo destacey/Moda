@@ -35,25 +35,28 @@ const PlanningIntervalPlanReviewPage = (props: {
 
   const predictability = planningIntervalData?.predictability
 
-  const teams = useMemo(() => {
-    if (!teamData) return []
-    return teamData
-      .filter((t) => t.type === 'Team')
-      .sort((a, b) => a.code.localeCompare(b.code))
-  }, [teamData])
+  const teams = useMemo(
+    () =>
+      !teamData
+        ? []
+        : teamData
+            .filter((t) => t.type === 'Team')
+            .sort((a, b) => a.code.localeCompare(b.code)),
+    [teamData],
+  )
 
   // Track user interactions separately from derived state
   const [userSelectedTab, setUserSelectedTab] = useState<string | null>(null)
 
   // Derive activeTab: use user selection, or fall back to hash/first team
-  const activeTab = useMemo(() => {
+  const activeTab = (() => {
     if (userSelectedTab) return userSelectedTab
     if (teams.length === 0) return ''
 
     const hash =
       typeof window !== 'undefined' ? window.location.hash.slice(1) : ''
     return hash && hash !== '' ? hash : teams[0]?.code.toLowerCase()
-  }, [userSelectedTab, teams])
+  })()
 
   // Update URL hash if it doesn't match activeTab - side effect only
   useEffect(() => {
@@ -85,21 +88,15 @@ const PlanningIntervalPlanReviewPage = (props: {
     router.push(`#${activeTab}`, { scroll: false })
   }, [activeTab, router])
 
-  const tabs = useMemo(
-    () =>
-      teams?.map((team) => {
-        return {
-          key: team.code.toLowerCase(),
-          tab: team.code,
-        }
-      }),
-    [teams],
-  )
+  const tabs = teams?.map((team) => ({
+    key: team.code.toLowerCase(),
+    tab: team.code,
+  }))
 
-  const activeTeam = useMemo((): PlanningIntervalTeamResponse => {
-    if (!teams || teams.length === 0 || !activeTab) return null
-    return teams?.find((t) => t.code.toLowerCase() === activeTab)
-  }, [teams, activeTab])
+  const activeTeam: PlanningIntervalTeamResponse =
+    !teams || teams.length === 0 || !activeTab
+      ? null
+      : teams?.find((t) => t.code.toLowerCase() === activeTab)
 
   if (!isLoading && !planningIntervalData) {
     return notFound()

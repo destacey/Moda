@@ -9,7 +9,7 @@ import { useGetExpenditureCategoriesQuery } from '@/src/store/features/ppm/expen
 import { ColDef } from 'ag-grid-community'
 import { Button } from 'antd'
 import Link from 'next/link'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { CreateExpenditureCategoryForm } from './_components'
 import { useMessage } from '@/src/components/contexts/messaging'
 
@@ -49,8 +49,7 @@ const ExpenditureCategoriesPage = () => {
     }
   }, [error, messageApi])
 
-  const columnDefs = useMemo<ColDef<ExpenditureCategoryListDto>[]>(
-    () => [
+  const columnDefs = useMemo<ColDef<ExpenditureCategoryListDto>[]>(() => [
       { field: 'id', hide: true },
       { field: 'name', cellRenderer: ExpenditureCategoryCellRenderer },
       { field: 'state.name', headerName: 'State', width: 100 },
@@ -65,17 +64,13 @@ const ExpenditureCategoriesPage = () => {
         width: 150,
       },
       { field: 'accountingCode', headerName: 'Accounting Code', width: 150 },
-    ],
-    [],
-  )
+    ], [])
 
-  const refresh = useCallback(async () => {
+  const refresh = async () => {
     refetch()
-  }, [refetch])
+  }
 
-  const actions = useMemo(() => {
-    if (!showActions) return null
-    return (
+  const actions = !showActions ? null : (
       <>
         {canCreateExpenditureCategory && (
           <Button onClick={() => setOpenCreateExpenditureCategoryForm(true)}>
@@ -84,7 +79,6 @@ const ExpenditureCategoriesPage = () => {
         )}
       </>
     )
-  }, [canCreateExpenditureCategory, showActions])
 
   const onCreateExpenditureCategoryFormClosed = (wasCreated: boolean) => {
     setOpenCreateExpenditureCategoryForm(false)

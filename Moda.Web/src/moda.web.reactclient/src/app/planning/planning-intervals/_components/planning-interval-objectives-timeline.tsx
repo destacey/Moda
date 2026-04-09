@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useMemo } from 'react'
+import React from 'react'
 import { Card, Flex, Typography } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
@@ -94,62 +94,49 @@ const PlanningIntervalObjectivesTimeline = ({
   teamNames,
   viewSelector,
 }: PlanningIntervalObjectivesTimelineProps) => {
-  const timelineOptions = useMemo(
-    (): ModaTimelineOptions<ObjectiveDataItem> => ({
-      maxHeight: 650,
-      start: planningIntervalCalendar?.start ?? dayjs().toDate(),
-      end: planningIntervalCalendar?.end ?? dayjs().toDate(),
-      min: planningIntervalCalendar?.start ?? dayjs().toDate(),
-      max: planningIntervalCalendar?.end ?? dayjs().toDate(),
-      groupOrder: 'content',
-    }),
-    [planningIntervalCalendar],
-  )
+  const timelineOptions: ModaTimelineOptions<ObjectiveDataItem> = {
+    maxHeight: 650,
+    start: planningIntervalCalendar?.start ?? dayjs().toDate(),
+    end: planningIntervalCalendar?.end ?? dayjs().toDate(),
+    min: planningIntervalCalendar?.start ?? dayjs().toDate(),
+    max: planningIntervalCalendar?.end ?? dayjs().toDate(),
+    groupOrder: 'content',
+  }
 
-  const iterations = useMemo((): ObjectiveDataItem[] => {
-    return (
-      planningIntervalCalendar?.iterationSchedules?.map(
-        (i): ObjectiveDataItem => ({
-          id: String(i.key),
-          planningIntervalKey: planningIntervalCalendar?.key,
-          title: i.name,
-          content: i.name ?? '',
-          start: dayjs(i.start).toDate(),
-          end: dayjs(i.end).add(1, 'day').subtract(1, 'second').toDate(),
-          type: 'background',
-        }),
-      ) ?? []
+  const iterations: ObjectiveDataItem[] =
+    planningIntervalCalendar?.iterationSchedules?.map(
+      (i): ObjectiveDataItem => ({
+        id: String(i.key),
+        planningIntervalKey: planningIntervalCalendar?.key,
+        title: i.name,
+        content: i.name ?? '',
+        start: dayjs(i.start).toDate(),
+        end: dayjs(i.end).add(1, 'day').subtract(1, 'second').toDate(),
+        type: 'background',
+      }),
+    ) ?? []
+
+  const objectives: ObjectiveDataItem[] = (objectivesData ?? [])
+    .filter((obj) => obj.status?.name !== 'Canceled')
+    .map(
+      (obj): ObjectiveDataItem => ({
+        id: String(obj.key),
+        title: `${obj.name} (${obj.status?.name}) - ${obj.progress}%`,
+        content: obj.name ?? '',
+        start: dayjs(
+          obj.startDate ?? planningIntervalCalendar?.start,
+        ).toDate(),
+        end: dayjs(
+          obj.targetDate ?? planningIntervalCalendar?.end,
+        ).toDate(),
+        group: obj.team?.name,
+        type: 'range',
+        zIndex: 1,
+        objectData: obj,
+      }),
     )
-  }, [planningIntervalCalendar])
 
-  const objectives = useMemo((): ObjectiveDataItem[] => {
-    return (
-      (objectivesData ?? [])
-        .filter((obj) => obj.status?.name !== 'Canceled')
-        .map(
-          (obj): ObjectiveDataItem => ({
-            id: String(obj.key),
-            title: `${obj.name} (${obj.status?.name}) - ${obj.progress}%`,
-            content: obj.name ?? '',
-            start: dayjs(
-              obj.startDate ?? planningIntervalCalendar?.start,
-            ).toDate(),
-            end: dayjs(
-              obj.targetDate ?? planningIntervalCalendar?.end,
-            ).toDate(),
-            group: obj.team?.name,
-            type: 'range',
-            zIndex: 1,
-            objectData: obj,
-          }),
-        ) ?? []
-    )
-  }, [objectivesData, planningIntervalCalendar])
-
-  const combinedItems = useMemo(
-    () => [...iterations, ...objectives],
-    [iterations, objectives],
-  )
+  const combinedItems = [...iterations, ...objectives]
   const derivedIsLoading = !(planningIntervalCalendar && objectivesData)
 
   // Hooks must run unconditionally; perform an early return after hooks

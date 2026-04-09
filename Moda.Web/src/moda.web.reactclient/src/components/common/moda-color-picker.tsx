@@ -117,32 +117,29 @@ const ModaColorPicker = forwardRef<ModaColorPickerRef, ModaColorPickerProps>(
       }
     }, [getTrigger])
 
-    const focusTriggerWithRetry = useCallback(
-      (attempt = 0) => {
-        const run = (currentAttempt: number) => {
-          focusTrigger()
+    const focusTriggerWithRetry = useCallback((attempt = 0) => {
+      const run = (currentAttempt: number) => {
+        focusTrigger()
 
-          refocusTimeoutRef.current = window.setTimeout(() => {
-            refocusTimeoutRef.current = null
+        refocusTimeoutRef.current = window.setTimeout(() => {
+          refocusTimeoutRef.current = null
 
-            const hasFocus = isFocusOnTrigger()
-            // Even if focused now, keep checking for a few frames because
-            // modal/popup teardown can steal focus right after close.
-            if (hasFocus && currentAttempt < 4) {
-              run(currentAttempt + 1)
-              return
-            }
+          const hasFocus = isFocusOnTrigger()
+          // Even if focused now, keep checking for a few frames because
+          // modal/popup teardown can steal focus right after close.
+          if (hasFocus && currentAttempt < 4) {
+            run(currentAttempt + 1)
+            return
+          }
 
-            if (!hasFocus && currentAttempt < 8) {
-              run(currentAttempt + 1)
-            }
-          }, 16)
-        }
+          if (!hasFocus && currentAttempt < 8) {
+            run(currentAttempt + 1)
+          }
+        }, 16)
+      }
 
-        run(attempt)
-      },
-      [focusTrigger, isFocusOnTrigger],
-    )
+      run(attempt)
+    }, [focusTrigger, isFocusOnTrigger])
 
     useImperativeHandle(
       ref,
@@ -183,25 +180,22 @@ const ModaColorPicker = forwardRef<ModaColorPickerRef, ModaColorPickerProps>(
       }
     }, [isFocusOnTrigger])
 
-    const onPickerChange = useCallback(
-      (color: Color | undefined) => {
-        const colorValue = color?.toHexString()
-        if (colorValue !== value) {
-          onChange?.(colorValue)
-        } else {
-          // Clear the color if the same color is selected
-          onChange?.(undefined)
-        }
-        shouldRefocusOnCloseRef.current = true
-        clearPendingRefocus()
-        setIsOpen(false)
-        // Controlled close doesn't always emit onOpenChange(false), so refocus here too.
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => focusTriggerWithRetry())
-        })
-      },
-      [clearPendingRefocus, focusTriggerWithRetry, onChange, value],
-    )
+    const onPickerChange = (color: Color | undefined) => {
+      const colorValue = color?.toHexString()
+      if (colorValue !== value) {
+        onChange?.(colorValue)
+      } else {
+        // Clear the color if the same color is selected
+        onChange?.(undefined)
+      }
+      shouldRefocusOnCloseRef.current = true
+      clearPendingRefocus()
+      setIsOpen(false)
+      // Controlled close doesn't always emit onOpenChange(false), so refocus here too.
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => focusTriggerWithRetry())
+      })
+    }
 
     return (
       <span ref={rootRef}>

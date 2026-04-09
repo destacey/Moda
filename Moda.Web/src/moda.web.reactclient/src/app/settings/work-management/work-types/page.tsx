@@ -5,7 +5,7 @@ import { useAppDispatch, useAppSelector, useDocumentTitle } from '@/src/hooks'
 import { WorkTypeDto } from '@/src/services/moda-api'
 import { ColDef } from 'ag-grid-community'
 import { Button } from 'antd'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { setIncludeInactive } from '../../../../store/features/work-management/work-type-slice'
 import { authorizePage } from '@/src/components/hoc'
 import { useGetWorkTypesQuery } from '@/src/store/features/work-management/work-type-api'
@@ -46,13 +46,13 @@ const WorkTypesPage = () => {
     error && console.error(error)
   }, [error])
 
-  const editWorkTypeButtonClicked = (id: number) => {
-    setEditWorkTypeId(id)
-    setOpenUpdateWorkTypeForm(true)
-  }
+  const columnDefs = useMemo<ColDef<WorkTypeDto>[]>(() => {
+    const editWorkTypeButtonClicked = (id: number) => {
+      setEditWorkTypeId(id)
+      setOpenUpdateWorkTypeForm(true)
+    }
 
-  const columnDefs = useMemo<ColDef<WorkTypeDto>[]>(
-    () => [
+    return [
       {
         width: 50,
         filter: false,
@@ -77,13 +77,11 @@ const WorkTypesPage = () => {
       { field: 'description', width: 300 },
       { field: 'level.name', headerName: 'Level' },
       { field: 'isActive', width: 100 }, // TODO: convert to yes/no
-    ],
-    [canUpdateWorkTypes],
-  )
+    ]}, [canUpdateWorkTypes])
 
-  const refresh = useCallback(async () => {
+  const refresh = async () => {
     refetch()
-  }, [refetch])
+  }
 
   const actions = () => {
     return (

@@ -2,7 +2,7 @@
 
 import { PlanningIntervalObjectiveListDto } from '@/src/services/moda-api'
 import Link from 'next/link'
-import { useCallback, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import ModaGrid from '../moda-grid'
 import { MenuProps, Progress } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
@@ -126,13 +126,17 @@ const PlanningIntervalObjectivesGrid = ({
     !!canManageObjectives &&
     hasPermissionClaim('Permissions.HealthChecks.Create')
 
-  const onEditObjectiveMenuClicked = useCallback((id: string, key: number) => {
-    setSelectedObjective({ id, key })
-    setOpenUpdateObjectiveForm(true)
-  }, [])
+  const refresh = async () => {
+    refreshObjectives()
+  }
 
-  const onCreateHealthCheckMenuClicked = useCallback(
-    (id: string, key: number) => {
+  const columnDefs = useMemo<ColDef<PlanningIntervalObjectiveListDto>[]>(() => {
+    const onEditObjectiveMenuClicked = (id: string, key: number) => {
+      setSelectedObjective({ id, key })
+      setOpenUpdateObjectiveForm(true)
+    }
+
+    const onCreateHealthCheckMenuClicked = (id: string, key: number) => {
       setSelectedObjective({ id, key })
       dispatch(
         beginHealthCheckCreate({
@@ -140,99 +144,89 @@ const PlanningIntervalObjectivesGrid = ({
           contextId: SystemContext.PlanningPlanningIntervalObjective,
         }),
       )
+    }
+
+    return [
+    {
+      width: 50,
+      filter: false,
+      sortable: false,
+      resizable: false,
+      hide: !canManageObjectives,
+      cellRenderer: (params) => {
+        const menuItems = getRowMenuItems({
+          planningIntervalKey: planningIntervalKey,
+          objectiveId: params.data.id,
+          objectiveKey: params.data.key,
+          canManageObjectives,
+          canCreateHealthChecks,
+          onEditObjectiveMenuClicked,
+          onCreateHealthCheckMenuClicked,
+        })
+
+        return RowMenuCellRenderer({ ...params, menuItems })
+      },
     },
-    [dispatch],
-  )
+    { field: 'id', hide: true },
+    { field: 'key', width: 90 },
+    {
+      field: 'name',
+      width: 500,
+      cellRenderer: PlanningIntervalObjectiveLinkCellRenderer,
+    },
+    { field: 'isStretch', width: 100 },
+    {
+      field: 'planningInterval.name',
+      headerName: 'Planning Interval',
+      cellRenderer: NestedPlanningIntervalLinkCellRenderer,
+      hide: hidePlanningInterval,
+    },
+    { field: 'status.name', headerName: 'Status', width: 125 },
+    {
+      field: 'team.name',
+      headerName: 'Team',
+      cellRenderer: NestedTeamNameLinkCellRenderer,
+      hide: hideTeam,
+    },
+    {
+      field: 'healthCheck.status.name',
+      headerName: 'Health',
+      width: 125,
+      cellRenderer: NestedHealthCheckStatusCellRenderer,
+    },
+    { field: 'progress', width: 250, cellRenderer: ProgressCellRenderer },
+    {
+      field: 'startDate',
+      valueGetter: (params) =>
+        params.data.startDate
+          ? dayjs(params.data.startDate).format('M/D/YYYY')
+          : null,
+    },
+    {
+      field: 'targetDate',
+      valueGetter: (params) =>
+        params.data.targetDate
+          ? dayjs(params.data.targetDate).format('M/D/YYYY')
+          : null,
+    },
+    {
+      field: 'order',
+      width: 100,
+      comparator: (a, b) => {
+        if (!a) return 1 // sort empty at the end
+        if (!b) return -1
 
-  const refresh = useCallback(async () => {
-    refreshObjectives()
-  }, [refreshObjectives])
-
-  const columnDefs = useMemo<ColDef<PlanningIntervalObjectiveListDto>[]>(
-    () => [
-      {
-        width: 50,
-        filter: false,
-        sortable: false,
-        resizable: false,
-        hide: !canManageObjectives,
-        cellRenderer: (params) => {
-          const menuItems = getRowMenuItems({
-            planningIntervalKey: planningIntervalKey,
-            objectiveId: params.data.id,
-            objectiveKey: params.data.key,
-            canManageObjectives,
-            canCreateHealthChecks,
-            onEditObjectiveMenuClicked,
-            onCreateHealthCheckMenuClicked,
-          })
-
-          return RowMenuCellRenderer({ ...params, menuItems })
-        },
+        return a - b
       },
-      { field: 'id', hide: true },
-      { field: 'key', width: 90 },
-      {
-        field: 'name',
-        width: 500,
-        cellRenderer: PlanningIntervalObjectiveLinkCellRenderer,
-      },
-      { field: 'isStretch', width: 100 },
-      {
-        field: 'planningInterval.name',
-        headerName: 'Planning Interval',
-        cellRenderer: NestedPlanningIntervalLinkCellRenderer,
-        hide: hidePlanningInterval,
-      },
-      { field: 'status.name', headerName: 'Status', width: 125 },
-      {
-        field: 'team.name',
-        headerName: 'Team',
-        cellRenderer: NestedTeamNameLinkCellRenderer,
-        hide: hideTeam,
-      },
-      {
-        field: 'healthCheck.status.name',
-        headerName: 'Health',
-        width: 125,
-        cellRenderer: NestedHealthCheckStatusCellRenderer,
-      },
-      { field: 'progress', width: 250, cellRenderer: ProgressCellRenderer },
-      {
-        field: 'startDate',
-        valueGetter: (params) =>
-          params.data.startDate
-            ? dayjs(params.data.startDate).format('M/D/YYYY')
-            : null,
-      },
-      {
-        field: 'targetDate',
-        valueGetter: (params) =>
-          params.data.targetDate
-            ? dayjs(params.data.targetDate).format('M/D/YYYY')
-            : null,
-      },
-      {
-        field: 'order',
-        width: 100,
-        comparator: (a, b) => {
-          if (!a) return 1 // sort empty at the end
-          if (!b) return -1
-
-          return a - b
-        },
-      },
-    ],
-    [
-      canCreateHealthChecks,
-      canManageObjectives,
-      hidePlanningInterval,
-      hideTeam,
-      onCreateHealthCheckMenuClicked,
-      onEditObjectiveMenuClicked,
-      planningIntervalKey,
-    ],
-  )
+    },
+  ]}, [
+    planningIntervalKey,
+    canManageObjectives,
+    canCreateHealthChecks,
+    hidePlanningInterval,
+    hideTeam,
+    dispatch,
+  ])
 
   const onHidePlanningIntervalChange = (checked: boolean) => {
     setHidePlanningInterval(checked)

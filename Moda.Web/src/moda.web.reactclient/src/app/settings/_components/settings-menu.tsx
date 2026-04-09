@@ -7,7 +7,6 @@ import {
   SubMenuType,
 } from 'antd/es/menu/interface'
 import useAuth from '../../../components/contexts/auth'
-import { useMemo } from 'react'
 import { Menu } from 'antd'
 import Link from 'next/link'
 import { useFeatureFlag } from '../../../hooks'
@@ -214,13 +213,11 @@ export default function SettingsMenu() {
   const { isEnabled: planningPoker } = useFeatureFlag('planning-poker')
 
   // Derive menu items based on user's permissions and feature flags
-  const menuItems = useMemo(() => {
-    return buildSettingsMenuItems({ planningPoker }).reduce(
+  const menuItems = buildSettingsMenuItems({ planningPoker }).reduce(
       (acc: ItemType<MenuItemType>[], item: SectionMenuItem) =>
         authorizeMenuItems(acc, item, hasPermissionClaim),
       [],
     )
-  }, [hasPermissionClaim, planningPoker])
 
   return (
     <Menu

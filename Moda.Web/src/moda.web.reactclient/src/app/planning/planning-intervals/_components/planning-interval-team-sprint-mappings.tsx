@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useMemo, useState } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import dayjs from 'dayjs'
 import { Button, Flex, Spin, Table, Tag, Typography } from 'antd'
@@ -86,17 +86,17 @@ export const PlanningIntervalTeamSprintMappings = ({
 
   const [editingTeam, setEditingTeam] = useState<TeamRowData | null>(null)
 
-  const onEditTeamSprints = useCallback((team: TeamRowData) => {
+  const onEditTeamSprints = (team: TeamRowData) => {
     setEditingTeam(team)
-  }, [])
+  }
 
-  const onFormSave = useCallback(() => {
+  const onFormSave = () => {
     setEditingTeam(null)
-  }, [])
+  }
 
-  const onFormCancel = useCallback(() => {
+  const onFormCancel = () => {
     setEditingTeam(null)
-  }, [])
+  }
 
   const { data: teamsData, isLoading: teamsLoading } =
     useGetPlanningIntervalTeamsQuery(planningInterval.key)
@@ -109,7 +109,7 @@ export const PlanningIntervalTeamSprintMappings = ({
   const isLoading = teamsLoading || sprintsLoading
 
   // Build sprint lookup by team and iteration
-  const sprintsByTeamAndIteration = useMemo(() => {
+  const sprintsByTeamAndIteration = (() => {
     if (!iterationSprintsData) return new Map<string, SprintListDto>()
 
     const lookup = new Map<string, SprintListDto>()
@@ -122,10 +122,10 @@ export const PlanningIntervalTeamSprintMappings = ({
     })
 
     return lookup
-  }, [iterationSprintsData])
+  })()
 
   // Build table data with team rows, filtered to only Teams (not Team of Teams), sorted alphabetically
-  const tableData = useMemo((): TeamRowData[] => {
+  const tableData: TeamRowData[] = (() => {
     if (!teamsData || !iterationSprintsData) return []
 
     return [...teamsData]
@@ -150,10 +150,10 @@ export const PlanningIntervalTeamSprintMappings = ({
           sprintsByIteration,
         }
       })
-  }, [teamsData, iterationSprintsData, sprintsByTeamAndIteration])
+  })()
 
   // Build table columns dynamically based on iterations
-  const columns = useMemo((): ColumnsType<TeamRowData> => {
+  const columns: ColumnsType<TeamRowData> = (() => {
     const cols: ColumnsType<TeamRowData> = [
       {
         title: 'Team',
@@ -243,13 +243,7 @@ export const PlanningIntervalTeamSprintMappings = ({
     }
 
     return cols
-  }, [
-    iterationSprintsData,
-    token.colorPrimary,
-    teamsData?.length,
-    canUpdatePlanningInterval,
-    onEditTeamSprints,
-  ])
+  })()
 
   if (isLoading) {
     return (

@@ -1,7 +1,7 @@
 'use client'
 
 import { ProjectPlanNodeDto } from '@/src/services/moda-api'
-import { useCallback, useEffect, useMemo, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import dayjs from 'dayjs'
 
 import { useMessage } from '@/src/components/contexts/messaging'
@@ -80,10 +80,7 @@ const ProjectPlanTable = ({
   const { data: taskTypeOptions = [] } = useGetTaskTypeOptionsQuery()
   const { data: employeeOptions = [] } = useGetEmployeeOptionsQuery(false)
 
-  const milestoneTypeValue = useMemo(
-    () => taskTypeOptions.find((opt) => opt.label === 'Milestone')?.value,
-    [taskTypeOptions],
-  )
+  const milestoneTypeValue = taskTypeOptions.find((opt) => opt.label === 'Milestone')?.value
 
   const [patchProjectTask] = usePatchProjectTaskMutation()
   const [patchProjectPhase] = usePatchProjectPhaseMutation()
@@ -160,563 +157,514 @@ const ProjectPlanTable = ({
     watchedPlannedStart,
   ])
 
-  const taskTypeFilterOptions = useMemo(
-    () =>
-      taskTypeOptions
+  const taskTypeFilterOptions = taskTypeOptions
         .map((o: any) => {
           const label = (o?.label ?? '') as string
           return label ? { label, value: label } : null
         })
-        .filter(Boolean),
-    [taskTypeOptions],
-  )
+        .filter(Boolean)
 
-  const taskStatusFilterOptions = useMemo(
-    () =>
-      taskStatusOptions
+  const taskStatusFilterOptions = taskStatusOptions
         .map((o: any) => {
           const label = (o?.label ?? '') as string
           return label ? { label, value: label } : null
         })
-        .filter(Boolean),
-    [taskStatusOptions],
-  )
+        .filter(Boolean)
 
-  const taskPriorityFilterOptions = useMemo(
-    () =>
-      taskPriorityOptions
+  const taskPriorityFilterOptions = taskPriorityOptions
         .map((o: any) => {
           const label = (o?.label ?? '') as string
           return label ? { label, value: label } : null
         })
-        .filter(Boolean),
-    [taskPriorityOptions],
-  )
+        .filter(Boolean)
 
-  const createDraftProjectTask = useCallback(
-    (draft: DraftItem): ProjectPlanNodeDto => ({
-      id: draft.id,
-      nodeType: 'Task',
-      key: '',
-      wbs: '',
-      name: '',
-      type: { id: 1, name: 'Task' },
-      status: { id: 1, name: 'Not Started' },
-      priority: { id: 2, name: 'Medium' },
-      assignees: [],
-      progress: 0,
-      order: draft.order,
-      children: [],
-    }),
-    [],
-  )
+  const createDraftProjectTask = (draft: DraftItem): ProjectPlanNodeDto => ({
+    id: draft.id,
+    nodeType: 'Task',
+    key: '',
+    wbs: '',
+    name: '',
+    type: { id: 1, name: 'Task' },
+    status: { id: 1, name: 'Not Started' },
+    priority: { id: 2, name: 'Medium' },
+    assignees: [],
+    progress: 0,
+    order: draft.order,
+    children: [],
+  })
 
-  const isPhaseNode = useCallback(
-    (node: ProjectPlanNodeDto | null | undefined) => node?.nodeType === 'Phase',
-    [],
-  )
+  const isPhaseNode = (node: ProjectPlanNodeDto | null | undefined) =>
+    node?.nodeType === 'Phase'
 
-  const projectTaskMoveValidator: MoveValidator<ProjectPlanNodeDto> =
-    useCallback(
-      (activeNode, targetParentNode, targetParentId) => {
-        // Phases cannot be moved
-        if (isPhaseNode(activeNode.node)) {
-          return { canMove: false, reason: 'Phases cannot be moved' }
-        }
-        const result = defaultMoveValidator(
-          activeNode,
-          targetParentNode,
-          targetParentId,
-        )
-        if (!result.canMove) return result
-        if (targetParentNode?.type?.name === 'Milestone') {
-          return {
-            canMove: false,
-            reason: 'Milestones cannot have child tasks',
-          }
-        }
-        return { canMove: true }
-      },
-      [isPhaseNode],
+  const projectTaskMoveValidator: MoveValidator<ProjectPlanNodeDto> = (
+    activeNode,
+    targetParentNode,
+    targetParentId,
+  ) => {
+    // Phases cannot be moved
+    if (isPhaseNode(activeNode.node)) {
+      return { canMove: false, reason: 'Phases cannot be moved' }
+    }
+    const result = defaultMoveValidator(
+      activeNode,
+      targetParentNode,
+      targetParentId,
     )
+    if (!result.canMove) return result
+    if (targetParentNode?.type?.name === 'Milestone') {
+      return {
+        canMove: false,
+        reason: 'Milestones cannot have child tasks',
+      }
+    }
+    return { canMove: true }
+  }
 
-  const handleNodeMove = useCallback(
-    async (
-      nodeId: string,
-      parentId: string | null,
-      order: number,
-      overNodeId?: string,
-      overIndex?: number,
-    ) => {
-      let resolvedParentId = parentId
+  const handleNodeMove = async (
+    nodeId: string,
+    parentId: string | null,
+    order: number,
+    overNodeId?: string,
+    overIndex?: number,
+  ) => {
+    let resolvedParentId = parentId
 
-      // When parentId is null (task dropped at root level), resolve to
-      // the nearest phase above the drop position in the flat tree.
-      if (resolvedParentId === null && overNodeId) {
-        const flatten = (nodes: ProjectPlanNodeDto[]): ProjectPlanNodeDto[] => {
-          const result: ProjectPlanNodeDto[] = []
-          for (const node of nodes) {
-            result.push(node)
-            if (node.children?.length) {
-              result.push(...flatten(node.children))
-            }
-          }
-          return result
-        }
-        const flat = flatten(tasks)
-        const activeIdx = flat.findIndex((n) => n.id === nodeId)
-        const overIdx = overIndex ?? flat.findIndex((n) => n.id === overNodeId)
-        const isDraggingUp = activeIdx > overIdx
-
-        // Scan backwards from over index to find the nearest phase
-        let nearestPhaseId: string | null = null
-        for (let i = Math.min(overIdx, flat.length - 1); i >= 0; i--) {
-          if (flat[i].nodeType === 'Phase') {
-            nearestPhaseId = flat[i].id
-            break
+    // When parentId is null (task dropped at root level), resolve to
+    // the nearest phase above the drop position in the flat tree.
+    if (resolvedParentId === null && overNodeId) {
+      const flatten = (nodes: ProjectPlanNodeDto[]): ProjectPlanNodeDto[] => {
+        const result: ProjectPlanNodeDto[] = []
+        for (const node of nodes) {
+          result.push(node)
+          if (node.children?.length) {
+            result.push(...flatten(node.children))
           }
         }
+        return result
+      }
+      const flat = flatten(tasks)
+      const activeIdx = flat.findIndex((n) => n.id === nodeId)
+      const overIdx = overIndex ?? flat.findIndex((n) => n.id === overNodeId)
+      const isDraggingUp = activeIdx > overIdx
 
-        if (nearestPhaseId) {
-          // If dragging up and the nearest phase is the task's current phase,
-          // use the phase above it instead (the user intends to leave this phase)
-          const activeNode = flat[activeIdx]
-          if (isDraggingUp && activeNode?.projectPhaseId === nearestPhaseId) {
-            const phases = flat.filter((n) => n.nodeType === 'Phase')
-            const phaseIdx = phases.findIndex((p) => p.id === nearestPhaseId)
-            if (phaseIdx > 0) {
-              resolvedParentId = phases[phaseIdx - 1].id
-            } else {
-              resolvedParentId = nearestPhaseId
-            }
+      // Scan backwards from over index to find the nearest phase
+      let nearestPhaseId: string | null = null
+      for (let i = Math.min(overIdx, flat.length - 1); i >= 0; i--) {
+        if (flat[i].nodeType === 'Phase') {
+          nearestPhaseId = flat[i].id
+          break
+        }
+      }
+
+      if (nearestPhaseId) {
+        // If dragging up and the nearest phase is the task's current phase,
+        // use the phase above it instead (the user intends to leave this phase)
+        const activeNode = flat[activeIdx]
+        if (isDraggingUp && activeNode?.projectPhaseId === nearestPhaseId) {
+          const phases = flat.filter((n) => n.nodeType === 'Phase')
+          const phaseIdx = phases.findIndex((p) => p.id === nearestPhaseId)
+          if (phaseIdx > 0) {
+            resolvedParentId = phases[phaseIdx - 1].id
           } else {
             resolvedParentId = nearestPhaseId
           }
+        } else {
+          resolvedParentId = nearestPhaseId
         }
       }
+    }
 
-      if (!resolvedParentId) {
-        messageApi.warning('Tasks must be placed within a phase')
-        return
-      }
+    if (!resolvedParentId) {
+      messageApi.warning('Tasks must be placed within a phase')
+      return
+    }
 
+    try {
+      await updateProjectTaskPlacement({
+        projectIdOrKey: projectKey,
+        id: nodeId,
+        request: {
+          taskId: nodeId,
+          parentId: resolvedParentId,
+          order,
+        },
+      }).unwrap()
+      await refetch()
+    } catch (error: any) {
+      messageApi.error(
+        error?.data?.detail || 'Failed to move task. Please try again.',
+      )
+    }
+  }
+
+  const handleTaskError = (
+    error: any,
+    taskId: string,
+    fallbackMessage: string,
+  ): false => {
+    const status = error?.status ?? error?.data?.status
+    const errors = error?.errors ?? error?.data?.errors
+    const detail = error?.detail ?? error?.data?.detail
+
+    if (status === 422 && errors) {
+      const errorMap: Record<string, string> = {}
+      const errorFields: string[] = []
+      Object.entries(errors).forEach(([key, messages]) => {
+        const fieldName = key.charAt(0).toLowerCase() + key.slice(1)
+        errorMap[fieldName] = Array.isArray(messages) ? messages[0] : messages
+        errorFields.push(fieldName)
+      })
+      setFieldErrors(errorMap)
+
+      setTimeout(() => {
+        let focused = false
+        for (const errorField of errorFields) {
+          const columnId =
+            errorField === 'plannedDate'
+              ? 'plannedStart'
+              : errorField.replace(/Id$/, '')
+          const cellElement = document.querySelector(
+            `[data-cell-id="${taskId}-${columnId}"]`,
+          )
+          if (cellElement) {
+            const input = cellElement.querySelector(
+              'input, .ant-select',
+            ) as HTMLElement
+            if (input) {
+              input.focus()
+              focused = true
+              break
+            }
+          }
+        }
+        if (!focused) {
+          const cellElement = document.querySelector(
+            `[data-cell-id="${taskId}-name"]`,
+          )
+          if (cellElement) {
+            const input = cellElement.querySelector('input') as HTMLElement
+            input?.focus()
+          }
+        }
+      }, 0)
+
+      messageApi.error('Correct the validation error(s) to continue.')
+    } else {
+      messageApi.error(detail ?? fallbackMessage)
+    }
+    return false
+  }
+
+  const handleUpdateTask = async (
+    taskId: string,
+    updates: Partial<any>,
+  ): Promise<boolean> => {
+    if (!projectKey) return false
+
+    const isDraft = taskId.startsWith('draft-')
+
+    if (isDraft) {
       try {
-        await updateProjectTaskPlacement({
+        const draft = draftsRef.current.find((d) => d.id === taskId)
+        if (!draft) return false
+
+        const request: any = {
+          name: updates.name || '',
+          typeId: updates.typeId || 1,
+          statusId: updates.statusId || 1,
+          priorityId: updates.priorityId || 2,
+          assigneeIds: updates.assigneeIds || [],
+          progress: updates.progress,
+          parentId: draft.parentId,
+          plannedStart: updates.plannedStart,
+          plannedEnd: updates.plannedEnd,
+          plannedDate: updates.plannedDate,
+          estimatedEffortHours: updates.estimatedEffortHours,
+        }
+
+        const response = await createProjectTask({
           projectIdOrKey: projectKey,
-          id: nodeId,
-          request: {
-            taskId: nodeId,
-            parentId: resolvedParentId,
-            order,
-          },
-        }).unwrap()
+          request,
+        })
+
+        if (response.error) throw response.error
+
+        messageApi.success(`Task created: ${response.data.key}`)
         await refetch()
+        return true
       } catch (error: any) {
-        messageApi.error(
-          error?.data?.detail || 'Failed to move task. Please try again.',
+        return handleTaskError(
+          error,
+          taskId,
+          'An error occurred while creating the project task. Please try again.',
         )
       }
-    },
-    [projectKey, tasks, updateProjectTaskPlacement, refetch, messageApi],
-  )
+    } else {
+      const node = findNodeById(
+        tasks || [],
+        taskId,
+      ) as ProjectPlanNodeDto | null
+      if (!node) return false
 
-  const handleTaskError = useCallback(
-    (error: any, taskId: string, fallbackMessage: string): false => {
-      const status = error?.status ?? error?.data?.status
-      const errors = error?.errors ?? error?.data?.errors
-      const detail = error?.detail ?? error?.data?.detail
-
-      if (status === 422 && errors) {
-        const errorMap: Record<string, string> = {}
-        const errorFields: string[] = []
-        Object.entries(errors).forEach(([key, messages]) => {
-          const fieldName = key.charAt(0).toLowerCase() + key.slice(1)
-          errorMap[fieldName] = Array.isArray(messages) ? messages[0] : messages
-          errorFields.push(fieldName)
-        })
-        setFieldErrors(errorMap)
-
-        setTimeout(() => {
-          let focused = false
-          for (const errorField of errorFields) {
-            const columnId =
-              errorField === 'plannedDate'
-                ? 'plannedStart'
-                : errorField.replace(/Id$/, '')
-            const cellElement = document.querySelector(
-              `[data-cell-id="${taskId}-${columnId}"]`,
-            )
-            if (cellElement) {
-              const input = cellElement.querySelector(
-                'input, .ant-select',
-              ) as HTMLElement
-              if (input) {
-                input.focus()
-                focused = true
-                break
-              }
-            }
-          }
-          if (!focused) {
-            const cellElement = document.querySelector(
-              `[data-cell-id="${taskId}-name"]`,
-            )
-            if (cellElement) {
-              const input = cellElement.querySelector('input') as HTMLElement
-              input?.focus()
-            }
-          }
-        }, 0)
-
-        messageApi.error('Correct the validation error(s) to continue.')
-      } else {
-        messageApi.error(detail ?? fallbackMessage)
-      }
-      return false
-    },
-    [messageApi, setFieldErrors],
-  )
-
-  const handleUpdateTask = useCallback(
-    async (taskId: string, updates: Partial<any>): Promise<boolean> => {
-      if (!projectKey) return false
-
-      const isDraft = taskId.startsWith('draft-')
-
-      if (isDraft) {
-        try {
-          const draft = draftsRef.current.find((d) => d.id === taskId)
-          if (!draft) return false
-
-          const request: any = {
-            name: updates.name || '',
-            typeId: updates.typeId || 1,
-            statusId: updates.statusId || 1,
-            priorityId: updates.priorityId || 2,
-            assigneeIds: updates.assigneeIds || [],
-            progress: updates.progress,
-            parentId: draft.parentId,
-            plannedStart: updates.plannedStart,
-            plannedEnd: updates.plannedEnd,
-            plannedDate: updates.plannedDate,
-            estimatedEffortHours: updates.estimatedEffortHours,
-          }
-
-          const response = await createProjectTask({
-            projectIdOrKey: projectKey,
-            request,
+      try {
+        if (isPhaseNode(node)) {
+          const patchOperations = buildProjectPhasePatchOperations(updates)
+          const response = await patchProjectPhase({
+            projectId,
+            phaseId: taskId,
+            patchOperations,
+            cacheKey: taskId,
           })
-
           if (response.error) throw response.error
-
-          messageApi.success(`Task created: ${response.data.key}`)
-          await refetch()
-          return true
-        } catch (error: any) {
-          return handleTaskError(
-            error,
+        } else {
+          const patchOperations = buildProjectTaskPatchOperations(updates)
+          const response = await patchProjectTask({
+            projectIdOrKey: projectKey,
             taskId,
-            'An error occurred while creating the project task. Please try again.',
-          )
+            patchOperations,
+            cacheKey: taskId,
+          })
+          if (response.error) throw response.error
         }
-      } else {
-        const node = findNodeById(
-          tasks || [],
+        await refetch()
+        return true
+      } catch (error: any) {
+        const entityName = isPhaseNode(node) ? 'phase' : 'task'
+        return handleTaskError(
+          error,
           taskId,
-        ) as ProjectPlanNodeDto | null
-        if (!node) return false
-
-        try {
-          if (isPhaseNode(node)) {
-            const patchOperations = buildProjectPhasePatchOperations(updates)
-            const response = await patchProjectPhase({
-              projectId,
-              phaseId: taskId,
-              patchOperations,
-              cacheKey: taskId,
-            })
-            if (response.error) throw response.error
-          } else {
-            const patchOperations = buildProjectTaskPatchOperations(updates)
-            const response = await patchProjectTask({
-              projectIdOrKey: projectKey,
-              taskId,
-              patchOperations,
-              cacheKey: taskId,
-            })
-            if (response.error) throw response.error
-          }
-          await refetch()
-          return true
-        } catch (error: any) {
-          const entityName = isPhaseNode(node) ? 'phase' : 'task'
-          return handleTaskError(
-            error,
-            taskId,
-            `An error occurred while updating the project ${entityName}. Please try again.`,
-          )
-        }
+          `An error occurred while updating the project ${entityName}. Please try again.`,
+        )
       }
-    },
-    [
-      messageApi,
-      projectId,
-      projectKey,
-      refetch,
-      tasks,
-      patchProjectTask,
-      patchProjectPhase,
-      createProjectTask,
-      handleTaskError,
-      isPhaseNode,
-    ],
-  )
+    }
+  }
 
-  const handleEditTask = useCallback((task: any) => {
+  const handleEditTask = (task: any) => {
     setSelectedTaskId(task.id)
     setOpenEditTaskForm(true)
-  }, [])
+  }
 
-  const handleEditPhase = useCallback((phase: any) => {
+  const handleEditPhase = (phase: any) => {
     setSelectedPhaseId(phase.id)
     setOpenEditPhaseForm(true)
-  }, [])
+  }
 
-  const handleDeleteTask = useCallback((task: any) => {
+  const handleDeleteTask = (task: any) => {
     setSelectedTaskId(task.id)
     setOpenDeleteTaskForm(true)
-  }, [])
+  }
 
-  const onEditTaskFormClosed = useCallback(
-    (wasSaved: boolean) => {
-      setOpenEditTaskForm(false)
-      setSelectedTaskId(undefined)
-      if (wasSaved) refetch()
-    },
-    [refetch],
-  )
+  const onEditTaskFormClosed = (wasSaved: boolean) => {
+    setOpenEditTaskForm(false)
+    setSelectedTaskId(undefined)
+    if (wasSaved) refetch()
+  }
 
-  const onDeleteTaskFormClosed = useCallback(
-    (wasDeleted: boolean) => {
-      setOpenDeleteTaskForm(false)
-      setSelectedTaskId(undefined)
-      if (wasDeleted) refetch()
-    },
-    [refetch],
-  )
+  const onDeleteTaskFormClosed = (wasDeleted: boolean) => {
+    setOpenDeleteTaskForm(false)
+    setSelectedTaskId(undefined)
+    if (wasDeleted) refetch()
+  }
 
-  const onCreateTaskFormClosed = useCallback(
-    (wasSaved: boolean) => {
-      setOpenCreateTaskForm(false)
-      if (wasSaved) refetch()
-    },
-    [refetch],
-  )
+  const onCreateTaskFormClosed = (wasSaved: boolean) => {
+    setOpenCreateTaskForm(false)
+    if (wasSaved) refetch()
+  }
 
-  const getFormValues = useCallback(
-    (rowId: string, data: ProjectPlanNodeDto[]) => {
-      const task = findNodeById(data, rowId) as ProjectPlanNodeDto | null
-      const isDraft = rowId.startsWith('draft-')
+  const getFormValues = (rowId: string, data: ProjectPlanNodeDto[]) => {
+    const task = findNodeById(data, rowId) as ProjectPlanNodeDto | null
+    const isDraft = rowId.startsWith('draft-')
 
-      if (isDraft || !task) {
-        return {
-          name: '',
-          typeId: 1,
-          statusId: 1,
-          priorityId: 2,
-          assigneeIds: [],
-          progress: 0,
-          plannedStart: null,
-          plannedEnd: null,
-          plannedDate: null,
-          estimatedEffortHours: null,
-        }
-      }
-
-      // Phase rows: limited fields
-      if (isPhaseNode(task)) {
-        return {
-          statusId: task.status?.id,
-          assigneeIds: task.assignees?.map((a) => a.id) ?? [],
-          plannedStart: task.start ? dayjs(task.start) : null,
-          plannedEnd: task.end ? dayjs(task.end) : null,
-          progress: task.progress,
-        }
-      }
-
+    if (isDraft || !task) {
       return {
-        name: task.name,
-        typeId: task.type?.id,
+        name: '',
+        typeId: 1,
+        statusId: 1,
+        priorityId: 2,
+        assigneeIds: [],
+        progress: 0,
+        plannedStart: null,
+        plannedEnd: null,
+        plannedDate: null,
+        estimatedEffortHours: null,
+      }
+    }
+
+    // Phase rows: limited fields
+    if (isPhaseNode(task)) {
+      return {
         statusId: task.status?.id,
-        priorityId: task.priority?.id,
         assigneeIds: task.assignees?.map((a) => a.id) ?? [],
-        progress: task.progress,
         plannedStart: task.start ? dayjs(task.start) : null,
         plannedEnd: task.end ? dayjs(task.end) : null,
-        plannedDate: task.plannedDate ? dayjs(task.plannedDate) : null,
-        estimatedEffortHours: task.estimatedEffortHours,
+        progress: task.progress,
       }
-    },
-    [isPhaseNode],
-  )
+    }
 
-  const computeChanges = useCallback(
-    (
-      rowId: string,
-      formValues: Record<string, any>,
-      data: ProjectPlanNodeDto[],
-    ) => {
-      const isDraft = rowId.startsWith('draft-')
-      const values = formValues as any
-      const completedStatusValue = taskStatusOptions.find(
-        (opt) => opt.label === 'Completed',
-      )?.value
-      const isCompleted = values.statusId === completedStatusValue
+    return {
+      name: task.name,
+      typeId: task.type?.id,
+      statusId: task.status?.id,
+      priorityId: task.priority?.id,
+      assigneeIds: task.assignees?.map((a) => a.id) ?? [],
+      progress: task.progress,
+      plannedStart: task.start ? dayjs(task.start) : null,
+      plannedEnd: task.end ? dayjs(task.end) : null,
+      plannedDate: task.plannedDate ? dayjs(task.plannedDate) : null,
+      estimatedEffortHours: task.estimatedEffortHours,
+    }
+  }
 
-      if (isDraft) {
-        const updates: Record<string, any> = {
-          name: values.name || '',
-          typeId: values.typeId,
-          statusId: values.statusId,
-          priorityId: values.priorityId,
-          assigneeIds: values.assigneeIds ?? [],
-        }
-        if (isSelectedRowMilestone) {
-          updates.plannedStart = null
-          updates.plannedEnd = null
-          updates.plannedDate = values.plannedDate
-            ? values.plannedDate.format('YYYY-MM-DD')
-            : null
-          updates.progress = null
-          updates.estimatedEffortHours = null
-        } else {
-          updates.plannedStart = values.plannedStart
-            ? values.plannedStart.format('YYYY-MM-DD')
-            : null
-          updates.plannedEnd = values.plannedEnd
-            ? values.plannedEnd.format('YYYY-MM-DD')
-            : null
-          updates.plannedDate = null
-          updates.progress = isCompleted ? 100 : (values.progress ?? 0)
-          updates.estimatedEffortHours = values.estimatedEffortHours
-            ? Number(values.estimatedEffortHours)
-            : null
-        }
-        return updates
+  const computeChanges = (
+    rowId: string,
+    formValues: Record<string, any>,
+    data: ProjectPlanNodeDto[],
+  ) => {
+    const isDraft = rowId.startsWith('draft-')
+    const values = formValues as any
+    const completedStatusValue = taskStatusOptions.find(
+      (opt) => opt.label === 'Completed',
+    )?.value
+    const isCompleted = values.statusId === completedStatusValue
+
+    if (isDraft) {
+      const updates: Record<string, any> = {
+        name: values.name || '',
+        typeId: values.typeId,
+        statusId: values.statusId,
+        priorityId: values.priorityId,
+        assigneeIds: values.assigneeIds ?? [],
       }
-
-      const task = findNodeById(data, rowId) as ProjectPlanNodeDto | null
-      if (!task) return null
-
-      const updates: Record<string, any> = {}
-      let hasChanges = false
-
-      if (values.name !== task.name) {
-        updates.name = values.name
-        hasChanges = true
-      }
-      if (values.statusId !== task.status?.id) {
-        updates.statusId = values.statusId
-        hasChanges = true
-      }
-      if (values.priorityId !== task.priority?.id) {
-        updates.priorityId = values.priorityId
-        hasChanges = true
-      }
-
-      const taskAssigneeIds = task.assignees?.map((a) => a.id) ?? []
-      const formAssigneeIds = values.assigneeIds ?? []
-      const assigneesChanged =
-        taskAssigneeIds.length !== formAssigneeIds.length ||
-        !taskAssigneeIds.every((id: string) => formAssigneeIds.includes(id))
-      if (assigneesChanged) {
-        updates.assigneeIds = formAssigneeIds
-        hasChanges = true
-      }
-
-      const taskPlannedStart = task.start
-        ? String(task.start).split('T')[0]
-        : null
-      const plannedStartFormatted = values.plannedStart
-        ? values.plannedStart.format('YYYY-MM-DD')
-        : null
-      if (plannedStartFormatted !== taskPlannedStart) {
-        updates.plannedStart = plannedStartFormatted
-        hasChanges = true
-      }
-
-      const taskPlannedEnd = task.end ? String(task.end).split('T')[0] : null
-      const plannedEndFormatted = values.plannedEnd
-        ? values.plannedEnd.format('YYYY-MM-DD')
-        : null
-      if (plannedEndFormatted !== taskPlannedEnd) {
-        updates.plannedEnd = plannedEndFormatted
-        hasChanges = true
-      }
-
-      const taskPlannedDate = task.plannedDate
-        ? String(task.plannedDate).split('T')[0]
-        : null
-      const plannedDateFormatted = values.plannedDate
-        ? values.plannedDate.format('YYYY-MM-DD')
-        : null
-      if (plannedDateFormatted !== taskPlannedDate) {
-        updates.plannedDate = plannedDateFormatted
-        hasChanges = true
-      }
-
-      const effectiveProgress = isCompleted ? 100 : values.progress
-      if (effectiveProgress !== task.progress) {
-        updates.progress = effectiveProgress
-        hasChanges = true
-      }
-
-      if (values.estimatedEffortHours !== task.estimatedEffortHours) {
+      if (isSelectedRowMilestone) {
+        updates.plannedStart = null
+        updates.plannedEnd = null
+        updates.plannedDate = values.plannedDate
+          ? values.plannedDate.format('YYYY-MM-DD')
+          : null
+        updates.progress = null
+        updates.estimatedEffortHours = null
+      } else {
+        updates.plannedStart = values.plannedStart
+          ? values.plannedStart.format('YYYY-MM-DD')
+          : null
+        updates.plannedEnd = values.plannedEnd
+          ? values.plannedEnd.format('YYYY-MM-DD')
+          : null
+        updates.plannedDate = null
+        updates.progress = isCompleted ? 100 : (values.progress ?? 0)
         updates.estimatedEffortHours = values.estimatedEffortHours
           ? Number(values.estimatedEffortHours)
           : null
-        hasChanges = true
       }
+      return updates
+    }
 
-      return hasChanges ? updates : null
-    },
-    [isSelectedRowMilestone, taskStatusOptions],
-  )
+    const task = findNodeById(data, rowId) as ProjectPlanNodeDto | null
+    if (!task) return null
 
-  const validateFields = useCallback(
-    (rowId: string, formValues: Record<string, any>) => {
-      const isDraft = rowId.startsWith('draft-')
-      const task = findNodeById(tasks, rowId) as ProjectPlanNodeDto | null
-      const isMilestone = isDraft
-        ? isSelectedRowMilestone
-        : task?.type?.name === 'Milestone'
+    const updates: Record<string, any> = {}
+    let hasChanges = false
 
-      if (isMilestone) return {}
+    if (values.name !== task.name) {
+      updates.name = values.name
+      hasChanges = true
+    }
+    if (values.statusId !== task.status?.id) {
+      updates.statusId = values.statusId
+      hasChanges = true
+    }
+    if (values.priorityId !== task.priority?.id) {
+      updates.priorityId = values.priorityId
+      hasChanges = true
+    }
 
-      const errors: Record<string, string> = {}
-      const hasPlannedStart = Boolean(formValues.plannedStart)
-      const hasPlannedEnd = Boolean(formValues.plannedEnd)
+    const taskAssigneeIds = task.assignees?.map((a) => a.id) ?? []
+    const formAssigneeIds = values.assigneeIds ?? []
+    const assigneesChanged =
+      taskAssigneeIds.length !== formAssigneeIds.length ||
+      !taskAssigneeIds.every((id: string) => formAssigneeIds.includes(id))
+    if (assigneesChanged) {
+      updates.assigneeIds = formAssigneeIds
+      hasChanges = true
+    }
 
-      if (hasPlannedStart !== hasPlannedEnd) {
-        const message =
-          'Planned Start and Planned End must both have a value or both be empty.'
-        errors.plannedStart = message
-        errors.plannedEnd = message
+    const taskPlannedStart = task.start
+      ? String(task.start).split('T')[0]
+      : null
+    const plannedStartFormatted = values.plannedStart
+      ? values.plannedStart.format('YYYY-MM-DD')
+      : null
+    if (plannedStartFormatted !== taskPlannedStart) {
+      updates.plannedStart = plannedStartFormatted
+      hasChanges = true
+    }
+
+    const taskPlannedEnd = task.end ? String(task.end).split('T')[0] : null
+    const plannedEndFormatted = values.plannedEnd
+      ? values.plannedEnd.format('YYYY-MM-DD')
+      : null
+    if (plannedEndFormatted !== taskPlannedEnd) {
+      updates.plannedEnd = plannedEndFormatted
+      hasChanges = true
+    }
+
+    const taskPlannedDate = task.plannedDate
+      ? String(task.plannedDate).split('T')[0]
+      : null
+    const plannedDateFormatted = values.plannedDate
+      ? values.plannedDate.format('YYYY-MM-DD')
+      : null
+    if (plannedDateFormatted !== taskPlannedDate) {
+      updates.plannedDate = plannedDateFormatted
+      hasChanges = true
+    }
+
+    const effectiveProgress = isCompleted ? 100 : values.progress
+    if (effectiveProgress !== task.progress) {
+      updates.progress = effectiveProgress
+      hasChanges = true
+    }
+
+    if (values.estimatedEffortHours !== task.estimatedEffortHours) {
+      updates.estimatedEffortHours = values.estimatedEffortHours
+        ? Number(values.estimatedEffortHours)
+        : null
+      hasChanges = true
+    }
+
+    return hasChanges ? updates : null
+  }
+
+  const validateFields = (rowId: string, formValues: Record<string, any>) => {
+    const isDraft = rowId.startsWith('draft-')
+    const task = findNodeById(tasks, rowId) as ProjectPlanNodeDto | null
+    const isMilestone = isDraft
+      ? isSelectedRowMilestone
+      : task?.type?.name === 'Milestone'
+
+    if (isMilestone) return {}
+
+    const errors: Record<string, string> = {}
+    const hasPlannedStart = Boolean(formValues.plannedStart)
+    const hasPlannedEnd = Boolean(formValues.plannedEnd)
+
+    if (hasPlannedStart !== hasPlannedEnd) {
+      const message =
+        'Planned Start and Planned End must both have a value or both be empty.'
+      errors.plannedStart = message
+      errors.plannedEnd = message
+    }
+
+    if (hasPlannedStart && hasPlannedEnd) {
+      const plannedStart = dayjs(formValues.plannedStart)
+      const plannedEnd = dayjs(formValues.plannedEnd)
+      if (plannedEnd.isBefore(plannedStart, 'day')) {
+        errors.plannedEnd = 'Planned End cannot be earlier than Planned Start.'
       }
+    }
 
-      if (hasPlannedStart && hasPlannedEnd) {
-        const plannedStart = dayjs(formValues.plannedStart)
-        const plannedEnd = dayjs(formValues.plannedEnd)
-        if (plannedEnd.isBefore(plannedStart, 'day')) {
-          errors.plannedEnd =
-            'Planned End cannot be earlier than Planned Start.'
-        }
-      }
-
-      return errors
-    },
-    [isSelectedRowMilestone, tasks],
-  )
+    return errors
+  }
 
   return (
     <>

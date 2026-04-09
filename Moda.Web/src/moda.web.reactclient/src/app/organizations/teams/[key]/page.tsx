@@ -6,9 +6,7 @@ import { CloseOutlined } from '@ant-design/icons'
 import {
   createElement,
   use,
-  useCallback,
   useEffect,
-  useMemo,
   useState,
 } from 'react'
 import TeamDetails from '../_components/team-details'
@@ -168,11 +166,11 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     { skip: !team?.id || !risksQueryEnabled },
   )
 
-  const onIncludeClosedRisksChanged = useCallback((includeClosed: boolean) => {
+  const onIncludeClosedRisksChanged = (includeClosed: boolean) => {
     setIncludeClosedRisks(includeClosed)
-  }, [])
+  }
 
-  const openCycleTimeReport = useCallback(() => {
+  const openCycleTimeReport = () => {
     // Check if the cycle time report tab is already open
     const cycleTimeTabExists = dynamicTabs.some(
       (tab) => tab.key === TeamTabs.CycleTimeReport,
@@ -192,9 +190,9 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
 
     // Switch to the cycle time report tab
     setActiveTab(TeamTabs.CycleTimeReport)
-  }, [dynamicTabs])
+  }
 
-  const openOperatingModelHistory = useCallback(() => {
+  const openOperatingModelHistory = () => {
     const tabExists = dynamicTabs.some(
       (tab) => tab.key === TeamTabs.OperatingModelHistory,
     )
@@ -211,9 +209,9 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     }
 
     setActiveTab(TeamTabs.OperatingModelHistory)
-  }, [dynamicTabs])
+  }
 
-  const actionsMenuItems: MenuProps['items'] = useMemo(() => {
+  const actionsMenuItems: MenuProps['items'] = (() => {
     const items: ItemType[] = []
 
     if (canUpdateTeam) {
@@ -295,16 +293,8 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     })
 
     return items
-  }, [
-    canManageTeamMemberships,
-    canUpdateTeam,
-    dispatch,
-    team?.isActive,
-    team?.operatingModel,
-    openCycleTimeReport,
-    openOperatingModelHistory,
-  ])
-  const renderTabContent = useCallback(() => {
+  })()
+  const renderTabContent = () => {
     switch (activeTab) {
       case TeamTabs.Details:
         return <TeamDetails team={team} />
@@ -344,14 +334,7 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       default:
         return null
     }
-  }, [
-    activeTab,
-    team,
-    risksQuery,
-    teamMembershipsQuery,
-    onIncludeClosedRisksChanged,
-    canUpdateTeam,
-  ])
+  }
 
   useEffect(() => {
     dispatch(retrieveTeam({ key: teamKey, type: 'Team' }))
@@ -370,38 +353,32 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   }, [activeTab, hasEverBeenScrum])
 
   // doesn't trigger on first render
-  const onTabChange = useCallback(
-    (tabKey: string) => {
-      setActiveTab(tabKey as TeamTabs)
+  const onTabChange = (tabKey: string) => {
+    setActiveTab(tabKey as TeamTabs)
 
-      // enables the query for the tab on first render if it hasn't been enabled yet
-      if (tabKey == TeamTabs.RiskManagement && !risksQueryEnabled) {
-        setRisksQueryEnabled(true)
-      } else if (
-        tabKey == TeamTabs.TeamMemberships &&
-        !teamMembershipsQueryEnabled
-      ) {
-        setTeamMembershipsQueryEnabled(true)
-      }
-    },
-    [risksQueryEnabled, teamMembershipsQueryEnabled],
-  )
+    // enables the query for the tab on first render if it hasn't been enabled yet
+    if (tabKey == TeamTabs.RiskManagement && !risksQueryEnabled) {
+      setRisksQueryEnabled(true)
+    } else if (
+      tabKey == TeamTabs.TeamMemberships &&
+      !teamMembershipsQueryEnabled
+    ) {
+      setTeamMembershipsQueryEnabled(true)
+    }
+  }
 
-  const closeTab = useCallback(
-    (tabKey: string, e: React.MouseEvent) => {
-      e.stopPropagation()
-      // Remove the tab from dynamicTabs
-      setDynamicTabs((prevTabs) => prevTabs.filter((tab) => tab.key !== tabKey))
+  const closeTab = (tabKey: string, e: React.MouseEvent) => {
+    e.stopPropagation()
+    // Remove the tab from dynamicTabs
+    setDynamicTabs((prevTabs) => prevTabs.filter((tab) => tab.key !== tabKey))
 
-      // If the active tab is being closed, switch to Details tab
-      if (activeTab === tabKey) {
-        setActiveTab(TeamTabs.Details)
-      }
-    },
-    [activeTab],
-  )
+    // If the active tab is being closed, switch to Details tab
+    if (activeTab === tabKey) {
+      setActiveTab(TeamTabs.Details)
+    }
+  }
 
-  const allTabs = useMemo(() => {
+  const allTabs = (() => {
     const staticTabs = getStaticTabs(hasEverBeenScrum === true).map((tab) => ({
       key: tab.key,
       tab: tab.tab,
@@ -421,7 +398,7 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     }))
 
     return [...staticTabs, ...closableTabs]
-  }, [dynamicTabs, closeTab, hasEverBeenScrum])
+  })()
 
   const onCreateTeamMembershipFormClosed = (wasSaved: boolean) => {
     setOpenCreateTeamMembershipForm(false)

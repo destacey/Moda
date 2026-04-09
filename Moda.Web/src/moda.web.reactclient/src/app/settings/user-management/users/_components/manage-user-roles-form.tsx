@@ -6,7 +6,7 @@ import {
   useManageUserRolesMutation,
 } from '@/src/store/features/user-management/users-api'
 import { Modal, Spin, Transfer, TransferProps } from 'antd'
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useConfirmModal } from '@/src/hooks'
 
 export interface ManageUserRolesFormProps {
@@ -46,7 +46,7 @@ const ManageUserRolesForm: React.FC<ManageUserRolesFormProps> = ({
     useManageUserRolesMutation()
 
   const { isOpen, isSaving, handleOk, handleCancel } = useConfirmModal({
-    onSubmit: useCallback(async () => {
+    onSubmit: async () => {
       try {
         const response = await manageUserRoles({
           userId: userId,
@@ -68,7 +68,7 @@ const ManageUserRolesForm: React.FC<ManageUserRolesFormProps> = ({
         }
         return false
       }
-    }, [manageUserRoles, userId, targetKeys, messageApi]),
+    },
     onComplete: onFormComplete,
     onCancel: onFormCancel,
     errorMessage:

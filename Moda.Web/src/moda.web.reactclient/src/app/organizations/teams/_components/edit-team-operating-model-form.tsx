@@ -1,7 +1,7 @@
 'use client'
 
 import { Form, Modal, Radio, Spin } from 'antd'
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 import {
   Methodology,
   SizingMethod,
@@ -67,33 +67,30 @@ const EditTeamOperatingModelForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<EditTeamOperatingModelFormValues>({
-      onSubmit: useCallback(
-        async (values: EditTeamOperatingModelFormValues, form) => {
-          try {
-            const request = mapToRequestValues(values)
-            await updateOperatingModel({
-              teamId,
-              operatingModelId,
-              request,
-            }).unwrap()
-            messageApi.success('Successfully updated operating model.')
-            return true
-          } catch (error) {
-            if (error.status === 422 && error.errors) {
-              const formErrors = toFormErrors(error.errors)
-              form.setFields(formErrors)
-              messageApi.error('Correct the validation error(s) to continue.')
-            } else {
-              messageApi.error(
-                error.detail ??
-                  'An unexpected error occurred while updating the operating model.',
-              )
-            }
-            return false
+      onSubmit: async (values: EditTeamOperatingModelFormValues, form) => {
+        try {
+          const request = mapToRequestValues(values)
+          await updateOperatingModel({
+            teamId,
+            operatingModelId,
+            request,
+          }).unwrap()
+          messageApi.success('Successfully updated operating model.')
+          return true
+        } catch (error) {
+          if (error.status === 422 && error.errors) {
+            const formErrors = toFormErrors(error.errors)
+            form.setFields(formErrors)
+            messageApi.error('Correct the validation error(s) to continue.')
+          } else {
+            messageApi.error(
+              error.detail ??
+                'An unexpected error occurred while updating the operating model.',
+            )
           }
-        },
-        [updateOperatingModel, teamId, operatingModelId, messageApi],
-      ),
+          return false
+        }
+      },
       onComplete: onFormComplete,
       onCancel: onFormCancel,
       errorMessage:

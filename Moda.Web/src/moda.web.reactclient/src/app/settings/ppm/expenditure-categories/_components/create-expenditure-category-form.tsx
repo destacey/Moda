@@ -6,7 +6,6 @@ import { useCreateExpenditureCategoryMutation } from '@/src/store/features/ppm/e
 import { toFormErrors } from '@/src/utils'
 import { Form, Input, Modal, Switch } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
-import { useCallback } from 'react'
 import { useModalForm } from '@/src/hooks'
 
 const { Item } = Form
@@ -47,8 +46,7 @@ const CreateExpenditureCategoryForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<CreateExpenditureCategoryFormValues>({
-      onSubmit: useCallback(
-        async (values: CreateExpenditureCategoryFormValues, form) => {
+      onSubmit: async (values: CreateExpenditureCategoryFormValues, form) => {
           try {
             const request = mapToRequestValues(values)
             const response = await createExpenditureCategory(request)
@@ -74,8 +72,6 @@ const CreateExpenditureCategoryForm = ({
             return false
           }
         },
-        [createExpenditureCategory, messageApi],
-      ),
       onComplete: onFormComplete,
       onCancel: onFormCancel,
       errorMessage:

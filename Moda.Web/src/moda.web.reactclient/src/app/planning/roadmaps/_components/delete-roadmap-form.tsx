@@ -5,7 +5,6 @@ import { useConfirmModal } from '@/src/hooks'
 import { RoadmapDetailsDto } from '@/src/services/moda-api'
 import { useDeleteRoadmapMutation } from '@/src/store/features/planning/roadmaps-api'
 import { Modal } from 'antd'
-import { useCallback } from 'react'
 
 export interface DeleteRoadmapFormProps {
   roadmap: RoadmapDetailsDto
@@ -23,7 +22,7 @@ const DeleteRoadmapForm = ({
   const [deleteRoadmapMutation] = useDeleteRoadmapMutation()
 
   const { isOpen, isSaving, handleOk, handleCancel } = useConfirmModal({
-    onSubmit: useCallback(async () => {
+    onSubmit: async () => {
       try {
         await deleteRoadmapMutation(roadmap.id)
         // TODO: not working because the parent page is gone
@@ -36,7 +35,7 @@ const DeleteRoadmapForm = ({
         console.log(error)
         return false
       }
-    }, [deleteRoadmapMutation, roadmap, messageApi]),
+    },
     onComplete: onFormComplete,
     onCancel: onFormCancel,
     errorMessage:

@@ -1,7 +1,6 @@
 import { useMessage } from '@/src/components/contexts/messaging'
 import { useChangeWorkProcessIsActiveMutation } from '@/src/store/features/work-management/work-process-api'
 import { Modal, Typography } from 'antd'
-import { useCallback } from 'react'
 import { useConfirmModal } from '@/src/hooks'
 
 const { Text } = Typography
@@ -29,7 +28,7 @@ const ChangeWorkProcessIsActiveForm = ({
   const [changeWorkProcessIsActive] = useChangeWorkProcessIsActiveMutation()
 
   const { isOpen, isSaving, handleOk, handleCancel } = useConfirmModal({
-    onSubmit: useCallback(async () => {
+    onSubmit: async () => {
       try {
         const request = {
           id: workProcessId,
@@ -48,7 +47,7 @@ const ChangeWorkProcessIsActiveForm = ({
         console.error(error)
         return false
       }
-    }, [changeWorkProcessIsActive, workProcessId, isActive, actionLowerCase, messageApi]),
+    },
     onComplete: onFormSave,
     onCancel: onFormCancel,
     errorMessage: `An unexpected error occurred while ${actionLowerCase}ing the work process.`,

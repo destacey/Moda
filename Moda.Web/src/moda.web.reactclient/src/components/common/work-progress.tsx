@@ -4,7 +4,7 @@ import { WorkItemProgressRollupDto } from '@/src/services/moda-api'
 import { Progress } from 'antd'
 import ModaTooltip from '@/src/components/common/moda-tooltip'
 import { round } from 'lodash'
-import { memo, useMemo } from 'react'
+import { memo } from 'react'
 
 export interface WorkProgressProps {
   progress: WorkItemProgressRollupDto
@@ -46,29 +46,25 @@ const calculateProgressPercentages = (
 }
 
 const WorkProgress = memo(({ progress }: WorkProgressProps) => {
-  const progressSummary = useMemo(
-    () => (progress ? calculateProgressPercentages(progress) : null),
-    [progress],
-  )
+  const progressSummary = progress
+    ? calculateProgressPercentages(progress)
+    : null
 
-  const titleText = useMemo(() => {
-    if (!progressSummary) return null
-    return (
-      <ul style={{ paddingLeft: 20 }}>
-        <li>
-          Proposed: {progressSummary.proposed} (
-          {progressSummary.proposedPercentage}%)
-        </li>
-        <li>
-          Active: {progressSummary.active} ({progressSummary.activePercentage}%)
-        </li>
-        <li>
-          Done: {progressSummary.done} ({progressSummary.donePercentage}%)
-        </li>
-        <li>Total: {progressSummary.total}</li>
-      </ul>
-    )
-  }, [progressSummary])
+  const titleText = !progressSummary ? null : (
+    <ul style={{ paddingLeft: 20 }}>
+      <li>
+        Proposed: {progressSummary.proposed} (
+        {progressSummary.proposedPercentage}%)
+      </li>
+      <li>
+        Active: {progressSummary.active} ({progressSummary.activePercentage}%)
+      </li>
+      <li>
+        Done: {progressSummary.done} ({progressSummary.donePercentage}%)
+      </li>
+      <li>Total: {progressSummary.total}</li>
+    </ul>
+  )
 
   if (!progressSummary) return null
 

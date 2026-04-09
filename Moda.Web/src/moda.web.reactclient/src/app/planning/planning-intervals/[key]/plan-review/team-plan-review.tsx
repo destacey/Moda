@@ -5,7 +5,7 @@ import {
   PlanningIntervalTeamResponse,
 } from '@/src/services/moda-api'
 import { Col, Flex, Row, Segmented, Space, Spin, Tag, Typography } from 'antd'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import TeamObjectivesListCard from './team-objectives-list-card'
 import TeamRisksListCard from './team-risks-list-card'
 import Link from 'next/link'
@@ -104,15 +104,12 @@ const TeamPlanReview = ({
   const canCreateRisks = hasPermissionClaim('Permissions.Risks.Create')
   const canUpdateRisks = hasPermissionClaim('Permissions.Risks.Update')
 
-  const viewSelector = useMemo(
-    () => (
-      <Segmented
-        options={viewSelectorOptions}
-        value={currentView}
-        onChange={setCurrentView}
-      />
-    ),
-    [currentView],
+  const viewSelector = (
+    <Segmented
+      options={viewSelectorOptions}
+      value={currentView}
+      onChange={setCurrentView}
+    />
   )
 
   const showDrawer = () => {

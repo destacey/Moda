@@ -24,7 +24,7 @@ import {
   TreeSelect,
 } from 'antd'
 import dayjs from 'dayjs'
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 
 const { Item } = Form
 const { TextArea } = Input
@@ -109,8 +109,7 @@ const EditProjectTaskForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<EditProjectTaskFormValues>({
-      onSubmit: useCallback(
-        async (values: EditProjectTaskFormValues, form) => {
+      onSubmit: async (values: EditProjectTaskFormValues, form) => {
           if (!taskData) {
             messageApi.error('Task data is not loaded.')
             return false
@@ -141,8 +140,6 @@ const EditProjectTaskForm = ({
             return false
           }
         },
-        [updateProjectTask, taskData, projectIdOrKey, taskIdOrKey, messageApi],
-      ),
       onComplete: onFormComplete,
       onCancel: onFormCancel,
       errorMessage:

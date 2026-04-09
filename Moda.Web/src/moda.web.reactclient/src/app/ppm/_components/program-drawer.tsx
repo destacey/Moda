@@ -14,7 +14,7 @@ import { useGetProgramQuery } from '@/src/store/features/ppm/programs-api'
 import { getDrawerWidthPixels, getSortedNameList } from '@/src/utils'
 import { Drawer, Flex } from 'antd'
 import Link from 'next/link'
-import { FC, useEffect, useMemo, useState } from 'react'
+import { FC, useEffect, useState } from 'react'
 
 export interface ProgramDrawerProps {
   programKey: number
@@ -33,10 +33,7 @@ const ProgramDrawer: FC<ProgramDrawerProps> = ({
   const { data: programData, isLoading, error } = useGetProgramQuery(programKey)
 
   const { hasPermissionClaim } = useAuth()
-  const canViewProgram = useMemo(
-    () => hasPermissionClaim('Permissions.Programs.View'),
-    [hasPermissionClaim],
-  )
+  const canViewProgram = hasPermissionClaim('Permissions.Programs.View')
 
   useEffect(() => {
     if (!canViewProgram) {
@@ -54,25 +51,13 @@ const ProgramDrawer: FC<ProgramDrawerProps> = ({
     }
   }, [error, messageApi])
 
-  const sponsorNames = useMemo(
-    () => getSortedNameList(programData?.programSponsors ?? []),
-    [programData],
-  )
+  const sponsorNames = getSortedNameList(programData?.programSponsors ?? [])
 
-  const ownerNames = useMemo(
-    () => getSortedNameList(programData?.programOwners ?? []),
-    [programData],
-  )
+  const ownerNames = getSortedNameList(programData?.programOwners ?? [])
 
-  const managerNames = useMemo(
-    () => getSortedNameList(programData?.programManagers ?? []),
-    [programData],
-  )
+  const managerNames = getSortedNameList(programData?.programManagers ?? [])
 
-  const strategicThemes = useMemo(
-    () => getSortedNameList(programData?.strategicThemes ?? []),
-    [programData],
-  )
+  const strategicThemes = getSortedNameList(programData?.strategicThemes ?? [])
 
   return (
     <Drawer

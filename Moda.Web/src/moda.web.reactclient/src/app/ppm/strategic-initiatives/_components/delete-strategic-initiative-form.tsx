@@ -5,7 +5,6 @@ import { useConfirmModal } from '@/src/hooks'
 import { StrategicInitiativeDetailsDto } from '@/src/services/moda-api'
 import { useDeleteStrategicInitiativeMutation } from '@/src/store/features/ppm/strategic-initiatives-api'
 import { Modal } from 'antd'
-import { useCallback } from 'react'
 
 export interface DeleteStrategicInitiativeFormProps {
   strategicInitiative: StrategicInitiativeDetailsDto
@@ -24,7 +23,7 @@ const DeleteStrategicInitiativeForm = ({
     useDeleteStrategicInitiativeMutation()
 
   const { isOpen, isSaving, handleOk, handleCancel } = useConfirmModal({
-    onSubmit: useCallback(async () => {
+    onSubmit: async () => {
       try {
         const response = await deleteStrategicInitiativeMutation(
           strategicInitiative.id,
@@ -41,7 +40,7 @@ const DeleteStrategicInitiativeForm = ({
         console.log(error)
         return false
       }
-    }, [deleteStrategicInitiativeMutation, strategicInitiative, messageApi]),
+    },
     onComplete: onFormComplete,
     onCancel: onFormCancel,
     errorMessage:

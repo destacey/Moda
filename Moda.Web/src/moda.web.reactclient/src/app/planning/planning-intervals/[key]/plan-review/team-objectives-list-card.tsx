@@ -5,7 +5,7 @@ import { PlusOutlined } from '@ant-design/icons'
 import { Badge, Button, Card, List, Space } from 'antd'
 import ObjectiveListItem from './objective-list-item'
 import ModaEmpty from '@/src/components/common/moda-empty'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import CreatePlanningIntervalObjectiveForm from '../../_components/create-planning-interval-objective-form'
 import useTheme from '@/src/components/contexts/theme'
 import {
@@ -67,10 +67,7 @@ const TeamObjectivesListCard = ({
 }: TeamObjectivesListCardProps) => {
   const [openCreateObjectiveForm, setOpenCreateObjectiveForm] =
     useState<boolean>(false)
-  const sortedObjectivesData = useMemo(
-    () => (objectivesData ? sortOrderedObjectives(objectivesData) : []),
-    [objectivesData],
-  )
+  const sortedObjectivesData = objectivesData ? sortOrderedObjectives(objectivesData) : []
 
   const messageApi = useMessage()
 
@@ -119,13 +116,13 @@ const TeamObjectivesListCard = ({
     )
   }, [messageApi, updateObjectivesOrderError])
 
-  const refresh = useCallback(() => {
+  const refresh = () => {
     refreshObjectives()
     // this will update the PI predictability on the plan review page title
     refreshPlanningInterval()
-  }, [refreshObjectives, refreshPlanningInterval])
+  }
 
-  const cardTitle = useMemo(() => {
+  const cardTitle = (() => {
     const count = objectives.length ?? 0
     const showBadge = count > 0
     return (
@@ -134,7 +131,7 @@ const TeamObjectivesListCard = ({
         {showBadge && <Badge color={badgeColor} size="small" count={count} />}
       </Space>
     )
-  }, [objectives.length, badgeColor])
+  })()
 
   const onCreateObjectiveFormClosed = (wasCreated: boolean) => {
     setOpenCreateObjectiveForm(false)

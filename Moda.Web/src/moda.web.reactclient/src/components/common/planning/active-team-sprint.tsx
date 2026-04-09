@@ -5,7 +5,7 @@ import { useGetSprintMetricsQuery } from '@/src/store/features/planning/sprints-
 import { SizingMethod } from '@/src/services/moda-api'
 import { Card, Col, Flex, Row, Skeleton, Typography } from 'antd'
 import Link from 'next/link'
-import { FC, useMemo } from 'react'
+import { FC } from 'react'
 import { CompletionRateMetric, VelocityMetric } from '../metrics'
 import TimelineProgress from './timeline-progress'
 import IterationHealthIndicator from './iteration-health-indicator'
@@ -31,7 +31,7 @@ const ActiveTeamSprint: FC<ActiveTeamSprintProps> = ({
       skip: !sprintData?.key,
     })
 
-  const displayValues = useMemo(() => {
+  const displayValues = (() => {
     if (!metrics) {
       return {
         total: 0,
@@ -50,7 +50,7 @@ const ActiveTeamSprint: FC<ActiveTeamSprintProps> = ({
       total: displayTotal,
       completed: displayCompleted,
     }
-  }, [metrics, useStoryPoints])
+  })()
 
   if (sprintIsLoading) {
     return <Skeleton active paragraph={{ rows: 3 }} />

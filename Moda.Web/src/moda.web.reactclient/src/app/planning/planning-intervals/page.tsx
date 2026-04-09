@@ -3,7 +3,7 @@
 import ModaGrid from '@/src/components/common/moda-grid'
 import PageTitle from '@/src/components/common/page-title'
 import Link from 'next/link'
-import { useCallback, useMemo, useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useDocumentTitle } from '../../../hooks/use-document-title'
 import dayjs from 'dayjs'
 import { CreatePlanningIntervalForm } from './_components'
@@ -38,19 +38,17 @@ const PlanningIntervalListPage = () => {
   )
   const showActions = canCreatePlanningInterval
 
-  const data = useMemo(() => {
-    if (!piData) return []
-
-    return piData.slice().sort((a, b) => {
-      const aStateIndex = stateOrder.indexOf(a.state.name)
-      const bStateIndex = stateOrder.indexOf(b.state.name)
-      if (aStateIndex !== bStateIndex) {
-        return aStateIndex - bStateIndex
-      } else {
-        return dayjs(b.start).unix() - dayjs(a.start).unix()
-      }
-    })
-  }, [piData])
+  const data = !piData
+    ? []
+    : piData.slice().sort((a, b) => {
+        const aStateIndex = stateOrder.indexOf(a.state.name)
+        const bStateIndex = stateOrder.indexOf(b.state.name)
+        if (aStateIndex !== bStateIndex) {
+          return aStateIndex - bStateIndex
+        } else {
+          return dayjs(b.start).unix() - dayjs(a.start).unix()
+        }
+      })
 
   const columnDefs = useMemo<ColDef<PlanningIntervalListDto>[]>(
     () => [
@@ -72,9 +70,9 @@ const PlanningIntervalListPage = () => {
     [],
   )
 
-  const refresh = useCallback(async () => {
+  const refresh = async () => {
     refetch()
-  }, [refetch])
+  }
 
   const onCreatePlanningIntervalFormClosed = (wasCreated: boolean) => {
     setOpenCreatePlanningIntervalForm(false)

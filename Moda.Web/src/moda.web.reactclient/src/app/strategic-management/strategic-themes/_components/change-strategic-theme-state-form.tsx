@@ -8,7 +8,6 @@ import {
   useArchiveStrategicThemeMutation,
 } from '@/src/store/features/strategic-management/strategic-themes-api'
 import { Modal, Space } from 'antd'
-import { useCallback } from 'react'
 
 export enum StrategicThemeStateAction {
   Activate = 'Activate',
@@ -34,7 +33,7 @@ const ChangeStrategicThemeStateForm = ({
   const [archiveStrategicThemeMutation] = useArchiveStrategicThemeMutation()
 
   const { isOpen, isSaving, handleOk, handleCancel } = useConfirmModal({
-    onSubmit: useCallback(async () => {
+    onSubmit: async () => {
       try {
         let response = null
         if (stateAction === StrategicThemeStateAction.Activate) {
@@ -65,13 +64,7 @@ const ChangeStrategicThemeStateForm = ({
         console.error(error)
         return false
       }
-    }, [
-      activateStrategicThemeMutation,
-      archiveStrategicThemeMutation,
-      strategicTheme,
-      stateAction,
-      messageApi,
-    ]),
+    },
     onComplete: onFormComplete,
     onCancel: onFormCancel,
     errorMessage: `An unexpected error occurred while ${stateAction}ing the strategic theme.`,

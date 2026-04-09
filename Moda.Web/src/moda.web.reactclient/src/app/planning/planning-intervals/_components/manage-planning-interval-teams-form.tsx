@@ -149,7 +149,7 @@ const ManagePlanningIntervalTeamsForm = ({
   }, [])
 
   const { isOpen, isSaving, handleOk, handleCancel } = useConfirmModal({
-    onSubmit: useCallback(async () => {
+    onSubmit: async () => {
       try {
         const request: ManagePlanningIntervalTeamsRequest = {
           id: id,
@@ -164,7 +164,7 @@ const ManagePlanningIntervalTeamsForm = ({
         console.error(error)
         return false
       }
-    }, [id, targetKeys, messageApi]),
+    },
     onComplete: onFormSave,
     onCancel: onFormCancel,
     errorMessage:

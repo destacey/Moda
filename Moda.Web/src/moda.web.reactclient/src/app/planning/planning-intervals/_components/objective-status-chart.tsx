@@ -4,7 +4,6 @@ import useTheme from '@/src/components/contexts/theme'
 import dynamic from 'next/dynamic'
 import type { PieConfig } from '@ant-design/charts'
 import { Card } from 'antd'
-import { useMemo } from 'react'
 
 const Pie = dynamic(
   () => import('@ant-design/charts').then((mod) => mod.Pie) as any,
@@ -27,7 +26,7 @@ const ObjectiveStatusChart = (props: ObjectiveStatusChartProps) => {
       ? 'rgba(0, 0, 0, 0.45)'
       : 'rgba(255, 255, 255, 0.45)'
 
-  const config = useMemo(() => {
+  const config = (() => {
     const total = props.data.reduce((acc, x) => acc + x.count, 0)
     return {
       title: {
@@ -65,7 +64,7 @@ const ObjectiveStatusChart = (props: ObjectiveStatusChartProps) => {
         },
       },
     } as PieConfig
-  }, [antDesignChartsTheme, fontColor, props.data])
+  })()
 
   if (!props.data || props.data.length === 0) return
 

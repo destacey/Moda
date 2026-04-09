@@ -1,7 +1,7 @@
 'use client'
 
 import { useDocumentTitle } from '@/src/hooks'
-import { use, useCallback, useState } from 'react'
+import { use, useState } from 'react'
 import { PageTitle } from '@/src/components/common'
 import { notFound } from 'next/navigation'
 import RisksGrid from '@/src/components/common/planning/risks-grid'
@@ -33,9 +33,9 @@ const PlanningIntervalRisksPage = (props: {
     includeClosed: includeClosedRisks,
   })
 
-  const onIncludeClosedRisksChanged = useCallback((includeClosed: boolean) => {
+  const onIncludeClosedRisksChanged = (includeClosed: boolean) => {
     setIncludeClosedRisks(includeClosed)
-  }, [])
+  }
 
   if (!isLoading && !planningIntervalData) {
     return notFound()

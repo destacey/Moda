@@ -9,7 +9,7 @@ import { useGetProjectLifecyclesQuery } from '@/src/store/features/ppm/project-l
 import { ColDef } from 'ag-grid-community'
 import { Button } from 'antd'
 import Link from 'next/link'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import CreateProjectLifecycleForm from './_components/create-project-lifecycle-form'
 import { useMessage } from '@/src/components/contexts/messaging'
 
@@ -46,24 +46,19 @@ const ProjectLifecyclesPage = () => {
     }
   }, [error, messageApi])
 
-  const columnDefs = useMemo<ColDef<ProjectLifecycleListDto>[]>(
-    () => [
+  const columnDefs = useMemo<ColDef<ProjectLifecycleListDto>[]>(() => [
       { field: 'id', hide: true },
       { field: 'key', width: 90 },
       { field: 'name', cellRenderer: ProjectLifecycleCellRenderer, sort: 'asc' },
       { field: 'state.name', headerName: 'State', width: 100 },
       { field: 'phaseCount', headerName: 'Phase Count', width: 120 },
-    ],
-    [],
-  )
+    ], [])
 
-  const refresh = useCallback(async () => {
+  const refresh = async () => {
     refetch()
-  }, [refetch])
+  }
 
-  const actions = useMemo(() => {
-    if (!showActions) return null
-    return (
+  const actions = !showActions ? null : (
       <>
         {canCreateProjectLifecycle && (
           <Button onClick={() => setOpenCreateForm(true)}>
@@ -72,7 +67,6 @@ const ProjectLifecyclesPage = () => {
         )}
       </>
     )
-  }, [canCreateProjectLifecycle, showActions])
 
   const onCreateFormClosed = (wasCreated: boolean) => {
     setOpenCreateForm(false)

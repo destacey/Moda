@@ -4,7 +4,6 @@ import { DeactivateTeamRequest, TeamDetailsDto } from '@/src/services/moda-api'
 import { useDeactivateTeamMutation } from '@/src/store/features/organizations/team-api'
 import { toFormErrors } from '@/src/utils'
 import { DatePicker, Form, Modal } from 'antd'
-import { useCallback } from 'react'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { useModalForm } from '@/src/hooks'
 
@@ -41,31 +40,28 @@ const DeactivateTeamForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<DeactivateTeamFormValues>({
-      onSubmit: useCallback(
-        async (values: DeactivateTeamFormValues, form) => {
-          try {
-            const request = mapToRequestValues(team.id, values.inactiveDate)
-            const response = await deactivateTeam(request)
-            if (response.error) throw response.error
+      onSubmit: async (values: DeactivateTeamFormValues, form) => {
+        try {
+          const request = mapToRequestValues(team.id, values.inactiveDate)
+          const response = await deactivateTeam(request)
+          if (response.error) throw response.error
 
-            messageApi.success('Team deactivated successfully')
-            return true
-          } catch (error) {
-            if (error.status === 422 && error.errors) {
-              const formErrors = toFormErrors(error.errors)
-              form.setFields(formErrors)
-              messageApi.error('Correct the validation error(s) to continue.')
-            } else {
-              messageApi.error(
-                error.detail ??
-                  'An error occurred while deactivating the team. Please try again.',
-              )
-            }
-            return false
+          messageApi.success('Team deactivated successfully')
+          return true
+        } catch (error) {
+          if (error.status === 422 && error.errors) {
+            const formErrors = toFormErrors(error.errors)
+            form.setFields(formErrors)
+            messageApi.error('Correct the validation error(s) to continue.')
+          } else {
+            messageApi.error(
+              error.detail ??
+                'An error occurred while deactivating the team. Please try again.',
+            )
           }
-        },
-        [deactivateTeam, team.id, messageApi],
-      ),
+          return false
+        }
+      },
       onComplete: onFormComplete,
       onCancel: onFormCancel,
       errorMessage:

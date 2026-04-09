@@ -4,7 +4,7 @@ import { useMessage } from '@/src/components/contexts/messaging'
 import { useAddPokerRoundMutation } from '@/src/store/features/planning/poker-sessions-api'
 import { PlusOutlined } from '@ant-design/icons'
 import { Button, Flex, Input, Typography } from 'antd'
-import { FC, useCallback, useState } from 'react'
+import { FC, useState } from 'react'
 import styles from './poker-session.module.css'
 
 const { Title, Text } = Typography
@@ -26,7 +26,7 @@ const PokerLobbyState: FC<PokerLobbyStateProps> = ({
   const [addRound, { isLoading }] = useAddPokerRoundMutation()
   const [label, setLabel] = useState('')
 
-  const handleAdd = useCallback(async () => {
+  const handleAdd = async () => {
     try {
       const response = await addRound({
         sessionId,
@@ -38,7 +38,7 @@ const PokerLobbyState: FC<PokerLobbyStateProps> = ({
     } catch {
       messageApi.error('Failed to add round.')
     }
-  }, [addRound, sessionId, sessionKey, label, messageApi])
+  }
 
   if (!isActive) {
     return (

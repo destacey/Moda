@@ -10,7 +10,6 @@ import { useGetEmployeesQuery } from '@/src/store/features/organizations/employe
 import { UserDetailsDto } from '@/src/services/moda-api'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { useModalForm } from '@/src/hooks'
-import { useCallback, useMemo } from 'react'
 
 const { Item } = Form
 
@@ -39,7 +38,7 @@ const EditUserForm = ({
     useGetEmployeesQuery(false)
   const { data: usersData } = useGetUsersQuery()
 
-  const employeeOptions = useMemo(() => {
+  const employeeOptions = (() => {
     if (!employeesData) return []
     const linkedEmployeeIds = new Set(
       usersData
@@ -49,12 +48,11 @@ const EditUserForm = ({
     return employeesData
       .filter((e) => e.isActive && !linkedEmployeeIds.has(e.id))
       .map((e) => ({ value: e.id, label: e.displayName }))
-  }, [employeesData, usersData, user.id])
+  })()
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<EditUserFormValues>({
-      onSubmit: useCallback(
-        async (values: EditUserFormValues, form) => {
+      onSubmit: async (values: EditUserFormValues, form) => {
           try {
             const response = await updateUser({
               id: user.id,
@@ -86,8 +84,6 @@ const EditUserForm = ({
             return false
           }
         },
-        [updateUser, messageApi, onFormUpdate, user.id],
-      ),
       onComplete: () => {},
       onCancel: onFormCancel,
       errorMessage: 'An unexpected error occurred while updating the user.',

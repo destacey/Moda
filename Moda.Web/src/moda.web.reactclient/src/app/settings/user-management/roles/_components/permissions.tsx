@@ -16,7 +16,7 @@ import {
   Typography,
 } from 'antd'
 import { SearchOutlined } from '@ant-design/icons'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { RoleDto } from '@/src/services/moda-api'
 
 const { Title } = Typography
@@ -44,10 +44,7 @@ interface PermissionCategory {
 }
 
 const Permissions = (props: PermissionsProps) => {
-  const sourcePermissions = useMemo(
-    () => props.permissions ?? [],
-    [props.permissions],
-  )
+  const sourcePermissions = props.permissions ?? []
   const [permissions, setPermissions] = useState<string[]>(sourcePermissions)
   const [searchText, setSearchText] = useState('')
   const [expandedKeys, setExpandedKeys] = useState<string[]>([])
@@ -67,13 +64,13 @@ const Permissions = (props: PermissionsProps) => {
 
   const [updatePermissions] = useUpdatePermissionsMutation()
 
-  const isDirty = useMemo(() => {
+  const isDirty = (() => {
     if (!isEditMode) return false
     if (permissions.length !== sourcePermissions.length) return true
     const sorted = [...permissions].sort()
     const sortedProps = [...sourcePermissions].sort()
     return sorted.some((p, i) => p !== sortedProps[i])
-  }, [isEditMode, permissions, sourcePermissions])
+  })()
 
   useEffect(() => {
     onDirtyChange?.(isDirty)
@@ -117,7 +114,7 @@ const Permissions = (props: PermissionsProps) => {
     }
   }, [isDirty])
 
-  const categories = useMemo(() => {
+  const categories = (() => {
     if (!permissionsData) return []
     const categoryMap = new Map<string, Map<string, PermissionItem[]>>()
 
@@ -147,22 +144,19 @@ const Permissions = (props: PermissionsProps) => {
     })
 
     return result.sort((a, b) => a.name.localeCompare(b.name))
-  }, [permissionsData])
+  })()
 
-  const allGroups = useMemo(
-    () => categories.flatMap((c) => c.groups),
-    [categories],
-  )
+  const allGroups = categories.flatMap((c) => c.groups)
 
-  const groupTotalCountMap = useMemo(() => {
+  const groupTotalCountMap = (() => {
     const map = new Map<string, number>()
     allGroups.forEach((group) => {
       map.set(group.name, group.permissions.length)
     })
     return map
-  }, [allGroups])
+  })()
 
-  const filteredCategories = useMemo(() => {
+  const filteredCategories = (() => {
     if (!searchText) return categories
     const lower = searchText.toLowerCase()
     return categories
@@ -186,19 +180,13 @@ const Permissions = (props: PermissionsProps) => {
         return { ...category, groups: filteredGroups }
       })
       .filter(Boolean) as PermissionCategory[]
-  }, [categories, searchText])
+  })()
 
-  const allFilteredGroups = useMemo(
-    () => filteredCategories.flatMap((c) => c.groups),
-    [filteredCategories],
-  )
+  const allFilteredGroups = filteredCategories.flatMap((c) => c.groups)
 
-  const effectivePermissionsSet = useMemo(
-    () => new Set(isEditMode ? permissions : sourcePermissions),
-    [isEditMode, permissions, sourcePermissions],
-  )
+  const effectivePermissionsSet = new Set(isEditMode ? permissions : sourcePermissions)
 
-  const displayCategories = useMemo(() => {
+  const displayCategories = (() => {
     if (isEditMode) return filteredCategories
     return filteredCategories
       .map((category) => {
@@ -215,17 +203,11 @@ const Permissions = (props: PermissionsProps) => {
         return { ...category, groups }
       })
       .filter(Boolean) as PermissionCategory[]
-  }, [effectivePermissionsSet, filteredCategories, isEditMode])
+  })()
 
-  const allDisplayGroups = useMemo(
-    () => displayCategories.flatMap((c) => c.groups),
-    [displayCategories],
-  )
+  const allDisplayGroups = displayCategories.flatMap((c) => c.groups)
 
-  const hasPermission = useCallback(
-    (permission: string) => effectivePermissionsSet.has(permission),
-    [effectivePermissionsSet],
-  )
+  const hasPermission = (permission: string) => effectivePermissionsSet.has(permission)
 
   const handlePermissionChange = (item: PermissionItem) => {
     if (!hasPermission(item.name)) {

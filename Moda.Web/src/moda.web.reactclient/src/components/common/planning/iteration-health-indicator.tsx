@@ -6,7 +6,7 @@ import {
 } from '@/src/utils/iteration-health'
 import { Badge } from 'antd'
 import ModaTooltip from '@/src/components/common/moda-tooltip'
-import { FC, useMemo } from 'react'
+import { FC } from 'react'
 import { PresetStatusColorType } from 'antd/es/_util/colors'
 
 const healthTooltip = (
@@ -52,14 +52,12 @@ const IterationHealthIndicator: FC<IterationHealthIndicatorProps> = ({
   completed,
   showLabel = true,
 }) => {
-  const healthResult = useMemo(() => {
-    return calculateIterationHealth({
-      startDate,
-      endDate,
-      total,
-      completed,
-    })
-  }, [startDate, endDate, total, completed])
+  const healthResult = calculateIterationHealth({
+    startDate,
+    endDate,
+    total,
+    completed,
+  })
 
   const getHealthColor = (
     status: IterationHealthStatus,

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import useAuth from '@/src/components/contexts/auth'
 import { useMessage } from '@/src/components/contexts/messaging'
 
@@ -69,7 +69,7 @@ function useConfirmModal({
     onCancel()
   }, [permission, permissionAllowed, messageApi, onCancel])
 
-  const handleOk = useCallback(async () => {
+  const handleOk = async () => {
     setIsSaving(true)
     try {
       if (await onSubmit()) {
@@ -81,11 +81,11 @@ function useConfirmModal({
     } finally {
       setIsSaving(false)
     }
-  }, [onSubmit, onComplete, messageApi, errorMessage])
+  }
 
-  const handleCancel = useCallback(() => {
+  const handleCancel = () => {
     onCancel()
-  }, [onCancel])
+  }
 
   return {
     isOpen,

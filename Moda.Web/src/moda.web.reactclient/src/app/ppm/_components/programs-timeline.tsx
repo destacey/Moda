@@ -11,7 +11,7 @@ import { ProgramListDto } from '@/src/services/moda-api'
 import { Card, Divider, Flex, Space, Switch, theme, Typography } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import dayjs from 'dayjs'
-import { ReactNode, useCallback, useMemo, useState } from 'react'
+import { ReactNode, useState } from 'react'
 import { ProgramDrawer } from '.'
 import { getLifecyclePhaseColorFromStatus, getLuminance } from '@/src/utils'
 
@@ -58,43 +58,39 @@ const ProgramsTimeline: React.FC<ProgramsTimelineProps> = (props) => {
   const [showCurrentTime, setShowCurrentTime] = useState<boolean>(true)
   const { token } = useToken()
 
-  const showDrawer = useCallback(() => {
+  const showDrawer = () => {
     setDrawerOpen(true)
-  }, [])
+  }
 
-  const onDrawerClose = useCallback(() => {
+  const onDrawerClose = () => {
     setDrawerOpen(false)
     setSelectedItemKey(null)
-  }, [])
+  }
 
-  const openProgramDrawer = useCallback(
-    (programKey: number) => {
-      setSelectedItemKey(programKey)
-      showDrawer()
-    },
-    [showDrawer],
-  )
+  const openProgramDrawer = (programKey: number) => {
+    setSelectedItemKey(programKey)
+    showDrawer()
+  }
 
   // Derive timeline items and window synchronously so the timeline receives data on first render
-  const processedPrograms = useMemo((): ProgramTimelineItem[] => {
-    if (props.isLoading || !props.programs) return []
+  const processedPrograms: ProgramTimelineItem[] =
+    props.isLoading || !props.programs
+      ? []
+      : props.programs
+          .filter((program) => program.start && program.end)
+          .map((program) => ({
+            id: String(program.id),
+            title: program.name,
+            content: program.name,
+            itemColor: getLifecyclePhaseColorFromStatus(program.status, token),
+            objectData: program,
+            type: 'range',
+            start: new Date(program.start),
+            end: new Date(program.end),
+            openProgramDrawer: openProgramDrawer,
+          }))
 
-    return props.programs
-      .filter((program) => program.start && program.end)
-      .map((program) => ({
-        id: String(program.id),
-        title: program.name,
-        content: program.name,
-        itemColor: getLifecyclePhaseColorFromStatus(program.status, token),
-        objectData: program,
-        type: 'range',
-        start: new Date(program.start),
-        end: new Date(program.end),
-        openProgramDrawer: openProgramDrawer,
-      }))
-  }, [openProgramDrawer, props.isLoading, props.programs, token])
-
-  const timelineWindow = useMemo(() => {
+  const timelineWindow = (() => {
     let minDate = dayjs()
     let maxDate = dayjs()
 
@@ -111,25 +107,22 @@ const ProgramsTimeline: React.FC<ProgramsTimelineProps> = (props) => {
     maxDate = maxDate.add(1, 'month')
 
     return { start: minDate.toDate(), end: maxDate.toDate() }
-  }, [processedPrograms])
+  })()
 
-  const timelineOptions = useMemo(
-    (): ModaTimelineOptions<ProgramTimelineItem> => ({
-      showCurrentTime: showCurrentTime,
-      maxHeight: 650,
-      start: timelineWindow.start,
-      end: timelineWindow.end,
-      min: timelineWindow.start,
-      max: timelineWindow.end,
-    }),
-    [showCurrentTime, timelineWindow.end, timelineWindow.start],
-  )
+  const timelineOptions: ModaTimelineOptions<ProgramTimelineItem> = {
+    showCurrentTime: showCurrentTime,
+    maxHeight: 650,
+    start: timelineWindow.start,
+    end: timelineWindow.end,
+    min: timelineWindow.start,
+    max: timelineWindow.end,
+  }
 
-  const onShowCurrentTimeChange = useCallback((checked: boolean) => {
+  const onShowCurrentTimeChange = (checked: boolean) => {
     setShowCurrentTime(checked)
-  }, [])
+  }
 
-  const controlItems = useCallback((): ItemType[] => {
+  const controlItems = (): ItemType[] => {
     const items: ItemType[] = []
 
     items.push({
@@ -148,7 +141,7 @@ const ProgramsTimeline: React.FC<ProgramsTimelineProps> = (props) => {
     })
 
     return items
-  }, [showCurrentTime, onShowCurrentTimeChange])
+  }
 
   const isLoading = props.isLoading
 

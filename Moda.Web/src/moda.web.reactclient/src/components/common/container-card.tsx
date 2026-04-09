@@ -1,6 +1,6 @@
 'use client'
 
-import { FC, ReactNode, useMemo } from 'react'
+import { FC, ReactNode } from 'react'
 import useTheme from '../contexts/theme'
 import { Badge, Card, Flex } from 'antd'
 
@@ -16,17 +16,15 @@ const ContainerCard: FC<ContainerCardProps> = (props) => {
 
   const { badgeColor } = useTheme()
 
-  const cardTitle = useMemo(() => {
-    const showBadge = count !== undefined && count > 0
-    return (
-      <Flex align="center" gap="small">
-        {title}
-        {showBadge && (
-          <Badge color={badgeColor} size="small" count={count} title="" />
-        )}
-      </Flex>
-    )
-  }, [title, count, badgeColor])
+  const showBadge = count !== undefined && count > 0
+  const cardTitle = (
+    <Flex align="center" gap="small">
+      {title}
+      {showBadge && (
+        <Badge color={badgeColor} size="small" count={count} title="" />
+      )}
+    </Flex>
+  )
 
   return (
     <Card

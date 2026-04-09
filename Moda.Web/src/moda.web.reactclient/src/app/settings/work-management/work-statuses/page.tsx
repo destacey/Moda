@@ -4,7 +4,7 @@ import { ModaGrid, PageTitle } from '@/src/components/common'
 import { useAppDispatch, useAppSelector, useDocumentTitle } from '@/src/hooks'
 import { WorkStatusDto } from '@/src/services/moda-api'
 import { ColDef } from 'ag-grid-community'
-import { useCallback, useEffect, useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { setIncludeInactive } from '../../../../store/features/work-management/work-status-slice'
 import { authorizePage } from '@/src/components/hoc'
 import { useGetWorkStatusesQuery } from '@/src/store/features/work-management/work-status-api'
@@ -28,19 +28,16 @@ const WorkStatusesPage = () => {
     error && console.error(error)
   }, [error])
 
-  const columnDefs = useMemo<ColDef<WorkStatusDto>[]>(
-    () => [
+  const columnDefs = useMemo<ColDef<WorkStatusDto>[]>(() => [
       { field: 'id', hide: true },
       { field: 'name' },
       { field: 'description', width: 300 },
       { field: 'isActive', width: 100 }, // TODO: convert to yes/no
-    ],
-    [],
-  )
+    ], [])
 
-  const refresh = useCallback(async () => {
+  const refresh = async () => {
     refetch()
-  }, [refetch])
+  }
 
   const onIncludeInactiveChange = (checked: boolean) => {
     dispatch(setIncludeInactive(checked))

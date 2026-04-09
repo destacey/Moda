@@ -2,7 +2,7 @@
 
 import { LinkDto, UpdateLinkRequest } from '@/src/services/moda-api'
 import { Form, Input, Modal } from 'antd'
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 import { toFormErrors } from '@/src/utils'
 import {
   useGetLinkQuery,
@@ -45,53 +45,46 @@ const EditLinkForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<EditLinkFormValues>({
-      onSubmit: useCallback(
-        async (values: EditLinkFormValues, form) => {
-          try {
-            const request = mapToRequestValues(values)
-            request.id = id
-            const response = await updateLink({ request, objectId: id })
-            if (response.error) {
-              throw response.error
-            }
-
-            messageApi.success('Successfully updated link.')
-            return true
-          } catch (error) {
-            if (error.status === 422 && error.errors) {
-              const formErrors = toFormErrors(error.errors)
-              form.setFields(formErrors)
-              messageApi.error('Correct the validation error(s) to continue.')
-            } else {
-              messageApi.error(
-                'An unexpected error occurred while updating the link.',
-              )
-              console.error(error)
-            }
-            return false
+      onSubmit: async (values: EditLinkFormValues, form) => {
+        try {
+          const request = mapToRequestValues(values)
+          request.id = id
+          const response = await updateLink({ request, objectId: id })
+          if (response.error) {
+            throw response.error
           }
-        },
-        [updateLink, id, messageApi],
-      ),
+
+          messageApi.success('Successfully updated link.')
+          return true
+        } catch (error) {
+          if (error.status === 422 && error.errors) {
+            const formErrors = toFormErrors(error.errors)
+            form.setFields(formErrors)
+            messageApi.error('Correct the validation error(s) to continue.')
+          } else {
+            messageApi.error(
+              'An unexpected error occurred while updating the link.',
+            )
+            console.error(error)
+          }
+          return false
+        }
+      },
       onComplete: onFormUpdate,
       onCancel: onFormCancel,
       permission: 'Permissions.Links.Update',
     })
 
-  const mapToFormValues = useCallback(
-    (link: LinkDto) => {
+  useEffect(() => {
+    if (!linkData || !isOpen) return
+    const mapToFormValues = (link: LinkDto) => {
       form.setFieldsValue({
         name: link.name,
         url: link.url,
       })
-    },
-    [form],
-  )
-
-  useEffect(() => {
-    if (!linkData || !isOpen) return
+    }
     mapToFormValues(linkData)
-  }, [linkData, isOpen, mapToFormValues])
+  }, [form, linkData, isOpen])
 
   return (
     <Modal

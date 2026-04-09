@@ -10,7 +10,6 @@ import { useCreatePortfolioMutation } from '@/src/store/features/ppm/portfolios-
 import { toFormErrors } from '@/src/utils'
 import { Form, Modal } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
-import { useCallback } from 'react'
 
 const { Item } = Form
 
@@ -51,34 +50,31 @@ const CreatePortfolioForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<CreatePortfolioFormValues>({
-      onSubmit: useCallback(
-        async (values: CreatePortfolioFormValues, form) => {
-          try {
-            const request = mapToRequestValues(values)
-            const response = await createPortfolio(request)
-            if (response.error) throw response.error
+      onSubmit: async (values: CreatePortfolioFormValues, form) => {
+        try {
+          const request = mapToRequestValues(values)
+          const response = await createPortfolio(request)
+          if (response.error) throw response.error
 
-            messageApi.success(
-              'Portfolio created successfully. Portfolio key: ' +
-                response.data.key,
+          messageApi.success(
+            'Portfolio created successfully. Portfolio key: ' +
+              response.data.key,
+          )
+          return true
+        } catch (error) {
+          if (error.status === 422 && error.errors) {
+            const formErrors = toFormErrors(error.errors)
+            form.setFields(formErrors)
+            messageApi.error('Correct the validation error(s) to continue.')
+          } else {
+            messageApi.error(
+              error.detail ??
+                'An error occurred while creating the portfolio. Please try again.',
             )
-            return true
-          } catch (error) {
-            if (error.status === 422 && error.errors) {
-              const formErrors = toFormErrors(error.errors)
-              form.setFields(formErrors)
-              messageApi.error('Correct the validation error(s) to continue.')
-            } else {
-              messageApi.error(
-                error.detail ??
-                  'An error occurred while creating the portfolio. Please try again.',
-              )
-            }
-            return false
           }
-        },
-        [createPortfolio, messageApi],
-      ),
+          return false
+        }
+      },
       onComplete: onFormComplete,
       onCancel: onFormCancel,
       errorMessage:

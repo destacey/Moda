@@ -1,7 +1,7 @@
 'use client'
 
 import PageTitle from '@/src/components/common/page-title'
-import { FC, useCallback, useState } from 'react'
+import { FC, useState } from 'react'
 import { useDocumentTitle } from '../../../hooks/use-document-title'
 import useAuth from '../../../components/contexts/auth'
 import { Button } from 'antd'
@@ -21,9 +21,9 @@ const RoadmapsPage: FC = () => {
   const canCreateRoadmap = hasPermissionClaim('Permissions.Roadmaps.Create')
   const showActions = canCreateRoadmap
 
-  const refresh = useCallback(async () => {
+  const refresh = async () => {
     refetch()
-  }, [refetch])
+  }
 
   const onCreateRoadmapFormClosed = (wasCreated: boolean) => {
     setOpenCreateRoadmapForm(false)

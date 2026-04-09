@@ -5,7 +5,7 @@ import BasicBreadcrumb from '@/src/components/common/basic-breadcrumb'
 import useAuth from '@/src/components/contexts/auth'
 import { authorizePage } from '@/src/components/hoc'
 import { Card, MenuProps } from 'antd'
-import { use, useCallback, useEffect, useMemo, useState } from 'react'
+import { use, useEffect, useState } from 'react'
 import ExpenditureCategorieDetailsLoading from './loading'
 import { notFound, useRouter } from 'next/navigation'
 import {
@@ -78,20 +78,20 @@ const ExpenditureCategoryDetailsPage = (props: {
     'Permissions.ExpenditureCategories.Delete',
   )
 
-  const renderTabContent = useCallback(() => {
+  const renderTabContent = () => {
     switch (activeTab) {
       case ExpenditureCategoryTabs.Details:
         return <ExpenditureCategoryDetails expenditureCategory={categoryData} />
       default:
         return null
     }
-  }, [activeTab, categoryData])
+  }
 
-  const onTabChange = useCallback((tabKey: string) => {
+  const onTabChange = (tabKey: string) => {
     setActiveTab(tabKey as ExpenditureCategoryTabs)
-  }, [])
+  }
 
-  const actionsMenuItems: MenuProps['items'] = useMemo(() => {
+  const actionsMenuItems: MenuProps['items'] = (() => {
     const currentState = categoryData?.state.name
     const availableActions =
       currentState === 'Proposed'
@@ -153,11 +153,7 @@ const ExpenditureCategoryDetailsPage = (props: {
     }
 
     return items
-  }, [
-    categoryData?.state.name,
-    canUpdateExpenditureCategories,
-    canDeleteExpenditureCategories,
-  ])
+  })()
 
   useEffect(() => {
     if (error) {
@@ -169,45 +165,33 @@ const ExpenditureCategoryDetailsPage = (props: {
     }
   }, [error, messageApi])
 
-  const onEditExpenditureCategoryFormClosed = useCallback(
-    (wasSaved: boolean) => {
-      setOpenEditExpenditureCategoryForm(false)
-      if (wasSaved) {
-        refetch()
-      }
-    },
-    [refetch],
-  )
+  const onEditExpenditureCategoryFormClosed = (wasSaved: boolean) => {
+    setOpenEditExpenditureCategoryForm(false)
+    if (wasSaved) {
+      refetch()
+    }
+  }
 
-  const onActivateExpenditureCategoryFormClosed = useCallback(
-    (wasSaved: boolean) => {
-      setOpenActivateExpenditureCategoryForm(false)
-      if (wasSaved) {
-        refetch()
-      }
-    },
-    [refetch],
-  )
+  const onActivateExpenditureCategoryFormClosed = (wasSaved: boolean) => {
+    setOpenActivateExpenditureCategoryForm(false)
+    if (wasSaved) {
+      refetch()
+    }
+  }
 
-  const onArchiveExpenditureCategoryFormClosed = useCallback(
-    (wasSaved: boolean) => {
-      setOpenArchiveExpenditureCategoryForm(false)
-      if (wasSaved) {
-        refetch()
-      }
-    },
-    [refetch],
-  )
+  const onArchiveExpenditureCategoryFormClosed = (wasSaved: boolean) => {
+    setOpenArchiveExpenditureCategoryForm(false)
+    if (wasSaved) {
+      refetch()
+    }
+  }
 
-  const onDeleteExpenditureCategoryFormClosed = useCallback(
-    (wasDeleted: boolean) => {
-      setOpenDeleteExpenditureCategoryForm(false)
-      if (wasDeleted) {
-        router.push('/settings/ppm/expenditure-categories')
-      }
-    },
-    [router],
-  )
+  const onDeleteExpenditureCategoryFormClosed = (wasDeleted: boolean) => {
+    setOpenDeleteExpenditureCategoryForm(false)
+    if (wasDeleted) {
+      router.push('/settings/ppm/expenditure-categories')
+    }
+  }
 
   if (isLoading) {
     return <ExpenditureCategorieDetailsLoading />

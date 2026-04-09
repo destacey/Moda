@@ -2,7 +2,7 @@
 
 import { useMsal, useIsAuthenticated } from '@azure/msal-react'
 import { InteractionStatus } from '@azure/msal-browser'
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import styles from './page.module.css'
 import { isLocalAuthActive, getAuthClient, getAuthStorage, setRememberMe as persistRememberMe, LOCAL_AUTH_TOKEN_KEY, LOCAL_AUTH_REFRESH_TOKEN_KEY, LOCAL_AUTH_TOKEN_EXPIRY_KEY, LOCAL_AUTH_MUST_CHANGE_PASSWORD_KEY } from '@/src/services/clients'
@@ -347,9 +347,9 @@ function MicrosoftLoginTab() {
   const isInitializing = inProgress === InteractionStatus.Startup
   const isLoggingIn = inProgress === InteractionStatus.HandleRedirect
 
-  const handleLogin = useCallback(async () => {
+  const handleLogin = async () => {
     await instance.loginRedirect()
-  }, [instance])
+  }
 
   return (
     <>
@@ -387,47 +387,44 @@ function LocalLoginTab() {
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleSubmit = useCallback(
-    async (e: React.FormEvent) => {
-      e.preventDefault()
-      setError('')
-      setIsSubmitting(true)
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError('')
+    setIsSubmitting(true)
 
-      try {
-        const authClient = getAuthClient()
-        const tokenResponse = await authClient.login({
-          userName: username,
-          password,
-        })
-        persistRememberMe(rememberMe)
-        const storage = getAuthStorage()
-        storage.setItem(LOCAL_AUTH_TOKEN_KEY, tokenResponse.token)
-        storage.setItem(
-          LOCAL_AUTH_REFRESH_TOKEN_KEY,
-          tokenResponse.refreshToken,
-        )
-        storage.setItem(
-          LOCAL_AUTH_TOKEN_EXPIRY_KEY,
-          new Date(tokenResponse.tokenExpiresAt).toISOString(),
-        )
-        if (tokenResponse.mustChangePassword) {
-          storage.setItem(LOCAL_AUTH_MUST_CHANGE_PASSWORD_KEY, 'true')
-        }
-        // Reload to trigger LocalOrMsalAuthGate to pick up the local token.
-        // AppContent will handle redirecting to any stored return URL.
-        window.location.href = '/'
-      } catch (err: any) {
-        const message =
-          err?.detail ||
-          err?.response?.data?.message ||
-          err?.message ||
-          'Invalid email or password.'
-        setError(message)
-        setIsSubmitting(false)
+    try {
+      const authClient = getAuthClient()
+      const tokenResponse = await authClient.login({
+        userName: username,
+        password,
+      })
+      persistRememberMe(rememberMe)
+      const storage = getAuthStorage()
+      storage.setItem(LOCAL_AUTH_TOKEN_KEY, tokenResponse.token)
+      storage.setItem(
+        LOCAL_AUTH_REFRESH_TOKEN_KEY,
+        tokenResponse.refreshToken,
+      )
+      storage.setItem(
+        LOCAL_AUTH_TOKEN_EXPIRY_KEY,
+        new Date(tokenResponse.tokenExpiresAt).toISOString(),
+      )
+      if (tokenResponse.mustChangePassword) {
+        storage.setItem(LOCAL_AUTH_MUST_CHANGE_PASSWORD_KEY, 'true')
       }
-    },
-    [username, password, rememberMe],
-  )
+      // Reload to trigger LocalOrMsalAuthGate to pick up the local token.
+      // AppContent will handle redirecting to any stored return URL.
+      window.location.href = '/'
+    } catch (err: any) {
+      const message =
+        err?.detail ||
+        err?.response?.data?.message ||
+        err?.message ||
+        'Invalid email or password.'
+      setError(message)
+      setIsSubmitting(false)
+    }
+  }
 
   return (
     <>

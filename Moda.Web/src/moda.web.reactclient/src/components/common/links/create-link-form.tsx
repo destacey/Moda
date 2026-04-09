@@ -2,7 +2,6 @@
 
 import { CreateLinkRequest } from '@/src/services/moda-api'
 import { Form, Input, Modal } from 'antd'
-import { useCallback } from 'react'
 import { toFormErrors } from '@/src/utils'
 import { useCreateLinkMutation } from '@/src/store/features/common/links-api'
 import { useMessage } from '../../contexts/messaging'
@@ -41,34 +40,31 @@ const CreateLinkForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<CreateLinkFormValues>({
-      onSubmit: useCallback(
-        async (values: CreateLinkFormValues, form) => {
-          try {
-            const request = mapToRequestValues(values)
-            request.objectId = objectId
-            const response = await createLink(request)
-            if (response.error) {
-              throw response.error
-            }
-
-            messageApi.success('Successfully created link.')
-            return true
-          } catch (error) {
-            if (error.status === 422 && error.errors) {
-              const formErrors = toFormErrors(error.errors)
-              form.setFields(formErrors)
-              messageApi.error('Correct the validation error(s) to continue.')
-            } else {
-              messageApi.error(
-                'An unexpected error occurred while creating the link.',
-              )
-              console.error(error)
-            }
-            return false
+      onSubmit: async (values: CreateLinkFormValues, form) => {
+        try {
+          const request = mapToRequestValues(values)
+          request.objectId = objectId
+          const response = await createLink(request)
+          if (response.error) {
+            throw response.error
           }
-        },
-        [createLink, objectId, messageApi],
-      ),
+
+          messageApi.success('Successfully created link.')
+          return true
+        } catch (error) {
+          if (error.status === 422 && error.errors) {
+            const formErrors = toFormErrors(error.errors)
+            form.setFields(formErrors)
+            messageApi.error('Correct the validation error(s) to continue.')
+          } else {
+            messageApi.error(
+              'An unexpected error occurred while creating the link.',
+            )
+            console.error(error)
+          }
+          return false
+        }
+      },
       onComplete: onFormCreate,
       onCancel: onFormCancel,
       permission: 'Permissions.Links.Create',

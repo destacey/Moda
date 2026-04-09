@@ -3,7 +3,7 @@
 import PageTitle from '@/src/components/common/page-title'
 import { authorizePage } from '@/src/components/hoc'
 import { notFound } from 'next/navigation'
-import { use, useCallback, useEffect, useMemo, useState } from 'react'
+import { use, useEffect, useState } from 'react'
 import { Card } from 'antd'
 import BasicBreadcrumb from '@/src/components/common/basic-breadcrumb'
 import WorkProcessDetailsLoading from './loading'
@@ -49,14 +49,14 @@ const WorkProcessDetailsPage = (props: {
     refetch,
   } = useGetWorkProcessQuery(workProcessKey.toString())
 
-  const renderTabContent = useCallback(() => {
+  const renderTabContent = () => {
     switch (activeTab) {
       case WorkProcessDetailsTabs.Details:
         return <WorkProcessDetails workProcess={workProcessData} />
       default:
         return null
     }
-  }, [activeTab, workProcessData])
+  }
 
   const onTabChange = (tabKey: string) => {
     setActiveTab(tabKey as WorkProcessDetailsTabs)
@@ -66,7 +66,7 @@ const WorkProcessDetailsPage = (props: {
     error && console.error(error)
   }, [error])
 
-  const actionsMenuItems = useMemo(() => {
+  const actionsMenuItems = (() => {
     if (!workProcessData?.isActive === undefined) return [] as ItemType[]
 
     const items = [] as ItemType[]
@@ -81,7 +81,7 @@ const WorkProcessDetailsPage = (props: {
       })
     }
     return items
-  }, [canUpdateWorkProcess, workProcessData?.isActive])
+  })()
 
   if (isLoading) {
     return <WorkProcessDetailsLoading />

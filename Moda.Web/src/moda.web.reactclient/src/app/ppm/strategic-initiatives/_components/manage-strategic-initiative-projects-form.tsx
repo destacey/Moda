@@ -18,7 +18,7 @@ import {
 } from '@/src/store/features/ppm/strategic-initiatives-api'
 import { ColDef } from 'ag-grid-community'
 import { Modal } from 'antd'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export interface ManageStrategicInitiativeProjectsFormProps {
   strategicInitiativeId: string
@@ -78,7 +78,7 @@ const ManageStrategicInitiativeProjectsForm = ({
     useManageStrategicInitiativeProjectsMutation()
 
   const { isOpen, isSaving, handleOk, handleCancel } = useConfirmModal({
-    onSubmit: useCallback(async () => {
+    onSubmit: async () => {
       try {
         const request: ManageStrategicInitiativeProjectsRequest = {
           id: strategicInitiativeId,
@@ -98,7 +98,7 @@ const ManageStrategicInitiativeProjectsForm = ({
         console.error(error)
         return false
       }
-    }, [manageProjects, strategicInitiativeId, targetProjects, messageApi]),
+    },
     onComplete: onFormComplete,
     onCancel: onFormCancel,
     errorMessage:
@@ -122,7 +122,7 @@ const ManageStrategicInitiativeProjectsForm = ({
     setSourceProjects(filteredProjects)
   }, [projectData, existingProjectsData])
 
-  const onDragStop = useCallback((items: ProjectListDto[]) => {
+  const onDragStop = (items: ProjectListDto[]) => {
     if (items.length === 0) return
 
     setSourceProjects((prevSource) =>
@@ -132,9 +132,9 @@ const ManageStrategicInitiativeProjectsForm = ({
     setTargetProjects((prevTarget) =>
       [...prevTarget, ...items].sort(defaultSort),
     )
-  }, [])
+  }
 
-  const handleDelete = useCallback((item: ProjectListDto) => {
+  const handleDelete = (item: ProjectListDto) => {
     if (!item) return
 
     setTargetProjects((prevTarget) =>
@@ -142,12 +142,9 @@ const ManageStrategicInitiativeProjectsForm = ({
     )
 
     setSourceProjects((prevSource) => [...prevSource, item].sort(defaultSort))
-  }, [])
+  }
 
-  const rightColDefs = useMemo(
-    () => asDeletableColDefs(projectColDefs, handleDelete),
-    [handleDelete],
-  )
+  const rightColDefs = asDeletableColDefs(projectColDefs, handleDelete)
 
   return (
     <Modal

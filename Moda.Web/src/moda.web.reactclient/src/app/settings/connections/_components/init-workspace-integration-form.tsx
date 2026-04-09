@@ -3,7 +3,7 @@ import { InitWorkspaceIntegrationRequest } from '@/src/services/moda-api'
 import { useInitAzdoConnectionWorkspaceMutation } from '@/src/store/features/app-integration/azdo-integration-api'
 import { toFormErrors } from '@/src/utils'
 import { Form, Input, Modal } from 'antd'
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useModalForm } from '@/src/hooks'
 
 const { Item } = Form
@@ -45,8 +45,7 @@ const InitWorkspaceIntegrationForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<InitWorkspaceIntegrationFormValues>({
-      onSubmit: useCallback(
-        async (values: InitWorkspaceIntegrationFormValues, form) => {
+      onSubmit: async (values: InitWorkspaceIntegrationFormValues, form) => {
           try {
             const request = mapToRequestValues(values)
             request.id = connectionId
@@ -72,8 +71,6 @@ const InitWorkspaceIntegrationForm = ({
             return false
           }
         },
-        [initAzdoConnectionWorkspace, connectionId, externalId, messageApi],
-      ),
       onComplete: onFormSave,
       onCancel: onFormCancel,
       errorMessage: 'Failed to initialize workspace.',

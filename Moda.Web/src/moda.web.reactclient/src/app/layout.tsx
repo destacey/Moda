@@ -5,7 +5,6 @@ import React, {
   memo,
   PropsWithChildren,
   useEffect,
-  useMemo,
   useState,
   useSyncExternalStore,
 } from 'react'
@@ -136,7 +135,7 @@ const MsalInitializingView = () => {
 
 const AppContent = memo(({ children }: PropsWithChildren) => {
   const screens = useBreakpoint()
-  const isMobile = useMemo(() => !screens.md, [screens.md]) // md breakpoint is 768px in Ant Design
+  const isMobile = !screens.md // md breakpoint is 768px in Ant Design
   const router = useRouter()
 
   // After authentication, redirect to the originally requested URL if one was stored

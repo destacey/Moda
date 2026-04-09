@@ -1,7 +1,7 @@
 'use client'
 
 import PageTitle from '@/src/components/common/page-title'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import ModaGrid from '@/src/components/common/moda-grid'
 import { authorizePage } from '@/src/components/hoc'
 import Link from 'next/link'
@@ -26,21 +26,18 @@ const RoleListPage = () => {
   const { hasClaim } = useAuth()
   const canCreateRole = hasClaim('Permission', 'Permissions.Roles.Create')
 
-  const columnDefs = useMemo(
-    () => [
+  const columnDefs = useMemo(() => [
       { field: 'name', cellRenderer: LinkCellRenderer },
       { field: 'description', width: 300 },
-    ],
-    [],
-  )
+    ], [])
 
   useEffect(() => {
     error && console.error(error)
   }, [error])
 
-  const refresh = useCallback(async () => {
+  const refresh = async () => {
     refetch()
-  }, [refetch])
+  }
 
   const actions = () => {
     return (

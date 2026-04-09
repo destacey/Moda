@@ -17,7 +17,7 @@ import { projectHelpText } from './project-help-text'
 import { DatePicker, Form, Modal, Select } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
 import dayjs from 'dayjs'
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 
 const { Item } = Form
 const { RangePicker } = DatePicker
@@ -85,8 +85,7 @@ const EditProjectForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<EditProjectFormValues>({
-      onSubmit: useCallback(
-        async (values: EditProjectFormValues, form) => {
+      onSubmit: async (values: EditProjectFormValues, form) => {
           try {
             const request = mapToRequestValues(values, projectData.id)
             const response = await updateProject({
@@ -111,8 +110,6 @@ const EditProjectForm = ({
             return false
           }
         },
-        [updateProject, projectData, messageApi],
-      ),
       onComplete: onFormComplete,
       onCancel: onFormCancel,
       errorMessage:

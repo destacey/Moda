@@ -14,7 +14,7 @@ import { useGetStrategicInitiativeQuery } from '@/src/store/features/ppm/strateg
 import { getDrawerWidthPixels, getSortedNameList } from '@/src/utils'
 import { Drawer, Flex } from 'antd'
 import Link from 'next/link'
-import { FC, useEffect, useMemo, useState } from 'react'
+import { FC, useEffect, useState } from 'react'
 
 export interface StrategicInitiativeDrawerProps {
   strategicInitiativeKey: number
@@ -37,9 +37,8 @@ const StrategicInitiativeDrawer: FC<StrategicInitiativeDrawerProps> = ({
   } = useGetStrategicInitiativeQuery(strategicInitiativeKey)
 
   const { hasPermissionClaim } = useAuth()
-  const canViewStrategicInitiative = useMemo(
-    () => hasPermissionClaim('Permissions.StrategicInitiatives.View'),
-    [hasPermissionClaim],
+  const canViewStrategicInitiative = hasPermissionClaim(
+    'Permissions.StrategicInitiatives.View',
   )
 
   useEffect(() => {
@@ -60,20 +59,12 @@ const StrategicInitiativeDrawer: FC<StrategicInitiativeDrawerProps> = ({
     }
   }, [error, messageApi])
 
-  const sponsorNames = useMemo(
-    () =>
-      getSortedNameList(
-        strategicInitiativeData?.strategicInitiativeSponsors ?? [],
-      ),
-    [strategicInitiativeData],
+  const sponsorNames = getSortedNameList(
+    strategicInitiativeData?.strategicInitiativeSponsors ?? [],
   )
 
-  const ownerNames = useMemo(
-    () =>
-      getSortedNameList(
-        strategicInitiativeData?.strategicInitiativeOwners ?? [],
-      ),
-    [strategicInitiativeData],
+  const ownerNames = getSortedNameList(
+    strategicInitiativeData?.strategicInitiativeOwners ?? [],
   )
 
   return (

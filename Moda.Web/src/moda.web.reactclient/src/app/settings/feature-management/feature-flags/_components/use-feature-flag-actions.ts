@@ -1,6 +1,5 @@
 'use client'
 
-import { useCallback } from 'react'
 import { App } from 'antd'
 import {
   useToggleFeatureFlagMutation,
@@ -21,43 +20,37 @@ const useFeatureFlagActions = () => {
   const [toggleFeatureFlag] = useToggleFeatureFlagMutation()
   const [archiveFeatureFlag] = useArchiveFeatureFlagMutation()
 
-  const handleToggle = useCallback(
-    async (flag: FeatureFlagInfo) => {
-      try {
-        await toggleFeatureFlag({
-          id: flag.id,
-          isEnabled: !flag.isEnabled,
-        }).unwrap()
-        messageApi.success(
-          `Feature flag ${!flag.isEnabled ? 'enabled' : 'disabled'}.`,
-        )
-      } catch {
-        messageApi.error('Failed to toggle feature flag.')
-      }
-    },
-    [toggleFeatureFlag, messageApi],
-  )
+  const handleToggle = async (flag: FeatureFlagInfo) => {
+    try {
+      await toggleFeatureFlag({
+        id: flag.id,
+        isEnabled: !flag.isEnabled,
+      }).unwrap()
+      messageApi.success(
+        `Feature flag ${!flag.isEnabled ? 'enabled' : 'disabled'}.`,
+      )
+    } catch {
+      messageApi.error('Failed to toggle feature flag.')
+    }
+  }
 
-  const handleArchive = useCallback(
-    (flag: FeatureFlagInfo) => {
-      modal.confirm({
-        title: 'Archive Feature Flag',
-        content: `Are you sure you want to archive "${flag.displayName}"? This will also disable the flag.`,
-        okText: 'Archive',
-        okButtonProps: { danger: true },
-        onOk: async () => {
-          try {
-            const response = await archiveFeatureFlag(flag.id)
-            if ('error' in response) throw response.error
-            messageApi.success('Feature flag archived.')
-          } catch {
-            messageApi.error('Failed to archive feature flag.')
-          }
-        },
-      })
-    },
-    [archiveFeatureFlag, messageApi, modal],
-  )
+  const handleArchive = (flag: FeatureFlagInfo) => {
+    modal.confirm({
+      title: 'Archive Feature Flag',
+      content: `Are you sure you want to archive "${flag.displayName}"? This will also disable the flag.`,
+      okText: 'Archive',
+      okButtonProps: { danger: true },
+      onOk: async () => {
+        try {
+          const response = await archiveFeatureFlag(flag.id)
+          if ('error' in response) throw response.error
+          messageApi.success('Feature flag archived.')
+        } catch {
+          messageApi.error('Failed to archive feature flag.')
+        }
+      },
+    })
+  }
 
   return { handleToggle, handleArchive }
 }

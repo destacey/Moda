@@ -11,7 +11,7 @@ import { ProjectListDto } from '@/src/services/moda-api'
 import { Card, Divider, Flex, Space, Switch, theme, Typography } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import dayjs from 'dayjs'
-import { FC, ReactNode, useCallback, useMemo, useState } from 'react'
+import { FC, ReactNode, useState } from 'react'
 import { ProjectDrawer } from '.'
 import { DataGroup } from 'vis-timeline/standalone'
 import { getLifecyclePhaseColorFromStatus, getLuminance } from '@/src/utils'
@@ -60,24 +60,21 @@ const ProjectsTimeline: FC<ProjectsTimelineProps> = (props) => {
   const [showCurrentTime, setShowCurrentTime] = useState<boolean>(true)
   const { token } = useToken()
 
-  const showDrawer = useCallback(() => {
+  const showDrawer = () => {
     setDrawerOpen(true)
-  }, [])
+  }
 
-  const onDrawerClose = useCallback(() => {
+  const onDrawerClose = () => {
     setDrawerOpen(false)
     setSelectedItemKey(null)
-  }, [])
+  }
 
-  const openProjectDrawer = useCallback(
-    (projectKey: string) => {
-      setSelectedItemKey(projectKey)
-      showDrawer()
-    },
-    [showDrawer],
-  )
+  const openProjectDrawer = (projectKey: string) => {
+    setSelectedItemKey(projectKey)
+    showDrawer()
+  }
 
-  const groups: DataGroup[] = useMemo((): DataGroup[] => {
+  const groups: DataGroup[] = (() => {
     if (!props.groupByProgram) {
       return []
     }
@@ -107,29 +104,28 @@ const ProjectsTimeline: FC<ProjectsTimelineProps> = (props) => {
       if (b.id === 'No Program') return -1
       return String(a.id).localeCompare(String(b.id))
     })
-  }, [props.groupByProgram, props.projects])
+  })()
 
   // Derive timeline items and window synchronously so the timeline receives data on first render
-  const processedProjects = useMemo((): ProjectTimelineItem[] => {
-    if (props.isLoading || !props.projects) return []
+  const processedProjects: ProjectTimelineItem[] =
+    props.isLoading || !props.projects
+      ? []
+      : props.projects
+          .filter((project) => project.start && project.end)
+          .map((project) => ({
+            id: String(project.id),
+            title: project.name,
+            content: project.name,
+            itemColor: getLifecyclePhaseColorFromStatus(project.status, token),
+            objectData: project,
+            group: project.program?.name ?? 'No Program',
+            type: 'range',
+            start: new Date(project.start),
+            end: new Date(project.end),
+            openProjectDrawer: openProjectDrawer,
+          }))
 
-    return props.projects
-      .filter((project) => project.start && project.end)
-      .map((project) => ({
-        id: String(project.id),
-        title: project.name,
-        content: project.name,
-        itemColor: getLifecyclePhaseColorFromStatus(project.status, token),
-        objectData: project,
-        group: project.program?.name ?? 'No Program',
-        type: 'range',
-        start: new Date(project.start),
-        end: new Date(project.end),
-        openProjectDrawer: openProjectDrawer,
-      }))
-  }, [openProjectDrawer, props.isLoading, props.projects, token])
-
-  const timelineWindow = useMemo(() => {
+  const timelineWindow = (() => {
     let minDate = dayjs()
     let maxDate = dayjs()
 
@@ -146,29 +142,26 @@ const ProjectsTimeline: FC<ProjectsTimelineProps> = (props) => {
     maxDate = maxDate.add(1, 'month')
 
     return { start: minDate.toDate(), end: maxDate.toDate() }
-  }, [processedProjects])
+  })()
 
-  const projectsNoDatesCount = useMemo(() => {
-    return props.projects.filter((project) => !project.start).length
-  }, [props.projects])
+  const projectsNoDatesCount = props.projects.filter(
+    (project) => !project.start,
+  ).length
 
-  const timelineOptions = useMemo(
-    (): ModaTimelineOptions<ProjectTimelineItem> => ({
-      showCurrentTime: showCurrentTime,
-      maxHeight: 650,
-      start: timelineWindow.start,
-      end: timelineWindow.end,
-      min: timelineWindow.start,
-      max: timelineWindow.end,
-    }),
-    [showCurrentTime, timelineWindow.end, timelineWindow.start],
-  )
+  const timelineOptions: ModaTimelineOptions<ProjectTimelineItem> = {
+    showCurrentTime: showCurrentTime,
+    maxHeight: 650,
+    start: timelineWindow.start,
+    end: timelineWindow.end,
+    min: timelineWindow.start,
+    max: timelineWindow.end,
+  }
 
-  const onShowCurrentTimeChange = useCallback((checked: boolean) => {
+  const onShowCurrentTimeChange = (checked: boolean) => {
     setShowCurrentTime(checked)
-  }, [])
+  }
 
-  const controlItems = useCallback((): ItemType[] => {
+  const controlItems = (): ItemType[] => {
     const items: ItemType[] = []
 
     items.push({
@@ -187,7 +180,7 @@ const ProjectsTimeline: FC<ProjectsTimelineProps> = (props) => {
     })
 
     return items
-  }, [showCurrentTime, onShowCurrentTimeChange])
+  }
 
   return (
     <>

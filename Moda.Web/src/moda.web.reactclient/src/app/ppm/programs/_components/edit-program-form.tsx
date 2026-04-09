@@ -14,7 +14,7 @@ import { useGetStrategicThemeOptionsQuery } from '@/src/store/features/strategic
 import { toFormErrors } from '@/src/utils'
 import { DatePicker, Form, Modal, Select } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 import dayjs from 'dayjs'
 
 const { Item } = Form
@@ -70,34 +70,31 @@ const EditProgramForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<EditProgramFormValues>({
-      onSubmit: useCallback(
-        async (values: EditProgramFormValues, form) => {
-          try {
-            const request = mapToRequestValues(values, programData.id)
-            const response = await updateProgram({
-              request,
-              cacheKey: programData.key,
-            })
-            if (response.error) throw response.error
+      onSubmit: async (values: EditProgramFormValues, form) => {
+        try {
+          const request = mapToRequestValues(values, programData.id)
+          const response = await updateProgram({
+            request,
+            cacheKey: programData.key,
+          })
+          if (response.error) throw response.error
 
-            messageApi.success('Program updated successfully.')
-            return true
-          } catch (error) {
-            if (error.status === 422 && error.errors) {
-              const formErrors = toFormErrors(error.errors)
-              form.setFields(formErrors)
-              messageApi.error('Correct the validation error(s) to continue.')
-            } else {
-              messageApi.error(
-                error.detail ??
-                  'An error occurred while updating the program. Please try again.',
-              )
-            }
-            return false
+          messageApi.success('Program updated successfully.')
+          return true
+        } catch (error) {
+          if (error.status === 422 && error.errors) {
+            const formErrors = toFormErrors(error.errors)
+            form.setFields(formErrors)
+            messageApi.error('Correct the validation error(s) to continue.')
+          } else {
+            messageApi.error(
+              error.detail ??
+                'An error occurred while updating the program. Please try again.',
+            )
           }
-        },
-        [updateProgram, programData, messageApi],
-      ),
+          return false
+        }
+      },
       onComplete: onFormComplete,
       onCancel: onFormCancel,
       errorMessage:

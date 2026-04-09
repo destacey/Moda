@@ -4,7 +4,6 @@ import { useMessage } from '@/src/components/contexts/messaging'
 import { ExpenditureCategoryDetailsDto } from '@/src/services/moda-api'
 import { useDeleteExpenditureCategoryMutation } from '@/src/store/features/ppm/expenditure-categories-api'
 import { Modal } from 'antd'
-import { useCallback } from 'react'
 import { useConfirmModal } from '@/src/hooks'
 
 export interface DeleteExpenditureCategoryFormProps {
@@ -24,7 +23,7 @@ const DeleteExpenditureCategoryForm = ({
     useDeleteExpenditureCategoryMutation()
 
   const { isOpen, isSaving, handleOk, handleCancel } = useConfirmModal({
-    onSubmit: useCallback(async () => {
+    onSubmit: async () => {
       try {
         const response = await deleteExpenditureCategory(expenditureCategory.id)
         if (response.error) {
@@ -40,7 +39,7 @@ const DeleteExpenditureCategoryForm = ({
         console.log(error)
         return false
       }
-    }, [deleteExpenditureCategory, expenditureCategory, messageApi]),
+    },
     onComplete: onFormComplete,
     onCancel: onFormCancel,
     errorMessage:

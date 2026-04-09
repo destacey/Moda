@@ -14,7 +14,7 @@ import {
 } from '@/src/store/features/ppm/projects-api'
 import { Alert, MenuProps, Tabs } from 'antd'
 import { notFound, usePathname, useRouter } from 'next/navigation'
-import { use, useCallback, useEffect, useMemo, useState } from 'react'
+import { use, useEffect, useState } from 'react'
 import ProjectDetailsLoading from './loading'
 import dynamic from 'next/dynamic'
 import {
@@ -113,7 +113,7 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
 
   useDocumentTitle(`${projectData?.name ?? projectKey} - Project Details`)
 
-  const tabs = useMemo(() => {
+  const tabs = (() => {
     const items = [
       { key: ProjectTabs.Details, label: 'Details' },
       { key: ProjectTabs.Team, label: 'Team' },
@@ -123,7 +123,7 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     }
     items.push({ key: ProjectTabs.WorkItems, label: 'Work Items' })
     return items
-  }, [projectData?.projectLifecycle])
+  })()
 
   const {
     data: workItemsData,
@@ -151,7 +151,7 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     dispatch(setBreadcrumbRoute({ route: breadcrumbRoute, pathname }))
   }, [dispatch, pathname, projectData])
 
-  const renderTabContent = useCallback(() => {
+  const renderTabContent = () => {
     switch (activeTab) {
       case ProjectTabs.Details:
         return <ProjectDetailsTab project={projectData} />
@@ -176,17 +176,9 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       default:
         return null
     }
-  }, [
-    activeTab,
-    canUpdateProject,
-    projectData,
-    projectKey,
-    refetchWorkItemsData,
-    workItemsData,
-    workItemsDataIsLoading,
-  ])
+  }
 
-  const onTabChange = useCallback((tabKey: string) => {
+  const onTabChange = (tabKey: string) => {
     setActiveTab(tabKey as ProjectTabs)
     const base = window.location.pathname + window.location.search
     if (tabKey === ProjectTabs.Details) {
@@ -194,12 +186,12 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     } else {
       window.history.replaceState(null, '', `${base}#${tabKey}`)
     }
-  }, [])
+  }
 
   const missingDates = projectData?.start === null || projectData?.end === null
   const missingLifecycle = !projectData?.projectLifecycle
 
-  const actionsMenuItems: MenuProps['items'] = useMemo(() => {
+  const actionsMenuItems: MenuProps['items'] = (() => {
     const currentStatus = projectData?.status.name
     const availableActions =
       currentStatus === 'Proposed'
@@ -317,118 +309,81 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     }
 
     return items
-  }, [
-    canDeleteProject,
-    canUpdateProject,
-    missingDates,
-    missingLifecycle,
-    projectData?.status.name,
-    projectData?.projectLifecycle,
-  ])
+  })()
 
-  const onEditProjectFormClosed = useCallback(
-    (wasSaved: boolean) => {
-      setOpenEditProjectForm(false)
-      if (wasSaved) {
-        refetchProject()
-      }
-    },
-    [refetchProject],
-  )
+  const onEditProjectFormClosed = (wasSaved: boolean) => {
+    setOpenEditProjectForm(false)
+    if (wasSaved) {
+      refetchProject()
+    }
+  }
 
-  const onAssignLifecycleFormClosed = useCallback(
-    (wasSaved: boolean) => {
-      setOpenAssignLifecycleForm(false)
-      if (wasSaved) {
-        refetchProject()
-      }
-    },
-    [refetchProject],
-  )
+  const onAssignLifecycleFormClosed = (wasSaved: boolean) => {
+    setOpenAssignLifecycleForm(false)
+    if (wasSaved) {
+      refetchProject()
+    }
+  }
 
-  const onChangeLifecycleFormClosed = useCallback(
-    (wasSaved: boolean) => {
-      setOpenChangeLifecycleForm(false)
-      if (wasSaved) {
-        refetchProject()
-      }
-    },
-    [refetchProject],
-  )
+  const onChangeLifecycleFormClosed = (wasSaved: boolean) => {
+    setOpenChangeLifecycleForm(false)
+    if (wasSaved) {
+      refetchProject()
+    }
+  }
 
-  const onChangeProgramFormClosed = useCallback(
-    (wasSaved: boolean) => {
-      setOpenChangeProgramForm(false)
-      if (wasSaved) {
-        refetchProject()
-      }
-    },
-    [refetchProject],
-  )
+  const onChangeProgramFormClosed = (wasSaved: boolean) => {
+    setOpenChangeProgramForm(false)
+    if (wasSaved) {
+      refetchProject()
+    }
+  }
 
-  const onChangeKeyFormClosed = useCallback(
-    (wasSaved: boolean, newKey?: string) => {
-      setOpenChangeKeyForm(false)
-      if (wasSaved) {
-        if (newKey && newKey !== projectData?.key) {
-          router.push(`/ppm/projects/${newKey}`)
-          return
-        }
-        refetchProject()
+  const onChangeKeyFormClosed = (wasSaved: boolean, newKey?: string) => {
+    setOpenChangeKeyForm(false)
+    if (wasSaved) {
+      if (newKey && newKey !== projectData?.key) {
+        router.push(`/ppm/projects/${newKey}`)
+        return
       }
-    },
-    [projectData?.key, refetchProject, router],
-  )
+      refetchProject()
+    }
+  }
 
-  const onApproveProjectFormClosed = useCallback(
-    (wasSaved: boolean) => {
-      setOpenApproveProjectForm(false)
-      if (wasSaved) {
-        refetchProject()
-      }
-    },
-    [refetchProject],
-  )
+  const onApproveProjectFormClosed = (wasSaved: boolean) => {
+    setOpenApproveProjectForm(false)
+    if (wasSaved) {
+      refetchProject()
+    }
+  }
 
-  const onActivateProjectFormClosed = useCallback(
-    (wasSaved: boolean) => {
-      setOpenActivateProjectForm(false)
-      if (wasSaved) {
-        refetchProject()
-      }
-    },
-    [refetchProject],
-  )
+  const onActivateProjectFormClosed = (wasSaved: boolean) => {
+    setOpenActivateProjectForm(false)
+    if (wasSaved) {
+      refetchProject()
+    }
+  }
 
-  const onCompleteProjectFormClosed = useCallback(
-    (wasSaved: boolean) => {
-      setOpenCompleteProjectForm(false)
-      if (wasSaved) {
-        refetchProject()
-      }
-    },
-    [refetchProject],
-  )
+  const onCompleteProjectFormClosed = (wasSaved: boolean) => {
+    setOpenCompleteProjectForm(false)
+    if (wasSaved) {
+      refetchProject()
+    }
+  }
 
-  const onCancelProjectFormClosed = useCallback(
-    (wasSaved: boolean) => {
-      setOpenCancelProjectForm(false)
-      if (wasSaved) {
-        refetchProject()
-      }
-    },
-    [refetchProject],
-  )
+  const onCancelProjectFormClosed = (wasSaved: boolean) => {
+    setOpenCancelProjectForm(false)
+    if (wasSaved) {
+      refetchProject()
+    }
+  }
 
-  const onDeleteProjectFormClosed = useCallback(
-    (wasDeleted: boolean) => {
-      setOpenDeleteProjectForm(false)
-      if (wasDeleted) {
-        router.push('/ppm/projects')
-      }
-    },
-    [router],
-  )
+  const onDeleteProjectFormClosed = (wasDeleted: boolean) => {
+    setOpenDeleteProjectForm(false)
+    if (wasDeleted) {
+      router.push('/ppm/projects')
+    }
+  }
 
   if (isLoading) {
     return <ProjectDetailsLoading />

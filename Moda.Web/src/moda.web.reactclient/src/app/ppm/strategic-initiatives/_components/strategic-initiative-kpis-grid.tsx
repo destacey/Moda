@@ -7,7 +7,7 @@ import { StrategicInitiativeKpiListDto } from '@/src/services/moda-api'
 import { ColDef, GetRowIdParams } from 'ag-grid-community'
 import { Button, MenuProps } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
-import { FC, useCallback, useMemo, useState } from 'react'
+import { FC, useState, useMemo } from 'react'
 import {
   AddStrategicInitiativeKpiMeasurementForm,
   DeleteStrategicInitiativeKpiForm,
@@ -103,16 +103,6 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
   const [openManageCheckpointPlanForm, setOpenManageCheckpointPlanForm] =
     useState<boolean>(false)
 
-  const onViewDetailsMenuClicked = useCallback((id: string) => {
-    setSelectedKpiId(id)
-    setOpenKpiDetailsDrawer(true)
-  }, [])
-
-  const onEditKpiMenuClicked = useCallback((id: string) => {
-    setSelectedKpiId(id)
-    setOpenEditKpiForm(true)
-  }, [])
-
   const onEditKpiFormClosed = (wasSaved: boolean) => {
     setOpenEditKpiForm(false)
     setSelectedKpiId(null)
@@ -120,11 +110,6 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
       refresh()
     }
   }
-
-  const onDeleteKpiMenuClicked = useCallback((id: string) => {
-    setSelectedKpiId(id)
-    setOpenDeleteKpiForm(true)
-  }, [])
 
   const onDeleteKpiFormClosed = (wasSaved: boolean) => {
     setOpenDeleteKpiForm(false)
@@ -134,11 +119,6 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
     }
   }
 
-  const onAddMeasurementMenuClicked = useCallback((id: string) => {
-    setSelectedKpiId(id)
-    setOpenAddMeasurementForm(true)
-  }, [])
-
   const onAddMeasurementFormClosed = (wasSaved: boolean) => {
     setOpenAddMeasurementForm(false)
     setSelectedKpiId(null)
@@ -146,11 +126,6 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
       refresh()
     }
   }
-
-  const onManageCheckpointPlanMenuClicked = useCallback((id: string) => {
-    setSelectedKpiId(id)
-    setOpenManageCheckpointPlanForm(true)
-  }, [])
 
   const onManageCheckpointPlanFormClosed = (wasSaved: boolean) => {
     setOpenManageCheckpointPlanForm(false)
@@ -161,7 +136,33 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
   }
 
   const columnDefs = useMemo<ColDef<StrategicInitiativeKpiListDto>[]>(
-    () => [
+    () => {
+      const onViewDetailsMenuClicked = (id: string) => {
+        setSelectedKpiId(id)
+        setOpenKpiDetailsDrawer(true)
+      }
+
+      const onEditKpiMenuClicked = (id: string) => {
+        setSelectedKpiId(id)
+        setOpenEditKpiForm(true)
+      }
+
+      const onDeleteKpiMenuClicked = (id: string) => {
+        setSelectedKpiId(id)
+        setOpenDeleteKpiForm(true)
+      }
+
+      const onAddMeasurementMenuClicked = (id: string) => {
+        setSelectedKpiId(id)
+        setOpenAddMeasurementForm(true)
+      }
+
+      const onManageCheckpointPlanMenuClicked = (id: string) => {
+        setSelectedKpiId(id)
+        setOpenManageCheckpointPlanForm(true)
+      }
+
+      return [
       {
         width: 50,
         filter: false,
@@ -224,27 +225,19 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
         headerName: 'Target Direction',
         width: 125,
       },
-    ],
+    ]},
     [
       canManageKpis,
       isReadOnly,
       strategicInitiativeId,
-      onViewDetailsMenuClicked,
-      onEditKpiMenuClicked,
-      onDeleteKpiMenuClicked,
-      onAddMeasurementMenuClicked,
-      onManageCheckpointPlanMenuClicked,
     ],
   )
 
-  const getRowId = useCallback(
-    (params: GetRowIdParams) => String(params.data.id),
-    [],
-  )
+  const getRowId = (params: GetRowIdParams) => String(params.data.id)
 
-  const refresh = useCallback(async () => {
+  const refresh = async () => {
     refetch()
-  }, [refetch])
+  }
 
   return (
     <>

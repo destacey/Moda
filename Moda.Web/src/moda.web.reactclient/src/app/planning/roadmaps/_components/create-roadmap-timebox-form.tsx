@@ -10,7 +10,7 @@ import {
 } from '@/src/store/features/planning/roadmaps-api'
 import { toFormErrors } from '@/src/utils'
 import { DatePicker, Form, Input, Modal, TreeSelect } from 'antd'
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 
 const { Item } = Form
 const { TextArea } = Input
@@ -62,8 +62,7 @@ const CreateRoadmapTimeboxForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<CreateRoadmapTimeboxFormValues>({
-      onSubmit: useCallback(
-        async (values: CreateRoadmapTimeboxFormValues, form) => {
+      onSubmit: async (values: CreateRoadmapTimeboxFormValues, form) => {
           try {
             const request = mapToRequestValues(values, roadmapId)
             const response = await createRoadmapTimebox(request)
@@ -85,8 +84,6 @@ const CreateRoadmapTimeboxForm = ({
             return false
           }
         },
-        [createRoadmapTimebox, roadmapId, messageApi],
-      ),
       onComplete: onFormComplete,
       onCancel: onFormCancel,
       errorMessage:

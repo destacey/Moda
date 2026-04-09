@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext } from 'react'
+import { createContext, useMemo } from 'react'
 import { MenuToggleContextType } from './types'
 import { useLocalStorageState } from '@/src/hooks'
 
@@ -14,8 +14,13 @@ export const MenuToggleProvider = ({ children }) => {
     true,
   )
 
+  const menuToggleContextValue = useMemo(
+    () => ({ menuCollapsed, setMenuCollapsed }),
+    [menuCollapsed, setMenuCollapsed],
+  )
+
   return (
-    <MenuToggleContext.Provider value={{ menuCollapsed, setMenuCollapsed }}>
+    <MenuToggleContext.Provider value={menuToggleContextValue}>
       {children}
     </MenuToggleContext.Provider>
   )

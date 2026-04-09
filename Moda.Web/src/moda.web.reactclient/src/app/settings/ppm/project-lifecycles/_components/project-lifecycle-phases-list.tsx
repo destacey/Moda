@@ -14,7 +14,7 @@ import {
 import { App, Button } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import { ColDef } from 'ag-grid-community'
-import { useCallback, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import AddProjectLifecyclePhaseForm from './add-project-lifecycle-phase-form'
 import EditProjectLifecyclePhaseForm from './edit-project-lifecycle-phase-form'
 
@@ -92,8 +92,20 @@ const ProjectLifecyclePhasesList = ({
     useRemoveProjectLifecyclePhaseMutation()
   const [reorderPhases] = useReorderProjectLifecyclePhasesMutation()
 
-  const handleDeletePhase = useCallback(
-    (phase: ProjectLifecyclePhaseDto) => {
+  const sortedPhases = useMemo(
+    () =>
+      !lifecycle?.phases
+        ? []
+        : [...lifecycle.phases].sort((a, b) => a.order - b.order),
+    [lifecycle?.phases],
+  )
+
+  const columnDefs = useMemo<ColDef<ProjectLifecyclePhaseDto>[]>(() => {
+    const handleEdit = (phase: ProjectLifecyclePhaseDto) => {
+      setEditingPhase(phase)
+    }
+
+    const handleDeletePhase = (phase: ProjectLifecyclePhaseDto) => {
       modal.confirm({
         title: 'Are you sure you want to delete this phase?',
         content: `${phase.order} - ${phase.name}`,
@@ -118,21 +130,9 @@ const ProjectLifecyclePhasesList = ({
           }
         },
       })
-    },
-    [lifecycle.id, removeProjectLifecyclePhase, messageApi, modal],
-  )
+    }
 
-  const handleEdit = useCallback((phase: ProjectLifecyclePhaseDto) => {
-    setEditingPhase(phase)
-  }, [])
-
-  const sortedPhases = useMemo(() => {
-    if (!lifecycle?.phases) return []
-    return [...lifecycle.phases].sort((a, b) => a.order - b.order)
-  }, [lifecycle?.phases])
-
-  const handleMove = useCallback(
-    async (phase: ProjectLifecyclePhaseDto, direction: 'up' | 'down') => {
+    const handleMove = async (phase: ProjectLifecyclePhaseDto, direction: 'up' | 'down') => {
       const ordered = [...sortedPhases]
       const index = ordered.findIndex((p) => p.id === phase.id)
       if (index < 0) return
@@ -156,12 +156,9 @@ const ProjectLifecyclePhasesList = ({
         )
         console.error(error)
       }
-    },
-    [sortedPhases, lifecycle.id, reorderPhases, messageApi],
-  )
+    }
 
-  const columnDefs = useMemo<ColDef<ProjectLifecyclePhaseDto>[]>(
-    () => [
+    return [
       {
         width: 50,
         filter: false,
@@ -184,9 +181,7 @@ const ProjectLifecyclePhasesList = ({
       { field: 'order', headerName: 'Order', width: 90, sort: 'asc' as const },
       { field: 'name', headerName: 'Name', width: 200 },
       { field: 'description', headerName: 'Description', flex: 1 },
-    ],
-    [canManagePhases, sortedPhases, handleEdit, handleDeletePhase, handleMove],
-  )
+    ]}, [canManagePhases, sortedPhases, modal, removeProjectLifecyclePhase, reorderPhases, lifecycle.id, messageApi])
 
   const actions = canManagePhases ? (
     <Button type="primary" size="small" onClick={() => setOpenAddPhaseForm(true)}>

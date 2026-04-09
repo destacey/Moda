@@ -6,7 +6,6 @@ import { useCreateProjectLifecycleMutation } from '@/src/store/features/ppm/proj
 import { toFormErrors } from '@/src/utils'
 import { Form, Modal } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
-import { useCallback } from 'react'
 import { useModalForm } from '@/src/hooks'
 
 const { Item } = Form
@@ -40,8 +39,7 @@ const CreateProjectLifecycleForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<CreateProjectLifecycleFormValues>({
-      onSubmit: useCallback(
-        async (values: CreateProjectLifecycleFormValues, form) => {
+      onSubmit: async (values: CreateProjectLifecycleFormValues, form) => {
           try {
             const request = mapToRequestValues(values)
             const response = await createProjectLifecycle(request)
@@ -66,8 +64,6 @@ const CreateProjectLifecycleForm = ({
             return false
           }
         },
-        [createProjectLifecycle, messageApi],
-      ),
       onComplete: onFormComplete,
       onCancel: onFormCancel,
       errorMessage:

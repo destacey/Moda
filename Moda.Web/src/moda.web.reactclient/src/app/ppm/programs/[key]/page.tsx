@@ -16,7 +16,7 @@ import { Alert, Badge, Col, Flex, MenuProps, Row, Typography } from 'antd'
 
 const { Text } = Typography
 import { notFound, usePathname, useRouter } from 'next/navigation'
-import { use, useCallback, useEffect, useMemo, useState } from 'react'
+import { use, useEffect, useState } from 'react'
 import ProgramDetailsLoading from './loading'
 import {
   ChangeProgramStatusForm,
@@ -101,7 +101,7 @@ const ProgramDetailsPage = (props: { params: Promise<{ key: string }> }) => {
 
   const missingDates = programData?.start === null || programData?.end === null
 
-  const actionsMenuItems: MenuProps['items'] = useMemo(() => {
+  const actionsMenuItems: MenuProps['items'] = (() => {
     const currentStatus = programData?.status.name
     const availableActions =
       currentStatus === 'Proposed'
@@ -170,62 +170,42 @@ const ProgramDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     }
 
     return items
-  }, [
-    canDeleteProgram,
-    canUpdateProgram,
-    missingDates,
-    programData?.status.name,
-  ])
+  })()
 
-  const onEditProgramFormClosed = useCallback(
-    (wasSaved: boolean) => {
-      setOpenEditProgramForm(false)
-      if (wasSaved) {
-        refetchProgram()
-      }
-    },
-    [refetchProgram],
-  )
+  const onEditProgramFormClosed = (wasSaved: boolean) => {
+    setOpenEditProgramForm(false)
+    if (wasSaved) {
+      refetchProgram()
+    }
+  }
 
-  const onActivateProgramFormClosed = useCallback(
-    (wasSaved: boolean) => {
-      setOpenActivateProgramForm(false)
-      if (wasSaved) {
-        refetchProgram()
-      }
-    },
-    [refetchProgram],
-  )
+  const onActivateProgramFormClosed = (wasSaved: boolean) => {
+    setOpenActivateProgramForm(false)
+    if (wasSaved) {
+      refetchProgram()
+    }
+  }
 
-  const onCompleteProgramFormClosed = useCallback(
-    (wasSaved: boolean) => {
-      setOpenCompleteProgramForm(false)
-      if (wasSaved) {
-        refetchProgram()
-      }
-    },
-    [refetchProgram],
-  )
+  const onCompleteProgramFormClosed = (wasSaved: boolean) => {
+    setOpenCompleteProgramForm(false)
+    if (wasSaved) {
+      refetchProgram()
+    }
+  }
 
-  const onCancelProgramFormClosed = useCallback(
-    (wasSaved: boolean) => {
-      setOpenCancelProgramForm(false)
-      if (wasSaved) {
-        refetchProgram()
-      }
-    },
-    [refetchProgram],
-  )
+  const onCancelProgramFormClosed = (wasSaved: boolean) => {
+    setOpenCancelProgramForm(false)
+    if (wasSaved) {
+      refetchProgram()
+    }
+  }
 
-  const onDeleteProgramFormClosed = useCallback(
-    (wasDeleted: boolean) => {
-      setOpenDeleteProgramForm(false)
-      if (wasDeleted) {
-        router.push('/ppm/programs')
-      }
-    },
-    [router],
-  )
+  const onDeleteProgramFormClosed = (wasDeleted: boolean) => {
+    setOpenDeleteProgramForm(false)
+    if (wasDeleted) {
+      router.push('/ppm/programs')
+    }
+  }
 
   if (isLoading) {
     return <ProgramDetailsLoading />

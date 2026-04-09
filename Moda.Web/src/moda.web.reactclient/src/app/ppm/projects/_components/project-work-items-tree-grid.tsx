@@ -1,6 +1,6 @@
 'use client'
 
-import { FC, ReactNode, useMemo } from 'react'
+import { FC, ReactNode } from 'react'
 import { ColumnDef } from '@tanstack/react-table'
 import Link from 'next/link'
 import {
@@ -248,15 +248,9 @@ const ProjectWorkItemsTreeGrid: FC<ProjectWorkItemsTreeGridProps> = ({
   viewSelector,
   gridHeight,
 }) => {
-  const treeData = useMemo(
-    () => buildWorkItemTree(workItems ?? []),
-    [workItems],
-  )
+  const treeData = buildWorkItemTree(workItems ?? [])
 
-  const columns = useMemo(
-    () => getColumns(hideProjectColumn),
-    [hideProjectColumn],
-  )
+  const columns = getColumns(hideProjectColumn)
 
   return (
     <TreeGrid<WorkItemTreeNode>

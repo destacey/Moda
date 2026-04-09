@@ -12,7 +12,7 @@ import { Badge, Col, Flex, MenuProps, Row, Typography } from 'antd'
 import { notFound, usePathname, useRouter } from 'next/navigation'
 
 const { Text } = Typography
-import { use, useCallback, useEffect, useMemo, useState } from 'react'
+import { use, useEffect, useState } from 'react'
 import StrategicInitiativeDetailsLoading from './loading'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import { ItemType } from 'antd/es/menu/interface'
@@ -116,11 +116,10 @@ const StrategicInitiativeDetailsPage = (props: {
   )
 
   // Derive isReadOnly from strategic initiative status
-  const isReadOnly = useMemo(() => {
-    if (!strategicInitiativeData) return false
+  const isReadOnly = !strategicInitiativeData ? false : (() => {
     const status = strategicInitiativeData.status.name
     return status === 'Completed' || status === 'Cancelled'
-  }, [strategicInitiativeData])
+  })()
 
   // Update breadcrumb route - side effect only
   useEffect(() => {
@@ -143,7 +142,7 @@ const StrategicInitiativeDetailsPage = (props: {
     dispatch(setBreadcrumbRoute({ route: breadcrumbRoute, pathname }))
   }, [dispatch, pathname, strategicInitiativeData])
 
-  const actionsMenuItems: MenuProps['items'] = useMemo(() => {
+  const actionsMenuItems: MenuProps['items'] = (() => {
     const currentStatus = strategicInitiativeData?.status.name
     const availableActions =
       currentStatus === 'Proposed'
@@ -274,80 +273,54 @@ const StrategicInitiativeDetailsPage = (props: {
     }
 
     return items
-  }, [
-    canDeleteStrategicInitiative,
-    canUpdateStrategicInitiative,
-    isReadOnly,
-    strategicInitiativeData?.status.name,
-  ])
+  })()
 
-  const onEditStrategicInitiativeFormClosed = useCallback(
-    (wasSaved: boolean) => {
-      setOpenEditStrategicInitiativeForm(false)
-      if (wasSaved) {
-        refetchStrategicInitiative()
-      }
-    },
-    [refetchStrategicInitiative],
-  )
+  const onEditStrategicInitiativeFormClosed = (wasSaved: boolean) => {
+    setOpenEditStrategicInitiativeForm(false)
+    if (wasSaved) {
+      refetchStrategicInitiative()
+    }
+  }
 
-  const onApproveStrategicInitiativeFormClosed = useCallback(
-    (wasSaved: boolean) => {
-      setOpenApproveStrategicInitiativeForm(false)
-      if (wasSaved) {
-        refetchStrategicInitiative()
-      }
-    },
-    [refetchStrategicInitiative],
-  )
+  const onApproveStrategicInitiativeFormClosed = (wasSaved: boolean) => {
+    setOpenApproveStrategicInitiativeForm(false)
+    if (wasSaved) {
+      refetchStrategicInitiative()
+    }
+  }
 
-  const onActivateStrategicInitiativeFormClosed = useCallback(
-    (wasSaved: boolean) => {
-      setOpenActivateStrategicInitiativeForm(false)
-      if (wasSaved) {
-        refetchStrategicInitiative()
-      }
-    },
-    [refetchStrategicInitiative],
-  )
+  const onActivateStrategicInitiativeFormClosed = (wasSaved: boolean) => {
+    setOpenActivateStrategicInitiativeForm(false)
+    if (wasSaved) {
+      refetchStrategicInitiative()
+    }
+  }
 
-  const onCompleteStrategicInitiativeFormClosed = useCallback(
-    (wasSaved: boolean) => {
-      setOpenCompleteStrategicInitiativeForm(false)
-      if (wasSaved) {
-        refetchStrategicInitiative()
-      }
-    },
-    [refetchStrategicInitiative],
-  )
+  const onCompleteStrategicInitiativeFormClosed = (wasSaved: boolean) => {
+    setOpenCompleteStrategicInitiativeForm(false)
+    if (wasSaved) {
+      refetchStrategicInitiative()
+    }
+  }
 
-  const onCancelStrategicInitiativeFormClosed = useCallback(
-    (wasSaved: boolean) => {
-      setOpenCancelStrategicInitiativeForm(false)
-      if (wasSaved) {
-        refetchStrategicInitiative()
-      }
-    },
-    [refetchStrategicInitiative],
-  )
+  const onCancelStrategicInitiativeFormClosed = (wasSaved: boolean) => {
+    setOpenCancelStrategicInitiativeForm(false)
+    if (wasSaved) {
+      refetchStrategicInitiative()
+    }
+  }
 
-  const onDeleteStrategicInitiativeFormClosed = useCallback(
-    (wasDeleted: boolean) => {
-      setOpenDeleteStrategicInitiativeForm(false)
-      if (wasDeleted) {
-        router.push('/ppm/strategic-initiatives')
-      }
-    },
-    [router],
-  )
+  const onDeleteStrategicInitiativeFormClosed = (wasDeleted: boolean) => {
+    setOpenDeleteStrategicInitiativeForm(false)
+    if (wasDeleted) {
+      router.push('/ppm/strategic-initiatives')
+    }
+  }
 
-  const onCreateKpiFormClosed = useCallback(
-    (wasSaved: boolean) => {
-      setOpenCreateKpiForm(false)
-      if (wasSaved) refetchKpis()
-    },
-    [refetchKpis],
-  )
+  const onCreateKpiFormClosed = (wasSaved: boolean) => {
+    setOpenCreateKpiForm(false)
+    if (wasSaved) refetchKpis()
+  }
 
   if (isLoading) {
     return <StrategicInitiativeDetailsLoading />

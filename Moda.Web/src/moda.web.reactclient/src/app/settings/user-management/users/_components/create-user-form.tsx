@@ -11,7 +11,6 @@ import { useGetRolesQuery } from '@/src/store/features/user-management/roles-api
 import { useGetEmployeesQuery } from '@/src/store/features/organizations/employee-api'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { useModalForm } from '@/src/hooks'
-import { useCallback, useMemo } from 'react'
 
 const { Item } = Form
 
@@ -48,16 +47,12 @@ const CreateUserForm = ({
     useGetEmployeesQuery(false)
   const { data: usersData } = useGetUsersQuery()
 
-  const roleOptions = useMemo(
-    () =>
-      rolesData?.map((role) => ({
+  const roleOptions = rolesData?.map((role) => ({
         value: role.name,
         label: role.name,
-      })) ?? [],
-    [rolesData],
-  )
+      })) ?? []
 
-  const employeeOptions = useMemo(() => {
+  const employeeOptions = (() => {
     if (!employeesData) return []
     const linkedEmployeeIds = new Set(
       usersData
@@ -67,12 +62,11 @@ const CreateUserForm = ({
     return employeesData
       .filter((e) => e.isActive && !linkedEmployeeIds.has(e.id))
       .map((e) => ({ value: e.id, label: e.displayName }))
-  }, [employeesData, usersData])
+  })()
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<CreateUserFormValues>({
-      onSubmit: useCallback(
-        async (values: CreateUserFormValues, form) => {
+      onSubmit: async (values: CreateUserFormValues, form) => {
           try {
             const response = await createUser({
               firstName: values.firstName,
@@ -130,8 +124,6 @@ const CreateUserForm = ({
             return false
           }
         },
-        [createUser, manageUserRoles, messageApi, onFormCreate],
-      ),
       onComplete: () => {},
       onCancel: onFormCancel,
       errorMessage: 'An unexpected error occurred while creating the user.',

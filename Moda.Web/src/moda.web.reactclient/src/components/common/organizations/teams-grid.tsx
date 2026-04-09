@@ -1,4 +1,4 @@
-import { FC, useCallback, useMemo } from 'react'
+import { FC, useMemo } from 'react'
 import ModaGrid from '../moda-grid'
 import { PlanningIntervalTeamResponse } from '@/src/services/moda-api'
 import {
@@ -16,28 +16,25 @@ export interface TeamsGridProps {
 const TeamsGrid: FC<TeamsGridProps> = (props) => {
   const { refetch } = props
 
-  const columnDefs = useMemo<ColDef<PlanningIntervalTeamResponse>[]>(
-    () => [
-      { field: 'key', width: 90 },
-      {
-        field: 'name',
-        cellRenderer: TeamNameLinkCellRenderer,
-      },
-      { field: 'code', width: 125 },
-      { field: 'type' },
-      {
-        field: 'teamOfTeams.name',
-        headerName: 'Team of Teams',
-        cellRenderer: NestedTeamOfTeamsNameLinkCellRenderer,
-      },
-      { field: 'isActive' }, // TODO: convert to yes/no
-    ],
-    [],
-  )
+  const columnDefs = useMemo<ColDef<PlanningIntervalTeamResponse>[]>(() => [
+    { field: 'key', width: 90 },
+    {
+      field: 'name',
+      cellRenderer: TeamNameLinkCellRenderer,
+    },
+    { field: 'code', width: 125 },
+    { field: 'type' },
+    {
+      field: 'teamOfTeams.name',
+      headerName: 'Team of Teams',
+      cellRenderer: NestedTeamOfTeamsNameLinkCellRenderer,
+    },
+    { field: 'isActive' }, // TODO: convert to yes/no
+  ], [])
 
-  const refresh = useCallback(async () => {
+  const refresh = async () => {
     refetch()
-  }, [refetch])
+  }
 
   return (
     <>

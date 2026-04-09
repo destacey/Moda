@@ -1,5 +1,4 @@
 import { GlobalToken, Typography } from 'antd'
-import { useMemo } from 'react'
 
 const { Paragraph } = Typography
 
@@ -13,17 +12,14 @@ export interface MarkdownBlockquoteProps
 }
 
 const MarkdownBlockquote = (props: MarkdownBlockquoteProps) => {
-  const blockquoteStyles = useMemo(
-    () => ({
-      paddingTop: '14px',
-      paddingBottom: '2px',
-      paddingLeft: props.token.padding,
-      paddingRight: props.token.padding,
-      borderLeft: `${props.token.lineWidthBold}px solid ${props.token.colorPrimary}`,
-      background: props.token.colorFillTertiary, // TODO: get this closer to the actual code block color <Text code {...props} />,
-    }),
-    [props.token],
-  )
+  const blockquoteStyles = {
+    paddingTop: '14px',
+    paddingBottom: '2px',
+    paddingLeft: props.token.padding,
+    paddingRight: props.token.padding,
+    borderLeft: `${props.token.lineWidthBold}px solid ${props.token.colorPrimary}`,
+    background: props.token.colorFillTertiary, // TODO: get this closer to the actual code block color <Text code {...props} />,
+  }
 
   if (
     !props.children ||

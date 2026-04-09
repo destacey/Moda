@@ -16,7 +16,7 @@ import {
 import { Card, Flex, Progress, Skeleton, Tag, Typography } from 'antd'
 import { GlobalToken } from 'antd'
 import dayjs from 'dayjs'
-import { CSSProperties, FC, useMemo } from 'react'
+import { CSSProperties, FC } from 'react'
 import styles from './kpi-card.module.css'
 
 const { Text } = Typography
@@ -368,7 +368,7 @@ const KpiCard: FC<KpiCardProps> = ({
   // Derive checkpoint and nextCheckpoint from the full list.
   // checkpoint    — most recent past checkpoint that has a measurement
   // nextCheckpoint — first future checkpoint, or first past checkpoint with no measurement
-  const { checkpoint, nextCheckpoint } = useMemo(() => {
+  const { checkpoint, nextCheckpoint } = (() => {
     const now = dayjs()
     const sorted = [...(checkpoints ?? [])].sort(
       (a, b) => dayjs(a.date).valueOf() - dayjs(b.date).valueOf(),
@@ -381,7 +381,7 @@ const KpiCard: FC<KpiCardProps> = ({
       (cp) => !dayjs(cp.date).isBefore(now) || cp.actualValue == null,
     )
     return { checkpoint, nextCheckpoint: next ?? undefined }
-  }, [checkpoints])
+  })()
 
   // Card-level health drives: accent bar, health badge, and actual value color.
   // The actual value color always matches the health badge color (unless regressed).
@@ -391,59 +391,58 @@ const KpiCard: FC<KpiCardProps> = ({
   //   3. checkpoint (last measured) — fallback when nextCheckpoint has no measurement
   // This keeps the card-level health and the checkpoint strip independent
   // when newer measurements exist on the next checkpoint.
-  const { effectiveHealth, effectiveTrend, health, trendArrow, hasActual, cssVars } =
-    useMemo(() => {
-      const nextHasMeasurement = nextCheckpoint?.actualValue != null
-      const effectiveHealth =
-        data.health ??
-        (nextHasMeasurement ? nextCheckpoint?.health : undefined) ??
-        checkpoint?.health
-      const effectiveTrend =
-        data.trend ??
-        (nextHasMeasurement ? nextCheckpoint?.trend : undefined) ??
-        checkpoint?.trend
-      const health = getHealthTokens(effectiveHealth, token)
-      const regressed = isRegressed(data)
-      const actualColor = regressed ? token.colorError : health.text
-      const hasActual = data.actualValue != null
-      const hasTrend = effectiveTrend && effectiveTrend !== KpiTrend.NoData
-      const trendColor = hasTrend
-        ? getTrendColor(effectiveTrend, token)
-        : token.colorTextSecondary
-      const trendArrow = hasTrend
-        ? getTrendArrow(effectiveTrend, data.targetDirection)
-        : null
-      const checkpointBorderColor = checkpoint
-        ? checkpoint.actualValue != null
-          ? getHealthTokens(checkpoint.health, token).text
-          : token.colorTextTertiary
+  const { effectiveHealth, effectiveTrend, health, trendArrow, hasActual, cssVars } = (() => {
+    const nextHasMeasurement = nextCheckpoint?.actualValue != null
+    const effectiveHealth =
+      data.health ??
+      (nextHasMeasurement ? nextCheckpoint?.health : undefined) ??
+      checkpoint?.health
+    const effectiveTrend =
+      data.trend ??
+      (nextHasMeasurement ? nextCheckpoint?.trend : undefined) ??
+      checkpoint?.trend
+    const health = getHealthTokens(effectiveHealth, token)
+    const regressed = isRegressed(data)
+    const actualColor = regressed ? token.colorError : health.text
+    const hasActual = data.actualValue != null
+    const hasTrend = effectiveTrend && effectiveTrend !== KpiTrend.NoData
+    const trendColor = hasTrend
+      ? getTrendColor(effectiveTrend, token)
+      : token.colorTextSecondary
+    const trendArrow = hasTrend
+      ? getTrendArrow(effectiveTrend, data.targetDirection)
+      : null
+    const checkpointBorderColor = checkpoint
+      ? checkpoint.actualValue != null
+        ? getHealthTokens(checkpoint.health, token).text
         : token.colorTextTertiary
+      : token.colorTextTertiary
 
-      const cssVars: KpiCssVars = {
-        '--kpi-accent': health.text,
-        '--kpi-health-text': health.text,
-        '--kpi-actual-color': hasActual ? actualColor : token.colorTextTertiary,
-        '--kpi-trend-color': trendColor,
-        '--kpi-muted': token.colorTextTertiary,
-        '--kpi-secondary': token.colorTextSecondary,
-        '--kpi-error': token.colorError,
-        '--kpi-error-bg': token.colorErrorBg,
-        '--kpi-error-border': token.colorErrorBorder,
-        '--kpi-primary': token.colorPrimary,
-        '--kpi-border': token.colorBorderSecondary,
-        '--kpi-fill-quaternary': token.colorFillQuaternary,
-        '--kpi-checkpoint-border': checkpointBorderColor,
-      }
+    const cssVars: KpiCssVars = {
+      '--kpi-accent': health.text,
+      '--kpi-health-text': health.text,
+      '--kpi-actual-color': hasActual ? actualColor : token.colorTextTertiary,
+      '--kpi-trend-color': trendColor,
+      '--kpi-muted': token.colorTextTertiary,
+      '--kpi-secondary': token.colorTextSecondary,
+      '--kpi-error': token.colorError,
+      '--kpi-error-bg': token.colorErrorBg,
+      '--kpi-error-border': token.colorErrorBorder,
+      '--kpi-primary': token.colorPrimary,
+      '--kpi-border': token.colorBorderSecondary,
+      '--kpi-fill-quaternary': token.colorFillQuaternary,
+      '--kpi-checkpoint-border': checkpointBorderColor,
+    }
 
-      return {
-        effectiveHealth,
-        effectiveTrend,
-        health,
-        trendArrow,
-        hasActual,
-        cssVars,
-      }
-    }, [token, data, checkpoint, nextCheckpoint])
+    return {
+      effectiveHealth,
+      effectiveTrend,
+      health,
+      trendArrow,
+      hasActual,
+      cssVars,
+    }
+  })()
 
   return (
     <Card

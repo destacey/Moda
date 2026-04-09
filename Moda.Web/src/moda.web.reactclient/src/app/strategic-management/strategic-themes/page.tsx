@@ -6,7 +6,7 @@ import { authorizePage } from '@/src/components/hoc'
 import { useDocumentTitle } from '@/src/hooks'
 import { useGetStrategicThemesQuery } from '@/src/store/features/strategic-management/strategic-themes-api'
 import { Button } from 'antd'
-import { FC, useCallback, useEffect, useMemo, useState } from 'react'
+import { FC, useEffect, useState } from 'react'
 import {
   CreateStrategicThemeForm,
   StrategicThemesFilterBar,
@@ -54,25 +54,23 @@ const StrategicThemesPage: FC = () => {
     }
   }, [error, messageApi])
 
-  const handleStateChange = useCallback((states: number[]) => {
+  const handleStateChange = (states: number[]) => {
     setSelectedStates(states)
-  }, [])
+  }
 
-  const refresh = useCallback(async () => {
+  const refresh = async () => {
     refetch()
-  }, [refetch])
+  }
 
-  const actions = useMemo(() => {
-    return (
-      <>
-        {canCreateStrategicTheme && (
-          <Button onClick={() => setOpenCreateStrategicThemeForm(true)}>
-            Create Strategic Theme
-          </Button>
-        )}
-      </>
-    )
-  }, [canCreateStrategicTheme])
+  const actions = (
+    <>
+      {canCreateStrategicTheme && (
+        <Button onClick={() => setOpenCreateStrategicThemeForm(true)}>
+          Create Strategic Theme
+        </Button>
+      )}
+    </>
+  )
 
   return (
     <>

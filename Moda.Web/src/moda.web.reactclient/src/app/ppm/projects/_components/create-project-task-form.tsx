@@ -23,7 +23,7 @@ import {
   Radio,
   TreeSelect,
 } from 'antd'
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 
 const { Item } = Form
 const { TextArea } = Input
@@ -88,8 +88,7 @@ const CreateProjectTaskForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<CreateProjectTaskFormValues>({
-      onSubmit: useCallback(
-        async (values: CreateProjectTaskFormValues, form) => {
+      onSubmit: async (values: CreateProjectTaskFormValues, form) => {
           try {
             const request = mapToRequestValues(values)
             const response = await createProjectTask({
@@ -116,8 +115,6 @@ const CreateProjectTaskForm = ({
             return false
           }
         },
-        [createProjectTask, projectIdOrKey, messageApi],
-      ),
       onComplete: onFormComplete,
       onCancel: onFormCancel,
       errorMessage:

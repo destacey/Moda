@@ -18,7 +18,6 @@ import {
   restrictedMenuSection,
   restrictedPermissionMenuItem,
 } from './menu-helper'
-import { useMemo } from 'react'
 import { ItemType, MenuItemType } from 'antd/es/menu/interface'
 import useAuth from '../../../components/contexts/auth'
 import { useFeatureFlag } from '../../../hooks'
@@ -158,26 +157,15 @@ const useAppMenuItems = () => {
   const { hasClaim } = useAuth()
   const { isEnabled: planningPoker } = useFeatureFlag('planning-poker')
 
-  const items = useMemo(
-    () => buildMenuItems({ planningPoker }),
-    [planningPoker],
+  const items = buildMenuItems({ planningPoker })
+
+  const filteredMenuItems = items.reduce(
+    (acc, item) => filterAndTransformMenuItem(acc, item, hasClaim),
+    [] as ItemType<MenuItemType>[],
   )
 
-  const filteredMenuItems = useMemo(
-    () =>
-      items.reduce(
-        (acc, item) => filterAndTransformMenuItem(acc, item, hasClaim),
-        [] as ItemType<MenuItemType>[],
-      ),
-    [items, hasClaim],
-  )
-
-  const routeKeyMap = useMemo(
-    () =>
-      buildRouteKeyMap(
-        items.filter((item): item is Item => 'display' in item),
-      ),
-    [items],
+  const routeKeyMap = buildRouteKeyMap(
+    items.filter((item): item is Item => 'display' in item),
   )
 
   return { menuItems: filteredMenuItems, routeKeyMap }

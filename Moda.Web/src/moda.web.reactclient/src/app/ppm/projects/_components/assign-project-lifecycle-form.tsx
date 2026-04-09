@@ -14,7 +14,7 @@ import {
 import { useAssignProjectLifecycleMutation } from '@/src/store/features/ppm/projects-api'
 import { toFormErrors } from '@/src/utils'
 import { Card, Flex, Form, Modal, Select, Timeline, Typography } from 'antd'
-import { useCallback, useEffect, useMemo } from 'react'
+import { useEffect } from 'react'
 
 const { Item } = Form
 const { Text } = Typography
@@ -44,20 +44,16 @@ const AssignProjectLifecycleForm = ({
     error: lifecyclesError,
   } = useGetProjectLifecyclesQuery(ProjectLifecycleState.Active)
 
-  const lifecycleOptions = useMemo(() => {
-    if (!lifecycleData) return []
-    return [...lifecycleData]
+  const lifecycleOptions = !lifecycleData ? [] : [...lifecycleData]
       .sort((a, b) => a.name.localeCompare(b.name))
       .map((lc) => ({
         label: lc.name,
         value: lc.id,
       }))
-  }, [lifecycleData])
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<AssignProjectLifecycleFormValues>({
-      onSubmit: useCallback(
-        async (values: AssignProjectLifecycleFormValues, form) => {
+      onSubmit: async (values: AssignProjectLifecycleFormValues, form) => {
           try {
             const request: AssignProjectLifecycleRequest = {
               lifecycleId: values.lifecycleId,
@@ -85,8 +81,6 @@ const AssignProjectLifecycleForm = ({
             return false
           }
         },
-        [assignProjectLifecycle, project, messageApi],
-      ),
       onComplete: onFormComplete,
       onCancel: onFormCancel,
       errorMessage:
@@ -101,9 +95,7 @@ const AssignProjectLifecycleForm = ({
     { skip: !selectedLifecycleId },
   )
 
-  const phaseItems = useMemo(() => {
-    if (!selectedLifecycle?.phases) return []
-    return [...selectedLifecycle.phases]
+  const phaseItems = !selectedLifecycle?.phases ? [] : [...selectedLifecycle.phases]
       .sort((a, b) => a.order - b.order)
       .map((phase) => ({
         content: (
@@ -114,7 +106,6 @@ const AssignProjectLifecycleForm = ({
           </>
         ),
       }))
-  }, [selectedLifecycle?.phases])
 
   useEffect(() => {
     if (lifecyclesError) {

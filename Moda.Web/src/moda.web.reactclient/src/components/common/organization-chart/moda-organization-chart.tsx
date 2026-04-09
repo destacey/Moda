@@ -1,4 +1,4 @@
-import { FC, ComponentType, useMemo, useRef } from 'react'
+import { FC, ComponentType, useRef } from 'react'
 import useTheme from '../../contexts/theme'
 import { OrganizationChart, OrganizationChartOptions } from '@ant-design/graphs'
 import {
@@ -29,63 +29,60 @@ const ModaOrganizationChart: FC<ModaOrganizationChartProps> = ({
 
   const { antvisG6ChartsTheme, token } = useTheme()
 
-  const options: OrganizationChartOptions = useMemo(
-    () => ({
-      padding: [40, 0, 0, 120],
-      autoFit: 'view',
-      data: (data as Record<string, unknown>) || { nodes: [], edges: [] },
-      node: {
-        style: {
-          component: (nodeData) => (
-            <NodeComponent data={nodeData.data} themeToken={token} />
-          ),
-          size: nodeSize,
-        },
+  const options: OrganizationChartOptions = {
+    padding: [40, 0, 0, 120],
+    autoFit: 'view',
+    data: (data as Record<string, unknown>) || { nodes: [], edges: [] },
+    node: {
+      style: {
+        component: (nodeData) => (
+          <NodeComponent data={nodeData.data} themeToken={token} />
+        ),
+        size: nodeSize,
       },
-      onReady: (graph) => {
-        chartInstanceRef.current = graph
+    },
+    onReady: (graph) => {
+      chartInstanceRef.current = graph
+    },
+    onDestroy: () => {
+      chartInstanceRef.current = null
+    },
+    edge: {
+      style: {
+        radius: 0,
+        lineWidth: 2,
+        endArrow: true,
+        startArrow: false,
+        stroke: '#91d5ff',
       },
-      onDestroy: () => {
-        chartInstanceRef.current = null
-      },
-      edge: {
-        style: {
-          radius: 0,
-          lineWidth: 2,
-          endArrow: true,
-          startArrow: false,
-          stroke: '#91d5ff',
-        },
-      },
-      layout: {
-        type: 'antv-dagre',
-        nodesep: 24,
-        ranksep: 0,
-        rankdir: 'TB',
-        controlPoints: true,
-      },
-      transforms: (transforms: CustomTransformOption[]) => {
-        const filteredTransforms = transforms.filter(
-          (transform) => transform.type !== 'collapse-expand-react-node',
-        )
+    },
+    layout: {
+      type: 'antv-dagre',
+      nodesep: 24,
+      ranksep: 0,
+      rankdir: 'TB',
+      controlPoints: true,
+    },
+    transforms: (transforms: CustomTransformOption[]) => {
+      const filteredTransforms = transforms.filter(
+        (transform) => transform.type !== 'collapse-expand-react-node',
+      )
 
-        const collapseExpandTransform = transforms.find(
-          (transform) => transform.type === 'collapse-expand-react-node',
-        )
+      const collapseExpandTransform = transforms.find(
+        (transform) => transform.type === 'collapse-expand-react-node',
+      )
 
-        return [
-          ...filteredTransforms,
-          {
-            ...(collapseExpandTransform || {}),
-            type: 'collapse-expand-react-node',
-            enable: true,
-            iconOffsetY: 24,
-          },
-        ]
-      },
-    }),
-    [NodeComponent, data, nodeSize, token],
-  )
+      return [
+        ...filteredTransforms,
+        {
+          ...(collapseExpandTransform || {}),
+          type: 'collapse-expand-react-node',
+          enable: true,
+          iconOffsetY: 24,
+        },
+      ]
+    },
+  }
 
   if (!data || !data.nodes || data.nodes.length === 0) {
     return <ModaEmpty message="No org chart data to display" />

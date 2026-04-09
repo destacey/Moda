@@ -11,7 +11,7 @@ import { useAppDispatch, useDocumentTitle } from '@/src/hooks'
 import { Card, MenuProps } from 'antd'
 import { notFound, usePathname, useRouter } from 'next/navigation'
 import PortfolioDetailsLoading from './loading'
-import { use, useCallback, useEffect, useMemo, useState } from 'react'
+import { use, useEffect, useState } from 'react'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import { ItemType } from 'antd/es/menu/interface'
 import {
@@ -188,19 +188,19 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     dispatch(setBreadcrumbRoute({ route: breadcrumbRoute, pathname }))
   }, [dispatch, pathname, portfolioData])
 
-  const handleProgramStatusChange = useCallback((statuses: number[]) => {
+  const handleProgramStatusChange = (statuses: number[]) => {
     setSelectedProgramStatuses(statuses)
-  }, [])
+  }
 
-  const handleSIStatusChange = useCallback((statuses: number[]) => {
+  const handleSIStatusChange = (statuses: number[]) => {
     setSelectedSIStatuses(statuses)
-  }, [])
+  }
 
-  const handleProjectStatusChange = useCallback((statuses: number[]) => {
+  const handleProjectStatusChange = (statuses: number[]) => {
     setSelectedProjectStatuses(statuses)
-  }, [])
+  }
 
-  const renderTabContent = useCallback(() => {
+  const renderTabContent = () => {
     switch (activeTab) {
       case PortfolioTabs.Details:
         return <PortfolioDetails portfolio={portfolioData} />
@@ -253,27 +253,9 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       default:
         return null
     }
-  }, [
-    activeTab,
-    portfolioData,
-    programData,
-    projectData,
-    strategicInitiativeData,
-    isLoadingPrograms,
-    isLoadingProjects,
-    isLoadingStrategicInitiatives,
-    refetchPrograms,
-    refetchProjects,
-    refetchStrategicInitiatives,
-    selectedProgramStatuses,
-    selectedProjectStatuses,
-    selectedSIStatuses,
-    handleProgramStatusChange,
-    handleProjectStatusChange,
-    handleSIStatusChange,
-  ])
+  }
 
-  const actionsMenuItems: MenuProps['items'] = useMemo(() => {
+  const actionsMenuItems: MenuProps['items'] = (() => {
     const currentStatus = portfolioData?.status.name
     const availableActions =
       currentStatus === 'Proposed'
@@ -338,78 +320,60 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     }
 
     return items
-  }, [canDeletePortfolio, canUpdatePortfolio, portfolioData?.status.name])
+  })()
 
   // doesn't trigger on first render
-  const onTabChange = useCallback(
-    (tabKey: string) => {
-      const tab = tabKey as PortfolioTabs
+  const onTabChange = (tabKey: string) => {
+    const tab = tabKey as PortfolioTabs
 
-      if (tab === PortfolioTabs.Programs && !programsQueried) {
-        setProgramsQueried(true)
-      } else if (tab === PortfolioTabs.Projects && !projectsQueried) {
-        setProjectsQueried(true)
-      } else if (
-        tab === PortfolioTabs.StrategicInitiatives &&
-        !strategicInitiativesQueried
-      ) {
-        setStrategicInitiativesQueried(true)
-      }
+    if (tab === PortfolioTabs.Programs && !programsQueried) {
+      setProgramsQueried(true)
+    } else if (tab === PortfolioTabs.Projects && !projectsQueried) {
+      setProjectsQueried(true)
+    } else if (
+      tab === PortfolioTabs.StrategicInitiatives &&
+      !strategicInitiativesQueried
+    ) {
+      setStrategicInitiativesQueried(true)
+    }
 
-      setActiveTab(tab)
-    },
-    [programsQueried, projectsQueried, strategicInitiativesQueried],
-  )
+    setActiveTab(tab)
+  }
 
-  const onEditPortfolioFormClosed = useCallback(
-    (wasSaved: boolean) => {
-      setOpenEditPortfolioForm(false)
-      if (wasSaved) {
-        refetchPortfolio()
-      }
-    },
-    [refetchPortfolio],
-  )
+  const onEditPortfolioFormClosed = (wasSaved: boolean) => {
+    setOpenEditPortfolioForm(false)
+    if (wasSaved) {
+      refetchPortfolio()
+    }
+  }
 
-  const onActivatePortfolioFormClosed = useCallback(
-    (wasSaved: boolean) => {
-      setOpenActivatePortfolioForm(false)
-      if (wasSaved) {
-        refetchPortfolio()
-      }
-    },
-    [refetchPortfolio],
-  )
+  const onActivatePortfolioFormClosed = (wasSaved: boolean) => {
+    setOpenActivatePortfolioForm(false)
+    if (wasSaved) {
+      refetchPortfolio()
+    }
+  }
 
-  const onClosePortfolioFormClosed = useCallback(
-    (wasSaved: boolean) => {
-      setOpenClosePortfolioForm(false)
-      if (wasSaved) {
-        refetchPortfolio()
-      }
-    },
-    [refetchPortfolio],
-  )
+  const onClosePortfolioFormClosed = (wasSaved: boolean) => {
+    setOpenClosePortfolioForm(false)
+    if (wasSaved) {
+      refetchPortfolio()
+    }
+  }
 
-  const onArchivePortfolioFormClosed = useCallback(
-    (wasSaved: boolean) => {
-      setOpenArchivePortfolioForm(false)
-      if (wasSaved) {
-        refetchPortfolio()
-      }
-    },
-    [refetchPortfolio],
-  )
+  const onArchivePortfolioFormClosed = (wasSaved: boolean) => {
+    setOpenArchivePortfolioForm(false)
+    if (wasSaved) {
+      refetchPortfolio()
+    }
+  }
 
-  const onDeletePortfolioFormClosed = useCallback(
-    (wasDeleted: boolean) => {
-      setOpenDeletePortfolioForm(false)
-      if (wasDeleted) {
-        router.push('/ppm/portfolios')
-      }
-    },
-    [router],
-  )
+  const onDeletePortfolioFormClosed = (wasDeleted: boolean) => {
+    setOpenDeletePortfolioForm(false)
+    if (wasDeleted) {
+      router.push('/ppm/portfolios')
+    }
+  }
 
   if (isLoading) {
     return <PortfolioDetailsLoading />

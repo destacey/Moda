@@ -1,7 +1,7 @@
 'use client'
 
 import { Menu } from 'antd'
-import { CSSProperties, FC, memo, useState, useMemo } from 'react'
+import { CSSProperties, FC, memo, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { useAppMenuItems } from '.'
 import { findMenuKeysByPathname } from './menu-helper'
@@ -47,10 +47,7 @@ const AppMenu: FC<AppMenuProps> = memo(({ style, theme: menuTheme }) => {
   const { menuCollapsed } = useMenuToggle()
   const pathname = usePathname()
 
-  const { selectedKeys, openKeys } = useMemo(
-    () => findMenuKeysByPathname(pathname, routeKeyMap),
-    [pathname, routeKeyMap],
-  )
+  const { selectedKeys, openKeys } = findMenuKeysByPathname(pathname, routeKeyMap)
 
   return (
     <AppMenuInner

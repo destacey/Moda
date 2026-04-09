@@ -4,7 +4,6 @@ import { Alert, Form, Input, Modal } from 'antd'
 import { useChangePasswordMutation } from '@/src/store/features/user-management/profile-api'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { useModalForm } from '@/src/hooks'
-import { useCallback } from 'react'
 import useAuth from '@/src/components/contexts/auth'
 
 const { Item } = Form
@@ -33,33 +32,30 @@ const ChangePasswordForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<ChangePasswordFormValues>({
-      onSubmit: useCallback(
-        async (values: ChangePasswordFormValues) => {
-          try {
-            const response = await changePassword({
-              currentPassword: values.currentPassword,
-              newPassword: values.newPassword,
-            })
+      onSubmit: async (values: ChangePasswordFormValues) => {
+        try {
+          const response = await changePassword({
+            currentPassword: values.currentPassword,
+            newPassword: values.newPassword,
+          })
 
-            if (response.error) {
-              throw response.error
-            }
-
-            messageApi.success('Password changed successfully. You will be logged out.')
-            // Log out after a brief delay so the user sees the success message
-            setTimeout(() => logout(), 1500)
-            return true
-          } catch (error: any) {
-            messageApi.error(
-              error.data?.detail ??
-                error.detail ??
-                'Failed to change password.',
-            )
-            return false
+          if (response.error) {
+            throw response.error
           }
-        },
-        [changePassword, messageApi, logout],
-      ),
+
+          messageApi.success('Password changed successfully. You will be logged out.')
+          // Log out after a brief delay so the user sees the success message
+          setTimeout(() => logout(), 1500)
+          return true
+        } catch (error: any) {
+          messageApi.error(
+            error.data?.detail ??
+              error.detail ??
+              'Failed to change password.',
+          )
+          return false
+        }
+      },
       onComplete: onFormComplete,
       onCancel: onFormCancel,
       errorMessage: 'An unexpected error occurred while changing the password.',

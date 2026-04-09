@@ -1,7 +1,7 @@
 'use client'
 
 import { Form, Input, Modal, Spin } from 'antd'
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 import { toFormErrors } from '@/src/utils'
 import {
   useGetFeatureFlagQuery,
@@ -37,8 +37,7 @@ const EditFeatureFlagForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<EditFeatureFlagFormValues>({
-      onSubmit: useCallback(
-        async (values: EditFeatureFlagFormValues, form) => {
+      onSubmit: async (values: EditFeatureFlagFormValues, form) => {
           try {
             const response = await updateFeatureFlag({
               id: featureFlagId,
@@ -67,8 +66,6 @@ const EditFeatureFlagForm = ({
             return false
           }
         },
-        [updateFeatureFlag, featureFlagId, messageApi, onFormSave],
-      ),
       onComplete: () => {},
       onCancel: onFormCancel,
       errorMessage:

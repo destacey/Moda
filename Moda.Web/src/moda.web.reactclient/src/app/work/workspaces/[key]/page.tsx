@@ -10,7 +10,7 @@ import {
 } from '@/src/store/features/work-management/workspace-api'
 import { Button, Card, Spin } from 'antd'
 import { notFound, usePathname } from 'next/navigation'
-import { use, useCallback, useEffect, useState } from 'react'
+import { use, useEffect, useState } from 'react'
 import WorkspaceDetailsLoading from './loading'
 import WorkspaceDetails from './workspace-details'
 import useAuth from '@/src/components/contexts/auth'
@@ -66,7 +66,7 @@ const WorkspaceDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const dispatch = useAppDispatch()
   const pathname = usePathname()
 
-  const renderTabContent = useCallback(() => {
+  const renderTabContent = () => {
     switch (activeTab) {
       case WorkspaceTabs.Details:
         return <WorkspaceDetails workspace={workspaceData} />
@@ -81,17 +81,11 @@ const WorkspaceDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       default:
         return null
     }
-  }, [
-    activeTab,
-    workspaceData,
-    workItemsQuery.data,
-    workItemsQuery.isLoading,
-    workItemsQuery.refetch,
-  ])
+  }
 
-  const onTabChange = useCallback((tabKey: string) => {
+  const onTabChange = (tabKey: string) => {
     setActiveTab(tabKey as WorkspaceTabs)
-  }, [])
+  }
 
   useEffect(() => {
     dispatch(setBreadcrumbTitle({ title: workspaceKey, pathname }))

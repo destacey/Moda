@@ -1,6 +1,6 @@
 'use client'
 
-import { FC, useMemo } from 'react'
+import { FC } from 'react'
 import { daysRemaining, percentageElapsed } from '@/src/utils'
 import { IterationState } from '../../types'
 import { MetricCard } from '.'
@@ -42,7 +42,7 @@ const DaysCountdownMetric: FC<DaysCountdownMetricProps> = ({
   labels = {},
   style,
 }) => {
-  const metric = useMemo(() => {
+  const metric = (() => {
     switch (state) {
       case IterationState.Future: {
         const daysUntilStart = daysRemaining(startDate)
@@ -64,7 +64,7 @@ const DaysCountdownMetric: FC<DaysCountdownMetricProps> = ({
       default:
         return null
     }
-  }, [state, startDate, endDate, labels])
+  })()
 
   if (!metric) return null
 

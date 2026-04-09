@@ -1,7 +1,7 @@
 'use client'
 
 import PageTitle from '@/src/components/common/page-title'
-import { use, useCallback, useEffect, useMemo, useState } from 'react'
+import { use, useEffect, useState } from 'react'
 import EmployeeDetails from './employee-details'
 import { Card, MenuProps } from 'antd'
 import { useDocumentTitle } from '@/src/hooks/use-document-title'
@@ -57,18 +57,18 @@ const EmployeeDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       : 'Employee Details',
   )
 
-  const renderTabContent = useCallback(() => {
+  const renderTabContent = () => {
     switch (activeTab) {
       case EmployeeTabs.Details:
         return <EmployeeDetails employee={employeeData} />
       default:
         return null
     }
-  }, [activeTab, employeeData])
+  }
 
-  const onTabChange = useCallback((tabKey: string) => {
+  const onTabChange = (tabKey: string) => {
     setActiveTab(tabKey as EmployeeTabs)
-  }, [])
+  }
 
   useEffect(() => {
     dispatch(setBreadcrumbTitle({ title: 'Details', pathname }))
@@ -80,7 +80,7 @@ const EmployeeDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     }
   }, [error, messageApi])
 
-  const actionsMenuItems: MenuProps['items'] = useMemo(() => {
+  const actionsMenuItems: MenuProps['items'] = (() => {
     const items: ItemType[] = []
     if (canDeleteEmployee) {
       items.push({
@@ -91,17 +91,14 @@ const EmployeeDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     }
 
     return items
-  }, [canDeleteEmployee])
+  })()
 
-  const onDeleteFormClosed = useCallback(
-    (wasDeleted: boolean) => {
-      setOpenDeleteEmployeeForm(false)
-      if (wasDeleted) {
-        router.push('/organizations/employees/')
-      }
-    },
-    [router],
-  )
+  const onDeleteFormClosed = (wasDeleted: boolean) => {
+    setOpenDeleteEmployeeForm(false)
+    if (wasDeleted) {
+      router.push('/organizations/employees/')
+    }
+  }
 
   if (isLoading) {
     return <EmployeeDetailsLoading />

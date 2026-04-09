@@ -34,7 +34,7 @@ import {
 } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
 import dayjs from 'dayjs'
-import { useCallback, useEffect, useMemo } from 'react'
+import { useEffect } from 'react'
 
 const { Item } = Form
 const { RangePicker } = DatePicker
@@ -99,15 +99,12 @@ const CreateProjectForm = ({
   const { data: lifecycleData, error: lifecycleOptionsError } =
     useGetProjectLifecyclesQuery(ProjectLifecycleState.Active)
 
-  const lifecycleOptions = useMemo(() => {
-    if (!lifecycleData) return []
-    return [...lifecycleData]
+  const lifecycleOptions = !lifecycleData ? [] : [...lifecycleData]
       .sort((a, b) => a.name.localeCompare(b.name))
       .map((lc) => ({
         label: lc.name,
         value: lc.id,
       }))
-  }, [lifecycleData])
 
   const { data: expenditureData, error: expenditureOptionsError } =
     useGetExpenditureCategoryOptionsQuery(false)
@@ -117,8 +114,7 @@ const CreateProjectForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<CreateProjectFormValues>({
-      onSubmit: useCallback(
-        async (values: CreateProjectFormValues, form) => {
+      onSubmit: async (values: CreateProjectFormValues, form) => {
           try {
             const request = mapToRequestValues(values)
             const response = await createProject(request)
@@ -142,8 +138,6 @@ const CreateProjectForm = ({
             return false
           }
         },
-        [createProject, messageApi],
-      ),
       onComplete: onFormComplete,
       onCancel: onFormCancel,
       errorMessage:
@@ -194,9 +188,7 @@ const CreateProjectForm = ({
     { skip: !selectedLifecycleId },
   )
 
-  const phaseItems = useMemo(() => {
-    if (!selectedLifecycle?.phases) return []
-    return [...selectedLifecycle.phases]
+  const phaseItems = !selectedLifecycle?.phases ? [] : [...selectedLifecycle.phases]
       .sort((a, b) => a.order - b.order)
       .map((phase) => ({
         content: (
@@ -207,7 +199,6 @@ const CreateProjectForm = ({
           </>
         ),
       }))
-  }, [selectedLifecycle?.phases])
 
   return (
     <Modal

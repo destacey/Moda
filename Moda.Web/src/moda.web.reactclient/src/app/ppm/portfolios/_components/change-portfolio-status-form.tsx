@@ -9,7 +9,6 @@ import {
   useClosePortfolioMutation,
 } from '@/src/store/features/ppm/portfolios-api'
 import { Modal, Space } from 'antd'
-import { useCallback } from 'react'
 
 export enum PortfolioStatusAction {
   Activate = 'Activate',
@@ -63,7 +62,7 @@ const ChangePortfolioStatusForm = ({
   const [archivePortfolioMutation] = useArchivePortfolioMutation()
 
   const { isOpen, isSaving, handleOk, handleCancel } = useConfirmModal({
-    onSubmit: useCallback(async () => {
+    onSubmit: async () => {
       try {
         const request = { id: portfolio.id, cacheKey: portfolio.key }
         let response = null
@@ -89,14 +88,7 @@ const ChangePortfolioStatusForm = ({
         console.log(error)
         return false
       }
-    }, [
-      portfolio,
-      statusAction,
-      activatePortfolioMutation,
-      closePortfolioMutation,
-      archivePortfolioMutation,
-      messageApi,
-    ]),
+    },
     onComplete: onFormComplete,
     onCancel: onFormCancel,
     errorMessage: `An unexpected error occurred while ${statusActionToPresentTense(statusAction)} the portfolio.`,

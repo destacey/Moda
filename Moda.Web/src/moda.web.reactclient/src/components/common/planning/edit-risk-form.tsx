@@ -10,7 +10,7 @@ import {
   Radio,
   Select,
 } from 'antd'
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { RiskDetailsDto, UpdateRiskRequest } from '@/src/services/moda-api'
 import { toFormErrors } from '@/src/utils'
 import dayjs from 'dayjs'
@@ -84,29 +84,26 @@ const EditRiskForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<EditRiskFormValues>({
-      onSubmit: useCallback(
-        async (values: EditRiskFormValues, form) => {
-          try {
-            const request = mapToRequestValues(values)
-            const response = await updateRisk({ request, cacheKey: riskKey })
+      onSubmit: async (values: EditRiskFormValues, form) => {
+        try {
+          const request = mapToRequestValues(values)
+          const response = await updateRisk({ request, cacheKey: riskKey })
 
-            if (response.error) {
-              throw response.error
-            }
-
-            return true
-          } catch (error) {
-            if (error.status === 422 && error.errors) {
-              const formErrors = toFormErrors(error.errors)
-              form.setFields(formErrors)
-            } else {
-              throw error
-            }
-            return false
+          if (response.error) {
+            throw response.error
           }
-        },
-        [updateRisk, riskKey],
-      ),
+
+          return true
+        } catch (error) {
+          if (error.status === 422 && error.errors) {
+            const formErrors = toFormErrors(error.errors)
+            form.setFields(formErrors)
+          } else {
+            throw error
+          }
+          return false
+        }
+      },
       onComplete: onFormSave,
       onCancel: onFormCancel,
       errorMessage:
@@ -114,8 +111,9 @@ const EditRiskForm = ({
       permission: 'Permissions.Risks.Update',
     })
 
-  const mapToFormValues = useCallback(
-    (risk: RiskDetailsDto) => {
+  useEffect(() => {
+    if (!riskData || !isOpen) return
+    const mapToFormValues = (risk: RiskDetailsDto) => {
       form.setFieldsValue({
         riskId: risk.id,
         teamId: risk.team.id,
@@ -129,15 +127,10 @@ const EditRiskForm = ({
         followUpDate: risk.followUpDate ? dayjs(risk.followUpDate) : undefined,
         response: risk.response || '',
       })
-    },
-    [form],
-  )
-
-  useEffect(() => {
-    if (!riskData || !isOpen) return
+    }
     setTeamName(riskData.team.name)
     mapToFormValues(riskData)
-  }, [riskData, isOpen, mapToFormValues])
+  }, [form, riskData, isOpen])
 
   return (
     <Modal

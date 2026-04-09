@@ -9,7 +9,7 @@ import {
 } from '@/src/store/features/work-management/workspace-api'
 import { toFormErrors } from '@/src/utils'
 import { Form, Modal, Select, Space, Typography } from 'antd'
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useModalForm } from '@/src/hooks'
 
 const { Item } = Form
@@ -59,8 +59,7 @@ const EditWorkItemProjectForm = (props: EditWorkItemProjectFormProps) => {
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<EditWorkItemProjectFormValues>({
-      onSubmit: useCallback(
-        async (values: EditWorkItemProjectFormValues, form) => {
+      onSubmit: async (values: EditWorkItemProjectFormValues, form) => {
           try {
             const request = mapToRequestValues(values, props.workItemId)
 
@@ -90,14 +89,6 @@ const EditWorkItemProjectForm = (props: EditWorkItemProjectFormProps) => {
             return false
           }
         },
-        [
-          updateWorkItemProject,
-          props.workItemId,
-          props.workItemKey,
-          props.workspaceId,
-          messageApi,
-        ],
-      ),
       onComplete: props.onFormComplete,
       onCancel: props.onFormCancel,
       errorMessage:

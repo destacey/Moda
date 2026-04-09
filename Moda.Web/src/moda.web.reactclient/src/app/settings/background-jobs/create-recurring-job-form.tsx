@@ -8,7 +8,6 @@ import {
 import { useCreateRecurringJobMutation } from '@/src/store/features/admin/background-jobs-api'
 import { toFormErrors } from '@/src/utils'
 import { Form, Input, Modal, Select } from 'antd'
-import { useCallback } from 'react'
 import { useModalForm } from '@/src/hooks'
 
 const { Item } = Form
@@ -46,8 +45,7 @@ const CreateRecurringJobForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<CreateRecurringJobFormValues>({
-      onSubmit: useCallback(
-        async (values: CreateRecurringJobFormValues, form) => {
+      onSubmit: async (values: CreateRecurringJobFormValues, form) => {
           try {
             const request = mapToRequestValues(values)
             const response = await createRecurringJob(request)
@@ -71,8 +69,6 @@ const CreateRecurringJobForm = ({
             return false
           }
         },
-        [createRecurringJob, messageApi],
-      ),
       onComplete: onFormCreate,
       onCancel: onFormCancel,
       errorMessage:

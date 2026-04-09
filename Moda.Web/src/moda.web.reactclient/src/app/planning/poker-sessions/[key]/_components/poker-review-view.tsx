@@ -4,7 +4,7 @@ import { PokerRoundDto } from '@/src/services/moda-api'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { useResetPokerRoundMutation } from '@/src/store/features/planning/poker-sessions-api'
 import { Button, Flex, Tag, Typography } from 'antd'
-import { FC, useCallback, useMemo } from 'react'
+import { FC } from 'react'
 import ResultsPanel from './results-panel'
 import RoundLabelHeader from './round-label-header'
 import styles from './poker-session.module.css'
@@ -30,7 +30,7 @@ const PokerReviewView: FC<PokerReviewViewProps> = ({
   const [resetRound, { isLoading: isResetting }] =
     useResetPokerRoundMutation()
 
-  const handleReset = useCallback(async () => {
+  const handleReset = async () => {
     try {
       const response = await resetRound({
         sessionId,
@@ -41,10 +41,10 @@ const PokerReviewView: FC<PokerReviewViewProps> = ({
     } catch {
       messageApi.error('Failed to reset round.')
     }
-  }, [resetRound, sessionId, round.id, sessionKey, messageApi])
+  }
 
   // Build vote map for participant cards
-  const voteMap = useMemo(() => {
+  const voteMap = (() => {
     const map = new Map<string, string>()
     for (const vote of round.votes) {
       if (vote.participant) {
@@ -52,10 +52,10 @@ const PokerReviewView: FC<PokerReviewViewProps> = ({
       }
     }
     return map
-  }, [round.votes])
+  })()
 
   // Group votes by value for breakdown
-  const voteGroups = useMemo(() => {
+  const voteGroups = (() => {
     const groups = new Map<string, string[]>()
     for (const vote of round.votes) {
       const names = groups.get(vote.value) ?? []
@@ -68,7 +68,7 @@ const PokerReviewView: FC<PokerReviewViewProps> = ({
       if (!isNaN(na) && !isNaN(nb)) return na - nb
       return a.localeCompare(b)
     })
-  }, [round.votes])
+  })()
 
   return (
     <Flex vertical gap={16}>

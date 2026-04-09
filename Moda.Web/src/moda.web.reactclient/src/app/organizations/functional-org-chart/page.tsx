@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation'
 import { authorizePage } from '../../../components/hoc'
 import { useAppDispatch, useDocumentTitle } from '../../../hooks'
 import { disableBreadcrumb } from '@/src/store/breadcrumbs'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { PageTitle } from '../../../components/common'
 import { useGetFunctionalOrganizationChartQuery } from '@/src/store/features/organizations/team-api'
 import {
@@ -98,9 +98,7 @@ const FunctionalOrgChartPage: React.FC = () => {
     skip: !asOfDate,
   })
 
-  const data = useMemo<TeamOrganizationGraphData>(() => {
-    return orgChartData ? transformOrganizationToGraph(orgChartData) : undefined
-  }, [orgChartData])
+  const data: TeamOrganizationGraphData = orgChartData ? transformOrganizationToGraph(orgChartData) : undefined
 
   useEffect(() => {
     dispatch(disableBreadcrumb(pathname))

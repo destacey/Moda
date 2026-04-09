@@ -4,7 +4,6 @@ import useTheme from '@/src/components/contexts/theme'
 import { PlanningIntervalTeamPredictabilityDto } from '@/src/services/moda-api'
 import { Card } from 'antd'
 import dynamic from 'next/dynamic'
-import { useMemo } from 'react'
 
 const Radar = dynamic(
   () => import('@ant-design/charts').then((mod) => mod.Radar) as any,
@@ -24,7 +23,7 @@ const TeamPredictabilityRadarChart: React.FC<
 }: TeamPredictabilityRadarChartProps) => {
   const { currentThemeName, antDesignChartsTheme } = useTheme()
 
-  const config = useMemo(() => {
+  const config = (() => {
     const fontColor =
       currentThemeName === 'light'
         ? 'rgba(0, 0, 0, 0.45)'
@@ -85,7 +84,7 @@ const TeamPredictabilityRadarChart: React.FC<
         },
       },
     } as any // this is a hack to fix typescript error. Should be as RadarConfig
-  }, [antDesignChartsTheme, currentThemeName, teamPredictabilities])
+  })()
 
   return (
     <Card

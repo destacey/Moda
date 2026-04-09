@@ -5,7 +5,6 @@ import { useConfirmModal } from '@/src/hooks'
 import { ProjectPortfolioDetailsDto } from '@/src/services/moda-api'
 import { useDeletePortfolioMutation } from '@/src/store/features/ppm/portfolios-api'
 import { Modal } from 'antd'
-import { useCallback } from 'react'
 
 export interface DeletePortfolioFormProps {
   portfolio: ProjectPortfolioDetailsDto
@@ -23,7 +22,7 @@ const DeletePortfolioForm = ({
   const [deletePortfolioMutation] = useDeletePortfolioMutation()
 
   const { isOpen, isSaving, handleOk, handleCancel } = useConfirmModal({
-    onSubmit: useCallback(async () => {
+    onSubmit: async () => {
       try {
         const response = await deletePortfolioMutation({
           portfolioId: portfolio.id,
@@ -42,7 +41,7 @@ const DeletePortfolioForm = ({
         console.log(error)
         return false
       }
-    }, [deletePortfolioMutation, portfolio, messageApi]),
+    },
     onComplete: onFormComplete,
     onCancel: onFormCancel,
     errorMessage:

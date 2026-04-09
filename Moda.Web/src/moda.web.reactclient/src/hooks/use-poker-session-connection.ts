@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import {
   HubConnectionBuilder,
   HubConnection,
@@ -39,11 +39,11 @@ export function usePokerSessionConnection(
     onPresenceChangeRef.current = onPresenceChange
   }, [onPresenceChange])
 
-  const emitPresence = useCallback(() => {
+  const emitPresence = () => {
     onPresenceChangeRef.current?.(
       Array.from(presenceMapRef.current.values()),
     )
-  }, [])
+  }
 
   const invalidateSession = useCallback(() => {
     if (sessionKey === undefined) return
@@ -159,5 +159,5 @@ export function usePokerSessionConnection(
         connectionRef.current = null
       }
     }
-  }, [sessionId, invalidateSession, emitPresence])
+  }, [sessionId, sessionKey, invalidateSession])
 }

@@ -9,7 +9,7 @@ import {
 import { useGetWorkTypeLevelOptionsQuery } from '@/src/store/features/work-management/work-type-level-api'
 import { toFormErrors } from '@/src/utils'
 import { Descriptions, Form, Input, Modal, Select } from 'antd'
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useModalForm } from '@/src/hooks'
 
 const { Item } = Form
@@ -52,8 +52,7 @@ const EditWorkTypeForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<EditWorkTypeFormValues>({
-      onSubmit: useCallback(
-        async (values: EditWorkTypeFormValues, form) => {
+      onSubmit: async (values: EditWorkTypeFormValues, form) => {
           try {
             const request = mapToRequestValues(workTypeId, values)
             const response = await updateWorkTypeMutation(request)
@@ -76,8 +75,6 @@ const EditWorkTypeForm = ({
             return false
           }
         },
-        [updateWorkTypeMutation, workTypeId, messageApi],
-      ),
       onComplete: onFormSave,
       onCancel: onFormCancel,
       errorMessage:

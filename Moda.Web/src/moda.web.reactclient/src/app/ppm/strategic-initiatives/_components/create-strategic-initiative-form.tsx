@@ -12,7 +12,7 @@ import { toFormErrors } from '@/src/utils'
 import { DatePicker, Form, Modal, Select } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
 import dayjs from 'dayjs'
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 
 const { Item } = Form
 const { RangePicker } = DatePicker
@@ -66,34 +66,31 @@ const CreateStrategicInitiativeForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<CreateStrategicInitiativeFormValues>({
-      onSubmit: useCallback(
-        async (values: CreateStrategicInitiativeFormValues, form) => {
-          try {
-            const request = mapToRequestValues(values)
-            const response = await createStrategicInitiative(request)
-            if (response.error) throw response.error
+      onSubmit: async (values: CreateStrategicInitiativeFormValues, form) => {
+        try {
+          const request = mapToRequestValues(values)
+          const response = await createStrategicInitiative(request)
+          if (response.error) throw response.error
 
-            messageApi.success(
-              'Strategic initiative created successfully. Strategic initiative key: ' +
-                response.data.key,
+          messageApi.success(
+            'Strategic initiative created successfully. Strategic initiative key: ' +
+              response.data.key,
+          )
+          return true
+        } catch (error) {
+          if (error.status === 422 && error.errors) {
+            const formErrors = toFormErrors(error.errors)
+            form.setFields(formErrors)
+            messageApi.error('Correct the validation error(s) to continue.')
+          } else {
+            messageApi.error(
+              error.detail ??
+                'An error occurred while creating the strategic initiative. Please try again.',
             )
-            return true
-          } catch (error) {
-            if (error.status === 422 && error.errors) {
-              const formErrors = toFormErrors(error.errors)
-              form.setFields(formErrors)
-              messageApi.error('Correct the validation error(s) to continue.')
-            } else {
-              messageApi.error(
-                error.detail ??
-                  'An error occurred while creating the strategic initiative. Please try again.',
-              )
-            }
-            return false
           }
-        },
-        [createStrategicInitiative, messageApi],
-      ),
+          return false
+        }
+      },
       onComplete: onFormComplete,
       onCancel: onFormCancel,
       errorMessage:

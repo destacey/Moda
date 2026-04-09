@@ -16,7 +16,7 @@ import { SizingMethod, SprintDetailsDto } from '@/src/services/moda-api'
 import { useGetSprintMetricsQuery } from '@/src/store/features/planning/sprints-api'
 import { Col, Flex, Row, Segmented, Skeleton } from 'antd'
 import { ModaTooltip } from '@/src/components/common'
-import { FC, ReactNode, useEffect, useMemo, useState } from 'react'
+import { FC, ReactNode, useEffect, useState } from 'react'
 
 export interface SprintMetricsProps {
   sprint: SprintDetailsDto
@@ -47,36 +47,25 @@ const SprintMetrics: FC<SprintMetricsProps> = ({
     }
   }, [sizingMethod])
 
-  const displayValues = useMemo(() => {
-    if (!metrics) {
-      return {
+  const displayValues = !metrics
+    ? {
         total: 0,
         completed: 0,
         inProgress: 0,
         notStarted: 0,
       }
-    }
-
-    const total = useStoryPoints
-      ? metrics.totalStoryPoints
-      : metrics.totalWorkItems
-    const completed = useStoryPoints
-      ? metrics.completedStoryPoints
-      : metrics.completedWorkItems
-    const inProgress = useStoryPoints
-      ? metrics.inProgressStoryPoints
-      : metrics.inProgressWorkItems
-    const notStarted = useStoryPoints
-      ? metrics.notStartedStoryPoints
-      : metrics.notStartedWorkItems
-
-    return {
-      total,
-      completed,
-      inProgress,
-      notStarted,
-    }
-  }, [metrics, useStoryPoints])
+    : {
+        total: useStoryPoints ? metrics.totalStoryPoints : metrics.totalWorkItems,
+        completed: useStoryPoints
+          ? metrics.completedStoryPoints
+          : metrics.completedWorkItems,
+        inProgress: useStoryPoints
+          ? metrics.inProgressStoryPoints
+          : metrics.inProgressWorkItems,
+        notStarted: useStoryPoints
+          ? metrics.notStartedStoryPoints
+          : metrics.notStartedWorkItems,
+      }
 
   // Notify parent when health indicator is ready
   useEffect(() => {

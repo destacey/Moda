@@ -7,7 +7,7 @@ import {
   useGetWorkItemQuery,
 } from '@/src/store/features/work-management/workspace-api'
 import { notFound, usePathname } from 'next/navigation'
-import { use, useCallback, useEffect, useMemo, useState } from 'react'
+import { use, useEffect, useState } from 'react'
 import WorkItemDetailsLoading from './loading'
 import { PageActions, PageTitle } from '@/src/components/common'
 import { Card, MenuProps } from 'antd'
@@ -96,9 +96,9 @@ const WorkItemDetailsPage = (props: {
   const dispatch = useAppDispatch()
   const pathname = usePathname()
 
-  const tabs = useMemo(() => getWorkItemTabs(workItemData), [workItemData])
+  const tabs = getWorkItemTabs(workItemData)
 
-  const renderTabContent = useCallback(() => {
+  const renderTabContent = () => {
     switch (activeTab) {
       case WorkItemTabs.Details:
         return <WorkItemDetails workItem={workItemData} />
@@ -118,19 +118,13 @@ const WorkItemDetailsPage = (props: {
       default:
         return null
     }
-  }, [
-    activeTab,
-    workItemData,
-    childWorkItemsQuery.data,
-    childWorkItemsQuery.isLoading,
-    childWorkItemsQuery.refetch,
-  ])
+  }
 
-  const onTabChange = useCallback((tabKey: string) => {
+  const onTabChange = (tabKey: string) => {
     setActiveTab(tabKey as WorkItemTabs)
-  }, [])
+  }
 
-  const actionsMenuItems: MenuProps['items'] = useMemo(() => {
+  const actionsMenuItems: MenuProps['items'] = (() => {
     const items: ItemType[] = []
 
     if (
@@ -145,7 +139,7 @@ const WorkItemDetailsPage = (props: {
     }
 
     return items
-  }, [canManageProjectWorkItems, workItemData?.type.tier.id])
+  })()
 
   useEffect(() => {
     const breadcrumbRoute: BreadcrumbItem[] = [

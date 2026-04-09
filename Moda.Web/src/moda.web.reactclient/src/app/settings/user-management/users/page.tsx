@@ -1,7 +1,7 @@
 'use client'
 
 import PageTitle from '@/src/components/common/page-title'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import ModaGrid from '@/src/components/common/moda-grid'
 import { authorizePage } from '@/src/components/hoc'
 import Link from 'next/link'
@@ -58,8 +58,7 @@ const UsersListPage = () => {
   const { getAccountActionMenuItems } = useUserAccountActions()
   const { data: usersData, isLoading, error, refetch } = useGetUsersQuery()
 
-  const columnDefs = useMemo<ColDef<UserDetailsDto>[]>(
-    () => [
+  const columnDefs = useMemo<ColDef<UserDetailsDto>[]>(() => [
       {
         width: 50,
         filter: false,
@@ -164,17 +163,15 @@ const UsersListPage = () => {
             <Tag color="error">Inactive</Tag>
           ),
       },
-    ],
-    [canUpdateUser, canUpdateUserRoles, showRowActions, getAccountActionMenuItems],
-  )
+    ], [showRowActions, canUpdateUser, canUpdateUserRoles, getAccountActionMenuItems, setEditingUser, setResettingPasswordUser, setManagingRolesUserId])
 
   useEffect(() => {
     error && console.error(error)
   }, [error])
 
-  const refresh = useCallback(async () => {
+  const refresh = async () => {
     refetch()
-  }, [refetch])
+  }
 
   const actions = () => {
     return (

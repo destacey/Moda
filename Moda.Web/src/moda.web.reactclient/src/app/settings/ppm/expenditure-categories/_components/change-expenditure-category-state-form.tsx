@@ -7,7 +7,6 @@ import {
   useArchiveExpenditureCategoryMutation,
 } from '@/src/store/features/ppm/expenditure-categories-api'
 import { Modal, Space } from 'antd'
-import { useCallback } from 'react'
 import { useConfirmModal } from '@/src/hooks'
 
 export enum ExpenditureCategoryStateAction {
@@ -36,7 +35,7 @@ const ChangeExpenditureCategoryStateForm = ({
     useArchiveExpenditureCategoryMutation()
 
   const { isOpen, isSaving, handleOk, handleCancel } = useConfirmModal({
-    onSubmit: useCallback(async () => {
+    onSubmit: async () => {
       try {
         let response = null
         if (stateAction === ExpenditureCategoryStateAction.Activate) {
@@ -61,13 +60,7 @@ const ChangeExpenditureCategoryStateForm = ({
         console.log(error)
         return false
       }
-    }, [
-      activateExpenditureCategoryMutation,
-      archiveExpenditureCategoryMutation,
-      expenditureCategory,
-      stateAction,
-      messageApi,
-    ]),
+    },
     onComplete: onFormComplete,
     onCancel: onFormCancel,
     errorMessage: `An unexpected error occurred while ${stateAction}ing the expenditure category.`,

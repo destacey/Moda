@@ -24,7 +24,7 @@ import {
   Timeline,
   Typography,
 } from 'antd'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 const { Item } = Form
 const { Text } = Typography
@@ -62,21 +62,17 @@ const ChangeProjectLifecycleForm = ({
   const { data: lifecycleData, isLoading: lifecyclesLoading } =
     useGetProjectLifecyclesQuery(ProjectLifecycleState.Active)
 
-  const lifecycleOptions = useMemo(() => {
-    if (!lifecycleData) return []
-    return [...lifecycleData]
+  const lifecycleOptions = !lifecycleData ? [] : [...lifecycleData]
       .filter((lc) => lc.id !== project?.projectLifecycle?.id)
       .sort((a, b) => a.name.localeCompare(b.name))
       .map((lc) => ({
         label: lc.name,
         value: lc.id,
       }))
-  }, [lifecycleData, project?.projectLifecycle?.id])
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<ChangeProjectLifecycleFormValues>({
-      onSubmit: useCallback(
-        async (values: ChangeProjectLifecycleFormValues, form) => {
+      onSubmit: async (values: ChangeProjectLifecycleFormValues, form) => {
           try {
             // Build phaseMapping from the form's mapping fields
             const phaseMapping: Record<string, string> = {}
@@ -113,8 +109,6 @@ const ChangeProjectLifecycleForm = ({
             return false
           }
         },
-        [changeProjectLifecycle, project, currentPhases, messageApi],
-      ),
       onComplete: onFormComplete,
       onCancel: onFormCancel,
       errorMessage:
@@ -131,15 +125,12 @@ const ChangeProjectLifecycleForm = ({
   )
 
   // New lifecycle phase options for mapping dropdowns
-  const newPhaseOptions = useMemo(() => {
-    if (!selectedLifecycle?.phases) return []
-    return [...selectedLifecycle.phases]
+  const newPhaseOptions = !selectedLifecycle?.phases ? [] : [...selectedLifecycle.phases]
       .sort((a, b) => a.order - b.order)
       .map((phase) => ({
         label: phase.name,
         value: phase.id,
       }))
-  }, [selectedLifecycle?.phases])
 
   // Auto-populate mapping when phase names match
   useEffect(() => {
@@ -161,9 +152,7 @@ const ChangeProjectLifecycleForm = ({
   }, [selectedLifecycle?.phases, currentPhases, form])
 
   // Phase preview timeline
-  const phaseItems = useMemo(() => {
-    if (!selectedLifecycle?.phases) return []
-    return [...selectedLifecycle.phases]
+  const phaseItems = !selectedLifecycle?.phases ? [] : [...selectedLifecycle.phases]
       .sort((a, b) => a.order - b.order)
       .map((phase) => ({
         content: (
@@ -174,7 +163,6 @@ const ChangeProjectLifecycleForm = ({
           </>
         ),
       }))
-  }, [selectedLifecycle?.phases])
 
   // Phase mapping table columns
   const mappingColumns = [

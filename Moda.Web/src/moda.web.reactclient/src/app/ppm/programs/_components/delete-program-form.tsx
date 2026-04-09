@@ -5,7 +5,6 @@ import { useConfirmModal } from '@/src/hooks'
 import { ProgramDetailsDto } from '@/src/services/moda-api'
 import { useDeleteProgramMutation } from '@/src/store/features/ppm/programs-api'
 import { Modal } from 'antd'
-import { useCallback } from 'react'
 
 export interface DeleteProgramFormProps {
   program: ProgramDetailsDto
@@ -23,7 +22,7 @@ const DeleteProgramForm = ({
   const [deleteProgramMutation] = useDeleteProgramMutation()
 
   const { isOpen, isSaving, handleOk, handleCancel } = useConfirmModal({
-    onSubmit: useCallback(async () => {
+    onSubmit: async () => {
       try {
         const response = await deleteProgramMutation(program.id)
         if (response.error) throw response.error
@@ -38,7 +37,7 @@ const DeleteProgramForm = ({
         console.log(error)
         return false
       }
-    }, [deleteProgramMutation, program, messageApi]),
+    },
     onComplete: onFormComplete,
     onCancel: onFormCancel,
     errorMessage:

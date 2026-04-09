@@ -7,7 +7,7 @@ import { useDebounce } from '@/src/hooks'
 import { useGetProjectsPlanSummariesQuery } from '@/src/store/features/ppm/projects-api'
 import { SearchOutlined } from '@ant-design/icons'
 import { Flex, Input, Spin } from 'antd'
-import { FC, useMemo, useState } from 'react'
+import { FC, useState } from 'react'
 import { PortfolioGroup, sortProjects } from './project-card-helpers'
 import PortfolioGroupSection from './portfolio-group-section'
 import styles from '../my-projects-dashboard.module.css'
@@ -31,10 +31,7 @@ const PortfolioGroupList: FC<PortfolioGroupListProps> = ({
   const [searchTerm, setSearchTerm] = useState('')
   const debouncedSearch = useDebounce(searchTerm, 300)
 
-  const projectIds = useMemo(
-    () => projects?.map((p) => p.id) ?? [],
-    [projects],
-  )
+  const projectIds = projects?.map((p) => p.id) ?? []
 
   const { data: planSummaries } = useGetProjectsPlanSummariesQuery(
     {
@@ -44,7 +41,7 @@ const PortfolioGroupList: FC<PortfolioGroupListProps> = ({
     { skip: projectIds.length === 0 },
   )
 
-  const groups = useMemo<PortfolioGroup[]>(() => {
+  const groups: PortfolioGroup[] = (() => {
     if (!projects) return []
 
     const needle = debouncedSearch.toLowerCase().trim()
@@ -68,7 +65,7 @@ const PortfolioGroupList: FC<PortfolioGroupListProps> = ({
         projects: sortProjects(group.projects),
       }))
       .sort((a, b) => a.portfolioName.localeCompare(b.portfolioName))
-  }, [projects, debouncedSearch])
+  })()
 
   if (isLoading) {
     return (

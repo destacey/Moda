@@ -10,7 +10,7 @@ import { ProgramListDto } from '@/src/services/moda-api'
 import { getSortedNames } from '@/src/utils'
 import { ColDef } from 'ag-grid-community'
 import dayjs from 'dayjs'
-import { FC, useCallback, useMemo } from 'react'
+import { FC, useMemo } from 'react'
 
 export interface ProgramsGridProps {
   programs: ProgramListDto[]
@@ -83,9 +83,9 @@ const ProgramsGrid: FC<ProgramsGridProps> = (props: ProgramsGridProps) => {
     [props.hidePortfolio],
   )
 
-  const refresh = useCallback(async () => {
+  const refresh = async () => {
     refetch()
-  }, [refetch])
+  }
 
   return (
     <>

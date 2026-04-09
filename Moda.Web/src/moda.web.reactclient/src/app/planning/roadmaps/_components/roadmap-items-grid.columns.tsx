@@ -13,7 +13,7 @@ import { Button, DatePicker, Dropdown, Flex, Form, Input, Select } from 'antd'
 import dayjs from 'dayjs'
 import { ColumnDef } from '@tanstack/react-table'
 import { ModaColorPicker } from '@/src/components/common'
-import { useCallback, useRef } from 'react'
+import { useRef } from 'react'
 import styles from '@/src/components/common/tree-grid/tree-grid.module.css'
 import {
   type FilterOption,
@@ -98,15 +98,12 @@ function FocusableColorPickerField({
   handleKeyDown,
 }: FocusableColorPickerFieldProps) {
   const focusTargetRef = useRef<HTMLDivElement | null>(null)
-  const onColorChange = useCallback(
-    (nextValue: string | undefined) => {
-      onChange?.(nextValue)
-      setTimeout(() => {
-        focusTargetRef.current?.focus()
-      }, 0)
-    },
-    [onChange],
-  )
+  const onColorChange = (nextValue: string | undefined) => {
+    onChange?.(nextValue)
+    setTimeout(() => {
+      focusTargetRef.current?.focus()
+    }, 0)
+  }
 
   return (
     <div

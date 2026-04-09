@@ -5,7 +5,7 @@ import { UserLinkCellRenderer } from '@/src/components/common/moda-grid-cell-ren
 import { RoleListDto, UserDetailsDto } from '@/src/services/moda-api'
 import { useGetRoleUsersQuery } from '@/src/store/features/user-management/roles-api'
 import { ColDef } from 'ag-grid-community'
-import { FC, useCallback, useMemo } from 'react'
+import { FC, useMemo } from 'react'
 
 export interface RoleUsersGridProps {
   roleId: string
@@ -18,8 +18,7 @@ const RoleUsersGrid: FC<RoleUsersGridProps> = (props: RoleUsersGridProps) => {
     refetch,
   } = useGetRoleUsersQuery(props.roleId)
 
-  const columnDefs = useMemo<ColDef<UserDetailsDto>[]>(
-    () => [
+  const columnDefs = useMemo<ColDef<UserDetailsDto>[]>(() => [
       { field: 'id', hide: true },
       { field: 'userName', cellRenderer: UserLinkCellRenderer },
       { field: 'firstName' },
@@ -33,13 +32,11 @@ const RoleUsersGrid: FC<RoleUsersGridProps> = (props: RoleUsersGridProps) => {
             .join(', ') ?? '',
       },
       { field: 'isActive' }, // TODO: convert to yes/no
-    ],
-    [],
-  )
+    ], [])
 
-  const refresh = useCallback(async () => {
+  const refresh = async () => {
     refetch()
-  }, [refetch])
+  }
 
   return (
     <ModaGrid

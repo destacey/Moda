@@ -9,7 +9,6 @@ import {
   useCompleteProgramMutation,
 } from '@/src/store/features/ppm/programs-api'
 import { Modal, Space } from 'antd'
-import { useCallback } from 'react'
 
 export enum ProgramStatusAction {
   Activate = 'Activate',
@@ -63,7 +62,7 @@ const ChangeProgramStatusForm = ({
   const [cancelProgramMutation] = useCancelProgramMutation()
 
   const { isOpen, isSaving, handleOk, handleCancel } = useConfirmModal({
-    onSubmit: useCallback(async () => {
+    onSubmit: async () => {
       // Check start/end dates before activating
       if (
         statusAction === ProgramStatusAction.Activate &&
@@ -100,14 +99,7 @@ const ChangeProgramStatusForm = ({
         console.log(error)
         return false
       }
-    }, [
-      program,
-      statusAction,
-      activateProgramMutation,
-      completeProgramMutation,
-      cancelProgramMutation,
-      messageApi,
-    ]),
+    },
     onComplete: onFormComplete,
     onCancel: onFormCancel,
     errorMessage: `An unexpected error occurred while ${statusActionToPresentTense(statusAction)} the program.`,

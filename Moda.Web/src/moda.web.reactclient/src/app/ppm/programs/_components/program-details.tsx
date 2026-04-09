@@ -14,29 +14,19 @@ import { getSortedNameList } from '@/src/utils'
 import { Card, Divider, Flex } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
-import { FC, useMemo } from 'react'
+import { FC } from 'react'
 
 export interface ProgramDetailsProps {
   program: ProgramDetailsDto
 }
 
 const ProgramDetails: FC<ProgramDetailsProps> = ({ program }) => {
-  const sponsorNames = useMemo(
-    () => (program ? getSortedNameList(program.programSponsors) : []),
-    [program],
-  )
-  const ownerNames = useMemo(
-    () => (program ? getSortedNameList(program.programOwners) : []),
-    [program],
-  )
-  const managerNames = useMemo(
-    () => (program ? getSortedNameList(program.programManagers) : []),
-    [program],
-  )
-  const strategicThemes = useMemo(
-    () => (program ? getSortedNameList(program.strategicThemes) : []),
-    [program],
-  )
+  const sponsorNames = program ? getSortedNameList(program.programSponsors) : []
+  const ownerNames = program ? getSortedNameList(program.programOwners) : []
+  const managerNames = program ? getSortedNameList(program.programManagers) : []
+  const strategicThemes = program
+    ? getSortedNameList(program.strategicThemes)
+    : []
 
   if (!program) return null
 

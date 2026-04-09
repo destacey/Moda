@@ -10,7 +10,6 @@ import {
   useCompleteProjectMutation,
 } from '@/src/store/features/ppm/projects-api'
 import { Modal, Space } from 'antd'
-import { useCallback } from 'react'
 
 export enum ProjectStatusAction {
   Approve = 'Approve',
@@ -70,7 +69,7 @@ const ChangeProjectStatusForm = ({
   const [cancelProjectMutation] = useCancelProjectMutation()
 
   const { isOpen, isSaving, handleOk, handleCancel } = useConfirmModal({
-    onSubmit: useCallback(async () => {
+    onSubmit: async () => {
       // Check start/end dates before activating
       if (
         statusAction === ProjectStatusAction.Activate &&
@@ -109,15 +108,7 @@ const ChangeProjectStatusForm = ({
         console.log(error)
         return false
       }
-    }, [
-      project,
-      statusAction,
-      approveProjectMutation,
-      activateProjectMutation,
-      completeProjectMutation,
-      cancelProjectMutation,
-      messageApi,
-    ]),
+    },
     onComplete: onFormComplete,
     onCancel: onFormCancel,
     errorMessage: `An unexpected error occurred while ${statusActionToPresentTense(statusAction)} the project.`,

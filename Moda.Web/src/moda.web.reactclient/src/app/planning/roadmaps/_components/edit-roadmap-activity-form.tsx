@@ -13,7 +13,7 @@ import {
 } from '@/src/store/features/planning/roadmaps-api'
 import { toFormErrors } from '@/src/utils'
 import { DatePicker, Form, Input, Modal, TreeSelect } from 'antd'
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import dayjs from 'dayjs'
 import { MarkdownEditor } from '@/src/components/common/markdown'
 import { useMessage } from '@/src/components/contexts/messaging'
@@ -96,8 +96,7 @@ const EditRoadmapActivityForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<EditRoadmapActivityFormValues>({
-      onSubmit: useCallback(
-        async (values: EditRoadmapActivityFormValues, form) => {
+      onSubmit: async (values: EditRoadmapActivityFormValues, form) => {
           try {
             const request = mapToRequestValues(values, activityId, roadmapId)
             const response = await updateRoadmapActivity(request)
@@ -119,8 +118,6 @@ const EditRoadmapActivityForm = ({
             return false
           }
         },
-        [updateRoadmapActivity, activityId, roadmapId, messageApi],
-      ),
       onComplete: onFormComplete,
       onCancel: onFormCancel,
       errorMessage:

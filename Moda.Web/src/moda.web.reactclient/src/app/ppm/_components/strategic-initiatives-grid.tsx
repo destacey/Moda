@@ -13,7 +13,7 @@ import { getSortedNames } from '@/src/utils'
 import { ColDef } from 'ag-grid-community'
 import dayjs from 'dayjs'
 import Link from 'next/link'
-import { FC, useCallback, useMemo } from 'react'
+import { FC, useMemo } from 'react'
 
 export interface StrategicInitiativesGridProps {
   strategicInitiatives: StrategicInitiativeListDto[]
@@ -41,60 +41,56 @@ const StrategicInitiativesGrid: FC<StrategicInitiativesGridProps> = (
 ) => {
   const { refetch } = props
 
-  const columnDefs = useMemo<ColDef<StrategicInitiativeListDto>[]>(
-    () => [
-      { field: 'key', width: 90 },
-      {
-        field: 'name',
-        cellRenderer: StrategicInitiativeLinkCellRenderer,
-        width: 300,
-      },
-      {
-        field: 'status.name',
-        headerName: 'Status',
-        width: 125,
-        cellRenderer: LifecycleStatusTagCellRenderer,
-      },
-      {
-        field: 'portfolio.name',
-        headerName: 'Portfolio',
-        width: 200,
-        hide: props.hidePortfolio,
-        cellRenderer: (params) =>
-          PortfolioLinkCellRenderer({ ...params, data: params.data.portfolio }),
-      },
-      {
-        field: 'start',
-        width: 125,
-        valueGetter: (params) =>
-          params.data.start &&
-          dayjs(params.data.start).format('MMM D, YYYY'),
-      },
-      {
-        field: 'end',
-        width: 125,
-        valueGetter: (params) =>
-          params.data.end && dayjs(params.data.end).format('MMM D, YYYY'),
-      },
-      {
-        field: 'strategicInitiativeSponsors',
-        headerName: 'Sponsors',
-        valueGetter: (params) =>
-          getSortedNames(params.data.strategicInitiativeSponsors),
-      },
-      {
-        field: 'strategicInitiativeOwners',
-        headerName: 'Owners',
-        valueGetter: (params) =>
-          getSortedNames(params.data.strategicInitiativeOwners),
-      },
-    ],
-    [props.hidePortfolio],
-  )
+  const columnDefs = useMemo<ColDef<StrategicInitiativeListDto>[]>(() => [
+    { field: 'key', width: 90 },
+    {
+      field: 'name',
+      cellRenderer: StrategicInitiativeLinkCellRenderer,
+      width: 300,
+    },
+    {
+      field: 'status.name',
+      headerName: 'Status',
+      width: 125,
+      cellRenderer: LifecycleStatusTagCellRenderer,
+    },
+    {
+      field: 'portfolio.name',
+      headerName: 'Portfolio',
+      width: 200,
+      hide: props.hidePortfolio,
+      cellRenderer: (params) =>
+        PortfolioLinkCellRenderer({ ...params, data: params.data.portfolio }),
+    },
+    {
+      field: 'start',
+      width: 125,
+      valueGetter: (params) =>
+        params.data.start && dayjs(params.data.start).format('MMM D, YYYY'),
+    },
+    {
+      field: 'end',
+      width: 125,
+      valueGetter: (params) =>
+        params.data.end && dayjs(params.data.end).format('MMM D, YYYY'),
+    },
+    {
+      field: 'strategicInitiativeSponsors',
+      headerName: 'Sponsors',
+      valueGetter: (params) =>
+        getSortedNames(params.data.strategicInitiativeSponsors),
+    },
+    {
+      field: 'strategicInitiativeOwners',
+      headerName: 'Owners',
+      valueGetter: (params) =>
+        getSortedNames(params.data.strategicInitiativeOwners),
+    },
+  ], [props.hidePortfolio])
 
-  const refresh = useCallback(async () => {
+  const refresh = async () => {
     refetch()
-  }, [refetch])
+  }
 
   return (
     <ModaGrid
