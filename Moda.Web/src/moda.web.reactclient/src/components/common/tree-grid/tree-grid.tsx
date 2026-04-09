@@ -261,14 +261,14 @@ function TreeGridInner<T extends TreeNode>(
 
       return newDraft.id
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       canCreateDraft,
       draftPrefix,
       onDraftsChange,
       setSelectedRowId,
       setSelectedCellId,
-    ], // tableRef is stable
+      tableRef,
+    ],
   )
 
   const addDraftAtRoot = useCallback(() => addDraft(), [addDraft])
@@ -404,6 +404,7 @@ function TreeGridInner<T extends TreeNode>(
     [data, draftTasks.length],
   )
 
+  // eslint-disable-next-line react-hooks/incompatible-library -- TanStack Table does not yet support React Compiler
   const table = useReactTable({
     data: dataWithDrafts,
     columns,
@@ -441,6 +442,7 @@ function TreeGridInner<T extends TreeNode>(
     initialState: { expanded: true },
   })
 
+  // eslint-disable-next-line react-compiler/react-compiler -- table is from useReactTable (incompatible library)
   tableRef.current = table
 
   const displayedRowCount = table.getRowModel().rows.length

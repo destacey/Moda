@@ -80,8 +80,7 @@ const TeamMembershipsGrid = ({
 
   const refresh = useCallback(async () => {
     refetch()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [refetch])
 
   const onEditTeamMembershipMenuClicked = useCallback(
     (membership: TeamMembershipDto) => {

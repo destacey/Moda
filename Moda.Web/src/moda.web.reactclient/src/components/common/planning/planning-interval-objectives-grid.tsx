@@ -146,8 +146,7 @@ const PlanningIntervalObjectivesGrid = ({
 
   const refresh = useCallback(async () => {
     refreshObjectives()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [refreshObjectives])
 
   const columnDefs = useMemo<ColDef<PlanningIntervalObjectiveListDto>[]>(
     () => [

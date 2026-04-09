@@ -53,6 +53,10 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
   const isInitializedRef = useRef(false)
   const dynamicOptionsRef = useRef<TimelineOptions>({})
   const prevWindowBoundsRef = useRef<{ start: Date; end: Date } | null>(null)
+  const propsDataRef = useRef(props.data)
+  propsDataRef.current = props.data
+  const propsGroupsRef = useRef(props.groups)
+  propsGroupsRef.current = props.groups
 
   const { currentThemeName, token } = useTheme()
 
@@ -322,8 +326,12 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
 
     setIsTimelineLoading(true)
 
+    // Read current data/groups from refs to avoid depending on the full arrays
+    const data = propsDataRef.current
+    const groups = propsGroupsRef.current
+
     const datasetItems = new DataSet([] as TItem[])
-    props.data.forEach((item) => {
+    data.forEach((item) => {
       const backgroundColor = item.itemColor ?? colors.item.background
       const newItem: TItem = {
         ...item,
@@ -341,8 +349,8 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
 
     datasetItemsRef.current = datasetItems
 
-    if (props.groups?.length && props.groups.length > 0) {
-      const datasetGroups = new DataSet(props.groups)
+    if (groups?.length && groups.length > 0) {
+      const datasetGroups = new DataSet(groups)
       datasetGroupsRef.current = datasetGroups
       timelineInstanceRef.current = new Timeline(
         timelineRef.current,
@@ -380,13 +388,11 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
     setTimeout(() => {
       setIsTimelineLoading(false)
     }, 800)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     props.isLoading,
     props.data.length, // Reinit when item count changes
     props.groups?.length, // Reinit when group count changes
     reinitTrigger, // Reinit when explicitly triggered (e.g., groups removed)
-    // Intentionally NOT including props.data or props.groups to avoid reinit on content changes
     colors.item.background,
     colors.background.background,
   ])

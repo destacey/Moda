@@ -67,13 +67,34 @@ const TeamObjectivesListCard = ({
 }: TeamObjectivesListCardProps) => {
   const [openCreateObjectiveForm, setOpenCreateObjectiveForm] =
     useState<boolean>(false)
-  const [objectives, setObjectives] = useState<
-    PlanningIntervalObjectiveListDto[]
-  >([])
+  const sortedObjectivesData = useMemo(
+    () => (objectivesData ? sortOrderedObjectives(objectivesData) : []),
+    [objectivesData],
+  )
 
   const messageApi = useMessage()
 
   const { badgeColor } = useTheme()
+
+  const [updateObjectivesOrder, { error: updateObjectivesOrderError }] =
+    useUpdateObjectivesOrderMutation()
+
+  const [localOverride, setLocalOverride] = useState<{
+    data: PlanningIntervalObjectiveListDto[]
+    source: PlanningIntervalObjectiveListDto[]
+  } | null>(null)
+
+  // Use derived state: discard local override if source data changed or error occurred
+  const objectives =
+    localOverride &&
+    localOverride.source === objectivesData &&
+    !updateObjectivesOrderError
+      ? localOverride.data
+      : sortedObjectivesData
+
+  const setObjectives = (value: PlanningIntervalObjectiveListDto[]) => {
+    setLocalOverride({ data: value, source: objectivesData })
+  }
 
   const canCreateObjectives =
     newObjectivesAllowed && planningIntervalId && canManageObjectives
@@ -86,19 +107,8 @@ const TeamObjectivesListCard = ({
     }),
   )
 
-  const [updateObjectivesOrder, { error: updateObjectivesOrderError }] =
-    useUpdateObjectivesOrderMutation()
-
-  useEffect(() => {
-    if (!objectivesData) return
-
-    setObjectives(sortOrderedObjectives(objectivesData))
-  }, [objectivesData])
-
   useEffect(() => {
     if (!updateObjectivesOrderError) return
-
-    setObjectives(sortOrderedObjectives(objectivesData))
 
     // TODO: show error message not working
     messageApi.error('Error updating objectives order.  Resetting order...')
@@ -107,14 +117,13 @@ const TeamObjectivesListCard = ({
       'Error updating objectives order:',
       updateObjectivesOrderError,
     )
-  }, [messageApi, objectivesData, updateObjectivesOrderError])
+  }, [messageApi, updateObjectivesOrderError])
 
   const refresh = useCallback(() => {
     refreshObjectives()
     // this will update the PI predictability on the plan review page title
     refreshPlanningInterval()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [refreshObjectives, refreshPlanningInterval])
 
   const cardTitle = useMemo(() => {
     const count = objectives.length ?? 0

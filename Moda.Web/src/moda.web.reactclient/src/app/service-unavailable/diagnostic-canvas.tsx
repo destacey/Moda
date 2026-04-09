@@ -1,4 +1,6 @@
 'use client'
+'use no memo'
+/* eslint-disable react-hooks/exhaustive-deps, react-hooks/refs, react-compiler/react-compiler */
 
 import { useEffect, useRef, useState } from 'react'
 import styles from './diagnostic-canvas.module.css'
@@ -261,7 +263,6 @@ export default function DiagnosticCanvas({ onClose }: DiagnosticCanvasProps) {
       window.removeEventListener('keydown', handleKey)
       clearTimeout(currentDiagnostic.loop)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onClose])
 
   const g = diagnosticRef.current

@@ -28,6 +28,11 @@ const eslintConfig = [
     rules: { 'react-compiler/react-compiler': 'warn' },
   },
   {
+    // incompatible with React Compiler (reads refs during render)
+    files: ['src/app/service-unavailable/diagnostic-canvas.tsx'],
+    linterOptions: { reportUnusedDisableDirectives: 'off' },
+  },
+  {
     ignores: ['coverage/**', 'src/services/moda-api.ts'],
   },
 ]
