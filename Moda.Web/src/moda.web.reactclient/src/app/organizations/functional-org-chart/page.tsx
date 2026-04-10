@@ -46,9 +46,13 @@ function transformOrganizationToGraph(
 
   const nodes: OrganizationChartNodeData<OrganizationalUnitWithoutId>[] = []
   const edges: OrganizationChartEdgeData[] = []
+  const visitedNodeIds = new Set<string>()
+  const edgeKeys = new Set<string>()
 
   function processUnit(unit: OrganizationalUnitDto) {
     if (!unit.id) return
+    if (visitedNodeIds.has(unit.id)) return
+    visitedNodeIds.add(unit.id)
 
     const nodeData: OrganizationChartNodeData<OrganizationalUnitWithoutId> = {
       id: unit.id,
@@ -66,10 +70,18 @@ function transformOrganizationToGraph(
     if (unit.children && unit.children.length > 0) {
       unit.children.forEach((child) => {
         if (child.id) {
+          if (child.id === unit.id) return
+
+          const edgeKey = `${unit.id}->${child.id}`
+          if (edgeKeys.has(edgeKey)) return
+          edgeKeys.add(edgeKey)
+
           const edge: OrganizationChartEdgeData = {
             id: `${unit.id}-${child.id}`,
             source: unit.id!,
             target: child.id,
+            sourcePort: '1',
+            targetPort: '0',
           }
           edges.push(edge)
           processUnit(child)

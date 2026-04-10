@@ -9,10 +9,13 @@ import ModaEmpty from '../moda-empty'
 
 interface CustomTransformOption {
   type: string
+  key?: string
   enable?: boolean
-  iconOffsetY?: number
+  iconPlacement?: 'bottom' | 'right'
+  refreshLayout?: boolean
   [key: string]: any
 }
+type TransformOption = CustomTransformOption | string
 
 export interface ModaOrganizationChartProps<T = any> {
   data: OrganizationChartGraphData<T>
@@ -39,6 +42,10 @@ const ModaOrganizationChart: FC<ModaOrganizationChartProps> = ({
           <NodeComponent data={nodeData.data} themeToken={token} />
         ),
         size: nodeSize,
+        ports: [
+          { key: '0', placement: [0.5, 0] },
+          { key: '1', placement: [0.5, 1] },
+        ],
       },
     },
     onReady: (graph) => {
@@ -48,40 +55,30 @@ const ModaOrganizationChart: FC<ModaOrganizationChartProps> = ({
       chartInstanceRef.current = null
     },
     edge: {
+      type: 'cubic-vertical',
       style: {
         radius: 0,
-        lineWidth: 2,
+        lineWidth: 1.5,
         endArrow: true,
         startArrow: false,
         stroke: '#91d5ff',
+        sourcePort: '1',
+        targetPort: '0',
       },
     },
     layout: {
-      type: 'antv-dagre',
+      type: 'dagre',
       nodesep: 24,
-      ranksep: 0,
+      ranksep: 48,
       rankdir: 'TB',
-      controlPoints: true,
+      controlPoints: false,
     },
-    transforms: (transforms: CustomTransformOption[]) => {
-      const filteredTransforms = transforms.filter(
-        (transform) => transform.type !== 'collapse-expand-react-node',
-      )
-
-      const collapseExpandTransform = transforms.find(
-        (transform) => transform.type === 'collapse-expand-react-node',
-      )
-
-      return [
-        ...filteredTransforms,
-        {
-          ...(collapseExpandTransform || {}),
-          type: 'collapse-expand-react-node',
-          enable: true,
-          iconOffsetY: 24,
-        },
-      ]
-    },
+    transforms: (transforms: TransformOption[]) =>
+      transforms.filter(
+        (transform) =>
+          typeof transform === 'string' ||
+          transform.type !== 'collapse-expand-react-node',
+      ),
   }
 
   if (!data || !data.nodes || data.nodes.length === 0) {
