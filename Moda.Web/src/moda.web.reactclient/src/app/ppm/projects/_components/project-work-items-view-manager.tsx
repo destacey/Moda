@@ -2,7 +2,7 @@
 
 import { ClusterOutlined, MenuOutlined } from '@ant-design/icons'
 import Segmented, { SegmentedLabeledOption } from 'antd/es/segmented'
-import { memo, useMemo, useState } from 'react'
+import { memo, useState } from 'react'
 import { WorkItemListDto } from '@/src/services/moda-api'
 import ProjectWorkItemsTreeGrid from './project-work-items-tree-grid'
 import WorkItemsGrid from '@/src/components/common/work/work-items-grid'
@@ -36,16 +36,13 @@ const ProjectWorkItemsViewManager = (
     props.defaultView ?? 'Tree',
   )
 
-  const viewSelector = useMemo(
-    () => (
+  const viewSelector = (
       <Segmented
         options={viewSelectorOptions}
         value={currentView}
         onChange={setCurrentView}
       />
-    ),
-    [currentView],
-  )
+    )
 
   return (
     <>

@@ -2,7 +2,7 @@
 
 import PageTitle from '@/src/components/common/page-title'
 import ModaGrid from '../../../../components/common/moda-grid'
-import { useCallback, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { authorizePage } from '../../../../components/hoc'
 import useAuth from '../../../../components/contexts/auth'
 import { ItemType } from 'antd/es/menu/interface'
@@ -36,22 +36,22 @@ const FeatureFlagsListPage = () => {
 
   const { handleToggle, handleArchive } = useFeatureFlagActions()
 
-  const refresh = useCallback(() => {
+  const refresh = () => {
     refetch()
-  }, [refetch])
+  }
 
-  const openDetailsDrawer = useCallback((id: number) => {
-    setViewingFlagId(id)
-    setDrawerOpen(true)
-  }, [])
-
-  const closeDetailsDrawer = useCallback(() => {
+  const closeDetailsDrawer = () => {
     setDrawerOpen(false)
     setViewingFlagId(null)
-  }, [])
+  }
 
-  const columnDefs = useMemo<ColDef<FeatureFlagListDto>[]>(
-    () => [
+  const columnDefs = useMemo<ColDef<FeatureFlagListDto>[]>(() => {
+    const openDetailsDrawer = (id: number) => {
+      setViewingFlagId(id)
+      setDrawerOpen(true)
+    }
+
+    return [
       {
         width: 50,
         filter: false,
@@ -124,20 +124,9 @@ const FeatureFlagsListPage = () => {
         width: 120,
         hide: !includeArchived,
       },
-    ],
-    [
-      canUpdate,
-      canDelete,
-      showRowActions,
-      openDetailsDrawer,
-      handleToggle,
-      handleArchive,
-      includeArchived,
-    ],
-  )
+    ]}, [showRowActions, canUpdate, canDelete, includeArchived, handleToggle, handleArchive])
 
-  const controlItems = useMemo<ItemType[]>(
-    () => [
+  const controlItems: ItemType[] = [
       {
         label: (
           <ControlItemSwitch
@@ -149,9 +138,7 @@ const FeatureFlagsListPage = () => {
         key: 'include-archived',
         onClick: () => setIncludeArchived((prev) => !prev),
       },
-    ],
-    [includeArchived],
-  )
+    ]
 
   return (
     <>

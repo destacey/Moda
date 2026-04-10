@@ -1,7 +1,7 @@
 'use client'
 
 import { Form, Input, Modal, Switch } from 'antd'
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 import { UpdatePlanningIntervalRequest } from '@/src/services/moda-api'
 import { toFormErrors } from '@/src/utils'
 import { MarkdownEditor } from '@/src/components/common/markdown'
@@ -50,35 +50,32 @@ const EditPlanningIntervalForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<EditPlanningIntervalFormValues>({
-      onSubmit: useCallback(
-        async (values: EditPlanningIntervalFormValues, form) => {
-          try {
-            const request = mapToRequestValues(values)
-            const response = await updatePlanningInterval({
-              request,
-              cacheKey: planningIntervalKey,
-            })
-            if (response.error) {
-              throw response.error
-            }
-            messageApi.success('Planning interval updated successfully.')
-            return true
-          } catch (error) {
-            if (error.status === 422 && error.errors) {
-              const formErrors = toFormErrors(error.errors)
-              form.setFields(formErrors)
-              messageApi.error('Correct the validation error(s) to continue.')
-            } else {
-              messageApi.error(
-                'An error occurred while updating the planning interval.',
-              )
-              console.error(error)
-            }
-            return false
+      onSubmit: async (values: EditPlanningIntervalFormValues, form) => {
+        try {
+          const request = mapToRequestValues(values)
+          const response = await updatePlanningInterval({
+            request,
+            cacheKey: planningIntervalKey,
+          })
+          if (response.error) {
+            throw response.error
           }
-        },
-        [updatePlanningInterval, planningIntervalKey, messageApi],
-      ),
+          messageApi.success('Planning interval updated successfully.')
+          return true
+        } catch (error) {
+          if (error.status === 422 && error.errors) {
+            const formErrors = toFormErrors(error.errors)
+            form.setFields(formErrors)
+            messageApi.error('Correct the validation error(s) to continue.')
+          } else {
+            messageApi.error(
+              'An error occurred while updating the planning interval.',
+            )
+            console.error(error)
+          }
+          return false
+        }
+      },
       onComplete: onFormUpdate,
       onCancel: onFormCancel,
       errorMessage:

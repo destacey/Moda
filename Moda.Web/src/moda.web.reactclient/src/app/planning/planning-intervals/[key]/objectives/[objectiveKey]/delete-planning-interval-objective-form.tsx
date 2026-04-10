@@ -3,7 +3,6 @@ import { useConfirmModal } from '@/src/hooks'
 import { PlanningIntervalObjectiveDetailsDto } from '@/src/services/moda-api'
 import { useDeletePlanningIntervalObjectiveMutation } from '@/src/store/features/planning/planning-interval-api'
 import { Modal } from 'antd'
-import { useCallback } from 'react'
 
 export interface DeletePlanningIntervalObjectiveFormProps {
   objective: PlanningIntervalObjectiveDetailsDto
@@ -21,7 +20,7 @@ const DeletePlanningIntervalObjectiveForm = ({
   const [deleteObjective] = useDeletePlanningIntervalObjectiveMutation()
 
   const { isOpen, isSaving, handleOk, handleCancel } = useConfirmModal({
-    onSubmit: useCallback(async () => {
+    onSubmit: async () => {
       try {
         const response = await deleteObjective({
           planningIntervalId: objective.planningInterval.id,
@@ -43,7 +42,7 @@ const DeletePlanningIntervalObjectiveForm = ({
         console.error(error)
         return false
       }
-    }, [deleteObjective, objective, messageApi]),
+    },
     onComplete: onFormSave,
     onCancel: onFormCancel,
     errorMessage:

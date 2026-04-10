@@ -1,6 +1,5 @@
 import { TeamMembershipDto } from '@/src/services/moda-api'
 import { TeamTypeName } from '../types'
-import { useCallback } from 'react'
 import { Descriptions, Modal } from 'antd'
 import dayjs from 'dayjs'
 import { useDeleteTeamMembershipMutation } from '@/src/store/features/organizations/team-api'
@@ -39,7 +38,7 @@ const DeleteTeamMembershipForm = ({
   const [deleteTeamMembershipMutation] = useDeleteTeamMembershipMutation()
 
   const { isOpen, isSaving, handleOk, handleCancel } = useConfirmModal({
-    onSubmit: useCallback(async () => {
+    onSubmit: async () => {
       try {
         const request = mapToRequestValues(membership, teamType)
         await deleteTeamMembershipMutation(request).unwrap()
@@ -52,7 +51,7 @@ const DeleteTeamMembershipForm = ({
         console.log(error)
         return false
       }
-    }, [deleteTeamMembershipMutation, membership, teamType, messageApi]),
+    },
     onComplete: onFormSave,
     onCancel: onFormCancel,
     errorMessage:

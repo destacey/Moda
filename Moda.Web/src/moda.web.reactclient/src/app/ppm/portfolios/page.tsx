@@ -7,7 +7,7 @@ import { useGetPortfoliosQuery } from '@/src/store/features/ppm/portfolios-api'
 import { AppstoreOutlined, MenuOutlined } from '@ant-design/icons'
 import { Button } from 'antd'
 import Segmented, { SegmentedLabeledOption } from 'antd/es/segmented'
-import { FC, useEffect, useMemo, useState } from 'react'
+import { FC, useEffect, useState } from 'react'
 import {
   CreatePortfolioForm,
   PortfoliosCardGrid,
@@ -59,29 +59,23 @@ const PortfoliosPage: FC = () => {
     }
   }, [error, messageApi])
 
-  const viewSelector = useMemo(
-    () => (
-      <Segmented
-        options={viewSelectorOptions}
-        value={currentView}
-        onChange={setCurrentView}
-      />
-    ),
-    [currentView],
+  const viewSelector = (
+    <Segmented
+      options={viewSelectorOptions}
+      value={currentView}
+      onChange={setCurrentView}
+    />
   )
 
-  const actions = useMemo(() => {
-    if (!showActions) return null
-    return (
-      <>
-        {canCreatePortfolio && (
-          <Button onClick={() => setOpenCreatePortfolioForm(true)}>
-            Create Portfolio
-          </Button>
-        )}
-      </>
-    )
-  }, [canCreatePortfolio, showActions])
+  const actions = !showActions ? null : (
+    <>
+      {canCreatePortfolio && (
+        <Button onClick={() => setOpenCreatePortfolioForm(true)}>
+          Create Portfolio
+        </Button>
+      )}
+    </>
+  )
 
   const onCreatePortfolioFormClosed = (wasCreated: boolean) => {
     setOpenCreatePortfolioForm(false)

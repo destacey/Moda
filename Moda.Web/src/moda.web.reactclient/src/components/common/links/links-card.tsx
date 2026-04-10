@@ -1,7 +1,7 @@
 import { Alert, Button, Card, Flex, Spin } from 'antd'
 import useAuth from '../../contexts/auth'
 import { EditOutlined, EditTwoTone, PlusOutlined } from '@ant-design/icons'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import CreateLinkForm from './create-link-form'
 import LinkItem from './link-item'
 import ModaEmpty from '../moda-empty'
@@ -48,10 +48,7 @@ const LinksContent = ({
   canDeleteLinks,
   error,
 }: LinksContentProps) => {
-  const sortedLinks = useMemo(
-    () => [...linksData].sort((a, b) => a.name.localeCompare(b.name)),
-    [linksData],
-  )
+  const sortedLinks = [...linksData].sort((a, b) => a.name.localeCompare(b.name))
 
   if (isLoading) {
     return <Spin size="small" />

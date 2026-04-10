@@ -1,7 +1,6 @@
 'use client'
 
 import { DatePicker, Form, Input, InputNumber, Modal, Typography } from 'antd'
-import { useCallback } from 'react'
 import { CreatePlanningIntervalRequest } from '@/src/services/moda-api'
 import { toFormErrors } from '@/src/utils'
 import { MarkdownEditor } from '@/src/components/common/markdown'
@@ -50,32 +49,29 @@ const CreatePlanningIntervalForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<CreatePlanningIntervalFormValues>({
-      onSubmit: useCallback(
-        async (values: CreatePlanningIntervalFormValues, form) => {
-          try {
-            const request = mapToRequestValues(values)
-            const response = await createPlanningInterval(request)
-            if (response.error) {
-              throw response.error
-            }
-            messageApi.success('Successfully created planning interval.')
-            return true
-          } catch (error) {
-            if (error.status === 422 && error.errors) {
-              const formErrors = toFormErrors(error.errors)
-              form.setFields(formErrors)
-              messageApi.error('Correct the validation error(s) to continue.')
-            } else {
-              messageApi.error(
-                'An error occurred while creating the planning interval. Please try again.',
-              )
-              console.error(error)
-            }
-            return false
+      onSubmit: async (values: CreatePlanningIntervalFormValues, form) => {
+        try {
+          const request = mapToRequestValues(values)
+          const response = await createPlanningInterval(request)
+          if (response.error) {
+            throw response.error
           }
-        },
-        [createPlanningInterval, messageApi],
-      ),
+          messageApi.success('Successfully created planning interval.')
+          return true
+        } catch (error) {
+          if (error.status === 422 && error.errors) {
+            const formErrors = toFormErrors(error.errors)
+            form.setFields(formErrors)
+            messageApi.error('Correct the validation error(s) to continue.')
+          } else {
+            messageApi.error(
+              'An error occurred while creating the planning interval. Please try again.',
+            )
+            console.error(error)
+          }
+          return false
+        }
+      },
       onComplete: onFormCreate,
       onCancel: onFormCancel,
       errorMessage:

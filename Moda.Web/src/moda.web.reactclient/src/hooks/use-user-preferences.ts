@@ -1,6 +1,5 @@
 'use client'
 
-import { useCallback } from 'react'
 import { UserPreferencesDto } from '@/src/services/moda-api'
 import {
   useGetUserPreferencesQuery,
@@ -15,13 +14,10 @@ export const useUserPreferences = () => {
 
   const current = preferences ?? DEFAULT_PREFERENCES
 
-  const setPreferences = useCallback(
-    (updater: (prev: UserPreferencesDto) => UserPreferencesDto) => {
-      const updated = updater(current)
-      updatePreferences(updated)
-    },
-    [current, updatePreferences],
-  )
+  const setPreferences = (updater: (prev: UserPreferencesDto) => UserPreferencesDto) => {
+    const updated = updater(current)
+    updatePreferences(updated)
+  }
 
   return { preferences: current, isLoading, setPreferences }
 }
@@ -31,19 +27,19 @@ export const useTourCompleted = (tourKey: string) => {
 
   const isCompleted = preferences.tours[tourKey] ?? false
 
-  const markCompleted = useCallback(() => {
+  const markCompleted = () => {
     setPreferences((prev) => ({
       ...prev,
       tours: { ...prev.tours, [tourKey]: true },
     }))
-  }, [tourKey, setPreferences])
+  }
 
-  const resetTour = useCallback(() => {
+  const resetTour = () => {
     setPreferences((prev) => ({
       ...prev,
       tours: { ...prev.tours, [tourKey]: false },
     }))
-  }, [tourKey, setPreferences])
+  }
 
   return { isCompleted, isLoading, markCompleted, resetTour }
 }

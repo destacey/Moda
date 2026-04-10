@@ -5,7 +5,6 @@ import { useConfirmModal } from '@/src/hooks'
 import { StrategicThemeDetailsDto } from '@/src/services/moda-api'
 import { useDeleteStrategicThemeMutation } from '@/src/store/features/strategic-management/strategic-themes-api'
 import { Modal } from 'antd'
-import { useCallback } from 'react'
 
 export interface DeleteStrategicThemeFormProps {
   strategicTheme: StrategicThemeDetailsDto
@@ -23,7 +22,7 @@ const DeleteStrategicThemeForm = ({
   const [deleteStrategicThemeMutation] = useDeleteStrategicThemeMutation()
 
   const { isOpen, isSaving, handleOk, handleCancel } = useConfirmModal({
-    onSubmit: useCallback(async () => {
+    onSubmit: async () => {
       try {
         const response = await deleteStrategicThemeMutation({
           strategicThemeId: strategicTheme.id,
@@ -42,7 +41,7 @@ const DeleteStrategicThemeForm = ({
         console.error(error)
         return false
       }
-    }, [deleteStrategicThemeMutation, strategicTheme, messageApi]),
+    },
     onComplete: onFormComplete,
     onCancel: onFormCancel,
     errorMessage:

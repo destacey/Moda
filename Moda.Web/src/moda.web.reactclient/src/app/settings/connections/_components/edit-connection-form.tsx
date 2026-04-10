@@ -14,7 +14,7 @@ import {
 } from '@/src/store/features/app-integration/connections-api'
 import { toFormErrors } from '@/src/utils'
 import { Button, Divider, Form, Input, Modal, Typography } from 'antd'
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useModalForm } from '@/src/hooks'
 
 const { Item } = Form
@@ -70,24 +70,20 @@ const EditConnectionForm = ({
   const [testConfig] =
     useTestAzdoConfigurationMutation()
 
-  const testConnectionConfiguration = useCallback(
-    async (configuration: TestAzureDevOpsConnectionRequest) => {
-      const response = await testConfig(configuration)
-      console.log('response', response)
-      if (response.error) {
-        setTestConfigurationResult('Failed to test configuration.')
-      } else {
-        setTestConfigurationResult('Successfully tested configuration.')
-      }
-      setTestingConfiguration(false)
-    },
-    [testConfig],
-  )
+  const testConnectionConfiguration = async (configuration: TestAzureDevOpsConnectionRequest) => {
+    const response = await testConfig(configuration)
+    console.log('response', response)
+    if (response.error) {
+      setTestConfigurationResult('Failed to test configuration.')
+    } else {
+      setTestConfigurationResult('Successfully tested configuration.')
+    }
+    setTestingConfiguration(false)
+  }
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<EditConnectionFormValues>({
-      onSubmit: useCallback(
-        async (values: EditConnectionFormValues, form) => {
+      onSubmit: async (values: EditConnectionFormValues, form) => {
           try {
             const request = mapToRequestValues(values)
             const response = await updateConnection(request)
@@ -106,8 +102,6 @@ const EditConnectionForm = ({
             return false
           }
         },
-        [updateConnection, messageApi],
-      ),
       onComplete: onFormUpdate,
       onCancel: onFormCancel,
       errorMessage: 'An error occurred while editing the connection.',

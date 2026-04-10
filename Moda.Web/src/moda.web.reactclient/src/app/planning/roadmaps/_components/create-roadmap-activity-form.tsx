@@ -9,7 +9,7 @@ import {
 } from '@/src/store/features/planning/roadmaps-api'
 import { toFormErrors } from '@/src/utils'
 import { DatePicker, Form, Input, Modal, TreeSelect } from 'antd'
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 
 const { Item } = Form
 const { TextArea } = Input
@@ -61,8 +61,7 @@ const CreateRoadmapActivityForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<CreateRoadmapActivityFormValues>({
-      onSubmit: useCallback(
-        async (values: CreateRoadmapActivityFormValues, form) => {
+      onSubmit: async (values: CreateRoadmapActivityFormValues, form) => {
           try {
             const request = mapToRequestValues(values, roadmapId)
             const response = await createRoadmapActivity(request)
@@ -84,8 +83,6 @@ const CreateRoadmapActivityForm = ({
             return false
           }
         },
-        [createRoadmapActivity, roadmapId, messageApi],
-      ),
       onComplete: onFormComplete,
       onCancel: onFormCancel,
       errorMessage:

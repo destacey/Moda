@@ -12,9 +12,7 @@ import { notFound, usePathname, useRouter } from 'next/navigation'
 import {
   ReactNode,
   use,
-  useCallback,
   useEffect,
-  useMemo,
   useState,
 } from 'react'
 import PlanningIntervalIterationDetailsLoading from './loading'
@@ -89,28 +87,22 @@ const PlanningIntervalIterationDetailsPage = (props: {
     },
   )
 
-  const handleIterationChange = useCallback(
-    (value: string | number) => {
-      router.push(`/planning/planning-intervals/${piKey}/iterations/${value}`)
-    },
-    [router, piKey],
-  )
+  const handleIterationChange = (value: string | number) => {
+    router.push(`/planning/planning-intervals/${piKey}/iterations/${value}`)
+  }
 
-  const iterationItems = useMemo(() => {
-    if (!piIterationsData) return []
+  const iterationItems = !piIterationsData
+    ? []
+    : [...piIterationsData]
+        .sort((a, b) => new Date(b.start).getTime() - new Date(a.start).getTime())
+        .map((option) => ({
+          label: option.name,
+          value: option.key,
+        }))
 
-    return [...piIterationsData]
-      .sort((a, b) => new Date(b.start).getTime() - new Date(a.start).getTime())
-      .map((option) => ({
-        label: option.name,
-        value: option.key,
-      }))
-  }, [piIterationsData])
-
-  const switchIterations = useMemo(() => {
-    if (!iterationItems.length) return null
-
-    return (
+  const switchIterations = !iterationItems.length
+    ? null
+    : (
       <IconMenu
         icon={<SwapOutlined />}
         tooltip="Switch to another PI iteration"
@@ -119,20 +111,16 @@ const PlanningIntervalIterationDetailsPage = (props: {
         onChange={handleIterationChange}
       />
     )
-  }, [iterationItems, piIterationKey, handleIterationChange])
 
-  const onTabChange = useCallback(
-    (tabKey: string) => {
-      setActiveTab(tabKey as IterationTabs)
+  const onTabChange = (tabKey: string) => {
+    setActiveTab(tabKey as IterationTabs)
 
-      if (tabKey === IterationTabs.Backlog && !backlogQueryEnabled) {
-        setBacklogQueryEnabled(true)
-      }
-    },
-    [backlogQueryEnabled],
-  )
+    if (tabKey === IterationTabs.Backlog && !backlogQueryEnabled) {
+      setBacklogQueryEnabled(true)
+    }
+  }
 
-  const renderTabContent = useCallback(() => {
+  const renderTabContent = () => {
     switch (activeTab) {
       case IterationTabs.Summary:
         return (
@@ -153,7 +141,7 @@ const PlanningIntervalIterationDetailsPage = (props: {
       default:
         return null
     }
-  }, [activeTab, iterationData, backlogData, backlogIsLoading, refetchBacklog])
+  }
 
   useEffect(() => {
     if (!iterationData) return

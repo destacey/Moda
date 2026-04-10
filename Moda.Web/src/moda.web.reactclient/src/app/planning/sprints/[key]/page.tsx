@@ -13,9 +13,7 @@ import { notFound, usePathname, useRouter } from 'next/navigation'
 import {
   ReactNode,
   use,
-  useCallback,
   useEffect,
-  useMemo,
   useState,
 } from 'react'
 import SprintDetailsLoading from './loading'
@@ -73,38 +71,29 @@ const SprintDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     dispatch(setBreadcrumbTitle({ title: sprintKey.toString(), pathname }))
   }, [dispatch, pathname, sprintData, sprintKey])
 
-  const handleSprintChange = useCallback(
-    (value: string | number) => {
-      router.push(`/planning/sprints/${value}`)
-    },
-    [router],
+  const handleSprintChange = (value: string | number) => {
+    router.push(`/planning/sprints/${value}`)
+  }
+
+  const sprintsItems = !teamSprints
+    ? []
+    : [...teamSprints]
+        .sort((a, b) => new Date(b.start).getTime() - new Date(a.start).getTime())
+        .map((option) => ({
+          label: option.name,
+          extra: option.state.name,
+          value: option.key,
+        }))
+
+  const switchSprints = !sprintsItems.length ? null : (
+    <IconMenu
+      icon={<SwapOutlined />}
+      tooltip="Switch to another team sprint"
+      items={sprintsItems}
+      selectedKeys={[sprintKey.toString()]}
+      onChange={handleSprintChange}
+    />
   )
-
-  const sprintsItems = useMemo(() => {
-    if (!teamSprints) return []
-
-    return [...teamSprints]
-      .sort((a, b) => new Date(b.start).getTime() - new Date(a.start).getTime())
-      .map((option) => ({
-        label: option.name,
-        extra: option.state.name,
-        value: option.key,
-      }))
-  }, [teamSprints])
-
-  const switchSprints = useMemo(() => {
-    if (!sprintsItems.length) return null
-
-    return (
-      <IconMenu
-        icon={<SwapOutlined />}
-        tooltip="Switch to another team sprint"
-        items={sprintsItems}
-        selectedKeys={[sprintKey.toString()]}
-        onChange={handleSprintChange}
-      />
-    )
-  }, [sprintsItems, sprintKey, handleSprintChange])
 
   if (isLoading) {
     return <SprintDetailsLoading />

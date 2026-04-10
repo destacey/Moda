@@ -1,4 +1,3 @@
-import { useMemo } from 'react'
 import { Col, Row, Space, Typography } from 'antd'
 import PlanningIntervalCard from './planning-interval-card'
 import dayjs from 'dayjs'
@@ -17,18 +16,15 @@ const isWithinTwoWeeks = (date: Date) => {
 const ActivePlanningIntervals = () => {
   const { data: piData } = useGetPlanningIntervalsQuery()
 
-  const activePlanningIntervals = useMemo(() => {
-    return (
-      piData
-        ?.filter(
-          (pi) =>
-            (pi.state.id as IterationState) === IterationState.Active ||
-            ((pi.state.id as IterationState) === IterationState.Future &&
-              isWithinTwoWeeks(pi.start)),
-        )
-        ?.sort((a, b) => dayjs(a.start).unix() - dayjs(b.start).unix()) || []
-    )
-  }, [piData])
+  const activePlanningIntervals =
+    piData
+      ?.filter(
+        (pi) =>
+          (pi.state.id as IterationState) === IterationState.Active ||
+          ((pi.state.id as IterationState) === IterationState.Future &&
+            isWithinTwoWeeks(pi.start)),
+      )
+      ?.sort((a, b) => dayjs(a.start).unix() - dayjs(b.start).unix()) || []
 
   if (activePlanningIntervals.length === 0) {
     return <div>No active planning intervals found.</div>

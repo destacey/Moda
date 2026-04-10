@@ -10,7 +10,6 @@ import {
   useCompleteStrategicInitiativeMutation,
 } from '@/src/store/features/ppm/strategic-initiatives-api'
 import { Modal, Space } from 'antd'
-import { useCallback } from 'react'
 
 export enum StrategicInitiativeStatusAction {
   Approve = 'Approve',
@@ -78,7 +77,7 @@ const ChangeStrategicInitiativeStatusForm = ({
     useCancelStrategicInitiativeMutation()
 
   const { isOpen, isSaving, handleOk, handleCancel } = useConfirmModal({
-    onSubmit: useCallback(async () => {
+    onSubmit: async () => {
       try {
         const request = {
           id: strategicInitiative.id,
@@ -113,15 +112,7 @@ const ChangeStrategicInitiativeStatusForm = ({
         console.log(error)
         return false
       }
-    }, [
-      strategicInitiative,
-      statusAction,
-      approveStrategicInitiativeMutation,
-      activateStrategicInitiativeMutation,
-      completeStrategicInitiativeMutation,
-      cancelStrategicInitiativeMutation,
-      messageApi,
-    ]),
+    },
     onComplete: onFormComplete,
     onCancel: onFormCancel,
     errorMessage: `An unexpected error occurred while ${statusActionToPresentTense(statusAction)} the strategic initiative.`,

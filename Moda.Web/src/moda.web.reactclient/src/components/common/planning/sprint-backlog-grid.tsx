@@ -3,7 +3,7 @@
 import { ModaGrid } from '@/src/components/common'
 import { SprintBacklogItemDto } from '@/src/services/moda-api'
 import { ColDef } from 'ag-grid-community'
-import { useCallback, useMemo } from 'react'
+import { useMemo } from 'react'
 import {
   workItemKeyComparator,
   workStatusCategoryComparator,
@@ -37,71 +37,68 @@ const SprintBacklogGrid = (props: SprintBacklogGridProps) => {
     gridHeight = -1,
   } = props
 
-  const columnDefs = useMemo<ColDef<SprintBacklogItemDto>[]>(
-    () => [
-      { field: 'rank', width: 50, filter: false },
-      {
-        field: 'key',
-        comparator: workItemKeyComparator,
-        cellRenderer: WorkItemLinkCellRenderer,
-      },
-      { field: 'type', width: 125 },
-      { field: 'title', width: 400 },
-      {
-        field: 'storyPoints',
-        headerName: 'SPs',
-        headerTooltip: 'Story Points',
-        width: 80,
-      },
-      { field: 'status', width: 125, cellRenderer: WorkStatusTagCellRenderer },
-      {
-        field: 'statusCategory.name',
-        headerName: 'Status Category',
-        width: 120,
-        comparator: workStatusCategoryComparator,
-      },
-      {
-        field: 'team.name',
-        headerName: 'Team',
-        cellRenderer: NestedTeamNameLinkCellRenderer,
-        hide: hideTeamColumn,
-      },
-      {
-        field: 'sprint.name',
-        headerName: 'Sprint',
-        cellRenderer: NestedWorkSprintLinkCellRenderer,
-        cellRendererParams: { showTeamCode: false },
-        hide: hideSprintColumn,
-      },
-      {
-        field: 'parent.key',
-        headerName: 'Parent Key',
-        comparator: workItemKeyComparator,
-        cellRenderer: ParentWorkItemLinkCellRenderer,
-      },
-      {
-        field: 'parent.title',
-        headerName: 'Parent',
-        width: 400,
-      },
-      {
-        field: 'assignedTo.name',
-        headerName: 'Assigned To',
-        cellRenderer: AssignedToLinkCellRenderer,
-      },
-      {
-        field: 'project.name',
-        headerName: 'Project',
-        width: 300,
-        cellRenderer: ProjectLinkCellRenderer,
-      },
-    ],
-    [hideTeamColumn, hideSprintColumn],
-  )
+  const columnDefs = useMemo<ColDef<SprintBacklogItemDto>[]>(() => [
+    { field: 'rank', width: 50, filter: false },
+    {
+      field: 'key',
+      comparator: workItemKeyComparator,
+      cellRenderer: WorkItemLinkCellRenderer,
+    },
+    { field: 'type', width: 125 },
+    { field: 'title', width: 400 },
+    {
+      field: 'storyPoints',
+      headerName: 'SPs',
+      headerTooltip: 'Story Points',
+      width: 80,
+    },
+    { field: 'status', width: 125, cellRenderer: WorkStatusTagCellRenderer },
+    {
+      field: 'statusCategory.name',
+      headerName: 'Status Category',
+      width: 120,
+      comparator: workStatusCategoryComparator,
+    },
+    {
+      field: 'team.name',
+      headerName: 'Team',
+      cellRenderer: NestedTeamNameLinkCellRenderer,
+      hide: hideTeamColumn,
+    },
+    {
+      field: 'sprint.name',
+      headerName: 'Sprint',
+      cellRenderer: NestedWorkSprintLinkCellRenderer,
+      cellRendererParams: { showTeamCode: false },
+      hide: hideSprintColumn,
+    },
+    {
+      field: 'parent.key',
+      headerName: 'Parent Key',
+      comparator: workItemKeyComparator,
+      cellRenderer: ParentWorkItemLinkCellRenderer,
+    },
+    {
+      field: 'parent.title',
+      headerName: 'Parent',
+      width: 400,
+    },
+    {
+      field: 'assignedTo.name',
+      headerName: 'Assigned To',
+      cellRenderer: AssignedToLinkCellRenderer,
+    },
+    {
+      field: 'project.name',
+      headerName: 'Project',
+      width: 300,
+      cellRenderer: ProjectLinkCellRenderer,
+    },
+  ], [hideTeamColumn, hideSprintColumn])
 
-  const refresh = useCallback(async () => {
+  const refresh = async () => {
     refetch()
-  }, [refetch])
+  }
 
   return (
     <ModaGrid

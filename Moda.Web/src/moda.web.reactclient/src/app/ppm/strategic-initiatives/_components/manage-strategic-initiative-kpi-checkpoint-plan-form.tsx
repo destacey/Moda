@@ -28,7 +28,7 @@ import {
   Typography,
 } from 'antd'
 import dayjs from 'dayjs'
-import { useCallback, useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 
 type InputNumberRef = { focus: () => void } | null
 
@@ -98,36 +98,33 @@ const ManageStrategicInitiativeKpiCheckpointPlanForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<ManageKpiCheckpointPlanFormValues>({
-      onSubmit: useCallback(
-        async (values: ManageKpiCheckpointPlanFormValues, form) => {
-          try {
-            const request = mapToRequestValues(
-              values,
-              strategicInitiativeId,
-              kpiId,
-            )
-            const response = await manageCheckpointPlan(request)
-            if (response.error) throw response.error
+      onSubmit: async (values: ManageKpiCheckpointPlanFormValues, form) => {
+        try {
+          const request = mapToRequestValues(
+            values,
+            strategicInitiativeId,
+            kpiId,
+          )
+          const response = await manageCheckpointPlan(request)
+          if (response.error) throw response.error
 
-            messageApi.success('KPI checkpoint plan updated successfully.')
-            return true
-          } catch (error) {
-            if (error.status === 422 && error.errors) {
-              const formErrors = toFormErrors(error.errors)
-              form.setFields(formErrors)
-              messageApi.error('Correct the validation error(s) to continue.')
-            } else {
-              messageApi.error(
-                error.detail ??
-                  'An error occurred while updating the KPI checkpoint plan. Please try again.',
-              )
-              console.error(error)
-            }
-            return false
+          messageApi.success('KPI checkpoint plan updated successfully.')
+          return true
+        } catch (error) {
+          if (error.status === 422 && error.errors) {
+            const formErrors = toFormErrors(error.errors)
+            form.setFields(formErrors)
+            messageApi.error('Correct the validation error(s) to continue.')
+          } else {
+            messageApi.error(
+              error.detail ??
+                'An error occurred while updating the KPI checkpoint plan. Please try again.',
+            )
+            console.error(error)
           }
-        },
-        [manageCheckpointPlan, strategicInitiativeId, kpiId, messageApi],
-      ),
+          return false
+        }
+      },
       onComplete: onFormComplete,
       onCancel: onFormCancel,
       errorMessage:

@@ -12,7 +12,7 @@ import {
 } from '@/src/store/features/work-management/workspace-api'
 import { toFormErrors } from '@/src/utils'
 import { Form, Input, Modal } from 'antd'
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useModalForm } from '@/src/hooks'
 
 const { Item } = Form
@@ -55,8 +55,7 @@ const SetWorkspaceExternalUrlTemplatesForm = (
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<SetWorkspaceExternalUrlTemplatesFormValues>({
-      onSubmit: useCallback(
-        async (values: SetWorkspaceExternalUrlTemplatesFormValues, form) => {
+      onSubmit: async (values: SetWorkspaceExternalUrlTemplatesFormValues, form) => {
           try {
             const request = mapToRequestValues(props.workspaceId, values)
             const response =
@@ -81,31 +80,20 @@ const SetWorkspaceExternalUrlTemplatesForm = (
             return false
           }
         },
-        [
-          setWorkspaceExternalUrlTemplatesMutation,
-          props.workspaceId,
-          messageApi,
-          refetch,
-        ],
-      ),
       onComplete: props.onFormUpdate,
       onCancel: props.onFormCancel,
     })
 
-  const mapToFormValues = useCallback(
-    (workspace: WorkspaceDto) => {
+  useEffect(() => {
+    if (!workspaceData || !isOpen) return
+    const mapToFormValues = (workspace: WorkspaceDto) => {
       form.setFieldsValue({
         externalViewWorkItemUrlTemplate:
           workspace.externalViewWorkItemUrlTemplate,
       })
-    },
-    [form],
-  )
-
-  useEffect(() => {
-    if (!workspaceData || !isOpen) return
+    }
     mapToFormValues(workspaceData)
-  }, [workspaceData, isOpen, mapToFormValues])
+  }, [form, workspaceData, isOpen])
 
   return (
     <Modal

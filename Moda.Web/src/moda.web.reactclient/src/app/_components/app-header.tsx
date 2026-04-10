@@ -7,7 +7,7 @@ import {
   SearchOutlined,
   ReadOutlined,
 } from '@ant-design/icons'
-import React, { FC, useMemo, useState } from 'react'
+import React, { FC, useState } from 'react'
 import {
   Layout,
   Button,
@@ -86,13 +86,10 @@ const AppHeader: FC = React.memo(() => {
   } = useGlobalSearch()
 
   // Flatten menu for mobile
-  const mobileMenuItems = useMemo(
-    () => flattenMenuItems(menuItems),
-    [menuItems],
-  )
+  const mobileMenuItems = flattenMenuItems(menuItems)
 
   // Avoid re-renders when authentication state changes
-  const profileComponent = useMemo(() => <ProfileMenu />, [])
+  const profileComponent = <ProfileMenu />
 
   const handleMenuClick: MenuProps['onClick'] = (e) => {
     // Find the clicked item and navigate using the custom route property

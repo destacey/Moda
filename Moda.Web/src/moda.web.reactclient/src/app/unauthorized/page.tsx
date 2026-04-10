@@ -2,19 +2,18 @@
 
 import { Button, Result, Typography } from 'antd'
 import { useMsal } from '@azure/msal-react'
-import { useCallback } from 'react'
 
 const { Paragraph, Text } = Typography
 
 export default function UnauthorizedPage() {
   const { instance } = useMsal()
 
-  const handleLogout = useCallback(async () => {
+  const handleLogout = async () => {
     instance.setActiveAccount(null)
     await instance.logoutRedirect({
       postLogoutRedirectUri: `${window.location.origin}/login`,
     })
-  }, [instance])
+  }
 
   const activeAccount = instance.getActiveAccount()
   const username = activeAccount?.username ?? 'Unknown user'

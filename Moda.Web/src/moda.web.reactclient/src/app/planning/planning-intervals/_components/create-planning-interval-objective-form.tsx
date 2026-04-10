@@ -1,7 +1,7 @@
 'use client'
 
 import { DatePicker, Form, Input, Modal, Select, Switch } from 'antd'
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { CreatePlanningIntervalObjectiveRequest } from '@/src/services/moda-api'
 import { toFormErrors } from '@/src/utils'
 import dayjs from 'dayjs'
@@ -78,36 +78,33 @@ const CreatePlanningIntervalObjectiveForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<CreatePlanningIntervalObjectiveFormValues>({
-      onSubmit: useCallback(
-        async (values: CreatePlanningIntervalObjectiveFormValues, form) => {
-          try {
-            const request = mapToRequestValues(values, order)
-            const response = await createObjective({
-              request,
-              planningIntervalKey: planningIntervalData?.key,
-            })
-            if (response.error) {
-              throw response.error
-            }
-            messageApi.success('Successfully created PI objective.')
-            return true
-          } catch (error) {
-            if (error.status === 422 && error.errors) {
-              const formErrors = toFormErrors(error.errors)
-              form.setFields(formErrors)
-              messageApi.error('Correct the validation error(s) to continue.')
-            } else {
-              messageApi.error(
-                error.detail ??
-                  'An unexpected error occurred while creating the PI objective.',
-              )
-              console.error(error)
-            }
-            return false
+      onSubmit: async (values: CreatePlanningIntervalObjectiveFormValues, form) => {
+        try {
+          const request = mapToRequestValues(values, order)
+          const response = await createObjective({
+            request,
+            planningIntervalKey: planningIntervalData?.key,
+          })
+          if (response.error) {
+            throw response.error
           }
-        },
-        [createObjective, planningIntervalData?.key, order, messageApi],
-      ),
+          messageApi.success('Successfully created PI objective.')
+          return true
+        } catch (error) {
+          if (error.status === 422 && error.errors) {
+            const formErrors = toFormErrors(error.errors)
+            form.setFields(formErrors)
+            messageApi.error('Correct the validation error(s) to continue.')
+          } else {
+            messageApi.error(
+              error.detail ??
+                'An unexpected error occurred while creating the PI objective.',
+            )
+            console.error(error)
+          }
+          return false
+        }
+      },
       onComplete: onFormCreate,
       onCancel: onFormCancel,
       errorMessage:
@@ -130,25 +127,19 @@ const CreatePlanningIntervalObjectiveForm = ({
     })
   }, [teamData, statusData, planningIntervalData?.id, teamId, form])
 
-  const disabledDate: RangePickerProps['disabledDate'] = useCallback(
-    (current) => {
-      return (
-        current < dayjs(planningIntervalData?.start) ||
-        current > dayjs(planningIntervalData?.end)
-      )
-    },
-    [planningIntervalData?.start, planningIntervalData?.end],
-  )
+  const disabledDate: RangePickerProps['disabledDate'] = (current) => {
+    return (
+      current < dayjs(planningIntervalData?.start) ||
+      current > dayjs(planningIntervalData?.end)
+    )
+  }
 
-  const isDateWithinPiRange = useCallback(
-    (date: Date) => {
-      return (
-        dayjs(planningIntervalData.start) <= dayjs(date) &&
-        dayjs(date) <= dayjs(planningIntervalData.end)
-      )
-    },
-    [planningIntervalData?.start, planningIntervalData?.end],
-  )
+  const isDateWithinPiRange = (date: Date) => {
+    return (
+      dayjs(planningIntervalData.start) <= dayjs(date) &&
+      dayjs(date) <= dayjs(planningIntervalData.end)
+    )
+  }
 
   return (
     <>

@@ -1,6 +1,6 @@
 'use client'
 
-import { ReactNode, useCallback, useMemo, useState } from 'react'
+import { ReactNode, useState } from 'react'
 import { Button, Card, Divider, Flex, Space, Switch, Typography } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import {
@@ -275,7 +275,7 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
   const [updateRoadmapItemDates, { error: updateDatesError }] =
     useUpdateRoadmapItemDatesMutation()
 
-  const processedData: ProcessedRoadmapData = useMemo(() => {
+  const processedData: ProcessedRoadmapData = (() => {
     if (!props.roadmap || props.isRoadmapItemsLoading || !props.roadmapItems) {
       return null
     }
@@ -309,24 +309,16 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
     )
 
     return { items, maxLevel }
-  }, [
-    props.isRoadmapItemsLoading,
-    props.openRoadmapItemDrawer,
-    props.roadmap,
-    props.roadmapItems,
-  ])
+  })()
 
   // Compute auto-drill level synchronously to avoid race condition with groups
-  const autoLevel = useMemo(() => {
-    if (!processedData) return 1
-    return processedData.maxLevel > 1 ? 2 : 1
-  }, [processedData])
+  const autoLevel = !processedData ? 1 : processedData.maxLevel > 1 ? 2 : 1
 
   // User's choice takes precedence over auto-drill, clamped to valid range
   const maxLevel = processedData?.maxLevel ?? 0
   const currentLevel = Math.min(userSelectedLevel ?? autoLevel, Math.max(maxLevel, 1))
 
-  const processedGroups = useMemo(() => {
+  const processedGroups = (() => {
     if (!processedData || currentLevel <= 1) return undefined
 
     const potentialGroups = processedData.items.filter(
@@ -336,52 +328,41 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
     )
 
     return createNestedGroups(potentialGroups, currentLevel)
-  }, [processedData, currentLevel])
+  })()
 
-  const filteredItems = useMemo(() => {
-    return (
-      processedData?.items.filter(
-        (item) =>
-          item.treeLevel === currentLevel ||
-          (item.treeLevel < currentLevel &&
-            item.objectData.$type !== RoadmapItemType.Roadmap &&
-            item.objectData.$type !== RoadmapItemType.Activity),
-      ) ?? []
-    )
-  }, [processedData?.items, currentLevel])
+  const filteredItems =
+    processedData?.items.filter(
+      (item) =>
+        item.treeLevel === currentLevel ||
+        (item.treeLevel < currentLevel &&
+          item.objectData.$type !== RoadmapItemType.Roadmap &&
+          item.objectData.$type !== RoadmapItemType.Activity),
+    ) ?? []
 
   // Compute timeline window synchronously from props so the timeline receives values on first render
-  const timelineWindow = useMemo(() => {
-    if (!props.roadmap) {
-      const now = dayjs()
-      return { start: now.toDate(), end: now.toDate() }
-    }
+  const timelineWindow = !props.roadmap
+    ? (() => {
+        const now = dayjs()
+        return { start: now.toDate(), end: now.toDate() }
+      })()
+    : { start: props.roadmap.start, end: props.roadmap.end }
 
-    return { start: props.roadmap.start, end: props.roadmap.end }
-  }, [props.roadmap])
-
-  const timelineOptions = useMemo(
-    (): ModaTimelineOptions<RoadmapTimelineItem> =>
-      // TODO: start,end,min,max types don't allow undefined, but initial state is undefined
-      ({
-        showCurrentTime: showCurrentTime,
-        maxHeight: 650,
-        start: timelineWindow.start,
-        end: timelineWindow.end,
-        min: timelineWindow.start,
-        max: timelineWindow.end,
-      }),
-    [showCurrentTime, timelineWindow.end, timelineWindow.start],
-  )
+  const timelineOptions: ModaTimelineOptions<RoadmapTimelineItem> = {
+    // TODO: start,end,min,max types don't allow undefined, but initial state is undefined
+    showCurrentTime: showCurrentTime,
+    maxHeight: 650,
+    start: timelineWindow.start,
+    end: timelineWindow.end,
+    min: timelineWindow.start,
+    max: timelineWindow.end,
+  }
 
   const onShowCurrentTimeChange = (checked: boolean) => {
     setShowCurrentTime(checked)
   }
 
-  const controlItems = useMemo((): ItemType[] => {
-    const items: ItemType[] = []
-
-    items.push({
+  const controlItems: ItemType[] = [
+    {
       label: (
         <Space>
           <Switch
@@ -394,47 +375,42 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
       ),
       key: 'show-current-time',
       onClick: () => setShowCurrentTime(!showCurrentTime),
-    })
-
-    return items
-  }, [showCurrentTime])
+    },
+  ]
 
   const onLevelChange = (treeLevel: number) => {
     setUserSelectedLevel(treeLevel)
   }
 
-  const onMove = useCallback(
-    async (item: TimelineItem) => {
-      const originalItem = processedData?.items.find((i) => i.id === item.id)
+  const onMove = async (item: TimelineItem) => {
+    const originalItem = processedData?.items.find((i) => i.id === item.id)
 
-      if (!originalItem) return
+    if (!originalItem) return
 
-      const { objectData } = originalItem
+    const { objectData } = originalItem
 
-      try {
-        const value = mapToRequestValues(
-          item.start,
-          item.end,
-          objectData.$type,
-          originalItem.id,
-          objectData.roadmapId,
-        )
+    try {
+      const value = mapToRequestValues(
+        item.start,
+        item.end,
+        objectData.$type,
+        originalItem.id,
+        objectData.roadmapId,
+      )
 
-        const response = await updateRoadmapItemDates(value)
-        if (response.error) {
-          throw response.error
-        }
-        console.log('Update roadmap activity dates')
-      } catch (error) {
-        messageApi.error(
-          error.detail ??
-            'An error occurred while updating the roadmap activity. Please try again.',
-        )
-        console.error('Error updating roadmap activity dates', error)
+      const response = await updateRoadmapItemDates(value)
+      if (response.error) {
+        throw response.error
       }
-    },
-    [messageApi, processedData?.items, updateRoadmapItemDates],
-  )
+      console.log('Update roadmap activity dates')
+    } catch (error) {
+      messageApi.error(
+        error.detail ??
+          'An error occurred while updating the roadmap activity. Please try again.',
+      )
+      console.error('Error updating roadmap activity dates', error)
+    }
+  }
 
   return (
     <>

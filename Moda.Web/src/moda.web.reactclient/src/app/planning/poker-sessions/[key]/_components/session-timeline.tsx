@@ -5,7 +5,7 @@ import { useMessage } from '@/src/components/contexts/messaging'
 import { useAddPokerRoundMutation } from '@/src/store/features/planning/poker-sessions-api'
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons'
 import { Button, Flex, Input, Popconfirm, Tag, Typography } from 'antd'
-import { FC, useCallback, useMemo, useState } from 'react'
+import { FC, useState } from 'react'
 import styles from './poker-session.module.css'
 
 const { Text } = Typography
@@ -35,7 +35,7 @@ const SessionTimeline: FC<SessionTimelineProps> = ({
   const [addRound, { isLoading: isAdding }] = useAddPokerRoundMutation()
   const [newRoundLabel, setNewRoundLabel] = useState('')
 
-  const handleAddRound = useCallback(async () => {
+  const handleAddRound = async () => {
     const label = newRoundLabel.trim()
     if (!label) return
     try {
@@ -49,9 +49,9 @@ const SessionTimeline: FC<SessionTimelineProps> = ({
     } catch {
       messageApi.error('Failed to add round.')
     }
-  }, [addRound, sessionId, sessionKey, newRoundLabel, messageApi])
+  }
 
-  const { activeRounds, completedRounds } = useMemo(() => {
+  const { activeRounds, completedRounds } = (() => {
     const sorted = [...rounds].sort((a, b) => a.order - b.order)
     return {
       activeRounds: sorted.filter(
@@ -59,12 +59,10 @@ const SessionTimeline: FC<SessionTimelineProps> = ({
       ),
       completedRounds: sorted.filter((r) => r.status === 'Accepted'),
     }
-  }, [rounds])
+  })()
 
-  const totalParticipants = useMemo(() => {
-    // Approximate from the round with the most votes
-    return rounds.reduce((max, r) => Math.max(max, r.voteCount), 0)
-  }, [rounds])
+  // Approximate from the round with the most votes
+  const totalParticipants = rounds.reduce((max, r) => Math.max(max, r.voteCount), 0)
 
   return (
     <div>

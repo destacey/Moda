@@ -6,7 +6,7 @@ import {
   IterationHealthStatus,
 } from '@/src/utils/iteration-health'
 import { Progress } from 'antd'
-import { FC, useMemo } from 'react'
+import { FC } from 'react'
 
 export interface IterationProgressBarProps {
   /** Start date of the iteration */
@@ -50,14 +50,12 @@ const IterationProgressBar: FC<IterationProgressBarProps> = ({
 
   const completionPercent = total > 0 ? (completed / total) * 100 : 0
 
-  const healthResult = useMemo(() => {
-    return calculateIterationHealth({
-      startDate,
-      endDate,
-      total,
-      completed,
-    })
-  }, [startDate, endDate, total, completed])
+  const healthResult = calculateIterationHealth({
+    startDate,
+    endDate,
+    total,
+    completed,
+  })
 
   const getProgressBarColor = (): string => {
     switch (healthResult.status) {

@@ -1,7 +1,6 @@
 'use client'
 
 import { Form, Input, Modal, DatePicker, Alert } from 'antd'
-import { useCallback } from 'react'
 import { useMessage } from '@/src/components/contexts/messaging'
 import dayjs, { Dayjs } from 'dayjs'
 import { ExclamationCircleOutlined } from '@ant-design/icons'
@@ -31,37 +30,34 @@ const CreatePersonalAccessTokenForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<CreateTokenFormValues>({
-      onSubmit: useCallback(
-        async (values: CreateTokenFormValues, form) => {
-          try {
-            const response = await createToken({
-              name: values.name,
-              expiresAt: values.expiresAt.toDate(),
-            })
+      onSubmit: async (values: CreateTokenFormValues, form) => {
+        try {
+          const response = await createToken({
+            name: values.name,
+            expiresAt: values.expiresAt.toDate(),
+          })
 
-            if (response.error) {
-              throw response.error
-            }
-
-            messageApi.success('Personal access token created successfully')
-            onFormCreate(response.data.token!)
-            return false
-          } catch (error) {
-            if (error.status === 422 && error.errors) {
-              const formErrors = toFormErrors(error.errors)
-              form.setFields(formErrors)
-              messageApi.error('Correct the validation error(s) to continue.')
-            } else {
-              messageApi.error(
-                error.detail ??
-                  'An error occurred while creating the PAT. Please try again.',
-              )
-            }
-            return false
+          if (response.error) {
+            throw response.error
           }
-        },
-        [createToken, messageApi, onFormCreate],
-      ),
+
+          messageApi.success('Personal access token created successfully')
+          onFormCreate(response.data.token!)
+          return false
+        } catch (error) {
+          if (error.status === 422 && error.errors) {
+            const formErrors = toFormErrors(error.errors)
+            form.setFields(formErrors)
+            messageApi.error('Correct the validation error(s) to continue.')
+          } else {
+            messageApi.error(
+              error.detail ??
+                'An error occurred while creating the PAT. Please try again.',
+            )
+          }
+          return false
+        }
+      },
       onComplete: () => {},
       onCancel: onFormCancel,
     })

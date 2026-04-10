@@ -9,7 +9,7 @@ import {
 } from 'ag-grid-community'
 import { DeleteOutlined } from '@ant-design/icons'
 import useTheme from '@/src/components/contexts/theme'
-import React, { ReactNode, useCallback, useRef } from 'react'
+import React, { ReactNode, useRef } from 'react'
 import { AgGridReact, AgGridReactProps } from 'ag-grid-react'
 import { Flex } from 'antd'
 
@@ -95,77 +95,51 @@ export const AgGridTransfer = <TData extends object>(
   const leftGridRef = props.leftGridRef ?? localLeftGridRef
   const rightGridRef = props.rightGridRef ?? localRightGridRef
 
-  const onDragStopInternal = useCallback(
-    (params: RowDragEndEvent<TData>) => {
-      if (onDragStop) {
-        onDragStop(params.nodes.map((node) => node.data))
-      } else
-        leftGridRef.current.api?.setNodesSelected({
-          nodes: params.nodes,
-          newValue: false,
-        })
-    },
-    // Refs are intentionally excluded - they don't trigger re-renders
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [onDragStop],
-  )
-
-  const onGridReady = useCallback(
-    (event: GridReadyEvent<TData>) => {
-      if (leftGridRef.current === null || rightGridRef.current === null) return
-
-      const dropZoneParams = rightGridRef.current.api.getRowDropZoneParams({
-        onDragStop: onDragStopInternal,
+  const onDragStopInternal = (params: RowDragEndEvent<TData>) => {
+    if (onDragStop) {
+      onDragStop(params.nodes.map((node) => node.data))
+    } else
+      leftGridRef.current.api?.setNodesSelected({
+        nodes: params.nodes,
+        newValue: false,
       })
+  }
 
-      leftGridRef.current.api.removeRowDropZone(dropZoneParams)
-      leftGridRef.current.api.addRowDropZone(dropZoneParams)
-    },
-    // Refs are intentionally excluded - they don't trigger re-renders
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [onDragStopInternal],
-  )
+  const onGridReady = (event: GridReadyEvent<TData>) => {
+    if (leftGridRef.current === null || rightGridRef.current === null) return
 
-  const getGrid = useCallback(
-    (isLeft: boolean) => (
-      <div style={{ minHeight: 400, width: '100%' }}>
-        <AgGridReact
-          ref={isLeft ? leftGridRef : rightGridRef}
-          getRowId={getRowId}
-          rowDragManaged={true}
-          rowSelection={isLeft ? leftGridRowSelection : rightGridRowSelection}
-          theme={agGridTheme}
-          rowDragMultiRow={isLeft}
-          suppressMoveWhenRowDragging={isLeft}
-          rowData={isLeft ? leftGridData : rightGridData}
-          columnDefs={isLeft ? leftColumnDef : rightColumnDef}
-          onGridReady={onGridReady}
-          context={
-            isLeft
-              ? { rightGridRef: rightGridRef }
-              : { leftGridRef: leftGridRef }
-          }
-          {...GridProps}
-          defaultColDef={{
-            ...(GridProps?.defaultColDef ?? {}),
-          }}
-        />
-      </div>
-    ),
-    [
-      agGridTheme,
-      leftGridRef,
-      rightGridRef,
-      getRowId,
-      leftGridRowSelection,
-      rightGridRowSelection,
-      leftGridData,
-      rightGridData,
-      leftColumnDef,
-      rightColumnDef,
-      GridProps,
-      onGridReady,
-    ],
+    const dropZoneParams = rightGridRef.current.api.getRowDropZoneParams({
+      onDragStop: onDragStopInternal,
+    })
+
+    leftGridRef.current.api.removeRowDropZone(dropZoneParams)
+    leftGridRef.current.api.addRowDropZone(dropZoneParams)
+  }
+
+  const getGrid = (isLeft: boolean) => (
+    <div style={{ minHeight: 400, width: '100%' }}>
+      <AgGridReact
+        ref={isLeft ? leftGridRef : rightGridRef}
+        getRowId={getRowId}
+        rowDragManaged={true}
+        rowSelection={isLeft ? leftGridRowSelection : rightGridRowSelection}
+        theme={agGridTheme}
+        rowDragMultiRow={isLeft}
+        suppressMoveWhenRowDragging={isLeft}
+        rowData={isLeft ? leftGridData : rightGridData}
+        columnDefs={isLeft ? leftColumnDef : rightColumnDef}
+        onGridReady={onGridReady}
+        context={
+          isLeft
+            ? { rightGridRef: rightGridRef }
+            : { leftGridRef: leftGridRef }
+        }
+        {...GridProps}
+        defaultColDef={{
+          ...(GridProps?.defaultColDef ?? {}),
+        }}
+      />
+    </div>
   )
 
   return (

@@ -4,7 +4,7 @@ import PageTitle from '@/src/components/common/page-title'
 import { authorizePage } from '../../../components/hoc'
 import { useDocumentTitle } from '../../../hooks'
 import { useGetWorkspacesQuery } from '@/src/store/features/work-management/workspace-api'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import Segmented, { SegmentedLabeledOption } from 'antd/es/segmented'
 import { AppstoreOutlined, MenuOutlined } from '@ant-design/icons'
 import { WorkspacesCardGrid, WorkspacesGrid } from './_components'
@@ -42,15 +42,12 @@ const WorkspacesPage: React.FC = () => {
     error && console.error(error)
   }, [error])
 
-  const viewSelector = useMemo(
-    () => (
-      <Segmented
-        options={viewSelectorOptions}
-        value={currentView}
-        onChange={setCurrentView}
-      />
-    ),
-    [currentView],
+  const viewSelector = (
+    <Segmented
+      options={viewSelectorOptions}
+      value={currentView}
+      onChange={setCurrentView}
+    />
   )
 
   return (

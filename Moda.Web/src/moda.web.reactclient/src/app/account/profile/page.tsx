@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button, Card } from 'antd'
 import { usePathname } from 'next/navigation'
 import PageTitle from '../../../components/common/page-title'
@@ -46,7 +46,7 @@ const AccountProfilePage = () => {
 
   const isLocalUser = authMethod === 'local'
 
-  const renderTabContent = useCallback(() => {
+  const renderTabContent = () => {
     switch (activeTab) {
       case AccountTabs.Profile:
         return React.createElement(ProfileForm, profileData)
@@ -57,11 +57,11 @@ const AccountProfilePage = () => {
       default:
         return null
     }
-  }, [activeTab, profileData])
+  }
 
-  const onTabChange = useCallback((tabKey: string) => {
+  const onTabChange = (tabKey: string) => {
     setActiveTab(tabKey as AccountTabs)
-  }, [])
+  }
 
   useEffect(() => {
     if (!isLoading && user) {

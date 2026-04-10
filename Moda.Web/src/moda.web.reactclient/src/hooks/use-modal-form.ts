@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Form } from 'antd'
 import type { FormInstance } from 'antd'
 import useAuth from '@/src/components/contexts/auth'
@@ -101,7 +101,7 @@ function useModalForm<TValues = Record<string, unknown>>({
       .catch(() => setIsValid(false))
   }, [form, formValues])
 
-  const handleOk = useCallback(async () => {
+  const handleOk = async () => {
     setIsSaving(true)
     try {
       const values = await form.validateFields()
@@ -124,12 +124,12 @@ function useModalForm<TValues = Record<string, unknown>>({
     } finally {
       setIsSaving(false)
     }
-  }, [form, onSubmit, onComplete, messageApi, errorMessage])
+  }
 
-  const handleCancel = useCallback(() => {
+  const handleCancel = () => {
     form.resetFields()
     onCancel()
-  }, [form, onCancel])
+  }
 
   return {
     form,

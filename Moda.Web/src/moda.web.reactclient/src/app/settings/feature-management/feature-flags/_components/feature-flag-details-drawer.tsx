@@ -7,7 +7,7 @@ import { getDrawerWidthPixels } from '@/src/utils'
 import { Button, Drawer, Dropdown, Flex } from 'antd'
 import { MoreOutlined } from '@ant-design/icons'
 import { ItemType } from 'antd/es/menu/interface'
-import { FC, useEffect, useMemo, useState } from 'react'
+import { FC, useEffect, useState } from 'react'
 import { LabeledContent } from '@/src/components/common/content'
 import EditFeatureFlagForm from './edit-feature-flag-form'
 import useFeatureFlagActions from './use-feature-flag-actions'
@@ -28,14 +28,8 @@ const FeatureFlagDetailsDrawer: FC<FeatureFlagDetailsDrawerProps> = ({
   const messageApi = useMessage()
   const { hasPermissionClaim } = useAuth()
 
-  const canUpdate = useMemo(
-    () => hasPermissionClaim('Permissions.FeatureFlags.Update'),
-    [hasPermissionClaim],
-  )
-  const canDelete = useMemo(
-    () => hasPermissionClaim('Permissions.FeatureFlags.Delete'),
-    [hasPermissionClaim],
-  )
+  const canUpdate = hasPermissionClaim('Permissions.FeatureFlags.Update')
+  const canDelete = hasPermissionClaim('Permissions.FeatureFlags.Delete')
 
   const {
     data: featureFlag,
@@ -54,7 +48,7 @@ const FeatureFlagDetailsDrawer: FC<FeatureFlagDetailsDrawerProps> = ({
     }
   }, [error, messageApi])
 
-  const extraMenu = useMemo(() => {
+  const extraMenu = (() => {
     if (!canUpdate && !canDelete) return undefined
     if (!featureFlag) return undefined
 
@@ -92,7 +86,7 @@ const FeatureFlagDetailsDrawer: FC<FeatureFlagDetailsDrawerProps> = ({
         <Button type="text" size="small" icon={<MoreOutlined />} />
       </Dropdown>
     )
-  }, [canUpdate, canDelete, featureFlag, handleToggle, handleArchive])
+  })()
 
   return (
     <>

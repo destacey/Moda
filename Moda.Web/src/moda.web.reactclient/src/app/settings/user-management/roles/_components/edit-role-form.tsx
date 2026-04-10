@@ -1,7 +1,7 @@
 'use client'
 
 import { Form, Input, Modal } from 'antd'
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 import { toFormErrors } from '@/src/utils'
 import { CreateOrUpdateRoleRequest, RoleDto } from '@/src/services/moda-api'
 import { useUpsertRoleMutation } from '@/src/store/features/user-management/roles-api'
@@ -32,8 +32,7 @@ const EditRoleForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<CreateOrUpdateRoleRequest>({
-      onSubmit: useCallback(
-        async (values: CreateOrUpdateRoleRequest, form) => {
+      onSubmit: async (values: CreateOrUpdateRoleRequest, form) => {
           try {
             const response = await upsertRole({
               id: role.id,
@@ -62,8 +61,6 @@ const EditRoleForm = ({
             return false
           }
         },
-        [upsertRole, role, messageApi],
-      ),
       onComplete: onFormComplete,
       onCancel: onFormCancel,
       errorMessage: 'An unexpected error occurred while updating the role.',

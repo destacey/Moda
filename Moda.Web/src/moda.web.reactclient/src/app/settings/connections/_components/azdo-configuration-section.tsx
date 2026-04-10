@@ -1,7 +1,7 @@
 import { TestAzureDevOpsConnectionRequest } from '@/src/services/moda-api'
 import { useTestAzdoConfigurationMutation } from '@/src/store/features/app-integration/azdo-integration-api'
 import { Button, Form, FormInstance, Input, Typography } from 'antd'
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 
 const { Item } = Form
 const { Text } = Typography
@@ -20,18 +20,15 @@ export const AzureDevOpsConfigurationSection: React.FC<ConfigSectionProps> = ({
 
   const [testConfig] = useTestAzdoConfigurationMutation()
 
-  const testConnectionConfiguration = useCallback(
-    async (configuration: TestAzureDevOpsConnectionRequest) => {
-      const response = await testConfig(configuration)
-      if (response.error) {
-        setTestConfigurationResult('Failed to test configuration.')
-      } else {
-        setTestConfigurationResult('Successfully tested configuration.')
-      }
-      setTestingConfiguration(false)
-    },
-    [testConfig],
-  )
+  const testConnectionConfiguration = async (configuration: TestAzureDevOpsConnectionRequest) => {
+    const response = await testConfig(configuration)
+    if (response.error) {
+      setTestConfigurationResult('Failed to test configuration.')
+    } else {
+      setTestConfigurationResult('Successfully tested configuration.')
+    }
+    setTestingConfiguration(false)
+  }
 
   return (
     <>

@@ -203,50 +203,47 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
    * Retry handler for service unavailable
    * -------------------------------------------------------------
    */
-  const handleRetry = useCallback(() => {
+  const handleRetry = () => {
     setIsServiceUnavailable(false)
     setIsLoading(true)
     refetchPermissions()
-  }, [refetchPermissions])
+  }
 
   /**
    * -------------------------------------------------------------
    * Token helper
    * -------------------------------------------------------------
    */
-  const acquireToken = useCallback(
-    async (requestOverrides?: Partial<SilentRequest>): Promise<string> => {
-      // For local auth, return the stored token
-      if (authMethod === 'local') {
-        const token = getLocalAuthToken()
-        if (token) return token
-        throw new Error('No local auth token found')
+  const acquireToken = useCallback(async (requestOverrides?: Partial<SilentRequest>): Promise<string> => {
+    // For local auth, return the stored token
+    if (authMethod === 'local') {
+      const token = getLocalAuthToken()
+      if (token) return token
+      throw new Error('No local auth token found')
+    }
+
+    const request = { ...tokenRequest, ...requestOverrides }
+
+    try {
+      // MSAL v5 requires account parameter for silent token acquisition
+      const accounts = instance.getAllAccounts()
+      if (accounts.length === 0) {
+        throw new Error('No authenticated accounts found')
       }
 
-      const request = { ...tokenRequest, ...requestOverrides }
-
-      try {
-        // MSAL v5 requires account parameter for silent token acquisition
-        const accounts = instance.getAllAccounts()
-        if (accounts.length === 0) {
-          throw new Error('No authenticated accounts found')
-        }
-
-        const response = await instance.acquireTokenSilent({
-          ...request,
-          account: request.account || accounts[0],
-        })
+      const response = await instance.acquireTokenSilent({
+        ...request,
+        account: request.account || accounts[0],
+      })
+      return response.accessToken
+    } catch (error) {
+      if (error instanceof InteractionRequiredAuthError) {
+        const response = await instance.acquireTokenPopup(request)
         return response.accessToken
-      } catch (error) {
-        if (error instanceof InteractionRequiredAuthError) {
-          const response = await instance.acquireTokenPopup(request)
-          return response.accessToken
-        }
-        throw error
       }
-    },
-    [instance, authMethod],
-  )
+      throw error
+    }
+  }, [authMethod, instance])
 
   /**
    * -------------------------------------------------------------
@@ -520,27 +517,36 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
    * Context value
    * -------------------------------------------------------------
    */
-  const permissionsSet = useMemo(
-    () => new Set(permissionsData?.permissions ?? []),
-    [permissionsData],
-  )
-
-  const authContext = useMemo<AuthContextType>(
-    () => ({
+  const authContext: AuthContextType = useMemo(
+    () => {
+      const permissionsSet = new Set(permissionsData?.permissions ?? [])
+      return {
+        user,
+        isLoading,
+        authMethod,
+        mustChangePassword,
+        acquireToken,
+        refreshUser,
+        hasClaim: (type: string, value: string) =>
+          user.claims.some((c) => c.type === type && c.value === value),
+        hasPermissionClaim: (value: string) => permissionsSet.has(value),
+        login,
+        localLogin,
+        logout,
+      }
+    },
+    [
       user,
       isLoading,
       authMethod,
       mustChangePassword,
       acquireToken,
       refreshUser,
-      hasClaim: (type: string, value: string) =>
-        user.claims.some((c) => c.type === type && c.value === value),
-      hasPermissionClaim: (value: string) => permissionsSet.has(value),
+      permissionsData,
       login,
       localLogin,
       logout,
-    }),
-    [user, isLoading, authMethod, mustChangePassword, acquireToken, refreshUser, permissionsSet, login, localLogin, logout],
+    ],
   )
 
   // Bypass all loading/error gates on logout route so logout executes promptly

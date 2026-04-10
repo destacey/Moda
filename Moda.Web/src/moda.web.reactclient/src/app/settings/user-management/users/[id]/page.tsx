@@ -5,7 +5,7 @@ import PageTitle from '@/src/components/common/page-title'
 import { authorizePage } from '@/src/components/hoc'
 import { notFound } from 'next/navigation'
 import UserDetailsLoading from './loading'
-import { use, useCallback, useEffect, useMemo, useState } from 'react'
+import { use, useEffect, useState } from 'react'
 import { Card, MenuProps } from 'antd'
 import BasicBreadcrumb from '@/src/components/common/basic-breadcrumb'
 import useAuth from '@/src/components/contexts/auth'
@@ -54,7 +54,7 @@ const UserDetailsPage = (props: { params: Promise<{ id: string }> }) => {
   const title = userData ? `${fullName} - User Details` : 'User Details'
   useDocumentTitle(title)
 
-  const actionsMenuItems: MenuProps['items'] = useMemo(() => {
+  const actionsMenuItems: MenuProps['items'] = (() => {
     if (!userData) return []
 
     const items: ItemType[] = []
@@ -96,26 +96,20 @@ const UserDetailsPage = (props: { params: Promise<{ id: string }> }) => {
     }
     items.push(...secondaryItems)
     return items
-  }, [
-    canUpdateUser,
-    canUpdateUserRoles,
-    isLocalUser,
-    userData,
-    getAccountActionMenuItems,
-  ])
+  })()
 
-  const renderTabContent = useCallback(() => {
+  const renderTabContent = () => {
     switch (activeTab) {
       case UserDetailsTabs.Details:
         return <UserDetails user={userData} />
       default:
         return null
     }
-  }, [activeTab, userData])
+  }
 
-  const onTabChange = useCallback((tabKey: string) => {
+  const onTabChange = (tabKey: string) => {
     setActiveTab(tabKey as UserDetailsTabs)
-  }, [])
+  }
 
   useEffect(() => {
     error && console.error(error)

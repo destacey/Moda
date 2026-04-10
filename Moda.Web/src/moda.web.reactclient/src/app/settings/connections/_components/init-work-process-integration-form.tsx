@@ -2,7 +2,6 @@ import { useMessage } from '@/src/components/contexts/messaging'
 import { InitWorkProcessIntegrationRequest } from '@/src/services/moda-api'
 import { useInitAzdoConnectionWorkProcessMutation } from '@/src/store/features/app-integration/azdo-integration-api'
 import { Modal, Typography } from 'antd'
-import { useCallback } from 'react'
 import { useConfirmModal } from '@/src/hooks'
 
 const { Text } = Typography
@@ -26,7 +25,7 @@ const InitWorkProcessIntegrationForm = ({
     useInitAzdoConnectionWorkProcessMutation()
 
   const { isOpen, isSaving, handleOk, handleCancel } = useConfirmModal({
-    onSubmit: useCallback(async () => {
+    onSubmit: async () => {
       try {
         const request = {
           id: connectionId,
@@ -46,7 +45,7 @@ const InitWorkProcessIntegrationForm = ({
         console.error(error)
         return false
       }
-    }, [initAzdoConnectionWorkProcess, connectionId, externalId, messageApi]),
+    },
     onComplete: onFormSave,
     onCancel: onFormCancel,
     errorMessage: 'Failed to initialize work process.',

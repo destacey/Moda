@@ -7,7 +7,6 @@ import {
   useArchiveProjectLifecycleMutation,
 } from '@/src/store/features/ppm/project-lifecycles-api'
 import { Modal, Space } from 'antd'
-import { useCallback } from 'react'
 import { useConfirmModal } from '@/src/hooks'
 
 export enum ProjectLifecycleStateAction {
@@ -36,7 +35,7 @@ const ChangeProjectLifecycleStateForm = ({
     useArchiveProjectLifecycleMutation()
 
   const { isOpen, isSaving, handleOk, handleCancel } = useConfirmModal({
-    onSubmit: useCallback(async () => {
+    onSubmit: async () => {
       try {
         let response = null
         if (stateAction === ProjectLifecycleStateAction.Activate) {
@@ -63,13 +62,7 @@ const ChangeProjectLifecycleStateForm = ({
         console.log(error)
         return false
       }
-    }, [
-      activateProjectLifecycleMutation,
-      archiveProjectLifecycleMutation,
-      lifecycle,
-      stateAction,
-      messageApi,
-    ]),
+    },
     onComplete: onFormComplete,
     onCancel: onFormCancel,
     errorMessage: `An unexpected error occurred while ${stateAction}ing the project lifecycle.`,

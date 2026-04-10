@@ -1,4 +1,11 @@
-import { createContext, ReactNode, useEffect, useMemo } from 'react'
+import {
+  createContext,
+  ReactNode,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+} from 'react'
 import {
   themeBalham,
   colorSchemeDark,
@@ -17,6 +24,8 @@ const agGridDarkTheme = themeBalham.withPart(colorSchemeDark)
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [currentThemeName, setCurrentThemeName] =
     useLocalStorageState<ThemeName>('modaTheme', 'light')
+  const hasMountedRef = useRef(false)
+  const transitionTimeoutRef = useRef<number | null>(null)
 
   const agGridTheme =
     currentThemeName === 'light' ? agGridLightTheme : agGridDarkTheme
@@ -24,58 +33,97 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     currentThemeName === 'light' ? 'classic' : 'classicDark'
   const antvisG6ChartsTheme = currentThemeName === 'light' ? 'light' : 'dark'
 
-  // Create the theme configuration
-  const currentTheme = useMemo(
-    () => (currentThemeName === 'light' ? lightTheme : darkTheme),
-    [currentThemeName],
+  const currentTheme = currentThemeName === 'light' ? lightTheme : darkTheme
+
+  useLayoutEffect(() => {
+    const root = document.documentElement
+    root.setAttribute('data-theme', currentThemeName)
+
+    // Skip animation for first paint; only animate explicit theme changes.
+    if (!hasMountedRef.current) {
+      hasMountedRef.current = true
+      return
+    }
+
+    root.classList.add('theme-transitioning')
+    if (transitionTimeoutRef.current) {
+      window.clearTimeout(transitionTimeoutRef.current)
+    }
+    transitionTimeoutRef.current = window.setTimeout(() => {
+      root.classList.remove('theme-transitioning')
+      transitionTimeoutRef.current = null
+    }, 350)
+  }, [currentThemeName])
+
+  useEffect(
+    () => () => {
+      if (transitionTimeoutRef.current) {
+        window.clearTimeout(transitionTimeoutRef.current)
+      }
+      document.documentElement.classList.remove('theme-transitioning')
+    },
+    [],
   )
-
-  // Use theme.useToken() inside ConfigProvider
-  const ThemeContent = ({ children }: { children: ReactNode }) => {
-    const { token } = theme.useToken()
-    const badgeColor = token.colorPrimary
-
-    useEffect(() => {
-      // Set data-theme on document.documentElement (html element) for global theme access
-      // This includes portaled elements like drawers that render outside the theme context
-      document.documentElement.setAttribute('data-theme', currentThemeName)
-      // currentThemeName is needed as dependency - when it changes in parent state,
-      // this component re-renders and we need to update the DOM attribute
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentThemeName])
-
-    const themeContextValue = useMemo(
-      () => ({
-        currentThemeName,
-        setCurrentThemeName,
-        agGridTheme,
-        token,
-        badgeColor,
-        antDesignChartsTheme,
-        antvisG6ChartsTheme,
-      }),
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      [
-        currentThemeName,
-        setCurrentThemeName,
-        agGridTheme,
-        token,
-        badgeColor,
-        antDesignChartsTheme,
-        antvisG6ChartsTheme,
-      ],
-    )
-
-    return (
-      <ThemeContext.Provider value={themeContextValue}>
-        {children}
-      </ThemeContext.Provider>
-    )
-  }
 
   return (
     <ConfigProvider theme={currentTheme} modal={{ closable: true, mask: { closable: false } }}>
-      <ThemeContent>{children}</ThemeContent>
+      <ThemeTokenProvider
+        currentThemeName={currentThemeName}
+        setCurrentThemeName={setCurrentThemeName}
+        agGridTheme={agGridTheme}
+        antDesignChartsTheme={antDesignChartsTheme}
+        antvisG6ChartsTheme={antvisG6ChartsTheme}
+      >
+        {children}
+      </ThemeTokenProvider>
     </ConfigProvider>
+  )
+}
+
+interface ThemeTokenProviderProps {
+  children: ReactNode
+  currentThemeName: ThemeName
+  setCurrentThemeName: (value: ThemeName) => void
+  agGridTheme: typeof agGridLightTheme
+  antDesignChartsTheme: string
+  antvisG6ChartsTheme: string
+}
+
+const ThemeTokenProvider = ({
+  children,
+  currentThemeName,
+  setCurrentThemeName,
+  agGridTheme,
+  antDesignChartsTheme,
+  antvisG6ChartsTheme,
+}: ThemeTokenProviderProps) => {
+  const { token } = theme.useToken()
+  const badgeColor = token.colorPrimary
+
+  const themeContextValue = useMemo(
+    () => ({
+      currentThemeName,
+      setCurrentThemeName,
+      agGridTheme,
+      token,
+      badgeColor,
+      antDesignChartsTheme,
+      antvisG6ChartsTheme,
+    }),
+    [
+      currentThemeName,
+      setCurrentThemeName,
+      agGridTheme,
+      token,
+      badgeColor,
+      antDesignChartsTheme,
+      antvisG6ChartsTheme,
+    ],
+  )
+
+  return (
+    <ThemeContext.Provider value={themeContextValue}>
+      {children}
+    </ThemeContext.Provider>
   )
 }

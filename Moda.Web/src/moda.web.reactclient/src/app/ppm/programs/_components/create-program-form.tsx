@@ -13,7 +13,6 @@ import { toFormErrors } from '@/src/utils'
 import { DatePicker, Form, Modal, Select } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
 import dayjs from 'dayjs'
-import { useCallback } from 'react'
 
 const { Item } = Form
 const { RangePicker } = DatePicker
@@ -67,33 +66,30 @@ const CreateProgramForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<CreateProgramFormValues>({
-      onSubmit: useCallback(
-        async (values: CreateProgramFormValues, form) => {
-          try {
-            const request = mapToRequestValues(values)
-            const response = await createProgram(request)
-            if (response.error) throw response.error
+      onSubmit: async (values: CreateProgramFormValues, form) => {
+        try {
+          const request = mapToRequestValues(values)
+          const response = await createProgram(request)
+          if (response.error) throw response.error
 
-            messageApi.success(
-              'Program created successfully. Program key: ' + response.data.key,
+          messageApi.success(
+            'Program created successfully. Program key: ' + response.data.key,
+          )
+          return true
+        } catch (error) {
+          if (error.status === 422 && error.errors) {
+            const formErrors = toFormErrors(error.errors)
+            form.setFields(formErrors)
+            messageApi.error('Correct the validation error(s) to continue.')
+          } else {
+            messageApi.error(
+              error.detail ??
+                'An error occurred while creating the program. Please try again.',
             )
-            return true
-          } catch (error) {
-            if (error.status === 422 && error.errors) {
-              const formErrors = toFormErrors(error.errors)
-              form.setFields(formErrors)
-              messageApi.error('Correct the validation error(s) to continue.')
-            } else {
-              messageApi.error(
-                error.detail ??
-                  'An error occurred while creating the program. Please try again.',
-              )
-            }
-            return false
           }
-        },
-        [createProgram, messageApi],
-      ),
+          return false
+        }
+      },
       onComplete: onFormComplete,
       onCancel: onFormCancel,
       errorMessage:

@@ -14,7 +14,7 @@ import {
 } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { HolderOutlined, MoreOutlined } from '@ant-design/icons'
 import HealthCheckTag from '@/src/components/common/health-check/health-check-tag'
 import { ItemType } from 'antd/es/menu/interface'
@@ -118,7 +118,7 @@ const ObjectiveListItem = ({
   }
 
   // TODO: make a menu component that will render one item with its icon, or a dropdown when there multiple items
-  const menuItems: MenuProps['items'] = useMemo(() => {
+  const menuItems: MenuProps['items'] = (() => {
     const items: ItemType[] = []
     if (canUpdateObjectives || canCreateHealthChecks) {
       items.push(
@@ -159,14 +159,7 @@ const ObjectiveListItem = ({
       )
     }
     return items
-  }, [
-    canUpdateObjectives,
-    canCreateHealthChecks,
-    objective.planningInterval.key,
-    objective.key,
-    objective.id,
-    dispatch,
-  ])
+  })()
 
   const onEditObjectiveFormClosed = (wasSaved: boolean) => {
     setOpenUpdateObjectiveForm(false)

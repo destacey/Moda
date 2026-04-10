@@ -1,5 +1,6 @@
 import nextCoreWebVitals from 'eslint-config-next/core-web-vitals'
 import nextTypescript from 'eslint-config-next/typescript'
+import reactCompiler from 'eslint-plugin-react-compiler'
 import { FlatCompat } from '@eslint/eslintrc'
 
 const compat = new FlatCompat({
@@ -22,6 +23,15 @@ const eslintConfig = [
       '@typescript-eslint/no-empty-object-type': 'off',
     },
   }),
+  {
+    plugins: { 'react-compiler': reactCompiler },
+    rules: { 'react-compiler/react-compiler': 'warn' },
+  },
+  {
+    // incompatible with React Compiler (reads refs during render)
+    files: ['src/app/service-unavailable/diagnostic-canvas.tsx'],
+    linterOptions: { reportUnusedDisableDirectives: 'off' },
+  },
   {
     ignores: ['coverage/**', 'src/services/moda-api.ts'],
   },

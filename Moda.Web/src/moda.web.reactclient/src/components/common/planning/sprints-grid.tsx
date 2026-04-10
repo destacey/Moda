@@ -37,42 +37,39 @@ const utcAsCalendarDateValueFormatter = (
 const SprintsGrid: FC<SprintsGridProps> = (props: SprintsGridProps) => {
   const { refetch, sprints = [] } = props
 
-  const columnDefs = useMemo<ColDef<SprintListDto>[]>(
-    () => [
-      { field: 'key', width: 90 },
-      { field: 'name', width: 250, cellRenderer: sprintLinkCellRenderer },
-      {
-        field: 'team.name',
-        headerName: 'Team',
-        width: 200,
-        hide: props.hideTeam,
-        cellRenderer: teamCellRenderer,
+  const columnDefs = useMemo<ColDef<SprintListDto>[]>(() => [
+    { field: 'key', width: 90 },
+    { field: 'name', width: 250, cellRenderer: sprintLinkCellRenderer },
+    {
+      field: 'team.name',
+      headerName: 'Team',
+      width: 200,
+      hide: props.hideTeam,
+      cellRenderer: teamCellRenderer,
+    },
+    { field: 'state.name', headerName: 'State', width: 125 },
+    {
+      field: 'start',
+      headerName: 'Start',
+      width: 150,
+      sort: 'desc',
+      cellDataType: 'date',
+      filterParams: {
+        includeTime: false,
       },
-      { field: 'state.name', headerName: 'State', width: 125 },
-      {
-        field: 'start',
-        headerName: 'Start',
-        width: 150,
-        sort: 'desc',
-        cellDataType: 'date',
-        filterParams: {
-          includeTime: false,
-        },
-        valueFormatter: utcAsCalendarDateValueFormatter,
+      valueFormatter: utcAsCalendarDateValueFormatter,
+    },
+    {
+      field: 'end',
+      headerName: 'End',
+      width: 150,
+      cellDataType: 'date',
+      filterParams: {
+        includeTime: false,
       },
-      {
-        field: 'end',
-        headerName: 'End',
-        width: 150,
-        cellDataType: 'date',
-        filterParams: {
-          includeTime: false,
-        },
-        valueFormatter: utcAsCalendarDateValueFormatter,
-      },
-    ],
-    [props.hideTeam],
-  )
+      valueFormatter: utcAsCalendarDateValueFormatter,
+    },
+  ], [props.hideTeam])
 
   return (
     <ModaGrid

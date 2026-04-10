@@ -1,7 +1,6 @@
 'use client'
 
 import { DatePicker, Form, Modal, Radio } from 'antd'
-import { useCallback } from 'react'
 import {
   Methodology,
   SetTeamOperatingModelRequest,
@@ -58,29 +57,26 @@ const SetTeamOperatingModelForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<SetTeamOperatingModelFormValues>({
-      onSubmit: useCallback(
-        async (values: SetTeamOperatingModelFormValues, form) => {
-          try {
-            const request = mapToRequestValues(values)
-            await setOperatingModel({ teamId, request }).unwrap()
-            messageApi.success('Successfully set operating model.')
-            return true
-          } catch (error) {
-            if (error.status === 422 && error.errors) {
-              const formErrors = toFormErrors(error.errors)
-              form.setFields(formErrors)
-              messageApi.error('Correct the validation error(s) to continue.')
-            } else {
-              messageApi.error(
-                error.detail ??
-                  'An unexpected error occurred while setting the operating model.',
-              )
-            }
-            return false
+      onSubmit: async (values: SetTeamOperatingModelFormValues, form) => {
+        try {
+          const request = mapToRequestValues(values)
+          await setOperatingModel({ teamId, request }).unwrap()
+          messageApi.success('Successfully set operating model.')
+          return true
+        } catch (error) {
+          if (error.status === 422 && error.errors) {
+            const formErrors = toFormErrors(error.errors)
+            form.setFields(formErrors)
+            messageApi.error('Correct the validation error(s) to continue.')
+          } else {
+            messageApi.error(
+              error.detail ??
+                'An unexpected error occurred while setting the operating model.',
+            )
           }
-        },
-        [setOperatingModel, teamId, messageApi],
-      ),
+          return false
+        }
+      },
       onComplete: onFormComplete,
       onCancel: onFormCancel,
       errorMessage:

@@ -5,7 +5,7 @@ import { PlusOutlined } from '@ant-design/icons'
 import { Badge, Button, Card, List, Space } from 'antd'
 import RiskListItem from './risk-list-item'
 import ModaEmpty from '@/src/components/common/moda-empty'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import CreateRiskForm from '@/src/components/common/planning/create-risk-form'
 import useTheme from '@/src/components/contexts/theme'
 
@@ -30,7 +30,7 @@ const TeamRisksListCard = ({
   const [openCreateRiskForm, setOpenCreateRiskForm] = useState<boolean>(false)
   const theme = useTheme()
 
-  const cardTitle = useMemo(() => {
+  const cardTitle = (() => {
     const count = risks?.length ?? 0
     const showBadge = count > 0
     return (
@@ -41,9 +41,9 @@ const TeamRisksListCard = ({
         )}
       </Space>
     )
-  }, [risks?.length, theme.badgeColor])
+  })()
 
-  const risksList = useMemo(() => {
+  const risksList = (() => {
     const sortedRisks = risks?.slice().sort((a, b) => {
       const aIndex = categoryOrder.indexOf(a.category)
       const bIndex = categoryOrder.indexOf(b.category)
@@ -72,7 +72,7 @@ const TeamRisksListCard = ({
         )}
       />
     )
-  }, [canUpdateRisks, refreshRisks, risks])
+  })()
 
   const onCreateRiskFormClosed = (wasCreated: boolean) => {
     setOpenCreateRiskForm(false)

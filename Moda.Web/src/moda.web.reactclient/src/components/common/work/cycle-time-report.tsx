@@ -1,6 +1,6 @@
 'use client'
 
-import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { FC, useEffect, useRef, useState } from 'react'
 import {
   DatePicker,
   Flex,
@@ -39,15 +39,11 @@ export interface CycleTimeReportProps {
 export const CycleTimeReport: FC<CycleTimeReportProps> = ({ teamCode }) => {
   const gridRef = useRef<AgGridReact<WorkItemListDto>>(null)
   const filterAnimationFrameRef = useRef<number | null>(null)
-  const defaultDoneFrom = useMemo(() => {
-    return dayjs().utc().subtract(90, 'days').startOf('day')
-  }, [])
-  const doneFromPresets = useMemo(() => {
-    return [30, 60, 90, 120, 180].map((days) => ({
-      label: `${days} Days`,
-      value: dayjs().utc().subtract(days, 'days').startOf('day'),
-    }))
-  }, [])
+  const defaultDoneFrom = dayjs().utc().subtract(90, 'days').startOf('day')
+  const doneFromPresets = [30, 60, 90, 120, 180].map((days) => ({
+    label: `${days} Days`,
+    value: dayjs().utc().subtract(days, 'days').startOf('day'),
+  }))
 
   const [selectedDate, setSelectedDate] = useState<Dayjs>(defaultDoneFrom)
   const [chartWorkItems, setChartWorkItems] = useState<WorkItemListDto[]>([])
@@ -55,9 +51,7 @@ export const CycleTimeReport: FC<CycleTimeReportProps> = ({ teamCode }) => {
   const [method, setMethod] = useState<CycleTimeOutlierMethod>('Balanced')
   const percentile = useDebounce(percentileInputValue, 500)
 
-  const doneFrom = useMemo(() => {
-    return selectedDate.toISOString()
-  }, [selectedDate])
+  const doneFrom = selectedDate.toISOString()
 
   const {
     data: workItemsData,
@@ -71,22 +65,16 @@ export const CycleTimeReport: FC<CycleTimeReportProps> = ({ teamCode }) => {
     doneTo: null,
   })
 
-  const cycleTimeItems = useMemo(() => {
-    return getCycleTimeWorkItems(workItemsData)
-  }, [workItemsData])
+  const cycleTimeItems = getCycleTimeWorkItems(workItemsData)
 
-  const normalizedPercentile = useMemo(() => {
-    return normalizePercentile(percentile)
-  }, [percentile])
+  const normalizedPercentile = normalizePercentile(percentile)
 
-  const sortedCycleTimeItems = useMemo(() => {
-    if (normalizedPercentile === 1 || normalizedPercentile === 0) {
-      return cycleTimeItems
-    }
-    return sortCycleTimeWorkItems(cycleTimeItems)
-  }, [cycleTimeItems, normalizedPercentile])
+  const sortedCycleTimeItems =
+    normalizedPercentile === 1 || normalizedPercentile === 0
+      ? cycleTimeItems
+      : sortCycleTimeWorkItems(cycleTimeItems)
 
-  const filteredWorkItems = useMemo(() => {
+  const filteredWorkItems = (() => {
     if (cycleTimeItems.length === 0) {
       return []
     }
@@ -109,14 +97,9 @@ export const CycleTimeReport: FC<CycleTimeReportProps> = ({ teamCode }) => {
       sortedCycleTimeItems,
       normalizedPercentile,
     )
-  }, [
-    cycleTimeItems,
-    method,
-    normalizedPercentile,
-    sortedCycleTimeItems,
-  ])
+  })()
 
-  const onFilterChanged = useCallback(() => {
+  const onFilterChanged = () => {
     if (filterAnimationFrameRef.current !== null) {
       return
     }
@@ -133,7 +116,7 @@ export const CycleTimeReport: FC<CycleTimeReportProps> = ({ teamCode }) => {
         setChartWorkItems(displayedRows)
       }
     })
-  }, [])
+  }
 
   // Initialize chart data when filtered work items change
   useEffect(() => {

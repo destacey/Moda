@@ -1,7 +1,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { FC, useMemo } from 'react'
+import { FC } from 'react'
 import useTheme from '../../contexts/theme'
 import { useGetHealthReportQuery } from '@/src/store/features/common/health-checks-api'
 import { Card } from 'antd'
@@ -52,80 +52,76 @@ const HealthReportChart: FC<HealthReportChartProps> = (
   } = useGetHealthReportQuery(props.objectId, { skip: !props.objectId })
 
   // Derive series data from health report data
-  const seriesData = useMemo(() => {
-    if (!healthReportData) return []
-
-    return healthReportData
-      .slice()
-      .sort((a, b) =>
-        dayjs(a.reportedOn).isAfter(dayjs(b.reportedOn)) ? 1 : -1,
-      )
-      .map((report) => ({
-        date: dayjs(report.reportedOn).toDate(),
-        status: convertStatusToNumber(report.status?.name),
-      }))
-  }, [healthReportData])
+  const seriesData = !healthReportData
+    ? []
+    : healthReportData
+        .slice()
+        .sort((a, b) =>
+          dayjs(a.reportedOn).isAfter(dayjs(b.reportedOn)) ? 1 : -1,
+        )
+        .map((report) => ({
+          date: dayjs(report.reportedOn).toDate(),
+          status: convertStatusToNumber(report.status?.name),
+        }))
 
   // https://ant-design-charts.antgroup.com/en/options/plots/component/axis
-  const config = useMemo(() => {
-    const fontColor =
-      currentThemeName === 'light'
-        ? 'rgba(0, 0, 0, 0.45)'
-        : 'rgba(255, 255, 255, 0.45)'
+  const fontColor =
+    currentThemeName === 'light'
+      ? 'rgba(0, 0, 0, 0.45)'
+      : 'rgba(255, 255, 255, 0.45)'
 
-    return {
-      title: {
-        title: 'Health Report',
-        style: {
-          titleFontSize: 14,
-          titleFontWeight: 'normal',
-          titleFill: fontColor,
+  const config = {
+    title: {
+      title: 'Health Report',
+      style: {
+        titleFontSize: 14,
+        titleFontWeight: 'normal',
+        titleFill: fontColor,
+      },
+    },
+    theme: antDesignChartsTheme,
+    height: 200,
+    width: 350,
+    data: seriesData,
+    xField: 'date',
+    yField: 'status',
+    point: {
+      size: 5,
+      shape: 'circle',
+    },
+    tooltip: {
+      title: (datum) => `${dayjs(datum.date).format('MMM D')}`, // Show full Date & Time
+      items: [
+        {
+          channel: 'y',
+          valueFormatter: (value) => statusMap[value],
+          name: 'Status',
         },
-      },
-      theme: antDesignChartsTheme,
-      height: 200,
-      width: 350,
-      data: seriesData,
-      xField: 'date',
-      yField: 'status',
-      point: {
-        size: 5,
-        shape: 'circle',
-      },
-      tooltip: {
-        title: (datum) => `${dayjs(datum.date).format('MMM D')}`, // Show full Date & Time
-        items: [
-          {
-            channel: 'y',
-            valueFormatter: (value) => statusMap[value],
-            name: 'Status',
-          },
-          {
-            channel: 'x',
-            valueFormatter: (value) => dayjs(value).format('h:mm A'),
-            name: 'Time',
-          },
-        ],
-      },
-      axis: {
-        x: {
-          gridStrokeOpacity: 0.3,
-          labelFormatter: (value) => dayjs(value).format('MMM D'),
+        {
+          channel: 'x',
+          valueFormatter: (value) => dayjs(value).format('h:mm A'),
+          name: 'Time',
         },
-        y: {
-          labelFormatter: (value) => statusMap[value],
-          gridStrokeOpacity: 0.3,
-        },
+      ],
+    },
+    axis: {
+      x: {
+        gridStrokeOpacity: 0.3,
+        labelFormatter: (value) => dayjs(value).format('MMM D'),
       },
-      scale: {
-        y: {
-          type: 'linear',
-          domain: [0, 1, 2],
-          tickMethod: () => [0, 1, 2],
-        },
+      y: {
+        labelFormatter: (value) => statusMap[value],
+        gridStrokeOpacity: 0.3,
       },
-    } as any
-  }, [antDesignChartsTheme, currentThemeName, seriesData])
+    },
+    scale: {
+      y: {
+        type: 'linear',
+        domain: [0, 1, 2],
+        tickMethod: () => [0, 1, 2],
+      },
+    },
+  } as any
 
   return (
     <Card

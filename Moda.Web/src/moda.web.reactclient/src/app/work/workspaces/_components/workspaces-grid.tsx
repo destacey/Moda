@@ -4,7 +4,7 @@ import { ModaGrid } from '@/src/components/common'
 import { WorkspaceLinkCellRenderer } from '@/src/components/common/moda-grid-cell-renderers'
 import { WorkspaceListDto } from '@/src/services/moda-api'
 import { ColDef } from 'ag-grid-community'
-import { ReactElement, useCallback, useMemo } from 'react'
+import { ReactElement, useMemo } from 'react'
 
 export interface WorkspacesGridProps {
   workspaces: WorkspaceListDto[]
@@ -16,20 +16,17 @@ export interface WorkspacesGridProps {
 const WorkspacesGrid = (props: WorkspacesGridProps) => {
   const { refetch } = props
 
-  const columnDefs = useMemo<ColDef<WorkspaceListDto>[]>(
-    () => [
-      { field: 'key', width: 90 },
-      { field: 'name', cellRenderer: WorkspaceLinkCellRenderer },
-      { field: 'description', width: 300 },
-      { field: 'ownership.name', headerName: 'Ownership' },
-      { field: 'isActive' },
-    ],
-    [],
-  )
+  const columnDefs = useMemo<ColDef<WorkspaceListDto>[]>(() => [
+    { field: 'key', width: 90 },
+    { field: 'name', cellRenderer: WorkspaceLinkCellRenderer },
+    { field: 'description', width: 300 },
+    { field: 'ownership.name', headerName: 'Ownership' },
+    { field: 'isActive' },
+  ], [])
 
-  const refresh = useCallback(async () => {
+  const refresh = async () => {
     refetch()
-  }, [refetch])
+  }
 
   return (
     <>

@@ -2,7 +2,7 @@
 
 import PageTitle from '@/src/components/common/page-title'
 import { Card, MenuProps } from 'antd'
-import { use, useCallback, useMemo, useState } from 'react'
+import { use, useState } from 'react'
 import PlanningIntervalObjectiveDetails from './planning-interval-objective-details'
 import { useDocumentTitle } from '@/src/hooks/use-document-title'
 import useAuth from '@/src/components/contexts/auth'
@@ -69,7 +69,7 @@ const ObjectiveDetailsPage = (props: {
     (state) => state.healthCheck.createContext.objectId,
   )
 
-  const renderTabContent = useCallback(() => {
+  const renderTabContent = () => {
     switch (activeTab) {
       case ObjectiveTabs.Details:
         return (
@@ -81,7 +81,7 @@ const ObjectiveDetailsPage = (props: {
       default:
         return null
     }
-  }, [activeTab, objectiveData, canManageObjectives])
+  }
 
   const onTabChange = (tabKey: string) => {
     setActiveTab(tabKey as ObjectiveTabs)
@@ -108,7 +108,7 @@ const ObjectiveDetailsPage = (props: {
     }
   }
 
-  const actionsMenuItems: MenuProps['items'] = useMemo(() => {
+  const actionsMenuItems: MenuProps['items'] = (() => {
     const items: ItemType[] = []
     if (canManageObjectives) {
       items.push(
@@ -152,14 +152,7 @@ const ObjectiveDetailsPage = (props: {
     })
 
     return items
-  }, [
-    canCreateHealthChecks,
-    canManageObjectives,
-    dispatch,
-    objectiveData?.id,
-    objectiveKey,
-    planningIntervalKey,
-  ])
+  })()
 
   if (isLoading) {
     return <PlanningIntervalObjectiveDetailsLoading />

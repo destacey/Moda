@@ -12,7 +12,6 @@ import { useCreateStrategicInitiativeKpiMutation } from '@/src/store/features/pp
 import { toFormErrors } from '@/src/utils'
 import { Form, Input, InputNumber, Modal, Select } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
-import { useCallback } from 'react'
 
 export interface CreateStrategicInitiativeKpiFormProps {
   strategicInitiativeId: string
@@ -65,33 +64,30 @@ const CreateStrategicInitiativeKpiForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<CreateStrategicInitiativeKpiFormValues>({
-      onSubmit: useCallback(
-        async (values: CreateStrategicInitiativeKpiFormValues, form) => {
-          try {
-            const request = mapToRequestValues(values, strategicInitiativeId)
-            const response = await createKpi(request)
-            if (response.error) throw response.error
+      onSubmit: async (values: CreateStrategicInitiativeKpiFormValues, form) => {
+        try {
+          const request = mapToRequestValues(values, strategicInitiativeId)
+          const response = await createKpi(request)
+          if (response.error) throw response.error
 
-            messageApi.success(
-              'KPI created successfully. KPI key: ' + response.data.key,
+          messageApi.success(
+            'KPI created successfully. KPI key: ' + response.data.key,
+          )
+          return true
+        } catch (error) {
+          if (error.status === 422 && error.errors) {
+            const formErrors = toFormErrors(error.errors)
+            form.setFields(formErrors)
+            messageApi.error('Correct the validation error(s) to continue.')
+          } else {
+            messageApi.error(
+              error.detail ??
+                'An error occurred while creating the KPI. Please try again.',
             )
-            return true
-          } catch (error) {
-            if (error.status === 422 && error.errors) {
-              const formErrors = toFormErrors(error.errors)
-              form.setFields(formErrors)
-              messageApi.error('Correct the validation error(s) to continue.')
-            } else {
-              messageApi.error(
-                error.detail ??
-                  'An error occurred while creating the KPI. Please try again.',
-              )
-            }
-            return false
           }
-        },
-        [createKpi, strategicInitiativeId, messageApi],
-      ),
+          return false
+        }
+      },
       onComplete: onFormComplete,
       onCancel: onFormCancel,
       errorMessage:

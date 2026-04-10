@@ -23,9 +23,7 @@ import { notFound, useParams, usePathname } from 'next/navigation'
 import {
   CSSProperties,
   FC,
-  useCallback,
   useEffect,
-  useMemo,
   useState,
 } from 'react'
 import { PresenceParticipant } from '@/src/hooks/use-poker-session-connection'
@@ -72,7 +70,7 @@ const PokerSessionDetailPage: FC = () => {
 
   const { token } = useTheme()
   const screens = useBreakpoint()
-  const isMobile = useMemo(() => !screens.md, [screens.md])
+  const isMobile = !screens.md
   const messageApi = useMessage()
   const { hasPermissionClaim } = useAuth()
   const canManage = hasPermissionClaim('Permissions.PokerSessions.Update')
@@ -110,7 +108,7 @@ const PokerSessionDetailPage: FC = () => {
   const [openEditForm, setOpenEditForm] = useState(false)
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
 
-  const handleComplete = useCallback(async () => {
+  const handleComplete = async () => {
     if (!session) return
     try {
       const response = await completeSession({
@@ -122,40 +120,37 @@ const PokerSessionDetailPage: FC = () => {
     } catch {
       messageApi.error('Failed to complete session.')
     }
-  }, [completeSession, session, messageApi])
+  }
 
-  const handleRemoveRound = useCallback(
-    async (roundId: string) => {
-      if (!session) return
-      try {
-        const response = await removeRound({
-          sessionId: session.id,
-          roundId,
-          sessionKey: session.key,
-        })
-        if (response.error) throw response.error
-        if (selectedRoundId === roundId) {
-          setSelectedRoundId(undefined)
-        }
-      } catch {
-        messageApi.error('Failed to remove round.')
+  const handleRemoveRound = async (roundId: string) => {
+    if (!session) return
+    try {
+      const response = await removeRound({
+        sessionId: session.id,
+        roundId,
+        sessionKey: session.key,
+      })
+      if (response.error) throw response.error
+      if (selectedRoundId === roundId) {
+        setSelectedRoundId(undefined)
       }
-    },
-    [removeRound, session, selectedRoundId, messageApi],
-  )
+    } catch {
+      messageApi.error('Failed to remove round.')
+    }
+  }
 
-  const handleCopyInviteLink = useCallback(() => {
+  const handleCopyInviteLink = () => {
     navigator.clipboard.writeText(window.location.href)
     messageApi.success('Invite link copied to clipboard.')
-  }, [messageApi])
+  }
 
-  const rounds = useMemo(() => session?.rounds ?? [], [session?.rounds])
+  const rounds = session?.rounds ?? []
   const activeRound = selectedRoundId
     ? rounds.find((r) => r.id === selectedRoundId)
     : (rounds.find((r) => r.status === 'Voting' || r.status === 'Revealed') ??
       rounds[0])
 
-  const handleConsensusSet = useCallback(async () => {
+  const handleConsensusSet = async () => {
     if (!session) return
     const hasNextVotingRound = rounds.some(
       (r) => r.id !== activeRound?.id && r.status === 'Voting',
@@ -172,18 +167,18 @@ const PokerSessionDetailPage: FC = () => {
       }
     }
     setSelectedRoundId(undefined)
-  }, [session, rounds, activeRound?.id, addRound])
+  }
 
   // Determine center column view mode
-  const centerViewMode = useMemo(() => {
-    if (!activeRound) return 'lobby' as const
-    if (activeRound.status === 'Accepted') return 'review' as const
-    return 'active' as const
-  }, [activeRound])
+  const centerViewMode = !activeRound
+    ? ('lobby' as const)
+    : activeRound.status === 'Accepted'
+      ? ('review' as const)
+      : ('active' as const)
 
   // Merge connected participants with voters from the active round
   // so that votes from disconnected users still appear
-  const roundParticipants = useMemo(() => {
+  const roundParticipants = (() => {
     const map = new Map<string, { id: string; name: string }>()
     for (const p of connectedParticipants) {
       map.set(p.id, p)
@@ -199,43 +194,40 @@ const PokerSessionDetailPage: FC = () => {
       }
     }
     return Array.from(map.values())
-  }, [connectedParticipants, activeRound])
+  })()
 
   // Derive the current user's vote from the API data
-  const selectedVote = useMemo(() => {
+  const selectedVote = (() => {
     if (!activeRound || !profile?.id) return undefined
     const myVote = activeRound.votes?.find(
       (v) => v.participant?.id === profile.id,
     )
     return myVote?.value || undefined
-  }, [activeRound, profile?.id])
+  })()
 
-  const handleVote = useCallback(
-    async (value: string) => {
-      if (!session || !activeRound) return
-      try {
-        if (selectedVote === value) {
-          const response = await withdrawVote({
-            sessionId: session.id,
-            roundId: activeRound.id,
-            sessionKey: session.key,
-          })
-          if (response.error) throw response.error
-        } else {
-          const response = await submitVote({
-            sessionId: session.id,
-            roundId: activeRound.id,
-            sessionKey: session.key,
-            request: { value },
-          })
-          if (response.error) throw response.error
-        }
-      } catch {
-        messageApi.error('Failed to submit vote.')
+  const handleVote = async (value: string) => {
+    if (!session || !activeRound) return
+    try {
+      if (selectedVote === value) {
+        const response = await withdrawVote({
+          sessionId: session.id,
+          roundId: activeRound.id,
+          sessionKey: session.key,
+        })
+        if (response.error) throw response.error
+      } else {
+        const response = await submitVote({
+          sessionId: session.id,
+          roundId: activeRound.id,
+          sessionKey: session.key,
+          request: { value },
+        })
+        if (response.error) throw response.error
       }
-    },
-    [submitVote, withdrawVote, selectedVote, session, activeRound, messageApi],
-  )
+    } catch {
+      messageApi.error('Failed to submit vote.')
+    }
+  }
 
   if (isLoading) {
     return <PokerSessionDetailsLoading />

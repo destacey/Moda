@@ -10,7 +10,7 @@ import {
 import { Button, Dropdown, Space } from 'antd'
 import type { MenuProps } from 'antd'
 import { DownOutlined } from '@ant-design/icons'
-import { FC, useCallback, useMemo } from 'react'
+import { FC } from 'react'
 import { calculateVoteStats } from './results-panel'
 import styles from './poker-session.module.css'
 
@@ -40,7 +40,7 @@ const VotingActions: FC<VotingActionsProps> = ({
   const [setConsensus, { isLoading: isSettingConsensus }] =
     useSetPokerRoundConsensusMutation()
 
-  const handleReveal = useCallback(async () => {
+  const handleReveal = async () => {
     try {
       const response = await revealRound({
         sessionId,
@@ -51,9 +51,9 @@ const VotingActions: FC<VotingActionsProps> = ({
     } catch {
       messageApi.error('Failed to reveal votes.')
     }
-  }, [revealRound, sessionId, round.id, sessionKey, messageApi])
+  }
 
-  const handleReset = useCallback(async () => {
+  const handleReset = async () => {
     try {
       const response = await resetRound({
         sessionId,
@@ -64,32 +64,28 @@ const VotingActions: FC<VotingActionsProps> = ({
     } catch {
       messageApi.error('Failed to reset round.')
     }
-  }, [resetRound, sessionId, round.id, sessionKey, messageApi])
+  }
 
-  const handleSetConsensus = useCallback(
-    async (value: string) => {
-      try {
-        const response = await setConsensus({
-          sessionId,
-          roundId: round.id,
-          sessionKey,
-          request: { estimate: value },
-        })
-        if (response.error) throw response.error
-        messageApi.success('Consensus set.')
-        onConsensusSet?.()
-      } catch {
-        messageApi.error('Failed to set consensus.')
-      }
-    },
-    [setConsensus, sessionId, round.id, sessionKey, messageApi, onConsensusSet],
-  )
+  const handleSetConsensus = async (value: string) => {
+    try {
+      const response = await setConsensus({
+        sessionId,
+        roundId: round.id,
+        sessionKey,
+        request: { estimate: value },
+      })
+      if (response.error) throw response.error
+      messageApi.success('Consensus set.')
+      onConsensusSet?.()
+    } catch {
+      messageApi.error('Failed to set consensus.')
+    }
+  }
 
-  const modeValue = useMemo(() => {
-    if (round.status !== 'Revealed' || round.votes.length === 0)
-      return undefined
-    return calculateVoteStats(round.votes).mode
-  }, [round.status, round.votes])
+  const modeValue =
+    round.status !== 'Revealed' || round.votes.length === 0
+      ? undefined
+      : calculateVoteStats(round.votes).mode
 
   const isVoting = round.status === 'Voting'
   const isRevealed = round.status === 'Revealed'

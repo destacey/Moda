@@ -2,7 +2,7 @@
 
 import { PageActions, PageTitle } from '@/src/components/common'
 import { Card, Flex, MenuProps, Spin, Tag, Typography } from 'antd'
-import { use, useCallback, useMemo, useState } from 'react'
+import { use, useState } from 'react'
 import useAuth from '@/src/components/contexts/auth'
 import { authorizePage } from '@/src/components/hoc'
 import { notFound, useRouter } from 'next/navigation'
@@ -76,9 +76,9 @@ const RoleDetailsPage = (props: { params: Promise<{ id: string }> }) => {
     hasPermissionClaim('Permissions.Roles.Delete') && editableRole
   const canUpdateUserRoles = hasPermissionClaim('Permissions.UserRoles.Update')
 
-  const tabs = useMemo(() => getRoleTabs(), [])
+  const tabs = getRoleTabs()
 
-  const actionsMenuItems: MenuProps['items'] = useMemo(() => {
+  const actionsMenuItems: MenuProps['items'] = (() => {
     let includesDetailsSection = false
     const items: ItemType[] = []
     if (canUpdateRole) {
@@ -116,9 +116,9 @@ const RoleDetailsPage = (props: { params: Promise<{ id: string }> }) => {
       })
     }
     return items
-  }, [canDeleteRole, canUpdateRole, canUpdateUserRoles, countData])
+  })()
 
-  const renderTabContent = useCallback(() => {
+  const renderTabContent = () => {
     switch (activeTab) {
       case RoleDetailsTabs.Permissions:
         return (
@@ -134,32 +134,26 @@ const RoleDetailsPage = (props: { params: Promise<{ id: string }> }) => {
       default:
         return null
     }
-  }, [activeTab, id, isSystemRole, roleData])
+  }
 
-  const onTabChange = useCallback(
-    (tabKey: string) => {
-      if (
-        permissionsDirty &&
-        !window.confirm(
-          'You have unsaved permission changes. Are you sure you want to leave?',
-        )
+  const onTabChange = (tabKey: string) => {
+    if (
+      permissionsDirty &&
+      !window.confirm(
+        'You have unsaved permission changes. Are you sure you want to leave?',
       )
-        return
-      setPermissionsDirty(false)
-      setActiveTab(tabKey as RoleDetailsTabs)
-    },
-    [permissionsDirty],
-  )
+    )
+      return
+    setPermissionsDirty(false)
+    setActiveTab(tabKey as RoleDetailsTabs)
+  }
 
-  const onDeleteRoleFormClosed = useCallback(
-    (wasDeleted: boolean) => {
-      setOpenDeleteRoleForm(false)
-      if (wasDeleted) {
-        router.push('/settings/user-management/roles')
-      }
-    },
-    [router],
-  )
+  const onDeleteRoleFormClosed = (wasDeleted: boolean) => {
+    setOpenDeleteRoleForm(false)
+    if (wasDeleted) {
+      router.push('/settings/user-management/roles')
+    }
+  }
 
   if (!isLoading && !roleData) {
     return notFound()

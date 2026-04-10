@@ -2,7 +2,7 @@
 
 import { ProjectPortfolioListDto } from '@/src/services/moda-api'
 import { Flex, List } from 'antd'
-import { ReactElement, useMemo } from 'react'
+import { ReactElement } from 'react'
 import PortfolioCard from './portfolio-card'
 import { ModaEmpty } from '@/src/components/common'
 
@@ -27,7 +27,7 @@ const gridConfig = {
 const PortfoliosCardGrid: React.FC<PortfoliosCardGridProps> = (
   props: PortfoliosCardGridProps,
 ) => {
-  const sortedPortfolios = useMemo<ProjectPortfolioListDto[]>(() => {
+  const sortedPortfolios: ProjectPortfolioListDto[] = (() => {
     if (!props.portfolios || props.portfolios.length === 0) {
       return []
     }
@@ -37,7 +37,7 @@ const PortfoliosCardGrid: React.FC<PortfoliosCardGridProps> = (
         portfolio.status.name === 'On Hold',
     )
     return activePortfolios.sort((a, b) => a.name.localeCompare(b.name))
-  }, [props.portfolios])
+  })()
 
   return (
     <>

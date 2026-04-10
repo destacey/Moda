@@ -13,7 +13,7 @@ import useAuth from '@/src/components/contexts/auth'
 import { toFormErrors } from '@/src/utils'
 import { Form, Input, Modal, Radio } from 'antd'
 import { useRouter } from 'next/navigation'
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 
 const { Item } = Form
 const { TextArea } = Input
@@ -68,8 +68,7 @@ const CopyRoadmapForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<CopyRoadmapFormValues>({
-      onSubmit: useCallback(
-        async (values: CopyRoadmapFormValues, form) => {
+      onSubmit: async (values: CopyRoadmapFormValues, form) => {
           try {
             const request = mapToRequestValues(values, sourceRoadmapId)
             const response = await copyRoadmap(request)
@@ -97,8 +96,6 @@ const CopyRoadmapForm = ({
             return false
           }
         },
-        [copyRoadmap, sourceRoadmapId, router, messageApi],
-      ),
       onComplete: onFormComplete,
       onCancel: onFormCancel,
       errorMessage:

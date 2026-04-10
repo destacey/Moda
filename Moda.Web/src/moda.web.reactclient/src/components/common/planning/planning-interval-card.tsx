@@ -5,7 +5,6 @@ import dayjs from 'dayjs'
 import Link from 'next/link'
 import { IterationState } from '../../types'
 import { useGetPlanningIntervalIterationsQuery } from '@/src/store/features/planning/planning-interval-api'
-import { useMemo } from 'react'
 
 const { Text } = Typography
 
@@ -40,9 +39,8 @@ const PlanningIntervalCard = ({
     },
   )
 
-  const activeIteration = useMemo(
-    () => iterationsData?.find((iteration) => iteration.state === 'Active'),
-    [iterationsData],
+  const activeIteration = iterationsData?.find(
+    (iteration) => iteration.state === 'Active',
   )
 
   if (!planningInterval) return null

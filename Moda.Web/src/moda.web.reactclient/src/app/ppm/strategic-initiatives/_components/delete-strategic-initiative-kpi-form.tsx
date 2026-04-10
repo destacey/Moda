@@ -5,7 +5,6 @@ import { useConfirmModal } from '@/src/hooks'
 import { StrategicInitiativeKpiListDto } from '@/src/services/moda-api'
 import { useDeleteStrategicInitiativeKpiMutation } from '@/src/store/features/ppm/strategic-initiatives-api'
 import { Modal } from 'antd'
-import { useCallback } from 'react'
 
 export interface DeleteStrategicInitiativeKpiFormProps {
   strategicInitiativeId: string
@@ -25,7 +24,7 @@ const DeleteStrategicInitiativeKpiForm = ({
   const [deleteKpiMutation] = useDeleteStrategicInitiativeKpiMutation()
 
   const { isOpen, isSaving, handleOk, handleCancel } = useConfirmModal({
-    onSubmit: useCallback(async () => {
+    onSubmit: async () => {
       try {
         const response = await deleteKpiMutation({
           strategicInitiativeId,
@@ -43,7 +42,7 @@ const DeleteStrategicInitiativeKpiForm = ({
         console.log(error)
         return false
       }
-    }, [deleteKpiMutation, strategicInitiativeId, kpi, messageApi]),
+    },
     onComplete: onFormComplete,
     onCancel: onFormCancel,
     errorMessage: 'An unexpected error occurred while deleting the KPI.',

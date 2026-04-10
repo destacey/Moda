@@ -43,6 +43,7 @@ export function useRemainingHeight(
   }, [calculate])
 
   // Callback ref — fires when the element mounts or unmounts.
+  // Must be stable so React doesn't repeatedly detach/reattach.
   const callbackRef = useCallback(
     (node: HTMLElement | null) => {
       // Clean up previous observer
@@ -65,7 +66,7 @@ export function useRemainingHeight(
         roRef.current.observe(scrollParent)
       }
     },
-    [bottomOffset, calculate],
+    [calculate, bottomOffset],
   )
 
   // Disconnect observer on unmount

@@ -6,7 +6,7 @@ import { authorizePage } from '@/src/components/hoc'
 import { useDocumentTitle } from '@/src/hooks'
 import { useGetProgramsQuery } from '@/src/store/features/ppm/programs-api'
 import { Button } from 'antd'
-import { FC, useCallback, useEffect, useMemo, useState } from 'react'
+import { FC, useEffect, useState } from 'react'
 import { CreateProgramForm } from './_components'
 import { ProgramsFilterBar, ProgramsGrid } from '../_components'
 import { useMessage } from '@/src/components/contexts/messaging'
@@ -53,22 +53,19 @@ const ProgramsPage: FC = () => {
     }
   }, [error, messageApi])
 
-  const handleStatusChange = useCallback((statuses: number[]) => {
+  const handleStatusChange = (statuses: number[]) => {
     setSelectedStatuses(statuses)
-  }, [])
+  }
 
-  const actions = useMemo(() => {
-    if (!showActions) return null
-    return (
-      <>
-        {canCreateProgram && (
-          <Button onClick={() => setOpenCreateProgramForm(true)}>
-            Create Program
-          </Button>
-        )}
-      </>
-    )
-  }, [canCreateProgram, showActions])
+  const actions = !showActions ? null : (
+    <>
+      {canCreateProgram && (
+        <Button onClick={() => setOpenCreateProgramForm(true)}>
+          Create Program
+        </Button>
+      )}
+    </>
+  )
 
   const onCreateProgramFormClosed = (wasCreated: boolean) => {
     setOpenCreateProgramForm(false)

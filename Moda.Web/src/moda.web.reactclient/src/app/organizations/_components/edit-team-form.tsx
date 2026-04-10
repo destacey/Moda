@@ -1,7 +1,7 @@
 'use client'
 
 import { Form, Input } from 'antd'
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 import { TeamDetailsDto, TeamOfTeamsDetailsDto } from '@/src/services/moda-api'
 import { EditTeamFormValues } from '../types'
 import withModalForm, {
@@ -22,8 +22,9 @@ interface EditTeamFormProps extends FormProps<EditTeamFormValues> {
 }
 
 const EditTeamForm = ({ form, team }: EditTeamFormProps) => {
-  const mapTeamToFormValues = useCallback(
-    (team: EditTeamFormValues) => {
+  useEffect(() => {
+    if (!team) return
+    const mapTeamToFormValues = (team: EditTeamFormValues) => {
       form.setFieldsValue({
         id: team.id,
         name: team.name,
@@ -31,13 +32,9 @@ const EditTeamForm = ({ form, team }: EditTeamFormProps) => {
         description: team.description || '',
         type: team.type,
       })
-    },
-    [form],
-  )
-
-  useEffect(() => {
-    team && mapTeamToFormValues(team as EditTeamFormValues)
-  }, [mapTeamToFormValues, team])
+    }
+    mapTeamToFormValues(team as EditTeamFormValues)
+  }, [form, team])
 
   return (
     <>

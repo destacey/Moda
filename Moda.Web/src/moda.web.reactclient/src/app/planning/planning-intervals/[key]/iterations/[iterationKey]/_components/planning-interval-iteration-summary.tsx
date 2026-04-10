@@ -24,7 +24,7 @@ import {
   Tooltip,
   Typography,
 } from 'antd'
-import { FC, ReactNode, useEffect, useMemo, useState } from 'react'
+import { FC, ReactNode, useEffect, useState } from 'react'
 import { SprintCard } from '.'
 import { IterationHealthIndicator } from '@/src/components/common/planning'
 import { useGetTeamOperatingModelsForTeamsQuery } from '@/src/store/features/organizations/team-api'
@@ -59,40 +59,29 @@ const PlanningIntervalIterationSummary: FC<
       { skip: !metrics || metrics.sprintMetrics.length === 0 },
     )
 
-  const sortedSprints = useMemo(() => {
-    if (!metrics) return []
-    return [...metrics.sprintMetrics].sort((a, b) =>
-      a.team.name.localeCompare(b.team.name),
-    )
-  }, [metrics])
+  const sortedSprints = !metrics
+    ? []
+    : [...metrics.sprintMetrics].sort((a, b) =>
+        a.team.name.localeCompare(b.team.name),
+      )
 
-  const operatingModelMap = useMemo(() => {
-    if (!operatingModels) return new Map()
-    return new Map(operatingModels.map((m) => [m.teamId, m]))
-  }, [operatingModels])
+  const operatingModelMap = !operatingModels
+    ? new Map()
+    : new Map(operatingModels.map((m) => [m.teamId, m]))
 
-  const displayValues = useMemo(() => {
-    if (!metrics) {
-      return {
+  const displayValues = !metrics
+    ? {
         total: 0,
         completed: 0,
         inProgress: 0,
         notStarted: 0,
       }
-    }
-
-    const total = metrics.totalWorkItems
-    const completed = metrics.completedWorkItems
-    const inProgress = metrics.inProgressWorkItems
-    const notStarted = metrics.notStartedWorkItems
-
-    return {
-      total,
-      completed,
-      inProgress,
-      notStarted,
-    }
-  }, [metrics])
+    : {
+        total: metrics.totalWorkItems,
+        completed: metrics.completedWorkItems,
+        inProgress: metrics.inProgressWorkItems,
+        notStarted: metrics.notStartedWorkItems,
+      }
 
   // Notify parent when health indicator is ready
   useEffect(() => {

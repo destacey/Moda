@@ -5,7 +5,6 @@ import {
   useGetEmployeeQuery,
 } from '@/src/store/features/organizations/employee-api'
 import { useMessage } from '@/src/components/contexts/messaging'
-import { useCallback } from 'react'
 import { Modal } from 'antd'
 import { useConfirmModal } from '@/src/hooks'
 
@@ -27,7 +26,7 @@ const DeleteEmployeeForm = ({
   const [deleteEmployeeMutation] = useDeleteEmployeeMutation()
 
   const { isOpen, isSaving, handleOk, handleCancel } = useConfirmModal({
-    onSubmit: useCallback(async () => {
+    onSubmit: async () => {
       if (!employeeData) return false
       try {
         await deleteEmployeeMutation(employeeData.id)
@@ -39,7 +38,7 @@ const DeleteEmployeeForm = ({
         )
         return false
       }
-    }, [deleteEmployeeMutation, employeeData, messageApi]),
+    },
     onComplete: onFormComplete,
     onCancel: onFormCancel,
     errorMessage:

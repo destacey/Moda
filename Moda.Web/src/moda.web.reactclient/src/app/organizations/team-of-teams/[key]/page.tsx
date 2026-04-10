@@ -5,9 +5,7 @@ import { Card, MenuProps } from 'antd'
 import {
   createElement,
   use,
-  useCallback,
   useEffect,
-  useMemo,
   useState,
 } from 'react'
 import TeamOfTeamsDetails from '../_components/team-of-teams-details'
@@ -105,11 +103,11 @@ const TeamOfTeamsDetailsPage = (props: {
     { skip: !team?.id || !risksQueryEnabled },
   )
 
-  const onIncludeClosedRisksChanged = useCallback((includeClosed: boolean) => {
+  const onIncludeClosedRisksChanged = (includeClosed: boolean) => {
     setIncludeClosedRisks(includeClosed)
-  }, [])
+  }
 
-  const actionsMenuItems: MenuProps['items'] = useMemo(() => {
+  const actionsMenuItems: MenuProps['items'] = (() => {
     const items: ItemType[] = []
 
     if (canUpdateTeam) {
@@ -137,8 +135,8 @@ const TeamOfTeamsDetailsPage = (props: {
     }
 
     return items
-  }, [canManageTeamMemberships, canUpdateTeam, dispatch, team?.isActive])
-  const renderTabContent = useCallback(() => {
+  })()
+  const renderTabContent = () => {
     switch (activeTab) {
       case TeamOfTeamsTabs.Details:
         return <TeamOfTeamsDetails team={team} />
@@ -163,13 +161,7 @@ const TeamOfTeamsDetailsPage = (props: {
       default:
         return null
     }
-  }, [
-    activeTab,
-    team,
-    risksQuery,
-    teamMembershipsQuery,
-    onIncludeClosedRisksChanged,
-  ])
+  }
 
   useEffect(() => {
     dispatch(retrieveTeam({ key: teamKey, type: 'Team of Teams' }))
@@ -184,22 +176,19 @@ const TeamOfTeamsDetailsPage = (props: {
   }, [error])
 
   // doesn't trigger on first render
-  const onTabChange = useCallback(
-    (tabKey: string) => {
-      setActiveTab(tabKey as TeamOfTeamsTabs)
+  const onTabChange = (tabKey: string) => {
+    setActiveTab(tabKey as TeamOfTeamsTabs)
 
-      // enables the query for the tab on first render if it hasn't been enabled yet
-      if (tabKey == TeamOfTeamsTabs.RiskManagement && !risksQueryEnabled) {
-        setRisksQueryEnabled(true)
-      } else if (
-        tabKey == TeamOfTeamsTabs.TeamMemberships &&
-        !teamMembershipsQueryEnabled
-      ) {
-        setTeamMembershipsQueryEnabled(true)
-      }
-    },
-    [risksQueryEnabled, teamMembershipsQueryEnabled],
-  )
+    // enables the query for the tab on first render if it hasn't been enabled yet
+    if (tabKey == TeamOfTeamsTabs.RiskManagement && !risksQueryEnabled) {
+      setRisksQueryEnabled(true)
+    } else if (
+      tabKey == TeamOfTeamsTabs.TeamMemberships &&
+      !teamMembershipsQueryEnabled
+    ) {
+      setTeamMembershipsQueryEnabled(true)
+    }
+  }
 
   const onCreateTeamMembershipFormClosed = (wasSaved: boolean) => {
     setOpenCreateTeamMembershipForm(false)

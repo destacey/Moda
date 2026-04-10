@@ -5,7 +5,7 @@ import {
   useGetRoadmapItemQuery,
 } from '@/src/store/features/planning/roadmaps-api'
 import { Modal } from 'antd'
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 
 export interface DeleteRoadmapItemFormProps {
   roadmapId: string
@@ -34,7 +34,7 @@ const DeleteRoadmapItemForm = ({
   })
 
   const { isOpen, isSaving, handleOk, handleCancel } = useConfirmModal({
-    onSubmit: useCallback(async () => {
+    onSubmit: async () => {
       if (!itemData) return false
       try {
         await deleteRoadmapItemMutation({
@@ -50,7 +50,7 @@ const DeleteRoadmapItemForm = ({
         console.log(error)
         return false
       }
-    }, [deleteRoadmapItemMutation, itemData, messageApi]),
+    },
     onComplete: onFormComplete,
     onCancel: onFormCancel,
     errorMessage:

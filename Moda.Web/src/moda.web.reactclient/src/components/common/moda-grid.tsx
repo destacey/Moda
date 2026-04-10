@@ -4,7 +4,6 @@ import './grid/ag-grid-init'
 import { AgGridReact, AgGridReactProps } from 'ag-grid-react'
 import {
   forwardRef,
-  useCallback,
   useImperativeHandle,
   useRef,
   useState,
@@ -95,25 +94,25 @@ const ModaGrid = forwardRef<AgGridReact, ModaGridProps>(
       }
     }
 
-    const onModelUpdated = useCallback(() => {
+    const onModelUpdated = () => {
       setDisplayedRowCount(gridRef.current?.api.getDisplayedRowCount() ?? 0)
-    }, [])
+    }
 
-    const onGlobalSearchChange = useCallback((e) => {
+    const onGlobalSearchChange = (e) => {
       const value = e.target.value
       setSearchValue(value)
       gridRef.current?.api.setGridOption('quickFilterText', value)
-    }, [])
+    }
 
-    const onBtnExport = useCallback(() => {
+    const onBtnExport = () => {
       gridRef.current?.api.exportDataAsCsv()
-    }, [])
+    }
 
-    const onClearFilters = useCallback(() => {
+    const onClearFilters = () => {
       gridRef.current?.api.setFilterModel(null)
       setSearchValue('')
       gridRef.current?.api.setGridOption('quickFilterText', undefined)
-    }, [])
+    }
 
     return (
       <div style={{ width: width }}>

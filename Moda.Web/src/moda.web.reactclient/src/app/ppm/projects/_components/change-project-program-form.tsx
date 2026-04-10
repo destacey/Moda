@@ -10,7 +10,7 @@ import { useGetPortfolioProgramOptionsQuery } from '@/src/store/features/ppm/por
 import { useChangeProjectProgramMutation } from '@/src/store/features/ppm/projects-api'
 import { toFormErrors } from '@/src/utils'
 import { Flex, Form, Modal, Select, Typography } from 'antd'
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 
 const { Item } = Form
 const { Text } = Typography
@@ -42,8 +42,7 @@ const ChangeProjectProgramForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<ChangeProjectProgramFormValues>({
-      onSubmit: useCallback(
-        async (values: ChangeProjectProgramFormValues, form) => {
+      onSubmit: async (values: ChangeProjectProgramFormValues, form) => {
           try {
             const request: ChangeProjectProgramRequest = {
               programId: values.programId ?? null,
@@ -71,8 +70,6 @@ const ChangeProjectProgramForm = ({
             return false
           }
         },
-        [changeProjectProgram, project, messageApi],
-      ),
       onComplete: onFormComplete,
       onCancel: onFormCancel,
       errorMessage:

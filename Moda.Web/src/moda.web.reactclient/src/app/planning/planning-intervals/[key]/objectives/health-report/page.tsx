@@ -1,7 +1,7 @@
 'use client'
 
 import PageTitle from '@/src/components/common/page-title'
-import { use, useCallback, useMemo } from 'react'
+import { use, useMemo } from 'react'
 import { useDocumentTitle } from '@/src/hooks/use-document-title'
 import { authorizePage } from '@/src/components/hoc'
 import { notFound } from 'next/navigation'
@@ -103,9 +103,9 @@ const ObjectiveHealthReportPage = (props: {
     [],
   )
 
-  const refresh = useCallback(async () => {
+  const refresh = async () => {
     refetch()
-  }, [refetch])
+  }
 
   if (!isLoading && !healthReport) {
     return notFound()

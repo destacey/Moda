@@ -10,7 +10,7 @@ import {
   Modal,
   Select,
 } from 'antd'
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 import { ManagePlanningIntervalDatesRequest } from '@/src/services/moda-api'
 import { toFormErrors } from '@/src/utils'
 import dayjs from 'dayjs'
@@ -84,36 +84,33 @@ const ManagePlanningIntervalDatesForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<ManagePlanningIntervalDatesFormValues>({
-      onSubmit: useCallback(
-        async (values: ManagePlanningIntervalDatesFormValues, form) => {
-          try {
-            const request = mapToRequestValues(values, id)
-            const response = await managePlanningIntervalDates({
-              request,
-              cacheKey: planningIntervalKey,
-            })
-            if (response.error) {
-              throw response.error
-            }
-            messageApi.success('Planning interval dates updated successfully.')
-            return true
-          } catch (error) {
-            if (error.status === 422 && error.errors) {
-              const formErrors = toFormErrors(error.errors)
-              form.setFields(formErrors)
-              messageApi.error('Correct the validation error(s) to continue.')
-            } else {
-              messageApi.error(
-                error.detail ??
-                  'An error occurred while updating the planning interval dates.',
-              )
-              console.error(error)
-            }
-            return false
+      onSubmit: async (values: ManagePlanningIntervalDatesFormValues, form) => {
+        try {
+          const request = mapToRequestValues(values, id)
+          const response = await managePlanningIntervalDates({
+            request,
+            cacheKey: planningIntervalKey,
+          })
+          if (response.error) {
+            throw response.error
           }
-        },
-        [managePlanningIntervalDates, id, planningIntervalKey, messageApi],
-      ),
+          messageApi.success('Planning interval dates updated successfully.')
+          return true
+        } catch (error) {
+          if (error.status === 422 && error.errors) {
+            const formErrors = toFormErrors(error.errors)
+            form.setFields(formErrors)
+            messageApi.error('Correct the validation error(s) to continue.')
+          } else {
+            messageApi.error(
+              error.detail ??
+                'An error occurred while updating the planning interval dates.',
+            )
+            console.error(error)
+          }
+          return false
+        }
+      },
       onComplete: onFormSave,
       onCancel: onFormCancel,
       errorMessage:

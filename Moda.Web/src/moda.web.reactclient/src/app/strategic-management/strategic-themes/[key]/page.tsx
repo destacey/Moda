@@ -9,7 +9,7 @@ import { useGetStrategicThemeQuery } from '@/src/store/features/strategic-manage
 import { Descriptions, MenuProps, Space } from 'antd'
 import { notFound, usePathname, useRouter } from 'next/navigation'
 import StrategicThemeDetailsLoading from './loading'
-import { use, useCallback, useEffect, useMemo, useState } from 'react'
+import { use, useEffect, useState } from 'react'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import { ItemType } from 'antd/es/menu/interface'
 import {
@@ -89,7 +89,7 @@ const StrategicThemeDetailsPage = (props: {
     error && console.error(error)
   }, [error])
 
-  const actionsMenuItems: MenuProps['items'] = useMemo(() => {
+  const actionsMenuItems: MenuProps['items'] = (() => {
     const currentState = strategicThemeData?.state.name
     const availableActions =
       currentState === 'Proposed'
@@ -151,51 +151,35 @@ const StrategicThemeDetailsPage = (props: {
     }
 
     return items
-  }, [
-    strategicThemeData?.state.name,
-    canUpdateStrategicTheme,
-    canDeleteStrategicTheme,
-  ])
+  })()
 
-  const onEditStrategicThemeFormClosed = useCallback(
-    (wasSaved: boolean) => {
-      setOpenEditStrategicThemeForm(false)
-      if (wasSaved) {
-        refetchStrategicTheme()
-      }
-    },
-    [refetchStrategicTheme],
-  )
+  const onEditStrategicThemeFormClosed = (wasSaved: boolean) => {
+    setOpenEditStrategicThemeForm(false)
+    if (wasSaved) {
+      refetchStrategicTheme()
+    }
+  }
 
-  const onActivateStrategicThemeFormClosed = useCallback(
-    (wasSaved: boolean) => {
-      setOpenActivateStrategicThemeForm(false)
-      if (wasSaved) {
-        refetchStrategicTheme()
-      }
-    },
-    [refetchStrategicTheme],
-  )
+  const onActivateStrategicThemeFormClosed = (wasSaved: boolean) => {
+    setOpenActivateStrategicThemeForm(false)
+    if (wasSaved) {
+      refetchStrategicTheme()
+    }
+  }
 
-  const onArchiveStrategicThemeFormClosed = useCallback(
-    (wasSaved: boolean) => {
-      setOpenArchiveStrategicThemeForm(false)
-      if (wasSaved) {
-        refetchStrategicTheme()
-      }
-    },
-    [refetchStrategicTheme],
-  )
+  const onArchiveStrategicThemeFormClosed = (wasSaved: boolean) => {
+    setOpenArchiveStrategicThemeForm(false)
+    if (wasSaved) {
+      refetchStrategicTheme()
+    }
+  }
 
-  const onDeleteStrategicThemeFormClosed = useCallback(
-    (wasDeleted: boolean) => {
-      setOpenDeleteStrategicThemeForm(false)
-      if (wasDeleted) {
-        router.push('/strategic-management/strategic-themes')
-      }
-    },
-    [router],
-  )
+  const onDeleteStrategicThemeFormClosed = (wasDeleted: boolean) => {
+    setOpenDeleteStrategicThemeForm(false)
+    if (wasDeleted) {
+      router.push('/strategic-management/strategic-themes')
+    }
+  }
 
   if (isLoading) {
     return <StrategicThemeDetailsLoading />

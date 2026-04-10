@@ -8,7 +8,7 @@ import {
 } from '@/src/store/features/planning/roadmaps-api'
 import { toFormErrors } from '@/src/utils'
 import { DatePicker, Form, Input, Modal, Radio } from 'antd'
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 import dayjs from 'dayjs'
 import { useGetEmployeeOptionsQuery } from '@/src/store/features/organizations/employee-api'
 import useAuth from '@/src/components/contexts/auth'
@@ -71,8 +71,7 @@ const EditRoadmapForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<EditRoadmapFormValues>({
-      onSubmit: useCallback(
-        async (values: EditRoadmapFormValues, form) => {
+      onSubmit: async (values: EditRoadmapFormValues, form) => {
           try {
             const request = mapToRequestValues(values, roadmapData.id)
             const response = await updateRoadmap({
@@ -97,8 +96,6 @@ const EditRoadmapForm = ({
             return false
           }
         },
-        [roadmapData, updateRoadmap, messageApi],
-      ),
       onComplete: onFormComplete,
       onCancel: onFormCancel,
       errorMessage:

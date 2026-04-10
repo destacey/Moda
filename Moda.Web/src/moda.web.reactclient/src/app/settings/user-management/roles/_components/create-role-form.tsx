@@ -11,7 +11,6 @@ import {
 } from '@/src/store/features/user-management/roles-api'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { useModalForm } from '@/src/hooks'
-import { useCallback } from 'react'
 
 const { Item } = Form
 const { TextArea } = Input
@@ -46,8 +45,7 @@ const CreateRoleForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<CreateRoleFormValues>({
-      onSubmit: useCallback(
-        async (values: CreateRoleFormValues, form) => {
+      onSubmit: async (values: CreateRoleFormValues, form) => {
           try {
             const response = await upsertRole({
               name: values.name,
@@ -87,8 +85,6 @@ const CreateRoleForm = ({
             return false
           }
         },
-        [upsertRole, updatePermissions, roleIdToCopyPermissions, roleData, messageApi, onFormCreate],
-      ),
       onComplete: () => {}, // handled in onSubmit via onFormCreate(id)
       onCancel: onFormCancel,
       errorMessage: 'An unexpected error occurred while creating the role.',

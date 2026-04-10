@@ -4,7 +4,6 @@ import { useMessage } from '@/src/components/contexts/messaging'
 import { AzureDevOpsConnectionDetailsDto } from '@/src/services/moda-api'
 import { useDeleteConnectionMutation } from '@/src/store/features/app-integration/connections-api'
 import { Descriptions, Modal } from 'antd'
-import { useCallback } from 'react'
 import { useConfirmModal } from '@/src/hooks'
 
 const { Item } = Descriptions
@@ -26,7 +25,7 @@ const DeleteAzdoConnectionForm = ({
     useDeleteConnectionMutation()
 
   const { isOpen, isSaving, handleOk, handleCancel } = useConfirmModal({
-    onSubmit: useCallback(async () => {
+    onSubmit: async () => {
       try {
         const response = await deleteConnectionMutation(connection.id)
         if (response.error) {
@@ -41,7 +40,7 @@ const DeleteAzdoConnectionForm = ({
         console.log(error)
         return false
       }
-    }, [deleteConnectionMutation, connection, messageApi]),
+    },
     onComplete: onFormSave,
     onCancel: onFormCancel,
     errorMessage:

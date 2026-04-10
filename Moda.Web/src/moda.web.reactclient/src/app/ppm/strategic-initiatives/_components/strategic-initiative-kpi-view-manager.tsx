@@ -8,7 +8,7 @@ import { useGetStrategicInitiativeKpiCheckpointPlanQuery } from '@/src/store/fea
 import { AppstoreOutlined, MenuOutlined } from '@ant-design/icons'
 import { Flex, Segmented, Spin } from 'antd'
 import styles from './strategic-initiative-kpi-view-manager.module.css'
-import { FC, memo, useMemo, useState } from 'react'
+import { FC, memo, useState } from 'react'
 
 import {
   StrategicInitiativeKpisGrid,
@@ -65,10 +65,7 @@ const KpiCardWithCheckpoints: FC<KpiCardWithCheckpointsProps> = ({
       kpiId: kpi.id,
     })
 
-  const checkpoints = useMemo(
-    () => checkpointPlan?.map(toKpiCardCheckpoint),
-    [checkpointPlan],
-  )
+  const checkpoints = checkpointPlan?.map(toKpiCardCheckpoint)
 
   return (
     <KpiCard
@@ -114,16 +111,13 @@ const StrategicInitiativeKpiViewManager: FC<
     setOpenKpiDetailsDrawer(true)
   }
 
-  const viewSelector = useMemo(
-    () => (
+  const viewSelector = (
       <Segmented
         options={viewOptions}
         value={currentView}
         onChange={setCurrentView}
       />
-    ),
-    [currentView],
-  )
+    )
 
   return (
     <>

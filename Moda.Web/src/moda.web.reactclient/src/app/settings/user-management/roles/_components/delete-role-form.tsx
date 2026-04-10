@@ -7,7 +7,7 @@ import {
   useGetRoleUsersCountQuery,
 } from '@/src/store/features/user-management/roles-api'
 import { Alert, Flex, Modal } from 'antd'
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useConfirmModal } from '@/src/hooks'
 
 export interface DeleteRoleFormProps {
@@ -32,7 +32,7 @@ const DeleteRoleForm = ({
   })
 
   const { isOpen, isSaving, handleOk, handleCancel } = useConfirmModal({
-    onSubmit: useCallback(async () => {
+    onSubmit: async () => {
       try {
         const response = await deleteRoleMutation(role.id)
 
@@ -50,7 +50,7 @@ const DeleteRoleForm = ({
         }
         return false
       }
-    }, [deleteRoleMutation, role, messageApi]),
+    },
     onComplete: onFormComplete,
     onCancel: onFormCancel,
     errorMessage: 'An unexpected error occurred while deleting the role.',

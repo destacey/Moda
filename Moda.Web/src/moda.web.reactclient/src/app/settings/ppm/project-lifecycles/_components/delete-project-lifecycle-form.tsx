@@ -4,7 +4,6 @@ import { useMessage } from '@/src/components/contexts/messaging'
 import { ProjectLifecycleDetailsDto } from '@/src/services/moda-api'
 import { useDeleteProjectLifecycleMutation } from '@/src/store/features/ppm/project-lifecycles-api'
 import { Modal } from 'antd'
-import { useCallback } from 'react'
 import { useConfirmModal } from '@/src/hooks'
 
 export interface DeleteProjectLifecycleFormProps {
@@ -23,7 +22,7 @@ const DeleteProjectLifecycleForm = ({
   const [deleteProjectLifecycle] = useDeleteProjectLifecycleMutation()
 
   const { isOpen, isSaving, handleOk, handleCancel } = useConfirmModal({
-    onSubmit: useCallback(async () => {
+    onSubmit: async () => {
       try {
         const response = await deleteProjectLifecycle(lifecycle.id)
         if (response.error) {
@@ -39,7 +38,7 @@ const DeleteProjectLifecycleForm = ({
         console.log(error)
         return false
       }
-    }, [deleteProjectLifecycle, lifecycle, messageApi]),
+    },
     onComplete: onFormComplete,
     onCancel: onFormCancel,
     errorMessage:

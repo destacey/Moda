@@ -13,7 +13,7 @@ import {
 import useAuth from '@/src/components/contexts/auth'
 import { toFormErrors } from '@/src/utils'
 import { DatePicker, Form, Input, Modal, Radio } from 'antd'
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 
 const { Item } = Form
 const { TextArea } = Input
@@ -62,8 +62,7 @@ const CreateRoadmapForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<CreateRoadmapFormValues>({
-      onSubmit: useCallback(
-        async (values: CreateRoadmapFormValues, form) => {
+      onSubmit: async (values: CreateRoadmapFormValues, form) => {
           try {
             const request = mapToRequestValues(values)
             const response = await createRoadmap(request)
@@ -87,8 +86,6 @@ const CreateRoadmapForm = ({
             return false
           }
         },
-        [createRoadmap, messageApi],
-      ),
       onComplete: onFormComplete,
       onCancel: onFormCancel,
       errorMessage:

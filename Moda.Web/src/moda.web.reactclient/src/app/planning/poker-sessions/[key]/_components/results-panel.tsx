@@ -2,7 +2,7 @@
 
 import { PokerVoteDto } from '@/src/services/moda-api'
 import { Flex, Statistic, Tag, Typography } from 'antd'
-import { FC, useMemo } from 'react'
+import { FC } from 'react'
 import styles from './poker-session.module.css'
 
 const { Text } = Typography
@@ -64,9 +64,9 @@ export interface ResultsPanelProps {
 }
 
 const ResultsPanel: FC<ResultsPanelProps> = ({ votes }) => {
-  const stats = useMemo(() => calculateVoteStats(votes), [votes])
+  const stats = calculateVoteStats(votes)
 
-  const distribution = useMemo(() => {
+  const distribution = (() => {
     const counts = new Map<string, number>()
     for (const vote of votes) {
       counts.set(vote.value, (counts.get(vote.value) ?? 0) + 1)
@@ -77,7 +77,7 @@ const ResultsPanel: FC<ResultsPanelProps> = ({ votes }) => {
       if (!isNaN(na) && !isNaN(nb)) return na - nb
       return a.localeCompare(b)
     })
-  }, [votes])
+  })()
 
   if (votes.length === 0) return null
 

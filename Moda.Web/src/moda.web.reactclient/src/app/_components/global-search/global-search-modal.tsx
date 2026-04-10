@@ -3,9 +3,7 @@
 import {
   FC,
   memo,
-  useCallback,
   useEffect,
-  useMemo,
   useRef,
   useState,
 } from 'react'
@@ -196,7 +194,7 @@ const GlobalSearchModal: FC<GlobalSearchModalProps> = memo(
     }, [scope]) // eslint-disable-line react-hooks/exhaustive-deps
 
     // Compute visible items based on active tab
-    const visibleItems = useMemo(() => {
+    const visibleItems = (() => {
       if (!data?.categories) return []
 
       if (activeTab === 'all') {
@@ -212,7 +210,7 @@ const GlobalSearchModal: FC<GlobalSearchModalProps> = memo(
           category: category.name,
         })) ?? []
       )
-    }, [data, activeTab])
+    })()
 
     // Reset active index when search term or tab changes
     useEffect(() => {
@@ -229,54 +227,48 @@ const GlobalSearchModal: FC<GlobalSearchModalProps> = memo(
       }
     }, [activeIndex])
 
-    const handleNavigate = useCallback(
-      (item: GlobalSearchResultItemDto) => {
-        router.push(getSearchResultUrl(item))
-        onClose()
-      },
-      [router, onClose],
-    )
+    const handleNavigate = (item: GlobalSearchResultItemDto) => {
+      router.push(getSearchResultUrl(item))
+      onClose()
+    }
 
     // Keyboard navigation
-    const handleKeyDown = useCallback(
-      (e: React.KeyboardEvent) => {
-        // Scope switching: Ctrl+D for docs, Ctrl+K for app (chord shortcut)
-        if ((e.metaKey || e.ctrlKey) && e.key === 'd') {
-          e.preventDefault()
-          setScope('docs')
-          return
-        }
-        if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-          e.preventDefault()
-          setScope('app')
-          return
-        }
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+      // Scope switching: Ctrl+D for docs, Ctrl+K for app (chord shortcut)
+      if ((e.metaKey || e.ctrlKey) && e.key === 'd') {
+        e.preventDefault()
+        setScope('docs')
+        return
+      }
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault()
+        setScope('app')
+        return
+      }
 
-        if (e.key === 'ArrowDown' && visibleItems.length > 0) {
-          e.preventDefault()
-          isKeyboardNavRef.current = true
-          setActiveIndex((prev) =>
-            prev < visibleItems.length - 1 ? prev + 1 : 0,
-          )
-        } else if (e.key === 'ArrowUp' && visibleItems.length > 0) {
-          e.preventDefault()
-          isKeyboardNavRef.current = true
-          setActiveIndex((prev) =>
-            prev > 0 ? prev - 1 : visibleItems.length - 1,
-          )
-        } else if (e.key === 'Enter' && activeIndex >= 0 && visibleItems[activeIndex]) {
-          e.preventDefault()
-          handleNavigate(visibleItems[activeIndex])
-        } else if (e.key === 'Escape') {
-          e.preventDefault()
-          onClose()
-        }
-      },
-      [visibleItems, activeIndex, handleNavigate, onClose],
-    )
+      if (e.key === 'ArrowDown' && visibleItems.length > 0) {
+        e.preventDefault()
+        isKeyboardNavRef.current = true
+        setActiveIndex((prev) =>
+          prev < visibleItems.length - 1 ? prev + 1 : 0,
+        )
+      } else if (e.key === 'ArrowUp' && visibleItems.length > 0) {
+        e.preventDefault()
+        isKeyboardNavRef.current = true
+        setActiveIndex((prev) =>
+          prev > 0 ? prev - 1 : visibleItems.length - 1,
+        )
+      } else if (e.key === 'Enter' && activeIndex >= 0 && visibleItems[activeIndex]) {
+        e.preventDefault()
+        handleNavigate(visibleItems[activeIndex])
+      } else if (e.key === 'Escape') {
+        e.preventDefault()
+        onClose()
+      }
+    }
 
     // Build tab items
-    const tabItems = useMemo(() => {
+    const tabItems = (() => {
       const categories = data?.categories ?? []
       const tabs = [
         {
@@ -291,13 +283,10 @@ const GlobalSearchModal: FC<GlobalSearchModalProps> = memo(
           })),
       ]
       return tabs
-    }, [data])
+    })()
 
     // Group items by category for "All" tab
-    const groupedResults = useMemo(() => {
-      if (!data?.categories || activeTab !== 'all') return null
-      return data.categories.filter((c) => c.items.length > 0)
-    }, [data, activeTab])
+    const groupedResults = (!data?.categories || activeTab !== 'all') ? null : data.categories.filter((c) => c.items.length > 0)
 
     const renderResultItem = (
       item: GlobalSearchResultItemDto & { category?: string },

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import type { TreeNode, TreeGridEditingConfig, RowClickArgs } from './types'
 
 /**
@@ -66,225 +66,210 @@ export function useTreeGridEditing<T extends TreeNode>(
   })
 
   // Resolve editable columns for a given row (or the currently selected row)
-  const resolveEditableColumns = useCallback(
-    (rowId: string | null) => {
-      if (typeof editableColumnIds === 'function') {
-        return editableColumnIds(rowId)
-      }
-      return editableColumnIds
-    },
-    [editableColumnIds],
-  )
+  const resolveEditableColumns = (rowId: string | null) => {
+    if (typeof editableColumnIds === 'function') {
+      return editableColumnIds(rowId)
+    }
+    return editableColumnIds
+  }
 
   // Resolve editable columns (may be static or dynamic based on selected row)
-  const editableColumns = useMemo(
-    () => resolveEditableColumns(selectedRowId),
-    [resolveEditableColumns, selectedRowId],
-  )
+  const editableColumns = resolveEditableColumns(selectedRowId)
 
-  const getFieldError = useCallback(
-    (fieldName: string): string | undefined => {
-      return fieldErrors[fieldName]
-    },
-    [fieldErrors],
-  )
+  const getFieldError = (fieldName: string): string | undefined => {
+    return fieldErrors[fieldName]
+  }
 
   // Focus management using MutationObserver for DOM stability
-  const focusCellById = useCallback(
-    (cellId: string) => {
-      focusObserverRef.current?.disconnect()
-      focusObserverRef.current = null
-      const requestToken = ++focusRequestTokenRef.current
+  const focusCellById = useCallback((cellId: string) => {
+    focusObserverRef.current?.disconnect()
+    focusObserverRef.current = null
+    const requestToken = ++focusRequestTokenRef.current
 
-      let columnId = ''
-      for (const col of cellIdColumnMatchOrder) {
-        if (cellId.endsWith(`-${col}`)) {
-          columnId = col
+    let columnId = ''
+    for (const col of cellIdColumnMatchOrder) {
+      if (cellId.endsWith(`-${col}`)) {
+        columnId = col
+        break
+      }
+    }
+
+    const isActiveElementInsideCell = () => {
+      const active = document.activeElement as HTMLElement | null
+      const activeCellId = active
+        ?.closest?.('[data-cell-id]')
+        ?.getAttribute('data-cell-id')
+      return activeCellId === cellId
+    }
+
+    const getActiveCellId = () => {
+      const active = document.activeElement as HTMLElement | null
+      return active
+        ?.closest?.('[data-cell-id]')
+        ?.getAttribute('data-cell-id')
+    }
+
+    const tryFocus = (attempt: number) => {
+      if (focusRequestTokenRef.current !== requestToken) {
+        return
+      }
+
+      let cellElement: Element | null = null
+      const allCells = document.querySelectorAll('[data-cell-id]')
+      for (const cell of allCells) {
+        if (cell.getAttribute('data-cell-id') === cellId) {
+          cellElement = cell
           break
         }
       }
 
-      const isActiveElementInsideCell = () => {
-        const active = document.activeElement as HTMLElement | null
-        const activeCellId = active
-          ?.closest?.('[data-cell-id]')
-          ?.getAttribute('data-cell-id')
-        return activeCellId === cellId
-      }
+      if (cellElement) {
+        const cellElementNode = cellElement as HTMLElement
+        cellElementNode.scrollIntoView({
+          block: 'nearest',
+          inline: 'nearest',
+        })
 
-      const getActiveCellId = () => {
-        const active = document.activeElement as HTMLElement | null
-        return active
-          ?.closest?.('[data-cell-id]')
-          ?.getAttribute('data-cell-id')
-      }
+        let input: HTMLElement | null = null
 
-      const tryFocus = (attempt: number) => {
-        if (focusRequestTokenRef.current !== requestToken) {
-          return
-        }
+        // Try DatePicker first
+        const picker = cellElement.querySelector('.ant-picker') as
+          | HTMLElement
+          | null
+        const pickerInput = cellElement.querySelector(
+          '.ant-picker-input > input',
+        ) as HTMLElement | null
 
-        let cellElement: Element | null = null
-        const allCells = document.querySelectorAll('[data-cell-id]')
-        for (const cell of allCells) {
-          if (cell.getAttribute('data-cell-id') === cellId) {
-            cellElement = cell
-            break
-          }
-        }
-
-        if (cellElement) {
-          const cellElementNode = cellElement as HTMLElement
-          cellElementNode.scrollIntoView({
-            block: 'nearest',
-            inline: 'nearest',
-          })
-
-          let input: HTMLElement | null = null
-
-          // Try DatePicker first
-          const picker = cellElement.querySelector('.ant-picker') as
-            | HTMLElement
-            | null
-          const pickerInput = cellElement.querySelector(
-            '.ant-picker-input > input',
+        if (picker && pickerInput) {
+          picker.focus()
+          input = pickerInput
+        } else {
+          // Try Select
+          const selectInput = cellElement.querySelector(
+            'input.ant-select-input',
           ) as HTMLElement | null
-
-          if (picker && pickerInput) {
-            picker.focus()
-            input = pickerInput
+          if (selectInput) {
+            input = selectInput
           } else {
-            // Try Select
-            const selectInput = cellElement.querySelector(
-              'input.ant-select-input',
-            ) as HTMLElement | null
-            if (selectInput) {
-              input = selectInput
-            } else {
-              // Try regular input
-              input = cellElement.querySelector('input')
-            }
+            // Try regular input
+            input = cellElement.querySelector('input')
+          }
+        }
+
+        if (!input) {
+          input = cellElement.querySelector('.ant-picker')
+        }
+
+        if (!input) {
+          input = cellElement.querySelector(
+            '[data-color-picker-focus]',
+          ) as HTMLElement | null
+        }
+
+        if (!input) {
+          input = cellElement.querySelector(
+            '.ant-color-picker-trigger',
+          ) as HTMLElement | null
+        }
+
+        if (input instanceof HTMLElement) {
+          input.focus()
+          if (input instanceof HTMLInputElement) {
+            input.select()
           }
 
-          if (!input) {
-            input = cellElement.querySelector('.ant-picker')
-          }
-
-          if (!input) {
-            input = cellElement.querySelector(
-              '[data-color-picker-focus]',
-            ) as HTMLElement | null
-          }
-
-          if (!input) {
-            input = cellElement.querySelector(
-              '.ant-color-picker-trigger',
-            ) as HTMLElement | null
-          }
-
-          if (input instanceof HTMLElement) {
-            input.focus()
-            if (input instanceof HTMLInputElement) {
-              input.select()
-            }
-
-            if (!isActiveElementInsideCell()) {
-              if (attempt < 12) {
-                setTimeout(() => tryFocus(attempt + 1), 20)
-              }
-              return
-            }
-
-            // DatePicker inputs can be re-mounted during state updates.
-            // Re-check shortly after and re-focus if focus was lost.
-            if (picker && pickerInput) {
-              setTimeout(() => {
-                if (!isActiveElementInsideCell()) {
-                  const activeCellId = getActiveCellId()
-                  if (activeCellId && activeCellId !== cellId) {
-                    return
-                  }
-                  tryFocus(6)
-                }
-              }, 40)
+          if (!isActiveElementInsideCell()) {
+            if (attempt < 12) {
+              setTimeout(() => tryFocus(attempt + 1), 20)
             }
             return
           }
-        }
 
-        if (attempt < 12) {
-          setTimeout(() => tryFocus(attempt + 1), 20)
+          // DatePicker inputs can be re-mounted during state updates.
+          // Re-check shortly after and re-focus if focus was lost.
+          if (picker && pickerInput) {
+            setTimeout(() => {
+              if (!isActiveElementInsideCell()) {
+                const activeCellId = getActiveCellId()
+                if (activeCellId && activeCellId !== cellId) {
+                  return
+                }
+                tryFocus(6)
+              }
+            }, 40)
+          }
+          return
         }
       }
 
-      // Use MutationObserver to wait for DOM stability before focusing
-      const cellEl = document.querySelector(`[data-cell-id="${cellId}"]`)
-      const observeTarget = cellEl?.closest('tr') ?? document.body
-      let stabilityTimer: ReturnType<typeof setTimeout> | null = null
-      const observer = new MutationObserver(() => {
-        if (stabilityTimer) clearTimeout(stabilityTimer)
-        stabilityTimer = setTimeout(() => {
-          observer.disconnect()
-          focusObserverRef.current = null
-          tryFocus(0)
-        }, 50)
-      })
-      focusObserverRef.current = observer
-      observer.observe(observeTarget, {
-        childList: true,
-        subtree: true,
-      })
-      // Kick off the timer in case there are no mutations
+      if (attempt < 12) {
+        setTimeout(() => tryFocus(attempt + 1), 20)
+      }
+    }
+
+    // Use MutationObserver to wait for DOM stability before focusing
+    const cellEl = document.querySelector(`[data-cell-id="${cellId}"]`)
+    const observeTarget = cellEl?.closest('tr') ?? document.body
+    let stabilityTimer: ReturnType<typeof setTimeout> | null = null
+    const observer = new MutationObserver(() => {
+      if (stabilityTimer) clearTimeout(stabilityTimer)
       stabilityTimer = setTimeout(() => {
         observer.disconnect()
+        focusObserverRef.current = null
         tryFocus(0)
       }, 50)
-    },
-    [cellIdColumnMatchOrder],
-  )
+    })
+    focusObserverRef.current = observer
+    observer.observe(observeTarget, {
+      childList: true,
+      subtree: true,
+    })
+    // Kick off the timer in case there are no mutations
+    stabilityTimer = setTimeout(() => {
+      observer.disconnect()
+      tryFocus(0)
+    }, 50)
+  }, [cellIdColumnMatchOrder])
 
   // Save form changes for a row
-  const saveFormChanges = useCallback(
-    async (rowId: string) => {
-      try {
-        // Run client-side validation if provided
-        if (validateFieldsRef.current) {
-          const validationErrors = validateFieldsRef.current(
-            rowId,
-            form.getFieldsValue(),
-          )
-          if (Object.keys(validationErrors).length > 0) {
-            setFieldErrorsRef.current(validationErrors)
-            return false
-          }
+  const saveFormChanges = useCallback(async (rowId: string) => {
+    try {
+      // Run client-side validation if provided
+      if (validateFieldsRef.current) {
+        const validationErrors = validateFieldsRef.current(
+          rowId,
+          form.getFieldsValue(),
+        )
+        if (Object.keys(validationErrors).length > 0) {
+          setFieldErrorsRef.current(validationErrors)
+          return false
         }
-
-        await form.validateFields()
-
-        const formValues = form.getFieldsValue()
-
-        // Clear any prior inline errors once local validation passes
-        if (Object.keys(fieldErrorsRef.current).length > 0) {
-          setFieldErrorsRef.current({})
-        }
-
-        // Use domain-specific change detection
-        const changes = computeChangesRef.current(rowId, formValues, data)
-        if (changes === null) {
-          return true // No changes, nothing to save
-        }
-
-        setIsSaving(true)
-        const success = await onSaveRef.current(rowId, changes)
-        setIsSaving(false)
-        return Boolean(success)
-      } catch {
-        setIsSaving(false)
-        return false
       }
-    },
-    [data, form],
-  )
+
+      await form.validateFields()
+
+      const formValues = form.getFieldsValue()
+
+      // Clear any prior inline errors once local validation passes
+      if (Object.keys(fieldErrorsRef.current).length > 0) {
+        setFieldErrorsRef.current({})
+      }
+
+      // Use domain-specific change detection
+      const changes = computeChangesRef.current(rowId, formValues, data)
+      if (changes === null) {
+        return true // No changes, nothing to save
+      }
+
+      setIsSaving(true)
+      const success = await onSaveRef.current(rowId, changes)
+      setIsSaving(false)
+      return Boolean(success)
+    } catch {
+      setIsSaving(false)
+      return false
+    }
+  }, [data, form])
 
   // Initialize form when row selection changes
   useEffect(() => {
@@ -443,249 +428,229 @@ export function useTreeGridEditing<T extends TreeNode>(
   ])
 
   // Per-cell keyboard handler
-  const handleKeyDown = useCallback(
-    async (e: React.KeyboardEvent, rowId: string, columnId: string) => {
-      if (!selectedRowId || !tableRef.current) return
+  const handleKeyDown = async (e: React.KeyboardEvent, rowId: string, columnId: string) => {
+    if (!selectedRowId || !tableRef.current) return
 
-      if (isSaving) {
+    if (isSaving) {
+      e.preventDefault()
+      return
+    }
+
+    const rows = tableRef.current.getRowModel().rows
+    const currentRowIndex = rows.findIndex(
+      (r: any) => r.original.id === rowId,
+    )
+    if (currentRowIndex === -1) return
+
+    const currentColIndex = editableColumns.indexOf(columnId)
+    if (currentColIndex === -1) return
+
+    let nextRowId: string | null = null
+    let nextColId: string | null = null
+
+    switch (e.key) {
+      case 'Enter':
+        if (
+          document.querySelector(
+            '.ant-select-dropdown:not(.ant-select-dropdown-hidden), .ant-picker-dropdown:not(.ant-picker-dropdown-hidden)',
+          )
+        ) {
+          return
+        }
         e.preventDefault()
-        return
-      }
-
-      const rows = tableRef.current.getRowModel().rows
-      const currentRowIndex = rows.findIndex(
-        (r: any) => r.original.id === rowId,
-      )
-      if (currentRowIndex === -1) return
-
-      const currentColIndex = editableColumns.indexOf(columnId)
-      if (currentColIndex === -1) return
-
-      let nextRowId: string | null = null
-      let nextColId: string | null = null
-
-      switch (e.key) {
-        case 'Enter':
-          if (
-            document.querySelector(
-              '.ant-select-dropdown:not(.ant-select-dropdown-hidden), .ant-picker-dropdown:not(.ant-picker-dropdown-hidden)',
-            )
-          ) {
-            return
-          }
-          e.preventDefault()
-          {
-            const saved = await saveFormChanges(selectedRowId)
-            if (saved) {
-              if (currentRowIndex < rows.length - 1) {
-                nextRowId = rows[currentRowIndex + 1].original.id
-                const targetCols = resolveEditableColumns(nextRowId)
-                nextColId = targetCols[0]
-                setSelectedRowId(nextRowId)
-                setSelectedCellId(`${nextRowId}-${nextColId}`)
-              } else {
-                setSelectedRowId(null)
-                setSelectedCellId(null)
-              }
-            }
-          }
-          return
-
-        case 'ArrowUp':
-          if (
-            document.querySelector(
-              '.ant-select-dropdown:not(.ant-select-dropdown-hidden), .ant-picker-dropdown:not(.ant-picker-dropdown-hidden)',
-            )
-          ) {
-            return
-          }
-          e.preventDefault()
-          if (currentRowIndex > 0) {
-            nextRowId = rows[currentRowIndex - 1].original.id
-            const targetCols = resolveEditableColumns(nextRowId)
-            nextColId = targetCols[0]
-            await saveFormChanges(selectedRowId)
-            setSelectedRowId(nextRowId)
-            setSelectedCellId(`${nextRowId}-${nextColId}`)
-            return
-          }
-          break
-
-        case 'ArrowDown':
-          if (
-            document.querySelector(
-              '.ant-select-dropdown:not(.ant-select-dropdown-hidden), .ant-picker-dropdown:not(.ant-picker-dropdown-hidden)',
-            )
-          ) {
-            return
-          }
-          e.preventDefault()
-          if (currentRowIndex < rows.length - 1) {
-            nextRowId = rows[currentRowIndex + 1].original.id
-            const targetCols = resolveEditableColumns(nextRowId)
-            nextColId = targetCols.includes(columnId) ? columnId : targetCols[0]
-            await saveFormChanges(selectedRowId)
-            setSelectedRowId(nextRowId)
-            setSelectedCellId(`${nextRowId}-${nextColId}`)
-            return
-          }
-          break
-
-        case 'Escape':
-          e.preventDefault()
-          if (rowId.startsWith(draftPrefix) && onCancelDraftRef.current) {
-            onCancelDraftRef.current(rowId)
-          }
-          setSelectedRowId(null)
-          setSelectedCellId(null)
-          return
-
-        case 'Tab': {
-          e.preventDefault()
-          e.stopPropagation()
-
-          if (document.activeElement instanceof HTMLElement) {
-            document.activeElement.blur()
-          }
-
-          const findNextColInCurrentRow = (
-            startColIdx: number,
-            direction: 1 | -1,
-          ): string | null => {
-            let idx = startColIdx
-            while (idx >= 0 && idx < editableColumns.length) {
-              const col = editableColumns[idx]
-              const cell = document.querySelector(
-                `[data-cell-id="${rowId}-${col}"]`,
-              )
-              if (
-                cell &&
-                cell.querySelector(
-                  'input, .ant-select, .ant-picker, .ant-color-picker, .ant-color-picker-trigger, [data-color-picker-focus]',
-                )
-              ) {
-                return col
-              }
-              idx += direction
-            }
-            return null
-          }
-
-          if (e.shiftKey) {
-            const col = findNextColInCurrentRow(currentColIndex - 1, -1)
-            if (col) {
-              nextColId = col
-              nextRowId = rowId
-            } else if (currentRowIndex > 0) {
-              nextRowId = rows[currentRowIndex - 1].original.id
-              const targetCols = resolveEditableColumns(nextRowId)
-              nextColId = targetCols[targetCols.length - 1]
-            } else {
-              await saveFormChanges(rowId)
-              setSelectedRowId(null)
-              setSelectedCellId(null)
-              return
-            }
-          } else {
-            const col = findNextColInCurrentRow(currentColIndex + 1, 1)
-            if (col) {
-              nextColId = col
-              nextRowId = rowId
-            } else if (currentRowIndex < rows.length - 1) {
+        {
+          const saved = await saveFormChanges(selectedRowId)
+          if (saved) {
+            if (currentRowIndex < rows.length - 1) {
               nextRowId = rows[currentRowIndex + 1].original.id
               const targetCols = resolveEditableColumns(nextRowId)
               nextColId = targetCols[0]
+              setSelectedRowId(nextRowId)
+              setSelectedCellId(`${nextRowId}-${nextColId}`)
             } else {
-              await saveFormChanges(rowId)
               setSelectedRowId(null)
               setSelectedCellId(null)
-              return
             }
           }
-          break
         }
-      }
+        return
 
-      if (nextRowId && nextColId) {
-        if (nextRowId !== rowId) {
-          const tabSaved = await saveFormChanges(rowId)
-          if (!tabSaved) return
+      case 'ArrowUp':
+        if (
+          document.querySelector(
+            '.ant-select-dropdown:not(.ant-select-dropdown-hidden), .ant-picker-dropdown:not(.ant-picker-dropdown-hidden)',
+          )
+        ) {
+          return
+        }
+        e.preventDefault()
+        if (currentRowIndex > 0) {
+          nextRowId = rows[currentRowIndex - 1].original.id
+          const targetCols = resolveEditableColumns(nextRowId)
+          nextColId = targetCols[0]
+          await saveFormChanges(selectedRowId)
+          setSelectedRowId(nextRowId)
+          setSelectedCellId(`${nextRowId}-${nextColId}`)
+          return
+        }
+        break
+
+      case 'ArrowDown':
+        if (
+          document.querySelector(
+            '.ant-select-dropdown:not(.ant-select-dropdown-hidden), .ant-picker-dropdown:not(.ant-picker-dropdown-hidden)',
+          )
+        ) {
+          return
+        }
+        e.preventDefault()
+        if (currentRowIndex < rows.length - 1) {
+          nextRowId = rows[currentRowIndex + 1].original.id
+          const targetCols = resolveEditableColumns(nextRowId)
+          nextColId = targetCols.includes(columnId) ? columnId : targetCols[0]
+          await saveFormChanges(selectedRowId)
+          setSelectedRowId(nextRowId)
+          setSelectedCellId(`${nextRowId}-${nextColId}`)
+          return
+        }
+        break
+
+      case 'Escape':
+        e.preventDefault()
+        if (rowId.startsWith(draftPrefix) && onCancelDraftRef.current) {
+          onCancelDraftRef.current(rowId)
+        }
+        setSelectedRowId(null)
+        setSelectedCellId(null)
+        return
+
+      case 'Tab': {
+        e.preventDefault()
+        e.stopPropagation()
+
+        if (document.activeElement instanceof HTMLElement) {
+          document.activeElement.blur()
         }
 
-        setSelectedRowId(nextRowId)
-        setSelectedCellId(`${nextRowId}-${nextColId}`)
-      }
-    },
-    [
-      draftPrefix,
-      editableColumns,
-      isSaving,
-      resolveEditableColumns,
-      saveFormChanges,
-      selectedRowId,
-    ],
-  )
+        const findNextColInCurrentRow = (
+          startColIdx: number,
+          direction: 1 | -1,
+        ): string | null => {
+          let idx = startColIdx
+          while (idx >= 0 && idx < editableColumns.length) {
+            const col = editableColumns[idx]
+            const cell = document.querySelector(
+              `[data-cell-id="${rowId}-${col}"]`,
+            )
+            if (
+              cell &&
+              cell.querySelector(
+                'input, .ant-select, .ant-picker, .ant-color-picker, .ant-color-picker-trigger, [data-color-picker-focus]',
+              )
+            ) {
+              return col
+            }
+            idx += direction
+          }
+          return null
+        }
 
-  // Row click handler
-  const handleRowClick = useCallback(
-    async (e: React.MouseEvent, args: RowClickArgs) => {
-      if (isSaving || !canEdit) {
-        return
-      }
-
-      const target = e.target as HTMLElement
-      if (
-        target.closest('.ant-select-dropdown') ||
-        target.closest('.ant-picker-dropdown') ||
-        target.closest('.ant-color-picker') ||
-        target.closest('input') ||
-        target.closest('.ant-select-selector') ||
-        target.closest('.ant-color-picker-trigger') ||
-        target.classList.contains('ant-select-item-option-content')
-      ) {
-        return
-      }
-
-      if (
-        target.closest('button') ||
-        target.closest('.ant-btn') ||
-        target.closest('.ant-dropdown-trigger') ||
-        target.closest('.ant-dropdown-menu')
-      ) {
-        return
-      }
-
-      const clickedColumnId = args.getClickedColumnId(target) ?? editableColumns[0]
-      const isEditable = args.isEditableColumn(clickedColumnId)
-
-      if (selectedRowId === args.rowId) {
-        if (isEditable) {
-          const targetCellId = `${args.rowId}-${clickedColumnId}`
-          if (selectedCellId !== targetCellId) {
-            setSelectedCellId(targetCellId)
+        if (e.shiftKey) {
+          const col = findNextColInCurrentRow(currentColIndex - 1, -1)
+          if (col) {
+            nextColId = col
+            nextRowId = rowId
+          } else if (currentRowIndex > 0) {
+            nextRowId = rows[currentRowIndex - 1].original.id
+            const targetCols = resolveEditableColumns(nextRowId)
+            nextColId = targetCols[targetCols.length - 1]
           } else {
-            focusCellById(targetCellId)
+            await saveFormChanges(rowId)
+            setSelectedRowId(null)
+            setSelectedCellId(null)
+            return
           }
         } else {
-          const targetCellId = `${args.rowId}-${editableColumns[0]}`
-          if (selectedCellId !== targetCellId) {
-            setSelectedCellId(targetCellId)
+          const col = findNextColInCurrentRow(currentColIndex + 1, 1)
+          if (col) {
+            nextColId = col
+            nextRowId = rowId
+          } else if (currentRowIndex < rows.length - 1) {
+            nextRowId = rows[currentRowIndex + 1].original.id
+            const targetCols = resolveEditableColumns(nextRowId)
+            nextColId = targetCols[0]
           } else {
-            focusCellById(targetCellId)
+            await saveFormChanges(rowId)
+            setSelectedRowId(null)
+            setSelectedCellId(null)
+            return
           }
         }
-      } else if (selectedRowId) {
-        const saved = await saveFormChanges(selectedRowId)
-        if (saved) {
-          const targetColumns = resolveEditableColumns(args.rowId)
-          const targetIsEditable = targetColumns.includes(clickedColumnId)
-          setSelectedRowId(args.rowId)
-          const targetCellId = targetIsEditable
-            ? `${args.rowId}-${clickedColumnId}`
-            : `${args.rowId}-${targetColumns[0]}`
+        break
+      }
+    }
+
+    if (nextRowId && nextColId) {
+      if (nextRowId !== rowId) {
+        const tabSaved = await saveFormChanges(rowId)
+        if (!tabSaved) return
+      }
+
+      setSelectedRowId(nextRowId)
+      setSelectedCellId(`${nextRowId}-${nextColId}`)
+    }
+  }
+
+  // Row click handler
+  const handleRowClick = async (e: React.MouseEvent, args: RowClickArgs) => {
+    if (isSaving || !canEdit) {
+      return
+    }
+
+    const target = e.target as HTMLElement
+    if (
+      target.closest('.ant-select-dropdown') ||
+      target.closest('.ant-picker-dropdown') ||
+      target.closest('.ant-color-picker') ||
+      target.closest('input') ||
+      target.closest('.ant-select-selector') ||
+      target.closest('.ant-color-picker-trigger') ||
+      target.classList.contains('ant-select-item-option-content')
+    ) {
+      return
+    }
+
+    if (
+      target.closest('button') ||
+      target.closest('.ant-btn') ||
+      target.closest('.ant-dropdown-trigger') ||
+      target.closest('.ant-dropdown-menu')
+    ) {
+      return
+    }
+
+    const clickedColumnId = args.getClickedColumnId(target) ?? editableColumns[0]
+    const isEditable = args.isEditableColumn(clickedColumnId)
+
+    if (selectedRowId === args.rowId) {
+      if (isEditable) {
+        const targetCellId = `${args.rowId}-${clickedColumnId}`
+        if (selectedCellId !== targetCellId) {
           setSelectedCellId(targetCellId)
+        } else {
+          focusCellById(targetCellId)
         }
       } else {
+        const targetCellId = `${args.rowId}-${editableColumns[0]}`
+        if (selectedCellId !== targetCellId) {
+          setSelectedCellId(targetCellId)
+        } else {
+          focusCellById(targetCellId)
+        }
+      }
+    } else if (selectedRowId) {
+      const saved = await saveFormChanges(selectedRowId)
+      if (saved) {
         const targetColumns = resolveEditableColumns(args.rowId)
         const targetIsEditable = targetColumns.includes(clickedColumnId)
         setSelectedRowId(args.rowId)
@@ -694,18 +659,16 @@ export function useTreeGridEditing<T extends TreeNode>(
           : `${args.rowId}-${targetColumns[0]}`
         setSelectedCellId(targetCellId)
       }
-    },
-    [
-      canEdit,
-      editableColumns,
-      focusCellById,
-      isSaving,
-      resolveEditableColumns,
-      saveFormChanges,
-      selectedCellId,
-      selectedRowId,
-    ],
-  )
+    } else {
+      const targetColumns = resolveEditableColumns(args.rowId)
+      const targetIsEditable = targetColumns.includes(clickedColumnId)
+      setSelectedRowId(args.rowId)
+      const targetCellId = targetIsEditable
+        ? `${args.rowId}-${clickedColumnId}`
+        : `${args.rowId}-${targetColumns[0]}`
+      setSelectedCellId(targetCellId)
+    }
+  }
 
   // Intercept Tab on the Select's inner <input> to prevent rc-select from
   // treating Tab as a selection key (it handles Tab identically to Enter).
@@ -714,21 +677,19 @@ export function useTreeGridEditing<T extends TreeNode>(
   //
   // Because stopPropagation also blocks our own onKeyDown handler on the
   // Select container, we call handleKeyDown directly for Tab events.
-  const createSelectInputKeyDown = useCallback(
+  const createSelectInputKeyDown =
     (rowId: string, columnId: string) =>
-      (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        if (e.key === 'Tab') {
-          e.stopPropagation()
-          // Synthesize the call that stopPropagation blocked
-          handleKeyDown(
-            e as unknown as React.KeyboardEvent,
-            rowId,
-            columnId,
-          )
-        }
-      },
-    [handleKeyDown],
-  )
+    (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      if (e.key === 'Tab') {
+        e.stopPropagation()
+        // Synthesize the call that stopPropagation blocked
+        handleKeyDown(
+          e as unknown as React.KeyboardEvent,
+          rowId,
+          columnId,
+        )
+      }
+    }
 
   return {
     tableRef,

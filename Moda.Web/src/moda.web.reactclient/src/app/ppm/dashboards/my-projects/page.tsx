@@ -14,7 +14,7 @@ import { QuestionCircleOutlined } from '@ant-design/icons'
 import { Button, Drawer, Grid, Tour } from 'antd'
 import { ModaTooltip } from '@/src/components/common'
 import { usePathname } from 'next/navigation'
-import { FC, useCallback, useEffect, useMemo, useState } from 'react'
+import { FC, useEffect, useState } from 'react'
 import MyProjectsDashboardFilterBar from './_components/filter-bar'
 import MyProjectsSummaryBar from './_components/summary-bar'
 import PortfolioGroupList from './_components/portfolio-group-list'
@@ -54,7 +54,7 @@ const MyProjectsPage: FC = () => {
     [],
   )
   const screens = useBreakpoint()
-  const isMobile = useMemo(() => !screens.md, [screens.md])
+  const isMobile = !screens.md
   const [layoutRef, layoutHeight] = useRemainingHeight()
 
   const [selectedProjectKey, setSelectedProjectKey] = useState<string | null>(
@@ -80,18 +80,15 @@ const MyProjectsPage: FC = () => {
     role: getRoleFilterValues(selectedRoles),
   })
 
-  const handleTourStepChange = useCallback(
-    (current: number) => {
-      if (
-        current === detailStepIndex &&
-        !selectedProjectKey &&
-        projects?.length
-      ) {
-        setSelectedProjectKey(projects[0].key)
-      }
-    },
-    [detailStepIndex, selectedProjectKey, projects, setSelectedProjectKey],
-  )
+  const handleTourStepChange = (current: number) => {
+    if (
+      current === detailStepIndex &&
+      !selectedProjectKey &&
+      projects?.length
+    ) {
+      setSelectedProjectKey(projects[0].key)
+    }
+  }
 
   useEffect(() => {
     if (error) {
@@ -109,27 +106,21 @@ const MyProjectsPage: FC = () => {
     dispatch(setBreadcrumbRoute({ route: breadcrumbRoute, pathname }))
   }, [dispatch, pathname])
 
-  const handleStatusChange = useCallback(
-    (statuses: number[]) => {
-      setSelectedStatuses(statuses)
-      setSelectedProjectKey(null)
-    },
-    [setSelectedStatuses],
-  )
+  const handleStatusChange = (statuses: number[]) => {
+    setSelectedStatuses(statuses)
+    setSelectedProjectKey(null)
+  }
 
-  const handleRoleChange = useCallback(
-    (roles: number[]) => {
-      setSelectedRoles(roles)
-      setSelectedProjectKey(null)
-    },
-    [setSelectedRoles],
-  )
+  const handleRoleChange = (roles: number[]) => {
+    setSelectedRoles(roles)
+    setSelectedProjectKey(null)
+  }
 
-  const handleResetFilters = useCallback(() => {
+  const handleResetFilters = () => {
     setSelectedStatuses(DEFAULT_STATUSES)
     setSelectedRoles([])
     setSelectedProjectKey(null)
-  }, [setSelectedStatuses, setSelectedRoles])
+  }
 
   return (
     <>

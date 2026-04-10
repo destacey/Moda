@@ -5,7 +5,6 @@ import { toFormErrors } from '@/src/utils'
 import { useResetUserPasswordMutation } from '@/src/store/features/user-management/users-api'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { useModalForm } from '@/src/hooks'
-import { useCallback } from 'react'
 
 const { Item } = Form
 
@@ -32,8 +31,7 @@ const ResetPasswordForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<ResetPasswordFormValues>({
-      onSubmit: useCallback(
-        async (values: ResetPasswordFormValues, form) => {
+      onSubmit: async (values: ResetPasswordFormValues, form) => {
           try {
             const response = await resetPassword({
               userId,
@@ -61,8 +59,6 @@ const ResetPasswordForm = ({
             return false
           }
         },
-        [resetPassword, messageApi, userId],
-      ),
       onComplete: onFormComplete,
       onCancel: onFormCancel,
       errorMessage:

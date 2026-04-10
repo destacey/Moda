@@ -1,7 +1,7 @@
 'use client'
 
 import { Flex, Form, Input, Modal, Tag, Typography } from 'antd'
-import { CSSProperties, useCallback } from 'react'
+import { CSSProperties } from 'react'
 import {
   CreatePokerSessionRequest,
   EstimationScaleDto,
@@ -85,8 +85,7 @@ const CreatePokerSessionForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<CreatePokerSessionFormValues>({
-      onSubmit: useCallback(
-        async (values: CreatePokerSessionFormValues, form) => {
+      onSubmit: async (values: CreatePokerSessionFormValues, form) => {
           try {
             const request: CreatePokerSessionRequest = {
               name: values.name,
@@ -112,8 +111,6 @@ const CreatePokerSessionForm = ({
             return false
           }
         },
-        [createPokerSession, messageApi],
-      ),
       onComplete: onFormCreate,
       onCancel: onFormCancel,
       errorMessage:
@@ -125,12 +122,9 @@ const CreatePokerSessionForm = ({
 
   const selectedScaleId = Form.useWatch('estimationScaleId', form)
 
-  const handleScaleSelect = useCallback(
-    (id: number) => {
-      form.setFieldsValue({ estimationScaleId: id })
-    },
-    [form],
-  )
+  const handleScaleSelect = (id: number) => {
+    form.setFieldsValue({ estimationScaleId: id })
+  }
 
   const cssVars: ScaleCssVars = {
     '--scale-border': token.colorBorderSecondary,

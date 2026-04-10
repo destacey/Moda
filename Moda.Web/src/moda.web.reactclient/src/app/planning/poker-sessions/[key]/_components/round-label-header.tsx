@@ -4,7 +4,7 @@ import { PokerRoundDto } from '@/src/services/moda-api'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { useUpdatePokerRoundLabelMutation } from '@/src/store/features/planning/poker-sessions-api'
 import { Input, Typography } from 'antd'
-import { FC, useCallback, useEffect, useRef, useState } from 'react'
+import { FC, useEffect, useRef, useState } from 'react'
 import styles from './poker-session.module.css'
 
 const { Text } = Typography
@@ -36,25 +36,22 @@ const RoundLabelHeader: FC<RoundLabelHeaderProps> = ({
     lastSavedRef.current = round.label ?? ''
   }, [round.id, round.label])
 
-  const saveLabel = useCallback(
-    async (value: string) => {
-      const trimmed = value.trim()
-      if (trimmed === lastSavedRef.current) return
-      lastSavedRef.current = trimmed
-      try {
-        const response = await updateLabel({
-          sessionId,
-          roundId: round.id,
-          sessionKey,
-          request: { label: trimmed || undefined },
-        })
-        if (response.error) throw response.error
-      } catch {
-        messageApi.error('Failed to update round label.')
-      }
-    },
-    [updateLabel, sessionId, round.id, sessionKey, messageApi],
-  )
+  const saveLabel = async (value: string) => {
+    const trimmed = value.trim()
+    if (trimmed === lastSavedRef.current) return
+    lastSavedRef.current = trimmed
+    try {
+      const response = await updateLabel({
+        sessionId,
+        roundId: round.id,
+        sessionKey,
+        request: { label: trimmed || undefined },
+      })
+      if (response.error) throw response.error
+    } catch {
+      messageApi.error('Failed to update round label.')
+    }
+  }
 
   // Cleanup pending debounce on unmount
   useEffect(() => {
@@ -65,28 +62,25 @@ const RoundLabelHeader: FC<RoundLabelHeaderProps> = ({
     }
   }, [])
 
-  const handleChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value
-      setLocalValue(value)
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    setLocalValue(value)
 
-      if (debounceRef.current) {
-        clearTimeout(debounceRef.current)
-      }
-      debounceRef.current = setTimeout(() => {
-        saveLabel(value)
-      }, DEBOUNCE_MS)
-    },
-    [saveLabel],
-  )
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current)
+    }
+    debounceRef.current = setTimeout(() => {
+      saveLabel(value)
+    }, DEBOUNCE_MS)
+  }
 
-  const handleBlur = useCallback(() => {
+  const handleBlur = () => {
     if (debounceRef.current) {
       clearTimeout(debounceRef.current)
       debounceRef.current = null
     }
     saveLabel(localValue)
-  }, [saveLabel, localValue])
+  }
 
   const isEditable = canManage
 

@@ -2,7 +2,7 @@
 
 import PageTitle from '@/src/components/common/page-title'
 import ModaGrid from '../../../components/common/moda-grid'
-import { useCallback, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { BackgroundJobDto } from '@/src/services/moda-api'
 import { getBackgroundJobsClient } from '@/src/services/clients'
 import { authorizePage } from '../../../components/hoc'
@@ -29,35 +29,29 @@ const BackgroundJobsListPage = () => {
     'Permissions.BackgroundJobs.Create',
   )
 
-  const columnDefs = useMemo<ColDef<BackgroundJobDto>[]>(
-    () => [
+  const columnDefs = useMemo<ColDef<BackgroundJobDto>[]>(() => [
       { field: 'id' },
       { field: 'action' },
       { field: 'status' },
       { field: 'type' },
       { field: 'namespace' },
       { field: 'startedAt', headerName: 'Start (UTC)' },
-    ],
-    [],
-  )
+    ], [])
 
   const { data: jobTypeData = [] } = useGetJobTypesQuery()
 
-  const getRunningJobs = useCallback(async () => {
+  const getRunningJobs = async () => {
     const backgroundJobsClient = await getBackgroundJobsClient()
     const jobDtos = await backgroundJobsClient.getRunningJobs()
     setBackgroundJobs(jobDtos)
-  }, [])
+  }
 
-  const runJob = useCallback(
-    async (jobTypeId: number) => {
-      const backgroundJobsClient = await getBackgroundJobsClient()
-      await backgroundJobsClient.run(jobTypeId)
-      getRunningJobs()
-    },
-    [getRunningJobs],
-  )
-  const actionsMenuItems: MenuProps['items'] = useMemo(() => {
+  const runJob = async (jobTypeId: number) => {
+    const backgroundJobsClient = await getBackgroundJobsClient()
+    await backgroundJobsClient.run(jobTypeId)
+    getRunningJobs()
+  }
+  const actionsMenuItems: MenuProps['items'] = (() => {
     const hangfireUrl = process.env.NEXT_PUBLIC_API_BASE_URL + '/jobs'
     const items: ItemType[] = []
 
@@ -131,7 +125,7 @@ const BackgroundJobsListPage = () => {
       }
     }
     return items
-  }, [canViewHangfire, canRunBackgroundJobs, jobTypeData, runJob])
+  })()
 
   const onCreateRecurringJobFormClosed = (wasSaved: boolean) => {
     setOpenCreateRecurringJobForm(false)

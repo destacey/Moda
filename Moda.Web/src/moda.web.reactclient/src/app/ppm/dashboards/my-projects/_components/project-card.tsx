@@ -5,7 +5,7 @@ import PhaseTimeline from '@/src/app/ppm/_components/phase-timeline'
 import { ProjectListDto, ProjectPlanSummaryDto } from '@/src/services/moda-api'
 import { Card, Flex, Typography } from 'antd'
 import dayjs from 'dayjs'
-import { FC, useMemo } from 'react'
+import { FC } from 'react'
 import { collectTeamMembers, getUserRoles } from './project-card-helpers'
 import ProjectStatPills from './project-stat-pills'
 import TeamAvatars from './team-avatars'
@@ -28,11 +28,8 @@ const ProjectCard: FC<ProjectCardProps> = ({
   planSummary,
   onSelect,
 }) => {
-  const roles = useMemo(
-    () => getUserRoles(project, employeeId),
-    [project, employeeId],
-  )
-  const teamMembers = useMemo(() => collectTeamMembers(project), [project])
+  const roles = getUserRoles(project, employeeId)
+  const teamMembers = collectTeamMembers(project)
   const endDate = project.end ? dayjs(project.end).format('MMM D, YYYY') : null
 
   return (

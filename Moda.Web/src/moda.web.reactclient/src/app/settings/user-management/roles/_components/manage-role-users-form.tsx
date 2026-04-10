@@ -7,7 +7,7 @@ import {
   useManageRoleUsersMutation,
 } from '@/src/store/features/user-management/users-api'
 import { Modal, Spin, Transfer, Typography, Flex, theme } from 'antd'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useConfirmModal } from '@/src/hooks'
 
 const { Text } = Typography
@@ -56,20 +56,14 @@ const ManageRoleUsersForm: React.FC<ManageRoleUsersFormProps> = ({
   const isLoading = allUsersLoading || roleUsersLoading
 
   // Compute pending changes
-  const usersToAdd = useMemo(
-    () => targetKeys.filter((key) => !initialTargetKeys.includes(key)),
-    [targetKeys, initialTargetKeys],
-  )
+  const usersToAdd = targetKeys.filter((key) => !initialTargetKeys.includes(key))
 
-  const usersToRemove = useMemo(
-    () => initialTargetKeys.filter((key) => !targetKeys.includes(key)),
-    [targetKeys, initialTargetKeys],
-  )
+  const usersToRemove = initialTargetKeys.filter((key) => !targetKeys.includes(key))
 
   const hasChanges = usersToAdd.length > 0 || usersToRemove.length > 0
 
   const { isOpen, isSaving, handleOk, handleCancel } = useConfirmModal({
-    onSubmit: useCallback(async () => {
+    onSubmit: async () => {
       try {
         const response = await manageRoleUsers({
           roleId: roleId,
@@ -94,7 +88,7 @@ const ManageRoleUsersForm: React.FC<ManageRoleUsersFormProps> = ({
         }
         return false
       }
-    }, [manageRoleUsers, roleId, usersToAdd, usersToRemove, messageApi]),
+    },
     onComplete: onFormComplete,
     onCancel: onFormCancel,
     errorMessage:
@@ -120,10 +114,7 @@ const ManageRoleUsersForm: React.FC<ManageRoleUsersFormProps> = ({
   }, [allUsersError, roleUsersError, onFormCancel, messageApi])
 
   // Map all users to Transfer data source
-  const dataSource = useMemo<TransferItem[]>(() => {
-    if (!allUsersData) return []
-
-    return allUsersData
+  const dataSource: TransferItem[] = !allUsersData ? [] : allUsersData
       .map((user) => ({
         key: user.id,
         title: user.isActive
@@ -133,37 +124,27 @@ const ManageRoleUsersForm: React.FC<ManageRoleUsersFormProps> = ({
         roles: user.roles?.map((r) => r.name) ?? [],
       }))
       .sort((a, b) => a.title.localeCompare(b.title))
-  }, [allUsersData])
 
-  const onChange = useCallback(
-    (nextTargetKeys: string[]) => {
-      const sortedTargetKeys = nextTargetKeys.sort(
-        (a, b) =>
-          (dataSource.findIndex((item) => item.key === a) || 0) -
-          (dataSource.findIndex((item) => item.key === b) || 0),
-      )
-      setTargetKeys(sortedTargetKeys)
-    },
-    [dataSource],
-  )
+  const onChange = (nextTargetKeys: string[]) => {
+    const sortedTargetKeys = nextTargetKeys.sort(
+      (a, b) =>
+        (dataSource.findIndex((item) => item.key === a) || 0) -
+        (dataSource.findIndex((item) => item.key === b) || 0),
+    )
+    setTargetKeys(sortedTargetKeys)
+  }
 
-  const onSelectChange = useCallback(
-    (sourceSelectedKeys: string[], targetSelectedKeys: string[]) => {
-      setSelectedKeys([...sourceSelectedKeys, ...targetSelectedKeys])
-    },
-    [],
-  )
+  const onSelectChange = (sourceSelectedKeys: string[], targetSelectedKeys: string[]) => {
+    setSelectedKeys([...sourceSelectedKeys, ...targetSelectedKeys])
+  }
 
-  const filterOption = useCallback(
-    (inputValue: string, option: TransferItem) => {
-      const search = inputValue.toLowerCase()
-      return (
-        option.title.toLowerCase().includes(search) ||
-        option.email.toLowerCase().includes(search)
-      )
-    },
-    [],
-  )
+  const filterOption = (inputValue: string, option: TransferItem) => {
+    const search = inputValue.toLowerCase()
+    return (
+      option.title.toLowerCase().includes(search) ||
+      option.email.toLowerCase().includes(search)
+    )
+  }
 
   return (
     <Modal

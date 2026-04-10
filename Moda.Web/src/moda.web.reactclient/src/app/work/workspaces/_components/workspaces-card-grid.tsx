@@ -2,7 +2,7 @@
 
 import { WorkspaceListDto } from '@/src/services/moda-api'
 import { Flex, List } from 'antd'
-import { ReactElement, useMemo } from 'react'
+import { ReactElement } from 'react'
 import { WorkspaceCard } from '.'
 import { ModaEmpty } from '@/src/components/common'
 
@@ -27,12 +27,12 @@ const gridConfig = {
 const WorkspacesCardGrid: React.FC<WorkspacesCardGridProps> = (
   props: WorkspacesCardGridProps,
 ) => {
-  const sortedWorkspaces = useMemo<WorkspaceListDto[]>(() => {
+  const sortedWorkspaces: WorkspaceListDto[] = (() => {
     if (!props.workspaces || props.workspaces.length === 0) {
       return []
     }
     return [...props.workspaces].sort((a, b) => a.name.localeCompare(b.name))
-  }, [props.workspaces])
+  })()
 
   return (
     <>

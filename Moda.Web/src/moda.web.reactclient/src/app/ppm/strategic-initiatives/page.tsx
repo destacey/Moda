@@ -6,7 +6,7 @@ import { authorizePage } from '@/src/components/hoc'
 import { useDocumentTitle } from '@/src/hooks'
 import { useGetStrategicInitiativesQuery } from '@/src/store/features/ppm/strategic-initiatives-api'
 import { Button } from 'antd'
-import { FC, useCallback, useEffect, useMemo, useState } from 'react'
+import { FC, useEffect, useState } from 'react'
 import { CreateStrategicInitiativeForm } from './_components'
 import {
   StrategicInitiativesFilterBar,
@@ -63,13 +63,11 @@ const StrategicInitiativesPage: FC = () => {
     }
   }, [error, messageApi])
 
-  const handleStatusChange = useCallback((statuses: number[]) => {
+  const handleStatusChange = (statuses: number[]) => {
     setSelectedStatuses(statuses)
-  }, [])
+  }
 
-  const actions = useMemo(() => {
-    if (!showActions) return null
-    return (
+  const actions = !showActions ? null : (
       <>
         {canCreateStrategicInitiative && (
           <Button onClick={() => setOpenCreateStrategicInitiativeForm(true)}>
@@ -78,7 +76,6 @@ const StrategicInitiativesPage: FC = () => {
         )}
       </>
     )
-  }, [canCreateStrategicInitiative, showActions])
 
   const onCreateStrategicInitiativeFormClosed = (wasCreated: boolean) => {
     setOpenCreateStrategicInitiativeForm(false)

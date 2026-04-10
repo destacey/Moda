@@ -6,7 +6,6 @@ import { CreateStrategicThemeRequest } from '@/src/services/moda-api'
 import { useCreateStrategicThemeMutation } from '@/src/store/features/strategic-management/strategic-themes-api'
 import { toFormErrors } from '@/src/utils'
 import { Form, Input, Modal } from 'antd'
-import { useCallback } from 'react'
 import { useModalForm } from '@/src/hooks'
 
 const { Item } = Form
@@ -40,8 +39,7 @@ const CreateStrategicThemeForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<CreateStrategicThemeFormValues>({
-      onSubmit: useCallback(
-        async (values: CreateStrategicThemeFormValues, form) => {
+      onSubmit: async (values: CreateStrategicThemeFormValues, form) => {
           try {
             const request = mapToRequestValues(values)
             const response = await createStrategicTheme(request)
@@ -67,8 +65,6 @@ const CreateStrategicThemeForm = ({
             return false
           }
         },
-        [createStrategicTheme, messageApi],
-      ),
       onComplete: onFormComplete,
       onCancel: onFormCancel,
       errorMessage:

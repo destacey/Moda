@@ -2,7 +2,7 @@
 
 import { BuildOutlined, MenuOutlined } from '@ant-design/icons'
 import Segmented, { SegmentedLabeledOption } from 'antd/es/segmented'
-import { memo, useMemo, useState } from 'react'
+import { memo, useState } from 'react'
 import { ProgramListDto } from '@/src/services/moda-api'
 import { Spin } from 'antd'
 import dynamic from 'next/dynamic'
@@ -33,15 +33,12 @@ const viewSelectorOptions: SegmentedLabeledOption[] = [
 const ProgramViewManager = (props: ProgramViewManagerProps) => {
   const [currentView, setCurrentView] = useState<string | number>('List')
 
-  const viewSelector = useMemo(
-    () => (
-      <Segmented
-        options={viewSelectorOptions}
-        value={currentView}
-        onChange={setCurrentView}
-      />
-    ),
-    [currentView],
+  const viewSelector = (
+    <Segmented
+      options={viewSelectorOptions}
+      value={currentView}
+      onChange={setCurrentView}
+    />
   )
 
   return (

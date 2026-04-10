@@ -1,7 +1,7 @@
 'use client'
 
 import { DatePicker, Descriptions, Form, Modal } from 'antd'
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 import {
   TeamMembershipDto,
   UpdateTeamMembershipRequest,
@@ -58,29 +58,26 @@ const EditTeamMembershipForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<UpdateTeamMembershipFormValues>({
-      onSubmit: useCallback(
-        async (values: UpdateTeamMembershipFormValues, form) => {
-          try {
-            const request = mapToRequestValues(values, membership, teamType)
-            await updateTeamMembership(request).unwrap()
-            messageApi.success('Successfully updated team membership.')
-            return true
-          } catch (error) {
-            if (error.status === 422 && error.errors) {
-              const formErrors = toFormErrors(error.errors)
-              form.setFields(formErrors)
-              messageApi.error('Correct the validation error(s) to continue.')
-            } else {
-              messageApi.error(
-                error.detail ??
-                  'An unexpected error occurred while updating the team membership.',
-              )
-            }
-            return false
+      onSubmit: async (values: UpdateTeamMembershipFormValues, form) => {
+        try {
+          const request = mapToRequestValues(values, membership, teamType)
+          await updateTeamMembership(request).unwrap()
+          messageApi.success('Successfully updated team membership.')
+          return true
+        } catch (error) {
+          if (error.status === 422 && error.errors) {
+            const formErrors = toFormErrors(error.errors)
+            form.setFields(formErrors)
+            messageApi.error('Correct the validation error(s) to continue.')
+          } else {
+            messageApi.error(
+              error.detail ??
+                'An unexpected error occurred while updating the team membership.',
+            )
           }
-        },
-        [updateTeamMembership, membership, teamType, messageApi],
-      ),
+          return false
+        }
+      },
       onComplete: onFormSave,
       onCancel: onFormCancel,
       errorMessage:

@@ -1,7 +1,7 @@
 'use client'
 
 import PageTitle from '@/src/components/common/page-title'
-import { use, useCallback, useEffect, useState } from 'react'
+import { use, useEffect, useState } from 'react'
 import RiskDetails from './risk-details'
 import { Button, Card } from 'antd'
 import { useDocumentTitle } from '@/src/hooks/use-document-title'
@@ -41,18 +41,18 @@ const RiskDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const canUpdateRisks = hasPermissionClaim('Permissions.Risks.Update')
   const showActions = canUpdateRisks
 
-  const renderTabContent = useCallback(() => {
+  const renderTabContent = () => {
     switch (activeTab) {
       case RiskTabs.Details:
         return <RiskDetails risk={riskData} />
       default:
         return null
     }
-  }, [activeTab, riskData])
+  }
 
-  const onTabChange = useCallback((tabKey: string) => {
+  const onTabChange = (tabKey: string) => {
     setActiveTab(tabKey as RiskTabs)
-  }, [])
+  }
 
   useEffect(() => {
     if (!riskData) return

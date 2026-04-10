@@ -6,7 +6,7 @@ import {
   MenuOutlined,
 } from '@ant-design/icons'
 import { Segmented } from 'antd'
-import { memo, useMemo, useState } from 'react'
+import { memo, useState } from 'react'
 import { ProjectListDto } from '@/src/services/moda-api'
 import { Spin } from 'antd'
 import dynamic from 'next/dynamic'
@@ -60,15 +60,12 @@ const ProjectViewManager = (props: ProjectViewManagerProps) => {
     setDrawerOpen(true)
   }
 
-  const viewSelector = useMemo(
-    () => (
-      <Segmented
-        options={viewSelectorOptions}
-        value={currentView}
-        onChange={setCurrentView}
-      />
-    ),
-    [currentView],
+  const viewSelector = (
+    <Segmented
+      options={viewSelectorOptions}
+      value={currentView}
+      onChange={setCurrentView}
+    />
   )
 
   return (

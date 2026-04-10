@@ -1,4 +1,3 @@
-import { useCallback } from 'react'
 import { App } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import useAuth from '@/src/components/contexts/auth'
@@ -26,8 +25,7 @@ export default function useUserAccountActions() {
   const [deactivateUser] = useDeactivateUserMutation()
   const [unlockUser] = useUnlockUserMutation()
 
-  const getAccountActionMenuItems = useCallback(
-    (user: UserAccountInfo): ItemType[] => {
+  const getAccountActionMenuItems = (user: UserAccountInfo): ItemType[] => {
       const items: ItemType[] = []
       const fullName = `${user.firstName} ${user.lastName}`
       const isCurrentUser =
@@ -120,9 +118,7 @@ export default function useUserAccountActions() {
       }
 
       return items
-    },
-    [authUser, modal, messageApi, activateUser, deactivateUser, unlockUser],
-  )
+    }
 
   return { getAccountActionMenuItems }
 }

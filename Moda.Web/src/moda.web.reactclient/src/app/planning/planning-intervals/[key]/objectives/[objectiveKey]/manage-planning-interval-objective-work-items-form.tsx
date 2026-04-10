@@ -13,7 +13,7 @@ import {
 import { useSearchWorkItemsQuery } from '@/src/store/features/work-management/workspace-api'
 import { SearchOutlined } from '@ant-design/icons'
 import { Flex, Input, Modal, Typography } from 'antd'
-import { useCallback, useMemo, useState } from 'react'
+import { useState } from 'react'
 import { ColDef } from 'ag-grid-community'
 import {
   AgGridTransfer,
@@ -122,24 +122,24 @@ const ManagePlanningIntervalObjectiveWorkItemsForm = ({
   const [manageObjectiveWorkItems] = useManageObjectiveWorkItemsMutation()
 
   // Derive target work items: existing items (minus removed) plus user-added items
-  const targetWorkItems = useMemo(() => {
+  const targetWorkItems = (() => {
     const existing =
       existingWorkItemsData?.workItems?.filter(
         (item) => !removedIds.has(item.id),
       ) ?? []
     return [...existing, ...addedItems].sort(defaultSort)
-  }, [existingWorkItemsData, addedItems, removedIds])
+  })()
 
   // Derive source work items: search results minus items already in target
-  const sourceWorkItems = useMemo(() => {
+  const sourceWorkItems = (() => {
     const targetIds = new Set(targetWorkItems.map((item) => item.id))
     return (searchResult ?? [])
       .filter((item) => !targetIds.has(item.id))
       .sort(defaultSort)
-  }, [searchResult, targetWorkItems])
+  })()
 
   const { isOpen, isSaving, handleOk, handleCancel } = useConfirmModal({
-    onSubmit: useCallback(async () => {
+    onSubmit: async () => {
       try {
         const request: ManagePlanningIntervalObjectiveWorkItemsRequest = {
           planningIntervalId: objectiveData?.planningInterval.id,
@@ -159,20 +159,14 @@ const ManagePlanningIntervalObjectiveWorkItemsForm = ({
         console.error(error)
         return false
       }
-    }, [
-      manageObjectiveWorkItems,
-      objectiveData,
-      targetWorkItems,
-      objectiveKey,
-      messageApi,
-    ]),
+    },
     onComplete: onFormComplete,
     onCancel: onFormCancel,
     errorMessage:
       'An error occurred while managing the work items. Please try again.',
   })
 
-  const onDragStop = useCallback((items: WorkItemListDto[]) => {
+  const onDragStop = (items: WorkItemListDto[]) => {
     if (items.length === 0) return
 
     // Items dragged from source to target: add them and un-remove if needed
@@ -184,30 +178,24 @@ const ManagePlanningIntervalObjectiveWorkItemsForm = ({
       }
       return next
     })
-  }, [])
+  }
 
-  const handleDelete = useCallback(
-    (item: WorkItemListDto) => {
-      if (!item) return
+  const handleDelete = (item: WorkItemListDto) => {
+    if (!item) return
 
-      const isExistingItem = existingWorkItemsData?.workItems?.some(
-        (w) => w.id === item.id,
-      )
-      if (isExistingItem) {
-        // Mark existing item as removed
-        setRemovedIds((prev) => new Set(prev).add(item.id))
-      } else {
-        // Remove user-added item
-        setAddedItems((prev) => prev.filter((p) => p.id !== item.id))
-      }
-    },
-    [existingWorkItemsData],
-  )
+    const isExistingItem = existingWorkItemsData?.workItems?.some(
+      (w) => w.id === item.id,
+    )
+    if (isExistingItem) {
+      // Mark existing item as removed
+      setRemovedIds((prev) => new Set(prev).add(item.id))
+    } else {
+      // Remove user-added item
+      setAddedItems((prev) => prev.filter((p) => p.id !== item.id))
+    }
+  }
 
-  const rightColDefs = useMemo(
-    () => asDeletableColDefs(workItemColDefs, handleDelete),
-    [handleDelete],
-  )
+  const rightColDefs = asDeletableColDefs(workItemColDefs, handleDelete)
 
   const handleSearch = (e) => {
     setSearchQuery(e.target.value)

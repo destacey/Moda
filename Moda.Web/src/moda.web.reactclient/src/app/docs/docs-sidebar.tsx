@@ -3,7 +3,6 @@
 import { Menu } from 'antd'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { useMemo } from 'react'
 import type { DocNavItem } from '@/src/services/docs'
 import type { MenuProps } from 'antd'
 
@@ -59,18 +58,15 @@ export default function DocsSidebar({
   const pathname = usePathname()
   const router = useRouter()
 
-  const menuItems = useMemo(() => {
+  const menuItems = (() => {
     const homeItem: MenuItem = {
       key: '/docs',
       label: 'Welcome',
     }
     return [homeItem, ...buildMenuItems(navigation)]
-  }, [navigation])
+  })()
 
-  const defaultOpenKeys = useMemo(
-    () => findOpenKeys(navigation, pathname),
-    [navigation, pathname],
-  )
+  const defaultOpenKeys = findOpenKeys(navigation, pathname)
 
   const handleClick: MenuProps['onClick'] = ({ key }) => {
     router.push(key)

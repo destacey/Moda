@@ -7,7 +7,6 @@ import {
   useGetProjectTaskQuery,
 } from '@/src/store/features/ppm/project-tasks-api'
 import { Modal } from 'antd'
-import { useCallback } from 'react'
 
 export interface DeleteProjectTaskFormProps {
   projectIdOrKey: string
@@ -35,7 +34,7 @@ const DeleteProjectTaskForm = ({
   })
 
   const { isOpen, isSaving, handleOk, handleCancel } = useConfirmModal({
-    onSubmit: useCallback(async () => {
+    onSubmit: async () => {
       if (!taskData) return false
 
       try {
@@ -56,7 +55,7 @@ const DeleteProjectTaskForm = ({
         )
         return false
       }
-    }, [deleteProjectTaskMutation, taskData, projectIdOrKey, messageApi]),
+    },
     onComplete: onFormComplete,
     onCancel: onFormCancel,
     errorMessage:

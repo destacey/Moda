@@ -23,6 +23,8 @@ export interface OrganizationChartEdgeData<T = Record<string, any>> {
   id?: ID
   source: ID
   target: ID
+  sourcePort?: string
+  targetPort?: string
   sourceNode?: ID
   targetNode?: ID
   type?: string

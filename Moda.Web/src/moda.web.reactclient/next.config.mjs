@@ -5,6 +5,7 @@ import { withSerwist } from '@serwist/turbopack'
  */
 const nextConfig = {
   output: 'standalone',
+  reactCompiler: true,
   experimental: {
     optimizePackageImports: ['antd', '@ant-design/icons', '@ant-design/charts'],
   },

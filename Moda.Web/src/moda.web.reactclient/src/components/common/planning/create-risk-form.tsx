@@ -1,7 +1,7 @@
 'use client'
 
 import { DatePicker, Form, Input, Modal, Radio, Select } from 'antd'
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 import { CreateRiskRequest } from '@/src/services/moda-api'
 import { toFormErrors } from '@/src/utils'
 import { MarkdownEditor } from '../markdown'
@@ -65,28 +65,25 @@ const CreateRiskForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<CreateRiskFormValues>({
-      onSubmit: useCallback(
-        async (values: CreateRiskFormValues, form) => {
-          try {
-            const request = mapToRequestValues(values)
-            const response = await createRisk(request)
-            if (response.error) {
-              throw response.error
-            }
-
-            return true
-          } catch (error) {
-            if (error.status === 422 && error.errors) {
-              const formErrors = toFormErrors(error.errors)
-              form.setFields(formErrors)
-            } else {
-              throw error
-            }
-            return false
+      onSubmit: async (values: CreateRiskFormValues, form) => {
+        try {
+          const request = mapToRequestValues(values)
+          const response = await createRisk(request)
+          if (response.error) {
+            throw response.error
           }
-        },
-        [createRisk],
-      ),
+
+          return true
+        } catch (error) {
+          if (error.status === 422 && error.errors) {
+            const formErrors = toFormErrors(error.errors)
+            form.setFields(formErrors)
+          } else {
+            throw error
+          }
+          return false
+        }
+      },
       onComplete: onFormCreate,
       onCancel: onFormCancel,
       errorMessage:

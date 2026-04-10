@@ -10,7 +10,7 @@ import { setIncludeInactive } from '@/src/store/features/work-management/work-pr
 import { ColDef } from 'ag-grid-community'
 import { ItemType } from 'antd/es/menu/interface'
 import Link from 'next/link'
-import { useCallback, useEffect, useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 
 const WorkProcessLinkCellRenderer = ({ value, data }) => {
   return <Link href={`./work-processes/${data.key}`}>{value}</Link>
@@ -29,24 +29,21 @@ const WorkProcessesPage: React.FC = () => {
   } = useGetWorkProcessesQuery(includeInactive)
   const dispatch = useAppDispatch()
 
-  const columnDefs = useMemo<ColDef<WorkProcessListDto>[]>(
-    () => [
+  const columnDefs = useMemo<ColDef<WorkProcessListDto>[]>(() => [
       { field: 'id', hide: true },
       { field: 'key', width: 80 },
       { field: 'name', width: 300, cellRenderer: WorkProcessLinkCellRenderer },
       { field: 'ownership.name', headerName: 'Ownership' },
       { field: 'isActive', width: 100 }, // TODO: convert to yes/no
-    ],
-    [],
-  )
+    ], [])
 
   useEffect(() => {
     error && console.error(error)
   }, [error])
 
-  const refresh = useCallback(async () => {
+  const refresh = async () => {
     refetch()
-  }, [refetch])
+  }
 
   const onIncludeInactiveChange = (checked: boolean) => {
     dispatch(setIncludeInactive(checked))

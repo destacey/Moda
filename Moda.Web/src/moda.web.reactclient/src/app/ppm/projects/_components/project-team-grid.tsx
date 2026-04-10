@@ -6,7 +6,7 @@ import { useGetProjectTeamQuery } from '@/src/store/features/ppm/projects-api'
 import { ColDef } from 'ag-grid-community'
 import { CustomCellRendererProps } from 'ag-grid-react'
 import Link from 'next/link'
-import { FC, useCallback } from 'react'
+import { FC } from 'react'
 
 const PersonLinkCellRenderer = (
   props: CustomCellRendererProps<ProjectTeamMemberDto>,
@@ -62,9 +62,9 @@ const ProjectTeamGrid: FC<ProjectTeamGridProps> = ({ projectIdOrKey }) => {
     refetch,
   } = useGetProjectTeamQuery(projectIdOrKey)
 
-  const refresh = useCallback(async () => {
+  const refresh = async () => {
     refetch()
-  }, [refetch])
+  }
 
   return (
     <ModaGrid

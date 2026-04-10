@@ -1,6 +1,5 @@
 import { Card, Typography } from 'antd'
 import Link from 'next/link'
-import { useMemo } from 'react'
 import { ModaOrganizationChartNodeProps } from '../../../components/common/organization-chart'
 
 const { Text, Title } = Typography
@@ -11,13 +10,10 @@ const OrganizationalChartTeamNode: React.FC<ModaOrganizationChartNodeProps> = ({
 }) => {
   const { key, name, type } = data
 
-  const colorMap = useMemo(
-    () => ({
-      'Team of Teams': themeToken.colorPrimary,
-      Team: '#87c9a7',
-    }),
-    [themeToken],
-  )
+  const colorMap = {
+    'Team of Teams': themeToken.colorPrimary,
+    Team: '#87c9a7',
+  }
 
   const teamLink =
     type.name === 'Team'

@@ -12,7 +12,7 @@ import {
 import { useGetTeamOptionsQuery } from '@/src/store/features/organizations/team-api'
 import { toFormErrors } from '@/src/utils'
 import { Flex, Form, Input, Modal, Select, Typography } from 'antd'
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useModalForm } from '@/src/hooks'
 
 const { Item, List } = Form
@@ -74,8 +74,7 @@ const MapAzdoWorkspaceTeamsForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<MapAzdoWorkspaceTeamsFormValues>({
-      onSubmit: useCallback(
-        async (values: MapAzdoWorkspaceTeamsFormValues, form) => {
+      onSubmit: async (values: MapAzdoWorkspaceTeamsFormValues, form) => {
           try {
             const request = mapToRequestValues(
               connectionId,
@@ -103,8 +102,6 @@ const MapAzdoWorkspaceTeamsForm = ({
             return false
           }
         },
-        [mapConnectionTeamsMutation, connectionId, workspaceId, messageApi],
-      ),
       onComplete: onFormSave,
       onCancel: onFormCancel,
       errorMessage: 'An error occurred while updating workspace team mappings.',

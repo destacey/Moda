@@ -6,7 +6,6 @@ import { useAddProjectLifecyclePhaseMutation } from '@/src/store/features/ppm/pr
 import { toFormErrors } from '@/src/utils'
 import { Form, Input, Modal } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
-import { useCallback } from 'react'
 import { useModalForm } from '@/src/hooks'
 
 const { Item } = Form
@@ -42,8 +41,7 @@ const AddProjectLifecyclePhaseForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<AddProjectLifecyclePhaseFormValues>({
-      onSubmit: useCallback(
-        async (values: AddProjectLifecyclePhaseFormValues, form) => {
+      onSubmit: async (values: AddProjectLifecyclePhaseFormValues, form) => {
           try {
             const request = mapToRequestValues(values)
             const response = await addProjectLifecyclePhase({
@@ -69,8 +67,6 @@ const AddProjectLifecyclePhaseForm = ({
             return false
           }
         },
-        [addProjectLifecyclePhase, lifecycleId, messageApi],
-      ),
       onComplete: onFormComplete,
       onCancel: onFormCancel,
       errorMessage:

@@ -2,7 +2,7 @@
 
 import PageTitle from '@/src/components/common/page-title'
 import AzdoConnectionDetails from './azdo-connection-details'
-import { use, useCallback, useEffect, useMemo, useState } from 'react'
+import { use, useEffect, useState } from 'react'
 import { Card } from 'antd'
 import { useDocumentTitle } from '@/src/hooks/use-document-title'
 import useAuth from '@/src/components/contexts/auth'
@@ -94,7 +94,7 @@ const ConnectionDetailsPage = (props: { params: Promise<{ id: string }> }) => {
     { error: syncAzdoConnectionOrganizationError },
   ] = useSyncAzdoConnectionOrganizationMutation()
 
-  const renderTabContent = useCallback(() => {
+  const renderTabContent = () => {
     switch (activeTab) {
       case ConnectionTabs.Details:
         return <AzdoConnectionDetails connection={azdoConnection} />
@@ -108,11 +108,11 @@ const ConnectionDetailsPage = (props: { params: Promise<{ id: string }> }) => {
       default:
         return null
     }
-  }, [activeTab, azdoConnection])
+  }
 
-  const onTabChange = useCallback((tabKey: string) => {
+  const onTabChange = (tabKey: string) => {
     setActiveTab(tabKey as ConnectionTabs)
-  }, [])
+  }
 
   useEffect(() => {
     if (!azdoConnection) return
@@ -148,7 +148,7 @@ const ConnectionDetailsPage = (props: { params: Promise<{ id: string }> }) => {
     }
   }
 
-  const updateSyncState = useCallback(async () => {
+  const updateSyncState = async () => {
     try {
       const response = await updateAzdoConnectionSyncState({
         connectionId: id,
@@ -166,14 +166,9 @@ const ConnectionDetailsPage = (props: { params: Promise<{ id: string }> }) => {
       console.error(error)
       messageApi.error(`Failed to change sync setting. Error: ${error.detail}`)
     }
-  }, [
-    azdoConnection?.isSyncEnabled,
-    messageApi,
-    id,
-    updateAzdoConnectionSyncState,
-  ])
+  }
 
-  const syncOrganizationConfiguration = useCallback(async () => {
+  const syncOrganizationConfiguration = async () => {
     try {
       const response = await syncAzdoConnectionOrganization(id)
       if (response.error) {
@@ -189,9 +184,9 @@ const ConnectionDetailsPage = (props: { params: Promise<{ id: string }> }) => {
       )
     }
     setIsSyncingOrganization(false)
-  }, [syncAzdoConnectionOrganization, messageApi, id])
+  }
 
-  const actionsMenuItems = useMemo(() => {
+  const actionsMenuItems = (() => {
     const items = [] as ItemType[]
     if (canUpdateConnections) {
       items.push({
@@ -233,13 +228,7 @@ const ConnectionDetailsPage = (props: { params: Promise<{ id: string }> }) => {
       )
     }
     return items
-  }, [
-    canDeleteConnections,
-    canUpdateConnections,
-    azdoConnection,
-    syncOrganizationConfiguration,
-    updateSyncState,
-  ])
+  })()
 
   if (!isLoading && !azdoConnection) {
     return notFound()

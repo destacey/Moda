@@ -5,9 +5,7 @@ import { Card, Space } from 'antd'
 import {
   createElement,
   use,
-  useCallback,
   useEffect,
-  useMemo,
   useState,
 } from 'react'
 import TeamsGrid, {
@@ -103,7 +101,7 @@ const PlanningIntervalDetailsPage = (props: {
 
   const { data: piListData } = useGetPlanningIntervalsQuery()
 
-  const actionsMenuItems = useMemo(() => {
+  const actionsMenuItems = (() => {
     const items = [] as ItemType[]
     if (canUpdatePlanningInterval) {
       items.push(
@@ -125,9 +123,9 @@ const PlanningIntervalDetailsPage = (props: {
       )
     }
     return items
-  }, [canUpdatePlanningInterval])
+  })()
 
-  const renderTabContent = useCallback(() => {
+  const renderTabContent = () => {
     switch (activeTab) {
       case PlanningIntervalTabs.Details:
         return (
@@ -148,7 +146,7 @@ const PlanningIntervalDetailsPage = (props: {
       default:
         return null
     }
-  }, [activeTab, planningIntervalData, refetchTeams, teamsData, teamsIsLoading])
+  }
 
   useEffect(() => {
     planningIntervalData &&
@@ -157,72 +155,54 @@ const PlanningIntervalDetailsPage = (props: {
       )
   }, [dispatch, pathname, planningIntervalData])
 
-  const onEditFormClosed = useCallback(
-    (wasSaved: boolean) => {
-      setOpenEditPlanningIntervalForm(false)
-      if (wasSaved) {
-        refetchPlanningInterval()
-      }
-    },
-    [refetchPlanningInterval],
-  )
+  const onEditFormClosed = (wasSaved: boolean) => {
+    setOpenEditPlanningIntervalForm(false)
+    if (wasSaved) {
+      refetchPlanningInterval()
+    }
+  }
 
-  const onManagePlanningIntervalDatesFormClosed = useCallback(
-    (wasSaved: boolean) => {
-      setOpenManagePlanningIntervalDatesForm(false)
-      if (wasSaved) {
-        refetchPlanningInterval()
-      }
-    },
-    [refetchPlanningInterval],
-  )
+  const onManagePlanningIntervalDatesFormClosed = (wasSaved: boolean) => {
+    setOpenManagePlanningIntervalDatesForm(false)
+    if (wasSaved) {
+      refetchPlanningInterval()
+    }
+  }
 
-  const onManageTeamsFormClosed = useCallback(
-    (wasSaved: boolean) => {
-      setOpenManageTeamsForm(false)
-      if (wasSaved) {
-        refetchPlanningInterval()
-      }
-    },
-    [refetchPlanningInterval],
-  )
+  const onManageTeamsFormClosed = (wasSaved: boolean) => {
+    setOpenManageTeamsForm(false)
+    if (wasSaved) {
+      refetchPlanningInterval()
+    }
+  }
 
   // doesn't trigger on first render
-  const onTabChange = useCallback(
-    (tabKey: string) => {
-      setActiveTab(tabKey as PlanningIntervalTabs)
+  const onTabChange = (tabKey: string) => {
+    setActiveTab(tabKey as PlanningIntervalTabs)
 
-      // enables the query for the tab on first render if it hasn't been enabled yet
-      if (tabKey == PlanningIntervalTabs.Teams && !teamsQueryEnabled) {
-        setTeamsQueryEnabled(true)
-      }
-    },
-    [teamsQueryEnabled],
-  )
+    // enables the query for the tab on first render if it hasn't been enabled yet
+    if (tabKey == PlanningIntervalTabs.Teams && !teamsQueryEnabled) {
+      setTeamsQueryEnabled(true)
+    }
+  }
 
-  const handlePIChange = useCallback(
-    (value: string | number) => {
-      router.push(`/planning/planning-intervals/${value}`)
-    },
-    [router],
-  )
+  const handlePIChange = (value: string | number) => {
+    router.push(`/planning/planning-intervals/${value}`)
+  }
 
-  const piItems = useMemo(() => {
-    if (!piListData) return []
+  const piItems = !piListData
+    ? []
+    : [...piListData]
+        .sort((a, b) => new Date(b.start).getTime() - new Date(a.start).getTime())
+        .map((option) => ({
+          label: option.name,
+          extra: option.state.name,
+          value: option.key,
+        }))
 
-    return [...piListData]
-      .sort((a, b) => new Date(b.start).getTime() - new Date(a.start).getTime())
-      .map((option) => ({
-        label: option.name,
-        extra: option.state.name,
-        value: option.key,
-      }))
-  }, [piListData])
-
-  const switchSprints = useMemo(() => {
-    if (!piItems.length) return null
-
-    return (
+  const switchSprints = !piItems.length
+    ? null
+    : (
       <IconMenu
         icon={<SwapOutlined />}
         tooltip="Switch to another PI"
@@ -231,7 +211,6 @@ const PlanningIntervalDetailsPage = (props: {
         onChange={handlePIChange}
       />
     )
-  }, [piItems, piKey, handlePIChange])
 
   if (isLoading) {
     return <PlanningIntervalDetailsLoading />

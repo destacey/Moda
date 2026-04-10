@@ -9,7 +9,7 @@ import {
 } from '@/src/store/features/ppm/projects-api'
 import { toFormErrors } from '@/src/utils'
 import { Flex, Form, Input, Modal, Typography } from 'antd'
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 
 const { Item } = Form
 const { Text } = Typography
@@ -39,8 +39,7 @@ const ChangeProjectKeyForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<ChangeProjectKeyFormValues>({
-      onSubmit: useCallback(
-        async (values: ChangeProjectKeyFormValues, form) => {
+      onSubmit: async (values: ChangeProjectKeyFormValues, form) => {
           try {
             const newKey = values.key.trim().toUpperCase()
             const request: ChangeProjectKeyRequest = {
@@ -72,8 +71,6 @@ const ChangeProjectKeyForm = ({
             return false
           }
         },
-        [changeProjectKey, projectData, messageApi, onFormComplete],
-      ),
       onComplete: () => {}, // Handled inside onSubmit since we need to pass newKey
       onCancel: onFormCancel,
       errorMessage:

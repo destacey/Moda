@@ -17,7 +17,7 @@ import { Divider, Drawer, Flex } from 'antd'
 import { ModaTooltip } from '@/src/components/common'
 import { projectHelpText } from '../projects/_components/project-help-text'
 import Link from 'next/link'
-import { FC, useEffect, useMemo, useState } from 'react'
+import { FC, useEffect, useState } from 'react'
 
 export interface ProjectDrawerProps {
   projectKey: string
@@ -36,10 +36,7 @@ const ProjectDrawer: FC<ProjectDrawerProps> = ({
   const { data: projectData, isLoading, error } = useGetProjectQuery(projectKey)
 
   const { hasPermissionClaim } = useAuth()
-  const canViewProject = useMemo(
-    () => hasPermissionClaim('Permissions.Projects.View'),
-    [hasPermissionClaim],
-  )
+  const canViewProject = hasPermissionClaim('Permissions.Projects.View')
 
   useEffect(() => {
     if (!canViewProject) {
@@ -57,30 +54,15 @@ const ProjectDrawer: FC<ProjectDrawerProps> = ({
     }
   }, [error, messageApi])
 
-  const sponsorNames = useMemo(
-    () => getSortedNameList(projectData?.projectSponsors ?? []),
-    [projectData],
-  )
+  const sponsorNames = getSortedNameList(projectData?.projectSponsors ?? [])
 
-  const ownerNames = useMemo(
-    () => getSortedNameList(projectData?.projectOwners ?? []),
-    [projectData],
-  )
+  const ownerNames = getSortedNameList(projectData?.projectOwners ?? [])
 
-  const managerNames = useMemo(
-    () => getSortedNameList(projectData?.projectManagers ?? []),
-    [projectData],
-  )
+  const managerNames = getSortedNameList(projectData?.projectManagers ?? [])
 
-  const memberNames = useMemo(
-    () => getSortedNameList(projectData?.projectMembers ?? []),
-    [projectData],
-  )
+  const memberNames = getSortedNameList(projectData?.projectMembers ?? [])
 
-  const strategicThemes = useMemo(
-    () => getSortedNameList(projectData?.strategicThemes ?? []),
-    [projectData],
-  )
+  const strategicThemes = getSortedNameList(projectData?.strategicThemes ?? [])
 
   return (
     <Drawer

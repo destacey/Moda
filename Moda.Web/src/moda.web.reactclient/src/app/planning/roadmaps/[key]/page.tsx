@@ -10,7 +10,7 @@ import {
 } from '@/src/store/features/planning/roadmaps-api'
 import { notFound, usePathname, useRouter } from 'next/navigation'
 import RoadmapDetailsLoading from './loading'
-import { use, useCallback, useEffect, useMemo, useState } from 'react'
+import { use, useEffect, useState } from 'react'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import { LockOutlined, UnlockOutlined } from '@ant-design/icons'
 import { Descriptions, Divider, MenuProps } from 'antd'
@@ -75,21 +75,20 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     skip: !roadmapData,
   })
 
-  const managersInfo = useMemo(() => {
-    if (!roadmapData) return 'Unknown'
-    return roadmapData.roadmapManagers
-      .slice()
-      .sort((a, b) => a.name.localeCompare(b.name))
-      .map((m) => m.name)
-      .join(', ')
-  }, [roadmapData])
+  const managersInfo = !roadmapData
+    ? 'Unknown'
+    : roadmapData.roadmapManagers
+        .slice()
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map((m) => m.name)
+        .join(', ')
 
-  const isRoadmapManager = useMemo(() => {
-    if (!roadmapData || !currentUserInternalEmployeeId) return false
-    return roadmapData.roadmapManagers.some(
+  const isRoadmapManager =
+    !!roadmapData &&
+    !!currentUserInternalEmployeeId &&
+    roadmapData.roadmapManagers.some(
       (rm) => rm.id === currentUserInternalEmployeeId,
     )
-  }, [roadmapData, currentUserInternalEmployeeId])
 
   useEffect(() => {
     if (!roadmapData) return
@@ -111,7 +110,7 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     dispatch(setBreadcrumbRoute({ route: breadcrumbRoute, pathname }))
   }, [dispatch, pathname, roadmapData])
 
-  const actionsMenuItems: MenuProps['items'] = useMemo(() => {
+  const actionsMenuItems: MenuProps['items'] = (() => {
     const items: ItemType[] = []
 
     // Copy is available to anyone who can view the roadmap and create roadmaps
@@ -159,78 +158,60 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     }
 
     return items
-  }, [canCreateRoadmap, canDeleteRoadmap, canUpdateRoadmap, isRoadmapManager])
+  })()
 
-  const onEditRoadmapFormClosed = useCallback(
-    (wasSaved: boolean) => {
-      setOpenEditRoadmapForm(false)
-      if (wasSaved) {
-        refetchRoadmap()
-      }
-    },
-    [refetchRoadmap],
-  )
+  const onEditRoadmapFormClosed = (wasSaved: boolean) => {
+    setOpenEditRoadmapForm(false)
+    if (wasSaved) {
+      refetchRoadmap()
+    }
+  }
 
-  const onCopyRoadmapFormClosed = useCallback(() => {
+  const onCopyRoadmapFormClosed = () => {
     setOpenCopyRoadmapForm(false)
-  }, [])
+  }
 
-  const onDeleteFormClosed = useCallback(
-    (wasDeleted: boolean) => {
-      setOpenDeleteRoadmapForm(false)
-      if (wasDeleted) {
-        router.push('/planning/roadmaps/')
-      }
-    },
-    [router],
-  )
+  const onDeleteFormClosed = (wasDeleted: boolean) => {
+    setOpenDeleteRoadmapForm(false)
+    if (wasDeleted) {
+      router.push('/planning/roadmaps/')
+    }
+  }
 
-  const onCreateRoadmapActivityFormClosed = useCallback(
-    (wasCreated: boolean) => {
-      setOpenCreateActivityForm(false)
-      if (wasCreated) {
-        refetchRoadmapItems()
-      }
-    },
-    [refetchRoadmapItems],
-  )
+  const onCreateRoadmapActivityFormClosed = (wasCreated: boolean) => {
+    setOpenCreateActivityForm(false)
+    if (wasCreated) {
+      refetchRoadmapItems()
+    }
+  }
 
-  const onCreateRoadmapTimeboxFormClosed = useCallback(
-    (wasCreated: boolean) => {
-      setOpenCreateTimeboxForm(false)
-      if (wasCreated) {
-        refetchRoadmapItems()
-      }
-    },
-    [refetchRoadmapItems],
-  )
+  const onCreateRoadmapTimeboxFormClosed = (wasCreated: boolean) => {
+    setOpenCreateTimeboxForm(false)
+    if (wasCreated) {
+      refetchRoadmapItems()
+    }
+  }
 
-  const visibilityTag = useMemo(
-    () =>
-      roadmapData?.visibility?.name === 'Public' ? (
-        <UnlockOutlined title={visibilityTitle('Public', managersInfo)} />
-      ) : (
-        <LockOutlined title={visibilityTitle('Private', managersInfo)} />
-      ),
-    [managersInfo, roadmapData?.visibility?.name],
-  )
+  const visibilityTag =
+    roadmapData?.visibility?.name === 'Public' ? (
+      <UnlockOutlined title={visibilityTitle('Public', managersInfo)} />
+    ) : (
+      <LockOutlined title={visibilityTitle('Private', managersInfo)} />
+    )
 
-  const showDrawer = useCallback(() => {
+  const showDrawer = () => {
     setDrawerOpen(true)
-  }, [])
+  }
 
-  const onDrawerClose = useCallback(() => {
+  const onDrawerClose = () => {
     setDrawerOpen(false)
     setSelectedItemId(null)
-  }, [])
+  }
 
-  const openRoadmapItemDrawer = useCallback(
-    (itemId: string) => {
-      setSelectedItemId(itemId)
-      showDrawer()
-    },
-    [showDrawer],
-  )
+  const openRoadmapItemDrawer = (itemId: string) => {
+    setSelectedItemId(itemId)
+    showDrawer()
+  }
 
   if (isLoading) {
     return <RoadmapDetailsLoading />

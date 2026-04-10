@@ -14,7 +14,7 @@ import { ColDef } from 'ag-grid-community'
 import { Button } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import Link from 'next/link'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   CreateEstimationScaleForm,
   DeleteEstimationScaleForm,
@@ -103,12 +103,12 @@ const EstimationScalesPage = () => {
     }
   }, [error, messageApi])
 
-  const handleEdit = useCallback((id: number) => {
-    setEditScaleId(id)
-  }, [])
+  const columnDefs = useMemo<ColDef<EstimationScaleDto>[]>(() => {
+    const handleEdit = (id: number) => {
+      setEditScaleId(id)
+    }
 
-  const handleToggleActive = useCallback(
-    async (scale: EstimationScaleDto) => {
+    const handleToggleActive = async (scale: EstimationScaleDto) => {
       try {
         const response = await setActiveStatus({
           id: scale.id,
@@ -126,16 +126,13 @@ const EstimationScalesPage = () => {
         )
         console.error(error)
       }
-    },
-    [setActiveStatus, messageApi],
-  )
+    }
 
-  const handleDelete = useCallback((scale: EstimationScaleDto) => {
-    setDeleteScale(scale)
-  }, [])
+    const handleDelete = (scale: EstimationScaleDto) => {
+      setDeleteScale(scale)
+    }
 
-  const columnDefs = useMemo<ColDef<EstimationScaleDto>[]>(
-    () => [
+    return [
       {
         width: 50,
         filter: false,
@@ -170,29 +167,17 @@ const EstimationScalesPage = () => {
         width: 100,
         valueGetter: (params) => params.data?.values?.length ?? 0,
       },
-    ],
-    [
-      showRowMenu,
-      canUpdateEstimationScale,
-      canDeleteEstimationScale,
-      handleEdit,
-      handleToggleActive,
-      handleDelete,
-    ],
-  )
+    ]}, [showRowMenu, canUpdateEstimationScale, canDeleteEstimationScale, setActiveStatus, messageApi])
 
-  const refresh = useCallback(async () => {
+  const refresh = async () => {
     refetch()
-  }, [refetch])
+  }
 
-  const actions = useMemo(() => {
-    if (!canCreateEstimationScale) return null
-    return (
+  const actions = !canCreateEstimationScale ? null : (
       <Button onClick={() => setOpenCreateForm(true)}>
         Create Estimation Scale
       </Button>
     )
-  }, [canCreateEstimationScale])
 
   const onCreateFormClosed = (wasCreated: boolean) => {
     setOpenCreateForm(false)
@@ -201,25 +186,19 @@ const EstimationScalesPage = () => {
     }
   }
 
-  const onEditFormClosed = useCallback(
-    (wasSaved: boolean) => {
-      setEditScaleId(null)
-      if (wasSaved) {
-        refetch()
-      }
-    },
-    [refetch],
-  )
+  const onEditFormClosed = (wasSaved: boolean) => {
+    setEditScaleId(null)
+    if (wasSaved) {
+      refetch()
+    }
+  }
 
-  const onDeleteFormClosed = useCallback(
-    (wasDeleted: boolean) => {
-      setDeleteScale(null)
-      if (wasDeleted) {
-        refetch()
-      }
-    },
-    [refetch],
-  )
+  const onDeleteFormClosed = (wasDeleted: boolean) => {
+    setDeleteScale(null)
+    if (wasDeleted) {
+      refetch()
+    }
+  }
 
   return (
     <>

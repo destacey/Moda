@@ -3,7 +3,7 @@
 import { RoadmapDetailsDto, RoadmapItemListDto } from '@/src/services/moda-api'
 import { BuildOutlined, MenuOutlined } from '@ant-design/icons'
 import Segmented, { SegmentedLabeledOption } from 'antd/es/segmented'
-import { memo, useMemo, useState } from 'react'
+import { memo, useState } from 'react'
 import dynamic from 'next/dynamic'
 import { Spin } from 'antd'
 import RoadmapItemsGrid from './roadmap-items-grid'
@@ -25,30 +25,23 @@ interface RoadmapViewManagerProps {
 const RoadmapViewManager = (props: RoadmapViewManagerProps) => {
   const [currentView, setCurrentView] = useState<string | number>('Timeline')
 
-  const viewSelectorOptions: SegmentedLabeledOption[] = useMemo(() => {
-    const options = [
-      {
-        value: 'Timeline',
-        icon: <BuildOutlined alt="Timeline" title="Timeline" />,
-      },
-      {
-        value: 'List',
-        icon: <MenuOutlined alt="List" title="List" />,
-      },
-    ]
+  const viewSelectorOptions: SegmentedLabeledOption[] = [
+    {
+      value: 'Timeline',
+      icon: <BuildOutlined alt="Timeline" title="Timeline" />,
+    },
+    {
+      value: 'List',
+      icon: <MenuOutlined alt="List" title="List" />,
+    },
+  ]
 
-    return options
-  }, [])
-
-  const viewSelector = useMemo(
-    () => (
-      <Segmented
-        options={viewSelectorOptions}
-        value={currentView}
-        onChange={setCurrentView}
-      />
-    ),
-    [currentView, viewSelectorOptions],
+  const viewSelector = (
+    <Segmented
+      options={viewSelectorOptions}
+      value={currentView}
+      onChange={setCurrentView}
+    />
   )
 
   return (

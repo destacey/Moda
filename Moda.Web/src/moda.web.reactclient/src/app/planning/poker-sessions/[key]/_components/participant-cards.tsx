@@ -2,7 +2,7 @@
 
 import { PokerVoteDto } from '@/src/services/moda-api'
 import { Flex } from 'antd'
-import { CSSProperties, FC, useMemo } from 'react'
+import { CSSProperties, FC } from 'react'
 import styles from './poker-session.module.css'
 
 export interface ParticipantCardsProps {
@@ -16,7 +16,7 @@ const ParticipantCards: FC<ParticipantCardsProps> = ({
   votes,
   isRevealed,
 }) => {
-  const voteMap = useMemo(() => {
+  const voteMap = (() => {
     const map = new Map<string, string>()
     for (const vote of votes) {
       if (vote.participant) {
@@ -24,7 +24,7 @@ const ParticipantCards: FC<ParticipantCardsProps> = ({
       }
     }
     return map
-  }, [votes])
+  })()
 
   return (
     <Flex wrap gap={16} justify="center">

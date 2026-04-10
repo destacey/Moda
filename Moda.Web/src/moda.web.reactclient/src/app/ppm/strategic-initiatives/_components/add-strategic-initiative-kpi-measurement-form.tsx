@@ -12,7 +12,7 @@ import {
 import { toFormErrors } from '@/src/utils'
 import { DatePicker, Descriptions, Form, InputNumber, Modal } from 'antd'
 import dayjs from 'dayjs'
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 
 const { Item: DescriptionItem } = Descriptions
 
@@ -64,38 +64,35 @@ const AddStrategicInitiativeKpiMeasurementForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<AddStrategicInitiativeKpiMeasurementFormValues>({
-      onSubmit: useCallback(
-        async (
-          values: AddStrategicInitiativeKpiMeasurementFormValues,
-          form,
-        ) => {
-          try {
-            const request = mapToRequestValues(
-              values,
-              strategicInitiativeId,
-              kpiId,
-            )
-            const response = await addKpiMeasurement(request)
-            if (response.error) throw response.error
+      onSubmit: async (
+        values: AddStrategicInitiativeKpiMeasurementFormValues,
+        form,
+      ) => {
+        try {
+          const request = mapToRequestValues(
+            values,
+            strategicInitiativeId,
+            kpiId,
+          )
+          const response = await addKpiMeasurement(request)
+          if (response.error) throw response.error
 
-            messageApi.success('KPI measurement added successfully.')
-            return true
-          } catch (error) {
-            if (error.status === 422 && error.errors) {
-              const formErrors = toFormErrors(error.errors)
-              form.setFields(formErrors)
-              messageApi.error('Correct the validation error(s) to continue.')
-            } else {
-              messageApi.error(
-                error.detail ??
-                  'An error occurred while adding a measurement to the KPI. Please try again.',
-              )
-            }
-            return false
+          messageApi.success('KPI measurement added successfully.')
+          return true
+        } catch (error) {
+          if (error.status === 422 && error.errors) {
+            const formErrors = toFormErrors(error.errors)
+            form.setFields(formErrors)
+            messageApi.error('Correct the validation error(s) to continue.')
+          } else {
+            messageApi.error(
+              error.detail ??
+                'An error occurred while adding a measurement to the KPI. Please try again.',
+            )
           }
-        },
-        [addKpiMeasurement, strategicInitiativeId, kpiId, messageApi],
-      ),
+          return false
+        }
+      },
       onComplete: onFormComplete,
       onCancel: onFormCancel,
       errorMessage:

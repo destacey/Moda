@@ -6,7 +6,7 @@ import { RightOutlined } from '@ant-design/icons'
 import { Badge, Card, Divider, Flex, Skeleton, Tag, Typography } from 'antd'
 import { ModaTooltip } from '@/src/components/common'
 import { useRouter } from 'next/navigation'
-import { FC, useMemo } from 'react'
+import { FC } from 'react'
 
 const { Text, Title } = Typography
 
@@ -43,10 +43,7 @@ const MyProjectsCard: FC = () => {
     { skip: !canViewProjects },
   )
 
-  const roleCounts = useMemo(
-    () => (summary ? getRoleCounts(summary) : []),
-    [summary],
-  )
+  const roleCounts = summary ? getRoleCounts(summary) : []
 
   if (!canViewProjects) return null
   if (!isLoading && (!summary || summary.totalCount === 0)) return null

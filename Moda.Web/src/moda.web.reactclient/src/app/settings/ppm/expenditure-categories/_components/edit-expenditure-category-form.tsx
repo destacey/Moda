@@ -9,7 +9,7 @@ import {
 import { toFormErrors } from '@/src/utils'
 import { Form, Input, Modal, Switch } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useModalForm } from '@/src/hooks'
 
 const { Item } = Form
@@ -58,8 +58,7 @@ const EditExpenditureCategoryForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<UpdateExpenditureCategoryFormValues>({
-      onSubmit: useCallback(
-        async (values: UpdateExpenditureCategoryFormValues, form) => {
+      onSubmit: async (values: UpdateExpenditureCategoryFormValues, form) => {
           try {
             const request = mapToRequestValues(values, categoryData.id)
             const response = await updateExpenditureCategory(request)
@@ -82,8 +81,6 @@ const EditExpenditureCategoryForm = ({
             return false
           }
         },
-        [updateExpenditureCategory, categoryData, messageApi],
-      ),
       onComplete: onFormComplete,
       onCancel: onFormCancel,
       errorMessage:

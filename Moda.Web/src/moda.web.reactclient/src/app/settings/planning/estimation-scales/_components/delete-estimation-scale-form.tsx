@@ -3,7 +3,6 @@
 import { useMessage } from '@/src/components/contexts/messaging'
 import { useDeleteEstimationScaleMutation } from '@/src/store/features/planning/estimation-scales-api'
 import { Modal } from 'antd'
-import { useCallback } from 'react'
 import { useConfirmModal } from '@/src/hooks'
 
 export interface DeleteEstimationScaleFormProps {
@@ -22,7 +21,7 @@ const DeleteEstimationScaleForm = ({
   const [deleteEstimationScale] = useDeleteEstimationScaleMutation()
 
   const { isOpen, isSaving, handleOk, handleCancel } = useConfirmModal({
-    onSubmit: useCallback(async () => {
+    onSubmit: async () => {
       try {
         const response = await deleteEstimationScale(estimationScale.id)
         if (response.error) {
@@ -37,7 +36,7 @@ const DeleteEstimationScaleForm = ({
         )
         return false
       }
-    }, [deleteEstimationScale, estimationScale, messageApi]),
+    },
     onComplete: onFormComplete,
     onCancel: onFormCancel,
     permission: 'Permissions.EstimationScales.Delete',

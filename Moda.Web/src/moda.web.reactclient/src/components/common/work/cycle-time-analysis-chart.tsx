@@ -1,6 +1,6 @@
 'use client'
 
-import { FC, useMemo } from 'react'
+import { FC } from 'react'
 import dynamic from 'next/dynamic'
 const Column = dynamic(
   () => import('@ant-design/charts').then((mod) => mod.Column) as any,
@@ -31,7 +31,7 @@ export const CycleTimeAnalysisChart: FC<CycleTimeAnalysisChartProps> = ({
 }) => {
   const { antDesignChartsTheme, token } = useTheme()
 
-  const chartData = useMemo(() => {
+  const chartData = (() => {
     // Handle empty work items
     if (workItems.length === 0) {
       return []
@@ -97,56 +97,54 @@ export const CycleTimeAnalysisChart: FC<CycleTimeAnalysisChartProps> = ({
     })
 
     return sortedData
-  }, [workItems])
+  })()
 
-  const config = useMemo(() => {
-    return {
-      theme: antDesignChartsTheme,
-      data: chartData,
-      xField: 'storyPointCategory',
-      yField: 'averageCycleTime',
-      label: {
-        text: (datum: ChartDataPoint) => `${datum.averageCycleTime.toFixed(2)}`,
-        position: 'top' as const,
-        style: {
-          dy: -20,
-        },
-      },
-      tooltip: {
-        title: 'Story Points',
-        items: [
-          {
-            name: 'Average Cycle Time',
-            field: 'averageCycleTime',
-            valueFormatter: (value: number) => `${value} days`,
-          },
-          {
-            name: 'Work Items',
-            field: 'count',
-          },
-        ],
-      },
-      axis: {
-        x: {
-          title: 'Story Points',
-        },
-        y: {
-          title: 'Average Cycle Time (Days)',
-        },
-      },
+  const config = {
+    theme: antDesignChartsTheme,
+    data: chartData,
+    xField: 'storyPointCategory',
+    yField: 'averageCycleTime',
+    label: {
+      text: (datum: ChartDataPoint) => `${datum.averageCycleTime.toFixed(2)}`,
+      position: 'top' as const,
       style: {
-        fill: (datum: ChartDataPoint) => {
-          if (datum.storyPointCategory === 'Overall') {
-            return token.colorSuccess
-          }
-          if (datum.storyPointCategory === 'No Story Points') {
-            return token.colorWarning
-          }
-          return token.colorPrimary
-        },
+        dy: -20,
       },
-    } as ColumnConfig
-  }, [antDesignChartsTheme, chartData, token])
+    },
+    tooltip: {
+      title: 'Story Points',
+      items: [
+        {
+          name: 'Average Cycle Time',
+          field: 'averageCycleTime',
+          valueFormatter: (value: number) => `${value} days`,
+        },
+        {
+          name: 'Work Items',
+          field: 'count',
+        },
+      ],
+    },
+    axis: {
+      x: {
+        title: 'Story Points',
+      },
+      y: {
+        title: 'Average Cycle Time (Days)',
+      },
+    },
+    style: {
+      fill: (datum: ChartDataPoint) => {
+        if (datum.storyPointCategory === 'Overall') {
+          return token.colorSuccess
+        }
+        if (datum.storyPointCategory === 'No Story Points') {
+          return token.colorWarning
+        }
+        return token.colorPrimary
+      },
+    },
+  } as ColumnConfig
 
   if (isLoading) {
     return (

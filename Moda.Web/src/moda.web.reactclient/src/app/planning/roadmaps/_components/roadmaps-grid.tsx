@@ -28,18 +28,14 @@ const dateOnlyValueFormatter = (params: ValueFormatterParams<RoadmapGridRow>) =>
   params.value && dayjs(params.value).format('M/D/YYYY')
 
 const RoadmapsGrid: FC<RoadmapsGridProps> = (props: RoadmapsGridProps) => {
-  const rowData = useMemo<RoadmapGridRow[]>(
-    () =>
-      props.roadmapsData.map((roadmap) => ({
-        ...roadmap,
-        roadmapManagersDisplay: roadmap.roadmapManagers
-          .slice()
-          .sort((a, b) => a.name.localeCompare(b.name))
-          .map((m) => m.name)
-          .join(', '),
-      })),
-    [props.roadmapsData],
-  )
+  const rowData: RoadmapGridRow[] = props.roadmapsData.map((roadmap) => ({
+    ...roadmap,
+    roadmapManagersDisplay: roadmap.roadmapManagers
+      .slice()
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map((m) => m.name)
+      .join(', '),
+  }))
 
   const columnDefs = useMemo<ColDef<RoadmapGridRow>[]>(
     () => [

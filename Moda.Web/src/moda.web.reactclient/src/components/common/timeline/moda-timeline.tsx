@@ -53,20 +53,19 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
   const isInitializedRef = useRef(false)
   const dynamicOptionsRef = useRef<TimelineOptions>({})
   const prevWindowBoundsRef = useRef<{ start: Date; end: Date } | null>(null)
+  const propsDataRef = useRef(props.data)
+  propsDataRef.current = props.data
+  const propsGroupsRef = useRef(props.groups)
+  propsGroupsRef.current = props.groups
 
   const { currentThemeName, token } = useTheme()
 
   const enableFullScreenToggle = props.allowFullScreen ?? false
   const enableSaveAsImage = props.allowSaveAsImage ?? false
 
-  const colors = useMemo(
-    () => DefaultTimeLineColors[currentThemeName],
-    [currentThemeName],
-  )
+  const colors = DefaultTimeLineColors[currentThemeName]
 
-  const itemTemplateManager = useCallback<
-    TimelineOptionsTemplateFunction<TItem>
-  >(
+  const itemTemplateManager: TimelineOptionsTemplateFunction<TItem> = useCallback(
     (item, element, _) => {
       if (!item) return ''
 
@@ -104,9 +103,7 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
     [colors.item.font, colors.item.foreground, props],
   )
 
-  const groupTemplateManager = useCallback<
-    TimelineOptionsTemplateFunction<TGroup>
-  >(
+  const groupTemplateManager: TimelineOptionsTemplateFunction<TGroup> = useCallback(
     (item, element, _) => {
       if (!item) return ''
 
@@ -147,7 +144,7 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
   )
 
   const onMoveProp = props.onMove
-  const onMove = useCallback<TimelineOptionsItemCallbackFunction>(
+  const onMove: TimelineOptionsItemCallbackFunction = useCallback(
     (item, callback) => {
       const original = datasetItemsRef.current?.get(item.id)
 
@@ -170,70 +167,68 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
     [onMoveProp],
   )
 
-  const baseOptions = useMemo((): TimelineOptions => {
-    return {
-      editable: {
-        updateTime: onMoveProp ? true : false,
-        updateGroup: false,
-        remove: false,
-        add: false,
-        overrideItems: false,
+  const baseOptions = useMemo<TimelineOptions>(() => ({
+    editable: {
+      updateTime: onMoveProp ? true : false,
+      updateGroup: false,
+      remove: false,
+      add: false,
+      overrideItems: false,
+    },
+    onMove,
+    selectable: true,
+    orientation: 'top',
+    maxHeight: props.options.maxHeight ?? 650,
+    minHeight: 200,
+    moveable: true,
+    showCurrentTime: props.options.showCurrentTime ?? true,
+    verticalScroll: true,
+    zoomKey: 'ctrlKey',
+    // Day-level precision: snap items to day boundaries when dragging
+    snap: (date) => {
+      const d = new Date(date)
+      d.setHours(0, 0, 0, 0)
+      return d
+    },
+    // Prevent zooming to time level (minimum 1 day)
+    zoomMin: 86400000,
+    // Format axis to show only dates, not times
+    format: {
+      minorLabels: {
+        day: 'D',
+        weekday: 'ddd D',
+        month: 'MMM',
+        year: 'YYYY',
       },
-      onMove,
-      selectable: true,
-      orientation: 'top',
-      maxHeight: props.options.maxHeight ?? 650,
-      minHeight: 200,
-      moveable: true,
-      showCurrentTime: props.options.showCurrentTime ?? true,
-      verticalScroll: true,
-      zoomKey: 'ctrlKey',
-      // Day-level precision: snap items to day boundaries when dragging
-      snap: (date) => {
-        const d = new Date(date)
-        d.setHours(0, 0, 0, 0)
-        return d
+      majorLabels: {
+        day: 'MMMM YYYY',
+        weekday: 'MMMM YYYY',
+        month: 'YYYY',
+        year: '',
       },
-      // Prevent zooming to time level (minimum 1 day)
-      zoomMin: 86400000,
-      // Format axis to show only dates, not times
-      format: {
-        minorLabels: {
-          day: 'D',
-          weekday: 'ddd D',
-          month: 'MMM',
-          year: 'YYYY',
-        },
-        majorLabels: {
-          day: 'MMMM YYYY',
-          weekday: 'MMMM YYYY',
-          month: 'YYYY',
-          year: '',
-        },
-      },
-      start: props.options.start,
-      end: props.options.end,
-      min: props.options.min,
-      max: props.options.max,
-      groupOrder: props.options.groupOrder ?? 'order',
-      groupHeightMode: 'auto',
-      xss: { disabled: false },
-      template: props.options.template ?? itemTemplateManager,
-      groupTemplate: groupTemplateManager,
-    }
-  }, [
-    groupTemplateManager,
-    itemTemplateManager,
-    props.options.end,
-    props.options.groupOrder,
-    props.options.max,
-    props.options.maxHeight,
-    props.options.min,
-    props.options.showCurrentTime,
-    props.options.start,
-    props.options.template,
+    },
+    start: props.options.start,
+    end: props.options.end,
+    min: props.options.min,
+    max: props.options.max,
+    groupOrder: props.options.groupOrder ?? 'order',
+    groupHeightMode: 'auto',
+    xss: { disabled: false },
+    template: props.options.template ?? itemTemplateManager,
+    groupTemplate: groupTemplateManager,
+  }), [
     onMove,
     onMoveProp,
+    props.options.maxHeight,
+    props.options.showCurrentTime,
+    props.options.start,
+    props.options.end,
+    props.options.min,
+    props.options.max,
+    props.options.groupOrder,
+    props.options.template,
+    itemTemplateManager,
+    groupTemplateManager,
   ])
 
   useEffect(() => {
@@ -322,8 +317,12 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
 
     setIsTimelineLoading(true)
 
+    // Read current data/groups from refs to avoid depending on the full arrays
+    const data = propsDataRef.current
+    const groups = propsGroupsRef.current
+
     const datasetItems = new DataSet([] as TItem[])
-    props.data.forEach((item) => {
+    data.forEach((item) => {
       const backgroundColor = item.itemColor ?? colors.item.background
       const newItem: TItem = {
         ...item,
@@ -341,8 +340,8 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
 
     datasetItemsRef.current = datasetItems
 
-    if (props.groups?.length && props.groups.length > 0) {
-      const datasetGroups = new DataSet(props.groups)
+    if (groups?.length && groups.length > 0) {
+      const datasetGroups = new DataSet(groups)
       datasetGroupsRef.current = datasetGroups
       timelineInstanceRef.current = new Timeline(
         timelineRef.current,
@@ -380,13 +379,11 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
     setTimeout(() => {
       setIsTimelineLoading(false)
     }, 800)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     props.isLoading,
     props.data.length, // Reinit when item count changes
     props.groups?.length, // Reinit when group count changes
     reinitTrigger, // Reinit when explicitly triggered (e.g., groups removed)
-    // Intentionally NOT including props.data or props.groups to avoid reinit on content changes
     colors.item.background,
     colors.background.background,
   ])
@@ -542,12 +539,12 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
     }
   }, [])
 
-  const toggleFullScreen = useCallback(() => {
+  const toggleFullScreen = () => {
     if (!enableFullScreenToggle) return
     setIsFullScreen(!isFullScreen)
-  }, [enableFullScreenToggle, isFullScreen])
+  }
 
-  const saveTimelineAsImage = useCallback(async () => {
+  const saveTimelineAsImage = async () => {
     if (!timelineRef.current || !timelineInstanceRef.current) return
 
     // Store current options
@@ -580,9 +577,9 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
       // Restore original options
       timelineInstanceRef.current.setOptions(currentOptions)
     }
-  }, [token.colorBgContainer])
+  }
 
-  const resetWindow = useCallback(() => {
+  const resetWindow = () => {
     if (timelineInstanceRef.current && initialWindowRef.current) {
       timelineInstanceRef.current.setWindow(
         initialWindowRef.current.start,
@@ -590,13 +587,13 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
         { animation: true },
       )
     }
-  }, [])
+  }
 
   const isLoading = props.isLoading || isTimelineLoading
   const hasData = props.data && props.data.length > 0
   const showControls = !isLoading && hasData
 
-  const menuItems: MenuProps['items'] = useMemo(() => {
+  const menuItems: MenuProps['items'] = (() => {
     const items: MenuProps['items'] = []
 
     if (enableFullScreenToggle) {
@@ -629,14 +626,7 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
     })
 
     return items
-  }, [
-    enableFullScreenToggle,
-    enableSaveAsImage,
-    isFullScreen,
-    toggleFullScreen,
-    saveTimelineAsImage,
-    resetWindow,
-  ])
+  })()
 
   return (
     <Spin spinning={isLoading} description="Loading timeline..." size="large">

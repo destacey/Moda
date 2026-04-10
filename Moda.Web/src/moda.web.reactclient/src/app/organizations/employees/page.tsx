@@ -2,7 +2,7 @@
 
 import PageTitle from '@/src/components/common/page-title'
 import ModaGrid from '../../../components/common/moda-grid'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { ItemType } from 'antd/es/menu/interface'
 import Link from 'next/link'
 import { useDocumentTitle } from '../../../hooks/use-document-title'
@@ -63,9 +63,9 @@ const EmployeeListPage = () => {
     [],
   )
 
-  const refresh = useCallback(async () => {
+  const refresh = async () => {
     refetch()
-  }, [refetch])
+  }
 
   const onIncludeInactiveChange = (checked: boolean) => {
     setIncludeInactive(checked)

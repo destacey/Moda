@@ -4,7 +4,7 @@ import PlanningIntervalObjectivesGrid from '@/src/components/common/planning/pla
 import { useDocumentTitle } from '@/src/hooks'
 import { BuildOutlined, MenuOutlined } from '@ant-design/icons'
 import Segmented, { SegmentedLabeledOption } from 'antd/es/segmented'
-import { use, useCallback, useMemo, useState } from 'react'
+import { use, useState } from 'react'
 import { CreatePlanningIntervalObjectiveForm } from '../../_components'
 import { PageTitle } from '@/src/components/common'
 import { notFound } from 'next/navigation'
@@ -76,20 +76,17 @@ const PlanningIntervalObjectivesPage = (props: {
     teamData?.filter((t) => t.type == 'Team').length > 0
   const showActions = canCreateObjectives
 
-  const viewSelector = useMemo(
-    () => (
-      <Segmented
-        options={viewSelectorOptions}
-        value={currentView}
-        onChange={setCurrentView}
-      />
-    ),
-    [currentView],
+  const viewSelector = (
+    <Segmented
+      options={viewSelectorOptions}
+      value={currentView}
+      onChange={setCurrentView}
+    />
   )
 
-  const createObjectiveButtonClicked = useCallback(() => {
+  const createObjectiveButtonClicked = () => {
     setOpenCreateObjectiveForm(true)
-  }, [])
+  }
 
   const onCreateObjectiveFormClosed = (wasCreated: boolean) => {
     setOpenCreateObjectiveForm(false)

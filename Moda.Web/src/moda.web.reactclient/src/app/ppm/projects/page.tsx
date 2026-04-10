@@ -6,7 +6,7 @@ import { authorizePage } from '@/src/components/hoc'
 import { useDocumentTitle, useLocalStorageState } from '@/src/hooks'
 import { useGetProjectsQuery } from '@/src/store/features/ppm/projects-api'
 import { Button } from 'antd'
-import { FC, useCallback, useEffect, useMemo, useState } from 'react'
+import { FC, useEffect, useState } from 'react'
 import { CreateProjectForm } from './_components'
 import { ProjectsFilterBar, ProjectsGrid } from '../_components'
 import { useMessage } from '@/src/components/contexts/messaging'
@@ -70,15 +70,13 @@ const ProjectsPage: FC = () => {
     }
   }, [error, messageApi])
 
-  const handleResetFilters = useCallback(() => {
+  const handleResetFilters = () => {
     setSelectedStatuses(DEFAULT_STATUSES)
     setSelectedPortfolioId(null)
     setSelectedRole(null)
-  }, [setSelectedStatuses, setSelectedPortfolioId, setSelectedRole])
+  }
 
-  const actions = useMemo(() => {
-    if (!showActions) return null
-    return (
+  const actions = !showActions ? null : (
       <>
         {canCreateProject && (
           <Button onClick={() => setOpenCreateProjectForm(true)}>
@@ -87,7 +85,6 @@ const ProjectsPage: FC = () => {
         )}
       </>
     )
-  }, [canCreateProject, showActions])
 
   const onCreateProjectFormClosed = (wasCreated: boolean) => {
     setOpenCreateProjectForm(false)

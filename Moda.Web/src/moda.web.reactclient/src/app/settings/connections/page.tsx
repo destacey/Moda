@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { ModaGrid, PageActions, PageTitle } from '../../../components/common'
 import { authorizePage } from '../../../components/hoc'
 import { useDocumentTitle } from '../../../hooks'
@@ -34,18 +34,15 @@ const ConnectionsPage = () => {
     'Permissions.Connections.Create',
   )
 
-  const columnDefs = useMemo<ColDef<ConnectionListDto>[]>(
-    () => [
+  const columnDefs = useMemo<ColDef<ConnectionListDto>[]>(() => [
       { field: 'id', hide: true },
       { field: 'name', cellRenderer: ConnectionLinkCellRenderer, width: 250 },
       { field: 'connector.name', width: 150 },
       { field: 'isActive', width: 125 },
       { field: 'isValidConfiguration', width: 150 },
-    ],
-    [],
-  )
+    ], [])
 
-  const actionsMenuItems = useMemo(() => {
+  const actionsMenuItems = (() => {
     const items = [] as ItemType[]
     if (canCreateConnection) {
       items.push({
@@ -55,11 +52,11 @@ const ConnectionsPage = () => {
       })
     }
     return items
-  }, [canCreateConnection])
+  })()
 
-  const refresh = useCallback(async () => {
+  const refresh = async () => {
     refetch()
-  }, [refetch])
+  }
 
   const onIncludeDisabledChange = (checked: boolean) => {
     setIncludeDisabled(checked)

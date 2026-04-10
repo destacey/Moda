@@ -1,4 +1,4 @@
-import { FC, ComponentType, useMemo, useRef } from 'react'
+import { FC, ComponentType, useRef } from 'react'
 import useTheme from '../../contexts/theme'
 import { OrganizationChart, OrganizationChartOptions } from '@ant-design/graphs'
 import {
@@ -9,10 +9,13 @@ import ModaEmpty from '../moda-empty'
 
 interface CustomTransformOption {
   type: string
+  key?: string
   enable?: boolean
-  iconOffsetY?: number
+  iconPlacement?: 'bottom' | 'right'
+  refreshLayout?: boolean
   [key: string]: any
 }
+type TransformOption = CustomTransformOption | string
 
 export interface ModaOrganizationChartProps<T = any> {
   data: OrganizationChartGraphData<T>
@@ -29,63 +32,54 @@ const ModaOrganizationChart: FC<ModaOrganizationChartProps> = ({
 
   const { antvisG6ChartsTheme, token } = useTheme()
 
-  const options: OrganizationChartOptions = useMemo(
-    () => ({
-      padding: [40, 0, 0, 120],
-      autoFit: 'view',
-      data: (data as Record<string, unknown>) || { nodes: [], edges: [] },
-      node: {
-        style: {
-          component: (nodeData) => (
-            <NodeComponent data={nodeData.data} themeToken={token} />
-          ),
-          size: nodeSize,
-        },
+  const options: OrganizationChartOptions = {
+    padding: [40, 0, 0, 120],
+    autoFit: 'view',
+    data: (data as Record<string, unknown>) || { nodes: [], edges: [] },
+    node: {
+      style: {
+        component: (nodeData) => (
+          <NodeComponent data={nodeData.data} themeToken={token} />
+        ),
+        size: nodeSize,
+        ports: [
+          { key: '0', placement: [0.5, 0] },
+          { key: '1', placement: [0.5, 1] },
+        ],
       },
-      onReady: (graph) => {
-        chartInstanceRef.current = graph
+    },
+    onReady: (graph) => {
+      chartInstanceRef.current = graph
+    },
+    onDestroy: () => {
+      chartInstanceRef.current = null
+    },
+    edge: {
+      type: 'cubic-vertical',
+      style: {
+        radius: 0,
+        lineWidth: 1.5,
+        endArrow: true,
+        startArrow: false,
+        stroke: '#91d5ff',
+        sourcePort: '1',
+        targetPort: '0',
       },
-      onDestroy: () => {
-        chartInstanceRef.current = null
-      },
-      edge: {
-        style: {
-          radius: 0,
-          lineWidth: 2,
-          endArrow: true,
-          startArrow: false,
-          stroke: '#91d5ff',
-        },
-      },
-      layout: {
-        type: 'antv-dagre',
-        nodesep: 24,
-        ranksep: 0,
-        rankdir: 'TB',
-        controlPoints: true,
-      },
-      transforms: (transforms: CustomTransformOption[]) => {
-        const filteredTransforms = transforms.filter(
-          (transform) => transform.type !== 'collapse-expand-react-node',
-        )
-
-        const collapseExpandTransform = transforms.find(
-          (transform) => transform.type === 'collapse-expand-react-node',
-        )
-
-        return [
-          ...filteredTransforms,
-          {
-            ...(collapseExpandTransform || {}),
-            type: 'collapse-expand-react-node',
-            enable: true,
-            iconOffsetY: 24,
-          },
-        ]
-      },
-    }),
-    [NodeComponent, data, nodeSize, token],
-  )
+    },
+    layout: {
+      type: 'dagre',
+      nodesep: 24,
+      ranksep: 48,
+      rankdir: 'TB',
+      controlPoints: false,
+    },
+    transforms: (transforms: TransformOption[]) =>
+      transforms.filter(
+        (transform) =>
+          typeof transform === 'string' ||
+          transform.type !== 'collapse-expand-react-node',
+      ),
+  }
 
   if (!data || !data.nodes || data.nodes.length === 0) {
     return <ModaEmpty message="No org chart data to display" />

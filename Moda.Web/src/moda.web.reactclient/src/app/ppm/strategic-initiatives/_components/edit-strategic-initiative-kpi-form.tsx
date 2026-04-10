@@ -15,7 +15,7 @@ import {
 import { toFormErrors } from '@/src/utils'
 import { Form, Input, InputNumber, Modal, Select } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 
 export interface EditStrategicInitiativeKpiFormProps {
   strategicInitiativeId: string
@@ -77,35 +77,32 @@ const EditStrategicInitiativeKpiForm = ({
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<EditStrategicInitiativeKpiFormValues>({
-      onSubmit: useCallback(
-        async (values: EditStrategicInitiativeKpiFormValues, form) => {
-          try {
-            const request = mapToRequestValues(
-              values,
-              strategicInitiativeId,
-              kpiId,
-            )
-            const response = await updateKpi(request)
-            if (response.error) throw response.error
+      onSubmit: async (values: EditStrategicInitiativeKpiFormValues, form) => {
+        try {
+          const request = mapToRequestValues(
+            values,
+            strategicInitiativeId,
+            kpiId,
+          )
+          const response = await updateKpi(request)
+          if (response.error) throw response.error
 
-            messageApi.success('KPI updated successfully.')
-            return true
-          } catch (error) {
-            if (error.status === 422 && error.errors) {
-              const formErrors = toFormErrors(error.errors)
-              form.setFields(formErrors)
-              messageApi.error('Correct the validation error(s) to continue.')
-            } else {
-              messageApi.error(
-                error.detail ??
-                  'An error occurred while updating the KPI. Please try again.',
-              )
-            }
-            return false
+          messageApi.success('KPI updated successfully.')
+          return true
+        } catch (error) {
+          if (error.status === 422 && error.errors) {
+            const formErrors = toFormErrors(error.errors)
+            form.setFields(formErrors)
+            messageApi.error('Correct the validation error(s) to continue.')
+          } else {
+            messageApi.error(
+              error.detail ??
+                'An error occurred while updating the KPI. Please try again.',
+            )
           }
-        },
-        [updateKpi, strategicInitiativeId, kpiId, messageApi],
-      ),
+          return false
+        }
+      },
       onComplete: onFormComplete,
       onCancel: onFormCancel,
       errorMessage:
