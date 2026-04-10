@@ -67,7 +67,7 @@ const WorkProcessDetailsPage = (props: {
   }, [error])
 
   const actionsMenuItems = (() => {
-    if (!workProcessData?.isActive === undefined) return [] as ItemType[]
+    if (workProcessData?.isActive === undefined) return [] as ItemType[]
 
     const items = [] as ItemType[]
     if (canUpdateWorkProcess) {

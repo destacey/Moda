@@ -21,52 +21,47 @@ export interface ObjectiveHealthChartDataItem {
 
 const ObjectiveHealthChart = (props: ObjectiveHealthChartProps) => {
   const { currentThemeName, antDesignChartsTheme } = useTheme()
+
+  if (!props.data || props.data.length === 0) return null
+
   const fontColor =
     currentThemeName === 'light'
       ? 'rgba(0, 0, 0, 0.45)'
       : 'rgba(255, 255, 255, 0.45)'
 
-  const config = (() => {
-    const total = props.data.reduce((acc, x) => acc + x.count, 0)
-    return {
-      title: {
-        title: 'Objectives By Health',
-        style: {
-          titleFontSize: 14,
-          titleFontWeight: 'normal',
-          titleFill: fontColor,
+  const total = props.data.reduce((acc, x) => acc + x.count, 0)
+  const config: PieConfig = {
+    title: {
+      title: 'Objectives By Health',
+      style: {
+        titleFontSize: 14,
+        titleFontWeight: 'normal',
+        titleFill: fontColor,
+      },
+    },
+    theme: antDesignChartsTheme,
+    data: props.data,
+    angleField: 'count',
+    colorField: 'type',
+    height: 350,
+    width: 425,
+    label: {
+      text: (d) =>
+        `${d.type}\n ${d.count} (${Math.round((d.count / total) * 100)}%)`,
+      transform: [
+        {
+          type: 'overlapDodgeY',
         },
+      ],
+    },
+    legend: {
+      color: {
+        title: false,
+        position: 'right',
+        rowPadding: 5,
       },
-      theme: antDesignChartsTheme,
-      data: props.data ?? [],
-      angleField: 'count',
-      colorField: 'type',
-      height: 350,
-      width: 425,
-      label: {
-        text: (d) =>
-          `${d.type}\n ${d.count} (${Math.round((d.count / total) * 100)}%)`,
-        //position: 'outside',
-        // style: {
-        //   fontWeight: 'bold',
-        // },
-        transform: [
-          {
-            type: 'overlapDodgeY',
-          },
-        ],
-      },
-      legend: {
-        color: {
-          title: false,
-          position: 'right',
-          rowPadding: 5,
-        },
-      },
-    } as PieConfig
-  })()
-
-  if (!props.data || props.data.length === 0) return
+    },
+  }
 
   return (
     <Card size="small">
