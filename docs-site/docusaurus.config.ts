@@ -20,8 +20,9 @@ const config: Config = {
   projectName: "Moda",
   trailingSlash: false,
 
-  onBrokenLinks: "warn",
-  onBrokenMarkdownLinks: "warn",
+  onBrokenLinks: "throw",
+  onBrokenMarkdownLinks: "throw",
+  onBrokenAnchors: "throw",
 
   i18n: {
     defaultLocale: "en",
