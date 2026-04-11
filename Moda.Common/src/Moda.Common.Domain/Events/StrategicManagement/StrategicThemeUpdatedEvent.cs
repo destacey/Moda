@@ -15,8 +15,8 @@ public record StrategicThemeUpdatedEvent : DomainEvent
         Timestamp = timestamp;
     }
 
-    public Guid Id { get; init; }
-    public string Name { get; init; }
-    public string Description { get; init; }
-    public StrategicThemeState State { get; init; }
+    public Guid Id { get; }
+    public string Name { get; }
+    public string Description { get; }
+    public StrategicThemeState State { get; }
 }

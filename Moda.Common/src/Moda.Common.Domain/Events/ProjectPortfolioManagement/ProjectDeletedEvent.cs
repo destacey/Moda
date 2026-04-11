@@ -11,5 +11,5 @@ public record ProjectDeletedEvent : DomainEvent
         Timestamp = timestamp;
     }
 
-    public Guid Id { get; init; }
+    public Guid Id { get; }
 }

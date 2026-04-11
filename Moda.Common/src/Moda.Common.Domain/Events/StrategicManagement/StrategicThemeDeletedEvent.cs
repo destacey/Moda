@@ -10,5 +10,5 @@ public sealed record StrategicThemeDeletedEvent : DomainEvent
         Timestamp = timestamp;
     }
 
-    public Guid Id { get; init; }
+    public Guid Id { get; }
 }

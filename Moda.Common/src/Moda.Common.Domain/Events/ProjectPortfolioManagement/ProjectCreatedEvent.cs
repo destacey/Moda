@@ -23,23 +23,23 @@ public sealed record ProjectCreatedEvent : DomainEvent, ISimpleProject
         Timestamp = timestamp;
     }
 
-    public Guid Id { get; init; }
-    public ProjectKey Key { get; init; }
-    public string Name { get; init; }
-    public string Description { get; init; }
-    public int ExpenditureCategoryId { get; init; }
-    public int StatusId { get; set; }
-    public LocalDateRange? DateRange { get; set; }
-    public Guid PortfolioId { get; set; }
-    public Guid? ProgramId { get; set; }
+    public Guid Id { get; }
+    public ProjectKey Key { get; }
+    public string Name { get; }
+    public string Description { get; }
+    public int ExpenditureCategoryId { get; }
+    public int StatusId { get; }
+    public LocalDateRange? DateRange { get; }
+    public Guid PortfolioId { get; }
+    public Guid? ProgramId { get; }
 
     /// <summary>
     /// The roles for the project.  The key is the role type id and the value is an array of user ids.
     /// </summary>
-    public Dictionary<int, Guid[]>? Roles { get; set; }
+    public Dictionary<int, Guid[]>? Roles { get; }
 
     /// <summary>
     /// The strategic theme ids for the project.
     /// </summary>
-    public Guid[] StrategicThemes { get; set; }
+    public Guid[] StrategicThemes { get; }
 }

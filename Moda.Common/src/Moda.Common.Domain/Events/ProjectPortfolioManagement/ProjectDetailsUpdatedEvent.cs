@@ -16,9 +16,9 @@ public sealed record ProjectDetailsUpdatedEvent : DomainEvent, ISimpleProject
         Timestamp = timestamp;
     }
 
-    public Guid Id { get; init; }
-    public ProjectKey Key { get; init; }
-    public string Name { get; init; }
-    public string Description { get; init; }
-    public int ExpenditureCategoryId { get; init; }
+    public Guid Id { get; }
+    public ProjectKey Key { get; }
+    public string Name { get; }
+    public string Description { get; }
+    public int ExpenditureCategoryId { get; }
 }

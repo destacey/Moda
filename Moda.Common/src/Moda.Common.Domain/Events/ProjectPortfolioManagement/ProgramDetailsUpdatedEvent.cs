@@ -14,8 +14,8 @@ public sealed record ProgramDetailsUpdatedEvent : DomainEvent, ISimpleProgram
         Timestamp = timestamp;
     }
 
-    public Guid Id { get; init; }
-    public int Key { get; init; }
-    public string Name { get; init; }
-    public string Description { get; init; }
+    public Guid Id { get; }
+    public int Key { get; }
+    public string Name { get; }
+    public string Description { get; }
 }
