@@ -45,11 +45,7 @@ public class ConnectionConfig : IEntityTypeConfiguration<Connection>
         //builder.Property<bool?>("IsSyncEnabled")
         //    .IsRequired(false);
 
-        // Audit
-        builder.Property(c => c.Created);
-        builder.Property(c => c.CreatedBy);
-        builder.Property(c => c.LastModified);
-        builder.Property(c => c.LastModifiedBy);
+        // Soft Delete
         builder.Property(c => c.Deleted);
         builder.Property(c => c.DeletedBy);
         builder.Property(c => c.IsDeleted);

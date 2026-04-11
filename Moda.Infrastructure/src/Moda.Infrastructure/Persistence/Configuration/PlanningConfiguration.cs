@@ -89,11 +89,7 @@ public class PlanningIntervalConfig : IEntityTypeConfiguration<PlanningInterval>
             options.Property(d => d.End).HasColumnName("End").IsRequired();
         });
 
-        // Audit
-        builder.Property(p => p.Created);
-        builder.Property(p => p.CreatedBy);
-        builder.Property(p => p.LastModified);
-        builder.Property(p => p.LastModifiedBy);
+        // Soft Delete
         builder.Property(p => p.Deleted);
         builder.Property(p => p.DeletedBy);
         builder.Property(p => p.IsDeleted);
@@ -134,11 +130,7 @@ public class PlanningIntervalIterationConfig : IEntityTypeConfiguration<Planning
             options.Property(d => d.End).HasColumnName("End").IsRequired();
         });
 
-        // Audit
-        builder.Property(i => i.Created);
-        builder.Property(i => i.CreatedBy);
-        builder.Property(i => i.LastModified);
-        builder.Property(i => i.LastModifiedBy);
+        // Soft Delete
         builder.Property(i => i.Deleted);
         builder.Property(i => i.DeletedBy);
         builder.Property(i => i.IsDeleted);
@@ -186,11 +178,7 @@ public class PlanningIntervalObjectiveConfig : IEntityTypeConfiguration<Planning
             .HasColumnType("varchar");
         builder.Property(o => o.IsStretch).IsRequired();
 
-        // Audit
-        builder.Property(o => o.Created);
-        builder.Property(o => o.CreatedBy);
-        builder.Property(o => o.LastModified);
-        builder.Property(o => o.LastModifiedBy);
+        // Soft Delete
         builder.Property(o => o.Deleted);
         builder.Property(o => o.DeletedBy);
         builder.Property(o => o.IsDeleted);
@@ -291,11 +279,7 @@ public class RiskConfig : IEntityTypeConfiguration<Risk>
         builder.Property(r => r.Response).HasMaxLength(1024);
         builder.Property(r => r.ClosedDate);
 
-        // Audit
-        builder.Property(r => r.Created);
-        builder.Property(r => r.CreatedBy);
-        builder.Property(r => r.LastModified);
-        builder.Property(r => r.LastModifiedBy);
+        // Soft Delete
         builder.Property(r => r.Deleted);
         builder.Property(r => r.DeletedBy);
         builder.Property(r => r.IsDeleted);
@@ -349,12 +333,6 @@ public class RoadmapConfig : IEntityTypeConfiguration<Roadmap>
             options.Property(d => d.Start).HasColumnName("Start").IsRequired();
             options.Property(d => d.End).HasColumnName("End").IsRequired();
         });
-
-        // Audit
-        builder.Property(r => r.Created);
-        builder.Property(r => r.CreatedBy);
-        builder.Property(r => r.LastModified);
-        builder.Property(r => r.LastModifiedBy);
 
         // Relationships
         builder.HasMany(r => r.RoadmapManagers)

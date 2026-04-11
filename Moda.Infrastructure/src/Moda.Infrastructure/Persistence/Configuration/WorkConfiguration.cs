@@ -445,14 +445,10 @@ public class WorkProcessConfig : IEntityTypeConfiguration<WorkProcess>
         builder.Property(w => w.ExternalId);
         builder.Property(w => w.IsActive);
 
-        // Audit
-        builder.Property(w => w.Created);
-        builder.Property(w => w.CreatedBy);
-        builder.Property(w => w.LastModified);
-        builder.Property(w => w.LastModifiedBy);
+        // Soft Delete
         builder.Property(w => w.Deleted);
         builder.Property(w => w.DeletedBy);
-        builder.Property(w => w.IsDeleted); ;
+        builder.Property(w => w.IsDeleted);
 
         // Relationships
         builder.HasMany(w => w.Schemes)
@@ -483,11 +479,7 @@ public class WorkProcessSchemeConfig : IEntityTypeConfiguration<WorkProcessSchem
         builder.Property(w => w.WorkflowId);
         builder.Property(w => w.IsActive);
 
-        // Audit
-        builder.Property(w => w.Created);
-        builder.Property(w => w.CreatedBy);
-        builder.Property(w => w.LastModified);
-        builder.Property(w => w.LastModifiedBy);
+        // Soft Delete
         builder.Property(w => w.Deleted);
         builder.Property(w => w.DeletedBy);
         builder.Property(w => w.IsDeleted);
@@ -580,11 +572,7 @@ public class WorkspaceConfig : IEntityTypeConfiguration<Workspace>
         });
 
 
-        // Audit
-        builder.Property(w => w.Created);
-        builder.Property(w => w.CreatedBy);
-        builder.Property(w => w.LastModified);
-        builder.Property(w => w.LastModifiedBy);
+        // Soft Delete
         builder.Property(w => w.Deleted);
         builder.Property(w => w.DeletedBy);
         builder.Property(w => w.IsDeleted);
@@ -622,11 +610,7 @@ public class WorkStatusConfig : IEntityTypeConfiguration<WorkStatus>
         builder.Property(w => w.Description).HasMaxLength(1024);
         builder.Property(w => w.IsActive);
 
-        // Audit
-        builder.Property(w => w.Created);
-        builder.Property(w => w.CreatedBy);
-        builder.Property(w => w.LastModified);
-        builder.Property(w => w.LastModifiedBy);
+        // Soft Delete
         builder.Property(w => w.Deleted);
         builder.Property(w => w.DeletedBy);
         builder.Property(w => w.IsDeleted);
@@ -714,11 +698,7 @@ public class WorkTypeConfig : IEntityTypeConfiguration<WorkType>
         builder.Property(w => w.Description).HasMaxLength(1024);
         builder.Property(w => w.IsActive);
 
-        // Audit
-        builder.Property(w => w.Created);
-        builder.Property(w => w.CreatedBy);
-        builder.Property(w => w.LastModified);
-        builder.Property(w => w.LastModifiedBy);
+        // Soft Delete
         builder.Property(w => w.Deleted);
         builder.Property(w => w.DeletedBy);
         builder.Property(w => w.IsDeleted);
@@ -759,11 +739,7 @@ public class WorkflowConfig : IEntityTypeConfiguration<Workflow>
             .HasMaxLength(32);
         builder.Property(w => w.IsActive);
 
-        // Audit
-        builder.Property(w => w.Created);
-        builder.Property(w => w.CreatedBy);
-        builder.Property(w => w.LastModified);
-        builder.Property(w => w.LastModifiedBy);
+        // Soft Delete
         builder.Property(w => w.Deleted);
         builder.Property(w => w.DeletedBy);
         builder.Property(w => w.IsDeleted);
@@ -800,11 +776,7 @@ public class WorkflowSchemeConfig : IEntityTypeConfiguration<WorkflowScheme>
             .HasMaxLength(32);
         builder.Property(w => w.IsActive);
 
-        // Audit
-        builder.Property(w => w.Created);
-        builder.Property(w => w.CreatedBy);
-        builder.Property(w => w.LastModified);
-        builder.Property(w => w.LastModifiedBy);
+        // Soft Delete
         builder.Property(w => w.Deleted);
         builder.Property(w => w.DeletedBy);
         builder.Property(w => w.IsDeleted);

@@ -45,11 +45,7 @@ public class ObjectiveConfiguration : IEntityTypeConfiguration<Objective>
         builder.Property(o => o.ClosedDate);
         builder.Property(o => o.Order);
 
-        // Audit
-        builder.Property(o => o.Created);
-        builder.Property(o => o.CreatedBy);
-        builder.Property(o => o.LastModified);
-        builder.Property(o => o.LastModifiedBy);
+        // Soft Delete
         builder.Property(o => o.Deleted);
         builder.Property(o => o.DeletedBy);
         builder.Property(o => o.IsDeleted);

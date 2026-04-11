@@ -52,11 +52,7 @@ public class BaseTeamConfig : IEntityTypeConfiguration<BaseTeam>
         builder.Property(o => o.InactiveDate);
         builder.Property(o => o.IsActive);
 
-        // Audit
-        builder.Property(o => o.Created);
-        builder.Property(o => o.CreatedBy);
-        builder.Property(o => o.LastModified);
-        builder.Property(o => o.LastModifiedBy);
+        // Soft Delete
         builder.Property(o => o.Deleted);
         builder.Property(o => o.DeletedBy);
         builder.Property(o => o.IsDeleted);
@@ -100,11 +96,7 @@ public class TeamMembershipConfig : IEntityTypeConfiguration<TeamMembership>
             .HasForeignKey(m => m.SourceId).OnDelete(DeleteBehavior.NoAction);
         builder.HasOne(o => o.Target).WithMany(m => m.ChildMemberships).HasForeignKey(m => m.TargetId).OnDelete(DeleteBehavior.NoAction);
 
-        // Audit
-        builder.Property(o => o.Created);
-        builder.Property(o => o.CreatedBy);
-        builder.Property(o => o.LastModified);
-        builder.Property(o => o.LastModifiedBy);
+        // Soft Delete
         builder.Property(o => o.Deleted);
         builder.Property(o => o.DeletedBy);
         builder.Property(o => o.IsDeleted);

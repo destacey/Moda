@@ -34,11 +34,7 @@ public class HealthCheckConfiguration : IEntityTypeConfiguration<HealthCheck>
         builder.Property(h => h.Expiration).IsRequired();
         builder.Property(h => h.Note).HasMaxLength(1024);
 
-        // Audit
-        builder.Property(r => r.Created);
-        builder.Property(r => r.CreatedBy);
-        builder.Property(r => r.LastModified);
-        builder.Property(r => r.LastModifiedBy);
+        // Soft Delete
         builder.Property(r => r.Deleted);
         builder.Property(r => r.DeletedBy);
         builder.Property(r => r.IsDeleted);

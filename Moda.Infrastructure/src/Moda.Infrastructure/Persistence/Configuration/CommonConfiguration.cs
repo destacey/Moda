@@ -57,11 +57,7 @@ public class EmployeeConfig : IEntityTypeConfiguration<Employee>
         });
 
 
-        // Audit
-        builder.Property(e => e.Created);
-        builder.Property(e => e.CreatedBy);
-        builder.Property(e => e.LastModified);
-        builder.Property(e => e.LastModifiedBy);
+        // Soft Delete
         builder.Property(e => e.Deleted);
         builder.Property(e => e.DeletedBy);
         builder.Property(e => e.IsDeleted);
