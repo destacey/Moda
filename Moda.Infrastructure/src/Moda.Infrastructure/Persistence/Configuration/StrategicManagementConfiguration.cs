@@ -18,6 +18,7 @@ public class StrategicThemeConfig : IEntityTypeConfiguration<StrategicTheme>
 
         builder.HasIndex(s => s.State);
 
+        builder.Property(s => s.Id).ValueGeneratedNever();
         builder.Property(s => s.Key).ValueGeneratedOnAdd();
         builder.Property(s => s.Name).HasMaxLength(64).IsRequired();
         builder.Property(s => s.Description).HasMaxLength(1024).IsRequired();
@@ -40,6 +41,7 @@ public class StrategyConfig : IEntityTypeConfiguration<Strategy>
 
         builder.HasIndex(s => s.Status);
 
+        builder.Property(s => s.Id).ValueGeneratedNever();
         builder.Property(s => s.Key).ValueGeneratedOnAdd();
         builder.Property(s => s.Name).HasMaxLength(1024).IsRequired();
         builder.Property(s => s.Description).HasMaxLength(3072);
@@ -69,6 +71,7 @@ public class VisionConfig : IEntityTypeConfiguration<Vision>
 
         builder.HasIndex(s => s.State);
 
+        builder.Property(s => s.Id).ValueGeneratedNever();
         builder.Property(s => s.Key).ValueGeneratedOnAdd();
         builder.Property(s => s.Description).HasMaxLength(3072).IsRequired();
 

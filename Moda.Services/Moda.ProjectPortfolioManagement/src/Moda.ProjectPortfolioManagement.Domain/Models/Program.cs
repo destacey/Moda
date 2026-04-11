@@ -10,7 +10,7 @@ namespace Moda.ProjectPortfolioManagement.Domain.Models;
 /// <summary>
 /// Represents a program consisting of related projects within a portfolio, designed to achieve strategic objectives.
 /// </summary>
-public sealed class Program : BaseAuditableEntity<Guid>, IHasIdAndKey, ISimpleProgram
+public sealed class Program : BaseAuditableEntity, IHasIdAndKey, ISimpleProgram
 {
     private readonly HashSet<RoleAssignment<ProgramRole>> _roles = [];
     private readonly HashSet<Project> _projects = [];

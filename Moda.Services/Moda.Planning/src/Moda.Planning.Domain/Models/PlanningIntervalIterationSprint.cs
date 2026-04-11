@@ -3,7 +3,7 @@ using Moda.Planning.Domain.Models.Iterations;
 
 namespace Moda.Planning.Domain.Models;
 
-public sealed class PlanningIntervalIterationSprint : BaseAuditableEntity<Guid>
+public sealed class PlanningIntervalIterationSprint : BaseAuditableEntity
 {
     private PlanningIntervalIterationSprint() { }
 

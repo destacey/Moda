@@ -4,7 +4,7 @@ using NodaTime;
 
 namespace Moda.Work.Domain.Models;
 
-public sealed class WorkProcessScheme : BaseSoftDeletableEntity<Guid>, IActivatable
+public sealed class WorkProcessScheme : BaseSoftDeletableEntity, IActivatable
 {
     private WorkProcessScheme() { }
 
@@ -14,13 +14,6 @@ public sealed class WorkProcessScheme : BaseSoftDeletableEntity<Guid>, IActivata
         WorkTypeId = workTypeId;
         WorkflowId = workflowId;
     }
-    internal WorkProcessScheme(WorkProcess workProcess, int workTypeId, Guid? workflowId)
-    {
-        WorkProcess = workProcess;
-        WorkTypeId = workTypeId;
-        WorkflowId = workflowId;
-    }
-
     public Guid WorkProcessId { get; }
     public WorkProcess? WorkProcess { get; private set; }
     public int WorkTypeId { get; }
@@ -78,25 +71,6 @@ public sealed class WorkProcessScheme : BaseSoftDeletableEntity<Guid>, IActivata
         Guard.Against.Default(workflowId, nameof(workflowId));
 
         var scheme = new WorkProcessScheme(workProcessId, workTypeId, workflowId);
-
-        // external work process schemes do not have to be active when they are first created in Moda
-        if (scheme.IsActive != isActive)
-            scheme.IsActive = isActive;
-
-        return scheme;
-    }
-
-    /// <summary>
-    /// Used when creating a new external work process scheme and work process together.  EF will set the WorkProcessId when the work process is saved.
-    /// </summary>
-    /// <param name="workProcess"></param>
-    /// <param name="workTypeId"></param>
-    /// <param name="workflowId"></param>
-    /// <param name="isActive"></param>
-    /// <returns></returns>
-    internal static WorkProcessScheme CreateExternal(WorkProcess workProcess, int workTypeId, Guid workflowId, bool isActive)
-    {
-        var scheme = new WorkProcessScheme(workProcess, workTypeId, workflowId);
 
         // external work process schemes do not have to be active when they are first created in Moda
         if (scheme.IsActive != isActive)

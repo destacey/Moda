@@ -16,6 +16,7 @@ public class TeamNodeConfig : IEntityTypeConfiguration<TeamNode>
         builder.HasAlternateKey(o => o.Key);
 
         // Properties
+        builder.Property(o => o.Id).ValueGeneratedNever();
         builder.Property(o => o.Key);
         builder.Property(o => o.Name).IsRequired().HasMaxLength(128);
         builder.Property(o => o.Code).IsRequired()
@@ -60,7 +61,7 @@ public class TeamMembershipEdgeConfig : IEntityTypeConfiguration<TeamMembershipE
         builder.HasKey(e => e.Id);
 
         // Properties
-        builder.Property(m => m.Id).ValueGeneratedOnAdd();
+        builder.Property(m => m.Id).ValueGeneratedNever();
         builder.Property(m => m.StartDate).IsRequired();
         builder.Property(m => m.EndDate);
 

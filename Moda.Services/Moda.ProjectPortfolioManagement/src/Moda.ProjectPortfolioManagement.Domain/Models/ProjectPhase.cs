@@ -9,7 +9,7 @@ namespace Moda.ProjectPortfolioManagement.Domain.Models;
 /// Represents a phase instance on a project, created from a project lifecycle phase template.
 /// Phases provide the top-level structure for a project's plan and group related tasks.
 /// </summary>
-public sealed class ProjectPhase : BaseAuditableEntity<Guid>
+public sealed class ProjectPhase : BaseAuditableEntity
 {
     private readonly HashSet<RoleAssignment<ProjectPhaseRole>> _roles = [];
 
@@ -17,7 +17,6 @@ public sealed class ProjectPhase : BaseAuditableEntity<Guid>
 
     private ProjectPhase(Guid projectId, ProjectLifecyclePhase lifecyclePhase)
     {
-        Id = Guid.CreateVersion7();
         ProjectId = projectId;
         ProjectLifecyclePhaseId = lifecyclePhase.Id;
         Name = lifecyclePhase.Name;

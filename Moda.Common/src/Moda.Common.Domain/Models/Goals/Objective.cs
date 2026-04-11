@@ -8,7 +8,7 @@ using NodaTime;
 namespace Moda.Goals.Domain.Models;
 
 // TODO make a BaseObjective to inherit Objective and KeyResult from
-public class Objective : BaseSoftDeletableEntity<Guid>, IHasIdAndKey
+public class Objective : BaseSoftDeletableEntity, IHasIdAndKey
 {
     private string _name = default!;
     private string? _description;

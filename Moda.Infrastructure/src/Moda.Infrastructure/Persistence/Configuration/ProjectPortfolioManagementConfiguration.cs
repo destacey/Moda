@@ -70,6 +70,7 @@ public class ProjectPortfolioConfiguration : IEntityTypeConfiguration<ProjectPor
 
         builder.HasIndex(p => p.Status);
 
+        builder.Property(p => p.Id).ValueGeneratedNever();
         builder.Property(p => p.Key).ValueGeneratedOnAdd();
         builder.Property(p => p.Name).HasMaxLength(128).IsRequired();
         builder.Property(p => p.Description).HasMaxLength(1024).IsRequired();
@@ -119,6 +120,7 @@ public class ProgramConfiguration : IEntityTypeConfiguration<Program>
 
         builder.HasIndex(p => p.Status);
 
+        builder.Property(p => p.Id).ValueGeneratedNever();
         builder.Property(p => p.Key).ValueGeneratedOnAdd();
         builder.Property(p => p.Name).HasMaxLength(128).IsRequired();
         builder.Property(p => p.Description).HasMaxLength(2048).IsRequired();
@@ -166,6 +168,7 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
 
         builder.HasIndex(p => p.Status);
 
+        builder.Property(p => p.Id).ValueGeneratedNever();
         builder.Property(p => p.Name).HasMaxLength(128).IsRequired();
         builder.Property(p => p.Description).HasMaxLength(4096).IsRequired();
         builder.Property(p => p.BusinessCase).HasMaxLength(4096);
@@ -240,6 +243,7 @@ public class StrategicInitiativeConfiguration : IEntityTypeConfiguration<Strateg
 
         builder.HasIndex(i => i.Status);
 
+        builder.Property(i => i.Id).ValueGeneratedNever();
         builder.Property(i => i.Key).ValueGeneratedOnAdd();
         builder.Property(i => i.Name).HasMaxLength(128).IsRequired();
         builder.Property(i => i.Description).HasMaxLength(2048).IsRequired();
@@ -280,6 +284,7 @@ public class StrategicInitiativeKpiConfiguration : IEntityTypeConfiguration<Stra
 
         builder.HasIndex(k => k.StrategicInitiativeId);
 
+        builder.Property(k => k.Id).ValueGeneratedNever();
         builder.Property(k => k.Key).ValueGeneratedOnAdd();
         builder.Property(k => k.Name).HasMaxLength(64).IsRequired();
         builder.Property(k => k.Description).HasMaxLength(512);
@@ -322,6 +327,7 @@ public class StrategicInitiativeKpiCheckpointConfiguration : IEntityTypeConfigur
 
         builder.HasIndex(k => k.KpiId);
 
+        builder.Property(k => k.Id).ValueGeneratedNever();
         builder.Property(k => k.TargetValue).IsRequired();
         builder.Property(k => k.AtRiskValue);
         builder.Property(k => k.CheckpointDate).IsRequired();
@@ -340,6 +346,7 @@ public class StrategicInitiativeKpiMeasurementConfiguration : IEntityTypeConfigu
 
         builder.HasIndex(m => m.KpiId);
 
+        builder.Property(m => m.Id).ValueGeneratedNever();
         builder.Property(m => m.ActualValue).IsRequired();
         builder.Property(m => m.MeasurementDate).IsRequired();
         builder.Property(m => m.Note).HasMaxLength(1024);
@@ -695,6 +702,7 @@ public class ProjectTaskConfiguration : IEntityTypeConfiguration<ProjectTask>
         builder.HasIndex(t => t.Key)
             .IsUnique();
 
+        builder.Property(t => t.Id).ValueGeneratedNever();
         builder.HasIndex(t => t.Number);
         builder.HasIndex(t => t.ProjectId);
         builder.HasIndex(t => t.ParentId);
@@ -787,6 +795,7 @@ public class ProjectTaskDependencyConfiguration : IEntityTypeConfiguration<Proje
 
         builder.HasKey(d => d.Id);
 
+        builder.Property(d => d.Id).ValueGeneratedNever();
         builder.HasIndex(d => d.PredecessorId);
         builder.HasIndex(d => d.SuccessorId);
         builder.HasIndex(d => d.RemovedOn);

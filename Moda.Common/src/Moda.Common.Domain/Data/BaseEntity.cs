@@ -52,3 +52,11 @@ public abstract class BaseEntity<TId> : IEntity<TId>
         _postPersistenceActions.Clear();
     }
 }
+
+public abstract class BaseEntity : BaseEntity<Guid>
+{
+    protected BaseEntity()
+    {
+        Id = Guid.CreateVersion7();
+    }
+}

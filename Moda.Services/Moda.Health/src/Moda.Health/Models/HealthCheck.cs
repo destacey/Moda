@@ -10,7 +10,7 @@ using NodaTime;
 
 namespace Moda.Health.Models;
 
-public sealed class HealthCheck : BaseSoftDeletableEntity<Guid>, IHealthCheck
+public sealed class HealthCheck : BaseSoftDeletableEntity, IHealthCheck
 {
     private HealthCheck() { }
 

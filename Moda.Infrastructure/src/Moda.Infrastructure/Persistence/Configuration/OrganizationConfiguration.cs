@@ -34,6 +34,7 @@ public class BaseTeamConfig : IEntityTypeConfiguration<BaseTeam>
         builder.HasIndex(o => new { o.IsActive, o.IsDeleted })
             .HasFilter("[IsDeleted] = 0");
 
+        builder.Property(o => o.Id).ValueGeneratedNever();
         builder.Property(o => o.Key).ValueGeneratedOnAdd();
 
         builder.Property(o => o.Name).IsRequired().HasMaxLength(128);
@@ -84,6 +85,7 @@ public class TeamMembershipConfig : IEntityTypeConfiguration<TeamMembership>
             .HasFilter("[IsDeleted] = 0");
 
         // Value Objects
+        builder.Property(m => m.Id).ValueGeneratedNever();
         builder.ComplexProperty(m => m.DateRange, options =>
         {
             options.Property(d => d.Start).HasColumnName("Start").IsRequired();
@@ -121,6 +123,8 @@ public class TeamOperatingModelConfig : IEntityTypeConfiguration<TeamOperatingMo
             .IncludeProperties(m => new { m.Id, m.Methodology, m.SizingMethod })
             .HasFilter("[End] IS NULL")
             .HasDatabaseName("IX_TeamOperatingModels_TeamId_Current");
+
+        builder.Property(m => m.Id).ValueGeneratedNever();
 
         // Enums
         builder.Property(m => m.Methodology)

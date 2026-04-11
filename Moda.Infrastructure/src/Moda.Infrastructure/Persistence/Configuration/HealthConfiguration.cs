@@ -18,6 +18,7 @@ public class HealthCheckConfiguration : IEntityTypeConfiguration<HealthCheck>
         builder.HasIndex(h => h.ObjectId)
             .IncludeProperties(o => new { o.Id });
 
+        builder.Property(h => h.Id).ValueGeneratedNever();
         builder.Property(h => h.ObjectId).IsRequired();
 
         builder.Property(h => h.Context).IsRequired()

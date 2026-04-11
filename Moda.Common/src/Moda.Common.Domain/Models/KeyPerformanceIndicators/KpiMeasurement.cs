@@ -8,7 +8,7 @@ namespace Moda.Common.Domain.Models.KeyPerformanceIndicators;
 /// <summary>
 /// Represents the common properties and behavior for a KPI measurement (check-in).  This class is intended to be immutable.
 /// </summary>
-public abstract class KpiMeasurement : BaseAuditableEntity<Guid>
+public abstract class KpiMeasurement : BaseAuditableEntity
 {
     protected string? _notes;
 

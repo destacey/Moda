@@ -9,9 +9,9 @@ namespace Moda.Work.Domain.Models;
 /// The work process defines a set of work process configurations that can be used
 /// within a workspace. A work process can be used in many workspaces.
 /// </summary>
-/// <seealso cref="Moda.Common.Domain.Data.BaseSoftDeletableEntity&lt;System.Guid&gt;" />
+/// <seealso cref="Moda.Common.Domain.Data.BaseSoftDeletableEntity" />
 /// <seealso cref="Moda.Common.Domain.Interfaces.IActivatable" />
-public sealed class WorkProcess : BaseSoftDeletableEntity<Guid>, IActivatable, IHasIdAndKey
+public sealed class WorkProcess : BaseSoftDeletableEntity, IActivatable, IHasIdAndKey
 {
     private string _name = null!;
     private string? _description;
@@ -162,9 +162,7 @@ public sealed class WorkProcess : BaseSoftDeletableEntity<Guid>, IActivatable, I
         if (_schemes.Any(s => s.WorkTypeId == workTypeId))
             return Result.Failure("The work type is already associated to this work process.");
 
-        WorkProcessScheme scheme = Id == Guid.Empty
-            ? WorkProcessScheme.CreateExternal(this, workTypeId, workflowId, isActive)
-            : WorkProcessScheme.CreateExternal(Id, workTypeId, workflowId, isActive);
+        WorkProcessScheme scheme = WorkProcessScheme.CreateExternal(Id, workTypeId, workflowId, isActive);
 
         _schemes.Add(scheme);
 

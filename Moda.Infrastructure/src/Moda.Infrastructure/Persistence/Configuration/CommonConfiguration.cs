@@ -29,6 +29,7 @@ public class EmployeeConfig : IEntityTypeConfiguration<Employee>
         builder.HasIndex(e => e.Email)
             .IncludeProperties(e => new { e.Id });
 
+        builder.Property(e => e.Id).ValueGeneratedNever();
         builder.Property(e => e.Key).ValueGeneratedOnAdd();
 
         builder.Property(e => e.EmployeeNumber).HasMaxLength(256).IsRequired();

@@ -7,7 +7,7 @@ using NodaTime;
 
 namespace Moda.Work.Domain.Models;
 
-public sealed class WorkItem : BaseAuditableEntity<Guid>, IHasWorkspace, IHasOptionalWorkTeam
+public sealed class WorkItem : BaseAuditableEntity, IHasWorkspace, IHasOptionalWorkTeam
 {
     private readonly List<WorkItem> _children = [];
     private readonly List<WorkItemHierarchy> _outboundHierarchyHistory = []; // source links
@@ -20,7 +20,7 @@ public sealed class WorkItem : BaseAuditableEntity<Guid>, IHasWorkspace, IHasOpt
 
     private WorkItem() { }
 
-    private WorkItem(WorkItemKey key, string title, Guid workspaceId, int? externalId, WorkType workType, int statusId, WorkStatusCategory statusCategory, IWorkItemParentInfo? parentInfo, Guid? teamId, Instant created, Guid? createdById, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int? priority, double stackRank, double? storyPoints, Guid? iterationId, Instant? activatedTimestamp, Instant? doneTimestamp, WorkItemExtended? extendedProps)
+    private WorkItem(WorkItemKey key, string title, Guid workspaceId, int? externalId, WorkType workType, int statusId, WorkStatusCategory statusCategory, IWorkItemParentInfo? parentInfo, Guid? teamId, Instant created, Guid? createdById, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int? priority, double stackRank, double? storyPoints, Guid? iterationId, Instant? activatedTimestamp, Instant? doneTimestamp, string? externalTeamIdentifier)
     {
         Key = key;
         Title = title;
@@ -42,7 +42,7 @@ public sealed class WorkItem : BaseAuditableEntity<Guid>, IHasWorkspace, IHasOpt
 
         ActivatedTimestamp = activatedTimestamp;
         DoneTimestamp = doneTimestamp;
-        ExtendedProps = extendedProps;
+        ExtendedProps = WorkItemExtended.Create(Id, externalTeamIdentifier);
 
         var result = UpdateParent(parentInfo, workType);
         if (result.IsFailure)
@@ -363,7 +363,7 @@ public sealed class WorkItem : BaseAuditableEntity<Guid>, IHasWorkspace, IHasOpt
         return Result.Success();
     }
 
-    public static WorkItem CreateExternal(Workspace workspace, int externalId, string title, WorkType workType, int statusId, WorkStatusCategory statusCategory, IWorkItemParentInfo? parentInfo, Guid? teamId, Instant created, Guid? createdById, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int? priority, double stackRank, double? storyPoints, Guid? iterationId, Instant? activatedTimestamp, Instant? doneTimestamp, WorkItemExtended? extendedProps)
+    public static WorkItem CreateExternal(Workspace workspace, int externalId, string title, WorkType workType, int statusId, WorkStatusCategory statusCategory, IWorkItemParentInfo? parentInfo, Guid? teamId, Instant created, Guid? createdById, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int? priority, double stackRank, double? storyPoints, Guid? iterationId, Instant? activatedTimestamp, Instant? doneTimestamp, string? externalTeamIdentifier)
     {
         Guard.Against.Null(workspace, nameof(workspace));
         Guard.Against.Null(workType, nameof(workType));
@@ -374,7 +374,7 @@ public sealed class WorkItem : BaseAuditableEntity<Guid>, IHasWorkspace, IHasOpt
         }
 
         var key = new WorkItemKey(workspace.Key, externalId);
-        return new WorkItem(key, title, workspace.Id, externalId, workType, statusId, statusCategory, parentInfo, teamId, created, createdById, lastModified, lastModifiedById, assignedToId, priority, stackRank, storyPoints, iterationId, activatedTimestamp, doneTimestamp, extendedProps);
+        return new WorkItem(key, title, workspace.Id, externalId, workType, statusId, statusCategory, parentInfo, teamId, created, createdById, lastModified, lastModifiedById, assignedToId, priority, stackRank, storyPoints, iterationId, activatedTimestamp, doneTimestamp, externalTeamIdentifier);
 
         //var result = workspace.AddWorkItem(workItem);  // this is handled in the handler for performance reasons
     }

@@ -28,6 +28,7 @@ public class ConnectionConfig : IEntityTypeConfiguration<Connection>
         builder.HasIndex(c => new { c.IsActive, c.IsDeleted })
             .HasFilter("[IsDeleted] = 0");
 
+        builder.Property(c => c.Id).ValueGeneratedNever();
         builder.Property(c => c.Name).IsRequired().HasMaxLength(128);
         builder.Property(c => c.Description).HasMaxLength(1024);
         builder.Property(w => w.Connector).IsRequired()

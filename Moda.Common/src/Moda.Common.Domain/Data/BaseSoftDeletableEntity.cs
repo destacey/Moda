@@ -19,3 +19,11 @@ public abstract class BaseSoftDeletableEntity<TId> : BaseAuditableEntity<TId>, I
     /// </summary>
     public bool IsDeleted { get; set; } = false;
 }
+
+public abstract class BaseSoftDeletableEntity : BaseSoftDeletableEntity<Guid>
+{
+    protected BaseSoftDeletableEntity()
+    {
+        Id = Guid.CreateVersion7();
+    }
+}

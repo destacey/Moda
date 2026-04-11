@@ -55,8 +55,6 @@ public class PlanningTeamConfig : IEntityTypeConfiguration<PlanningTeam>
             .WithOne(t => t.Team)
             .HasForeignKey(t => t.TeamId)
             .OnDelete(DeleteBehavior.Cascade);
-
-        // Ignore
     }
 }
 
@@ -77,6 +75,7 @@ public class PlanningIntervalConfig : IEntityTypeConfiguration<PlanningInterval>
         builder.HasIndex(p => p.Name)
             .IsUnique();
 
+        builder.Property(p => p.Id).ValueGeneratedNever();
         builder.Property(p => p.Key).ValueGeneratedOnAdd();
 
         builder.Property(p => p.Name).HasMaxLength(128).IsRequired();
@@ -115,6 +114,7 @@ public class PlanningIntervalIterationConfig : IEntityTypeConfiguration<Planning
             .IncludeProperties(i => new { i.Id, i.Key, i.Name, i.Category })
             .HasFilter("[IsDeleted] = 0");
 
+        builder.Property(i => i.Id).ValueGeneratedNever();
         builder.Property(i => i.Key).ValueGeneratedOnAdd();
 
         builder.Property(i => i.Name).HasMaxLength(128).IsRequired();
@@ -165,6 +165,7 @@ public class PlanningIntervalObjectiveConfig : IEntityTypeConfiguration<Planning
             .IncludeProperties(o => new { o.Id, o.Key, o.PlanningIntervalId, o.Type, o.IsStretch })
             .HasFilter("[IsDeleted] = 0");
 
+        builder.Property(o => o.Id).ValueGeneratedNever();
         builder.Property(o => o.Key).ValueGeneratedOnAdd();
 
         builder.Property(o => o.ObjectiveId).IsRequired();
@@ -198,8 +199,6 @@ public class PlanningIntervalObjectiveConfig : IEntityTypeConfiguration<Planning
             .WithOne()
             .HasForeignKey<SimpleHealthCheck>(h => h.ObjectId)
             .OnDelete(DeleteBehavior.Cascade);
-
-        // Ignore
     }
 }
 
@@ -249,6 +248,7 @@ public class RiskConfig : IEntityTypeConfiguration<Risk>
         builder.HasIndex(r => new { r.TeamId, r.IsDeleted })
             .HasFilter("[IsDeleted] = 0");
 
+        builder.Property(r => r.Id).ValueGeneratedNever();
         builder.Property(r => r.Key).ValueGeneratedOnAdd();
 
         builder.Property(r => r.Summary).HasMaxLength(256).IsRequired();
@@ -317,6 +317,7 @@ public class RoadmapConfig : IEntityTypeConfiguration<Roadmap>
         builder.HasIndex(r => r.Visibility)
             .IncludeProperties(r => new { r.Id, r.Key, r.Name });
 
+        builder.Property(r => r.Id).ValueGeneratedNever();
         builder.Property(r => r.Key).ValueGeneratedOnAdd();
 
         builder.Property(r => r.Name).HasMaxLength(128).IsRequired();
@@ -389,6 +390,7 @@ public class BaseRoadmapItemConfiguration : IEntityTypeConfiguration<BaseRoadmap
         builder.HasIndex(ri => ri.RoadmapId);
 
         // Properties
+        builder.Property(ri => ri.Id).ValueGeneratedNever();
         builder.Property(ri => ri.Name).HasMaxLength(128).IsRequired();
         builder.Property(ri => ri.Description).HasMaxLength(2048);
 
@@ -468,6 +470,7 @@ public class IterationConfig : IEntityTypeConfiguration<Iteration>
         builder.HasAlternateKey(i => i.Key);
 
         // Properties
+        builder.Property(i => i.Id).ValueGeneratedNever();
         builder.Property(i => i.Key).ValueGeneratedOnAdd();
         builder.Property(i => i.Name).HasMaxLength(256).IsRequired();
 
@@ -558,6 +561,7 @@ public class PlanningIntervalIterationSprintConfig : IEntityTypeConfiguration<Pl
             .IsUnique()
             .IncludeProperties(s => new { s.PlanningIntervalId, s.PlanningIntervalIterationId });
 
+        builder.Property(s => s.Id).ValueGeneratedNever();
         builder.Property(s => s.PlanningIntervalId).IsRequired();
         builder.Property(s => s.PlanningIntervalIterationId).IsRequired();
         builder.Property(s => s.SprintId).IsRequired();
@@ -636,6 +640,7 @@ public class PokerSessionConfig : IEntityTypeConfiguration<PokerSession>
 
         builder.HasIndex(s => s.Key);
 
+        builder.Property(s => s.Id).ValueGeneratedNever();
         builder.Property(s => s.Key).ValueGeneratedOnAdd();
         builder.Property(s => s.Name).IsRequired().HasMaxLength(256);
         builder.Property(s => s.EstimationScaleId).IsRequired();
@@ -680,6 +685,7 @@ public class PokerRoundConfig : IEntityTypeConfiguration<PokerRound>
 
         builder.HasIndex(r => r.PokerSessionId);
 
+        builder.Property(r => r.Id).ValueGeneratedNever();
         builder.Property(r => r.PokerSessionId).IsRequired();
         builder.Property(r => r.Label).HasMaxLength(512);
         builder.Property(r => r.Status).IsRequired()
@@ -710,6 +716,7 @@ public class PokerVoteConfig : IEntityTypeConfiguration<PokerVote>
 
         builder.HasIndex(v => new { v.PokerRoundId, v.ParticipantId }).IsUnique();
 
+        builder.Property(v => v.Id).ValueGeneratedNever();
         builder.Property(v => v.PokerRoundId).IsRequired();
         builder.Property(v => v.ParticipantId)
             .IsRequired()
