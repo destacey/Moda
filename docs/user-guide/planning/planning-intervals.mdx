@@ -12,7 +12,7 @@ A **Planning Interval** (PI) is a fixed timeframe — typically 8-12 weeks — d
 Every planning interval has:
 - **Name** and optional **Description**
 - **Date Range** — Start and end date for the PI
-- **Teams** — The [teams](../organizations/index#teams) and [teams of teams](../organizations/index#teams-of-teams) participating
+- **Teams** — The [teams](../organizations/index.mdx#teams) and [teams of teams](../organizations/index.mdx#teams-of-teams) participating
 - **Iterations** — Time-boxed periods within the PI (typically 2-week sprints)
 - **[Objectives](#objectives)** — Team commitments for the PI
 - **Objectives Locked** — Flag to prevent changes to objectives after PI planning
@@ -38,17 +38,17 @@ The PI detail page is the command center for a planning interval. It provides se
   - **Objective Health Chart** — Pie chart grouping objectives by health check status
 
 **Teams Tab:**
-- Grid of all [teams](../organizations/index#teams) assigned to the PI
+- Grid of all [teams](../organizations/index.mdx#teams) assigned to the PI
 
 **Sprint Mappings Tab:**
-- Configuration grid mapping each team's [sprints](./sprints) to PI iterations
+- Configuration grid mapping each team's [sprints](./sprints.mdx) to PI iterations
 - Each team can have one sprint per iteration
 
 **Horizontal navigation** across the PI provides quick access to:
 - PI Details
 - [Plan Review](#plan-review)
 - [Objectives](#objectives)
-- [Risks](./risks)
+- [Risks](./risks.mdx)
 - Reports (Health Report)
 
 ## Iterations within a PI
@@ -64,13 +64,13 @@ Iterations can be auto-generated using **Initialize Iterations** which creates e
 
 ### PI Iteration Detail Page
 
-A PI iteration groups all matching [sprints](./sprints) from participating teams into a single aggregate view. When multiple teams participate in a PI, each team's sprint is mapped to the corresponding iteration (see [Sprint Mapping](#sprint-mapping)). The iteration detail page rolls up metrics from all mapped sprints, giving you a cross-team view of progress.
+A PI iteration groups all matching [sprints](./sprints.mdx) from participating teams into a single aggregate view. When multiple teams participate in a PI, each team's sprint is mapped to the corresponding iteration (see [Sprint Mapping](#sprint-mapping)). The iteration detail page rolls up metrics from all mapped sprints, giving you a cross-team view of progress.
 
 **Summary Tab:**
 - **Timeline progress bar** — Visual indicator of time elapsed from start to end date
 - **Team Count** — Number of distinct teams with sprints mapped to this iteration
 - **Sprint Count** — Total number of sprints included in the aggregation
-- **Aggregate Metrics** (for Active/Completed iterations, see [Sprint Metrics](./sprints#sprint-metrics) for definitions):
+- **Aggregate Metrics** (for Active/Completed iterations, see [Sprint Metrics](./sprints.mdx#sprint-metrics) for definitions):
   - Total/Completed/Remaining story points (or item counts)
   - Completion Rate percentage
   - Velocity
@@ -79,7 +79,7 @@ A PI iteration groups all matching [sprints](./sprints) from participating teams
 - Metrics can be toggled between **Story Points** and **Count** sizing methods
 
 **Backlog Tab:**
-- Combined sprint backlog grid showing [work items](../work-management/index#work-items) from all mapped sprints
+- Combined sprint backlog grid showing [work items](../work-management/work-items.mdx#work-items) from all mapped sprints
 - Columns: Rank, Key, Type, Title, Story Points, Status, Status Category, Team
 
 > **Tip:** Click on an iteration card on the PI Details tab to navigate directly to its detail page.
@@ -91,7 +91,7 @@ A PI iteration groups all matching [sprints](./sprints) from participating teams
 
 ## Sprint Mapping
 
-Team [Sprints](./sprints) are mapped to PI iterations. This mapping connects each team's delivery cadence to the broader PI schedule, enabling aggregate views and cross-team coordination.
+Team [Sprints](./sprints.mdx) are mapped to PI iterations. This mapping connects each team's delivery cadence to the broader PI schedule, enabling aggregate views and cross-team coordination.
 
 **Rules:**
 - A team can only have one sprint per iteration
@@ -127,10 +127,10 @@ graph LR
     S2 -->|contains| W3 & W4
 ```
 
-Objectives bridge the gap between strategic intent and execution. A team commits to objectives during PI planning, then links [work items](../work-management/index#work-items) that fulfill those objectives. As work items are completed in [sprints](./sprints), objective progress is tracked.
+Objectives bridge the gap between strategic intent and execution. A team commits to objectives during PI planning, then links [work items](../work-management/work-items.mdx#work-items) that fulfill those objectives. As work items are completed in [sprints](./sprints.mdx), objective progress is tracked.
 
 Each objective has:
-- **Team** — The [team](../organizations/index#teams) committing to the objective
+- **Team** — The [team](../organizations/index.mdx#teams) committing to the objective
 - **Type** — Team objective or Team of Teams objective
 - **Status**:
   - **Not Started** — Work hasn't begun
@@ -160,7 +160,7 @@ Each objective has its own detail page showing:
 - PI link, Team link, Status, Is Stretch flag, Start/Target/Closed dates, Type
 - Description (Markdown)
 - **Health Report Chart** — Historical health check status over time
-- **Work Items Card** — Grid of linked [work items](../work-management/index#work-items) with ability to link/unlink
+- **Work Items Card** — Grid of linked [work items](../work-management/work-items.mdx#work-items) with ability to link/unlink
 - **Links Card** — Cross-entity associations
 
 Actions: Edit, Delete, Create Health Check
@@ -192,7 +192,7 @@ The **Plan Review** page provides a team-by-team view of the PI, with one tab pe
 Each team tab shows:
 - **Team Predictability** metric (if available from prior PIs)
 - Two view modes:
-  - **List View** — Objective cards and [risk](./risks) cards for the team
+  - **List View** — Objective cards and [risk](./risks.mdx) cards for the team
   - **Timeline View** — Objectives displayed on a timeline
 
 The plan review only shows delivery teams (not Teams of Teams). URL hash navigation (`#team-code`) allows linking directly to a specific team's tab.
@@ -220,5 +220,5 @@ The plan review only shows delivery teams (not Teams of Teams). URL hash navigat
 
 1. Navigate to the PI detail page
 2. Click **Plan Review** in the horizontal nav
-3. Review each team's objectives and [risks](./risks) tab-by-tab
+3. Review each team's objectives and [risks](./risks.mdx) tab-by-tab
 4. Switch between List and Timeline views for different perspectives

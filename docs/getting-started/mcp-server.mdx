@@ -17,15 +17,15 @@ The MCP server exposes 50+ tools across Moda's core modules:
 
 | Module | Capabilities |
 |--------|-------------|
-| **[PPM](../user-guide/ppm/index)** | List/view portfolios, programs, projects, phases, tasks. Create and update tasks. View project plan tree and summary metrics. Get critical path. Manage task dependencies. |
-| **[Planning](../user-guide/planning/index)** | List/view planning intervals, iterations, objectives, risks. Get PI predictability and health reports. View calendars. |
-| **[Roadmaps](../user-guide/planning/roadmaps)** | List/view roadmaps and their items (activities, milestones, timeboxes). |
-| **[Organizations](../user-guide/organizations/index)** | List/view teams and users. |
+| **[PPM](../user-guide/ppm/index.mdx)** | List/view portfolios, programs, projects, phases, tasks. Create and update tasks. View project plan tree and summary metrics. Get critical path. Manage task dependencies. |
+| **[Planning](../user-guide/planning/index.mdx)** | List/view planning intervals, iterations, objectives, risks. Get PI predictability and health reports. View calendars. |
+| **[Roadmaps](../user-guide/planning/roadmaps.mdx)** | List/view roadmaps and their items (activities, milestones, timeboxes). |
+| **[Organizations](../user-guide/organizations/index.mdx)** | List/view teams and users. |
 
 ## Prerequisites
 
 1. A running Moda instance with API access
-2. A **[Personal Access Token (PAT)](./your-profile#personal-access-tokens)** — create one from your profile page
+2. A **[Personal Access Token (PAT)](./your-profile.mdx#personal-access-tokens)** — create one from your profile page
 3. **Node.js 20+** installed on your machine
 
 ## Setup
@@ -118,7 +118,7 @@ The MCP server accepts configuration via environment variables or CLI arguments:
 | Environment Variable | CLI Argument | Description |
 |---------------------|-------------|-------------|
 | `MODA_API_BASE_URL` | `--base-url` | The base URL of your Moda API instance |
-| `MODA_API_KEY` | `--api-key` | Your [Personal Access Token](./your-profile#personal-access-tokens) |
+| `MODA_API_KEY` | `--api-key` | Your [Personal Access Token](./your-profile.mdx#personal-access-tokens) |
 
 CLI arguments take precedence over environment variables.
 
@@ -198,8 +198,8 @@ npx skills add destacey/moda
 
 ## Security
 
-The MCP server authenticates using your [Personal Access Token](./your-profile#personal-access-tokens). The token inherits your permissions — the MCP server can only access what you can access.
+The MCP server authenticates using your [Personal Access Token](./your-profile.mdx#personal-access-tokens). The token inherits your permissions — the MCP server can only access what you can access.
 
 - Store your API key securely — don't commit it to version control
 - Use environment variables rather than hardcoding in config files
-- Revoke tokens from your [profile page](./your-profile#personal-access-tokens) if compromised
+- Revoke tokens from your [profile page](./your-profile.mdx#personal-access-tokens) if compromised
