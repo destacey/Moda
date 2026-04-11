@@ -2,7 +2,7 @@
 
 namespace Moda.Infrastructure.Auditing;
 
-public sealed class Trail : BaseEntity<Guid>
+public sealed class Trail : BaseEntity
 {
     public required string UserId { get; set; }
     public string? Type { get; set; }

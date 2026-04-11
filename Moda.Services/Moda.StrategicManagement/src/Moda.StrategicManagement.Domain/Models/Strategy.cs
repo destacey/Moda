@@ -7,7 +7,7 @@ namespace Moda.StrategicManagement.Domain.Models;
 /// <summary>
 /// Represents a strategic plan or initiative to achieve organizational goals.
 /// </summary>
-public sealed class Strategy : BaseAuditableEntity<Guid>, IHasIdAndKey
+public sealed class Strategy : BaseAuditableEntity, IHasIdAndKey
 {
     private string _name = default!;
     private string? _description;

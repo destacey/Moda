@@ -4,7 +4,7 @@ using Moda.Common.Domain.Data;
 
 namespace Moda.Links.Models;
 
-public sealed class Link : BaseEntity<Guid>
+public sealed class Link : BaseEntity
 {
     private string _name = default!;
     private string _url = default!;

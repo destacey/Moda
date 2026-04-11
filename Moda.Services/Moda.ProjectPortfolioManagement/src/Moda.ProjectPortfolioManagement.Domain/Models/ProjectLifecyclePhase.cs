@@ -6,13 +6,12 @@ namespace Moda.ProjectPortfolioManagement.Domain.Models;
 /// <summary>
 /// Represents a phase definition within a project lifecycle template.
 /// </summary>
-public sealed class ProjectLifecyclePhase : BaseAuditableEntity<Guid>
+public sealed class ProjectLifecyclePhase : BaseAuditableEntity
 {
     private ProjectLifecyclePhase() { }
 
     internal ProjectLifecyclePhase(Guid projectLifecycleId, string name, string description, int order)
     {
-        Id = Guid.CreateVersion7();
         ProjectLifecycleId = projectLifecycleId;
         Name = name;
         Description = description;

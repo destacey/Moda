@@ -8,7 +8,7 @@ namespace Moda.Organization.Domain.Models;
 /// Represents the operating model for a team, defining how the team works
 /// (methodology and sizing method) for a specific date range.
 /// </summary>
-public sealed class TeamOperatingModel : BaseAuditableEntity<Guid>
+public sealed class TeamOperatingModel : BaseAuditableEntity
 {
     private TeamOperatingModel() { }
 

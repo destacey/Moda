@@ -5,7 +5,7 @@ using Moda.ProjectPortfolioManagement.Domain.Enums;
 
 namespace Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 
-public sealed class StrategicInitiative : BaseAuditableEntity<Guid>, IHasIdAndKey
+public sealed class StrategicInitiative : BaseAuditableEntity, IHasIdAndKey
 {
     private readonly HashSet<RoleAssignment<StrategicInitiativeRole>> _roles = [];
     private readonly HashSet<StrategicInitiativeKpi> _kpis = [];

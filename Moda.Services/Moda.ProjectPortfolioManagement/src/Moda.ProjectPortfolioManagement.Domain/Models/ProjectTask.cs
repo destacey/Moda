@@ -11,7 +11,7 @@ namespace Moda.ProjectPortfolioManagement.Domain.Models;
 /// <summary>
 /// Represents a task within a project with hierarchical structure and dependency management.
 /// </summary>
-public sealed class ProjectTask : BaseAuditableEntity<Guid>, IHasIdAndKey<ProjectTaskKey>, IHasProject
+public sealed class ProjectTask : BaseAuditableEntity, IHasIdAndKey<ProjectTaskKey>, IHasProject
 {
     private readonly List<ProjectTask> _children = [];
     private readonly HashSet<RoleAssignment<TaskRole>> _roles = [];

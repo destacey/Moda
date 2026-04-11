@@ -225,7 +225,7 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
                                 iterationId,
                                 externalWorkItem.ActivatedTimestamp,
                                 externalWorkItem.DoneTimestamp,
-                                CreateExtendedPropsIfNeeded(null, externalWorkItem.ExternalTeamIdentifier)
+                                externalWorkItem.ExternalTeamIdentifier
                             );
                             newWorkItems.Add(workItem);
 
@@ -434,14 +434,9 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
         return new EmployeeIds(createdById, lastModifiedById, assignedToId);
     }
 
-    private static WorkItemExtended? CreateExtendedPropsIfNeeded(Guid? workItemId, string? externalTeamIdentifier)
+    private static WorkItemExtended? CreateExtendedPropsIfNeeded(Guid workItemId, string? externalTeamIdentifier)
     {
-        if (string.IsNullOrWhiteSpace(externalTeamIdentifier))
-            return null;
-
-        return workItemId.HasValue
-            ? WorkItemExtended.Create(workItemId.Value, externalTeamIdentifier)
-            : WorkItemExtended.Create(externalTeamIdentifier);
+        return WorkItemExtended.Create(workItemId, externalTeamIdentifier);
     }
 
     private async Task MapMissingParents(Workspace workspace, Dictionary<int, int> missingParents, CancellationToken cancellationToken)

@@ -6,7 +6,7 @@ using NodaTime;
 
 namespace Moda.Work.Domain.Models;
 
-public abstract class WorkItemLink : BaseAuditableEntity<Guid>
+public abstract class WorkItemLink : BaseAuditableEntity
 {
     private string? _comment;
 

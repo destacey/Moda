@@ -7,7 +7,7 @@ using Moda.Planning.Domain.Interfaces;
 using NodaTime;
 
 namespace Moda.Planning.Domain.Models;
-public sealed class PlanningIntervalIteration : BaseSoftDeletableEntity<Guid>, ILocalSchedule, INavigable
+public sealed class PlanningIntervalIteration : BaseSoftDeletableEntity, ILocalSchedule, INavigable
 {
     private readonly List<PlanningIntervalIterationSprint> _iterationSprints = [];
 

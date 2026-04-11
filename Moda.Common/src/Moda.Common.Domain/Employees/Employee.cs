@@ -6,7 +6,7 @@ using Moda.Common.Models;
 using NodaTime;
 
 namespace Moda.Common.Domain.Employees;
-public sealed class Employee : BaseSoftDeletableEntity<Guid>, IActivatable, IHasIdAndKey
+public sealed class Employee : BaseSoftDeletableEntity, IActivatable, IHasIdAndKey
 {
     private readonly List<Employee> _directReports = [];
 

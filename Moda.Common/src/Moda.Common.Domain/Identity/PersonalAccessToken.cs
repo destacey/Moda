@@ -8,7 +8,7 @@ namespace Moda.Common.Domain.Identity;
 /// <summary>
 /// Represents a personal access token used for API authentication.
 /// </summary>
-public sealed class PersonalAccessToken : BaseAuditableEntity<Guid>
+public sealed class PersonalAccessToken : BaseAuditableEntity
 {
     private PersonalAccessToken() { }
 
