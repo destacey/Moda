@@ -1,5 +1,5 @@
 ﻿namespace Moda.Planning.Domain.Models;
-public class PlanningIntervalTeam
+public sealed class PlanningIntervalTeam
 {
     private PlanningIntervalTeam() { }
     internal PlanningIntervalTeam(Guid planningIntervalId, Guid teamId)

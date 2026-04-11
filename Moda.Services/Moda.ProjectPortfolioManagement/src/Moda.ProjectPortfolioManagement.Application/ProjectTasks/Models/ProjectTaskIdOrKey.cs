@@ -8,7 +8,7 @@ namespace Moda.ProjectPortfolioManagement.Application.ProjectTasks.Models;
 /// <summary>
 /// Represents either a Guid ID or a TaskKey (string like "APOLLO-T001").
 /// </summary>
-public class ProjectTaskIdOrKey : OneOfBase<Guid, ProjectTaskKey>
+public sealed class ProjectTaskIdOrKey : OneOfBase<Guid, ProjectTaskKey>
 {
     public ProjectTaskIdOrKey(OneOf<Guid, ProjectTaskKey> value) : base(value) { }
 

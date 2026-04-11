@@ -8,7 +8,7 @@ namespace Moda.Work.Domain.Models;
 /// <summary>
 /// A copy of the Moda.Common.Domain.Interfaces.Organization.ISimpleTeam interface.  Used to hold basic team information for the work service and db context.
 /// </summary>
-public class WorkTeam : ISimpleTeam, IHasIdAndKey, IHasTeamIdAndCode
+public sealed class WorkTeam : ISimpleTeam, IHasIdAndKey, IHasTeamIdAndCode
 {
     private WorkTeam() { }
 

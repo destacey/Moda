@@ -8,7 +8,7 @@ namespace Moda.Work.Domain.Models;
 /// <summary>
 /// This object ensures the integrity and system state of global work type levels.
 /// </summary>
-public class WorkTypeHierarchy : BaseAuditableEntity<int>
+public sealed class WorkTypeHierarchy : BaseAuditableEntity<int>
 {
     private readonly List<WorkTypeLevel> _levels = [];
 

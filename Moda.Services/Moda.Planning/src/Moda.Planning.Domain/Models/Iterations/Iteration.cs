@@ -16,7 +16,7 @@ namespace Moda.Planning.Domain.Models.Iterations;
 /// </summary>
 /// <remarks>An iteration is characterized by its name, type, state, date range, and ownership information.  This class
 /// provides methods for creating and updating iterations, as well as managing associated metadata.</remarks>
-public class Iteration : BaseAuditableEntity, IHasIdAndKey, ISimpleIteration
+public sealed class Iteration : BaseAuditableEntity, IHasIdAndKey, ISimpleIteration
 {
     private readonly List<KeyValueObjectMetadata> _externalMetadata = [];
 

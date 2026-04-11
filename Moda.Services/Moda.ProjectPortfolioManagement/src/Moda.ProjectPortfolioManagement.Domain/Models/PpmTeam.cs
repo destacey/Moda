@@ -8,7 +8,7 @@ namespace Moda.ProjectPortfolioManagement.Domain.Models;
 /// <summary>
 /// A copy of the Moda.Common.Domain.Interfaces.Organization.ISimpleTeam interface.  Used to hold basic team information for the project portfolio management service and db context.
 /// </summary>
-public class PpmTeam : ISimpleTeam, IHasIdAndKey, IHasTeamIdAndCode
+public sealed class PpmTeam : ISimpleTeam, IHasIdAndKey, IHasTeamIdAndCode
 {
     private PpmTeam() { }
 

@@ -3,7 +3,7 @@ using Moda.Common.Interfaces;
 using NodaTime;
 
 namespace Moda.Common.Domain.Models.Planning.Iterations;
-public class IterationDateRange : ValueObject, IDateRange<Instant?>
+public sealed class IterationDateRange : ValueObject, IDateRange<Instant?>
 {
     public IterationDateRange(Instant? start, Instant? end)
     {

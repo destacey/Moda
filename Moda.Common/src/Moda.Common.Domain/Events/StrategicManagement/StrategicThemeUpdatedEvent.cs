@@ -3,7 +3,7 @@ using Moda.Common.Domain.Interfaces.StrategicManagement;
 using NodaTime;
 
 namespace Moda.Common.Domain.Events.StrategicManagement;
-public record StrategicThemeUpdatedEvent : DomainEvent
+public sealed record StrategicThemeUpdatedEvent : DomainEvent
 {
     public StrategicThemeUpdatedEvent(IStrategicThemeData strategicTheme, Instant timestamp)
     {

@@ -1,6 +1,6 @@
 ﻿namespace Moda.ProjectPortfolioManagement.Domain.Models;
 
-public class StrategicThemeTag<T> : ISystemAuditable
+public sealed class StrategicThemeTag<T> : ISystemAuditable
 {
     protected StrategicThemeTag() { }
 

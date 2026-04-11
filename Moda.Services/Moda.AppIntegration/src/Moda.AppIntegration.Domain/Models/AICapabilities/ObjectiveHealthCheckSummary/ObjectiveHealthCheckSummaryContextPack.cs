@@ -54,7 +54,7 @@ public sealed class ObjectiveHealthCheckSummaryContextPack : ContextPack
     
 }
 
-public class ObjectiveMetadata
+public sealed class ObjectiveMetadata
 {
     public required Guid Id { get; set; }
     public required string Title { get; set; }
@@ -88,7 +88,7 @@ public class ObjectiveMetadata
     }
 }
 
-public class WorkItemMetadata
+public sealed class WorkItemMetadata
 {
     public required Guid Id { get; set; }
     public required string Title { get; set; }
