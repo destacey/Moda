@@ -4,7 +4,7 @@ using Moda.Common.Domain.Interfaces;
 using Moda.Planning.Domain.Enums;
 
 namespace Moda.Planning.Domain.Models.Roadmaps;
-public abstract class BaseRoadmapItem : BaseEntity<Guid>, ISystemAuditable
+public abstract class BaseRoadmapItem : BaseAuditableEntity<Guid>
 {
     private string _name = default!;
     private string? _description;

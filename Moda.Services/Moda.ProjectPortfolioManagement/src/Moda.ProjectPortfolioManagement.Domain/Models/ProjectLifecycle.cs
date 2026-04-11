@@ -8,7 +8,7 @@ namespace Moda.ProjectPortfolioManagement.Domain.Models;
 /// Represents a project lifecycle template that defines the ordered phases a project goes through.
 /// Lifecycles enforce consistency across projects by standardizing the top-level planning structure.
 /// </summary>
-public sealed class ProjectLifecycle : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey
+public sealed class ProjectLifecycle : BaseAuditableEntity<Guid>, IHasIdAndKey
 {
     private readonly List<ProjectLifecyclePhase> _phases = [];
 

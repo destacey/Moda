@@ -1,10 +1,9 @@
-using Ardalis.GuardClauses;
+﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
-using Moda.Common.Domain.Interfaces;
 
 namespace Moda.Planning.Domain.Models.PlanningPoker;
 
-public class EstimationScale : BaseEntity<int>, ISystemAuditable
+public class EstimationScale : BaseAuditableEntity<int>
 {
     private readonly List<string> _values = [];
 

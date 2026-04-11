@@ -12,7 +12,7 @@ namespace Moda.ProjectPortfolioManagement.Domain.Models;
 /// <summary>
 /// Represents an individual project within a portfolio or program.
 /// </summary>
-public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey<ProjectKey>, ISimpleProject
+public sealed class Project : BaseAuditableEntity<Guid>, IHasIdAndKey<ProjectKey>, ISimpleProject
 {
     private readonly HashSet<RoleAssignment<ProjectRole>> _roles = [];
     private readonly HashSet<StrategicThemeTag<Project>> _strategicThemeTags = [];

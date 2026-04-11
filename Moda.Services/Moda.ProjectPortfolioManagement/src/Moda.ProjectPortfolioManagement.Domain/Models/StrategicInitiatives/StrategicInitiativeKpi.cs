@@ -5,7 +5,7 @@ using Moda.Common.Domain.Models.KeyPerformanceIndicators;
 
 namespace Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 
-public sealed class StrategicInitiativeKpi : Kpi, ISystemAuditable
+public sealed class StrategicInitiativeKpi : Kpi
 {
     private readonly HashSet<StrategicInitiativeKpiCheckpoint> _checkpoints = [];
     private readonly HashSet<StrategicInitiativeKpiMeasurement> _measurements = [];

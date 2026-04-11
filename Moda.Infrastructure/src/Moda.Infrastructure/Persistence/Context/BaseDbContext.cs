@@ -62,14 +62,9 @@ public abstract class BaseDbContext : IdentityDbContext<ApplicationUser, Applica
             }
         }
 
-        // configure max length for user ID columns on auditable and soft-deletable entities
+        // configure max length for user ID columns on soft-deletable entities
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {
-            if (typeof(IAuditable).IsAssignableFrom(entityType.ClrType))
-            {
-                modelBuilder.Entity(entityType.ClrType).Property(nameof(IAuditable.CreatedBy)).HasMaxLength(450);
-                modelBuilder.Entity(entityType.ClrType).Property(nameof(IAuditable.LastModifiedBy)).HasMaxLength(450);
-            }
             if (typeof(ISoftDelete).IsAssignableFrom(entityType.ClrType))
             {
                 modelBuilder.Entity(entityType.ClrType).Property(nameof(ISoftDelete.DeletedBy)).HasMaxLength(450);
@@ -112,35 +107,25 @@ public abstract class BaseDbContext : IdentityDbContext<ApplicationUser, Applica
     {
         var timestamp = _dateTimeProvider.Now;
         foreach (var entry in ChangeTracker.Entries()
-            .Where(e => e.Entity is IAuditable or ISystemAuditable or ISoftDelete)
+            .Where(e => e.Entity is ISystemAuditable or ISoftDelete)
             .ToList())
         {
 
             if (entry.State == EntityState.Added)
             {
-                if (entry.Entity is ISystemAuditable systemAuditable)
+                if (entry.Entity is ISystemAuditable)
                 {
                     entry.Property("SystemCreated").CurrentValue = timestamp;
                     entry.Property("SystemCreatedBy").CurrentValue = userId;
-                }
-                if (entry.Entity is IAuditable auditable)
-                {
-                    auditable.Created = timestamp;
-                    auditable.CreatedBy = userId;
                 }
             }
 
             if (entry.State == EntityState.Added || entry.State == EntityState.Modified || entry.HasChangedOwnedEntities())
             {
-                if (entry.Entity is ISystemAuditable systemAuditable)
+                if (entry.Entity is ISystemAuditable)
                 {
                     entry.Property("SystemLastModified").CurrentValue = timestamp;
                     entry.Property("SystemLastModifiedBy").CurrentValue = userId;
-                }
-                if (entry.Entity is IAuditable auditable)
-                {
-                    auditable.LastModified = timestamp;
-                    auditable.LastModifiedBy = userId;
                 }
             }
 
@@ -159,7 +144,7 @@ public abstract class BaseDbContext : IdentityDbContext<ApplicationUser, Applica
 
         var auditableEntries = ChangeTracker.Entries()
             .Where(e =>
-                (e.Entity is IAuditable or ISystemAuditable)
+                e.Entity is ISystemAuditable
                 && (e.State is EntityState.Added or EntityState.Deleted or EntityState.Modified
                     || e.HasChangedOwnedEntities()))
             .ToList();

@@ -11,7 +11,7 @@ namespace Moda.ProjectPortfolioManagement.Domain.Models;
 /// <summary>
 /// Represents a collection of projects or programs that are managed together to achieve strategic results.
 /// </summary>
-public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey
+public sealed class ProjectPortfolio : BaseAuditableEntity<Guid>, IHasIdAndKey
 {
     private const string ReadOnlyErrorMessage = "Project Portfolio is readonly and cannot be updated.";
 

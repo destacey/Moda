@@ -7,7 +7,7 @@ using NodaTime;
 
 namespace Moda.Work.Domain.Models;
 
-public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable, IHasWorkspace, IHasOptionalWorkTeam
+public sealed class WorkItem : BaseAuditableEntity<Guid>, IHasWorkspace, IHasOptionalWorkTeam
 {
     private readonly List<WorkItem> _children = [];
     private readonly List<WorkItemHierarchy> _outboundHierarchyHistory = []; // source links
