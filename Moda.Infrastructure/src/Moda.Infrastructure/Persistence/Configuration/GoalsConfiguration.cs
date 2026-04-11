@@ -27,6 +27,7 @@ public class ObjectiveConfiguration : IEntityTypeConfiguration<Objective>
             .IncludeProperties(o => new { o.Id, o.Key, o.Name, o.Type, o.Status, o.OwnerId, o.Order })
             .HasFilter("[IsDeleted] = 0");
 
+        builder.Property(o => o.Id).ValueGeneratedNever();
         builder.Property(o => o.Key).ValueGeneratedOnAdd();
 
         builder.Property(o => o.Name).IsRequired().HasMaxLength(256);

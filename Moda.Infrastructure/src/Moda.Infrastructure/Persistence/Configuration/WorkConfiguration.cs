@@ -159,6 +159,7 @@ public class WorkItemConfig : IEntityTypeConfiguration<WorkItem>
             .HasColumnType("varchar")
             .HasMaxLength(64);
 
+        builder.Property(w => w.Id).ValueGeneratedNever();
         builder.Property(w => w.Title).IsRequired().HasMaxLength(256);
         builder.Property(w => w.StatusCategory).IsRequired()
             .HasConversion<EnumConverter<WorkStatusCategory>>()
@@ -322,6 +323,7 @@ public class WorkItemLinkConfig : IEntityTypeConfiguration<WorkItemLink>
             .HasFilter("[RemovedOn] IS NULL AND [LinkType] = 'Dependency'");
 
         // Properties
+        builder.Property(w => w.Id).ValueGeneratedNever();
         builder.Property(w => w.LinkType).IsRequired()
             .HasConversion<EnumConverter<WorkItemLinkType>>()
             .HasColumnType("varchar")
@@ -435,6 +437,7 @@ public class WorkProcessConfig : IEntityTypeConfiguration<WorkProcess>
         builder.Property(w => w.Key).ValueGeneratedOnAdd();
 
         // Properties
+        builder.Property(w => w.Id).ValueGeneratedNever();
         builder.Property(w => w.Name).HasMaxLength(128).IsRequired();
         builder.Property(w => w.Description).HasMaxLength(1024);
 
@@ -474,6 +477,7 @@ public class WorkProcessSchemeConfig : IEntityTypeConfiguration<WorkProcessSchem
             .HasFilter("[IsDeleted] = 0");
 
         // Properties
+        builder.Property(w => w.Id).ValueGeneratedNever();
         builder.Property(w => w.WorkProcessId);
         builder.Property(w => w.WorkTypeId);
         builder.Property(w => w.WorkflowId);
@@ -540,6 +544,7 @@ public class WorkspaceConfig : IEntityTypeConfiguration<Workspace>
             .HasFilter("[IsDeleted] = 0");
 
         // Properties
+        builder.Property(w => w.Id).ValueGeneratedNever();
         builder.Property(w => w.Key).IsRequired()
             .HasConversion(
                 w => w.Value,
@@ -730,6 +735,7 @@ public class WorkflowConfig : IEntityTypeConfiguration<Workflow>
             .HasFilter("[IsDeleted] = 0");
 
         // Properties
+        builder.Property(w => w.Id).ValueGeneratedNever();
         builder.Property(p => p.Key).ValueGeneratedOnAdd();
         builder.Property(w => w.Name).IsRequired().HasMaxLength(128);
         builder.Property(w => w.Description).HasMaxLength(1024);
@@ -770,6 +776,7 @@ public class WorkflowSchemeConfig : IEntityTypeConfiguration<WorkflowScheme>
             .HasFilter("[IsDeleted] = 0");
 
         // Properties
+        builder.Property(w => w.Id).ValueGeneratedNever();
         builder.Property(w => w.WorkStatusCategory).IsRequired()
             .HasConversion<EnumConverter<WorkStatusCategory>>()
             .HasColumnType("varchar")

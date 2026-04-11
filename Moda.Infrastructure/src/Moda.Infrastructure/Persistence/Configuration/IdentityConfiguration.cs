@@ -152,6 +152,7 @@ public class PersonalAccessTokenConfig : IEntityTypeConfiguration<PersonalAccess
             .HasDatabaseName("IX_PersonalAccessTokens_TokenIdentifier_RevokedAt_ExpiresAt");
 
         // Properties
+        builder.Property(p => p.Id).ValueGeneratedNever();
         builder.Property(p => p.Name)
             .HasMaxLength(100)
             .IsRequired();
