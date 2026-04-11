@@ -7,7 +7,7 @@ audience: [user, agent]
 
 # Work Configuration
 
-Work configuration defines the rules for how [work items](./work-items#work-items) are categorized and how they flow through stages. These settings are managed in [Settings > Work Management](../settings/index#work-management-settings).
+Work configuration defines the rules for how [work items](./work-items.mdx#work-items) are categorized and how they flow through stages. These settings are managed in [Settings > Work Management](../settings/index.mdx#work-management-settings).
 
 ## How It All Fits Together
 
@@ -29,7 +29,7 @@ erDiagram
 
 ## Work Processes
 
-A **Work Process** defines the configuration of [work types](#work-types) and their [workflows](#workflows) used within a [workspace](./work-items#workspaces). Think of it as a template that determines what kinds of work can be created and how that work flows through stages.
+A **Work Process** defines the configuration of [work types](#work-types) and their [workflows](#workflows) used within a [workspace](./work-items.mdx#workspaces). Think of it as a template that determines what kinds of work can be created and how that work flows through stages.
 
 A work process contains a **Work Process Scheme** that links:
 - **[Work Types](#work-types)** — What categories of work are available
@@ -38,12 +38,12 @@ A work process contains a **Work Process Scheme** that links:
 **Business rules:**
 - A work process requires at least one work type to be configured
 - A work type can only appear once within a work process
-- A single work process can be used by multiple [workspaces](./work-items#workspaces)
+- A single work process can be used by multiple [workspaces](./work-items.mdx#workspaces)
 - Only active work processes can be assigned to workspaces
 
 ## Work Types
 
-A **Work Type** represents a category of [work item](./work-items#work-items). Common examples include:
+A **Work Type** represents a category of [work item](./work-items.mdx#work-items). Common examples include:
 - **Epic** — Large body of work that can be broken into features
 - **Feature** — A product capability or deliverable
 - **User Story** — A user-centric requirement
@@ -52,7 +52,7 @@ A **Work Type** represents a category of [work item](./work-items#work-items). C
 
 ### Work Type Tiers
 
-Work types are organized into **Tiers** that group them by purpose and define [hierarchy rules](./work-items#work-item-hierarchy-rules):
+Work types are organized into **Tiers** that group them by purpose and define [hierarchy rules](./work-items.mdx#work-item-hierarchy-rules):
 
 | Tier | Purpose | Hierarchy | Examples |
 |------|---------|-----------|----------|
@@ -76,7 +76,7 @@ Custom Portfolio-tier levels can be added to support deeper hierarchies (e.g., a
 
 ## Workflows
 
-A **Workflow** defines the set of [statuses](#work-statuses) and their ordering that a [work item](./work-items#work-items) goes through from creation to completion. Each work type in a [work process](#work-processes) is assigned a workflow.
+A **Workflow** defines the set of [statuses](#work-statuses) and their ordering that a [work item](./work-items.mdx#work-items) goes through from creation to completion. Each work type in a [work process](#work-processes) is assigned a workflow.
 
 A workflow contains a **Workflow Scheme** that defines:
 - **[Work Statuses](#work-statuses)** — The available states
@@ -119,26 +119,26 @@ A **Work Status** represents a specific state within a [workflow](#workflows) (e
 | **Done** | 3 | Work has been completed |
 | **Removed** | 4 | Work has been removed from scope without completion |
 
-This normalization enables Moda to calculate metrics like [cycle time](../organizations/index#cycle-time-report-report), throughput, and [completion rates](../planning/sprints#metric-definitions) across [teams](../organizations/index#teams) that may use different workflow configurations.
+This normalization enables Moda to calculate metrics like [cycle time](../organizations/index.mdx#cycle-time-report-report), throughput, and [completion rates](../planning/sprints.mdx#metric-definitions) across [teams](../organizations/index.mdx#teams) that may use different workflow configurations.
 
 ## Configuration Tasks
 
 ### Configuring Work Types
 
-1. Navigate to [Settings > Work Management > Work Types](../settings/index#work-types)
+1. Navigate to [Settings > Work Management > Work Types](../settings/index.mdx#work-types)
 2. Create or modify work types
 3. Assign each work type to a [tier](#work-type-tiers) (Portfolio, Requirement, Task, or Other)
 
 ### Configuring Work Statuses
 
-1. Navigate to [Settings > Work Management > Work Statuses](../settings/index#work-statuses)
+1. Navigate to [Settings > Work Management > Work Statuses](../settings/index.mdx#work-statuses)
 2. Create work statuses with their display names
 3. Assign each to a [work status category](#work-status-categories)
 
 ### Configuring Work Processes
 
-1. Navigate to [Settings > Work Management > Work Processes](../settings/index#work-processes)
+1. Navigate to [Settings > Work Management > Work Processes](../settings/index.mdx#work-processes)
 2. Create a work process
 3. Add [work types](#work-types) and assign [workflows](#workflows) to each
 4. Activate the work process
-5. The work process can then be assigned to [workspaces](./work-items#workspaces)
+5. The work process can then be assigned to [workspaces](./work-items.mdx#workspaces)

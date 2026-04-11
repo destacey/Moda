@@ -20,8 +20,8 @@ const config: Config = {
   projectName: "Moda",
   trailingSlash: false,
 
-  onBrokenLinks: "warn",
-  onBrokenMarkdownLinks: "warn",
+  onBrokenLinks: "throw",
+  onBrokenAnchors: "throw",
 
   i18n: {
     defaultLocale: "en",
@@ -31,6 +31,9 @@ const config: Config = {
   // Enable Mermaid diagram support
   markdown: {
     mermaid: true,
+    hooks: {
+      onBrokenMarkdownLinks: "throw",
+    },
   },
   themes: ["@docusaurus/theme-mermaid"],
 

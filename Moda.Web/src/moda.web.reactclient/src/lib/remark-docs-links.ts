@@ -18,7 +18,12 @@
 import { visit } from 'unist-util-visit'
 import path from 'path'
 
-export default function remarkDocsLinks(options = {}) {
+interface RemarkDocsLinksOptions {
+  slug?: string[]
+  basePath?: string
+}
+
+export default function remarkDocsLinks(options: RemarkDocsLinksOptions = {}) {
   const { slug = [], basePath = '/docs' } = options
 
   // Determine the source file's directory in the docs tree.
@@ -29,8 +34,9 @@ export default function remarkDocsLinks(options = {}) {
   // Both cases: strip the last segment to get the directory.
   const sourceDir = slug.length > 1 ? slug.slice(0, -1).join('/') : ''
 
-  return (tree) => {
-    visit(tree, 'link', (node) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tree: any) => {
+    visit(tree, 'link', (node: any) => {
       const href = node.url
       if (!href) return
 
@@ -58,8 +64,8 @@ export default function remarkDocsLinks(options = {}) {
         path.posix.join(sourceDir, hrefPath),
       )
 
-      // Strip trailing /index
-      const cleaned = resolved.replace(/\/index$/, '')
+      // Strip file extensions (.mdx, .md) and trailing /index
+      const cleaned = resolved.replace(/\.mdx?$/, '').replace(/\/index$/, '')
 
       // Build the absolute URL
       node.url = `${basePath}/${cleaned}${hash}`

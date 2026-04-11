@@ -9,7 +9,7 @@ audience: [user, agent]
 
 ## Portfolios
 
-A **Portfolio** is the top-level container for [projects](./projects), programs, and [strategic initiatives](./strategic-initiatives). It represents a collection of related work managed together to achieve strategic objectives.
+A **Portfolio** is the top-level container for [projects](./projects.mdx), programs, and [strategic initiatives](./strategic-initiatives.mdx). It represents a collection of related work managed together to achieve strategic objectives.
 
 Every portfolio has:
 - **Name** and **Description**
@@ -18,9 +18,9 @@ Every portfolio has:
 - **Roles** — People assigned to portfolio-level roles
 
 Portfolios contain:
-- **Programs** — Groups of related [projects](./projects)
-- **[Projects](./projects)** — Individual initiatives
-- **[Strategic Initiatives](./strategic-initiatives)** — High-level strategic efforts tracked with [KPIs](./strategic-initiatives#kpis)
+- **Programs** — Groups of related [projects](./projects.mdx)
+- **[Projects](./projects.mdx)** — Individual initiatives
+- **[Strategic Initiatives](./strategic-initiatives.mdx)** — High-level strategic efforts tracked with [KPIs](./strategic-initiatives.mdx#kpis)
 
 ### Portfolio Roles
 
@@ -55,7 +55,7 @@ stateDiagram-v2
 | **Archived** | Retired, read-only | Start and end date required |
 
 **Transition rules:**
-- All [programs](#programs) and [projects](./projects) must be closed before closing a portfolio
+- All [programs](#programs) and [projects](./projects.mdx) must be closed before closing a portfolio
 - Only Proposed portfolios can be deleted
 - Archived portfolios are read-only
 
@@ -65,25 +65,25 @@ The portfolio detail page has four tabs:
 
 **Details Tab** — Shows sponsors, owners, and managers (sorted alphabetically), description (Markdown), and links to related entities.
 
-**Programs Tab** — Grid of [programs](#programs) with Key, Name, Status, Start/End dates, Managers, Owners, Sponsors, and [Strategic Themes](../strategic-management/index#strategic-themes). Supports List and Timeline views. Filtered to show Active programs by default.
+**Programs Tab** — Grid of [programs](#programs) with Key, Name, Status, Start/End dates, Managers, Owners, Sponsors, and [Strategic Themes](../strategic-management/index.mdx#strategic-themes). Supports List and Timeline views. Filtered to show Active programs by default.
 
-**Projects Tab** — Grid of [projects](./projects) with Key, Name, Status, Portfolio, Program, Start/End dates, Managers, Owners, Sponsors, Strategic Themes, and Lifecycle. Supports **Card**, **List**, and **Timeline** views. Filtered to show Approved and Active projects by default. The Timeline view groups projects by program.
+**Projects Tab** — Grid of [projects](./projects.mdx) with Key, Name, Status, Portfolio, Program, Start/End dates, Managers, Owners, Sponsors, Strategic Themes, and Lifecycle. Supports **Card**, **List**, and **Timeline** views. Filtered to show Approved and Active projects by default. The Timeline view groups projects by program.
 
-**Strategic Initiatives Tab** — Grid of [strategic initiatives](./strategic-initiatives) with Key, Name, Status, Start/End dates, Managers, Owners, Sponsors, and Strategic Themes. Supports List and Timeline views. Filtered to show Approved and Active by default.
+**Strategic Initiatives Tab** — Grid of [strategic initiatives](./strategic-initiatives.mdx) with Key, Name, Status, Start/End dates, Managers, Owners, Sponsors, and Strategic Themes. Supports List and Timeline views. Filtered to show Approved and Active by default.
 
 ## Programs
 
-A **Program** groups related [projects](./projects) within a portfolio for coordinated management.
+A **Program** groups related [projects](./projects.mdx) within a portfolio for coordinated management.
 
 Every program has:
 - **Name** and **Description**
 - **Status** — Proposed, Active, Completed, or Cancelled
 - **Date Range** — Start and optional end date
 - **Roles** — Sponsor, Owner, Manager
-- **Strategic Theme Tags** — Links to [strategic themes](../strategic-management/index#strategic-themes) for alignment
+- **Strategic Theme Tags** — Links to [strategic themes](../strategic-management/index.mdx#strategic-themes) for alignment
 
 **Business rules:**
-- Only active programs accept new [projects](./projects)
+- Only active programs accept new [projects](./projects.mdx)
 - All projects must be completed or cancelled before completing a program
 - Only Proposed programs can be deleted
 - Active status requires a date range
@@ -92,7 +92,7 @@ Every program has:
 
 The program detail page uses a two-column layout:
 
-**Left sidebar** — Portfolio link, date range, timeline progress bar, sponsors/owners/managers, [strategic themes](../strategic-management/index#strategic-themes), description (Markdown), and links.
+**Left sidebar** — Portfolio link, date range, timeline progress bar, sponsors/owners/managers, [strategic themes](../strategic-management/index.mdx#strategic-themes), description (Markdown), and links.
 
 **Right content area** — Badge showing project count, with project cards that can be expanded or clicked to open a project drawer.
 
