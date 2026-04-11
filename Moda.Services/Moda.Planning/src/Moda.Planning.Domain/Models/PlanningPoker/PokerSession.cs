@@ -7,7 +7,7 @@ using NodaTime;
 
 namespace Moda.Planning.Domain.Models.PlanningPoker;
 
-public class PokerSession : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey
+public class PokerSession : BaseAuditableEntity<Guid>, IHasIdAndKey
 {
     private readonly List<PokerRound> _rounds = [];
 

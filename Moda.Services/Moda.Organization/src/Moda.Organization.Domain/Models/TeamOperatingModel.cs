@@ -1,5 +1,4 @@
-﻿using Ardalis.GuardClauses;
-using CSharpFunctionalExtensions;
+﻿using CSharpFunctionalExtensions;
 using Moda.Organization.Domain.Enums;
 using NodaTime;
 
@@ -9,7 +8,7 @@ namespace Moda.Organization.Domain.Models;
 /// Represents the operating model for a team, defining how the team works
 /// (methodology and sizing method) for a specific date range.
 /// </summary>
-public sealed class TeamOperatingModel : BaseEntity<Guid>, ISystemAuditable
+public sealed class TeamOperatingModel : BaseAuditableEntity<Guid>
 {
     private TeamOperatingModel() { }
 

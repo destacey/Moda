@@ -4,7 +4,7 @@ using Moda.Common.Domain.Data;
 
 namespace Moda.Common.Domain.FeatureManagement;
 
-public sealed class FeatureFlag : BaseEntity<int>, ISystemAuditable
+public sealed class FeatureFlag : BaseAuditableEntity<int>
 {
     private FeatureFlag() { }
 

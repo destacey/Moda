@@ -6,7 +6,7 @@ namespace Moda.ProjectPortfolioManagement.Domain.Models;
 /// <summary>
 /// Represents a dependency relationship between two project tasks.
 /// </summary>
-public sealed class ProjectTaskDependency : BaseEntity<Guid>, ISystemAuditable
+public sealed class ProjectTaskDependency : BaseAuditableEntity<Guid>
 {
     private ProjectTaskDependency() { }
 

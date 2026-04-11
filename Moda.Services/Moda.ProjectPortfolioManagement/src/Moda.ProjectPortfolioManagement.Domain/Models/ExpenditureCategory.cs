@@ -4,7 +4,7 @@ using Moda.ProjectPortfolioManagement.Domain.Enums;
 
 namespace Moda.ProjectPortfolioManagement.Domain.Models;
 
-public sealed class ExpenditureCategory : BaseEntity<int>, ISystemAuditable
+public sealed class ExpenditureCategory : BaseAuditableEntity<int>
 {
     private ExpenditureCategory() { }
 

@@ -8,7 +8,7 @@ namespace Moda.Common.Domain.Models.KeyPerformanceIndicators;
 /// <summary>
 /// Represents the common properties and behavior for a KPI checkpoint (expected progress checkpoint).
 /// </summary>
-public abstract class KpiCheckpoint : BaseEntity<Guid>
+public abstract class KpiCheckpoint : BaseAuditableEntity<Guid>
 {
     protected string _dateLabel = default!;
 

@@ -8,7 +8,7 @@ namespace Moda.Work.Domain.Models;
 
 /// <summary>Allows work types to be grouped and defined in a hierarchy.</summary>
 /// <seealso cref="Moda.Common.Domain.Data.BaseSoftDeletableEntity&lt;System.Int32&gt;" />
-public sealed class WorkTypeLevel : BaseEntity<int>, ISystemAuditable
+public sealed class WorkTypeLevel : BaseAuditableEntity<int>
 {
     private string _name = null!;
     private string? _description;

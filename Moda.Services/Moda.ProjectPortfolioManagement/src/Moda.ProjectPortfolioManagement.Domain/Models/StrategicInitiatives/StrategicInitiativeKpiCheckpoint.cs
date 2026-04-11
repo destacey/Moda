@@ -3,7 +3,7 @@ using NodaTime;
 
 namespace Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 
-public sealed class StrategicInitiativeKpiCheckpoint : KpiCheckpoint, ISystemAuditable
+public sealed class StrategicInitiativeKpiCheckpoint : KpiCheckpoint
 {
     private StrategicInitiativeKpiCheckpoint() : base() { }
 

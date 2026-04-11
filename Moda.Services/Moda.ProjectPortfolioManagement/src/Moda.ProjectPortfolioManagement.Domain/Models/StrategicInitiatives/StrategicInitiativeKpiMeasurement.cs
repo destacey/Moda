@@ -4,7 +4,7 @@ using NodaTime;
 
 namespace Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 
-public sealed class StrategicInitiativeKpiMeasurement : KpiMeasurement, ISystemAuditable
+public sealed class StrategicInitiativeKpiMeasurement : KpiMeasurement
 {
     private StrategicInitiativeKpiMeasurement() : base() { }
 
