@@ -9,11 +9,11 @@ public abstract class BaseMembership : BaseSoftDeletableEntity
 
     /// <summary>Gets the source identifier.</summary>
     /// <value>The source identifier.</value>
-    public Guid SourceId { get; init; }
+    public Guid SourceId { get; protected init; }
 
     /// <summary>Gets the target identifier.</summary>
     /// <value>The target identifier.</value>
-    public Guid TargetId { get; init; }
+    public Guid TargetId { get; protected init; }
 
     /// <summary>Gets or sets the date range.</summary>
     /// <value>The date range.</value>
