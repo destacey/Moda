@@ -89,8 +89,8 @@ function docExists(targetPath: string): boolean {
 
 function extractRelativeLinks(
   content: string,
-): { href: string; text: string }[] {
-  const links: { href: string; text: string }[] = []
+): { href: string; text: string; rawHref: string }[] {
+  const links: { href: string; text: string; rawHref: string }[] = []
   LINK_REGEX.lastIndex = 0
   let match: RegExpExecArray | null
 
@@ -99,7 +99,7 @@ function extractRelativeLinks(
     if (href.startsWith('./') || href.startsWith('../')) {
       const pathOnly = href.split('#')[0].replace(/\.mdx?$/, '')
       if (pathOnly) {
-        links.push({ href: pathOnly, text })
+        links.push({ href: pathOnly, text, rawHref: href.split('#')[0] })
       }
     }
   }
@@ -151,17 +151,18 @@ describe('Documentation', () => {
   })
 
   describe('no broken internal links', () => {
-    const allLinks: [string, string, string, string[]][] = []
+    const allLinks: { source: string; href: string; rawHref: string; text: string; fileSlug: string[] }[] = []
 
     for (const doc of allDocs) {
       const links = extractRelativeLinks(doc.content)
       for (const link of links) {
-        allLinks.push([
-          doc.slug.join('/') || 'index',
-          link.href,
-          link.text,
-          doc.fileSlug,
-        ])
+        allLinks.push({
+          source: doc.slug.join('/') || 'index',
+          href: link.href,
+          rawHref: link.rawHref,
+          text: link.text,
+          fileSlug: doc.fileSlug,
+        })
       }
     }
 
@@ -170,16 +171,47 @@ describe('Documentation', () => {
     })
 
     it.each(
-      allLinks.map(([source, href, text, fileSlug]) => ({
-        name: `${source} -> "${href}" (${text})`,
-        source,
-        href,
-        fileSlug,
+      allLinks.map((l) => ({
+        name: `${l.source} -> "${l.href}" (${l.text})`,
+        ...l,
       })),
-    )('$name', ({ source, href, fileSlug }) => {
+    )('$name', ({ href, fileSlug }) => {
       const resolved = resolveLink(fileSlug, href)
       const exists = docExists(resolved)
       expect(exists).toBe(true)
     })
+  })
+
+  describe('remark plugin handles all link formats', () => {
+    const linksWithExtensions: { source: string; rawHref: string; text: string; fileSlug: string[] }[] = []
+
+    for (const doc of allDocs) {
+      const links = extractRelativeLinks(doc.content)
+      for (const link of links) {
+        if (/\.mdx?$/.test(link.rawHref)) {
+          linksWithExtensions.push({
+            source: doc.slug.join('/') || 'index',
+            rawHref: link.rawHref,
+            text: link.text,
+            fileSlug: doc.fileSlug,
+          })
+        }
+      }
+    }
+
+    if (linksWithExtensions.length > 0) {
+      it.each(
+        linksWithExtensions.map((l) => ({
+          name: `${l.source} -> "${l.rawHref}" (${l.text})`,
+          ...l,
+        })),
+      )('$name targets a valid doc after extension stripping', ({ rawHref, fileSlug }) => {
+        // Simulate what the remark plugin does: resolve path, strip .mdx/.md extension, strip /index
+        const sourceDir = fileSlug.slice(0, -1).join('/')
+        const resolved = path.posix.normalize(path.posix.join(sourceDir, rawHref))
+        const cleaned = resolved.replace(/\.mdx?$/, '').replace(/\/index$/, '')
+        expect(docExists(cleaned)).toBe(true)
+      })
+    }
   })
 })

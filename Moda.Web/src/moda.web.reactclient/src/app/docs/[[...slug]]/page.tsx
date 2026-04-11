@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import { serialize } from 'next-mdx-remote/serialize'
 import remarkGfm from 'remark-gfm'
-import remarkDocsLinks from '@/src/lib/remark-docs-links.mjs'
+import remarkDocsLinks from '@/src/lib/remark-docs-links'
 import { getDocBySlug, getAllDocSlugs } from '@/src/services/docs'
 import DocsPageContent from '../docs-page-content'
 
