@@ -97,7 +97,7 @@ function extractRelativeLinks(
   while ((match = LINK_REGEX.exec(content)) !== null) {
     const [, text, href] = match
     if (href.startsWith('./') || href.startsWith('../')) {
-      const pathOnly = href.split('#')[0]
+      const pathOnly = href.split('#')[0].replace(/\.mdx?$/, '')
       if (pathOnly) {
         links.push({ href: pathOnly, text })
       }

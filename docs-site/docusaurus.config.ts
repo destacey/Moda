@@ -21,7 +21,6 @@ const config: Config = {
   trailingSlash: false,
 
   onBrokenLinks: "throw",
-  onBrokenMarkdownLinks: "throw",
   onBrokenAnchors: "throw",
 
   i18n: {
@@ -32,6 +31,9 @@ const config: Config = {
   // Enable Mermaid diagram support
   markdown: {
     mermaid: true,
+    hooks: {
+      onBrokenMarkdownLinks: "throw",
+    },
   },
   themes: ["@docusaurus/theme-mermaid"],
 
