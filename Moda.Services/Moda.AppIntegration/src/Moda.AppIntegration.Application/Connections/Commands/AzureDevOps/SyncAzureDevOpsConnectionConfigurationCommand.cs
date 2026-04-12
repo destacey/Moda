@@ -75,6 +75,11 @@ internal sealed class SyncAzureDevOpsConnectionConfigurationCommandHandler(IAppI
             }
         }
 
+        // Capture workspace WorkProcessIds before sync to detect changes
+        var workspaceProcessesBefore = connection.Configuration.Workspaces
+            .Where(w => w.IntegrationState is not null)
+            .ToDictionary(w => w.ExternalId, w => w.WorkProcessId);
+
         var importWorkspacesResult = connection.SyncWorkspaces(request.Workspaces, _timestamp);
         if (importWorkspacesResult.IsFailure)
         {
@@ -89,6 +94,9 @@ internal sealed class SyncAzureDevOpsConnectionConfigurationCommandHandler(IAppI
 
         await _appIntegrationDbContext.SaveChangesAsync(cancellationToken);
 
+        // Detect and handle workspace process changes
+        await UpdateWorkspaceProcessAssignments(connection, workspaceProcessesBefore, cancellationToken);
+
         return Result.Success();
 
         Result LogAndReturnFailure(Result result)
@@ -96,6 +104,42 @@ internal sealed class SyncAzureDevOpsConnectionConfigurationCommandHandler(IAppI
             _logger.LogError("Errors occurred while processing {AppRequestName}. {Error}", AppRequestName, result.Error);
 
             return Result.Failure($"Errors occurred while processing {AppRequestName}.");
+        }
+    }
+
+    /// <summary>
+    /// Detects workspaces whose Azure DevOps process changed and updates the corresponding Moda Workspace's WorkProcessId.
+    /// </summary>
+    private async Task UpdateWorkspaceProcessAssignments(AzureDevOpsBoardsConnection connection, Dictionary<Guid, Guid?> workspaceProcessesBefore, CancellationToken cancellationToken)
+    {
+        foreach (var workspace in connection.Configuration.Workspaces)
+        {
+            if (workspace.IntegrationState is null || workspace.WorkProcessId is null)
+                continue;
+
+            // Check if this workspace's process changed during sync
+            if (!workspaceProcessesBefore.TryGetValue(workspace.ExternalId, out var previousProcessId)
+                || previousProcessId == workspace.WorkProcessId)
+                continue;
+
+            var workspaceInternalId = workspace.IntegrationState.InternalId;
+
+            _logger.LogInformation(
+                "Detected work process change for workspace {WorkspaceId}: {OldProcessId} -> {NewProcessId}. Updating Moda workspace.",
+                workspaceInternalId, previousProcessId, workspace.WorkProcessId);
+
+            var changeResult = await _sender.Send(
+                new ChangeExternalWorkspaceWorkProcessCommand(workspaceInternalId, workspace.WorkProcessId.Value),
+                cancellationToken);
+
+            if (changeResult.IsFailure)
+            {
+                // Log but don't fail the overall sync — the workspace will be updated on the next sync
+                // once the new process is initialized
+                _logger.LogWarning(
+                    "Failed to update work process for workspace {WorkspaceId}. The new process may not be initialized yet. Error: {Error}",
+                    workspaceInternalId, changeResult.Error);
+            }
         }
     }
 

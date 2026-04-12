@@ -205,24 +205,26 @@ public sealed class Workspace : BaseSoftDeletableEntity, IActivatable<WorkspaceA
     }
 
     /// <summary>
-    /// The process for changing the work process assigned to the workspace.
+    /// Changes the work process assigned to this externally-managed workspace.
+    /// This is used when the external system (e.g., Azure DevOps) reassigns
+    /// a project to a different process.
     /// </summary>
-    /// <exception cref="NotImplementedException"></exception>
-    //public Result ChangeWorkspaceProcess(WorkProcess workProcess)
-    //{
-    //    if (workProcess.Ownership != Ownership)
-    //        return Result.Failure($"Unable to assign the work process because the ownership does not match the workspace ownership.");
+    /// <param name="newWorkProcessId">The internal ID of the new work process.</param>
+    /// <param name="timestamp">The timestamp of the change.</param>
+    /// <returns>A result indicating success or failure.</returns>
+    public Result ChangeWorkProcess(Guid newWorkProcessId, Instant timestamp)
+    {
+        if (OwnershipInfo.Ownership is not Ownership.Managed)
+            return Result.Failure("Unable to change the work process on a non-managed workspace.");
 
-    //    if (!WorkItems.Any())
-    //    {
-    //        WorkProcessId = workProcess.Id;
-    //        return Result.Success();
-    //    }
+        if (WorkProcessId == newWorkProcessId)
+            return Result.Success();
 
-    //    // TODO what if the work process doesn't cover all of the work types for existing work items
-    //    //
-    //    throw new NotImplementedException();
-    //}
+        WorkProcessId = newWorkProcessId;
+        AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
+
+        return Result.Success();
+    }
 
     /// <summary>The process for activating a workspace.</summary>
     /// <param name="args">The arguments.</param>
