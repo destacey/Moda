@@ -1,4 +1,4 @@
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 
@@ -19,17 +19,10 @@ internal static class ModelBuilderExtensions
             var parameterType = Expression.Parameter(modelBuilder.Entity(entity).Metadata.ClrType);
             var filterBody = ReplacingExpressionVisitor.Replace(filter.Parameters.Single(), parameterType, filter.Body);
 
-            // get the existing query filter
-            if (modelBuilder.Entity(entity).Metadata.GetQueryFilter() is { } existingFilter)
-            {
-                var existingFilterBody = ReplacingExpressionVisitor.Replace(existingFilter.Parameters.Single(), parameterType, existingFilter.Body);
-
-                // combine the existing query filter with the new query filter
-                filterBody = Expression.AndAlso(existingFilterBody, filterBody);
-            }
-
-            // apply the new query filter
-            modelBuilder.Entity(entity).HasQueryFilter(Expression.Lambda(filterBody, parameterType));
+            // apply the query filter with a key based on the interface type
+            modelBuilder.Entity(entity).Metadata.SetQueryFilter(
+                typeof(TInterface).Name,
+                Expression.Lambda(filterBody, parameterType));
         }
 
         return modelBuilder;
