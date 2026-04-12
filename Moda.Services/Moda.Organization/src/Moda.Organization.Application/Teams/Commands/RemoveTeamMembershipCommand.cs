@@ -1,6 +1,4 @@
-﻿using Moda.Organization.Application.Teams.Models;
-
-namespace Moda.Organization.Application.Teams.Commands;
+﻿namespace Moda.Organization.Application.Teams.Commands;
 
 public sealed record RemoveTeamMembershipCommand(Guid TeamId, Guid TeamMembershipId) : ICommand;
 

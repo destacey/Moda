@@ -1,7 +1,7 @@
-﻿using Moda.Common.Domain.Enums.Planning;
+﻿using System.Linq.Expressions;
+using Moda.Common.Domain.Enums.Planning;
 using Moda.Common.Domain.Enums.Work;
 using NodaTime;
-using System.Linq.Expressions;
 
 namespace Moda.Work.Domain.Models;
 public sealed record DependencyWorkItemInfo

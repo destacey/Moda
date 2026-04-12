@@ -1,5 +1,4 @@
-using Moda.ProjectPortfolioManagement.Application.Projects.Dtos;
-using Moda.ProjectPortfolioManagement.Domain.Models;
+﻿using Moda.ProjectPortfolioManagement.Application.Projects.Dtos;
 
 namespace Moda.ProjectPortfolioManagement.Application.Projects.Queries;
 

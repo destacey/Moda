@@ -1,5 +1,5 @@
-﻿using Moda.Common.Application.Models;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
+using Moda.Common.Application.Models;
 using Moda.Common.Domain.Enums.Organization;
 using Moda.Planning.Application.Models;
 using Moda.Planning.Domain.Enums;

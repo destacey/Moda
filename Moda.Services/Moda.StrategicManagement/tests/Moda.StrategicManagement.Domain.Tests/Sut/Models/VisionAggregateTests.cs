@@ -1,5 +1,4 @@
-﻿using Bogus;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Moda.Common.Models;
 using Moda.StrategicManagement.Domain.Enums;
 using Moda.StrategicManagement.Domain.Models;

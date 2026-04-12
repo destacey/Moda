@@ -1,6 +1,4 @@
-using Moda.Common.Models;
-using Moda.ProjectPortfolioManagement.Domain.Enums;
-using Moda.ProjectPortfolioManagement.Domain.Models;
+﻿using Moda.ProjectPortfolioManagement.Domain.Enums;
 using TaskStatus = Moda.ProjectPortfolioManagement.Domain.Enums.TaskStatus;
 
 namespace Moda.ProjectPortfolioManagement.Application.Projects.Commands;

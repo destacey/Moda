@@ -1,5 +1,4 @@
-﻿using FluentValidation;
-using Microsoft.AspNetCore.JsonPatch.SystemTextJson;
+﻿using Microsoft.AspNetCore.JsonPatch.SystemTextJson;
 using Moda.Common.Application.Models;
 using Moda.Common.Application.Requests;
 using Moda.Planning.Application.Roadmaps.Commands;

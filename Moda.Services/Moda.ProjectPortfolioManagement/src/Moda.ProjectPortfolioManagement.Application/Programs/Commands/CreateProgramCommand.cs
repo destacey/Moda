@@ -1,6 +1,5 @@
 ﻿using Moda.Common.Application.Models;
 using Moda.Common.Domain.Enums.StrategicManagement;
-using Moda.ProjectPortfolioManagement.Application.Projects.Commands;
 using Moda.ProjectPortfolioManagement.Domain.Enums;
 
 namespace Moda.ProjectPortfolioManagement.Application.Programs.Commands;

@@ -1,8 +1,8 @@
 ﻿using CSharpFunctionalExtensions;
 using Moda.Common.Domain.Enums.Organization;
+using Moda.Common.Domain.Events.Organization;
 using Moda.Common.Domain.Models.Organizations;
 using Moda.Organization.Domain.Enums;
-using Moda.Common.Domain.Events.Organization;
 using NodaTime;
 
 namespace Moda.Organization.Domain.Models;

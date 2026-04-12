@@ -1,6 +1,5 @@
 ﻿using System.Reflection;
 using System.Text.Json;
-using NJsonSchema;
 using NJsonSchema.Generation;
 
 namespace Moda.Infrastructure.OpenApi;

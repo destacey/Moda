@@ -1,6 +1,5 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
-using Moda.Common.Domain.Interfaces;
 using Moda.Planning.Domain.Enums;
 
 namespace Moda.Planning.Domain.Models.Roadmaps;

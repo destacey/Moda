@@ -1,5 +1,4 @@
-﻿using Moda.Common.Domain.Interfaces;
-using Moda.Planning.Domain.Models.Iterations;
+﻿using Moda.Planning.Domain.Models.Iterations;
 
 namespace Moda.Planning.Domain.Models;
 

@@ -1,9 +1,7 @@
-﻿using CSharpFunctionalExtensions;
-using Moda.Common.Extensions;
+﻿using Moda.Common.Extensions;
 using Moda.Web.Api.Extensions;
 using Moda.Web.Api.Models.Work.Workspaces;
 using Moda.Work.Application.WorkItemDependencies.Dtos;
-using Moda.Work.Application.WorkItems.Commands;
 using Moda.Work.Application.WorkItems.Dtos;
 using Moda.Work.Application.WorkItems.Queries;
 using Moda.Work.Application.Workspaces.Commands;

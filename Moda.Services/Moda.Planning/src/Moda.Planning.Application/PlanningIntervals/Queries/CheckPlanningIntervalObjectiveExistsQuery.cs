@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using Moda.Common.Application.Models;
 
 namespace Moda.Planning.Application.PlanningIntervals.Queries;

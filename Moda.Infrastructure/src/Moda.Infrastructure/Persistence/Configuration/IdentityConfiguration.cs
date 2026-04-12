@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Moda.Common.Application.Identity.Users;
 using Moda.Common.Domain.Employees;
 
 namespace Moda.Infrastructure.Persistence.Configuration;

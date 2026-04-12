@@ -2,13 +2,13 @@
 using Moda.Common.Application.Interfaces.ExternalWork;
 using Moda.Common.Application.Models;
 using Moda.Common.Application.Requests.Planning.Iterations;
+using Moda.Common.Domain.Enums.AppIntegrations;
+using Moda.Common.Domain.Enums.Organization;
+using Moda.Common.Domain.Enums.Planning;
 using Moda.Common.Domain.Events.Planning.Iterations;
 using Moda.Common.Domain.Models;
 using Moda.Common.Domain.Models.Planning.Iterations;
 using Moda.Planning.Domain.Models.Iterations;
-using Moda.Common.Domain.Enums.AppIntegrations;
-using Moda.Common.Domain.Enums.Planning;
-using Moda.Common.Domain.Enums.Organization;
 
 namespace Moda.Planning.Application.Iterations.Commands;
 internal sealed class SyncAzureDevOpsIterationsCommandHandler(IPlanningDbContext planningDbContext, ILogger<SyncAzureDevOpsIterationsCommandHandler> logger, IDateTimeProvider dateTimeProvider, IEventPublisher eventPublisher)

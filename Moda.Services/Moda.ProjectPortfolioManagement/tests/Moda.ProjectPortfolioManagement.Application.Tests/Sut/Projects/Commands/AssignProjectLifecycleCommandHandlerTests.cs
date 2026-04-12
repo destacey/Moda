@@ -1,8 +1,7 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moda.ProjectPortfolioManagement.Application.Projects.Commands;
 using Moda.ProjectPortfolioManagement.Application.Tests.Infrastructure;
-using Moda.ProjectPortfolioManagement.Domain.Enums;
 using Moda.ProjectPortfolioManagement.Domain.Tests.Data;
 using Moda.Tests.Shared;
 using Moq;

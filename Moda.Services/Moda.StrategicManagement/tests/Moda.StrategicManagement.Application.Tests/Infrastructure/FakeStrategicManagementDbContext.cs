@@ -1,9 +1,8 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Moda.Common.Domain.Employees;
 using Moda.Common.Domain.Identity;
-using Moda.StrategicManagement.Application;
 using Moda.StrategicManagement.Domain.Models;
 using Moda.Tests.Shared.Infrastructure;
 

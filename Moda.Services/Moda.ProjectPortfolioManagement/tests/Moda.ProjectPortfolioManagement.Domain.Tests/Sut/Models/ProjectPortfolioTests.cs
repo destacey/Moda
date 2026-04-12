@@ -1,4 +1,6 @@
 ﻿using FluentAssertions;
+using Moda.Common.Domain.Events.ProjectPortfolioManagement;
+using Moda.Common.Domain.Models.ProjectPortfolioManagement;
 using Moda.Common.Models;
 using Moda.ProjectPortfolioManagement.Domain.Enums;
 using Moda.ProjectPortfolioManagement.Domain.Models;
@@ -7,8 +9,6 @@ using Moda.ProjectPortfolioManagement.Domain.Tests.Data.Extensions;
 using Moda.Tests.Shared;
 using NodaTime.Extensions;
 using NodaTime.Testing;
-using Moda.Common.Domain.Events.ProjectPortfolioManagement;
-using Moda.Common.Domain.Models.ProjectPortfolioManagement;
 
 namespace Moda.ProjectPortfolioManagement.Domain.Tests.Sut.Models;
 

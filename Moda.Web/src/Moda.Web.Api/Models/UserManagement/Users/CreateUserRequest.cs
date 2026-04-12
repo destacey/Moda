@@ -1,6 +1,4 @@
-using Moda.Common.Application.Identity;
-
-namespace Moda.Web.Api.Models.UserManagement.Users;
+﻿namespace Moda.Web.Api.Models.UserManagement.Users;
 
 public sealed record CreateUserRequest
 {

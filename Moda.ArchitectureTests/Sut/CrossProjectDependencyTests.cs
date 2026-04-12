@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
-using NetArchTest.Rules;
 using Moda.ArchitectureTests.Helpers;
+using NetArchTest.Rules;
 
 namespace Moda.ArchitectureTests.Sut;
 

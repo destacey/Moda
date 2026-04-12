@@ -1,9 +1,6 @@
-using Microsoft.EntityFrameworkCore;
-using Moda.Common.Application.Interfaces;
-using Moda.Common.Application.Search;
+﻿using Moda.Common.Application.Search;
 using Moda.Common.Application.Search.Dtos;
 using Moda.Common.Extensions;
-using Moda.ProjectPortfolioManagement.Domain.Enums;
 using Moda.ProjectPortfolioManagement.Domain.Models;
 using Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 

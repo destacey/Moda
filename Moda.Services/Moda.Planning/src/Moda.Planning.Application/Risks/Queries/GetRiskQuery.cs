@@ -1,5 +1,5 @@
-﻿using Moda.Common.Application.Models;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
+using Moda.Common.Application.Models;
 using Moda.Planning.Application.Risks.Dtos;
 
 namespace Moda.Planning.Application.Risks.Queries;
