@@ -43,13 +43,43 @@ public sealed class AzureDevOpsSyncManager(ILogger<AzureDevOpsSyncManager> logge
     private static readonly Action<ILogger, int, int, int, int, int, Exception?> _summary = LoggerMessage.Define<int, int, int, int, int>(LogLevel.Information, new EventId((int)AppEventId.AppIntegration_AzureDevOpsBoardsSyncManager_SyncSummary, nameof(AppEventId.AppIntegration_AzureDevOpsBoardsSyncManager_SyncSummary)), "Synced {ActiveWorkProcessesSyncedCount} of {ActiveWorkProcessesCount} active work processes and {ActiveWorkspacesSyncedCount} of {ActiveWorkspacesCount} active workspaces for {ActiveConnectionsCount} active Azure DevOps connections.");
 
     /// <summary>
-    /// Bundles the connection-level configuration that is threaded through every sync step.
+    /// Tracks sync progress counters across connections.
     /// </summary>
-    private sealed record SyncContext(
-        string OrganizationUrl,
-        string PersonalAccessToken,
-        string SystemId,
-        Guid SyncId);
+    private sealed class ConnectionSyncResult
+    {
+        public int ActiveWorkProcesses { get; set; }
+        public int WorkProcessesSynced { get; set; }
+        public int ActiveWorkspaces { get; set; }
+        public int WorkspacesSynced { get; set; }
+
+        public void Add(ConnectionSyncResult other)
+        {
+            ActiveWorkProcesses += other.ActiveWorkProcesses;
+            WorkProcessesSynced += other.WorkProcessesSynced;
+            ActiveWorkspaces += other.ActiveWorkspaces;
+            WorkspacesSynced += other.WorkspacesSynced;
+        }
+    }
+
+    /// <summary>
+    /// Bundles the connection-level configuration that is threaded through every sync step.
+    /// Validated at construction so callers don't need to re-check.
+    /// </summary>
+    private sealed record SyncContext
+    {
+        public string OrganizationUrl { get; }
+        public string PersonalAccessToken { get; }
+        public string SystemId { get; }
+        public Guid SyncId { get; }
+
+        public SyncContext(string organizationUrl, string personalAccessToken, string systemId, Guid syncId)
+        {
+            OrganizationUrl = Guard.Against.NullOrWhiteSpace(organizationUrl, nameof(organizationUrl));
+            PersonalAccessToken = Guard.Against.NullOrWhiteSpace(personalAccessToken, nameof(personalAccessToken));
+            SystemId = Guard.Against.NullOrWhiteSpace(systemId, nameof(systemId));
+            SyncId = Guard.Against.Default(syncId, nameof(syncId));
+        }
+    }
 
     public async Task<Result> Sync(SyncType syncType, CancellationToken cancellationToken)
     {
@@ -61,21 +91,15 @@ public sealed class AzureDevOpsSyncManager(ILogger<AzureDevOpsSyncManager> logge
             try
             {
                 var connections = await _sender.Send(new GetConnectionsQuery(false, Connector.AzureDevOps), cancellationToken);
-                if (!connections.Any(c => c.IsValidConfiguration && c.IsSyncEnabled == true))
+                var activeConnections = connections.Where(c => c.IsValidConfiguration && c.IsSyncEnabled == true).ToList();
+                if (activeConnections.Count == 0)
                 {
                     var message = "No active Azure DevOps connections found.";
                     _logger.LogInformation(message);
                     return Result.Failure(message);
                 }
 
-                var activeConnections = connections.Where(c => c.IsValidConfiguration && c.IsSyncEnabled == true).ToList();
-
-                // TODO: convert to a sync result object that can be returned to hangfire
-                var activeConnectionsCount = activeConnections.Count;
-                var activeWorkProcessesCount = 0;
-                var activeWorkProcessesSyncedCount = 0;
-                var activeWorkspacesCount = 0;
-                var activeWorkspacesSyncedCount = 0;
+                var totals = new ConnectionSyncResult();
 
                 foreach (var connection in activeConnections)
                 {
@@ -91,17 +115,11 @@ public sealed class AzureDevOpsSyncManager(ILogger<AzureDevOpsSyncManager> logge
                             connection, syncType, syncId, cancellationToken);
 
                         if (connectionResult.IsSuccess)
-                        {
-                            var (wpCount, wpSyncedCount, wsCount, wsSyncedCount) = connectionResult.Value;
-                            activeWorkProcessesCount += wpCount;
-                            activeWorkProcessesSyncedCount += wpSyncedCount;
-                            activeWorkspacesCount += wsCount;
-                            activeWorkspacesSyncedCount += wsSyncedCount;
-                        }
+                            totals.Add(connectionResult.Value);
                     }
                 }
 
-                _summary(_logger, activeWorkProcessesSyncedCount, activeWorkProcessesCount, activeWorkspacesSyncedCount, activeWorkspacesCount, activeConnectionsCount, null);
+                _summary(_logger, totals.WorkProcessesSynced, totals.ActiveWorkProcesses, totals.WorkspacesSynced, totals.ActiveWorkspaces, activeConnections.Count, null);
 
                 return Result.Success();
             }
@@ -115,23 +133,22 @@ public sealed class AzureDevOpsSyncManager(ILogger<AzureDevOpsSyncManager> logge
 
     /// <summary>
     /// Syncs a single connection: organization config, work processes, workspaces, and dependencies.
-    /// Returns (workProcessCount, workProcessSyncedCount, workspaceCount, workspaceSyncedCount).
     /// </summary>
-    private async Task<Result<(int WorkProcessCount, int WorkProcessSyncedCount, int WorkspaceCount, int WorkspaceSyncedCount)>> SyncConnection(
+    private async Task<Result<ConnectionSyncResult>> SyncConnection(
         ConnectionListDto connection, SyncType syncType, Guid syncId, CancellationToken cancellationToken)
     {
         var syncOrganizationResult = await _initManager.SyncOrganizationConfiguration(connection.Id, cancellationToken, syncId);
         if (syncOrganizationResult.IsFailure)
         {
             _logger.LogError("An error occurred while syncing Azure DevOps organization configuration for connection with ID {ConnectionId}. Error: {Error}", connection.Id, syncOrganizationResult.Error);
-            return Result.Failure<(int, int, int, int)>(syncOrganizationResult.Error);
+            return Result.Failure<ConnectionSyncResult>(syncOrganizationResult.Error);
         }
 
         var connectionDetails = await _sender.Send(new GetAzureDevOpsConnectionQuery(connection.Id), cancellationToken);
         if (connectionDetails is null)
         {
             _logger.LogError("Unable to retrieve connection details for Azure DevOps connection with ID {ConnectionId}.", connection.Id);
-            return Result.Failure<(int, int, int, int)>("Unable to retrieve connection details.");
+            return Result.Failure<ConnectionSyncResult>("Unable to retrieve connection details.");
         }
 
         var configuration = connectionDetails.Configuration;
@@ -155,19 +172,17 @@ public sealed class AzureDevOpsSyncManager(ILogger<AzureDevOpsSyncManager> logge
         if (activeWorkProcesses.Count == 0)
         {
             _noActiveWorkProcesses(_logger, connection.Id, null);
-            return Result.Success<(int, int, int, int)>((0, 0, 0, 0));
+            return Result.Success(new ConnectionSyncResult());
         }
 
-        var workProcessSyncedCount = 0;
-        var workspaceCount = 0;
-        var workspaceSyncedCount = 0;
+        var result = new ConnectionSyncResult { ActiveWorkProcesses = activeWorkProcesses.Count };
 
         foreach (var workProcess in activeWorkProcesses)
         {
             if (cancellationToken.IsCancellationRequested)
             {
                 _cancellationRequested(_logger, null);
-                return Result.Success<(int, int, int, int)>((activeWorkProcesses.Count, workProcessSyncedCount, workspaceCount, workspaceSyncedCount));
+                return Result.Success(result);
             }
 
             var syncResult = await SyncWorkProcess(ctx, workProcess.ExternalId, workProcess.IntegrationState!.InternalId, cancellationToken);
@@ -178,7 +193,7 @@ public sealed class AzureDevOpsSyncManager(ILogger<AzureDevOpsSyncManager> logge
             }
 
             _workProcessSynced(_logger, workProcess.IntegrationState!.InternalId, null);
-            workProcessSyncedCount++;
+            result.WorkProcessesSynced++;
 
             var activeWorkspaces = configuration.Workspaces
                 .Where(w => w.WorkProcessId == workProcess.ExternalId
@@ -192,7 +207,7 @@ public sealed class AzureDevOpsSyncManager(ILogger<AzureDevOpsSyncManager> logge
                 continue;
             }
 
-            workspaceCount += activeWorkspaces.Count;
+            result.ActiveWorkspaces += activeWorkspaces.Count;
             foreach (var workspace in activeWorkspaces)
             {
                 using (_logger.BeginScope(new Dictionary<string, object> { ["WorkspaceId"] = workspace.IntegrationState!.InternalId }))
@@ -200,14 +215,14 @@ public sealed class AzureDevOpsSyncManager(ILogger<AzureDevOpsSyncManager> logge
                     if (cancellationToken.IsCancellationRequested)
                     {
                         _cancellationRequested(_logger, null);
-                        return Result.Success<(int, int, int, int)>((activeWorkProcesses.Count, workProcessSyncedCount, workspaceCount, workspaceSyncedCount));
+                        return Result.Success(result);
                     }
 
                     var workspaceTeams = workspaceTeamsLookup.TryGetValue(workspace.ExternalId, out var wt) ? wt : [];
 
                     var syncWorkspaceResult = await SyncWorkspaceData(ctx, syncType, workspace, workspaceTeams, cancellationToken);
                     if (syncWorkspaceResult.IsSuccess)
-                        workspaceSyncedCount++;
+                        result.WorkspacesSynced++;
                 }
             }
         }
@@ -218,7 +233,7 @@ public sealed class AzureDevOpsSyncManager(ILogger<AzureDevOpsSyncManager> logge
             _logger.LogError("An error occurred while processing dependencies for Azure DevOps connection {ConnectionId}. Error: {Error}", connection.Id, processDependenciesResult.Error);
         }
 
-        return Result.Success<(int, int, int, int)>((activeWorkProcesses.Count, workProcessSyncedCount, workspaceCount, workspaceSyncedCount));
+        return Result.Success(result);
     }
 
     /// <summary>
@@ -238,7 +253,9 @@ public sealed class AzureDevOpsSyncManager(ILogger<AzureDevOpsSyncManager> logge
 
         _workspaceSynced(_logger, workspaceId, null);
 
-        var syncIterationsResult = await SyncIterations(ctx, workspace.Name, workspaceTeams, cancellationToken);
+        BuildTeamSettingsAndMappings(workspaceTeams, out var teamSettings, out var teamMappings);
+
+        var syncIterationsResult = await SyncIterations(ctx, workspace.Name, teamSettings, teamMappings, cancellationToken);
         if (syncIterationsResult.IsFailure)
         {
             _logger.LogError("An error occurred while syncing Azure DevOps workspace {WorkspaceId} iterations. Error: {Error}", workspaceId, syncIterationsResult.Error);
@@ -266,7 +283,7 @@ public sealed class AzureDevOpsSyncManager(ILogger<AzureDevOpsSyncManager> logge
             // Each work item sync step is attempted independently
             var hasWorkItemSyncError = false;
 
-            var syncWorkItemsResult = await SyncWorkItems(ctx, lastChangedDate, workspaceId, workspace.Name, workspaceTeams, workTypeNames, cancellationToken);
+            var syncWorkItemsResult = await SyncWorkItems(ctx, lastChangedDate, workspaceId, workspace.Name, teamSettings, teamMappings, workTypeNames, cancellationToken);
             if (syncWorkItemsResult.IsFailure)
             {
                 _logger.LogError("An error occurred while syncing Azure DevOps workspace {WorkspaceId} work items. Error: {Error}", workspaceId, syncWorkItemsResult.Error);
@@ -321,8 +338,6 @@ public sealed class AzureDevOpsSyncManager(ILogger<AzureDevOpsSyncManager> logge
 
     private async Task<Result> SyncWorkProcess(SyncContext ctx, Guid workProcessExternalId, Guid workProcessId, CancellationToken cancellationToken)
     {
-        Guard.Against.NullOrWhiteSpace(ctx.OrganizationUrl, nameof(ctx.OrganizationUrl));
-        Guard.Against.NullOrWhiteSpace(ctx.PersonalAccessToken, nameof(ctx.PersonalAccessToken));
         Guard.Against.Default(workProcessExternalId, nameof(workProcessExternalId));
         Guard.Against.Default(workProcessId, nameof(workProcessId));
 
@@ -337,7 +352,7 @@ public sealed class AzureDevOpsSyncManager(ILogger<AzureDevOpsSyncManager> logge
         {
             var levels = await _sender.Send(new GetWorkTypeLevelsQuery(), cancellationToken);
             if (levels is null)
-                return Result.Failure<Guid>("Unable to get work type levels.");
+                return Result.Failure("Unable to get work type levels.");
 
             int defaultLevelId = -1;
             foreach (var l in levels)
@@ -350,11 +365,11 @@ public sealed class AzureDevOpsSyncManager(ILogger<AzureDevOpsSyncManager> logge
             }
 
             if (defaultLevelId == -1)
-                return Result.Failure<Guid>("Unable to get work type levels.");
+                return Result.Failure("Unable to get work type levels.");
 
             var syncWorkTypesResult = await _sender.Send(new SyncExternalWorkTypesCommand(workTypes, defaultLevelId), cancellationToken);
             if (syncWorkTypesResult.IsFailure)
-                return syncWorkTypesResult.ConvertFailure<Guid>();
+                return syncWorkTypesResult;
         }
 
         // create new statuses
@@ -362,7 +377,7 @@ public sealed class AzureDevOpsSyncManager(ILogger<AzureDevOpsSyncManager> logge
         {
             var syncWorkStatusesResult = await _sender.Send(new SyncExternalWorkStatusesCommand(processResult.Value.WorkStatuses), cancellationToken);
             if (syncWorkStatusesResult.IsFailure)
-                return syncWorkStatusesResult.ConvertFailure<Guid>();
+                return syncWorkStatusesResult;
         }
 
         // get the work process scheme, work type, and workflow
@@ -383,7 +398,7 @@ public sealed class AzureDevOpsSyncManager(ILogger<AzureDevOpsSyncManager> logge
                 "Auto-generated workflow for Azure DevOps work process.",
                 workType), cancellationToken);
                 if (createWorkflowResult.IsFailure)
-                    return createWorkflowResult.ConvertFailure<Guid>();
+                    return createWorkflowResult.ConvertFailure();
 
                 workflowMappings.Add(CreateWorkProcessSchemeDto.Create(workType.Name, workType.IsActive, createWorkflowResult.Value));
             }
@@ -391,7 +406,7 @@ public sealed class AzureDevOpsSyncManager(ILogger<AzureDevOpsSyncManager> logge
             {
                 var syncWorkflowResult = await _sender.Send(new UpdateExternalWorkflowCommand(scheme.Workflow.Id, scheme.Workflow.Name, scheme.Workflow.Description, workType), cancellationToken);
                 if (syncWorkflowResult.IsFailure)
-                    return syncWorkflowResult.ConvertFailure<Guid>();
+                    return syncWorkflowResult;
 
                 workflowMappings.Add(CreateWorkProcessSchemeDto.Create(workType.Name, workType.IsActive, scheme.Workflow.Id));
             }
@@ -407,8 +422,6 @@ public sealed class AzureDevOpsSyncManager(ILogger<AzureDevOpsSyncManager> logge
 
     private async Task<Result> SyncWorkspace(SyncContext ctx, Guid workspaceExternalId, CancellationToken cancellationToken)
     {
-        Guard.Against.NullOrWhiteSpace(ctx.OrganizationUrl, nameof(ctx.OrganizationUrl));
-        Guard.Against.NullOrWhiteSpace(ctx.PersonalAccessToken, nameof(ctx.PersonalAccessToken));
         Guard.Against.Default(workspaceExternalId, nameof(workspaceExternalId));
 
         var workspaceResult = await ExternalCallMeasure.MeasureAsync(_logger, "Azdo_Sync_GetWorkspace", () => _azureDevOpsService.GetWorkspace(ctx.OrganizationUrl, ctx.PersonalAccessToken, workspaceExternalId, cancellationToken), ctx.SyncId);
@@ -422,13 +435,9 @@ public sealed class AzureDevOpsSyncManager(ILogger<AzureDevOpsSyncManager> logge
             : updateResult;
     }
 
-    private async Task<Result> SyncIterations(SyncContext ctx, string azdoWorkspaceName, AzureDevOpsWorkspaceTeamDto[] workspaceTeams, CancellationToken cancellationToken)
+    private async Task<Result> SyncIterations(SyncContext ctx, string azdoWorkspaceName, Dictionary<Guid, Guid?> teamSettings, Dictionary<Guid, Guid?> teamMappings, CancellationToken cancellationToken)
     {
-        Guard.Against.NullOrWhiteSpace(ctx.OrganizationUrl, nameof(ctx.OrganizationUrl));
-        Guard.Against.NullOrWhiteSpace(ctx.PersonalAccessToken, nameof(ctx.PersonalAccessToken));
         Guard.Against.NullOrWhiteSpace(azdoWorkspaceName, nameof(azdoWorkspaceName));
-
-        BuildTeamSettingsAndMappings(workspaceTeams, out var teamSettings, out var teamMappings);
 
         var iterationsResult = await ExternalCallMeasure.MeasureAsync(_logger, "Azdo_Sync_GetIterations", () => _azureDevOpsService.GetIterations(ctx.OrganizationUrl, ctx.PersonalAccessToken, azdoWorkspaceName, teamSettings, cancellationToken), ctx.SyncId);
         if (iterationsResult.IsFailure)
@@ -439,13 +448,9 @@ public sealed class AzureDevOpsSyncManager(ILogger<AzureDevOpsSyncManager> logge
         return syncResult;
     }
 
-    private async Task<Result> SyncWorkItems(SyncContext ctx, DateTime lastChangedDate, Guid workspaceId, string azdoWorkspaceName, AzureDevOpsWorkspaceTeamDto[] workspaceTeams, string[] workTypeNames, CancellationToken cancellationToken)
+    private async Task<Result> SyncWorkItems(SyncContext ctx, DateTime lastChangedDate, Guid workspaceId, string azdoWorkspaceName, Dictionary<Guid, Guid?> teamSettings, Dictionary<Guid, Guid?> teamMappings, string[] workTypeNames, CancellationToken cancellationToken)
     {
-        Guard.Against.NullOrWhiteSpace(ctx.OrganizationUrl, nameof(ctx.OrganizationUrl));
-        Guard.Against.NullOrWhiteSpace(ctx.PersonalAccessToken, nameof(ctx.PersonalAccessToken));
         Guard.Against.Default(workspaceId, nameof(workspaceId));
-
-        BuildTeamSettingsAndMappings(workspaceTeams, out var teamSettings, out var teamMappings);
 
         var workItemsResult = await ExternalCallMeasure.MeasureAsync(_logger, "Azdo_Sync_GetWorkItems", () => _azureDevOpsService.GetWorkItems(ctx.OrganizationUrl, ctx.PersonalAccessToken, azdoWorkspaceName, lastChangedDate, workTypeNames, teamSettings, cancellationToken), ctx.SyncId);
         if (workItemsResult.IsFailure)
@@ -462,8 +467,6 @@ public sealed class AzureDevOpsSyncManager(ILogger<AzureDevOpsSyncManager> logge
 
     private async Task<Result> SyncWorkItemParentChanges(SyncContext ctx, DateTime lastChangedDate, Guid workspaceId, string azdoWorkspaceName, string[] workTypeNames, CancellationToken cancellationToken)
     {
-        Guard.Against.NullOrWhiteSpace(ctx.OrganizationUrl, nameof(ctx.OrganizationUrl));
-        Guard.Against.NullOrWhiteSpace(ctx.PersonalAccessToken, nameof(ctx.PersonalAccessToken));
         Guard.Against.Default(workspaceId, nameof(workspaceId));
 
         var parentLinkChangesResult = await ExternalCallMeasure.MeasureAsync(_logger, "Azdo_Sync_GetParentLinkChanges", () => _azureDevOpsService.GetParentLinkChanges(ctx.OrganizationUrl, ctx.PersonalAccessToken, azdoWorkspaceName, lastChangedDate, workTypeNames, cancellationToken), ctx.SyncId);
@@ -479,8 +482,6 @@ public sealed class AzureDevOpsSyncManager(ILogger<AzureDevOpsSyncManager> logge
 
     private async Task<Result> SyncWorkItemDependencyChanges(SyncContext ctx, DateTime lastChangedDate, Guid workspaceId, string azdoWorkspaceName, string[] workTypeNames, CancellationToken cancellationToken)
     {
-        Guard.Against.NullOrWhiteSpace(ctx.OrganizationUrl, nameof(ctx.OrganizationUrl));
-        Guard.Against.NullOrWhiteSpace(ctx.PersonalAccessToken, nameof(ctx.PersonalAccessToken));
         Guard.Against.Default(workspaceId, nameof(workspaceId));
 
         var dependencyLinkChangesResult = await ExternalCallMeasure.MeasureAsync(_logger, "Azdo_Sync_GetDependencyLinkChanges", () => _azureDevOpsService.GetDependencyLinkChanges(ctx.OrganizationUrl, ctx.PersonalAccessToken, azdoWorkspaceName, lastChangedDate, workTypeNames, cancellationToken), ctx.SyncId);
@@ -496,8 +497,6 @@ public sealed class AzureDevOpsSyncManager(ILogger<AzureDevOpsSyncManager> logge
 
     private async Task<Result> SyncDeletedWorkItems(SyncContext ctx, Guid workspaceId, string azdoWorkspaceName, DateTime lastChangedDate, CancellationToken cancellationToken)
     {
-        Guard.Against.NullOrWhiteSpace(ctx.OrganizationUrl, nameof(ctx.OrganizationUrl));
-        Guard.Against.NullOrWhiteSpace(ctx.PersonalAccessToken, nameof(ctx.PersonalAccessToken));
         Guard.Against.Default(workspaceId, nameof(workspaceId));
 
         var getDeletedWorkItemIdsResult = await ExternalCallMeasure.MeasureAsync(_logger, "Azdo_Sync_GetDeletedWorkItemIds", () => _azureDevOpsService.GetDeletedWorkItemIds(ctx.OrganizationUrl, ctx.PersonalAccessToken, azdoWorkspaceName, lastChangedDate, cancellationToken), ctx.SyncId);
