@@ -3,6 +3,7 @@ using CSharpFunctionalExtensions;
 using Moda.Planning.Domain.Enums;
 
 namespace Moda.Planning.Domain.Models.Roadmaps;
+
 public abstract class BaseRoadmapItem : BaseAuditableEntity
 {
     private string _name = default!;

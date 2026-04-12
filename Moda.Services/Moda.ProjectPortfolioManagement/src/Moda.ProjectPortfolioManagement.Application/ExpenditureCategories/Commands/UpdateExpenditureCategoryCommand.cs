@@ -6,7 +6,7 @@ public sealed record UpdateExpenditureCategoryCommand(
     string Description,
     bool IsCapitalizable,
     bool RequiresDepreciation,
-    string? AccountingCode) 
+    string? AccountingCode)
     : ICommand;
 
 public sealed class UpdateExpenditureCategoryCommandValidator : AbstractValidator<UpdateExpenditureCategoryCommand>
@@ -31,7 +31,7 @@ public sealed class UpdateExpenditureCategoryCommandValidator : AbstractValidato
 
 internal sealed class UpdateExpenditureCategoryCommandHandler(
     IProjectPortfolioManagementDbContext projectPortfolioManagementDbContext,
-    ILogger<UpdateExpenditureCategoryCommandHandler> logger) 
+    ILogger<UpdateExpenditureCategoryCommandHandler> logger)
     : ICommandHandler<UpdateExpenditureCategoryCommand>
 {
     private const string AppRequestName = nameof(UpdateExpenditureCategoryCommand);

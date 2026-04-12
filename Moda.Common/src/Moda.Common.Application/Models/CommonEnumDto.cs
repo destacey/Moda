@@ -1,4 +1,5 @@
 ﻿namespace Moda.Common.Application.Models;
+
 public record CommonEnumDto
 {
     public int Id { get; set; }

@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using Moda.Work.Domain.Tests.Data;
 using Xunit;
 
@@ -34,7 +34,7 @@ public class FakeWorkDbContextExamples
         // Arrange
         using var context = new FakeWorkDbContext();
         var workspace = new WorkspaceFaker().AsExternal().Generate();
-        
+
         context.AddWorkspace(workspace);
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
         context.SaveChangesCallCount.Should().Be(1);
@@ -53,7 +53,7 @@ public class FakeWorkDbContextExamples
         // Arrange
         var context = new FakeWorkDbContext();
         var workspace = new WorkspaceFaker().AsExternal().Generate();
-        
+
         context.AddWorkspace(workspace);
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
@@ -69,7 +69,7 @@ public class FakeWorkDbContextExamples
     {
         // Arrange & Act
         FakeWorkDbContext? capturedContext = null;
-        
+
         using (var context = new FakeWorkDbContext())
         {
             var workspace = new WorkspaceFaker().AsExternal().Generate();

@@ -1,4 +1,4 @@
-using Moda.Tests.Shared.Data;
+﻿using Moda.Tests.Shared.Data;
 using Moda.Tests.Shared.Extensions;
 using Moda.Work.Domain.Models;
 
@@ -17,7 +17,7 @@ public class WorkProcessSchemeFaker : PrivateConstructorFaker<WorkProcessScheme>
         RuleFor(x => x.Id, f => f.Random.Guid());
         RuleFor(x => x.WorkProcessId, f => f.Random.Guid());
         RuleFor(x => x.IsActive, true);
-        
+
         // Set navigation properties after construction using stored references
         FinishWith((f, scheme) =>
         {

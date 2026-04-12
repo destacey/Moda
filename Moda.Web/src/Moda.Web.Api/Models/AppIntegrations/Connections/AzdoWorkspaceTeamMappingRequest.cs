@@ -37,7 +37,7 @@ public sealed class AzdoWorkspaceTeamMappingRequestValidator : CustomValidator<A
         RuleFor(t => t.TeamId)
             .NotEmpty();
 
-        When(t => t.InternalTeamId.HasValue, 
+        When(t => t.InternalTeamId.HasValue,
             () => RuleFor(t => t.InternalTeamId)
                 .NotEmpty());
     }

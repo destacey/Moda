@@ -4,6 +4,7 @@ using Moda.Planning.Domain.Models.Roadmaps;
 using Moda.Tests.Shared.Data;
 
 namespace Moda.Planning.Domain.Tests.Data;
+
 public class RoadmapActivityFaker : PrivateConstructorFaker<RoadmapActivity>
 {
     public RoadmapActivityFaker(Guid? roadmapId = null, LocalDate? localDate = null)
@@ -17,7 +18,7 @@ public class RoadmapActivityFaker : PrivateConstructorFaker<RoadmapActivity>
         RuleFor(x => x.DateRange, f => new LocalDateRange(BaseDate, BaseDate.PlusDays(10)));
         RuleFor(x => x.Color, f => string.Format("#{0:X6}", f.Random.Hexadecimal(0x1000000)));
         RuleFor(x => x.ParentId, f => null);
-        RuleFor(x => x.Order, f => f.Random.Int(1,1000));
+        RuleFor(x => x.Order, f => f.Random.Int(1, 1000));
     }
 
     public LocalDate BaseDate { get; }
@@ -33,7 +34,8 @@ public static class RoadmapActivityFakerExtensions
         if (!string.IsNullOrWhiteSpace(description)) { faker.RuleFor(x => x.Description, description); }
         if (dateRange is not null) { faker.RuleFor(x => x.DateRange, dateRange); }
         if (parentId.HasValue && parent is null) { faker.RuleFor(x => x.ParentId, parentId); }
-        if (parent is not null) {
+        if (parent is not null)
+        {
             faker.RuleFor(x => x.ParentId, parent.Id);
             faker.RuleFor(x => x.Parent, parent);
         }

@@ -2,6 +2,7 @@
 using Moda.Planning.Domain.Enums;
 
 namespace Moda.Planning.Application.Risks.Queries;
+
 public sealed record GetMyRisksQuery() : IQuery<IReadOnlyList<RiskListDto>>;
 
 internal sealed class GetMyRisksQueryHandler : IQueryHandler<GetMyRisksQuery, IReadOnlyList<RiskListDto>>

@@ -2,6 +2,7 @@
 using Moda.Work.Application.WorkItems.Dtos;
 
 namespace Moda.Work.Application.WorkItems.Queries;
+
 public sealed record SearchWorkItemsQuery(string SearchTerm, int Top) : IQuery<Result<IReadOnlyCollection<WorkItemListDto>>>;
 
 internal sealed class SearchWorkItemsQueryHandler(IWorkDbContext workDbContext, ILogger<SearchWorkItemsQueryHandler> logger) : IQueryHandler<SearchWorkItemsQuery, Result<IReadOnlyCollection<WorkItemListDto>>>
@@ -21,7 +22,7 @@ internal sealed class SearchWorkItemsQueryHandler(IWorkDbContext workDbContext, 
 
         var workitems = await _workDbContext.WorkItems
             .Where(e => e.Title.Contains(request.SearchTerm)
-                || ((string)e.Key).Contains(request.SearchTerm) 
+                || ((string)e.Key).Contains(request.SearchTerm)
                 || (e.ParentId.HasValue && ((string)e.Parent!.Key).Contains(request.SearchTerm)))
             .ProjectToType<WorkItemListDto>()
             .ToArrayAsync(cancellationToken);

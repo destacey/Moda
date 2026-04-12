@@ -2,6 +2,7 @@
 using Moda.Common.Application.Validators;
 
 namespace Moda.Common.Application.Requests.WorkManagement.Commands;
+
 public sealed record UpdateExternalWorkflowCommand(Guid WorkflowId, string Name, string? Description, IExternalWorkTypeWorkflow ExternalWorkTypeWorkflow) : ICommand, ILongRunningRequest;
 
 public sealed class UpdateExternalWorkflowCommandValidator : CustomValidator<UpdateExternalWorkflowCommand>

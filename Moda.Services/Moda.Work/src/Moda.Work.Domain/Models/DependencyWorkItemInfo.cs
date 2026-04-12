@@ -4,6 +4,7 @@ using Moda.Common.Domain.Enums.Work;
 using NodaTime;
 
 namespace Moda.Work.Domain.Models;
+
 public sealed record DependencyWorkItemInfo
 {
     public Guid WorkItemId { get; set; }
@@ -26,8 +27,8 @@ public sealed record DependencyWorkItemInfo
     public static DependencyWorkItemInfo Create(WorkItem workItem, Instant? now = null)
     {
         Instant? plannedOn = null;
-        if (workItem.Iteration != null 
-            && workItem.Iteration.Type == IterationType.Sprint 
+        if (workItem.Iteration != null
+            && workItem.Iteration.Type == IterationType.Sprint
             && workItem.Iteration.State != IterationState.Completed
             && (!now.HasValue || workItem.Iteration.DateRange.End > now.Value))
         {

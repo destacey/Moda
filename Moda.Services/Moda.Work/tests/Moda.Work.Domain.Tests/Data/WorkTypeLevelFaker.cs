@@ -4,6 +4,7 @@ using Moda.Tests.Shared.Data;
 using Moda.Work.Domain.Models;
 
 namespace Moda.Work.Domain.Tests.Data;
+
 public class WorkTypeLevelFaker : PrivateConstructorFaker<WorkTypeLevel>
 {
     public WorkTypeLevelFaker()

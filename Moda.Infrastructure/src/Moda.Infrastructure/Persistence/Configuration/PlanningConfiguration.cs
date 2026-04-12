@@ -24,7 +24,7 @@ public class PlanningTeamConfig : IEntityTypeConfiguration<PlanningTeam>
         builder.HasKey(t => t.Id);
         builder.HasAlternateKey(t => t.Key);
 
-        builder.HasIndex(t => t.Id )
+        builder.HasIndex(t => t.Id)
             .IncludeProperties(t => new { t.Key, t.Name, t.Code, t.Type, t.IsActive });
         builder.HasIndex(t => t.Key)
             .IncludeProperties(t => new { t.Id, t.Name, t.Code, t.Type, t.IsActive });
@@ -243,7 +243,7 @@ public class RiskConfig : IEntityTypeConfiguration<Risk>
             .HasFilter("[IsDeleted] = 0");
         builder.HasIndex(r => new { r.Key, r.IsDeleted })
             .HasFilter("[IsDeleted] = 0");
-        builder.HasIndex(r => new {r.AssigneeId, r.IsDeleted})
+        builder.HasIndex(r => new { r.AssigneeId, r.IsDeleted })
             .HasFilter("[IsDeleted] = 0");
         builder.HasIndex(r => new { r.TeamId, r.IsDeleted })
             .HasFilter("[IsDeleted] = 0");

@@ -1,6 +1,7 @@
 ﻿using Moda.Common.Application.Models;
 
 namespace Moda.Planning.Application.PlanningIntervals.Commands;
+
 public sealed record CreatePlanningIntervalCommand(string Name, string? Description, LocalDateRange DateRange, int IterationWeeks, string? IterationPrefix) : ICommand<ObjectIdAndKey>;
 
 public sealed class CreatePlanningIntervalCommandValidator : CustomValidator<CreatePlanningIntervalCommand>

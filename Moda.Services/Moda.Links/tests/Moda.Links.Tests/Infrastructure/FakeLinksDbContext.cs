@@ -16,7 +16,7 @@ public class FakeLinksDbContext : ILinksDbContext, IDisposable
 {
     // Links domain entities
     private readonly List<Link> _links = [];
-    
+
     // Common domain entities
     private readonly List<Employee> _employees = [];
     private readonly List<ExternalEmployeeBlacklistItem> _externalEmployeeBlacklistItems = [];
@@ -32,7 +32,7 @@ public class FakeLinksDbContext : ILinksDbContext, IDisposable
 
     // ChangeTracker - we can't create a real one, so we return null and the handler uses defensive coding
     public ChangeTracker ChangeTracker => null!;
-    
+
     public DatabaseFacade Database => throw new NotImplementedException("Database operations are not supported in FakeLinksDbContext. Use integration tests with a real DbContext for database-specific functionality.");
 
     /// <summary>
@@ -65,7 +65,7 @@ public class FakeLinksDbContext : ILinksDbContext, IDisposable
     // Link
     public void AddLink(Link link) => _links.Add(link);
     public void AddLinks(IEnumerable<Link> links) => _links.AddRange(links);
-    
+
     // Employee
     public void AddEmployee(Employee employee) => _employees.Add(employee);
     public void AddEmployees(IEnumerable<Employee> employees) => _employees.AddRange(employees);

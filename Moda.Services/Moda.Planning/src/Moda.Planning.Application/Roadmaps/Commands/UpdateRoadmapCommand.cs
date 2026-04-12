@@ -2,6 +2,7 @@
 using Moda.Common.Domain.Enums;
 
 namespace Moda.Planning.Application.Roadmaps.Commands;
+
 public sealed record UpdateRoadmapCommand(Guid Id, string Name, string? Description, LocalDateRange DateRange, List<Guid> RoadmapManagerIds, Visibility Visibility) : ICommand;
 
 public sealed class UpdateRoadmapCommandValidator : AbstractValidator<UpdateRoadmapCommand>
@@ -39,7 +40,7 @@ public sealed class UpdateRoadmapCommandValidator : AbstractValidator<UpdateRoad
     public bool IncludeCurrentUser(IEnumerable<Guid> roadmapManagerIds)
     {
         var employeeId = Guard.Against.NullOrEmpty(_currentUser.GetEmployeeId());
-        return  roadmapManagerIds.Contains(employeeId);
+        return roadmapManagerIds.Contains(employeeId);
     }
 }
 

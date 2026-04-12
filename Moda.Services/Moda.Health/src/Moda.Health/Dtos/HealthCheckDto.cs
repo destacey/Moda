@@ -4,6 +4,7 @@ using Moda.Health.Models;
 using NodaTime;
 
 namespace Moda.Health.Dtos;
+
 public sealed record HealthCheckDto : IMapFrom<HealthCheck>
 {
     /// <summary>

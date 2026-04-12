@@ -4,6 +4,7 @@ using Moda.Common.Domain.Employees;
 using Moda.Common.Models;
 
 namespace Moda.Common.Application.Employees.Commands;
+
 public sealed record CreateEmployeeCommand : ICommand<ObjectIdAndKey>
 {
     public CreateEmployeeCommand(PersonName name, string employeeNumber, Instant? hireDate, EmailAddress email, string? jobTitle, string? department, string? officeLocation, Guid? managerId)

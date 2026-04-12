@@ -18,7 +18,7 @@ public class FakeStrategicManagementDbContext : IStrategicManagementDbContext, I
     private readonly List<Strategy> _strategies = [];
     private readonly List<StrategicTheme> _strategicThemes = [];
     private readonly List<Vision> _visions = [];
-    
+
     // Common domain entities
     private readonly List<Employee> _employees = [];
     private readonly List<ExternalEmployeeBlacklistItem> _externalEmployeeBlacklistItems = [];
@@ -36,7 +36,7 @@ public class FakeStrategicManagementDbContext : IStrategicManagementDbContext, I
 
     // ChangeTracker - we can't create a real one, so we return null and the handler uses defensive coding
     public ChangeTracker ChangeTracker => null!;
-    
+
     public DatabaseFacade Database => throw new NotImplementedException("Database operations are not supported in FakeStrategicManagementDbContext. Use integration tests with a real DbContext for database-specific functionality.");
 
     /// <summary>
@@ -70,15 +70,15 @@ public class FakeStrategicManagementDbContext : IStrategicManagementDbContext, I
     // Strategy
     public void AddStrategy(Strategy strategy) => _strategies.Add(strategy);
     public void AddStrategies(IEnumerable<Strategy> strategies) => _strategies.AddRange(strategies);
-    
+
     // StrategicTheme
     public void AddStrategicTheme(StrategicTheme theme) => _strategicThemes.Add(theme);
     public void AddStrategicThemes(IEnumerable<StrategicTheme> themes) => _strategicThemes.AddRange(themes);
-    
+
     // Vision
     public void AddVision(Vision vision) => _visions.Add(vision);
     public void AddVisions(IEnumerable<Vision> visions) => _visions.AddRange(visions);
-    
+
     // Employee
     public void AddEmployee(Employee employee) => _employees.Add(employee);
     public void AddEmployees(IEnumerable<Employee> employees) => _employees.AddRange(employees);

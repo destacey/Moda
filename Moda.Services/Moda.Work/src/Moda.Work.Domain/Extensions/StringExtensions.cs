@@ -2,6 +2,7 @@
 using Moda.Work.Domain.Models;
 
 namespace Moda.Work.Domain.Extensions;
+
 public static class StringExtensions
 {
 

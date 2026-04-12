@@ -2,6 +2,7 @@
 using Moda.Common.Domain.Models.Planning.Iterations;
 
 namespace Moda.Common.Domain.Interfaces.Planning.Iterations;
+
 public interface ISimpleIteration
 {
     Guid Id { get; }

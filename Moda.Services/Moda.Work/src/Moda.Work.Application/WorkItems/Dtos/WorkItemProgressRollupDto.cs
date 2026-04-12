@@ -24,7 +24,7 @@ public record WorkItemProgressRollupDto
 
     public static WorkItemProgressRollupDto CreateEmpty()
     {
-        return Create(0,0,0);
+        return Create(0, 0, 0);
     }
 
     public static WorkItemProgressRollupDto Create(List<WorkItemProgressStateDto> workItems)

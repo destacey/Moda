@@ -8,7 +8,7 @@ public class CurrentUser(IHttpContextAccessor httpContextAccessor, IServiceProvi
 {
     private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
     private readonly IServiceProvider _serviceProvider = serviceProvider;
-    
+
     private ClaimsPrincipal? _user;
     private string _userId = string.Empty;
 

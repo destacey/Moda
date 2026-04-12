@@ -5,6 +5,7 @@ using Moda.Common.Domain.Models;
 using Moda.Common.Extensions;
 
 namespace Moda.AppIntegration.Domain.Models;
+
 public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsConnectionConfiguration>, ISyncableConnection
 {
     private string? _systemId;
@@ -132,7 +133,7 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
                 if (TeamConfiguration?.WorkspaceTeams.Any(t => t.WorkspaceId == workspace.ExternalId) == true)
                 {
                     var removeTeamsResult = TeamConfiguration.RemoveTeamsForWorkspace(workspace.ExternalId);
-                    if (removeTeamsResult.IsFailure) 
+                    if (removeTeamsResult.IsFailure)
                         return removeTeamsResult;
                 }
 
@@ -151,7 +152,7 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
                         || existing.WorkProcessId != workspace.WorkProcessId)
                     {
                         var result = existing.Update(workspace.Name, workspace.Description, workspace.WorkProcessId);
-                        if (result.IsFailure) 
+                        if (result.IsFailure)
                             return result;
 
                         hasChanges = true;
@@ -260,7 +261,7 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
                 .Select(t => t.TeamId)
                 .ToArray();
 
-            if (teamsToRemove.Length >0)
+            if (teamsToRemove.Length > 0)
             {
                 var removeResult = TeamConfiguration.RemoveTeams(teamsToRemove);
                 if (removeResult.IsFailure)

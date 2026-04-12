@@ -9,7 +9,7 @@ public sealed class DeleteExpenditureCategoryCommandValidator : AbstractValidato
     public DeleteExpenditureCategoryCommandValidator()
     {
         RuleFor(x => x.Id)
-            .GreaterThan(0);    
+            .GreaterThan(0);
     }
 }
 
@@ -34,7 +34,7 @@ internal sealed class DeleteExpenditureCategoryCommandHandler(
                 return Result.Failure("Expenditure Category not found.");
             }
 
-            if(!expenditureCategory.CanBeDeleted())
+            if (!expenditureCategory.CanBeDeleted())
             {
                 _logger.LogInformation("Expenditure Category {ExpenditureCategoryId} cannot be deleted.", request.Id);
                 return Result.Failure("Expenditure Category cannot be deleted.");

@@ -4,6 +4,7 @@ using Moda.Work.Application.Persistence;
 using Moda.Work.Application.WorkItems.Dtos;
 
 namespace Moda.Work.Application.WorkItems.Queries;
+
 public sealed record GetWorkItemMetricsQuery : IQuery<Result<IReadOnlyCollection<WorkItemProgressDailyRollupDto>>>
 {
     public GetWorkItemMetricsQuery(Guid workspaceId, WorkItemKey workItemKey)
@@ -54,7 +55,7 @@ internal sealed class GetWorkItemMetricsQueryHandler(IWorkDbContext workDbContex
         var workItem = await query
             .Select(w => new { w.Id, w.Created, w.DoneTimestamp, w.Type.Level!.Tier })
             .FirstOrDefaultAsync(cancellationToken);
-        if (workItem is null) 
+        if (workItem is null)
         {
             _logger.LogError("{AppRequestName}: Work item not found. {@Request}", AppRequestName, request);
             return Result.Failure<IReadOnlyCollection<WorkItemProgressDailyRollupDto>>("Work item not found.");
@@ -77,9 +78,9 @@ internal sealed class GetWorkItemMetricsQueryHandler(IWorkDbContext workDbContex
             if (end < latestChildDone)
             {
                 end = latestChildDone;
-            }            
+            }
         }
 
         return WorkItemProgressDailyRollupDto.CreateList(start, end, progress);
-    }    
+    }
 }

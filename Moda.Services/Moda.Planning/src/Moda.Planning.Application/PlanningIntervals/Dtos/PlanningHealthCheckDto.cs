@@ -1,6 +1,7 @@
 ﻿using Moda.Common.Application.Dtos;
 
 namespace Moda.Planning.Application.PlanningIntervals.Dtos;
+
 public sealed record PlanningHealthCheckDto
 {
     /// <summary>

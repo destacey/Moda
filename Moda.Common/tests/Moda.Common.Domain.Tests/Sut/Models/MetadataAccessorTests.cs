@@ -1,6 +1,7 @@
 ﻿using Moda.Common.Domain.Models;
 
 namespace Moda.Common.Domain.Tests.Sut.Models;
+
 public class MetadataAccessorTests
 {
     [Fact]

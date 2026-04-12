@@ -6,6 +6,7 @@ using NodaTime;
 using NodaTime.Extensions;
 
 namespace Moda.Work.Domain.Tests.Data;
+
 public class WorkItemFaker : PrivateConstructorFaker<WorkItem>
 {
     public WorkItemFaker(Guid? workspaceId = null)
@@ -41,7 +42,7 @@ public class WorkItemFaker : PrivateConstructorFaker<WorkItem>
             else
             {
                 activatedTimestamp = doneTimestamp = created.Plus(Duration.FromDays(FakerHub.Random.Int(1, 10)));
-            }            
+            }
         }
 
         RuleFor(x => x.Id, f => f.Random.Guid());

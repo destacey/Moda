@@ -20,7 +20,7 @@ internal sealed class TeamHasEverBeenScrumQueryHandler(IOrganizationDbContext or
         if (!teamExists)
             return null;
 
-            // Query through Team aggregate
+        // Query through Team aggregate
         return await _organizationDbContext.Teams
             .Where(t => t.Id == request.TeamId)
             .SelectMany(t => t.OperatingModels)

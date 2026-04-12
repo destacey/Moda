@@ -12,7 +12,7 @@ public sealed class ArchiveExpenditureCategoryCommandValidator : AbstractValidat
 }
 
 internal sealed class ArchiveExpenditureCategoryCommandHandler(
-    IProjectPortfolioManagementDbContext projectPortfolioManagementDbContext, 
+    IProjectPortfolioManagementDbContext projectPortfolioManagementDbContext,
     ILogger<ArchiveExpenditureCategoryCommandHandler> logger)
     : ICommandHandler<ArchiveExpenditureCategoryCommand>
 {

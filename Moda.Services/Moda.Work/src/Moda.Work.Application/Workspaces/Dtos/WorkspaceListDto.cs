@@ -1,6 +1,7 @@
 ﻿using Moda.Common.Application.Dtos;
 
 namespace Moda.Work.Application.Workspaces.Dtos;
+
 public sealed record WorkspaceListDto : IMapFrom<Workspace>
 {
     public Guid Id { get; set; }

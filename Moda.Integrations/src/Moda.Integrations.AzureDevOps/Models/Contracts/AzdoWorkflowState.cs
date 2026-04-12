@@ -2,6 +2,7 @@
 using Moda.Common.Domain.Enums.Work;
 
 namespace Moda.Integrations.AzureDevOps.Models.Contracts;
+
 public sealed record AzdoWorkflowState : IExternalWorkflowState
 {
     public required string StatusName { get; set; }

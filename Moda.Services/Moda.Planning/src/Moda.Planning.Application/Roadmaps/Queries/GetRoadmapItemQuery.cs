@@ -6,6 +6,7 @@ using Moda.Planning.Application.Roadmaps.Dtos;
 using Moda.Planning.Domain.Models.Roadmaps;
 
 namespace Moda.Planning.Application.Roadmaps.Queries;
+
 public sealed record GetRoadmapItemQuery : IQuery<RoadmapItemDetailsDto?>
 {
     public GetRoadmapItemQuery(IdOrKey roadmapIdOrKey, Guid itemId)
@@ -35,7 +36,8 @@ internal sealed class GetRoadmapItemQueryHandler(IPlanningDbContext planningDbCo
             .Where(r => r.Id == request.ItemId)
             .FirstOrDefaultAsync(cancellationToken);
 
-        if (item == null) {
+        if (item == null)
+        {
             return null;
         }
 

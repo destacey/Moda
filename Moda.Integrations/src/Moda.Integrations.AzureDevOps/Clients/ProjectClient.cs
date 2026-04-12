@@ -4,6 +4,7 @@ using Moda.Integrations.AzureDevOps.Models.Projects;
 using RestSharp;
 
 namespace Moda.Integrations.AzureDevOps.Clients;
+
 internal sealed class ProjectClient : BaseClient
 {
     internal ProjectClient(string organizationUrl, string token, string apiVersion)

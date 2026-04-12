@@ -19,7 +19,7 @@ public class TeamFaker : PrivateConstructorFaker<Team>
         RuleFor(x => x.Description, f => f.Random.Words(5));
         RuleFor(x => x.Type, f => TeamType.Team);
         RuleFor(x => x.ActiveDate, f => activeDate);
-        RuleFor(x => x.IsActive, f => true);        
+        RuleFor(x => x.IsActive, f => true);
     }
 }
 

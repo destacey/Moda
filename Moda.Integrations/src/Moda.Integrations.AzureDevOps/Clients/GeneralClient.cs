@@ -2,6 +2,7 @@
 using RestSharp;
 
 namespace Moda.Integrations.AzureDevOps.Clients;
+
 internal sealed class GeneralClient : BaseClient
 {
     internal GeneralClient(string organizationUrl, string token, string apiVersion)

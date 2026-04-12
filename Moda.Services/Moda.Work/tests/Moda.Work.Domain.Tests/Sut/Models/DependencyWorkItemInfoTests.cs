@@ -1,4 +1,4 @@
-using Moda.Common.Domain.Enums.Planning;
+﻿using Moda.Common.Domain.Enums.Planning;
 using Moda.Common.Domain.Enums.Work;
 using Moda.Tests.Shared;
 using Moda.Work.Domain.Models;
@@ -42,7 +42,7 @@ public class DependencyWorkItemInfoTests
         // Arrange
         var now = _dateTimeProvider.Now;
         var iteration = _workIterationFaker.WithEndDate(now.Plus(Duration.FromDays(5)), IterationState.Active, IterationType.Sprint).Generate();
-        
+
         var workItem = _workItemFaker.WithData(statusCategory: WorkStatusCategory.Active, iterationId: iteration.Id).Generate();
         workItem.Iteration = iteration;
 
@@ -62,7 +62,7 @@ public class DependencyWorkItemInfoTests
         // Arrange
         var now = _dateTimeProvider.Now;
         var iteration = _workIterationFaker.WithEndDate(now.Plus(Duration.FromDays(5)), IterationState.Active, IterationType.Iteration).Generate();
-        
+
         var workItem = _workItemFaker.WithData(statusCategory: WorkStatusCategory.Active, iterationId: iteration.Id).Generate();
         workItem.Iteration = iteration;
 
@@ -82,7 +82,7 @@ public class DependencyWorkItemInfoTests
         // Arrange
         var now = _dateTimeProvider.Now;
         var iteration = _workIterationFaker.WithEndDate(now.Plus(Duration.FromDays(5)), IterationState.Completed, IterationType.Sprint).Generate();
-        
+
         var workItem = _workItemFaker.WithData(statusCategory: WorkStatusCategory.Active, iterationId: iteration.Id).Generate();
         workItem.Iteration = iteration;
 
@@ -102,7 +102,7 @@ public class DependencyWorkItemInfoTests
         // Arrange
         var now = _dateTimeProvider.Now;
         var iteration = _workIterationFaker.WithEndDate(now.Minus(Duration.FromDays(5)), IterationState.Active, IterationType.Sprint).Generate();
-        
+
         var workItem = _workItemFaker.WithData(statusCategory: WorkStatusCategory.Active, iterationId: iteration.Id).Generate();
         workItem.Iteration = iteration;
 
@@ -122,7 +122,7 @@ public class DependencyWorkItemInfoTests
         // Arrange
         var now = _dateTimeProvider.Now;
         var iteration = _workIterationFaker.WithEndDate(now, IterationState.Active, IterationType.Sprint).Generate();
-        
+
         var workItem = _workItemFaker.WithData(statusCategory: WorkStatusCategory.Active, iterationId: iteration.Id).Generate();
         workItem.Iteration = iteration;
 
@@ -142,7 +142,7 @@ public class DependencyWorkItemInfoTests
         // Arrange
         var now = _dateTimeProvider.Now;
         var iteration = _workIterationFaker.WithEndDate(now.Plus(Duration.FromDays(1)), IterationState.Future, IterationType.Sprint).Generate();
-        
+
         var workItem = _workItemFaker.WithData(statusCategory: WorkStatusCategory.Active, iterationId: iteration.Id).Generate();
         workItem.Iteration = iteration;
 
@@ -162,7 +162,7 @@ public class DependencyWorkItemInfoTests
         // Arrange
         var now = _dateTimeProvider.Now;
         var iteration = _workIterationFaker.WithEndDate(now.Minus(Duration.FromDays(5)), IterationState.Active, IterationType.Sprint).Generate();
-        
+
         var workItem = _workItemFaker.WithData(statusCategory: WorkStatusCategory.Active, iterationId: iteration.Id).Generate();
         workItem.Iteration = iteration;
 
@@ -199,7 +199,7 @@ public class DependencyWorkItemInfoTests
         // Arrange
         var now = _dateTimeProvider.Now;
         var iteration = _workIterationFaker.WithEndDate(now.Plus(Duration.FromDays(7)), IterationState.Active, IterationType.Sprint).Generate();
-        
+
         var workItem = _workItemFaker.WithData(statusCategory: WorkStatusCategory.Active, iterationId: iteration.Id).Generate();
         workItem.Iteration = iteration;
 
@@ -217,7 +217,7 @@ public class DependencyWorkItemInfoTests
         // Arrange - Create a completed, past, non-sprint iteration (all filters should exclude it)
         var now = _dateTimeProvider.Now;
         var iteration = _workIterationFaker.WithEndDate(now.Minus(Duration.FromDays(5)), IterationState.Completed, IterationType.Iteration).Generate();
-        
+
         var workItem = _workItemFaker.WithData(statusCategory: WorkStatusCategory.Active, iterationId: iteration.Id).Generate();
         workItem.Iteration = iteration;
 

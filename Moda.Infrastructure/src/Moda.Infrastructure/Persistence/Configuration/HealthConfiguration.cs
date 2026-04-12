@@ -5,6 +5,7 @@ using Moda.Health.Models;
 using Moda.Infrastructure.Persistence.Converters;
 
 namespace Moda.Infrastructure.Persistence.Configuration;
+
 public class HealthCheckConfiguration : IEntityTypeConfiguration<HealthCheck>
 {
     public void Configure(EntityTypeBuilder<HealthCheck> builder)

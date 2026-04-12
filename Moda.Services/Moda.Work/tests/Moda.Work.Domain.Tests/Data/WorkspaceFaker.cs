@@ -1,4 +1,4 @@
-using Moda.Common.Domain.Enums.AppIntegrations;
+﻿using Moda.Common.Domain.Enums.AppIntegrations;
 using Moda.Common.Domain.Models;
 using Moda.Common.Models;
 using Moda.Tests.Shared.Data;
@@ -36,7 +36,7 @@ public static class WorkspaceFakerExtensions
             var actualExternalId = externalId ?? f.Random.Guid().ToString();
             return OwnershipInfo.CreateExternalOwned(connector, actualSystemId, actualExternalId);
         });
-        
+
         if (externalViewWorkItemUrlTemplate != null)
         {
             faker.RuleFor(x => x.ExternalViewWorkItemUrlTemplate, externalViewWorkItemUrlTemplate);

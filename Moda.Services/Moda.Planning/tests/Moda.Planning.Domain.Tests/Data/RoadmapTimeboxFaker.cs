@@ -3,6 +3,7 @@ using Moda.Planning.Domain.Models.Roadmaps;
 using Moda.Tests.Shared.Data;
 
 namespace Moda.Planning.Domain.Tests.Data;
+
 public class RoadmapTimeboxFaker : PrivateConstructorFaker<RoadmapTimebox>
 {
     public RoadmapTimeboxFaker(Guid? roadmapId = null, LocalDate? localDate = null)
@@ -31,7 +32,8 @@ public static class RoadmapTimeboxFakerExtensions
         if (!string.IsNullOrWhiteSpace(description)) { faker.RuleFor(x => x.Description, description); }
         if (dateRange is not null) { faker.RuleFor(x => x.DateRange, dateRange); }
         if (parentId.HasValue && parent is null) { faker.RuleFor(x => x.ParentId, parentId); }
-        if (parent is not null) {
+        if (parent is not null)
+        {
             faker.RuleFor(x => x.ParentId, parent.Id);
             faker.RuleFor(x => x.Parent, parent);
         }

@@ -1,6 +1,7 @@
 ﻿using Mapster;
 
 namespace Moda.AppIntegration.Application.Connections.Dtos.AzureDevOps;
+
 public sealed record AzureDevOpsTeamConfigurationDto : IMapFrom<AzureDevOpsBoardsTeamConfiguration>
 {
     /// <summary>

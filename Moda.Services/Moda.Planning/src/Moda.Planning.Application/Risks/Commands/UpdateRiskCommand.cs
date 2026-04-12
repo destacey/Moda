@@ -1,6 +1,7 @@
 ﻿using Moda.Planning.Domain.Enums;
 
 namespace Moda.Planning.Application.Risks.Commands;
+
 public sealed record UpdateRiskCommand(Guid Id, string Summary, string? Description, Guid TeamId,
     RiskStatus Status, RiskCategory Category, RiskGrade Impact, RiskGrade Likelihood, Guid? AssigneeId,
     LocalDate? FollowUpDate, string? Response) : ICommand<int>;

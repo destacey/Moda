@@ -20,7 +20,7 @@ public class StrategicInitiativeFaker : PrivateConstructorFaker<StrategicInitiat
         RuleFor(x => x.Name, f => f.Commerce.ProductName());
         RuleFor(x => x.Description, f => f.Lorem.Paragraph());
         RuleFor(x => x.Status, f => StrategicInitiativeStatus.Proposed);
-        RuleFor(x => x.DateRange, f => new LocalDateRange(start, end)); 
+        RuleFor(x => x.DateRange, f => new LocalDateRange(start, end));
         RuleFor(x => x.PortfolioId, f => f.Random.Guid());
     }
 }
@@ -78,11 +78,11 @@ public static class StrategicInitiativeFakerExtensions
     /// <returns></returns>
     public static StrategicInitiative AsProposed(
         this StrategicInitiativeFaker faker,
-        TestingDateTimeProvider dateTimeProvider, 
+        TestingDateTimeProvider dateTimeProvider,
         Guid? portfolioId = null)
-    { 
+    {
         var start = dateTimeProvider.Now.Plus(Duration.FromDays(10)).InUtc().LocalDateTime.Date;
-    var end = start.PlusDays(200);
+        var end = start.PlusDays(200);
 
         return faker.WithData(
             status: StrategicInitiativeStatus.Proposed,
@@ -122,9 +122,9 @@ public static class StrategicInitiativeFakerExtensions
     /// <returns></returns>
     public static StrategicInitiative AsActive(
         this StrategicInitiativeFaker faker,
-        TestingDateTimeProvider dateTimeProvider, 
+        TestingDateTimeProvider dateTimeProvider,
         Guid? portfolioId = null)
-    { 
+    {
         var start = dateTimeProvider.Now.Plus(Duration.FromDays(-10)).InUtc().LocalDateTime.Date;
         var end = start.PlusDays(200);
 

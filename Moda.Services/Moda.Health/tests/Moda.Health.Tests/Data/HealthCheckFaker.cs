@@ -1,6 +1,7 @@
 ﻿using Moda.Tests.Shared.Data;
 
 namespace Moda.Health.Tests.Data;
+
 public class HealthCheckFaker : PrivateConstructorFaker<HealthCheck>
 {
     public HealthCheckFaker(Instant timestamp, Guid? objectId = null)

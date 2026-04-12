@@ -67,7 +67,7 @@ public static class IdOrKeyExtensions
     /// <returns></returns>
     public static Expression<Func<T, bool>> CreateFilter<T>(this IdOrKey idOrKey) where T : IHasIdAndKey
     {
-        return idOrKey.Match<Expression<Func<T,bool>>>(
+        return idOrKey.Match<Expression<Func<T, bool>>>(
             id => (x => x.Id == id),
             key => (x => x.Key == key)
         );

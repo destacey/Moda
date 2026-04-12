@@ -5,6 +5,7 @@ using Moda.Planning.Application.Iterations.Dtos;
 using Moda.Planning.Domain.Models.Iterations;
 
 namespace Moda.Planning.Application.Iterations.Queries;
+
 public sealed record GetSprintQuery : IQuery<SprintDetailsDto?>
 {
     public GetSprintQuery(IdOrKey idOrKey)

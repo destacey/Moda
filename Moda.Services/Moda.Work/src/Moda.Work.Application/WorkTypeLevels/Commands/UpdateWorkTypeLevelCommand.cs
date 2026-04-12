@@ -1,6 +1,7 @@
 ﻿using Moda.Work.Application.Persistence;
 
 namespace Moda.Work.Application.WorkTypeLevels.Commands;
+
 public sealed record UpdateWorkTypeLevelCommand : ICommand
 {
     public UpdateWorkTypeLevelCommand(int id, string name, string? description)

@@ -3,6 +3,7 @@ using Moda.Common.Application.Models;
 using Moda.Planning.Application.Risks.Dtos;
 
 namespace Moda.Planning.Application.Risks.Queries;
+
 public sealed record GetRiskQuery : IQuery<RiskDetailsDto?>
 {
     public GetRiskQuery(IdOrKey idOrKey)

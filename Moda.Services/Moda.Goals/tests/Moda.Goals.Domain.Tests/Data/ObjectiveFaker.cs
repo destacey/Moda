@@ -1,6 +1,7 @@
 ﻿using Moda.Common.Domain.Enums.Goals;
 
 namespace Moda.Goals.Domain.Tests.Data;
+
 public class ObjectiveFaker : Faker<Objective>
 {
     public ObjectiveFaker(ObjectiveType type, ObjectiveStatus status, Guid? ownerId, Guid? planId, LocalDate? start, LocalDate? end)

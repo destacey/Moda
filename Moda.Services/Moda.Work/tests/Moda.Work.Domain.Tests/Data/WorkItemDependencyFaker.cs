@@ -5,6 +5,7 @@ using NodaTime;
 using NodaTime.Extensions;
 
 namespace Moda.Work.Domain.Tests.Data;
+
 public class WorkItemDependencyFaker : PrivateConstructorFaker<WorkItemDependency>
 {
     public WorkItemDependencyFaker(Instant now)
@@ -35,15 +36,15 @@ public static class WorkItemDependencyFakerExtensions
 {
     public static WorkItemDependencyFaker WithData(this WorkItemDependencyFaker faker, WorkItem? source = null, WorkItem? target = null, Instant? sourcePlannedOn = null, Instant? targetPlannedOn = null, Instant? createdOn = null, Guid? createdById = null, string? comment = null)
     {
-        if (source != null) 
-        { 
-            faker.RuleFor(x => x.SourceId, source.Id); 
+        if (source != null)
+        {
+            faker.RuleFor(x => x.SourceId, source.Id);
             faker.RuleFor(x => x.Source, source);
             faker.RuleFor(x => x.SourceStatusCategory, source.StatusCategory);
         }
-        if (target != null) 
-        { 
-            faker.RuleFor(x => x.TargetId, target.Id); 
+        if (target != null)
+        {
+            faker.RuleFor(x => x.TargetId, target.Id);
             faker.RuleFor(x => x.Target, target);
             faker.RuleFor(x => x.TargetStatusCategory, target.StatusCategory);
         }

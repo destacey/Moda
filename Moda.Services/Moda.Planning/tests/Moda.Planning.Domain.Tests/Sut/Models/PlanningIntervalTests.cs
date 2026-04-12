@@ -9,6 +9,7 @@ using NodaTime.Extensions;
 using NodaTime.Testing;
 
 namespace Moda.Planning.Domain.Tests.Sut.Models;
+
 public class PlanningIntervalTests
 {
     private readonly TestingDateTimeProvider _dateTimeProvider;
@@ -814,14 +815,14 @@ public class PlanningIntervalTests
 
         // Map first sprint successfully
         sut.MapSprintToIteration(iterationId, sprint1);
-        
+
         // Set up Sprint navigation property (simulates EF Core loading)
         foreach (var mapping in sut.IterationSprints)
         {
             if (mapping.SprintId == sprint1.Id)
                 mapping.SetPrivate(m => m.Sprint, sprint1);
         }
-        
+
         sut.IterationSprints.Should().HaveCount(1);
         sut.IterationSprints.First().SprintId.Should().Be(sprint1.Id);
 

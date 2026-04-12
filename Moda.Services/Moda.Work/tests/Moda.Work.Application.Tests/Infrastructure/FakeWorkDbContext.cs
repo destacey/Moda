@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Moda.Common.Domain.Employees;
@@ -29,7 +29,7 @@ public class FakeWorkDbContext : IWorkDbContext, IDisposable
     private readonly List<WorkItemReference> _workItemReferences = [];
     private readonly List<WorkItemHierarchy> _workItemHierarchies = [];
     private readonly List<WorkItemDependency> _workItemDependencies = [];
-    
+
     // Common domain entities
     private readonly List<Employee> _employees = [];
     private readonly List<ExternalEmployeeBlacklistItem> _externalEmployeeBlacklistItems = [];
@@ -57,7 +57,7 @@ public class FakeWorkDbContext : IWorkDbContext, IDisposable
 
     // ChangeTracker - we can't create a real one, so we return null and the handler uses defensive coding (_workDbContext.ChangeTracker?.Clear())
     public ChangeTracker ChangeTracker => null!;
-    
+
     public DatabaseFacade Database => throw new NotImplementedException("Database operations are not supported in FakeWorkDbContext. Use integration tests with a real DbContext for database-specific functionality.");
 
     /// <summary>
@@ -69,7 +69,7 @@ public class FakeWorkDbContext : IWorkDbContext, IDisposable
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         SaveChangesCallCount++;
-        
+
         // Return the total number of entities as a simple success indicator
         var count = _workspaces.Count + _workProcesses.Count + _workItems.Count +
                     _workTypes.Count + _workStatuses.Count + _workflows.Count +
@@ -97,43 +97,43 @@ public class FakeWorkDbContext : IWorkDbContext, IDisposable
     // Workspace
     public void AddWorkspace(Workspace workspace) => _workspaces.Add(workspace);
     public void AddWorkspaces(IEnumerable<Workspace> workspaces) => _workspaces.AddRange(workspaces);
-    
+
     // WorkProcess
     public void AddWorkProcess(WorkProcess workProcess) => _workProcesses.Add(workProcess);
     public void AddWorkProcesses(IEnumerable<WorkProcess> workProcesses) => _workProcesses.AddRange(workProcesses);
-    
+
     // WorkItem
     public void AddWorkItem(WorkItem workItem) => _workItems.Add(workItem);
     public void AddWorkItems(IEnumerable<WorkItem> workItems) => _workItems.AddRange(workItems);
-    
+
     // WorkType
     public void AddWorkType(WorkType workType) => _workTypes.Add(workType);
     public void AddWorkTypes(IEnumerable<WorkType> workTypes) => _workTypes.AddRange(workTypes);
-    
+
     // WorkStatus
     public void AddWorkStatus(WorkStatus workStatus) => _workStatuses.Add(workStatus);
     public void AddWorkStatuses(IEnumerable<WorkStatus> workStatuses) => _workStatuses.AddRange(workStatuses);
-    
+
     // Workflow
     public void AddWorkflow(Workflow workflow) => _workflows.Add(workflow);
     public void AddWorkflows(IEnumerable<Workflow> workflows) => _workflows.AddRange(workflows);
-    
+
     // WorkTypeHierarchy
     public void AddWorkTypeHierarchy(WorkTypeHierarchy hierarchy) => _workTypeHierarchies.Add(hierarchy);
     public void AddWorkTypeHierarchies(IEnumerable<WorkTypeHierarchy> hierarchies) => _workTypeHierarchies.AddRange(hierarchies);
-    
+
     // WorkTeam
     public void AddWorkTeam(WorkTeam team) => _workTeams.Add(team);
     public void AddWorkTeams(IEnumerable<WorkTeam> teams) => _workTeams.AddRange(teams);
-    
+
     // WorkProject
     public void AddWorkProject(WorkProject project) => _workProjects.Add(project);
     public void AddWorkProjects(IEnumerable<WorkProject> projects) => _workProjects.AddRange(projects);
-    
+
     // WorkIteration
     public void AddWorkIteration(WorkIteration iteration) => _workIterations.Add(iteration);
     public void AddWorkIterations(IEnumerable<WorkIteration> iterations) => _workIterations.AddRange(iterations);
-    
+
     // Employee
     public void AddEmployee(Employee employee) => _employees.Add(employee);
     public void AddEmployees(IEnumerable<Employee> employees) => _employees.AddRange(employees);

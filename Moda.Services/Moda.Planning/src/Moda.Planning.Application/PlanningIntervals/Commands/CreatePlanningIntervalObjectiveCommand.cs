@@ -4,6 +4,7 @@ using Moda.Common.Application.Requests.Goals.Commands;
 using Moda.Common.Domain.Enums.Goals;
 
 namespace Moda.Planning.Application.PlanningIntervals.Commands;
+
 public sealed record CreatePlanningIntervalObjectiveCommand(Guid PlanningIntervalId, Guid TeamId, string Name, string? Description, LocalDate? StartDate, LocalDate? TargetDate, bool IsStretch, int? Order) : ICommand<ObjectIdAndKey>;
 
 public sealed class CreatePlanningIntervalObjectiveCommandValidator : CustomValidator<CreatePlanningIntervalObjectiveCommand>

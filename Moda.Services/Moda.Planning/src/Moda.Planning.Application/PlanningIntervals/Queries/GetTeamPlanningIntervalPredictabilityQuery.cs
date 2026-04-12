@@ -4,6 +4,7 @@ using Moda.Common.Domain.Enums.Organization;
 using Moda.Planning.Domain.Enums;
 
 namespace Moda.Planning.Application.PlanningIntervals.Queries;
+
 public sealed record GetTeamPlanningIntervalPredictabilityQuery : IQuery<double?>
 {
     public GetTeamPlanningIntervalPredictabilityQuery(IdOrKey idOrKey, Guid teamId)

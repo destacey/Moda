@@ -3,6 +3,7 @@ using Moda.Common.Application.Dtos;
 using Moda.Common.Domain.Employees;
 
 namespace Moda.Common.Application.Employees.Dtos;
+
 public sealed record EmployeeNavigationDto : NavigationDto, IMapFrom<Employee>
 {
     public static EmployeeNavigationDto From(Employee employee)

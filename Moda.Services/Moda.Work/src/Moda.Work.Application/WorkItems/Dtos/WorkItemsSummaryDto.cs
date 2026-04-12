@@ -1,4 +1,5 @@
 ﻿namespace Moda.Work.Application.WorkItems.Dtos;
+
 public sealed record WorkItemsSummaryDto
 {
     public required WorkItemProgressRollupDto ProgressSummary { get; set; }

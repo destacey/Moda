@@ -3,6 +3,7 @@ using Moda.Common.Application.Models;
 using Moda.Planning.Application.PlanningIntervals.Dtos;
 
 namespace Moda.Planning.Application.PlanningIntervals.Queries;
+
 public sealed record GetPlanningIntervalIterationsQuery : IQuery<IReadOnlyList<PlanningIntervalIterationListDto>>
 {
     public GetPlanningIntervalIterationsQuery(IdOrKey idOrKey)

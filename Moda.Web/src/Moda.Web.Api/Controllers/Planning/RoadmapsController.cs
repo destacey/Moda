@@ -21,7 +21,7 @@ public class RoadmapsController : ControllerBase
     private readonly IValidator<UpdateRoadmapTimeboxRequest> _updateTimeboxValidator;
 
     public RoadmapsController(
-        ILogger<RoadmapsController> logger, 
+        ILogger<RoadmapsController> logger,
         ISender sender,
         IValidator<UpdateRoadmapActivityRequest> updateActivityValidator,
         IValidator<UpdateRoadmapMilestoneRequest> updateMilestoneValidator,

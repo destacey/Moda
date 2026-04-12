@@ -2,6 +2,7 @@
 using CSharpFunctionalExtensions;
 
 namespace Moda.Common.Domain.Models;
+
 public static class MetadataManager<TMetadata> where TMetadata : KeyValueObjectMetadata
 {
     /// <summary>

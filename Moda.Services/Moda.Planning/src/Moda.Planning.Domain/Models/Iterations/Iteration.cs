@@ -124,7 +124,7 @@ public sealed class Iteration : BaseAuditableEntity, IHasIdAndKey, ISimpleIterat
     /// <returns></returns>
     public static Iteration Create(string name, IterationType type, IterationState state, IterationDateRange dateRange, Guid? teamId, OwnershipInfo ownershipInfo, List<KeyValueObjectMetadata> externalMetadata, Instant timestamp)
     {
-        var iteration = new Iteration (name, type, state, dateRange, teamId, ownershipInfo, externalMetadata);
+        var iteration = new Iteration(name, type, state, dateRange, teamId, ownershipInfo, externalMetadata);
 
         iteration.AddPostPersistenceAction(() => iteration.AddDomainEvent(new IterationCreatedEvent(iteration, timestamp)));
 

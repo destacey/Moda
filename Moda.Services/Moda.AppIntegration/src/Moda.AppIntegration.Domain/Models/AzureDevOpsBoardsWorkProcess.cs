@@ -3,6 +3,7 @@ using Moda.Common.Domain.Models;
 using Moda.Common.Extensions;
 
 namespace Moda.AppIntegration.Domain.Models;
+
 public sealed class AzureDevOpsBoardsWorkProcess : IntegrationObject<Guid>
 {
     private string _name = null!;

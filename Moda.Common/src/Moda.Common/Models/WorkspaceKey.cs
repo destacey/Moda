@@ -2,6 +2,7 @@
 using CSharpFunctionalExtensions;
 
 namespace Moda.Common.Models;
+
 public sealed class WorkspaceKey : ValueObject
 {
     /// <summary>

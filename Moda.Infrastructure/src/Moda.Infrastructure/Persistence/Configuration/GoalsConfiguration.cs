@@ -5,6 +5,7 @@ using Moda.Goals.Domain.Models;
 using Moda.Infrastructure.Persistence.Converters;
 
 namespace Moda.Infrastructure.Persistence.Configuration;
+
 public class ObjectiveConfiguration : IEntityTypeConfiguration<Objective>
 {
     public void Configure(EntityTypeBuilder<Objective> builder)

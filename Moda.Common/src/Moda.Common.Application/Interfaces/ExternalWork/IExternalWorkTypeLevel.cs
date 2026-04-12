@@ -1,6 +1,7 @@
 ﻿using Moda.Common.Domain.Enums.Work;
 
 namespace Moda.Common.Application.Interfaces.ExternalWork;
+
 public interface IExternalWorkTypeLevel
 {
     string Id { get; set; }

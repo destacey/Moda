@@ -8,6 +8,7 @@ using Moda.Web.Api.Extensions;
 using Moq;
 
 namespace Moda.Web.Api.Tests.Sut.Extensions;
+
 public sealed class ResultExtensionsTests
 {
     private readonly Mock<HttpContext> _mockHttpContext;

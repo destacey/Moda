@@ -1,4 +1,5 @@
 ﻿namespace Moda.Common.Extensions;
+
 public static class GuidExtensions
 {
     public static bool IsDefault(this Guid value)

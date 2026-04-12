@@ -90,7 +90,7 @@ public class WorkspacesController(ISender sender) : ControllerBase
         }
         else if (idOrKey.IsValidWorkspaceKeyFormat())
         {
-               query = new GetWorkItemsQuery(new WorkspaceKey(idOrKey));
+            query = new GetWorkItemsQuery(new WorkspaceKey(idOrKey));
         }
         else
         {
@@ -229,7 +229,7 @@ public class WorkspacesController(ISender sender) : ControllerBase
 
         var result = await _sender.Send(new GetWorkItemDependenciesQuery(idOrKey, key), cancellationToken);
 
-        
+
         return result.IsFailure
             ? BadRequest(result.ToBadRequestObject(HttpContext))
             : result.Value is not null

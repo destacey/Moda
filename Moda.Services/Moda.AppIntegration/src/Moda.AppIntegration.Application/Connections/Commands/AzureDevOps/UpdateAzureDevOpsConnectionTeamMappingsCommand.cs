@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Moda.AppIntegration.Application.Connections.Dtos.AzureDevOps;
 
 namespace Moda.AppIntegration.Application.Connections.Commands;
+
 public sealed record UpdateAzureDevOpsConnectionTeamMappingsCommand(Guid ConnectionId, List<AzureDevOpsWorkspaceTeamMappingDto> TeamMappings, Guid[] ValidTeamIds) : ICommand;
 
 public sealed class AzdoConnectionTeamMappingsRequestValidator : CustomValidator<UpdateAzureDevOpsConnectionTeamMappingsCommand>

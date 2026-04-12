@@ -1,4 +1,5 @@
 ﻿namespace Moda.Organization.Application.Teams.Queries;
+
 public sealed record TeamExistsQuery : IQuery<bool>
 {
     public TeamExistsQuery(Guid teamId)

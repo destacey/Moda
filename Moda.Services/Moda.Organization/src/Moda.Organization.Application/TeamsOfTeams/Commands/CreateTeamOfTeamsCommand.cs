@@ -3,6 +3,7 @@ using Moda.Organization.Application.Teams.Models;
 using NodaTime;
 
 namespace Moda.Organization.Application.TeamsOfTeams.Commands;
+
 public sealed record CreateTeamOfTeamsCommand(string Name, TeamCode Code, string? Description, LocalDate ActiveDate) : ICommand<int>;
 
 public sealed class CreateTeamOfTeamsCommandValidator : CustomValidator<CreateTeamOfTeamsCommand>

@@ -5,6 +5,7 @@ using Moda.Common.Models;
 using NodaTime;
 
 namespace Moda.Integrations.MicrosoftGraph.Model;
+
 public sealed record AzureAdEmployee : IExternalEmployee
 {
     public AzureAdEmployee(User user)

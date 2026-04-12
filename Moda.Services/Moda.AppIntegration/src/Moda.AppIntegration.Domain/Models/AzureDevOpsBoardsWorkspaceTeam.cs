@@ -1,6 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 
 namespace Moda.AppIntegration.Domain.Models;
+
 public sealed class AzureDevOpsBoardsWorkspaceTeam
 {
     private string _teamName = default!;
@@ -29,10 +30,10 @@ public sealed class AzureDevOpsBoardsWorkspaceTeam
     /// <summary>
     /// TeamName is the name of the team in the Azure DevOps system.
     /// </summary>
-    public string TeamName 
-    { 
-        get => _teamName; 
-        private set => _teamName = Guard.Against.NullOrWhiteSpace(value, nameof(TeamName)); 
+    public string TeamName
+    {
+        get => _teamName;
+        private set => _teamName = Guard.Against.NullOrWhiteSpace(value, nameof(TeamName));
     }
 
     public Guid? BoardId { get; private set; }

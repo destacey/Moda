@@ -3,6 +3,7 @@ using Moda.Common.Application.Employees.Dtos;
 using Moda.Planning.Domain.Models.Roadmaps;
 
 namespace Moda.Planning.Application.Roadmaps.Dtos;
+
 public sealed record RoadmapListDto : IMapFrom<Roadmap>
 {
     /// <summary>Gets or sets the identifier.</summary>

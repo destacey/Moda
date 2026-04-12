@@ -4,6 +4,7 @@ using Moda.Common.Models;
 using Moda.Work.Domain.Extensions;
 
 namespace Moda.Work.Domain.Models;
+
 public sealed class WorkItemKey : ValueObject
 {
     /// <summary>

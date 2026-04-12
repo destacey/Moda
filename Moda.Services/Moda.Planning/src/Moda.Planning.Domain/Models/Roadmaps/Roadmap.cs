@@ -8,6 +8,7 @@ using Moda.Planning.Domain.Interfaces.Roadmaps;
 using OneOf;
 
 namespace Moda.Planning.Domain.Models.Roadmaps;
+
 public sealed class Roadmap : BaseAuditableEntity, ILocalSchedule, IHasIdAndKey
 {
     private readonly bool _objectConstruction = false;

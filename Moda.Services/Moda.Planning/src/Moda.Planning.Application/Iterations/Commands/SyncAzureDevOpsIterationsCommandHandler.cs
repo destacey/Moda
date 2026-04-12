@@ -11,6 +11,7 @@ using Moda.Common.Domain.Models.Planning.Iterations;
 using Moda.Planning.Domain.Models.Iterations;
 
 namespace Moda.Planning.Application.Iterations.Commands;
+
 internal sealed class SyncAzureDevOpsIterationsCommandHandler(IPlanningDbContext planningDbContext, ILogger<SyncAzureDevOpsIterationsCommandHandler> logger, IDateTimeProvider dateTimeProvider, IEventPublisher eventPublisher)
  : ICommandHandler<SyncAzureDevOpsIterationsCommand>
 {

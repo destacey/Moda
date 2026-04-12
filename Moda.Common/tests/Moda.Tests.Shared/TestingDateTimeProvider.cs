@@ -4,6 +4,7 @@ using NodaTime.Extensions;
 using NodaTime.Testing;
 
 namespace Moda.Tests.Shared;
+
 public class TestingDateTimeProvider : IDateTimeProvider
 {
     private readonly FakeClock _clock;

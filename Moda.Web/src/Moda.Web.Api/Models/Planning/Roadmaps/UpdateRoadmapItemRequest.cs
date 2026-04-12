@@ -6,7 +6,7 @@ namespace Moda.Web.Api.Models.Planning.Roadmaps;
 [JsonDerivedType(typeof(UpdateRoadmapMilestoneRequest), typeDiscriminator: "milestone")]
 [JsonDerivedType(typeof(UpdateRoadmapTimeboxRequest), typeDiscriminator: "timebox")]
 public abstract record UpdateRoadmapItemRequest
-{ 
+{
     /// <summary>
     /// The Roadmap Id the Roadmap Item belongs to.
     /// </summary>

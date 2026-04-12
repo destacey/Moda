@@ -71,10 +71,10 @@ public class WorkItemDependencyTests
         var source = _workItemFaker.WithData(statusCategory: sourceStatusCategory).Generate();
         var target = _workItemFaker.WithData(statusCategory: targetStatusCategory).Generate();
 
-        var sourcePlannedOn = sourceOffsetDays.HasValue 
+        var sourcePlannedOn = sourceOffsetDays.HasValue
             ? now.Plus(Duration.FromDays(sourceOffsetDays.Value))
             : (Instant?)null;
-        var targetPlannedOn = targetOffsetDays.HasValue 
+        var targetPlannedOn = targetOffsetDays.HasValue
             ? now.Plus(Duration.FromDays(targetOffsetDays.Value))
             : (Instant?)null;
 
@@ -119,7 +119,7 @@ public class WorkItemDependencyTests
 
         // predecessor equal successor -> Healthy
         yield return new object[] { WorkStatusCategory.Proposed, WorkStatusCategory.Proposed, 5, 5, DependencyPlanningHealth.Healthy };
-        
+
         // predecessor after successor -> Unhealthy
         yield return new object[] { WorkStatusCategory.Proposed, WorkStatusCategory.Proposed, 5, 2, DependencyPlanningHealth.Unhealthy };
 
@@ -165,7 +165,7 @@ public class WorkItemDependencyTests
         var sourcePlannedOn = now.Plus(Duration.FromDays(5));
         var targetPlannedOn = now.Plus(Duration.FromDays(2));
         var dep = _dependencyFaker.WithData(source: source, target: target, sourcePlannedOn: sourcePlannedOn, targetPlannedOn: targetPlannedOn, createdOn: now).Generate();
-        
+
         Assert.Equal(DependencyPlanningHealth.Unhealthy, dep.Health);
 
         // Act: move target planned date after source
@@ -490,7 +490,7 @@ public class WorkItemDependencyTests
 
         var sourceIteration = _workIterationFaker.WithEndDate(now.Plus(Duration.FromDays(5))).Generate();
         var targetIteration = _workIterationFaker.WithEndDate(now.Plus(Duration.FromDays(10))).Generate();
-        
+
         var source = _workItemFaker.WithData(statusCategory: WorkStatusCategory.Active, iterationId: sourceIteration.Id).Generate();
         source.Iteration = sourceIteration;
         var target = _workItemFaker.WithData(statusCategory: WorkStatusCategory.Active, iterationId: targetIteration.Id).Generate();

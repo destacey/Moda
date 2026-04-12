@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 namespace Moda.Planning.Domain.Enums;
+
 public enum RiskImpact
 {
     [Display(Name = "Low", Description = "The impact of the risk occurring is low.", Order = 1)]

@@ -4,6 +4,7 @@ using Moda.Common.Application.Interfaces;
 using Moda.Links.Models;
 
 namespace Moda.Links.Queries;
+
 public sealed record GetLinkQuery(Guid LinkId) : IQuery<LinkDto?>;
 
 internal sealed class GetLinkQueryHandler : IQueryHandler<GetLinkQuery, LinkDto?>

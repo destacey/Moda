@@ -4,6 +4,7 @@ using Moda.Common.Application.Interfaces;
 using Moda.Health.Dtos;
 
 namespace Moda.Health.Queries;
+
 public sealed record GetHealthCheckQuery(Guid Id) : IQuery<HealthCheckDto?>;
 
 internal sealed class GetHealthCheckQueryHandler : IQueryHandler<GetHealthCheckQuery, HealthCheckDto?>

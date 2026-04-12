@@ -8,6 +8,7 @@ using Moda.Common.Application.Validation;
 using Moda.Links.Models;
 
 namespace Moda.Links.Commands;
+
 public sealed record UpdateLinkCommand(Guid LinkId, string Name, string Url) : ICommand<LinkDto>;
 
 public sealed class UpdateLinkCommandValidator : CustomValidator<UpdateLinkCommand>

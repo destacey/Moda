@@ -3,6 +3,7 @@ using Moda.Work.Application.Persistence;
 using Moda.Work.Application.WorkItems.Dtos;
 
 namespace Moda.Work.Application.WorkItems.Commands;
+
 internal sealed class SyncExternalWorkItemParentChangesCommandHandler(IWorkDbContext workDbContext, ILogger<SyncExternalWorkItemParentChangesCommandHandler> logger) : ICommandHandler<SyncExternalWorkItemParentChangesCommand>
 {
     private const string AppRequestName = nameof(SyncExternalWorkItemParentChangesCommand);
@@ -48,8 +49,8 @@ internal sealed class SyncExternalWorkItemParentChangesCommandHandler(IWorkDbCon
                         .ThenBy(wil => _changedOperationOrder.TryGetValue(wil.ChangedOperation, out int value) ? value : int.MaxValue)
                     .First();
 
-                var parent = parentLink.ChangedOperation == "remove" 
-                    ? null 
+                var parent = parentLink.ChangedOperation == "remove"
+                    ? null
                     : parentWorkItems.FirstOrDefault(pwi => pwi.ExternalId == parentLink.SourceId);  // TODO: make sure the workspace id matches
 
                 var updateParentResult = child.UpdateParent(parent, child.Type);

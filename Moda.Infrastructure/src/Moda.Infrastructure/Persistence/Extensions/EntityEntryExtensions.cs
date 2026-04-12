@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Moda.Infrastructure.Persistence.Extensions;
+
 public static class EntityEntryExtensions
 {
     public static bool HasChangedOwnedEntities(this EntityEntry entry) =>

@@ -2,6 +2,7 @@
 using Moda.StrategicManagement.Domain.Enums;
 
 namespace Moda.StrategicManagement.Application.Visions.Queries;
+
 public sealed record GetVisionStatesQuery : IQuery<List<VisionStateDto>> { }
 
 internal sealed class GetVisionStatesQueryHandler : IQueryHandler<GetVisionStatesQuery, List<VisionStateDto>>

@@ -2,7 +2,8 @@
 using Moda.Common.Application.Requests.Goals.Commands;
 
 namespace Moda.Planning.Application.PlanningIntervals.Commands;
-public sealed record UpdatePlanningIntervalObjectivesOrderCommand(Guid PlanningIntervalId, Dictionary<Guid,int?> Objectives) : ICommand;
+
+public sealed record UpdatePlanningIntervalObjectivesOrderCommand(Guid PlanningIntervalId, Dictionary<Guid, int?> Objectives) : ICommand;
 
 public sealed class UpdatePlanningIntervalObjectivesOrderCommandValidator : CustomValidator<UpdatePlanningIntervalObjectivesOrderCommand>
 {
@@ -36,7 +37,7 @@ internal sealed class UpdatePlanningIntervalObjectivesOrderCommandHandler(IPlann
                 .Where(p => p.Id == request.PlanningIntervalId)
                 .SelectMany(p => p.Objectives
                     .Where(o => request.Objectives.Keys.Contains(o.Id))
-                    .Select(o => new {o.Id, o.ObjectiveId}))
+                    .Select(o => new { o.Id, o.ObjectiveId }))
                 .ToListAsync(cancellationToken);
 
             if (piObjectives is null)

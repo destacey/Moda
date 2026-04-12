@@ -1,6 +1,7 @@
 ﻿using Ardalis.GuardClauses;
 
 namespace Moda.Common.Extensions;
+
 public static class EnumerableExtensions
 {
     /// <summary>Batches the specified batch size.</summary>

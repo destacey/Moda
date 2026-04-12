@@ -2,6 +2,7 @@
 using System.Text.Json.Serialization;
 
 namespace Moda.Common.Domain.Models;
+
 public sealed class IntegrationState<TId>
 {
     private IntegrationState() { }

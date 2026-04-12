@@ -1,4 +1,5 @@
 ﻿namespace Moda.Integrations.AzureDevOps.Models;
+
 internal sealed record ListResponse<T>
 {
     public int Count { get; set; }

@@ -2,6 +2,7 @@
 using Moda.Work.Application.WorkItems.Dtos;
 
 namespace Moda.Work.Application.WorkItems.Queries;
+
 public sealed record GetExternalObjectWorkItemMetricsQuery(Guid ObjectiveId, DateOnly Start, DateOnly End) : IQuery<List<WorkItemProgressDailyRollupDto>>;
 
 internal sealed class GetExternalObjectWorkItemMetricsQueryHandler(IWorkDbContext workDbContext) : IQueryHandler<GetExternalObjectWorkItemMetricsQuery, List<WorkItemProgressDailyRollupDto>>
@@ -16,5 +17,5 @@ internal sealed class GetExternalObjectWorkItemMetricsQueryHandler(IWorkDbContex
         var progress = await new WorkItemProgressStateBuilder(_workDbContext, query).Build(cancellationToken);
 
         return WorkItemProgressDailyRollupDto.CreateList(request.Start, request.End, progress);
-    }    
+    }
 }

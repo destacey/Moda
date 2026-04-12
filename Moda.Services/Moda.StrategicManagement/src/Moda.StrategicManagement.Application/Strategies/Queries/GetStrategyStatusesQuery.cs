@@ -2,6 +2,7 @@
 using Moda.StrategicManagement.Domain.Enums;
 
 namespace Moda.StrategicManagement.Application.Strategies.Queries;
+
 public sealed record GetStrategyStatusesQuery : IQuery<List<StrategyStatusDto>> { }
 
 internal sealed class GetStrategyStatusesQueryHandler : IQueryHandler<GetStrategyStatusesQuery, List<StrategyStatusDto>>

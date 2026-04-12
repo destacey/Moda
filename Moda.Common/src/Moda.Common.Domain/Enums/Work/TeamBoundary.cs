@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 namespace Moda.Common.Domain.Enums.Work;
+
 public enum TeamBoundary
 {
     [Display(Name = "Intra-Team", Description = "The dependency is within the same team.", Order = 1)]

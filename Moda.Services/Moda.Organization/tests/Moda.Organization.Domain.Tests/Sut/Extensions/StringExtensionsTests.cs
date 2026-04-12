@@ -1,6 +1,7 @@
 ﻿using Moda.Common.Domain.Extensions.Organizations;
 
 namespace Moda.Organization.Domain.Tests.Sut.Extensions;
+
 public class StringExtensionsTests
 {
     [Theory]

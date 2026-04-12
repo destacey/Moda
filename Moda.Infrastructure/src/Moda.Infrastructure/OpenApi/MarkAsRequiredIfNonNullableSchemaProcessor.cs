@@ -3,6 +3,7 @@ using System.Text.Json;
 using NJsonSchema.Generation;
 
 namespace Moda.Infrastructure.OpenApi;
+
 public class MarkAsRequiredIfNonNullableSchemaProcessor : ISchemaProcessor
 {
     public void Process(SchemaProcessorContext context)

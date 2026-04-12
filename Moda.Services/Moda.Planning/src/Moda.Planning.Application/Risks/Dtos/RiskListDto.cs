@@ -3,6 +3,7 @@ using Moda.Common.Extensions;
 using Moda.Planning.Application.Models;
 
 namespace Moda.Planning.Application.Risks.Dtos;
+
 public class RiskListDto : IMapFrom<Risk>
 {
     public Guid Id { get; set; }

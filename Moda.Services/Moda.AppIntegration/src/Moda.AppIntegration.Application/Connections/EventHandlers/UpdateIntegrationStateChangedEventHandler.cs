@@ -5,6 +5,7 @@ using Moda.Common.Domain.Events;
 using Serilog.Context;
 
 namespace Moda.AppIntegration.Application.Connections.EventHandlers;
+
 internal sealed class UpdateIntegrationStateChangedEventHandler(IAppIntegrationDbContext appIntegrationDbContext, ILogger<UpdateIntegrationStateChangedEventHandler> logger) : IEventNotificationHandler<IntegrationStateChangedEvent<Guid>>
 {
     private readonly IAppIntegrationDbContext _appIntegrationDbContext = appIntegrationDbContext;

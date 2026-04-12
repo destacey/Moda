@@ -3,6 +3,7 @@ using Moda.Common.Application.Requests.Goals.Dtos;
 using Moda.Planning.Application.Models;
 
 namespace Moda.Planning.Application.PlanningIntervals.Dtos;
+
 public sealed record PlanningIntervalObjectiveListDto
 {
     /// <summary>Gets or sets the identifier.</summary>

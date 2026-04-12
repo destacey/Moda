@@ -9,6 +9,7 @@ using Moda.Planning.Domain.Models.Iterations;
 using NodaTime;
 
 namespace Moda.Planning.Domain.Models;
+
 public sealed class PlanningInterval : BaseSoftDeletableEntity, ILocalSchedule, INavigable
 {
     private readonly List<PlanningIntervalTeam> _teams = [];
@@ -353,7 +354,7 @@ public sealed class PlanningInterval : BaseSoftDeletableEntity, ILocalSchedule, 
             // If already mapped to this iteration, operation is idempotent - return success
             if (existingMapping.PlanningIntervalIterationId == iterationId)
                 return Result.Success();
-            
+
             // Sprint is mapped to a different iteration - unmap it and continue to map to new iteration
             _iterationSprints.Remove(existingMapping);
         }
@@ -362,7 +363,7 @@ public sealed class PlanningInterval : BaseSoftDeletableEntity, ILocalSchedule, 
         // This ensures a team can only have one sprint per iteration (replace behavior)
         var teamSprintInIteration = _iterationSprints
             .Where(s => s.PlanningIntervalIterationId == iterationId && s.SprintId != sprint.Id)
-            .FirstOrDefault(s => s.Sprint?.TeamId == sprint.TeamId);        
+            .FirstOrDefault(s => s.Sprint?.TeamId == sprint.TeamId);
         if (teamSprintInIteration is not null)
         {
             _iterationSprints.Remove(teamSprintInIteration);
@@ -423,7 +424,7 @@ public sealed class PlanningInterval : BaseSoftDeletableEntity, ILocalSchedule, 
             {
                 // Null value means unmap any existing team sprint from this iteration
                 var teamSprintsInIteration = _iterationSprints
-                    .Where(s => s.PlanningIntervalIterationId == iterationId && 
+                    .Where(s => s.PlanningIntervalIterationId == iterationId &&
                                s.Sprint?.TeamId == teamId)
                     .ToList();
 

@@ -4,6 +4,7 @@ using Moda.Planning.Domain.Models;
 using Moda.Tests.Shared.Data;
 
 namespace Moda.Planning.Domain.Tests.Data;
+
 public class PlanningIntervalObjectiveFaker : PrivateConstructorFaker<PlanningIntervalObjective>
 {
     public PlanningIntervalObjectiveFaker(Guid planningIntervalId, PlanningTeam team, ObjectiveStatus status, bool isStretch)

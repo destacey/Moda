@@ -4,6 +4,7 @@ using Moda.Common.Domain.Events.Planning.Iterations;
 using Moda.Work.Application.Persistence;
 
 namespace Moda.Work.Application.WorkIterations.EventHandlers;
+
 internal sealed class WorkIterationSyncHandler(IWorkDbContext workDbContext, ILogger<WorkIterationSyncHandler> logger, IDateTimeProvider dateTimeProvider) :
     IEventNotificationHandler<IterationCreatedEvent>,
     IEventNotificationHandler<IterationUpdatedEvent>,

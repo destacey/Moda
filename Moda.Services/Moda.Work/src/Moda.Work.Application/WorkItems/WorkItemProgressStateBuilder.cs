@@ -3,6 +3,7 @@ using Moda.Work.Application.Persistence;
 using Moda.Work.Application.WorkItems.Dtos;
 
 namespace Moda.Work.Application.WorkItems;
+
 internal sealed class WorkItemProgressStateBuilder(IWorkDbContext workDbContext, IQueryable<WorkItem> workItemsQuery)
 {
     private readonly IWorkDbContext _workDbContext = workDbContext;

@@ -3,6 +3,7 @@ using Moda.Organization.Application.Teams.Models;
 using NodaTime;
 
 namespace Moda.Organization.Application.Teams.Queries;
+
 public sealed record GetFunctionalOrganizationChartQuery(LocalDate? AsOfDate = null) : IQuery<FunctionalOrganizationChartDto>;
 
 internal sealed class GetFunctionalOrganizationChartQueryHandler(IOrganizationDbContext organizationDbContext, ILogger<GetFunctionalOrganizationChartQueryHandler> logger, IDateTimeProvider dateTimeProvider) : IQueryHandler<GetFunctionalOrganizationChartQuery, FunctionalOrganizationChartDto>

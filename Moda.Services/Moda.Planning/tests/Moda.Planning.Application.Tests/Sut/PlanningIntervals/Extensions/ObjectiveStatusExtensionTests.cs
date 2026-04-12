@@ -2,6 +2,7 @@
 using Moda.Planning.Application.PlanningIntervals.Extensions;
 
 namespace Moda.Planning.Application.Tests.Sut.PlanningIntervals.Extensions;
+
 public class ObjectiveStatusExtensionTests
 {
     [Theory]

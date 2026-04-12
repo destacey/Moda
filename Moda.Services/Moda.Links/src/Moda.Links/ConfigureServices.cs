@@ -5,6 +5,7 @@ using Mapster.Utils;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Moda.Links;
+
 public static class ConfigureServices
 {
     public static IServiceCollection AddLinksApplication(this IServiceCollection services)

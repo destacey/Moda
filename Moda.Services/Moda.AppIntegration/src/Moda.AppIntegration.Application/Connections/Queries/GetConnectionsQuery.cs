@@ -6,6 +6,7 @@ using Moda.AppIntegration.Domain.Models.AzureOpenAI;
 using Moda.Common.Domain.Enums.AppIntegrations;
 
 namespace Moda.AppIntegration.Application.Connections.Queries;
+
 public sealed record GetConnectionsQuery(bool IncludeInactive = false, Connector? Type = null) : IQuery<IReadOnlyList<ConnectionListDto>>;
 
 internal sealed class GetConnectionsQueryHandler(IAppIntegrationDbContext appIntegrationDbContext) : IQueryHandler<GetConnectionsQuery, IReadOnlyList<ConnectionListDto>>

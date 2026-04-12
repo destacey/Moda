@@ -2,6 +2,7 @@
 using Moda.Organization.Application.Teams.Models;
 
 namespace Moda.Organization.Application.TeamsOfTeams.Commands;
+
 public sealed record UpdateTeamOfTeamsCommand(Guid Id, string Name, TeamCode Code, string? Description) : ICommand<int>;
 
 public sealed class UpdateTeamOfTeamsCommandValidator : CustomValidator<UpdateTeamOfTeamsCommand>

@@ -2,6 +2,7 @@
 using NodaTime;
 
 namespace Moda.Organization.Domain.Tests.Sut.Models;
+
 public class MembershipDateRangeTests
 {
     #region New

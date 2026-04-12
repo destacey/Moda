@@ -1,4 +1,5 @@
 ﻿namespace Moda.Integrations.AzureDevOps.Models.WorkItems;
+
 internal sealed record WiqlResponse
 {
     public required string QueryType { get; set; }

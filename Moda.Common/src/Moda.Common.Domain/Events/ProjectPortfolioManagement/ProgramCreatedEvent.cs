@@ -3,6 +3,7 @@ using Moda.Common.Models;
 using NodaTime;
 
 namespace Moda.Common.Domain.Events.ProjectPortfolioManagement;
+
 public sealed record ProgramCreatedEvent : DomainEvent, ISimpleProgram
 {
     public ProgramCreatedEvent(ISimpleProgram project, int statusId, LocalDateRange? dateRange, Guid portfolioId, Dictionary<int, Guid[]> roles, Guid[] strategicThemes, Instant timestamp)

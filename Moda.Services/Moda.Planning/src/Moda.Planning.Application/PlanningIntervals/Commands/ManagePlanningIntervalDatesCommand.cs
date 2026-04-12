@@ -2,6 +2,7 @@
 using Moda.Planning.Application.PlanningIntervals.Dtos;
 
 namespace Moda.Planning.Application.PlanningIntervals.Commands;
+
 public sealed record ManagePlanningIntervalDatesCommand : ICommand
 {
     public ManagePlanningIntervalDatesCommand(Guid id, LocalDateRange dateRange, IEnumerable<PlanningIntervalIterationUpsertDto> iterations)

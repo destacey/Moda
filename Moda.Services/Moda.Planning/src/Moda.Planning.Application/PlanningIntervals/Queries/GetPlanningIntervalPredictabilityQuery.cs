@@ -5,6 +5,7 @@ using Moda.Planning.Application.Models;
 using Moda.Planning.Domain.Enums;
 
 namespace Moda.Planning.Application.PlanningIntervals.Queries;
+
 public sealed record GetPlanningIntervalPredictabilityQuery : IQuery<PlanningIntervalPredictabilityDto?>
 {
     public GetPlanningIntervalPredictabilityQuery(IdOrKey idOrKey)

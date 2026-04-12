@@ -40,7 +40,7 @@ internal sealed class DeleteStrategicInitiativeCommandHandler(
 
             var portfolio = await _projectPortfolioManagementDbContext.Portfolios
                     .Include(p => p.StrategicInitiatives.Where(i => i.Id == request.Id))
-                        // The rest of the strategic initiative relationships are already include from the initial strategicInitiative query
+                    // The rest of the strategic initiative relationships are already include from the initial strategicInitiative query
                     .FirstOrDefaultAsync(p => p.Id == strategicInitiative.PortfolioId, cancellationToken);
             if (portfolio == null)
             {

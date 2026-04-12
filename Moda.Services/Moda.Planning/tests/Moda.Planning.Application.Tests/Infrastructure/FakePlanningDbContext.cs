@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Moda.Common.Domain.Employees;
@@ -52,7 +52,7 @@ public class FakePlanningDbContext : IPlanningDbContext, IDisposable
 
     // ChangeTracker - we can't create a real one, so we return null and the handler uses defensive coding
     public ChangeTracker ChangeTracker => null!;
-    
+
     public DatabaseFacade Database => throw new NotImplementedException("Database operations are not supported in FakePlanningDbContext. Use integration tests with a real DbContext for database-specific functionality.");
 
     /// <summary>
@@ -64,7 +64,7 @@ public class FakePlanningDbContext : IPlanningDbContext, IDisposable
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         SaveChangesCallCount++;
-        
+
         // Return the total number of entities as a simple success indicator
         var count = _iterations.Count + _planningIntervals.Count + _risks.Count +
                     _planningTeams.Count + _planningHealthChecks.Count + _roadmaps.Count +
@@ -88,27 +88,27 @@ public class FakePlanningDbContext : IPlanningDbContext, IDisposable
     // Iteration
     public void AddIteration(Iteration iteration) => _iterations.Add(iteration);
     public void AddIterations(IEnumerable<Iteration> iterations) => _iterations.AddRange(iterations);
-    
+
     // PlanningInterval
     public void AddPlanningInterval(PlanningInterval planningInterval) => _planningIntervals.Add(planningInterval);
     public void AddPlanningIntervals(IEnumerable<PlanningInterval> planningIntervals) => _planningIntervals.AddRange(planningIntervals);
-    
+
     // Risk
     public void AddRisk(Risk risk) => _risks.Add(risk);
     public void AddRisks(IEnumerable<Risk> risks) => _risks.AddRange(risks);
-    
+
     // PlanningTeam
     public void AddPlanningTeam(PlanningTeam planningTeam) => _planningTeams.Add(planningTeam);
     public void AddPlanningTeams(IEnumerable<PlanningTeam> planningTeams) => _planningTeams.AddRange(planningTeams);
-    
+
     // SimpleHealthCheck
     public void AddPlanningHealthCheck(SimpleHealthCheck healthCheck) => _planningHealthChecks.Add(healthCheck);
     public void AddPlanningHealthChecks(IEnumerable<SimpleHealthCheck> healthChecks) => _planningHealthChecks.AddRange(healthChecks);
-    
+
     // Roadmap
     public void AddRoadmap(Roadmap roadmap) => _roadmaps.Add(roadmap);
     public void AddRoadmaps(IEnumerable<Roadmap> roadmaps) => _roadmaps.AddRange(roadmaps);
-    
+
     // EstimationScale
     public void AddEstimationScale(EstimationScale scale) => _estimationScales.Add(scale);
     public void AddEstimationScales(IEnumerable<EstimationScale> scales) => _estimationScales.AddRange(scales);

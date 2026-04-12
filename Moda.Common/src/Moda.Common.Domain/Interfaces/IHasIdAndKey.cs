@@ -4,7 +4,7 @@ public interface IHasIdAndKey<TKey>
 {
     Guid Id { get; }
     TKey Key { get; }
-} 
+}
 
 
 public interface IHasIdAndKey

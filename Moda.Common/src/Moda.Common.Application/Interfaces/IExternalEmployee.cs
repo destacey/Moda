@@ -1,6 +1,7 @@
 ﻿using Moda.Common.Models;
 
 namespace Moda.Common.Application.Interfaces;
+
 public interface IExternalEmployee
 {
     string EmployeeNumber { get; }

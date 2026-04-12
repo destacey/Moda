@@ -3,6 +3,7 @@ using Moda.Integrations.AzureDevOps.Models.WorkItems;
 using Moda.Integrations.AzureDevOps.Tests.Models;
 
 namespace Moda.Integrations.AzureDevOps.Tests.Sut.Models.WorkItems;
+
 public class ReportingWorkItemLinkResponseTests : CommonResponseOptions
 {
     [Fact]

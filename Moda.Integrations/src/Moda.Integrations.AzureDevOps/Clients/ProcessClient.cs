@@ -3,6 +3,7 @@ using Moda.Integrations.AzureDevOps.Models.Processes;
 using RestSharp;
 
 namespace Moda.Integrations.AzureDevOps.Clients;
+
 internal sealed class ProcessClient : BaseClient
 {
     internal ProcessClient(string organizationUrl, string token, string apiVersion)

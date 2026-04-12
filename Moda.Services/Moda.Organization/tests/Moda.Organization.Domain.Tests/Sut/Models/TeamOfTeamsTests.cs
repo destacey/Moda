@@ -10,6 +10,7 @@ using NodaTime.Extensions;
 using NodaTime.Testing;
 
 namespace Moda.Organization.Domain.Tests.Sut.Models;
+
 public class TeamOfTeamsTests
 {
     private readonly TestingDateTimeProvider _dateTimeProvider;

@@ -3,6 +3,7 @@ using Moda.Common.Application.Validators;
 using Moda.Common.Models;
 
 namespace Moda.Common.Application.Employees.Commands;
+
 public sealed record UpdateEmployeeCommand : ICommand<int>
 {
     public UpdateEmployeeCommand(Guid id, PersonName name, string employeeNumber, Instant? hireDate, EmailAddress email, string? jobTitle, string? department, string? officeLocation, Guid? managerId)

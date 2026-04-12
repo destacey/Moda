@@ -2,7 +2,8 @@
 using Moda.Planning.Domain.Models.Roadmaps;
 
 namespace Moda.Planning.Application.Roadmaps.Commands;
-public sealed record UpdateRoadmapRootActivitiesOrderCommand(Guid RoadmapId, Dictionary<Guid,int> ChildrenOrder) : ICommand;
+
+public sealed record UpdateRoadmapRootActivitiesOrderCommand(Guid RoadmapId, Dictionary<Guid, int> ChildrenOrder) : ICommand;
 
 public sealed class UpdateRoadmapRootActivitiesOrderCommandValidator : CustomValidator<UpdateRoadmapRootActivitiesOrderCommand>
 {

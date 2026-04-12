@@ -1,6 +1,7 @@
 ﻿using Moda.Planning.Domain.Enums;
 
 namespace Moda.Planning.Application.PlanningIntervals.Dtos;
+
 public sealed record ImportPlanningIntervalObjectiveDto(
     int ImportId,
     Guid PlanningIntervalId,

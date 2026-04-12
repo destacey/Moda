@@ -1,4 +1,5 @@
 ﻿namespace Moda.Planning.Application.PlanningIntervals.Commands;
+
 public sealed record UpdatePlanningIntervalCommand(Guid Id, string Name, string? Description, bool ObjectivesLocked) : ICommand<int>;
 
 public sealed class UpdatePlanningIntervalCommandValidator : CustomValidator<UpdatePlanningIntervalCommand>

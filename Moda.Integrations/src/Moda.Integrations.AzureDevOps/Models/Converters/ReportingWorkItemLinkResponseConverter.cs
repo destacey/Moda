@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using Moda.Integrations.AzureDevOps.Models.WorkItems;
 
 namespace Moda.Integrations.AzureDevOps.Models.Converters;
+
 internal class ReportingWorkItemLinkResponseConverter : JsonConverter<ReportingWorkItemLinkResponse>
 {
     public override ReportingWorkItemLinkResponse Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)

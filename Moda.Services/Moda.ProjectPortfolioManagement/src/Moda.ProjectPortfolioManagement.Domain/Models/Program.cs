@@ -204,7 +204,7 @@ public sealed class Program : BaseAuditableEntity, IHasIdAndKey, ISimpleProgram
     /// <returns></returns>
     public Result UpdateStrategicThemes(HashSet<Guid> strategicThemeIds)
     {
-        Guard.Against.Null(strategicThemeIds, nameof(strategicThemeIds));;
+        Guard.Against.Null(strategicThemeIds, nameof(strategicThemeIds)); ;
 
         return StrategicThemeTagManager<Program>.UpdateTags(_strategicThemeTags, Id, strategicThemeIds, "program");
     }

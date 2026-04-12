@@ -1,4 +1,5 @@
 ﻿namespace Moda.Health.Dtos;
+
 public sealed record HealthStatusDto
 {
     public int Id { get; set; }

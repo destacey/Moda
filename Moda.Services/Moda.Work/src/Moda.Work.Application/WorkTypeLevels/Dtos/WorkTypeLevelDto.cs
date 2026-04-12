@@ -2,6 +2,7 @@
 using Moda.Common.Application.Requests.WorkManagement.Interfaces;
 
 namespace Moda.Work.Application.WorkTypeLevels.Dtos;
+
 public sealed record WorkTypeLevelDto : IMapFrom<WorkTypeLevel>, IWorkTypeLevelDto
 {
     public int Id { get; set; }

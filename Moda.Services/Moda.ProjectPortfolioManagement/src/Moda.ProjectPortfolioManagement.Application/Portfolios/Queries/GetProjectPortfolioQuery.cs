@@ -4,6 +4,7 @@ using Moda.ProjectPortfolioManagement.Application.Portfolios.Dtos;
 using Moda.ProjectPortfolioManagement.Domain.Models;
 
 namespace Moda.ProjectPortfolioManagement.Application.Portfolios.Queries;
+
 public sealed record GetProjectPortfolioQuery : IQuery<ProjectPortfolioDetailsDto?>
 {
     public GetProjectPortfolioQuery(IdOrKey idOrKey)
@@ -14,7 +15,7 @@ public sealed record GetProjectPortfolioQuery : IQuery<ProjectPortfolioDetailsDt
     public Expression<Func<ProjectPortfolio, bool>> IdOrKeyFilter { get; }
 }
 
-internal sealed class GetProjectPortfolioQueryHandler(IProjectPortfolioManagementDbContext projectPortfolioManagementDbContext) 
+internal sealed class GetProjectPortfolioQueryHandler(IProjectPortfolioManagementDbContext projectPortfolioManagementDbContext)
     : IQueryHandler<GetProjectPortfolioQuery, ProjectPortfolioDetailsDto?>
 {
     private readonly IProjectPortfolioManagementDbContext _projectPortfolioManagementDbContext = projectPortfolioManagementDbContext;

@@ -27,7 +27,8 @@ internal sealed class DeleteEmployeeCommandHandler(IModaDbContext modaDbContext,
             var employee = await _modaDbContext.Employees
                 .Include(e => e.DirectReports)
                 .FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
-            if (employee is null) {
+            if (employee is null)
+            {
                 _logger.LogWarning("Employee with ID {EmployeeId} not found for deletion.", request.Id);
                 return Result.Failure("Employee not found.");
             }

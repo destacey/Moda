@@ -34,7 +34,7 @@ internal sealed class DeleteProjectCommandHandler(IProjectPortfolioManagementDbC
 
             var portfolioQuery = _projectPortfolioManagementDbContext.Portfolios
                     .Include(p => p.Projects.Where(p => p.Id == request.Id))
-                        // The rest of the project relationships are already include from the initial project query
+                    // The rest of the project relationships are already include from the initial project query
                     .AsQueryable();
             if (project.ProgramId.HasValue)
             {

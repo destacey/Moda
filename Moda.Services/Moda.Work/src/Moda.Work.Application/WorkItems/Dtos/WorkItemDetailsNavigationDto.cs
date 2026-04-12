@@ -4,6 +4,7 @@ using Moda.Work.Application.WorkIterations.Dtos;
 using Moda.Work.Application.WorkTeams.Dtos;
 
 namespace Moda.Work.Application.WorkItems.Dtos;
+
 public sealed record WorkItemDetailsNavigationDto : IMapFrom<WorkItem>
 {
     public required Guid Id { get; set; }

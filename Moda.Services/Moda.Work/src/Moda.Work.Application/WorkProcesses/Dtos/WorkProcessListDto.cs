@@ -1,6 +1,7 @@
 ﻿using Moda.Common.Application.Dtos;
 
 namespace Moda.Work.Application.WorkProcesses.Dtos;
+
 public sealed record WorkProcessListDto : IMapFrom<WorkProcess>
 {
     public Guid Id { get; set; }

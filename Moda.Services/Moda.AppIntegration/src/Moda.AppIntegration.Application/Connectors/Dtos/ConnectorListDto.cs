@@ -1,4 +1,5 @@
 ﻿namespace Moda.AppIntegration.Application.Connectors.Dtos;
+
 public sealed class ConnectorListDto
 {
     public int Id { get; set; }

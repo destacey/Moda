@@ -4,6 +4,7 @@ using Moda.Common.Domain.Events.ProjectPortfolioManagement;
 using Moda.Work.Application.Persistence;
 
 namespace Moda.Work.Application.WorkProjects.EventHandlers;
+
 internal sealed class ProjectSyncHandler(IWorkDbContext workDbContext, ILogger<ProjectSyncHandler> logger) :
     IEventNotificationHandler<ProjectCreatedEvent>,
     IEventNotificationHandler<ProjectDetailsUpdatedEvent>,

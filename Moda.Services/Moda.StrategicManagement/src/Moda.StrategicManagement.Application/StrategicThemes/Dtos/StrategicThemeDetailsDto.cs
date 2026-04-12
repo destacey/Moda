@@ -2,6 +2,7 @@
 using Moda.StrategicManagement.Domain.Models;
 
 namespace Moda.StrategicManagement.Application.StrategicThemes.Dtos;
+
 public sealed record StrategicThemeDetailsDto : IMapFrom<StrategicTheme>
 {
     /// <summary>

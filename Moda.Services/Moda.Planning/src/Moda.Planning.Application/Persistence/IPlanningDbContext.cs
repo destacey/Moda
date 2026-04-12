@@ -3,6 +3,7 @@ using Moda.Planning.Domain.Models.PlanningPoker;
 using Moda.Planning.Domain.Models.Roadmaps;
 
 namespace Moda.Planning.Application.Persistence;
+
 public interface IPlanningDbContext : IModaDbContext
 {
     DbSet<Iteration> Iterations { get; }

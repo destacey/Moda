@@ -2,6 +2,7 @@
 using Moda.StrategicManagement.Domain.Models;
 
 namespace Moda.StrategicManagement.Application.Visions.Dtos;
+
 public sealed record VisionDto : IMapFrom<Vision>
 {
     /// <summary>

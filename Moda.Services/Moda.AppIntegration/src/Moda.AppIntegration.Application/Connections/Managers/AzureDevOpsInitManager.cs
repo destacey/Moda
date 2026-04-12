@@ -15,6 +15,7 @@ using Moda.Common.Domain.Models;
 using Moda.Common.Models;
 
 namespace Moda.AppIntegration.Application.Connections.Managers;
+
 public sealed class AzureDevOpsInitManager(ILogger<AzureDevOpsInitManager> logger, IAzureDevOpsService azureDevOpsService, ISender sender) : IAzureDevOpsInitManager
 {
     private readonly ILogger<AzureDevOpsInitManager> _logger = logger;
@@ -76,7 +77,7 @@ public sealed class AzureDevOpsInitManager(ILogger<AzureDevOpsInitManager> logge
 
                 // Load Teams
                 List<IExternalTeam> teams = [];
-                if (workspaces.Count !=0)
+                if (workspaces.Count != 0)
                 {
                     var projectIds = workspaces.Select(w => w.ExternalId).ToArray();
                     var teamsResult = await ExternalCallMeasure.MeasureAsync(_logger, "Azdo_SyncOrganizationConfiguration_GetTeams", () => _azureDevOpsService.GetTeams(connection.Configuration.OrganizationUrl, connection.Configuration.PersonalAccessToken, projectIds, cancellationToken), syncId);
@@ -128,7 +129,7 @@ public sealed class AzureDevOpsInitManager(ILogger<AzureDevOpsInitManager> logge
                     return processResult.ConvertFailure<Guid>();
 
                 var workTypes = processResult.Value.WorkTypes.OfType<IExternalWorkType>().ToList();
-                if (workTypes.Count !=0)
+                if (workTypes.Count != 0)
                 {
                     var levels = await _sender.Send(new GetWorkTypeLevelsQuery(), cancellationToken);
                     if (levels is null)
@@ -141,7 +142,7 @@ public sealed class AzureDevOpsInitManager(ILogger<AzureDevOpsInitManager> logge
                         return syncWorkTypesResult.ConvertFailure<Guid>();
                 }
 
-                if (processResult.Value.WorkStatuses.Count !=0)
+                if (processResult.Value.WorkStatuses.Count != 0)
                 {
                     var syncWorkStatusesResult = await _sender.Send(new SyncExternalWorkStatusesCommand(processResult.Value.WorkStatuses), cancellationToken);
                     if (syncWorkStatusesResult.IsFailure)

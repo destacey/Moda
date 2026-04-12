@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 
 namespace Moda.Integrations.AzureDevOps.IntegrationTests.Models;
+
 public sealed class AzdoOrganizationOptions : BaseConfiguration
 {
     public readonly static string SectionName = "AzdoOrganization";

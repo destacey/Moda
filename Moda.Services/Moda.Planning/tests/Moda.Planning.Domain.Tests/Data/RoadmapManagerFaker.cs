@@ -2,6 +2,7 @@
 using Moda.Tests.Shared.Data;
 
 namespace Moda.Planning.Domain.Tests.Data;
+
 public class RoadmapManagerFaker : PrivateConstructorFaker<RoadmapManager>
 {
     public RoadmapManagerFaker(Guid roadmapId)

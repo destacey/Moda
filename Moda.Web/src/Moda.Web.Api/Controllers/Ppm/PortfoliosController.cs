@@ -17,7 +17,7 @@ namespace Moda.Web.Api.Controllers.Ppm;
 [Route("api/ppm/[controller]")]
 [ApiVersionNeutral]
 [ApiController]
-public class PortfoliosController(ILogger<PortfoliosController> logger, ISender sender) 
+public class PortfoliosController(ILogger<PortfoliosController> logger, ISender sender)
     : ControllerBase
 {
     private readonly ILogger<PortfoliosController> _logger = logger;

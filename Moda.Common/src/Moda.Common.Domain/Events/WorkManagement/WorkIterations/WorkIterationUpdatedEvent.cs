@@ -4,6 +4,7 @@ using Moda.Common.Domain.Models.Planning.Iterations;
 using NodaTime;
 
 namespace Moda.Common.Domain.Events.WorkManagement.WorkIterations;
+
 public sealed record WorkIterationUpdatedEvent : DomainEvent
 {
     public WorkIterationUpdatedEvent(ISimpleIteration iteration, Instant timestamp)

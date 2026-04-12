@@ -9,6 +9,7 @@ using NodaTime.Extensions;
 using NodaTime.Testing;
 
 namespace Moda.StrategicManagement.Domain.Tests.Sut.Models;
+
 public sealed class VisionAggregateTests
 {
     private readonly TestingDateTimeProvider _dateTimeProvider;

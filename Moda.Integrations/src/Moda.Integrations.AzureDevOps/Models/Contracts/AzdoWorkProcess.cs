@@ -1,6 +1,7 @@
 ﻿using Moda.Common.Application.Interfaces.ExternalWork;
 
 namespace Moda.Integrations.AzureDevOps.Models.Contracts;
+
 public record AzdoWorkProcess : IExternalWorkProcess
 {
     public Guid Id { get; set; }

@@ -1,6 +1,7 @@
 ﻿using Moda.Planning.Domain.Interfaces;
 
 namespace Moda.Planning.Application.PlanningIntervals.Dtos;
+
 public sealed record LocalScheduleDto
 {
     public Guid Id { get; set; }

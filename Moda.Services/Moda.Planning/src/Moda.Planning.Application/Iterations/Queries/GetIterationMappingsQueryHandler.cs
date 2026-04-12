@@ -2,6 +2,7 @@
 using Moda.Common.Domain.Enums;
 
 namespace Moda.Planning.Application.Iterations.Queries;
+
 internal sealed class GetIterationMappingsQueryHandler(IPlanningDbContext planningDbContext, ILogger<GetIterationMappingsQueryHandler> logger) : IQueryHandler<GetIterationMappingsQuery, Dictionary<string, Guid>>
 {
     private const string AppRequestName = nameof(GetIterationMappingsQuery);

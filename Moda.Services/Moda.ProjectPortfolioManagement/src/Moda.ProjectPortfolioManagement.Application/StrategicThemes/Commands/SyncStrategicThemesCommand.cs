@@ -6,8 +6,8 @@ namespace Moda.ProjectPortfolioManagement.Application.StrategicThemes.Commands;
 public sealed record SyncStrategicThemesCommand(IEnumerable<IStrategicThemeData> StrategicThemes) : ICommand;
 
 internal sealed class SyncStrategicThemesCommandHandler(
-    IProjectPortfolioManagementDbContext ppmContext, 
-    ILogger<SyncStrategicThemesCommandHandler> logger) 
+    IProjectPortfolioManagementDbContext ppmContext,
+    ILogger<SyncStrategicThemesCommandHandler> logger)
     : ICommandHandler<SyncStrategicThemesCommand>
 {
     private const string AppRequestName = nameof(SyncStrategicThemesCommand);

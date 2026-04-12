@@ -2,6 +2,7 @@
 using Moda.Common.Application.Employees.Dtos;
 
 namespace Moda.Work.Application.WorkItems.Dtos;
+
 public sealed record WorkItemLinkDto : IMapFrom<WorkItemLink>
 {
     public Guid Id { get; set; }

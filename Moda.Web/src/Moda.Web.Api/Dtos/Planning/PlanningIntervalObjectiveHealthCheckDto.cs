@@ -4,6 +4,7 @@ using Moda.Planning.Application.Models;
 using Moda.Planning.Application.PlanningIntervals.Dtos;
 
 namespace Moda.Web.Api.Dtos.Planning;
+
 public sealed record PlanningIntervalObjectiveHealthCheckDto
 {
     /// <summary>Gets or sets the identifier.</summary>

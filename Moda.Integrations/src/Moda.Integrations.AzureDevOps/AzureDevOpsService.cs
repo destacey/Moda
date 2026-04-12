@@ -43,7 +43,7 @@ public class AzureDevOpsService(ILogger<AzureDevOpsService> logger, IServiceProv
     public async Task<Result<string>> GetSystemId(string organizationUrl, string token, CancellationToken cancellationToken)
     {
         var generalService = GetService<GeneralService>(organizationUrl, token);
-        
+
         var result = await generalService.GetConnectionData(cancellationToken).ConfigureAwait(false);
         if (result.IsFailure)
             return Result.Failure<string>(result.Error);

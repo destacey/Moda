@@ -5,6 +5,7 @@ using Moda.Tests.Shared.Data;
 using NodaTime.Extensions;
 
 namespace Moda.Planning.Domain.Tests.Data;
+
 public class PlanningIntervalIterationFaker : PrivateConstructorFaker<PlanningIntervalIteration>
 {
     public PlanningIntervalIterationFaker(Guid? planningIntervalId = null)

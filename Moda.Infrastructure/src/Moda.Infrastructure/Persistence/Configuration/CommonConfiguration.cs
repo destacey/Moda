@@ -14,14 +14,14 @@ public class EmployeeConfig : IEntityTypeConfiguration<Employee>
         builder.HasKey(e => e.Id);
         builder.HasAlternateKey(e => e.Key);
 
-        builder.HasIndex(e => new { e.Id, e.IsDeleted})
+        builder.HasIndex(e => new { e.Id, e.IsDeleted })
             .HasFilter("[IsDeleted] = 0");
-        
+
         builder.HasIndex(e => e.EmployeeNumber)
             .IsUnique()
             .IncludeProperties(e => new { e.Id })
             .HasFilter("[IsDeleted] = 0");
-        
+
         builder.HasIndex(e => new { e.IsActive, e.IsDeleted })
             .HasFilter("[IsDeleted] = 0");
 

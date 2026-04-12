@@ -1,6 +1,7 @@
 ﻿using Moda.Common.Application.Interfaces.ExternalWork;
 
 namespace Moda.Common.Application.Validators;
+
 public sealed class IExternalIterationValidator<T> : CustomValidator<IExternalIteration<T>> where T : class
 {
     public IExternalIterationValidator()
@@ -15,18 +16,18 @@ public sealed class IExternalIterationValidator<T> : CustomValidator<IExternalIt
         RuleFor(c => c.Type)
             .IsInEnum();
 
-        When(c => c.Start.HasValue, 
+        When(c => c.Start.HasValue,
             () => RuleFor(c => c.Start)
                 .NotEmpty());
 
-        When(c => c.End.HasValue, 
+        When(c => c.End.HasValue,
             () => RuleFor(c => c.End)
                 .NotEmpty());
 
         RuleFor(c => c.State)
             .IsInEnum();
 
-        When(c => c.TeamId.HasValue, 
+        When(c => c.TeamId.HasValue,
             () => RuleFor(c => c.TeamId)
                 .NotEmpty());
 

@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 
 namespace Moda.Integrations.AzureDevOps.IntegrationTests;
+
 public static class ConfigurationHelper
 {
     public static IConfigurationRoot GetConfiguration()

@@ -1,6 +1,7 @@
 ﻿using Moda.Common.Domain.Enums.Work;
 
 namespace Moda.Work.Application.WorkItems.Dtos;
+
 public sealed record WorkItemProgressStateDto : IMapFrom<WorkItem>
 {
     public Guid Id { get; set; }

@@ -3,6 +3,7 @@ using Moda.StrategicManagement.Domain.Enums;
 using NodaTime;
 
 namespace Moda.StrategicManagement.Domain.Models;
+
 public sealed class VisionAggregate(List<Vision> visions)
 {
     private readonly List<Vision> _visions = visions;

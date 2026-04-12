@@ -3,6 +3,7 @@ using Moda.Common.Application.Requests.WorkManagement.Interfaces;
 using Moda.Common.Models;
 
 namespace Moda.Common.Application.Requests.WorkManagement.Queries;
+
 public sealed record GetWorkspaceWorkTypesQuery : IQuery<Result<IReadOnlyList<IWorkTypeDto>>>
 {
     public GetWorkspaceWorkTypesQuery(Guid workspaceId)

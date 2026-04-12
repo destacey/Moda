@@ -4,6 +4,7 @@ using Moda.Organization.Application.Models;
 using NodaTime;
 
 namespace Moda.Organization.Application.Teams.Dtos;
+
 public sealed record TeamDetailsDto : IMapFrom<Team>
 {
     /// <summary>

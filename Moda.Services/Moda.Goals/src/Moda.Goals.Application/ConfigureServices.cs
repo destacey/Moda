@@ -3,6 +3,7 @@ using Mapster.Utils;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Moda.Goals.Application;
+
 public static class ConfigureServices
 {
     public static IServiceCollection AddGoalsApplication(this IServiceCollection services)

@@ -4,6 +4,7 @@ using Moda.Integrations.AzureDevOps.Models.Processes;
 using Moda.Integrations.AzureDevOps.Tests.Models;
 
 namespace Moda.Integrations.AzureDevOps.Tests.Sut.Models.Processes;
+
 public class BehaviorDtoExtensionsTests : CommonResponseOptions
 {
     [Fact]

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Moda.Common.Domain.FeatureManagement;
 
 namespace Moda.Infrastructure.Persistence.Configuration;
+
 public class FeatureFlagConfiguration : IEntityTypeConfiguration<FeatureFlag>
 {
     public void Configure(EntityTypeBuilder<FeatureFlag> builder)

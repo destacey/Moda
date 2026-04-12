@@ -3,6 +3,7 @@ using Moda.Common.Domain.Employees;
 using Moda.Common.Helpers;
 
 namespace Moda.Common.Application.Employees.Dtos;
+
 public sealed record EmployeeDetailsDto : IMapFrom<Employee>
 {
     /// <summary>Gets the identifier.</summary>

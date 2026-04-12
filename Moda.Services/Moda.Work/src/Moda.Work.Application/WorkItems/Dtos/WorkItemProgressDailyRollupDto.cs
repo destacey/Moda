@@ -1,6 +1,7 @@
 ﻿using Moda.Common.Domain.Enums.Work;
 
 namespace Moda.Work.Application.WorkItems.Dtos;
+
 public sealed record WorkItemProgressDailyRollupDto : WorkItemProgressRollupDto
 {
     public DateOnly Date { get; set; }

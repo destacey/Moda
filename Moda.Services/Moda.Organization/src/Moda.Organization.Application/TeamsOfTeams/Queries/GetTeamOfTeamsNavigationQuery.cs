@@ -2,6 +2,7 @@
 using Moda.Organization.Application.Models;
 
 namespace Moda.Organization.Application.TeamsOfTeams.Queries;
+
 public sealed record GetTeamOfTeamsNavigationQuery : IQuery<TeamNavigationDto?>
 {
     public GetTeamOfTeamsNavigationQuery(Guid teamId)
@@ -19,8 +20,8 @@ public sealed record GetTeamOfTeamsNavigationQuery : IQuery<TeamNavigationDto?>
 }
 
 internal sealed class GetTeamOfTeamsNavigationQueryHandler(
-    IOrganizationDbContext organizationDbContext, 
-    ILogger<GetTeamOfTeamsNavigationQueryHandler> logger) 
+    IOrganizationDbContext organizationDbContext,
+    ILogger<GetTeamOfTeamsNavigationQueryHandler> logger)
     : IQueryHandler<GetTeamOfTeamsNavigationQuery, TeamNavigationDto?>
 {
     private readonly IOrganizationDbContext _organizationDbContext = organizationDbContext;

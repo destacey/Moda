@@ -2,6 +2,7 @@
 using Moda.Work.Domain.Interfaces;
 
 namespace Moda.Work.Application.WorkItems.Dtos;
+
 public sealed record WorkItemParentInfo : IMapFrom<WorkItem>, IWorkItemParentInfo
 {
     public Guid Id { get; init; }

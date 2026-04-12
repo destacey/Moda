@@ -1,6 +1,7 @@
 ﻿using Moda.Planning.Application.Risks.Dtos;
 
 namespace Moda.Planning.Application.Risks.Commands;
+
 public sealed record ImportRisksCommand : ICommand
 {
     public ImportRisksCommand(IEnumerable<ImportRiskDto> risks)

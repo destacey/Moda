@@ -1,4 +1,5 @@
 ﻿namespace Moda.AppIntegration.Application.Interfaces;
+
 public interface IAzureDevOpsInitManager : ITransientService
 {
     Task<Result> SyncOrganizationConfiguration(Guid connectionId, CancellationToken cancellationToken, Guid? syncId = null);

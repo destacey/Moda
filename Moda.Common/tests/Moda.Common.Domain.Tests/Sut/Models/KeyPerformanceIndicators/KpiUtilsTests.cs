@@ -141,16 +141,16 @@ public sealed class KpiUtilsTests
 
     [Theory]
     //                       start   actual  target  direction                        expected  comment
-    [InlineData(              0.0,    0.0,   100.0, KpiTargetDirection.Increase,       0.0)]  // at start
-    [InlineData(              0.0,   50.0,   100.0, KpiTargetDirection.Increase,       0.5)]  // halfway
-    [InlineData(              0.0,  100.0,   100.0, KpiTargetDirection.Increase,       1.0)]  // at target
-    [InlineData(              0.0,  125.0,   100.0, KpiTargetDirection.Increase,       1.25)] // beyond target
-    [InlineData(              0.0,  -25.0,   100.0, KpiTargetDirection.Increase,      -0.25)] // regressed
-    [InlineData(            100.0,  100.0,     0.0, KpiTargetDirection.Decrease,       0.0)]  // at start
-    [InlineData(            100.0,   50.0,     0.0, KpiTargetDirection.Decrease,       0.5)]  // halfway
-    [InlineData(            100.0,    0.0,     0.0, KpiTargetDirection.Decrease,       1.0)]  // at target
-    [InlineData(            100.0,  -25.0,     0.0, KpiTargetDirection.Decrease,       1.25)] // beyond target
-    [InlineData(            100.0,  125.0,     0.0, KpiTargetDirection.Decrease,      -0.25)] // regressed
+    [InlineData(0.0, 0.0, 100.0, KpiTargetDirection.Increase, 0.0)]  // at start
+    [InlineData(0.0, 50.0, 100.0, KpiTargetDirection.Increase, 0.5)]  // halfway
+    [InlineData(0.0, 100.0, 100.0, KpiTargetDirection.Increase, 1.0)]  // at target
+    [InlineData(0.0, 125.0, 100.0, KpiTargetDirection.Increase, 1.25)] // beyond target
+    [InlineData(0.0, -25.0, 100.0, KpiTargetDirection.Increase, -0.25)] // regressed
+    [InlineData(100.0, 100.0, 0.0, KpiTargetDirection.Decrease, 0.0)]  // at start
+    [InlineData(100.0, 50.0, 0.0, KpiTargetDirection.Decrease, 0.5)]  // halfway
+    [InlineData(100.0, 0.0, 0.0, KpiTargetDirection.Decrease, 1.0)]  // at target
+    [InlineData(100.0, -25.0, 0.0, KpiTargetDirection.Decrease, 1.25)] // beyond target
+    [InlineData(100.0, 125.0, 0.0, KpiTargetDirection.Decrease, -0.25)] // regressed
     public void CalculateProgress_ShouldReturnExpected_ForDirectionAndValues(double startingValue, double actualValue, double targetValue, KpiTargetDirection direction, double expected)
     {
         // Act

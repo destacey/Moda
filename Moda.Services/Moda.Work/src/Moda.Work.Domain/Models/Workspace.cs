@@ -83,10 +83,10 @@ public sealed class Workspace : BaseSoftDeletableEntity, IActivatable<WorkspaceA
     /// <summary>
     /// A url template for external work items.  This template plus the work item external id will create a url to view the work item in the external system.
     /// </summary>
-    public string? ExternalViewWorkItemUrlTemplate 
-    { 
-        get => _externalViewWorkItemUrlTemplate; 
-        private set => _externalViewWorkItemUrlTemplate = value.NullIfWhiteSpacePlusTrim(); 
+    public string? ExternalViewWorkItemUrlTemplate
+    {
+        get => _externalViewWorkItemUrlTemplate;
+        private set => _externalViewWorkItemUrlTemplate = value.NullIfWhiteSpacePlusTrim();
     }
 
     /// <summary>
@@ -132,7 +132,7 @@ public sealed class Workspace : BaseSoftDeletableEntity, IActivatable<WorkspaceA
             if (workItem != null)
                 _workItems.Remove(workItem);
         }
-        
+
         return Result.Success();
     }
 
@@ -150,7 +150,7 @@ public sealed class Workspace : BaseSoftDeletableEntity, IActivatable<WorkspaceA
 
         // return success if no changes
         if (string.Equals(Name, newName, StringComparison.Ordinal)
-            && string.Equals(Description, newDescription, StringComparison.Ordinal)) 
+            && string.Equals(Description, newDescription, StringComparison.Ordinal))
             return Result.Success();
 
         Name = newName;

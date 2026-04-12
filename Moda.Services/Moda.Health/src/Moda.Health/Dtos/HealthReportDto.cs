@@ -1,4 +1,5 @@
 ﻿namespace Moda.Health.Dtos;
+
 public sealed record HealthReportDto
 {
     public HealthReportDto(IReadOnlyCollection<HealthCheckDto> healthChecks)

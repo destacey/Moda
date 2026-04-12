@@ -1,6 +1,7 @@
 ﻿using Moda.Planning.Domain.Enums;
 
 namespace Moda.Planning.Application.Risks.Dtos;
+
 public sealed record ImportRiskDto(
     int ImportId,
     string Summary,

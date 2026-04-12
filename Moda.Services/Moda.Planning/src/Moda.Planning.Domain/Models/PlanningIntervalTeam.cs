@@ -1,4 +1,5 @@
 ﻿namespace Moda.Planning.Domain.Models;
+
 public sealed class PlanningIntervalTeam
 {
     private PlanningIntervalTeam() { }

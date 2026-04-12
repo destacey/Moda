@@ -1,4 +1,4 @@
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using Moda.Common.Application.Models;
@@ -51,7 +51,7 @@ public sealed class ObjectiveHealthCheckSummaryContextPack : ContextPack
         var hashBytes = SHA256.HashData(bytes);
         return Convert.ToHexString(hashBytes).ToLowerInvariant();
     }
-    
+
 }
 
 public sealed class ObjectiveMetadata

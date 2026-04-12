@@ -1,4 +1,4 @@
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using Moda.ProjectPortfolioManagement.Application.Projects.Models;
 using Moda.ProjectPortfolioManagement.Application.ProjectTasks.Dtos;
 using Moda.ProjectPortfolioManagement.Domain.Models;
@@ -17,8 +17,8 @@ public sealed record GetProjectTasksQuery : IQuery<IReadOnlyList<ProjectTaskList
         StatusFilter = statusFilter;
         ParentId = parentId;
     }
-        
-    public Expression<Func<ProjectTask, bool>> ProjectIdOrKeyFilter { get; } 
+
+    public Expression<Func<ProjectTask, bool>> ProjectIdOrKeyFilter { get; }
     public Domain.Enums.TaskStatus? StatusFilter { get; }
     public Guid? ParentId { get; }
 }

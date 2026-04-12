@@ -3,6 +3,7 @@ using Moda.Planning.Application.Models;
 using Moda.Planning.Domain.Models.Iterations;
 
 namespace Moda.Planning.Application.Iterations.Dtos;
+
 public sealed record SprintDetailsDto : IMapFrom<Iteration>
 {
     public Guid Id { get; set; }

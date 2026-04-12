@@ -9,7 +9,7 @@ public sealed class TeamMembershipFaker : PrivateConstructorFaker<TeamMembership
     public TeamMembershipFaker()
     {
         var start = LocalDate.FromDateTime(DateTime.UtcNow.AddMonths(-3));
-        
+
         RuleFor(x => x.Id, f => f.Random.Guid());
         RuleFor(x => x.SourceId, f => f.Random.Guid());
         RuleFor(x => x.TargetId, f => f.Random.Guid());

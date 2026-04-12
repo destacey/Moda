@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 
 namespace Moda.Infrastructure.Auth.AzureAd;
+
 public sealed class AzureAdSettings
 {
     public const string SectionName = "SecuritySettings:AzureAd";

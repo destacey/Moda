@@ -3,6 +3,7 @@ using Moda.Common.Domain.Enums.AppIntegrations;
 using Moda.Common.Extensions;
 
 namespace Moda.AppIntegration.Domain.Models;
+
 public abstract class Connection : BaseSoftDeletableEntity, IActivatable
 {
     /// <summary>

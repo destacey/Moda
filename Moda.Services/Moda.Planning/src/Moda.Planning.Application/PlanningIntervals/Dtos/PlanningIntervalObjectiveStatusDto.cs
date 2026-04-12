@@ -1,4 +1,5 @@
 ﻿namespace Moda.Planning.Application.PlanningIntervals.Dtos;
+
 public sealed record PlanningIntervalObjectiveStatusDto
 {
     public int Id { get; set; }

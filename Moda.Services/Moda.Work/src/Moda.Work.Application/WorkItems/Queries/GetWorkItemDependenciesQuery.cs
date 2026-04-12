@@ -4,6 +4,7 @@ using Moda.Work.Application.WorkItemDependencies.Dtos;
 using Moda.Work.Application.Workspaces.Models;
 
 namespace Moda.Work.Application.WorkItems.Queries;
+
 public sealed record GetWorkItemDependenciesQuery : IQuery<Result<List<ScopedDependencyDto>?>>
 {
     public GetWorkItemDependenciesQuery(WorkspaceIdOrKey workspaceIdOrKey, WorkItemKey workItemKey)

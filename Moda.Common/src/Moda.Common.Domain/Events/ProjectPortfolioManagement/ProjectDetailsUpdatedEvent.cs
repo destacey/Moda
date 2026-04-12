@@ -3,6 +3,7 @@ using Moda.Common.Domain.Models.ProjectPortfolioManagement;
 using NodaTime;
 
 namespace Moda.Common.Domain.Events.ProjectPortfolioManagement;
+
 public sealed record ProjectDetailsUpdatedEvent : DomainEvent, ISimpleProject
 {
     public ProjectDetailsUpdatedEvent(ISimpleProject project, int expenditureCategoryId, Instant timestamp)

@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 
 namespace Moda.Tests.Shared.Data;
+
 public class IncludePrivateFieldBinder : Bogus.Binder
 {
     public override Dictionary<string, MemberInfo> GetMembers(Type type)

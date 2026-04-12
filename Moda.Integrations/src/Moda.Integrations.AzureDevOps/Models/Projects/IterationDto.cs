@@ -58,14 +58,14 @@ internal static class IterationDtoExtensions
         // Azure DevOps iterations are sprints only if they do not have child iterations and they have start and end dates
         var type = !iteration.HasChildren && start.HasValue && end.HasValue
             ? IterationType.Sprint
-            : IterationType.Iteration;                
+            : IterationType.Iteration;
 
         return new AzdoIteration(iteration.Id, iteration.Name, type, start, end, iteration.TeamId, metadata, now);
     }
 
     public static List<IExternalIteration<AzdoIterationMetadata>> ToIExternalIterations(this List<IterationDto> iterations, Instant now, Guid projectId)
     {
-        List<IExternalIteration<AzdoIterationMetadata>> azdoIterations = new (iterations.Count);
+        List<IExternalIteration<AzdoIterationMetadata>> azdoIterations = new(iterations.Count);
         foreach (var iteration in iterations)
         {
             azdoIterations.Add(iteration.ToAzdoIteration(now, projectId));

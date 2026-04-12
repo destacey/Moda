@@ -4,6 +4,7 @@ using Moda.Planning.Domain.Models.Roadmaps;
 using Moda.Tests.Shared.Data;
 
 namespace Moda.Planning.Domain.Tests.Data;
+
 public class RoadmapFaker : PrivateConstructorFaker<Roadmap>
 {
     public RoadmapFaker(LocalDate? localDate = null)

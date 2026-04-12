@@ -2,6 +2,7 @@
 using Moda.Common.Domain.Employees;
 
 namespace Moda.Common.Application.Employees.Commands;
+
 public sealed record RemoveInvalidEmployeeCommand(Guid Id) : ICommand<int>;
 
 internal sealed class RemoveInvalidEmployeeCommandHandler : ICommandHandler<RemoveInvalidEmployeeCommand, int>

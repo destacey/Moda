@@ -1,4 +1,5 @@
 ﻿namespace Moda.Common.Application.Interfaces.ExternalWork;
+
 public interface IExternalWorkProcess
 {
     Guid Id { get; }

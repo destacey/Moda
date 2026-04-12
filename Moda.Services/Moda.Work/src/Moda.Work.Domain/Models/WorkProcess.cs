@@ -134,7 +134,7 @@ public sealed class WorkProcess : BaseSoftDeletableEntity, IActivatable, IHasIdA
             foreach (WorkProcessScheme scheme in Schemes)
             {
                 if (!scheme.IsActive) continue;
-                
+
                 var deactivateSchemeResult = scheme.Deactivate(timestamp);
                 if (deactivateSchemeResult.IsFailure)
                     return Result.Failure(deactivateSchemeResult.Error);

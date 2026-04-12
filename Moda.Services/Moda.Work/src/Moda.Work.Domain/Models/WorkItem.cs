@@ -59,9 +59,9 @@ public sealed class WorkItem : BaseAuditableEntity, IHasWorkspace, IHasOptionalW
         private set => field = Guard.Against.Null(value, nameof(Key));
     } = null!;
 
-    public string Title 
-    { 
-        get; 
+    public string Title
+    {
+        get;
         private set => field = Guard.Against.NullOrWhiteSpace(value, nameof(Title)).Trim();
 
     } = null!;

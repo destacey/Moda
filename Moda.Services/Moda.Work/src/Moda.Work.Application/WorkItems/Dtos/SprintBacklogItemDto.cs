@@ -8,6 +8,7 @@ using Moda.Work.Application.Workspaces.Dtos;
 using Moda.Work.Application.WorkTeams.Dtos;
 
 namespace Moda.Work.Application.WorkItems.Dtos;
+
 public sealed record SprintBacklogItemDto : IMapFrom<WorkItem>
 {
     // Named constant for the Done status category id to avoid repeated casts
@@ -26,7 +27,7 @@ public sealed record SprintBacklogItemDto : IMapFrom<WorkItem>
     public EmployeeNavigationDto? AssignedTo { get; set; }
     public Instant Created { get; set; }
     public Instant? Activated { get; set; }
-    public Instant? Done { get; set; }    
+    public Instant? Done { get; set; }
     public int Rank { get; set; }
     public int? ParentRank { get; set; }
     public WorkProjectNavigationDto? Project { get; set; }

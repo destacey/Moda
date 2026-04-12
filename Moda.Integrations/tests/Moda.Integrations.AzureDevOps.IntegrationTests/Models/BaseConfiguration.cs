@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 
 namespace Moda.Integrations.AzureDevOps.IntegrationTests.Models;
+
 public abstract class BaseConfiguration
 {
     public BaseConfiguration(IConfiguration configuration, string sectionName)

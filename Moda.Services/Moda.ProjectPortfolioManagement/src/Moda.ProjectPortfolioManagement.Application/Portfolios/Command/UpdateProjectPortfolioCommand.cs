@@ -67,7 +67,8 @@ internal sealed class UpdateProjectPortfolioCommandHandler(
 
             var roles = GetRoles(request);
             var updateRolesResult = portfolio.UpdateRoles(roles);
-            if (updateRolesResult.IsFailure) {
+            if (updateRolesResult.IsFailure)
+            {
                 return await HandleDomainFailure(portfolio, updateRolesResult, cancellationToken);
             }
 

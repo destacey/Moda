@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 namespace Moda.Common.Application.Dtos;
+
 public record SimpleNavigationDto
 {
     [Required]

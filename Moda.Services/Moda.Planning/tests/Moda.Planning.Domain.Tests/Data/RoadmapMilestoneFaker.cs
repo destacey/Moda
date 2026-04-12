@@ -2,6 +2,7 @@
 using Moda.Tests.Shared.Data;
 
 namespace Moda.Planning.Domain.Tests.Data;
+
 public class RoadmapMilestoneFaker : PrivateConstructorFaker<RoadmapMilestone>
 {
     public RoadmapMilestoneFaker(Guid? roadmapId = null, LocalDate? localDate = null)
@@ -30,7 +31,8 @@ public static class RoadmapMilestoneFakerExtensions
         if (!string.IsNullOrWhiteSpace(description)) { faker.RuleFor(x => x.Description, description); }
         if (date is not null) { faker.RuleFor(x => x.Date, date); }
         if (parentId.HasValue && parent is null) { faker.RuleFor(x => x.ParentId, parentId); }
-        if (parent is not null) {
+        if (parent is not null)
+        {
             faker.RuleFor(x => x.ParentId, parent.Id);
             faker.RuleFor(x => x.Parent, parent);
         }

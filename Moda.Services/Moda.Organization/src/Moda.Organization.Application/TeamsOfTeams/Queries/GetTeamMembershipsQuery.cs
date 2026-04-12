@@ -1,6 +1,7 @@
 ﻿using Moda.Organization.Application.Models;
 
 namespace Moda.Organization.Application.TeamsOfTeams.Queries;
+
 public sealed record GetTeamMembershipsQuery : IQuery<IReadOnlyList<TeamMembershipDto>>
 {
     public GetTeamMembershipsQuery(Guid teamId)

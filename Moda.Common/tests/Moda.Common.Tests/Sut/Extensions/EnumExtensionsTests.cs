@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 namespace Moda.Common.Tests.Sut.Extensions;
+
 public class EnumExtensionsTests
 {
     [Theory]

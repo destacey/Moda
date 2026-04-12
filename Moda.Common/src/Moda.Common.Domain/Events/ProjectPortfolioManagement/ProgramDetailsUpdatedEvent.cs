@@ -2,6 +2,7 @@
 using NodaTime;
 
 namespace Moda.Common.Domain.Events.ProjectPortfolioManagement;
+
 public sealed record ProgramDetailsUpdatedEvent : DomainEvent, ISimpleProgram
 {
     public ProgramDetailsUpdatedEvent(ISimpleProgram program, Instant timestamp)

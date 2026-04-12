@@ -1,4 +1,5 @@
 ﻿namespace Moda.Common.Application.Requests.WorkManagement.Interfaces;
+
 public interface IWorkProcessSchemeDto
 {
     Guid Id { get; }

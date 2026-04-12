@@ -2,6 +2,7 @@
 using Moda.Work.Application.WorkProcesses.Dtos;
 
 namespace Moda.Work.Application.WorkProcesses.Queries;
+
 public sealed record GetWorkProcessesQuery(bool IncludeInactive = false) : IQuery<IReadOnlyList<WorkProcessListDto>>;
 
 internal sealed class GetWorkProcessesQueryHandler(IWorkDbContext workDbContext, ILogger<GetWorkProcessesQueryHandler> logger) : IQueryHandler<GetWorkProcessesQuery, IReadOnlyList<WorkProcessListDto>>

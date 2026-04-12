@@ -3,7 +3,7 @@ using Moda.Planning.Domain.Models.PlanningPoker;
 
 namespace Moda.Planning.Application.PokerSessions.Dtos;
 
-public sealed record  PokerRoundDto : IMapFrom<PokerRound>
+public sealed record PokerRoundDto : IMapFrom<PokerRound>
 {
     public Guid Id { get; set; }
     public string? Label { get; set; }

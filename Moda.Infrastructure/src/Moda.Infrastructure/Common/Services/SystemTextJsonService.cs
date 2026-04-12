@@ -5,6 +5,7 @@ using NodaTime.Serialization.SystemTextJson;
 using OneOf.Serialization.SystemTextJson;
 
 namespace Moda.Infrastructure.Common.Services;
+
 public sealed class SystemTextJsonService : ISerializerService
 {
     public T Deserialize<T>(string text)

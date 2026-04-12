@@ -3,6 +3,7 @@ using Moda.Common.Application.Dtos;
 using Moda.Goals.Domain.Models;
 
 namespace Moda.Common.Application.Requests.Goals.Dtos;
+
 public sealed record ObjectiveListDto : IMapFrom<Objective>
 {
     /// <summary>Gets or sets the identifier.</summary>

@@ -3,6 +3,7 @@ using Moda.Planning.Domain.Models;
 using Moda.Tests.Shared.Data;
 
 namespace Moda.Planning.Domain.Tests.Data;
+
 public class SimpleHealthCheckFaker : PrivateConstructorFaker<SimpleHealthCheck>
 {
     public SimpleHealthCheckFaker(Instant timestamp, Guid? objectId = null)

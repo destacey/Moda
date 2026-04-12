@@ -2,6 +2,7 @@
 using Moda.Common.Application.Validators;
 
 namespace Moda.Common.Application.Requests.Planning.Iterations;
+
 public sealed record SyncAzureDevOpsIterationsCommand(string SystemId, List<IExternalIteration<AzdoIterationMetadata>> Iterations, Dictionary<Guid, Guid?> TeamMappings) : ICommand, ILongRunningRequest;
 
 public sealed class SyncAzureDevOpsIterationsCommandValidator : CustomValidator<SyncAzureDevOpsIterationsCommand>
@@ -13,8 +14,8 @@ public sealed class SyncAzureDevOpsIterationsCommandValidator : CustomValidator<
 
         RuleForEach(c => c.Iterations)
             .NotNull()
-            .SetValidator(new IExternalIterationValidator<AzdoIterationMetadata>()); 
-        
+            .SetValidator(new IExternalIterationValidator<AzdoIterationMetadata>());
+
         When(c => c.TeamMappings.Count > 0, () =>
             {
                 RuleForEach(c => c.TeamMappings).ChildRules(teamMapping =>

@@ -1,4 +1,4 @@
-using Moda.ProjectPortfolioManagement.Domain.Enums;
+﻿using Moda.ProjectPortfolioManagement.Domain.Enums;
 using Moda.ProjectPortfolioManagement.Domain.Models;
 
 namespace Moda.ProjectPortfolioManagement.Application.ProjectTasks.Commands;
@@ -100,7 +100,7 @@ internal sealed class UpdateProjectTaskCommandHandler(
             // Update progress
             if (task.Type is ProjectTaskType.Task)
             {
-                if(request.Progress is null)
+                if (request.Progress is null)
                 {
                     _logger.LogInformation("Progress must be provided for task type 'Task'.");
                     return Result.Failure("Progress must be provided for task type 'Task'.");

@@ -1,6 +1,7 @@
 ﻿using Moda.Work.Application.Persistence;
 
 namespace Moda.Work.Application.WorkProcesses.Commands;
+
 public sealed record ActivateWorkProcessCommand(Guid Id) : ICommand;
 
 internal sealed class ActivateWorkProcessCommandHandler(IWorkDbContext workDbContext, ILogger<ActivateWorkProcessCommandHandler> logger, IDateTimeProvider dateTimeProvider) : ICommandHandler<ActivateWorkProcessCommand>

@@ -38,7 +38,7 @@ internal sealed class CreateStrategicInitiativeKpiCommandHandler(
             if (strategicInitiative == null)
             {
                 _logger.LogInformation("Strategic Initiative with Id {StrategicInitiativeId} not found.", request.StrategicInitiativeId);
-                return Result.Failure<ObjectIdAndKey>("Strategic Initiative not found.");            
+                return Result.Failure<ObjectIdAndKey>("Strategic Initiative not found.");
             }
 
             var createResult = strategicInitiative.CreateKpi(request.UpsertParameters);

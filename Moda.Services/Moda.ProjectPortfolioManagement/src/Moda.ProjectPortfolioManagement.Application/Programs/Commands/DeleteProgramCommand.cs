@@ -13,9 +13,9 @@ public sealed class DeleteProgramCommandValidator : AbstractValidator<DeleteProg
 }
 
 internal sealed class DeleteProgramCommandHandler(
-    IProjectPortfolioManagementDbContext ppmDbContext, 
-    ILogger<DeleteProgramCommandHandler> logger, 
-    IDateTimeProvider dateTimeProvider) 
+    IProjectPortfolioManagementDbContext ppmDbContext,
+    ILogger<DeleteProgramCommandHandler> logger,
+    IDateTimeProvider dateTimeProvider)
     : ICommandHandler<DeleteProgramCommand>
 {
     private const string AppRequestName = nameof(DeleteProgramCommand);

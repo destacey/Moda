@@ -1,4 +1,5 @@
 ﻿namespace Moda.Organization.Application.TeamsOfTeams.Queries;
+
 public sealed record TeamOfTeamsExistsQuery : IQuery<bool>
 {
     public TeamOfTeamsExistsQuery(Guid teamId)
@@ -16,8 +17,8 @@ public sealed record TeamOfTeamsExistsQuery : IQuery<bool>
 }
 
 internal sealed class TeamOfTeamsExistsQueryHandler(
-    IOrganizationDbContext organizationDbContext, 
-    ILogger<TeamOfTeamsExistsQueryHandler> logger) 
+    IOrganizationDbContext organizationDbContext,
+    ILogger<TeamOfTeamsExistsQueryHandler> logger)
     : IQueryHandler<TeamOfTeamsExistsQuery, bool>
 {
     private readonly IOrganizationDbContext _organizationDbContext = organizationDbContext;

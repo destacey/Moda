@@ -2,6 +2,7 @@
 using Moda.Planning.Domain.Models.Roadmaps;
 
 namespace Moda.Planning.Domain.Tests.Models;
+
 internal record class TestUpsertRoadmapItem : IUpsertRoadmapItem
 {
     public TestUpsertRoadmapItem(BaseRoadmapItem item)

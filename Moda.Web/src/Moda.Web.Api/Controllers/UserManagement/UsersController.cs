@@ -87,7 +87,7 @@ public class UsersController(IUserService userService) : ControllerBase
     {
         if (id != request.UserId)
             return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(nameof(id), nameof(request.UserId), HttpContext));
-        
+
         var result = await _userService.AssignRolesAsync(request.ToAssignUserRolesRequest(), cancellationToken);
 
         return result.IsSuccess

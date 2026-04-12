@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Moda.AppIntegration.Application.Connections.Dtos.AzureDevOps;
 
 namespace Moda.AppIntegration.Application.Connections.Queries.AzureDevOps;
+
 public sealed record GetAzureDevOpsConnectionTeamsQuery(Guid ConnectionId, Guid? WorkspaceId = null) : IQuery<List<AzureDevOpsWorkspaceTeamDto>>;
 
 internal sealed class GetAzureDevOpsConnectionTeamsQueryHandler(IAppIntegrationDbContext appIntegrationDbContext) : IQueryHandler<GetAzureDevOpsConnectionTeamsQuery, List<AzureDevOpsWorkspaceTeamDto>>

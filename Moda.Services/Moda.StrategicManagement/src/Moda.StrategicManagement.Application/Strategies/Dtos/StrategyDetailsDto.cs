@@ -2,6 +2,7 @@
 using Moda.StrategicManagement.Domain.Models;
 
 namespace Moda.StrategicManagement.Application.Strategies.Dtos;
+
 public sealed record StrategyDetailsDto : IMapFrom<Strategy>
 {
     /// <summary>
