@@ -51,7 +51,7 @@ public static class RoadmapActivityFakerExtensions
 
         var childFaker = new RoadmapActivityFaker(localDate: faker.BaseDate);
 
-        List<BaseRoadmapItem> children = [with(childrenCount)];
+        List<BaseRoadmapItem> children = new(childrenCount);
         for (int i = 0; i < childrenCount; i++)
         {
             var child = childFaker.WithData(parent: activity, order: i + 1).Generate();

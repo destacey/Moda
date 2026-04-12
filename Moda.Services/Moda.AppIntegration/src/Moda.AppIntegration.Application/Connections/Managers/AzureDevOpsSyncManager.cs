@@ -477,8 +477,8 @@ public sealed class AzureDevOpsSyncManager(ILogger<AzureDevOpsSyncManager> logge
             return;
         }
 
-        teamSettings = [with(workspaceTeams.Length)];
-        teamMappings = [with(workspaceTeams.Length)];
+        teamSettings = new (workspaceTeams.Length);
+        teamMappings = new(workspaceTeams.Length);
 
         foreach (var team in workspaceTeams)
         {

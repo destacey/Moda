@@ -65,7 +65,7 @@ internal static class IterationDtoExtensions
 
     public static List<IExternalIteration<AzdoIterationMetadata>> ToIExternalIterations(this List<IterationDto> iterations, Instant now, Guid projectId)
     {
-        List<IExternalIteration<AzdoIterationMetadata>> azdoIterations = [with(iterations.Count)];
+        List<IExternalIteration<AzdoIterationMetadata>> azdoIterations = new (iterations.Count);
         foreach (var iteration in iterations)
         {
             azdoIterations.Add(iteration.ToAzdoIteration(now, projectId));

@@ -40,7 +40,7 @@ public sealed class MicrosoftGraphService : IExternalEmployeeDirectoryService
             _logger.LogInformation("Found {UserCount} users in Active Directory via Microsoft Graph", users.Count);
 
             users = users.Where(u => !string.IsNullOrWhiteSpace(u.Id) && !string.IsNullOrEmpty(u.GivenName) && !string.IsNullOrEmpty(u.Surname)).ToList();
-            List<AzureAdEmployee> employees = [with(users.Count)];
+            List<AzureAdEmployee> employees = new(users.Count);
             foreach (var user in users)
             {
                 employees.Add(new AzureAdEmployee(user));
