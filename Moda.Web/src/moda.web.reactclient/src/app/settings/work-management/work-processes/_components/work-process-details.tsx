@@ -21,7 +21,7 @@ const WorkProcessDetails = ({ workProcess }: WorkProcessDetailsProps) => {
   return (
     <>
       <Descriptions>
-        <Item label="Ownership">{workProcess.ownership.name}</Item>
+        <Item label="Ownership">{workProcess.ownership?.name}</Item>
         <Item label="Is Active?">{workProcess.isActive?.toString()}</Item>
       </Descriptions>
       <Descriptions>
@@ -35,10 +35,10 @@ const WorkProcessDetails = ({ workProcess }: WorkProcessDetailsProps) => {
         renderItem={(scheme) => (
           <ListItem>
             <ListItemMeta
-              title={scheme.workType.name}
-              description={scheme.workType.description}
+              title={scheme.workType?.name}
+              description={scheme.workType?.description}
             />
-            <div>{scheme.workflow.name}</div>
+            <div>{scheme.workflow?.name}</div>
             {/* <Link
               href={`/settings/work-management/workflows/${scheme.workflow.key}`}
             >
