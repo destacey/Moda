@@ -235,7 +235,7 @@ public class TeamsOfTeamsController : ControllerBase
 
         return result.IsSuccess
             ? CreatedAtAction(nameof(GetRiskById), new { id, riskId = result.Value }, result.Value)
-            : BadRequest(result.ToBadRequestObject(HttpContext)); ;
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     [HttpPut("{id}/risks/{riskId}")]

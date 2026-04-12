@@ -511,7 +511,7 @@ public class TeamOfTeamsTests
         var team = _teamOfTeamsFaker.Generate();
         var parentTeam = _teamOfTeamsFaker.Generate();
         LocalDate start = new(2023, 1, 1);
-        LocalDate? end = new(2023, 5, 1); ;
+        LocalDate? end = new(2023, 5, 1);
         MembershipDateRange dateRange = new(start, end);
 
         // Act

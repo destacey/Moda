@@ -74,7 +74,6 @@ public abstract class BaseMembership : BaseSoftDeletableEntity
     {
         if (IsPastOn(date)) { return MembershipState.Past; }
         if (IsActiveOn(date)) { return MembershipState.Active; }
-        ;
         return MembershipState.Future;
     }
 }

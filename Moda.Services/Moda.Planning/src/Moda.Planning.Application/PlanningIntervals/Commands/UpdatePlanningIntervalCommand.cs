@@ -16,7 +16,7 @@ public sealed class UpdatePlanningIntervalCommandValidator : CustomValidator<Upd
             .MaximumLength(128)
             .MustAsync(async (model, name, cancellationToken)
                 => await BeUniquePlanningIntervalName(model.Id, name, cancellationToken))
-                .WithMessage("The Planning Interval name already exists."); ;
+                .WithMessage("The Planning Interval name already exists.");
 
         RuleFor(e => e.Description)
             .MaximumLength(2048);

@@ -53,7 +53,7 @@ public sealed class UpdateRiskRequestValidator : CustomValidator<UpdateRiskReque
 
         RuleFor(r => (RiskGrade)r.LikelihoodId)
             .IsInEnum()
-            .WithMessage("A valid likelihood must be selected."); ;
+            .WithMessage("A valid likelihood must be selected.");
 
         RuleFor(r => r.Response)
             .MaximumLength(1024);

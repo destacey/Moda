@@ -43,7 +43,7 @@ public sealed class PlanningIntervalIterationUpsertRequestValidator : CustomVali
 
         RuleFor(c => (IterationCategory)c.CategoryId)
             .IsInEnum()
-            .WithMessage(errorMessage: "A valid iteration category must be selected."); ;
+            .WithMessage(errorMessage: "A valid iteration category must be selected.");
 
         RuleFor(i => i.Start)
             .NotNull();

@@ -35,7 +35,7 @@ public sealed class UpdateWorkTypeLevelCommandValidator : CustomValidator<Update
         RuleFor(c => c.Name)
             .NotEmpty()
             .MaximumLength(128)
-            .MustAsync(async (cmd, workTypeLevel, cancellationToken) => await BeUniqueName(cmd.Id, workTypeLevel, cancellationToken)).WithMessage("The work type level name already exists."); ;
+            .MustAsync(async (cmd, workTypeLevel, cancellationToken) => await BeUniqueName(cmd.Id, workTypeLevel, cancellationToken)).WithMessage("The work type level name already exists.");
 
         RuleFor(c => c.Description)
             .MaximumLength(1024);
