@@ -21,7 +21,7 @@ internal static class ModelBuilderExtensions
 
             // apply the query filter with a key based on the interface type
             modelBuilder.Entity(entity).Metadata.SetQueryFilter(
-                typeof(TInterface).Name,
+                typeof(TInterface).FullName!,
                 Expression.Lambda(filterBody, parameterType));
         }
 

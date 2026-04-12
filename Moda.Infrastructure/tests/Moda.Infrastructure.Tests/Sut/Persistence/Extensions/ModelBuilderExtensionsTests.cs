@@ -32,8 +32,8 @@ public sealed class ModelBuilderExtensionsTests
         var softDeletableType = model.FindEntityType(typeof(SoftDeletableEntity));
         var anotherSoftDeletableType = model.FindEntityType(typeof(AnotherSoftDeletableEntity));
 
-        GetRequiredQueryFilter(softDeletableType!, nameof(ISoftDelete));
-        GetRequiredQueryFilter(anotherSoftDeletableType!, nameof(ISoftDelete));
+        GetRequiredQueryFilter(softDeletableType!, typeof(ISoftDelete).FullName!);
+        GetRequiredQueryFilter(anotherSoftDeletableType!, typeof(ISoftDelete).FullName!);
     }
 
     [Fact]
@@ -58,7 +58,7 @@ public sealed class ModelBuilderExtensionsTests
 
         // Assert - the filter expression should reference IsDeleted
         var entityType = model.FindEntityType(typeof(SoftDeletableEntity));
-        var filter = GetRequiredQueryFilter(entityType!, nameof(ISoftDelete));
+        var filter = GetRequiredQueryFilter(entityType!, typeof(ISoftDelete).FullName!);
 
         filter.Expression!.Body.ToString().Should().Contain("IsDeleted");
     }
@@ -72,7 +72,7 @@ public sealed class ModelBuilderExtensionsTests
 
         // Assert - base entity should have the filter
         var baseType = model.FindEntityType(typeof(SoftDeletableEntity));
-        GetRequiredQueryFilter(baseType!, nameof(ISoftDelete));
+        GetRequiredQueryFilter(baseType!, typeof(ISoftDelete).FullName!);
 
         // Derived entity has a base type and should not have its own filter
         var derivedType = model.FindEntityType(typeof(DerivedSoftDeletableEntity));
@@ -94,8 +94,8 @@ public sealed class ModelBuilderExtensionsTests
 
         filters.Should().HaveCount(2);
 
-        var softDeleteFilter = GetRequiredQueryFilter(auditableType, nameof(ISoftDelete));
-        var auditableFilter = GetRequiredQueryFilter(auditableType, nameof(IAuditable));
+        var softDeleteFilter = GetRequiredQueryFilter(auditableType, typeof(ISoftDelete).FullName!);
+        var auditableFilter = GetRequiredQueryFilter(auditableType, typeof(IAuditable).FullName!);
 
         softDeleteFilter.Expression!.Body.ToString().Should().Contain("IsDeleted");
         auditableFilter.Expression!.Body.ToString().Should().Contain("CreatedBy");
@@ -110,7 +110,7 @@ public sealed class ModelBuilderExtensionsTests
 
         // Assert - the filter's parameter type should match the entity type
         var entityType = model.FindEntityType(typeof(SoftDeletableEntity));
-        var filter = GetRequiredQueryFilter(entityType!, nameof(ISoftDelete));
+        var filter = GetRequiredQueryFilter(entityType!, typeof(ISoftDelete).FullName!);
 
         filter.Expression!.Parameters.Should().HaveCount(1);
         filter.Expression.Parameters[0].Type.Should().Be(typeof(SoftDeletableEntity));
