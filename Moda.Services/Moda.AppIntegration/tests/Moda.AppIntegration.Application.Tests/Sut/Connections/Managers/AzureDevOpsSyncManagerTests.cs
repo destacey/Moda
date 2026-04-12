@@ -1,4 +1,4 @@
-using CSharpFunctionalExtensions;
+﻿using CSharpFunctionalExtensions;
 using FluentAssertions;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -15,11 +15,9 @@ using Moda.Common.Application.Interfaces.ExternalWork;
 using Moda.Common.Application.Models;
 using Moda.Common.Application.Requests.Planning.Iterations;
 using Moda.Common.Application.Requests.WorkManagement.Commands;
-using Moda.Common.Application.Requests.WorkManagement.Dtos;
 using Moda.Common.Application.Requests.WorkManagement.Interfaces;
 using Moda.Common.Application.Requests.WorkManagement.Queries;
 using Moda.Common.Domain.Enums.AppIntegrations;
-using Moda.Common.Domain.Enums.Work;
 using Moq;
 using Moq.AutoMock;
 using NodaTime;
