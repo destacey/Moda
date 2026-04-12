@@ -34,6 +34,10 @@ export function getSearchResultUrl(item: GlobalSearchResultItemDto): string {
       return `/planning/planning-intervals/${parts[0]}/plan-review#${parts[1]}`
     }
 
+    // Planning - Roadmaps
+    case 'Roadmap':
+      return `/planning/roadmaps/${key}`
+
     // PPM
     case 'Project':
       return `/ppm/projects/${key}`

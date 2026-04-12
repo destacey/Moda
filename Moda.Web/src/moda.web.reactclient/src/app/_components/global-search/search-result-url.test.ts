@@ -79,6 +79,12 @@ describe('getSearchResultUrl', () => {
         '/planning/planning-intervals',
       )
     })
+
+    it('returns roadmap url', () => {
+      expect(getSearchResultUrl(item('Roadmap', '42'))).toBe(
+        '/planning/roadmaps/42',
+      )
+    })
   })
 
   describe('PPM', () => {

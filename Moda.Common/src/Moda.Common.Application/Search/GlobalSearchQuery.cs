@@ -29,7 +29,8 @@ internal sealed class GlobalSearchQueryHandler(ISender sender, ICurrentUser curr
         var canSearchPlanning = await HasAnyPermission(cancellationToken,
             ApplicationPermission.NameFor(ApplicationAction.View, ApplicationResource.PlanningIntervals),
             ApplicationPermission.NameFor(ApplicationAction.View, ApplicationResource.PlanningIntervalObjectives),
-            ApplicationPermission.NameFor(ApplicationAction.View, ApplicationResource.Iterations));
+            ApplicationPermission.NameFor(ApplicationAction.View, ApplicationResource.Iterations),
+            ApplicationPermission.NameFor(ApplicationAction.View, ApplicationResource.Roadmaps));
 
         var canSearchPpm = await HasAnyPermission(cancellationToken,
             ApplicationPermission.NameFor(ApplicationAction.View, ApplicationResource.Projects),
