@@ -12,8 +12,8 @@ namespace Moda.Planning.Domain.Models;
 /// </summary>
 public sealed class PlanningTeam : ISimpleTeam, IHasIdAndKey, IHasTeamIdAndCode
 {
-    protected readonly List<Iteration> _iterations = [];
-    protected readonly List<PlanningIntervalTeam> _planningIntervalTeams = [];
+    private readonly List<Iteration> _iterations = [];
+    private readonly List<PlanningIntervalTeam> _planningIntervalTeams = [];
 
     private PlanningTeam() { }
 
