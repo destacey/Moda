@@ -122,11 +122,36 @@ public sealed class AzureDevOpsInitManager(ILogger<AzureDevOpsInitManager> logge
                 if (connectionCheckResult.IsFailure)
                     return connectionCheckResult.ConvertFailure<Guid>();
 
-                var exists = await _sender.Send(new ExternalWorkProcessExistsQuery(workProcessExternalId), cancellationToken);
-                if (exists)
+                // Check if THIS connection already has this process integrated
+                var connectionWorkProcess = connectionCheckResult.Value.Configuration.WorkProcesses
+                    .FirstOrDefault(wp => wp.ExternalId == workProcessExternalId);
+                if (connectionWorkProcess?.IntegrationState is not null)
                 {
-                    _logger.LogError("Unable to initialize a work process {WorkProcessExternalId} from Azure DevOps for connection {ConnectionId} because it is already integrated.", workProcessExternalId, connectionId);
+                    _logger.LogError("Unable to initialize a work process {WorkProcessExternalId} from Azure DevOps for connection {ConnectionId} because it is already integrated on this connection.", workProcessExternalId, connectionId);
                     return Result.Failure<Guid>($"Unable to initialize a work process {workProcessExternalId} from Azure DevOps for connection {connectionId} because it is already integrated.");
+                }
+
+                // Check if another connection has already created a WorkProcess for this ExternalId.
+                // Azure DevOps built-in processes (Agile, Scrum, CMMI, Basic) share the same GUID across
+                // all organizations, so we reuse the existing WorkProcess rather than creating a duplicate.
+                var existsGlobally = await _sender.Send(new ExternalWorkProcessExistsQuery(workProcessExternalId), cancellationToken);
+                if (existsGlobally)
+                {
+                    var existingRegistrations = await _sender.Send(new GetIntegrationRegistrationsForWorkProcessesQuery(workProcessExternalId), cancellationToken);
+                    var existingRegistration = existingRegistrations.FirstOrDefault();
+                    if (existingRegistration is null)
+                    {
+                        _logger.LogError("Work process {WorkProcessExternalId} exists but no integration registration was found.", workProcessExternalId);
+                        return Result.Failure<Guid>($"Work process {workProcessExternalId} exists but no integration registration was found.");
+                    }
+
+                    _logger.LogInformation("Reusing existing work process {WorkProcessInternalId} for Azure DevOps process {WorkProcessExternalId} on connection {ConnectionId}.", existingRegistration.IntegrationState.InternalId, workProcessExternalId, connectionId);
+
+                    var linkResult = await _sender.Send(new UpdateAzureDevOpsWorkProcessIntegrationStateCommand(connectionId, existingRegistration), cancellationToken);
+
+                    return linkResult.IsSuccess
+                        ? Result.Success(existingRegistration.IntegrationState.InternalId)
+                        : linkResult.ConvertFailure<Guid>();
                 }
 
                 var importWorkspacesResult = await SyncOrganizationConfiguration(connectionId, cancellationToken);

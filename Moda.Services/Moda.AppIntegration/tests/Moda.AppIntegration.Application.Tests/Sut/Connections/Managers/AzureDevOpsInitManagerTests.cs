@@ -7,6 +7,7 @@ using Moda.AppIntegration.Application.Connections.Commands.AzureDevOps;
 using Moda.AppIntegration.Application.Connections.Dtos.AzureDevOps;
 using Moda.AppIntegration.Application.Connections.Managers;
 using Moda.AppIntegration.Application.Connections.Queries.AzureDevOps;
+using Moda.Common.Application.Dtos;
 using Moda.Common.Application.Interfaces;
 using Moda.Common.Application.Interfaces.ExternalWork;
 using Moda.Common.Application.Requests.WorkManagement.Commands;
@@ -372,18 +373,20 @@ public class AzureDevOpsInitManagerTests
     }
 
     [Fact]
-    public async Task InitWorkProcessIntegration_WhenAlreadyIntegrated_ReturnsFailure()
+    public async Task InitWorkProcessIntegration_WhenAlreadyIntegratedOnThisConnection_ReturnsFailure()
     {
-        // Arrange
+        // Arrange - the connection already has an IntegrationState for this process
         var connectionId = Guid.CreateVersion7();
         var wpExternalId = Guid.CreateVersion7();
+        var wpInternalId = Guid.CreateVersion7();
         var details = CreateConnectionDetails(connectionId,
-            workProcesses: [new AzureDevOpsWorkProcessDto { ExternalId = wpExternalId, Name = "Agile" }]);
+            workProcesses: [new AzureDevOpsWorkProcessDto
+            {
+                ExternalId = wpExternalId,
+                Name = "Agile",
+                IntegrationState = new IntegrationStateDto { InternalId = wpInternalId, IsActive = true }
+            }]);
         SetupConnectionQuery(connectionId, details);
-
-        _mocker.GetMock<ISender>()
-            .Setup(s => s.Send(It.Is<ExternalWorkProcessExistsQuery>(q => q.ExternalId == wpExternalId), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(true);
 
         // Act
         var result = await _sut.InitWorkProcessIntegration(connectionId, wpExternalId, CancellationToken.None);
@@ -391,6 +394,57 @@ public class AzureDevOpsInitManagerTests
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Error.Should().Contain("already integrated");
+    }
+
+    [Fact]
+    public async Task InitWorkProcessIntegration_WhenProcessExistsOnAnotherConnection_ReusesExistingWorkProcess()
+    {
+        // Arrange - Process exists globally (another connection initialized it)
+        // but this connection does NOT have an IntegrationState for it yet
+        var connectionId = Guid.CreateVersion7();
+        var wpExternalId = Guid.CreateVersion7();
+        var wpInternalId = Guid.CreateVersion7();
+
+        var details = CreateConnectionDetails(connectionId,
+            workProcesses: [new AzureDevOpsWorkProcessDto { ExternalId = wpExternalId, Name = "Agile" }]);
+        SetupConnectionQuery(connectionId, details);
+
+        // ExternalWorkProcessExistsQuery - returns true (another connection has it)
+        _mocker.GetMock<ISender>()
+            .Setup(s => s.Send(It.IsAny<ExternalWorkProcessExistsQuery>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+
+        // GetIntegrationRegistrationsForWorkProcessesQuery - returns the existing registration
+        var existingIntegrationState = IntegrationState<Guid>.Create(wpInternalId, true);
+        var existingRegistration = new IntegrationRegistration<Guid, Guid>(wpExternalId, existingIntegrationState);
+        _mocker.GetMock<ISender>()
+            .Setup(s => s.Send(It.Is<GetIntegrationRegistrationsForWorkProcessesQuery>(q => q.ExternalId == wpExternalId), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<IntegrationRegistration<Guid, Guid>> { existingRegistration });
+
+        // UpdateAzureDevOpsWorkProcessIntegrationStateCommand - links this connection
+        _mocker.GetMock<ISender>()
+            .Setup(s => s.Send(It.IsAny<UpdateAzureDevOpsWorkProcessIntegrationStateCommand>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Result.Success());
+
+        // Act
+        var result = await _sut.InitWorkProcessIntegration(connectionId, wpExternalId, CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().Be(wpInternalId);
+
+        // Should NOT create a new work process
+        _mocker.GetMock<ISender>()
+            .Verify(s => s.Send(It.IsAny<CreateExternalWorkProcessCommand>(), It.IsAny<CancellationToken>()), Times.Never);
+
+        // Should NOT call Azure DevOps to get the process details (no need to sync types/statuses/workflows)
+        _mocker.GetMock<IAzureDevOpsService>()
+            .Verify(s => s.GetWorkProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>()), Times.Never);
+
+        // Should link this connection to the existing work process
+        _mocker.GetMock<ISender>()
+            .Verify(s => s.Send(It.Is<UpdateAzureDevOpsWorkProcessIntegrationStateCommand>(c =>
+                c.ConnectionId == connectionId), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
