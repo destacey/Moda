@@ -12,9 +12,6 @@ namespace Moda.Work.Domain.Models;
 /// <seealso cref="Moda.Common.Domain.Interfaces.IActivatable" />
 public sealed class WorkType : BaseSoftDeletableEntity<int>, IActivatable
 {
-    private string _name = null!;
-    private string? _description;
-
     private WorkType() { }
 
     private WorkType(string name, string? description, int levelId)
@@ -28,16 +25,16 @@ public sealed class WorkType : BaseSoftDeletableEntity<int>, IActivatable
     /// <value>The name.</value>
     public string Name
     {
-        get => _name;
-        init => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
-    }
+        get;
+        init => field = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
+    } = null!;
 
     /// <summary>The description of the work type.</summary>
     /// <value>The description.</value>
     public string? Description
     {
-        get => _description;
-        private set => _description = value.NullIfWhiteSpacePlusTrim();
+        get;
+        private set => field = value.NullIfWhiteSpacePlusTrim();
     }
 
     public int LevelId { get; private set; }

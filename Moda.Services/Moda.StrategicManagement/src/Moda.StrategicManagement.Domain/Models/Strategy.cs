@@ -9,9 +9,6 @@ namespace Moda.StrategicManagement.Domain.Models;
 /// </summary>
 public sealed class Strategy : BaseAuditableEntity, IHasIdAndKey
 {
-    private string _name = default!;
-    private string? _description;
-
     private Strategy() { }
 
     private Strategy(string name, string? description, StrategyStatus status, FlexibleDateRange? dates)
@@ -32,17 +29,17 @@ public sealed class Strategy : BaseAuditableEntity, IHasIdAndKey
     /// </summary>
     public string Name
     {
-        get => _name;
-        private set => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
-    }
+        get;
+        private set => field = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
+    } = default!;
 
     /// <summary>
     /// A detailed description of the strategy.
     /// </summary>
     public string? Description
     {
-        get => _description;
-        private set => _description = value.NullIfWhiteSpacePlusTrim();
+        get;
+        private set => field = value.NullIfWhiteSpacePlusTrim();
     }
 
     /// <summary>

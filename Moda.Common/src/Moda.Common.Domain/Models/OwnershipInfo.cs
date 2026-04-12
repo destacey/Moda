@@ -8,9 +8,6 @@ namespace Moda.Common.Domain.Models;
 
 public sealed class OwnershipInfo : ValueObject
 {
-    private string? _systemId;
-    private string? _externalId;
-
     private OwnershipInfo() { }
     private OwnershipInfo(Ownership ownership, Connector? connector = null, string? systemId = null, string? externalId = null)
     {
@@ -48,8 +45,8 @@ public sealed class OwnershipInfo : ValueObject
     /// </summary>
     public string? SystemId
     {
-        get => _systemId;
-        private init => _systemId = value.NullIfWhiteSpacePlusTrim();
+        get;
+        private init => field = value.NullIfWhiteSpacePlusTrim();
     }
 
     /// <summary>
@@ -57,8 +54,8 @@ public sealed class OwnershipInfo : ValueObject
     /// </summary>
     public string? ExternalId
     {
-        get => _externalId;
-        private init => _externalId = value.NullIfWhiteSpacePlusTrim();
+        get;
+        private init => field = value.NullIfWhiteSpacePlusTrim();
     }
 
     /// <summary>

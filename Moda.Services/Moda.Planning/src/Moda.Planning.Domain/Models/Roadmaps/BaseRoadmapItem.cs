@@ -6,10 +6,6 @@ namespace Moda.Planning.Domain.Models.Roadmaps;
 
 public abstract class BaseRoadmapItem : BaseAuditableEntity
 {
-    private string _name = default!;
-    private string? _description;
-    private string? _color;
-
     /// <summary>
     /// The Roadmap Id.
     /// </summary>
@@ -20,17 +16,17 @@ public abstract class BaseRoadmapItem : BaseAuditableEntity
     /// </summary>
     public string Name
     {
-        get => _name;
-        protected set => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
-    }
+        get;
+        protected set => field = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
+    } = default!;
 
     /// <summary>
     /// The description of the Roadmap.
     /// </summary>
     public string? Description
     {
-        get => _description;
-        protected set => _description = value.NullIfWhiteSpacePlusTrim();
+        get;
+        protected set => field = value.NullIfWhiteSpacePlusTrim();
     }
 
     /// <summary>
@@ -51,7 +47,7 @@ public abstract class BaseRoadmapItem : BaseAuditableEntity
     /// <summary>
     /// The color of the Roadmap. This is used to display the Roadmap in the UI.
     /// </summary>
-    public string? Color { get => _color; protected set => _color = value.NullIfWhiteSpacePlusTrim(); }
+    public string? Color { get; protected set => field = value.NullIfWhiteSpacePlusTrim(); }
 
     /// <summary>
     /// Change the parent Roadmap Activity from the Roadmap Item.

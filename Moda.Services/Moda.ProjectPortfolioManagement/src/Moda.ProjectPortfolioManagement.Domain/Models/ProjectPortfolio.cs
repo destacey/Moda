@@ -15,9 +15,6 @@ public sealed class ProjectPortfolio : BaseAuditableEntity, IHasIdAndKey
 {
     private const string ReadOnlyErrorMessage = "Project Portfolio is readonly and cannot be updated.";
 
-    private string _name = default!;
-    private string _description = default!;
-
     private readonly HashSet<RoleAssignment<ProjectPortfolioRole>> _roles = [];
     private readonly HashSet<Program> _programs = [];
     private readonly HashSet<Project> _projects = [];
@@ -59,18 +56,18 @@ public sealed class ProjectPortfolio : BaseAuditableEntity, IHasIdAndKey
     /// </summary>
     public string Name
     {
-        get => _name;
-        private set => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
-    }
+        get;
+        private set => field = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
+    } = default!;
 
     /// <summary>
     /// A detailed description of the portfolio’s purpose.
     /// </summary>
     public string Description
     {
-        get => _description;
-        private set => _description = Guard.Against.NullOrWhiteSpace(value, nameof(Description)).Trim();
-    }
+        get;
+        private set => field = Guard.Against.NullOrWhiteSpace(value, nameof(Description)).Trim();
+    } = default!;
 
     /// <summary>
     /// The status of the portfolio.

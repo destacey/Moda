@@ -6,9 +6,6 @@ namespace Moda.AppIntegration.Domain.Models;
 
 public sealed class AzureDevOpsBoardsWorkspace : IntegrationObject<Guid>
 {
-    private string _name = null!;
-    private string? _description;
-
     private AzureDevOpsBoardsWorkspace() { }
 
     [JsonConstructor]
@@ -27,16 +24,16 @@ public sealed class AzureDevOpsBoardsWorkspace : IntegrationObject<Guid>
     /// <value>The name of the connection.</value>
     public string Name
     {
-        get => _name;
-        private set => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
-    }
+        get;
+        private set => field = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
+    } = null!;
 
     /// <summary>Gets or sets the description.</summary>
     /// <value>The connection description.</value>
     public string? Description
     {
-        get => _description;
-        private set => _description = value.NullIfWhiteSpacePlusTrim();
+        get;
+        private set => field = value.NullIfWhiteSpacePlusTrim();
     }
 
     /// <summary>Gets or sets the work process identifier.</summary>

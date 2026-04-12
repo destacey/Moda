@@ -8,9 +8,6 @@ namespace Moda.Work.Domain.Models;
 
 public abstract class WorkItemLink : BaseAuditableEntity
 {
-    private string? _comment;
-
-    // EF
     protected WorkItemLink() { }
 
     protected WorkItemLink(Guid sourceId, Guid targetId, WorkItemLinkType linkType, Instant createdOn, Guid? createdById, Instant? removedOn, Guid? removedById, string? comment)
@@ -55,8 +52,8 @@ public abstract class WorkItemLink : BaseAuditableEntity
 
     public string? Comment
     {
-        get => _comment;
-        private set => _comment = value.NullIfWhiteSpacePlusTrim();
+        get;
+        private set => field = value.NullIfWhiteSpacePlusTrim();
     }
 
     public virtual void Update(Guid? createdById, Guid? removedById, string? comment)

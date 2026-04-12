@@ -10,10 +10,6 @@ namespace Moda.Organization.Domain.Models;
 
 public abstract class BaseTeam : BaseSoftDeletableEntity, ISimpleTeam, IHasIdAndKey
 {
-    private string _name = null!;
-    private TeamCode _code = null!;
-    private string? _description;
-
     protected readonly List<TeamMembership> _parentMemberships = [];
 
     /// <summary>Gets the key.</summary>
@@ -25,25 +21,25 @@ public abstract class BaseTeam : BaseSoftDeletableEntity, ISimpleTeam, IHasIdAnd
     /// </summary>
     public string Name
     {
-        get => _name;
-        protected set => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
-    }
+        get;
+        protected set => field = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
+    } = null!;
 
     /// <summary>Gets the code.</summary>
     /// <value>The code.</value>
     public TeamCode Code
     {
-        get => _code;
-        protected set => _code = Guard.Against.Null(value, nameof(Code));
-    }
+        get;
+        protected set => field = Guard.Against.Null(value, nameof(Code));
+    } = null!;
 
     /// <summary>
     /// The description of the team.
     /// </summary>
     public string? Description
     {
-        get => _description;
-        protected set => _description = value.NullIfWhiteSpacePlusTrim();
+        get;
+        protected set => field = value.NullIfWhiteSpacePlusTrim();
     }
 
     /// <summary>Gets the type.  This value should not change.</summary>

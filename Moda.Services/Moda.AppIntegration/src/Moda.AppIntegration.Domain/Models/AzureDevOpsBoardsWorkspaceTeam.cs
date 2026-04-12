@@ -4,8 +4,6 @@ namespace Moda.AppIntegration.Domain.Models;
 
 public sealed class AzureDevOpsBoardsWorkspaceTeam
 {
-    private string _teamName = default!;
-
     private AzureDevOpsBoardsWorkspaceTeam() { }
 
     [JsonConstructor]
@@ -32,9 +30,9 @@ public sealed class AzureDevOpsBoardsWorkspaceTeam
     /// </summary>
     public string TeamName
     {
-        get => _teamName;
-        private set => _teamName = Guard.Against.NullOrWhiteSpace(value, nameof(TeamName));
-    }
+        get;
+        private set => field = Guard.Against.NullOrWhiteSpace(value, nameof(TeamName));
+    } = default!;
 
     public Guid? BoardId { get; private set; }
 

@@ -12,9 +12,6 @@ namespace Moda.Planning.Domain.Models.Roadmaps;
 public sealed class Roadmap : BaseAuditableEntity, ILocalSchedule, IHasIdAndKey
 {
     private readonly bool _objectConstruction = false;
-    private string _name = default!;
-    private string? _description;
-    private LocalDateRange _dateRange = default!;
     private readonly List<RoadmapManager> _roadmapManagers = [];
     private readonly List<BaseRoadmapItem> _items = [];
 
@@ -49,17 +46,17 @@ public sealed class Roadmap : BaseAuditableEntity, ILocalSchedule, IHasIdAndKey
     /// </summary>
     public string Name
     {
-        get => _name;
-        private set => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
-    }
+        get;
+        private set => field = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
+    } = default!;
 
     /// <summary>
     /// The description of the Roadmap.
     /// </summary>
     public string? Description
     {
-        get => _description;
-        private set => _description = value.NullIfWhiteSpacePlusTrim();
+        get;
+        private set => field = value.NullIfWhiteSpacePlusTrim();
     }
 
     /// <summary>
@@ -67,9 +64,9 @@ public sealed class Roadmap : BaseAuditableEntity, ILocalSchedule, IHasIdAndKey
     /// </summary>
     public LocalDateRange DateRange
     {
-        get => _dateRange;
-        private set => _dateRange = Guard.Against.Null(value, nameof(DateRange));
-    }
+        get;
+        private set => field = Guard.Against.Null(value, nameof(DateRange));
+    } = default!;
 
     /// <summary>
     /// The visibility of the Roadmap. If the Roadmap is public, all users can see the Roadmap. Otherwise, only the Roadmap Managers can see the Roadmap.

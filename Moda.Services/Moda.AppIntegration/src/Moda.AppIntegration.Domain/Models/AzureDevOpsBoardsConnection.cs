@@ -8,7 +8,6 @@ namespace Moda.AppIntegration.Domain.Models;
 
 public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsConnectionConfiguration>, ISyncableConnection
 {
-    private string? _systemId;
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     private AzureDevOpsBoardsConnection() { }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
@@ -31,8 +30,8 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
     // ISyncableConnection implementation
     public string? SystemId
     {
-        get => _systemId;
-        private set => _systemId = value?.Trim();
+        get;
+        private set => field = value?.Trim();
     }
 
     public bool IsSyncEnabled { get; private set; } = false;

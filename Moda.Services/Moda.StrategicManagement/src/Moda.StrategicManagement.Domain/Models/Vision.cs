@@ -11,8 +11,6 @@ namespace Moda.StrategicManagement.Domain.Models;
 /// </summary>
 public sealed class Vision : BaseAuditableEntity, IHasIdAndKey
 {
-    private string _description = default!;
-
     private Vision() { }
 
     private Vision(string description)
@@ -31,9 +29,9 @@ public sealed class Vision : BaseAuditableEntity, IHasIdAndKey
     /// </summary>
     public string Description
     {
-        get => _description;
-        private set => _description = Guard.Against.NullOrWhiteSpace(value, nameof(Description)).Trim();
-    }
+        get;
+        private set => field = Guard.Against.NullOrWhiteSpace(value, nameof(Description)).Trim();
+    } = default!;
 
     /// <summary>
     /// The current lifecycle state of the vision (e.g., Active, Proposed, Archived).

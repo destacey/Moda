@@ -13,9 +13,6 @@ namespace Moda.Work.Domain.Models;
 /// <seealso cref="Moda.Common.Domain.Interfaces.IActivatable" />
 public sealed class WorkProcess : BaseSoftDeletableEntity, IActivatable, IHasIdAndKey
 {
-    private string _name = null!;
-    private string? _description;
-
     private readonly List<WorkProcessScheme> _schemes = [];
     private readonly List<Workspace> _workspaces = [];
 
@@ -45,17 +42,17 @@ public sealed class WorkProcess : BaseSoftDeletableEntity, IActivatable, IHasIdA
     /// </summary>
     public string Name
     {
-        get => _name;
-        private set => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
-    }
+        get;
+        private set => field = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
+    } = null!;
 
     /// <summary>
     /// The description of the work process.
     /// </summary>
     public string? Description
     {
-        get => _description;
-        private set => _description = value.NullIfWhiteSpacePlusTrim();
+        get;
+        private set => field = value.NullIfWhiteSpacePlusTrim();
     }
 
     /// <summary>
