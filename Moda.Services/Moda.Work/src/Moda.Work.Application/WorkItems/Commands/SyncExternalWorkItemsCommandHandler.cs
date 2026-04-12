@@ -141,7 +141,7 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
                     .Where(wi => wi.ExternalId.HasValue)
                     .ToDictionary(wi => wi.ExternalId!.Value, wi => wi);
 
-                List<WorkItem> newWorkItems = new(chunkSize);
+                List<WorkItem> newWorkItems = [with(chunkSize)];
 
                 foreach (var externalWorkItem in chunk)
                 {

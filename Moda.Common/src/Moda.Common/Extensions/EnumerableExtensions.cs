@@ -14,14 +14,14 @@ public static class EnumerableExtensions
         Guard.Against.Null(source);
         Guard.Against.OutOfRange(batchSize, nameof(batchSize), 1, int.MaxValue);
 
-        List<T> list = new(batchSize);
+        List<T> list = [with(batchSize)];
         foreach (T item in source)
         {
             list.Add(item);
             if (list.Count == batchSize)
             {
                 yield return list;
-                list = new List<T>(batchSize);
+                list = [with(batchSize)];
             }
         }
 

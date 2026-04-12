@@ -1,4 +1,4 @@
-namespace Moda.ArchitectureTests.Helpers;
+﻿namespace Moda.ArchitectureTests.Helpers;
 
 /// <summary>
 /// Provides helper methods for file system operations in architecture tests.
@@ -107,7 +107,7 @@ public static class FileSystemHelper
 
         if (!Directory.Exists(servicesRoot))
         {
-            return new List<string>();
+            return [];
         }
 
         return Directory.GetDirectories(servicesRoot)

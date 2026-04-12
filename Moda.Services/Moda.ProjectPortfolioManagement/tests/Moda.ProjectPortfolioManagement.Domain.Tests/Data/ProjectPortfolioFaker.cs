@@ -45,7 +45,7 @@ public static class ProjectPortfolioFakerExtensions
                 faker.RuleFor(x => x.Id, portfolioId);
             }
 
-            HashSet<RoleAssignment<ProjectPortfolioRole>> updatedRoles = new();
+            HashSet<RoleAssignment<ProjectPortfolioRole>> updatedRoles = [];
             foreach (var role in roles)
             {
                 foreach (var employeeId in role.Value)

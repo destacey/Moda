@@ -43,18 +43,18 @@ public class GenericExtensionsTests
         DepthFirstFlattenTestModel two = new()
         {
             Name = "two",
-            Children = new() { twoOne, twoTwo }
+            Children = [twoOne, twoTwo]
         };
         DepthFirstFlattenTestModel three = new()
         {
             Name = "three",
-            Children = new() { threeOne, threeTwo }
+            Children = [threeOne, threeTwo]
         };
 
         DepthFirstFlattenTestModel root = new()
         {
             Name = "root",
-            Children = new() { one, two, three }
+            Children = [one, two, three]
         };
 
         // Act

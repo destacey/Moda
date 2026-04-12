@@ -7,7 +7,7 @@ namespace Moda.Work.Domain.Models;
 /// </summary>
 public sealed class WorkItemRevision : BaseEntity, ISoftDelete
 {
-    private readonly List<WorkItemRevisionChange> _changes = new();
+    private readonly List<WorkItemRevisionChange> _changes = [];
 
     private WorkItemRevision() { }
 

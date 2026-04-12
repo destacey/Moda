@@ -40,7 +40,7 @@ public sealed class MicrosoftGraphService : IExternalEmployeeDirectoryService
             _logger.LogInformation("Found {UserCount} users in Active Directory via Microsoft Graph", users.Count);
 
             users = users.Where(u => !string.IsNullOrWhiteSpace(u.Id) && !string.IsNullOrEmpty(u.GivenName) && !string.IsNullOrEmpty(u.Surname)).ToList();
-            List<AzureAdEmployee> employees = new(users.Count);
+            List<AzureAdEmployee> employees = [with(users.Count)];
             foreach (var user in users)
             {
                 employees.Add(new AzureAdEmployee(user));
@@ -74,7 +74,7 @@ public sealed class MicrosoftGraphService : IExternalEmployeeDirectoryService
                 requestConfiguration.QueryParameters.Top = _maxPageSize;
             }, cancellationToken);
 
-        List<User> users = new();
+        List<User> users = [];
         if (members is null || members.Value is null)
         {
             _logger.LogWarning("GetGroupMembers:  No members found for group {GroupId} in Active Directory via Microsoft Graph", groupId);
@@ -112,7 +112,7 @@ public sealed class MicrosoftGraphService : IExternalEmployeeDirectoryService
                 requestConfiguration.QueryParameters.Top = _maxPageSize;
             }, cancellationToken);
 
-        List<User> users = new();
+        List<User> users = [];
         if (adUsers is null || adUsers.Value is null)
         {
             _logger.LogWarning("GetActiveDirectoryUsers:  No users found in Active Directory via Microsoft Graph");

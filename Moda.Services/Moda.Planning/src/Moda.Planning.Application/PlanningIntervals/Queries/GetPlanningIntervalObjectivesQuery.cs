@@ -70,7 +70,7 @@ internal sealed class GetPlanningIntervalObjectivesQueryHandler(IPlanningDbConte
 
         // map the list of objectives
         var piNavigation = NavigationDto.Create(planningInterval.Id, planningInterval.Key, planningInterval.Name);
-        List<PlanningIntervalObjectiveListDto> piObjectives = new(objectives.Count);
+        List<PlanningIntervalObjectiveListDto> piObjectives = [with(objectives.Count)];
         foreach (var piObjective in planningInterval.Objectives)
         {
             piObjectives.Add(PlanningIntervalObjectiveListDto.Create(piObjective, objectives.Single(o => o.Id == piObjective.ObjectiveId), piNavigation, _dateTimeProvider.Now));

@@ -252,9 +252,11 @@ public sealed class PokerSession : BaseAuditableEntity, IHasIdAndKey
     {
         try
         {
-            var session = new PokerSession(name, estimationScaleId, facilitatorId);
-            session.Status = PokerSessionStatus.Active;
-            session.ActivatedOn = timestamp;
+            var session = new PokerSession(name, estimationScaleId, facilitatorId)
+            {
+                Status = PokerSessionStatus.Active,
+                ActivatedOn = timestamp
+            };
             return Result.Success(session);
         }
         catch (Exception ex)

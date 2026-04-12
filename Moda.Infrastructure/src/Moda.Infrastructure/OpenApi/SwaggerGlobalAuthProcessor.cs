@@ -39,8 +39,8 @@ public class SwaggerGlobalAuthProcessor : IOperationProcessor
                 // Add both authentication schemes as alternatives
                 // Each security requirement in the array represents an OR relationship
                 // Users can authenticate with either JWT Bearer OR API Key
-                context.OperationDescription.Operation.Security = new List<OpenApiSecurityRequirement>
-                {
+                context.OperationDescription.Operation.Security =
+                [
                     // Option 1: JWT Bearer (OAuth2)
                     new OpenApiSecurityRequirement
                     {
@@ -51,7 +51,7 @@ public class SwaggerGlobalAuthProcessor : IOperationProcessor
                     {
                         { "ApiKey", Array.Empty<string>() }
                     }
-                };
+                ];
             }
         }
 

@@ -61,7 +61,7 @@ internal sealed class GetTeamMembershipsQueryHandler : IQueryHandler<GetTeamMemb
         var team = await query
             .SingleAsync(cancellationToken);
 
-        List<TeamMembershipDto> memberships = new List<TeamMembershipDto>();
+        List<TeamMembershipDto> memberships = [];
         if (team.ParentMemberships.Any())
         {
             memberships.AddRange(team.ParentMemberships.Select(m => TeamMembershipDto.Create(m, _dateTimeProvider)).ToList());

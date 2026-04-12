@@ -34,7 +34,7 @@ public class EnumerableExtensionsTests
     public void Batch_WhenEmptySource_ThrowsException()
     {
         // Arrange
-        List<int> source = new();
+        List<int> source = [];
 
         // Act
         var result = source.Batch(10);

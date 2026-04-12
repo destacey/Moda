@@ -603,8 +603,10 @@ public class RoadmapTests
         createChildResult.IsSuccess.Should().BeTrue();
 
         // Create update request with new parent
-        var updateActivity = new TestUpsertRoadmapActivity(createChildResult.Value);
-        updateActivity.ParentId = createParentResult.Value.Id;
+        var updateActivity = new TestUpsertRoadmapActivity(createChildResult.Value)
+        {
+            ParentId = createParentResult.Value.Id
+        };
 
         // Act
         var result = roadmap.UpdateActivity(createChildResult.Value.Id, updateActivity, managerId);

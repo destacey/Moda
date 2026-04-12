@@ -36,7 +36,7 @@ public class MapPlanningIntervalSprintsCommandHandlerTests : IDisposable
         var command = new MapPlanningIntervalSprintsCommand(
             Guid.NewGuid(),
             Guid.NewGuid(),
-            new Dictionary<Guid, Guid?>());
+            []);
 
         // Act
         var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
@@ -66,7 +66,7 @@ public class MapPlanningIntervalSprintsCommandHandlerTests : IDisposable
         var command = new MapPlanningIntervalSprintsCommand(
             planningInterval.Id,
             otherTeamId, // Different team not in PI
-            new Dictionary<Guid, Guid?>());
+            []);
 
         // Act
         var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
@@ -412,7 +412,7 @@ public class MapPlanningIntervalSprintsCommandHandlerTests : IDisposable
         var command = new MapPlanningIntervalSprintsCommand(
             planningInterval.Id,
             team1Id,
-            new Dictionary<Guid, Guid?>());
+            []);
 
         // Act
         var result = await _handler.Handle(command, TestContext.Current.CancellationToken);

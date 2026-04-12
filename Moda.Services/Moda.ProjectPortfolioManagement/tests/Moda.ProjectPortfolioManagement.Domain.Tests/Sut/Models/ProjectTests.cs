@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using Moda.Common.Domain.Models.ProjectPortfolioManagement;
 using Moda.Common.Models;
 using Moda.ProjectPortfolioManagement.Domain.Enums;
@@ -1529,7 +1529,7 @@ public class ProjectTests
         var newLifecycle = new ProjectLifecycleFaker().AsActiveWithPhases(("Phase 1", "First phase"));
 
         // Act
-        var result = project.ChangeLifecycle(newLifecycle, new Dictionary<Guid, Guid>());
+        var result = project.ChangeLifecycle(newLifecycle, []);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -1544,7 +1544,7 @@ public class ProjectTests
         var newLifecycle = new ProjectLifecycleFaker().AsActiveWithPhases(("Phase 1", "First phase"));
 
         // Act
-        var result = project.ChangeLifecycle(newLifecycle, new Dictionary<Guid, Guid>());
+        var result = project.ChangeLifecycle(newLifecycle, []);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -1559,7 +1559,7 @@ public class ProjectTests
         var newLifecycle = new ProjectLifecycleFaker().AsProposedWithPhases(("Phase 1", "First phase"));
 
         // Act
-        var result = project.ChangeLifecycle(newLifecycle, new Dictionary<Guid, Guid>());
+        var result = project.ChangeLifecycle(newLifecycle, []);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -1575,7 +1575,7 @@ public class ProjectTests
         project.AssignLifecycle(lifecycle);
 
         // Act
-        var result = project.ChangeLifecycle(lifecycle, new Dictionary<Guid, Guid>());
+        var result = project.ChangeLifecycle(lifecycle, []);
 
         // Assert
         result.IsFailure.Should().BeTrue();

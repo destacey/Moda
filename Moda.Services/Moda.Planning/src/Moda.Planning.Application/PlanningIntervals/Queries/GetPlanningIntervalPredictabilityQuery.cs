@@ -42,7 +42,7 @@ internal sealed class GetPlanningIntervalPredictabilityQueryHandler : IQueryHand
         if (planningInterval is null)
             return null;
         else if (!planningInterval.Teams.Any())
-            return new PlanningIntervalPredictabilityDto(null, new List<PlanningIntervalTeamPredictabilityDto>());
+            return new PlanningIntervalPredictabilityDto(null, []);
 
         var currentDate = _dateTimeProvider.Now.InUtc().Date;
 

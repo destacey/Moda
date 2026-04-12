@@ -1,11 +1,11 @@
-using Moda.ProjectPortfolioManagement.Application.Projects.Commands;
+﻿using Moda.ProjectPortfolioManagement.Application.Projects.Commands;
 
 namespace Moda.Web.Api.Models.Ppm.Projects;
 
 public sealed record ChangeProjectLifecycleRequest
 {
     public Guid LifecycleId { get; set; }
-    public Dictionary<Guid, Guid> PhaseMapping { get; set; } = new();
+    public Dictionary<Guid, Guid> PhaseMapping { get; set; } = [];
 
     public ChangeProjectLifecycleCommand ToCommand(Guid projectId)
         => new(projectId, LifecycleId, PhaseMapping);

@@ -9,12 +9,12 @@ public sealed record ManagePlanningIntervalDatesCommand : ICommand
     {
         Id = id;
         DateRange = Guard.Against.Null(dateRange);
-        Iterations = iterations?.ToList() ?? new List<PlanningIntervalIterationUpsertDto>();
+        Iterations = iterations?.ToList() ?? [];
     }
 
     public Guid Id { get; }
     public LocalDateRange DateRange { get; }
-    public List<PlanningIntervalIterationUpsertDto> Iterations { get; } = new();
+    public List<PlanningIntervalIterationUpsertDto> Iterations { get; } = [];
 }
 
 public sealed class ManagePlanningIntervalDatesCommandValidator : CustomValidator<ManagePlanningIntervalDatesCommand>
