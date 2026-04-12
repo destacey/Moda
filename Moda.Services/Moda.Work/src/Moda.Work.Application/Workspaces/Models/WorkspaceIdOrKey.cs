@@ -4,6 +4,7 @@ using Moda.Work.Domain.Interfaces;
 using OneOf;
 
 namespace Moda.Work.Application.Workspaces.Models;
+
 public sealed class WorkspaceIdOrKey : OneOfBase<Guid, WorkspaceKey>
 {
     public WorkspaceIdOrKey(OneOf<Guid, WorkspaceKey> value) : base(value) { }

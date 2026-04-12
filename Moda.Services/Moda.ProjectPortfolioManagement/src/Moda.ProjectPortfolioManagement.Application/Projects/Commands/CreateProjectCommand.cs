@@ -116,7 +116,8 @@ internal sealed class CreateProjectCommandHandler(
             var portfolio = await _projectPortfolioManagementDbContext.Portfolios
                     .Include(p => p.Programs)
                     .FirstOrDefaultAsync(p => p.Id == request.PortfolioId, cancellationToken);
-            if (portfolio == null) {
+            if (portfolio == null)
+            {
                 _logger.LogInformation("Portfolio with Id {PortfolioId} not found.", request.PortfolioId);
                 return Result.Failure<ProjectIdAndKey>("Portfolio not found.");
             }

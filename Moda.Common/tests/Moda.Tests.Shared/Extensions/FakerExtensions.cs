@@ -1,7 +1,8 @@
-﻿using Bogus;
-using System.Reflection;
+﻿using System.Reflection;
+using Bogus;
 
 namespace Moda.Tests.Shared.Extensions;
+
 public static class FakerExtensions
 {
     public static Faker<T> UsePrivateConstructor<T>(this Faker<T> faker) where T : class

@@ -7,6 +7,7 @@ using Moda.Planning.Domain.Enums;
 using Moda.Planning.Domain.Models.Roadmaps;
 
 namespace Moda.Planning.Application.Roadmaps.Queries;
+
 public sealed record GetRoadmapActivitiesQuery : IQuery<List<RoadmapActivityListDto>>
 {
     public GetRoadmapActivitiesQuery(IdOrKey idOrKey)

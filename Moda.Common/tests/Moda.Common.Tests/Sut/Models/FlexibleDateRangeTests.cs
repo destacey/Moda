@@ -2,6 +2,7 @@
 using NodaTime;
 
 namespace Moda.Common.Tests.Sut.Models;
+
 public sealed class FlexibleDateRangeTests
 {
     [Fact]

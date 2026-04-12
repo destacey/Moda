@@ -2,6 +2,7 @@
 using Moda.Common.Domain.Enums.StrategicManagement;
 
 namespace Moda.StrategicManagement.Application.StrategicThemes.Queries;
+
 public sealed record GetStrategicThemeStatesQuery : IQuery<List<StrategicThemeStateDto>> { }
 
 internal sealed class GetStrategicThemeStatesQueryHandler : IQueryHandler<GetStrategicThemeStatesQuery, List<StrategicThemeStateDto>>

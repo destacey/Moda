@@ -1,6 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 
 namespace Moda.Integrations.AzureDevOps.Models.Projects;
+
 internal sealed record IterationNodeResponse
 {
     [JsonPropertyName("id")]

@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using Moda.Common.Domain.Employees;
 using Moda.Common.Domain.Models.ProjectPortfolioManagement;
 using Moda.Common.Domain.Tests.Data;
@@ -108,7 +108,7 @@ public class GetProjectTeamQueryHandlerTests : IDisposable
         sponsorMember.Roles.Should().ContainSingle().Which.Should().Be("Project Sponsor");
         sponsorMember.ActiveWorkItemCount.Should().Be(0);
 
-        var managerMember = result.Single(m => m.Employee.Id == manager.Id);
+        var managerMember = result!.Single(m => m.Employee.Id == manager.Id);
         managerMember.Roles.Should().ContainSingle().Which.Should().Be("Project Manager");
     }
 
@@ -327,5 +327,6 @@ public class GetProjectTeamQueryHandlerTests : IDisposable
     public void Dispose()
     {
         _dbContext.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

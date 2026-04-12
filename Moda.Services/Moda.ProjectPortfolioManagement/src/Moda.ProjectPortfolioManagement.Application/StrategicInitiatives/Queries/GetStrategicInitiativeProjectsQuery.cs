@@ -4,6 +4,7 @@ using Moda.ProjectPortfolioManagement.Application.Projects.Dtos;
 using Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 
 namespace Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Queries;
+
 public sealed record GetStrategicInitiativeProjectsQuery : IQuery<List<ProjectListDto>?>
 {
     public GetStrategicInitiativeProjectsQuery(IdOrKey strategicInitiativeIdOrKey)

@@ -3,12 +3,13 @@ using Moda.ProjectPortfolioManagement.Domain.Models;
 using Moda.Tests.Shared.Data;
 
 namespace Moda.ProjectPortfolioManagement.Domain.Tests.Data;
+
 public sealed class ExpenditureCategoryFaker : PrivateConstructorFaker<ExpenditureCategory>
 {
     public ExpenditureCategoryFaker()
     {
         RuleFor(x => x.Id, f => f.Random.Int(1, 1000));
-        RuleFor(x => x.Name, f => f.Commerce.Department()); 
+        RuleFor(x => x.Name, f => f.Commerce.Department());
         RuleFor(x => x.Description, f => f.Lorem.Sentence());
         RuleFor(x => x.State, f => f.PickRandom<ExpenditureCategoryState>());
         RuleFor(x => x.IsCapitalizable, f => f.Random.Bool());

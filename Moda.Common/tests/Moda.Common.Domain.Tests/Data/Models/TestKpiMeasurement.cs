@@ -7,7 +7,7 @@ namespace Moda.Common.Domain.Tests.Data.Models;
 /// </summary>
 public class TestKpiMeasurement : KpiMeasurement
 {
-    private TestKpiMeasurement(): base() { }
+    private TestKpiMeasurement() : base() { }
 
     private TestKpiMeasurement(Guid kpiId, double actualValue, Instant measurementDate, Guid measuredById, string? note)
         : base(kpiId, actualValue, measurementDate, measuredById, note)

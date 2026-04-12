@@ -4,6 +4,7 @@ using Moda.Common.Domain.Enums.AppIntegrations;
 using NodaTime;
 
 namespace Moda.AppIntegration.Application.Connections.Commands;
+
 public sealed record CreateAzureDevOpsConnectionCommand(string Name, string? Description, string Organization, string PersonalAccessToken) : ICommand<Guid>;
 
 public sealed class CreateAzureDevOpsConnectionCommandValidator : CustomValidator<CreateAzureDevOpsConnectionCommand>

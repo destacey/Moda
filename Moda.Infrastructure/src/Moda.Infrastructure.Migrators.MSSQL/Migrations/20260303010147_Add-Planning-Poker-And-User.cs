@@ -9,7 +9,7 @@ public partial class AddPlanningPokerAndUser : Migration
 {
     /// <inheritdoc />
     protected override void Up(MigrationBuilder migrationBuilder)
-    {         
+    {
         migrationBuilder.Sql("""
                 CREATE VIEW [Identity].[vw_ModaUsers] AS
                 SELECT

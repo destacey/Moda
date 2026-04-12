@@ -60,7 +60,7 @@ public static class TeamOperatingModelFakerExtensions
 
     public static TeamOperatingModelFaker AsClosed(this TeamOperatingModelFaker faker, LocalDate? endDate = null)
     {
-        var actualEndDate = endDate ?? new LocalDate(2025,5,20);
+        var actualEndDate = endDate ?? new LocalDate(2025, 5, 20);
 
         faker.RuleFor(x => x.DateRange, f => new OperatingModelDateRange(
             actualEndDate.PlusDays(-90),

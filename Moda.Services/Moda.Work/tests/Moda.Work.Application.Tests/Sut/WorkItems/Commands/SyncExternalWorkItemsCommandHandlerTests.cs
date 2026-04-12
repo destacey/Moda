@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moda.Common.Application.Interfaces.ExternalWork;
 using Moda.Common.Application.Requests.WorkManagement.Commands;
@@ -109,15 +109,15 @@ public class SyncExternalWorkItemsCommandHandlerTests : IDisposable
         // Arrange
         var workspaceId = Guid.NewGuid();
         var workProcessId = Guid.NewGuid();
-        
+
         var workProcess = CreateWorkProcessWithSchemes("User Story", "New");
-        
+
         var workspace = _workspaceFaker
             .AsExternal()
             .WithId(workspaceId)
             .WithWorkProcessId(workProcessId)
             .Generate();
-        
+
         var externalWorkItem = _externalWorkItemFaker
             .WithWorkType("UnknownType")
             .Generate();
@@ -146,15 +146,15 @@ public class SyncExternalWorkItemsCommandHandlerTests : IDisposable
         // Arrange
         var workspaceId = Guid.NewGuid();
         var workProcessId = Guid.NewGuid();
-        
+
         var workProcess = CreateWorkProcessWithSchemes("User Story", "New");
-        
+
         var workspace = _workspaceFaker
             .AsExternal()
             .WithId(workspaceId)
             .WithWorkProcessId(workProcessId)
             .Generate();
-        
+
         var externalWorkItem = _externalWorkItemFaker
             .WithWorkType("User Story")
             .WithWorkStatus("UnknownStatus")
@@ -190,7 +190,7 @@ public class SyncExternalWorkItemsCommandHandlerTests : IDisposable
         var mockWorkDbContext = new Mock<IWorkDbContext>();
         mockWorkDbContext.Setup(x => x.Workspaces)
             .Throws(new InvalidOperationException("Database error"));
-        
+
         var handlerWithMock = new SyncExternalWorkItemsCommandHandler(mockWorkDbContext.Object, _mockLogger.Object);
 
         // Act & Assert
@@ -235,7 +235,7 @@ public class SyncExternalWorkItemsCommandHandlerTests : IDisposable
         var mockWorkDbContext = new Mock<IWorkDbContext>();
         mockWorkDbContext.Setup(x => x.Workspaces)
             .Throws(new InvalidOperationException("Database error"));
-        
+
         var handlerWithMock = new SyncExternalWorkItemsCommandHandler(mockWorkDbContext.Object, _mockLogger.Object);
 
         // Act
@@ -265,17 +265,17 @@ public class SyncExternalWorkItemsCommandHandlerTests : IDisposable
     {
         var workType = new WorkTypeFaker().WithName(workTypeName).Generate();
         var workStatus = new WorkStatusFaker().WithName(workStatusName).Generate();
-        
+
         // Create workflow with properly linked workflow scheme
         var workflow = new WorkflowFaker()
             .WithWorkflowScheme(workStatus, WorkStatusCategory.Proposed)
             .Generate();
-        
+
         var workProcessScheme = new WorkProcessSchemeFaker()
             .WithWorkType(workType)
             .WithWorkflow(workflow)
             .Generate();
-        
+
         return _workProcessFaker
             .WithSchemes([workProcessScheme])
             .Generate();

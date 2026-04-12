@@ -151,7 +151,7 @@ public class TeamsOfTeamsController : ControllerBase
     {
         if (id != request.TeamId)
             return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(nameof(id), nameof(request.TeamId), HttpContext));
-        else if(teamMembershipId != request.TeamMembershipId)
+        else if (teamMembershipId != request.TeamMembershipId)
             return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(nameof(teamMembershipId), nameof(request.TeamMembershipId), HttpContext));
 
         var result = await _sender.Send(request.ToTeamOfTeamsUpdateTeamMembershipCommand(), cancellationToken);
@@ -235,7 +235,7 @@ public class TeamsOfTeamsController : ControllerBase
 
         return result.IsSuccess
             ? CreatedAtAction(nameof(GetRiskById), new { id, riskId = result.Value }, result.Value)
-            : BadRequest(result.ToBadRequestObject(HttpContext)); ;
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     [HttpPut("{id}/risks/{riskId}")]

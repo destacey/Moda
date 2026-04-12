@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using Moda.Common.Application.Interfaces;
 using Moda.Common.Application.Search.Dtos;
 using Moda.Common.Domain.Authorization;
 

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
 namespace Moda.AppIntegration.Application.Connections.Commands.AzureDevOps;
+
 public sealed record UpdateAzureDevOpsConnectionSyncStateCommand(Guid Id, bool IsSyncEnabled) : ICommand;
 
 internal sealed class UpdateAzureDevOpsConnectionSyncStateCommandHandler(ILogger<UpdateAzureDevOpsConnectionSyncStateCommandHandler> logger, IAppIntegrationDbContext appIntegrationDbContext, IDateTimeProvider dateTimeProvider) : ICommandHandler<UpdateAzureDevOpsConnectionSyncStateCommand>

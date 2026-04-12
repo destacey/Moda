@@ -9,6 +9,7 @@ using Moda.Integrations.AzureDevOps.Models;
 using Moda.Integrations.AzureDevOps.Models.Projects;
 
 namespace Moda.Integrations.AzureDevOps.Services;
+
 internal sealed class ProjectService(string organizationUrl, string token, string apiVersion, ILogger<ProjectService> logger)
 {
     private readonly ProjectClient _projectClient = new(organizationUrl, token, apiVersion);

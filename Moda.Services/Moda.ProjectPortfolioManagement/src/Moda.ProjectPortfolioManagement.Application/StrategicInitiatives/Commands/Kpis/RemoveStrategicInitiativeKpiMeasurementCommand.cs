@@ -1,6 +1,4 @@
-﻿using Moda.Common.Application.Models;
-
-namespace Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Commands.Kpis;
+﻿namespace Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Commands.Kpis;
 
 public sealed record RemoveStrategicInitiativeKpiMeasurementCommand(Guid StrategicInitiativeId, Guid KpiId, Guid MeasurementId) : ICommand;
 

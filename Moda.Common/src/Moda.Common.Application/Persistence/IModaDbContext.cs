@@ -4,6 +4,7 @@ using Moda.Common.Domain.Employees;
 using Moda.Common.Domain.Identity;
 
 namespace Moda.Common.Application.Persistence;
+
 public interface IModaDbContext
 {
     // this dependency is bigger than needed, but most of the extensions methods are leveraging it.

@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Moda.AppIntegration.Application.Persistence;
@@ -38,7 +38,7 @@ public class FakeAppIntegrationDbContext : IAppIntegrationDbContext, IDisposable
 
     // ChangeTracker - we can't create a real one, so we return null and the handler uses defensive coding
     public ChangeTracker ChangeTracker => null!;
-    
+
     public DatabaseFacade Database => throw new NotImplementedException("Database operations are not supported in FakeAppIntegrationDbContext. Use integration tests with a real DbContext for database-specific functionality.");
 
     /// <summary>
@@ -72,11 +72,11 @@ public class FakeAppIntegrationDbContext : IAppIntegrationDbContext, IDisposable
     // Connection
     public void AddConnection(Connection connection) => _connections.Add(connection);
     public void AddConnections(IEnumerable<Connection> connections) => _connections.AddRange(connections);
-    
+
     // AzureDevOpsBoardsConnection
     public void AddAzureDevOpsBoardsConnection(AzureDevOpsBoardsConnection connection) => _azureDevOpsBoardsConnections.Add(connection);
     public void AddAzureDevOpsBoardsConnections(IEnumerable<AzureDevOpsBoardsConnection> connections) => _azureDevOpsBoardsConnections.AddRange(connections);
-    
+
     // Employee
     public void AddEmployee(Employee employee) => _employees.Add(employee);
     public void AddEmployees(IEnumerable<Employee> employees) => _employees.AddRange(employees);

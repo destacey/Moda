@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 namespace Moda.Common.Application.BackgroundJobs;
+
 public enum BackgroundJobType
 {
     // Integration Jobs

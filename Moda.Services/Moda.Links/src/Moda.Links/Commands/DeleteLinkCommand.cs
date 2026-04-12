@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Moda.Common.Application.Interfaces;
 
 namespace Moda.Links.Commands;
+
 public sealed record DeleteLinkCommand(Guid LinkId) : ICommand;
 
 internal sealed class DeleteLinkCommandHandler : ICommandHandler<DeleteLinkCommand>

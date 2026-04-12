@@ -19,10 +19,10 @@ using PpmSyncStrategicThemesCommand = Moda.ProjectPortfolioManagement.Applicatio
 namespace Moda.Web.Api.Services;
 
 public class JobManager(
-    ILogger<JobManager> logger, 
-    IEmployeeService employeeService, 
-    IAzureDevOpsSyncManager azdoBoardsSyncManager, 
-    ISender sender) 
+    ILogger<JobManager> logger,
+    IEmployeeService employeeService,
+    IAzureDevOpsSyncManager azdoBoardsSyncManager,
+    ISender sender)
     : IJobManager
 {
     // TODO: does this belong in JobService/HangfireService?
@@ -80,7 +80,7 @@ public class JobManager(
         _logger.LogInformation("Completed {BackgroundJob} job", nameof(RunSyncTeamsWithGraphTables));
     }
 
-    [DisableConcurrentExecution(60 *3)]
+    [DisableConcurrentExecution(60 * 3)]
     public async Task RunSyncIterations(CancellationToken cancellationToken)
     {
         _logger.LogInformation("Running {BackgroundJob} job", nameof(RunSyncIterations));

@@ -1,6 +1,7 @@
 ﻿using Moda.Organization.Application.Teams.Models;
 
 namespace Moda.Organization.Application.Persistence;
+
 public interface IOrganizationDbContext : IModaDbContext
 {
     DbSet<BaseTeam> BaseTeams { get; }

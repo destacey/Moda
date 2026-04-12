@@ -1,5 +1,4 @@
 ﻿using Moda.Common.Domain.Enums.Organization;
-using Moda.Common.Domain.Events;
 using Moda.Common.Domain.Events.Organization;
 using Moda.Common.Domain.Models.Organizations;
 using Moda.Organization.Domain.Models;
@@ -11,6 +10,7 @@ using NodaTime.Extensions;
 using NodaTime.Testing;
 
 namespace Moda.Organization.Domain.Tests.Sut.Models;
+
 public class TeamOfTeamsTests
 {
     private readonly TestingDateTimeProvider _dateTimeProvider;
@@ -511,7 +511,7 @@ public class TeamOfTeamsTests
         var team = _teamOfTeamsFaker.Generate();
         var parentTeam = _teamOfTeamsFaker.Generate();
         LocalDate start = new(2023, 1, 1);
-        LocalDate? end = new(2023, 5, 1); ;
+        LocalDate? end = new(2023, 5, 1);
         MembershipDateRange dateRange = new(start, end);
 
         // Act

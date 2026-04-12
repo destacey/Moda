@@ -2,6 +2,7 @@
 using Moda.Work.Application.WorkTypes.Dtos;
 
 namespace Moda.Work.Application.WorkTypes.Queries;
+
 public sealed record GetWorkTypesQuery : IQuery<IReadOnlyList<WorkTypeDto>>
 {
     public GetWorkTypesQuery(bool includeInactive = false)

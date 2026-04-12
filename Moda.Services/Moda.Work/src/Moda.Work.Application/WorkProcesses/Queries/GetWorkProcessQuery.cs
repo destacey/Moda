@@ -2,6 +2,7 @@
 using Moda.Work.Application.WorkProcesses.Dtos;
 
 namespace Moda.Work.Application.WorkProcesses.Queries;
+
 public sealed record GetWorkProcessQuery : IQuery<Result<WorkProcessDto?>>
 {
     public GetWorkProcessQuery(Guid workProcessId)

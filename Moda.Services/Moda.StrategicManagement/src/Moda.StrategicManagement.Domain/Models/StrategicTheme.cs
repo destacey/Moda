@@ -12,9 +12,6 @@ namespace Moda.StrategicManagement.Domain.Models;
 /// </summary>
 public sealed class StrategicTheme : BaseAuditableEntity, IHasIdAndKey, IStrategicThemeData
 {
-    private string _name = default!;
-    private string _description = default!;
-
     private StrategicTheme() { }
 
     private StrategicTheme(string name, string description, StrategicThemeState state)
@@ -34,18 +31,18 @@ public sealed class StrategicTheme : BaseAuditableEntity, IHasIdAndKey, IStrateg
     /// </summary>
     public string Name
     {
-        get => _name;
-        private set => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
-    }
+        get;
+        private set => field = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
+    } = default!;
 
     /// <summary>
     /// A detailed description of the strategic theme and its importance.
     /// </summary>
     public string Description
     {
-        get => _description;
-        private set => _description = Guard.Against.NullOrWhiteSpace(value, nameof(Description)).Trim();
-    }
+        get;
+        private set => field = Guard.Against.NullOrWhiteSpace(value, nameof(Description)).Trim();
+    } = default!;
 
     /// <summary>
     /// The current lifecycle state of the strategic theme (e.g., Active, Proposed, Archived).

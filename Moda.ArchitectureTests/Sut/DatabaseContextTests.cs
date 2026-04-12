@@ -1,9 +1,7 @@
-using FluentAssertions;
-using NetArchTest.Rules;
-using Moda.Common.Domain;
-using Moda.Common.Application.Persistence;
-using Moda.Infrastructure.Persistence.Context;
+﻿using FluentAssertions;
 using Moda.ArchitectureTests.Helpers;
+using Moda.Infrastructure.Persistence.Context;
+using NetArchTest.Rules;
 
 namespace Moda.ArchitectureTests.Sut;
 

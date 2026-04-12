@@ -12,7 +12,7 @@ public sealed class ActivateExpenditureCategoryCommandValidator : AbstractValida
 }
 
 internal sealed class ActivateExpenditureCategoryCommandHandler(
-    IProjectPortfolioManagementDbContext projectPortfolioManagementDbContext, 
+    IProjectPortfolioManagementDbContext projectPortfolioManagementDbContext,
     ILogger<ActivateExpenditureCategoryCommandHandler> logger)
     : ICommandHandler<ActivateExpenditureCategoryCommand>
 {

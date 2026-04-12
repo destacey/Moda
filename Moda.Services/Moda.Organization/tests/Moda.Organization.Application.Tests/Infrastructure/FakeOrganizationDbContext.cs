@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Moda.Common.Domain.Employees;
@@ -21,7 +21,7 @@ public class FakeOrganizationDbContext : IOrganizationDbContext, IDisposable
     private readonly List<Team> _teams = [];
     private readonly List<TeamOfTeams> _teamOfTeams = [];
     private readonly List<TeamOperatingModel> _teamOperatingModels = [];
-    
+
     // Common domain entities
     private readonly List<Employee> _employees = [];
     private readonly List<ExternalEmployeeBlacklistItem> _externalEmployeeBlacklistItems = [];
@@ -40,7 +40,7 @@ public class FakeOrganizationDbContext : IOrganizationDbContext, IDisposable
 
     // ChangeTracker - we can't create a real one, so we return null and the handler uses defensive coding
     public ChangeTracker ChangeTracker => null!;
-    
+
     public DatabaseFacade Database => throw new NotImplementedException("Database operations are not supported in FakeOrganizationDbContext. Use integration tests with a real DbContext for database-specific functionality.");
 
     /// <summary>
@@ -108,20 +108,20 @@ public class FakeOrganizationDbContext : IOrganizationDbContext, IDisposable
     // BaseTeam
     public void AddBaseTeam(BaseTeam baseTeam) => _baseTeams.Add(baseTeam);
     public void AddBaseTeams(IEnumerable<BaseTeam> baseTeams) => _baseTeams.AddRange(baseTeams);
-    
+
     // Team
     public void AddTeam(Team team)
     {
         _teams.Add(team);
         _baseTeams.Add(team);
     }
-    
+
     public void AddTeams(IEnumerable<Team> teams)
     {
         _teams.AddRange(teams);
         _baseTeams.AddRange(teams);
     }
-    
+
     // TeamOfTeams
     public void AddTeamOfTeams(TeamOfTeams teamOfTeams)
     {

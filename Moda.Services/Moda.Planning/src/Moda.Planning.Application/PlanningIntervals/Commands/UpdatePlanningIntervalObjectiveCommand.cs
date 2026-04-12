@@ -5,6 +5,7 @@ using Moda.Planning.Application.PlanningIntervals.Extensions;
 using Moda.Planning.Domain.Enums;
 
 namespace Moda.Planning.Application.PlanningIntervals.Commands;
+
 public sealed record UpdatePlanningIntervalObjectiveCommand(Guid PlanningIntervalId, Guid PlanningIntervalObjectiveId, string Name, string? Description, ObjectiveStatus Status, double Progress, LocalDate? StartDate, LocalDate? TargetDate, bool IsStretch) : ICommand<int>;
 
 public sealed class UpdatePlanningIntervalObjectiveCommandValidator : CustomValidator<UpdatePlanningIntervalObjectiveCommand>

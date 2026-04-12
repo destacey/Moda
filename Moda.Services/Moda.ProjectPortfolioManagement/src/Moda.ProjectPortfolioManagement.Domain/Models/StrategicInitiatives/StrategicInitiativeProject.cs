@@ -1,6 +1,6 @@
 ﻿namespace Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 
-public class StrategicInitiativeProject
+public sealed class StrategicInitiativeProject
 {
     private StrategicInitiativeProject() { }
 

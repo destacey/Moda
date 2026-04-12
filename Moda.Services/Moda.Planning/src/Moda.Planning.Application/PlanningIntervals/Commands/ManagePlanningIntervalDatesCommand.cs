@@ -2,18 +2,19 @@
 using Moda.Planning.Application.PlanningIntervals.Dtos;
 
 namespace Moda.Planning.Application.PlanningIntervals.Commands;
+
 public sealed record ManagePlanningIntervalDatesCommand : ICommand
 {
     public ManagePlanningIntervalDatesCommand(Guid id, LocalDateRange dateRange, IEnumerable<PlanningIntervalIterationUpsertDto> iterations)
     {
         Id = id;
         DateRange = Guard.Against.Null(dateRange);
-        Iterations = iterations?.ToList() ?? new List<PlanningIntervalIterationUpsertDto>();
+        Iterations = iterations?.ToList() ?? [];
     }
 
     public Guid Id { get; }
     public LocalDateRange DateRange { get; }
-    public List<PlanningIntervalIterationUpsertDto> Iterations { get; } = new();
+    public List<PlanningIntervalIterationUpsertDto> Iterations { get; } = [];
 }
 
 public sealed class ManagePlanningIntervalDatesCommandValidator : CustomValidator<ManagePlanningIntervalDatesCommand>

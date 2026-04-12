@@ -46,7 +46,7 @@ public static class ProgramFakerExtensions
                 faker.RuleFor(x => x.Id, programId);
             }
 
-            HashSet<RoleAssignment<ProgramRole>> updatedRoles = new();
+            HashSet<RoleAssignment<ProgramRole>> updatedRoles = [];
             foreach (var role in roles)
             {
                 foreach (var employeeId in role.Value)

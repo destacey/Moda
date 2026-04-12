@@ -1,4 +1,5 @@
 ﻿namespace Moda.Common.Application.Validators;
+
 public sealed class IExternalEmployeeValidator : CustomValidator<IExternalEmployee>
 {
     public IExternalEmployeeValidator()

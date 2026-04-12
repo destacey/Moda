@@ -1,6 +1,7 @@
 ﻿using Moda.Work.Application.Persistence;
 
 namespace Moda.Work.Application.WorkStatuses.Commands;
+
 public sealed record UpdateWorkStatusCommand : ICommand<int>
 {
     public UpdateWorkStatusCommand(int id, string? description)

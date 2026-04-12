@@ -2,6 +2,7 @@
 using Moda.Work.Domain.Models;
 
 namespace Moda.Work.Domain.Tests.Sut.Models;
+
 public class WorkItemKeyTests
 {
     [Theory]

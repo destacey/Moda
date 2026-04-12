@@ -4,7 +4,7 @@ using NodaTime;
 
 namespace Moda.Planning.Domain.Models.PlanningPoker;
 
-public class PokerVote : BaseEntity
+public sealed class PokerVote : BaseEntity
 {
     private PokerVote() { }
 

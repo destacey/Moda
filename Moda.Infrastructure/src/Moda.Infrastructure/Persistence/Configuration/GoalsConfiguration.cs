@@ -1,10 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Moda.Common.Domain.Enums.Goals;
-using Moda.Goals.Domain.Models;
+using Moda.Common.Domain.Models.Goals;
 using Moda.Infrastructure.Persistence.Converters;
 
 namespace Moda.Infrastructure.Persistence.Configuration;
+
 public class ObjectiveConfiguration : IEntityTypeConfiguration<Objective>
 {
     public void Configure(EntityTypeBuilder<Objective> builder)

@@ -2,6 +2,7 @@
 using Moda.Common.Application.Dtos;
 
 namespace Moda.AppIntegration.Application.Connections.Dtos.AzureDevOps;
+
 public sealed record AzureDevOpsWorkProcessDto : IMapFrom<AzureDevOpsBoardsWorkProcess>
 {
     public Guid ExternalId { get; set; }

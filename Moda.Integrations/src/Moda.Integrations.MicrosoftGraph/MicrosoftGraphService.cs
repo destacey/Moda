@@ -74,7 +74,7 @@ public sealed class MicrosoftGraphService : IExternalEmployeeDirectoryService
                 requestConfiguration.QueryParameters.Top = _maxPageSize;
             }, cancellationToken);
 
-        List<User> users = new();
+        List<User> users = [];
         if (members is null || members.Value is null)
         {
             _logger.LogWarning("GetGroupMembers:  No members found for group {GroupId} in Active Directory via Microsoft Graph", groupId);
@@ -112,7 +112,7 @@ public sealed class MicrosoftGraphService : IExternalEmployeeDirectoryService
                 requestConfiguration.QueryParameters.Top = _maxPageSize;
             }, cancellationToken);
 
-        List<User> users = new();
+        List<User> users = [];
         if (adUsers is null || adUsers.Value is null)
         {
             _logger.LogWarning("GetActiveDirectoryUsers:  No users found in Active Directory via Microsoft Graph");

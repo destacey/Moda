@@ -16,7 +16,7 @@ namespace Moda.Planning.Domain.Models.Iterations;
 /// </summary>
 /// <remarks>An iteration is characterized by its name, type, state, date range, and ownership information.  This class
 /// provides methods for creating and updating iterations, as well as managing associated metadata.</remarks>
-public class Iteration : BaseAuditableEntity, IHasIdAndKey, ISimpleIteration
+public sealed class Iteration : BaseAuditableEntity, IHasIdAndKey, ISimpleIteration
 {
     private readonly List<KeyValueObjectMetadata> _externalMetadata = [];
 
@@ -124,7 +124,7 @@ public class Iteration : BaseAuditableEntity, IHasIdAndKey, ISimpleIteration
     /// <returns></returns>
     public static Iteration Create(string name, IterationType type, IterationState state, IterationDateRange dateRange, Guid? teamId, OwnershipInfo ownershipInfo, List<KeyValueObjectMetadata> externalMetadata, Instant timestamp)
     {
-        var iteration = new Iteration (name, type, state, dateRange, teamId, ownershipInfo, externalMetadata);
+        var iteration = new Iteration(name, type, state, dateRange, teamId, ownershipInfo, externalMetadata);
 
         iteration.AddPostPersistenceAction(() => iteration.AddDomainEvent(new IterationCreatedEvent(iteration, timestamp)));
 

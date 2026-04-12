@@ -1,10 +1,11 @@
 ﻿using Moda.Common.Application.Interfaces.ExternalWork;
 
 namespace Moda.Common.Application.Validators;
+
 public sealed class IExternalWorkItemValidator : CustomValidator<IExternalWorkItem>
 {
     public IExternalWorkItemValidator()
-    {        
+    {
         RuleFor(c => c.Id)
             .NotEmpty();
 

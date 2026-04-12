@@ -4,6 +4,7 @@ using Moda.Common.Domain.Events.StrategicManagement;
 using Moda.ProjectPortfolioManagement.Domain.Models;
 
 namespace Moda.ProjectPortfolioManagement.Application.StrategicThemes.EventHandlers;
+
 internal sealed class StrategicThemeChangedHandler(IProjectPortfolioManagementDbContext ppmContext, ILogger<StrategicThemeChangedHandler> logger) :
     IEventNotificationHandler<StrategicThemeCreatedEvent>,
     IEventNotificationHandler<StrategicThemeUpdatedEvent>,

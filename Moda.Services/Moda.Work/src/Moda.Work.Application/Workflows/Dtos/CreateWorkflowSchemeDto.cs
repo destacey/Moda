@@ -2,6 +2,7 @@
 using Moda.Work.Domain.Interfaces;
 
 namespace Moda.Work.Application.Workflows.Dtos;
+
 public sealed record CreateWorkflowSchemeDto : ICreateWorkflowScheme
 {
     public int WorkStatusId { get; set; }

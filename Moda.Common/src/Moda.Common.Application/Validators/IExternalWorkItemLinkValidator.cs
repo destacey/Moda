@@ -1,6 +1,7 @@
 ﻿using Moda.Common.Application.Interfaces.ExternalWork;
 
 namespace Moda.Common.Application.Validators;
+
 public sealed class IExternalWorkItemLinkValidator : CustomValidator<IExternalWorkItemLink>
 {
     public IExternalWorkItemLinkValidator()

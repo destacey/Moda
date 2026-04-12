@@ -73,7 +73,7 @@ internal sealed class UpdateExternalWorkflowCommandHandler(IWorkDbContext workDb
 
                 if (scheme.IsActive != ws.IsActive)
                 {
-                    var activateResult = ws.IsActive 
+                    var activateResult = ws.IsActive
                         ? workflow.ActivateScheme(scheme.Id, _timestamp)
                         : workflow.DeactivateScheme(scheme.Id, _timestamp);
                     if (activateResult.IsFailure)

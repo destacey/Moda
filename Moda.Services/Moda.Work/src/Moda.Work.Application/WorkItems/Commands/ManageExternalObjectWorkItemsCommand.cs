@@ -2,6 +2,7 @@
 using Moda.Work.Application.Persistence;
 
 namespace Moda.Work.Application.WorkItems.Commands;
+
 public sealed record ManageExternalObjectWorkItemsCommand(Guid PlanningIntervalId, Guid ObjectiveId, SystemContext Context, IEnumerable<Guid> WorkItemIds) : ICommand;
 
 internal sealed class ManageExternalObjectWorkItemsCommandHandler(IWorkDbContext workDbContext, ILogger<ManageExternalObjectWorkItemsCommandHandler> logger) : ICommandHandler<ManageExternalObjectWorkItemsCommand>

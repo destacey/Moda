@@ -361,7 +361,7 @@ internal partial class UserService
             {
                 _logger.LogError("Error updating user {UserId}: {Errors}", user.Id, result.Errors.Select(e => e.Description));
             }
-        }       
+        }
 
         return Result.Success();
     }

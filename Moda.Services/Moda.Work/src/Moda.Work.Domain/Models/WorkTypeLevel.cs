@@ -9,9 +9,6 @@ namespace Moda.Work.Domain.Models;
 /// <summary>Allows work types to be grouped and defined in a hierarchy.</summary>
 public sealed class WorkTypeLevel : BaseAuditableEntity<int>
 {
-    private string _name = null!;
-    private string? _description;
-
     private WorkTypeLevel() { }
 
     private WorkTypeLevel(string name, string? description, WorkTypeTier tier, Ownership ownership, int order)
@@ -27,16 +24,16 @@ public sealed class WorkTypeLevel : BaseAuditableEntity<int>
     /// <value>The name.</value>
     public string Name
     {
-        get => _name;
-        private set => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
-    }
+        get;
+        private set => field = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
+    } = null!;
 
     /// <summary>The description of the work type level.</summary>
     /// <value>The description.</value>
     public string? Description
     {
-        get => _description;
-        private set => _description = value.NullIfWhiteSpacePlusTrim();
+        get;
+        private set => field = value.NullIfWhiteSpacePlusTrim();
     }
 
     public WorkTypeTier Tier { get; private init; }

@@ -4,6 +4,7 @@ using Moda.Common.Application.Interfaces;
 using Moda.Links.Models;
 
 namespace Moda.Links.Queries;
+
 public sealed record GetLinksQuery(Guid ObjectId) : IQuery<IReadOnlyList<LinkDto>>;
 
 internal sealed class GetLinksQueryHandler : IQueryHandler<GetLinksQuery, IReadOnlyList<LinkDto>>

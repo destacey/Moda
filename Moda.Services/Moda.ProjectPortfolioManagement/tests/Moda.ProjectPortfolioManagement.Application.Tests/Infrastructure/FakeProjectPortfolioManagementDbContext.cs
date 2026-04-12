@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Moda.Common.Domain.Employees;
@@ -53,7 +53,7 @@ public class FakeProjectPortfolioManagementDbContext : IProjectPortfolioManageme
 
     // ChangeTracker - we can't create a real one, so we return null and the handler uses defensive coding
     public ChangeTracker ChangeTracker => null!;
-    
+
     public DatabaseFacade Database => throw new NotImplementedException("Database operations are not supported in FakeProjectPortfolioManagementDbContext. Use integration tests with a real DbContext for database-specific functionality.");
 
     /// <summary>
@@ -89,15 +89,15 @@ public class FakeProjectPortfolioManagementDbContext : IProjectPortfolioManageme
     // ExpenditureCategory
     public void AddExpenditureCategory(ExpenditureCategory category) => _expenditureCategories.Add(category);
     public void AddExpenditureCategories(IEnumerable<ExpenditureCategory> categories) => _expenditureCategories.AddRange(categories);
-    
+
     // ProjectPortfolio
     public void AddPortfolio(ProjectPortfolio portfolio) => _portfolios.Add(portfolio);
     public void AddPortfolios(IEnumerable<ProjectPortfolio> portfolios) => _portfolios.AddRange(portfolios);
-    
+
     // Program
     public void AddProgram(Program program) => _programs.Add(program);
     public void AddPrograms(IEnumerable<Program> programs) => _programs.AddRange(programs);
-    
+
     // Project
     public void AddProject(Project project) => _projects.Add(project);
     public void AddProjects(IEnumerable<Project> projects) => _projects.AddRange(projects);
@@ -117,7 +117,7 @@ public class FakeProjectPortfolioManagementDbContext : IProjectPortfolioManageme
     // StrategicTheme (PPM)
     public void AddPpmStrategicTheme(StrategicTheme theme) => _ppmStrategicThemes.Add(theme);
     public void AddPpmStrategicThemes(IEnumerable<StrategicTheme> themes) => _ppmStrategicThemes.AddRange(themes);
-    
+
     // StrategicInitiative
     public void AddStrategicInitiative(StrategicInitiative initiative) => _strategicInitiatives.Add(initiative);
     public void AddStrategicInitiatives(IEnumerable<StrategicInitiative> initiatives) => _strategicInitiatives.AddRange(initiatives);

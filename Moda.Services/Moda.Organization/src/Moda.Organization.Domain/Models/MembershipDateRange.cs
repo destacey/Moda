@@ -4,7 +4,8 @@ using Moda.Common.Interfaces;
 using NodaTime;
 
 namespace Moda.Organization.Domain.Models;
-public class MembershipDateRange : ValueObject, IDateRange<LocalDate, LocalDate?>
+
+public sealed class MembershipDateRange : ValueObject, IDateRange<LocalDate, LocalDate?>
 {
     public MembershipDateRange(LocalDate start, LocalDate? end)
     {

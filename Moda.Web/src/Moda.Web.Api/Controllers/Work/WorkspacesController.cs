@@ -1,9 +1,7 @@
-﻿using CSharpFunctionalExtensions;
-using Moda.Common.Extensions;
+﻿using Moda.Common.Extensions;
 using Moda.Web.Api.Extensions;
 using Moda.Web.Api.Models.Work.Workspaces;
 using Moda.Work.Application.WorkItemDependencies.Dtos;
-using Moda.Work.Application.WorkItems.Commands;
 using Moda.Work.Application.WorkItems.Dtos;
 using Moda.Work.Application.WorkItems.Queries;
 using Moda.Work.Application.Workspaces.Commands;
@@ -92,7 +90,7 @@ public class WorkspacesController(ISender sender) : ControllerBase
         }
         else if (idOrKey.IsValidWorkspaceKeyFormat())
         {
-               query = new GetWorkItemsQuery(new WorkspaceKey(idOrKey));
+            query = new GetWorkItemsQuery(new WorkspaceKey(idOrKey));
         }
         else
         {
@@ -231,7 +229,7 @@ public class WorkspacesController(ISender sender) : ControllerBase
 
         var result = await _sender.Send(new GetWorkItemDependenciesQuery(idOrKey, key), cancellationToken);
 
-        
+
         return result.IsFailure
             ? BadRequest(result.ToBadRequestObject(HttpContext))
             : result.Value is not null

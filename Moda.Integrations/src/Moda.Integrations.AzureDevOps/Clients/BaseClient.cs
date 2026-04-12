@@ -6,6 +6,7 @@ using RestSharp;
 using RestSharp.Serializers.Json;
 
 namespace Moda.Integrations.AzureDevOps.Clients;
+
 internal abstract class BaseClient : IDisposable
 {
     protected readonly RestClient _client;

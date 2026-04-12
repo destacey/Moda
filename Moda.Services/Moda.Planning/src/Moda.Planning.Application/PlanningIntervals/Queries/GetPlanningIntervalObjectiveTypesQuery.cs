@@ -3,6 +3,7 @@ using Moda.Planning.Application.PlanningIntervals.Dtos;
 using Moda.Planning.Domain.Enums;
 
 namespace Moda.Planning.Application.PlanningIntervals.Queries;
+
 public sealed record GetPlanningIntervalObjectiveTypesQuery() : IQuery<IReadOnlyList<PlanningIntervalObjectiveTypeDto>>;
 
 internal sealed class GetPlanningIntervalObjectiveTypesQueryHandler : IQueryHandler<GetPlanningIntervalObjectiveTypesQuery, IReadOnlyList<PlanningIntervalObjectiveTypeDto>>

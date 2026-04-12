@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 
 namespace Moda.Integrations.AzureDevOps.IntegrationTests.Models;
+
 public class ProcessServiceData : BaseConfiguration
 {
     public readonly static string SectionName = "ProcessServiceData";

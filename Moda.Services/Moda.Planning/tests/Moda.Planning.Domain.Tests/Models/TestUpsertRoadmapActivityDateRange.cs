@@ -3,6 +3,7 @@ using Moda.Common.Models;
 using Moda.Planning.Domain.Interfaces.Roadmaps;
 
 namespace Moda.Planning.Domain.Tests.Models;
+
 internal record TestUpsertRoadmapActivityDateRange : IUpsertRoadmapActivityDateRange
 {
     [SetsRequiredMembers]

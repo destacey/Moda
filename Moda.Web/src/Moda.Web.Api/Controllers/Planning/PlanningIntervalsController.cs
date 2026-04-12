@@ -204,8 +204,8 @@ public class PlanningIntervalsController : ControllerBase
     {
         var iterations = await _sender.Send(new GetPlanningIntervalIterationsQuery(idOrKey), cancellationToken);
 
-        return iterations is not null 
-            ? Ok(iterations) 
+        return iterations is not null
+            ? Ok(iterations)
             : NotFound();
     }
 
@@ -245,8 +245,8 @@ public class PlanningIntervalsController : ControllerBase
     {
         var iterations = await _sender.Send(new GetPlanningIntervalIterationSprintsQuery(idOrKey, iterationId), cancellationToken);
 
-        return iterations is not null 
-            ? Ok(iterations) 
+        return iterations is not null
+            ? Ok(iterations)
             : NotFound();
     }
 

@@ -1,6 +1,4 @@
-using Moda.Common.Application.Identity;
-
-namespace Moda.Common.Application.Identity.Users;
+﻿namespace Moda.Common.Application.Identity.Users;
 
 public sealed record CreateUserCommand
 {

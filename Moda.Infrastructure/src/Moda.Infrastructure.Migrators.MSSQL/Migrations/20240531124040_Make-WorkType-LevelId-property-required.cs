@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
-using Moda.Common.Domain.Enums.Work;
 using Moda.Common.Domain.Enums;
+using Moda.Common.Domain.Enums.Work;
 
 #nullable disable
 

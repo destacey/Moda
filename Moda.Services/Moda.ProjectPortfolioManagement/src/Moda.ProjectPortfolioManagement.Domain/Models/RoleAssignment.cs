@@ -2,7 +2,7 @@
 
 namespace Moda.ProjectPortfolioManagement.Domain.Models;
 
-public class RoleAssignment<T> : ISystemAuditable where T : Enum
+public sealed class RoleAssignment<T> : ISystemAuditable where T : Enum
 {
     private RoleAssignment() { }
 

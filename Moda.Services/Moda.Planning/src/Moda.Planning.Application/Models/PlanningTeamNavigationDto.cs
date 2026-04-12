@@ -2,6 +2,7 @@
 using Moda.Common.Extensions;
 
 namespace Moda.Planning.Application.Models;
+
 public record PlanningTeamNavigationDto : NavigationDto, IMapFrom<PlanningTeam>
 {
     public required string Type { get; set; }

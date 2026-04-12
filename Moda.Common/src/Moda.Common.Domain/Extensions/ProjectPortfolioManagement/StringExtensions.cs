@@ -2,6 +2,7 @@
 using Moda.Common.Domain.Models.ProjectPortfolioManagement;
 
 namespace Moda.Common.Domain.Extensions.ProjectPortfolioManagement;
+
 public static partial class StringExtensions
 {
     /// <summary>

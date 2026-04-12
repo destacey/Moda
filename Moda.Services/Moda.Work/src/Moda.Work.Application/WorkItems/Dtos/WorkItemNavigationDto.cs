@@ -1,4 +1,5 @@
 ﻿namespace Moda.Work.Application.WorkItems.Dtos;
+
 public sealed record WorkItemNavigationDto : IMapFrom<WorkItem>
 {
     public required Guid Id { get; set; }
@@ -11,6 +12,6 @@ public sealed record WorkItemNavigationDto : IMapFrom<WorkItem>
     {
         config.NewConfig<WorkItem, WorkItemNavigationDto>()
             .Map(dest => dest.WorkspaceKey, src => src.Workspace.Key)
-            .Map(dest => dest.ExternalViewWorkItemUrl, src => src.Workspace.ExternalViewWorkItemUrlTemplate == null ? null : $"{src.Workspace.ExternalViewWorkItemUrlTemplate}{src.ExternalId}"); ;
+            .Map(dest => dest.ExternalViewWorkItemUrl, src => src.Workspace.ExternalViewWorkItemUrlTemplate == null ? null : $"{src.Workspace.ExternalViewWorkItemUrlTemplate}{src.ExternalId}");
     }
 }

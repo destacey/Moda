@@ -1,4 +1,5 @@
 ﻿namespace Moda.Common.Tests.Sut.Extensions;
+
 public class GuidExtensionsTests
 {
     [Theory]

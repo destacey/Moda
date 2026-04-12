@@ -3,6 +3,7 @@ using Moda.Work.Domain.Models;
 using NodaTime;
 
 namespace Moda.Infrastructure.Persistence.Initialization;
+
 public class WorkSeeder : ICustomSeeder
 {
     public async Task Initialize(ModaDbContext dbContext, IDateTimeProvider dateTimeProvider, CancellationToken cancellationToken)

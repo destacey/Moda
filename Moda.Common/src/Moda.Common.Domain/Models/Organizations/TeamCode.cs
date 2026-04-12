@@ -4,7 +4,7 @@ using Moda.Common.Domain.Extensions.Organizations;
 
 namespace Moda.Common.Domain.Models.Organizations;
 
-public class TeamCode : ValueObject
+public sealed class TeamCode : ValueObject
 {
     public const string Regex = "^([A-Z0-9]){2,10}$";
 

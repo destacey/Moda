@@ -4,6 +4,7 @@ using Ardalis.GuardClauses;
 using RestSharp;
 
 namespace Moda.Integrations.AzureDevOps.Extensions;
+
 internal static class RestRequestExtensions
 {
     internal static void AddAcceptHeaderWithApiVersion(this RestRequest request, string apiVersion, bool includePreviewTag = false)

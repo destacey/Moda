@@ -6,6 +6,7 @@ using NodaTime.Extensions;
 using NodaTime.Testing;
 
 namespace Moda.Planning.Domain.Tests.Sut.Models;
+
 public class SimpleSimpleHealthCheckTests
 {
     private readonly TestingDateTimeProvider _dateTimeProvider;

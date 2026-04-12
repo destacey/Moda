@@ -4,6 +4,7 @@ using Mapster.Utils;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Moda.Common.Application;
+
 public static class ConfigureServices
 {
     public static IServiceCollection AddCommonApplication(this IServiceCollection services)

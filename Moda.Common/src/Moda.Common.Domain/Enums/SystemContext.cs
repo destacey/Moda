@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 namespace Moda.Common.Domain.Enums;
+
 public enum SystemContext
 {
     // Current Db length is set to 64 characters

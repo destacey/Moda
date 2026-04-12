@@ -6,12 +6,9 @@ using Moda.Planning.Domain.Enums;
 using NodaTime;
 
 namespace Moda.Planning.Domain.Models;
-public class Risk : BaseSoftDeletableEntity, IHasIdAndKey
-{
-    private string _summary = default!;
-    private string? _description;
-    private string? _response;
 
+public sealed class Risk : BaseSoftDeletableEntity, IHasIdAndKey
+{
     private Risk() { }
 
     private Risk(string summary, string? description, Guid? teamId, Instant reportedOn, Guid reportedById, RiskCategory category, RiskGrade impact, RiskGrade likelihood, Guid? assigneeId, LocalDate? followUpDate, string? response)
@@ -40,17 +37,17 @@ public class Risk : BaseSoftDeletableEntity, IHasIdAndKey
     /// </summary>
     public string Summary
     {
-        get => _summary;
-        private set => _summary = Guard.Against.NullOrWhiteSpace(value, nameof(Summary)).Trim();
-    }
+        get;
+        private set => field = Guard.Against.NullOrWhiteSpace(value, nameof(Summary)).Trim();
+    } = default!;
 
     /// <summary>
     /// The description of the Risk.
     /// </summary>
     public string? Description
     {
-        get => _description;
-        private set => _description = value.NullIfWhiteSpacePlusTrim();
+        get;
+        private set => field = value.NullIfWhiteSpacePlusTrim();
     }
 
     // TODO: switch TeamId to ObjectId and Context
@@ -99,8 +96,8 @@ public class Risk : BaseSoftDeletableEntity, IHasIdAndKey
     /// </summary>
     public string? Response
     {
-        get => _response;
-        private set => _response = value.NullIfWhiteSpacePlusTrim();
+        get;
+        private set => field = value.NullIfWhiteSpacePlusTrim();
     }
 
     /// <summary>

@@ -7,7 +7,7 @@ public sealed record CreateExpenditureCategoryCommand(
     string Description,
     bool IsCapitalizable,
     bool RequiresDepreciation,
-    string? AccountingCode) 
+    string? AccountingCode)
     : ICommand<int>;
 
 public sealed class CreateExpenditureCategoryCommandValidator : AbstractValidator<CreateExpenditureCategoryCommand>
@@ -29,7 +29,7 @@ public sealed class CreateExpenditureCategoryCommandValidator : AbstractValidato
 
 internal sealed class CreateExpenditureCategoryCommandHandler(
     IProjectPortfolioManagementDbContext projectPortfolioManagementDbContext,
-    ILogger<CreateExpenditureCategoryCommandHandler> logger) 
+    ILogger<CreateExpenditureCategoryCommandHandler> logger)
     : ICommandHandler<CreateExpenditureCategoryCommand, int>
 {
     private const string AppRequestName = nameof(CreateExpenditureCategoryCommand);

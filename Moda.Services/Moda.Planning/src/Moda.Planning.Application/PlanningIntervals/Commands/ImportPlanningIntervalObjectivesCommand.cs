@@ -5,6 +5,7 @@ using Moda.Planning.Application.PlanningIntervals.Dtos;
 using Moda.Planning.Application.PlanningIntervals.Extensions;
 
 namespace Moda.Planning.Application.PlanningIntervals.Commands;
+
 public sealed record ImportPlanningIntervalObjectivesCommand : ICommand
 {
     public ImportPlanningIntervalObjectivesCommand(IEnumerable<ImportPlanningIntervalObjectiveDto> objectives)

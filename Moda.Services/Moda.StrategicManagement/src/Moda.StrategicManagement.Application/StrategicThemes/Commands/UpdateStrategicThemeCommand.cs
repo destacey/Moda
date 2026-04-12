@@ -21,7 +21,7 @@ public sealed class UpdateStrategicThemeCommandValidator : AbstractValidator<Upd
 }
 
 internal sealed class UpdateStrategicThemeCommandHandler(
-    IStrategicManagementDbContext strategicManagementDbContext, 
+    IStrategicManagementDbContext strategicManagementDbContext,
     ILogger<UpdateStrategicThemeCommandHandler> logger,
     IDateTimeProvider dateTimeProvider)
     : ICommandHandler<UpdateStrategicThemeCommand>

@@ -8,9 +8,6 @@ namespace Moda.Work.Domain.Models;
 
 public abstract class WorkItemLink : BaseAuditableEntity
 {
-    private string? _comment;
-
-    // EF
     protected WorkItemLink() { }
 
     protected WorkItemLink(Guid sourceId, Guid targetId, WorkItemLinkType linkType, Instant createdOn, Guid? createdById, Instant? removedOn, Guid? removedById, string? comment)
@@ -19,7 +16,7 @@ public abstract class WorkItemLink : BaseAuditableEntity
         Guard.Against.NullOrEmpty(targetId);
 
         if (sourceId == targetId)
-            throw new ArgumentException("A work item cannot be linked to itself.", nameof(targetId));        
+            throw new ArgumentException("A work item cannot be linked to itself.", nameof(targetId));
 
         SourceId = sourceId;
         TargetId = targetId;
@@ -32,15 +29,15 @@ public abstract class WorkItemLink : BaseAuditableEntity
     }
 
     public Guid SourceId { get; private init; }
-    
+
     public WorkItem? Source { get; protected set; }
-    
+
     public Guid TargetId { get; private init; }
-    
+
     public WorkItem? Target { get; protected set; }
-    
+
     public WorkItemLinkType LinkType { get; private set; }
-    
+
     public Instant CreatedOn { get; private init; }
 
     public Guid? CreatedById { get; private set; }
@@ -53,10 +50,10 @@ public abstract class WorkItemLink : BaseAuditableEntity
 
     public Employee? RemovedBy { get; private set; }
 
-    public string? Comment 
-    { 
-        get => _comment; 
-        private set => _comment = value.NullIfWhiteSpacePlusTrim(); 
+    public string? Comment
+    {
+        get;
+        private set => field = value.NullIfWhiteSpacePlusTrim();
     }
 
     public virtual void Update(Guid? createdById, Guid? removedById, string? comment)

@@ -1,6 +1,7 @@
 ﻿using Moda.Common.Application.Interfaces.ExternalWork;
 
 namespace Moda.Common.Application.Interfaces;
+
 public interface IAzureDevOpsService
 {
     Task<Result<string>> GetSystemId(string organizationUrl, string token, CancellationToken cancellationToken);

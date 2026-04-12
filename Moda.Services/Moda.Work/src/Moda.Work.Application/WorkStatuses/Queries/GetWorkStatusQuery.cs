@@ -3,6 +3,7 @@ using Moda.Work.Application.Persistence;
 using Moda.Work.Application.WorkStatuses.Dtos;
 
 namespace Moda.Work.Application.WorkStatuses.Queries;
+
 public sealed record GetWorkStatusQuery : IQuery<WorkStatusDto?>
 {
     public GetWorkStatusQuery(int id)

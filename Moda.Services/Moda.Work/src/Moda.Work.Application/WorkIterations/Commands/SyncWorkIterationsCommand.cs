@@ -2,6 +2,7 @@
 using Moda.Work.Application.Persistence;
 
 namespace Moda.Work.Application.WorkIterations.Commands;
+
 public sealed record SyncWorkIterationsCommand(IEnumerable<ISimpleIteration> Iterations) : ICommand, ILongRunningRequest;
 
 internal sealed class SyncWorkIterationsCommandHandler(
@@ -44,7 +45,7 @@ internal sealed class SyncWorkIterationsCommandHandler(
                 _workDbContext.WorkIterations.RemoveRange(iterationsToDelete);
                 deleteCount = iterationsToDelete.Count;
             }
-            
+
             // Handle creates and updates
             foreach (var iteration in request.Iterations)
             {
@@ -74,7 +75,7 @@ internal sealed class SyncWorkIterationsCommandHandler(
             }
 
             await _workDbContext.SaveChangesAsync(cancellationToken);
-            
+
             _logger.LogInformation("Sync Work iterations completed. Created: {CreateCount}, Updated: {UpdateCount}, Deleted: {DeleteCount}.",
                 createCount, updateCount, deleteCount);
 

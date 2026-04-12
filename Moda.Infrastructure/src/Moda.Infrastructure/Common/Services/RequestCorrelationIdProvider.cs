@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 
 namespace Moda.Infrastructure.Common.Services;
+
 public class RequestCorrelationIdProvider(IHttpContextAccessor httpContextAccessor) : IRequestCorrelationIdProvider
 {
     private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;

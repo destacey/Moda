@@ -2,6 +2,7 @@
 using Moda.Common.Application.Requests.WorkManagement.Interfaces;
 
 namespace Moda.Work.Application.Workflows.Dtos;
+
 public sealed record WorkflowDto : IMapFrom<Workflow>, IWorkflowDto
 {
     public Guid Id { get; set; }

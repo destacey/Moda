@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Moda.Common.Application.Events;
 using Moda.Common.Application.Exceptions;
 using Moda.Common.Application.Identity.Roles;
@@ -179,7 +179,7 @@ public class RoleServiceTests
         // Arrange
         var role = new ApplicationRole("CustomRole", "A custom role");
         _mockRoleManager.Setup(x => x.FindByIdAsync("role-1")).ReturnsAsync(role);
-        _mockUserManager.Setup(x => x.GetUsersInRoleAsync("CustomRole")).ReturnsAsync(new List<ApplicationUser>());
+        _mockUserManager.Setup(x => x.GetUsersInRoleAsync("CustomRole")).ReturnsAsync([]);
         _mockRoleManager.Setup(x => x.DeleteAsync(role)).ReturnsAsync(IdentityResult.Success);
 
         var sut = CreateSut();
@@ -232,7 +232,7 @@ public class RoleServiceTests
         var role = new ApplicationRole("CustomRole");
         _mockRoleManager.Setup(x => x.FindByIdAsync("role-1")).ReturnsAsync(role);
         _mockUserManager.Setup(x => x.GetUsersInRoleAsync("CustomRole"))
-            .ReturnsAsync(new List<ApplicationUser> { new() { Id = "user-1" } });
+            .ReturnsAsync([new() { Id = "user-1" }]);
 
         var sut = CreateSut();
 

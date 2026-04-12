@@ -1,6 +1,7 @@
 ﻿using Mapster;
 
 namespace Moda.Organization.Application.Teams.Queries;
+
 public sealed record GetTeamsQuery : IQuery<IReadOnlyList<TeamListDto>>
 {
     public GetTeamsQuery(bool includeInactive = false, IEnumerable<Guid>? ids = null)
@@ -14,8 +15,8 @@ public sealed record GetTeamsQuery : IQuery<IReadOnlyList<TeamListDto>>
 }
 
 internal sealed class GetTeamsQueryHandler(
-    IOrganizationDbContext organizationDbContext, 
-    IDateTimeProvider dateTimeProvider) 
+    IOrganizationDbContext organizationDbContext,
+    IDateTimeProvider dateTimeProvider)
     : IQueryHandler<GetTeamsQuery, IReadOnlyList<TeamListDto>>
 {
     private readonly IOrganizationDbContext _organizationDbContext = organizationDbContext;

@@ -16,7 +16,7 @@ public sealed class PlanningIntervalIterationUpsertDtoValidator : CustomValidato
 
         RuleFor(c => c.Category)
             .IsInEnum()
-            .WithMessage(errorMessage: "A valid iteration category must be selected."); ;
+            .WithMessage(errorMessage: "A valid iteration category must be selected.");
 
         RuleFor(c => c.DateRange)
             .NotNull();

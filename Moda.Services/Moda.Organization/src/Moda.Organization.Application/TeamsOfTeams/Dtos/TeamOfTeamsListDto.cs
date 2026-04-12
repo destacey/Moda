@@ -4,6 +4,7 @@ using Moda.Organization.Application.Models;
 using NodaTime;
 
 namespace Moda.Organization.Application.TeamsOfTeams.Dtos;
+
 public class TeamOfTeamsListDto : IMapFrom<BaseTeam>
 {
     /// <summary>Gets or sets the identifier.</summary>

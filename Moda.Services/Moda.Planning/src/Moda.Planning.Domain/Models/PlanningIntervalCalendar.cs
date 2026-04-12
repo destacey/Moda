@@ -2,9 +2,10 @@
 using Moda.Planning.Domain.Interfaces;
 
 namespace Moda.Planning.Domain.Models;
+
 public sealed record PlanningIntervalCalendar : IHasIdAndKey
 {
-    private readonly List<ILocalSchedule> _iterationSchedules = new();
+    private readonly List<ILocalSchedule> _iterationSchedules = [];
 
     internal PlanningIntervalCalendar(ILocalSchedule planningInterval, IEnumerable<ILocalSchedule> iterations)
     {

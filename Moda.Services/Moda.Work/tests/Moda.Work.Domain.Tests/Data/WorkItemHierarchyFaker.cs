@@ -1,4 +1,4 @@
-using Moda.Tests.Shared.Data;
+﻿using Moda.Tests.Shared.Data;
 using Moda.Work.Domain.Models;
 using NodaTime;
 
@@ -9,7 +9,7 @@ public class WorkItemHierarchyFaker : PrivateConstructorFaker<WorkItemHierarchy>
     public WorkItemHierarchyFaker(Instant? timestamp = null)
     {
         var ts = timestamp ?? SystemClock.Instance.GetCurrentInstant();
-        
+
         RuleFor(x => x.SourceId, f => f.Random.Guid());
         RuleFor(x => x.TargetId, f => f.Random.Guid());
         RuleFor(x => x.CreatedOn, ts);

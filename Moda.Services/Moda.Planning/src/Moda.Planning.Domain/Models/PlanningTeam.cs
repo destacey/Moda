@@ -10,10 +10,10 @@ namespace Moda.Planning.Domain.Models;
 /// <summary>
 /// A copy of the Moda.Common.Domain.Interfaces.Organization.ISimpleTeam interface.  Used to hold team information for the planning service and db context.
 /// </summary>
-public class PlanningTeam : ISimpleTeam, IHasIdAndKey, IHasTeamIdAndCode
+public sealed class PlanningTeam : ISimpleTeam, IHasIdAndKey, IHasTeamIdAndCode
 {
-    protected readonly List<Iteration> _iterations = [];
-    protected readonly List<PlanningIntervalTeam> _planningIntervalTeams = [];
+    private readonly List<Iteration> _iterations = [];
+    private readonly List<PlanningIntervalTeam> _planningIntervalTeams = [];
 
     private PlanningTeam() { }
 

@@ -1,10 +1,8 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Moda.Common.Domain.Employees;
 using Moda.Common.Domain.Identity;
-using Moda.Health;
-using Moda.Health.Models;
 using Moda.Tests.Shared.Infrastructure;
 
 namespace Moda.Health.Tests.Infrastructure;
@@ -17,7 +15,7 @@ public class FakeHealthDbContext : IHealthDbContext, IDisposable
 {
     // Health domain entities
     private readonly List<HealthCheck> _healthChecks = [];
-    
+
     // Common domain entities
     private readonly List<Employee> _employees = [];
     private readonly List<ExternalEmployeeBlacklistItem> _externalEmployeeBlacklistItems = [];
@@ -33,7 +31,7 @@ public class FakeHealthDbContext : IHealthDbContext, IDisposable
 
     // ChangeTracker - we can't create a real one, so we return null and the handler uses defensive coding
     public ChangeTracker ChangeTracker => null!;
-    
+
     public DatabaseFacade Database => throw new NotImplementedException("Database operations are not supported in FakeHealthDbContext. Use integration tests with a real DbContext for database-specific functionality.");
 
     /// <summary>
@@ -66,7 +64,7 @@ public class FakeHealthDbContext : IHealthDbContext, IDisposable
     // HealthCheck
     public void AddHealthCheck(HealthCheck healthCheck) => _healthChecks.Add(healthCheck);
     public void AddHealthChecks(IEnumerable<HealthCheck> healthChecks) => _healthChecks.AddRange(healthChecks);
-    
+
     // Employee
     public void AddEmployee(Employee employee) => _employees.Add(employee);
     public void AddEmployees(IEnumerable<Employee> employees) => _employees.AddRange(employees);

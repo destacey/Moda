@@ -34,6 +34,6 @@ var modaClient = builder.AddJavaScriptApp("moda-client", "../Moda.Web/src/moda.w
     .WithExternalHttpEndpoints()
     .WithEnvironment("NEXT_PUBLIC_API_BASE_URL", modaApi.GetEndpoint("http"))
     .WithEnvironment("NEXT_OTEL_VERBOSE", "1");
-    //.WithEnvironment("NODE_TLS_REJECT_UNAUTHORIZED", "0"); // Allow self-signed certs for local development.  not needed for http.
+//.WithEnvironment("NODE_TLS_REJECT_UNAUTHORIZED", "0"); // Allow self-signed certs for local development.  not needed for http.
 
 builder.Build().Run();

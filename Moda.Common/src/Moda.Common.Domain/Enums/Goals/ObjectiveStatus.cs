@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 namespace Moda.Common.Domain.Enums.Goals;
+
 public enum ObjectiveStatus
 {
     [Display(Name = "Not Started", Description = "The objective has not been started.", Order = 1)]

@@ -1,6 +1,7 @@
 ﻿using Moda.Common.Domain.Enums.Work;
 
 namespace Moda.Common.Domain.Extensions;
+
 public static class DependencyStateExtensions
 {
     public static DependencyState FromStatusCategoryString(string statusCategory)

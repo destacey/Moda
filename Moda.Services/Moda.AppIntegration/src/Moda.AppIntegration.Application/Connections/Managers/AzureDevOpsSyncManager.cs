@@ -99,7 +99,7 @@ public sealed class AzureDevOpsSyncManager(ILogger<AzureDevOpsSyncManager> logge
                         // Build a lookup for workspace teams to avoid re-enumerating the full collection per workspace
                         var workspaceTeamsLookup = teamConfiguration?.WorkspaceTeams is not null
                             ? teamConfiguration.WorkspaceTeams.GroupBy(t => t.WorkspaceId).ToDictionary(g => g.Key, g => g.ToArray())
-                            : new Dictionary<Guid, AzureDevOpsWorkspaceTeamDto[]>();
+                            : [];
 
                         var activeWorkProcesses = configuration.WorkProcesses
                         .Where(wp => wp.IntegrationState is not null && wp.IntegrationState.IsActive)
@@ -477,8 +477,8 @@ public sealed class AzureDevOpsSyncManager(ILogger<AzureDevOpsSyncManager> logge
             return;
         }
 
-        teamSettings = new Dictionary<Guid, Guid?>(workspaceTeams.Length);
-        teamMappings = new Dictionary<Guid, Guid?>(workspaceTeams.Length);
+        teamSettings = new (workspaceTeams.Length);
+        teamMappings = new(workspaceTeams.Length);
 
         foreach (var team in workspaceTeams)
         {

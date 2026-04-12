@@ -2,6 +2,7 @@
 using Moda.Planning.Domain.Interfaces.Roadmaps;
 
 namespace Moda.Planning.Domain.Tests.Models;
+
 internal record TestUpsertRoadmapMilestoneDate : IUpsertRoadmapMilestoneDate
 {
     [SetsRequiredMembers]

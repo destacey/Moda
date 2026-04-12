@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 namespace Moda.Organization.Domain.Enums;
+
 public enum MembershipState
 {
     [Display(Name = "Past", Description = "The membership was completed and is in the past.", Order = 1)]

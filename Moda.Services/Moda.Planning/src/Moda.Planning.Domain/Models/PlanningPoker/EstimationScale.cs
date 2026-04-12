@@ -3,7 +3,7 @@ using CSharpFunctionalExtensions;
 
 namespace Moda.Planning.Domain.Models.PlanningPoker;
 
-public class EstimationScale : BaseAuditableEntity<int>
+public sealed class EstimationScale : BaseAuditableEntity<int>
 {
     private readonly List<string> _values = [];
 

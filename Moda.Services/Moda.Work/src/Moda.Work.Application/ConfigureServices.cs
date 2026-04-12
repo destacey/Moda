@@ -3,6 +3,7 @@ using Mapster.Utils;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Moda.Work.Application;
+
 public static class ConfigureServices
 {
     public static IServiceCollection AddWorkApplication(this IServiceCollection services)

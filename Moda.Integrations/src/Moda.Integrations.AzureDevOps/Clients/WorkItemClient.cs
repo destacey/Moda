@@ -5,6 +5,7 @@ using Moda.Integrations.AzureDevOps.Models.WorkItems;
 using RestSharp;
 
 namespace Moda.Integrations.AzureDevOps.Clients;
+
 internal sealed class WorkItemClient : BaseClient
 {
     internal WorkItemClient(string organizationUrl, string token, string apiVersion)
@@ -138,7 +139,7 @@ internal sealed class WorkItemClient : BaseClient
                 break;
             }
 
-            workItemLinks.AddRange(response.Data.Values);            
+            workItemLinks.AddRange(response.Data.Values);
 
             if (response.Data.IsLastBatch)
             {

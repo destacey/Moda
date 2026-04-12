@@ -1,4 +1,5 @@
 ﻿namespace Moda.Organization.Domain.Models;
+
 public sealed class TeamMembership : BaseMembership
 {
     private TeamMembership() { }

@@ -1,6 +1,7 @@
 ﻿using Moda.Integrations.AzureDevOps.Models.Contracts;
 
 namespace Moda.Integrations.AzureDevOps.Models.Projects;
+
 internal record ProjectDto
 {
     public Guid Id { get; set; }

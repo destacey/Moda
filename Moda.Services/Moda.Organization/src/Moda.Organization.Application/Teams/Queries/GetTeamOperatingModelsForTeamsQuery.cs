@@ -33,7 +33,7 @@ internal sealed class GetTeamOperatingModelsForTeamsQueryHandler(IOrganizationDb
 
         query = query.Where(x =>
             x.Model.DateRange.Start <= asOfDate &&
-            (x.Model.DateRange.End == null || x.Model.DateRange.End >= asOfDate));        
+            (x.Model.DateRange.End == null || x.Model.DateRange.End >= asOfDate));
 
         var results = await query
             .Select(x => new { x.Id, x.Model })

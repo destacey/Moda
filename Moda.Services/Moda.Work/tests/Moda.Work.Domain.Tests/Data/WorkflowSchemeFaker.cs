@@ -1,4 +1,4 @@
-using Moda.Common.Domain.Enums.Work;
+﻿using Moda.Common.Domain.Enums.Work;
 using Moda.Tests.Shared.Data;
 using Moda.Tests.Shared.Extensions;
 using Moda.Work.Domain.Models;
@@ -19,7 +19,7 @@ public class WorkflowSchemeFaker : PrivateConstructorFaker<WorkflowScheme>
         RuleFor(x => x.WorkflowId, f => f.Random.Guid());
         RuleFor(x => x.Order, f => f.Random.Int(1, 10));
         RuleFor(x => x.IsActive, true);
-        
+
         // Set navigation properties after construction
         FinishWith((f, scheme) =>
         {

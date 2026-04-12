@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
-using NetArchTest.Rules;
 using Moda.ArchitectureTests.Helpers;
+using NetArchTest.Rules;
 
 namespace Moda.ArchitectureTests.Sut;
 
@@ -67,7 +67,7 @@ public class CrossProjectDependencyTests
         // Assert
         result.IsSuccessful.Should().BeTrue(
             "Domain layer should not depend on Application layer. Violating types: {0}",
-            string.Join(", ", result.FailingTypes ?? new List<Type>()));
+            string.Join(", ", result.FailingTypes ?? []));
     }
 
     [Fact]
@@ -85,7 +85,7 @@ public class CrossProjectDependencyTests
         // Assert
         result.IsSuccessful.Should().BeTrue(
             "Domain layer should not depend on Infrastructure layer. Violating types: {0}",
-            string.Join(", ", result.FailingTypes ?? new List<Type>()));
+            string.Join(", ", result.FailingTypes ?? []));
     }
 
     [Fact]
@@ -103,7 +103,7 @@ public class CrossProjectDependencyTests
         // Assert
         result.IsSuccessful.Should().BeTrue(
             "Domain layer should not depend on Web layer. Violating types: {0}",
-            string.Join(", ", result.FailingTypes ?? new List<Type>()));
+            string.Join(", ", result.FailingTypes ?? []));
     }
 
     [Fact]
@@ -129,7 +129,7 @@ public class CrossProjectDependencyTests
         // Assert
         result.IsSuccessful.Should().BeTrue(
             "Domain projects should only depend on Moda.Common and Moda.Common.Domain (not Application/Infrastructure/Integrations/Web). Violating types: {0}",
-            string.Join(", ", result.FailingTypes ?? new List<Type>()));
+            string.Join(", ", result.FailingTypes ?? []));
     }
 
     #endregion
@@ -151,7 +151,7 @@ public class CrossProjectDependencyTests
         // Assert
         result.IsSuccessful.Should().BeTrue(
             "Application layer should not depend on Infrastructure layer. Violating types: {0}",
-            string.Join(", ", result.FailingTypes ?? new List<Type>()));
+            string.Join(", ", result.FailingTypes ?? []));
     }
 
     [Fact]
@@ -169,7 +169,7 @@ public class CrossProjectDependencyTests
         // Assert
         result.IsSuccessful.Should().BeTrue(
             "Application layer should not depend on Web layer. Violating types: {0}",
-            string.Join(", ", result.FailingTypes ?? new List<Type>()));
+            string.Join(", ", result.FailingTypes ?? []));
     }
 
     [Fact]
@@ -187,7 +187,7 @@ public class CrossProjectDependencyTests
         // Assert
         result.IsSuccessful.Should().BeTrue(
             "Application layer should not depend on Integrations projects. Violating types: {0}",
-            string.Join(", ", result.FailingTypes ?? new List<Type>()));
+            string.Join(", ", result.FailingTypes ?? []));
     }
 
 
@@ -325,7 +325,7 @@ public class CrossProjectDependencyTests
         // Assert
         result.IsSuccessful.Should().BeTrue(
             "Moda.Common.Domain should not depend on Moda.Common.Application. Violating types: {0}",
-            string.Join(", ", result.FailingTypes ?? new List<Type>()));
+            string.Join(", ", result.FailingTypes ?? []));
     }
 
     [Fact]
@@ -344,7 +344,7 @@ public class CrossProjectDependencyTests
         // Assert
         result.IsSuccessful.Should().BeTrue(
             "Moda.Common.Domain should not depend on Infrastructure. Violating types: {0}",
-            string.Join(", ", result.FailingTypes ?? new List<Type>()));
+            string.Join(", ", result.FailingTypes ?? []));
     }
 
     [Fact]
@@ -363,7 +363,7 @@ public class CrossProjectDependencyTests
         // Assert
         result.IsSuccessful.Should().BeTrue(
             "Moda.Common.Application should not depend on Infrastructure. Violating types: {0}",
-            string.Join(", ", result.FailingTypes ?? new List<Type>()));
+            string.Join(", ", result.FailingTypes ?? []));
     }
 
     #endregion

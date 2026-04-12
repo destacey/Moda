@@ -4,6 +4,7 @@ using Moda.Integrations.AzureDevOps.Models.Contracts;
 using NodaTime;
 
 namespace Moda.Integrations.AzureDevOps.Models.WorkItems;
+
 internal sealed record ReportingWorkItemLinkResponse
 {
     // TODO: Is Rel enough or shoule we use a LinkType to verify forward or reverse?

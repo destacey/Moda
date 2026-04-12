@@ -4,6 +4,7 @@ using Moda.Planning.Domain.Enums;
 using Moda.Planning.Domain.Interfaces.Roadmaps;
 
 namespace Moda.Planning.Domain.Models.Roadmaps;
+
 public sealed class RoadmapTimebox : BaseRoadmapItem
 {
     private LocalDateRange _dateRange = default!;

@@ -1,6 +1,7 @@
 ﻿using Moda.Common.Domain.Enums.Organization;
 
 namespace Moda.Organization.Application.Teams.Models;
+
 public sealed record TeamHierarchyNode
 {
     public Guid Id { get; set; }

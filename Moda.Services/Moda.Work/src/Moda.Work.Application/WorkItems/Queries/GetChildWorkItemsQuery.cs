@@ -3,6 +3,7 @@ using Moda.Work.Application.Persistence;
 using Moda.Work.Application.WorkItems.Dtos;
 
 namespace Moda.Work.Application.WorkItems.Queries;
+
 public sealed record GetChildWorkItemsQuery : IQuery<Result<IReadOnlyCollection<WorkItemListDto>>>
 {
     public GetChildWorkItemsQuery(Guid workspaceId, WorkItemKey workItemKey)

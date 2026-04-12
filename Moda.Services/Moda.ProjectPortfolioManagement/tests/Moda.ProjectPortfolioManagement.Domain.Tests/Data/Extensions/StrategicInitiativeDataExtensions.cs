@@ -4,6 +4,7 @@ using Moda.Tests.Shared;
 using Moda.Tests.Shared.Extensions;
 
 namespace Moda.ProjectPortfolioManagement.Domain.Tests.Data.Extensions;
+
 public static class StrategicInitiativeDataExtensions
 {
     public static StrategicInitiative AddKpis(this StrategicInitiative strategicInitiative, int count)

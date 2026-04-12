@@ -3,6 +3,7 @@ using Moda.Common.Application.Dtos;
 using NodaTime;
 
 namespace Moda.Infrastructure.Identity;
+
 public class IdentityMappingConfig : IRegister
 {
     public void Register(TypeAdapterConfig config)

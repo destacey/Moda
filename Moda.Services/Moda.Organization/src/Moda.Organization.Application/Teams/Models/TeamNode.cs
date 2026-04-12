@@ -2,6 +2,7 @@
 using NodaTime;
 
 namespace Moda.Organization.Application.Teams.Models;
+
 public sealed record TeamNode
 {
     public Guid Id { get; set; }

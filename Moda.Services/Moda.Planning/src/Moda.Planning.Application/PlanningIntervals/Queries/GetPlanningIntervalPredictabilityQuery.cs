@@ -1,10 +1,11 @@
-﻿using Moda.Common.Application.Models;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
+using Moda.Common.Application.Models;
 using Moda.Common.Domain.Enums.Organization;
 using Moda.Planning.Application.Models;
 using Moda.Planning.Domain.Enums;
 
 namespace Moda.Planning.Application.PlanningIntervals.Queries;
+
 public sealed record GetPlanningIntervalPredictabilityQuery : IQuery<PlanningIntervalPredictabilityDto?>
 {
     public GetPlanningIntervalPredictabilityQuery(IdOrKey idOrKey)
@@ -41,7 +42,7 @@ internal sealed class GetPlanningIntervalPredictabilityQueryHandler : IQueryHand
         if (planningInterval is null)
             return null;
         else if (!planningInterval.Teams.Any())
-            return new PlanningIntervalPredictabilityDto(null, new List<PlanningIntervalTeamPredictabilityDto>());
+            return new PlanningIntervalPredictabilityDto(null, []);
 
         var currentDate = _dateTimeProvider.Now.InUtc().Date;
 

@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 namespace Moda.Common.Domain.Enums.Planning;
+
 public enum IterationType
 {
     [Display(Name = "Iteration", Description = "A time-boxed period of work.", Order = 1)]

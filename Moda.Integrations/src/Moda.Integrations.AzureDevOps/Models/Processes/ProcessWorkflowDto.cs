@@ -1,4 +1,5 @@
 ﻿namespace Moda.Integrations.AzureDevOps.Models.Processes;
+
 internal sealed record ProcessWorkflowItemDto
 {
     public required string TypeReferenceName { get; set; }

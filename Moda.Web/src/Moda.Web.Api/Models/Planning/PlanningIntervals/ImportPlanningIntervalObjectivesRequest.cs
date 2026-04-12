@@ -1,5 +1,4 @@
-﻿using Moda.Common.Application.Requests.Planning;
-using Moda.Planning.Application.PlanningIntervals.Dtos;
+﻿using Moda.Planning.Application.PlanningIntervals.Dtos;
 using Moda.Planning.Domain.Enums;
 using NodaTime.Extensions;
 

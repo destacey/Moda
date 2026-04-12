@@ -3,6 +3,7 @@ using Moda.Common.Application.Persistence;
 using Moda.Common.Domain.Employees;
 
 namespace Moda.Common.Application.Employees.Queries;
+
 public sealed record GetEmployeeNumberMapQuery : IQuery<IReadOnlyList<EmployeeNumberMapDto>>
 {
     public GetEmployeeNumberMapQuery(bool includeInactive = false)

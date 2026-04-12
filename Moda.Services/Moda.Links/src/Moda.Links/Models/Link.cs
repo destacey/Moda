@@ -6,9 +6,6 @@ namespace Moda.Links.Models;
 
 public sealed class Link : BaseEntity
 {
-    private string _name = default!;
-    private string _url = default!;
-
     private Link() { }
     private Link(Guid objectId, string name, string url)
     {
@@ -20,14 +17,14 @@ public sealed class Link : BaseEntity
     public Guid ObjectId { get; set; }
     public string Name
     {
-        get => _name;
-        private set => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
-    }
+        get;
+        private set => field = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
+    } = default!;
     public string Url
     {
-        get => _url;
-        private set => _url = Guard.Against.NullOrWhiteSpace(value, nameof(Url)).Trim();
-    }
+        get;
+        private set => field = Guard.Against.NullOrWhiteSpace(value, nameof(Url)).Trim();
+    } = default!;
 
     public Result Update(string name, string url)
     {

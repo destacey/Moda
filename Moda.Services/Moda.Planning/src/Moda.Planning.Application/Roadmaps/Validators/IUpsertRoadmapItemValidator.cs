@@ -1,6 +1,7 @@
 ﻿using Moda.Planning.Domain.Interfaces.Roadmaps;
 
 namespace Moda.Planning.Application.Roadmaps.Validators;
+
 public class IUpsertRoadmapItemValidator : CustomValidator<IUpsertRoadmapItem>
 {
     public IUpsertRoadmapItemValidator()

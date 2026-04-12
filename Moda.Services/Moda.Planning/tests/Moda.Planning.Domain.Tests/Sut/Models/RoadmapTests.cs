@@ -11,6 +11,7 @@ using NodaTime.Testing;
 using OneOf;
 
 namespace Moda.Planning.Domain.Tests.Sut.Models;
+
 public class RoadmapTests
 {
     private readonly TestingDateTimeProvider _dateTimeProvider;
@@ -70,14 +71,14 @@ public class RoadmapTests
         var fakeRoadmap = _faker.Generate();
         var managerId = Guid.NewGuid();
         var roadmap = Roadmap.Create(fakeRoadmap.Name, fakeRoadmap.Description, fakeRoadmap.DateRange, fakeRoadmap.Visibility, [managerId]).Value;
-        
+
         var newName = "Updated Name";
         var newDescription = "Updated Description";
         var newDateRange = new LocalDateRange(_dateTimeProvider.Today.PlusDays(1), _dateTimeProvider.Today.PlusDays(11));
         var newVisibility = Visibility.Private;
 
         // Act
-        var result = roadmap.Update(newName, newDescription, newDateRange,[managerId], newVisibility, managerId);
+        var result = roadmap.Update(newName, newDescription, newDateRange, [managerId], newVisibility, managerId);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -602,8 +603,10 @@ public class RoadmapTests
         createChildResult.IsSuccess.Should().BeTrue();
 
         // Create update request with new parent
-        var updateActivity = new TestUpsertRoadmapActivity(createChildResult.Value);
-        updateActivity.ParentId = createParentResult.Value.Id;
+        var updateActivity = new TestUpsertRoadmapActivity(createChildResult.Value)
+        {
+            ParentId = createParentResult.Value.Id
+        };
 
         // Act
         var result = roadmap.UpdateActivity(createChildResult.Value.Id, updateActivity, managerId);

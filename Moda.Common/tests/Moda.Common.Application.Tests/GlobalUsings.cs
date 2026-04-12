@@ -1,5 +1,2 @@
-global using FluentAssertions;
-global using Moq;
-global using Moq.AutoMock;
-global using NodaTime;
+﻿global using Moq;
 global using Xunit;

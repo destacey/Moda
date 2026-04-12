@@ -4,6 +4,7 @@ using Microsoft.Graph;
 using Moda.Infrastructure.Auth.AzureAd;
 
 namespace Moda.Infrastructure.GraphApi;
+
 public sealed class GraphHelper
 {
     // Settings object

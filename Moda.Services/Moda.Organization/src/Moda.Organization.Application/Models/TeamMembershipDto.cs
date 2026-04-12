@@ -1,6 +1,7 @@
 ﻿using NodaTime;
 
 namespace Moda.Organization.Application.Models;
+
 public record TeamMembershipDto
 {
     public Guid Id { get; set; }

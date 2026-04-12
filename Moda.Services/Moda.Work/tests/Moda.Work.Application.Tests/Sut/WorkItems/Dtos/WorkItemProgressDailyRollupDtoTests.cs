@@ -224,7 +224,7 @@ public sealed class WorkItemProgressDailyRollupDtoTests
                 DoneTimestamp = Instant.FromUtc(2023, 1, 7, 12, 15)
             }
         ];
-        
+
         List<WorkItemProgressDailyRollupDto> expectedData =
         [
             WorkItemProgressDailyRollupDto.CreateEmpty(new DateOnly(2023, 1, 1)),

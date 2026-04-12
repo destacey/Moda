@@ -1,6 +1,7 @@
 ﻿using NodaTime;
 
 namespace Moda.Common.Extensions;
+
 public static class LocalDateExtensions
 {
     public static Instant ToInstant(this LocalDate localDate)

@@ -4,6 +4,7 @@ using Moda.Work.Application.Persistence;
 using Moda.Work.Application.WorkProcesses.Dtos;
 
 namespace Moda.Work.Application.WorkProcesses.Queries;
+
 internal sealed class GetWorkProcessSchemesQueryHandler(IWorkDbContext workDbContext, ILogger<GetWorkProcessSchemesQueryHandler> logger) : IQueryHandler<GetWorkProcessSchemesQuery, IReadOnlyList<IWorkProcessSchemeDto>>
 {
     private const string AppRequestName = nameof(GetWorkProcessSchemesQuery);

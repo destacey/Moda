@@ -46,7 +46,7 @@ public class CreateUserCommandValidatorTests
         var command = CreateValidModaCommand();
 
         // Act
-        var result = await _sut.TestValidateAsync(command);
+        var result = await _sut.TestValidateAsync(command, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.ShouldNotHaveAnyValidationErrors();
@@ -59,7 +59,7 @@ public class CreateUserCommandValidatorTests
         var command = CreateValidEntraIdCommand();
 
         // Act
-        var result = await _sut.TestValidateAsync(command);
+        var result = await _sut.TestValidateAsync(command, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.ShouldNotHaveAnyValidationErrors();
@@ -77,7 +77,7 @@ public class CreateUserCommandValidatorTests
         command.LoginProvider = string.Empty;
 
         // Act
-        var result = await _sut.TestValidateAsync(command);
+        var result = await _sut.TestValidateAsync(command, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.ShouldHaveValidationErrorFor(x => x.LoginProvider);
@@ -91,7 +91,7 @@ public class CreateUserCommandValidatorTests
         command.LoginProvider = "InvalidProvider";
 
         // Act
-        var result = await _sut.TestValidateAsync(command);
+        var result = await _sut.TestValidateAsync(command, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.ShouldHaveValidationErrorFor(x => x.LoginProvider)
@@ -110,7 +110,7 @@ public class CreateUserCommandValidatorTests
         command.Password = null;
 
         // Act
-        var result = await _sut.TestValidateAsync(command);
+        var result = await _sut.TestValidateAsync(command, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.ShouldHaveValidationErrorFor(x => x.Password)
@@ -125,7 +125,7 @@ public class CreateUserCommandValidatorTests
         command.Password = "short";
 
         // Act
-        var result = await _sut.TestValidateAsync(command);
+        var result = await _sut.TestValidateAsync(command, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.ShouldHaveValidationErrorFor(x => x.Password)
@@ -140,7 +140,7 @@ public class CreateUserCommandValidatorTests
         command.Password = "password1";
 
         // Act
-        var result = await _sut.TestValidateAsync(command);
+        var result = await _sut.TestValidateAsync(command, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.ShouldHaveValidationErrorFor(x => x.Password)
@@ -155,7 +155,7 @@ public class CreateUserCommandValidatorTests
         command.Password = "PASSWORD1";
 
         // Act
-        var result = await _sut.TestValidateAsync(command);
+        var result = await _sut.TestValidateAsync(command, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.ShouldHaveValidationErrorFor(x => x.Password)
@@ -170,7 +170,7 @@ public class CreateUserCommandValidatorTests
         command.Password = "Passwords";
 
         // Act
-        var result = await _sut.TestValidateAsync(command);
+        var result = await _sut.TestValidateAsync(command, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.ShouldHaveValidationErrorFor(x => x.Password)
@@ -185,7 +185,7 @@ public class CreateUserCommandValidatorTests
         command.Password = "ShouldNotBeHere123!";
 
         // Act
-        var result = await _sut.TestValidateAsync(command);
+        var result = await _sut.TestValidateAsync(command, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.ShouldHaveValidationErrorFor(x => x.Password)
@@ -204,7 +204,7 @@ public class CreateUserCommandValidatorTests
         command.Email = string.Empty;
 
         // Act
-        var result = await _sut.TestValidateAsync(command);
+        var result = await _sut.TestValidateAsync(command, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.ShouldHaveValidationErrorFor(x => x.Email);
@@ -218,7 +218,7 @@ public class CreateUserCommandValidatorTests
         command.Email = "not-an-email";
 
         // Act
-        var result = await _sut.TestValidateAsync(command);
+        var result = await _sut.TestValidateAsync(command, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.ShouldHaveValidationErrorFor(x => x.Email)
@@ -233,7 +233,7 @@ public class CreateUserCommandValidatorTests
         _mockUserService.Setup(x => x.ExistsWithEmailAsync(command.Email, null)).ReturnsAsync(true);
 
         // Act
-        var result = await _sut.TestValidateAsync(command);
+        var result = await _sut.TestValidateAsync(command, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.ShouldHaveValidationErrorFor(x => x.Email)
@@ -252,7 +252,7 @@ public class CreateUserCommandValidatorTests
         command.FirstName = string.Empty;
 
         // Act
-        var result = await _sut.TestValidateAsync(command);
+        var result = await _sut.TestValidateAsync(command, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.ShouldHaveValidationErrorFor(x => x.FirstName);
@@ -267,7 +267,7 @@ public class CreateUserCommandValidatorTests
         command.FirstName = new string('A', length);
 
         // Act
-        var result = await _sut.TestValidateAsync(command);
+        var result = await _sut.TestValidateAsync(command, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.ShouldHaveValidationErrorFor(x => x.FirstName);
@@ -281,7 +281,7 @@ public class CreateUserCommandValidatorTests
         command.LastName = string.Empty;
 
         // Act
-        var result = await _sut.TestValidateAsync(command);
+        var result = await _sut.TestValidateAsync(command, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.ShouldHaveValidationErrorFor(x => x.LastName);
@@ -299,7 +299,7 @@ public class CreateUserCommandValidatorTests
         command.PhoneNumber = null;
 
         // Act
-        var result = await _sut.TestValidateAsync(command);
+        var result = await _sut.TestValidateAsync(command, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.ShouldNotHaveValidationErrorFor(x => x.PhoneNumber);
@@ -314,7 +314,7 @@ public class CreateUserCommandValidatorTests
         _mockUserService.Setup(x => x.ExistsWithPhoneNumberAsync("555-1234", null)).ReturnsAsync(true);
 
         // Act
-        var result = await _sut.TestValidateAsync(command);
+        var result = await _sut.TestValidateAsync(command, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.ShouldHaveValidationErrorFor(x => x.PhoneNumber);

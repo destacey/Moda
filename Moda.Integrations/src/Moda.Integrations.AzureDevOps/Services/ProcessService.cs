@@ -6,9 +6,10 @@ using Moda.Integrations.AzureDevOps.Models.Contracts;
 using Moda.Integrations.AzureDevOps.Models.Processes;
 
 namespace Moda.Integrations.AzureDevOps.Services;
+
 internal sealed class ProcessService(string organizationUrl, string token, string apiVersion, ILogger<ProcessService> logger)
 {
-    private readonly ProcessClient _processClient = new (organizationUrl, token, apiVersion);
+    private readonly ProcessClient _processClient = new(organizationUrl, token, apiVersion);
     private readonly ILogger<ProcessService> _logger = logger;
 
     public async Task<Result<List<AzdoWorkProcess>>> GetProcesses(CancellationToken cancellationToken)
@@ -28,7 +29,7 @@ internal sealed class ProcessService(string organizationUrl, string token, strin
             }
 
             var processes = response.Data?.Items.ToAzdoWorkProcesses() ?? [];
-            
+
             if (_logger.IsEnabled(LogLevel.Debug))
                 _logger.LogDebug("{ProcessCount} processes found.", processes.Count);
 

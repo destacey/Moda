@@ -2,6 +2,7 @@
 using Moda.Work.Domain.Models;
 
 namespace Moda.Work.Domain.Tests.Data;
+
 public class WorkStatusFaker : PrivateConstructorFaker<WorkStatus>
 {
     public WorkStatusFaker()

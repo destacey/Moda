@@ -5,6 +5,7 @@ using Moda.Integrations.AzureDevOps.Models.Projects;
 using NodaTime;
 
 namespace Moda.Integrations.AzureDevOps.Models.WorkItems;
+
 internal class WorkItemResponse
 {
     [JsonPropertyName("id")]
@@ -45,10 +46,10 @@ internal static class WorkItemResponseExtensions
             LastModifiedBy = workItem.Fields.ChangedBy?.UniqueName,
             Priority = workItem.Fields.Priority,
             StackRank = workItem.Fields.StackRank > 0 ? workItem.Fields.StackRank : _defaultStackRank,
-            ActivatedTimestamp = activated.HasValue 
+            ActivatedTimestamp = activated.HasValue
                 ? activated < created ? created : activated
                 : null,
-            DoneTimestamp = closed.HasValue 
+            DoneTimestamp = closed.HasValue
                 ? closed < created ? created : closed
                 : null,
             TeamId = iteration.TeamId,

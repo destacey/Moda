@@ -2,6 +2,7 @@
 using System.Reflection;
 
 namespace Moda.Tests.Shared.Extensions;
+
 public static class GenericExtensions
 {
     /// <summary>
@@ -46,12 +47,12 @@ public static class GenericExtensions
     public static void AddToPrivateList<T, TItem>(this T instance, string fieldName, TItem item)
     {
         ArgumentNullException.ThrowIfNull(instance);
-        if(string.IsNullOrWhiteSpace(fieldName)) throw new ArgumentNullException(nameof(fieldName));
+        if (string.IsNullOrWhiteSpace(fieldName)) throw new ArgumentNullException(nameof(fieldName));
         ArgumentNullException.ThrowIfNull(item);
 
         var fieldInfo = typeof(T).GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance);
 
-        var value = fieldInfo?.GetValue(instance) 
+        var value = fieldInfo?.GetValue(instance)
             ?? throw new InvalidOperationException($"Could not get the {fieldName} list from the {instance.GetType().Name} instance.");
 
         var list = (List<TItem>)value;

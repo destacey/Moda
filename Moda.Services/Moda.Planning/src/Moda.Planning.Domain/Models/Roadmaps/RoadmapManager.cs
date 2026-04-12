@@ -1,6 +1,7 @@
 ﻿using Moda.Common.Domain.Employees;
 
 namespace Moda.Planning.Domain.Models.Roadmaps;
+
 public sealed class RoadmapManager
 {
     private RoadmapManager() { }

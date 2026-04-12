@@ -1,6 +1,7 @@
 ﻿using Moda.Common.Domain.Enums.Work;
 
 namespace Moda.Work.Domain.Interfaces;
+
 public interface IWorkItemParentInfo
 {
     Guid Id { get; }

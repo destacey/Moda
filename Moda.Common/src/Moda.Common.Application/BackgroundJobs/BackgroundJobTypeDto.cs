@@ -1,4 +1,5 @@
 ﻿namespace Moda.Common.Application.BackgroundJobs;
+
 public sealed record BackgroundJobTypeDto
 {
     public int Id { get; set; }

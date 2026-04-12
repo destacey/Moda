@@ -1,4 +1,5 @@
 ﻿namespace Moda.Planning.Application.PlanningIntervals.Commands;
+
 public sealed record UpdatePlanningIntervalCommand(Guid Id, string Name, string? Description, bool ObjectivesLocked) : ICommand<int>;
 
 public sealed class UpdatePlanningIntervalCommandValidator : CustomValidator<UpdatePlanningIntervalCommand>
@@ -15,7 +16,7 @@ public sealed class UpdatePlanningIntervalCommandValidator : CustomValidator<Upd
             .MaximumLength(128)
             .MustAsync(async (model, name, cancellationToken)
                 => await BeUniquePlanningIntervalName(model.Id, name, cancellationToken))
-                .WithMessage("The Planning Interval name already exists."); ;
+                .WithMessage("The Planning Interval name already exists.");
 
         RuleFor(e => e.Description)
             .MaximumLength(2048);

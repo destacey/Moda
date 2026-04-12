@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 using Moda.Integrations.AzureDevOps.Models.Projects;
 using Moda.Integrations.AzureDevOps.Tests.Models;
 using Moda.Integrations.AzureDevOps.Utils;
@@ -44,7 +44,7 @@ public class ProjectServiceTests : CommonResponseOptions
         var deserialized = JsonSerializer.Deserialize<IterationNodeResponse>(json, _options);
 
         // Act - Use a helper method to test the flattening logic
-        var result = FlattenIterationNode(deserialized!, new Dictionary<Guid, Guid>());
+        var result = FlattenIterationNode(deserialized!, []);
 
         // Assert
         result.Should().HaveCount(3);
@@ -271,7 +271,7 @@ public class ProjectServiceTests : CommonResponseOptions
         };
 
         // Act
-        var result = FlattenIterationNode(root, new Dictionary<Guid, Guid>());
+        var result = FlattenIterationNode(root, []);
 
         // Assert
         result.Should().ContainSingle();
@@ -330,7 +330,7 @@ public class ProjectServiceTests : CommonResponseOptions
         };
 
         // Act
-        var result = FlattenIterationNode(root, new Dictionary<Guid, Guid>());
+        var result = FlattenIterationNode(root, []);
 
         // Assert
         result.Should().HaveCount(2);
@@ -371,7 +371,7 @@ public class ProjectServiceTests : CommonResponseOptions
         };
 
         // Act
-        var result = FlattenIterationNode(root, new Dictionary<Guid, Guid>());
+        var result = FlattenIterationNode(root, []);
 
         // Assert
         result.Should().HaveCount(3);
@@ -401,7 +401,7 @@ public class ProjectServiceTests : CommonResponseOptions
         };
 
         // Act
-        var result = FlattenIterationNode(root, new Dictionary<Guid, Guid>());
+        var result = FlattenIterationNode(root, []);
 
         // Assert
         result.Should().ContainSingle();
@@ -423,7 +423,7 @@ public class ProjectServiceTests : CommonResponseOptions
         };
 
         // Act
-        var result = FlattenIterationNode(root, new Dictionary<Guid, Guid>());
+        var result = FlattenIterationNode(root, []);
 
         // Assert
         result.Should().ContainSingle();
@@ -464,7 +464,7 @@ public class ProjectServiceTests : CommonResponseOptions
         };
 
         // Act
-        var result = FlattenIterationNode(root, new Dictionary<Guid, Guid>());
+        var result = FlattenIterationNode(root, []);
 
         // Assert
         result.Should().HaveCount(3);

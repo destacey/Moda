@@ -2,6 +2,7 @@
 using Moda.Organization.Application.Models;
 
 namespace Moda.Organization.Application.Teams.Queries;
+
 public sealed record GetTeamNavigationQuery : IQuery<TeamNavigationDto?>
 {
     public GetTeamNavigationQuery(Guid teamId)

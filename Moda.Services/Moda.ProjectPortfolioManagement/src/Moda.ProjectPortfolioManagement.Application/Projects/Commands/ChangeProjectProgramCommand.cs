@@ -33,7 +33,7 @@ internal sealed class ChangeProjectProgramCommandHandler(IProjectPortfolioManage
         {
             var project = await _projectPortfolioManagementDbContext.Projects
                 .Include(p => p.Program)
-                .Include(p => p.Portfolio)
+                .Include(p => p.Portfolio!)
                     .ThenInclude(p => p.Programs)
                 .FirstOrDefaultAsync(s => s.Id == request.Id, cancellationToken);
             if (project is null)

@@ -1,4 +1,4 @@
-using Moda.Tests.Shared.Data;
+﻿using Moda.Tests.Shared.Data;
 using Moda.Tests.Shared.Extensions;
 using Moda.Work.Domain.Models;
 using NodaTime;
@@ -10,19 +10,19 @@ public class WorkItemRevisionFaker : PrivateConstructorFaker<WorkItemRevision>
     public WorkItemRevisionFaker(Instant? timestamp = null)
     {
         var ts = timestamp ?? SystemClock.Instance.GetCurrentInstant();
-        
+
         RuleFor(x => x.WorkItemId, f => f.Random.Guid());
         RuleFor(x => x.Revision, f => f.Random.Int(1, 100));
         RuleFor(x => x.RevisedById, f => f.Random.Guid());
         RuleFor(x => x.RevisedDate, ts);
-        
+
         // Set up the changes collection using FinishWith
         FinishWith((f, revision) =>
         {
             var changes = new WorkItemRevisionChangeFaker()
                 .WithWorkItemRevisionId(revision.WorkItemId)
                 .Generate(f.Random.Int(1, 5));
-            
+
             var changesList = GenericExtensions.GetPrivateList<WorkItemRevisionChange>(revision, "_changes");
             changesList.Clear();
             changesList.AddRange(changes);

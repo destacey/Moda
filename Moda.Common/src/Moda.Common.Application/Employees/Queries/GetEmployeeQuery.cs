@@ -5,6 +5,7 @@ using Moda.Common.Application.Persistence;
 using Moda.Common.Domain.Employees;
 
 namespace Moda.Common.Application.Employees.Queries;
+
 public sealed record GetEmployeeQuery : IQuery<EmployeeDetailsDto?>
 {
     public GetEmployeeQuery(IdOrKey idOrKey)
@@ -16,7 +17,7 @@ public sealed record GetEmployeeQuery : IQuery<EmployeeDetailsDto?>
 }
 
 internal sealed class GetEmployeeQueryHandler(
-    IModaDbContext modaDbContext) 
+    IModaDbContext modaDbContext)
     : IQueryHandler<GetEmployeeQuery, EmployeeDetailsDto?>
 {
     private readonly IModaDbContext _modaDbContext = modaDbContext;

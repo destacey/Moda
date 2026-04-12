@@ -1,4 +1,5 @@
 ﻿namespace Moda.Planning.Domain.Interfaces;
+
 public interface ILocalSchedule
 {
     Guid Id { get; }

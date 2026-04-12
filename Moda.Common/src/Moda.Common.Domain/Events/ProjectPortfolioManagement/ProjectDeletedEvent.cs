@@ -2,7 +2,7 @@
 
 namespace Moda.Common.Domain.Events.ProjectPortfolioManagement;
 
-public record ProjectDeletedEvent : DomainEvent
+public sealed record ProjectDeletedEvent : DomainEvent
 {
     public ProjectDeletedEvent(Guid id, Instant timestamp)
     {
@@ -11,5 +11,5 @@ public record ProjectDeletedEvent : DomainEvent
         Timestamp = timestamp;
     }
 
-    public Guid Id { get; init; }
+    public Guid Id { get; }
 }

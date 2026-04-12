@@ -7,7 +7,7 @@ using NodaTime;
 
 namespace Moda.Planning.Domain.Models.PlanningPoker;
 
-public class PokerSession : BaseAuditableEntity, IHasIdAndKey
+public sealed class PokerSession : BaseAuditableEntity, IHasIdAndKey
 {
     private readonly List<PokerRound> _rounds = [];
 
@@ -252,9 +252,11 @@ public class PokerSession : BaseAuditableEntity, IHasIdAndKey
     {
         try
         {
-            var session = new PokerSession(name, estimationScaleId, facilitatorId);
-            session.Status = PokerSessionStatus.Active;
-            session.ActivatedOn = timestamp;
+            var session = new PokerSession(name, estimationScaleId, facilitatorId)
+            {
+                Status = PokerSessionStatus.Active,
+                ActivatedOn = timestamp
+            };
             return Result.Success(session);
         }
         catch (Exception ex)

@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
@@ -20,7 +20,7 @@ public sealed class ExceptionMiddleware(IProblemDetailsService problemDetailsSer
             await next(httpContext);
         }
         catch (Exception ex)
-        {            
+        {
             using (LogContext.PushProperty("CorrelationId", httpContext.TraceIdentifier))
             using (LogContext.PushProperty("UserEmail", _currentUser.GetUserEmail() is string userEmail ? userEmail : "Anonymous"))
             using (LogContext.PushProperty("UserId", _currentUser.GetUserId()))

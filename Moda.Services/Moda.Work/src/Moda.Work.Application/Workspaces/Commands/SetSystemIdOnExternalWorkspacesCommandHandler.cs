@@ -3,6 +3,7 @@ using Moda.Common.Domain.Enums;
 using Moda.Work.Application.Persistence;
 
 namespace Moda.Work.Application.Workspaces.Commands;
+
 internal sealed class SetSystemIdOnExternalWorkspacesCommandHandler(IWorkDbContext workDbContext, ILogger<SetSystemIdOnExternalWorkspacesCommandHandler> logger) : ICommandHandler<SetSystemIdOnExternalWorkspacesCommand>
 {
     private const string AppRequestName = nameof(SetSystemIdOnExternalWorkspacesCommand);

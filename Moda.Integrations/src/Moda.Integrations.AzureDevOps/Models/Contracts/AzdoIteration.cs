@@ -50,13 +50,13 @@ public sealed record AzdoIteration : IExternalIteration<AzdoIterationMetadata>
         else if (Start.HasValue && !End.HasValue)
         {
             state = Start.Value > now
-                ? IterationState.Future 
+                ? IterationState.Future
                 : IterationState.Active;
         }
         else if (!Start.HasValue && End.HasValue)
         {
             state = End.Value < now
-                ? IterationState.Completed 
+                ? IterationState.Completed
                 : IterationState.Active;
         }
 

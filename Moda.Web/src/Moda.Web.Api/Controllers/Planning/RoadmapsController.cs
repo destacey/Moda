@@ -1,5 +1,4 @@
-﻿using FluentValidation;
-using Microsoft.AspNetCore.JsonPatch.SystemTextJson;
+﻿using Microsoft.AspNetCore.JsonPatch.SystemTextJson;
 using Moda.Common.Application.Models;
 using Moda.Common.Application.Requests;
 using Moda.Planning.Application.Roadmaps.Commands;
@@ -22,7 +21,7 @@ public class RoadmapsController : ControllerBase
     private readonly IValidator<UpdateRoadmapTimeboxRequest> _updateTimeboxValidator;
 
     public RoadmapsController(
-        ILogger<RoadmapsController> logger, 
+        ILogger<RoadmapsController> logger,
         ISender sender,
         IValidator<UpdateRoadmapActivityRequest> updateActivityValidator,
         IValidator<UpdateRoadmapMilestoneRequest> updateMilestoneValidator,

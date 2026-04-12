@@ -3,11 +3,9 @@ using Moda.Common.Domain.Models;
 using Moda.Common.Extensions;
 
 namespace Moda.AppIntegration.Domain.Models;
+
 public sealed class AzureDevOpsBoardsWorkProcess : IntegrationObject<Guid>
 {
-    private string _name = null!;
-    private string? _description;
-
     private AzureDevOpsBoardsWorkProcess() { }
 
     [JsonConstructor]
@@ -23,14 +21,14 @@ public sealed class AzureDevOpsBoardsWorkProcess : IntegrationObject<Guid>
 
     public string Name
     {
-        get => _name;
-        private set => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
-    }
+        get;
+        private set => field = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
+    } = null!;
 
     public string? Description
     {
-        get => _description;
-        private set => _description = value.NullIfWhiteSpacePlusTrim();
+        get;
+        private set => field = value.NullIfWhiteSpacePlusTrim();
     }
 
     public Result Update(string name, string? description)

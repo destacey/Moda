@@ -4,6 +4,7 @@ using Moda.Common.Domain.Models.Planning.Iterations;
 using Moda.Planning.Domain.Models.Iterations;
 
 namespace Moda.Planning.Application.Iterations.Dtos;
+
 public sealed record SimpleIterationDto : IMapFrom<Iteration>, ISimpleIteration
 {
     public Guid Id { get; init; }

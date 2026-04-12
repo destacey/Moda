@@ -1,13 +1,11 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Moda.Planning.Application.PokerSessions.Commands;
 using Moda.Planning.Application.PokerSessions.Dtos;
 using Moda.Planning.Application.PokerSessions.Interfaces;
 using Moda.Planning.Application.Tests.Infrastructure;
 using Moda.Planning.Domain.Enums;
-using Moda.Planning.Domain.Models.PlanningPoker;
 using Moda.Planning.Domain.Tests.Data;
 using Moq;
-using NodaTime;
 
 namespace Moda.Planning.Application.Tests.PokerSessions.Commands;
 

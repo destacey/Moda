@@ -5,15 +5,11 @@ using Moda.Common.Domain.Enums.Goals;
 using Moda.Common.Extensions;
 using NodaTime;
 
-namespace Moda.Goals.Domain.Models;
+namespace Moda.Common.Domain.Models.Goals;
 
 // TODO make a BaseObjective to inherit Objective and KeyResult from
 public class Objective : BaseSoftDeletableEntity, IHasIdAndKey
 {
-    private string _name = default!;
-    private string? _description;
-    private double _progress;
-
     private Objective() { }
 
     public Objective(string name, string? description, ObjectiveType type, Guid? ownerId, Guid? planId, LocalDate? startDate, LocalDate? targetDate, int? order)
@@ -40,17 +36,17 @@ public class Objective : BaseSoftDeletableEntity, IHasIdAndKey
     /// </summary>
     public string Name
     {
-        get => _name;
-        protected set => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
-    }
+        get;
+        protected set => field = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
+    } = default!;
 
     /// <summary>
     /// The description of the Objective.
     /// </summary>
     public string? Description
     {
-        get => _description;
-        protected set => _description = value.NullIfWhiteSpacePlusTrim();
+        get;
+        protected set => field = value.NullIfWhiteSpacePlusTrim();
     }
 
     /// <summary>Gets or sets the type.</summary>
@@ -66,8 +62,8 @@ public class Objective : BaseSoftDeletableEntity, IHasIdAndKey
     public double Progress
     {
         // TODO: switch to decimal
-        get => _progress;
-        private set => _progress = value < 0
+        get;
+        private set => field = value < 0
             ? 0.0d
             : value > 100
                 ? 100.0d

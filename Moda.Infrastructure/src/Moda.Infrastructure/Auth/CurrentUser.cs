@@ -1,7 +1,6 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using Moda.Common.Application.Identity.Users;
 
 namespace Moda.Infrastructure.Auth;
 
@@ -9,7 +8,7 @@ public class CurrentUser(IHttpContextAccessor httpContextAccessor, IServiceProvi
 {
     private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
     private readonly IServiceProvider _serviceProvider = serviceProvider;
-    
+
     private ClaimsPrincipal? _user;
     private string _userId = string.Empty;
 

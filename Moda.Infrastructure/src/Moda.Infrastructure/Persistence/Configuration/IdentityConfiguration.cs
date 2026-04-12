@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Moda.Common.Application.Identity.Users;
 using Moda.Common.Domain.Employees;
 
 namespace Moda.Infrastructure.Persistence.Configuration;
@@ -14,7 +13,7 @@ public class ApplicationUserConfig : IEntityTypeConfiguration<ApplicationUser>
         builder.ToTable("Users", SchemaNames.Identity);
 
         builder.HasIndex(u => u.Id)
-            .IncludeProperties(e => new { e.UserName, e.EmployeeId, e.Email, e.FirstName, e.LastName }); ;
+            .IncludeProperties(e => new { e.UserName, e.EmployeeId, e.Email, e.FirstName, e.LastName });
 
         builder.Property(u => u.ObjectId).HasMaxLength(256);
 

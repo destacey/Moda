@@ -1,4 +1,4 @@
-namespace Moda.Integrations.AzureDevOps.Utils;
+﻿namespace Moda.Integrations.AzureDevOps.Utils;
 
 /// <summary>
 /// Utility methods for working with Azure DevOps classification nodes.
@@ -24,11 +24,11 @@ internal static class ClassificationNodeUtils
     {
         // Find the second backslash (start of classification type node)
         int firstBackslash = path.IndexOf('\\');
-        if (firstBackslash == -1) 
+        if (firstBackslash == -1)
             return path;
 
         int secondBackslash = path.IndexOf('\\', firstBackslash + 1);
-        if (secondBackslash == -1) 
+        if (secondBackslash == -1)
             return path;
 
         // Find the third backslash (end of classification type node)

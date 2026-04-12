@@ -15,8 +15,6 @@ namespace Moda.Work.Domain.Models;
 public sealed class Workflow : BaseSoftDeletableEntity, IActivatable, IHasIdAndKey
 {
     private readonly List<WorkflowScheme> _schemes = [];
-    private string _name = null!;
-    private string? _description;
 
     private Workflow() { }
 
@@ -37,17 +35,17 @@ public sealed class Workflow : BaseSoftDeletableEntity, IActivatable, IHasIdAndK
     /// </summary>
     public string Name
     {
-        get => _name;
-        private set => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
-    }
+        get;
+        private set => field = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
+    } = null!;
 
     /// <summary>
     /// The description of the workflow.
     /// </summary>
     public string? Description
     {
-        get => _description;
-        private set => _description = value.NullIfWhiteSpacePlusTrim();
+        get;
+        private set => field = value.NullIfWhiteSpacePlusTrim();
     }
 
     /// <summary>

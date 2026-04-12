@@ -3,6 +3,7 @@ using Moda.ProjectPortfolioManagement.Domain.Models;
 using Moda.Tests.Shared.Data;
 
 namespace Moda.ProjectPortfolioManagement.Domain.Tests.Data;
+
 public sealed class StrategicThemeFaker : PrivateConstructorFaker<StrategicTheme>
 {
     public StrategicThemeFaker()

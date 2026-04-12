@@ -17,10 +17,6 @@ namespace Moda.Work.Domain.Models;
 /// support for external work item URL templates.</remarks>
 public sealed class Workspace : BaseSoftDeletableEntity, IActivatable<WorkspaceActivatableArgs, Instant>, IHasWorkspaceIdAndKey
 {
-    private WorkspaceKey _key = null!;
-    private string _name = null!;
-    private string? _description;
-    private string? _externalViewWorkItemUrlTemplate;
     private readonly List<WorkItem> _workItems = [];
 
     private Workspace() { }
@@ -43,26 +39,26 @@ public sealed class Workspace : BaseSoftDeletableEntity, IActivatable<WorkspaceA
     /// <value>The key.</value>
     public WorkspaceKey Key
     {
-        get => _key;
-        private set => _key = Guard.Against.Null(value, nameof(Key));
-    }
+        get;
+        private set => field = Guard.Against.Null(value, nameof(Key));
+    } = null!;
 
     /// <summary>
     /// The name of the workspace.
     /// </summary>
     public string Name
     {
-        get => _name;
-        private set => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
-    }
+        get;
+        private set => field = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
+    } = null!;
 
     /// <summary>
     /// The description of the workspace.
     /// </summary>
     public string? Description
     {
-        get => _description;
-        private set => _description = value.NullIfWhiteSpacePlusTrim();
+        get;
+        private set => field = value.NullIfWhiteSpacePlusTrim();
     }
 
     /// <summary>
@@ -83,10 +79,10 @@ public sealed class Workspace : BaseSoftDeletableEntity, IActivatable<WorkspaceA
     /// <summary>
     /// A url template for external work items.  This template plus the work item external id will create a url to view the work item in the external system.
     /// </summary>
-    public string? ExternalViewWorkItemUrlTemplate 
-    { 
-        get => _externalViewWorkItemUrlTemplate; 
-        private set => _externalViewWorkItemUrlTemplate = value.NullIfWhiteSpacePlusTrim(); 
+    public string? ExternalViewWorkItemUrlTemplate
+    {
+        get;
+        private set => field = value.NullIfWhiteSpacePlusTrim();
     }
 
     /// <summary>
@@ -132,7 +128,7 @@ public sealed class Workspace : BaseSoftDeletableEntity, IActivatable<WorkspaceA
             if (workItem != null)
                 _workItems.Remove(workItem);
         }
-        
+
         return Result.Success();
     }
 
@@ -150,7 +146,7 @@ public sealed class Workspace : BaseSoftDeletableEntity, IActivatable<WorkspaceA
 
         // return success if no changes
         if (string.Equals(Name, newName, StringComparison.Ordinal)
-            && string.Equals(Description, newDescription, StringComparison.Ordinal)) 
+            && string.Equals(Description, newDescription, StringComparison.Ordinal))
             return Result.Success();
 
         Name = newName;

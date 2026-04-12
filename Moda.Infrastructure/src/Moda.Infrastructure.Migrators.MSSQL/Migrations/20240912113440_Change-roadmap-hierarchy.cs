@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -83,8 +82,8 @@ public partial class Changeroadmaphierarchy : Migration
             column: "ParentId",
             principalSchema: "Planning",
             principalTable: "Roadmaps",
-            principalColumn: "Id"); 
-        
+            principalColumn: "Id");
+
         migrationBuilder.Sql(@"
          IF EXISTS (SELECT 1 FROM [Planning].RoadmapLinks)
              BEGIN

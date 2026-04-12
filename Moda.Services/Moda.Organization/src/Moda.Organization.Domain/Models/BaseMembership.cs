@@ -3,17 +3,18 @@ using Moda.Organization.Domain.Enums;
 using NodaTime;
 
 namespace Moda.Organization.Domain.Models;
+
 public abstract class BaseMembership : BaseSoftDeletableEntity
 {
     private MembershipDateRange _dateRange = default!;
 
     /// <summary>Gets the source identifier.</summary>
     /// <value>The source identifier.</value>
-    public Guid SourceId { get; init; }
+    public Guid SourceId { get; protected init; }
 
     /// <summary>Gets the target identifier.</summary>
     /// <value>The target identifier.</value>
-    public Guid TargetId { get; init; }
+    public Guid TargetId { get; protected init; }
 
     /// <summary>Gets or sets the date range.</summary>
     /// <value>The date range.</value>
@@ -72,7 +73,7 @@ public abstract class BaseMembership : BaseSoftDeletableEntity
     public MembershipState StateOn(LocalDate date)
     {
         if (IsPastOn(date)) { return MembershipState.Past; }
-        if (IsActiveOn(date)) { return MembershipState.Active; };
+        if (IsActiveOn(date)) { return MembershipState.Active; }
         return MembershipState.Future;
     }
 }

@@ -1,4 +1,5 @@
 ﻿namespace Moda.Planning.Application.Risks.Dtos;
+
 public sealed record RiskStatusDto
 {
     public int Id { get; set; }

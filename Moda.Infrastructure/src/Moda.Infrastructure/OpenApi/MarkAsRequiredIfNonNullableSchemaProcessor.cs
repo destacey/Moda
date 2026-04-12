@@ -1,9 +1,9 @@
 ﻿using System.Reflection;
 using System.Text.Json;
-using NJsonSchema;
 using NJsonSchema.Generation;
 
 namespace Moda.Infrastructure.OpenApi;
+
 public class MarkAsRequiredIfNonNullableSchemaProcessor : ISchemaProcessor
 {
     public void Process(SchemaProcessorContext context)

@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
-using Moda.Infrastructure.Auth.Local;
 
 namespace Moda.Infrastructure.Auth.Permissions;
 

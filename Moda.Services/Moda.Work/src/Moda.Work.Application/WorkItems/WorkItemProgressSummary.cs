@@ -1,6 +1,7 @@
 ﻿using Moda.Work.Application.WorkItems.Dtos;
 
 namespace Moda.Work.Application.WorkItems;
+
 internal sealed class WorkItemProgressSummary
 {
     public required WorkItemProgressRollupDto RootRollup { get; set; }

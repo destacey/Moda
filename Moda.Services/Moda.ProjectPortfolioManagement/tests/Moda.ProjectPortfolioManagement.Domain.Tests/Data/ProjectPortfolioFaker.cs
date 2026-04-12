@@ -37,7 +37,7 @@ public static class ProjectPortfolioFakerExtensions
         if (!string.IsNullOrWhiteSpace(description)) { faker.RuleFor(x => x.Description, description); }
         if (status.HasValue) { faker.RuleFor(x => x.Status, status); }
 
-        if (roles is not null) 
+        if (roles is not null)
         {
             var portfolioId = id ?? Guid.NewGuid();
             if (!id.HasValue)
@@ -45,7 +45,7 @@ public static class ProjectPortfolioFakerExtensions
                 faker.RuleFor(x => x.Id, portfolioId);
             }
 
-            HashSet<RoleAssignment<ProjectPortfolioRole>> updatedRoles = new();
+            HashSet<RoleAssignment<ProjectPortfolioRole>> updatedRoles = [];
             foreach (var role in roles)
             {
                 foreach (var employeeId in role.Value)
@@ -54,7 +54,7 @@ public static class ProjectPortfolioFakerExtensions
                 }
             }
 
-            faker.RuleFor("_roles", x => updatedRoles); 
+            faker.RuleFor("_roles", x => updatedRoles);
         }
 
         if (dateRange is not null) { faker.RuleFor(x => x.DateRange, dateRange); }
@@ -114,5 +114,5 @@ public static class ProjectPortfolioFakerExtensions
         ).Generate();
     }
 
-    
+
 }

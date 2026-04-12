@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 namespace Moda.Common.Application.Enums;
+
 public enum SyncType
 {
     [Display(Name = "Full", Description = "Full sync of all data.", Order = 1)]

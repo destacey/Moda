@@ -4,6 +4,7 @@ using Moda.Common.Domain.Enums;
 using NodaTime;
 
 namespace Moda.Planning.Domain.Models;
+
 public sealed class SimpleHealthCheck : BaseEntity<Guid>
 {
     private SimpleHealthCheck() { }

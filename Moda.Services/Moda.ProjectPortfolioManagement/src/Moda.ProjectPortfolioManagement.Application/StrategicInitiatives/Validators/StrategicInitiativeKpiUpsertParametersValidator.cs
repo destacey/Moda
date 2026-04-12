@@ -6,7 +6,7 @@ namespace Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Valid
 public sealed class StrategicInitiativeKpiUpsertParametersValidator : CustomValidator<StrategicInitiativeKpiUpsertParameters>
 {
     public StrategicInitiativeKpiUpsertParametersValidator()
-    { 
+    {
         RuleFor(x => x.Name)
             .NotEmpty()
             .MaximumLength(64);

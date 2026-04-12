@@ -4,6 +4,7 @@ using Moda.Integrations.AzureDevOps.Clients;
 using Moda.Integrations.AzureDevOps.Models.WorkItems;
 
 namespace Moda.Integrations.AzureDevOps.Services;
+
 internal sealed class WorkItemService(string organizationUrl, string token, string apiVersion, ILogger<WorkItemService> logger)
 {
     private readonly WorkItemClient _workItemClient = new(organizationUrl, token, apiVersion);

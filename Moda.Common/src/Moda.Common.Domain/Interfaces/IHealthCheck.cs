@@ -2,6 +2,7 @@
 using NodaTime;
 
 namespace Moda.Common.Domain.Interfaces;
+
 public interface IHealthCheck
 {
     Guid Id { get; }

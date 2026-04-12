@@ -1,6 +1,7 @@
 ﻿using Moda.Planning.Domain.Enums;
 
 namespace Moda.Planning.Domain.Models;
+
 public sealed class UpsertPlanningIntervalIteration
 {
     public Guid? Id { get; set; }

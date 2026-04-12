@@ -2,6 +2,7 @@
 using Moda.Integrations.AzureDevOps.Models.Contracts;
 
 namespace Moda.Integrations.AzureDevOps.Models.Projects;
+
 internal sealed record ProjectDetailsDto : ProjectDto
 {
     public List<PropertyDto> Properties { get; set; } = [];

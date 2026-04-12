@@ -9,6 +9,7 @@ using Moda.Tests.Shared.Extensions;
 using NodaTime;
 
 namespace Moda.Organization.Domain.Tests.Sut.Models;
+
 public class TeamTests
 {
     private readonly TestingDateTimeProvider _dateTimeProvider;
@@ -851,7 +852,7 @@ public class TeamTests
         // Assert
         removeResult.IsSuccess.Should().BeTrue();
         team.OperatingModels.Should().HaveCount(1);
-        
+
         var restoredModel = team.OperatingModels.First();
         restoredModel.Id.Should().Be(model1Id);
         restoredModel.IsCurrent.Should().BeTrue(); // End date should be cleared

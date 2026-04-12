@@ -1,7 +1,6 @@
 ﻿using Moda.Common.Models;
 using Moda.Planning.Domain.Models;
 using Moda.Tests.Shared.Data;
-using Moda.Tests.Shared.Extensions;
 using NodaTime.Extensions;
 
 namespace Moda.Planning.Domain.Tests.Data;

@@ -24,7 +24,7 @@ public class ConnectionConfig : IEntityTypeConfiguration<Connection>
             .HasFilter("[IsDeleted] = 0");
         builder.HasIndex(c => new { c.Connector, c.IsActive, c.IsDeleted })
             .IncludeProperties(c => new { c.Id, c.Name })
-            .HasFilter("[IsDeleted] = 0"); ;
+            .HasFilter("[IsDeleted] = 0");
         builder.HasIndex(c => new { c.IsActive, c.IsDeleted })
             .HasFilter("[IsDeleted] = 0");
 

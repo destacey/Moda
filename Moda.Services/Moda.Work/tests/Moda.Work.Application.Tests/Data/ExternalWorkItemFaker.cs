@@ -1,4 +1,4 @@
-using Bogus;
+﻿using Bogus;
 using Moda.Work.Application.Tests.Models;
 using NodaTime;
 
@@ -10,7 +10,7 @@ public class ExternalWorkItemFaker : Faker<ExternalTestWorkItem>
     {
         var createdInstant = created ?? Instant.FromUtc(2024, 1, 1, 0, 0, 0);
         var lastModifiedInstant = lastModified ?? Instant.FromUtc(2024, 1, 15, 12, 0, 0);
-        
+
         RuleFor(x => x.Id, f => f.Random.Int(1, 10000));
         RuleFor(x => x.Title, f => f.Lorem.Sentence(5));
         // Use predictable defaults instead of random selection
@@ -36,7 +36,7 @@ public class ExternalWorkItemFaker : Faker<ExternalTestWorkItem>
 public static class ExternalWorkItemFakerExtensions
 {
     public static ExternalWorkItemFaker WithId(this ExternalWorkItemFaker faker, int id)
-    { 
+    {
         faker.RuleFor(x => x.Id, id);
         return faker;
     }

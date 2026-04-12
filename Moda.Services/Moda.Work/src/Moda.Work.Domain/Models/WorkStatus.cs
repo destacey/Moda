@@ -10,9 +10,6 @@ namespace Moda.Work.Domain.Models;
 /// <seealso cref="Moda.Common.Domain.Interfaces.IActivatable" />
 public sealed class WorkStatus : BaseSoftDeletableEntity<int>, IActivatable
 {
-    private string _name = null!;
-    private string? _description;
-
     private WorkStatus() { }
 
     private WorkStatus(string name, string? description)
@@ -25,16 +22,16 @@ public sealed class WorkStatus : BaseSoftDeletableEntity<int>, IActivatable
     /// <value>The name.</value>
     public string Name
     {
-        get => _name;
-        private init => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
-    }
+        get;
+        private init => field = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
+    } = null!;
 
     /// <summary>The description of the work status.</summary>
     /// <value>The description.</value>
     public string? Description
     {
-        get => _description;
-        private set => _description = value.NullIfWhiteSpacePlusTrim();
+        get;
+        private set => field = value.NullIfWhiteSpacePlusTrim();
     }
 
     /// <summary>Indicates whether the work status is active or not.</summary>

@@ -4,6 +4,7 @@ using Moda.Common.Application.Interfaces;
 using Moda.Health.Dtos;
 
 namespace Moda.Health.Queries;
+
 public sealed record GetHealthChecksQuery(IEnumerable<Guid> Ids) : IQuery<IReadOnlyList<HealthCheckDto>>;
 
 internal sealed class GetHealthChecksQueryHandler(IHealthDbContext healthDbContext) : IQueryHandler<GetHealthChecksQuery, IReadOnlyList<HealthCheckDto>>

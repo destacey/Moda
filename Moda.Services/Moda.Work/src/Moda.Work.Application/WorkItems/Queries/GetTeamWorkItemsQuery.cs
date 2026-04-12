@@ -8,7 +8,7 @@ using Moda.Work.Application.WorkItems.Dtos;
 namespace Moda.Work.Application.WorkItems.Queries;
 
 public sealed record GetTeamWorkItemsQuery : IQuery<List<WorkItemListDto>>
-{    
+{
     public GetTeamWorkItemsQuery(TeamIdOrCode teamIdOrCode, WorkStatusCategory[]? statusCategories = null, Instant? doneFrom = null, Instant? doneTo = null)
     {
         TeamFilter = teamIdOrCode.CreateWorkTeamFilter<WorkItem>();
@@ -24,7 +24,7 @@ public sealed record GetTeamWorkItemsQuery : IQuery<List<WorkItemListDto>>
 }
 
 internal sealed class GetTeamWorkItemsQueryHandler(
-    IWorkDbContext workDbContext) 
+    IWorkDbContext workDbContext)
     : IQueryHandler<GetTeamWorkItemsQuery, List<WorkItemListDto>>
 {
     private readonly IWorkDbContext _workDbContext = workDbContext;

@@ -1,4 +1,4 @@
-using Moda.Tests.Shared.Data;
+﻿using Moda.Tests.Shared.Data;
 using Moda.Work.Domain.Models;
 using NodaTime;
 
@@ -9,9 +9,9 @@ public class WorkTypeHierarchyFaker : PrivateConstructorFaker<WorkTypeHierarchy>
     public WorkTypeHierarchyFaker(Instant? timestamp = null)
     {
         var ts = timestamp ?? SystemClock.Instance.GetCurrentInstant();
-        
+
         RuleFor(x => x.Id, 1); // WorkTypeHierarchy typically has Id = 1 as it's a singleton
-        
+
         // WorkTypeHierarchy uses Initialize() static method which sets up the levels
         // We need to use FinishWith to call Initialize and replace the instance
         FinishWith((f, hierarchy) =>

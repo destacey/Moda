@@ -3,6 +3,7 @@ using Mapster.Utils;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Moda.ProjectPortfolioManagement.Application;
+
 public static class ConfigureServices
 {
     public static IServiceCollection AddProjectPortfolioManagementApplication(this IServiceCollection services)

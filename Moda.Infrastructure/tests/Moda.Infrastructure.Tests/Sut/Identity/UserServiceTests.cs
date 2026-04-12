@@ -1,5 +1,4 @@
-using System.Linq.Expressions;
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore.Query;
@@ -486,7 +485,7 @@ public class UserServiceTests
         // Arrange
         var user = CreateUser();
         _mockUserManager.Setup(x => x.Users).Returns(new[] { user }.AsQueryable().BuildMockDbSet().Object);
-        _mockUserManager.Setup(x => x.GetRolesAsync(user)).ReturnsAsync(new List<string> { "Basic" });
+        _mockUserManager.Setup(x => x.GetRolesAsync(user)).ReturnsAsync(["Basic"]);
         _mockUserManager.Setup(x => x.RemoveFromRolesAsync(user, It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync(IdentityResult.Success);
         _mockUserManager.Setup(x => x.AddToRolesAsync(user, It.IsAny<IEnumerable<string>>()))
@@ -511,9 +510,9 @@ public class UserServiceTests
         // Arrange
         var user = CreateUser();
         _mockUserManager.Setup(x => x.Users).Returns(new[] { user }.AsQueryable().BuildMockDbSet().Object);
-        _mockUserManager.Setup(x => x.GetRolesAsync(user)).ReturnsAsync(new List<string> { "Admin" });
+        _mockUserManager.Setup(x => x.GetRolesAsync(user)).ReturnsAsync(["Admin"]);
         _mockUserManager.Setup(x => x.GetUsersInRoleAsync(ApplicationRoles.Admin))
-            .ReturnsAsync(new List<ApplicationUser> { user });
+            .ReturnsAsync([user]);
 
         var command = new AssignUserRolesCommand("user-1", ["Basic"]);
         var sut = CreateSut();

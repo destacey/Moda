@@ -2,6 +2,7 @@
 using Moda.Work.Application.WorkStatuses.Dtos;
 
 namespace Moda.Work.Application.WorkStatuses.Queries;
+
 public sealed record GetWorkStatusesQuery(bool IncludeInactive = false) : IQuery<IReadOnlyList<WorkStatusDto>>;
 
 internal sealed class GetWorkStatusesQueryHandler : IQueryHandler<GetWorkStatusesQuery, IReadOnlyList<WorkStatusDto>>

@@ -8,6 +8,7 @@ using Moda.Work.Application.WorkTeams.Dtos;
 using Moda.Work.Application.WorkTypes.Dtos;
 
 namespace Moda.Work.Application.WorkItems.Dtos;
+
 public sealed record WorkItemDetailsDto : IMapFrom<WorkItem>
 {
     public Guid Id { get; set; }

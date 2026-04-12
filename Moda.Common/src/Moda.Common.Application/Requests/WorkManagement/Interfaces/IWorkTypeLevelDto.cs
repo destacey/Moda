@@ -1,6 +1,7 @@
 ﻿using Moda.Common.Application.Dtos;
 
 namespace Moda.Common.Application.Requests.WorkManagement.Interfaces;
+
 public interface IWorkTypeLevelDto
 {
     int Id { get; }

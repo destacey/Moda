@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Moda.Links.Models;
 
 namespace Moda.Infrastructure.Persistence.Configuration;
+
 public class LinkConfiguration : IEntityTypeConfiguration<Link>
 {
     public void Configure(EntityTypeBuilder<Link> builder)

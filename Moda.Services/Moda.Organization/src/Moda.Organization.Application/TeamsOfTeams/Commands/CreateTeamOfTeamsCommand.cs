@@ -1,9 +1,9 @@
 ﻿using Moda.Common.Domain.Models.Organizations;
-using Moda.Organization.Application.Teams.Commands;
 using Moda.Organization.Application.Teams.Models;
 using NodaTime;
 
 namespace Moda.Organization.Application.TeamsOfTeams.Commands;
+
 public sealed record CreateTeamOfTeamsCommand(string Name, TeamCode Code, string? Description, LocalDate ActiveDate) : ICommand<int>;
 
 public sealed class CreateTeamOfTeamsCommandValidator : CustomValidator<CreateTeamOfTeamsCommand>

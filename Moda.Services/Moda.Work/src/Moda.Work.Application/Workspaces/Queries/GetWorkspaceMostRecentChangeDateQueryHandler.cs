@@ -2,6 +2,7 @@
 using Moda.Work.Application.Persistence;
 
 namespace Moda.Work.Application.Workspaces.Queries;
+
 internal sealed class GetWorkspaceMostRecentChangeDateQueryHandler(IWorkDbContext workDbContext, ILogger<GetWorkspaceMostRecentChangeDateQueryHandler> logger) : IQueryHandler<GetWorkspaceMostRecentChangeDateQuery, Result<Instant?>>
 {
     private const string AppRequestName = nameof(GetWorkspaceMostRecentChangeDateQuery);

@@ -3,6 +3,7 @@ using Moda.Common.Application.Requests.WorkManagement.Interfaces;
 using Moda.Work.Application.WorkStatuses.Dtos;
 
 namespace Moda.Work.Application.Workflows.Dtos;
+
 public sealed record WorkflowSchemeDto : IMapFrom<WorkflowScheme>, IWorkflowSchemeDto
 {
     public Guid Id { get; set; }

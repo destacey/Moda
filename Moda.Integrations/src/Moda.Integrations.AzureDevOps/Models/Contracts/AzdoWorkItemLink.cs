@@ -3,6 +3,7 @@ using Moda.Common.Domain.Enums.Work;
 using NodaTime;
 
 namespace Moda.Integrations.AzureDevOps.Models.Contracts;
+
 public sealed record AzdoWorkItemLink : IExternalWorkItemLink
 {
     public WorkItemLinkType LinkType { get; set; }

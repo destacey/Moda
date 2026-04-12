@@ -1,6 +1,7 @@
 ﻿using NodaTime;
 
 namespace Moda.Common.Domain.Events.StrategicManagement;
+
 public sealed record StrategicThemeDeletedEvent : DomainEvent
 {
     public StrategicThemeDeletedEvent(Guid id, Instant timestamp)
@@ -10,5 +11,5 @@ public sealed record StrategicThemeDeletedEvent : DomainEvent
         Timestamp = timestamp;
     }
 
-    public Guid Id { get; init; }
+    public Guid Id { get; }
 }

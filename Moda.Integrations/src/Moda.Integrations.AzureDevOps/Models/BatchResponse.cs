@@ -1,4 +1,5 @@
 ﻿namespace Moda.Integrations.AzureDevOps.Models;
+
 internal sealed record BatchResponse<T>
 {
     public List<T> Values { get; set; } = [];

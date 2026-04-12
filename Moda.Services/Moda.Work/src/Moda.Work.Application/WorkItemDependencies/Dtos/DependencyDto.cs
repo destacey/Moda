@@ -4,6 +4,7 @@ using Moda.Common.Domain.Enums.Work;
 using Moda.Work.Application.WorkItems.Dtos;
 
 namespace Moda.Work.Application.WorkItemDependencies.Dtos;
+
 public sealed record DependencyDto : IMapFrom<WorkItemDependency>
 {
     public Guid Id { get; set; }
@@ -18,8 +19,8 @@ public sealed record DependencyDto : IMapFrom<WorkItemDependency>
 
     public required SimpleNavigationDto Health { get; set; }
 
-    public SimpleNavigationDto Scope => 
-        Source.Team != null && Target.Team != null 
+    public SimpleNavigationDto Scope =>
+        Source.Team != null && Target.Team != null
         ? Source.Team.Id == Target.Team.Id
             ? SimpleNavigationDto.FromEnum(DependencyScope.IntraTeam)
             : SimpleNavigationDto.FromEnum(DependencyScope.CrossTeam)

@@ -31,9 +31,9 @@ public record DescriptiveNavigationDto : DescriptiveNavigationDto<Guid, int>
     public static DescriptiveNavigationDto Create(Guid id, int key, string name, string? description)
     => new()
     {
-            Id = id,
-            Key = key,
-            Name = name,
-            Description = description
+        Id = id,
+        Key = key,
+        Name = name,
+        Description = description
     };
 }

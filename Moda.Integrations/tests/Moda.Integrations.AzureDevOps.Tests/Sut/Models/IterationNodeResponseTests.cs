@@ -4,6 +4,7 @@ using Moda.Integrations.AzureDevOps.Models.Projects;
 using Moda.Integrations.AzureDevOps.Tests.Models;
 
 namespace Moda.Integrations.AzureDevOps.Tests.Sut.Models;
+
 public class IterationNodeResponseTests : CommonResponseOptions
 {
     [Fact]

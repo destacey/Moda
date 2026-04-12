@@ -2,6 +2,7 @@
 using NodaTime;
 
 namespace Moda.Health.Models;
+
 public sealed class HealthReport
 {
     private readonly List<HealthCheck> _healthChecks = [];

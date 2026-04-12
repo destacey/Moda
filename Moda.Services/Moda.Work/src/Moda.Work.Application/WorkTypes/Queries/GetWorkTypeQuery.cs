@@ -3,6 +3,7 @@ using Moda.Work.Application.Persistence;
 using Moda.Work.Application.WorkTypes.Dtos;
 
 namespace Moda.Work.Application.WorkTypes.Queries;
+
 public sealed record GetWorkTypeQuery : IQuery<WorkTypeDto?>
 {
     public GetWorkTypeQuery(int id)

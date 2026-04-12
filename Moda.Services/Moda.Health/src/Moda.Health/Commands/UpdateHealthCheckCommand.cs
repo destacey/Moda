@@ -10,6 +10,7 @@ using Moda.Health.Dtos;
 using NodaTime;
 
 namespace Moda.Health.Commands;
+
 public sealed record UpdateHealthCheckCommand(Guid Id, HealthStatus Status, Instant Expiration, string? Note) : ICommand<HealthCheckDto>;
 
 public sealed class UpdateHealthCheckCommandValidator : CustomValidator<UpdateHealthCheckCommand>

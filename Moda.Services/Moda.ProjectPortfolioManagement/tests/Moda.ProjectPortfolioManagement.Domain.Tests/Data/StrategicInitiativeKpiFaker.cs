@@ -1,4 +1,4 @@
-using Moda.Common.Domain.Models.KeyPerformanceIndicators;
+﻿using Moda.Common.Domain.Models.KeyPerformanceIndicators;
 using Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 using Moda.Tests.Shared.Data;
 
@@ -16,7 +16,7 @@ public sealed class StrategicInitiativeKpiFaker : PrivateConstructorFaker<Strate
         RuleFor(x => x.Prefix, f => f.PickRandom<string?>(null, "$", "€"));
         RuleFor(x => x.Suffix, f => f.PickRandom<string?>(null, "%", "K", "M"));
         RuleFor(x => x.TargetDirection, f => f.PickRandom<KpiTargetDirection>());
-        RuleFor( x => x.StrategicInitiativeId, f => f.Random.Guid());
+        RuleFor(x => x.StrategicInitiativeId, f => f.Random.Guid());
     }
 }
 

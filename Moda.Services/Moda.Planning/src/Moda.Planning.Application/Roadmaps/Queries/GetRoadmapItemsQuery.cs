@@ -6,6 +6,7 @@ using Moda.Planning.Application.Roadmaps.Dtos;
 using Moda.Planning.Domain.Models.Roadmaps;
 
 namespace Moda.Planning.Application.Roadmaps.Queries;
+
 public sealed record GetRoadmapItemsQuery : IQuery<List<RoadmapItemListDto>>
 {
     public GetRoadmapItemsQuery(IdOrKey idOrKey)

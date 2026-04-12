@@ -52,8 +52,8 @@ public abstract class KpiMeasurement : BaseAuditableEntity
     /// Additional note or context regarding the measurement.
     /// </summary>
     public string? Note
-    { 
-        get => _notes; 
-        protected set => _notes = value.NullIfWhiteSpacePlusTrim(); 
+    {
+        get => _notes;
+        protected set => _notes = value.NullIfWhiteSpacePlusTrim();
     }
 }

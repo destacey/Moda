@@ -11,7 +11,7 @@ public record NavigationDto<TId, TKey>
     {
         Id = id;
         Key = key;
-        Name = name;        
+        Name = name;
     }
 
     [Required]
@@ -29,10 +29,10 @@ public record NavigationDto : NavigationDto<Guid, int>
     public static NavigationDto Create(Guid id, int key, string name)
     => new()
     {
-            Id = id,
-            Key = key,
-            Name = name
-        };
+        Id = id,
+        Key = key,
+        Name = name
+    };
 
     /// <summary>
     /// Creates a NavigationDto from any entity implementing INavigable.

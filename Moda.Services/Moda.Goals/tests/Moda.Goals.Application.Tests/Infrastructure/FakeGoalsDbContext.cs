@@ -1,10 +1,10 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Moda.Common.Domain.Employees;
 using Moda.Common.Domain.Identity;
+using Moda.Common.Domain.Models.Goals;
 using Moda.Goals.Application.Persistence;
-using Moda.Goals.Domain.Models;
 using Moda.Tests.Shared.Infrastructure;
 
 namespace Moda.Goals.Application.Tests.Infrastructure;
@@ -17,7 +17,7 @@ public class FakeGoalsDbContext : IGoalsDbContext, IDisposable
 {
     // Goals domain entities
     private readonly List<Objective> _objectives = [];
-    
+
     // Common domain entities
     private readonly List<Employee> _employees = [];
     private readonly List<ExternalEmployeeBlacklistItem> _externalEmployeeBlacklistItems = [];
@@ -33,7 +33,7 @@ public class FakeGoalsDbContext : IGoalsDbContext, IDisposable
 
     // ChangeTracker - we can't create a real one, so we return null and the handler uses defensive coding
     public ChangeTracker ChangeTracker => null!;
-    
+
     public DatabaseFacade Database => throw new NotImplementedException("Database operations are not supported in FakeGoalsDbContext. Use integration tests with a real DbContext for database-specific functionality.");
 
     /// <summary>
@@ -66,7 +66,7 @@ public class FakeGoalsDbContext : IGoalsDbContext, IDisposable
     // Objective
     public void AddObjective(Objective objective) => _objectives.Add(objective);
     public void AddObjectives(IEnumerable<Objective> objectives) => _objectives.AddRange(objectives);
-    
+
     // Employee
     public void AddEmployee(Employee employee) => _employees.Add(employee);
     public void AddEmployees(IEnumerable<Employee> employees) => _employees.AddRange(employees);

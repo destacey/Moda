@@ -1,6 +1,7 @@
 ﻿using Ardalis.GuardClauses;
 
 namespace Moda.Planning.Application.Roadmaps.Commands;
+
 public sealed record UpdateRoadmapRootActivityOrderCommand(Guid RoadmapId, Guid RoadmapActivityId, int Order) : ICommand;
 
 public sealed class UpdateRoadmapRootActivityOrderCommandValidator : CustomValidator<UpdateRoadmapRootActivityOrderCommand>

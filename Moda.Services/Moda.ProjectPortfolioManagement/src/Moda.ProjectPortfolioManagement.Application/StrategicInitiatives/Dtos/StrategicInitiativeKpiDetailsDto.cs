@@ -2,6 +2,7 @@
 using Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 
 namespace Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Dtos;
+
 public sealed record StrategicInitiativeKpiDetailsDto : IMapFrom<StrategicInitiativeKpi>
 {
     public Guid Id { get; set; }

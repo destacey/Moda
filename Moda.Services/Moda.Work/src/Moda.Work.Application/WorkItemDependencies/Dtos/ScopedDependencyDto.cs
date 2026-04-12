@@ -3,6 +3,7 @@ using Moda.Common.Application.Employees.Dtos;
 using Moda.Work.Application.WorkItems.Dtos;
 
 namespace Moda.Work.Application.WorkItemDependencies.Dtos;
+
 public sealed record ScopedDependencyDto
 {
     public Guid Id { get; set; }

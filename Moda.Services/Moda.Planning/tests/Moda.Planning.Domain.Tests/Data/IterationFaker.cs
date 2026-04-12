@@ -1,4 +1,4 @@
-using Moda.Common.Domain.Enums.AppIntegrations;
+﻿using Moda.Common.Domain.Enums.AppIntegrations;
 using Moda.Common.Domain.Enums.Planning;
 using Moda.Common.Domain.Models;
 using Moda.Common.Domain.Models.Planning.Iterations;
@@ -114,7 +114,7 @@ public static class IterationFakerExtensions
             var actualExternalId = externalId ?? f.Random.AlphaNumeric(10);
             var iteration = faker.Generate();
             var ownershipInfo = OwnershipInfo.CreateExternalOwned(connector, actualSystemId, actualExternalId);
-            
+
             // Create a new faker with the ownership info
             return new IterationFaker()
                 .WithOwnershipInfo(ownershipInfo)

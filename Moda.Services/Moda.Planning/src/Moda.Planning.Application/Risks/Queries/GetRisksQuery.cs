@@ -2,6 +2,7 @@
 using Moda.Planning.Domain.Enums;
 
 namespace Moda.Planning.Application.Risks.Queries;
+
 public sealed record GetRisksQuery : IQuery<IReadOnlyList<RiskListDto>>
 {
     public GetRisksQuery(bool includeClosed)
@@ -11,7 +12,7 @@ public sealed record GetRisksQuery : IQuery<IReadOnlyList<RiskListDto>>
 
     public GetRisksQuery(Guid teamId, bool includeClosed)
     {
-        TeamIds = new List<Guid> { teamId };
+        TeamIds = [teamId];
         IncludeClosed = includeClosed;
     }
 
@@ -21,7 +22,7 @@ public sealed record GetRisksQuery : IQuery<IReadOnlyList<RiskListDto>>
         IncludeClosed = includeClosed;
     }
 
-    public List<Guid> TeamIds { get; private set; } = new();
+    public List<Guid> TeamIds { get; private set; } = [];
     public bool IncludeClosed { get; private set; }
 }
 

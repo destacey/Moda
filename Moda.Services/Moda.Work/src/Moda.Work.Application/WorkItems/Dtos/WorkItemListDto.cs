@@ -9,6 +9,7 @@ using Moda.Work.Application.WorkTeams.Dtos;
 using Moda.Work.Application.WorkTypes.Dtos;
 
 namespace Moda.Work.Application.WorkItems.Dtos;
+
 public sealed record WorkItemListDto : IMapFrom<WorkItem>
 {
     // Named constant for the Done status category id to avoid repeated casts

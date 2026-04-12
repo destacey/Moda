@@ -1,6 +1,7 @@
 ﻿using Moda.Common.Models;
 
 namespace Moda.Common.Tests.Sut.Models;
+
 public class WorkspaceKeyTests
 {
     [Theory]

@@ -6,6 +6,7 @@ using Moda.Common.Application.Validation;
 using Moda.Links.Models;
 
 namespace Moda.Links.Commands;
+
 public sealed record CreateLinkCommand(Guid ObjectId, string Name, string Url) : ICommand<Guid>;
 
 public sealed class CreateLinkCommandValidator : CustomValidator<CreateLinkCommand>

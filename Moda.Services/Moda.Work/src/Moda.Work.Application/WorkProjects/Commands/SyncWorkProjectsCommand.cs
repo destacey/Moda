@@ -3,6 +3,7 @@ using Moda.Common.Domain.Interfaces.ProjectPortfolioManagement;
 using Moda.Work.Application.Persistence;
 
 namespace Moda.Work.Application.WorkProjects.Commands;
+
 public sealed record SyncWorkProjectsCommand(IEnumerable<ISimpleProject> Projects) : ICommand, ILongRunningRequest;
 
 internal sealed class SyncWorkProjectsCommandHandler(

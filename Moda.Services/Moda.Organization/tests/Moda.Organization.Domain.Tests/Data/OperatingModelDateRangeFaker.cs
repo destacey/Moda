@@ -8,7 +8,7 @@ public sealed class OperatingModelDateRangeFaker : Faker<OperatingModelDateRange
 {
     public OperatingModelDateRangeFaker()
     {
-        CustomInstantiator(f => 
+        CustomInstantiator(f =>
         {
             var startDateTime = f.Date.Recent(days: 180); // Within last 180 days
             return new OperatingModelDateRange(LocalDate.FromDateTime(startDateTime), null);

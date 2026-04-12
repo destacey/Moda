@@ -1,6 +1,7 @@
 ﻿using Ardalis.GuardClauses;
 
 namespace Moda.Common.Extensions;
+
 public static class EnumerableExtensions
 {
     /// <summary>Batches the specified batch size.</summary>
@@ -13,7 +14,7 @@ public static class EnumerableExtensions
         Guard.Against.Null(source);
         Guard.Against.OutOfRange(batchSize, nameof(batchSize), 1, int.MaxValue);
 
-        List<T> list = new(batchSize);
+        List<T> list = new (batchSize);
         foreach (T item in source)
         {
             list.Add(item);

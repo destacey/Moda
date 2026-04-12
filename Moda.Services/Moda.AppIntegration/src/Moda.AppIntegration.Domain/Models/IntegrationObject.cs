@@ -2,6 +2,7 @@
 using Moda.Common.Domain.Models;
 
 namespace Moda.AppIntegration.Domain.Models;
+
 public abstract class IntegrationObject<TId>
 {
     [JsonInclude]

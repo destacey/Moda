@@ -8,7 +8,7 @@ namespace Moda.Organization.Domain.Models;
 /// <summary>
 /// Represents the effective date range for a team operating model.
 /// </summary>
-public class OperatingModelDateRange : ValueObject, IDateRange<LocalDate, LocalDate?>
+public sealed class OperatingModelDateRange : ValueObject, IDateRange<LocalDate, LocalDate?>
 {
     public OperatingModelDateRange(LocalDate start, LocalDate? end)
     {

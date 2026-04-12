@@ -2,6 +2,7 @@
 using System.Text.Json.Serialization;
 
 namespace Moda.AppIntegration.Domain.Models;
+
 public sealed class AzureDevOpsBoardsTeamConfiguration
 {
     [JsonConstructor]

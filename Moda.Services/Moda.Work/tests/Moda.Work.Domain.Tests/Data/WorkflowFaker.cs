@@ -1,4 +1,4 @@
-using Moda.Common.Domain.Enums;
+﻿using Moda.Common.Domain.Enums;
 using Moda.Common.Domain.Enums.Work;
 using Moda.Tests.Shared.Data;
 using Moda.Tests.Shared.Extensions;
@@ -20,7 +20,7 @@ public class WorkflowFaker : PrivateConstructorFaker<Workflow>
         RuleFor(x => x.Ownership, Ownership.Owned);
         RuleFor(x => x.IsActive, true);
         RuleFor("_schemes", f => new List<WorkflowScheme>());
-        
+
         // Set up the workflow scheme if configured
         FinishWith((f, workflow) =>
         {
@@ -30,10 +30,10 @@ public class WorkflowFaker : PrivateConstructorFaker<Workflow>
                     .WithWorkStatus(_workStatus)
                     .WithWorkStatusCategory(_workStatusCategory.Value)
                     .Generate();
-                
+
                 // Set the bidirectional relationship
                 typeof(WorkflowScheme).GetProperty("Workflow")!.SetValue(scheme, workflow);
-                
+
                 var schemesList = GenericExtensions.GetPrivateList<WorkflowScheme>(workflow, "_schemes");
                 schemesList.Clear();
                 schemesList.Add(scheme);
@@ -67,7 +67,7 @@ public static class WorkflowFakerExtensions
         // Store the work status and category in the faker instance using the helper
         faker.SetPrivateField("_workStatus", workStatus);
         faker.SetPrivateField("_workStatusCategory", category);
-        
+
         return faker;
     }
 

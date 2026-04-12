@@ -1,6 +1,7 @@
 ﻿using NodaTime;
 
 namespace Moda.Common.Tests.Sut.Extensions;
+
 public class LocalDateExtensionsTests
 {
     [Fact]

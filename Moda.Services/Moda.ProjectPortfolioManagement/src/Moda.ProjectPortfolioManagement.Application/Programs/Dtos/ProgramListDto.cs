@@ -18,7 +18,7 @@ public sealed record ProgramListDto : IMapFrom<Program>
     /// The name of the program.
     /// </summary>
     public required string Name { get; set; }
-    
+
     /// <summary>
     /// The current status of the program.
     /// </summary>

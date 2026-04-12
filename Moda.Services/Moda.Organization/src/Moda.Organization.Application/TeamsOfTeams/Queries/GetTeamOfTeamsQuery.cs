@@ -1,6 +1,7 @@
 ﻿using Mapster;
 
 namespace Moda.Organization.Application.TeamsOfTeams.Queries;
+
 public sealed record GetTeamOfTeamsQuery : IQuery<TeamOfTeamsDetailsDto?>
 {
     public GetTeamOfTeamsQuery(Guid teamId)
@@ -18,9 +19,9 @@ public sealed record GetTeamOfTeamsQuery : IQuery<TeamOfTeamsDetailsDto?>
 }
 
 internal sealed class GetTeamOfTeamsQueryHandler(
-    IOrganizationDbContext organizationDbContext, 
-    ILogger<GetTeamOfTeamsQueryHandler> logger, 
-    IDateTimeProvider dateTimeProvider) 
+    IOrganizationDbContext organizationDbContext,
+    ILogger<GetTeamOfTeamsQueryHandler> logger,
+    IDateTimeProvider dateTimeProvider)
     : IQueryHandler<GetTeamOfTeamsQuery, TeamOfTeamsDetailsDto?>
 {
     private readonly IOrganizationDbContext _organizationDbContext = organizationDbContext;

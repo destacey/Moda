@@ -3,6 +3,7 @@ using Moda.Common.Application.Employees.Dtos;
 using Moda.Common.Application.Persistence;
 
 namespace Moda.Common.Application.Employees.Queries;
+
 public sealed record GetEmployeesQuery(bool IncludeInactive = false) : IQuery<IReadOnlyList<EmployeeListDto>>;
 
 internal sealed class GetEmployeesQueryHandler : IQueryHandler<GetEmployeesQuery, IReadOnlyList<EmployeeListDto>>

@@ -1,6 +1,7 @@
 ﻿using Moda.Common.Models;
 
 namespace Moda.Common.Application.Validators;
+
 public sealed class PersonNameValidator : CustomValidator<PersonName>
 {
     public PersonNameValidator()

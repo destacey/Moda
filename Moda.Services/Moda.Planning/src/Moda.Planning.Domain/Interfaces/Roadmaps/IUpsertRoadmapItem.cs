@@ -1,4 +1,5 @@
 ﻿namespace Moda.Planning.Domain.Interfaces.Roadmaps;
+
 public interface IUpsertRoadmapItem
 {
     string Name { get; }

@@ -1,4 +1,5 @@
 ﻿namespace Moda.Common.Application.Requests.WorkManagement.Interfaces;
+
 public interface ICreateWorkProcessScheme
 {
     string WorkTypeName { get; set; }

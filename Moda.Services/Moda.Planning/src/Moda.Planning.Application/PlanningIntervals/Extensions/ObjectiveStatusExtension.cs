@@ -1,6 +1,7 @@
 ﻿using Moda.Planning.Domain.Enums;
 
 namespace Moda.Planning.Application.PlanningIntervals.Extensions;
+
 public static class ObjectiveStatusExtension
 {
     public static Common.Domain.Enums.Goals.ObjectiveStatus ToGoalObjectiveStatus(this ObjectiveStatus status)

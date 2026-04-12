@@ -1,6 +1,5 @@
-using Moda.Planning.Domain.Models.PlanningPoker;
+﻿using Moda.Planning.Domain.Models.PlanningPoker;
 using Moda.Tests.Shared.Data;
-using NodaTime;
 using NodaTime.Extensions;
 
 namespace Moda.Planning.Domain.Tests.Data;

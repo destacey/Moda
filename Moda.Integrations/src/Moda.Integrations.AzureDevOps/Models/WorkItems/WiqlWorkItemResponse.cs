@@ -1,4 +1,5 @@
 ﻿namespace Moda.Integrations.AzureDevOps.Models.WorkItems;
+
 internal sealed record WiqlWorkItemResponse
 {
     public int Id { get; set; }

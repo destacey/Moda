@@ -1,6 +1,7 @@
 ﻿using NodaTime;
 
 namespace Moda.Organization.Application.Teams.Models;
+
 public sealed record TeamMembershipEdge
 {
     public Guid Id { get; set; }

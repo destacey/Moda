@@ -2,6 +2,7 @@
 using Moda.Work.Application.Workspaces.Dtos;
 
 namespace Moda.Work.Application.Workspaces.Queries;
+
 public sealed record GetWorkspacesQuery(bool IncludeInactive = false) : IQuery<IReadOnlyList<WorkspaceListDto>>;
 
 internal sealed class GetWorkspacesQueryHandler(IWorkDbContext workDbContext) : IQueryHandler<GetWorkspacesQuery, IReadOnlyList<WorkspaceListDto>>

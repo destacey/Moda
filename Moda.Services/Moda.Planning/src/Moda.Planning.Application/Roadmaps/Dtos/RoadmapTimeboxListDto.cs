@@ -1,6 +1,7 @@
 ﻿using Moda.Planning.Domain.Models.Roadmaps;
 
 namespace Moda.Planning.Application.Roadmaps.Dtos;
+
 public sealed record RoadmapTimeboxListDto : RoadmapItemListDto, IMapFrom<RoadmapTimebox>
 {
     /// <summary>

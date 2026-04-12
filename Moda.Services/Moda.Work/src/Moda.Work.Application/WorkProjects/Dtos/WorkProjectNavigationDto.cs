@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 namespace Moda.Work.Application.WorkProjects.Dtos;
+
 public sealed record WorkProjectNavigationDto : IMapFrom<WorkProject>
 {
     [Required]

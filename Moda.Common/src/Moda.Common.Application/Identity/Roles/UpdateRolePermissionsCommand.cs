@@ -1,4 +1,4 @@
-namespace Moda.Common.Application.Identity.Roles;
+﻿namespace Moda.Common.Application.Identity.Roles;
 
 public sealed record UpdateRolePermissionsCommand
 {
@@ -9,7 +9,7 @@ public sealed record UpdateRolePermissionsCommand
     }
 
     public string RoleId { get; }
-    public List<string> Permissions { get; } = new();
+    public List<string> Permissions { get; } = [];
 }
 
 public sealed class UpdateRolePermissionsCommandValidator : CustomValidator<UpdateRolePermissionsCommand>

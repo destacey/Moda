@@ -1,6 +1,7 @@
 ﻿using Moda.Common.Application.Dtos;
 
 namespace Moda.Work.Application.WorkTeams.Dtos;
+
 public record WorkTeamNavigationDto : NavigationDto, IMapFrom<WorkTeam>
 {
     public required string Code { get; set; }

@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 namespace Moda.Common.Domain.Enums;
+
 public enum Visibility
 {
     [Display(Name = "Public", Description = "The object is visible to all users.", Order = 1)]

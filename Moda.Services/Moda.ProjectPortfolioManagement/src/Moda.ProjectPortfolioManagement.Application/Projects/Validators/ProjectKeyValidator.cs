@@ -19,7 +19,7 @@ public sealed class ProjectKeyValidator : CustomValidator<ProjectKey>
     private async Task<bool> BeUniqueProjectKey(string key, CancellationToken cancellationToken)
     {
         var query = _ppmDbContext.Projects.AsQueryable();
-        
+
         if (_id.HasValue)
         {
             query = query.Where(p => p.Id != _id.Value);

@@ -9,6 +9,7 @@ using Moda.Health.Models;
 using NodaTime;
 
 namespace Moda.Health.Commands;
+
 public sealed record CreateHealthCheckCommand(Guid ObjectId, SystemContext Context, HealthStatus Status, Instant Expiration, string? Note) : ICommand<Guid>;
 
 public sealed class CreateHealthCheckCommandValidator : CustomValidator<CreateHealthCheckCommand>

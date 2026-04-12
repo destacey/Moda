@@ -1,8 +1,9 @@
 ﻿using Mapster;
 using Moda.Common.Application.Dtos;
-using Moda.Goals.Domain.Models;
+using Moda.Common.Domain.Models.Goals;
 
 namespace Moda.Common.Application.Requests.Goals.Dtos;
+
 public sealed record ObjectiveDetailsDto : IMapFrom<Objective>
 {
     /// <summary>Gets or sets the identifier.</summary>

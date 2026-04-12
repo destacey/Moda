@@ -1,6 +1,7 @@
 ﻿using Moda.Work.Application.WorkProjects.Dtos;
 
 namespace Moda.Work.Application.WorkItems.Dtos;
+
 public class WorkItemProjectInfoDto : IMapFrom<WorkItem>
 {
     public Guid Id { get; set; }

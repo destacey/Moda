@@ -4,6 +4,7 @@ using Moda.Work.Domain.Interfaces;
 using Moda.Work.Domain.Tests.Data;
 
 namespace Moda.Work.Domain.Tests.Sut.Models;
+
 public class WorkItemTests
 {
     private readonly TestingDateTimeProvider _dateTimeProvider;
@@ -12,8 +13,8 @@ public class WorkItemTests
 
     public WorkItemTests()
     {
-        _dateTimeProvider = new(new DateTime(2024,04,01, 11,0,0));
-        _workItemFaker = new WorkItemFaker(); 
+        _dateTimeProvider = new(new DateTime(2024, 04, 01, 11, 0, 0));
+        _workItemFaker = new WorkItemFaker();
         _workTypeFaker = new WorkTypeFaker();
     }
 

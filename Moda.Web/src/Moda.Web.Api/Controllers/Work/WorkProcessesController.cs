@@ -65,7 +65,7 @@ public class WorkProcessesController(ILogger<WorkProcessesController> logger, IS
     {
         var result = await _sender.Send(new ActivateWorkProcessCommand(id), cancellationToken);
 
-        return result.IsSuccess 
+        return result.IsSuccess
             ? NoContent()
             : BadRequest(result.ToBadRequestObject(HttpContext));
     }
@@ -79,7 +79,7 @@ public class WorkProcessesController(ILogger<WorkProcessesController> logger, IS
     {
         var result = await _sender.Send(new DeactivateWorkProcessCommand(id), cancellationToken);
 
-        return result.IsSuccess 
+        return result.IsSuccess
             ? NoContent()
             : BadRequest(result.ToBadRequestObject(HttpContext));
     }
