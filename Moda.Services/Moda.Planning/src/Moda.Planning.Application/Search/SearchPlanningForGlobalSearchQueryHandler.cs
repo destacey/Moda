@@ -1,15 +1,17 @@
-﻿using MediatR;
+﻿using Ardalis.GuardClauses;
+using MediatR;
 using Moda.Common.Application.Requests.Goals.Queries;
 using Moda.Common.Application.Search;
 using Moda.Common.Application.Search.Dtos;
+using Moda.Common.Domain.Enums;
 using Moda.Common.Domain.Enums.Planning;
 using Moda.Planning.Domain.Models.Iterations;
 using Moda.Planning.Domain.Models.Roadmaps;
 
 namespace Moda.Planning.Application.Search;
 
-internal sealed class SearchPlanningForGlobalSearchQueryHandler(IPlanningDbContext planningDbContext, ISender sender, IDateTimeProvider dateTimeProvider)
-    : IQueryHandler<SearchPlanningForGlobalSearchQuery, ServiceSearchResponse>, ILongRunningRequest
+internal sealed class SearchPlanningForGlobalSearchQueryHandler(IPlanningDbContext planningDbContext, ISender sender, IDateTimeProvider dateTimeProvider, ICurrentUser currentUser)
+    : IQueryHandler<SearchPlanningForGlobalSearchQuery, ServiceSearchResponse>
 {
     public async Task<ServiceSearchResponse> Handle(SearchPlanningForGlobalSearchQuery request, CancellationToken cancellationToken)
     {
@@ -127,8 +129,11 @@ internal sealed class SearchPlanningForGlobalSearchQueryHandler(IPlanningDbConte
             TotalCount = piTeamCount
         });
 
-        // Roadmaps
+        // Roadmaps (respect visibility: public or current user is a manager)
+        var currentUserEmployeeId = Guard.Against.NullOrEmpty(currentUser.GetEmployeeId());
+        var publicVisibility = Visibility.Public;
         var roadmapQuery = planningDbContext.Roadmaps
+            .Where(r => r.Visibility == publicVisibility || r.RoadmapManagers.Any(m => m.ManagerId == currentUserEmployeeId))
             .Where(r => r.Name.Contains(term));
 
         var roadmapCount = await roadmapQuery.CountAsync(cancellationToken);

@@ -92,13 +92,13 @@ internal sealed class GlobalSearchQueryHandler(ISender sender, ICurrentUser curr
 
 // Query records dispatched to each service — handlers live in their respective Application projects
 public sealed record SearchWorkForGlobalSearchQuery(ServiceSearchRequest Request)
-    : IQuery<ServiceSearchResponse>;
+    : IQuery<ServiceSearchResponse>, ILongRunningRequest;
 
 public sealed record SearchOrganizationForGlobalSearchQuery(ServiceSearchRequest Request)
-    : IQuery<ServiceSearchResponse>;
+    : IQuery<ServiceSearchResponse>, ILongRunningRequest;
 
 public sealed record SearchPlanningForGlobalSearchQuery(ServiceSearchRequest Request)
-    : IQuery<ServiceSearchResponse>;
+    : IQuery<ServiceSearchResponse>, ILongRunningRequest;
 
 public sealed record SearchPpmForGlobalSearchQuery(ServiceSearchRequest Request)
-    : IQuery<ServiceSearchResponse>;
+    : IQuery<ServiceSearchResponse>, ILongRunningRequest;

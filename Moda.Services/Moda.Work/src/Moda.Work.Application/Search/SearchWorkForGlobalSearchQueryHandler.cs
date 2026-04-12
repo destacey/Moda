@@ -5,7 +5,7 @@ using Moda.Work.Application.Persistence;
 namespace Moda.Work.Application.Search;
 
 internal sealed class SearchWorkForGlobalSearchQueryHandler(IWorkDbContext workDbContext)
-    : IQueryHandler<SearchWorkForGlobalSearchQuery, ServiceSearchResponse>, ILongRunningRequest
+    : IQueryHandler<SearchWorkForGlobalSearchQuery, ServiceSearchResponse>
 {
     public async Task<ServiceSearchResponse> Handle(SearchWorkForGlobalSearchQuery request, CancellationToken cancellationToken)
     {
