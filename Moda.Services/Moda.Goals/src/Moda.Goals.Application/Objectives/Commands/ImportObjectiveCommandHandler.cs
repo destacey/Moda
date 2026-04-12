@@ -1,6 +1,6 @@
 ﻿using Moda.Common.Application.Requests.Goals.Commands;
+using Moda.Common.Domain.Models.Goals;
 using Moda.Goals.Application.Persistence;
-using Moda.Goals.Domain.Models;
 
 namespace Moda.Goals.Application.Objectives.Commands;
 

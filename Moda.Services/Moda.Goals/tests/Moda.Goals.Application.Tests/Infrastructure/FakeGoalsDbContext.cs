@@ -3,8 +3,8 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Moda.Common.Domain.Employees;
 using Moda.Common.Domain.Identity;
+using Moda.Common.Domain.Models.Goals;
 using Moda.Goals.Application.Persistence;
-using Moda.Goals.Domain.Models;
 using Moda.Tests.Shared.Infrastructure;
 
 namespace Moda.Goals.Application.Tests.Infrastructure;

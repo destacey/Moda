@@ -5,7 +5,7 @@ using Moda.Common.Domain.Enums.Goals;
 using Moda.Common.Extensions;
 using NodaTime;
 
-namespace Moda.Goals.Domain.Models;
+namespace Moda.Common.Domain.Models.Goals;
 
 // TODO make a BaseObjective to inherit Objective and KeyResult from
 public class Objective : BaseSoftDeletableEntity, IHasIdAndKey

@@ -1,4 +1,4 @@
-﻿using Moda.Goals.Domain.Models;
+﻿using Moda.Common.Domain.Models.Goals;
 
 namespace Moda.Goals.Application.Persistence;
 
