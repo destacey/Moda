@@ -116,8 +116,7 @@ public class ChangeExternalWorkspaceWorkProcessCommandHandlerTests : IDisposable
         // Assert
         result.IsSuccess.Should().BeTrue();
         workspace.WorkProcessId.Should().Be(process.Id);
-        // ChangeWorkProcess no-ops when same ID, but handler still calls SaveChangesAsync
-        _fakeWorkDbContext.SaveChangesCallCount.Should().Be(1);
+        _fakeWorkDbContext.SaveChangesCallCount.Should().Be(0);
     }
 
     [Fact]

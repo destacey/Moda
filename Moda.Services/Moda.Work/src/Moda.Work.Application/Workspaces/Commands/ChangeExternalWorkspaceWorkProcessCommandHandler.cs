@@ -27,6 +27,9 @@ internal sealed class ChangeExternalWorkspaceWorkProcessCommandHandler(IWorkDbCo
             return Result.Failure($"Work process with external ID {request.NewWorkProcessExternalId} not found. The process may not be initialized yet.");
         }
 
+        if (workspace.WorkProcessId == newWorkProcess.Id)
+            return Result.Success();
+
         var result = workspace.ChangeWorkProcess(newWorkProcess.Id, _dateTimeProvider.Now);
         if (result.IsFailure)
         {

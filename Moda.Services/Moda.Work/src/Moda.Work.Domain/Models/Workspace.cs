@@ -214,6 +214,8 @@ public sealed class Workspace : BaseSoftDeletableEntity, IActivatable<WorkspaceA
     /// <returns>A result indicating success or failure.</returns>
     public Result ChangeWorkProcess(Guid newWorkProcessId, Instant timestamp)
     {
+        Guard.Against.Default(newWorkProcessId, nameof(newWorkProcessId));
+
         if (OwnershipInfo.Ownership is not Ownership.Managed)
             return Result.Failure("Unable to change the work process on a non-managed workspace.");
 

@@ -238,7 +238,8 @@ public sealed class AzureDevOpsSyncManager(ILogger<AzureDevOpsSyncManager> logge
 
     /// <summary>
     /// Syncs a single workspace: configuration, iterations, work items, parent changes, dependency changes, and deleted items.
-    /// Each step is attempted independently — a failure in one step does not skip the remaining steps.
+    /// Workspace config and iteration sync failures are blocking — subsequent steps depend on them.
+    /// Work item sync steps (items, parent changes, dependency changes, deleted items) are attempted independently.
     /// </summary>
     private async Task<Result> SyncWorkspaceData(SyncContext ctx, SyncType syncType, AzureDevOpsWorkspaceDto workspace, AzureDevOpsWorkspaceTeamDto[] workspaceTeams, CancellationToken cancellationToken)
     {
