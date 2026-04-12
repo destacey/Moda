@@ -1,4 +1,4 @@
-using Moda.Common.Application.Search;
+﻿using Moda.Common.Application.Search;
 using Moda.Common.Application.Search.Dtos;
 using Moda.Work.Application.Persistence;
 
