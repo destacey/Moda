@@ -14,13 +14,15 @@ on:
 jobs:
     build-and-test-api:
         runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            checks: write
         defaults:
             run:
                 shell: bash
-                working-directory: Moda.Web/src/Moda.Web.Api
         steps:
             - name: checkout
-              uses: actions/checkout@v2
+              uses: actions/checkout@v4
 
             - name: Setup .NET
               uses: actions/setup-dotnet@v3
@@ -28,13 +30,35 @@ jobs:
                   dotnet-version: 10.0.x
 
             - name: Restore dependencies
-              run: dotnet restore
+              run: dotnet restore Moda.slnx
 
             - name: Build
-              run: dotnet build --no-restore
+              run: dotnet build Moda.slnx --no-restore
 
             - name: Test
-              run: dotnet test --no-build --verbosity normal
+              run: dotnet test Moda.slnx --no-build --verbosity normal --logger "trx;LogFileName=test-results.trx" --collect:"XPlat Code Coverage"
+
+            - name: Test Report
+              uses: dorny/test-reporter@v1
+              if: always()
+              with:
+                  name: .NET Test Results
+                  path: "**/test-results.trx"
+                  reporter: dotnet-trx
+
+            - name: Generate Coverage Report
+              uses: danielpalme/ReportGenerator-GitHub-Action@5
+              if: always()
+              with:
+                  reports: "**/coverage.cobertura.xml"
+                  targetdir: coveragereport
+
+            - name: Upload Coverage Report
+              uses: actions/upload-artifact@v4
+              if: always()
+              with:
+                  name: dotnet-coverage
+                  path: coveragereport
 
     build-and-test-client:
         runs-on: ubuntu-latest
@@ -61,6 +85,13 @@ jobs:
 
             - name: npm run test:coverage
               run: npm run test:coverage
+
+            - name: Upload Coverage Report
+              uses: actions/upload-artifact@v4
+              if: always()
+              with:
+                  name: frontend-coverage
+                  path: Moda.Web/src/moda.web.reactclient/coverage
 
     build-and-push-image:
         runs-on: ubuntu-latest
