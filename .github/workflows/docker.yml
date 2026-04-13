@@ -38,6 +38,10 @@ jobs:
             - name: Test
               run: dotnet test Moda.slnx --no-build --verbosity normal --logger "trx;LogFileName=test-results.trx" --collect:"XPlat Code Coverage" --results-directory ./TestResults
 
+            - name: List Test Results
+              if: always()
+              run: find ./TestResults -type f | head -50 || echo "TestResults directory not found"
+
             - name: Test Report
               uses: dorny/test-reporter@v1
               if: always()
@@ -46,11 +50,17 @@ jobs:
                   path: "TestResults/**/test-results.trx"
                   reporter: dotnet-trx
 
+            - name: Merge Coverage Reports
+              if: always()
+              run: |
+                  dotnet tool install --global dotnet-coverage
+                  dotnet-coverage merge TestResults/*/coverage.cobertura.xml --output TestResults/coverage.cobertura.xml --output-format cobertura
+
             - name: Generate Coverage Report
               uses: danielpalme/ReportGenerator-GitHub-Action@5
               if: always()
               with:
-                  reports: "TestResults/**/coverage.cobertura.xml"
+                  reports: "TestResults/coverage.cobertura.xml"
                   targetdir: coveragereport
 
             - name: Upload Coverage Report
