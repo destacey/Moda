@@ -36,21 +36,21 @@ jobs:
               run: dotnet build Moda.slnx --no-restore
 
             - name: Test
-              run: dotnet test Moda.slnx --no-build --verbosity normal --logger "trx;LogFileName=test-results.trx" --collect:"XPlat Code Coverage"
+              run: dotnet test Moda.slnx --no-build --verbosity normal --logger "trx;LogFileName=test-results.trx" --collect:"XPlat Code Coverage" --results-directory ./TestResults
 
             - name: Test Report
               uses: dorny/test-reporter@v1
               if: always()
               with:
                   name: .NET Test Results
-                  path: "**/test-results.trx"
+                  path: "TestResults/**/test-results.trx"
                   reporter: dotnet-trx
 
             - name: Generate Coverage Report
               uses: danielpalme/ReportGenerator-GitHub-Action@5
               if: always()
               with:
-                  reports: "**/coverage.cobertura.xml"
+                  reports: "TestResults/**/coverage.cobertura.xml"
                   targetdir: coveragereport
 
             - name: Upload Coverage Report
