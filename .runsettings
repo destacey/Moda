@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat Code Coverage">
+        <Configuration>
+          <Format>cobertura</Format>
+          <Exclude>
+            [Moda.*.Tests]*,
+            [Moda.Tests.Shared]*,
+            [Moda.ArchitectureTests]*,
+            [Moda.Infrastructure.Migrators.MSSQL]*,
+            [Moda.AppHost]*
+          </Exclude>
+          <ExcludeByAttribute>
+            Obsolete,
+            GeneratedCode,
+            GeneratedCodeAttribute,
+            CompilerGeneratedAttribute,
+            ExcludeFromCodeCoverage,
+            ExcludeFromCodeCoverageAttribute
+          </ExcludeByAttribute>
+          <ExcludeByFile>
+            **/Migrations/**,
+            **/Persistence/Initialization/*Seeder*.cs
+          </ExcludeByFile>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>
