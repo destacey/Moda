@@ -109,10 +109,7 @@
   <Folder Name="/Moda.Web/" />
   <Folder Name="/Moda.Web/src/">
     <Project Path="Moda.Web/src/Moda.Web.Api/Moda.Web.Api.csproj" />
-    <Project Path="Moda.Web/src/moda.web.reactclient/moda.web.reactclient.esproj">
-      <Build />
-      <Deploy />
-    </Project>
+    <Project Path="Moda.Web/src/moda.web.reactclient/moda.web.reactclient.esproj" />
   </Folder>
   <Folder Name="/Moda.Web/tests/">
     <Project Path="Moda.Web/tests/Moda.Web.Api.Tests/Moda.Web.Api.Tests.csproj" />

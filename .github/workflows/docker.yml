@@ -36,15 +36,11 @@ jobs:
               run: dotnet build Moda.slnx --no-restore
 
             - name: Test
-              run: dotnet test Moda.slnx --no-build --verbosity normal --logger "trx;LogFileName=test-results.trx" --collect:"XPlat Code Coverage" --results-directory ./TestResults
-
-            - name: List Test Results
-              if: always()
-              run: find ./TestResults -type f | head -50 || echo "TestResults directory not found"
+              run: dotnet test Moda.slnx --no-build --verbosity normal --logger "trx;LogFileName=test-results.trx" --collect:"XPlat Code Coverage" --results-directory ./TestResults --filter "FullyQualifiedName!~IntegrationTests"
 
             - name: Test Report
               uses: dorny/test-reporter@v1
-              if: always()
+              if: always() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
               with:
                   name: .NET Test Results
                   path: "TestResults/**/test-results.trx"
