@@ -5,8 +5,10 @@ import {
   Fragment,
   type ChangeEvent,
   type Ref,
+  useCallback,
   useEffect,
   useImperativeHandle,
+  useMemo,
   useRef,
   useState,
   ReactElement,
@@ -142,19 +144,22 @@ function TreeGridInner<T extends TreeNode>(
   const [internalFieldErrors, setInternalFieldErrors] =
     useState<Record<string, string>>(EMPTY_FIELD_ERRORS)
   const fieldErrors = externalFieldErrors ?? internalFieldErrors
-  const setFieldErrors = (errors: Record<string, string>) => {
-    if (onFieldErrorsChange) {
-      onFieldErrorsChange(errors)
-    } else {
-      setInternalFieldErrors(errors)
-    }
-  }
+  const setFieldErrors = useCallback(
+    (errors: Record<string, string>) => {
+      if (onFieldErrorsChange) {
+        onFieldErrorsChange(errors)
+      } else {
+        setInternalFieldErrors(errors)
+      }
+    },
+    [onFieldErrorsChange],
+  )
 
   // ─── Draft management ────────────────────────────────────
-  const dataWithDrafts =
-    !createDraftNode || draftTasks.length === 0
-      ? data
-      : mergeDraftsIntoTree(data, draftTasks, createDraftNode)
+  const dataWithDrafts = useMemo(() => {
+    if (!createDraftNode || draftTasks.length === 0) return data
+    return mergeDraftsIntoTree(data, draftTasks, createDraftNode)
+  }, [data, draftTasks, createDraftNode])
 
   // ─── Editing hook ────────────────────────────────────────
   const canEdit = editingConfig?.canEdit ?? false
@@ -220,72 +225,107 @@ function TreeGridInner<T extends TreeNode>(
   const canCreateDraft =
     canEdit && !isEditing && draftTasks.length === 0 && !!createDraftNode
 
-  const addDraft = (parentId?: string): string | null => {
-    if (!canCreateDraft) return null
+  const addDraft = useCallback(
+    (parentId?: string): string | null => {
+      if (!canCreateDraft) return null
 
-    draftCounterRef.current += 1
-    const newDraft: DraftItem = {
-      id: `${draftPrefix}${Date.now()}-${draftCounterRef.current}`,
-      parentId,
-      order: 0,
-    }
-    setDraftTasks((prev) => {
-      const next = [...prev, newDraft]
-      onDraftsChange?.(next)
-      return next
-    })
-
-    // Ensure parent is expanded when adding a child draft
-    if (parentId && tableRef.current) {
-      const rows = tableRef.current.getRowModel().rows
-      const parentRow = rows.find((r: any) => r.original.id === parentId)
-      if (parentRow && !parentRow.getIsExpanded()) {
-        parentRow.toggleExpanded()
+      draftCounterRef.current += 1
+      const newDraft: DraftItem = {
+        id: `${draftPrefix}${Date.now()}-${draftCounterRef.current}`,
+        parentId,
+        order: 0,
       }
-    }
+      setDraftTasks((prev) => {
+        const next = [...prev, newDraft]
+        onDraftsChange?.(next)
+        return next
+      })
 
-    // Defer selection so the draft row renders first (unselected),
-    // then a second render mounts the editable input for focusing.
-    requestAnimationFrame(() => {
-      setTimeout(() => {
-        setSelectedRowId(newDraft.id)
-        setSelectedCellId(`${newDraft.id}-name`)
-      }, 50)
-    })
+      // Ensure parent is expanded when adding a child draft
+      if (parentId && tableRef.current) {
+        const rows = tableRef.current.getRowModel().rows
+        const parentRow = rows.find((r: any) => r.original.id === parentId)
+        if (parentRow && !parentRow.getIsExpanded()) {
+          parentRow.toggleExpanded()
+        }
+      }
 
-    return newDraft.id
-  }
+      // Defer selection so the draft row renders first (unselected),
+      // then a second render mounts the editable input for focusing.
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          setSelectedRowId(newDraft.id)
+          setSelectedCellId(`${newDraft.id}-name`)
+        }, 50)
+      })
 
-  const addDraftAtRoot = () => addDraft()
+      return newDraft.id
+    },
+    [
+      canCreateDraft,
+      draftPrefix,
+      onDraftsChange,
+      setSelectedRowId,
+      setSelectedCellId,
+      tableRef,
+    ],
+  )
 
-  const addDraftAsChild = (parentId: string) => addDraft(parentId)
+  const addDraftAtRoot = useCallback(() => addDraft(), [addDraft])
+
+  const addDraftAsChild = useCallback(
+    (parentId: string) => addDraft(parentId),
+    [addDraft],
+  )
 
   // ─── Column context ──────────────────────────────────────
   const dragEnabledBase =
     enableDragAndDrop && !!onNodeMove && !isLoading && !isEditing
 
-  const dragEnabledForColumns =
-    dragEnabledBase &&
-    !(!!searchValue || columnFilters.length > 0 || sorting.length > 0)
+  const columnContext: TreeGridColumnContext = useMemo(() => {
+    const dragEnabledForColumns =
+      dragEnabledBase &&
+      !(!!searchValue || columnFilters.length > 0 || sorting.length > 0)
 
-  const columnContext: TreeGridColumnContext = {
+    return {
+      selectedRowId,
+      handleKeyDown,
+      createSelectInputKeyDown,
+      getFieldError,
+      editableColumns,
+      isDragEnabled: dragEnabledForColumns,
+      canCreateDraft,
+      addDraftAtRoot,
+      addDraftAsChild,
+    }
+  }, [
+    searchValue,
+    columnFilters.length,
+    sorting.length,
     selectedRowId,
     handleKeyDown,
     createSelectInputKeyDown,
     getFieldError,
     editableColumns,
-    isDragEnabled: dragEnabledForColumns,
+    dragEnabledBase,
     canCreateDraft,
     addDraftAtRoot,
     addDraftAsChild,
-  }
+  ])
 
   // ─── Resolved columns ───────────────────────────────────
-  const columns =
-    typeof columnsProp === 'function' ? columnsProp(columnContext) : columnsProp
+  const columns = useMemo(() => {
+    if (typeof columnsProp === 'function') {
+      return columnsProp(columnContext)
+    }
+    return columnsProp
+  }, [columnsProp, columnContext])
 
   // ─── Flattened tree for DnD ──────────────────────────────
-  const flattenedNodes = flattenTree(dataWithDrafts)
+  const flattenedNodes = useMemo(
+    () => flattenTree(dataWithDrafts),
+    [dataWithDrafts],
+  )
 
   // ─── DnD setup ───────────────────────────────────────────
   const sensors = useSensors(
@@ -295,65 +335,74 @@ function TreeGridInner<T extends TreeNode>(
     useSensor(KeyboardSensor),
   )
 
-  const handleDragStart = (event: DragStartEvent) => {
-    setDraggedNodeId(event.active.id as string)
-    setSelectedRowId(null)
-  }
+  const handleDragStart = useCallback(
+    (event: DragStartEvent) => {
+      setDraggedNodeId(event.active.id as string)
+      setSelectedRowId(null)
+    },
+    [setSelectedRowId],
+  )
 
-  const handleDragEnd = async (event: DragEndEvent) => {
-    const { active, over, delta } = event
-    setDraggedNodeId(null)
+  const handleDragEnd = useCallback(
+    async (event: DragEndEvent) => {
+      const { active, over, delta } = event
+      setDraggedNodeId(null)
 
-    if (!over || !onNodeMove) return
+      if (!over || !onNodeMove) return
 
-    const horizontalOffset = delta.x
-    const hasHorizontalMovement =
-      Math.abs(horizontalOffset) >= INDENTATION_WIDTH / 2
+      const horizontalOffset = delta.x
+      const hasHorizontalMovement =
+        Math.abs(horizontalOffset) >= INDENTATION_WIDTH / 2
 
-    if (active.id === over.id && !hasHorizontalMovement) return
+      if (active.id === over.id && !hasHorizontalMovement) return
 
-    const projection = getProjection(
-      flattenedNodes,
-      active.id as string,
-      over.id as string,
-      horizontalOffset,
-      INDENTATION_WIDTH,
-      moveValidator,
-    )
-
-    if (!projection.canDrop) {
-      onMoveRejected?.(
-        projection.reason || 'Cannot move item to this location',
+      const projection = getProjection(
+        flattenedNodes,
+        active.id as string,
+        over.id as string,
+        horizontalOffset,
+        INDENTATION_WIDTH,
+        moveValidator,
       )
-      return
-    }
 
-    const overIndex = flattenedNodes.findIndex((t) => t.node.id === over.id)
-    const newOrder = calculateOrderInParent(
-      flattenedNodes,
-      active.id as string,
-      overIndex,
-      projection.parentId,
-    )
+      if (!projection.canDrop) {
+        onMoveRejected?.(
+          projection.reason || 'Cannot move item to this location',
+        )
+        return
+      }
 
-    try {
-      await onNodeMove(active.id as string, projection.parentId, newOrder, over.id as string, overIndex)
-    } catch (error) {
-      onMoveRejected?.(
-        error instanceof Error ? error.message : 'Failed to move item',
+      const overIndex = flattenedNodes.findIndex((t) => t.node.id === over.id)
+      const newOrder = calculateOrderInParent(
+        flattenedNodes,
+        active.id as string,
+        overIndex,
+        projection.parentId,
       )
-    }
-  }
 
-  const handleDragCancel = (_event: DragCancelEvent) => {
+      try {
+        await onNodeMove(active.id as string, projection.parentId, newOrder, over.id as string, overIndex)
+      } catch (error) {
+        onMoveRejected?.(
+          error instanceof Error ? error.message : 'Failed to move item',
+        )
+      }
+    },
+    [flattenedNodes, moveValidator, onNodeMove, onMoveRejected],
+  )
+
+  const handleDragCancel = useCallback((_event: DragCancelEvent) => {
     setDraggedNodeId(null)
     if (document.activeElement instanceof HTMLElement) {
       document.activeElement.blur()
     }
-  }
+  }, [])
 
   // ─── TanStack table ─────────────────────────────────────
-  const totalRowCount = countTreeNodes(data) + draftTasks.length
+  const totalRowCount = useMemo(
+    () => countTreeNodes(data) + draftTasks.length,
+    [data, draftTasks.length],
+  )
 
   // eslint-disable-next-line react-hooks/incompatible-library -- TanStack Table does not yet support React Compiler
   const table = useReactTable({
@@ -401,18 +450,18 @@ function TreeGridInner<T extends TreeNode>(
   // ─── Toolbar wiring ──────────────────────────────────────
   const visibleColumnCount = table.getVisibleLeafColumns().length
 
-  const onSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const onSearchChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     setSearchValue(e.target.value)
-  }
+  }, [])
 
-  const onClearFilters = () => {
+  const onClearFilters = useCallback(() => {
     setSearchValue('')
     setSorting([])
     setColumnFilters([])
     setTextFilterDraftValues({})
     filterDebounceTimersRef.current.forEach((timer) => clearTimeout(timer))
     filterDebounceTimersRef.current.clear()
-  }
+  }, [])
 
   const hasActiveFilters =
     !!searchValue || columnFilters.length > 0 || sorting.length > 0
@@ -445,44 +494,47 @@ function TreeGridInner<T extends TreeNode>(
     }
   }, [])
 
-  const handleTextFilterChange = (
-    e: ChangeEvent<HTMLInputElement>,
-    columnId: string,
-    setFilterValue: (value: string | undefined) => void,
-    filterInputId: string,
-  ) => {
-    const next = e.target.value
-    setTextFilterDraftValues((prev) => ({
-      ...prev,
-      [columnId]: next,
-    }))
+  const handleTextFilterChange = useCallback(
+    (
+      e: ChangeEvent<HTMLInputElement>,
+      columnId: string,
+      setFilterValue: (value: string | undefined) => void,
+      filterInputId: string,
+    ) => {
+      const next = e.target.value
+      setTextFilterDraftValues((prev) => ({
+        ...prev,
+        [columnId]: next,
+      }))
 
-    const existingTimer = filterDebounceTimersRef.current.get(columnId)
-    if (existingTimer) {
-      clearTimeout(existingTimer)
-    }
+      const existingTimer = filterDebounceTimersRef.current.get(columnId)
+      if (existingTimer) {
+        clearTimeout(existingTimer)
+      }
 
-    const timer = setTimeout(() => {
-      setFilterValue(next ? next : undefined)
-      setTextFilterDraftValues((prev) => {
-        if (!(columnId in prev)) return prev
-        const updated = { ...prev }
-        delete updated[columnId]
-        return updated
-      })
-      filterDebounceTimersRef.current.delete(columnId)
-    }, FILTER_DEBOUNCE_MS)
-    filterDebounceTimersRef.current.set(columnId, timer)
+      const timer = setTimeout(() => {
+        setFilterValue(next ? next : undefined)
+        setTextFilterDraftValues((prev) => {
+          if (!(columnId in prev)) return prev
+          const updated = { ...prev }
+          delete updated[columnId]
+          return updated
+        })
+        filterDebounceTimersRef.current.delete(columnId)
+      }, FILTER_DEBOUNCE_MS)
+      filterDebounceTimersRef.current.set(columnId, timer)
 
-    pendingFilterFocusRef.current = {
-      inputId: filterInputId,
-      selectionStart: e.target.selectionStart,
-      selectionEnd: e.target.selectionEnd,
-    }
-  }
+      pendingFilterFocusRef.current = {
+        inputId: filterInputId,
+        selectionStart: e.target.selectionStart,
+        selectionEnd: e.target.selectionEnd,
+      }
+    },
+    [],
+  )
 
   // ─── CSV export ──────────────────────────────────────────
-  const onExportCsv = () => {
+  const onExportCsv = useCallback(() => {
     const exportableColumns = columns.filter((col: any) => {
       const meta = col.meta as TreeGridColumnMeta | undefined
       if (meta?.enableExport === false) return false
@@ -519,7 +571,7 @@ function TreeGridInner<T extends TreeNode>(
 
     const csv = generateCsv(headers, rows)
     downloadCsvWithTimestamp(csv, csvFileName)
-  }
+  }, [table, columns, csvFileName])
 
   // ─── Ref handle ──────────────────────────────────────────
   useImperativeHandle(ref, () => ({
@@ -528,16 +580,19 @@ function TreeGridInner<T extends TreeNode>(
   }))
 
   // ─── Row/cell click handlers ────────────────────────────
-  const handleRowClickWithContext = (e: React.MouseEvent, rowId: string) => {
-    void handleRowClick(e, {
-      rowId,
-      isEditableColumn: (columnId) => editableColumns.includes(columnId),
-      getClickedColumnId: (target) =>
-        target.closest('td')?.getAttribute('data-column-id') ?? null,
-    })
-  }
+  const handleRowClickWithContext = useCallback(
+    (e: React.MouseEvent, rowId: string) => {
+      void handleRowClick(e, {
+        rowId,
+        isEditableColumn: (columnId) => editableColumns.includes(columnId),
+        getClickedColumnId: (target) =>
+          target.closest('td')?.getAttribute('data-column-id') ?? null,
+      })
+    },
+    [handleRowClick, editableColumns],
+  )
 
-  const handleCellClick = (e: React.MouseEvent) => {
+  const handleCellClick = useCallback((e: React.MouseEvent) => {
     const target = e.target as HTMLElement
     if (
       target.closest('input') ||
@@ -547,7 +602,7 @@ function TreeGridInner<T extends TreeNode>(
     ) {
       e.stopPropagation()
     }
-  }
+  }, [])
 
   // ─── Resolved leftSlot ──────────────────────────────────
   const resolvedLeftSlot =
