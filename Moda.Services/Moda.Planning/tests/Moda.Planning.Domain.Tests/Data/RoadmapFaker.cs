@@ -1,4 +1,5 @@
 ﻿using Moda.Common.Domain.Enums;
+using Moda.Common.Domain.Enums.Planning;
 using Moda.Common.Models;
 using Moda.Planning.Domain.Models.Roadmaps;
 using Moda.Tests.Shared.Data;
@@ -17,6 +18,7 @@ public class RoadmapFaker : PrivateConstructorFaker<Roadmap>
         RuleFor(x => x.Description, f => f.Random.Words(5));
         RuleFor(x => x.DateRange, f => new LocalDateRange(BaseDate, BaseDate.PlusDays(10)));
         RuleFor(x => x.Visibility, f => f.PickRandom<Visibility>());
+        RuleFor(x => x.State, f => RoadmapState.Active);
         //RuleFor(x => x.Managers, f => managerFaker.Generate(1)); // TODO not working
     }
 
@@ -25,13 +27,14 @@ public class RoadmapFaker : PrivateConstructorFaker<Roadmap>
 
 public static class RoadmapFakerExtensions
 {
-    public static RoadmapFaker WithData(this RoadmapFaker faker, Guid? id = null, string? name = null, string? description = null, LocalDateRange? dateRange = null, Visibility? visibility = null)
+    public static RoadmapFaker WithData(this RoadmapFaker faker, Guid? id = null, string? name = null, string? description = null, LocalDateRange? dateRange = null, Visibility? visibility = null, RoadmapState? state = null)
     {
         if (id.HasValue) { faker.RuleFor(x => x.Id, id.Value); }
         if (!string.IsNullOrWhiteSpace(name)) { faker.RuleFor(x => x.Name, name); }
         if (!string.IsNullOrWhiteSpace(description)) { faker.RuleFor(x => x.Description, description); }
         if (dateRange is not null) { faker.RuleFor(x => x.DateRange, dateRange); }
         if (visibility.HasValue) { faker.RuleFor(x => x.Visibility, visibility); }
+        if (state.HasValue) { faker.RuleFor(x => x.State, state.Value); }
         // TODO - Add roadmap managers
 
         return faker;

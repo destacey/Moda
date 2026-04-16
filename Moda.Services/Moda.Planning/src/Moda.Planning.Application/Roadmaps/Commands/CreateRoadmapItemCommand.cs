@@ -5,7 +5,7 @@ using OneOf;
 
 namespace Moda.Planning.Application.Roadmaps.Commands;
 
-public sealed record CreateRoadmapItemCommand(Guid RoadmapId, OneOf<IUpsertRoadmapActivity, IUpsertRoadmapMilestone, IUpsertRoadmapTimebox> item) : ICommand<Guid>;
+public sealed record CreateRoadmapItemCommand(Guid RoadmapId, OneOf<IUpsertRoadmapActivity, IUpsertRoadmapMilestone, IUpsertRoadmapTimebox> Item) : ICommand<Guid>;
 
 public sealed class CreateRoadmapItemCommandValidator : AbstractValidator<CreateRoadmapItemCommand>
 {
@@ -25,7 +25,7 @@ public sealed class CreateRoadmapItemCommandValidator : AbstractValidator<Create
         RuleFor(x => x.RoadmapId)
             .NotEmpty();
 
-        RuleFor(x => x.item)
+        RuleFor(x => x.Item)
             .NotNull()
             .Custom((item, context) =>
             {
@@ -68,7 +68,7 @@ internal sealed class CreateRoadmapItemCommandHandler(IPlanningDbContext plannin
             if (roadmap is null)
                 return Result.Failure<Guid>($"Roadmap with id {request.RoadmapId} not found");
 
-            Result<BaseRoadmapItem> result = request.item.Match(
+            Result<BaseRoadmapItem> result = request.Item.Match(
                activity => roadmap.CreateActivity(activity, _currentUserEmployeeId).Map(x => (BaseRoadmapItem)x),
                milestone => roadmap.CreateMilestone(milestone, _currentUserEmployeeId).Map(x => (BaseRoadmapItem)x),
                timebox => roadmap.CreateTimebox(timebox, _currentUserEmployeeId).Map(x => (BaseRoadmapItem)x)

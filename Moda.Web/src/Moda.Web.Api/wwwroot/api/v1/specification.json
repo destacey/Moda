@@ -12902,6 +12902,23 @@
         ],
         "summary": "Get a list of roadmaps.",
         "operationId": "Roadmaps_GetRoadmaps",
+        "parameters": [
+          {
+            "name": "state",
+            "in": "query",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            "x-position": 1
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -13160,6 +13177,98 @@
         ],
         "summary": "Delete a roadmap.",
         "operationId": "Roadmaps_Delete",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/planning/roadmaps/{id}/archive": {
+      "post": {
+        "tags": [
+          "Roadmaps"
+        ],
+        "summary": "Archive a roadmap.",
+        "operationId": "Roadmaps_Archive",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/planning/roadmaps/{id}/activate": {
+      "post": {
+        "tags": [
+          "Roadmaps"
+        ],
+        "summary": "Activate a roadmap.",
+        "operationId": "Roadmaps_Activate",
         "parameters": [
           {
             "name": "id",
@@ -13823,6 +13932,48 @@
                   "type": "array",
                   "items": {
                     "$ref": "#/components/schemas/VisibilityDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/planning/roadmaps/states": {
+      "get": {
+        "tags": [
+          "Roadmaps"
+        ],
+        "summary": "Get a list of all roadmap states.",
+        "operationId": "Roadmaps_GetStateOptions",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RoadmapStateDto"
                   }
                 }
               }
@@ -28166,6 +28317,7 @@
           "start",
           "end",
           "visibility",
+          "state",
           "roadmapManagers"
         ],
         "properties": {
@@ -28193,6 +28345,9 @@
           "visibility": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
           },
+          "state": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
           "color": {
             "type": "string",
             "nullable": true
@@ -28215,6 +28370,7 @@
           "start",
           "end",
           "visibility",
+          "state",
           "roadmapManagers"
         ],
         "properties": {
@@ -28244,6 +28400,9 @@
             "format": "date"
           },
           "visibility": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "state": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
           },
           "roadmapManagers": {
@@ -29107,6 +29266,17 @@
         }
       },
       "VisibilityDto": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CommonEnumDto"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false
+          }
+        ]
+      },
+      "RoadmapStateDto": {
         "allOf": [
           {
             "$ref": "#/components/schemas/CommonEnumDto"

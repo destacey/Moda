@@ -40,6 +40,11 @@ public sealed record RoadmapDetailsDto : IMapFrom<Roadmap>
     public required SimpleNavigationDto Visibility { get; set; }
 
     /// <summary>
+    /// The state of the Roadmap.
+    /// </summary>
+    public required SimpleNavigationDto State { get; set; }
+
+    /// <summary>
     /// The managers of the Roadmap.
     /// </summary>
     public required List<EmployeeNavigationDto> RoadmapManagers { get; set; }
@@ -50,6 +55,7 @@ public sealed record RoadmapDetailsDto : IMapFrom<Roadmap>
             .Map(dest => dest.Start, src => src.DateRange.Start)
             .Map(dest => dest.End, src => src.DateRange.End)
             .Map(dest => dest.Visibility, src => SimpleNavigationDto.FromEnum(src.Visibility))
+            .Map(dest => dest.State, src => SimpleNavigationDto.FromEnum(src.State))
             .Map(dest => dest.RoadmapManagers, src => src.RoadmapManagers.Select(m => EmployeeNavigationDto.From(m.Manager!)));
     }
 }

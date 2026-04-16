@@ -1,6 +1,7 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
 using Moda.Common.Domain.Enums;
+using Moda.Common.Domain.Enums.Planning;
 using Moda.Common.Domain.Interfaces;
 using Moda.Planning.Domain.Enums;
 using Moda.Planning.Domain.Interfaces;
@@ -17,7 +18,7 @@ public sealed class Roadmap : BaseAuditableEntity, ILocalSchedule, IHasIdAndKey
 
     private Roadmap() { }
 
-    private Roadmap(string name, string? description, LocalDateRange dateRange, Visibility visibility, IEnumerable<Guid> roadmapManagerIds)
+    private Roadmap(string name, string? description, LocalDateRange dateRange, Visibility visibility, RoadmapState state, IEnumerable<Guid> roadmapManagerIds)
     {
         _objectConstruction = true;
 
@@ -27,6 +28,7 @@ public sealed class Roadmap : BaseAuditableEntity, ILocalSchedule, IHasIdAndKey
         Description = description;
         DateRange = dateRange;
         Visibility = visibility;
+        State = state;
 
         foreach (var managerId in roadmapManagerIds)
         {
@@ -74,6 +76,11 @@ public sealed class Roadmap : BaseAuditableEntity, ILocalSchedule, IHasIdAndKey
     public Visibility Visibility { get; private set; }
 
     /// <summary>
+    /// The state of the Roadmap.
+    /// </summary>
+    public RoadmapState State { get; private set; }
+
+    /// <summary>
     /// The managers of the Roadmap. Managers have full control over the Roadmap.
     /// </summary>
     public IReadOnlyList<RoadmapManager> RoadmapManagers => _roadmapManagers.AsReadOnly();
@@ -97,7 +104,7 @@ public sealed class Roadmap : BaseAuditableEntity, ILocalSchedule, IHasIdAndKey
     /// <returns></returns>
     public Result Update(string name, string? description, LocalDateRange dateRange, IEnumerable<Guid> roadmapManagerIds, Visibility visibility, Guid currentUserEmployeeId)
     {
-        var isManagerResult = CanEmployeeManage(currentUserEmployeeId);
+        var isManagerResult = CanModify(currentUserEmployeeId);
         if (isManagerResult.IsFailure)
         {
             return isManagerResult;
@@ -151,7 +158,7 @@ public sealed class Roadmap : BaseAuditableEntity, ILocalSchedule, IHasIdAndKey
         // bypass manager check if no managers exist on initial creation
         if (!_objectConstruction)
         {
-            var isManagerResult = CanEmployeeManage(currentUserEmployeeId);
+            var isManagerResult = CanModify(currentUserEmployeeId);
             if (isManagerResult.IsFailure)
             {
                 return isManagerResult;
@@ -174,7 +181,7 @@ public sealed class Roadmap : BaseAuditableEntity, ILocalSchedule, IHasIdAndKey
     /// <returns></returns>
     public Result RemoveManager(Guid roadmapManagerId, Guid currentUserEmployeeId)
     {
-        var isManagerResult = CanEmployeeManage(currentUserEmployeeId);
+        var isManagerResult = CanModify(currentUserEmployeeId);
         if (isManagerResult.IsFailure)
         {
             return isManagerResult;
@@ -204,7 +211,7 @@ public sealed class Roadmap : BaseAuditableEntity, ILocalSchedule, IHasIdAndKey
     /// <returns></returns>
     public Result RemoveChild(Guid childId, Guid currentUserEmployeeId)
     {
-        var isManagerResult = CanEmployeeManage(currentUserEmployeeId);
+        var isManagerResult = CanModify(currentUserEmployeeId);
         if (isManagerResult.IsFailure)
         {
             return isManagerResult;
@@ -231,7 +238,7 @@ public sealed class Roadmap : BaseAuditableEntity, ILocalSchedule, IHasIdAndKey
     /// <returns></returns>
     public Result SetChildrenOrder(Dictionary<Guid, int> childActivities, Guid currentUserEmployeeId)
     {
-        var isManagerResult = CanEmployeeManage(currentUserEmployeeId);
+        var isManagerResult = CanModify(currentUserEmployeeId);
         if (isManagerResult.IsFailure)
         {
             return isManagerResult;
@@ -276,7 +283,7 @@ public sealed class Roadmap : BaseAuditableEntity, ILocalSchedule, IHasIdAndKey
             return Result.Failure("Order must be greater than 0.");
         }
 
-        var isManagerResult = CanEmployeeManage(currentUserEmployeeId);
+        var isManagerResult = CanModify(currentUserEmployeeId);
         if (isManagerResult.IsFailure)
         {
             return isManagerResult;
@@ -350,8 +357,46 @@ public sealed class Roadmap : BaseAuditableEntity, ILocalSchedule, IHasIdAndKey
     /// <returns></returns>
     public Result CanDelete(Guid currentUserEmployeeId)
     {
-        return CanEmployeeManage(currentUserEmployeeId);
+        return CanModify(currentUserEmployeeId);
     }
+
+    /// <summary>
+    /// Archives the Roadmap. Only active roadmaps can be archived.
+    /// </summary>
+    /// <param name="currentUserEmployeeId"></param>
+    /// <returns></returns>
+    public Result Archive(Guid currentUserEmployeeId)
+    {
+        if (!IsManager(currentUserEmployeeId))
+            return Result.Failure("User is not a roadmap manager of this roadmap.");
+
+        if (State != RoadmapState.Active)
+            return Result.Failure("Only active roadmaps can be archived.");
+
+        State = RoadmapState.Archived;
+
+        return Result.Success();
+    }
+
+    /// <summary>
+    /// Activates an archived Roadmap.
+    /// </summary>
+    /// <param name="currentUserEmployeeId"></param>
+    /// <returns></returns>
+    public Result Activate(Guid currentUserEmployeeId)
+    {
+        if (!IsManager(currentUserEmployeeId))
+            return Result.Failure("User is not a roadmap manager of this roadmap.");
+
+        if (State != RoadmapState.Archived)
+            return Result.Failure("Only archived roadmaps can be activated.");
+
+        State = RoadmapState.Active;
+
+        return Result.Success();
+    }
+
+    private bool IsManager(Guid employeeId) => _roadmapManagers.Any(x => x.ManagerId == employeeId);
 
     /// <summary>
     /// Can the employee manage the Roadmap.
@@ -360,9 +405,22 @@ public sealed class Roadmap : BaseAuditableEntity, ILocalSchedule, IHasIdAndKey
     /// <returns></returns>
     private Result CanEmployeeManage(Guid employeeId)
     {
-        return _roadmapManagers.Any(x => x.ManagerId == employeeId)
+        return IsManager(employeeId)
             ? Result.Success()
             : Result.Failure("User is not a roadmap manager of this roadmap.");
+    }
+
+    /// <summary>
+    /// Can the employee modify the Roadmap.  The Roadmap must be active and the employee must be a manager.
+    /// </summary>
+    /// <param name="employeeId"></param>
+    /// <returns></returns>
+    private Result CanModify(Guid employeeId)
+    {
+        if (State == RoadmapState.Archived)
+            return Result.Failure("Archived roadmaps cannot be modified.");
+
+        return CanEmployeeManage(employeeId);
     }
 
 
@@ -385,7 +443,7 @@ public sealed class Roadmap : BaseAuditableEntity, ILocalSchedule, IHasIdAndKey
     {
         try
         {
-            var isManagerResult = CanEmployeeManage(currentUserEmployeeId);
+            var isManagerResult = CanModify(currentUserEmployeeId);
             if (isManagerResult.IsFailure)
             {
                 return Result.Failure<T>(isManagerResult.Error);
@@ -454,7 +512,7 @@ public sealed class Roadmap : BaseAuditableEntity, ILocalSchedule, IHasIdAndKey
     {
         try
         {
-            var isManagerResult = CanEmployeeManage(currentUserEmployeeId);
+            var isManagerResult = CanModify(currentUserEmployeeId);
             if (isManagerResult.IsFailure)
             {
                 return isManagerResult;
@@ -550,7 +608,7 @@ public sealed class Roadmap : BaseAuditableEntity, ILocalSchedule, IHasIdAndKey
         OneOf<IUpsertRoadmapActivityDateRange, IUpsertRoadmapMilestoneDate, IUpsertRoadmapTimeboxDateRange> dateUpdate,
         Guid currentUserEmployeeId)
     {
-        var isManagerResult = CanEmployeeManage(currentUserEmployeeId);
+        var isManagerResult = CanModify(currentUserEmployeeId);
         if (isManagerResult.IsFailure)
             return isManagerResult;
 
@@ -585,7 +643,7 @@ public sealed class Roadmap : BaseAuditableEntity, ILocalSchedule, IHasIdAndKey
     /// <returns></returns>
     public Result MoveActivity(Guid activityId, Guid? newParentId, int newOrder, Guid currentUserEmployeeId)
     {
-        var isManagerResult = CanEmployeeManage(currentUserEmployeeId);
+        var isManagerResult = CanModify(currentUserEmployeeId);
         if (isManagerResult.IsFailure)
         {
             return isManagerResult;
@@ -666,7 +724,7 @@ public sealed class Roadmap : BaseAuditableEntity, ILocalSchedule, IHasIdAndKey
 
     public Result DeleteItem(Guid itemId, Guid currentUserEmployeeId)
     {
-        var isManagerResult = CanEmployeeManage(currentUserEmployeeId);
+        var isManagerResult = CanModify(currentUserEmployeeId);
         if (isManagerResult.IsFailure)
         {
             return isManagerResult;
@@ -735,7 +793,7 @@ public sealed class Roadmap : BaseAuditableEntity, ILocalSchedule, IHasIdAndKey
     {
         try
         {
-            return new Roadmap(name, description, dateRange, visibility, roadmapManagerIds);
+            return new Roadmap(name, description, dateRange, visibility, RoadmapState.Active, roadmapManagerIds);
         }
         catch (Exception ex)
         {
@@ -754,7 +812,7 @@ public sealed class Roadmap : BaseAuditableEntity, ILocalSchedule, IHasIdAndKey
     {
         try
         {
-            var newRoadmap = new Roadmap(name, Description, DateRange, visibility, roadmapManagerIds);
+            var newRoadmap = new Roadmap(name, Description, DateRange, visibility, RoadmapState.Active, roadmapManagerIds);
 
             // Copy all items - we need to maintain a mapping of old items to new items for parent references
             var itemMapping = new Dictionary<Guid, BaseRoadmapItem>();
