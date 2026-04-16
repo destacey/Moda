@@ -1,9 +1,9 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Moda.Planning.Application.EstimationScales.Commands;
 using Moda.Planning.Application.Tests.Infrastructure;
 using Moq;
 
-namespace Moda.Planning.Application.Tests.EstimationScales.Commands;
+namespace Moda.Planning.Application.Tests.Sut.EstimationScales.Commands;
 
 public class CreateEstimationScaleCommandHandlerTests : IDisposable
 {

@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Moda.Common.Application.Interfaces;
 using Moda.Common.Domain.Enums.Planning;
 using Moda.Planning.Application.Roadmaps.Commands;
@@ -7,27 +7,36 @@ using Moda.Planning.Domain.Models.Roadmaps;
 using Moda.Planning.Domain.Tests.Data;
 using Moq;
 
-namespace Moda.Planning.Application.Tests.Roadmaps.Commands;
+namespace Moda.Planning.Application.Tests.Sut.Roadmaps.Commands;
 
-public class ArchiveRoadmapCommandHandlerTests : IDisposable
+public class ActivateRoadmapCommandHandlerTests : IDisposable
 {
     private readonly FakePlanningDbContext _dbContext;
-    private readonly Mock<ILogger<ArchiveRoadmapCommandHandler>> _mockLogger;
+    private readonly Mock<ILogger<ActivateRoadmapCommandHandler>> _mockLogger;
     private readonly Mock<ICurrentUser> _mockCurrentUser;
     private readonly Guid _currentEmployeeId = Guid.NewGuid();
     private readonly RoadmapFaker _faker;
 
-    public ArchiveRoadmapCommandHandlerTests()
+    public ActivateRoadmapCommandHandlerTests()
     {
         _dbContext = new FakePlanningDbContext();
-        _mockLogger = new Mock<ILogger<ArchiveRoadmapCommandHandler>>();
+        _mockLogger = new Mock<ILogger<ActivateRoadmapCommandHandler>>();
         _mockCurrentUser = new Mock<ICurrentUser>();
         _mockCurrentUser.Setup(u => u.GetEmployeeId()).Returns(_currentEmployeeId);
         _faker = new RoadmapFaker();
     }
 
-    private ArchiveRoadmapCommandHandler CreateHandler() =>
+    private ActivateRoadmapCommandHandler CreateHandler() =>
         new(_dbContext, _mockCurrentUser.Object, _mockLogger.Object);
+
+    private Roadmap CreateArchivedRoadmap(Guid? managerId = null)
+    {
+        var mgrId = managerId ?? _currentEmployeeId;
+        var fakeRoadmap = _faker.Generate();
+        var roadmap = Roadmap.Create(fakeRoadmap.Name, fakeRoadmap.Description, fakeRoadmap.DateRange, fakeRoadmap.Visibility, [mgrId]).Value;
+        roadmap.Archive(mgrId);
+        return roadmap;
+    }
 
     private Roadmap CreateActiveRoadmap(Guid? managerId = null)
     {
@@ -37,21 +46,21 @@ public class ArchiveRoadmapCommandHandlerTests : IDisposable
     }
 
     [Fact]
-    public async Task Handle_ShouldArchiveRoadmap_WhenActiveAndUserIsManager()
+    public async Task Handle_ShouldActivateRoadmap_WhenArchivedAndUserIsManager()
     {
         // Arrange
-        var roadmap = CreateActiveRoadmap();
+        var roadmap = CreateArchivedRoadmap();
         _dbContext.AddRoadmap(roadmap);
         var handler = CreateHandler();
 
-        var command = new ArchiveRoadmapCommand(roadmap.Id);
+        var command = new ActivateRoadmapCommand(roadmap.Id);
 
         // Act
         var result = await handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        roadmap.State.Should().Be(RoadmapState.Archived);
+        roadmap.State.Should().Be(RoadmapState.Active);
         _dbContext.SaveChangesCallCount.Should().Be(1);
     }
 
@@ -60,7 +69,7 @@ public class ArchiveRoadmapCommandHandlerTests : IDisposable
     {
         // Arrange
         var handler = CreateHandler();
-        var command = new ArchiveRoadmapCommand(Guid.NewGuid());
+        var command = new ActivateRoadmapCommand(Guid.NewGuid());
 
         // Act
         var result = await handler.Handle(command, TestContext.Current.CancellationToken);
@@ -76,31 +85,11 @@ public class ArchiveRoadmapCommandHandlerTests : IDisposable
     {
         // Arrange
         var otherManagerId = Guid.NewGuid();
-        var roadmap = CreateActiveRoadmap(managerId: otherManagerId);
+        var roadmap = CreateArchivedRoadmap(managerId: otherManagerId);
         _dbContext.AddRoadmap(roadmap);
         var handler = CreateHandler();
 
-        var command = new ArchiveRoadmapCommand(roadmap.Id);
-
-        // Act
-        var result = await handler.Handle(command, TestContext.Current.CancellationToken);
-
-        // Assert
-        result.IsFailure.Should().BeTrue();
-        roadmap.State.Should().Be(RoadmapState.Active);
-        _dbContext.SaveChangesCallCount.Should().Be(0);
-    }
-
-    [Fact]
-    public async Task Handle_ShouldFail_WhenRoadmapIsAlreadyArchived()
-    {
-        // Arrange
-        var roadmap = CreateActiveRoadmap();
-        roadmap.Archive(_currentEmployeeId);
-        _dbContext.AddRoadmap(roadmap);
-        var handler = CreateHandler();
-
-        var command = new ArchiveRoadmapCommand(roadmap.Id);
+        var command = new ActivateRoadmapCommand(roadmap.Id);
 
         // Act
         var result = await handler.Handle(command, TestContext.Current.CancellationToken);
@@ -108,6 +97,25 @@ public class ArchiveRoadmapCommandHandlerTests : IDisposable
         // Assert
         result.IsFailure.Should().BeTrue();
         roadmap.State.Should().Be(RoadmapState.Archived);
+        _dbContext.SaveChangesCallCount.Should().Be(0);
+    }
+
+    [Fact]
+    public async Task Handle_ShouldFail_WhenRoadmapIsAlreadyActive()
+    {
+        // Arrange
+        var roadmap = CreateActiveRoadmap();
+        _dbContext.AddRoadmap(roadmap);
+        var handler = CreateHandler();
+
+        var command = new ActivateRoadmapCommand(roadmap.Id);
+
+        // Act
+        var result = await handler.Handle(command, TestContext.Current.CancellationToken);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        roadmap.State.Should().Be(RoadmapState.Active);
         _dbContext.SaveChangesCallCount.Should().Be(0);
     }
 

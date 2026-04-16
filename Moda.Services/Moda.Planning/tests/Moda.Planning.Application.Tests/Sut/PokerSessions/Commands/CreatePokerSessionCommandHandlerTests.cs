@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Moda.Common.Application.Interfaces;
 using Moda.Planning.Application.PokerSessions.Commands;
 using Moda.Planning.Application.Tests.Infrastructure;
@@ -6,7 +6,7 @@ using Moda.Planning.Domain.Tests.Data;
 using Moq;
 using NodaTime;
 
-namespace Moda.Planning.Application.Tests.PokerSessions.Commands;
+namespace Moda.Planning.Application.Tests.Sut.PokerSessions.Commands;
 
 public class CreatePokerSessionCommandHandlerTests : IDisposable
 {
