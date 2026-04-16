@@ -159,7 +159,7 @@ public class ProjectTasksController(ILogger<ProjectTasksController> logger, ISen
     }
 
     [HttpDelete("{id}")]
-    [MustHavePermission(ApplicationAction.Delete, ApplicationResource.Projects)]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Projects)]
     [OpenApiOperation("Delete a project task.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
