@@ -370,13 +370,13 @@ export const projectsApi = apiSlice.injectEndpoints({
       void,
       {
         projectId: string
+        projectKey: string
         phaseId: string
         patchOperations: Array<{
           op: 'replace' | 'add' | 'remove'
           path: string
           value?: any
         }>
-        cacheKey: string
       }
     >({
       queryFn: async ({ projectId, phaseId, patchOperations }) => {
@@ -408,11 +408,12 @@ export const projectsApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
-      invalidatesTags: (result, error, { cacheKey }) => {
+      invalidatesTags: (result, error, { projectId, projectKey }) => {
         return [
-          { type: QueryTags.ProjectPlanTree, id: cacheKey },
+          { type: QueryTags.ProjectPlanTree, id: projectKey },
           { type: QueryTags.Project, id: 'LIST' },
-          { type: QueryTags.Project, id: cacheKey },
+          { type: QueryTags.Project, id: projectId },
+          { type: QueryTags.Project, id: projectKey },
           { type: QueryTags.Project, id: 'MY_SUMMARY' },
           { type: QueryTags.PortfolioProjects, id: 'LIST' },
           { type: QueryTags.ProgramProjects, id: 'LIST' },

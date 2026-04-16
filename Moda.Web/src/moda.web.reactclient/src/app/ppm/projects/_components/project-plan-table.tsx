@@ -430,9 +430,9 @@ const ProjectPlanTable = ({
             const patchOperations = buildProjectPhasePatchOperations(updates)
             const response = await patchProjectPhase({
               projectId,
+              projectKey,
               phaseId: taskId,
               patchOperations,
-              cacheKey: taskId,
             })
             if (response.error) throw response.error
           } else {
