@@ -9,7 +9,7 @@ import {
   useCancelStrategicInitiativeMutation,
   useCompleteStrategicInitiativeMutation,
 } from '@/src/store/features/ppm/strategic-initiatives-api'
-import { Modal, Space } from 'antd'
+import { Alert, Modal, Space } from 'antd'
 
 export enum StrategicInitiativeStatusAction {
   Approve = 'Approve',
@@ -134,7 +134,7 @@ const ChangeStrategicInitiativeStatusForm = ({
         <div>
           {strategicInitiative?.key} - {strategicInitiative?.name}
         </div>
-        {'This action cannot be undone.'}
+        <Alert message="This action cannot be undone." type="warning" showIcon />
       </Space>
     </Modal>
   )
