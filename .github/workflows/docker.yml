@@ -31,15 +31,13 @@ jobs:
                   dotnet-version: 10.0.x
 
             - name: Restore dependencies
-              run: |
-                  dotnet sln Moda.slnx remove Moda.Web/src/moda.web.reactclient/moda.web.reactclient.esproj
-                  dotnet restore Moda.slnx
+              run: dotnet restore Moda.CI.slnx
 
             - name: Build
-              run: dotnet build Moda.slnx --no-restore --configuration Release
+              run: dotnet build Moda.CI.slnx --no-restore --configuration Release
 
             - name: Test
-              run: dotnet test Moda.slnx --no-build --configuration Release --verbosity normal --settings .runsettings --logger "trx;LogFileName=test-results.trx" --collect:"XPlat Code Coverage" --results-directory ./TestResults --filter "FullyQualifiedName!~IntegrationTests"
+              run: dotnet test Moda.CI.slnx --no-build --configuration Release --verbosity normal --settings .runsettings --logger "trx;LogFileName=test-results.trx" --collect:"XPlat Code Coverage" --results-directory ./TestResults --filter "FullyQualifiedName!~IntegrationTests"
 
             - name: Test Report
               uses: dorny/test-reporter@v1
