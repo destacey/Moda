@@ -89,6 +89,7 @@ internal sealed class GetProjectsQueryHandler(IProjectPortfolioManagementDbConte
             }
         }
 
-        return await query.ProjectToType<ProjectListDto>().ToListAsync(cancellationToken);
+        var projects = await query.ProjectToType<ProjectListDto>().ToListAsync(cancellationToken);
+        return [.. projects.OrderBy(p => p.Name)];
     }
 }

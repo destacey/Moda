@@ -8,7 +8,7 @@ import {
   useArchivePortfolioMutation,
   useClosePortfolioMutation,
 } from '@/src/store/features/ppm/portfolios-api'
-import { Modal, Space } from 'antd'
+import { Alert, Modal, Space } from 'antd'
 
 export enum PortfolioStatusAction {
   Activate = 'Activate',
@@ -110,7 +110,7 @@ const ChangePortfolioStatusForm = ({
         <div>
           {portfolio?.key} - {portfolio?.name}
         </div>
-        {'This action cannot be undone.'}
+        <Alert message="This action cannot be undone." type="warning" showIcon />
       </Space>
     </Modal>
   )

@@ -8,7 +8,7 @@ import {
   useCancelProgramMutation,
   useCompleteProgramMutation,
 } from '@/src/store/features/ppm/programs-api'
-import { Modal, Space } from 'antd'
+import { Alert, Modal, Space } from 'antd'
 
 export enum ProgramStatusAction {
   Activate = 'Activate',
@@ -121,7 +121,7 @@ const ChangeProgramStatusForm = ({
         <div>
           {program?.key} - {program?.name}
         </div>
-        {'This action cannot be undone.'}
+        <Alert message="This action cannot be undone." type="warning" showIcon />
       </Space>
     </Modal>
   )

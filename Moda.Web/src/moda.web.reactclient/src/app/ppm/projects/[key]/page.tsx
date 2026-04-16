@@ -240,18 +240,20 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
         label: ProjectAction.ChangeKey,
         onClick: () => setOpenChangeKeyForm(true),
       })
-      if (!projectData?.projectLifecycle) {
-        items.push({
-          key: 'assign-lifecycle',
-          label: ProjectAction.AssignLifecycle,
-          onClick: () => setOpenAssignLifecycleForm(true),
-        })
-      } else {
-        items.push({
-          key: 'change-lifecycle',
-          label: ProjectAction.ChangeLifecycle,
-          onClick: () => setOpenChangeLifecycleForm(true),
-        })
+      if (currentStatus !== 'Cancelled') {
+        if (!projectData?.projectLifecycle) {
+          items.push({
+            key: 'assign-lifecycle',
+            label: ProjectAction.AssignLifecycle,
+            onClick: () => setOpenAssignLifecycleForm(true),
+          })
+        } else {
+          items.push({
+            key: 'change-lifecycle',
+            label: ProjectAction.ChangeLifecycle,
+            onClick: () => setOpenChangeLifecycleForm(true),
+          })
+        }
       }
     }
     if (canDeleteProject && availableActions.includes(ProjectAction.Delete)) {

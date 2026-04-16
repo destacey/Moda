@@ -23,6 +23,7 @@ internal sealed class GetProjectPortfoliosQueryHandler(IProjectPortfolioManageme
             query = query.Where(pp => request.StatusFilter.Contains(pp.Status));
         }
 
-        return await query.ProjectToType<ProjectPortfolioListDto>().ToListAsync(cancellationToken);
+        var portfolios = await query.ProjectToType<ProjectPortfolioListDto>().ToListAsync(cancellationToken);
+        return [.. portfolios.OrderBy(p => p.Name)];
     }
 }

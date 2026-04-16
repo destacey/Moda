@@ -38,6 +38,7 @@ internal sealed class GetProgramsQueryHandler(IProjectPortfolioManagementDbConte
             query = query.Where(pp => pp.PortfolioId == portfolioId);
         }
 
-        return await query.ProjectToType<ProgramListDto>().ToListAsync(cancellationToken);
+        var programs = await query.ProjectToType<ProgramListDto>().ToListAsync(cancellationToken);
+        return [.. programs.OrderBy(p => p.Name)];
     }
 }

@@ -9,7 +9,7 @@ import {
   useCancelProjectMutation,
   useCompleteProjectMutation,
 } from '@/src/store/features/ppm/projects-api'
-import { Modal, Space } from 'antd'
+import { Alert, Modal, Space } from 'antd'
 
 export enum ProjectStatusAction {
   Approve = 'Approve',
@@ -134,7 +134,7 @@ const ChangeProjectStatusForm = ({
         <div>
           {project?.key} - {project?.name}
         </div>
-        {'This action cannot be undone.'}
+        <Alert message="This action cannot be undone." type="warning" showIcon />
       </Space>
     </Modal>
   )

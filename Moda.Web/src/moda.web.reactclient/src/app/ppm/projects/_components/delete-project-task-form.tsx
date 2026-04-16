@@ -25,10 +25,7 @@ const DeleteProjectTaskForm = ({
 
   const [deleteProjectTaskMutation] = useDeleteProjectTaskMutation()
 
-  const {
-    data: taskData,
-    isLoading,
-  } = useGetProjectTaskQuery({
+  const { data: taskData, isLoading } = useGetProjectTaskQuery({
     projectIdOrKey,
     taskIdOrKey,
   })
@@ -58,9 +55,8 @@ const DeleteProjectTaskForm = ({
     },
     onComplete: onFormComplete,
     onCancel: onFormCancel,
-    errorMessage:
-      'An unexpected error occurred while deleting the task.',
-    permission: 'Permissions.Projects.Delete',
+    errorMessage: 'An unexpected error occurred while deleting the task.',
+    permission: 'Permissions.Projects.Update',
   })
 
   if (isLoading) {
