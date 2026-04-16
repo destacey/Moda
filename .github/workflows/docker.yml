@@ -31,7 +31,9 @@ jobs:
                   dotnet-version: 10.0.x
 
             - name: Restore dependencies
-              run: dotnet restore Moda.slnx
+              run: |
+                  dotnet sln Moda.slnx remove Moda.Web/src/moda.web.reactclient/moda.web.reactclient.esproj
+                  dotnet restore Moda.slnx
 
             - name: Build
               run: dotnet build Moda.slnx --no-restore --configuration Release
