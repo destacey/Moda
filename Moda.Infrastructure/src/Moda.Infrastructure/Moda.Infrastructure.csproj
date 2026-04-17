@@ -72,6 +72,7 @@
         <PackageReference Include="Serilog.Sinks.OpenTelemetry" />
         <PackageReference Include="Serilog.Sinks.Seq" />
         <PackageReference Include="SimplerSoftware.EntityFrameworkCore.SqlServer.NodaTime" />
+        <PackageReference Include="System.Security.Cryptography.Xml" />
         <PackageReference Include="ZymLabs.NSwag.FluentValidation.AspNetCore" />
     </ItemGroup>
 

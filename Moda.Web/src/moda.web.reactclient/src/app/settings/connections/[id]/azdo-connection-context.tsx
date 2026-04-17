@@ -1,4 +1,4 @@
-import { AzureDevOpsConnectionDetailsDto } from '@/src/services/moda-api'
+import { ConnectionDetailsDto } from '@/src/services/moda-api'
 import { QueryTags } from '@/src/store/features/query-tags'
 import {
   QueryActionCreatorResult,
@@ -8,15 +8,9 @@ import { createContext } from 'react'
 
 export interface AzdoConnectionContextInterface {
   connectionId: string
-  organizationUrl: string
+  organizationUrl: string | undefined
   reloadConnectionData: () => QueryActionCreatorResult<
-    QueryDefinition<
-      string,
-      any,
-      QueryTags,
-      AzureDevOpsConnectionDetailsDto,
-      'api'
-    >
+    QueryDefinition<string, any, QueryTags, ConnectionDetailsDto, 'api'>
   >
 }
 

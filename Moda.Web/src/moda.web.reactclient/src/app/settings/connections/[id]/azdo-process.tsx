@@ -117,13 +117,15 @@ const AzdoProcess = (props: AzdoProcessProps) => {
               <Title level={5} style={{ marginTop: '0px' }}>
                 {props.workProcess.name}
               </Title>
-              <Link
-                href={`${azdoConnection.organizationUrl}/_settings/process?process-name=${props.workProcess.name}&_a=workitemtypes`}
-                target="_blank"
-                title="Open in Azure DevOps"
-              >
-                <ExportOutlined style={{ width: '12px' }} />
-              </Link>
+              {azdoConnection.organizationUrl && (
+                <Link
+                  href={`${azdoConnection.organizationUrl}/_settings/process?process-name=${props.workProcess.name}&_a=workitemtypes`}
+                  target="_blank"
+                  title="Open in Azure DevOps"
+                >
+                  <ExportOutlined style={{ width: '12px' }} />
+                </Link>
+              )}
             </Flex>
           </Flex>
           <Space>{integrationContent()}</Space>

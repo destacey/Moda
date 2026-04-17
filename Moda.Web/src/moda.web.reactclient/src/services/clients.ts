@@ -98,7 +98,6 @@ export function clearLocalAuth(): void {
 const unauthAxiosClient = axios.create({
   baseURL: apiUrl,
   timeout: 30000,
-  transformResponse: (data) => data,
 })
 
 // Auth client uses unauthenticated axios (login endpoints are [AllowAnonymous])
@@ -107,8 +106,6 @@ export const getAuthClient = () => new AuthClient('', unauthAxiosClient)
 const axiosClient = axios.create({
   baseURL: apiUrl,
   timeout: 30000, // 30 second timeout
-  // Ensuring that responses are processed correctly.
-  transformResponse: (data) => data,
 })
 
 // Response interceptor with automatic 401 token refresh and retry.

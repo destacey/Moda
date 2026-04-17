@@ -35,13 +35,15 @@ const AzdoWorkspaceCard = (props: AzdoWorkspaceCardProps) => {
         title={
           <>
             {props.workspace.name}{' '}
-            <Link
-              href={`${azdoConnection.organizationUrl}/${props.workspace.name}`}
-              target="_blank"
-              title="Open in Azure DevOps"
-            >
-              <ExportOutlined style={{ width: '12px' }} />
-            </Link>
+            {azdoConnection.organizationUrl && (
+              <Link
+                href={`${azdoConnection.organizationUrl}/${props.workspace.name}`}
+                target="_blank"
+                title="Open in Azure DevOps"
+              >
+                <ExportOutlined style={{ width: '12px' }} />
+              </Link>
+            )}
           </>
         }
         extra={
