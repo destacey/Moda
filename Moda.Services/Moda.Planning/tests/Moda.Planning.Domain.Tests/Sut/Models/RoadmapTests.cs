@@ -1,4 +1,5 @@
 ﻿using Moda.Common.Domain.Enums;
+using Moda.Common.Domain.Enums.Planning;
 using Moda.Common.Models;
 using Moda.Planning.Domain.Enums;
 using Moda.Planning.Domain.Interfaces.Roadmaps;
@@ -45,6 +46,7 @@ public class RoadmapTests
         result.Value.Description.Should().Be(fakeRoadmap.Description);
         result.Value.DateRange.Should().Be(fakeRoadmap.DateRange);
         result.Value.Visibility.Should().Be(fakeRoadmap.Visibility);
+        result.Value.State.Should().Be(RoadmapState.Active);
         result.Value.RoadmapManagers.Should().HaveCount(1);
         result.Value.RoadmapManagers.First().ManagerId.Should().Be(managerId);
     }
@@ -196,6 +198,162 @@ public class RoadmapTests
 
     #endregion Add/Remove Manager Tests
 
+    #region Archive/Activate Tests
+
+    [Fact]
+    public void Archive_WhenActive_ShouldReturnSuccess()
+    {
+        // Arrange
+        var fakeRoadmap = _faker.Generate();
+        var managerId = Guid.NewGuid();
+        var roadmap = Roadmap.Create(fakeRoadmap.Name, fakeRoadmap.Description, fakeRoadmap.DateRange, fakeRoadmap.Visibility, [managerId]).Value;
+
+        // Act
+        var result = roadmap.Archive(managerId);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        roadmap.State.Should().Be(RoadmapState.Archived);
+    }
+
+    [Fact]
+    public void Archive_WhenAlreadyArchived_ShouldReturnFailure()
+    {
+        // Arrange
+        var fakeRoadmap = _faker.Generate();
+        var managerId = Guid.NewGuid();
+        var roadmap = Roadmap.Create(fakeRoadmap.Name, fakeRoadmap.Description, fakeRoadmap.DateRange, fakeRoadmap.Visibility, [managerId]).Value;
+        roadmap.Archive(managerId);
+
+        // Act
+        var result = roadmap.Archive(managerId);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("Only active roadmaps can be archived.");
+    }
+
+    [Fact]
+    public void Archive_WhenUserIsNotManager_ShouldReturnFailure()
+    {
+        // Arrange
+        var fakeRoadmap = _faker.Generate();
+        var managerId = Guid.NewGuid();
+        var roadmap = Roadmap.Create(fakeRoadmap.Name, fakeRoadmap.Description, fakeRoadmap.DateRange, fakeRoadmap.Visibility, [managerId]).Value;
+
+        // Act
+        var result = roadmap.Archive(Guid.NewGuid());
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("User is not a roadmap manager of this roadmap.");
+    }
+
+    [Fact]
+    public void Activate_WhenArchived_ShouldReturnSuccess()
+    {
+        // Arrange
+        var fakeRoadmap = _faker.Generate();
+        var managerId = Guid.NewGuid();
+        var roadmap = Roadmap.Create(fakeRoadmap.Name, fakeRoadmap.Description, fakeRoadmap.DateRange, fakeRoadmap.Visibility, [managerId]).Value;
+        roadmap.Archive(managerId);
+
+        // Act
+        var result = roadmap.Activate(managerId);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        roadmap.State.Should().Be(RoadmapState.Active);
+    }
+
+    [Fact]
+    public void Activate_WhenAlreadyActive_ShouldReturnFailure()
+    {
+        // Arrange
+        var fakeRoadmap = _faker.Generate();
+        var managerId = Guid.NewGuid();
+        var roadmap = Roadmap.Create(fakeRoadmap.Name, fakeRoadmap.Description, fakeRoadmap.DateRange, fakeRoadmap.Visibility, [managerId]).Value;
+
+        // Act
+        var result = roadmap.Activate(managerId);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("Only archived roadmaps can be activated.");
+    }
+
+    [Fact]
+    public void Activate_WhenUserIsNotManager_ShouldReturnFailure()
+    {
+        // Arrange
+        var fakeRoadmap = _faker.Generate();
+        var managerId = Guid.NewGuid();
+        var roadmap = Roadmap.Create(fakeRoadmap.Name, fakeRoadmap.Description, fakeRoadmap.DateRange, fakeRoadmap.Visibility, [managerId]).Value;
+        roadmap.Archive(managerId);
+
+        // Act
+        var result = roadmap.Activate(Guid.NewGuid());
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("User is not a roadmap manager of this roadmap.");
+    }
+
+    [Fact]
+    public void Update_WhenArchived_ShouldReturnFailure()
+    {
+        // Arrange
+        var fakeRoadmap = _faker.Generate();
+        var managerId = Guid.NewGuid();
+        var roadmap = Roadmap.Create(fakeRoadmap.Name, fakeRoadmap.Description, fakeRoadmap.DateRange, fakeRoadmap.Visibility, [managerId]).Value;
+        roadmap.Archive(managerId);
+
+        // Act
+        var result = roadmap.Update("New Name", "New Desc", fakeRoadmap.DateRange, [managerId], Visibility.Public, managerId);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("Archived roadmaps cannot be modified.");
+    }
+
+    [Fact]
+    public void CreateActivity_WhenArchived_ShouldReturnFailure()
+    {
+        // Arrange
+        var fakeRoadmap = _faker.Generate();
+        var managerId = Guid.NewGuid();
+        var roadmap = Roadmap.Create(fakeRoadmap.Name, fakeRoadmap.Description, fakeRoadmap.DateRange, fakeRoadmap.Visibility, [managerId]).Value;
+        roadmap.Archive(managerId);
+
+        var upsertActivity = new TestUpsertRoadmapActivity(_activityFaker.Generate());
+
+        // Act
+        var result = roadmap.CreateActivity(upsertActivity, managerId);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("Archived roadmaps cannot be modified.");
+    }
+
+    [Fact]
+    public void CanDelete_WhenArchived_ShouldReturnFailure()
+    {
+        // Arrange
+        var fakeRoadmap = _faker.Generate();
+        var managerId = Guid.NewGuid();
+        var roadmap = Roadmap.Create(fakeRoadmap.Name, fakeRoadmap.Description, fakeRoadmap.DateRange, fakeRoadmap.Visibility, [managerId]).Value;
+        roadmap.Archive(managerId);
+
+        // Act
+        var result = roadmap.CanDelete(managerId);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("Archived roadmaps cannot be modified.");
+    }
+
+    #endregion Archive/Activate Tests
+
     #region Copy Tests
 
     [Fact]
@@ -219,6 +377,7 @@ public class RoadmapTests
         result.Value.Description.Should().Be(fakeRoadmap.Description);
         result.Value.DateRange.Should().Be(fakeRoadmap.DateRange);
         result.Value.Visibility.Should().Be(newVisibility);
+        result.Value.State.Should().Be(RoadmapState.Active);
         result.Value.RoadmapManagers.Should().HaveCount(1);
         result.Value.RoadmapManagers.First().ManagerId.Should().Be(newManagerId);
         result.Value.Items.Should().BeEmpty();

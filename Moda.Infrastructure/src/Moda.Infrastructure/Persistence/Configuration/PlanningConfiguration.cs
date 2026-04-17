@@ -328,6 +328,11 @@ public class RoadmapConfig : IEntityTypeConfiguration<Roadmap>
             .HasMaxLength(32)
             .HasColumnType("varchar");
 
+        builder.Property(r => r.State).IsRequired()
+            .HasConversion<EnumConverter<RoadmapState>>()
+            .HasMaxLength(32)
+            .HasColumnType("varchar");
+
         // Value Objects
         builder.ComplexProperty(r => r.DateRange, options =>
         {

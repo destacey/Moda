@@ -23,6 +23,7 @@ interface RoadmapItemDrawerProps {
   drawerOpen: boolean
   onDrawerClose: () => void
   openRoadmapItemDrawer: (itemId: string) => void
+  isReadOnly?: boolean
 }
 
 const RoadmapItemDrawer: FC<RoadmapItemDrawerProps> = (
@@ -68,7 +69,8 @@ const RoadmapItemDrawer: FC<RoadmapItemDrawerProps> = (
         }}
         destroyOnHidden={true}
         extra={
-          canUpdateRoadmap && (
+          canUpdateRoadmap &&
+          !props.isReadOnly && (
             <Button onClick={() => setOpenEditRoadmapItemForm(true)}>
               Edit
             </Button>

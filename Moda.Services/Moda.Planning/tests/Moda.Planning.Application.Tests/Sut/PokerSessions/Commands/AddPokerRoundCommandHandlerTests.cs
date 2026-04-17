@@ -6,57 +6,53 @@ using Moda.Planning.Application.Tests.Infrastructure;
 using Moda.Planning.Domain.Enums;
 using Moda.Planning.Domain.Tests.Data;
 using Moq;
-using NodaTime;
 
-namespace Moda.Planning.Application.Tests.PokerSessions.Commands;
+namespace Moda.Planning.Application.Tests.Sut.PokerSessions.Commands;
 
-public class RevealPokerRoundCommandHandlerTests : IDisposable
+public class AddPokerRoundCommandHandlerTests : IDisposable
 {
     private readonly FakePlanningDbContext _dbContext;
-    private readonly RevealPokerRoundCommandHandler _handler;
-    private readonly Mock<ILogger<RevealPokerRoundCommandHandler>> _mockLogger;
+    private readonly AddPokerRoundCommandHandler _handler;
+    private readonly Mock<ILogger<AddPokerRoundCommandHandler>> _mockLogger;
     private readonly Mock<IPokerSessionNotifier> _mockNotifier;
 
     private readonly PokerSessionFaker _sessionFaker;
 
-    public RevealPokerRoundCommandHandlerTests()
+    public AddPokerRoundCommandHandlerTests()
     {
         _dbContext = new FakePlanningDbContext();
-        _mockLogger = new Mock<ILogger<RevealPokerRoundCommandHandler>>();
+        _mockLogger = new Mock<ILogger<AddPokerRoundCommandHandler>>();
         _mockNotifier = new Mock<IPokerSessionNotifier>();
 
-        _handler = new RevealPokerRoundCommandHandler(_dbContext, _mockNotifier.Object, _mockLogger.Object);
+        _handler = new AddPokerRoundCommandHandler(_dbContext, _mockNotifier.Object, _mockLogger.Object);
         _sessionFaker = new PokerSessionFaker();
     }
 
     [Fact]
-    public async Task Handle_ShouldRevealVotes_WhenRoundIsVoting()
+    public async Task Handle_ShouldAddRound_WhenSessionIsActive()
     {
         // Arrange
         var session = _sessionFaker.WithStatus(PokerSessionStatus.Active).Generate();
         _dbContext.AddPokerSession(session);
 
-        session.AddRound("Story to estimate");
-        var round = session.Rounds.First();
-        session.SubmitVote(round.Id, Guid.NewGuid().ToString(), "5", Instant.FromUtc(2026, 1, 15, 10, 0));
-
-        var command = new RevealPokerRoundCommand(session.Id, round.Id);
+        var command = new AddPokerRoundCommand(session.Id, "User Story #123");
 
         // Act
         var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        round.Status.Should().Be(PokerRoundStatus.Revealed);
+        session.Rounds.Should().HaveCount(1);
+        session.Rounds.First().Label.Should().Be("User Story #123");
         _dbContext.SaveChangesCallCount.Should().Be(1);
-        _mockNotifier.Verify(n => n.NotifyVotesRevealed(session.Id, round.Id, It.IsAny<IEnumerable<PokerVoteDto>>()), Times.Once);
+        _mockNotifier.Verify(n => n.NotifyRoundAdded(session.Id, It.IsAny<PokerRoundDto>()), Times.Once);
     }
 
     [Fact]
     public async Task Handle_ShouldFail_WhenSessionDoesNotExist()
     {
         // Arrange
-        var command = new RevealPokerRoundCommand(Guid.NewGuid(), Guid.NewGuid());
+        var command = new AddPokerRoundCommand(Guid.NewGuid(), "User Story #123");
 
         // Act
         var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
@@ -68,18 +64,13 @@ public class RevealPokerRoundCommandHandlerTests : IDisposable
     }
 
     [Fact]
-    public async Task Handle_ShouldFail_WhenRoundIsAlreadyRevealed()
+    public async Task Handle_ShouldFail_WhenSessionIsNotActive()
     {
         // Arrange
-        var session = _sessionFaker.WithStatus(PokerSessionStatus.Active).Generate();
+        var session = _sessionFaker.WithStatus(PokerSessionStatus.Completed).Generate();
         _dbContext.AddPokerSession(session);
 
-        session.AddRound("Story");
-        var round = session.Rounds.First();
-        session.SubmitVote(round.Id, Guid.NewGuid().ToString(), "5", Instant.FromUtc(2026, 1, 15, 10, 0));
-        session.RevealRound(round.Id);
-
-        var command = new RevealPokerRoundCommand(session.Id, round.Id);
+        var command = new AddPokerRoundCommand(session.Id, "User Story #123");
 
         // Act
         var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
@@ -87,24 +78,28 @@ public class RevealPokerRoundCommandHandlerTests : IDisposable
         // Assert
         result.IsFailure.Should().BeTrue();
         _dbContext.SaveChangesCallCount.Should().Be(0);
-        _mockNotifier.Verify(n => n.NotifyVotesRevealed(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<IEnumerable<PokerVoteDto>>()), Times.Never);
+        _mockNotifier.Verify(n => n.NotifyRoundAdded(It.IsAny<Guid>(), It.IsAny<PokerRoundDto>()), Times.Never);
     }
 
     [Fact]
-    public async Task Handle_ShouldFail_WhenRoundDoesNotExist()
+    public async Task Handle_ShouldAddMultipleRounds_WithCorrectOrder()
     {
         // Arrange
         var session = _sessionFaker.WithStatus(PokerSessionStatus.Active).Generate();
         _dbContext.AddPokerSession(session);
 
-        var command = new RevealPokerRoundCommand(session.Id, Guid.NewGuid());
+        var command1 = new AddPokerRoundCommand(session.Id, "Round 1");
+        var command2 = new AddPokerRoundCommand(session.Id, "Round 2");
 
         // Act
-        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
+        var result1 = await _handler.Handle(command1, TestContext.Current.CancellationToken);
+        var result2 = await _handler.Handle(command2, TestContext.Current.CancellationToken);
 
         // Assert
-        result.IsFailure.Should().BeTrue();
-        _dbContext.SaveChangesCallCount.Should().Be(0);
+        result1.IsSuccess.Should().BeTrue();
+        result2.IsSuccess.Should().BeTrue();
+        session.Rounds.Should().HaveCount(2);
+        _dbContext.SaveChangesCallCount.Should().Be(2);
     }
 
     public void Dispose()

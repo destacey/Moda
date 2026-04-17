@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.JsonPatch.SystemTextJson;
 using Moda.Common.Application.Models;
 using Moda.Common.Application.Requests;
+using Moda.Common.Domain.Enums.Planning;
 using Moda.Planning.Application.Roadmaps.Commands;
 using Moda.Planning.Application.Roadmaps.Dtos;
 using Moda.Planning.Application.Roadmaps.Queries;
@@ -39,9 +40,19 @@ public class RoadmapsController : ControllerBase
     [OpenApiOperation("Get a list of roadmaps.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IEnumerable<RoadmapListDto>>> GetRoadmaps(CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<RoadmapListDto>>> GetRoadmaps([FromQuery] int[]? state, CancellationToken cancellationToken)
     {
-        var roadmaps = await _sender.Send(new GetRoadmapsQuery(), cancellationToken);
+        RoadmapState[]? filter = null;
+        if (state is { Length: > 0 })
+        {
+            var invalid = state.Where(s => !Enum.IsDefined(typeof(RoadmapState), s)).ToArray();
+            if (invalid.Length > 0)
+                return BadRequest(ProblemDetailsExtensions.ForBadRequest($"Invalid roadmap state value(s): {string.Join(", ", invalid)}.", HttpContext));
+
+            filter = [.. state.Select(s => (RoadmapState)s)];
+        }
+
+        var roadmaps = await _sender.Send(new GetRoadmapsQuery(filter), cancellationToken);
         return Ok(roadmaps);
     }
 
@@ -111,6 +122,34 @@ public class RoadmapsController : ControllerBase
     public async Task<ActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new DeleteRoadmapCommand(id), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpPost("{id}/archive")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Roadmaps)]
+    [OpenApiOperation("Archive a roadmap.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> Archive(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(new ArchiveRoadmapCommand(id), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpPost("{id}/activate")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Roadmaps)]
+    [OpenApiOperation("Activate a roadmap.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> Activate(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(new ActivateRoadmapCommand(id), cancellationToken);
 
         return result.IsSuccess
             ? NoContent()
@@ -350,5 +389,16 @@ public class RoadmapsController : ControllerBase
     {
         var items = await _sender.Send(new GetVisibilitiesQuery(), cancellationToken);
         return Ok(items.OrderBy(c => c.Order));
+    }
+
+    [HttpGet("states")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Roadmaps)]
+    [OpenApiOperation("Get a list of all roadmap states.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IEnumerable<RoadmapStateDto>>> GetStateOptions(CancellationToken cancellationToken)
+    {
+        var items = await _sender.Send(new GetRoadmapStatesQuery(), cancellationToken);
+        return Ok(items.OrderBy(s => s.Order));
     }
 }

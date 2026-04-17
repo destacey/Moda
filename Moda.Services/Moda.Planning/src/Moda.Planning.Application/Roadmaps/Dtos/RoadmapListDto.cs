@@ -35,6 +35,11 @@ public sealed record RoadmapListDto : IMapFrom<Roadmap>
     public required SimpleNavigationDto Visibility { get; set; }
 
     /// <summary>
+    /// The state of the Roadmap.
+    /// </summary>
+    public required SimpleNavigationDto State { get; set; }
+
+    /// <summary>
     /// The color of the Roadmap. Must be a valid hex color code.
     /// </summary>
     public string? Color { get; set; }
@@ -50,6 +55,7 @@ public sealed record RoadmapListDto : IMapFrom<Roadmap>
             .Map(dest => dest.Start, src => src.DateRange.Start)
             .Map(dest => dest.End, src => src.DateRange.End)
             .Map(dest => dest.Visibility, src => SimpleNavigationDto.FromEnum(src.Visibility))
+            .Map(dest => dest.State, src => SimpleNavigationDto.FromEnum(src.State))
             .Map(dest => dest.RoadmapManagers, src => src.RoadmapManagers.Select(x => EmployeeNavigationDto.From(x.Manager!)).ToList());
     }
 }

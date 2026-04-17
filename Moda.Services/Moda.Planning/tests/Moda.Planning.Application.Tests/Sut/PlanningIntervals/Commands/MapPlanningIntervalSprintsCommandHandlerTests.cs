@@ -7,7 +7,7 @@ using Moda.Tests.Shared.Extensions;
 using Moq;
 using NodaTime;
 
-namespace Moda.Planning.Application.Tests.PlanningIntervals.Commands;
+namespace Moda.Planning.Application.Tests.Sut.PlanningIntervals.Commands;
 
 public class MapPlanningIntervalSprintsCommandHandlerTests : IDisposable
 {
