@@ -8,11 +8,11 @@ import { TimelineOptionsTemplateFunction } from '@/src/lib/vis-timeline'
 import { Button, Dropdown, MenuProps, Spin } from 'antd'
 import useTheme from '../../contexts/theme'
 import { WaydEmpty } from '..'
-import './moda-timeline.css'
+import './wayd-timeline.css'
 import {
   DefaultTimeLineColors,
   getDefaultTemplate,
-} from './moda-timeline.utils'
+} from './wayd-timeline.utils'
 import {
   ModaDataGroup,
   ModaDataItem,

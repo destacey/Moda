@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import WaydStatisticNumber from './moda-statistic-number'
+import WaydStatisticNumber from './wayd-statistic-number'
 
 describe('WaydStatisticNumber', () => {
   it('renders the number correctly', () => {

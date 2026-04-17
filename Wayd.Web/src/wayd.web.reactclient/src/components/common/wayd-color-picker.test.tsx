@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-import WaydColorPicker from './moda-color-picker'
+import WaydColorPicker from './wayd-color-picker'
 
 const latestColorPickerProps: { current: any | null } = { current: null }
 

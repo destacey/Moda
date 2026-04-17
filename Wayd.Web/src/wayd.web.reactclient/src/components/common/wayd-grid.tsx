@@ -27,7 +27,7 @@ import {
 } from '@ant-design/icons'
 import { ItemType } from 'antd/es/menu/interface'
 import useTheme from '../contexts/theme'
-import WaydEmpty from './moda-empty'
+import WaydEmpty from './wayd-empty'
 import { ControlItemsMenu } from './control-items-menu'
 import { useRemainingHeight } from '@/src/hooks'
 

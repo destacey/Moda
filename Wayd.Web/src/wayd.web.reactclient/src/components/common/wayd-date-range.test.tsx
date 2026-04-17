@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import WaydDateRange from './moda-date-range'
+import WaydDateRange from './wayd-date-range'
 import { DateRange } from '../types'
 
 describe('WaydDateRange', () => {

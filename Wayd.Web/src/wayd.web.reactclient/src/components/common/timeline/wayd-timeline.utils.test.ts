@@ -1,4 +1,4 @@
-import { DefaultTimeLineColors, getDefaultTemplate } from './moda-timeline.utils';
+import { DefaultTimeLineColors, getDefaultTemplate } from './wayd-timeline.utils';
 
 describe('DefaultTimeLineColors', () => {
   it('should have light and dark themes with required color fields', () => {

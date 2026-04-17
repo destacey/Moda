@@ -21,7 +21,7 @@ import {
   renderSprintLinkHelper,
   renderTeamLinkHelper,
   renderWorkItemLinkHelper,
-} from './moda-grid-cell-renderers'
+} from './wayd-grid-cell-renderers'
 import { DependencyHealth, WorkStatusCategory } from '../types'
 
 // Mock Next.js Link component
