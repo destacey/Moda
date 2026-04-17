@@ -61,7 +61,14 @@ const filterActivities = (activities: RoadmapActivityListDto[], activityId) => {
     .filter((a) => a.id !== activityId)
     .map((a) => ({
       ...a,
-      children: a.children ? filterActivities(a.children, activityId) : [],
+      children: a.children
+        ? filterActivities(
+            a.children.filter(
+              (c): c is RoadmapActivityListDto => c.$type === 'activity',
+            ),
+            activityId,
+          )
+        : [],
     }))
 }
 
