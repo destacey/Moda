@@ -14,13 +14,16 @@ on:
 jobs:
     build-and-test-api:
         runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            checks: write
+            pull-requests: write
         defaults:
             run:
                 shell: bash
-                working-directory: Moda.Web/src/Moda.Web.Api
         steps:
             - name: checkout
-              uses: actions/checkout@v2
+              uses: actions/checkout@v4
 
             - name: Setup .NET
               uses: actions/setup-dotnet@v3
@@ -28,13 +31,58 @@ jobs:
                   dotnet-version: 10.0.x
 
             - name: Restore dependencies
-              run: dotnet restore
+              run: dotnet restore Moda.CI.slnx
 
             - name: Build
-              run: dotnet build --no-restore
+              run: dotnet build Moda.CI.slnx --no-restore --configuration Release
 
             - name: Test
-              run: dotnet test --no-build --verbosity normal
+              run: dotnet test Moda.CI.slnx --no-build --configuration Release --verbosity normal --settings .runsettings --logger "trx;LogFileName=test-results.trx" --collect:"XPlat Code Coverage" --results-directory ./TestResults --filter "FullyQualifiedName!~IntegrationTests"
+
+            - name: Test Report
+              uses: dorny/test-reporter@v1
+              if: always() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+              with:
+                  name: .NET Test Results
+                  path: "TestResults/**/test-results.trx"
+                  reporter: dotnet-trx
+
+            - name: Merge Coverage Reports
+              if: always()
+              run: |
+                  dotnet tool install --global dotnet-coverage
+                  dotnet-coverage merge TestResults/*/coverage.cobertura.xml --output TestResults/coverage.cobertura.xml --output-format cobertura
+
+            - name: Generate Coverage Report
+              uses: danielpalme/ReportGenerator-GitHub-Action@5
+              if: always()
+              with:
+                  reports: "TestResults/coverage.cobertura.xml"
+                  targetdir: coveragereport
+
+            - name: Upload Coverage Report
+              uses: actions/upload-artifact@v4
+              if: always()
+              with:
+                  name: dotnet-coverage
+                  path: coveragereport
+
+            - name: Coverage Summary
+              uses: irongut/CodeCoverageSummary@v1.3.0
+              if: always()
+              with:
+                  filename: "TestResults/coverage.cobertura.xml"
+                  format: markdown
+                  output: both
+                  badge: true
+                  hide_complexity: true
+
+            - name: Add Coverage PR Comment
+              uses: marocchino/sticky-pull-request-comment@v2
+              if: always() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+              with:
+                  header: dotnet-coverage
+                  path: code-coverage-results.md
 
     build-and-test-client:
         runs-on: ubuntu-latest
@@ -61,6 +109,13 @@ jobs:
 
             - name: npm run test:coverage
               run: npm run test:coverage
+
+            - name: Upload Coverage Report
+              uses: actions/upload-artifact@v4
+              if: always()
+              with:
+                  name: frontend-coverage
+                  path: Moda.Web/src/moda.web.reactclient/coverage
 
     build-and-push-image:
         runs-on: ubuntu-latest
