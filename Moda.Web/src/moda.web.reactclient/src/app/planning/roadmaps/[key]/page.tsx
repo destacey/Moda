@@ -5,6 +5,7 @@ import useAuth from '@/src/components/contexts/auth'
 import { authorizePage } from '@/src/components/hoc'
 import { useAppDispatch, useDocumentTitle } from '@/src/hooks'
 import {
+  ROADMAP_STATE,
   useGetRoadmapItemsQuery,
   useGetRoadmapQuery,
 } from '@/src/store/features/planning/roadmaps-api'
@@ -94,7 +95,7 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       (rm) => rm.id === currentUserInternalEmployeeId,
     )
 
-  const isArchived = roadmapData?.state?.name === 'Archived'
+  const isArchived = roadmapData?.state?.id === ROADMAP_STATE.Archived
 
   useEffect(() => {
     if (!roadmapData) return

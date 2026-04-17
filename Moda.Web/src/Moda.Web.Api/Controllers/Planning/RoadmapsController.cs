@@ -42,9 +42,15 @@ public class RoadmapsController : ControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IEnumerable<RoadmapListDto>>> GetRoadmaps([FromQuery] int[]? state, CancellationToken cancellationToken)
     {
-        RoadmapState[]? filter = state is { Length: > 0 }
-            ? [.. state.Select(s => (RoadmapState)s)]
-            : null;
+        RoadmapState[]? filter = null;
+        if (state is { Length: > 0 })
+        {
+            var invalid = state.Where(s => !Enum.IsDefined(typeof(RoadmapState), s)).ToArray();
+            if (invalid.Length > 0)
+                return BadRequest(ProblemDetailsExtensions.ForBadRequest($"Invalid roadmap state value(s): {string.Join(", ", invalid)}.", HttpContext));
+
+            filter = [.. state.Select(s => (RoadmapState)s)];
+        }
 
         var roadmaps = await _sender.Send(new GetRoadmapsQuery(filter), cancellationToken);
         return Ok(roadmaps);
