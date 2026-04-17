@@ -7,32 +7,32 @@ var builder = DistributedApplication.CreateBuilder(args);
 var databaseConfigPath = Path.Combine(builder.AppHostDirectory, "..", "Wayd.Web", "src", "Wayd.Web.Api", "Configurations", "database.json");
 var databaseConfig = new ConfigurationBuilder()
     .AddJsonFile(databaseConfigPath, optional: false)
-    .AddUserSecrets("ccaebfb8-fc4c-4b73-9da4-9bab70a12a1c") // ModaWebApi user secrets for local development
+    .AddUserSecrets("ccaebfb8-fc4c-4b73-9da4-9bab70a12a1c") // Wayd.Web.Api user secrets for local development
     .Build();
 
 var connectionString = databaseConfig["DatabaseSettings:ConnectionString"]
     ?? throw new InvalidOperationException("Connection string not found in database.json");
 
 // Add the connection string as a parameter with the value from database.json
-builder.Configuration["ConnectionStrings:ModaDb"] = connectionString;
-var modaDb = builder.AddConnectionString("ModaDb");
+builder.Configuration["ConnectionStrings:WaydDb"] = connectionString;
+var waydDb = builder.AddConnectionString("WaydDb");
 
 // Option 2: SQL Server Container (for local development)
 // Uncomment below to use a containerized SQL Server
 // var sqlServer = builder.AddSqlServer("sql")
-//     .WithDataVolume("moda-sqldata");
-// var modaDb = sqlServer.AddDatabase("ModaDb");
+//     .WithDataVolume("wayd-sqldata");
+// var waydDb = sqlServer.AddDatabase("WaydDb");
 
-var modaApi = builder.AddProject<Projects.Wayd_Web_Api>("moda-api")
-    .WithReference(modaDb)
-    .WaitFor(modaDb);
+var waydApi = builder.AddProject<Projects.Wayd_Web_Api>("wayd-api")
+    .WithReference(waydDb)
+    .WaitFor(waydDb);
 
-var modaClient = builder.AddJavaScriptApp("moda-client", "../Wayd.Web/src/wayd.web.reactclient", "dev")
-    .WithReference(modaApi)
-    .WaitFor(modaApi)
+var waydClient = builder.AddJavaScriptApp("wayd-client", "../Wayd.Web/src/wayd.web.reactclient", "dev")
+    .WithReference(waydApi)
+    .WaitFor(waydApi)
     .WithHttpEndpoint(env: "PORT", port: 3000)
     .WithExternalHttpEndpoints()
-    .WithEnvironment("NEXT_PUBLIC_API_BASE_URL", modaApi.GetEndpoint("http"))
+    .WithEnvironment("NEXT_PUBLIC_API_BASE_URL", waydApi.GetEndpoint("http"))
     .WithEnvironment("NEXT_OTEL_VERBOSE", "1");
 //.WithEnvironment("NODE_TLS_REJECT_UNAUTHORIZED", "0"); // Allow self-signed certs for local development.  not needed for http.
 

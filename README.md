@@ -90,7 +90,7 @@ No external identity provider needed. Configure a JWT signing secret in `Moda.We
 }
 ```
 
-On first run, the database seeder creates a default admin user (`admin@moda.local` / `Password1!`). You will be prompted to change the password on first login.
+On first run, the database seeder creates a default admin user (`admin@wayd.local` / `Password1!`). You will be prompted to change the password on first login.
 
 Create a `.env` file in the repository root:
 
@@ -247,7 +247,7 @@ See [CLAUDE.md](CLAUDE.md) for detailed architecture documentation.
 **Local Auth:**
 
 - Ensure `SecuritySettings:LocalJwt:Secret` is configured (at least 32 characters)
-- Default admin credentials: `admin@moda.local` / `Password1!` (must change on first login)
+- Default admin credentials: `admin@wayd.local` / `Password1!` (must change on first login)
 - If locked out, an admin can unlock accounts via Settings > User Management
 
 **Azure AD:**

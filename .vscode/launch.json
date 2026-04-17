@@ -2,13 +2,13 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug Moda API on Host",
+            "name": "Debug Wayd API on Host",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/Moda.Web/src/Moda.Web.Api/bin/Debug/net9.0/Moda.Web.Api.dll",
+            "program": "${workspaceFolder}/Wayd.Web/src/Wayd.Web.Api/bin/Debug/net9.0/Wayd.Web.Api.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/Moda.Web/src/Moda.Web.Api",
+            "cwd": "${workspaceFolder}/Wayd.Web/src/Wayd.Web.Api",
             "stopAtEntry": false,
             "serverReadyAction": {
                 "action": "openExternally",
@@ -33,13 +33,13 @@
             "type": "msedge",
             "request": "launch",
             "url": "http://localhost:3000",
-            "cwd": "${workspaceFolder}/Moda.Web/src/moda.web.reactclient",
+            "cwd": "${workspaceFolder}/Wayd.Web/src/wayd.web.reactclient",
         },
         {
             "name": "Next.js: debug full stack",
             "type": "node",
             "request": "launch",
-            "program": "${workspaceFolder}/Moda.Web/src/moda.web.reactclient/node_modules/next/dist/bin/next",
+            "program": "${workspaceFolder}/Wayd.Web/src/wayd.web.reactclient/node_modules/next/dist/bin/next",
             "runtimeArgs": ["--inspect"],
             "skipFiles": ["<node_internals>/**"],
             "serverReadyAction": {
@@ -47,7 +47,7 @@
                 "killOnServerStop": true,
                 "pattern": "- Local:.+(https?://.+)",
                 "uriFormat": "%s",
-                "webRoot": "${workspaceFolder}/Moda.Web/src/moda.web.reactclient/"
+                "webRoot": "${workspaceFolder}/Wayd.Web/src/wayd.web.reactclient/"
             }
         },
         {
@@ -61,31 +61,31 @@
             "netCore": {
                 "debuggerPath": "/remote_debugger/vsdbg",
             },
-            "containerName": "moda.web.api",
+            "containerName": "wayd.web.api",
             // "preLaunchTask": "Compose Up",
             "postDebugTask": "Compose Down"
         },
         {
             "type": "chrome",
             "request": "launch",
-            "name": "Browser: Launch Moda React Client in Chrome",
+            "name": "Browser: Launch Wayd React Client in Chrome",
             "url": "http://localhost:5002"
         },
     ],
     "compounds": [
         {
-            "name": "Compound: Launch Moda on Host",
+            "name": "Compound: Launch Wayd on Host",
             "configurations": [
-                "Debug Moda API on Host",
+                "Debug Wayd API on Host",
                 "Next.js: debug full stack"
             ],
             "stopAll": true
         },
         {
-            "name": "Compound: Launch Moda with Compose",
+            "name": "Compound: Launch Wayd with Compose",
             "configurations": [
                 "Docker: Attach to API in Docker",
-                "Browser: Launch Moda React Client in Chrome"
+                "Browser: Launch Wayd React Client in Chrome"
             ],
             "preLaunchTask": "Compose and Wait",
             "stopAll": true

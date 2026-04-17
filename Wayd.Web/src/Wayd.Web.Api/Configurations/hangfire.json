@@ -4,7 +4,7 @@
         "Dashboard": {
             "AppPath": null,
             "StatsPollingInterval": 2000,
-            "DashboardTitle": "Moda Jobs"
+            "DashboardTitle": "Wayd Jobs"
         },
         "Server": {
             "HeartbeatInterval": "00:00:30",
@@ -21,7 +21,7 @@
         },
         "Storage": {
             "StorageProvider": "mssql",
-            "ConnectionString": "Data Source=(localdb)\\mssqllocaldb;Initial Catalog=Moda;Integrated Security=True;MultipleActiveResultSets=True",
+            "ConnectionString": "Data Source=(localdb)\\mssqllocaldb;Initial Catalog=Wayd;Integrated Security=True;MultipleActiveResultSets=True",
             "Options": {
                 "CommandBatchMaxTimeout": "00:05:00",
                 "QueuePollInterval": "00:00:15",

@@ -7,14 +7,14 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 # Install dependencies based on the preferred package manager
-COPY Moda.Web/src/moda.web.reactclient/package.json Moda.Web/src/moda.web.reactclient/package-lock.json* ./
+COPY Wayd.Web/src/wayd.web.reactclient/package.json Wayd.Web/src/wayd.web.reactclient/package-lock.json* ./
 RUN npm ci
 
 # Rebuild the source code only when needed
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
-COPY Moda.Web/src/moda.web.reactclient/ .
+COPY Wayd.Web/src/wayd.web.reactclient/ .
 
 # Copy shared docs folder for static page generation during build.
 COPY docs/ /docs/

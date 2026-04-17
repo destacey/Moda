@@ -3,12 +3,12 @@
 version: "3.4"
 
 services:
-    modawebapi:
-        container_name: moda.web.api
-        image: modawebapi
+    waydwebapi:
+        container_name: wayd.web.api
+        image: waydwebapi
         build:
             context: .
-            dockerfile: Moda.Web/src/Moda.Web.Api/Dockerfile
+            dockerfile: Wayd.Web/src/Wayd.Web.Api/Dockerfile
         ports:
             - 5000:80
             - 5001:443
@@ -23,12 +23,12 @@ services:
             - ~/.vsdbg:/remote_debugger:rw
             - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
             - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
-    modawebclient:
-        container_name: moda.web.client
-        image: modawebclient
+    waydwebclient:
+        container_name: wayd.web.client
+        image: waydwebclient
         build:
             context: .
-            dockerfile: Moda.Web/src/moda.web.reactclient/Dockerfile
+            dockerfile: Wayd.Web/src/wayd.web.reactclient/Dockerfile
         ports:
             - 5002:3000
         environment:

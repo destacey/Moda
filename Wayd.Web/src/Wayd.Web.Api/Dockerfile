@@ -15,16 +15,16 @@ WORKDIR /src
 COPY ["Directory.Build.props", "./"]
 COPY ["Directory.Packages.props", "./"]
 # Copy all .csproj files to preserve project structure for restore
-COPY ["Moda.Web/src/Moda.Web.Api/Moda.Web.Api.csproj", "Moda.Web/src/Moda.Web.Api/"]
-RUN dotnet restore "Moda.Web/src/Moda.Web.Api/Moda.Web.Api.csproj"
+COPY ["Wayd.Web/src/Wayd.Web.Api/Wayd.Web.Api.csproj", "Wayd.Web/src/Wayd.Web.Api/"]
+RUN dotnet restore "Wayd.Web/src/Wayd.Web.Api/Wayd.Web.Api.csproj"
 COPY . .
-WORKDIR "/src/Moda.Web/src/Moda.Web.Api"
-RUN dotnet build "Moda.Web.Api.csproj" -c Release -o /app/build
+WORKDIR "/src/Wayd.Web/src/Wayd.Web.Api"
+RUN dotnet build "Wayd.Web.Api.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "Moda.Web.Api.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "Wayd.Web.Api.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Moda.Web.Api.dll"]
+ENTRYPOINT ["dotnet", "Wayd.Web.Api.dll"]
