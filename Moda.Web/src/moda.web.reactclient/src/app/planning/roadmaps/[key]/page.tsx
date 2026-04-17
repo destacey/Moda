@@ -13,15 +13,17 @@ import RoadmapDetailsLoading from './loading'
 import { use, useEffect, useState } from 'react'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import { LockOutlined, UnlockOutlined } from '@ant-design/icons'
-import { Descriptions, Divider, MenuProps } from 'antd'
+import { Descriptions, Divider, MenuProps, Space, Tag } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import {
+  ChangeRoadmapStateForm,
   CopyRoadmapForm,
   DeleteRoadmapForm,
   EditRoadmapForm,
   RoadmapItemDrawer,
   RoadmapViewManager,
 } from '../_components'
+import { RoadmapStateAction } from '../_components/change-roadmap-state-form'
 import { MarkdownRenderer } from '@/src/components/common/markdown'
 import CreateRoadmapActivityForm from '../_components/create-roadmap-activity-form'
 import CreateRoadmapTimeboxForm from '../_components/create-roadmap-timebox-form'
@@ -44,6 +46,8 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const [openCopyRoadmapForm, setOpenCopyRoadmapForm] = useState<boolean>(false)
   const [openDeleteRoadmapForm, setOpenDeleteRoadmapForm] =
     useState<boolean>(false)
+  const [openChangeStateForm, setOpenChangeStateForm] =
+    useState<RoadmapStateAction | null>(null)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
 
@@ -90,6 +94,8 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       (rm) => rm.id === currentUserInternalEmployeeId,
     )
 
+  const isArchived = roadmapData?.state?.name === 'Archived'
+
   useEffect(() => {
     if (!roadmapData) return
 
@@ -124,21 +130,35 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
 
     if (!isRoadmapManager) return items
 
-    if (canUpdateRoadmap) {
+    if (canUpdateRoadmap && !isArchived) {
       items.push({
         key: 'edit',
         label: 'Edit',
         onClick: () => setOpenEditRoadmapForm(true),
       })
     }
-    if (canDeleteRoadmap) {
+    if (canUpdateRoadmap && !isArchived) {
+      items.push({
+        key: 'archive',
+        label: 'Archive',
+        onClick: () => setOpenChangeStateForm(RoadmapStateAction.Archive),
+      })
+    }
+    if (canDeleteRoadmap && !isArchived) {
       items.push({
         key: 'delete',
         label: 'Delete',
         onClick: () => setOpenDeleteRoadmapForm(true),
       })
     }
-    if (canUpdateRoadmap) {
+    if (canUpdateRoadmap && isArchived) {
+      items.push({
+        key: 'activate',
+        label: 'Activate',
+        onClick: () => setOpenChangeStateForm(RoadmapStateAction.Activate),
+      })
+    }
+    if (canUpdateRoadmap && !isArchived) {
       items.push(
         {
           key: 'create-divider',
@@ -178,6 +198,13 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     }
   }
 
+  const onChangeStateFormClosed = (wasChanged: boolean) => {
+    setOpenChangeStateForm(null)
+    if (wasChanged) {
+      refetchRoadmap()
+    }
+  }
+
   const onCreateRoadmapActivityFormClosed = (wasCreated: boolean) => {
     setOpenCreateActivityForm(false)
     if (wasCreated) {
@@ -198,6 +225,13 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     ) : (
       <LockOutlined title={visibilityTitle('Private', managersInfo)} />
     )
+
+  const headerTags = (
+    <Space>
+      {visibilityTag}
+      {isArchived && <Tag>Archived</Tag>}
+    </Space>
+  )
 
   const showDrawer = () => {
     setDrawerOpen(true)
@@ -227,7 +261,7 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
         title={`${roadmapData?.key} - ${roadmapData?.name}`}
         subtitle="Roadmap Details"
         actions={<PageActions actionItems={actionsMenuItems} />}
-        tags={visibilityTag}
+        tags={headerTags}
       />
       {roadmapData && (
         <>
@@ -251,7 +285,7 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
         roadmapItems={roadmapItems}
         isRoadmapItemsLoading={isRoadmapItemsLoading}
         refreshRoadmapItems={refetchRoadmapItems}
-        canUpdateRoadmap={canUpdateRoadmap && isRoadmapManager}
+        canUpdateRoadmap={canUpdateRoadmap && isRoadmapManager && !isArchived}
         openRoadmapItemDrawer={openRoadmapItemDrawer}
       />
       {openEditRoadmapForm && (
@@ -290,6 +324,14 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
           onFormCancel={() => onCreateRoadmapTimeboxFormClosed(false)}
         />
       )}
+      {openChangeStateForm && (
+        <ChangeRoadmapStateForm
+          roadmap={roadmapData}
+          stateAction={openChangeStateForm}
+          onFormComplete={() => onChangeStateFormClosed(true)}
+          onFormCancel={() => onChangeStateFormClosed(false)}
+        />
+      )}
       {roadmapData?.id && selectedItemId && (
         <RoadmapItemDrawer
           roadmapId={roadmapData.id}
@@ -297,6 +339,7 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
           drawerOpen={drawerOpen}
           onDrawerClose={onDrawerClose}
           openRoadmapItemDrawer={openRoadmapItemDrawer}
+          isReadOnly={isArchived}
         />
       )}
     </>

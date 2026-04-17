@@ -53,11 +53,17 @@ const RoadmapsGrid: FC<RoadmapsGridProps> = (props: RoadmapsGridProps) => {
       },
       {
         field: 'roadmapManagersDisplay',
+        headerName: 'Roadmap Managers',
       },
       {
         field: 'visibility.name',
         headerName: 'Visibility',
         width: 125,
+      },
+      {
+        field: 'state.name',
+        headerName: 'State',
+        width: 120,
       },
     ],
     [],
