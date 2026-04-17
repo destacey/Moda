@@ -8,7 +8,7 @@ import { createContext } from 'react'
 
 export interface AzdoConnectionContextInterface {
   connectionId: string
-  organizationUrl: string
+  organizationUrl: string | undefined
   reloadConnectionData: () => QueryActionCreatorResult<
     QueryDefinition<string, any, QueryTags, ConnectionDetailsDto, 'api'>
   >
