@@ -1,5 +1,5 @@
 {
-  "x-generator": "NSwag v14.6.3.0 (NJsonSchema v11.5.2.0 (Newtonsoft.Json v13.0.0.0))",
+  "x-generator": "NSwag v14.7.0.0 (NJsonSchema v11.6.0.0 (Newtonsoft.Json v13.0.0.0))",
   "openapi": "3.0.0",
   "info": {
     "title": "Moda API",
@@ -20779,10 +20779,12 @@
         ],
         "properties": {
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "slug": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "items": {
             "type": "array",
@@ -20806,17 +20808,20 @@
         ],
         "properties": {
           "title": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "subtitle": {
             "type": "string",
             "nullable": true
           },
           "key": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "entityType": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "auxKey": {
             "type": "string",
@@ -21309,8 +21314,8 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
           "userId",
+          "id",
           "dateTime"
         ],
         "properties": {
@@ -21321,7 +21326,8 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "userId": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "type": {
             "type": "string",
@@ -21584,10 +21590,10 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
-          "key",
           "name",
-          "state"
+          "state",
+          "id",
+          "key"
         ],
         "properties": {
           "id": {
@@ -21601,7 +21607,8 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "state": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -21630,11 +21637,11 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
-          "key",
           "name",
           "description",
-          "state"
+          "state",
+          "id",
+          "key"
         ],
         "properties": {
           "id": {
@@ -21648,10 +21655,12 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "description": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "state": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -21739,9 +21748,9 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
           "name",
-          "state"
+          "state",
+          "id"
         ],
         "properties": {
           "id": {
@@ -21751,10 +21760,12 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "state": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           }
         }
       },
@@ -21799,10 +21810,10 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
-          "key",
           "name",
-          "status"
+          "status",
+          "id",
+          "key"
         ],
         "properties": {
           "id": {
@@ -21816,7 +21827,8 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "status": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -21837,11 +21849,11 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
-          "key",
           "name",
           "description",
-          "status"
+          "status",
+          "id",
+          "key"
         ],
         "properties": {
           "id": {
@@ -21855,10 +21867,12 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "description": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "status": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -21981,10 +21995,10 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
-          "key",
           "description",
-          "state"
+          "state",
+          "id",
+          "key"
         ],
         "properties": {
           "id": {
@@ -21998,7 +22012,8 @@
             "format": "int32"
           },
           "description": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "state": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -22071,9 +22086,9 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
           "name",
           "state",
+          "id",
           "isCapitalizable",
           "requiresDepreciation"
         ],
@@ -22083,7 +22098,8 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "state": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -22104,10 +22120,10 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
           "name",
           "description",
           "state",
+          "id",
           "isCapitalizable",
           "requiresDepreciation"
         ],
@@ -22117,10 +22133,12 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "description": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "state": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -22228,9 +22246,9 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
           "name",
-          "state"
+          "state",
+          "id"
         ],
         "properties": {
           "id": {
@@ -22238,10 +22256,12 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "state": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           }
         }
       },
@@ -22249,14 +22269,14 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
-          "key",
           "name",
           "description",
           "status",
           "portfolioSponsors",
           "portfolioOwners",
-          "portfolioManagers"
+          "portfolioManagers",
+          "id",
+          "key"
         ],
         "properties": {
           "id": {
@@ -22270,10 +22290,12 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "description": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "status": {
             "$ref": "#/components/schemas/LifecycleNavigationDto"
@@ -22336,14 +22358,14 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
-          "key",
           "name",
           "description",
           "status",
           "portfolioSponsors",
           "portfolioOwners",
-          "portfolioManagers"
+          "portfolioManagers",
+          "id",
+          "key"
         ],
         "properties": {
           "id": {
@@ -22357,10 +22379,12 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "description": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "status": {
             "$ref": "#/components/schemas/LifecycleNavigationDto"
@@ -22512,15 +22536,15 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
-          "key",
           "name",
           "status",
           "portfolio",
           "programSponsors",
           "programOwners",
           "programManagers",
-          "strategicThemes"
+          "strategicThemes",
+          "id",
+          "key"
         ],
         "properties": {
           "id": {
@@ -22534,7 +22558,8 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "status": {
             "$ref": "#/components/schemas/LifecycleNavigationDto"
@@ -22582,7 +22607,6 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
           "key",
           "name",
           "status",
@@ -22592,6 +22616,7 @@
           "projectManagers",
           "projectMembers",
           "strategicThemes",
+          "id",
           "phases"
         ],
         "properties": {
@@ -22602,10 +22627,12 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "status": {
             "$ref": "#/components/schemas/LifecycleNavigationDto"
@@ -22681,9 +22708,9 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
           "name",
           "status",
+          "id",
           "order",
           "progress"
         ],
@@ -22695,7 +22722,8 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "status": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -22724,13 +22752,13 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
-          "key",
           "name",
           "status",
           "portfolio",
           "strategicInitiativeSponsors",
-          "strategicInitiativeOwners"
+          "strategicInitiativeOwners",
+          "id",
+          "key"
         ],
         "properties": {
           "id": {
@@ -22744,7 +22772,8 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "status": {
             "$ref": "#/components/schemas/LifecycleNavigationDto"
@@ -22812,8 +22841,8 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
-          "name"
+          "name",
+          "id"
         ],
         "properties": {
           "id": {
@@ -22823,7 +22852,8 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           }
         }
       },
@@ -22831,8 +22861,6 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
-          "key",
           "name",
           "description",
           "status",
@@ -22840,7 +22868,9 @@
           "programSponsors",
           "programOwners",
           "programManagers",
-          "strategicThemes"
+          "strategicThemes",
+          "id",
+          "key"
         ],
         "properties": {
           "id": {
@@ -22854,10 +22884,12 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "description": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "status": {
             "$ref": "#/components/schemas/LifecycleNavigationDto"
@@ -23115,11 +23147,11 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
-          "key",
           "name",
           "description",
           "state",
+          "id",
+          "key",
           "phaseCount"
         ],
         "properties": {
@@ -23134,10 +23166,12 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "description": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "state": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -23166,12 +23200,12 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
-          "key",
           "name",
           "description",
           "state",
-          "phases"
+          "phases",
+          "id",
+          "key"
         ],
         "properties": {
           "id": {
@@ -23185,10 +23219,12 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "description": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "state": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -23205,9 +23241,9 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
           "name",
           "description",
+          "id",
           "order"
         ],
         "properties": {
@@ -23218,10 +23254,12 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "description": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "order": {
             "type": "integer",
@@ -23413,7 +23451,6 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
           "key",
           "name",
           "description",
@@ -23425,6 +23462,7 @@
           "projectManagers",
           "projectMembers",
           "strategicThemes",
+          "id",
           "phases"
         ],
         "properties": {
@@ -23435,13 +23473,16 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "description": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "businessCase": {
             "type": "string",
@@ -23925,13 +23966,13 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
           "key",
           "title",
           "workspace",
           "type",
           "status",
           "statusCategory",
+          "id",
           "stackRank",
           "created"
         ],
@@ -23943,10 +23984,12 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "title": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "workspace": {
             "$ref": "#/components/schemas/WorkspaceNavigationDto"
@@ -23955,7 +23998,8 @@
             "$ref": "#/components/schemas/WorkTypeNavigationDto"
           },
           "status": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "statusCategory": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -24075,10 +24119,10 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
           "name",
           "level",
-          "tier"
+          "tier",
+          "id"
         ],
         "properties": {
           "id": {
@@ -24086,7 +24130,8 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "level": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -24109,17 +24154,21 @@
           "id": {
             "type": "string",
             "format": "guid",
+            "minLength": 1,
             "nullable": false,
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "title": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "workspaceKey": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "externalViewWorkItemUrl": {
             "type": "string",
@@ -24135,12 +24184,18 @@
           {
             "type": "object",
             "additionalProperties": false,
+            "required": [
+              "code",
+              "type"
+            ],
             "properties": {
               "code": {
-                "type": "string"
+                "type": "string",
+                "minLength": 1
               },
               "type": {
-                "type": "string"
+                "type": "string",
+                "minLength": 1
               }
             }
           }
@@ -24242,12 +24297,12 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
           "nodeType",
           "name",
           "status",
-          "order",
           "wbs",
+          "id",
+          "order",
           "progress",
           "assignees",
           "children"
@@ -24260,10 +24315,12 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "nodeType": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "status": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -24273,7 +24330,8 @@
             "format": "int32"
           },
           "wbs": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "start": {
             "type": "string",
@@ -24377,10 +24435,10 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
           "name",
           "description",
           "status",
+          "id",
           "order",
           "progress",
           "assignees"
@@ -24393,10 +24451,12 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "description": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "status": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -24544,14 +24604,14 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
           "key",
-          "projectId",
           "name",
           "type",
           "status",
           "priority",
           "assignees",
+          "id",
+          "projectId",
           "progress",
           "order"
         ],
@@ -24563,7 +24623,8 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "projectId": {
             "type": "string",
@@ -24572,7 +24633,8 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "type": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -24637,9 +24699,9 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
           "key",
-          "name"
+          "name",
+          "id"
         ],
         "properties": {
           "id": {
@@ -24649,10 +24711,12 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           }
         }
       },
@@ -24660,14 +24724,14 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
           "key",
-          "projectId",
           "name",
           "type",
           "status",
           "priority",
           "assignees",
+          "id",
+          "projectId",
           "progress",
           "order",
           "projectPhaseId"
@@ -24680,7 +24744,8 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "projectId": {
             "type": "string",
@@ -24689,7 +24754,8 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "description": {
             "type": "string",
@@ -25060,8 +25126,8 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
           "name",
+          "id",
           "order"
         ],
         "properties": {
@@ -25070,7 +25136,8 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "description": {
             "type": "string",
@@ -25086,8 +25153,8 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
           "name",
+          "id",
           "order"
         ],
         "properties": {
@@ -25096,7 +25163,8 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "description": {
             "type": "string",
@@ -25112,8 +25180,8 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
           "name",
+          "id",
           "order"
         ],
         "properties": {
@@ -25122,7 +25190,8 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "description": {
             "type": "string",
@@ -25138,14 +25207,14 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
-          "key",
           "name",
           "description",
           "status",
           "portfolio",
           "strategicInitiativeSponsors",
-          "strategicInitiativeOwners"
+          "strategicInitiativeOwners",
+          "id",
+          "key"
         ],
         "properties": {
           "id": {
@@ -25159,10 +25228,12 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "description": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "status": {
             "$ref": "#/components/schemas/LifecycleNavigationDto"
@@ -25367,9 +25438,9 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
+          "name",
           "id",
           "key",
-          "name",
           "targetValue",
           "targetDirection"
         ],
@@ -25385,7 +25456,8 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "startingValue": {
             "type": "number",
@@ -25435,9 +25507,9 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
+          "name",
           "id",
           "key",
-          "name",
           "targetValue",
           "targetDirection"
         ],
@@ -25453,7 +25525,8 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "description": {
             "type": "string",
@@ -25642,10 +25715,10 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
+          "dateLabel",
           "id",
           "targetValue",
-          "checkpointDate",
-          "dateLabel"
+          "checkpointDate"
         ],
         "properties": {
           "id": {
@@ -25668,7 +25741,8 @@
             "format": "date-time"
           },
           "dateLabel": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           }
         }
       },
@@ -25676,10 +25750,10 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
+          "dateLabel",
           "id",
           "targetValue",
-          "checkpointDate",
-          "dateLabel"
+          "checkpointDate"
         ],
         "properties": {
           "id": {
@@ -25702,7 +25776,8 @@
             "format": "date-time"
           },
           "dateLabel": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "measurement": {
             "nullable": true,
@@ -25734,10 +25809,10 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
+          "measuredBy",
           "id",
           "actualValue",
-          "measurementDate",
-          "measuredBy"
+          "measurementDate"
         ],
         "properties": {
           "id": {
@@ -25955,8 +26030,8 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
           "name",
+          "id",
           "isActive",
           "values"
         ],
@@ -25966,7 +26041,8 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "description": {
             "type": "string",
@@ -26075,12 +26151,12 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
+          "name",
+          "state",
           "id",
           "key",
-          "name",
           "start",
-          "end",
-          "state"
+          "end"
         ],
         "properties": {
           "id": {
@@ -26094,7 +26170,8 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "start": {
             "type": "string",
@@ -26113,12 +26190,12 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
-          "key",
           "name",
           "start",
           "end",
           "state",
+          "id",
+          "key",
           "objectivesLocked"
         ],
         "properties": {
@@ -26133,7 +26210,8 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "description": {
             "type": "string",
@@ -26164,12 +26242,12 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
-          "key",
           "name",
           "start",
           "end",
-          "iterationSchedules"
+          "iterationSchedules",
+          "id",
+          "key"
         ],
         "properties": {
           "id": {
@@ -26183,7 +26261,8 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "start": {
             "type": "string",
@@ -26205,11 +26284,11 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
-          "key",
           "name",
           "start",
-          "end"
+          "end",
+          "id",
+          "key"
         ],
         "properties": {
           "id": {
@@ -26223,7 +26302,8 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "start": {
             "type": "string",
@@ -26280,9 +26360,13 @@
           {
             "type": "object",
             "additionalProperties": false,
+            "required": [
+              "type"
+            ],
             "properties": {
               "type": {
-                "type": "string"
+                "type": "string",
+                "minLength": 1
               }
             }
           }
@@ -26432,9 +26516,13 @@
           {
             "type": "object",
             "additionalProperties": false,
+            "required": [
+              "type"
+            ],
             "properties": {
               "type": {
-                "type": "string"
+                "type": "string",
+                "minLength": 1
               }
             }
           }
@@ -26551,13 +26639,13 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
-          "key",
           "name",
           "start",
           "end",
           "state",
-          "category"
+          "category",
+          "id",
+          "key"
         ],
         "properties": {
           "id": {
@@ -26571,7 +26659,8 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "start": {
             "type": "string",
@@ -26582,7 +26671,8 @@
             "format": "date"
           },
           "state": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "category": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -26593,14 +26683,14 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
-          "key",
           "name",
           "start",
           "end",
           "state",
           "category",
-          "planningInterval"
+          "planningInterval",
+          "id",
+          "key"
         ],
         "properties": {
           "id": {
@@ -26614,7 +26704,8 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "start": {
             "type": "string",
@@ -26625,7 +26716,8 @@
             "format": "date"
           },
           "state": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "category": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -26639,8 +26731,8 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
           "name",
+          "id",
           "order"
         ],
         "properties": {
@@ -26649,7 +26741,8 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "description": {
             "type": "string",
@@ -26665,12 +26758,12 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
-          "key",
           "name",
           "start",
           "end",
           "category",
+          "id",
+          "key",
           "sprints"
         ],
         "properties": {
@@ -26685,7 +26778,8 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "start": {
             "type": "string",
@@ -26710,13 +26804,13 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
-          "key",
           "name",
           "state",
+          "team",
+          "id",
+          "key",
           "start",
-          "end",
-          "team"
+          "end"
         ],
         "properties": {
           "id": {
@@ -26730,7 +26824,8 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "state": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -26792,12 +26887,13 @@
         "description": "Response containing PI Iteration metrics aggregated across all mapped sprints.",
         "additionalProperties": false,
         "required": [
-          "iterationId",
-          "iterationKey",
           "iterationName",
           "start",
           "end",
           "category",
+          "sprintMetrics",
+          "iterationId",
+          "iterationKey",
           "teamCount",
           "sprintCount",
           "totalWorkItems",
@@ -26808,8 +26904,7 @@
           "inProgressStoryPoints",
           "notStartedWorkItems",
           "notStartedStoryPoints",
-          "missingStoryPointsCount",
-          "sprintMetrics"
+          "missingStoryPointsCount"
         ],
         "properties": {
           "iterationId": {
@@ -26823,7 +26918,8 @@
             "format": "int32"
           },
           "iterationName": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "start": {
             "type": "string",
@@ -26898,13 +26994,13 @@
         "description": "Metrics summary for an individual sprint within the PI Iteration.",
         "additionalProperties": false,
         "required": [
-          "sprintId",
-          "sprintKey",
           "sprintName",
           "state",
+          "team",
+          "sprintId",
+          "sprintKey",
           "start",
           "end",
-          "team",
           "totalWorkItems",
           "totalStoryPoints",
           "completedWorkItems",
@@ -26927,7 +27023,8 @@
             "format": "int32"
           },
           "sprintName": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "state": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -26990,7 +27087,6 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
           "key",
           "title",
           "workspace",
@@ -26998,6 +27094,7 @@
           "status",
           "statusCategory",
           "sprint",
+          "id",
           "created",
           "rank",
           "stackRank"
@@ -27010,19 +27107,23 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "title": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "workspace": {
             "$ref": "#/components/schemas/WorkspaceNavigationDto"
           },
           "type": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "status": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "statusCategory": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -27109,14 +27210,14 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
-          "key",
           "name",
           "status",
           "planningInterval",
           "team",
-          "progress",
           "type",
+          "id",
+          "key",
+          "progress",
           "isStretch"
         ],
         "properties": {
@@ -27131,7 +27232,8 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "status": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -27181,8 +27283,8 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
           "status",
+          "id",
           "expiration"
         ],
         "properties": {
@@ -27205,14 +27307,14 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
-          "key",
           "name",
           "status",
-          "progress",
           "planningInterval",
           "team",
           "type",
+          "id",
+          "key",
+          "progress",
           "isStretch"
         ],
         "properties": {
@@ -27227,7 +27329,8 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "description": {
             "type": "string",
@@ -27421,13 +27524,13 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
-          "key",
           "name",
           "status",
           "type",
           "planningInterval",
           "team",
+          "id",
+          "key",
           "progress",
           "isStretch"
         ],
@@ -27446,7 +27549,8 @@
           },
           "name": {
             "type": "string",
-            "description": "The name of the objective."
+            "description": "The name of the objective.",
+            "minLength": 1
           },
           "status": {
             "description": "Gets or sets the status.",
@@ -27613,8 +27717,8 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
           "name",
+          "id",
           "order"
         ],
         "properties": {
@@ -27623,7 +27727,8 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "description": {
             "type": "string",
@@ -27639,13 +27744,13 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
-          "key",
           "summary",
-          "reportedOn",
           "status",
           "category",
-          "exposure"
+          "exposure",
+          "id",
+          "key",
+          "reportedOn"
         ],
         "properties": {
           "id": {
@@ -27659,7 +27764,8 @@
             "format": "int32"
           },
           "summary": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "team": {
             "nullable": true,
@@ -27674,13 +27780,16 @@
             "format": "date-time"
           },
           "status": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "category": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "exposure": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "assignee": {
             "nullable": true,
@@ -27701,10 +27810,10 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
-          "key",
           "name",
           "status",
+          "id",
+          "key",
           "roundCount"
         ],
         "properties": {
@@ -27719,10 +27828,12 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "status": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "facilitator": {
             "nullable": true,
@@ -27749,11 +27860,13 @@
           "id": {
             "type": "string",
             "format": "guid",
+            "minLength": 1,
             "nullable": false,
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "userName": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "name": {
             "type": "string",
@@ -27777,10 +27890,10 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
-          "key",
           "name",
           "status",
+          "id",
+          "key",
           "rounds"
         ],
         "properties": {
@@ -27795,10 +27908,12 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "status": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "facilitator": {
             "nullable": true,
@@ -27838,11 +27953,11 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
           "status",
+          "votes",
+          "id",
           "order",
-          "voteCount",
-          "votes"
+          "voteCount"
         ],
         "properties": {
           "id": {
@@ -27856,7 +27971,8 @@
             "nullable": true
           },
           "status": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "consensusEstimate": {
             "type": "string",
@@ -28012,16 +28128,16 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
-          "key",
           "summary",
-          "reportedOn",
           "reportedBy",
           "status",
           "category",
           "impact",
           "likelihood",
-          "exposure"
+          "exposure",
+          "id",
+          "key",
+          "reportedOn"
         ],
         "properties": {
           "id": {
@@ -28035,7 +28151,8 @@
             "format": "int32"
           },
           "summary": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "description": {
             "type": "string",
@@ -28233,8 +28350,8 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
           "name",
+          "id",
           "order"
         ],
         "properties": {
@@ -28243,7 +28360,8 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "description": {
             "type": "string",
@@ -28259,8 +28377,8 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
           "name",
+          "id",
           "order"
         ],
         "properties": {
@@ -28269,7 +28387,8 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "description": {
             "type": "string",
@@ -28285,8 +28404,8 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
           "name",
+          "id",
           "order"
         ],
         "properties": {
@@ -28295,7 +28414,8 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "description": {
             "type": "string",
@@ -28311,14 +28431,14 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
-          "key",
           "name",
           "start",
           "end",
           "visibility",
           "state",
-          "roadmapManagers"
+          "roadmapManagers",
+          "id",
+          "key"
         ],
         "properties": {
           "id": {
@@ -28332,7 +28452,8 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "start": {
             "type": "string",
@@ -28364,14 +28485,14 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
-          "key",
           "name",
           "start",
           "end",
           "visibility",
           "state",
-          "roadmapManagers"
+          "roadmapManagers",
+          "id",
+          "key"
         ],
         "properties": {
           "id": {
@@ -28385,7 +28506,8 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "description": {
             "type": "string",
@@ -28590,11 +28712,11 @@
         },
         "additionalProperties": false,
         "required": [
+          "name",
+          "type",
           "$type",
           "id",
-          "roadmapId",
-          "name",
-          "type"
+          "roadmapId"
         ],
         "properties": {
           "id": {
@@ -28610,7 +28732,8 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "type": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -28636,8 +28759,8 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
-          "name"
+          "name",
+          "id"
         ],
         "properties": {
           "id": {
@@ -28647,7 +28770,8 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           }
         }
       },
@@ -28659,6 +28783,10 @@
           {
             "type": "object",
             "additionalProperties": false,
+            "required": [
+              "start",
+              "end"
+            ],
             "properties": {
               "start": {
                 "type": "string",
@@ -28690,6 +28818,9 @@
           {
             "type": "object",
             "additionalProperties": false,
+            "required": [
+              "date"
+            ],
             "properties": {
               "date": {
                 "type": "string",
@@ -28707,6 +28838,10 @@
           {
             "type": "object",
             "additionalProperties": false,
+            "required": [
+              "start",
+              "end"
+            ],
             "properties": {
               "start": {
                 "type": "string",
@@ -28732,11 +28867,11 @@
         },
         "additionalProperties": false,
         "required": [
+          "name",
+          "type",
           "$type",
           "id",
-          "roadmapId",
-          "name",
-          "type"
+          "roadmapId"
         ],
         "properties": {
           "id": {
@@ -28752,7 +28887,8 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "description": {
             "type": "string",
@@ -28786,6 +28922,10 @@
           {
             "type": "object",
             "additionalProperties": false,
+            "required": [
+              "start",
+              "end"
+            ],
             "properties": {
               "start": {
                 "type": "string",
@@ -28817,6 +28957,9 @@
           {
             "type": "object",
             "additionalProperties": false,
+            "required": [
+              "date"
+            ],
             "properties": {
               "date": {
                 "type": "string",
@@ -28834,6 +28977,10 @@
           {
             "type": "object",
             "additionalProperties": false,
+            "required": [
+              "start",
+              "end"
+            ],
             "properties": {
               "start": {
                 "type": "string",
@@ -28935,6 +29082,9 @@
           {
             "type": "object",
             "additionalProperties": false,
+            "required": [
+              "date"
+            ],
             "properties": {
               "date": {
                 "type": "string",
@@ -29291,13 +29441,13 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
-          "key",
           "name",
           "state",
+          "team",
+          "id",
+          "key",
           "start",
-          "end",
-          "team"
+          "end"
         ],
         "properties": {
           "id": {
@@ -29311,7 +29461,8 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "state": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -29398,8 +29549,8 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
           "name",
+          "id",
           "order"
         ],
         "properties": {
@@ -29408,7 +29559,8 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "description": {
             "type": "string",
@@ -29424,10 +29576,10 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
-          "key",
           "name",
           "ownership",
+          "id",
+          "key",
           "isActive"
         ],
         "properties": {
@@ -29442,7 +29594,8 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "ownership": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -29456,10 +29609,10 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
-          "key",
           "name",
           "ownership",
+          "id",
+          "key",
           "isActive"
         ],
         "properties": {
@@ -29474,7 +29627,8 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "description": {
             "type": "string",
@@ -29492,9 +29646,9 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
           "workType",
           "workflow",
+          "id",
           "isActive"
         ],
         "properties": {
@@ -29519,9 +29673,9 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
           "name",
           "level",
+          "id",
           "isActive"
         ],
         "properties": {
@@ -29530,7 +29684,8 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "description": {
             "type": "string",
@@ -29548,10 +29703,10 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
-          "key",
           "name",
           "ownership",
+          "id",
+          "key",
           "isActive",
           "schemes"
         ],
@@ -29567,7 +29722,8 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "description": {
             "type": "string",
@@ -29591,9 +29747,9 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
           "workStatus",
           "workStatusCategory",
+          "id",
           "order",
           "isActive"
         ],
@@ -29623,8 +29779,8 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
           "name",
+          "id",
           "isActive"
         ],
         "properties": {
@@ -29633,7 +29789,8 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "description": {
             "type": "string",
@@ -29648,10 +29805,10 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
           "key",
           "name",
           "ownership",
+          "id",
           "isActive"
         ],
         "properties": {
@@ -29662,10 +29819,12 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "description": {
             "type": "string",
@@ -29683,11 +29842,11 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
           "key",
           "name",
           "ownership",
           "workProcess",
+          "id",
           "isActive"
         ],
         "properties": {
@@ -29698,10 +29857,12 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "description": {
             "type": "string",
@@ -29744,13 +29905,13 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
           "key",
           "title",
           "workspace",
           "type",
           "status",
           "statusCategory",
+          "id",
           "created",
           "lastModified"
         ],
@@ -29762,7 +29923,8 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "externalId": {
             "type": "integer",
@@ -29770,7 +29932,8 @@
             "nullable": true
           },
           "title": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "workspace": {
             "$ref": "#/components/schemas/WorkspaceNavigationDto"
@@ -29779,7 +29942,8 @@
             "$ref": "#/components/schemas/WorkTypeNavigationDto"
           },
           "status": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "statusCategory": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -29878,8 +30042,8 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
-          "key"
+          "key",
+          "id"
         ],
         "properties": {
           "id": {
@@ -29889,7 +30053,8 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "project": {
             "nullable": true,
@@ -29935,12 +30100,12 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
           "dependency",
           "type",
           "state",
           "health",
           "scope",
+          "id",
           "createdOn"
         ],
         "properties": {
@@ -29954,7 +30119,8 @@
             "$ref": "#/components/schemas/WorkItemDetailsNavigationDto"
           },
           "type": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "state": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -29999,23 +30165,29 @@
           "id": {
             "type": "string",
             "format": "guid",
+            "minLength": 1,
             "nullable": false,
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "title": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "workspaceKey": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "type": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "status": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "statusCategory": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -30056,8 +30228,8 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
           "name",
+          "id",
           "order"
         ],
         "properties": {
@@ -30066,7 +30238,8 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "description": {
             "type": "string",
@@ -30125,9 +30298,9 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
           "name",
           "tier",
+          "id",
           "order"
         ],
         "properties": {
@@ -30136,7 +30309,8 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "description": {
             "type": "string",
@@ -30281,8 +30455,8 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
           "name",
+          "id",
           "order"
         ],
         "properties": {
@@ -30291,7 +30465,8 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "description": {
             "type": "string",
@@ -30307,13 +30482,13 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
-          "key",
           "displayName",
           "firstName",
           "lastName",
           "employeeNumber",
           "email",
+          "id",
+          "key",
           "isActive"
         ],
         "properties": {
@@ -30328,17 +30503,20 @@
             "format": "int32"
           },
           "displayName": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "firstName": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "middleName": {
             "type": "string",
             "nullable": true
           },
           "lastName": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "suffix": {
             "type": "string",
@@ -30349,10 +30527,12 @@
             "nullable": true
           },
           "employeeNumber": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "email": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "jobTitle": {
             "type": "string",
@@ -30383,14 +30563,14 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
-          "key",
           "displayName",
           "fullName",
           "firstName",
           "lastName",
           "employeeNumber",
           "email",
+          "id",
+          "key",
           "isActive"
         ],
         "properties": {
@@ -30405,20 +30585,24 @@
             "format": "int32"
           },
           "displayName": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "fullName": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "firstName": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "middleName": {
             "type": "string",
             "nullable": true
           },
           "lastName": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "suffix": {
             "type": "string",
@@ -30429,7 +30613,8 @@
             "nullable": true
           },
           "employeeNumber": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "hireDate": {
             "type": "string",
@@ -30437,7 +30622,8 @@
             "nullable": true
           },
           "email": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "jobTitle": {
             "type": "string",
@@ -30928,11 +31114,11 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
           "child",
           "parent",
-          "start",
-          "state"
+          "state",
+          "id",
+          "start"
         ],
         "properties": {
           "id": {
@@ -30957,7 +31143,8 @@
             "nullable": true
           },
           "state": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           }
         }
       },
@@ -31035,13 +31222,13 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
           "key",
           "title",
           "workspace",
           "type",
           "status",
           "statusCategory",
+          "id",
           "created",
           "rank",
           "stackRank"
@@ -31054,19 +31241,23 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "title": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "workspace": {
             "$ref": "#/components/schemas/WorkspaceNavigationDto"
           },
           "type": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "status": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "statusCategory": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -31159,12 +31350,12 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
           "source",
           "target",
           "linkType",
           "state",
           "health",
+          "id",
           "scope",
           "createdOn"
         ],
@@ -31239,8 +31430,7 @@
           },
           "start": {
             "type": "string",
-            "format": "date",
-            "minLength": 1
+            "format": "date"
           },
           "end": {
             "type": "string",
@@ -31352,13 +31542,13 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
-          "key",
           "name",
           "code",
           "type",
-          "level",
-          "path"
+          "path",
+          "id",
+          "key",
+          "level"
         ],
         "properties": {
           "id": {
@@ -31372,10 +31562,12 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "code": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "type": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -31385,7 +31577,8 @@
             "format": "int32"
           },
           "path": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "children": {
             "type": "array",
@@ -31609,10 +31802,10 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
-          "objectId",
           "name",
-          "url"
+          "url",
+          "id",
+          "objectId"
         ],
         "properties": {
           "id": {
@@ -31628,10 +31821,12 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "url": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           }
         }
       },
@@ -31697,10 +31892,10 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
-          "objectId",
           "status",
           "reportedBy",
+          "id",
+          "objectId",
           "reportedOn",
           "expiration"
         ],
@@ -31819,8 +32014,8 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
           "name",
+          "id",
           "order"
         ],
         "properties": {
@@ -31829,7 +32024,8 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "description": {
             "type": "string",
@@ -31920,9 +32116,9 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
+          "teamName",
           "workspaceId",
-          "teamId",
-          "teamName"
+          "teamId"
         ],
         "properties": {
           "workspaceId": {
@@ -31938,7 +32134,8 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "teamName": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "boardId": {
             "type": "string",
@@ -32064,10 +32261,10 @@
         },
         "additionalProperties": false,
         "required": [
-          "$type",
-          "id",
           "name",
           "connector",
+          "$type",
+          "id",
           "isActive",
           "isValidConfiguration"
         ],
@@ -32079,7 +32276,8 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "systemId": {
             "type": "string",
@@ -32133,8 +32331,8 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
-          "name"
+          "name",
+          "id"
         ],
         "properties": {
           "id": {
@@ -32142,7 +32340,8 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "description": {
             "type": "string",
@@ -32161,10 +32360,10 @@
         },
         "additionalProperties": false,
         "required": [
-          "$type",
-          "id",
           "name",
           "connector",
+          "$type",
+          "id",
           "isActive",
           "isValidConfiguration"
         ],
@@ -32176,7 +32375,8 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "description": {
             "type": "string",
@@ -32208,6 +32408,10 @@
           {
             "type": "object",
             "additionalProperties": false,
+            "required": [
+              "configuration",
+              "teamConfiguration"
+            ],
             "properties": {
               "systemId": {
                 "type": "string",
@@ -32238,13 +32442,16 @@
         ],
         "properties": {
           "organization": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "personalAccessToken": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "organizationUrl": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "workProcesses": {
             "type": "array",
@@ -32264,8 +32471,8 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "externalId",
-          "name"
+          "name",
+          "externalId"
         ],
         "properties": {
           "externalId": {
@@ -32275,7 +32482,8 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "description": {
             "type": "string",
@@ -32302,6 +32510,7 @@
           "internalId": {
             "type": "string",
             "format": "guid",
+            "minLength": 1,
             "nullable": false,
             "example": "00000000-0000-0000-0000-000000000000"
           },
@@ -32314,8 +32523,8 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "externalId",
           "name",
+          "externalId",
           "workProcessId"
         ],
         "properties": {
@@ -32326,7 +32535,8 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "description": {
             "type": "string",
@@ -32371,6 +32581,9 @@
           {
             "type": "object",
             "additionalProperties": false,
+            "required": [
+              "configuration"
+            ],
             "properties": {
               "configuration": {
                 "$ref": "#/components/schemas/AzureOpenAIConnectionConfigurationDto"
@@ -32392,13 +32605,16 @@
         ],
         "properties": {
           "baseUrl": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "apiKey": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "deploymentName": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "defaultTemperature": {
             "type": "number",
@@ -32425,8 +32641,8 @@
         "x-abstract": true,
         "additionalProperties": false,
         "required": [
-          "$type",
-          "name"
+          "name",
+          "$type"
         ],
         "properties": {
           "name": {
@@ -32456,14 +32672,20 @@
           {
             "type": "object",
             "additionalProperties": false,
+            "required": [
+              "organization",
+              "personalAccessToken"
+            ],
             "properties": {
               "organization": {
                 "type": "string",
-                "description": "The Azure DevOps Organization name."
+                "description": "The Azure DevOps Organization name.",
+                "minLength": 1
               },
               "personalAccessToken": {
                 "type": "string",
-                "description": "The personal access token that enables access to Azure DevOps data."
+                "description": "The personal access token that enables access to Azure DevOps data.",
+                "minLength": 1
               }
             }
           }
@@ -32477,18 +32699,26 @@
           {
             "type": "object",
             "additionalProperties": false,
+            "required": [
+              "baseUrl",
+              "apiKey",
+              "deploymentName"
+            ],
             "properties": {
               "baseUrl": {
                 "type": "string",
-                "description": "Azure OpenAI resource URL."
+                "description": "Azure OpenAI resource URL.",
+                "minLength": 1
               },
               "apiKey": {
                 "type": "string",
-                "description": "The API key for Azure OpenAI resource."
+                "description": "The API key for Azure OpenAI resource.",
+                "minLength": 1
               },
               "deploymentName": {
                 "type": "string",
-                "description": "The OpenAI model deployment name to use for this connection (e.g. \"gpt-4o\")"
+                "description": "The OpenAI model deployment name to use for this connection (e.g. \"gpt-4o\")",
+                "minLength": 1
               }
             }
           }
@@ -32506,9 +32736,9 @@
         "x-abstract": true,
         "additionalProperties": false,
         "required": [
+          "name",
           "$type",
-          "id",
-          "name"
+          "id"
         ],
         "properties": {
           "id": {
@@ -32546,14 +32776,20 @@
           {
             "type": "object",
             "additionalProperties": false,
+            "required": [
+              "organization",
+              "personalAccessToken"
+            ],
             "properties": {
               "organization": {
                 "type": "string",
-                "description": "The Azure DevOps Organization name."
+                "description": "The Azure DevOps Organization name.",
+                "minLength": 1
               },
               "personalAccessToken": {
                 "type": "string",
-                "description": "The personal access token that enables access to Azure DevOps data."
+                "description": "The personal access token that enables access to Azure DevOps data.",
+                "minLength": 1
               }
             }
           }
@@ -32567,18 +32803,26 @@
           {
             "type": "object",
             "additionalProperties": false,
+            "required": [
+              "baseUrl",
+              "apiKey",
+              "deploymentName"
+            ],
             "properties": {
               "baseUrl": {
                 "type": "string",
-                "description": "Azure OpenAI resource URL."
+                "description": "Azure OpenAI resource URL.",
+                "minLength": 1
               },
               "apiKey": {
                 "type": "string",
-                "description": "The API key for Azure OpenAI resource."
+                "description": "The API key for Azure OpenAI resource.",
+                "minLength": 1
               },
               "deploymentName": {
                 "type": "string",
-                "description": "The OpenAI model deployment name to use for this connection (e.g. \"gpt-4o\")"
+                "description": "The OpenAI model deployment name to use for this connection (e.g. \"gpt-4o\")",
+                "minLength": 1
               }
             }
           }
@@ -32588,10 +32832,10 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id",
           "name",
-          "order",
-          "groupName"
+          "groupName",
+          "id",
+          "order"
         ],
         "properties": {
           "id": {
@@ -32599,7 +32843,8 @@
             "format": "int32"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "description": {
             "type": "string",
@@ -32610,7 +32855,8 @@
             "format": "int32"
           },
           "groupName": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           }
         }
       },

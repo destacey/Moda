@@ -12,6 +12,7 @@
         <PackageReference Include="Moq" />
         <PackageReference Include="Moq.AutoMock" />
         <PackageReference Include="NodaTime.Testing" />
+        <PackageReference Include="System.Security.Cryptography.Xml" />
         <PackageReference Include="xunit.v3" />
         <PackageReference Include="xunit.runner.visualstudio">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
