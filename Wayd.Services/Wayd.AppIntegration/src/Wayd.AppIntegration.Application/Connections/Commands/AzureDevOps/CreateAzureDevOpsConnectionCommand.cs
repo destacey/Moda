@@ -78,9 +78,9 @@ internal sealed class CreateAzureDevOpsConnectionCommandHandler(IAppIntegrationD
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Moda Request: Exception for Request {Name} {@Request}", AppRequestName, request);
+            _logger.LogError(ex, "Wayd Request: Exception for Request {Name} {@Request}", AppRequestName, request);
 
-            return Result.Failure<Guid>($"Moda Request: Exception for Request {AppRequestName} {request}");
+            return Result.Failure<Guid>($"Wayd Request: Exception for Request {AppRequestName} {request}");
         }
     }
 }

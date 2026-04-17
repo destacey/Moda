@@ -84,7 +84,7 @@ internal sealed class GetPlanningIntervalObjectivesQueryHandler(IPlanningDbConte
         var requestName = request.GetType().Name;
         var exception = new InternalServerException(message);
 
-        _logger.LogError(exception, "Moda Request: Exception for Request {Name} {@Request}. {Message}", requestName, request, message);
+        _logger.LogError(exception, "Wayd Request: Exception for Request {Name} {@Request}. {Message}", requestName, request, message);
         throw exception;
     }
 }

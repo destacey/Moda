@@ -60,7 +60,7 @@ internal sealed class UpdateLinkCommandHandler : ICommandHandler<UpdateLinkComma
                 link.ClearDomainEvents();
 
                 var requestName = request.GetType().Name;
-                _logger.LogError("Moda Request: Failure for Request {Name} {@Request}.  Error message: {Error}", requestName, request, updateResult.Error);
+                _logger.LogError("Wayd Request: Failure for Request {Name} {@Request}.  Error message: {Error}", requestName, request, updateResult.Error);
                 return Result.Failure<LinkDto>(updateResult.Error);
             }
 
@@ -72,9 +72,9 @@ internal sealed class UpdateLinkCommandHandler : ICommandHandler<UpdateLinkComma
         {
             var requestName = request.GetType().Name;
 
-            _logger.LogError(ex, "Moda Request: Exception for Request {Name} {@Request}", requestName, request);
+            _logger.LogError(ex, "Wayd Request: Exception for Request {Name} {@Request}", requestName, request);
 
-            return Result.Failure<LinkDto>($"Moda Request: Exception for Request {requestName} {request}");
+            return Result.Failure<LinkDto>($"Wayd Request: Exception for Request {requestName} {request}");
         }
     }
 }

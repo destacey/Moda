@@ -82,7 +82,7 @@ internal sealed class UpdateAzureOpenAIConnectionCommandHandler(IAppIntegrationD
                 await _appIntegrationDbContext.Entry(connection).ReloadAsync(cancellationToken);
                 connection.ClearDomainEvents();
 
-                _logger.LogError("Moda Request: Failure for Request {Name} {@Request}.  Error message: {Error}", AppRequestName, request, updateResult.Error);
+                _logger.LogError("Wayd Request: Failure for Request {Name} {@Request}.  Error message: {Error}", AppRequestName, request, updateResult.Error);
                 return Result.Failure<Guid>(updateResult.Error);
             }
 
@@ -92,9 +92,9 @@ internal sealed class UpdateAzureOpenAIConnectionCommandHandler(IAppIntegrationD
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Moda Request: Exception for Request {Name} {@Request}", AppRequestName, request);
+            _logger.LogError(ex, "Wayd Request: Exception for Request {Name} {@Request}", AppRequestName, request);
 
-            return Result.Failure<Guid>($"Moda Request: Exception for Request {AppRequestName} {request}");
+            return Result.Failure<Guid>($"Wayd Request: Exception for Request {AppRequestName} {request}");
         }
     }
 }

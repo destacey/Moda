@@ -35,7 +35,7 @@
             }
         },
         "Properties": {
-            "Application": "Moda"
+            "Application": "Wayd"
         },
         "WriteTo": [
             { "Name": "Console" }

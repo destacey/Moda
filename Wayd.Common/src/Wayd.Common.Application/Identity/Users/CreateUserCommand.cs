@@ -44,7 +44,7 @@ public sealed class CreateUserCommandValidator : CustomValidator<CreateUserComma
 
         RuleFor(u => u.Password)
             .NotEmpty()
-                .WithMessage("Password is required for Moda accounts.")
+                .WithMessage("Password is required for Wayd accounts.")
             .MinimumLength(8)
                 .WithMessage("Password must be at least 8 characters.")
             .Matches("[A-Z]")

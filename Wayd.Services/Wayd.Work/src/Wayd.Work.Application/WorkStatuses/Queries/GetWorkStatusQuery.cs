@@ -48,7 +48,7 @@ internal sealed class GetWorkStatusQueryHandler : IQueryHandler<GetWorkStatusQue
             var requestName = request.GetType().Name;
             var exception = new InternalServerException("No work state id or name provided.");
 
-            _logger.LogError(exception, "Moda Request: Exception for Request {Name} {@Request}", requestName, request);
+            _logger.LogError(exception, "Wayd Request: Exception for Request {Name} {@Request}", requestName, request);
             throw exception;
         }
 

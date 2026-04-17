@@ -33,7 +33,7 @@ const eslintConfig = [
     linterOptions: { reportUnusedDisableDirectives: 'off' },
   },
   {
-    ignores: ['coverage/**', 'src/services/moda-api.ts'],
+    ignores: ['coverage/**', 'src/services/wayd-api.ts'],
   },
 ]
 

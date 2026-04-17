@@ -45,7 +45,7 @@ namespace Wayd.ArchitectureTests.Sut;
 /// Wayd.Web/
 ///   src/
 ///     Wayd.Web.Api/
-///     moda.web.reactclient/
+///     wayd.web.reactclient/
 ///
 /// Wayd.ArchitectureTests/ (exception - no src/tests folders)
 ///

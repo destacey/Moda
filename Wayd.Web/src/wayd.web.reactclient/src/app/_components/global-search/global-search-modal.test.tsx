@@ -162,7 +162,7 @@ describe('GlobalSearchModal', () => {
     it('does not trigger search for single character', async () => {
       render(<GlobalSearchModal open={true} onClose={jest.fn()} />)
       await act(async () => {
-        fireEvent.change(screen.getByPlaceholderText('Search Moda...'), {
+        fireEvent.change(screen.getByPlaceholderText('Search Wayd...'), {
           target: { value: 'a' },
         })
         jest.advanceTimersByTime(300)
@@ -173,7 +173,7 @@ describe('GlobalSearchModal', () => {
     it('triggers search after 2+ characters with debounce', async () => {
       render(<GlobalSearchModal open={true} onClose={jest.fn()} />)
       await act(async () => {
-        fireEvent.change(screen.getByPlaceholderText('Search Moda...'), {
+        fireEvent.change(screen.getByPlaceholderText('Search Wayd...'), {
           target: { value: 'te' },
         })
         jest.advanceTimersByTime(300)
@@ -207,7 +207,7 @@ describe('GlobalSearchModal', () => {
       render(<GlobalSearchModal open={true} onClose={onClose} />)
       await act(async () => { jest.runAllTimers() }) // flush autofocus timer
       await act(async () => {
-        fireEvent.change(screen.getByPlaceholderText('Search Moda...'), {
+        fireEvent.change(screen.getByPlaceholderText('Search Wayd...'), {
           target: { value: 'te' },
         })
         jest.runAllTimers() // flush debounce
@@ -248,7 +248,7 @@ describe('GlobalSearchModal', () => {
       setupMock({ data: { categories: [] } })
       render(<GlobalSearchModal open={true} onClose={jest.fn()} />)
       await act(async () => {
-        fireEvent.change(screen.getByPlaceholderText('Search Moda...'), {
+        fireEvent.change(screen.getByPlaceholderText('Search Wayd...'), {
           target: { value: 'te' },
         })
         jest.runAllTimers()
@@ -262,7 +262,7 @@ describe('GlobalSearchModal', () => {
       const onClose = jest.fn()
       render(<GlobalSearchModal open={true} onClose={onClose} />)
       await act(async () => { jest.runAllTimers() })
-      fireEvent.keyDown(screen.getByPlaceholderText('Search Moda...'), { key: 'Escape' })
+      fireEvent.keyDown(screen.getByPlaceholderText('Search Wayd...'), { key: 'Escape' })
       expect(onClose).toHaveBeenCalled()
     })
 
@@ -273,7 +273,7 @@ describe('GlobalSearchModal', () => {
       render(<GlobalSearchModal open={true} onClose={onClose} />)
       await act(async () => { jest.runAllTimers() })
       await act(async () => {
-        fireEvent.change(screen.getByPlaceholderText('Search Moda...'), {
+        fireEvent.change(screen.getByPlaceholderText('Search Wayd...'), {
           target: { value: 'te' },
         })
         jest.runAllTimers()
@@ -281,10 +281,10 @@ describe('GlobalSearchModal', () => {
 
       // Select first item with ArrowDown, then press Enter
       await act(async () => {
-        fireEvent.keyDown(screen.getByPlaceholderText('Search Moda...'), { key: 'ArrowDown' })
+        fireEvent.keyDown(screen.getByPlaceholderText('Search Wayd...'), { key: 'ArrowDown' })
       })
       await act(async () => {
-        fireEvent.keyDown(screen.getByPlaceholderText('Search Moda...'), { key: 'Enter' })
+        fireEvent.keyDown(screen.getByPlaceholderText('Search Wayd...'), { key: 'Enter' })
       })
       expect(mockPush).toHaveBeenCalled()
       expect(onClose).toHaveBeenCalled()

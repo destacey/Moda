@@ -10,7 +10,7 @@ Not every PR needs a changeset — only ones that should produce a new published
 
 ## Adding a changeset to your PR
 
-From the `Moda.Web/src/Moda.Mcp` directory:
+From the `Wayd.Web/src/Wayd.Mcp` directory:
 
 ```bash
 npx changeset

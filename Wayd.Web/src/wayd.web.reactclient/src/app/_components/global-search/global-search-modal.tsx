@@ -375,7 +375,7 @@ const GlobalSearchModal: FC<GlobalSearchModalProps> = memo(
             ref={inputRef}
             prefix={<SearchOutlined />}
             placeholder={
-              scope === 'app' ? 'Search Moda...' : 'Search documentation...'
+              scope === 'app' ? 'Search Wayd...' : 'Search documentation...'
             }
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}

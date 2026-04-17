@@ -28,7 +28,7 @@ internal sealed class UpdateAzureDevOpsConnectionSyncStateCommandHandler(ILogger
                 await _appIntegrationDbContext.Entry(connection).ReloadAsync(cancellationToken);
                 connection.ClearDomainEvents();
 
-                _logger.LogError("Moda Request: Failure for Request {Name} {@Request}.  Error message: {Error}", AppRequestName, request, updateResult.Error);
+                _logger.LogError("Wayd Request: Failure for Request {Name} {@Request}.  Error message: {Error}", AppRequestName, request, updateResult.Error);
                 return Result.Failure<Guid>(updateResult.Error);
             }
 
@@ -38,9 +38,9 @@ internal sealed class UpdateAzureDevOpsConnectionSyncStateCommandHandler(ILogger
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Moda Request: Exception for Request {Name} {@Request}", AppRequestName, request);
+            _logger.LogError(ex, "Wayd Request: Exception for Request {Name} {@Request}", AppRequestName, request);
 
-            return Result.Failure($"Moda Request: Exception for Request AppRequestName {request}");
+            return Result.Failure($"Wayd Request: Exception for Request AppRequestName {request}");
         }
     }
 }

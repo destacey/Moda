@@ -114,7 +114,7 @@ public class CreateUserCommandValidatorTests
 
         // Assert
         result.ShouldHaveValidationErrorFor(x => x.Password)
-            .WithErrorMessage("Password is required for Moda accounts.");
+            .WithErrorMessage("Password is required for Wayd accounts.");
     }
 
     [Fact]

@@ -45,8 +45,8 @@ internal sealed class SetConsensusCommandHandler(IPlanningDbContext planningDbCo
         catch (Exception ex)
         {
             var requestName = request.GetType().Name;
-            _logger.LogError(ex, "Moda Request: Exception for Request {Name} {@Request}", requestName, request);
-            return Result.Failure($"Moda Request: Exception for Request {requestName} {request}");
+            _logger.LogError(ex, "Wayd Request: Exception for Request {Name} {@Request}", requestName, request);
+            return Result.Failure($"Wayd Request: Exception for Request {requestName} {request}");
         }
     }
 }

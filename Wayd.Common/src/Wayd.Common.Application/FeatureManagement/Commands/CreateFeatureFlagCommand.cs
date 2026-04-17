@@ -56,8 +56,8 @@ internal sealed class CreateFeatureFlagCommandHandler(
         catch (Exception ex)
         {
             var requestName = request.GetType().Name;
-            _logger.LogError(ex, "Moda Request: Exception for Request {Name} {@Request}", requestName, request);
-            return Result.Failure<int>($"Moda Request: Exception for Request {requestName} {request}");
+            _logger.LogError(ex, "Wayd Request: Exception for Request {Name} {@Request}", requestName, request);
+            return Result.Failure<int>($"Wayd Request: Exception for Request {requestName} {request}");
         }
     }
 }

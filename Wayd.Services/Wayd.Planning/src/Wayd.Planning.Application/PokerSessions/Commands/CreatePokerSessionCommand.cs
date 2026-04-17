@@ -54,8 +54,8 @@ internal sealed class CreatePokerSessionCommandHandler(IPlanningDbContext planni
         catch (Exception ex)
         {
             var requestName = request.GetType().Name;
-            _logger.LogError(ex, "Moda Request: Exception for Request {Name} {@Request}", requestName, request);
-            return Result.Failure<ObjectIdAndKey>($"Moda Request: Exception for Request {requestName} {request}");
+            _logger.LogError(ex, "Wayd Request: Exception for Request {Name} {@Request}", requestName, request);
+            return Result.Failure<ObjectIdAndKey>($"Wayd Request: Exception for Request {requestName} {request}");
         }
     }
 }

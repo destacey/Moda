@@ -49,8 +49,8 @@ internal sealed class AddPokerRoundCommandHandler(IPlanningDbContext planningDbC
         catch (Exception ex)
         {
             var requestName = request.GetType().Name;
-            _logger.LogError(ex, "Moda Request: Exception for Request {Name} {@Request}", requestName, request);
-            return Result.Failure<PokerRoundDto>($"Moda Request: Exception for Request {requestName} {request}");
+            _logger.LogError(ex, "Wayd Request: Exception for Request {Name} {@Request}", requestName, request);
+            return Result.Failure<PokerRoundDto>($"Wayd Request: Exception for Request {requestName} {request}");
         }
     }
 }

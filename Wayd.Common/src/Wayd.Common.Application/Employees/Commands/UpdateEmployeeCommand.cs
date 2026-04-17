@@ -125,7 +125,7 @@ internal sealed class UpdateEmployeeCommandHandler : ICommandHandler<UpdateEmplo
                 && employee.ManagerId != request.ManagerId
                 && await _modaDbContext.Employees.AllAsync(e => e.Id != request.ManagerId.Value, cancellationToken))
             {
-                _logger.LogWarning("Moda Request: Unable to find manager {ManagerId} while updating employee {EmployeeId}", request.ManagerId.Value, request.Id);
+                _logger.LogWarning("Wayd Request: Unable to find manager {ManagerId} while updating employee {EmployeeId}", request.ManagerId.Value, request.Id);
                 return Result.Failure<int>("Manager not found.");
             }
 
@@ -149,7 +149,7 @@ internal sealed class UpdateEmployeeCommandHandler : ICommandHandler<UpdateEmplo
                 employee.ClearDomainEvents();
 
                 var requestName = request.GetType().Name;
-                _logger.LogError("Moda Request: Failure for Request {Name} {@Request}.  Error message: {Error}", requestName, request, updateResult.Error);
+                _logger.LogError("Wayd Request: Failure for Request {Name} {@Request}.  Error message: {Error}", requestName, request, updateResult.Error);
                 return Result.Failure<int>(updateResult.Error);
             }
 
@@ -161,9 +161,9 @@ internal sealed class UpdateEmployeeCommandHandler : ICommandHandler<UpdateEmplo
         {
             var requestName = request.GetType().Name;
 
-            _logger.LogError(ex, "Moda Request: Exception for Request {Name} {@Request}", requestName, request);
+            _logger.LogError(ex, "Wayd Request: Exception for Request {Name} {@Request}", requestName, request);
 
-            return Result.Failure<int>($"Moda Request: Exception for Request {requestName} {request}");
+            return Result.Failure<int>($"Wayd Request: Exception for Request {requestName} {request}");
         }
     }
 }

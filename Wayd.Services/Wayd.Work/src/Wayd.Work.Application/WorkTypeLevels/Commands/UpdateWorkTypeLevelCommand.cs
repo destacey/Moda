@@ -80,7 +80,7 @@ internal sealed class UpdateWorkTypeLevelCommandHandler : ICommandHandler<Update
 
             if (updateResult.IsFailure)
             {
-                _logger.LogError("Moda Request: Failure for Request {Name} {@Request}.  Error message: {Error}", AppRequestName, request, updateResult.Error);
+                _logger.LogError("Wayd Request: Failure for Request {Name} {@Request}.  Error message: {Error}", AppRequestName, request, updateResult.Error);
                 return Result.Failure(updateResult.Error);
             }
 
@@ -90,9 +90,9 @@ internal sealed class UpdateWorkTypeLevelCommandHandler : ICommandHandler<Update
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Moda Request: Exception for Request {Name} {@Request}", AppRequestName, request);
+            _logger.LogError(ex, "Wayd Request: Exception for Request {Name} {@Request}", AppRequestName, request);
 
-            return Result.Failure($"Moda Request: Exception for Request {AppRequestName} {request}");
+            return Result.Failure($"Wayd Request: Exception for Request {AppRequestName} {request}");
         }
     }
 }

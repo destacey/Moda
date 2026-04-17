@@ -67,9 +67,9 @@ internal sealed class CreateWorkTypeLevelCommandHandler : ICommandHandler<Create
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Moda Request: Exception for Request {Name} {@Request}", AppRequestName, request);
+            _logger.LogError(ex, "Wayd Request: Exception for Request {Name} {@Request}", AppRequestName, request);
 
-            return Result.Failure<int>($"Moda Request: Exception for Request {AppRequestName} {request}");
+            return Result.Failure<int>($"Wayd Request: Exception for Request {AppRequestName} {request}");
         }
     }
 }

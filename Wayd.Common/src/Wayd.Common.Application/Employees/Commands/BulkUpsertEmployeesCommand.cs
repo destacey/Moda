@@ -81,7 +81,7 @@ internal sealed class BulkUpsertEmployeesCommandHandler(IWaydDbContext modaDbCon
                         await _modaDbContext.Entry(employee).ReloadAsync(cancellationToken);
                         employee.ClearDomainEvents();
 
-                        _logger.LogError("Moda Request: Failure for Request {Name}.  Error message: {Error}", requestName, updateResult.Error);
+                        _logger.LogError("Wayd Request: Failure for Request {Name}.  Error message: {Error}", requestName, updateResult.Error);
                         errors.Add(externalEmployee.EmployeeNumber, updateResult.Error);
 
                         continue;
@@ -113,7 +113,7 @@ internal sealed class BulkUpsertEmployeesCommandHandler(IWaydDbContext modaDbCon
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Moda Request: Exception for Request {Name}", requestName);
+                _logger.LogError(ex, "Wayd Request: Exception for Request {Name}", requestName);
             }
         }
 
@@ -129,9 +129,9 @@ internal sealed class BulkUpsertEmployeesCommandHandler(IWaydDbContext modaDbCon
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Moda Request: Exception for Request {Name} while updating the database.", requestName);
+            _logger.LogError(ex, "Wayd Request: Exception for Request {Name} while updating the database.", requestName);
 
-            return Result.Failure<int>($"Moda Request: Exception for Request {requestName} {request}");
+            return Result.Failure<int>($"Wayd Request: Exception for Request {requestName} {request}");
         }
     }
 

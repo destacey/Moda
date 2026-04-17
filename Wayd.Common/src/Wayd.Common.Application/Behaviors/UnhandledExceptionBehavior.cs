@@ -26,9 +26,9 @@ public class UnhandledExceptionBehavior<TRequest, TResponse> : IPipelineBehavior
             var requestType = request.GetType().GetInterfaces().FirstOrDefault(i => i.IsGenericType && customRequestTypes.Contains(i.GetGenericTypeDefinition()));
             if (requestType is not null)
             {
-                _logger.LogError(ex, "Moda Request: Unhandled Exception for Request {Name} {@Request}. Request Type: {RequestTypeName}", requestName, request, requestType.Name);
+                _logger.LogError(ex, "Wayd Request: Unhandled Exception for Request {Name} {@Request}. Request Type: {RequestTypeName}", requestName, request, requestType.Name);
 
-                var errorMessage = $"Moda Request: Unhandled Exception for Request {requestName} {request}";
+                var errorMessage = $"Wayd Request: Unhandled Exception for Request {requestName} {request}";
 
                 //if (requestType == typeof(ICommand) || requestType == typeof(ICommand<>))
                 //{
@@ -39,7 +39,7 @@ public class UnhandledExceptionBehavior<TRequest, TResponse> : IPipelineBehavior
             }
             else
             {
-                _logger.LogError(ex, "Moda Request: Unhandled Exception for Request {Name} {@Request}", requestName, request);
+                _logger.LogError(ex, "Wayd Request: Unhandled Exception for Request {Name} {@Request}", requestName, request);
             }
 
             throw;
