@@ -1,4 +1,4 @@
-namespace Moda.ProjectPortfolioManagement.Application.Projects.Dtos;
+namespace Wayd.ProjectPortfolioManagement.Application.Projects.Dtos;
 
 /// <summary>
 /// Aggregated task metrics across all of the current user's projects.

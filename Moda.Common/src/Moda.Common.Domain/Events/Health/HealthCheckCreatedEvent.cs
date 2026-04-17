@@ -1,7 +1,7 @@
-﻿using Moda.Common.Domain.Enums;
+﻿using Wayd.Common.Domain.Enums;
 using NodaTime;
 
-namespace Moda.Common.Domain.Events.Health;
+namespace Wayd.Common.Domain.Events.Health;
 
 public sealed record HealthCheckCreatedEvent : DomainEvent
 {

@@ -1,6 +1,6 @@
-﻿using Moda.Planning.Domain.Interfaces.Roadmaps;
+﻿using Wayd.Planning.Domain.Interfaces.Roadmaps;
 
-namespace Moda.Planning.Application.Roadmaps.Validators;
+namespace Wayd.Planning.Application.Roadmaps.Validators;
 
 public sealed class IUpsertRoadmapMilestoneDateValidator : CustomValidator<IUpsertRoadmapMilestoneDate>
 {

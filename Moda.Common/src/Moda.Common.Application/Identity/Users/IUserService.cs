@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 
-namespace Moda.Common.Application.Identity.Users;
+namespace Wayd.Common.Application.Identity.Users;
 
 public interface IUserService : ITransientService
 {

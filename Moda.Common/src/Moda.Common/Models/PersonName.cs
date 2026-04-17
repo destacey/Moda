@@ -1,7 +1,7 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
 
-namespace Moda.Common.Models;
+namespace Wayd.Common.Models;
 
 public class PersonName : ValueObject
 {

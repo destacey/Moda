@@ -1,9 +1,9 @@
 ﻿using System.Security.Claims;
-using Moda.Common.Application.Interfaces;
-using Moda.Web.Api.Extensions;
-using Moda.Web.Api.Models.UserManagement.Profiles;
+using Wayd.Common.Application.Interfaces;
+using Wayd.Web.Api.Extensions;
+using Wayd.Web.Api.Models.UserManagement.Profiles;
 
-namespace Moda.Web.Api.Controllers.UserManagement;
+namespace Wayd.Web.Api.Controllers.UserManagement;
 
 [Route("api/user-management/profiles")]
 [ApiVersionNeutral]

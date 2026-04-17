@@ -1,6 +1,6 @@
-using Moda.ProjectPortfolioManagement.Domain.Models;
+using Wayd.ProjectPortfolioManagement.Domain.Models;
 
-namespace Moda.ProjectPortfolioManagement.Domain.Services;
+namespace Wayd.ProjectPortfolioManagement.Domain.Services;
 
 /// <summary>
 /// Domain service for calculating Work Breakdown Structure (WBS) codes for project tasks.

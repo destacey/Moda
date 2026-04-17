@@ -1,4 +1,4 @@
-namespace Moda.Infrastructure.Persistence;
+namespace Wayd.Infrastructure.Persistence;
 
 public class DatabaseSettings
 {

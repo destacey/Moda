@@ -1,7 +1,7 @@
-﻿using Moda.Organization.Application.Teams.Models;
+﻿using Wayd.Organization.Application.Teams.Models;
 using NodaTime;
 
-namespace Moda.Organization.Application.TeamsOfTeams.Commands;
+namespace Wayd.Organization.Application.TeamsOfTeams.Commands;
 
 public sealed record DeactivateTeamOfTeamsCommand(Guid Id, LocalDate InactiveDate) : ICommand;
 

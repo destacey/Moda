@@ -1,8 +1,8 @@
 ﻿using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using Moda.AppIntegration.Domain.Models.AzureOpenAI;
+using Wayd.AppIntegration.Domain.Models.AzureOpenAI;
 
-namespace Moda.AppIntegration.Application.Connections.Commands.AzureOpenAI;
+namespace Wayd.AppIntegration.Application.Connections.Commands.AzureOpenAI;
 
 public sealed record UpdateAzureOpenAIConnectionCommand(Guid Id, string Name, string BaseUrl, string? Description, string DeploymentName, string ApiKey) : ICommand<Guid>;
 

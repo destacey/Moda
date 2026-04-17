@@ -1,4 +1,4 @@
-namespace Moda.Common.Application.Search.Dtos;
+namespace Wayd.Common.Application.Search.Dtos;
 
 public sealed record GlobalSearchResultDto
 {

@@ -1,4 +1,4 @@
-﻿namespace Moda.Planning.Application.PokerSessions.Commands;
+﻿namespace Wayd.Planning.Application.PokerSessions.Commands;
 
 public sealed record DeletePokerSessionCommand(Guid Id) : ICommand;
 

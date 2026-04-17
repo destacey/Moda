@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Moda.ProjectPortfolioManagement.Domain.Enums;
+namespace Wayd.ProjectPortfolioManagement.Domain.Enums;
 
 // max length of 32 characters
 

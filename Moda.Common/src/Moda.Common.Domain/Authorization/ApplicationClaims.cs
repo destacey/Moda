@@ -1,4 +1,4 @@
-﻿namespace Moda.Common.Domain.Authorization;
+﻿namespace Wayd.Common.Domain.Authorization;
 
 public static class ApplicationClaims
 {

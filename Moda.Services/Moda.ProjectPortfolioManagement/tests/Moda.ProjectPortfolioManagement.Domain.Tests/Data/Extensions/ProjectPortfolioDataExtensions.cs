@@ -1,9 +1,9 @@
-﻿using Moda.ProjectPortfolioManagement.Domain.Models;
-using Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
-using Moda.Tests.Shared;
-using Moda.Tests.Shared.Extensions;
+﻿using Wayd.ProjectPortfolioManagement.Domain.Models;
+using Wayd.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
+using Wayd.Tests.Shared;
+using Wayd.Tests.Shared.Extensions;
 
-namespace Moda.ProjectPortfolioManagement.Domain.Tests.Data.Extensions;
+namespace Wayd.ProjectPortfolioManagement.Domain.Tests.Data.Extensions;
 
 /// <summary>
 /// Extensions to help with testing and creating test data for ProjectPortfolio.

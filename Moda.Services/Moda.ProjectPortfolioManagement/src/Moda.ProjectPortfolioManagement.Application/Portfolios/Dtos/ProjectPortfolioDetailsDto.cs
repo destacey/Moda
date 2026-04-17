@@ -1,9 +1,9 @@
-﻿using Moda.Common.Application.Dtos;
-using Moda.Common.Application.Employees.Dtos;
-using Moda.ProjectPortfolioManagement.Domain.Enums;
-using Moda.ProjectPortfolioManagement.Domain.Models;
+﻿using Wayd.Common.Application.Dtos;
+using Wayd.Common.Application.Employees.Dtos;
+using Wayd.ProjectPortfolioManagement.Domain.Enums;
+using Wayd.ProjectPortfolioManagement.Domain.Models;
 
-namespace Moda.ProjectPortfolioManagement.Application.Portfolios.Dtos;
+namespace Wayd.ProjectPortfolioManagement.Application.Portfolios.Dtos;
 
 public sealed record ProjectPortfolioDetailsDto : IMapFrom<ProjectPortfolio>
 {

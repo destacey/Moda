@@ -1,6 +1,6 @@
-﻿using Moda.Common.Domain.Enums.Work;
+﻿using Wayd.Common.Domain.Enums.Work;
 
-namespace Moda.Common.Domain.Extensions;
+namespace Wayd.Common.Domain.Extensions;
 
 public static class DependencyStateExtensions
 {

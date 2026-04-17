@@ -1,9 +1,9 @@
-﻿using Moda.Common.Domain.Enums.Planning;
-using Moda.Common.Domain.Interfaces.Planning.Iterations;
-using Moda.Common.Domain.Models.Planning.Iterations;
+﻿using Wayd.Common.Domain.Enums.Planning;
+using Wayd.Common.Domain.Interfaces.Planning.Iterations;
+using Wayd.Common.Domain.Models.Planning.Iterations;
 using NodaTime;
 
-namespace Moda.Common.Domain.Events.WorkManagement.WorkIterations;
+namespace Wayd.Common.Domain.Events.WorkManagement.WorkIterations;
 
 public sealed record WorkIterationUpdatedEvent : DomainEvent
 {

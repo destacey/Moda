@@ -1,6 +1,6 @@
-using Moda.Common.Extensions;
+using Wayd.Common.Extensions;
 
-namespace Moda.AppIntegration.Domain.Models.AzureOpenAI;
+namespace Wayd.AppIntegration.Domain.Models.AzureOpenAI;
 
 public class AzureOpenAIConnection : Connection<AzureOpenAIConnectionConfiguration>
 {
@@ -17,7 +17,7 @@ public class AzureOpenAIConnection : Connection<AzureOpenAIConnectionConfigurati
         Name = name;
         Description = description;
         IsValidConfiguration = configurationIsValid;
-        Connector = Moda.Common.Domain.Enums.AppIntegrations.Connector.AzureOpenAI;
+        Connector = Wayd.Common.Domain.Enums.AppIntegrations.Connector.AzureOpenAI;
         Configuration = Guard.Against.Null(configuration, nameof(Configuration));
     }
 

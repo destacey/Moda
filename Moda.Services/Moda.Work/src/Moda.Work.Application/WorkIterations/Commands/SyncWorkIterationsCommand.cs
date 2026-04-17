@@ -1,7 +1,7 @@
-﻿using Moda.Common.Domain.Interfaces.Planning.Iterations;
-using Moda.Work.Application.Persistence;
+﻿using Wayd.Common.Domain.Interfaces.Planning.Iterations;
+using Wayd.Work.Application.Persistence;
 
-namespace Moda.Work.Application.WorkIterations.Commands;
+namespace Wayd.Work.Application.WorkIterations.Commands;
 
 public sealed record SyncWorkIterationsCommand(IEnumerable<ISimpleIteration> Iterations) : ICommand, ILongRunningRequest;
 

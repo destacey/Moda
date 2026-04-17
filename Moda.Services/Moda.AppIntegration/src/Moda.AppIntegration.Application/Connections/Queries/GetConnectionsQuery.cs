@@ -1,11 +1,11 @@
 ﻿using Mapster;
 using Microsoft.EntityFrameworkCore;
-using Moda.AppIntegration.Application.Connections.Dtos.AzureDevOps;
-using Moda.AppIntegration.Application.Connections.Dtos.AzureOpenAI;
-using Moda.AppIntegration.Domain.Models.AzureOpenAI;
-using Moda.Common.Domain.Enums.AppIntegrations;
+using Wayd.AppIntegration.Application.Connections.Dtos.AzureDevOps;
+using Wayd.AppIntegration.Application.Connections.Dtos.AzureOpenAI;
+using Wayd.AppIntegration.Domain.Models.AzureOpenAI;
+using Wayd.Common.Domain.Enums.AppIntegrations;
 
-namespace Moda.AppIntegration.Application.Connections.Queries;
+namespace Wayd.AppIntegration.Application.Connections.Queries;
 
 public sealed record GetConnectionsQuery(bool IncludeInactive = false, Connector? Type = null) : IQuery<IReadOnlyList<ConnectionListDto>>;
 

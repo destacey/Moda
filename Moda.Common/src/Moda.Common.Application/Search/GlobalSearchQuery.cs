@@ -1,8 +1,8 @@
 ﻿using MediatR;
-using Moda.Common.Application.Search.Dtos;
-using Moda.Common.Domain.Authorization;
+using Wayd.Common.Application.Search.Dtos;
+using Wayd.Common.Domain.Authorization;
 
-namespace Moda.Common.Application.Search;
+namespace Wayd.Common.Application.Search;
 
 public sealed record GlobalSearchQuery(string SearchTerm, int MaxResultsPerCategory = 5)
     : IQuery<Result<GlobalSearchResultDto>>;

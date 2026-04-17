@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Moda.Organization.Domain.Enums;
+namespace Wayd.Organization.Domain.Enums;
 
 /// <summary>
 /// Defines the methodology a team uses to manage their work.

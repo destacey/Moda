@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace Moda.Common.Helpers;
+namespace Wayd.Common.Helpers;
 
 public static class StringHelpers
 {

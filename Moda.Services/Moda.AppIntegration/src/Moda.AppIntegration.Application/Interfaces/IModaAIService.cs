@@ -1,6 +1,6 @@
-using Moda.AppIntegration.Domain.Models.AICapabilities.ObjectiveHealthCheckSummary;
+using Wayd.AppIntegration.Domain.Models.AICapabilities.ObjectiveHealthCheckSummary;
 
-namespace Moda.AppIntegration.Application.Interfaces;
+namespace Wayd.AppIntegration.Application.Interfaces;
 
 public interface IModaAIService
 {

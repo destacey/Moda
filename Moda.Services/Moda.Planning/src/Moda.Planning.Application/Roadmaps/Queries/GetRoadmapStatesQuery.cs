@@ -1,7 +1,7 @@
-using Moda.Common.Application.Models;
-using Moda.Common.Domain.Enums.Planning;
+using Wayd.Common.Application.Models;
+using Wayd.Common.Domain.Enums.Planning;
 
-namespace Moda.Planning.Application.Roadmaps.Queries;
+namespace Wayd.Planning.Application.Roadmaps.Queries;
 
 public sealed record GetRoadmapStatesQuery : IQuery<List<RoadmapStateDto>> { }
 

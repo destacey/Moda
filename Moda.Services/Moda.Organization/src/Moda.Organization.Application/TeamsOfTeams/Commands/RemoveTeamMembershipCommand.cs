@@ -1,4 +1,4 @@
-﻿namespace Moda.Organization.Application.TeamsOfTeams.Commands;
+﻿namespace Wayd.Organization.Application.TeamsOfTeams.Commands;
 
 public sealed record RemoveTeamMembershipCommand(Guid TeamId, Guid TeamMembershipId) : ICommand;
 

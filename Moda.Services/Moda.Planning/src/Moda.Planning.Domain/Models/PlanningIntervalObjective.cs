@@ -1,8 +1,8 @@
 ﻿using CSharpFunctionalExtensions;
-using Moda.Common.Domain.Interfaces;
-using Moda.Planning.Domain.Enums;
+using Wayd.Common.Domain.Interfaces;
+using Wayd.Planning.Domain.Enums;
 
-namespace Moda.Planning.Domain.Models;
+namespace Wayd.Planning.Domain.Models;
 
 public sealed class PlanningIntervalObjective : BaseSoftDeletableEntity, IHasIdAndKey
 {

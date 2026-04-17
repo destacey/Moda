@@ -1,4 +1,4 @@
-﻿namespace Moda.Common.Application.FeatureManagement.Commands;
+﻿namespace Wayd.Common.Application.FeatureManagement.Commands;
 
 public sealed record ToggleFeatureFlagCommand(
     int Id,

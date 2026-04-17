@@ -1,7 +1,7 @@
 using Bogus;
-using Moda.StrategicManagement.Domain.Models;
+using Wayd.StrategicManagement.Domain.Models;
 
-namespace Moda.StrategicManagement.Domain.Tests.Data;
+namespace Wayd.StrategicManagement.Domain.Tests.Data;
 
 /// <summary>
 /// Faker for VisionAggregate. Since VisionAggregate is an aggregate of Vision entities,

@@ -4,14 +4,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Moda.Common.Application.Exceptions;
-using Moda.Common.Application.Identity;
-using Moda.Common.Application.Identity.Tokens;
-using Moda.Infrastructure.Auth.Local;
-using Moda.Infrastructure.Identity;
-using Moda.Tests.Shared;
+using Wayd.Common.Application.Exceptions;
+using Wayd.Common.Application.Identity;
+using Wayd.Common.Application.Identity.Tokens;
+using Wayd.Infrastructure.Auth.Local;
+using Wayd.Infrastructure.Identity;
+using Wayd.Tests.Shared;
 
-namespace Moda.Infrastructure.Tests.Sut.Auth.Local;
+namespace Wayd.Infrastructure.Tests.Sut.Auth.Local;
 
 public class TokenServiceTests
 {

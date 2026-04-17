@@ -1,11 +1,11 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
-using Moda.Common.Domain.Employees;
-using Moda.Common.Domain.Enums.Work;
-using Moda.Work.Domain.Interfaces;
+using Wayd.Common.Domain.Employees;
+using Wayd.Common.Domain.Enums.Work;
+using Wayd.Work.Domain.Interfaces;
 using NodaTime;
 
-namespace Moda.Work.Domain.Models;
+namespace Wayd.Work.Domain.Models;
 
 public sealed class WorkItem : BaseAuditableEntity, IHasWorkspace, IHasOptionalWorkTeam
 {

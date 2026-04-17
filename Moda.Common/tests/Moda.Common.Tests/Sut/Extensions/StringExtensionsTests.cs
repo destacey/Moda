@@ -1,4 +1,4 @@
-﻿namespace Moda.Common.Tests.Sut.Extensions;
+﻿namespace Wayd.Common.Tests.Sut.Extensions;
 
 public class StringExtensionsTests
 {

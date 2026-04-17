@@ -1,5 +1,5 @@
-using Moda.Common.Application.Dtos;
+using Wayd.Common.Application.Dtos;
 
-namespace Moda.Common.Application.Requests.AppIntegration;
+namespace Wayd.Common.Application.Requests.AppIntegration;
 
 public sealed record GetAIConnectionQuery() : IQuery<EnabledAIConnectionDto>;

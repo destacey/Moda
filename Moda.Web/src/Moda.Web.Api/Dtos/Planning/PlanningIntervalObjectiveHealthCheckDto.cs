@@ -1,9 +1,9 @@
-﻿using Moda.Common.Application.Dtos;
-using Moda.Health.Dtos;
-using Moda.Planning.Application.Models;
-using Moda.Planning.Application.PlanningIntervals.Dtos;
+﻿using Wayd.Common.Application.Dtos;
+using Wayd.Health.Dtos;
+using Wayd.Planning.Application.Models;
+using Wayd.Planning.Application.PlanningIntervals.Dtos;
 
-namespace Moda.Web.Api.Dtos.Planning;
+namespace Wayd.Web.Api.Dtos.Planning;
 
 public sealed record PlanningIntervalObjectiveHealthCheckDto
 {

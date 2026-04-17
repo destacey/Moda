@@ -1,11 +1,11 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
-using Moda.Common.Domain.Identity;
-using Moda.Common.Domain.Interfaces;
-using Moda.Planning.Domain.Enums;
+using Wayd.Common.Domain.Identity;
+using Wayd.Common.Domain.Interfaces;
+using Wayd.Planning.Domain.Enums;
 using NodaTime;
 
-namespace Moda.Planning.Domain.Models.PlanningPoker;
+namespace Wayd.Planning.Domain.Models.PlanningPoker;
 
 public sealed class PokerSession : BaseAuditableEntity, IHasIdAndKey
 {

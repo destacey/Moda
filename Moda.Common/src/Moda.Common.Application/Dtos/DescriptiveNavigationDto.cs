@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Moda.Common.Domain.Interfaces;
+using Wayd.Common.Domain.Interfaces;
 
-namespace Moda.Common.Application.Dtos;
+namespace Wayd.Common.Application.Dtos;
 
 public record NavigationDto<TId, TKey>
 {

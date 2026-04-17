@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
+namespace Wayd.Infrastructure.Migrators.MSSQL.Migrations
 {
     /// <inheritdoc />
     public partial class AddWorkTypes : Migration

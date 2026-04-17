@@ -1,7 +1,7 @@
-﻿using Moda.Common.Application.Dtos;
-using Moda.Planning.Application.Iterations.Dtos;
+﻿using Wayd.Common.Application.Dtos;
+using Wayd.Planning.Application.Iterations.Dtos;
 
-namespace Moda.Planning.Application.PlanningIntervals.Dtos;
+namespace Wayd.Planning.Application.PlanningIntervals.Dtos;
 
 /// <summary>
 /// DTO for Planning Interval iteration with its mapped sprints.

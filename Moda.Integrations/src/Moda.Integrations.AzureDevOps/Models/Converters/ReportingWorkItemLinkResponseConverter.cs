@@ -1,8 +1,8 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
-using Moda.Integrations.AzureDevOps.Models.WorkItems;
+using Wayd.Integrations.AzureDevOps.Models.WorkItems;
 
-namespace Moda.Integrations.AzureDevOps.Models.Converters;
+namespace Wayd.Integrations.AzureDevOps.Models.Converters;
 
 internal class ReportingWorkItemLinkResponseConverter : JsonConverter<ReportingWorkItemLinkResponse>
 {

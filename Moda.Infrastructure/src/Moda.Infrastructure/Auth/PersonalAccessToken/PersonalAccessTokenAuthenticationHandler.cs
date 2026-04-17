@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Moda.Infrastructure.Auth.PersonalAccessToken;
+namespace Wayd.Infrastructure.Auth.PersonalAccessToken;
 
 /// <summary>
 /// Authentication handler for Personal Access Tokens (PATs).

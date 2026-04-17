@@ -1,17 +1,17 @@
-﻿using Moda.Common.Domain.Enums;
-using Moda.Common.Domain.Enums.Planning;
-using Moda.Common.Models;
-using Moda.Planning.Domain.Enums;
-using Moda.Planning.Domain.Interfaces.Roadmaps;
-using Moda.Planning.Domain.Models.Roadmaps;
-using Moda.Planning.Domain.Tests.Data;
-using Moda.Planning.Domain.Tests.Models;
-using Moda.Tests.Shared;
+﻿using Wayd.Common.Domain.Enums;
+using Wayd.Common.Domain.Enums.Planning;
+using Wayd.Common.Models;
+using Wayd.Planning.Domain.Enums;
+using Wayd.Planning.Domain.Interfaces.Roadmaps;
+using Wayd.Planning.Domain.Models.Roadmaps;
+using Wayd.Planning.Domain.Tests.Data;
+using Wayd.Planning.Domain.Tests.Models;
+using Wayd.Tests.Shared;
 using NodaTime.Extensions;
 using NodaTime.Testing;
 using OneOf;
 
-namespace Moda.Planning.Domain.Tests.Sut.Models;
+namespace Wayd.Planning.Domain.Tests.Sut.Models;
 
 public class RoadmapTests
 {

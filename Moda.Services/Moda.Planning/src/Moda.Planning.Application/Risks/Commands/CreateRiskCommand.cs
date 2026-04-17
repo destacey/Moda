@@ -1,8 +1,8 @@
 ﻿using Ardalis.GuardClauses;
-using Moda.Common.Application.Models;
-using Moda.Planning.Domain.Enums;
+using Wayd.Common.Application.Models;
+using Wayd.Planning.Domain.Enums;
 
-namespace Moda.Planning.Application.Risks.Commands;
+namespace Wayd.Planning.Application.Risks.Commands;
 
 public sealed record CreateRiskCommand(string Summary, string? Description, Guid TeamId,
     RiskCategory Category, RiskGrade Impact, RiskGrade Likelihood, Guid? AssigneeId,

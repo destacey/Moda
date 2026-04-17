@@ -1,4 +1,4 @@
-using Moda.Infrastructure.Auth.AzureAd;
+using Wayd.Infrastructure.Auth.AzureAd;
 
 namespace System.Security.Claims;
 

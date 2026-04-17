@@ -1,7 +1,7 @@
-using Moda.ProjectPortfolioManagement.Domain.Enums;
+using Wayd.ProjectPortfolioManagement.Domain.Enums;
 using NodaTime;
 
-namespace Moda.ProjectPortfolioManagement.Domain.Models;
+namespace Wayd.ProjectPortfolioManagement.Domain.Models;
 
 /// <summary>
 /// Represents a dependency relationship between two project tasks.

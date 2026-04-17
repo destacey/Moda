@@ -1,6 +1,6 @@
-﻿using Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
+﻿using Wayd.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 
-namespace Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Dtos;
+namespace Wayd.ProjectPortfolioManagement.Application.StrategicInitiatives.Dtos;
 
 public sealed record StrategicInitiativeKpiCheckpointDto : IMapFrom<StrategicInitiativeKpiCheckpoint>
 {

@@ -1,7 +1,7 @@
-﻿using Moda.Common.Application.Dtos;
-using Moda.Common.Application.Requests.WorkManagement.Interfaces;
+﻿using Wayd.Common.Application.Dtos;
+using Wayd.Common.Application.Requests.WorkManagement.Interfaces;
 
-namespace Moda.Work.Application.WorkTypes.Dtos;
+namespace Wayd.Work.Application.WorkTypes.Dtos;
 
 public sealed record WorkTypeDto : IMapFrom<WorkType>, IWorkTypeDto
 {

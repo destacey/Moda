@@ -1,8 +1,8 @@
-﻿using Moda.Common.Extensions;
-using Moda.Planning.Application.PlanningIntervals.Dtos;
-using Moda.Planning.Domain.Enums;
+﻿using Wayd.Common.Extensions;
+using Wayd.Planning.Application.PlanningIntervals.Dtos;
+using Wayd.Planning.Domain.Enums;
 
-namespace Moda.Planning.Application.PlanningIntervals.Queries;
+namespace Wayd.Planning.Application.PlanningIntervals.Queries;
 
 public sealed record GetPlanningIntervalObjectiveTypesQuery() : IQuery<IReadOnlyList<PlanningIntervalObjectiveTypeDto>>;
 

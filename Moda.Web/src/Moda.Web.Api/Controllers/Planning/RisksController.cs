@@ -1,13 +1,13 @@
 ﻿using CsvHelper;
-using Moda.Common.Application.Interfaces;
-using Moda.Common.Application.Models;
-using Moda.Planning.Application.Risks.Commands;
-using Moda.Planning.Application.Risks.Dtos;
-using Moda.Planning.Application.Risks.Queries;
-using Moda.Web.Api.Extensions;
-using Moda.Web.Api.Models.Planning.Risks;
+using Wayd.Common.Application.Interfaces;
+using Wayd.Common.Application.Models;
+using Wayd.Planning.Application.Risks.Commands;
+using Wayd.Planning.Application.Risks.Dtos;
+using Wayd.Planning.Application.Risks.Queries;
+using Wayd.Web.Api.Extensions;
+using Wayd.Web.Api.Models.Planning.Risks;
 
-namespace Moda.Web.Api.Controllers.Planning;
+namespace Wayd.Web.Api.Controllers.Planning;
 
 [Route("api/planning/risks")]
 [ApiVersionNeutral]

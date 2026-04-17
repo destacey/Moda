@@ -1,10 +1,10 @@
-using Moda.Common.Application.Identity.PersonalAccessTokens.Commands;
-using Moda.Common.Application.Identity.PersonalAccessTokens.Dtos;
-using Moda.Common.Application.Identity.PersonalAccessTokens.Queries;
-using Moda.Web.Api.Extensions;
-using Moda.Web.Api.Models.UserManagement.PersonalAccessTokens;
+using Wayd.Common.Application.Identity.PersonalAccessTokens.Commands;
+using Wayd.Common.Application.Identity.PersonalAccessTokens.Dtos;
+using Wayd.Common.Application.Identity.PersonalAccessTokens.Queries;
+using Wayd.Web.Api.Extensions;
+using Wayd.Web.Api.Models.UserManagement.PersonalAccessTokens;
 
-namespace Moda.Web.Api.Controllers.UserManagement;
+namespace Wayd.Web.Api.Controllers.UserManagement;
 
 [Route("api/user-management/personal-access-tokens")]
 [ApiVersionNeutral]

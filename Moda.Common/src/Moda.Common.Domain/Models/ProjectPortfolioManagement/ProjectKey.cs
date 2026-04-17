@@ -1,8 +1,8 @@
 using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
-using Moda.Common.Domain.Extensions.ProjectPortfolioManagement;
+using Wayd.Common.Domain.Extensions.ProjectPortfolioManagement;
 
-namespace Moda.Common.Domain.Models.ProjectPortfolioManagement;
+namespace Wayd.Common.Domain.Models.ProjectPortfolioManagement;
 
 /// <summary>
 /// Represents a unique project key used for task key generation (e.g., "APOLLO", "MARS1").

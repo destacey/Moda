@@ -1,7 +1,7 @@
 ﻿using Mapster;
-using Moda.Common.Domain.Identity;
+using Wayd.Common.Domain.Identity;
 
-namespace Moda.Common.Application.Identity.Users;
+namespace Wayd.Common.Application.Identity.Users;
 
 public sealed record UserNavigationDto : IMapFrom<User>
 {

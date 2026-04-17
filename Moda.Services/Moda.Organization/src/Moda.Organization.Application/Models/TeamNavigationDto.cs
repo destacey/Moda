@@ -1,7 +1,7 @@
 ﻿using Mapster;
-using Moda.Common.Application.Dtos;
+using Wayd.Common.Application.Dtos;
 
-namespace Moda.Organization.Application.Models;
+namespace Wayd.Organization.Application.Models;
 
 public record TeamNavigationDto : NavigationDto, IMapFrom<BaseTeam>
 {

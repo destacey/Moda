@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Moda.Common.Domain.Enums.Goals;
-using Moda.Common.Domain.Models.Goals;
-using Moda.Infrastructure.Persistence.Converters;
+using Wayd.Common.Domain.Enums.Goals;
+using Wayd.Common.Domain.Models.Goals;
+using Wayd.Infrastructure.Persistence.Converters;
 
-namespace Moda.Infrastructure.Persistence.Configuration;
+namespace Wayd.Infrastructure.Persistence.Configuration;
 
 public class ObjectiveConfiguration : IEntityTypeConfiguration<Objective>
 {

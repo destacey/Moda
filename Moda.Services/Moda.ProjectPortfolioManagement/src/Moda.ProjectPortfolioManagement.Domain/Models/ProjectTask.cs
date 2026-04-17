@@ -1,12 +1,12 @@
 using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
-using Moda.Common.Domain.Models.ProjectPortfolioManagement;
-using Moda.ProjectPortfolioManagement.Domain.Enums;
-using Moda.ProjectPortfolioManagement.Domain.Interfaces;
+using Wayd.Common.Domain.Models.ProjectPortfolioManagement;
+using Wayd.ProjectPortfolioManagement.Domain.Enums;
+using Wayd.ProjectPortfolioManagement.Domain.Interfaces;
 using NodaTime;
-using TaskStatus = Moda.ProjectPortfolioManagement.Domain.Enums.TaskStatus;
+using TaskStatus = Wayd.ProjectPortfolioManagement.Domain.Enums.TaskStatus;
 
-namespace Moda.ProjectPortfolioManagement.Domain.Models;
+namespace Wayd.ProjectPortfolioManagement.Domain.Models;
 
 /// <summary>
 /// Represents a task within a project with hierarchical structure and dependency management.

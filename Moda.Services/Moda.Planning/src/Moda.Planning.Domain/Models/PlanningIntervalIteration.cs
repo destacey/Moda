@@ -1,12 +1,12 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
-using Moda.Common.Domain.Enums.Planning;
-using Moda.Common.Domain.Interfaces;
-using Moda.Planning.Domain.Enums;
-using Moda.Planning.Domain.Interfaces;
+using Wayd.Common.Domain.Enums.Planning;
+using Wayd.Common.Domain.Interfaces;
+using Wayd.Planning.Domain.Enums;
+using Wayd.Planning.Domain.Interfaces;
 using NodaTime;
 
-namespace Moda.Planning.Domain.Models;
+namespace Wayd.Planning.Domain.Models;
 
 public sealed class PlanningIntervalIteration : BaseSoftDeletableEntity, ILocalSchedule, INavigable
 {

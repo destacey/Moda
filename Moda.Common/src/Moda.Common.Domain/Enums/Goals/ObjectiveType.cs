@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Moda.Common.Domain.Enums.Goals;
+namespace Wayd.Common.Domain.Enums.Goals;
 
 public enum ObjectiveType
 {

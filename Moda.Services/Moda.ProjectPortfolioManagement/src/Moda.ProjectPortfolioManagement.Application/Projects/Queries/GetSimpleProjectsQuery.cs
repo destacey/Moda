@@ -1,6 +1,6 @@
-﻿using Moda.Common.Domain.Interfaces.ProjectPortfolioManagement;
+﻿using Wayd.Common.Domain.Interfaces.ProjectPortfolioManagement;
 
-namespace Moda.ProjectPortfolioManagement.Application.Projects.Queries;
+namespace Wayd.ProjectPortfolioManagement.Application.Projects.Queries;
 
 public sealed record GetSimpleProjectsQuery() : IQuery<List<ISimpleProject>>;
 

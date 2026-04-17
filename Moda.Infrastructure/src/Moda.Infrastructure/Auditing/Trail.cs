@@ -1,6 +1,6 @@
 ﻿using NodaTime;
 
-namespace Moda.Infrastructure.Auditing;
+namespace Wayd.Infrastructure.Auditing;
 
 public sealed class Trail : BaseEntity
 {

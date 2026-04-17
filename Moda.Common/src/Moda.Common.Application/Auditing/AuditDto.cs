@@ -1,4 +1,4 @@
-﻿namespace Moda.Common.Application.Auditing;
+﻿namespace Wayd.Common.Application.Auditing;
 
 public sealed record AuditDto
 {

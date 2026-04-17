@@ -1,14 +1,14 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
-using Moda.Common.Domain.Enums;
-using Moda.Common.Domain.Enums.Planning;
-using Moda.Common.Domain.Interfaces;
-using Moda.Planning.Domain.Enums;
-using Moda.Planning.Domain.Interfaces;
-using Moda.Planning.Domain.Interfaces.Roadmaps;
+using Wayd.Common.Domain.Enums;
+using Wayd.Common.Domain.Enums.Planning;
+using Wayd.Common.Domain.Interfaces;
+using Wayd.Planning.Domain.Enums;
+using Wayd.Planning.Domain.Interfaces;
+using Wayd.Planning.Domain.Interfaces.Roadmaps;
 using OneOf;
 
-namespace Moda.Planning.Domain.Models.Roadmaps;
+namespace Wayd.Planning.Domain.Models.Roadmaps;
 
 public sealed class Roadmap : BaseAuditableEntity, ILocalSchedule, IHasIdAndKey
 {

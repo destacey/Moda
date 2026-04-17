@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Dtos;
+namespace Wayd.ProjectPortfolioManagement.Application.StrategicInitiatives.Dtos;
 
 public sealed record StrategicInitiativeStatusDto
 {

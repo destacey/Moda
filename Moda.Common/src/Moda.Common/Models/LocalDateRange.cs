@@ -1,15 +1,15 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
-using Moda.Common.Interfaces;
+using Wayd.Common.Interfaces;
 using NodaTime;
 
-namespace Moda.Common.Models;
+namespace Wayd.Common.Models;
 
 /// <summary>
 /// A date range that uses <see cref="LocalDate" />.
 /// </summary>
 /// <seealso cref="CSharpFunctionalExtensions.ValueObject" />
-/// <seealso cref="Moda.Common.Interfaces.IDateRange&lt;NodaTime.LocalDate&gt;" />
+/// <seealso cref="Wayd.Common.Interfaces.IDateRange&lt;NodaTime.LocalDate&gt;" />
 public class LocalDateRange : ValueObject, IDateRange<LocalDate>
 {
     public LocalDateRange(LocalDate start, LocalDate end)

@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics;
-using Moda.Common.Application.Requests.WorkManagement.Commands;
-using Moda.Work.Application.Persistence;
+using Wayd.Common.Application.Requests.WorkManagement.Commands;
+using Wayd.Work.Application.Persistence;
 
-namespace Moda.Work.Application.WorkItemDependencies.Commands;
+namespace Wayd.Work.Application.WorkItemDependencies.Commands;
 
 internal sealed class ProcessDependenciesCommandHandler(
     IWorkDbContext workDbContext,

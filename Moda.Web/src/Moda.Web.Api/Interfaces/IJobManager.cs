@@ -1,6 +1,6 @@
-﻿using Moda.Common.Application.Enums;
+﻿using Wayd.Common.Application.Enums;
 
-namespace Moda.Web.Api.Interfaces;
+namespace Wayd.Web.Api.Interfaces;
 
 public interface IJobManager
 {

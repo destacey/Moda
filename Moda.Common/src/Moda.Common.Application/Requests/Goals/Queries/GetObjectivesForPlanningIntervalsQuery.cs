@@ -1,6 +1,6 @@
-﻿using Moda.Common.Application.Requests.Goals.Dtos;
+﻿using Wayd.Common.Application.Requests.Goals.Dtos;
 
-namespace Moda.Common.Application.Requests.Goals.Queries;
+namespace Wayd.Common.Application.Requests.Goals.Queries;
 
 public sealed record GetObjectivesForPlanningIntervalsQuery : IQuery<IReadOnlyList<ObjectiveListDto>>
 {

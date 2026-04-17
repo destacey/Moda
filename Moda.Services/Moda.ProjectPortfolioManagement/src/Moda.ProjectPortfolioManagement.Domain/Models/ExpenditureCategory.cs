@@ -1,8 +1,8 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
-using Moda.ProjectPortfolioManagement.Domain.Enums;
+using Wayd.ProjectPortfolioManagement.Domain.Enums;
 
-namespace Moda.ProjectPortfolioManagement.Domain.Models;
+namespace Wayd.ProjectPortfolioManagement.Domain.Models;
 
 public sealed class ExpenditureCategory : BaseAuditableEntity<int>
 {

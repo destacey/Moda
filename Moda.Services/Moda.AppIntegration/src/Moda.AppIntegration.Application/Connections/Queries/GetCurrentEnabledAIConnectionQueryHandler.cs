@@ -1,7 +1,7 @@
-using Moda.Common.Application.Dtos;
-using Moda.Common.Application.Requests.AppIntegration;
+using Wayd.Common.Application.Dtos;
+using Wayd.Common.Application.Requests.AppIntegration;
 
-namespace Moda.AppIntegration.Application.Connections.Queries;
+namespace Wayd.AppIntegration.Application.Connections.Queries;
 
 internal sealed class GetAIConnectionQueryHandler(IAppIntegrationDbContext appIntegrationDbContext) : IQueryHandler<GetAIConnectionQuery, EnabledAIConnectionDto>
 {

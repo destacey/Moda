@@ -1,9 +1,9 @@
-﻿using Moda.Common.Application.Requests.WorkManagement.Interfaces;
-using Moda.Common.Application.Requests.WorkManagement.Queries;
-using Moda.Work.Application.Persistence;
-using Moda.Work.Application.WorkTypes.Dtos;
+﻿using Wayd.Common.Application.Requests.WorkManagement.Interfaces;
+using Wayd.Common.Application.Requests.WorkManagement.Queries;
+using Wayd.Work.Application.Persistence;
+using Wayd.Work.Application.WorkTypes.Dtos;
 
-namespace Moda.Work.Application.Workspaces.Queries;
+namespace Wayd.Work.Application.Workspaces.Queries;
 
 internal sealed class GetWorkspaceWorkTypesQueryHandler(IWorkDbContext workDbContext, ILogger<GetWorkspaceWorkTypesQueryHandler> logger) : IQueryHandler<GetWorkspaceWorkTypesQuery, Result<IReadOnlyList<IWorkTypeDto>>>
 {

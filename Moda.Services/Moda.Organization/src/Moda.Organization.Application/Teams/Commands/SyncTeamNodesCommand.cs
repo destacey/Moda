@@ -1,4 +1,4 @@
-﻿namespace Moda.Organization.Application.Teams.Commands;
+﻿namespace Wayd.Organization.Application.Teams.Commands;
 
 public sealed record SyncTeamNodesCommand() : ICommand, ILongRunningRequest;
 

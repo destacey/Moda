@@ -1,6 +1,6 @@
-﻿using Moda.Links.Commands;
+﻿using Wayd.Links.Commands;
 
-namespace Moda.Web.Api.Models.Links;
+namespace Wayd.Web.Api.Models.Links;
 
 public sealed record UpdateLinkRequest
 {

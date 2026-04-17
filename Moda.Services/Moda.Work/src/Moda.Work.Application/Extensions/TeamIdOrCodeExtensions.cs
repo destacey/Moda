@@ -1,8 +1,8 @@
 ﻿using System.Linq.Expressions;
-using Moda.Common.Application.Models.Organizations;
-using Moda.Work.Domain.Interfaces;
+using Wayd.Common.Application.Models.Organizations;
+using Wayd.Work.Domain.Interfaces;
 
-namespace Moda.Work.Application.Extensions;
+namespace Wayd.Work.Application.Extensions;
 
 public static class TeamIdOrCodeExtensions
 {

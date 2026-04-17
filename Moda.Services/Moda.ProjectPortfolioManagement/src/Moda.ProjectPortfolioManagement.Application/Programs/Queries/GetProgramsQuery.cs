@@ -1,8 +1,8 @@
-﻿using Moda.Common.Application.Models;
-using Moda.ProjectPortfolioManagement.Application.Programs.Dtos;
-using Moda.ProjectPortfolioManagement.Domain.Enums;
+﻿using Wayd.Common.Application.Models;
+using Wayd.ProjectPortfolioManagement.Application.Programs.Dtos;
+using Wayd.ProjectPortfolioManagement.Domain.Enums;
 
-namespace Moda.ProjectPortfolioManagement.Application.Programs.Queries;
+namespace Wayd.ProjectPortfolioManagement.Application.Programs.Queries;
 
 public sealed record GetProgramsQuery(ProgramStatus[]? StatusFilter = null, IdOrKey? PortfolioIdOrKey = null) : IQuery<List<ProgramListDto>?>;
 

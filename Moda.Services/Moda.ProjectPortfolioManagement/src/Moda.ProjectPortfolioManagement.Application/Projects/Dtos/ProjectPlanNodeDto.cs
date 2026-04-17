@@ -1,7 +1,7 @@
-using Moda.Common.Application.Dtos;
-using Moda.Common.Application.Employees.Dtos;
+using Wayd.Common.Application.Dtos;
+using Wayd.Common.Application.Employees.Dtos;
 
-namespace Moda.ProjectPortfolioManagement.Application.Projects.Dtos;
+namespace Wayd.ProjectPortfolioManagement.Application.Projects.Dtos;
 
 /// <summary>
 /// Unified DTO for the project plan tree that includes both phases and tasks as nodes.

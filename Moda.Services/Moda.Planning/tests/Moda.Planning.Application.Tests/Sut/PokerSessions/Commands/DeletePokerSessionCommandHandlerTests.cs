@@ -1,11 +1,11 @@
 ﻿using Microsoft.Extensions.Logging;
-using Moda.Planning.Application.PokerSessions.Commands;
-using Moda.Planning.Application.Tests.Infrastructure;
-using Moda.Planning.Domain.Enums;
-using Moda.Planning.Domain.Tests.Data;
+using Wayd.Planning.Application.PokerSessions.Commands;
+using Wayd.Planning.Application.Tests.Infrastructure;
+using Wayd.Planning.Domain.Enums;
+using Wayd.Planning.Domain.Tests.Data;
 using Moq;
 
-namespace Moda.Planning.Application.Tests.Sut.PokerSessions.Commands;
+namespace Wayd.Planning.Application.Tests.Sut.PokerSessions.Commands;
 
 public class DeletePokerSessionCommandHandlerTests : IDisposable
 {

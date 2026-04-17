@@ -1,8 +1,8 @@
 ﻿using System.Linq.Expressions;
-using Moda.Common.Domain.Interfaces;
+using Wayd.Common.Domain.Interfaces;
 using OneOf;
 
-namespace Moda.Common.Application.Models;
+namespace Wayd.Common.Application.Models;
 
 public class IdOrKey : OneOfBase<Guid, int>
 {

@@ -1,12 +1,12 @@
 ﻿using System.Linq.Expressions;
 using MediatR;
-using Moda.Common.Application.Models;
-using Moda.Common.Extensions;
-using Moda.Planning.Application.PlanningIntervals.Queries;
-using Moda.Planning.Application.Risks.Dtos;
-using Moda.Planning.Domain.Enums;
+using Wayd.Common.Application.Models;
+using Wayd.Common.Extensions;
+using Wayd.Planning.Application.PlanningIntervals.Queries;
+using Wayd.Planning.Application.Risks.Dtos;
+using Wayd.Planning.Domain.Enums;
 
-namespace Moda.Planning.Application.Risks.Queries;
+namespace Wayd.Planning.Application.Risks.Queries;
 
 public sealed record GetRisksByPlanningIntervalQuery : IQuery<IReadOnlyList<RiskListDto>>
 {

@@ -1,14 +1,14 @@
 ﻿using FluentAssertions;
 using Microsoft.Extensions.Logging;
-using Moda.Common.Application.Interfaces;
-using Moda.Common.Domain.Models.ProjectPortfolioManagement;
-using Moda.ProjectPortfolioManagement.Application.Projects.Commands;
-using Moda.ProjectPortfolioManagement.Application.Tests.Infrastructure;
-using Moda.ProjectPortfolioManagement.Domain.Tests.Data;
-using Moda.Tests.Shared;
+using Wayd.Common.Application.Interfaces;
+using Wayd.Common.Domain.Models.ProjectPortfolioManagement;
+using Wayd.ProjectPortfolioManagement.Application.Projects.Commands;
+using Wayd.ProjectPortfolioManagement.Application.Tests.Infrastructure;
+using Wayd.ProjectPortfolioManagement.Domain.Tests.Data;
+using Wayd.Tests.Shared;
 using Moq;
 
-namespace Moda.ProjectPortfolioManagement.Application.Tests.Sut.Projects.Commands;
+namespace Wayd.ProjectPortfolioManagement.Application.Tests.Sut.Projects.Commands;
 
 public class ChangeProjectKeyCommandHandlerTests : IDisposable
 {

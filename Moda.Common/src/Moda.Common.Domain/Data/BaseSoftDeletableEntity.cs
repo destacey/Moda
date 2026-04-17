@@ -1,6 +1,6 @@
 ﻿using NodaTime;
 
-namespace Moda.Common.Domain.Data;
+namespace Wayd.Common.Domain.Data;
 
 public abstract class BaseSoftDeletableEntity<TId> : BaseAuditableEntity<TId>, ISoftDelete
 {

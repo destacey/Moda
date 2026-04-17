@@ -1,6 +1,6 @@
-﻿using Moda.Organization.Application.Teams.Models;
+﻿using Wayd.Organization.Application.Teams.Models;
 
-namespace Moda.Organization.Application.TeamsOfTeams.Commands;
+namespace Wayd.Organization.Application.TeamsOfTeams.Commands;
 
 public sealed record AddTeamMembershipCommand(Guid TeamId, Guid ParentTeamId, MembershipDateRange DateRange) : ICommand;
 

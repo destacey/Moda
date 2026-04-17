@@ -15,13 +15,13 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Moda.Common.Domain\Moda.Common.Domain.csproj" />
-      <ProjectReference Include="..\Moda.Common\Moda.Common.csproj" />
+      <ProjectReference Include="..\Wayd.Common.Domain\Wayd.Common.Domain.csproj" />
+      <ProjectReference Include="..\Wayd.Common\Wayd.Common.csproj" />
     </ItemGroup>
 
 
     <ItemGroup>
-        <InternalsVisibleTo Include="Moda.Common.Application.Tests" />
+        <InternalsVisibleTo Include="Wayd.Common.Application.Tests" />
         <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
     </ItemGroup>
 

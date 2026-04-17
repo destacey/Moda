@@ -1,9 +1,9 @@
-﻿using Moda.Health.Dtos;
-using Moda.Health.Queries;
-using Moda.Web.Api.Extensions;
-using Moda.Web.Api.Models.Health;
+﻿using Wayd.Health.Dtos;
+using Wayd.Health.Queries;
+using Wayd.Web.Api.Extensions;
+using Wayd.Web.Api.Models.Health;
 
-namespace Moda.Web.Api.Controllers.Health;
+namespace Wayd.Web.Api.Controllers.Health;
 
 [Route("api/[controller]")]
 [ApiVersionNeutral]

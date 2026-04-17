@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace Moda.Infrastructure.Identity;
+namespace Wayd.Infrastructure.Identity;
 
 internal partial class UserService
 {

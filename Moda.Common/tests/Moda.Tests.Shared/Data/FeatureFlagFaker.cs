@@ -1,6 +1,6 @@
-using Moda.Common.Domain.FeatureManagement;
+using Wayd.Common.Domain.FeatureManagement;
 
-namespace Moda.Tests.Shared.Data;
+namespace Wayd.Tests.Shared.Data;
 
 public sealed class FeatureFlagFaker : PrivateConstructorFaker<FeatureFlag>
 {

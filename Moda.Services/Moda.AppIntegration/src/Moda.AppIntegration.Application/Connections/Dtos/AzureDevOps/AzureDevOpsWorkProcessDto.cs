@@ -1,7 +1,7 @@
 ﻿using Mapster;
-using Moda.Common.Application.Dtos;
+using Wayd.Common.Application.Dtos;
 
-namespace Moda.AppIntegration.Application.Connections.Dtos.AzureDevOps;
+namespace Wayd.AppIntegration.Application.Connections.Dtos.AzureDevOps;
 
 public sealed record AzureDevOpsWorkProcessDto : IMapFrom<AzureDevOpsBoardsWorkProcess>
 {

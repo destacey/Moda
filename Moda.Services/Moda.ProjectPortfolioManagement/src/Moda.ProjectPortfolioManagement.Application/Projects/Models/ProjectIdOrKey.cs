@@ -1,10 +1,10 @@
 ﻿using System.Linq.Expressions;
-using Moda.Common.Domain.Interfaces;
-using Moda.Common.Domain.Models.ProjectPortfolioManagement;
-using Moda.ProjectPortfolioManagement.Domain.Interfaces;
+using Wayd.Common.Domain.Interfaces;
+using Wayd.Common.Domain.Models.ProjectPortfolioManagement;
+using Wayd.ProjectPortfolioManagement.Domain.Interfaces;
 using OneOf;
 
-namespace Moda.ProjectPortfolioManagement.Application.Projects.Models;
+namespace Wayd.ProjectPortfolioManagement.Application.Projects.Models;
 
 /// <summary>r
 /// Represents either a Guid ID or a string project key.

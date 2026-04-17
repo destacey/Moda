@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Moda.Common.Domain.Models;
+using Wayd.Common.Domain.Models;
 
-namespace Moda.AppIntegration.Application.Connections.Commands;
+namespace Wayd.AppIntegration.Application.Connections.Commands;
 
 public sealed record UpdateAzureDevOpsWorkspaceIntegrationStateCommand(Guid ConnectionId, IntegrationRegistration<Guid, Guid> IntegrationRegistration) : ICommand;
 

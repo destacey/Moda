@@ -1,6 +1,6 @@
-﻿using Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Commands;
+﻿using Wayd.ProjectPortfolioManagement.Application.StrategicInitiatives.Commands;
 
-namespace Moda.Web.Api.Models.Ppm.StrategicInitiatives;
+namespace Wayd.Web.Api.Models.Ppm.StrategicInitiatives;
 
 public sealed record ManageStrategicInitiativeProjectsRequest
 {

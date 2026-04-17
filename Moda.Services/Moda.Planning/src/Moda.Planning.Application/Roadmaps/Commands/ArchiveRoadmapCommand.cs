@@ -1,6 +1,6 @@
 using Ardalis.GuardClauses;
 
-namespace Moda.Planning.Application.Roadmaps.Commands;
+namespace Wayd.Planning.Application.Roadmaps.Commands;
 
 public sealed record ArchiveRoadmapCommand(Guid Id) : ICommand;
 

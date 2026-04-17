@@ -1,4 +1,4 @@
-﻿namespace Moda.Common.Application.Persistence;
+﻿namespace Wayd.Common.Application.Persistence;
 
 public interface IConnectionStringSecurer
 {

@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using Bogus;
 
-namespace Moda.Tests.Shared.Extensions;
+namespace Wayd.Tests.Shared.Extensions;
 
 public static class FakerExtensions
 {

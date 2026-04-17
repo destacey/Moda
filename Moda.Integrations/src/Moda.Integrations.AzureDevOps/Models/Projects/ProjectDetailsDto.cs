@@ -1,7 +1,7 @@
 ﻿using Ardalis.GuardClauses;
-using Moda.Integrations.AzureDevOps.Models.Contracts;
+using Wayd.Integrations.AzureDevOps.Models.Contracts;
 
-namespace Moda.Integrations.AzureDevOps.Models.Projects;
+namespace Wayd.Integrations.AzureDevOps.Models.Projects;
 
 internal sealed record ProjectDetailsDto : ProjectDto
 {

@@ -1,8 +1,8 @@
-﻿using Moda.Common.Application.Requests.WorkManagement.Commands;
-using Moda.Common.Domain.Enums;
-using Moda.Work.Application.Persistence;
+﻿using Wayd.Common.Application.Requests.WorkManagement.Commands;
+using Wayd.Common.Domain.Enums;
+using Wayd.Work.Application.Persistence;
 
-namespace Moda.Work.Application.WorkItems.Commands;
+namespace Wayd.Work.Application.WorkItems.Commands;
 
 internal sealed class DeleteExternalWorkItemsCommandHandler(IWorkDbContext workDbContext, ILogger<SyncExternalWorkItemsCommandHandler> logger) : ICommandHandler<DeleteExternalWorkItemsCommand>
 {

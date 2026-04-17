@@ -1,7 +1,7 @@
 ﻿using System.Text.RegularExpressions;
-using Moda.Common.Domain.Models.ProjectPortfolioManagement;
+using Wayd.Common.Domain.Models.ProjectPortfolioManagement;
 
-namespace Moda.Common.Domain.Extensions.ProjectPortfolioManagement;
+namespace Wayd.Common.Domain.Extensions.ProjectPortfolioManagement;
 
 public static partial class StringExtensions
 {

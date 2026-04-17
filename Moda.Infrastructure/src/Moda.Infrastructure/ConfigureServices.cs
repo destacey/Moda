@@ -11,16 +11,16 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
-using Moda.Infrastructure.FeatureManagement;
-using Moda.Infrastructure.Logging;
-using Moda.Infrastructure.OpenTelemetry;
-using Moda.Infrastructure.SignalR;
-using Moda.Integrations.AzureDevOps;
-using Moda.Integrations.MicrosoftGraph;
-using Moda.Planning.Application.PokerSessions.Interfaces;
+using Wayd.Infrastructure.FeatureManagement;
+using Wayd.Infrastructure.Logging;
+using Wayd.Infrastructure.OpenTelemetry;
+using Wayd.Infrastructure.SignalR;
+using Wayd.Integrations.AzureDevOps;
+using Wayd.Integrations.MicrosoftGraph;
+using Wayd.Planning.Application.PokerSessions.Interfaces;
 using NodaTime;
 
-namespace Moda.Infrastructure;
+namespace Wayd.Infrastructure;
 
 public static class ConfigureServices
 {

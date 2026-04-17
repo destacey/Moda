@@ -1,7 +1,7 @@
-using Moda.Common.Domain.Models.ProjectPortfolioManagement;
-using Moda.ProjectPortfolioManagement.Application.Projects.Commands;
+using Wayd.Common.Domain.Models.ProjectPortfolioManagement;
+using Wayd.ProjectPortfolioManagement.Application.Projects.Commands;
 
-namespace Moda.Web.Api.Models.Ppm.Projects;
+namespace Wayd.Web.Api.Models.Ppm.Projects;
 
 public sealed record ChangeProjectKeyRequest
 {

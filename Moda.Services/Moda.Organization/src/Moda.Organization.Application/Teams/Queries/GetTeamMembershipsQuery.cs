@@ -1,6 +1,6 @@
-﻿using Moda.Organization.Application.Models;
+﻿using Wayd.Organization.Application.Models;
 
-namespace Moda.Organization.Application.Teams.Queries;
+namespace Wayd.Organization.Application.Teams.Queries;
 
 public sealed record GetTeamMembershipsQuery : IQuery<IReadOnlyList<TeamMembershipDto>>
 {

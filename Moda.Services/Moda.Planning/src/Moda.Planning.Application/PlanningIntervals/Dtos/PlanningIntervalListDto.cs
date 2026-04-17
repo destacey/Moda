@@ -1,6 +1,6 @@
-﻿using Moda.Common.Application.Dtos;
+﻿using Wayd.Common.Application.Dtos;
 
-namespace Moda.Planning.Application.PlanningIntervals.Dtos;
+namespace Wayd.Planning.Application.PlanningIntervals.Dtos;
 
 public sealed record PlanningIntervalListDto
 {

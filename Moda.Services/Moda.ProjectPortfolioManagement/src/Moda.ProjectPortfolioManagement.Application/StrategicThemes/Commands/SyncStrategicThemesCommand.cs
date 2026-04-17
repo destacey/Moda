@@ -1,7 +1,7 @@
-﻿using Moda.Common.Domain.Interfaces.StrategicManagement;
-using Moda.ProjectPortfolioManagement.Domain.Models;
+﻿using Wayd.Common.Domain.Interfaces.StrategicManagement;
+using Wayd.ProjectPortfolioManagement.Domain.Models;
 
-namespace Moda.ProjectPortfolioManagement.Application.StrategicThemes.Commands;
+namespace Wayd.ProjectPortfolioManagement.Application.StrategicThemes.Commands;
 
 public sealed record SyncStrategicThemesCommand(IEnumerable<IStrategicThemeData> StrategicThemes) : ICommand;
 

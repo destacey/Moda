@@ -1,4 +1,4 @@
-namespace Moda.Common.Application.Dtos;
+namespace Wayd.Common.Application.Dtos;
 
 public sealed record EnabledAIConnectionDto
 {

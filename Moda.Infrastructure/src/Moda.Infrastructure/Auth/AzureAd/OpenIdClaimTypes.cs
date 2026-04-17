@@ -1,4 +1,4 @@
-﻿namespace Moda.Infrastructure.Auth.AzureAd;
+﻿namespace Wayd.Infrastructure.Auth.AzureAd;
 
 internal static class OpenIdConnectClaimTypes
 {

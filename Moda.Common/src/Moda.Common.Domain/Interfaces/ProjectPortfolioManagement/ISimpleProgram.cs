@@ -1,4 +1,4 @@
-﻿namespace Moda.Common.Domain.Interfaces.ProjectPortfolioManagement;
+﻿namespace Wayd.Common.Domain.Interfaces.ProjectPortfolioManagement;
 
 public interface ISimpleProgram
 {

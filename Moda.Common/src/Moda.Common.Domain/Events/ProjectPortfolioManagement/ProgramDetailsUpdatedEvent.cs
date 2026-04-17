@@ -1,7 +1,7 @@
-﻿using Moda.Common.Domain.Interfaces.ProjectPortfolioManagement;
+﻿using Wayd.Common.Domain.Interfaces.ProjectPortfolioManagement;
 using NodaTime;
 
-namespace Moda.Common.Domain.Events.ProjectPortfolioManagement;
+namespace Wayd.Common.Domain.Events.ProjectPortfolioManagement;
 
 public sealed record ProgramDetailsUpdatedEvent : DomainEvent, ISimpleProgram
 {

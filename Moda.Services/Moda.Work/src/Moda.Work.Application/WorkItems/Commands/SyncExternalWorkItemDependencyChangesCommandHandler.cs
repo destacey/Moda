@@ -1,8 +1,8 @@
-﻿using Moda.Common.Application.Interfaces.ExternalWork;
-using Moda.Common.Application.Requests.WorkManagement.Commands;
-using Moda.Work.Application.Persistence;
+﻿using Wayd.Common.Application.Interfaces.ExternalWork;
+using Wayd.Common.Application.Requests.WorkManagement.Commands;
+using Wayd.Work.Application.Persistence;
 
-namespace Moda.Work.Application.WorkItems.Commands;
+namespace Wayd.Work.Application.WorkItems.Commands;
 
 internal sealed class SyncExternalWorkItemDependencyChangesCommandHandler(IWorkDbContext workDbContext, ILogger<SyncExternalWorkItemDependencyChangesCommandHandler> logger, IDateTimeProvider dateTimeProvider) : ICommandHandler<SyncExternalWorkItemDependencyChangesCommand>
 {

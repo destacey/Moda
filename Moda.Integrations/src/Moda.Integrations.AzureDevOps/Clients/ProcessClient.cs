@@ -1,8 +1,8 @@
-﻿using Moda.Integrations.AzureDevOps.Models.Contracts;
-using Moda.Integrations.AzureDevOps.Models.Processes;
+﻿using Wayd.Integrations.AzureDevOps.Models.Contracts;
+using Wayd.Integrations.AzureDevOps.Models.Processes;
 using RestSharp;
 
-namespace Moda.Integrations.AzureDevOps.Clients;
+namespace Wayd.Integrations.AzureDevOps.Clients;
 
 internal sealed class ProcessClient : BaseClient
 {

@@ -1,6 +1,6 @@
-using Moda.Planning.Domain.Models.PlanningPoker;
+using Wayd.Planning.Domain.Models.PlanningPoker;
 
-namespace Moda.Planning.Application.EstimationScales.Commands;
+namespace Wayd.Planning.Application.EstimationScales.Commands;
 
 public sealed record CreateEstimationScaleCommand(string Name, string? Description, List<string> Values) : ICommand<int>;
 

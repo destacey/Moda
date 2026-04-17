@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 
-namespace Moda.Infrastructure.Auth.AzureAd;
+namespace Wayd.Infrastructure.Auth.AzureAd;
 
 public sealed class AzureAdSettings
 {

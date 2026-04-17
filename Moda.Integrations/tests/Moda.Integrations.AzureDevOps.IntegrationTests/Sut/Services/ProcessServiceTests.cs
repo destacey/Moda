@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
-using Moda.Integrations.AzureDevOps.IntegrationTests.Models;
-using Moda.Integrations.AzureDevOps.Services;
+using Wayd.Integrations.AzureDevOps.IntegrationTests.Models;
+using Wayd.Integrations.AzureDevOps.Services;
 using Moq;
 
-namespace Moda.Integrations.AzureDevOps.IntegrationTests.Sut.Services;
+namespace Wayd.Integrations.AzureDevOps.IntegrationTests.Sut.Services;
 
 [Collection("OptionsCollection")]
 public class ProcessServiceTests

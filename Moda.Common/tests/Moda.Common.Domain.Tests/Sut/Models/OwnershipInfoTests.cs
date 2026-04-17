@@ -1,8 +1,8 @@
-using Moda.Common.Domain.Enums;
-using Moda.Common.Domain.Enums.AppIntegrations;
-using Moda.Common.Domain.Models;
+using Wayd.Common.Domain.Enums;
+using Wayd.Common.Domain.Enums.AppIntegrations;
+using Wayd.Common.Domain.Models;
 
-namespace Moda.Common.Domain.Tests.Sut.Models;
+namespace Wayd.Common.Domain.Tests.Sut.Models;
 
 public sealed class OwnershipInfoTests
 {

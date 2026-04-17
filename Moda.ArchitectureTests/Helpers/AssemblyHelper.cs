@@ -1,4 +1,4 @@
-namespace Moda.ArchitectureTests.Helpers;
+namespace Wayd.ArchitectureTests.Helpers;
 
 /// <summary>
 /// Provides helper methods for loading and accessing assemblies in architecture tests.
@@ -9,12 +9,12 @@ public static class AssemblyHelper
     #region Domain Assembly Methods
 
     /// <summary>
-    /// Gets all Domain assemblies (Moda.*.Domain, including Common.Domain).
+    /// Gets all Domain assemblies (Wayd.*.Domain, including Common.Domain).
     /// </summary>
     public static System.Reflection.Assembly[] GetDomainAssemblies()
     {
         var assemblyDir = GetAssemblyDirectory();
-        var domainDlls = Directory.GetFiles(assemblyDir, "Moda.*.Domain.dll")
+        var domainDlls = Directory.GetFiles(assemblyDir, "Wayd.*.Domain.dll")
             .Where(f =>
             {
                 var fileName = Path.GetFileName(f);
@@ -27,12 +27,12 @@ public static class AssemblyHelper
 
     /// <summary>
     /// Gets all service Domain assemblies (excludes Common.Domain).
-    /// Pattern: Moda.{ServiceName}.Domain
+    /// Pattern: Wayd.{ServiceName}.Domain
     /// </summary>
     public static System.Reflection.Assembly[] GetServiceDomainAssemblies()
     {
         var assemblyDir = GetAssemblyDirectory();
-        var domainDlls = Directory.GetFiles(assemblyDir, "Moda.*.Domain.dll")
+        var domainDlls = Directory.GetFiles(assemblyDir, "Wayd.*.Domain.dll")
             .Where(f =>
             {
                 var fileName = Path.GetFileName(f);
@@ -48,12 +48,12 @@ public static class AssemblyHelper
     #region Application Assembly Methods
 
     /// <summary>
-    /// Gets all Application assemblies (Moda.*.Application, including Common.Application).
+    /// Gets all Application assemblies (Wayd.*.Application, including Common.Application).
     /// </summary>
     public static System.Reflection.Assembly[] GetApplicationAssemblies()
     {
         var assemblyDir = GetAssemblyDirectory();
-        var applicationDlls = Directory.GetFiles(assemblyDir, "Moda.*.Application.dll")
+        var applicationDlls = Directory.GetFiles(assemblyDir, "Wayd.*.Application.dll")
             .Where(f =>
             {
                 var fileName = Path.GetFileName(f);
@@ -66,12 +66,12 @@ public static class AssemblyHelper
 
     /// <summary>
     /// Gets all service Application assemblies (excludes Common.Application).
-    /// Pattern: Moda.{ServiceName}.Application
+    /// Pattern: Wayd.{ServiceName}.Application
     /// </summary>
     public static System.Reflection.Assembly[] GetServiceApplicationAssemblies()
     {
         var assemblyDir = GetAssemblyDirectory();
-        var applicationDlls = Directory.GetFiles(assemblyDir, "Moda.*.Application.dll")
+        var applicationDlls = Directory.GetFiles(assemblyDir, "Wayd.*.Application.dll")
             .Where(f =>
             {
                 var fileName = Path.GetFileName(f);
@@ -92,7 +92,7 @@ public static class AssemblyHelper
     public static System.Reflection.Assembly[] GetInfrastructureAssemblies()
     {
         var assemblyDir = GetAssemblyDirectory();
-        var infrastructureDlls = Directory.GetFiles(assemblyDir, "Moda.*.Infrastructure*.dll")
+        var infrastructureDlls = Directory.GetFiles(assemblyDir, "Wayd.*.Infrastructure*.dll")
             .Where(f =>
             {
                 var fileName = Path.GetFileName(f);
@@ -109,12 +109,12 @@ public static class AssemblyHelper
 
     /// <summary>
     /// Gets all Integration assemblies.
-    /// Pattern: Moda.Integrations.{IntegrationName}
+    /// Pattern: Wayd.Integrations.{IntegrationName}
     /// </summary>
     public static System.Reflection.Assembly[] GetIntegrationAssemblies()
     {
         var assemblyDir = GetAssemblyDirectory();
-        var integrationDlls = Directory.GetFiles(assemblyDir, "Moda.Integrations.*.dll")
+        var integrationDlls = Directory.GetFiles(assemblyDir, "Wayd.Integrations.*.dll")
             .Where(f =>
             {
                 var fileName = Path.GetFileName(f);
@@ -130,32 +130,32 @@ public static class AssemblyHelper
     #region Common Assembly Methods
 
     /// <summary>
-    /// Gets the Moda.Common.Domain assembly.
+    /// Gets the Wayd.Common.Domain assembly.
     /// </summary>
     public static System.Reflection.Assembly GetCommonDomainAssembly()
     {
-        return typeof(Moda.Common.Domain.Events.DomainEvent).Assembly;
+        return typeof(Wayd.Common.Domain.Events.DomainEvent).Assembly;
     }
 
     /// <summary>
-    /// Gets the Moda.Common.Application assembly.
+    /// Gets the Wayd.Common.Application assembly.
     /// </summary>
     public static System.Reflection.Assembly GetCommonApplicationAssembly()
     {
-        return typeof(Moda.Common.Application.Persistence.IModaDbContext).Assembly;
+        return typeof(Wayd.Common.Application.Persistence.IModaDbContext).Assembly;
     }
 
     /// <summary>
-    /// Gets the Moda.Common assembly.
+    /// Gets the Wayd.Common assembly.
     /// </summary>
     public static System.Reflection.Assembly GetCommonAssembly()
     {
         var assembly = AppDomain.CurrentDomain.GetAssemblies()
-            .FirstOrDefault(a => a.GetName().Name == "Moda.Common");
+            .FirstOrDefault(a => a.GetName().Name == "Wayd.Common");
 
         if (assembly == null)
         {
-            throw new InvalidOperationException("Moda.Common assembly not found");
+            throw new InvalidOperationException("Wayd.Common assembly not found");
         }
 
         return assembly;
@@ -166,11 +166,11 @@ public static class AssemblyHelper
     #region Specific Assembly Methods
 
     /// <summary>
-    /// Gets the Moda.Infrastructure assembly.
+    /// Gets the Wayd.Infrastructure assembly.
     /// </summary>
     public static System.Reflection.Assembly GetInfrastructureAssembly()
     {
-        return typeof(Moda.Infrastructure.Persistence.Context.ModaDbContext).Assembly;
+        return typeof(Wayd.Infrastructure.Persistence.Context.ModaDbContext).Assembly;
     }
 
     #endregion
@@ -188,8 +188,8 @@ public static class AssemblyHelper
 
         while (currentDir != null)
         {
-            // Look for Moda.slnx file
-            if (File.Exists(Path.Combine(currentDir, "Moda.slnx")))
+            // Look for Wayd.slnx file
+            if (File.Exists(Path.Combine(currentDir, "Wayd.slnx")))
             {
                 return currentDir;
             }
@@ -197,7 +197,7 @@ public static class AssemblyHelper
             currentDir = Directory.GetParent(currentDir)?.FullName;
         }
 
-        throw new InvalidOperationException("Could not find solution root. Expected to find Moda.slnx file.");
+        throw new InvalidOperationException("Could not find solution root. Expected to find Wayd.slnx file.");
     }
 
     /// <summary>

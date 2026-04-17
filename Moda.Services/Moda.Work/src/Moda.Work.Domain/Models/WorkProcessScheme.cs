@@ -2,7 +2,7 @@
 using CSharpFunctionalExtensions;
 using NodaTime;
 
-namespace Moda.Work.Domain.Models;
+namespace Wayd.Work.Domain.Models;
 
 public sealed class WorkProcessScheme : BaseSoftDeletableEntity, IActivatable
 {

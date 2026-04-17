@@ -1,9 +1,9 @@
-using Moda.Common.Models;
-using Moda.StrategicManagement.Domain.Enums;
-using Moda.StrategicManagement.Domain.Models;
-using Moda.Tests.Shared.Data;
+using Wayd.Common.Models;
+using Wayd.StrategicManagement.Domain.Enums;
+using Wayd.StrategicManagement.Domain.Models;
+using Wayd.Tests.Shared.Data;
 
-namespace Moda.StrategicManagement.Domain.Tests.Data;
+namespace Wayd.StrategicManagement.Domain.Tests.Data;
 
 public sealed class StrategyFaker : PrivateConstructorFaker<Strategy>
 {

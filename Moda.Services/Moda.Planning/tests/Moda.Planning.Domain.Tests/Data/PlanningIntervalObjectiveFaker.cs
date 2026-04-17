@@ -1,9 +1,9 @@
-﻿using Moda.Common.Domain.Enums.Organization;
-using Moda.Planning.Domain.Enums;
-using Moda.Planning.Domain.Models;
-using Moda.Tests.Shared.Data;
+﻿using Wayd.Common.Domain.Enums.Organization;
+using Wayd.Planning.Domain.Enums;
+using Wayd.Planning.Domain.Models;
+using Wayd.Tests.Shared.Data;
 
-namespace Moda.Planning.Domain.Tests.Data;
+namespace Wayd.Planning.Domain.Tests.Data;
 
 public class PlanningIntervalObjectiveFaker : PrivateConstructorFaker<PlanningIntervalObjective>
 {

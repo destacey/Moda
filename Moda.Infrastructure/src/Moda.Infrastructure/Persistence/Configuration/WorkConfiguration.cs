@@ -1,17 +1,17 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Moda.Common.Domain.Enums;
-using Moda.Common.Domain.Enums.AppIntegrations;
-using Moda.Common.Domain.Enums.Organization;
-using Moda.Common.Domain.Enums.Planning;
-using Moda.Common.Domain.Enums.Work;
-using Moda.Common.Domain.Models.Organizations;
-using Moda.Common.Domain.Models.ProjectPortfolioManagement;
-using Moda.Common.Models;
-using Moda.Infrastructure.Persistence.Converters;
-using Moda.Work.Domain.Models;
+using Wayd.Common.Domain.Enums;
+using Wayd.Common.Domain.Enums.AppIntegrations;
+using Wayd.Common.Domain.Enums.Organization;
+using Wayd.Common.Domain.Enums.Planning;
+using Wayd.Common.Domain.Enums.Work;
+using Wayd.Common.Domain.Models.Organizations;
+using Wayd.Common.Domain.Models.ProjectPortfolioManagement;
+using Wayd.Common.Models;
+using Wayd.Infrastructure.Persistence.Converters;
+using Wayd.Work.Domain.Models;
 
-namespace Moda.Infrastructure.Persistence.Configuration;
+namespace Wayd.Infrastructure.Persistence.Configuration;
 
 public class WorkTypeHierarchyConfig : IEntityTypeConfiguration<WorkTypeHierarchy>
 {

@@ -1,6 +1,6 @@
-﻿using Moda.Work.Application.WorkProjects.Dtos;
+﻿using Wayd.Work.Application.WorkProjects.Dtos;
 
-namespace Moda.Work.Application.WorkItems.Dtos;
+namespace Wayd.Work.Application.WorkItems.Dtos;
 
 public class WorkItemProjectInfoDto : IMapFrom<WorkItem>
 {

@@ -1,8 +1,8 @@
-﻿using Moda.AppIntegration.Domain.Interfaces;
-using Moda.Common.Domain.Enums.AppIntegrations;
-using Moda.Common.Extensions;
+﻿using Wayd.AppIntegration.Domain.Interfaces;
+using Wayd.Common.Domain.Enums.AppIntegrations;
+using Wayd.Common.Extensions;
 
-namespace Moda.AppIntegration.Domain.Models;
+namespace Wayd.AppIntegration.Domain.Models;
 
 public abstract class Connection : BaseSoftDeletableEntity, IActivatable
 {

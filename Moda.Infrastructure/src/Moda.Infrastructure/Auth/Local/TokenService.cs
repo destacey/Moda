@@ -5,10 +5,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using Moda.Common.Application.Identity;
-using Moda.Common.Application.Identity.Tokens;
+using Wayd.Common.Application.Identity;
+using Wayd.Common.Application.Identity.Tokens;
 
-namespace Moda.Infrastructure.Auth.Local;
+namespace Wayd.Infrastructure.Auth.Local;
 
 internal class TokenService(
     UserManager<ApplicationUser> userManager,

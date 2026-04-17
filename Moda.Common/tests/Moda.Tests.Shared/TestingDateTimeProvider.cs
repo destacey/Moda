@@ -1,9 +1,9 @@
-﻿using Moda.Common.Application.Interfaces;
+﻿using Wayd.Common.Application.Interfaces;
 using NodaTime;
 using NodaTime.Extensions;
 using NodaTime.Testing;
 
-namespace Moda.Tests.Shared;
+namespace Wayd.Tests.Shared;
 
 public class TestingDateTimeProvider : IDateTimeProvider
 {

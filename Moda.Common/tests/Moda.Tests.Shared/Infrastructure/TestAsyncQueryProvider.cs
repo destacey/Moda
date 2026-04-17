@@ -1,7 +1,7 @@
 ﻿using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore.Query;
 
-namespace Moda.Tests.Shared.Infrastructure;
+namespace Wayd.Tests.Shared.Infrastructure;
 
 /// <summary>
 /// Test async query provider for mocking EF Core async operations

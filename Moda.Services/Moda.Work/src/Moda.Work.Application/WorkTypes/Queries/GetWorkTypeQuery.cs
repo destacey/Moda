@@ -1,8 +1,8 @@
-﻿using Moda.Common.Application.Exceptions;
-using Moda.Work.Application.Persistence;
-using Moda.Work.Application.WorkTypes.Dtos;
+﻿using Wayd.Common.Application.Exceptions;
+using Wayd.Work.Application.Persistence;
+using Wayd.Work.Application.WorkTypes.Dtos;
 
-namespace Moda.Work.Application.WorkTypes.Queries;
+namespace Wayd.Work.Application.WorkTypes.Queries;
 
 public sealed record GetWorkTypeQuery : IQuery<WorkTypeDto?>
 {

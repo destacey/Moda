@@ -4,7 +4,7 @@ using Mapster;
 using Mapster.Utils;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Moda.Links;
+namespace Wayd.Links;
 
 public static class ConfigureServices
 {

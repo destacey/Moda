@@ -1,10 +1,10 @@
 ﻿using Ardalis.GuardClauses;
-using Moda.Common.Domain.Employees;
-using Moda.Common.Domain.Enums.Work;
-using Moda.Common.Extensions;
+using Wayd.Common.Domain.Employees;
+using Wayd.Common.Domain.Enums.Work;
+using Wayd.Common.Extensions;
 using NodaTime;
 
-namespace Moda.Work.Domain.Models;
+namespace Wayd.Work.Domain.Models;
 
 public abstract class WorkItemLink : BaseAuditableEntity
 {

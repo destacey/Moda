@@ -1,8 +1,8 @@
 ﻿using System.Text.Json.Serialization;
-using Moda.Common.Application.Dtos;
-using Moda.Planning.Domain.Models.Roadmaps;
+using Wayd.Common.Application.Dtos;
+using Wayd.Planning.Domain.Models.Roadmaps;
 
-namespace Moda.Planning.Application.Roadmaps.Dtos;
+namespace Wayd.Planning.Application.Roadmaps.Dtos;
 
 [JsonDerivedType(typeof(RoadmapItemDetailsDto), typeDiscriminator: "roadmap-item")]
 [JsonDerivedType(typeof(RoadmapActivityDetailsDto), typeDiscriminator: "activity")]

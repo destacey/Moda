@@ -1,7 +1,7 @@
-﻿using Moda.Common.Domain.Models.KeyPerformanceIndicators;
+﻿using Wayd.Common.Domain.Models.KeyPerformanceIndicators;
 using NodaTime;
 
-namespace Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
+namespace Wayd.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 
 public sealed class StrategicInitiativeKpiCheckpoint : KpiCheckpoint
 {

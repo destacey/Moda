@@ -1,9 +1,9 @@
-﻿using Moda.Common.Domain.Interfaces.ProjectPortfolioManagement;
-using Moda.Common.Domain.Models.ProjectPortfolioManagement;
-using Moda.Common.Models;
+﻿using Wayd.Common.Domain.Interfaces.ProjectPortfolioManagement;
+using Wayd.Common.Domain.Models.ProjectPortfolioManagement;
+using Wayd.Common.Models;
 using NodaTime;
 
-namespace Moda.Common.Domain.Events.ProjectPortfolioManagement;
+namespace Wayd.Common.Domain.Events.ProjectPortfolioManagement;
 
 public sealed record ProjectCreatedEvent : DomainEvent, ISimpleProject
 {

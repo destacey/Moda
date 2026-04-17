@@ -4,10 +4,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
 using Microsoft.Graph.Models;
 using Microsoft.Graph.Models.ODataErrors;
-using Moda.Common.Application.Interfaces;
-using Moda.Integrations.MicrosoftGraph.Model;
+using Wayd.Common.Application.Interfaces;
+using Wayd.Integrations.MicrosoftGraph.Model;
 
-namespace Moda.Integrations.MicrosoftGraph;
+namespace Wayd.Integrations.MicrosoftGraph;
 
 public sealed class MicrosoftGraphService : IExternalEmployeeDirectoryService
 {

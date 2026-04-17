@@ -1,9 +1,9 @@
-﻿using Moda.Common.Domain.Enums.Planning;
-using Moda.Common.Domain.Interfaces.Planning.Iterations;
-using Moda.Common.Domain.Models.Planning.Iterations;
+﻿using Wayd.Common.Domain.Enums.Planning;
+using Wayd.Common.Domain.Interfaces.Planning.Iterations;
+using Wayd.Common.Domain.Models.Planning.Iterations;
 using NodaTime;
 
-namespace Moda.Common.Domain.Events.Planning.Iterations;
+namespace Wayd.Common.Domain.Events.Planning.Iterations;
 
 public sealed record IterationCreatedEvent : DomainEvent, ISimpleIteration
 {

@@ -1,6 +1,6 @@
-﻿using Moda.Common.Domain.Models;
+﻿using Wayd.Common.Domain.Models;
 
-namespace Moda.Common.Domain.Tests.Sut.Models;
+namespace Wayd.Common.Domain.Tests.Sut.Models;
 
 public class MetadataManagerTests
 {

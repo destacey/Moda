@@ -1,6 +1,6 @@
-﻿using Moda.Work.Application.WorkItems.Dtos;
+﻿using Wayd.Work.Application.WorkItems.Dtos;
 
-namespace Moda.Work.Application.WorkItems;
+namespace Wayd.Work.Application.WorkItems;
 
 internal sealed class WorkItemProgressSummary
 {

@@ -1,9 +1,9 @@
-﻿using Moda.Common.Application.Search;
-using Moda.Common.Application.Search.Dtos;
-using Moda.Common.Domain.Employees;
-using Moda.Common.Domain.Enums.Organization;
+﻿using Wayd.Common.Application.Search;
+using Wayd.Common.Application.Search.Dtos;
+using Wayd.Common.Domain.Employees;
+using Wayd.Common.Domain.Enums.Organization;
 
-namespace Moda.Organization.Application.Search;
+namespace Wayd.Organization.Application.Search;
 
 internal sealed class SearchOrganizationForGlobalSearchQueryHandler(IOrganizationDbContext organizationDbContext)
     : IQueryHandler<SearchOrganizationForGlobalSearchQuery, ServiceSearchResponse>

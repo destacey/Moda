@@ -4,7 +4,7 @@ using Mapster;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace Moda.Infrastructure.Identity;
+namespace Wayd.Infrastructure.Identity;
 
 internal class RoleService(
     RoleManager<ApplicationRole> roleManager,
@@ -175,7 +175,7 @@ internal class RoleService(
 
     /// <summary>Handles specific validation errors if they exist.</summary>
     /// <param name="result">The result.</param>
-    /// <exception cref="Moda.Common.Application.Exceptions.ValidationException"></exception>
+    /// <exception cref="Wayd.Common.Application.Exceptions.ValidationException"></exception>
     private void HandleValidationErrors(IdentityResult result)
     {
         if (result.Errors.Any(e => e.Code == "DuplicateRoleName"))

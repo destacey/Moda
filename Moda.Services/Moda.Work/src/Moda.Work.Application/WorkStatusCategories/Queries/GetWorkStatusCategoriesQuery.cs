@@ -1,6 +1,6 @@
-﻿using Moda.Common.Domain.Enums.Work;
+﻿using Wayd.Common.Domain.Enums.Work;
 
-namespace Moda.Work.Application.WorkStatusCategories.Queries;
+namespace Wayd.Work.Application.WorkStatusCategories.Queries;
 
 public sealed record GetWorkStatusCategoriesQuery : IQuery<IReadOnlyList<WorkStatusCategoryListDto>> { }
 

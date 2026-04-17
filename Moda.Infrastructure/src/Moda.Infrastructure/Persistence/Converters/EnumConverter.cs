@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace Moda.Infrastructure.Persistence.Converters;
+namespace Wayd.Infrastructure.Persistence.Converters;
 
 public class EnumConverter<T> : ValueConverter<T, string>
 {

@@ -1,6 +1,6 @@
-﻿using Moda.ProjectPortfolioManagement.Domain.Models;
+﻿using Wayd.ProjectPortfolioManagement.Domain.Models;
 
-namespace Moda.ProjectPortfolioManagement.Application.ExpenditureCategories.Commands;
+namespace Wayd.ProjectPortfolioManagement.Application.ExpenditureCategories.Commands;
 
 public sealed record CreateExpenditureCategoryCommand(
     string Name,

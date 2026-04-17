@@ -1,9 +1,9 @@
-﻿using Moda.Common.Domain.Models.Organizations;
-using Moda.Organization.Application.Teams.Models;
-using Moda.Organization.Domain.Enums;
+﻿using Wayd.Common.Domain.Models.Organizations;
+using Wayd.Organization.Application.Teams.Models;
+using Wayd.Organization.Domain.Enums;
 using NodaTime;
 
-namespace Moda.Organization.Application.Teams.Commands;
+namespace Wayd.Organization.Application.Teams.Commands;
 
 public sealed record CreateTeamCommand(string Name, TeamCode Code, string? Description, LocalDate ActiveDate) : ICommand<int>;
 

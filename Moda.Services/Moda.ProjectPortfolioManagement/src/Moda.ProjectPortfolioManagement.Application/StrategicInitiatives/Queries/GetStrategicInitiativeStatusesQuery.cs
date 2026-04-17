@@ -1,8 +1,8 @@
-using Moda.Common.Extensions;
-using Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Dtos;
-using Moda.ProjectPortfolioManagement.Domain.Enums;
+using Wayd.Common.Extensions;
+using Wayd.ProjectPortfolioManagement.Application.StrategicInitiatives.Dtos;
+using Wayd.ProjectPortfolioManagement.Domain.Enums;
 
-namespace Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Queries;
+namespace Wayd.ProjectPortfolioManagement.Application.StrategicInitiatives.Queries;
 
 public sealed record GetStrategicInitiativeStatusesQuery : IQuery<IReadOnlyList<StrategicInitiativeStatusDto>> { }
 

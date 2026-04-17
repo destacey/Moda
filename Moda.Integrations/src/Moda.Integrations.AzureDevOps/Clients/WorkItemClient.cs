@@ -1,10 +1,10 @@
 ﻿using Ardalis.GuardClauses;
-using Moda.Common.Extensions;
-using Moda.Integrations.AzureDevOps.Models;
-using Moda.Integrations.AzureDevOps.Models.WorkItems;
+using Wayd.Common.Extensions;
+using Wayd.Integrations.AzureDevOps.Models;
+using Wayd.Integrations.AzureDevOps.Models.WorkItems;
 using RestSharp;
 
-namespace Moda.Integrations.AzureDevOps.Clients;
+namespace Wayd.Integrations.AzureDevOps.Clients;
 
 internal sealed class WorkItemClient : BaseClient
 {

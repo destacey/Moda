@@ -1,12 +1,12 @@
 ﻿using System.Text.Json.Serialization;
 using Mapster;
-using Moda.AppIntegration.Application.Connections.Dtos.AzureDevOps;
-using Moda.AppIntegration.Application.Connections.Dtos.AzureOpenAI;
-using Moda.AppIntegration.Domain.Interfaces;
-using Moda.AppIntegration.Domain.Models.AzureOpenAI;
-using Moda.Common.Application.Dtos;
+using Wayd.AppIntegration.Application.Connections.Dtos.AzureDevOps;
+using Wayd.AppIntegration.Application.Connections.Dtos.AzureOpenAI;
+using Wayd.AppIntegration.Domain.Interfaces;
+using Wayd.AppIntegration.Domain.Models.AzureOpenAI;
+using Wayd.Common.Application.Dtos;
 
-namespace Moda.AppIntegration.Application.Connections.Dtos;
+namespace Wayd.AppIntegration.Application.Connections.Dtos;
 
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "$type")]
 //[JsonDerivedType(typeof(ConnectionDetailsDto), typeDiscriminator: "connection")]

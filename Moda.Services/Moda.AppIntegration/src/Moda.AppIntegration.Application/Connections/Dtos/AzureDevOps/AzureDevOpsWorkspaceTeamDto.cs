@@ -1,6 +1,6 @@
 ﻿using Mapster;
 
-namespace Moda.AppIntegration.Application.Connections.Dtos.AzureDevOps;
+namespace Wayd.AppIntegration.Application.Connections.Dtos.AzureDevOps;
 
 public sealed record AzureDevOpsWorkspaceTeamDto : IMapFrom<AzureDevOpsBoardsWorkspaceTeam>
 {
@@ -25,7 +25,7 @@ public sealed record AzureDevOpsWorkspaceTeamDto : IMapFrom<AzureDevOpsBoardsWor
     public Guid? BoardId { get; set; }
 
     /// <summary>
-    /// The unique identifier for the team within Moda.
+    /// The unique identifier for the team within Wayd.
     /// </summary>
     public Guid? InternalTeamId { get; set; }
 }

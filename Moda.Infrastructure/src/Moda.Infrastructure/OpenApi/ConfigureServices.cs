@@ -8,7 +8,7 @@ using NSwag;
 using NSwag.AspNetCore;
 using ZymLabs.NSwag.FluentValidation;
 
-namespace Moda.Infrastructure.OpenApi;
+namespace Wayd.Infrastructure.OpenApi;
 
 internal static class ConfigureServices
 {

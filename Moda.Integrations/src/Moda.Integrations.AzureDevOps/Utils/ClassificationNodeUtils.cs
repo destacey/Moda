@@ -1,4 +1,4 @@
-﻿namespace Moda.Integrations.AzureDevOps.Utils;
+﻿namespace Wayd.Integrations.AzureDevOps.Utils;
 
 /// <summary>
 /// Utility methods for working with Azure DevOps classification nodes.

@@ -1,7 +1,7 @@
-﻿using Moda.ProjectPortfolioManagement.Application.Projects.Dtos;
-using Moda.ProjectPortfolioManagement.Domain.Enums;
+﻿using Wayd.ProjectPortfolioManagement.Application.Projects.Dtos;
+using Wayd.ProjectPortfolioManagement.Domain.Enums;
 
-namespace Moda.ProjectPortfolioManagement.Application.Projects.Queries;
+namespace Wayd.ProjectPortfolioManagement.Application.Projects.Queries;
 
 /// <summary>
 /// Returns plan summary metrics for multiple projects in a single query.

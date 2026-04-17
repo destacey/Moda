@@ -1,4 +1,4 @@
-namespace Moda.Common.Application.Interfaces;
+namespace Wayd.Common.Application.Interfaces;
 
 public interface ISerializerService : ITransientService
 {

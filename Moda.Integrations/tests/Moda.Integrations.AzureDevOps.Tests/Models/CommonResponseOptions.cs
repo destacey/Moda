@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
-using Moda.Integrations.AzureDevOps.Models.Converters;
+using Wayd.Integrations.AzureDevOps.Models.Converters;
 
-namespace Moda.Integrations.AzureDevOps.Tests.Models;
+namespace Wayd.Integrations.AzureDevOps.Tests.Models;
 
 public class CommonResponseOptions
 {

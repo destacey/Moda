@@ -1,10 +1,10 @@
-﻿using Moda.Common.Application.Requests.WorkManagement.Commands;
-using Moda.Work.Application.Persistence;
-using Moda.Work.Application.Workflows.Dtos;
-using Moda.Work.Application.WorkProcesses.Commands;
-using Moda.Work.Domain.Interfaces;
+﻿using Wayd.Common.Application.Requests.WorkManagement.Commands;
+using Wayd.Work.Application.Persistence;
+using Wayd.Work.Application.Workflows.Dtos;
+using Wayd.Work.Application.WorkProcesses.Commands;
+using Wayd.Work.Domain.Interfaces;
 
-namespace Moda.Work.Application.Workflows.Commands;
+namespace Wayd.Work.Application.Workflows.Commands;
 
 internal sealed class CreateExternalWorkflowCommandHandler(IWorkDbContext workDbContext, ILogger<CreateExternalWorkProcessCommandHandler> logger) : ICommandHandler<CreateExternalWorkflowCommand, Guid>
 {

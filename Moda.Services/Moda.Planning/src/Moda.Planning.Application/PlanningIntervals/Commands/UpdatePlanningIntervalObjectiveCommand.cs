@@ -1,10 +1,10 @@
 ﻿using MediatR;
-using Moda.Common.Application.Requests.Goals.Commands;
-using Moda.Common.Application.Requests.Goals.Queries;
-using Moda.Planning.Application.PlanningIntervals.Extensions;
-using Moda.Planning.Domain.Enums;
+using Wayd.Common.Application.Requests.Goals.Commands;
+using Wayd.Common.Application.Requests.Goals.Queries;
+using Wayd.Planning.Application.PlanningIntervals.Extensions;
+using Wayd.Planning.Domain.Enums;
 
-namespace Moda.Planning.Application.PlanningIntervals.Commands;
+namespace Wayd.Planning.Application.PlanningIntervals.Commands;
 
 public sealed record UpdatePlanningIntervalObjectiveCommand(Guid PlanningIntervalId, Guid PlanningIntervalObjectiveId, string Name, string? Description, ObjectiveStatus Status, double Progress, LocalDate? StartDate, LocalDate? TargetDate, bool IsStretch) : ICommand<int>;
 

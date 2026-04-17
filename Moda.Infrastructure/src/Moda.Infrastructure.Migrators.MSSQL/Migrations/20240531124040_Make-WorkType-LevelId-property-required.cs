@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
-using Moda.Common.Domain.Enums;
-using Moda.Common.Domain.Enums.Work;
+using Wayd.Common.Domain.Enums;
+using Wayd.Common.Domain.Enums.Work;
 
 #nullable disable
 
-namespace Moda.Infrastructure.Migrators.MSSQL.Migrations;
+namespace Wayd.Infrastructure.Migrators.MSSQL.Migrations;
 
 /// <inheritdoc />
 public partial class MakeWorkTypeLevelIdpropertyrequired : Migration

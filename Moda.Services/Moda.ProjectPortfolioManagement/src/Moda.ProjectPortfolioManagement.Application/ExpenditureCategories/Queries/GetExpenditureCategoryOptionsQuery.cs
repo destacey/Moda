@@ -1,7 +1,7 @@
-﻿using Moda.ProjectPortfolioManagement.Application.ExpenditureCategories.Dtos;
-using Moda.ProjectPortfolioManagement.Domain.Enums;
+﻿using Wayd.ProjectPortfolioManagement.Application.ExpenditureCategories.Dtos;
+using Wayd.ProjectPortfolioManagement.Domain.Enums;
 
-namespace Moda.ProjectPortfolioManagement.Application.ExpenditureCategories.Queries;
+namespace Wayd.ProjectPortfolioManagement.Application.ExpenditureCategories.Queries;
 
 public sealed record GetExpenditureCategoryOptionsQuery(bool? IncludeArchived) : IQuery<List<ExpenditureCategoryOptionDto>>;
 

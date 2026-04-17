@@ -1,7 +1,7 @@
-﻿using Moda.Work.Application.WorkTypeTiers.Dtos;
-using Moda.Work.Application.WorkTypeTiers.Queries;
+﻿using Wayd.Work.Application.WorkTypeTiers.Dtos;
+using Wayd.Work.Application.WorkTypeTiers.Queries;
 
-namespace Moda.Web.Api.Controllers.Work;
+namespace Wayd.Web.Api.Controllers.Work;
 
 [Route("api/work/work-type-tiers")]
 [ApiVersionNeutral]

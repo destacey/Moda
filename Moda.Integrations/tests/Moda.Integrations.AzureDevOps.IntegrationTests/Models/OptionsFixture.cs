@@ -1,4 +1,4 @@
-﻿namespace Moda.Integrations.AzureDevOps.IntegrationTests.Models;
+﻿namespace Wayd.Integrations.AzureDevOps.IntegrationTests.Models;
 
 public class OptionsFixture : IDisposable
 {

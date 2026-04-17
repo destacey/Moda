@@ -1,9 +1,9 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
-using Moda.Common.Domain.Enums;
+using Wayd.Common.Domain.Enums;
 using NodaTime;
 
-namespace Moda.Planning.Domain.Models;
+namespace Wayd.Planning.Domain.Models;
 
 public sealed class SimpleHealthCheck : BaseEntity<Guid>
 {

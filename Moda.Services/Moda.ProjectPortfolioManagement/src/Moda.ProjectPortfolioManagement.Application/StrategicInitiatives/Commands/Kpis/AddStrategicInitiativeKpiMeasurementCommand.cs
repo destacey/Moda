@@ -1,7 +1,7 @@
-﻿using Moda.Common.Application.Models;
-using Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
+﻿using Wayd.Common.Application.Models;
+using Wayd.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 
-namespace Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Commands.Kpis;
+namespace Wayd.ProjectPortfolioManagement.Application.StrategicInitiatives.Commands.Kpis;
 
 public sealed record AddStrategicInitiativeKpiMeasurementCommand(Guid StrategicInitiativeId, Guid KpiId, double ActualValue, Instant MeasurementDate, string? Note) : ICommand;
 

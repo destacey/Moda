@@ -1,7 +1,7 @@
-﻿using Moda.ProjectPortfolioManagement.Application.ProjectTasks.Models;
-using Moda.ProjectPortfolioManagement.Domain.Enums;
+﻿using Wayd.ProjectPortfolioManagement.Application.ProjectTasks.Models;
+using Wayd.ProjectPortfolioManagement.Domain.Enums;
 
-namespace Moda.ProjectPortfolioManagement.Application.ProjectTasks.Commands;
+namespace Wayd.ProjectPortfolioManagement.Application.ProjectTasks.Commands;
 
 public sealed record CreateProjectTaskCommand(
     Guid ProjectId,

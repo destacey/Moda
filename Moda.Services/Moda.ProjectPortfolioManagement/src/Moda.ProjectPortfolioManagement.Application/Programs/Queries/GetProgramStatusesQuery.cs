@@ -1,8 +1,8 @@
-using Moda.Common.Extensions;
-using Moda.ProjectPortfolioManagement.Application.Programs.Dtos;
-using Moda.ProjectPortfolioManagement.Domain.Enums;
+using Wayd.Common.Extensions;
+using Wayd.ProjectPortfolioManagement.Application.Programs.Dtos;
+using Wayd.ProjectPortfolioManagement.Domain.Enums;
 
-namespace Moda.ProjectPortfolioManagement.Application.Programs.Queries;
+namespace Wayd.ProjectPortfolioManagement.Application.Programs.Queries;
 
 public sealed record GetProgramStatusesQuery : IQuery<IReadOnlyList<ProgramStatusDto>> { }
 

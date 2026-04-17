@@ -1,8 +1,8 @@
-﻿using Moda.Tests.Shared.Data;
-using Moda.Work.Domain.Models;
+﻿using Wayd.Tests.Shared.Data;
+using Wayd.Work.Domain.Models;
 using NodaTime;
 
-namespace Moda.Work.Domain.Tests.Data;
+namespace Wayd.Work.Domain.Tests.Data;
 
 public class WorkTypeHierarchyFaker : PrivateConstructorFaker<WorkTypeHierarchy>
 {

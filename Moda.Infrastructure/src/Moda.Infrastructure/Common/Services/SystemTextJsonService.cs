@@ -4,7 +4,7 @@ using NodaTime;
 using NodaTime.Serialization.SystemTextJson;
 using OneOf.Serialization.SystemTextJson;
 
-namespace Moda.Infrastructure.Common.Services;
+namespace Wayd.Infrastructure.Common.Services;
 
 public sealed class SystemTextJsonService : ISerializerService
 {

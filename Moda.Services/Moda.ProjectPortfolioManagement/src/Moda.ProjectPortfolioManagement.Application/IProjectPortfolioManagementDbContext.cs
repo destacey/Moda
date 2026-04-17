@@ -1,7 +1,7 @@
-﻿using Moda.ProjectPortfolioManagement.Domain.Models;
-using Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
+﻿using Wayd.ProjectPortfolioManagement.Domain.Models;
+using Wayd.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 
-namespace Moda.ProjectPortfolioManagement.Application;
+namespace Wayd.ProjectPortfolioManagement.Application;
 
 public interface IProjectPortfolioManagementDbContext : IModaDbContext
 {

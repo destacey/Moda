@@ -1,8 +1,8 @@
 ﻿using Bogus;
-using Moda.Work.Application.Tests.Models;
+using Wayd.Work.Application.Tests.Models;
 using NodaTime;
 
-namespace Moda.Work.Application.Tests.Data;
+namespace Wayd.Work.Application.Tests.Data;
 
 public class ExternalWorkItemFaker : Faker<ExternalTestWorkItem>
 {

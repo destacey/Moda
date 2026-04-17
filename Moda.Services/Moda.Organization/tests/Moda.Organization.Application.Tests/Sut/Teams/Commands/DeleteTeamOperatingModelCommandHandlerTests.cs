@@ -1,14 +1,14 @@
 ﻿using System.Reflection;
 using Microsoft.Extensions.Logging;
-using Moda.Organization.Application.Teams.Commands;
-using Moda.Organization.Application.Tests.Infrastructure;
-using Moda.Organization.Domain.Enums;
-using Moda.Organization.Domain.Models;
-using Moda.Organization.Domain.Tests.Data;
+using Wayd.Organization.Application.Teams.Commands;
+using Wayd.Organization.Application.Tests.Infrastructure;
+using Wayd.Organization.Domain.Enums;
+using Wayd.Organization.Domain.Models;
+using Wayd.Organization.Domain.Tests.Data;
 using Moq;
 using NodaTime;
 
-namespace Moda.Organization.Application.Tests.Sut.Teams.Commands;
+namespace Wayd.Organization.Application.Tests.Sut.Teams.Commands;
 
 public class DeleteTeamOperatingModelCommandHandlerTests : IDisposable
 {

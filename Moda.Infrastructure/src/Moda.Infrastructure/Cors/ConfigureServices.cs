@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Moda.Infrastructure.Cors;
+namespace Wayd.Infrastructure.Cors;
 
 internal static class ConfigureServices
 {

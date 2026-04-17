@@ -1,6 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 
-namespace Moda.Common.Models;
+namespace Wayd.Common.Models;
 
 public class Progress : ValueObject
 {

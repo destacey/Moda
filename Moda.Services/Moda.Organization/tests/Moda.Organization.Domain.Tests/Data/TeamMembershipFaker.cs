@@ -1,8 +1,8 @@
-﻿using Moda.Organization.Domain.Models;
-using Moda.Tests.Shared.Data;
+﻿using Wayd.Organization.Domain.Models;
+using Wayd.Tests.Shared.Data;
 using NodaTime;
 
-namespace Moda.Organization.Domain.Tests.Data;
+namespace Wayd.Organization.Domain.Tests.Data;
 
 public sealed class TeamMembershipFaker : PrivateConstructorFaker<TeamMembership>
 {

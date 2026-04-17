@@ -1,6 +1,6 @@
-﻿using Moda.Common.Domain.Models.Organizations;
+﻿using Wayd.Common.Domain.Models.Organizations;
 
-namespace Moda.Organization.Application.Validators;
+namespace Wayd.Organization.Application.Validators;
 
 public sealed class TeamCodeValidator : CustomValidator<TeamCode>
 {

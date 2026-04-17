@@ -1,8 +1,8 @@
-﻿using Moda.Common.Domain.Models.KeyPerformanceIndicators;
-using Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
-using Moda.Tests.Shared.Data;
+﻿using Wayd.Common.Domain.Models.KeyPerformanceIndicators;
+using Wayd.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
+using Wayd.Tests.Shared.Data;
 
-namespace Moda.ProjectPortfolioManagement.Domain.Tests.Data;
+namespace Wayd.ProjectPortfolioManagement.Domain.Tests.Data;
 
 public sealed class StrategicInitiativeKpiFaker : PrivateConstructorFaker<StrategicInitiativeKpi>
 {

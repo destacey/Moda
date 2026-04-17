@@ -1,20 +1,20 @@
 ﻿using FluentAssertions;
 using Microsoft.Extensions.Logging;
-using Moda.Common.Application.Interfaces.ExternalWork;
-using Moda.Common.Application.Requests.WorkManagement.Commands;
-using Moda.Common.Domain.Enums.Work;
-using Moda.Work.Application.Persistence;
-using Moda.Work.Application.Tests.Data;
-using Moda.Work.Application.Tests.Infrastructure;
-using Moda.Work.Application.WorkItems.Commands;
-using Moda.Work.Domain.Models;
-using Moda.Work.Domain.Tests.Data;
+using Wayd.Common.Application.Interfaces.ExternalWork;
+using Wayd.Common.Application.Requests.WorkManagement.Commands;
+using Wayd.Common.Domain.Enums.Work;
+using Wayd.Work.Application.Persistence;
+using Wayd.Work.Application.Tests.Data;
+using Wayd.Work.Application.Tests.Infrastructure;
+using Wayd.Work.Application.WorkItems.Commands;
+using Wayd.Work.Domain.Models;
+using Wayd.Work.Domain.Tests.Data;
 using Moq;
 using NodaTime;
 using NodaTime.Testing;
 using Xunit;
 
-namespace Moda.Work.Application.Tests.Sut.WorkItems.Commands;
+namespace Wayd.Work.Application.Tests.Sut.WorkItems.Commands;
 
 public class SyncExternalWorkItemsCommandHandlerTests : IDisposable
 {

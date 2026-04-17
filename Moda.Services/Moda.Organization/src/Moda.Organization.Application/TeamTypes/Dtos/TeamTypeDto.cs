@@ -1,4 +1,4 @@
-﻿namespace Moda.Organization.Application.TeamTypes.Dtos;
+﻿namespace Wayd.Organization.Application.TeamTypes.Dtos;
 
 public sealed record TeamTypeDto
 {

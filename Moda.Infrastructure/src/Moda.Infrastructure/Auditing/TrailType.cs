@@ -1,4 +1,4 @@
-namespace Moda.Infrastructure.Auditing;
+namespace Wayd.Infrastructure.Auditing;
 
 // Max length of 32
 public enum TrailType : byte

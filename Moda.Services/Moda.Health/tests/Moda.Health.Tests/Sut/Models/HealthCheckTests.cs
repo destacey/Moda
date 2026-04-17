@@ -1,10 +1,10 @@
-﻿using Moda.Common.Domain.Events.Health;
-using Moda.Health.Tests.Data;
-using Moda.Tests.Shared;
+﻿using Wayd.Common.Domain.Events.Health;
+using Wayd.Health.Tests.Data;
+using Wayd.Tests.Shared;
 using NodaTime.Extensions;
 using NodaTime.Testing;
 
-namespace Moda.Health.Tests.Sut.Models;
+namespace Wayd.Health.Tests.Sut.Models;
 
 public class HealthCheckTests
 {

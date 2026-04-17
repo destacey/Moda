@@ -1,6 +1,6 @@
 ﻿using FluentValidation.Validators;
 
-namespace Moda.Common.Application.Validation;
+namespace Wayd.Common.Application.Validation;
 
 // SetValidator doesn't work when dealing with a nullable reference type
 // Use this SetNonNullableValidator extension method instead

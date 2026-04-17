@@ -1,6 +1,6 @@
-﻿using Moda.Common.Application.Models;
+﻿using Wayd.Common.Application.Models;
 
-namespace Moda.StrategicManagement.Application.StrategicThemes.Commands;
+namespace Wayd.StrategicManagement.Application.StrategicThemes.Commands;
 
 public sealed record UpdateStrategicThemeCommand(Guid Id, string Name, string Description) : ICommand;
 

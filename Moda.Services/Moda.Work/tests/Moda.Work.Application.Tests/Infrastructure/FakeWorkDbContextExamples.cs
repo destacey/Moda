@@ -1,8 +1,8 @@
 ﻿using FluentAssertions;
-using Moda.Work.Domain.Tests.Data;
+using Wayd.Work.Domain.Tests.Data;
 using Xunit;
 
-namespace Moda.Work.Application.Tests.Infrastructure;
+namespace Wayd.Work.Application.Tests.Infrastructure;
 
 /// <summary>
 /// Example tests demonstrating the features of FakeWorkDbContext.

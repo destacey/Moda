@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Moda.ProjectPortfolioManagement.Domain.Enums;
+namespace Wayd.ProjectPortfolioManagement.Domain.Enums;
 
 /// <summary>
 /// Represents the role an employee can have for a project task.

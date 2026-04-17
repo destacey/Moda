@@ -1,6 +1,6 @@
-﻿using Moda.Common.Application.Dtos;
+﻿using Wayd.Common.Application.Dtos;
 
-namespace Moda.Work.Application.WorkTypes.Dtos;
+namespace Wayd.Work.Application.WorkTypes.Dtos;
 
 public sealed record WorkTypeNavigationDto : IMapFrom<WorkType>
 {

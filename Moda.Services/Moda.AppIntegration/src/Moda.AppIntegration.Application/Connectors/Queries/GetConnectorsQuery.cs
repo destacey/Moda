@@ -1,8 +1,8 @@
 ﻿
 
-using Moda.Common.Domain.Enums.AppIntegrations;
+using Wayd.Common.Domain.Enums.AppIntegrations;
 
-namespace Moda.AppIntegration.Application.Connectors.Queries;
+namespace Wayd.AppIntegration.Application.Connectors.Queries;
 
 public sealed record GetConnectorsQuery : IQuery<IReadOnlyList<ConnectorListDto>> { }
 

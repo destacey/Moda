@@ -1,8 +1,8 @@
-﻿using Moda.Common.Application.Requests.Goals.Commands;
-using Moda.Common.Domain.Models.Goals;
-using Moda.Goals.Application.Persistence;
+﻿using Wayd.Common.Application.Requests.Goals.Commands;
+using Wayd.Common.Domain.Models.Goals;
+using Wayd.Goals.Application.Persistence;
 
-namespace Moda.Goals.Application.Objectives.Commands;
+namespace Wayd.Goals.Application.Objectives.Commands;
 
 internal sealed class ImportObjectiveCommandHandler(IGoalsDbContext goalsDbContext, ILogger<ImportObjectiveCommandHandler> logger) : ICommandHandler<ImportObjectiveCommand, Guid>
 {

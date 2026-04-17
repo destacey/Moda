@@ -1,9 +1,9 @@
-using Moda.Common.Application.Events;
-using Moda.Common.Domain.Enums;
-using Moda.Common.Domain.Events.Organization;
-using Moda.ProjectPortfolioManagement.Domain.Models;
+using Wayd.Common.Application.Events;
+using Wayd.Common.Domain.Enums;
+using Wayd.Common.Domain.Events.Organization;
+using Wayd.ProjectPortfolioManagement.Domain.Models;
 
-namespace Moda.ProjectPortfolioManagement.Application.PpmTeams.EventHandlers;
+namespace Wayd.ProjectPortfolioManagement.Application.PpmTeams.EventHandlers;
 
 internal sealed class PpmTeamChangeEventHandler :
     IEventNotificationHandler<TeamCreatedEvent>,

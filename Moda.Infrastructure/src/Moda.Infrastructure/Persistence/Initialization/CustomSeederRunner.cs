@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace Moda.Infrastructure.Persistence.Initialization;
+namespace Wayd.Infrastructure.Persistence.Initialization;
 
 internal class CustomSeederRunner
 {

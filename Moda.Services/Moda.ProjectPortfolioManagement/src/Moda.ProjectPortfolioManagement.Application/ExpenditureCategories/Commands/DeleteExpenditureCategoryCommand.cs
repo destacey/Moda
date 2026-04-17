@@ -1,6 +1,6 @@
-﻿using Moda.Common.Application.Models;
+﻿using Wayd.Common.Application.Models;
 
-namespace Moda.ProjectPortfolioManagement.Application.ExpenditureCategories.Commands;
+namespace Wayd.ProjectPortfolioManagement.Application.ExpenditureCategories.Commands;
 
 public sealed record DeleteExpenditureCategoryCommand(int Id) : ICommand;
 

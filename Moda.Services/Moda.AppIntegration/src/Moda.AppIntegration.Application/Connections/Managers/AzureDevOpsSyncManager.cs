@@ -1,23 +1,23 @@
 using Ardalis.GuardClauses;
 using MediatR;
-using Moda.AppIntegration.Application.Connections.Dtos.AzureDevOps;
-using Moda.AppIntegration.Application.Connections.Queries;
-using Moda.AppIntegration.Application.Connections.Queries.AzureDevOps;
-using Moda.AppIntegration.Application.Interfaces;
-using Moda.AppIntegration.Application.Logging;
-using Moda.Common.Application.Enums;
-using Moda.Common.Application.Exceptions;
-using Moda.Common.Application.Interfaces.ExternalWork;
-using Moda.Common.Application.Logging;
-using Moda.Common.Application.Requests.Planning.Iterations;
-using Moda.Common.Application.Requests.WorkManagement.Commands;
-using Moda.Common.Application.Requests.WorkManagement.Dtos;
-using Moda.Common.Application.Requests.WorkManagement.Queries;
-using Moda.Common.Domain.Enums.AppIntegrations;
-using Moda.Common.Domain.Enums.Work;
+using Wayd.AppIntegration.Application.Connections.Dtos.AzureDevOps;
+using Wayd.AppIntegration.Application.Connections.Queries;
+using Wayd.AppIntegration.Application.Connections.Queries.AzureDevOps;
+using Wayd.AppIntegration.Application.Interfaces;
+using Wayd.AppIntegration.Application.Logging;
+using Wayd.Common.Application.Enums;
+using Wayd.Common.Application.Exceptions;
+using Wayd.Common.Application.Interfaces.ExternalWork;
+using Wayd.Common.Application.Logging;
+using Wayd.Common.Application.Requests.Planning.Iterations;
+using Wayd.Common.Application.Requests.WorkManagement.Commands;
+using Wayd.Common.Application.Requests.WorkManagement.Dtos;
+using Wayd.Common.Application.Requests.WorkManagement.Queries;
+using Wayd.Common.Domain.Enums.AppIntegrations;
+using Wayd.Common.Domain.Enums.Work;
 using NodaTime;
 
-namespace Moda.AppIntegration.Application.Connections.Managers;
+namespace Wayd.AppIntegration.Application.Connections.Managers;
 
 public sealed class AzureDevOpsSyncManager(ILogger<AzureDevOpsSyncManager> logger, IAzureDevOpsService azureDevOpsService, ISender sender, IAzureDevOpsInitManager initManager) : IAzureDevOpsSyncManager
 {

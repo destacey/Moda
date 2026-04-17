@@ -1,8 +1,8 @@
 ﻿using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
-using Moda.Common.Domain.Data;
+using Wayd.Common.Domain.Data;
 
-namespace Moda.Common.Domain.FeatureManagement;
+namespace Wayd.Common.Domain.FeatureManagement;
 
 public sealed class FeatureFlag : BaseAuditableEntity<int>
 {

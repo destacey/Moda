@@ -1,6 +1,6 @@
-﻿using Moda.Common.Domain.Models.KeyPerformanceIndicators;
+﻿using Wayd.Common.Domain.Models.KeyPerformanceIndicators;
 
-namespace Moda.Common.Domain.Tests.Data.Models;
+namespace Wayd.Common.Domain.Tests.Data.Models;
 
 public sealed class TestKpiCheckpoint : KpiCheckpoint
 {

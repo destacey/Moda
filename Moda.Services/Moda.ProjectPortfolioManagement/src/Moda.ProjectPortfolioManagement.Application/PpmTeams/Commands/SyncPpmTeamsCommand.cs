@@ -1,7 +1,7 @@
-﻿using Moda.Common.Domain.Interfaces.Organization;
-using Moda.ProjectPortfolioManagement.Domain.Models;
+﻿using Wayd.Common.Domain.Interfaces.Organization;
+using Wayd.ProjectPortfolioManagement.Domain.Models;
 
-namespace Moda.ProjectPortfolioManagement.Application.PpmTeams.Commands;
+namespace Wayd.ProjectPortfolioManagement.Application.PpmTeams.Commands;
 
 public sealed record SyncPpmTeamsCommand(IEnumerable<ISimpleTeam> Teams) : ICommand, ILongRunningRequest;
 

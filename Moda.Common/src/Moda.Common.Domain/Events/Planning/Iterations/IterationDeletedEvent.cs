@@ -1,6 +1,6 @@
 ﻿using NodaTime;
 
-namespace Moda.Common.Domain.Events.Planning.Iterations;
+namespace Wayd.Common.Domain.Events.Planning.Iterations;
 
 public sealed record IterationDeletedEvent : DomainEvent
 {

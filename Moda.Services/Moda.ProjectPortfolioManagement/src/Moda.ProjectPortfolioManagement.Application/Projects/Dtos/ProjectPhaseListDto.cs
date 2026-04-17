@@ -1,7 +1,7 @@
-﻿using Moda.Common.Application.Dtos;
-using Moda.ProjectPortfolioManagement.Domain.Models;
+﻿using Wayd.Common.Application.Dtos;
+using Wayd.ProjectPortfolioManagement.Domain.Models;
 
-namespace Moda.ProjectPortfolioManagement.Application.Projects.Dtos;
+namespace Wayd.ProjectPortfolioManagement.Application.Projects.Dtos;
 
 public sealed record ProjectPhaseListDto : IMapFrom<ProjectPhase>
 {

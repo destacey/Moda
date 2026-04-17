@@ -1,4 +1,4 @@
-﻿namespace Moda.Web.Api.Models.Planning.PlanningIntervals;
+﻿namespace Wayd.Web.Api.Models.Planning.PlanningIntervals;
 
 public sealed record UpdatePlanningIntervalObjectivesOrderRequest
 {

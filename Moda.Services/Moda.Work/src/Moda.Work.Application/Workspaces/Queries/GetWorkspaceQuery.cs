@@ -1,8 +1,8 @@
-﻿using Moda.Common.Models;
-using Moda.Work.Application.Persistence;
-using Moda.Work.Application.Workspaces.Dtos;
+﻿using Wayd.Common.Models;
+using Wayd.Work.Application.Persistence;
+using Wayd.Work.Application.Workspaces.Dtos;
 
-namespace Moda.Work.Application.Workspaces.Queries;
+namespace Wayd.Work.Application.Workspaces.Queries;
 
 public sealed record GetWorkspaceQuery : IQuery<Result<WorkspaceDto?>>
 {

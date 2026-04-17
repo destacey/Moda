@@ -1,9 +1,9 @@
-﻿using Moda.Common.Domain.Enums.Organization;
-using Moda.Common.Domain.Models.Organizations;
-using Moda.Tests.Shared.Data;
-using Moda.Work.Domain.Models;
+﻿using Wayd.Common.Domain.Enums.Organization;
+using Wayd.Common.Domain.Models.Organizations;
+using Wayd.Tests.Shared.Data;
+using Wayd.Work.Domain.Models;
 
-namespace Moda.Work.Domain.Tests.Data;
+namespace Wayd.Work.Domain.Tests.Data;
 
 public class WorkTeamFaker : PrivateConstructorFaker<WorkTeam>
 {

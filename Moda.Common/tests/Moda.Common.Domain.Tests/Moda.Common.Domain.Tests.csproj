@@ -19,8 +19,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\src\Moda.Common.Domain\Moda.Common.Domain.csproj" />
-      <ProjectReference Include="..\Moda.Tests.Shared\Moda.Tests.Shared.csproj" />
+      <ProjectReference Include="..\..\src\Wayd.Common.Domain\Wayd.Common.Domain.csproj" />
+      <ProjectReference Include="..\Wayd.Tests.Shared\Wayd.Tests.Shared.csproj" />
     </ItemGroup>
 
 </Project>

@@ -1,7 +1,7 @@
-﻿using Moda.Common.Domain.Interfaces;
-using Moda.Planning.Domain.Interfaces;
+﻿using Wayd.Common.Domain.Interfaces;
+using Wayd.Planning.Domain.Interfaces;
 
-namespace Moda.Planning.Domain.Models;
+namespace Wayd.Planning.Domain.Models;
 
 public sealed record PlanningIntervalCalendar : IHasIdAndKey
 {

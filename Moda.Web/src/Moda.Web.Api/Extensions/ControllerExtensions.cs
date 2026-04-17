@@ -1,4 +1,4 @@
-﻿namespace Moda.Web.Api.Extensions;
+﻿namespace Wayd.Web.Api.Extensions;
 
 /// <summary>
 /// Extension methods for ASP.NET Core controllers.

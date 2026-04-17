@@ -1,12 +1,12 @@
 ﻿using Microsoft.FeatureManagement.Mvc;
-using Moda.Common.Domain.FeatureManagement;
-using Moda.Planning.Application.EstimationScales.Commands;
-using Moda.Planning.Application.EstimationScales.Dtos;
-using Moda.Planning.Application.EstimationScales.Queries;
-using Moda.Web.Api.Extensions;
-using Moda.Web.Api.Models.Planning.EstimationScales;
+using Wayd.Common.Domain.FeatureManagement;
+using Wayd.Planning.Application.EstimationScales.Commands;
+using Wayd.Planning.Application.EstimationScales.Dtos;
+using Wayd.Planning.Application.EstimationScales.Queries;
+using Wayd.Web.Api.Extensions;
+using Wayd.Web.Api.Models.Planning.EstimationScales;
 
-namespace Moda.Web.Api.Controllers.Planning;
+namespace Wayd.Web.Api.Controllers.Planning;
 
 [Route("api/planning/estimation-scales")]
 [ApiVersionNeutral]

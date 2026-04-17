@@ -1,6 +1,6 @@
-using Moda.Common.Application.Persistence;
+using Wayd.Common.Application.Persistence;
 
-namespace Moda.Common.Application.Identity.PersonalAccessTokens.Commands;
+namespace Wayd.Common.Application.Identity.PersonalAccessTokens.Commands;
 
 /// <summary>
 /// Command to update a personal access token's name and/or expiration date.

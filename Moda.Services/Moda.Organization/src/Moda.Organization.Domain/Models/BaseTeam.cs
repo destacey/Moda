@@ -1,12 +1,12 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
-using Moda.Common.Domain.Enums.Organization;
-using Moda.Common.Domain.Interfaces.Organization;
-using Moda.Common.Domain.Models.Organizations;
-using Moda.Common.Extensions;
+using Wayd.Common.Domain.Enums.Organization;
+using Wayd.Common.Domain.Interfaces.Organization;
+using Wayd.Common.Domain.Models.Organizations;
+using Wayd.Common.Extensions;
 using NodaTime;
 
-namespace Moda.Organization.Domain.Models;
+namespace Wayd.Organization.Domain.Models;
 
 public abstract class BaseTeam : BaseSoftDeletableEntity, ISimpleTeam, IHasIdAndKey
 {

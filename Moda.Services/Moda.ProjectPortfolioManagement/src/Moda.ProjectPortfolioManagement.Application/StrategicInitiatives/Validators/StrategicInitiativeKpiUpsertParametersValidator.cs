@@ -1,7 +1,7 @@
-﻿using Moda.Common.Domain.Models.KeyPerformanceIndicators;
-using Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
+﻿using Wayd.Common.Domain.Models.KeyPerformanceIndicators;
+using Wayd.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 
-namespace Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Validators;
+namespace Wayd.ProjectPortfolioManagement.Application.StrategicInitiatives.Validators;
 
 public sealed class StrategicInitiativeKpiUpsertParametersValidator : CustomValidator<StrategicInitiativeKpiUpsertParameters>
 {

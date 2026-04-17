@@ -1,14 +1,14 @@
-﻿using Moda.Common.Domain.Enums.Organization;
-using Moda.Common.Domain.Events.Organization;
-using Moda.Common.Domain.Interfaces;
-using Moda.Common.Domain.Interfaces.Organization;
-using Moda.Common.Domain.Models.Organizations;
-using Moda.Planning.Domain.Models.Iterations;
+﻿using Wayd.Common.Domain.Enums.Organization;
+using Wayd.Common.Domain.Events.Organization;
+using Wayd.Common.Domain.Interfaces;
+using Wayd.Common.Domain.Interfaces.Organization;
+using Wayd.Common.Domain.Models.Organizations;
+using Wayd.Planning.Domain.Models.Iterations;
 
-namespace Moda.Planning.Domain.Models;
+namespace Wayd.Planning.Domain.Models;
 
 /// <summary>
-/// A copy of the Moda.Common.Domain.Interfaces.Organization.ISimpleTeam interface.  Used to hold team information for the planning service and db context.
+/// A copy of the Wayd.Common.Domain.Interfaces.Organization.ISimpleTeam interface.  Used to hold team information for the planning service and db context.
 /// </summary>
 public sealed class PlanningTeam : ISimpleTeam, IHasIdAndKey, IHasTeamIdAndCode
 {

@@ -1,8 +1,8 @@
 ﻿using System.Text.Json;
-using Moda.Integrations.AzureDevOps.Models.WorkItems;
-using Moda.Integrations.AzureDevOps.Tests.Models;
+using Wayd.Integrations.AzureDevOps.Models.WorkItems;
+using Wayd.Integrations.AzureDevOps.Tests.Models;
 
-namespace Moda.Integrations.AzureDevOps.Tests.Sut.Models.WorkItems;
+namespace Wayd.Integrations.AzureDevOps.Tests.Sut.Models.WorkItems;
 
 public class ReportingWorkItemLinkResponseTests : CommonResponseOptions
 {

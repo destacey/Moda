@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace Moda.AppIntegration.Application.Connections.Dtos.AzureDevOps;
+namespace Wayd.AppIntegration.Application.Connections.Dtos.AzureDevOps;
 
 public sealed record AzureDevOpsWorkspaceTeamMappingDto(Guid WorkspaceId, Guid ExternalTeamId, Guid? InternalTeamId);
 

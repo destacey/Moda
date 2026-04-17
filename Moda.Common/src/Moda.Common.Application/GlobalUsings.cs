@@ -2,10 +2,10 @@
 global using FluentValidation;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.Extensions.Logging;
-global using Moda.Common.Application.Behaviors;
-global using Moda.Common.Application.Interfaces;
-global using Moda.Common.Application.Models;
-global using Moda.Common.Application.Validation;
-global using Moda.Common.Domain.Events;
-global using Moda.Common.Extensions;
+global using Wayd.Common.Application.Behaviors;
+global using Wayd.Common.Application.Interfaces;
+global using Wayd.Common.Application.Models;
+global using Wayd.Common.Application.Validation;
+global using Wayd.Common.Domain.Events;
+global using Wayd.Common.Extensions;
 global using NodaTime;

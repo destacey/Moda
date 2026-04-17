@@ -1,15 +1,15 @@
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
-using Moda.Common.Application.Requests.WorkManagement.Commands;
-using Moda.Common.Domain.Enums;
-using Moda.Tests.Shared;
-using Moda.Work.Application.Tests.Infrastructure;
-using Moda.Work.Application.Workspaces.Commands;
-using Moda.Work.Domain.Tests.Data;
+using Wayd.Common.Application.Requests.WorkManagement.Commands;
+using Wayd.Common.Domain.Enums;
+using Wayd.Tests.Shared;
+using Wayd.Work.Application.Tests.Infrastructure;
+using Wayd.Work.Application.Workspaces.Commands;
+using Wayd.Work.Domain.Tests.Data;
 using Moq;
 using Xunit;
 
-namespace Moda.Work.Application.Tests.Sut.Workspaces.Commands;
+namespace Wayd.Work.Application.Tests.Sut.Workspaces.Commands;
 
 public class ChangeExternalWorkspaceWorkProcessCommandHandlerTests : IDisposable
 {

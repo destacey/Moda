@@ -1,6 +1,6 @@
-﻿using Moda.Common.Application.Dtos;
+﻿using Wayd.Common.Application.Dtos;
 
-namespace Moda.Organization.Application.Teams.Dtos;
+namespace Wayd.Organization.Application.Teams.Dtos;
 
 /// <summary>
 /// Represents an organizational unit.

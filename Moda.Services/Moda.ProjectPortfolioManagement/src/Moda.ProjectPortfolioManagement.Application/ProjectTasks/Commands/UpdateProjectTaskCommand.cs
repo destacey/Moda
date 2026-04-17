@@ -1,7 +1,7 @@
-﻿using Moda.ProjectPortfolioManagement.Domain.Enums;
-using Moda.ProjectPortfolioManagement.Domain.Models;
+﻿using Wayd.ProjectPortfolioManagement.Domain.Enums;
+using Wayd.ProjectPortfolioManagement.Domain.Models;
 
-namespace Moda.ProjectPortfolioManagement.Application.ProjectTasks.Commands;
+namespace Wayd.ProjectPortfolioManagement.Application.ProjectTasks.Commands;
 
 public sealed record UpdateProjectTaskCommand(
     Guid Id,

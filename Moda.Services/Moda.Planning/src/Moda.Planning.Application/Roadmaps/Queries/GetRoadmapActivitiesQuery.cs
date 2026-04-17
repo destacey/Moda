@@ -1,12 +1,12 @@
 ﻿using System.Linq.Expressions;
 using Ardalis.GuardClauses;
-using Moda.Common.Application.Models;
-using Moda.Common.Domain.Enums;
-using Moda.Planning.Application.Roadmaps.Dtos;
-using Moda.Planning.Domain.Enums;
-using Moda.Planning.Domain.Models.Roadmaps;
+using Wayd.Common.Application.Models;
+using Wayd.Common.Domain.Enums;
+using Wayd.Planning.Application.Roadmaps.Dtos;
+using Wayd.Planning.Domain.Enums;
+using Wayd.Planning.Domain.Models.Roadmaps;
 
-namespace Moda.Planning.Application.Roadmaps.Queries;
+namespace Wayd.Planning.Application.Roadmaps.Queries;
 
 public sealed record GetRoadmapActivitiesQuery : IQuery<List<RoadmapActivityListDto>>
 {

@@ -1,11 +1,11 @@
-﻿using Moda.Common.Domain.Enums.Planning;
-using Moda.Common.Domain.Enums.Work;
-using Moda.Tests.Shared;
-using Moda.Work.Domain.Models;
-using Moda.Work.Domain.Tests.Data;
+﻿using Wayd.Common.Domain.Enums.Planning;
+using Wayd.Common.Domain.Enums.Work;
+using Wayd.Tests.Shared;
+using Wayd.Work.Domain.Models;
+using Wayd.Work.Domain.Tests.Data;
 using NodaTime;
 
-namespace Moda.Work.Domain.Tests.Sut.Models;
+namespace Wayd.Work.Domain.Tests.Sut.Models;
 
 public class DependencyWorkItemInfoTests
 {

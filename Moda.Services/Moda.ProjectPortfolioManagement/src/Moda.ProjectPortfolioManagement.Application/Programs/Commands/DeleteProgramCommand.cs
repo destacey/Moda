@@ -1,5 +1,5 @@
 ﻿
-namespace Moda.ProjectPortfolioManagement.Application.Programs.Commands;
+namespace Wayd.ProjectPortfolioManagement.Application.Programs.Commands;
 
 public sealed record DeleteProgramCommand(Guid Id) : ICommand;
 

@@ -1,7 +1,7 @@
-﻿using Moda.ProjectPortfolioManagement.Application.Portfolios.Dtos;
-using Moda.ProjectPortfolioManagement.Domain.Enums;
+﻿using Wayd.ProjectPortfolioManagement.Application.Portfolios.Dtos;
+using Wayd.ProjectPortfolioManagement.Domain.Enums;
 
-namespace Moda.ProjectPortfolioManagement.Application.Portfolios.Queries;
+namespace Wayd.ProjectPortfolioManagement.Application.Portfolios.Queries;
 
 /// <summary>
 /// Retrieves a list of ProjectPortfolios based on the provided filter.  Returns all ProjectPortfolios if no filter is provided.

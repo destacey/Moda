@@ -1,10 +1,10 @@
 ﻿using System.Linq.Expressions;
 using Mapster;
-using Moda.Common.Application.Employees.Dtos;
-using Moda.Common.Application.Persistence;
-using Moda.Common.Domain.Employees;
+using Wayd.Common.Application.Employees.Dtos;
+using Wayd.Common.Application.Persistence;
+using Wayd.Common.Domain.Employees;
 
-namespace Moda.Common.Application.Employees.Queries;
+namespace Wayd.Common.Application.Employees.Queries;
 
 public sealed record GetEmployeeQuery : IQuery<EmployeeDetailsDto?>
 {

@@ -1,10 +1,10 @@
 using FluentAssertions;
-using Moda.AppIntegration.Domain.Models;
-using Moda.AppIntegration.Domain.Models.AzureOpenAI;
-using Moda.Common.Domain.Enums.AppIntegrations;
-using Moda.Tests.Shared;
+using Wayd.AppIntegration.Domain.Models;
+using Wayd.AppIntegration.Domain.Models.AzureOpenAI;
+using Wayd.Common.Domain.Enums.AppIntegrations;
+using Wayd.Tests.Shared;
 
-namespace Moda.AppIntegration.Domain.Tests.Sut.Models;
+namespace Wayd.AppIntegration.Domain.Tests.Sut.Models;
 
 public class ConnectionTests
 {
@@ -107,6 +107,6 @@ public class ConnectionTests
             _dateTimeProvider.Now);
 
         // Assert
-        connection.Should().NotBeAssignableTo<Moda.AppIntegration.Domain.Interfaces.ISyncableConnection>();
+        connection.Should().NotBeAssignableTo<Wayd.AppIntegration.Domain.Interfaces.ISyncableConnection>();
     }
 }

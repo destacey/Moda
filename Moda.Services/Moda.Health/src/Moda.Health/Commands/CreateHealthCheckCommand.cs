@@ -2,13 +2,13 @@
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Moda.Common.Application.Interfaces;
-using Moda.Common.Application.Validation;
-using Moda.Common.Domain.Enums;
-using Moda.Health.Models;
+using Wayd.Common.Application.Interfaces;
+using Wayd.Common.Application.Validation;
+using Wayd.Common.Domain.Enums;
+using Wayd.Health.Models;
 using NodaTime;
 
-namespace Moda.Health.Commands;
+namespace Wayd.Health.Commands;
 
 public sealed record CreateHealthCheckCommand(Guid ObjectId, SystemContext Context, HealthStatus Status, Instant Expiration, string? Note) : ICommand<Guid>;
 

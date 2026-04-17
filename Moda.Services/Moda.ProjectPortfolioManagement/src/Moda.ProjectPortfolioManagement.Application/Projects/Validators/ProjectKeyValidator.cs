@@ -1,6 +1,6 @@
-﻿using Moda.Common.Domain.Models.ProjectPortfolioManagement;
+﻿using Wayd.Common.Domain.Models.ProjectPortfolioManagement;
 
-namespace Moda.ProjectPortfolioManagement.Application.Projects.Validators;
+namespace Wayd.ProjectPortfolioManagement.Application.Projects.Validators;
 
 public sealed class ProjectKeyValidator : CustomValidator<ProjectKey>
 {

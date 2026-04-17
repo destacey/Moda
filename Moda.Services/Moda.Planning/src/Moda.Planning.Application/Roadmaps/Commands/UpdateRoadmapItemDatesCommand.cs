@@ -1,8 +1,8 @@
 ﻿using Ardalis.GuardClauses;
-using Moda.Planning.Domain.Interfaces.Roadmaps;
+using Wayd.Planning.Domain.Interfaces.Roadmaps;
 using OneOf;
 
-namespace Moda.Planning.Application.Roadmaps.Commands;
+namespace Wayd.Planning.Application.Roadmaps.Commands;
 
 public sealed record UpdateRoadmapItemDatesCommand(Guid RoadmapId, Guid ItemId, OneOf<IUpsertRoadmapActivityDateRange, IUpsertRoadmapMilestoneDate, IUpsertRoadmapTimeboxDateRange> Dates) : ICommand;
 

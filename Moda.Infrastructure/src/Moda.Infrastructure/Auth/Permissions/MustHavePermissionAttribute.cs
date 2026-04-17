@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 
-namespace Moda.Infrastructure.Auth.Permissions;
+namespace Wayd.Infrastructure.Auth.Permissions;
 
 public class MustHavePermissionAttribute : AuthorizeAttribute
 {

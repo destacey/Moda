@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
-namespace Moda.AppIntegration.Domain.Models.AzureOpenAI;
+namespace Wayd.AppIntegration.Domain.Models.AzureOpenAI;
 
 public sealed class AzureOpenAIConnectionConfiguration
 {

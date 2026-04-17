@@ -1,8 +1,8 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
-using Moda.StrategicManagement.Domain.Enums;
+using Wayd.StrategicManagement.Domain.Enums;
 
-namespace Moda.StrategicManagement.Domain.Models;
+namespace Wayd.StrategicManagement.Domain.Models;
 
 /// <summary>
 /// Represents a strategic plan or initiative to achieve organizational goals.

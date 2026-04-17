@@ -1,4 +1,4 @@
-﻿namespace Moda.Web.Api.Models.UserManagement.Roles;
+﻿namespace Wayd.Web.Api.Models.UserManagement.Roles;
 
 public sealed record CreateOrUpdateRoleRequest
 {

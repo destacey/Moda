@@ -1,8 +1,8 @@
 using FluentAssertions;
-using Moda.ArchitectureTests.Helpers;
-using static Moda.ArchitectureTests.Helpers.FileSystemHelper;
+using Wayd.ArchitectureTests.Helpers;
+using static Wayd.ArchitectureTests.Helpers.FileSystemHelper;
 
-namespace Moda.ArchitectureTests.Sut;
+namespace Wayd.ArchitectureTests.Sut;
 
 /// <summary>
 /// Tests to enforce consistent file and folder structure conventions across the solution.
@@ -10,52 +10,52 @@ namespace Moda.ArchitectureTests.Sut;
 ///
 /// Expected Structure:
 ///
-/// Moda.Common/
+/// Wayd.Common/
 ///   src/
-///     Moda.Common/
-///     Moda.Common.Domain/
-///     Moda.Common.Application/
+///     Wayd.Common/
+///     Wayd.Common.Domain/
+///     Wayd.Common.Application/
 ///   tests/
-///     Moda.Common.Tests/
-///     Moda.Common.Domain.Tests/
-///     Moda.Common.Application.Tests/
-///     Moda.Tests.Shared/
+///     Wayd.Common.Tests/
+///     Wayd.Common.Domain.Tests/
+///     Wayd.Common.Application.Tests/
+///     Wayd.Tests.Shared/
 ///
-/// Moda.Infrastructure/
+/// Wayd.Infrastructure/
 ///   src/
-///     Moda.Infrastructure/
-///     Moda.Infrastructure.Migrators.MSSQL/
+///     Wayd.Infrastructure/
+///     Wayd.Infrastructure.Migrators.MSSQL/
 ///
-/// Moda.Integrations/
+/// Wayd.Integrations/
 ///   src/
-///     Moda.Integrations.{IntegrationName}/
+///     Wayd.Integrations.{IntegrationName}/
 ///   tests/
-///     Moda.Integrations.{IntegrationName}.Tests/
-///     Moda.Integrations.{IntegrationName}.IntegrationTests/ (optional)
+///     Wayd.Integrations.{IntegrationName}.Tests/
+///     Wayd.Integrations.{IntegrationName}.IntegrationTests/ (optional)
 ///
-/// Moda.Services/
-///   Moda.{ServiceName}/
+/// Wayd.Services/
+///   Wayd.{ServiceName}/
 ///     src/
-///       Moda.{ServiceName}.Domain/
-///       Moda.{ServiceName}.Application/
+///       Wayd.{ServiceName}.Domain/
+///       Wayd.{ServiceName}.Application/
 ///     tests/
-///       Moda.{ServiceName}.Domain.Tests/
-///       Moda.{ServiceName}.Application.Tests/
+///       Wayd.{ServiceName}.Domain.Tests/
+///       Wayd.{ServiceName}.Application.Tests/
 ///
-/// Moda.Web/
+/// Wayd.Web/
 ///   src/
-///     Moda.Web.Api/
+///     Wayd.Web.Api/
 ///     moda.web.reactclient/
 ///
-/// Moda.ArchitectureTests/ (exception - no src/tests folders)
+/// Wayd.ArchitectureTests/ (exception - no src/tests folders)
 ///
 /// Key Rules:
 /// - Source projects MUST be in a 'src' folder
 /// - Test projects MUST be in a 'tests' folder
 /// - Test projects MUST end with '.Tests' or '.IntegrationTests'
-/// - Service projects follow the pattern: Moda.Services/{ServiceName}/src/ and /tests/
-/// - Integration projects follow the pattern: Moda.Integrations/src/ and /tests/
-/// - Moda.ArchitectureTests is the only exception to the src/tests folder rule
+/// - Service projects follow the pattern: Wayd.Services/{ServiceName}/src/ and /tests/
+/// - Integration projects follow the pattern: Wayd.Integrations/src/ and /tests/
+/// - Wayd.ArchitectureTests is the only exception to the src/tests folder rule
 /// </summary>
 public class FileStructureTests
 {
@@ -69,17 +69,17 @@ public class FileStructureTests
         // Arrange
         var expectedProjects = new[]
         {
-            "Moda.Common",
-            "Moda.Common.Domain",
-            "Moda.Common.Application"
+            "Wayd.Common",
+            "Wayd.Common.Domain",
+            "Wayd.Common.Application"
         };
 
         // Act & Assert
         foreach (var projectName in expectedProjects)
         {
-            var projectPath = Path.Combine(SolutionRoot, "Moda.Common", "src", projectName);
+            var projectPath = Path.Combine(SolutionRoot, "Wayd.Common", "src", projectName);
             Directory.Exists(projectPath).Should().BeTrue(
-                "Common source project {0} should be in Moda.Common/src/ folder", projectName);
+                "Common source project {0} should be in Wayd.Common/src/ folder", projectName);
 
             var csprojPath = Path.Combine(projectPath, $"{projectName}.csproj");
             File.Exists(csprojPath).Should().BeTrue(
@@ -93,18 +93,18 @@ public class FileStructureTests
         // Arrange
         var expectedTestProjects = new[]
         {
-            "Moda.Common.Tests",
-            "Moda.Common.Domain.Tests",
-            "Moda.Common.Application.Tests",
-            "Moda.Tests.Shared"
+            "Wayd.Common.Tests",
+            "Wayd.Common.Domain.Tests",
+            "Wayd.Common.Application.Tests",
+            "Wayd.Tests.Shared"
         };
 
         // Act & Assert
         foreach (var projectName in expectedTestProjects)
         {
-            var projectPath = Path.Combine(SolutionRoot, "Moda.Common", "tests", projectName);
+            var projectPath = Path.Combine(SolutionRoot, "Wayd.Common", "tests", projectName);
             Directory.Exists(projectPath).Should().BeTrue(
-                "Common test project {0} should be in Moda.Common/tests/ folder", projectName);
+                "Common test project {0} should be in Wayd.Common/tests/ folder", projectName);
 
             var csprojPath = Path.Combine(projectPath, $"{projectName}.csproj");
             File.Exists(csprojPath).Should().BeTrue(
@@ -122,16 +122,16 @@ public class FileStructureTests
         // Arrange
         var expectedProjects = new[]
         {
-            "Moda.Infrastructure",
-            "Moda.Infrastructure.Migrators.MSSQL"
+            "Wayd.Infrastructure",
+            "Wayd.Infrastructure.Migrators.MSSQL"
         };
 
         // Act & Assert
         foreach (var projectName in expectedProjects)
         {
-            var projectPath = Path.Combine(SolutionRoot, "Moda.Infrastructure", "src", projectName);
+            var projectPath = Path.Combine(SolutionRoot, "Wayd.Infrastructure", "src", projectName);
             Directory.Exists(projectPath).Should().BeTrue(
-                "Infrastructure source project {0} should be in Moda.Infrastructure/src/ folder", projectName);
+                "Infrastructure source project {0} should be in Wayd.Infrastructure/src/ folder", projectName);
 
             var csprojPath = Path.Combine(projectPath, $"{projectName}.csproj");
             File.Exists(csprojPath).Should().BeTrue(
@@ -147,27 +147,27 @@ public class FileStructureTests
     public void IntegrationLayer_SourceProjects_ShouldBeInSrcFolder()
     {
         // Arrange
-        var integrationsRoot = Path.Combine(SolutionRoot, "Moda.Integrations");
+        var integrationsRoot = Path.Combine(SolutionRoot, "Wayd.Integrations");
         if (!Directory.Exists(integrationsRoot))
         {
-            Assert.Fail("Moda.Integrations directory should exist");
+            Assert.Fail("Wayd.Integrations directory should exist");
             return;
         }
 
         var srcFolder = Path.Combine(integrationsRoot, "src");
         if (!Directory.Exists(srcFolder))
         {
-            Assert.Fail("Moda.Integrations/src directory should exist");
+            Assert.Fail("Wayd.Integrations/src directory should exist");
             return;
         }
 
         // Act
         var integrationProjects = Directory.GetDirectories(srcFolder)
-            .Where(d => Path.GetFileName(d).StartsWith("Moda.Integrations."))
+            .Where(d => Path.GetFileName(d).StartsWith("Wayd.Integrations."))
             .ToList();
 
         // Assert
-        integrationProjects.Should().NotBeEmpty("There should be at least one integration project in Moda.Integrations/src/");
+        integrationProjects.Should().NotBeEmpty("There should be at least one integration project in Wayd.Integrations/src/");
 
         foreach (var projectPath in integrationProjects)
         {
@@ -182,7 +182,7 @@ public class FileStructureTests
     public void IntegrationLayer_TestProjects_ShouldBeInTestsFolder()
     {
         // Arrange
-        var integrationsRoot = Path.Combine(SolutionRoot, "Moda.Integrations");
+        var integrationsRoot = Path.Combine(SolutionRoot, "Wayd.Integrations");
         var testsFolder = Path.Combine(integrationsRoot, "tests");
 
         if (!Directory.Exists(testsFolder))
@@ -196,7 +196,7 @@ public class FileStructureTests
             .Where(d =>
             {
                 var name = Path.GetFileName(d);
-                return name.StartsWith("Moda.Integrations.") &&
+                return name.StartsWith("Wayd.Integrations.") &&
                        (name.EndsWith(".Tests") || name.EndsWith(".IntegrationTests"));
             })
             .ToList();
@@ -215,7 +215,7 @@ public class FileStructureTests
     public void IntegrationLayer_TestProjects_ShouldHaveCorrectSuffix()
     {
         // Arrange
-        var integrationsRoot = Path.Combine(SolutionRoot, "Moda.Integrations");
+        var integrationsRoot = Path.Combine(SolutionRoot, "Wayd.Integrations");
         var testsFolder = Path.Combine(integrationsRoot, "tests");
 
         if (!Directory.Exists(testsFolder))
@@ -226,7 +226,7 @@ public class FileStructureTests
 
         // Act
         var allTestFolders = Directory.GetDirectories(testsFolder)
-            .Where(d => Path.GetFileName(d).StartsWith("Moda.Integrations."))
+            .Where(d => Path.GetFileName(d).StartsWith("Wayd.Integrations."))
             .ToList();
 
         var invalidTestProjects = allTestFolders
@@ -390,21 +390,21 @@ public class FileStructureTests
     public void WebLayer_SourceProjects_ShouldBeInSrcFolder()
     {
         // Arrange
-        var webRoot = Path.Combine(SolutionRoot, "Moda.Web");
+        var webRoot = Path.Combine(SolutionRoot, "Wayd.Web");
         if (!Directory.Exists(webRoot))
         {
-            Assert.Fail("Moda.Web directory should exist");
+            Assert.Fail("Wayd.Web directory should exist");
             return;
         }
 
         var srcFolder = Path.Combine(webRoot, "src");
 
         // Act & Assert
-        Directory.Exists(srcFolder).Should().BeTrue("Moda.Web should have a src folder");
+        Directory.Exists(srcFolder).Should().BeTrue("Wayd.Web should have a src folder");
 
         var expectedProjects = new[]
         {
-            "Moda.Web.Api",
+            "Wayd.Web.Api",
             "moda.web.reactclient"
         };
 
@@ -412,7 +412,7 @@ public class FileStructureTests
         {
             var projectPath = Path.Combine(srcFolder, projectName);
             Directory.Exists(projectPath).Should().BeTrue(
-                "Web project {0} should exist in Moda.Web/src/ folder", projectName);
+                "Web project {0} should exist in Wayd.Web/src/ folder", projectName);
         }
     }
 
@@ -424,22 +424,22 @@ public class FileStructureTests
     public void ArchitectureTests_ShouldBeAtRootLevel()
     {
         // Arrange
-        var archTestsPath = Path.Combine(SolutionRoot, "Moda.ArchitectureTests");
+        var archTestsPath = Path.Combine(SolutionRoot, "Wayd.ArchitectureTests");
 
         // Act & Assert
         Directory.Exists(archTestsPath).Should().BeTrue(
-            "Moda.ArchitectureTests should exist at solution root level");
+            "Wayd.ArchitectureTests should exist at solution root level");
 
-        var csprojPath = Path.Combine(archTestsPath, "Moda.ArchitectureTests.csproj");
+        var csprojPath = Path.Combine(archTestsPath, "Wayd.ArchitectureTests.csproj");
         File.Exists(csprojPath).Should().BeTrue(
-            "Moda.ArchitectureTests.csproj should exist");
+            "Wayd.ArchitectureTests.csproj should exist");
     }
 
     [Fact]
     public void ArchitectureTests_ShouldNotHaveSrcOrTestsFolders()
     {
         // Arrange
-        var archTestsPath = Path.Combine(SolutionRoot, "Moda.ArchitectureTests");
+        var archTestsPath = Path.Combine(SolutionRoot, "Wayd.ArchitectureTests");
 
         // Act
         var srcFolder = Path.Combine(archTestsPath, "src");
@@ -447,10 +447,10 @@ public class FileStructureTests
 
         // Assert
         Directory.Exists(srcFolder).Should().BeFalse(
-            "Moda.ArchitectureTests should not have a 'src' folder - it's the only exception to the src/tests rule");
+            "Wayd.ArchitectureTests should not have a 'src' folder - it's the only exception to the src/tests rule");
 
         Directory.Exists(testsFolder).Should().BeFalse(
-            "Moda.ArchitectureTests should not have a 'tests' folder - it's the only exception to the src/tests rule");
+            "Wayd.ArchitectureTests should not have a 'tests' folder - it's the only exception to the src/tests rule");
     }
 
     #endregion

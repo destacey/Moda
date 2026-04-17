@@ -1,6 +1,6 @@
-﻿using Moda.Common.Domain.Enums.Organization;
+﻿using Wayd.Common.Domain.Enums.Organization;
 
-namespace Moda.Organization.Application.Teams.Models;
+namespace Wayd.Organization.Application.Teams.Models;
 
 public sealed record TeamHierarchyNode
 {

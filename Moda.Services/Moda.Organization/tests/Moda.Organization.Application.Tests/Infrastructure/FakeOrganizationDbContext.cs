@@ -1,14 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Moda.Common.Domain.Employees;
-using Moda.Common.Domain.Identity;
-using Moda.Organization.Application.Persistence;
-using Moda.Organization.Application.Teams.Models;
-using Moda.Organization.Domain.Models;
-using Moda.Tests.Shared.Infrastructure;
+using Wayd.Common.Domain.Employees;
+using Wayd.Common.Domain.Identity;
+using Wayd.Organization.Application.Persistence;
+using Wayd.Organization.Application.Teams.Models;
+using Wayd.Organization.Domain.Models;
+using Wayd.Tests.Shared.Infrastructure;
 
-namespace Moda.Organization.Application.Tests.Infrastructure;
+namespace Wayd.Organization.Application.Tests.Infrastructure;
 
 /// <summary>
 /// A test double for IOrganizationDbContext that provides in-memory collections for all DbSets.

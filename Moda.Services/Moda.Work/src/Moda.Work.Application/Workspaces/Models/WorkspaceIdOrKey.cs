@@ -1,9 +1,9 @@
 ﻿using System.Linq.Expressions;
-using Moda.Common.Models;
-using Moda.Work.Domain.Interfaces;
+using Wayd.Common.Models;
+using Wayd.Work.Domain.Interfaces;
 using OneOf;
 
-namespace Moda.Work.Application.Workspaces.Models;
+namespace Wayd.Work.Application.Workspaces.Models;
 
 public sealed class WorkspaceIdOrKey : OneOfBase<Guid, WorkspaceKey>
 {

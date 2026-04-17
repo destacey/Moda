@@ -2,11 +2,11 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Identity.Web;
-using Moda.Infrastructure.GraphApi;
-using Moda.Integrations.MicrosoftGraph;
+using Wayd.Infrastructure.GraphApi;
+using Wayd.Integrations.MicrosoftGraph;
 using Serilog;
 
-namespace Moda.Infrastructure.Auth.AzureAd;
+namespace Wayd.Infrastructure.Auth.AzureAd;
 
 internal static class ConfigureServices
 {

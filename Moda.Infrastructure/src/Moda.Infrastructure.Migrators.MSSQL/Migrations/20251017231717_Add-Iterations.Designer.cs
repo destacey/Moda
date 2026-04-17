@@ -6,11 +6,11 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Moda.Infrastructure.Persistence.Context;
+using Wayd.Infrastructure.Persistence.Context;
 
 #nullable disable
 
-namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
+namespace Wayd.Infrastructure.Migrators.MSSQL.Migrations
 {
     [DbContext(typeof(ModaDbContext))]
     [Migration("20251017231717_Add-Iterations")]
@@ -110,7 +110,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("UserTokens", "Identity");
                 });
 
-            modelBuilder.Entity("Moda.AppIntegration.Domain.Models.Connection", b =>
+            modelBuilder.Entity("Wayd.AppIntegration.Domain.Models.Connection", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -180,7 +180,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.UseTphMappingStrategy();
                 });
 
-            modelBuilder.Entity("Moda.Common.Domain.Employees.Employee", b =>
+            modelBuilder.Entity("Wayd.Common.Domain.Employees.Employee", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -244,7 +244,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
-                    b.ComplexProperty<Dictionary<string, object>>("Name", "Moda.Common.Domain.Employees.Employee.Name#PersonName", b1 =>
+                    b.ComplexProperty<Dictionary<string, object>>("Name", "Wayd.Common.Domain.Employees.Employee.Name#PersonName", b1 =>
                         {
                             b1.IsRequired();
 
@@ -300,7 +300,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("Employees", "Organization");
                 });
 
-            modelBuilder.Entity("Moda.Common.Domain.Employees.ExternalEmployeeBlacklistItem", b =>
+            modelBuilder.Entity("Wayd.Common.Domain.Employees.ExternalEmployeeBlacklistItem", b =>
                 {
                     b.Property<string>("ObjectId")
                         .HasColumnType("nvarchar(450)");
@@ -312,7 +312,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("ExternalEmployeeBlacklistItems", "Organization");
                 });
 
-            modelBuilder.Entity("Moda.Common.Domain.Models.KeyValueObjectMetadata", b =>
+            modelBuilder.Entity("Wayd.Common.Domain.Models.KeyValueObjectMetadata", b =>
                 {
                     b.Property<Guid>("ObjectId")
                         .HasColumnType("uniqueidentifier");
@@ -346,7 +346,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("IterationExternalMetadata", "Planning");
                 });
 
-            modelBuilder.Entity("Moda.Goals.Domain.Models.Objective", b =>
+            modelBuilder.Entity("Wayd.Goals.Domain.Models.Objective", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -446,7 +446,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("Objectives", "Goals");
                 });
 
-            modelBuilder.Entity("Moda.Health.Models.HealthCheck", b =>
+            modelBuilder.Entity("Wayd.Health.Models.HealthCheck", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -514,7 +514,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("HealthChecks", "Health");
                 });
 
-            modelBuilder.Entity("Moda.Infrastructure.Auditing.Trail", b =>
+            modelBuilder.Entity("Wayd.Infrastructure.Auditing.Trail", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -564,7 +564,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("AuditTrails", "Auditing");
                 });
 
-            modelBuilder.Entity("Moda.Infrastructure.Identity.ApplicationRole", b =>
+            modelBuilder.Entity("Wayd.Infrastructure.Identity.ApplicationRole", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -594,7 +594,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("Roles", "Identity");
                 });
 
-            modelBuilder.Entity("Moda.Infrastructure.Identity.ApplicationRoleClaim", b =>
+            modelBuilder.Entity("Wayd.Infrastructure.Identity.ApplicationRoleClaim", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -625,7 +625,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("RoleClaims", "Identity");
                 });
 
-            modelBuilder.Entity("Moda.Infrastructure.Identity.ApplicationUser", b =>
+            modelBuilder.Entity("Wayd.Infrastructure.Identity.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -715,7 +715,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("Users", "Identity");
                 });
 
-            modelBuilder.Entity("Moda.Links.Models.Link", b =>
+            modelBuilder.Entity("Wayd.Links.Models.Link", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -746,7 +746,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("Links", "Links");
                 });
 
-            modelBuilder.Entity("Moda.Organization.Application.Teams.Models.TeamMembershipEdge", b =>
+            modelBuilder.Entity("Wayd.Organization.Application.Teams.Models.TeamMembershipEdge", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -781,7 +781,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("TeamMembershipEdges", "Organization");
                 });
 
-            modelBuilder.Entity("Moda.Organization.Application.Teams.Models.TeamNode", b =>
+            modelBuilder.Entity("Wayd.Organization.Application.Teams.Models.TeamNode", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -842,7 +842,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("TeamNodes", "Organization");
                 });
 
-            modelBuilder.Entity("Moda.Organization.Domain.Models.BaseTeam", b =>
+            modelBuilder.Entity("Wayd.Organization.Domain.Models.BaseTeam", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -935,7 +935,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.UseTphMappingStrategy();
                 });
 
-            modelBuilder.Entity("Moda.Organization.Domain.Models.TeamMembership", b =>
+            modelBuilder.Entity("Wayd.Organization.Domain.Models.TeamMembership", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -968,7 +968,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<Guid>("TargetId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.ComplexProperty<Dictionary<string, object>>("DateRange", "Moda.Organization.Domain.Models.TeamMembership.DateRange#MembershipDateRange", b1 =>
+                    b.ComplexProperty<Dictionary<string, object>>("DateRange", "Wayd.Organization.Domain.Models.TeamMembership.DateRange#MembershipDateRange", b1 =>
                         {
                             b1.IsRequired();
 
@@ -1001,7 +1001,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("TeamMemberships", "Organization");
                 });
 
-            modelBuilder.Entity("Moda.Planning.Domain.Models.Iterations.Iteration", b =>
+            modelBuilder.Entity("Wayd.Planning.Domain.Models.Iterations.Iteration", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1043,7 +1043,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasMaxLength(32)
                         .HasColumnType("varchar");
 
-                    b.ComplexProperty<Dictionary<string, object>>("DateRange", "Moda.Planning.Domain.Models.Iterations.Iteration.DateRange#IterationDateRange", b1 =>
+                    b.ComplexProperty<Dictionary<string, object>>("DateRange", "Wayd.Planning.Domain.Models.Iterations.Iteration.DateRange#IterationDateRange", b1 =>
                         {
                             b1.IsRequired();
 
@@ -1056,7 +1056,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                                 .HasColumnName("Start");
                         });
 
-                    b.ComplexProperty<Dictionary<string, object>>("OwnershipInfo", "Moda.Planning.Domain.Models.Iterations.Iteration.OwnershipInfo#OwnershipInfo", b1 =>
+                    b.ComplexProperty<Dictionary<string, object>>("OwnershipInfo", "Wayd.Planning.Domain.Models.Iterations.Iteration.OwnershipInfo#OwnershipInfo", b1 =>
                         {
                             b1.IsRequired();
 
@@ -1086,7 +1086,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("Iterations", "Planning");
                 });
 
-            modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningInterval", b =>
+            modelBuilder.Entity("Wayd.Planning.Domain.Models.PlanningInterval", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1131,7 +1131,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<bool>("ObjectivesLocked")
                         .HasColumnType("bit");
 
-                    b.ComplexProperty<Dictionary<string, object>>("DateRange", "Moda.Planning.Domain.Models.PlanningInterval.DateRange#LocalDateRange", b1 =>
+                    b.ComplexProperty<Dictionary<string, object>>("DateRange", "Wayd.Planning.Domain.Models.PlanningInterval.DateRange#LocalDateRange", b1 =>
                         {
                             b1.IsRequired();
 
@@ -1159,7 +1159,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("PlanningIntervals", "Planning");
                 });
 
-            modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningIntervalIteration", b =>
+            modelBuilder.Entity("Wayd.Planning.Domain.Models.PlanningIntervalIteration", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1205,7 +1205,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<Guid>("PlanningIntervalId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.ComplexProperty<Dictionary<string, object>>("DateRange", "Moda.Planning.Domain.Models.PlanningIntervalIteration.DateRange#LocalDateRange", b1 =>
+                    b.ComplexProperty<Dictionary<string, object>>("DateRange", "Wayd.Planning.Domain.Models.PlanningIntervalIteration.DateRange#LocalDateRange", b1 =>
                         {
                             b1.IsRequired();
 
@@ -1240,7 +1240,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("PlanningIntervalIterations", "Planning");
                 });
 
-            modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningIntervalObjective", b =>
+            modelBuilder.Entity("Wayd.Planning.Domain.Models.PlanningIntervalObjective", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1324,7 +1324,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("PlanningIntervalObjectives", "Planning");
                 });
 
-            modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningIntervalTeam", b =>
+            modelBuilder.Entity("Wayd.Planning.Domain.Models.PlanningIntervalTeam", b =>
                 {
                     b.Property<Guid>("PlanningIntervalId")
                         .HasColumnType("uniqueidentifier");
@@ -1343,7 +1343,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("PlanningIntervalTeams", "Planning");
                 });
 
-            modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningTeam", b =>
+            modelBuilder.Entity("Wayd.Planning.Domain.Models.PlanningTeam", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
@@ -1393,7 +1393,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("PlanningTeams", "Planning");
                 });
 
-            modelBuilder.Entity("Moda.Planning.Domain.Models.Risk", b =>
+            modelBuilder.Entity("Wayd.Planning.Domain.Models.Risk", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1498,7 +1498,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("Risks", "Planning");
                 });
 
-            modelBuilder.Entity("Moda.Planning.Domain.Models.Roadmaps.BaseRoadmapItem", b =>
+            modelBuilder.Entity("Wayd.Planning.Domain.Models.Roadmaps.BaseRoadmapItem", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1551,7 +1551,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.UseTphMappingStrategy();
                 });
 
-            modelBuilder.Entity("Moda.Planning.Domain.Models.Roadmaps.Roadmap", b =>
+            modelBuilder.Entity("Wayd.Planning.Domain.Models.Roadmaps.Roadmap", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1589,7 +1589,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasMaxLength(32)
                         .HasColumnType("varchar");
 
-                    b.ComplexProperty<Dictionary<string, object>>("DateRange", "Moda.Planning.Domain.Models.Roadmaps.Roadmap.DateRange#LocalDateRange", b1 =>
+                    b.ComplexProperty<Dictionary<string, object>>("DateRange", "Wayd.Planning.Domain.Models.Roadmaps.Roadmap.DateRange#LocalDateRange", b1 =>
                         {
                             b1.IsRequired();
 
@@ -1621,7 +1621,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("Roadmaps", "Planning");
                 });
 
-            modelBuilder.Entity("Moda.Planning.Domain.Models.Roadmaps.RoadmapManager", b =>
+            modelBuilder.Entity("Wayd.Planning.Domain.Models.Roadmaps.RoadmapManager", b =>
                 {
                     b.Property<Guid>("RoadmapId")
                         .HasColumnType("uniqueidentifier");
@@ -1642,7 +1642,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("RoadmapManagers", "Planning");
                 });
 
-            modelBuilder.Entity("Moda.Planning.Domain.Models.SimpleHealthCheck", b =>
+            modelBuilder.Entity("Wayd.Planning.Domain.Models.SimpleHealthCheck", b =>
                 {
                     b.Property<Guid>("ObjectId")
                         .HasColumnType("uniqueidentifier");
@@ -1668,7 +1668,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("PlanningHealthChecks", "Planning");
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.ExpenditureCategory", b =>
+            modelBuilder.Entity("Wayd.ProjectPortfolioManagement.Domain.Models.ExpenditureCategory", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -1718,7 +1718,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("ExpenditureCategories", "Ppm");
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.Program", b =>
+            modelBuilder.Entity("Wayd.ProjectPortfolioManagement.Domain.Models.Program", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1771,7 +1771,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("Programs", "Ppm");
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.Project", b =>
+            modelBuilder.Entity("Wayd.ProjectPortfolioManagement.Domain.Models.Project", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1834,7 +1834,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("Projects", "Ppm");
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.ProjectPortfolio", b =>
+            modelBuilder.Entity("Wayd.ProjectPortfolioManagement.Domain.Models.ProjectPortfolio", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1882,7 +1882,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("Portfolios", "Ppm");
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.RoleAssignment<Moda.ProjectPortfolioManagement.Domain.Enums.ProgramRole>", b =>
+            modelBuilder.Entity("Wayd.ProjectPortfolioManagement.Domain.Models.RoleAssignment<Wayd.ProjectPortfolioManagement.Domain.Enums.ProgramRole>", b =>
                 {
                     b.Property<Guid>("ObjectId")
                         .HasColumnType("uniqueidentifier");
@@ -1915,7 +1915,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("ProgramRoleAssignments", "Ppm");
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.RoleAssignment<Moda.ProjectPortfolioManagement.Domain.Enums.ProjectPortfolioRole>", b =>
+            modelBuilder.Entity("Wayd.ProjectPortfolioManagement.Domain.Models.RoleAssignment<Wayd.ProjectPortfolioManagement.Domain.Enums.ProjectPortfolioRole>", b =>
                 {
                     b.Property<Guid>("ObjectId")
                         .HasColumnType("uniqueidentifier");
@@ -1948,7 +1948,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("PortfolioRoleAssignments", "Ppm");
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.RoleAssignment<Moda.ProjectPortfolioManagement.Domain.Enums.ProjectRole>", b =>
+            modelBuilder.Entity("Wayd.ProjectPortfolioManagement.Domain.Models.RoleAssignment<Wayd.ProjectPortfolioManagement.Domain.Enums.ProjectRole>", b =>
                 {
                     b.Property<Guid>("ObjectId")
                         .HasColumnType("uniqueidentifier");
@@ -1981,7 +1981,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("ProjectRoleAssignments", "Ppm");
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.RoleAssignment<Moda.ProjectPortfolioManagement.Domain.Enums.StrategicInitiativeRole>", b =>
+            modelBuilder.Entity("Wayd.ProjectPortfolioManagement.Domain.Models.RoleAssignment<Wayd.ProjectPortfolioManagement.Domain.Enums.StrategicInitiativeRole>", b =>
                 {
                     b.Property<Guid>("ObjectId")
                         .HasColumnType("uniqueidentifier");
@@ -2014,7 +2014,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("StrategicInitiativeRoleAssignments", "Ppm");
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiative", b =>
+            modelBuilder.Entity("Wayd.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiative", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -2067,7 +2067,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("StrategicInitiatives", "Ppm");
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiativeKpi", b =>
+            modelBuilder.Entity("Wayd.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiativeKpi", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -2132,7 +2132,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.UseTpcMappingStrategy();
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiativeKpiCheckpoint", b =>
+            modelBuilder.Entity("Wayd.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiativeKpiCheckpoint", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -2173,7 +2173,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.UseTpcMappingStrategy();
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiativeKpiMeasurement", b =>
+            modelBuilder.Entity("Wayd.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiativeKpiMeasurement", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -2218,7 +2218,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.UseTpcMappingStrategy();
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiativeProject", b =>
+            modelBuilder.Entity("Wayd.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiativeProject", b =>
                 {
                     b.Property<Guid>("StrategicInitiativeId")
                         .HasColumnType("uniqueidentifier");
@@ -2235,7 +2235,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("StrategicInitiativeProjects", "Ppm");
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicTheme", b =>
+            modelBuilder.Entity("Wayd.ProjectPortfolioManagement.Domain.Models.StrategicTheme", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
@@ -2267,7 +2267,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("StrategicThemes", "Ppm");
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicThemeTag<Moda.ProjectPortfolioManagement.Domain.Models.Program>", b =>
+            modelBuilder.Entity("Wayd.ProjectPortfolioManagement.Domain.Models.StrategicThemeTag<Wayd.ProjectPortfolioManagement.Domain.Models.Program>", b =>
                 {
                     b.Property<Guid>("ObjectId")
                         .HasColumnType("uniqueidentifier");
@@ -2296,7 +2296,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("ProgramStrategicThemes", "Ppm");
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicThemeTag<Moda.ProjectPortfolioManagement.Domain.Models.Project>", b =>
+            modelBuilder.Entity("Wayd.ProjectPortfolioManagement.Domain.Models.StrategicThemeTag<Wayd.ProjectPortfolioManagement.Domain.Models.Project>", b =>
                 {
                     b.Property<Guid>("ObjectId")
                         .HasColumnType("uniqueidentifier");
@@ -2325,7 +2325,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("ProjectStrategicThemes", "Ppm");
                 });
 
-            modelBuilder.Entity("Moda.StrategicManagement.Domain.Models.StrategicTheme", b =>
+            modelBuilder.Entity("Wayd.StrategicManagement.Domain.Models.StrategicTheme", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -2373,7 +2373,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("StrategicThemes", "StrategicManagement");
                 });
 
-            modelBuilder.Entity("Moda.StrategicManagement.Domain.Models.Strategy", b =>
+            modelBuilder.Entity("Wayd.StrategicManagement.Domain.Models.Strategy", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -2420,7 +2420,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("Strategies", "StrategicManagement");
                 });
 
-            modelBuilder.Entity("Moda.StrategicManagement.Domain.Models.Vision", b =>
+            modelBuilder.Entity("Wayd.StrategicManagement.Domain.Models.Vision", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -2463,7 +2463,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("Visions", "StrategicManagement");
                 });
 
-            modelBuilder.Entity("Moda.Work.Domain.Models.WorkItem", b =>
+            modelBuilder.Entity("Wayd.Work.Domain.Models.WorkItem", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -2602,7 +2602,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("WorkItems", "Work");
                 });
 
-            modelBuilder.Entity("Moda.Work.Domain.Models.WorkItemExtended", b =>
+            modelBuilder.Entity("Wayd.Work.Domain.Models.WorkItemExtended", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
@@ -2618,7 +2618,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("WorkItemsExtended", "Work");
                 });
 
-            modelBuilder.Entity("Moda.Work.Domain.Models.WorkItemLink", b =>
+            modelBuilder.Entity("Wayd.Work.Domain.Models.WorkItemLink", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -2685,7 +2685,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("WorkItemLinks", "Work");
                 });
 
-            modelBuilder.Entity("Moda.Work.Domain.Models.WorkItemReference", b =>
+            modelBuilder.Entity("Wayd.Work.Domain.Models.WorkItemReference", b =>
                 {
                     b.Property<Guid>("WorkItemId")
                         .HasColumnType("uniqueidentifier");
@@ -2723,7 +2723,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("WorkItemReferences", "Work");
                 });
 
-            modelBuilder.Entity("Moda.Work.Domain.Models.WorkProcess", b =>
+            modelBuilder.Entity("Wayd.Work.Domain.Models.WorkProcess", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -2793,7 +2793,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("WorkProcesses", "Work");
                 });
 
-            modelBuilder.Entity("Moda.Work.Domain.Models.WorkProcessScheme", b =>
+            modelBuilder.Entity("Wayd.Work.Domain.Models.WorkProcessScheme", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -2849,7 +2849,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("WorkProcessSchemes", "Work");
                 });
 
-            modelBuilder.Entity("Moda.Work.Domain.Models.WorkProject", b =>
+            modelBuilder.Entity("Wayd.Work.Domain.Models.WorkProject", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
@@ -2874,7 +2874,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("WorkProjects", "Work");
                 });
 
-            modelBuilder.Entity("Moda.Work.Domain.Models.WorkStatus", b =>
+            modelBuilder.Entity("Wayd.Work.Domain.Models.WorkStatus", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -2931,7 +2931,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("WorkStatuses", "Work");
                 });
 
-            modelBuilder.Entity("Moda.Work.Domain.Models.WorkTeam", b =>
+            modelBuilder.Entity("Wayd.Work.Domain.Models.WorkTeam", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
@@ -2981,7 +2981,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("WorkTeams", "Work");
                 });
 
-            modelBuilder.Entity("Moda.Work.Domain.Models.WorkType", b =>
+            modelBuilder.Entity("Wayd.Work.Domain.Models.WorkType", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -3054,7 +3054,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("WorkTypes", "Work");
                 });
 
-            modelBuilder.Entity("Moda.Work.Domain.Models.WorkTypeHierarchy", b =>
+            modelBuilder.Entity("Wayd.Work.Domain.Models.WorkTypeHierarchy", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -3081,7 +3081,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("WorkTypeHierarchies", "Work");
                 });
 
-            modelBuilder.Entity("Moda.Work.Domain.Models.WorkTypeLevel", b =>
+            modelBuilder.Entity("Wayd.Work.Domain.Models.WorkTypeLevel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -3137,7 +3137,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("WorkTypeLevels", "Work");
                 });
 
-            modelBuilder.Entity("Moda.Work.Domain.Models.Workflow", b =>
+            modelBuilder.Entity("Wayd.Work.Domain.Models.Workflow", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -3205,7 +3205,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("Workflows", "Work");
                 });
 
-            modelBuilder.Entity("Moda.Work.Domain.Models.WorkflowScheme", b =>
+            modelBuilder.Entity("Wayd.Work.Domain.Models.WorkflowScheme", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -3264,7 +3264,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("WorkflowSchemes", "Work");
                 });
 
-            modelBuilder.Entity("Moda.Work.Domain.Models.Workspace", b =>
+            modelBuilder.Entity("Wayd.Work.Domain.Models.Workspace", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -3355,35 +3355,35 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("Workspaces", "Work");
                 });
 
-            modelBuilder.Entity("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsConnection", b =>
+            modelBuilder.Entity("Wayd.AppIntegration.Domain.Models.AzureDevOpsBoardsConnection", b =>
                 {
-                    b.HasBaseType("Moda.AppIntegration.Domain.Models.Connection");
+                    b.HasBaseType("Wayd.AppIntegration.Domain.Models.Connection");
 
                     b.HasDiscriminator().HasValue("AzureDevOpsBoards");
                 });
 
-            modelBuilder.Entity("Moda.Organization.Domain.Models.Team", b =>
+            modelBuilder.Entity("Wayd.Organization.Domain.Models.Team", b =>
                 {
-                    b.HasBaseType("Moda.Organization.Domain.Models.BaseTeam");
+                    b.HasBaseType("Wayd.Organization.Domain.Models.BaseTeam");
 
                     b.HasDiscriminator().HasValue("Team");
                 });
 
-            modelBuilder.Entity("Moda.Organization.Domain.Models.TeamOfTeams", b =>
+            modelBuilder.Entity("Wayd.Organization.Domain.Models.TeamOfTeams", b =>
                 {
-                    b.HasBaseType("Moda.Organization.Domain.Models.BaseTeam");
+                    b.HasBaseType("Wayd.Organization.Domain.Models.BaseTeam");
 
                     b.HasDiscriminator().HasValue("TeamOfTeams");
                 });
 
-            modelBuilder.Entity("Moda.Planning.Domain.Models.Roadmaps.RoadmapActivity", b =>
+            modelBuilder.Entity("Wayd.Planning.Domain.Models.Roadmaps.RoadmapActivity", b =>
                 {
-                    b.HasBaseType("Moda.Planning.Domain.Models.Roadmaps.BaseRoadmapItem");
+                    b.HasBaseType("Wayd.Planning.Domain.Models.Roadmaps.BaseRoadmapItem");
 
                     b.Property<int>("Order")
                         .HasColumnType("int");
 
-                    b.ComplexProperty<Dictionary<string, object>>("DateRange", "Moda.Planning.Domain.Models.Roadmaps.RoadmapActivity.DateRange#LocalDateRange", b1 =>
+                    b.ComplexProperty<Dictionary<string, object>>("DateRange", "Wayd.Planning.Domain.Models.Roadmaps.RoadmapActivity.DateRange#LocalDateRange", b1 =>
                         {
                             b1.IsRequired();
 
@@ -3401,9 +3401,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.HasDiscriminator().HasValue(1);
                 });
 
-            modelBuilder.Entity("Moda.Planning.Domain.Models.Roadmaps.RoadmapMilestone", b =>
+            modelBuilder.Entity("Wayd.Planning.Domain.Models.Roadmaps.RoadmapMilestone", b =>
                 {
-                    b.HasBaseType("Moda.Planning.Domain.Models.Roadmaps.BaseRoadmapItem");
+                    b.HasBaseType("Wayd.Planning.Domain.Models.Roadmaps.BaseRoadmapItem");
 
                     b.Property<DateTime>("Date")
                         .ValueGeneratedOnUpdateSometimes()
@@ -3413,11 +3413,11 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.HasDiscriminator().HasValue(2);
                 });
 
-            modelBuilder.Entity("Moda.Planning.Domain.Models.Roadmaps.RoadmapTimebox", b =>
+            modelBuilder.Entity("Wayd.Planning.Domain.Models.Roadmaps.RoadmapTimebox", b =>
                 {
-                    b.HasBaseType("Moda.Planning.Domain.Models.Roadmaps.BaseRoadmapItem");
+                    b.HasBaseType("Wayd.Planning.Domain.Models.Roadmaps.BaseRoadmapItem");
 
-                    b.ComplexProperty<Dictionary<string, object>>("DateRange", "Moda.Planning.Domain.Models.Roadmaps.RoadmapTimebox.DateRange#LocalDateRange", b1 =>
+                    b.ComplexProperty<Dictionary<string, object>>("DateRange", "Wayd.Planning.Domain.Models.Roadmaps.RoadmapTimebox.DateRange#LocalDateRange", b1 =>
                         {
                             b1.IsRequired();
 
@@ -3437,7 +3437,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("Moda.Infrastructure.Identity.ApplicationUser", null)
+                    b.HasOne("Wayd.Infrastructure.Identity.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3446,7 +3446,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("Moda.Infrastructure.Identity.ApplicationUser", null)
+                    b.HasOne("Wayd.Infrastructure.Identity.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3455,13 +3455,13 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
-                    b.HasOne("Moda.Infrastructure.Identity.ApplicationRole", null)
+                    b.HasOne("Wayd.Infrastructure.Identity.ApplicationRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Moda.Infrastructure.Identity.ApplicationUser", null)
+                    b.HasOne("Wayd.Infrastructure.Identity.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3470,16 +3470,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("Moda.Infrastructure.Identity.ApplicationUser", null)
+                    b.HasOne("Wayd.Infrastructure.Identity.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Moda.Common.Domain.Employees.Employee", b =>
+            modelBuilder.Entity("Wayd.Common.Domain.Employees.Employee", b =>
                 {
-                    b.HasOne("Moda.Common.Domain.Employees.Employee", "Manager")
+                    b.HasOne("Wayd.Common.Domain.Employees.Employee", "Manager")
                         .WithMany("DirectReports")
                         .HasForeignKey("ManagerId")
                         .OnDelete(DeleteBehavior.NoAction);
@@ -3487,18 +3487,18 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Manager");
                 });
 
-            modelBuilder.Entity("Moda.Common.Domain.Models.KeyValueObjectMetadata", b =>
+            modelBuilder.Entity("Wayd.Common.Domain.Models.KeyValueObjectMetadata", b =>
                 {
-                    b.HasOne("Moda.Planning.Domain.Models.Iterations.Iteration", null)
+                    b.HasOne("Wayd.Planning.Domain.Models.Iterations.Iteration", null)
                         .WithMany("ExternalMetadata")
                         .HasForeignKey("ObjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Moda.Health.Models.HealthCheck", b =>
+            modelBuilder.Entity("Wayd.Health.Models.HealthCheck", b =>
                 {
-                    b.HasOne("Moda.Common.Domain.Employees.Employee", "ReportedBy")
+                    b.HasOne("Wayd.Common.Domain.Employees.Employee", "ReportedBy")
                         .WithMany()
                         .HasForeignKey("ReportedById")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -3507,18 +3507,18 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("ReportedBy");
                 });
 
-            modelBuilder.Entity("Moda.Infrastructure.Identity.ApplicationRoleClaim", b =>
+            modelBuilder.Entity("Wayd.Infrastructure.Identity.ApplicationRoleClaim", b =>
                 {
-                    b.HasOne("Moda.Infrastructure.Identity.ApplicationRole", null)
+                    b.HasOne("Wayd.Infrastructure.Identity.ApplicationRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Moda.Infrastructure.Identity.ApplicationUser", b =>
+            modelBuilder.Entity("Wayd.Infrastructure.Identity.ApplicationUser", b =>
                 {
-                    b.HasOne("Moda.Common.Domain.Employees.Employee", "Employee")
+                    b.HasOne("Wayd.Common.Domain.Employees.Employee", "Employee")
                         .WithMany()
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.NoAction);
@@ -3526,15 +3526,15 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Employee");
                 });
 
-            modelBuilder.Entity("Moda.Organization.Application.Teams.Models.TeamMembershipEdge", b =>
+            modelBuilder.Entity("Wayd.Organization.Application.Teams.Models.TeamMembershipEdge", b =>
                 {
-                    b.HasOne("Moda.Organization.Application.Teams.Models.TeamNode", "FromNode")
+                    b.HasOne("Wayd.Organization.Application.Teams.Models.TeamNode", "FromNode")
                         .WithMany("ParentMemberships")
                         .HasForeignKey("FromNodeId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Moda.Organization.Application.Teams.Models.TeamNode", "ToNode")
+                    b.HasOne("Wayd.Organization.Application.Teams.Models.TeamNode", "ToNode")
                         .WithMany("ChildMemberships")
                         .HasForeignKey("ToNodeId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -3545,15 +3545,15 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("ToNode");
                 });
 
-            modelBuilder.Entity("Moda.Organization.Domain.Models.TeamMembership", b =>
+            modelBuilder.Entity("Wayd.Organization.Domain.Models.TeamMembership", b =>
                 {
-                    b.HasOne("Moda.Organization.Domain.Models.BaseTeam", "Source")
+                    b.HasOne("Wayd.Organization.Domain.Models.BaseTeam", "Source")
                         .WithMany("ParentMemberships")
                         .HasForeignKey("SourceId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Moda.Organization.Domain.Models.TeamOfTeams", "Target")
+                    b.HasOne("Wayd.Organization.Domain.Models.TeamOfTeams", "Target")
                         .WithMany("ChildMemberships")
                         .HasForeignKey("TargetId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -3564,9 +3564,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Target");
                 });
 
-            modelBuilder.Entity("Moda.Planning.Domain.Models.Iterations.Iteration", b =>
+            modelBuilder.Entity("Wayd.Planning.Domain.Models.Iterations.Iteration", b =>
                 {
-                    b.HasOne("Moda.Planning.Domain.Models.PlanningTeam", "Team")
+                    b.HasOne("Wayd.Planning.Domain.Models.PlanningTeam", "Team")
                         .WithMany()
                         .HasForeignKey("TeamId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -3574,24 +3574,24 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Team");
                 });
 
-            modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningIntervalIteration", b =>
+            modelBuilder.Entity("Wayd.Planning.Domain.Models.PlanningIntervalIteration", b =>
                 {
-                    b.HasOne("Moda.Planning.Domain.Models.PlanningInterval", null)
+                    b.HasOne("Wayd.Planning.Domain.Models.PlanningInterval", null)
                         .WithMany("Iterations")
                         .HasForeignKey("PlanningIntervalId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningIntervalObjective", b =>
+            modelBuilder.Entity("Wayd.Planning.Domain.Models.PlanningIntervalObjective", b =>
                 {
-                    b.HasOne("Moda.Planning.Domain.Models.PlanningInterval", null)
+                    b.HasOne("Wayd.Planning.Domain.Models.PlanningInterval", null)
                         .WithMany("Objectives")
                         .HasForeignKey("PlanningIntervalId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Moda.Planning.Domain.Models.PlanningTeam", "Team")
+                    b.HasOne("Wayd.Planning.Domain.Models.PlanningTeam", "Team")
                         .WithMany()
                         .HasForeignKey("TeamId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3600,15 +3600,15 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Team");
                 });
 
-            modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningIntervalTeam", b =>
+            modelBuilder.Entity("Wayd.Planning.Domain.Models.PlanningIntervalTeam", b =>
                 {
-                    b.HasOne("Moda.Planning.Domain.Models.PlanningInterval", null)
+                    b.HasOne("Wayd.Planning.Domain.Models.PlanningInterval", null)
                         .WithMany("Teams")
                         .HasForeignKey("PlanningIntervalId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Moda.Planning.Domain.Models.PlanningTeam", "Team")
+                    b.HasOne("Wayd.Planning.Domain.Models.PlanningTeam", "Team")
                         .WithMany("PlanningIntervalTeams")
                         .HasForeignKey("TeamId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3617,20 +3617,20 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Team");
                 });
 
-            modelBuilder.Entity("Moda.Planning.Domain.Models.Risk", b =>
+            modelBuilder.Entity("Wayd.Planning.Domain.Models.Risk", b =>
                 {
-                    b.HasOne("Moda.Common.Domain.Employees.Employee", "Assignee")
+                    b.HasOne("Wayd.Common.Domain.Employees.Employee", "Assignee")
                         .WithMany()
                         .HasForeignKey("AssigneeId")
                         .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("Moda.Common.Domain.Employees.Employee", "ReportedBy")
+                    b.HasOne("Wayd.Common.Domain.Employees.Employee", "ReportedBy")
                         .WithMany()
                         .HasForeignKey("ReportedById")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Moda.Planning.Domain.Models.PlanningTeam", "Team")
+                    b.HasOne("Wayd.Planning.Domain.Models.PlanningTeam", "Team")
                         .WithMany()
                         .HasForeignKey("TeamId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -3642,14 +3642,14 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Team");
                 });
 
-            modelBuilder.Entity("Moda.Planning.Domain.Models.Roadmaps.BaseRoadmapItem", b =>
+            modelBuilder.Entity("Wayd.Planning.Domain.Models.Roadmaps.BaseRoadmapItem", b =>
                 {
-                    b.HasOne("Moda.Planning.Domain.Models.Roadmaps.RoadmapActivity", "Parent")
+                    b.HasOne("Wayd.Planning.Domain.Models.Roadmaps.RoadmapActivity", "Parent")
                         .WithMany("Children")
                         .HasForeignKey("ParentId")
                         .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("Moda.Planning.Domain.Models.Roadmaps.Roadmap", null)
+                    b.HasOne("Wayd.Planning.Domain.Models.Roadmaps.Roadmap", null)
                         .WithMany("Items")
                         .HasForeignKey("RoadmapId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3658,15 +3658,15 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Parent");
                 });
 
-            modelBuilder.Entity("Moda.Planning.Domain.Models.Roadmaps.RoadmapManager", b =>
+            modelBuilder.Entity("Wayd.Planning.Domain.Models.Roadmaps.RoadmapManager", b =>
                 {
-                    b.HasOne("Moda.Common.Domain.Employees.Employee", "Manager")
+                    b.HasOne("Wayd.Common.Domain.Employees.Employee", "Manager")
                         .WithMany()
                         .HasForeignKey("ManagerId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Moda.Planning.Domain.Models.Roadmaps.Roadmap", null)
+                    b.HasOne("Wayd.Planning.Domain.Models.Roadmaps.Roadmap", null)
                         .WithMany("RoadmapManagers")
                         .HasForeignKey("RoadmapId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3675,24 +3675,24 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Manager");
                 });
 
-            modelBuilder.Entity("Moda.Planning.Domain.Models.SimpleHealthCheck", b =>
+            modelBuilder.Entity("Wayd.Planning.Domain.Models.SimpleHealthCheck", b =>
                 {
-                    b.HasOne("Moda.Planning.Domain.Models.PlanningIntervalObjective", null)
+                    b.HasOne("Wayd.Planning.Domain.Models.PlanningIntervalObjective", null)
                         .WithOne("HealthCheck")
-                        .HasForeignKey("Moda.Planning.Domain.Models.SimpleHealthCheck", "ObjectId")
+                        .HasForeignKey("Wayd.Planning.Domain.Models.SimpleHealthCheck", "ObjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.Program", b =>
+            modelBuilder.Entity("Wayd.ProjectPortfolioManagement.Domain.Models.Program", b =>
                 {
-                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.ProjectPortfolio", "Portfolio")
+                    b.HasOne("Wayd.ProjectPortfolioManagement.Domain.Models.ProjectPortfolio", "Portfolio")
                         .WithMany("Programs")
                         .HasForeignKey("PortfolioId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsOne("Moda.Common.Models.LocalDateRange", "DateRange", b1 =>
+                    b.OwnsOne("Wayd.Common.Models.LocalDateRange", "DateRange", b1 =>
                         {
                             b1.Property<Guid>("ProgramId")
                                 .HasColumnType("uniqueidentifier");
@@ -3718,26 +3718,26 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Portfolio");
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.Project", b =>
+            modelBuilder.Entity("Wayd.ProjectPortfolioManagement.Domain.Models.Project", b =>
                 {
-                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.ExpenditureCategory", "ExpenditureCategory")
+                    b.HasOne("Wayd.ProjectPortfolioManagement.Domain.Models.ExpenditureCategory", "ExpenditureCategory")
                         .WithMany()
                         .HasForeignKey("ExpenditureCategoryId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.ProjectPortfolio", "Portfolio")
+                    b.HasOne("Wayd.ProjectPortfolioManagement.Domain.Models.ProjectPortfolio", "Portfolio")
                         .WithMany("Projects")
                         .HasForeignKey("PortfolioId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.Program", "Program")
+                    b.HasOne("Wayd.ProjectPortfolioManagement.Domain.Models.Program", "Program")
                         .WithMany("Projects")
                         .HasForeignKey("ProgramId")
                         .OnDelete(DeleteBehavior.NoAction);
 
-                    b.OwnsOne("Moda.Common.Models.LocalDateRange", "DateRange", b1 =>
+                    b.OwnsOne("Wayd.Common.Models.LocalDateRange", "DateRange", b1 =>
                         {
                             b1.Property<Guid>("ProjectId")
                                 .HasColumnType("uniqueidentifier");
@@ -3767,9 +3767,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Program");
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.ProjectPortfolio", b =>
+            modelBuilder.Entity("Wayd.ProjectPortfolioManagement.Domain.Models.ProjectPortfolio", b =>
                 {
-                    b.OwnsOne("Moda.Common.Models.FlexibleDateRange", "DateRange", b1 =>
+                    b.OwnsOne("Wayd.Common.Models.FlexibleDateRange", "DateRange", b1 =>
                         {
                             b1.Property<Guid>("ProjectPortfolioId")
                                 .HasColumnType("uniqueidentifier");
@@ -3793,15 +3793,15 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("DateRange");
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.RoleAssignment<Moda.ProjectPortfolioManagement.Domain.Enums.ProgramRole>", b =>
+            modelBuilder.Entity("Wayd.ProjectPortfolioManagement.Domain.Models.RoleAssignment<Wayd.ProjectPortfolioManagement.Domain.Enums.ProgramRole>", b =>
                 {
-                    b.HasOne("Moda.Common.Domain.Employees.Employee", "Employee")
+                    b.HasOne("Wayd.Common.Domain.Employees.Employee", "Employee")
                         .WithMany()
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.Program", null)
+                    b.HasOne("Wayd.ProjectPortfolioManagement.Domain.Models.Program", null)
                         .WithMany("Roles")
                         .HasForeignKey("ObjectId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3810,15 +3810,15 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Employee");
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.RoleAssignment<Moda.ProjectPortfolioManagement.Domain.Enums.ProjectPortfolioRole>", b =>
+            modelBuilder.Entity("Wayd.ProjectPortfolioManagement.Domain.Models.RoleAssignment<Wayd.ProjectPortfolioManagement.Domain.Enums.ProjectPortfolioRole>", b =>
                 {
-                    b.HasOne("Moda.Common.Domain.Employees.Employee", "Employee")
+                    b.HasOne("Wayd.Common.Domain.Employees.Employee", "Employee")
                         .WithMany()
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.ProjectPortfolio", null)
+                    b.HasOne("Wayd.ProjectPortfolioManagement.Domain.Models.ProjectPortfolio", null)
                         .WithMany("Roles")
                         .HasForeignKey("ObjectId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3827,15 +3827,15 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Employee");
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.RoleAssignment<Moda.ProjectPortfolioManagement.Domain.Enums.ProjectRole>", b =>
+            modelBuilder.Entity("Wayd.ProjectPortfolioManagement.Domain.Models.RoleAssignment<Wayd.ProjectPortfolioManagement.Domain.Enums.ProjectRole>", b =>
                 {
-                    b.HasOne("Moda.Common.Domain.Employees.Employee", "Employee")
+                    b.HasOne("Wayd.Common.Domain.Employees.Employee", "Employee")
                         .WithMany()
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.Project", null)
+                    b.HasOne("Wayd.ProjectPortfolioManagement.Domain.Models.Project", null)
                         .WithMany("Roles")
                         .HasForeignKey("ObjectId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3844,15 +3844,15 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Employee");
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.RoleAssignment<Moda.ProjectPortfolioManagement.Domain.Enums.StrategicInitiativeRole>", b =>
+            modelBuilder.Entity("Wayd.ProjectPortfolioManagement.Domain.Models.RoleAssignment<Wayd.ProjectPortfolioManagement.Domain.Enums.StrategicInitiativeRole>", b =>
                 {
-                    b.HasOne("Moda.Common.Domain.Employees.Employee", "Employee")
+                    b.HasOne("Wayd.Common.Domain.Employees.Employee", "Employee")
                         .WithMany()
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiative", null)
+                    b.HasOne("Wayd.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiative", null)
                         .WithMany("Roles")
                         .HasForeignKey("ObjectId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3861,15 +3861,15 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Employee");
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiative", b =>
+            modelBuilder.Entity("Wayd.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiative", b =>
                 {
-                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.ProjectPortfolio", "Portfolio")
+                    b.HasOne("Wayd.ProjectPortfolioManagement.Domain.Models.ProjectPortfolio", "Portfolio")
                         .WithMany("StrategicInitiatives")
                         .HasForeignKey("PortfolioId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsOne("Moda.Common.Models.LocalDateRange", "DateRange", b1 =>
+                    b.OwnsOne("Wayd.Common.Models.LocalDateRange", "DateRange", b1 =>
                         {
                             b1.Property<Guid>("StrategicInitiativeId")
                                 .HasColumnType("uniqueidentifier");
@@ -3896,33 +3896,33 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Portfolio");
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiativeKpi", b =>
+            modelBuilder.Entity("Wayd.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiativeKpi", b =>
                 {
-                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiative", null)
+                    b.HasOne("Wayd.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiative", null)
                         .WithMany("Kpis")
                         .HasForeignKey("StrategicInitiativeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiativeKpiCheckpoint", b =>
+            modelBuilder.Entity("Wayd.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiativeKpiCheckpoint", b =>
                 {
-                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiativeKpi", null)
+                    b.HasOne("Wayd.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiativeKpi", null)
                         .WithMany("Checkpoints")
                         .HasForeignKey("KpiId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiativeKpiMeasurement", b =>
+            modelBuilder.Entity("Wayd.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiativeKpiMeasurement", b =>
                 {
-                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiativeKpi", null)
+                    b.HasOne("Wayd.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiativeKpi", null)
                         .WithMany("Measurements")
                         .HasForeignKey("KpiId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Moda.Common.Domain.Employees.Employee", "MeasuredBy")
+                    b.HasOne("Wayd.Common.Domain.Employees.Employee", "MeasuredBy")
                         .WithMany()
                         .HasForeignKey("MeasuredById")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -3931,15 +3931,15 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("MeasuredBy");
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiativeProject", b =>
+            modelBuilder.Entity("Wayd.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiativeProject", b =>
                 {
-                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.Project", "Project")
+                    b.HasOne("Wayd.ProjectPortfolioManagement.Domain.Models.Project", "Project")
                         .WithMany("StrategicInitiativeProjects")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiative", "StrategicInitiative")
+                    b.HasOne("Wayd.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiative", "StrategicInitiative")
                         .WithMany("StrategicInitiativeProjects")
                         .HasForeignKey("StrategicInitiativeId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -3950,15 +3950,15 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("StrategicInitiative");
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicThemeTag<Moda.ProjectPortfolioManagement.Domain.Models.Program>", b =>
+            modelBuilder.Entity("Wayd.ProjectPortfolioManagement.Domain.Models.StrategicThemeTag<Wayd.ProjectPortfolioManagement.Domain.Models.Program>", b =>
                 {
-                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.Program", "Object")
+                    b.HasOne("Wayd.ProjectPortfolioManagement.Domain.Models.Program", "Object")
                         .WithMany("StrategicThemeTags")
                         .HasForeignKey("ObjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.StrategicTheme", "StrategicTheme")
+                    b.HasOne("Wayd.ProjectPortfolioManagement.Domain.Models.StrategicTheme", "StrategicTheme")
                         .WithMany()
                         .HasForeignKey("StrategicThemeId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -3969,15 +3969,15 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("StrategicTheme");
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicThemeTag<Moda.ProjectPortfolioManagement.Domain.Models.Project>", b =>
+            modelBuilder.Entity("Wayd.ProjectPortfolioManagement.Domain.Models.StrategicThemeTag<Wayd.ProjectPortfolioManagement.Domain.Models.Project>", b =>
                 {
-                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.Project", "Object")
+                    b.HasOne("Wayd.ProjectPortfolioManagement.Domain.Models.Project", "Object")
                         .WithMany("StrategicThemeTags")
                         .HasForeignKey("ObjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.StrategicTheme", "StrategicTheme")
+                    b.HasOne("Wayd.ProjectPortfolioManagement.Domain.Models.StrategicTheme", "StrategicTheme")
                         .WithMany()
                         .HasForeignKey("StrategicThemeId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -3988,9 +3988,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("StrategicTheme");
                 });
 
-            modelBuilder.Entity("Moda.StrategicManagement.Domain.Models.Strategy", b =>
+            modelBuilder.Entity("Wayd.StrategicManagement.Domain.Models.Strategy", b =>
                 {
-                    b.OwnsOne("Moda.Common.Models.FlexibleDateRange", "Dates", b1 =>
+                    b.OwnsOne("Wayd.Common.Models.FlexibleDateRange", "Dates", b1 =>
                         {
                             b1.Property<Guid>("StrategyId")
                                 .HasColumnType("uniqueidentifier");
@@ -4014,9 +4014,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Dates");
                 });
 
-            modelBuilder.Entity("Moda.StrategicManagement.Domain.Models.Vision", b =>
+            modelBuilder.Entity("Wayd.StrategicManagement.Domain.Models.Vision", b =>
                 {
-                    b.OwnsOne("Moda.Common.Models.FlexibleInstantRange", "Dates", b1 =>
+                    b.OwnsOne("Wayd.Common.Models.FlexibleInstantRange", "Dates", b1 =>
                         {
                             b1.Property<Guid>("VisionId")
                                 .HasColumnType("uniqueidentifier");
@@ -4040,51 +4040,51 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Dates");
                 });
 
-            modelBuilder.Entity("Moda.Work.Domain.Models.WorkItem", b =>
+            modelBuilder.Entity("Wayd.Work.Domain.Models.WorkItem", b =>
                 {
-                    b.HasOne("Moda.Common.Domain.Employees.Employee", "AssignedTo")
+                    b.HasOne("Wayd.Common.Domain.Employees.Employee", "AssignedTo")
                         .WithMany()
                         .HasForeignKey("AssignedToId");
 
-                    b.HasOne("Moda.Common.Domain.Employees.Employee", "CreatedBy")
+                    b.HasOne("Wayd.Common.Domain.Employees.Employee", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Moda.Common.Domain.Employees.Employee", "LastModifiedBy")
+                    b.HasOne("Wayd.Common.Domain.Employees.Employee", "LastModifiedBy")
                         .WithMany()
                         .HasForeignKey("LastModifiedById")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Moda.Work.Domain.Models.WorkItem", "Parent")
+                    b.HasOne("Wayd.Work.Domain.Models.WorkItem", "Parent")
                         .WithMany("Children")
                         .HasForeignKey("ParentId");
 
-                    b.HasOne("Moda.Work.Domain.Models.WorkProject", "ParentProject")
+                    b.HasOne("Wayd.Work.Domain.Models.WorkProject", "ParentProject")
                         .WithMany()
                         .HasForeignKey("ParentProjectId");
 
-                    b.HasOne("Moda.Work.Domain.Models.WorkProject", "Project")
+                    b.HasOne("Wayd.Work.Domain.Models.WorkProject", "Project")
                         .WithMany()
                         .HasForeignKey("ProjectId");
 
-                    b.HasOne("Moda.Work.Domain.Models.WorkStatus", "Status")
+                    b.HasOne("Wayd.Work.Domain.Models.WorkStatus", "Status")
                         .WithMany()
                         .HasForeignKey("StatusId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Moda.Work.Domain.Models.WorkTeam", "Team")
+                    b.HasOne("Wayd.Work.Domain.Models.WorkTeam", "Team")
                         .WithMany()
                         .HasForeignKey("TeamId");
 
-                    b.HasOne("Moda.Work.Domain.Models.WorkType", "Type")
+                    b.HasOne("Wayd.Work.Domain.Models.WorkType", "Type")
                         .WithMany()
                         .HasForeignKey("TypeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Moda.Work.Domain.Models.Workspace", "Workspace")
+                    b.HasOne("Wayd.Work.Domain.Models.Workspace", "Workspace")
                         .WithMany("WorkItems")
                         .HasForeignKey("WorkspaceId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -4111,34 +4111,34 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Workspace");
                 });
 
-            modelBuilder.Entity("Moda.Work.Domain.Models.WorkItemExtended", b =>
+            modelBuilder.Entity("Wayd.Work.Domain.Models.WorkItemExtended", b =>
                 {
-                    b.HasOne("Moda.Work.Domain.Models.WorkItem", null)
+                    b.HasOne("Wayd.Work.Domain.Models.WorkItem", null)
                         .WithOne("ExtendedProps")
-                        .HasForeignKey("Moda.Work.Domain.Models.WorkItemExtended", "Id")
+                        .HasForeignKey("Wayd.Work.Domain.Models.WorkItemExtended", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Moda.Work.Domain.Models.WorkItemLink", b =>
+            modelBuilder.Entity("Wayd.Work.Domain.Models.WorkItemLink", b =>
                 {
-                    b.HasOne("Moda.Common.Domain.Employees.Employee", "CreatedBy")
+                    b.HasOne("Wayd.Common.Domain.Employees.Employee", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Moda.Common.Domain.Employees.Employee", "RemovedBy")
+                    b.HasOne("Wayd.Common.Domain.Employees.Employee", "RemovedBy")
                         .WithMany()
                         .HasForeignKey("RemovedById")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Moda.Work.Domain.Models.WorkItem", "Source")
+                    b.HasOne("Wayd.Work.Domain.Models.WorkItem", "Source")
                         .WithMany("OutboundLinksHistory")
                         .HasForeignKey("SourceId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Moda.Work.Domain.Models.WorkItem", "Target")
+                    b.HasOne("Wayd.Work.Domain.Models.WorkItem", "Target")
                         .WithMany("InboundLinksHistory")
                         .HasForeignKey("TargetId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -4153,30 +4153,30 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Target");
                 });
 
-            modelBuilder.Entity("Moda.Work.Domain.Models.WorkItemReference", b =>
+            modelBuilder.Entity("Wayd.Work.Domain.Models.WorkItemReference", b =>
                 {
-                    b.HasOne("Moda.Work.Domain.Models.WorkItem", null)
+                    b.HasOne("Wayd.Work.Domain.Models.WorkItem", null)
                         .WithMany("ReferenceLinks")
                         .HasForeignKey("WorkItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Moda.Work.Domain.Models.WorkProcessScheme", b =>
+            modelBuilder.Entity("Wayd.Work.Domain.Models.WorkProcessScheme", b =>
                 {
-                    b.HasOne("Moda.Work.Domain.Models.WorkProcess", "WorkProcess")
+                    b.HasOne("Wayd.Work.Domain.Models.WorkProcess", "WorkProcess")
                         .WithMany("Schemes")
                         .HasForeignKey("WorkProcessId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Moda.Work.Domain.Models.WorkType", "WorkType")
+                    b.HasOne("Wayd.Work.Domain.Models.WorkType", "WorkType")
                         .WithMany()
                         .HasForeignKey("WorkTypeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Moda.Work.Domain.Models.Workflow", "Workflow")
+                    b.HasOne("Wayd.Work.Domain.Models.Workflow", "Workflow")
                         .WithMany()
                         .HasForeignKey("WorkflowId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -4188,9 +4188,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Workflow");
                 });
 
-            modelBuilder.Entity("Moda.Work.Domain.Models.WorkType", b =>
+            modelBuilder.Entity("Wayd.Work.Domain.Models.WorkType", b =>
                 {
-                    b.HasOne("Moda.Work.Domain.Models.WorkTypeLevel", "Level")
+                    b.HasOne("Wayd.Work.Domain.Models.WorkTypeLevel", "Level")
                         .WithMany()
                         .HasForeignKey("LevelId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -4199,23 +4199,23 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Level");
                 });
 
-            modelBuilder.Entity("Moda.Work.Domain.Models.WorkTypeLevel", b =>
+            modelBuilder.Entity("Wayd.Work.Domain.Models.WorkTypeLevel", b =>
                 {
-                    b.HasOne("Moda.Work.Domain.Models.WorkTypeHierarchy", null)
+                    b.HasOne("Wayd.Work.Domain.Models.WorkTypeHierarchy", null)
                         .WithMany("Levels")
                         .HasForeignKey("WorkTypeHierarchyId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("Moda.Work.Domain.Models.WorkflowScheme", b =>
+            modelBuilder.Entity("Wayd.Work.Domain.Models.WorkflowScheme", b =>
                 {
-                    b.HasOne("Moda.Work.Domain.Models.WorkStatus", "WorkStatus")
+                    b.HasOne("Wayd.Work.Domain.Models.WorkStatus", "WorkStatus")
                         .WithMany()
                         .HasForeignKey("WorkStatusId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Moda.Work.Domain.Models.Workflow", "Workflow")
+                    b.HasOne("Wayd.Work.Domain.Models.Workflow", "Workflow")
                         .WithMany("Schemes")
                         .HasForeignKey("WorkflowId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -4226,9 +4226,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Workflow");
                 });
 
-            modelBuilder.Entity("Moda.Work.Domain.Models.Workspace", b =>
+            modelBuilder.Entity("Wayd.Work.Domain.Models.Workspace", b =>
                 {
-                    b.HasOne("Moda.Work.Domain.Models.WorkProcess", "WorkProcess")
+                    b.HasOne("Wayd.Work.Domain.Models.WorkProcess", "WorkProcess")
                         .WithMany("Workspaces")
                         .HasForeignKey("WorkProcessId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -4237,9 +4237,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("WorkProcess");
                 });
 
-            modelBuilder.Entity("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsConnection", b =>
+            modelBuilder.Entity("Wayd.AppIntegration.Domain.Models.AzureDevOpsBoardsConnection", b =>
                 {
-                    b.OwnsOne("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsConnectionConfiguration", "Configuration", b1 =>
+                    b.OwnsOne("Wayd.AppIntegration.Domain.Models.AzureDevOpsBoardsConnectionConfiguration", "Configuration", b1 =>
                         {
                             b1.Property<Guid>("AzureDevOpsBoardsConnectionId")
                                 .HasColumnType("uniqueidentifier");
@@ -4261,7 +4261,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                             b1.WithOwner()
                                 .HasForeignKey("AzureDevOpsBoardsConnectionId");
 
-                            b1.OwnsMany("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsWorkProcess", "WorkProcesses", b2 =>
+                            b1.OwnsMany("Wayd.AppIntegration.Domain.Models.AzureDevOpsBoardsWorkProcess", "WorkProcesses", b2 =>
                                 {
                                     b2.Property<Guid>("AzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId")
                                         .HasColumnType("uniqueidentifier");
@@ -4287,7 +4287,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                                     b2.WithOwner()
                                         .HasForeignKey("AzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId");
 
-                                    b2.OwnsOne("Moda.Common.Domain.Models.IntegrationState<System.Guid>", "IntegrationState", b3 =>
+                                    b2.OwnsOne("Wayd.Common.Domain.Models.IntegrationState<System.Guid>", "IntegrationState", b3 =>
                                         {
                                             b3.Property<Guid>("AzureDevOpsBoardsWorkProcessAzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId")
                                                 .HasColumnType("uniqueidentifier");
@@ -4312,7 +4312,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                                     b2.Navigation("IntegrationState");
                                 });
 
-                            b1.OwnsMany("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsWorkspace", "Workspaces", b2 =>
+                            b1.OwnsMany("Wayd.AppIntegration.Domain.Models.AzureDevOpsBoardsWorkspace", "Workspaces", b2 =>
                                 {
                                     b2.Property<Guid>("AzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId")
                                         .HasColumnType("uniqueidentifier");
@@ -4371,7 +4371,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                             b1.Navigation("Workspaces");
                         });
 
-                    b.OwnsOne("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsTeamConfiguration", "TeamConfiguration", b1 =>
+                    b.OwnsOne("Wayd.AppIntegration.Domain.Models.AzureDevOpsBoardsTeamConfiguration", "TeamConfiguration", b1 =>
                         {
                             b1.Property<Guid>("AzureDevOpsBoardsConnectionId")
                                 .HasColumnType("uniqueidentifier");
@@ -4385,7 +4385,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                             b1.WithOwner()
                                 .HasForeignKey("AzureDevOpsBoardsConnectionId");
 
-                            b1.OwnsMany("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsWorkspaceTeam", "WorkspaceTeams", b2 =>
+                            b1.OwnsMany("Wayd.AppIntegration.Domain.Models.AzureDevOpsBoardsWorkspaceTeam", "WorkspaceTeams", b2 =>
                                 {
                                     b2.Property<Guid>("AzureDevOpsBoardsTeamConfigurationAzureDevOpsBoardsConnectionId")
                                         .HasColumnType("uniqueidentifier");
@@ -4428,29 +4428,29 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Moda.Common.Domain.Employees.Employee", b =>
+            modelBuilder.Entity("Wayd.Common.Domain.Employees.Employee", b =>
                 {
                     b.Navigation("DirectReports");
                 });
 
-            modelBuilder.Entity("Moda.Organization.Application.Teams.Models.TeamNode", b =>
+            modelBuilder.Entity("Wayd.Organization.Application.Teams.Models.TeamNode", b =>
                 {
                     b.Navigation("ChildMemberships");
 
                     b.Navigation("ParentMemberships");
                 });
 
-            modelBuilder.Entity("Moda.Organization.Domain.Models.BaseTeam", b =>
+            modelBuilder.Entity("Wayd.Organization.Domain.Models.BaseTeam", b =>
                 {
                     b.Navigation("ParentMemberships");
                 });
 
-            modelBuilder.Entity("Moda.Planning.Domain.Models.Iterations.Iteration", b =>
+            modelBuilder.Entity("Wayd.Planning.Domain.Models.Iterations.Iteration", b =>
                 {
                     b.Navigation("ExternalMetadata");
                 });
 
-            modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningInterval", b =>
+            modelBuilder.Entity("Wayd.Planning.Domain.Models.PlanningInterval", b =>
                 {
                     b.Navigation("Iterations");
 
@@ -4459,24 +4459,24 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Teams");
                 });
 
-            modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningIntervalObjective", b =>
+            modelBuilder.Entity("Wayd.Planning.Domain.Models.PlanningIntervalObjective", b =>
                 {
                     b.Navigation("HealthCheck");
                 });
 
-            modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningTeam", b =>
+            modelBuilder.Entity("Wayd.Planning.Domain.Models.PlanningTeam", b =>
                 {
                     b.Navigation("PlanningIntervalTeams");
                 });
 
-            modelBuilder.Entity("Moda.Planning.Domain.Models.Roadmaps.Roadmap", b =>
+            modelBuilder.Entity("Wayd.Planning.Domain.Models.Roadmaps.Roadmap", b =>
                 {
                     b.Navigation("Items");
 
                     b.Navigation("RoadmapManagers");
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.Program", b =>
+            modelBuilder.Entity("Wayd.ProjectPortfolioManagement.Domain.Models.Program", b =>
                 {
                     b.Navigation("Projects");
 
@@ -4485,7 +4485,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("StrategicThemeTags");
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.Project", b =>
+            modelBuilder.Entity("Wayd.ProjectPortfolioManagement.Domain.Models.Project", b =>
                 {
                     b.Navigation("Roles");
 
@@ -4494,7 +4494,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("StrategicThemeTags");
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.ProjectPortfolio", b =>
+            modelBuilder.Entity("Wayd.ProjectPortfolioManagement.Domain.Models.ProjectPortfolio", b =>
                 {
                     b.Navigation("Programs");
 
@@ -4505,7 +4505,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("StrategicInitiatives");
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiative", b =>
+            modelBuilder.Entity("Wayd.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiative", b =>
                 {
                     b.Navigation("Kpis");
 
@@ -4514,14 +4514,14 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("StrategicInitiativeProjects");
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiativeKpi", b =>
+            modelBuilder.Entity("Wayd.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiativeKpi", b =>
                 {
                     b.Navigation("Checkpoints");
 
                     b.Navigation("Measurements");
                 });
 
-            modelBuilder.Entity("Moda.Work.Domain.Models.WorkItem", b =>
+            modelBuilder.Entity("Wayd.Work.Domain.Models.WorkItem", b =>
                 {
                     b.Navigation("Children");
 
@@ -4534,34 +4534,34 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("ReferenceLinks");
                 });
 
-            modelBuilder.Entity("Moda.Work.Domain.Models.WorkProcess", b =>
+            modelBuilder.Entity("Wayd.Work.Domain.Models.WorkProcess", b =>
                 {
                     b.Navigation("Schemes");
 
                     b.Navigation("Workspaces");
                 });
 
-            modelBuilder.Entity("Moda.Work.Domain.Models.WorkTypeHierarchy", b =>
+            modelBuilder.Entity("Wayd.Work.Domain.Models.WorkTypeHierarchy", b =>
                 {
                     b.Navigation("Levels");
                 });
 
-            modelBuilder.Entity("Moda.Work.Domain.Models.Workflow", b =>
+            modelBuilder.Entity("Wayd.Work.Domain.Models.Workflow", b =>
                 {
                     b.Navigation("Schemes");
                 });
 
-            modelBuilder.Entity("Moda.Work.Domain.Models.Workspace", b =>
+            modelBuilder.Entity("Wayd.Work.Domain.Models.Workspace", b =>
                 {
                     b.Navigation("WorkItems");
                 });
 
-            modelBuilder.Entity("Moda.Organization.Domain.Models.TeamOfTeams", b =>
+            modelBuilder.Entity("Wayd.Organization.Domain.Models.TeamOfTeams", b =>
                 {
                     b.Navigation("ChildMemberships");
                 });
 
-            modelBuilder.Entity("Moda.Planning.Domain.Models.Roadmaps.RoadmapActivity", b =>
+            modelBuilder.Entity("Wayd.Planning.Domain.Models.Roadmaps.RoadmapActivity", b =>
                 {
                     b.Navigation("Children");
                 });

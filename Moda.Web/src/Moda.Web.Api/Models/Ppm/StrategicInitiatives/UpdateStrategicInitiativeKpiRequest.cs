@@ -1,8 +1,8 @@
-﻿using Moda.Common.Domain.Models.KeyPerformanceIndicators;
-using Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Commands.Kpis;
-using Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
+﻿using Wayd.Common.Domain.Models.KeyPerformanceIndicators;
+using Wayd.ProjectPortfolioManagement.Application.StrategicInitiatives.Commands.Kpis;
+using Wayd.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 
-namespace Moda.Web.Api.Models.Ppm.StrategicInitiatives;
+namespace Wayd.Web.Api.Models.Ppm.StrategicInitiatives;
 
 public sealed record UpdateStrategicInitiativeKpiRequest
 {

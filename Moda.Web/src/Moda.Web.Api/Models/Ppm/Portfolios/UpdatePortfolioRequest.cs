@@ -1,6 +1,6 @@
-﻿using Moda.ProjectPortfolioManagement.Application.Portfolios.Command;
+﻿using Wayd.ProjectPortfolioManagement.Application.Portfolios.Command;
 
-namespace Moda.Web.Api.Models.Ppm.Portfolios;
+namespace Wayd.Web.Api.Models.Ppm.Portfolios;
 
 public sealed record UpdatePortfolioRequest
 {

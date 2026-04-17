@@ -1,7 +1,7 @@
-using Moda.Common.Application.Models;
-using Moda.Planning.Domain.Models.PlanningPoker;
+using Wayd.Common.Application.Models;
+using Wayd.Planning.Domain.Models.PlanningPoker;
 
-namespace Moda.Planning.Application.PokerSessions.Commands;
+namespace Wayd.Planning.Application.PokerSessions.Commands;
 
 public sealed record CreatePokerSessionCommand(string Name, int EstimationScaleId) : ICommand<ObjectIdAndKey>;
 

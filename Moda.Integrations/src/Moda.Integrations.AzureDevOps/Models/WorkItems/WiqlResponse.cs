@@ -1,4 +1,4 @@
-﻿namespace Moda.Integrations.AzureDevOps.Models.WorkItems;
+﻿namespace Wayd.Integrations.AzureDevOps.Models.WorkItems;
 
 internal sealed record WiqlResponse
 {

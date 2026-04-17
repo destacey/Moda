@@ -1,7 +1,7 @@
-using Moda.Links.Models;
-using Moda.Tests.Shared.Data;
+using Wayd.Links.Models;
+using Wayd.Tests.Shared.Data;
 
-namespace Moda.Links.Tests.Data;
+namespace Wayd.Links.Tests.Data;
 
 public sealed class LinkFaker : PrivateConstructorFaker<Link>
 {

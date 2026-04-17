@@ -1,9 +1,9 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
-using Moda.Common.Models;
-using Moda.Work.Domain.Extensions;
+using Wayd.Common.Models;
+using Wayd.Work.Domain.Extensions;
 
-namespace Moda.Work.Domain.Models;
+namespace Wayd.Work.Domain.Models;
 
 public sealed class WorkItemKey : ValueObject
 {

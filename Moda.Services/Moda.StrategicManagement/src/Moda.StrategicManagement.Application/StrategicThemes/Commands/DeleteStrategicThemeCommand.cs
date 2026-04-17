@@ -1,8 +1,8 @@
-﻿using Moda.Common.Application.Events;
-using Moda.Common.Application.Models;
-using Moda.Common.Domain.Events.StrategicManagement;
+﻿using Wayd.Common.Application.Events;
+using Wayd.Common.Application.Models;
+using Wayd.Common.Domain.Events.StrategicManagement;
 
-namespace Moda.StrategicManagement.Application.StrategicThemes.Commands;
+namespace Wayd.StrategicManagement.Application.StrategicThemes.Commands;
 
 public sealed record DeleteStrategicThemeCommand(Guid Id) : ICommand;
 public sealed class DeleteStrategicThemeCommandValidator : AbstractValidator<DeleteStrategicThemeCommand>

@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace Moda.Web.Api.Configurations;
+namespace Wayd.Web.Api.Configurations;
 
 internal static class ConfigureServices
 {

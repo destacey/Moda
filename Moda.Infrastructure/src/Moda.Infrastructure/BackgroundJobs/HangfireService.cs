@@ -1,9 +1,9 @@
 using System.Linq.Expressions;
 using Hangfire;
-using Moda.Common.Application.BackgroundJobs;
+using Wayd.Common.Application.BackgroundJobs;
 using NodaTime;
 
-namespace Moda.Infrastructure.BackgroundJobs;
+namespace Wayd.Infrastructure.BackgroundJobs;
 
 public class HangfireService : IJobService
 {

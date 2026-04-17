@@ -1,6 +1,6 @@
-﻿using Moda.StrategicManagement.Application.StrategicThemes.Commands;
+﻿using Wayd.StrategicManagement.Application.StrategicThemes.Commands;
 
-namespace Moda.Web.Api.Models.StrategicManagement.StrategicThemes;
+namespace Wayd.Web.Api.Models.StrategicManagement.StrategicThemes;
 
 public sealed record UpdateStrategicThemeRequest
 {

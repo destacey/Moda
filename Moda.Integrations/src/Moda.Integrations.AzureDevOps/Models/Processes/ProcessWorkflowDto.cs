@@ -1,4 +1,4 @@
-﻿namespace Moda.Integrations.AzureDevOps.Models.Processes;
+﻿namespace Wayd.Integrations.AzureDevOps.Models.Processes;
 
 internal sealed record ProcessWorkflowItemDto
 {

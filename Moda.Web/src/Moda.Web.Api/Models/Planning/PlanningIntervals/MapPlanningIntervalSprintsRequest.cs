@@ -1,6 +1,6 @@
-﻿using Moda.Planning.Application.PlanningIntervals.Commands;
+﻿using Wayd.Planning.Application.PlanningIntervals.Commands;
 
-namespace Moda.Web.Api.Models.Planning.PlanningIntervals;
+namespace Wayd.Web.Api.Models.Planning.PlanningIntervals;
 
 /// <summary>
 /// Request model for mapping team sprints to Planning Interval iterations.

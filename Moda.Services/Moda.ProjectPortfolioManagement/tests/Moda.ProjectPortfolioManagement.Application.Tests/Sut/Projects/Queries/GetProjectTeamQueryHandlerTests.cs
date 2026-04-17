@@ -1,17 +1,17 @@
 ﻿using FluentAssertions;
-using Moda.Common.Domain.Employees;
-using Moda.Common.Domain.Models.ProjectPortfolioManagement;
-using Moda.Common.Domain.Tests.Data;
-using Moda.Common.Models;
-using Moda.ProjectPortfolioManagement.Application.Projects.Queries;
-using Moda.ProjectPortfolioManagement.Application.Tests.Infrastructure;
-using Moda.ProjectPortfolioManagement.Domain.Enums;
-using Moda.ProjectPortfolioManagement.Domain.Models;
-using Moda.ProjectPortfolioManagement.Domain.Tests.Data;
-using Moda.Tests.Shared.Extensions;
-using TaskStatus = Moda.ProjectPortfolioManagement.Domain.Enums.TaskStatus;
+using Wayd.Common.Domain.Employees;
+using Wayd.Common.Domain.Models.ProjectPortfolioManagement;
+using Wayd.Common.Domain.Tests.Data;
+using Wayd.Common.Models;
+using Wayd.ProjectPortfolioManagement.Application.Projects.Queries;
+using Wayd.ProjectPortfolioManagement.Application.Tests.Infrastructure;
+using Wayd.ProjectPortfolioManagement.Domain.Enums;
+using Wayd.ProjectPortfolioManagement.Domain.Models;
+using Wayd.ProjectPortfolioManagement.Domain.Tests.Data;
+using Wayd.Tests.Shared.Extensions;
+using TaskStatus = Wayd.ProjectPortfolioManagement.Domain.Enums.TaskStatus;
 
-namespace Moda.ProjectPortfolioManagement.Application.Tests.Sut.Projects.Queries;
+namespace Wayd.ProjectPortfolioManagement.Application.Tests.Sut.Projects.Queries;
 
 public class GetProjectTeamQueryHandlerTests : IDisposable
 {

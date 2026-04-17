@@ -1,6 +1,6 @@
 ﻿using NodaTime;
 
-namespace Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
+namespace Wayd.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 
 public sealed record UpsertStrategicInitiativeKpiCheckpoint
 {

@@ -1,12 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Moda.Common.Application.Persistence;
-using Moda.Common.Domain.Employees;
-using Moda.Common.Domain.Identity;
-using Moda.Tests.Shared.Infrastructure;
+using Wayd.Common.Application.Persistence;
+using Wayd.Common.Domain.Employees;
+using Wayd.Common.Domain.Identity;
+using Wayd.Tests.Shared.Infrastructure;
 
-namespace Moda.Common.Application.Tests.Infrastructure;
+namespace Wayd.Common.Application.Tests.Infrastructure;
 
 /// <summary>
 /// A test double for IModaDbContext that provides in-memory collections for all DbSets.

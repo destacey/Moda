@@ -1,7 +1,7 @@
-﻿using Moda.Planning.Application.PlanningIntervals.Dtos;
-using Moda.Planning.Domain.Enums;
+﻿using Wayd.Planning.Application.PlanningIntervals.Dtos;
+using Wayd.Planning.Domain.Enums;
 
-namespace Moda.Web.Api.Models.Planning.PlanningIntervals;
+namespace Wayd.Web.Api.Models.Planning.PlanningIntervals;
 
 public sealed record PlanningIntervalIterationUpsertRequest
 {

@@ -1,4 +1,4 @@
-﻿namespace Moda.Common.Domain.Events;
+﻿namespace Wayd.Common.Domain.Events;
 
 /// <summary>
 /// Marker interface to represent an event

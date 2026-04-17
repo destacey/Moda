@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Moda.Common.Domain.Employees;
-using Moda.Common.Domain.Identity;
+using Wayd.Common.Domain.Employees;
+using Wayd.Common.Domain.Identity;
 
-namespace Moda.Common.Application.Persistence;
+namespace Wayd.Common.Application.Persistence;
 
 public interface IModaDbContext
 {

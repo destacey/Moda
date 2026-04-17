@@ -1,4 +1,4 @@
-﻿namespace Moda.Planning.Application.PlanningIntervals.Commands;
+﻿namespace Wayd.Planning.Application.PlanningIntervals.Commands;
 
 public sealed record ManagePlanningIntervalTeamsCommand(Guid Id, IEnumerable<Guid> TeamIds) : ICommand;
 

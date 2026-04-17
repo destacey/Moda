@@ -1,8 +1,8 @@
-﻿using Moda.Common.Application.Dtos;
-using Moda.Organization.Application.Teams.Models;
+﻿using Wayd.Common.Application.Dtos;
+using Wayd.Organization.Application.Teams.Models;
 using NodaTime;
 
-namespace Moda.Organization.Application.Teams.Queries;
+namespace Wayd.Organization.Application.Teams.Queries;
 
 public sealed record GetFunctionalOrganizationChartQuery(LocalDate? AsOfDate = null) : IQuery<FunctionalOrganizationChartDto>;
 

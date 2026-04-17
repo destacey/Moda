@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
-using Moda.Common.Domain.Models;
+using Wayd.Common.Domain.Models;
 
-namespace Moda.AppIntegration.Domain.Models;
+namespace Wayd.AppIntegration.Domain.Models;
 
 public abstract class IntegrationObject<TId>
 {

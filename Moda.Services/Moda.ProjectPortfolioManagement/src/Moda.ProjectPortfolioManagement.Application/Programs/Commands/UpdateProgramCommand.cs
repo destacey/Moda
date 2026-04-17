@@ -1,7 +1,7 @@
-﻿using Moda.ProjectPortfolioManagement.Domain.Enums;
-using Moda.ProjectPortfolioManagement.Domain.Models;
+﻿using Wayd.ProjectPortfolioManagement.Domain.Enums;
+using Wayd.ProjectPortfolioManagement.Domain.Models;
 
-namespace Moda.ProjectPortfolioManagement.Application.Programs.Commands;
+namespace Wayd.ProjectPortfolioManagement.Application.Programs.Commands;
 
 public sealed record UpdateProgramCommand(Guid Id, string Name, string Description, LocalDateRange? DateRange, List<Guid>? SponsorIds, List<Guid>? OwnerIds, List<Guid>? ManagerIds, List<Guid>? StrategicThemeIds) : ICommand;
 

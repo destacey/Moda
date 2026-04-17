@@ -1,8 +1,8 @@
 ﻿using Mapster;
 using Microsoft.EntityFrameworkCore;
-using Moda.AppIntegration.Application.Connections.Dtos.AzureDevOps;
+using Wayd.AppIntegration.Application.Connections.Dtos.AzureDevOps;
 
-namespace Moda.AppIntegration.Application.Connections.Queries.AzureDevOps;
+namespace Wayd.AppIntegration.Application.Connections.Queries.AzureDevOps;
 
 public sealed record GetAzureDevOpsConnectionQuery(Guid ConnectionId) : IQuery<AzureDevOpsConnectionDetailsDto?>;
 

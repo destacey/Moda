@@ -1,4 +1,4 @@
-namespace Moda.Web.Api.Models.Ppm.ProjectTasks;
+namespace Wayd.Web.Api.Models.Ppm.ProjectTasks;
 
 public sealed record AddTaskDependencyRequest
 {

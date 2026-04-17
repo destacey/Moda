@@ -1,4 +1,4 @@
-﻿namespace Moda.Organization.Application.BaseTeams.Queries;
+﻿namespace Wayd.Organization.Application.BaseTeams.Queries;
 
 public sealed record GetValidBaseTeamIdsQuery() : IQuery<Guid[]>;
 internal sealed class GetValidBaseTeamIdsQueryHandler : IQueryHandler<GetValidBaseTeamIdsQuery, Guid[]>

@@ -1,7 +1,7 @@
-﻿using Moda.Common.Application.Models;
-using Moda.StrategicManagement.Domain.Enums;
+﻿using Wayd.Common.Application.Models;
+using Wayd.StrategicManagement.Domain.Enums;
 
-namespace Moda.StrategicManagement.Application.Strategies.Queries;
+namespace Wayd.StrategicManagement.Application.Strategies.Queries;
 
 public sealed record GetStrategyStatusesQuery : IQuery<List<StrategyStatusDto>> { }
 

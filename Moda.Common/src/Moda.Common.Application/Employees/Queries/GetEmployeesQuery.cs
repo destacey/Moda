@@ -1,8 +1,8 @@
 ﻿using Mapster;
-using Moda.Common.Application.Employees.Dtos;
-using Moda.Common.Application.Persistence;
+using Wayd.Common.Application.Employees.Dtos;
+using Wayd.Common.Application.Persistence;
 
-namespace Moda.Common.Application.Employees.Queries;
+namespace Wayd.Common.Application.Employees.Queries;
 
 public sealed record GetEmployeesQuery(bool IncludeInactive = false) : IQuery<IReadOnlyList<EmployeeListDto>>;
 

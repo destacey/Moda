@@ -1,8 +1,8 @@
-using Moda.Common.Extensions;
-using Moda.ProjectPortfolioManagement.Application.ProjectTasks.Dtos;
-using Moda.ProjectPortfolioManagement.Domain.Enums;
+using Wayd.Common.Extensions;
+using Wayd.ProjectPortfolioManagement.Application.ProjectTasks.Dtos;
+using Wayd.ProjectPortfolioManagement.Domain.Enums;
 
-namespace Moda.ProjectPortfolioManagement.Application.ProjectTasks.Queries;
+namespace Wayd.ProjectPortfolioManagement.Application.ProjectTasks.Queries;
 
 public sealed record GetProjectTaskTypesQuery : IQuery<IReadOnlyList<ProjectTaskTypeDto>> { }
 

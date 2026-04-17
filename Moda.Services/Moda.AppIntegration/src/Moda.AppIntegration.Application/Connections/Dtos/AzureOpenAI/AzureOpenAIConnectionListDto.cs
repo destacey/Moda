@@ -1,7 +1,7 @@
 using Mapster;
-using Moda.AppIntegration.Domain.Models.AzureOpenAI;
+using Wayd.AppIntegration.Domain.Models.AzureOpenAI;
 
-namespace Moda.AppIntegration.Application.Connections.Dtos.AzureOpenAI;
+namespace Wayd.AppIntegration.Application.Connections.Dtos.AzureOpenAI;
 
 public sealed record AzureOpenAIConnectionListDto : ConnectionListDto, IMapFrom<AzureOpenAIConnection>
 {

@@ -1,9 +1,9 @@
 ﻿using System.Linq.Expressions;
-using Moda.Common.Application.Models;
-using Moda.ProjectPortfolioManagement.Application.Programs.Dtos;
-using Moda.ProjectPortfolioManagement.Domain.Models;
+using Wayd.Common.Application.Models;
+using Wayd.ProjectPortfolioManagement.Application.Programs.Dtos;
+using Wayd.ProjectPortfolioManagement.Domain.Models;
 
-namespace Moda.ProjectPortfolioManagement.Application.Programs.Queries;
+namespace Wayd.ProjectPortfolioManagement.Application.Programs.Queries;
 
 public sealed record GetProgramQuery : IQuery<ProgramDetailsDto?>
 {

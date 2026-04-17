@@ -1,7 +1,7 @@
 ﻿using Ardalis.GuardClauses;
-using Moda.Common.Domain.Enums;
+using Wayd.Common.Domain.Enums;
 
-namespace Moda.Planning.Application.Roadmaps.Commands;
+namespace Wayd.Planning.Application.Roadmaps.Commands;
 
 public sealed record UpdateRoadmapCommand(Guid Id, string Name, string? Description, LocalDateRange DateRange, List<Guid> RoadmapManagerIds, Visibility Visibility) : ICommand;
 

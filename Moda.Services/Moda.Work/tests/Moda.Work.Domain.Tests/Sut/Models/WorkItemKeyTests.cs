@@ -1,7 +1,7 @@
-﻿using Moda.Common.Models;
-using Moda.Work.Domain.Models;
+﻿using Wayd.Common.Models;
+using Wayd.Work.Domain.Models;
 
-namespace Moda.Work.Domain.Tests.Sut.Models;
+namespace Wayd.Work.Domain.Tests.Sut.Models;
 
 public class WorkItemKeyTests
 {

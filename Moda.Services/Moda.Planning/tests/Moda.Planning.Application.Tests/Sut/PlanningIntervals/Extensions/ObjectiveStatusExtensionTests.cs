@@ -1,7 +1,7 @@
-﻿using Moda.Common.Domain.Enums.Goals;
-using Moda.Planning.Application.PlanningIntervals.Extensions;
+﻿using Wayd.Common.Domain.Enums.Goals;
+using Wayd.Planning.Application.PlanningIntervals.Extensions;
 
-namespace Moda.Planning.Application.Tests.Sut.PlanningIntervals.Extensions;
+namespace Wayd.Planning.Application.Tests.Sut.PlanningIntervals.Extensions;
 
 public class ObjectiveStatusExtensionTests
 {
@@ -13,7 +13,7 @@ public class ObjectiveStatusExtensionTests
     [InlineData(5, 5)] // Missed
     public void ToGoalObjectiveStatus(int enumValue, int expectedValue)
     {
-        var currentEnum = (Moda.Planning.Domain.Enums.ObjectiveStatus)enumValue;
+        var currentEnum = (Wayd.Planning.Domain.Enums.ObjectiveStatus)enumValue;
 
         // Act
         var result = currentEnum.ToGoalObjectiveStatus();
@@ -27,7 +27,7 @@ public class ObjectiveStatusExtensionTests
     [InlineData(6)]
     public void ToGoalObjectiveStatus_ThrowsArgumentOutOfRangeException(int enumValue)
     {
-        var currentEnum = (Moda.Planning.Domain.Enums.ObjectiveStatus)enumValue;
+        var currentEnum = (Wayd.Planning.Domain.Enums.ObjectiveStatus)enumValue;
 
         // Act
         Action act = () => currentEnum.ToGoalObjectiveStatus();

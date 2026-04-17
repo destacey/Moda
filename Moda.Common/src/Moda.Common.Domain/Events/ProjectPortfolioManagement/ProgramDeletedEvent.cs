@@ -1,6 +1,6 @@
 ﻿using NodaTime;
 
-namespace Moda.Common.Domain.Events.ProjectPortfolioManagement;
+namespace Wayd.Common.Domain.Events.ProjectPortfolioManagement;
 
 public sealed record ProgramDeletedEvent : DomainEvent
 {

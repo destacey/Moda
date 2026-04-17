@@ -1,4 +1,4 @@
-﻿namespace Moda.Common.Domain.Enums;
+﻿namespace Wayd.Common.Domain.Enums;
 
 /// <summary>
 /// Represents the high-level position of an item in its lifecycle.

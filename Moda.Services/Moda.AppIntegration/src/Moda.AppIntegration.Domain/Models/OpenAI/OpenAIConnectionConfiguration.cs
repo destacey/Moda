@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
-namespace Moda.AppIntegration.Domain.Models.OpenAI;
+namespace Wayd.AppIntegration.Domain.Models.OpenAI;
 
 public sealed class OpenAIConnectionConfiguration
 {

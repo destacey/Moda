@@ -1,6 +1,6 @@
 using Serilog;
 
-namespace Moda.Infrastructure.Common;
+namespace Wayd.Infrastructure.Common;
 
 public static class StaticLogger
 {

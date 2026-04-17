@@ -1,4 +1,4 @@
-﻿namespace Moda.Common.Domain.Interfaces;
+﻿namespace Wayd.Common.Domain.Interfaces;
 
 public interface IHasIdAndKey<TKey>
 {

@@ -1,8 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.FeatureManagement;
-using Moda.Common.Application.FeatureManagement;
+using Wayd.Common.Application.FeatureManagement;
 
-namespace Moda.Infrastructure.FeatureManagement;
+namespace Wayd.Infrastructure.FeatureManagement;
 
 internal static class ConfigureServices
 {

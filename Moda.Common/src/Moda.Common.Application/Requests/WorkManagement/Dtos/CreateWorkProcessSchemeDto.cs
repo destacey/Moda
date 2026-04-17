@@ -1,6 +1,6 @@
-﻿using Moda.Common.Application.Requests.WorkManagement.Interfaces;
+﻿using Wayd.Common.Application.Requests.WorkManagement.Interfaces;
 
-namespace Moda.Common.Application.Requests.WorkManagement.Dtos;
+namespace Wayd.Common.Application.Requests.WorkManagement.Dtos;
 
 public sealed record CreateWorkProcessSchemeDto : ICreateWorkProcessScheme
 {

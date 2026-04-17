@@ -1,4 +1,4 @@
-﻿namespace Moda.Infrastructure.Persistence.Initialization;
+﻿namespace Wayd.Infrastructure.Persistence.Initialization;
 
 internal interface IDatabaseInitializer
 {

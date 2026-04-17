@@ -3,7 +3,7 @@ using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Sinks.OpenTelemetry;
 
-namespace Moda.Infrastructure.Logging;
+namespace Wayd.Infrastructure.Logging;
 
 internal static class ConfigureServices
 {

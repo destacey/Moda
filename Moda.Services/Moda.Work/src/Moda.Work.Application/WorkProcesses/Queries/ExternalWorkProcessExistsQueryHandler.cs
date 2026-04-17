@@ -1,7 +1,7 @@
-﻿using Moda.Common.Application.Requests.WorkManagement.Queries;
-using Moda.Work.Application.Persistence;
+﻿using Wayd.Common.Application.Requests.WorkManagement.Queries;
+using Wayd.Work.Application.Persistence;
 
-namespace Moda.Work.Application.WorkProcesses.Queries;
+namespace Wayd.Work.Application.WorkProcesses.Queries;
 
 internal sealed class ExternalWorkProcessExistsQueryHandler(IWorkDbContext workDbContext) : IQueryHandler<ExternalWorkProcessExistsQuery, bool>
 {

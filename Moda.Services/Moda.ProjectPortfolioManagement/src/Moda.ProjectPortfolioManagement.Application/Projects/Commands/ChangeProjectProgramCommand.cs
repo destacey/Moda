@@ -1,4 +1,4 @@
-﻿namespace Moda.ProjectPortfolioManagement.Application.Projects.Commands;
+﻿namespace Wayd.ProjectPortfolioManagement.Application.Projects.Commands;
 
 /// <summary>
 /// Command to change the Program of a Project.

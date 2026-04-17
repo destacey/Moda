@@ -1,4 +1,4 @@
-﻿namespace Moda.Work.Application.WorkStatusCategories.Dtos;
+﻿namespace Wayd.Work.Application.WorkStatusCategories.Dtos;
 
 public sealed record WorkStatusCategoryListDto
 {

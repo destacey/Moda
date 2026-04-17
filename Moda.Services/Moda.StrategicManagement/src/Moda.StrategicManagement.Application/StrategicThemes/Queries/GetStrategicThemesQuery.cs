@@ -1,7 +1,7 @@
-﻿using Moda.Common.Domain.Enums.StrategicManagement;
-using Moda.StrategicManagement.Application.StrategicThemes.Dtos;
+﻿using Wayd.Common.Domain.Enums.StrategicManagement;
+using Wayd.StrategicManagement.Application.StrategicThemes.Dtos;
 
-namespace Moda.StrategicManagement.Application.StrategicThemes.Queries;
+namespace Wayd.StrategicManagement.Application.StrategicThemes.Queries;
 
 /// <summary>
 /// Retrieves a list of StrategicThemes based on the provided filter.  Returns all StrategicThemes if no filter is provided.

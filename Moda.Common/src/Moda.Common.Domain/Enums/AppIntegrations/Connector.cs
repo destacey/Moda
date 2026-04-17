@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Moda.Common.Domain.Enums.AppIntegrations;
+namespace Wayd.Common.Domain.Enums.AppIntegrations;
 
 // Max length of 32 characters
 public enum Connector

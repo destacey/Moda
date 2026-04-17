@@ -1,9 +1,9 @@
 ﻿using Ardalis.GuardClauses;
-using Moda.Planning.Domain.Interfaces.Roadmaps;
-using Moda.Planning.Domain.Models.Roadmaps;
+using Wayd.Planning.Domain.Interfaces.Roadmaps;
+using Wayd.Planning.Domain.Models.Roadmaps;
 using OneOf;
 
-namespace Moda.Planning.Application.Roadmaps.Commands;
+namespace Wayd.Planning.Application.Roadmaps.Commands;
 
 public sealed record CreateRoadmapItemCommand(Guid RoadmapId, OneOf<IUpsertRoadmapActivity, IUpsertRoadmapMilestone, IUpsertRoadmapTimebox> Item) : ICommand<Guid>;
 

@@ -1,4 +1,4 @@
-namespace Moda.Common.Application.Identity;
+namespace Wayd.Common.Application.Identity;
 
 public static class LoginProviders
 {

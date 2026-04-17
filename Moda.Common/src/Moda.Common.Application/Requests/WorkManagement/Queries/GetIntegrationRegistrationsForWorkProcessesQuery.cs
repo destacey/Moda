@@ -1,6 +1,6 @@
-﻿using Moda.Common.Domain.Models;
+﻿using Wayd.Common.Domain.Models;
 
-namespace Moda.Common.Application.Requests.WorkManagement.Queries;
+namespace Wayd.Common.Application.Requests.WorkManagement.Queries;
 
 public sealed record GetIntegrationRegistrationsForWorkProcessesQuery(Guid? ExternalId = null)
     : IQuery<List<IntegrationRegistration<Guid, Guid>>>;

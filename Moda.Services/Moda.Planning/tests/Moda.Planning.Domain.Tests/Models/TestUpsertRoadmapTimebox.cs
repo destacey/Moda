@@ -1,8 +1,8 @@
-﻿using Moda.Common.Models;
-using Moda.Planning.Domain.Interfaces.Roadmaps;
-using Moda.Planning.Domain.Models.Roadmaps;
+﻿using Wayd.Common.Models;
+using Wayd.Planning.Domain.Interfaces.Roadmaps;
+using Wayd.Planning.Domain.Models.Roadmaps;
 
-namespace Moda.Planning.Domain.Tests.Models;
+namespace Wayd.Planning.Domain.Tests.Models;
 
 internal record TestUpsertRoadmapTimebox : TestUpsertRoadmapItem, IUpsertRoadmapTimebox
 {

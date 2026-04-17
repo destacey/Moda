@@ -1,6 +1,6 @@
-﻿using Moda.Common.Application.Persistence;
+﻿using Wayd.Common.Application.Persistence;
 
-namespace Moda.Common.Application.Employees.Commands;
+namespace Wayd.Common.Application.Employees.Commands;
 
 public sealed record DeleteEmployeeCommand(Guid Id) : ICommand;
 

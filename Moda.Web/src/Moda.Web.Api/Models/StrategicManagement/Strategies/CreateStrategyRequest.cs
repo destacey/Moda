@@ -1,7 +1,7 @@
-﻿using Moda.StrategicManagement.Application.Strategies.Commands;
-using Moda.StrategicManagement.Domain.Enums;
+﻿using Wayd.StrategicManagement.Application.Strategies.Commands;
+using Wayd.StrategicManagement.Domain.Enums;
 
-namespace Moda.Web.Api.Models.StrategicManagement.Strategies;
+namespace Wayd.Web.Api.Models.StrategicManagement.Strategies;
 
 public sealed record CreateStrategyRequest
 {

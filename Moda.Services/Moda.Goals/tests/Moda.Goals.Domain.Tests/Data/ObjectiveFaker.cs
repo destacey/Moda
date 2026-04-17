@@ -1,7 +1,7 @@
-﻿using Moda.Common.Domain.Enums.Goals;
-using Moda.Common.Domain.Models.Goals;
+﻿using Wayd.Common.Domain.Enums.Goals;
+using Wayd.Common.Domain.Models.Goals;
 
-namespace Moda.Goals.Domain.Tests.Data;
+namespace Wayd.Goals.Domain.Tests.Data;
 
 public class ObjectiveFaker : Faker<Objective>
 {

@@ -1,9 +1,9 @@
-﻿using Moda.Common.Application.Interfaces;
-using Moda.Common.Domain.Enums;
-using Moda.Common.Extensions;
-using Moda.Health.Dtos;
+﻿using Wayd.Common.Application.Interfaces;
+using Wayd.Common.Domain.Enums;
+using Wayd.Common.Extensions;
+using Wayd.Health.Dtos;
 
-namespace Moda.Health.Queries;
+namespace Wayd.Health.Queries;
 
 public sealed record GetHealthStatusesQuery : IQuery<IReadOnlyList<HealthStatusDto>> { }
 

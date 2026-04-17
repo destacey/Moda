@@ -1,4 +1,4 @@
-﻿namespace Moda.Work.Domain.Models;
+﻿namespace Wayd.Work.Domain.Models;
 
 // TODO: convert this to an entity value attribute architecture
 public sealed class WorkItemExtended

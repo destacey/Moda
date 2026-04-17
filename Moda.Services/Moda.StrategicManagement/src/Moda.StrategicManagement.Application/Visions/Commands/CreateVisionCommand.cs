@@ -1,7 +1,7 @@
-﻿using Moda.Common.Application.Models;
-using Moda.StrategicManagement.Domain.Models;
+﻿using Wayd.Common.Application.Models;
+using Wayd.StrategicManagement.Domain.Models;
 
-namespace Moda.StrategicManagement.Application.Visions.Commands;
+namespace Wayd.StrategicManagement.Application.Visions.Commands;
 
 public sealed record CreateVisionCommand(string Description) : ICommand<ObjectIdAndKey>;
 

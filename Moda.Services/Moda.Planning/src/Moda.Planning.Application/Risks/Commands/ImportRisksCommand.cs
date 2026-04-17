@@ -1,6 +1,6 @@
-﻿using Moda.Planning.Application.Risks.Dtos;
+﻿using Wayd.Planning.Application.Risks.Dtos;
 
-namespace Moda.Planning.Application.Risks.Commands;
+namespace Wayd.Planning.Application.Risks.Commands;
 
 public sealed record ImportRisksCommand : ICommand
 {

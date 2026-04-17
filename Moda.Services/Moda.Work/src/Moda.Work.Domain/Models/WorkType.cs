@@ -1,15 +1,15 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
-using Moda.Common.Extensions;
+using Wayd.Common.Extensions;
 using NodaTime;
 
-namespace Moda.Work.Domain.Models;
+namespace Wayd.Work.Domain.Models;
 
 /// <summary>
 /// Represents a type of work item.
 /// </summary>
-/// <seealso cref="Moda.Common.Domain.Data.BaseSoftDeletableEntity&lt;System.Guid&gt;" />
-/// <seealso cref="Moda.Common.Domain.Interfaces.IActivatable" />
+/// <seealso cref="Wayd.Common.Domain.Data.BaseSoftDeletableEntity&lt;System.Guid&gt;" />
+/// <seealso cref="Wayd.Common.Domain.Interfaces.IActivatable" />
 public sealed class WorkType : BaseSoftDeletableEntity<int>, IActivatable
 {
     private WorkType() { }

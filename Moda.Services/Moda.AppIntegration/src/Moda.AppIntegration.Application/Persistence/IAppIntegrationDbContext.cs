@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Moda.AppIntegration.Domain.Models.AzureOpenAI;
+using Wayd.AppIntegration.Domain.Models.AzureOpenAI;
 
-namespace Moda.AppIntegration.Application.Persistence;
+namespace Wayd.AppIntegration.Application.Persistence;
 
 public interface IAppIntegrationDbContext : IModaDbContext
 {

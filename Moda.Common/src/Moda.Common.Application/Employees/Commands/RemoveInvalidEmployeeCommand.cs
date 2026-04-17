@@ -1,7 +1,7 @@
-﻿using Moda.Common.Application.Persistence;
-using Moda.Common.Domain.Employees;
+﻿using Wayd.Common.Application.Persistence;
+using Wayd.Common.Domain.Employees;
 
-namespace Moda.Common.Application.Employees.Commands;
+namespace Wayd.Common.Application.Employees.Commands;
 
 public sealed record RemoveInvalidEmployeeCommand(Guid Id) : ICommand<int>;
 

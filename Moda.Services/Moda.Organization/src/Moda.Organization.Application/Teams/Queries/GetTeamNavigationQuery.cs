@@ -1,7 +1,7 @@
 ﻿using Mapster;
-using Moda.Organization.Application.Models;
+using Wayd.Organization.Application.Models;
 
-namespace Moda.Organization.Application.Teams.Queries;
+namespace Wayd.Organization.Application.Teams.Queries;
 
 public sealed record GetTeamNavigationQuery : IQuery<TeamNavigationDto?>
 {

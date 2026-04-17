@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using Microsoft.Extensions.Configuration;
 
-namespace Moda.Integrations.AzureDevOps.IntegrationTests;
+namespace Wayd.Integrations.AzureDevOps.IntegrationTests;
 
 public static class ConfigurationHelper
 {

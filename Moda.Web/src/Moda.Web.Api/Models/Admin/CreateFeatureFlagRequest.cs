@@ -1,6 +1,6 @@
-using Moda.Common.Application.FeatureManagement.Commands;
+using Wayd.Common.Application.FeatureManagement.Commands;
 
-namespace Moda.Web.Api.Models.Admin;
+namespace Wayd.Web.Api.Models.Admin;
 
 public class CreateFeatureFlagRequest
 {

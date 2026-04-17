@@ -1,13 +1,13 @@
-﻿using Moda.Common.Application.Dtos;
-using Moda.Common.Application.Employees.Dtos;
-using Moda.Common.Domain.Enums.Planning;
-using Moda.Work.Application.WorkIterations.Dtos;
-using Moda.Work.Application.WorkProjects.Dtos;
-using Moda.Work.Application.Workspaces.Dtos;
-using Moda.Work.Application.WorkTeams.Dtos;
-using Moda.Work.Application.WorkTypes.Dtos;
+﻿using Wayd.Common.Application.Dtos;
+using Wayd.Common.Application.Employees.Dtos;
+using Wayd.Common.Domain.Enums.Planning;
+using Wayd.Work.Application.WorkIterations.Dtos;
+using Wayd.Work.Application.WorkProjects.Dtos;
+using Wayd.Work.Application.Workspaces.Dtos;
+using Wayd.Work.Application.WorkTeams.Dtos;
+using Wayd.Work.Application.WorkTypes.Dtos;
 
-namespace Moda.Work.Application.WorkItems.Dtos;
+namespace Wayd.Work.Application.WorkItems.Dtos;
 
 public sealed record WorkItemDetailsDto : IMapFrom<WorkItem>
 {

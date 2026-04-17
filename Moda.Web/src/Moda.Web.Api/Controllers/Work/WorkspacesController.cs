@@ -1,15 +1,15 @@
-﻿using Moda.Common.Extensions;
-using Moda.Web.Api.Extensions;
-using Moda.Web.Api.Models.Work.Workspaces;
-using Moda.Work.Application.WorkItemDependencies.Dtos;
-using Moda.Work.Application.WorkItems.Dtos;
-using Moda.Work.Application.WorkItems.Queries;
-using Moda.Work.Application.Workspaces.Commands;
-using Moda.Work.Application.Workspaces.Dtos;
-using Moda.Work.Application.Workspaces.Queries;
-using Moda.Work.Domain.Models;
+﻿using Wayd.Common.Extensions;
+using Wayd.Web.Api.Extensions;
+using Wayd.Web.Api.Models.Work.Workspaces;
+using Wayd.Work.Application.WorkItemDependencies.Dtos;
+using Wayd.Work.Application.WorkItems.Dtos;
+using Wayd.Work.Application.WorkItems.Queries;
+using Wayd.Work.Application.Workspaces.Commands;
+using Wayd.Work.Application.Workspaces.Dtos;
+using Wayd.Work.Application.Workspaces.Queries;
+using Wayd.Work.Domain.Models;
 
-namespace Moda.Web.Api.Controllers.Work;
+namespace Wayd.Web.Api.Controllers.Work;
 
 [Route("api/work/workspaces")]
 [ApiVersionNeutral]

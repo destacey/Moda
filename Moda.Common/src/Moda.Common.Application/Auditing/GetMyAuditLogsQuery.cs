@@ -1,6 +1,6 @@
 using MediatR;
 
-namespace Moda.Common.Application.Auditing;
+namespace Wayd.Common.Application.Auditing;
 
 public sealed record GetMyAuditLogsQuery : IRequest<List<AuditDto>>
 {

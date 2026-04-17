@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Moda.Common.Domain.Interfaces;
-using Moda.Infrastructure.Persistence.Extensions;
+using Wayd.Common.Domain.Interfaces;
+using Wayd.Infrastructure.Persistence.Extensions;
 
-namespace Moda.Infrastructure.Tests.Sut.Persistence.Extensions;
+namespace Wayd.Infrastructure.Tests.Sut.Persistence.Extensions;
 
 public sealed class ModelBuilderExtensionsTests
 {

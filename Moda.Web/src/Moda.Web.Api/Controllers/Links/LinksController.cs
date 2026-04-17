@@ -1,10 +1,10 @@
-﻿using Moda.Links.Commands;
-using Moda.Links.Models;
-using Moda.Links.Queries;
-using Moda.Web.Api.Extensions;
-using Moda.Web.Api.Models.Links;
+﻿using Wayd.Links.Commands;
+using Wayd.Links.Models;
+using Wayd.Links.Queries;
+using Wayd.Web.Api.Extensions;
+using Wayd.Web.Api.Models.Links;
 
-namespace Moda.Web.Api.Controllers.Links;
+namespace Wayd.Web.Api.Controllers.Links;
 
 [Route("api/[controller]")]
 [ApiVersionNeutral]

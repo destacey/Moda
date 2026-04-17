@@ -1,8 +1,8 @@
-﻿using Moda.Common.Application.Models;
-using Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Validators;
-using Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
+﻿using Wayd.Common.Application.Models;
+using Wayd.ProjectPortfolioManagement.Application.StrategicInitiatives.Validators;
+using Wayd.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 
-namespace Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Commands.Kpis;
+namespace Wayd.ProjectPortfolioManagement.Application.StrategicInitiatives.Commands.Kpis;
 
 public sealed record CreateStrategicInitiativeKpiCommand(Guid StrategicInitiativeId, StrategicInitiativeKpiUpsertParameters UpsertParameters) : ICommand<ObjectIdAndKey>;
 

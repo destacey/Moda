@@ -1,8 +1,8 @@
 ﻿using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using Moda.AppIntegration.Application.Connections.Dtos.AzureDevOps;
+using Wayd.AppIntegration.Application.Connections.Dtos.AzureDevOps;
 
-namespace Moda.AppIntegration.Application.Connections.Commands;
+namespace Wayd.AppIntegration.Application.Connections.Commands;
 
 public sealed record UpdateAzureDevOpsConnectionTeamMappingsCommand(Guid ConnectionId, List<AzureDevOpsWorkspaceTeamMappingDto> TeamMappings, Guid[] ValidTeamIds) : ICommand;
 

@@ -1,10 +1,10 @@
 ﻿using MediatR;
-using Moda.Common.Application.Requests.Goals.Commands;
-using Moda.Common.Domain.Enums.Goals;
-using Moda.Planning.Application.PlanningIntervals.Dtos;
-using Moda.Planning.Application.PlanningIntervals.Extensions;
+using Wayd.Common.Application.Requests.Goals.Commands;
+using Wayd.Common.Domain.Enums.Goals;
+using Wayd.Planning.Application.PlanningIntervals.Dtos;
+using Wayd.Planning.Application.PlanningIntervals.Extensions;
 
-namespace Moda.Planning.Application.PlanningIntervals.Commands;
+namespace Wayd.Planning.Application.PlanningIntervals.Commands;
 
 public sealed record ImportPlanningIntervalObjectivesCommand : ICommand
 {

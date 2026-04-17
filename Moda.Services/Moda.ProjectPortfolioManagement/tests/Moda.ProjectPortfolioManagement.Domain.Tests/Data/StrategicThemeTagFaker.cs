@@ -1,7 +1,7 @@
-using Moda.ProjectPortfolioManagement.Domain.Models;
-using Moda.Tests.Shared.Data;
+using Wayd.ProjectPortfolioManagement.Domain.Models;
+using Wayd.Tests.Shared.Data;
 
-namespace Moda.ProjectPortfolioManagement.Domain.Tests.Data;
+namespace Wayd.ProjectPortfolioManagement.Domain.Tests.Data;
 
 /// <summary>
 /// Faker for StrategicThemeTag. Since it's generic, you'll need to specify the object type when using it.

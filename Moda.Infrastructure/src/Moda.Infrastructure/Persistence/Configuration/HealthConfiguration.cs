@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Moda.Common.Domain.Enums;
-using Moda.Health.Models;
-using Moda.Infrastructure.Persistence.Converters;
+using Wayd.Common.Domain.Enums;
+using Wayd.Health.Models;
+using Wayd.Infrastructure.Persistence.Converters;
 
-namespace Moda.Infrastructure.Persistence.Configuration;
+namespace Wayd.Infrastructure.Persistence.Configuration;
 
 public class HealthCheckConfiguration : IEntityTypeConfiguration<HealthCheck>
 {

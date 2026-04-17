@@ -1,4 +1,4 @@
-﻿namespace Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Commands;
+﻿namespace Wayd.ProjectPortfolioManagement.Application.StrategicInitiatives.Commands;
 
 public sealed record CompleteStrategicInitiativeCommand(Guid Id) : ICommand;
 

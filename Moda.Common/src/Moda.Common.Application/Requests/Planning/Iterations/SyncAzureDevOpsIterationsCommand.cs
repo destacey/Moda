@@ -1,7 +1,7 @@
-﻿using Moda.Common.Application.Interfaces.ExternalWork;
-using Moda.Common.Application.Validators;
+﻿using Wayd.Common.Application.Interfaces.ExternalWork;
+using Wayd.Common.Application.Validators;
 
-namespace Moda.Common.Application.Requests.Planning.Iterations;
+namespace Wayd.Common.Application.Requests.Planning.Iterations;
 
 public sealed record SyncAzureDevOpsIterationsCommand(string SystemId, List<IExternalIteration<AzdoIterationMetadata>> Iterations, Dictionary<Guid, Guid?> TeamMappings) : ICommand, ILongRunningRequest;
 

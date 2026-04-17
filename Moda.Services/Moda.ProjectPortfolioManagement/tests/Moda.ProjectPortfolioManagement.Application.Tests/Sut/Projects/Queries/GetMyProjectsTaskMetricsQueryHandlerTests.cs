@@ -1,17 +1,17 @@
 using FluentAssertions;
-using Moda.Common.Application.Interfaces;
-using Moda.Common.Models;
-using Moda.ProjectPortfolioManagement.Application.Projects.Queries;
-using Moda.ProjectPortfolioManagement.Application.Tests.Infrastructure;
-using Moda.ProjectPortfolioManagement.Domain.Enums;
-using Moda.ProjectPortfolioManagement.Domain.Tests.Data;
-using Moda.Tests.Shared;
+using Wayd.Common.Application.Interfaces;
+using Wayd.Common.Models;
+using Wayd.ProjectPortfolioManagement.Application.Projects.Queries;
+using Wayd.ProjectPortfolioManagement.Application.Tests.Infrastructure;
+using Wayd.ProjectPortfolioManagement.Domain.Enums;
+using Wayd.ProjectPortfolioManagement.Domain.Tests.Data;
+using Wayd.Tests.Shared;
 using Moq;
 using NodaTime;
 using NodaTime.Testing;
-using TaskStatus = Moda.ProjectPortfolioManagement.Domain.Enums.TaskStatus;
+using TaskStatus = Wayd.ProjectPortfolioManagement.Domain.Enums.TaskStatus;
 
-namespace Moda.ProjectPortfolioManagement.Application.Tests.Sut.Projects.Queries;
+namespace Wayd.ProjectPortfolioManagement.Application.Tests.Sut.Projects.Queries;
 
 public class GetMyProjectsTaskMetricsQueryHandlerTests : IDisposable
 {

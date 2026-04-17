@@ -1,9 +1,9 @@
-﻿using Moda.Common.Application.Events;
-using Moda.Common.Domain.Enums;
-using Moda.Common.Domain.Events.Planning.Iterations;
-using Moda.Work.Application.Persistence;
+﻿using Wayd.Common.Application.Events;
+using Wayd.Common.Domain.Enums;
+using Wayd.Common.Domain.Events.Planning.Iterations;
+using Wayd.Work.Application.Persistence;
 
-namespace Moda.Work.Application.WorkIterations.EventHandlers;
+namespace Wayd.Work.Application.WorkIterations.EventHandlers;
 
 internal sealed class WorkIterationSyncHandler(IWorkDbContext workDbContext, ILogger<WorkIterationSyncHandler> logger, IDateTimeProvider dateTimeProvider) :
     IEventNotificationHandler<IterationCreatedEvent>,

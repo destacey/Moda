@@ -1,7 +1,7 @@
-﻿using Moda.Common.Application.Models;
-using Moda.StrategicManagement.Domain.Enums;
+﻿using Wayd.Common.Application.Models;
+using Wayd.StrategicManagement.Domain.Enums;
 
-namespace Moda.StrategicManagement.Application.Visions.Queries;
+namespace Wayd.StrategicManagement.Application.Visions.Queries;
 
 public sealed record GetVisionStatesQuery : IQuery<List<VisionStateDto>> { }
 

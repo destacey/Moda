@@ -23,9 +23,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Moda.Common\src\Moda.Common.Application\Moda.Common.Application.csproj" />
-    <ProjectReference Include="..\..\..\..\Moda.Common\tests\Moda.Tests.Shared\Moda.Tests.Shared.csproj" />
-    <ProjectReference Include="..\..\src\Moda.Planning.Domain\Moda.Planning.Domain.csproj" />
+    <ProjectReference Include="..\..\..\..\Wayd.Common\src\Wayd.Common.Application\Wayd.Common.Application.csproj" />
+    <ProjectReference Include="..\..\..\..\Wayd.Common\tests\Wayd.Tests.Shared\Wayd.Tests.Shared.csproj" />
+    <ProjectReference Include="..\..\src\Wayd.Planning.Domain\Wayd.Planning.Domain.csproj" />
   </ItemGroup>
 
 </Project>

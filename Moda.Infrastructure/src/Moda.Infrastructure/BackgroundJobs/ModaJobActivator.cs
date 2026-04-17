@@ -2,7 +2,7 @@
 using Hangfire.Server;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Moda.Infrastructure.BackgroundJobs;
+namespace Wayd.Infrastructure.BackgroundJobs;
 
 public class ModaJobActivator : JobActivator
 {

@@ -1,6 +1,6 @@
-using Moda.ProjectPortfolioManagement.Application.Projects.Commands;
+using Wayd.ProjectPortfolioManagement.Application.Projects.Commands;
 
-namespace Moda.Web.Api.Models.Ppm.ProjectLifecycles;
+namespace Wayd.Web.Api.Models.Ppm.ProjectLifecycles;
 
 public sealed record AssignProjectLifecycleRequest
 {

@@ -1,7 +1,7 @@
-﻿using Moda.Common.Domain.Enums.Work;
-using Moda.Integrations.AzureDevOps.Models.Contracts;
+﻿using Wayd.Common.Domain.Enums.Work;
+using Wayd.Integrations.AzureDevOps.Models.Contracts;
 
-namespace Moda.Integrations.AzureDevOps.Models.Processes;
+namespace Wayd.Integrations.AzureDevOps.Models.Processes;
 
 internal sealed record ProcessWorkItemStateDto
 {

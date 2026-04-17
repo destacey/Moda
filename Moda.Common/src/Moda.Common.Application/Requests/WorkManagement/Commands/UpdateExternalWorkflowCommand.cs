@@ -1,7 +1,7 @@
-﻿using Moda.Common.Application.Interfaces.ExternalWork;
-using Moda.Common.Application.Validators;
+﻿using Wayd.Common.Application.Interfaces.ExternalWork;
+using Wayd.Common.Application.Validators;
 
-namespace Moda.Common.Application.Requests.WorkManagement.Commands;
+namespace Wayd.Common.Application.Requests.WorkManagement.Commands;
 
 public sealed record UpdateExternalWorkflowCommand(Guid WorkflowId, string Name, string? Description, IExternalWorkTypeWorkflow ExternalWorkTypeWorkflow) : ICommand, ILongRunningRequest;
 

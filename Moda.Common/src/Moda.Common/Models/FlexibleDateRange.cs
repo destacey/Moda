@@ -1,9 +1,9 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
-using Moda.Common.Interfaces;
+using Wayd.Common.Interfaces;
 using NodaTime;
 
-namespace Moda.Common.Models;
+namespace Wayd.Common.Models;
 
 /// <summary>
 /// A date range that uses <see cref="LocalDate" for the start date and <see cref="LocalDate?"/> for the end date.

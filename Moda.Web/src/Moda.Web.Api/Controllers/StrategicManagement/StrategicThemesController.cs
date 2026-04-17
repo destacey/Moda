@@ -1,12 +1,12 @@
-﻿using Moda.Common.Application.Models;
-using Moda.Common.Domain.Enums.StrategicManagement;
-using Moda.StrategicManagement.Application.StrategicThemes.Commands;
-using Moda.StrategicManagement.Application.StrategicThemes.Dtos;
-using Moda.StrategicManagement.Application.StrategicThemes.Queries;
-using Moda.Web.Api.Extensions;
-using Moda.Web.Api.Models.StrategicManagement.StrategicThemes;
+﻿using Wayd.Common.Application.Models;
+using Wayd.Common.Domain.Enums.StrategicManagement;
+using Wayd.StrategicManagement.Application.StrategicThemes.Commands;
+using Wayd.StrategicManagement.Application.StrategicThemes.Dtos;
+using Wayd.StrategicManagement.Application.StrategicThemes.Queries;
+using Wayd.Web.Api.Extensions;
+using Wayd.Web.Api.Models.StrategicManagement.StrategicThemes;
 
-namespace Moda.Web.Api.Controllers.StrategicManagement;
+namespace Wayd.Web.Api.Controllers.StrategicManagement;
 
 [Route("api/strategic-management/strategic-themes")]
 [ApiVersionNeutral]

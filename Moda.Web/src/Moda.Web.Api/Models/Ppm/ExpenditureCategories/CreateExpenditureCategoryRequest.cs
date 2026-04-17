@@ -1,6 +1,6 @@
-﻿using Moda.ProjectPortfolioManagement.Application.ExpenditureCategories.Commands;
+﻿using Wayd.ProjectPortfolioManagement.Application.ExpenditureCategories.Commands;
 
-namespace Moda.Web.Api.Models.Ppm.ExpenditureCategories;
+namespace Wayd.Web.Api.Models.Ppm.ExpenditureCategories;
 
 public sealed record CreateExpenditureCategoryRequest
 {

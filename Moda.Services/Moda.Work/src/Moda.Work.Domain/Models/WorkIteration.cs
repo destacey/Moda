@@ -1,16 +1,16 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
-using Moda.Common.Domain.Enums.Planning;
-using Moda.Common.Domain.Events.WorkManagement.WorkIterations;
-using Moda.Common.Domain.Interfaces.Planning.Iterations;
-using Moda.Common.Domain.Models.Planning.Iterations;
-using Moda.Work.Domain.Interfaces;
+using Wayd.Common.Domain.Enums.Planning;
+using Wayd.Common.Domain.Events.WorkManagement.WorkIterations;
+using Wayd.Common.Domain.Interfaces.Planning.Iterations;
+using Wayd.Common.Domain.Models.Planning.Iterations;
+using Wayd.Work.Domain.Interfaces;
 using NodaTime;
 
-namespace Moda.Work.Domain.Models;
+namespace Wayd.Work.Domain.Models;
 
 /// <summary>
-/// A copy of the Moda.Common.Domain.Interfaces.Planning.Iterations.ISimpleIteration interface.  Used to hold basic iteration information for the work service and db context.
+/// A copy of the Wayd.Common.Domain.Interfaces.Planning.Iterations.ISimpleIteration interface.  Used to hold basic iteration information for the work service and db context.
 /// </summary>
 public sealed class WorkIteration : BaseEntity<Guid>, ISimpleIteration, IHasIdAndKey, IHasOptionalWorkTeam
 {

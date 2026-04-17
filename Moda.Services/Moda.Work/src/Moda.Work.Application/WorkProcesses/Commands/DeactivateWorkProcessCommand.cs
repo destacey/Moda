@@ -1,6 +1,6 @@
-﻿using Moda.Work.Application.Persistence;
+﻿using Wayd.Work.Application.Persistence;
 
-namespace Moda.Work.Application.WorkProcesses.Commands;
+namespace Wayd.Work.Application.WorkProcesses.Commands;
 
 public sealed record DeactivateWorkProcessCommand(Guid Id) : ICommand;
 

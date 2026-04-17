@@ -1,10 +1,10 @@
-﻿using Moda.ProjectPortfolioManagement.Application.ExpenditureCategories.Commands;
-using Moda.ProjectPortfolioManagement.Application.ExpenditureCategories.Dtos;
-using Moda.ProjectPortfolioManagement.Application.ExpenditureCategories.Queries;
-using Moda.Web.Api.Extensions;
-using Moda.Web.Api.Models.Ppm.ExpenditureCategories;
+﻿using Wayd.ProjectPortfolioManagement.Application.ExpenditureCategories.Commands;
+using Wayd.ProjectPortfolioManagement.Application.ExpenditureCategories.Dtos;
+using Wayd.ProjectPortfolioManagement.Application.ExpenditureCategories.Queries;
+using Wayd.Web.Api.Extensions;
+using Wayd.Web.Api.Models.Ppm.ExpenditureCategories;
 
-namespace Moda.Web.Api.Controllers.Ppm;
+namespace Wayd.Web.Api.Controllers.Ppm;
 
 [Route("api/ppm/expenditure-categories")]
 [ApiVersionNeutral]

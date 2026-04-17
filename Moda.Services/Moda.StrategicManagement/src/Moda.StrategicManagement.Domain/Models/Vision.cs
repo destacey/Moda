@@ -1,9 +1,9 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
-using Moda.StrategicManagement.Domain.Enums;
+using Wayd.StrategicManagement.Domain.Enums;
 using NodaTime;
 
-namespace Moda.StrategicManagement.Domain.Models;
+namespace Wayd.StrategicManagement.Domain.Models;
 
 /// <summary>
 /// Represents the overarching purpose and direction of the organization.

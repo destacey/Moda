@@ -1,10 +1,10 @@
 ﻿using System.Linq.Expressions;
-using Moda.Common.Application.Models;
-using Moda.Common.Domain.Enums.Planning;
-using Moda.Planning.Application.Iterations.Dtos;
-using Moda.Planning.Domain.Models.Iterations;
+using Wayd.Common.Application.Models;
+using Wayd.Common.Domain.Enums.Planning;
+using Wayd.Planning.Application.Iterations.Dtos;
+using Wayd.Planning.Domain.Models.Iterations;
 
-namespace Moda.Planning.Application.Iterations.Queries;
+namespace Wayd.Planning.Application.Iterations.Queries;
 
 public sealed record GetSprintQuery : IQuery<SprintDetailsDto?>
 {

@@ -1,4 +1,4 @@
-﻿namespace Moda.Work.Application.WorkTypeTiers.Dtos;
+﻿namespace Wayd.Work.Application.WorkTypeTiers.Dtos;
 
 public sealed record WorkTypeTierDto
 {

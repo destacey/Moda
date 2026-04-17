@@ -1,14 +1,14 @@
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
-using Moda.ProjectPortfolioManagement.Application.ProjectTasks.Commands;
-using Moda.ProjectPortfolioManagement.Application.Tests.Infrastructure;
-using Moda.ProjectPortfolioManagement.Domain.Tests.Data;
-using Moda.Tests.Shared;
+using Wayd.ProjectPortfolioManagement.Application.ProjectTasks.Commands;
+using Wayd.ProjectPortfolioManagement.Application.Tests.Infrastructure;
+using Wayd.ProjectPortfolioManagement.Domain.Tests.Data;
+using Wayd.Tests.Shared;
 using Moq;
 using NodaTime.Extensions;
 using NodaTime.Testing;
 
-namespace Moda.ProjectPortfolioManagement.Application.Tests.Sut.ProjectTasks.Commands;
+namespace Wayd.ProjectPortfolioManagement.Application.Tests.Sut.ProjectTasks.Commands;
 
 public class RemoveProjectTaskDependencyCommandHandlerTests : IDisposable
 {

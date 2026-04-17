@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
-using Moda.Common.Domain.Enums;
+using Wayd.Common.Domain.Enums;
 
-namespace Moda.ProjectPortfolioManagement.Domain.Enums;
+namespace Wayd.ProjectPortfolioManagement.Domain.Enums;
 
 /// <summary>
 /// Represents the status of a project task.

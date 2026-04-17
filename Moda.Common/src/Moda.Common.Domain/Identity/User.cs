@@ -1,6 +1,6 @@
-﻿using Moda.Common.Domain.Data;
+﻿using Wayd.Common.Domain.Data;
 
-namespace Moda.Common.Domain.Identity;
+namespace Wayd.Common.Domain.Identity;
 
 /// <summary>
 /// Read-only domain representation of an application user.

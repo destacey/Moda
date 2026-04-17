@@ -8,14 +8,14 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\..\Moda.Common\src\Moda.Common.Application\Moda.Common.Application.csproj" />
-        <ProjectReference Include="..\..\..\..\Moda.Common\src\Moda.Common\Moda.Common.csproj" />
-        <ProjectReference Include="..\Moda.Work.Domain\Moda.Work.Domain.csproj" />
+        <ProjectReference Include="..\..\..\..\Wayd.Common\src\Wayd.Common.Application\Wayd.Common.Application.csproj" />
+        <ProjectReference Include="..\..\..\..\Wayd.Common\src\Wayd.Common\Wayd.Common.csproj" />
+        <ProjectReference Include="..\Wayd.Work.Domain\Wayd.Work.Domain.csproj" />
     </ItemGroup>
 
 
     <ItemGroup>
-        <InternalsVisibleTo Include="Moda.Work.Application.Tests" />
+        <InternalsVisibleTo Include="Wayd.Work.Application.Tests" />
         <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
     </ItemGroup>
 </Project>

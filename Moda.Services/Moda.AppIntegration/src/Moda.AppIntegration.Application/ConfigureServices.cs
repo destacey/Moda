@@ -4,7 +4,7 @@ using Mapster;
 using Mapster.Utils;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Moda.AppIntegration.Application;
+namespace Wayd.AppIntegration.Application;
 
 public static class ConfigureServices
 {

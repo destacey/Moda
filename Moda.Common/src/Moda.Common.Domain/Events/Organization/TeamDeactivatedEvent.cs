@@ -1,6 +1,6 @@
 using NodaTime;
 
-namespace Moda.Common.Domain.Events.Organization;
+namespace Wayd.Common.Domain.Events.Organization;
 
 public sealed record TeamDeactivatedEvent : DomainEvent
 {

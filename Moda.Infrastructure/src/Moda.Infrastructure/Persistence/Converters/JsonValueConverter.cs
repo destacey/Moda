@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace Moda.Infrastructure.Persistence.Converters;
+namespace Wayd.Infrastructure.Persistence.Converters;
 
 public class JsonValueConverter<T> : ValueConverter<T, string>
 {

@@ -1,11 +1,11 @@
-﻿using Moda.Planning.Domain.Models.Roadmaps;
-using Moda.Planning.Domain.Tests.Data;
-using Moda.Planning.Domain.Tests.Models;
-using Moda.Tests.Shared;
+﻿using Wayd.Planning.Domain.Models.Roadmaps;
+using Wayd.Planning.Domain.Tests.Data;
+using Wayd.Planning.Domain.Tests.Models;
+using Wayd.Tests.Shared;
 using NodaTime.Extensions;
 using NodaTime.Testing;
 
-namespace Moda.Planning.Domain.Tests.Sut.Models.Roadmaps;
+namespace Wayd.Planning.Domain.Tests.Sut.Models.Roadmaps;
 
 public class BaseRoadmapItemTests
 {

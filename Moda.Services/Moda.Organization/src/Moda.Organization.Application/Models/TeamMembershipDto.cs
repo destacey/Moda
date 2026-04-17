@@ -1,6 +1,6 @@
 ﻿using NodaTime;
 
-namespace Moda.Organization.Application.Models;
+namespace Wayd.Organization.Application.Models;
 
 public record TeamMembershipDto
 {

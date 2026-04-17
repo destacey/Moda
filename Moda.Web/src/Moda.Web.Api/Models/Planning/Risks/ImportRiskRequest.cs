@@ -1,9 +1,9 @@
-﻿using Moda.Common.Application.Interfaces;
-using Moda.Planning.Application.Risks.Dtos;
-using Moda.Planning.Domain.Enums;
+﻿using Wayd.Common.Application.Interfaces;
+using Wayd.Planning.Application.Risks.Dtos;
+using Wayd.Planning.Domain.Enums;
 using NodaTime.Extensions;
 
-namespace Moda.Web.Api.Models.Planning.Risks;
+namespace Wayd.Web.Api.Models.Planning.Risks;
 
 public class ImportRiskRequest
 {

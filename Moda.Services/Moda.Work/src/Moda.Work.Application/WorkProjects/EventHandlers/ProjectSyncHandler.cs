@@ -1,9 +1,9 @@
-﻿using Moda.Common.Application.Events;
-using Moda.Common.Domain.Enums;
-using Moda.Common.Domain.Events.ProjectPortfolioManagement;
-using Moda.Work.Application.Persistence;
+﻿using Wayd.Common.Application.Events;
+using Wayd.Common.Domain.Enums;
+using Wayd.Common.Domain.Events.ProjectPortfolioManagement;
+using Wayd.Work.Application.Persistence;
 
-namespace Moda.Work.Application.WorkProjects.EventHandlers;
+namespace Wayd.Work.Application.WorkProjects.EventHandlers;
 
 internal sealed class ProjectSyncHandler(IWorkDbContext workDbContext, ILogger<ProjectSyncHandler> logger) :
     IEventNotificationHandler<ProjectCreatedEvent>,

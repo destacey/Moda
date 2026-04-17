@@ -1,6 +1,6 @@
-﻿using Moda.Common.Application.Persistence;
+﻿using Wayd.Common.Application.Persistence;
 
-namespace Moda.Common.Application.Employees.Queries;
+namespace Wayd.Common.Application.Employees.Queries;
 
 public sealed record GetEmployeeByEmployeeNumberQuery(string EmployeeNumber) : IQuery<Guid?>;
 

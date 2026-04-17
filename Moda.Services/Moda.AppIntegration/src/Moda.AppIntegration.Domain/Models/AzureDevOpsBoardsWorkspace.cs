@@ -1,8 +1,8 @@
 ﻿using System.Text.Json.Serialization;
-using Moda.Common.Domain.Models;
-using Moda.Common.Extensions;
+using Wayd.Common.Domain.Models;
+using Wayd.Common.Extensions;
 
-namespace Moda.AppIntegration.Domain.Models;
+namespace Wayd.AppIntegration.Domain.Models;
 
 public sealed class AzureDevOpsBoardsWorkspace : IntegrationObject<Guid>
 {

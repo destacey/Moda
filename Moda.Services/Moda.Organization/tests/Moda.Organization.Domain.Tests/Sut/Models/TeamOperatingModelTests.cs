@@ -1,9 +1,9 @@
-﻿using Moda.Organization.Domain.Enums;
-using Moda.Organization.Domain.Models;
-using Moda.Organization.Domain.Tests.Data;
+﻿using Wayd.Organization.Domain.Enums;
+using Wayd.Organization.Domain.Models;
+using Wayd.Organization.Domain.Tests.Data;
 using NodaTime;
 
-namespace Moda.Organization.Domain.Tests.Sut.Models;
+namespace Wayd.Organization.Domain.Tests.Sut.Models;
 
 public class TeamOperatingModelTests
 {

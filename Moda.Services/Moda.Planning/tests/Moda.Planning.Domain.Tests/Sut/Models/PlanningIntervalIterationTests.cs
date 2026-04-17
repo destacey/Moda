@@ -1,13 +1,13 @@
-﻿using Moda.Common.Domain.Enums.Planning;
-using Moda.Common.Models;
-using Moda.Planning.Domain.Enums;
-using Moda.Planning.Domain.Models;
-using Moda.Planning.Domain.Tests.Data;
-using Moda.Tests.Shared;
+﻿using Wayd.Common.Domain.Enums.Planning;
+using Wayd.Common.Models;
+using Wayd.Planning.Domain.Enums;
+using Wayd.Planning.Domain.Models;
+using Wayd.Planning.Domain.Tests.Data;
+using Wayd.Tests.Shared;
 using NodaTime.Extensions;
 using NodaTime.Testing;
 
-namespace Moda.Planning.Domain.Tests.Sut.Models;
+namespace Wayd.Planning.Domain.Tests.Sut.Models;
 
 public class PlanningIntervalIterationTests
 {

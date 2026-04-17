@@ -1,9 +1,9 @@
-﻿using Moda.Common.Domain.Enums.Planning;
-using Moda.Common.Domain.Interfaces.Planning.Iterations;
-using Moda.Common.Domain.Models.Planning.Iterations;
-using Moda.Planning.Domain.Models.Iterations;
+﻿using Wayd.Common.Domain.Enums.Planning;
+using Wayd.Common.Domain.Interfaces.Planning.Iterations;
+using Wayd.Common.Domain.Models.Planning.Iterations;
+using Wayd.Planning.Domain.Models.Iterations;
 
-namespace Moda.Planning.Application.Iterations.Dtos;
+namespace Wayd.Planning.Application.Iterations.Dtos;
 
 public sealed record SimpleIterationDto : IMapFrom<Iteration>, ISimpleIteration
 {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Moda.Infrastructure.Common.Services;
+using Wayd.Infrastructure.Common.Services;
 
-namespace Moda.Infrastructure.Common;
+namespace Wayd.Infrastructure.Common;
 
 internal static class ConfigureServices
 {

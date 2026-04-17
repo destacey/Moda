@@ -1,8 +1,8 @@
-using Moda.Common.Domain.Employees;
-using Moda.Common.Models;
-using Moda.Tests.Shared.Data;
+using Wayd.Common.Domain.Employees;
+using Wayd.Common.Models;
+using Wayd.Tests.Shared.Data;
 
-namespace Moda.Common.Domain.Tests.Data;
+namespace Wayd.Common.Domain.Tests.Data;
 
 public sealed class EmployeeFaker : PrivateConstructorFaker<Employee>
 {

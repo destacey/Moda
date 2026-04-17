@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Moda.Planning.Domain.Enums;
+namespace Wayd.Planning.Domain.Enums;
 
 // max length of 32 characters
 public enum PlanningIntervalObjectiveType

@@ -1,7 +1,7 @@
-﻿using Moda.Common.Domain.Enums.Work;
-using Moda.Work.Application.WorkTypeTiers.Dtos;
+﻿using Wayd.Common.Domain.Enums.Work;
+using Wayd.Work.Application.WorkTypeTiers.Dtos;
 
-namespace Moda.Work.Application.WorkTypeTiers.Queries;
+namespace Wayd.Work.Application.WorkTypeTiers.Queries;
 
 public sealed record GetWorkTypeTiersQuery : IQuery<IReadOnlyList<WorkTypeTierDto>> { }
 

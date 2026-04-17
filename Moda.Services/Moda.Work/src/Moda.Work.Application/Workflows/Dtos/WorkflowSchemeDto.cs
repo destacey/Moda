@@ -1,8 +1,8 @@
-﻿using Moda.Common.Application.Dtos;
-using Moda.Common.Application.Requests.WorkManagement.Interfaces;
-using Moda.Work.Application.WorkStatuses.Dtos;
+﻿using Wayd.Common.Application.Dtos;
+using Wayd.Common.Application.Requests.WorkManagement.Interfaces;
+using Wayd.Work.Application.WorkStatuses.Dtos;
 
-namespace Moda.Work.Application.Workflows.Dtos;
+namespace Wayd.Work.Application.Workflows.Dtos;
 
 public sealed record WorkflowSchemeDto : IMapFrom<WorkflowScheme>, IWorkflowSchemeDto
 {

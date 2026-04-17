@@ -1,8 +1,8 @@
 ﻿using Ardalis.GuardClauses;
-using Moda.Common.Domain.Identity;
+using Wayd.Common.Domain.Identity;
 using NodaTime;
 
-namespace Moda.Planning.Domain.Models.PlanningPoker;
+namespace Wayd.Planning.Domain.Models.PlanningPoker;
 
 public sealed class PokerVote : BaseEntity
 {

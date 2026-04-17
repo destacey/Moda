@@ -2,7 +2,7 @@
 using System.Text.Json;
 using NJsonSchema.Generation;
 
-namespace Moda.Infrastructure.OpenApi;
+namespace Wayd.Infrastructure.OpenApi;
 
 public class MarkAsRequiredIfNonNullableSchemaProcessor : ISchemaProcessor
 {

@@ -1,6 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 
-namespace Moda.Web.Api.Extensions;
+namespace Wayd.Web.Api.Extensions;
 
 public static class ResultExtensions
 {

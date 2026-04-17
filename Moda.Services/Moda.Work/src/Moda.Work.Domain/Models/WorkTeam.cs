@@ -1,12 +1,12 @@
-﻿using Moda.Common.Domain.Enums.Organization;
-using Moda.Common.Domain.Events.Organization;
-using Moda.Common.Domain.Interfaces.Organization;
-using Moda.Common.Domain.Models.Organizations;
+﻿using Wayd.Common.Domain.Enums.Organization;
+using Wayd.Common.Domain.Events.Organization;
+using Wayd.Common.Domain.Interfaces.Organization;
+using Wayd.Common.Domain.Models.Organizations;
 
-namespace Moda.Work.Domain.Models;
+namespace Wayd.Work.Domain.Models;
 
 /// <summary>
-/// A copy of the Moda.Common.Domain.Interfaces.Organization.ISimpleTeam interface.  Used to hold basic team information for the work service and db context.
+/// A copy of the Wayd.Common.Domain.Interfaces.Organization.ISimpleTeam interface.  Used to hold basic team information for the work service and db context.
 /// </summary>
 public sealed class WorkTeam : ISimpleTeam, IHasIdAndKey, IHasTeamIdAndCode
 {

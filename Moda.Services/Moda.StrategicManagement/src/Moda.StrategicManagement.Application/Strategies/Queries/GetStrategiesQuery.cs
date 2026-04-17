@@ -1,7 +1,7 @@
-﻿using Moda.StrategicManagement.Application.Strategies.Dtos;
-using Moda.StrategicManagement.Domain.Enums;
+﻿using Wayd.StrategicManagement.Application.Strategies.Dtos;
+using Wayd.StrategicManagement.Domain.Enums;
 
-namespace Moda.StrategicManagement.Application.Strategies.Queries;
+namespace Wayd.StrategicManagement.Application.Strategies.Queries;
 
 /// <summary>
 /// Retrieves a list of Strategies based on the provided filter.  Returns all Strategies if no filter is provided.

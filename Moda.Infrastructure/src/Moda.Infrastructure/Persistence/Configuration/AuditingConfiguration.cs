@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Moda.Infrastructure.Persistence.Configuration;
+namespace Wayd.Infrastructure.Persistence.Configuration;
 
 public class AuditTrailConfig : IEntityTypeConfiguration<Trail>
 {

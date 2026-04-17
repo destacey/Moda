@@ -1,6 +1,6 @@
-﻿using Moda.Organization.Domain.Enums;
+﻿using Wayd.Organization.Domain.Enums;
 
-namespace Moda.Organization.Application.Teams.Queries;
+namespace Wayd.Organization.Application.Teams.Queries;
 
 /// <summary>
 /// Checks if a team has ever used the Scrum methodology.

@@ -1,7 +1,7 @@
-using Moda.Planning.Application.PokerSessions.Dtos;
-using Moda.Planning.Domain.Enums;
+using Wayd.Planning.Application.PokerSessions.Dtos;
+using Wayd.Planning.Domain.Enums;
 
-namespace Moda.Planning.Application.PokerSessions.Queries;
+namespace Wayd.Planning.Application.PokerSessions.Queries;
 
 public sealed record GetPokerSessionsQuery(PokerSessionStatus? Status = null) : IQuery<IReadOnlyList<PokerSessionListDto>>;
 

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Moda.Organization.Domain.Enums;
+namespace Wayd.Organization.Domain.Enums;
 
 public enum MembershipState
 {

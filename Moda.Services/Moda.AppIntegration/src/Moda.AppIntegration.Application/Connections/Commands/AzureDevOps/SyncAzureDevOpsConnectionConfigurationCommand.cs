@@ -1,11 +1,11 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Moda.Common.Application.Interfaces.ExternalWork;
-using Moda.Common.Application.Requests.WorkManagement.Commands;
-using Moda.Common.Domain.Models;
+using Wayd.Common.Application.Interfaces.ExternalWork;
+using Wayd.Common.Application.Requests.WorkManagement.Commands;
+using Wayd.Common.Domain.Models;
 using NodaTime;
 
-namespace Moda.AppIntegration.Application.Connections.Commands.AzureDevOps;
+namespace Wayd.AppIntegration.Application.Connections.Commands.AzureDevOps;
 
 public sealed record SyncAzureDevOpsConnectionConfigurationCommand(
     Guid ConnectionId,

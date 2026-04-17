@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 
-namespace Moda.Infrastructure.GraphApi;
+namespace Wayd.Infrastructure.GraphApi;
 
 public class GraphApiSettings
 {

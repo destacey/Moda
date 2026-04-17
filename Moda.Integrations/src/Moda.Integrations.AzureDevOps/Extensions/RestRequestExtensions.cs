@@ -3,7 +3,7 @@ using System.Text;
 using Ardalis.GuardClauses;
 using RestSharp;
 
-namespace Moda.Integrations.AzureDevOps.Extensions;
+namespace Wayd.Integrations.AzureDevOps.Extensions;
 
 internal static class RestRequestExtensions
 {

@@ -1,7 +1,7 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
 
-namespace Moda.ProjectPortfolioManagement.Domain.Models;
+namespace Wayd.ProjectPortfolioManagement.Domain.Models;
 
 public static class RoleManager
 {

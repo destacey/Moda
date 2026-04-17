@@ -1,9 +1,9 @@
 ﻿using System.Linq.Expressions;
-using Moda.Common.Application.Models;
-using Moda.Planning.Application.PokerSessions.Dtos;
-using Moda.Planning.Domain.Models.PlanningPoker;
+using Wayd.Common.Application.Models;
+using Wayd.Planning.Application.PokerSessions.Dtos;
+using Wayd.Planning.Domain.Models.PlanningPoker;
 
-namespace Moda.Planning.Application.PokerSessions.Queries;
+namespace Wayd.Planning.Application.PokerSessions.Queries;
 
 public sealed record GetPokerSessionQuery : IQuery<PokerSessionDetailsDto?>
 {

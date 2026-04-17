@@ -1,6 +1,6 @@
-using Moda.Planning.Application.EstimationScales.Commands;
+using Wayd.Planning.Application.EstimationScales.Commands;
 
-namespace Moda.Web.Api.Models.Planning.EstimationScales;
+namespace Wayd.Web.Api.Models.Planning.EstimationScales;
 
 public class UpdateEstimationScaleRequest
 {

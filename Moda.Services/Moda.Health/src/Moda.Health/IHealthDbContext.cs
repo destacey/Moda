@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Moda.Common.Application.Persistence;
-using Moda.Health.Models;
+using Wayd.Common.Application.Persistence;
+using Wayd.Health.Models;
 
-namespace Moda.Health;
+namespace Wayd.Health;
 
 public interface IHealthDbContext : IModaDbContext
 {

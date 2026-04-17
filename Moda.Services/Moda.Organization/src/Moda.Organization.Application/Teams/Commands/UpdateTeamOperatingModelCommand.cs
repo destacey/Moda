@@ -1,6 +1,6 @@
-﻿using Moda.Organization.Domain.Enums;
+﻿using Wayd.Organization.Domain.Enums;
 
-namespace Moda.Organization.Application.Teams.Commands;
+namespace Wayd.Organization.Application.Teams.Commands;
 
 public sealed record UpdateTeamOperatingModelCommand(
     Guid TeamId,

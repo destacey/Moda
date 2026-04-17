@@ -3,10 +3,10 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.FeatureManagement;
-using Moda.Common.Application.FeatureManagement;
-using Moda.Common.Domain.FeatureManagement;
+using Wayd.Common.Application.FeatureManagement;
+using Wayd.Common.Domain.FeatureManagement;
 
-namespace Moda.Infrastructure.FeatureManagement;
+namespace Wayd.Infrastructure.FeatureManagement;
 
 internal sealed class DatabaseFeatureDefinitionProvider(
     IServiceScopeFactory scopeFactory,

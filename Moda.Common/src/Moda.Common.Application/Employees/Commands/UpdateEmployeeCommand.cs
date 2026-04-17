@@ -1,8 +1,8 @@
-﻿using Moda.Common.Application.Persistence;
-using Moda.Common.Application.Validators;
-using Moda.Common.Models;
+﻿using Wayd.Common.Application.Persistence;
+using Wayd.Common.Application.Validators;
+using Wayd.Common.Models;
 
-namespace Moda.Common.Application.Employees.Commands;
+namespace Wayd.Common.Application.Employees.Commands;
 
 public sealed record UpdateEmployeeCommand : ICommand<int>
 {

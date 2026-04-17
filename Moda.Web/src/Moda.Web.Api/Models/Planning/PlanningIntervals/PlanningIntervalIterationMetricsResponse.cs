@@ -1,6 +1,6 @@
-﻿using Moda.Common.Application.Dtos;
+﻿using Wayd.Common.Application.Dtos;
 
-namespace Moda.Web.Api.Models.Planning.PlanningIntervals;
+namespace Wayd.Web.Api.Models.Planning.PlanningIntervals;
 
 /// <summary>
 /// Response containing PI Iteration metrics aggregated across all mapped sprints.

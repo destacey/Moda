@@ -1,12 +1,12 @@
-﻿using Moda.Common.Application.Interfaces.ExternalWork;
-using Moda.Common.Application.Requests.WorkManagement.Commands;
-using Moda.Common.Domain.Enums;
-using Moda.Common.Domain.Enums.Work;
-using Moda.Work.Application.Persistence;
-using Moda.Work.Application.WorkItems.Dtos;
-using Moda.Work.Domain.Interfaces;
+﻿using Wayd.Common.Application.Interfaces.ExternalWork;
+using Wayd.Common.Application.Requests.WorkManagement.Commands;
+using Wayd.Common.Domain.Enums;
+using Wayd.Common.Domain.Enums.Work;
+using Wayd.Work.Application.Persistence;
+using Wayd.Work.Application.WorkItems.Dtos;
+using Wayd.Work.Domain.Interfaces;
 
-namespace Moda.Work.Application.WorkItems.Commands;
+namespace Wayd.Work.Application.WorkItems.Commands;
 
 // TODO: add validation
 

@@ -1,6 +1,6 @@
-﻿using Moda.StrategicManagement.Application.Visions.Commands;
+﻿using Wayd.StrategicManagement.Application.Visions.Commands;
 
-namespace Moda.Web.Api.Models.StrategicManagement.Visions;
+namespace Wayd.Web.Api.Models.StrategicManagement.Visions;
 
 public sealed record CreateVisionRequest
 {

@@ -23,10 +23,10 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\..\Moda.Common\src\Moda.Common.Domain\Moda.Common.Domain.csproj" />
-        <ProjectReference Include="..\..\..\..\Moda.Common\tests\Moda.Tests.Shared\Moda.Tests.Shared.csproj" />
-        <ProjectReference Include="..\Moda.Organization.Domain.Tests\Moda.Organization.Domain.Tests.csproj" />
-        <ProjectReference Include="..\..\src\Moda.Organization.Application\Moda.Organization.Application.csproj" />
+        <ProjectReference Include="..\..\..\..\Wayd.Common\src\Wayd.Common.Domain\Wayd.Common.Domain.csproj" />
+        <ProjectReference Include="..\..\..\..\Wayd.Common\tests\Wayd.Tests.Shared\Wayd.Tests.Shared.csproj" />
+        <ProjectReference Include="..\Wayd.Organization.Domain.Tests\Wayd.Organization.Domain.Tests.csproj" />
+        <ProjectReference Include="..\..\src\Wayd.Organization.Application\Wayd.Organization.Application.csproj" />
     </ItemGroup>
 
     <ItemGroup>

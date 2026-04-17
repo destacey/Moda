@@ -4,10 +4,10 @@ using CSharpFunctionalExtensions;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
-using Moda.Web.Api.Extensions;
+using Wayd.Web.Api.Extensions;
 using Moq;
 
-namespace Moda.Web.Api.Tests.Sut.Extensions;
+namespace Wayd.Web.Api.Tests.Sut.Extensions;
 
 public sealed class ResultExtensionsTests
 {

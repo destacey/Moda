@@ -1,9 +1,9 @@
 ﻿using Azure.Core;
 using Azure.Identity;
 using Microsoft.Graph;
-using Moda.Infrastructure.Auth.AzureAd;
+using Wayd.Infrastructure.Auth.AzureAd;
 
-namespace Moda.Infrastructure.GraphApi;
+namespace Wayd.Infrastructure.GraphApi;
 
 public sealed class GraphHelper
 {

@@ -1,7 +1,7 @@
-using Moda.Organization.Application.Teams.Commands;
-using Moda.Organization.Domain.Enums;
+using Wayd.Organization.Application.Teams.Commands;
+using Wayd.Organization.Domain.Enums;
 
-namespace Moda.Web.Api.Models.Organizations.Teams;
+namespace Wayd.Web.Api.Models.Organizations.Teams;
 
 public sealed record UpdateTeamOperatingModelRequest
 {

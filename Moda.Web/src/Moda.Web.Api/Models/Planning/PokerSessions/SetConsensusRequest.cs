@@ -1,6 +1,6 @@
-using Moda.Planning.Application.PokerSessions.Commands;
+using Wayd.Planning.Application.PokerSessions.Commands;
 
-namespace Moda.Web.Api.Models.Planning.PokerSessions;
+namespace Wayd.Web.Api.Models.Planning.PokerSessions;
 
 public class SetConsensusRequest
 {

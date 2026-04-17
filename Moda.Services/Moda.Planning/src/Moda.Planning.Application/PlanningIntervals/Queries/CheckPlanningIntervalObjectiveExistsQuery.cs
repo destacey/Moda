@@ -1,7 +1,7 @@
 ﻿using System.Linq.Expressions;
-using Moda.Common.Application.Models;
+using Wayd.Common.Application.Models;
 
-namespace Moda.Planning.Application.PlanningIntervals.Queries;
+namespace Wayd.Planning.Application.PlanningIntervals.Queries;
 
 /// <summary>
 /// Query to check if a planning interval objective exists. If it exists, returns the ID of the objective.

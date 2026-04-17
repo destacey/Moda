@@ -1,6 +1,6 @@
-﻿using Moda.Common.Domain.Enums;
+﻿using Wayd.Common.Domain.Enums;
 
-namespace Moda.Common.Domain.Models.KeyPerformanceIndicators;
+namespace Wayd.Common.Domain.Models.KeyPerformanceIndicators;
 
 public static class KpiUtils
 {

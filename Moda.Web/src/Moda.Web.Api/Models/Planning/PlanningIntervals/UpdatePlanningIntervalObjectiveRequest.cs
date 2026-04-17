@@ -1,7 +1,7 @@
-﻿using Moda.Planning.Application.PlanningIntervals.Commands;
-using Moda.Planning.Domain.Enums;
+﻿using Wayd.Planning.Application.PlanningIntervals.Commands;
+using Wayd.Planning.Domain.Enums;
 
-namespace Moda.Web.Api.Models.Planning.PlanningIntervals;
+namespace Wayd.Web.Api.Models.Planning.PlanningIntervals;
 
 public class UpdatePlanningIntervalObjectiveRequest
 {

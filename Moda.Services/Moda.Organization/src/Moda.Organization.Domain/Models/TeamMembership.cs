@@ -1,4 +1,4 @@
-﻿namespace Moda.Organization.Domain.Models;
+﻿namespace Wayd.Organization.Domain.Models;
 
 public sealed class TeamMembership : BaseMembership
 {

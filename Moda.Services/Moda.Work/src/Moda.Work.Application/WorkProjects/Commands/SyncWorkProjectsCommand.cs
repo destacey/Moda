@@ -1,8 +1,8 @@
-﻿using Moda.Common.Domain.Enums;
-using Moda.Common.Domain.Interfaces.ProjectPortfolioManagement;
-using Moda.Work.Application.Persistence;
+﻿using Wayd.Common.Domain.Enums;
+using Wayd.Common.Domain.Interfaces.ProjectPortfolioManagement;
+using Wayd.Work.Application.Persistence;
 
-namespace Moda.Work.Application.WorkProjects.Commands;
+namespace Wayd.Work.Application.WorkProjects.Commands;
 
 public sealed record SyncWorkProjectsCommand(IEnumerable<ISimpleProject> Projects) : ICommand, ILongRunningRequest;
 

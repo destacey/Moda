@@ -1,18 +1,18 @@
-﻿using Moda.Common.Application.Models;
-using Moda.ProjectPortfolioManagement.Application.Portfolios.Command;
-using Moda.ProjectPortfolioManagement.Application.Portfolios.Dtos;
-using Moda.ProjectPortfolioManagement.Application.Portfolios.Queries;
-using Moda.ProjectPortfolioManagement.Application.Programs.Dtos;
-using Moda.ProjectPortfolioManagement.Application.Programs.Queries;
-using Moda.ProjectPortfolioManagement.Application.Projects.Dtos;
-using Moda.ProjectPortfolioManagement.Application.Projects.Queries;
-using Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Dtos;
-using Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Queries;
-using Moda.ProjectPortfolioManagement.Domain.Enums;
-using Moda.Web.Api.Extensions;
-using Moda.Web.Api.Models.Ppm.Portfolios;
+﻿using Wayd.Common.Application.Models;
+using Wayd.ProjectPortfolioManagement.Application.Portfolios.Command;
+using Wayd.ProjectPortfolioManagement.Application.Portfolios.Dtos;
+using Wayd.ProjectPortfolioManagement.Application.Portfolios.Queries;
+using Wayd.ProjectPortfolioManagement.Application.Programs.Dtos;
+using Wayd.ProjectPortfolioManagement.Application.Programs.Queries;
+using Wayd.ProjectPortfolioManagement.Application.Projects.Dtos;
+using Wayd.ProjectPortfolioManagement.Application.Projects.Queries;
+using Wayd.ProjectPortfolioManagement.Application.StrategicInitiatives.Dtos;
+using Wayd.ProjectPortfolioManagement.Application.StrategicInitiatives.Queries;
+using Wayd.ProjectPortfolioManagement.Domain.Enums;
+using Wayd.Web.Api.Extensions;
+using Wayd.Web.Api.Models.Ppm.Portfolios;
 
-namespace Moda.Web.Api.Controllers.Ppm;
+namespace Wayd.Web.Api.Controllers.Ppm;
 
 [Route("api/ppm/[controller]")]
 [ApiVersionNeutral]

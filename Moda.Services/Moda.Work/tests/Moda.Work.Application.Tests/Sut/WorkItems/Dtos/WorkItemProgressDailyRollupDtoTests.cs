@@ -1,9 +1,9 @@
-﻿using Moda.Common.Domain.Enums.Work;
-using Moda.Work.Application.WorkItems.Dtos;
+﻿using Wayd.Common.Domain.Enums.Work;
+using Wayd.Work.Application.WorkItems.Dtos;
 using NodaTime;
 using Xunit;
 
-namespace Moda.Work.Application.Tests.Sut.WorkItems.Dtos;
+namespace Wayd.Work.Application.Tests.Sut.WorkItems.Dtos;
 
 public sealed class WorkItemProgressDailyRollupDtoTests
 {

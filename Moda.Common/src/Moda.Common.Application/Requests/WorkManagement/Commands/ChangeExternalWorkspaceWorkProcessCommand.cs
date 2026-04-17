@@ -1,4 +1,4 @@
-namespace Moda.Common.Application.Requests.WorkManagement.Commands;
+namespace Wayd.Common.Application.Requests.WorkManagement.Commands;
 
 /// <summary>
 /// Changes the work process assigned to an externally-managed workspace.

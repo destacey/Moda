@@ -1,4 +1,4 @@
-﻿namespace Moda.Common.Application.Validators;
+﻿namespace Wayd.Common.Application.Validators;
 
 public sealed class AzdoIterationMetadataValidator : CustomValidator<AzdoIterationMetadata>
 {

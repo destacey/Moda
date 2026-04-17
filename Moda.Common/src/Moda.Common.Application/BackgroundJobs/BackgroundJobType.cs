@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Moda.Common.Application.BackgroundJobs;
+namespace Wayd.Common.Application.BackgroundJobs;
 
 public enum BackgroundJobType
 {

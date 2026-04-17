@@ -3,7 +3,7 @@ using Mapster;
 using Mapster.Utils;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Moda.Organization.Application;
+namespace Wayd.Organization.Application;
 
 public static class ConfigureServices
 {

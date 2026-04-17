@@ -1,7 +1,7 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
 
-namespace Moda.Common.Domain.Models;
+namespace Wayd.Common.Domain.Models;
 
 /// <summary>
 /// Lightweight instance wrapper around a metadata collection that delegates behavior to <see cref="MetadataManager{TMetadata}"/>.

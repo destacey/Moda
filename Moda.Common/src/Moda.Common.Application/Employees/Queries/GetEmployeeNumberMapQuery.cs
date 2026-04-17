@@ -1,8 +1,8 @@
 ﻿using Mapster;
-using Moda.Common.Application.Persistence;
-using Moda.Common.Domain.Employees;
+using Wayd.Common.Application.Persistence;
+using Wayd.Common.Domain.Employees;
 
-namespace Moda.Common.Application.Employees.Queries;
+namespace Wayd.Common.Application.Employees.Queries;
 
 public sealed record GetEmployeeNumberMapQuery : IQuery<IReadOnlyList<EmployeeNumberMapDto>>
 {

@@ -1,11 +1,11 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
-using Moda.Common.Domain.Data;
-using Moda.Common.Extensions;
-using Moda.Common.Models;
+using Wayd.Common.Domain.Data;
+using Wayd.Common.Extensions;
+using Wayd.Common.Models;
 using NodaTime;
 
-namespace Moda.Common.Domain.Employees;
+namespace Wayd.Common.Domain.Employees;
 
 public sealed class Employee : BaseSoftDeletableEntity, IActivatable, IHasIdAndKey
 {

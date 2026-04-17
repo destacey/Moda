@@ -1,4 +1,4 @@
-﻿namespace Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Commands.Kpis;
+﻿namespace Wayd.ProjectPortfolioManagement.Application.StrategicInitiatives.Commands.Kpis;
 
 public sealed record DeleteStrategicInitiativeKpiCommand(Guid StrategicInitiativeId, Guid KpiId) : ICommand;
 

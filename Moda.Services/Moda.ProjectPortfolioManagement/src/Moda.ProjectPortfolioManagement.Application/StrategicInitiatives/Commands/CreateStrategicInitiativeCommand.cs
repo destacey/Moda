@@ -1,7 +1,7 @@
-﻿using Moda.Common.Application.Models;
-using Moda.ProjectPortfolioManagement.Domain.Enums;
+﻿using Wayd.Common.Application.Models;
+using Wayd.ProjectPortfolioManagement.Domain.Enums;
 
-namespace Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Commands;
+namespace Wayd.ProjectPortfolioManagement.Application.StrategicInitiatives.Commands;
 
 public sealed record CreateStrategicInitiativeCommand(string Name, string Description, LocalDateRange DateRange, Guid PortfolioId, List<Guid>? SponsorIds, List<Guid>? OwnerIds) : ICommand<ObjectIdAndKey>;
 

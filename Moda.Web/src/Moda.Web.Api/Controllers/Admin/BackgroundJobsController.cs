@@ -1,11 +1,11 @@
 ﻿using System.Linq.Expressions;
-using Moda.Common.Application.BackgroundJobs;
-using Moda.Common.Application.Enums;
-using Moda.Web.Api.Extensions;
-using Moda.Web.Api.Interfaces;
-using Moda.Web.Api.Models.Admin;
+using Wayd.Common.Application.BackgroundJobs;
+using Wayd.Common.Application.Enums;
+using Wayd.Web.Api.Extensions;
+using Wayd.Web.Api.Interfaces;
+using Wayd.Web.Api.Models.Admin;
 
-namespace Moda.Web.Api.Controllers.Admin;
+namespace Wayd.Web.Api.Controllers.Admin;
 
 [Route("api/admin/background-jobs")]
 [ApiVersionNeutral]

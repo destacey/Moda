@@ -1,8 +1,8 @@
 using FluentAssertions;
-using Moda.Tests.Shared;
-using Moda.Work.Domain.Tests.Data;
+using Wayd.Tests.Shared;
+using Wayd.Work.Domain.Tests.Data;
 
-namespace Moda.Work.Domain.Tests.Sut.Models;
+namespace Wayd.Work.Domain.Tests.Sut.Models;
 
 public class WorkspaceTests
 {

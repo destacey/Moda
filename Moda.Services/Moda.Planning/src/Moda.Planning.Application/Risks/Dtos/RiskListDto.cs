@@ -1,8 +1,8 @@
-﻿using Moda.Common.Application.Employees.Dtos;
-using Moda.Common.Extensions;
-using Moda.Planning.Application.Models;
+﻿using Wayd.Common.Application.Employees.Dtos;
+using Wayd.Common.Extensions;
+using Wayd.Planning.Application.Models;
 
-namespace Moda.Planning.Application.Risks.Dtos;
+namespace Wayd.Planning.Application.Risks.Dtos;
 
 public class RiskListDto : IMapFrom<Risk>
 {

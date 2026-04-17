@@ -1,8 +1,8 @@
 ﻿using CSharpFunctionalExtensions;
-using Moda.Organization.Domain.Enums;
+using Wayd.Organization.Domain.Enums;
 using NodaTime;
 
-namespace Moda.Organization.Domain.Models;
+namespace Wayd.Organization.Domain.Models;
 
 /// <summary>
 /// Represents the operating model for a team, defining how the team works

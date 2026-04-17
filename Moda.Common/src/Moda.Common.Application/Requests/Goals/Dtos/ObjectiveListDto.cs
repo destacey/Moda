@@ -1,8 +1,8 @@
 ﻿using Mapster;
-using Moda.Common.Application.Dtos;
-using Moda.Common.Domain.Models.Goals;
+using Wayd.Common.Application.Dtos;
+using Wayd.Common.Domain.Models.Goals;
 
-namespace Moda.Common.Application.Requests.Goals.Dtos;
+namespace Wayd.Common.Application.Requests.Goals.Dtos;
 
 public sealed record ObjectiveListDto : IMapFrom<Objective>
 {

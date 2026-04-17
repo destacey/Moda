@@ -1,9 +1,9 @@
-﻿using Moda.Web.Api.Extensions;
-using Moda.Web.Api.Models.Work.WorkTypes;
-using Moda.Work.Application.WorkTypes.Dtos;
-using Moda.Work.Application.WorkTypes.Queries;
+﻿using Wayd.Web.Api.Extensions;
+using Wayd.Web.Api.Models.Work.WorkTypes;
+using Wayd.Work.Application.WorkTypes.Dtos;
+using Wayd.Work.Application.WorkTypes.Queries;
 
-namespace Moda.Web.Api.Controllers.Work;
+namespace Wayd.Web.Api.Controllers.Work;
 
 [Route("api/work/work-types")]
 [ApiVersionNeutral]

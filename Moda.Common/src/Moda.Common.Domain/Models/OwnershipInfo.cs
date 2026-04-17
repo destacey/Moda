@@ -1,10 +1,10 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
-using Moda.Common.Domain.Enums;
-using Moda.Common.Domain.Enums.AppIntegrations;
-using Moda.Common.Extensions;
+using Wayd.Common.Domain.Enums;
+using Wayd.Common.Domain.Enums.AppIntegrations;
+using Wayd.Common.Extensions;
 
-namespace Moda.Common.Domain.Models;
+namespace Wayd.Common.Domain.Models;
 
 public sealed class OwnershipInfo : ValueObject
 {

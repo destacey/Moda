@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Moda.ProjectPortfolioManagement.Application.Portfolios.Dtos;
+namespace Wayd.ProjectPortfolioManagement.Application.Portfolios.Dtos;
 
 public sealed record ProjectPortfolioStatusDto
 {

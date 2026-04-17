@@ -1,6 +1,6 @@
-﻿using Moda.Common.Domain.Interfaces.Organization;
+﻿using Wayd.Common.Domain.Interfaces.Organization;
 
-namespace Moda.Organization.Application.Teams.Queries;
+namespace Wayd.Organization.Application.Teams.Queries;
 
 public sealed record GetSimpleTeamsQuery() : IQuery<List<ISimpleTeam>>;
 

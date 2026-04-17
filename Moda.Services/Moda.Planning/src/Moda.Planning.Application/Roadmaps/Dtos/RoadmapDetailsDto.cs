@@ -1,8 +1,8 @@
-﻿using Moda.Common.Application.Dtos;
-using Moda.Common.Application.Employees.Dtos;
-using Moda.Planning.Domain.Models.Roadmaps;
+﻿using Wayd.Common.Application.Dtos;
+using Wayd.Common.Application.Employees.Dtos;
+using Wayd.Planning.Domain.Models.Roadmaps;
 
-namespace Moda.Planning.Application.Roadmaps.Dtos;
+namespace Wayd.Planning.Application.Roadmaps.Dtos;
 
 public sealed record RoadmapDetailsDto : IMapFrom<Roadmap>
 {

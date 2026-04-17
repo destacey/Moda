@@ -1,6 +1,6 @@
-﻿using Moda.Work.Application.Persistence;
+﻿using Wayd.Work.Application.Persistence;
 
-namespace Moda.Work.Application.WorkTypeLevels.Commands;
+namespace Wayd.Work.Application.WorkTypeLevels.Commands;
 
 public sealed record UpdateWorkTypeLevelCommand : ICommand
 {

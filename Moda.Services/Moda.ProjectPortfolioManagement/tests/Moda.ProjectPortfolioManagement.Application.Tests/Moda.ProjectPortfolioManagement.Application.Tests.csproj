@@ -23,11 +23,11 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\..\Moda.Common\src\Moda.Common.Domain\Moda.Common.Domain.csproj" />
-        <ProjectReference Include="..\..\..\..\Moda.Common\tests\Moda.Tests.Shared\Moda.Tests.Shared.csproj" />
-        <ProjectReference Include="..\Moda.ProjectPortfolioManagement.Domain.Tests\Moda.ProjectPortfolioManagement.Domain.Tests.csproj" />
-        <ProjectReference Include="..\..\src\Moda.ProjectPortfolioManagement.Application\Moda.ProjectPortfolioManagement.Application.csproj" />
-        <ProjectReference Include="..\..\..\..\Moda.Common\tests\Moda.Common.Domain.Tests\Moda.Common.Domain.Tests.csproj" />
+        <ProjectReference Include="..\..\..\..\Wayd.Common\src\Wayd.Common.Domain\Wayd.Common.Domain.csproj" />
+        <ProjectReference Include="..\..\..\..\Wayd.Common\tests\Wayd.Tests.Shared\Wayd.Tests.Shared.csproj" />
+        <ProjectReference Include="..\Wayd.ProjectPortfolioManagement.Domain.Tests\Wayd.ProjectPortfolioManagement.Domain.Tests.csproj" />
+        <ProjectReference Include="..\..\src\Wayd.ProjectPortfolioManagement.Application\Wayd.ProjectPortfolioManagement.Application.csproj" />
+        <ProjectReference Include="..\..\..\..\Wayd.Common\tests\Wayd.Common.Domain.Tests\Wayd.Common.Domain.Tests.csproj" />
     </ItemGroup>
 
     <ItemGroup>

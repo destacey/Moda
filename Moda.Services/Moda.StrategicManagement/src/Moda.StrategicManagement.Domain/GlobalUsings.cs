@@ -1,4 +1,4 @@
-﻿global using Moda.Common.Domain.Data;
-global using Moda.Common.Domain.Interfaces;
-global using Moda.Common.Extensions;
-global using Moda.Common.Models;
+﻿global using Wayd.Common.Domain.Data;
+global using Wayd.Common.Domain.Interfaces;
+global using Wayd.Common.Extensions;
+global using Wayd.Common.Models;

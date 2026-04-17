@@ -1,7 +1,7 @@
-﻿using Moda.Common.Domain.Models;
+﻿using Wayd.Common.Domain.Models;
 using NodaTime;
 
-namespace Moda.Organization.Domain.Models;
+namespace Wayd.Organization.Domain.Models;
 
 public sealed record TeamDeactivatableArgs : DeactivatableArgs
 {

@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Moda.Common.Application.Events;
-using Moda.Common.Domain.Enums;
-using Moda.Common.Domain.Events;
+using Wayd.Common.Application.Events;
+using Wayd.Common.Domain.Enums;
+using Wayd.Common.Domain.Events;
 using Serilog.Context;
 
-namespace Moda.AppIntegration.Application.Connections.EventHandlers;
+namespace Wayd.AppIntegration.Application.Connections.EventHandlers;
 
 internal sealed class UpdateIntegrationStateChangedEventHandler(IAppIntegrationDbContext appIntegrationDbContext, ILogger<UpdateIntegrationStateChangedEventHandler> logger) : IEventNotificationHandler<IntegrationStateChangedEvent<Guid>>
 {

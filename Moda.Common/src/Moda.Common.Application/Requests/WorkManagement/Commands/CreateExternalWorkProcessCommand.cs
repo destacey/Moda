@@ -1,9 +1,9 @@
-﻿using Moda.Common.Application.Interfaces.ExternalWork;
-using Moda.Common.Application.Requests.WorkManagement.Interfaces;
-using Moda.Common.Application.Validators;
-using Moda.Common.Domain.Models;
+﻿using Wayd.Common.Application.Interfaces.ExternalWork;
+using Wayd.Common.Application.Requests.WorkManagement.Interfaces;
+using Wayd.Common.Application.Validators;
+using Wayd.Common.Domain.Models;
 
-namespace Moda.Common.Application.Requests.WorkManagement.Commands;
+namespace Wayd.Common.Application.Requests.WorkManagement.Commands;
 
 public sealed record CreateExternalWorkProcessCommand(IExternalWorkProcessConfiguration ExternalWorkProcess, IEnumerable<ICreateWorkProcessScheme> WorkProcessSchemes) : ICommand<IntegrationState<Guid>>;
 

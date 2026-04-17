@@ -1,7 +1,7 @@
-using Moda.Common.Application.Identity.Users;
-using Moda.Planning.Domain.Models.PlanningPoker;
+using Wayd.Common.Application.Identity.Users;
+using Wayd.Planning.Domain.Models.PlanningPoker;
 
-namespace Moda.Planning.Application.PokerSessions.Dtos;
+namespace Wayd.Planning.Application.PokerSessions.Dtos;
 
 public sealed record PokerVoteDto : IMapFrom<PokerVote>
 {

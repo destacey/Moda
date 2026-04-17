@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Moda.Common.Domain.Enums.Work;
+namespace Wayd.Common.Domain.Enums.Work;
 
 // max length of 32 characters
 public enum DependencyState

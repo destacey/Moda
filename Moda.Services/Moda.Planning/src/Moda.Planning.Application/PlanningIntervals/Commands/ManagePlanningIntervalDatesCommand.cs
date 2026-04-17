@@ -1,7 +1,7 @@
 ﻿using Ardalis.GuardClauses;
-using Moda.Planning.Application.PlanningIntervals.Dtos;
+using Wayd.Planning.Application.PlanningIntervals.Dtos;
 
-namespace Moda.Planning.Application.PlanningIntervals.Commands;
+namespace Wayd.Planning.Application.PlanningIntervals.Commands;
 
 public sealed record ManagePlanningIntervalDatesCommand : ICommand
 {

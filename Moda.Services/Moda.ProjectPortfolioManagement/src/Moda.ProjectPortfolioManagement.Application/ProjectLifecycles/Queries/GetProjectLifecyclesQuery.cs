@@ -1,7 +1,7 @@
-using Moda.ProjectPortfolioManagement.Application.ProjectLifecycles.Dtos;
-using Moda.ProjectPortfolioManagement.Domain.Enums;
+using Wayd.ProjectPortfolioManagement.Application.ProjectLifecycles.Dtos;
+using Wayd.ProjectPortfolioManagement.Domain.Enums;
 
-namespace Moda.ProjectPortfolioManagement.Application.ProjectLifecycles.Queries;
+namespace Wayd.ProjectPortfolioManagement.Application.ProjectLifecycles.Queries;
 
 public sealed record GetProjectLifecyclesQuery(ProjectLifecycleState? StateFilter = null) : IQuery<List<ProjectLifecycleListDto>>;
 

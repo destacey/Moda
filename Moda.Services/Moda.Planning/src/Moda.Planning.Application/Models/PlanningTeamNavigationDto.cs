@@ -1,7 +1,7 @@
-﻿using Moda.Common.Application.Dtos;
-using Moda.Common.Extensions;
+﻿using Wayd.Common.Application.Dtos;
+using Wayd.Common.Extensions;
 
-namespace Moda.Planning.Application.Models;
+namespace Wayd.Planning.Application.Models;
 
 public record PlanningTeamNavigationDto : NavigationDto, IMapFrom<PlanningTeam>
 {

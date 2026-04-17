@@ -1,6 +1,6 @@
-using Moda.Common.Application.Employees.Dtos;
+using Wayd.Common.Application.Employees.Dtos;
 
-namespace Moda.ProjectPortfolioManagement.Application.Projects.Dtos;
+namespace Wayd.ProjectPortfolioManagement.Application.Projects.Dtos;
 
 /// <summary>
 /// Represents a team member on a project with their roles, assigned phases, and active workload.

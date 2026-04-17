@@ -1,2 +1,2 @@
-﻿global using Moda.Common.Extensions;
-global using Moda.Common.Helpers;
+﻿global using Wayd.Common.Extensions;
+global using Wayd.Common.Helpers;

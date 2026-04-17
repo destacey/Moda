@@ -1,8 +1,8 @@
-﻿using Moda.Common.Application.Events;
-using Moda.Common.Domain.Enums;
-using Moda.Common.Domain.Events.Health;
+﻿using Wayd.Common.Application.Events;
+using Wayd.Common.Domain.Enums;
+using Wayd.Common.Domain.Events.Health;
 
-namespace Moda.Planning.Application.PlanningHealthChecks.EventHandlers;
+namespace Wayd.Planning.Application.PlanningHealthChecks.EventHandlers;
 
 internal sealed class ObjectiveHealthCheckEventHandler(IPlanningDbContext planningDbContext, ILogger<ObjectiveHealthCheckEventHandler> logger) :
     IEventNotificationHandler<HealthCheckCreatedEvent>,

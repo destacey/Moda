@@ -1,8 +1,8 @@
-﻿using Moda.Common.Models;
-using Moda.Work.Application.Persistence;
-using Moda.Work.Application.WorkItems.Dtos;
+﻿using Wayd.Common.Models;
+using Wayd.Work.Application.Persistence;
+using Wayd.Work.Application.WorkItems.Dtos;
 
-namespace Moda.Work.Application.WorkItems.Queries;
+namespace Wayd.Work.Application.WorkItems.Queries;
 
 public sealed record GetChildWorkItemsQuery : IQuery<Result<IReadOnlyCollection<WorkItemListDto>>>
 {

@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Moda.Web.Api.Models.AppIntegrations.Connections;
+namespace Wayd.Web.Api.Models.AppIntegrations.Connections;
 
 [JsonDerivedType(typeof(CreateAzureDevOpsConnectionRequest), typeDiscriminator: "azure-devops")]
 [JsonDerivedType(typeof(CreateAzureOpenAIConnectionRequest), typeDiscriminator: "azure-openai")]

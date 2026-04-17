@@ -1,6 +1,6 @@
-﻿using Moda.Work.Domain.Extensions;
+﻿using Wayd.Work.Domain.Extensions;
 
-namespace Moda.Work.Domain.Tests.Sut.Extensions;
+namespace Wayd.Work.Domain.Tests.Sut.Extensions;
 
 public class StringExtensionsTests
 {

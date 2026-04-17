@@ -1,7 +1,7 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
 
-namespace Moda.Common.Domain.Models;
+namespace Wayd.Common.Domain.Models;
 
 public static class MetadataManager<TMetadata> where TMetadata : KeyValueObjectMetadata
 {

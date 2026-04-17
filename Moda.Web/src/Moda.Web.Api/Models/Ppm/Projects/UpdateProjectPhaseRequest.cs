@@ -1,8 +1,8 @@
-using Moda.ProjectPortfolioManagement.Application.Projects.Commands;
-using Moda.ProjectPortfolioManagement.Application.Projects.Dtos;
-using TaskStatus = Moda.ProjectPortfolioManagement.Domain.Enums.TaskStatus;
+using Wayd.ProjectPortfolioManagement.Application.Projects.Commands;
+using Wayd.ProjectPortfolioManagement.Application.Projects.Dtos;
+using TaskStatus = Wayd.ProjectPortfolioManagement.Domain.Enums.TaskStatus;
 
-namespace Moda.Web.Api.Models.Ppm.Projects;
+namespace Wayd.Web.Api.Models.Ppm.Projects;
 
 public sealed record UpdateProjectPhaseRequest
 {

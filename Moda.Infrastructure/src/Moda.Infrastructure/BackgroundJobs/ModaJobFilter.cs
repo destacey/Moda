@@ -4,7 +4,7 @@ using Hangfire.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Moda.Infrastructure.BackgroundJobs;
+namespace Wayd.Infrastructure.BackgroundJobs;
 
 public class ModaJobFilter : IClientFilter
 {

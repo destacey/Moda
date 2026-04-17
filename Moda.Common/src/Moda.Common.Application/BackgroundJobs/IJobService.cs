@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
 
-namespace Moda.Common.Application.BackgroundJobs;
+namespace Wayd.Common.Application.BackgroundJobs;
 
 public interface IJobService : IScopedService
 {

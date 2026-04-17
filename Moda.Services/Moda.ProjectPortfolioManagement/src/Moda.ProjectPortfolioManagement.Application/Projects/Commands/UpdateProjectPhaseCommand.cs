@@ -1,7 +1,7 @@
-﻿using Moda.ProjectPortfolioManagement.Domain.Enums;
-using TaskStatus = Moda.ProjectPortfolioManagement.Domain.Enums.TaskStatus;
+﻿using Wayd.ProjectPortfolioManagement.Domain.Enums;
+using TaskStatus = Wayd.ProjectPortfolioManagement.Domain.Enums.TaskStatus;
 
-namespace Moda.ProjectPortfolioManagement.Application.Projects.Commands;
+namespace Wayd.ProjectPortfolioManagement.Application.Projects.Commands;
 
 public sealed record UpdateProjectPhaseCommand(
     Guid ProjectId,

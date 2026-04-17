@@ -1,7 +1,7 @@
-﻿using Moda.Web.Api.Extensions;
-using Moda.Web.Api.Models.UserManagement.Users;
+﻿using Wayd.Web.Api.Extensions;
+using Wayd.Web.Api.Models.UserManagement.Users;
 
-namespace Moda.Web.Api.Controllers.UserManagement;
+namespace Wayd.Web.Api.Controllers.UserManagement;
 
 [Route("api/user-management/users")]
 [ApiVersionNeutral]

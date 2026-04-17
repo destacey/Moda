@@ -1,8 +1,8 @@
-﻿using Moda.Common.Application.Exceptions;
-using Moda.Work.Application.Persistence;
-using Moda.Work.Application.WorkStatuses.Dtos;
+﻿using Wayd.Common.Application.Exceptions;
+using Wayd.Work.Application.Persistence;
+using Wayd.Work.Application.WorkStatuses.Dtos;
 
-namespace Moda.Work.Application.WorkStatuses.Queries;
+namespace Wayd.Work.Application.WorkStatuses.Queries;
 
 public sealed record GetWorkStatusQuery : IQuery<WorkStatusDto?>
 {

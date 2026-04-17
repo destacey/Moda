@@ -1,4 +1,4 @@
-﻿namespace Moda.ProjectPortfolioManagement.Application.Portfolios.Command;
+﻿namespace Wayd.ProjectPortfolioManagement.Application.Portfolios.Command;
 
 public sealed record CloseProjectPortfolioCommand(Guid Id) : ICommand;
 

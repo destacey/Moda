@@ -1,9 +1,9 @@
 ﻿using Mapster;
 using Microsoft.EntityFrameworkCore;
-using Moda.Common.Application.Interfaces;
-using Moda.Health.Dtos;
+using Wayd.Common.Application.Interfaces;
+using Wayd.Health.Dtos;
 
-namespace Moda.Health.Queries;
+namespace Wayd.Health.Queries;
 
 public sealed record GetHealthChecksQuery(IEnumerable<Guid> Ids) : IQuery<IReadOnlyList<HealthCheckDto>>;
 

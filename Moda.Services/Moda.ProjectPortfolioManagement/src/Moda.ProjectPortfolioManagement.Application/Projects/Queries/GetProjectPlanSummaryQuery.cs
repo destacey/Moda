@@ -1,10 +1,10 @@
 ﻿using System.Linq.Expressions;
-using Moda.ProjectPortfolioManagement.Application.Projects.Dtos;
-using Moda.ProjectPortfolioManagement.Application.Projects.Models;
-using Moda.ProjectPortfolioManagement.Domain.Enums;
-using Moda.ProjectPortfolioManagement.Domain.Models;
+using Wayd.ProjectPortfolioManagement.Application.Projects.Dtos;
+using Wayd.ProjectPortfolioManagement.Application.Projects.Models;
+using Wayd.ProjectPortfolioManagement.Domain.Enums;
+using Wayd.ProjectPortfolioManagement.Domain.Models;
 
-namespace Moda.ProjectPortfolioManagement.Application.Projects.Queries;
+namespace Wayd.ProjectPortfolioManagement.Application.Projects.Queries;
 
 /// <summary>
 /// Returns summary metrics for a project's plan, computed from leaf tasks.

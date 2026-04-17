@@ -1,9 +1,9 @@
 ﻿using Mapster;
 using Microsoft.EntityFrameworkCore;
-using Moda.Common.Application.Interfaces;
-using Moda.Links.Models;
+using Wayd.Common.Application.Interfaces;
+using Wayd.Links.Models;
 
-namespace Moda.Links.Queries;
+namespace Wayd.Links.Queries;
 
 public sealed record GetLinkQuery(Guid LinkId) : IQuery<LinkDto?>;
 

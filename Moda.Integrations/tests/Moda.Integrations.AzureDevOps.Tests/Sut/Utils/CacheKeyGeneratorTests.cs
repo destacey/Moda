@@ -1,6 +1,6 @@
-using Moda.Integrations.AzureDevOps.Utils;
+using Wayd.Integrations.AzureDevOps.Utils;
 
-namespace Moda.Integrations.AzureDevOps.Tests.Sut.Utils;
+namespace Wayd.Integrations.AzureDevOps.Tests.Sut.Utils;
 
 /// <summary>
 /// Tests for CacheKeyGenerator, focusing on cache key optimization and consistency.

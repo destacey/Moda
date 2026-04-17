@@ -1,11 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Moda.Common.Domain.Enums.StrategicManagement;
-using Moda.Infrastructure.Persistence.Converters;
-using Moda.StrategicManagement.Domain.Enums;
-using Moda.StrategicManagement.Domain.Models;
+using Wayd.Common.Domain.Enums.StrategicManagement;
+using Wayd.Infrastructure.Persistence.Converters;
+using Wayd.StrategicManagement.Domain.Enums;
+using Wayd.StrategicManagement.Domain.Models;
 
-namespace Moda.Infrastructure.Persistence.Configuration;
+namespace Wayd.Infrastructure.Persistence.Configuration;
 
 public class StrategicThemeConfig : IEntityTypeConfiguration<StrategicTheme>
 {

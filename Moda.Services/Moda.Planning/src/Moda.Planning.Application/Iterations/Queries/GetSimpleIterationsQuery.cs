@@ -1,7 +1,7 @@
-﻿using Moda.Common.Domain.Interfaces.Planning.Iterations;
-using Moda.Planning.Application.Iterations.Dtos;
+﻿using Wayd.Common.Domain.Interfaces.Planning.Iterations;
+using Wayd.Planning.Application.Iterations.Dtos;
 
-namespace Moda.Planning.Application.Iterations.Queries;
+namespace Wayd.Planning.Application.Iterations.Queries;
 
 public sealed record GetSimpleIterationsQuery() : IQuery<List<ISimpleIteration>>;
 

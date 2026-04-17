@@ -1,9 +1,9 @@
 ﻿using MediatR;
-using Moda.Common.Application.Models;
-using Moda.Common.Application.Requests.Goals.Commands;
-using Moda.Common.Domain.Enums.Goals;
+using Wayd.Common.Application.Models;
+using Wayd.Common.Application.Requests.Goals.Commands;
+using Wayd.Common.Domain.Enums.Goals;
 
-namespace Moda.Planning.Application.PlanningIntervals.Commands;
+namespace Wayd.Planning.Application.PlanningIntervals.Commands;
 
 public sealed record CreatePlanningIntervalObjectiveCommand(Guid PlanningIntervalId, Guid TeamId, string Name, string? Description, LocalDate? StartDate, LocalDate? TargetDate, bool IsStretch, int? Order) : ICommand<ObjectIdAndKey>;
 

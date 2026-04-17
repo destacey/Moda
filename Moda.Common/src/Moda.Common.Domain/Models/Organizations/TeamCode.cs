@@ -1,8 +1,8 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
-using Moda.Common.Domain.Extensions.Organizations;
+using Wayd.Common.Domain.Extensions.Organizations;
 
-namespace Moda.Common.Domain.Models.Organizations;
+namespace Wayd.Common.Domain.Models.Organizations;
 
 public sealed class TeamCode : ValueObject
 {

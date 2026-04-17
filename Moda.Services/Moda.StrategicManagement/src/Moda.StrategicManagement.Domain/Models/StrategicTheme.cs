@@ -1,11 +1,11 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
-using Moda.Common.Domain.Enums.StrategicManagement;
-using Moda.Common.Domain.Events.StrategicManagement;
-using Moda.Common.Domain.Interfaces.StrategicManagement;
+using Wayd.Common.Domain.Enums.StrategicManagement;
+using Wayd.Common.Domain.Events.StrategicManagement;
+using Wayd.Common.Domain.Interfaces.StrategicManagement;
 using NodaTime;
 
-namespace Moda.StrategicManagement.Domain.Models;
+namespace Wayd.StrategicManagement.Domain.Models;
 
 /// <summary>
 /// Represents a high-level focus area or priority that guides related initiatives.

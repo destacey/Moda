@@ -1,8 +1,8 @@
 ﻿using Mapster;
-using Moda.Common.Application.Dtos;
+using Wayd.Common.Application.Dtos;
 using NodaTime;
 
-namespace Moda.Infrastructure.Identity;
+namespace Wayd.Infrastructure.Identity;
 
 public class IdentityMappingConfig : IRegister
 {

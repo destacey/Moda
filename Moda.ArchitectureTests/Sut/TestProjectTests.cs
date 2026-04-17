@@ -1,7 +1,7 @@
 using FluentAssertions;
-using Moda.ArchitectureTests.Helpers;
+using Wayd.ArchitectureTests.Helpers;
 
-namespace Moda.ArchitectureTests.Sut;
+namespace Wayd.ArchitectureTests.Sut;
 
 /// <summary>
 /// Tests to enforce test project naming and organization conventions.
@@ -13,16 +13,16 @@ namespace Moda.ArchitectureTests.Sut;
 /// Naming:
 /// - Test projects MUST end with ".Tests" or ".IntegrationTests"
 /// - Test project names should mirror source project names with ".Tests" suffix
-/// - Example: Moda.Work.Domain -> Moda.Work.Domain.Tests
-/// - Example: Moda.Work.Application -> Moda.Work.Application.Tests
+/// - Example: Wayd.Work.Domain -> Wayd.Work.Domain.Tests
+/// - Example: Wayd.Work.Application -> Wayd.Work.Application.Tests
 ///
 /// Project References:
 /// - Test projects SHOULD reference their corresponding source project
-/// - Example: Moda.Work.Domain.Tests should reference Moda.Work.Domain
+/// - Example: Wayd.Work.Domain.Tests should reference Wayd.Work.Domain
 ///
 /// Namespace Conventions:
 /// - Test namespaces should mirror source namespaces with .Tests suffix
-/// - Example: Moda.Work.Domain.Models -> Moda.Work.Domain.Tests.Sut.Models
+/// - Example: Wayd.Work.Domain.Models -> Wayd.Work.Domain.Tests.Sut.Models
 ///
 /// Location:
 /// - Test projects must be in a 'tests' folder (validated by FileStructureTests)
@@ -41,7 +41,7 @@ public class TestProjectTests
         var testProjectPaths = FileSystemHelper.GetAllTestProjectPaths();
 
         // Known exceptions: Shared test utilities projects
-        var exceptions = new[] { "Moda.Tests.Shared" };
+        var exceptions = new[] { "Wayd.Tests.Shared" };
 
         // Act
         var invalidTestProjects = testProjectPaths
@@ -57,7 +57,7 @@ public class TestProjectTests
 
         // Assert
         invalidTestProjects.Should().BeEmpty(
-            "All test projects should end with '.Tests' or '.IntegrationTests' (except shared test utilities like Moda.Tests.Shared). Invalid projects: {0}",
+            "All test projects should end with '.Tests' or '.IntegrationTests' (except shared test utilities like Wayd.Tests.Shared). Invalid projects: {0}",
             string.Join(", ", invalidTestProjects));
     }
 
@@ -228,11 +228,11 @@ public class TestProjectTests
     public void CommonTests_ShouldBeInCommonTestsFolder()
     {
         // Arrange
-        var commonTestsFolder = Path.Combine(SolutionRoot, "Moda.Common", "tests");
+        var commonTestsFolder = Path.Combine(SolutionRoot, "Wayd.Common", "tests");
 
         if (!Directory.Exists(commonTestsFolder))
         {
-            Assert.Fail("Moda.Common/tests folder should exist");
+            Assert.Fail("Wayd.Common/tests folder should exist");
             return;
         }
 
@@ -240,13 +240,13 @@ public class TestProjectTests
         var testProjects = Directory.GetFiles(commonTestsFolder, "*.csproj", SearchOption.AllDirectories);
 
         // Assert
-        testProjects.Should().NotBeEmpty("Moda.Common/tests should contain test projects");
+        testProjects.Should().NotBeEmpty("Wayd.Common/tests should contain test projects");
 
         foreach (var testProject in testProjects)
         {
             var projectName = Path.GetFileNameWithoutExtension(testProject);
-            (projectName.EndsWith(".Tests") || projectName == "Moda.Tests.Shared").Should().BeTrue(
-                "Test project {0} should end with '.Tests' or be 'Moda.Tests.Shared'", projectName);
+            (projectName.EndsWith(".Tests") || projectName == "Wayd.Tests.Shared").Should().BeTrue(
+                "Test project {0} should end with '.Tests' or be 'Wayd.Tests.Shared'", projectName);
         }
     }
 
@@ -254,7 +254,7 @@ public class TestProjectTests
     public void ServiceTests_ShouldBeOrganizedByService()
     {
         // Arrange
-        var servicesRoot = Path.Combine(SolutionRoot, "Moda.Services");
+        var servicesRoot = Path.Combine(SolutionRoot, "Wayd.Services");
 
         if (!Directory.Exists(servicesRoot))
         {
@@ -265,7 +265,7 @@ public class TestProjectTests
 
         // Act - Check each service has proper test organization
         var serviceFolders = Directory.GetDirectories(servicesRoot)
-            .Where(d => Path.GetFileName(d).StartsWith("Moda."));
+            .Where(d => Path.GetFileName(d).StartsWith("Wayd."));
 
         foreach (var serviceFolder in serviceFolders)
         {
@@ -306,7 +306,7 @@ public class TestProjectTests
         var projectsMissingXUnit = new List<string>();
 
         // Known exceptions: Shared test utilities projects don't need test frameworks
-        var exceptions = new[] { "Moda.Tests.Shared" };
+        var exceptions = new[] { "Wayd.Tests.Shared" };
 
         // Act
         foreach (var testProjectPath in allTestProjects)

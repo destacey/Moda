@@ -1,4 +1,4 @@
-﻿namespace Moda.Web.Api.Models.Work.WorkStatuses;
+﻿namespace Wayd.Web.Api.Models.Work.WorkStatuses;
 
 public sealed record CreateWorkStatusRequest
 {

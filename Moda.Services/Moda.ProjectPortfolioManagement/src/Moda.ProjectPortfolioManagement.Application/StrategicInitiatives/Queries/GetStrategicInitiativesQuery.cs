@@ -1,8 +1,8 @@
-﻿using Moda.Common.Application.Models;
-using Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Dtos;
-using Moda.ProjectPortfolioManagement.Domain.Enums;
+﻿using Wayd.Common.Application.Models;
+using Wayd.ProjectPortfolioManagement.Application.StrategicInitiatives.Dtos;
+using Wayd.ProjectPortfolioManagement.Domain.Enums;
 
-namespace Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Queries;
+namespace Wayd.ProjectPortfolioManagement.Application.StrategicInitiatives.Queries;
 
 /// <summary>
 /// Retrieves a list of strategic initiatives based on the provided filter.  Returns all strategic initiatives if no filter is provided.

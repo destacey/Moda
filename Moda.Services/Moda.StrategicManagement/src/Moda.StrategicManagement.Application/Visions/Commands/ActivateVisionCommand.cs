@@ -1,6 +1,6 @@
-﻿using Moda.StrategicManagement.Domain.Models;
+﻿using Wayd.StrategicManagement.Domain.Models;
 
-namespace Moda.StrategicManagement.Application.Visions.Commands;
+namespace Wayd.StrategicManagement.Application.Visions.Commands;
 
 public sealed record ActivateVisionCommand(Guid Id) : ICommand;
 

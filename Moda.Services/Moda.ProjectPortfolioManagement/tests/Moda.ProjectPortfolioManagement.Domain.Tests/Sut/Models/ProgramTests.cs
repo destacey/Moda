@@ -1,13 +1,13 @@
 ﻿using FluentAssertions;
-using Moda.Common.Models;
-using Moda.ProjectPortfolioManagement.Domain.Enums;
-using Moda.ProjectPortfolioManagement.Domain.Models;
-using Moda.ProjectPortfolioManagement.Domain.Tests.Data;
-using Moda.Tests.Shared;
+using Wayd.Common.Models;
+using Wayd.ProjectPortfolioManagement.Domain.Enums;
+using Wayd.ProjectPortfolioManagement.Domain.Models;
+using Wayd.ProjectPortfolioManagement.Domain.Tests.Data;
+using Wayd.Tests.Shared;
 using NodaTime.Extensions;
 using NodaTime.Testing;
 
-namespace Moda.ProjectPortfolioManagement.Domain.Tests.Sut.Models;
+namespace Wayd.ProjectPortfolioManagement.Domain.Tests.Sut.Models;
 
 public class ProgramTests
 {

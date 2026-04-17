@@ -1,7 +1,7 @@
-﻿using Moda.Common.Application.Requests.WorkManagement.Queries;
-using Moda.Work.Application.Persistence;
+﻿using Wayd.Common.Application.Requests.WorkManagement.Queries;
+using Wayd.Work.Application.Persistence;
 
-namespace Moda.Work.Application.Workspaces.Queries;
+namespace Wayd.Work.Application.Workspaces.Queries;
 
 internal sealed class WorkspaceKeyExistsQueryHandler(IWorkDbContext workDbContext) : IQueryHandler<WorkspaceKeyExistsQuery, bool>
 {

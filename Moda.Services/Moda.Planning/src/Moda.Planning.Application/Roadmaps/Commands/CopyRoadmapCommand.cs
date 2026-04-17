@@ -1,8 +1,8 @@
 ﻿using Ardalis.GuardClauses;
-using Moda.Common.Application.Models;
-using Moda.Common.Domain.Enums;
+using Wayd.Common.Application.Models;
+using Wayd.Common.Domain.Enums;
 
-namespace Moda.Planning.Application.Roadmaps.Commands;
+namespace Wayd.Planning.Application.Roadmaps.Commands;
 
 public sealed record CopyRoadmapCommand(Guid SourceRoadmapId, string Name, List<Guid> RoadmapManagerIds, Visibility Visibility) : ICommand<ObjectIdAndKey>;
 

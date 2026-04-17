@@ -1,9 +1,9 @@
 ﻿using Mapster;
-using Moda.Common.Application.Dtos;
-using Moda.Health.Models;
+using Wayd.Common.Application.Dtos;
+using Wayd.Health.Models;
 using NodaTime;
 
-namespace Moda.Health.Dtos;
+namespace Wayd.Health.Dtos;
 
 public sealed record HealthCheckDto : IMapFrom<HealthCheck>
 {

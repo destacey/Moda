@@ -1,8 +1,8 @@
-﻿using Moda.Common.Application.Requests.WorkManagement.Commands;
-using Moda.Common.Domain.Models;
-using Moda.Work.Application.Persistence;
+﻿using Wayd.Common.Application.Requests.WorkManagement.Commands;
+using Wayd.Common.Domain.Models;
+using Wayd.Work.Application.Persistence;
 
-namespace Moda.Work.Application.WorkProcesses.Commands;
+namespace Wayd.Work.Application.WorkProcesses.Commands;
 
 internal sealed class CreateExternalWorkProcessCommandHandler(IWorkDbContext workDbContext, IDateTimeProvider dateTimeProvider, ILogger<CreateExternalWorkProcessCommandHandler> logger) : ICommandHandler<CreateExternalWorkProcessCommand, IntegrationState<Guid>>
 {

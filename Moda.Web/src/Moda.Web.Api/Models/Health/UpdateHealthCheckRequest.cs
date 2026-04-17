@@ -1,8 +1,8 @@
-﻿using Moda.Common.Application.Interfaces;
-using Moda.Common.Domain.Enums;
-using Moda.Health.Commands;
+﻿using Wayd.Common.Application.Interfaces;
+using Wayd.Common.Domain.Enums;
+using Wayd.Health.Commands;
 
-namespace Moda.Web.Api.Models.Health;
+namespace Wayd.Web.Api.Models.Health;
 
 public class UpdateHealthCheckRequest
 {

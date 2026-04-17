@@ -1,4 +1,4 @@
-﻿namespace Moda.Planning.Application.Risks.Dtos;
+﻿namespace Wayd.Planning.Application.Risks.Dtos;
 
 public sealed record RiskCategoryDto
 {

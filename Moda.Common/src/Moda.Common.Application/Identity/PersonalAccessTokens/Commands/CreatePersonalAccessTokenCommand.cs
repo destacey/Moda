@@ -1,7 +1,7 @@
-using Moda.Common.Application.Persistence;
-using Moda.Common.Domain.Identity;
+using Wayd.Common.Application.Persistence;
+using Wayd.Common.Domain.Identity;
 
-namespace Moda.Common.Application.Identity.PersonalAccessTokens.Commands;
+namespace Wayd.Common.Application.Identity.PersonalAccessTokens.Commands;
 
 /// <summary>
 /// Command to create a new personal access token.

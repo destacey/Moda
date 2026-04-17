@@ -7,7 +7,7 @@ using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 
-namespace Moda.Infrastructure.OpenTelemetry;
+namespace Wayd.Infrastructure.OpenTelemetry;
 
 internal static class ConfigureServices
 {

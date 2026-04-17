@@ -1,4 +1,4 @@
-﻿namespace Moda.Common.Domain.Data;
+﻿namespace Wayd.Common.Domain.Data;
 
 public abstract class BaseAuditableEntity<TId> : BaseEntity<TId>, ISystemAuditable
 {

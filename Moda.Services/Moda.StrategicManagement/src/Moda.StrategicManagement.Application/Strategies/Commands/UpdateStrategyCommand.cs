@@ -1,7 +1,7 @@
-﻿using Moda.Common.Application.Models;
-using Moda.StrategicManagement.Domain.Enums;
+﻿using Wayd.Common.Application.Models;
+using Wayd.StrategicManagement.Domain.Enums;
 
-namespace Moda.StrategicManagement.Application.Strategies.Commands;
+namespace Wayd.StrategicManagement.Application.Strategies.Commands;
 
 public sealed record UpdateStrategyCommand(Guid Id, string Name, string Description, StrategyStatus Status, FlexibleDateRange? Dates) : ICommand;
 

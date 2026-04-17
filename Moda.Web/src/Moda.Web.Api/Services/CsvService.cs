@@ -1,8 +1,8 @@
 ﻿using System.Globalization;
 using CsvHelper;
-using Moda.Common.Application.Interfaces;
+using Wayd.Common.Application.Interfaces;
 
-namespace Moda.Web.Api.Services;
+namespace Wayd.Web.Api.Services;
 
 public class CsvService : ICsvService
 {

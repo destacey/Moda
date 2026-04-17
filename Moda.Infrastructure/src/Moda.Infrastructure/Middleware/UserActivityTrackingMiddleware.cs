@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 
-namespace Moda.Infrastructure.Middleware;
+namespace Wayd.Infrastructure.Middleware;
 
 public class UserActivityTrackingMiddleware(
     ICurrentUser currentUser,

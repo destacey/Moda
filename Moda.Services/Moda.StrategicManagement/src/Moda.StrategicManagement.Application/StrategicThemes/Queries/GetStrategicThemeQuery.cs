@@ -1,9 +1,9 @@
 ﻿using System.Linq.Expressions;
-using Moda.Common.Application.Models;
-using Moda.StrategicManagement.Application.StrategicThemes.Dtos;
-using Moda.StrategicManagement.Domain.Models;
+using Wayd.Common.Application.Models;
+using Wayd.StrategicManagement.Application.StrategicThemes.Dtos;
+using Wayd.StrategicManagement.Domain.Models;
 
-namespace Moda.StrategicManagement.Application.StrategicThemes.Queries;
+namespace Wayd.StrategicManagement.Application.StrategicThemes.Queries;
 
 /// <summary>
 /// Get a StrategicTheme by Id or Key

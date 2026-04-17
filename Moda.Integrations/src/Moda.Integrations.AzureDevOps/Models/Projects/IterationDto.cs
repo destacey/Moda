@@ -1,11 +1,11 @@
-﻿using Moda.Common.Application.Interfaces.ExternalWork;
-using Moda.Common.Application.Models;
-using Moda.Common.Domain.Enums.Planning;
-using Moda.Integrations.AzureDevOps.Models.Contracts;
-using Moda.Integrations.AzureDevOps.Utils;
+﻿using Wayd.Common.Application.Interfaces.ExternalWork;
+using Wayd.Common.Application.Models;
+using Wayd.Common.Domain.Enums.Planning;
+using Wayd.Integrations.AzureDevOps.Models.Contracts;
+using Wayd.Integrations.AzureDevOps.Utils;
 using NodaTime;
 
-namespace Moda.Integrations.AzureDevOps.Models.Projects;
+namespace Wayd.Integrations.AzureDevOps.Models.Projects;
 
 internal sealed record IterationDto
 {

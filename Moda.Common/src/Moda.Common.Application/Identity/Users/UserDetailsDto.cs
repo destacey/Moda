@@ -1,7 +1,7 @@
-﻿using Moda.Common.Application.Dtos;
-using Moda.Common.Application.Identity.Roles;
+﻿using Wayd.Common.Application.Dtos;
+using Wayd.Common.Application.Identity.Roles;
 
-namespace Moda.Common.Application.Identity.Users;
+namespace Wayd.Common.Application.Identity.Users;
 
 public sealed record UserDetailsDto
 {

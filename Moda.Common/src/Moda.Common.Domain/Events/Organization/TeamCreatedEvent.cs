@@ -1,9 +1,9 @@
-using Moda.Common.Domain.Enums.Organization;
-using Moda.Common.Domain.Interfaces.Organization;
-using Moda.Common.Domain.Models.Organizations;
+using Wayd.Common.Domain.Enums.Organization;
+using Wayd.Common.Domain.Interfaces.Organization;
+using Wayd.Common.Domain.Models.Organizations;
 using NodaTime;
 
-namespace Moda.Common.Domain.Events.Organization;
+namespace Wayd.Common.Domain.Events.Organization;
 
 public sealed record TeamCreatedEvent : DomainEvent, ISimpleTeam
 {

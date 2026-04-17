@@ -1,14 +1,14 @@
 ﻿using Microsoft.FeatureManagement.Mvc;
-using Moda.Common.Application.Models;
-using Moda.Common.Domain.FeatureManagement;
-using Moda.Planning.Application.PokerSessions.Commands;
-using Moda.Planning.Application.PokerSessions.Dtos;
-using Moda.Planning.Application.PokerSessions.Queries;
-using Moda.Planning.Domain.Enums;
-using Moda.Web.Api.Extensions;
-using Moda.Web.Api.Models.Planning.PokerSessions;
+using Wayd.Common.Application.Models;
+using Wayd.Common.Domain.FeatureManagement;
+using Wayd.Planning.Application.PokerSessions.Commands;
+using Wayd.Planning.Application.PokerSessions.Dtos;
+using Wayd.Planning.Application.PokerSessions.Queries;
+using Wayd.Planning.Domain.Enums;
+using Wayd.Web.Api.Extensions;
+using Wayd.Web.Api.Models.Planning.PokerSessions;
 
-namespace Moda.Web.Api.Controllers.Planning;
+namespace Wayd.Web.Api.Controllers.Planning;
 
 [Route("api/planning/poker-sessions")]
 [ApiVersionNeutral]

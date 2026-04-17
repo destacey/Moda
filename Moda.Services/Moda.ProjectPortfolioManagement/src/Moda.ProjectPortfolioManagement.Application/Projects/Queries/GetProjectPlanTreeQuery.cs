@@ -1,13 +1,13 @@
 ﻿using System.Linq.Expressions;
-using Moda.Common.Application.Dtos;
-using Moda.Common.Application.Employees.Dtos;
-using Moda.ProjectPortfolioManagement.Application.Projects.Dtos;
-using Moda.ProjectPortfolioManagement.Application.Projects.Models;
-using Moda.ProjectPortfolioManagement.Domain.Enums;
-using Moda.ProjectPortfolioManagement.Domain.Models;
-using Moda.ProjectPortfolioManagement.Domain.Services;
+using Wayd.Common.Application.Dtos;
+using Wayd.Common.Application.Employees.Dtos;
+using Wayd.ProjectPortfolioManagement.Application.Projects.Dtos;
+using Wayd.ProjectPortfolioManagement.Application.Projects.Models;
+using Wayd.ProjectPortfolioManagement.Domain.Enums;
+using Wayd.ProjectPortfolioManagement.Domain.Models;
+using Wayd.ProjectPortfolioManagement.Domain.Services;
 
-namespace Moda.ProjectPortfolioManagement.Application.Projects.Queries;
+namespace Wayd.ProjectPortfolioManagement.Application.Projects.Queries;
 
 public sealed record GetProjectPlanTreeQuery : IQuery<IReadOnlyList<ProjectPlanNodeDto>>
 {

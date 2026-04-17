@@ -2,22 +2,22 @@
 using FluentAssertions;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using Moda.AppIntegration.Application.Connections.Commands;
-using Moda.AppIntegration.Application.Connections.Commands.AzureDevOps;
-using Moda.AppIntegration.Application.Connections.Dtos.AzureDevOps;
-using Moda.AppIntegration.Application.Connections.Managers;
-using Moda.AppIntegration.Application.Connections.Queries.AzureDevOps;
-using Moda.Common.Application.Dtos;
-using Moda.Common.Application.Interfaces;
-using Moda.Common.Application.Interfaces.ExternalWork;
-using Moda.Common.Application.Requests.WorkManagement.Commands;
-using Moda.Common.Application.Requests.WorkManagement.Queries;
-using Moda.Common.Domain.Enums.AppIntegrations;
-using Moda.Common.Domain.Models;
+using Wayd.AppIntegration.Application.Connections.Commands;
+using Wayd.AppIntegration.Application.Connections.Commands.AzureDevOps;
+using Wayd.AppIntegration.Application.Connections.Dtos.AzureDevOps;
+using Wayd.AppIntegration.Application.Connections.Managers;
+using Wayd.AppIntegration.Application.Connections.Queries.AzureDevOps;
+using Wayd.Common.Application.Dtos;
+using Wayd.Common.Application.Interfaces;
+using Wayd.Common.Application.Interfaces.ExternalWork;
+using Wayd.Common.Application.Requests.WorkManagement.Commands;
+using Wayd.Common.Application.Requests.WorkManagement.Queries;
+using Wayd.Common.Domain.Enums.AppIntegrations;
+using Wayd.Common.Domain.Models;
 using Moq;
 using Moq.AutoMock;
 
-namespace Moda.AppIntegration.Application.Tests.Sut.Connections.Managers;
+namespace Wayd.AppIntegration.Application.Tests.Sut.Connections.Managers;
 
 public class AzureDevOpsInitManagerTests
 {

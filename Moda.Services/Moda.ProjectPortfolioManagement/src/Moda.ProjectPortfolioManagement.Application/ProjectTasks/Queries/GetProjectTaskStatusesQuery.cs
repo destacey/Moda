@@ -1,8 +1,8 @@
-using Moda.Common.Extensions;
-using Moda.ProjectPortfolioManagement.Application.ProjectTasks.Dtos;
-using TaskStatus = Moda.ProjectPortfolioManagement.Domain.Enums.TaskStatus;
+using Wayd.Common.Extensions;
+using Wayd.ProjectPortfolioManagement.Application.ProjectTasks.Dtos;
+using TaskStatus = Wayd.ProjectPortfolioManagement.Domain.Enums.TaskStatus;
 
-namespace Moda.ProjectPortfolioManagement.Application.ProjectTasks.Queries;
+namespace Wayd.ProjectPortfolioManagement.Application.ProjectTasks.Queries;
 
 public sealed record GetProjectTaskStatusesQuery : IQuery<IReadOnlyList<TaskStatusDto>> { }
 

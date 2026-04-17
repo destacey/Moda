@@ -1,8 +1,8 @@
-﻿using Moda.Common.Application.Events;
-using Moda.Common.Domain.Enums;
-using Moda.Common.Domain.Events.Organization;
+﻿using Wayd.Common.Application.Events;
+using Wayd.Common.Domain.Enums;
+using Wayd.Common.Domain.Events.Organization;
 
-namespace Moda.Planning.Application.PlanningTeams.EventHandlers;
+namespace Wayd.Planning.Application.PlanningTeams.EventHandlers;
 
 internal sealed class PlanningTeamChangeEventHandler :
     IEventNotificationHandler<TeamCreatedEvent>,

@@ -1,7 +1,7 @@
 ﻿using MediatR;
-using Moda.Common.Application.Requests.Goals.Commands;
+using Wayd.Common.Application.Requests.Goals.Commands;
 
-namespace Moda.Planning.Application.PlanningIntervals.Commands;
+namespace Wayd.Planning.Application.PlanningIntervals.Commands;
 
 public sealed record UpdatePlanningIntervalObjectivesOrderCommand(Guid PlanningIntervalId, Dictionary<Guid, int?> Objectives) : ICommand;
 

@@ -1,17 +1,17 @@
-﻿using Moda.Organization.Application.Models;
-using Moda.Organization.Application.TeamsOfTeams.Commands;
-using Moda.Organization.Application.TeamsOfTeams.Dtos;
-using Moda.Organization.Application.TeamsOfTeams.Queries;
-using Moda.Planning.Application.Risks.Dtos;
-using Moda.Planning.Application.Risks.Queries;
-using Moda.Web.Api.Extensions;
-using Moda.Web.Api.Models.Organizations;
-using Moda.Web.Api.Models.Organizations.TeamOfTeams;
-using Moda.Web.Api.Models.Organizations.Teams;
-using Moda.Web.Api.Models.Organizations.TeamsOfTeams;
-using Moda.Web.Api.Models.Planning.Risks;
+﻿using Wayd.Organization.Application.Models;
+using Wayd.Organization.Application.TeamsOfTeams.Commands;
+using Wayd.Organization.Application.TeamsOfTeams.Dtos;
+using Wayd.Organization.Application.TeamsOfTeams.Queries;
+using Wayd.Planning.Application.Risks.Dtos;
+using Wayd.Planning.Application.Risks.Queries;
+using Wayd.Web.Api.Extensions;
+using Wayd.Web.Api.Models.Organizations;
+using Wayd.Web.Api.Models.Organizations.TeamOfTeams;
+using Wayd.Web.Api.Models.Organizations.Teams;
+using Wayd.Web.Api.Models.Organizations.TeamsOfTeams;
+using Wayd.Web.Api.Models.Planning.Risks;
 
-namespace Moda.Web.Api.Controllers.Organizations;
+namespace Wayd.Web.Api.Controllers.Organizations;
 
 [Route("api/organization/teams-of-teams")]
 [ApiVersionNeutral]

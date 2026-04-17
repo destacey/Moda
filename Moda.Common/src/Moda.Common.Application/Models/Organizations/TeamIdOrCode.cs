@@ -1,9 +1,9 @@
 ﻿using System.Linq.Expressions;
-using Moda.Common.Domain.Interfaces.Organization;
-using Moda.Common.Domain.Models.Organizations;
+using Wayd.Common.Domain.Interfaces.Organization;
+using Wayd.Common.Domain.Models.Organizations;
 using OneOf;
 
-namespace Moda.Common.Application.Models.Organizations;
+namespace Wayd.Common.Application.Models.Organizations;
 
 public sealed class TeamIdOrCode : OneOfBase<Guid, TeamCode>
 {

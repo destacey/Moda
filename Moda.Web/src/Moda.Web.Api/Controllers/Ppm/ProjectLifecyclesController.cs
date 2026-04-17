@@ -1,11 +1,11 @@
-using Moda.ProjectPortfolioManagement.Application.ProjectLifecycles.Commands;
-using Moda.ProjectPortfolioManagement.Application.ProjectLifecycles.Dtos;
-using Moda.ProjectPortfolioManagement.Application.ProjectLifecycles.Queries;
-using Moda.ProjectPortfolioManagement.Domain.Enums;
-using Moda.Web.Api.Extensions;
-using Moda.Web.Api.Models.Ppm.ProjectLifecycles;
+using Wayd.ProjectPortfolioManagement.Application.ProjectLifecycles.Commands;
+using Wayd.ProjectPortfolioManagement.Application.ProjectLifecycles.Dtos;
+using Wayd.ProjectPortfolioManagement.Application.ProjectLifecycles.Queries;
+using Wayd.ProjectPortfolioManagement.Domain.Enums;
+using Wayd.Web.Api.Extensions;
+using Wayd.Web.Api.Models.Ppm.ProjectLifecycles;
 
-namespace Moda.Web.Api.Controllers.Ppm;
+namespace Wayd.Web.Api.Controllers.Ppm;
 
 [Route("api/ppm/project-lifecycles")]
 [ApiVersionNeutral]

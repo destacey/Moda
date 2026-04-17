@@ -3,11 +3,11 @@ using FluentValidation;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Moda.Common.Application.Interfaces;
-using Moda.Common.Application.Validation;
-using Moda.Links.Models;
+using Wayd.Common.Application.Interfaces;
+using Wayd.Common.Application.Validation;
+using Wayd.Links.Models;
 
-namespace Moda.Links.Commands;
+namespace Wayd.Links.Commands;
 
 public sealed record UpdateLinkCommand(Guid LinkId, string Name, string Url) : ICommand<LinkDto>;
 

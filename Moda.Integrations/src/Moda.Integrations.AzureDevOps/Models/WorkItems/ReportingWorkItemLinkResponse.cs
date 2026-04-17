@@ -1,9 +1,9 @@
-﻿using Moda.Common.Application.Interfaces.ExternalWork;
-using Moda.Common.Domain.Enums.Work;
-using Moda.Integrations.AzureDevOps.Models.Contracts;
+﻿using Wayd.Common.Application.Interfaces.ExternalWork;
+using Wayd.Common.Domain.Enums.Work;
+using Wayd.Integrations.AzureDevOps.Models.Contracts;
 using NodaTime;
 
-namespace Moda.Integrations.AzureDevOps.Models.WorkItems;
+namespace Wayd.Integrations.AzureDevOps.Models.WorkItems;
 
 internal sealed record ReportingWorkItemLinkResponse
 {

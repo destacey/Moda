@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
-namespace Moda.Common.Domain.Models;
+namespace Wayd.Common.Domain.Models;
 
 public sealed class IntegrationState<TId>
 {

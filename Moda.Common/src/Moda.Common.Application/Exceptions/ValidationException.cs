@@ -1,6 +1,6 @@
 ﻿using FluentValidation.Results;
 
-namespace Moda.Common.Application.Exceptions;
+namespace Wayd.Common.Application.Exceptions;
 
 public class ValidationException : Exception
 {

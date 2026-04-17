@@ -1,9 +1,9 @@
 using FluentAssertions;
-using Moda.AppIntegration.Domain.Interfaces;
-using Moda.AppIntegration.Domain.Models;
-using Moda.Tests.Shared;
+using Wayd.AppIntegration.Domain.Interfaces;
+using Wayd.AppIntegration.Domain.Models;
+using Wayd.Tests.Shared;
 
-namespace Moda.AppIntegration.Domain.Tests.Sut.Models;
+namespace Wayd.AppIntegration.Domain.Tests.Sut.Models;
 
 public class AzureDevOpsBoardsConnectionTests
 {

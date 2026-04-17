@@ -1,8 +1,8 @@
 using Mapster;
-using Moda.Common.Application.Identity.PersonalAccessTokens.Dtos;
-using Moda.Common.Application.Persistence;
+using Wayd.Common.Application.Identity.PersonalAccessTokens.Dtos;
+using Wayd.Common.Application.Persistence;
 
-namespace Moda.Common.Application.Identity.PersonalAccessTokens.Queries;
+namespace Wayd.Common.Application.Identity.PersonalAccessTokens.Queries;
 
 /// <summary>
 /// Query to get all personal access tokens for the current user.

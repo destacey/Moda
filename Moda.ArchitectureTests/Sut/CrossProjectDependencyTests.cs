@@ -1,8 +1,8 @@
 ﻿using FluentAssertions;
-using Moda.ArchitectureTests.Helpers;
+using Wayd.ArchitectureTests.Helpers;
 using NetArchTest.Rules;
 
-namespace Moda.ArchitectureTests.Sut;
+namespace Wayd.ArchitectureTests.Sut;
 
 /// <summary>
 /// Architecture tests to enforce Clean Architecture dependency rules.
@@ -13,29 +13,29 @@ namespace Moda.ArchitectureTests.Sut;
 ///
 /// Key Rules Enforced:
 ///
-/// Domain Layer (Moda.*.Domain):
+/// Domain Layer (Wayd.*.Domain):
 /// - Must NOT depend on Application, Infrastructure, Web, or Integrations
-/// - Can only depend on Moda.Common and Moda.Common.Domain
+/// - Can only depend on Wayd.Common and Wayd.Common.Domain
 /// - Should contain only entities, value objects, domain events, and business logic
 ///
-/// Application Layer (Moda.*.Application):
+/// Application Layer (Wayd.*.Application):
 /// - Must NOT depend on Infrastructure, Web, or Integrations
 /// - Should ONLY depend on its own Domain layer (not other service Domain layers)
-/// - Can depend on Moda.Common, Moda.Common.Domain, and Moda.Common.Application
+/// - Can depend on Wayd.Common, Wayd.Common.Domain, and Wayd.Common.Application
 /// - Should contain commands, queries, DTOs, and application logic
 ///
 /// Common Layers:
-/// - Moda.Common.Domain must NOT depend on Moda.Common.Application
-/// - Moda.Common and Moda.Common.Domain must NOT depend on Infrastructure
-/// - Moda.Common.Application must NOT depend on Infrastructure
+/// - Wayd.Common.Domain must NOT depend on Wayd.Common.Application
+/// - Wayd.Common and Wayd.Common.Domain must NOT depend on Infrastructure
+/// - Wayd.Common.Application must NOT depend on Infrastructure
 ///
-/// Infrastructure Layer (Moda.*.Infrastructure):
+/// Infrastructure Layer (Wayd.*.Infrastructure):
 /// - Must NOT depend on Web layer
 /// - Can depend on Application, Domain, and Common layers
 ///
-/// Integration Layer (Moda.Integrations.*):
+/// Integration Layer (Wayd.Integrations.*):
 /// - Must NOT depend on Infrastructure, Web, or any Service layers
-/// - Should ONLY depend on Moda.Common layers (Moda.Common, Moda.Common.Domain, Moda.Common.Application)
+/// - Should ONLY depend on Wayd.Common layers (Wayd.Common, Wayd.Common.Domain, Wayd.Common.Application)
 /// - Should contain external system integration logic (Azure DevOps, Microsoft Graph, etc.)
 ///
 /// Service Isolation:
@@ -44,7 +44,7 @@ namespace Moda.ArchitectureTests.Sut;
 /// - Service Application projects must NOT depend on other service Application projects
 /// - Service Application projects must NOT depend on other service Domain projects
 /// - The Organization.Domain cross-cutting dependency is a known issue that needs to be resolved
-/// - All cross-service dependencies should be moved to Moda.Common layers
+/// - All cross-service dependencies should be moved to Wayd.Common layers
 ///
 /// Web Layer (not tested here, but allowed to depend on all layers)
 /// </summary>
@@ -97,7 +97,7 @@ public class CrossProjectDependencyTests
         // Act
         var result = domainAssemblies
             .ShouldNot()
-            .HaveDependencyOn("Moda.Web")
+            .HaveDependencyOn("Wayd.Web")
             .GetResult();
 
         // Assert
@@ -117,18 +117,18 @@ public class CrossProjectDependencyTests
             .That()
             .ResideInNamespace("Moda")
             .And()
-            .DoNotResideInNamespace("Moda.Common.Domain")
+            .DoNotResideInNamespace("Wayd.Common.Domain")
             .ShouldNot()
             .HaveDependencyOnAll(
-                "Moda.Common.Application",
-                "Moda.Infrastructure",
-                "Moda.Integrations",
-                "Moda.Web")
+                "Wayd.Common.Application",
+                "Wayd.Infrastructure",
+                "Wayd.Integrations",
+                "Wayd.Web")
             .GetResult();
 
         // Assert
         result.IsSuccessful.Should().BeTrue(
-            "Domain projects should only depend on Moda.Common and Moda.Common.Domain (not Application/Infrastructure/Integrations/Web). Violating types: {0}",
+            "Domain projects should only depend on Wayd.Common and Wayd.Common.Domain (not Application/Infrastructure/Integrations/Web). Violating types: {0}",
             string.Join(", ", result.FailingTypes ?? []));
     }
 
@@ -163,7 +163,7 @@ public class CrossProjectDependencyTests
         // Act
         var result = applicationAssemblies
             .ShouldNot()
-            .HaveDependencyOn("Moda.Web")
+            .HaveDependencyOn("Wayd.Web")
             .GetResult();
 
         // Assert
@@ -181,7 +181,7 @@ public class CrossProjectDependencyTests
         // Act
         var result = applicationAssemblies
             .ShouldNot()
-            .HaveDependencyOn("Moda.Integrations")
+            .HaveDependencyOn("Wayd.Integrations")
             .GetResult();
 
         // Assert
@@ -204,7 +204,7 @@ public class CrossProjectDependencyTests
         // Act
         var result = Types.InAssemblies(infrastructureAssemblies)
             .ShouldNot()
-            .HaveDependencyOn("Moda.Web")
+            .HaveDependencyOn("Wayd.Web")
             .GetResult();
 
         // Assert
@@ -227,13 +227,13 @@ public class CrossProjectDependencyTests
         var result = Types.InAssemblies(integrationAssemblies)
             .ShouldNot()
             .HaveDependencyOnAll(
-                "Moda.Infrastructure",
-                "Moda.Web")
+                "Wayd.Infrastructure",
+                "Wayd.Web")
             .GetResult();
 
         // Assert
         result.IsSuccessful.Should().BeTrue(
-            "Integration projects should only depend on Moda.Common layers (not Infrastructure, Web, or Service layers). Violating types: {0}",
+            "Integration projects should only depend on Wayd.Common layers (not Infrastructure, Web, or Service layers). Violating types: {0}",
             string.Join(", ", result.FailingTypes ?? []));
     }
 
@@ -313,18 +313,18 @@ public class CrossProjectDependencyTests
     public void CommonDomain_ShouldNotDependOnCommonApplication()
     {
         // Arrange
-        var assembly = typeof(Moda.Common.Domain.Events.DomainEvent).Assembly;
+        var assembly = typeof(Wayd.Common.Domain.Events.DomainEvent).Assembly;
         var types = Types.InAssembly(assembly);
 
         // Act
         var result = types
             .ShouldNot()
-            .HaveDependencyOn("Moda.Common.Application")
+            .HaveDependencyOn("Wayd.Common.Application")
             .GetResult();
 
         // Assert
         result.IsSuccessful.Should().BeTrue(
-            "Moda.Common.Domain should not depend on Moda.Common.Application. Violating types: {0}",
+            "Wayd.Common.Domain should not depend on Wayd.Common.Application. Violating types: {0}",
             string.Join(", ", result.FailingTypes ?? []));
     }
 
@@ -332,7 +332,7 @@ public class CrossProjectDependencyTests
     public void CommonDomain_ShouldNotDependOnInfrastructure()
     {
         // Arrange
-        var assembly = typeof(Moda.Common.Domain.Events.DomainEvent).Assembly;
+        var assembly = typeof(Wayd.Common.Domain.Events.DomainEvent).Assembly;
         var types = Types.InAssembly(assembly);
 
         // Act
@@ -343,7 +343,7 @@ public class CrossProjectDependencyTests
 
         // Assert
         result.IsSuccessful.Should().BeTrue(
-            "Moda.Common.Domain should not depend on Infrastructure. Violating types: {0}",
+            "Wayd.Common.Domain should not depend on Infrastructure. Violating types: {0}",
             string.Join(", ", result.FailingTypes ?? []));
     }
 
@@ -351,7 +351,7 @@ public class CrossProjectDependencyTests
     public void CommonApplication_ShouldNotDependOnInfrastructure()
     {
         // Arrange
-        var assembly = typeof(Moda.Common.Application.Persistence.IModaDbContext).Assembly;
+        var assembly = typeof(Wayd.Common.Application.Persistence.IModaDbContext).Assembly;
         var types = Types.InAssembly(assembly);
 
         // Act
@@ -362,7 +362,7 @@ public class CrossProjectDependencyTests
 
         // Assert
         result.IsSuccessful.Should().BeTrue(
-            "Moda.Common.Application should not depend on Infrastructure. Violating types: {0}",
+            "Wayd.Common.Application should not depend on Infrastructure. Violating types: {0}",
             string.Join(", ", result.FailingTypes ?? []));
     }
 
@@ -469,7 +469,7 @@ public class CrossProjectDependencyTests
 
         foreach (var serviceApplication in allServiceApplications)
         {
-            // Extract the service name (e.g., "Moda.Work" from "Moda.Work.Application")
+            // Extract the service name (e.g., "Wayd.Work" from "Wayd.Work.Application")
             var applicationName = serviceApplication.GetName().Name!;
             var serviceName = applicationName.Replace(".Application", "");
             var ownDomainName = serviceName + ".Domain";

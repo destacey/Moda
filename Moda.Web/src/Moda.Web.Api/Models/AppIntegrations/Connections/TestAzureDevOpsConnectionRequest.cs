@@ -1,4 +1,4 @@
-﻿namespace Moda.Web.Api.Models.AppIntegrations.Connections;
+﻿namespace Wayd.Web.Api.Models.AppIntegrations.Connections;
 
 public class TestAzureDevOpsConnectionRequest
 {

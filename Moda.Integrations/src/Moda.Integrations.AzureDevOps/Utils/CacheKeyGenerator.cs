@@ -2,7 +2,7 @@ using System.Collections.Concurrent;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Moda.Integrations.AzureDevOps.Utils;
+namespace Wayd.Integrations.AzureDevOps.Utils;
 
 /// <summary>
 /// Generates cache keys for Azure DevOps resources with optimized performance.

@@ -1,7 +1,7 @@
-﻿using Moda.Work.Application.WorkStatusCategories.Dtos;
-using Moda.Work.Application.WorkStatusCategories.Queries;
+﻿using Wayd.Work.Application.WorkStatusCategories.Dtos;
+using Wayd.Work.Application.WorkStatusCategories.Queries;
 
-namespace Moda.Web.Api.Controllers.Work;
+namespace Wayd.Web.Api.Controllers.Work;
 
 [Route("api/work/work-status-categories")]
 [ApiVersionNeutral]

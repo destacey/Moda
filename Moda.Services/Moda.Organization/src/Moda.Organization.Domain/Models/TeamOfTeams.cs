@@ -1,16 +1,16 @@
 ﻿using CSharpFunctionalExtensions;
-using Moda.Common.Domain.Enums.Organization;
-using Moda.Common.Domain.Events.Organization;
-using Moda.Common.Domain.Models.Organizations;
-using Moda.Organization.Domain.Enums;
+using Wayd.Common.Domain.Enums.Organization;
+using Wayd.Common.Domain.Events.Organization;
+using Wayd.Common.Domain.Models.Organizations;
+using Wayd.Organization.Domain.Enums;
 using NodaTime;
 
-namespace Moda.Organization.Domain.Models;
+namespace Wayd.Organization.Domain.Models;
 
 /// <summary>
 /// A team of teams is a collection of teams and/or other team of teams that aims to help deliver products collaboratively in the same complex environment.
 /// </summary>
-/// <seealso cref="Moda.Organization.Domain.Models.BaseTeam" />
+/// <seealso cref="Wayd.Organization.Domain.Models.BaseTeam" />
 /// <seealso cref=""/>
 public sealed class TeamOfTeams : BaseTeam, IActivatable<Instant, TeamDeactivatableArgs>
 {

@@ -1,7 +1,7 @@
-﻿using Moda.StrategicManagement.Application.Visions.Dtos;
-using Moda.StrategicManagement.Domain.Enums;
+﻿using Wayd.StrategicManagement.Application.Visions.Dtos;
+using Wayd.StrategicManagement.Domain.Enums;
 
-namespace Moda.StrategicManagement.Application.Visions.Queries;
+namespace Wayd.StrategicManagement.Application.Visions.Queries;
 
 /// <summary>
 /// Retrieves a list of Visions based on the provided filter.  Returns all Visions if no filter is provided.

@@ -1,6 +1,6 @@
-using Moda.ProjectPortfolioManagement.Application.ProjectLifecycles.Commands;
+using Wayd.ProjectPortfolioManagement.Application.ProjectLifecycles.Commands;
 
-namespace Moda.Web.Api.Models.Ppm.ProjectLifecycles;
+namespace Wayd.Web.Api.Models.Ppm.ProjectLifecycles;
 
 public sealed record UpdateProjectLifecycleRequest
 {

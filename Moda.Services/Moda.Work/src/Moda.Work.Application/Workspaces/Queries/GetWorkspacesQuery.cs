@@ -1,7 +1,7 @@
-﻿using Moda.Work.Application.Persistence;
-using Moda.Work.Application.Workspaces.Dtos;
+﻿using Wayd.Work.Application.Persistence;
+using Wayd.Work.Application.Workspaces.Dtos;
 
-namespace Moda.Work.Application.Workspaces.Queries;
+namespace Wayd.Work.Application.Workspaces.Queries;
 
 public sealed record GetWorkspacesQuery(bool IncludeInactive = false) : IQuery<IReadOnlyList<WorkspaceListDto>>;
 

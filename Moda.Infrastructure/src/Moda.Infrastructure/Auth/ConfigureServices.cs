@@ -2,12 +2,12 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Moda.Infrastructure.Auth.AzureAd;
-using Moda.Infrastructure.Auth.Local;
-using Moda.Infrastructure.Auth.Permissions;
-using Moda.Infrastructure.Auth.PersonalAccessToken;
+using Wayd.Infrastructure.Auth.AzureAd;
+using Wayd.Infrastructure.Auth.Local;
+using Wayd.Infrastructure.Auth.Permissions;
+using Wayd.Infrastructure.Auth.PersonalAccessToken;
 
-namespace Moda.Infrastructure.Auth;
+namespace Wayd.Infrastructure.Auth;
 
 internal static class ConfigureServices
 {

@@ -1,8 +1,8 @@
-﻿using Moda.Common.Domain.Extensions.Organizations;
-using Moda.Common.Domain.Models.Organizations;
-using Moda.Organization.Application.TeamsOfTeams.Commands;
+﻿using Wayd.Common.Domain.Extensions.Organizations;
+using Wayd.Common.Domain.Models.Organizations;
+using Wayd.Organization.Application.TeamsOfTeams.Commands;
 
-namespace Moda.Web.Api.Models.Organizations.TeamOfTeams;
+namespace Wayd.Web.Api.Models.Organizations.TeamOfTeams;
 
 public sealed record UpdateTeamOfTeamsRequest
 {

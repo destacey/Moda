@@ -1,7 +1,7 @@
-﻿using Moda.Work.Application.Persistence;
-using Moda.Work.Application.WorkStatuses.Dtos;
+﻿using Wayd.Work.Application.Persistence;
+using Wayd.Work.Application.WorkStatuses.Dtos;
 
-namespace Moda.Work.Application.WorkStatuses.Queries;
+namespace Wayd.Work.Application.WorkStatuses.Queries;
 
 public sealed record GetWorkStatusesQuery(bool IncludeInactive = false) : IQuery<IReadOnlyList<WorkStatusDto>>;
 

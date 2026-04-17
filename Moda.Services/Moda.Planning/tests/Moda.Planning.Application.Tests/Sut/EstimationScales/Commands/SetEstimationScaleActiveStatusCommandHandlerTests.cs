@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
-using Moda.Planning.Application.EstimationScales.Commands;
-using Moda.Planning.Application.Tests.Infrastructure;
-using Moda.Planning.Domain.Tests.Data;
+using Wayd.Planning.Application.EstimationScales.Commands;
+using Wayd.Planning.Application.Tests.Infrastructure;
+using Wayd.Planning.Domain.Tests.Data;
 using Moq;
 
-namespace Moda.Planning.Application.Tests.Sut.EstimationScales.Commands;
+namespace Wayd.Planning.Application.Tests.Sut.EstimationScales.Commands;
 
 public class SetEstimationScaleActiveStatusCommandHandlerTests : IDisposable
 {

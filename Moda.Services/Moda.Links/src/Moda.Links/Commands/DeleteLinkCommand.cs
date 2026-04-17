@@ -1,9 +1,9 @@
 ﻿using CSharpFunctionalExtensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Moda.Common.Application.Interfaces;
+using Wayd.Common.Application.Interfaces;
 
-namespace Moda.Links.Commands;
+namespace Wayd.Links.Commands;
 
 public sealed record DeleteLinkCommand(Guid LinkId) : ICommand;
 

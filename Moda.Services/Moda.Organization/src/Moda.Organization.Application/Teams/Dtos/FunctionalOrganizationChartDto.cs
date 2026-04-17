@@ -1,6 +1,6 @@
 ﻿using NodaTime;
 
-namespace Moda.Organization.Application.Teams.Dtos;
+namespace Wayd.Organization.Application.Teams.Dtos;
 
 public sealed record FunctionalOrganizationChartDto
 {

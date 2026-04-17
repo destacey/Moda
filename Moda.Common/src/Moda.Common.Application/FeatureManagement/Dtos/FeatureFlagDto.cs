@@ -1,7 +1,7 @@
 using Mapster;
-using Moda.Common.Domain.FeatureManagement;
+using Wayd.Common.Domain.FeatureManagement;
 
-namespace Moda.Common.Application.FeatureManagement.Dtos;
+namespace Wayd.Common.Application.FeatureManagement.Dtos;
 
 public sealed record FeatureFlagDto : IMapFrom<FeatureFlag>
 {

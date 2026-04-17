@@ -1,8 +1,8 @@
-using Moda.Planning.Domain.Enums;
-using Moda.Planning.Domain.Models.PlanningPoker;
-using Moda.Tests.Shared.Data;
+using Wayd.Planning.Domain.Enums;
+using Wayd.Planning.Domain.Models.PlanningPoker;
+using Wayd.Tests.Shared.Data;
 
-namespace Moda.Planning.Domain.Tests.Data;
+namespace Wayd.Planning.Domain.Tests.Data;
 
 public class PokerRoundFaker : PrivateConstructorFaker<PokerRound>
 {

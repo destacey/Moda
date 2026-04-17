@@ -1,7 +1,7 @@
-﻿using Moda.ProjectPortfolioManagement.Domain.Enums;
-using Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
+﻿using Wayd.ProjectPortfolioManagement.Domain.Enums;
+using Wayd.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 
-namespace Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Commands;
+namespace Wayd.ProjectPortfolioManagement.Application.StrategicInitiatives.Commands;
 
 public sealed record UpdateStrategicInitiativeCommand(Guid Id, string Name, string Description, LocalDateRange DateRange, List<Guid>? SponsorIds, List<Guid>? OwnerIds) : ICommand;
 

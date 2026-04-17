@@ -1,9 +1,9 @@
 using System.Linq.Expressions;
-using Moda.Common.Domain.Interfaces;
-using Moda.Common.Domain.Models.ProjectPortfolioManagement;
+using Wayd.Common.Domain.Interfaces;
+using Wayd.Common.Domain.Models.ProjectPortfolioManagement;
 using OneOf;
 
-namespace Moda.ProjectPortfolioManagement.Application.ProjectTasks.Models;
+namespace Wayd.ProjectPortfolioManagement.Application.ProjectTasks.Models;
 
 /// <summary>
 /// Represents either a Guid ID or a TaskKey (string like "APOLLO-T001").

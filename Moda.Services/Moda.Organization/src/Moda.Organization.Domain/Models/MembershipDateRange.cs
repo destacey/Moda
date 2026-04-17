@@ -1,9 +1,9 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
-using Moda.Common.Interfaces;
+using Wayd.Common.Interfaces;
 using NodaTime;
 
-namespace Moda.Organization.Domain.Models;
+namespace Wayd.Organization.Domain.Models;
 
 public sealed class MembershipDateRange : ValueObject, IDateRange<LocalDate, LocalDate?>
 {

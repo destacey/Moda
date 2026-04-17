@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace Moda.Infrastructure.Identity;
+namespace Wayd.Infrastructure.Identity;
 
 internal static class IdentityResultExtensions
 {

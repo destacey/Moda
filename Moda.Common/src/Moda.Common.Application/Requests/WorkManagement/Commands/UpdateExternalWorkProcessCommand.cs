@@ -1,8 +1,8 @@
-﻿using Moda.Common.Application.Interfaces.ExternalWork;
-using Moda.Common.Application.Requests.WorkManagement.Interfaces;
-using Moda.Common.Application.Validators;
+﻿using Wayd.Common.Application.Interfaces.ExternalWork;
+using Wayd.Common.Application.Requests.WorkManagement.Interfaces;
+using Wayd.Common.Application.Validators;
 
-namespace Moda.Common.Application.Requests.WorkManagement.Commands;
+namespace Wayd.Common.Application.Requests.WorkManagement.Commands;
 
 /// <summary>
 /// Updates an external work process configuration.

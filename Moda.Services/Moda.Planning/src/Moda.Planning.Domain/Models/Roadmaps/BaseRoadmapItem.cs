@@ -1,8 +1,8 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
-using Moda.Planning.Domain.Enums;
+using Wayd.Planning.Domain.Enums;
 
-namespace Moda.Planning.Domain.Models.Roadmaps;
+namespace Wayd.Planning.Domain.Models.Roadmaps;
 
 public abstract class BaseRoadmapItem : BaseAuditableEntity
 {

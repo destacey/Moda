@@ -1,4 +1,4 @@
-﻿namespace Moda.Planning.Application.PlanningIntervals.Commands;
+﻿namespace Wayd.Planning.Application.PlanningIntervals.Commands;
 
 public sealed record UpdatePlanningIntervalCommand(Guid Id, string Name, string? Description, bool ObjectivesLocked) : ICommand<int>;
 

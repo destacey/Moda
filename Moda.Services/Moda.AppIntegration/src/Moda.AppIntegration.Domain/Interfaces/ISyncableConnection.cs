@@ -1,4 +1,4 @@
-﻿namespace Moda.AppIntegration.Domain.Interfaces;
+﻿namespace Wayd.AppIntegration.Domain.Interfaces;
 
 /// <summary>
 /// Marker interface for connections that support bidirectional or unidirectional synchronization

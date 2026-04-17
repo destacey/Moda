@@ -1,7 +1,7 @@
-﻿using Moda.Common.Extensions;
-using Moda.ProjectPortfolioManagement.Domain.Models;
+﻿using Wayd.Common.Extensions;
+using Wayd.ProjectPortfolioManagement.Domain.Models;
 
-namespace Moda.ProjectPortfolioManagement.Application.ExpenditureCategories.Dtos;
+namespace Wayd.ProjectPortfolioManagement.Application.ExpenditureCategories.Dtos;
 
 public sealed record ExpenditureCategoryOptionDto : IMapFrom<ExpenditureCategory>
 {

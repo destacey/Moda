@@ -1,6 +1,6 @@
-﻿using Moda.Common.Models;
+﻿using Wayd.Common.Models;
 
-namespace Moda.Work.Domain.Interfaces;
+namespace Wayd.Work.Domain.Interfaces;
 
 public interface IHasWorkspaceIdAndKey
 {

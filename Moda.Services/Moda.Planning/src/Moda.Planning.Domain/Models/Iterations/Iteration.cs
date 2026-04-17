@@ -1,15 +1,15 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
-using Moda.Common.Domain.Enums;
-using Moda.Common.Domain.Enums.Planning;
-using Moda.Common.Domain.Events.Planning.Iterations;
-using Moda.Common.Domain.Interfaces;
-using Moda.Common.Domain.Interfaces.Planning.Iterations;
-using Moda.Common.Domain.Models;
-using Moda.Common.Domain.Models.Planning.Iterations;
+using Wayd.Common.Domain.Enums;
+using Wayd.Common.Domain.Enums.Planning;
+using Wayd.Common.Domain.Events.Planning.Iterations;
+using Wayd.Common.Domain.Interfaces;
+using Wayd.Common.Domain.Interfaces.Planning.Iterations;
+using Wayd.Common.Domain.Models;
+using Wayd.Common.Domain.Models.Planning.Iterations;
 using NodaTime;
 
-namespace Moda.Planning.Domain.Models.Iterations;
+namespace Wayd.Planning.Domain.Models.Iterations;
 
 /// <summary>
 /// Represents an iteration, which is a time-boxed unit of work typically associated with a team.

@@ -1,7 +1,7 @@
-using Moda.Common.Application.Requests.WorkManagement.Commands;
-using Moda.Work.Application.Persistence;
+using Wayd.Common.Application.Requests.WorkManagement.Commands;
+using Wayd.Work.Application.Persistence;
 
-namespace Moda.Work.Application.Workspaces.Commands;
+namespace Wayd.Work.Application.Workspaces.Commands;
 
 internal sealed class ChangeExternalWorkspaceWorkProcessCommandHandler(IWorkDbContext workDbContext, IDateTimeProvider dateTimeProvider, ILogger<ChangeExternalWorkspaceWorkProcessCommandHandler> logger) : ICommandHandler<ChangeExternalWorkspaceWorkProcessCommand>
 {

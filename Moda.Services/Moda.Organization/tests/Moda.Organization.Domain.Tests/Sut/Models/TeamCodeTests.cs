@@ -1,6 +1,6 @@
-﻿using Moda.Common.Domain.Models.Organizations;
+﻿using Wayd.Common.Domain.Models.Organizations;
 
-namespace Moda.Common.Tests.Sut.Models;
+namespace Wayd.Common.Tests.Sut.Models;
 
 public class TeamCodeTests
 {

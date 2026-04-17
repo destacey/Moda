@@ -1,14 +1,14 @@
-﻿using Moda.Common.Application.Models;
-using Moda.ProjectPortfolioManagement.Application.Projects.Dtos;
-using Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Commands;
-using Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Commands.Kpis;
-using Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Dtos;
-using Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Queries;
-using Moda.ProjectPortfolioManagement.Domain.Enums;
-using Moda.Web.Api.Extensions;
-using Moda.Web.Api.Models.Ppm.StrategicInitiatives;
+﻿using Wayd.Common.Application.Models;
+using Wayd.ProjectPortfolioManagement.Application.Projects.Dtos;
+using Wayd.ProjectPortfolioManagement.Application.StrategicInitiatives.Commands;
+using Wayd.ProjectPortfolioManagement.Application.StrategicInitiatives.Commands.Kpis;
+using Wayd.ProjectPortfolioManagement.Application.StrategicInitiatives.Dtos;
+using Wayd.ProjectPortfolioManagement.Application.StrategicInitiatives.Queries;
+using Wayd.ProjectPortfolioManagement.Domain.Enums;
+using Wayd.Web.Api.Extensions;
+using Wayd.Web.Api.Models.Ppm.StrategicInitiatives;
 
-namespace Moda.Web.Api.Controllers.Ppm;
+namespace Wayd.Web.Api.Controllers.Ppm;
 
 [Route("api/ppm/strategic-initiatives")]
 [ApiVersionNeutral]

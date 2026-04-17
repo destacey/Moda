@@ -1,10 +1,10 @@
 ﻿using System.Linq.Expressions;
-using Moda.Common.Application.Models;
-using Moda.Common.Domain.Enums.Planning;
-using Moda.Work.Application.Persistence;
-using Moda.Work.Application.WorkItems.Dtos;
+using Wayd.Common.Application.Models;
+using Wayd.Common.Domain.Enums.Planning;
+using Wayd.Work.Application.Persistence;
+using Wayd.Work.Application.WorkItems.Dtos;
 
-namespace Moda.Work.Application.WorkItems.Queries;
+namespace Wayd.Work.Application.WorkItems.Queries;
 
 public sealed record GetSprintBacklogQuery : IQuery<List<SprintBacklogItemDto>?>
 {

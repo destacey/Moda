@@ -1,10 +1,10 @@
-﻿using Moda.Common.Models;
-using Moda.ProjectPortfolioManagement.Domain.Enums;
-using Moda.ProjectPortfolioManagement.Domain.Models;
-using Moda.Tests.Shared;
-using Moda.Tests.Shared.Data;
+﻿using Wayd.Common.Models;
+using Wayd.ProjectPortfolioManagement.Domain.Enums;
+using Wayd.ProjectPortfolioManagement.Domain.Models;
+using Wayd.Tests.Shared;
+using Wayd.Tests.Shared.Data;
 
-namespace Moda.ProjectPortfolioManagement.Domain.Tests.Data;
+namespace Wayd.ProjectPortfolioManagement.Domain.Tests.Data;
 
 public sealed class ProgramFaker : PrivateConstructorFaker<Program>
 {

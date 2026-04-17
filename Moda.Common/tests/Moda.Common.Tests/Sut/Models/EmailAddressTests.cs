@@ -1,6 +1,6 @@
-﻿using Moda.Common.Models;
+﻿using Wayd.Common.Models;
 
-namespace Moda.Common.Tests.Sut.Models;
+namespace Wayd.Common.Tests.Sut.Models;
 
 public class EmailAddressTests
 {

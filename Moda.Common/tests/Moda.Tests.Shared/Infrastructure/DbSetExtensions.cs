@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace Moda.Tests.Shared.Infrastructure;
+namespace Wayd.Tests.Shared.Infrastructure;
 
 /// <summary>
 /// Extension methods for converting collections to mock DbSets for testing.

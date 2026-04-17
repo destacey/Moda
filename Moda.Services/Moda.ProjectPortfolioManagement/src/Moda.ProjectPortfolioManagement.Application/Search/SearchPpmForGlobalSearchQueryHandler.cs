@@ -1,10 +1,10 @@
-﻿using Moda.Common.Application.Search;
-using Moda.Common.Application.Search.Dtos;
-using Moda.Common.Extensions;
-using Moda.ProjectPortfolioManagement.Domain.Models;
-using Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
+﻿using Wayd.Common.Application.Search;
+using Wayd.Common.Application.Search.Dtos;
+using Wayd.Common.Extensions;
+using Wayd.ProjectPortfolioManagement.Domain.Models;
+using Wayd.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 
-namespace Moda.ProjectPortfolioManagement.Application.Search;
+namespace Wayd.ProjectPortfolioManagement.Application.Search;
 
 internal sealed class SearchPpmForGlobalSearchQueryHandler(IProjectPortfolioManagementDbContext ppmDbContext)
     : IQueryHandler<SearchPpmForGlobalSearchQuery, ServiceSearchResponse>
@@ -60,7 +60,7 @@ internal sealed class SearchPpmForGlobalSearchQueryHandler(IProjectPortfolioMana
                 Title = p.Name,
                 Subtitle = p.Status.GetDisplayName(),
                 Key = p.Key.ToString(),
-                EntityType = nameof(Moda.ProjectPortfolioManagement.Domain.Models.Program)
+                EntityType = nameof(Wayd.ProjectPortfolioManagement.Domain.Models.Program)
             }).ToList(),
             TotalCount = programCount
         });

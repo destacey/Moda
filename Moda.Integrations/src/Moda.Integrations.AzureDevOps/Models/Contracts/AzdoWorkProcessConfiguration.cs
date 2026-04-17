@@ -1,6 +1,6 @@
-﻿using Moda.Common.Application.Interfaces.ExternalWork;
+﻿using Wayd.Common.Application.Interfaces.ExternalWork;
 
-namespace Moda.Integrations.AzureDevOps.Models.Contracts;
+namespace Wayd.Integrations.AzureDevOps.Models.Contracts;
 
 public sealed record AzdoWorkProcessConfiguration : AzdoWorkProcess, IExternalWorkProcessConfiguration
 {

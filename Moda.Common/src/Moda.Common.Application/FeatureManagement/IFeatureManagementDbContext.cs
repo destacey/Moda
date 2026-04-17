@@ -1,7 +1,7 @@
-using Moda.Common.Application.Persistence;
-using Moda.Common.Domain.FeatureManagement;
+using Wayd.Common.Application.Persistence;
+using Wayd.Common.Domain.FeatureManagement;
 
-namespace Moda.Common.Application.FeatureManagement;
+namespace Wayd.Common.Application.FeatureManagement;
 
 public interface IFeatureManagementDbContext : IModaDbContext
 {

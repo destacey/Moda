@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Moda.Common.Domain.Employees;
-using Moda.Common.Models;
+using Wayd.Common.Domain.Employees;
+using Wayd.Common.Models;
 
-namespace Moda.Infrastructure.Persistence.Configuration;
+namespace Wayd.Infrastructure.Persistence.Configuration;
 
 public class EmployeeConfig : IEntityTypeConfiguration<Employee>
 {

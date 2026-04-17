@@ -1,9 +1,9 @@
 ﻿using FluentAssertions;
-using Moda.ProjectPortfolioManagement.Domain.Enums;
-using Moda.ProjectPortfolioManagement.Domain.Models;
-using Moda.ProjectPortfolioManagement.Domain.Tests.Data;
+using Wayd.ProjectPortfolioManagement.Domain.Enums;
+using Wayd.ProjectPortfolioManagement.Domain.Models;
+using Wayd.ProjectPortfolioManagement.Domain.Tests.Data;
 
-namespace Moda.ProjectPortfolioManagement.Domain.Tests.Sut.Models;
+namespace Wayd.ProjectPortfolioManagement.Domain.Tests.Sut.Models;
 
 public class ExpenditureCategoryTests
 {

@@ -1,4 +1,4 @@
-﻿namespace Moda.Common.Application.Interfaces.ExternalWork;
+﻿namespace Wayd.Common.Application.Interfaces.ExternalWork;
 
 public interface IExternalWorkStatus
 {

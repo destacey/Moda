@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Moda.Infrastructure.Common.Services;
+namespace Wayd.Infrastructure.Common.Services;
 
 /// <summary>
 /// Implementation of token hashing service using SHA256 with salt.

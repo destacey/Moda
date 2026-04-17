@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Moda.Infrastructure.Auth;
+namespace Wayd.Infrastructure.Auth;
 
 public class CurrentUser(IHttpContextAccessor httpContextAccessor, IServiceProvider serviceProvider) : ICurrentUser, ICurrentUserInitializer
 {

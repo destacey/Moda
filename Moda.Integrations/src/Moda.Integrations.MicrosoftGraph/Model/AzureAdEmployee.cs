@@ -1,10 +1,10 @@
 ﻿using Ardalis.GuardClauses;
 using Microsoft.Graph.Models;
-using Moda.Common.Application.Interfaces;
-using Moda.Common.Models;
+using Wayd.Common.Application.Interfaces;
+using Wayd.Common.Models;
 using NodaTime;
 
-namespace Moda.Integrations.MicrosoftGraph.Model;
+namespace Wayd.Integrations.MicrosoftGraph.Model;
 
 public sealed record AzureAdEmployee : IExternalEmployee
 {

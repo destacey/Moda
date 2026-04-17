@@ -1,7 +1,7 @@
 ﻿using Ardalis.GuardClauses;
-using Moda.Planning.Domain.Models.Roadmaps;
+using Wayd.Planning.Domain.Models.Roadmaps;
 
-namespace Moda.Planning.Application.Roadmaps.Commands;
+namespace Wayd.Planning.Application.Roadmaps.Commands;
 
 public sealed record UpdateRoadmapRootActivitiesOrderCommand(Guid RoadmapId, Dictionary<Guid, int> ChildrenOrder) : ICommand;
 

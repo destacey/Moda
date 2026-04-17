@@ -1,12 +1,12 @@
 ﻿using CSharpFunctionalExtensions;
-using Moda.AppIntegration.Application.Connections.Commands.AzureDevOps;
-using Moda.AppIntegration.Application.Connections.Commands.AzureOpenAI;
-using Moda.AppIntegration.Application.Connections.Dtos.AzureDevOps;
-using Moda.AppIntegration.Application.Connections.Dtos.AzureOpenAI;
-using Moda.Web.Api.Extensions;
-using Moda.Web.Api.Models.AppIntegrations.Connections;
+using Wayd.AppIntegration.Application.Connections.Commands.AzureDevOps;
+using Wayd.AppIntegration.Application.Connections.Commands.AzureOpenAI;
+using Wayd.AppIntegration.Application.Connections.Dtos.AzureDevOps;
+using Wayd.AppIntegration.Application.Connections.Dtos.AzureOpenAI;
+using Wayd.Web.Api.Extensions;
+using Wayd.Web.Api.Models.AppIntegrations.Connections;
 
-namespace Moda.Web.Api.Controllers.AppIntegrations;
+namespace Wayd.Web.Api.Controllers.AppIntegrations;
 
 [Route("api/app-integrations/connections")]
 [ApiVersionNeutral]

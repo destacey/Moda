@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\Moda.Infrastructure\Moda.Infrastructure.csproj" />
+    <ProjectReference Include="..\Wayd.Infrastructure\Wayd.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

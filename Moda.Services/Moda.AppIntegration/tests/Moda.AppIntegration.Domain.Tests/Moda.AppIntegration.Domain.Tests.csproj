@@ -22,8 +22,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\..\Moda.Common\tests\Moda.Tests.Shared\Moda.Tests.Shared.csproj" />
-        <ProjectReference Include="..\..\src\Moda.AppIntegration.Domain\Moda.AppIntegration.Domain.csproj" />
+        <ProjectReference Include="..\..\..\..\Wayd.Common\tests\Wayd.Tests.Shared\Wayd.Tests.Shared.csproj" />
+        <ProjectReference Include="..\..\src\Wayd.AppIntegration.Domain\Wayd.AppIntegration.Domain.csproj" />
     </ItemGroup>
 
     <ItemGroup>

@@ -1,6 +1,6 @@
-﻿using Moda.Common.Domain.Models.Goals;
+﻿using Wayd.Common.Domain.Models.Goals;
 
-namespace Moda.Goals.Application.Persistence;
+namespace Wayd.Goals.Application.Persistence;
 
 public interface IGoalsDbContext : IModaDbContext
 {

@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Moda.Infrastructure.Identity;
+namespace Wayd.Infrastructure.Identity;
 
 internal static class ConfigureServices
 {

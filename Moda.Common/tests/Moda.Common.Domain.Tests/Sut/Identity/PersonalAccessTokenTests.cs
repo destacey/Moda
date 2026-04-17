@@ -1,10 +1,10 @@
-using Moda.Common.Domain.Identity;
-using Moda.Tests.Shared;
-using Moda.Tests.Shared.Data;
+using Wayd.Common.Domain.Identity;
+using Wayd.Tests.Shared;
+using Wayd.Tests.Shared.Data;
 using NodaTime.Extensions;
 using NodaTime.Testing;
 
-namespace Moda.Common.Domain.Tests.Sut.Identity;
+namespace Wayd.Common.Domain.Tests.Sut.Identity;
 
 public sealed class PersonalAccessTokenTests
 {

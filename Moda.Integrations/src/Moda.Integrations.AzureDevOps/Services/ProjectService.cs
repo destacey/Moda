@@ -1,14 +1,14 @@
 ﻿using System.Net;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
-using Moda.Common.Application.Interfaces.ExternalWork;
-using Moda.Common.Application.Logging;
-using Moda.Common.Extensions;
-using Moda.Integrations.AzureDevOps.Clients;
-using Moda.Integrations.AzureDevOps.Models;
-using Moda.Integrations.AzureDevOps.Models.Projects;
+using Wayd.Common.Application.Interfaces.ExternalWork;
+using Wayd.Common.Application.Logging;
+using Wayd.Common.Extensions;
+using Wayd.Integrations.AzureDevOps.Clients;
+using Wayd.Integrations.AzureDevOps.Models;
+using Wayd.Integrations.AzureDevOps.Models.Projects;
 
-namespace Moda.Integrations.AzureDevOps.Services;
+namespace Wayd.Integrations.AzureDevOps.Services;
 
 internal sealed class ProjectService(string organizationUrl, string token, string apiVersion, ILogger<ProjectService> logger)
 {

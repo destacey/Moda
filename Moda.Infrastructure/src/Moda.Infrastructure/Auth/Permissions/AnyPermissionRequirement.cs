@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 
-namespace Moda.Infrastructure.Auth.Permissions;
+namespace Wayd.Infrastructure.Auth.Permissions;
 
 internal class AnyPermissionRequirement(IEnumerable<string> permissions) : IAuthorizationRequirement
 {

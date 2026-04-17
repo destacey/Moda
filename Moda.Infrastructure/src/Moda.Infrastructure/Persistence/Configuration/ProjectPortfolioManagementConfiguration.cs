@@ -1,17 +1,17 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Moda.Common.Domain.Enums.Organization;
-using Moda.Common.Domain.Enums.StrategicManagement;
-using Moda.Common.Domain.Models.KeyPerformanceIndicators;
-using Moda.Common.Domain.Models.Organizations;
-using Moda.Common.Domain.Models.ProjectPortfolioManagement;
-using Moda.Common.Models;
-using Moda.Infrastructure.Persistence.Converters;
-using Moda.ProjectPortfolioManagement.Domain.Enums;
-using Moda.ProjectPortfolioManagement.Domain.Models;
-using Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
+using Wayd.Common.Domain.Enums.Organization;
+using Wayd.Common.Domain.Enums.StrategicManagement;
+using Wayd.Common.Domain.Models.KeyPerformanceIndicators;
+using Wayd.Common.Domain.Models.Organizations;
+using Wayd.Common.Domain.Models.ProjectPortfolioManagement;
+using Wayd.Common.Models;
+using Wayd.Infrastructure.Persistence.Converters;
+using Wayd.ProjectPortfolioManagement.Domain.Enums;
+using Wayd.ProjectPortfolioManagement.Domain.Models;
+using Wayd.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 
-namespace Moda.Infrastructure.Persistence.Configuration;
+namespace Wayd.Infrastructure.Persistence.Configuration;
 
 public class ExpenditureCategoryConfig : IEntityTypeConfiguration<ExpenditureCategory>
 {

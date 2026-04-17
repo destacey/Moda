@@ -1,7 +1,7 @@
 ﻿using MediatR;
-using ValidationException = Moda.Common.Application.Exceptions.ValidationException;
+using ValidationException = Wayd.Common.Application.Exceptions.ValidationException;
 
-namespace Moda.Common.Application.Behaviors;
+namespace Wayd.Common.Application.Behaviors;
 
 public class ValidationBehavior<TRequest, TResponse>(IEnumerable<IValidator<TRequest>> validators) : IPipelineBehavior<TRequest, TResponse>
     where TRequest : notnull, IRequest<TResponse>

@@ -1,6 +1,6 @@
-﻿using Moda.Common.Helpers;
+﻿using Wayd.Common.Helpers;
 
-namespace Moda.Common.Tests.Sut.Helpers;
+namespace Wayd.Common.Tests.Sut.Helpers;
 
 public class StringHelpersTests
 {

@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Moda.Infrastructure.Persistence.Context;
+using Wayd.Infrastructure.Persistence.Context;
 
 #nullable disable
 
-namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
+namespace Wayd.Infrastructure.Migrators.MSSQL.Migrations
 {
     [DbContext(typeof(ModaDbContext))]
     [Migration("20230825222715_Rename-LocalId-to-Key")]
@@ -107,7 +107,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("UserTokens", "Identity");
                 });
 
-            modelBuilder.Entity("Moda.AppIntegration.Domain.Models.Connection", b =>
+            modelBuilder.Entity("Wayd.AppIntegration.Domain.Models.Connection", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -176,7 +176,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.UseTphMappingStrategy();
                 });
 
-            modelBuilder.Entity("Moda.Common.Domain.Employees.Employee", b =>
+            modelBuilder.Entity("Wayd.Common.Domain.Employees.Employee", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -260,7 +260,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("Employees", "Organization");
                 });
 
-            modelBuilder.Entity("Moda.Common.Domain.Employees.ExternalEmployeeBlacklistItem", b =>
+            modelBuilder.Entity("Wayd.Common.Domain.Employees.ExternalEmployeeBlacklistItem", b =>
                 {
                     b.Property<string>("ObjectId")
                         .HasColumnType("nvarchar(450)");
@@ -272,7 +272,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("ExternalEmployeeBlacklistItems", "Organization");
                 });
 
-            modelBuilder.Entity("Moda.Goals.Domain.Models.Objective", b =>
+            modelBuilder.Entity("Wayd.Goals.Domain.Models.Objective", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -369,7 +369,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("Objectives", "Goals");
                 });
 
-            modelBuilder.Entity("Moda.Infrastructure.Auditing.Trail", b =>
+            modelBuilder.Entity("Wayd.Infrastructure.Auditing.Trail", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -404,7 +404,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("AuditTrails", "Auditing");
                 });
 
-            modelBuilder.Entity("Moda.Infrastructure.Identity.ApplicationRole", b =>
+            modelBuilder.Entity("Wayd.Infrastructure.Identity.ApplicationRole", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -434,7 +434,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("Roles", "Identity");
                 });
 
-            modelBuilder.Entity("Moda.Infrastructure.Identity.ApplicationRoleClaim", b =>
+            modelBuilder.Entity("Wayd.Infrastructure.Identity.ApplicationRoleClaim", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -465,7 +465,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("RoleClaims", "Identity");
                 });
 
-            modelBuilder.Entity("Moda.Infrastructure.Identity.ApplicationUser", b =>
+            modelBuilder.Entity("Wayd.Infrastructure.Identity.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -555,7 +555,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("Users", "Identity");
                 });
 
-            modelBuilder.Entity("Moda.Organization.Domain.Models.BaseTeam", b =>
+            modelBuilder.Entity("Wayd.Organization.Domain.Models.BaseTeam", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -643,7 +643,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.UseTphMappingStrategy();
                 });
 
-            modelBuilder.Entity("Moda.Organization.Domain.Models.TeamMembership", b =>
+            modelBuilder.Entity("Wayd.Organization.Domain.Models.TeamMembership", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -689,7 +689,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("TeamMemberships", "Organization");
                 });
 
-            modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningTeam", b =>
+            modelBuilder.Entity("Wayd.Planning.Domain.Models.PlanningTeam", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
@@ -752,7 +752,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("PlanningTeams", "Planning");
                 });
 
-            modelBuilder.Entity("Moda.Planning.Domain.Models.ProgramIncrement", b =>
+            modelBuilder.Entity("Wayd.Planning.Domain.Models.ProgramIncrement", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -813,7 +813,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("ProgramIncrements", "Planning");
                 });
 
-            modelBuilder.Entity("Moda.Planning.Domain.Models.ProgramIncrementObjective", b =>
+            modelBuilder.Entity("Wayd.Planning.Domain.Models.ProgramIncrementObjective", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -892,7 +892,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("ProgramIncrementObjectives", "Planning");
                 });
 
-            modelBuilder.Entity("Moda.Planning.Domain.Models.ProgramIncrementTeam", b =>
+            modelBuilder.Entity("Wayd.Planning.Domain.Models.ProgramIncrementTeam", b =>
                 {
                     b.Property<Guid>("ProgramIncrementId")
                         .HasColumnType("uniqueidentifier");
@@ -911,7 +911,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("ProgramIncrementTeams", "Planning");
                 });
 
-            modelBuilder.Entity("Moda.Planning.Domain.Models.Risk", b =>
+            modelBuilder.Entity("Wayd.Planning.Domain.Models.Risk", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1012,7 +1012,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("Risks", "Planning");
                 });
 
-            modelBuilder.Entity("Moda.Work.Domain.Models.BacklogLevel", b =>
+            modelBuilder.Entity("Wayd.Work.Domain.Models.BacklogLevel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -1073,7 +1073,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("BacklogLevels", "Work");
                 });
 
-            modelBuilder.Entity("Moda.Work.Domain.Models.BacklogLevelScheme", b =>
+            modelBuilder.Entity("Wayd.Work.Domain.Models.BacklogLevelScheme", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1107,7 +1107,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("BacklogLevelSchemes", "Work");
                 });
 
-            modelBuilder.Entity("Moda.Work.Domain.Models.WorkState", b =>
+            modelBuilder.Entity("Wayd.Work.Domain.Models.WorkState", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -1162,7 +1162,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("WorkStates", "Work");
                 });
 
-            modelBuilder.Entity("Moda.Work.Domain.Models.WorkType", b =>
+            modelBuilder.Entity("Wayd.Work.Domain.Models.WorkType", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -1217,30 +1217,30 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("WorkTypes", "Work");
                 });
 
-            modelBuilder.Entity("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsConnection", b =>
+            modelBuilder.Entity("Wayd.AppIntegration.Domain.Models.AzureDevOpsBoardsConnection", b =>
                 {
-                    b.HasBaseType("Moda.AppIntegration.Domain.Models.Connection");
+                    b.HasBaseType("Wayd.AppIntegration.Domain.Models.Connection");
 
                     b.HasDiscriminator().HasValue("AzureDevOpsBoards");
                 });
 
-            modelBuilder.Entity("Moda.Organization.Domain.Models.Team", b =>
+            modelBuilder.Entity("Wayd.Organization.Domain.Models.Team", b =>
                 {
-                    b.HasBaseType("Moda.Organization.Domain.Models.BaseTeam");
+                    b.HasBaseType("Wayd.Organization.Domain.Models.BaseTeam");
 
                     b.HasDiscriminator().HasValue("Team");
                 });
 
-            modelBuilder.Entity("Moda.Organization.Domain.Models.TeamOfTeams", b =>
+            modelBuilder.Entity("Wayd.Organization.Domain.Models.TeamOfTeams", b =>
                 {
-                    b.HasBaseType("Moda.Organization.Domain.Models.BaseTeam");
+                    b.HasBaseType("Wayd.Organization.Domain.Models.BaseTeam");
 
                     b.HasDiscriminator().HasValue("TeamOfTeams");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("Moda.Infrastructure.Identity.ApplicationUser", null)
+                    b.HasOne("Wayd.Infrastructure.Identity.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1249,7 +1249,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("Moda.Infrastructure.Identity.ApplicationUser", null)
+                    b.HasOne("Wayd.Infrastructure.Identity.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1258,13 +1258,13 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
-                    b.HasOne("Moda.Infrastructure.Identity.ApplicationRole", null)
+                    b.HasOne("Wayd.Infrastructure.Identity.ApplicationRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Moda.Infrastructure.Identity.ApplicationUser", null)
+                    b.HasOne("Wayd.Infrastructure.Identity.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1273,21 +1273,21 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("Moda.Infrastructure.Identity.ApplicationUser", null)
+                    b.HasOne("Wayd.Infrastructure.Identity.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Moda.Common.Domain.Employees.Employee", b =>
+            modelBuilder.Entity("Wayd.Common.Domain.Employees.Employee", b =>
                 {
-                    b.HasOne("Moda.Common.Domain.Employees.Employee", "Manager")
+                    b.HasOne("Wayd.Common.Domain.Employees.Employee", "Manager")
                         .WithMany("DirectReports")
                         .HasForeignKey("ManagerId")
                         .OnDelete(DeleteBehavior.NoAction);
 
-                    b.OwnsOne("Moda.Common.Models.PersonName", "Name", b1 =>
+                    b.OwnsOne("Wayd.Common.Models.PersonName", "Name", b1 =>
                         {
                             b1.Property<Guid>("EmployeeId")
                                 .HasColumnType("uniqueidentifier");
@@ -1333,18 +1333,18 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Moda.Infrastructure.Identity.ApplicationRoleClaim", b =>
+            modelBuilder.Entity("Wayd.Infrastructure.Identity.ApplicationRoleClaim", b =>
                 {
-                    b.HasOne("Moda.Infrastructure.Identity.ApplicationRole", null)
+                    b.HasOne("Wayd.Infrastructure.Identity.ApplicationRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Moda.Infrastructure.Identity.ApplicationUser", b =>
+            modelBuilder.Entity("Wayd.Infrastructure.Identity.ApplicationUser", b =>
                 {
-                    b.HasOne("Moda.Common.Domain.Employees.Employee", "Employee")
+                    b.HasOne("Wayd.Common.Domain.Employees.Employee", "Employee")
                         .WithMany()
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.NoAction);
@@ -1352,21 +1352,21 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Employee");
                 });
 
-            modelBuilder.Entity("Moda.Organization.Domain.Models.TeamMembership", b =>
+            modelBuilder.Entity("Wayd.Organization.Domain.Models.TeamMembership", b =>
                 {
-                    b.HasOne("Moda.Organization.Domain.Models.BaseTeam", "Source")
+                    b.HasOne("Wayd.Organization.Domain.Models.BaseTeam", "Source")
                         .WithMany("ParentMemberships")
                         .HasForeignKey("SourceId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Moda.Organization.Domain.Models.TeamOfTeams", "Target")
+                    b.HasOne("Wayd.Organization.Domain.Models.TeamOfTeams", "Target")
                         .WithMany("ChildMemberships")
                         .HasForeignKey("TargetId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.OwnsOne("Moda.Organization.Domain.Models.MembershipDateRange", "DateRange", b1 =>
+                    b.OwnsOne("Wayd.Organization.Domain.Models.MembershipDateRange", "DateRange", b1 =>
                         {
                             b1.Property<Guid>("TeamMembershipId")
                                 .HasColumnType("uniqueidentifier");
@@ -1397,9 +1397,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Target");
                 });
 
-            modelBuilder.Entity("Moda.Planning.Domain.Models.ProgramIncrement", b =>
+            modelBuilder.Entity("Wayd.Planning.Domain.Models.ProgramIncrement", b =>
                 {
-                    b.OwnsOne("Moda.Common.Models.LocalDateRange", "DateRange", b1 =>
+                    b.OwnsOne("Wayd.Common.Models.LocalDateRange", "DateRange", b1 =>
                         {
                             b1.Property<Guid>("ProgramIncrementId")
                                 .HasColumnType("uniqueidentifier");
@@ -1426,15 +1426,15 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Moda.Planning.Domain.Models.ProgramIncrementObjective", b =>
+            modelBuilder.Entity("Wayd.Planning.Domain.Models.ProgramIncrementObjective", b =>
                 {
-                    b.HasOne("Moda.Planning.Domain.Models.ProgramIncrement", null)
+                    b.HasOne("Wayd.Planning.Domain.Models.ProgramIncrement", null)
                         .WithMany("Objectives")
                         .HasForeignKey("ProgramIncrementId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Moda.Planning.Domain.Models.PlanningTeam", "Team")
+                    b.HasOne("Wayd.Planning.Domain.Models.PlanningTeam", "Team")
                         .WithMany()
                         .HasForeignKey("TeamId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1443,15 +1443,15 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Team");
                 });
 
-            modelBuilder.Entity("Moda.Planning.Domain.Models.ProgramIncrementTeam", b =>
+            modelBuilder.Entity("Wayd.Planning.Domain.Models.ProgramIncrementTeam", b =>
                 {
-                    b.HasOne("Moda.Planning.Domain.Models.ProgramIncrement", null)
+                    b.HasOne("Wayd.Planning.Domain.Models.ProgramIncrement", null)
                         .WithMany("Teams")
                         .HasForeignKey("ProgramIncrementId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Moda.Planning.Domain.Models.PlanningTeam", "Team")
+                    b.HasOne("Wayd.Planning.Domain.Models.PlanningTeam", "Team")
                         .WithMany("ProgramIncrementTeams")
                         .HasForeignKey("TeamId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1460,20 +1460,20 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Team");
                 });
 
-            modelBuilder.Entity("Moda.Planning.Domain.Models.Risk", b =>
+            modelBuilder.Entity("Wayd.Planning.Domain.Models.Risk", b =>
                 {
-                    b.HasOne("Moda.Common.Domain.Employees.Employee", "Assignee")
+                    b.HasOne("Wayd.Common.Domain.Employees.Employee", "Assignee")
                         .WithMany()
                         .HasForeignKey("AssigneeId")
                         .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("Moda.Common.Domain.Employees.Employee", "ReportedBy")
+                    b.HasOne("Wayd.Common.Domain.Employees.Employee", "ReportedBy")
                         .WithMany()
                         .HasForeignKey("ReportedById")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Moda.Planning.Domain.Models.PlanningTeam", "Team")
+                    b.HasOne("Wayd.Planning.Domain.Models.PlanningTeam", "Team")
                         .WithMany()
                         .HasForeignKey("TeamId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -1485,43 +1485,43 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Team");
                 });
 
-            modelBuilder.Entity("Moda.Work.Domain.Models.BacklogLevel", b =>
+            modelBuilder.Entity("Wayd.Work.Domain.Models.BacklogLevel", b =>
                 {
-                    b.HasOne("Moda.Work.Domain.Models.BacklogLevelScheme", null)
+                    b.HasOne("Wayd.Work.Domain.Models.BacklogLevelScheme", null)
                         .WithMany("BacklogLevels")
                         .HasForeignKey("ParentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Moda.Common.Domain.Employees.Employee", b =>
+            modelBuilder.Entity("Wayd.Common.Domain.Employees.Employee", b =>
                 {
                     b.Navigation("DirectReports");
                 });
 
-            modelBuilder.Entity("Moda.Organization.Domain.Models.BaseTeam", b =>
+            modelBuilder.Entity("Wayd.Organization.Domain.Models.BaseTeam", b =>
                 {
                     b.Navigation("ParentMemberships");
                 });
 
-            modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningTeam", b =>
+            modelBuilder.Entity("Wayd.Planning.Domain.Models.PlanningTeam", b =>
                 {
                     b.Navigation("ProgramIncrementTeams");
                 });
 
-            modelBuilder.Entity("Moda.Planning.Domain.Models.ProgramIncrement", b =>
+            modelBuilder.Entity("Wayd.Planning.Domain.Models.ProgramIncrement", b =>
                 {
                     b.Navigation("Objectives");
 
                     b.Navigation("Teams");
                 });
 
-            modelBuilder.Entity("Moda.Work.Domain.Models.BacklogLevelScheme", b =>
+            modelBuilder.Entity("Wayd.Work.Domain.Models.BacklogLevelScheme", b =>
                 {
                     b.Navigation("BacklogLevels");
                 });
 
-            modelBuilder.Entity("Moda.Organization.Domain.Models.TeamOfTeams", b =>
+            modelBuilder.Entity("Wayd.Organization.Domain.Models.TeamOfTeams", b =>
                 {
                     b.Navigation("ChildMemberships");
                 });

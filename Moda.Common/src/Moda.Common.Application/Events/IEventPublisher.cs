@@ -1,4 +1,4 @@
-namespace Moda.Common.Application.Events;
+namespace Wayd.Common.Application.Events;
 
 public interface IEventPublisher : ITransientService
 {

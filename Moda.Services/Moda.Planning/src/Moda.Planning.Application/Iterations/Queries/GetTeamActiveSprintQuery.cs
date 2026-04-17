@@ -1,7 +1,7 @@
-﻿using Moda.Common.Domain.Enums.Planning;
-using Moda.Planning.Application.Iterations.Dtos;
+﻿using Wayd.Common.Domain.Enums.Planning;
+using Wayd.Planning.Application.Iterations.Dtos;
 
-namespace Moda.Planning.Application.Iterations.Queries;
+namespace Wayd.Planning.Application.Iterations.Queries;
 
 public sealed record GetTeamActiveSprintQuery(Guid TeamId) : IQuery<SprintDetailsDto?>;
 

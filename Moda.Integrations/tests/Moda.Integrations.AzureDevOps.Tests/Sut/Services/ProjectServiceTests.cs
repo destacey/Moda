@@ -1,9 +1,9 @@
 ﻿using System.Text.Json;
-using Moda.Integrations.AzureDevOps.Models.Projects;
-using Moda.Integrations.AzureDevOps.Tests.Models;
-using Moda.Integrations.AzureDevOps.Utils;
+using Wayd.Integrations.AzureDevOps.Models.Projects;
+using Wayd.Integrations.AzureDevOps.Tests.Models;
+using Wayd.Integrations.AzureDevOps.Utils;
 
-namespace Moda.Integrations.AzureDevOps.Tests.Sut.Services;
+namespace Wayd.Integrations.AzureDevOps.Tests.Sut.Services;
 
 public class ProjectServiceTests : CommonResponseOptions
 {

@@ -1,7 +1,7 @@
-﻿using Moda.Common.Domain.Data;
-using Moda.Common.Domain.Events;
+﻿using Wayd.Common.Domain.Data;
+using Wayd.Common.Domain.Events;
 
-namespace Moda.Common.Domain.Tests.Sut.Data;
+namespace Wayd.Common.Domain.Tests.Sut.Data;
 
 public sealed class BaseEntityTests
 {

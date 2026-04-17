@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Moda.Integrations.AzureDevOps.Models.WorkItems;
+namespace Wayd.Integrations.AzureDevOps.Models.WorkItems;
 
 internal class WorkItemFieldsResponse
 {

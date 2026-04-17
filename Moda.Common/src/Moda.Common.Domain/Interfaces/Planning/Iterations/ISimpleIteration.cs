@@ -1,7 +1,7 @@
-﻿using Moda.Common.Domain.Enums.Planning;
-using Moda.Common.Domain.Models.Planning.Iterations;
+﻿using Wayd.Common.Domain.Enums.Planning;
+using Wayd.Common.Domain.Models.Planning.Iterations;
 
-namespace Moda.Common.Domain.Interfaces.Planning.Iterations;
+namespace Wayd.Common.Domain.Interfaces.Planning.Iterations;
 
 public interface ISimpleIteration
 {

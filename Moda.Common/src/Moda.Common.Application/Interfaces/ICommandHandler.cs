@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace Moda.Common.Application.Interfaces;
+namespace Wayd.Common.Application.Interfaces;
 
 public interface ICommandHandler<TCommand> : IRequestHandler<TCommand, Result> where TCommand : ICommand
 {

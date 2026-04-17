@@ -1,6 +1,6 @@
-﻿using Moda.Work.Application.WorkItems.Commands;
+﻿using Wayd.Work.Application.WorkItems.Commands;
 
-namespace Moda.Web.Api.Models.Work.Workspaces;
+namespace Wayd.Web.Api.Models.Work.Workspaces;
 
 public class UpdateWorkItemProjectRequest
 {

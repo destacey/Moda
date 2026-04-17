@@ -1,9 +1,9 @@
-﻿using Moda.Common.Domain.Enums.Work;
-using Moda.Tests.Shared;
-using Moda.Work.Domain.Interfaces;
-using Moda.Work.Domain.Tests.Data;
+﻿using Wayd.Common.Domain.Enums.Work;
+using Wayd.Tests.Shared;
+using Wayd.Work.Domain.Interfaces;
+using Wayd.Work.Domain.Tests.Data;
 
-namespace Moda.Work.Domain.Tests.Sut.Models;
+namespace Wayd.Work.Domain.Tests.Sut.Models;
 
 public class WorkItemTests
 {

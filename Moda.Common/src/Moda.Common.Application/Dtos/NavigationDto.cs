@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Moda.Common.Application.Dtos;
+namespace Wayd.Common.Application.Dtos;
 
 public record DescriptiveNavigationDto<TId, TKey>
 {

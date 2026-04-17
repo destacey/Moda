@@ -1,6 +1,6 @@
-﻿using Moda.ProjectPortfolioManagement.Application.Projects.Dtos;
+﻿using Wayd.ProjectPortfolioManagement.Application.Projects.Dtos;
 
-namespace Moda.ProjectPortfolioManagement.Application.Projects.Queries;
+namespace Wayd.ProjectPortfolioManagement.Application.Projects.Queries;
 
 public sealed record GetProjectPhasesQuery(Guid ProjectId) : IQuery<List<ProjectPhaseListDto>>;
 

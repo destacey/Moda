@@ -1,8 +1,8 @@
 ﻿using Ardalis.GuardClauses;
-using Moda.Organization.Domain.Enums;
+using Wayd.Organization.Domain.Enums;
 using NodaTime;
 
-namespace Moda.Organization.Domain.Models;
+namespace Wayd.Organization.Domain.Models;
 
 public abstract class BaseMembership : BaseSoftDeletableEntity
 {

@@ -1,8 +1,8 @@
 ﻿using FluentAssertions;
-using Moda.ArchitectureTests.Helpers;
+using Wayd.ArchitectureTests.Helpers;
 using NetArchTest.Rules;
 
-namespace Moda.ArchitectureTests.Sut;
+namespace Wayd.ArchitectureTests.Sut;
 
 /// <summary>
 /// Tests to enforce CQRS (Command Query Responsibility Segregation) pattern conventions.

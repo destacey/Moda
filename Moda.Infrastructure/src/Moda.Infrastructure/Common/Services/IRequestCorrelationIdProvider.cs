@@ -1,4 +1,4 @@
-﻿namespace Moda.Infrastructure.Common.Services;
+﻿namespace Wayd.Infrastructure.Common.Services;
 
 public interface IRequestCorrelationIdProvider : IScopedService
 {

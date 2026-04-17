@@ -1,8 +1,8 @@
-﻿using Moda.Common.Application.Models;
-using Moda.StrategicManagement.Domain.Enums;
-using Moda.StrategicManagement.Domain.Models;
+﻿using Wayd.Common.Application.Models;
+using Wayd.StrategicManagement.Domain.Enums;
+using Wayd.StrategicManagement.Domain.Models;
 
-namespace Moda.StrategicManagement.Application.Strategies.Commands;
+namespace Wayd.StrategicManagement.Application.Strategies.Commands;
 
 public sealed record CreateStrategyCommand(string Name, string Description, StrategyStatus Status, FlexibleDateRange? Dates) : ICommand<ObjectIdAndKey>;
 

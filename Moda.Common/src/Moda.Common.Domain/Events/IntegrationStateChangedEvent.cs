@@ -1,8 +1,8 @@
-﻿using Moda.Common.Domain.Enums;
-using Moda.Common.Domain.Models;
+﻿using Wayd.Common.Domain.Enums;
+using Wayd.Common.Domain.Models;
 using NodaTime;
 
-namespace Moda.Common.Domain.Events;
+namespace Wayd.Common.Domain.Events;
 
 public record IntegrationStateChangedEvent<TId> : DomainEvent
 {

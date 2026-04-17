@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using Moda.Planning.Domain.Interfaces.Roadmaps;
+using Wayd.Planning.Domain.Interfaces.Roadmaps;
 
-namespace Moda.Planning.Domain.Tests.Models;
+namespace Wayd.Planning.Domain.Tests.Models;
 
 internal record TestUpsertRoadmapMilestoneDate : IUpsertRoadmapMilestoneDate
 {

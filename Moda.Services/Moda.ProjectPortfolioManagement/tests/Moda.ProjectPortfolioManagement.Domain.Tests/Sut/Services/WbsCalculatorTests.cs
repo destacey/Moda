@@ -1,9 +1,9 @@
 using FluentAssertions;
-using Moda.ProjectPortfolioManagement.Domain.Models;
-using Moda.ProjectPortfolioManagement.Domain.Services;
-using Moda.ProjectPortfolioManagement.Domain.Tests.Data;
+using Wayd.ProjectPortfolioManagement.Domain.Models;
+using Wayd.ProjectPortfolioManagement.Domain.Services;
+using Wayd.ProjectPortfolioManagement.Domain.Tests.Data;
 
-namespace Moda.ProjectPortfolioManagement.Domain.Tests.Sut.Services;
+namespace Wayd.ProjectPortfolioManagement.Domain.Tests.Sut.Services;
 
 public class WbsCalculatorTests
 {

@@ -1,6 +1,6 @@
-using Moda.Common.Domain.Enums;
+using Wayd.Common.Domain.Enums;
 
-namespace Moda.AppIntegration.Domain.Models.AICapabilities.ObjectiveHealthCheckSummary;
+namespace Wayd.AppIntegration.Domain.Models.AICapabilities.ObjectiveHealthCheckSummary;
 
 /// <summary>
 /// Used as a type to generate a schema for Structured Outputs from LLMs around the AI Assisted Objective Health Checks feature.

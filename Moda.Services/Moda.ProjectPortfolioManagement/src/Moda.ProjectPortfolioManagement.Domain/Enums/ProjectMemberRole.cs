@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Moda.ProjectPortfolioManagement.Domain.Enums;
+namespace Wayd.ProjectPortfolioManagement.Domain.Enums;
 
 /// <summary>
 /// Represents the combined set of roles a user can have on a project,

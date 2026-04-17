@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 
-namespace Moda.Common.Extensions;
+namespace Wayd.Common.Extensions;
 
 public static class EnumExtensions
 {

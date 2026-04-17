@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Mapster;
-using Moda.Organization.Application.Models;
+using Wayd.Organization.Application.Models;
 using NodaTime;
 
-namespace Moda.Organization.Application.TeamsOfTeams.Dtos;
+namespace Wayd.Organization.Application.TeamsOfTeams.Dtos;
 
 public class TeamOfTeamsListDto : IMapFrom<BaseTeam>
 {

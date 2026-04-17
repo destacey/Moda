@@ -1,6 +1,6 @@
-﻿using Moda.Common.Application.Employees.Commands;
+﻿using Wayd.Common.Application.Employees.Commands;
 
-namespace Moda.Web.Api.Models.Organizations.Employees;
+namespace Wayd.Web.Api.Models.Organizations.Employees;
 
 public sealed record CreateEmployeeRequest
 {

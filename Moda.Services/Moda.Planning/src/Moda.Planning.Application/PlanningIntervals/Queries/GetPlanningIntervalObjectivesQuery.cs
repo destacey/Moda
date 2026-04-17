@@ -1,11 +1,11 @@
 ﻿using System.Linq.Expressions;
 using MediatR;
-using Moda.Common.Application.Dtos;
-using Moda.Common.Application.Models;
-using Moda.Common.Application.Requests.Goals.Queries;
-using Moda.Planning.Application.PlanningIntervals.Dtos;
+using Wayd.Common.Application.Dtos;
+using Wayd.Common.Application.Models;
+using Wayd.Common.Application.Requests.Goals.Queries;
+using Wayd.Planning.Application.PlanningIntervals.Dtos;
 
-namespace Moda.Planning.Application.PlanningIntervals.Queries;
+namespace Wayd.Planning.Application.PlanningIntervals.Queries;
 
 public sealed record GetPlanningIntervalObjectivesQuery : IQuery<IReadOnlyList<PlanningIntervalObjectiveListDto>>
 {

@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Moda.Work.Domain.Models;
+using Wayd.Work.Domain.Models;
 using NodaTime;
 
-namespace Moda.Infrastructure.Persistence.Initialization;
+namespace Wayd.Infrastructure.Persistence.Initialization;
 
 public class WorkSeeder : ICustomSeeder
 {

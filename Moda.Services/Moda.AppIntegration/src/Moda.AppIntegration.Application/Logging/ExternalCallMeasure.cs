@@ -1,7 +1,7 @@
 using System.Diagnostics;
-using Moda.Common.Application.Logging;
+using Wayd.Common.Application.Logging;
 
-namespace Moda.AppIntegration.Application.Logging;
+namespace Wayd.AppIntegration.Application.Logging;
 
 public static class ExternalCallMeasure
 {

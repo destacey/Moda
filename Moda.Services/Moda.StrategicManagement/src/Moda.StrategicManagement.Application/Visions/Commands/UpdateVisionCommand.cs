@@ -1,6 +1,6 @@
-﻿using Moda.Common.Application.Models;
+﻿using Wayd.Common.Application.Models;
 
-namespace Moda.StrategicManagement.Application.Visions.Commands;
+namespace Wayd.StrategicManagement.Application.Visions.Commands;
 
 public sealed record UpdateVisionCommand(Guid Id, string Description) : ICommand;
 

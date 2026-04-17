@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace Moda.Common.Application.Behaviors;
+namespace Wayd.Common.Application.Behaviors;
 
 public sealed class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : class
 {

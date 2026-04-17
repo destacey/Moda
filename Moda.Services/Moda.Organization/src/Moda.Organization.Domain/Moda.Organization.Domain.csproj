@@ -11,12 +11,12 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\..\Moda.Common\src\Moda.Common.Domain\Moda.Common.Domain.csproj" />
-        <ProjectReference Include="..\..\..\..\Moda.Common\src\Moda.Common\Moda.Common.csproj" />
+        <ProjectReference Include="..\..\..\..\Wayd.Common\src\Wayd.Common.Domain\Wayd.Common.Domain.csproj" />
+        <ProjectReference Include="..\..\..\..\Wayd.Common\src\Wayd.Common\Wayd.Common.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <InternalsVisibleTo Include="Moda.Organization.Domain.Tests" />
+        <InternalsVisibleTo Include="Wayd.Organization.Domain.Tests" />
     </ItemGroup>
 
 </Project>

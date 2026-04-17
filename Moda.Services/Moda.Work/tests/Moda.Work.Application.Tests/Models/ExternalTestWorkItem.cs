@@ -1,7 +1,7 @@
-﻿using Moda.Common.Application.Interfaces.ExternalWork;
+﻿using Wayd.Common.Application.Interfaces.ExternalWork;
 using NodaTime;
 
-namespace Moda.Work.Application.Tests.Models;
+namespace Wayd.Work.Application.Tests.Models;
 
 public class ExternalTestWorkItem : IExternalWorkItem
 {

@@ -1,7 +1,7 @@
-﻿using Moda.Common.Domain.Models.Organizations;
-using Moda.Organization.Application.Teams.Models;
+﻿using Wayd.Common.Domain.Models.Organizations;
+using Wayd.Organization.Application.Teams.Models;
 
-namespace Moda.Organization.Application.TeamsOfTeams.Commands;
+namespace Wayd.Organization.Application.TeamsOfTeams.Commands;
 
 public sealed record UpdateTeamOfTeamsCommand(Guid Id, string Name, TeamCode Code, string? Description) : ICommand<int>;
 

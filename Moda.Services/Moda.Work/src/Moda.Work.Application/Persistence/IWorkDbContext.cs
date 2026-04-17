@@ -1,4 +1,4 @@
-﻿namespace Moda.Work.Application.Persistence;
+﻿namespace Wayd.Work.Application.Persistence;
 
 public interface IWorkDbContext : IModaDbContext
 {

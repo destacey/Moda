@@ -1,8 +1,8 @@
 ﻿using CSharpFunctionalExtensions;
-using Moda.Common.Domain.Enums.Work;
+using Wayd.Common.Domain.Enums.Work;
 using NodaTime;
 
-namespace Moda.Work.Domain.Models;
+namespace Wayd.Work.Domain.Models;
 
 public sealed class WorkflowScheme : BaseSoftDeletableEntity, IActivatable
 {

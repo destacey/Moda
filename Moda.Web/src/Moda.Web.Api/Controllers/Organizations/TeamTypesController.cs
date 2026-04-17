@@ -1,7 +1,7 @@
-﻿using Moda.Organization.Application.TeamTypes.Dtos;
-using Moda.Organization.Application.TeamTypes.Queries;
+﻿using Wayd.Organization.Application.TeamTypes.Dtos;
+using Wayd.Organization.Application.TeamTypes.Queries;
 
-namespace Moda.Web.Api.Controllers.Work;
+namespace Wayd.Web.Api.Controllers.Work;
 
 [Route("api/organization/team-types")]
 [ApiVersionNeutral]

@@ -1,14 +1,14 @@
-﻿using Moda.Common.Domain.Enums.Organization;
-using Moda.Common.Domain.Events.Organization;
-using Moda.Common.Domain.Models.Organizations;
-using Moda.Organization.Domain.Enums;
-using Moda.Organization.Domain.Models;
-using Moda.Organization.Domain.Tests.Data;
-using Moda.Tests.Shared;
-using Moda.Tests.Shared.Extensions;
+﻿using Wayd.Common.Domain.Enums.Organization;
+using Wayd.Common.Domain.Events.Organization;
+using Wayd.Common.Domain.Models.Organizations;
+using Wayd.Organization.Domain.Enums;
+using Wayd.Organization.Domain.Models;
+using Wayd.Organization.Domain.Tests.Data;
+using Wayd.Tests.Shared;
+using Wayd.Tests.Shared.Extensions;
 using NodaTime;
 
-namespace Moda.Organization.Domain.Tests.Sut.Models;
+namespace Wayd.Organization.Domain.Tests.Sut.Models;
 
 public class TeamTests
 {

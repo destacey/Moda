@@ -1,14 +1,14 @@
 ﻿using Microsoft.AspNetCore.JsonPatch.SystemTextJson;
-using Moda.Common.Application.Models;
-using Moda.Common.Application.Requests;
-using Moda.Common.Domain.Enums.Planning;
-using Moda.Planning.Application.Roadmaps.Commands;
-using Moda.Planning.Application.Roadmaps.Dtos;
-using Moda.Planning.Application.Roadmaps.Queries;
-using Moda.Web.Api.Extensions;
-using Moda.Web.Api.Models.Planning.Roadmaps;
+using Wayd.Common.Application.Models;
+using Wayd.Common.Application.Requests;
+using Wayd.Common.Domain.Enums.Planning;
+using Wayd.Planning.Application.Roadmaps.Commands;
+using Wayd.Planning.Application.Roadmaps.Dtos;
+using Wayd.Planning.Application.Roadmaps.Queries;
+using Wayd.Web.Api.Extensions;
+using Wayd.Web.Api.Models.Planning.Roadmaps;
 
-namespace Moda.Web.Api.Controllers.Planning;
+namespace Wayd.Web.Api.Controllers.Planning;
 
 [Route("api/planning/[controller]")]
 [ApiVersionNeutral]

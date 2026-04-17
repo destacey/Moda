@@ -1,7 +1,7 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
 
-namespace Moda.Planning.Domain.Models.PlanningPoker;
+namespace Wayd.Planning.Domain.Models.PlanningPoker;
 
 public sealed class EstimationScale : BaseAuditableEntity<int>
 {

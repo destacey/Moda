@@ -1,11 +1,11 @@
-﻿using Moda.Common.Application.Requests.WorkManagement.Queries;
-using Moda.Web.Api.Extensions;
-using Moda.Web.Api.Models.Work.WorkTypeLevels;
-using Moda.Work.Application.WorkTypeLevels.Commands;
-using Moda.Work.Application.WorkTypeLevels.Dtos;
-using Moda.Work.Application.WorkTypeLevels.Queries;
+﻿using Wayd.Common.Application.Requests.WorkManagement.Queries;
+using Wayd.Web.Api.Extensions;
+using Wayd.Web.Api.Models.Work.WorkTypeLevels;
+using Wayd.Work.Application.WorkTypeLevels.Commands;
+using Wayd.Work.Application.WorkTypeLevels.Dtos;
+using Wayd.Work.Application.WorkTypeLevels.Queries;
 
-namespace Moda.Web.Api.Controllers.Work;
+namespace Wayd.Web.Api.Controllers.Work;
 
 [Route("api/work/work-type-levels")]
 [ApiVersionNeutral]

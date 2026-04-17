@@ -1,6 +1,6 @@
-﻿using Moda.ProjectPortfolioManagement.Application.ExpenditureCategories.Dtos;
+﻿using Wayd.ProjectPortfolioManagement.Application.ExpenditureCategories.Dtos;
 
-namespace Moda.ProjectPortfolioManagement.Application.ExpenditureCategories.Queries;
+namespace Wayd.ProjectPortfolioManagement.Application.ExpenditureCategories.Queries;
 
 public sealed record GetExpenditureCategoryQuery(int id) : IQuery<ExpenditureCategoryDetailsDto?>;
 

@@ -1,6 +1,6 @@
-using Moda.ProjectPortfolioManagement.Application.Programs.Commands;
+using Wayd.ProjectPortfolioManagement.Application.Programs.Commands;
 
-namespace Moda.Web.Api.Models.Ppm.Programs;
+namespace Wayd.Web.Api.Models.Ppm.Programs;
 
 public sealed record CreateProgramRequest
 {

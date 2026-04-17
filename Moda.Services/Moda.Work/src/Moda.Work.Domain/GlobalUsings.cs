@@ -1,5 +1,5 @@
-﻿global using Moda.Common.Domain.Data;
-global using Moda.Common.Domain.Enums;
-global using Moda.Common.Domain.Events;
-global using Moda.Common.Domain.Interfaces;
-global using Moda.Common.Domain.Models;
+﻿global using Wayd.Common.Domain.Data;
+global using Wayd.Common.Domain.Enums;
+global using Wayd.Common.Domain.Events;
+global using Wayd.Common.Domain.Interfaces;
+global using Wayd.Common.Domain.Models;

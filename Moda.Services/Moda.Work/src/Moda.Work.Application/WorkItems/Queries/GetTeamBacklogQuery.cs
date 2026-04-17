@@ -1,11 +1,11 @@
 ﻿using System.Linq.Expressions;
-using Moda.Common.Application.Models.Organizations;
-using Moda.Common.Domain.Enums.Work;
-using Moda.Work.Application.Extensions;
-using Moda.Work.Application.Persistence;
-using Moda.Work.Application.WorkItems.Dtos;
+using Wayd.Common.Application.Models.Organizations;
+using Wayd.Common.Domain.Enums.Work;
+using Wayd.Work.Application.Extensions;
+using Wayd.Work.Application.Persistence;
+using Wayd.Work.Application.WorkItems.Dtos;
 
-namespace Moda.Work.Application.WorkItems.Queries;
+namespace Wayd.Work.Application.WorkItems.Queries;
 
 public sealed record GetTeamBacklogQuery : IQuery<Result<List<WorkItemBacklogItemDto>>>
 {

@@ -31,39 +31,39 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\Moda.Common\src\Moda.Common\Moda.Common.csproj" />
+        <ProjectReference Include="..\..\..\Wayd.Common\src\Wayd.Common\Wayd.Common.csproj" />
         <ProjectReference
-            Include="..\..\..\Moda.Services\Moda.AppIntegration\src\Moda.AppIntegration.Application\Moda.AppIntegration.Application.csproj" />
+            Include="..\..\..\Wayd.Services\Wayd.AppIntegration\src\Wayd.AppIntegration.Application\Wayd.AppIntegration.Application.csproj" />
         <ProjectReference
-            Include="..\..\..\Moda.Common\src\Moda.Common.Application\Moda.Common.Application.csproj" />
+            Include="..\..\..\Wayd.Common\src\Wayd.Common.Application\Wayd.Common.Application.csproj" />
         <ProjectReference
-            Include="..\..\..\Moda.Common\src\Moda.Common.Domain\Moda.Common.Domain.csproj" />
+            Include="..\..\..\Wayd.Common\src\Wayd.Common.Domain\Wayd.Common.Domain.csproj" />
         <ProjectReference
-            Include="..\..\..\Moda.Services\Moda.Goals\src\Moda.Goals.Application\Moda.Goals.Application.csproj" />
+            Include="..\..\..\Wayd.Services\Wayd.Goals\src\Wayd.Goals.Application\Wayd.Goals.Application.csproj" />
         <ProjectReference
-            Include="..\..\..\Moda.Infrastructure\src\Moda.Infrastructure.Migrators.MSSQL\Moda.Infrastructure.Migrators.MSSQL.csproj" />
+            Include="..\..\..\Wayd.Infrastructure\src\Wayd.Infrastructure.Migrators.MSSQL\Wayd.Infrastructure.Migrators.MSSQL.csproj" />
         <ProjectReference
-            Include="..\..\..\Moda.Infrastructure\src\Moda.Infrastructure\Moda.Infrastructure.csproj" />
+            Include="..\..\..\Wayd.Infrastructure\src\Wayd.Infrastructure\Wayd.Infrastructure.csproj" />
         <ProjectReference
-            Include="..\..\..\Moda.Integrations\src\Moda.Integrations.AzureDevOps\Moda.Integrations.AzureDevOps.csproj" />
+            Include="..\..\..\Wayd.Integrations\src\Wayd.Integrations.AzureDevOps\Wayd.Integrations.AzureDevOps.csproj" />
         <ProjectReference
-            Include="..\..\..\Moda.Services\Moda.Health\src\Moda.Health\Moda.Health.csproj" />
+            Include="..\..\..\Wayd.Services\Wayd.Health\src\Wayd.Health\Wayd.Health.csproj" />
         <ProjectReference
-            Include="..\..\..\Moda.Services\Moda.Links\src\Moda.Links\Moda.Links.csproj" />
+            Include="..\..\..\Wayd.Services\Wayd.Links\src\Wayd.Links\Wayd.Links.csproj" />
         <ProjectReference
-            Include="..\..\..\Moda.Services\Moda.Organization\src\Moda.Organization.Application\Moda.Organization.Application.csproj" />
+            Include="..\..\..\Wayd.Services\Wayd.Organization\src\Wayd.Organization.Application\Wayd.Organization.Application.csproj" />
         <ProjectReference
-            Include="..\..\..\Moda.Services\Moda.Planning\src\Moda.Planning.Application\Moda.Planning.Application.csproj" />
+            Include="..\..\..\Wayd.Services\Wayd.Planning\src\Wayd.Planning.Application\Wayd.Planning.Application.csproj" />
         <ProjectReference
-            Include="..\..\..\Moda.Services\Moda.ProjectPortfolioManagement\src\Moda.ProjectPortfolioManagement.Application\Moda.ProjectPortfolioManagement.Application.csproj" />
+            Include="..\..\..\Wayd.Services\Wayd.ProjectPortfolioManagement\src\Wayd.ProjectPortfolioManagement.Application\Wayd.ProjectPortfolioManagement.Application.csproj" />
         <ProjectReference
-            Include="..\..\..\Moda.Services\Moda.ProjectPortfolioManagement\src\Moda.ProjectPortfolioManagement.Domain\Moda.ProjectPortfolioManagement.Domain.csproj" />
+            Include="..\..\..\Wayd.Services\Wayd.ProjectPortfolioManagement\src\Wayd.ProjectPortfolioManagement.Domain\Wayd.ProjectPortfolioManagement.Domain.csproj" />
         <ProjectReference
-            Include="..\..\..\Moda.Services\Moda.StrategicManagement\src\Moda.StrategicManagement.Application\Moda.StrategicManagement.Application.csproj" />
+            Include="..\..\..\Wayd.Services\Wayd.StrategicManagement\src\Wayd.StrategicManagement.Application\Wayd.StrategicManagement.Application.csproj" />
         <ProjectReference
-            Include="..\..\..\Moda.Services\Moda.Work\src\Moda.Work.Application\Moda.Work.Application.csproj" />
+            Include="..\..\..\Wayd.Services\Wayd.Work\src\Wayd.Work.Application\Wayd.Work.Application.csproj" />
         <ProjectReference
-            Include="..\..\..\Moda.Services\Moda.Work\src\Moda.Work.Domain\Moda.Work.Domain.csproj" />
+            Include="..\..\..\Wayd.Services\Wayd.Work\src\Wayd.Work.Domain\Wayd.Work.Domain.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -94,7 +94,7 @@
         Condition=" '$(Configuration)' == 'Debug' ">
         <Exec ConsoleToMSBuild="true" ContinueOnError="true" WorkingDirectory="$(ProjectDir)"
             EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Development"
-            Command="npx openapi-mcp-generator -i wwwroot\api\v1\specification.json -o $(RepoRoot)/Moda.MCP -t stdio -n moda-mcp">
+            Command="npx openapi-mcp-generator -i wwwroot\api\v1\specification.json -o $(RepoRoot)/Wayd.MCP -t stdio -n moda-mcp">
             <Output TaskParameter="ExitCode" PropertyName="OpenAPIMCPGeneratorExitCode" />
             <Output TaskParameter="ConsoleOutput" PropertyName="OpenAPIMCPGeneratorOutput" />
         </Exec>

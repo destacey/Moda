@@ -1,4 +1,4 @@
-﻿namespace Moda.Common.Application.Requests.WorkManagement.Interfaces;
+﻿namespace Wayd.Common.Application.Requests.WorkManagement.Interfaces;
 
 public interface IWorkStatusDto
 {

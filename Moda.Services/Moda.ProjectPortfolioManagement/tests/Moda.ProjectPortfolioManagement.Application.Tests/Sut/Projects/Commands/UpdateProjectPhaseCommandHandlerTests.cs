@@ -1,16 +1,16 @@
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
-using Moda.ProjectPortfolioManagement.Application.Projects.Commands;
-using Moda.ProjectPortfolioManagement.Application.Tests.Infrastructure;
-using Moda.ProjectPortfolioManagement.Domain.Tests.Data;
-using Moda.Tests.Shared;
+using Wayd.ProjectPortfolioManagement.Application.Projects.Commands;
+using Wayd.ProjectPortfolioManagement.Application.Tests.Infrastructure;
+using Wayd.ProjectPortfolioManagement.Domain.Tests.Data;
+using Wayd.Tests.Shared;
 using Moq;
 using NodaTime;
 using NodaTime.Extensions;
 using NodaTime.Testing;
-using TaskStatus = Moda.ProjectPortfolioManagement.Domain.Enums.TaskStatus;
+using TaskStatus = Wayd.ProjectPortfolioManagement.Domain.Enums.TaskStatus;
 
-namespace Moda.ProjectPortfolioManagement.Application.Tests.Sut.Projects.Commands;
+namespace Wayd.ProjectPortfolioManagement.Application.Tests.Sut.Projects.Commands;
 
 public class UpdateProjectPhaseCommandHandlerTests : IDisposable
 {

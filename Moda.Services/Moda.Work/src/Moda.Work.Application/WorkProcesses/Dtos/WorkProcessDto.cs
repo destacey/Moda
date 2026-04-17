@@ -1,6 +1,6 @@
-﻿using Moda.Common.Application.Dtos;
+﻿using Wayd.Common.Application.Dtos;
 
-namespace Moda.Work.Application.WorkProcesses.Dtos;
+namespace Wayd.Work.Application.WorkProcesses.Dtos;
 
 public sealed record WorkProcessDto : IMapFrom<WorkProcess>
 {

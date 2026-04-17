@@ -1,6 +1,6 @@
-﻿using Moda.Common.Domain.Enums.Goals;
+﻿using Wayd.Common.Domain.Enums.Goals;
 
-namespace Moda.Common.Application.Requests.Goals.Commands;
+namespace Wayd.Common.Application.Requests.Goals.Commands;
 
 public sealed record CreateObjectiveCommand(string Name, string? Description, ObjectiveType Type, Guid? OwnerId, Guid? PlanId, LocalDate? StartDate, LocalDate? TargetDate, int? Order) : ICommand<Guid>;
 

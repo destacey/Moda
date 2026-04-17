@@ -1,7 +1,7 @@
-﻿using Moda.Common.Domain.Interfaces.Organization;
-using Moda.Work.Application.Persistence;
+﻿using Wayd.Common.Domain.Interfaces.Organization;
+using Wayd.Work.Application.Persistence;
 
-namespace Moda.Work.Application.WorkTeams.Commands;
+namespace Wayd.Work.Application.WorkTeams.Commands;
 
 public sealed record SyncWorkTeamsCommand(IEnumerable<ISimpleTeam> Teams) : ICommand, ILongRunningRequest;
 

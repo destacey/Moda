@@ -3,7 +3,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
-namespace Moda.Infrastructure.SignalR;
+namespace Wayd.Infrastructure.SignalR;
 
 [Authorize]
 public class PlanningPokerHub : Hub

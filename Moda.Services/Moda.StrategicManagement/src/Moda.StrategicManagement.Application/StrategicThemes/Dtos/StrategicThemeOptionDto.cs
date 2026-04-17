@@ -1,7 +1,7 @@
-﻿using Moda.Common.Extensions;
-using Moda.StrategicManagement.Domain.Models;
+﻿using Wayd.Common.Extensions;
+using Wayd.StrategicManagement.Domain.Models;
 
-namespace Moda.StrategicManagement.Application.StrategicThemes.Dtos;
+namespace Wayd.StrategicManagement.Application.StrategicThemes.Dtos;
 
 public sealed record StrategicThemeOptionDto : IMapFrom<StrategicTheme>
 {

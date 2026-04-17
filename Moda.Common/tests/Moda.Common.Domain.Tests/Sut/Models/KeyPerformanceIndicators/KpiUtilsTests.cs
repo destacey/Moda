@@ -1,7 +1,7 @@
-﻿using Moda.Common.Domain.Enums;
-using Moda.Common.Domain.Models.KeyPerformanceIndicators;
+﻿using Wayd.Common.Domain.Enums;
+using Wayd.Common.Domain.Models.KeyPerformanceIndicators;
 
-namespace Moda.Common.Domain.Tests.Sut.Models.KeyPerformanceIndicators;
+namespace Wayd.Common.Domain.Tests.Sut.Models.KeyPerformanceIndicators;
 
 public sealed class KpiUtilsTests
 {

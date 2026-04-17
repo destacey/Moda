@@ -1,6 +1,6 @@
-﻿using Moda.Common.Extensions;
+﻿using Wayd.Common.Extensions;
 
-namespace Moda.AppIntegration.Domain.Models.OpenAI;
+namespace Wayd.AppIntegration.Domain.Models.OpenAI;
 
 public class OpenAIConnection : Connection<OpenAIConnectionConfiguration>
 {
@@ -17,7 +17,7 @@ public class OpenAIConnection : Connection<OpenAIConnectionConfiguration>
         Name = name;
         Description = description;
         IsValidConfiguration = configurationIsValid;
-        Connector = Moda.Common.Domain.Enums.AppIntegrations.Connector.OpenAI;
+        Connector = Wayd.Common.Domain.Enums.AppIntegrations.Connector.OpenAI;
         Configuration = Guard.Against.Null(configuration, nameof(Configuration));
     }
 

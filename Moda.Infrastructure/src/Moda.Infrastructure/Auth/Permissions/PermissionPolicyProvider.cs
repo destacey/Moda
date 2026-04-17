@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 
-namespace Moda.Infrastructure.Auth.Permissions;
+namespace Wayd.Infrastructure.Auth.Permissions;
 
 internal class PermissionPolicyProvider : IAuthorizationPolicyProvider
 {

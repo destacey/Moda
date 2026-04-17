@@ -1,8 +1,8 @@
-﻿using Moda.Common.Application.Requests.WorkManagement.Interfaces;
-using Moda.Common.Application.Requests.WorkManagement.Queries;
-using Moda.Work.Application.Persistence;
+﻿using Wayd.Common.Application.Requests.WorkManagement.Interfaces;
+using Wayd.Common.Application.Requests.WorkManagement.Queries;
+using Wayd.Work.Application.Persistence;
 
-namespace Moda.Work.Application.WorkTypeLevels.Queries;
+namespace Wayd.Work.Application.WorkTypeLevels.Queries;
 
 internal sealed class GetWorkTypeLevelsQueryHandler : IQueryHandler<GetWorkTypeLevelsQuery, IReadOnlyList<IWorkTypeLevelDto>>
 {

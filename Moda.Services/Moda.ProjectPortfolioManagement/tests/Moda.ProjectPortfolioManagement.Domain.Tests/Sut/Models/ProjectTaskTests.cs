@@ -1,11 +1,11 @@
 using FluentAssertions;
-using Moda.Common.Domain.Models.ProjectPortfolioManagement;
-using Moda.ProjectPortfolioManagement.Domain.Tests.Data;
-using Moda.Tests.Shared;
+using Wayd.Common.Domain.Models.ProjectPortfolioManagement;
+using Wayd.ProjectPortfolioManagement.Domain.Tests.Data;
+using Wayd.Tests.Shared;
 using NodaTime.Extensions;
 using NodaTime.Testing;
 
-namespace Moda.ProjectPortfolioManagement.Domain.Tests.Sut.Models;
+namespace Wayd.ProjectPortfolioManagement.Domain.Tests.Sut.Models;
 
 public class ProjectTaskTests
 {

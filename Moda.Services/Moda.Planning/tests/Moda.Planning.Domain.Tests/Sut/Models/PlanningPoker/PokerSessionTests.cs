@@ -1,8 +1,8 @@
-using Moda.Planning.Domain.Enums;
-using Moda.Planning.Domain.Models.PlanningPoker;
+using Wayd.Planning.Domain.Enums;
+using Wayd.Planning.Domain.Models.PlanningPoker;
 using NodaTime.Extensions;
 
-namespace Moda.Planning.Domain.Tests.Sut.Models.PlanningPoker;
+namespace Wayd.Planning.Domain.Tests.Sut.Models.PlanningPoker;
 
 public class PokerSessionTests
 {

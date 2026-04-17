@@ -1,6 +1,6 @@
-﻿using Moda.Common.Domain.Enums.Work;
+﻿using Wayd.Common.Domain.Enums.Work;
 
-namespace Moda.Work.Domain.Interfaces;
+namespace Wayd.Work.Domain.Interfaces;
 
 public interface ICreateWorkflowScheme
 {

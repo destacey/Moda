@@ -1,9 +1,9 @@
 ﻿using System.Linq.Expressions;
-using Moda.ProjectPortfolioManagement.Application.Projects.Models;
-using Moda.ProjectPortfolioManagement.Application.ProjectTasks.Dtos;
-using Moda.ProjectPortfolioManagement.Domain.Models;
+using Wayd.ProjectPortfolioManagement.Application.Projects.Models;
+using Wayd.ProjectPortfolioManagement.Application.ProjectTasks.Dtos;
+using Wayd.ProjectPortfolioManagement.Domain.Models;
 
-namespace Moda.ProjectPortfolioManagement.Application.ProjectTasks.Queries;
+namespace Wayd.ProjectPortfolioManagement.Application.ProjectTasks.Queries;
 
 public sealed record GetProjectTasksQuery : IQuery<IReadOnlyList<ProjectTaskListDto>>
 {

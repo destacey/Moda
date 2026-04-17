@@ -1,6 +1,6 @@
-﻿using Moda.Planning.Application.PlanningIntervals.Dtos;
+﻿using Wayd.Planning.Application.PlanningIntervals.Dtos;
 
-namespace Moda.Planning.Application.PlanningIntervals.Queries;
+namespace Wayd.Planning.Application.PlanningIntervals.Queries;
 
 public sealed record GetPlanningIntervalsQuery() : IQuery<IReadOnlyList<PlanningIntervalListDto>>;
 

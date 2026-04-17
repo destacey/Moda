@@ -1,7 +1,7 @@
 ﻿using System.Text.RegularExpressions;
-using Moda.Common.Models;
+using Wayd.Common.Models;
 
-namespace Moda.Common.Extensions;
+namespace Wayd.Common.Extensions;
 
 public static class StringExtensions
 {

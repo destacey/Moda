@@ -1,16 +1,16 @@
 ﻿using Microsoft.AspNetCore.JsonPatch.SystemTextJson;
-using Moda.Common.Application.Models;
-using Moda.ProjectPortfolioManagement.Application.Projects.Commands;
-using Moda.ProjectPortfolioManagement.Application.Projects.Dtos;
-using Moda.ProjectPortfolioManagement.Application.Projects.Queries;
-using Moda.ProjectPortfolioManagement.Domain.Enums;
-using Moda.Web.Api.Extensions;
-using Moda.Web.Api.Models.Ppm.ProjectLifecycles;
-using Moda.Web.Api.Models.Ppm.Projects;
-using Moda.Work.Application.WorkItems.Dtos;
-using Moda.Work.Application.WorkItems.Queries;
+using Wayd.Common.Application.Models;
+using Wayd.ProjectPortfolioManagement.Application.Projects.Commands;
+using Wayd.ProjectPortfolioManagement.Application.Projects.Dtos;
+using Wayd.ProjectPortfolioManagement.Application.Projects.Queries;
+using Wayd.ProjectPortfolioManagement.Domain.Enums;
+using Wayd.Web.Api.Extensions;
+using Wayd.Web.Api.Models.Ppm.ProjectLifecycles;
+using Wayd.Web.Api.Models.Ppm.Projects;
+using Wayd.Work.Application.WorkItems.Dtos;
+using Wayd.Work.Application.WorkItems.Queries;
 
-namespace Moda.Web.Api.Controllers.Ppm;
+namespace Wayd.Web.Api.Controllers.Ppm;
 
 [Route("api/ppm/[controller]")]
 [ApiVersionNeutral]

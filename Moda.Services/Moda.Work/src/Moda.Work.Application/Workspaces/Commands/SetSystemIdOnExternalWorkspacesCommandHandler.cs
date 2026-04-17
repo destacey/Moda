@@ -1,8 +1,8 @@
-﻿using Moda.Common.Application.Requests.WorkManagement.Commands;
-using Moda.Common.Domain.Enums;
-using Moda.Work.Application.Persistence;
+﻿using Wayd.Common.Application.Requests.WorkManagement.Commands;
+using Wayd.Common.Domain.Enums;
+using Wayd.Work.Application.Persistence;
 
-namespace Moda.Work.Application.Workspaces.Commands;
+namespace Wayd.Work.Application.Workspaces.Commands;
 
 internal sealed class SetSystemIdOnExternalWorkspacesCommandHandler(IWorkDbContext workDbContext, ILogger<SetSystemIdOnExternalWorkspacesCommandHandler> logger) : ICommandHandler<SetSystemIdOnExternalWorkspacesCommand>
 {

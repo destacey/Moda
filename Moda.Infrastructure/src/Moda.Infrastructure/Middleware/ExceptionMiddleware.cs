@@ -6,7 +6,7 @@ using Serilog;
 using Serilog.Context;
 using Serilog.Events;
 
-namespace Moda.Infrastructure.Middleware;
+namespace Wayd.Infrastructure.Middleware;
 
 public sealed class ExceptionMiddleware(IProblemDetailsService problemDetailsService, ICurrentUser currentUser) : IMiddleware
 {

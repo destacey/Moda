@@ -20,11 +20,11 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\..\Moda.Common\src\Moda.Common.Domain\Moda.Common.Domain.csproj" />
-        <ProjectReference Include="..\..\..\..\Moda.Common\tests\Moda.Tests.Shared\Moda.Tests.Shared.csproj" />
-        <ProjectReference Include="..\..\src\Moda.Planning.Application\Moda.Planning.Application.csproj" />
-        <ProjectReference Include="..\..\src\Moda.Planning.Domain\Moda.Planning.Domain.csproj" />
-        <ProjectReference Include="..\Moda.Planning.Domain.Tests\Moda.Planning.Domain.Tests.csproj" />
+        <ProjectReference Include="..\..\..\..\Wayd.Common\src\Wayd.Common.Domain\Wayd.Common.Domain.csproj" />
+        <ProjectReference Include="..\..\..\..\Wayd.Common\tests\Wayd.Tests.Shared\Wayd.Tests.Shared.csproj" />
+        <ProjectReference Include="..\..\src\Wayd.Planning.Application\Wayd.Planning.Application.csproj" />
+        <ProjectReference Include="..\..\src\Wayd.Planning.Domain\Wayd.Planning.Domain.csproj" />
+        <ProjectReference Include="..\Wayd.Planning.Domain.Tests\Wayd.Planning.Domain.Tests.csproj" />
     </ItemGroup>
 
 </Project>

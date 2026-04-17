@@ -1,11 +1,11 @@
 ﻿using CSharpFunctionalExtensions;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
-using Moda.Common.Application.Interfaces;
-using Moda.Common.Application.Validation;
-using Moda.Links.Models;
+using Wayd.Common.Application.Interfaces;
+using Wayd.Common.Application.Validation;
+using Wayd.Links.Models;
 
-namespace Moda.Links.Commands;
+namespace Wayd.Links.Commands;
 
 public sealed record CreateLinkCommand(Guid ObjectId, string Name, string Url) : ICommand<Guid>;
 

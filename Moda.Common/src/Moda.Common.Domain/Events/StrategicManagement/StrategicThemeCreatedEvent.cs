@@ -1,8 +1,8 @@
-﻿using Moda.Common.Domain.Enums.StrategicManagement;
-using Moda.Common.Domain.Interfaces.StrategicManagement;
+﻿using Wayd.Common.Domain.Enums.StrategicManagement;
+using Wayd.Common.Domain.Interfaces.StrategicManagement;
 using NodaTime;
 
-namespace Moda.Common.Domain.Events.StrategicManagement;
+namespace Wayd.Common.Domain.Events.StrategicManagement;
 
 public sealed record StrategicThemeCreatedEvent : DomainEvent, IStrategicThemeData
 {

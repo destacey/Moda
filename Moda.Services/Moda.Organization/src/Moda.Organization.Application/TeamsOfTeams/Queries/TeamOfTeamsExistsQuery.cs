@@ -1,4 +1,4 @@
-﻿namespace Moda.Organization.Application.TeamsOfTeams.Queries;
+﻿namespace Wayd.Organization.Application.TeamsOfTeams.Queries;
 
 public sealed record TeamOfTeamsExistsQuery : IQuery<bool>
 {

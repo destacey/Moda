@@ -8,7 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 
-namespace Moda.Infrastructure.BackgroundJobs;
+namespace Wayd.Infrastructure.BackgroundJobs;
 
 internal static class ConfigureServices
 {

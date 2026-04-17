@@ -1,7 +1,7 @@
 using CSharpFunctionalExtensions;
-using Moda.Common.Domain.Models.KeyPerformanceIndicators;
+using Wayd.Common.Domain.Models.KeyPerformanceIndicators;
 
-namespace Moda.Common.Domain.Tests.Data.Models;
+namespace Wayd.Common.Domain.Tests.Data.Models;
 
 /// <summary>
 /// Concrete implementation of Kpi for testing purposes.

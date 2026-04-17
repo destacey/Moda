@@ -1,4 +1,4 @@
-namespace Moda.Common.Application.Search;
+namespace Wayd.Common.Application.Search;
 
 public sealed class GlobalSearchQueryValidator : CustomValidator<GlobalSearchQuery>
 {

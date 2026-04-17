@@ -1,4 +1,4 @@
-namespace Moda.Infrastructure.SecurityHeaders;
+namespace Wayd.Infrastructure.SecurityHeaders;
 
 public class SecurityHeaderSettings
 {

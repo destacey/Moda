@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Moda.Common.Application.Models;
+using Wayd.Common.Application.Models;
 
-namespace Moda.Web.Api.Controllers;
+namespace Wayd.Web.Api.Controllers;
 
 #nullable disable
 #pragma warning disable RCS1163

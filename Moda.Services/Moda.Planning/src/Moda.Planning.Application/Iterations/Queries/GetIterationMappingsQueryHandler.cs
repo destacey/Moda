@@ -1,7 +1,7 @@
-﻿using Moda.Common.Application.Requests.Planning.Iterations;
-using Moda.Common.Domain.Enums;
+﻿using Wayd.Common.Application.Requests.Planning.Iterations;
+using Wayd.Common.Domain.Enums;
 
-namespace Moda.Planning.Application.Iterations.Queries;
+namespace Wayd.Planning.Application.Iterations.Queries;
 
 internal sealed class GetIterationMappingsQueryHandler(IPlanningDbContext planningDbContext, ILogger<GetIterationMappingsQueryHandler> logger) : IQueryHandler<GetIterationMappingsQuery, Dictionary<string, Guid>>
 {

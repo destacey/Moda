@@ -1,7 +1,7 @@
-﻿using Moda.Web.Api.Extensions;
-using Moda.Web.Api.Models.AppIntegrations.Connections;
+﻿using Wayd.Web.Api.Extensions;
+using Wayd.Web.Api.Models.AppIntegrations.Connections;
 
-namespace Moda.Web.Api.Controllers.AppIntegrations;
+namespace Wayd.Web.Api.Controllers.AppIntegrations;
 
 [Route("api/app-integrations/connections/azure-openai")]
 [ApiVersionNeutral]

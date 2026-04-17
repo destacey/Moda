@@ -1,6 +1,6 @@
-﻿using Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
+﻿using Wayd.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 
-namespace Moda.ProjectPortfolioManagement.Domain.Tests.Data.Extensions;
+namespace Wayd.ProjectPortfolioManagement.Domain.Tests.Data.Extensions;
 
 public static class StrategicInitiativeKpiDataExtensions
 {

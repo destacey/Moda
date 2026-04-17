@@ -1,6 +1,6 @@
 ﻿using NodaTime;
 
-namespace Moda.Common.Domain.Events.StrategicManagement;
+namespace Wayd.Common.Domain.Events.StrategicManagement;
 
 public sealed record StrategicThemeDeletedEvent : DomainEvent
 {

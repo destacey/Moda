@@ -1,9 +1,9 @@
-﻿using Moda.Common.Models;
-using Moda.Planning.Domain.Models;
-using Moda.Tests.Shared.Data;
+﻿using Wayd.Common.Models;
+using Wayd.Planning.Domain.Models;
+using Wayd.Tests.Shared.Data;
 using NodaTime.Extensions;
 
-namespace Moda.Planning.Domain.Tests.Data;
+namespace Wayd.Planning.Domain.Tests.Data;
 
 public class PlanningIntervalFaker : PrivateConstructorFaker<PlanningInterval>
 {

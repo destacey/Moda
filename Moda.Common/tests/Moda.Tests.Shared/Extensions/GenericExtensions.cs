@@ -1,7 +1,7 @@
 ﻿using System.Linq.Expressions;
 using System.Reflection;
 
-namespace Moda.Tests.Shared.Extensions;
+namespace Wayd.Tests.Shared.Extensions;
 
 public static class GenericExtensions
 {

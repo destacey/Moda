@@ -3,18 +3,18 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.Extensions.Logging;
-using Moda.Common.Application.Events;
-using Moda.Common.Application.Exceptions;
-using Moda.Common.Application.Identity;
-using Moda.Common.Application.Identity.Users;
-using Moda.Common.Application.Interfaces;
-using Moda.Common.Domain.Authorization;
-using Moda.Common.Domain.Identity;
-using Moda.Infrastructure.Identity;
-using Moda.Tests.Shared;
-using NotFoundException = Moda.Common.Application.Exceptions.NotFoundException;
+using Wayd.Common.Application.Events;
+using Wayd.Common.Application.Exceptions;
+using Wayd.Common.Application.Identity;
+using Wayd.Common.Application.Identity.Users;
+using Wayd.Common.Application.Interfaces;
+using Wayd.Common.Domain.Authorization;
+using Wayd.Common.Domain.Identity;
+using Wayd.Infrastructure.Identity;
+using Wayd.Tests.Shared;
+using NotFoundException = Wayd.Common.Application.Exceptions.NotFoundException;
 
-namespace Moda.Infrastructure.Tests.Sut.Identity;
+namespace Wayd.Infrastructure.Tests.Sut.Identity;
 
 public class UserServiceTests
 {

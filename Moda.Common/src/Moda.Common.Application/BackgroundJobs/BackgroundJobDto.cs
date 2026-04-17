@@ -1,4 +1,4 @@
-﻿namespace Moda.Common.Application.BackgroundJobs;
+﻿namespace Wayd.Common.Application.BackgroundJobs;
 
 public record BackgroundJobDto
 {

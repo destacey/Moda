@@ -1,6 +1,6 @@
-﻿using Moda.Common.Domain.Enums.Planning;
+﻿using Wayd.Common.Domain.Enums.Planning;
 
-namespace Moda.Common.Application.Interfaces.ExternalWork;
+namespace Wayd.Common.Application.Interfaces.ExternalWork;
 
 public interface IExternalIteration<TMetadata> where TMetadata : class
 {

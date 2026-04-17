@@ -2,7 +2,7 @@ using System.Text.RegularExpressions;
 using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
 
-namespace Moda.Common.Domain.Models.ProjectPortfolioManagement;
+namespace Wayd.Common.Domain.Models.ProjectPortfolioManagement;
 
 /// <summary>
 /// Represents a unique identifier for a project task in the format {ProjectKey}-{Number}.

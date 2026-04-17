@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Moda.Common.Domain.Employees;
+using Wayd.Common.Domain.Employees;
 using NodaTime;
 
-namespace Moda.Infrastructure.Identity;
+namespace Wayd.Infrastructure.Identity;
 
 public class ApplicationUser : IdentityUser
 {

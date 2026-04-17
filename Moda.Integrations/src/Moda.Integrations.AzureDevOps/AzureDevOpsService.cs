@@ -2,15 +2,15 @@
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
-using Moda.Common.Application.Interfaces;
-using Moda.Common.Application.Interfaces.ExternalWork;
-using Moda.Common.Application.Models;
-using Moda.Integrations.AzureDevOps.Models.Projects;
-using Moda.Integrations.AzureDevOps.Models.WorkItems;
-using Moda.Integrations.AzureDevOps.Services;
-using Moda.Integrations.AzureDevOps.Utils;
+using Wayd.Common.Application.Interfaces;
+using Wayd.Common.Application.Interfaces.ExternalWork;
+using Wayd.Common.Application.Models;
+using Wayd.Integrations.AzureDevOps.Models.Projects;
+using Wayd.Integrations.AzureDevOps.Models.WorkItems;
+using Wayd.Integrations.AzureDevOps.Services;
+using Wayd.Integrations.AzureDevOps.Utils;
 
-namespace Moda.Integrations.AzureDevOps;
+namespace Wayd.Integrations.AzureDevOps;
 
 public class AzureDevOpsService(ILogger<AzureDevOpsService> logger, IServiceProvider serviceProvider, IDateTimeProvider dateTimeProvider, IMemoryCache memoryCache) : IAzureDevOpsService
 {

@@ -1,6 +1,6 @@
-﻿using Moda.Planning.Domain.Enums;
+﻿using Wayd.Planning.Domain.Enums;
 
-namespace Moda.Planning.Domain.Models;
+namespace Wayd.Planning.Domain.Models;
 
 public sealed class UpsertPlanningIntervalIteration
 {

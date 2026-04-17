@@ -1,11 +1,11 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
-using Moda.Common.Domain.Events.ProjectPortfolioManagement;
-using Moda.Common.Domain.Interfaces.ProjectPortfolioManagement;
-using Moda.ProjectPortfolioManagement.Domain.Enums;
+using Wayd.Common.Domain.Events.ProjectPortfolioManagement;
+using Wayd.Common.Domain.Interfaces.ProjectPortfolioManagement;
+using Wayd.ProjectPortfolioManagement.Domain.Enums;
 using NodaTime;
 
-namespace Moda.ProjectPortfolioManagement.Domain.Models;
+namespace Wayd.ProjectPortfolioManagement.Domain.Models;
 
 /// <summary>
 /// Represents a program consisting of related projects within a portfolio, designed to achieve strategic objectives.

@@ -1,7 +1,7 @@
-﻿using Moda.Organization.Domain.Models;
+﻿using Wayd.Organization.Domain.Models;
 using NodaTime;
 
-namespace Moda.Organization.Domain.Tests.Sut.Models;
+namespace Wayd.Organization.Domain.Tests.Sut.Models;
 
 public class TeamToTeamMembershipTests
 {

@@ -1,9 +1,9 @@
 ﻿using System.Text.Json;
-using Moda.Common.Extensions;
-using Moda.Integrations.AzureDevOps.Models.Projects;
-using Moda.Integrations.AzureDevOps.Tests.Models;
+using Wayd.Common.Extensions;
+using Wayd.Integrations.AzureDevOps.Models.Projects;
+using Wayd.Integrations.AzureDevOps.Tests.Models;
 
-namespace Moda.Integrations.AzureDevOps.Tests.Sut.Models;
+namespace Wayd.Integrations.AzureDevOps.Tests.Sut.Models;
 
 public class IterationNodeResponseTests : CommonResponseOptions
 {

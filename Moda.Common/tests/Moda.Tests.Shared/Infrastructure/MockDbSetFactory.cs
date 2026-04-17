@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Moq;
 
-namespace Moda.Tests.Shared.Infrastructure;
+namespace Wayd.Tests.Shared.Infrastructure;
 
 /// <summary>
 /// Provides helper methods for creating mock DbSets for testing.

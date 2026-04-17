@@ -1,6 +1,6 @@
-﻿using Moda.Common.Application.Models;
+﻿using Wayd.Common.Application.Models;
 
-namespace Moda.Planning.Application.PlanningIntervals.Commands;
+namespace Wayd.Planning.Application.PlanningIntervals.Commands;
 
 public sealed record CreatePlanningIntervalCommand(string Name, string? Description, LocalDateRange DateRange, int IterationWeeks, string? IterationPrefix) : ICommand<ObjectIdAndKey>;
 

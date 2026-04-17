@@ -1,7 +1,7 @@
-﻿using Moda.Common.Domain.Enums.Organization;
-using Moda.Organization.Application.TeamTypes.Dtos;
+﻿using Wayd.Common.Domain.Enums.Organization;
+using Wayd.Organization.Application.TeamTypes.Dtos;
 
-namespace Moda.Organization.Application.TeamTypes.Queries;
+namespace Wayd.Organization.Application.TeamTypes.Queries;
 
 public sealed record GetTeamTypesQuery : IQuery<IReadOnlyList<TeamTypeDto>> { }
 

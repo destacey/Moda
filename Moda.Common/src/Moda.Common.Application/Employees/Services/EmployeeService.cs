@@ -1,8 +1,8 @@
 ﻿using MediatR;
-using Moda.Common.Application.Employees.Commands;
-using Moda.Common.Application.Identity.Users;
+using Wayd.Common.Application.Employees.Commands;
+using Wayd.Common.Application.Identity.Users;
 
-namespace Moda.Common.Application.Services;
+namespace Wayd.Common.Application.Services;
 
 public sealed class EmployeeService : IEmployeeService
 {

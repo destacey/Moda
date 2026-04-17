@@ -1,10 +1,10 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
-using Moda.Common.Domain.Enums.Work;
-using Moda.Common.Extensions;
+using Wayd.Common.Domain.Enums.Work;
+using Wayd.Common.Extensions;
 using NodaTime;
 
-namespace Moda.Work.Domain.Models;
+namespace Wayd.Work.Domain.Models;
 
 /// <summary>Allows work types to be grouped and defined in a hierarchy.</summary>
 public sealed class WorkTypeLevel : BaseAuditableEntity<int>

@@ -1,6 +1,6 @@
 ﻿using Ardalis.GuardClauses;
 
-namespace Moda.Planning.Application.Roadmaps.Commands;
+namespace Wayd.Planning.Application.Roadmaps.Commands;
 
 public sealed record DeleteRoadmapItemCommand(Guid RoadmapId, Guid ActivityId) : ICommand;
 public sealed class DeleteRoadmapItemCommandValidator : AbstractValidator<DeleteRoadmapItemCommand>

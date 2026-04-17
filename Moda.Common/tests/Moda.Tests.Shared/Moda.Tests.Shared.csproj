@@ -8,7 +8,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Moda.Common.Application\Moda.Common.Application.csproj" />
+    <ProjectReference Include="..\..\src\Wayd.Common.Application\Wayd.Common.Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>

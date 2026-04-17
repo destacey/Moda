@@ -1,6 +1,6 @@
 ﻿using Mapster;
 
-namespace Moda.Organization.Application.TeamsOfTeams.Queries;
+namespace Wayd.Organization.Application.TeamsOfTeams.Queries;
 
 public sealed record GetTeamOfTeamsListQuery : IQuery<IReadOnlyList<TeamOfTeamsListDto>>
 {

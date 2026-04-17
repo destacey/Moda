@@ -1,9 +1,9 @@
 using System.Linq.Expressions;
-using Moda.Common.Application.Models;
-using Moda.ProjectPortfolioManagement.Application.ProjectLifecycles.Dtos;
-using Moda.ProjectPortfolioManagement.Domain.Models;
+using Wayd.Common.Application.Models;
+using Wayd.ProjectPortfolioManagement.Application.ProjectLifecycles.Dtos;
+using Wayd.ProjectPortfolioManagement.Domain.Models;
 
-namespace Moda.ProjectPortfolioManagement.Application.ProjectLifecycles.Queries;
+namespace Wayd.ProjectPortfolioManagement.Application.ProjectLifecycles.Queries;
 
 public sealed record GetProjectLifecycleQuery : IQuery<ProjectLifecycleDetailsDto?>
 {

@@ -1,6 +1,6 @@
-﻿using Moda.Common.Domain.Extensions.Organizations;
+﻿using Wayd.Common.Domain.Extensions.Organizations;
 
-namespace Moda.Organization.Domain.Tests.Sut.Extensions;
+namespace Wayd.Organization.Domain.Tests.Sut.Extensions;
 
 public class StringExtensionsTests
 {

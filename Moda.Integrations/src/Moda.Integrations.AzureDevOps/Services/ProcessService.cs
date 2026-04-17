@@ -1,11 +1,11 @@
 ﻿using System.Net;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
-using Moda.Integrations.AzureDevOps.Clients;
-using Moda.Integrations.AzureDevOps.Models.Contracts;
-using Moda.Integrations.AzureDevOps.Models.Processes;
+using Wayd.Integrations.AzureDevOps.Clients;
+using Wayd.Integrations.AzureDevOps.Models.Contracts;
+using Wayd.Integrations.AzureDevOps.Models.Processes;
 
-namespace Moda.Integrations.AzureDevOps.Services;
+namespace Wayd.Integrations.AzureDevOps.Services;
 
 internal sealed class ProcessService(string organizationUrl, string token, string apiVersion, ILogger<ProcessService> logger)
 {

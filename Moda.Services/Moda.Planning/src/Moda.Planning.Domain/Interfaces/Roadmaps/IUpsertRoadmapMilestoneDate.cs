@@ -1,6 +1,6 @@
 ﻿using NodaTime;
 
-namespace Moda.Planning.Domain.Interfaces.Roadmaps;
+namespace Wayd.Planning.Domain.Interfaces.Roadmaps;
 
 public interface IUpsertRoadmapMilestoneDate
 {

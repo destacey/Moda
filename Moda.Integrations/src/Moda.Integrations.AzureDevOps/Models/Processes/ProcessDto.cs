@@ -1,6 +1,6 @@
-﻿using Moda.Integrations.AzureDevOps.Models.Contracts;
+﻿using Wayd.Integrations.AzureDevOps.Models.Contracts;
 
-namespace Moda.Integrations.AzureDevOps.Models.Processes;
+namespace Wayd.Integrations.AzureDevOps.Models.Processes;
 
 internal sealed record ProcessDto
 {

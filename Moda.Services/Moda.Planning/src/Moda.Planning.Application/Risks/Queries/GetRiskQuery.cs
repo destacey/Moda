@@ -1,8 +1,8 @@
 ﻿using System.Linq.Expressions;
-using Moda.Common.Application.Models;
-using Moda.Planning.Application.Risks.Dtos;
+using Wayd.Common.Application.Models;
+using Wayd.Planning.Application.Risks.Dtos;
 
-namespace Moda.Planning.Application.Risks.Queries;
+namespace Wayd.Planning.Application.Risks.Queries;
 
 public sealed record GetRiskQuery : IQuery<RiskDetailsDto?>
 {

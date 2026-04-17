@@ -1,4 +1,4 @@
-﻿namespace Moda.Planning.Application.PlanningIntervals.Commands;
+﻿namespace Wayd.Planning.Application.PlanningIntervals.Commands;
 
 /// <summary>
 /// Command to synchronize team sprint mappings to Planning Interval iterations.

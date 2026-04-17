@@ -1,8 +1,8 @@
 ﻿using System.Text.Json;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Moda.Infrastructure.Persistence.Converters;
+using Wayd.Infrastructure.Persistence.Converters;
 
-namespace Moda.Infrastructure.Persistence.Extensions;
+namespace Wayd.Infrastructure.Persistence.Extensions;
 
 public static class PropertyBuilderExtensions
 {

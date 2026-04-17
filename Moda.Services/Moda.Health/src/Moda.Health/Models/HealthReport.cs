@@ -1,7 +1,7 @@
-﻿using Moda.Common.Domain.Enums;
+﻿using Wayd.Common.Domain.Enums;
 using NodaTime;
 
-namespace Moda.Health.Models;
+namespace Wayd.Health.Models;
 
 public sealed class HealthReport
 {

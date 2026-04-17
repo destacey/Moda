@@ -1,8 +1,8 @@
 ﻿using CSharpFunctionalExtensions;
 using Microsoft.EntityFrameworkCore;
-using Moda.Planning.Domain.Models.PlanningPoker;
+using Wayd.Planning.Domain.Models.PlanningPoker;
 
-namespace Moda.Infrastructure.Persistence.Initialization;
+namespace Wayd.Infrastructure.Persistence.Initialization;
 
 public class EstimationScaleSeeder : ICustomSeeder
 {

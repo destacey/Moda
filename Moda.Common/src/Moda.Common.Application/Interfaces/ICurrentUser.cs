@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 
-namespace Moda.Common.Application.Interfaces;
+namespace Wayd.Common.Application.Interfaces;
 
 public interface ICurrentUser
 {

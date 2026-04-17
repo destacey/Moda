@@ -1,8 +1,8 @@
 ﻿using Ardalis.GuardClauses;
-using Moda.Common.Domain.Enums.StrategicManagement;
-using Moda.Common.Domain.Interfaces.StrategicManagement;
+using Wayd.Common.Domain.Enums.StrategicManagement;
+using Wayd.Common.Domain.Interfaces.StrategicManagement;
 
-namespace Moda.ProjectPortfolioManagement.Domain.Models;
+namespace Wayd.ProjectPortfolioManagement.Domain.Models;
 
 /// <summary>
 /// Represents a strategic theme within the PPM domain.  The primary StrategicTheme entity is defined in the StrategicManagement domain.

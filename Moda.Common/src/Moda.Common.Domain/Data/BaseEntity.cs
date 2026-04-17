@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Moda.Common.Domain.Data;
+namespace Wayd.Common.Domain.Data;
 
 public abstract class BaseEntity<TId> : IEntity<TId>
 {

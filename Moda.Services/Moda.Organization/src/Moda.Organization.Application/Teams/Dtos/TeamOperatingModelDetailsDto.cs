@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Mapster;
-using Moda.Organization.Domain.Enums;
+using Wayd.Organization.Domain.Enums;
 using NodaTime;
 
-namespace Moda.Organization.Application.Teams.Dtos;
+namespace Wayd.Organization.Application.Teams.Dtos;
 
 /// <summary>
 /// Represents the operating model for a team.

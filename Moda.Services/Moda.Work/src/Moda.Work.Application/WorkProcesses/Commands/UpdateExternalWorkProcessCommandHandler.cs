@@ -1,9 +1,9 @@
-﻿using Moda.Common.Application.Interfaces.ExternalWork;
-using Moda.Common.Application.Requests.WorkManagement.Commands;
-using Moda.Common.Application.Requests.WorkManagement.Interfaces;
-using Moda.Work.Application.Persistence;
+﻿using Wayd.Common.Application.Interfaces.ExternalWork;
+using Wayd.Common.Application.Requests.WorkManagement.Commands;
+using Wayd.Common.Application.Requests.WorkManagement.Interfaces;
+using Wayd.Work.Application.Persistence;
 
-namespace Moda.Work.Application.WorkProcesses.Commands;
+namespace Wayd.Work.Application.WorkProcesses.Commands;
 
 internal sealed class UpdateExternalWorkProcessCommandHandler(IWorkDbContext workDbContext, IDateTimeProvider dateTimeProvider, ILogger<UpdateExternalWorkProcessCommandHandler> logger) : ICommandHandler<UpdateExternalWorkProcessCommand>
 {

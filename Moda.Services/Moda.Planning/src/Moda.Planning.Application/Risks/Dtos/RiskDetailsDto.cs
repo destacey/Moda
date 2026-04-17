@@ -1,7 +1,7 @@
-﻿using Moda.Common.Application.Dtos;
-using Moda.Planning.Application.Models;
+﻿using Wayd.Common.Application.Dtos;
+using Wayd.Planning.Application.Models;
 
-namespace Moda.Planning.Application.Risks.Dtos;
+namespace Wayd.Planning.Application.Risks.Dtos;
 
 public class RiskDetailsDto : IMapFrom<Risk>
 {

@@ -37,7 +37,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\src\Moda.Integrations.AzureDevOps\Moda.Integrations.AzureDevOps.csproj" />
+        <ProjectReference Include="..\..\src\Wayd.Integrations.AzureDevOps\Wayd.Integrations.AzureDevOps.csproj" />
     </ItemGroup>
 
 </Project>

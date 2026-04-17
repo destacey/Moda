@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
-namespace Moda.Infrastructure.Persistence.Extensions;
+namespace Wayd.Infrastructure.Persistence.Extensions;
 
 public static class EntityEntryExtensions
 {

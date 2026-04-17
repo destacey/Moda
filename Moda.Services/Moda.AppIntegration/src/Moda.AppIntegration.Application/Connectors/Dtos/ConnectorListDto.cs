@@ -1,4 +1,4 @@
-﻿namespace Moda.AppIntegration.Application.Connectors.Dtos;
+﻿namespace Wayd.AppIntegration.Application.Connectors.Dtos;
 
 public sealed class ConnectorListDto
 {

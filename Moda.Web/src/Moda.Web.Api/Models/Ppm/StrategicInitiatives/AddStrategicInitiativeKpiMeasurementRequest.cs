@@ -1,6 +1,6 @@
-﻿using Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Commands.Kpis;
+﻿using Wayd.ProjectPortfolioManagement.Application.StrategicInitiatives.Commands.Kpis;
 
-namespace Moda.Web.Api.Models.Ppm.StrategicInitiatives;
+namespace Wayd.Web.Api.Models.Ppm.StrategicInitiatives;
 
 public sealed record AddStrategicInitiativeKpiMeasurementRequest
 {

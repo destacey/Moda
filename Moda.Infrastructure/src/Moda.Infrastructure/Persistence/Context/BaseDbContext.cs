@@ -4,11 +4,11 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Options;
-using Moda.Infrastructure.Common.Services;
-using Moda.Infrastructure.Persistence.Extensions;
+using Wayd.Infrastructure.Common.Services;
+using Wayd.Infrastructure.Persistence.Extensions;
 using NodaTime;
 
-namespace Moda.Infrastructure.Persistence.Context;
+namespace Wayd.Infrastructure.Persistence.Context;
 
 public abstract class BaseDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, string, IdentityUserClaim<string>, ApplicationUserRole, IdentityUserLogin<string>, ApplicationRoleClaim, IdentityUserToken<string>>
 {

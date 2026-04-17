@@ -1,4 +1,4 @@
-﻿namespace Moda.Infrastructure.Common;
+﻿namespace Wayd.Infrastructure.Common;
 
 internal class DbProviderKeys
 {

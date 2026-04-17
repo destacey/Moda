@@ -1,7 +1,7 @@
-using Moda.ProjectPortfolioManagement.Application.ProjectTasks.Commands;
-using Moda.ProjectPortfolioManagement.Domain.Enums;
+using Wayd.ProjectPortfolioManagement.Application.ProjectTasks.Commands;
+using Wayd.ProjectPortfolioManagement.Domain.Enums;
 
-namespace Moda.Web.Api.Models.Ppm.ProjectTasks;
+namespace Wayd.Web.Api.Models.Ppm.ProjectTasks;
 
 public sealed record CreateProjectTaskRequest
 {

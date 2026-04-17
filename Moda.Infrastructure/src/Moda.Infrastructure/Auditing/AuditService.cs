@@ -1,7 +1,7 @@
 ﻿using Mapster;
 using Microsoft.EntityFrameworkCore;
 
-namespace Moda.Infrastructure.Auditing;
+namespace Wayd.Infrastructure.Auditing;
 
 public class AuditService(ModaDbContext context) : IAuditService
 {

@@ -1,9 +1,9 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
-using Moda.Common.Domain.Enums.Work;
+using Wayd.Common.Domain.Enums.Work;
 using NodaTime;
 
-namespace Moda.Work.Domain.Models;
+namespace Wayd.Work.Domain.Models;
 
 /// <summary>
 /// This object ensures the integrity and system state of global work type levels.

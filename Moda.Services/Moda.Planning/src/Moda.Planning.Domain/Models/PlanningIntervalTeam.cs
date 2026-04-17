@@ -1,4 +1,4 @@
-﻿namespace Moda.Planning.Domain.Models;
+﻿namespace Wayd.Planning.Domain.Models;
 
 public sealed class PlanningIntervalTeam
 {

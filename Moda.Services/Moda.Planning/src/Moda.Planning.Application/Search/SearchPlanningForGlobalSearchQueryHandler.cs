@@ -1,14 +1,14 @@
 ﻿using Ardalis.GuardClauses;
 using MediatR;
-using Moda.Common.Application.Requests.Goals.Queries;
-using Moda.Common.Application.Search;
-using Moda.Common.Application.Search.Dtos;
-using Moda.Common.Domain.Enums;
-using Moda.Common.Domain.Enums.Planning;
-using Moda.Planning.Domain.Models.Iterations;
-using Moda.Planning.Domain.Models.Roadmaps;
+using Wayd.Common.Application.Requests.Goals.Queries;
+using Wayd.Common.Application.Search;
+using Wayd.Common.Application.Search.Dtos;
+using Wayd.Common.Domain.Enums;
+using Wayd.Common.Domain.Enums.Planning;
+using Wayd.Planning.Domain.Models.Iterations;
+using Wayd.Planning.Domain.Models.Roadmaps;
 
-namespace Moda.Planning.Application.Search;
+namespace Wayd.Planning.Application.Search;
 
 internal sealed class SearchPlanningForGlobalSearchQueryHandler(IPlanningDbContext planningDbContext, ISender sender, IDateTimeProvider dateTimeProvider, ICurrentUser currentUser)
     : IQueryHandler<SearchPlanningForGlobalSearchQuery, ServiceSearchResponse>

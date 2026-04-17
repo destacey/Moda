@@ -1,21 +1,21 @@
-﻿using Moda.Common.Domain.Enums.Work;
-using Moda.Organization.Application.Models;
-using Moda.Organization.Application.Teams.Commands;
-using Moda.Organization.Application.Teams.Dtos;
-using Moda.Organization.Application.Teams.Queries;
-using Moda.Planning.Application.Iterations.Dtos;
-using Moda.Planning.Application.Iterations.Queries;
-using Moda.Planning.Application.Risks.Dtos;
-using Moda.Planning.Application.Risks.Queries;
-using Moda.Web.Api.Extensions;
-using Moda.Web.Api.Models.Organizations;
-using Moda.Web.Api.Models.Organizations.Teams;
-using Moda.Web.Api.Models.Planning.Risks;
-using Moda.Work.Application.WorkItemDependencies.Dtos;
-using Moda.Work.Application.WorkItems.Dtos;
-using Moda.Work.Application.WorkItems.Queries;
+﻿using Wayd.Common.Domain.Enums.Work;
+using Wayd.Organization.Application.Models;
+using Wayd.Organization.Application.Teams.Commands;
+using Wayd.Organization.Application.Teams.Dtos;
+using Wayd.Organization.Application.Teams.Queries;
+using Wayd.Planning.Application.Iterations.Dtos;
+using Wayd.Planning.Application.Iterations.Queries;
+using Wayd.Planning.Application.Risks.Dtos;
+using Wayd.Planning.Application.Risks.Queries;
+using Wayd.Web.Api.Extensions;
+using Wayd.Web.Api.Models.Organizations;
+using Wayd.Web.Api.Models.Organizations.Teams;
+using Wayd.Web.Api.Models.Planning.Risks;
+using Wayd.Work.Application.WorkItemDependencies.Dtos;
+using Wayd.Work.Application.WorkItems.Dtos;
+using Wayd.Work.Application.WorkItems.Queries;
 
-namespace Moda.Web.Api.Controllers.Organizations;
+namespace Wayd.Web.Api.Controllers.Organizations;
 
 [Route("api/organization/teams")]
 [ApiVersionNeutral]

@@ -1,9 +1,9 @@
 ﻿using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
-using Moda.Integrations.AzureDevOps.Clients;
-using Moda.Integrations.AzureDevOps.Models.WorkItems;
+using Wayd.Integrations.AzureDevOps.Clients;
+using Wayd.Integrations.AzureDevOps.Models.WorkItems;
 
-namespace Moda.Integrations.AzureDevOps.Services;
+namespace Wayd.Integrations.AzureDevOps.Services;
 
 internal sealed class WorkItemService(string organizationUrl, string token, string apiVersion, ILogger<WorkItemService> logger)
 {

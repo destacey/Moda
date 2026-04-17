@@ -1,7 +1,7 @@
 ﻿using Mapster;
-using Moda.Common.Domain.Models;
+using Wayd.Common.Domain.Models;
 
-namespace Moda.Common.Application.Dtos;
+namespace Wayd.Common.Application.Dtos;
 
 public sealed class IntegrationStateDto : IMapFrom<IntegrationState<Guid>>
 {

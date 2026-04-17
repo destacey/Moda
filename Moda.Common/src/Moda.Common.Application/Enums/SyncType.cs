@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Moda.Common.Application.Enums;
+namespace Wayd.Common.Application.Enums;
 
 public enum SyncType
 {

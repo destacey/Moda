@@ -1,4 +1,4 @@
-﻿namespace Moda.Common.Application.Requests.WorkManagement.Commands;
+﻿namespace Wayd.Common.Application.Requests.WorkManagement.Commands;
 
 public sealed record ProcessDependenciesCommand(string SystemId) : ICommand, ILongRunningRequest;
 

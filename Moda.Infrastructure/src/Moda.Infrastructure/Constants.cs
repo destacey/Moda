@@ -1,4 +1,4 @@
-﻿namespace Moda.Infrastructure;
+﻿namespace Wayd.Infrastructure;
 
 public static class ServiceEndpoints
 {

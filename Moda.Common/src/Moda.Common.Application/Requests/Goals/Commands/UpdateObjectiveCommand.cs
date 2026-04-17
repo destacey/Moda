@@ -1,6 +1,6 @@
-﻿using Moda.Common.Domain.Enums.Goals;
+﻿using Wayd.Common.Domain.Enums.Goals;
 
-namespace Moda.Common.Application.Requests.Goals.Commands;
+namespace Wayd.Common.Application.Requests.Goals.Commands;
 
 public sealed record UpdateObjectiveCommand(Guid Id, string Name, string? Description, ObjectiveStatus Status, double Progress, Guid? OwnerId, LocalDate? StartDate, LocalDate? TargetDate) : ICommand<Guid>;
 

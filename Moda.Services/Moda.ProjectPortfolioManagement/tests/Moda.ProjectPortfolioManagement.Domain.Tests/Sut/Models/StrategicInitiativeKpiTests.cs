@@ -1,14 +1,14 @@
 ﻿using FluentAssertions;
-using Moda.Common.Domain.Models.KeyPerformanceIndicators;
-using Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
-using Moda.ProjectPortfolioManagement.Domain.Tests.Data;
-using Moda.ProjectPortfolioManagement.Domain.Tests.Data.Extensions;
-using Moda.Tests.Shared;
+using Wayd.Common.Domain.Models.KeyPerformanceIndicators;
+using Wayd.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
+using Wayd.ProjectPortfolioManagement.Domain.Tests.Data;
+using Wayd.ProjectPortfolioManagement.Domain.Tests.Data.Extensions;
+using Wayd.Tests.Shared;
 using NodaTime;
 using NodaTime.Extensions;
 using NodaTime.Testing;
 
-namespace Moda.ProjectPortfolioManagement.Domain.Tests.Sut.Models;
+namespace Wayd.ProjectPortfolioManagement.Domain.Tests.Sut.Models;
 
 public sealed class StrategicInitiativeKpiTests
 {

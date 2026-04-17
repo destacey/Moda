@@ -1,6 +1,6 @@
-﻿using Moda.Planning.Domain.Enums;
+﻿using Wayd.Planning.Domain.Enums;
 
-namespace Moda.Planning.Application.PlanningIntervals.Extensions;
+namespace Wayd.Planning.Application.PlanningIntervals.Extensions;
 
 public static class ObjectiveStatusExtension
 {

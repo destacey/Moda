@@ -1,12 +1,12 @@
-﻿using Moda.Common.Application.Models;
-using Moda.StrategicManagement.Application.Strategies.Commands;
-using Moda.StrategicManagement.Application.Strategies.Dtos;
-using Moda.StrategicManagement.Application.Strategies.Queries;
-using Moda.StrategicManagement.Domain.Enums;
-using Moda.Web.Api.Extensions;
-using Moda.Web.Api.Models.StrategicManagement.Strategies;
+﻿using Wayd.Common.Application.Models;
+using Wayd.StrategicManagement.Application.Strategies.Commands;
+using Wayd.StrategicManagement.Application.Strategies.Dtos;
+using Wayd.StrategicManagement.Application.Strategies.Queries;
+using Wayd.StrategicManagement.Domain.Enums;
+using Wayd.Web.Api.Extensions;
+using Wayd.Web.Api.Models.StrategicManagement.Strategies;
 
-namespace Moda.Web.Api.Controllers.StrategicManagement;
+namespace Wayd.Web.Api.Controllers.StrategicManagement;
 
 [Route("api/strategic-management/[controller]")]
 [ApiVersionNeutral]

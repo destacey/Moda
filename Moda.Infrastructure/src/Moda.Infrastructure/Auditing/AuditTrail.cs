@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using NodaTime;
 using NodaTime.Serialization.SystemTextJson;
 
-namespace Moda.Infrastructure.Auditing;
+namespace Wayd.Infrastructure.Auditing;
 
 public class AuditTrail
 {

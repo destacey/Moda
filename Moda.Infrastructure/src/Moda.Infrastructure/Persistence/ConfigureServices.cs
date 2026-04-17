@@ -1,17 +1,17 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Moda.Common.Application.FeatureManagement;
-using Moda.Goals.Application.Persistence;
-using Moda.Health;
-using Moda.Links;
-using Moda.Planning.Application.Persistence;
-using Moda.ProjectPortfolioManagement.Application;
-using Moda.StrategicManagement.Application;
-using Moda.Work.Application.Persistence;
+using Wayd.Common.Application.FeatureManagement;
+using Wayd.Goals.Application.Persistence;
+using Wayd.Health;
+using Wayd.Links;
+using Wayd.Planning.Application.Persistence;
+using Wayd.ProjectPortfolioManagement.Application;
+using Wayd.StrategicManagement.Application;
+using Wayd.Work.Application.Persistence;
 using Serilog;
 
-namespace Moda.Infrastructure.Persistence;
+namespace Wayd.Infrastructure.Persistence;
 
 internal static class ConfigureServices
 {
@@ -57,7 +57,7 @@ internal static class ConfigureServices
             case DbProviderKeys.SqlServer:
                 return builder.UseSqlServer(connectionString, options =>
                 {
-                    options.MigrationsAssembly("Moda.Infrastructure.Migrators.MSSQL");
+                    options.MigrationsAssembly("Wayd.Infrastructure.Migrators.MSSQL");
                     options.UseNodaTime();
                 });
 
@@ -65,7 +65,7 @@ internal static class ConfigureServices
             //    AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
             //    return builder.UseNpgsql(connectionString, options =>
             //    {
-            //        options.MigrationsAssembly("Moda.Infrastructure.Migrators.PostgreSQL");
+            //        options.MigrationsAssembly("Wayd.Infrastructure.Migrators.PostgreSQL");
             //        options.UseNodaTime();
             //    });
 

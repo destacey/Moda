@@ -1,6 +1,6 @@
-﻿using Moda.Common.Application.Dtos;
+﻿using Wayd.Common.Application.Dtos;
 
-namespace Moda.Work.Application.Workspaces.Dtos;
+namespace Wayd.Work.Application.Workspaces.Dtos;
 
 public sealed record WorkspaceNavigationDto : NavigationDto<Guid, string>, IMapFrom<Workspace>
 {

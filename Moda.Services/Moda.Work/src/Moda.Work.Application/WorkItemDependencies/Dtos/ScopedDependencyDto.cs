@@ -1,8 +1,8 @@
-﻿using Moda.Common.Application.Dtos;
-using Moda.Common.Application.Employees.Dtos;
-using Moda.Work.Application.WorkItems.Dtos;
+﻿using Wayd.Common.Application.Dtos;
+using Wayd.Common.Application.Employees.Dtos;
+using Wayd.Work.Application.WorkItems.Dtos;
 
-namespace Moda.Work.Application.WorkItemDependencies.Dtos;
+namespace Wayd.Work.Application.WorkItemDependencies.Dtos;
 
 public sealed record ScopedDependencyDto
 {

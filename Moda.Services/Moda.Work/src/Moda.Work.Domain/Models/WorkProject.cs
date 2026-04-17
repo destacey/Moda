@@ -1,10 +1,10 @@
-﻿using Moda.Common.Domain.Interfaces.ProjectPortfolioManagement;
-using Moda.Common.Domain.Models.ProjectPortfolioManagement;
+﻿using Wayd.Common.Domain.Interfaces.ProjectPortfolioManagement;
+using Wayd.Common.Domain.Models.ProjectPortfolioManagement;
 
-namespace Moda.Work.Domain.Models;
+namespace Wayd.Work.Domain.Models;
 
 /// <summary>
-/// A copy of the Moda.Common.Domain.Interfaces.Ppm.ISimpleProject interface.  Used to hold basic project information for the work service and db context.
+/// A copy of the Wayd.Common.Domain.Interfaces.Ppm.ISimpleProject interface.  Used to hold basic project information for the work service and db context.
 /// </summary>
 public sealed class WorkProject : ISimpleProject, IHasIdAndKey<ProjectKey>
 {

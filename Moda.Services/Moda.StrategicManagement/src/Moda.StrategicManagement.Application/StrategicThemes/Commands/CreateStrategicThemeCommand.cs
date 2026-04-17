@@ -1,8 +1,8 @@
-﻿using Moda.Common.Application.Models;
-using Moda.Common.Domain.Enums.StrategicManagement;
-using Moda.StrategicManagement.Domain.Models;
+﻿using Wayd.Common.Application.Models;
+using Wayd.Common.Domain.Enums.StrategicManagement;
+using Wayd.StrategicManagement.Domain.Models;
 
-namespace Moda.StrategicManagement.Application.StrategicThemes.Commands;
+namespace Wayd.StrategicManagement.Application.StrategicThemes.Commands;
 
 public sealed record CreateStrategicThemeCommand(string Name, string Description) : ICommand<ObjectIdAndKey>;
 

@@ -1,4 +1,4 @@
-﻿namespace Moda.Common.Application.Identity.PersonalAccessTokens.Dtos;
+﻿namespace Wayd.Common.Application.Identity.PersonalAccessTokens.Dtos;
 
 /// <summary>
 /// DTO for personal access token information.

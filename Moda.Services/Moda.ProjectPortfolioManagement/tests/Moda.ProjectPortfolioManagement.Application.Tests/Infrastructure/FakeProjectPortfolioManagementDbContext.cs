@@ -1,13 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Moda.Common.Domain.Employees;
-using Moda.Common.Domain.Identity;
-using Moda.ProjectPortfolioManagement.Domain.Models;
-using Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
-using Moda.Tests.Shared.Infrastructure;
+using Wayd.Common.Domain.Employees;
+using Wayd.Common.Domain.Identity;
+using Wayd.ProjectPortfolioManagement.Domain.Models;
+using Wayd.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
+using Wayd.Tests.Shared.Infrastructure;
 
-namespace Moda.ProjectPortfolioManagement.Application.Tests.Infrastructure;
+namespace Wayd.ProjectPortfolioManagement.Application.Tests.Infrastructure;
 
 /// <summary>
 /// A test double for IProjectPortfolioManagementDbContext that provides in-memory collections for all DbSets.

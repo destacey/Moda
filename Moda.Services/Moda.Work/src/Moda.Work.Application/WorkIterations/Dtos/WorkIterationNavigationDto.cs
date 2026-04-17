@@ -1,7 +1,7 @@
-﻿using Moda.Common.Application.Dtos;
-using Moda.Work.Application.WorkTeams.Dtos;
+﻿using Wayd.Common.Application.Dtos;
+using Wayd.Work.Application.WorkTeams.Dtos;
 
-namespace Moda.Work.Application.WorkIterations.Dtos;
+namespace Wayd.Work.Application.WorkIterations.Dtos;
 
 public sealed record WorkIterationNavigationDto : NavigationDto, IMapFrom<WorkIteration>
 {

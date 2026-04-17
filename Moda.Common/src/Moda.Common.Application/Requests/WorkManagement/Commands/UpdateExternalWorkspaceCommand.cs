@@ -1,5 +1,5 @@
-﻿using Moda.Common.Application.Interfaces.ExternalWork;
+﻿using Wayd.Common.Application.Interfaces.ExternalWork;
 
-namespace Moda.Common.Application.Requests.WorkManagement.Commands;
+namespace Wayd.Common.Application.Requests.WorkManagement.Commands;
 
 public sealed record UpdateExternalWorkspaceCommand(IExternalWorkspaceConfiguration ExternalWorkspace) : ICommand, ILongRunningRequest;

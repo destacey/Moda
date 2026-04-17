@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace Moda.AppIntegration.Application.Connections.Commands.AzureOpenAI;
+namespace Wayd.AppIntegration.Application.Connections.Commands.AzureOpenAI;
 
 public sealed record DeleteAzureOpenAIConnectionCommand(Guid Id) : ICommand;
 

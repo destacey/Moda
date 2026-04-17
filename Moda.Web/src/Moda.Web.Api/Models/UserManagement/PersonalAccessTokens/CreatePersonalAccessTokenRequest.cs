@@ -1,7 +1,7 @@
-using Moda.Common.Application.Identity.PersonalAccessTokens.Commands;
-using Moda.Common.Application.Interfaces;
+using Wayd.Common.Application.Identity.PersonalAccessTokens.Commands;
+using Wayd.Common.Application.Interfaces;
 
-namespace Moda.Web.Api.Models.UserManagement.PersonalAccessTokens;
+namespace Wayd.Web.Api.Models.UserManagement.PersonalAccessTokens;
 
 public sealed record CreatePersonalAccessTokenRequest
 {

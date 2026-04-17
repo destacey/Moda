@@ -1,6 +1,6 @@
 using MediatR;
 
-namespace Moda.Common.Application.Events;
+namespace Wayd.Common.Application.Events;
 
 public class EventNotification<TEvent> : INotification where TEvent : IEvent
 {

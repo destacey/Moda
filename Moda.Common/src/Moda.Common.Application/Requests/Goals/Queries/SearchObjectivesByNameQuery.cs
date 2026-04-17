@@ -1,6 +1,6 @@
-using Moda.Common.Application.Requests.Goals.Dtos;
+using Wayd.Common.Application.Requests.Goals.Dtos;
 
-namespace Moda.Common.Application.Requests.Goals.Queries;
+namespace Wayd.Common.Application.Requests.Goals.Queries;
 
 /// <summary>
 /// Searches objectives by name. Returns matching objectives with their PlanId and OwnerId

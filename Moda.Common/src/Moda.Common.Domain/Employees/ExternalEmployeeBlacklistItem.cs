@@ -1,4 +1,4 @@
-﻿namespace Moda.Common.Domain.Employees;
+﻿namespace Wayd.Common.Domain.Employees;
 
 public sealed class ExternalEmployeeBlacklistItem
 {

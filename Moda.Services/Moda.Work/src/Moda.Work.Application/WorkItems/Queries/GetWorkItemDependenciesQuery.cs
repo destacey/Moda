@@ -1,9 +1,9 @@
 ﻿using System.Linq.Expressions;
-using Moda.Work.Application.Persistence;
-using Moda.Work.Application.WorkItemDependencies.Dtos;
-using Moda.Work.Application.Workspaces.Models;
+using Wayd.Work.Application.Persistence;
+using Wayd.Work.Application.WorkItemDependencies.Dtos;
+using Wayd.Work.Application.Workspaces.Models;
 
-namespace Moda.Work.Application.WorkItems.Queries;
+namespace Wayd.Work.Application.WorkItems.Queries;
 
 public sealed record GetWorkItemDependenciesQuery : IQuery<Result<List<ScopedDependencyDto>?>>
 {

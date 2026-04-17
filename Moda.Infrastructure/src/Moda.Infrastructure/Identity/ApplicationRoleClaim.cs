@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using NodaTime;
 
-namespace Moda.Infrastructure.Identity;
+namespace Wayd.Infrastructure.Identity;
 
 public class ApplicationRoleClaim : IdentityRoleClaim<string>
 {

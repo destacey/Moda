@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace Moda.AppIntegration.Application.Connections.Commands.AzureDevOps;
+namespace Wayd.AppIntegration.Application.Connections.Commands.AzureDevOps;
 
 public sealed record DeleteAzureDevOpsConnectionCommand(Guid Id) : ICommand;
 

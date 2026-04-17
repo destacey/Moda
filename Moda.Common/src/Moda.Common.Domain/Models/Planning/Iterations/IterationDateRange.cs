@@ -1,8 +1,8 @@
 ﻿using CSharpFunctionalExtensions;
-using Moda.Common.Interfaces;
+using Wayd.Common.Interfaces;
 using NodaTime;
 
-namespace Moda.Common.Domain.Models.Planning.Iterations;
+namespace Wayd.Common.Domain.Models.Planning.Iterations;
 
 public sealed class IterationDateRange : ValueObject, IDateRange<Instant?>
 {

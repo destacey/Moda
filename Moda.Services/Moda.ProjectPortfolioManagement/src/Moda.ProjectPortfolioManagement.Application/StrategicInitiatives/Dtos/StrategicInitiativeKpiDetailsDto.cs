@@ -1,7 +1,7 @@
-﻿using Moda.Common.Domain.Models.KeyPerformanceIndicators;
-using Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
+﻿using Wayd.Common.Domain.Models.KeyPerformanceIndicators;
+using Wayd.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 
-namespace Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Dtos;
+namespace Wayd.ProjectPortfolioManagement.Application.StrategicInitiatives.Dtos;
 
 public sealed record StrategicInitiativeKpiDetailsDto : IMapFrom<StrategicInitiativeKpi>
 {

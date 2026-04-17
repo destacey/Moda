@@ -1,6 +1,6 @@
-﻿using Moda.Common.Models;
+﻿using Wayd.Common.Models;
 
-namespace Moda.Common.Application.Interfaces;
+namespace Wayd.Common.Application.Interfaces;
 
 public interface IExternalEmployee
 {

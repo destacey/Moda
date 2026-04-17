@@ -1,7 +1,7 @@
-using Moda.Common.Domain.Identity;
+using Wayd.Common.Domain.Identity;
 using NodaTime;
 
-namespace Moda.Tests.Shared.Data;
+namespace Wayd.Tests.Shared.Data;
 
 public sealed class PersonalAccessTokenFaker : PrivateConstructorFaker<PersonalAccessToken>
 {

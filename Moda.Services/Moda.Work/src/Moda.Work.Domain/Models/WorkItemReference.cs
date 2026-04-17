@@ -1,4 +1,4 @@
-﻿namespace Moda.Work.Domain.Models;
+﻿namespace Wayd.Work.Domain.Models;
 /// <summary>
 /// References to work items from other objects.
 /// </summary>

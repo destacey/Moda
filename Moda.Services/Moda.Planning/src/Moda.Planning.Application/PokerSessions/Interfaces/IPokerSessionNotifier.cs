@@ -1,6 +1,6 @@
-﻿using Moda.Planning.Application.PokerSessions.Dtos;
+﻿using Wayd.Planning.Application.PokerSessions.Dtos;
 
-namespace Moda.Planning.Application.PokerSessions.Interfaces;
+namespace Wayd.Planning.Application.PokerSessions.Interfaces;
 
 public interface IPokerSessionNotifier
 {

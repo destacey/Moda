@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Moda.Infrastructure.Auth.PersonalAccessToken;
+namespace Wayd.Infrastructure.Auth.PersonalAccessToken;
 
 internal static class ConfigureServices
 {

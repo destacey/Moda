@@ -1,9 +1,9 @@
-using Moda.Common.Models;
-using Moda.ProjectPortfolioManagement.Domain.Models;
-using Moda.Tests.Shared.Data;
-using TaskStatus = Moda.ProjectPortfolioManagement.Domain.Enums.TaskStatus;
+using Wayd.Common.Models;
+using Wayd.ProjectPortfolioManagement.Domain.Models;
+using Wayd.Tests.Shared.Data;
+using TaskStatus = Wayd.ProjectPortfolioManagement.Domain.Enums.TaskStatus;
 
-namespace Moda.ProjectPortfolioManagement.Domain.Tests.Data;
+namespace Wayd.ProjectPortfolioManagement.Domain.Tests.Data;
 
 public sealed class ProjectPhaseFaker : PrivateConstructorFaker<ProjectPhase>
 {

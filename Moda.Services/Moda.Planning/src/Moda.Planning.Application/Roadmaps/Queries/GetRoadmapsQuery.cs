@@ -1,9 +1,9 @@
 ﻿using Ardalis.GuardClauses;
-using Moda.Common.Domain.Enums;
-using Moda.Common.Domain.Enums.Planning;
-using Moda.Planning.Application.Roadmaps.Dtos;
+using Wayd.Common.Domain.Enums;
+using Wayd.Common.Domain.Enums.Planning;
+using Wayd.Planning.Application.Roadmaps.Dtos;
 
-namespace Moda.Planning.Application.Roadmaps.Queries;
+namespace Wayd.Planning.Application.Roadmaps.Queries;
 
 public sealed record GetRoadmapsQuery(RoadmapState[]? StateFilter = null) : IQuery<List<RoadmapListDto>>;
 

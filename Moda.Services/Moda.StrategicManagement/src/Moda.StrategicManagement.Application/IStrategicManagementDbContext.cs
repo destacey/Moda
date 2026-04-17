@@ -1,6 +1,6 @@
-﻿using Moda.StrategicManagement.Domain.Models;
+﻿using Wayd.StrategicManagement.Domain.Models;
 
-namespace Moda.StrategicManagement.Application;
+namespace Wayd.StrategicManagement.Application;
 
 public interface IStrategicManagementDbContext : IModaDbContext
 {

@@ -5,12 +5,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Web;
-using Moda.Common.Application.Employees.Queries;
-using Moda.Common.Application.Identity;
-using Moda.Common.Extensions;
-using NotFoundException = Moda.Common.Application.Exceptions.NotFoundException;
+using Wayd.Common.Application.Employees.Queries;
+using Wayd.Common.Application.Identity;
+using Wayd.Common.Extensions;
+using NotFoundException = Wayd.Common.Application.Exceptions.NotFoundException;
 
-namespace Moda.Infrastructure.Identity;
+namespace Wayd.Infrastructure.Identity;
 
 internal partial class UserService
 {
@@ -100,7 +100,7 @@ internal partial class UserService
             {
                 _logger.LogWarning("Registration denied for user {Username} (ObjectId: {ObjectId}). No matching employee record found.",
                     username, principalObjectId);
-                throw new ForbiddenException("Registration is restricted to users with an employee record in Moda.");
+                throw new ForbiddenException("Registration is restricted to users with an employee record in Wayd.");
             }
 
             user = new ApplicationUser

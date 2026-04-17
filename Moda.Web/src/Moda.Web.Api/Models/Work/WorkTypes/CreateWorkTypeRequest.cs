@@ -1,6 +1,6 @@
-﻿using Moda.Work.Application.WorkTypes.Commands;
+﻿using Wayd.Work.Application.WorkTypes.Commands;
 
-namespace Moda.Web.Api.Models.Work.WorkTypes;
+namespace Wayd.Web.Api.Models.Work.WorkTypes;
 
 public sealed record CreateWorkTypeRequest
 {

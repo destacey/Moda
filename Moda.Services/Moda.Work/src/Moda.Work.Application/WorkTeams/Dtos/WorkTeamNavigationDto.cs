@@ -1,6 +1,6 @@
-﻿using Moda.Common.Application.Dtos;
+﻿using Wayd.Common.Application.Dtos;
 
-namespace Moda.Work.Application.WorkTeams.Dtos;
+namespace Wayd.Work.Application.WorkTeams.Dtos;
 
 public record WorkTeamNavigationDto : NavigationDto, IMapFrom<WorkTeam>
 {

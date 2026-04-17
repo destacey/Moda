@@ -1,8 +1,8 @@
 using MediatR;
-using Moda.Common.Application.Requests.Goals.Commands;
-using Moda.Common.Application.Requests.Goals.Queries;
+using Wayd.Common.Application.Requests.Goals.Commands;
+using Wayd.Common.Application.Requests.Goals.Queries;
 
-namespace Moda.Planning.Application.PlanningIntervals.Commands;
+namespace Wayd.Planning.Application.PlanningIntervals.Commands;
 
 public sealed record DeletePlanningIntervalObjectiveCommand(Guid PlanningIntervalId, Guid PlanningIntervalObjectiveId) : ICommand;
 

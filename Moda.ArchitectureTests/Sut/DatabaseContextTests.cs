@@ -1,9 +1,9 @@
 ﻿using FluentAssertions;
-using Moda.ArchitectureTests.Helpers;
-using Moda.Infrastructure.Persistence.Context;
+using Wayd.ArchitectureTests.Helpers;
+using Wayd.Infrastructure.Persistence.Context;
 using NetArchTest.Rules;
 
-namespace Moda.ArchitectureTests.Sut;
+namespace Wayd.ArchitectureTests.Sut;
 
 /// <summary>
 /// Tests to enforce proper Database Context abstraction and usage patterns.
@@ -109,7 +109,7 @@ public class DatabaseContextTests
         // Act - Application should not reference ModaDbContext or other concrete implementations
         var result = Types.InAssemblies(applicationAssemblies)
             .ShouldNot()
-            .HaveDependencyOn("Moda.Infrastructure.Persistence.Context.ModaDbContext")
+            .HaveDependencyOn("Wayd.Infrastructure.Persistence.Context.ModaDbContext")
             .GetResult();
 
         // Assert
@@ -195,7 +195,7 @@ public class DatabaseContextTests
         // Arrange - Check all assemblies for DbContext implementations
         var allAssemblies = AppDomain.CurrentDomain.GetAssemblies()
             .Where(a => a.FullName != null &&
-                        a.FullName.StartsWith("Moda.") &&
+                        a.FullName.StartsWith("Wayd.") &&
                         !a.FullName.Contains("Test"))
             .ToArray();
 
@@ -206,7 +206,7 @@ public class DatabaseContextTests
             .And()
             .HaveNameEndingWith("DbContext")
             .And()
-            .DoNotResideInNamespace("Moda.Infrastructure")
+            .DoNotResideInNamespace("Wayd.Infrastructure")
             .And()
             .AreClasses()
             .GetTypes()
@@ -226,14 +226,14 @@ public class DatabaseContextTests
         // Arrange - Check all assemblies for IEntityTypeConfiguration implementations
         var allAssemblies = AppDomain.CurrentDomain.GetAssemblies()
             .Where(a => a.FullName != null &&
-                        a.FullName.StartsWith("Moda.") &&
+                        a.FullName.StartsWith("Wayd.") &&
                         !a.FullName.Contains("Test"))
             .ToArray();
 
         // Act - Find entity configurations not in Infrastructure
         var entityConfigsOutsideInfra = Types.InAssemblies(allAssemblies)
             .That()
-            .DoNotResideInNamespace("Moda.Infrastructure")
+            .DoNotResideInNamespace("Wayd.Infrastructure")
             .And()
             .HaveNameEndingWith("Configuration")
             .And()
@@ -269,7 +269,7 @@ public class DatabaseContextTests
         // Act - Integration layer should not reference ModaDbContext
         var result = Types.InAssemblies(integrationAssemblies)
             .ShouldNot()
-            .HaveDependencyOn("Moda.Infrastructure.Persistence.Context.ModaDbContext")
+            .HaveDependencyOn("Wayd.Infrastructure.Persistence.Context.ModaDbContext")
             .GetResult();
 
         // Assert
@@ -286,7 +286,7 @@ public class DatabaseContextTests
     public void CommonDomain_ShouldNotReferenceDbContext()
     {
         // Arrange - Force assembly load using typeof
-        var assembly = typeof(Moda.Common.Domain.Events.DomainEvent).Assembly;
+        var assembly = typeof(Wayd.Common.Domain.Events.DomainEvent).Assembly;
 
         // Act
         var result = Types.InAssembly(assembly)
@@ -296,7 +296,7 @@ public class DatabaseContextTests
 
         // Assert
         result.IsSuccessful.Should().BeTrue(
-            "Moda.Common.Domain should not reference Entity Framework Core. Violating types: {0}",
+            "Wayd.Common.Domain should not reference Entity Framework Core. Violating types: {0}",
             string.Join(", ", result.FailingTypes ?? []));
     }
 
@@ -304,7 +304,7 @@ public class DatabaseContextTests
     public void CommonApplication_CanDefineIDbContextInterface()
     {
         // Arrange - Force assembly load using typeof
-        var assembly = typeof(Moda.Common.Application.Persistence.IModaDbContext).Assembly;
+        var assembly = typeof(Wayd.Common.Application.Persistence.IModaDbContext).Assembly;
 
         // Act - Look for IModaDbContext interface definition
         var dbContextInterface = Types.InAssembly(assembly)
@@ -318,14 +318,14 @@ public class DatabaseContextTests
 
         // Assert - This is informational - Common.Application SHOULD define the interface
         dbContextInterface.Should().NotBeEmpty(
-            "Moda.Common.Application should define the IModaDbContext interface for use by Application layers");
+            "Wayd.Common.Application should define the IModaDbContext interface for use by Application layers");
     }
 
     [Fact]
     public void CommonApplication_ShouldNotImplementDbContext()
     {
         // Arrange - Force assembly load using typeof
-        var assembly = typeof(Moda.Common.Application.Persistence.IModaDbContext).Assembly;
+        var assembly = typeof(Wayd.Common.Application.Persistence.IModaDbContext).Assembly;
 
         // Act - Look for concrete DbContext implementations (should be in Infrastructure only)
         var dbContextImplementations = Types.InAssembly(assembly)
@@ -339,7 +339,7 @@ public class DatabaseContextTests
 
         // Assert
         dbContextImplementations.Should().BeEmpty(
-            "Moda.Common.Application should only define DbContext interfaces, not implementations. Implementations belong in Infrastructure. Violating types: {0}",
+            "Wayd.Common.Application should only define DbContext interfaces, not implementations. Implementations belong in Infrastructure. Violating types: {0}",
             string.Join(", ", dbContextImplementations.Select(t => t.FullName)));
     }
 

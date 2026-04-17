@@ -1,8 +1,8 @@
-﻿using Moda.Common.Application.Requests.Goals.Dtos;
-using Moda.Common.Application.Requests.Goals.Queries;
-using Moda.Goals.Application.Persistence;
+﻿using Wayd.Common.Application.Requests.Goals.Dtos;
+using Wayd.Common.Application.Requests.Goals.Queries;
+using Wayd.Goals.Application.Persistence;
 
-namespace Moda.Goals.Application.Objectives.Queries;
+namespace Wayd.Goals.Application.Objectives.Queries;
 
 internal sealed class GetObjectiveForPlanningIntervalQueryHandler(IGoalsDbContext goalsDbContext) : IQueryHandler<GetObjectiveForPlanningIntervalQuery, ObjectiveDetailsDto?>
 {

@@ -1,10 +1,10 @@
-﻿using Moda.Common.Application.Requests.WorkManagement.Queries;
-using Moda.Web.Api.Extensions;
-using Moda.Work.Application.WorkProcesses.Commands;
-using Moda.Work.Application.WorkProcesses.Dtos;
-using Moda.Work.Application.WorkProcesses.Queries;
+﻿using Wayd.Common.Application.Requests.WorkManagement.Queries;
+using Wayd.Web.Api.Extensions;
+using Wayd.Work.Application.WorkProcesses.Commands;
+using Wayd.Work.Application.WorkProcesses.Dtos;
+using Wayd.Work.Application.WorkProcesses.Queries;
 
-namespace Moda.Web.Api.Controllers.Work;
+namespace Wayd.Web.Api.Controllers.Work;
 
 [Route("api/work/work-processes")]
 [ApiVersionNeutral]

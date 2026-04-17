@@ -1,10 +1,10 @@
-﻿using Moda.Common.Application.Requests.WorkManagement.Commands;
-using Moda.Common.Application.Validators;
-using Moda.Common.Domain.Models;
-using Moda.Common.Models;
-using Moda.Work.Application.Persistence;
+﻿using Wayd.Common.Application.Requests.WorkManagement.Commands;
+using Wayd.Common.Application.Validators;
+using Wayd.Common.Domain.Models;
+using Wayd.Common.Models;
+using Wayd.Work.Application.Persistence;
 
-namespace Moda.Work.Application.Workspaces.Commands;
+namespace Wayd.Work.Application.Workspaces.Commands;
 
 public sealed class CreateExternalWorkspaceCommandHandlerValidator : CustomValidator<CreateExternalWorkspaceCommand>
 {

@@ -1,7 +1,7 @@
-﻿using Moda.Integrations.AzureDevOps.Models;
+﻿using Wayd.Integrations.AzureDevOps.Models;
 using RestSharp;
 
-namespace Moda.Integrations.AzureDevOps.Clients;
+namespace Wayd.Integrations.AzureDevOps.Clients;
 
 internal sealed class GeneralClient : BaseClient
 {

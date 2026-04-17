@@ -1,4 +1,4 @@
-﻿namespace Moda.Web.Api.Models.Work.Workspaces;
+﻿namespace Wayd.Web.Api.Models.Work.Workspaces;
 
 public sealed record SetExternalUrlTemplatesRequest(string? ExternalViewWorkItemUrlTemplate);
 

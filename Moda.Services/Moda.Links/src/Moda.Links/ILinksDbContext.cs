@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Moda.Common.Application.Persistence;
-using Moda.Links.Models;
+using Wayd.Common.Application.Persistence;
+using Wayd.Links.Models;
 
-namespace Moda.Links;
+namespace Wayd.Links;
 
 public interface ILinksDbContext : IModaDbContext
 {

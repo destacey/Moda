@@ -1,6 +1,6 @@
-﻿using Moda.Common.Models;
+﻿using Wayd.Common.Models;
 
-namespace Moda.Common.Application.Requests.WorkManagement.Queries;
+namespace Wayd.Common.Application.Requests.WorkManagement.Queries;
 
 public sealed record WorkspaceKeyExistsQuery : IQuery<bool>
 {

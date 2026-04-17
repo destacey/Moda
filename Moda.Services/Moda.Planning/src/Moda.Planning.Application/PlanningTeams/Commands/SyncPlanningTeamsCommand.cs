@@ -1,6 +1,6 @@
-﻿using Moda.Common.Domain.Interfaces.Organization;
+﻿using Wayd.Common.Domain.Interfaces.Organization;
 
-namespace Moda.Planning.Application.PlanningTeams.Commands;
+namespace Wayd.Planning.Application.PlanningTeams.Commands;
 
 public sealed record SyncPlanningTeamsCommand(IEnumerable<ISimpleTeam> Teams) : ICommand, ILongRunningRequest;
 

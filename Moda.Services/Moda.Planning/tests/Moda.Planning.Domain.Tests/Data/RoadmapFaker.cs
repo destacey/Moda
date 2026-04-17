@@ -1,10 +1,10 @@
-﻿using Moda.Common.Domain.Enums;
-using Moda.Common.Domain.Enums.Planning;
-using Moda.Common.Models;
-using Moda.Planning.Domain.Models.Roadmaps;
-using Moda.Tests.Shared.Data;
+﻿using Wayd.Common.Domain.Enums;
+using Wayd.Common.Domain.Enums.Planning;
+using Wayd.Common.Models;
+using Wayd.Planning.Domain.Models.Roadmaps;
+using Wayd.Tests.Shared.Data;
 
-namespace Moda.Planning.Domain.Tests.Data;
+namespace Wayd.Planning.Domain.Tests.Data;
 
 public class RoadmapFaker : PrivateConstructorFaker<Roadmap>
 {

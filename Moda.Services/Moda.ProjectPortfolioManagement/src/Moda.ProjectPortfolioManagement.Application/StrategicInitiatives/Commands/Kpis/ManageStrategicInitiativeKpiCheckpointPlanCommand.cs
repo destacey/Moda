@@ -1,7 +1,7 @@
-﻿using Moda.Common.Domain.Models.KeyPerformanceIndicators;
-using Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
+﻿using Wayd.Common.Domain.Models.KeyPerformanceIndicators;
+using Wayd.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 
-namespace Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Commands.Kpis;
+namespace Wayd.ProjectPortfolioManagement.Application.StrategicInitiatives.Commands.Kpis;
 
 public sealed record StrategicInitiativeKpiCheckpointPlanItem(
     Guid? CheckpointId,

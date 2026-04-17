@@ -1,7 +1,7 @@
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Options;
 
-namespace Moda.Infrastructure.Persistence.ConnectionString;
+namespace Wayd.Infrastructure.Persistence.ConnectionString;
 
 public class ConnectionStringSecurer : IConnectionStringSecurer
 {

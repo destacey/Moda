@@ -1,9 +1,9 @@
 ﻿using System.Linq.Expressions;
-using Moda.Common.Application.Models;
-using Moda.StrategicManagement.Application.Strategies.Dtos;
-using Moda.StrategicManagement.Domain.Models;
+using Wayd.Common.Application.Models;
+using Wayd.StrategicManagement.Application.Strategies.Dtos;
+using Wayd.StrategicManagement.Domain.Models;
 
-namespace Moda.StrategicManagement.Application.Strategies.Queries;
+namespace Wayd.StrategicManagement.Application.Strategies.Queries;
 
 /// <summary>
 /// Get a Strategy by Id or Key

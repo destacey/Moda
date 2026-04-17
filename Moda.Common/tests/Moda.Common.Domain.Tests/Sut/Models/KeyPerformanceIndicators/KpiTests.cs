@@ -1,11 +1,11 @@
-using Moda.Common.Domain.Models.KeyPerformanceIndicators;
-using Moda.Common.Domain.Tests.Data;
-using Moda.Common.Domain.Tests.Data.Models;
-using Moda.Tests.Shared;
+using Wayd.Common.Domain.Models.KeyPerformanceIndicators;
+using Wayd.Common.Domain.Tests.Data;
+using Wayd.Common.Domain.Tests.Data.Models;
+using Wayd.Tests.Shared;
 using NodaTime.Extensions;
 using NodaTime.Testing;
 
-namespace Moda.Common.Domain.Tests.Sut.Models.KeyPerformanceIndicators;
+namespace Wayd.Common.Domain.Tests.Sut.Models.KeyPerformanceIndicators;
 
 public sealed class KpiTests
 {

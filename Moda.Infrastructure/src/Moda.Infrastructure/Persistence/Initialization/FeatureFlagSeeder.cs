@@ -1,8 +1,8 @@
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
-using Moda.Common.Domain.FeatureManagement;
+using Wayd.Common.Domain.FeatureManagement;
 
-namespace Moda.Infrastructure.Persistence.Initialization;
+namespace Wayd.Infrastructure.Persistence.Initialization;
 
 public class FeatureFlagSeeder : ICustomSeeder
 {

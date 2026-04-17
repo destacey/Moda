@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Serilog.Events;
 
-namespace Moda.Infrastructure.Middleware;
+namespace Wayd.Infrastructure.Middleware;
 
 internal static class ConfigureServices
 {

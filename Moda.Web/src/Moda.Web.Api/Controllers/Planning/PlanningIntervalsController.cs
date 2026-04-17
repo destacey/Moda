@@ -1,24 +1,24 @@
 ﻿using CSharpFunctionalExtensions;
 using CsvHelper;
 using Mapster;
-using Moda.Common.Application.Interfaces;
-using Moda.Common.Application.Models;
-using Moda.Common.Extensions;
-using Moda.Health.Queries;
-using Moda.Organization.Application.Teams.Queries;
-using Moda.Organization.Application.TeamsOfTeams.Queries;
-using Moda.Planning.Application.PlanningIntervals.Commands;
-using Moda.Planning.Application.PlanningIntervals.Dtos;
-using Moda.Planning.Application.PlanningIntervals.Queries;
-using Moda.Planning.Application.Risks.Dtos;
-using Moda.Planning.Application.Risks.Queries;
-using Moda.Web.Api.Dtos.Planning;
-using Moda.Web.Api.Extensions;
-using Moda.Web.Api.Models.Planning.PlanningIntervals;
-using Moda.Work.Application.WorkItems.Dtos;
-using Moda.Work.Application.WorkItems.Queries;
+using Wayd.Common.Application.Interfaces;
+using Wayd.Common.Application.Models;
+using Wayd.Common.Extensions;
+using Wayd.Health.Queries;
+using Wayd.Organization.Application.Teams.Queries;
+using Wayd.Organization.Application.TeamsOfTeams.Queries;
+using Wayd.Planning.Application.PlanningIntervals.Commands;
+using Wayd.Planning.Application.PlanningIntervals.Dtos;
+using Wayd.Planning.Application.PlanningIntervals.Queries;
+using Wayd.Planning.Application.Risks.Dtos;
+using Wayd.Planning.Application.Risks.Queries;
+using Wayd.Web.Api.Dtos.Planning;
+using Wayd.Web.Api.Extensions;
+using Wayd.Web.Api.Models.Planning.PlanningIntervals;
+using Wayd.Work.Application.WorkItems.Dtos;
+using Wayd.Work.Application.WorkItems.Queries;
 
-namespace Moda.Web.Api.Controllers.Planning;
+namespace Wayd.Web.Api.Controllers.Planning;
 
 [Route("api/planning/planning-intervals")]
 [ApiVersionNeutral]

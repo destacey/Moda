@@ -1,4 +1,4 @@
-﻿namespace Moda.Web.Api.Models.Work.WorkTypeLevels;
+﻿namespace Wayd.Web.Api.Models.Work.WorkTypeLevels;
 
 public class UpdateWorkTypeLevelsOrderRequest
 {

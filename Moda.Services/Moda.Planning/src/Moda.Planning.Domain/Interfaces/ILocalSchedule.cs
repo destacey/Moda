@@ -1,4 +1,4 @@
-﻿namespace Moda.Planning.Domain.Interfaces;
+﻿namespace Wayd.Planning.Domain.Interfaces;
 
 public interface ILocalSchedule
 {

@@ -1,9 +1,9 @@
 ﻿using System.Linq.Expressions;
-using Moda.Common.Application.Models;
-using Moda.StrategicManagement.Application.Visions.Dtos;
-using Moda.StrategicManagement.Domain.Models;
+using Wayd.Common.Application.Models;
+using Wayd.StrategicManagement.Application.Visions.Dtos;
+using Wayd.StrategicManagement.Domain.Models;
 
-namespace Moda.StrategicManagement.Application.Visions.Queries;
+namespace Wayd.StrategicManagement.Application.Visions.Queries;
 
 /// <summary>
 /// Get a Vision by Id or Key

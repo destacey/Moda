@@ -1,7 +1,7 @@
-using Moda.Common.Domain.Models.ProjectPortfolioManagement;
-using Moda.ProjectPortfolioManagement.Application.Projects.Validators;
+using Wayd.Common.Domain.Models.ProjectPortfolioManagement;
+using Wayd.ProjectPortfolioManagement.Application.Projects.Validators;
 
-namespace Moda.ProjectPortfolioManagement.Application.Projects.Commands;
+namespace Wayd.ProjectPortfolioManagement.Application.Projects.Commands;
 
 /// <summary>
 /// Command to change the Key of a Project.

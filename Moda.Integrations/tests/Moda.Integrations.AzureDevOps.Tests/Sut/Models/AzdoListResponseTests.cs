@@ -1,9 +1,9 @@
 ﻿using System.Text.Json;
-using Moda.Integrations.AzureDevOps.Models.Contracts;
-using Moda.Integrations.AzureDevOps.Models.Processes;
-using Moda.Integrations.AzureDevOps.Tests.Models;
+using Wayd.Integrations.AzureDevOps.Models.Contracts;
+using Wayd.Integrations.AzureDevOps.Models.Processes;
+using Wayd.Integrations.AzureDevOps.Tests.Models;
 
-namespace Moda.Integrations.AzureDevOps.Tests.Sut.Models;
+namespace Wayd.Integrations.AzureDevOps.Tests.Sut.Models;
 
 public class AzdoListResponseTests : CommonResponseOptions
 {

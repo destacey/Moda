@@ -1,18 +1,18 @@
 ﻿using CSharpFunctionalExtensions;
-using Moda.Common.Domain.Enums.Organization;
-using Moda.Common.Domain.Events.Organization;
-using Moda.Common.Domain.Interfaces.Organization;
-using Moda.Common.Domain.Models.Organizations;
-using Moda.Organization.Domain.Enums;
+using Wayd.Common.Domain.Enums.Organization;
+using Wayd.Common.Domain.Events.Organization;
+using Wayd.Common.Domain.Interfaces.Organization;
+using Wayd.Common.Domain.Models.Organizations;
+using Wayd.Organization.Domain.Enums;
 using NodaTime;
 
-namespace Moda.Organization.Domain.Models;
+namespace Wayd.Organization.Domain.Models;
 
 /// <summary>
 /// A team is a collection of team members that work together to execute against a prioritized set of goals.
 /// </summary>
-/// <seealso cref="Moda.Organization.Domain.Models.BaseTeam" />
-/// <seealso cref="Moda.Common.Domain.Interfaces.Organization.IActivatable{NodaTime.Instant, Moda.Organization.Domain.Models.TeamDeactivatableArgs}" />"/>
+/// <seealso cref="Wayd.Organization.Domain.Models.BaseTeam" />
+/// <seealso cref="Wayd.Common.Domain.Interfaces.Organization.IActivatable{NodaTime.Instant, Wayd.Organization.Domain.Models.TeamDeactivatableArgs}" />"/>
 public sealed class Team : BaseTeam, IActivatable<Instant, TeamDeactivatableArgs>, IHasTeamIdAndCode
 {
     private readonly List<TeamOperatingModel> _operatingModels = [];

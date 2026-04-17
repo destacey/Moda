@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Moda.Web.Api.Models.Planning.Roadmaps;
+namespace Wayd.Web.Api.Models.Planning.Roadmaps;
 
 [JsonDerivedType(typeof(CreateRoadmapActivityRequest), typeDiscriminator: "activity")]
 [JsonDerivedType(typeof(CreateRoadmapMilestoneRequest), typeDiscriminator: "milestone")]

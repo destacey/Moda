@@ -1,9 +1,9 @@
-﻿using Moda.Common.Application.Events;
-using Moda.Common.Domain.Enums;
-using Moda.Common.Domain.Events.Organization;
-using Moda.Work.Application.Persistence;
+﻿using Wayd.Common.Application.Events;
+using Wayd.Common.Domain.Enums;
+using Wayd.Common.Domain.Events.Organization;
+using Wayd.Work.Application.Persistence;
 
-namespace Moda.Work.Application.WorkTeams.EventHandlers;
+namespace Wayd.Work.Application.WorkTeams.EventHandlers;
 
 internal sealed class WorkTeamChangeEventHandler :
     IEventNotificationHandler<TeamCreatedEvent>,

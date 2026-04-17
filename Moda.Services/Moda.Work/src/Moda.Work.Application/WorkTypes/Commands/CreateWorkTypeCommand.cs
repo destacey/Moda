@@ -1,6 +1,6 @@
-﻿using Moda.Work.Application.Persistence;
+﻿using Wayd.Work.Application.Persistence;
 
-namespace Moda.Work.Application.WorkTypes.Commands;
+namespace Wayd.Work.Application.WorkTypes.Commands;
 
 public sealed record CreateWorkTypeCommand(string Name, string? Description, int LevelId) : ICommand<int>;
 

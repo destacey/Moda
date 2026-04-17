@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Moda.Common.Domain.Enums.Organization;
-using Moda.Infrastructure.Persistence.Converters;
-using Moda.Organization.Application.Teams.Models;
+using Wayd.Common.Domain.Enums.Organization;
+using Wayd.Infrastructure.Persistence.Converters;
+using Wayd.Organization.Application.Teams.Models;
 
-namespace Moda.Infrastructure.Persistence.Configuration;
+namespace Wayd.Infrastructure.Persistence.Configuration;
 
 public class TeamNodeConfig : IEntityTypeConfiguration<TeamNode>
 {

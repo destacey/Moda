@@ -1,8 +1,8 @@
 ﻿using CSharpFunctionalExtensions;
-using Moda.StrategicManagement.Domain.Enums;
+using Wayd.StrategicManagement.Domain.Enums;
 using NodaTime;
 
-namespace Moda.StrategicManagement.Domain.Models;
+namespace Wayd.StrategicManagement.Domain.Models;
 
 public sealed class VisionAggregate(List<Vision> visions)
 {

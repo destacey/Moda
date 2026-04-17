@@ -1,4 +1,4 @@
-﻿namespace Moda.Common.Domain.Models;
+﻿namespace Wayd.Common.Domain.Models;
 
 /// <summary>
 /// Represents the registration of an external id with the internal object's id and state.

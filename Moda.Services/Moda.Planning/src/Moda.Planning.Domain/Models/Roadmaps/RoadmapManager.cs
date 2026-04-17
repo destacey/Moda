@@ -1,6 +1,6 @@
-﻿using Moda.Common.Domain.Employees;
+﻿using Wayd.Common.Domain.Employees;
 
-namespace Moda.Planning.Domain.Models.Roadmaps;
+namespace Wayd.Planning.Domain.Models.Roadmaps;
 
 public sealed class RoadmapManager
 {

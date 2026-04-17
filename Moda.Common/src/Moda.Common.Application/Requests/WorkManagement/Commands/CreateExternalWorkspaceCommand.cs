@@ -1,8 +1,8 @@
-﻿using Moda.Common.Application.Interfaces.ExternalWork;
-using Moda.Common.Domain.Enums.AppIntegrations;
-using Moda.Common.Domain.Models;
-using Moda.Common.Models;
+﻿using Wayd.Common.Application.Interfaces.ExternalWork;
+using Wayd.Common.Domain.Enums.AppIntegrations;
+using Wayd.Common.Domain.Models;
+using Wayd.Common.Models;
 
-namespace Moda.Common.Application.Requests.WorkManagement.Commands;
+namespace Wayd.Common.Application.Requests.WorkManagement.Commands;
 
 public sealed record CreateExternalWorkspaceCommand(Connector Connector, string SystemId, IExternalWorkspaceConfiguration ExternalWorkspace, WorkspaceKey WorkspaceKey, string WorkspaceName, string? ExternalViewWorkItemUrlTemplate) : ICommand<IntegrationState<Guid>>;

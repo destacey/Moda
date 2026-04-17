@@ -1,4 +1,4 @@
-﻿namespace Moda.Infrastructure.SecurityHeaders;
+﻿namespace Wayd.Infrastructure.SecurityHeaders;
 
 internal class HeaderNames
 {

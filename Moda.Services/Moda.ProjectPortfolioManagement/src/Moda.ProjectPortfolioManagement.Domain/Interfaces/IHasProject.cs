@@ -1,6 +1,6 @@
-﻿using Moda.ProjectPortfolioManagement.Domain.Models;
+﻿using Wayd.ProjectPortfolioManagement.Domain.Models;
 
-namespace Moda.ProjectPortfolioManagement.Domain.Interfaces;
+namespace Wayd.ProjectPortfolioManagement.Domain.Interfaces;
 
 public interface IHasProject
 {

@@ -1,10 +1,10 @@
-﻿using Moda.Common.Application.FeatureManagement.Commands;
-using Moda.Common.Application.FeatureManagement.Dtos;
-using Moda.Common.Application.FeatureManagement.Queries;
-using Moda.Web.Api.Extensions;
-using Moda.Web.Api.Models.Admin;
+﻿using Wayd.Common.Application.FeatureManagement.Commands;
+using Wayd.Common.Application.FeatureManagement.Dtos;
+using Wayd.Common.Application.FeatureManagement.Queries;
+using Wayd.Web.Api.Extensions;
+using Wayd.Web.Api.Models.Admin;
 
-namespace Moda.Web.Api.Controllers.Admin;
+namespace Wayd.Web.Api.Controllers.Admin;
 
 [Route("api/admin/feature-flags")]
 [ApiVersionNeutral]

@@ -1,6 +1,6 @@
-﻿using Moda.Common.Domain.Models.Organizations;
+﻿using Wayd.Common.Domain.Models.Organizations;
 
-namespace Moda.Common.Domain.Interfaces.Organization;
+namespace Wayd.Common.Domain.Interfaces.Organization;
 
 public interface IHasTeamIdAndCode
 {

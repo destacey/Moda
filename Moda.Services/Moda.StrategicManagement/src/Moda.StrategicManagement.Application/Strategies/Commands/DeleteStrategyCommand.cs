@@ -1,6 +1,6 @@
-﻿using Moda.Common.Application.Models;
+﻿using Wayd.Common.Application.Models;
 
-namespace Moda.StrategicManagement.Application.Strategies.Commands;
+namespace Wayd.StrategicManagement.Application.Strategies.Commands;
 
 public sealed record DeleteStrategyCommand(Guid Id) : ICommand;
 public sealed class DeleteStrategyCommandValidator : AbstractValidator<DeleteStrategyCommand>

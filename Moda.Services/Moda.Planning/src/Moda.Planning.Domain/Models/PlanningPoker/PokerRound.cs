@@ -1,9 +1,9 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
-using Moda.Planning.Domain.Enums;
+using Wayd.Planning.Domain.Enums;
 using NodaTime;
 
-namespace Moda.Planning.Domain.Models.PlanningPoker;
+namespace Wayd.Planning.Domain.Models.PlanningPoker;
 
 public sealed class PokerRound : BaseEntity
 {

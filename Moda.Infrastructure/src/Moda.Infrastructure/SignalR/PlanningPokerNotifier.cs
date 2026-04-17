@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using Moda.Planning.Application.PokerSessions.Dtos;
-using Moda.Planning.Application.PokerSessions.Interfaces;
+using Wayd.Planning.Application.PokerSessions.Dtos;
+using Wayd.Planning.Application.PokerSessions.Interfaces;
 
-namespace Moda.Infrastructure.SignalR;
+namespace Wayd.Infrastructure.SignalR;
 
 internal sealed class PlanningPokerNotifier(IHubContext<PlanningPokerHub> hubContext) : IPokerSessionNotifier
 {

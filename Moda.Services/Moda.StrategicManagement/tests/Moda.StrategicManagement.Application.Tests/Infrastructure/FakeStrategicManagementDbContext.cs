@@ -1,12 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Moda.Common.Domain.Employees;
-using Moda.Common.Domain.Identity;
-using Moda.StrategicManagement.Domain.Models;
-using Moda.Tests.Shared.Infrastructure;
+using Wayd.Common.Domain.Employees;
+using Wayd.Common.Domain.Identity;
+using Wayd.StrategicManagement.Domain.Models;
+using Wayd.Tests.Shared.Infrastructure;
 
-namespace Moda.StrategicManagement.Application.Tests.Infrastructure;
+namespace Wayd.StrategicManagement.Application.Tests.Infrastructure;
 
 /// <summary>
 /// A test double for IStrategicManagementDbContext that provides in-memory collections for all DbSets.

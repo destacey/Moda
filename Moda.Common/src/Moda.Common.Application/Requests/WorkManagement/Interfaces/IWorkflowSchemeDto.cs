@@ -1,6 +1,6 @@
-﻿using Moda.Common.Application.Dtos;
+﻿using Wayd.Common.Application.Dtos;
 
-namespace Moda.Common.Application.Requests.WorkManagement.Interfaces;
+namespace Wayd.Common.Application.Requests.WorkManagement.Interfaces;
 
 public interface IWorkflowSchemeDto
 {

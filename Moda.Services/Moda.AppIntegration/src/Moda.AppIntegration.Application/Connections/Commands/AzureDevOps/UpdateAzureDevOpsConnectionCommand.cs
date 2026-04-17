@@ -1,8 +1,8 @@
 ﻿using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using Moda.Common.Domain.Enums.AppIntegrations;
+using Wayd.Common.Domain.Enums.AppIntegrations;
 
-namespace Moda.AppIntegration.Application.Connections.Commands.AzureDevOps;
+namespace Wayd.AppIntegration.Application.Connections.Commands.AzureDevOps;
 
 public sealed record UpdateAzureDevOpsConnectionCommand(Guid Id, string Name, string? Description, string Organization, string PersonalAccessToken) : ICommand<Guid>;
 

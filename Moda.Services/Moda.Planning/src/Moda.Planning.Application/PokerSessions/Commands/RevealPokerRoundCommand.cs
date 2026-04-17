@@ -1,7 +1,7 @@
-﻿using Moda.Planning.Application.PokerSessions.Dtos;
-using Moda.Planning.Application.PokerSessions.Interfaces;
+﻿using Wayd.Planning.Application.PokerSessions.Dtos;
+using Wayd.Planning.Application.PokerSessions.Interfaces;
 
-namespace Moda.Planning.Application.PokerSessions.Commands;
+namespace Wayd.Planning.Application.PokerSessions.Commands;
 
 public sealed record RevealPokerRoundCommand(Guid SessionId, Guid RoundId) : ICommand;
 

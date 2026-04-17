@@ -1,9 +1,9 @@
 ﻿using Mapster;
-using Moda.Organization.Application.Models;
-using Moda.Organization.Application.Teams.Dtos;
-using Moda.Organization.Application.TeamsOfTeams.Dtos;
+using Wayd.Organization.Application.Models;
+using Wayd.Organization.Application.Teams.Dtos;
+using Wayd.Organization.Application.TeamsOfTeams.Dtos;
 
-namespace Moda.Web.Api.Models.Planning.PlanningIntervals;
+namespace Wayd.Web.Api.Models.Planning.PlanningIntervals;
 
 public class PlanningIntervalTeamResponse : IMapFrom<TeamListDto>, IMapFrom<TeamOfTeamsListDto>
 {

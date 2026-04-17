@@ -4,7 +4,7 @@ using Mapster;
 using Mapster.Utils;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Moda.Health;
+namespace Wayd.Health;
 
 public static class ConfigureServices
 {

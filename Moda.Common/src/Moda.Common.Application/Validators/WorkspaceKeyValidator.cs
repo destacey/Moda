@@ -1,6 +1,6 @@
-﻿using Moda.Common.Models;
+﻿using Wayd.Common.Models;
 
-namespace Moda.Common.Application.Validators;
+namespace Wayd.Common.Application.Validators;
 
 public sealed class WorkspaceKeyValidator : CustomValidator<WorkspaceKey>
 {

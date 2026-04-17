@@ -1,11 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Moda.Common.Domain.Enums;
+namespace Wayd.Common.Domain.Enums;
 
 // Max length of 32 characters
 public enum Ownership
 {
-    [Display(Description = "The object is owned by Moda.")]
+    [Display(Description = "The object is owned by Wayd.")]
     Owned = 0,
 
     [Display(Description = "The object is owned by an external system.")]

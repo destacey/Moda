@@ -1,6 +1,6 @@
 ﻿using NodaTime;
 
-namespace Moda.Common.Domain.Models;
+namespace Wayd.Common.Domain.Models;
 
 public abstract record ActivatableArgs
 {

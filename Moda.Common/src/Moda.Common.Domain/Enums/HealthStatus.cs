@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Moda.Common.Domain.Enums;
+namespace Wayd.Common.Domain.Enums;
 
 // max length of 32 characters
 public enum HealthStatus

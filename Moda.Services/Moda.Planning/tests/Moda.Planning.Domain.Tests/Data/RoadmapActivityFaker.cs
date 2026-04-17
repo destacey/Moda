@@ -1,9 +1,9 @@
 ﻿using System.Reflection;
-using Moda.Common.Models;
-using Moda.Planning.Domain.Models.Roadmaps;
-using Moda.Tests.Shared.Data;
+using Wayd.Common.Models;
+using Wayd.Planning.Domain.Models.Roadmaps;
+using Wayd.Tests.Shared.Data;
 
-namespace Moda.Planning.Domain.Tests.Data;
+namespace Wayd.Planning.Domain.Tests.Data;
 
 public class RoadmapActivityFaker : PrivateConstructorFaker<RoadmapActivity>
 {

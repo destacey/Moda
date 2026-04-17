@@ -1,7 +1,7 @@
-﻿using Moda.Common.Domain.Enums;
-using Moda.Planning.Application.Roadmaps.Commands;
+﻿using Wayd.Common.Domain.Enums;
+using Wayd.Planning.Application.Roadmaps.Commands;
 
-namespace Moda.Web.Api.Models.Planning.Roadmaps;
+namespace Wayd.Web.Api.Models.Planning.Roadmaps;
 
 public sealed record CreateRoadmapRequest
 {

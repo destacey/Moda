@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Moda.Integrations.AzureDevOps.Models;
+namespace Wayd.Integrations.AzureDevOps.Models;
 
 internal sealed record UserResponse
 {

@@ -1,7 +1,7 @@
-﻿using Moda.Common.Application.Requests.WorkManagement.Commands;
-using Moda.Work.Application.Persistence;
+﻿using Wayd.Common.Application.Requests.WorkManagement.Commands;
+using Wayd.Work.Application.Persistence;
 
-namespace Moda.Work.Application.WorkStatuses.Commands;
+namespace Wayd.Work.Application.WorkStatuses.Commands;
 
 internal sealed class SyncExternalWorkStatusesCommandHandler(IWorkDbContext workDbContext, IDateTimeProvider dateTimeProvider, ILogger<SyncExternalWorkStatusesCommandHandler> logger) : ICommandHandler<SyncExternalWorkStatusesCommand>
 {

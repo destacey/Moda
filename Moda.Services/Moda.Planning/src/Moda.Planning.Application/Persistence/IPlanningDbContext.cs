@@ -1,8 +1,8 @@
-﻿using Moda.Planning.Domain.Models.Iterations;
-using Moda.Planning.Domain.Models.PlanningPoker;
-using Moda.Planning.Domain.Models.Roadmaps;
+﻿using Wayd.Planning.Domain.Models.Iterations;
+using Wayd.Planning.Domain.Models.PlanningPoker;
+using Wayd.Planning.Domain.Models.Roadmaps;
 
-namespace Moda.Planning.Application.Persistence;
+namespace Wayd.Planning.Application.Persistence;
 
 public interface IPlanningDbContext : IModaDbContext
 {

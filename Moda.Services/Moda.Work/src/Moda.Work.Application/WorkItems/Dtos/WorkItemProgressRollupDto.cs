@@ -1,6 +1,6 @@
-﻿using Moda.Common.Domain.Enums.Work;
+﻿using Wayd.Common.Domain.Enums.Work;
 
-namespace Moda.Work.Application.WorkItems.Dtos;
+namespace Wayd.Work.Application.WorkItems.Dtos;
 
 /// <summary>
 /// Progress data for a collection of work items.  Work items with a status category of Proposed, Active, and Done are counted.  Work items with a status category of Removed are not included

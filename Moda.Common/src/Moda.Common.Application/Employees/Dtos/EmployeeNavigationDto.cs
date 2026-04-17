@@ -1,8 +1,8 @@
 ﻿using Mapster;
-using Moda.Common.Application.Dtos;
-using Moda.Common.Domain.Employees;
+using Wayd.Common.Application.Dtos;
+using Wayd.Common.Domain.Employees;
 
-namespace Moda.Common.Application.Employees.Dtos;
+namespace Wayd.Common.Application.Employees.Dtos;
 
 public sealed record EmployeeNavigationDto : NavigationDto, IMapFrom<Employee>
 {

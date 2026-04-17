@@ -1,11 +1,11 @@
-﻿using Moda.Common.Application.Employees.Commands;
-using Moda.Common.Application.Employees.Dtos;
-using Moda.Common.Application.Employees.Queries;
-using Moda.Common.Application.Models;
-using Moda.Web.Api.Extensions;
-using Moda.Web.Api.Models.Organizations.Employees;
+﻿using Wayd.Common.Application.Employees.Commands;
+using Wayd.Common.Application.Employees.Dtos;
+using Wayd.Common.Application.Employees.Queries;
+using Wayd.Common.Application.Models;
+using Wayd.Web.Api.Extensions;
+using Wayd.Web.Api.Models.Organizations.Employees;
 
-namespace Moda.Web.Api.Controllers.Organizations;
+namespace Wayd.Web.Api.Controllers.Organizations;
 
 [Route("api/organization/employees")]
 [ApiVersionNeutral]

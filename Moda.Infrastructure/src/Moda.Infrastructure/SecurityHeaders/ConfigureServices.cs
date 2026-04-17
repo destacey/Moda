@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 
-namespace Moda.Infrastructure.SecurityHeaders;
+namespace Wayd.Infrastructure.SecurityHeaders;
 
 internal static class ConfigureServices
 {

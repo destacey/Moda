@@ -1,6 +1,6 @@
-﻿using Moda.AppIntegration.Application.Connections.Commands.AzureDevOps;
+﻿using Wayd.AppIntegration.Application.Connections.Commands.AzureDevOps;
 
-namespace Moda.Web.Api.Models.AppIntegrations.Connections;
+namespace Wayd.Web.Api.Models.AppIntegrations.Connections;
 
 public sealed record UpdateAzureDevOpsConnectionRequest : UpdateConnectionRequest
 {

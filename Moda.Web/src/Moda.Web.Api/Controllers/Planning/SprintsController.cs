@@ -1,9 +1,9 @@
-﻿using Moda.Planning.Application.Iterations.Dtos;
-using Moda.Planning.Application.Iterations.Queries;
-using Moda.Work.Application.WorkItems.Dtos;
-using Moda.Work.Application.WorkItems.Queries;
+﻿using Wayd.Planning.Application.Iterations.Dtos;
+using Wayd.Planning.Application.Iterations.Queries;
+using Wayd.Work.Application.WorkItems.Dtos;
+using Wayd.Work.Application.WorkItems.Queries;
 
-namespace Moda.Web.Api.Controllers.Planning;
+namespace Wayd.Web.Api.Controllers.Planning;
 
 [Route("api/planning/[controller]")]
 [ApiVersionNeutral]

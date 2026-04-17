@@ -1,12 +1,12 @@
 ﻿using FluentAssertions;
 using Microsoft.Extensions.Logging;
-using Moda.Common.Domain.Models.ProjectPortfolioManagement;
-using Moda.ProjectPortfolioManagement.Application.ProjectTasks.Queries;
-using Moda.ProjectPortfolioManagement.Application.Tests.Infrastructure;
-using Moda.ProjectPortfolioManagement.Domain.Tests.Data;
+using Wayd.Common.Domain.Models.ProjectPortfolioManagement;
+using Wayd.ProjectPortfolioManagement.Application.ProjectTasks.Queries;
+using Wayd.ProjectPortfolioManagement.Application.Tests.Infrastructure;
+using Wayd.ProjectPortfolioManagement.Domain.Tests.Data;
 using Moq;
 
-namespace Moda.ProjectPortfolioManagement.Application.Tests.Sut.ProjectTasks.Queries;
+namespace Wayd.ProjectPortfolioManagement.Application.Tests.Sut.ProjectTasks.Queries;
 
 public class GetCriticalPathQueryHandlerTests : IDisposable
 {

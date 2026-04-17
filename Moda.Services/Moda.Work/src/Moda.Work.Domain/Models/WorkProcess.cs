@@ -1,16 +1,16 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
-using Moda.Common.Extensions;
+using Wayd.Common.Extensions;
 using NodaTime;
 
-namespace Moda.Work.Domain.Models;
+namespace Wayd.Work.Domain.Models;
 
 /// <summary>
 /// The work process defines a set of work process configurations that can be used
 /// within a workspace. A work process can be used in many workspaces.
 /// </summary>
-/// <seealso cref="Moda.Common.Domain.Data.BaseSoftDeletableEntity" />
-/// <seealso cref="Moda.Common.Domain.Interfaces.IActivatable" />
+/// <seealso cref="Wayd.Common.Domain.Data.BaseSoftDeletableEntity" />
+/// <seealso cref="Wayd.Common.Domain.Interfaces.IActivatable" />
 public sealed class WorkProcess : BaseSoftDeletableEntity, IActivatable, IHasIdAndKey
 {
     private readonly List<WorkProcessScheme> _schemes = [];

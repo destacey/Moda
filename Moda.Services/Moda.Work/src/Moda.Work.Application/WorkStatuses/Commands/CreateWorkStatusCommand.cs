@@ -1,6 +1,6 @@
-﻿using Moda.Work.Application.Persistence;
+﻿using Wayd.Work.Application.Persistence;
 
-namespace Moda.Work.Application.WorkStatuses.Commands;
+namespace Wayd.Work.Application.WorkStatuses.Commands;
 
 public sealed record CreateWorkStatusCommand : ICommand<int>
 {

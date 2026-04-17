@@ -1,4 +1,4 @@
-﻿namespace Moda.Common.Application.FeatureManagement.Commands;
+﻿namespace Wayd.Common.Application.FeatureManagement.Commands;
 
 public sealed record ArchiveFeatureFlagCommand(int Id) : ICommand;
 

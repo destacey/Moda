@@ -1,4 +1,4 @@
-﻿namespace Moda.ProjectPortfolioManagement.Application.ExpenditureCategories.Commands;
+﻿namespace Wayd.ProjectPortfolioManagement.Application.ExpenditureCategories.Commands;
 
 public sealed record UpdateExpenditureCategoryCommand(
     int Id,

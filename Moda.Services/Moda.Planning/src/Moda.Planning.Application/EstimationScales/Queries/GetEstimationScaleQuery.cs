@@ -1,6 +1,6 @@
-using Moda.Planning.Application.EstimationScales.Dtos;
+using Wayd.Planning.Application.EstimationScales.Dtos;
 
-namespace Moda.Planning.Application.EstimationScales.Queries;
+namespace Wayd.Planning.Application.EstimationScales.Queries;
 
 public sealed record GetEstimationScaleQuery(int Id) : IQuery<EstimationScaleDto?>;
 

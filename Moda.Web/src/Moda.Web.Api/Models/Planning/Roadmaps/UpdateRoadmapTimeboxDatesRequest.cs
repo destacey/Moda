@@ -1,8 +1,8 @@
-﻿using Moda.Planning.Application.Roadmaps.Commands;
-using Moda.Planning.Domain.Interfaces.Roadmaps;
+﻿using Wayd.Planning.Application.Roadmaps.Commands;
+using Wayd.Planning.Domain.Interfaces.Roadmaps;
 using OneOf;
 
-namespace Moda.Web.Api.Models.Planning.Roadmaps;
+namespace Wayd.Web.Api.Models.Planning.Roadmaps;
 
 public sealed record UpdateRoadmapTimeboxDatesRequest : UpdateRoadmapItemDatesRequest
 {

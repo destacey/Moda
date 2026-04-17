@@ -11,9 +11,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\..\..\Moda.Common\src\Moda.Common.Application\Moda.Common.Application.csproj" />
-      <ProjectReference Include="..\..\..\..\Moda.Common\src\Moda.Common\Moda.Common.csproj" />
-      <ProjectReference Include="..\Moda.StrategicManagement.Domain\Moda.StrategicManagement.Domain.csproj" />
+      <ProjectReference Include="..\..\..\..\Wayd.Common\src\Wayd.Common.Application\Wayd.Common.Application.csproj" />
+      <ProjectReference Include="..\..\..\..\Wayd.Common\src\Wayd.Common\Wayd.Common.csproj" />
+      <ProjectReference Include="..\Wayd.StrategicManagement.Domain\Wayd.StrategicManagement.Domain.csproj" />
     </ItemGroup>
 
 </Project>

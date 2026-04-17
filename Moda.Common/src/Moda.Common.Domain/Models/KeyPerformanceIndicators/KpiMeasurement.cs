@@ -1,9 +1,9 @@
-﻿using Moda.Common.Domain.Data;
-using Moda.Common.Domain.Employees;
-using Moda.Common.Extensions;
+﻿using Wayd.Common.Domain.Data;
+using Wayd.Common.Domain.Employees;
+using Wayd.Common.Extensions;
 using NodaTime;
 
-namespace Moda.Common.Domain.Models.KeyPerformanceIndicators;
+namespace Wayd.Common.Domain.Models.KeyPerformanceIndicators;
 
 /// <summary>
 /// Represents the common properties and behavior for a KPI measurement (check-in).  This class is intended to be immutable.

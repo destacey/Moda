@@ -2,7 +2,7 @@
 using MediatR;
 using Serilog.Context;
 
-namespace Moda.Common.Application.Behaviors;
+namespace Wayd.Common.Application.Behaviors;
 
 public class PerformanceBehavior<TRequest, TResponse>(ILogger<PerformanceBehavior<TRequest, TResponse>> logger, ISerializerService jsonSerializer) : IPipelineBehavior<TRequest, TResponse> where TRequest : class, IRequest<TResponse>
 {

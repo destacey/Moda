@@ -28,33 +28,33 @@
 
     <ItemGroup>
         <!-- Reference all domain and application projects to load assemblies for testing -->
-        <ProjectReference Include="..\Moda.Common\src\Moda.Common\Moda.Common.csproj" />
-        <ProjectReference Include="..\Moda.Common\src\Moda.Common.Domain\Moda.Common.Domain.csproj" />
-        <ProjectReference Include="..\Moda.Common\src\Moda.Common.Application\Moda.Common.Application.csproj" />
+        <ProjectReference Include="..\Wayd.Common\src\Wayd.Common\Wayd.Common.csproj" />
+        <ProjectReference Include="..\Wayd.Common\src\Wayd.Common.Domain\Wayd.Common.Domain.csproj" />
+        <ProjectReference Include="..\Wayd.Common\src\Wayd.Common.Application\Wayd.Common.Application.csproj" />
 
         <!-- Infrastructure Projects -->
-        <ProjectReference Include="..\Moda.Infrastructure\src\Moda.Infrastructure\Moda.Infrastructure.csproj" />
-        <ProjectReference Include="..\Moda.Infrastructure\src\Moda.Infrastructure.Migrators.MSSQL\Moda.Infrastructure.Migrators.MSSQL.csproj" />
+        <ProjectReference Include="..\Wayd.Infrastructure\src\Wayd.Infrastructure\Wayd.Infrastructure.csproj" />
+        <ProjectReference Include="..\Wayd.Infrastructure\src\Wayd.Infrastructure.Migrators.MSSQL\Wayd.Infrastructure.Migrators.MSSQL.csproj" />
 
         <!-- Integration Projects -->
-        <ProjectReference Include="..\Moda.Integrations\src\Moda.Integrations.AzureDevOps\Moda.Integrations.AzureDevOps.csproj" />
-        <ProjectReference Include="..\Moda.Integrations\src\Moda.Integrations.MicrosoftGraph\Moda.Integrations.MicrosoftGraph.csproj" />
+        <ProjectReference Include="..\Wayd.Integrations\src\Wayd.Integrations.AzureDevOps\Wayd.Integrations.AzureDevOps.csproj" />
+        <ProjectReference Include="..\Wayd.Integrations\src\Wayd.Integrations.MicrosoftGraph\Wayd.Integrations.MicrosoftGraph.csproj" />
 
         <!-- Service Domain Projects -->
-        <ProjectReference Include="..\Moda.Services\Moda.Work\src\Moda.Work.Domain\Moda.Work.Domain.csproj" />
-        <ProjectReference Include="..\Moda.Services\Moda.Work\src\Moda.Work.Application\Moda.Work.Application.csproj" />
-        <ProjectReference Include="..\Moda.Services\Moda.Organization\src\Moda.Organization.Domain\Moda.Organization.Domain.csproj" />
-        <ProjectReference Include="..\Moda.Services\Moda.Organization\src\Moda.Organization.Application\Moda.Organization.Application.csproj" />
-        <ProjectReference Include="..\Moda.Services\Moda.Planning\src\Moda.Planning.Domain\Moda.Planning.Domain.csproj" />
-        <ProjectReference Include="..\Moda.Services\Moda.Planning\src\Moda.Planning.Application\Moda.Planning.Application.csproj" />
-        <ProjectReference Include="..\Moda.Services\Moda.Goals\src\Moda.Goals.Domain\Moda.Goals.Domain.csproj" />
-        <ProjectReference Include="..\Moda.Services\Moda.Goals\src\Moda.Goals.Application\Moda.Goals.Application.csproj" />
-        <ProjectReference Include="..\Moda.Services\Moda.AppIntegration\src\Moda.AppIntegration.Domain\Moda.AppIntegration.Domain.csproj" />
-        <ProjectReference Include="..\Moda.Services\Moda.AppIntegration\src\Moda.AppIntegration.Application\Moda.AppIntegration.Application.csproj" />
-        <ProjectReference Include="..\Moda.Services\Moda.StrategicManagement\src\Moda.StrategicManagement.Domain\Moda.StrategicManagement.Domain.csproj" />
-        <ProjectReference Include="..\Moda.Services\Moda.StrategicManagement\src\Moda.StrategicManagement.Application\Moda.StrategicManagement.Application.csproj" />
-        <ProjectReference Include="..\Moda.Services\Moda.ProjectPortfolioManagement\src\Moda.ProjectPortfolioManagement.Domain\Moda.ProjectPortfolioManagement.Domain.csproj" />
-        <ProjectReference Include="..\Moda.Services\Moda.ProjectPortfolioManagement\src\Moda.ProjectPortfolioManagement.Application\Moda.ProjectPortfolioManagement.Application.csproj" />
+        <ProjectReference Include="..\Wayd.Services\Wayd.Work\src\Wayd.Work.Domain\Wayd.Work.Domain.csproj" />
+        <ProjectReference Include="..\Wayd.Services\Wayd.Work\src\Wayd.Work.Application\Wayd.Work.Application.csproj" />
+        <ProjectReference Include="..\Wayd.Services\Wayd.Organization\src\Wayd.Organization.Domain\Wayd.Organization.Domain.csproj" />
+        <ProjectReference Include="..\Wayd.Services\Wayd.Organization\src\Wayd.Organization.Application\Wayd.Organization.Application.csproj" />
+        <ProjectReference Include="..\Wayd.Services\Wayd.Planning\src\Wayd.Planning.Domain\Wayd.Planning.Domain.csproj" />
+        <ProjectReference Include="..\Wayd.Services\Wayd.Planning\src\Wayd.Planning.Application\Wayd.Planning.Application.csproj" />
+        <ProjectReference Include="..\Wayd.Services\Wayd.Goals\src\Wayd.Goals.Domain\Wayd.Goals.Domain.csproj" />
+        <ProjectReference Include="..\Wayd.Services\Wayd.Goals\src\Wayd.Goals.Application\Wayd.Goals.Application.csproj" />
+        <ProjectReference Include="..\Wayd.Services\Wayd.AppIntegration\src\Wayd.AppIntegration.Domain\Wayd.AppIntegration.Domain.csproj" />
+        <ProjectReference Include="..\Wayd.Services\Wayd.AppIntegration\src\Wayd.AppIntegration.Application\Wayd.AppIntegration.Application.csproj" />
+        <ProjectReference Include="..\Wayd.Services\Wayd.StrategicManagement\src\Wayd.StrategicManagement.Domain\Wayd.StrategicManagement.Domain.csproj" />
+        <ProjectReference Include="..\Wayd.Services\Wayd.StrategicManagement\src\Wayd.StrategicManagement.Application\Wayd.StrategicManagement.Application.csproj" />
+        <ProjectReference Include="..\Wayd.Services\Wayd.ProjectPortfolioManagement\src\Wayd.ProjectPortfolioManagement.Domain\Wayd.ProjectPortfolioManagement.Domain.csproj" />
+        <ProjectReference Include="..\Wayd.Services\Wayd.ProjectPortfolioManagement\src\Wayd.ProjectPortfolioManagement.Application\Wayd.ProjectPortfolioManagement.Application.csproj" />
     </ItemGroup>
 
 </Project>

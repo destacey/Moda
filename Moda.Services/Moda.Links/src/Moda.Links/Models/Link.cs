@@ -1,8 +1,8 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
-using Moda.Common.Domain.Data;
+using Wayd.Common.Domain.Data;
 
-namespace Moda.Links.Models;
+namespace Wayd.Links.Models;
 
 public sealed class Link : BaseEntity
 {

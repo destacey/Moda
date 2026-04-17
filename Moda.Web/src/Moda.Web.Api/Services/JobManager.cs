@@ -1,22 +1,22 @@
 ﻿using Hangfire;
-using Moda.AppIntegration.Application.Interfaces;
-using Moda.Common.Application.Enums;
-using Moda.Common.Application.Exceptions;
-using Moda.Common.Application.Interfaces;
-using Moda.Organization.Application.Teams.Commands;
-using Moda.Organization.Application.Teams.Queries;
-using Moda.Planning.Application.Iterations.Queries;
-using Moda.Planning.Application.PlanningTeams.Commands;
-using Moda.ProjectPortfolioManagement.Application.PpmTeams.Commands;
-using Moda.ProjectPortfolioManagement.Application.Projects.Queries;
-using Moda.StrategicManagement.Application.StrategicThemes.Queries;
-using Moda.Web.Api.Interfaces;
-using Moda.Work.Application.WorkIterations.Commands;
-using Moda.Work.Application.WorkProjects.Commands;
-using Moda.Work.Application.WorkTeams.Commands;
-using PpmSyncStrategicThemesCommand = Moda.ProjectPortfolioManagement.Application.StrategicThemes.Commands.SyncStrategicThemesCommand;
+using Wayd.AppIntegration.Application.Interfaces;
+using Wayd.Common.Application.Enums;
+using Wayd.Common.Application.Exceptions;
+using Wayd.Common.Application.Interfaces;
+using Wayd.Organization.Application.Teams.Commands;
+using Wayd.Organization.Application.Teams.Queries;
+using Wayd.Planning.Application.Iterations.Queries;
+using Wayd.Planning.Application.PlanningTeams.Commands;
+using Wayd.ProjectPortfolioManagement.Application.PpmTeams.Commands;
+using Wayd.ProjectPortfolioManagement.Application.Projects.Queries;
+using Wayd.StrategicManagement.Application.StrategicThemes.Queries;
+using Wayd.Web.Api.Interfaces;
+using Wayd.Work.Application.WorkIterations.Commands;
+using Wayd.Work.Application.WorkProjects.Commands;
+using Wayd.Work.Application.WorkTeams.Commands;
+using PpmSyncStrategicThemesCommand = Wayd.ProjectPortfolioManagement.Application.StrategicThemes.Commands.SyncStrategicThemesCommand;
 
-namespace Moda.Web.Api.Services;
+namespace Wayd.Web.Api.Services;
 
 public class JobManager(
     ILogger<JobManager> logger,

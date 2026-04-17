@@ -1,6 +1,6 @@
-using Moda.AppIntegration.Application.Connections.Commands.AzureOpenAI;
+using Wayd.AppIntegration.Application.Connections.Commands.AzureOpenAI;
 
-namespace Moda.Web.Api.Models.AppIntegrations.Connections;
+namespace Wayd.Web.Api.Models.AppIntegrations.Connections;
 
 public sealed record UpdateAzureOpenAIConnectionRequest : UpdateConnectionRequest
 {

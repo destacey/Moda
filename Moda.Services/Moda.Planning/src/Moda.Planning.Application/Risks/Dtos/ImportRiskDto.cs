@@ -1,6 +1,6 @@
-﻿using Moda.Planning.Domain.Enums;
+﻿using Wayd.Planning.Domain.Enums;
 
-namespace Moda.Planning.Application.Risks.Dtos;
+namespace Wayd.Planning.Application.Risks.Dtos;
 
 public sealed record ImportRiskDto(
     int ImportId,

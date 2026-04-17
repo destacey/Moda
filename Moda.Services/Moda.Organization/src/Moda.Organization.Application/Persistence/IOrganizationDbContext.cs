@@ -1,6 +1,6 @@
-﻿using Moda.Organization.Application.Teams.Models;
+﻿using Wayd.Organization.Application.Teams.Models;
 
-namespace Moda.Organization.Application.Persistence;
+namespace Wayd.Organization.Application.Persistence;
 
 public interface IOrganizationDbContext : IModaDbContext
 {

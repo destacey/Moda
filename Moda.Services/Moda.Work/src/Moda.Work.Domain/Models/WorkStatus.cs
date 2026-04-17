@@ -1,13 +1,13 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
-using Moda.Common.Extensions;
+using Wayd.Common.Extensions;
 using NodaTime;
 
-namespace Moda.Work.Domain.Models;
+namespace Wayd.Work.Domain.Models;
 
 /// <summary>Represents the status within a workflow.</summary>
-/// <seealso cref="Moda.Common.Domain.Data.BaseSoftDeletableEntity&lt;System.Guid&gt;" />
-/// <seealso cref="Moda.Common.Domain.Interfaces.IActivatable" />
+/// <seealso cref="Wayd.Common.Domain.Data.BaseSoftDeletableEntity&lt;System.Guid&gt;" />
+/// <seealso cref="Wayd.Common.Domain.Interfaces.IActivatable" />
 public sealed class WorkStatus : BaseSoftDeletableEntity<int>, IActivatable
 {
     private WorkStatus() { }

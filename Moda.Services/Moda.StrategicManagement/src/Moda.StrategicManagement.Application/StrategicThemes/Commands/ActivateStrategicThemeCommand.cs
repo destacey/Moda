@@ -1,4 +1,4 @@
-﻿namespace Moda.StrategicManagement.Application.StrategicThemes.Commands;
+﻿namespace Wayd.StrategicManagement.Application.StrategicThemes.Commands;
 
 public sealed record ActivateStrategicThemeCommand(Guid Id) : ICommand;
 

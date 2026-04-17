@@ -1,4 +1,4 @@
-namespace Moda.Infrastructure.BackgroundJobs;
+namespace Wayd.Infrastructure.BackgroundJobs;
 
 public class HangfireStorageSettings
 {

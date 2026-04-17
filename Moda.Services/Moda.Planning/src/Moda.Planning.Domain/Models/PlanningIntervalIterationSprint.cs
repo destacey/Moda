@@ -1,6 +1,6 @@
-﻿using Moda.Planning.Domain.Models.Iterations;
+﻿using Wayd.Planning.Domain.Models.Iterations;
 
-namespace Moda.Planning.Domain.Models;
+namespace Wayd.Planning.Domain.Models;
 
 public sealed class PlanningIntervalIterationSprint : BaseAuditableEntity
 {

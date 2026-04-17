@@ -1,9 +1,9 @@
-﻿using Moda.Integrations.AzureDevOps.Models;
-using Moda.Integrations.AzureDevOps.Models.Contracts;
-using Moda.Integrations.AzureDevOps.Models.Projects;
+﻿using Wayd.Integrations.AzureDevOps.Models;
+using Wayd.Integrations.AzureDevOps.Models.Contracts;
+using Wayd.Integrations.AzureDevOps.Models.Projects;
 using RestSharp;
 
-namespace Moda.Integrations.AzureDevOps.Clients;
+namespace Wayd.Integrations.AzureDevOps.Clients;
 
 internal sealed class ProjectClient : BaseClient
 {

@@ -1,9 +1,9 @@
 ﻿using CSharpFunctionalExtensions;
-using Moda.Planning.Domain.Enums;
-using Moda.Planning.Domain.Interfaces.Roadmaps;
+using Wayd.Planning.Domain.Enums;
+using Wayd.Planning.Domain.Interfaces.Roadmaps;
 using NodaTime;
 
-namespace Moda.Planning.Domain.Models.Roadmaps;
+namespace Wayd.Planning.Domain.Models.Roadmaps;
 
 public sealed class RoadmapMilestone : BaseRoadmapItem
 {

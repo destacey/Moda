@@ -1,8 +1,8 @@
-﻿using Moda.Common.Application.Exceptions;
-using Moda.Web.Api.Extensions;
-using Moda.Web.Api.Models.UserManagement.Roles;
+﻿using Wayd.Common.Application.Exceptions;
+using Wayd.Web.Api.Extensions;
+using Wayd.Web.Api.Models.UserManagement.Roles;
 
-namespace Moda.Web.Api.Controllers.UserManagement;
+namespace Wayd.Web.Api.Controllers.UserManagement;
 
 [Route("api/user-management/roles")]
 [ApiVersionNeutral]

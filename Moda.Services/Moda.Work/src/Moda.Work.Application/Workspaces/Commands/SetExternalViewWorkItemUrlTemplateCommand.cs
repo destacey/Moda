@@ -1,6 +1,6 @@
-﻿using Moda.Work.Application.Persistence;
+﻿using Wayd.Work.Application.Persistence;
 
-namespace Moda.Work.Application.Workspaces.Commands;
+namespace Wayd.Work.Application.Workspaces.Commands;
 
 public sealed record SetExternalViewWorkItemUrlTemplateCommand(Guid WorkspaceId, string? ExternalViewWorkItemUrlTemplate) : ICommand;
 

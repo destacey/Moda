@@ -1,14 +1,14 @@
 ﻿using FluentAssertions;
-using Moda.Common.Models;
-using Moda.StrategicManagement.Domain.Enums;
-using Moda.StrategicManagement.Domain.Models;
-using Moda.StrategicManagement.Domain.Tests.Data;
-using Moda.Tests.Shared;
+using Wayd.Common.Models;
+using Wayd.StrategicManagement.Domain.Enums;
+using Wayd.StrategicManagement.Domain.Models;
+using Wayd.StrategicManagement.Domain.Tests.Data;
+using Wayd.Tests.Shared;
 using NodaTime;
 using NodaTime.Extensions;
 using NodaTime.Testing;
 
-namespace Moda.StrategicManagement.Domain.Tests.Sut.Models;
+namespace Wayd.StrategicManagement.Domain.Tests.Sut.Models;
 
 public sealed class VisionAggregateTests
 {

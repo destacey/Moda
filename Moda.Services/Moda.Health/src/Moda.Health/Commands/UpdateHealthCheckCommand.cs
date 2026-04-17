@@ -3,13 +3,13 @@ using FluentValidation;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Moda.Common.Application.Interfaces;
-using Moda.Common.Application.Validation;
-using Moda.Common.Domain.Enums;
-using Moda.Health.Dtos;
+using Wayd.Common.Application.Interfaces;
+using Wayd.Common.Application.Validation;
+using Wayd.Common.Domain.Enums;
+using Wayd.Health.Dtos;
 using NodaTime;
 
-namespace Moda.Health.Commands;
+namespace Wayd.Health.Commands;
 
 public sealed record UpdateHealthCheckCommand(Guid Id, HealthStatus Status, Instant Expiration, string? Note) : ICommand<HealthCheckDto>;
 

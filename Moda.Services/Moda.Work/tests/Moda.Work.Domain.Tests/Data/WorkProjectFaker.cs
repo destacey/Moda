@@ -1,8 +1,8 @@
-using Moda.Common.Domain.Models.ProjectPortfolioManagement;
-using Moda.Tests.Shared.Data;
-using Moda.Work.Domain.Models;
+using Wayd.Common.Domain.Models.ProjectPortfolioManagement;
+using Wayd.Tests.Shared.Data;
+using Wayd.Work.Domain.Models;
 
-namespace Moda.Work.Domain.Tests.Data;
+namespace Wayd.Work.Domain.Tests.Data;
 
 public class WorkProjectFaker : PrivateConstructorFaker<WorkProject>
 {

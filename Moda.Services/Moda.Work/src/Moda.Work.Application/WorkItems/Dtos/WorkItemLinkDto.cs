@@ -1,7 +1,7 @@
-﻿using Moda.Common.Application.Dtos;
-using Moda.Common.Application.Employees.Dtos;
+﻿using Wayd.Common.Application.Dtos;
+using Wayd.Common.Application.Employees.Dtos;
 
-namespace Moda.Work.Application.WorkItems.Dtos;
+namespace Wayd.Work.Application.WorkItems.Dtos;
 
 public sealed record WorkItemLinkDto : IMapFrom<WorkItemLink>
 {

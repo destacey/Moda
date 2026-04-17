@@ -1,6 +1,6 @@
-﻿using Moda.AppIntegration.Application.Connections.Dtos.AzureDevOps;
+﻿using Wayd.AppIntegration.Application.Connections.Dtos.AzureDevOps;
 
-namespace Moda.Web.Api.Models.AppIntegrations.Connections;
+namespace Wayd.Web.Api.Models.AppIntegrations.Connections;
 
 public sealed record AzdoWorkspaceTeamMappingRequest
 {
@@ -15,7 +15,7 @@ public sealed record AzdoWorkspaceTeamMappingRequest
     public Guid TeamId { get; set; }
 
     /// <summary>
-    /// The unique identifier for the team within Moda.
+    /// The unique identifier for the team within Wayd.
     /// </summary>
     public Guid? InternalTeamId { get; set; }
 

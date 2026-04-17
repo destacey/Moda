@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace Moda.Tests.Shared.Data;
+namespace Wayd.Tests.Shared.Data;
 
 public class IncludePrivateFieldBinder : Bogus.Binder
 {

@@ -1,6 +1,6 @@
-﻿using Moda.Common.Domain.FeatureManagement;
+﻿using Wayd.Common.Domain.FeatureManagement;
 
-namespace Moda.Common.Application.FeatureManagement.Commands;
+namespace Wayd.Common.Application.FeatureManagement.Commands;
 
 public sealed record CreateFeatureFlagCommand(
     string Name,

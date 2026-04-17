@@ -1,6 +1,6 @@
-﻿using Moda.Organization.Application.TeamsOfTeams.Commands;
+﻿using Wayd.Organization.Application.TeamsOfTeams.Commands;
 
-namespace Moda.Web.Api.Models.Organizations.Teams;
+namespace Wayd.Web.Api.Models.Organizations.Teams;
 
 public sealed record DeactivateTeamOfTeamsRequest
 {

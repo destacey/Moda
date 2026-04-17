@@ -1,6 +1,6 @@
-﻿using Moda.Common.Domain.Enums.AppIntegrations;
+﻿using Wayd.Common.Domain.Enums.AppIntegrations;
 
-namespace Moda.Common.Application.Requests.Planning.Iterations;
+namespace Wayd.Common.Application.Requests.Planning.Iterations;
 
 public sealed record GetIterationMappingsQuery(Connector Connector, string SystemId) : IQuery<Dictionary<string, Guid>>;
 

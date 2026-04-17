@@ -1,9 +1,9 @@
 ﻿using System.Linq.Expressions;
-using Moda.Common.Application.Models;
-using Moda.Common.Domain.Enums.Organization;
-using Moda.Planning.Domain.Enums;
+using Wayd.Common.Application.Models;
+using Wayd.Common.Domain.Enums.Organization;
+using Wayd.Planning.Domain.Enums;
 
-namespace Moda.Planning.Application.PlanningIntervals.Queries;
+namespace Wayd.Planning.Application.PlanningIntervals.Queries;
 
 public sealed record GetTeamPlanningIntervalPredictabilityQuery : IQuery<double?>
 {

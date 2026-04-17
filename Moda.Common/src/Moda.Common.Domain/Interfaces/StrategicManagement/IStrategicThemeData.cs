@@ -1,6 +1,6 @@
-﻿using Moda.Common.Domain.Enums.StrategicManagement;
+﻿using Wayd.Common.Domain.Enums.StrategicManagement;
 
-namespace Moda.Common.Domain.Interfaces.StrategicManagement;
+namespace Wayd.Common.Domain.Interfaces.StrategicManagement;
 
 public interface IStrategicThemeData
 {

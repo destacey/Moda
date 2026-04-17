@@ -1,7 +1,7 @@
-﻿using Moda.Common.Application.Models;
-using Moda.Common.Domain.Enums.StrategicManagement;
+﻿using Wayd.Common.Application.Models;
+using Wayd.Common.Domain.Enums.StrategicManagement;
 
-namespace Moda.StrategicManagement.Application.StrategicThemes.Queries;
+namespace Wayd.StrategicManagement.Application.StrategicThemes.Queries;
 
 public sealed record GetStrategicThemeStatesQuery : IQuery<List<StrategicThemeStateDto>> { }
 

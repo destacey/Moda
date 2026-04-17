@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
-namespace Moda.AppIntegration.Domain.Models;
+namespace Wayd.AppIntegration.Domain.Models;
 
 public sealed class AzureDevOpsBoardsConnectionConfiguration
 {

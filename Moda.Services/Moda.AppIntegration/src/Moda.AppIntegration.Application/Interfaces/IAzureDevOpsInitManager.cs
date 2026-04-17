@@ -1,4 +1,4 @@
-﻿namespace Moda.AppIntegration.Application.Interfaces;
+﻿namespace Wayd.AppIntegration.Application.Interfaces;
 
 public interface IAzureDevOpsInitManager : ITransientService
 {

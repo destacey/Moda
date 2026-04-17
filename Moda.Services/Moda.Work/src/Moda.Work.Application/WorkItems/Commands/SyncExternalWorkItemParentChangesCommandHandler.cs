@@ -1,8 +1,8 @@
-﻿using Moda.Common.Application.Requests.WorkManagement.Commands;
-using Moda.Work.Application.Persistence;
-using Moda.Work.Application.WorkItems.Dtos;
+﻿using Wayd.Common.Application.Requests.WorkManagement.Commands;
+using Wayd.Work.Application.Persistence;
+using Wayd.Work.Application.WorkItems.Dtos;
 
-namespace Moda.Work.Application.WorkItems.Commands;
+namespace Wayd.Work.Application.WorkItems.Commands;
 
 internal sealed class SyncExternalWorkItemParentChangesCommandHandler(IWorkDbContext workDbContext, ILogger<SyncExternalWorkItemParentChangesCommandHandler> logger) : ICommandHandler<SyncExternalWorkItemParentChangesCommand>
 {

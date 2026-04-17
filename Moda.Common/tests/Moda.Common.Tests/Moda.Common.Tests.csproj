@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Moda.Common\Moda.Common.csproj" />
+    <ProjectReference Include="..\..\src\Wayd.Common\Wayd.Common.csproj" />
   </ItemGroup>
 
 </Project>

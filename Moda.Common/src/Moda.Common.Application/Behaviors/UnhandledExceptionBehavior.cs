@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace Moda.Common.Application.Behaviors;
+namespace Wayd.Common.Application.Behaviors;
 
 public class UnhandledExceptionBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : notnull, IRequest<TResponse>

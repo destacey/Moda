@@ -1,15 +1,15 @@
 ﻿using Microsoft.AspNetCore.JsonPatch.SystemTextJson;
-using Moda.Common.Domain.Models.ProjectPortfolioManagement;
-using Moda.ProjectPortfolioManagement.Application.Projects.Queries;
-using Moda.ProjectPortfolioManagement.Application.ProjectTasks.Commands;
-using Moda.ProjectPortfolioManagement.Application.ProjectTasks.Dtos;
-using Moda.ProjectPortfolioManagement.Application.ProjectTasks.Models;
-using Moda.ProjectPortfolioManagement.Application.ProjectTasks.Queries;
-using Moda.Web.Api.Extensions;
-using Moda.Web.Api.Models.Ppm.ProjectTasks;
-using TaskStatus = Moda.ProjectPortfolioManagement.Domain.Enums.TaskStatus;
+using Wayd.Common.Domain.Models.ProjectPortfolioManagement;
+using Wayd.ProjectPortfolioManagement.Application.Projects.Queries;
+using Wayd.ProjectPortfolioManagement.Application.ProjectTasks.Commands;
+using Wayd.ProjectPortfolioManagement.Application.ProjectTasks.Dtos;
+using Wayd.ProjectPortfolioManagement.Application.ProjectTasks.Models;
+using Wayd.ProjectPortfolioManagement.Application.ProjectTasks.Queries;
+using Wayd.Web.Api.Extensions;
+using Wayd.Web.Api.Models.Ppm.ProjectTasks;
+using TaskStatus = Wayd.ProjectPortfolioManagement.Domain.Enums.TaskStatus;
 
-namespace Moda.Web.Api.Controllers.Ppm;
+namespace Wayd.Web.Api.Controllers.Ppm;
 
 [Route("api/ppm/projects/{projectIdOrKey}/tasks")]
 [ApiVersionNeutral]

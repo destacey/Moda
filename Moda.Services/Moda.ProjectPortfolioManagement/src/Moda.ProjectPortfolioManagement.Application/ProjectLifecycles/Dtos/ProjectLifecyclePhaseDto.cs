@@ -1,6 +1,6 @@
-using Moda.ProjectPortfolioManagement.Domain.Models;
+using Wayd.ProjectPortfolioManagement.Domain.Models;
 
-namespace Moda.ProjectPortfolioManagement.Application.ProjectLifecycles.Dtos;
+namespace Wayd.ProjectPortfolioManagement.Application.ProjectLifecycles.Dtos;
 
 public sealed record ProjectLifecyclePhaseDto : IMapFrom<ProjectLifecyclePhase>
 {

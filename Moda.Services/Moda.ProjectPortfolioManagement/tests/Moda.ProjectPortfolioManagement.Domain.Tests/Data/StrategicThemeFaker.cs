@@ -1,8 +1,8 @@
-﻿using Moda.Common.Domain.Enums.StrategicManagement;
-using Moda.ProjectPortfolioManagement.Domain.Models;
-using Moda.Tests.Shared.Data;
+﻿using Wayd.Common.Domain.Enums.StrategicManagement;
+using Wayd.ProjectPortfolioManagement.Domain.Models;
+using Wayd.Tests.Shared.Data;
 
-namespace Moda.ProjectPortfolioManagement.Domain.Tests.Data;
+namespace Wayd.ProjectPortfolioManagement.Domain.Tests.Data;
 
 public sealed class StrategicThemeFaker : PrivateConstructorFaker<StrategicTheme>
 {

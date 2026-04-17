@@ -1,7 +1,7 @@
-﻿using Moda.Common.Models;
+﻿using Wayd.Common.Models;
 using NodaTime;
 
-namespace Moda.Common.Tests.Sut.Models;
+namespace Wayd.Common.Tests.Sut.Models;
 
 public sealed class FlexibleDateRangeTests
 {

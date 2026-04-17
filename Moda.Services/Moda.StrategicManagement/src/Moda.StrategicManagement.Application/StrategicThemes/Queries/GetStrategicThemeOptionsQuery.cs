@@ -1,7 +1,7 @@
-﻿using Moda.Common.Domain.Enums.StrategicManagement;
-using Moda.StrategicManagement.Application.StrategicThemes.Dtos;
+﻿using Wayd.Common.Domain.Enums.StrategicManagement;
+using Wayd.StrategicManagement.Application.StrategicThemes.Dtos;
 
-namespace Moda.StrategicManagement.Application.StrategicThemes.Queries;
+namespace Wayd.StrategicManagement.Application.StrategicThemes.Queries;
 
 public sealed record GetStrategicThemeOptionsQuery(bool? IncludeArchived) : IQuery<List<StrategicThemeOptionDto>>;
 

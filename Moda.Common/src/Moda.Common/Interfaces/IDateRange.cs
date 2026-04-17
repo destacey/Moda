@@ -1,4 +1,4 @@
-﻿namespace Moda.Common.Interfaces;
+﻿namespace Wayd.Common.Interfaces;
 
 /// <summary>
 /// 

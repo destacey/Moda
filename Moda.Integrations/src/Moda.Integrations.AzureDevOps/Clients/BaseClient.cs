@@ -1,11 +1,11 @@
 ﻿using System.Text.Json;
 using Ardalis.GuardClauses;
-using Moda.Integrations.AzureDevOps.Extensions;
-using Moda.Integrations.AzureDevOps.Models.Converters;
+using Wayd.Integrations.AzureDevOps.Extensions;
+using Wayd.Integrations.AzureDevOps.Models.Converters;
 using RestSharp;
 using RestSharp.Serializers.Json;
 
-namespace Moda.Integrations.AzureDevOps.Clients;
+namespace Wayd.Integrations.AzureDevOps.Clients;
 
 internal abstract class BaseClient : IDisposable
 {

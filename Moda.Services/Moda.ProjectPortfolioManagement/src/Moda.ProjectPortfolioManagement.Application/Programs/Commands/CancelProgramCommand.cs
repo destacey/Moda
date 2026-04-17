@@ -1,4 +1,4 @@
-﻿namespace Moda.ProjectPortfolioManagement.Application.Programs.Commands;
+﻿namespace Wayd.ProjectPortfolioManagement.Application.Programs.Commands;
 
 public sealed record CancelProgramCommand(Guid Id) : ICommand;
 

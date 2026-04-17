@@ -1,6 +1,6 @@
-﻿using Moda.Common.Application.Requests.WorkManagement.Interfaces;
+﻿using Wayd.Common.Application.Requests.WorkManagement.Interfaces;
 
-namespace Moda.Work.Application.WorkStatuses.Dtos;
+namespace Wayd.Work.Application.WorkStatuses.Dtos;
 
 public sealed record WorkStatusDto : IMapFrom<WorkStatus>, IWorkStatusDto
 {

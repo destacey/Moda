@@ -1,6 +1,6 @@
-﻿using Moda.Common.Domain.Models.ProjectPortfolioManagement;
+﻿using Wayd.Common.Domain.Models.ProjectPortfolioManagement;
 
-namespace Moda.ProjectPortfolioManagement.Application.Projects.Queries;
+namespace Wayd.ProjectPortfolioManagement.Application.Projects.Queries;
 
 public sealed record GetProjectIdQuery(ProjectKey Key) : IQuery<Guid?>;
 

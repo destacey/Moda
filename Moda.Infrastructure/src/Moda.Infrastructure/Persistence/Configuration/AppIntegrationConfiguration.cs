@@ -1,12 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Moda.AppIntegration.Domain.Models.AzureOpenAI;
-using Moda.AppIntegration.Domain.Models.OpenAI;
-using Moda.Common.Domain.Enums.AppIntegrations;
-using Moda.Infrastructure.Persistence.Converters;
-using Moda.Infrastructure.Persistence.Extensions;
+using Wayd.AppIntegration.Domain.Models.AzureOpenAI;
+using Wayd.AppIntegration.Domain.Models.OpenAI;
+using Wayd.Common.Domain.Enums.AppIntegrations;
+using Wayd.Infrastructure.Persistence.Converters;
+using Wayd.Infrastructure.Persistence.Extensions;
 
-namespace Moda.Infrastructure.Persistence.Configuration;
+namespace Wayd.Infrastructure.Persistence.Configuration;
 
 public class ConnectionConfig : IEntityTypeConfiguration<Connection>
 {

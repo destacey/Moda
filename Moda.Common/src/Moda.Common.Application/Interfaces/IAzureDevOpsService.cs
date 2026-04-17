@@ -1,6 +1,6 @@
-﻿using Moda.Common.Application.Interfaces.ExternalWork;
+﻿using Wayd.Common.Application.Interfaces.ExternalWork;
 
-namespace Moda.Common.Application.Interfaces;
+namespace Wayd.Common.Application.Interfaces;
 
 public interface IAzureDevOpsService
 {

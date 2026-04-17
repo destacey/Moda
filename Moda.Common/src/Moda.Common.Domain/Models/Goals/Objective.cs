@@ -1,11 +1,11 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
-using Moda.Common.Domain.Data;
-using Moda.Common.Domain.Enums.Goals;
-using Moda.Common.Extensions;
+using Wayd.Common.Domain.Data;
+using Wayd.Common.Domain.Enums.Goals;
+using Wayd.Common.Extensions;
 using NodaTime;
 
-namespace Moda.Common.Domain.Models.Goals;
+namespace Wayd.Common.Domain.Models.Goals;
 
 // TODO make a BaseObjective to inherit Objective and KeyResult from
 public class Objective : BaseSoftDeletableEntity, IHasIdAndKey

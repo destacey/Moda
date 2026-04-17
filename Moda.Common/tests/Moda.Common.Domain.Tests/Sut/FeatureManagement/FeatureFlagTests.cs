@@ -1,7 +1,7 @@
-using Moda.Common.Domain.FeatureManagement;
-using Moda.Tests.Shared.Data;
+using Wayd.Common.Domain.FeatureManagement;
+using Wayd.Tests.Shared.Data;
 
-namespace Moda.Common.Domain.Tests.Sut.FeatureManagement;
+namespace Wayd.Common.Domain.Tests.Sut.FeatureManagement;
 
 public sealed class FeatureFlagTests
 {

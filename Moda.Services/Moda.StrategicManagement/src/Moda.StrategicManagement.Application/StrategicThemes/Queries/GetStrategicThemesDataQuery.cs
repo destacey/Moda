@@ -1,6 +1,6 @@
-﻿using Moda.Common.Domain.Interfaces.StrategicManagement;
+﻿using Wayd.Common.Domain.Interfaces.StrategicManagement;
 
-namespace Moda.StrategicManagement.Application.StrategicThemes.Queries;
+namespace Wayd.StrategicManagement.Application.StrategicThemes.Queries;
 
 /// <summary>
 /// Retrieves a list of StrategicThemes based on IStrategicThemeData.

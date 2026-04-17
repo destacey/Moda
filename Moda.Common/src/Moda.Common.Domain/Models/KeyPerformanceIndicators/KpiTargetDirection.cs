@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Moda.Common.Domain.Models.KeyPerformanceIndicators;
+namespace Wayd.Common.Domain.Models.KeyPerformanceIndicators;
 
 // max length of 32 characters
 

@@ -1,6 +1,6 @@
 ﻿using NodaTime;
 
-namespace Moda.Work.Domain.Models;
+namespace Wayd.Work.Domain.Models;
 
 /// <summary>
 /// A specific field change within a work item revision.

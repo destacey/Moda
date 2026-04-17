@@ -1,4 +1,4 @@
-﻿namespace Moda.Integrations.AzureDevOps.Models;
+﻿namespace Wayd.Integrations.AzureDevOps.Models;
 
 internal sealed record BatchResponse<T>
 {

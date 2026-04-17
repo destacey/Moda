@@ -1,9 +1,9 @@
-﻿using Moda.Common.Application.Interfaces.ExternalWork;
-using Moda.Common.Application.Models;
-using Moda.Common.Domain.Enums.Planning;
+﻿using Wayd.Common.Application.Interfaces.ExternalWork;
+using Wayd.Common.Application.Models;
+using Wayd.Common.Domain.Enums.Planning;
 using NodaTime;
 
-namespace Moda.Integrations.AzureDevOps.Models.Contracts;
+namespace Wayd.Integrations.AzureDevOps.Models.Contracts;
 
 public sealed record AzdoIteration : IExternalIteration<AzdoIterationMetadata>
 {

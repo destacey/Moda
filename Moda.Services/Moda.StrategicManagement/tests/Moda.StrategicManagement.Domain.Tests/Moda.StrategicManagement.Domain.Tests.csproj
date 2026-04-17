@@ -23,8 +23,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Moda.Common\tests\Moda.Tests.Shared\Moda.Tests.Shared.csproj" />
-    <ProjectReference Include="..\..\src\Moda.StrategicManagement.Domain\Moda.StrategicManagement.Domain.csproj" />
+    <ProjectReference Include="..\..\..\..\Wayd.Common\tests\Wayd.Tests.Shared\Wayd.Tests.Shared.csproj" />
+    <ProjectReference Include="..\..\src\Wayd.StrategicManagement.Domain\Wayd.StrategicManagement.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,8 +1,8 @@
-﻿using Moda.Common.Application.Dtos;
-using Moda.Planning.Application.Models;
-using Moda.Planning.Domain.Models.Iterations;
+﻿using Wayd.Common.Application.Dtos;
+using Wayd.Planning.Application.Models;
+using Wayd.Planning.Domain.Models.Iterations;
 
-namespace Moda.Planning.Application.Iterations.Dtos;
+namespace Wayd.Planning.Application.Iterations.Dtos;
 
 public sealed record SprintListDto : IMapFrom<Iteration>
 {

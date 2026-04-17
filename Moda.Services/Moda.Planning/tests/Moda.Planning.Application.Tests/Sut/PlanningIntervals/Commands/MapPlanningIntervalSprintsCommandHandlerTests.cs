@@ -1,13 +1,13 @@
 ﻿using Microsoft.Extensions.Logging;
-using Moda.Common.Models;
-using Moda.Planning.Application.PlanningIntervals.Commands;
-using Moda.Planning.Application.Tests.Infrastructure;
-using Moda.Planning.Domain.Tests.Data;
-using Moda.Tests.Shared.Extensions;
+using Wayd.Common.Models;
+using Wayd.Planning.Application.PlanningIntervals.Commands;
+using Wayd.Planning.Application.Tests.Infrastructure;
+using Wayd.Planning.Domain.Tests.Data;
+using Wayd.Tests.Shared.Extensions;
 using Moq;
 using NodaTime;
 
-namespace Moda.Planning.Application.Tests.Sut.PlanningIntervals.Commands;
+namespace Wayd.Planning.Application.Tests.Sut.PlanningIntervals.Commands;
 
 public class MapPlanningIntervalSprintsCommandHandlerTests : IDisposable
 {

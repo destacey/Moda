@@ -1,6 +1,6 @@
-﻿using Moda.Organization.Domain.Models;
+﻿using Wayd.Organization.Domain.Models;
 
-namespace Moda.Web.Api.Models.Organizations;
+namespace Wayd.Web.Api.Models.Organizations;
 
 public sealed record UpdateTeamMembershipRequest
 {

@@ -1,7 +1,7 @@
-﻿using Moda.Common.Domain.Enums;
-using Moda.Work.Application.WorkItems.Commands;
+﻿using Wayd.Common.Domain.Enums;
+using Wayd.Work.Application.WorkItems.Commands;
 
-namespace Moda.Web.Api.Models.Planning.PlanningIntervals;
+namespace Wayd.Web.Api.Models.Planning.PlanningIntervals;
 
 public sealed record ManagePlanningIntervalObjectiveWorkItemsRequest
 {

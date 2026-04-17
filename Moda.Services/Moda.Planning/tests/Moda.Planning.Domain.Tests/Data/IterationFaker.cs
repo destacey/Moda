@@ -1,11 +1,11 @@
-﻿using Moda.Common.Domain.Enums.AppIntegrations;
-using Moda.Common.Domain.Enums.Planning;
-using Moda.Common.Domain.Models;
-using Moda.Common.Domain.Models.Planning.Iterations;
-using Moda.Planning.Domain.Models.Iterations;
-using Moda.Tests.Shared.Data;
+﻿using Wayd.Common.Domain.Enums.AppIntegrations;
+using Wayd.Common.Domain.Enums.Planning;
+using Wayd.Common.Domain.Models;
+using Wayd.Common.Domain.Models.Planning.Iterations;
+using Wayd.Planning.Domain.Models.Iterations;
+using Wayd.Tests.Shared.Data;
 
-namespace Moda.Planning.Domain.Tests.Data;
+namespace Wayd.Planning.Domain.Tests.Data;
 
 public sealed class IterationFaker : PrivateConstructorFaker<Iteration>
 {

@@ -1,6 +1,6 @@
 ﻿using NodaTime;
 
-namespace Moda.Common.Domain.Identity;
+namespace Wayd.Common.Domain.Identity;
 
 public abstract record ApplicationRoleEvent : DomainEvent
 {

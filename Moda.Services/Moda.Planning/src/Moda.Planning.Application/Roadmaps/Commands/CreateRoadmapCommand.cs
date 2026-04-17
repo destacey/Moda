@@ -1,9 +1,9 @@
 ﻿using Ardalis.GuardClauses;
-using Moda.Common.Application.Models;
-using Moda.Common.Domain.Enums;
-using Moda.Planning.Domain.Models.Roadmaps;
+using Wayd.Common.Application.Models;
+using Wayd.Common.Domain.Enums;
+using Wayd.Planning.Domain.Models.Roadmaps;
 
-namespace Moda.Planning.Application.Roadmaps.Commands;
+namespace Wayd.Planning.Application.Roadmaps.Commands;
 
 public sealed record CreateRoadmapCommand(string Name, string? Description, LocalDateRange DateRange, List<Guid> RoadmapManagerIds, Visibility Visibility) : ICommand<ObjectIdAndKey>;
 

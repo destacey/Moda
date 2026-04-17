@@ -1,6 +1,6 @@
-﻿using Moda.Tests.Shared.Data;
+﻿using Wayd.Tests.Shared.Data;
 
-namespace Moda.Health.Tests.Data;
+namespace Wayd.Health.Tests.Data;
 
 public class HealthCheckFaker : PrivateConstructorFaker<HealthCheck>
 {

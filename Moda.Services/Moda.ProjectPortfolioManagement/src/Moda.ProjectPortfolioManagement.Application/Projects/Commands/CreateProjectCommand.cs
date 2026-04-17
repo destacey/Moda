@@ -1,10 +1,10 @@
-﻿using Moda.Common.Domain.Enums.StrategicManagement;
-using Moda.Common.Domain.Models.ProjectPortfolioManagement;
-using Moda.ProjectPortfolioManagement.Application.Projects.Models;
-using Moda.ProjectPortfolioManagement.Application.Projects.Validators;
-using Moda.ProjectPortfolioManagement.Domain.Enums;
+﻿using Wayd.Common.Domain.Enums.StrategicManagement;
+using Wayd.Common.Domain.Models.ProjectPortfolioManagement;
+using Wayd.ProjectPortfolioManagement.Application.Projects.Models;
+using Wayd.ProjectPortfolioManagement.Application.Projects.Validators;
+using Wayd.ProjectPortfolioManagement.Domain.Enums;
 
-namespace Moda.ProjectPortfolioManagement.Application.Projects.Commands;
+namespace Wayd.ProjectPortfolioManagement.Application.Projects.Commands;
 
 public sealed record CreateProjectCommand(string Name, string Description, string? BusinessCase, string? ExpectedBenefits, ProjectKey Key, int ExpenditureCategoryId, LocalDateRange? DateRange, Guid PortfolioId, Guid? ProgramId, Guid? ProjectLifecycleId, List<Guid>? SponsorIds, List<Guid>? OwnerIds, List<Guid>? ManagerIds, List<Guid>? MemberIds, List<Guid>? StrategicThemeIds) : ICommand<ProjectIdAndKey>;
 

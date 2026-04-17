@@ -1,9 +1,9 @@
 ﻿using System.Text.Json;
-using Moda.Common.Domain.Enums.Work;
-using Moda.Integrations.AzureDevOps.Models.Processes;
-using Moda.Integrations.AzureDevOps.Tests.Models;
+using Wayd.Common.Domain.Enums.Work;
+using Wayd.Integrations.AzureDevOps.Models.Processes;
+using Wayd.Integrations.AzureDevOps.Tests.Models;
 
-namespace Moda.Integrations.AzureDevOps.Tests.Sut.Models.Processes;
+namespace Wayd.Integrations.AzureDevOps.Tests.Sut.Models.Processes;
 
 public class BehaviorDtoExtensionsTests : CommonResponseOptions
 {

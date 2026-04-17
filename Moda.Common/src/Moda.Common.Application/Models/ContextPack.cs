@@ -1,4 +1,4 @@
-namespace Moda.Common.Application.Models;
+namespace Wayd.Common.Application.Models;
 
 public abstract class ContextPack
 {

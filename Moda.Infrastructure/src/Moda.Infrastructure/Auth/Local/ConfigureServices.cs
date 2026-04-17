@@ -7,7 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Moda.Infrastructure.Auth.Local;
+namespace Wayd.Infrastructure.Auth.Local;
 
 internal static class ConfigureServices
 {

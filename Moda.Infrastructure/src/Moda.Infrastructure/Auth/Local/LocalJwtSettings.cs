@@ -1,4 +1,4 @@
-namespace Moda.Infrastructure.Auth.Local;
+namespace Wayd.Infrastructure.Auth.Local;
 
 public sealed class LocalJwtSettings
 {

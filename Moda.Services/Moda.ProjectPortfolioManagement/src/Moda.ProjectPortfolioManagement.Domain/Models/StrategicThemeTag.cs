@@ -1,4 +1,4 @@
-﻿namespace Moda.ProjectPortfolioManagement.Domain.Models;
+﻿namespace Wayd.ProjectPortfolioManagement.Domain.Models;
 
 public sealed class StrategicThemeTag<T> : ISystemAuditable
 {

@@ -1,4 +1,4 @@
-﻿namespace Moda.Health.Dtos;
+﻿namespace Wayd.Health.Dtos;
 
 public sealed record HealthStatusDto
 {

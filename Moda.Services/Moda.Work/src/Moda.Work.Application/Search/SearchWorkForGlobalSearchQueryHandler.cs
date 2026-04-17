@@ -1,8 +1,8 @@
-﻿using Moda.Common.Application.Search;
-using Moda.Common.Application.Search.Dtos;
-using Moda.Work.Application.Persistence;
+﻿using Wayd.Common.Application.Search;
+using Wayd.Common.Application.Search.Dtos;
+using Wayd.Work.Application.Persistence;
 
-namespace Moda.Work.Application.Search;
+namespace Wayd.Work.Application.Search;
 
 internal sealed class SearchWorkForGlobalSearchQueryHandler(IWorkDbContext workDbContext)
     : IQueryHandler<SearchWorkForGlobalSearchQuery, ServiceSearchResponse>

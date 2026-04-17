@@ -1,8 +1,8 @@
-﻿using Moda.Common.Application.Requests.WorkManagement.Queries;
-using Moda.Common.Domain.Models;
-using Moda.Work.Application.Persistence;
+﻿using Wayd.Common.Application.Requests.WorkManagement.Queries;
+using Wayd.Common.Domain.Models;
+using Wayd.Work.Application.Persistence;
 
-namespace Moda.Work.Application.WorkProcesses.Queries;
+namespace Wayd.Work.Application.WorkProcesses.Queries;
 
 internal sealed class GetIntegrationRegistrationsForWorkProcessesQueryHandler(IWorkDbContext workDbContext) : IQueryHandler<GetIntegrationRegistrationsForWorkProcessesQuery, List<IntegrationRegistration<Guid, Guid>>>
 {

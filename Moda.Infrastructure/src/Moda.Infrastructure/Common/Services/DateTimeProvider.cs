@@ -1,6 +1,6 @@
 ﻿using NodaTime;
 
-namespace Moda.Infrastructure.Common.Services;
+namespace Wayd.Infrastructure.Common.Services;
 
 public class DateTimeProvider(IClock clock) : IDateTimeProvider
 {

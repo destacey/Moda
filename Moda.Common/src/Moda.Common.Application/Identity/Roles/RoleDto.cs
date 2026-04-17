@@ -1,4 +1,4 @@
-namespace Moda.Common.Application.Identity.Roles;
+namespace Wayd.Common.Application.Identity.Roles;
 
 public sealed record RoleDto
 {

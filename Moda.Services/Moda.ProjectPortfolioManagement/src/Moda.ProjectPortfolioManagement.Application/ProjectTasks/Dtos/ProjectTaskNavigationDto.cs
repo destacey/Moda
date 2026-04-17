@@ -1,6 +1,6 @@
-using Moda.ProjectPortfolioManagement.Domain.Models;
+using Wayd.ProjectPortfolioManagement.Domain.Models;
 
-namespace Moda.ProjectPortfolioManagement.Application.ProjectTasks.Dtos;
+namespace Wayd.ProjectPortfolioManagement.Application.ProjectTasks.Dtos;
 
 /// <summary>
 /// Navigation DTO for a project task.

@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 
-namespace Moda.Infrastructure.Persistence.Extensions;
+namespace Wayd.Infrastructure.Persistence.Extensions;
 
 internal static class ModelBuilderExtensions
 {

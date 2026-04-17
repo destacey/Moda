@@ -1,7 +1,7 @@
-using Moda.Common.Domain.Models.Organizations;
+using Wayd.Common.Domain.Models.Organizations;
 using NodaTime;
 
-namespace Moda.Common.Domain.Events.Organization;
+namespace Wayd.Common.Domain.Events.Organization;
 
 public sealed record TeamUpdatedEvent : DomainEvent
 {

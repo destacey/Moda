@@ -1,9 +1,9 @@
 ﻿using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
-using Moda.Integrations.AzureDevOps.Clients;
-using Moda.Integrations.AzureDevOps.Models;
+using Wayd.Integrations.AzureDevOps.Clients;
+using Wayd.Integrations.AzureDevOps.Models;
 
-namespace Moda.Integrations.AzureDevOps.Services;
+namespace Wayd.Integrations.AzureDevOps.Services;
 
 internal sealed class GeneralService(string organizationUrl, string token, string apiVersion, ILogger<GeneralService> logger)
 {

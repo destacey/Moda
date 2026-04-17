@@ -1,8 +1,8 @@
-﻿using Moda.Common.Domain.Tests.Data.Models;
-using Moda.Tests.Shared;
-using Moda.Tests.Shared.Data;
+﻿using Wayd.Common.Domain.Tests.Data.Models;
+using Wayd.Tests.Shared;
+using Wayd.Tests.Shared.Data;
 
-namespace Moda.Common.Domain.Tests.Data;
+namespace Wayd.Common.Domain.Tests.Data;
 
 public sealed class TestKpiMeasurementFaker : PrivateConstructorFaker<TestKpiMeasurement>
 {

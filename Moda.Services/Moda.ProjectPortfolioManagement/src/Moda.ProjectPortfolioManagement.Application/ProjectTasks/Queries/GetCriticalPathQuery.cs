@@ -1,6 +1,6 @@
-﻿using Moda.Common.Domain.Models.ProjectPortfolioManagement;
+﻿using Wayd.Common.Domain.Models.ProjectPortfolioManagement;
 
-namespace Moda.ProjectPortfolioManagement.Application.ProjectTasks.Queries;
+namespace Wayd.ProjectPortfolioManagement.Application.ProjectTasks.Queries;
 
 /// <summary>
 /// Gets the critical path for a project (ordered list of task IDs on the critical path).

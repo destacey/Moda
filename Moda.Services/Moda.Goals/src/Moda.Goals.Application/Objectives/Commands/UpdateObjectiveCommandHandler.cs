@@ -1,7 +1,7 @@
-﻿using Moda.Common.Application.Requests.Goals.Commands;
-using Moda.Goals.Application.Persistence;
+﻿using Wayd.Common.Application.Requests.Goals.Commands;
+using Wayd.Goals.Application.Persistence;
 
-namespace Moda.Goals.Application.Objectives.Commands;
+namespace Wayd.Goals.Application.Objectives.Commands;
 
 internal sealed class UpdateObjectiveCommandHandler(IGoalsDbContext goalsDbContext, IDateTimeProvider dateTimeProvider, ILogger<UpdateObjectiveCommandHandler> logger) : ICommandHandler<UpdateObjectiveCommand, Guid>
 {

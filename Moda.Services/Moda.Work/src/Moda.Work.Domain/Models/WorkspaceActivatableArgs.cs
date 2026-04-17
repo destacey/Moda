@@ -1,6 +1,6 @@
 ﻿using NodaTime;
 
-namespace Moda.Work.Domain.Models;
+namespace Wayd.Work.Domain.Models;
 
 public sealed record WorkspaceActivatableArgs : ActivatableArgs
 {

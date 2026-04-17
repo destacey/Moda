@@ -1,20 +1,20 @@
 using MediatR;
-using Moda.AppIntegration.Application.Connections.Commands;
-using Moda.AppIntegration.Application.Connections.Commands.AzureDevOps;
-using Moda.AppIntegration.Application.Connections.Dtos.AzureDevOps;
-using Moda.AppIntegration.Application.Connections.Queries.AzureDevOps;
-using Moda.AppIntegration.Application.Interfaces;
-using Moda.AppIntegration.Application.Logging;
-using Moda.Common.Application.Interfaces.ExternalWork;
-using Moda.Common.Application.Requests.WorkManagement.Commands;
-using Moda.Common.Application.Requests.WorkManagement.Dtos;
-using Moda.Common.Application.Requests.WorkManagement.Queries;
-using Moda.Common.Domain.Enums.AppIntegrations;
-using Moda.Common.Domain.Enums.Work;
-using Moda.Common.Domain.Models;
-using Moda.Common.Models;
+using Wayd.AppIntegration.Application.Connections.Commands;
+using Wayd.AppIntegration.Application.Connections.Commands.AzureDevOps;
+using Wayd.AppIntegration.Application.Connections.Dtos.AzureDevOps;
+using Wayd.AppIntegration.Application.Connections.Queries.AzureDevOps;
+using Wayd.AppIntegration.Application.Interfaces;
+using Wayd.AppIntegration.Application.Logging;
+using Wayd.Common.Application.Interfaces.ExternalWork;
+using Wayd.Common.Application.Requests.WorkManagement.Commands;
+using Wayd.Common.Application.Requests.WorkManagement.Dtos;
+using Wayd.Common.Application.Requests.WorkManagement.Queries;
+using Wayd.Common.Domain.Enums.AppIntegrations;
+using Wayd.Common.Domain.Enums.Work;
+using Wayd.Common.Domain.Models;
+using Wayd.Common.Models;
 
-namespace Moda.AppIntegration.Application.Connections.Managers;
+namespace Wayd.AppIntegration.Application.Connections.Managers;
 
 public sealed class AzureDevOpsInitManager(ILogger<AzureDevOpsInitManager> logger, IAzureDevOpsService azureDevOpsService, ISender sender) : IAzureDevOpsInitManager
 {

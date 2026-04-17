@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 
-namespace Moda.Infrastructure.Auth;
+namespace Wayd.Infrastructure.Auth;
 
 public interface ICurrentUserInitializer
 {

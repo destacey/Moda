@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Moda.Infrastructure.Persistence.ConnectionString;
+namespace Wayd.Infrastructure.Persistence.ConnectionString;
 
 internal class ConnectionStringValidator : IConnectionStringValidator
 {

@@ -1,8 +1,8 @@
-﻿using Moda.Common.Application.Dtos;
-using Moda.Common.Application.Requests.Goals.Dtos;
-using Moda.Planning.Application.Models;
+﻿using Wayd.Common.Application.Dtos;
+using Wayd.Common.Application.Requests.Goals.Dtos;
+using Wayd.Planning.Application.Models;
 
-namespace Moda.Planning.Application.PlanningIntervals.Dtos;
+namespace Wayd.Planning.Application.PlanningIntervals.Dtos;
 
 public sealed record PlanningIntervalObjectiveDetailsDto
 {

@@ -1,14 +1,14 @@
-using Moda.AppIntegration.Application.Connections.Commands.AzureDevOps;
-using Moda.AppIntegration.Application.Connections.Dtos.AzureDevOps;
-using Moda.AppIntegration.Application.Connections.Queries.AzureDevOps;
-using Moda.AppIntegration.Application.Interfaces;
-using Moda.AppIntegration.Domain.Models;
-using Moda.Common.Application.Interfaces;
-using Moda.Organization.Application.BaseTeams.Queries;
-using Moda.Web.Api.Extensions;
-using Moda.Web.Api.Models.AppIntegrations.Connections;
+using Wayd.AppIntegration.Application.Connections.Commands.AzureDevOps;
+using Wayd.AppIntegration.Application.Connections.Dtos.AzureDevOps;
+using Wayd.AppIntegration.Application.Connections.Queries.AzureDevOps;
+using Wayd.AppIntegration.Application.Interfaces;
+using Wayd.AppIntegration.Domain.Models;
+using Wayd.Common.Application.Interfaces;
+using Wayd.Organization.Application.BaseTeams.Queries;
+using Wayd.Web.Api.Extensions;
+using Wayd.Web.Api.Models.AppIntegrations.Connections;
 
-namespace Moda.Web.Api.Controllers.AppIntegrations;
+namespace Wayd.Web.Api.Controllers.AppIntegrations;
 
 [Route("api/app-integrations/connections/azure-devops")]
 [ApiVersionNeutral]

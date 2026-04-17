@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Moda.Common.Domain.Enums.Planning;
+namespace Wayd.Common.Domain.Enums.Planning;
 
 // max length of 32 characters
 public enum IterationState

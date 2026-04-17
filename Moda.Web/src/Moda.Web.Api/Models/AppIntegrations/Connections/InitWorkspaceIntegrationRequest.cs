@@ -1,6 +1,6 @@
-﻿using Moda.Common.Extensions;
+﻿using Wayd.Common.Extensions;
 
-namespace Moda.Web.Api.Models.AppIntegrations.Connections;
+namespace Wayd.Web.Api.Models.AppIntegrations.Connections;
 
 public sealed record InitWorkspaceIntegrationRequest
 {

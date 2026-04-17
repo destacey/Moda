@@ -1,6 +1,6 @@
 ﻿using NodaTime;
 
-namespace Moda.Common.Domain.Events;
+namespace Wayd.Common.Domain.Events;
 
 public static class EntityCreatedEvent
 {

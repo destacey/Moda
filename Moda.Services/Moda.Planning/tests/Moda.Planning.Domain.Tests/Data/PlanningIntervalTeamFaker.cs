@@ -1,7 +1,7 @@
-using Moda.Planning.Domain.Models;
-using Moda.Tests.Shared.Data;
+using Wayd.Planning.Domain.Models;
+using Wayd.Tests.Shared.Data;
 
-namespace Moda.Planning.Domain.Tests.Data;
+namespace Wayd.Planning.Domain.Tests.Data;
 
 public sealed class PlanningIntervalTeamFaker : PrivateConstructorFaker<PlanningIntervalTeam>
 {

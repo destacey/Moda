@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Moda.Common.Domain.Enums.Organization;
+namespace Wayd.Common.Domain.Enums.Organization;
 
 // max length of 32 characters
 public enum TeamType

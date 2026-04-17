@@ -1,6 +1,6 @@
 ﻿using Ardalis.GuardClauses;
 
-namespace Moda.Common.Domain.Models;
+namespace Wayd.Common.Domain.Models;
 
 public class KeyValueObjectMetadata : ISystemAuditable
 {

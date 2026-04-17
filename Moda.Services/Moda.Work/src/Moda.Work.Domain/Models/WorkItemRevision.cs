@@ -1,6 +1,6 @@
 ﻿using NodaTime;
 
-namespace Moda.Work.Domain.Models;
+namespace Wayd.Work.Domain.Models;
 
 /// <summary>
 /// The work item revision is a change record for a work item.

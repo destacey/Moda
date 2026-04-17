@@ -1,6 +1,6 @@
-using Moda.Planning.Application.PokerSessions.Interfaces;
+using Wayd.Planning.Application.PokerSessions.Interfaces;
 
-namespace Moda.Planning.Application.PokerSessions.Commands;
+namespace Wayd.Planning.Application.PokerSessions.Commands;
 
 public sealed record SetConsensusCommand(Guid SessionId, Guid RoundId, string Estimate) : ICommand;
 

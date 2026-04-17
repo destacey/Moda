@@ -1,10 +1,10 @@
-﻿using Moda.Common.Domain.Enums.Organization;
-using Moda.Common.Domain.Models.Organizations;
-using Moda.Organization.Domain.Models;
-using Moda.Tests.Shared.Data;
+﻿using Wayd.Common.Domain.Enums.Organization;
+using Wayd.Common.Domain.Models.Organizations;
+using Wayd.Organization.Domain.Models;
+using Wayd.Tests.Shared.Data;
 using NodaTime;
 
-namespace Moda.Organization.Domain.Tests.Data;
+namespace Wayd.Organization.Domain.Tests.Data;
 
 public class TeamFaker : PrivateConstructorFaker<Team>
 {

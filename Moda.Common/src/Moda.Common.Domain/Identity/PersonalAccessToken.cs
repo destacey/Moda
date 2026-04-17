@@ -1,9 +1,9 @@
 using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
-using Moda.Common.Domain.Data;
+using Wayd.Common.Domain.Data;
 using NodaTime;
 
-namespace Moda.Common.Domain.Identity;
+namespace Wayd.Common.Domain.Identity;
 
 /// <summary>
 /// Represents a personal access token used for API authentication.

@@ -1,4 +1,4 @@
-namespace Moda.ProjectPortfolioManagement.Application.Projects.Dtos;
+namespace Wayd.ProjectPortfolioManagement.Application.Projects.Dtos;
 
 /// <summary>
 /// Summary of the current user's project involvement, with counts per role.

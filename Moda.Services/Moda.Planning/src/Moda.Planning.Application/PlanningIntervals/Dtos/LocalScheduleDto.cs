@@ -1,6 +1,6 @@
-﻿using Moda.Planning.Domain.Interfaces;
+﻿using Wayd.Planning.Domain.Interfaces;
 
-namespace Moda.Planning.Application.PlanningIntervals.Dtos;
+namespace Wayd.Planning.Application.PlanningIntervals.Dtos;
 
 public sealed record LocalScheduleDto
 {

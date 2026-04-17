@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace Moda.Infrastructure.Persistence.Initialization;
+namespace Wayd.Infrastructure.Persistence.Initialization;
 
 internal class ApplicationDbInitializer
 {

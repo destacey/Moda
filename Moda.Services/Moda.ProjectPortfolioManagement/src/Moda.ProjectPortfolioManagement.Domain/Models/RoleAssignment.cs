@@ -1,6 +1,6 @@
-﻿using Moda.Common.Domain.Employees;
+﻿using Wayd.Common.Domain.Employees;
 
-namespace Moda.ProjectPortfolioManagement.Domain.Models;
+namespace Wayd.ProjectPortfolioManagement.Domain.Models;
 
 public sealed class RoleAssignment<T> : ISystemAuditable where T : Enum
 {

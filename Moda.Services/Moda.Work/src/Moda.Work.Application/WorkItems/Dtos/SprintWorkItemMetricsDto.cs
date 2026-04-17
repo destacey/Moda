@@ -1,6 +1,6 @@
-using Moda.Common.Domain.Enums.Work;
+using Wayd.Common.Domain.Enums.Work;
 
-namespace Moda.Work.Application.WorkItems.Dtos;
+namespace Wayd.Work.Application.WorkItems.Dtos;
 
 /// <summary>
 /// Work item metrics for a single sprint.

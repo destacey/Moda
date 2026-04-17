@@ -1,7 +1,7 @@
-﻿using Moda.Work.Application.Persistence;
-using Moda.Work.Application.WorkProcesses.Dtos;
+﻿using Wayd.Work.Application.Persistence;
+using Wayd.Work.Application.WorkProcesses.Dtos;
 
-namespace Moda.Work.Application.WorkProcesses.Queries;
+namespace Wayd.Work.Application.WorkProcesses.Queries;
 
 public sealed record GetWorkProcessesQuery(bool IncludeInactive = false) : IQuery<IReadOnlyList<WorkProcessListDto>>;
 

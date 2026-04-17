@@ -1,9 +1,9 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
-using Moda.Common.Domain.Data;
-using Moda.Common.Extensions;
+using Wayd.Common.Domain.Data;
+using Wayd.Common.Extensions;
 
-namespace Moda.Common.Domain.Models.KeyPerformanceIndicators;
+namespace Wayd.Common.Domain.Models.KeyPerformanceIndicators;
 
 /// <summary>
 /// Represents the common properties and behavior for a Key Performance Indicator (KPI).

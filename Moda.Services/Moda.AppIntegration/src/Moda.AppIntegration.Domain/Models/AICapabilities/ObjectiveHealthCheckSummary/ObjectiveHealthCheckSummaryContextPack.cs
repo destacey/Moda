@@ -1,9 +1,9 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
-using Moda.Common.Application.Models;
+using Wayd.Common.Application.Models;
 
-namespace Moda.AppIntegration.Domain.Models.AICapabilities.ObjectiveHealthCheckSummary;
+namespace Wayd.AppIntegration.Domain.Models.AICapabilities.ObjectiveHealthCheckSummary;
 
 public sealed class ObjectiveHealthCheckSummaryContextPack : ContextPack
 {

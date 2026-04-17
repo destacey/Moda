@@ -1,8 +1,8 @@
 using FluentValidation.TestHelper;
-using Moda.Common.Application.Identity;
-using Moda.Common.Application.Identity.Users;
+using Wayd.Common.Application.Identity;
+using Wayd.Common.Application.Identity.Users;
 
-namespace Moda.Common.Application.Tests.Sut.Identity.Users;
+namespace Wayd.Common.Application.Tests.Sut.Identity.Users;
 
 public class CreateUserCommandValidatorTests
 {

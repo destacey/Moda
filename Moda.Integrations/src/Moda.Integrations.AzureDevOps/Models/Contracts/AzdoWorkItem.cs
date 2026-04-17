@@ -1,7 +1,7 @@
-﻿using Moda.Common.Application.Interfaces.ExternalWork;
+﻿using Wayd.Common.Application.Interfaces.ExternalWork;
 using NodaTime;
 
-namespace Moda.Integrations.AzureDevOps.Models.Contracts;
+namespace Wayd.Integrations.AzureDevOps.Models.Contracts;
 
 public sealed record AzdoWorkItem : IExternalWorkItem
 {

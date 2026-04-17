@@ -1,6 +1,6 @@
 ﻿using Mapster;
 
-namespace Moda.Links.Models;
+namespace Wayd.Links.Models;
 
 public sealed record LinkDto : IMapFrom<Link>
 {

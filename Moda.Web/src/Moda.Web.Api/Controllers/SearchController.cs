@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
-using Moda.Common.Application.Search;
-using Moda.Common.Application.Search.Dtos;
-using Moda.Web.Api.Extensions;
+using Wayd.Common.Application.Search;
+using Wayd.Common.Application.Search.Dtos;
+using Wayd.Web.Api.Extensions;
 
-namespace Moda.Web.Api.Controllers;
+namespace Wayd.Web.Api.Controllers;
 
 [Route("api/search")]
 [ApiVersionNeutral]

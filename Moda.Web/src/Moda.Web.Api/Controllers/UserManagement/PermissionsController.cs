@@ -1,4 +1,4 @@
-﻿namespace Moda.Web.Api.Controllers.UserManagement;
+﻿namespace Wayd.Web.Api.Controllers.UserManagement;
 
 [Route("api/user-management/permissions")]
 [ApiVersionNeutral]

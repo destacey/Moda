@@ -1,6 +1,6 @@
-﻿using Moda.Common.Domain.Enums.Work;
+﻿using Wayd.Common.Domain.Enums.Work;
 
-namespace Moda.Work.Application.WorkItems.Dtos;
+namespace Wayd.Work.Application.WorkItems.Dtos;
 
 public sealed record WorkItemProgressStateDto : IMapFrom<WorkItem>
 {

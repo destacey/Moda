@@ -1,19 +1,19 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Moda.Common.Domain.Enums;
-using Moda.Common.Domain.Enums.AppIntegrations;
-using Moda.Common.Domain.Enums.Organization;
-using Moda.Common.Domain.Enums.Planning;
-using Moda.Common.Domain.Models;
-using Moda.Common.Domain.Models.Organizations;
-using Moda.Infrastructure.Persistence.Converters;
-using Moda.Planning.Domain.Enums;
-using Moda.Planning.Domain.Models;
-using Moda.Planning.Domain.Models.Iterations;
-using Moda.Planning.Domain.Models.PlanningPoker;
-using Moda.Planning.Domain.Models.Roadmaps;
+using Wayd.Common.Domain.Enums;
+using Wayd.Common.Domain.Enums.AppIntegrations;
+using Wayd.Common.Domain.Enums.Organization;
+using Wayd.Common.Domain.Enums.Planning;
+using Wayd.Common.Domain.Models;
+using Wayd.Common.Domain.Models.Organizations;
+using Wayd.Infrastructure.Persistence.Converters;
+using Wayd.Planning.Domain.Enums;
+using Wayd.Planning.Domain.Models;
+using Wayd.Planning.Domain.Models.Iterations;
+using Wayd.Planning.Domain.Models.PlanningPoker;
+using Wayd.Planning.Domain.Models.Roadmaps;
 
-namespace Moda.Infrastructure.Persistence.Configuration;
+namespace Wayd.Infrastructure.Persistence.Configuration;
 
 public class PlanningTeamConfig : IEntityTypeConfiguration<PlanningTeam>
 {

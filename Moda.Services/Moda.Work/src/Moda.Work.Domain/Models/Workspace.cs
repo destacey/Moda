@@ -1,12 +1,12 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
-using Moda.Common.Domain.Enums.AppIntegrations;
-using Moda.Common.Extensions;
-using Moda.Common.Models;
-using Moda.Work.Domain.Interfaces;
+using Wayd.Common.Domain.Enums.AppIntegrations;
+using Wayd.Common.Extensions;
+using Wayd.Common.Models;
+using Wayd.Work.Domain.Interfaces;
 using NodaTime;
 
-namespace Moda.Work.Domain.Models;
+namespace Wayd.Work.Domain.Models;
 
 /// <summary>
 /// Represents a workspace that organizes and manages work items, processes, and related metadata.

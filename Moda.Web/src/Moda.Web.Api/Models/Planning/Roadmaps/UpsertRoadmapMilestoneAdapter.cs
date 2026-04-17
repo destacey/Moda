@@ -1,6 +1,6 @@
-﻿using Moda.Planning.Domain.Interfaces.Roadmaps;
+﻿using Wayd.Planning.Domain.Interfaces.Roadmaps;
 
-namespace Moda.Web.Api.Models.Planning.Roadmaps;
+namespace Wayd.Web.Api.Models.Planning.Roadmaps;
 
 internal record UpsertRoadmapMilestoneAdapter : IUpsertRoadmapMilestone
 {

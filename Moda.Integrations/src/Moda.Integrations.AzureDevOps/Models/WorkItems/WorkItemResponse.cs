@@ -1,10 +1,10 @@
 ﻿using System.Text.Json.Serialization;
-using Moda.Common.Application.Interfaces.ExternalWork;
-using Moda.Integrations.AzureDevOps.Models.Contracts;
-using Moda.Integrations.AzureDevOps.Models.Projects;
+using Wayd.Common.Application.Interfaces.ExternalWork;
+using Wayd.Integrations.AzureDevOps.Models.Contracts;
+using Wayd.Integrations.AzureDevOps.Models.Projects;
 using NodaTime;
 
-namespace Moda.Integrations.AzureDevOps.Models.WorkItems;
+namespace Wayd.Integrations.AzureDevOps.Models.WorkItems;
 
 internal class WorkItemResponse
 {

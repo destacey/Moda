@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Moda.Integrations.AzureDevOps.Models.Contracts;
+namespace Wayd.Integrations.AzureDevOps.Models.Contracts;
 
 internal class AzdoListResponse<T>
 {

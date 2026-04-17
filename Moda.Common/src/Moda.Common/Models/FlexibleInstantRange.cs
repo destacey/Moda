@@ -1,9 +1,9 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
-using Moda.Common.Interfaces;
+using Wayd.Common.Interfaces;
 using NodaTime;
 
-namespace Moda.Common.Models;
+namespace Wayd.Common.Models;
 
 /// <summary>
 /// A date range that uses <see cref="Instant" /> for the start and a nullable <see cref="Instant" /> for the end.

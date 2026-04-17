@@ -1,6 +1,6 @@
-﻿using Moda.Common.Domain.Models.KeyPerformanceIndicators;
+﻿using Wayd.Common.Domain.Models.KeyPerformanceIndicators;
 
-namespace Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
+namespace Wayd.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 
 /// <summary>
 /// Represents the parameters required to create or update a strategic initiative KPI.

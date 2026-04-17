@@ -1,7 +1,7 @@
-using Moda.Common.Application.FeatureManagement.Dtos;
-using Moda.Common.Application.FeatureManagement.Queries;
+using Wayd.Common.Application.FeatureManagement.Dtos;
+using Wayd.Common.Application.FeatureManagement.Queries;
 
-namespace Moda.Web.Api.Controllers;
+namespace Wayd.Web.Api.Controllers;
 
 [Route("api/feature-flags")]
 [ApiVersionNeutral]

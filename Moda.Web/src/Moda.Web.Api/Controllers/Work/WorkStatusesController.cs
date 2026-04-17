@@ -1,9 +1,9 @@
-﻿using Moda.Web.Api.Extensions;
-using Moda.Web.Api.Models.Work.WorkStatuses;
-using Moda.Work.Application.WorkStatuses.Dtos;
-using Moda.Work.Application.WorkStatuses.Queries;
+﻿using Wayd.Web.Api.Extensions;
+using Wayd.Web.Api.Models.Work.WorkStatuses;
+using Wayd.Work.Application.WorkStatuses.Dtos;
+using Wayd.Work.Application.WorkStatuses.Queries;
 
-namespace Moda.Web.Api.Controllers.Work;
+namespace Wayd.Web.Api.Controllers.Work;
 
 [Route("api/work/work-statuses")]
 [ApiVersionNeutral]

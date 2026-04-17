@@ -1,7 +1,7 @@
-﻿using Moda.Common.Application.Requests.WorkManagement.Commands;
-using Moda.Work.Application.Persistence;
+﻿using Wayd.Common.Application.Requests.WorkManagement.Commands;
+using Wayd.Work.Application.Persistence;
 
-namespace Moda.Work.Application.Workflows.Commands;
+namespace Wayd.Work.Application.Workflows.Commands;
 
 internal sealed class UpdateExternalWorkflowCommandHandler(IWorkDbContext workDbContext, ILogger<UpdateExternalWorkflowCommandHandler> logger, IDateTimeProvider dateTimeProvider) : ICommandHandler<UpdateExternalWorkflowCommand>
 {

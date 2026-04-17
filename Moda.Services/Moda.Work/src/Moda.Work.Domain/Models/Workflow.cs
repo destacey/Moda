@@ -1,17 +1,17 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
-using Moda.Common.Domain.Enums.Work;
-using Moda.Common.Extensions;
-using Moda.Work.Domain.Interfaces;
+using Wayd.Common.Domain.Enums.Work;
+using Wayd.Common.Extensions;
+using Wayd.Work.Domain.Interfaces;
 using NodaTime;
 
-namespace Moda.Work.Domain.Models;
+namespace Wayd.Work.Domain.Models;
 
 /// <summary>
 /// A workflow is a sequence of work statuses that a work item can move through.  It is used to define the process for a work item.
 /// </summary>
-/// <seealso cref="Moda.Common.Domain.Data.BaseSoftDeletableEntity&lt;System.Guid&gt;" />
-/// <seealso cref="Moda.Common.Domain.Interfaces.IActivatable" />
+/// <seealso cref="Wayd.Common.Domain.Data.BaseSoftDeletableEntity&lt;System.Guid&gt;" />
+/// <seealso cref="Wayd.Common.Domain.Interfaces.IActivatable" />
 public sealed class Workflow : BaseSoftDeletableEntity, IActivatable, IHasIdAndKey
 {
     private readonly List<WorkflowScheme> _schemes = [];

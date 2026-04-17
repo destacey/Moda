@@ -1,7 +1,7 @@
 ﻿using Mapster;
 using NodaTime;
 
-namespace Moda.Organization.Application.Teams.Queries;
+namespace Wayd.Organization.Application.Teams.Queries;
 
 /// <summary>
 /// Gets the operating model for a team. When AsOfDate is null, returns the current model.

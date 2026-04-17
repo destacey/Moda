@@ -1,6 +1,6 @@
 ﻿using NodaTime;
 
-namespace Moda.Organization.Application.Teams.Models;
+namespace Wayd.Organization.Application.Teams.Models;
 
 public sealed record TeamMembershipEdge
 {

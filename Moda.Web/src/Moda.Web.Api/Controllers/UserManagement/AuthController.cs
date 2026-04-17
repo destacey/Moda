@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
-using Moda.Common.Application.Identity.Tokens;
+using Wayd.Common.Application.Identity.Tokens;
 
-namespace Moda.Web.Api.Controllers.UserManagement;
+namespace Wayd.Web.Api.Controllers.UserManagement;
 
 [Route("api/auth")]
 [ApiVersionNeutral]

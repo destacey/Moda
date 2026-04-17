@@ -6,10 +6,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
-using Moda.Infrastructure.Auth.Local;
+using Wayd.Infrastructure.Auth.Local;
 using Serilog;
 
-namespace Moda.Infrastructure.Auth.AzureAd;
+namespace Wayd.Infrastructure.Auth.AzureAd;
 
 internal class AzureAdJwtBearerEvents : JwtBearerEvents
 {

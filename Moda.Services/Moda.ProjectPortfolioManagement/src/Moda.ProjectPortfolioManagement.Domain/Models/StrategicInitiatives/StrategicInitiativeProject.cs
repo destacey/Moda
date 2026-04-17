@@ -1,4 +1,4 @@
-﻿namespace Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
+﻿namespace Wayd.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 
 public sealed class StrategicInitiativeProject
 {

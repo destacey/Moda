@@ -1,9 +1,9 @@
-﻿using Moda.Common.Domain.Enums.Work;
-using Moda.Common.Domain.Extensions;
-using Moda.Work.Application.Persistence;
-using Moda.Work.Application.WorkItemDependencies.Dtos;
+﻿using Wayd.Common.Domain.Enums.Work;
+using Wayd.Common.Domain.Extensions;
+using Wayd.Work.Application.Persistence;
+using Wayd.Work.Application.WorkItemDependencies.Dtos;
 
-namespace Moda.Work.Application.WorkItems.Queries;
+namespace Wayd.Work.Application.WorkItems.Queries;
 
 public sealed record GetTeamDependenciesQuery(Guid TeamId, List<DependencyState> DependencyStatuses) : IQuery<List<DependencyDto>?>;
 

@@ -1,10 +1,10 @@
-﻿using Moda.Tests.Shared.Data;
-using Moda.Tests.Shared.Extensions;
-using Moda.Work.Domain.Models;
+﻿using Wayd.Tests.Shared.Data;
+using Wayd.Tests.Shared.Extensions;
+using Wayd.Work.Domain.Models;
 using NodaTime;
 using NodaTime.Extensions;
 
-namespace Moda.Work.Domain.Tests.Data;
+namespace Wayd.Work.Domain.Tests.Data;
 
 public class WorkItemDependencyFaker : PrivateConstructorFaker<WorkItemDependency>
 {

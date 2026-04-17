@@ -1,6 +1,6 @@
-using Moda.Planning.Domain.Models.PlanningPoker;
+using Wayd.Planning.Domain.Models.PlanningPoker;
 
-namespace Moda.Planning.Application.EstimationScales.Dtos;
+namespace Wayd.Planning.Application.EstimationScales.Dtos;
 
 public class EstimationScaleDto : IMapFrom<EstimationScale>
 {

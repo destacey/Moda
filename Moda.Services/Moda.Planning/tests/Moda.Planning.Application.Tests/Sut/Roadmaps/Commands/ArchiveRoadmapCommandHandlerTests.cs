@@ -1,13 +1,13 @@
 ﻿using Microsoft.Extensions.Logging;
-using Moda.Common.Application.Interfaces;
-using Moda.Common.Domain.Enums.Planning;
-using Moda.Planning.Application.Roadmaps.Commands;
-using Moda.Planning.Application.Tests.Infrastructure;
-using Moda.Planning.Domain.Models.Roadmaps;
-using Moda.Planning.Domain.Tests.Data;
+using Wayd.Common.Application.Interfaces;
+using Wayd.Common.Domain.Enums.Planning;
+using Wayd.Planning.Application.Roadmaps.Commands;
+using Wayd.Planning.Application.Tests.Infrastructure;
+using Wayd.Planning.Domain.Models.Roadmaps;
+using Wayd.Planning.Domain.Tests.Data;
 using Moq;
 
-namespace Moda.Planning.Application.Tests.Sut.Roadmaps.Commands;
+namespace Wayd.Planning.Application.Tests.Sut.Roadmaps.Commands;
 
 public class ArchiveRoadmapCommandHandlerTests : IDisposable
 {

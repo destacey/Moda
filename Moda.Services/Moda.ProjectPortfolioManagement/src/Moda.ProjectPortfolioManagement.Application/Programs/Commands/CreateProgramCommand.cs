@@ -1,8 +1,8 @@
-﻿using Moda.Common.Application.Models;
-using Moda.Common.Domain.Enums.StrategicManagement;
-using Moda.ProjectPortfolioManagement.Domain.Enums;
+﻿using Wayd.Common.Application.Models;
+using Wayd.Common.Domain.Enums.StrategicManagement;
+using Wayd.ProjectPortfolioManagement.Domain.Enums;
 
-namespace Moda.ProjectPortfolioManagement.Application.Programs.Commands;
+namespace Wayd.ProjectPortfolioManagement.Application.Programs.Commands;
 
 public sealed record CreateProgramCommand(string Name, string Description, LocalDateRange? DateRange, Guid PortfolioId, List<Guid>? SponsorIds, List<Guid>? OwnerIds, List<Guid>? ManagerIds, List<Guid>? StrategicThemeIds) : ICommand<ObjectIdAndKey>;
 

@@ -1,6 +1,6 @@
 ﻿using Mapster;
 
-namespace Moda.Organization.Application.Teams.Queries;
+namespace Wayd.Organization.Application.Teams.Queries;
 
 /// <summary>
 /// Gets a specific operating model for a team. 

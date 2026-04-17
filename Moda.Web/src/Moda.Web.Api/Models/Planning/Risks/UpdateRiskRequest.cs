@@ -1,7 +1,7 @@
-﻿using Moda.Planning.Application.Risks.Commands;
-using Moda.Planning.Domain.Enums;
+﻿using Wayd.Planning.Application.Risks.Commands;
+using Wayd.Planning.Domain.Enums;
 
-namespace Moda.Web.Api.Models.Planning.Risks;
+namespace Wayd.Web.Api.Models.Planning.Risks;
 
 public class UpdateRiskRequest
 {

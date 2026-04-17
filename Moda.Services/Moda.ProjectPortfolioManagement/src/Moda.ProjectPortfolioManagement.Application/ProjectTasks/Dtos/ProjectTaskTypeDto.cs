@@ -1,4 +1,4 @@
-namespace Moda.ProjectPortfolioManagement.Application.ProjectTasks.Dtos;
+namespace Wayd.ProjectPortfolioManagement.Application.ProjectTasks.Dtos;
 
 public sealed record ProjectTaskTypeDto
 {

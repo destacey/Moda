@@ -1,4 +1,4 @@
-﻿namespace Moda.Common.Domain.Interfaces;
+﻿namespace Wayd.Common.Domain.Interfaces;
 
 /// <summary>
 /// Represents an entity that supports system-level auditing.

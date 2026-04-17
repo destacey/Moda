@@ -2,9 +2,9 @@
 
 var builder = DistributedApplication.CreateBuilder(args);
 
-// Option 1: External SQL Server (uses connection string from Moda.Web.Api/Configurations/database.json)
-// Load connection string from Moda.Web.Api database.json configuration
-var databaseConfigPath = Path.Combine(builder.AppHostDirectory, "..", "Moda.Web", "src", "Moda.Web.Api", "Configurations", "database.json");
+// Option 1: External SQL Server (uses connection string from Wayd.Web.Api/Configurations/database.json)
+// Load connection string from Wayd.Web.Api database.json configuration
+var databaseConfigPath = Path.Combine(builder.AppHostDirectory, "..", "Wayd.Web", "src", "Wayd.Web.Api", "Configurations", "database.json");
 var databaseConfig = new ConfigurationBuilder()
     .AddJsonFile(databaseConfigPath, optional: false)
     .AddUserSecrets("ccaebfb8-fc4c-4b73-9da4-9bab70a12a1c") // ModaWebApi user secrets for local development
@@ -27,7 +27,7 @@ var modaApi = builder.AddProject<Projects.Moda_Web_Api>("moda-api")
     .WithReference(modaDb)
     .WaitFor(modaDb);
 
-var modaClient = builder.AddJavaScriptApp("moda-client", "../Moda.Web/src/moda.web.reactclient", "dev")
+var modaClient = builder.AddJavaScriptApp("moda-client", "../Wayd.Web/src/moda.web.reactclient", "dev")
     .WithReference(modaApi)
     .WaitFor(modaApi)
     .WithHttpEndpoint(env: "PORT", port: 3000)

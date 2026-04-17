@@ -1,6 +1,6 @@
 ﻿using NodaTime;
 
-namespace Moda.Common.Extensions;
+namespace Wayd.Common.Extensions;
 
 public static class LocalDateExtensions
 {

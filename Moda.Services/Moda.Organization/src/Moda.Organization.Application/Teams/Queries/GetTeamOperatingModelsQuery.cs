@@ -1,6 +1,6 @@
 ﻿using Mapster;
 
-namespace Moda.Organization.Application.Teams.Queries;
+namespace Wayd.Organization.Application.Teams.Queries;
 
 /// <summary>
 /// Gets all operating models for a team, ordered by start date descending (most recent first).

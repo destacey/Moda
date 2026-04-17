@@ -1,4 +1,4 @@
-namespace Moda.Common.Application.Requests.Goals.Dtos;
+namespace Wayd.Common.Application.Requests.Goals.Dtos;
 
 public sealed record ObjectiveSearchResultDto
 {

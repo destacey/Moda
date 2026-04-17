@@ -1,6 +1,6 @@
-﻿using Moda.Work.Domain.Models;
+﻿using Wayd.Work.Domain.Models;
 
-namespace Moda.Work.Domain.Interfaces;
+namespace Wayd.Work.Domain.Interfaces;
 
 public interface IHasOptionalWorkTeam
 {

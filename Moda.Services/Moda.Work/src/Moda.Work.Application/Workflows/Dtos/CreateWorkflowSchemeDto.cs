@@ -1,7 +1,7 @@
-﻿using Moda.Common.Domain.Enums.Work;
-using Moda.Work.Domain.Interfaces;
+﻿using Wayd.Common.Domain.Enums.Work;
+using Wayd.Work.Domain.Interfaces;
 
-namespace Moda.Work.Application.Workflows.Dtos;
+namespace Wayd.Work.Application.Workflows.Dtos;
 
 public sealed record CreateWorkflowSchemeDto : ICreateWorkflowScheme
 {

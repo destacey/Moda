@@ -1,6 +1,6 @@
-﻿using Moda.Common.Domain.Enums;
+﻿using Wayd.Common.Domain.Enums;
 
-namespace Moda.Common.Application.Requests;
+namespace Wayd.Common.Application.Requests;
 
 public sealed record GetVisibilitiesQuery : IQuery<List<VisibilityDto>> { }
 

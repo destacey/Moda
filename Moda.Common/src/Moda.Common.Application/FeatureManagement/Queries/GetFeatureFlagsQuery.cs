@@ -1,7 +1,7 @@
 ﻿using Mapster;
-using Moda.Common.Application.FeatureManagement.Dtos;
+using Wayd.Common.Application.FeatureManagement.Dtos;
 
-namespace Moda.Common.Application.FeatureManagement.Queries;
+namespace Wayd.Common.Application.FeatureManagement.Queries;
 
 public sealed record GetFeatureFlagsQuery(bool IncludeArchived = false) : IQuery<List<FeatureFlagListDto>>;
 

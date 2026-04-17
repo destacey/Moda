@@ -1,9 +1,9 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
-using Moda.Planning.Domain.Enums;
-using Moda.Planning.Domain.Interfaces.Roadmaps;
+using Wayd.Planning.Domain.Enums;
+using Wayd.Planning.Domain.Interfaces.Roadmaps;
 
-namespace Moda.Planning.Domain.Models.Roadmaps;
+namespace Wayd.Planning.Domain.Models.Roadmaps;
 
 /// <summary>
 /// An activity is a core component of the roadmap, representing a theme, project, piece of work or a group of related tasks.

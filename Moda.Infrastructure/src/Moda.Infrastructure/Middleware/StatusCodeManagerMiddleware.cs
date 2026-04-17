@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 
-namespace Moda.Infrastructure.Middleware;
+namespace Wayd.Infrastructure.Middleware;
 
 public sealed class StatusCodeManagerMiddleware : IMiddleware
 {

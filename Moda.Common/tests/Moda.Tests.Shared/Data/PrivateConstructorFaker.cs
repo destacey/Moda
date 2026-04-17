@@ -1,7 +1,7 @@
 ﻿using Bogus;
-using Moda.Tests.Shared.Extensions;
+using Wayd.Tests.Shared.Extensions;
 
-namespace Moda.Tests.Shared.Data;
+namespace Wayd.Tests.Shared.Data;
 
 public class PrivateConstructorFaker<T> : Faker<T> where T : class
 {
