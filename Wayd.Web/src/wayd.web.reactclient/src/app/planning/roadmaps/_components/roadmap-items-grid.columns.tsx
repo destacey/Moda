@@ -12,7 +12,7 @@ import {
 import { Button, DatePicker, Dropdown, Flex, Form, Input, Select } from 'antd'
 import dayjs from 'dayjs'
 import { ColumnDef } from '@tanstack/react-table'
-import { ModaColorPicker } from '@/src/components/common'
+import { WaydColorPicker } from '@/src/components/common'
 import { useRef } from 'react'
 import styles from '@/src/components/common/tree-grid/tree-grid.module.css'
 import {
@@ -129,7 +129,7 @@ function FocusableColorPickerField({
         void handleKeyDown(e, rowId, 'color')
       }}
     >
-      <ModaColorPicker value={value} onChange={onColorChange} />
+      <WaydColorPicker value={value} onChange={onColorChange} />
     </div>
   )
 }

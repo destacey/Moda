@@ -4,7 +4,7 @@ import { ProjectPortfolioListDto } from '@/src/services/wayd-api'
 import { Flex, List } from 'antd'
 import { ReactElement } from 'react'
 import PortfolioCard from './portfolio-card'
-import { ModaEmpty } from '@/src/components/common'
+import { WaydEmpty } from '@/src/components/common'
 
 const { Item: ListItem } = List
 
@@ -52,7 +52,7 @@ const PortfoliosCardGrid: React.FC<PortfoliosCardGridProps> = (
           size: 'large',
         }}
         locale={{
-          emptyText: <ModaEmpty message="No active portfolios found" />,
+          emptyText: <WaydEmpty message="No active portfolios found" />,
         }}
         dataSource={sortedPortfolios}
         renderItem={(item: ProjectPortfolioListDto) => (

@@ -22,7 +22,7 @@ export default function UnauthorizedPage() {
     <Result
       status="403"
       title="Access Denied"
-      subTitle="You are not authorized to access Moda."
+      subTitle="You are not authorized to access Wayd."
       extra={[
         <Button type="primary" key="logout" onClick={handleLogout}>
           Sign Out
@@ -36,7 +36,7 @@ export default function UnauthorizedPage() {
         </Paragraph>
         <Paragraph>
           Your account has been authenticated, but you do not have the required
-          permissions to use Moda. Please contact your administrator if you
+          permissions to use Wayd. Please contact your administrator if you
           believe this is an error.
         </Paragraph>
       </div>

@@ -1,6 +1,6 @@
 'use client'
 
-import { ModaGrid, PageTitle } from '@/src/components/common'
+import { WaydGrid, PageTitle } from '@/src/components/common'
 import useAuth from '@/src/components/contexts/auth'
 import { authorizePage } from '@/src/components/hoc'
 import { useDocumentTitle } from '@/src/hooks'
@@ -79,7 +79,7 @@ const ProjectLifecyclesPage = () => {
     <>
       <PageTitle title="Project Lifecycles" actions={actions} />
 
-      <ModaGrid
+      <WaydGrid
         height={600}
         columnDefs={columnDefs}
         rowData={lifecycleData}

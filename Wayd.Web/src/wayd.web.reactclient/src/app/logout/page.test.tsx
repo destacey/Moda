@@ -34,11 +34,11 @@ describe('LogoutPage', () => {
     ).toBeInTheDocument()
   })
 
-  it('renders the Moda logo', () => {
+  it('renders the Wayd logo', () => {
     render(<LogoutPage />)
 
-    expect(screen.getByAltText('Moda')).toBeInTheDocument()
-    expect(screen.getByText('moda')).toBeInTheDocument()
+    expect(screen.getByAltText('Wayd')).toBeInTheDocument()
+    expect(screen.getByText('wayd')).toBeInTheDocument()
   })
 
   it('triggers logout on mount', async () => {

@@ -4,7 +4,7 @@ import { WorkspaceListDto } from '@/src/services/wayd-api'
 import { Flex, List } from 'antd'
 import { ReactElement } from 'react'
 import { WorkspaceCard } from '.'
-import { ModaEmpty } from '@/src/components/common'
+import { WaydEmpty } from '@/src/components/common'
 
 const { Item: ListItem } = List
 
@@ -46,7 +46,7 @@ const WorkspacesCardGrid: React.FC<WorkspacesCardGridProps> = (
           description: 'Loading workspaces...',
           size: 'large',
         }}
-        locale={{ emptyText: <ModaEmpty message="No workspaces found" /> }}
+        locale={{ emptyText: <WaydEmpty message="No workspaces found" /> }}
         dataSource={sortedWorkspaces}
         renderItem={(item: WorkspaceListDto) => (
           <ListItem>

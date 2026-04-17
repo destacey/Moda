@@ -13,7 +13,7 @@ import {
 } from '@/src/services/wayd-api'
 import { DatePicker, Spin } from 'antd'
 import {
-  ModaOrganizationChart,
+  WaydOrganizationChart,
   OrganizationChartEdgeData,
   OrganizationChartGraphData,
   OrganizationChartNodeData,
@@ -149,7 +149,7 @@ const FunctionalOrgChartPage: React.FC = () => {
         size="large"
       >
         {!isLoading && (
-          <ModaOrganizationChart
+          <WaydOrganizationChart
             data={data}
             NodeComponent={OrganizationalChartTeamNode}
           />

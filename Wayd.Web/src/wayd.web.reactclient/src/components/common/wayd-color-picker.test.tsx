@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-import ModaColorPicker from './moda-color-picker'
+import WaydColorPicker from './moda-color-picker'
 
 const latestColorPickerProps: { current: any | null } = { current: null }
 
@@ -60,7 +60,7 @@ jest.mock('../contexts/theme', () => ({
   }),
 }))
 
-describe('ModaColorPicker', () => {
+describe('WaydColorPicker', () => {
   beforeEach(() => {
     latestColorPickerProps.current = null
     jest
@@ -76,7 +76,7 @@ describe('ModaColorPicker', () => {
   })
 
   it('renders closed by default', () => {
-    render(<ModaColorPicker value="#abcdef" onChange={jest.fn()} />)
+    render(<WaydColorPicker value="#abcdef" onChange={jest.fn()} />)
 
     expect(screen.getByTestId('color-picker-trigger')).toBeInTheDocument()
     expect(screen.getByTestId('color-picker-open-state')).toHaveTextContent(
@@ -86,7 +86,7 @@ describe('ModaColorPicker', () => {
 
   it('calls onChange with selected color when different from current value', () => {
     const onChange = jest.fn()
-    render(<ModaColorPicker value="#000000" onChange={onChange} />)
+    render(<WaydColorPicker value="#000000" onChange={onChange} />)
 
     fireEvent.click(screen.getByTestId('color-picker-select'))
 
@@ -95,7 +95,7 @@ describe('ModaColorPicker', () => {
 
   it('clears color when selecting same value', () => {
     const onChange = jest.fn()
-    render(<ModaColorPicker value="#123456" onChange={onChange} />)
+    render(<WaydColorPicker value="#123456" onChange={onChange} />)
 
     fireEvent.click(screen.getByTestId('color-picker-select'))
 
@@ -103,7 +103,7 @@ describe('ModaColorPicker', () => {
   })
 
   it('supports usage without onChange handler', () => {
-    render(<ModaColorPicker value="#000000" />)
+    render(<WaydColorPicker value="#000000" />)
 
     expect(() => {
       fireEvent.click(screen.getByTestId('color-picker-select'))
@@ -111,7 +111,7 @@ describe('ModaColorPicker', () => {
   })
 
   it('closes after selection and refocuses trigger', async () => {
-    render(<ModaColorPicker value={undefined} onChange={jest.fn()} />)
+    render(<WaydColorPicker value={undefined} onChange={jest.fn()} />)
 
     fireEvent.click(screen.getByTestId('color-picker-open'))
     expect(screen.getByTestId('color-picker-open-state')).toHaveTextContent('open')
@@ -129,8 +129,8 @@ describe('ModaColorPicker', () => {
     })
   })
 
-  it('keeps open state controlled by ModaColorPicker', () => {
-    render(<ModaColorPicker value={undefined} onChange={jest.fn()} />)
+  it('keeps open state controlled by WaydColorPicker', () => {
+    render(<WaydColorPicker value={undefined} onChange={jest.fn()} />)
 
     expect(latestColorPickerProps.current).toBeTruthy()
     expect(latestColorPickerProps.current.open).toBe(false)

@@ -8,7 +8,7 @@ export interface DateRange {
   end?: Date
 }
 
-// Iteration States from Moda.Common.Domain.Enums.Work.IterationState
+// Iteration States from Wayd.Common.Domain.Enums.Work.IterationState
 export enum IterationState {
   Unknown = 0,
   Completed = 1,
@@ -16,7 +16,7 @@ export enum IterationState {
   Future = 3,
 }
 
-// Work Type Tiers from Moda.Common.Domain.Enums.Work.WorkTypeTier
+// Work Type Tiers from Wayd.Common.Domain.Enums.Work.WorkTypeTier
 export enum WorkTypeTier {
   Portfolio = 0,
   Requirement = 1,
@@ -24,7 +24,7 @@ export enum WorkTypeTier {
   Other = 3,
 }
 
-// Work Status Categories from Moda.Common.Domain.Enums.Work.WorkStatusCategory
+// Work Status Categories from Wayd.Common.Domain.Enums.Work.WorkStatusCategory
 export enum WorkStatusCategory {
   Proposed = 0,
   Active = 1,

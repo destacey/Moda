@@ -2,8 +2,8 @@
 
 import { Tooltip, TooltipProps } from 'antd'
 
-const ModaTooltip = (props: TooltipProps) => (
+const WaydTooltip = (props: TooltipProps) => (
   <Tooltip mouseEnterDelay={0.5} {...props} />
 )
 
-export default ModaTooltip
+export default WaydTooltip

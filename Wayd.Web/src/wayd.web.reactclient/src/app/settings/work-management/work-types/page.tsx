@@ -1,6 +1,6 @@
 'use client'
 
-import { ModaGrid, PageTitle } from '@/src/components/common'
+import { WaydGrid, PageTitle } from '@/src/components/common'
 import { useAppDispatch, useAppSelector, useDocumentTitle } from '@/src/hooks'
 import { WorkTypeDto } from '@/src/services/wayd-api'
 import { ColDef } from 'ag-grid-community'
@@ -126,7 +126,7 @@ const WorkTypesPage = () => {
     <>
       <PageTitle title="Work Types" actions={actions()} />
 
-      <ModaGrid
+      <WaydGrid
         height={600}
         columnDefs={columnDefs}
         gridControlMenuItems={controlItems}

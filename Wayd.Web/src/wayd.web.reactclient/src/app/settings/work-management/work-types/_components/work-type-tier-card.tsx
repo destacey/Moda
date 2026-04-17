@@ -1,4 +1,4 @@
-import { ModaEmpty } from '@/src/components/common'
+import { WaydEmpty } from '@/src/components/common'
 import { WorkTypeLevelDto, WorkTypeTierDto } from '@/src/services/wayd-api'
 import { Button, Card, List, Typography } from 'antd'
 import { useEffect, useMemo, useState } from 'react'
@@ -140,7 +140,7 @@ const WorkTypeTierCard = (props: WorkTypeTierCardProps) => {
             style={{ width: '100%' }}
             dataSource={orderedLevels}
             locale={{
-              emptyText: <ModaEmpty message="No work type levels" />,
+              emptyText: <WaydEmpty message="No work type levels" />,
             }}
             renderItem={(level) => (
               <SortableContext

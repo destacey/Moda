@@ -1,6 +1,6 @@
 'use client'
 
-import ModaGrid from '@/src/components/common/moda-grid'
+import WaydGrid from '@/src/components/common/wayd-grid'
 import PageTitle from '@/src/components/common/page-title'
 import Link from 'next/link'
 import { useState, useMemo } from 'react'
@@ -100,7 +100,7 @@ const PlanningIntervalListPage = () => {
         title="Planning Intervals"
         actions={showActions && actions()}
       />
-      <ModaGrid
+      <WaydGrid
         columnDefs={columnDefs}
         rowData={data}
         loading={isLoading}

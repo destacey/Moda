@@ -1,6 +1,6 @@
 'use client'
 
-import { ModaDateRange } from '@/src/components/common'
+import { WaydDateRange } from '@/src/components/common'
 import {
   ContentList,
   ExpandableContent,
@@ -51,7 +51,7 @@ const ProgramDetails: FC<ProgramDetailsProps> = ({ program }) => {
           </LabeledContent>
 
           <LabeledContent label="Dates">
-            <ModaDateRange
+            <WaydDateRange
               dateRange={{ start: program.start, end: program.end }}
             />
           </LabeledContent>

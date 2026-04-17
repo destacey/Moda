@@ -1,6 +1,6 @@
 'use client'
 
-import { ModaGrid } from '@/src/components/common'
+import { WaydGrid } from '@/src/components/common'
 import { WorkItemBacklogItemDto } from '@/src/services/wayd-api'
 import { ColDef } from 'ag-grid-community'
 import { useMemo } from 'react'
@@ -12,7 +12,7 @@ import {
   ProjectLinkCellRenderer,
   WorkItemLinkCellRenderer,
   WorkStatusTagCellRenderer,
-} from '../moda-grid-cell-renderers'
+} from '../wayd-grid-cell-renderers'
 import {
   workItemKeyComparator,
   workStatusCategoryComparator,
@@ -91,7 +91,7 @@ const WorkItemsBacklogGrid = (props: WorkItemsBacklogGridProps) => {
 
   return (
     <>
-      <ModaGrid
+      <WaydGrid
         height={550}
         columnDefs={columnDefs}
         rowData={props.workItems}

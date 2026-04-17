@@ -1,11 +1,11 @@
 'use client'
 
-import { LifecycleStatusTag, ModaDateRange } from '@/src/components/common'
+import { LifecycleStatusTag, WaydDateRange } from '@/src/components/common'
 import { LinkOutlined } from '@ant-design/icons'
 import { ProjectDetailsDto } from '@/src/services/wayd-api'
 import { getSortedNames } from '@/src/utils'
 import { Button, Flex, Typography } from 'antd'
-import { ModaTooltip } from '@/src/components/common'
+import { WaydTooltip } from '@/src/components/common'
 import Link from 'next/link'
 import { FC } from 'react'
 import styles from '../my-projects-dashboard.module.css'
@@ -27,7 +27,7 @@ const ProjectDetailHeader: FC<ProjectDetailHeaderProps> = ({ project }) => {
           <Title level={4} style={{ margin: 0 }}>
             {project.name}
           </Title>
-          <ModaTooltip title="Open project details">
+          <WaydTooltip title="Open project details">
             <Link href={`/ppm/projects/${project.key}`}>
               <Button
                 type="text"
@@ -35,7 +35,7 @@ const ProjectDetailHeader: FC<ProjectDetailHeaderProps> = ({ project }) => {
                 icon={<LinkOutlined style={{ fontSize: 11 }} />}
               />
             </Link>
-          </ModaTooltip>
+          </WaydTooltip>
           <LifecycleStatusTag status={project.status} />
         </Flex>
         <Flex gap={12} align="center" wrap>
@@ -59,7 +59,7 @@ const ProjectDetailHeader: FC<ProjectDetailHeaderProps> = ({ project }) => {
           )}
           {(project.start || project.end) && (
             <Text type="secondary" style={{ fontSize: 12 }}>
-              <ModaDateRange
+              <WaydDateRange
                 dateRange={{ start: project.start, end: project.end }}
               />
             </Text>

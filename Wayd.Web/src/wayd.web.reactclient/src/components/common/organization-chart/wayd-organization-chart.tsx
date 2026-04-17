@@ -5,7 +5,7 @@ import {
   ModaOrganizationChartNodeProps,
   OrganizationChartGraphData,
 } from './types'
-import ModaEmpty from '../moda-empty'
+import WaydEmpty from '../wayd-empty'
 
 interface CustomTransformOption {
   type: string
@@ -23,7 +23,7 @@ export interface ModaOrganizationChartProps<T = any> {
   nodeSize?: [number, number]
 }
 
-const ModaOrganizationChart: FC<ModaOrganizationChartProps> = ({
+const WaydOrganizationChart: FC<ModaOrganizationChartProps> = ({
   data,
   NodeComponent,
   nodeSize = [250, 80],
@@ -82,7 +82,7 @@ const ModaOrganizationChart: FC<ModaOrganizationChartProps> = ({
   }
 
   if (!data || !data.nodes || data.nodes.length === 0) {
-    return <ModaEmpty message="No org chart data to display" />
+    return <WaydEmpty message="No org chart data to display" />
   }
 
   return (
@@ -94,4 +94,4 @@ const ModaOrganizationChart: FC<ModaOrganizationChartProps> = ({
   )
 }
 
-export default ModaOrganizationChart
+export default WaydOrganizationChart

@@ -2,11 +2,11 @@
 
 import PageTitle from '@/src/components/common/page-title'
 import { useEffect, useMemo, useState } from 'react'
-import ModaGrid from '@/src/components/common/moda-grid'
+import WaydGrid from '@/src/components/common/wayd-grid'
 import { authorizePage } from '@/src/components/hoc'
 import Link from 'next/link'
 import { Button, Tag } from 'antd'
-import { ModaTooltip } from '@/src/components/common'
+import { WaydTooltip } from '@/src/components/common'
 import useAuth from '@/src/components/contexts/auth'
 import { useDocumentTitle } from '@/src/hooks'
 import { useGetUsersQuery } from '@/src/store/features/user-management/users-api'
@@ -16,7 +16,7 @@ import dayjs from 'dayjs'
 import {
   RowMenuCellRenderer,
   UserLinkCellRenderer,
-} from '@/src/components/common/moda-grid-cell-renderers'
+} from '@/src/components/common/wayd-grid-cell-renderers'
 import {
   CreateUserForm,
   EditUserForm,
@@ -140,11 +140,11 @@ const UsersListPage = () => {
         width: 120,
         cellRenderer: (params: { value: Date | undefined }) =>
           params.value && new Date(params.value) > new Date() ? (
-            <ModaTooltip
+            <WaydTooltip
               title={`Locked until ${dayjs(params.value).format('MMM D, YYYY h:mm A')}`}
             >
               <Tag color="error">Locked</Tag>
-            </ModaTooltip>
+            </WaydTooltip>
           ) : null,
       },
       {
@@ -189,7 +189,7 @@ const UsersListPage = () => {
     <>
       <PageTitle title="Users" actions={actions()} />
 
-      <ModaGrid
+      <WaydGrid
         height={600}
         columnDefs={columnDefs}
         rowData={usersData}

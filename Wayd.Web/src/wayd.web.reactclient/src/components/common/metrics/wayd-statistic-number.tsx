@@ -7,7 +7,7 @@ export interface ModaStatisticNumberProps {
   precision?: number
 }
 
-export const ModaStatisticNumber: FC<ModaStatisticNumberProps> = ({
+export const WaydStatisticNumber: FC<ModaStatisticNumberProps> = ({
   value,
   precision,
 }) => {
@@ -25,4 +25,4 @@ export const ModaStatisticNumber: FC<ModaStatisticNumberProps> = ({
   )
 }
 
-export default ModaStatisticNumber
+export default WaydStatisticNumber

@@ -1,11 +1,11 @@
 'use client'
 
-import { ModaGrid } from '@/src/components/common'
+import { WaydGrid } from '@/src/components/common'
 import {
   LifecycleStatusTagCellRenderer,
   PortfolioLinkCellRenderer,
   ProgramLinkCellRenderer,
-} from '@/src/components/common/moda-grid-cell-renderers'
+} from '@/src/components/common/wayd-grid-cell-renderers'
 import { ProgramListDto } from '@/src/services/wayd-api'
 import { getSortedNames } from '@/src/utils'
 import { ColDef } from 'ag-grid-community'
@@ -89,7 +89,7 @@ const ProgramsGrid: FC<ProgramsGridProps> = (props: ProgramsGridProps) => {
 
   return (
     <>
-      <ModaGrid
+      <WaydGrid
         columnDefs={columnDefs}
         rowData={props.programs}
         loadData={refresh}

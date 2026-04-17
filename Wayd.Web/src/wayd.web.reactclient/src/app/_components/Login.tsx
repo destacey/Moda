@@ -38,12 +38,12 @@ const Login: React.FC = () => {
         <Flex vertical align="center" justify="center">
           <Flex align="center" justify="center">
             <Image
-              src={'/moda-icon.png'}
-              alt="Moda Icon"
+              src={'/wayd-icon.png'}
+              alt="Wayd Icon"
               style={{ width: '40px', height: '40px', marginRight: '10px' }}
             />
             <Title level={2} style={{ margin: 0 }}>
-              Moda
+              Wayd
             </Title>
           </Flex>
           <br />

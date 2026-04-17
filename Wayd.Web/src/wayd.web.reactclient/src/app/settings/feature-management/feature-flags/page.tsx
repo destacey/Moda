@@ -1,14 +1,14 @@
 'use client'
 
 import PageTitle from '@/src/components/common/page-title'
-import ModaGrid from '../../../../components/common/moda-grid'
+import WaydGrid from '../../../../components/common/wayd-grid'
 import { useMemo, useState } from 'react'
 import { authorizePage } from '../../../../components/hoc'
 import useAuth from '../../../../components/contexts/auth'
 import { ItemType } from 'antd/es/menu/interface'
 import { useDocumentTitle } from '../../../../hooks'
 import { ControlItemSwitch } from '../../../../components/common/control-items-menu'
-import { RowMenuCellRenderer } from '../../../../components/common/moda-grid-cell-renderers'
+import { RowMenuCellRenderer } from '../../../../components/common/wayd-grid-cell-renderers'
 import { FeatureFlagListDto } from '@/src/services/wayd-api'
 import { useGetFeatureFlagsQuery } from '@/src/store/features/admin/feature-flags-api'
 import EditFeatureFlagForm from './_components/edit-feature-flag-form'
@@ -143,7 +143,7 @@ const FeatureFlagsListPage = () => {
   return (
     <>
       <PageTitle title="Feature Flags" />
-      <ModaGrid
+      <WaydGrid
         height={600}
         columnDefs={columnDefs}
         rowData={featureFlags}

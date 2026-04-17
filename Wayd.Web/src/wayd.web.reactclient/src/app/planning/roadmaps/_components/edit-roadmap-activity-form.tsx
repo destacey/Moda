@@ -1,6 +1,6 @@
 'use client'
 
-import { ModaColorPicker } from '@/src/components/common'
+import { WaydColorPicker } from '@/src/components/common'
 import {
   RoadmapActivityDetailsDto,
   RoadmapActivityListDto,
@@ -238,7 +238,7 @@ const EditRoadmapActivityForm = ({
           <RangePicker />
         </Item>
         <Item name="color" label="Color">
-          <ModaColorPicker />
+          <WaydColorPicker />
         </Item>
       </Form>
     </Modal>

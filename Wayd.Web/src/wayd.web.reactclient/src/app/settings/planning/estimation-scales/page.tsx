@@ -1,7 +1,7 @@
 'use client'
 
-import { ModaGrid, PageTitle } from '@/src/components/common'
-import { RowMenuCellRenderer } from '@/src/components/common/moda-grid-cell-renderers'
+import { WaydGrid, PageTitle } from '@/src/components/common'
+import { RowMenuCellRenderer } from '@/src/components/common/wayd-grid-cell-renderers'
 import useAuth from '@/src/components/contexts/auth'
 import { authorizePage, requireFeatureFlag } from '@/src/components/hoc'
 import { useDocumentTitle } from '@/src/hooks'
@@ -204,7 +204,7 @@ const EstimationScalesPage = () => {
     <>
       <PageTitle title="Estimation Scales" actions={actions} />
 
-      <ModaGrid
+      <WaydGrid
         height={600}
         columnDefs={columnDefs}
         rowData={scaleData}

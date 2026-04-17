@@ -2,7 +2,7 @@
 
 import { WorkItemDetailsDto } from '@/src/services/wayd-api'
 import { Card, Statistic } from 'antd'
-import { ModaTooltip } from '@/src/components/common'
+import { WaydTooltip } from '@/src/components/common'
 import dayjs from 'dayjs'
 
 export interface WorkItemTimeToStartProps {
@@ -39,14 +39,14 @@ const WorkItemTimeToStart = ({ workItem }: WorkItemTimeToStartProps) => {
 
   return (
     <Card>
-      <ModaTooltip title={tooltip}>
+      <WaydTooltip title={tooltip}>
         <Statistic
           title={metricName}
           value={metricValue}
           suffix="days"
           precision={2}
         />
-      </ModaTooltip>
+      </WaydTooltip>
     </Card>
   )
 }

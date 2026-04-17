@@ -1,6 +1,6 @@
 'use client'
 
-import { ModaGrid } from '@/src/components/common'
+import { WaydGrid } from '@/src/components/common'
 import { StrategicThemeListDto } from '@/src/services/wayd-api'
 import { ColDef } from 'ag-grid-community'
 import Link from 'next/link'
@@ -35,7 +35,7 @@ const StrategicThemesGrid: React.FC<StrategicThemesGridProps> = (
   ], [])
 
   return (
-    <ModaGrid
+    <WaydGrid
       height={props.gridHeight}
       columnDefs={columnDefs}
       rowData={props.strategicThemesData}

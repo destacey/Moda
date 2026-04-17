@@ -3,7 +3,7 @@
 import { PlanningIntervalObjectiveListDto } from '@/src/services/wayd-api'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
-import ModaGrid from '../moda-grid'
+import WaydGrid from '../wayd-grid'
 import { MenuProps, Progress } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import useAuth from '../../contexts/auth'
@@ -19,7 +19,7 @@ import {
   RowMenuCellRenderer,
   NestedTeamNameLinkCellRenderer,
   NestedPlanningIntervalLinkCellRenderer,
-} from '../moda-grid-cell-renderers'
+} from '../wayd-grid-cell-renderers'
 import { ColDef } from 'ag-grid-community'
 import { ControlItemSwitch } from '../control-items-menu'
 
@@ -286,7 +286,7 @@ const PlanningIntervalObjectivesGrid = ({
   return (
     <>
       {/* TODO:  setup dynamic height */}
-      <ModaGrid
+      <WaydGrid
         height={650}
         columnDefs={columnDefs}
         rowData={objectivesData}

@@ -182,7 +182,7 @@ const CreateRoadmapTimeboxForm = ({
         </Item>
         {/* Hide for now */}
         {/* <Item name="color" label="Color">
-          <ModaColorPicker
+          <WaydColorPicker
             color={form.getFieldValue('color')}
             onChange={onColorChange}
           />

@@ -1,12 +1,12 @@
 'use client'
 
-import { ModaGrid } from '@/src/components/common'
+import { WaydGrid } from '@/src/components/common'
 import {
   LifecycleStatusTagCellRenderer,
   PortfolioLinkCellRenderer,
   ProgramLinkCellRenderer,
   ProjectLinkCellRenderer,
-} from '@/src/components/common/moda-grid-cell-renderers'
+} from '@/src/components/common/wayd-grid-cell-renderers'
 import { ProjectListDto } from '@/src/services/wayd-api'
 import { getSortedNames } from '@/src/utils'
 import { ColDef } from 'ag-grid-community'
@@ -104,7 +104,7 @@ const ProjectsGrid: FC<ProjectsGridProps> = (props: ProjectsGridProps) => {
 
   return (
     <>
-      <ModaGrid
+      <WaydGrid
         columnDefs={columnDefs}
         rowData={props.projects}
         loadData={refresh}

@@ -1,2 +1,2 @@
-export { default as ModaOrganizationChart } from './moda-organization-chart'
+export { default as WaydOrganizationChart } from './wayd-organization-chart'
 export * from './types'

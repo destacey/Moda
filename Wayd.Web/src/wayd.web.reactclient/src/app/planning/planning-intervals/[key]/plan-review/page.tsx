@@ -6,7 +6,7 @@ import { use, useEffect, useMemo, useState } from 'react'
 import { Alert, Card, Tag } from 'antd'
 import TeamPlanReview from './team-plan-review'
 import { notFound, useRouter } from 'next/navigation'
-import { ModaEmpty, PageTitle } from '@/src/components/common'
+import { WaydEmpty, PageTitle } from '@/src/components/common'
 import PlanningIntervalPlanReviewLoading from './loading'
 import { authorizePage } from '@/src/components/hoc'
 import {
@@ -104,7 +104,7 @@ const PlanningIntervalPlanReviewPage = (props: {
   if (isLoading || teamsIsLoading) return <PlanningIntervalPlanReviewLoading />
   if (!planningIntervalData) return null
   if (tabs?.length === 0)
-    return <ModaEmpty message="No teams found for this PI" />
+    return <WaydEmpty message="No teams found for this PI" />
 
   const tabExists = tabs?.some((t) => t.key === activeTab)
 

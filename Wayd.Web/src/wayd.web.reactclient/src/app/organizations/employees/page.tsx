@@ -1,7 +1,7 @@
 'use client'
 
 import PageTitle from '@/src/components/common/page-title'
-import ModaGrid from '../../../components/common/moda-grid'
+import WaydGrid from '../../../components/common/wayd-grid'
 import { useEffect, useState, useMemo } from 'react'
 import { ItemType } from 'antd/es/menu/interface'
 import Link from 'next/link'
@@ -88,7 +88,7 @@ const EmployeeListPage = () => {
   return (
     <>
       <PageTitle title="Employees" />
-      <ModaGrid
+      <WaydGrid
         columnDefs={columnDefs}
         gridControlMenuItems={controlItems}
         rowData={employeesData}

@@ -11,7 +11,7 @@ import { ProjectDetails } from '.'
 import { projectHelpText } from './project-help-text'
 import ProjectTaskMetrics from './project-task-metrics'
 import { FC } from 'react'
-import { ModaEmpty } from '@/src/components/common'
+import { WaydEmpty } from '@/src/components/common'
 
 const { Title } = Typography
 
@@ -106,7 +106,7 @@ const ProjectDetailsTab: FC<ProjectDetailsTabProps> = ({ project }) => {
         </Flex>
       )}
       {!project.projectLifecycle && (
-        <ModaEmpty message="No lifecycle defined for this project." />
+        <WaydEmpty message="No lifecycle defined for this project." />
       )}
     </>
   )

@@ -1,7 +1,7 @@
 'use client'
 
 import PageTitle from '@/src/components/common/page-title'
-import ModaGrid from '../../../components/common/moda-grid'
+import WaydGrid from '../../../components/common/wayd-grid'
 import { useMemo, useState } from 'react'
 import { BackgroundJobDto } from '@/src/services/wayd-api'
 import { getBackgroundJobsClient } from '@/src/services/clients'
@@ -141,7 +141,7 @@ const BackgroundJobsListPage = () => {
         actions={<PageActions actionItems={actionsMenuItems} />}
       />
 
-      <ModaGrid
+      <WaydGrid
         height={600}
         columnDefs={columnDefs}
         rowData={backgroundJobs}

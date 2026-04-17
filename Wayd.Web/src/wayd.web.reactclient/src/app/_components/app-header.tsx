@@ -172,7 +172,7 @@ const AppHeader: FC = React.memo(() => {
             whiteSpace: 'nowrap',
           }}
         >
-          Moda
+          Wayd
         </Title>
       </Flex>
       <Flex align="center" gap={8}>

@@ -27,7 +27,7 @@ import {
 } from '@ant-design/icons'
 import { ItemType } from 'antd/es/menu/interface'
 import useTheme from '../contexts/theme'
-import ModaEmpty from './moda-empty'
+import WaydEmpty from './moda-empty'
 import { ControlItemsMenu } from './control-items-menu'
 import { useRemainingHeight } from '@/src/hooks'
 
@@ -52,7 +52,7 @@ const modaDefaultColDef = {
   floatingFilter: true,
 }
 
-const ModaGrid = forwardRef<AgGridReact, ModaGridProps>(
+const WaydGrid = forwardRef<AgGridReact, ModaGridProps>(
   (
     {
       height,
@@ -194,7 +194,7 @@ const ModaGrid = forwardRef<AgGridReact, ModaGridProps>(
               loading={props.loading}
               loadingOverlayComponent={() => <Spin size="large" />}
               noRowsOverlayComponent={() => (
-                <ModaEmpty message={emptyMessage ?? 'No records found.'} />
+                <WaydEmpty message={emptyMessage ?? 'No records found.'} />
               )}
               enableCellTextSelection={true}
               ensureDomOrder={true}
@@ -208,6 +208,6 @@ const ModaGrid = forwardRef<AgGridReact, ModaGridProps>(
   },
 )
 
-ModaGrid.displayName = 'ModaGrid'
+WaydGrid.displayName = 'WaydGrid'
 
-export default ModaGrid
+export default WaydGrid

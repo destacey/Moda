@@ -10,7 +10,7 @@ import {
 } from '@/src/store/features/user-management/personal-access-tokens-api'
 import { PersonalAccessTokenDto } from '@/src/services/wayd-api'
 import dayjs from 'dayjs'
-import ModaGrid from '@/src/components/common/moda-grid'
+import WaydGrid from '@/src/components/common/wayd-grid'
 import { CustomCellRendererProps } from 'ag-grid-react'
 import { ColDef } from 'ag-grid-community'
 import {
@@ -19,7 +19,7 @@ import {
   PersonalAccessTokenCreatedModal,
 } from './_components'
 import { useMessage } from '@/src/components/contexts/messaging'
-import { RowMenuCellRenderer } from '@/src/components/common/moda-grid-cell-renderers'
+import { RowMenuCellRenderer } from '@/src/components/common/wayd-grid-cell-renderers'
 import { ItemType } from 'antd/es/menu/interface'
 import { MenuProps } from 'antd'
 
@@ -263,7 +263,7 @@ const PersonalAccessTokens: FC = () => {
         </Button>
       </Space>
 
-      <ModaGrid
+      <WaydGrid
         height={500}
         columnDefs={columnDefs}
         rowData={tokens}

@@ -3,8 +3,8 @@ import { ThemeConstants } from '@/src/config/theme/theme-constants'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Moda',
-    short_name: 'Moda',
+    name: 'Wayd',
+    short_name: 'Wayd',
     description:
       'Intelligent delivery management platform for engineering teams',
     start_url: '/',
@@ -35,14 +35,14 @@ export default function manifest(): MetadataRoute.Manifest {
         sizes: '1169x693',
         type: 'image/png',
         form_factor: 'wide',
-        label: 'Moda dashboard showing planning intervals and projects',
+        label: 'Wayd dashboard showing planning intervals and projects',
       },
       {
         src: '/screenshots/mobile.png',
         sizes: '374x567',
         type: 'image/png',
         form_factor: 'narrow',
-        label: 'Moda mobile view showing planning intervals and projects',
+        label: 'Wayd mobile view showing planning intervals and projects',
       },
     ],
   }

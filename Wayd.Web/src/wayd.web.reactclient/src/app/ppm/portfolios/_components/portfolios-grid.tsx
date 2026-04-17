@@ -1,7 +1,7 @@
 'use client'
 
-import { ModaGrid } from '@/src/components/common'
-import { PortfolioLinkCellRenderer } from '@/src/components/common/moda-grid-cell-renderers'
+import { WaydGrid } from '@/src/components/common'
+import { PortfolioLinkCellRenderer } from '@/src/components/common/wayd-grid-cell-renderers'
 import { ProjectPortfolioListDto } from '@/src/services/wayd-api'
 import { getSortedNames } from '@/src/utils'
 import { ColDef } from 'ag-grid-community'
@@ -54,7 +54,7 @@ const PortfoliosGrid: React.FC<PortfoliosGridProps> = (
 
   return (
     <>
-      <ModaGrid
+      <WaydGrid
         columnDefs={columnDefs}
         rowData={props.portfolios}
         loadData={refresh}

@@ -5,7 +5,7 @@ import {
   IterationHealthStatus,
 } from '@/src/utils/iteration-health'
 import { Badge } from 'antd'
-import ModaTooltip from '@/src/components/common/moda-tooltip'
+import WaydTooltip from '@/src/components/common/wayd-tooltip'
 import { FC } from 'react'
 import { PresetStatusColorType } from 'antd/es/_util/colors'
 
@@ -80,11 +80,11 @@ const IterationHealthIndicator: FC<IterationHealthIndicatorProps> = ({
 
   // span is needed for Tooltip to work with Badge
   return (
-    <ModaTooltip title={healthTooltip}>
+    <WaydTooltip title={healthTooltip}>
       <span>
         <Badge status={color} text={showLabel ? healthResult.status : ''} />
       </span>
-    </ModaTooltip>
+    </WaydTooltip>
   )
 }
 

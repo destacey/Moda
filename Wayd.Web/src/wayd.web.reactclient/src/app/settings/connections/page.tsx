@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { ModaGrid, PageActions, PageTitle } from '../../../components/common'
+import { WaydGrid, PageActions, PageTitle } from '../../../components/common'
 import { authorizePage } from '../../../components/hoc'
 import { useDocumentTitle } from '../../../hooks'
 import useAuth from '../../../components/contexts/auth'
@@ -83,7 +83,7 @@ const ConnectionsPage = () => {
         actions={<PageActions actionItems={actionsMenuItems} />}
       />
 
-      <ModaGrid
+      <WaydGrid
         height={600}
         columnDefs={columnDefs}
         gridControlMenuItems={controlItems}

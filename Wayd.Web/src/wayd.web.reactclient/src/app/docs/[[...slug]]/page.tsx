@@ -76,7 +76,7 @@ export async function generateMetadata({ params }: DocsPageProps) {
     : getDocBySlug([...slug, 'index']) || getDocBySlug(slug)
 
   return {
-    title: doc ? `${doc.frontmatter.title} | Moda Docs` : 'Moda Documentation',
+    title: doc ? `${doc.frontmatter.title} | Wayd Docs` : 'Wayd Documentation',
     description: doc?.frontmatter.description,
   }
 }

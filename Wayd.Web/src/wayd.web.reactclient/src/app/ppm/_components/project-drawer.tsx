@@ -1,6 +1,6 @@
 'use client'
 
-import { ModaDateRange } from '@/src/components/common'
+import { WaydDateRange } from '@/src/components/common'
 import {
   ContentList,
   ExpandableContent,
@@ -14,7 +14,7 @@ import { useMessage } from '@/src/components/contexts/messaging'
 import { useGetProjectQuery } from '@/src/store/features/ppm/projects-api'
 import { getDrawerWidthPixels, getSortedNameList } from '@/src/utils'
 import { Divider, Drawer, Flex } from 'antd'
-import { ModaTooltip } from '@/src/components/common'
+import { WaydTooltip } from '@/src/components/common'
 import { projectHelpText } from '../projects/_components/project-help-text'
 import Link from 'next/link'
 import { FC, useEffect, useState } from 'react'
@@ -95,7 +95,7 @@ const ProjectDrawer: FC<ProjectDrawerProps> = ({
             </LabeledContent>
           )}
           <LabeledContent label="Dates">
-            <ModaDateRange
+            <WaydDateRange
               dateRange={{ start: projectData?.start, end: projectData?.end }}
             />
           </LabeledContent>
@@ -104,9 +104,9 @@ const ProjectDrawer: FC<ProjectDrawerProps> = ({
           </LabeledContent>
           <LabeledContent label="Lifecycle">
             {projectData?.projectLifecycle ? (
-              <ModaTooltip title={projectData.projectLifecycle.description}>
+              <WaydTooltip title={projectData.projectLifecycle.description}>
                 {projectData.projectLifecycle.name}
-              </ModaTooltip>
+              </WaydTooltip>
             ) : (
               'No lifecycle assigned'
             )}

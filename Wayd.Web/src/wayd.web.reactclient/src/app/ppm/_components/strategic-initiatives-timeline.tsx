@@ -3,7 +3,7 @@
 import { ControlItemsMenu } from '@/src/components/common/control-items-menu'
 import {
   ModaDataItem,
-  ModaTimeline,
+  WaydTimeline,
   ModaTimelineOptions,
   TimelineTemplate,
 } from '@/src/components/common/timeline'
@@ -159,7 +159,7 @@ const StrategicInitiativesTimeline: FC<StrategicInitiativesTimelineProps> = (
         {props.viewSelector}
       </Flex>
       <Card size="small" variant="borderless">
-        <ModaTimeline
+        <WaydTimeline
           data={processedStrategicInitiatives}
           isLoading={props.isLoading}
           options={timelineOptions}

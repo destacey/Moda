@@ -4,7 +4,7 @@ import matter from 'gray-matter'
 
 // Path to the shared docs folder.
 // DOCS_PATH env var allows overriding in Docker/CI (e.g., DOCS_PATH=/docs).
-// Default: 3 levels up from cwd (Moda.Web/src/moda.web.reactclient) to repo root.
+// Default: 3 levels up from cwd (Wayd.Web/src/wayd.web.reactclient) to repo root.
 const DOCS_ROOT = process.env.DOCS_PATH
   ? path.resolve(process.env.DOCS_PATH)
   : path.join(process.cwd(), '..', '..', '..', 'docs')

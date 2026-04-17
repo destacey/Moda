@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import ModaGrid from '../../../components/common/moda-grid'
+import WaydGrid from '../../../components/common/wayd-grid'
 import useAuth, { Claim } from '../../../components/contexts/auth'
 import { ColDef } from 'ag-grid-community'
 
@@ -11,7 +11,7 @@ const ClaimsGrid = () => {
     [],
   )
 
-  return <ModaGrid columnDefs={columnDefs} rowData={user.claims} />
+  return <WaydGrid columnDefs={columnDefs} rowData={user.claims} />
 }
 
 export default ClaimsGrid

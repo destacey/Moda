@@ -3,7 +3,7 @@
 import { FC } from 'react'
 import Link from 'next/link'
 import { Card, Flex, Typography } from 'antd'
-import ModaDateRange from '@/src/components/common/moda-date-range'
+import WaydDateRange from '@/src/components/common/wayd-date-range'
 import useTheme from '@/src/components/contexts/theme'
 import './planning-interval-iterations-list-item.css'
 import { PlanningIntervalIterationListDto } from '@/src/services/wayd-api'
@@ -54,7 +54,7 @@ const PlanningIntervalIterationsListItem: FC<
           </Flex>
 
           <Flex align="center" gap={token.marginXS}>
-            <ModaDateRange dateRange={iteration} />
+            <WaydDateRange dateRange={iteration} />
           </Flex>
         </Flex>
       </Card>

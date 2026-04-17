@@ -42,7 +42,7 @@ const inter = Inter({ subsets: ['latin'] })
 /**
  * Shows the appropriate page for unauthenticated users based on route
  */
-const RETURN_URL_KEY = 'moda.returnUrl'
+const RETURN_URL_KEY = 'wayd.returnUrl'
 
 const UnauthenticatedView = () => {
   const pathname = usePathname()
@@ -106,12 +106,12 @@ const MsalInitializingView = () => {
             <div className={logoutStyles.logo}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/moda-icon.png"
-                alt="Moda"
+                src="/wayd-icon.png"
+                alt="Wayd"
                 className={logoutStyles.logoIcon}
               />
               <div className={logoutStyles.logoDivider} />
-              <span className={logoutStyles.logoText}>moda</span>
+              <span className={logoutStyles.logoText}>wayd</span>
             </div>
             <div className={logoutStyles.spinnerWrapper}>
               <LoadingSpinner />
@@ -261,7 +261,7 @@ const RootLayout = ({ children }: React.PropsWithChildren) => {
             name="viewport"
             content="width=device-width, initial-scale=1, viewport-fit=cover"
           />
-          <link rel="apple-touch-icon" href="/moda-icon.png" />
+          <link rel="apple-touch-icon" href="/wayd-icon.png" />
           <meta name="mobile-web-app-capable" content="yes" />
           <meta
             name="apple-mobile-web-app-status-bar-style"
@@ -282,7 +282,7 @@ const RootLayout = ({ children }: React.PropsWithChildren) => {
           name="viewport"
           content="width=device-width, initial-scale=1, viewport-fit=cover"
         />
-        <link rel="apple-touch-icon" href="/moda-icon.png" />
+        <link rel="apple-touch-icon" href="/wayd-icon.png" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       </head>

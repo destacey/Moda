@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react'
 import { GlobalToken } from 'antd'
-import ModaTooltip from '@/src/components/common/moda-tooltip'
+import WaydTooltip from '@/src/components/common/wayd-tooltip'
 import { CopyOutlined } from '@ant-design/icons'
 
 export interface MarkdownCodeBlockProps
@@ -58,7 +58,7 @@ const MarkdownCodeBlock: React.FC<MarkdownCodeBlockProps> = ({
         position: 'relative',
       }}
     >
-      <ModaTooltip title="Copy">
+      <WaydTooltip title="Copy">
         <CopyOutlined
           role="button"
           aria-label="Copy code to clipboard"
@@ -70,7 +70,7 @@ const MarkdownCodeBlock: React.FC<MarkdownCodeBlockProps> = ({
             cursor: 'pointer',
           }}
         />
-      </ModaTooltip>
+      </WaydTooltip>
       <pre {...rest}>
         <code style={{ ...style, fontFamily: 'monospace', fontSize: '0.9em' }}>
           {children}

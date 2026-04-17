@@ -1,6 +1,6 @@
 'use client'
 
-import { ModaGrid } from '@/src/components/common'
+import { WaydGrid } from '@/src/components/common'
 import { SprintBacklogItemDto } from '@/src/services/wayd-api'
 import { ColDef } from 'ag-grid-community'
 import { useMemo } from 'react'
@@ -16,7 +16,7 @@ import {
   ProjectLinkCellRenderer,
   WorkItemLinkCellRenderer,
   WorkStatusTagCellRenderer,
-} from '@/src/components/common/moda-grid-cell-renderers'
+} from '@/src/components/common/wayd-grid-cell-renderers'
 
 export interface SprintBacklogGridProps {
   workItems: SprintBacklogItemDto[]
@@ -101,7 +101,7 @@ const SprintBacklogGrid = (props: SprintBacklogGridProps) => {
   }
 
   return (
-    <ModaGrid
+    <WaydGrid
       height={gridHeight}
       columnDefs={columnDefs}
       rowData={workItems}

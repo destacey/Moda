@@ -1,6 +1,6 @@
 'use client'
 
-import { ModaGrid } from '@/src/components/common'
+import { WaydGrid } from '@/src/components/common'
 import { ProjectTeamMemberDto } from '@/src/services/wayd-api'
 import { useGetProjectTeamQuery } from '@/src/store/features/ppm/projects-api'
 import { ColDef } from 'ag-grid-community'
@@ -67,7 +67,7 @@ const ProjectTeamGrid: FC<ProjectTeamGridProps> = ({ projectIdOrKey }) => {
   }
 
   return (
-    <ModaGrid
+    <WaydGrid
       columnDefs={columnDefs}
       rowData={teamData}
       loadData={refresh}

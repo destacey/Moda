@@ -1,6 +1,6 @@
 'use client'
 
-import { ModaGrid } from '@/src/components/common'
+import { WaydGrid } from '@/src/components/common'
 import { WorkItemListDto } from '@/src/services/wayd-api'
 import { ColDef, ICellRendererParams } from 'ag-grid-community'
 import { forwardRef, ReactNode, useMemo } from 'react'
@@ -14,7 +14,7 @@ import {
   ProjectLinkCellRenderer,
   WorkItemLinkCellRenderer,
   WorkStatusTagCellRenderer,
-} from '../moda-grid-cell-renderers'
+} from '../wayd-grid-cell-renderers'
 import {
   workItemKeyComparator,
   workStatusCategoryComparator,
@@ -134,7 +134,7 @@ const WorkItemsGrid = forwardRef<
   }
 
   return (
-    <ModaGrid
+    <WaydGrid
       ref={ref}
       height={props.gridHeight}
       columnDefs={columnDefs}

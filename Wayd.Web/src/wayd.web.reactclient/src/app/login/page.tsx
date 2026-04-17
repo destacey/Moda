@@ -539,12 +539,12 @@ export default function LoginPage() {
             <div className={styles.logo}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/moda-icon.png"
-                alt="Moda"
+                src="/wayd-icon.png"
+                alt="Wayd"
                 className={styles.logoIcon}
               />
               <div className={styles.logoDivider} />
-              <span className={styles.logoText}>moda</span>
+              <span className={styles.logoText}>wayd</span>
             </div>
 
             <h1 className={styles.title}>Welcome</h1>

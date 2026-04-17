@@ -1,8 +1,8 @@
 'use client'
 
-import { ModaGrid } from '@/src/components/common'
-import { ModaStatisticNumber } from '@/src/components/common/metrics'
-import { RowMenuCellRenderer } from '@/src/components/common/moda-grid-cell-renderers'
+import { WaydGrid } from '@/src/components/common'
+import { WaydStatisticNumber } from '@/src/components/common/metrics'
+import { RowMenuCellRenderer } from '@/src/components/common/wayd-grid-cell-renderers'
 import { StrategicInitiativeKpiListDto } from '@/src/services/wayd-api'
 import { ColDef, GetRowIdParams } from 'ag-grid-community'
 import { Button, MenuProps } from 'antd'
@@ -28,7 +28,7 @@ export interface StrategicInitiativeKpisGridProps {
 }
 
 const StatisticNumberCellRenderer = (params) => {
-  return <ModaStatisticNumber value={params.value} />
+  return <WaydStatisticNumber value={params.value} />
 }
 
 interface RowMenuProps extends MenuProps {
@@ -241,7 +241,7 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
 
   return (
     <>
-      <ModaGrid
+      <WaydGrid
         columnDefs={columnDefs}
         rowData={kpis}
         loadData={refresh}

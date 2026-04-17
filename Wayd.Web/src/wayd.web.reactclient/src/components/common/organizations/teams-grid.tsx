@@ -1,10 +1,10 @@
 import { FC, useMemo } from 'react'
-import ModaGrid from '../moda-grid'
+import WaydGrid from '../wayd-grid'
 import { PlanningIntervalTeamResponse } from '@/src/services/wayd-api'
 import {
   NestedTeamOfTeamsNameLinkCellRenderer,
   TeamNameLinkCellRenderer,
-} from '../moda-grid-cell-renderers'
+} from '../wayd-grid-cell-renderers'
 import { ColDef } from 'ag-grid-community'
 
 export interface TeamsGridProps {
@@ -39,7 +39,7 @@ const TeamsGrid: FC<TeamsGridProps> = (props) => {
   return (
     <>
       {/* TODO:  setup dynamic height */}
-      <ModaGrid
+      <WaydGrid
         height={550}
         columnDefs={columnDefs}
         rowData={props.teams}

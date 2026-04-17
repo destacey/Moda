@@ -8,7 +8,7 @@ const Area = dynamic(
 import { AreaConfig } from '@ant-design/charts'
 import useTheme from '../../contexts/theme'
 import { WorkItemProgressDailyRollupDto } from '@/src/services/wayd-api'
-import ModaEmpty from '../moda-empty'
+import WaydEmpty from '../wayd-empty'
 import { Spin, Typography } from 'antd'
 import dayjs from 'dayjs'
 
@@ -101,7 +101,7 @@ const WorkItemsCumulativeFlowChart = (
     return (
       <>
         <Title level={5}>Cumulative Flow</Title>
-        <ModaEmpty message="No work item data to display" />
+        <WaydEmpty message="No work item data to display" />
       </>
     )
 

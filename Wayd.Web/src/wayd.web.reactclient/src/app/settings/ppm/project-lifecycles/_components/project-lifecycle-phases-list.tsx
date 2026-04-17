@@ -1,7 +1,7 @@
 'use client'
 
-import { ModaGrid } from '@/src/components/common'
-import { RowMenuCellRenderer } from '@/src/components/common/moda-grid-cell-renderers'
+import { WaydGrid } from '@/src/components/common'
+import { RowMenuCellRenderer } from '@/src/components/common/wayd-grid-cell-renderers'
 import { useMessage } from '@/src/components/contexts/messaging'
 import {
   ProjectLifecycleDetailsDto,
@@ -191,7 +191,7 @@ const ProjectLifecyclePhasesList = ({
 
   return (
     <>
-      <ModaGrid
+      <WaydGrid
         height={300}
         columnDefs={columnDefs}
         rowData={sortedPhases}

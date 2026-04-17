@@ -1,7 +1,7 @@
 'use client'
 
-import { ModaGrid } from '@/src/components/common'
-import { RowMenuCellRenderer } from '@/src/components/common/moda-grid-cell-renderers'
+import { WaydGrid } from '@/src/components/common'
+import { RowMenuCellRenderer } from '@/src/components/common/wayd-grid-cell-renderers'
 import { PokerSessionListDto } from '@/src/services/wayd-api'
 import { ColDef, ICellRendererParams } from 'ag-grid-community'
 import { ItemType } from 'antd/es/menu/interface'
@@ -119,7 +119,7 @@ const PokerSessionsGrid: FC<PokerSessionsGridProps> = ({
   )
 
   return (
-    <ModaGrid
+    <WaydGrid
       columnDefs={columnDefs}
       gridControlMenuItems={gridControlMenuItems}
       rowData={sessions}

@@ -15,7 +15,7 @@ import { IterationState } from '@/src/components/types'
 import { SizingMethod, SprintDetailsDto } from '@/src/services/wayd-api'
 import { useGetSprintMetricsQuery } from '@/src/store/features/planning/sprints-api'
 import { Col, Flex, Row, Segmented, Skeleton } from 'antd'
-import { ModaTooltip } from '@/src/components/common'
+import { WaydTooltip } from '@/src/components/common'
 import { FC, ReactNode, useEffect, useState } from 'react'
 
 export interface SprintMetricsProps {
@@ -96,7 +96,7 @@ const SprintMetrics: FC<SprintMetricsProps> = ({
   return (
     <Flex vertical gap="small">
       <Flex gap="small" justify="flex-end">
-        <ModaTooltip title="Switch between counting work items and summing story points for metrics">
+        <WaydTooltip title="Switch between counting work items and summing story points for metrics">
           <Segmented<string>
             options={['Count', 'Story Points']}
             value={useStoryPoints ? 'Story Points' : 'Count'}
@@ -108,7 +108,7 @@ const SprintMetrics: FC<SprintMetricsProps> = ({
               )
             }
           />
-        </ModaTooltip>
+        </WaydTooltip>
       </Flex>
       <Row gutter={[8, 8]}>
         {sprint.state.id !== IterationState.Completed && (

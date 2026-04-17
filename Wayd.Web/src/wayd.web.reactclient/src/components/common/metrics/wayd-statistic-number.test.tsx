@@ -1,9 +1,9 @@
 import { render, screen } from '@testing-library/react'
-import ModaStatisticNumber from './moda-statistic-number'
+import WaydStatisticNumber from './moda-statistic-number'
 
-describe('ModaStatisticNumber', () => {
+describe('WaydStatisticNumber', () => {
   it('renders the number correctly', () => {
-    render(<ModaStatisticNumber value={12345.67} />)
+    render(<WaydStatisticNumber value={12345.67} />)
     const numberElement = screen.getByText((content, element) => {
       const hasText = (node: Element) => node.textContent === '12,345.67'
       const elementHasText = hasText(element!)
@@ -16,23 +16,23 @@ describe('ModaStatisticNumber', () => {
   })
 
   it('renders nothing when value is null', () => {
-    const { container } = render(<ModaStatisticNumber value={null} />)
+    const { container } = render(<WaydStatisticNumber value={null} />)
     expect(container.firstChild).toBeNull()
   })
 
   it('renders nothing when value is undefined', () => {
-    const { container } = render(<ModaStatisticNumber value={undefined} />)
+    const { container } = render(<WaydStatisticNumber value={undefined} />)
     expect(container.firstChild).toBeNull()
   })
 
   it('renders 0 correctly', () => {
-    render(<ModaStatisticNumber value={0} />)
+    render(<WaydStatisticNumber value={0} />)
     const numberElement = screen.getByText('0')
     expect(numberElement).toBeInTheDocument()
   })
 
   it('renders the number with the specified precision (no rounding)', () => {
-    render(<ModaStatisticNumber value={12345.6789} precision={2} />)
+    render(<WaydStatisticNumber value={12345.6789} precision={2} />)
 
     // Match the entire formatted number
     const numberElement = screen.getByText((content, element) => {

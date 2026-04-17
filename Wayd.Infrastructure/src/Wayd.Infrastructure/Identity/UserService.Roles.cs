@@ -47,8 +47,8 @@ internal partial class UserService
             var adminCount = (await _userManager.GetUsersInRoleAsync(ApplicationRoles.Admin)).Count;
             if (adminCount <= 1)
             {
-                _logger.LogWarning("Moda should have at least 1 Admin.");
-                throw new ConflictException("Moda should have at least 1 Admin.");
+                _logger.LogWarning("Wayd should have at least 1 Admin.");
+                throw new ConflictException("Wayd should have at least 1 Admin.");
             }
         }
 
@@ -117,8 +117,8 @@ internal partial class UserService
                 var removalCount = command.UserIdsToRemove.Count;
                 if (adminCount - removalCount < 1)
                 {
-                    _logger.LogWarning("Moda should have at least 1 Admin.");
-                    return Result.Failure("Moda should have at least 1 Admin.");
+                    _logger.LogWarning("Wayd should have at least 1 Admin.");
+                    return Result.Failure("Wayd should have at least 1 Admin.");
                 }
             }
 

@@ -17,7 +17,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = React.memo(
 
     if (!markdown) return null
     return (
-      <div className="moda-markdown-renderer">
+      <div className="wayd-markdown-renderer">
         <ReactMarkdown
           components={markdownComponents}
           remarkPlugins={[remarkGfm]}

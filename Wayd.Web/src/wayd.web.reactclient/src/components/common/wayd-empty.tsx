@@ -4,8 +4,8 @@ export interface ModaEmptyProps {
   message?: string
 }
 
-const ModaEmpty = ({ message }: ModaEmptyProps) => {
+const WaydEmpty = ({ message }: ModaEmptyProps) => {
   return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={message} />
 }
 
-export default ModaEmpty
+export default WaydEmpty

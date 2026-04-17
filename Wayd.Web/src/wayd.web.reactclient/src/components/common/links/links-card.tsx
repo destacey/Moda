@@ -4,7 +4,7 @@ import { EditOutlined, EditTwoTone, PlusOutlined } from '@ant-design/icons'
 import { useState } from 'react'
 import CreateLinkForm from './create-link-form'
 import LinkItem from './link-item'
-import ModaEmpty from '../moda-empty'
+import WaydEmpty from '../wayd-empty'
 import { useGetLinksQuery } from '@/src/store/features/common/links-api'
 import { LinkDto } from '@/src/services/wayd-api'
 
@@ -59,7 +59,7 @@ const LinksContent = ({
   }
 
   if (!hasLinks) {
-    return <ModaEmpty message="No links found" />
+    return <WaydEmpty message="No links found" />
   }
 
   return (

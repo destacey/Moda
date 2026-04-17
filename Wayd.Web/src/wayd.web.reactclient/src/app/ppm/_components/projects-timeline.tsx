@@ -3,7 +3,7 @@
 import { ControlItemsMenu } from '@/src/components/common/control-items-menu'
 import {
   ModaDataItem,
-  ModaTimeline,
+  WaydTimeline,
   ModaTimelineOptions,
   TimelineTemplate,
 } from '@/src/components/common/timeline'
@@ -190,7 +190,7 @@ const ProjectsTimeline: FC<ProjectsTimelineProps> = (props) => {
         {props.viewSelector}
       </Flex>
       <Card size="small" variant="borderless">
-        <ModaTimeline
+        <WaydTimeline
           data={processedProjects}
           groups={groups.length > 0 ? groups : undefined}
           isLoading={props.isLoading}

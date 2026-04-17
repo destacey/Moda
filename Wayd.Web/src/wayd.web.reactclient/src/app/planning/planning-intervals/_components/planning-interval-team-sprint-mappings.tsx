@@ -14,7 +14,7 @@ import {
   useGetIterationSprintsQuery,
   useGetPlanningIntervalTeamsQuery,
 } from '@/src/store/features/planning/planning-interval-api'
-import ModaEmpty from '@/src/components/common/moda-empty'
+import WaydEmpty from '@/src/components/common/wayd-empty'
 import useTheme from '@/src/components/contexts/theme'
 import useAuth from '@/src/components/contexts/auth'
 import ConfigureTeamSprintMappingsForm from './configure-team-sprint-mappings-form'
@@ -255,7 +255,7 @@ export const PlanningIntervalTeamSprintMappings = ({
 
   if (!teamsData || teamsData.length === 0) {
     return (
-      <ModaEmpty message="No teams configured for this planning interval" />
+      <WaydEmpty message="No teams configured for this planning interval" />
     )
   }
 

@@ -4,7 +4,7 @@ import { PlanningIntervalObjectiveListDto } from '@/src/services/wayd-api'
 import { PlusOutlined } from '@ant-design/icons'
 import { Badge, Button, Card, List, Space } from 'antd'
 import ObjectiveListItem from './objective-list-item'
-import ModaEmpty from '@/src/components/common/moda-empty'
+import WaydEmpty from '@/src/components/common/wayd-empty'
 import { useEffect, useState } from 'react'
 import CreatePlanningIntervalObjectiveForm from '../../_components/create-planning-interval-objective-form'
 import useTheme from '@/src/components/contexts/theme'
@@ -206,7 +206,7 @@ const TeamObjectivesListCard = ({
             size="small"
             dataSource={objectives}
             locale={{
-              emptyText: <ModaEmpty message="No objectives" />,
+              emptyText: <WaydEmpty message="No objectives" />,
             }}
             renderItem={(objective) => (
               <SortableContext

@@ -7,7 +7,7 @@ import {
 import { ColDef, ColGroupDef, GetRowIdParams } from 'ag-grid-community'
 import { CustomCellRendererProps } from 'ag-grid-react'
 import { FC, useMemo } from 'react'
-import ModaGrid from '../moda-grid'
+import WaydGrid from '../wayd-grid'
 import { workItemKeyComparator } from './work-item-utils'
 import Link from 'next/link'
 import { ExportOutlined } from '@ant-design/icons'
@@ -15,7 +15,7 @@ import {
   DependencyHealthCellRenderer,
   renderSprintLinkHelper,
   renderTeamLinkHelper,
-} from '../moda-grid-cell-renderers'
+} from '../wayd-grid-cell-renderers'
 
 export interface WorkItemDependenciesGridProps {
   workItem: WorkItemDetailsDto
@@ -143,7 +143,7 @@ const WorkItemDependenciesGrid: FC<WorkItemDependenciesGridProps> = (props) => {
 
   return (
     <>
-      <ModaGrid
+      <WaydGrid
         height={550}
         columnDefs={columnDefs}
         rowData={props.dependencies}

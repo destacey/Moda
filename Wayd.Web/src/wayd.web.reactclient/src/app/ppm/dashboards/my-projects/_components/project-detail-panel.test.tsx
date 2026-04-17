@@ -165,7 +165,7 @@ describe('ProjectDetailPanel', () => {
     expect(screen.getByTestId('plan-view')).toHaveTextContent('PROJ1')
   })
 
-  it('renders ModaEmpty when no lifecycle is assigned', () => {
+  it('renders WaydEmpty when no lifecycle is assigned', () => {
     mockUseGetProjectQuery.mockReturnValue({
       data: createProjectDetails({ projectLifecycle: null }),
       isLoading: false,

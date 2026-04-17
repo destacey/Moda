@@ -36,7 +36,7 @@ import {
   FeatureFlagsClient,
   PersonalAccessTokensClient,
   SearchClient,
-} from './moda-api'
+} from './wayd-api'
 import { tokenRequest } from '@/auth-config'
 import { InteractionRequiredAuthError } from '@azure/msal-browser'
 import { msalInstance, getMsalReady } from '../components/contexts/auth/msal-instance'

@@ -7,7 +7,7 @@ import { Timeline, TimelineOptions } from 'vis-timeline/standalone'
 import { TimelineOptionsTemplateFunction } from '@/src/lib/vis-timeline'
 import { Button, Dropdown, MenuProps, Spin } from 'antd'
 import useTheme from '../../contexts/theme'
-import { ModaEmpty } from '..'
+import { WaydEmpty } from '..'
 import './moda-timeline.css'
 import {
   DefaultTimeLineColors,
@@ -30,7 +30,7 @@ import { saveElementAsImage } from '@/src/utils'
 import { TimelineOptionsItemCallbackFunction } from 'vis-timeline'
 import dayjs from 'dayjs'
 
-const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
+const WaydTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
   props: ModaTimelineProps<TItem, TGroup>,
 ) => {
   const [isTimelineLoading, setIsTimelineLoading] = useState(false)
@@ -667,11 +667,11 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
         {!isLoading &&
           (!props.data || props.data.length === 0) &&
           (!props.groups || props.groups.length === 0) && (
-            <ModaEmpty message={props.emptyMessage ?? 'No timeline data'} />
+            <WaydEmpty message={props.emptyMessage ?? 'No timeline data'} />
           )}
       </div>
     </Spin>
   )
 }
 
-export default memo(ModaTimeline)
+export default memo(WaydTimeline)

@@ -1,7 +1,7 @@
 'use client'
 
-import { ModaGrid } from '@/src/components/common'
-import { renderTeamLinkHelper } from '@/src/components/common/moda-grid-cell-renderers'
+import { WaydGrid } from '@/src/components/common'
+import { renderTeamLinkHelper } from '@/src/components/common/wayd-grid-cell-renderers'
 import { SprintListDto } from '@/src/services/wayd-api'
 import {
   ColDef,
@@ -72,7 +72,7 @@ const SprintsGrid: FC<SprintsGridProps> = (props: SprintsGridProps) => {
   ], [props.hideTeam])
 
   return (
-    <ModaGrid
+    <WaydGrid
       columnDefs={columnDefs}
       rowData={sprints}
       loadData={refetch}

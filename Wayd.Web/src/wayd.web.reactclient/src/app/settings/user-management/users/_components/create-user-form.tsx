@@ -178,7 +178,7 @@ const CreateUserForm = ({
             rules={[
               {
                 required: true,
-                message: 'Password is required for Moda accounts',
+                message: 'Password is required for Wayd accounts',
               },
               { min: 8, message: 'Password must be at least 8 characters' },
               {

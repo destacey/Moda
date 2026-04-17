@@ -1,12 +1,12 @@
 'use client'
 
-import { ModaDateRange } from '@/src/components/common'
+import { WaydDateRange } from '@/src/components/common'
 import { ContentList, LabeledContent } from '@/src/components/common/content'
 import LinksCard from '@/src/components/common/links/links-card'
 import TimelineProgress from '@/src/components/common/planning/timeline-progress'
 import { ProjectDetailsDto } from '@/src/services/wayd-api'
 import { Card, Divider, Flex } from 'antd'
-import { ModaTooltip } from '@/src/components/common'
+import { WaydTooltip } from '@/src/components/common'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { FC } from 'react'
@@ -67,7 +67,7 @@ const ProjectDetails: FC<ProjectDetailsProps> = ({ project }) => {
           )}
 
           <LabeledContent label="Dates">
-            <ModaDateRange
+            <WaydDateRange
               dateRange={{ start: project.start, end: project.end }}
             />
           </LabeledContent>
@@ -78,9 +78,9 @@ const ProjectDetails: FC<ProjectDetailsProps> = ({ project }) => {
 
           <LabeledContent label="Lifecycle">
             {project.projectLifecycle ? (
-              <ModaTooltip title={project.projectLifecycle.description}>
+              <WaydTooltip title={project.projectLifecycle.description}>
                 {project.projectLifecycle.name}
-              </ModaTooltip>
+              </WaydTooltip>
             ) : (
               'No lifecycle assigned'
             )}

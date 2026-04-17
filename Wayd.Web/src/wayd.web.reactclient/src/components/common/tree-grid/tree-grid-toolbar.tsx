@@ -2,7 +2,7 @@
 
 import styles from './tree-grid.module.css'
 import { Button, Input, Popover, Typography } from 'antd'
-import ModaTooltip from '@/src/components/common/moda-tooltip'
+import WaydTooltip from '@/src/components/common/wayd-tooltip'
 import {
   ClearOutlined,
   DownloadOutlined,
@@ -50,16 +50,16 @@ const TreeGridToolbar = ({
           className={styles.toolbarSearch}
         />
         {onRefresh && (
-          <ModaTooltip title="Refresh">
+          <WaydTooltip title="Refresh">
             <Button
               type="text"
               shape="circle"
               icon={<ReloadOutlined />}
               onClick={onRefresh}
             />
-          </ModaTooltip>
+          </WaydTooltip>
         )}
-        <ModaTooltip title="Clear Filters and Sorting">
+        <WaydTooltip title="Clear Filters and Sorting">
           <Button
             type="text"
             shape="circle"
@@ -67,10 +67,10 @@ const TreeGridToolbar = ({
             onClick={onClearFilters}
             disabled={!hasActiveFilters}
           />
-        </ModaTooltip>
+        </WaydTooltip>
         <span className={styles.toolbarDivider} />
         {onExportCsv && (
-          <ModaTooltip title="Export to CSV">
+          <WaydTooltip title="Export to CSV">
             <Button
               type="text"
               shape="circle"
@@ -78,7 +78,7 @@ const TreeGridToolbar = ({
               onClick={onExportCsv}
               disabled={isLoading || displayedRowCount === 0}
             />
-          </ModaTooltip>
+          </WaydTooltip>
         )}
         {helpContent && (
           <Popover
@@ -88,13 +88,13 @@ const TreeGridToolbar = ({
             getPopupContainer={() => document.body}
             overlayStyle={{ maxWidth: 'calc(100vw - 24px)' }}
           >
-            <ModaTooltip title="Grid Actions Help">
+            <WaydTooltip title="Grid Actions Help">
               <Button
                 type="text"
                 shape="circle"
                 icon={<QuestionCircleOutlined />}
               />
-            </ModaTooltip>
+            </WaydTooltip>
           </Popover>
         )}
         {rightSlot && (

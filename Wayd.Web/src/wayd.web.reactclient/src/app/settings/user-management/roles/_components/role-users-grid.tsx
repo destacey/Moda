@@ -1,7 +1,7 @@
 'use client'
 
-import { ModaGrid } from '@/src/components/common'
-import { UserLinkCellRenderer } from '@/src/components/common/moda-grid-cell-renderers'
+import { WaydGrid } from '@/src/components/common'
+import { UserLinkCellRenderer } from '@/src/components/common/wayd-grid-cell-renderers'
 import { RoleListDto, UserDetailsDto } from '@/src/services/wayd-api'
 import { useGetRoleUsersQuery } from '@/src/store/features/user-management/roles-api'
 import { ColDef } from 'ag-grid-community'
@@ -39,7 +39,7 @@ const RoleUsersGrid: FC<RoleUsersGridProps> = (props: RoleUsersGridProps) => {
   }
 
   return (
-    <ModaGrid
+    <WaydGrid
       height={550}
       columnDefs={columnDefs}
       rowData={usersData}

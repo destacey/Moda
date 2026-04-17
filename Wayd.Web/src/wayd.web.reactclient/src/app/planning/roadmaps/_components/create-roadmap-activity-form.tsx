@@ -1,4 +1,4 @@
-import { ModaColorPicker } from '@/src/components/common'
+import { WaydColorPicker } from '@/src/components/common'
 import { MarkdownEditor } from '@/src/components/common/markdown'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { useModalForm } from '@/src/hooks'
@@ -180,7 +180,7 @@ const CreateRoadmapActivityForm = ({
           <RangePicker />
         </Item>
         <Item name="color" label="Color">
-          <ModaColorPicker />
+          <WaydColorPicker />
         </Item>
       </Form>
     </Modal>

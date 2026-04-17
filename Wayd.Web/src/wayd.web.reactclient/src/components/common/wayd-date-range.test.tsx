@@ -1,18 +1,18 @@
 import { render, screen } from '@testing-library/react'
-import ModaDateRange from './moda-date-range'
+import WaydDateRange from './moda-date-range'
 import { DateRange } from '../types'
 
-describe('ModaDateRange', () => {
+describe('WaydDateRange', () => {
   describe('null/undefined handling', () => {
     it('should return null when dateRange is undefined', () => {
       const { container } = render(
-        <ModaDateRange dateRange={undefined as any} />,
+        <WaydDateRange dateRange={undefined as any} />,
       )
       expect(container.firstChild).toBeNull()
     })
 
     it('should return null when dateRange is null', () => {
-      const { container } = render(<ModaDateRange dateRange={null as any} />)
+      const { container } = render(<WaydDateRange dateRange={null as any} />)
       expect(container.firstChild).toBeNull()
     })
 
@@ -20,7 +20,7 @@ describe('ModaDateRange', () => {
       const dateRange: DateRange = {
         end: new Date('2024-12-31'),
       }
-      const { container } = render(<ModaDateRange dateRange={dateRange} />)
+      const { container } = render(<WaydDateRange dateRange={dateRange} />)
       expect(container.firstChild).toBeNull()
     })
 
@@ -28,13 +28,13 @@ describe('ModaDateRange', () => {
       const dateRange: DateRange = {
         start: new Date('2024-01-01'),
       }
-      const { container } = render(<ModaDateRange dateRange={dateRange} />)
+      const { container } = render(<WaydDateRange dateRange={dateRange} />)
       expect(container.firstChild).toBeNull()
     })
 
     it('should return null when both dates are missing', () => {
       const dateRange: DateRange = {}
-      const { container } = render(<ModaDateRange dateRange={dateRange} />)
+      const { container } = render(<WaydDateRange dateRange={dateRange} />)
       expect(container.firstChild).toBeNull()
     })
   })
@@ -45,7 +45,7 @@ describe('ModaDateRange', () => {
         start: new Date('2024-03-15T12:00:00'),
         end: new Date('2024-06-20T12:00:00'),
       }
-      const { container } = render(<ModaDateRange dateRange={dateRange} />)
+      const { container } = render(<WaydDateRange dateRange={dateRange} />)
       expect(container.textContent).toMatch(/Mar \d+ - Jun \d+, 2024/)
       expect(container.textContent).not.toMatch(/PM|AM/)
     })
@@ -55,7 +55,7 @@ describe('ModaDateRange', () => {
         start: new Date('2024-01-01T12:00:00'),
         end: new Date('2024-12-31T12:00:00'),
       }
-      const { container } = render(<ModaDateRange dateRange={dateRange} />)
+      const { container } = render(<WaydDateRange dateRange={dateRange} />)
       expect(container.textContent).toMatch(/Jan \d+ - Dec \d+, 2024/)
     })
 
@@ -64,7 +64,7 @@ describe('ModaDateRange', () => {
         start: new Date('2024-07-04T12:00:00'),
         end: new Date('2024-07-04T12:00:00'),
       }
-      const { container } = render(<ModaDateRange dateRange={dateRange} />)
+      const { container } = render(<WaydDateRange dateRange={dateRange} />)
       expect(container.textContent).toMatch(/Jul \d+ - Jul \d+, 2024/)
     })
   })
@@ -75,7 +75,7 @@ describe('ModaDateRange', () => {
         start: new Date('2023-11-15T12:00:00'),
         end: new Date('2024-02-20T12:00:00'),
       }
-      const { container } = render(<ModaDateRange dateRange={dateRange} />)
+      const { container } = render(<WaydDateRange dateRange={dateRange} />)
       expect(container.textContent).toMatch(/Nov \d+, 2023 - Feb \d+, 2024/)
       expect(container.textContent).not.toMatch(/PM|AM/)
     })
@@ -85,7 +85,7 @@ describe('ModaDateRange', () => {
         start: new Date('2022-01-01T12:00:00'),
         end: new Date('2025-12-31T12:00:00'),
       }
-      const { container } = render(<ModaDateRange dateRange={dateRange} />)
+      const { container } = render(<WaydDateRange dateRange={dateRange} />)
       expect(container.textContent).toMatch(/Jan \d+, 2022 - Dec \d+, 2025/)
     })
   })
@@ -97,7 +97,7 @@ describe('ModaDateRange', () => {
         end: new Date('2024-06-20T16:45:00'),
       }
       const { container } = render(
-        <ModaDateRange dateRange={dateRange} withTime={true} />,
+        <WaydDateRange dateRange={dateRange} withTime={true} />,
       )
       expect(container.textContent).toMatch(/Mar \d+, \d+:\d+ [AP]M/)
       expect(container.textContent).toMatch(/Jun \d+, 2024 \d+:\d+ [AP]M/)
@@ -109,7 +109,7 @@ describe('ModaDateRange', () => {
         end: new Date('2024-02-20T17:30:00'),
       }
       const { container } = render(
-        <ModaDateRange dateRange={dateRange} withTime={true} />,
+        <WaydDateRange dateRange={dateRange} withTime={true} />,
       )
       expect(container.textContent).toMatch(/Nov \d+, 2023 \d+:\d+ [AP]M/)
       expect(container.textContent).toMatch(/Feb \d+, 2024 \d+:\d+ [AP]M/)
@@ -121,7 +121,7 @@ describe('ModaDateRange', () => {
         end: new Date('2024-12-31T23:59:59'),
       }
       const { container } = render(
-        <ModaDateRange dateRange={dateRange} withTime={true} />,
+        <WaydDateRange dateRange={dateRange} withTime={true} />,
       )
       expect(container.textContent).toMatch(/Jan \d+, 12:00 AM/)
       expect(container.textContent).toMatch(/Dec \d+, 2024 11:59 PM/)
@@ -133,7 +133,7 @@ describe('ModaDateRange', () => {
         end: new Date('2024-06-15T12:30:00'),
       }
       const { container } = render(
-        <ModaDateRange dateRange={dateRange} withTime={true} />,
+        <WaydDateRange dateRange={dateRange} withTime={true} />,
       )
       expect(container.textContent).toMatch(/Jun \d+, 12:00 PM/)
       expect(container.textContent).toMatch(/Jun \d+, 2024 12:30 PM/)
@@ -146,7 +146,7 @@ describe('ModaDateRange', () => {
         start: new Date('2024-03-15T14:30:00'),
         end: new Date('2024-06-20T16:45:00'),
       }
-      render(<ModaDateRange dateRange={dateRange} />)
+      render(<WaydDateRange dateRange={dateRange} />)
       // Should not show time
       const text = screen.getByText(/Mar 15 - Jun 20, 2024/)
       expect(text).toBeInTheDocument()
@@ -158,7 +158,7 @@ describe('ModaDateRange', () => {
         start: new Date('2024-03-15T14:30:00'),
         end: new Date('2024-06-20T16:45:00'),
       }
-      render(<ModaDateRange dateRange={dateRange} withTime={false} />)
+      render(<WaydDateRange dateRange={dateRange} withTime={false} />)
       // Should not show time
       const text = screen.getByText(/Mar 15 - Jun 20, 2024/)
       expect(text).toBeInTheDocument()
@@ -172,7 +172,7 @@ describe('ModaDateRange', () => {
         start: new Date('2024-02-29T12:00:00'),
         end: new Date('2024-03-01T12:00:00'),
       }
-      const { container } = render(<ModaDateRange dateRange={dateRange} />)
+      const { container } = render(<WaydDateRange dateRange={dateRange} />)
       expect(container.textContent).toMatch(/Feb \d+ - Mar \d+, 2024/)
     })
 
@@ -182,7 +182,7 @@ describe('ModaDateRange', () => {
         end: new Date('2024-01-01T00:00:00'),
       }
       const { container } = render(
-        <ModaDateRange dateRange={dateRange} withTime={true} />,
+        <WaydDateRange dateRange={dateRange} withTime={true} />,
       )
       expect(container.textContent).toMatch(/Dec \d+, 2023 11:59 PM/)
       expect(container.textContent).toMatch(/Jan \d+, 2024 12:00 AM/)

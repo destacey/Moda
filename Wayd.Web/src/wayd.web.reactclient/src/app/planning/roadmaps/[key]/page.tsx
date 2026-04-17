@@ -1,6 +1,6 @@
 'use client'
 
-import { ModaDateRange, PageActions, PageTitle } from '@/src/components/common'
+import { WaydDateRange, PageActions, PageTitle } from '@/src/components/common'
 import useAuth from '@/src/components/contexts/auth'
 import { authorizePage } from '@/src/components/hoc'
 import { useAppDispatch, useDocumentTitle } from '@/src/hooks'
@@ -268,7 +268,7 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
         <>
           <Descriptions>
             <Item label="Dates">
-              <ModaDateRange
+              <WaydDateRange
                 dateRange={{ start: roadmapData.start, end: roadmapData.end }}
               />
             </Item>

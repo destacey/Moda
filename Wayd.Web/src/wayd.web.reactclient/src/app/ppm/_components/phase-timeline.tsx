@@ -3,7 +3,7 @@
 import { CheckCircleFilled, CloseCircleFilled } from '@ant-design/icons'
 import { ProjectPhaseListDto } from '@/src/services/wayd-api'
 import { Steps } from 'antd'
-import { ModaTooltip } from '@/src/components/common'
+import { WaydTooltip } from '@/src/components/common'
 import dayjs from 'dayjs'
 import { FC, useEffect, useRef, useState } from 'react'
 import styles from './phase-timeline.module.css'
@@ -42,27 +42,27 @@ function getIcon(status: PhaseStatus, tooltipContent: React.ReactNode) {
   switch (status) {
     case 'completed':
       return (
-        <ModaTooltip title={tooltipContent}>
+        <WaydTooltip title={tooltipContent}>
           <CheckCircleFilled className={styles.iconCompleted} />
-        </ModaTooltip>
+        </WaydTooltip>
       )
     case 'in-progress':
       return (
-        <ModaTooltip title={tooltipContent}>
+        <WaydTooltip title={tooltipContent}>
           <span className={styles.dotInProgress} />
-        </ModaTooltip>
+        </WaydTooltip>
       )
     case 'cancelled':
       return (
-        <ModaTooltip title={tooltipContent}>
+        <WaydTooltip title={tooltipContent}>
           <CloseCircleFilled className={styles.iconCancelled} />
-        </ModaTooltip>
+        </WaydTooltip>
       )
     default:
       return (
-        <ModaTooltip title={tooltipContent}>
+        <WaydTooltip title={tooltipContent}>
           <span className={styles.dotNotStarted} />
-        </ModaTooltip>
+        </WaydTooltip>
       )
   }
 }
@@ -175,11 +175,11 @@ const PhaseTimeline: FC<PhaseTimelineProps> = ({ phases, displayMode }) => {
     const tooltip = buildTooltip(phase, status, mode)
     return {
       title: (
-        <ModaTooltip title={tooltip}>
+        <WaydTooltip title={tooltip}>
           <span className={mode === 'small' ? styles.titleSmall : undefined}>
             {phase.name}
           </span>
-        </ModaTooltip>
+        </WaydTooltip>
       ),
       content: buildContent(phase, mode),
       status: mapStepStatus(status),

@@ -1,6 +1,6 @@
 'use client'
 
-import { ModaDateRange } from '@/src/components/common'
+import { WaydDateRange } from '@/src/components/common'
 import {
   ContentList,
   ExpandableContent,
@@ -93,7 +93,7 @@ const StrategicInitiativeDrawer: FC<StrategicInitiativeDrawerProps> = ({
             {strategicInitiativeData?.status.name}
           </LabeledContent>
           <LabeledContent label="Dates">
-            <ModaDateRange
+            <WaydDateRange
               dateRange={{
                 start: strategicInitiativeData?.start,
                 end: strategicInitiativeData?.end,

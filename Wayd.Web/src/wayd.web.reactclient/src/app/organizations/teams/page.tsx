@@ -1,7 +1,7 @@
 'use client'
 
 import PageTitle from '@/src/components/common/page-title'
-import ModaGrid from '../../../components/common/moda-grid'
+import WaydGrid from '../../../components/common/wayd-grid'
 import { useMemo } from 'react'
 import { ItemType } from 'antd/es/menu/interface'
 import { Button } from 'antd'
@@ -18,7 +18,7 @@ import { ModalCreateTeamForm } from '../_components/create-team-form'
 import {
   NestedTeamOfTeamsNameLinkCellRenderer,
   TeamNameLinkCellRenderer,
-} from '../../../components/common/moda-grid-cell-renderers'
+} from '../../../components/common/wayd-grid-cell-renderers'
 import { TeamListItem } from '../types'
 import { ColDef } from 'ag-grid-community'
 import { ControlItemSwitch } from '../../../components/common/control-items-menu'
@@ -106,7 +106,7 @@ const TeamListPage = () => {
   return (
     <>
       <PageTitle title="Teams" actions={actions()} />
-      <ModaGrid
+      <WaydGrid
         columnDefs={columnDefs}
         gridControlMenuItems={controlItems}
         rowData={teams}

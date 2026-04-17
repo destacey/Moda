@@ -9,7 +9,7 @@ const Column = dynamic(
 import { ColumnConfig } from '@ant-design/charts'
 import { Flex, Skeleton } from 'antd'
 import { DotChartOutlined } from '@ant-design/icons'
-import ModaEmpty from '../moda-empty'
+import WaydEmpty from '../wayd-empty'
 import useTheme from '../../contexts/theme'
 import { WorkItemListDto } from '@/src/services/wayd-api'
 
@@ -157,7 +157,7 @@ export const CycleTimeAnalysisChart: FC<CycleTimeAnalysisChartProps> = ({
   }
 
   if (chartData.length === 0) {
-    return <ModaEmpty message="No data available for chart" />
+    return <WaydEmpty message="No data available for chart" />
   }
 
   return (

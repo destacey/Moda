@@ -1,13 +1,13 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import ModaGrid from '../../../components/common/moda-grid'
+import WaydGrid from '../../../components/common/wayd-grid'
 import { TeamMembershipDto } from '@/src/services/wayd-api'
 import dayjs from 'dayjs'
 import {
   RowMenuCellRenderer,
   renderTeamLinkHelper,
-} from '../../../components/common/moda-grid-cell-renderers'
+} from '../../../components/common/wayd-grid-cell-renderers'
 import useAuth from '../../../components/contexts/auth'
 import { MenuProps } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
@@ -161,7 +161,7 @@ const TeamMembershipsGrid = ({
   }
   return (
     <>
-      <ModaGrid
+      <WaydGrid
         height={550}
         columnDefs={columnDefs}
         rowData={teamMemberships}

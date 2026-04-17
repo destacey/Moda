@@ -1,10 +1,10 @@
 'use client'
 
-import { ModaGrid } from '@/src/components/common'
+import { WaydGrid } from '@/src/components/common'
 import {
   LifecycleStatusTagCellRenderer,
   PortfolioLinkCellRenderer,
-} from '@/src/components/common/moda-grid-cell-renderers'
+} from '@/src/components/common/wayd-grid-cell-renderers'
 import {
   NavigationDto,
   StrategicInitiativeListDto,
@@ -93,7 +93,7 @@ const StrategicInitiativesGrid: FC<StrategicInitiativesGridProps> = (
   }
 
   return (
-    <ModaGrid
+    <WaydGrid
       columnDefs={columnDefs}
       rowData={props.strategicInitiatives}
       loadData={refresh}

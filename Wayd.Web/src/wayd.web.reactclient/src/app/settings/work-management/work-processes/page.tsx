@@ -1,6 +1,6 @@
 'use client'
 
-import { ModaGrid, PageTitle } from '@/src/components/common'
+import { WaydGrid, PageTitle } from '@/src/components/common'
 import { ControlItemSwitch } from '@/src/components/common/control-items-menu'
 import { authorizePage } from '@/src/components/hoc'
 import { useAppDispatch, useAppSelector, useDocumentTitle } from '@/src/hooks'
@@ -67,7 +67,7 @@ const WorkProcessesPage: React.FC = () => {
     <>
       <PageTitle title="Work Processes" />
 
-      <ModaGrid
+      <WaydGrid
         height={600}
         columnDefs={columnDefs}
         gridControlMenuItems={controlItems}

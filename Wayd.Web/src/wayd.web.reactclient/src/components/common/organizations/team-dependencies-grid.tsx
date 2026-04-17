@@ -4,13 +4,13 @@ import { DependencyDto, TeamDetailsDto } from '@/src/services/wayd-api'
 import { ColDef, ColGroupDef, GetRowIdParams } from 'ag-grid-community'
 import { CustomCellRendererProps } from 'ag-grid-react'
 import { FC, useMemo } from 'react'
-import ModaGrid from '../moda-grid'
+import WaydGrid from '../wayd-grid'
 import {
   DependencyHealthCellRenderer,
   renderSprintLinkHelper,
   renderTeamLinkHelper,
   renderWorkItemLinkHelper,
-} from '../moda-grid-cell-renderers'
+} from '../wayd-grid-cell-renderers'
 import { workItemKeyComparator } from '../work'
 
 export interface TeamDependenciesGridProps {
@@ -109,7 +109,7 @@ const TeamDependenciesGrid: FC<TeamDependenciesGridProps> = (props) => {
 
   return (
     <>
-      <ModaGrid
+      <WaydGrid
         height={550}
         columnDefs={columnDefs}
         rowData={props.dependencies}

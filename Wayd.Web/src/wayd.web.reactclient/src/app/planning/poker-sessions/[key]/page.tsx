@@ -17,7 +17,7 @@ import {
 } from '@/src/store/features/planning/poker-sessions-api'
 import { useGetProfileQuery } from '@/src/store/features/user-management/profile-api'
 import { Avatar, Button, Divider, Drawer, Flex, Grid, Tag } from 'antd'
-import { ModaTooltip } from '@/src/components/common'
+import { WaydTooltip } from '@/src/components/common'
 import { EditOutlined, LinkOutlined } from '@ant-design/icons'
 import { notFound, useParams, usePathname } from 'next/navigation'
 import {
@@ -289,14 +289,14 @@ const PokerSessionDetailPage: FC = () => {
           size="small"
         >
           {connectedParticipants.map((p) => (
-            <ModaTooltip key={p.id} title={p.name}>
+            <WaydTooltip key={p.id} title={p.name}>
               <Avatar
                 size="small"
                 style={{ backgroundColor: getAvatarColor(p.id) }}
               >
                 {p.name.charAt(0).toUpperCase()}
               </Avatar>
-            </ModaTooltip>
+            </WaydTooltip>
           ))}
         </AvatarGroup>
       )}

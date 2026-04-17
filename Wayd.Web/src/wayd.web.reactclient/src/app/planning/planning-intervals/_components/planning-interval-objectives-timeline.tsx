@@ -12,7 +12,7 @@ import {
 import {
   ModaDataGroup,
   ModaDataItem,
-  ModaTimeline,
+  WaydTimeline,
   ModaTimelineOptions,
   TimelineTemplate,
 } from '@/src/components/common/timeline'
@@ -150,7 +150,7 @@ const PlanningIntervalObjectivesTimeline = ({
         </Flex>
       )}
       <Card size="small" variant="borderless">
-        <ModaTimeline
+        <WaydTimeline
           data={combinedItems}
           groups={
             enableGroups

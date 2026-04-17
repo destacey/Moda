@@ -47,7 +47,7 @@ import {
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 
 import { generateCsv, downloadCsvWithTimestamp } from '@/src/utils/csv-utils'
-import { ModaEmpty } from '@/src/components/common'
+import { WaydEmpty } from '@/src/components/common'
 
 import { useRemainingHeight } from '@/src/hooks'
 import styles from './tree-grid.module.css'
@@ -797,7 +797,7 @@ function TreeGridInner<T extends TreeNode>(
                 colSpan={visibleColumnCount}
                 className={`${styles.td} ${styles.empty}`}
               >
-                <ModaEmpty message={emptyMessage} />
+                <WaydEmpty message={emptyMessage} />
               </td>
             </tr>
           ) : (
@@ -913,7 +913,7 @@ function TreeGridInner<T extends TreeNode>(
  * the tree-grid utility library into a single component with toolbar, inline
  * editing, drag-and-drop reordering, column filtering, and CSV export.
  *
- * Analogous to ModaGrid for ag-grid, but for hierarchical (tree) data.
+ * Analogous to WaydGrid for ag-grid, but for hierarchical (tree) data.
  */
 const TreeGrid = forwardRef(TreeGridInner) as <T extends TreeNode>(
   props: TreeGridProps<T> & { ref?: Ref<TreeGridHandle> },

@@ -1,11 +1,11 @@
 import React from 'react'
 import { render, screen } from '@testing-library/react'
 
-// Mock the ModaGrid component
+// Mock the WaydGrid component
 jest.mock('../index', () => ({
-  ModaGrid: jest.fn(
+  WaydGrid: jest.fn(
     ({ columnDefs, rowData, loadData, loading, height, emptyMessage }) => (
-      <div data-testid="moda-grid">
+      <div data-testid="wayd-grid">
         <div data-testid="row-count">{rowData?.length ?? 0}</div>
         <div data-testid="loading">{loading ? 'loading' : 'not-loading'}</div>
         <div data-testid="height">{height}</div>
@@ -22,7 +22,7 @@ jest.mock('../index', () => ({
 }))
 
 // Mock the TeamNameLinkCellRenderer
-jest.mock('../moda-grid-cell-renderers', () => ({
+jest.mock('../wayd-grid-cell-renderers', () => ({
   TeamNameLinkCellRenderer: jest.fn(({ data }) => (
     <div data-testid="team-link">{data?.name}</div>
   )),
@@ -62,7 +62,7 @@ describe('SprintsGrid', () => {
     jest.clearAllMocks()
   })
 
-  it('renders the ModaGrid component', () => {
+  it('renders the WaydGrid component', () => {
     render(
       <SprintsGrid
         sprints={mockSprints}
@@ -71,10 +71,10 @@ describe('SprintsGrid', () => {
       />,
     )
 
-    expect(screen.getByTestId('moda-grid')).toBeInTheDocument()
+    expect(screen.getByTestId('wayd-grid')).toBeInTheDocument()
   })
 
-  it('passes sprint data to ModaGrid', () => {
+  it('passes sprint data to WaydGrid', () => {
     render(
       <SprintsGrid
         sprints={mockSprints}
@@ -86,7 +86,7 @@ describe('SprintsGrid', () => {
     expect(screen.getByTestId('row-count')).toHaveTextContent('2')
   })
 
-  it('passes loading state to ModaGrid', () => {
+  it('passes loading state to WaydGrid', () => {
     render(
       <SprintsGrid
         sprints={mockSprints}
@@ -98,7 +98,7 @@ describe('SprintsGrid', () => {
     expect(screen.getByTestId('loading')).toHaveTextContent('loading')
   })
 
-  it('passes not loading state to ModaGrid', () => {
+  it('passes not loading state to WaydGrid', () => {
     render(
       <SprintsGrid
         sprints={mockSprints}
@@ -203,7 +203,7 @@ describe('SprintsGrid', () => {
   })
 
   it('respects hideTeam prop when provided', () => {
-    const ModaGrid = ModaGridModule.ModaGrid as jest.Mock
+    const WaydGrid = ModaGridModule.WaydGrid as jest.Mock
 
     render(
       <SprintsGrid
@@ -214,8 +214,8 @@ describe('SprintsGrid', () => {
       />,
     )
 
-    // Check that ModaGrid was called with column definitions
-    const mockCall = ModaGrid.mock.calls[0][0]
+    // Check that WaydGrid was called with column definitions
+    const mockCall = WaydGrid.mock.calls[0][0]
     const teamColumn = mockCall.columnDefs.find(
       (col: any) => col.field === 'team.name',
     )
@@ -225,7 +225,7 @@ describe('SprintsGrid', () => {
   })
 
   it('does not hide team column by default', () => {
-    const ModaGrid = ModaGridModule.ModaGrid as jest.Mock
+    const WaydGrid = ModaGridModule.WaydGrid as jest.Mock
 
     render(
       <SprintsGrid
@@ -235,8 +235,8 @@ describe('SprintsGrid', () => {
       />,
     )
 
-    // Check that ModaGrid was called with column definitions
-    const mockCall = ModaGrid.mock.calls[0][0]
+    // Check that WaydGrid was called with column definitions
+    const mockCall = WaydGrid.mock.calls[0][0]
     const teamColumn = mockCall.columnDefs.find(
       (col: any) => col.field === 'team.name',
     )
@@ -246,7 +246,7 @@ describe('SprintsGrid', () => {
   })
 
   it('defines all expected columns with correct fields', () => {
-    const ModaGrid = ModaGridModule.ModaGrid as jest.Mock
+    const WaydGrid = ModaGridModule.WaydGrid as jest.Mock
 
     render(
       <SprintsGrid
@@ -256,7 +256,7 @@ describe('SprintsGrid', () => {
       />,
     )
 
-    const mockCall = ModaGrid.mock.calls[0][0]
+    const mockCall = WaydGrid.mock.calls[0][0]
     const columnFields = mockCall.columnDefs.map((col: any) => col.field)
 
     expect(columnFields).toContain('key')

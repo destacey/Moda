@@ -1,6 +1,6 @@
 import { Button, Dropdown } from 'antd'
 import type { MenuProps } from 'antd'
-import ModaTooltip from '@/src/components/common/moda-tooltip'
+import WaydTooltip from '@/src/components/common/wayd-tooltip'
 import { FC, ReactNode } from 'react'
 import useTheme from '../contexts/theme'
 
@@ -60,7 +60,7 @@ const IconMenu: FC<IconMenuProps> = ({
   if (!icon || !items || items.length === 0) return null
 
   return (
-    <ModaTooltip title={tooltip}>
+    <WaydTooltip title={tooltip}>
       <Dropdown
         menu={{
           items: menuItems,
@@ -78,7 +78,7 @@ const IconMenu: FC<IconMenuProps> = ({
       >
         <Button type="text" shape="circle" icon={icon} />
       </Dropdown>
-    </ModaTooltip>
+    </WaydTooltip>
   )
 }
 

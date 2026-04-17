@@ -11,9 +11,9 @@ import {
   HealthCheckStatusCellRenderer,
   HealthCheckStatusColumn,
   NestedTeamNameLinkCellRenderer,
-} from '@/src/components/common/moda-grid-cell-renderers'
+} from '@/src/components/common/wayd-grid-cell-renderers'
 import dayjs from 'dayjs'
-import { ModaGrid } from '@/src/components/common'
+import { WaydGrid } from '@/src/components/common'
 import { Progress } from 'antd'
 import { useGetPlanningIntervalObjectivesHealthReportQuery } from '@/src/store/features/planning/planning-interval-api'
 
@@ -115,7 +115,7 @@ const ObjectiveHealthReportPage = (props: {
     <>
       <PageTitle title="PI Objectives Health Report" />
       {/* TODO:  setup dynamic height */}
-      <ModaGrid
+      <WaydGrid
         columnDefs={columnDefs}
         rowData={healthReport}
         loading={isLoading}

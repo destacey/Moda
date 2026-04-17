@@ -136,7 +136,7 @@ const MapAzdoWorkspaceTeamsForm = ({
     >
       <Flex gap="small" vertical style={{ marginBottom: '15px' }}>
         <Text type="secondary">
-          Map the Azure DevOps workspace teams to Moda teams.
+          Map the Azure DevOps workspace teams to Wayd teams.
         </Text>
         <Text>Workspace: {workspaceName}</Text>
       </Flex>

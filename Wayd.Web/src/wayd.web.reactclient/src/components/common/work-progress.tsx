@@ -2,7 +2,7 @@
 
 import { WorkItemProgressRollupDto } from '@/src/services/wayd-api'
 import { Progress } from 'antd'
-import ModaTooltip from '@/src/components/common/moda-tooltip'
+import WaydTooltip from '@/src/components/common/wayd-tooltip'
 import { round } from 'lodash'
 import { memo } from 'react'
 
@@ -71,7 +71,7 @@ const WorkProgress = memo(({ progress }: WorkProgressProps) => {
   return (
     <>
       {progressSummary.total > 0 && (
-        <ModaTooltip title={titleText}>
+        <WaydTooltip title={titleText}>
           <Progress
             percent={
               progressSummary.activePercentage + progressSummary.donePercentage
@@ -80,7 +80,7 @@ const WorkProgress = memo(({ progress }: WorkProgressProps) => {
             percentPosition={{ align: 'center', type: 'outer' }}
             success={{ percent: progressSummary.donePercentage }}
           />
-        </ModaTooltip>
+        </WaydTooltip>
       )}
     </>
   )

@@ -74,11 +74,11 @@ export default function ServiceUnavailablePage({
       <div className={styles.content}>
         <Result
         status={isAuthIssue ? 'warning' : 500}
-        title={isAuthIssue ? 'Session Error' : 'Moda API Unavailable'}
+        title={isAuthIssue ? 'Session Error' : 'Wayd API Unavailable'}
         subTitle={
           isAuthIssue
             ? 'The server is running, but your session could not be verified. Signing out and back in typically resolves this.'
-            : 'Moda is unable to connect to the server. Please try again later.'
+            : 'Wayd is unable to connect to the server. Please try again later.'
         }
         extra={
           <Space>

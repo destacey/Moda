@@ -58,7 +58,7 @@ const customPanelRender: ColorPickerProps['panelRender'] = (
   </Space>
 )
 
-const ModaColorPicker = forwardRef<ModaColorPickerRef, ModaColorPickerProps>(
+const WaydColorPicker = forwardRef<ModaColorPickerRef, ModaColorPickerProps>(
   (props, ref) => {
     const { value, onChange } = props
     const [isOpen, setIsOpen] = useState(false)
@@ -234,6 +234,6 @@ const ModaColorPicker = forwardRef<ModaColorPickerRef, ModaColorPickerProps>(
   },
 )
 
-ModaColorPicker.displayName = 'ModaColorPicker'
+WaydColorPicker.displayName = 'WaydColorPicker'
 
-export default ModaColorPicker
+export default WaydColorPicker

@@ -1,12 +1,12 @@
 'use client'
 
-import { ModaEmpty } from '@/src/components/common'
+import { WaydEmpty } from '@/src/components/common'
 import PhaseTimeline from '@/src/app/ppm/_components/phase-timeline'
 import ProjectTaskMetrics from '@/src/app/ppm/projects/_components/project-task-metrics'
 import { useGetProjectQuery } from '@/src/store/features/ppm/projects-api'
 import { LinkOutlined } from '@ant-design/icons'
 import { Button, Card, Flex, Skeleton, Typography } from 'antd'
-import { ModaTooltip } from '@/src/components/common'
+import { WaydTooltip } from '@/src/components/common'
 import Link from 'next/link'
 import { FC } from 'react'
 import ProjectDetailHeader from './project-detail-header'
@@ -70,17 +70,17 @@ const ProjectDetailContent: FC<{ projectKey: string }> = ({ projectKey }) => {
           <Flex vertical gap={8}>
             <Flex align="center" gap={4}>
               <Text strong style={{ fontSize: 13 }}>Project Plan</Text>
-              <ModaTooltip title="Open full project plan">
+              <WaydTooltip title="Open full project plan">
                 <Link href={`/ppm/projects/${project.key}#plan`}>
                   <Button type="text" size="small" icon={<LinkOutlined style={{ fontSize: 11 }} />} />
                 </Link>
-              </ModaTooltip>
+              </WaydTooltip>
             </Flex>
             <ProjectPlanView projectKey={project.key} />
           </Flex>
         </>
       ) : (
-        <ModaEmpty message="No project plan defined. Assign a project lifecycle to enable planning." />
+        <WaydEmpty message="No project plan defined. Assign a project lifecycle to enable planning." />
       )}
     </Flex>
   )

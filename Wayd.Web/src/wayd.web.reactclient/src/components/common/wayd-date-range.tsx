@@ -11,7 +11,7 @@ export interface ModaDateRangeProps {
   withTime?: boolean
 }
 
-const ModaDateRange = ({ dateRange, withTime = false }: ModaDateRangeProps) => {
+const WaydDateRange = ({ dateRange, withTime = false }: ModaDateRangeProps) => {
   if (!dateRange || !dateRange.start || !dateRange.end) return null
 
   const shortFormat = withTime ? SHORT_DATE_TIME_FORMAT : SHORT_DATE_FORMAT
@@ -28,4 +28,4 @@ const ModaDateRange = ({ dateRange, withTime = false }: ModaDateRangeProps) => {
   )
 }
 
-export default ModaDateRange
+export default WaydDateRange

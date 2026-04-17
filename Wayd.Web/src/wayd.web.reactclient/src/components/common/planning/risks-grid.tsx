@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
-import ModaGrid from '../moda-grid'
+import WaydGrid from '../wayd-grid'
 import { RiskListDto } from '@/src/services/wayd-api'
 import { ItemType } from 'antd/es/menu/interface'
 import { Button } from 'antd'
@@ -9,7 +9,7 @@ import useAuth from '../../contexts/auth'
 import CreateRiskForm from './create-risk-form'
 import { EditOutlined } from '@ant-design/icons'
 import EditRiskForm from './edit-risk-form'
-import { NestedTeamNameLinkCellRenderer } from '../moda-grid-cell-renderers'
+import { NestedTeamNameLinkCellRenderer } from '../wayd-grid-cell-renderers'
 import { ColDef } from 'ag-grid-community'
 import { ControlItemSwitch } from '../control-items-menu'
 
@@ -177,7 +177,7 @@ const RisksGrid = ({
   return (
     <>
       {/* TODO:  setup dynamic height */}
-      <ModaGrid
+      <WaydGrid
         height={gridHeight}
         columnDefs={columnDefs}
         rowData={risks}

@@ -2,7 +2,7 @@
 
 import PageTitle from '@/src/components/common/page-title'
 import { useEffect, useMemo, useState } from 'react'
-import ModaGrid from '@/src/components/common/moda-grid'
+import WaydGrid from '@/src/components/common/wayd-grid'
 import { authorizePage } from '@/src/components/hoc'
 import Link from 'next/link'
 import { Button } from 'antd'
@@ -55,7 +55,7 @@ const RoleListPage = () => {
     <>
       <PageTitle title="Roles" actions={actions()} />
 
-      <ModaGrid
+      <WaydGrid
         height={600}
         columnDefs={columnDefs}
         rowData={roleData}

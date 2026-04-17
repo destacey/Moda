@@ -1,13 +1,13 @@
 'use client'
 
 import React, { useMemo } from 'react'
-import ModaGrid from '../moda-grid'
+import WaydGrid from '../wayd-grid'
 import Link from 'next/link'
 import dayjs from 'dayjs'
 import {
   HealthCheckStatusCellRenderer,
   MarkdownCellRenderer,
-} from '../moda-grid-cell-renderers'
+} from '../wayd-grid-cell-renderers'
 import { HealthCheckDto } from '@/src/services/wayd-api'
 import { ColDef } from 'ag-grid-community'
 import { useGetHealthReportQuery } from '@/src/store/features/common/health-checks-api'
@@ -70,7 +70,7 @@ const HealthReportGrid = (props: HealthReportGridProps) => {
 
   return (
     <>
-      <ModaGrid
+      <WaydGrid
         height={550}
         columnDefs={columnDefs}
         rowData={healthReportData}

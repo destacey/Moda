@@ -12,7 +12,7 @@ import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import { useGetProjectsQuery } from '@/src/store/features/ppm/projects-api'
 import { QuestionCircleOutlined } from '@ant-design/icons'
 import { Button, Drawer, Grid, Tour } from 'antd'
-import { ModaTooltip } from '@/src/components/common'
+import { WaydTooltip } from '@/src/components/common'
 import { usePathname } from 'next/navigation'
 import { FC, useEffect, useState } from 'react'
 import MyProjectsDashboardFilterBar from './_components/filter-bar'
@@ -127,7 +127,7 @@ const MyProjectsPage: FC = () => {
       <PageTitle
         title="My Projects"
         actions={
-          <ModaTooltip title="Take a tour">
+          <WaydTooltip title="Take a tour">
             <Button
               type="text"
               shape="circle"
@@ -135,7 +135,7 @@ const MyProjectsPage: FC = () => {
               aria-label="Start dashboard tour"
               onClick={onTourStart}
             />
-          </ModaTooltip>
+          </WaydTooltip>
         }
       />
       <MyProjectsDashboardFilterBar

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import ModaGrid from '@/src/components/common/moda-grid'
+import WaydGrid from '@/src/components/common/wayd-grid'
 import {
   useDeleteTeamOperatingModelMutation,
   useGetTeamOperatingModelsQuery,
@@ -11,7 +11,7 @@ import {
   TeamOperatingModelDetailsDto,
 } from '@/src/services/wayd-api'
 import { useMessage } from '@/src/components/contexts/messaging'
-import { RowMenuCellRenderer } from '@/src/components/common/moda-grid-cell-renderers'
+import { RowMenuCellRenderer } from '@/src/components/common/wayd-grid-cell-renderers'
 import { Tag } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import dayjs from 'dayjs'
@@ -189,7 +189,7 @@ const TeamOperatingModelsGrid = ({
 
   return (
     <>
-      <ModaGrid
+      <WaydGrid
         height={550}
         columnDefs={columnDefs}
         rowData={operatingModelsData}

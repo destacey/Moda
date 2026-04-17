@@ -1,6 +1,6 @@
 'use client'
 
-import { ModaEmpty } from '@/src/components/common'
+import { WaydEmpty } from '@/src/components/common'
 import useAuth from '@/src/components/contexts/auth'
 import { ProjectListDto } from '@/src/services/wayd-api'
 import { useDebounce } from '@/src/hooks'
@@ -76,7 +76,7 @@ const PortfolioGroupList: FC<PortfolioGroupListProps> = ({
   }
 
   if (!projects || projects.length === 0) {
-    return <ModaEmpty message="No projects found" />
+    return <WaydEmpty message="No projects found" />
   }
 
   return (
@@ -90,7 +90,7 @@ const PortfolioGroupList: FC<PortfolioGroupListProps> = ({
         size="small"
       />
       {groups.length === 0 ? (
-        <ModaEmpty message="No matching projects" />
+        <WaydEmpty message="No matching projects" />
       ) : (
         groups.map((group) => (
           <PortfolioGroupSection

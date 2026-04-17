@@ -1,6 +1,6 @@
 'use client'
 
-import { ModaGrid } from '@/src/components/common'
+import { WaydGrid } from '@/src/components/common'
 import { RoadmapListDto } from '@/src/services/wayd-api'
 import { ColDef, ValueFormatterParams } from 'ag-grid-community'
 import dayjs from 'dayjs'
@@ -70,7 +70,7 @@ const RoadmapsGrid: FC<RoadmapsGridProps> = (props: RoadmapsGridProps) => {
   )
 
   return (
-    <ModaGrid
+    <WaydGrid
       height={props.gridHeight ?? 650}
       columnDefs={columnDefs}
       rowData={rowData}

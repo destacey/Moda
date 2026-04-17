@@ -1,5 +1,5 @@
 import { WorkItemListDto } from '@/src/services/wayd-api'
-import ModaEmpty from '../moda-empty'
+import WaydEmpty from '../wayd-empty'
 import { List } from 'antd'
 import WorkItemListItem from './work-item-list-item'
 
@@ -17,7 +17,7 @@ const WorkItemsListCard = ({
       size="small"
       loading={isLoading}
       dataSource={workItems}
-      locale={{ emptyText: <ModaEmpty message="No work items" /> }}
+      locale={{ emptyText: <WaydEmpty message="No work items" /> }}
       renderItem={(workItem) => <WorkItemListItem workItem={workItem} />}
     />
   )

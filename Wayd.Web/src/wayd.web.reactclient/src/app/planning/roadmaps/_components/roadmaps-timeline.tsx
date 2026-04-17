@@ -14,7 +14,7 @@ import {
 import { ControlItemsMenu } from '@/src/components/common/control-items-menu'
 import {
   ModaDataGroup,
-  ModaTimeline,
+  WaydTimeline,
   ModaTimelineOptions,
 } from '@/src/components/common/timeline'
 import {
@@ -431,7 +431,7 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
         </Flex>
       </Flex>
       <Card size="small" variant="borderless">
-        <ModaTimeline
+        <WaydTimeline
           data={filteredItems}
           groups={processedGroups}
           isLoading={props.isRoadmapItemsLoading}
