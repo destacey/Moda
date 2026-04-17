@@ -20,14 +20,14 @@ public sealed class RevokePersonalAccessTokenCommandValidator : CustomValidator<
 }
 
 internal sealed class RevokePersonalAccessTokenCommandHandler(
-    IModaDbContext dbContext,
+    IWaydDbContext dbContext,
     ICurrentUser currentUser,
     IDateTimeProvider dateTimeProvider,
     ILogger<RevokePersonalAccessTokenCommandHandler> logger) : ICommandHandler<RevokePersonalAccessTokenCommand>
 {
     private const string AppRequestName = nameof(RevokePersonalAccessTokenCommand);
 
-    private readonly IModaDbContext _dbContext = dbContext;
+    private readonly IWaydDbContext _dbContext = dbContext;
     private readonly ICurrentUser _currentUser = currentUser;
     private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
     private readonly ILogger<RevokePersonalAccessTokenCommandHandler> _logger = logger;

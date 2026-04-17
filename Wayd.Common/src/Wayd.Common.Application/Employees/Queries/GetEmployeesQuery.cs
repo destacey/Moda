@@ -8,9 +8,9 @@ public sealed record GetEmployeesQuery(bool IncludeInactive = false) : IQuery<IR
 
 internal sealed class GetEmployeesQueryHandler : IQueryHandler<GetEmployeesQuery, IReadOnlyList<EmployeeListDto>>
 {
-    private readonly IModaDbContext _modaDbContext;
+    private readonly IWaydDbContext _modaDbContext;
 
-    public GetEmployeesQueryHandler(IModaDbContext modaDbContext)
+    public GetEmployeesQueryHandler(IWaydDbContext modaDbContext)
     {
         _modaDbContext = modaDbContext;
     }

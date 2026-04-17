@@ -54,9 +54,9 @@ public sealed record CreateEmployeeCommand : ICommand<ObjectIdAndKey>
 
 public sealed class CreateEmployeeCommandValidator : CustomValidator<CreateEmployeeCommand>
 {
-    private readonly IModaDbContext _modaDbContext;
+    private readonly IWaydDbContext _modaDbContext;
 
-    public CreateEmployeeCommandValidator(IModaDbContext modaDbContext)
+    public CreateEmployeeCommandValidator(IWaydDbContext modaDbContext)
     {
         _modaDbContext = modaDbContext;
 
@@ -93,11 +93,11 @@ public sealed class CreateEmployeeCommandValidator : CustomValidator<CreateEmplo
 
 internal sealed class CreateEmployeeCommandHandler : ICommandHandler<CreateEmployeeCommand, ObjectIdAndKey>
 {
-    private readonly IModaDbContext _modaDbContext;
+    private readonly IWaydDbContext _modaDbContext;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ILogger<CreateEmployeeCommandHandler> _logger;
 
-    public CreateEmployeeCommandHandler(IModaDbContext modaDbContext, IDateTimeProvider dateTimeProvider, ILogger<CreateEmployeeCommandHandler> logger)
+    public CreateEmployeeCommandHandler(IWaydDbContext modaDbContext, IDateTimeProvider dateTimeProvider, ILogger<CreateEmployeeCommandHandler> logger)
     {
         _modaDbContext = modaDbContext;
         _dateTimeProvider = dateTimeProvider;

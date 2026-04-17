@@ -12,7 +12,7 @@ using Wayd.Infrastructure.Persistence.Context;
 
 namespace Wayd.Infrastructure.Migrators.MSSQL.Migrations
 {
-    [DbContext(typeof(ModaDbContext))]
+    [DbContext(typeof(WaydDbContext))]
     [Migration("20240428170744_Add-index-to-WorkItems-for-searching")]
     partial class AddindextoWorkItemsforsearching
     {

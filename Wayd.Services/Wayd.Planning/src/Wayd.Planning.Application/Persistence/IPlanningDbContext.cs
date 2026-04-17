@@ -4,7 +4,7 @@ using Wayd.Planning.Domain.Models.Roadmaps;
 
 namespace Wayd.Planning.Application.Persistence;
 
-public interface IPlanningDbContext : IModaDbContext
+public interface IPlanningDbContext : IWaydDbContext
 {
     DbSet<Iteration> Iterations { get; }
     DbSet<PlanningIntervalObjective> PlanningIntervalObjectives { get; }

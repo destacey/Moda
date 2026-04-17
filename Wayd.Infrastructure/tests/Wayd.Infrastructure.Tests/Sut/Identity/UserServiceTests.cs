@@ -27,7 +27,7 @@ public class UserServiceTests
     private readonly Mock<ISender> _mockSender;
     private readonly Mock<ICurrentUser> _mockCurrentUser;
 
-    // UserService depends on ModaDbContext and GraphServiceClient which are hard to mock.
+    // UserService depends on WaydDbContext and GraphServiceClient which are hard to mock.
     // We test the methods that primarily use UserManager.
 
     public UserServiceTests()
@@ -56,7 +56,7 @@ public class UserServiceTests
 
     private UserService CreateSut()
     {
-        // ModaDbContext and GraphServiceClient are required but not used by the methods we test
+        // WaydDbContext and GraphServiceClient are required but not used by the methods we test
         // (CreateAsync, UpdateAsync, ActivateUserAsync, DeactivateUserAsync, AssignRolesAsync).
         // We pass null! for them since those methods don't touch them.
         return new UserService(
@@ -64,7 +64,7 @@ public class UserServiceTests
             _mockSignInManager.Object,
             _mockUserManager.Object,
             _mockRoleManager.Object,
-            null!, // ModaDbContext - not used by these methods
+            null!, // WaydDbContext - not used by these methods
             _mockEvents.Object,
             null!, // GraphServiceClient - not used by these methods
             _mockSender.Object,

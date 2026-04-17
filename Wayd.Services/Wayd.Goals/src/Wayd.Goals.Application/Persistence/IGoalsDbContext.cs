@@ -2,7 +2,7 @@
 
 namespace Wayd.Goals.Application.Persistence;
 
-public interface IGoalsDbContext : IModaDbContext
+public interface IGoalsDbContext : IWaydDbContext
 {
     DbSet<Objective> Objectives { get; }
 }

@@ -12,7 +12,7 @@ using Wayd.Infrastructure.Persistence.Context;
 
 namespace Wayd.Infrastructure.Migrators.MSSQL.Migrations
 {
-    [DbContext(typeof(ModaDbContext))]
+    [DbContext(typeof(WaydDbContext))]
     [Migration("20240616155104_Add-IsDeleted-filter-to-indexes")]
     partial class AddIsDeletedfiltertoindexes
     {

@@ -11,7 +11,7 @@ using Wayd.Infrastructure.Persistence.Context;
 
 namespace Wayd.Infrastructure.Migrators.MSSQL.Migrations
 {
-    [DbContext(typeof(ModaDbContext))]
+    [DbContext(typeof(WaydDbContext))]
     [Migration("20230825222715_Rename-LocalId-to-Key")]
     partial class RenameLocalIdtoKey
     {

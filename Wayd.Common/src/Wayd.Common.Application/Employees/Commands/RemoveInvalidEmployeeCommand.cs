@@ -7,11 +7,11 @@ public sealed record RemoveInvalidEmployeeCommand(Guid Id) : ICommand<int>;
 
 internal sealed class RemoveInvalidEmployeeCommandHandler : ICommandHandler<RemoveInvalidEmployeeCommand, int>
 {
-    private readonly IModaDbContext _modaDbContext;
+    private readonly IWaydDbContext _modaDbContext;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ILogger<RemoveInvalidEmployeeCommandHandler> _logger;
 
-    public RemoveInvalidEmployeeCommandHandler(IModaDbContext modaDbContext, IDateTimeProvider dateTimeProvider, ILogger<RemoveInvalidEmployeeCommandHandler> logger)
+    public RemoveInvalidEmployeeCommandHandler(IWaydDbContext modaDbContext, IDateTimeProvider dateTimeProvider, ILogger<RemoveInvalidEmployeeCommandHandler> logger)
     {
         _modaDbContext = modaDbContext;
         _dateTimeProvider = dateTimeProvider;

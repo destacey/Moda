@@ -6,7 +6,7 @@ namespace Wayd.Infrastructure.Persistence.Initialization;
 
 public class FeatureFlagSeeder : ICustomSeeder
 {
-    public async Task Initialize(ModaDbContext dbContext, IDateTimeProvider dateTimeProvider, CancellationToken cancellationToken)
+    public async Task Initialize(WaydDbContext dbContext, IDateTimeProvider dateTimeProvider, CancellationToken cancellationToken)
     {
         var definitions = GetAllDefinitions();
         if (definitions.Length == 0)

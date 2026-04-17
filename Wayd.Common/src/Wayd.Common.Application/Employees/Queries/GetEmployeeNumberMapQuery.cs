@@ -16,9 +16,9 @@ public sealed record GetEmployeeNumberMapQuery : IQuery<IReadOnlyList<EmployeeNu
 
 internal sealed class GetEmployeeNumberMapQueryHandler : IQueryHandler<GetEmployeeNumberMapQuery, IReadOnlyList<EmployeeNumberMapDto>>
 {
-    private readonly IModaDbContext _modaDbContext;
+    private readonly IWaydDbContext _modaDbContext;
 
-    public GetEmployeeNumberMapQueryHandler(IModaDbContext modaDbContext)
+    public GetEmployeeNumberMapQueryHandler(IWaydDbContext modaDbContext)
     {
         _modaDbContext = modaDbContext;
     }

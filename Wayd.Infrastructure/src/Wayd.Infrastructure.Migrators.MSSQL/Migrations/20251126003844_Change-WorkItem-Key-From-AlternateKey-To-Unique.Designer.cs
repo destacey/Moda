@@ -12,7 +12,7 @@ using Wayd.Infrastructure.Persistence.Context;
 
 namespace Wayd.Infrastructure.Migrators.MSSQL.Migrations
 {
-    [DbContext(typeof(ModaDbContext))]
+    [DbContext(typeof(WaydDbContext))]
     [Migration("20251126003844_Change-WorkItem-Key-From-AlternateKey-To-Unique")]
     partial class ChangeWorkItemKeyFromAlternateKeyToUnique
     {

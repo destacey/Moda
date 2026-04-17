@@ -11,7 +11,7 @@ using Wayd.Infrastructure.Persistence.Context;
 
 namespace Wayd.Infrastructure.Migrators.MSSQL.Migrations
 {
-    [DbContext(typeof(ModaDbContext))]
+    [DbContext(typeof(WaydDbContext))]
     [Migration("20231223182420_Add-PI-Iteration-And-Update-Enum-DbConfig")]
     partial class AddPIIterationAndUpdateEnumDbConfig
     {

@@ -12,7 +12,7 @@ using Wayd.Infrastructure.Persistence.Context;
 
 namespace Wayd.Infrastructure.Migrators.MSSQL.Migrations
 {
-    [DbContext(typeof(ModaDbContext))]
+    [DbContext(typeof(WaydDbContext))]
     [Migration("20240609144717_Add-DoneTimestamp-to-WorkItem")]
     partial class AddDoneTimestamptoWorkItem
     {

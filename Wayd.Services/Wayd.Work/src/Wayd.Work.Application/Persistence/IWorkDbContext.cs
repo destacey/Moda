@@ -1,6 +1,6 @@
 ﻿namespace Wayd.Work.Application.Persistence;
 
-public interface IWorkDbContext : IModaDbContext
+public interface IWorkDbContext : IWaydDbContext
 {
     DbSet<WorkTypeHierarchy> WorkTypeHierarchies { get; }
     DbSet<Workflow> Workflows { get; }

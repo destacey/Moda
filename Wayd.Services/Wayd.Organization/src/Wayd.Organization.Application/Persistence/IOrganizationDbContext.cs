@@ -2,7 +2,7 @@
 
 namespace Wayd.Organization.Application.Persistence;
 
-public interface IOrganizationDbContext : IModaDbContext
+public interface IOrganizationDbContext : IWaydDbContext
 {
     DbSet<BaseTeam> BaseTeams { get; }
     DbSet<Team> Teams { get; }

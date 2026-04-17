@@ -12,7 +12,7 @@ using Wayd.Infrastructure.Persistence.Context;
 
 namespace Wayd.Infrastructure.Migrators.MSSQL.Migrations
 {
-    [DbContext(typeof(ModaDbContext))]
+    [DbContext(typeof(WaydDbContext))]
     [Migration("20241128155347_Add-Team-Dates-And-Graph-Tables")]
     partial class AddTeamDatesAndGraphTables
     {

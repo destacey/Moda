@@ -11,7 +11,7 @@ using Wayd.Infrastructure.Persistence.Context;
 
 namespace Wayd.Infrastructure.Migrators.MSSQL.Migrations
 {
-    [DbContext(typeof(ModaDbContext))]
+    [DbContext(typeof(WaydDbContext))]
     [Migration("20230409155730_Rename-TeamMemberhsip")]
     partial class RenameTeamMemberhsip
     {

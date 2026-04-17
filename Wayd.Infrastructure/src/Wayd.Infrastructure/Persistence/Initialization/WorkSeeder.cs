@@ -6,12 +6,12 @@ namespace Wayd.Infrastructure.Persistence.Initialization;
 
 public class WorkSeeder : ICustomSeeder
 {
-    public async Task Initialize(ModaDbContext dbContext, IDateTimeProvider dateTimeProvider, CancellationToken cancellationToken)
+    public async Task Initialize(WaydDbContext dbContext, IDateTimeProvider dateTimeProvider, CancellationToken cancellationToken)
     {
         await SeedWorkTypeLevelScheme(dbContext, dateTimeProvider, cancellationToken);
     }
 
-    public static async Task SeedWorkTypeLevelScheme(ModaDbContext dbContext, IDateTimeProvider dateTimeProvider, CancellationToken cancellationToken)
+    public static async Task SeedWorkTypeLevelScheme(WaydDbContext dbContext, IDateTimeProvider dateTimeProvider, CancellationToken cancellationToken)
     {
         Instant timestamp = dateTimeProvider.Now;
 

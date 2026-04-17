@@ -11,7 +11,7 @@ using Wayd.Infrastructure.Persistence.Context;
 
 namespace Wayd.Infrastructure.Migrators.MSSQL.Migrations
 {
-    [DbContext(typeof(ModaDbContext))]
+    [DbContext(typeof(WaydDbContext))]
     [Migration("20240120165116_Change-AuditTrail-CorrelationId-To-String")]
     partial class ChangeAuditTrailCorrelationIdToString
     {

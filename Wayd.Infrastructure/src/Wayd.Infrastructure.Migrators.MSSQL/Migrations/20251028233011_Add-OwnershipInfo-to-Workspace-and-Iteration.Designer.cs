@@ -12,7 +12,7 @@ using Wayd.Infrastructure.Persistence.Context;
 
 namespace Wayd.Infrastructure.Migrators.MSSQL.Migrations
 {
-    [DbContext(typeof(ModaDbContext))]
+    [DbContext(typeof(WaydDbContext))]
     [Migration("20251028233011_Add-OwnershipInfo-to-Workspace-and-Iteration")]
     partial class AddOwnershipInfotoWorkspaceandIteration
     {

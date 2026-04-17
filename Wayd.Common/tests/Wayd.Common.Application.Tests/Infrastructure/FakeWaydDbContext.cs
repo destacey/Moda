@@ -9,10 +9,10 @@ using Wayd.Tests.Shared.Infrastructure;
 namespace Wayd.Common.Application.Tests.Infrastructure;
 
 /// <summary>
-/// A test double for IModaDbContext that provides in-memory collections for all DbSets.
+/// A test double for IWaydDbContext that provides in-memory collections for all DbSets.
 /// This eliminates the need for complex Moq setups in tests and is reusable across all Common domain tests.
 /// </summary>
-public class FakeModaDbContext : IModaDbContext, IDisposable
+public class FakeWaydDbContext : IWaydDbContext, IDisposable
 {
     // Common domain entities
     private readonly List<Employee> _employees = [];
@@ -29,7 +29,7 @@ public class FakeModaDbContext : IModaDbContext, IDisposable
     // ChangeTracker - we can't create a real one, so we return null and the handler uses defensive coding (_dbContext.ChangeTracker?.Clear())
     public ChangeTracker ChangeTracker => null!;
 
-    public DatabaseFacade Database => throw new NotImplementedException("Database operations are not supported in FakeModaDbContext. Use integration tests with a real DbContext for database-specific functionality.");
+    public DatabaseFacade Database => throw new NotImplementedException("Database operations are not supported in FakeWaydDbContext. Use integration tests with a real DbContext for database-specific functionality.");
 
     /// <summary>
     /// Gets the number of times SaveChangesAsync has been called.

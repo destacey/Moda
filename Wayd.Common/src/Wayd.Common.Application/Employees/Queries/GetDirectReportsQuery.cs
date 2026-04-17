@@ -8,10 +8,10 @@ public sealed record GetDirectReportsQuery(Guid EmployeeId) : IQuery<IReadOnlyLi
 
 internal sealed class GetDirectReportsQueryHandler : IQueryHandler<GetDirectReportsQuery, IReadOnlyList<EmployeeListDto>>
 {
-    private readonly IModaDbContext _modaDbContext;
+    private readonly IWaydDbContext _modaDbContext;
     private readonly ILogger<GetDirectReportsQueryHandler> _logger;
 
-    public GetDirectReportsQueryHandler(IModaDbContext modaDbContext, ILogger<GetDirectReportsQueryHandler> logger)
+    public GetDirectReportsQueryHandler(IWaydDbContext modaDbContext, ILogger<GetDirectReportsQueryHandler> logger)
     {
         _modaDbContext = modaDbContext;
         _logger = logger;

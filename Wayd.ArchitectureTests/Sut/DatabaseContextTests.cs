@@ -106,15 +106,15 @@ public class DatabaseContextTests
         // Arrange
         var applicationAssemblies = AssemblyHelper.GetApplicationAssemblies();
 
-        // Act - Application should not reference ModaDbContext or other concrete implementations
+        // Act - Application should not reference WaydDbContext or other concrete implementations
         var result = Types.InAssemblies(applicationAssemblies)
             .ShouldNot()
-            .HaveDependencyOn("Wayd.Infrastructure.Persistence.Context.ModaDbContext")
+            .HaveDependencyOn("Wayd.Infrastructure.Persistence.Context.WaydDbContext")
             .GetResult();
 
         // Assert
         result.IsSuccessful.Should().BeTrue(
-            "Application layer should not reference concrete DbContext implementations. Use IModaDbContext interface instead. Violating types: {0}",
+            "Application layer should not reference concrete DbContext implementations. Use IWaydDbContext interface instead. Violating types: {0}",
             string.Join(", ", result.FailingTypes ?? []));
     }
 
@@ -131,7 +131,7 @@ public class DatabaseContextTests
             .And()
             .DoNotHaveNameEndingWith("IDbContext")
             .And()
-            .DoNotHaveNameEndingWith("IModaDbContext")
+            .DoNotHaveNameEndingWith("IWaydDbContext")
             .And()
             .AreClasses()
             .GetTypes()
@@ -149,12 +149,12 @@ public class DatabaseContextTests
         // Arrange
         var applicationAssemblies = AssemblyHelper.GetApplicationAssemblies();
 
-        // Act - This test verifies that IModaDbContext interface is available and used
+        // Act - This test verifies that IWaydDbContext interface is available and used
         var typesUsingDbContext = Types.InAssemblies(applicationAssemblies)
             .GetTypes()
             .Where(t => t.GetConstructors().Any(c =>
                 c.GetParameters().Any(p =>
-                    p.ParameterType.Name == "IModaDbContext")))
+                    p.ParameterType.Name == "IWaydDbContext")))
             .ToList();
 
         // Assert - This is informational, just ensuring the pattern exists
@@ -170,9 +170,9 @@ public class DatabaseContextTests
     public void InfrastructureLayer_ShouldContainDbContextImplementation()
     {
         // Arrange - Force assembly load using typeof
-        var assembly = typeof(ModaDbContext).Assembly;
+        var assembly = typeof(WaydDbContext).Assembly;
 
-        // Act - Look for ModaDbContext in Infrastructure
+        // Act - Look for WaydDbContext in Infrastructure
         var dbContextTypes = Types.InAssembly(assembly)
             .That()
             .HaveNameEndingWith("DbContext")
@@ -185,8 +185,8 @@ public class DatabaseContextTests
         dbContextTypes.Should().NotBeEmpty(
             "Infrastructure layer should contain DbContext implementation(s)");
 
-        dbContextTypes.Should().Contain(t => t.Name == "ModaDbContext",
-            "Infrastructure should contain the main ModaDbContext class");
+        dbContextTypes.Should().Contain(t => t.Name == "WaydDbContext",
+            "Infrastructure should contain the main WaydDbContext class");
     }
 
     [Fact]
@@ -266,15 +266,15 @@ public class DatabaseContextTests
             return;
         }
 
-        // Act - Integration layer should not reference ModaDbContext
+        // Act - Integration layer should not reference WaydDbContext
         var result = Types.InAssemblies(integrationAssemblies)
             .ShouldNot()
-            .HaveDependencyOn("Wayd.Infrastructure.Persistence.Context.ModaDbContext")
+            .HaveDependencyOn("Wayd.Infrastructure.Persistence.Context.WaydDbContext")
             .GetResult();
 
         // Assert
         result.IsSuccessful.Should().BeTrue(
-            "Integration layer should not reference concrete DbContext implementations. Use IModaDbContext interface if needed. Violating types: {0}",
+            "Integration layer should not reference concrete DbContext implementations. Use IWaydDbContext interface if needed. Violating types: {0}",
             string.Join(", ", result.FailingTypes ?? []));
     }
 
@@ -304,12 +304,12 @@ public class DatabaseContextTests
     public void CommonApplication_CanDefineIDbContextInterface()
     {
         // Arrange - Force assembly load using typeof
-        var assembly = typeof(Wayd.Common.Application.Persistence.IModaDbContext).Assembly;
+        var assembly = typeof(Wayd.Common.Application.Persistence.IWaydDbContext).Assembly;
 
-        // Act - Look for IModaDbContext interface definition
+        // Act - Look for IWaydDbContext interface definition
         var dbContextInterface = Types.InAssembly(assembly)
             .That()
-            .HaveNameEndingWith("IModaDbContext")
+            .HaveNameEndingWith("IWaydDbContext")
             .Or()
             .HaveNameEndingWith("IDbContext")
             .GetTypes()
@@ -318,14 +318,14 @@ public class DatabaseContextTests
 
         // Assert - This is informational - Common.Application SHOULD define the interface
         dbContextInterface.Should().NotBeEmpty(
-            "Wayd.Common.Application should define the IModaDbContext interface for use by Application layers");
+            "Wayd.Common.Application should define the IWaydDbContext interface for use by Application layers");
     }
 
     [Fact]
     public void CommonApplication_ShouldNotImplementDbContext()
     {
         // Arrange - Force assembly load using typeof
-        var assembly = typeof(Wayd.Common.Application.Persistence.IModaDbContext).Assembly;
+        var assembly = typeof(Wayd.Common.Application.Persistence.IWaydDbContext).Assembly;
 
         // Act - Look for concrete DbContext implementations (should be in Infrastructure only)
         var dbContextImplementations = Types.InAssembly(assembly)

@@ -20,13 +20,13 @@ public sealed class DeletePersonalAccessTokenCommandValidator : CustomValidator<
 }
 
 internal sealed class DeletePersonalAccessTokenCommandHandler(
-    IModaDbContext dbContext,
+    IWaydDbContext dbContext,
     ICurrentUser currentUser,
     ILogger<DeletePersonalAccessTokenCommandHandler> logger) : ICommandHandler<DeletePersonalAccessTokenCommand>
 {
     private const string AppRequestName = nameof(DeletePersonalAccessTokenCommand);
 
-    private readonly IModaDbContext _dbContext = dbContext;
+    private readonly IWaydDbContext _dbContext = dbContext;
     private readonly ICurrentUser _currentUser = currentUser;
     private readonly ILogger<DeletePersonalAccessTokenCommandHandler> _logger = logger;
 

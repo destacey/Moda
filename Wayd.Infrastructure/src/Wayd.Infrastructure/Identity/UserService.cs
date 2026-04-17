@@ -13,7 +13,7 @@ internal partial class UserService(
     SignInManager<ApplicationUser> signInManager,
     UserManager<ApplicationUser> userManager,
     RoleManager<ApplicationRole> roleManager,
-    ModaDbContext db,
+    WaydDbContext db,
     IEventPublisher events,
     GraphServiceClient graphServiceClient,
     ISender sender,
@@ -24,7 +24,7 @@ internal partial class UserService(
     private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
     private readonly UserManager<ApplicationUser> _userManager = userManager;
     private readonly RoleManager<ApplicationRole> _roleManager = roleManager;
-    private readonly ModaDbContext _db = db;
+    private readonly WaydDbContext _db = db;
     private readonly IEventPublisher _events = events;
     private readonly GraphServiceClient _graphServiceClient = graphServiceClient;
     private readonly ISender _sender = sender;

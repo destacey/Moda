@@ -9,9 +9,9 @@ namespace Wayd.Common.Application.Identity.PersonalAccessTokens.Queries;
 /// </summary>
 public sealed record GetMyPersonalAccessTokensQuery : IQuery<Result<List<PersonalAccessTokenDto>>>;
 
-internal sealed class GetMyPersonalAccessTokensQueryHandler(IModaDbContext dbContext, ICurrentUser currentUser) : IQueryHandler<GetMyPersonalAccessTokensQuery, Result<List<PersonalAccessTokenDto>>>
+internal sealed class GetMyPersonalAccessTokensQueryHandler(IWaydDbContext dbContext, ICurrentUser currentUser) : IQueryHandler<GetMyPersonalAccessTokensQuery, Result<List<PersonalAccessTokenDto>>>
 {
-    private readonly IModaDbContext _dbContext = dbContext;
+    private readonly IWaydDbContext _dbContext = dbContext;
     private readonly ICurrentUser _currentUser = currentUser;
 
     public async Task<Result<List<PersonalAccessTokenDto>>> Handle(GetMyPersonalAccessTokensQuery request, CancellationToken cancellationToken)

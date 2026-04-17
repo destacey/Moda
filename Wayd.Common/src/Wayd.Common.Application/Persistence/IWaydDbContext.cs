@@ -5,7 +5,7 @@ using Wayd.Common.Domain.Identity;
 
 namespace Wayd.Common.Application.Persistence;
 
-public interface IModaDbContext
+public interface IWaydDbContext
 {
     // this dependency is bigger than needed, but most of the extensions methods are leveraging it.
     DatabaseFacade Database { get; }

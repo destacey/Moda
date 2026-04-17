@@ -11,8 +11,8 @@ using Wayd.Infrastructure.Persistence.Context;
 
 namespace Wayd.Infrastructure.Migrators.MSSQL.Migrations
 {
-    [DbContext(typeof(ModaDbContext))]
-    partial class ModaDbContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(WaydDbContext))]
+    partial class WaydDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {

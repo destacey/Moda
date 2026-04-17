@@ -12,7 +12,7 @@ using Wayd.Infrastructure.Persistence.Context;
 
 namespace Wayd.Infrastructure.Migrators.MSSQL.Migrations
 {
-    [DbContext(typeof(ModaDbContext))]
+    [DbContext(typeof(WaydDbContext))]
     [Migration("20240804143953_Add-WorkTeam-and-update-PlanningTeam-configuration")]
     partial class AddWorkTeamandupdatePlanningTeamconfiguration
     {

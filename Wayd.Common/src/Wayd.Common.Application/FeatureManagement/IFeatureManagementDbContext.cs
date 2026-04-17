@@ -3,7 +3,7 @@ using Wayd.Common.Domain.FeatureManagement;
 
 namespace Wayd.Common.Application.FeatureManagement;
 
-public interface IFeatureManagementDbContext : IModaDbContext
+public interface IFeatureManagementDbContext : IWaydDbContext
 {
     DbSet<FeatureFlag> FeatureFlags { get; }
 }

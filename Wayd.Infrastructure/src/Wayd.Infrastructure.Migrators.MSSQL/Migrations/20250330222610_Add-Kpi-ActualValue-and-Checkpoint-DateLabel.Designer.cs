@@ -12,7 +12,7 @@ using Wayd.Infrastructure.Persistence.Context;
 
 namespace Wayd.Infrastructure.Migrators.MSSQL.Migrations
 {
-    [DbContext(typeof(ModaDbContext))]
+    [DbContext(typeof(WaydDbContext))]
     [Migration("20250330222610_Add-Kpi-ActualValue-and-Checkpoint-DateLabel")]
     partial class AddKpiActualValueandCheckpointDateLabel
     {

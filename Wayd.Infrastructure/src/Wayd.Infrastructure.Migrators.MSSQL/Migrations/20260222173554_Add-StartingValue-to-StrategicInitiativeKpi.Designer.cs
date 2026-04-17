@@ -12,7 +12,7 @@ using Wayd.Infrastructure.Persistence.Context;
 
 namespace Wayd.Infrastructure.Migrators.MSSQL.Migrations
 {
-    [DbContext(typeof(ModaDbContext))]
+    [DbContext(typeof(WaydDbContext))]
     [Migration("20260222173554_Add-StartingValue-to-StrategicInitiativeKpi")]
     partial class AddStartingValuetoStrategicInitiativeKpi
     {

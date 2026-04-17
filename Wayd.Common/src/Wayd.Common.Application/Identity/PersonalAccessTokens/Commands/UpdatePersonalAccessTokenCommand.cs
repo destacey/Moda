@@ -11,12 +11,12 @@ public sealed class UpdatePersonalAccessTokenCommandValidator : CustomValidator<
 {
     private const int MaxExpirationDays = 730; // 2 years
 
-    private readonly IModaDbContext _dbContext;
+    private readonly IWaydDbContext _dbContext;
     private readonly ICurrentUser _currentUser;
     private readonly IDateTimeProvider _dateTimeProvider;
 
     public UpdatePersonalAccessTokenCommandValidator(
-        IModaDbContext dbContext,
+        IWaydDbContext dbContext,
         ICurrentUser currentUser,
         IDateTimeProvider dateTimeProvider)
     {
@@ -58,14 +58,14 @@ public sealed class UpdatePersonalAccessTokenCommandValidator : CustomValidator<
 }
 
 internal sealed class UpdatePersonalAccessTokenCommandHandler(
-    IModaDbContext dbContext,
+    IWaydDbContext dbContext,
     ICurrentUser currentUser,
     IDateTimeProvider dateTimeProvider,
     ILogger<UpdatePersonalAccessTokenCommandHandler> logger) : ICommandHandler<UpdatePersonalAccessTokenCommand>
 {
     private const string AppRequestName = nameof(UpdatePersonalAccessTokenCommand);
 
-    private readonly IModaDbContext _dbContext = dbContext;
+    private readonly IWaydDbContext _dbContext = dbContext;
     private readonly ICurrentUser _currentUser = currentUser;
     private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
     private readonly ILogger<UpdatePersonalAccessTokenCommandHandler> _logger = logger;

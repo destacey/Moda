@@ -3,7 +3,7 @@ using Wayd.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 
 namespace Wayd.ProjectPortfolioManagement.Application;
 
-public interface IProjectPortfolioManagementDbContext : IModaDbContext
+public interface IProjectPortfolioManagementDbContext : IWaydDbContext
 {
     DbSet<ExpenditureCategory> ExpenditureCategories { get; }
     DbSet<ProjectPortfolio> Portfolios { get; }

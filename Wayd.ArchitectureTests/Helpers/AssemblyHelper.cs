@@ -142,7 +142,7 @@ public static class AssemblyHelper
     /// </summary>
     public static System.Reflection.Assembly GetCommonApplicationAssembly()
     {
-        return typeof(Wayd.Common.Application.Persistence.IModaDbContext).Assembly;
+        return typeof(Wayd.Common.Application.Persistence.IWaydDbContext).Assembly;
     }
 
     /// <summary>
@@ -170,7 +170,7 @@ public static class AssemblyHelper
     /// </summary>
     public static System.Reflection.Assembly GetInfrastructureAssembly()
     {
-        return typeof(Wayd.Infrastructure.Persistence.Context.ModaDbContext).Assembly;
+        return typeof(Wayd.Infrastructure.Persistence.Context.WaydDbContext).Assembly;
     }
 
     #endregion

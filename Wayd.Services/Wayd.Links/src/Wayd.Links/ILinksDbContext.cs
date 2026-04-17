@@ -4,7 +4,7 @@ using Wayd.Links.Models;
 
 namespace Wayd.Links;
 
-public interface ILinksDbContext : IModaDbContext
+public interface ILinksDbContext : IWaydDbContext
 {
     DbSet<Link> Links { get; }
 }

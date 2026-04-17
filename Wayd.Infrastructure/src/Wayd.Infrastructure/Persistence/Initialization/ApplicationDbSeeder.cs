@@ -19,7 +19,7 @@ internal class ApplicationDbSeeder
         _dateTimeProvider = dateTimeProvider;
     }
 
-    public async Task SeedDatabase(ModaDbContext dbContext, CancellationToken cancellationToken)
+    public async Task SeedDatabase(WaydDbContext dbContext, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Seeding Database");
 
@@ -29,7 +29,7 @@ internal class ApplicationDbSeeder
         _logger.LogInformation("Database Seeding Complete.");
     }
 
-    private async Task SeedRoles(ModaDbContext dbContext)
+    private async Task SeedRoles(WaydDbContext dbContext)
     {
         _logger.LogInformation("Seeding Roles");
 
@@ -60,7 +60,7 @@ internal class ApplicationDbSeeder
         _logger.LogInformation("Roles Seeding Complete.");
     }
 
-    private async Task AssignPermissionsToRole(ModaDbContext dbContext, IReadOnlyList<ApplicationPermission> permissions, ApplicationRole role)
+    private async Task AssignPermissionsToRole(WaydDbContext dbContext, IReadOnlyList<ApplicationPermission> permissions, ApplicationRole role)
     {
         try
         {

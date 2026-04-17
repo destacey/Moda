@@ -39,7 +39,7 @@ public class RoleServiceTests
         return new RoleService(
             _mockRoleManager.Object,
             _mockUserManager.Object,
-            null!, // ModaDbContext - not used by Create/Delete methods
+            null!, // WaydDbContext - not used by Create/Delete methods
             _mockCurrentUser.Object,
             _mockEvents.Object,
             _dateTimeProvider);

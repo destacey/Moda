@@ -37,7 +37,7 @@ internal static class ConfigureServices
         return services
             .Configure<DatabaseSettings>(config.GetSection(nameof(DatabaseSettings)))
 
-            .AddDbContext<ModaDbContext>(m => m.UseDatabase(dbProvider, rootConnectionString))
+            .AddDbContext<WaydDbContext>(m => m.UseDatabase(dbProvider, rootConnectionString))
             .AddDomainDbContexts()
 
             .AddTransient<IDatabaseInitializer, DatabaseInitializer>()
@@ -76,17 +76,17 @@ internal static class ConfigureServices
 
     private static IServiceCollection AddDomainDbContexts(this IServiceCollection services)
     {
-        services.AddScoped<IModaDbContext, ModaDbContext>();
-        services.AddScoped<IAppIntegrationDbContext, ModaDbContext>();
-        services.AddScoped<IFeatureManagementDbContext, ModaDbContext>();
-        services.AddScoped<IGoalsDbContext, ModaDbContext>();
-        services.AddScoped<IHealthDbContext, ModaDbContext>();
-        services.AddScoped<ILinksDbContext, ModaDbContext>();
-        services.AddScoped<IOrganizationDbContext, ModaDbContext>();
-        services.AddScoped<IPlanningDbContext, ModaDbContext>();
-        services.AddScoped<IProjectPortfolioManagementDbContext, ModaDbContext>();
-        services.AddScoped<IStrategicManagementDbContext, ModaDbContext>();
-        services.AddScoped<IWorkDbContext, ModaDbContext>();
+        services.AddScoped<IWaydDbContext, WaydDbContext>();
+        services.AddScoped<IAppIntegrationDbContext, WaydDbContext>();
+        services.AddScoped<IFeatureManagementDbContext, WaydDbContext>();
+        services.AddScoped<IGoalsDbContext, WaydDbContext>();
+        services.AddScoped<IHealthDbContext, WaydDbContext>();
+        services.AddScoped<ILinksDbContext, WaydDbContext>();
+        services.AddScoped<IOrganizationDbContext, WaydDbContext>();
+        services.AddScoped<IPlanningDbContext, WaydDbContext>();
+        services.AddScoped<IProjectPortfolioManagementDbContext, WaydDbContext>();
+        services.AddScoped<IStrategicManagementDbContext, WaydDbContext>();
+        services.AddScoped<IWorkDbContext, WaydDbContext>();
 
         return services;
     }

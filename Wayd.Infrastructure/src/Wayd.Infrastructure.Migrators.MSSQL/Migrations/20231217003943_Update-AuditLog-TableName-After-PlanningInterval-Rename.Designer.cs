@@ -11,7 +11,7 @@ using Wayd.Infrastructure.Persistence.Context;
 
 namespace Wayd.Infrastructure.Migrators.MSSQL.Migrations
 {
-    [DbContext(typeof(ModaDbContext))]
+    [DbContext(typeof(WaydDbContext))]
     [Migration("20231217003943_Update-AuditLog-TableName-After-PlanningInterval-Rename")]
     partial class UpdateAuditLogTableNameAfterPlanningIntervalRename
     {

@@ -17,10 +17,10 @@ public sealed record GetEmployeeQuery : IQuery<EmployeeDetailsDto?>
 }
 
 internal sealed class GetEmployeeQueryHandler(
-    IModaDbContext modaDbContext)
+    IWaydDbContext modaDbContext)
     : IQueryHandler<GetEmployeeQuery, EmployeeDetailsDto?>
 {
-    private readonly IModaDbContext _modaDbContext = modaDbContext;
+    private readonly IWaydDbContext _modaDbContext = modaDbContext;
 
     public async Task<EmployeeDetailsDto?> Handle(GetEmployeeQuery request, CancellationToken cancellationToken)
     {

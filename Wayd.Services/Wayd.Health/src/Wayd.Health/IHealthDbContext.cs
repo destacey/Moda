@@ -4,7 +4,7 @@ using Wayd.Health.Models;
 
 namespace Wayd.Health;
 
-public interface IHealthDbContext : IModaDbContext
+public interface IHealthDbContext : IWaydDbContext
 {
     DbSet<HealthCheck> HealthChecks { get; }
 }

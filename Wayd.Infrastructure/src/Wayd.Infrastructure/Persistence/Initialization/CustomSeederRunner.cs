@@ -5,10 +5,10 @@ namespace Wayd.Infrastructure.Persistence.Initialization;
 internal class CustomSeederRunner
 {
     private readonly ICustomSeeder[] _seeders;
-    private readonly ModaDbContext _dbContext;
+    private readonly WaydDbContext _dbContext;
     private readonly IDateTimeProvider _dateTimeProvider;
 
-    public CustomSeederRunner(IServiceProvider serviceProvider, ModaDbContext dbContext, IDateTimeProvider dateTimeProvider)
+    public CustomSeederRunner(IServiceProvider serviceProvider, WaydDbContext dbContext, IDateTimeProvider dateTimeProvider)
     {
         _seeders = serviceProvider.GetServices<ICustomSeeder>().ToArray();
         _dbContext = dbContext;

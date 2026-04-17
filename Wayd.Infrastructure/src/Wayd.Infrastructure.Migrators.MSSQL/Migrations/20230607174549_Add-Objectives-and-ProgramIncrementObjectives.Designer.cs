@@ -11,7 +11,7 @@ using Wayd.Infrastructure.Persistence.Context;
 
 namespace Wayd.Infrastructure.Migrators.MSSQL.Migrations
 {
-    [DbContext(typeof(ModaDbContext))]
+    [DbContext(typeof(WaydDbContext))]
     [Migration("20230607174549_Add-Objectives-and-ProgramIncrementObjectives")]
     partial class AddObjectivesandProgramIncrementObjectives
     {

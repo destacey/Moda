@@ -16,7 +16,7 @@ namespace Wayd.Infrastructure.Auth.PersonalAccessToken;
 /// </summary>
 public class PersonalAccessTokenAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {
-    private readonly ModaDbContext _dbContext;
+    private readonly WaydDbContext _dbContext;
     private readonly ITokenHashingService _tokenHashingService;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IServiceProvider _serviceProvider;
@@ -26,7 +26,7 @@ public class PersonalAccessTokenAuthenticationHandler : AuthenticationHandler<Au
         IOptionsMonitor<AuthenticationSchemeOptions> options,
         ILoggerFactory loggerFactory,
         UrlEncoder encoder,
-        ModaDbContext dbContext,
+        WaydDbContext dbContext,
         ITokenHashingService tokenHashingService,
         IDateTimeProvider dateTimeProvider,
         IServiceProvider serviceProvider)
@@ -117,7 +117,7 @@ public class PersonalAccessTokenAuthenticationHandler : AuthenticationHandler<Au
                     try
                     {
                         using var scope = _serviceProvider.CreateScope();
-                        var dbContext = scope.ServiceProvider.GetRequiredService<ModaDbContext>();
+                        var dbContext = scope.ServiceProvider.GetRequiredService<WaydDbContext>();
                         var dateTimeProvider = scope.ServiceProvider.GetRequiredService<IDateTimeProvider>();
 
                         var token = await dbContext.PersonalAccessTokens

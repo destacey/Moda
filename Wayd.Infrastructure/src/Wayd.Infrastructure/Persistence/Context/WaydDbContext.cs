@@ -29,9 +29,9 @@ using StrategicTheme = Wayd.StrategicManagement.Domain.Models.StrategicTheme;
 
 namespace Wayd.Infrastructure.Persistence.Context;
 
-public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IFeatureManagementDbContext, IGoalsDbContext, IHealthDbContext, ILinksDbContext, IOrganizationDbContext, IPlanningDbContext, IProjectPortfolioManagementDbContext, IStrategicManagementDbContext, IWorkDbContext
+public class WaydDbContext : BaseDbContext, IAppIntegrationDbContext, IFeatureManagementDbContext, IGoalsDbContext, IHealthDbContext, ILinksDbContext, IOrganizationDbContext, IPlanningDbContext, IProjectPortfolioManagementDbContext, IStrategicManagementDbContext, IWorkDbContext
 {
-    public ModaDbContext(DbContextOptions options, ICurrentUser currentUser, IDateTimeProvider dateTimeProvider, IOptions<DatabaseSettings> dbSettings, IEventPublisher events, IRequestCorrelationIdProvider requestCorrelationIdProvider)
+    public WaydDbContext(DbContextOptions options, ICurrentUser currentUser, IDateTimeProvider dateTimeProvider, IOptions<DatabaseSettings> dbSettings, IEventPublisher events, IRequestCorrelationIdProvider requestCorrelationIdProvider)
         : base(options, currentUser, dateTimeProvider, dbSettings, events, requestCorrelationIdProvider)
     {
     }

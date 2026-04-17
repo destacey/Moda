@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Wayd.Infrastructure.Auditing;
 
-public class AuditService(ModaDbContext context) : IAuditService
+public class AuditService(WaydDbContext context) : IAuditService
 {
-    private readonly ModaDbContext _context = context;
+    private readonly WaydDbContext _context = context;
 
     public async Task<List<AuditDto>> GetUserTrailsAsync(string userId)
     {

@@ -12,7 +12,7 @@ using Wayd.Infrastructure.Persistence.Context;
 
 namespace Wayd.Infrastructure.Migrators.MSSQL.Migrations
 {
-    [DbContext(typeof(ModaDbContext))]
+    [DbContext(typeof(WaydDbContext))]
     [Migration("20241012133336_Migrate-Roadmap-children-to-RoadmapItems")]
     partial class MigrateRoadmapchildrentoRoadmapItems
     {

@@ -32,7 +32,7 @@ public class UserActivityBackgroundService(
             try
             {
                 using var scope = _serviceProvider.CreateScope();
-                var dbContext = scope.ServiceProvider.GetRequiredService<ModaDbContext>();
+                var dbContext = scope.ServiceProvider.GetRequiredService<WaydDbContext>();
                 var dateTimeProvider = scope.ServiceProvider.GetRequiredService<IDateTimeProvider>();
 
                 var user = await dbContext.Users

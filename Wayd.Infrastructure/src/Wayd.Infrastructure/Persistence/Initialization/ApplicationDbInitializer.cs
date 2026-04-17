@@ -5,11 +5,11 @@ namespace Wayd.Infrastructure.Persistence.Initialization;
 
 internal class ApplicationDbInitializer
 {
-    private readonly ModaDbContext _dbContext;
+    private readonly WaydDbContext _dbContext;
     private readonly ApplicationDbSeeder _dbSeeder;
     private readonly ILogger<ApplicationDbInitializer> _logger;
 
-    public ApplicationDbInitializer(ModaDbContext dbContext, ApplicationDbSeeder dbSeeder, ILogger<ApplicationDbInitializer> logger)
+    public ApplicationDbInitializer(WaydDbContext dbContext, ApplicationDbSeeder dbSeeder, ILogger<ApplicationDbInitializer> logger)
     {
         _dbContext = dbContext;
         _dbSeeder = dbSeeder;

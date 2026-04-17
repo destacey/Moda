@@ -6,7 +6,7 @@ namespace Wayd.Infrastructure.Persistence.Initialization;
 
 public class EstimationScaleSeeder : ICustomSeeder
 {
-    public async Task Initialize(ModaDbContext dbContext, IDateTimeProvider dateTimeProvider, CancellationToken cancellationToken)
+    public async Task Initialize(WaydDbContext dbContext, IDateTimeProvider dateTimeProvider, CancellationToken cancellationToken)
     {
         if (await dbContext.EstimationScales.AnyAsync(cancellationToken))
             return;

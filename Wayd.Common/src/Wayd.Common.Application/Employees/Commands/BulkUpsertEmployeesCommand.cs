@@ -33,9 +33,9 @@ public sealed class BulkUpsertEmployeesCommandValidator : CustomValidator<BulkUp
     }
 }
 
-internal sealed class BulkUpsertEmployeesCommandHandler(IModaDbContext modaDbContext, IDateTimeProvider dateTimeProvider, ILogger<BulkUpsertEmployeesCommandHandler> logger) : ICommandHandler<BulkUpsertEmployeesCommand>
+internal sealed class BulkUpsertEmployeesCommandHandler(IWaydDbContext modaDbContext, IDateTimeProvider dateTimeProvider, ILogger<BulkUpsertEmployeesCommandHandler> logger) : ICommandHandler<BulkUpsertEmployeesCommand>
 {
-    private readonly IModaDbContext _modaDbContext = modaDbContext;
+    private readonly IWaydDbContext _modaDbContext = modaDbContext;
     private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
     private readonly ILogger<BulkUpsertEmployeesCommandHandler> _logger = logger;
 

@@ -6,11 +6,11 @@ namespace Wayd.Infrastructure.Persistence.Initialization;
 
 internal class DatabaseInitializer : IDatabaseInitializer
 {
-    private readonly ModaDbContext _context;
+    private readonly WaydDbContext _context;
     private readonly IServiceProvider _serviceProvider;
     private readonly ILogger<DatabaseInitializer> _logger;
 
-    public DatabaseInitializer(ModaDbContext context, IServiceProvider serviceProvider, ILogger<DatabaseInitializer> logger)
+    public DatabaseInitializer(WaydDbContext context, IServiceProvider serviceProvider, ILogger<DatabaseInitializer> logger)
     {
         _context = context;
         _serviceProvider = serviceProvider;

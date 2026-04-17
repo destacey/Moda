@@ -18,9 +18,9 @@ public sealed class GetPersonalAccessTokenQueryValidator : CustomValidator<GetPe
     }
 }
 
-internal sealed class GetPersonalAccessTokenQueryHandler(IModaDbContext dbContext, ICurrentUser currentUser) : IQueryHandler<GetPersonalAccessTokenQuery, Result<PersonalAccessTokenDto>>
+internal sealed class GetPersonalAccessTokenQueryHandler(IWaydDbContext dbContext, ICurrentUser currentUser) : IQueryHandler<GetPersonalAccessTokenQuery, Result<PersonalAccessTokenDto>>
 {
-    private readonly IModaDbContext _dbContext = dbContext;
+    private readonly IWaydDbContext _dbContext = dbContext;
     private readonly ICurrentUser _currentUser = currentUser;
 
     public async Task<Result<PersonalAccessTokenDto>> Handle(GetPersonalAccessTokenQuery request, CancellationToken cancellationToken)

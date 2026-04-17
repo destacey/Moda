@@ -351,7 +351,7 @@ public class CrossProjectDependencyTests
     public void CommonApplication_ShouldNotDependOnInfrastructure()
     {
         // Arrange
-        var assembly = typeof(Wayd.Common.Application.Persistence.IModaDbContext).Assembly;
+        var assembly = typeof(Wayd.Common.Application.Persistence.IWaydDbContext).Assembly;
         var types = Types.InAssembly(assembly);
 
         // Act

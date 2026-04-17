@@ -12,7 +12,7 @@ using Wayd.Infrastructure.Persistence.Context;
 
 namespace Wayd.Infrastructure.Migrators.MSSQL.Migrations
 {
-    [DbContext(typeof(ModaDbContext))]
+    [DbContext(typeof(WaydDbContext))]
     [Migration("20251106061034_Fix-WorkIteration-to-WorkTeam-mapping")]
     partial class FixWorkIterationtoWorkTeammapping
     {

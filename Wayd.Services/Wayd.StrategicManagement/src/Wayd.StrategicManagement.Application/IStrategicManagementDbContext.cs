@@ -2,7 +2,7 @@
 
 namespace Wayd.StrategicManagement.Application;
 
-public interface IStrategicManagementDbContext : IModaDbContext
+public interface IStrategicManagementDbContext : IWaydDbContext
 {
     DbSet<Strategy> Strategies { get; }
     DbSet<StrategicTheme> StrategicThemes { get; }

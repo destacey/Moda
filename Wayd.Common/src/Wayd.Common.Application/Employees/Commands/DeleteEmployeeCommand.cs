@@ -13,11 +13,11 @@ public sealed class DeleteEmployeeCommandValidator : CustomValidator<DeleteEmplo
     }
 }
 
-internal sealed class DeleteEmployeeCommandHandler(IModaDbContext modaDbContext, ILogger<DeleteEmployeeCommandHandler> logger) : ICommandHandler<DeleteEmployeeCommand>
+internal sealed class DeleteEmployeeCommandHandler(IWaydDbContext modaDbContext, ILogger<DeleteEmployeeCommandHandler> logger) : ICommandHandler<DeleteEmployeeCommand>
 {
     private const string AppRequestName = nameof(DeleteEmployeeCommand);
 
-    private readonly IModaDbContext _modaDbContext = modaDbContext;
+    private readonly IWaydDbContext _modaDbContext = modaDbContext;
     private readonly ILogger<DeleteEmployeeCommandHandler> _logger = logger;
 
     public async Task<Result> Handle(DeleteEmployeeCommand request, CancellationToken cancellationToken)

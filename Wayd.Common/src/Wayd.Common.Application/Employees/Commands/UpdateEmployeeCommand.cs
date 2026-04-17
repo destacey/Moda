@@ -58,9 +58,9 @@ public sealed record UpdateEmployeeCommand : ICommand<int>
 
 public sealed class UpdateEmployeeCommandValidator : CustomValidator<UpdateEmployeeCommand>
 {
-    private readonly IModaDbContext _modaDbContext;
+    private readonly IWaydDbContext _modaDbContext;
 
-    public UpdateEmployeeCommandValidator(IModaDbContext modaDbContext)
+    public UpdateEmployeeCommandValidator(IWaydDbContext modaDbContext)
     {
         _modaDbContext = modaDbContext;
 
@@ -100,11 +100,11 @@ public sealed class UpdateEmployeeCommandValidator : CustomValidator<UpdateEmplo
 
 internal sealed class UpdateEmployeeCommandHandler : ICommandHandler<UpdateEmployeeCommand, int>
 {
-    private readonly IModaDbContext _modaDbContext;
+    private readonly IWaydDbContext _modaDbContext;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ILogger<UpdateEmployeeCommandHandler> _logger;
 
-    public UpdateEmployeeCommandHandler(IModaDbContext modaDbContext, IDateTimeProvider dateTimeProvider, ILogger<UpdateEmployeeCommandHandler> logger)
+    public UpdateEmployeeCommandHandler(IWaydDbContext modaDbContext, IDateTimeProvider dateTimeProvider, ILogger<UpdateEmployeeCommandHandler> logger)
     {
         _modaDbContext = modaDbContext;
         _dateTimeProvider = dateTimeProvider;

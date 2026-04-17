@@ -6,9 +6,9 @@ public sealed record GetEmployeeByEmployeeNumberQuery(string EmployeeNumber) : I
 
 internal sealed class GetEmployeeByEmployeeNumberQueryHandler : IQueryHandler<GetEmployeeByEmployeeNumberQuery, Guid?>
 {
-    private readonly IModaDbContext _modaDbContext;
+    private readonly IWaydDbContext _modaDbContext;
 
-    public GetEmployeeByEmployeeNumberQueryHandler(IModaDbContext modaDbContext)
+    public GetEmployeeByEmployeeNumberQueryHandler(IWaydDbContext modaDbContext)
     {
         _modaDbContext = modaDbContext;
     }

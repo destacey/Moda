@@ -9,14 +9,14 @@ namespace Wayd.Infrastructure.Identity;
 internal class RoleService(
     RoleManager<ApplicationRole> roleManager,
     UserManager<ApplicationUser> userManager,
-    ModaDbContext db,
+    WaydDbContext db,
     ICurrentUser currentUser,
     IEventPublisher events,
     IDateTimeProvider dateTimeProvider) : IRoleService
 {
     private readonly RoleManager<ApplicationRole> _roleManager = roleManager;
     private readonly UserManager<ApplicationUser> _userManager = userManager;
-    private readonly ModaDbContext _db = db;
+    private readonly WaydDbContext _db = db;
     private readonly ICurrentUser _currentUser = currentUser;
     private readonly IEventPublisher _events = events;
     private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;

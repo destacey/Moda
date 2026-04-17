@@ -19,12 +19,12 @@ public sealed class CreatePersonalAccessTokenCommandValidator : CustomValidator<
     private const int MaxTokensPerUser = 10;
     private const int MaxExpirationDays = 730; // 2 years
 
-    private readonly IModaDbContext _dbContext;
+    private readonly IWaydDbContext _dbContext;
     private readonly ICurrentUser _currentUser;
     private readonly IDateTimeProvider _dateTimeProvider;
 
     public CreatePersonalAccessTokenCommandValidator(
-        IModaDbContext dbContext,
+        IWaydDbContext dbContext,
         ICurrentUser currentUser,
         IDateTimeProvider dateTimeProvider)
     {
@@ -63,7 +63,7 @@ public sealed class CreatePersonalAccessTokenCommandValidator : CustomValidator<
 }
 
 internal sealed class CreatePersonalAccessTokenCommandHandler(
-    IModaDbContext dbContext,
+    IWaydDbContext dbContext,
     ICurrentUser currentUser,
     IDateTimeProvider dateTimeProvider,
     ITokenHashingService tokenHashingService,
@@ -71,7 +71,7 @@ internal sealed class CreatePersonalAccessTokenCommandHandler(
 {
     private const string AppRequestName = nameof(CreatePersonalAccessTokenCommand);
 
-    private readonly IModaDbContext _dbContext = dbContext;
+    private readonly IWaydDbContext _dbContext = dbContext;
     private readonly ICurrentUser _currentUser = currentUser;
     private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
     private readonly ITokenHashingService _tokenHashingService = tokenHashingService;
