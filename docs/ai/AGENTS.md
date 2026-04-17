@@ -1,17 +1,17 @@
-# AGENTS.md - Moda Agent Context
+# AGENTS.md - Wayd Agent Context
 
-This file provides context for AI coding agents working with the Moda codebase.
+This file provides context for AI coding agents working with the Wayd codebase.
 
 ## Quick Start
 
-- **Build**: `dotnet build Moda.slnx`
-- **Test**: `dotnet test Moda.slnx`
-- **Frontend**: `cd Moda.Web/src/moda.web.reactclient && npm install && npm run dev`
-- **Full stack**: `cd Moda.AppHost && dotnet run`
+- **Build**: `dotnet build Wayd.slnx`
+- **Test**: `dotnet test Wayd.slnx`
+- **Frontend**: `cd Wayd.Web/src/wayd.web.reactclient && npm install && npm run dev`
+- **Full stack**: `cd Wayd.AppHost && dotnet run`
 
 ## Architecture at a Glance
 
-Moda is a **modular monolith** using **Clean Architecture** with **DDD**. The dependency flow is:
+Wayd is a **modular monolith** using **Clean Architecture** with **DDD**. The dependency flow is:
 
 ```
 Domain → Application → Infrastructure → Web API
@@ -19,9 +19,9 @@ Domain → Application → Infrastructure → Web API
 
 Each domain service is a vertical slice:
 ```
-Moda.Services/Moda.{Service}/
-  src/Moda.{Service}.Domain/       # Entities, value objects (zero dependencies)
-  src/Moda.{Service}.Application/  # Commands, queries, DTOs (depends on Domain)
+Wayd.Services/Wayd.{Service}/
+  src/Wayd.{Service}.Domain/       # Entities, value objects (zero dependencies)
+  src/Wayd.{Service}.Application/  # Commands, queries, DTOs (depends on Domain)
   tests/                           # Mirror of src structure
 ```
 
@@ -31,15 +31,15 @@ All services share a single `ModaDbContext` (no repository pattern).
 
 | Service | Namespace | Purpose |
 |---------|-----------|---------|
-| Work | `Moda.Work` | Work items, workspaces, work processes, workflows |
-| Organization | `Moda.Organization` | Teams, employees, team memberships |
-| Planning | `Moda.Planning` | Planning intervals, iterations |
-| Goals | `Moda.Goals` | Objectives, key results |
-| ProjectPortfolioManagement | `Moda.ProjectPortfolioManagement` | Projects, portfolios |
-| StrategicManagement | `Moda.StrategicManagement` | Strategic themes |
-| AppIntegration | `Moda.AppIntegration` | External system connections |
-| Links | `Moda.Links` | Cross-entity associations |
-| Health | `Moda.Health` | Health checks |
+| Work | `Wayd.Work` | Work items, workspaces, work processes, workflows |
+| Organization | `Wayd.Organization` | Teams, employees, team memberships |
+| Planning | `Wayd.Planning` | Planning intervals, iterations |
+| Goals | `Wayd.Goals` | Objectives, key results |
+| ProjectPortfolioManagement | `Wayd.ProjectPortfolioManagement` | Projects, portfolios |
+| StrategicManagement | `Wayd.StrategicManagement` | Strategic themes |
+| AppIntegration | `Wayd.AppIntegration` | External system connections |
+| Links | `Wayd.Links` | Cross-entity associations |
+| Health | `Wayd.Health` | Health checks |
 
 ## Patterns to Follow
 
@@ -131,22 +131,22 @@ import { getThingsClient } from '@/src/services/clients'
 6. **Return `Result<T>`** from handlers, not exceptions
 7. **Use NodaTime** (`Instant`, `LocalDate`) instead of `DateTime`
 8. **Central Package Management** - versions in `Directory.Packages.props` only
-9. **Architecture tests exist** - run `dotnet test Moda.ArchitectureTests` to verify dependency rules
+9. **Architecture tests exist** - run `dotnet test Wayd.ArchitectureTests` to verify dependency rules
 10. **Feature flags** - new features behind flags defined in `FeatureFlags.cs`
 
 ## Key File Locations
 
 | What | Where |
 |------|-------|
-| Solution file | `Moda.slnx` |
+| Solution file | `Wayd.slnx` |
 | Package versions | `Directory.Packages.props` |
-| DB Context | `Moda.Infrastructure/src/Moda.Infrastructure/Persistence/Context/ModaDbContext.cs` |
-| Entity configs | `Moda.Infrastructure/src/Moda.Infrastructure/Persistence/Configuration/` |
-| Migrations | `Moda.Infrastructure/src/Moda.Infrastructure.Migrators.MSSQL/` |
-| Feature flags | `Moda.Common/src/Moda.Common.Domain/FeatureManagement/FeatureFlags.cs` |
-| API controllers | `Moda.Web/src/Moda.Web.Api/Controllers/` |
-| Generated TS client | `Moda.Web/src/moda.web.reactclient/src/services/moda-api.ts` |
-| Client factories | `Moda.Web/src/moda.web.reactclient/src/services/clients.ts` |
-| Frontend pages | `Moda.Web/src/moda.web.reactclient/src/app/` |
-| Shared test fakers | `Moda.Common/tests/Moda.Tests.Shared/` |
-| Architecture tests | `Moda.ArchitectureTests/` |
+| DB Context | `Wayd.Infrastructure/src/Wayd.Infrastructure/Persistence/Context/ModaDbContext.cs` |
+| Entity configs | `Wayd.Infrastructure/src/Wayd.Infrastructure/Persistence/Configuration/` |
+| Migrations | `Wayd.Infrastructure/src/Wayd.Infrastructure.Migrators.MSSQL/` |
+| Feature flags | `Wayd.Common/src/Wayd.Common.Domain/FeatureManagement/FeatureFlags.cs` |
+| API controllers | `Wayd.Web/src/Wayd.Web.Api/Controllers/` |
+| Generated TS client | `Wayd.Web/src/wayd.web.reactclient/src/services/wayd-api.ts` |
+| Client factories | `Wayd.Web/src/wayd.web.reactclient/src/services/clients.ts` |
+| Frontend pages | `Wayd.Web/src/wayd.web.reactclient/src/app/` |
+| Shared test fakers | `Wayd.Common/tests/Wayd.Tests.Shared/` |
+| Architecture tests | `Wayd.ArchitectureTests/` |

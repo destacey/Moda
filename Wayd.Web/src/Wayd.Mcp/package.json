@@ -31,13 +31,13 @@
     "project-management"
   ],
   "license": "MIT",
-  "homepage": "https://destacey.github.io/Moda",
+  "homepage": "https://destacey.github.io/Wayd",
   "bugs": {
-    "url": "https://github.com/destacey/Moda/issues"
+    "url": "https://github.com/destacey/Wayd/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/destacey/Moda.git",
+    "url": "git+https://github.com/destacey/Wayd.git",
     "directory": "Moda.Web/src/Moda.Mcp"
   },
   "publishConfig": {

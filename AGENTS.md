@@ -1,12 +1,12 @@
 # AGENTS.md
 
-This file provides context for AI agents working with the Moda codebase.
+This file provides context for AI agents working with the Wayd codebase.
 
-## What is Moda?
+## What is Wayd?
 
-Moda is an intelligent delivery management platform designed to give engineering leaders and teams end-to-end visibility into software delivery. When delivery spans multiple teams, projects, and systems, visibility breaks down. Moda brings it all together — tracking work items, aligning teams to planning intervals and products, and surfacing dependencies across the organization.
+Wayd is an intelligent delivery management platform designed to give engineering leaders and teams end-to-end visibility into software delivery. When delivery spans multiple teams, projects, and systems, visibility breaks down. Wayd brings it all together — tracking work items, aligning teams to planning intervals and products, and surfacing dependencies across the organization.
 
-**Core Philosophy:** Moda acts as a unified hub that synchronizes data from multiple business systems and combines it with capabilities those systems lack — connecting the dots so teams can see the full picture in one place.
+**Core Philosophy:** Wayd acts as a unified hub that synchronizes data from multiple business systems and combines it with capabilities those systems lack — connecting the dots so teams can see the full picture in one place.
 
 Built with Clean Architecture, Domain-Driven Design, and a modular monolith approach with a shared database.
 
@@ -19,23 +19,23 @@ Built with Clean Architecture, Domain-Driven Design, and a modular monolith appr
 ## Repository Structure
 
 ```
-Moda/
-  Moda.Common/                    # Shared libraries and base abstractions
-  Moda.Services/                  # 9 vertical slice domain services
-    Moda.Work/                    # Work items, workspaces, processes, workflows
-    Moda.Organization/            # Teams, employees, memberships
-    Moda.Planning/                # PIs, sprints, objectives, risks, roadmaps
-    Moda.Goals/                   # Objectives and key results (skeleton)
-    Moda.ProjectPortfolioManagement/  # Portfolios, programs, projects, tasks
-    Moda.StrategicManagement/     # Visions, strategies, themes
-    Moda.AppIntegration/          # Integration configuration
-    Moda.Links/                   # Cross-entity relationships
-    Moda.Health/                  # Health checks
-  Moda.Infrastructure/            # EF Core, auth, jobs, logging
-  Moda.Integrations/              # Azure DevOps, Microsoft Graph
-  Moda.Web/
-    Moda.Web.Api/                 # ASP.NET Core Web API
-    moda.web.reactclient/         # Next.js 16 / React 19 frontend
+Wayd/
+  Wayd.Common/                    # Shared libraries and base abstractions
+  Wayd.Services/                  # 9 vertical slice domain services
+    Wayd.Work/                    # Work items, workspaces, processes, workflows
+    Wayd.Organization/            # Teams, employees, memberships
+    Wayd.Planning/                # PIs, sprints, objectives, risks, roadmaps
+    Wayd.Goals/                   # Objectives and key results (skeleton)
+    Wayd.ProjectPortfolioManagement/  # Portfolios, programs, projects, tasks
+    Wayd.StrategicManagement/     # Visions, strategies, themes
+    Wayd.AppIntegration/          # Integration configuration
+    Wayd.Links/                   # Cross-entity relationships
+    Wayd.Health/                  # Health checks
+  Wayd.Infrastructure/            # EF Core, auth, jobs, logging
+  Wayd.Integrations/              # Azure DevOps, Microsoft Graph
+  Wayd.Web/
+    Wayd.Web.Api/                 # ASP.NET Core Web API
+    wayd.web.reactclient/         # Next.js 16 / React 19 frontend
   docs/                           # Documentation (MDX, shared by Docusaurus and Next.js)
   docs-site/                      # Docusaurus config for GitHub Pages
 ```
@@ -46,7 +46,7 @@ Moda/
 - **Application** depends only on Domain — commands, queries, handlers, DTOs, validators
 - **Infrastructure** depends on Application and Domain — EF Core, auth, background jobs
 - **Web API** depends on all layers — thin controllers delegating to MediatR
-- Architecture tests in `Moda.ArchitectureTests` enforce these rules
+- Architecture tests in `Wayd.ArchitectureTests` enforce these rules
 
 ## Key Patterns
 

@@ -12,7 +12,7 @@ audience: [developer]
 .NET Aspire provides a unified dashboard for all services:
 
 ```bash
-cd Moda.AppHost
+cd Wayd.AppHost
 dotnet run
 ```
 
@@ -27,42 +27,42 @@ dotnet run
 
 ```bash
 dotnet ef migrations add <MigrationName> \
-  --project "Moda.Infrastructure/src/Moda.Infrastructure.Migrators.MSSQL" \
-  --startup-project "Moda.Web/src/Moda.Web.Api"
+  --project "Wayd.Infrastructure/src/Wayd.Infrastructure.Migrators.MSSQL" \
+  --startup-project "Wayd.Web/src/Wayd.Web.Api"
 ```
 
 ### Running Tests
 
 ```bash
 # All tests
-dotnet test Moda.slnx
+dotnet test Wayd.slnx
 
 # Specific project
-dotnet test "Moda.Services/Moda.Work/tests/Moda.Work.Application.Tests/Moda.Work.Application.Tests.csproj"
+dotnet test "Wayd.Services/Wayd.Work/tests/Wayd.Work.Application.Tests/Wayd.Work.Application.Tests.csproj"
 
 # Filtered tests
 dotnet test --filter "FullyQualifiedName~ProjectServiceTests"
 
 # Frontend tests
-cd Moda.Web/src/moda.web.reactclient
+cd Wayd.Web/src/wayd.web.reactclient
 npm test
 ```
 
 ### Architecture Tests
 
 ```bash
-dotnet test Moda.ArchitectureTests/Moda.ArchitectureTests.csproj
+dotnet test Wayd.ArchitectureTests/Wayd.ArchitectureTests.csproj
 ```
 
 These tests enforce Clean Architecture dependency rules across the solution.
 
 ## VS Code Launch Configurations
 
-- **Compound: Launch Moda on Host** - Runs API and client natively
-- **Compound: Launch Moda with Compose** - Full stack via Docker Compose
+- **Compound: Launch Wayd on Host** - Runs API and client natively
+- **Compound: Launch Wayd with Compose** - Full stack via Docker Compose
 
 ## Debugging
 
-- Backend: Attach to the `Moda.Web.Api` process or use VS Code launch config
+- Backend: Attach to the `Wayd.Web.Api` process or use VS Code launch config
 - Frontend: Use browser DevTools or VS Code debugger
 - Logs: Check Aspire dashboard or Seq (Docker) for structured logs

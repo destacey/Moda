@@ -1,16 +1,16 @@
 # @modanpm/moda-mcp
 
-A [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server for the [Moda](https://destacey.github.io/Moda) work management API. Exposes Moda's project portfolio management, planning, and work item data to AI assistants.
+A [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server for the [Wayd](https://destacey.github.io/Wayd) work management API. Exposes Wayd's project portfolio management, planning, and work item data to AI assistants.
 
 ## Requirements
 
 - Node.js >= 20
-- A running Moda instance with API access
-- A Moda Personal Access Token (PAT)
+- A running Wayd instance with API access
+- A Wayd Personal Access Token (PAT)
 
 ## Configuration
 
-The server requires two values: the base URL of your Moda instance and an API key. These can be supplied as **environment variables** or **CLI arguments** — CLI arguments take priority if both are provided.
+The server requires two values: the base URL of your Wayd instance and an API key. These can be supplied as **environment variables** or **CLI arguments** — CLI arguments take priority if both are provided.
 
 | | Environment variable | CLI argument |
 |---|---|---|
@@ -47,12 +47,12 @@ CLI args enable the `inputs` pattern, which prompts for values at connection tim
   "inputs": [
     {
       "id": "modaBaseUrl",
-      "description": "Moda base URL",
+      "description": "Wayd base URL",
       "type": "promptString"
     },
     {
       "id": "modaApiKey",
-      "description": "Moda API key (Personal Access Token)",
+      "description": "Wayd API key (Personal Access Token)",
       "type": "promptString",
       "password": true
     }
@@ -131,7 +131,7 @@ Then use `moda-mcp` as the command instead of `npx -y @modanpm/moda-mcp` in any 
 
 ## Agent Skills (Claude Code)
 
-Skills are prompt files that guide Claude on how to efficiently use the Moda MCP tools — which tools to call in sequence, how to resolve IDs, and what the entity relationships look like. Without them, agents tend to make redundant calls or miss non-obvious patterns (e.g. project lifecycle transitions use separate action endpoints, not a status field).
+Skills are prompt files that guide Claude on how to efficiently use the Wayd MCP tools — which tools to call in sequence, how to resolve IDs, and what the entity relationships look like. Without them, agents tend to make redundant calls or miss non-obvious patterns (e.g. project lifecycle transitions use separate action endpoints, not a status field).
 
 Three self-contained skills are available:
 
@@ -179,6 +179,6 @@ Once installed, activate a skill in Claude Code with `/moda-ppm`, `/moda-pi`, or
 
 ## Links
 
-- [Moda documentation](https://destacey.github.io/Moda)
-- [GitHub repository](https://github.com/destacey/Moda)
-- [Report an issue](https://github.com/destacey/Moda/issues)
+- [Wayd documentation](https://destacey.github.io/Wayd)
+- [GitHub repository](https://github.com/destacey/Wayd)
+- [Report an issue](https://github.com/destacey/Wayd/issues)

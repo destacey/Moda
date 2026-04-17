@@ -1,16 +1,16 @@
-# Moda
+# Wayd
 
 **An intelligent delivery management platform designed to give engineering leaders and teams end-to-end visibility into software delivery.**
 
-When delivery spans multiple teams, projects, and systems, visibility breaks down. Moda brings it all together — tracking work items, aligning teams to planning intervals and products, and surfacing dependencies across the organization.
+When delivery spans multiple teams, projects, and systems, visibility breaks down. Wayd brings it all together — tracking work items, aligning teams to planning intervals and products, and surfacing dependencies across the organization.
 
-**Core Philosophy:** Moda acts as a unified hub that synchronizes data from multiple business systems and combines it with capabilities those systems lack — connecting the dots so teams can see the full picture in one place.
+**Core Philosophy:** Wayd acts as a unified hub that synchronizes data from multiple business systems and combines it with capabilities those systems lack — connecting the dots so teams can see the full picture in one place.
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md)
 
 ## 📚 Documentation
 
-[Full Documentation](https://destacey.github.io/Moda) | [Contributing Guide](CONTRIBUTING.md)
+[Full Documentation](https://destacey.github.io/Wayd) | [Contributing Guide](CONTRIBUTING.md)
 
 ## ✨ Key Features
 
@@ -55,30 +55,30 @@ Before you begin, ensure you have installed:
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/destacey/Moda.git
-cd Moda
+git clone https://github.com/destacey/Wayd.git
+cd Wayd
 ```
 
 ### 2. Configure Database
 
-Create or update `Moda.Web/src/Moda.Web.Api/Configurations/database.json`:
+Create or update `Wayd.Web/src/Wayd.Web.Api/Configurations/database.json`:
 
 ```json
 {
   "DatabaseSettings": {
     "DBProvider": "mssql",
-    "ConnectionString": "Server=localhost;Database=Moda;Trusted_Connection=True;TrustServerCertificate=True;"
+    "ConnectionString": "Server=localhost;Database=Wayd;Trusted_Connection=True;TrustServerCertificate=True;"
   }
 }
 ```
 
 ### 3. Configure Authentication
 
-Moda supports two authentication methods: **Microsoft Entra ID (Azure AD)** for directory-based SSO, and **Moda (Local)** for self-contained username/password authentication with JWT tokens. You can use either or both — each user is assigned a login provider at creation time.
+Wayd supports two authentication methods: **Microsoft Entra ID (Azure AD)** for directory-based SSO, and **Wayd (Local)** for self-contained username/password authentication with JWT tokens. You can use either or both — each user is assigned a login provider at creation time.
 
 #### Option A: Local Authentication (Simplest)
 
-No external identity provider needed. Configure a JWT signing secret in `Moda.Web/src/Moda.Web.Api/Configurations/security.json` (or user secrets):
+No external identity provider needed. Configure a JWT signing secret in `Wayd.Web/src/Wayd.Web.Api/Configurations/security.json` (or user secrets):
 
 ```json
 {
@@ -112,10 +112,10 @@ API_BASE_URL='http://localhost:5000'
 
 ### 4. Run with .NET Aspire (Recommended)
 
-The easiest way to run Moda locally with full observability:
+The easiest way to run Wayd locally with full observability:
 
 ```bash
-cd Moda.AppHost
+cd Wayd.AppHost
 dotnet run
 ```
 
@@ -157,14 +157,14 @@ docker compose up
 **Terminal 1 - API:**
 
 ```bash
-cd Moda.Web/src/Moda.Web.Api
+cd Wayd.Web/src/Wayd.Web.Api
 dotnet run
 ```
 
 **Terminal 2 - Client:**
 
 ```bash
-cd Moda.Web/src/moda.web.reactclient
+cd Wayd.Web/src/wayd.web.reactclient
 npm install
 npm run dev
 ```
@@ -176,19 +176,19 @@ Access at <http://localhost:3000>
 **Run all tests:**
 
 ```bash
-dotnet test Moda.slnx
+dotnet test Wayd.slnx
 ```
 
 **Run architecture tests (enforce Clean Architecture rules):**
 
 ```bash
-dotnet test Moda.ArchitectureTests/Moda.ArchitectureTests.csproj
+dotnet test Wayd.ArchitectureTests/Wayd.ArchitectureTests.csproj
 ```
 
 **Run specific test project:**
 
 ```bash
-dotnet test "Moda.Services/Moda.Work/tests/Moda.Work.Application.Tests/Moda.Work.Application.Tests.csproj"
+dotnet test "Wayd.Services/Wayd.Work/tests/Wayd.Work.Application.Tests/Wayd.Work.Application.Tests.csproj"
 ```
 
 ## 📊 Database Migrations
@@ -197,21 +197,21 @@ dotnet test "Moda.Services/Moda.Work/tests/Moda.Work.Application.Tests/Moda.Work
 
 ```bash
 dotnet ef migrations add <MigrationName> \
-  --project "Moda.Infrastructure/src/Moda.Infrastructure.Migrators.MSSQL" \
-  --startup-project "Moda.Web/src/Moda.Web.Api"
+  --project "Wayd.Infrastructure/src/Wayd.Infrastructure.Migrators.MSSQL" \
+  --startup-project "Wayd.Web/src/Wayd.Web.Api"
 ```
 
 **Apply migrations:**
 
 ```bash
 dotnet ef database update \
-  --project "Moda.Infrastructure/src/Moda.Infrastructure.Migrators.MSSQL" \
-  --startup-project "Moda.Web/src/Moda.Web.Api"
+  --project "Wayd.Infrastructure/src/Wayd.Infrastructure.Migrators.MSSQL" \
+  --startup-project "Wayd.Web/src/Wayd.Web.Api"
 ```
 
 ## 🏛️ Architecture
 
-Moda follows **Clean Architecture** with **Domain-Driven Design** principles:
+Wayd follows **Clean Architecture** with **Domain-Driven Design** principles:
 
 ```text
 ┌─────────────────────────────────────────┐
@@ -264,12 +264,12 @@ See [CLAUDE.md](CLAUDE.md) for detailed architecture documentation.
 
 ### Next.js Build Errors
 
-- Clear Next.js cache: `cd Moda.Web/src/moda.web.reactclient && rm -rf .next`
+- Clear Next.js cache: `cd Wayd.Web/src/wayd.web.reactclient && rm -rf .next`
 - Reinstall dependencies: `npm clean-install`
 
 ## 🤝 Contributing
 
-See our [Contributing Guide](CONTRIBUTING.md) for detailed instructions on how to contribute to Moda.
+See our [Contributing Guide](CONTRIBUTING.md) for detailed instructions on how to contribute to Wayd.
 
 **Quick checklist:**
 
@@ -281,13 +281,13 @@ See our [Contributing Guide](CONTRIBUTING.md) for detailed instructions on how t
 
 **Before submitting:**
 
-- Run tests: `dotnet test Moda.slnx`
-- Run architecture tests: `dotnet test Moda.ArchitectureTests/Moda.ArchitectureTests.csproj`
+- Run tests: `dotnet test Wayd.slnx`
+- Run architecture tests: `dotnet test Wayd.ArchitectureTests/Wayd.ArchitectureTests.csproj`
 - Ensure code follows existing patterns (see [CLAUDE.md](CLAUDE.md))
 
 ## 📖 Additional Resources
 
-- **Full Documentation**: <https://destacey.github.io/Moda>
+- **Full Documentation**: <https://destacey.github.io/Wayd>
 - **Architecture Guide**: [CLAUDE.md](CLAUDE.md)
 - **API Documentation**: Available at `/swagger` when API is running
 
@@ -321,7 +321,7 @@ SecuritySettings__AzureAd__RootIssuer={your root issuer/sts url for AAD}
 SecuritySettings__AzureAd__TenantId={your tenant ID}
 ```
 
-**For local (Moda) authentication:**
+**For local (Wayd) authentication:**
 
 ```env
 SecuritySettings__LocalJwt__Secret={strong random secret, at least 32 chars}
@@ -330,13 +330,13 @@ SecuritySettings__LocalJwt__Secret={strong random secret, at least 32 chars}
 Optional local JWT settings (with defaults):
 
 ```env
-SecuritySettings__LocalJwt__Issuer=Moda
+SecuritySettings__LocalJwt__Issuer=Wayd
 SecuritySettings__LocalJwt__Audience=ModaApi
 SecuritySettings__LocalJwt__TokenExpirationInMinutes=60
 SecuritySettings__LocalJwt__RefreshTokenExpirationInDays=7
 ```
 
-Additionally, by default Moda logs to the console via Serilog. If you wish to configure any of the other supported sinks (currently Seq, Datadog and Application Insights), provide the appropriate Serilog**Using**x and Serilog**WriteTo**x settings as env vars for your moda-api container. An example with DataDog (taken from some TF for the `azurerm_container_app` resource type):
+Additionally, by default Wayd logs to the console via Serilog. If you wish to configure any of the other supported sinks (currently Seq, Datadog and Application Insights), provide the appropriate Serilog**Using**x and Serilog**WriteTo**x settings as env vars for your wayd-api container. An example with DataDog (taken from some TF for the `azurerm_container_app` resource type):
 
 ```terraform
       env {
@@ -361,17 +361,17 @@ Additionally, by default Moda logs to the console via Serilog. If you wish to co
 
       env {
         name  = "Serilog__WriteTo__1__Args__host"
-        value = "moda-api"
+        value = "wayd-api"
       }
 
       env {
         name  = "Serilog__WriteTo__1__Args__tags__0"
-        value = "product:moda"
+        value = "product:wayd"
       }
 
       env {
         name  = "Serilog__WriteTo__1__Args__tags__1"
-        value = "service:moda-api"
+        value = "service:wayd-api"
       }
 ```
 

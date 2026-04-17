@@ -1,13 +1,13 @@
 ---
 title: Feature Flags
-description: Feature management system for controlling feature visibility in Moda.
+description: Feature management system for controlling feature visibility in Wayd.
 sidebar_position: 3
 audience: [developer, agent]
 ---
 
 # Feature Flags
 
-Moda uses Microsoft.FeatureManagement to control feature visibility. Feature flags are defined in code, stored in the database, and managed through the Settings UI.
+Wayd uses Microsoft.FeatureManagement to control feature visibility. Feature flags are defined in code, stored in the database, and managed through the Settings UI.
 
 ## How It Works
 
@@ -20,7 +20,7 @@ Moda uses Microsoft.FeatureManagement to control feature visibility. Feature fla
 
 ### 1. Define the Flag
 
-In `Moda.Common.Domain/FeatureManagement/FeatureFlags.cs`:
+In `Wayd.Common.Domain/FeatureManagement/FeatureFlags.cs`:
 
 ```csharp
 public static class FeatureFlags
@@ -71,8 +71,8 @@ Pass flag state into menu builder functions to conditionally show navigation ite
 
 | File | Purpose |
 |------|---------|
-| `Moda.Common.Domain/FeatureManagement/FeatureFlags.cs` | Flag definitions |
-| `Moda.Infrastructure/Persistence/Initialization/FeatureFlagSeeder.cs` | Auto-seeds flags |
-| `Moda.Infrastructure/FeatureManagement/DatabaseFeatureDefinitionProvider.cs` | Database provider |
-| `moda.web.reactclient/src/hooks/use-feature-flag.ts` | Frontend hook |
-| `moda.web.reactclient/src/components/hoc/require-feature-flag.tsx` | Page-level gate |
+| `Wayd.Common.Domain/FeatureManagement/FeatureFlags.cs` | Flag definitions |
+| `Wayd.Infrastructure/Persistence/Initialization/FeatureFlagSeeder.cs` | Auto-seeds flags |
+| `Wayd.Infrastructure/FeatureManagement/DatabaseFeatureDefinitionProvider.cs` | Database provider |
+| `wayd.web.reactclient/src/hooks/use-feature-flag.ts` | Frontend hook |
+| `wayd.web.reactclient/src/components/hoc/require-feature-flag.tsx` | Page-level gate |

@@ -1,6 +1,6 @@
 ---
 title: Work Items & Workspaces
-description: Creating, viewing, and managing work items within workspaces in Moda.
+description: Creating, viewing, and managing work items within workspaces in Wayd.
 sidebar_position: 1
 audience: [user, agent]
 ---
@@ -16,8 +16,8 @@ Every workspace has:
 - **Name** and optional **Description**
 - **[Work Process](./work-configuration.mdx#work-processes)** — The configuration that defines available [work types](./work-configuration.mdx#work-types) and [workflows](./work-configuration.mdx#workflows)
 - **Ownership** — How the workspace is managed:
-  - **Owned** — Created and managed within Moda
-  - **Managed** — Synchronized from an external system (e.g., an Azure DevOps project) and read-only in Moda. See [Administration > Integrations](../settings/index.mdx#integrations).
+  - **Owned** — Created and managed within Wayd
+  - **Managed** — Synchronized from an external system (e.g., an Azure DevOps project) and read-only in Wayd. See [Administration > Integrations](../settings/index.mdx#integrations).
 
 ### Workspace List Page
 
@@ -49,7 +49,7 @@ Actions: Set External URLs (for managed workspaces)
 
 ## Work Items
 
-A **Work Item** is the fundamental unit of work in Moda. It represents any piece of work that needs to be tracked — tasks, bugs, user stories, features, epics, or any other type defined by the [work process](./work-configuration.mdx#work-processes).
+A **Work Item** is the fundamental unit of work in Wayd. It represents any piece of work that needs to be tracked — tasks, bugs, user stories, features, epics, or any other type defined by the [work process](./work-configuration.mdx#work-processes).
 
 Every work item has:
 - **Key** — Unique identifier in format `\{WorkspaceKey\}-\{Number\}` (e.g., `PLAT-1234`). See [Work Item Keys](#work-item-keys).
@@ -72,10 +72,10 @@ Work items support:
 - **Parent/Child hierarchy** — Work items can be nested (e.g., Epic > Feature > User Story > Task). See [Hierarchy Rules](#work-item-hierarchy-rules).
 - **[Dependencies](#work-item-dependencies)** — Predecessor/successor relationships with planning health tracking
 - **[Revisions](#work-item-revisions)** — Change history tracking what changed, when, and by whom
-- **Links** — Cross-entity associations to other objects in Moda
+- **Links** — Cross-entity associations to other objects in Wayd
 - **References** — Tracked references from other domains (e.g., linked to an [objective](../planning/planning-intervals.mdx#objectives) or [project](../ppm/projects.mdx))
 
-> **Note:** Work items in **Managed** workspaces (synced from Azure DevOps) are read-only. They can be viewed and linked to other Moda objects, but cannot be edited directly.
+> **Note:** Work items in **Managed** workspaces (synced from Azure DevOps) are read-only. They can be viewed and linked to other Wayd objects, but cannot be edited directly.
 
 ### Work Item Detail Page
 
@@ -105,7 +105,7 @@ The work item detail page has multiple tabs that adapt based on the work item's 
 
 ### Where Work Items Appear
 
-Work items are visible in multiple places throughout Moda:
+Work items are visible in multiple places throughout Wayd:
 - **[Workspace detail page](#workspace-detail-page)** — All work items in the workspace
 - **[Team Backlog tab](../organizations/index.mdx#backlog-tab)** — All work items assigned to a team across all workspaces
 - **[Team Dependency Management tab](../organizations/index.mdx#dependency-management-tab)** — Dependencies involving the team
@@ -163,5 +163,5 @@ Work items follow strict hierarchy rules based on their [work type tier](./work-
 
 Workspaces, [work processes](./work-configuration.mdx#work-processes), and [workflows](./work-configuration.mdx#workflows) all follow the same ownership model:
 
-- **Owned** — Created and fully managed within Moda
-- **Managed** — Synchronized from an external system (e.g., Azure DevOps). The external system is the source of truth. Changes in the external system are reflected in Moda via [background synchronization](../settings/index.mdx#background-jobs). Managed entities display an external URL template for linking back to the source. See [Administration > Integrations](../settings/index.mdx#integrations) for configuration details.
+- **Owned** — Created and fully managed within Wayd
+- **Managed** — Synchronized from an external system (e.g., Azure DevOps). The external system is the source of truth. Changes in the external system are reflected in Wayd via [background synchronization](../settings/index.mdx#background-jobs). Managed entities display an external URL template for linking back to the source. See [Administration > Integrations](../settings/index.mdx#integrations) for configuration details.

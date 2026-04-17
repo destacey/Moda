@@ -1,6 +1,6 @@
 ﻿# AI Objective Health Assessment – Context Pack v1
 
-This document defines the contract between the **Moda API** (which assembles objective and work-item data) and the **AI worker** (which evaluates objective health via an LLM).
+This document defines the contract between the **Wayd API** (which assembles objective and work-item data) and the **AI worker** (which evaluates objective health via an LLM).
 
 ---
 

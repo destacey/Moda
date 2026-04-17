@@ -9,18 +9,18 @@ audience: [developer, agent]
 
 ## Database Architecture
 
-Moda uses a **single shared database** accessed through `ModaDbContext`. All domain services share this context.
+Wayd uses a **single shared database** accessed through `ModaDbContext`. All domain services share this context.
 
 Entity configurations are organized by domain area in:
 ```
-Moda.Infrastructure/src/Moda.Infrastructure/Persistence/Configuration/
+Wayd.Infrastructure/src/Wayd.Infrastructure/Persistence/Configuration/
 ```
 
 ## Entity Framework Core
 
 ### Direct DbContext Usage
 
-Moda does **not** use the Repository pattern. Application handlers access `ModaDbContext` directly:
+Wayd does **not** use the Repository pattern. Application handlers access `ModaDbContext` directly:
 
 ```csharp
 public class GetWorkItemQueryHandler : IQueryHandler<GetWorkItemQuery, WorkItemDto>
@@ -59,22 +59,22 @@ public class WorkItemConfiguration : IEntityTypeConfiguration<WorkItem>
 
 ## Migrations
 
-Migrations are managed in `Moda.Infrastructure.Migrators.MSSQL`.
+Migrations are managed in `Wayd.Infrastructure.Migrators.MSSQL`.
 
 ### Creating a Migration
 
 ```bash
 dotnet ef migrations add <MigrationName> \
-  --project "Moda.Infrastructure/src/Moda.Infrastructure.Migrators.MSSQL" \
-  --startup-project "Moda.Web/src/Moda.Web.Api"
+  --project "Wayd.Infrastructure/src/Wayd.Infrastructure.Migrators.MSSQL" \
+  --startup-project "Wayd.Web/src/Wayd.Web.Api"
 ```
 
 ### Applying Migrations
 
 ```bash
 dotnet ef database update \
-  --project "Moda.Infrastructure/src/Moda.Infrastructure.Migrators.MSSQL" \
-  --startup-project "Moda.Web/src/Moda.Web.Api"
+  --project "Wayd.Infrastructure/src/Wayd.Infrastructure.Migrators.MSSQL" \
+  --startup-project "Wayd.Web/src/Wayd.Web.Api"
 ```
 
 Migrations also run automatically on application startup via `app.Services.InitializeDatabases()`.

@@ -1,19 +1,19 @@
 ---
 title: Adding a Feature
-description: Step-by-step guide for implementing new features in Moda.
+description: Step-by-step guide for implementing new features in Wayd.
 sidebar_position: 4
 audience: [developer, agent]
 ---
 
 # Adding a Feature
 
-This guide walks through the typical process of adding a new feature to Moda, touching all layers of the architecture.
+This guide walks through the typical process of adding a new feature to Wayd, touching all layers of the architecture.
 
 ## 1. Domain Layer
 
 Start with the domain model:
 
-1. Define or update entities in `Moda.\{Service\}.Domain/Models/`
+1. Define or update entities in `Wayd.\{Service\}.Domain/Models/`
 2. Add value objects if needed
 3. Define domain events for significant state changes
 4. Write domain tests
@@ -33,7 +33,7 @@ Add commands, queries, and handlers:
 
 If the feature requires database changes:
 
-1. Add entity configuration in `Moda.Infrastructure/Persistence/Configuration/`
+1. Add entity configuration in `Wayd.Infrastructure/Persistence/Configuration/`
 2. Create a database migration
 3. Update seed data if necessary
 
@@ -41,7 +41,7 @@ If the feature requires database changes:
 
 Expose the feature through the API:
 
-1. Add controller actions in `Moda.Web.Api/Controllers/`
+1. Add controller actions in `Wayd.Web.Api/Controllers/`
 2. Controllers should be thin - delegate to MediatR
 3. Return appropriate HTTP status codes
 

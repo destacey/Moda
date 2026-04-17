@@ -1,6 +1,6 @@
 # Feature Management
 
-Moda uses [Microsoft.FeatureManagement](https://learn.microsoft.com/en-us/azure/azure-app-configuration/use-feature-flags-dotnet-core) to control feature visibility across the application. Feature flags are stored in the database and managed through the Settings UI.
+Wayd uses [Microsoft.FeatureManagement](https://learn.microsoft.com/en-us/azure/azure-app-configuration/use-feature-flags-dotnet-core) to control feature visibility across the application. Feature flags are stored in the database and managed through the Settings UI.
 
 ## Overview
 
@@ -25,7 +25,7 @@ Currently, all feature flags should be defined as **system flags** in code.
 
 ### Step 1: Define the Flag
 
-Add the flag definition to `Moda.Common.Domain/FeatureManagement/FeatureFlags.cs`:
+Add the flag definition to `Wayd.Common.Domain/FeatureManagement/FeatureFlags.cs`:
 
 ```csharp
 public static class FeatureFlags
@@ -161,11 +161,11 @@ const useAppMenuItems = () => {
 
 ### Backend
 
-- **Domain entity**: `Moda.Common.Domain/FeatureManagement/FeatureFlag.cs`
-- **Flag definitions**: `Moda.Common.Domain/FeatureManagement/FeatureFlags.cs`
-- **Seeder**: `Moda.Infrastructure/Persistence/Initialization/FeatureFlagSeeder.cs`
-- **Definition provider**: `Moda.Infrastructure/FeatureManagement/DatabaseFeatureDefinitionProvider.cs` — implements `IFeatureDefinitionProvider` with 30-second caching
-- **API controllers**: `Moda.Web.Api/Controllers/FeatureManagement/` — admin CRUD and client endpoint for enabled flags
+- **Domain entity**: `Wayd.Common.Domain/FeatureManagement/FeatureFlag.cs`
+- **Flag definitions**: `Wayd.Common.Domain/FeatureManagement/FeatureFlags.cs`
+- **Seeder**: `Wayd.Infrastructure/Persistence/Initialization/FeatureFlagSeeder.cs`
+- **Definition provider**: `Wayd.Infrastructure/FeatureManagement/DatabaseFeatureDefinitionProvider.cs` — implements `IFeatureDefinitionProvider` with 30-second caching
+- **API controllers**: `Wayd.Web.Api/Controllers/FeatureManagement/` — admin CRUD and client endpoint for enabled flags
 
 ### Frontend
 

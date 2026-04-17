@@ -22,7 +22,7 @@ The work domain provides the capabilities to manage your teams work items.
 
 A workspace is a container for work items.
 
-A workspace is either owned by Moda or managed by an external application and synchronized with Moda.
+A workspace is either owned by Wayd or managed by an external application and synchronized with Wayd.
 
 ## Work Item
 

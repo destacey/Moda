@@ -4,13 +4,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-Moda is an intelligent delivery management platform designed to give engineering leaders and teams end-to-end visibility into software delivery. It acts as a unified hub that synchronizes data from multiple business systems and combines it with capabilities those systems lack — connecting the dots so teams can see the full picture in one place. Built with Clean Architecture, Domain-Driven Design, and a modular monolith approach with a shared database.
+Wayd is an intelligent delivery management platform designed to give engineering leaders and teams end-to-end visibility into software delivery. It acts as a unified hub that synchronizes data from multiple business systems and combines it with capabilities those systems lack — connecting the dots so teams can see the full picture in one place. Built with Clean Architecture, Domain-Driven Design, and a modular monolith approach with a shared database.
 
 **For domain context** (entities, relationships, business rules): See [AGENTS.md](AGENTS.md) and [docs/llms-full.txt](docs/llms-full.txt)
 **For domain terminology**: See [docs/ai/domain-glossary.mdx](docs/ai/domain-glossary.mdx)
 **For user-facing documentation**: See [docs/](docs/) (shared by Docusaurus and Next.js in-app docs)
 
-Documentation site: <https://destacey.github.io/Moda>
+Documentation site: <https://destacey.github.io/Wayd>
 
 ## Build and Test Commands
 
@@ -18,34 +18,34 @@ Documentation site: <https://destacey.github.io/Moda>
 
 ```bash
 # Build the entire solution
-dotnet build Moda.slnx
+dotnet build Wayd.slnx
 
 # Build a specific project
-dotnet build "Moda.Web/src/Moda.Web.Api/Moda.Web.Api.csproj"
+dotnet build "Wayd.Web/src/Wayd.Web.Api/Wayd.Web.Api.csproj"
 
 # Run all tests
-dotnet test Moda.slnx
+dotnet test Wayd.slnx
 
 # Run tests for a specific project
-dotnet test "Moda.Services/Moda.Work/tests/Moda.Work.Application.Tests/Moda.Work.Application.Tests.csproj"
+dotnet test "Wayd.Services/Wayd.Work/tests/Wayd.Work.Application.Tests/Wayd.Work.Application.Tests.csproj"
 
 # Run specific test class or method
 dotnet test --filter "FullyQualifiedName~ProjectServiceTests"
 
 # Run architecture tests (enforce Clean Architecture rules)
-dotnet test Moda.ArchitectureTests/Moda.ArchitectureTests.csproj
+dotnet test Wayd.ArchitectureTests/Wayd.ArchitectureTests.csproj
 
 # Run the API locally
-cd Moda.Web/src/Moda.Web.Api && dotnet run
+cd Wayd.Web/src/Wayd.Web.Api && dotnet run
 
 # Database migrations (from repository root)
-dotnet ef migrations add <MigrationName> --project "Moda.Infrastructure/src/Moda.Infrastructure.Migrators.MSSQL" --startup-project "Moda.Web/src/Moda.Web.Api"
-dotnet ef database update --project "Moda.Infrastructure/src/Moda.Infrastructure.Migrators.MSSQL" --startup-project "Moda.Web/src/Moda.Web.Api"
+dotnet ef migrations add <MigrationName> --project "Wayd.Infrastructure/src/Wayd.Infrastructure.Migrators.MSSQL" --startup-project "Wayd.Web/src/Wayd.Web.Api"
+dotnet ef database update --project "Wayd.Infrastructure/src/Wayd.Infrastructure.Migrators.MSSQL" --startup-project "Wayd.Web/src/Wayd.Web.Api"
 ```
 
 ### Frontend (Next.js)
 
-From the `Moda.Web/src/moda.web.reactclient` directory:
+From the `Wayd.Web/src/wayd.web.reactclient` directory:
 
 ```bash
 npm install     # Install dependencies
@@ -58,7 +58,7 @@ npm test        # Run tests
 ### .NET Aspire (Recommended for Local Development)
 
 ```bash
-cd Moda.AppHost && dotnet run
+cd Wayd.AppHost && dotnet run
 ```
 
 - Aspire Dashboard: <http://localhost:15888>
@@ -89,16 +89,16 @@ Infrastructure (depends on Application & Domain)
 Web API (depends on all layers)
 ```
 
-Architecture tests in `Moda.ArchitectureTests` enforce these dependency rules.
+Architecture tests in `Wayd.ArchitectureTests` enforce these dependency rules.
 
 ### Where Code Lives
 
-- **Domain logic**: `Moda.Services/{ServiceName}/src/{ServiceName}.Domain/Models/`
-- **Commands/Queries**: `Moda.Services/{ServiceName}/src/{ServiceName}.Application/{Feature}/Commands/` and `Queries/`
-- **API endpoints**: `Moda.Web/src/Moda.Web.Api/Controllers/{DomainArea}/`
-- **Infrastructure**: `Moda.Infrastructure/src/Moda.Infrastructure/{Concern}/`
-- **Integrations**: `Moda.Integrations/src/Moda.Integrations.{SystemName}/`
-- **Frontend pages**: `Moda.Web/src/moda.web.reactclient/src/app/`
+- **Domain logic**: `Wayd.Services/{ServiceName}/src/{ServiceName}.Domain/Models/`
+- **Commands/Queries**: `Wayd.Services/{ServiceName}/src/{ServiceName}.Application/{Feature}/Commands/` and `Queries/`
+- **API endpoints**: `Wayd.Web/src/Wayd.Web.Api/Controllers/{DomainArea}/`
+- **Infrastructure**: `Wayd.Infrastructure/src/Wayd.Infrastructure/{Concern}/`
+- **Integrations**: `Wayd.Integrations/src/Wayd.Integrations.{SystemName}/`
+- **Frontend pages**: `Wayd.Web/src/wayd.web.reactclient/src/app/`
 - **Tests**: Mirror the source structure in `tests/` folders
 
 ### Key Patterns
@@ -122,7 +122,7 @@ Architecture tests in `Moda.ArchitectureTests` enforce these dependency rules.
 
 ### Frontend (React/Next.js)
 
-- **API calls**: Always use NSwag-generated typed client (e.g., `getProjectsClient()`). Never use `authenticatedFetch()` directly. Clients in `moda.web.reactclient/src/services/clients.ts`.
+- **API calls**: Always use NSwag-generated typed client (e.g., `getProjectsClient()`). Never use `authenticatedFetch()` directly. Clients in `wayd.web.reactclient/src/services/clients.ts`.
 - **Theming**: Ant Design theme tokens only — never hardcode colors. Prefer CSS variables (`var(--ant-color-primary)`) in CSS modules over `theme.useToken()` in JS. Only use `theme.useToken()` when values are needed in JS logic.
 - **State**: Redux Toolkit + RTK Query for API data. React Context for auth/theme. `useState` for local UI state.
 - **PWA**: Installable via Serwist (`@serwist/turbopack`). See [Frontend Development docs](docs/contributing/frontend.mdx#pwa-progressive-web-app) for details.
@@ -135,15 +135,15 @@ Architecture tests in `Moda.ArchitectureTests` enforce these dependency rules.
 Two methods, configured per user via `LoginProvider`:
 
 1. **Microsoft Entra ID** — SSO via Azure AD. Requires `.env` with `AAD_CLIENT_ID`, `AAD_TENANT_ID`, etc.
-2. **Moda (Local)** — JWT auth. Requires `SecuritySettings:LocalJwt:Secret` in API config.
+2. **Wayd (Local)** — JWT auth. Requires `SecuritySettings:LocalJwt:Secret` in API config.
 
-Key files: `Moda.Infrastructure/Auth/Local/TokenService.cs`, `moda.web.reactclient/src/components/contexts/auth/auth-context.tsx`
+Key files: `Wayd.Infrastructure/Auth/Local/TokenService.cs`, `wayd.web.reactclient/src/components/contexts/auth/auth-context.tsx`
 
 ### Feature Flags
 
 Microsoft.FeatureManagement — defined in code, stored in database, managed via Settings UI.
 
-1. Define in `Moda.Common.Domain/FeatureManagement/FeatureFlags.cs`
+1. Define in `Wayd.Common.Domain/FeatureManagement/FeatureFlags.cs`
 2. Gate backend: `[FeatureGate(FeatureFlags.Names.MyFlag)]` or `IFeatureManager.IsEnabledAsync()`
 3. Gate frontend: `requireFeatureFlag` HOC or `useFeatureFlag` hook
 4. Gate menus: pass flag state into menu builder functions
@@ -151,16 +151,16 @@ Microsoft.FeatureManagement — defined in code, stored in database, managed via
 
 ### OpenAPI Client Generation
 
-NSwag generates TypeScript client from API's OpenAPI spec on Debug build. Config in `nswag.json`. Generated client in `moda.web.reactclient/src/services/moda-api.ts`.
+NSwag generates TypeScript client from API's OpenAPI spec on Debug build. Config in `nswag.json`. Generated client in `wayd.web.reactclient/src/services/wayd-api.ts`.
 
 ### Database
 
-Single shared `ModaDbContext`. Entity configs in `Moda.Infrastructure/Persistence/Configuration/`. Migrations in `Moda.Infrastructure.Migrators.MSSQL`. Auto-applied on startup via `app.Services.InitializeDatabases()`.
+Single shared `ModaDbContext`. Entity configs in `Wayd.Infrastructure/Persistence/Configuration/`. Migrations in `Wayd.Infrastructure.Migrators.MSSQL`. Auto-applied on startup via `app.Services.InitializeDatabases()`.
 
 ### Testing
 
 - Test naming: `{ProjectName}.Tests`
-- Domain fakers in `Moda.Tests.Shared`
+- Domain fakers in `Wayd.Tests.Shared`
 - Fake DbContext implementations for each application area
 - Moq.AutoMock for automatic dependency mocking
 
@@ -168,4 +168,4 @@ Single shared `ModaDbContext`. Entity configs in `Moda.Infrastructure/Persistenc
 
 - **Main branch**: `main` (not master)
 - **Docker Compose**: Environment variable changes require full teardown and rebuild (`docker compose down` then `up`)
-- **OpenTelemetry**: Configured in `Moda.Infrastructure/src/Moda.Infrastructure/OpenTelemetry/ConfigureServices.cs`. Frontend server-side only via `instrumentation.ts`.
+- **OpenTelemetry**: Configured in `Wayd.Infrastructure/src/Wayd.Infrastructure/OpenTelemetry/ConfigureServices.cs`. Frontend server-side only via `instrumentation.ts`.

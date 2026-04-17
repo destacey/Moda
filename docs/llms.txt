@@ -1,12 +1,12 @@
-# Moda
+# Wayd
 
 > An intelligent delivery management platform designed to give engineering leaders and teams end-to-end visibility into software delivery.
 
 ## Overview
 
-When delivery spans multiple teams, projects, and systems, visibility breaks down. Moda brings it all together — tracking work items, aligning teams to planning intervals and products, and surfacing dependencies across the organization. It acts as a unified hub that synchronizes data from multiple business systems and combines it with capabilities those systems lack.
+When delivery spans multiple teams, projects, and systems, visibility breaks down. Wayd brings it all together — tracking work items, aligning teams to planning intervals and products, and surfacing dependencies across the organization. It acts as a unified hub that synchronizes data from multiple business systems and combines it with capabilities those systems lack.
 
-Moda supports:
+Wayd supports:
 
 - **Organizations** — Teams and teams of teams with operating models, memberships, and hierarchy
 - **Planning** — Planning intervals (PIs), sprints, objectives, risks, roadmaps, and planning poker
@@ -16,7 +16,7 @@ Moda supports:
 
 ## Documentation
 
-- [Welcome](docs/index.mdx): Overview of Moda and documentation structure
+- [Welcome](docs/index.mdx): Overview of Wayd and documentation structure
 - [Organizations](docs/user-guide/organizations/index.mdx): Teams, teams of teams, operating models, and organizational hierarchy
 - [Planning Overview](docs/user-guide/planning/index.mdx): How planning connects teams, sprints, objectives, and work items
 - [Planning Intervals](docs/user-guide/planning/planning-intervals.mdx): PIs, iterations, sprint mapping, objectives, predictability, plan review
