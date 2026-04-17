@@ -1,6 +1,6 @@
 'use client'
 
-import { WorkspaceDto } from '@/src/services/moda-api'
+import { WorkspaceDto } from '@/src/services/wayd-api'
 import { Descriptions } from 'antd'
 import Link from 'next/link'
 

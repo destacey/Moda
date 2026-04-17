@@ -4,7 +4,7 @@ import { useMessage } from '@/src/components/contexts/messaging'
 import {
   AzdoConnectionTeamMappingsRequest,
   AzdoWorkspaceTeamMappingRequest,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import {
   useGetAzdoConnectionTeamsQuery,
   useMapAzdoConnectionTeamsMutation,

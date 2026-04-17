@@ -10,7 +10,7 @@ import { useGetFunctionalOrganizationChartQuery } from '@/src/store/features/org
 import {
   OrganizationalUnitDto,
   FunctionalOrganizationChartDto,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import { DatePicker, Spin } from 'antd'
 import {
   ModaOrganizationChart,

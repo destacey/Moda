@@ -1,6 +1,6 @@
 import { apiSlice } from './apiSlice'
 import { QueryTags } from './query-tags'
-import { ClientFeatureFlagDto } from '@/src/services/moda-api'
+import { ClientFeatureFlagDto } from '@/src/services/wayd-api'
 import { getFeatureFlagsClient } from '@/src/services/clients'
 
 export const clientFeatureFlagsApi = apiSlice.injectEndpoints({

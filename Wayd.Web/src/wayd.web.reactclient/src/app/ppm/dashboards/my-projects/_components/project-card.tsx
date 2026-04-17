@@ -2,7 +2,7 @@
 
 import { LifecycleStatusTag } from '@/src/components/common'
 import PhaseTimeline from '@/src/app/ppm/_components/phase-timeline'
-import { ProjectListDto, ProjectPlanSummaryDto } from '@/src/services/moda-api'
+import { ProjectListDto, ProjectPlanSummaryDto } from '@/src/services/wayd-api'
 import { Card, Flex, Typography } from 'antd'
 import dayjs from 'dayjs'
 import { FC } from 'react'

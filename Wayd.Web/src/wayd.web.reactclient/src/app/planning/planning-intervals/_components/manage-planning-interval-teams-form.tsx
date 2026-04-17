@@ -13,7 +13,7 @@ import difference from 'lodash/difference'
 import {
   ManagePlanningIntervalTeamsRequest,
   PlanningIntervalTeamResponse,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import type { ColumnsType, TableRowSelection } from 'antd/es/table/interface'
 import { useMessage } from '@/src/components/contexts/messaging'
 

@@ -5,7 +5,7 @@ import { useModalForm } from '@/src/hooks'
 import {
   ChangeProjectProgramRequest,
   ProjectDetailsDto,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import { useGetPortfolioProgramOptionsQuery } from '@/src/store/features/ppm/portfolios-api'
 import { useChangeProjectProgramMutation } from '@/src/store/features/ppm/projects-api'
 import { toFormErrors } from '@/src/utils'

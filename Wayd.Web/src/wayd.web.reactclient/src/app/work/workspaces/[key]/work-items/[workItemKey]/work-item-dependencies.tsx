@@ -1,7 +1,7 @@
 'use client'
 
 import { WorkItemDependenciesGrid } from '@/src/components/common/work'
-import { WorkItemDetailsDto } from '@/src/services/moda-api'
+import { WorkItemDetailsDto } from '@/src/services/wayd-api'
 import { useGetWorkItemDependenciesQuery } from '@/src/store/features/work-management/workspace-api'
 import { useEffect } from 'react'
 

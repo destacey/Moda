@@ -1,6 +1,6 @@
 'use client'
 
-import { PokerRoundDto } from '@/src/services/moda-api'
+import { PokerRoundDto } from '@/src/services/wayd-api'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { useResetPokerRoundMutation } from '@/src/store/features/planning/poker-sessions-api'
 import { Button, Flex, Tag, Typography } from 'antd'

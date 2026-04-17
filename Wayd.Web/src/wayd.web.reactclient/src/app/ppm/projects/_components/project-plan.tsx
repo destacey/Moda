@@ -1,6 +1,6 @@
 'use client'
 
-import { ProjectDetailsDto } from '@/src/services/moda-api'
+import { ProjectDetailsDto } from '@/src/services/wayd-api'
 import { FC } from 'react'
 import { ProjectPlanTable } from '.'
 import { useGetProjectPlanTreeQuery } from '@/src/store/features/ppm/projects-api'

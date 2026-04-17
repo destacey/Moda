@@ -3,7 +3,7 @@
 import { ModaGrid } from '@/src/components/common'
 import { ModaStatisticNumber } from '@/src/components/common/metrics'
 import { RowMenuCellRenderer } from '@/src/components/common/moda-grid-cell-renderers'
-import { StrategicInitiativeKpiListDto } from '@/src/services/moda-api'
+import { StrategicInitiativeKpiListDto } from '@/src/services/wayd-api'
 import { ColDef, GetRowIdParams } from 'ag-grid-community'
 import { Button, MenuProps } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'

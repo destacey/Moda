@@ -3,7 +3,7 @@ import {
   CreateHealthCheckRequest,
   HealthCheckDto,
   UpdateHealthCheckRequest,
-} from '../../services/moda-api'
+} from '../../services/wayd-api'
 import { getHealthChecksClient } from '../../services/clients'
 import { CreateHealthCheckFormValues } from '../../components/common/health-check/create-health-check-form'
 import { SystemContext } from '../../components/constants'

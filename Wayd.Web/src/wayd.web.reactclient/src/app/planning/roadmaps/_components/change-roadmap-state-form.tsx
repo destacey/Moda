@@ -2,7 +2,7 @@
 
 import { useMessage } from '@/src/components/contexts/messaging'
 import { useConfirmModal } from '@/src/hooks'
-import { RoadmapDetailsDto } from '@/src/services/moda-api'
+import { RoadmapDetailsDto } from '@/src/services/wayd-api'
 import {
   useActivateRoadmapMutation,
   useArchiveRoadmapMutation,

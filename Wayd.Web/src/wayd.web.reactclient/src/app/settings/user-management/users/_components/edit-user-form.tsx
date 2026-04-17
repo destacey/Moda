@@ -7,7 +7,7 @@ import {
   useUpdateUserMutation,
 } from '@/src/store/features/user-management/users-api'
 import { useGetEmployeesQuery } from '@/src/store/features/organizations/employee-api'
-import { UserDetailsDto } from '@/src/services/moda-api'
+import { UserDetailsDto } from '@/src/services/wayd-api'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { useModalForm } from '@/src/hooks'
 

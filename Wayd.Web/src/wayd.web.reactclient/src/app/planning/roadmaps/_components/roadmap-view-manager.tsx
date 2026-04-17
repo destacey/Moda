@@ -1,6 +1,6 @@
 'use client'
 
-import { RoadmapDetailsDto, RoadmapItemListDto } from '@/src/services/moda-api'
+import { RoadmapDetailsDto, RoadmapItemListDto } from '@/src/services/wayd-api'
 import { BuildOutlined, MenuOutlined } from '@ant-design/icons'
 import Segmented, { SegmentedLabeledOption } from 'antd/es/segmented'
 import { memo, useState } from 'react'

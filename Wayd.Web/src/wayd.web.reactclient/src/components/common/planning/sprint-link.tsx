@@ -1,4 +1,4 @@
-import { WorkIterationNavigationDto } from '@/src/services/moda-api'
+import { WorkIterationNavigationDto } from '@/src/services/wayd-api'
 import Link from 'next/link'
 
 export interface SprintLinkProps {

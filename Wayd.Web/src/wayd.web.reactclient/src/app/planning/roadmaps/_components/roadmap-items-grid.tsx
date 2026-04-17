@@ -7,7 +7,7 @@ import {
   RoadmapItemListDto,
   RoadmapMilestoneListDto,
   RoadmapTimeboxListDto,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import { PlusOutlined } from '@ant-design/icons'
 import { Button, Form } from 'antd'
 import dayjs from 'dayjs'

@@ -1,7 +1,7 @@
 'use client'
 
 import { useMessage } from '@/src/components/contexts/messaging'
-import { UpdateExpenditureCategoryRequest } from '@/src/services/moda-api'
+import { UpdateExpenditureCategoryRequest } from '@/src/services/wayd-api'
 import {
   useGetExpenditureCategoryQuery,
   useUpdateExpenditureCategoryMutation,

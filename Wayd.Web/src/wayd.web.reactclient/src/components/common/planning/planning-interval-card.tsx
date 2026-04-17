@@ -1,4 +1,4 @@
-import { PlanningIntervalListDto } from '@/src/services/moda-api'
+import { PlanningIntervalListDto } from '@/src/services/wayd-api'
 import { daysRemaining } from '@/src/utils'
 import { Card, Space, Typography } from 'antd'
 import dayjs from 'dayjs'

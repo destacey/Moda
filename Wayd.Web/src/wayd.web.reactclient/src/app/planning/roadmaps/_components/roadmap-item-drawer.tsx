@@ -2,7 +2,7 @@ import {
   RoadmapActivityDetailsDto,
   RoadmapMilestoneDetailsDto,
   RoadmapTimeboxDetailsDto,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import { useGetRoadmapItemQuery } from '@/src/store/features/planning/roadmaps-api'
 import { Button, Drawer } from 'antd'
 import {

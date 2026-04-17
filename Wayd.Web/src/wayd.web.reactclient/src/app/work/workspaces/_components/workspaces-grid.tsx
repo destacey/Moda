@@ -2,7 +2,7 @@
 
 import { ModaGrid } from '@/src/components/common'
 import { WorkspaceLinkCellRenderer } from '@/src/components/common/moda-grid-cell-renderers'
-import { WorkspaceListDto } from '@/src/services/moda-api'
+import { WorkspaceListDto } from '@/src/services/wayd-api'
 import { ColDef } from 'ag-grid-community'
 import { ReactElement, useMemo } from 'react'
 

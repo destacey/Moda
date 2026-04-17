@@ -1,5 +1,5 @@
 import { Card, List } from 'antd'
-import { RiskListDto } from '@/src/services/moda-api'
+import { RiskListDto } from '@/src/services/wayd-api'
 import Link from 'next/link'
 import { useGetMyRisksQuery } from '@/src/store/features/planning/risks-api'
 import useAuth from '../../contexts/auth'

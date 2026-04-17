@@ -5,7 +5,7 @@ import {
   TeamListItem,
   TeamTypeName,
 } from '../../../app/organizations/types'
-import { TeamDetailsDto, TeamOfTeamsDetailsDto } from '@/src/services/moda-api'
+import { TeamDetailsDto, TeamOfTeamsDetailsDto } from '@/src/services/wayd-api'
 import { getTeamsClient, getTeamsOfTeamsClient } from '@/src/services/clients'
 
 type TeamDetails = TeamDetailsDto | TeamOfTeamsDetailsDto

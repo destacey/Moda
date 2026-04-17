@@ -20,7 +20,7 @@ import WorkItemDependencies from './work-item-dependencies'
 import useAuth from '@/src/components/contexts/auth'
 import { ItemType } from 'antd/es/menu/interface'
 import EditWorkItemProjectForm from '../../../_components/edit-workitem-project-form'
-import { WorkItemDetailsDto } from '@/src/services/moda-api'
+import { WorkItemDetailsDto } from '@/src/services/wayd-api'
 import { WorkTypeTier } from '@/src/components/types'
 
 enum WorkItemTabs {

@@ -32,7 +32,7 @@ import { CreateTeamMembershipForm } from '../../_components'
 import { InactiveTag, PageActions } from '@/src/components/common'
 import { ItemType } from 'antd/es/menu/interface'
 import DeactivateTeamOfTeamsForm from '../../_components/deactivate-team-of-teams-form'
-import { TeamOfTeamsDetailsDto } from '@/src/services/moda-api'
+import { TeamOfTeamsDetailsDto } from '@/src/services/wayd-api'
 
 enum TeamOfTeamsTabs {
   Details = 'details',

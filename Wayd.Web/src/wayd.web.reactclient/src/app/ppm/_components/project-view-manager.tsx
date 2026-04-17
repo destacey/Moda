@@ -7,7 +7,7 @@ import {
 } from '@ant-design/icons'
 import { Segmented } from 'antd'
 import { memo, useState } from 'react'
-import { ProjectListDto } from '@/src/services/moda-api'
+import { ProjectListDto } from '@/src/services/wayd-api'
 import { Spin } from 'antd'
 import dynamic from 'next/dynamic'
 import ProjectsGrid from './projects-grid'

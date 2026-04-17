@@ -11,7 +11,7 @@ import {
   Select,
 } from 'antd'
 import { useEffect } from 'react'
-import { ManagePlanningIntervalDatesRequest } from '@/src/services/moda-api'
+import { ManagePlanningIntervalDatesRequest } from '@/src/services/wayd-api'
 import { toFormErrors } from '@/src/utils'
 import dayjs from 'dayjs'
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons'

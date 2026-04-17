@@ -1,7 +1,7 @@
 import { act, render, screen } from '@testing-library/react'
 import { userEvent } from '@testing-library/user-event'
 import PortfolioGroupList from './portfolio-group-list'
-import { ProjectListDto } from '@/src/services/moda-api'
+import { ProjectListDto } from '@/src/services/wayd-api'
 
 global.ResizeObserver = class {
   observe() {}

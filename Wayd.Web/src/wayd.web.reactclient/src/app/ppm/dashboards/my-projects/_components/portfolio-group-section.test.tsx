@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import { userEvent } from '@testing-library/user-event'
 import PortfolioGroupSection from './portfolio-group-section'
 import { PortfolioGroup } from './project-card-helpers'
-import { ProjectListDto } from '@/src/services/moda-api'
+import { ProjectListDto } from '@/src/services/wayd-api'
 
 global.ResizeObserver = class {
   observe() {}

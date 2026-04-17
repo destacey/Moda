@@ -1,7 +1,7 @@
 import { getWorkTypesClient } from '@/src/services/clients'
 import { apiSlice } from '../apiSlice'
 import { QueryTags } from '../query-tags'
-import { UpdateWorkTypeRequest, WorkTypeDto } from '@/src/services/moda-api'
+import { UpdateWorkTypeRequest, WorkTypeDto } from '@/src/services/wayd-api'
 
 export const workTypeApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({

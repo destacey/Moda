@@ -1,7 +1,7 @@
 'use client'
 
 import { useMessage } from '@/src/components/contexts/messaging'
-import { CreateEstimationScaleRequest } from '@/src/services/moda-api'
+import { CreateEstimationScaleRequest } from '@/src/services/wayd-api'
 import { useCreateEstimationScaleMutation } from '@/src/store/features/planning/estimation-scales-api'
 import { toFormErrors } from '@/src/utils'
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons'

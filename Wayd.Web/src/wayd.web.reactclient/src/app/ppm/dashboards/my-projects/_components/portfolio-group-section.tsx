@@ -3,7 +3,7 @@
 import { RightOutlined } from '@ant-design/icons'
 import { Flex, Typography } from 'antd'
 import { FC, useState } from 'react'
-import { ProjectPlanSummaryDto } from '@/src/services/moda-api'
+import { ProjectPlanSummaryDto } from '@/src/services/wayd-api'
 import { PortfolioGroup } from './project-card-helpers'
 import ProjectCard from './project-card'
 import styles from '../my-projects-dashboard.module.css'

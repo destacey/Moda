@@ -17,7 +17,7 @@ import {
 } from 'antd'
 import { SearchOutlined } from '@ant-design/icons'
 import { useEffect, useState } from 'react'
-import { RoleDto } from '@/src/services/moda-api'
+import { RoleDto } from '@/src/services/wayd-api'
 
 const { Title } = Typography
 

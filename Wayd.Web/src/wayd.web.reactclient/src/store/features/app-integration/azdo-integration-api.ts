@@ -4,7 +4,7 @@ import {
   InitWorkProcessIntegrationRequest,
   InitWorkspaceIntegrationRequest,
   TestAzureDevOpsConnectionRequest,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import { apiSlice } from '../apiSlice'
 import { getAzureDevOpsConnectionsClient } from '@/src/services/clients'
 import { QueryTags } from '../query-tags'

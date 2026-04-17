@@ -3,7 +3,7 @@
 import {
   AzureDevOpsWorkProcessDto,
   AzureDevOpsWorkspaceDto,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import { Alert, Space, Tabs, Typography } from 'antd'
 import AzdoProcess from './azdo-process'
 

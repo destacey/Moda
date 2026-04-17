@@ -5,7 +5,7 @@ import { RowMenuCellRenderer } from '@/src/components/common/moda-grid-cell-rend
 import useAuth from '@/src/components/contexts/auth'
 import { authorizePage, requireFeatureFlag } from '@/src/components/hoc'
 import { useDocumentTitle } from '@/src/hooks'
-import { EstimationScaleDto } from '@/src/services/moda-api'
+import { EstimationScaleDto } from '@/src/services/wayd-api'
 import {
   useGetEstimationScalesQuery,
   useSetEstimationScaleActiveStatusMutation,

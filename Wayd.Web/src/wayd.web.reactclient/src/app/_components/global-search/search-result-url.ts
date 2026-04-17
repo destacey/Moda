@@ -1,4 +1,4 @@
-import { GlobalSearchResultItemDto } from '@/src/services/moda-api'
+import { GlobalSearchResultItemDto } from '@/src/services/wayd-api'
 
 export function getSearchResultUrl(item: GlobalSearchResultItemDto): string {
   const { entityType, key, auxKey } = item

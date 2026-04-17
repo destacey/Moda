@@ -32,7 +32,7 @@ jest.mock('../moda-grid-cell-renderers', () => ({
 
 import SprintsGrid from './sprints-grid'
 import * as ModaGridModule from '../index'
-import { SprintListDto } from '@/src/services/moda-api'
+import { SprintListDto } from '@/src/services/wayd-api'
 
 describe('SprintsGrid', () => {
   const mockRefetch = jest.fn()

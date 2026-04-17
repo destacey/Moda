@@ -6,7 +6,7 @@ import {
   ExpenditureCategoryDetailsDto,
   ExpenditureCategoryListDto,
   UpdateExpenditureCategoryRequest,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import { BaseOptionType } from 'antd/es/select'
 
 export const expenditureCategoriesApi = apiSlice.injectEndpoints({

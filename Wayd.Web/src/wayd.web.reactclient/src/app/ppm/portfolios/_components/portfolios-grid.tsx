@@ -2,7 +2,7 @@
 
 import { ModaGrid } from '@/src/components/common'
 import { PortfolioLinkCellRenderer } from '@/src/components/common/moda-grid-cell-renderers'
-import { ProjectPortfolioListDto } from '@/src/services/moda-api'
+import { ProjectPortfolioListDto } from '@/src/services/wayd-api'
 import { getSortedNames } from '@/src/utils'
 import { ColDef } from 'ag-grid-community'
 import { ReactElement, useMemo } from 'react'

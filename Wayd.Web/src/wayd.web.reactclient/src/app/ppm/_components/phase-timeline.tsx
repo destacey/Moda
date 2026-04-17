@@ -1,7 +1,7 @@
 'use client'
 
 import { CheckCircleFilled, CloseCircleFilled } from '@ant-design/icons'
-import { ProjectPhaseListDto } from '@/src/services/moda-api'
+import { ProjectPhaseListDto } from '@/src/services/wayd-api'
 import { Steps } from 'antd'
 import { ModaTooltip } from '@/src/components/common'
 import dayjs from 'dayjs'

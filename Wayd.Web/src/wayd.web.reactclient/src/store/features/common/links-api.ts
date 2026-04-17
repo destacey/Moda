@@ -5,7 +5,7 @@ import {
   CreateLinkRequest,
   LinkDto,
   UpdateLinkRequest,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 
 export interface StoreUpdateLinkRequest {
   request: UpdateLinkRequest

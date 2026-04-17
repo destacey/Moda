@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { userEvent } from '@testing-library/user-event'
 import ProjectPlanView from './project-plan-view'
-import { ProjectPlanNodeDto } from '@/src/services/moda-api'
+import { ProjectPlanNodeDto } from '@/src/services/wayd-api'
 
 global.ResizeObserver = class {
   observe() {}

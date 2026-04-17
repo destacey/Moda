@@ -1,7 +1,7 @@
 'use client'
 
 import { ModaGrid } from '@/src/components/common'
-import { SprintBacklogItemDto } from '@/src/services/moda-api'
+import { SprintBacklogItemDto } from '@/src/services/wayd-api'
 import { ColDef } from 'ag-grid-community'
 import { useMemo } from 'react'
 import {

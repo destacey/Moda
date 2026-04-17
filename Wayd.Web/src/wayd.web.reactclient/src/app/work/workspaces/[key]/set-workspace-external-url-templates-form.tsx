@@ -4,7 +4,7 @@ import { useMessage } from '@/src/components/contexts/messaging'
 import {
   SetExternalUrlTemplatesRequest,
   WorkspaceDto,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import {
   SetWorkspaceExternalUrlTemplatesRequest,
   useGetWorkspaceQuery,

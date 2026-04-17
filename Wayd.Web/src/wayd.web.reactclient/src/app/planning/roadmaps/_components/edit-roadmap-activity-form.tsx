@@ -5,7 +5,7 @@ import {
   RoadmapActivityDetailsDto,
   RoadmapActivityListDto,
   UpdateRoadmapActivityRequest,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import {
   useGetRoadmapActivitiesQuery,
   useGetRoadmapItemQuery,

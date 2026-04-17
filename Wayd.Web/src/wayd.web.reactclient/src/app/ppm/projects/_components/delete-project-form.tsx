@@ -2,7 +2,7 @@
 
 import { useMessage } from '@/src/components/contexts/messaging'
 import { useConfirmModal } from '@/src/hooks'
-import { ProjectDetailsDto } from '@/src/services/moda-api'
+import { ProjectDetailsDto } from '@/src/services/wayd-api'
 import { useDeleteProjectMutation } from '@/src/store/features/ppm/projects-api'
 import { Modal } from 'antd'
 

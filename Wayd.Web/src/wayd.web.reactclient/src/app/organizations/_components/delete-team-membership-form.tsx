@@ -1,4 +1,4 @@
-import { TeamMembershipDto } from '@/src/services/moda-api'
+import { TeamMembershipDto } from '@/src/services/wayd-api'
 import { TeamTypeName } from '../types'
 import { Descriptions, Modal } from 'antd'
 import dayjs from 'dayjs'

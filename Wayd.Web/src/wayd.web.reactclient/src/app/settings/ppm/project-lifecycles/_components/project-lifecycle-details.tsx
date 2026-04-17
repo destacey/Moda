@@ -1,6 +1,6 @@
 'use client'
 
-import { ProjectLifecycleDetailsDto } from '@/src/services/moda-api'
+import { ProjectLifecycleDetailsDto } from '@/src/services/wayd-api'
 import { Descriptions, Space } from 'antd'
 
 const { Item } = Descriptions

@@ -12,7 +12,7 @@ import {
   SetConsensusRequest,
   SubmitVoteRequest,
   UpdatePokerRoundLabelRequest,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 
 export interface UpdatePokerSessionRequest {
   name: string

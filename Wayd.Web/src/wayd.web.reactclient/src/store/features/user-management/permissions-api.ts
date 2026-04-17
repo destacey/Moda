@@ -1,4 +1,4 @@
-import { ApplicationPermission } from '@/src/services/moda-api'
+import { ApplicationPermission } from '@/src/services/wayd-api'
 import { apiSlice } from '../apiSlice'
 import { getPermissionsClient } from '@/src/services/clients'
 import { QueryTags } from '../query-tags'

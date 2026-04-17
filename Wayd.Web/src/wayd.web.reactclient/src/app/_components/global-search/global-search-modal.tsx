@@ -26,7 +26,7 @@ import {
   GlobalSearchCategoryDto,
   GlobalSearchResultDto,
   GlobalSearchResultItemDto,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import { getSearchResultUrl } from './search-result-url'
 import styles from './global-search-modal.module.css'
 

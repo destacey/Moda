@@ -6,7 +6,7 @@ import { Flex, Modal, Select, Spin, Typography } from 'antd'
 import {
   MapPlanningIntervalSprintsRequest,
   SprintListDto,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import {
   useGetIterationSprintsQuery,
   useMapTeamSprintsMutation,

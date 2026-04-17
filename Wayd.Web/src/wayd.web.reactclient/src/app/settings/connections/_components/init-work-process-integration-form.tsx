@@ -1,5 +1,5 @@
 import { useMessage } from '@/src/components/contexts/messaging'
-import { InitWorkProcessIntegrationRequest } from '@/src/services/moda-api'
+import { InitWorkProcessIntegrationRequest } from '@/src/services/wayd-api'
 import { useInitAzdoConnectionWorkProcessMutation } from '@/src/store/features/app-integration/azdo-integration-api'
 import { Modal, Typography } from 'antd'
 import { useConfirmModal } from '@/src/hooks'

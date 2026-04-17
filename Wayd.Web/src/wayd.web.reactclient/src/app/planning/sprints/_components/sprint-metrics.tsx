@@ -12,7 +12,7 @@ import {
 import { IterationHealthIndicator } from '@/src/components/common/planning'
 import useTheme from '@/src/components/contexts/theme'
 import { IterationState } from '@/src/components/types'
-import { SizingMethod, SprintDetailsDto } from '@/src/services/moda-api'
+import { SizingMethod, SprintDetailsDto } from '@/src/services/wayd-api'
 import { useGetSprintMetricsQuery } from '@/src/store/features/planning/sprints-api'
 import { Col, Flex, Row, Segmented, Skeleton } from 'antd'
 import { ModaTooltip } from '@/src/components/common'

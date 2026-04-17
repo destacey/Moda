@@ -6,7 +6,7 @@ import {
   SprintDetailsDto,
   SprintListDto,
   SprintWorkItemMetricsDto,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 
 export const sprintsApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({

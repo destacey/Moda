@@ -1,7 +1,7 @@
 'use client'
 
 import { useMessage } from '@/src/components/contexts/messaging'
-import { UpdateWorkTypeRequest } from '@/src/services/moda-api'
+import { UpdateWorkTypeRequest } from '@/src/services/wayd-api'
 import {
   useGetWorkTypeQuery,
   useUpdateWorkTypeMutation,

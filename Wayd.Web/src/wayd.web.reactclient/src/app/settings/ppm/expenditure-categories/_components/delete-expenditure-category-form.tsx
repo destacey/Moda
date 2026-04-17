@@ -1,7 +1,7 @@
 'use client'
 
 import { useMessage } from '@/src/components/contexts/messaging'
-import { ExpenditureCategoryDetailsDto } from '@/src/services/moda-api'
+import { ExpenditureCategoryDetailsDto } from '@/src/services/wayd-api'
 import { useDeleteExpenditureCategoryMutation } from '@/src/store/features/ppm/expenditure-categories-api'
 import { Modal } from 'antd'
 import { useConfirmModal } from '@/src/hooks'

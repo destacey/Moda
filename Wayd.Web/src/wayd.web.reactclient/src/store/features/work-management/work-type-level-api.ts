@@ -1,4 +1,4 @@
-import { UpdateWorkTypeLevelsOrderRequest } from './../../../services/moda-api'
+import { UpdateWorkTypeLevelsOrderRequest } from './../../../services/wayd-api'
 import {
   getWorkTypeLevelsClient,
   getWorkTypeTiersClient,
@@ -9,7 +9,7 @@ import {
   CreateWorkTypeLevelRequest,
   UpdateWorkTypeLevelRequest,
   WorkTypeLevelDto,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import { BaseOptionType } from 'antd/es/select'
 
 export const workTypeLevelApi = apiSlice.injectEndpoints({

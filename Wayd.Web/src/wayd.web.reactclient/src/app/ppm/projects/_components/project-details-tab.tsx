@@ -4,7 +4,7 @@ import {
 } from '@/src/components/common/content'
 import { MarkdownRenderer } from '@/src/components/common/markdown'
 import PhaseTimeline from '../../_components/phase-timeline'
-import { ProjectDetailsDto } from '@/src/services/moda-api'
+import { ProjectDetailsDto } from '@/src/services/wayd-api'
 import { useGetProjectPlanSummaryQuery } from '@/src/store/features/ppm/projects-api'
 import { Card, Col, Flex, Row, Typography } from 'antd'
 import { ProjectDetails } from '.'

@@ -1,6 +1,6 @@
 'use client'
 
-import { LifecycleNavigationDto } from '@/src/services/moda-api'
+import { LifecycleNavigationDto } from '@/src/services/wayd-api'
 import { FC, memo } from 'react'
 import { Tag } from 'antd'
 import { LifecyclePhase } from '../types'

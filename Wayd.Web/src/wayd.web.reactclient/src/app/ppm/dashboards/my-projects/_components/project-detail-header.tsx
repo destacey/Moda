@@ -2,7 +2,7 @@
 
 import { LifecycleStatusTag, ModaDateRange } from '@/src/components/common'
 import { LinkOutlined } from '@ant-design/icons'
-import { ProjectDetailsDto } from '@/src/services/moda-api'
+import { ProjectDetailsDto } from '@/src/services/wayd-api'
 import { getSortedNames } from '@/src/utils'
 import { Button, Flex, Typography } from 'antd'
 import { ModaTooltip } from '@/src/components/common'

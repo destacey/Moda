@@ -5,7 +5,7 @@ import { useEffect } from 'react'
 import {
   TeamMembershipDto,
   UpdateTeamMembershipRequest,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import { toFormErrors } from '@/src/utils'
 import { useUpdateTeamMembershipMutation } from '@/src/store/features/organizations/team-api'
 import { TeamTypeName } from '../types'

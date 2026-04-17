@@ -1,7 +1,7 @@
 'use client'
 
 import { useMessage } from '@/src/components/contexts/messaging'
-import { CreateExpenditureCategoryRequest } from '@/src/services/moda-api'
+import { CreateExpenditureCategoryRequest } from '@/src/services/wayd-api'
 import { useCreateExpenditureCategoryMutation } from '@/src/store/features/ppm/expenditure-categories-api'
 import { toFormErrors } from '@/src/utils'
 import { Form, Input, Modal, Switch } from 'antd'

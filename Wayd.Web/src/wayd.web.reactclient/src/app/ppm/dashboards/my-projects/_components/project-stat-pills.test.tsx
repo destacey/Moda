@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import ProjectStatPills from './project-stat-pills'
-import { ProjectPlanSummaryDto } from '@/src/services/moda-api'
+import { ProjectPlanSummaryDto } from '@/src/services/wayd-api'
 
 global.ResizeObserver = class {
   observe() {}

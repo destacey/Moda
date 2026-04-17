@@ -2,7 +2,7 @@
 
 import { useMessage } from '@/src/components/contexts/messaging'
 import { useModalForm } from '@/src/hooks'
-import { ChangeProjectKeyRequest } from '@/src/services/moda-api'
+import { ChangeProjectKeyRequest } from '@/src/services/wayd-api'
 import {
   useChangeProjectKeyMutation,
   useGetProjectQuery,

@@ -5,7 +5,7 @@ import {
   CreatePersonalAccessTokenResult,
   CreatePersonalAccessTokenRequest,
   UpdatePersonalAccessTokenRequest,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import { getPersonalAccessTokensClient } from '@/src/services/clients'
 
 export const personalAccessTokensApi = apiSlice.injectEndpoints({

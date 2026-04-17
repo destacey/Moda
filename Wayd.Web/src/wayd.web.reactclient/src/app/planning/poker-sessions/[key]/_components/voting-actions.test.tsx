@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { PokerRoundDto } from '@/src/services/moda-api'
+import { PokerRoundDto } from '@/src/services/wayd-api'
 import VotingActions from './voting-actions'
 import {
   useRevealPokerRoundMutation,

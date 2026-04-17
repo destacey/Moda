@@ -3,7 +3,7 @@
 import { MarkdownEditor } from '@/src/components/common/markdown'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { useModalForm } from '@/src/hooks'
-import { CreateRoadmapTimeboxRequest } from '@/src/services/moda-api'
+import { CreateRoadmapTimeboxRequest } from '@/src/services/wayd-api'
 import {
   useCreateRoadmapItemMutation,
   useGetRoadmapActivitiesQuery,

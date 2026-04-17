@@ -6,7 +6,7 @@ import { useMessage } from '@/src/components/contexts/messaging'
 import {
   ProjectLifecycleDetailsDto,
   ProjectLifecyclePhaseDto,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import {
   useRemoveProjectLifecyclePhaseMutation,
   useReorderProjectLifecyclePhasesMutation,

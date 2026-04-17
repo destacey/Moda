@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import ActiveTeamSprint from './active-team-sprint'
-import { SizingMethod } from '../../../services/moda-api'
+import { SizingMethod } from '../../../services/wayd-api'
 
 // Mock the API hooks
 jest.mock('../../../store/features/organizations/team-api', () => ({

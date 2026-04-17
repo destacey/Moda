@@ -6,7 +6,7 @@ import {
   getLifecyclePhaseTagColor,
 } from './color-helper'
 import { LifecyclePhase } from '../components/types'
-import { LifecycleNavigationDto } from '../services/moda-api'
+import { LifecycleNavigationDto } from '../services/wayd-api'
 
 describe('getLuminance', () => {
   test('should return 1 for a light color', () => {

@@ -4,7 +4,7 @@ import { useConfirmModal, useDebounce } from '@/src/hooks'
 import {
   ManagePlanningIntervalObjectiveWorkItemsRequest,
   WorkItemListDto,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import {
   useGetObjectiveWorkItemsQuery,
   useGetPlanningIntervalObjectiveQuery,

@@ -4,7 +4,7 @@ import { useMessage } from '@/src/components/contexts/messaging'
 import {
   ProjectLifecyclePhaseDto,
   ProjectLifecyclePhaseRequest,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import { useUpdateProjectLifecyclePhaseMutation } from '@/src/store/features/ppm/project-lifecycles-api'
 import { toFormErrors } from '@/src/utils'
 import { Form, Input, Modal } from 'antd'

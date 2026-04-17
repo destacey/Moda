@@ -9,7 +9,7 @@ import {
 import LinksCard from '@/src/components/common/links/links-card'
 import { MarkdownRenderer } from '@/src/components/common/markdown'
 import TimelineProgress from '@/src/components/common/planning/timeline-progress'
-import { ProgramDetailsDto } from '@/src/services/moda-api'
+import { ProgramDetailsDto } from '@/src/services/wayd-api'
 import { getSortedNameList } from '@/src/utils'
 import { Card, Divider, Flex } from 'antd'
 import dayjs from 'dayjs'

@@ -10,7 +10,7 @@ import { ModaTooltip } from '@/src/components/common'
 import useAuth from '@/src/components/contexts/auth'
 import { useDocumentTitle } from '@/src/hooks'
 import { useGetUsersQuery } from '@/src/store/features/user-management/users-api'
-import { RoleListDto, UserDetailsDto } from '@/src/services/moda-api'
+import { RoleListDto, UserDetailsDto } from '@/src/services/wayd-api'
 import { ColDef, ValueFormatterParams } from 'ag-grid-community'
 import dayjs from 'dayjs'
 import {

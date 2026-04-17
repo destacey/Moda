@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { userEvent } from '@testing-library/user-event'
 import ProjectCard from './project-card'
-import { ProjectListDto } from '@/src/services/moda-api'
+import { ProjectListDto } from '@/src/services/wayd-api'
 
 global.ResizeObserver = class {
   observe() {}

@@ -10,7 +10,7 @@ import {
   RoadmapMilestoneListDto,
   RoadmapTimeboxListDto,
   UpdateRoadmapActivityDatesRequest,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import { ControlItemsMenu } from '@/src/components/common/control-items-menu'
 import {
   ModaDataGroup,

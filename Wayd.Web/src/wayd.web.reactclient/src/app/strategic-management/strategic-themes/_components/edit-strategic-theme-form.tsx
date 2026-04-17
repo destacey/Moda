@@ -2,7 +2,7 @@
 
 import { MarkdownEditor } from '@/src/components/common/markdown'
 import { useMessage } from '@/src/components/contexts/messaging'
-import { UpdateStrategicThemeRequest } from '@/src/services/moda-api'
+import { UpdateStrategicThemeRequest } from '@/src/services/wayd-api'
 import {
   useGetStrategicThemeQuery,
   useUpdateStrategicThemeMutation,

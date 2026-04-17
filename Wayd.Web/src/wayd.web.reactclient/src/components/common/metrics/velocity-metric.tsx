@@ -3,7 +3,7 @@
 import { CSSProperties, FC } from 'react'
 import { MetricCard } from '.'
 import useTheme from '@/src/components/contexts/theme'
-import { SizingMethod } from '@/src/services/moda-api'
+import { SizingMethod } from '@/src/services/wayd-api'
 
 const getTooltipText = (sizingMethod: SizingMethod): string => {
   const unit =

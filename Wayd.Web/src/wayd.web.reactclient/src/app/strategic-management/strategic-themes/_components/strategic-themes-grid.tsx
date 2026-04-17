@@ -1,7 +1,7 @@
 'use client'
 
 import { ModaGrid } from '@/src/components/common'
-import { StrategicThemeListDto } from '@/src/services/moda-api'
+import { StrategicThemeListDto } from '@/src/services/wayd-api'
 import { ColDef } from 'ag-grid-community'
 import Link from 'next/link'
 import { useMemo } from 'react'

@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import ProjectDetailHeader from './project-detail-header'
-import { ProjectDetailsDto } from '@/src/services/moda-api'
+import { ProjectDetailsDto } from '@/src/services/wayd-api'
 
 global.ResizeObserver = class {
   observe() {}

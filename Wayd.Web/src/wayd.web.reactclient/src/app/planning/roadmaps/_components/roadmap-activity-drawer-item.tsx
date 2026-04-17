@@ -1,5 +1,5 @@
 import { MarkdownRenderer } from '@/src/components/common/markdown'
-import { RoadmapActivityDetailsDto } from '@/src/services/moda-api'
+import { RoadmapActivityDetailsDto } from '@/src/services/wayd-api'
 import { ColorPicker, Descriptions, Flex } from 'antd'
 import dayjs from 'dayjs'
 import { FC } from 'react'

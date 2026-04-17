@@ -8,7 +8,7 @@ import {
   HealthCheckStatusCellRenderer,
   MarkdownCellRenderer,
 } from '../moda-grid-cell-renderers'
-import { HealthCheckDto } from '@/src/services/moda-api'
+import { HealthCheckDto } from '@/src/services/wayd-api'
 import { ColDef } from 'ag-grid-community'
 import { useGetHealthReportQuery } from '@/src/store/features/common/health-checks-api'
 

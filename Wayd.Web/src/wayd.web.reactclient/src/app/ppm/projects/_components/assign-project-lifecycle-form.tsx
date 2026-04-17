@@ -6,7 +6,7 @@ import {
   AssignProjectLifecycleRequest,
   ProjectDetailsDto,
   ProjectLifecycleState,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import {
   useGetProjectLifecycleQuery,
   useGetProjectLifecyclesQuery,

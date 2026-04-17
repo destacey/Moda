@@ -12,7 +12,7 @@ import {
   Switch,
 } from 'antd'
 import { useEffect } from 'react'
-import { UpdatePlanningIntervalObjectiveRequest } from '@/src/services/moda-api'
+import { UpdatePlanningIntervalObjectiveRequest } from '@/src/services/wayd-api'
 import { toFormErrors } from '@/src/utils'
 import dayjs from 'dayjs'
 import { RangePickerProps } from 'antd/es/date-picker'

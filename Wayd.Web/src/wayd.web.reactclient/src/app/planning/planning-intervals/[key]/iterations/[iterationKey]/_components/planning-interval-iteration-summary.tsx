@@ -12,7 +12,7 @@ import useTheme from '@/src/components/contexts/theme'
 import {
   PlanningIntervalIterationDetailsDto,
   SizingMethod,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import { useGetPlanningIntervalIterationMetricsQuery } from '@/src/store/features/planning/planning-interval-api'
 import {
   Col,

@@ -1,6 +1,6 @@
 'use client'
 
-import { PlanningIntervalObjectiveListDto } from '@/src/services/moda-api'
+import { PlanningIntervalObjectiveListDto } from '@/src/services/wayd-api'
 import {
   Button,
   Card,

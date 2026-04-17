@@ -1,6 +1,6 @@
 'use client'
 
-import { ProjectPlanSummaryDto } from '@/src/services/moda-api'
+import { ProjectPlanSummaryDto } from '@/src/services/wayd-api'
 import { Flex } from 'antd'
 import { FC } from 'react'
 import styles from '../my-projects-dashboard.module.css'

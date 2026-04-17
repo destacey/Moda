@@ -3,7 +3,7 @@
 import { Form, Input, Modal } from 'antd'
 import { useEffect } from 'react'
 import { toFormErrors } from '@/src/utils'
-import { CreateOrUpdateRoleRequest, RoleDto } from '@/src/services/moda-api'
+import { CreateOrUpdateRoleRequest, RoleDto } from '@/src/services/wayd-api'
 import { useUpsertRoleMutation } from '@/src/store/features/user-management/roles-api'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { useModalForm } from '@/src/hooks'

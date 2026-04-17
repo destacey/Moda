@@ -15,7 +15,7 @@ import {
   SizingMethod,
   SprintMetricsSummary,
   TeamOperatingModelDetailsDto,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import { Card, Col, Flex, Grid, Row, Tag, Typography } from 'antd'
 import { ModaTooltip } from '@/src/components/common'
 import dayjs from 'dayjs'

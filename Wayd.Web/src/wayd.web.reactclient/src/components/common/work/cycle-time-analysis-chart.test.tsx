@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { CycleTimeAnalysisChart } from './cycle-time-analysis-chart'
-import { WorkItemListDto } from '@/src/services/moda-api'
+import { WorkItemListDto } from '@/src/services/wayd-api'
 
 // Mock Next.js dynamic import
 jest.mock('next/dynamic', () => ({

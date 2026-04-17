@@ -6,7 +6,7 @@ import {
   SprintMetricsSummary,
   TeamOperatingModelDetailsDto,
   Methodology,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 
 // Mock Metrics components
 jest.mock('../../../../../../../components/common/metrics', () => ({

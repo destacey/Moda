@@ -1,4 +1,4 @@
-import { WorkItemListDto } from '@/src/services/moda-api'
+import { WorkItemListDto } from '@/src/services/wayd-api'
 import ModaEmpty from '../moda-empty'
 import { List } from 'antd'
 import WorkItemListItem from './work-item-list-item'

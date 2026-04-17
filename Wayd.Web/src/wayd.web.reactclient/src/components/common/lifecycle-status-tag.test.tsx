@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import LifecycleStatusTag from './lifecycle-status-tag'
-import { LifecycleNavigationDto } from '@/src/services/moda-api'
+import { LifecycleNavigationDto } from '@/src/services/wayd-api'
 
 describe('LifecycleStatusTag', () => {
   describe('NotStarted phase', () => {

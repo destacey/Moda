@@ -3,7 +3,7 @@
 import { EmployeeSelect } from '@/src/components/common/organizations'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { useModalForm } from '@/src/hooks'
-import { CopyRoadmapRequest } from '@/src/services/moda-api'
+import { CopyRoadmapRequest } from '@/src/services/wayd-api'
 import { useGetEmployeeOptionsQuery } from '@/src/store/features/organizations/employee-api'
 import {
   useCopyRoadmapMutation,

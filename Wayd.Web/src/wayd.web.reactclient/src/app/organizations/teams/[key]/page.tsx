@@ -40,7 +40,7 @@ import {
   TeamOperatingModelsGrid,
   EditTeamOperatingModelForm,
 } from '../_components'
-import { Methodology, TeamDetailsDto } from '@/src/services/moda-api'
+import { Methodology, TeamDetailsDto } from '@/src/services/wayd-api'
 import {
   CreateTeamMembershipForm,
   EditTeamForm,

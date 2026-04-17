@@ -9,7 +9,7 @@ import {
 import {
   SizingMethod,
   TeamOperatingModelDetailsDto,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { RowMenuCellRenderer } from '@/src/components/common/moda-grid-cell-renderers'
 import { Tag } from 'antd'

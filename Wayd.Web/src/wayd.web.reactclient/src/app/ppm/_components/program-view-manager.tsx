@@ -3,7 +3,7 @@
 import { BuildOutlined, MenuOutlined } from '@ant-design/icons'
 import Segmented, { SegmentedLabeledOption } from 'antd/es/segmented'
 import { memo, useState } from 'react'
-import { ProgramListDto } from '@/src/services/moda-api'
+import { ProgramListDto } from '@/src/services/wayd-api'
 import { Spin } from 'antd'
 import dynamic from 'next/dynamic'
 import ProgramsGrid from './programs-grid'

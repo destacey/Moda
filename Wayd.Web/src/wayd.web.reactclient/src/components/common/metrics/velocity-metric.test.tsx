@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import VelocityMetric from './velocity-metric'
-import { SizingMethod } from '../../../services/moda-api'
+import { SizingMethod } from '../../../services/wayd-api'
 
 // Mock useTheme
 jest.mock('../../contexts/theme', () => ({

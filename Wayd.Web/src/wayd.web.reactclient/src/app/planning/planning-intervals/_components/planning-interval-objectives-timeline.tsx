@@ -8,7 +8,7 @@ import { DataGroup } from 'vis-timeline/standalone'
 import {
   PlanningIntervalCalendarDto,
   PlanningIntervalObjectiveListDto,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import {
   ModaDataGroup,
   ModaDataItem,

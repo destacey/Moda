@@ -1,5 +1,5 @@
 import { MarkdownRenderer } from '@/src/components/common/markdown'
-import { RoadmapTimeboxDetailsDto } from '@/src/services/moda-api'
+import { RoadmapTimeboxDetailsDto } from '@/src/services/wayd-api'
 import { Descriptions, Flex } from 'antd'
 import dayjs from 'dayjs'
 import { FC } from 'react'

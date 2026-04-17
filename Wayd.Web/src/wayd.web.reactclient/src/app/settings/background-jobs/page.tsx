@@ -3,7 +3,7 @@
 import PageTitle from '@/src/components/common/page-title'
 import ModaGrid from '../../../components/common/moda-grid'
 import { useMemo, useState } from 'react'
-import { BackgroundJobDto } from '@/src/services/moda-api'
+import { BackgroundJobDto } from '@/src/services/wayd-api'
 import { getBackgroundJobsClient } from '@/src/services/clients'
 import { authorizePage } from '../../../components/hoc'
 import useAuth from '../../../components/contexts/auth'

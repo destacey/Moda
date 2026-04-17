@@ -1,6 +1,6 @@
 import { getProfileClient } from '@/src/services/clients'
 import { apiSlice } from '../apiSlice'
-import { ChangePasswordRequest, UserDetailsDto, UserPermissionsResponse, UserPreferencesDto } from '@/src/services/moda-api'
+import { ChangePasswordRequest, UserDetailsDto, UserPermissionsResponse, UserPreferencesDto } from '@/src/services/wayd-api'
 import { QueryTags } from '../query-tags'
 
 export const profileApi = apiSlice.injectEndpoints({

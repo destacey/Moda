@@ -1,6 +1,6 @@
 'use client'
 
-import { UpdateRoadmapRequest } from '@/src/services/moda-api'
+import { UpdateRoadmapRequest } from '@/src/services/wayd-api'
 import {
   useUpdateRoadmapMutation,
   useGetVisibilityOptionsQuery,

@@ -6,7 +6,7 @@ import {
   AzureDevOpsConnectionDetailsDto,
   TestAzureDevOpsConnectionRequest,
   UpdateAzureDevOpsConnectionRequest,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import { useTestAzdoConfigurationMutation } from '@/src/store/features/app-integration/azdo-integration-api'
 import {
   useGetConnectionQuery,

@@ -1,7 +1,7 @@
 import React from 'react'
 import { render, screen } from '@testing-library/react'
 import SprintLink from './sprint-link'
-import { WorkIterationNavigationDto } from '@/src/services/moda-api'
+import { WorkIterationNavigationDto } from '@/src/services/wayd-api'
 
 // Mock Next.js Link component
 jest.mock('next/link', () => {

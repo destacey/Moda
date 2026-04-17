@@ -1,6 +1,6 @@
 import { getHealthChecksClient } from '@/src/services/clients'
 import { apiSlice } from '../apiSlice'
-import { HealthCheckDto } from '@/src/services/moda-api'
+import { HealthCheckDto } from '@/src/services/wayd-api'
 import { QueryTags } from '../query-tags'
 
 export const healthChecksApi = apiSlice.injectEndpoints({

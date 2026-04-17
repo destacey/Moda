@@ -1,6 +1,6 @@
 'use client'
 
-import { PlanningHealthCheckDto } from '@/src/services/moda-api'
+import { PlanningHealthCheckDto } from '@/src/services/wayd-api'
 import { Descriptions, Popover, Spin, Tag } from 'antd'
 import dayjs from 'dayjs'
 import { useAppDispatch, useAppSelector } from '@/src/hooks'

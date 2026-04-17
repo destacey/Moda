@@ -1,4 +1,4 @@
-import { WorkItemListDto } from '@/src/services/moda-api'
+import { WorkItemListDto } from '@/src/services/wayd-api'
 import { Flex, List, Space, Tag, Typography } from 'antd'
 import Link from 'next/link'
 import ExternalIconLink from '../external-icon-link'

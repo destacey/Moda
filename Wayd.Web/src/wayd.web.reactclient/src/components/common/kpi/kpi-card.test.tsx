@@ -4,7 +4,7 @@ import {
   KpiHealth,
   KpiTargetDirection,
   KpiTrend,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 
 // ─── Mock dayjs ──────────────────────────────────────────────────────────────
 // Allows controlling "now" for checkpoint derivation tests.

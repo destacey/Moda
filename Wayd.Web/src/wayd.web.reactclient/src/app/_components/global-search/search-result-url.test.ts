@@ -1,4 +1,4 @@
-import { GlobalSearchResultItemDto } from '@/src/services/moda-api'
+import { GlobalSearchResultItemDto } from '@/src/services/wayd-api'
 import { getSearchResultUrl } from './search-result-url'
 
 const item = (

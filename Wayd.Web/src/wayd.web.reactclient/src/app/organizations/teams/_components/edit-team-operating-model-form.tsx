@@ -6,7 +6,7 @@ import {
   Methodology,
   SizingMethod,
   UpdateTeamOperatingModelRequest,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import { toFormErrors } from '@/src/utils'
 import {
   useGetTeamOperatingModelQuery,

@@ -2,7 +2,7 @@
 
 import { MarkdownRenderer } from '@/src/components/common/markdown'
 import { useMessage } from '@/src/components/contexts/messaging'
-import { KpiHealth, KpiTrend } from '@/src/services/moda-api'
+import { KpiHealth, KpiTrend } from '@/src/services/wayd-api'
 import {
   useGetStrategicInitiativeKpiCheckpointPlanQuery,
   useGetStrategicInitiativeKpiMeasurementsQuery,

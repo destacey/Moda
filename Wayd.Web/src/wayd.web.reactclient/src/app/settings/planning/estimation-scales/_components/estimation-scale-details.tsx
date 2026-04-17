@@ -1,6 +1,6 @@
 'use client'
 
-import { EstimationScaleDto } from '@/src/services/moda-api'
+import { EstimationScaleDto } from '@/src/services/wayd-api'
 import { Descriptions, Space, Tag } from 'antd'
 
 const { Item } = Descriptions

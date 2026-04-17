@@ -2,7 +2,7 @@ import { BaseOptionType } from 'antd/es/select'
 import { apiSlice } from '../apiSlice'
 import { QueryTags } from '../query-tags'
 import { getEmployeesClient } from '@/src/services/clients'
-import { EmployeeDetailsDto, EmployeeListDto } from '@/src/services/moda-api'
+import { EmployeeDetailsDto, EmployeeListDto } from '@/src/services/wayd-api'
 
 export const employeeApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({

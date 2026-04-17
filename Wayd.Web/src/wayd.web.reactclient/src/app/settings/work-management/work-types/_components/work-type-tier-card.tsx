@@ -1,5 +1,5 @@
 import { ModaEmpty } from '@/src/components/common'
-import { WorkTypeLevelDto, WorkTypeTierDto } from '@/src/services/moda-api'
+import { WorkTypeLevelDto, WorkTypeTierDto } from '@/src/services/wayd-api'
 import { Button, Card, List, Typography } from 'antd'
 import { useEffect, useMemo, useState } from 'react'
 import { CreateWorkTypeLevelForm, WorkTypeLevelCard } from '.'

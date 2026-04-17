@@ -1,6 +1,6 @@
 import { MarkdownEditor } from '@/src/components/common/markdown'
 import { useMessage } from '@/src/components/contexts/messaging'
-import { UpdateWorkTypeLevelRequest } from '@/src/services/moda-api'
+import { UpdateWorkTypeLevelRequest } from '@/src/services/wayd-api'
 import {
   useGetWorkTypeLevelQuery,
   useUpdateWorkTypeLevelMutation,

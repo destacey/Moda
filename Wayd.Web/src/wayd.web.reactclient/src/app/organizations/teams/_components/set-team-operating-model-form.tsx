@@ -5,7 +5,7 @@ import {
   Methodology,
   SetTeamOperatingModelRequest,
   SizingMethod,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import { toFormErrors } from '@/src/utils'
 import { useSetTeamOperatingModelMutation } from '@/src/store/features/organizations/team-api'
 import { useMessage } from '@/src/components/contexts/messaging'

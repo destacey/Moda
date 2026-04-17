@@ -3,7 +3,7 @@
 import { ClusterOutlined, MenuOutlined } from '@ant-design/icons'
 import Segmented, { SegmentedLabeledOption } from 'antd/es/segmented'
 import { memo, useState } from 'react'
-import { WorkItemListDto } from '@/src/services/moda-api'
+import { WorkItemListDto } from '@/src/services/wayd-api'
 import ProjectWorkItemsTreeGrid from './project-work-items-tree-grid'
 import WorkItemsGrid from '@/src/components/common/work/work-items-grid'
 

@@ -1,7 +1,7 @@
 'use client'
 
 import { DatePicker, Form, Input, InputNumber, Modal, Typography } from 'antd'
-import { CreatePlanningIntervalRequest } from '@/src/services/moda-api'
+import { CreatePlanningIntervalRequest } from '@/src/services/wayd-api'
 import { toFormErrors } from '@/src/utils'
 import { MarkdownEditor } from '@/src/components/common/markdown'
 import { useMessage } from '@/src/components/contexts/messaging'

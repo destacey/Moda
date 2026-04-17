@@ -15,7 +15,7 @@ import { Button } from 'antd'
 import { authorizePage, requireFeatureFlag } from '@/src/components/hoc'
 import { ControlItemSwitch } from '@/src/components/common/control-items-menu'
 import { ItemType } from 'antd/es/menu/interface'
-import { PokerSessionListDto, PokerSessionStatus } from '@/src/services/moda-api'
+import { PokerSessionListDto, PokerSessionStatus } from '@/src/services/wayd-api'
 import {
   useGetPokerSessionsQuery,
   useCompletePokerSessionMutation,

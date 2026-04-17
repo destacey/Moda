@@ -23,11 +23,11 @@ var modaDb = builder.AddConnectionString("ModaDb");
 //     .WithDataVolume("moda-sqldata");
 // var modaDb = sqlServer.AddDatabase("ModaDb");
 
-var modaApi = builder.AddProject<Projects.Moda_Web_Api>("moda-api")
+var modaApi = builder.AddProject<Projects.Wayd_Web_Api>("moda-api")
     .WithReference(modaDb)
     .WaitFor(modaDb);
 
-var modaClient = builder.AddJavaScriptApp("moda-client", "../Wayd.Web/src/moda.web.reactclient", "dev")
+var modaClient = builder.AddJavaScriptApp("moda-client", "../Wayd.Web/src/wayd.web.reactclient", "dev")
     .WithReference(modaApi)
     .WaitFor(modaApi)
     .WithHttpEndpoint(env: "PORT", port: 3000)

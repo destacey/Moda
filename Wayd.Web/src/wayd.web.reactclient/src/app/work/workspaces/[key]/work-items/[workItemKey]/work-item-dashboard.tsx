@@ -3,7 +3,7 @@
 import {
   WorkItemDetailsDto,
   WorkItemProgressDailyRollupDto,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import WorkItemCycleTime from './work-item-cycle-time'
 import WorkItemTimeToStart from './work-item-time-to-start'
 import { Card, Space } from 'antd'

@@ -6,7 +6,7 @@ import {
   RiskDetailsDto,
   RiskListDto,
   UpdateRiskRequest,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import { QueryTags } from '../query-tags'
 import _ from 'lodash'
 import { OptionModel } from '@/src/components/types'

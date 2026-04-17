@@ -8,7 +8,7 @@ import {
 import {
   NavigationDto,
   StrategicInitiativeListDto,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import { getSortedNames } from '@/src/utils'
 import { ColDef } from 'ag-grid-community'
 import dayjs from 'dayjs'

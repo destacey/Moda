@@ -10,7 +10,7 @@ import {
   SimpleNavigationDto,
   UserDetailsDto,
   WorkIterationNavigationDto,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import Link from 'next/link'
 import { MarkdownRenderer } from './markdown'
 import { CustomCellRendererProps } from 'ag-grid-react'

@@ -1,7 +1,7 @@
 'use client'
 
 import { ModaGrid } from '@/src/components/common'
-import { WorkItemListDto } from '@/src/services/moda-api'
+import { WorkItemListDto } from '@/src/services/wayd-api'
 import { ColDef, ICellRendererParams } from 'ag-grid-community'
 import { forwardRef, ReactNode, useMemo } from 'react'
 import { AgGridReact } from 'ag-grid-react'

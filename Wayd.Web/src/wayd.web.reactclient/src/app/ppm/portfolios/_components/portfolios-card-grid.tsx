@@ -1,6 +1,6 @@
 'use client'
 
-import { ProjectPortfolioListDto } from '@/src/services/moda-api'
+import { ProjectPortfolioListDto } from '@/src/services/wayd-api'
 import { Flex, List } from 'antd'
 import { ReactElement } from 'react'
 import PortfolioCard from './portfolio-card'

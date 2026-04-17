@@ -1,4 +1,4 @@
-import { AzureDevOpsConnectionDetailsDto } from '@/src/services/moda-api'
+import { AzureDevOpsConnectionDetailsDto } from '@/src/services/wayd-api'
 import { Col, Descriptions, Row, Typography } from 'antd'
 import AzdoConnectionConfiguration from './azdo-connection-configuration'
 import { MarkdownRenderer } from '@/src/components/common/markdown'

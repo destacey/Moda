@@ -11,7 +11,7 @@ import {
   WorkItemProjectInfoDto,
   WorkspaceDto,
   WorkspaceListDto,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 
 export interface GetWorkItemRequest {
   idOrKey: string

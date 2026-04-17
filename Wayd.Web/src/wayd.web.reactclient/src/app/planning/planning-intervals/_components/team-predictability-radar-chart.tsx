@@ -1,7 +1,7 @@
 'use client'
 
 import useTheme from '@/src/components/contexts/theme'
-import { PlanningIntervalTeamPredictabilityDto } from '@/src/services/moda-api'
+import { PlanningIntervalTeamPredictabilityDto } from '@/src/services/wayd-api'
 import { Card } from 'antd'
 import dynamic from 'next/dynamic'
 

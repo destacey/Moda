@@ -5,7 +5,7 @@ import {
   FeatureFlagListDto,
   ToggleFeatureFlagRequest,
   UpdateFeatureFlagRequest,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import { getFeatureFlagsClient } from '@/src/services/clients'
 
 export const featureFlagsApi = apiSlice.injectEndpoints({

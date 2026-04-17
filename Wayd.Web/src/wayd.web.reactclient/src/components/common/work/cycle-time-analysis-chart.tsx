@@ -11,7 +11,7 @@ import { Flex, Skeleton } from 'antd'
 import { DotChartOutlined } from '@ant-design/icons'
 import ModaEmpty from '../moda-empty'
 import useTheme from '../../contexts/theme'
-import { WorkItemListDto } from '@/src/services/moda-api'
+import { WorkItemListDto } from '@/src/services/wayd-api'
 
 export interface CycleTimeAnalysisChartProps {
   workItems: WorkItemListDto[]

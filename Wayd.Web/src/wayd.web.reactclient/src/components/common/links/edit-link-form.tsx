@@ -1,6 +1,6 @@
 'use client'
 
-import { LinkDto, UpdateLinkRequest } from '@/src/services/moda-api'
+import { LinkDto, UpdateLinkRequest } from '@/src/services/wayd-api'
 import { Form, Input, Modal } from 'antd'
 import { useEffect } from 'react'
 import { toFormErrors } from '@/src/utils'

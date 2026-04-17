@@ -3,7 +3,7 @@
 import { LifecycleStatusTag } from '@/src/components/common'
 import TimelineProgress from '@/src/components/common/planning/timeline-progress'
 import PhaseTimeline from './phase-timeline'
-import { ProjectListDto } from '@/src/services/moda-api'
+import { ProjectListDto } from '@/src/services/wayd-api'
 import { getSortedNames } from '@/src/utils'
 import { Card, Flex, Spin, Typography } from 'antd'
 import styles from './projects-card-view.module.css'

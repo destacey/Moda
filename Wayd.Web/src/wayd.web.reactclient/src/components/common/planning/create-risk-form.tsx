@@ -2,7 +2,7 @@
 
 import { DatePicker, Form, Input, Modal, Radio, Select } from 'antd'
 import { useEffect } from 'react'
-import { CreateRiskRequest } from '@/src/services/moda-api'
+import { CreateRiskRequest } from '@/src/services/wayd-api'
 import { toFormErrors } from '@/src/utils'
 import { MarkdownEditor } from '../markdown'
 import {

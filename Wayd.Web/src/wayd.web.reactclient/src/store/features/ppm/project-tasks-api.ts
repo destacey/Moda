@@ -12,7 +12,7 @@ import {
   AddTaskDependencyRequest,
   ProjectTaskIdAndKey,
   UpdateProjectTaskPlacementRequest,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import { QueryTags } from '../query-tags'
 import { OptionModel } from '@/src/components/types'
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { ProjectPlanNodeDto } from '@/src/services/moda-api'
+import { ProjectPlanNodeDto } from '@/src/services/wayd-api'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import dayjs from 'dayjs'
 

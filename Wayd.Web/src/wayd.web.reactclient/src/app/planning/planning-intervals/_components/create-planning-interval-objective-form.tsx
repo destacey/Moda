@@ -2,7 +2,7 @@
 
 import { DatePicker, Form, Input, Modal, Select, Switch } from 'antd'
 import { useEffect, useState } from 'react'
-import { CreatePlanningIntervalObjectiveRequest } from '@/src/services/moda-api'
+import { CreatePlanningIntervalObjectiveRequest } from '@/src/services/wayd-api'
 import { toFormErrors } from '@/src/utils'
 import dayjs from 'dayjs'
 import { RangePickerProps } from 'antd/es/date-picker'

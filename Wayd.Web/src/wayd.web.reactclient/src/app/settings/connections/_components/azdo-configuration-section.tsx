@@ -1,4 +1,4 @@
-import { TestAzureDevOpsConnectionRequest } from '@/src/services/moda-api'
+import { TestAzureDevOpsConnectionRequest } from '@/src/services/wayd-api'
 import { useTestAzdoConfigurationMutation } from '@/src/store/features/app-integration/azdo-integration-api'
 import { Button, Form, FormInstance, Input, Typography } from 'antd'
 import { useState } from 'react'

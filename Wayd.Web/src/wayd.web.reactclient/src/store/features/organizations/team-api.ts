@@ -13,13 +13,13 @@ import {
   SetTeamOperatingModelRequest,
   UpdateTeamOperatingModelRequest,
   TeamOperatingModelDetailsDto,
-} from './../../../services/moda-api'
+} from './../../../services/wayd-api'
 import { TeamListItem, TeamTypeName } from '@/src/app/organizations/types'
 import { apiSlice } from '../apiSlice'
 import { QueryTags } from '../query-tags'
 import { getTeamsClient, getTeamsOfTeamsClient } from '@/src/services/clients'
 import { BaseOptionType } from 'antd/es/select'
-import { DependencyDto, WorkItemBacklogItemDto } from '@/src/services/moda-api'
+import { DependencyDto, WorkItemBacklogItemDto } from '@/src/services/wayd-api'
 import { OptionModel } from '@/src/components/types'
 
 export const teamApi = apiSlice.injectEndpoints({

@@ -1,6 +1,6 @@
 import { GlobalToken } from 'antd'
 import { LifecyclePhase } from '../components/types'
-import { LifecycleNavigationDto } from '../services/moda-api'
+import { LifecycleNavigationDto } from '../services/wayd-api'
 
 /**
  * Determines the ant design status color string based on the status of a work status category.

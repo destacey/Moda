@@ -2,7 +2,7 @@
 
 import { ModaGrid } from '@/src/components/common'
 import { UserLinkCellRenderer } from '@/src/components/common/moda-grid-cell-renderers'
-import { RoleListDto, UserDetailsDto } from '@/src/services/moda-api'
+import { RoleListDto, UserDetailsDto } from '@/src/services/wayd-api'
 import { useGetRoleUsersQuery } from '@/src/store/features/user-management/roles-api'
 import { ColDef } from 'ag-grid-community'
 import { FC, useMemo } from 'react'

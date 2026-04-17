@@ -2,7 +2,7 @@
 
 import { ModaGrid } from '@/src/components/common'
 import { renderTeamLinkHelper } from '@/src/components/common/moda-grid-cell-renderers'
-import { SprintListDto } from '@/src/services/moda-api'
+import { SprintListDto } from '@/src/services/wayd-api'
 import {
   ColDef,
   ICellRendererParams,

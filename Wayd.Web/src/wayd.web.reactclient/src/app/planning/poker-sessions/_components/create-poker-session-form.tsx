@@ -5,7 +5,7 @@ import { CSSProperties } from 'react'
 import {
   CreatePokerSessionRequest,
   EstimationScaleDto,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import { toFormErrors } from '@/src/utils'
 import { useMessage } from '@/src/components/contexts/messaging'
 import useTheme from '@/src/components/contexts/theme'

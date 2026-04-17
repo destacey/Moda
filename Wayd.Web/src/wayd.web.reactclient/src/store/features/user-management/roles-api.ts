@@ -5,7 +5,7 @@ import {
   RoleListDto,
   UpdateRolePermissionsRequest,
   UserDetailsDto,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import { getRolesClient } from '@/src/services/clients'
 import { QueryTags } from '../query-tags'
 

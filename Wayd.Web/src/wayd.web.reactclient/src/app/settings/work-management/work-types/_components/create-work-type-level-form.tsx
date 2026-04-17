@@ -1,6 +1,6 @@
 import { MarkdownEditor } from '@/src/components/common/markdown'
 import { useMessage } from '@/src/components/contexts/messaging'
-import { CreateWorkTypeLevelRequest } from '@/src/services/moda-api'
+import { CreateWorkTypeLevelRequest } from '@/src/services/wayd-api'
 import { useCreateWorkTypeLevelMutation } from '@/src/store/features/work-management/work-type-level-api'
 import { toFormErrors } from '@/src/utils'
 import { Form, Input, Modal } from 'antd'

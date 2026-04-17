@@ -6,7 +6,7 @@ import CreateLinkForm from './create-link-form'
 import LinkItem from './link-item'
 import ModaEmpty from '../moda-empty'
 import { useGetLinksQuery } from '@/src/store/features/common/links-api'
-import { LinkDto } from '@/src/services/moda-api'
+import { LinkDto } from '@/src/services/wayd-api'
 
 export interface LinksCardProps {
   objectId: string

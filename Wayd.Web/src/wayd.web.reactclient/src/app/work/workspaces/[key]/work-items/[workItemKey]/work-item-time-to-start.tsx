@@ -1,6 +1,6 @@
 'use client'
 
-import { WorkItemDetailsDto } from '@/src/services/moda-api'
+import { WorkItemDetailsDto } from '@/src/services/wayd-api'
 import { Card, Statistic } from 'antd'
 import { ModaTooltip } from '@/src/components/common'
 import dayjs from 'dayjs'

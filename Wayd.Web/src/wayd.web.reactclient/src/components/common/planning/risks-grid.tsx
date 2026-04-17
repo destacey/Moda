@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import ModaGrid from '../moda-grid'
-import { RiskListDto } from '@/src/services/moda-api'
+import { RiskListDto } from '@/src/services/wayd-api'
 import { ItemType } from 'antd/es/menu/interface'
 import { Button } from 'antd'
 import dayjs from 'dayjs'

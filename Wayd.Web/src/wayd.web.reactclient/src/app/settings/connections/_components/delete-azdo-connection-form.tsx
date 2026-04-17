@@ -1,7 +1,7 @@
 'use client'
 
 import { useMessage } from '@/src/components/contexts/messaging'
-import { AzureDevOpsConnectionDetailsDto } from '@/src/services/moda-api'
+import { AzureDevOpsConnectionDetailsDto } from '@/src/services/wayd-api'
 import { useDeleteConnectionMutation } from '@/src/store/features/app-integration/connections-api'
 import { Descriptions, Modal } from 'antd'
 import { useConfirmModal } from '@/src/hooks'

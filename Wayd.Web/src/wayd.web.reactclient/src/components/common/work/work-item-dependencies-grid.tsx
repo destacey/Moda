@@ -3,7 +3,7 @@
 import {
   ScopedDependencyDto,
   WorkItemDetailsDto,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import { ColDef, ColGroupDef, GetRowIdParams } from 'ag-grid-community'
 import { CustomCellRendererProps } from 'ag-grid-react'
 import { FC, useMemo } from 'react'

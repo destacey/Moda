@@ -4,7 +4,7 @@ import { useMessage } from '@/src/components/contexts/messaging'
 import {
   BackgroundJobTypeDto,
   CreateRecurringJobRequest,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import { useCreateRecurringJobMutation } from '@/src/store/features/admin/background-jobs-api'
 import { toFormErrors } from '@/src/utils'
 import { Form, Input, Modal, Select } from 'antd'

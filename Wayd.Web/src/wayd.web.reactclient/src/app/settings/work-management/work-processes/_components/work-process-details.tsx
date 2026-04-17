@@ -1,6 +1,6 @@
 'use client'
 
-import { WorkProcessDto } from '@/src/services/moda-api'
+import { WorkProcessDto } from '@/src/services/wayd-api'
 import { useGetWorkProcessSchemesQuery } from '@/src/store/features/work-management/work-process-api'
 import { Descriptions, List } from 'antd'
 

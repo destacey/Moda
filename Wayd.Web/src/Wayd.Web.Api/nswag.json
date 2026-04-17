@@ -3,7 +3,7 @@
     "defaultVariables": null,
     "documentGenerator": {
         "aspNetCoreToOpenApi": {
-            "project": "Moda.Web.Api.csproj",
+            "project": "Wayd.Web.Api.csproj",
             "msBuildProjectExtensionsPath": null,
             "configuration": "$(Configuration)",
             "runtime": null,
@@ -123,7 +123,7 @@
             "enumNameGeneratorType": null,
             "serviceHost": null,
             "serviceSchemes": null,
-            "output": "../moda.web.reactclient/src/services/moda-api.ts",
+            "output": "../wayd.web.reactclient/src/services/wayd-api.ts",
             "newLineBehavior": "Auto"
         }
     }

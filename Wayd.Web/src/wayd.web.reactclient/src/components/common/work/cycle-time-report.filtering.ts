@@ -1,4 +1,4 @@
-import { WorkItemListDto } from '@/src/services/moda-api'
+import { WorkItemListDto } from '@/src/services/wayd-api'
 
 export type CycleTimeOutlierMethod = 'Balanced' | 'Forecasting'
 

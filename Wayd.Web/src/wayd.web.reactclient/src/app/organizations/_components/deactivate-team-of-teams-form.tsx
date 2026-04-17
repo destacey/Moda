@@ -3,7 +3,7 @@
 import {
   DeactivateTeamRequest as DeactivateTeamOfTeamsRequest,
   TeamOfTeamsDetailsDto,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import { useDeactivateTeamOfTeamsMutation } from '@/src/store/features/organizations/team-api'
 import { toFormErrors } from '@/src/utils'
 import { DatePicker, Form, Modal } from 'antd'

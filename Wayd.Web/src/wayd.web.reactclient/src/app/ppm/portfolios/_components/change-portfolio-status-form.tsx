@@ -2,7 +2,7 @@
 
 import { useMessage } from '@/src/components/contexts/messaging'
 import { useConfirmModal } from '@/src/hooks'
-import { ProjectPortfolioDetailsDto } from '@/src/services/moda-api'
+import { ProjectPortfolioDetailsDto } from '@/src/services/wayd-api'
 import {
   useActivatePortfolioMutation,
   useArchivePortfolioMutation,

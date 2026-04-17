@@ -9,7 +9,7 @@ import type { ColumnsType } from 'antd/es/table'
 import {
   PlanningIntervalDetailsDto,
   SprintListDto,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import {
   useGetIterationSprintsQuery,
   useGetPlanningIntervalTeamsQuery,

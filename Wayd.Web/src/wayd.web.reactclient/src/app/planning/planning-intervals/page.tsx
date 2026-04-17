@@ -11,7 +11,7 @@ import useAuth from '../../../components/contexts/auth'
 import { Button } from 'antd'
 import { authorizePage } from '../../../components/hoc'
 import { useGetPlanningIntervalsQuery } from '@/src/store/features/planning/planning-interval-api'
-import { PlanningIntervalListDto } from '@/src/services/moda-api'
+import { PlanningIntervalListDto } from '@/src/services/wayd-api'
 import { ColDef, ValueFormatterParams } from 'ag-grid-community'
 
 const PlanningIntervalLinkCellRenderer = ({ value, data }) => {

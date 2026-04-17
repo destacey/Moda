@@ -3,7 +3,7 @@
 import {
   PlanningIntervalDetailsDto,
   PlanningIntervalTeamResponse,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import { Col, Flex, Row, Segmented, Space, Spin, Tag, Typography } from 'antd'
 import { useState } from 'react'
 import TeamObjectivesListCard from './team-objectives-list-card'

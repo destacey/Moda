@@ -26214,7 +26214,7 @@ export interface AzdoWorkspaceTeamMappingRequest {
     workspaceId: string;
     /** The unique identifier for the team in the Azure DevOps system. */
     teamId: string;
-    /** The unique identifier for the team within Moda. */
+    /** The unique identifier for the team within Wayd. */
     internalTeamId?: string | undefined;
 }
 

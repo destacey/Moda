@@ -5,7 +5,7 @@ import {
   StrategicThemeDetailsDto,
   StrategicThemeListDto,
   UpdateStrategicThemeRequest,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import { getStrategicThemesClient } from '@/src/services/clients'
 import { QueryTags } from '../query-tags'
 import { OptionModel } from '@/src/components/types'

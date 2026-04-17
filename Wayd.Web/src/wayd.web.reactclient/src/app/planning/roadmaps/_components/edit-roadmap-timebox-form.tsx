@@ -2,7 +2,7 @@ import {
   RoadmapTimeboxDetailsDto,
   RoadmapTimeboxListDto,
   UpdateRoadmapTimeboxRequest,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import {
   useGetRoadmapActivitiesQuery,
   useGetRoadmapItemQuery,

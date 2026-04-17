@@ -8,7 +8,7 @@ import {
   useRevokePersonalAccessTokenMutation,
   useDeletePersonalAccessTokenMutation,
 } from '@/src/store/features/user-management/personal-access-tokens-api'
-import { PersonalAccessTokenDto } from '@/src/services/moda-api'
+import { PersonalAccessTokenDto } from '@/src/services/wayd-api'
 import dayjs from 'dayjs'
 import ModaGrid from '@/src/components/common/moda-grid'
 import { CustomCellRendererProps } from 'ag-grid-react'

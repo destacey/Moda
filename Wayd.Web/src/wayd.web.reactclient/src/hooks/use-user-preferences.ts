@@ -1,6 +1,6 @@
 'use client'
 
-import { UserPreferencesDto } from '@/src/services/moda-api'
+import { UserPreferencesDto } from '@/src/services/wayd-api'
 import {
   useGetUserPreferencesQuery,
   useUpdateUserPreferencesMutation,

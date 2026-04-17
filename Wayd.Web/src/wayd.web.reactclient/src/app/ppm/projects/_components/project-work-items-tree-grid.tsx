@@ -12,7 +12,7 @@ import { Button, Flex } from 'antd'
 import treeGridStyles from '@/src/components/common/tree-grid/tree-grid.module.css'
 import { TreeGrid } from '@/src/components/common/tree-grid'
 import type { TreeGridColumnMeta } from '@/src/components/common/tree-grid'
-import { WorkItemListDto } from '@/src/services/moda-api'
+import { WorkItemListDto } from '@/src/services/wayd-api'
 import {
   WorkItemTreeNode,
   buildWorkItemTree,

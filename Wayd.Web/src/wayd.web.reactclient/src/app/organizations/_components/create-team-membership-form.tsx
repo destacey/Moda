@@ -1,7 +1,7 @@
 'use client'
 
 import { DatePicker, Form, Modal, Select } from 'antd'
-import { AddTeamMembershipRequest } from '@/src/services/moda-api'
+import { AddTeamMembershipRequest } from '@/src/services/wayd-api'
 import { toFormErrors } from '@/src/utils'
 import {
   useCreateTeamMembershipMutation,

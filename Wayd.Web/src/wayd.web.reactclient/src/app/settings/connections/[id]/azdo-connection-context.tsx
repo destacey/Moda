@@ -1,4 +1,4 @@
-import { ConnectionDetailsDto } from '@/src/services/moda-api'
+import { ConnectionDetailsDto } from '@/src/services/wayd-api'
 import { QueryTags } from '@/src/store/features/query-tags'
 import {
   QueryActionCreatorResult,

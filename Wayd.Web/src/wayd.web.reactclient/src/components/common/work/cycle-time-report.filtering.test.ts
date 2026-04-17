@@ -6,7 +6,7 @@ import {
   normalizePercentile,
   sortCycleTimeWorkItems,
 } from './cycle-time-report.filtering'
-import { WorkItemListDto } from '@/src/services/moda-api'
+import { WorkItemListDto } from '@/src/services/wayd-api'
 
 const createMockWorkItem = (
   key: string,

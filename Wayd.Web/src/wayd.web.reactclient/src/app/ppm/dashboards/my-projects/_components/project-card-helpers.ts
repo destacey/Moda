@@ -1,4 +1,4 @@
-import { EmployeeNavigationDto, ProjectListDto } from '@/src/services/moda-api'
+import { EmployeeNavigationDto, ProjectListDto } from '@/src/services/wayd-api'
 
 export interface PortfolioGroup {
   portfolioId: string

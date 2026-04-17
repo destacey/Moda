@@ -1,6 +1,6 @@
 import { FC, useMemo } from 'react'
 import ModaGrid from '../moda-grid'
-import { PlanningIntervalTeamResponse } from '@/src/services/moda-api'
+import { PlanningIntervalTeamResponse } from '@/src/services/wayd-api'
 import {
   NestedTeamOfTeamsNameLinkCellRenderer,
   TeamNameLinkCellRenderer,

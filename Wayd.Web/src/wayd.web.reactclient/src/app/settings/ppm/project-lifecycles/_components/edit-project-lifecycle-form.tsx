@@ -1,7 +1,7 @@
 'use client'
 
 import { useMessage } from '@/src/components/contexts/messaging'
-import { UpdateProjectLifecycleRequest } from '@/src/services/moda-api'
+import { UpdateProjectLifecycleRequest } from '@/src/services/wayd-api'
 import {
   useGetProjectLifecycleQuery,
   useUpdateProjectLifecycleMutation,

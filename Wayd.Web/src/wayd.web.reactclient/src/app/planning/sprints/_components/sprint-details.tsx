@@ -1,7 +1,7 @@
 'use client'
 
 import { IterationState } from '@/src/components/types'
-import { SizingMethod, SprintDetailsDto } from '@/src/services/moda-api'
+import { SizingMethod, SprintDetailsDto } from '@/src/services/wayd-api'
 import { Descriptions, Flex } from 'antd'
 import Link from 'next/link'
 import SprintMetrics from './sprint-metrics'

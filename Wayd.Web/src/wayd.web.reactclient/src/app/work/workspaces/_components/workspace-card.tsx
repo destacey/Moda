@@ -1,4 +1,4 @@
-import { WorkspaceListDto } from '@/src/services/moda-api'
+import { WorkspaceListDto } from '@/src/services/wayd-api'
 import { Card, Descriptions, Space, Tag, Typography } from 'antd'
 import { useRouter } from 'next/navigation'
 

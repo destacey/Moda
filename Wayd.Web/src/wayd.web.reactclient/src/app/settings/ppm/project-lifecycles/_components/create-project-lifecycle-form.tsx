@@ -1,7 +1,7 @@
 'use client'
 
 import { useMessage } from '@/src/components/contexts/messaging'
-import { CreateProjectLifecycleRequest } from '@/src/services/moda-api'
+import { CreateProjectLifecycleRequest } from '@/src/services/wayd-api'
 import { useCreateProjectLifecycleMutation } from '@/src/store/features/ppm/project-lifecycles-api'
 import { toFormErrors } from '@/src/utils'
 import { Form, Modal } from 'antd'

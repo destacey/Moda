@@ -1,4 +1,4 @@
-import { WorkItemListDto } from '@/src/services/moda-api'
+import { WorkItemListDto } from '@/src/services/wayd-api'
 import { buildWorkItemTree } from './work-item-tree-utils'
 
 /** Creates a minimal WorkItemListDto for testing. */

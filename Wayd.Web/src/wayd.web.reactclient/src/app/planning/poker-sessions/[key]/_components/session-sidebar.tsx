@@ -1,6 +1,6 @@
 'use client'
 
-import { PokerSessionDetailsDto } from '@/src/services/moda-api'
+import { PokerSessionDetailsDto } from '@/src/services/wayd-api'
 import { Button, Divider } from 'antd'
 import { FC } from 'react'
 import SessionSummary from './session-summary'

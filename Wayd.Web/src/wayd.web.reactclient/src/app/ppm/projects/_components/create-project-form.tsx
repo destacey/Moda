@@ -7,7 +7,7 @@ import { useModalForm } from '@/src/hooks'
 import {
   CreateProjectRequest,
   ProjectLifecycleState,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import {
   useGetProjectLifecycleQuery,
   useGetProjectLifecyclesQuery,

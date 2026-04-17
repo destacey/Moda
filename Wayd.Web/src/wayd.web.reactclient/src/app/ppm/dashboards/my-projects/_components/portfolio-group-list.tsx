@@ -2,7 +2,7 @@
 
 import { ModaEmpty } from '@/src/components/common'
 import useAuth from '@/src/components/contexts/auth'
-import { ProjectListDto } from '@/src/services/moda-api'
+import { ProjectListDto } from '@/src/services/wayd-api'
 import { useDebounce } from '@/src/hooks'
 import { useGetProjectsPlanSummariesQuery } from '@/src/store/features/ppm/projects-api'
 import { SearchOutlined } from '@ant-design/icons'

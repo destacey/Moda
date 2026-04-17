@@ -1,7 +1,7 @@
 'use client'
 
 import LinksCard from '@/src/components/common/links/links-card'
-import { PlanningIntervalDetailsDto } from '@/src/services/moda-api'
+import { PlanningIntervalDetailsDto } from '@/src/services/wayd-api'
 import { Col, Descriptions, DescriptionsProps, Divider, Row, Space } from 'antd'
 import dayjs from 'dayjs'
 import {

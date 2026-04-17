@@ -25,7 +25,7 @@ import {
   UpdatePlanningIntervalRequest,
   WorkItemProgressDailyRollupDto,
   WorkItemsSummaryDto,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import { apiSlice } from '../apiSlice'
 import { getPlanningIntervalsClient } from '@/src/services/clients'
 import { QueryTags } from '../query-tags'

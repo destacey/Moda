@@ -1,4 +1,4 @@
-import { WorkTypeLevelDto } from '@/src/services/moda-api'
+import { WorkTypeLevelDto } from '@/src/services/wayd-api'
 import { Button, Card, List } from 'antd'
 import { EditWorkTypeLevelForm } from '.'
 import { useState } from 'react'

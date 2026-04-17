@@ -7,7 +7,7 @@ import {
   Methodology,
   SizingMethod,
   TeamDetailsDto,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import { Col, Descriptions, Divider, Flex, Row } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'

@@ -1,4 +1,4 @@
-import { AzureDevOpsConnectionConfigurationDto } from '@/src/services/moda-api'
+import { AzureDevOpsConnectionConfigurationDto } from '@/src/services/wayd-api'
 import { Descriptions } from 'antd'
 
 const { Item } = Descriptions

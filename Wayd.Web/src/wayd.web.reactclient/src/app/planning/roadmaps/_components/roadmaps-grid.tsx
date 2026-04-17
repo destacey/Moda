@@ -1,7 +1,7 @@
 'use client'
 
 import { ModaGrid } from '@/src/components/common'
-import { RoadmapListDto } from '@/src/services/moda-api'
+import { RoadmapListDto } from '@/src/services/wayd-api'
 import { ColDef, ValueFormatterParams } from 'ag-grid-community'
 import dayjs from 'dayjs'
 import Link from 'next/link'

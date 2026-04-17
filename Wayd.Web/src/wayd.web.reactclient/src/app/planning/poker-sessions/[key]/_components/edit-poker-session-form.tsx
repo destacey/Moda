@@ -2,7 +2,7 @@
 
 import { Alert, Flex, Form, Input, Modal, Spin, Tag, Typography } from 'antd'
 import { CSSProperties, useEffect } from 'react'
-import { EstimationScaleDto } from '@/src/services/moda-api'
+import { EstimationScaleDto } from '@/src/services/wayd-api'
 import { toFormErrors } from '@/src/utils'
 import { useMessage } from '@/src/components/contexts/messaging'
 import useTheme from '@/src/components/contexts/theme'

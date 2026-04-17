@@ -1,6 +1,6 @@
 'use client'
 
-import { AzureDevOpsWorkspaceDto } from '@/src/services/moda-api'
+import { AzureDevOpsWorkspaceDto } from '@/src/services/wayd-api'
 import { AppstoreAddOutlined, ExportOutlined } from '@ant-design/icons'
 import { Button, Card, Descriptions, Typography } from 'antd'
 import Link from 'next/link'

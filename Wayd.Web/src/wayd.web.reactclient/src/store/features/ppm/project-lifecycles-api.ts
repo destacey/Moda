@@ -8,7 +8,7 @@ import {
   ProjectLifecyclePhaseRequest,
   ProjectLifecycleState,
   UpdateProjectLifecycleRequest,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 
 export const projectLifecyclesApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({

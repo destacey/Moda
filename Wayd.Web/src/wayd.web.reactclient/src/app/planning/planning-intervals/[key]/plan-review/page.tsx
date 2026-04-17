@@ -1,7 +1,7 @@
 'use client'
 
 import { useDocumentTitle } from '@/src/hooks'
-import { PlanningIntervalTeamResponse } from '@/src/services/moda-api'
+import { PlanningIntervalTeamResponse } from '@/src/services/wayd-api'
 import { use, useEffect, useMemo, useState } from 'react'
 import { Alert, Card, Tag } from 'antd'
 import TeamPlanReview from './team-plan-review'

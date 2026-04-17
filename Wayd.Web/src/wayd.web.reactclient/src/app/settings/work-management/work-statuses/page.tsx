@@ -2,7 +2,7 @@
 
 import { ModaGrid, PageTitle } from '@/src/components/common'
 import { useAppDispatch, useAppSelector, useDocumentTitle } from '@/src/hooks'
-import { WorkStatusDto } from '@/src/services/moda-api'
+import { WorkStatusDto } from '@/src/services/wayd-api'
 import { ColDef } from 'ag-grid-community'
 import { useEffect, useMemo } from 'react'
 import { setIncludeInactive } from '../../../../store/features/work-management/work-status-slice'

@@ -1,6 +1,6 @@
 'use client'
 
-import { CreateHealthCheckRequest } from '@/src/services/moda-api'
+import { CreateHealthCheckRequest } from '@/src/services/wayd-api'
 import { DatePicker, Form, FormProps, Radio } from 'antd'
 import useAuth from '../../contexts/auth'
 import dayjs from 'dayjs'

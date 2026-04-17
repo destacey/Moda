@@ -6,7 +6,7 @@ import { Card, Flex, Typography } from 'antd'
 import ModaDateRange from '@/src/components/common/moda-date-range'
 import useTheme from '@/src/components/contexts/theme'
 import './planning-interval-iterations-list-item.css'
-import { PlanningIntervalIterationListDto } from '@/src/services/moda-api'
+import { PlanningIntervalIterationListDto } from '@/src/services/wayd-api'
 
 const { Title, Text } = Typography
 

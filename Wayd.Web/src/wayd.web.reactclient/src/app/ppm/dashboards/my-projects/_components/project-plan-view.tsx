@@ -4,7 +4,7 @@ import { getAvatarColor } from '@/src/utils'
 import {
   ProjectPlanNodeDto,
   EmployeeNavigationDto,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import { useGetProjectPlanTreeQuery } from '@/src/store/features/ppm/projects-api'
 import {
   CheckCircleFilled,

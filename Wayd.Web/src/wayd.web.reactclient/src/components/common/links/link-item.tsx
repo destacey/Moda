@@ -1,4 +1,4 @@
-import { LinkDto } from '@/src/services/moda-api'
+import { LinkDto } from '@/src/services/wayd-api'
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons'
 import { Button, Flex, Popconfirm } from 'antd'
 import Link from 'next/link'

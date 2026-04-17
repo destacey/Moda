@@ -1,6 +1,6 @@
 'use client'
 
-import { DeactivateTeamRequest, TeamDetailsDto } from '@/src/services/moda-api'
+import { DeactivateTeamRequest, TeamDetailsDto } from '@/src/services/wayd-api'
 import { useDeactivateTeamMutation } from '@/src/store/features/organizations/team-api'
 import { toFormErrors } from '@/src/utils'
 import { DatePicker, Form, Modal } from 'antd'

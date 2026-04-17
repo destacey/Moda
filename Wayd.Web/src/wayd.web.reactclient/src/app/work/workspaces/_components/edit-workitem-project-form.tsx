@@ -1,7 +1,7 @@
 'use client'
 
 import { useMessage } from '@/src/components/contexts/messaging'
-import { UpdateWorkItemProjectRequest } from '@/src/services/moda-api'
+import { UpdateWorkItemProjectRequest } from '@/src/services/wayd-api'
 import { useGetProjectOptionsQuery } from '@/src/store/features/ppm/projects-api'
 import {
   useGetWorkItemProjectInfoQuery,

@@ -3,7 +3,7 @@
 import { ResponsiveFlex } from '@/src/components/common'
 import LinksCard from '@/src/components/common/links/links-card'
 import { MarkdownRenderer } from '@/src/components/common/markdown'
-import { ProjectPortfolioDetailsDto } from '@/src/services/moda-api'
+import { ProjectPortfolioDetailsDto } from '@/src/services/wayd-api'
 import { getSortedNames } from '@/src/utils'
 import { Descriptions, Flex } from 'antd'
 

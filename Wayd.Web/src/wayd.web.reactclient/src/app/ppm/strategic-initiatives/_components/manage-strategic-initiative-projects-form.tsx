@@ -10,7 +10,7 @@ import { useConfirmModal } from '@/src/hooks'
 import {
   ManageStrategicInitiativeProjectsRequest,
   ProjectListDto,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import { useGetPortfolioProjectsQuery } from '@/src/store/features/ppm/portfolios-api'
 import {
   useGetStrategicInitiativeProjectsQuery,

@@ -11,7 +11,7 @@ import {
   Select,
 } from 'antd'
 import { useEffect, useState } from 'react'
-import { RiskDetailsDto, UpdateRiskRequest } from '@/src/services/moda-api'
+import { RiskDetailsDto, UpdateRiskRequest } from '@/src/services/wayd-api'
 import { toFormErrors } from '@/src/utils'
 import dayjs from 'dayjs'
 import { MarkdownEditor } from '../markdown'

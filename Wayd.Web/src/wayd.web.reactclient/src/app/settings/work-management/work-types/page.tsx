@@ -2,7 +2,7 @@
 
 import { ModaGrid, PageTitle } from '@/src/components/common'
 import { useAppDispatch, useAppSelector, useDocumentTitle } from '@/src/hooks'
-import { WorkTypeDto } from '@/src/services/moda-api'
+import { WorkTypeDto } from '@/src/services/wayd-api'
 import { ColDef } from 'ag-grid-community'
 import { Button } from 'antd'
 import { useEffect, useMemo, useState } from 'react'

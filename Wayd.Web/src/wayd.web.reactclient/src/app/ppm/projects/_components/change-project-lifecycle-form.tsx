@@ -6,7 +6,7 @@ import {
   ProjectDetailsDto,
   ProjectLifecycleState,
   ProjectPhaseListDto,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import { getProjectsClient } from '@/src/services/clients'
 import {
   useGetProjectLifecycleQuery,

@@ -1,6 +1,6 @@
 import { render, screen, act } from '@testing-library/react'
 import { userEvent } from '@testing-library/user-event'
-import { ProjectPhaseListDto } from '@/src/services/moda-api'
+import { ProjectPhaseListDto } from '@/src/services/wayd-api'
 import PhaseTimeline from './phase-timeline'
 
 // --- ResizeObserver mock that allows triggering resize callbacks ---

@@ -1,5 +1,5 @@
 import { useMessage } from '@/src/components/contexts/messaging'
-import { InitWorkspaceIntegrationRequest } from '@/src/services/moda-api'
+import { InitWorkspaceIntegrationRequest } from '@/src/services/wayd-api'
 import { useInitAzdoConnectionWorkspaceMutation } from '@/src/store/features/app-integration/azdo-integration-api'
 import { toFormErrors } from '@/src/utils'
 import { Form, Input, Modal } from 'antd'

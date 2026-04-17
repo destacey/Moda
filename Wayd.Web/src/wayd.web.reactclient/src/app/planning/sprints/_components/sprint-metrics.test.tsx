@@ -12,7 +12,7 @@ import {
   SprintDetailsDto,
   SprintMetricsDto,
   SizingMethod,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import { useGetSprintMetricsQuery } from '../../../../store/features/planning/sprints-api'
 
 // Mock dayjs

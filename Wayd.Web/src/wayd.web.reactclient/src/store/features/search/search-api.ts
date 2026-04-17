@@ -1,5 +1,5 @@
 import { getSearchClient } from '@/src/services/clients'
-import { GlobalSearchResultDto } from '@/src/services/moda-api'
+import { GlobalSearchResultDto } from '@/src/services/wayd-api'
 import { apiSlice } from '../apiSlice'
 
 export interface GlobalSearchRequest {

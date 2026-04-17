@@ -2,7 +2,7 @@
 
 import { useGetActiveSprintQuery } from '@/src/store/features/organizations/team-api'
 import { useGetSprintMetricsQuery } from '@/src/store/features/planning/sprints-api'
-import { SizingMethod } from '@/src/services/moda-api'
+import { SizingMethod } from '@/src/services/wayd-api'
 import { Card, Col, Flex, Row, Skeleton, Typography } from 'antd'
 import Link from 'next/link'
 import { FC } from 'react'

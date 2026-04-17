@@ -2,7 +2,7 @@ import { ModaColorPicker } from '@/src/components/common'
 import { MarkdownEditor } from '@/src/components/common/markdown'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { useModalForm } from '@/src/hooks'
-import { CreateRoadmapActivityRequest } from '@/src/services/moda-api'
+import { CreateRoadmapActivityRequest } from '@/src/services/wayd-api'
 import {
   useCreateRoadmapItemMutation,
   useGetRoadmapActivitiesQuery,

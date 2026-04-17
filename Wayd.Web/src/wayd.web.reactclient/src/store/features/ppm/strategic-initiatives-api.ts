@@ -10,7 +10,7 @@ import {
   StrategicInitiativeKpiListDto,
   StrategicInitiativeKpiMeasurementDto,
   UpdateStrategicInitiativeKpiRequest,
-} from './../../../services/moda-api'
+} from './../../../services/wayd-api'
 import { apiSlice } from './../apiSlice'
 import { QueryTags } from '../query-tags'
 import { getStrategicInitiativesClient } from '@/src/services/clients'
@@ -20,7 +20,7 @@ import {
   StrategicInitiativeDetailsDto,
   StrategicInitiativeListDto,
   UpdateStrategicInitiativeRequest,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import { OptionModel } from '@/src/components/types'
 
 export const strategicInitiativesApi = apiSlice.injectEndpoints({

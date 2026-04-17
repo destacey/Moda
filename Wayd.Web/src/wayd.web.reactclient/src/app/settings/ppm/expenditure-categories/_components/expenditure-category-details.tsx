@@ -1,6 +1,6 @@
 'use client'
 
-import { ExpenditureCategoryDetailsDto } from '@/src/services/moda-api'
+import { ExpenditureCategoryDetailsDto } from '@/src/services/wayd-api'
 import { Descriptions, Space } from 'antd'
 
 const { Item } = Descriptions

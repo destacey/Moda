@@ -4,7 +4,7 @@ import {
   KpiHealth,
   KpiTargetDirection,
   KpiTrend,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import useTheme from '@/src/components/contexts/theme'
 import {
   ArrowDownOutlined,

@@ -13,7 +13,7 @@ import {
 import dayjs, { Dayjs } from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { useGetTeamWorkItemsQuery } from '@/src/store/features/organizations/team-api'
-import { WorkStatusCategory, WorkItemListDto } from '@/src/services/moda-api'
+import { WorkStatusCategory, WorkItemListDto } from '@/src/services/wayd-api'
 import { useDebounce } from '@/src/hooks'
 import { CycleTimeAnalysisChart, WorkItemsGrid } from '.'
 import {

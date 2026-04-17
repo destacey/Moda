@@ -4,7 +4,7 @@ import {
   ConnectorListDto,
   CreateConnectionRequest,
   UpdateConnectionRequest,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import { apiSlice } from '../apiSlice'
 import { QueryTags } from '../query-tags'
 import { getConnectionsClient } from '@/src/services/clients'

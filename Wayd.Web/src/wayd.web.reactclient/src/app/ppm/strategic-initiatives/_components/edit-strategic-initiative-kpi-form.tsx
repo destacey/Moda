@@ -7,7 +7,7 @@ import { useModalForm } from '@/src/hooks'
 import {
   KpiTargetDirection,
   UpdateStrategicInitiativeKpiRequest,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import {
   useGetStrategicInitiativeKpiQuery,
   useUpdateStrategicInitiativeKpiMutation,

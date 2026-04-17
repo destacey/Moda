@@ -2,7 +2,7 @@
 
 import { MarkdownEditor } from '@/src/components/common/markdown'
 import { useMessage } from '@/src/components/contexts/messaging'
-import { CreateStrategicThemeRequest } from '@/src/services/moda-api'
+import { CreateStrategicThemeRequest } from '@/src/services/wayd-api'
 import { useCreateStrategicThemeMutation } from '@/src/store/features/strategic-management/strategic-themes-api'
 import { toFormErrors } from '@/src/utils'
 import { Form, Input, Modal } from 'antd'

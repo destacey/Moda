@@ -1,6 +1,6 @@
 'use client'
 
-import { CreateLinkRequest } from '@/src/services/moda-api'
+import { CreateLinkRequest } from '@/src/services/wayd-api'
 import { Form, Input, Modal } from 'antd'
 import { toFormErrors } from '@/src/utils'
 import { useCreateLinkMutation } from '@/src/store/features/common/links-api'

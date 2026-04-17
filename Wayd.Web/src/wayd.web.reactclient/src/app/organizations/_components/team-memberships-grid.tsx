@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import ModaGrid from '../../../components/common/moda-grid'
-import { TeamMembershipDto } from '@/src/services/moda-api'
+import { TeamMembershipDto } from '@/src/services/wayd-api'
 import dayjs from 'dayjs'
 import {
   RowMenuCellRenderer,

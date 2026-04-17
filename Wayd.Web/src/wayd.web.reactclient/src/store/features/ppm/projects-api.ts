@@ -16,7 +16,7 @@ import {
   ProjectTeamMemberDto,
   MyProjectsSummaryDto,
   MyProjectsTaskMetricsDto,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import { QueryTags } from '../query-tags'
 import { BaseOptionType } from 'antd/es/select'
 import { OptionModel } from '@/src/components/types'

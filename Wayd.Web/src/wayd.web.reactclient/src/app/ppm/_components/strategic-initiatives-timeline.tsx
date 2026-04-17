@@ -7,7 +7,7 @@ import {
   ModaTimelineOptions,
   TimelineTemplate,
 } from '@/src/components/common/timeline'
-import { StrategicInitiativeListDto } from '@/src/services/moda-api'
+import { StrategicInitiativeListDto } from '@/src/services/wayd-api'
 import { Card, Divider, Flex, Space, Switch, theme, Typography } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import dayjs from 'dayjs'

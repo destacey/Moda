@@ -1,0 +1,128 @@
+<Solution>
+  <Folder Name="/Wayd.Common/" />
+  <Folder Name="/Wayd.Common/src/">
+    <Project Path="Wayd.Common/src/Wayd.Common.Application/Wayd.Common.Application.csproj" />
+    <Project Path="Wayd.Common/src/Wayd.Common.Domain/Wayd.Common.Domain.csproj" />
+    <Project Path="Wayd.Common/src/Wayd.Common/Wayd.Common.csproj" />
+  </Folder>
+  <Folder Name="/Wayd.Common/tests/">
+    <Project Path="Wayd.Common/tests/Wayd.Common.Application.Tests/Wayd.Common.Application.Tests.csproj" />
+    <Project Path="Wayd.Common/tests/Wayd.Common.Domain.Tests/Wayd.Common.Domain.Tests.csproj" />
+    <Project Path="Wayd.Common/tests/Wayd.Common.Tests/Wayd.Common.Tests.csproj" />
+    <Project Path="Wayd.Common/tests/Wayd.Tests.Shared/Wayd.Tests.Shared.csproj" />
+  </Folder>
+  <Folder Name="/Wayd.Infrastructure/" />
+  <Folder Name="/Wayd.Infrastructure/src/">
+    <Project Path="Wayd.Infrastructure/src/Wayd.Infrastructure.Migrators.MSSQL/Wayd.Infrastructure.Migrators.MSSQL.csproj" />
+    <Project Path="Wayd.Infrastructure/src/Wayd.Infrastructure/Wayd.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/Wayd.Infrastructure/tests/">
+    <Project Path="Wayd.Infrastructure/tests/Wayd.Infrastructure.Tests/Wayd.Infrastructure.Tests.csproj" />
+  </Folder>
+  <Folder Name="/Wayd.Integrations/" />
+  <Folder Name="/Wayd.Integrations/src/">
+    <Project Path="Wayd.Integrations/src/Wayd.Integrations.AzureDevOps/Wayd.Integrations.AzureDevOps.csproj" />
+    <Project Path="Wayd.Integrations/src/Wayd.Integrations.MicrosoftGraph/Wayd.Integrations.MicrosoftGraph.csproj" />
+  </Folder>
+  <Folder Name="/Wayd.Integrations/tests/">
+    <Project Path="Wayd.Integrations/tests/Wayd.Integrations.AzureDevOps.IntegrationTests/Wayd.Integrations.AzureDevOps.IntegrationTests.csproj" />
+    <Project Path="Wayd.Integrations/tests/Wayd.Integrations.AzureDevOps.Tests/Wayd.Integrations.AzureDevOps.Tests.csproj" />
+  </Folder>
+  <Folder Name="/Wayd.Services/" />
+  <Folder Name="/Wayd.Services/Wayd.AppIntegration/" />
+  <Folder Name="/Wayd.Services/Wayd.AppIntegration/src/">
+    <Project Path="Wayd.Services/Wayd.AppIntegration/src/Wayd.AppIntegration.Application/Wayd.AppIntegration.Application.csproj" />
+    <Project Path="Wayd.Services/Wayd.AppIntegration/src/Wayd.AppIntegration.Domain/Wayd.AppIntegration.Domain.csproj" />
+  </Folder>
+  <Folder Name="/Wayd.Services/Wayd.AppIntegration/tests/">
+    <Project Path="Wayd.Services/Wayd.AppIntegration/tests/Wayd.AppIntegration.Application.Tests/Wayd.AppIntegration.Application.Tests.csproj" />
+    <Project Path="Wayd.Services/Wayd.AppIntegration/tests/Wayd.AppIntegration.Domain.Tests/Wayd.AppIntegration.Domain.Tests.csproj" />
+  </Folder>
+  <Folder Name="/Wayd.Services/Wayd.Goals/" />
+  <Folder Name="/Wayd.Services/Wayd.Goals/src/">
+    <Project Path="Wayd.Services/Wayd.Goals/src/Wayd.Goals.Application/Wayd.Goals.Application.csproj" />
+    <Project Path="Wayd.Services/Wayd.Goals/src/Wayd.Goals.Domain/Wayd.Goals.Domain.csproj" />
+  </Folder>
+  <Folder Name="/Wayd.Services/Wayd.Goals/tests/">
+    <Project Path="Wayd.Services/Wayd.Goals/tests/Wayd.Goals.Application.Tests/Wayd.Goals.Application.Tests.csproj" />
+    <Project Path="Wayd.Services/Wayd.Goals/tests/Wayd.Goals.Domain.Tests/Wayd.Goals.Domain.Tests.csproj" />
+  </Folder>
+  <Folder Name="/Wayd.Services/Wayd.Health/" />
+  <Folder Name="/Wayd.Services/Wayd.Health/src/">
+    <Project Path="Wayd.Services/Wayd.Health/src/Wayd.Health/Wayd.Health.csproj" />
+  </Folder>
+  <Folder Name="/Wayd.Services/Wayd.Health/tests/">
+    <Project Path="Wayd.Services/Wayd.Health/tests/Wayd.Health.Tests/Wayd.Health.Tests.csproj" />
+  </Folder>
+  <Folder Name="/Wayd.Services/Wayd.Links/" />
+  <Folder Name="/Wayd.Services/Wayd.Links/src/">
+    <Project Path="Wayd.Services/Wayd.Links/src/Wayd.Links/Wayd.Links.csproj" />
+  </Folder>
+  <Folder Name="/Wayd.Services/Wayd.Links/tests/">
+    <Project Path="Wayd.Services/Wayd.Links/tests/Wayd.Links.Tests/Wayd.Links.Tests.csproj" />
+  </Folder>
+  <Folder Name="/Wayd.Services/Wayd.Organization/" />
+  <Folder Name="/Wayd.Services/Wayd.Organization/src/">
+    <Project Path="Wayd.Services/Wayd.Organization/src/Wayd.Organization.Application/Wayd.Organization.Application.csproj" />
+    <Project Path="Wayd.Services/Wayd.Organization/src/Wayd.Organization.Domain/Wayd.Organization.Domain.csproj" />
+  </Folder>
+  <Folder Name="/Wayd.Services/Wayd.Organization/tests/">
+    <Project Path="Wayd.Services/Wayd.Organization/tests/Wayd.Organization.Application.Tests/Wayd.Organization.Application.Tests.csproj" />
+    <Project Path="Wayd.Services/Wayd.Organization/tests/Wayd.Organization.Domain.Tests/Wayd.Organization.Domain.Tests.csproj" />
+  </Folder>
+  <Folder Name="/Wayd.Services/Wayd.Planning/" />
+  <Folder Name="/Wayd.Services/Wayd.Planning/src/">
+    <Project Path="Wayd.Services/Wayd.Planning/src/Wayd.Planning.Application/Wayd.Planning.Application.csproj" />
+    <Project Path="Wayd.Services/Wayd.Planning/src/Wayd.Planning.Domain/Wayd.Planning.Domain.csproj" />
+  </Folder>
+  <Folder Name="/Wayd.Services/Wayd.Planning/tests/">
+    <Project Path="Wayd.Services/Wayd.Planning/tests/Wayd.Planning.Application.Tests/Wayd.Planning.Application.Tests.csproj" />
+    <Project Path="Wayd.Services/Wayd.Planning/tests/Wayd.Planning.Domain.Tests/Wayd.Planning.Domain.Tests.csproj" />
+  </Folder>
+  <Folder Name="/Wayd.Services/Wayd.ProjectPortfolioManagement/" />
+  <Folder Name="/Wayd.Services/Wayd.ProjectPortfolioManagement/src/">
+    <Project Path="Wayd.Services/Wayd.ProjectPortfolioManagement/src/Wayd.ProjectPortfolioManagement.Application/Wayd.ProjectPortfolioManagement.Application.csproj" />
+    <Project Path="Wayd.Services/Wayd.ProjectPortfolioManagement/src/Wayd.ProjectPortfolioManagement.Domain/Wayd.ProjectPortfolioManagement.Domain.csproj" />
+  </Folder>
+  <Folder Name="/Wayd.Services/Wayd.ProjectPortfolioManagement/tests/">
+    <Project Path="Wayd.Services/Wayd.ProjectPortfolioManagement/tests/Wayd.ProjectPortfolioManagement.Application.Tests/Wayd.ProjectPortfolioManagement.Application.Tests.csproj" />
+    <Project Path="Wayd.Services/Wayd.ProjectPortfolioManagement/tests/Wayd.ProjectPortfolioManagement.Domain.Tests/Wayd.ProjectPortfolioManagement.Domain.Tests.csproj" />
+  </Folder>
+  <Folder Name="/Wayd.Services/Wayd.StrategicManagement/" />
+  <Folder Name="/Wayd.Services/Wayd.StrategicManagement/src/">
+    <Project Path="Wayd.Services/Wayd.StrategicManagement/src/Wayd.StrategicManagement.Application/Wayd.StrategicManagement.Application.csproj" />
+    <Project Path="Wayd.Services/Wayd.StrategicManagement/src/Wayd.StrategicManagement.Domain/Wayd.StrategicManagement.Domain.csproj" />
+  </Folder>
+  <Folder Name="/Wayd.Services/Wayd.StrategicManagement/tests/">
+    <Project Path="Wayd.Services/Wayd.StrategicManagement/tests/Wayd.StrategicManagement.Application.Tests/Wayd.StrategicManagement.Application.Tests.csproj" />
+    <Project Path="Wayd.Services/Wayd.StrategicManagement/tests/Wayd.StrategicManagement.Domain.Tests/Wayd.StrategicManagement.Domain.Tests.csproj" />
+  </Folder>
+  <Folder Name="/Wayd.Services/Wayd.Work/" />
+  <Folder Name="/Wayd.Services/Wayd.Work/src/">
+    <Project Path="Wayd.Services/Wayd.Work/src/Wayd.Work.Application/Wayd.Work.Application.csproj" />
+    <Project Path="Wayd.Services/Wayd.Work/src/Wayd.Work.Domain/Wayd.Work.Domain.csproj" />
+  </Folder>
+  <Folder Name="/Wayd.Services/Wayd.Work/tests/">
+    <Project Path="Wayd.Services/Wayd.Work/tests/Wayd.Work.Application.Tests/Wayd.Work.Application.Tests.csproj" />
+    <Project Path="Wayd.Services/Wayd.Work/tests/Wayd.Work.Domain.Tests/Wayd.Work.Domain.Tests.csproj" />
+  </Folder>
+  <Folder Name="/Wayd.Web/" />
+  <Folder Name="/Wayd.Web/src/">
+    <Project Path="Wayd.Web/src/Wayd.Web.Api/Wayd.Web.Api.csproj" />
+    <Project Path="Wayd.Web/src/wayd.web.reactclient/wayd.web.reactclient.esproj">
+      <Build />
+      <Deploy />
+    </Project>
+  </Folder>
+  <Folder Name="/Wayd.Web/tests/">
+    <Project Path="Wayd.Web/tests/Wayd.Web.Api.Tests/Wayd.Web.Api.Tests.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="README.md" />
+  </Folder>
+  <Project Path="Wayd.AppHost/Wayd.AppHost.csproj" />
+  <Project Path="Wayd.ArchitectureTests/Wayd.ArchitectureTests.csproj" />
+</Solution>

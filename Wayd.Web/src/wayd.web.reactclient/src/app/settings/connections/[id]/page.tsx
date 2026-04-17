@@ -25,7 +25,7 @@ import {
 } from '@/src/store/features/app-integration/azdo-integration-api'
 import { useGetConnectionQuery } from '@/src/store/features/app-integration/connections-api'
 import { useMessage } from '@/src/components/contexts/messaging'
-import { AzureDevOpsConnectionDetailsDto } from '@/src/services/moda-api'
+import { AzureDevOpsConnectionDetailsDto } from '@/src/services/wayd-api'
 
 enum ConnectionTabs {
   Details = 'details',

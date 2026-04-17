@@ -2,7 +2,7 @@
 
 import { ModaGrid } from '@/src/components/common'
 import { RowMenuCellRenderer } from '@/src/components/common/moda-grid-cell-renderers'
-import { PokerSessionListDto } from '@/src/services/moda-api'
+import { PokerSessionListDto } from '@/src/services/wayd-api'
 import { ColDef, ICellRendererParams } from 'ag-grid-community'
 import { ItemType } from 'antd/es/menu/interface'
 import Link from 'next/link'

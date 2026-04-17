@@ -1,7 +1,7 @@
 'use client'
 
 import { useMessage } from '@/src/components/contexts/messaging'
-import { UpdateEstimationScaleRequest } from '@/src/services/moda-api'
+import { UpdateEstimationScaleRequest } from '@/src/services/wayd-api'
 import {
   useGetEstimationScaleQuery,
   useUpdateEstimationScaleMutation,

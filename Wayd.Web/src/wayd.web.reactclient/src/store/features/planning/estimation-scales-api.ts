@@ -5,7 +5,7 @@ import {
   CreateEstimationScaleRequest,
   EstimationScaleDto,
   UpdateEstimationScaleRequest,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 
 export const estimationScalesApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({

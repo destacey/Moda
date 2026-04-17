@@ -1,6 +1,6 @@
 'use client'
 
-import { UserDetailsDto } from '@/src/services/moda-api'
+import { UserDetailsDto } from '@/src/services/wayd-api'
 import { InfoCircleOutlined } from '@ant-design/icons'
 import { Card, Descriptions, Flex, List, Tag } from 'antd'
 import dayjs from 'dayjs'

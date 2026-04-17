@@ -7,7 +7,7 @@ const Area = dynamic(
 )
 import { AreaConfig } from '@ant-design/charts'
 import useTheme from '../../contexts/theme'
-import { WorkItemProgressDailyRollupDto } from '@/src/services/moda-api'
+import { WorkItemProgressDailyRollupDto } from '@/src/services/wayd-api'
 import ModaEmpty from '../moda-empty'
 import { Spin, Typography } from 'antd'
 import dayjs from 'dayjs'

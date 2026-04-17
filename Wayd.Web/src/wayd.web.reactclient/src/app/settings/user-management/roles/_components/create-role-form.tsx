@@ -3,7 +3,7 @@
 import { Form, Input, Modal, Select } from 'antd'
 import { useState } from 'react'
 import { toFormErrors } from '@/src/utils'
-import { RoleDto, UpdateRolePermissionsRequest } from '@/src/services/moda-api'
+import { RoleDto, UpdateRolePermissionsRequest } from '@/src/services/wayd-api'
 import {
   useGetRoleQuery,
   useUpdatePermissionsMutation,

@@ -1,6 +1,6 @@
 'use client'
 
-import { WorkItemProgressRollupDto } from '@/src/services/moda-api'
+import { WorkItemProgressRollupDto } from '@/src/services/wayd-api'
 import { Progress } from 'antd'
 import ModaTooltip from '@/src/components/common/moda-tooltip'
 import { round } from 'lodash'

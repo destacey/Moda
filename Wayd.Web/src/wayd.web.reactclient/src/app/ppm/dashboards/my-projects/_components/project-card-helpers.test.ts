@@ -7,7 +7,7 @@ import {
 import {
   EmployeeNavigationDto,
   ProjectListDto,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 
 // --- Factories ---
 

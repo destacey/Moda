@@ -6,7 +6,7 @@ import {
   PortfolioLinkCellRenderer,
   ProgramLinkCellRenderer,
 } from '@/src/components/common/moda-grid-cell-renderers'
-import { ProgramListDto } from '@/src/services/moda-api'
+import { ProgramListDto } from '@/src/services/wayd-api'
 import { getSortedNames } from '@/src/utils'
 import { ColDef } from 'ag-grid-community'
 import dayjs from 'dayjs'

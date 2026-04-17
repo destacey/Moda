@@ -2,7 +2,7 @@
 
 import { useMessage } from '@/src/components/contexts/messaging'
 import { useConfirmModal } from '@/src/hooks'
-import { StrategicInitiativeKpiListDto } from '@/src/services/moda-api'
+import { StrategicInitiativeKpiListDto } from '@/src/services/wayd-api'
 import { useDeleteStrategicInitiativeKpiMutation } from '@/src/store/features/ppm/strategic-initiatives-api'
 import { Modal } from 'antd'
 

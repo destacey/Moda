@@ -1,6 +1,6 @@
 'use client'
 
-import { WorkItemDetailsDto } from '@/src/services/moda-api'
+import { WorkItemDetailsDto } from '@/src/services/wayd-api'
 import { SprintLink } from '@/src/components/common/planning'
 import { Descriptions } from 'antd'
 import dayjs from 'dayjs'

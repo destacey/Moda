@@ -405,7 +405,7 @@ public class FileStructureTests
         var expectedProjects = new[]
         {
             "Wayd.Web.Api",
-            "moda.web.reactclient"
+            "wayd.web.reactclient"
         };
 
         foreach (var projectName in expectedProjects)

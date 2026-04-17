@@ -3,7 +3,7 @@
 import { BuildOutlined, MenuOutlined } from '@ant-design/icons'
 import Segmented, { SegmentedLabeledOption } from 'antd/es/segmented'
 import { memo, useState } from 'react'
-import { StrategicInitiativeListDto } from '@/src/services/moda-api'
+import { StrategicInitiativeListDto } from '@/src/services/wayd-api'
 import { Spin } from 'antd'
 import dynamic from 'next/dynamic'
 import { StrategicInitiativesGrid } from '.'

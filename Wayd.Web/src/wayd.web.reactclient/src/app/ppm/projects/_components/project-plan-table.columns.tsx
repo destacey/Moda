@@ -1,4 +1,4 @@
-import { ProjectPlanNodeDto } from '@/src/services/moda-api'
+import { ProjectPlanNodeDto } from '@/src/services/wayd-api'
 import {
   CaretDownOutlined,
   CaretRightOutlined,

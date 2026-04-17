@@ -1,6 +1,6 @@
 import LinksCard from '@/src/components/common/links/links-card'
 import { MarkdownRenderer } from '@/src/components/common/markdown'
-import { RiskDetailsDto } from '@/src/services/moda-api'
+import { RiskDetailsDto } from '@/src/services/wayd-api'
 import { Col, Descriptions, Row } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'

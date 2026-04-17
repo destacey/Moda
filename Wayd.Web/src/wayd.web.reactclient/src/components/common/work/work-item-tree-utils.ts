@@ -1,5 +1,5 @@
 import type { TreeNode } from '@/src/components/common/tree-grid'
-import type { WorkItemListDto } from '@/src/services/moda-api'
+import type { WorkItemListDto } from '@/src/services/wayd-api'
 
 /**
  * Extends WorkItemListDto to satisfy the TreeNode interface required by TreeGrid.

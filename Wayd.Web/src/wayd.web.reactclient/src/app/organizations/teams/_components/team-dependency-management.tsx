@@ -1,7 +1,7 @@
 'use client'
 
 import TeamDependenciesGrid from '@/src/components/common/organizations/team-dependencies-grid'
-import { TeamDetailsDto } from '@/src/services/moda-api'
+import { TeamDetailsDto } from '@/src/services/wayd-api'
 import { useGetTeamDependenciesQuery } from '@/src/store/features/organizations/team-api'
 import { FC } from 'react'
 

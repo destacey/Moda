@@ -1,7 +1,7 @@
 import { getWorkStatusesClient } from '@/src/services/clients'
 import { apiSlice } from '../apiSlice'
 import { QueryTags } from '../query-tags'
-import { WorkStatusDto } from '@/src/services/moda-api'
+import { WorkStatusDto } from '@/src/services/wayd-api'
 
 export const workStatusApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({

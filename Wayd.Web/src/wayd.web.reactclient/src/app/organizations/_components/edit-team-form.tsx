@@ -2,7 +2,7 @@
 
 import { Form, Input } from 'antd'
 import { useEffect } from 'react'
-import { TeamDetailsDto, TeamOfTeamsDetailsDto } from '@/src/services/moda-api'
+import { TeamDetailsDto, TeamOfTeamsDetailsDto } from '@/src/services/wayd-api'
 import { EditTeamFormValues } from '../types'
 import withModalForm, {
   FormProps,

@@ -1,4 +1,4 @@
-import { TeamNavigationDto } from '@/src/services/moda-api'
+import { TeamNavigationDto } from '@/src/services/wayd-api'
 
 export interface TeamListItem extends TeamNavigationDto {
   code?: string

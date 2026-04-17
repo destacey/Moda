@@ -3,7 +3,7 @@
 import {
   AzureDevOpsWorkProcessDto,
   AzureDevOpsWorkspaceDto,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import { ExportOutlined } from '@ant-design/icons'
 import { Button, Flex, List, Space, Typography } from 'antd'
 import Link from 'next/link'

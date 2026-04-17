@@ -13,14 +13,14 @@ import {
   UpdateRoadmapMilestoneRequest,
   UpdateRoadmapTimeboxDatesRequest,
   UpdateRoadmapTimeboxRequest,
-} from './../../../services/moda-api'
+} from './../../../services/wayd-api'
 import {
   CopyRoadmapRequest,
   CreateRoadmapRequest,
   RoadmapDetailsDto,
   RoadmapListDto,
   UpdateRoadmapRequest,
-} from '@/src/services/moda-api'
+} from '@/src/services/wayd-api'
 import { apiSlice } from '../apiSlice'
 import { QueryTags } from '../query-tags'
 import { authenticatedFetch, getRoadmapsClient } from '@/src/services/clients'

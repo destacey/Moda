@@ -1,7 +1,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { WorkItemProgressDailyRollupDto } from '@/src/services/moda-api'
+import { WorkItemProgressDailyRollupDto } from '@/src/services/wayd-api'
 import useTheme from '@/src/components/contexts/theme'
 import { Card } from 'antd'
 

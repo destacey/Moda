@@ -1,6 +1,6 @@
 'use client'
 
-import { WorkspaceListDto } from '@/src/services/moda-api'
+import { WorkspaceListDto } from '@/src/services/wayd-api'
 import { Flex, List } from 'antd'
 import { ReactElement } from 'react'
 import { WorkspaceCard } from '.'
