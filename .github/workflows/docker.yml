@@ -135,7 +135,7 @@ jobs:
               id: init
               run: |
                   terraform init
-                  terraform workspace select wayd-dev
+                  terraform workspace select -or-create wayd-dev
                   terraform workspace show
 
             - name: Terraform fmt
