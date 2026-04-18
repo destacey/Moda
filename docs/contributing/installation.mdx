@@ -1,6 +1,6 @@
 ---
 title: Installation
-description: How to clone, build, and run Moda locally.
+description: How to clone, build, and run Wayd locally.
 sidebar_position: 5
 audience: [developer]
 ---
@@ -10,26 +10,26 @@ audience: [developer]
 ## Clone the Repository
 
 ```bash
-git clone https://github.com/destacey/Moda.git
-cd Moda
+git clone https://github.com/destacey/Wayd.git
+cd Wayd
 ```
 
 ## Build the Backend
 
 ```bash
-dotnet build Moda.slnx
+dotnet build Wayd.slnx
 ```
 
 ## Install Frontend Dependencies
 
 ```bash
-cd Moda.Web/src/moda.web.reactclient
+cd Wayd.Web/src/wayd.web.reactclient
 npm install
 ```
 
 ## Set Up the Database
 
-Moda uses SQL Server. You can use SQL Server LocalDB, a full SQL Server instance, or a Docker container.
+Wayd uses SQL Server. You can use SQL Server LocalDB, a full SQL Server instance, or a Docker container.
 
 ### Apply Migrations
 
@@ -37,8 +37,8 @@ From the repository root:
 
 ```bash
 dotnet ef database update \
-  --project "Moda.Infrastructure/src/Moda.Infrastructure.Migrators.MSSQL" \
-  --startup-project "Moda.Web/src/Moda.Web.Api"
+  --project "Wayd.Infrastructure/src/Wayd.Infrastructure.Migrators.MSSQL" \
+  --startup-project "Wayd.Web/src/Wayd.Web.Api"
 ```
 
 ## Run the Application
@@ -46,7 +46,7 @@ dotnet ef database update \
 ### Option 1: .NET Aspire (Recommended)
 
 ```bash
-cd Moda.AppHost
+cd Wayd.AppHost
 dotnet run
 ```
 
@@ -56,11 +56,11 @@ Access the Aspire dashboard at `http://localhost:15888` for telemetry, logs, and
 
 ```bash
 # Terminal 1 - API
-cd Moda.Web/src/Moda.Web.Api
+cd Wayd.Web/src/Wayd.Web.Api
 dotnet run
 
 # Terminal 2 - Frontend
-cd Moda.Web/src/moda.web.reactclient
+cd Wayd.Web/src/wayd.web.reactclient
 npm run dev
 ```
 

@@ -1,19 +1,19 @@
 ---
 title: MCP Server
-description: Connect AI assistants like Claude to Moda using the Model Context Protocol (MCP) server.
+description: Connect AI assistants like Claude to Wayd using the Model Context Protocol (MCP) server.
 sidebar_position: 4
 audience: [user, developer, agent]
 ---
 
 # MCP Server
 
-Moda provides an [MCP (Model Context Protocol)](https://modelcontextprotocol.io) server that lets AI assistants like Claude interact directly with your Moda instance. The MCP server exposes Moda's API as structured tools that AI agents can call to read and manage your delivery data.
+Wayd provides an [MCP (Model Context Protocol)](https://modelcontextprotocol.io) server that lets AI assistants like Claude interact directly with your Wayd instance. The MCP server exposes Wayd's API as structured tools that AI agents can call to read and manage your delivery data.
 
-**Package:** [`@modanpm/moda-mcp`](https://www.npmjs.com/package/@modanpm/moda-mcp)
+**Package:** [`@modanpm/wayd-mcp`](https://www.npmjs.com/package/@modanpm/wayd-mcp)
 
 ## What Can It Do?
 
-The MCP server exposes 50+ tools across Moda's core modules:
+The MCP server exposes 50+ tools across Wayd's core modules:
 
 | Module | Capabilities |
 |--------|-------------|
@@ -24,7 +24,7 @@ The MCP server exposes 50+ tools across Moda's core modules:
 
 ## Prerequisites
 
-1. A running Moda instance with API access
+1. A running Wayd instance with API access
 2. A **[Personal Access Token (PAT)](./your-profile.mdx#personal-access-tokens)** — create one from your profile page
 3. **Node.js 20+** installed on your machine
 
@@ -40,11 +40,11 @@ Add the following to your Claude Desktop configuration file:
 ```json
 {
   "mcpServers": {
-    "moda": {
+    "wayd": {
       "command": "npx",
-      "args": ["-y", "@modanpm/moda-mcp"],
+      "args": ["-y", "@modanpm/wayd-mcp"],
       "env": {
-        "MODA_API_BASE_URL": "https://your-moda-instance.com",
+        "MODA_API_BASE_URL": "https://your-wayd-instance.com",
         "MODA_API_KEY": "your-personal-access-token"
       }
     }
@@ -59,11 +59,11 @@ Add a `.mcp.json` file to your project root:
 ```json
 {
   "mcpServers": {
-    "moda": {
+    "wayd": {
       "command": "npx",
-      "args": ["-y", "@modanpm/moda-mcp"],
+      "args": ["-y", "@modanpm/wayd-mcp"],
       "env": {
-        "MODA_API_BASE_URL": "https://your-moda-instance.com",
+        "MODA_API_BASE_URL": "https://your-wayd-instance.com",
         "MODA_API_KEY": "your-personal-access-token"
       }
     }
@@ -74,7 +74,7 @@ Add a `.mcp.json` file to your project root:
 Or set environment variables in your shell and omit the `env` block:
 
 ```bash
-export MODA_API_BASE_URL="https://your-moda-instance.com"
+export MODA_API_BASE_URL="https://your-wayd-instance.com"
 export MODA_API_KEY="your-personal-access-token"
 ```
 
@@ -87,22 +87,22 @@ Add to your `.vscode/mcp.json` or workspace settings:
   "inputs": [
     {
       "id": "modaBaseUrl",
-      "description": "Moda API base URL",
+      "description": "Wayd API base URL",
       "type": "promptString"
     },
     {
       "id": "modaApiKey",
-      "description": "Moda API key (Personal Access Token)",
+      "description": "Wayd API key (Personal Access Token)",
       "type": "promptString",
       "password": true
     }
   ],
   "servers": {
-    "moda": {
+    "wayd": {
       "type": "stdio",
       "command": "npx",
       "args": [
-        "-y", "@modanpm/moda-mcp",
+        "-y", "@modanpm/wayd-mcp",
         "--base-url", "${input:modaBaseUrl}",
         "--api-key", "${input:modaApiKey}"
       ]
@@ -117,7 +117,7 @@ The MCP server accepts configuration via environment variables or CLI arguments:
 
 | Environment Variable | CLI Argument | Description |
 |---------------------|-------------|-------------|
-| `MODA_API_BASE_URL` | `--base-url` | The base URL of your Moda API instance |
+| `MODA_API_BASE_URL` | `--base-url` | The base URL of your Wayd API instance |
 | `MODA_API_KEY` | `--api-key` | Your [Personal Access Token](./your-profile.mdx#personal-access-tokens) |
 
 CLI arguments take precedence over environment variables.
@@ -126,14 +126,14 @@ CLI arguments take precedence over environment variables.
 
 For Claude Code users, three pre-built skills provide guided workflows:
 
-- **`/moda-ppm`** — Portfolio, program, and project operations
-- **`/moda-pi`** — Planning intervals, iterations, objectives, and risks
-- **`/moda-roadmaps`** — Roadmap exploration with activities and milestones
+- **`/wayd-ppm`** — Portfolio, program, and project operations
+- **`/wayd-pi`** — Planning intervals, iterations, objectives, and risks
+- **`/wayd-roadmaps`** — Roadmap exploration with activities and milestones
 
 Install the skills:
 
 ```bash
-npx skills add destacey/moda
+npx skills add destacey/wayd
 ```
 
 ## Available Tools

@@ -1,0 +1,10 @@
+﻿namespace Wayd.Common.Application.Interfaces.ExternalWork;
+
+public interface IExternalWorkProcess
+{
+    Guid Id { get; }
+    string Name { get; }
+    string? Description { get; }
+    List<Guid> WorkspaceIds { get; }
+    bool IsEnabled { get; }
+}

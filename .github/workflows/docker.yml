@@ -17,7 +17,7 @@ jobs:
         defaults:
             run:
                 shell: bash
-                working-directory: Moda.Web/src/Moda.Web.Api
+                working-directory: Wayd.Web/src/Wayd.Web.Api
         steps:
             - name: checkout
               uses: actions/checkout@v2
@@ -41,7 +41,7 @@ jobs:
         defaults:
             run:
                 shell: bash
-                working-directory: Moda.Web/src/moda.web.reactclient
+                working-directory: Wayd.Web/src/wayd.web.reactclient
         steps:
             - name: checkout
               uses: actions/checkout@v4
@@ -69,10 +69,10 @@ jobs:
             fail-fast: false
             matrix:
                 include:
-                    - dockerfile: ./Moda.Web/src/Moda.Web.Api/Dockerfile
+                    - dockerfile: ./Wayd.Web/src/Wayd.Web.Api/Dockerfile
                       image: awaldow/moda-api
                       contextDir: .
-                    - dockerfile: ./Moda.Web/src/moda.web.reactclient/Dockerfile
+                    - dockerfile: ./Wayd.Web/src/wayd.web.reactclient/Dockerfile
                       image: awaldow/moda-client
                       contextDir: .
         permissions:
@@ -119,7 +119,7 @@ jobs:
         needs: [build-and-push-image]
         defaults:
             run:
-                working-directory: .iac/moda
+                working-directory: .iac/wayd
 
         steps:
             - uses: actions/checkout@v3
@@ -164,7 +164,7 @@ jobs:
               uses: dflook/terraform-output@v1
               with:
                   workspace: moda-dev
-                  path: .iac/moda
+                  path: .iac/wayd
               env:
                   TERRAFORM_CLOUD_TOKENS: app.terraform.io=${{ secrets.TF_API_TOKEN }}
 
@@ -180,8 +180,8 @@ jobs:
               run: dotnet tool install --global dotnet-ef
 
             - name: Build for migrations
-              run: dotnet build Moda.Web/src/Moda.Web.Api/Moda.Web.Api.csproj
+              run: dotnet build Wayd.Web/src/Wayd.Web.Api/Wayd.Web.Api.csproj
 
             - name: Run migrations
               run: |
-                  dotnet ef database update --connection "${{ steps.tfoutputs.outputs.sql_server_connection_string }}" --startup-project Moda.Web/src/Moda.Web.Api/Moda.Web.Api.csproj --project Moda.Infrastructure/src/Moda.Infrastructure.Migrators.MSSQL/Moda.Infrastructure.Migrators.MSSQL.csproj
+                  dotnet ef database update --connection "${{ steps.tfoutputs.outputs.sql_server_connection_string }}" --startup-project Wayd.Web/src/Wayd.Web.Api/Wayd.Web.Api.csproj --project Wayd.Infrastructure/src/Wayd.Infrastructure.Migrators.MSSQL/Wayd.Infrastructure.Migrators.MSSQL.csproj

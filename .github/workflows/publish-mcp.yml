@@ -8,7 +8,7 @@ on:
     push:
         branches: [main]
         paths:
-            - "Moda.Web/src/Moda.Mcp/CHANGELOG.md"
+            - "Wayd.Web/src/Wayd.Mcp/CHANGELOG.md"
     workflow_dispatch:
 
 jobs:
@@ -17,7 +17,7 @@ jobs:
         runs-on: ubuntu-latest
         defaults:
             run:
-                working-directory: Moda.Web/src/Moda.Mcp
+                working-directory: Wayd.Web/src/Wayd.Mcp
         steps:
             - uses: actions/checkout@v4
 
@@ -41,7 +41,7 @@ jobs:
             - name: Tag release
               working-directory: ${{ github.workspace }}
               run: |
-                  VERSION=$(node -p "require('./Moda.Web/src/Moda.Mcp/package.json').version")
+                  VERSION=$(node -p "require('./Wayd.Web/src/Wayd.Mcp/package.json').version")
                   git config user.name "github-actions[bot]"
                   git config user.email "github-actions[bot]@users.noreply.github.com"
                   git tag "mcp-v${VERSION}"

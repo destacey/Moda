@@ -1,0 +1,94 @@
+﻿using System.Reflection;
+using System.Text.Json.Serialization;
+using FluentValidation.AspNetCore;
+using Wayd.AppIntegration.Application;
+using Wayd.Common.Application;
+using Wayd.Common.Application.Interfaces;
+using Wayd.Goals.Application;
+using Wayd.Health;
+using Wayd.Infrastructure;
+using Wayd.Infrastructure.Common;
+using Wayd.Links;
+using Wayd.Organization.Application;
+using Wayd.Planning.Application;
+using Wayd.ProjectPortfolioManagement.Application;
+using Wayd.StrategicManagement.Application;
+using Wayd.Web.Api.Configurations;
+using Wayd.Web.Api.Interfaces;
+using Wayd.Web.Api.Services;
+using Wayd.Work.Application;
+using NodaTime.Serialization.SystemTextJson;
+using Serilog;
+
+StaticLogger.EnsureInitialized();
+Log.Information("Server Booting Up...");
+try
+{
+    var builder = WebApplication.CreateBuilder(args);
+
+    builder.Host.AddConfigurations();
+
+    builder.AddServiceDefaults();
+
+    builder.Services.AddControllers()
+        .AddJsonOptions(options =>
+        {
+            options.JsonSerializerOptions.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
+            options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+            options.JsonSerializerOptions.AllowTrailingCommas = true;
+        });
+
+    builder.Services.Configure<ApiBehaviorOptions>(options =>
+    {
+        options.InvalidModelStateResponseFactory = context =>
+        {
+            var problemDetails = ExceptionMiddleware.EnrichValidationProblemDetails(new ValidationProblemDetails(context.ModelState), context.HttpContext);
+
+            return new UnprocessableEntityObjectResult(problemDetails)
+            {
+                ContentTypes = { "application/problem+json" }
+            };
+        };
+    });
+
+    builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+    builder.Services.AddFluentValidationAutoValidation();
+    builder.Services.AddFluentValidationClientsideAdapters();
+
+    builder.Services.AddCommonApplication();
+    builder.Services.AddInfrastructure(builder.Configuration, builder.Environment);
+
+    builder.Services.AddAppIntegrationApplication();
+    builder.Services.AddGoalsApplication();
+    builder.Services.AddHealthApplication();
+    builder.Services.AddLinksApplication();
+    builder.Services.AddOrganizationApplication();
+    builder.Services.AddPlanningApplication();
+    builder.Services.AddProjectPortfolioManagementApplication();
+    builder.Services.AddStrategicManagementApplication();
+    builder.Services.AddWorkApplication();
+
+    builder.Services.AddScoped<ICsvService, CsvService>();
+    builder.Services.AddScoped<IJobManager, JobManager>();
+
+
+    var app = builder.Build();
+
+    await app.Services.InitializeDatabases();
+
+    app.UseInfrastructure(builder.Configuration);
+    app.MapDefaultEndpoints();
+    app.Run();
+}
+catch (Exception ex) when (!ex.GetType().Name.Equals("HostAbortedException", StringComparison.Ordinal))
+{
+    StaticLogger.EnsureInitialized();
+    Log.Fatal(ex, "Unhandled exception");
+}
+finally
+{
+    StaticLogger.EnsureInitialized();
+    Log.Information("Server Shutting down...");
+    Log.CloseAndFlush();
+}

@@ -360,3 +360,6 @@ nul
 
 # Playwright MCP screenshots
 .playwright-mcp/
+
+# Transient PR description drafted for rename/wayd
+PR_DESCRIPTION.md

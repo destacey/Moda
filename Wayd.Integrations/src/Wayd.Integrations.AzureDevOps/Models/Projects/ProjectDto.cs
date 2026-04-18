@@ -1,0 +1,33 @@
+﻿using Wayd.Integrations.AzureDevOps.Models.Contracts;
+
+namespace Wayd.Integrations.AzureDevOps.Models.Projects;
+
+internal record ProjectDto
+{
+    public Guid Id { get; set; }
+    public required string Name { get; set; }
+    public string? Description { get; set; }
+}
+
+internal static class ProjectDtoExtensions
+{
+    public static AzdoWorkspace ToAzdoWorkspace(this ProjectDto project)
+    {
+        return new AzdoWorkspace
+        {
+            Id = project.Id,
+            Name = project.Name,
+            Description = project.Description,
+        };
+    }
+
+    public static List<AzdoWorkspace> ToAzdoWorkspaces(this List<ProjectDto> projects)
+    {
+        var azdoProjects = new List<AzdoWorkspace>(projects.Count);
+        foreach (var project in projects)
+        {
+            azdoProjects.Add(project.ToAzdoWorkspace());
+        }
+        return azdoProjects;
+    }
+}

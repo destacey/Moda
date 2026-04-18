@@ -1,19 +1,19 @@
-# Contributing to Moda
+# Contributing to Wayd
 
-Thank you for your interest in contributing to Moda! We welcome contributions from the community to improve the project and make it better for everyone.
+Thank you for your interest in contributing to Wayd! We welcome contributions from the community to improve the project and make it better for everyone.
 
 ## How to Contribute
 
 ### 1. Reporting Issues
-If you encounter a bug, have a question, or want to suggest an enhancement, please [create an issue](https://github.com/destacey/Moda/issues). When creating an issue:
+If you encounter a bug, have a question, or want to suggest an enhancement, please [create an issue](https://github.com/destacey/Wayd/issues). When creating an issue:
 - Provide a clear and descriptive title.
 - Explain the issue in detail, including steps to reproduce if applicable.
 - Attach relevant screenshots or code snippets if necessary.
 
 ### 2. Suggesting Features
-We’re always looking for ways to improve Moda. If you have an idea for a new feature:
+We’re always looking for ways to improve Wayd. If you have an idea for a new feature:
 - Check if it’s already been suggested by browsing existing issues.
-- If it hasn’t been suggested, [open a new issue](https://github.com/destacey/Moda/issues) and describe your idea clearly.
+- If it hasn’t been suggested, [open a new issue](https://github.com/destacey/Wayd/issues) and describe your idea clearly.
 
 ### 3. Submitting Code Changes
 #### Fork and Clone the Repository
@@ -21,8 +21,8 @@ Non-maintainers will need to fork the repository before making changes. Pull req
 1. Fork the repository to your own GitHub account.
 2. Clone your fork locally:
    ```bash
-   git clone https://github.com/your-username/Moda.git
-   cd Moda
+   git clone https://github.com/your-username/Wayd.git
+   cd Wayd
    ```
 
 #### Set Up Your Environment
@@ -61,7 +61,7 @@ git push origin feature/your-feature-name
 ```
 
 #### Create a Pull Request
-1. Go to the [original repository](https://github.com/destacey/Moda) on GitHub.
+1. Go to the [original repository](https://github.com/destacey/Wayd) on GitHub.
 2. Click the **New Pull Request** button.
 3. Select your branch and provide a detailed description of your changes, including links to any related issues.
 
@@ -81,4 +81,4 @@ If you need help while contributing, feel free to reach out by:
 - Commenting on an existing issue related to your question.
 - Opening a new issue with your question or concern.
 
-Thank you for contributing to Moda! Together, we can build something amazing.
+Thank you for contributing to Wayd! Together, we can build something amazing.

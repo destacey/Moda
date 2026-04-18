@@ -1,23 +1,23 @@
 ---
 title: Administration
-description: User management, feature flags, integrations, and application configuration in Moda.
+description: User management, feature flags, integrations, and application configuration in Wayd.
 sidebar_position: 7
 audience: [user, agent]
 ---
 
 # Administration
 
-The Administration area provides tools for configuring Moda, managing users, controlling feature visibility, and connecting to external systems.
+The Administration area provides tools for configuring Wayd, managing users, controlling feature visibility, and connecting to external systems.
 
 ## User Management
 
 ### Users
 
-User accounts control access to Moda. Each user has:
+User accounts control access to Wayd. Each user has:
 - **Display Name** and **Email**
 - **Login Provider** — How the user authenticates (set at creation, immutable):
   - **Microsoft Entra ID** — Single sign-on via Azure Active Directory
-  - **Moda (Local)** — Username/password authentication with JWT tokens
+  - **Wayd (Local)** — Username/password authentication with JWT tokens
 - **Roles** — Permission groups that control what the user can see and do
 - **Status** — Active, Inactive, or Locked
 
@@ -45,7 +45,7 @@ Users can generate **Personal Access Tokens (PATs)** for API access. These are m
 
 ## Feature Management
 
-Moda uses **feature flags** to control the visibility of features across the application. Feature flags allow new functionality to be deployed but hidden until ready for use.
+Wayd uses **feature flags** to control the visibility of features across the application. Feature flags allow new functionality to be deployed but hidden until ready for use.
 
 ### How Feature Flags Work
 
@@ -103,32 +103,32 @@ Feature flags gate both backend API endpoints and frontend UI elements. When a f
 
 ## Integrations
 
-Moda integrates with external systems to synchronize data. Integrations are configured through **Connections**.
+Wayd integrates with external systems to synchronize data. Integrations are configured through **Connections**.
 
 ### Ownership Model
 
-When data is synchronized from an external system, the objects created in Moda have a **Managed** ownership. This distinguishes them from objects created directly in Moda:
+When data is synchronized from an external system, the objects created in Wayd have a **Managed** ownership. This distinguishes them from objects created directly in Wayd:
 
-- **Owned** — The object is created and managed within Moda. Users can edit it freely.
-- **Managed** — The object is owned by an external system and is **read-only** in Moda. Changes must be made in the source system and will be reflected in Moda on the next sync.
+- **Owned** — The object is created and managed within Wayd. Users can edit it freely.
+- **Managed** — The object is owned by an external system and is **read-only** in Wayd. Changes must be made in the source system and will be reflected in Wayd on the next sync.
 
-Managed objects can still be associated or linked to owned items. For example, a [work item](../work-management/work-items.mdx#work-items) synced from Azure DevOps (managed in Moda) can be linked to a team [objective](../planning/planning-intervals.mdx#objectives) owned by Moda.
+Managed objects can still be associated or linked to owned items. For example, a [work item](../work-management/work-items.mdx#work-items) synced from Azure DevOps (managed in Wayd) can be linked to a team [objective](../planning/planning-intervals.mdx#objectives) owned by Wayd.
 
 The ownership model applies to [workspaces](../work-management/work-items.mdx#workspaces), [work items](../work-management/work-items.mdx#work-items), [work processes](../work-management/work-configuration.mdx#work-processes), [workflows](../work-management/work-configuration.mdx#workflows), and [sprints](../planning/sprints.mdx).
 
 ### Connections
 
-A **Connection** represents a configured integration with an external application via a Moda **Connector**. Each connection includes authentication and endpoint configuration needed to establish the link.
+A **Connection** represents a configured integration with an external application via a Wayd **Connector**. Each connection includes authentication and endpoint configuration needed to establish the link.
 
-A **Connector** is an API that allows a specific external service to integrate with Moda. Multiple connections for the same connector can be configured — for example, when an organization has multiple Azure DevOps instances.
+A **Connector** is an API that allows a specific external service to integrate with Wayd. Multiple connections for the same connector can be configured — for example, when an organization has multiple Azure DevOps instances.
 
 ### Azure DevOps Boards
 
-The Azure DevOps Boards connector enables one-way synchronization of work data from Azure DevOps into Moda.
+The Azure DevOps Boards connector enables one-way synchronization of work data from Azure DevOps into Wayd.
 
 **Data mapping:**
 
-| Azure DevOps | Moda |
+| Azure DevOps | Wayd |
 |-------------|------|
 | Project | Workspace |
 | Work Item | Work Item |
@@ -142,22 +142,22 @@ The Azure DevOps Boards connector enables one-way synchronization of work data f
 
 **Business rules:**
 - Each Azure DevOps organization can only be linked by one connection
-- Synchronized items have **Managed** ownership and are read-only in Moda
+- Synchronized items have **Managed** ownership and are read-only in Wayd
 - Sync is controlled by workspace-level integration state (active/inactive)
 - Background jobs (Hangfire) perform synchronization on a recurring schedule
 
 ### Microsoft Graph
 
-The Microsoft Graph integration synchronizes employee and user data from Microsoft Entra ID (Azure Active Directory) into Moda's Organization domain.
+The Microsoft Graph integration synchronizes employee and user data from Microsoft Entra ID (Azure Active Directory) into Wayd's Organization domain.
 
 **Capabilities:**
 - Import employees from Azure AD
 - Keep employee information up to date
-- Map AD users to Moda employees
+- Map AD users to Wayd employees
 
 ## Background Jobs
 
-Moda uses **Hangfire** for background job processing. The background jobs dashboard is available at **Settings > Background Jobs** and provides:
+Wayd uses **Hangfire** for background job processing. The background jobs dashboard is available at **Settings > Background Jobs** and provides:
 - List of recurring jobs and their schedules
 - Job execution history
 - Manual job triggering

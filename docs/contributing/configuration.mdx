@@ -1,6 +1,6 @@
 ---
 title: Configuration
-description: Database, authentication, and environment configuration for Moda.
+description: Database, authentication, and environment configuration for Wayd.
 sidebar_position: 6
 audience: [developer]
 ---
@@ -12,12 +12,12 @@ audience: [developer]
 Database connection strings are configured in:
 
 ```
-Moda.Web/src/Moda.Web.Api/Configurations/database.json
+Wayd.Web/src/Wayd.Web.Api/Configurations/database.json
 ```
 
 ## Authentication
 
-Moda supports two authentication providers:
+Wayd supports two authentication providers:
 
 ### Microsoft Entra ID (Azure AD)
 
@@ -33,26 +33,26 @@ API_BASE_URL='https://localhost:5001'
 
 ### Local Authentication
 
-Configure in `Moda.Web/src/Moda.Web.Api/Configurations/security.json` or User Secrets:
+Configure in `Wayd.Web/src/Wayd.Web.Api/Configurations/security.json` or User Secrets:
 
 ```json
 {
-  "SecuritySettings": {
-    "LocalJwt": {
-      "Secret": "<strong-random-secret-at-least-32-chars>",
-      "Issuer": "Moda",
-      "Audience": "ModaApi",
-      "TokenExpirationInMinutes": 60,
-      "RefreshTokenExpirationInDays": 7
+    "SecuritySettings": {
+        "LocalJwt": {
+            "Secret": "<strong-random-secret-at-least-32-chars>",
+            "Issuer": "Wayd",
+            "Audience": "WaydApi",
+            "TokenExpirationInMinutes": 60,
+            "RefreshTokenExpirationInDays": 7
+        }
     }
-  }
 }
 ```
 
 ## Environment Variables
 
-| Variable | Purpose |
-|----------|---------|
-| `OTEL_EXPORTER_OTLP_ENDPOINT` | OpenTelemetry collector endpoint |
-| `APPLICATIONINSIGHTS_CONNECTION_STRING` | Azure Application Insights |
-| `ASPNETCORE_ENVIRONMENT` | Runtime environment (Development, Production) |
+| Variable                                | Purpose                                       |
+| --------------------------------------- | --------------------------------------------- |
+| `OTEL_EXPORTER_OTLP_ENDPOINT`           | OpenTelemetry collector endpoint              |
+| `APPLICATIONINSIGHTS_CONNECTION_STRING` | Azure Application Insights                    |
+| `ASPNETCORE_ENVIRONMENT`                | Runtime environment (Development, Production) |

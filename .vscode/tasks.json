@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/Moda.Web/src/Moda.Web.Api/Moda.Web.Api.csproj",
+                "${workspaceFolder}/Wayd.Web/src/Wayd.Web.Api/Wayd.Web.Api.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -19,7 +19,7 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/Moda.Web/src/Moda.Web.Api/Moda.Web.Api.csproj",
+                "${workspaceFolder}/Wayd.Web/src/Wayd.Web.Api/Wayd.Web.Api.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -33,7 +33,7 @@
                 "watch",
                 "run",
                 "--project",
-                "${workspaceFolder}/Moda.Web/src/Moda.Web.Api/Moda.Web.Api.csproj"
+                "${workspaceFolder}/Wayd.Web/src/Wayd.Web.Api/Wayd.Web.Api.csproj"
             ],
             "problemMatcher": "$msCompile"
         },

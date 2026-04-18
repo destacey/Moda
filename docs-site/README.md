@@ -1,4 +1,4 @@
-# Moda Documentation Site
+# Wayd Documentation Site
 
 This site is built using [Docusaurus](https://docusaurus.io/) and deployed to GitHub Pages. It reads MDX content from the shared `docs/` folder at the repository root.
 

@@ -3,7 +3,7 @@ import type { Config } from "@docusaurus/types";
 import type * as Preset from "@docusaurus/preset-classic";
 
 const config: Config = {
-  title: "Moda",
+  title: "Wayd",
   tagline:
     "Work management for planning, managing, and delivering across teams",
   favicon: "img/favicon.ico",
@@ -13,11 +13,11 @@ const config: Config = {
   },
 
   // GitHub Pages deployment
-  // Use DOCS_BASE_URL env var for local dev (defaults to /Moda/ for GitHub Pages)
+  // Use DOCS_BASE_URL env var for local dev (defaults to /Wayd/ for GitHub Pages)
   url: "https://destacey.github.io",
-  baseUrl: process.env.DOCS_BASE_URL || "/Moda/",
+  baseUrl: process.env.DOCS_BASE_URL || "/Wayd/",
   organizationName: "destacey",
-  projectName: "Moda",
+  projectName: "Wayd",
   trailingSlash: false,
 
   onBrokenLinks: "throw",
@@ -46,7 +46,7 @@ const config: Config = {
           path: "../docs",
           sidebarPath: "./sidebars.ts",
           routeBasePath: "docs",
-          editUrl: "https://github.com/destacey/Moda/edit/main/docs/",
+          editUrl: "https://github.com/destacey/Wayd/edit/main/docs/",
           showLastUpdateTime: true,
         },
         blog: false, // Disable blog for now
@@ -63,7 +63,7 @@ const config: Config = {
       respectPrefersColorScheme: true,
     },
     navbar: {
-      title: "Moda",
+      title: "Wayd",
       items: [
         {
           type: "docSidebar",
@@ -84,7 +84,7 @@ const config: Config = {
           label: "Reference",
         },
         {
-          href: "https://github.com/destacey/Moda",
+          href: "https://github.com/destacey/Wayd",
           label: "GitHub",
           position: "right",
         },
@@ -117,12 +117,12 @@ const config: Config = {
           items: [
             {
               label: "GitHub",
-              href: "https://github.com/destacey/Moda",
+              href: "https://github.com/destacey/Wayd",
             },
           ],
         },
       ],
-      copyright: `Copyright \u00a9 ${new Date().getFullYear()} Moda. Built with Docusaurus.`,
+      copyright: `Copyright \u00a9 ${new Date().getFullYear()} Wayd. Built with Docusaurus.`,
     },
     prism: {
       theme: prismThemes.github,

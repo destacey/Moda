@@ -1,0 +1,108 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <UserSecretsId>ccaebfb8-fc4c-4b73-9da4-9bab70a12a1c</UserSecretsId>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <NoWarn>$(NoWarn);1591</NoWarn>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <DockerfileContext>..\..\..</DockerfileContext>
+        <DockerComposeProjectPath>..\..\..\docker-compose.dcproj</DockerComposeProjectPath>
+        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="CsvHelper" />
+        <PackageReference Include="FluentValidation.AspNetCore" />
+        <PackageReference Include="Hangfire.Console.Extensions.Serilog" />
+        <PackageReference Include="Microsoft.AspNetCore.JsonPatch.SystemTextJson" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" />
+        <PackageReference Include="NodaTime.Serialization.SystemTextJson" />
+        <PackageReference Include="NSwag.AspNetCore" />
+        <PackageReference Include="NSwag.MSBuild">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Serilog.AspNetCore" />
+        <PackageReference Include="SimplerSoftware.EntityFrameworkCore.SqlServer.NodaTime" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\Wayd.Common\src\Wayd.Common\Wayd.Common.csproj" />
+        <ProjectReference
+            Include="..\..\..\Wayd.Services\Wayd.AppIntegration\src\Wayd.AppIntegration.Application\Wayd.AppIntegration.Application.csproj" />
+        <ProjectReference
+            Include="..\..\..\Wayd.Common\src\Wayd.Common.Application\Wayd.Common.Application.csproj" />
+        <ProjectReference
+            Include="..\..\..\Wayd.Common\src\Wayd.Common.Domain\Wayd.Common.Domain.csproj" />
+        <ProjectReference
+            Include="..\..\..\Wayd.Services\Wayd.Goals\src\Wayd.Goals.Application\Wayd.Goals.Application.csproj" />
+        <ProjectReference
+            Include="..\..\..\Wayd.Infrastructure\src\Wayd.Infrastructure.Migrators.MSSQL\Wayd.Infrastructure.Migrators.MSSQL.csproj" />
+        <ProjectReference
+            Include="..\..\..\Wayd.Infrastructure\src\Wayd.Infrastructure\Wayd.Infrastructure.csproj" />
+        <ProjectReference
+            Include="..\..\..\Wayd.Integrations\src\Wayd.Integrations.AzureDevOps\Wayd.Integrations.AzureDevOps.csproj" />
+        <ProjectReference
+            Include="..\..\..\Wayd.Services\Wayd.Health\src\Wayd.Health\Wayd.Health.csproj" />
+        <ProjectReference
+            Include="..\..\..\Wayd.Services\Wayd.Links\src\Wayd.Links\Wayd.Links.csproj" />
+        <ProjectReference
+            Include="..\..\..\Wayd.Services\Wayd.Organization\src\Wayd.Organization.Application\Wayd.Organization.Application.csproj" />
+        <ProjectReference
+            Include="..\..\..\Wayd.Services\Wayd.Planning\src\Wayd.Planning.Application\Wayd.Planning.Application.csproj" />
+        <ProjectReference
+            Include="..\..\..\Wayd.Services\Wayd.ProjectPortfolioManagement\src\Wayd.ProjectPortfolioManagement.Application\Wayd.ProjectPortfolioManagement.Application.csproj" />
+        <ProjectReference
+            Include="..\..\..\Wayd.Services\Wayd.ProjectPortfolioManagement\src\Wayd.ProjectPortfolioManagement.Domain\Wayd.ProjectPortfolioManagement.Domain.csproj" />
+        <ProjectReference
+            Include="..\..\..\Wayd.Services\Wayd.StrategicManagement\src\Wayd.StrategicManagement.Application\Wayd.StrategicManagement.Application.csproj" />
+        <ProjectReference
+            Include="..\..\..\Wayd.Services\Wayd.Work\src\Wayd.Work.Application\Wayd.Work.Application.csproj" />
+        <ProjectReference
+            Include="..\..\..\Wayd.Services\Wayd.Work\src\Wayd.Work.Domain\Wayd.Work.Domain.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Update="Configurations\*.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="wwwroot\api\v1\" />
+    </ItemGroup>
+
+    <PropertyGroup>
+        <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+    </PropertyGroup>
+    <Target Name="NSwag" AfterTargets="PostBuildEvent" Condition=" '$(Configuration)' == 'Debug' ">
+        <Exec ConsoleToMSBuild="true" ContinueOnError="true" WorkingDirectory="$(ProjectDir)"
+            EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Development"
+            Command="$(NSwagExe_Net100) run nswag.json /variables:Configuration=$(Configuration)">
+            <Output TaskParameter="ExitCode" PropertyName="NSwagExitCode" />
+            <Output TaskParameter="ConsoleOutput" PropertyName="NSwagOutput" />
+        </Exec>
+
+        <Message Text="$(NSwagOutput)" Condition="'$(NSwagExitCode)' == '0'" Importance="low" />
+        <Error Text="$(NSwagOutput)" Condition="'$(NSwagExitCode)' != '0'" />
+    </Target>
+    <!-- <Target Name="OpenAPIMCPGenerator" AfterTargets="PostBuildEvent"
+        Condition=" '$(Configuration)' == 'Debug' ">
+        <Exec ConsoleToMSBuild="true" ContinueOnError="true" WorkingDirectory="$(ProjectDir)"
+            EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Development"
+            Command="npx openapi-mcp-generator -i wwwroot\api\v1\specification.json -o $(RepoRoot)/Wayd.MCP -t stdio -n moda-mcp">
+            <Output TaskParameter="ExitCode" PropertyName="OpenAPIMCPGeneratorExitCode" />
+            <Output TaskParameter="ConsoleOutput" PropertyName="OpenAPIMCPGeneratorOutput" />
+        </Exec>
+
+        <Message Text="$(OpenAPIMCPGeneratorOutput)"
+            Condition="'$(OpenAPIMCPGeneratorExitCode)' == '0'" Importance="low" />
+        <Error Text="$(OpenAPIMCPGeneratorOutput)"
+            Condition="'$(OpenAPIMCPGeneratorExitCode)' != '0'" />
+
+    </Target> -->
+</Project>

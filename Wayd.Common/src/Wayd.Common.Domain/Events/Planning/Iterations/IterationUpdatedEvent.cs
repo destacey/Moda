@@ -1,0 +1,30 @@
+﻿using Wayd.Common.Domain.Enums.Planning;
+using Wayd.Common.Domain.Interfaces.Planning.Iterations;
+using Wayd.Common.Domain.Models.Planning.Iterations;
+using NodaTime;
+
+namespace Wayd.Common.Domain.Events.Planning.Iterations;
+
+public sealed record IterationUpdatedEvent : DomainEvent, ISimpleIteration
+{
+    public IterationUpdatedEvent(ISimpleIteration iteration, Instant timestamp)
+    {
+        Id = iteration.Id;
+        Key = iteration.Key;
+        Name = iteration.Name;
+        Type = iteration.Type;
+        State = iteration.State;
+        DateRange = iteration.DateRange;
+        TeamId = iteration.TeamId;
+
+        Timestamp = timestamp;
+    }
+
+    public Guid Id { get; }
+    public int Key { get; }
+    public string Name { get; }
+    public IterationType Type { get; }
+    public IterationState State { get; }
+    public IterationDateRange DateRange { get; }
+    public Guid? TeamId { get; }
+}

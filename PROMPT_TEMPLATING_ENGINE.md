@@ -1,12 +1,12 @@
 ﻿# Prompt Templating Overview
 
-This document describes the general structure, versioning approach, and operational expectations for AI prompt templates used across Moda's AI-assisted workflows. It defines the principles and conventions for building, storing, and executing prompts consistently across multiple features.
+This document describes the general structure, versioning approach, and operational expectations for AI prompt templates used across Wayd's AI-assisted workflows. It defines the principles and conventions for building, storing, and executing prompts consistently across multiple features.
 
 ---
 
 ## 1. Purpose
 
-Establish a reusable and versioned pattern for how Moda constructs, manages, and executes prompts for LLM calls. This approach ensures:
+Establish a reusable and versioned pattern for how Wayd constructs, manages, and executes prompts for LLM calls. This approach ensures:
 
 * Consistency across AI-powered features (e.g., objective health, summaries, classifications)
 * Predictable model behavior and output formats
@@ -91,7 +91,7 @@ Provides concise, realistic examples that demonstrate expected reasoning and out
 
 Data assembled dynamically by the API at runtime.
 
-* Derived from Moda’s local SQL mirrors or APIs.
+* Derived from Wayd’s local SQL mirrors or APIs.
 * Structured as a **Context Pack** object.
 * Serialized into readable text for the model.
 * Includes relevant evidence, aggregates, and timestamps.
@@ -151,10 +151,10 @@ For `objective_health`:
 * **System:** Instructs model to output `{status, description}` only.
 * **Policy:** Defines meaning of `Healthy`, `At Risk`, `Unhealthy`.
 * **Few-Shot:** Three examples showing each status type.
-* **Context:** Built from objective + work item data in Moda.
+* **Context:** Built from objective + work item data in Wayd.
 
 Resulting call: System + Policy + Few-Shot + Context → Model → Validated JSON response.
 
 ---
 
-This structure ensures all AI features in Moda follow the same composable, versioned, and auditable pattern for prompt design.
+This structure ensures all AI features in Wayd follow the same composable, versioned, and auditable pattern for prompt design.

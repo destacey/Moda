@@ -1,13 +1,13 @@
 ---
 title: Domain Glossary
-description: Comprehensive glossary of domain terms, concepts, and their relationships in Moda.
+description: Comprehensive glossary of domain terms, concepts, and their relationships in Wayd.
 sidebar_position: 1
 audience: [agent]
 ---
 
 # Domain Glossary
 
-This glossary defines the key terms and concepts used throughout Moda. It is designed to help AI agents and developers understand the domain language.
+This glossary defines the key terms and concepts used throughout Wayd. It is designed to help AI agents and developers understand the domain language.
 
 ## Organization
 
@@ -29,7 +29,7 @@ This glossary defines the key terms and concepts used throughout Moda. It is des
 |------|-----------|
 | **Planning Interval (PI)** | A fixed timeframe (typically 8-12 weeks) during which teams deliver value toward committed objectives. Contains iterations, objectives, and team associations. States: Future, Active, Completed. |
 | **Iteration** | A time-boxed period within a PI. Has a Name, Category (Development or Innovation and Planning), and Date Range. Aggregates sprint metrics across all mapped team sprints. |
-| **Sprint** | A short time-boxed period (typically 2 weeks) owned by a team. Type: Sprint or Iteration. State: Future, Active, Completed. Can be Owned (Moda) or Managed (external system). |
+| **Sprint** | A short time-boxed period (typically 2 weeks) owned by a team. Type: Sprint or Iteration. State: Future, Active, Completed. Can be Owned (Wayd) or Managed (external system). |
 | **Sprint Mapping** | The association of a team's sprint to a PI iteration. One sprint per team per iteration. Enables cross-team aggregate views. |
 | **Planning Interval Objective** | A team's commitment to deliver a specific outcome within a PI. Has Status (NotStarted, InProgress, Completed, Canceled, Missed), IsStretch flag, and optional Health Check. |
 | **Stretch Objective** | An aspirational goal that is not counted toward predictability. Contrasts with committed objectives. |
@@ -118,10 +118,10 @@ This glossary defines the key terms and concepts used throughout Moda. It is des
 
 | Term | Definition |
 |------|-----------|
-| **Ownership** | Whether an object is Owned (Moda-managed), Managed (external system, read-only in Moda), or System (immutable Moda defaults). |
-| **Link** | A cross-entity association between any Moda object and an external URL. Simple name + URL pair. |
+| **Ownership** | Whether an object is Owned (Wayd-managed), Managed (external system, read-only in Wayd), or System (immutable Wayd defaults). |
+| **Link** | A cross-entity association between any Wayd object and an external URL. Simple name + URL pair. |
 | **Connection** | A configured integration with an external system via a Connector (e.g., Azure DevOps). Includes auth and endpoint config. |
-| **Connector** | An API enabling a specific external service to integrate with Moda (e.g., AzureDevOps, MicrosoftGraph). Multiple connections per connector allowed. |
+| **Connector** | An API enabling a specific external service to integrate with Wayd (e.g., AzureDevOps, MicrosoftGraph). Multiple connections per connector allowed. |
 | **Feature Flag** | A toggle controlling feature visibility. Defined in code, stored in database, managed via Settings UI. New flags seeded as disabled on startup. |
 | **Health Check** | A status indicator (Healthy, AtRisk, Unhealthy/Critical) with expiration. Used on objectives, initiatives, and other entities. |
 | **SystemContext** | Identifies which domain references a work item (e.g., Goals, Projects). Used for work item references. |

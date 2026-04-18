@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <ItemGroup>
+        <PackageReference Include="CSharpFunctionalExtensions" />
+        <PackageReference Include="FluentValidation" />
+        <PackageReference Include="MediatR.Contracts" />
+        <PackageReference Include="NodaTime" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Wayd.Common\Wayd.Common.csproj" />
+    </ItemGroup>
+
+</Project>

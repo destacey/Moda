@@ -1,0 +1,48 @@
+'use client'
+
+import { WaydGrid } from '@/src/components/common'
+import { StrategicThemeListDto } from '@/src/services/wayd-api'
+import { ColDef } from 'ag-grid-community'
+import Link from 'next/link'
+import { useMemo } from 'react'
+
+export interface StrategicThemesGridProps {
+  strategicThemesData: StrategicThemeListDto[]
+  strategicThemesLoading: boolean
+  refreshStrategicThemes: () => void
+  gridHeight?: number | undefined
+}
+
+const StrategicThemeCellRenderer = ({ value, data }) => {
+  return (
+    <Link href={`/strategic-management/strategic-themes/${data.key}`}>
+      {value}
+    </Link>
+  )
+}
+
+const StrategicThemesGrid: React.FC<StrategicThemesGridProps> = (
+  props: StrategicThemesGridProps,
+) => {
+  const columnDefs = useMemo<ColDef<StrategicThemeListDto>[]>(() => [
+    { field: 'key', width: 90 },
+    { field: 'name', width: 350, cellRenderer: StrategicThemeCellRenderer },
+    {
+      field: 'state.name',
+      headerName: 'State',
+      width: 125,
+    },
+  ], [])
+
+  return (
+    <WaydGrid
+      height={props.gridHeight}
+      columnDefs={columnDefs}
+      rowData={props.strategicThemesData}
+      loadData={props.refreshStrategicThemes}
+      loading={props.strategicThemesLoading}
+    />
+  )
+}
+
+export default StrategicThemesGrid

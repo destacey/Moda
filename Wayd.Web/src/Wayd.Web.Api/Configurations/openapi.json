@@ -1,0 +1,10 @@
+{
+  "SwaggerSettings": {
+    "Enable": true,
+    "Title": "Wayd API",
+    "Version": "v1",
+    "License": true,
+    "LicenseName": "MIT License",
+    "LicenseUrl": "https://github.com/destacey/Wayd/blob/main/LICENSE.md"
+  }
+}

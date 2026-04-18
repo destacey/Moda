@@ -1,19 +1,19 @@
-# Moda — Complete Domain Context for LLMs
+# Wayd — Complete Domain Context for LLMs
 
-This document provides comprehensive context about Moda's domain model, business rules, and architecture for AI agents and language models.
+This document provides comprehensive context about Wayd's domain model, business rules, and architecture for AI agents and language models.
 
 ## System Overview
 
-Moda is an intelligent delivery management platform designed to give engineering leaders and teams end-to-end visibility into software delivery. It acts as a unified hub that synchronizes data from multiple business systems and combines it with capabilities those systems lack — connecting the dots so teams can see the full picture in one place.
+Wayd is an intelligent delivery management platform designed to give engineering leaders and teams end-to-end visibility into software delivery. It acts as a unified hub that synchronizes data from multiple business systems and combines it with capabilities those systems lack — connecting the dots so teams can see the full picture in one place.
 
 Built with .NET 10, ASP.NET Core, Entity Framework Core, Next.js 16, React 19, and Ant Design. Follows Clean Architecture with Domain-Driven Design, organized as a modular monolith with a shared database.
 
 ### Ownership Model
 
-Objects in Moda have an ownership attribute:
-- **Owned** — Created and managed within Moda
-- **Managed** — Synchronized from an external system (e.g., Azure DevOps) and read-only in Moda
-- **System** — Moda system-owned, immutable by users
+Objects in Wayd have an ownership attribute:
+- **Owned** — Created and managed within Wayd
+- **Managed** — Synchronized from an external system (e.g., Azure DevOps) and read-only in Wayd
+- **System** — Wayd system-owned, immutable by users
 
 ---
 
@@ -159,7 +159,7 @@ Fundamental unit of work. Properties:
 
 Supports: Parent/child hierarchy, dependencies, revisions, links, references.
 
-Managed workspace items are read-only in Moda.
+Managed workspace items are read-only in Wayd.
 
 ### Work Item Metrics (per item)
 
@@ -345,10 +345,10 @@ Cross-domain usage: Tags on Projects, Programs, Strategic Initiatives for alignm
 
 ### Azure DevOps Boards Connector
 
-One-way sync (Azure DevOps → Moda):
-- Azure DevOps Project → Moda Workspace
-- Azure DevOps Work Item → Moda Work Item
-- Azure DevOps Work Item Type → Moda Work Type
+One-way sync (Azure DevOps → Wayd):
+- Azure DevOps Project → Wayd Workspace
+- Azure DevOps Work Item → Wayd Work Item
+- Azure DevOps Work Item Type → Wayd Work Type
 - Azure DevOps Area → Team ↔ Work Item association
 - Azure DevOps Iteration → Sprint / PI association
 

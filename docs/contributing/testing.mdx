@@ -1,6 +1,6 @@
 ---
 title: Testing
-description: Testing strategies, patterns, and conventions in Moda.
+description: Testing strategies, patterns, and conventions in Wayd.
 sidebar_position: 3
 audience: [developer, agent]
 ---
@@ -10,9 +10,9 @@ audience: [developer, agent]
 ## Test Projects
 
 Test projects mirror the source structure:
-- `Moda.\{ServiceName\}.Domain.Tests` - Domain logic tests
-- `Moda.\{ServiceName\}.Application.Tests` - Handler and validator tests
-- `Moda.ArchitectureTests` - Enforce Clean Architecture dependency rules
+- `Wayd.\{ServiceName\}.Domain.Tests` - Domain logic tests
+- `Wayd.\{ServiceName\}.Application.Tests` - Handler and validator tests
+- `Wayd.ArchitectureTests` - Enforce Clean Architecture dependency rules
 
 ## Frameworks and Libraries
 
@@ -33,7 +33,7 @@ Test classes and methods should clearly describe the scenario being tested.
 
 ## Fake Data
 
-Domain fakers are located in `Moda.Tests.Shared`. Use Bogus to generate realistic test data:
+Domain fakers are located in `Wayd.Tests.Shared`. Use Bogus to generate realistic test data:
 
 ```csharp
 var faker = new WorkItemFaker();
@@ -46,22 +46,22 @@ Fake DbContext implementations are available for each application area for integ
 
 ```bash
 # All tests
-dotnet test Moda.slnx
+dotnet test Wayd.slnx
 
 # Specific project
-dotnet test "Moda.Services/Moda.Work/tests/Moda.Work.Application.Tests/Moda.Work.Application.Tests.csproj"
+dotnet test "Wayd.Services/Wayd.Work/tests/Wayd.Work.Application.Tests/Wayd.Work.Application.Tests.csproj"
 
 # By class name
 dotnet test --filter "FullyQualifiedName~ProjectServiceTests"
 
 # Architecture tests
-dotnet test Moda.ArchitectureTests/Moda.ArchitectureTests.csproj
+dotnet test Wayd.ArchitectureTests/Wayd.ArchitectureTests.csproj
 ```
 
 ## Frontend Tests
 
 ```bash
-cd Moda.Web/src/moda.web.reactclient
+cd Wayd.Web/src/wayd.web.reactclient
 npm test
 npm run test:coverage
 ```

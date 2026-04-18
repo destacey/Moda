@@ -1,0 +1,15 @@
+﻿using NodaTime;
+
+namespace Wayd.Common.Domain.Events.ProjectPortfolioManagement;
+
+public sealed record ProjectDeletedEvent : DomainEvent
+{
+    public ProjectDeletedEvent(Guid id, Instant timestamp)
+    {
+        Id = id;
+
+        Timestamp = timestamp;
+    }
+
+    public Guid Id { get; }
+}
