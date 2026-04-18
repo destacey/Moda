@@ -1,15 +1,15 @@
 # resource "azurerm_storage_account" "moda_storage" {
 #   name                     = "stmodadev"
-#   resource_group_name      = azurerm_resource_group.wayd_dev_rg.name
-#   location                 = azurerm_resource_group.wayd_dev_rg.location
+#   resource_group_name      = azurerm_resource_group.moda_dev_rg.name
+#   location                 = azurerm_resource_group.moda_dev_rg.location
 #   account_tier             = "Standard"
 #   account_replication_type = "LRS"
 # }
 
-resource "azurerm_mssql_server" "wayd_sql_server" {
+resource "azurerm_mssql_server" "moda_sql_server" {
   name                         = "sql-moda-dev"
-  resource_group_name          = azurerm_resource_group.wayd_dev_rg.name
-  location                     = azurerm_resource_group.wayd_dev_rg.location
+  resource_group_name          = azurerm_resource_group.moda_dev_rg.name
+  location                     = azurerm_resource_group.moda_dev_rg.location
   version                      = "12.0"
   administrator_login          = "modaadmin"
   administrator_login_password = var.sql_admin_pass
@@ -20,9 +20,9 @@ resource "azurerm_mssql_server" "wayd_sql_server" {
   }
 }
 
-resource "azurerm_mssql_database" "wayd_db" {
+resource "azurerm_mssql_database" "moda_db" {
   name                        = "sqldb-moda-dev"
-  server_id                   = azurerm_mssql_server.wayd_sql_server.id
+  server_id                   = azurerm_mssql_server.moda_sql_server.id
   auto_pause_delay_in_minutes = 60
   max_size_gb                 = 10
   sku_name                    = "GP_S_Gen5_1"
@@ -33,7 +33,7 @@ resource "azurerm_mssql_database" "wayd_db" {
 
 resource "azurerm_mssql_firewall_rule" "allow_azure" {
   name             = "Allow Azure Services"
-  server_id        = azurerm_mssql_server.wayd_sql_server.id
+  server_id        = azurerm_mssql_server.moda_sql_server.id
   start_ip_address = "0.0.0.0"
   end_ip_address   = "0.0.0.0"
 }

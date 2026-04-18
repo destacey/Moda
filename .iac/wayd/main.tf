@@ -10,7 +10,7 @@ terraform {
   cloud {
     organization = "moda"
     workspaces {
-      tags = ["wayd"]
+      tags = ["moda"]
     }
   }
 }
@@ -28,7 +28,7 @@ provider "azurerm" {
 data "azurerm_client_config" "current" {}
 
 
-resource "azurerm_resource_group" "wayd_dev_rg" {
+resource "azurerm_resource_group" "moda_dev_rg" {
   name     = "rg-moda-dev"
   location = var.location
 }

@@ -134,7 +134,7 @@ jobs:
               id: init
               run: |
                   terraform init
-                  terraform workspace select wayd-dev
+                  terraform workspace select moda-dev
                   terraform workspace show
 
             - name: Terraform fmt
@@ -163,7 +163,7 @@ jobs:
               id: tfoutputs
               uses: dflook/terraform-output@v1
               with:
-                  workspace: wayd-dev
+                  workspace: moda-dev
                   path: .iac/wayd
               env:
                   TERRAFORM_CLOUD_TOKENS: app.terraform.io=${{ secrets.TF_API_TOKEN }}
