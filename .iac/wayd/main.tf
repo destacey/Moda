@@ -1,16 +1,16 @@
 # Configure the Azure provider
 terraform {
-  required_version = ">= 1.1.0"
+  required_version = ">= 1.14.0"
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 4.24.0"
+      version = "~> 4.69"
     }
   }
   cloud {
-    organization = "moda"
+    organization = "wayd"
     workspaces {
-      tags = ["moda"]
+      tags = ["wayd"]
     }
   }
 }
@@ -28,8 +28,8 @@ provider "azurerm" {
 data "azurerm_client_config" "current" {}
 
 
-resource "azurerm_resource_group" "moda_dev_rg" {
-  name     = "rg-moda-dev"
+resource "azurerm_resource_group" "wayd_dev_rg" {
+  name     = "rg-wayd-dev"
   location = var.location
 }
 

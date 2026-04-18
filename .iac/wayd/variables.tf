@@ -73,7 +73,7 @@ variable "client_url" {
 variable "signalr_name" {
   type        = string
   description = "The name of the Azure SignalR Service instance."
-  default     = "sigr-moda-dev"
+  default     = "sigr-wayd-dev"
 }
 
 variable "signalr_sku" {

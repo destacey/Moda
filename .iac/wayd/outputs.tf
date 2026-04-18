@@ -4,22 +4,22 @@ output "sql_server_connection_string" {
 }
 
 output "api_hostname" {
-  value = azurerm_container_app.moda_backend.ingress.0.fqdn
+  value = azurerm_container_app.wayd_backend.ingress.0.fqdn
 }
 
 output "client_hostname" {
-  value = azurerm_container_app.moda_frontend.ingress.0.fqdn
+  value = azurerm_container_app.wayd_frontend.ingress.0.fqdn
 }
 
 output "swa_token" {
-  value     = azurerm_static_site.moda_swa.api_key
+  value     = azurerm_static_web_app.wayd_swa.api_key
   sensitive = true
 }
 
 output "swa_hostname" {
-  value = azurerm_static_site.moda_swa.default_host_name
+  value = azurerm_static_web_app.wayd_swa.default_host_name
 }
 
 output "signalr_hostname" {
-  value = azurerm_signalr_service.moda_signalr.hostname
+  value = azurerm_signalr_service.wayd_signalr.hostname
 }

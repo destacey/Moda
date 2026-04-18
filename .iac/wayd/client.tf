@@ -1,6 +1,6 @@
-resource "azurerm_static_site" "moda_swa" {
-  name                = "swa-moda"
-  resource_group_name = azurerm_resource_group.moda_dev_rg.name
+resource "azurerm_static_web_app" "wayd_swa" {
+  name                = "swa-wayd"
+  resource_group_name = azurerm_resource_group.wayd_dev_rg.name
   location            = "westus2"
   sku_tier            = "Free"
   sku_size            = "Free"
@@ -9,12 +9,12 @@ resource "azurerm_static_site" "moda_swa" {
 # resource "azurerm_resource_group_template_deployment" "client_appsettings" {
 #   deployment_mode     = "Incremental"
 #   name                = "client-appsettings"
-#   resource_group_name = azurerm_resource_group.moda_dev_rg.name
+#   resource_group_name = azurerm_resource_group.wayd_dev_rg.name
 
 #   template_content = file("swa-config.json")
 #   parameters_content = jsonencode({
 #     staticSiteName = {
-#       value = azurerm_static_site.moda_swa.name
+#       value = azurerm_static_web_app.wayd_swa.name
 #     }
 #     tenantId = {
 #       value = data.azurerm_client_config.current.tenant_id

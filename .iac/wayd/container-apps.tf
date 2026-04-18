@@ -1,25 +1,25 @@
 locals {
-  sql_conn_string = "Server=tcp:${azurerm_mssql_server.moda_sql_server.fully_qualified_domain_name},1433;Initial Catalog=${azurerm_mssql_database.moda_db.name};Persist Security Info=False;User ID=modaadmin;Password=${var.sql_admin_pass};MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+  sql_conn_string = "Server=tcp:${azurerm_mssql_server.wayd_sql_server.fully_qualified_domain_name},1433;Initial Catalog=${azurerm_mssql_database.wayd_db.name};Persist Security Info=False;User ID=waydadmin;Password=${var.sql_admin_pass};MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
 }
 
-resource "azurerm_container_app_environment" "moda_cae" {
-  name                       = "cae-moda"
-  resource_group_name        = azurerm_resource_group.moda_dev_rg.name
-  location                   = azurerm_resource_group.moda_dev_rg.location
-  log_analytics_workspace_id = azurerm_log_analytics_workspace.moda.id
+resource "azurerm_container_app_environment" "wayd_cae" {
+  name                       = "cae-wayd"
+  resource_group_name        = azurerm_resource_group.wayd_dev_rg.name
+  location                   = azurerm_resource_group.wayd_dev_rg.location
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.wayd.id
 
 }
 
-resource "azurerm_log_analytics_workspace" "moda" {
-  location            = azurerm_resource_group.moda_dev_rg.location
-  name                = "la-moda"
-  resource_group_name = azurerm_resource_group.moda_dev_rg.name
+resource "azurerm_log_analytics_workspace" "wayd" {
+  location            = azurerm_resource_group.wayd_dev_rg.location
+  name                = "la-wayd"
+  resource_group_name = azurerm_resource_group.wayd_dev_rg.name
 }
 
-resource "azurerm_container_app" "moda_frontend" {
-  name                         = "moda-client"
-  container_app_environment_id = azurerm_container_app_environment.moda_cae.id
-  resource_group_name          = azurerm_resource_group.moda_dev_rg.name
+resource "azurerm_container_app" "wayd_frontend" {
+  name                         = "wayd-client"
+  container_app_environment_id = azurerm_container_app_environment.wayd_cae.id
+  resource_group_name          = azurerm_resource_group.wayd_dev_rg.name
   revision_mode                = "Single"
 
   ingress {
@@ -41,7 +41,7 @@ resource "azurerm_container_app" "moda_frontend" {
     max_replicas = 3
 
     container {
-      name   = "moda-client"
+      name   = "wayd-client"
       image  = "awaldow/moda-client:${var.docker_tag}"
       cpu    = 0.25
       memory = "0.5Gi"
@@ -75,7 +75,7 @@ resource "azurerm_container_app" "moda_frontend" {
 
       env {
         name  = "NEXT_PUBLIC_API_BASE_URL"
-        value = "https://${azurerm_container_app.moda_backend.ingress.0.fqdn}"
+        value = "https://${azurerm_container_app.wayd_backend.ingress.0.fqdn}"
       }
 
       env {
@@ -101,10 +101,10 @@ resource "azurerm_container_app" "moda_frontend" {
   }
 }
 
-resource "azurerm_container_app" "moda_backend" {
-  name                         = "moda-api"
-  container_app_environment_id = azurerm_container_app_environment.moda_cae.id
-  resource_group_name          = azurerm_resource_group.moda_dev_rg.name
+resource "azurerm_container_app" "wayd_backend" {
+  name                         = "wayd-api"
+  container_app_environment_id = azurerm_container_app_environment.wayd_cae.id
+  resource_group_name          = azurerm_resource_group.wayd_dev_rg.name
   revision_mode                = "Single"
 
   ingress {
@@ -129,7 +129,7 @@ resource "azurerm_container_app" "moda_backend" {
 
   secret {
     name  = "signalr-conn-string"
-    value = azurerm_signalr_service.moda_signalr.primary_connection_string
+    value = azurerm_signalr_service.wayd_signalr.primary_connection_string
   }
 
   secret {
@@ -146,7 +146,7 @@ resource "azurerm_container_app" "moda_backend" {
     max_replicas = 3
 
     container {
-      name   = "moda-api"
+      name   = "wayd-api"
       image  = "awaldow/moda-api:${var.docker_tag}"
       cpu    = 0.25
       memory = "0.5Gi"
@@ -257,12 +257,12 @@ resource "azurerm_container_app" "moda_backend" {
 
       env {
         name  = "SecuritySettings__LocalJwt__Issuer"
-        value = "Moda"
+        value = "Wayd"
       }
 
       env {
         name  = "SecuritySettings__LocalJwt__Audience"
-        value = "ModaApi"
+        value = "WaydApi"
       }
 
       env {
@@ -277,7 +277,7 @@ resource "azurerm_container_app" "moda_backend" {
 
       env {
         name  = "CorsSettings__WebClient"
-        value = "https://${azurerm_static_site.moda_swa.default_host_name};${var.client_url}"
+        value = "https://${azurerm_static_web_app.wayd_swa.default_host_name};${var.client_url}"
       }
     }
   }
