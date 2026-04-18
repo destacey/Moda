@@ -89,8 +89,116 @@ variable "local_jwt_refresh_token_expiration_days" {
 
 variable "docker_tag" {
   type        = string
-  description = "The tag for the Docker image."
+  description = "The tag for the Docker images."
   default     = "latest"
+}
+
+variable "docker_image_registry" {
+  type        = string
+  description = "The container registry host (e.g. 'docker.io/awaldow', 'ghcr.io/myorg', 'myregistry.azurecr.io'). Do not include a trailing slash."
+  default     = "docker.io/awaldow"
+}
+
+variable "api_image_name" {
+  type        = string
+  description = "The repository name of the API image within the registry (e.g. 'moda-api')."
+  default     = "moda-api"
+}
+
+variable "client_image_name" {
+  type        = string
+  description = "The repository name of the client image within the registry (e.g. 'moda-client')."
+  default     = "moda-client"
+}
+
+variable "sql_ad_admin_login_username" {
+  type        = string
+  description = "The display name used for the Azure AD administrator on the SQL Server."
+  default     = "Wayd SQL Admins"
+}
+
+variable "sql_admin_login" {
+  type        = string
+  description = "The SQL Server administrator login name (non-AD). Must not collide with reserved names or match common SQL keywords."
+  default     = "waydadmin"
+}
+
+variable "jwt_issuer" {
+  type        = string
+  description = "JWT Issuer claim value used by the backend for local (non-AAD) tokens."
+  default     = "Wayd"
+}
+
+variable "jwt_audience" {
+  type        = string
+  description = "JWT Audience claim value used by the backend for local (non-AAD) tokens."
+  default     = "WaydApi"
+}
+
+variable "allow_azure_services_sql_access" {
+  type        = bool
+  description = "Whether to create a SQL firewall rule allowing all Azure services (0.0.0.0-0.0.0.0) to connect. Useful for dev where the container apps need access; consider disabling for prod in favor of VNet integration."
+  default     = true
+}
+
+variable "container_app_cpu" {
+  type        = number
+  description = "vCPU allocation per container app replica (0.25, 0.5, 0.75, 1.0, ...)."
+  default     = 0.25
+}
+
+variable "container_app_memory" {
+  type        = string
+  description = "Memory allocation per container app replica (e.g. '0.5Gi', '1Gi', '2Gi'). Must be paired with a compatible CPU value per Azure Container Apps rules."
+  default     = "0.5Gi"
+}
+
+variable "container_app_min_replicas" {
+  type        = number
+  description = "Minimum replicas per container app. Set to 0 for scale-to-zero (free when idle, cold starts on wake)."
+  default     = 0
+}
+
+variable "container_app_max_replicas" {
+  type        = number
+  description = "Maximum replicas per container app."
+  default     = 3
+}
+
+variable "sql_sku_name" {
+  type        = string
+  description = "SKU name for the Azure SQL database (e.g. 'GP_S_Gen5_1' serverless, 'GP_Gen5_2' provisioned, 'S0', 'P1')."
+  default     = "GP_S_Gen5_1"
+}
+
+variable "sql_max_size_gb" {
+  type        = number
+  description = "Maximum size in GB for the Azure SQL database."
+  default     = 10
+}
+
+variable "sql_min_capacity" {
+  type        = number
+  description = "Minimum vCores for serverless SQL databases. Ignored for non-serverless SKUs."
+  default     = 0.5
+}
+
+variable "sql_auto_pause_delay_in_minutes" {
+  type        = number
+  description = "Time in minutes of inactivity before a serverless SQL database auto-pauses. -1 to disable, requires minutes >= 60 when enabled. Ignored for non-serverless SKUs."
+  default     = 60
+}
+
+variable "log_analytics_sku" {
+  type        = string
+  description = "SKU name for the Log Analytics workspace."
+  default     = "PerGB2018"
+}
+
+variable "log_analytics_retention_in_days" {
+  type        = number
+  description = "Retention period for Log Analytics workspace data, in days (30-730). Data beyond the 31-day free tier incurs additional cost."
+  default     = 30
 }
 
 variable "client_url" {
@@ -101,12 +209,18 @@ variable "client_url" {
 
 variable "signalr_name" {
   type        = string
-  description = "The name of the Azure SignalR Service instance."
-  default     = "sigr-wayd-dev"
+  description = "Optional override for the Azure SignalR Service instance name. Leave empty to use the default 'sigr-<project>-<environment>'."
+  default     = ""
 }
 
 variable "signalr_sku" {
   type        = string
-  description = "The SKU name for the Azure SignalR Service (e.g., Free_F1, Standard_S1)."
+  description = "The SKU name for the Azure SignalR Service (e.g. 'Free_F1', 'Standard_S1')."
   default     = "Free_F1"
+}
+
+variable "signalr_capacity" {
+  type        = number
+  description = "Capacity units for the Azure SignalR Service."
+  default     = 1
 }

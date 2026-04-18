@@ -24,6 +24,9 @@ provider "azurerm" {
 data "azurerm_client_config" "current" {}
 
 locals {
+  # e.g. project="wayd", environment="dev" -> "wayd-dev"
+  name_stem = "${var.project}-${var.environment}"
+
   common_tags = {
     environment = var.environment
     project     = var.project
@@ -32,7 +35,7 @@ locals {
 }
 
 resource "azurerm_resource_group" "wayd_dev_rg" {
-  name     = "rg-wayd-dev"
+  name     = "rg-${local.name_stem}"
   location = var.location
   tags     = local.common_tags
 }

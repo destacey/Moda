@@ -1,9 +1,9 @@
 locals {
-  sql_conn_string = "Server=tcp:${azurerm_mssql_server.wayd_sql_server.fully_qualified_domain_name},1433;Initial Catalog=${azurerm_mssql_database.wayd_db.name};Persist Security Info=False;User ID=waydadmin;Password=${var.sql_admin_pass};MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+  sql_conn_string = "Server=tcp:${azurerm_mssql_server.wayd_sql_server.fully_qualified_domain_name},1433;Initial Catalog=${azurerm_mssql_database.wayd_db.name};Persist Security Info=False;User ID=${var.sql_admin_login};Password=${var.sql_admin_pass};MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
 }
 
 resource "azurerm_container_app_environment" "wayd_cae" {
-  name                       = "cae-wayd"
+  name                       = "cae-${local.name_stem}"
   resource_group_name        = azurerm_resource_group.wayd_dev_rg.name
   location                   = azurerm_resource_group.wayd_dev_rg.location
   log_analytics_workspace_id = azurerm_log_analytics_workspace.wayd.id
@@ -13,16 +13,16 @@ resource "azurerm_container_app_environment" "wayd_cae" {
 
 resource "azurerm_log_analytics_workspace" "wayd" {
   location            = azurerm_resource_group.wayd_dev_rg.location
-  name                = "la-wayd"
+  name                = "la-${local.name_stem}"
   resource_group_name = azurerm_resource_group.wayd_dev_rg.name
-  sku                 = "PerGB2018"
-  retention_in_days   = 30
+  sku                 = var.log_analytics_sku
+  retention_in_days   = var.log_analytics_retention_in_days
 
   tags = local.common_tags
 }
 
 resource "azurerm_container_app" "wayd_frontend" {
-  name                         = "wayd-client"
+  name                         = "${var.project}-client-${var.environment}"
   container_app_environment_id = azurerm_container_app_environment.wayd_cae.id
   resource_group_name          = azurerm_resource_group.wayd_dev_rg.name
   revision_mode                = "Single"
@@ -42,14 +42,14 @@ resource "azurerm_container_app" "wayd_frontend" {
   }
 
   template {
-    min_replicas = 0
-    max_replicas = 3
+    min_replicas = var.container_app_min_replicas
+    max_replicas = var.container_app_max_replicas
 
     container {
-      name   = "wayd-client"
-      image  = "awaldow/moda-client:${var.docker_tag}"
-      cpu    = 0.25
-      memory = "0.5Gi"
+      name   = "${var.project}-client"
+      image  = "${var.docker_image_registry}/${var.client_image_name}:${var.docker_tag}"
+      cpu    = var.container_app_cpu
+      memory = var.container_app_memory
 
       readiness_probe {
         port                    = 3000
@@ -100,7 +100,7 @@ resource "azurerm_container_app" "wayd_frontend" {
 }
 
 resource "azurerm_container_app" "wayd_backend" {
-  name                         = "wayd-api"
+  name                         = "${var.project}-api-${var.environment}"
   container_app_environment_id = azurerm_container_app_environment.wayd_cae.id
   resource_group_name          = azurerm_resource_group.wayd_dev_rg.name
   revision_mode                = "Single"
@@ -140,14 +140,14 @@ resource "azurerm_container_app" "wayd_backend" {
   }
 
   template {
-    min_replicas = 0
-    max_replicas = 3
+    min_replicas = var.container_app_min_replicas
+    max_replicas = var.container_app_max_replicas
 
     container {
-      name   = "wayd-api"
-      image  = "awaldow/moda-api:${var.docker_tag}"
-      cpu    = 0.25
-      memory = "0.5Gi"
+      name   = "${var.project}-api"
+      image  = "${var.docker_image_registry}/${var.api_image_name}:${var.docker_tag}"
+      cpu    = var.container_app_cpu
+      memory = var.container_app_memory
 
       readiness_probe {
         port                    = 8080
@@ -246,12 +246,12 @@ resource "azurerm_container_app" "wayd_backend" {
 
       env {
         name  = "SecuritySettings__LocalJwt__Issuer"
-        value = "Wayd"
+        value = var.jwt_issuer
       }
 
       env {
         name  = "SecuritySettings__LocalJwt__Audience"
-        value = "WaydApi"
+        value = var.jwt_audience
       }
 
       env {
