@@ -301,7 +301,7 @@ function AnalyticsIllustration() {
           fontWeight="700"
           letterSpacing="2"
         >
-          MODA
+          WAYD
         </text>
       </g>
     </svg>
