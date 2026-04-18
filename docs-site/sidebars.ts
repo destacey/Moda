@@ -103,6 +103,13 @@ const sidebars: SidebarsConfig = {
             'contributing/api',
           ],
         },
+        {
+          type: 'category',
+          label: 'Migration',
+          items: [
+            'contributing/migrating-from-moda',
+          ],
+        },
       ],
     },
   ],
