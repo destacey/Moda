@@ -34,7 +34,7 @@ public class FakeWorkDbContext : IWorkDbContext, IDisposable
     private readonly List<Employee> _employees = [];
     private readonly List<ExternalEmployeeBlacklistItem> _externalEmployeeBlacklistItems = [];
     private readonly List<PersonalAccessToken> _personalAccessTokens = [];
-    private readonly List<User> _modaUsers = [];
+    private readonly List<User> _waydUsers = [];
 
     // DbSet properties
     public DbSet<Workspace> Workspaces => _workspaces.AsDbSet();
@@ -53,7 +53,7 @@ public class FakeWorkDbContext : IWorkDbContext, IDisposable
     public DbSet<Employee> Employees => _employees.AsDbSet();
     public DbSet<ExternalEmployeeBlacklistItem> ExternalEmployeeBlacklistItems => _externalEmployeeBlacklistItems.AsDbSet();
     public DbSet<PersonalAccessToken> PersonalAccessTokens => _personalAccessTokens.AsDbSet();
-    public DbSet<User> ModaUsers => _modaUsers.AsDbSet();
+    public DbSet<User> WaydUsers => _waydUsers.AsDbSet();
 
     // ChangeTracker - we can't create a real one, so we return null and the handler uses defensive coding (_workDbContext.ChangeTracker?.Clear())
     public ChangeTracker ChangeTracker => null!;

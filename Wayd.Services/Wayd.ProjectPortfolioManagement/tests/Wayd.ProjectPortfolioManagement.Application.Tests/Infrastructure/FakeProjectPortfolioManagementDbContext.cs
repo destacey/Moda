@@ -32,7 +32,7 @@ public class FakeProjectPortfolioManagementDbContext : IProjectPortfolioManageme
     private readonly List<Employee> _employees = [];
     private readonly List<ExternalEmployeeBlacklistItem> _externalEmployeeBlacklistItems = [];
     private readonly List<PersonalAccessToken> _personalAccessTokens = [];
-    private readonly List<User> _modaUsers = [];
+    private readonly List<User> _waydUsers = [];
 
     // DbSet properties
     public DbSet<ExpenditureCategory> ExpenditureCategories => _expenditureCategories.AsDbSet();
@@ -49,7 +49,7 @@ public class FakeProjectPortfolioManagementDbContext : IProjectPortfolioManageme
     public DbSet<Employee> Employees => _employees.AsDbSet();
     public DbSet<ExternalEmployeeBlacklistItem> ExternalEmployeeBlacklistItems => _externalEmployeeBlacklistItems.AsDbSet();
     public DbSet<PersonalAccessToken> PersonalAccessTokens => _personalAccessTokens.AsDbSet();
-    public DbSet<User> ModaUsers => _modaUsers.AsDbSet();
+    public DbSet<User> WaydUsers => _waydUsers.AsDbSet();
 
     // ChangeTracker - we can't create a real one, so we return null and the handler uses defensive coding
     public ChangeTracker ChangeTracker => null!;

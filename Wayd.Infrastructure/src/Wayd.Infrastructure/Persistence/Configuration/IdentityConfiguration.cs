@@ -107,11 +107,11 @@ public class IdentityUserTokenConfig : IEntityTypeConfiguration<IdentityUserToke
             .ToTable("UserTokens", SchemaNames.Identity);
 }
 
-public class ModaUserConfig : IEntityTypeConfiguration<User>
+public class WaydUserConfig : IEntityTypeConfiguration<User>
 {
     public void Configure(EntityTypeBuilder<User> builder)
     {
-        builder.ToView("vw_ModaUsers", SchemaNames.Identity);
+        builder.ToView("vw_WaydUsers", SchemaNames.Identity);
 
         builder.HasKey(u => u.Id);
         builder.Property(u => u.Id).HasMaxLength(450);

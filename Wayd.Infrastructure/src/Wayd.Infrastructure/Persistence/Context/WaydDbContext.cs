@@ -40,7 +40,7 @@ public class WaydDbContext : BaseDbContext, IAppIntegrationDbContext, IFeatureMa
     public DbSet<Employee> Employees => Set<Employee>();
     public DbSet<ExternalEmployeeBlacklistItem> ExternalEmployeeBlacklistItems => Set<ExternalEmployeeBlacklistItem>();
     public DbSet<PersonalAccessToken> PersonalAccessTokens => Set<PersonalAccessToken>();
-    public DbSet<User> ModaUsers => Set<User>();
+    public DbSet<User> WaydUsers => Set<User>();
 
     #endregion Common
 
