@@ -183,7 +183,11 @@ Once copied, restart Claude Code (or open it at the new directory) — your prio
 
 ## What changed (for reference)
 
-The rename is code-only — the **infrastructure was intentionally not migrated** in this pass. A follow-up PR will rebuild the Azure environment on a fresh Terraform Cloud organization.
+The Moda → Wayd transition shipped across three PRs:
+
+1. **Code rename** — solution, projects, namespaces, DbContext, frontend branding, docs
+2. **Migration doc** — this page
+3. **Infrastructure rebuild** — Terraform Cloud organization rebuilt from scratch as `wayd`, Azure resources redeployed with `wayd-*` naming
 
 ### What changed
 
@@ -198,18 +202,18 @@ The rename is code-only — the **infrastructure was intentionally not migrated*
 - PWA manifest, page titles, alt text, logo text, SVG brand elements
 - Docusaurus config (title, baseUrl, project URLs)
 - All internal GitHub / Pages URL references
+- **Infrastructure** (in the follow-up PR): new `wayd` Terraform Cloud organization + `wayd-dev` workspace; Azure resources renamed (`rg-wayd-dev`, `sql-wayd-dev`, `sqldb-wayd-dev`, `cae-wayd`, `la-wayd`, `swa-wayd`, `sigr-wayd-dev`, container apps `wayd-api` / `wayd-client`); SQL admin login renamed to `waydadmin`
+- **JWT Issuer / Audience** (in the infrastructure PR): `Moda` / `ModaApi` → `Wayd` / `WaydApi` across `security.json`, Terraform env vars, and C# fallback defaults
 
 ### What intentionally stayed as "moda"
 
-These are deferred to later PRs for data compatibility, token compatibility, or because they live outside the repo:
+These are deferred because they live outside the repo or depend on data compatibility:
 
-- Azure resource names (`sqldb-moda-dev`, `rg-moda-dev`, `sql-moda-dev`, container apps `moda-api` / `moda-client`, etc.) — managed by existing Terraform state
-- JWT `Issuer = "Moda"` / `Audience = "ModaApi"` — changing invalidates tokens currently in circulation
-- `LoginProviders.Moda = "Moda"` constant and matching frontend `loginProvider === 'Moda'` checks — user rows in the database have `LoginProvider = "Moda"`
-- `@modanpm/moda-mcp` npm package — published artifact
+- `LoginProviders.Moda = "Moda"` constant and matching frontend `loginProvider === 'Moda'` checks — user rows in the database have `LoginProvider = "Moda"`; renaming requires a coordinated data migration
+- `@modanpm/moda-mcp` npm package — published artifact on the npm registry
 - `awaldow/moda-api` / `awaldow/moda-client` Docker Hub images — third-party publisher
-- `docs/_legacy/*.drawio.svg` — embedded text in legacy diagrams
-- `skills/moda-ppm`, `skills/moda-pi`, `skills/moda-roadmaps` — separately published skill names
+- `docs/_legacy/*.drawio.svg` — embedded text inside legacy architecture diagrams (art assets)
+- `skills/moda-pi`, `skills/moda-ppm`, `skills/moda-roadmaps`, `skills/moda-teams`, `skills/moda-users` — separately published skill names
 
 ## Troubleshooting
 
