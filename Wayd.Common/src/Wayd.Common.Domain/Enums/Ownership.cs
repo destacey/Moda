@@ -11,6 +11,6 @@ public enum Ownership
     [Display(Description = "The object is owned by an external system.")]
     Managed = 1,
 
-    [Display(Description = "The object is owned by Wayd, but not changable by a user.")]
+    [Display(Description = "The object is owned by Wayd, but not changeable by a user.")]
     System = 2,
 }
