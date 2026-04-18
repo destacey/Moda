@@ -44,7 +44,7 @@ public class EmployeesController(ILogger<EmployeesController> logger, ISender se
     [HttpPost]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.Employees)]
     [OpenApiOperation("Create an employee.", "")]
-    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201IdAndKey))]
+    [ApiConventionMethod(typeof(WaydApiConventions), nameof(WaydApiConventions.CreateReturn201IdAndKey))]
     public async Task<ActionResult<ObjectIdAndKey>> Create(CreateEmployeeRequest request, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(request.ToCreateEmployeeCommand(), cancellationToken);

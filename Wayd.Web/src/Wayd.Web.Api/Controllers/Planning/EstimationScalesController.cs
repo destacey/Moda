@@ -43,7 +43,7 @@ public class EstimationScalesController(ISender sender) : ControllerBase
     [HttpPost]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.EstimationScales)]
     [OpenApiOperation("Create a custom estimation scale.", "")]
-    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201Int))]
+    [ApiConventionMethod(typeof(WaydApiConventions), nameof(WaydApiConventions.CreateReturn201Int))]
     public async Task<ActionResult<int>> Create([FromBody] CreateEstimationScaleRequest request, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(request.ToCreateEstimationScaleCommand(), cancellationToken);

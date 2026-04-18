@@ -6,7 +6,7 @@ namespace Wayd.Web.Api.Controllers;
 #nullable disable
 #pragma warning disable RCS1163
 
-public static class ModaApiConventions
+public static class WaydApiConventions
 {
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]

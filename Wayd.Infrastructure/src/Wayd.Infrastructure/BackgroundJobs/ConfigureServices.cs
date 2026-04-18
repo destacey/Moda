@@ -1,4 +1,4 @@
-using Hangfire;
+﻿using Hangfire;
 using Hangfire.Console;
 using Hangfire.Console.Extensions;
 using Hangfire.Dashboard.BasicAuthorization;
@@ -26,12 +26,12 @@ internal static class ConfigureServices
         if (string.IsNullOrEmpty(storageSettings.ConnectionString)) throw new Exception("Hangfire Storage Provider ConnectionString is not configured.");
         _logger.Information("Hangfire: Current Storage Provider : {StorageProvider}", storageSettings.StorageProvider);
 
-        services.AddSingleton<JobActivator, ModaJobActivator>();
+        services.AddSingleton<JobActivator, WaydJobActivator>();
 
         services.AddHangfire((provider, hangfireConfig) => hangfireConfig
             .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
             .UseDatabase(storageSettings.StorageProvider, storageSettings.ConnectionString, config)
-            .UseFilter(new ModaJobFilter(provider))
+            .UseFilter(new WaydJobFilter(provider))
             .UseFilter(new LogJobFilter())
             .UseConsole());
 

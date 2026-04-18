@@ -75,7 +75,7 @@ public class RolesController(IRoleService roleService, IUserService userService,
     [HttpPost]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.Roles)]
     [OpenApiOperation("Create or update a role.", "")]
-    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201String))]
+    [ApiConventionMethod(typeof(WaydApiConventions), nameof(WaydApiConventions.CreateReturn201String))]
     public async Task<ActionResult<string>> CreateOrUpdate(CreateOrUpdateRoleRequest request)
     {
         var id = await _roleService.CreateOrUpdate(request.ToCreateOrUpdateRoleCommand());

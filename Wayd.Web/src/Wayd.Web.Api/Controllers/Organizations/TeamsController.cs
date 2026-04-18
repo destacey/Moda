@@ -53,7 +53,7 @@ public class TeamsController(ILogger<TeamsController> logger, ISender sender) : 
     [HttpPost]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.Teams)]
     [OpenApiOperation("Create a team.", "")]
-    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201Int))]
+    [ApiConventionMethod(typeof(WaydApiConventions), nameof(WaydApiConventions.CreateReturn201Int))]
     public async Task<ActionResult> Create([FromBody] CreateTeamRequest request, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(request.ToCreateTeamCommand(), cancellationToken);

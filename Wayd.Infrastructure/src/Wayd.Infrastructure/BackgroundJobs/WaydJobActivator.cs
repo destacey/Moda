@@ -4,11 +4,11 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Wayd.Infrastructure.BackgroundJobs;
 
-public class ModaJobActivator : JobActivator
+public class WaydJobActivator : JobActivator
 {
     private readonly IServiceScopeFactory _scopeFactory;
 
-    public ModaJobActivator(IServiceScopeFactory scopeFactory) =>
+    public WaydJobActivator(IServiceScopeFactory scopeFactory) =>
         _scopeFactory = scopeFactory ?? throw new ArgumentNullException(nameof(scopeFactory));
 
     public override JobActivatorScope BeginScope(PerformContext context) =>

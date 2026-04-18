@@ -86,7 +86,7 @@ public class ProjectsController(ILogger<ProjectsController> logger, ISender send
     [HttpPost]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.Projects)]
     [OpenApiOperation("Create a project.", "")]
-    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201IdAndKey))]
+    [ApiConventionMethod(typeof(WaydApiConventions), nameof(WaydApiConventions.CreateReturn201IdAndKey))]
     public async Task<ActionResult<ObjectIdAndKey>> Create([FromBody] CreateProjectRequest request, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(request.ToCreateProjectCommand(), cancellationToken);

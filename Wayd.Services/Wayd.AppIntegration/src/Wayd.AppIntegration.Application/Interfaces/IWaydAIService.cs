@@ -1,8 +1,8 @@
-using Wayd.AppIntegration.Domain.Models.AICapabilities.ObjectiveHealthCheckSummary;
+﻿using Wayd.AppIntegration.Domain.Models.AICapabilities.ObjectiveHealthCheckSummary;
 
 namespace Wayd.AppIntegration.Application.Interfaces;
 
-public interface IModaAIService
+public interface IWaydAIService
 {
     /// <summary>
     /// Gets the system ID for the given Azure OpenAI connection configuration.

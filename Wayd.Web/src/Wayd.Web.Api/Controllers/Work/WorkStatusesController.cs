@@ -48,7 +48,7 @@ public class WorkStatusesController : ControllerBase
     [HttpPost]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.WorkStatuses)]
     [OpenApiOperation("Create a work status.", "")]
-    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201Int))]
+    [ApiConventionMethod(typeof(WaydApiConventions), nameof(WaydApiConventions.CreateReturn201Int))]
     public async Task<ActionResult> Create(CreateWorkStatusRequest request, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(request.ToCreateWorkStatusCommand(), cancellationToken);

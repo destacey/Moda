@@ -73,7 +73,7 @@ public class RoadmapsController : ControllerBase
     [HttpPost]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.Roadmaps)]
     [OpenApiOperation("Create a roadmap.", "")]
-    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201IdAndKey))]
+    [ApiConventionMethod(typeof(WaydApiConventions), nameof(WaydApiConventions.CreateReturn201IdAndKey))]
     public async Task<ActionResult<ObjectIdAndKey>> Create([FromBody] CreateRoadmapRequest request, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(request.ToCreateRoadmapCommand(), cancellationToken);
@@ -86,7 +86,7 @@ public class RoadmapsController : ControllerBase
     [HttpPost("copy")]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.Roadmaps)]
     [OpenApiOperation("Copy an existing roadmap.", "")]
-    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201IdAndKey))]
+    [ApiConventionMethod(typeof(WaydApiConventions), nameof(WaydApiConventions.CreateReturn201IdAndKey))]
     public async Task<ActionResult<ObjectIdAndKey>> Copy([FromBody] CopyRoadmapRequest request, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(request.ToCopyRoadmapCommand(), cancellationToken);
@@ -194,7 +194,7 @@ public class RoadmapsController : ControllerBase
     [HttpPost("{roadmapId}/items")]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.Roadmaps)]
     [OpenApiOperation("Create a roadmap item of type: Activity, Timebox, Milestone.", "")]
-    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201IdAndKey))]
+    [ApiConventionMethod(typeof(WaydApiConventions), nameof(WaydApiConventions.CreateReturn201IdAndKey))]
     public async Task<ActionResult<ObjectIdAndKey>> CreateItem(Guid roadmapId, [FromBody] CreateRoadmapItemRequest request, CancellationToken cancellationToken)
     {
         if (roadmapId != request.RoadmapId)

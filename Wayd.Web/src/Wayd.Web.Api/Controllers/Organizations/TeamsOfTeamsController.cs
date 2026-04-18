@@ -55,7 +55,7 @@ public class TeamsOfTeamsController : ControllerBase
     [HttpPost]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.Teams)]
     [OpenApiOperation("Create a team of teams.", "")]
-    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201Int))]
+    [ApiConventionMethod(typeof(WaydApiConventions), nameof(WaydApiConventions.CreateReturn201Int))]
     public async Task<ActionResult> Create(CreateTeamOfTeamsRequest request, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(request.ToCreateTeamOfTeamsCommand(), cancellationToken);

@@ -96,7 +96,7 @@ public class PlanningIntervalsController : ControllerBase
     [HttpPost]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.PlanningIntervals)]
     [OpenApiOperation("Create a planning interval.", "")]
-    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201IdAndKey))]
+    [ApiConventionMethod(typeof(WaydApiConventions), nameof(WaydApiConventions.CreateReturn201IdAndKey))]
     public async Task<ActionResult> Create([FromBody] CreatePlanningIntervalRequest request, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(request.ToCreatePlanningIntervalCommand(), cancellationToken);

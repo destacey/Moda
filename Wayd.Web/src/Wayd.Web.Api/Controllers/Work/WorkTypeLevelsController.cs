@@ -51,7 +51,7 @@ public class WorkTypeLevelsController : ControllerBase
     [HttpPost]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.WorkTypeLevels)]
     [OpenApiOperation("Create a work type level.", "")]
-    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201Int))]
+    [ApiConventionMethod(typeof(WaydApiConventions), nameof(WaydApiConventions.CreateReturn201Int))]
     public async Task<ActionResult> Create(CreateWorkTypeLevelRequest request, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(request.ToCreateWorkTypeLevelCommand(), cancellationToken);

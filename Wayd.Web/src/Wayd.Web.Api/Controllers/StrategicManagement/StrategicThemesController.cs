@@ -49,7 +49,7 @@ public class StrategicThemesController(ILogger<StrategicThemesController> logger
     [HttpPost]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.StrategicThemes)]
     [OpenApiOperation("Create a strategic theme.", "")]
-    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201IdAndKey))]
+    [ApiConventionMethod(typeof(WaydApiConventions), nameof(WaydApiConventions.CreateReturn201IdAndKey))]
     public async Task<ActionResult<ObjectIdAndKey>> Create([FromBody] CreateStrategicThemeRequest request, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(request.ToCreateStrategicThemeCommand(), cancellationToken);

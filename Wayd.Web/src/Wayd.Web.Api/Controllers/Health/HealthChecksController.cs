@@ -50,7 +50,7 @@ public class HealthChecksController : ControllerBase
     [HttpPost]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.HealthChecks)]
     [OpenApiOperation("Create a health report.", "")]
-    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201Guid))]
+    [ApiConventionMethod(typeof(WaydApiConventions), nameof(WaydApiConventions.CreateReturn201Guid))]
     public async Task<ActionResult> Create([FromBody] CreateHealthCheckRequest request, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(request.ToCreateHealthCheckCommand(), cancellationToken);

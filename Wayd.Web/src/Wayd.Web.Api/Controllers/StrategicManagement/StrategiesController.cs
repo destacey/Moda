@@ -47,7 +47,7 @@ public class StrategiesController(ILogger<StrategiesController> logger, ISender 
     [HttpPost]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.Strategies)]
     [OpenApiOperation("Create a strategy.", "")]
-    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201IdAndKey))]
+    [ApiConventionMethod(typeof(WaydApiConventions), nameof(WaydApiConventions.CreateReturn201IdAndKey))]
     public async Task<ActionResult<ObjectIdAndKey>> Create([FromBody] CreateStrategyRequest request, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(request.ToCreateStrategyCommand(), cancellationToken);

@@ -64,7 +64,7 @@ public class RisksController : ControllerBase
     [HttpPost()]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.Risks)]
     [OpenApiOperation("Create a risk.", "")]
-    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201IdAndKey))]
+    [ApiConventionMethod(typeof(WaydApiConventions), nameof(WaydApiConventions.CreateReturn201IdAndKey))]
     public async Task<ActionResult<ObjectIdAndKey>> Create([FromBody] CreateRiskRequest request, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(request.ToCreateRiskCommand(), cancellationToken);

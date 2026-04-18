@@ -1,4 +1,4 @@
-using Wayd.ProjectPortfolioManagement.Application.ProjectLifecycles.Commands;
+﻿using Wayd.ProjectPortfolioManagement.Application.ProjectLifecycles.Commands;
 using Wayd.ProjectPortfolioManagement.Application.ProjectLifecycles.Dtos;
 using Wayd.ProjectPortfolioManagement.Application.ProjectLifecycles.Queries;
 using Wayd.ProjectPortfolioManagement.Domain.Enums;
@@ -44,7 +44,7 @@ public class ProjectLifecyclesController(ILogger<ProjectLifecyclesController> lo
     [HttpPost]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.ProjectLifecycles)]
     [OpenApiOperation("Create a project lifecycle.", "")]
-    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201Guid))]
+    [ApiConventionMethod(typeof(WaydApiConventions), nameof(WaydApiConventions.CreateReturn201Guid))]
     public async Task<ActionResult<Guid>> Create([FromBody] CreateProjectLifecycleRequest request, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(request.ToCreateProjectLifecycleCommand(), cancellationToken);
@@ -116,7 +116,7 @@ public class ProjectLifecyclesController(ILogger<ProjectLifecyclesController> lo
     [HttpPost("{id}/phases")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.ProjectLifecycles)]
     [OpenApiOperation("Add a phase to a project lifecycle.", "")]
-    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201Guid))]
+    [ApiConventionMethod(typeof(WaydApiConventions), nameof(WaydApiConventions.CreateReturn201Guid))]
     public async Task<ActionResult<Guid>> AddPhase(Guid id, [FromBody] ProjectLifecyclePhaseRequest request, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(request.ToAddCommand(id), cancellationToken);

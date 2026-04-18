@@ -59,7 +59,7 @@ public class ProgramsController(ILogger<ProgramsController> logger, ISender send
     [HttpPost]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.Programs)]
     [OpenApiOperation("Create a program.", "")]
-    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201IdAndKey))]
+    [ApiConventionMethod(typeof(WaydApiConventions), nameof(WaydApiConventions.CreateReturn201IdAndKey))]
     public async Task<ActionResult<ObjectIdAndKey>> Create([FromBody] CreateProgramRequest request, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(request.ToCreateProgramCommand(), cancellationToken);

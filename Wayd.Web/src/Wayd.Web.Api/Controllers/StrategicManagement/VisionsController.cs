@@ -47,7 +47,7 @@ public class VisionsController(ILogger<VisionsController> logger, ISender sender
     [HttpPost]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.Visions)]
     [OpenApiOperation("Create a vision.", "")]
-    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201IdAndKey))]
+    [ApiConventionMethod(typeof(WaydApiConventions), nameof(WaydApiConventions.CreateReturn201IdAndKey))]
     public async Task<ActionResult<ObjectIdAndKey>> Create([FromBody] CreateVisionRequest request, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(request.ToCreateVisionCommand(), cancellationToken);

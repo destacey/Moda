@@ -45,7 +45,7 @@ public class PokerSessionsController(ISender sender) : ControllerBase
     [HttpPost]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.PokerSessions)]
     [OpenApiOperation("Create a poker session.", "")]
-    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201IdAndKey))]
+    [ApiConventionMethod(typeof(WaydApiConventions), nameof(WaydApiConventions.CreateReturn201IdAndKey))]
     public async Task<ActionResult<ObjectIdAndKey>> Create([FromBody] CreatePokerSessionRequest request, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(request.ToCreatePokerSessionCommand(), cancellationToken);

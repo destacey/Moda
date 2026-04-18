@@ -65,7 +65,7 @@ public class ConnectionsController(ISender sender) : ControllerBase
     [HttpPost]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.Connections)]
     [OpenApiOperation("Create a new connection.", "Accepts polymorphic request based on connector type.")]
-    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201Guid))]
+    [ApiConventionMethod(typeof(WaydApiConventions), nameof(WaydApiConventions.CreateReturn201Guid))]
     public async Task<ActionResult> CreateConnection(
         [FromBody] CreateConnectionRequest request,
         CancellationToken cancellationToken)

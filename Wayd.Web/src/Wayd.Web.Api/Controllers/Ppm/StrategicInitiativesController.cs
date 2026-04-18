@@ -55,7 +55,7 @@ public class StrategicInitiativesController(ILogger<StrategicInitiativesControll
     [HttpPost]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.StrategicInitiatives)]
     [OpenApiOperation("Create a strategic initiative.", "")]
-    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201IdAndKey))]
+    [ApiConventionMethod(typeof(WaydApiConventions), nameof(WaydApiConventions.CreateReturn201IdAndKey))]
     public async Task<ActionResult<ObjectIdAndKey>> Create([FromBody] CreateStrategicInitiativeRequest request, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(request.ToCreateStrategicInitiativeCommand(), cancellationToken);
@@ -201,7 +201,7 @@ public class StrategicInitiativesController(ILogger<StrategicInitiativesControll
     [HttpPost("{id}/kpis")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.StrategicInitiatives)]
     [OpenApiOperation("Create a KPI for a strategic initiative.", "")]
-    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201IdAndKey))]
+    [ApiConventionMethod(typeof(WaydApiConventions), nameof(WaydApiConventions.CreateReturn201IdAndKey))]
     public async Task<ActionResult<ObjectIdAndKey>> CreateKpi(Guid id, [FromBody] CreateStrategicInitiativeKpiRequest request, CancellationToken cancellationToken)
     {
         if (id != request.StrategicInitiativeId)

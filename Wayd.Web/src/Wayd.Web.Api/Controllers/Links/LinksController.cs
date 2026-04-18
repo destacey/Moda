@@ -47,7 +47,7 @@ public class LinksController : ControllerBase
     [HttpPost]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.Links)]
     [OpenApiOperation("Create a link.", "")]
-    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201Guid))]
+    [ApiConventionMethod(typeof(WaydApiConventions), nameof(WaydApiConventions.CreateReturn201Guid))]
     public async Task<ActionResult> Create([FromBody] CreateLinkRequest request, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(request.ToCreateLinkCommand(), cancellationToken);

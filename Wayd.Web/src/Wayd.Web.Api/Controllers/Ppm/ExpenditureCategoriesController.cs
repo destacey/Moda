@@ -43,7 +43,7 @@ public class ExpenditureCategoriesController(ILogger<ExpenditureCategoriesContro
     [HttpPost]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.ExpenditureCategories)]
     [OpenApiOperation("Create an expenditure category.", "")]
-    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201Int))]
+    [ApiConventionMethod(typeof(WaydApiConventions), nameof(WaydApiConventions.CreateReturn201Int))]
     public async Task<ActionResult<int>> Create([FromBody] CreateExpenditureCategoryRequest request, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(request.ToCreateExpenditureCategoryCommand(), cancellationToken);

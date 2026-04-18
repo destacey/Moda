@@ -56,7 +56,7 @@ public class PortfoliosController(ILogger<PortfoliosController> logger, ISender 
     [HttpPost]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.ProjectPortfolios)]
     [OpenApiOperation("Create a portfolio.", "")]
-    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201IdAndKey))]
+    [ApiConventionMethod(typeof(WaydApiConventions), nameof(WaydApiConventions.CreateReturn201IdAndKey))]
     public async Task<ActionResult<ObjectIdAndKey>> Create([FromBody] CreatePortfolioRequest request, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(request.ToCreateProjectPortfolioCommand(), cancellationToken);

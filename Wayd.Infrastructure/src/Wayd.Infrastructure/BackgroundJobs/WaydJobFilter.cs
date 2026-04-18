@@ -6,14 +6,14 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Wayd.Infrastructure.BackgroundJobs;
 
-public class ModaJobFilter : IClientFilter
+public class WaydJobFilter : IClientFilter
 {
     private static readonly ILog _logger = LogProvider.GetCurrentClassLogger();
     private const string JobAdminUserId = "11111111-1111-1111-1111-111111111111";
 
     private readonly IServiceProvider _services;
 
-    public ModaJobFilter(IServiceProvider services) => _services = services;
+    public WaydJobFilter(IServiceProvider services) => _services = services;
 
     public void OnCreating(CreatingContext context)
     {
