@@ -47,7 +47,7 @@ internal class AzureAdJwtBearerEvents : JwtBearerEvents
         // Peeking at the issuer before validation prevents IdentityModel
         // from emitting IDX10205 diagnostic noise during cross-scheme attempts.
         var localJwtSettings = _config.GetSection(LocalJwtSettings.SectionName).Get<LocalJwtSettings>();
-        var localIssuer = localJwtSettings?.Issuer ?? "Moda";
+        var localIssuer = localJwtSettings?.Issuer ?? "Wayd";
         var token = context.Token;
         if (token is null)
         {

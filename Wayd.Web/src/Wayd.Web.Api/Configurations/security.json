@@ -17,8 +17,8 @@
         },
         "LocalJwt": {
             "Secret": "DEV-ONLY-SECRET-REPLACE-IN-PRODUCTION!!",
-            "Issuer": "Moda",
-            "Audience": "ModaApi",
+            "Issuer": "Wayd",
+            "Audience": "WaydApi",
             "TokenExpirationInMinutes": 60,
             "RefreshTokenExpirationInDays": 7
         },
