@@ -58,11 +58,11 @@ public sealed record UpdateEmployeeCommand : ICommand<int>
 
 public sealed class UpdateEmployeeCommandValidator : CustomValidator<UpdateEmployeeCommand>
 {
-    private readonly IWaydDbContext _modaDbContext;
+    private readonly IWaydDbContext _waydDbContext;
 
-    public UpdateEmployeeCommandValidator(IWaydDbContext modaDbContext)
+    public UpdateEmployeeCommandValidator(IWaydDbContext waydDbContext)
     {
-        _modaDbContext = modaDbContext;
+        _waydDbContext = waydDbContext;
 
         RuleLevelCascadeMode = CascadeMode.Stop;
 
@@ -92,7 +92,7 @@ public sealed class UpdateEmployeeCommandValidator : CustomValidator<UpdateEmplo
 
     public async Task<bool> BeUniqueEmployeeNumber(Guid id, string employeeNumber, CancellationToken cancellationToken)
     {
-        return await _modaDbContext.Employees
+        return await _waydDbContext.Employees
             .Where(e => e.Id != id)
             .AllAsync(e => e.EmployeeNumber != employeeNumber, cancellationToken);
     }
@@ -100,13 +100,13 @@ public sealed class UpdateEmployeeCommandValidator : CustomValidator<UpdateEmplo
 
 internal sealed class UpdateEmployeeCommandHandler : ICommandHandler<UpdateEmployeeCommand, int>
 {
-    private readonly IWaydDbContext _modaDbContext;
+    private readonly IWaydDbContext _waydDbContext;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ILogger<UpdateEmployeeCommandHandler> _logger;
 
-    public UpdateEmployeeCommandHandler(IWaydDbContext modaDbContext, IDateTimeProvider dateTimeProvider, ILogger<UpdateEmployeeCommandHandler> logger)
+    public UpdateEmployeeCommandHandler(IWaydDbContext waydDbContext, IDateTimeProvider dateTimeProvider, ILogger<UpdateEmployeeCommandHandler> logger)
     {
-        _modaDbContext = modaDbContext;
+        _waydDbContext = waydDbContext;
         _dateTimeProvider = dateTimeProvider;
         _logger = logger;
     }
@@ -115,7 +115,7 @@ internal sealed class UpdateEmployeeCommandHandler : ICommandHandler<UpdateEmplo
     {
         try
         {
-            var employee = await _modaDbContext.Employees
+            var employee = await _waydDbContext.Employees
                 .FirstOrDefaultAsync(p => p.Id == request.Id, cancellationToken);
             if (employee is null)
                 return Result.Failure<int>("Employee not found.");
@@ -123,7 +123,7 @@ internal sealed class UpdateEmployeeCommandHandler : ICommandHandler<UpdateEmplo
             // verify the manager exists
             if (request.ManagerId.HasValue
                 && employee.ManagerId != request.ManagerId
-                && await _modaDbContext.Employees.AllAsync(e => e.Id != request.ManagerId.Value, cancellationToken))
+                && await _waydDbContext.Employees.AllAsync(e => e.Id != request.ManagerId.Value, cancellationToken))
             {
                 _logger.LogWarning("Wayd Request: Unable to find manager {ManagerId} while updating employee {EmployeeId}", request.ManagerId.Value, request.Id);
                 return Result.Failure<int>("Manager not found.");
@@ -145,7 +145,7 @@ internal sealed class UpdateEmployeeCommandHandler : ICommandHandler<UpdateEmplo
             if (updateResult.IsFailure)
             {
                 // Reset the entity
-                await _modaDbContext.Entry(employee).ReloadAsync(cancellationToken);
+                await _waydDbContext.Entry(employee).ReloadAsync(cancellationToken);
                 employee.ClearDomainEvents();
 
                 var requestName = request.GetType().Name;
@@ -153,7 +153,7 @@ internal sealed class UpdateEmployeeCommandHandler : ICommandHandler<UpdateEmplo
                 return Result.Failure<int>(updateResult.Error);
             }
 
-            await _modaDbContext.SaveChangesAsync(cancellationToken);
+            await _waydDbContext.SaveChangesAsync(cancellationToken);
 
             return Result.Success(employee.Key);
         }

@@ -8,18 +8,18 @@ public sealed record GetDirectReportsQuery(Guid EmployeeId) : IQuery<IReadOnlyLi
 
 internal sealed class GetDirectReportsQueryHandler : IQueryHandler<GetDirectReportsQuery, IReadOnlyList<EmployeeListDto>>
 {
-    private readonly IWaydDbContext _modaDbContext;
+    private readonly IWaydDbContext _waydDbContext;
     private readonly ILogger<GetDirectReportsQueryHandler> _logger;
 
-    public GetDirectReportsQueryHandler(IWaydDbContext modaDbContext, ILogger<GetDirectReportsQueryHandler> logger)
+    public GetDirectReportsQueryHandler(IWaydDbContext waydDbContext, ILogger<GetDirectReportsQueryHandler> logger)
     {
-        _modaDbContext = modaDbContext;
+        _waydDbContext = waydDbContext;
         _logger = logger;
     }
 
     public async Task<IReadOnlyList<EmployeeListDto>> Handle(GetDirectReportsQuery request, CancellationToken cancellationToken)
     {
-        return await _modaDbContext.Employees
+        return await _waydDbContext.Employees
             .Where(e => e.ManagerId == request.EmployeeId && e.IsActive)
             .ProjectToType<EmployeeListDto>()
             .ToListAsync(cancellationToken);

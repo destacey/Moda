@@ -8,16 +8,16 @@ public sealed record GetEmployeesQuery(bool IncludeInactive = false) : IQuery<IR
 
 internal sealed class GetEmployeesQueryHandler : IQueryHandler<GetEmployeesQuery, IReadOnlyList<EmployeeListDto>>
 {
-    private readonly IWaydDbContext _modaDbContext;
+    private readonly IWaydDbContext _waydDbContext;
 
-    public GetEmployeesQueryHandler(IWaydDbContext modaDbContext)
+    public GetEmployeesQueryHandler(IWaydDbContext waydDbContext)
     {
-        _modaDbContext = modaDbContext;
+        _waydDbContext = waydDbContext;
     }
 
     public async Task<IReadOnlyList<EmployeeListDto>> Handle(GetEmployeesQuery request, CancellationToken cancellationToken)
     {
-        var query = _modaDbContext.Employees
+        var query = _waydDbContext.Employees
             .AsQueryable();
 
         if (!request.IncludeInactive)

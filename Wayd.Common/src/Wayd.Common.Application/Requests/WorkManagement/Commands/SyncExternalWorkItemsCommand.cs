@@ -8,8 +8,8 @@ namespace Wayd.Common.Application.Requests.WorkManagement.Commands;
 /// </summary>
 /// <param name="WorkspaceId"></param>
 /// <param name="WorkItems"></param>
-/// <param name="TeamMappings">The key is set to the external team id and value is set to the internal (Moda) team id.</param>
-/// <param name="IterationMappings">The key is set to the external iteration id and value is set to the internal (Moda) iteration id.</param>
+/// <param name="TeamMappings">The key is set to the external team id and value is set to the internal (Wayd) team id.</param>
+/// <param name="IterationMappings">The key is set to the external iteration id and value is set to the internal (Wayd) iteration id.</param>
 public sealed record SyncExternalWorkItemsCommand(Guid WorkspaceId, List<IExternalWorkItem> WorkItems, Dictionary<Guid, Guid?> TeamMappings, Dictionary<string, Guid> IterationMappings) : ICommand, ILongRunningRequest;
 
 public sealed class SyncExternalWorkItemsCommandValidator : CustomValidator<SyncExternalWorkItemsCommand>

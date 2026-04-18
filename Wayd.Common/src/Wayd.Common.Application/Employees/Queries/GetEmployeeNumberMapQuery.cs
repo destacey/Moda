@@ -16,16 +16,16 @@ public sealed record GetEmployeeNumberMapQuery : IQuery<IReadOnlyList<EmployeeNu
 
 internal sealed class GetEmployeeNumberMapQueryHandler : IQueryHandler<GetEmployeeNumberMapQuery, IReadOnlyList<EmployeeNumberMapDto>>
 {
-    private readonly IWaydDbContext _modaDbContext;
+    private readonly IWaydDbContext _waydDbContext;
 
-    public GetEmployeeNumberMapQueryHandler(IWaydDbContext modaDbContext)
+    public GetEmployeeNumberMapQueryHandler(IWaydDbContext waydDbContext)
     {
-        _modaDbContext = modaDbContext;
+        _waydDbContext = waydDbContext;
     }
 
     public async Task<IReadOnlyList<EmployeeNumberMapDto>> Handle(GetEmployeeNumberMapQuery request, CancellationToken cancellationToken)
     {
-        var query = _modaDbContext.Employees.AsQueryable();
+        var query = _waydDbContext.Employees.AsQueryable();
 
         if (!request.IncludeInactive)
             query = query.Where(e => e.IsActive);

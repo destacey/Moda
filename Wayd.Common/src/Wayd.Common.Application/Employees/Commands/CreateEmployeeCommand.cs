@@ -54,11 +54,11 @@ public sealed record CreateEmployeeCommand : ICommand<ObjectIdAndKey>
 
 public sealed class CreateEmployeeCommandValidator : CustomValidator<CreateEmployeeCommand>
 {
-    private readonly IWaydDbContext _modaDbContext;
+    private readonly IWaydDbContext _waydDbContext;
 
-    public CreateEmployeeCommandValidator(IWaydDbContext modaDbContext)
+    public CreateEmployeeCommandValidator(IWaydDbContext waydDbContext)
     {
-        _modaDbContext = modaDbContext;
+        _waydDbContext = waydDbContext;
 
         RuleLevelCascadeMode = CascadeMode.Stop;
 
@@ -87,19 +87,19 @@ public sealed class CreateEmployeeCommandValidator : CustomValidator<CreateEmplo
 
     public async Task<bool> BeUniqueEmployeeNumber(string employeeNumber, CancellationToken cancellationToken)
     {
-        return await _modaDbContext.Employees.AllAsync(x => x.EmployeeNumber != employeeNumber, cancellationToken);
+        return await _waydDbContext.Employees.AllAsync(x => x.EmployeeNumber != employeeNumber, cancellationToken);
     }
 }
 
 internal sealed class CreateEmployeeCommandHandler : ICommandHandler<CreateEmployeeCommand, ObjectIdAndKey>
 {
-    private readonly IWaydDbContext _modaDbContext;
+    private readonly IWaydDbContext _waydDbContext;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ILogger<CreateEmployeeCommandHandler> _logger;
 
-    public CreateEmployeeCommandHandler(IWaydDbContext modaDbContext, IDateTimeProvider dateTimeProvider, ILogger<CreateEmployeeCommandHandler> logger)
+    public CreateEmployeeCommandHandler(IWaydDbContext waydDbContext, IDateTimeProvider dateTimeProvider, ILogger<CreateEmployeeCommandHandler> logger)
     {
-        _modaDbContext = modaDbContext;
+        _waydDbContext = waydDbContext;
         _dateTimeProvider = dateTimeProvider;
         _logger = logger;
     }
@@ -111,7 +111,7 @@ internal sealed class CreateEmployeeCommandHandler : ICommandHandler<CreateEmplo
             // verify the manager exists
             var managerId = request.ManagerId;
             if (managerId.HasValue
-                && await _modaDbContext.Employees.AllAsync(e => e.Id != request.ManagerId, cancellationToken))
+                && await _waydDbContext.Employees.AllAsync(e => e.Id != request.ManagerId, cancellationToken))
             {
                 managerId = null;
             }
@@ -129,9 +129,9 @@ internal sealed class CreateEmployeeCommandHandler : ICommandHandler<CreateEmplo
                 _dateTimeProvider.Now
                 );
 
-            await _modaDbContext.Employees.AddAsync(employee, cancellationToken);
+            await _waydDbContext.Employees.AddAsync(employee, cancellationToken);
 
-            await _modaDbContext.SaveChangesAsync(cancellationToken);
+            await _waydDbContext.SaveChangesAsync(cancellationToken);
 
             return new ObjectIdAndKey(employee.Id, employee.Key);
         }

@@ -57,7 +57,7 @@ public sealed class CreateUserCommandValidator : CustomValidator<CreateUserComma
 
         RuleFor(u => u.Password)
             .Null()
-                .WithMessage("Password must not be provided for non-Moda accounts.")
+                .WithMessage("Password must not be provided for non-Wayd accounts.")
             .When(u => u.LoginProvider != LoginProviders.Moda);
     }
 }

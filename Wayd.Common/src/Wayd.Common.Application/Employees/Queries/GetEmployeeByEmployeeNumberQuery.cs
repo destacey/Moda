@@ -6,16 +6,16 @@ public sealed record GetEmployeeByEmployeeNumberQuery(string EmployeeNumber) : I
 
 internal sealed class GetEmployeeByEmployeeNumberQueryHandler : IQueryHandler<GetEmployeeByEmployeeNumberQuery, Guid?>
 {
-    private readonly IWaydDbContext _modaDbContext;
+    private readonly IWaydDbContext _waydDbContext;
 
-    public GetEmployeeByEmployeeNumberQueryHandler(IWaydDbContext modaDbContext)
+    public GetEmployeeByEmployeeNumberQueryHandler(IWaydDbContext waydDbContext)
     {
-        _modaDbContext = modaDbContext;
+        _waydDbContext = waydDbContext;
     }
 
     public async Task<Guid?> Handle(GetEmployeeByEmployeeNumberQuery request, CancellationToken cancellationToken)
     {
-        return await _modaDbContext.Employees
+        return await _waydDbContext.Employees
             .Where(e => e.EmployeeNumber == request.EmployeeNumber)
             .Select(e => e.Id)
             .FirstOrDefaultAsync(cancellationToken);

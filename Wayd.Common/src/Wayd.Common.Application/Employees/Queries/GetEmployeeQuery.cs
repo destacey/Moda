@@ -17,14 +17,14 @@ public sealed record GetEmployeeQuery : IQuery<EmployeeDetailsDto?>
 }
 
 internal sealed class GetEmployeeQueryHandler(
-    IWaydDbContext modaDbContext)
+    IWaydDbContext waydDbContext)
     : IQueryHandler<GetEmployeeQuery, EmployeeDetailsDto?>
 {
-    private readonly IWaydDbContext _modaDbContext = modaDbContext;
+    private readonly IWaydDbContext _waydDbContext = waydDbContext;
 
     public async Task<EmployeeDetailsDto?> Handle(GetEmployeeQuery request, CancellationToken cancellationToken)
     {
-        return await _modaDbContext.Employees
+        return await _waydDbContext.Employees
             .Where(request.IdOrKeyFilter)
             .ProjectToType<EmployeeDetailsDto>()
             .FirstOrDefaultAsync(cancellationToken);

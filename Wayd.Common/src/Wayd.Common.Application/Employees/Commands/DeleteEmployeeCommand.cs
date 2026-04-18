@@ -13,18 +13,18 @@ public sealed class DeleteEmployeeCommandValidator : CustomValidator<DeleteEmplo
     }
 }
 
-internal sealed class DeleteEmployeeCommandHandler(IWaydDbContext modaDbContext, ILogger<DeleteEmployeeCommandHandler> logger) : ICommandHandler<DeleteEmployeeCommand>
+internal sealed class DeleteEmployeeCommandHandler(IWaydDbContext waydDbContext, ILogger<DeleteEmployeeCommandHandler> logger) : ICommandHandler<DeleteEmployeeCommand>
 {
     private const string AppRequestName = nameof(DeleteEmployeeCommand);
 
-    private readonly IWaydDbContext _modaDbContext = modaDbContext;
+    private readonly IWaydDbContext _waydDbContext = waydDbContext;
     private readonly ILogger<DeleteEmployeeCommandHandler> _logger = logger;
 
     public async Task<Result> Handle(DeleteEmployeeCommand request, CancellationToken cancellationToken)
     {
         try
         {
-            var employee = await _modaDbContext.Employees
+            var employee = await _waydDbContext.Employees
                 .Include(e => e.DirectReports)
                 .FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
             if (employee is null)
@@ -33,9 +33,9 @@ internal sealed class DeleteEmployeeCommandHandler(IWaydDbContext modaDbContext,
                 return Result.Failure("Employee not found.");
             }
 
-            _modaDbContext.Employees.Remove(employee);
+            _waydDbContext.Employees.Remove(employee);
 
-            await _modaDbContext.SaveChangesAsync(cancellationToken);
+            await _waydDbContext.SaveChangesAsync(cancellationToken);
 
             _logger.LogInformation("Employee {EmployeeId} deleted successfully. Name: {EmployeeName}, Email: {EmployeeEmail}", request.Id, employee.Name, employee.Email);
 

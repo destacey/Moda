@@ -7,13 +7,13 @@ public sealed record RemoveInvalidEmployeeCommand(Guid Id) : ICommand<int>;
 
 internal sealed class RemoveInvalidEmployeeCommandHandler : ICommandHandler<RemoveInvalidEmployeeCommand, int>
 {
-    private readonly IWaydDbContext _modaDbContext;
+    private readonly IWaydDbContext _waydDbContext;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ILogger<RemoveInvalidEmployeeCommandHandler> _logger;
 
-    public RemoveInvalidEmployeeCommandHandler(IWaydDbContext modaDbContext, IDateTimeProvider dateTimeProvider, ILogger<RemoveInvalidEmployeeCommandHandler> logger)
+    public RemoveInvalidEmployeeCommandHandler(IWaydDbContext waydDbContext, IDateTimeProvider dateTimeProvider, ILogger<RemoveInvalidEmployeeCommandHandler> logger)
     {
-        _modaDbContext = modaDbContext;
+        _waydDbContext = waydDbContext;
         _dateTimeProvider = dateTimeProvider;
         _logger = logger;
     }
@@ -22,7 +22,7 @@ internal sealed class RemoveInvalidEmployeeCommandHandler : ICommandHandler<Remo
     {
         try
         {
-            var employee = await _modaDbContext.Employees
+            var employee = await _waydDbContext.Employees
                 .Include(e => e.DirectReports)
                 .FirstOrDefaultAsync(p => p.Id == request.Id, cancellationToken);
             if (employee is null || string.IsNullOrWhiteSpace(employee.EmployeeNumber))
@@ -46,7 +46,7 @@ internal sealed class RemoveInvalidEmployeeCommandHandler : ICommandHandler<Remo
             if (updateResult.IsFailure)
             {
                 // Reset the entity
-                await _modaDbContext.Entry(employee).ReloadAsync(cancellationToken);
+                await _waydDbContext.Entry(employee).ReloadAsync(cancellationToken);
                 employee.ClearDomainEvents();
 
                 var requestName = request.GetType().Name;
@@ -59,12 +59,12 @@ internal sealed class RemoveInvalidEmployeeCommandHandler : ICommandHandler<Remo
                 report.UpdateManagerId(null, _dateTimeProvider.Now);
             }
 
-            await _modaDbContext.SaveChangesAsync(cancellationToken);
+            await _waydDbContext.SaveChangesAsync(cancellationToken);
 
-            _modaDbContext.Employees.Remove(employee);
+            _waydDbContext.Employees.Remove(employee);
 
-            _modaDbContext.ExternalEmployeeBlacklistItems.Add(new ExternalEmployeeBlacklistItem { ObjectId = objectId });
-            await _modaDbContext.SaveChangesAsync(cancellationToken);
+            _waydDbContext.ExternalEmployeeBlacklistItems.Add(new ExternalEmployeeBlacklistItem { ObjectId = objectId });
+            await _waydDbContext.SaveChangesAsync(cancellationToken);
 
             _logger.LogInformation("The invalid employee {EmployeeId} with employee number {EmployeeNumber} has been deleted", request.Id, objectId);
             _logger.LogInformation("Object Id {EmployeeNumber} has been added to the ExternalEmployeeBlacklistItems list.", objectId);
