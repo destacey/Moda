@@ -15,21 +15,25 @@ terraform {
   }
 }
 
-// Leave this here, but don't use it. When using aliased providers, there has to be
-// a provider without an alias in order for plans and applies to work. We declare one here
-// to satisfy the CLI's validation, and we use the aliased providers for the resources
-// because we'll have one per subscription.
+# Subscription and tenant IDs are sourced from ARM_SUBSCRIPTION_ID / ARM_TENANT_ID
+# environment variables set on the Terraform Cloud workspace.
 provider "azurerm" {
   features {}
-  subscription_id = "ed2e6819-f47c-416b-a022-23dfbf609330" // Can also be set via ARM_SUBSCRIPTION_ID
-  tenant_id       = "f399216f-be6b-4062-8700-54952e44e7ef" // Can also be set via ARM_TENANT_ID
 }
 
 data "azurerm_client_config" "current" {}
 
+locals {
+  common_tags = {
+    environment = var.environment
+    project     = var.project
+    managed_by  = "terraform"
+  }
+}
 
 resource "azurerm_resource_group" "wayd_dev_rg" {
   name     = "rg-wayd-dev"
   location = var.location
+  tags     = local.common_tags
 }
 

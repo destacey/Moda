@@ -16,4 +16,6 @@ resource "azurerm_signalr_service" "wayd_signalr" {
       "https://${azurerm_static_web_app.wayd_swa.default_host_name}",
     ]
   }
+
+  tags = local.common_tags
 }

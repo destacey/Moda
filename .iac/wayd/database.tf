@@ -7,9 +7,11 @@ resource "azurerm_mssql_server" "wayd_sql_server" {
   administrator_login_password = var.sql_admin_pass
   azuread_administrator {
     tenant_id      = data.azurerm_client_config.current.tenant_id
-    object_id      = "aca6c8fd-ba48-4931-b0c8-006550378db4"
+    object_id      = var.sql_ad_admin_object_id
     login_username = "Wayd SQL Admins"
   }
+
+  tags = local.common_tags
 }
 
 resource "azurerm_mssql_database" "wayd_db" {
@@ -21,6 +23,8 @@ resource "azurerm_mssql_database" "wayd_db" {
   min_capacity                = 0.5
   read_replica_count          = 0
   read_scale                  = false
+
+  tags = local.common_tags
 }
 
 resource "azurerm_mssql_firewall_rule" "allow_azure" {

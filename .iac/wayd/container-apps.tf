@@ -8,12 +8,17 @@ resource "azurerm_container_app_environment" "wayd_cae" {
   location                   = azurerm_resource_group.wayd_dev_rg.location
   log_analytics_workspace_id = azurerm_log_analytics_workspace.wayd.id
 
+  tags = local.common_tags
 }
 
 resource "azurerm_log_analytics_workspace" "wayd" {
   location            = azurerm_resource_group.wayd_dev_rg.location
   name                = "la-wayd"
   resource_group_name = azurerm_resource_group.wayd_dev_rg.name
+  sku                 = "PerGB2018"
+  retention_in_days   = 30
+
+  tags = local.common_tags
 }
 
 resource "azurerm_container_app" "wayd_frontend" {
@@ -45,15 +50,6 @@ resource "azurerm_container_app" "wayd_frontend" {
       image  = "awaldow/moda-client:${var.docker_tag}"
       cpu    = 0.25
       memory = "0.5Gi"
-
-      # liveness_probe {
-      #   port                    = 8080
-      #   transport               = "HTTP"
-      #   failure_count_threshold = 3
-      #   path                    = "/health"
-      #   interval_seconds        = 30
-      #   initial_delay           = 15
-      # }
 
       readiness_probe {
         port                    = 3000
@@ -99,6 +95,8 @@ resource "azurerm_container_app" "wayd_frontend" {
       }
     }
   }
+
+  tags = local.common_tags
 }
 
 resource "azurerm_container_app" "wayd_backend" {
@@ -150,15 +148,6 @@ resource "azurerm_container_app" "wayd_backend" {
       image  = "awaldow/moda-api:${var.docker_tag}"
       cpu    = 0.25
       memory = "0.5Gi"
-
-      # liveness_probe {
-      #   port                    = 8080
-      #   transport               = "HTTP"
-      #   failure_count_threshold = 3
-      #   path                    = "/health"
-      #   interval_seconds        = 30
-      #   initial_delay           = 15
-      # }
 
       readiness_probe {
         port                    = 8080
@@ -212,42 +201,42 @@ resource "azurerm_container_app" "wayd_backend" {
 
       env {
         name  = "SecuritySettings__AzureAd__ClientId"
-        value = "fdca5e6f-46a2-455c-b2f3-06a9a6877190"
+        value = var.api_app_reg_client_id
       }
 
       env {
         name  = "SecuritySettings__AzureAd__Domain"
-        value = "dstaceyoutlook.onmicrosoft.com"
+        value = var.aad_domain
       }
 
       env {
         name  = "SecuritySettings__AzureAd__RootIssuer"
-        value = "https://sts.windows.net/f399216f-be6b-4062-8700-54952e44e7ef/"
+        value = "https://sts.windows.net/${var.aad_tenant_id}/"
       }
 
       env {
         name  = "SecuritySettings__AzureAd__TenantId"
-        value = "f399216f-be6b-4062-8700-54952e44e7ef"
+        value = var.aad_tenant_id
       }
 
       env {
         name  = "SecuritySettings__Swagger__ApiScope"
-        value = "api://fdca5e6f-46a2-455c-b2f3-06a9a6877190/access_as_user"
+        value = var.app_reg_api_scope
       }
 
       env {
         name  = "SecuritySettings__Swagger__AuthorizationUrl"
-        value = "https://login.microsoftonline.com/f399216f-be6b-4062-8700-54952e44e7ef/oauth2/v2.0/authorize"
+        value = "https://login.microsoftonline.com/${var.aad_tenant_id}/oauth2/v2.0/authorize"
       }
 
       env {
         name  = "SecuritySettings__Swagger__OpenIdClientId"
-        value = "4d566fb3-7966-4c77-9864-113020fd646f"
+        value = var.swagger_openid_client_id
       }
 
       env {
         name  = "SecuritySettings__Swagger__TokenUrl"
-        value = "https://login.microsoftonline.com/f399216f-be6b-4062-8700-54952e44e7ef/oauth2/v2.0/token"
+        value = "https://login.microsoftonline.com/${var.aad_tenant_id}/oauth2/v2.0/token"
       }
 
       env {
@@ -281,4 +270,6 @@ resource "azurerm_container_app" "wayd_backend" {
       }
     }
   }
+
+  tags = local.common_tags
 }
