@@ -2,7 +2,7 @@ import { FC, ComponentType, useRef } from 'react'
 import useTheme from '../../contexts/theme'
 import { OrganizationChart, OrganizationChartOptions } from '@ant-design/graphs'
 import {
-  ModaOrganizationChartNodeProps,
+  WaydOrganizationChartNodeProps,
   OrganizationChartGraphData,
 } from './types'
 import WaydEmpty from '../wayd-empty'
@@ -17,13 +17,13 @@ interface CustomTransformOption {
 }
 type TransformOption = CustomTransformOption | string
 
-export interface ModaOrganizationChartProps<T = any> {
+export interface WaydOrganizationChartProps<T = any> {
   data: OrganizationChartGraphData<T>
-  NodeComponent: ComponentType<ModaOrganizationChartNodeProps>
+  NodeComponent: ComponentType<WaydOrganizationChartNodeProps>
   nodeSize?: [number, number]
 }
 
-const WaydOrganizationChart: FC<ModaOrganizationChartProps> = ({
+const WaydOrganizationChart: FC<WaydOrganizationChartProps> = ({
   data,
   NodeComponent,
   nodeSize = [250, 80],

@@ -93,7 +93,7 @@ public static class ConfigureServices
                 };
             })
             .AddExceptionMiddleware()
-            .AddModaFeatureManagement()
+            .AddWaydFeatureManagement()
             .AddMediatR(options => options.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
             .AddOpenApiDocumentation(config)
             .AddPersistence(config)

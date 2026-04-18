@@ -72,7 +72,7 @@ public sealed class WorkProcessScheme : BaseSoftDeletableEntity, IActivatable
 
         var scheme = new WorkProcessScheme(workProcessId, workTypeId, workflowId);
 
-        // external work process schemes do not have to be active when they are first created in Moda
+        // external work process schemes do not have to be active when they are first created in Wayd
         if (scheme.IsActive != isActive)
             scheme.IsActive = isActive;
 

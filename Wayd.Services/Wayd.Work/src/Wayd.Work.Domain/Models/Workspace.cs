@@ -272,7 +272,7 @@ public sealed class Workspace : BaseSoftDeletableEntity, IActivatable<WorkspaceA
     /// <returns></returns>
     public static Workspace Create(WorkspaceKey key, string name, string? description, Guid workProcessId, Instant timestamp)
     {
-        var workspace = new Workspace(key, name, description, OwnershipInfo.CreateModaOwned(), workProcessId, null);
+        var workspace = new Workspace(key, name, description, OwnershipInfo.CreateWaydOwned(), workProcessId, null);
 
         workspace.AddDomainEvent(EntityCreatedEvent.WithEntity(workspace, timestamp));
 

@@ -59,10 +59,10 @@ public sealed class OwnershipInfo : ValueObject
     }
 
     /// <summary>
-    /// Creates a Moda owned instance of OwnershipInfo. 
+    /// Creates a Wayd owned instance of OwnershipInfo. 
     /// </summary>
     /// <returns></returns>
-    public static OwnershipInfo CreateModaOwned()
+    public static OwnershipInfo CreateWaydOwned()
         => new(Ownership.Owned);
 
     /// <summary>

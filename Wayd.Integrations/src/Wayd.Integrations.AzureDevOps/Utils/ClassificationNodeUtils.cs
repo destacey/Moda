@@ -14,9 +14,9 @@ internal static class ClassificationNodeUtils
     /// This method removes the classification type to return just the project and hierarchy.
     ///
     /// Examples:
-    /// - "\\Moda\\Iteration\\Team Moda" -> "\\Moda\\Team Moda"
-    /// - "\\Moda\\Area\\Product\\Feature" -> "\\Moda\\Product\\Feature"
-    /// - "\\Moda\\Iteration" -> "\\Moda"
+    /// - "\\Wayd\\Iteration\\Team Wayd" -> "\\Wayd\\Team Wayd"
+    /// - "\\Wayd\\Area\\Product\\Feature" -> "\\Wayd\\Product\\Feature"
+    /// - "\\Wayd\\Iteration" -> "\\Wayd"
     /// </remarks>
     /// <param name="path">The classification path from Azure DevOps.</param>
     /// <returns>The path with the classification type node removed.</returns>

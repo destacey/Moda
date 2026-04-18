@@ -118,7 +118,7 @@ internal static class ConfigureServices
                 options.TagsSorter = "alpha";
                 options.OAuth2Client = new OAuth2ClientSettings
                 {
-                    AppName = "Moda API Client",
+                    AppName = "Wayd API Client",
                     ClientId = config["SecuritySettings:Swagger:OpenIdClientId"],
                     ClientSecret = null,
                     UsePkceWithAuthorizationCodeGrant = true,

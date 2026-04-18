@@ -22,7 +22,7 @@ public sealed class IterationFaker : PrivateConstructorFaker<Iteration>
         RuleFor(x => x.State, f => f.PickRandom<IterationState>());
         RuleFor(x => x.DateRange, f => IterationDateRange.Create(start, end));
         RuleFor(x => x.TeamId, f => f.Random.Guid());
-        RuleFor(x => x.OwnershipInfo, f => OwnershipInfo.CreateModaOwned());
+        RuleFor(x => x.OwnershipInfo, f => OwnershipInfo.CreateWaydOwned());
     }
 }
 

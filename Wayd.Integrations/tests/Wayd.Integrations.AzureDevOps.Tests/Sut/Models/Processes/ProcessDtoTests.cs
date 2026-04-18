@@ -18,7 +18,7 @@ public class ProcessDtoTests : CommonResponseOptions
         // Assert
         Assert.NotNull(actualResponse);
         actualResponse.TypeId.Should().Be(Guid.Parse("15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77"));
-        actualResponse.Name.Should().Be("Moda Agile Process");
+        actualResponse.Name.Should().Be("Wayd Agile Process");
         actualResponse.Description.Should().Be("Includes a fourth level initiative work item type");
         Assert.NotNull(actualResponse.Projects);
         actualResponse.Projects.Should().HaveCount(1);
@@ -31,14 +31,14 @@ public class ProcessDtoTests : CommonResponseOptions
         return """
             {
                 "typeId": "15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77",
-                "name": "Moda Agile Process",
+                "name": "Wayd Agile Process",
                 "referenceName": "Inherited.15e0d0dd8d8946aead4a7c1d9742bd77",
                 "description": "Includes a fourth level initiative work item type",
                 "projects": [
                     {
                         "id": "3b15d01e-d259-48eb-a15c-dd29384fd598",
-                        "name": "Moda",
-                        "description": "test project for Moda",
+                        "name": "Wayd",
+                        "description": "test project for Wayd",
                         "url": "vstfs:///Classification/TeamProject/3b15d01e-d259-48eb-a15c-dd29384fd598"
                     }
                 ],

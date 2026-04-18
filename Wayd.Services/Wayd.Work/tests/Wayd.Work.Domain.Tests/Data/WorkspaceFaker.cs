@@ -15,7 +15,7 @@ public class WorkspaceFaker : PrivateConstructorFaker<Workspace>
         RuleFor(x => x.Key, f => new WorkspaceKey($"TEST{f.Random.Int(1, 999)}"));
         RuleFor(x => x.Name, f => f.Company.CompanyName());
         RuleFor(x => x.Description, f => f.Lorem.Sentence());
-        RuleFor(x => x.OwnershipInfo, f => OwnershipInfo.CreateModaOwned());
+        RuleFor(x => x.OwnershipInfo, f => OwnershipInfo.CreateWaydOwned());
         RuleFor(x => x.IsActive, true);
     }
 }

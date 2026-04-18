@@ -34,7 +34,7 @@ internal sealed class SyncExternalWorkTypesCommandHandler(IWorkDbContext workDbC
 
         // Work types are global and cannot be deleted or updated at this time
 
-        // TODO: add the ability to disable work types if they are no longer used within moda and disabled externally
+        // TODO: add the ability to disable work types if they are no longer used within wayd and disabled externally
 
         return Result.Success();
     }

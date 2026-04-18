@@ -21,11 +21,11 @@ public class ClassificationNodeResponseTests : CommonResponseOptions
         Assert.NotNull(actualResponse);
         actualResponse.Id.Should().Be(45);
         actualResponse.Identifier.Should().Be(Guid.Parse("e060e843-5539-4ec4-becf-f61c5f3c5f85"));
-        actualResponse.Name.Should().Be("Moda");
+        actualResponse.Name.Should().Be("Wayd");
         //actualResponse.HasChildren.Should().BeTrue();
         actualResponse.Children.Should().NotBeNull();
         actualResponse.Children!.Count.Should().Be(3);
-        //actualResponse.Path.Should().Be("\\Moda\\Area");
+        //actualResponse.Path.Should().Be("\\Wayd\\Area");
 
         var list = actualResponse.FlattenHierarchy(a => a.Children).ToList();
 
@@ -33,13 +33,13 @@ public class ClassificationNodeResponseTests : CommonResponseOptions
     }
 
     //[Theory]
-    //[InlineData("\\Moda\\Area", "Moda")]
-    //[InlineData("\\Moda\\Area\\Core", "Moda\\Core")]
-    //[InlineData("\\Moda\\Area\\Core\\Integrations", "Moda\\Core\\Integrations")]
-    //[InlineData("\\Moda\\Area\\Data", "Moda\\Data")]
-    //[InlineData("\\Moda\\Area\\Product", "Moda\\Product")]
-    //[InlineData("\\Moda\\Area\\Product\\Planning", "Moda\\Product\\Planning")]
-    //[InlineData("\\Moda\\Area\\Product\\Work Management", "Moda\\Product\\Work Management")]
+    //[InlineData("\\Wayd\\Area", "Wayd")]
+    //[InlineData("\\Wayd\\Area\\Core", "Wayd\\Core")]
+    //[InlineData("\\Wayd\\Area\\Core\\Integrations", "Wayd\\Core\\Integrations")]
+    //[InlineData("\\Wayd\\Area\\Data", "Wayd\\Data")]
+    //[InlineData("\\Wayd\\Area\\Product", "Wayd\\Product")]
+    //[InlineData("\\Wayd\\Area\\Product\\Planning", "Wayd\\Product\\Planning")]
+    //[InlineData("\\Wayd\\Area\\Product\\Work Management", "Wayd\\Product\\Work Management")]
     //public void WorkItemPath_ReturnsCorrectPath(string path, string expected)
     //{
     //    // Arrange
@@ -64,7 +64,7 @@ public class ClassificationNodeResponseTests : CommonResponseOptions
             {
                 "id": 45,
                 "identifier": "e060e843-5539-4ec4-becf-f61c5f3c5f85",
-                "name": "Moda",
+                "name": "Wayd",
                 "structureType": "area",
                 "hasChildren": true,
                 "children": [
@@ -81,10 +81,10 @@ public class ClassificationNodeResponseTests : CommonResponseOptions
                                 "name": "Integrations",
                                 "structureType": "area",
                                 "hasChildren": false,
-                                "path": "\\Moda\\Area\\Core\\Integrations"
+                                "path": "\\Wayd\\Area\\Core\\Integrations"
                             }
                         ],
-                        "path": "\\Moda\\Area\\Core Services"
+                        "path": "\\Wayd\\Area\\Core Services"
                     },
                     {
                         "id": 123,
@@ -92,7 +92,7 @@ public class ClassificationNodeResponseTests : CommonResponseOptions
                         "name": "Data",
                         "structureType": "area",
                         "hasChildren": false,
-                        "path": "\\Moda\\Area\\Data"
+                        "path": "\\Wayd\\Area\\Data"
                     },
                     {
                         "id": 124,
@@ -107,7 +107,7 @@ public class ClassificationNodeResponseTests : CommonResponseOptions
                                 "name": "Planning",
                                 "structureType": "area",
                                 "hasChildren": false,
-                                "path": "\\Moda\\Area\\Product\\Planning"
+                                "path": "\\Wayd\\Area\\Product\\Planning"
                             },
                             {
                                 "id": 126,
@@ -115,13 +115,13 @@ public class ClassificationNodeResponseTests : CommonResponseOptions
                                 "name": "Work Management",
                                 "structureType": "area",
                                 "hasChildren": false,
-                                "path": "\\Moda\\Area\\Product\\Work Management"
+                                "path": "\\Wayd\\Area\\Product\\Work Management"
                             }
                         ],
-                        "path": "\\Moda\\Area\\Product"
+                        "path": "\\Wayd\\Area\\Product"
                     },
                 ],
-                "path": "\\Moda\\Area"
+                "path": "\\Wayd\\Area"
             }
             """;
     }

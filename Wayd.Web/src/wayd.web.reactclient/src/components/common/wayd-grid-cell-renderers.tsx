@@ -1,7 +1,7 @@
 import { ExportOutlined, MoreOutlined } from '@ant-design/icons'
 import { Button, Dropdown } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
-import './moda-grid-cell-renderers.css'
+import './wayd-grid-cell-renderers.css'
 import HealthCheckTag from './health-check/health-check-tag'
 import {
   LifecycleNavigationDto,

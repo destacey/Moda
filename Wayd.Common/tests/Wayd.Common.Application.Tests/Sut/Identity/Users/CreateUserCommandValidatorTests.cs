@@ -1,4 +1,4 @@
-using FluentValidation.TestHelper;
+﻿using FluentValidation.TestHelper;
 using Wayd.Common.Application.Identity;
 using Wayd.Common.Application.Identity.Users;
 
@@ -19,7 +19,7 @@ public class CreateUserCommandValidatorTests
         _sut = new CreateUserCommandValidator(_mockUserService.Object);
     }
 
-    private static CreateUserCommand CreateValidModaCommand() => new()
+    private static CreateUserCommand CreateValidWaydCommand() => new()
     {
         FirstName = "John",
         LastName = "Doe",
@@ -43,7 +43,7 @@ public class CreateUserCommandValidatorTests
     public async Task Validate_ShouldPass_WhenModaCommandIsValid()
     {
         // Arrange
-        var command = CreateValidModaCommand();
+        var command = CreateValidWaydCommand();
 
         // Act
         var result = await _sut.TestValidateAsync(command, cancellationToken: TestContext.Current.CancellationToken);
@@ -73,7 +73,7 @@ public class CreateUserCommandValidatorTests
     public async Task Validate_ShouldFail_WhenLoginProviderIsEmpty()
     {
         // Arrange
-        var command = CreateValidModaCommand();
+        var command = CreateValidWaydCommand();
         command.LoginProvider = string.Empty;
 
         // Act
@@ -87,7 +87,7 @@ public class CreateUserCommandValidatorTests
     public async Task Validate_ShouldFail_WhenLoginProviderIsInvalid()
     {
         // Arrange
-        var command = CreateValidModaCommand();
+        var command = CreateValidWaydCommand();
         command.LoginProvider = "InvalidProvider";
 
         // Act
@@ -106,7 +106,7 @@ public class CreateUserCommandValidatorTests
     public async Task Validate_ShouldFail_WhenModaAccountHasNoPassword()
     {
         // Arrange
-        var command = CreateValidModaCommand();
+        var command = CreateValidWaydCommand();
         command.Password = null;
 
         // Act
@@ -121,7 +121,7 @@ public class CreateUserCommandValidatorTests
     public async Task Validate_ShouldFail_WhenModaAccountPasswordIsTooShort()
     {
         // Arrange
-        var command = CreateValidModaCommand();
+        var command = CreateValidWaydCommand();
         command.Password = "short";
 
         // Act
@@ -136,7 +136,7 @@ public class CreateUserCommandValidatorTests
     public async Task Validate_ShouldFail_WhenPasswordHasNoUppercase()
     {
         // Arrange
-        var command = CreateValidModaCommand();
+        var command = CreateValidWaydCommand();
         command.Password = "password1";
 
         // Act
@@ -151,7 +151,7 @@ public class CreateUserCommandValidatorTests
     public async Task Validate_ShouldFail_WhenPasswordHasNoLowercase()
     {
         // Arrange
-        var command = CreateValidModaCommand();
+        var command = CreateValidWaydCommand();
         command.Password = "PASSWORD1";
 
         // Act
@@ -166,7 +166,7 @@ public class CreateUserCommandValidatorTests
     public async Task Validate_ShouldFail_WhenPasswordHasNoDigit()
     {
         // Arrange
-        var command = CreateValidModaCommand();
+        var command = CreateValidWaydCommand();
         command.Password = "Passwords";
 
         // Act
@@ -189,7 +189,7 @@ public class CreateUserCommandValidatorTests
 
         // Assert
         result.ShouldHaveValidationErrorFor(x => x.Password)
-            .WithErrorMessage("Password must not be provided for non-Moda accounts.");
+            .WithErrorMessage("Password must not be provided for non-Wayd accounts.");
     }
 
     #endregion
@@ -200,7 +200,7 @@ public class CreateUserCommandValidatorTests
     public async Task Validate_ShouldFail_WhenEmailIsEmpty()
     {
         // Arrange
-        var command = CreateValidModaCommand();
+        var command = CreateValidWaydCommand();
         command.Email = string.Empty;
 
         // Act
@@ -214,7 +214,7 @@ public class CreateUserCommandValidatorTests
     public async Task Validate_ShouldFail_WhenEmailIsInvalid()
     {
         // Arrange
-        var command = CreateValidModaCommand();
+        var command = CreateValidWaydCommand();
         command.Email = "not-an-email";
 
         // Act
@@ -229,7 +229,7 @@ public class CreateUserCommandValidatorTests
     public async Task Validate_ShouldFail_WhenEmailAlreadyExists()
     {
         // Arrange
-        var command = CreateValidModaCommand();
+        var command = CreateValidWaydCommand();
         _mockUserService.Setup(x => x.ExistsWithEmailAsync(command.Email, null)).ReturnsAsync(true);
 
         // Act
@@ -248,7 +248,7 @@ public class CreateUserCommandValidatorTests
     public async Task Validate_ShouldFail_WhenFirstNameIsEmpty()
     {
         // Arrange
-        var command = CreateValidModaCommand();
+        var command = CreateValidWaydCommand();
         command.FirstName = string.Empty;
 
         // Act
@@ -263,7 +263,7 @@ public class CreateUserCommandValidatorTests
     public async Task Validate_ShouldFail_WhenFirstNameExceedsMaxLength(int length)
     {
         // Arrange
-        var command = CreateValidModaCommand();
+        var command = CreateValidWaydCommand();
         command.FirstName = new string('A', length);
 
         // Act
@@ -277,7 +277,7 @@ public class CreateUserCommandValidatorTests
     public async Task Validate_ShouldFail_WhenLastNameIsEmpty()
     {
         // Arrange
-        var command = CreateValidModaCommand();
+        var command = CreateValidWaydCommand();
         command.LastName = string.Empty;
 
         // Act
@@ -295,7 +295,7 @@ public class CreateUserCommandValidatorTests
     public async Task Validate_ShouldPass_WhenPhoneNumberIsNull()
     {
         // Arrange
-        var command = CreateValidModaCommand();
+        var command = CreateValidWaydCommand();
         command.PhoneNumber = null;
 
         // Act
@@ -309,7 +309,7 @@ public class CreateUserCommandValidatorTests
     public async Task Validate_ShouldFail_WhenPhoneNumberAlreadyExists()
     {
         // Arrange
-        var command = CreateValidModaCommand();
+        var command = CreateValidWaydCommand();
         command.PhoneNumber = "555-1234";
         _mockUserService.Setup(x => x.ExistsWithPhoneNumberAsync("555-1234", null)).ReturnsAsync(true);
 

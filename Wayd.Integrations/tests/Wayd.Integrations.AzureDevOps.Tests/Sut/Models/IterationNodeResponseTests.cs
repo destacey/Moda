@@ -20,10 +20,10 @@ public class IterationNodeResponseTests : CommonResponseOptions
         Assert.NotNull(actualResponse);
         actualResponse.Id.Should().Be(127);
         actualResponse.Identifier.Should().Be(Guid.Parse("68429463-523f-4c69-8c16-4321543db2e4"));
-        actualResponse.Name.Should().Be("Moda");
+        actualResponse.Name.Should().Be("Wayd");
         actualResponse.Children.Should().NotBeNull();
         actualResponse.Children!.Count.Should().Be(2);
-        actualResponse.Path.Should().Be("\\Moda\\Iteration");
+        actualResponse.Path.Should().Be("\\Wayd\\Iteration");
 
         var list = actualResponse.FlattenHierarchy(a => a.Children).ToList();
 
@@ -44,14 +44,14 @@ public class IterationNodeResponseTests : CommonResponseOptions
             {
                 "id": 127,
                 "identifier": "68429463-523f-4c69-8c16-4321543db2e4",
-                "name": "Moda",
+                "name": "Wayd",
                 "structureType": "iteration",
                 "hasChildren": true,
                 "children": [
                     {
                         "id": 421,
                         "identifier": "8f218f2f-dc77-4f6a-af01-6d39deb89cca",
-                        "name": "Moda Integrations Team",
+                        "name": "Wayd Integrations Team",
                         "structureType": "iteration",
                         "hasChildren": true,
                         "children": [
@@ -61,17 +61,17 @@ public class IterationNodeResponseTests : CommonResponseOptions
                                 "name": "Test",
                                 "structureType": "iteration",
                                 "hasChildren": false,
-                                "path": "\\Moda\\Iteration\\Moda Integrations Team\\Test",
-                                "url": "https://dev.azure.com/dstacey/3b15d01e-d259-48eb-a15c-dd29384fd598/_apis/wit/classificationNodes/Iterations/Moda%20Integrations%20Team/Test"
+                                "path": "\\Wayd\\Iteration\\Wayd Integrations Team\\Test",
+                                "url": "https://dev.azure.com/dstacey/3b15d01e-d259-48eb-a15c-dd29384fd598/_apis/wit/classificationNodes/Iterations/Wayd%20Integrations%20Team/Test"
                             }
                         ],
-                        "path": "\\Moda\\Iteration\\Moda Integrations Team",
-                        "url": "https://dev.azure.com/dstacey/3b15d01e-d259-48eb-a15c-dd29384fd598/_apis/wit/classificationNodes/Iterations/Moda%20Integrations%20Team"
+                        "path": "\\Wayd\\Iteration\\Wayd Integrations Team",
+                        "url": "https://dev.azure.com/dstacey/3b15d01e-d259-48eb-a15c-dd29384fd598/_apis/wit/classificationNodes/Iterations/Wayd%20Integrations%20Team"
                     },
                     {
                         "id": 422,
                         "identifier": "c2d4a31b-9c69-4efb-898e-34a82b559edf",
-                        "name": "Team Moda",
+                        "name": "Team Wayd",
                         "structureType": "iteration",
                         "hasChildren": true,
                         "children": [
@@ -99,8 +99,8 @@ public class IterationNodeResponseTests : CommonResponseOptions
                                                     "startDate": "2022-09-12T00:00:00Z",
                                                     "finishDate": "2022-09-25T00:00:00Z"
                                                 },
-                                                "path": "\\Moda\\Iteration\\Team Moda\\2022\\22.3\\22.3.6",
-                                                "url": "https://dev.azure.com/dstacey/3b15d01e-d259-48eb-a15c-dd29384fd598/_apis/wit/classificationNodes/Iterations/Team%20Moda/2022/22.3/22.3.6"
+                                                "path": "\\Wayd\\Iteration\\Team Wayd\\2022\\22.3\\22.3.6",
+                                                "url": "https://dev.azure.com/dstacey/3b15d01e-d259-48eb-a15c-dd29384fd598/_apis/wit/classificationNodes/Iterations/Team%20Wayd/2022/22.3/22.3.6"
                                             },
                                             {
                                                 "id": 426,
@@ -112,16 +112,16 @@ public class IterationNodeResponseTests : CommonResponseOptions
                                                     "startDate": "2022-09-26T00:00:00Z",
                                                     "finishDate": "2022-10-09T00:00:00Z"
                                                 },
-                                                "path": "\\Moda\\Iteration\\Team Moda\\2022\\22.3\\22.3.7",
-                                                "url": "https://dev.azure.com/dstacey/3b15d01e-d259-48eb-a15c-dd29384fd598/_apis/wit/classificationNodes/Iterations/Team%20Moda/2022/22.3/22.3.7"
+                                                "path": "\\Wayd\\Iteration\\Team Wayd\\2022\\22.3\\22.3.7",
+                                                "url": "https://dev.azure.com/dstacey/3b15d01e-d259-48eb-a15c-dd29384fd598/_apis/wit/classificationNodes/Iterations/Team%20Wayd/2022/22.3/22.3.7"
                                             }
                                         ],
                                         "attributes": {
                                             "startDate": "2022-08-01T00:00:00Z",
                                             "finishDate": "2022-10-09T00:00:00Z"
                                         },
-                                        "path": "\\Moda\\Iteration\\Team Moda\\2022\\22.3",
-                                        "url": "https://dev.azure.com/dstacey/3b15d01e-d259-48eb-a15c-dd29384fd598/_apis/wit/classificationNodes/Iterations/Team%20Moda/2022/22.3"
+                                        "path": "\\Wayd\\Iteration\\Team Wayd\\2022\\22.3",
+                                        "url": "https://dev.azure.com/dstacey/3b15d01e-d259-48eb-a15c-dd29384fd598/_apis/wit/classificationNodes/Iterations/Team%20Wayd/2022/22.3"
                                     },
                                     {
                                         "id": 427,
@@ -140,8 +140,8 @@ public class IterationNodeResponseTests : CommonResponseOptions
                                                     "startDate": "2022-10-10T00:00:00Z",
                                                     "finishDate": "2022-10-23T00:00:00Z"
                                                 },
-                                                "path": "\\Moda\\Iteration\\Team Moda\\2022\\22.4\\22.4.1",
-                                                "url": "https://dev.azure.com/dstacey/3b15d01e-d259-48eb-a15c-dd29384fd598/_apis/wit/classificationNodes/Iterations/Team%20Moda/2022/22.4/22.4.1"
+                                                "path": "\\Wayd\\Iteration\\Team Wayd\\2022\\22.4\\22.4.1",
+                                                "url": "https://dev.azure.com/dstacey/3b15d01e-d259-48eb-a15c-dd29384fd598/_apis/wit/classificationNodes/Iterations/Team%20Wayd/2022/22.4/22.4.1"
                                             },
                                             {
                                                 "id": 429,
@@ -153,8 +153,8 @@ public class IterationNodeResponseTests : CommonResponseOptions
                                                     "startDate": "2022-10-24T00:00:00Z",
                                                     "finishDate": "2022-11-06T00:00:00Z"
                                                 },
-                                                "path": "\\Moda\\Iteration\\Team Moda\\2022\\22.4\\22.4.2",
-                                                "url": "https://dev.azure.com/dstacey/3b15d01e-d259-48eb-a15c-dd29384fd598/_apis/wit/classificationNodes/Iterations/Team%20Moda/2022/22.4/22.4.2"
+                                                "path": "\\Wayd\\Iteration\\Team Wayd\\2022\\22.4\\22.4.2",
+                                                "url": "https://dev.azure.com/dstacey/3b15d01e-d259-48eb-a15c-dd29384fd598/_apis/wit/classificationNodes/Iterations/Team%20Wayd/2022/22.4/22.4.2"
                                             },
                                             {
                                                 "id": 430,
@@ -166,24 +166,24 @@ public class IterationNodeResponseTests : CommonResponseOptions
                                                     "startDate": "2022-11-07T00:00:00Z",
                                                     "finishDate": "2022-11-20T00:00:00Z"
                                                 },
-                                                "path": "\\Moda\\Iteration\\Team Moda\\2022\\22.4\\22.4.3",
-                                                "url": "https://dev.azure.com/dstacey/3b15d01e-d259-48eb-a15c-dd29384fd598/_apis/wit/classificationNodes/Iterations/Team%20Moda/2022/22.4/22.4.3"
+                                                "path": "\\Wayd\\Iteration\\Team Wayd\\2022\\22.4\\22.4.3",
+                                                "url": "https://dev.azure.com/dstacey/3b15d01e-d259-48eb-a15c-dd29384fd598/_apis/wit/classificationNodes/Iterations/Team%20Wayd/2022/22.4/22.4.3"
                                             },
                                         ],
                                         "attributes": {
                                             "startDate": "2022-10-10T00:00:00Z",
                                             "finishDate": "2023-01-01T00:00:00Z"
                                         },
-                                        "path": "\\Moda\\Iteration\\Team Moda\\2022\\22.4",
-                                        "url": "https://dev.azure.com/dstacey/3b15d01e-d259-48eb-a15c-dd29384fd598/_apis/wit/classificationNodes/Iterations/Team%20Moda/2022/22.4"
+                                        "path": "\\Wayd\\Iteration\\Team Wayd\\2022\\22.4",
+                                        "url": "https://dev.azure.com/dstacey/3b15d01e-d259-48eb-a15c-dd29384fd598/_apis/wit/classificationNodes/Iterations/Team%20Wayd/2022/22.4"
                                     }
                                 ],
                                 "attributes": {
                                     "startDate": "2022-01-03T00:00:00Z",
                                     "finishDate": "2023-01-01T00:00:00Z"
                                 },
-                                "path": "\\Moda\\Iteration\\Team Moda\\2022",
-                                "url": "https://dev.azure.com/dstacey/3b15d01e-d259-48eb-a15c-dd29384fd598/_apis/wit/classificationNodes/Iterations/Team%20Moda/2022"
+                                "path": "\\Wayd\\Iteration\\Team Wayd\\2022",
+                                "url": "https://dev.azure.com/dstacey/3b15d01e-d259-48eb-a15c-dd29384fd598/_apis/wit/classificationNodes/Iterations/Team%20Wayd/2022"
                             },
                             {
                                 "id": 431,
@@ -195,8 +195,8 @@ public class IterationNodeResponseTests : CommonResponseOptions
                                     "startDate": "2023-01-02T00:00:00Z",
                                     "finishDate": "2023-12-31T00:00:00Z"
                                 },
-                                "path": "\\Moda\\Iteration\\Team Moda\\2023",
-                                "url": "https://dev.azure.com/dstacey/3b15d01e-d259-48eb-a15c-dd29384fd598/_apis/wit/classificationNodes/Iterations/Team%20Moda/2023"
+                                "path": "\\Wayd\\Iteration\\Team Wayd\\2023",
+                                "url": "https://dev.azure.com/dstacey/3b15d01e-d259-48eb-a15c-dd29384fd598/_apis/wit/classificationNodes/Iterations/Team%20Wayd/2023"
                             },
                             {
                                 "id": 432,
@@ -208,15 +208,15 @@ public class IterationNodeResponseTests : CommonResponseOptions
                                     "startDate": "2024-01-01T00:00:00Z",
                                     "finishDate": "2024-12-29T00:00:00Z"
                                 },
-                                "path": "\\Moda\\Iteration\\Team Moda\\2024",
-                                "url": "https://dev.azure.com/dstacey/3b15d01e-d259-48eb-a15c-dd29384fd598/_apis/wit/classificationNodes/Iterations/Team%20Moda/2024"
+                                "path": "\\Wayd\\Iteration\\Team Wayd\\2024",
+                                "url": "https://dev.azure.com/dstacey/3b15d01e-d259-48eb-a15c-dd29384fd598/_apis/wit/classificationNodes/Iterations/Team%20Wayd/2024"
                             }
                         ],
-                        "path": "\\Moda\\Iteration\\Team Moda",
-                        "url": "https://dev.azure.com/dstacey/3b15d01e-d259-48eb-a15c-dd29384fd598/_apis/wit/classificationNodes/Iterations/Team%20Moda"
+                        "path": "\\Wayd\\Iteration\\Team Wayd",
+                        "url": "https://dev.azure.com/dstacey/3b15d01e-d259-48eb-a15c-dd29384fd598/_apis/wit/classificationNodes/Iterations/Team%20Wayd"
                     }
                 ],
-                "path": "\\Moda\\Iteration",
+                "path": "\\Wayd\\Iteration",
                 "_links": {
                     "self": {
                         "href": "https://dev.azure.com/dstacey/3b15d01e-d259-48eb-a15c-dd29384fd598/_apis/wit/classificationNodes/Iterations"

@@ -1,12 +1,12 @@
-using Wayd.Integrations.AzureDevOps.Utils;
+﻿using Wayd.Integrations.AzureDevOps.Utils;
 
 namespace Wayd.Integrations.AzureDevOps.Tests.Sut.Utils;
 
 public class ClassificationPathUtilsTests
 {
     [Theory]
-    [InlineData("\\Moda\\Iteration", "\\Moda")]
-    [InlineData("\\Moda\\Area", "\\Moda")]
+    [InlineData("\\Wayd\\Iteration", "\\Wayd")]
+    [InlineData("\\Wayd\\Area", "\\Wayd")]
     [InlineData("\\ProjectName\\Iteration", "\\ProjectName")]
     public void RemoveClassificationTypeFromPath_WithRootPath_ReturnsProjectOnly(string input, string expected)
     {
@@ -18,9 +18,9 @@ public class ClassificationPathUtilsTests
     }
 
     [Theory]
-    [InlineData("\\Moda\\Iteration\\Team Moda", "\\Moda\\Team Moda")]
-    [InlineData("\\Moda\\Iteration\\Moda Integrations Team\\Test", "\\Moda\\Moda Integrations Team\\Test")]
-    [InlineData("\\Moda\\Area\\Product\\Feature", "\\Moda\\Product\\Feature")]
+    [InlineData("\\Wayd\\Iteration\\Team Wayd", "\\Wayd\\Team Wayd")]
+    [InlineData("\\Wayd\\Iteration\\Wayd Integrations Team\\Test", "\\Wayd\\Wayd Integrations Team\\Test")]
+    [InlineData("\\Wayd\\Area\\Product\\Feature", "\\Wayd\\Product\\Feature")]
     public void RemoveClassificationTypeFromPath_WithSingleLevelHierarchy_RemovesClassificationType(string input, string expected)
     {
         // Act
@@ -31,9 +31,9 @@ public class ClassificationPathUtilsTests
     }
 
     [Theory]
-    [InlineData("\\Moda\\Iteration\\Team Moda\\2022\\22.3\\22.3.6", "\\Moda\\Team Moda\\2022\\22.3\\22.3.6")]
-    [InlineData("\\Moda\\Iteration\\Team Moda\\2022", "\\Moda\\Team Moda\\2022")]
-    [InlineData("\\Moda\\Area\\Product\\Feature\\SubFeature\\Component", "\\Moda\\Product\\Feature\\SubFeature\\Component")]
+    [InlineData("\\Wayd\\Iteration\\Team Wayd\\2022\\22.3\\22.3.6", "\\Wayd\\Team Wayd\\2022\\22.3\\22.3.6")]
+    [InlineData("\\Wayd\\Iteration\\Team Wayd\\2022", "\\Wayd\\Team Wayd\\2022")]
+    [InlineData("\\Wayd\\Area\\Product\\Feature\\SubFeature\\Component", "\\Wayd\\Product\\Feature\\SubFeature\\Component")]
     public void RemoveClassificationTypeFromPath_WithDeepHierarchy_RemovesClassificationType(string input, string expected)
     {
         // Act
@@ -44,8 +44,8 @@ public class ClassificationPathUtilsTests
     }
 
     [Theory]
-    [InlineData("\\Moda\\Iteration\\Team Iteration Name", "\\Moda\\Team Iteration Name")]
-    [InlineData("\\Moda\\Area\\Area Team\\Iteration Area", "\\Moda\\Area Team\\Iteration Area")]
+    [InlineData("\\Wayd\\Iteration\\Team Iteration Name", "\\Wayd\\Team Iteration Name")]
+    [InlineData("\\Wayd\\Area\\Area Team\\Iteration Area", "\\Wayd\\Area Team\\Iteration Area")]
     public void RemoveClassificationTypeFromPath_WithClassificationTypeInHierarchyNames_OnlyRemovesSecondNode(string input, string expected)
     {
         // Act
@@ -57,8 +57,8 @@ public class ClassificationPathUtilsTests
 
     [Theory]
     [InlineData("")]
-    [InlineData("Moda")]
-    [InlineData("\\Moda")]
+    [InlineData("Wayd")]
+    [InlineData("\\Wayd")]
     public void RemoveClassificationTypeFromPath_WithInvalidPath_ReturnsOriginalPath(string input)
     {
         // Act
@@ -74,20 +74,20 @@ public class ClassificationPathUtilsTests
         // Arrange - Real paths from Azure DevOps
         var testCases = new Dictionary<string, string>
         {
-            { "\\Moda\\Iteration", "\\Moda" },
-            { "\\Moda\\Iteration\\Moda Integrations Team", "\\Moda\\Moda Integrations Team" },
-            { "\\Moda\\Iteration\\Moda Integrations Team\\Test", "\\Moda\\Moda Integrations Team\\Test" },
-            { "\\Moda\\Iteration\\Team Moda", "\\Moda\\Team Moda" },
-            { "\\Moda\\Iteration\\Team Moda\\2022", "\\Moda\\Team Moda\\2022" },
-            { "\\Moda\\Iteration\\Team Moda\\2022\\22.3", "\\Moda\\Team Moda\\2022\\22.3" },
-            { "\\Moda\\Iteration\\Team Moda\\2022\\22.3\\22.3.6", "\\Moda\\Team Moda\\2022\\22.3\\22.3.6" },
-            { "\\Moda\\Iteration\\Team Moda\\2022\\22.3\\22.3.7", "\\Moda\\Team Moda\\2022\\22.3\\22.3.7" },
-            { "\\Moda\\Iteration\\Team Moda\\2022\\22.4", "\\Moda\\Team Moda\\2022\\22.4" },
-            { "\\Moda\\Iteration\\Team Moda\\2022\\22.4\\22.4.1", "\\Moda\\Team Moda\\2022\\22.4\\22.4.1" },
-            { "\\Moda\\Iteration\\Team Moda\\2022\\22.4\\22.4.2", "\\Moda\\Team Moda\\2022\\22.4\\22.4.2" },
-            { "\\Moda\\Iteration\\Team Moda\\2022\\22.4\\22.4.3", "\\Moda\\Team Moda\\2022\\22.4\\22.4.3" },
-            { "\\Moda\\Iteration\\Team Moda\\2023", "\\Moda\\Team Moda\\2023" },
-            { "\\Moda\\Iteration\\Team Moda\\2024", "\\Moda\\Team Moda\\2024" }
+            { "\\Wayd\\Iteration", "\\Wayd" },
+            { "\\Wayd\\Iteration\\Wayd Integrations Team", "\\Wayd\\Wayd Integrations Team" },
+            { "\\Wayd\\Iteration\\Wayd Integrations Team\\Test", "\\Wayd\\Wayd Integrations Team\\Test" },
+            { "\\Wayd\\Iteration\\Team Wayd", "\\Wayd\\Team Wayd" },
+            { "\\Wayd\\Iteration\\Team Wayd\\2022", "\\Wayd\\Team Wayd\\2022" },
+            { "\\Wayd\\Iteration\\Team Wayd\\2022\\22.3", "\\Wayd\\Team Wayd\\2022\\22.3" },
+            { "\\Wayd\\Iteration\\Team Wayd\\2022\\22.3\\22.3.6", "\\Wayd\\Team Wayd\\2022\\22.3\\22.3.6" },
+            { "\\Wayd\\Iteration\\Team Wayd\\2022\\22.3\\22.3.7", "\\Wayd\\Team Wayd\\2022\\22.3\\22.3.7" },
+            { "\\Wayd\\Iteration\\Team Wayd\\2022\\22.4", "\\Wayd\\Team Wayd\\2022\\22.4" },
+            { "\\Wayd\\Iteration\\Team Wayd\\2022\\22.4\\22.4.1", "\\Wayd\\Team Wayd\\2022\\22.4\\22.4.1" },
+            { "\\Wayd\\Iteration\\Team Wayd\\2022\\22.4\\22.4.2", "\\Wayd\\Team Wayd\\2022\\22.4\\22.4.2" },
+            { "\\Wayd\\Iteration\\Team Wayd\\2022\\22.4\\22.4.3", "\\Wayd\\Team Wayd\\2022\\22.4\\22.4.3" },
+            { "\\Wayd\\Iteration\\Team Wayd\\2023", "\\Wayd\\Team Wayd\\2023" },
+            { "\\Wayd\\Iteration\\Team Wayd\\2024", "\\Wayd\\Team Wayd\\2024" }
         };
 
         // Act & Assert

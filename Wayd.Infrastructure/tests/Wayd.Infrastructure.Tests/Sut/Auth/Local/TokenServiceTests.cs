@@ -16,8 +16,8 @@ namespace Wayd.Infrastructure.Tests.Sut.Auth.Local;
 public class TokenServiceTests
 {
     private const string TestSecret = "ThisIsATestSecretKeyThatIsLongEnoughForHmacSha256!";
-    private const string TestIssuer = "TestModa";
-    private const string TestAudience = "TestModaApi";
+    private const string TestIssuer = "TestWayd";
+    private const string TestAudience = "TestWaydApi";
 
     private readonly Mock<UserManager<ApplicationUser>> _mockUserManager;
     private readonly Mock<SignInManager<ApplicationUser>> _mockSignInManager;

@@ -39,7 +39,7 @@ public sealed class WorkTypeLevel : BaseAuditableEntity<int>
     public WorkTypeTier Tier { get; private init; }
 
     /// <summary>
-    /// Indicates whether the work type level is owned by Moda or a third party system.  This value can not change.
+    /// Indicates whether the work type level is owned by Wayd or a third party system.  This value can not change.
     /// </summary>
     /// <value>The ownership.</value>
     public Ownership Ownership { get; private init; }

@@ -29,7 +29,7 @@ internal static class ConfigureServices
                     options.Protocol = OtlpProtocol.Grpc;
                     options.ResourceAttributes = new Dictionary<string, object>
                     {
-                        ["service.name"] = builder.Configuration["OTEL_SERVICE_NAME"] ?? "moda-api"
+                        ["service.name"] = builder.Configuration["OTEL_SERVICE_NAME"] ?? "wayd-api"
                     };
                 });
             }

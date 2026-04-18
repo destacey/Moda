@@ -52,7 +52,7 @@ export interface OrganizationChartGraphData<
   combos?: OrganizationChartComboData<TCombo>[]
 }
 
-export interface ModaOrganizationChartNodeProps {
+export interface WaydOrganizationChartNodeProps {
   data: any
   themeToken: GlobalToken
 }

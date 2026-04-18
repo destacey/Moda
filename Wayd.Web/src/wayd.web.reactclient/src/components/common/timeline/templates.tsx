@@ -3,11 +3,11 @@
 import React from 'react'
 import { Typography } from 'antd'
 import { getLuminance } from '@/src/utils/color-helper'
-import { ModaDataGroup, ModaDataItem, TimelineTemplate } from './types'
+import { WaydDataGroup, WaydDataItem, TimelineTemplate } from './types'
 
 const { Text } = Typography
 
-export const RangeItemTemplate: TimelineTemplate<ModaDataItem> = (props) => {
+export const RangeItemTemplate: TimelineTemplate<WaydDataItem> = (props) => {
   // TODO: The 0.6 needs to be tested with some of the other colors
   // TODO: ItemColor is optional,
   const fontColor =
@@ -20,7 +20,7 @@ export const RangeItemTemplate: TimelineTemplate<ModaDataItem> = (props) => {
   )
 }
 
-export const GroupTemplate: TimelineTemplate<ModaDataGroup> = (props) => {
+export const GroupTemplate: TimelineTemplate<WaydDataGroup> = (props) => {
   return (
     <Text
       style={{
@@ -35,7 +35,7 @@ export const GroupTemplate: TimelineTemplate<ModaDataGroup> = (props) => {
   )
 }
 
-export const BackgroundItemTemplate: TimelineTemplate<ModaDataItem> = (
+export const BackgroundItemTemplate: TimelineTemplate<WaydDataItem> = (
   props,
 ) => {
   return (

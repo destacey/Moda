@@ -14,9 +14,9 @@ import {
   getDefaultTemplate,
 } from './wayd-timeline.utils'
 import {
-  ModaDataGroup,
-  ModaDataItem,
-  ModaTimelineProps,
+  WaydDataGroup,
+  WaydDataItem,
+  WaydTimelineProps,
   TimelineTemplate,
 } from '.'
 import {
@@ -30,8 +30,8 @@ import { saveElementAsImage } from '@/src/utils'
 import { TimelineOptionsItemCallbackFunction } from 'vis-timeline'
 import dayjs from 'dayjs'
 
-const WaydTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
-  props: ModaTimelineProps<TItem, TGroup>,
+const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
+  props: WaydTimelineProps<TItem, TGroup>,
 ) => {
   const [isTimelineLoading, setIsTimelineLoading] = useState(false)
   const [isFullScreen, setIsFullScreen] = useState(false)
@@ -65,83 +65,85 @@ const WaydTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
 
   const colors = DefaultTimeLineColors[currentThemeName]
 
-  const itemTemplateManager: TimelineOptionsTemplateFunction<TItem> = useCallback(
-    (item, element, _) => {
-      if (!item) return ''
+  const itemTemplateManager: TimelineOptionsTemplateFunction<TItem> =
+    useCallback(
+      (item, element, _) => {
+        if (!item) return ''
 
-      const mapId = item.id ?? 0
-      if (elementMapRef.current?.[mapId])
-        return elementMapRef.current[mapId].container
+        const mapId = item.id ?? 0
+        if (elementMapRef.current?.[mapId])
+          return elementMapRef.current[mapId].container
 
-      // Create a container for the React element (prevents DOM node errors)
-      const container = document.createElement('div')
-      if (element) element.appendChild(container)
-      const root = createRoot(container)
+        // Create a container for the React element (prevents DOM node errors)
+        const container = document.createElement('div')
+        if (element) element.appendChild(container)
+        const root = createRoot(container)
 
-      // Unfortunately, typescript doesn't seem to handle nested constrained generics very well (see: https://github.com/microsoft/TypeScript/issues/23132)
-      //  so we must add the type annotation here to avoid the error
-      const Template: TimelineTemplate<ModaDataItem> = getDefaultTemplate(
-        item.type,
-        props,
-      )
-
-      if (Template)
-        root.render(
-          <Template
-            item={item}
-            fontColor={colors.item.font}
-            foregroundColor={colors.item.foreground}
-          />,
+        // Unfortunately, typescript doesn't seem to handle nested constrained generics very well (see: https://github.com/microsoft/TypeScript/issues/23132)
+        //  so we must add the type annotation here to avoid the error
+        const Template: TimelineTemplate<WaydDataItem> = getDefaultTemplate(
+          item.type,
+          props,
         )
 
-      // Store the rendered element container and root to reference later
-      elementMapRef.current[mapId] = { container, root }
+        if (Template)
+          root.render(
+            <Template
+              item={item}
+              fontColor={colors.item.font}
+              foregroundColor={colors.item.foreground}
+            />,
+          )
 
-      // Return the new container
-      return container
-    },
-    [colors.item.font, colors.item.foreground, props],
-  )
+        // Store the rendered element container and root to reference later
+        elementMapRef.current[mapId] = { container, root }
 
-  const groupTemplateManager: TimelineOptionsTemplateFunction<TGroup> = useCallback(
-    (item, element, _) => {
-      if (!item) return ''
+        // Return the new container
+        return container
+      },
+      [colors.item.font, colors.item.foreground, props],
+    )
 
-      const mapId = item.id ?? 0
-      if (elementMapRef.current?.[mapId])
-        return elementMapRef.current[mapId].container
+  const groupTemplateManager: TimelineOptionsTemplateFunction<TGroup> =
+    useCallback(
+      (item, element, _) => {
+        if (!item) return ''
 
-      // Create a container for the react element (prevents DOM node errors)
-      const container = document.createElement('div')
-      element?.appendChild(container)
-      const root = createRoot(container)
+        const mapId = item.id ?? 0
+        if (elementMapRef.current?.[mapId])
+          return elementMapRef.current[mapId].container
 
-      // Unfortunately, typescript doesn't seem to handle nested constrained generics very well (see: https://github.com/microsoft/TypeScript/issues/23132)
-      //  so we must add the type annotation here to avoid the error
-      const Template: TimelineTemplate<ModaDataGroup> = getDefaultTemplate(
-        'group',
-        props,
-      )
+        // Create a container for the react element (prevents DOM node errors)
+        const container = document.createElement('div')
+        element?.appendChild(container)
+        const root = createRoot(container)
 
-      if (Template) {
-        root.render(
-          <Template
-            item={item}
-            fontColor={colors.item.font}
-            foregroundColor={colors.item.foreground}
-            parentElement={element}
-          />,
+        // Unfortunately, typescript doesn't seem to handle nested constrained generics very well (see: https://github.com/microsoft/TypeScript/issues/23132)
+        //  so we must add the type annotation here to avoid the error
+        const Template: TimelineTemplate<WaydDataGroup> = getDefaultTemplate(
+          'group',
+          props,
         )
-      }
 
-      // Store the rendered element container and root to reference later
-      elementMapRef.current[mapId] = { container, root }
+        if (Template) {
+          root.render(
+            <Template
+              item={item}
+              fontColor={colors.item.font}
+              foregroundColor={colors.item.foreground}
+              parentElement={element}
+            />,
+          )
+        }
 
-      // Return the new container
-      return container
-    },
-    [colors.item.font, colors.item.foreground, props],
-  )
+        // Store the rendered element container and root to reference later
+        elementMapRef.current[mapId] = { container, root }
+
+        // Return the new container
+        return container
+      },
+      [colors.item.font, colors.item.foreground, props],
+    )
 
   const onMoveProp = props.onMove
   const onMove: TimelineOptionsItemCallbackFunction = useCallback(
@@ -167,69 +169,72 @@ const WaydTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
     [onMoveProp],
   )
 
-  const baseOptions = useMemo<TimelineOptions>(() => ({
-    editable: {
-      updateTime: onMoveProp ? true : false,
-      updateGroup: false,
-      remove: false,
-      add: false,
-      overrideItems: false,
-    },
-    onMove,
-    selectable: true,
-    orientation: 'top',
-    maxHeight: props.options.maxHeight ?? 650,
-    minHeight: 200,
-    moveable: true,
-    showCurrentTime: props.options.showCurrentTime ?? true,
-    verticalScroll: true,
-    zoomKey: 'ctrlKey',
-    // Day-level precision: snap items to day boundaries when dragging
-    snap: (date) => {
-      const d = new Date(date)
-      d.setHours(0, 0, 0, 0)
-      return d
-    },
-    // Prevent zooming to time level (minimum 1 day)
-    zoomMin: 86400000,
-    // Format axis to show only dates, not times
-    format: {
-      minorLabels: {
-        day: 'D',
-        weekday: 'ddd D',
-        month: 'MMM',
-        year: 'YYYY',
+  const baseOptions = useMemo<TimelineOptions>(
+    () => ({
+      editable: {
+        updateTime: onMoveProp ? true : false,
+        updateGroup: false,
+        remove: false,
+        add: false,
+        overrideItems: false,
       },
-      majorLabels: {
-        day: 'MMMM YYYY',
-        weekday: 'MMMM YYYY',
-        month: 'YYYY',
-        year: '',
+      onMove,
+      selectable: true,
+      orientation: 'top',
+      maxHeight: props.options.maxHeight ?? 650,
+      minHeight: 200,
+      moveable: true,
+      showCurrentTime: props.options.showCurrentTime ?? true,
+      verticalScroll: true,
+      zoomKey: 'ctrlKey',
+      // Day-level precision: snap items to day boundaries when dragging
+      snap: (date) => {
+        const d = new Date(date)
+        d.setHours(0, 0, 0, 0)
+        return d
       },
-    },
-    start: props.options.start,
-    end: props.options.end,
-    min: props.options.min,
-    max: props.options.max,
-    groupOrder: props.options.groupOrder ?? 'order',
-    groupHeightMode: 'auto',
-    xss: { disabled: false },
-    template: props.options.template ?? itemTemplateManager,
-    groupTemplate: groupTemplateManager,
-  }), [
-    onMove,
-    onMoveProp,
-    props.options.maxHeight,
-    props.options.showCurrentTime,
-    props.options.start,
-    props.options.end,
-    props.options.min,
-    props.options.max,
-    props.options.groupOrder,
-    props.options.template,
-    itemTemplateManager,
-    groupTemplateManager,
-  ])
+      // Prevent zooming to time level (minimum 1 day)
+      zoomMin: 86400000,
+      // Format axis to show only dates, not times
+      format: {
+        minorLabels: {
+          day: 'D',
+          weekday: 'ddd D',
+          month: 'MMM',
+          year: 'YYYY',
+        },
+        majorLabels: {
+          day: 'MMMM YYYY',
+          weekday: 'MMMM YYYY',
+          month: 'YYYY',
+          year: '',
+        },
+      },
+      start: props.options.start,
+      end: props.options.end,
+      min: props.options.min,
+      max: props.options.max,
+      groupOrder: props.options.groupOrder ?? 'order',
+      groupHeightMode: 'auto',
+      xss: { disabled: false },
+      template: props.options.template ?? itemTemplateManager,
+      groupTemplate: groupTemplateManager,
+    }),
+    [
+      onMove,
+      onMoveProp,
+      props.options.maxHeight,
+      props.options.showCurrentTime,
+      props.options.start,
+      props.options.end,
+      props.options.min,
+      props.options.max,
+      props.options.groupOrder,
+      props.options.template,
+      itemTemplateManager,
+      groupTemplateManager,
+    ],
+  )
 
   useEffect(() => {
     // Always update dynamicOptionsRef based on fullscreen state

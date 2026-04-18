@@ -9,9 +9,10 @@ audience: [developer, agent]
 
 ## Database Architecture
 
-Wayd uses a **single shared database** accessed through `ModaDbContext`. All domain services share this context.
+Wayd uses a **single shared database** accessed through `WaydDbContext`. All domain services share this context.
 
 Entity configurations are organized by domain area in:
+
 ```
 Wayd.Infrastructure/src/Wayd.Infrastructure/Persistence/Configuration/
 ```
@@ -20,12 +21,12 @@ Wayd.Infrastructure/src/Wayd.Infrastructure/Persistence/Configuration/
 
 ### Direct DbContext Usage
 
-Wayd does **not** use the Repository pattern. Application handlers access `ModaDbContext` directly:
+Wayd does **not** use the Repository pattern. Application handlers access `WaydDbContext` directly:
 
 ```csharp
 public class GetWorkItemQueryHandler : IQueryHandler<GetWorkItemQuery, WorkItemDto>
 {
-    private readonly ModaDbContext _context;
+    private readonly WaydDbContext _context;
 
     public async Task<Result<WorkItemDto>> Handle(GetWorkItemQuery request, CancellationToken ct)
     {
@@ -82,6 +83,7 @@ Migrations also run automatically on application startup via `app.Services.Initi
 ## Database Initialization
 
 On startup, the application:
+
 1. Applies pending migrations
 2. Seeds feature flags from code definitions
 3. Runs any data initialization logic

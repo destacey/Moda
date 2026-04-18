@@ -1,4 +1,4 @@
 dotnet ef database update `
-    --project .\Moda.Infrastructure\src\Moda.Infrastructure.Migrators.MSSQL\Moda.Infrastructure.Migrators.MSSQL.csproj `
-    --startup-project .\Moda.Web\src\Moda.Web.Api\Moda.Web.Api.csproj `
-    --connection "Server=localhost,1433;Database=moda;User Id=sa;Password=ffadisodija1345@#$;TrustServerCertificate=true"
+    --project .\Wayd.Infrastructure\src\Wayd.Infrastructure.Migrators.MSSQL\Wayd.Infrastructure.Migrators.MSSQL.csproj `
+    --startup-project .\Wayd.Web\src\Wayd.Web.Api\Wayd.Web.Api.csproj `
+    --connection "Server=localhost,1433;Database=wayd;User Id=sa;Password=Test123@sql;TrustServerCertificate=true"

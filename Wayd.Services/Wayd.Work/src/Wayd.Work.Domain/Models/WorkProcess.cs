@@ -56,7 +56,7 @@ public sealed class WorkProcess : BaseSoftDeletableEntity, IActivatable, IHasIdA
     }
 
     /// <summary>
-    /// Indicates whether the work process is owned by Moda or a third party system.  This value should not change.
+    /// Indicates whether the work process is owned by Wayd or a third party system.  This value should not change.
     /// </summary>
     /// <value>The ownership.</value>
     public Ownership Ownership { get; private init; }

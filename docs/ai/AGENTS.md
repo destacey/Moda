@@ -18,6 +18,7 @@ Domain → Application → Infrastructure → Web API
 ```
 
 Each domain service is a vertical slice:
+
 ```
 Wayd.Services/Wayd.{Service}/
   src/Wayd.{Service}.Domain/       # Entities, value objects (zero dependencies)
@@ -25,21 +26,21 @@ Wayd.Services/Wayd.{Service}/
   tests/                           # Mirror of src structure
 ```
 
-All services share a single `ModaDbContext` (no repository pattern).
+All services share a single `WaydDbContext` (no repository pattern).
 
 ## Domain Services
 
-| Service | Namespace | Purpose |
-|---------|-----------|---------|
-| Work | `Wayd.Work` | Work items, workspaces, work processes, workflows |
-| Organization | `Wayd.Organization` | Teams, employees, team memberships |
-| Planning | `Wayd.Planning` | Planning intervals, iterations |
-| Goals | `Wayd.Goals` | Objectives, key results |
-| ProjectPortfolioManagement | `Wayd.ProjectPortfolioManagement` | Projects, portfolios |
-| StrategicManagement | `Wayd.StrategicManagement` | Strategic themes |
-| AppIntegration | `Wayd.AppIntegration` | External system connections |
-| Links | `Wayd.Links` | Cross-entity associations |
-| Health | `Wayd.Health` | Health checks |
+| Service                    | Namespace                         | Purpose                                           |
+| -------------------------- | --------------------------------- | ------------------------------------------------- |
+| Work                       | `Wayd.Work`                       | Work items, workspaces, work processes, workflows |
+| Organization               | `Wayd.Organization`               | Teams, employees, team memberships                |
+| Planning                   | `Wayd.Planning`                   | Planning intervals, iterations                    |
+| Goals                      | `Wayd.Goals`                      | Objectives, key results                           |
+| ProjectPortfolioManagement | `Wayd.ProjectPortfolioManagement` | Projects, portfolios                              |
+| StrategicManagement        | `Wayd.StrategicManagement`        | Strategic themes                                  |
+| AppIntegration             | `Wayd.AppIntegration`             | External system connections                       |
+| Links                      | `Wayd.Links`                      | Cross-entity associations                         |
+| Health                     | `Wayd.Health`                     | Health checks                                     |
 
 ## Patterns to Follow
 
@@ -61,7 +62,7 @@ public sealed class CreateThingCommandValidator : AbstractValidator<CreateThingC
 // 3. Handler (returns Result<T>, uses DbContext directly)
 internal sealed class CreateThingHandler : ICommandHandler<CreateThingCommand, Guid>
 {
-    private readonly ModaDbContext _context;
+    private readonly WaydDbContext _context;
     private readonly IDateTimeProvider _dateTimeProvider;
 
     public async Task<Result<Guid>> Handle(CreateThingCommand request, CancellationToken ct)
@@ -82,7 +83,7 @@ public sealed record GetThingQuery(Guid Id) : IQuery<ThingDto>;
 
 internal sealed class GetThingHandler : IQueryHandler<GetThingQuery, ThingDto>
 {
-    private readonly ModaDbContext _context;
+    private readonly WaydDbContext _context;
 
     public async Task<Result<ThingDto>> Handle(GetThingQuery request, CancellationToken ct)
     {
@@ -115,7 +116,7 @@ public async Task<ActionResult<Guid>> Create(CreateThingRequest request, Cancell
 
 ```typescript
 // Use NSwag-generated client, never authenticatedFetch()
-import { getThingsClient } from '@/src/services/clients'
+import { getThingsClient } from "@/src/services/clients";
 
 // Use Ant Design theme tokens, never hardcoded colors
 // Use CSS modules with var(--ant-color-primary) etc.
@@ -127,7 +128,7 @@ import { getThingsClient } from '@/src/services/clients'
 2. **Never hardcode colors** - use Ant Design theme tokens
 3. **Never use `authenticatedFetch()`** - use NSwag-generated typed clients
 4. **No `Async` suffix** on new async methods
-5. **No repository pattern** - use `ModaDbContext` directly
+5. **No repository pattern** - use `WaydDbContext` directly
 6. **Return `Result<T>`** from handlers, not exceptions
 7. **Use NodaTime** (`Instant`, `LocalDate`) instead of `DateTime`
 8. **Central Package Management** - versions in `Directory.Packages.props` only
@@ -136,17 +137,18 @@ import { getThingsClient } from '@/src/services/clients'
 
 ## Key File Locations
 
-| What | Where |
-|------|-------|
-| Solution file | `Wayd.slnx` |
-| Package versions | `Directory.Packages.props` |
-| DB Context | `Wayd.Infrastructure/src/Wayd.Infrastructure/Persistence/Context/ModaDbContext.cs` |
-| Entity configs | `Wayd.Infrastructure/src/Wayd.Infrastructure/Persistence/Configuration/` |
-| Migrations | `Wayd.Infrastructure/src/Wayd.Infrastructure.Migrators.MSSQL/` |
-| Feature flags | `Wayd.Common/src/Wayd.Common.Domain/FeatureManagement/FeatureFlags.cs` |
-| API controllers | `Wayd.Web/src/Wayd.Web.Api/Controllers/` |
-| Generated TS client | `Wayd.Web/src/wayd.web.reactclient/src/services/wayd-api.ts` |
-| Client factories | `Wayd.Web/src/wayd.web.reactclient/src/services/clients.ts` |
-| Frontend pages | `Wayd.Web/src/wayd.web.reactclient/src/app/` |
-| Shared test fakers | `Wayd.Common/tests/Wayd.Tests.Shared/` |
+| What                | Where                                                                              |
+| ------------------- | ---------------------------------------------------------------------------------- |
+| Solution file       | `Wayd.slnx`                                                                        |
+| Package versions    | `Directory.Packages.props`                                                         |
+| DB Context          | `Wayd.Infrastructure/src/Wayd.Infrastructure/Persistence/Context/WaydDbContext.cs` |
+| Entity configs      | `Wayd.Infrastructure/src/Wayd.Infrastructure/Persistence/Configuration/`           |
+| Migrations          | `Wayd.Infrastructure/src/Wayd.Infrastructure.Migrators.MSSQL/`                     |
+| Feature flags       | `Wayd.Common/src/Wayd.Common.Domain/FeatureManagement/FeatureFlags.cs`             |
+| API controllers     | `Wayd.Web/src/Wayd.Web.Api/Controllers/`                                           |
+| Generated TS client | `Wayd.Web/src/wayd.web.reactclient/src/services/wayd-api.ts`                       |
+| Client factories    | `Wayd.Web/src/wayd.web.reactclient/src/services/clients.ts`                        |
+| Frontend pages      | `Wayd.Web/src/wayd.web.reactclient/src/app/`                                       |
+| Shared test fakers  | `Wayd.Common/tests/Wayd.Tests.Shared/`                                             |
+| Architecture tests  | `Wayd.ArchitectureTests/`                                                         ests.Shared/` |
 | Architecture tests | `Wayd.ArchitectureTests/` |

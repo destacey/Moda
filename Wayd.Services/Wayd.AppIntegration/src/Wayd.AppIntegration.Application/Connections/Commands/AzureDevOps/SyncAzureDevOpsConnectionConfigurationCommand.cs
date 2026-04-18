@@ -108,7 +108,7 @@ internal sealed class SyncAzureDevOpsConnectionConfigurationCommandHandler(IAppI
     }
 
     /// <summary>
-    /// Detects workspaces whose Azure DevOps process changed and updates the corresponding Moda Workspace's WorkProcessId.
+    /// Detects workspaces whose Azure DevOps process changed and updates the corresponding Wayd Workspace's WorkProcessId.
     /// </summary>
     private async Task UpdateWorkspaceProcessAssignments(AzureDevOpsBoardsConnection connection, Dictionary<Guid, Guid?> workspaceProcessesBefore, CancellationToken cancellationToken)
     {
@@ -125,9 +125,9 @@ internal sealed class SyncAzureDevOpsConnectionConfigurationCommandHandler(IAppI
             var workspaceInternalId = workspace.IntegrationState.InternalId;
 
             _logger.LogInformation(
-                "Detected work process change for workspace {WorkspaceId}: {OldProcessId} -> {NewProcessId}. Updating Moda workspace.",
+                "Detected work process change for workspace {WorkspaceId}: {OldProcessId} -> {NewProcessId}. Updating Wayd workspace.",
                 workspaceInternalId, previousProcessId, workspace.WorkProcessId);
-
+    
             var changeResult = await _sender.Send(
                 new ChangeExternalWorkspaceWorkProcessCommand(workspaceInternalId, workspace.WorkProcessId.Value),
                 cancellationToken);

@@ -1,10 +1,10 @@
 import { Card, Typography } from 'antd'
 import Link from 'next/link'
-import { ModaOrganizationChartNodeProps } from '../../../components/common/organization-chart'
+import { WaydOrganizationChartNodeProps } from '../../../components/common/organization-chart'
 
 const { Text, Title } = Typography
 
-const OrganizationalChartTeamNode: React.FC<ModaOrganizationChartNodeProps> = ({
+const OrganizationalChartTeamNode: React.FC<WaydOrganizationChartNodeProps> = ({
   data,
   themeToken,
 }) => {

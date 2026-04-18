@@ -6,17 +6,17 @@ import {
 } from 'vis-timeline/standalone'
 import { TimelineOptionsTemplateFunction } from '@/src/lib/vis-timeline'
 
-export type ModaDataItem<T = unknown, G = unknown> = DataItemEnhanced<G> & {
+export type WaydDataItem<T = unknown, G = unknown> = DataItemEnhanced<G> & {
   itemColor?: string
   objectData?: T
 }
 
-export type ModaDataGroup<T = unknown> = DataGroup & {
+export type WaydDataGroup<T = unknown> = DataGroup & {
   treeLevel?: number // undocumented property, that is used for styling
   objectData?: T
 }
 
-export type ModaTimelineOptions<T> = {
+export type WaydTimelineOptions<T> = {
   maxHeight?: number
   minHeight?: number
   showCurrentTime?: boolean
@@ -28,14 +28,14 @@ export type ModaTimelineOptions<T> = {
   template?: TimelineOptionsTemplateFunction<T>
 }
 
-export type ModaTimelineProps<
-  TItem extends ModaDataItem,
-  TGroup extends ModaDataGroup,
+export type WaydTimelineProps<
+  TItem extends WaydDataItem,
+  TGroup extends WaydDataGroup,
 > = {
   data: TItem[]
   groups?: TGroup[]
   isLoading: boolean
-  options: ModaTimelineOptions<TItem>
+  options: WaydTimelineOptions<TItem>
   rangeItemTemplate?: TimelineTemplate<TItem>
   groupTemplate?: TimelineTemplate<TGroup>
   emptyMessage?: string
@@ -44,22 +44,22 @@ export type ModaTimelineProps<
   onMove?: (item: TimelineItem) => void
 }
 
-export type GroupTemplateProps<T extends ModaDataGroup> = {
+export type GroupTemplateProps<T extends WaydDataGroup> = {
   item: T
   fontColor: string
   foregroundColor?: string
   parentElement?: HTMLElement
 }
 
-export type ItemTemplateProps<T extends ModaDataItem> = {
+export type ItemTemplateProps<T extends WaydDataItem> = {
   item: T
   fontColor: string
   foregroundColor?: string
 }
 
-export type TimelineTemplate<T extends ModaDataItem | ModaDataGroup> =
-  T extends ModaDataItem
+export type TimelineTemplate<T extends WaydDataItem | WaydDataGroup> =
+  T extends WaydDataItem
     ? FC<ItemTemplateProps<T>>
-    : T extends ModaDataGroup
+    : T extends WaydDataGroup
       ? FC<GroupTemplateProps<T>>
       : never

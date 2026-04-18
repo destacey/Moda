@@ -330,7 +330,7 @@ SecuritySettings__LocalJwt__Secret={strong random secret, at least 32 chars}
 Optional local JWT settings (with defaults):
 
 ```env
-SecuritySettings__LocalJwt__Issuer=Wayd
+SecuritySettings__LocalJwt__Issuer=Moda
 SecuritySettings__LocalJwt__Audience=ModaApi
 SecuritySettings__LocalJwt__TokenExpirationInMinutes=60
 SecuritySettings__LocalJwt__RefreshTokenExpirationInDays=7

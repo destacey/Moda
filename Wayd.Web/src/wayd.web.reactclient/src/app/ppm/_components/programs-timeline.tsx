@@ -2,9 +2,9 @@
 
 import { ControlItemsMenu } from '@/src/components/common/control-items-menu'
 import {
-  ModaDataItem,
+  WaydDataItem,
   WaydTimeline,
-  ModaTimelineOptions,
+  WaydTimelineOptions,
   TimelineTemplate,
 } from '@/src/components/common/timeline'
 import { ProgramListDto } from '@/src/services/wayd-api'
@@ -25,7 +25,7 @@ export interface ProgramsTimelineProps {
   viewSelector?: ReactNode
 }
 
-interface ProgramTimelineItem extends ModaDataItem<ProgramListDto, string> {
+interface ProgramTimelineItem extends WaydDataItem<ProgramListDto, string> {
   id: string
   openProgramDrawer: (programKey: number) => void
 }
@@ -109,7 +109,7 @@ const ProgramsTimeline: React.FC<ProgramsTimelineProps> = (props) => {
     return { start: minDate.toDate(), end: maxDate.toDate() }
   })()
 
-  const timelineOptions: ModaTimelineOptions<ProgramTimelineItem> = {
+  const timelineOptions: WaydTimelineOptions<ProgramTimelineItem> = {
     showCurrentTime: showCurrentTime,
     maxHeight: 650,
     start: timelineWindow.start,

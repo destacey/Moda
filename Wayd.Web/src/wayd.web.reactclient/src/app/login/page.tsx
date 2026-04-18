@@ -279,7 +279,7 @@ function AnalyticsIllustration() {
         </g>
       ))}
 
-      {/* Center "MODA" badge */}
+      {/* Center "WAYD" badge */}
       <g filter="url(#shadow)">
         <rect
           x="108"

@@ -13,12 +13,12 @@ import {
 } from '@/src/services/wayd-api'
 import { ControlItemsMenu } from '@/src/components/common/control-items-menu'
 import {
-  ModaDataGroup,
+  WaydDataGroup,
   WaydTimeline,
-  ModaTimelineOptions,
+  WaydTimelineOptions,
 } from '@/src/components/common/timeline'
 import {
-  ModaDataItem,
+  WaydDataItem,
   TimelineTemplate,
 } from '@/src/components/common/timeline/types'
 import dayjs from 'dayjs'
@@ -40,7 +40,7 @@ export interface RoadmapsTimelineProps {
   isRoadmapManager: boolean
 }
 
-interface RoadmapTimelineItem extends ModaDataItem<RoadmapItemListDto, string> {
+interface RoadmapTimelineItem extends WaydDataItem<RoadmapItemListDto, string> {
   id: string
   end: Date
   order?: number
@@ -172,7 +172,7 @@ function flattenRoadmapItems(
 function createNestedGroups(
   items: RoadmapTimelineItem[],
   currentLevel: number,
-): ModaDataGroup<RoadmapItemListDto>[] {
+): WaydDataGroup<RoadmapItemListDto>[] {
   // Get all items up to but not including current level
   const groupItems = items.filter((item) => item.treeLevel < currentLevel)
 
@@ -189,7 +189,7 @@ function createNestedGroups(
   })
 
   // Create the nested groups structure - include all items
-  const groups: ModaDataGroup<RoadmapItemListDto>[] = groupItems.map(
+  const groups: WaydDataGroup<RoadmapItemListDto>[] = groupItems.map(
     (item) => ({
       id: item.id,
       content: item.objectData?.name || '',
@@ -316,7 +316,10 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
 
   // User's choice takes precedence over auto-drill, clamped to valid range
   const maxLevel = processedData?.maxLevel ?? 0
-  const currentLevel = Math.min(userSelectedLevel ?? autoLevel, Math.max(maxLevel, 1))
+  const currentLevel = Math.min(
+    userSelectedLevel ?? autoLevel,
+    Math.max(maxLevel, 1),
+  )
 
   const processedGroups = (() => {
     if (!processedData || currentLevel <= 1) return undefined
@@ -347,7 +350,7 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
       })()
     : { start: props.roadmap.start, end: props.roadmap.end }
 
-  const timelineOptions: ModaTimelineOptions<RoadmapTimelineItem> = {
+  const timelineOptions: WaydTimelineOptions<RoadmapTimelineItem> = {
     // TODO: start,end,min,max types don't allow undefined, but initial state is undefined
     showCurrentTime: showCurrentTime,
     maxHeight: 650,

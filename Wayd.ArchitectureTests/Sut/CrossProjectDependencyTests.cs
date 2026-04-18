@@ -115,7 +115,7 @@ public class CrossProjectDependencyTests
         // Act
         var result = domainAssemblies
             .That()
-            .ResideInNamespace("Moda")
+            .ResideInNamespace("Wayd")
             .And()
             .DoNotResideInNamespace("Wayd.Common.Domain")
             .ShouldNot()

@@ -37,7 +37,7 @@ public sealed class AzureDevOpsBoardsWorkspaceTeam
     public Guid? BoardId { get; private set; }
 
     /// <summary>
-    /// InternalTeamId is the unique identifier for the team in the Moda system.
+    /// InternalTeamId is the unique identifier for the team in the Wayd system.
     /// </summary>
     public Guid? InternalTeamId { get; private set; }
 

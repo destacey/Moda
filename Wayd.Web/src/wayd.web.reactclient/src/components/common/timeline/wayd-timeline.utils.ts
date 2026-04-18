@@ -1,8 +1,8 @@
 import { ThemeName } from '@/src/components/contexts/theme/types'
 import {
-  ModaDataGroup,
-  ModaDataItem,
-  ModaTimelineProps,
+  WaydDataGroup,
+  WaydDataItem,
+  WaydTimelineProps,
   TimelineTemplate,
 } from '@/src/components/common/timeline/types'
 import { DataItemEnhanced } from 'vis-timeline/standalone'
@@ -47,27 +47,27 @@ export const DefaultTimeLineColors: Record<ThemeName, TimeLineColorData> = {
 }
 
 export function getDefaultTemplate<
-  TItem extends ModaDataItem,
-  TGroup extends ModaDataGroup,
+  TItem extends WaydDataItem,
+  TGroup extends WaydDataGroup,
 >(
   type: 'group',
-  props: ModaTimelineProps<TItem, TGroup>,
+  props: WaydTimelineProps<TItem, TGroup>,
 ): TimelineTemplate<TGroup>
 
 export function getDefaultTemplate<
-  TItem extends ModaDataItem,
-  TGroup extends ModaDataGroup,
+  TItem extends WaydDataItem,
+  TGroup extends WaydDataGroup,
 >(
   type: DataItemEnhanced['type'],
-  props: ModaTimelineProps<TItem, TGroup>,
+  props: WaydTimelineProps<TItem, TGroup>,
 ): TimelineTemplate<TItem>
 
 export function getDefaultTemplate<
-  TItem extends ModaDataItem,
-  TGroup extends ModaDataGroup,
+  TItem extends WaydDataItem,
+  TGroup extends WaydDataGroup,
 >(
   type: DataItemEnhanced['type'] | 'group',
-  props: ModaTimelineProps<TItem, TGroup>,
+  props: WaydTimelineProps<TItem, TGroup>,
 ) {
   switch (type) {
     case 'range':

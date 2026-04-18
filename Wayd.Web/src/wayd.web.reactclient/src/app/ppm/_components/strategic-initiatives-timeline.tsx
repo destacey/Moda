@@ -2,9 +2,9 @@
 
 import { ControlItemsMenu } from '@/src/components/common/control-items-menu'
 import {
-  ModaDataItem,
+  WaydDataItem,
   WaydTimeline,
-  ModaTimelineOptions,
+  WaydTimelineOptions,
   TimelineTemplate,
 } from '@/src/components/common/timeline'
 import { StrategicInitiativeListDto } from '@/src/services/wayd-api'
@@ -25,7 +25,7 @@ export interface StrategicInitiativesTimelineProps {
   viewSelector?: ReactNode
 }
 
-interface StrategicInitiativeTimelineItem extends ModaDataItem<
+interface StrategicInitiativeTimelineItem extends WaydDataItem<
   StrategicInitiativeListDto,
   string
 > {
@@ -116,7 +116,7 @@ const StrategicInitiativesTimeline: FC<StrategicInitiativesTimelineProps> = (
     return { start: minDate.toDate(), end: maxDate.toDate() }
   })()
 
-  const timelineOptions: ModaTimelineOptions<StrategicInitiativeTimelineItem> =
+  const timelineOptions: WaydTimelineOptions<StrategicInitiativeTimelineItem> =
     {
       showCurrentTime: showCurrentTime,
       maxHeight: 650,

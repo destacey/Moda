@@ -49,7 +49,7 @@ public sealed class Workflow : BaseSoftDeletableEntity, IActivatable, IHasIdAndK
     }
 
     /// <summary>
-    /// Indicates whether the workflow is owned by Moda or a third party system.  This value should not change.
+    /// Indicates whether the workflow is owned by Wayd or a third party system.  This value should not change.
     /// </summary>
     public Ownership Ownership { get; private init; }
 

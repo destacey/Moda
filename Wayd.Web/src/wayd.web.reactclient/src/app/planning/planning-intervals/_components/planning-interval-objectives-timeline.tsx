@@ -10,10 +10,10 @@ import {
   PlanningIntervalObjectiveListDto,
 } from '@/src/services/wayd-api'
 import {
-  ModaDataGroup,
-  ModaDataItem,
+  WaydDataGroup,
+  WaydDataItem,
   WaydTimeline,
-  ModaTimelineOptions,
+  WaydTimelineOptions,
   TimelineTemplate,
 } from '@/src/components/common/timeline'
 
@@ -27,8 +27,10 @@ interface PlanningIntervalObjectivesTimelineProps {
   viewSelector?: React.ReactNode
 }
 
-interface ObjectiveDataItem
-  extends ModaDataItem<PlanningIntervalObjectiveListDto, string> {
+interface ObjectiveDataItem extends WaydDataItem<
+  PlanningIntervalObjectiveListDto,
+  string
+> {
   planningIntervalKey?: number
   zIndex?: number
 }
@@ -80,7 +82,7 @@ const getDataGroups = (
   }
 
   return groups.map(
-    (group): ModaDataGroup => ({
+    (group): WaydDataGroup => ({
       id: group,
       content: group,
     }),
@@ -94,7 +96,7 @@ const PlanningIntervalObjectivesTimeline = ({
   teamNames,
   viewSelector,
 }: PlanningIntervalObjectivesTimelineProps) => {
-  const timelineOptions: ModaTimelineOptions<ObjectiveDataItem> = {
+  const timelineOptions: WaydTimelineOptions<ObjectiveDataItem> = {
     maxHeight: 650,
     start: planningIntervalCalendar?.start ?? dayjs().toDate(),
     end: planningIntervalCalendar?.end ?? dayjs().toDate(),
@@ -123,12 +125,8 @@ const PlanningIntervalObjectivesTimeline = ({
         id: String(obj.key),
         title: `${obj.name} (${obj.status?.name}) - ${obj.progress}%`,
         content: obj.name ?? '',
-        start: dayjs(
-          obj.startDate ?? planningIntervalCalendar?.start,
-        ).toDate(),
-        end: dayjs(
-          obj.targetDate ?? planningIntervalCalendar?.end,
-        ).toDate(),
+        start: dayjs(obj.startDate ?? planningIntervalCalendar?.start).toDate(),
+        end: dayjs(obj.targetDate ?? planningIntervalCalendar?.end).toDate(),
         group: obj.team?.name,
         type: 'range',
         zIndex: 1,

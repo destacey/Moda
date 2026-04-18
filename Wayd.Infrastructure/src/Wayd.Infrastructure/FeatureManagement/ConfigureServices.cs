@@ -1,4 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.FeatureManagement;
 using Wayd.Common.Application.FeatureManagement;
 
@@ -6,7 +6,7 @@ namespace Wayd.Infrastructure.FeatureManagement;
 
 internal static class ConfigureServices
 {
-    public static IServiceCollection AddModaFeatureManagement(this IServiceCollection services)
+    public static IServiceCollection AddWaydFeatureManagement(this IServiceCollection services)
     {
         services.AddSingleton<DatabaseFeatureDefinitionProvider>();
         services.AddSingleton<IFeatureDefinitionProvider>(sp =>

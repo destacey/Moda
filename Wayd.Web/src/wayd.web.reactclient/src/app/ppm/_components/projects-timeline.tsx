@@ -2,9 +2,9 @@
 
 import { ControlItemsMenu } from '@/src/components/common/control-items-menu'
 import {
-  ModaDataItem,
+  WaydDataItem,
   WaydTimeline,
-  ModaTimelineOptions,
+  WaydTimelineOptions,
   TimelineTemplate,
 } from '@/src/components/common/timeline'
 import { ProjectListDto } from '@/src/services/wayd-api'
@@ -27,7 +27,7 @@ export interface ProjectsTimelineProps {
   groupByProgram?: boolean
 }
 
-interface ProjectTimelineItem extends ModaDataItem<ProjectListDto, string> {
+interface ProjectTimelineItem extends WaydDataItem<ProjectListDto, string> {
   id: string
   openProjectDrawer: (projectKey: string) => void
 }
@@ -148,7 +148,7 @@ const ProjectsTimeline: FC<ProjectsTimelineProps> = (props) => {
     (project) => !project.start,
   ).length
 
-  const timelineOptions: ModaTimelineOptions<ProjectTimelineItem> = {
+  const timelineOptions: WaydTimelineOptions<ProjectTimelineItem> = {
     showCurrentTime: showCurrentTime,
     maxHeight: 650,
     start: timelineWindow.start,

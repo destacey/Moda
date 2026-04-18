@@ -7,9 +7,9 @@ namespace Wayd.Common.Domain.Tests.Sut.Models;
 public sealed class OwnershipInfoTests
 {
     [Fact]
-    public void CreateModaOwned_ShouldReturnOwned_WithNoConnectorOrIds()
+    public void CreateWaydOwned_ShouldReturnOwned_WithNoConnectorOrIds()
     {
-        var info = OwnershipInfo.CreateModaOwned();
+        var info = OwnershipInfo.CreateWaydOwned();
 
         info.Should().NotBeNull();
         info.Ownership.Should().Be(Ownership.Owned);
@@ -76,8 +76,8 @@ public sealed class OwnershipInfoTests
     [Fact]
     public void OwnedInstances_ShouldBeEqual()
     {
-        var a = OwnershipInfo.CreateModaOwned();
-        var b = OwnershipInfo.CreateModaOwned();
+        var a = OwnershipInfo.CreateWaydOwned();
+        var b = OwnershipInfo.CreateWaydOwned();
 
         a.Equals(b).Should().BeTrue();
         (a == b).Should().BeTrue();

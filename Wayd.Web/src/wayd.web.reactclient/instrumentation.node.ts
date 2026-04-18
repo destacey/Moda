@@ -14,7 +14,7 @@ process.env.OTEL_METRIC_EXPORT_INTERVAL = '5000'
 process.env.OTEL_METRIC_EXPORT_TIMEOUT = '3000'
 
 const sdk = new NodeSDK({
-  serviceName: process.env.OTEL_SERVICE_NAME || 'moda-client',
+  serviceName: process.env.OTEL_SERVICE_NAME || 'wayd-client',
   traceExporter: new OTLPTraceExporter(),
   instrumentations: [
     getNodeAutoInstrumentations({

@@ -32,7 +32,7 @@ internal sealed class SyncExternalWorkStatusesCommandHandler(IWorkDbContext work
 
         // Work statuses are global and cannot be deleted or updated at this time
 
-        // TODO: add the ability to disable work statuses if they are no longer used within moda and disabled externally
+        // TODO: add the ability to disable work statuses if they are no longer used within wayd and disabled externally
 
         return Result.Success();
     }
