@@ -11,15 +11,6 @@ output "client_hostname" {
   value = azurerm_container_app.wayd_frontend.ingress.0.fqdn
 }
 
-output "swa_token" {
-  value     = azurerm_static_web_app.wayd_swa.api_key
-  sensitive = true
-}
-
-output "swa_hostname" {
-  value = azurerm_static_web_app.wayd_swa.default_host_name
-}
-
 output "signalr_hostname" {
   value = azurerm_signalr_service.wayd_signalr.hostname
 }

@@ -14,7 +14,6 @@ resource "azurerm_signalr_service" "wayd_signalr" {
     allowed_origins = [
       # Must match the name pattern used in container-apps.tf for wayd_frontend.
       "https://${var.project}-client-${var.environment}.${azurerm_container_app_environment.wayd_cae.default_domain}",
-      "https://${azurerm_static_web_app.wayd_swa.default_host_name}",
     ]
   }
 

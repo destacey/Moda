@@ -265,8 +265,10 @@ resource "azurerm_container_app" "wayd_backend" {
       }
 
       env {
-        name  = "CorsSettings__WebClient"
-        value = "https://${azurerm_static_web_app.wayd_swa.default_host_name};${var.client_url}"
+        name = "CorsSettings__WebClient"
+        # Frontend FQDN computed from the name pattern (matches wayd_frontend definition
+        # above) to avoid a wayd_backend -> wayd_frontend -> wayd_backend cycle.
+        value = var.client_url != "" ? "https://${var.project}-client-${var.environment}.${azurerm_container_app_environment.wayd_cae.default_domain};${var.client_url}" : "https://${var.project}-client-${var.environment}.${azurerm_container_app_environment.wayd_cae.default_domain}"
       }
     }
   }

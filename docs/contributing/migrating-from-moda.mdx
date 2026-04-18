@@ -202,7 +202,7 @@ The Moda → Wayd transition shipped across three PRs:
 - PWA manifest, page titles, alt text, logo text, SVG brand elements
 - Docusaurus config (title, baseUrl, project URLs)
 - All internal GitHub / Pages URL references
-- **Infrastructure** (in the follow-up PR): new `wayd` Terraform Cloud organization + `wayd-dev` workspace; Azure resources renamed (`rg-wayd-dev`, `sql-wayd-dev`, `sqldb-wayd-dev`, `cae-wayd`, `la-wayd`, `swa-wayd`, `sigr-wayd-dev`, container apps `wayd-api` / `wayd-client`); SQL admin login renamed to `waydadmin`
+- **Infrastructure** (in the follow-up PR): new `wayd` Terraform Cloud organization + `wayd-dev` workspace; Azure resources renamed (`rg-wayd-dev`, `sql-wayd-dev`, `sqldb-wayd-dev`, `cae-wayd-dev`, `la-wayd-dev`, `sigr-wayd-dev`, container apps `wayd-api-dev` / `wayd-client-dev`); SQL admin login renamed to `waydadmin`; the unused Azure Static Web App was removed
 - **JWT Issuer / Audience** (in the infrastructure PR): `Moda` / `ModaApi` → `Wayd` / `WaydApi` across `security.json`, Terraform env vars, and C# fallback defaults
 
 ### What intentionally stayed as "moda"

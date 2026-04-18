@@ -4,12 +4,6 @@ variable "location" {
   default     = "westus3"
 }
 
-variable "swa_location" {
-  type        = string
-  description = "The Azure region for the Static Web App. SWA is only available in a limited set of regions."
-  default     = "westus2"
-}
-
 variable "environment" {
   type        = string
   description = "Deployment environment name (e.g. dev, staging, prod). Used for tagging."
@@ -203,7 +197,7 @@ variable "log_analytics_retention_in_days" {
 
 variable "client_url" {
   type        = string
-  description = "Additional client URL to allow in CORS for the API. Leave empty if the SWA host is the only allowed client."
+  description = "Additional client URL to allow in CORS for the API (e.g. a custom domain). Leave empty if the container app's default hostname is the only allowed client."
   default     = ""
 }
 

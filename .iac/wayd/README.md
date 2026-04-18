@@ -9,7 +9,6 @@ The deployed stack is:
 - **Container App Environment + Log Analytics** workspace
 - **Container Apps** — API (ASP.NET Core) and client (Next.js), both behind HTTPS ingress
 - **Azure SignalR Service** — for real-time features
-- **Azure Static Web App** — reserved for alternate client hosting
 
 The configuration is designed to be reusable across organizations and environments by overriding variables. The only file you need to edit directly is the `cloud {}` block in [main.tf](./main.tf) to point at your own Terraform Cloud organization — see [Terraform Cloud](#terraform-cloud) below. Everything else is driven by variables.
 
@@ -94,7 +93,6 @@ Override these in the TFC workspace only if the defaults don't fit:
 | `project` | `wayd` | Used in resource naming and tags |
 | `environment` | `dev` | Used in resource naming and tags |
 | `location` | `westus3` | Primary Azure region |
-| `swa_location` | `westus2` | Static Web App region (SWA has limited regions) |
 | `docker_image_registry` | `docker.io/awaldow` | Container image registry host |
 | `api_image_name` | `moda-api` | API image repository name |
 | `client_image_name` | `moda-client` | Client image repository name |
@@ -133,7 +131,6 @@ Most Azure resources are named using the pattern `<prefix>-${project}-${environm
 | Log Analytics | `la-wayd-dev` | `project`, `environment` |
 | Container App (API) | `wayd-api-dev` | `project`, `environment` |
 | Container App (client) | `wayd-client-dev` | `project`, `environment` |
-| Static Web App | `swa-wayd-dev` | `project`, `environment` |
 | SignalR | `sigr-wayd-dev` | `project`, `environment`, or `signalr_name` to override directly |
 
 ## Deploying
@@ -179,7 +176,7 @@ With defaults on `dev` and idle usage, expect **$5–$40/month** for a single en
 - SQL serverless auto-pauses after 60 min idle (free when paused; ~$0.52/vCore-hour active)
 - Container apps scale to zero (free when idle)
 - Log Analytics free tier covers first 5 GB/month ingested
-- SignalR Free_F1 and SWA Free are always-free
+- SignalR Free_F1 is always-free
 - Resource group itself incurs no charge
 
 Provisioned SQL SKUs, longer Log Analytics retention, or `min_replicas >= 1` will increase the baseline cost.
