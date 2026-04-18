@@ -5,7 +5,16 @@ import { InteractionStatus } from '@azure/msal-browser'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import styles from './page.module.css'
-import { isLocalAuthActive, getAuthClient, getAuthStorage, setRememberMe as persistRememberMe, LOCAL_AUTH_TOKEN_KEY, LOCAL_AUTH_REFRESH_TOKEN_KEY, LOCAL_AUTH_TOKEN_EXPIRY_KEY, LOCAL_AUTH_MUST_CHANGE_PASSWORD_KEY } from '@/src/services/clients'
+import {
+  isLocalAuthActive,
+  getAuthClient,
+  getAuthStorage,
+  setRememberMe as persistRememberMe,
+  LOCAL_AUTH_TOKEN_KEY,
+  LOCAL_AUTH_REFRESH_TOKEN_KEY,
+  LOCAL_AUTH_TOKEN_EXPIRY_KEY,
+  LOCAL_AUTH_MUST_CHANGE_PASSWORD_KEY,
+} from '@/src/services/clients'
 
 const pulseAnimation = `
 @keyframes pulse {
@@ -279,7 +288,7 @@ function AnalyticsIllustration() {
         </g>
       ))}
 
-      {/* Center "WAYD" badge */}
+      {/* Center "wayd" badge */}
       <g filter="url(#shadow)">
         <rect
           x="108"
@@ -301,7 +310,7 @@ function AnalyticsIllustration() {
           fontWeight="700"
           letterSpacing="2"
         >
-          WAYD
+          wayd
         </text>
       </g>
     </svg>
@@ -401,10 +410,7 @@ function LocalLoginTab() {
       persistRememberMe(rememberMe)
       const storage = getAuthStorage()
       storage.setItem(LOCAL_AUTH_TOKEN_KEY, tokenResponse.token)
-      storage.setItem(
-        LOCAL_AUTH_REFRESH_TOKEN_KEY,
-        tokenResponse.refreshToken,
-      )
+      storage.setItem(LOCAL_AUTH_REFRESH_TOKEN_KEY, tokenResponse.refreshToken)
       storage.setItem(
         LOCAL_AUTH_TOKEN_EXPIRY_KEY,
         new Date(tokenResponse.tokenExpiresAt).toISOString(),
@@ -428,9 +434,7 @@ function LocalLoginTab() {
 
   return (
     <>
-      <p className={styles.subtitle}>
-        Sign in with your email and password.
-      </p>
+      <p className={styles.subtitle}>Sign in with your email and password.</p>
 
       <form onSubmit={handleSubmit} className={styles.localForm}>
         <input
@@ -540,7 +544,7 @@ export default function LoginPage() {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/wayd-icon.png"
-                alt="Wayd"
+                alt="wayd"
                 className={styles.logoIcon}
               />
               <div className={styles.logoDivider} />
