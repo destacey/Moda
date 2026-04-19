@@ -53,11 +53,11 @@ public sealed class CreateUserCommandValidator : CustomValidator<CreateUserComma
                 .WithMessage("Password must contain at least one lowercase letter.")
             .Matches("[0-9]")
                 .WithMessage("Password must contain at least one digit.")
-            .When(u => u.LoginProvider == LoginProviders.Moda);
+            .When(u => u.LoginProvider == LoginProviders.Wayd);
 
         RuleFor(u => u.Password)
             .Null()
                 .WithMessage("Password must not be provided for non-Wayd accounts.")
-            .When(u => u.LoginProvider != LoginProviders.Moda);
+            .When(u => u.LoginProvider != LoginProviders.Wayd);
     }
 }

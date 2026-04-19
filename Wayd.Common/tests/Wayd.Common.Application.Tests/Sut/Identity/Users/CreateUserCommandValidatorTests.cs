@@ -24,7 +24,7 @@ public class CreateUserCommandValidatorTests
         FirstName = "John",
         LastName = "Doe",
         Email = "john.doe@example.com",
-        LoginProvider = LoginProviders.Moda,
+        LoginProvider = LoginProviders.Wayd,
         Password = "Password123!",
     };
 
@@ -40,7 +40,7 @@ public class CreateUserCommandValidatorTests
     #region Valid Commands
 
     [Fact]
-    public async Task Validate_ShouldPass_WhenModaCommandIsValid()
+    public async Task Validate_ShouldPass_WhenWaydCommandIsValid()
     {
         // Arrange
         var command = CreateValidWaydCommand();
@@ -103,7 +103,7 @@ public class CreateUserCommandValidatorTests
     #region Password Validation
 
     [Fact]
-    public async Task Validate_ShouldFail_WhenModaAccountHasNoPassword()
+    public async Task Validate_ShouldFail_WhenWaydAccountHasNoPassword()
     {
         // Arrange
         var command = CreateValidWaydCommand();
@@ -118,7 +118,7 @@ public class CreateUserCommandValidatorTests
     }
 
     [Fact]
-    public async Task Validate_ShouldFail_WhenModaAccountPasswordIsTooShort()
+    public async Task Validate_ShouldFail_WhenWaydAccountPasswordIsTooShort()
     {
         // Arrange
         var command = CreateValidWaydCommand();
@@ -178,7 +178,7 @@ public class CreateUserCommandValidatorTests
     }
 
     [Fact]
-    public async Task Validate_ShouldFail_WhenNonModaAccountHasPassword()
+    public async Task Validate_ShouldFail_WhenNonWaydAccountHasPassword()
     {
         // Arrange
         var command = CreateValidEntraIdCommand();

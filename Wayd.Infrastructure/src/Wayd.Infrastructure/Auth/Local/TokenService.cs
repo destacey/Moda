@@ -32,9 +32,9 @@ internal class TokenService(
             throw new UnauthorizedException("Invalid credentials.");
         }
 
-        if (user.LoginProvider != LoginProviders.Moda)
+        if (user.LoginProvider != LoginProviders.Wayd)
         {
-            _logger.LogWarning("Login failed: user {UserName} is not a Moda account (provider: {LoginProvider}).", command.UserName, user.LoginProvider);
+            _logger.LogWarning("Login failed: user {UserName} is not a Wayd account (provider: {LoginProvider}).", command.UserName, user.LoginProvider);
             throw new UnauthorizedException("Invalid credentials.");
         }
 
