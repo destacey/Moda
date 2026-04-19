@@ -16,7 +16,7 @@ const { Item } = Form
 
 const loginProviderOptions = [
   { value: 'MicrosoftEntraId', label: 'Microsoft Entra ID' },
-  { value: 'Moda', label: 'Moda' },
+  { value: 'Wayd', label: 'Wayd' },
 ]
 
 export interface CreateUserFormProps {
@@ -76,7 +76,7 @@ const CreateUserForm = ({
               employeeId: values.employeeId || undefined,
               loginProvider: values.loginProvider,
               password:
-                values.loginProvider === 'Moda'
+                values.loginProvider === 'Wayd'
                   ? values.password
                   : undefined,
             })
@@ -171,7 +171,7 @@ const CreateUserForm = ({
           <Input maxLength={256} />
         </Item>
 
-        {loginProvider === 'Moda' && (
+        {loginProvider === 'Wayd' && (
           <Item
             label="Password"
             name="password"

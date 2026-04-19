@@ -70,7 +70,7 @@ public class TokenServiceTests
             FirstName = "Test",
             LastName = "User",
             IsActive = isActive,
-            LoginProvider = LoginProviders.Moda,
+            LoginProvider = LoginProviders.Wayd,
         };
     }
 

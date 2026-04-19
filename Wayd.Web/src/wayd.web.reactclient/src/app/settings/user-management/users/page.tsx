@@ -87,7 +87,7 @@ const UsersListPage = () => {
             )
           }
           const secondaryItems: ItemType[] = []
-          if (canUpdateUser && params.data.loginProvider === 'Moda') {
+          if (canUpdateUser && params.data.loginProvider === 'Wayd') {
             secondaryItems.push({
               key: 'reset-password',
               label: 'Reset Password',

@@ -97,7 +97,7 @@ public class UserServiceTests
             FirstName = "John",
             LastName = "Doe",
             Email = "john@example.com",
-            LoginProvider = LoginProviders.Moda,
+            LoginProvider = LoginProviders.Wayd,
             Password = "Password123!",
         };
 
@@ -121,7 +121,7 @@ public class UserServiceTests
             u.LastName == "Doe" &&
             u.Email == "john@example.com" &&
             u.UserName == "john@example.com" &&
-            u.LoginProvider == LoginProviders.Moda &&
+            u.LoginProvider == LoginProviders.Wayd &&
             u.IsActive), "Password123!"), Times.Once);
         _mockUserManager.Verify(x => x.AddToRoleAsync(It.IsAny<ApplicationUser>(), ApplicationRoles.Basic), Times.Once);
         _mockEvents.Verify(x => x.PublishAsync(It.IsAny<ApplicationUserCreatedEvent>()), Times.Once);
@@ -168,7 +168,7 @@ public class UserServiceTests
             FirstName = "John",
             LastName = "Doe",
             Email = "john@example.com",
-            LoginProvider = LoginProviders.Moda,
+            LoginProvider = LoginProviders.Wayd,
             Password = "Password123!",
         };
 
@@ -549,7 +549,7 @@ public class UserServiceTests
     public async Task ChangePasswordAsync_ShouldSucceed_WhenLocalUserWithValidPassword()
     {
         // Arrange
-        var user = CreateUser(loginProvider: LoginProviders.Moda);
+        var user = CreateUser(loginProvider: LoginProviders.Wayd);
         _mockUserManager.Setup(x => x.FindByIdAsync("user-1")).ReturnsAsync(user);
         _mockUserManager.Setup(x => x.ChangePasswordAsync(user, "OldPass123!", "NewPass456!"))
             .ReturnsAsync(IdentityResult.Success);
@@ -569,7 +569,7 @@ public class UserServiceTests
     public async Task ChangePasswordAsync_ShouldClearMustChangePassword_WhenFlagIsSet()
     {
         // Arrange
-        var user = CreateUser(loginProvider: LoginProviders.Moda);
+        var user = CreateUser(loginProvider: LoginProviders.Wayd);
         user.MustChangePassword = true;
         _mockUserManager.Setup(x => x.FindByIdAsync("user-1")).ReturnsAsync(user);
         _mockUserManager.Setup(x => x.ChangePasswordAsync(user, "OldPass123!", "NewPass456!"))
@@ -610,7 +610,7 @@ public class UserServiceTests
     public async Task ChangePasswordAsync_ShouldReturnFailure_WhenIdentityFails()
     {
         // Arrange
-        var user = CreateUser(loginProvider: LoginProviders.Moda);
+        var user = CreateUser(loginProvider: LoginProviders.Wayd);
         _mockUserManager.Setup(x => x.FindByIdAsync("user-1")).ReturnsAsync(user);
         _mockUserManager.Setup(x => x.ChangePasswordAsync(user, "wrong", "NewPass456!"))
             .ReturnsAsync(IdentityResult.Failed(new IdentityError { Description = "Incorrect password." }));
@@ -650,7 +650,7 @@ public class UserServiceTests
     public async Task ResetPasswordAsync_ShouldSucceed_AndSetMustChangePassword()
     {
         // Arrange
-        var user = CreateUser(loginProvider: LoginProviders.Moda);
+        var user = CreateUser(loginProvider: LoginProviders.Wayd);
         _mockUserManager.Setup(x => x.FindByIdAsync("user-1")).ReturnsAsync(user);
         _mockUserManager.Setup(x => x.GeneratePasswordResetTokenAsync(user)).ReturnsAsync("reset-token");
         _mockUserManager.Setup(x => x.ResetPasswordAsync(user, "reset-token", "NewPass456!"))
@@ -674,7 +674,7 @@ public class UserServiceTests
     public async Task ResetPasswordAsync_ShouldClearLockout_WhenUserIsLockedOut()
     {
         // Arrange
-        var user = CreateUser(loginProvider: LoginProviders.Moda);
+        var user = CreateUser(loginProvider: LoginProviders.Wayd);
         _mockUserManager.Setup(x => x.FindByIdAsync("user-1")).ReturnsAsync(user);
         _mockUserManager.Setup(x => x.GeneratePasswordResetTokenAsync(user)).ReturnsAsync("reset-token");
         _mockUserManager.Setup(x => x.ResetPasswordAsync(user, "reset-token", "NewPass456!"))
@@ -700,7 +700,7 @@ public class UserServiceTests
     public async Task ResetPasswordAsync_ShouldNotClearLockout_WhenUserIsNotLockedOut()
     {
         // Arrange
-        var user = CreateUser(loginProvider: LoginProviders.Moda);
+        var user = CreateUser(loginProvider: LoginProviders.Wayd);
         _mockUserManager.Setup(x => x.FindByIdAsync("user-1")).ReturnsAsync(user);
         _mockUserManager.Setup(x => x.GeneratePasswordResetTokenAsync(user)).ReturnsAsync("reset-token");
         _mockUserManager.Setup(x => x.ResetPasswordAsync(user, "reset-token", "NewPass456!"))
@@ -742,7 +742,7 @@ public class UserServiceTests
     public async Task ResetPasswordAsync_ShouldReturnFailure_WhenIdentityFails()
     {
         // Arrange
-        var user = CreateUser(loginProvider: LoginProviders.Moda);
+        var user = CreateUser(loginProvider: LoginProviders.Wayd);
         _mockUserManager.Setup(x => x.FindByIdAsync("user-1")).ReturnsAsync(user);
         _mockUserManager.Setup(x => x.GeneratePasswordResetTokenAsync(user)).ReturnsAsync("reset-token");
         _mockUserManager.Setup(x => x.ResetPasswordAsync(user, "reset-token", "weak"))
@@ -783,7 +783,7 @@ public class UserServiceTests
     public async Task UnlockUserAsync_ShouldSucceed_WhenUserIsLockedOut()
     {
         // Arrange
-        var user = CreateUser(loginProvider: LoginProviders.Moda);
+        var user = CreateUser(loginProvider: LoginProviders.Wayd);
         _mockUserManager.Setup(x => x.FindByIdAsync("user-1")).ReturnsAsync(user);
         _mockUserManager.Setup(x => x.IsLockedOutAsync(user)).ReturnsAsync(true);
         _mockUserManager.Setup(x => x.SetLockoutEndDateAsync(user, null)).ReturnsAsync(IdentityResult.Success);
@@ -804,7 +804,7 @@ public class UserServiceTests
     public async Task UnlockUserAsync_ShouldReturnFailure_WhenUserIsNotLockedOut()
     {
         // Arrange
-        var user = CreateUser(loginProvider: LoginProviders.Moda);
+        var user = CreateUser(loginProvider: LoginProviders.Wayd);
         _mockUserManager.Setup(x => x.FindByIdAsync("user-1")).ReturnsAsync(user);
         _mockUserManager.Setup(x => x.IsLockedOutAsync(user)).ReturnsAsync(false);
 

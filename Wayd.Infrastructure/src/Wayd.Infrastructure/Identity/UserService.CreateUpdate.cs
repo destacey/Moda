@@ -150,10 +150,10 @@ internal partial class UserService
             EmployeeId = command.EmployeeId,
             PhoneNumber = command.PhoneNumber,
             LoginProvider = command.LoginProvider,
-            MustChangePassword = command.LoginProvider == LoginProviders.Moda,
+            MustChangePassword = command.LoginProvider == LoginProviders.Wayd,
         };
 
-        IdentityResult result = command.LoginProvider == LoginProviders.Moda
+        IdentityResult result = command.LoginProvider == LoginProviders.Wayd
             ? await _userManager.CreateAsync(user, command.Password!)
             : await _userManager.CreateAsync(user);
 
@@ -219,7 +219,7 @@ internal partial class UserService
             throw new NotFoundException("User Not Found.");
         }
 
-        if (user.LoginProvider != LoginProviders.Moda)
+        if (user.LoginProvider != LoginProviders.Wayd)
         {
             return Result.Failure("Password change is only available for local accounts.");
         }
@@ -251,7 +251,7 @@ internal partial class UserService
             throw new NotFoundException("User Not Found.");
         }
 
-        if (user.LoginProvider != LoginProviders.Moda)
+        if (user.LoginProvider != LoginProviders.Wayd)
         {
             return Result.Failure("Password reset is only available for local accounts.");
         }
