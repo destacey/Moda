@@ -1,25 +1,30 @@
 locals {
-  sql_conn_string = "Server=tcp:${azurerm_mssql_server.moda_sql_server.fully_qualified_domain_name},1433;Initial Catalog=${azurerm_mssql_database.moda_db.name};Persist Security Info=False;User ID=modaadmin;Password=${var.sql_admin_pass};MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+  sql_conn_string = "Server=tcp:${azurerm_mssql_server.wayd_sql_server.fully_qualified_domain_name},1433;Initial Catalog=${azurerm_mssql_database.wayd_db.name};Persist Security Info=False;User ID=${var.sql_admin_login};Password=${var.sql_admin_pass};MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
 }
 
-resource "azurerm_container_app_environment" "moda_cae" {
-  name                       = "cae-moda"
-  resource_group_name        = azurerm_resource_group.moda_dev_rg.name
-  location                   = azurerm_resource_group.moda_dev_rg.location
-  log_analytics_workspace_id = azurerm_log_analytics_workspace.moda.id
+resource "azurerm_container_app_environment" "wayd_cae" {
+  name                       = "cae-${local.name_stem}"
+  resource_group_name        = azurerm_resource_group.wayd_dev_rg.name
+  location                   = azurerm_resource_group.wayd_dev_rg.location
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.wayd.id
 
+  tags = local.common_tags
 }
 
-resource "azurerm_log_analytics_workspace" "moda" {
-  location            = azurerm_resource_group.moda_dev_rg.location
-  name                = "la-moda"
-  resource_group_name = azurerm_resource_group.moda_dev_rg.name
+resource "azurerm_log_analytics_workspace" "wayd" {
+  location            = azurerm_resource_group.wayd_dev_rg.location
+  name                = "la-${local.name_stem}"
+  resource_group_name = azurerm_resource_group.wayd_dev_rg.name
+  sku                 = var.log_analytics_sku
+  retention_in_days   = var.log_analytics_retention_in_days
+
+  tags = local.common_tags
 }
 
-resource "azurerm_container_app" "moda_frontend" {
-  name                         = "moda-client"
-  container_app_environment_id = azurerm_container_app_environment.moda_cae.id
-  resource_group_name          = azurerm_resource_group.moda_dev_rg.name
+resource "azurerm_container_app" "wayd_frontend" {
+  name                         = "${var.project}-client-${var.environment}"
+  container_app_environment_id = azurerm_container_app_environment.wayd_cae.id
+  resource_group_name          = azurerm_resource_group.wayd_dev_rg.name
   revision_mode                = "Single"
 
   ingress {
@@ -37,23 +42,14 @@ resource "azurerm_container_app" "moda_frontend" {
   }
 
   template {
-    min_replicas = 0
-    max_replicas = 3
+    min_replicas = var.container_app_min_replicas
+    max_replicas = var.container_app_max_replicas
 
     container {
-      name   = "moda-client"
-      image  = "awaldow/moda-client:${var.docker_tag}"
-      cpu    = 0.25
-      memory = "0.5Gi"
-
-      # liveness_probe {
-      #   port                    = 8080
-      #   transport               = "HTTP"
-      #   failure_count_threshold = 3
-      #   path                    = "/health"
-      #   interval_seconds        = 30
-      #   initial_delay           = 15
-      # }
+      name   = "${var.project}-client"
+      image  = "${var.docker_image_registry}/${var.client_image_name}:${var.docker_tag}"
+      cpu    = var.container_app_cpu
+      memory = var.container_app_memory
 
       readiness_probe {
         port                    = 3000
@@ -75,7 +71,7 @@ resource "azurerm_container_app" "moda_frontend" {
 
       env {
         name  = "NEXT_PUBLIC_API_BASE_URL"
-        value = "https://${azurerm_container_app.moda_backend.ingress.0.fqdn}"
+        value = "https://${azurerm_container_app.wayd_backend.ingress.0.fqdn}"
       }
 
       env {
@@ -99,12 +95,14 @@ resource "azurerm_container_app" "moda_frontend" {
       }
     }
   }
+
+  tags = local.common_tags
 }
 
-resource "azurerm_container_app" "moda_backend" {
-  name                         = "moda-api"
-  container_app_environment_id = azurerm_container_app_environment.moda_cae.id
-  resource_group_name          = azurerm_resource_group.moda_dev_rg.name
+resource "azurerm_container_app" "wayd_backend" {
+  name                         = "${var.project}-api-${var.environment}"
+  container_app_environment_id = azurerm_container_app_environment.wayd_cae.id
+  resource_group_name          = azurerm_resource_group.wayd_dev_rg.name
   revision_mode                = "Single"
 
   ingress {
@@ -129,7 +127,7 @@ resource "azurerm_container_app" "moda_backend" {
 
   secret {
     name  = "signalr-conn-string"
-    value = azurerm_signalr_service.moda_signalr.primary_connection_string
+    value = azurerm_signalr_service.wayd_signalr.primary_connection_string
   }
 
   secret {
@@ -142,23 +140,14 @@ resource "azurerm_container_app" "moda_backend" {
   }
 
   template {
-    min_replicas = 0
-    max_replicas = 3
+    min_replicas = var.container_app_min_replicas
+    max_replicas = var.container_app_max_replicas
 
     container {
-      name   = "moda-api"
-      image  = "awaldow/moda-api:${var.docker_tag}"
-      cpu    = 0.25
-      memory = "0.5Gi"
-
-      # liveness_probe {
-      #   port                    = 8080
-      #   transport               = "HTTP"
-      #   failure_count_threshold = 3
-      #   path                    = "/health"
-      #   interval_seconds        = 30
-      #   initial_delay           = 15
-      # }
+      name   = "${var.project}-api"
+      image  = "${var.docker_image_registry}/${var.api_image_name}:${var.docker_tag}"
+      cpu    = var.container_app_cpu
+      memory = var.container_app_memory
 
       readiness_probe {
         port                    = 8080
@@ -212,42 +201,42 @@ resource "azurerm_container_app" "moda_backend" {
 
       env {
         name  = "SecuritySettings__AzureAd__ClientId"
-        value = "fdca5e6f-46a2-455c-b2f3-06a9a6877190"
+        value = var.api_app_reg_client_id
       }
 
       env {
         name  = "SecuritySettings__AzureAd__Domain"
-        value = "dstaceyoutlook.onmicrosoft.com"
+        value = var.aad_domain
       }
 
       env {
         name  = "SecuritySettings__AzureAd__RootIssuer"
-        value = "https://sts.windows.net/f399216f-be6b-4062-8700-54952e44e7ef/"
+        value = "https://sts.windows.net/${var.aad_tenant_id}/"
       }
 
       env {
         name  = "SecuritySettings__AzureAd__TenantId"
-        value = "f399216f-be6b-4062-8700-54952e44e7ef"
+        value = var.aad_tenant_id
       }
 
       env {
         name  = "SecuritySettings__Swagger__ApiScope"
-        value = "api://fdca5e6f-46a2-455c-b2f3-06a9a6877190/access_as_user"
+        value = var.app_reg_api_scope
       }
 
       env {
         name  = "SecuritySettings__Swagger__AuthorizationUrl"
-        value = "https://login.microsoftonline.com/f399216f-be6b-4062-8700-54952e44e7ef/oauth2/v2.0/authorize"
+        value = "https://login.microsoftonline.com/${var.aad_tenant_id}/oauth2/v2.0/authorize"
       }
 
       env {
         name  = "SecuritySettings__Swagger__OpenIdClientId"
-        value = "4d566fb3-7966-4c77-9864-113020fd646f"
+        value = var.swagger_openid_client_id
       }
 
       env {
         name  = "SecuritySettings__Swagger__TokenUrl"
-        value = "https://login.microsoftonline.com/f399216f-be6b-4062-8700-54952e44e7ef/oauth2/v2.0/token"
+        value = "https://login.microsoftonline.com/${var.aad_tenant_id}/oauth2/v2.0/token"
       }
 
       env {
@@ -257,12 +246,12 @@ resource "azurerm_container_app" "moda_backend" {
 
       env {
         name  = "SecuritySettings__LocalJwt__Issuer"
-        value = "Moda"
+        value = var.jwt_issuer
       }
 
       env {
         name  = "SecuritySettings__LocalJwt__Audience"
-        value = "ModaApi"
+        value = var.jwt_audience
       }
 
       env {
@@ -276,9 +265,13 @@ resource "azurerm_container_app" "moda_backend" {
       }
 
       env {
-        name  = "CorsSettings__WebClient"
-        value = "https://${azurerm_static_site.moda_swa.default_host_name};${var.client_url}"
+        name = "CorsSettings__WebClient"
+        # Frontend FQDN computed from the name pattern (matches wayd_frontend definition
+        # above) to avoid a wayd_backend -> wayd_frontend -> wayd_backend cycle.
+        value = var.client_url != "" ? "https://${var.project}-client-${var.environment}.${azurerm_container_app_environment.wayd_cae.default_domain};${var.client_url}" : "https://${var.project}-client-${var.environment}.${azurerm_container_app_environment.wayd_cae.default_domain}"
       }
     }
   }
+
+  tags = local.common_tags
 }

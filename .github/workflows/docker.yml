@@ -125,16 +125,17 @@ jobs:
             - uses: actions/checkout@v3
               name: Checkout
 
-            - uses: hashicorp/setup-terraform@v2
+            - uses: hashicorp/setup-terraform@v3
               name: Setup Terraform
               with:
+                  terraform_version: "1.14.x"
                   cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
             - name: Terraform Init
               id: init
               run: |
                   terraform init
-                  terraform workspace select moda-dev
+                  terraform workspace select -or-create wayd-dev
                   terraform workspace show
 
             - name: Terraform fmt
@@ -163,7 +164,7 @@ jobs:
               id: tfoutputs
               uses: dflook/terraform-output@v1
               with:
-                  workspace: moda-dev
+                  workspace: wayd-dev
                   path: .iac/wayd
               env:
                   TERRAFORM_CLOUD_TOKENS: app.terraform.io=${{ secrets.TF_API_TOKEN }}
