@@ -46,7 +46,7 @@ const UserDetailsPage = (props: { params: Promise<{ id: string }> }) => {
   const { getAccountActionMenuItems } = useUserAccountActions()
   const { data: userData, isLoading, error } = useGetUserQuery(id)
 
-  const isLocalUser = userData?.loginProvider === 'Moda'
+  const isLocalUser = userData?.loginProvider === 'Wayd'
 
   const fullName = userData
     ? `${userData?.firstName} ${userData?.lastName}`
