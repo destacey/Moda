@@ -49,6 +49,14 @@ internal sealed class UserIdentityStore(WaydDbContext db) : IUserIdentityStore
             cancellationToken);
     }
 
+    public async Task<IReadOnlyDictionary<string, string>> GetActiveSubjectsByProvider(string provider, CancellationToken cancellationToken = default)
+    {
+        return await _db.UserIdentities
+            .AsNoTracking()
+            .Where(ui => ui.IsActive && ui.Provider == provider)
+            .ToDictionaryAsync(ui => ui.UserId, ui => ui.ProviderSubject, cancellationToken);
+    }
+
     public async Task<int> DeactivateAllActive(string userId, Instant unlinkedAt, string unlinkReason, CancellationToken cancellationToken = default)
     {
         var active = await _db.UserIdentities
