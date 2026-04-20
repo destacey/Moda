@@ -15,8 +15,6 @@ public class ApplicationUserConfig : IEntityTypeConfiguration<ApplicationUser>
         builder.HasIndex(u => u.Id)
             .IncludeProperties(e => new { e.UserName, e.EmployeeId, e.Email, e.FirstName, e.LastName });
 
-        builder.Property(u => u.ObjectId).HasMaxLength(256);
-
         builder.Property(u => u.FirstName).HasMaxLength(100);
         builder.Property(u => u.LastName).HasMaxLength(100);
         builder.Property(u => u.PhoneNumber).HasMaxLength(20);

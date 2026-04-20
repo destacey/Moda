@@ -1,10 +1,11 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using NodaTime;
 
 namespace Wayd.Infrastructure.Identity;
 
-internal sealed class UserIdentityStore(WaydDbContext db) : IUserIdentityStore
+internal sealed class UserIdentityStore(WaydDbContext db, ILogger<UserIdentityStore> logger) : IUserIdentityStore
 {
     // SQL Server error numbers for unique-constraint / duplicate-key violations.
     // 2627 = unique constraint, 2601 = unique index. We treat either as "another
@@ -14,6 +15,7 @@ internal sealed class UserIdentityStore(WaydDbContext db) : IUserIdentityStore
     private const int SqlUniqueIndexErrorNumber = 2601;
 
     private readonly WaydDbContext _db = db;
+    private readonly ILogger<UserIdentityStore> _logger = logger;
 
     public Task<UserIdentity?> FindActive(string provider, string? tenantId, string subject, CancellationToken cancellationToken = default)
     {
@@ -47,6 +49,36 @@ internal sealed class UserIdentityStore(WaydDbContext db) : IUserIdentityStore
             ui.IsActive &&
             ui.Provider == provider,
             cancellationToken);
+    }
+
+    public async Task<IReadOnlyDictionary<string, string>> GetActiveSubjectsByProvider(string provider, CancellationToken cancellationToken = default)
+    {
+        // The "at most one active identity per user+provider" invariant is
+        // enforced in application code, not at the schema level — so defensively
+        // group here rather than letting ToDictionaryAsync throw if a bad row
+        // slips through. Duplicates are logged and the latest-linked row wins,
+        // so a batch sync can complete on otherwise-healthy users.
+        var rows = await _db.UserIdentities
+            .AsNoTracking()
+            .Where(ui => ui.IsActive && ui.Provider == provider)
+            .Select(ui => new { ui.UserId, ui.ProviderSubject, ui.LinkedAt })
+            .ToListAsync(cancellationToken);
+
+        var result = new Dictionary<string, string>(rows.Count);
+        foreach (var group in rows.GroupBy(r => r.UserId))
+        {
+            if (group.Count() > 1)
+            {
+                _logger.LogWarning(
+                    "UserIdentity invariant violation: user {UserId} has {Count} active identities for provider {Provider}. Using most recently linked row.",
+                    group.Key, group.Count(), provider);
+            }
+
+            var winner = group.OrderByDescending(r => r.LinkedAt).First();
+            result[group.Key] = winner.ProviderSubject;
+        }
+
+        return result;
     }
 
     public async Task<int> DeactivateAllActive(string userId, Instant unlinkedAt, string unlinkReason, CancellationToken cancellationToken = default)

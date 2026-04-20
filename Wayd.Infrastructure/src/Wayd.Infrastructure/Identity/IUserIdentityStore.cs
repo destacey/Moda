@@ -20,6 +20,14 @@ internal interface IUserIdentityStore : IScopedService
     Task<bool> ExistsActive(string userId, string provider, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Returns a dictionary mapping <c>UserId</c> to the <c>ProviderSubject</c> of
+    /// their active identity row for the given provider. Used by batch processes
+    /// that need to correlate users to an external identifier (e.g., employee
+    /// records keyed by the Entra <c>oid</c>).
+    /// </summary>
+    Task<IReadOnlyDictionary<string, string>> GetActiveSubjectsByProvider(string provider, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Marks every active row for a user as inactive, setting <c>UnlinkedAt</c> and
     /// the given <c>unlinkReason</c>. Used to enforce the "exactly one active identity
     /// per user at rest" invariant when a new identity is being linked.

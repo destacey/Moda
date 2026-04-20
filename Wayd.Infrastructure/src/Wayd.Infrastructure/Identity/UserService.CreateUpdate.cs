@@ -127,7 +127,7 @@ internal partial class UserService
         }
 
         var user = await _userManager.FindByNameAsync(username);
-        if (user is not null && !string.IsNullOrWhiteSpace(user.ObjectId))
+        if (user is not null && await _userIdentityStore.ExistsActive(user.Id, LoginProviders.MicrosoftEntraId))
         {
             _logger.LogError("Username or Email {Username} not valid", username);
             throw new InternalServerException($"Username {username} is already taken.");
@@ -136,7 +136,7 @@ internal partial class UserService
         if (user is null)
         {
             user = await _userManager.FindByEmailAsync(email);
-            if (user is not null && !string.IsNullOrWhiteSpace(user.ObjectId))
+            if (user is not null && await _userIdentityStore.ExistsActive(user.Id, LoginProviders.MicrosoftEntraId))
             {
                 _logger.LogError("Email {email} is already taken.", email);
                 throw new InternalServerException($"Email {email} is already taken.");
@@ -148,7 +148,9 @@ internal partial class UserService
         IdentityResult? result;
         if (user is not null)
         {
-            user.ObjectId = principal.GetObjectId();
+            // Existing user — linking them to Entra. The UserIdentity row is inserted
+            // downstream by EnsureEntraIdentityRowAsync, which also deactivates any
+            // prior active identity (e.g., a Wayd local identity being migrated to SSO).
             result = await _userManager.UpdateAsync(user);
 
             await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id, _dateTimeProvider.Now));
@@ -166,7 +168,6 @@ internal partial class UserService
 
             user = new ApplicationUser
             {
-                ObjectId = principalObjectId,
                 FirstName = principal.FindFirstValue(ClaimTypes.GivenName) ?? Guard.Against.NullOrWhiteSpace(adUser?.GivenName),
                 LastName = principal.FindFirstValue(ClaimTypes.Surname) ?? Guard.Against.NullOrWhiteSpace(adUser?.Surname),
                 Email = email,
@@ -445,10 +446,23 @@ internal partial class UserService
         if (users.Count != 0)
         {
             var employees = await _sender.Send(new GetEmployeeNumberMapQuery(), cancellationToken);
+            // External employee records are keyed by the Entra oid, which lives in
+            // the user's active MicrosoftEntraId UserIdentity row.
+            var entraSubjectsByUserId = await _userIdentityStore.GetActiveSubjectsByProvider(LoginProviders.MicrosoftEntraId, cancellationToken);
+            // Pre-index by EmployeeNumber so per-user lookup is O(1) instead of scanning
+            // the full employees list for every user. Last-wins on duplicate numbers —
+            // matches the old FirstOrDefault behavior since duplicates would have been
+            // unreachable anyway.
+            var employeeIdByNumber = employees
+                .GroupBy(e => e.EmployeeNumber)
+                .ToDictionary(g => g.Key, g => g.Last().Id);
+
             foreach (var user in users)
             {
-                var employeeId = employees.Where(e => e.EmployeeNumber == user.ObjectId).Select(e => (Guid?)e.Id ?? null).FirstOrDefault();
-                if (!employeeId.HasValue)
+                if (!entraSubjectsByUserId.TryGetValue(user.Id, out var entraSubject))
+                    continue;
+
+                if (!employeeIdByNumber.TryGetValue(entraSubject, out var employeeId))
                     continue;
 
                 user.EmployeeId = employeeId;
@@ -469,18 +483,46 @@ internal partial class UserService
 
     public async Task<Result> SyncUsersFromEmployeeRecords(List<IExternalEmployee> externalEmployees, CancellationToken cancellationToken)
     {
-        var users = await _userManager.Users.Where(u => u.ObjectId != null).ToListAsync(cancellationToken);
+        // Only sync users who have an active Entra identity — that's what pairs them
+        // with an external employee record (keyed by Entra oid). Filter server-side
+        // via an EXISTS subquery against UserIdentities so we don't have to round-
+        // trip user IDs in an IN (...) list, which hits the 2100-parameter SQL
+        // Server limit past a few thousand users.
+        var users = await _userManager.Users
+            .Where(u => _db.UserIdentities.Any(ui =>
+                ui.UserId == u.Id &&
+                ui.IsActive &&
+                ui.Provider == LoginProviders.MicrosoftEntraId))
+            .ToListAsync(cancellationToken);
 
-        _logger.LogDebug("{UserCount} users found with EmployeeId.", users.Count);
+        _logger.LogDebug("{UserCount} users found with an active Entra identity.", users.Count);
         if (users.Count == 0)
             return Result.Success();
 
+        // Second query — just the subject map for the users we actually need to
+        // correlate. Still cheap because it's filtered by active + provider.
+        var entraSubjectsByUserId = await _userIdentityStore.GetActiveSubjectsByProvider(LoginProviders.MicrosoftEntraId, cancellationToken);
+
+        // Pre-index by EmployeeNumber so per-user correlation is O(1) instead of
+        // scanning the full externalEmployees list for every user.
+        var employeesByNumber = externalEmployees
+            .GroupBy(e => e.EmployeeNumber)
+            .ToDictionary(g => g.Key, g => g.Last());
+
         foreach (var user in users)
         {
-            var employee = externalEmployees.FirstOrDefault(e => e.EmployeeNumber == user.ObjectId);
+            if (!entraSubjectsByUserId.TryGetValue(user.Id, out var entraSubject))
+            {
+                // Edge case: user's identity was deactivated between the two queries.
+                continue;
+            }
+
+            var employee = employeesByNumber.GetValueOrDefault(entraSubject);
             if (employee is null)
             {
-                _logger.LogWarning("Employee with Id {EmployeeId} not found.", user.EmployeeId);
+                _logger.LogWarning(
+                    "No external employee record matched Entra subject {EntraSubject} for user {UserId}.",
+                    entraSubject, user.Id);
                 continue;
             }
 
