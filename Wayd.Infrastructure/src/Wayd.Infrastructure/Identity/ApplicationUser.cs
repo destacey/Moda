@@ -24,4 +24,6 @@ public class ApplicationUser : IdentityUser
     public UserPreferences Preferences { get; set; } = new();
 
     public ICollection<ApplicationUserRole> UserRoles { get; set; } = [];
+
+    public ICollection<UserIdentity> Identities { get; set; } = [];
 }

@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Wayd.Common.Application.Identity;
 using Wayd.Common.Application.Identity.Tokens;
+using Wayd.Infrastructure.Identity;
 
 namespace Wayd.Infrastructure.Auth.Local;
 
@@ -15,12 +16,14 @@ internal class TokenService(
     SignInManager<ApplicationUser> signInManager,
     IConfiguration config,
     IDateTimeProvider dateTimeProvider,
+    IUserIdentityStore userIdentityStore,
     ILogger<TokenService> logger) : ITokenService
 {
     private readonly UserManager<ApplicationUser> _userManager = userManager;
     private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
     private readonly IConfiguration _config = config;
     private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
+    private readonly IUserIdentityStore _userIdentityStore = userIdentityStore;
     private readonly ILogger<TokenService> _logger = logger;
 
     public async Task<TokenResponse> GetTokenAsync(LoginCommand command, CancellationToken cancellationToken)
@@ -56,6 +59,16 @@ internal class TokenService(
         {
             _logger.LogWarning("Login failed: user {UserName} is inactive.", command.UserName);
             throw new UnauthorizedException("Your account has been deactivated. Please contact an administrator.");
+        }
+
+        // Require an active UserIdentity row for the Wayd provider. Uniform with
+        // the Entra flow and enables "disable local login for this user" without
+        // a new flag — an admin can deactivate the identity row instead.
+        var hasActiveIdentity = await _userIdentityStore.ExistsActive(user.Id, LoginProviders.Wayd, cancellationToken);
+        if (!hasActiveIdentity)
+        {
+            _logger.LogWarning("Login failed: user {UserName} has no active Wayd identity.", command.UserName);
+            throw new UnauthorizedException("Invalid credentials.");
         }
 
         return await GenerateTokensAndUpdateUser(user);
