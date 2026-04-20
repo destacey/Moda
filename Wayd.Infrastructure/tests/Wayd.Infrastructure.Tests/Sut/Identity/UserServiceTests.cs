@@ -26,9 +26,11 @@ public class UserServiceTests
     private readonly TestingDateTimeProvider _dateTimeProvider;
     private readonly Mock<ISender> _mockSender;
     private readonly Mock<ICurrentUser> _mockCurrentUser;
+    private readonly Mock<IUserIdentityStore> _mockUserIdentityStore;
 
-    // UserService depends on WaydDbContext and GraphServiceClient which are hard to mock.
-    // We test the methods that primarily use UserManager.
+    // UserService depends on WaydDbContext and GraphServiceClient which are hard to
+    // mock. We test methods that don't require them. UserIdentity writes go through
+    // IUserIdentityStore so they can be verified via Moq.
 
     public UserServiceTests()
     {
@@ -52,13 +54,17 @@ public class UserServiceTests
         _mockSender = new Mock<ISender>();
         _mockCurrentUser = new Mock<ICurrentUser>();
         _mockCurrentUser.Setup(x => x.GetUserId()).Returns("current-user-id");
+        _mockUserIdentityStore = new Mock<IUserIdentityStore>();
+
+        // Pass-through: tests don't exercise transaction semantics. Invoke the
+        // action directly so CreateAsync behaves as if the transaction succeeded.
+        _mockUserIdentityStore
+            .Setup(s => s.ExecuteInTransaction(It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()))
+            .Returns<Func<CancellationToken, Task>, CancellationToken>((action, ct) => action(ct));
     }
 
     private UserService CreateSut()
     {
-        // WaydDbContext and GraphServiceClient are required but not used by the methods we test
-        // (CreateAsync, UpdateAsync, ActivateUserAsync, DeactivateUserAsync, AssignRolesAsync).
-        // We pass null! for them since those methods don't touch them.
         return new UserService(
             _mockLogger.Object,
             _mockSignInManager.Object,
@@ -69,7 +75,8 @@ public class UserServiceTests
             null!, // GraphServiceClient - not used by these methods
             _mockSender.Object,
             _dateTimeProvider,
-            _mockCurrentUser.Object);
+            _mockCurrentUser.Object,
+            _mockUserIdentityStore.Object);
     }
 
     private static ApplicationUser CreateUser(string id = "user-1", string userName = "testuser", bool isActive = true, string loginProvider = LoginProviders.MicrosoftEntraId)
@@ -186,6 +193,96 @@ public class UserServiceTests
         result.Error.Should().Contain("Duplicate username.");
         _mockUserManager.Verify(x => x.AddToRoleAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()), Times.Never);
         _mockEvents.Verify(x => x.PublishAsync(It.IsAny<ApplicationUserCreatedEvent>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task CreateAsync_ShouldWriteActiveWaydIdentity_WhenLocalUserCreated()
+    {
+        // Arrange
+        var command = new CreateUserCommand
+        {
+            FirstName = "John",
+            LastName = "Doe",
+            Email = "john@example.com",
+            LoginProvider = LoginProviders.Wayd,
+            Password = "Password123!",
+        };
+
+        _mockUserManager
+            .Setup(x => x.CreateAsync(It.IsAny<ApplicationUser>(), "Password123!"))
+            .ReturnsAsync(IdentityResult.Success);
+        _mockUserManager
+            .Setup(x => x.AddToRoleAsync(It.IsAny<ApplicationUser>(), ApplicationRoles.Basic))
+            .ReturnsAsync(IdentityResult.Success);
+
+        var sut = CreateSut();
+
+        // Act
+        var result = await sut.CreateAsync(command, TestContext.Current.CancellationToken);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        _mockUserIdentityStore.Verify(s => s.Add(
+            It.Is<UserIdentity>(ui =>
+                ui.UserId == result.Value &&
+                ui.Provider == LoginProviders.Wayd &&
+                ui.ProviderTenantId == null &&
+                ui.ProviderSubject == result.Value &&
+                ui.IsActive &&
+                ui.UnlinkedAt == null),
+            It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task CreateAsync_ShouldNotWriteIdentity_WhenEntraAdminProvisionedUser()
+    {
+        // Entra users created by an admin have no oid/tid yet — the identity row
+        // is only written on their first SSO login via the principal flow.
+        var command = new CreateUserCommand
+        {
+            FirstName = "Jane",
+            LastName = "Doe",
+            Email = "jane@example.com",
+            LoginProvider = LoginProviders.MicrosoftEntraId,
+        };
+
+        _mockUserManager
+            .Setup(x => x.CreateAsync(It.IsAny<ApplicationUser>()))
+            .ReturnsAsync(IdentityResult.Success);
+        _mockUserManager
+            .Setup(x => x.AddToRoleAsync(It.IsAny<ApplicationUser>(), ApplicationRoles.Basic))
+            .ReturnsAsync(IdentityResult.Success);
+
+        var sut = CreateSut();
+
+        await sut.CreateAsync(command, TestContext.Current.CancellationToken);
+
+        _mockUserIdentityStore.Verify(s => s.Add(It.IsAny<UserIdentity>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task CreateAsync_ShouldNotWriteIdentity_WhenUserManagerCreateFails()
+    {
+        var command = new CreateUserCommand
+        {
+            FirstName = "John",
+            LastName = "Doe",
+            Email = "john@example.com",
+            LoginProvider = LoginProviders.Wayd,
+            Password = "Password123!",
+        };
+
+        _mockUserManager
+            .Setup(x => x.CreateAsync(It.IsAny<ApplicationUser>(), "Password123!"))
+            .ReturnsAsync(IdentityResult.Failed(new IdentityError { Description = "Duplicate." }));
+
+        var sut = CreateSut();
+
+        var result = await sut.CreateAsync(command, TestContext.Current.CancellationToken);
+
+        result.IsFailure.Should().BeTrue();
+        _mockUserIdentityStore.Verify(s => s.Add(It.IsAny<UserIdentity>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]

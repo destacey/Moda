@@ -52,6 +52,42 @@ public class ApplicationUserConfig : IEntityTypeConfiguration<ApplicationUser>
     }
 }
 
+public class UserIdentityConfig : IEntityTypeConfiguration<UserIdentity>
+{
+    public void Configure(EntityTypeBuilder<UserIdentity> builder)
+    {
+        builder.ToTable("UserIdentities", SchemaNames.Identity);
+
+        builder.HasKey(ui => ui.Id);
+        builder.Property(ui => ui.Id).ValueGeneratedNever();
+
+        builder.Property(ui => ui.UserId).HasMaxLength(450).IsRequired();
+        builder.Property(ui => ui.Provider).HasMaxLength(50).IsRequired();
+        builder.Property(ui => ui.ProviderTenantId).HasMaxLength(100);
+        builder.Property(ui => ui.ProviderSubject).HasMaxLength(256).IsRequired();
+        builder.Property(ui => ui.IsActive).IsRequired();
+        builder.Property(ui => ui.LinkedAt).IsRequired();
+        builder.Property(ui => ui.UnlinkedAt);
+        builder.Property(ui => ui.UnlinkReason).HasMaxLength(50);
+
+        // One active identity per (provider, tenant, subject). Filtered so inactive
+        // rows don't collide and so NULL tenants (Wayd provider) are handled per
+        // SQL Server filtered-unique-index semantics.
+        builder.HasIndex(ui => new { ui.Provider, ui.ProviderTenantId, ui.ProviderSubject })
+            .IsUnique()
+            .HasFilter("[IsActive] = 1")
+            .HasDatabaseName("UX_UserIdentities_Provider_Tenant_Subject_Active");
+
+        builder.HasIndex(ui => ui.UserId)
+            .HasDatabaseName("IX_UserIdentities_UserId");
+
+        builder.HasOne(ui => ui.User)
+            .WithMany(u => u.Identities)
+            .HasForeignKey(ui => ui.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+    }
+}
+
 public class ApplicationRoleConfig : IEntityTypeConfiguration<ApplicationRole>
 {
     public void Configure(EntityTypeBuilder<ApplicationRole> builder)

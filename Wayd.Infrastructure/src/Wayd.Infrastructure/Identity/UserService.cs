@@ -18,7 +18,8 @@ internal partial class UserService(
     GraphServiceClient graphServiceClient,
     ISender sender,
     IDateTimeProvider dateTimeProvider,
-    ICurrentUser currentUser) : IUserService
+    ICurrentUser currentUser,
+    IUserIdentityStore userIdentityStore) : IUserService
 {
     private readonly ILogger<UserService> _logger = logger;
     private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
@@ -30,6 +31,7 @@ internal partial class UserService(
     private readonly ISender _sender = sender;
     private readonly ICurrentUser _currentUser = currentUser;
     private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
+    private readonly IUserIdentityStore _userIdentityStore = userIdentityStore;
 
     public async Task<IReadOnlyList<UserDetailsDto>> SearchAsync(UserListFilter filter, CancellationToken cancellationToken)
     {

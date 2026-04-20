@@ -24,6 +24,7 @@ public class TokenServiceTests
     private readonly IConfiguration _configuration;
     private readonly TestingDateTimeProvider _dateTimeProvider;
     private readonly Mock<ILogger<TokenService>> _mockLogger;
+    private readonly Mock<IUserIdentityStore> _mockUserIdentityStore;
     private readonly TokenService _sut;
 
     public TokenServiceTests()
@@ -51,12 +52,14 @@ public class TokenServiceTests
 
         _dateTimeProvider = new TestingDateTimeProvider(DateTime.UtcNow);
         _mockLogger = new Mock<ILogger<TokenService>>();
+        _mockUserIdentityStore = new Mock<IUserIdentityStore>();
 
         _sut = new TokenService(
             _mockUserManager.Object,
             _mockSignInManager.Object,
             _configuration,
             _dateTimeProvider,
+            _mockUserIdentityStore.Object,
             _mockLogger.Object);
     }
 
@@ -74,6 +77,13 @@ public class TokenServiceTests
         };
     }
 
+    private void SeedActiveWaydIdentity(string userId)
+    {
+        _mockUserIdentityStore
+            .Setup(s => s.ExistsActive(userId, LoginProviders.Wayd, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+    }
+
     #region GetTokenAsync
 
     [Fact]
@@ -81,6 +91,7 @@ public class TokenServiceTests
     {
         // Arrange
         var user = CreateLocalUser();
+        SeedActiveWaydIdentity(user.Id);
         var command = new LoginCommand("testuser", "Password123!");
 
         _mockUserManager.Setup(x => x.FindByNameAsync("testuser")).ReturnsAsync(user);
@@ -113,6 +124,7 @@ public class TokenServiceTests
         var employeeId = Guid.NewGuid();
         var user = CreateLocalUser();
         user.EmployeeId = employeeId;
+        SeedActiveWaydIdentity(user.Id);
         var command = new LoginCommand("testuser", "Password123!");
 
         _mockUserManager.Setup(x => x.FindByNameAsync("testuser")).ReturnsAsync(user);
@@ -216,10 +228,33 @@ public class TokenServiceTests
     }
 
     [Fact]
+    public async Task GetTokenAsync_ShouldThrowUnauthorized_WhenNoActiveWaydIdentity()
+    {
+        // Credentials valid, user active, but the UserIdentity row has been deactivated
+        // (admin-revoked local login). Must fail without issuing a token.
+        var user = CreateLocalUser();
+        _mockUserManager.Setup(x => x.FindByNameAsync("testuser")).ReturnsAsync(user);
+        _mockSignInManager.Setup(x => x.CheckPasswordSignInAsync(user, "Password123!", true))
+            .ReturnsAsync(SignInResult.Success);
+        _mockUserIdentityStore
+            .Setup(s => s.ExistsActive(user.Id, LoginProviders.Wayd, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(false);
+
+        var command = new LoginCommand("testuser", "Password123!");
+
+        var act = () => _sut.GetTokenAsync(command, TestContext.Current.CancellationToken);
+
+        await act.Should().ThrowAsync<UnauthorizedException>()
+            .WithMessage("Invalid credentials.");
+        _mockUserManager.Verify(x => x.UpdateAsync(It.IsAny<ApplicationUser>()), Times.Never);
+    }
+
+    [Fact]
     public async Task GetTokenAsync_ShouldUpdateRefreshToken_WhenLoginSucceeds()
     {
         // Arrange
         var user = CreateLocalUser();
+        SeedActiveWaydIdentity(user.Id);
         var command = new LoginCommand("testuser", "Password123!");
 
         _mockUserManager.Setup(x => x.FindByNameAsync("testuser")).ReturnsAsync(user);
@@ -245,6 +280,7 @@ public class TokenServiceTests
     {
         // Arrange - first get a valid token
         var user = CreateLocalUser();
+        SeedActiveWaydIdentity(user.Id);
         user.RefreshToken = "valid-refresh-token";
         user.RefreshTokenExpiryTime = _dateTimeProvider.Now.ToDateTimeUtc().AddDays(7);
 
@@ -280,6 +316,7 @@ public class TokenServiceTests
     {
         // Arrange - get a valid JWT first
         var user = CreateLocalUser();
+        SeedActiveWaydIdentity(user.Id);
         user.RefreshToken = "stored-refresh-token";
         user.RefreshTokenExpiryTime = _dateTimeProvider.Now.ToDateTimeUtc().AddDays(7);
 
@@ -308,6 +345,7 @@ public class TokenServiceTests
     {
         // Arrange
         var user = CreateLocalUser();
+        SeedActiveWaydIdentity(user.Id);
 
         _mockUserManager.Setup(x => x.FindByNameAsync("testuser")).ReturnsAsync(user);
         _mockSignInManager.Setup(x => x.CheckPasswordSignInAsync(user, "Password123!", true))
@@ -337,6 +375,7 @@ public class TokenServiceTests
     {
         // Arrange
         var user = CreateLocalUser();
+        SeedActiveWaydIdentity(user.Id);
 
         _mockUserManager.Setup(x => x.FindByNameAsync("testuser")).ReturnsAsync(user);
         _mockSignInManager.Setup(x => x.CheckPasswordSignInAsync(user, "Password123!", true))
@@ -360,6 +399,38 @@ public class TokenServiceTests
             .WithMessage("User account is inactive.");
     }
 
+    [Fact]
+    public async Task RefreshTokenAsync_ShouldThrowUnauthorized_WhenWaydIdentityDeactivatedAfterLogin()
+    {
+        // Simulates admin revocation of the user's local login between issuing the
+        // initial token and the refresh. The refresh must fail — otherwise a revoked
+        // user could keep minting access tokens until the refresh-token TTL elapses.
+        var user = CreateLocalUser();
+        SeedActiveWaydIdentity(user.Id);
+
+        _mockUserManager.Setup(x => x.FindByNameAsync("testuser")).ReturnsAsync(user);
+        _mockSignInManager.Setup(x => x.CheckPasswordSignInAsync(user, "Password123!", true))
+            .ReturnsAsync(SignInResult.Success);
+        _mockUserManager.Setup(x => x.UpdateAsync(user)).ReturnsAsync(IdentityResult.Success);
+
+        var tokenResponse = await _sut.GetTokenAsync(new LoginCommand("testuser", "Password123!"), TestContext.Current.CancellationToken);
+        var currentRefreshToken = user.RefreshToken;
+
+        _mockUserManager.Setup(x => x.FindByIdAsync("user-1")).ReturnsAsync(user);
+
+        // Deactivate the Wayd identity after the initial token was issued.
+        _mockUserIdentityStore
+            .Setup(s => s.ExistsActive(user.Id, LoginProviders.Wayd, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(false);
+
+        var refreshCommand = new RefreshTokenCommand(tokenResponse.Token, currentRefreshToken!);
+
+        var act = () => _sut.RefreshTokenAsync(refreshCommand, TestContext.Current.CancellationToken);
+
+        await act.Should().ThrowAsync<UnauthorizedException>()
+            .WithMessage("Invalid credentials.");
+    }
+
     #endregion
 
     #region GetSettings
@@ -374,9 +445,11 @@ public class TokenServiceTests
             _mockSignInManager.Object,
             emptyConfig,
             _dateTimeProvider,
+            _mockUserIdentityStore.Object,
             _mockLogger.Object);
 
         var user = CreateLocalUser();
+        SeedActiveWaydIdentity(user.Id);
         _mockUserManager.Setup(x => x.FindByNameAsync("testuser")).ReturnsAsync(user);
         _mockSignInManager.Setup(x => x.CheckPasswordSignInAsync(user, "Password123!", true))
             .ReturnsAsync(SignInResult.Success);
