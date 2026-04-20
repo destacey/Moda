@@ -139,6 +139,8 @@ Two methods, configured per user via `LoginProvider`:
 
 Key files: `Wayd.Infrastructure/Auth/Local/TokenService.cs`, `wayd.web.reactclient/src/components/contexts/auth/auth-context.tsx`
 
+**Ongoing refactor:** the identity model (how users link to login providers) is being generalized. See [docs/contributing/specs/identity-model-refactor.mdx](docs/contributing/specs/identity-model-refactor.mdx) — multi-PR spec covering a `UserIdentity` table, multi-provider support (Entra + Auth0), tenant-migration history, and a future token-exchange flow.
+
 ### Feature Flags
 
 Microsoft.FeatureManagement — defined in code, stored in database, managed via Settings UI.

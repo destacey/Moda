@@ -1,0 +1,298 @@
+---
+title: Identity Model Refactor
+description: Multi-PR spec for unifying Wayd's identity model across login providers, supporting tenant migrations, and enabling token exchange.
+sidebar_position: 1
+audience: [developer, agent]
+---
+
+# Identity Model Refactor
+
+This spec coordinates a multi-PR effort to generalize Wayd's identity model so it can support:
+
+1. Multiple OIDC providers side-by-side (Microsoft Entra ID today, Auth0 soon).
+2. Multi-tenant Entra logins where different orgs' tenants are onboarded independently.
+3. History-preserving tenant migrations (e.g., an org moves their users from one Entra tenant to another).
+4. A future token-exchange flow that mints a Wayd JWT carrying permission claims, eliminating the "Loading Permissions" wait on first load after inactivity.
+
+The work is sequenced across several PRs so each is independently shippable and reversible.
+
+## Background
+
+### Today's model
+
+Identity linkage lives as flat columns on [`ApplicationUser`](../../../Wayd.Infrastructure/src/Wayd.Infrastructure/Identity/ApplicationUser.cs):
+
+- `ObjectId` — nullable string, populated from the Entra `oid` claim. Unused by the local (Wayd) provider.
+- `LoginProvider` — `"MicrosoftEntraId"` or `"Wayd"` (see [`LoginProviders`](../../../Wayd.Common/src/Wayd.Common.Application/Identity/LoginProviders.cs)).
+
+Lookups diverge by provider:
+
+- Entra: [`UserService.CreateUpdate.cs:35`](../../../Wayd.Infrastructure/src/Wayd.Infrastructure/Identity/UserService.CreateUpdate.cs#L35) — `u.ObjectId == objectId`.
+- Local: [`TokenService.cs:28`](../../../Wayd.Infrastructure/src/Wayd.Infrastructure/Auth/Local/TokenService.cs#L28) — `FindByNameAsync(username)`.
+
+### Why this shape doesn't generalize
+
+- No uniqueness guarantee per provider. `ObjectId` has no index; nothing prevents an Auth0 `sub` colliding with an Entra `oid`.
+- No tenant dimension. Multi-tenant Entra works today by accident (Entra `oid`s are globally unique within Entra). A second OIDC provider breaks that assumption.
+- `ObjectId` is Entra's word. In an OIDC-generic world the field is the `sub` claim.
+- A tenant migration (same human, new tenant → new `tid` + new `oid`) has no clean representation. Overwriting the flat columns loses audit history.
+
+### What's changing
+
+Introduce a `UserIdentity` table — one row per (user, provider-identity) pair — with columns `(Provider, ProviderTenantId, ProviderSubject)`. Every authentication path resolves through the same lookup. History is preserved by marking old rows inactive rather than deleting them.
+
+## Target model
+
+```mermaid
+erDiagram
+    ApplicationUser ||--o{ UserIdentity : has
+    ApplicationUser {
+        string Id PK
+        string UserName
+        string Email
+        string LoginProvider "primary provider (default)"
+        string PendingMigrationTenantId "nullable; staged tenant move"
+    }
+    UserIdentity {
+        guid Id PK
+        string UserId FK
+        string Provider "MicrosoftEntraId | Wayd | Auth0"
+        string ProviderTenantId "Entra tid, Auth0 tenant, null for Wayd"
+        string ProviderSubject "Entra oid, Auth0 sub, ApplicationUser.Id for Wayd"
+        bool IsActive
+        Instant LinkedAt
+        Instant UnlinkedAt "nullable"
+        string UnlinkReason "nullable; TenantMigration | AdminRevoked | UserUnlinked"
+    }
+```
+
+### Invariants
+
+- Unique filtered index: `(Provider, ProviderTenantId, ProviderSubject) WHERE IsActive = 1`. `NULL` tenant values are distinct under SQL Server's filtered unique index semantics.
+- Every `ApplicationUser` has **exactly one** active `UserIdentity` at rest. (Transient second rows may exist mid-transaction during a rebind.)
+- Local users get a row with `Provider = "Wayd"`, `ProviderTenantId = NULL`, `ProviderSubject = ApplicationUser.Id.ToString()`. The stable Wayd user id is the subject — not the username, which is mutable.
+- `ApplicationUser.LoginProvider` is retained as a "default/primary" indicator to avoid churn in code that reads it today. It mirrors the active `UserIdentity.Provider`.
+
+### Unified lookup
+
+```csharp
+var identity = db.UserIdentities.SingleOrDefault(i =>
+    i.IsActive &&
+    i.Provider == provider &&
+    i.ProviderTenantId == tenantId &&
+    i.ProviderSubject == subject);
+```
+
+Every provider — Entra, Auth0, Wayd local — uses the same query. Provider-specific logic is confined to *how the incoming credential is validated* (OIDC token vs. username/password), not how the user is resolved.
+
+## PR sequence
+
+Four PRs, landing in order. Each is independently shippable and reversible.
+
+### PR 1 — Introduce `UserIdentity` table + cutover (invisible)
+
+**Goal:** replace the flat `ObjectId` column with a proper identity table. No behavior changes, no new features. If done right, no user notices.
+
+**Scope:**
+
+- New `UserIdentity` entity, EF config, fluent mapping.
+- Filtered unique index on `(Provider, ProviderTenantId, ProviderSubject) WHERE IsActive = 1`.
+- Migration:
+  - Create `UserIdentity` table.
+  - Backfill: one row per existing `ApplicationUser`:
+    - Entra users (`LoginProvider = "MicrosoftEntraId"`, `ObjectId IS NOT NULL`) → `Provider = "MicrosoftEntraId"`, `ProviderSubject = ObjectId`, `ProviderTenantId = NULL`.
+    - Local users (`LoginProvider = "Wayd"`) → `Provider = "Wayd"`, `ProviderSubject = ApplicationUser.Id`, `ProviderTenantId = NULL`.
+  - Leave `ApplicationUser.ObjectId` in place (rollback safety net).
+- Update lookup sites:
+  - [`UserService.CreateUpdate.cs:35`](../../../Wayd.Infrastructure/src/Wayd.Infrastructure/Identity/UserService.CreateUpdate.cs#L35) — query `UserIdentity` by `(Provider, ProviderTenantId, ProviderSubject)`.
+  - [`TokenService.cs:28`](../../../Wayd.Infrastructure/src/Wayd.Infrastructure/Auth/Local/TokenService.cs#L28) — resolve by username → `ApplicationUser`, then assert an active `Wayd` `UserIdentity` row exists. Deactivated row ⇒ deny login.
+- **Null-`tid` upgrade path on Entra login:**
+  - If no match on `(provider, tid, sub)`, fall back to `(provider, sub)` where `ProviderTenantId IS NULL`.
+  - If exactly one row matches, write `tid` into it and proceed.
+  - If more than one row matches (e.g., `oid` collision across tenants — astronomically unlikely but possible), bail out and log. Do **not** auto-link.
+  - Use a transaction with appropriate locking to prevent concurrent-login races from racing each other through the upgrade.
+
+**Out of scope for PR 1:**
+
+- Dropping `ObjectId` from `ApplicationUser`. Keep one release as rollback safety.
+- Removing `ApplicationUser.LoginProvider`.
+- Any admin UI.
+- Tenant migration rebind.
+- Token exchange endpoint.
+
+**Pre-deploy audit queries (must all return 0 before deploy):**
+
+```sql
+-- Any user with an ObjectId but wrong provider tag?
+SELECT COUNT(*) FROM identity.Users
+WHERE ObjectId IS NOT NULL AND LoginProvider <> 'MicrosoftEntraId';
+
+-- Any Entra user missing their ObjectId?
+SELECT COUNT(*) FROM identity.Users
+WHERE LoginProvider = 'MicrosoftEntraId' AND ObjectId IS NULL;
+```
+
+**Post-migration assertion:** every `ApplicationUser` has exactly one active `UserIdentity`. Fail the deploy if not.
+
+**Rollback plan:** revert code. Old `ObjectId`-based lookups work unchanged. `UserIdentity` table sits unused, which is harmless.
+
+**Merge criteria:** logs show the null-`tid` upgrade path populating tenants on normal logins for at least a few days, across both providers. Zero duplicate-user creations. Zero login failures attributable to the new lookup.
+
+### PR 2 — Drop `ObjectId` from `ApplicationUser`
+
+Tiny cleanup PR once PR 1 has been stable in prod for a release cycle (a week or two).
+
+**Scope:**
+
+- Remove `ObjectId` property from [`ApplicationUser`](../../../Wayd.Infrastructure/src/Wayd.Infrastructure/Identity/ApplicationUser.cs).
+- Remove from [`ApplicationUserConfig`](../../../Wayd.Infrastructure/src/Wayd.Infrastructure/Persistence/Configuration/IdentityConfiguration.cs).
+- Migration: drop the column.
+- Clean up references (e.g., `SyncUsersFromEmployeeRecords`, `UpdateMissingEmployeeIds` which read `ObjectId` today — they need to read from the `UserIdentity` row instead, or be rewritten to use a different employee correlation).
+
+**Rollback:** harder. Restoring the column requires re-backfilling from `UserIdentity`. Hence the one-release gap after PR 1 to be sure.
+
+### PR 3 — Token exchange + Wayd JWT with permission claims (multi-PR effort on its own)
+
+This is the architectural shift that also fixes the 10-second "Loading Permissions" screen. It will likely span several PRs internally.
+
+**Premise:** treat external IdP tokens (Entra, Auth0) as *identity assertions*, not API credentials. The API only ever validates Wayd JWTs.
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant F as Frontend (MSAL / auth0-spa-js)
+    participant E as External IdP (Entra / Auth0)
+    participant X as Wayd /auth/exchange
+    participant A as Wayd API
+
+    U->>F: Opens app
+    F->>E: Silent login / redirect
+    E-->>F: IdP id token (iss, tid, sub, email)
+    F->>X: POST /auth/exchange { provider, idToken }
+    X->>X: Validate signature via provider's JWKS
+    X->>X: Lookup UserIdentity (provider, tid, sub)
+    X->>X: Load permissions
+    X-->>F: Wayd JWT (sub=userId, roles, permissions, permissionsVersion)
+    F->>A: API call with Wayd JWT
+    A->>A: Validate Wayd JWT only
+    A-->>F: Response
+```
+
+**Provider registry (backend config):**
+
+```
+{ name, type: "entra" | "auth0" | "oidc-generic",
+  issuer, audience, jwksUri, tenantId?, allowedDomains?, userMappingStrategy }
+```
+
+One config row per onboarded external tenant. Multi-tenant Entra = N rows, one per onboarded org's `tid`. Auth0 = N rows, one per Auth0 tenant.
+
+**Exchange endpoint responsibilities:**
+
+1. Resolve provider config by `iss`.
+2. Fetch/cache provider JWKS. Validate signature, issuer, audience, expiry.
+3. Extract `(ProviderTenantId, ProviderSubject)` per provider's rules (Entra: `tid`, `oid`; Auth0: tenant, `sub`).
+4. Resolve via `UserIdentity` lookup.
+5. Load permissions.
+6. Mint Wayd JWT. Include `permissionsVersion` claim.
+7. Return JWT + refresh token.
+
+**Frontend changes:**
+
+- auth-context no longer calls `useGetUserPermissionsQuery`. Permissions are decoded from Wayd JWT claims.
+- MSAL and Auth0 SDKs both feed `/auth/exchange`. After exchange, the provider SDK is only used to silently refresh the *external* id token when the Wayd JWT refresh flow requires it.
+- "Loading Permissions" screen goes away — claims arrive with the JWT, no extra round-trip.
+- Home-realm discovery (email domain → which provider SDK to initialize) is a new pre-login step if Auth0 is onboarded.
+
+**Permission revocation latency:**
+
+- Short Wayd JWT lifetime (5–15 min) + silent refresh.
+- `permissionsVersion` claim lets the backend force a refresh when permissions change server-side (client compares its cached version to the one it expects; on mismatch, triggers re-exchange).
+
+**JWKS caching:** per-provider with sane TTL. Cold starts must not block logins for seconds.
+
+**Logout:** each provider has its own end-session endpoint. The logout handler dispatches to the right one based on the user's active `UserIdentity.Provider`.
+
+### PR 4 — Admin-initiated tenant migration
+
+Land this just before the org's migration window. Builds on PR 3's exchange endpoint — the rebind lives naturally in the exchange handler.
+
+**Scope:**
+
+- Add `PendingMigrationTenantId` (nullable) to `ApplicationUser`. Migration only, no backfill.
+- Admin UI action on the user detail page: "Migrate to new tenant" — captures target `tid`, sets `PendingMigrationTenantId`. Permissions-gated.
+- Exchange-endpoint migration logic:
+  - On no-match for `(provider, tid, sub)`, check for a user with matching email *and* `PendingMigrationTenantId == token.tid`.
+  - If found, do the transactional rebind in one shot:
+    1. Mark existing active `UserIdentity` row inactive. Set `UnlinkedAt`, `UnlinkReason = "TenantMigration"`.
+    2. Insert new active row with `(provider, token.tid, token.sub)`.
+    3. Clear `PendingMigrationTenantId`.
+  - `UserId` never changes. Every FK downstream (permissions, work items, audit) is preserved.
+- Admin UI: identity-history view on user detail page (read-only list of past + current `UserIdentity` rows with timestamps and reasons). Without this, history's value isn't realized.
+- Cancel action: clear `PendingMigrationTenantId` if staged but not yet completed.
+
+**Test scenarios (non-exhaustive):**
+
+- Admin stages migration, user logs in from new tenant → rebind happens. Old row inactive with correct reason. Downstream FKs untouched.
+- Admin stages migration, user logs in from old tenant → normal login, no rebind, flag still pending.
+- Different user with same email logs in from new tenant → no rebind. Email match scoped to the flagged user only.
+- Concurrent admin writes → last-write-wins on flag, no corruption.
+
+**Out of scope (future extensions):**
+
+- Self-service migration with email verification.
+- Bulk CSV/API migration import.
+
+## Cross-cutting decisions
+
+### Local users in `UserIdentity`
+
+Local (Wayd) users get a row in `UserIdentity` with `ProviderSubject = ApplicationUser.Id`. Two reasons:
+
+1. **Uniformity.** One lookup path for all providers. The exchange endpoint doesn't branch on provider for identity resolution.
+2. **Username mutability.** Usernames will be user-editable in the future. The subject in `UserIdentity` must be immutable — the `ApplicationUser.Id` is the stable identifier. A username rename touches `ApplicationUser.UserName` only; `UserIdentity` is untouched.
+
+The local-login flow still resolves by username first (`FindByNameAsync`), verifies the password, and then asserts that an active `Wayd` `UserIdentity` exists. Step 2 looks redundant today but enables "disable local login for this specific user" as a natural consequence (deactivate the identity row — no new flag, no schema change).
+
+### Why `ApplicationUser.LoginProvider` stays
+
+Redundant in principle (could derive from the active `UserIdentity` row), but keeping it:
+
+- Avoids churn in code that reads it today (e.g., password-change/reset gating).
+- Gives the UI a cheap "primary provider" indicator without joining to `UserIdentity`.
+- Can be removed in a future cleanup PR if it proves to drift from `UserIdentity`.
+
+### Tenant migration history
+
+Every rebind preserves the old `UserIdentity` row (inactive, with `UnlinkedAt` + `UnlinkReason`). This gives:
+
+- An audit trail of which tenant a user used to belong to.
+- Debuggability for "why did this user end up with this `UserId`?"
+- A natural place to record non-migration unlink events (`AdminRevoked`, `UserUnlinked`) if that's ever needed.
+
+### What this does *not* address
+
+- **Account linking** (one Wayd user authenticating via multiple providers simultaneously — e.g., both Entra and Auth0). The schema supports it — multiple active rows per user — but no flow creates that state today. Defer until there's a concrete need.
+- **Auth0 onboarding itself.** PR 1 makes Auth0 a config/provider-registry problem rather than a schema problem; the actual Auth0 integration is downstream of PR 3.
+- **Personal Microsoft accounts.** Out of scope for all four PRs. The email-trust assumptions in migration (PR 4) rely on org-controlled tenants.
+
+## Impact on the "Loading Permissions" delay
+
+The 10-second "Loading Permissions" screen users see on first load after ~24 hours of inactivity is caused by a sequential waterfall in the frontend:
+
+1. MSAL forces a silent token refresh (3–8s when the access token has expired).
+2. RTK Query's permissions fetch (60-second cache, long-gone after 24h) waits for the token refresh.
+3. User profile assembly waits for permissions.
+
+The perf problem is fixed by **PR 3**, not PR 1 or PR 2. Embedding permissions as Wayd JWT claims eliminates step 2 entirely; silent refresh returns a token that already carries everything auth-context needs.
+
+This is called out here because it's often the spark for discussing this work, and it's useful to know which PR actually delivers the fix.
+
+## References
+
+- [`ApplicationUser`](../../../Wayd.Infrastructure/src/Wayd.Infrastructure/Identity/ApplicationUser.cs) — current user entity.
+- [`LoginProviders`](../../../Wayd.Common/src/Wayd.Common.Application/Identity/LoginProviders.cs) — provider constants.
+- [`UserService.CreateUpdate.cs`](../../../Wayd.Infrastructure/src/Wayd.Infrastructure/Identity/UserService.CreateUpdate.cs) — Entra lookup + create/update from principal.
+- [`TokenService.cs`](../../../Wayd.Infrastructure/src/Wayd.Infrastructure/Auth/Local/TokenService.cs) — local JWT issuance.
+- [`IdentityConfiguration.cs`](../../../Wayd.Infrastructure/src/Wayd.Infrastructure/Persistence/Configuration/IdentityConfiguration.cs) — EF Core mapping.
+- [Configuration > Authentication](../configuration.mdx#authentication) — dev-side auth setup.

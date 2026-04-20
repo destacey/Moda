@@ -19,6 +19,10 @@ Wayd.Web/src/Wayd.Web.Api/Configurations/database.json
 
 Wayd supports two authentication providers:
 
+:::info Ongoing refactor
+The identity model that links users to their login providers is being generalized to support multiple OIDC providers, multi-tenant Entra, tenant migrations, and a future token-exchange flow. See [Identity Model Refactor](./specs/identity-model-refactor.mdx) for the multi-PR spec.
+:::
+
 ### Microsoft Entra ID (Azure AD)
 
 Create a `.env` file in the repository root:
